@@ -18,13 +18,13 @@ void lv_example_dropdown_3(void)
     lv_obj_t * dropdown = lv_dropdown_create(lv_scr_act());
     lv_obj_align(dropdown, LV_ALIGN_TOP_LEFT, 10, 10);
     lv_dropdown_set_options(dropdown, "New project\n"
-                                      "New file\n"
-                                      "Save\n"
-                                      "Save as ...\n"
-                                      "Open project\n"
-                                      "Recent projects\n"
-                                      "Preferences\n"
-                                      "Exit");
+                            "New file\n"
+                            "Save\n"
+                            "Save as ...\n"
+                            "Open project\n"
+                            "Recent projects\n"
+                            "Preferences\n"
+                            "Exit");
 
     /*Set a fixed text to display on the button of the drop-down list*/
     lv_dropdown_set_text(dropdown, "Menu");

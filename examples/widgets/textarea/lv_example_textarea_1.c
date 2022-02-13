@@ -28,9 +28,10 @@ void lv_example_textarea_1(void)
     lv_obj_add_state(ta, LV_STATE_FOCUSED); /*To be sure the cursor is visible*/
 
     static const char * btnm_map[] = {"1", "2", "3", "\n",
-                               "4", "5", "6", "\n",
-                               "7", "8", "9", "\n",
-                               LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_NEW_LINE, ""};
+                                      "4", "5", "6", "\n",
+                                      "7", "8", "9", "\n",
+                                      LV_SYMBOL_BACKSPACE, "0", LV_SYMBOL_NEW_LINE, ""
+                                     };
 
     lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act());
     lv_obj_set_size(btnm, 200, 150);

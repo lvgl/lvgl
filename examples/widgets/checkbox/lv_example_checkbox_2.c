@@ -59,7 +59,7 @@ void lv_example_checkbox_2(void)
     lv_obj_set_size(cont1, lv_pct(40), lv_pct(80));
     lv_obj_add_event_cb(cont1, radio_event_handler, LV_EVENT_CLICKED, &active_index_1);
 
-    for (i = 0;i < 5;i++) {
+    for(i = 0; i < 5; i++) {
         lv_snprintf(buf, sizeof(buf), "A %d", (int)i + 1);
         radiobutton_create(cont1, buf);
 
@@ -73,7 +73,7 @@ void lv_example_checkbox_2(void)
     lv_obj_set_x(cont2, lv_pct(50));
     lv_obj_add_event_cb(cont2, radio_event_handler, LV_EVENT_CLICKED, &active_index_2);
 
-    for (i = 0;i < 3;i++) {
+    for(i = 0; i < 3; i++) {
         lv_snprintf(buf, sizeof(buf), "B %d", (int)i + 1);
         radiobutton_create(cont2, buf);
     }

@@ -36,7 +36,7 @@ void lv_example_grid_5(void)
 
         obj = lv_obj_create(cont);
         lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_STRETCH, col, 1,
-                                 LV_GRID_ALIGN_STRETCH, row, 1);
+                             LV_GRID_ALIGN_STRETCH, row, 1);
         label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "%d,%d", col, row);
         lv_obj_center(label);

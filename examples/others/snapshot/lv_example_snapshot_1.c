@@ -1,14 +1,14 @@
 #include "../../lv_examples.h"
 #if LV_USE_SNAPSHOT && LV_BUILD_EXAMPLES
 
-static void event_cb(lv_event_t* e)
+static void event_cb(lv_event_t * e)
 {
     lv_obj_t * snapshot_obj = lv_event_get_user_data(e);
     lv_obj_t * img = lv_event_get_target(e);
 
     if(snapshot_obj) {
-        lv_img_dsc_t* snapshot = (void*)lv_img_get_src(snapshot_obj);
-        if(snapshot){
+        lv_img_dsc_t * snapshot = (void *)lv_img_get_src(snapshot_obj);
+        if(snapshot) {
             lv_snapshot_free(snapshot);
         }
 

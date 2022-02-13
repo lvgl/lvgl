@@ -74,7 +74,7 @@ void lv_example_chart_6(void)
     ser = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_chart_set_next_value(chart, ser, lv_rand(10,90));
+        lv_chart_set_next_value(chart, ser, lv_rand(10, 90));
     }
 
     lv_chart_set_zoom_x(chart, 500);

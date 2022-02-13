@@ -19,9 +19,9 @@ void lv_example_label_2(void)
     /*Create the main label*/
     lv_obj_t * main_label = lv_label_create(lv_scr_act());
     lv_label_set_text(main_label, "A simple method to create\n"
-                                  "shadows on a text.\n"
-                                  "It even works with\n\n"
-                                  "newlines     and spaces.");
+                      "shadows on a text.\n"
+                      "It even works with\n\n"
+                      "newlines     and spaces.");
 
     /*Set the same text for the shadow label*/
     lv_label_set_text(shadow_label, lv_label_get_text(main_label));

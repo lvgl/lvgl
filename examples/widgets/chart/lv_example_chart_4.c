@@ -78,8 +78,8 @@ void lv_example_chart_4(void)
     lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_chart_set_next_value(chart, ser1, lv_rand(60,90));
-        lv_chart_set_next_value(chart, ser2, lv_rand(10,40));
+        lv_chart_set_next_value(chart, ser1, lv_rand(60, 90));
+        lv_chart_set_next_value(chart, ser2, lv_rand(10, 40));
     }
 }
 

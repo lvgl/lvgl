@@ -17,11 +17,11 @@ static void float_btn_event_cb(lv_event_t * e)
     lv_obj_t * sub_page = lv_menu_page_create(menu, NULL);
 
     cont = lv_menu_cont_create(sub_page);
-    label= lv_label_create(cont);
+    label = lv_label_create(cont);
     lv_label_set_text_fmt(label, "Hello, I am hiding inside %i", btn_cnt);
 
     cont = lv_menu_cont_create(main_page);
-    label= lv_label_create(cont);
+    label = lv_label_create(cont);
     lv_label_set_text_fmt(label, "Item %i", btn_cnt);
     lv_menu_set_load_page_event(menu, cont, sub_page);
 

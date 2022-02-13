@@ -93,7 +93,7 @@ static void btn_start_event_handler(lv_event_t * e)
 {
     lv_obj_t * btn = lv_event_get_target(e);
 
-    if (!anim_timeline) {
+    if(!anim_timeline) {
         anim_timeline_create();
     }
 
@@ -105,7 +105,7 @@ static void btn_start_event_handler(lv_event_t * e)
 static void btn_del_event_handler(lv_event_t * e)
 {
     LV_UNUSED(e);
-    if (anim_timeline) {
+    if(anim_timeline) {
         lv_anim_timeline_del(anim_timeline);
         anim_timeline = NULL;
     }
@@ -114,7 +114,7 @@ static void btn_del_event_handler(lv_event_t * e)
 static void btn_stop_event_handler(lv_event_t * e)
 {
     LV_UNUSED(e);
-    if (anim_timeline) {
+    if(anim_timeline) {
         lv_anim_timeline_stop(anim_timeline);
     }
 }
@@ -123,7 +123,7 @@ static void slider_prg_event_handler(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target(e);
 
-    if (!anim_timeline) {
+    if(!anim_timeline) {
         anim_timeline_create();
     }
 

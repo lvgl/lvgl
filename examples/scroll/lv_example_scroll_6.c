@@ -27,7 +27,8 @@ static void scroll_event_cb(lv_event_t * e)
         /*If diff_y is out of the circle use the last point of the circle (the radius)*/
         if(diff_y >= r) {
             x = r;
-        } else {
+        }
+        else {
             /*Use Pythagoras theorem to get x from radius and y*/
             uint32_t x_sqr = r * r - diff_y * diff_y;
             lv_sqrt_res_t res;

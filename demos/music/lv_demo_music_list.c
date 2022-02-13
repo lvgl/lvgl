@@ -102,7 +102,7 @@ lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
 
     lv_style_init(&style_artist);
     lv_style_set_text_font(&style_artist, font_small);
-    lv_style_set_text_color(&style_artist,lv_color_hex(0xb1b0be));
+    lv_style_set_text_color(&style_artist, lv_color_hex(0xb1b0be));
 
     lv_style_init(&style_time);
     lv_style_set_text_font(&style_time, font_medium);
