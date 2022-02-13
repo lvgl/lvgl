@@ -7,20 +7,20 @@ static void event_cb(lv_event_t * e)
     lv_obj_t * label = lv_event_get_user_data(e);
 
     switch(code) {
-    case LV_EVENT_PRESSED:
-        lv_label_set_text(label, "The last button event:\nLV_EVENT_PRESSED");
-        break;
-    case LV_EVENT_CLICKED:
-        lv_label_set_text(label, "The last button event:\nLV_EVENT_CLICKED");
-        break;
-    case LV_EVENT_LONG_PRESSED:
-        lv_label_set_text(label, "The last button event:\nLV_EVENT_LONG_PRESSED");
-        break;
-    case LV_EVENT_LONG_PRESSED_REPEAT:
-        lv_label_set_text(label, "The last button event:\nLV_EVENT_LONG_PRESSED_REPEAT");
-        break;
-    default:
-        break;
+        case LV_EVENT_PRESSED:
+            lv_label_set_text(label, "The last button event:\nLV_EVENT_PRESSED");
+            break;
+        case LV_EVENT_CLICKED:
+            lv_label_set_text(label, "The last button event:\nLV_EVENT_CLICKED");
+            break;
+        case LV_EVENT_LONG_PRESSED:
+            lv_label_set_text(label, "The last button event:\nLV_EVENT_LONG_PRESSED");
+            break;
+        case LV_EVENT_LONG_PRESSED_REPEAT:
+            lv_label_set_text(label, "The last button event:\nLV_EVENT_LONG_PRESSED_REPEAT");
+            break;
+        default:
+            break;
     }
 }
 

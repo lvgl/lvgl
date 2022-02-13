@@ -20,7 +20,7 @@ static void ta_event_cb(lv_event_t * e)
 void lv_example_keyboard_1(void)
 {
     /*Create a keyboard to use it with an of the text areas*/
-    lv_obj_t *kb = lv_keyboard_create(lv_scr_act());
+    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
 
     /*Create a text area. The keyboard will write here*/
     lv_obj_t * ta;

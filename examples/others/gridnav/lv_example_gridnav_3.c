@@ -55,16 +55,16 @@ void lv_example_gridnav_3(void)
     lv_obj_set_style_bg_color(cont_sub1, lv_palette_lighten(LV_PALETTE_RED, 5), LV_STATE_FOCUSED);
     lv_obj_set_width(label, lv_pct(100));
     lv_label_set_text(label,
-            "I'm a very long text which is makes my container scrollable. "
-            "As LV_GRIDNAV_FLAG_SCROLL_FIRST is enabled arrow will scroll me first "
-            "and a new objects will be focused only when an edge is reached with the scrolling.\n\n"
-            "This is only some placeholder text to be sure the parent will be scrollable. \n\n"
-            "Hello world!\n"
-            "Hello world!\n"
-            "Hello world!\n"
-            "Hello world!\n"
-            "Hello world!\n"
-            "Hello world!");
+                      "I'm a very long text which is makes my container scrollable. "
+                      "As LV_GRIDNAV_FLAG_SCROLL_FIRST is enabled arrow will scroll me first "
+                      "and a new objects will be focused only when an edge is reached with the scrolling.\n\n"
+                      "This is only some placeholder text to be sure the parent will be scrollable. \n\n"
+                      "Hello world!\n"
+                      "Hello world!\n"
+                      "Hello world!\n"
+                      "Hello world!\n"
+                      "Hello world!\n"
+                      "Hello world!");
 
     /*Create a third container that can be focused with ENTER and contains an other grid nav*/
     lv_obj_t * cont_sub2 = lv_obj_create(cont_main);

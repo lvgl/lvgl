@@ -8,7 +8,7 @@
  */
 void lv_example_tileview_1(void)
 {
-    lv_obj_t *tv = lv_tileview_create(lv_scr_act());
+    lv_obj_t * tv = lv_tileview_create(lv_scr_act());
 
     /*Tile1: just a label*/
     lv_obj_t * tile1 = lv_tileview_add_tile(tv, 0, 0, LV_DIR_BOTTOM);

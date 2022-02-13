@@ -38,7 +38,8 @@ void lv_example_chart_3(void)
 
     /*Add two data series*/
     lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_lighten(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_darken(LV_PALETTE_GREEN, 2), LV_CHART_AXIS_SECONDARY_Y);
+    lv_chart_series_t * ser2 = lv_chart_add_series(chart, lv_palette_darken(LV_PALETTE_GREEN, 2),
+                                                   LV_CHART_AXIS_SECONDARY_Y);
 
     /*Set the next points on 'ser1'*/
     lv_chart_set_next_value(chart, ser1, 31);

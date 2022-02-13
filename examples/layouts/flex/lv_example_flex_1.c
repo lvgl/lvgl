@@ -24,7 +24,7 @@ void lv_example_flex_1(void)
         lv_obj_t * label;
 
         /*Add items to the row*/
-        obj= lv_btn_create(cont_row);
+        obj = lv_btn_create(cont_row);
         lv_obj_set_size(obj, 100, LV_PCT(100));
 
         label = lv_label_create(obj);

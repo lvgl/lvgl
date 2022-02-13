@@ -14,7 +14,7 @@ void lv_example_span_1(void)
 
     lv_obj_t * spans = lv_spangroup_create(lv_scr_act());
     lv_obj_set_width(spans, 300);
-    lv_obj_set_height(spans,300);
+    lv_obj_set_height(spans, 300);
     lv_obj_center(spans);
     lv_obj_add_style(spans, &style, 0);
 
