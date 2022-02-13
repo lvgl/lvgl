@@ -27,7 +27,8 @@ static void draw_event_cb(lv_event_t * e)
         if(chk) {
             sw_area.x2 -= 2;
             sw_area.x1 = sw_area.x2 - 16;
-        } else {
+        }
+        else {
             sw_area.x1 += 2;
             sw_area.x2 = sw_area.x1 + 16;
         }
@@ -92,8 +93,8 @@ void lv_example_table_2(void)
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_label_set_text_fmt(label, "%"LV_PRIu32" items were created in %"LV_PRIu32" ms\n"
-                                  "using %"LV_PRIu32" bytes of memory",
-                                  ITEM_CNT, elaps, mem_used);
+                          "using %"LV_PRIu32" bytes of memory",
+                          ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);
 

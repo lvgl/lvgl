@@ -34,7 +34,8 @@ void lv_example_scroll_2(void)
         if(i == 3) {
             lv_label_set_text_fmt(label, "Panel %"LV_PRIu32"\nno snap", i);
             lv_obj_clear_flag(btn, LV_OBJ_FLAG_SNAPPABLE);
-        } else {
+        }
+        else {
             lv_label_set_text_fmt(label, "Panel %"LV_PRIu32, i);
         }
 

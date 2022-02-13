@@ -16,13 +16,15 @@ static void draw_event_cb(lv_event_t * e)
 
         /*Add a line mask that keeps the area below the line*/
         lv_draw_mask_line_param_t line_mask_param;
-        lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
+        lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y,
+                                      LV_DRAW_MASK_LINE_SIDE_BOTTOM);
         int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
 
         /*Add a fade effect: transparent bottom covering top*/
         lv_coord_t h = lv_obj_get_height(obj);
         lv_draw_mask_fade_param_t fade_mask_param;
-        lv_draw_mask_fade_init(&fade_mask_param, &obj->coords, LV_OPA_COVER, obj->coords.y1 + h / 8, LV_OPA_TRANSP,obj->coords.y2);
+        lv_draw_mask_fade_init(&fade_mask_param, &obj->coords, LV_OPA_COVER, obj->coords.y1 + h / 8, LV_OPA_TRANSP,
+                               obj->coords.y2);
         int16_t fade_mask_id = lv_draw_mask_add(&fade_mask_param, NULL);
 
         /*Draw a rectangle that will be affected by the mask*/
@@ -77,7 +79,8 @@ static void draw_event_cb(lv_event_t * e)
 
             if(dsc->id == 1  || dsc->id == 3) {
                 dsc->line_dsc->color  = lv_palette_main(LV_PALETTE_GREEN);
-            } else {
+            }
+            else {
                 dsc->line_dsc->color  = lv_palette_lighten(LV_PALETTE_GREY, 1);
             }
         }

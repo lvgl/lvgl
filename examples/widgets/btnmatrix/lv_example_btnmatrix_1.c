@@ -16,7 +16,8 @@ static void event_handler(lv_event_t * e)
 
 static const char * btnm_map[] = {"1", "2", "3", "4", "5", "\n",
                                   "6", "7", "8", "9", "0", "\n",
-                                  "Action1", "Action2", ""};
+                                  "Action1", "Action2", ""
+                                 };
 
 void lv_example_btnmatrix_1(void)
 {

@@ -20,7 +20,8 @@ static void sw_event_cb(lv_event_t * e)
         lv_anim_set_exec_cb(&a, anim_x_cb);
         lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
         lv_anim_start(&a);
-    } else {
+    }
+    else {
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);

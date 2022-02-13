@@ -34,8 +34,8 @@ void lv_example_canvas_2(void)
     /*Create hole on the canvas*/
     uint32_t x;
     uint32_t y;
-    for( y = 10; y < 30; y++) {
-        for( x = 5; x < 20; x++) {
+    for(y = 10; y < 30; y++) {
+        for(x = 5; x < 20; x++) {
             lv_canvas_set_px_color(canvas, x, y, c0);
         }
     }
