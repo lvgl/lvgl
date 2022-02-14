@@ -975,7 +975,7 @@ static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
     }
 
     /*Accepted character?*/
-    // We're sure ta->accepted_chars != NULL
+    /*We're sure ta->accepted_chars != NULL*/
     uint32_t i = 0;
 
     while(ta->accepted_chars[i] != '\0') {
