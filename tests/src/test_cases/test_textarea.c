@@ -23,6 +23,7 @@ void test_textarea_should_have_valid_documented_defualt_values(void)
     TEST_ASSERT_EQUAL(0U, lv_textarea_get_one_line(textarea));
     /* No placeholder text should be set on widget creation */
     TEST_ASSERT_EQUAL_STRING("", lv_textarea_get_placeholder_text(textarea));
+    TEST_ASSERT_EQUAL_STRING("", lv_textarea_get_text(textarea));
 }
 
 /* When in password mode the lv_textarea_get_text function returns
