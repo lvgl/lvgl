@@ -27,7 +27,7 @@ The message box is built from other widgets, so you can check these widgets' doc
 
 If `parent` is `NULL` the message box will be modal. `title` and `txt` are strings for the title and the text. 
 `btn_txts[]` is an array with the buttons' text. E.g. `const char * btn_txts[] = {"Ok", "Cancel", NULL}`.
-`add_colse_btn` can be `true` or `false` to add/don't add a close button.
+`add_close_btn` can be `true` or `false` to add/don't add a close button.
 
 ### Get the parts
 The building blocks of the message box can be obtained using the following functions:
