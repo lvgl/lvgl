@@ -148,7 +148,7 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
 
-#if LV_USE_REFR_DEBUG == 0
+#if LV_USE_REFR_DEBUG
         lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
