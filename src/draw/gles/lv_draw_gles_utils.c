@@ -64,28 +64,17 @@ void _lv_draw_gles_utils_init()
 
 void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * internals)
 {
-    mat4 kek;
-    glm_mat4_identity(kek);
-#if 1
+    mat4 tmp;
+    glm_mat4_identity(tmp);
     glm_ortho(0.0f,
               (float)LV_GPU_SDL_GLES_HOR_RES,
               (float)LV_GPU_SDL_GLES_VER_RES,
               0.0f,
               -1.0f, 1.0f,
-              kek);
-#endif
-    glm_mat4_ucopy(kek, internals->projection);
-#include <memory.h>
-  //  memcpy(internals->projection, kek, sizeof(mat4));
-#if 0
-    glm_mat4_identity(internals->projection);
-    glm_ortho(0.0f,
-              (float)LV_GPU_SDL_GLES_HOR_RES,
-              0.0f,
-              (float)LV_GPU_SDL_GLES_VER_RES,
-              -1.0f, 1.0f,
-              internals->projection);
-#endif
+              tmp);
+    /* unaligned? sigsev on glm_ortho */
+    glm_mat4_ucopy(tmp, internals->projection);
+
 
     internals->rect_shader = lv_draw_gles_shader_program_create(rect_vertex_shader_str, rect_fragment_shader_str);
     glUseProgram(internals->rect_shader);
