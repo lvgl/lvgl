@@ -14,7 +14,7 @@ void setUp(void)
 
 void tearDown(void)
 {
-    /* Function run after every test */
+    lv_obj_clean(lv_scr_act());
 }
 
 void test_table_should_return_assigned_cell_value(void)
