@@ -64,8 +64,10 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
 bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter,
                            uint32_t letter_next)
 {
+
     LV_ASSERT_NULL(font_p);
     LV_ASSERT_NULL(dsc_out);
+
     const lv_font_t * placeholder_font = NULL;
     const lv_font_t * f = font_p;
 
@@ -91,9 +93,19 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
         return true;
     }
 
+
+    if(letter < 0x20 ||
+       letter == 0xf8ff || /*LV_SYMBOL_DUMMY*/
+       letter == 0x200c) { /*ZERO WIDTH NON-JOINER*/
+        dsc_out->box_w = 0;
+        dsc_out->adv_w = 0;
+    }
+    else {
+        dsc_out->box_w = font_p->line_height / 2;
+        dsc_out->adv_w = dsc_out->box_w + 2;
+    }
+
     dsc_out->resolved_font = NULL;
-    dsc_out->box_w = font_p->line_height / 2;
-    dsc_out->adv_w = dsc_out->box_w + 2;
     dsc_out->box_h = font_p->line_height;
     dsc_out->ofs_x = 0;
     dsc_out->ofs_y = 0;
