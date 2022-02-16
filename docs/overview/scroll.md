@@ -149,6 +149,7 @@ static int scroll_value = 0;
 static void store_scroll_value_event_cb(lv_event_t* e) {
   lv_obj_t* screen = lv_event_get_target(e);
   scroll_value = lv_obj_get_scroll_top(screen);
+  printf("%d pixels are scrolled out on the top\n", scroll_value);
 }
 
 lv_obj_t* container = lv_obj_create(NULL);
