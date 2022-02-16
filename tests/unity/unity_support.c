@@ -151,7 +151,7 @@ bool lv_test_assert_img_eq(const char * fn_ref)
 
   png_release(&p);
 
-  return err;
+  return !err;
   
 }
 
