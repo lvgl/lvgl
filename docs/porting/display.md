@@ -191,7 +191,9 @@ void my_clean_dcache_cb(lv_disp_drv_t * disp_drv, uint32)
 }
 ```
 
-## Rotation
+## Other options
+
+### Rotation
 
 LVGL supports rotation of the display in 90 degree increments. You can select whether you'd like software rotation or hardware rotation.
 
@@ -206,6 +208,25 @@ The default rotation of your display when it is initialized can be set using the
 Display rotation can also be changed at runtime using the `lv_disp_set_rotation(disp, rot)` API.
 
 Support for software rotation is a new feature, so there may be some glitches/bugs depending on your configuration. If you encounter a problem please open an issue on [GitHub](https://github.com/lvgl/lvgl/issues).
+
+### Decoupling the display refresh timer
+Normally the dirty (a.k.a invalid) areas are checked and redrawn in every `LV_DISP_DEF_REFR_PERIOD` milliseconds (set in `lv_conf.h`). 
+However, in some cases you might need more control on when the display refreshing happen, for example to synchronize rendering with VSYNC or the TE signal.
+
+You can do this in the following way:
+```c
+/*Delete the original display refresh timer*/
+lv_timer_del(disp->refr_timer); 
+disp->refr_timer = NULL;
+
+
+/*Call this anywhere you want to refresh the dirty areas*/
+_lv_disp_refr_timer(NULL);
+```
+
+If you have multiple displays call `lv_disp_set_deafult(disp1);` to select the display to refresh before `_lv_disp_refr_timer(NULL);`.
+
+Note that `lv_timer_handler()` and `_lv_disp_refr_timer()` can not run at the same time.
 
 ## Further reading
 
