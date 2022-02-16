@@ -137,26 +137,34 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
-    if(!_lv_area_intersect(&clip_coords_for_obj, clip_area_ori, &obj_coords_ext)) return;
+    bool com_clip_res = _lv_area_intersect(&clip_coords_for_obj, clip_area_ori, &obj_coords_ext);
 
-    draw_ctx->clip_area = &clip_coords_for_obj;
+    /*If the object is visible on the current clip area draw it.*/
+    if(com_clip_res) {
+        draw_ctx->clip_area = &clip_coords_for_obj;
 
-    /*Draw the object*/
-    lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
-    lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
-    lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
+        /*Draw the object*/
+        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
+        lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
+        lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
 
-#if LV_USE_REFR_DEBUG
-    lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
-    lv_draw_rect_dsc_t draw_dsc;
-    lv_draw_rect_dsc_init(&draw_dsc);
-    draw_dsc.bg_color.full = debug_color.full;
-    draw_dsc.bg_opa = LV_OPA_20;
-    draw_dsc.border_width = 1;
-    draw_dsc.border_opa = LV_OPA_30;
-    draw_dsc.border_color = debug_color;
-    lv_draw_rect(draw_ctx, &draw_dsc, &obj_coords_ext);
+#if LV_USE_REFR_DEBUG == 0
+        lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_draw_rect_dsc_init(&draw_dsc);
+        draw_dsc.bg_color.full = debug_color.full;
+        draw_dsc.bg_opa = LV_OPA_20;
+        draw_dsc.border_width = 1;
+        draw_dsc.border_opa = LV_OPA_30;
+        draw_dsc.border_color = debug_color;
+        lv_draw_rect(draw_ctx, &draw_dsc, &obj_coords_ext);
 #endif
+    }
+    /*If not visible on the current clip area and children are clipped to the parent's size
+     *the object has nothing to do with this area so stop drawing.*/
+    else if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        return;
+    }
 
     /*With overflow visible keep the previous clip area to let the children visible out of this object too
      *With not overflow visible limit the clip are to the object's coordinates to clip the children*/
@@ -181,12 +189,15 @@ void lv_refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         }
     }
 
-    draw_ctx->clip_area = &clip_coords_for_obj;
+    /*If the object was visible on the clip area call the post draw events too*/
+    if(com_clip_res) {
+        draw_ctx->clip_area = &clip_coords_for_obj;
 
-    /*If all the children are redrawn make 'post draw' draw*/
-    lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw_ctx);
-    lv_event_send(obj, LV_EVENT_DRAW_POST, draw_ctx);
-    lv_event_send(obj, LV_EVENT_DRAW_POST_END, draw_ctx);
+        /*If all the children are redrawn make 'post draw' draw*/
+        lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw_ctx);
+        lv_event_send(obj, LV_EVENT_DRAW_POST, draw_ctx);
+        lv_event_send(obj, LV_EVENT_DRAW_POST_END, draw_ctx);
+    }
 
     draw_ctx->clip_area = clip_area_ori;
 }
