@@ -1,10 +1,10 @@
 /**
- * @file lv_draw_gles.h
+ * @file lv_draw_gles_priv.h
  *
  */
 
-#ifndef LV_DRAW_GLES_H
-#define LV_DRAW_GLES_H
+#ifndef LV_DRAW_GLES_PRIV_H
+#define LV_DRAW_GLES_PRIV_H
 
 
 #ifdef __cplusplus
@@ -20,8 +20,8 @@ extern "C" {
 
 #include LV_GPU_SDL_GLES_GLAD_INCLUDE_PATH
 
-#include "../lv_draw.h"
-#include "../../core/lv_disp.h"
+#include <cglm/cglm.h>
+
 
 /*********************
  *      DEFINES
@@ -31,21 +31,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct lv_draw_gles_context_internals_t {
+    mat4 projection;
+    GLuint rect_shader;
+    GLint rect_shader_pos_location;
+    GLint rect_shader_projection_location;
+    GLint rect_shader_model_location;
 
-typedef struct {
-    lv_draw_ctx_t base_draw;
-    GLuint *framebuffer;
-    struct lv_draw_gles_context_internals_t * internals;
-} lv_draw_gles_ctx_t;
+} lv_draw_gles_context_internals_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
-
-void lv_draw_gles_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
-
 
 /*======================
  * Add/remove functions
@@ -67,10 +64,10 @@ void lv_draw_gles_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_GLES*/
+#endif /*LV_USE_GPU_SDL_GLES*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_GLES_H*/
+#endif /*LV_DRAW_GLES_PRIV_H*/

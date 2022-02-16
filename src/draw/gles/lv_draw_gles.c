@@ -13,6 +13,8 @@
 #if LV_USE_GPU_SDL_GLES
 
 #include "lv_draw_gles.h"
+#include "lv_draw_gles_utils.h"
+#include "lv_draw_gles_priv.h"
 
 /*********************
  *      DEFINES
@@ -83,6 +85,8 @@ void lv_draw_gles_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * d
 
 void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
+    _lv_draw_gles_utils_init();
+    lv_memset_00(draw_ctx, sizeof(lv_draw_gles_ctx_t));
     draw_ctx->draw_rect = lv_draw_gles_draw_rect;
     draw_ctx->draw_img = lv_draw_gles_img_core;
     draw_ctx->draw_letter = lv_draw_gles_draw_letter;
@@ -90,6 +94,11 @@ void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_ctx->draw_arc = lv_draw_gles_draw_arc;
     draw_ctx->draw_polygon = lv_draw_gles_polygon;
     draw_ctx->draw_bg = lv_draw_gles_draw_bg;
+    lv_draw_gles_ctx_t * draw_ctx_gles = (lv_draw_gles_ctx_t *) draw_ctx;
+    draw_ctx_gles->framebuffer = (GLuint*)disp_drv->user_data;
+    draw_ctx_gles->internals = lv_mem_alloc(sizeof(lv_draw_gles_context_internals_t));
+    lv_memset_00(draw_ctx_gles->internals, sizeof(lv_draw_gles_context_internals_t));
+    lv_draw_gles_utils_internals_init(draw_ctx_gles->internals);
 }
 
 void lv_draw_gles_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
