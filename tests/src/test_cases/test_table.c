@@ -152,36 +152,35 @@ static void draw_part_event_cb(lv_event_t * e)
 void test_table_rendering(void)
 {
 
-  lv_obj_t * table = lv_table_create(lv_scr_act());
-  lv_obj_center(table);
-  lv_obj_add_event_cb(table, draw_part_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
-  lv_obj_set_style_border_side(table, LV_BORDER_SIDE_FULL, LV_PART_ITEMS);
-  lv_table_set_col_cnt(table, 5);
-  lv_table_set_row_cnt(table, 5);
-  lv_table_set_col_width(table, 1, 60);
-  lv_table_set_col_width(table, 2, 100);
+    lv_obj_center(table);
+    lv_obj_add_event_cb(table, draw_part_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_set_style_border_side(table, LV_BORDER_SIDE_FULL, LV_PART_ITEMS);
+    lv_table_set_col_cnt(table, 5);
+    lv_table_set_row_cnt(table, 5);
+    lv_table_set_col_width(table, 1, 60);
+    lv_table_set_col_width(table, 2, 100);
 
-  lv_table_add_cell_ctrl(table, 0, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-  lv_table_set_cell_value(table, 0, 1, "2 cells are merged");
+    lv_table_add_cell_ctrl(table, 0, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_value(table, 0, 1, "2 cells are merged");
 
-  lv_table_add_cell_ctrl(table, 1, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-  lv_table_add_cell_ctrl(table, 1, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-  lv_table_add_cell_ctrl(table, 1, 2, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-  lv_table_add_cell_ctrl(table, 1, 3, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
-  lv_table_set_cell_value(table, 1, 0, "5 cells are merged");
+    lv_table_add_cell_ctrl(table, 1, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_add_cell_ctrl(table, 1, 1, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_add_cell_ctrl(table, 1, 2, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_add_cell_ctrl(table, 1, 3, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_value(table, 1, 0, "5 cells are merged");
 
-  uint32_t i;
-  for(i = 0; i < 5; i++) {
-      lv_table_set_cell_value_fmt(table, 3, i, "%d", i);
-  }
+    uint32_t i;
+    for(i = 0; i < 5; i++) {
+        lv_table_set_cell_value_fmt(table, 3, i, "%d", i);
+    }
 
-  lv_table_set_cell_value_fmt(table, 2, 3, "Multi\nline text");
-  lv_table_set_cell_value_fmt(table, 2, 4, "Very long text wrapped automatically");
+    lv_table_set_cell_value_fmt(table, 2, 3, "Multi\nline text");
+    lv_table_set_cell_value_fmt(table, 2, 4, "Very long text wrapped automatically");
 
-  lv_table_add_cell_ctrl(table, 4, 3, LV_TABLE_CELL_CTRL_TEXT_CROP);
-  lv_table_set_cell_value_fmt(table, 4, 3, "Long text to crop if too long");
-  
-  TEST_ASSERT_EQUAL_SCREENSHOT("table_1.png");
+    lv_table_add_cell_ctrl(table, 4, 3, LV_TABLE_CELL_CTRL_TEXT_CROP);
+    lv_table_set_cell_value_fmt(table, 4, 3, "Long text to crop if too long");
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("table_1.png");
 }
 
 #endif
