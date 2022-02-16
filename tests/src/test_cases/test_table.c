@@ -151,10 +151,11 @@ static void draw_part_event_cb(lv_event_t * e)
 
 void test_table_rendering(void)
 {
-
     lv_obj_center(table);
     lv_obj_add_event_cb(table, draw_part_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
     lv_obj_set_style_border_side(table, LV_BORDER_SIDE_FULL, LV_PART_ITEMS);
+    lv_obj_set_style_pad_all(table, 10, LV_PART_ITEMS);
+    lv_obj_set_style_border_width(table, 5, LV_PART_ITEMS);
     lv_table_set_col_cnt(table, 5);
     lv_table_set_row_cnt(table, 5);
     lv_table_set_col_width(table, 1, 60);
@@ -178,7 +179,7 @@ void test_table_rendering(void)
     lv_table_set_cell_value_fmt(table, 2, 4, "Very long text wrapped automatically");
 
     lv_table_add_cell_ctrl(table, 4, 3, LV_TABLE_CELL_CTRL_TEXT_CROP);
-    lv_table_set_cell_value_fmt(table, 4, 3, "Long text to crop if too long");
+    lv_table_set_cell_value_fmt(table, 4, 3, "crop crop crop crop crop crop crop crop ");
 
     TEST_ASSERT_EQUAL_SCREENSHOT("table_1.png");
 }

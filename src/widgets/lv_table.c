@@ -244,7 +244,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     lv_table_t * table = (lv_table_t *)obj;
     uint16_t old_col_cnt = table->col_cnt;
     table->col_cnt         = col_cnt;
-    table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->row_h[0]));
+    table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
     LV_ASSERT_MALLOC(table->col_w);
     if(table->col_w == NULL) return;
 
@@ -663,18 +663,19 @@ static void draw_main(lv_event_t * e)
 
             uint16_t col_merge = 0;
             for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
-                uint16_t idx = cell + col_merge;
-                char * next_cell_data = table->cell_data[idx];
+                char * next_cell_data = table->cell_data[cell + col_merge];
 
-                if(is_cell_empty(next_cell_data))
-                    break;
+                if(is_cell_empty(next_cell_data)) break;
 
                 lv_table_cell_ctrl_t merge_ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
                 if(merge_ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
-                    lv_coord_t offset = table->col_w[idx + 1];
+                    lv_coord_t offset = table->col_w[col + col_merge + 1];
 
                     if(rtl) cell_area.x1 -= offset;
                     else cell_area.x2 += offset;
+                }
+                else {
+                    break;
                 }
             }
 
@@ -827,15 +828,17 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
         /* Merge cells */
         uint16_t col_merge = 0;
         for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
-            uint16_t idx = cell + col_merge;
-            char * next_cell_data = table->cell_data[idx];
+            char * next_cell_data = table->cell_data[cell + col_merge];
 
-            if(is_cell_empty(next_cell_data))
-                break;
+            if(is_cell_empty(next_cell_data)) break;
 
             lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
-            if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)
-                txt_w += table->col_w[idx + 1];
+            if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
+                txt_w += table->col_w[col + col_merge + 1];
+            }
+            else {
+                break;
+            }
         }
 
         lv_table_cell_ctrl_t ctrl = 0;
