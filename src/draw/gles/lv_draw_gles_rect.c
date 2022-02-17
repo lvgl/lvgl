@@ -32,6 +32,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -39,13 +40,34 @@
 
 void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
+    draw_bg(draw_ctx, dsc, coords);
+
+
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+{
+    if(dsc->bg_opa <= LV_OPA_MIN) return;
+    /* bg color part */
+
     lv_draw_gles_ctx_t *ctx = (lv_draw_gles_ctx_t*)draw_ctx;
     lv_draw_gles_context_internals_t * internals = (lv_draw_gles_context_internals_t*)ctx->internals;
     LV_LOG_INFO("x1:%d x2:%d y1:%d y2:%d", coords->x1, coords->x2, coords->y1, coords->y2);
 
+    vec4 color;
+    color[0] = (float)dsc->bg_color.ch.red/255.0f;
+    color[1] = (float)dsc->bg_color.ch.green/255.0f;
+    color[2] = (float)dsc->bg_color.ch.blue/255.0f;
+    color[3] = (float)dsc->bg_color.ch.alpha/255.0f;
+
+
     if(coords->x2 - coords->x1 > 700)
     {
-        return;
+      //  return;
     }
 
     static GLfloat vertices[] = {
@@ -71,16 +93,12 @@ void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
     glUseProgram(internals->rect_shader);
 
     glUniformMatrix4fv(internals->rect_shader_model_location, 1, GL_FALSE, &model[0][0]);
+    glUniform4f(internals->rect_shader_color_location, color[0], color[1], color[2], color[3]);
     glVertexAttribPointer(internals->rect_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
     glEnableVertexAttribArray(internals->rect_shader_pos_location);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #endif /*LV_USE_GPU_SDL_GLES*/
