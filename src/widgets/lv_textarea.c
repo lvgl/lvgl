@@ -1205,6 +1205,8 @@ static void update_cursor_position_on_click(lv_event_t * e)
 #endif
 }
 
+/* Returns LV_RES_OK when no operation were performed
+ * Returns LV_RES_INV when a user defined text was inserted */
 static lv_res_t insert_handler(lv_obj_t * obj, const char * txt)
 {
     ta_insert_replace = NULL;
