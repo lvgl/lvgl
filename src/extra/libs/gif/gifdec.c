@@ -133,28 +133,28 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
 #elif LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
     gif->frame = &gif->canvas[2 * width * height];
 #endif
-    if (gif->bgindex)
+    if (gif->bgindex) {
         memset(gif->frame, gif->bgindex, gif->width * gif->height);
+    }
     bgcolor = &gif->palette->colors[gif->bgindex*3];
 
-    if (bgcolor[0] || bgcolor[1] || bgcolor [2])
-        for (i = 0; i < gif->width * gif->height; i++) {
+    for (i = 0; i < gif->width * gif->height; i++) {
 #if LV_COLOR_DEPTH == 32
-            gif->canvas[i*4 + 0] = *(bgcolor + 2);
-            gif->canvas[i*4 + 1] = *(bgcolor + 1);
-            gif->canvas[i*4 + 2] = *(bgcolor + 0);
-            gif->canvas[i*4 + 3] = 0xff;
+        gif->canvas[i*4 + 0] = *(bgcolor + 2);
+        gif->canvas[i*4 + 1] = *(bgcolor + 1);
+        gif->canvas[i*4 + 2] = *(bgcolor + 0);
+        gif->canvas[i*4 + 3] = 0xff;
 #elif LV_COLOR_DEPTH == 16
-            lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-            gif->canvas[i*3 + 0] = c.full & 0xff;
-            gif->canvas[i*3 + 1] = (c.full >> 8) & 0xff;
-            gif->canvas[i*3 + 2] = 0xff;
+        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+        gif->canvas[i*3 + 0] = c.full & 0xff;
+        gif->canvas[i*3 + 1] = (c.full >> 8) & 0xff;
+        gif->canvas[i*3 + 2] = 0xff;
 #elif LV_COLOR_DEPTH == 8
-            lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-            gif->canvas[i*2 + 0] = c.full;
-            gif->canvas[i*2 + 1] = 0xff;
+        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+        gif->canvas[i*2 + 0] = c.full;
+        gif->canvas[i*2 + 1] = 0xff;
 #endif
-        }
+    }
     gif->anim_start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
     goto ok;
 fail:
