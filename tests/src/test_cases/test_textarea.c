@@ -93,4 +93,15 @@ void test_textarea_should_keep_only_accepted_chars(void)
     TEST_ASSERT_EQUAL_STRING(accepted_list, lv_textarea_get_text(textarea));
 }
 
+void test_textarea_in_one_line_mode_should_ignore_line_break_characters(void)
+{
+    lv_textarea_set_one_line(textarea, true);
+
+    lv_textarea_add_char(textarea, '\n');
+    TEST_ASSERT_EQUAL_STRING(textarea_default_text, lv_textarea_get_text(textarea));
+
+    lv_textarea_add_char(textarea, '\r');
+    TEST_ASSERT_EQUAL_STRING(textarea_default_text, lv_textarea_get_text(textarea));
+}
+
 #endif
