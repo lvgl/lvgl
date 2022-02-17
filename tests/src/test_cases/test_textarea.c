@@ -6,7 +6,7 @@
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * textarea = NULL;
 
-static const char *textarea_default_text = "";
+static const char * textarea_default_text = "";
 
 void setUp(void)
 {

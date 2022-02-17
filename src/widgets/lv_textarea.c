@@ -1209,9 +1209,12 @@ static lv_res_t insert_handler(lv_obj_t * obj, const char * txt)
 {
     ta_insert_replace = NULL;
     lv_event_send(obj, LV_EVENT_INSERT, (char *)txt);
-    if(ta_insert_replace) {
-        if(ta_insert_replace[0] == '\0') return LV_RES_INV; /*Drop this text*/
 
+    /* Drop txt if insert replace is set to '\0' */
+    if(ta_insert_replace && ta_insert_replace[0] == '\0')
+        return LV_RES_INV;
+
+    if(ta_insert_replace) {
         /*Add the replaced text directly it's different from the original*/
         if(strcmp(ta_insert_replace, txt)) {
             lv_textarea_add_text(obj, ta_insert_replace);
