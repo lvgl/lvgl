@@ -103,6 +103,11 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
+    if(ta->one_line && (c == '\n' || c == '\r')) {
+        LV_LOG_INFO("Text area: line break ignored in one-line mode");
+        return;
+    }
+
     uint32_t u32_buf[2];
     u32_buf[0] = c;
     u32_buf[1] = 0;
@@ -115,11 +120,6 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
 
     lv_res_t res = insert_handler(obj, letter_buf);
     if(res != LV_RES_OK) return;
-
-    if(ta->one_line && (c == '\n' || c == '\r')) {
-        LV_LOG_INFO("Text area: line break ignored in one-line mode");
-        return;
-    }
 
     uint32_t c_uni = _lv_txt_encoded_next((const char *)&c, NULL);
 
