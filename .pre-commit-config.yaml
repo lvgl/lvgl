@@ -12,7 +12,7 @@ repos:
     # listed in the files regex pattern. Ignoring the files in the exclude pattern.
     - id: format-source
       name: Formatting source files
-      entry: astyle --options=scripts/code-format-per-file.cfg
+      entry: astyle --options=scripts/code-format.cfg --ignore-exclude-errors
       stages: [ commit ]
       language: system
       pass_filenames: true
