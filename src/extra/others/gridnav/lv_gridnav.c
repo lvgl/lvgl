@@ -81,6 +81,27 @@ void lv_gridnav_remove(lv_obj_t * obj)
     lv_obj_remove_event_cb(obj, gridnav_event_cb);
 }
 
+void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en)
+{
+    LV_ASSERT_NULL(to_focus);
+    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(cont, gridnav_event_cb);
+    if(dsc == NULL) {
+        LV_LOG_WARN("`cont` is not a gridnav container");
+        return;
+    }
+
+    if(obj_is_focuable(to_focus) == false) {
+        LV_LOG_WARN("The object to focus is not focusable");
+        return;
+    }
+
+    lv_obj_clear_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+    lv_obj_add_state(to_focus, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+    lv_obj_scroll_to_view(to_focus, anim_en);
+    dsc->focused_obj = to_focus;
+
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
