@@ -119,7 +119,7 @@ static void gridnav_event_cb(lv_event_t * e)
         if(dsc->focused_obj == NULL) dsc->focused_obj = find_first_focusable(obj);
         if(dsc->focused_obj == NULL) return;
 
-        uint32_t key = lv_indev_get_key(lv_indev_get_act());
+        uint32_t key = lv_event_get_key(e);
         lv_obj_t * guess = NULL;
 
         if(key == LV_KEY_RIGHT) {
