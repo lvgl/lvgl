@@ -103,6 +103,14 @@ void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl);
  */
 void lv_gridnav_remove(lv_obj_t * obj);
 
+/**
+ * Manually focus an object on gridnav container
+ * @param cont      pointer to a gridnav container
+ * @param to_focus  pointer to an object to focus
+ * @param anim_en   LV_ANIM_ON/OFF
+ */
+void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en);
+
 /**********************
  *      MACROS
  **********************/
