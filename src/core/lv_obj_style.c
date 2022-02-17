@@ -45,7 +45,6 @@ typedef enum {
 static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector);
 static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part);
 static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v);
-static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
@@ -174,7 +173,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
-    if(prop & LV_STYLE_PROP_LAYOUT_REFR) {
+    if(lv_style_lookup_flags(prop) & LV_STYLE_PROP_LAYOUT_REFR) {
         if(part == LV_PART_ANY ||
            part == LV_PART_MAIN ||
            lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT ||
@@ -184,18 +183,18 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
         }
     }
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY ||
-                                                         (prop & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
+                                                         (lv_style_lookup_flags(prop) & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
         if(parent) lv_obj_mark_layout_as_dirty(parent);
     }
 
-    if(prop == LV_STYLE_PROP_ANY || (prop & LV_STYLE_PROP_EXT_DRAW)) {
+    if(prop == LV_STYLE_PROP_ANY || (lv_style_lookup_flags(prop) & LV_STYLE_PROP_EXT_DRAW)) {
         lv_obj_refresh_ext_draw_size(obj);
     }
     lv_obj_invalidate(obj);
 
     if(prop == LV_STYLE_PROP_ANY ||
-       ((prop & LV_STYLE_PROP_INHERIT) && ((prop & LV_STYLE_PROP_EXT_DRAW) || (prop & LV_STYLE_PROP_LAYOUT_REFR)))) {
+       ((lv_style_lookup_flags(prop) & LV_STYLE_PROP_INHERIT) && ((lv_style_lookup_flags(prop) & LV_STYLE_PROP_EXT_DRAW) || (lv_style_lookup_flags(prop) & LV_STYLE_PROP_LAYOUT_REFR)))) {
         if(part != LV_PART_SCROLLBAR) {
             refresh_children_style(obj);
         }
@@ -210,11 +209,7 @@ void lv_obj_enable_style_refresh(bool en)
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     lv_style_value_t value_act;
-    bool inherit = prop & LV_STYLE_PROP_INHERIT ? true : false;
-    bool filter = prop & LV_STYLE_PROP_FILTER ? true : false;
-    if(filter) {
-        prop &= ~LV_STYLE_PROP_FILTER;
-    }
+    bool inherit = lv_style_lookup_flags(prop) & LV_STYLE_PROP_INHERIT ? true : false;
     bool found = false;
     while(obj) {
         found = get_prop_core(obj, part, prop, &value_act);
@@ -250,7 +245,6 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
             value_act = lv_style_prop_get_default(prop);
         }
     }
-    if(filter) value_act = apply_color_filter(obj, part, value_act);
     return value_act;
 }
 
@@ -353,6 +347,18 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
 #endif
         lv_anim_start(&a);
     }
+}
+
+
+lv_style_value_t _lv_obj_style_apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v)
+{
+    if(obj == NULL) return v;
+    const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);
+    if(f && f->filter_cb) {
+        lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
+        if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
+    }
+    return v;
 }
 
 _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
@@ -594,17 +600,6 @@ static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         return true;
     }
     else return false;
-}
-
-static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v)
-{
-    if(obj == NULL) return v;
-    const lv_color_filter_dsc_t * f = lv_obj_get_style_color_filter_dsc(obj, part);
-    if(f && f->filter_cb) {
-        lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
-        if(f_opa != 0) v.color = f->filter_cb(f, v.color, f_opa);
-    }
-    return v;
 }
 
 /**
