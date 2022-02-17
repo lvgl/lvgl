@@ -153,6 +153,10 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
         lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
         gif->canvas[i*2 + 0] = c.full;
         gif->canvas[i*2 + 1] = 0xff;
+#elif LV_COLOR_DEPTH == 1
+        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+        gif->canvas[i*2 + 0] = c.ch.red > 128 ? 1 : 0;
+        gif->canvas[i*2 + 1] = 0xff;
 #endif
     }
     gif->anim_start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
