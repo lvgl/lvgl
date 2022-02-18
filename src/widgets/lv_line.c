@@ -83,7 +83,7 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en)
     lv_line_t * line = (lv_line_t *)obj;
     if(line->y_inv == en) return;
 
-    line->y_inv = en == false ? 0 : 1;
+    line->y_inv = en ? 1U : 0U;
 
     lv_obj_invalidate(obj);
 }
@@ -98,7 +98,7 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
 
     lv_line_t * line = (lv_line_t *)obj;
 
-    return line->y_inv == 0 ? false : true;
+    return line->y_inv == 1U;
 }
 
 /**********************
