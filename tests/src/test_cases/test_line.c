@@ -19,12 +19,13 @@ void tearDown(void)
     /* Function run after every test */
 }
 
-void test_line_should_have_valid_documented_defualt_values(void)
+void test_line_should_have_valid_documented_default_values(void)
 {
     lv_line_t * line_ptr = (lv_line_t *) line;
     TEST_ASSERT_EQUAL_UINT16(default_point_num, line_ptr->point_num);
     TEST_ASSERT_NULL(line_ptr->point_array);
     TEST_ASSERT_FALSE(lv_line_get_y_invert(line));
+    TEST_ASSERT_FALSE(lv_obj_has_flag(line, LV_OBJ_FLAG_CLICKABLE));
 }
 
 void test_line_should_return_valid_y_invert(void)
