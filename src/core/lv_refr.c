@@ -376,8 +376,15 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
     else {
         perf_monitor.perf_last_time = lv_tick_get();
-        uint32_t fps_limit = 1000 / disp_refr->refr_timer->period;
+        uint32_t fps_limit;
         uint32_t fps;
+
+        if(disp_refr->refr_timer) {
+            fps_limit = 1000 / disp_refr->refr_timer->period;
+        }
+        else {
+            fps_limit = 1000 / LV_DISP_DEF_REFR_PERIOD;
+        }
 
         if(perf_monitor.elaps_sum == 0) {
             perf_monitor.elaps_sum = 1;
