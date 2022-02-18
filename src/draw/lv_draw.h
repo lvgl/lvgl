@@ -88,8 +88,25 @@ typedef struct _lv_draw_ctx_t  {
     /**
      * Wait until all background operations are finished. (E.g. GPU operations)
      */
-    void (*wait_for_finish)(struct _lv_draw_ctx_t * draw);
+    void (*wait_for_finish)(struct _lv_draw_ctx_t * draw_ctx);
 
+    /**
+     * Copy an area from buffer to an other
+     * @param draw_ctx      pointer to a draw context
+     * @param dest_buf      copy the buffer into this buffer
+     * @param dest_stride   the width of the dest_buf in pixels
+     * @param dest_area     the destination area
+     * @param src_buf       copy from this buffer
+     * @param src_stride    the width of src_buf in pixels
+     * @param src_area      the source area.
+     *
+     * @note dest_area and src_area must have the same width and height
+     *       but can have different x and y position.
+     * @note dest_area and src_area must be clipped to the real dimensions of the buffers
+     */
+    void (*buffer_copy)(struct _lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
+                        const lv_area_t * dest_area,
+                        void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
