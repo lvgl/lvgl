@@ -228,6 +228,8 @@ If you have multiple displays call `lv_disp_set_deafult(disp1);` to select the d
 
 Note that `lv_timer_handler()` and `_lv_disp_refr_timer()` can not run at the same time.
 
+If the performance monitor is enabled, the value of `LV_DISP_DEF_REFR_PERIOD` needs to be set to be consistent with the refresh period of the display to ensure that the statistical results are correct.
+
 ## Further reading
 
 - [lv_port_disp_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_disp_template.c) for a template for your own driver.
