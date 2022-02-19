@@ -143,22 +143,23 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_line_t * line = (lv_line_t *)obj;
 
+        if(line->point_num == 0 || line->point_array == NULL) return;
+
         lv_point_t * p = lv_event_get_param(e);
         lv_coord_t w = 0;
         lv_coord_t h = 0;
-        if(line->point_num > 0) {
-            uint16_t i;
-            for(i = 0; i < line->point_num; i++) {
-                w = LV_MAX(line->point_array[i].x, w);
-                h = LV_MAX(line->point_array[i].y, h);
-            }
 
-            lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-            w += line_width;
-            h += line_width;
-            p->x = w;
-            p->y = h;
+        uint16_t i;
+        for(i = 0; i < line->point_num; i++) {
+            w = LV_MAX(line->point_array[i].x, w);
+            h = LV_MAX(line->point_array[i].y, h);
         }
+
+        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        w += line_width;
+        h += line_width;
+        p->x = w;
+        p->y = h;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_line_t * line = (lv_line_t *)obj;
