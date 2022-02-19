@@ -15,7 +15,7 @@ static bool mouse_pressed;
 static bool key_pressed;
 static bool enc_pressed;
 
-void lv_test_mouse_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data) 
+void lv_test_mouse_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
   LV_UNUSED(drv);
   data->point.x = x_act;
@@ -26,7 +26,7 @@ void lv_test_mouse_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
 void lv_test_mouse_move_to(lv_coord_t x, lv_coord_t y)
 {
   x_act = x;
-  y_act = y;  
+  y_act = y;
 }
 
 void lv_test_mouse_move_by(lv_coord_t x, lv_coord_t y)
@@ -46,7 +46,7 @@ void lv_test_mouse_release(void)
 }
 
 void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y)
-{ 
+{
   lv_test_mouse_release();
   lv_test_indev_wait(50);
   lv_test_mouse_move_to(x, y);
@@ -57,7 +57,7 @@ void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y)
 }
 
 
-void lv_test_keypad_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data) 
+void lv_test_keypad_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
   LV_UNUSED(drv);
   data->key = key_act;
@@ -86,7 +86,7 @@ void lv_test_key_hit(uint32_t k)
   lv_test_indev_wait(50);
 }
 
-void lv_test_encoder_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data) 
+void lv_test_encoder_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
   LV_UNUSED(drv);
   data->enc_diff = diff_act;

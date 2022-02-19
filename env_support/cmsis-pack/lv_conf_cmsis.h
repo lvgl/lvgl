@@ -90,8 +90,8 @@
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h" 
-        
+        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
+
         #if __PER_COUNTER_VER__ < 10902ul
             #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
         #else
