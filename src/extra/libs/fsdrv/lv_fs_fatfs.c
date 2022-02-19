@@ -161,8 +161,8 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  * @param drv pointer to a driver where this function belongs
  * @param file_p pointer to a FIL variable
  * @param buf pointer to a buffer with the bytes to write
- * @param btr Bytes To Write
- * @param br the number of real written bytes (Bytes Written). NULL if unused.
+ * @param btw Bytes To Write
+ * @param bw the number of real written bytes (Bytes Written). NULL if unused.
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
