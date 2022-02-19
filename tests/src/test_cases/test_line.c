@@ -48,7 +48,7 @@ void test_line_size_should_be_updated_after_adding_points(void)
 
     /* Get the biggest coordinate on both axis */
     uint16_t point_idx = 0;
-    for (point_idx = 0; point_idx < point_cnt; point_idx++) {
+    for(point_idx = 0; point_idx < point_cnt; point_idx++) {
         calculated_width = LV_MAX(points[point_idx].x, calculated_width);
         calculated_height = LV_MAX(points[point_idx].y, calculated_height);
     }
