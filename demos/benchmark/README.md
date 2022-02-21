@@ -31,7 +31,7 @@ In other words, the benchmark shows the FPS from the pure rendering time.
 
 By default, only the changed areas are refreshed. It means if only a few pixels are changed in 1 ms the benchmark will show 1000 FPS. To measure the performance with full screen refresh uncomment `lv_obj_invalidate(lv_scr_act())` in `monitor_cb()` in `lv_demo_benchmark.c`.
 
-![LVGL benchmark running](https://github.com/lvgl/lv_examples/blob/master/src/lv_demo_benchmark/screenshot1.png?raw=true)
+![LVGL benchmark running](https://github.com/lvgl/lvgl/tree/master/demos/benchmark/screenshot1.png?raw=true)
 
 
 ## Result summary 
@@ -48,4 +48,4 @@ In the first section of the table, "Slow but common cases", those cases are disp
 Below this in the "All cases section" all the results are shown. The < 10 FPS results are shown with red, the >= 10 but < 20 FPS values are displayed with orange.
 
 
-![LVGL benchmark result summary](https://github.com/lvgl/lv_examples/blob/master/src/lv_demo_benchmark/screenshot2.png?raw=true)
+![LVGL benchmark result summary](https://github.com/lvgl/lvgl/tree/master/demos/benchmark/screenshot2.png?raw=true)
