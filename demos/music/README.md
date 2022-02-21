@@ -4,7 +4,7 @@
 The music player demo shows what kind of modern, smartphone-like user interfaces can be created on LVGL. It works the best with display with 480x272 or 272x480 resolution. 
 
 
-![Music player demo with LVGL embedded GUI library](https://github.com/lvgl/lv_examples/blob/master/src/lv_demo_music/screenshot1.gif?raw=true)
+![Music player demo with LVGL embedded GUI library](https://github.com/lvgl/lvgl/tree/master/demos/music/screenshot1.gif?raw=true)
 
 ## Run the demo
 - In `lv_conf.h` or equivalent places set `LV_USE_DEMO_MUSIC 1`
