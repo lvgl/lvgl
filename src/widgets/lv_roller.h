@@ -17,6 +17,11 @@ extern "C" {
 
 #if LV_USE_ROLLER != 0
 
+/*Testing of dependencies*/
+#if LV_USE_LABEL == 0
+#error "lv_roller: lv_label is required. Enable it in lv_conf.h (LV_USE_ROLLER 1)"
+#endif
+
 #include "../core/lv_obj.h"
 #include "lv_label.h"
 
