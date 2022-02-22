@@ -4,15 +4,20 @@
 Generates lv_conf_internal.h from lv_conf_template.h to provide default values
 '''
 
+import os
 import sys
 import re
+
+SCRIPT_DIR = os.path.dirname(__file__)
+LV_CONF_TEMPLATE = os.path.join(SCRIPT_DIR, "..", "lv_conf_template.h")
+LV_CONF_INTERNAL = os.path.join(SCRIPT_DIR, "..", "src", "lv_conf_internal.h")
 
 if sys.version_info < (3,6,0):
   print("Python >=3.6 is required", file=sys.stderr)
   exit(1)
 
-fin = open("../lv_conf_template.h", "r")
-fout = open("../src/lv_conf_internal.h", "w")
+fin = open(LV_CONF_TEMPLATE)
+fout = open(LV_CONF_INTERNAL, "w")
 
 fout.write(
 '''/**
