@@ -34,6 +34,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj);
 const lv_obj_class_t lv_spinbox_class = {
     .constructor_cb = lv_spinbox_constructor,
     .event_cb = lv_spinbox_event,
+    .width_def = LV_DPI_DEF,
     .instance_size = sizeof(lv_spinbox_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .base_class = &lv_textarea_class
@@ -336,7 +337,6 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     lv_textarea_set_one_line(obj, true);
     lv_textarea_set_cursor_click_pos(obj, true);
-    lv_obj_set_width(obj, LV_DPI_DEF);
 
     lv_spinbox_updatevalue(obj);
 

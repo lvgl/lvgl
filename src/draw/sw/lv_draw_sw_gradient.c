@@ -28,7 +28,7 @@
 #endif
 
 #if LV_GRAD_CACHE_DEF_SIZE != 0 && LV_GRAD_CACHE_DEF_SIZE < 256
-	#error "LV_GRAD_CACHE_DEF_SIZE is too small"
+    #error "LV_GRAD_CACHE_DEF_SIZE is too small"
 #endif
 
 /**********************
