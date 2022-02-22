@@ -22,7 +22,7 @@
  *********************/
 #define MY_CLASS &lv_slider_class
 
-#define LV_SLIDER_KNOB_COORD(hor, is_rtl, area) (hor ? (is_rtl ? area.x1 : area.x2) : (is_rtl ? area.y1 : area.y2))
+#define LV_SLIDER_KNOB_COORD(is_rtl, area) (is_rtl ? area.x1 : area.x2)
 
 /**********************
  *      TYPEDEFS
@@ -330,30 +330,20 @@ static void draw_knob(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     lv_coord_t objw = lv_obj_get_width(obj);
     lv_coord_t objh = lv_obj_get_height(obj);
-    bool hor = objw >= objh ? true : false;
-    lv_coord_t knob_size = hor ? objh : objw;
+    bool is_horizontal = objw >= objh;
     bool sym = false;
     if(slider->bar.mode == LV_BAR_MODE_SYMMETRICAL && slider->bar.min_value < 0 && slider->bar.max_value > 0) sym = true;
 
-    lv_area_t knob_area;
+    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    bool is_rtl = base_dir == LV_BASE_DIR_RTL;
 
+    lv_area_t knob_area;
     /*Horizontal*/
-    if(hor) {
-        if(!sym) {
-            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BASE_DIR_RTL, slider->bar.indic_area);
-        }
-        else {
-            if(slider->bar.cur_value >= 0) {
-                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir == LV_BASE_DIR_RTL, slider->bar.indic_area);
-            }
-            else {
-                knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BASE_DIR_RTL, slider->bar.indic_area);
-            }
-        }
+    if(is_horizontal) {
+        knob_area.x1 = LV_SLIDER_KNOB_COORD(is_rtl, slider->bar.indic_area);
     }
     /*Vertical*/
     else {
@@ -374,7 +364,8 @@ static void draw_knob(lv_event_t * e)
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
-    position_knob(obj, &knob_area, knob_size, hor);
+    lv_coord_t knob_size = is_horizontal ? objh : objw;
+    position_knob(obj, &knob_area, knob_size, is_horizontal);
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
@@ -401,13 +392,13 @@ static void draw_knob(lv_event_t * e)
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         /*Draw a second knob for the start_value side*/
-        if(hor) {
-            knob_area.x1 = LV_SLIDER_KNOB_COORD(hor, base_dir != LV_BASE_DIR_RTL, slider->bar.indic_area);
+        if(is_horizontal) {
+            knob_area.x1 = LV_SLIDER_KNOB_COORD(is_rtl, slider->bar.indic_area);
         }
         else {
             knob_area.y1 = slider->bar.indic_area.y2;
         }
-        position_knob(obj, &knob_area, knob_size, hor);
+        position_knob(obj, &knob_area, knob_size, is_horizontal);
         lv_area_copy(&slider->left_knob_area, &knob_area);
 
         lv_memcpy(&knob_rect_dsc, &knob_rect_dsc_tmp, sizeof(lv_draw_rect_dsc_t));
