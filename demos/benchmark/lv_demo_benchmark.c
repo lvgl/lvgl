@@ -602,7 +602,7 @@ static lv_obj_t * subtitle;
 static uint32_t rnd_act;
 
 
-static uint32_t rnd_map[] = {
+static const uint32_t rnd_map[] = {
     0xbd13204f, 0x67d8167f, 0x20211c99, 0xb0a7cc05,
     0x06d5c703, 0xeafb01a7, 0xd0473b5c, 0xc999aaa2,
     0x86f9d5d9, 0x294bdb29, 0x12a3c207, 0x78914d14,
@@ -631,7 +631,7 @@ static uint32_t rnd_map[] = {
 
 static void benchmark_init(void)
 {
-    lv_disp_t * disp = lv_disp_get_next(NULL);
+    lv_disp_t * disp = lv_disp_get_default();
     disp->driver->monitor_cb = monitor_cb;
 
     lv_obj_t * scr = lv_scr_act();
@@ -763,7 +763,7 @@ static void generate_report(void)
 
     row++;
     char buf[256];
-    for(i = 0; i < sizeof(scenes) / sizeof(scene_dsc_t) - 1; i++) {
+    for(i = 0; scenes[i].create_cb; i++) {
 
         if(scenes[i].fps_normal < 20 && scenes[i].weight >= 10) {
             lv_table_set_cell_value(table, row, 0, scenes[i].name);
@@ -808,7 +808,7 @@ static void generate_report(void)
     //        lv_table_set_cell_type(table, row, 0, 4);
     row++;
 
-    for(i = 0; i < sizeof(scenes) / sizeof(scene_dsc_t) - 1; i++) {
+    for(i = 0; scenes[i].create_cb; i++) {
         lv_table_set_cell_value(table, row, 0, scenes[i].name);
 
         lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
@@ -862,7 +862,7 @@ static void report_cb(lv_timer_t * timer)
             if(scenes[scene_act].create_cb) scene_act++;    /*If still there are scenes go to the next*/
         }
         else {
-            scene_act ++;
+            scene_act++;
         }
         opa_mode = false;
     }
@@ -936,7 +936,7 @@ static void scene_next_task_cb(lv_timer_t * timer)
             if(scenes[scene_act].create_cb) scene_act++;    /*If still there are scenes go to the next*/
         }
         else {
-            scene_act ++;
+            scene_act++;
         }
         opa_mode = false;
     }
@@ -948,7 +948,7 @@ static void scene_next_task_cb(lv_timer_t * timer)
 
     if(scenes[scene_act].create_cb) {
         lv_label_set_text_fmt(title, "%"LV_PRId32"/%d: %s%s", scene_act * 2 + (opa_mode ? 1 : 0),
-                              (sizeof(scenes) / sizeof(scene_dsc_t) * 2) - 2,  scenes[scene_act].name, opa_mode ? " + opa" : "");
+                              (dimof(scenes) * 2) - 2,  scenes[scene_act].name, opa_mode ? " + opa" : "");
         if(opa_mode) {
             lv_label_set_text_fmt(subtitle, "Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
                                   scenes[scene_act].fps_normal);
@@ -1040,7 +1040,7 @@ static void line_create(lv_style_t * style)
         uint32_t j;
         for(j = 1; j < LINE_POINT_NUM; j++) {
             points[i][j].x = points[i][j - 1].x + rnd_next(LINE_POINT_DIFF_MIN, LINE_POINT_DIFF_MAX);
-            points[i][j].y = rnd_next(LINE_POINT_DIFF_MIN, LINE_POINT_DIFF_MAX) ;
+            points[i][j].y = rnd_next(LINE_POINT_DIFF_MIN, LINE_POINT_DIFF_MAX);
         }
 
 
