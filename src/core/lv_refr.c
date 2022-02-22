@@ -213,6 +213,11 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     if(!disp) disp = lv_disp_get_default();
     if(!disp) return;
 
+    if(disp->rendering_in_progress) {
+        LV_LOG_ERROR("detected modifying dirty areas in render");
+        return;
+    }
+
     /*Clear the invalidate buffer if the parameter is NULL*/
     if(area_p == NULL) {
         disp->inv_p = 0;
@@ -519,6 +524,7 @@ static void lv_refr_areas(void)
 
     disp_refr->driver->draw_buf->last_area = 0;
     disp_refr->driver->draw_buf->last_part = 0;
+    disp_refr->rendering_in_progress = true;
 
     for(i = 0; i < disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
@@ -531,6 +537,8 @@ static void lv_refr_areas(void)
             px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
         }
     }
+
+    disp_refr->rendering_in_progress = false;
 }
 
 /**
