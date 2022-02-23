@@ -250,26 +250,20 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
 
     uint16_t old_col_cnt = table->col_cnt;
     table->col_cnt         = col_cnt;
-    table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
-    LV_ASSERT_MALLOC(table->col_w);
-    if(table->col_w == NULL) return;
+    uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
 
     /*Free the unused cells*/
     if(old_col_cnt > col_cnt) {
         uint16_t old_cell_cnt = old_col_cnt * table->row_cnt;
-        uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
         uint32_t i;
         for(i = new_cell_cnt; i < old_cell_cnt; i++) {
             lv_mem_free(table->cell_data[i]);
         }
     }
 
-    char ** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char *));
-    LV_ASSERT_MALLOC(new_cell_data);
-    if(new_cell_data == NULL) return;
-    uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
-    lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
-
+    table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
+    LV_ASSERT_MALLOC(table->col_w);
+    if(table->col_w == NULL) return;
     /*Initialize the new fields*/
     if(old_col_cnt < col_cnt) {
         uint32_t col;
@@ -277,6 +271,12 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
             table->col_w[col] = LV_DPI_DEF;
         }
     }
+
+    /* Try to allocate space for new_cell_cnt pointers */
+    char ** new_cell_data = lv_mem_alloc(new_cell_cnt * sizeof(char *));
+    LV_ASSERT_MALLOC(new_cell_data);
+    if(new_cell_data == NULL) return;
+    lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
 
     /*The new column(s) messes up the mapping of `cell_data`*/
     uint32_t old_col_start;
