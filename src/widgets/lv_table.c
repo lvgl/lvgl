@@ -811,8 +811,8 @@ static void refr_size(lv_obj_t * obj, uint32_t start_row)
 }
 
 static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_t * font,
-        lv_coord_t letter_space, lv_coord_t line_space,
-        lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom)
+                                 lv_coord_t letter_space, lv_coord_t line_space,
+                                 lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom)
 {
     lv_table_t * table = (lv_table_t *)obj;
     lv_point_t txt_size;
@@ -851,14 +851,14 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
         /*With text crop assume 1 line*/
         if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
             h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
-                    h_max);
+                           h_max);
         }
         /*Without text crop calculate the height of the text in the cell*/
         else {
             txt_w -= cell_left + cell_right;
 
             lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
-                    letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
+                            letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
 
             h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
             cell += col_merge;

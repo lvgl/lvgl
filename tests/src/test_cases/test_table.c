@@ -191,7 +191,6 @@ void test_table_should_reduce_cells(void)
     const uint16_t initial_row_num = 1;
     const uint16_t final_col_num = 4;
     const uint16_t final_row_num = 1;
-    lv_table_t * ptr = (lv_table_t *) table;
 
     lv_obj_center(table);
 
