@@ -237,7 +237,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
         lv_memset_00(&table->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(table->cell_data[0]));
     }
 
-    refr_size(obj, 0) ;
+    refr_size(obj, 0);
 }
 
 void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
@@ -294,8 +294,7 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     lv_mem_free(table->cell_data);
     table->cell_data = new_cell_data;
 
-
-    refr_size(obj, 0) ;
+    refr_size(obj, 0);
 }
 
 void lv_table_set_col_width(lv_obj_t * obj, uint16_t col_id, lv_coord_t w)
@@ -935,7 +934,8 @@ static size_t get_cell_txt_len(const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     retval = _lv_txt_ap_calc_bytes_cnt(txt) + 1;
 #else
-    /* +1: trailing '\0'; +1: format byte */
+    /* cell_data layout: [ctrl][txt][trailing '\0' terminator]
+     * +2 because of the trailing '\0' and the ctrl */
     retval = strlen(txt) + 2;
 #endif
 
