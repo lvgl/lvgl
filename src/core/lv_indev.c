@@ -709,13 +709,13 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             int32_t s;
             if(data->enc_diff < 0) {
                 for(s = 0; s < -data->enc_diff; s++) {
-                	lv_group_send_data(g, LV_KEY_LEFT);
+                    lv_group_send_data(g, LV_KEY_LEFT);
                     if(indev_reset_check(&i->proc)) return;
                 }
             }
             else if(data->enc_diff > 0) {
                 for(s = 0; s < data->enc_diff; s++) {
-                	lv_group_send_data(g, LV_KEY_RIGHT);
+                    lv_group_send_data(g, LV_KEY_RIGHT);
                     if(indev_reset_check(&i->proc)) return;
                 }
             }
@@ -726,13 +726,13 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             int32_t s;
             if(data->enc_diff < 0) {
                 for(s = 0; s < -data->enc_diff; s++) {
-                	lv_group_focus_prev(g);
+                    lv_group_focus_prev(g);
                     if(indev_reset_check(&i->proc)) return;
                 }
             }
             else if(data->enc_diff > 0) {
                 for(s = 0; s < data->enc_diff; s++) {
-                	lv_group_focus_next(g);
+                    lv_group_focus_next(g);
                     if(indev_reset_check(&i->proc)) return;
                 }
             }
