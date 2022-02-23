@@ -187,24 +187,30 @@ void test_table_rendering(void)
 /* See #3120 for context */
 void test_table_should_reduce_cells(void)
 {
+    const uint16_t initial_col_num = 8;
+    const uint16_t initial_row_num = 1;
+    const uint16_t final_col_num = 4;
+    const uint16_t final_row_num = 1;
+    lv_table_t * ptr = (lv_table_t *) table;
+
     lv_obj_center(table);
 
-    lv_table_set_col_cnt(table, 8);
-    lv_table_set_row_cnt(table, 8);
+    lv_table_set_col_cnt(table, initial_col_num);
+    lv_table_set_row_cnt(table, initial_row_num);
 
-    uint32_t i, j;
-    for(i = 0; i < 8; i ++) {
-        for(j = 0; j < 8; j ++) {
-            lv_table_set_cell_value(table, i, j, "00");
+    uint32_t row_idx, col_idx;
+    for(row_idx = 0; row_idx < initial_row_num; row_idx++) {
+        for(col_idx = 0; col_idx < initial_col_num; col_idx++) {
+            lv_table_set_cell_value(table, row_idx, col_idx, "00");
         }
     }
 
-    lv_table_set_col_cnt(table, 4); //If comment this line, it can run
-    lv_table_set_row_cnt(table, 4);
+    lv_table_set_col_cnt(table, final_col_num);
+    lv_table_set_row_cnt(table, final_row_num);
 
-    for(i = 0; i < 4; i ++) {
-        for(j = 0; j < 4; j ++) {
-            lv_table_set_cell_value(table, i, j, "00");
+    for(row_idx = 0; row_idx < final_row_num; row_idx++) {
+        for(col_idx = 0; col_idx < final_col_num; col_idx++) {
+            lv_table_set_cell_value(table, row_idx, col_idx, "00");
         }
     }
 }
