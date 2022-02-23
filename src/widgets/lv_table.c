@@ -206,6 +206,9 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
+
+    if(table->row_cnt == row_cnt) return;
+
     uint16_t old_row_cnt = table->row_cnt;
     table->row_cnt         = row_cnt;
 
@@ -242,6 +245,9 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
+
+    if(table->col_cnt == col_cnt) return;
+
     uint16_t old_col_cnt = table->col_cnt;
     table->col_cnt         = col_cnt;
     table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
