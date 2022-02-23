@@ -417,6 +417,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         if(data->key == LV_KEY_ENTER) {
             /*Send the ENTER as a normal KEY*/
             lv_group_send_data(g, LV_KEY_ENTER);
+            if(indev_reset_check(&i->proc)) return;
 
             lv_event_send(indev_obj_act, LV_EVENT_PRESSED, indev_act);
             if(indev_reset_check(&i->proc)) return;
@@ -424,6 +425,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         else if(data->key == LV_KEY_ESC) {
             /*Send the ESC as a normal KEY*/
             lv_group_send_data(g, LV_KEY_ESC);
+            if(indev_reset_check(&i->proc)) return;
 
             lv_event_send(indev_obj_act, LV_EVENT_CANCEL, indev_act);
             if(indev_reset_check(&i->proc)) return;
@@ -443,6 +445,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
         else {
             lv_group_send_data(g, data->key);
+            if(indev_reset_check(&i->proc)) return;
         }
     }
     /*Pressing*/
@@ -579,6 +582,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         else if(data->key == LV_KEY_ESC) {
             /*Send the ESC as a normal KEY*/
             lv_group_send_data(g, LV_KEY_ESC);
+            if(indev_reset_check(&i->proc)) return;
 
             lv_event_send(indev_obj_act, LV_EVENT_CANCEL, indev_act);
             if(indev_reset_check(&i->proc)) return;
@@ -586,6 +590,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
         else {
             lv_group_send_data(g, data->key);
+            if(indev_reset_check(&i->proc)) return;
         }
     }
     /*Pressing*/
@@ -676,8 +681,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                     lv_event_send(indev_obj_act, LV_EVENT_CLICKED, indev_act);
                     if(indev_reset_check(&i->proc)) return;
 
-
                     lv_group_send_data(g, LV_KEY_ENTER);
+                    if(indev_reset_check(&i->proc)) return;
                 }
                 else {
                     lv_obj_clear_state(indev_obj_act, LV_STATE_PRESSED);    /*Remove the pressed state manually*/
@@ -703,10 +708,16 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             LV_LOG_INFO("rotated by %+d (edit)", data->enc_diff);
             int32_t s;
             if(data->enc_diff < 0) {
-                for(s = 0; s < -data->enc_diff; s++) lv_group_send_data(g, LV_KEY_LEFT);
+                for(s = 0; s < -data->enc_diff; s++) {
+                	lv_group_send_data(g, LV_KEY_LEFT);
+                    if(indev_reset_check(&i->proc)) return;
+                }
             }
             else if(data->enc_diff > 0) {
-                for(s = 0; s < data->enc_diff; s++) lv_group_send_data(g, LV_KEY_RIGHT);
+                for(s = 0; s < data->enc_diff; s++) {
+                	lv_group_send_data(g, LV_KEY_RIGHT);
+                    if(indev_reset_check(&i->proc)) return;
+                }
             }
         }
         /*In navigate mode focus on the next/prev objects*/
@@ -714,10 +725,16 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             LV_LOG_INFO("rotated by %+d (nav)", data->enc_diff);
             int32_t s;
             if(data->enc_diff < 0) {
-                for(s = 0; s < -data->enc_diff; s++) lv_group_focus_prev(g);
+                for(s = 0; s < -data->enc_diff; s++) {
+                	lv_group_focus_prev(g);
+                    if(indev_reset_check(&i->proc)) return;
+                }
             }
             else if(data->enc_diff > 0) {
-                for(s = 0; s < data->enc_diff; s++) lv_group_focus_next(g);
+                for(s = 0; s < data->enc_diff; s++) {
+                	lv_group_focus_next(g);
+                    if(indev_reset_check(&i->proc)) return;
+                }
             }
         }
     }
