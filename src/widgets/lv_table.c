@@ -817,54 +817,59 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom)
 {
     lv_table_t * table = (lv_table_t *)obj;
-    lv_point_t txt_size;
-    lv_coord_t txt_w;
-
-    uint16_t row_start = row_id * table->col_cnt;
-    uint16_t cell;
-    uint16_t col;
     lv_coord_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
 
-    for(cell = row_start, col = 0; cell < row_start + table->col_cnt; cell++, col++) {
-        if(is_cell_empty(table->cell_data[cell])) {
-            continue;
-        }
+    /* Calculate the cell_data index where to start */
+    uint16_t row_start = row_id * table->col_cnt;
+
+    /* Traverse the cells in the row_id row */
+    uint16_t cell;
+    uint16_t col;
+    for(cell = row_start, col = 0; cell < (row_start + table->col_cnt); cell++, col++) {
+        char * current_cell_data = table->cell_data[cell];
+        if(is_cell_empty(current_cell_data)) break;
+
+        lv_table_cell_ctrl_t cell_ctrl = 0;
+        lv_coord_t txt_w = 0;
 
         txt_w = table->col_w[col];
-        /* Merge cells */
-        uint16_t col_merge = 0;
-        for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
-            char * next_cell_data = table->cell_data[cell + col_merge];
 
-            if(is_cell_empty(next_cell_data)) break;
+        /* Traverse the current row from the first until the penultimate column.
+         * Increment the text width if the cell has the LV_TABLE_CELL_CTRL_MERGE_RIGHT control,
+         * exit the traversal when the current cell control is not LV_TABLE_CELL_CTRL_MERGE_RIGHT */
+        uint16_t last_merged_col_idx = 0;
+        for(last_merged_col_idx = 0; (last_merged_col_idx + col) < (table->col_cnt - 1); last_merged_col_idx++) {
+            if(is_cell_empty(table->cell_data[cell + last_merged_col_idx])) break;
 
-            lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) next_cell_data[0];
-            if(ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT) {
-                txt_w += table->col_w[col + col_merge + 1];
-            }
-            else {
-                break;
-            }
+            char * column_cell_data = table->cell_data[cell + last_merged_col_idx];
+            cell_ctrl = (lv_table_cell_ctrl_t) column_cell_data[0];
+
+            /* exit the traversal of the row cells */
+            if(!(cell_ctrl & LV_TABLE_CELL_CTRL_MERGE_RIGHT)) break;
+
+            txt_w += table->col_w[cell + last_merged_col_idx + 1];
         }
 
-        lv_table_cell_ctrl_t ctrl = 0;
-        if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
+        /*Get the current cell control*/
+        cell_ctrl = (lv_table_cell_ctrl_t) current_cell_data[0];
 
-        /*With text crop assume 1 line*/
-        if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
-            h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
-                           h_max);
+        /*When cropping the text we can assume the row height is equal to the line height*/
+        if(cell_ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
+            lv_coord_t line_height = lv_font_get_line_height(font) + cell_top + cell_bottom;
+            h_max = LV_MAX(line_height, h_max);
         }
-        /*Without text crop calculate the height of the text in the cell*/
+        /*Else we have to calculate the height of the cell text*/
         else {
-            txt_w -= cell_left + cell_right;
+            lv_point_t txt_size;
+            txt_w -= (cell_left + cell_right);
 
             lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
                             letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
 
             h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
-            cell += col_merge;
-            col += col_merge;
+            /*Skip until one element after the last merged column*/
+            cell += last_merged_col_idx;
+            col += last_merged_col_idx;
         }
     }
 
