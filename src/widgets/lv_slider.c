@@ -83,8 +83,8 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     /*Initialize the allocated 'slider'*/
     slider->value_to_set = NULL;
-    slider->dragging = 0;
-    slider->left_knob_focus = 0;
+    slider->dragging = 0U;
+    slider->left_knob_focus = 0U;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
