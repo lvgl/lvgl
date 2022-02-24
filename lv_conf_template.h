@@ -126,6 +126,11 @@
  *However the opened images might consume additional RAM.
  *0: to disable caching*/
 #define LV_IMG_CACHE_DEF_SIZE   0
+#if LV_IMG_CACHE_DEF_SIZE != 0
+
+    /*Limit the total memory used by images*/
+    #define LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE (64 * 1024)
+#endif
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/

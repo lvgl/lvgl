@@ -35,6 +35,8 @@ typedef struct {
      * Decrement all lifes by one every in every ::lv_img_cache_open.
      * If life == 0 the entry can be reused*/
     int32_t life;
+
+    uint32_t mem_cost_size;
 } _lv_img_cache_entry_t;
 
 /**********************
@@ -57,8 +59,9 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
  * More cached images mean more opened image at same time which might mean more memory usage.
  * E.g. if 20 PNG or JPG images are open in the RAM they consume memory while opened in the cache.
  * @param new_entry_cnt number of image to cache
+ * @param new_total_size cache total memory size
  */
-void lv_img_cache_set_size(uint16_t new_slot_num);
+void lv_img_cache_set_size(uint16_t new_entry_cnt, uint32_t new_total_size);
 
 /**
  * Invalidate an image source in the cache.
