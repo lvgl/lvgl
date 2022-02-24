@@ -10,18 +10,16 @@
 
 #if LV_USE_GPU_SDL_GLES
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <cglm/cglm.h>
-
+#include "lv_draw_gles.h"
 #include "lv_draw_gles_utils.h"
+#include "../../misc/lv_log.h"
+#include "../../core/lv_refr.h"
 
 
 /*********************
  *      DEFINES
  *********************/
-
+#define BYTES_PER_PIXEL 3
 /**********************
  *      TYPEDEFS
  **********************/
@@ -29,28 +27,12 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static GLuint shader_create(GLenum type, const char *src);
+static void lvgl_buf_to_opengl_buf(GLubyte *opengl_buf, const void *lvgl_buf);
+static void opengl_buf_to_lvgl_buf(void *lvgl_buf, const GLubyte *opengl_buf);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static char rect_vertex_shader_str[] =
-    "attribute vec2 a_position;   \n"
-    "uniform mat4 projection;   \n"
-    "uniform mat4 model;   \n"
-    "void main()                  \n"
-    "{                            \n"
-    "   gl_Position = projection * model * vec4(a_position.x, a_position.y, 0.0, 1.0); \n"
-    "}                            \n";
-
-static char rect_fragment_shader_str[] =
-    "precision mediump float;                            \n"
-    "uniform vec4 color;   \n"
-    "void main()                                         \n"
-    "{                                                   \n"
-    "  gl_FragColor = color;          \n"
-    "}                                                   \n";
 
 /**********************
  *      MACROS
@@ -59,79 +41,90 @@ static char rect_fragment_shader_str[] =
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void _lv_draw_gles_utils_init()
-{
-}
-
 void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * internals)
 {
-    mat4 tmp;
-    glm_mat4_identity(tmp);
-    glm_ortho(0.0f,
-              (float)LV_GPU_SDL_GLES_HOR_RES,
-              (float)LV_GPU_SDL_GLES_VER_RES,
-              0.0f,
-              -1.0f, 1.0f,
-              tmp);
-    /* unaligned? sigsev on glm_ortho */
-    glm_mat4_ucopy(tmp, internals->projection);
+    /* Generate buffer for temp gpu texture */
+    internals->gpu_texture_pixels = malloc(LV_GPU_SDL_GLES_HOR_RES * LV_GPU_SDL_GLES_VER_RES * BYTES_PER_PIXEL * sizeof(GLubyte));
+    /* Maybe initialize with all zeros? */
 
+    /* Generate temp gpu texture */
+    glGenTextures(1, &internals->gpu_texture);
+    glBindTexture(GL_TEXTURE_2D, internals->gpu_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, LV_GPU_SDL_GLES_HOR_RES, LV_GPU_SDL_GLES_VER_RES, 0, GL_RGB, GL_UNSIGNED_BYTE, internals->gpu_texture_pixels);
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    internals->rect_shader = lv_draw_gles_shader_program_create(rect_vertex_shader_str, rect_fragment_shader_str);
-    glUseProgram(internals->rect_shader);
-    internals->rect_shader_pos_location = glGetAttribLocation(internals->rect_shader, "a_position");
-    internals->rect_shader_projection_location = glGetUniformLocation(internals->rect_shader, "projection");
-    internals->rect_shader_model_location = glGetUniformLocation(internals->rect_shader, "model");
-    internals->rect_shader_color_location = glGetUniformLocation(internals->rect_shader, "color");
-    glUniformMatrix4fv(internals->rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
-    internals->pixels = malloc( 800 * 600 * 3 * sizeof(GLubyte));
+    LV_LOG_USER("GPU texture is created.");
+
 }
 
-GLuint lv_draw_gles_shader_program_create(const char *vertex_src, const char *fragment_src)
+void lv_draw_gles_utils_upload_texture(lv_draw_ctx_t * draw_ctx)
 {
-    GLuint vertex = shader_create(GL_VERTEX_SHADER, vertex_src);
-    GLuint fragment = shader_create(GL_FRAGMENT_SHADER, fragment_src);
-    GLuint program = glCreateProgram();
+    lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
+    lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
 
-    glAttachShader(program, vertex);
-    glAttachShader(program, fragment);
+    lvgl_buf_to_opengl_buf(internals->gpu_texture_pixels, draw_gles_ctx->base_draw.buf);
 
-    glLinkProgram(program);
+    glBindTexture(GL_TEXTURE_2D, internals->gpu_texture);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, LV_GPU_SDL_GLES_HOR_RES, LV_GPU_SDL_GLES_VER_RES, GL_RGB, GL_UNSIGNED_BYTE, internals->gpu_texture_pixels);
+    glBindTexture(GL_TEXTURE_2D,0);
 
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
-
-    return program;
 }
+
+void lv_draw_gles_utils_download_texture(lv_draw_ctx_t * draw_ctx)
+{
+    lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
+    lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
+
+    GLuint fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, internals->gpu_texture, 0);
+    glReadPixels(0, 0, LV_GPU_SDL_GLES_HOR_RES, LV_GPU_SDL_GLES_VER_RES, GL_RGB, GL_UNSIGNED_BYTE, internals->gpu_texture_pixels);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &fbo);
+
+
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+
+    opengl_buf_to_lvgl_buf(disp->driver->draw_buf->buf1,  internals->gpu_texture_pixels);
+
+
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static GLuint shader_create(GLenum type, const char *src)
+static void lvgl_buf_to_opengl_buf(GLubyte *opengl_buf, const void *lvgl_buf)
 {
-    GLint success = 0;
-
-    GLuint shader = glCreateShader(type);
-
-    glShaderSource(shader, 1, &src, NULL);
-    glCompileShader(shader);
-
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if(!success)
-    {
-        GLint info_log_len = 0;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &info_log_len);
-
-        char *info_log = malloc(info_log_len+1);
-        info_log[info_log_len] = '\0';
-
-        glGetShaderInfoLog(shader, info_log_len, NULL, info_log);
-        fprintf(stderr, "Failed to compile shader : %s", info_log);
-        free(info_log);
+    lv_color_t *buf = (lv_color_t*)lvgl_buf;
+    for (uint32_t y=0; y<LV_GPU_SDL_GLES_VER_RES; y++) {
+        for (uint32_t x=0; x<LV_GPU_SDL_GLES_HOR_RES; x++) {
+            uint32_t index = (y * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+            opengl_buf[index++] = buf->ch.red;
+            opengl_buf[index++] = buf->ch.green;
+            opengl_buf[index++] = buf->ch.blue;
+            buf++;
+        }
     }
+}
 
-    return shader;
+static void opengl_buf_to_lvgl_buf(void *lvgl_buf, const GLubyte *opengl_buf)
+{
+    lv_color_t *buf = (lv_color_t*)lvgl_buf;
+    for (uint32_t y=0; y<LV_GPU_SDL_GLES_VER_RES; y++) {
+        for (uint32_t x=0; x<LV_GPU_SDL_GLES_HOR_RES; x++) {
+            uint32_t index = (y * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.red = opengl_buf[index++];
+            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.green = opengl_buf[index++];
+            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.blue = opengl_buf[index++];
+            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.alpha = 0xFF;
+        }
+    }
 }
 
 #endif /*LV_USE_GPU_SDL_GLES*/

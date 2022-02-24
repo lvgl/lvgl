@@ -19,6 +19,7 @@ extern "C" {
 #include LV_GPU_SDL_GLES_GLAD_INCLUDE_PATH
 
 #include "lv_draw_gles_priv.h"
+#include "../lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -32,9 +33,10 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void _lv_draw_gles_utils_init();
 void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * internals);
-GLuint lv_draw_gles_shader_program_create(const char *vertex_src, const char *fragment_src);
+/* upload lvgl buffer to opengl texture */
+void lv_draw_gles_utils_upload_texture(lv_draw_ctx_t * draw_ctx);
+void lv_draw_gles_utils_download_texture(lv_draw_ctx_t * draw_ctx);
 
 /**********************
  *      MACROS

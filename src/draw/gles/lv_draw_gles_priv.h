@@ -32,13 +32,8 @@ extern "C" {
  **********************/
 
 typedef struct lv_draw_gles_context_internals_t {
-    mat4 projection;
-    GLuint rect_shader;
-    GLint rect_shader_pos_location;
-    GLint rect_shader_projection_location;
-    GLint rect_shader_model_location;
-    GLint rect_shader_color_location;
-    GLubyte *pixels;
+    GLubyte *gpu_texture_pixels;
+    GLuint gpu_texture;
 
 } lv_draw_gles_context_internals_t;
 
