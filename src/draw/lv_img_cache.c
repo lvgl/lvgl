@@ -160,7 +160,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
     /*If the number of cache entries is insufficient, look for the entry that can be reused*/
     if(cached_src == NULL) {
         cached_src = find_reuse_entry();
-        LV_LOG_INFO("cache entry is full, find reuse entry: %p", cached_src);
+        LV_LOG_INFO("cache entry is full, find reuse entry");
     }
 
 #else
