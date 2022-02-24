@@ -87,3 +87,38 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 Use 4 spaces indentation instead of tab.
 
 You can use **astyle** to format the code. Run `code-formatter.sh` from the `scrips` folder.
+
+#### pre-commit
+
+[pre-commit](https://pre-commit.com/) is a multi-language package manager for pre-commit hooks.
+See the [instalation guide](https://pre-commit.com/#installation) to get pre-commit python package
+installed into your development machine.
+
+Once you have `pre-commit` installed you will need to [set up the git hook scripts](https://pre-commit.com/#3-install-the-git-hook-scripts) with:
+```console
+pre-commit install
+```
+
+now `pre-commit` will run automatically on `git commit`!
+
+##### Hooks
+
+The `format-source` local hook (see `.pre-commit-config.yaml`) runs **astyle** on all the staged source and header
+files (that are not excluded, see `exclude` key of the hook configuration) before entering the commit message,
+if any file gets formatted by **astyle** you will need to add the change to the staging area and run `git commit` again.
+
+The `trailing-whitespace` hook fixes trailing whitespaces on all of the files.
+
+##### Skipping hooks
+
+If you want to skip any particular hook you can do so with:
+```console
+SKIP=name-of-the-hook git commit
+```
+
+##### Testing hooks
+
+It's no necessary to do a commit to test the hooks, you can test hooks by adding the files into the staging area and run:
+```console
+pre-commit run name-of-the-hook
+```
