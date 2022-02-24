@@ -11,14 +11,7 @@
 
 #if LV_USE_GPU_SDL_GLES
 
-#include "lv_draw_gles_priv.h"
-#include "lv_draw_gles_blend.h"
-#include "lv_draw_gles.h"
-#include "../lv_draw_rect.h"
-#include "../lv_draw_img.h"
-#include "../lv_draw_label.h"
-#include "../../core/lv_refr.h"
-
+#include "../lv_draw.h"
 
 #include LV_GPU_SDL_GLES_GLAD_INCLUDE_PATH
 
