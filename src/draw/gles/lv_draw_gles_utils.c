@@ -84,6 +84,7 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     internals->rect_shader_model_location = glGetUniformLocation(internals->rect_shader, "model");
     internals->rect_shader_color_location = glGetUniformLocation(internals->rect_shader, "color");
     glUniformMatrix4fv(internals->rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
+    internals->pixels = malloc( 800 * 600 * 3 * sizeof(GLubyte));
 }
 
 GLuint lv_draw_gles_shader_program_create(const char *vertex_src, const char *fragment_src)

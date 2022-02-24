@@ -38,6 +38,7 @@ typedef struct lv_draw_gles_context_internals_t {
     GLint rect_shader_projection_location;
     GLint rect_shader_model_location;
     GLint rect_shader_color_location;
+    GLubyte *pixels;
 
 } lv_draw_gles_context_internals_t;
 

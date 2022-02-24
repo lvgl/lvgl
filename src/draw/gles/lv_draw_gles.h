@@ -21,6 +21,7 @@ extern "C" {
 #include LV_GPU_SDL_GLES_GLAD_INCLUDE_PATH
 
 #include "../lv_draw.h"
+#include "../sw/lv_draw_sw_blend.h"
 #include "../../core/lv_disp.h"
 
 /*********************
@@ -34,7 +35,10 @@ extern "C" {
 
 typedef struct {
     lv_draw_ctx_t base_draw;
-    GLuint *framebuffer;
+
+    /** Fill an area of the destination buffer with a color*/
+    void (*blend)(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+    GLuint *texture;
     struct lv_draw_gles_context_internals_t * internals;
 } lv_draw_gles_ctx_t;
 
