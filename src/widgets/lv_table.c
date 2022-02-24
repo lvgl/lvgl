@@ -206,6 +206,9 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
+
+    if(table->row_cnt == row_cnt) return;
+
     uint16_t old_row_cnt = table->row_cnt;
     table->row_cnt         = row_cnt;
 
@@ -234,7 +237,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
         lv_memset_00(&table->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(table->cell_data[0]));
     }
 
-    refr_size(obj, 0) ;
+    refr_size(obj, 0);
 }
 
 void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
@@ -242,35 +245,18 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_table_t * table = (lv_table_t *)obj;
+
+    if(table->col_cnt == col_cnt) return;
+
     uint16_t old_col_cnt = table->col_cnt;
     table->col_cnt         = col_cnt;
-    table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
-    LV_ASSERT_MALLOC(table->col_w);
-    if(table->col_w == NULL) return;
-
-    /*Free the unused cells*/
-    if(old_col_cnt > col_cnt) {
-        uint16_t old_cell_cnt = old_col_cnt * table->row_cnt;
-        uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
-        uint32_t i;
-        for(i = new_cell_cnt; i < old_cell_cnt; i++) {
-            lv_mem_free(table->cell_data[i]);
-        }
-    }
 
     char ** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char *));
     LV_ASSERT_MALLOC(new_cell_data);
     if(new_cell_data == NULL) return;
     uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
-    lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
 
-    /*Initialize the new fields*/
-    if(old_col_cnt < col_cnt) {
-        uint32_t col;
-        for(col = old_col_cnt; col < col_cnt; col++) {
-            table->col_w[col] = LV_DPI_DEF;
-        }
-    }
+    lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
 
     /*The new column(s) messes up the mapping of `cell_data`*/
     uint32_t old_col_start;
@@ -283,10 +269,28 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
 
         lv_memcpy_small(&new_cell_data[new_col_start], &table->cell_data[old_col_start],
                         sizeof(new_cell_data[0]) * min_col_cnt);
+
+        /*Free the old cells (only if the table becomes smaller)*/
+        int32_t i;
+        for(i = 0; i < (int32_t)old_col_cnt - col_cnt; i++) {
+            uint32_t idx = old_col_start + min_col_cnt + i;
+            lv_mem_free(table->cell_data[idx]);
+            table->cell_data[idx] = NULL;
+        }
     }
 
     lv_mem_free(table->cell_data);
     table->cell_data = new_cell_data;
+
+    /*Initialize the new column widths if any*/
+    table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
+    LV_ASSERT_MALLOC(table->col_w);
+    if(table->col_w == NULL) return;
+
+    uint32_t col;
+    for(col = old_col_cnt; col < col_cnt; col++) {
+        table->col_w[col] = LV_DPI_DEF;
+    }
 
 
     refr_size(obj, 0) ;
@@ -811,21 +815,26 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom)
 {
     lv_table_t * table = (lv_table_t *)obj;
-    lv_point_t txt_size;
-    lv_coord_t txt_w;
 
+    lv_coord_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
+    /* Calculate the cell_data index where to start */
     uint16_t row_start = row_id * table->col_cnt;
+
+    /* Traverse the cells in the row_id row */
     uint16_t cell;
     uint16_t col;
-    lv_coord_t h_max = lv_font_get_line_height(font) + cell_top + cell_bottom;
-
     for(cell = row_start, col = 0; cell < row_start + table->col_cnt; cell++, col++) {
-        if(is_cell_empty(table->cell_data[cell])) {
+        char * cell_data = table->cell_data[cell];
+
+        if(is_cell_empty(cell_data)) {
             continue;
         }
 
-        txt_w = table->col_w[col];
-        /* Merge cells */
+        lv_coord_t txt_w = table->col_w[col];
+
+        /* Traverse the current row from the first until the penultimate column.
+         * Increment the text width if the cell has the LV_TABLE_CELL_CTRL_MERGE_RIGHT control,
+         * exit the traversal when the current cell control is not LV_TABLE_CELL_CTRL_MERGE_RIGHT */
         uint16_t col_merge = 0;
         for(col_merge = 0; col_merge + col < table->col_cnt - 1; col_merge++) {
             char * next_cell_data = table->cell_data[cell + col_merge];
@@ -841,22 +850,23 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
             }
         }
 
-        lv_table_cell_ctrl_t ctrl = 0;
-        if(table->cell_data[cell]) ctrl = table->cell_data[cell][0];
+        lv_table_cell_ctrl_t ctrl = (lv_table_cell_ctrl_t) cell_data[0];
 
-        /*With text crop assume 1 line*/
+        /*When cropping the text we can assume the row height is equal to the line height*/
         if(ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP) {
             h_max = LV_MAX(lv_font_get_line_height(font) + cell_top + cell_bottom,
                            h_max);
         }
-        /*Without text crop calculate the height of the text in the cell*/
+        /*Else we have to calculate the height of the cell text*/
         else {
+            lv_point_t txt_size;
             txt_w -= cell_left + cell_right;
 
             lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
                             letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
 
             h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
+            /*Skip until one element after the last merged column*/
             cell += col_merge;
             col += col_merge;
         }
@@ -924,7 +934,8 @@ static size_t get_cell_txt_len(const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     retval = _lv_txt_ap_calc_bytes_cnt(txt) + 1;
 #else
-    /* +1: trailing '\0'; +1: format byte */
+    /* cell_data layout: [ctrl][txt][trailing '\0' terminator]
+     * +2 because of the trailing '\0' and the ctrl */
     retval = strlen(txt) + 2;
 #endif
 
