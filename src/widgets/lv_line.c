@@ -83,7 +83,7 @@ void lv_line_set_y_invert(lv_obj_t * obj, bool en)
     lv_line_t * line = (lv_line_t *)obj;
     if(line->y_inv == en) return;
 
-    line->y_inv = en == false ? 0 : 1;
+    line->y_inv = en ? 1U : 0U;
 
     lv_obj_invalidate(obj);
 }
@@ -98,7 +98,7 @@ bool lv_line_get_y_invert(const lv_obj_t * obj)
 
     lv_line_t * line = (lv_line_t *)obj;
 
-    return line->y_inv == 0 ? false : true;
+    return line->y_inv == 1U;
 }
 
 /**********************
@@ -143,22 +143,23 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_line_t * line = (lv_line_t *)obj;
 
+        if(line->point_num == 0 || line->point_array == NULL) return;
+
         lv_point_t * p = lv_event_get_param(e);
         lv_coord_t w = 0;
         lv_coord_t h = 0;
-        if(line->point_num > 0) {
-            uint16_t i;
-            for(i = 0; i < line->point_num; i++) {
-                w = LV_MAX(line->point_array[i].x, w);
-                h = LV_MAX(line->point_array[i].y, h);
-            }
 
-            lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-            w += line_width;
-            h += line_width;
-            p->x = w;
-            p->y = h;
+        uint16_t i;
+        for(i = 0; i < line->point_num; i++) {
+            w = LV_MAX(line->point_array[i].x, w);
+            h = LV_MAX(line->point_array[i].y, h);
         }
+
+        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
+        w += line_width;
+        h += line_width;
+        p->x = w;
+        p->y = h;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_line_t * line = (lv_line_t *)obj;
@@ -170,18 +171,17 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_get_coords(obj, &area);
         lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
         lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
-        lv_point_t p1;
-        lv_point_t p2;
         lv_coord_t h = lv_obj_get_height(obj);
-        uint16_t i;
 
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /*Read all points and draw the lines*/
+        uint16_t i;
         for(i = 0; i < line->point_num - 1; i++) {
-
+            lv_point_t p1;
+            lv_point_t p2;
             p1.x = line->point_array[i].x + x_ofs;
             p2.x = line->point_array[i + 1].x + x_ofs;
 
