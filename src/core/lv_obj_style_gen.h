@@ -509,6 +509,12 @@ static inline lv_opa_t lv_obj_get_style_color_filter_opa(const struct _lv_obj_t 
     return (lv_opa_t)v.num;
 }
 
+static inline const lv_anim_t * lv_obj_get_style_anim(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ANIM);
+    return (const lv_anim_t *)v.ptr;
+}
+
 static inline uint32_t lv_obj_get_style_anim_time(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_ANIM_TIME);
@@ -631,6 +637,7 @@ void lv_obj_set_style_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selec
 void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value,
                                        lv_style_selector_t selector);
 void lv_obj_set_style_color_filter_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
+void lv_obj_set_style_anim(struct _lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
