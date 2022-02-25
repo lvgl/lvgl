@@ -1021,7 +1021,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
     }
     /*In roll inf. mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
-        const lv_anim_t anim_template = (const lv_anim_t *)lv_obj_get_style_anim(obj, LV_PART_MAIN);
+        const lv_anim_t *anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
         uint16_t anim_speed = lv_obj_get_style_anim_speed(obj, LV_PART_MAIN);
         if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;

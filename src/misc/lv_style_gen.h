@@ -83,7 +83,7 @@ void lv_style_set_clip_corner(lv_style_t * style, bool value);
 void lv_style_set_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value);
 void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value);
-void lv_style_set_anim(lv_style_t * style, const void * value);
+void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
 void lv_style_set_anim_time(lv_style_t * style, uint32_t value);
 void lv_style_set_anim_speed(lv_style_t * style, uint32_t value);
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value);

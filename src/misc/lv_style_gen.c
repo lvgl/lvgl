@@ -680,7 +680,7 @@ void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value)
     lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, v);
 }
 
-void lv_style_set_anim(lv_style_t * style, const void * value)
+void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value)
 {
     lv_style_value_t v = {
         .ptr = value
