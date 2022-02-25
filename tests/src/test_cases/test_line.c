@@ -7,6 +7,8 @@ static lv_obj_t * active_screen = NULL;
 static lv_obj_t * line = NULL;
 
 static const uint16_t default_point_num = 0U;
+static const lv_coord_t initial_extra_draw_size = 5U;
+static const lv_coord_t final_extra_draw_size = 10U;
 
 void setUp(void)
 {
@@ -59,6 +61,38 @@ void test_line_size_should_be_updated_after_adding_points(void)
 
     TEST_ASSERT_EQUAL_UINT16(calculated_width, lv_obj_get_self_width(line));
     TEST_ASSERT_EQUAL_UINT16(calculated_height, lv_obj_get_self_height(line));
+}
+
+static void line_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+        /* Set the new line extra draw size */
+        lv_event_set_ext_draw_size(e, initial_extra_draw_size);
+    }
+}
+
+void test_line_should_update_extra_draw_size_based_on_style(void)
+{
+    /* Setup an event handler for line extra draw size event */
+    lv_obj_add_event_cb(line, line_event_cb, LV_EVENT_ALL, NULL);
+    /* Trigger the extra draw size event */
+    lv_obj_refresh_ext_draw_size(line);
+
+    TEST_ASSERT_EQUAL(1U, _lv_obj_get_ext_draw_size(line));
+
+    /* Update line width style */
+    static lv_style_t line_style;
+    lv_style_init(&line_style);
+    lv_obj_set_style_line_width(line, LV_PART_MAIN, final_extra_draw_size);
+    lv_obj_add_style(line, &line_style, LV_PART_MAIN);
+    lv_obj_report_style_change(&line_style);
+
+    /* Trigger the extra draw size event */
+    lv_obj_refresh_ext_draw_size(line);
+
+    TEST_ASSERT_EQUAL(final_extra_draw_size, _lv_obj_get_ext_draw_size(line));
 }
 
 #endif
