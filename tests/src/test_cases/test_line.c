@@ -16,7 +16,7 @@ void setUp(void)
 
 void tearDown(void)
 {
-    /* Function run after every test */
+    lv_obj_clean(active_screen);
 }
 
 void test_line_should_have_valid_documented_default_values(void)
