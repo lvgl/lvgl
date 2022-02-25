@@ -344,6 +344,10 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "The intensity of mixing of color filter."},
 
+ {'name': 'ANIM',
+ 'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "The animation template for the object's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
+
 {'name': 'ANIM_TIME',
  'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},

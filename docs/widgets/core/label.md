@@ -58,6 +58,10 @@ The whole mechanism (click and select the text as you drag your finger/mouse) is
 ### Very long texts
 LVGL can efficiently handle very long (e.g. > 40k characters) labels by saving some extra data (~12 bytes) to speed up drawing. To enable this feature, set `LV_LABEL_LONG_TXT_HINT   1` in `lv_conf.h`.
 
+### Custom scrolling animations
+Some aspects of the scrolling animations in long modes `LV_LABEL_LONG_SCROLL` and `LV_LABEL_LONG_SCROLL_CIRCULAR` can be customized by setting the animation property of a style, using `lv_style_set_anim()`.
+Currently, only the start and repeat delay of the circular scrolling animation can be customized. If you need to customize another aspect of the scrolling animation, feel free to open an [issue on Github](https://github.com/lvgl/lvgl/issues) to request the feature.
+
 ### Symbols
 The labels can display symbols alongside letters (or on their own). Read the [Font](/overview/font) section to learn more about the symbols.
 
