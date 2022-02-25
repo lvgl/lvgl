@@ -80,14 +80,11 @@ void test_line_should_update_extra_draw_size_based_on_style(void)
     /* Trigger the extra draw size event */
     lv_obj_refresh_ext_draw_size(line);
 
-    TEST_ASSERT_EQUAL(1U, _lv_obj_get_ext_draw_size(line));
+    TEST_ASSERT_EQUAL(initial_extra_draw_size, _lv_obj_get_ext_draw_size(line));
 
-    /* Update line width style */
-    static lv_style_t line_style;
-    lv_style_init(&line_style);
-    lv_obj_set_style_line_width(line, LV_PART_MAIN, final_extra_draw_size);
-    lv_obj_add_style(line, &line_style, LV_PART_MAIN);
-    lv_obj_report_style_change(&line_style);
+    /* Update line width style, the event handler should set the extra draw size
+     * to the line width */
+    lv_obj_set_style_line_width(line, final_extra_draw_size, LV_PART_MAIN);
 
     /* Trigger the extra draw size event */
     lv_obj_refresh_ext_draw_size(line);
