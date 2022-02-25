@@ -23,3 +23,9 @@ Draw label with gradient color
 .. lv_example:: widgets/label/lv_example_label_4
   :language: c
 
+Customize circular scrolling animation
+""""""""""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/label/lv_example_label_5
+  :language: c
+
