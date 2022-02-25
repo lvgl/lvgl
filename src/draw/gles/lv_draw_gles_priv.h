@@ -34,7 +34,7 @@ extern "C" {
 typedef struct lv_draw_gles_context_internals_t {
     GLubyte *gpu_texture_pixels;
     GLuint gpu_texture;
-
+    GLuint framebuffer;
 } lv_draw_gles_context_internals_t;
 
 /**********************
