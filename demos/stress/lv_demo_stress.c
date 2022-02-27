@@ -422,7 +422,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
     }
 
     //    printf("step end: %d\n", state);
-    state ++;
+    state++;
 }
 
 static void auto_del(lv_obj_t * obj, uint32_t delay)
