@@ -893,6 +893,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         else if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER &&
                                                        lv_group_get_editing(lv_obj_get_group(btnm)))) {
             ext->btn_id_pr = ext->btn_id_focused;
+            ext->btn_id_act = ext->btn_id_focused;
             invalidate_button_area(btnm, ext->btn_id_focused);
         }
 #endif
