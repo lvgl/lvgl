@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.2.0
+ * Configuration file for v8.3.0-dev
  */
 
 /*
@@ -90,7 +90,7 @@
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h" 
+        #define LV_TICK_CUSTOM_INCLUDE              "perf_counter.h" 
         
         #if __PER_COUNTER_VER__ < 10902ul
             #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
@@ -126,13 +126,13 @@
     /*Allow buffering some shadow calculation.
     *LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
     *Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
-    #define LV_SHADOW_CACHE_SIZE        0
+    #define LV_SHADOW_CACHE_SIZE 0
 
     /* Set number of maximally cached circle data.
     * The circumference of 1/4 circle are saved for anti-aliasing
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
-    #define LV_CIRCLE_CACHE_SIZE        4
+    #define LV_CIRCLE_CACHE_SIZE 4
 #endif /*LV_DRAW_COMPLEX*/
 
 /*Default image cache size. Image caching keeps the images opened.
@@ -140,23 +140,23 @@
  *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  *However the opened images might consume additional RAM.
  *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE           0
+#define LV_IMG_CACHE_DEF_SIZE   0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-#define LV_GRADIENT_MAX_STOPS           2
+#define LV_GRADIENT_MAX_STOPS       2
 
 /*Default gradient buffer size.
  *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
  *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
  *If the cache is too small the map will be allocated only while it's required for the drawing.
  *0 mean no caching.*/
-#define LV_GRAD_CACHE_DEF_SIZE          0
+#define LV_GRAD_CACHE_DEF_SIZE      0
 
 /*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
  *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
  *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-#define LV_DITHER_GRADIENT              0
+#define LV_DITHER_GRADIENT      0
 #if LV_DITHER_GRADIENT
     /*Add support for error diffusion dithering.
      *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
@@ -189,6 +189,7 @@
     #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
 
+/*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 
 /*Use SDL renderer API*/
 #define LV_USE_GPU_SDL 0
@@ -543,7 +544,7 @@
 /*-----------
  * Themes
  *----------*/
-
+ 
 #ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
     /*A simple, impressive and very complete theme*/
     #define LV_USE_THEME_DEFAULT 1
@@ -593,13 +594,15 @@
 /*1: Enable grid navigation*/
 #define LV_USE_GRIDNAV  0
 
+/*1: Enable lv_obj fragment*/
+#define LV_USE_FRAGMENT 0
+
 /*==================
 * EXAMPLES
 *==================*/
 
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES 1
-
 
 /*--END OF LV_CONF_H--*/
 

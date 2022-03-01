@@ -36,9 +36,9 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
   
   <releases>
-    <release date="2022-02-14" version="1.0.1-alpha3" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.1-alpha3.pack">
+    <release date="2022-02-26" version="1.0.1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.1.pack">
       - LVGL 8.3.0-dev
-      - Monthly update
+      - Monthly update for February
     </release>
     <release date="2022-01-31" version="1.0.0" url="https://github.com/lvgl/lvgl/blob/d851fe0528fcb920fee86c944fe9dbbaf6fbb0c9/env_support/cmsis-pack/LVGL.lvgl.1.0.0.pack?raw=true">
       - LVGL 8.2.0
