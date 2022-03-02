@@ -35,6 +35,15 @@ typedef struct lv_draw_gles_context_internals_t {
     GLubyte *gpu_texture_pixels;
     GLuint gpu_texture;
     GLuint framebuffer;
+    mat4 projection;
+    GLuint rect_shader;
+    GLint rect_shader_pos_location;
+    GLint rect_shader_projection_location;
+    GLint rect_shader_model_location;
+    GLint rect_shader_color_location;
+    GLint rect_shader_resolution_location;
+    GLint rect_shader_radius_location;
+    GLint rect_shader_coords_location;
 } lv_draw_gles_context_internals_t;
 
 /**********************

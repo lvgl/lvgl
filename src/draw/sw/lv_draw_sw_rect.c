@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <src/draw/gles/lv_draw_gles_utils.h>
 #include "lv_draw_sw.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_txt_ap.h"
@@ -69,15 +70,15 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
 void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 #if LV_DRAW_COMPLEX
-    draw_shadow(draw_ctx, dsc, coords);
+  //  draw_shadow(draw_ctx, dsc, coords);
 #endif
 
     draw_bg(draw_ctx, dsc, coords);
-    draw_bg_img(draw_ctx, dsc, coords);
+    //draw_bg_img(draw_ctx, dsc, coords);
 
-    draw_border(draw_ctx, dsc, coords);
+    //draw_border(draw_ctx, dsc, coords);
 
-    draw_outline(draw_ctx, dsc, coords);
+  //  draw_outline(draw_ctx, dsc, coords);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -129,6 +130,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
         blend_dsc.blend_area = &bg_coords;
         blend_dsc.opa = dsc->bg_opa;
 
+        //return; /* Implemented */
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
         return;
     }
@@ -152,6 +154,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     lv_draw_mask_radius_param_t mask_rout_param;
     if(rout > 0 || mask_any) {
         mask_buf = lv_mem_buf_get(clipped_w);
+        rout =5;
         lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
         mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
     }

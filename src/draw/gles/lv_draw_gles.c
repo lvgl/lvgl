@@ -93,7 +93,7 @@ void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 
     draw_gles_ctx->base_draw.draw_rect = lv_draw_gles_draw_rect;
     draw_gles_ctx->base_draw.draw_img = lv_draw_gles_img_core;
-    draw_gles_ctx->base_draw.draw_letter = NULL;
+    draw_gles_ctx->base_draw.draw_letter = lv_draw_gles_draw_letter;
     draw_gles_ctx->base_draw.draw_line = lv_draw_gles_draw_line;
     draw_gles_ctx->base_draw.draw_arc = lv_draw_gles_draw_arc;
     draw_gles_ctx->base_draw.draw_polygon = lv_draw_gles_polygon;
