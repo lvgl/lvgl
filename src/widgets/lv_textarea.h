@@ -1,5 +1,5 @@
 /**
- * @file lv_ta.h
+ * @file lv_textarea.h
  *
  */
 
@@ -76,7 +76,7 @@ enum {
  **********************/
 
 /**
- * Create a text area objects
+ * Create a text area object
  * @param parent    pointer to an object, it will be the parent of the new text area
  * @return          pointer to the created text area
  */

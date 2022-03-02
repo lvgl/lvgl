@@ -69,29 +69,29 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
     if(lv_img_src_get_type(src) == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = src;
-       gifobj->gif = gd_open_gif_data(img_dsc->data);
+        gifobj->gif = gd_open_gif_data(img_dsc->data);
     }
     else if(lv_img_src_get_type(src) == LV_IMG_SRC_FILE) {
-       gifobj->gif = gd_open_gif_file(src);
+        gifobj->gif = gd_open_gif_file(src);
     }
     if(gifobj->gif == NULL) {
         LV_LOG_WARN("Could't load the source");
         return;
     }
 
-   gifobj->imgdsc.data = gifobj->gif->canvas;
-   gifobj->imgdsc.header.always_zero = 0;
-   gifobj->imgdsc.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-   gifobj->imgdsc.header.h = gifobj->gif->height;
-   gifobj->imgdsc.header.w = gifobj->gif->width;
-   gifobj->last_call = lv_tick_get();
+    gifobj->imgdsc.data = gifobj->gif->canvas;
+    gifobj->imgdsc.header.always_zero = 0;
+    gifobj->imgdsc.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    gifobj->imgdsc.header.h = gifobj->gif->height;
+    gifobj->imgdsc.header.w = gifobj->gif->width;
+    gifobj->last_call = lv_tick_get();
 
-   lv_img_set_src(obj, &gifobj->imgdsc);
+    lv_img_set_src(obj, &gifobj->imgdsc);
 
-   lv_timer_resume(gifobj->timer);
-   lv_timer_reset(gifobj->timer);
+    lv_timer_resume(gifobj->timer);
+    lv_timer_reset(gifobj->timer);
 
-   next_frame_task_cb(gifobj->timer);
+    next_frame_task_cb(gifobj->timer);
 
 }
 
@@ -139,7 +139,8 @@ static void next_frame_task_cb(lv_timer_t * t)
         if(gifobj->gif->loop_count == 1) {
             lv_res_t res = lv_event_send(obj, LV_EVENT_READY, NULL);
             if(res != LV_FS_RES_OK) return;
-        } else {
+        }
+        else {
             if(gifobj->gif->loop_count > 1)  gifobj->gif->loop_count--;
             gd_rewind(gifobj->gif);
         }

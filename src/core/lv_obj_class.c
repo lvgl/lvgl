@@ -55,7 +55,7 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         LV_TRACE_OBJ_CREATE("creating a screen");
         lv_disp_t * disp = lv_disp_get_default();
         if(!disp) {
-            LV_LOG_WARN("No display created to so far. No place to assign the new screen");
+            LV_LOG_WARN("No display created yet. No place to assign the new screen");
             return NULL;
         }
 

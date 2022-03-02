@@ -6,7 +6,7 @@ decoder.open_cb = open_png
 
 # Create an image from the png file
 try:
-    with open('../assets/img_cogwheel_argb.png','rb') as f:
+    with open('../assets/img_cogwheel_argb.png', 'rb') as f:
         png_data = f.read()
 except:
     print("Could not find img_cogwheel_argb.png")
@@ -41,4 +41,3 @@ obj.add_style(style, 0)
 obj.set_src(img_cogwheel_argb)
 
 obj.center()
-

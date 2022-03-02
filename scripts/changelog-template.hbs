@@ -47,7 +47,7 @@
   {{/commit-list}}
 
   ### Fixes
-  {{#commit-list merges heading='' message='^fix'  message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE)'}}
+  {{#commit-list merges heading='' message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE)'}}
     - {{message}} [`{{id}}`]({{href}})
   {{/commit-list}}
   {{#commit-list commits heading='' message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE)'}}

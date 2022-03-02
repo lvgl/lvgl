@@ -71,7 +71,7 @@ typedef enum {
  **********************/
 
 /**
- * Create a bar objects
+ * Create a bar object
  * @param parent    pointer to an object, it will be the parent of the new bar
  * @return          pointer to the created bar
  */

@@ -34,5 +34,5 @@ btn1.add_style(style_pr, lv.STATE.PRESSED)
 btn1.add_style(style_def, 0)
 
 label = lv.label(btn1)
-label.set_text("Gum");
+label.set_text("Gum")
 

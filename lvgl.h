@@ -14,7 +14,7 @@ extern "C" {
  * CURRENT VERSION OF LVGL
  ***************************/
 #define LVGL_VERSION_MAJOR 8
-#define LVGL_VERSION_MINOR 1
+#define LVGL_VERSION_MINOR 2
 #define LVGL_VERSION_PATCH 0
 #define LVGL_VERSION_INFO ""
 

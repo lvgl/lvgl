@@ -46,7 +46,7 @@ label = lv.label(btn)                       # Add a label to the button
 label.set_text("Button")                    # Set the labels text
 label.center()
 
-# Create an other button and use the red style too
+# Create another button and use the red style too
 btn2 = lv.btn(lv.scr_act())
 btn2.remove_style_all()                     # Remove the styles coming from the theme
 btn2.set_pos(10, 80)                        # Set its position
@@ -54,9 +54,9 @@ btn2.set_size(120, 50)                      # Set its size
 btn2.add_style(style_btn, 0)
 btn2.add_style(style_btn_red, 0)
 btn2.add_style(style_btn_pressed, lv.STATE.PRESSED)
-btn2.set_style_radius(lv.RADIUS.CIRCLE, 0); # Add a local style
+btn2.set_style_radius(lv.RADIUS.CIRCLE, 0)  # Add a local style
 
 label = lv.label(btn2)                      # Add a label to the button
-label.set_text("Button 2");                 # Set the labels text
+label.set_text("Button 2")                  # Set the labels text
 label.center()
 

@@ -127,7 +127,7 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MAX4(knob_left, knob_right, knob_bottom, knob_top);
-        knob_size += 2;         /*For rounding error*/
+        knob_size += _LV_SWITCH_KNOB_EXT_AREA_CORRECTION;
         knob_size += lv_obj_calculate_ext_draw_size(obj, LV_PART_KNOB);
 
         lv_coord_t * s = lv_event_get_param(e);
@@ -148,8 +148,7 @@ static void draw_main(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    const lv_area_t * clip_area = lv_event_get_param(e);
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
     /*Calculate the indicator area*/
     lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
@@ -169,18 +168,12 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
-    lv_draw_rect(&indic_area, clip_area, &draw_indic_dsc);
+    lv_draw_rect(draw_ctx, &draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
-    lv_coord_t objh = lv_obj_get_height(obj);
-    lv_coord_t knob_size = objh;
-    lv_area_t knob_area;
-
-    lv_coord_t anim_length = obj->coords.x2 - bg_right - obj->coords.x1 - bg_left - knob_size;
-
-    lv_coord_t anim_value_x;
-
-    bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
+    lv_coord_t anim_value_x = 0;
+    lv_coord_t knob_size = lv_obj_get_height(obj);
+    lv_coord_t anim_length = lv_area_get_width(&obj->coords) - knob_size;
 
     if(LV_SWITCH_IS_ANIMATING(sw)) {
         /* Use the animation's coordinate */
@@ -188,18 +181,20 @@ static void draw_main(lv_event_t * e)
     }
     else {
         /* Use LV_STATE_CHECKED to decide the coordinate */
+        bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
         anim_value_x = chk ? anim_length : 0;
     }
 
-    if(base_dir == LV_BASE_DIR_RTL) {
+    if(LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN)) {
         anim_value_x = anim_length - anim_value_x;
     }
 
-    knob_area.x1 = obj->coords.x1 + bg_left + anim_value_x;
+    lv_area_t knob_area;
+    knob_area.x1 = obj->coords.x1 + anim_value_x;
     knob_area.x2 = knob_area.x1 + knob_size;
 
-    knob_area.y1 = obj->coords.y1 + bg_top;
-    knob_area.y2 = obj->coords.y2 - bg_bottom;
+    knob_area.y1 = obj->coords.y1;
+    knob_area.y2 = obj->coords.y2;
 
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
@@ -216,7 +211,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
-    lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
+    lv_draw_rect(draw_ctx, &knob_rect_dsc, &knob_area);
 }
 
 static void lv_switch_anim_exec_cb(void * var, int32_t value)

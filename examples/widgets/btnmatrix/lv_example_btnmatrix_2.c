@@ -54,13 +54,13 @@ static void event_cb(lv_event_t * e)
             img_draw_dsc.recolor = lv_color_black();
             if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  img_draw_dsc.recolor_opa = LV_OPA_30;
 
-            lv_draw_img(&a, dsc->clip_area, &img_star, &img_draw_dsc);
+            lv_draw_img(dsc->draw_ctx, &img_draw_dsc, &a, &img_star);
         }
     }
 }
 
 /**
- * Add custom drawer to the button matrix to customize butons one by one
+ * Add custom drawer to the button matrix to customize buttons one by one
  */
 void lv_example_btnmatrix_2(void)
 {

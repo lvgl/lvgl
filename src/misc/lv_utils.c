@@ -37,7 +37,7 @@
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
  * @note The function cmp must return negative if its first
- *  argument (the search key) is less that its second (a table entry),
+ *  argument (the search key) is less than its second (a table entry),
  *  zero if equal, and positive if greater.
  *
  *  @note Items in the array must be in ascending order.
@@ -46,7 +46,7 @@
  * @param base   Pointer to first element to search
  * @param n      Number of elements
  * @param size   Size of each element
- * @param cmp    Pointer to comparison function (see #lv_font_codeCompare as a comparison function
+ * @param cmp    Pointer to comparison function (see #unicode_list_compare as a comparison function
  * example)
  *
  * @return a pointer to a matching item, or NULL if none exists.

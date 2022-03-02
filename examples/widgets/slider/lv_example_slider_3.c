@@ -49,7 +49,7 @@ static void slider_event_cb(lv_event_t * e)
             lv_draw_label_dsc_t label_draw_dsc;
             lv_draw_label_dsc_init(&label_draw_dsc);
 
-            lv_draw_label(&label_area, dsc->clip_area, &label_draw_dsc, buf, NULL);
+            lv_draw_label(dsc->draw_ctx, &label_draw_dsc, &label_area, buf, NULL);
         }
     }
 }

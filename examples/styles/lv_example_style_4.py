@@ -19,5 +19,3 @@ style.set_outline_pad(8)
 obj = lv.obj(lv.scr_act())
 obj.add_style(style, 0)
 obj.center()
-
-

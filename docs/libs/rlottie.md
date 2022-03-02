@@ -12,7 +12,7 @@ LVGL provides the interface to [Samsung/rlottie](https://github.com/Samsung/rlot
 ## Build Rlottie
 To build Samsung's Rlottie C++14-compatible compiler and optionally CMake 3.14 or higher is required.
 
-To build on desktop you can follow the instrutions from Rlottie's [README](https://github.com/Samsung/rlottie/blob/master/README.md). In the most basic case it looks like this:
+To build on desktop you can follow the instructions from Rlottie's [README](https://github.com/Samsung/rlottie/blob/master/README.md). In the most basic case it looks like this:
 ```
 mkdir rlottie_workdir
 cd rlottie_workdir
@@ -70,6 +70,30 @@ Lottie is standard and popular format so you can find many animation files on th
 For example: https://lottiefiles.com/
 
 You can also create your own animations with Adobe After Effects or similar software.
+
+## Controlling animations
+
+LVGL provides two functions to control the animation mode: `lv_rlottie_set_play_mode` and `lv_rlottie_set_current_frame`.
+You'll combine your intentions when calling the first method, like in these examples:
+```c
+lv_obj_t * lottie = lv_rlottie_create_from_file(scr, 128, 128, "test.json");
+lv_obj_center(lottie);
+// Pause to a specific frame
+lv_rlottie_set_current_frame(lottie, 50);
+lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PAUSE); // The specified frame will be displayed and then the animation will pause
+
+// Play backward and loop
+lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_BACKWARD | LV_RLOTTIE_CTRL_LOOP);
+
+// Play forward once (no looping)
+lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_FORWARD);
+```
+
+The default animation mode is **play forward with loop**.
+
+If you don't enable looping, a `LV_EVENT_READY` is sent when the animation can not make more progress without looping.
+
+To get the number of frames in an animation or the current frame index, you can cast the `lv_obj_t` instance to a `lv_rlottie_t` instance and inspect the `current_frame` and `total_frames` members. 
 
 ## Example
 ```eval_rst

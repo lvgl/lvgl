@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/dropdown.md
+:github_url: |github_link_base|/widgets/core/dropdown.md
 ```
 # Drop-down list (lv_dropdown)
 
@@ -29,8 +29,8 @@ The button goes to `LV_STATE_CHECKED` when it's opened.
 - `LV_PART_SCROLLBAR` The scrollbar background, border, shadow properties and width (for its own width) and right padding for the spacing on the right.
 - `LV_PART_SELECTED` Refers to the currently pressed, checked or pressed+checked option. Also uses the typical background properties. 
 
-As list does not exist when the drop-down list is closed it's not possible to simply add styles to it.
-Insteada add an event handler to the button for `LV_EVENT_READY` (triggered when the list is opened) and add styles to the list in it like this:
+The list is hidden/shown on open/close. To add styles to it use `lv_dropdown_get_list(dropdown)`  to get the list object. For example:
+
 ```c
 lv_obj_t * list = lv_dropdown_get_list(dropdown) /*Get the list*/
 lv_obj_add_style(list, &my_style, ...)           /*Add the styles to the list*/}`
@@ -77,8 +77,8 @@ To manually open or close the drop-down list the `lv_dropdown_open/close(dropdow
 ## Events
 Apart from the [Generic events](../overview/event.html#generic-events), the following [Special events](../overview/event.html#special-events) are sent by the drop-down list:
 - `LV_EVENT_VALUE_CHANGED` Sent when the new option is selected or the list is opened/closed.
-- `LV_EVENT_APPLY` Sent when the list is opened
 - `LV_EVENT_CANCEL`  Sent when the list is closed
+- `LV_EVENT_READY` Sent when the list is opened
 
 See the events of the [Base object](/widgets/obj) too.
 

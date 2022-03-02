@@ -20,6 +20,7 @@ extern "C" {
 #include "chart/lv_chart.h"
 #include "keyboard/lv_keyboard.h"
 #include "list/lv_list.h"
+#include "menu/lv_menu.h"
 #include "msgbox/lv_msgbox.h"
 #include "meter/lv_meter.h"
 #include "spinbox/lv_spinbox.h"

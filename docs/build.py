@@ -32,7 +32,7 @@ ex.exec()
 
 urlpath = re.sub('release/', '', br)
  
-# Be sure the github links point to the right branch
+# Be sure the GitHub links point to the right branch
 f = open("header.rst", "w")
 f.write(".. |github_link_base| replace:: https://github.com/lvgl/lvgl/blob/" + gitcommit + "/docs")
 f.close()
@@ -64,17 +64,17 @@ cmd("cd ../scripts && doxygen Doxyfile")
 # BUILD PDF
 
 if not skip_latex:
-  # Silly workarond to include the more or less correct PDF download link in the PDF
+  # Silly workaround to include the more or less correct PDF download link in the PDF
   #cmd("cp -f " + lang +"/latex/LVGL.pdf LVGL.pdf | true")
   cmd("sphinx-build -b latex . out_latex")
 
   # Generate PDF
   cmd("cd out_latex && latexmk -pdf 'LVGL.tex'")
-  # Copy the result PDF to the main directory to make it avaiable for the HTML build
+  # Copy the result PDF to the main directory to make it available for the HTML build
   cmd("cd out_latex && cp -f LVGL.pdf ../LVGL.pdf")
 else:
   print("skipping latex build as requested")
 
-# BULD HTML
+# BUILD HTML
 cmd("sphinx-build -b html . ../out_html")
 

@@ -1,12 +1,12 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/animimg.md
+:github_url: |github_link_base|/widgets/extra/animimg.md
 ```
 # Animation Image (lv_animimg)
 
 ## Overview
 
-The animation image is similar to the norlmal 'Image' object. The only difference is that instead of one source image, you set an array of multiple source images.
+The animation image is similar to the normal 'Image' object. The only difference is that instead of one source image, you set an array of multiple source images.
 
 You can specify a duration and repeat count.
 

@@ -56,7 +56,7 @@ class ExampleChart_6():
                 # print("last_id: ",self.last_id)
             if dsc.part == lv.PART.CURSOR and dsc.p1 and dsc.p2 and dsc.p1.y == dsc.p2.y and self.last_id >= 0:
 
-                v = self.ser_p[self.last_id];
+                v = self.ser_p[self.last_id]
      
                 # print("value: ",v)
                 value_txt = str(v)
@@ -66,13 +66,13 @@ class ExampleChart_6():
                 a = lv.area_t()
                 a.y2 = dsc.p1.y - 5
                 a.y1 = a.y2 - size.y - 10
-                a.x1 = dsc.p1.x + 10;
-                a.x2 = a.x1 + size.x + 10;
+                a.x1 = dsc.p1.x + 10
+                a.x2 = a.x1 + size.x + 10
                 
                 draw_rect_dsc = lv.draw_rect_dsc_t()
                 draw_rect_dsc.init()
                 draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.BLUE)
-                draw_rect_dsc.radius = 3;
+                draw_rect_dsc.radius = 3
                 
                 lv.draw_rect(a, dsc.clip_area, draw_rect_dsc)
                 

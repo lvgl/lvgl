@@ -100,7 +100,7 @@ void lv_port_indev_init(void)
      * Mouse
      * -----------------*/
 
-    /*Initialize your touchpad if you have*/
+    /*Initialize your mouse if you have*/
     mouse_init();
 
     /*Register a mouse input device*/

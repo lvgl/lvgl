@@ -4,9 +4,9 @@ def event_handler(e):
     if code == lv.EVENT.VALUE_CHANGED:
         txt = obj.get_text()
         if obj.get_state() & lv.STATE.CHECKED:
-            state =  "Checked"
+            state = "Checked"
         else:
-            state = "Unchecked";
+            state = "Unchecked"
         print(txt + ":" + state)
 
 

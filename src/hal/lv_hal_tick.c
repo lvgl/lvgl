@@ -29,8 +29,8 @@
  *  STATIC VARIABLES
  **********************/
 #if !LV_TICK_CUSTOM
-static uint32_t sys_time = 0;
-static volatile uint8_t tick_irq_flag;
+    static uint32_t sys_time = 0;
+    static volatile uint8_t tick_irq_flag;
 #endif
 
 /**********************

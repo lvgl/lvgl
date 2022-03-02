@@ -35,24 +35,36 @@ typedef struct {
  **********************/
 
 /**
- * Set the relative the position of an object (relative to the parent's top left corner)
+ * Set the position of an object relative to the set alignment.
  * @param obj       pointer to an object
- * @param x         new distance from the left side of the parent plus the parent's left padding
- * @param y         new distance from the top side of the parent  plus the parent's right padding
+ * @param x         new x coordinate
+ * @param y         new y coordinate
+ * @note            With default alignment it's the distance from the top left corner
+ * @note            E.g. LV_ALIGN_CENTER alignment it's the offset from the center of the parent
+ * @note            The position is interpreted on the content area of the parent
+ * @note            The values can be set in pixel or in percentage of parent size with `lv_pct(v)`
  */
 void lv_obj_set_pos(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
 /**
- * Set the x coordinate of a object
+ * Set the x coordinate of an object
  * @param obj       pointer to an object
- * @param x         new distance from the left side from the parent plus the parent's left padding
+ * @param x         new x coordinate
+ * @note            With default alignment it's the distance from the top left corner
+ * @note            E.g. LV_ALIGN_CENTER alignment it's the offset from the center of the parent
+ * @note            The position is interpreted on the content area of the parent
+ * @note            The values can be set in pixel or in percentage of parent size with `lv_pct(v)`
  */
 void lv_obj_set_x(struct _lv_obj_t * obj, lv_coord_t x);
 
 /**
- * Set the y coordinate of a object
+ * Set the y coordinate of an object
  * @param obj       pointer to an object
- * @param y         new distance from the top of the parent  plus the parent's top padding
+ * @param y         new y coordinate
+ * @note            With default alignment it's the distance from the top left corner
+ * @note            E.g. LV_ALIGN_CENTER alignment it's the offset from the center of the parent
+ * @note            The position is interpreted on the content area of the parent
+ * @note            The values can be set in pixel or in percentage of parent size with `lv_pct(v)`
  */
 void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
 
@@ -141,7 +153,7 @@ void lv_obj_mark_layout_as_dirty(struct _lv_obj_t * obj);
 void lv_obj_update_layout(const struct _lv_obj_t * obj);
 
 /**
- * Regsiter a new layout
+ * Register a new layout
  * @param cb        the layout update callback
  * @param user_data custom data that will be passed to `cb`
  * @return          the ID of the new layout
@@ -244,6 +256,20 @@ lv_coord_t lv_obj_get_y(const struct _lv_obj_t * obj);
  * @note            The returned value is always the distance from the parent even if `obj` is positioned by a layout.
  */
 lv_coord_t lv_obj_get_y2(const struct _lv_obj_t * obj);
+
+/**
+ * Get the actually set x coordinate of object, i.e. the offset form the set alignment
+ * @param obj       pointer to an object
+ * @return          the set x coordinate
+ */
+lv_coord_t lv_obj_get_x_aligned(const struct _lv_obj_t * obj);
+
+/**
+ * Get the actually set y coordinate of object, i.e. the offset form the set alignment
+ * @param obj       pointer to an object
+ * @return          the set y coordinate
+ */
+lv_coord_t lv_obj_get_y_aligned(const struct _lv_obj_t * obj);
 
 /**
  * Get the width of an object

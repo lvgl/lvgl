@@ -18,7 +18,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_hal.h"
-#include "../draw/lv_img_buf.h"
+#include "../draw/lv_draw.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_ll.h"
@@ -54,7 +54,6 @@ typedef struct _lv_disp_draw_buf_t {
     /*Internal, used by the library*/
     void * buf_act;
     uint32_t size; /*In pixel count*/
-    lv_area_t area;
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
     /*1: It was the last chunk to flush. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
@@ -80,9 +79,12 @@ typedef struct _lv_disp_drv_t {
     lv_coord_t hor_res;         /**< Horizontal resolution.*/
     lv_coord_t ver_res;         /**< Vertical resolution.*/
 
-    lv_coord_t physical_hor_res;     /**< Horizontal resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t physical_ver_res;     /**< Vertical resolution of the full / physical display. Set to -1 for fullscreen mode.*/
-    lv_coord_t offset_x;             /**< Horizontal offset from the full / physical display. Set to 0 for fullscreen mode.*/
+    lv_coord_t
+    physical_hor_res;     /**< Horizontal resolution of the full / physical display. Set to -1 for fullscreen mode.*/
+    lv_coord_t
+    physical_ver_res;     /**< Vertical resolution of the full / physical display. Set to -1 for fullscreen mode.*/
+    lv_coord_t
+    offset_x;             /**< Horizontal offset from the full / physical display. Set to 0 for fullscreen mode.*/
     lv_coord_t offset_y;             /**< Vertical offset from the full / physical display. Set to 0 for fullscreen mode.*/
 
     /** Pointer to a buffer initialized with `lv_disp_draw_buf_init()`.
@@ -113,6 +115,9 @@ typedef struct _lv_disp_drv_t {
     void (*set_px_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa);
 
+    void (*clear_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, uint32_t size);
+
+
     /** OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
      * number of flushed pixels*/
     void (*monitor_cb)(struct _lv_disp_drv_t * disp_drv, uint32_t time, uint32_t px);
@@ -125,19 +130,17 @@ typedef struct _lv_disp_drv_t {
     /** OPTIONAL: Called when lvgl needs any CPU cache that affects rendering to be cleaned*/
     void (*clean_dcache_cb)(struct _lv_disp_drv_t * disp_drv);
 
-    /** OPTIONAL: called to wait while the gpu is working*/
-    void (*gpu_wait_cb)(struct _lv_disp_drv_t * disp_drv);
-
     /** OPTIONAL: called when driver parameters are updated */
     void (*drv_update_cb)(struct _lv_disp_drv_t * disp_drv);
-
-    /** OPTIONAL: Fill a memory with a color (GPU only)*/
-    void (*gpu_fill_cb)(struct _lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
-                        const lv_area_t * fill_area, lv_color_t color);
 
     /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
+
+    lv_draw_ctx_t * draw_ctx;
+    void (*draw_ctx_init)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
+    void (*draw_ctx_deinit)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx);
+    size_t draw_ctx_size;
 
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom display driver user data*/
@@ -173,7 +176,6 @@ uint8_t del_prev  :
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
     const void * bg_img;            /**< An image source to display as wallpaper*/
-    void (*bg_fn)(lv_area_t*);/**< A function to handle drawing*/
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];

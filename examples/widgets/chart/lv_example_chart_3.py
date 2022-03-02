@@ -28,8 +28,8 @@ chart.set_axis_tick(lv.chart.AXIS.SECONDARY_Y, 10, 5, 3, 4,True, 50)
 chart.set_zoom_x(800)
 
 # Add two data series
-ser1 = lv.chart.add_series(chart, lv.palette_lighten(lv.PALETTE.GREEN, 2), lv.chart.AXIS.PRIMARY_Y);
-ser2 = lv.chart.add_series(chart, lv.palette_darken(lv.PALETTE.GREEN, 2), lv.chart.AXIS.SECONDARY_Y);
+ser1 = lv.chart.add_series(chart, lv.palette_lighten(lv.PALETTE.GREEN, 2), lv.chart.AXIS.PRIMARY_Y)
+ser2 = lv.chart.add_series(chart, lv.palette_darken(lv.PALETTE.GREEN, 2), lv.chart.AXIS.SECONDARY_Y)
 
 # Set the next points on 'ser1'
 chart.set_next_value(ser1, 31)
@@ -46,7 +46,7 @@ chart.set_next_value(ser1, 22)
 chart.set_next_value(ser1, 58)
 
 # Directly set points on 'ser2'
-ser2.y_points =  [92,71,61,15,21,35,35,58,31,53,33,73]
+ser2.y_points = [92,71,61,15,21,35,35,58,31,53,33,73]
 
-chart.refresh()  #Required after direct set
+chart.refresh()  # Required after direct set
 

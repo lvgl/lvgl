@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/win.md
+:github_url: |github_link_base|/widgets/extra/win.md
 ```
 # Window (lv_win)
 

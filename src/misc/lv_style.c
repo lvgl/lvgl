@@ -65,7 +65,6 @@ void lv_style_reset(lv_style_t * style)
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
-
 }
 
 lv_style_prop_t lv_style_register_prop(void)
@@ -209,7 +208,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
     style->has_group |= 1 << group;
 }
 
-lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
+lv_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
     return lv_style_get_prop_inlined(style, prop, value);
 }

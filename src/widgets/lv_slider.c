@@ -109,13 +109,19 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     /*Advanced hit testing: react only on dragging the knob(s)*/
     if(code == LV_EVENT_HIT_TEST) {
         lv_hit_test_info_t * info = lv_event_get_param(e);
+        lv_coord_t ext_click_area = obj->spec_attr ? obj->spec_attr->ext_click_pad : 0;
 
         /*Ordinary slider: was the knob area hit?*/
-        info->res = _lv_area_is_point_on(&slider->right_knob_area, info->point, 0);
+        lv_area_t a;
+        lv_area_copy(&a, &slider->right_knob_area);
+        lv_area_increase(&a, ext_click_area, ext_click_area);
+        info->res = _lv_area_is_point_on(&a, info->point, 0);
 
-        /*There's still a change we have a hit, if we have another knob*/
+        /*There's still a chance that there is a hit if there is another knob*/
         if((info->res == false) && (type == LV_SLIDER_MODE_RANGE)) {
-            info->res = _lv_area_is_point_on(&slider->left_knob_area, info->point, 0);
+            lv_area_copy(&a, &slider->left_knob_area);
+            lv_area_increase(&a, ext_click_area, ext_click_area);
+            info->res = _lv_area_is_point_on(&a, info->point, 0);
         }
     }
     else if(code == LV_EVENT_PRESSED) {
@@ -323,7 +329,7 @@ static void draw_knob(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
-    const lv_area_t * clip_area = lv_event_get_param(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
     lv_coord_t objw = lv_obj_get_width(obj);
@@ -372,7 +378,7 @@ static void draw_knob(lv_event_t * e)
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, clip_area);
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.part = LV_PART_KNOB;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_SLIDER_DRAW_PART_KNOB;
@@ -382,7 +388,7 @@ static void draw_knob(lv_event_t * e)
 
     if(lv_slider_get_mode(obj) != LV_SLIDER_MODE_RANGE) {
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+        lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
     else {
@@ -391,7 +397,7 @@ static void draw_knob(lv_event_t * e)
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(&slider->right_knob_area, clip_area, &knob_rect_dsc);
+        lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         /*Draw a second knob for the start_value side*/
@@ -411,7 +417,7 @@ static void draw_knob(lv_event_t * e)
         part_draw_dsc.id = 1;
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(&slider->left_knob_area, clip_area, &knob_rect_dsc);
+        lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->left_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }

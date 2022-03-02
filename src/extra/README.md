@@ -22,9 +22,10 @@ Here some ideas as inspiration feel free to contribute with ideas too.
 - Ruler, horizontal or vertical with major and minor ticks and labels
 - New [List items types](https://github.com/lvgl/lvgl/tree/master/src/extra/widgets/list)
 - [Preloaders](https://www.google.com/search?q=preloader&sxsrf=ALeKk01ddA4YB0WEgLLN1bZNSm8YER7pkg:1623080551559&source=lnms&tbm=isch&sa=X&ved=2ahUKEwiwoN6d7oXxAhVuw4sKHVedBB4Q_AUoAXoECAEQAw&biw=952&bih=940)
-- Drop-down list with a container to which an content can be added
+- Drop-down list with a container to which content can be added
 - 9 patch button: Similar to [lv_imgbtn](https://docs.lvgl.io/8.0/widgets/extra/imgbtn.html) but 9 images for 4 corner, 4 sides and the center
 
 ## Contributors
 - lv_animimg: @ZhaoQiang-b45475
 - lv_span: @guoweilkd 
+- lv_menu: @HX2003

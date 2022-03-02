@@ -20,4 +20,3 @@ style.set_shadow_ofs_y(20)
 obj = lv.obj(lv.scr_act())
 obj.add_style(style, 0)
 obj.center()
-

@@ -3,6 +3,7 @@
 
 #include "unity/unity.h"
 
+#include "lv_test_helpers.h"
 #include "lv_test_indev.h"
 
 void test_checkbox_creation_successfull(void);
@@ -89,7 +90,7 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
 
     lv_mem_monitor(&m1);
 
-    TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size);
+    LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size));
 }
 
 #endif

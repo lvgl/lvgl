@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stdbool.h>
+#include <stdint.h>
 #include "../font/lv_font.h"
 #include "lv_color.h"
 #include "lv_area.h"
@@ -50,6 +51,12 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 #define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .v_p = { .const_props = prop_array }, .has_group = 0xFF, .is_const = 1 }
 #endif
 
+/** On simple system, don't waste resources on gradients */
+#if !defined(LV_DRAW_COMPLEX) || !defined(LV_GRADIENT_MAX_STOPS)
+#define LV_GRADIENT_MAX_STOPS 2
+#endif
+
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -62,6 +69,7 @@ enum {
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
     LV_BLEND_MODE_MULTIPLY,   /**< Multiply the foreground and background*/
+    LV_BLEND_MODE_REPLACE,    /**< Replace background with foreground in the area*/
 };
 
 typedef uint8_t lv_blend_mode_t;
@@ -103,6 +111,36 @@ enum {
 };
 
 typedef uint8_t lv_grad_dir_t;
+
+/**
+ * The dithering algorithm for the gradient
+ * Depends on LV_DITHER_GRADIENT
+ */
+enum {
+    LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/
+    LV_DITHER_ORDERED,  /**< Ordered dithering. Faster to compute and use less memory but lower quality*/
+    LV_DITHER_ERR_DIFF, /**< Error diffusion mode. Slower to compute and use more memory but give highest dither quality*/
+};
+
+typedef uint8_t lv_dither_mode_t;
+
+/** A gradient stop definition.
+ *  This matches a color and a position in a virtual 0-255 scale.
+ */
+typedef struct {
+    lv_color_t color;   /**< The stop color */
+    uint8_t    frac;    /**< The stop position in 1/255 unit */
+} lv_gradient_stop_t;
+
+/** A descriptor of a gradient. */
+typedef struct {
+    lv_gradient_stop_t   stops[LV_GRADIENT_MAX_STOPS]; /**< A gradient stop array */
+    uint8_t              stops_count;                  /**< The number of used stops in the array */
+    lv_grad_dir_t        dir : 3;                      /**< The gradient direction.
+                                                        * Any of LV_GRAD_DIR_HOR, LV_GRAD_DIR_VER, LV_GRAD_DIR_NONE */
+    lv_dither_mode_t     dither : 3;                   /**< Whether to dither the gradient or not.
+                                                        * Any of LV_DITHER_NONE, LV_DITHER_ORDERED, LV_DITHER_ERR_DIFF */
+} lv_grad_dsc_t;
 
 /**
  * A common type to handle all the property types in the same way.
@@ -153,13 +191,16 @@ typedef enum {
     LV_STYLE_BG_GRAD_DIR             = 35,
     LV_STYLE_BG_MAIN_STOP            = 36,
     LV_STYLE_BG_GRAD_STOP            = 37,
+    LV_STYLE_BG_GRAD                 = 38,
+    LV_STYLE_BG_DITHER_MODE          = 39,
 
-    LV_STYLE_BG_IMG_SRC              = 38 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_BG_IMG_OPA              = 39,
-    LV_STYLE_BG_IMG_RECOLOR          = 40,
-    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 40 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BG_IMG_RECOLOR_OPA      = 41,
-    LV_STYLE_BG_IMG_TILED            = 42,
+
+    LV_STYLE_BG_IMG_SRC              = 40 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_BG_IMG_OPA              = 41,
+    LV_STYLE_BG_IMG_RECOLOR          = 42,
+    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 42 | LV_STYLE_PROP_FILTER,
+    LV_STYLE_BG_IMG_RECOLOR_OPA      = 43,
+    LV_STYLE_BG_IMG_TILED            = 44,
 
     /*Group 3*/
     LV_STYLE_BORDER_COLOR            = 48,
@@ -338,7 +379,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
  *         LV_RES_OK: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
  */
-lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
+lv_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
 
 
 /**
@@ -351,7 +392,8 @@ lv_res_t lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_va
  * @note For performance reasons there are no sanity check on `style`
  * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
  */
-static inline lv_res_t lv_style_get_prop_inlined(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
+static inline lv_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_style_prop_t prop,
+                                                 lv_style_value_t * value)
 {
     if(style->is_const) {
         const lv_style_const_prop_t * const_prop;
@@ -411,7 +453,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
 /**
  * Checks if a style is empty (has no properties)
  * @param style pointer to a style
- * @return
+ * @return true if the style is empty
  */
 bool lv_style_is_empty(const lv_style_t * style);
 
@@ -424,6 +466,12 @@ bool lv_style_is_empty(const lv_style_t * style);
 uint8_t _lv_style_get_prop_group(lv_style_prop_t prop);
 
 #include "lv_style_gen.h"
+
+static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_set_width(style, value);
+    lv_style_set_height(style, value);
+}
 
 static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
 {
@@ -451,12 +499,6 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
     lv_style_set_pad_column(style, value);
 }
 
-static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_set_width(style, value);
-    lv_style_set_height(style, value);
-}
-
 
 /*************************
  *    GLOBAL VARIABLES
@@ -467,10 +509,13 @@ static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value)
  **********************/
 
 #if LV_USE_ASSERT_STYLE
-#  define LV_ASSERT_STYLE(style_p)    LV_ASSERT_MSG(style_p != NULL, "The style is NULL");          \
-    LV_ASSERT_MSG(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted");
+#  define LV_ASSERT_STYLE(style_p)                                                                            \
+    do {                                                                                                      \
+        LV_ASSERT_MSG(style_p != NULL, "The style is NULL");                                                  \
+        LV_ASSERT_MSG(style_p->sentinel == LV_STYLE_SENTINEL_VALUE, "Style is not initialized or corrupted"); \
+    } while(0)
 #else
-# define LV_ASSERT_STYLE(p)
+#  define LV_ASSERT_STYLE(p) do{}while(0)
 #endif
 
 #ifdef __cplusplus

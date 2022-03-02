@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/table.md
+:github_url: |github_link_base|/widgets/core/table.md
 ```
 # Table (lv_table)
 
@@ -70,7 +70,7 @@ The following *Keys* are processed by the Tables:
 
 Note that, as usual, the state of `LV_KEY_ENTER` is translated to `LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
 
-`lv_table_get_selected_cell(table, &row, &col)` can be sued the get currentéy selected cell. Row and column eill be set to `LV_TABLE_CELL_NONE` no cell is celected.
+`lv_table_get_selected_cell(table, &row, &col)` can be used to get the currently selected cell. Row and column will be set to `LV_TABLE_CELL_NONE` no cell is selected.
 
 Learn more about [Keys](/overview/indev).
 

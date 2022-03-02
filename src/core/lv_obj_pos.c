@@ -202,7 +202,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     lv_obj_readjust_scroll(obj, LV_ANIM_OFF);
 
     /*If the object was out of the parent invalidate the new scrollbar area too.
-     *If it wasn't out of the parent but out now, also invalidate the srollbars*/
+     *If it wasn't out of the parent but out now, also invalidate the scrollbars*/
     bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
     if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
 
@@ -292,7 +292,7 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
     /*Make the display refreshing*/
     lv_disp_t * disp = lv_obj_get_disp(scr);
-    lv_timer_resume(disp->refr_timer);
+    if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
 }
 
 void lv_obj_update_layout(const lv_obj_t * obj)
@@ -538,6 +538,17 @@ lv_coord_t lv_obj_get_y2(const lv_obj_t * obj)
     return lv_obj_get_y(obj) + lv_obj_get_height(obj);
 }
 
+lv_coord_t lv_obj_get_x_aligned(const lv_obj_t * obj)
+{
+    return lv_obj_get_style_x(obj, LV_PART_MAIN);
+}
+
+lv_coord_t lv_obj_get_y_aligned(const lv_obj_t * obj)
+{
+    return lv_obj_get_style_y(obj, LV_PART_MAIN);
+}
+
+
 lv_coord_t lv_obj_get_width(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -568,7 +579,7 @@ lv_coord_t lv_obj_get_content_height(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t bottom =  lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
 
     return lv_obj_get_height(obj) - top - bottom - 2 * border_width;
@@ -796,6 +807,12 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    /*If the object has overflow visible it can be drawn anywhere on its parent
+     *It needs to be checked recursively*/
+    while(lv_obj_get_parent(obj) && lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        obj = lv_obj_get_parent(obj);
+    }
+
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
     lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
@@ -813,7 +830,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
 
-    /*Invalidate the object only if it belongs to the current or previous'*/
+    /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
     if(obj_scr != lv_disp_get_scr_act(disp) &&
@@ -824,26 +841,29 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     }
 
     /*Truncate the area to the object*/
-    lv_area_t obj_coords;
-    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
-    lv_area_copy(&obj_coords, &obj->coords);
-    obj_coords.x1 -= ext_size;
-    obj_coords.y1 -= ext_size;
-    obj_coords.x2 += ext_size;
-    obj_coords.y2 += ext_size;
+    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        lv_area_t obj_coords;
+        lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+        lv_area_copy(&obj_coords, &obj->coords);
+        obj_coords.x1 -= ext_size;
+        obj_coords.y1 -= ext_size;
+        obj_coords.x2 += ext_size;
+        obj_coords.y2 += ext_size;
 
-    bool is_common;
-
-    is_common = _lv_area_intersect(area, area, &obj_coords);
-    if(is_common == false) return false;  /*The area is not on the object*/
+        /*The area is not on the object*/
+        if(!_lv_area_intersect(area, area, &obj_coords)) return false;
+    }
 
     /*Truncate recursively to the parents*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     while(par != NULL) {
-        is_common = _lv_area_intersect(area, area, &par->coords);
-        if(is_common == false) return false;       /*If no common parts with parent break;*/
-        if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return
-                false; /*If the parent is hidden then the child is hidden and won't be drawn*/
+        /*If the parent is hidden then the child is hidden and won't be drawn*/
+        if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false;
+
+        /*Truncate to the parent and if no common parts break*/
+        if(!lv_obj_has_flag(par, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+            if(!_lv_area_intersect(area, area, &par->coords)) return false;
+        }
 
         par = lv_obj_get_parent(par);
     }
@@ -888,6 +908,9 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
+    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) return false;
+    if(lv_obj_has_state(obj, LV_STATE_DISABLED)) return false;
+
     lv_area_t a;
     lv_obj_get_click_area(obj, &a);
     bool res = _lv_area_is_point_on(&a, point, 0);
@@ -955,13 +978,14 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                         child_res = LV_MAX(child_res, obj->coords.x2 - child->coords.x1 + 1);
                         break;
                     default:
-                    	/* Consider other cases only if x=0 and use the width of the object.
-                    	 * With x!=0 circular dependency could occur. */
-                    	if(lv_obj_get_style_y(child, 0) == 0) {
-                    		child_res = LV_MAX(child_res, lv_area_get_width(&child->coords));
-                    	}
+                        /* Consider other cases only if x=0 and use the width of the object.
+                         * With x!=0 circular dependency could occur. */
+                        if(lv_obj_get_style_x(child, 0) == 0) {
+                            child_res = LV_MAX(child_res, lv_area_get_width(&child->coords) + pad_right);
+                        }
                 }
-            } else {
+            }
+            else {
                 child_res = LV_MAX(child_res, obj->coords.x2 - child->coords.x1 + 1);
             }
         }
@@ -986,13 +1010,14 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                         child_res = LV_MAX(child_res, child->coords.x2 - obj->coords.x1 + 1);
                         break;
                     default:
-                    	/* Consider other cases only if x=0 and use the width of the object.
-                    	 * With x!=0 circular dependency could occur. */
-                    	if(lv_obj_get_style_y(child, 0) == 0) {
-                    		child_res = LV_MAX(child_res, lv_area_get_width(&child->coords));
-                    	}
+                        /* Consider other cases only if x=0 and use the width of the object.
+                         * With x!=0 circular dependency could occur. */
+                        if(lv_obj_get_style_y(child, 0) == 0) {
+                            child_res = LV_MAX(child_res, lv_area_get_width(&child->coords) + pad_left);
+                        }
                 }
-            } else {
+            }
+            else {
                 child_res = LV_MAX(child_res, child->coords.x2 - obj->coords.x1 + 1);
             }
         }
@@ -1036,14 +1061,15 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
                     child_res = LV_MAX(child_res, child->coords.y2 - obj->coords.y1 + 1);
                     break;
                 default:
-                	/* Consider other cases only if y=0 and use the height of the object.
-                	 * With y!=0 circular dependency could occur. */
-                	if(lv_obj_get_style_y(child, 0) == 0) {
-                		child_res = LV_MAX(child_res, lv_area_get_height(&child->coords));
-                	}
-                	break;
+                    /* Consider other cases only if y=0 and use the height of the object.
+                     * With y!=0 circular dependency could occur. */
+                    if(lv_obj_get_style_y(child, 0) == 0) {
+                        child_res = LV_MAX(child_res, lv_area_get_height(&child->coords) + pad_top);
+                    }
+                    break;
             }
-        } else {
+        }
+        else {
             child_res = LV_MAX(child_res, child->coords.y2 - obj->coords.y1 + 1);
         }
     }
@@ -1051,7 +1077,8 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
     if(child_res != LV_COORD_MIN) {
         child_res += pad_bottom;
         return LV_MAX(child_res, self_h);
-    } else {
+    }
+    else {
         return self_h;
     }
 

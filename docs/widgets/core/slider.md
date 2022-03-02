@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/slider.md
+:github_url: |github_link_base|/widgets/core/slider.md
 ```
 # Slider (lv_slider)
 
@@ -32,6 +32,8 @@ The mode can be changed with `lv_slider_set_mode(slider, LV_SLIDER_MODE_...)`
 ### Knob-only mode
 Normally, the slider can be adjusted either by dragging the knob, or by clicking on the slider bar. 
 In the latter case the knob moves to the point clicked and slider value changes accordingly. In some cases it is desirable to set the slider to react on dragging the knob only. This feature is enabled by adding the `LV_OBJ_FLAG_ADV_HITTEST`: `lv_obj_add_flag(slider, LV_OBJ_FLAG_ADV_HITTEST)`.
+
+The extended click area (set by `lv_obj_set_ext_click_area(slider, value)`) increases to knob's click area.
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent while the slider is being dragged or changed with keys. 

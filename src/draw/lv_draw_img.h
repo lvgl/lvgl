@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_img_decoder.h"
 #include "lv_img_buf.h"
-#include "lv_draw_blend.h"
+#include "../misc/lv_style.h"
 
 /*********************
  *      DEFINES
@@ -45,6 +45,8 @@ typedef struct {
     uint8_t antialias       : 1;
 } lv_draw_img_dsc_t;
 
+struct _lv_draw_ctx_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -57,7 +59,12 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_draw_img_dsc_t * dsc);
+void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                 const void * src);
+
+
+void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+                         const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
 /**
  * Get the type of an image source

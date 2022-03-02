@@ -4,7 +4,7 @@ import fs_driver
 #
 
 ltr_label = lv.label(lv.scr_act())
-ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).");
+ltr_label.set_text("In modern terminology, a microcontroller is similar to a system on a chip (SoC).")
 # ltr_label.set_style_text_font(ltr_label, &lv_font_montserrat_16, 0);
 
 fs_drv = lv.fs_drv_t()

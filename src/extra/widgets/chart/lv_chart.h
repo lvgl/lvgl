@@ -135,7 +135,7 @@ typedef enum {
  **********************/
 
 /**
- * Create a chart objects
+ * Create a chart object
  * @param parent    pointer to an object, it will be the parent of the new chart
  * @return          pointer to the created chart
  */
@@ -330,7 +330,7 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
  * Set the coordinate of the cursor with respect to the paddings
  * @param obj       pointer to a chart object
  * @param cursor    pointer to the cursor
- * @param pos       the new coordinate of cursor relative the the chart
+ * @param pos       the new coordinate of cursor relative to the chart
  */
 void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * pos);
 

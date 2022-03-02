@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/widgets/textarea.md
+:github_url: |github_link_base|/widgets/core/textarea.md
 ```
 # Text area (lv_textarea)
 
@@ -13,9 +13,9 @@ Long lines are wrapped and when the text becomes long enough the Text area can b
 One line mode and password modes are supported.
 
 ## Parts and Styles
-- `LV_PART_MAIN` The background of the text area. Uses all the typical backgrond style properties and the text related style properties including `text_align` to align the text to the left, right or center.
+- `LV_PART_MAIN` The background of the text area. Uses all the typical background style properties and the text related style properties including `text_align` to align the text to the left, right or center.
 - `LV_PART_SCROLLBAR` The scrollbar that is shown when the text is too long.
-- `LV_PART_SELECTED` Detemines the style of the [selected text](/widgets/core/label.html#text-selection). Only `text_color` and `bg_color` style properties can be used. `bg_color` should be set directly on the label of the text area.
+- `LV_PART_SELECTED` Determines the style of the [selected text](/widgets/core/label.html#text-selection). Only `text_color` and `bg_color` style properties can be used. `bg_color` should be set directly on the label of the text area.
 - `LV_PART_CURSOR` Marks the position where the characters are inserted. The cursor's area is always the bounding box of the current character. 
 A block cursor can be created by adding a background color and background opacity to `LV_PART_CURSOR`'s style. The create line cursor leave the cursor transparent and set a left border. 
 The `anim_time` style property sets the cursor's blink time. 
@@ -83,7 +83,7 @@ The maximum number of characters can be limited with `lv_textarea_set_max_length
 
 
 ### Very long texts
-If there is a very long text in the Text area (e. g. > 20k characters), scrolling and drawing might be slow. 
+If there is a very long text in the Text area (e.g. > 20k characters), scrolling and drawing might be slow. 
 However, by enabling `LV_LABEL_LONG_TXT_HINT   1` in `lv_conf.h` the performance can be hugely improved. 
 This will save some additional information about the label to speed up its drawing. 
 Using `LV_LABEL_LONG_TXT_HINT` the scrolling and drawing will as fast as with "normal" short texts.
@@ -94,10 +94,10 @@ This works much like when you select text on your PC with your mouse.
 
 ## Events
 - `LV_EVENT_INSERT` Sent right before a character or text is inserted. 
-The event paramter is the text about to be inserted. `lv_textarea_set_insert_replace(textarea, "New text")` replaces the text to insert. 
+The event parameter is the text about to be inserted. `lv_textarea_set_insert_replace(textarea, "New text")` replaces the text to insert. 
 The new text cannot be in a local variable which is destroyed when the event callback exists. `""` means do not insert anything.
 - `LV_EVENT_VALUE_CHANGED` Sent when the content of the text area has been changed. 
-- `LV_EVENT_APPLY` Sent when `LV_KEY_ENTER` is pressed (or(sent) to a one line text area.
+- `LV_EVENT_READY` Sent when `LV_KEY_ENTER` is pressed (or sent) to a one line text area.
 
 See the events of the [Base object](/widgets/obj) too.
 

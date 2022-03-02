@@ -20,6 +20,7 @@ extern "C" {
 #include "qrcode/lv_example_qrcode.h"
 #include "freetype/lv_example_freetype.h"
 #include "rlottie/lv_example_rlottie.h"
+#include "ffmpeg/lv_example_ffmpeg.h"
 
 /*********************
  *      DEFINES

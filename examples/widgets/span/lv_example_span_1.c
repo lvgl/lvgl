@@ -24,10 +24,10 @@ void lv_example_span_1(void)
     lv_spangroup_set_mode(spans, LV_SPAN_MODE_BREAK);
 
     lv_span_t * span = lv_spangroup_new_span(spans);
-    lv_span_set_text(span, "china is a beautiful country.");
+    lv_span_set_text(span, "China is a beautiful country.");
     lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED));
     lv_style_set_text_decor(&span->style, LV_TEXT_DECOR_STRIKETHROUGH | LV_TEXT_DECOR_UNDERLINE);
-    lv_style_set_text_opa(&span->style, LV_OPA_30);
+    lv_style_set_text_opa(&span->style, LV_OPA_50);
 
     span = lv_spangroup_new_span(spans);
     lv_span_set_text_static(span, "good good study, day day up.");

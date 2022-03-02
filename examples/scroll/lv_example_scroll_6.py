@@ -16,7 +16,7 @@ def scroll_event_cb(e):
 
         child_y_center = child_a.y1 + child_a.get_height() // 2
 
-        diff_y = child_y_center - cont_y_center;
+        diff_y = child_y_center - cont_y_center
         diff_y = abs(diff_y)
 
         # Get the x of diff_y on a circle.
@@ -26,7 +26,7 @@ def scroll_event_cb(e):
             x = r
         else:
             # Use Pythagoras theorem to get x from radius and y
-            x_sqr = r * r - diff_y * diff_y;
+            x_sqr = r * r - diff_y * diff_y
             res = lv.sqrt_res_t()
             lv.sqrt(x_sqr, res, 0x8000)   # Use lvgl's built in sqrt root function
             x = r - res.i

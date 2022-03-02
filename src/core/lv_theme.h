@@ -47,7 +47,7 @@ typedef struct _lv_theme_t {
 
 /**
  * Get the theme assigned to the display of the object
- * @param obj       pointer to object
+ * @param obj       pointer to a theme object
  * @return          the theme of the object's display (can be NULL)
  */
 lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj);
@@ -77,29 +77,34 @@ void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb);
 
 /**
  * Get the small font of the theme
+ * @param obj pointer to an object
  * @return pointer to the font
  */
 const lv_font_t * lv_theme_get_font_small(lv_obj_t * obj);
 /**
  * Get the normal font of the theme
+ * @param obj pointer to an object
  * @return pointer to the font
  */
 const lv_font_t * lv_theme_get_font_normal(lv_obj_t * obj);
 
 /**
  * Get the subtitle font of the theme
+ * @param obj pointer to an object
  * @return pointer to the font
  */
 const lv_font_t * lv_theme_get_font_large(lv_obj_t * obj);
 
 /**
  * Get the primary color of the theme
+ * @param obj pointer to an object
  * @return the color
  */
 lv_color_t lv_theme_get_color_primary(lv_obj_t * obj);
 
 /**
  * Get the secondary color of the theme
+ * @param obj pointer to an object
  * @return the color
  */
 lv_color_t lv_theme_get_color_secondary(lv_obj_t * obj);

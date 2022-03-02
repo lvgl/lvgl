@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_mask.h"
+#include "lv_draw.h"
 #if LV_DRAW_COMPLEX
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
@@ -41,6 +41,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mas
 LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x,
                                                                  lv_coord_t abs_y, lv_coord_t len,
                                                                  lv_draw_mask_map_param_t * param);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_polygon(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                     lv_coord_t abs_y, lv_coord_t len,
+                                                                     lv_draw_mask_polygon_param_t * param);
 
 LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
                                                                lv_coord_t len,
@@ -140,16 +143,16 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf,
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
 LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                                lv_coord_t len, const int16_t *ids, int16_t ids_count)
+                                                                lv_coord_t len, const int16_t * ids, int16_t ids_count)
 {
     bool changed = false;
     _lv_draw_mask_common_dsc_t * dsc;
 
-    for (int i = 0; i < ids_count; i++) {
+    for(int i = 0; i < ids_count; i++) {
         int16_t id = ids[i];
-        if (id == LV_MASK_ID_INV) continue;
+        if(id == LV_MASK_ID_INV) continue;
         dsc = LV_GC_ROOT(_lv_draw_mask_list[id]).param;
-        if (!dsc) continue;
+        if(!dsc) continue;
         lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
         res = dsc->cb(mask_buf, abs_x, abs_y, len, dsc);
         if(res == LV_DRAW_MASK_RES_TRANSP) return LV_DRAW_MASK_RES_TRANSP;
@@ -219,6 +222,10 @@ void lv_draw_mask_free_param(void * p)
             }
         }
     }
+    else if(pdsc->type == LV_DRAW_MASK_TYPE_POLYGON) {
+        lv_draw_mask_polygon_param_t * poly_p = (lv_draw_mask_polygon_param_t *) p;
+        lv_mem_free(poly_p->cfg.points);
+    }
 }
 
 void _lv_draw_mask_cleanup(void)
@@ -252,10 +259,10 @@ bool lv_draw_mask_is_any(const lv_area_t * a)
 
     uint8_t i;
     for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        _lv_draw_mask_common_dsc_t * comm_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+        _lv_draw_mask_common_dsc_t * comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
         if(comm_param == NULL) continue;
         if(comm_param->type == LV_DRAW_MASK_TYPE_RADIUS) {
-            lv_draw_mask_radius_param_t * radius_param =  LV_GC_ROOT(_lv_draw_mask_list[i]).param;
+            lv_draw_mask_radius_param_t * radius_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
             if(radius_param->cfg.outer) {
                 if(!_lv_area_is_out(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
             }
@@ -462,7 +469,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
 
 /**
  * Initialize a fade mask.
- * @param param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param param pointer to an `lv_draw_mask_radius_param_t` to initialize
  * @param rect coordinates of the rectangle to affect (absolute coordinates)
  * @param radius radius of the rectangle
  * @param inv true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
@@ -471,9 +478,9 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
 {
     lv_coord_t w = lv_area_get_width(rect);
     lv_coord_t h = lv_area_get_height(rect);
-    if(radius < 0) radius = 0;
     int32_t short_side = LV_MIN(w, h);
     if(radius > short_side >> 1) radius = short_side >> 1;
+    if(radius < 0) radius = 0;
 
     lv_area_copy(&param->cfg.rect, rect);
     param->cfg.radius = radius;
@@ -558,6 +565,31 @@ void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * c
     param->cfg.map = map;
     param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_map;
     param->dsc.type = LV_DRAW_MASK_TYPE_MAP;
+}
+
+void lv_draw_mask_polygon_init(lv_draw_mask_polygon_param_t * param, const lv_point_t * points, uint16_t point_cnt)
+{
+    /*Join adjacent points if they are on the same coordinate*/
+    lv_point_t * p = lv_mem_alloc(point_cnt * sizeof(lv_point_t));
+    if(p == NULL) return;
+    uint16_t i;
+    uint16_t pcnt = 0;
+    p[0] = points[0];
+    for(i = 0; i < point_cnt - 1; i++) {
+        if(points[i].x != points[i + 1].x || points[i].y != points[i + 1].y) {
+            p[pcnt] = points[i];
+            pcnt++;
+        }
+    }
+    /*The first and the last points are also adjacent*/
+    if(points[0].x != points[point_cnt - 1].x || points[0].y != points[point_cnt - 1].y) {
+        p[pcnt] = points[point_cnt - 1];
+        pcnt++;
+    }
+    param->cfg.points = p;
+    param->cfg.point_cnt = pcnt;
+    param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_polygon;
+    param->dsc.type = LV_DRAW_MASK_TYPE_POLYGON;
 }
 
 /**********************
@@ -1045,7 +1077,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
        (abs_y >= rect.y1 + radius && abs_y <= rect.y2 - radius)) {
         if(outer == false) {
             /*Remove the edges*/
-            int32_t last =  rect.x1 - abs_x;
+            int32_t last = rect.x1 - abs_x;
             if(last > len) return LV_DRAW_MASK_RES_TRANSP;
             if(last >= 0) {
                 lv_memset_00(&mask_buf[0], last);
@@ -1063,7 +1095,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
             int32_t first = rect.x1 - abs_x;
             if(first < 0) first = 0;
             if(first <= len) {
-                int32_t last =  rect.x2 - abs_x - first + 1;
+                int32_t last = rect.x2 - abs_x - first + 1;
                 if(first + last > len) last = len - first;
                 if(last >= 0) {
                     lv_memset_00(&mask_buf[first], last);
@@ -1218,6 +1250,79 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask
     return LV_DRAW_MASK_RES_CHANGED;
 }
 
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_polygon(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                     lv_coord_t abs_y, lv_coord_t len,
+                                                                     lv_draw_mask_polygon_param_t * param)
+{
+    uint16_t i;
+    struct {
+        lv_point_t p1;
+        lv_point_t p2;
+    } lines[2], tmp;
+    uint16_t line_cnt = 0;
+    lv_memset_00(&lines, sizeof(lines));
+    int psign_prev = 0;
+    for(i = 0; i < param->cfg.point_cnt; i++) {
+        lv_point_t p1 = param->cfg.points[i];
+        lv_point_t p2 = param->cfg.points[i + 1 < param->cfg.point_cnt ? i + 1 : 0];
+        int pdiff = p1.y - p2.y, psign = pdiff / LV_ABS(pdiff);
+        if(pdiff > 0) {
+            if(abs_y > p1.y || abs_y < p2.y) continue;
+            lines[line_cnt].p1 = p2;
+            lines[line_cnt].p2 = p1;
+        }
+        else {
+            if(abs_y < p1.y || abs_y > p2.y) continue;
+            lines[line_cnt].p1 = p1;
+            lines[line_cnt].p2 = p2;
+        }
+        if(psign_prev && psign_prev == psign) continue;
+        psign_prev = psign;
+        line_cnt++;
+        if(line_cnt == 2) break;
+    }
+    if(line_cnt != 2) return LV_DRAW_MASK_RES_TRANSP;
+    if(lines[0].p1.x > lines[1].p1.x || lines[0].p2.x > lines[1].p2.x) {
+        tmp = lines[0];
+        lines[0] = lines[1];
+        lines[1] = tmp;
+    }
+    lv_draw_mask_line_param_t line_p;
+    lv_draw_mask_line_points_init(&line_p, lines[0].p1.x, lines[0].p1.y, lines[0].p2.x, lines[0].p2.y,
+                                  LV_DRAW_MASK_LINE_SIDE_RIGHT);
+    if(line_p.steep == 0 && line_p.flat) {
+        lv_coord_t x1 = LV_MIN(lines[0].p1.x, lines[0].p2.x);
+        lv_coord_t x2 = LV_MAX(lines[0].p1.x, lines[0].p2.x);
+        for(i = 0; i < len; i++) {
+            mask_buf[i] = mask_mix(mask_buf[i], (abs_x + i >= x1 && abs_x + i <= x2) * 0xFF);
+        }
+        lv_draw_mask_free_param(&line_p);
+        return LV_DRAW_MASK_RES_CHANGED;
+    }
+    lv_draw_mask_res_t res1 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, &line_p);
+    lv_draw_mask_free_param(&line_p);
+    if(res1 == LV_DRAW_MASK_RES_TRANSP) {
+        return LV_DRAW_MASK_RES_TRANSP;
+    }
+    lv_draw_mask_line_points_init(&line_p, lines[1].p1.x, lines[1].p1.y, lines[1].p2.x, lines[1].p2.y,
+                                  LV_DRAW_MASK_LINE_SIDE_LEFT);
+    if(line_p.steep == 0 && line_p.flat) {
+        lv_coord_t x1 = LV_MIN(lines[1].p1.x, lines[1].p2.x);
+        lv_coord_t x2 = LV_MAX(lines[1].p1.x, lines[1].p2.x);
+        for(i = 0; i < len; i++) {
+            mask_buf[i] = mask_mix(mask_buf[i], (abs_x + i >= x1 && abs_x + i <= x2) * 0xFF);
+        }
+        lv_draw_mask_free_param(&line_p);
+        return LV_DRAW_MASK_RES_CHANGED;
+    }
+    lv_draw_mask_res_t res2 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, &line_p);
+    lv_draw_mask_free_param(&line_p);
+    if(res2 == LV_DRAW_MASK_RES_TRANSP) {
+        return LV_DRAW_MASK_RES_TRANSP;
+    }
+    if(res1 == LV_DRAW_MASK_RES_CHANGED || res2 == LV_DRAW_MASK_RES_CHANGED) return LV_DRAW_MASK_RES_CHANGED;
+    return res1;
+}
 /**
  * Initialize the circle drawing
  * @param c pointer to a point. The coordinates will be calculated here
@@ -1275,10 +1380,10 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
 
     /*Special case, handle manually*/
     if(radius == 1) {
-        c->cir_opa[0] =  180;
-        c->opa_start_on_y[0] =  0;
-        c->opa_start_on_y[1] =  1;
-        c->x_start_on_y[0] =  0;
+        c->cir_opa[0] = 180;
+        c->opa_start_on_y[0] = 0;
+        c->opa_start_on_y[1] = 1;
+        c->x_start_on_y[0] = 0;
         return;
     }
 

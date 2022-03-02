@@ -30,24 +30,24 @@ static void msgbox_close_click_event_cb(lv_event_t * e);
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_msgbox_class = {
-        .base_class = &lv_obj_class,
-        .width_def = LV_DPI_DEF * 2,
-        .height_def = LV_SIZE_CONTENT,
-        .instance_size = sizeof(lv_msgbox_t)
+    .base_class = &lv_obj_class,
+    .width_def = LV_DPI_DEF * 2,
+    .height_def = LV_SIZE_CONTENT,
+    .instance_size = sizeof(lv_msgbox_t)
 };
 
 const lv_obj_class_t lv_msgbox_content_class = {
-        .base_class = &lv_obj_class,
-        .width_def = LV_PCT(100),
-        .height_def = LV_SIZE_CONTENT,
-        .instance_size = sizeof(lv_obj_t)
+    .base_class = &lv_obj_class,
+    .width_def = LV_PCT(100),
+    .height_def = LV_SIZE_CONTENT,
+    .instance_size = sizeof(lv_obj_t)
 };
 
 const lv_obj_class_t lv_msgbox_backdrop_class = {
-        .base_class = &lv_obj_class,
-        .width_def = LV_PCT(100),
-        .height_def = LV_PCT(100),
-        .instance_size = sizeof(lv_obj_t)
+    .base_class = &lv_obj_class,
+    .width_def = LV_PCT(100),
+    .height_def = LV_PCT(100),
+    .instance_size = sizeof(lv_obj_t)
 };
 
 /**********************
@@ -85,7 +85,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     bool has_title = title && strlen(title) > 0;
 
     /*When a close button is required, we need the empty label as spacer to push the button to the right*/
-    if (add_close_btn || has_title) {
+    if(add_close_btn || has_title) {
         mbox->title = lv_label_create(obj);
         lv_label_set_text(mbox->title, has_title ? title : "");
         lv_label_set_long_mode(mbox->title, LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -108,7 +108,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     mbox->content = lv_obj_class_create_obj(&lv_msgbox_content_class, obj);
 
     bool has_txt = txt && strlen(txt) > 0;
-    if (has_txt) {
+    if(has_txt) {
         mbox->text = lv_label_create(mbox->content);
         lv_label_set_text(mbox->text, txt);
         lv_label_set_long_mode(mbox->text, LV_LABEL_LONG_WRAP);

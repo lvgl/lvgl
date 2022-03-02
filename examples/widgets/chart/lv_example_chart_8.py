@@ -40,8 +40,8 @@ def draw_event_cb(e):
         a.x1 = dsc.p1.x
         a.x2 = dsc.p2.x
         a.y1 = min(dsc.p1.y, dsc.p2.y)
-        a.y2 = cont_a.y2 - 13 # -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesnt look like 0 
-        lv.draw_rect(a, dsc.clip_area, draw_rect_dsc)
+        a.y2 = cont_a.y2 - 13 # -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesn't look like 0
+        dsc.draw_ctx.rect(draw_rect_dsc, a)
 
         # Remove the mask
         lv.draw_mask_free_param(line_mask_param)
@@ -116,7 +116,7 @@ def lv_example_chart_8():
 
             #  Draw to the series in the reverse order to which they were initialised.
             #   Without this the higher values will draw on top of the lower ones.
-            #   This is because the Z-height of a series matches the order it was initialsied
+            #   This is because the Z-height of a series matches the order it was initialised
             stacked_area_chart.obj.set_next_value( stacked_area_chart.series_list[3 - series_index - 1], draw_heights[series_index])
 
     stacked_area_chart.obj.refresh()

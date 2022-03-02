@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+/****************************************************************************
+*  Copyright 2022 Gorgon Meducer (Email:embedded_zhuoran@hotmail.com)       *
+*                                                                           *
+*  Licensed under the Apache License, Version 2.0 (the "License");          *
+*  you may not use this file except in compliance with the License.         *
+*  You may obtain a copy of the License at                                  *
+*                                                                           *
+*     http://www.apache.org/licenses/LICENSE-2.0                            *
+*                                                                           *
+*  Unless required by applicable law or agreed to in writing, software      *
+*  distributed under the License is distributed on an "AS IS" BASIS,        *
+*  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+*  See the License for the specific language governing permissions and      *
+*  limitations under the License.                                           *
+*                                                                           *
+****************************************************************************/
+-->
+
+
+<package schemaVersion="1.4" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+  <vendor>LVGL</vendor>
+  <name>lvgl</name>
+  <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
+  <url>https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/</url>
+  <supportContact>https://github.com/lvgl/lvgl/issues/new/choose</supportContact>
+  <license>LICENCE.txt</license>
+  <!-- optional license file -->
+  <!-- 
+  <license>
+  </license>
+  -->
+  
+  <repository type="git">https://github.com/lvgl/lvgl.git</repository>
+  
+  <releases>
+    <release date="2022-01-31" version="1.0.0" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.0.pack">
+      - LVGL 8.2.0
+      - Enable LV_TICK_CUSTOM when perf_counter is detected.
+      - Celebrate Spring Festival
+    </release>
+  </releases>
+
+  <keywords>
+    <!-- keywords for indexing -->
+    <keyword>Cortex-M</keyword>
+    <keyword>SysTick</keyword>
+    <keyword>Performance Analaysis</keyword>
+  </keywords>
+  
+    <conditions> 
+        <!--
+        <condition id="Arm Compiler">
+            <description>Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang).</description>
+            <accept Tcompiler="ARMCC" Toptions="AC6"/>
+            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+            <accept Tcompiler="ARMCC" Toptions="AC5"/>
+        </condition>
+        <condition id="Arm GCC">
+            <description>GNU Tools for Arm Embedded Processors.</description>
+            <accept Tcompiler="GCC"/>
+        </condition>
+        <condition id="Cortex-M Processors">
+            <description>Support All Cortex-M based processors</description>
+            <accept  Dcore="Cortex-M0"/>
+            <accept  Dcore="Cortex-M0+"/>
+            <accept  Dcore="Cortex-M1"/>
+            <accept  Dcore="Cortex-M3"/>
+            <accept  Dcore="Cortex-M4"/>
+            <accept  Dcore="Cortex-M7"/>
+            <accept  Dcore="Cortex-M23"/>
+            <accept  Dcore="Cortex-M33"/>
+            <accept  Dcore="Cortex-M35P"/>
+            <accept  Dcore="Cortex-M55"/>
+            <accept  Dcore="SC000"/>
+            <accept  Dcore="SC300"/>
+            <accept  Dcore="ARMV8MBL"/>
+            <accept  Dcore="ARMV8MML"/>
+        </condition>
+        
+        <condition id="CMSIS-CORE">
+            <description>Require CMSIS-CORE Support</description>
+            <require Cclass="CMSIS" Cgroup="CORE"/>
+        </condition>
+        
+
+        
+        <condition id="Cortex-M Arm GCC">
+            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+            <require condition="Arm GCC"/>
+            <require condition="Cortex-M Processors"/>
+        </condition>
+        <condition id="Cortex-M Arm Compiler">
+            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+            <require condition="Arm Compiler"/>
+            <require condition="Cortex-M Processors"/>
+        </condition>
+        
+        <condition id="Cortex-M Arm GCC CMSIS-CORE">
+            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+            <require condition="Arm GCC"/>
+            <require condition="Cortex-M Processors"/>
+            <require condition="CMSIS-CORE"/>
+        </condition>
+        <condition id="Cortex-M Arm Compiler CMSIS-CORE">
+            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+            <require condition="Arm Compiler"/>
+            <require condition="Cortex-M Processors"/>
+            <require condition="CMSIS-CORE"/>
+        </condition>
+        -->
+        
+        <condition id="LVGL-Essential">
+            <description>Require LVGL Essential Service</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        </condition>
+        
+    </conditions>
+  <!-- apis section (optional - for Application Programming Interface descriptions) -->
+  <!-- 
+  <apis>
+  </apis>
+  -->
+
+  <!-- boards section (mandatory for Board Support Packs) -->
+  <!-- 
+  <boards>
+  </boards>
+  -->
+
+  <!-- devices section (mandatory for Device Family Packs) -->
+  <!--
+  <devices>
+  </devices>
+  -->
+
+  <!-- examples section (optional for all Software Packs)-->
+  <!--
+  <examples>
+  </examples>
+  -->
+  
+  <!-- conditions section (optional for all Software Packs)-->
+  <!--
+  <conditions>
+  </conditions>
+  -->
+
+    <components>
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.2.0">
+            <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
+            <doc></doc>
+            <component Cgroup="lvgl" Csub="Essential" >
+              <description>The Essential services of LVGL (without extra content)</description>
+              <files>
+                <!-- src/core -->
+                <file category="sourceC"            name="src/core/lv_disp.c" />
+                <file category="sourceC"            name="src/core/lv_event.c" />
+                <file category="sourceC"            name="src/core/lv_group.c" />
+                <file category="sourceC"            name="src/core/lv_indev.c" />
+                <file category="sourceC"            name="src/core/lv_indev_scroll.c" />
+                <file category="sourceC"            name="src/core/lv_obj.c" />
+                <file category="sourceC"            name="src/core/lv_obj_class.c" />
+                <file category="sourceC"            name="src/core/lv_obj_draw.c" />
+                <file category="sourceC"            name="src/core/lv_obj_pos.c" />
+                <file category="sourceC"            name="src/core/lv_obj_scroll.c" />
+                <file category="sourceC"            name="src/core/lv_obj_style.c" />
+                <file category="sourceC"            name="src/core/lv_obj_style_gen.c" />
+                <file category="sourceC"            name="src/core/lv_obj_tree.c" />
+                <file category="sourceC"            name="src/core/lv_refr.c" />
+                <file category="sourceC"            name="src/core/lv_theme.c" />
+                
+                <!-- src/draw -->
+                <file category="sourceC"            name="src/draw/lv_draw.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_arc.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_img.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_label.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_line.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_mask.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
+                <file category="sourceC"            name="src/draw/lv_img_buf.c" />
+                <file category="sourceC"            name="src/draw/lv_img_cache.c" />
+                <file category="sourceC"            name="src/draw/lv_img_decoder.c" />
+                
+                <!-- src/draw/sw -->
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_arc.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_blend.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_dither.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_gradient.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_img.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_letter.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_line.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_polygon.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_rect.c" />
+                
+                <!-- src/font -->
+                <file category="sourceC"            name="src/font/lv_font.c" />
+                <file category="sourceC"            name="src/font/lv_font_dejavu_16_persian_hebrew.c" />
+                <file category="sourceC"            name="src/font/lv_font_fmt_txt.c" />
+                <file category="sourceC"            name="src/font/lv_font_loader.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_8.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_10.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_12.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_12_subpx.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_14.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_16.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_18.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_20.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_22.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_24.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_26.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_28.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_28_compressed.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_30.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_32.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_34.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_36.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_38.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_40.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_42.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_44.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_46.c" />
+                <file category="sourceC"            name="src/font/lv_font_montserrat_48.c" />
+                <file category="sourceC"            name="src/font/lv_font_simsun_16_cjk.c" />
+                <file category="sourceC"            name="src/font/lv_font_unscii_8.c" />
+                <file category="sourceC"            name="src/font/lv_font_unscii_16.c" />
+                
+                <!-- src/hal -->
+                <file category="sourceC"            name="src/hal/lv_hal_disp.c" />
+                <file category="sourceC"            name="src/hal/lv_hal_indev.c" />
+                <file category="sourceC"            name="src/hal/lv_hal_tick.c" />
+                
+                <!-- src/misc-->
+                <file category="sourceC"            name="src/misc/lv_anim.c" />
+                <file category="sourceC"            name="src/misc/lv_anim_timeline.c" />
+                <file category="sourceC"            name="src/misc/lv_area.c" />
+                <file category="sourceC"            name="src/misc/lv_async.c" />
+                <file category="sourceC"            name="src/misc/lv_bidi.c" />
+                <file category="sourceC"            name="src/misc/lv_color.c" />
+                <file category="sourceC"            name="src/misc/lv_fs.c" />
+                <file category="sourceC"            name="src/misc/lv_gc.c" />
+                <file category="sourceC"            name="src/misc/lv_ll.c" />
+                <file category="sourceC"            name="src/misc/lv_log.c" />
+                <file category="sourceC"            name="src/misc/lv_lru.c" />
+                <file category="sourceC"            name="src/misc/lv_math.c" />
+                <file category="sourceC"            name="src/misc/lv_mem.c" />
+                <file category="sourceC"            name="src/misc/lv_printf.c" />
+                <file category="sourceC"            name="src/misc/lv_style.c" />
+                <file category="sourceC"            name="src/misc/lv_style_gen.c" />
+                <file category="sourceC"            name="src/misc/lv_templ.c" />
+                <file category="sourceC"            name="src/misc/lv_timer.c" />
+                <file category="sourceC"            name="src/misc/lv_tlsf.c" />
+                <file category="sourceC"            name="src/misc/lv_txt.c" />
+                <file category="sourceC"            name="src/misc/lv_txt_ap.c" />
+                <file category="sourceC"            name="src/misc/lv_utils.c" />
+                
+                <!-- src/widgets -->
+                <file category="sourceC"            name="src/widgets/lv_arc.c" />
+                <file category="sourceC"            name="src/widgets/lv_bar.c" />
+                <file category="sourceC"            name="src/widgets/lv_btn.c" />
+                <file category="sourceC"            name="src/widgets/lv_btnmatrix.c" />
+                <file category="sourceC"            name="src/widgets/lv_canvas.c" />
+                <file category="sourceC"            name="src/widgets/lv_checkbox.c" />
+                <file category="sourceC"            name="src/widgets/lv_dropdown.c" />
+                <file category="sourceC"            name="src/widgets/lv_img.c" />
+                <file category="sourceC"            name="src/widgets/lv_label.c" />
+                <file category="sourceC"            name="src/widgets/lv_line.c" />
+                <file category="sourceC"            name="src/widgets/lv_objx_templ.c" />
+                <file category="sourceC"            name="src/widgets/lv_roller.c" />
+                <file category="sourceC"            name="src/widgets/lv_slider.c" />
+                <file category="sourceC"            name="src/widgets/lv_switch.c" />
+                <file category="sourceC"            name="src/widgets/lv_table.c" />
+                <file category="sourceC"            name="src/widgets/lv_textarea.c" />
+                
+                <!-- general -->
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.0" />
+                <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
+                <file category="header"             name="lvgl.h" />
+                <file category="doc"                name="README.md"/>
+                
+              </files>
+              
+              <Pre_Include_Global_h>
+              
+/*! \brief use lv_config_cmsis.h which will be pre-included */
+#define LV_CONF_SKIP
+              </Pre_Include_Global_h>
+              
+               <RTE_Components_h>
+               
+/*! \brief Enable LVGL */
+#define RTE_GRAPHICS_LVGL               
+               </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="Porting"  condition="LVGL-Essential">
+              <description>Porting Templates</description>
+              <files>
+                <file category="header"     name="examples/porting/lv_port_disp_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_disp_template.c" attr="config" version="1.0.0" />
+                
+                <file category="header"     name="examples/porting/lv_port_indev_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_indev_template.c" attr="config" version="1.0.0" />
+
+                <file category="header"     name="examples/porting/lv_port_fs_template.h" attr="config" version="1.0.0" />
+                <file category="sourceC"    name="examples/porting/lv_port_fs_template.c" attr="config" version="1.0.0" />
+              </files>
+            </component>
+
+            <component Cgroup="lvgl" Csub="GPU STM32-DMA2D"  condition="LVGL-Essential">
+              <description>An hardware acceleration from STM32-DMA2D</description>
+              <files>
+              <file category="sourceC"            name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable STM32 DMA2D */
+#define LV_USE_GPU_STM32_DMA2D      1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-Essential">
+              <description>An hardware acceleration from NXP-PXP</description>
+              <files>
+              <file category="sourceC"            name="src/draw/nxp_pxp/lv_gpu_nxp_pxp.c" />
+              <file category="sourceC"            name="src/draw/nxp_pxp/lv_gpu_nxp_pxp_osa.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable NXP PXP */
+#define LV_USE_GPU_NXP_PXP          1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="GPU NXP-VGLite"  condition="LVGL-Essential">
+              <description>An hardware acceleration from NXP-VGLite</description>
+              <files>
+              <file category="sourceC"            name="src/draw/nxp_vglite/lv_gpu_nxp_vglite.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable NXP VGLite */
+#define LV_USE_GPU_NXP_VG_LITE          1
+              </RTE_Components_h>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Extra Themes"  condition="LVGL-Essential">
+              <description>Extra Themes, Widgets and Layouts</description>
+              <files>
+                <file category="sourceC"            name="src/extra/lv_extra.c" />
+              
+                <!-- src/extra/themes -->
+                <file category="sourceC"            name="src/extra/themes/default/lv_theme_default.c" />
+                <file category="sourceC"            name="src/extra/themes/basic/lv_theme_basic.c" />
+                <file category="sourceC"            name="src/extra/themes/mono/lv_theme_mono.c" />
+                
+                <!-- src/extra/widgets -->
+                <file category="sourceC"            name="src/extra/widgets/animimg/lv_animimg.c" />
+                <file category="sourceC"            name="src/extra/widgets/calendar/lv_calendar.c" />
+                <file category="sourceC"            name="src/extra/widgets/calendar/lv_calendar_header_arrow.c" />
+                <file category="sourceC"            name="src/extra/widgets/calendar/lv_calendar_header_dropdown.c" />
+                <file category="sourceC"            name="src/extra/widgets/chart/lv_chart.c" />
+                <file category="sourceC"            name="src/extra/widgets/colorwheel/lv_colorwheel.c" />
+                <file category="sourceC"            name="src/extra/widgets/imgbtn/lv_imgbtn.c" />
+                <file category="sourceC"            name="src/extra/widgets/keyboard/lv_keyboard.c" />
+                <file category="sourceC"            name="src/extra/widgets/led/lv_led.c" />
+                <file category="sourceC"            name="src/extra/widgets/list/lv_list.c" />
+                <file category="sourceC"            name="src/extra/widgets/menu/lv_menu.c" />
+                <file category="sourceC"            name="src/extra/widgets/meter/lv_meter.c" />
+                <file category="sourceC"            name="src/extra/widgets/msgbox/lv_msgbox.c" />
+                <file category="sourceC"            name="src/extra/widgets/span/lv_span.c" />
+                <file category="sourceC"            name="src/extra/widgets/spinbox/lv_spinbox.c" />
+                <file category="sourceC"            name="src/extra/widgets/spinner/lv_spinner.c" />
+                <file category="sourceC"            name="src/extra/widgets/tabview/lv_tabview.c" />
+                <file category="sourceC"            name="src/extra/widgets/tileview/lv_tileview.c" />
+                <file category="sourceC"            name="src/extra/widgets/win/lv_win.c" />
+                
+                <!-- src/extra/layouts -->
+                <file category="sourceC"            name="src/extra/layouts/flex/lv_flex.c" />
+                <file category="sourceC"            name="src/extra/layouts/grid/lv_grid.c" />
+              </files>
+              
+              <RTE_Components_h>
+               
+/*! \brief use extra themes, widgets and layouts */
+#define RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES               
+              </RTE_Components_h>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Libs PNG"  condition="LVGL-Essential">
+              <description>Add PNG support</description>
+              <files>
+                <!-- src/extra/libs/png -->
+                <file category="sourceC"            name="src/extra/libs/png/lodepng.c" />
+                <file category="sourceC"            name="src/extra/libs/png/lv_png.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable PNG support */
+#define LV_USE_PNG          1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="Libs BMP"  condition="LVGL-Essential">
+              <description>Add BMP support</description>
+              <files>
+                <!-- src/extra/libs/bmp -->
+                <file category="sourceC"            name="src/extra/libs/bmp/lv_bmp.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable BMP support */
+#define LV_USE_BMP          1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="Libs freetype"  condition="LVGL-Essential">
+              <description>Add freetype support, an extra librbary is required.</description>
+              <files>
+                <!-- src/extra/libs/freetype -->
+                <file category="sourceC"            name="src/extra/libs/freetype/lv_freetype.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable freetype support */
+#define LV_USE_FREETYPE          1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="Libs GIF"  condition="LVGL-Essential">
+              <description>Add GIF support</description>
+              <files>
+                <!-- src/extra/libs/gif -->
+                <file category="sourceC"            name="src/extra/libs/gif/lv_gif.c" />
+                <file category="sourceC"            name="src/extra/libs/gif/gifdec.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable gif support */
+#define LV_USE_GIF         1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="Libs sJPG"  condition="LVGL-Essential">
+              <description>Add sJPG support</description>
+              <files>
+                <!-- src/extra/libs/sjpg -->
+                <file category="sourceC"            name="src/extra/libs/sjpg/lv_sjpg.c" />
+                <file category="sourceC"            name="src/extra/libs/sjpg/tjpgd.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable sJPG support */
+#define LV_USE_SJPG         1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="Libs QRCode"  condition="LVGL-Essential">
+              <description>Add QRCode support</description>
+              <files>
+                <!-- src/extra/libs/qrcode -->
+                <file category="sourceC"            name="src/extra/libs/qrcode/lv_qrcode.c" />
+                <file category="sourceC"            name="src/extra/libs/qrcode/qrcodegen.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable QRCode support */
+#define LV_USE_QRCODE         1
+              </RTE_Components_h>
+              
+            </component>
+
+            <component Cgroup="lvgl" Csub="Libs FileSystem"  condition="LVGL-Essential">
+              <description>Add FileSystem support</description>
+              <files>
+                <!-- src/extra/libs/fsdrv -->
+                <file category="sourceC"            name="src/extra/libs/fsdrv/lv_fs_fatfs.c" />
+                <file category="sourceC"            name="src/extra/libs/fsdrv/lv_fs_posix.c" />
+                <file category="sourceC"            name="src/extra/libs/fsdrv/lv_fs_stdio.c" />
+              </files>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Libs RLOTTIE"  condition="LVGL-Essential">
+              <description>Add RLOTTIE support, an extra librbary is required.</description>
+              <files>
+                <!-- src/extra/libs/rlottie -->
+                <file category="sourceC"            name="src/extra/libs/rlottie/lv_rlottie.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable RLOTTIE support */
+#define LV_USE_RLOTTIE         1
+              </RTE_Components_h>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Libs ffmpeg"  condition="LVGL-Essential">
+              <description>Add ffmpeg support, an extra librbary is required.</description>
+              <files>
+                <!-- src/extra/libs/ffmpeg -->
+                <file category="sourceC"            name="src/extra/libs/ffmpeg/lv_ffmpeg.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable ffmpeg support */
+#define LV_USE_FFMPEG         1
+              </RTE_Components_h>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Benchmark"  condition="LVGL-Essential">
+              <description>Add the official benchmark.</description>
+              <files>
+                <!-- demos/benchmark -->
+                <file category="sourceC"            name="demos/benchmark/lv_demo_benchmark.c" />
+                <file category="header"            name="demos/benchmark/lv_demo_benchmark.h" />
+                
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_alpha16.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_chroma_keyed.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c" />
+                
+                <file category="doc"            name="demos/benchmark/README.md" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable demo:bencharmk */
+#define LV_USE_DEMO_BENCHMARK         1
+              </RTE_Components_h>
+              
+            </component>
+            
+            <component Cgroup="lvgl" Csub="Demo:Widgets"  condition="LVGL-Essential">
+              <description>Add the demo:widgets</description>
+              <files>
+                <!-- demos/widgets -->
+                <file category="sourceC"            name="demos/widgets/lv_demo_widgets.c" />
+                <file category="header"             name="demos/widgets/lv_demo_widgets.h" />
+                
+                <file category="sourceC"            name="demos/widgets/assets/img_clothes.c" />
+                <file category="sourceC"            name="demos/widgets/assets/img_demo_widgets_avatar.c" />
+                <file category="sourceC"            name="demos/widgets/assets/img_lvgl_logo.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable demo:widgets support */
+#define LV_USE_DEMO_WIDGETS         1
+              </RTE_Components_h>
+              
+            </component>
+        </bundle>
+    </components>
+  
+  <!-- optional taxonomy section for defining new component Class and Group names -->
+  <!--
+  <taxonomy>
+  </taxonomy>
+  -->
+  
+</package>

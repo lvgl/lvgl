@@ -18,5 +18,6 @@
    freetype
    qrcode
    rlottie
+   ffmpeg
 ```
 

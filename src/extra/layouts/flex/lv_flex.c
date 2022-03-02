@@ -54,8 +54,8 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void flex_update(lv_obj_t * cont, void * user_data);
-static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id, lv_coord_t item_gap,
-                              lv_coord_t max_main_size, track_t * t);
+static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id, lv_coord_t max_main_size,
+                              lv_coord_t item_gap, track_t * t);
 static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, int32_t item_last_id, lv_coord_t abs_x,
                            lv_coord_t abs_y, lv_coord_t max_main_size, lv_coord_t item_gap, track_t * t);
 static void place_content(lv_flex_align_t place, lv_coord_t max_size, lv_coord_t content_size, lv_coord_t item_cnt,
@@ -274,7 +274,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
         place_content(track_cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
     }
 
-    track_first_item =  f.rev ? cont->spec_attr->child_cnt - 1 : 0;
+    track_first_item = f.rev ? cont->spec_attr->child_cnt - 1 : 0;
 
     if(rtl && !f.row) {
         *cross_pos += total_track_cross_size;

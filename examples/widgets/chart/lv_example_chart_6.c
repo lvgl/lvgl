@@ -41,7 +41,7 @@ static void event_cb(lv_event_t * e)
         draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
         draw_rect_dsc.radius = 3;
 
-        lv_draw_rect(&a, dsc->clip_area, &draw_rect_dsc);
+        lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
 
         lv_draw_label_dsc_t draw_label_dsc;
         lv_draw_label_dsc_init(&draw_label_dsc);
@@ -50,7 +50,7 @@ static void event_cb(lv_event_t * e)
         a.x2 -= 5;
         a.y1 += 5;
         a.y2 -= 5;
-        lv_draw_label(&a, dsc->clip_area, &draw_label_dsc, buf, NULL);
+        lv_draw_label(dsc->draw_ctx, &draw_label_dsc, &a, buf, NULL);
     }
 }
 

@@ -667,7 +667,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
         xr = xs_fract + 0x80;
     }
     else if(xs_fract > 0x90) {
-        xn =  1;
+        xn = 1;
         if(dsc->tmp.xs_int + xn >= dsc->cfg.src_w) xn = 0;
         xr = (0xFF - xs_fract) + 0x80;
     }
@@ -686,7 +686,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
         yr = ys_fract + 0x80;
     }
     else if(ys_fract > 0x90) {
-        yn =  1;
+        yn = 1;
         if(dsc->tmp.ys_int + yn >= dsc->cfg.src_h) yn = 0;
 
         yr = (0xFF - ys_fract) + 0x80;

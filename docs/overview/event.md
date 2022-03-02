@@ -101,6 +101,9 @@ The following event codes exist:
 - `LV_EVENT_DRAW_PART_BEGIN` Starting to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
 - `LV_EVENT_DRAW_PART_END`   Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
 
+In `LV_EVENT_DRAW_...` events it's not allowed to adjust the widgets' properties. E.g. you can not call `lv_obj_set_width()`.
+In other words only `get` functions can be called. 
+
 ### Other events
 - `LV_EVENT_DELETE`       Object is being deleted
 - `LV_EVENT_CHILD_CHANGED`    Child was removed/added
@@ -151,8 +154,8 @@ lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 
 `lv_event_t` is the only parameter passed to the event callback and it contains all data about the event. The following values can be gotten from it:
 - `lv_event_get_code(e)` get the event code
-- `lv_event_get_target(e)` get the object to which an event was sent
-- `lv_event_get_original_target(e)` get the object to which an event was originally sent (different from `lv_event_get_target` if [event bubbling](#event-bubbling) is enabled)
+- `lv_event_get_current_target(e)` get the object to which an event was sent. I.e. the object whose event handler is being called.
+- `lv_event_get_target(e)` get the object that originally triggered the event (different from `lv_event_get_target` if [event bubbling](#event-bubbling) is enabled)
 - `lv_event_get_user_data(e)` get the pointer passed as the last parameter of `lv_obj_add_event_cb`.
 - `lv_event_get_param(e)` get the parameter passed as the last parameter of `lv_event_send` 
 

@@ -21,7 +21,7 @@
 
 #else
 
-#define LV_MEM_CUSTOM_INCLUDE	"zephyr/lvgl_mem.h"
+#define LV_MEM_CUSTOM_INCLUDE	"../zephyr/lvgl_mem.h"
 #define LV_MEM_CUSTOM_ALLOC	lvgl_malloc
 #define LV_MEM_CUSTOM_REALLOC	lvgl_realloc
 #define LV_MEM_CUSTOM_FREE	lvgl_free

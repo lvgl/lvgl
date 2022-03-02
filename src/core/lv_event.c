@@ -62,10 +62,11 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event_code, void * param)
     e.user_data = NULL;
     e.param = param;
     e.deleted = 0;
-
+    e.stop_bubbling = 0;
+    e.stop_processing = 0;
 
     /*Build a simple linked list from the objects used in the events
-     *It's important to know if an this object was deleted by a nested event
+     *It's important to know if this object was deleted by a nested event
      *called from this `event_cb`.*/
     e.prev = event_head;
     event_head = &e;
@@ -86,7 +87,7 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     if(class_p == NULL) base = e->current_target->class_p;
     else base = class_p->base_class;
 
-    /*Find a base in which Call the ancestor's event handler_cb is set*/
+    /*Find a base in which call the ancestor's event handler_cb if set*/
     while(base && base->event_cb == NULL) base = base->base_class;
 
     if(base == NULL) return LV_RES_OK;
@@ -116,7 +117,7 @@ lv_obj_t * lv_event_get_current_target(lv_event_t * e)
 
 lv_event_code_t lv_event_get_code(lv_event_t * e)
 {
-    return e->code;
+    return e->code & ~LV_EVENT_PREPROCESS;
 }
 
 void * lv_event_get_param(lv_event_t * e)
@@ -127,6 +128,16 @@ void * lv_event_get_param(lv_event_t * e)
 void * lv_event_get_user_data(lv_event_t * e)
 {
     return e->user_data;
+}
+
+void lv_event_stop_bubbling(lv_event_t * e)
+{
+    e->stop_bubbling = 1;
+}
+
+void lv_event_stop_processing(lv_event_t * e)
+{
+    e->stop_processing = 1;
 }
 
 
@@ -240,6 +251,18 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
     return false;
 }
 
+void * lv_obj_get_event_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->spec_attr == NULL) return false;
+
+    int32_t i = 0;
+    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
+        if(event_cb == obj->spec_attr->event_dsc[i].cb) return obj->spec_attr->event_dsc[i].user_data;
+    }
+    return NULL;
+}
+
 lv_indev_t * lv_event_get_indev(lv_event_t * e)
 {
 
@@ -279,7 +302,7 @@ lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e)
     }
 }
 
-const lv_area_t * lv_event_get_clip_area(lv_event_t * e)
+lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e)
 {
     if(e->code == LV_EVENT_DRAW_MAIN ||
        e->code == LV_EVENT_DRAW_MAIN_BEGIN ||
@@ -408,18 +431,22 @@ static lv_res_t event_send_core(lv_event_t * e)
     lv_indev_t * indev_act = lv_indev_get_act();
     if(indev_act) {
         if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, e->code);
+        if(e->stop_processing) return LV_RES_OK;
+        if(e->deleted) return LV_RES_INV;
     }
 
-    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(e->current_target, 0);
     lv_res_t res = LV_RES_OK;
-    res = lv_obj_event_base(NULL, e);
+    lv_event_dsc_t * event_dsc = res == LV_RES_INV ? NULL : lv_obj_get_event_dsc(e->current_target, 0);
 
     uint32_t i = 0;
     while(event_dsc && res == LV_RES_OK) {
-        if(event_dsc->cb && (event_dsc->filter == LV_EVENT_ALL || event_dsc->filter == e->code)) {
+        if(event_dsc->cb  && ((event_dsc->filter & LV_EVENT_PREPROCESS) == LV_EVENT_PREPROCESS)
+           && (event_dsc->filter == (LV_EVENT_ALL | LV_EVENT_PREPROCESS) ||
+               (event_dsc->filter & ~LV_EVENT_PREPROCESS) == e->code)) {
             e->user_data = event_dsc->user_data;
             event_dsc->cb(e);
 
+            if(e->stop_processing) return LV_RES_OK;
             /*Stop if the object is deleted*/
             if(e->deleted) return LV_RES_INV;
         }
@@ -428,12 +455,30 @@ static lv_res_t event_send_core(lv_event_t * e)
         event_dsc = lv_obj_get_event_dsc(e->current_target, i);
     }
 
-    if(res == LV_RES_OK && e->current_target->parent && event_is_bubbled(e))
-    {
-            e->current_target = e->current_target->parent;
-            res = event_send_core(e);
-            if(res != LV_RES_OK) return LV_RES_INV;
+    res = lv_obj_event_base(NULL, e);
 
+    event_dsc = res == LV_RES_INV ? NULL : lv_obj_get_event_dsc(e->current_target, 0);
+
+    i = 0;
+    while(event_dsc && res == LV_RES_OK) {
+        if(event_dsc->cb && ((event_dsc->filter & LV_EVENT_PREPROCESS) == 0)
+           && (event_dsc->filter == LV_EVENT_ALL || event_dsc->filter == e->code)) {
+            e->user_data = event_dsc->user_data;
+            event_dsc->cb(e);
+
+            if(e->stop_processing) return LV_RES_OK;
+            /*Stop if the object is deleted*/
+            if(e->deleted) return LV_RES_INV;
+        }
+
+        i++;
+        event_dsc = lv_obj_get_event_dsc(e->current_target, i);
+    }
+
+    if(res == LV_RES_OK && e->current_target->parent && event_is_bubbled(e)) {
+        e->current_target = e->current_target->parent;
+        res = event_send_core(e);
+        if(res != LV_RES_OK) return LV_RES_INV;
     }
 
     return res;
@@ -441,6 +486,8 @@ static lv_res_t event_send_core(lv_event_t * e)
 
 static bool event_is_bubbled(lv_event_t * e)
 {
+    if(e->stop_bubbling) return false;
+
     /*Event codes that always bubble*/
     switch(e->code) {
         case LV_EVENT_CHILD_CREATED:

@@ -46,4 +46,4 @@ lv_obj_t * lv_calendar_header_dropdown_create(lv_obj_t * parent);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_CALENDAR_H*/
+#endif /*LV_CALENDAR_HEADER_DROPDOWN_H*/

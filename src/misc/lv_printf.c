@@ -749,7 +749,7 @@ static int _vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, cons
                                              width, flags);
                         }
                     }
-                    else if (*format == 'V') {
+                    else if(*format == 'V') {
                         lv_vaformat_t * vaf = va_arg(va, lv_vaformat_t *);
                         va_list copy;
 

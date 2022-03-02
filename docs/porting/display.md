@@ -56,20 +56,19 @@ This means the `flush_cb` callback only has to update the address of the framebu
 This configuration should be used if the MCU has an LCD controller peripheral and not with an external display controller (e.g. ILI9341 or SSD1963) accessed via serial link. The latter will generally be too slow to maintain high frame rates with full screen redraws.
 
 ### Direct mode
-If the `direct mode` flag is enabled in the display driver LVGL will draw directly into a **screen sized frame buffer**. That is the draw buffer(s) needs to be screen sized. 
+If the `direct_mode` flag is enabled in the display driver LVGL will draw directly into a **screen sized frame buffer**. That is the draw buffer(s) needs to be screen sized. 
 It this case `flush_cb` will be called only once when all dirty areas are redrawn.
 With `direct_mode` the frame buffer always contains the current frame as it should be displayed on the screen. 
 If 2 frame buffers are provided as draw buffers LVGL will alter the buffers but always draw only the dirty areas. 
-Therefore the the 2 buffers needs to synchronized in `flush_cb` like this:
+Therefore the 2 buffers needs to synchronized in `flush_cb` like this:
 1. Display the frame buffer pointed by `color_p`
 2. Copy the redrawn areas from `color_p` to the other buffer.
 
 The get the redrawn areas to copy use the following functions
 `_lv_refr_get_disp_refreshing()` returns the display being refreshed
 `disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
-`disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into an other one and should be ignored
+`disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into another one and should be ignored
 `disp->inv_p` number of valid elements in `inv_areas`
-```
 
 ## Display driver
 
@@ -93,17 +92,15 @@ LVGL might render the screen in multiple chunks and therefore call `flush_cb` mu
 There are some optional display driver data fields:
 - `physical_hor_res` horizontal resolution of the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to -1 / same as `hor_res`).
 - `physical_ver_res` vertical resolution of the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to -1 / same as `ver_res`).
-- `offset_x` horizontal offset from the the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to 0).
-- `offset_y` vertical offset from the the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to 0).
+- `offset_x` horizontal offset from the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to 0).
+- `offset_y` vertical offset from the full / physical display in pixels. Only set this when _not_ using the full screen (defaults to 0).
 - `color_chroma_key` A color which will be drawn as transparent on chrome keyed images. Set to `LV_COLOR_CHROMA_KEY` from `lv_conf.h` by default.
 - `anti_aliasing` use anti-aliasing (edge smoothing). Enabled by default if `LV_COLOR_DEPTH` is set to at least 16 in `lv_conf.h`.
 - `rotated` and `sw_rotate` See the [Rotation](#rotation) section below.
 - `screen_transp` if `1` the screen itself can have transparency as well. `LV_COLOR_SCREEN_TRANSP` must be enabled in `lv_conf.h` and `LV_COLOR_DEPTH` must be 32.
 - `user_data` A custom `void` user data for the driver.
 - `full_refresh` always redrawn the whole screen (see above)
-- `direct_mode` drive directly into the frame buffer (see above)
-- `user_data` A custom `void `user data for the driver..
-
+- `direct_mode` draw directly into the frame buffer (see above)
 
 Some other optional callbacks to make it easier and more optimal to work with monochrome, grayscale or other non-standard RGB displays:
 - `rounder_cb` Round the coordinates of areas to redraw. E.g. a 2x2 px can be converted to 2x8.
@@ -200,7 +197,7 @@ LVGL supports rotation of the display in 90 degree increments. You can select wh
 
 If you select software rotation (`sw_rotate` flag set to 1), LVGL will perform the rotation for you. Your driver can and should assume that the screen width and height have not changed. Simply flush pixels to the display as normal. Software rotation requires no additional logic in your `flush_cb` callback.
 
-There is a noticeable amount of overhead to performing rotation in software. Hardware rotation is  available to avoid unwanted slow downs. In this mode, LVGL draws into the buffer as if your screen width and height were swapped. You are responsible for rotating the provided pixels yourself. 
+There is a noticeable amount of overhead to performing rotation in software. Hardware rotation is available to avoid unwanted slowdowns. In this mode, LVGL draws into the buffer as if your screen width and height were swapped. You are responsible for rotating the provided pixels yourself. 
 
 The default rotation of your display when it is initialized can be set using the `rotated` flag. The available options are `LV_DISP_ROT_NONE`, `LV_DISP_ROT_90`, `LV_DISP_ROT_180`, or `LV_DISP_ROT_270`. The rotation values are relative to how you would rotate the physical display in the clockwise direction. Thus, `LV_DISP_ROT_90` means you rotate the hardware 90 degrees clockwise, and the display rotates 90 degrees counterclockwise to compensate.
 

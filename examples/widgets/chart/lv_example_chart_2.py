@@ -35,7 +35,7 @@ def draw_event_cb(e):
     coords = lv.area_t()
     obj.get_coords(coords)
     a.y2 = coords.y2
-    lv.draw_rect(a, dsc.clip_area, draw_rect_dsc)
+    dsc.draw_ctx.rect(draw_rect_dsc, a)
 
     # Remove the masks
     lv.draw_mask_remove_id(line_mask_id)
@@ -44,7 +44,7 @@ def draw_event_cb(e):
 
 def add_data(timer):
     # LV_UNUSED(timer);
-    cnt = 0;
+    cnt = 0
     chart1.set_next_value(ser1, lv.rand(20, 90))
 
     if cnt % 4 == 0:

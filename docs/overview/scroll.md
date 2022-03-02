@@ -5,7 +5,7 @@
 # Scroll
 
 ## Overview
-In LVGL scrolling works very intuitively: if an object is outside of its parent content area (the size without padding), the parent becomes scrollable and scrollbar(s) will appear. That's it.
+In LVGL scrolling works very intuitively: if an object is outside its parent content area (the size without padding), the parent becomes scrollable and scrollbar(s) will appear. That's it.
 
 Any object can be scrollable including `lv_obj_t`, `lv_img`, `lv_btn`, `lv_meter`, etc
 
@@ -17,7 +17,7 @@ The object can either be scrolled horizontally or vertically in one stroke; diag
 Scrollbars are displayed according to a configured `mode`. The following `mode`s exist:
 - `LV_SCROLLBAR_MODE_OFF`  Never show the scrollbars
 - `LV_SCROLLBAR_MODE_ON`  Always show the scrollbars
-- `LV_SCROLLBAR_MODE_ACTIVE` Show scroll bars while a object is being scrolled
+- `LV_SCROLLBAR_MODE_ACTIVE` Show scroll bars while an object is being scrolled
 - `LV_SCROLLBAR_MODE_AUTO`  Show scroll bars when the content is large enough to be scrolled
 
 `lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_...)` sets the scrollbar mode on an object.
@@ -50,6 +50,8 @@ lv_obj_add_style(obj, &style_blue, LV_STATE_SCROLLED | LV_PART_SCROLLBAR);
 If the base direction of the `LV_PART_SCROLLBAR` is RTL (`LV_BASE_DIR_RTL`) the vertical scrollbar will be placed on the left. 
 Note that, the `base_dir` style property is inherited. Therefore, it can be set directly on the `LV_PART_SCROLLBAR` part of an object
 or on the object's or any parent's main part to make a scrollbar inherit the base direction. 
+
+`pad_left/right/top/bottom` sets the spacing around the scrollbars and `width` sets the scrollbar's width. 
 
 ### Events
 The following events are related to scrolling:
@@ -89,7 +91,7 @@ OR-ed values are also possible. E.g. `LV_DIR_TOP | LV_DIR_LEFT`.
 If an object can't be scrolled further (e.g. its content has reached the bottom-most position) additional scrolling is propagated to its parent. If the parent can be scrolled in that direction than it will be scrolled instead.
 It continues propagating to the grandparent and grand-grandparents as well.
 
-The propagation on scrolling is called "scroll chaining" and it can be enabled/disabled with the `LV_OBJ_FLAG_SCROLL_CHAIN` flag. 
+The propagation on scrolling is called "scroll chaining" and it can be enabled/disabled with `LV_OBJ_FLAG_SCROLL_CHAIN_HOR/VER` flag.
 If chaining is disabled the propagation stops on the object and the parent(s) won't be scrolled.
 
 ### Scroll momentum

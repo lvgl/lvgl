@@ -16,8 +16,9 @@ class NewTheme(lv.theme_t):
         th_act = lv.theme_get_from_obj(lv.scr_act())
         # This theme will be applied only after base theme is applied
         self.set_parent(th_act)        
-        
-class ExampleStyle_14():
+
+
+class ExampleStyle_14:
     
     def __init__(self):
         # 
@@ -38,7 +39,7 @@ class ExampleStyle_14():
         label = lv.label(btn)
         label.set_text("New theme")
         
-    def new_theme_apply_cb(self,th, obj):
+    def new_theme_apply_cb(self, th, obj):
         print(th,obj)
         if obj.get_class() == lv.btn_class:
             obj.add_style(self.th_new.style_btn, 0)
@@ -49,5 +50,6 @@ class ExampleStyle_14():
         self.th_new = NewTheme()
         self.th_new.set_apply_cb(self.new_theme_apply_cb)
         lv.disp_get_default().set_theme(self.th_new)
-        
+
+
 exampleStyle_14 = ExampleStyle_14()

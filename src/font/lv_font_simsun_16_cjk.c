@@ -5,13 +5,13 @@
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
-#include "lvgl.h"
+    #include "lvgl.h"
 #else
-#include "../../lvgl.h"
+    #include "../../lvgl.h"
 #endif
 
 #ifndef LV_FONT_SIMSUN_16_CJK
-#define LV_FONT_SIMSUN_16_CJK 1
+    #define LV_FONT_SIMSUN_16_CJK 1
 #endif
 
 #if LV_FONT_SIMSUN_16_CJK
@@ -23696,8 +23696,7 @@ static const uint16_t unicode_list_5[] = {
 };
 
 /*Collect the unicode lists and glyph_id offsets*/
-static const lv_font_fmt_txt_cmap_t cmaps[] =
-{
+static const lv_font_fmt_txt_cmap_t cmaps[] = {
     {
         .range_start = 32, .range_length = 96, .glyph_id_start = 1,
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
@@ -23769,7 +23768,7 @@ lv_font_t lv_font_simsun_16_cjk = {
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     .subpx = LV_FONT_SUBPX_NONE,
 #endif
-#if LV_VERSION_CHECK(7, 4, 0)
+#if LV_VERSION_CHECK(7, 4, 0) || LVGL_VERSION_MAJOR >= 8
     .underline_position = -2,
     .underline_thickness = 1,
 #endif

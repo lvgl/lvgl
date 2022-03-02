@@ -33,14 +33,18 @@ extern "C" {
  * General types
  *-----------------*/
 
+struct _lv_font_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
+    const struct _lv_font_t *
+        resolved_font; /**< Pointer to a font where the gylph was actually found after handling fallbacks*/
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
-    uint16_t box_w;  /**< Width of the glyph's bounding box*/
-    uint16_t box_h;  /**< Height of the glyph's bounding box*/
-    int16_t ofs_x;   /**< x offset of the bounding box*/
+    uint16_t box_w; /**< Width of the glyph's bounding box*/
+    uint16_t box_h; /**< Height of the glyph's bounding box*/
+    int16_t ofs_x;  /**< x offset of the bounding box*/
     int16_t ofs_y;  /**< y offset of the bounding box*/
-    uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
+    uint8_t bpp: 4;  /**< Bit-per-pixel: 1, 2, 4, 8*/
+    uint8_t is_placeholder: 1; /** Glyph is missing. But placeholder will still be displayed */
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
@@ -52,8 +56,6 @@ enum {
 };
 
 typedef uint8_t lv_font_subpx_t;
-
-struct _lv_font_t;
 
 /** Describe the properties of a font*/
 typedef struct _lv_font_t {
@@ -71,11 +73,11 @@ typedef struct _lv_font_t {
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
 
-    const void * dsc;                     /**< Store implementation specific or run_time data or caching here*/
+    const void * dsc;               /**< Store implementation specific or run_time data or caching here*/
+    const struct _lv_font_t * fallback;   /**< Fallback font for missing glyph. Resolved recursively */
 #if LV_USE_USER_DATA
     void * user_data;               /**< Custom user data for font.*/
 #endif
-
 } lv_font_t;
 
 /**********************
@@ -95,6 +97,7 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
  * @param font_p pointer to font
  * @param dsc_out store the result descriptor here
  * @param letter an UNICODE letter code
+ * @param letter_next the next letter after `letter`. Used for kerning
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
@@ -210,20 +213,12 @@ LV_FONT_DECLARE(lv_font_montserrat_46)
 LV_FONT_DECLARE(lv_font_montserrat_48)
 #endif
 
-#if LV_FONT_MONTSERRAT_28_COMPRESSED
-LV_FONT_DECLARE(lv_font_montserrat_28_compressed)
-#endif
-
 #if LV_FONT_MONTSERRAT_12_SUBPX
 LV_FONT_DECLARE(lv_font_montserrat_12_subpx)
 #endif
 
-#if LV_FONT_UNSCII_8
-LV_FONT_DECLARE(lv_font_unscii_8)
-#endif
-
-#if LV_FONT_UNSCII_16
-LV_FONT_DECLARE(lv_font_unscii_16)
+#if LV_FONT_MONTSERRAT_28_COMPRESSED
+LV_FONT_DECLARE(lv_font_montserrat_28_compressed)
 #endif
 
 #if LV_FONT_DEJAVU_16_PERSIAN_HEBREW
@@ -232,6 +227,14 @@ LV_FONT_DECLARE(lv_font_dejavu_16_persian_hebrew)
 
 #if LV_FONT_SIMSUN_16_CJK
 LV_FONT_DECLARE(lv_font_simsun_16_cjk)
+#endif
+
+#if LV_FONT_UNSCII_8
+LV_FONT_DECLARE(lv_font_unscii_8)
+#endif
+
+#if LV_FONT_UNSCII_16
+LV_FONT_DECLARE(lv_font_unscii_16)
 #endif
 
 /*Declare the custom (user defined) fonts*/

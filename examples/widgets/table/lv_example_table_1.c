@@ -18,7 +18,7 @@ static void draw_part_event_cb(lv_event_t * e)
         }
         /*In the first column align the texts to the right*/
         else if(col == 0) {
-            dsc->label_dsc->flag = LV_TEXT_ALIGN_RIGHT;
+            dsc->label_dsc->align = LV_TEXT_ALIGN_RIGHT;
         }
 
         /*MAke every 2nd row grayish*/

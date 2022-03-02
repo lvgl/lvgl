@@ -64,6 +64,11 @@ code.sig-name
   transform: translate(0, -10px);
 }
 
+/*Let `code` wrap*/
+.rst-content code, .rst-content tt, code {
+  white-space: normal;
+}
+
 .lv-example, .lv-example > iframe {
   border: none;
   outline: none;

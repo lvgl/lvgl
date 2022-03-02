@@ -37,7 +37,7 @@ panel.update_snap(lv.ANIM.ON)
 
 
 # Switch between "One scroll" and "Normal scroll" mode
-sw = lv.switch(lv.scr_act());
+sw = lv.switch(lv.scr_act())
 sw.align(lv.ALIGN.TOP_RIGHT, -20, 10)
 sw.add_event_cb(lambda evt:  sw_event_cb(evt,panel), lv.EVENT.ALL, None)
 label = lv.label(lv.scr_act())

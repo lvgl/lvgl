@@ -106,7 +106,42 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
  */
 void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
 {
+    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NULL(indev->driver);
+    LV_ASSERT_NULL(indev->driver->read_timer);
+    lv_timer_del(indev->driver->read_timer);
+
+    LV_ASSERT_NULL(new_drv);
+    if(new_drv->disp == NULL) {
+        new_drv->disp = lv_disp_get_default();
+    }
+    if(new_drv->disp == NULL) {
+        LV_LOG_WARN("lv_indev_drv_register: no display registered hence can't attach the indev to "
+                    "a display");
+        indev->proc.disabled = true;
+        return;
+    }
+
     indev->driver = new_drv;
+    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_INDEV_DEF_READ_PERIOD, indev);
+    indev->proc.reset_query   = 1;
+}
+
+/**
+* Remove the provided input device. Make sure not to use the provided input device afterwards anymore.
+* @param indev pointer to delete
+*/
+void lv_indev_delete(lv_indev_t * indev)
+{
+    LV_ASSERT_NULL(indev);
+    LV_ASSERT_NULL(indev->driver);
+    LV_ASSERT_NULL(indev->driver->read_timer);
+    /*Clean up the read timer first*/
+    lv_timer_del(indev->driver->read_timer);
+    /*Remove the input device from the list*/
+    _lv_ll_remove(&LV_GC_ROOT(_lv_indev_ll), indev);
+    /*Free the memory of the input device*/
+    lv_mem_free(indev);
 }
 
 /**

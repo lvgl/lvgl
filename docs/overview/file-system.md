@@ -21,6 +21,8 @@ static lv_fs_drv_t drv;                   /*Needs to be static or global*/
 lv_fs_drv_init(&drv);                     /*Basic initialization*/
 
 drv.letter = 'S';                         /*An uppercase letter to identify the drive */
+drv.cache_size = my_cahce_size;           /*Cache size for reading in bytes. 0 to not cache.*/
+
 drv.ready_cb = my_ready_cb;               /*Callback to tell if the drive is ready to use */
 drv.open_cb = my_open_cb;                 /*Callback to open a file */
 drv.close_cb = my_close_cb;               /*Callback to close a file */

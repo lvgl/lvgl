@@ -54,7 +54,7 @@ void lv_example_chart_3(void)
     lv_chart_set_next_value(chart, ser1, 22);
     lv_chart_set_next_value(chart, ser1, 58);
 
-    lv_coord_t * ser2_array =  lv_chart_get_y_array(chart, ser2);
+    lv_coord_t * ser2_array = lv_chart_get_y_array(chart, ser2);
     /*Directly set points on 'ser2'*/
     ser2_array[0] = 92;
     ser2_array[1] = 71;

@@ -83,13 +83,16 @@ lv_obj_set_pos(parent, 50, 50);	/*Move the parent. The child will move with it.*
 
 ### Visibility only on the parent
 
-If a child is partially or fully outside of its parent then the parts outside will not be visible.
+If a child is partially or fully outside its parent then the parts outside will not be visible.
 
 ![](/misc/par_child3.png "A graphical object is visible on its parent")  
 
 ```c
 lv_obj_set_x(obj1, -30);	/*Move the child a little bit off the parent*/
 ```
+
+This behavior can be overwritten with `lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);` which allow the children to be drawn out of the parent.
+
 
 ### Create and delete objects
 

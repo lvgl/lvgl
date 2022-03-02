@@ -34,7 +34,7 @@ typedef enum {
 } lv_cover_res_t;
 
 typedef struct {
-    const lv_area_t * clip_area;        /**< The current clip area, required if you need to draw something in the event*/
+    lv_draw_ctx_t * draw_ctx;           /**< Draw context*/
     const struct _lv_obj_class_t * class_p;     /**< The class that sent the event */
     uint32_t type;                      /**< The type if part being draw. Element of `lv_<name>_draw_part_type_t` */
     lv_area_t * draw_area;              /**< The area of the part being drawn*/
@@ -125,9 +125,9 @@ lv_coord_t lv_obj_calculate_ext_draw_size(struct _lv_obj_t * obj, uint32_t part)
 /**
  * Initialize a draw descriptor used in events.
  * @param dsc pointer to a descriptor. Later it should be passed as parameter to an `LV_EEVNT_DRAW_PART_BEGIN/END` event.
- * @param clip_area the current clip area of the drawing
+ * @param draw the current draw context. (usually returned by `lv_event_get_draw_ctx(e)`)
  */
-void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, const lv_area_t * clip_area);
+void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw_ctx);
 
 /**
  * Check the type obj a part draw descriptor

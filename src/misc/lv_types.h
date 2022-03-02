@@ -88,7 +88,7 @@ typedef uint32_t lv_uintptr_t;
 #endif
 
 #ifdef __cplusplus
-} /*extern "C"*/ 
+} /*extern "C"*/
 #endif
 
 #endif /*LV_TYPES_H*/

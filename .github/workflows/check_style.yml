@@ -1,0 +1,39 @@
+name: Verify code formatting
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install astyle
+        run: |
+          sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu `lsb_release -sc` main universe restricted multiverse"
+          sudo apt-get update -y -qq
+          sudo apt-get install astyle
+      - name: Format code
+        run: python code-format.py
+        working-directory: scripts
+      - name: Check that repository is clean
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! (git diff --exit-code --color=always | tee /tmp/lvgl_diff.patch); then
+            echo "Please apply the preceding diff to your code or run scripts/code-format.py"
+            exit 1
+          fi
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        if: github.event_name == 'pull_request' && failure()
+        with:
+          message: |
+            Your PR needs its formatting corrected before it can be merged upstream.
+            
+            Please run `scripts/code-format.py` and commit the resulting change.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

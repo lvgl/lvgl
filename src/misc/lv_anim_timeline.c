@@ -170,7 +170,7 @@ uint32_t lv_anim_timeline_get_playtime(lv_anim_timeline_t * at)
     uint32_t playtime = 0;
     for(uint32_t i = 0; i < at->anim_dsc_cnt; i++) {
         uint32_t end = lv_anim_get_playtime(&at->anim_dsc[i].anim);
-        if (end == LV_ANIM_PLAYTIME_INFINITE)
+        if(end == LV_ANIM_PLAYTIME_INFINITE)
             return end;
         end += at->anim_dsc[i].start_time;
         if(end > playtime) {
