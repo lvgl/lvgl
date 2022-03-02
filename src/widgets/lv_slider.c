@@ -331,10 +331,8 @@ static void draw_knob(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    const bool is_horizontal = is_slider_horizontal(obj);
 
-    lv_coord_t objw = lv_obj_get_width(obj);
-    lv_coord_t objh = lv_obj_get_height(obj);
-    bool is_horizontal = objw >= objh;
     bool sym = false;
     if(slider->bar.mode == LV_BAR_MODE_SYMMETRICAL && slider->bar.min_value < 0 && slider->bar.max_value > 0) sym = true;
 
@@ -342,30 +340,21 @@ static void draw_knob(lv_event_t * e)
     bool is_rtl = base_dir == LV_BASE_DIR_RTL;
 
     lv_area_t knob_area;
-    /*Horizontal*/
+    lv_coord_t knob_size;
     if(is_horizontal) {
+        knob_size = lv_obj_get_height(obj);
         knob_area.x1 = LV_SLIDER_KNOB_COORD(is_rtl, slider->bar.indic_area);
     }
     /*Vertical*/
     else {
-        if(!sym) {
-            knob_area.y1 = slider->bar.indic_area.y1;
-        }
-        else {
-            if(slider->bar.cur_value >= 0) {
-                knob_area.y1 = slider->bar.indic_area.y1;
-            }
-            else {
-                knob_area.y1 = slider->bar.indic_area.y2;
-            }
-        }
+        knob_size = lv_obj_get_width(obj);
+        if(sym && slider->bar.cur_value < 0) knob_area.y1 = slider->bar.indic_area.y2;
+        else knob_area.y1 = slider->bar.indic_area.y1;
     }
 
     lv_draw_rect_dsc_t knob_rect_dsc;
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
-
-    lv_coord_t knob_size = is_horizontal ? objh : objw;
     position_knob(obj, &knob_area, knob_size, is_horizontal);
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
