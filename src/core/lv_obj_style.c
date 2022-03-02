@@ -173,7 +173,11 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
-    if(lv_style_lookup_flags(prop) & LV_STYLE_PROP_LAYOUT_REFR) {
+    bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYOUT_REFR);
+    bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_EXT_DRAW);
+    bool is_inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
+
+    if(is_layout_refr) {
         if(part == LV_PART_ANY ||
            part == LV_PART_MAIN ||
            lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT ||
@@ -182,19 +186,19 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
-    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY ||
-                                                         (lv_style_lookup_flags(prop) & LV_STYLE_PROP_PARENT_LAYOUT_REFR))) {
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
         if(parent) lv_obj_mark_layout_as_dirty(parent);
     }
 
-    if(prop == LV_STYLE_PROP_ANY || (lv_style_lookup_flags(prop) & LV_STYLE_PROP_EXT_DRAW)) {
+    if(prop == LV_STYLE_PROP_ANY || is_ext_draw) {
         lv_obj_refresh_ext_draw_size(obj);
     }
     lv_obj_invalidate(obj);
 
-    if(prop == LV_STYLE_PROP_ANY ||
-       ((lv_style_lookup_flags(prop) & LV_STYLE_PROP_INHERIT) && ((lv_style_lookup_flags(prop) & LV_STYLE_PROP_EXT_DRAW) || (lv_style_lookup_flags(prop) & LV_STYLE_PROP_LAYOUT_REFR)))) {
+
+
+    if(prop == LV_STYLE_PROP_ANY || (is_inherit && (is_ext_draw || is_layout_refr))) {
         if(part != LV_PART_SCROLLBAR) {
             refresh_children_style(obj);
         }
@@ -209,7 +213,7 @@ void lv_obj_enable_style_refresh(bool en)
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     lv_style_value_t value_act;
-    bool inherit = lv_style_lookup_flags(prop) & LV_STYLE_PROP_INHERIT ? true : false;
+    bool inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
     bool found = false;
     while(obj) {
         found = get_prop_core(obj, part, prop, &value_act);

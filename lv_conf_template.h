@@ -153,6 +153,9 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
+/*Maximum number of custom style properties to support*/
+#define LV_STYLE_MAX_CUSTOM_PROPS 64
+
 /*-------------
  * GPU
  *-----------*/

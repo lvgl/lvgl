@@ -40,4 +40,30 @@ void test_gradient_vertical_misalignment(void)
     }
 }
 
+void test_custom_prop_ids(void)
+{
+    uint8_t fake_flag = 0;
+    uint32_t initial_custom_props = lv_style_get_num_custom_props();
+    uint32_t max_props_to_register = LV_STYLE_MAX_CUSTOM_PROPS - initial_custom_props;
+    for(uint32_t i = 0; i < max_props_to_register; i++) {
+        lv_style_prop_t prop = lv_style_register_prop(fake_flag);
+        /* Should have a higher index than the last built-in prop */
+        TEST_ASSERT_GREATER_THAN(_LV_STYLE_LAST_BUILT_IN_PROP, prop);
+        if(i == 0) {
+            /* Should be equal to the first expected index of a custom prop */
+            TEST_ASSERT_EQUAL(prop, _LV_STYLE_NUM_BUILT_IN_PROPS + initial_custom_props);
+        }
+        /*We should find our flags*/
+        TEST_ASSERT_EQUAL(_lv_style_prop_lookup_flags(prop), fake_flag);
+        if(fake_flag == 0xff)
+            fake_flag = 0;
+        else
+            fake_flag++;
+    }
+    /* This should now fail as there are no custom IDs left */
+    lv_style_prop_t inv_prop = lv_style_register_prop(0);
+    TEST_ASSERT_EQUAL(inv_prop, LV_STYLE_PROP_INV);
+    TEST_ASSERT_EQUAL(lv_style_get_num_custom_props(), LV_STYLE_MAX_CUSTOM_PROPS);
+}
+
 #endif

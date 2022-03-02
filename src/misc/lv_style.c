@@ -25,7 +25,7 @@
  *  GLOBAL VARIABLES
  **********************/
 
-uint8_t lv_style_lookup_table[256] = {
+const uint8_t lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PROPS] = {
     [LV_STYLE_WIDTH] =                    LV_STYLE_PROP_LAYOUT_REFR,
     [LV_STYLE_MIN_WIDTH] =                LV_STYLE_PROP_LAYOUT_REFR,
     [LV_STYLE_MAX_WIDTH] =                LV_STYLE_PROP_LAYOUT_REFR,
@@ -120,9 +120,13 @@ uint8_t lv_style_lookup_table[256] = {
     [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
 };
 
+uint8_t * lv_style_custom_prop_flag_lookup_table = NULL;
+
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static uint16_t act_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
 
 /**********************
  *      MACROS
@@ -164,10 +168,34 @@ void lv_style_reset(lv_style_t * style)
 
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
 {
-    static uint16_t act_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
-    act_id++;
-    lv_style_lookup_table[act_id] = flag;
-    return act_id;
+    /*
+     * Allocate the lookup table if it's not yet available.
+     */
+    if(lv_style_custom_prop_flag_lookup_table == NULL) {
+        lv_style_custom_prop_flag_lookup_table = lv_mem_alloc(LV_STYLE_MAX_CUSTOM_PROPS);
+        if(lv_style_custom_prop_flag_lookup_table == NULL) {
+            LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
+            return LV_STYLE_PROP_INV;
+        }
+    }
+    act_custom_prop_id++;
+    /*
+     * This ID is the true property ID passed to users, so compare it to the expected
+     * total number of properties, not just custom ones.
+     */
+    if(act_custom_prop_id >= _LV_STYLE_NUM_TOTAL_PROPS) {
+        /* Revert the addition */
+        act_custom_prop_id--;
+        LV_LOG_ERROR("Too many custom properties registered");
+        return LV_STYLE_PROP_INV;
+    }
+    lv_style_custom_prop_flag_lookup_table[act_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
+    return act_custom_prop_id;
+}
+
+lv_style_prop_t lv_style_get_num_custom_props(void)
+{
+    return act_custom_prop_id - _LV_STYLE_LAST_BUILT_IN_PROP;
 }
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
