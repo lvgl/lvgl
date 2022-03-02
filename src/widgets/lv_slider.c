@@ -35,6 +35,7 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
 static void draw_knob(lv_event_t * e);
+static bool is_slider_horizontal(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -442,6 +443,11 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob
     knob_area->x2 += knob_right + transf_w;
     knob_area->y1 -= knob_top + transf_h;
     knob_area->y2 += knob_bottom + transf_h;
+}
+
+static bool is_slider_horizontal(lv_obj_t * obj)
+{
+    return lv_obj_get_width(obj) >= lv_obj_get_height(obj);
 }
 
 #endif
