@@ -4,15 +4,20 @@
 Generates lv_conf_internal.h from lv_conf_template.h to provide default values
 '''
 
+import os
 import sys
 import re
+
+SCRIPT_DIR = os.path.dirname(__file__)
+LV_CONF_TEMPLATE = os.path.join(SCRIPT_DIR, "..", "lv_conf_template.h")
+LV_CONF_INTERNAL = os.path.join(SCRIPT_DIR, "..", "src", "lv_conf_internal.h")
 
 if sys.version_info < (3,6,0):
   print("Python >=3.6 is required", file=sys.stderr)
   exit(1)
 
-fin = open("../lv_conf_template.h", "r")
-fout = open("../src/lv_conf_internal.h", "w")
+fin = open(LV_CONF_TEMPLATE)
+fout = open(LV_CONF_INTERNAL, "w")
 
 fout.write(
 '''/**
@@ -99,8 +104,8 @@ for line in fin.read().splitlines():
 
     #If the value should be 1 (enabled) by default use a more complex structure for Kconfig checks because
     #if a not defined CONFIG_... value should be interpreted as 0 and not the LVGL default
-    is_one = re.search(r'[\s]*#[\s]*define[\s]*[A-Z0-9_]+[\s]+1[\s]*$', line)
-    if(is_one):
+    is_one = re.search(r'[\s]*#[\s]*define[\s]*[A-Z0-9_]+[\s]+1([\s]*$|[\s]+)', line)
+    if is_one:
       #1. Use the value if already set from lv_conf.h or anything else (i.e. do nothing)
       #2. In Kconfig environment use the CONFIG_... value if set, else use 0
       #3. In not Kconfig environment use the LVGL's default value

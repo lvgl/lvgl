@@ -235,8 +235,11 @@ int64_t lv_pow(int64_t base, int8_t exp)
  */
 int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out)
 {
-    if(x >= max_in) return max_out;
-    if(x <= min_in) return min_out;
+    if(max_in >= min_in && x >= max_in) return max_out;
+    if(max_in >= min_in && x <= min_in) return min_out;
+
+    if(max_in <= min_in && x <= max_in) return max_out;
+    if(max_in <= min_in && x >= min_in) return min_out;
 
     /**
      * The equation should be:

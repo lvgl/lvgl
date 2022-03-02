@@ -27,17 +27,9 @@
     #define ALIGN(X)    (((X) + 3) & ~3)
 #endif
 
-#define MAX_WIN_RES     1024 /**TODO: Find a way to get this information: max(horz_res, vert_res)*/
-
-#if _DITHER_GRADIENT
-    #if LV_DITHER_ERROR_DIFFUSION == 1
-        #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t) + MAX_WIN_RES * sizeof(lv_color_t) + MAX_WIN_RES * sizeof(lv_scolor24_t)
-    #else
-        #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t) + MAX_WIN_RES * sizeof(lv_color_t)
-    #endif /* LV_DITHER_ERROR_DIFFUSION */
-#else
-    #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t)
-#endif /* _DITHER_GRADIENT */
+#if LV_GRAD_CACHE_DEF_SIZE != 0 && LV_GRAD_CACHE_DEF_SIZE < 256
+    #error "LV_GRAD_CACHE_DEF_SIZE is too small"
+#endif
 
 /**********************
  *  STATIC PROTOTYPES

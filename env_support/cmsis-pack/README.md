@@ -64,7 +64,7 @@
     #define LV_USE_THEME_MONO       0
 #endif
 ```
-7. Update LV_TICK_CUSTOM related macros:
+7. Update `LV_TICK_CUSTOM` related macros:
 ```c
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
@@ -73,7 +73,12 @@
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
         #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h" 
-        #define LV_TICK_CUSTOM_SYS_TIME_EXPR    (get_system_ticks() / (SystemCoreClock / 1000ul))
+        
+        #if __PER_COUNTER_VER__ < 10902ul
+            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
+        #else
+            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
+        #endif
     #endif   /*LV_TICK_CUSTOM*/
 #else
     #define LV_TICK_CUSTOM 0
@@ -83,7 +88,7 @@
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
 ```
-9. Thoroughly remove the 'DEMO USAGE' section.
+9. Thoroughly remove the `DEMO USAGE` section.
 10. Thoroughly remove the '3rd party libraries' section.
 10. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
@@ -127,7 +132,7 @@ enter the following command:
 
 Update '**PATH_TO_ADD**' if necessary. 
 
-go to the cmsis-pack folder. 
+go to the **cmsis-pack** folder. 
 
 enter the following command:
 

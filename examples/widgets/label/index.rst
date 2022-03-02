@@ -1,16 +1,16 @@
-  
-Line wrap, recoloring and scrolling 
+
+Line wrap, recoloring and scrolling
 """""""""""""""""""""""""""""""""""
 
 .. lv_example:: widgets/label/lv_example_label_1
   :language: c
 
-Text shadow 
+Text shadow
 """"""""""""
 
 .. lv_example:: widgets/label/lv_example_label_2
   :language: c
-  
+
 Show LTR, RTL and Chinese texts
 """"""""""""""""""""""""""""""""""""
 
@@ -21,5 +21,11 @@ Draw label with gradient color
 """"""""""""""""""""""""""""""""""""
 
 .. lv_example:: widgets/label/lv_example_label_4
+  :language: c
+
+Customize circular scrolling animation
+""""""""""""""""""""""""""""""""""""
+
+.. lv_example:: widgets/label/lv_example_label_5
   :language: c
 

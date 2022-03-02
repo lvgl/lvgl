@@ -2,7 +2,7 @@
 
 import os
 
-os.system('astyle --options=code-format.cfg "../src/*.c,*.h"')
-os.system('astyle --options=code-format.cfg "../demos/*.c,*.h"')
-os.system('astyle --options=code-format.cfg "../examples/*.c,*.h"')
-os.system('astyle --options=code-format.cfg "../tests/src/test_cases/*.c"')
+os.system('astyle --options=code-format.cfg --recursive "../src/*.c,*.h"')
+os.system('astyle --options=code-format.cfg --recursive "../demos/*.c,*.h"')
+os.system('astyle --options=code-format.cfg --recursive "../examples/*.c,*.h"')
+os.system('astyle --options=code-format.cfg --recursive "../tests/src/test_cases/*.c"')

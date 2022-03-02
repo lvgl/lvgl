@@ -83,18 +83,6 @@ void lv_log(const char * format, ...) LV_FORMAT_ATTRIBUTE(1, 2);
 void _lv_log_add(lv_log_level_t level, const char * file, int line,
                  const char * func, const char * format, ...) LV_FORMAT_ATTRIBUTE(5, 6);
 
-/**
- * Add a log
- * @param level     the level of log. (From `lv_log_level_t` enum)
- * @param file      name of the file when the log added
- * @param line      line number in the source code where the log added
- * @param func      name of the function when the log added
- * @param format    printf-like format string
- * @param ...       parameters for `format`
- */
-void _lv_log_add(lv_log_level_t level, const char * file, int line,
-                 const char * func, const char * format, ...) LV_FORMAT_ATTRIBUTE(5, 6);
-
 /**********************
  *      MACROS
  **********************/

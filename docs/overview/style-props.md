@@ -708,6 +708,15 @@ The intensity of mixing of color filter.
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
+### anim
+The animation template for the object's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
 ### anim_time
 The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more.
 <ul>
