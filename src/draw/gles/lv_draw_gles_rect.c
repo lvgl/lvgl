@@ -29,6 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *      MACROS
@@ -90,6 +91,12 @@ void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, 
     blend_dsc.blend_mode = dsc->blend_mode;
     blend_dsc.color = bg_color;
 
+    /*Most simple case: just a plain rectangle*/
+    if(!mask_any && dsc->radius == 0 && (grad_dir == LV_GRAD_DIR_NONE)) {
+        opengl_draw_plain_rect(draw_ctx, dsc, coords);
+        return;
+    }
+
     lv_opa_t opa = dsc->bg_opa >= LV_OPA_MAX ? LV_OPA_COVER : dsc->bg_opa;
 
     /*Get the real radius. Can't be larger than the half of the shortest side */
@@ -105,12 +112,55 @@ void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, 
     lv_opa_t * mask_buf = NULL;
     lv_draw_mask_radius_param_t mask_rout_param;
     if(rout > 0 || mask_any) {
+        /*********** Radius mask drawing ***********/
+
+        /*** top-mid part ***/
+        lv_area_t top_mid_coords;
+        top_mid_coords.x1 = coords->x1 + rout;
+        top_mid_coords.x2 = coords->x2 - rout;
+        top_mid_coords.y1 = coords->y1;
+        top_mid_coords.y2 = coords->y1 + rout;
+        opengl_draw_plain_rect(draw_ctx, dsc, &top_mid_coords);
+
+        /*** center part ***/
+        lv_area_t center_coords;
+        center_coords.x1 = coords->x1 + rout;
+        center_coords.x2 = coords->x2 - rout;
+        center_coords.y1 = coords->y1 + rout;
+        center_coords.y2 = coords->y2 - rout;
+        opengl_draw_plain_rect(draw_ctx, dsc, &center_coords);
+
+        /*** bottom-mid part ***/
+        lv_area_t bottom_mid_coords;
+        bottom_mid_coords.x1 = coords->x1 + rout;
+        bottom_mid_coords.x2 = coords->x2 - rout;
+        bottom_mid_coords.y1 = coords->y2 - rout;
+        bottom_mid_coords.y2 = coords->y2;
+        opengl_draw_plain_rect(draw_ctx, dsc, &bottom_mid_coords);
+
+        /*** left-mid part ***/
+        lv_area_t left_mid_coords;
+        left_mid_coords.x1 = coords->x1;
+        left_mid_coords.x2 = coords->x1 + rout;
+        left_mid_coords.y1 = coords->y1 + rout;
+        left_mid_coords.y2 = coords->y2 - rout;
+        opengl_draw_plain_rect(draw_ctx, dsc, &left_mid_coords);
+
+        /*** right-mid part ***/
+        lv_area_t right_mid_coords;
+        right_mid_coords.x1 = coords->x2-rout;
+        right_mid_coords.x2 = coords->x2;
+        right_mid_coords.y1 = coords->y1 + rout;
+        right_mid_coords.y2 = coords->y2 - rout;
+        opengl_draw_plain_rect(draw_ctx, dsc, &right_mid_coords);
+
         LV_LOG_USER("rout : %d coords: x1 :%d x2: %d y1 : %d y2 : %d", dsc->radius, bg_coords.x1, bg_coords.x2, bg_coords.y1, bg_coords.y2);
       //  mask_buf = lv_mem_buf_get(clipped_w);
         //lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
        // mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-    }
 
+    }
+#if 0
     vec2 resolution;
     resolution[0] = (float)coords->x2 - (float)coords->x1;
     resolution[1] = (float)coords->y2 - (float)coords->y1;
@@ -164,7 +214,52 @@ void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, 
     glEnableVertexAttribArray(internals->rect_shader_pos_location);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#endif
+}
 
+void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
+    lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
+
+    lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
+    lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;
+    vec4 color;
+    color[0] = (float)bg_color.ch.red/255.0f;
+    color[1] = (float)bg_color.ch.green/255.0f;
+    color[2] = (float)bg_color.ch.blue/255.0f;
+    color[3] = (float)bg_color.ch.alpha/255.0f;
+    static GLfloat vertices[] = {
+        0.0f, 1.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+    };
+
+    mat4 model;
+    glm_mat4_identity(model);
+    glm_translate(model, (vec3) {coords->x1, coords->y2});
+    glm_scale(model, (vec3) {coords->x2 - coords->x1, coords->y1 - coords->y2});
+    LV_LOG_USER("coords: x1 :%d x2: %d y1 : %d y2 : %d", coords->x1,
+                coords->x2,
+                coords->y1,
+                coords->y2);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
+    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(internals->rect_shader);
+
+    glUniform4f(internals->rect_shader_color_location, color[0], color[1], color[2], color[3]);
+    glUniformMatrix4fv(internals->rect_shader_model_location, 1, GL_FALSE, &model[0][0]);
+    glVertexAttribPointer(internals->rect_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
+    glEnableVertexAttribArray(internals->rect_shader_pos_location);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 #endif /*LV_USE_GPU_SDL_GLES*/

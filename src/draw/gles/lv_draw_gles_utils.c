@@ -79,6 +79,24 @@ static char rect_fragment_shader_str[] =
 
     "}                                                   \n";
 
+static char plain_rect_vertex_shader_str[] =
+    "attribute vec2 a_position;   \n"
+    "uniform mat4 u_projection;   \n"
+    "uniform mat4 u_model;   \n"
+    "void main()                  \n"
+    "{                            \n"
+    "   gl_Position = u_projection * u_model * vec4(a_position.x, a_position.y, 0.0, 1.0); \n"
+    "}                            \n";
+
+static char plain_rect_fragment_shader_str[] =
+    "precision mediump float;\n"
+    "uniform vec4 u_color;   \n"
+
+    "void main() \n"
+    "{\n"
+    "    gl_FragColor = u_color; \n"
+    "}\n";
+
 /**********************
  *      MACROS
  **********************/
@@ -137,6 +155,16 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     internals->rect_shader_radius_location = glGetUniformLocation(internals->rect_shader, "u_radius");
     internals->rect_shader_coords_location = glGetUniformLocation(internals->rect_shader, "u_coords");
     glUniformMatrix4fv(internals->rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
+    glUseProgram(0);
+
+    internals->plain_rect_shader = shader_program_create(plain_rect_vertex_shader_str, plain_rect_fragment_shader_str);
+    glUseProgram(internals->plain_rect_shader);
+    internals->plain_rect_shader_pos_location = glGetAttribLocation(internals->rect_shader, "a_position");
+    internals->plain_rect_shader_projection_location = glGetUniformLocation(internals->rect_shader, "u_projection");
+    internals->plain_rect_shader_model_location = glGetUniformLocation(internals->rect_shader, "u_model");
+    internals->plain_rect_shader_color_location = glGetUniformLocation(internals->rect_shader, "u_color");
+    glUniformMatrix4fv(internals->rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
+    glUseProgram(0);
 }
 
 void lv_draw_gles_utils_upload_texture(lv_draw_ctx_t * draw_ctx)
