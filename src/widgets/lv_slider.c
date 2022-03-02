@@ -195,40 +195,40 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_point_t p;
         lv_indev_get_point(indev, &p);
-        lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
-
-        lv_coord_t w = lv_obj_get_width(obj);
-        lv_coord_t h = lv_obj_get_height(obj);
-
-        lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,   LV_PART_MAIN);
-        lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,  LV_PART_MAIN);
-        lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,    LV_PART_MAIN);
-        lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-
-        int32_t range = slider->bar.max_value - slider->bar.min_value;
         int32_t new_value = 0;
-        int32_t real_max_value = slider->bar.max_value;
-        int32_t real_min_value = slider->bar.min_value;
 
-        if(w >= h) {
-            lv_coord_t indic_w = w - bg_left - bg_right;
-            if(base_dir == LV_BASE_DIR_RTL) {
-                new_value = (obj->coords.x2 - bg_right) - p.x; /*Make the point relative to the indicator*/
+        const int32_t range = slider->bar.max_value - slider->bar.min_value;
+        if(is_slider_horizontal(obj)) {
+            const lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+            const lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+            const lv_coord_t w = lv_obj_get_width(obj);
+            const lv_coord_t indic_w = w - bg_left - bg_right;
+
+            if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
+                /*Make the point relative to the indicator*/
+                new_value = (obj->coords.x2 - bg_right) - p.x;
             }
             else {
-                new_value = p.x - (obj->coords.x1 + bg_left); /*Make the point relative to the indicator*/
+                /*Make the point relative to the indicator*/
+                new_value = p.x - (obj->coords.x1 + bg_left);
             }
             new_value = (new_value * range) / indic_w;
             new_value += slider->bar.min_value;
         }
         else {
-            lv_coord_t indic_h = h - bg_bottom - bg_top;
-            new_value = p.y - (obj->coords.y2 + bg_bottom); /*Make the point relative to the indicator*/
+            const lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+            const lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+            const lv_coord_t h = lv_obj_get_height(obj);
+            const lv_coord_t indic_h = h - bg_bottom - bg_top;
+
+            /*Make the point relative to the indicator*/
+            new_value = p.y - (obj->coords.y2 + bg_bottom);
             new_value = (-new_value * range) / indic_h;
             new_value += slider->bar.min_value;
-
         }
 
+        int32_t real_max_value = slider->bar.max_value;
+        int32_t real_min_value = slider->bar.min_value;
         /*Figure out the min. and max. for this mode*/
         if(slider->value_to_set == &slider->bar.start_value) {
             real_max_value = slider->bar.cur_value;
@@ -237,8 +237,8 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             real_min_value = slider->bar.start_value;
         }
 
-        if(new_value < real_min_value) new_value = real_min_value;
-        else if(new_value > real_max_value) new_value = real_max_value;
+        new_value = LV_CLAMP(real_min_value, new_value, real_max_value);
+
         if(*slider->value_to_set != new_value) {
             *slider->value_to_set = new_value;
             lv_obj_invalidate(obj);
