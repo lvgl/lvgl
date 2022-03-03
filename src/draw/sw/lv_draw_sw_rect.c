@@ -73,7 +73,7 @@ void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, c
   //  draw_shadow(draw_ctx, dsc, coords);
 #endif
 
-    draw_bg(draw_ctx, dsc, coords);
+    //draw_bg(draw_ctx, dsc, coords);
     //draw_bg_img(draw_ctx, dsc, coords);
 
     //draw_border(draw_ctx, dsc, coords);
@@ -154,7 +154,6 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     lv_draw_mask_radius_param_t mask_rout_param;
     if(rout > 0 || mask_any) {
         mask_buf = lv_mem_buf_get(clipped_w);
-        rout =5;
         lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
         mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
     }

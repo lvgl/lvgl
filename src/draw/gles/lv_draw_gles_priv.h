@@ -41,6 +41,17 @@ typedef struct lv_draw_gles_context_internals_t {
     GLint plain_rect_shader_projection_location;
     GLint plain_rect_shader_model_location;
     GLint plain_rect_shader_color_location;
+
+    GLuint corner_rect_shader;
+    GLint corner_rect_shader_pos_location;
+    GLint corner_rect_shader_projection_location;
+    GLint corner_rect_shader_model_location;
+    GLint corner_rect_shader_color_location;
+    GLint corner_rect_shader_corner_location;
+    GLint corner_rect_shader_radius_location;
+
+
+
     GLuint rect_shader;
     GLint rect_shader_pos_location;
     GLint rect_shader_projection_location;

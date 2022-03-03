@@ -97,6 +97,30 @@ static char plain_rect_fragment_shader_str[] =
     "    gl_FragColor = u_color; \n"
     "}\n";
 
+static char corner_rect_vertex_shader_str[] =
+    "attribute vec2 a_position;   \n"
+    "uniform mat4 u_projection;   \n"
+    "uniform mat4 u_model;   \n"
+    "void main()                  \n"
+    "{                            \n"
+    "   gl_Position = u_projection * u_model * vec4(a_position.x, a_position.y, 0.0, 1.0); \n"
+    "}                            \n";
+
+static char corner_rect_fragment_shader_str[] =
+    "precision mediump float;\n"
+    "uniform vec4 u_color;   \n"
+    "uniform vec2 u_corner;   \n"
+    "uniform float u_radius;   \n"
+
+    "void main() \n"
+    "{\n"
+    "    float dist = distance(gl_FragCoord.xy, u_corner); \n"
+    "    if (dist > u_radius) { \n"
+    "        discard;"
+    "    }\n"
+    "    gl_FragColor = u_color; \n"
+    "}\n";
+
 /**********************
  *      MACROS
  **********************/
@@ -159,11 +183,22 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
 
     internals->plain_rect_shader = shader_program_create(plain_rect_vertex_shader_str, plain_rect_fragment_shader_str);
     glUseProgram(internals->plain_rect_shader);
-    internals->plain_rect_shader_pos_location = glGetAttribLocation(internals->rect_shader, "a_position");
-    internals->plain_rect_shader_projection_location = glGetUniformLocation(internals->rect_shader, "u_projection");
-    internals->plain_rect_shader_model_location = glGetUniformLocation(internals->rect_shader, "u_model");
-    internals->plain_rect_shader_color_location = glGetUniformLocation(internals->rect_shader, "u_color");
+    internals->plain_rect_shader_pos_location = glGetAttribLocation(internals->plain_rect_shader, "a_position");
+    internals->plain_rect_shader_projection_location = glGetUniformLocation(internals->plain_rect_shader, "u_projection");
+    internals->plain_rect_shader_model_location = glGetUniformLocation(internals->plain_rect_shader, "u_model");
+    internals->plain_rect_shader_color_location = glGetUniformLocation(internals->plain_rect_shader, "u_color");
     glUniformMatrix4fv(internals->rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
+    glUseProgram(0);
+
+    internals->corner_rect_shader = shader_program_create(corner_rect_vertex_shader_str, corner_rect_fragment_shader_str);
+    glUseProgram(internals->corner_rect_shader);
+    internals->corner_rect_shader_pos_location = glGetAttribLocation(internals->corner_rect_shader, "a_position");
+    internals->corner_rect_shader_projection_location = glGetUniformLocation(internals->corner_rect_shader, "u_projection");
+    internals->corner_rect_shader_model_location = glGetUniformLocation(internals->corner_rect_shader, "u_model");
+    internals->corner_rect_shader_color_location = glGetUniformLocation(internals->corner_rect_shader, "u_color");
+    internals->corner_rect_shader_corner_location = glGetUniformLocation(internals->corner_rect_shader, "u_corner");
+    internals->corner_rect_shader_radius_location= glGetUniformLocation(internals->corner_rect_shader, "u_radius");
+    glUniformMatrix4fv(internals->corner_rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);
 }
 

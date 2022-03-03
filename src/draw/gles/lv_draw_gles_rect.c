@@ -30,6 +30,7 @@
  **********************/
 void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+void opengl_draw_corner_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords, int x, int y, int radius);
 
 /**********************
  *      MACROS
@@ -47,9 +48,9 @@ void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, c
 void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     /* Do software drawing */
-    //lv_draw_sw_rect(draw_ctx, dsc, coords);
+    lv_draw_sw_rect(draw_ctx, dsc, coords);
 
-    //lv_draw_gles_utils_upload_texture(draw_ctx);
+    lv_draw_gles_utils_upload_texture(draw_ctx);
     /* Do opengl drawing */
     opengl_draw_rect(draw_ctx, dsc, coords);
     lv_draw_gles_utils_download_texture(draw_ctx);
@@ -154,6 +155,41 @@ void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, 
         right_mid_coords.y2 = coords->y2 - rout;
         opengl_draw_plain_rect(draw_ctx, dsc, &right_mid_coords);
 
+        /*** top-left part ***/
+        lv_area_t top_left_coords;
+        top_left_coords.x1 = coords->x1;
+        top_left_coords.x2 = coords->x1 + rout;
+        top_left_coords.y1 = coords->y1;
+        top_left_coords.y2 = coords->y1  + rout;
+        opengl_draw_corner_rect(draw_ctx, dsc, &top_left_coords,
+                                top_left_coords.x2, top_left_coords.y2, rout);
+
+        /*** bottom-left part ***/
+        lv_area_t bottom_left_coords;
+        bottom_left_coords.x1 = coords->x1;
+        bottom_left_coords.x2 = coords->x1 + rout;
+        bottom_left_coords.y1 = coords->y2 - rout;
+        bottom_left_coords.y2 = coords->y2;
+        opengl_draw_corner_rect(draw_ctx, dsc, &bottom_left_coords,
+                                top_left_coords.x2, bottom_left_coords.y1, rout);
+        /*** top-right part ***/
+        lv_area_t top_right_coords;
+        top_right_coords.x1 = coords->x2 - rout;
+        top_right_coords.x2 = coords->x2;
+        top_right_coords.y1 = coords->y1;
+        top_right_coords.y2 = coords->y1  + rout;
+        opengl_draw_corner_rect(draw_ctx, dsc, &top_right_coords,
+                                top_right_coords.x1, top_left_coords.y2, rout);
+        /*** bottom-right part ***/
+        lv_area_t bottom_right_coords;
+        bottom_right_coords.x1 = coords->x2 - rout;
+        bottom_right_coords.x2 = coords->x2;
+        bottom_right_coords.y1 = coords->y2 - rout;
+        bottom_right_coords.y2 = coords->y2;
+        opengl_draw_corner_rect(draw_ctx, dsc, &bottom_right_coords,
+                                bottom_right_coords.x1, bottom_right_coords.y1, rout);
+
+
         LV_LOG_USER("rout : %d coords: x1 :%d x2: %d y1 : %d y2 : %d", dsc->radius, bg_coords.x1, bg_coords.x2, bg_coords.y1, bg_coords.y2);
       //  mask_buf = lv_mem_buf_get(clipped_w);
         //lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
@@ -249,17 +285,67 @@ void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
                 coords->y2);
 
     glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
-    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(internals->rect_shader);
+    glUseProgram(internals->plain_rect_shader);
 
-    glUniform4f(internals->rect_shader_color_location, color[0], color[1], color[2], color[3]);
-    glUniformMatrix4fv(internals->rect_shader_model_location, 1, GL_FALSE, &model[0][0]);
-    glVertexAttribPointer(internals->rect_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
-    glEnableVertexAttribArray(internals->rect_shader_pos_location);
+    glUniform4f(internals->plain_rect_shader_color_location, color[0], color[1], color[2], color[3]);
+    glUniformMatrix4fv(internals->plain_rect_shader_model_location, 1, GL_FALSE, &model[0][0]);
+    glVertexAttribPointer(internals->plain_rect_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
+    glEnableVertexAttribArray(internals->plain_rect_shader_pos_location);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void opengl_draw_corner_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords, int x, int y, int radius)
+{
+    lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
+    lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
+
+    lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
+    lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;
+    vec4 color;
+    color[0] = (float)bg_color.ch.red/255.0f;
+    color[1] = (float)bg_color.ch.green/255.0f;
+    color[2] = (float)bg_color.ch.blue/255.0f;
+    color[3] = (float)bg_color.ch.alpha/255.0f;
+    static GLfloat vertices[] = {
+        0.0f, 1.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f,
+
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+    };
+
+    mat4 model;
+    glm_mat4_identity(model);
+    glm_translate(model, (vec3) {coords->x1, coords->y2});
+    glm_scale(model, (vec3) {coords->x2 - coords->x1, coords->y1 - coords->y2});
+
+    vec2 corner;
+    corner[0] = (float)x;
+    corner[1] = (float)y;
+
+    float r = (float) radius;
+
+    LV_LOG_USER("coords: x1 :%d x2: %d y1 : %d y2 : %d", coords->x1,
+                coords->x2,
+                coords->y1,
+                coords->y2);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
+
+    glUseProgram(internals->corner_rect_shader);
+
+    glUniform4f(internals->corner_rect_shader_color_location, color[0], color[1], color[2], color[3]);
+    glUniform2f(internals->corner_rect_shader_corner_location, corner[0], corner[1]);
+    glUniform1f(internals->corner_rect_shader_radius_location, r);
+    glUniformMatrix4fv(internals->corner_rect_shader_model_location, 1, GL_FALSE, &model[0][0]);
+    glVertexAttribPointer(internals->corner_rect_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
+    glEnableVertexAttribArray(internals->corner_rect_shader_pos_location);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
 #endif /*LV_USE_GPU_SDL_GLES*/
