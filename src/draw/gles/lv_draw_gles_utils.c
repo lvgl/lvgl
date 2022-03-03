@@ -105,8 +105,8 @@ static char corner_rect_vertex_shader_str[] =
     "{                            \n"
     "   gl_Position = u_projection * u_model * vec4(a_position.x, a_position.y, 0.0, 1.0); \n"
     "}                            \n";
-
-static char corner_rect_fragment_shader_str[] =
+/* Without antialiasing */
+static char corner2_rect_fragment_shader_str[] =
     "precision mediump float;\n"
     "uniform vec4 u_color;   \n"
     "uniform vec2 u_corner;   \n"
@@ -119,6 +119,20 @@ static char corner_rect_fragment_shader_str[] =
     "        discard;"
     "    }\n"
     "    gl_FragColor = u_color; \n"
+    "}\n";
+
+static char corner_rect_fragment_shader_str[] =
+    "precision mediump float;\n"
+    "uniform vec4 u_color;   \n"
+    "uniform vec2 u_corner;   \n"
+    "uniform float u_radius;   \n"
+
+    "void main() \n"
+    "{\n"
+    "    float dist = distance(gl_FragCoord.xy, u_corner); \n"
+    "    float c = smoothstep(u_radius, u_radius - 0.8, dist);\n"
+    "    vec4 mask_color = vec4(u_color.r , u_color.g, u_color.b, c);\n"
+    "    gl_FragColor = mask_color; \n"
     "}\n";
 
 /**********************
