@@ -319,7 +319,7 @@
         #ifdef CONFIG_LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE
             #define LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE CONFIG_LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE
         #else
-            #define LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE (64 * 1024)
+            #define LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE 16384
         #endif
     #endif
 #endif

@@ -167,6 +167,11 @@ menu "LVGL configuration"
                     save the continuous open/decode of images.
                     However the opened images might consume additional RAM.
 
+            config LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE
+                int "Limit the total memory used by images."
+                depends on LV_IMG_CACHE_DEF_SIZE > 0
+                default 16384
+
             config LV_GRADIENT_MAX_STOPS
                 int "Number of stops allowed per gradient."
                 default 2

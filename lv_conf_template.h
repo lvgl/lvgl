@@ -129,7 +129,7 @@
 #if LV_IMG_CACHE_DEF_SIZE != 0
 
     /*Limit the total memory used by images*/
-    #define LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE (64 * 1024)
+    #define LV_IMG_CACHE_DEF_MEM_TOTAL_SIZE 16384
 #endif
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
