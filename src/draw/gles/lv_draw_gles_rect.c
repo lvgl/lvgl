@@ -48,12 +48,12 @@ void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, c
 void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     /* Do software drawing */
-    lv_draw_sw_rect(draw_ctx, dsc, coords);
+   // lv_draw_sw_rect(draw_ctx, dsc, coords);
 
-   // lv_draw_gles_utils_upload_texture(draw_ctx);
+    //lv_draw_gles_utils_upload_texture(draw_ctx);
     /* Do opengl drawing */
-    // opengl_draw_rect(draw_ctx, dsc, coords);
-    //lv_draw_gles_utils_download_texture(draw_ctx);
+     opengl_draw_rect(draw_ctx, dsc, coords);
+    lv_draw_gles_utils_download_texture(draw_ctx);
 }
 
 /**********************
@@ -263,7 +263,7 @@ void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
     color[0] = (float)bg_color.ch.red/255.0f;
     color[1] = (float)bg_color.ch.green/255.0f;
     color[2] = (float)bg_color.ch.blue/255.0f;
-    color[3] = (float)bg_color.ch.alpha/255.0f;
+    color[3] = (float)dsc->bg_opa/255.0f;
     static GLfloat vertices[] = {
         0.0f, 1.0f,
         1.0f, 0.0f,
@@ -306,7 +306,7 @@ void opengl_draw_corner_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
     color[0] = (float)bg_color.ch.red/255.0f;
     color[1] = (float)bg_color.ch.green/255.0f;
     color[2] = (float)bg_color.ch.blue/255.0f;
-    color[3] = (float)bg_color.ch.alpha/255.0f;
+    color[3] = (float)dsc->bg_opa/255.0f;
     static GLfloat vertices[] = {
         0.0f, 1.0f,
         1.0f, 0.0f,
