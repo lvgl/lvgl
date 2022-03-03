@@ -195,8 +195,8 @@ static inline bool _lv_txt_is_break_char(uint32_t letter)
 extern uint8_t (*_lv_txt_encoded_size)(const char *);
 
 /**
- * Convert an Unicode letter to encoded
- * @param letter_uni an Unicode letter
+ * Convert a Unicode letter to encoded
+ * @param letter_uni a Unicode letter
  * @return Encoded character in Little Endian to be compatible with C chars (e.g. 'Á', 'Ü')
  */
 extern uint32_t (*_lv_txt_unicode_to_encoded)(uint32_t);

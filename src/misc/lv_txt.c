@@ -519,8 +519,8 @@ static uint8_t lv_txt_utf8_size(const char * str)
 }
 
 /**
- * Convert an Unicode letter to UTF-8.
- * @param letter_uni an Unicode letter
+ * Convert a Unicode letter to UTF-8.
+ * @param letter_uni a Unicode letter
  * @return UTF-8 coded character in Little Endian to be compatible with C chars (e.g. 'Á', 'Ű')
  */
 static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
@@ -761,8 +761,8 @@ static uint8_t lv_txt_iso8859_1_size(const char * str)
 }
 
 /**
- * Convert an Unicode letter to ISO8859-1.
- * @param letter_uni an Unicode letter
+ * Convert a Unicode letter to ISO8859-1.
+ * @param letter_uni a Unicode letter
  * @return ISO8859-1 coded character in Little Endian to be compatible with C chars (e.g. 'Á', 'Ű')
  */
 static uint32_t lv_txt_unicode_to_iso8859_1(uint32_t letter_uni)

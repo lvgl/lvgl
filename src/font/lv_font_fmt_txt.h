@@ -204,7 +204,7 @@ typedef struct {
 /**
  * Used as `get_glyph_bitmap` callback in LittelvGL's native font format if the font is uncompressed.
  * @param font pointer to font
- * @param unicode_letter an unicode letter which bitmap should be get
+ * @param unicode_letter a unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
  */
 const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t letter);
@@ -213,7 +213,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t lett
  * Used as `get_glyph_dsc` callback in LittelvGL's native font format if the font is uncompressed.
  * @param font_p pointer to font
  * @param dsc_out store the result descriptor here
- * @param letter an UNICODE letter code
+ * @param letter a UNICODE letter code
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
