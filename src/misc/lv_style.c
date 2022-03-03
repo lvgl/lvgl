@@ -126,7 +126,7 @@ uint8_t * lv_style_custom_prop_flag_lookup_table = NULL;
  *  STATIC VARIABLES
  **********************/
 
-static uint16_t act_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
+static uint16_t last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
 
 /**********************
  *      MACROS
@@ -178,24 +178,24 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
             return LV_STYLE_PROP_INV;
         }
     }
-    act_custom_prop_id++;
+    last_custom_prop_id++;
     /*
      * This ID is the true property ID passed to users, so compare it to the expected
      * total number of properties, not just custom ones.
      */
-    if(act_custom_prop_id >= _LV_STYLE_NUM_TOTAL_PROPS) {
+    if(last_custom_prop_id >= _LV_STYLE_NUM_TOTAL_PROPS) {
         /* Revert the addition */
-        act_custom_prop_id--;
+        last_custom_prop_id--;
         LV_LOG_ERROR("Too many custom properties registered");
         return LV_STYLE_PROP_INV;
     }
-    lv_style_custom_prop_flag_lookup_table[act_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
-    return act_custom_prop_id;
+    lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
+    return last_custom_prop_id;
 }
 
 lv_style_prop_t lv_style_get_num_custom_props(void)
 {
-    return act_custom_prop_id - _LV_STYLE_LAST_BUILT_IN_PROP;
+    return last_custom_prop_id - _LV_STYLE_LAST_BUILT_IN_PROP;
 }
 
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
