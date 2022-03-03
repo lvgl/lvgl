@@ -32,7 +32,10 @@ extern "C" {
 
 /**
  * Flags for style behavior
+ * 
+ * The rest of the flags will have _FLAG added to their name in v9.
  */
+#define LV_STYLE_PROP_FLAG_NONE             (0)
 #define LV_STYLE_PROP_INHERIT               (1 << 0)  /*Inherited*/
 #define LV_STYLE_PROP_EXT_DRAW              (1 << 1)  /*Requires ext. draw size update when changed*/
 #define LV_STYLE_PROP_LAYOUT_REFR           (1 << 2)  /*Requires layout update when changed*/
