@@ -25,7 +25,7 @@
  *  GLOBAL VARIABLES
  **********************/
 
-const uint8_t lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PROPS] = {
+const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PROPS] = {
     [LV_STYLE_WIDTH] =                    LV_STYLE_PROP_LAYOUT_REFR,
     [LV_STYLE_MIN_WIDTH] =                LV_STYLE_PROP_LAYOUT_REFR,
     [LV_STYLE_MAX_WIDTH] =                LV_STYLE_PROP_LAYOUT_REFR,
@@ -120,7 +120,7 @@ const uint8_t lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PRO
     [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
 };
 
-uint8_t * lv_style_custom_prop_flag_lookup_table = NULL;
+uint8_t * _lv_style_custom_prop_flag_lookup_table = NULL;
 
 /**********************
  *  STATIC VARIABLES
@@ -171,9 +171,9 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
     /*
      * Allocate the lookup table if it's not yet available.
      */
-    if(lv_style_custom_prop_flag_lookup_table == NULL) {
-        lv_style_custom_prop_flag_lookup_table = lv_mem_alloc(LV_STYLE_MAX_CUSTOM_PROPS);
-        if(lv_style_custom_prop_flag_lookup_table == NULL) {
+    if(_lv_style_custom_prop_flag_lookup_table == NULL) {
+        _lv_style_custom_prop_flag_lookup_table = lv_mem_alloc(LV_STYLE_MAX_CUSTOM_PROPS);
+        if(_lv_style_custom_prop_flag_lookup_table == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
         }
@@ -189,7 +189,7 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
         LV_LOG_ERROR("Too many custom properties registered");
         return LV_STYLE_PROP_INV;
     }
-    lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
+    _lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
     return last_custom_prop_id;
 }
 

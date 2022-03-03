@@ -498,15 +498,15 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
 
 static inline uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
-    extern const uint8_t lv_style_builtin_prop_flag_lookup_table[];
-    extern uint8_t * lv_style_custom_prop_flag_lookup_table;
+    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
+    extern uint8_t * _lv_style_custom_prop_flag_lookup_table;
     if(prop == LV_STYLE_PROP_ANY || prop == LV_STYLE_PROP_INV)
         return 0;
     if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
-        return lv_style_builtin_prop_flag_lookup_table[prop];
+        return _lv_style_builtin_prop_flag_lookup_table[prop];
     prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
-    if(lv_style_custom_prop_flag_lookup_table != NULL && prop < LV_STYLE_MAX_CUSTOM_PROPS)
-        return lv_style_custom_prop_flag_lookup_table[prop];
+    if(_lv_style_custom_prop_flag_lookup_table != NULL && prop < LV_STYLE_MAX_CUSTOM_PROPS)
+        return _lv_style_custom_prop_flag_lookup_table[prop];
     return 0;
 }
 
