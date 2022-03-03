@@ -32,7 +32,7 @@ extern "C" {
 
 /**
  * Flags for style behavior
- * 
+ *
  * The rest of the flags will have _FLAG added to their name in v9.
  */
 #define LV_STYLE_PROP_FLAG_NONE             (0)
