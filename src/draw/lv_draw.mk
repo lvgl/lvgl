@@ -16,3 +16,4 @@ VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw
 CFLAGS += "-I$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw"
 
 include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/sdl/lv_draw_sdl.mk
+include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/sw/lv_draw_sw.mk
