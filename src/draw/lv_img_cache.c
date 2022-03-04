@@ -35,6 +35,7 @@
  **********************/
 #if LV_IMG_CACHE_DEF_SIZE
     static bool lv_img_cache_match(const void * src1, const void * src2);
+    static void lv_img_cache_close(_lv_img_cache_entry_t * cached_src);
     static _lv_img_cache_entry_t * find_reuse_entry(void);
     static _lv_img_cache_entry_t * find_empty_entry(void);
 #endif
@@ -139,16 +140,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
         /*Close the decoder to reuse if it was opened (has a valid source)*/
         if(cache_reuse) {
             LV_LOG_INFO("image draw: cache miss, close and reuse an entry");
-
-            lv_img_decoder_close(&cache_reuse->dec_dsc);
-
-            LV_LOG_INFO("cache free size = %" PRIu32 " + %" PRIu32, cache_free_size, cache_reuse->mem_cost_size);
-            cache_free_size += cache_reuse->mem_cost_size;
-
-            /*Mark the entry to be released*/
-            cache_reuse->dec_dsc.src = NULL;
-            cache_reuse->mem_cost_size = 0;
-
+            lv_img_cache_close(cache_reuse);
             cached_src = cache_reuse;
         }
         else {
@@ -159,8 +151,9 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
 
     /*If the number of cache entries is insufficient, look for the entry that can be reused*/
     if(cached_src == NULL) {
-        cached_src = find_reuse_entry();
         LV_LOG_INFO("cache entry is full, find reuse entry");
+        cached_src = find_reuse_entry();
+        lv_img_cache_close(cached_src);
     }
 
 #else
@@ -181,6 +174,8 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
     else {
         /*Record the amount of memory occupied*/
         cached_src->mem_cost_size = img_req_size;
+
+        LV_LOG_INFO("cache_free_size(%" PRIu32 ") -= %" PRIu32, cache_free_size, img_req_size);
         cache_free_size -= img_req_size;
     }
 #endif
@@ -249,7 +244,7 @@ void lv_img_cache_invalidate_src(const void * src)
     for(i = 0; i < cache_entry_cnt; i++) {
         if(src == NULL || lv_img_cache_match(src, cache[i].dec_dsc.src)) {
             if(cache[i].dec_dsc.src != NULL) {
-                lv_img_decoder_close(&cache[i].dec_dsc);
+                lv_img_cache_close(&cache[i]);
             }
 
             lv_memset_00(&cache[i], sizeof(_lv_img_cache_entry_t));
@@ -275,6 +270,18 @@ static bool lv_img_cache_match(const void * src1, const void * src2)
     return strcmp(src1, src2) == 0;
 }
 
+static void lv_img_cache_close(_lv_img_cache_entry_t * cached_src)
+{
+    lv_img_decoder_close(&cached_src->dec_dsc);
+
+    LV_LOG_INFO("cache_free_size(%" PRIu32 ") += %" PRIu32, cache_free_size, cached_src->mem_cost_size);
+    cache_free_size += cached_src->mem_cost_size;
+
+    /*Mark the entry to be released*/
+    lv_memset_00(cached_src, sizeof(_lv_img_cache_entry_t));
+}
+
+
 static _lv_img_cache_entry_t * find_reuse_entry(void)
 {
     _lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
@@ -284,7 +291,7 @@ static _lv_img_cache_entry_t * find_reuse_entry(void)
 
     for(uint16_t i = 0; i < cache_entry_cnt; i++) {
         _lv_img_cache_entry_t * cache_p = &cache[i];
-        if(cache_p->dec_dsc.src && cache_p->mem_cost_size) {
+        if(cache_p->dec_dsc.src != NULL) {
             if(cache_p->life < life_min) {
                 life_min = cache_p->life;
                 cached_src = &cache[i];
@@ -302,8 +309,9 @@ static _lv_img_cache_entry_t * find_empty_entry(void)
 
     for(uint16_t i = 0; i < cache_entry_cnt; i++) {
         _lv_img_cache_entry_t * cache_p = &cache[i];
-        if(cache_p->dec_dsc.src == NULL && cache_p->mem_cost_size == 0) {
+        if(cache_p->dec_dsc.src == NULL) {
             cached_src = cache_p;
+            break;
         }
     }
 
