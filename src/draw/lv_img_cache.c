@@ -114,11 +114,15 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
     }
 
     /*Calculate the memory usage of an image*/
-    uint32_t img_req_size = lv_img_buf_get_img_size(header.w, header.h, header.cf);
+    uint32_t img_req_size = 0;
 
-    if(img_req_size == 0) {
-        LV_LOG_WARN("can't get image require memory size, cf = %" PRIu32, header.cf);
-        return NULL;
+    if(lv_img_src_get_type(src) == LV_IMG_SRC_FILE) {
+        img_req_size = lv_img_buf_get_img_size(header.w, header.h, header.cf);
+
+        if(img_req_size == 0) {
+            LV_LOG_WARN("can't get image require memory size, cf = %" PRIu32, header.cf);
+            return NULL;
+        }
     }
 
     /*Do not decode image that exceed the limit*/
@@ -280,7 +284,6 @@ static void lv_img_cache_close(_lv_img_cache_entry_t * cached_src)
     /*Mark the entry to be released*/
     lv_memset_00(cached_src, sizeof(_lv_img_cache_entry_t));
 }
-
 
 static _lv_img_cache_entry_t * find_reuse_entry(void)
 {
