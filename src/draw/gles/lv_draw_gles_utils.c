@@ -135,6 +135,27 @@ static char corner_rect_fragment_shader_str[] =
     "    gl_FragColor = mask_color; \n"
     "}\n";
 
+static char simple_img_vertex_shader_str[] =
+    "attribute vec2 a_position;   \n"
+    "attribute vec2 a_uv;   \n"
+    "varying vec2 v_uv; \n"
+    "uniform mat4 u_projection;   \n"
+    "uniform mat4 u_model;   \n"
+    "void main()                  \n"
+    "{                            \n"
+    "   gl_Position = u_projection * u_model * vec4(a_position.x, a_position.y, 0.0, 1.0); \n"
+    "   v_uv = a_uv; \n"
+    "}                            \n";
+
+static char simple_img_fragment_shader_str[] =
+    "precision mediump float;\n"
+    "varying vec2 v_uv; \n"
+    "uniform sampler2D s_texture;   \n"
+
+    "void main() \n"
+    "{\n"
+    "    gl_FragColor = texture2D(s_texture, v_uv); \n"
+    "}\n";
 /**********************
  *      MACROS
  **********************/
@@ -213,6 +234,17 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     internals->corner_rect_shader_corner_location = glGetUniformLocation(internals->corner_rect_shader, "u_corner");
     internals->corner_rect_shader_radius_location= glGetUniformLocation(internals->corner_rect_shader, "u_radius");
     glUniformMatrix4fv(internals->corner_rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
+    glUseProgram(0);
+    LV_LOG_USER("%d", glGetError());
+
+    internals->simple_img_shader = shader_program_create(simple_img_vertex_shader_str, simple_img_fragment_shader_str);
+    glUseProgram(internals->simple_img_shader);
+    internals->simple_img_shader_pos_location = glGetAttribLocation(internals->simple_img_shader, "a_position");
+    internals->simple_img_shader_uv_location = glGetAttribLocation(internals->simple_img_shader, "a_uv");
+    internals->simple_img_shader_projection_location = glGetUniformLocation(internals->simple_img_shader, "u_projection");
+    internals->simple_img_shader_model_location = glGetUniformLocation(internals->simple_img_shader, "u_model");
+    internals->simple_img_shader_texture_location = glGetUniformLocation(internals->simple_img_shader, "s_texture");
+    glUniformMatrix4fv(internals->simple_img_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);
 }
 

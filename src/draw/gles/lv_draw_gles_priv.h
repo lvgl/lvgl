@@ -60,6 +60,13 @@ typedef struct lv_draw_gles_context_internals_t {
     GLint rect_shader_resolution_location;
     GLint rect_shader_radius_location;
     GLint rect_shader_coords_location;
+
+    GLuint simple_img_shader;
+    GLint simple_img_shader_pos_location;
+    GLint simple_img_shader_uv_location;
+    GLint simple_img_shader_projection_location;
+    GLint simple_img_shader_model_location;
+    GLint simple_img_shader_texture_location;
 } lv_draw_gles_context_internals_t;
 
 /**********************

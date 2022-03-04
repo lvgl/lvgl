@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include <src/draw/gles/lv_draw_gles_utils.h>
+#include <assert.h>
 #include "lv_draw_sw.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_txt_ap.h"
@@ -70,15 +71,15 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
 void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 #if LV_DRAW_COMPLEX
-  //  draw_shadow(draw_ctx, dsc, coords);
+    draw_shadow(draw_ctx, dsc, coords);
 #endif
 
-    //draw_bg(draw_ctx, dsc, coords);
-    //draw_bg_img(draw_ctx, dsc, coords);
+    draw_bg(draw_ctx, dsc, coords);
+    draw_bg_img(draw_ctx, dsc, coords);
 
-    //draw_border(draw_ctx, dsc, coords);
+    draw_border(draw_ctx, dsc, coords);
 
-  //  draw_outline(draw_ctx, dsc, coords);
+    draw_outline(draw_ctx, dsc, coords);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -172,6 +173,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
 
     /*Get gradient if appropriate*/
     lv_grad_t * grad = lv_gradient_get(&dsc->bg_grad, coords_bg_w, coords_bg_h);
+
     if(grad && grad_dir == LV_GRAD_DIR_HOR) {
         blend_dsc.src_buf = grad->map + clipped_coords.x1 - bg_coords.x1;
     }

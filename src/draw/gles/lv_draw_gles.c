@@ -25,6 +25,9 @@ void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
 void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                              uint32_t letter);
 
+lv_res_t lv_draw_gles_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                               const lv_area_t * coords, const void * src);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -45,12 +48,7 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_draw_gles_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                              const lv_area_t * coords, const void * src)
-{
-    LV_LOG_INFO("");
 
-}
 
 
 void lv_draw_gles_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
@@ -92,7 +90,7 @@ void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     lv_draw_gles_utils_internals_init(draw_gles_ctx->internals);
 
     draw_gles_ctx->base_draw.draw_rect = lv_draw_gles_draw_rect;
-    draw_gles_ctx->base_draw.draw_img = lv_draw_gles_img_core;
+    draw_gles_ctx->base_draw.draw_img = lv_draw_gles_draw_img;
     draw_gles_ctx->base_draw.draw_letter = lv_draw_gles_draw_letter;
     draw_gles_ctx->base_draw.draw_line = lv_draw_gles_draw_line;
     draw_gles_ctx->base_draw.draw_arc = lv_draw_gles_draw_arc;
