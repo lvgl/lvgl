@@ -841,7 +841,7 @@ menu "LVGL configuration"
     menu "Themes"
         config LV_USE_THEME_DEFAULT
             bool "A simple, impressive and very complete theme"
-            default y if !LV_CONF_MINIMAL
+            default y if !LV_COLOR_DEPTH_1 && !LV_CONF_MINIMAL
         config LV_THEME_DEFAULT_DARK
             bool "Yes to set dark mode, No to set light mode"
             depends on LV_USE_THEME_DEFAULT
@@ -855,7 +855,10 @@ menu "LVGL configuration"
             depends on LV_USE_THEME_DEFAULT
         config LV_USE_THEME_BASIC
             bool "A very simple theme that is a good starting point for a custom theme"
-            default y if !LV_CONF_MINIMAL
+            default y if !LV_COLOR_DEPTH_1 && !LV_CONF_MINIMAL
+        config LV_USE_THEME_MONO
+            bool "Monochrome theme, suitable for some E-paper & dot matrix displays"
+            default y if LV_COLOR_DEPTH_1 && !LV_CONF_MINIMAL
     endmenu
 
     menu "Layouts"
