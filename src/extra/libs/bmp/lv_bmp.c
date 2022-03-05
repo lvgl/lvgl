@@ -152,7 +152,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         b.row_size_bytes = ((b.bpp * b.px_width + 31) / 32) * 4;
 
         bool color_depth_error = false;
-        if(LV_COLOR_DEPTH == 32 && (b.bpp != 32 || b.bpp != 24)) {
+        if(LV_COLOR_DEPTH == 32 && (b.bpp != 32 && b.bpp != 24)) {
             LV_LOG_WARN("LV_COLOR_DEPTH == 32 but bpp is %d (should be 32 or 24)", b.bpp);
             color_depth_error = true;
         }
