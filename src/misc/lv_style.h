@@ -259,8 +259,6 @@ typedef enum {
 
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
     _LV_STYLE_NUM_BUILT_IN_PROPS     = _LV_STYLE_LAST_BUILT_IN_PROP + 1,
-    _LV_STYLE_LAST_CUSTOM_PROP       = _LV_STYLE_NUM_BUILT_IN_PROPS + LV_STYLE_MAX_CUSTOM_PROPS - 1,
-    _LV_STYLE_NUM_TOTAL_PROPS        = _LV_STYLE_LAST_CUSTOM_PROP + 1,
 
     LV_STYLE_PROP_ANY                = 0xFFFF
 } lv_style_prop_t;
@@ -500,12 +498,13 @@ static inline uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
     extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
     extern uint8_t * _lv_style_custom_prop_flag_lookup_table;
+    extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
     if(prop == LV_STYLE_PROP_ANY || prop == LV_STYLE_PROP_INV)
         return 0;
     if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
         return _lv_style_builtin_prop_flag_lookup_table[prop];
     prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
-    if(_lv_style_custom_prop_flag_lookup_table != NULL && prop < LV_STYLE_MAX_CUSTOM_PROPS)
+    if(_lv_style_custom_prop_flag_lookup_table != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
         return _lv_style_custom_prop_flag_lookup_table[prop];
     return 0;
 }

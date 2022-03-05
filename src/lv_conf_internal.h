@@ -369,15 +369,6 @@
     #endif
 #endif
 
-/*Maximum number of custom style properties to support*/
-#ifndef LV_STYLE_MAX_CUSTOM_PROPS
-    #ifdef CONFIG_LV_STYLE_MAX_CUSTOM_PROPS
-        #define LV_STYLE_MAX_CUSTOM_PROPS CONFIG_LV_STYLE_MAX_CUSTOM_PROPS
-    #else
-        #define LV_STYLE_MAX_CUSTOM_PROPS 64
-    #endif
-#endif
-
 /*-------------
  * GPU
  *-----------*/

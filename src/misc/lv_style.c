@@ -121,6 +121,7 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
 };
 
 uint8_t * _lv_style_custom_prop_flag_lookup_table = NULL;
+uint32_t _lv_style_custom_prop_flag_lookup_table_size = 0;
 
 /**********************
  *  STATIC VARIABLES
@@ -171,24 +172,22 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
     /*
      * Allocate the lookup table if it's not yet available.
      */
-    if(_lv_style_custom_prop_flag_lookup_table == NULL) {
-        _lv_style_custom_prop_flag_lookup_table = lv_mem_alloc(LV_STYLE_MAX_CUSTOM_PROPS);
-        if(_lv_style_custom_prop_flag_lookup_table == NULL) {
+    uint8_t required_size = (last_custom_prop_id + 1 - _LV_STYLE_LAST_BUILT_IN_PROP);
+    if(_lv_style_custom_prop_flag_lookup_table_size < required_size) {
+        /* Round required_size up to the nearest 32-byte value */
+        required_size = (required_size + 31) & ~31;
+        uint8_t * old_p = _lv_style_custom_prop_flag_lookup_table;
+        uint8_t * new_p = lv_mem_realloc(old_p, required_size * sizeof(uint8_t));
+        if(new_p == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
         }
+        _lv_style_custom_prop_flag_lookup_table = new_p;
+        _lv_style_custom_prop_flag_lookup_table_size = required_size;
     }
     last_custom_prop_id++;
-    /*
-     * This ID is the true property ID passed to users, so compare it to the expected
-     * total number of properties, not just custom ones.
-     */
-    if(last_custom_prop_id >= _LV_STYLE_NUM_TOTAL_PROPS) {
-        /* Revert the addition */
-        last_custom_prop_id--;
-        LV_LOG_ERROR("Too many custom properties registered");
-        return LV_STYLE_PROP_INV;
-    }
+    /* This should never happen - we should bail out above */
+    LV_ASSERT_NULL(_lv_style_custom_prop_flag_lookup_table);
     _lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
     return last_custom_prop_id;
 }
