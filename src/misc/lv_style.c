@@ -418,6 +418,20 @@ uint8_t _lv_style_get_prop_group(lv_style_prop_t prop)
     return (uint8_t)group;
 }
 
+uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
+{
+    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
+    extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
+    if(prop == LV_STYLE_PROP_ANY || prop == LV_STYLE_PROP_INV)
+        return 0;
+    if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
+        return _lv_style_builtin_prop_flag_lookup_table[prop];
+    prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
+    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
+        return LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[prop];
+    return 0;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
