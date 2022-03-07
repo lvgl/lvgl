@@ -312,8 +312,6 @@ get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC ${COMPILE_OPTIONS})
-target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})
-
 
 set(TEST_INCLUDE_DIRS
     $<BUILD_INTERFACE:${LVGL_TEST_DIR}/src>
@@ -323,6 +321,7 @@ set(TEST_INCLUDE_DIRS
 
 add_library(test_common
     STATIC
+        src/img_caret_down.c
         src/lv_test_indev.c
         src/lv_test_init.c
         src/test_fonts/font_1.c
@@ -330,7 +329,6 @@ add_library(test_common
         src/test_fonts/font_3.c
         unity/unity_support.c
         unity/unity.c
-        src/img_caret_down.c
 )
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
 target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
@@ -340,7 +338,6 @@ target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 # then we can add our parent directory to the include path.
 # TODO: This is not good practice and should be fixed.
 get_filename_component(LVGL_PARENT_DIR ${LVGL_DIR} DIRECTORY)
-target_include_directories(lvgl_examples PUBLIC $<BUILD_INTERFACE:${LVGL_PARENT_DIR}>)
 
 # Generate one test executable for each source file pair.
 # The sources in src/test_runners is auto-generated, the
