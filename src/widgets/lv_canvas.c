@@ -642,8 +642,8 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
         return;
     }
 
-    lv_img_header_t header;
-    lv_res_t res = lv_img_decoder_get_info(src, &header);
+    lv_img_decoder_info_t info;
+    lv_res_t res = lv_img_decoder_get_info(src, &info);
     if(res != LV_RES_OK) {
         LV_LOG_WARN("lv_canvas_draw_img: Couldn't get the image data.");
         return;
@@ -661,8 +661,8 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_area_t coords;
     coords.x1 = x;
     coords.y1 = y;
-    coords.x2 = x + header.w - 1;
-    coords.y2 = y + header.h - 1;
+    coords.x2 = x + info.header.w - 1;
+    coords.y2 = y + info.header.h - 1;
 
     lv_draw_img(driver.draw_ctx, draw_dsc, &coords, src);
 

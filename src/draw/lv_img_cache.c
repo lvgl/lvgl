@@ -105,8 +105,8 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
     if(cached_src)
         return cached_src;
 
-    lv_img_header_t header;
-    lv_res_t res = lv_img_decoder_get_info(src, &header);
+    lv_img_decoder_info_t info;
+    lv_res_t res = lv_img_decoder_get_info(src, &info);
 
     if(res != LV_RES_OK) {
         LV_LOG_WARN("can't get image info");
@@ -114,16 +114,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
     }
 
     /*Calculate the memory usage of an image*/
-    uint32_t img_req_size = 0;
-
-    if(lv_img_src_get_type(src) == LV_IMG_SRC_FILE) {
-        img_req_size = lv_img_buf_get_img_size(header.w, header.h, header.cf);
-
-        if(img_req_size == 0) {
-            LV_LOG_WARN("can't get image require memory size, cf = %" PRIu32, header.cf);
-            return NULL;
-        }
-    }
+    uint32_t img_req_size = info.mem_cost_size;
 
     /*Do not decode image that exceed the limit*/
     if(img_req_size > cache_total_size) {

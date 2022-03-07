@@ -200,9 +200,9 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(imgbtn->img_src_left[state] == NULL &&
            imgbtn->img_src_mid[state] != NULL &&
            imgbtn->img_src_right[state] == NULL) {
-            lv_img_header_t header;
-            lv_img_decoder_get_info(imgbtn->img_src_mid[state], &header);
-            p->x = LV_MAX(p->x, header.w);
+            lv_img_decoder_info_t info;
+            lv_img_decoder_get_info(imgbtn->img_src_mid[state], &info);
+            p->x = LV_MAX(p->x, info.header.w);
         }
     }
 }
@@ -232,29 +232,29 @@ static void draw_main(lv_event_t * e)
     lv_draw_img_dsc_init(&img_dsc);
     lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
 
-    lv_img_header_t header;
+    lv_img_decoder_info_t info;
     lv_area_t coords_part;
     lv_coord_t left_w = 0;
     lv_coord_t right_w = 0;
 
     if(src) {
-        lv_img_decoder_get_info(src, &header);
-        left_w = header.w;
+        lv_img_decoder_get_info(src, &info);
+        left_w = info.header.w;
         coords_part.x1 = coords.x1;
         coords_part.y1 = coords.y1;
-        coords_part.x2 = coords.x1 + header.w - 1;
-        coords_part.y2 = coords.y1 + header.h - 1;
+        coords_part.x2 = coords.x1 + info.header.w - 1;
+        coords_part.y2 = coords.y1 + info.header.h - 1;
         lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
     }
 
     src = imgbtn->img_src_right[state];
     if(src) {
-        lv_img_decoder_get_info(src, &header);
-        right_w = header.w;
-        coords_part.x1 = coords.x2 - header.w + 1;
+        lv_img_decoder_get_info(src, &info);
+        right_w = info.header.w;
+        coords_part.x1 = coords.x2 - info.header.w + 1;
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x2;
-        coords_part.y2 = coords.y1 + header.h - 1;
+        coords_part.y2 = coords.y1 + info.header.h - 1;
         lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
     }
 
@@ -271,20 +271,20 @@ static void draw_main(lv_event_t * e)
         comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, draw_ctx->clip_area);
         if(comm_res) {
             lv_coord_t i;
-            lv_img_decoder_get_info(src, &header);
+            lv_img_decoder_get_info(src, &info);
 
             const lv_area_t * clip_area_ori = draw_ctx->clip_area;
             draw_ctx->clip_area = &clip_area_center;
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
-            coords_part.x2 = coords_part.x1 + header.w - 1;
-            coords_part.y2 = coords_part.y1 + header.h - 1;
+            coords_part.x2 = coords_part.x1 + info.header.w - 1;
+            coords_part.y2 = coords_part.y1 + info.header.h - 1;
 
-            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + header.w - 1); i += header.w) {
+            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + info.header.w - 1); i += info.header.w) {
                 lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
                 coords_part.x1 = coords_part.x2 + 1;
-                coords_part.x2 += header.w;
+                coords_part.x2 += info.header.w;
             }
             draw_ctx->clip_area = clip_area_ori;
         }
@@ -295,18 +295,18 @@ static void refr_img(lv_obj_t * obj)
 {
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
-    lv_img_header_t header;
+    lv_img_decoder_info_t info;
 
     const void * src = imgbtn->img_src_mid[state];
     if(src == NULL) return;
 
     lv_res_t info_res = LV_RES_OK;
-    info_res = lv_img_decoder_get_info(src, &header);
+    info_res = lv_img_decoder_get_info(src, &info);
 
     if(info_res == LV_RES_OK) {
-        imgbtn->act_cf = header.cf;
+        imgbtn->act_cf = info.header.cf;
         lv_obj_refresh_self_size(obj);
-        lv_obj_set_height(obj, header.h); /*Keep the user defined width*/
+        lv_obj_set_height(obj, info.header.h); /*Keep the user defined width*/
     }
     else {
         imgbtn->act_cf = LV_IMG_CF_UNKNOWN;

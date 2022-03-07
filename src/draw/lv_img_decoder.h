@@ -42,6 +42,7 @@ typedef uint8_t lv_img_src_t;
 
 /*Decoder function definitions*/
 struct _lv_img_decoder_dsc_t;
+struct _lv_img_decoder_info_t;
 struct _lv_img_decoder_t;
 
 /**
@@ -52,7 +53,7 @@ struct _lv_img_decoder_t;
  * @return LV_RES_OK: info written correctly; LV_RES_INV: failed
  */
 typedef lv_res_t (*lv_img_decoder_info_f_t)(struct _lv_img_decoder_t * decoder, const void * src,
-                                            lv_img_header_t * header);
+                                            struct _lv_img_decoder_info_t * info);
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
@@ -94,6 +95,11 @@ typedef struct _lv_img_decoder_t {
 #endif
 } lv_img_decoder_t;
 
+typedef struct _lv_img_decoder_info_t {
+    lv_img_header_t header;
+
+    uint32_t mem_cost_size;
+} lv_img_decoder_info_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_img_decoder_dsc_t {
@@ -113,7 +119,7 @@ typedef struct _lv_img_decoder_dsc_t {
     lv_img_src_t src_type;
 
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
-    lv_img_header_t header;
+    lv_img_decoder_info_t info;
 
     /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
      *  MUST be set in `open` function*/
@@ -150,7 +156,7 @@ void _lv_img_decoder_init(void);
  * @param header the image info will be stored here
  * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
  */
-lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header);
+lv_res_t lv_img_decoder_get_info(const void * src, lv_img_decoder_info_t * info);
 
 /**
  * Open an image.
@@ -232,7 +238,7 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  * @param header store the image data here
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
-lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
+lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_decoder_info_t * info);
 
 /**
  * Open a built in image

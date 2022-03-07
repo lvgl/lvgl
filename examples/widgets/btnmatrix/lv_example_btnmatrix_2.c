@@ -39,15 +39,15 @@ static void event_cb(lv_event_t * e)
         /*Add custom content to the 4th button when the button itself was drawn*/
         if(dsc->id == 3) {
             LV_IMG_DECLARE(img_star);
-            lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(&img_star, &header);
+            lv_img_decoder_info_t info;
+            lv_res_t res = lv_img_decoder_get_info(&img_star, &info);
             if(res != LV_RES_OK) return;
 
             lv_area_t a;
-            a.x1 = dsc->draw_area->x1 + (lv_area_get_width(dsc->draw_area) - header.w) / 2;
-            a.x2 = a.x1 + header.w - 1;
-            a.y1 = dsc->draw_area->y1 + (lv_area_get_height(dsc->draw_area) - header.h) / 2;
-            a.y2 = a.y1 + header.h - 1;
+            a.x1 = dsc->draw_area->x1 + (lv_area_get_width(dsc->draw_area) - info.header.w) / 2;
+            a.x2 = a.x1 + info.header.w - 1;
+            a.y1 = dsc->draw_area->y1 + (lv_area_get_height(dsc->draw_area) - info.header.h) / 2;
+            a.y2 = a.y1 + info.header.h - 1;
 
             lv_draw_img_dsc_t img_draw_dsc;
             lv_draw_img_dsc_init(&img_draw_dsc);

@@ -102,8 +102,8 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
         return;
     }
 
-    lv_img_header_t header;
-    lv_img_decoder_get_info(src, &header);
+    lv_img_decoder_info_t info;
+    lv_img_decoder_get_info(src, &info);
 
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
@@ -140,16 +140,16 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
         lv_point_t size;
         lv_txt_get_size(&size, src, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-        header.w = size.x;
-        header.h = size.y;
+        info.header.w = size.x;
+        info.header.h = size.y;
     }
 
     img->src_type = src_type;
-    img->w        = header.w;
-    img->h        = header.h;
-    img->cf       = header.cf;
-    img->pivot.x = header.w / 2;
-    img->pivot.y = header.h / 2;
+    img->w        = info.header.w;
+    img->h        = info.header.h;
+    img->cf       = info.header.cf;
+    img->pivot.x = info.header.w / 2;
+    img->pivot.y = info.header.h / 2;
 
     lv_obj_refresh_self_size(obj);
 

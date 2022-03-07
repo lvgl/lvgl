@@ -351,8 +351,8 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
         lv_draw_label(draw_ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
     }
     else {
-        lv_img_header_t header;
-        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
+        lv_img_decoder_info_t info;
+        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &info);
         if(res != LV_RES_OK) {
             LV_LOG_WARN("Couldn't read the background image");
             return;
@@ -368,23 +368,23 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
         /*Center align*/
         if(dsc->bg_img_tiled == false) {
             lv_area_t area;
-            area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
-            area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
-            area.x2 = area.x1 + header.w - 1;
-            area.y2 = area.y1 + header.h - 1;
+            area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - info.header.w / 2;
+            area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - info.header.h / 2;
+            area.x2 = area.x1 + info.header.w - 1;
+            area.y2 = area.y1 + info.header.h - 1;
 
             lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
         }
         else {
             lv_area_t area;
             area.y1 = coords->y1;
-            area.y2 = area.y1 + header.h - 1;
+            area.y2 = area.y1 + info.header.h - 1;
 
-            for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
+            for(; area.y1 <= coords->y2; area.y1 += info.header.h, area.y2 += info.header.h) {
 
                 area.x1 = coords->x1;
-                area.x2 = area.x1 + header.w - 1;
-                for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
+                area.x2 = area.x1 + info.header.w - 1;
+                for(; area.x1 <= coords->x2; area.x1 += info.header.w, area.x2 += info.header.w) {
                     lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
                 }
             }

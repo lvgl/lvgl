@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
+static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_decoder_info_t * info);
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
@@ -62,7 +62,7 @@ void lv_png_init(void)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_decoder_info_t * info)
 {
     (void) decoder; /*Unused*/
     lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
@@ -86,11 +86,12 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
             if(rn != 8) return LV_RES_INV;
             lv_fs_close(&f);
             /*Save the data in the header*/
-            header->always_zero = 0;
-            header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+            info->header.always_zero = 0;
+            info->header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
             /*The width and height are stored in Big endian format so convert them to little endian*/
-            header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
-            header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
+            info->header.w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
+            info->header.h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
+            info->mem_cost_size = info->header.w * info->header.h * 4;
 
             return LV_RES_OK;
         }
@@ -100,10 +101,11 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
         const lv_img_dsc_t * img_dsc = src;
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
         if(memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RES_INV;
-        header->always_zero = 0;
-        header->cf = img_dsc->header.cf;       /*Save the color format*/
-        header->w = img_dsc->header.w;         /*Save the color width*/
-        header->h = img_dsc->header.h;         /*Save the color height*/
+        info->header.always_zero = 0;
+        info->header.cf = img_dsc->header.cf;       /*Save the color format*/
+        info->header.w = img_dsc->header.w;         /*Save the color width*/
+        info->header.h = img_dsc->header.h;         /*Save the color height*/
+        info->mem_cost_size = info->header.w * info->header.h * 4;
         return LV_RES_OK;
     }
 

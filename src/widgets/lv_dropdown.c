@@ -790,11 +790,11 @@ static void draw_main(lv_event_t * e)
             symbol_h = size.y;
         }
         else {
-            lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &header);
+            lv_img_decoder_info_t info;
+            lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &info);
             if(res == LV_RES_OK) {
-                symbol_w = header.w;
-                symbol_h = header.h;
+                symbol_w = info.header.w;
+                symbol_h = info.header.h;
             }
             else {
                 symbol_w = -1;

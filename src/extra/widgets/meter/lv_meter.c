@@ -609,13 +609,13 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             if(indic->type_data.needle_img.src == NULL) continue;
 
             int32_t angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
-            lv_img_header_t info;
+            lv_img_decoder_info_t info;
             lv_img_decoder_get_info(indic->type_data.needle_img.src, &info);
             lv_area_t a;
             a.x1 = scale_center.x - indic->type_data.needle_img.pivot.x;
             a.y1 = scale_center.y - indic->type_data.needle_img.pivot.y;
-            a.x2 = a.x1 + info.w - 1;
-            a.y2 = a.y1 + info.h - 1;
+            a.x2 = a.x1 + info.header.w - 1;
+            a.y2 = a.y1 + info.header.h - 1;
 
             img_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
             img_dsc.pivot.x = indic->type_data.needle_img.pivot.x;
@@ -688,7 +688,7 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
     }
     else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
         int32_t angle = lv_map(value, scale->min, scale->max, scale->rotation, scale->rotation + scale->angle_range);
-        lv_img_header_t info;
+        lv_img_decoder_info_t info;
         lv_img_decoder_get_info(indic->type_data.needle_img.src, &info);
 
         angle = angle * 10;
@@ -697,7 +697,8 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
         scale_center.x -= indic->type_data.needle_img.pivot.x;
         scale_center.y -= indic->type_data.needle_img.pivot.y;
         lv_area_t a;
-        _lv_img_buf_get_transformed_area(&a, info.w, info.h, angle, LV_IMG_ZOOM_NONE, &indic->type_data.needle_img.pivot);
+        _lv_img_buf_get_transformed_area(&a, info.header.w, info.header.h, angle, LV_IMG_ZOOM_NONE,
+                                         &indic->type_data.needle_img.pivot);
         a.x1 += scale_center.x - 2;
         a.y1 += scale_center.y - 2;
         a.x2 += scale_center.x + 2;

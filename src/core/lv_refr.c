@@ -645,12 +645,12 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
             draw_ctx->draw_bg(draw_ctx, &dsc, draw_ctx->buf_area);
         }
         else if(disp_refr->bg_img) {
-            lv_img_header_t header;
+            lv_img_decoder_info_t info;
             lv_res_t res;
-            res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
+            res = lv_img_decoder_get_info(disp_refr->bg_img, &info);
             if(res == LV_RES_OK) {
                 lv_area_t a;
-                lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
+                lv_area_set(&a, 0, 0, info.header.w - 1, info.header.h - 1);
                 lv_draw_img_dsc_t dsc;
                 lv_draw_img_dsc_init(&dsc);
                 dsc.opa = disp_refr->bg_opa;
