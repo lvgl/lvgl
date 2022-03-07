@@ -16,6 +16,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdint.h>
 #include "../font/lv_font.h"
+#include "../misc/lv_gc.h"
 #include "lv_color.h"
 #include "lv_area.h"
 #include "lv_anim.h"
@@ -497,15 +498,14 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
 static inline uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
     extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
-    extern uint8_t * _lv_style_custom_prop_flag_lookup_table;
     extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
     if(prop == LV_STYLE_PROP_ANY || prop == LV_STYLE_PROP_INV)
         return 0;
     if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
         return _lv_style_builtin_prop_flag_lookup_table[prop];
     prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
-    if(_lv_style_custom_prop_flag_lookup_table != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
-        return _lv_style_custom_prop_flag_lookup_table[prop];
+    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
+        return LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[prop];
     return 0;
 }
 

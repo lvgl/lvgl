@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_style.h"
+#include "../misc/lv_gc.h"
 #include "../misc/lv_mem.h"
 
 /*********************
@@ -120,7 +121,6 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
 };
 
-uint8_t * _lv_style_custom_prop_flag_lookup_table = NULL;
 uint32_t _lv_style_custom_prop_flag_lookup_table_size = 0;
 
 /**********************
@@ -176,19 +176,19 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
     if(_lv_style_custom_prop_flag_lookup_table_size < required_size) {
         /* Round required_size up to the nearest 32-byte value */
         required_size = (required_size + 31) & ~31;
-        uint8_t * old_p = _lv_style_custom_prop_flag_lookup_table;
+        uint8_t * old_p = LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table);
         uint8_t * new_p = lv_mem_realloc(old_p, required_size * sizeof(uint8_t));
         if(new_p == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
         }
-        _lv_style_custom_prop_flag_lookup_table = new_p;
+        LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) = new_p;
         _lv_style_custom_prop_flag_lookup_table_size = required_size;
     }
     last_custom_prop_id++;
     /* This should never happen - we should bail out above */
-    LV_ASSERT_NULL(_lv_style_custom_prop_flag_lookup_table);
-    _lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
+    LV_ASSERT_NULL(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table));
+    LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
     return last_custom_prop_id;
 }
 
