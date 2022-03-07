@@ -153,6 +153,11 @@ lv_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t pro
 bool lv_obj_remove_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector);
 
 /**
+ * Used internally for color filtering
+ */
+lv_style_value_t _lv_obj_style_apply_color_filter(const struct _lv_obj_t * obj, uint32_t part, lv_style_value_t v);
+
+/**
  * Used internally to create a style transition
  * @param obj
  * @param part
