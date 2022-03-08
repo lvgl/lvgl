@@ -148,4 +148,22 @@ void test_slider_normal_mode_should_leave_edit_mode_if_released(void)
     TEST_ASSERT_FALSE(lv_group_get_editing(g));
 }
 
+void test_slider_event_hit_test(void)
+{
+    /* Validate if point 0,0 can click in the slider */
+    lv_point_t point = {
+        .x = 0,
+        .y = 0
+    };
+
+    lv_hit_test_info_t info = {
+        .res = false,
+        .point = &point
+    };
+    lv_event_send(slider, LV_EVENT_HIT_TEST, (void *) &info);
+
+    /* Point was hit */
+    TEST_ASSERT(info.res);
+}
+
 #endif
