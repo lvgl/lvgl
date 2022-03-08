@@ -331,13 +331,9 @@ static void draw_knob(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_slider_t * slider = (lv_slider_t *)obj;
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+
+    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
     const bool is_horizontal = is_slider_horizontal(obj);
-
-    bool sym = false;
-    if(slider->bar.mode == LV_BAR_MODE_SYMMETRICAL && slider->bar.min_value < 0 && slider->bar.max_value > 0) sym = true;
-
-    lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
-    bool is_rtl = base_dir == LV_BASE_DIR_RTL;
 
     lv_area_t knob_area;
     lv_coord_t knob_size;
@@ -345,17 +341,21 @@ static void draw_knob(lv_event_t * e)
         knob_size = lv_obj_get_height(obj);
         knob_area.x1 = LV_SLIDER_KNOB_COORD(is_rtl, slider->bar.indic_area);
     }
-    /*Vertical*/
     else {
+        bool is_symmetrical = false;
+        if(slider->bar.mode == LV_BAR_MODE_SYMMETRICAL && slider->bar.min_value < 0 && slider->bar.max_value > 0) is_symmetrical = true;
+
         knob_size = lv_obj_get_width(obj);
-        if(sym && slider->bar.cur_value < 0) knob_area.y1 = slider->bar.indic_area.y2;
+        if(is_symmetrical && slider->bar.cur_value < 0) knob_area.y1 = slider->bar.indic_area.y2;
         else knob_area.y1 = slider->bar.indic_area.y1;
     }
 
     lv_draw_rect_dsc_t knob_rect_dsc;
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
+    /* Update knob area with knob style */
     position_knob(obj, &knob_area, knob_size, is_horizontal);
+    /* Update right knob area with calculated knob area */
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
@@ -376,12 +376,12 @@ static void draw_knob(lv_event_t * e)
         /*Save the draw part_draw_dsc. because it can be modified in the event*/
         lv_draw_rect_dsc_t knob_rect_dsc_tmp;
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
-
+        /* Draw the right knob */
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
-        /*Draw a second knob for the start_value side*/
+        /*Calculate the second knob area*/
         if(is_horizontal) {
             knob_area.x1 = LV_SLIDER_KNOB_COORD(is_rtl, slider->bar.indic_area);
         }
