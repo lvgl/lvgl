@@ -33,7 +33,7 @@
  **********************/
 static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
+static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, const lv_coord_t knob_size, const bool hor);
 static void draw_knob(lv_event_t * e);
 static bool is_slider_horizontal(lv_obj_t * obj);
 
@@ -403,9 +403,8 @@ static void draw_knob(lv_event_t * e)
     }
 }
 
-static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob_size, bool hor)
+static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, const lv_coord_t knob_size, const bool hor)
 {
-
     if(hor) {
         knob_area->x1 -= (knob_size >> 1);
         knob_area->x2 = knob_area->x1 + knob_size - 1;
@@ -419,9 +418,9 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, lv_coord_t knob
         knob_area->x2 = obj->coords.x2;
     }
 
-    lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
-    lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
-    lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
+    lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
+    lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
+    lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
     lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
     lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_KNOB);
