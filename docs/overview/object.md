@@ -164,8 +164,9 @@ Read the [Layer overview](/overview/layer) section to learn more about layers.
 A new screen can be loaded with animation by using `lv_scr_load_anim(scr, transition_type, time, delay, auto_del)`. The following transition types exist:
 - `LV_SCR_LOAD_ANIM_NONE` Switch immediately after `delay` milliseconds
 - `LV_SCR_LOAD_ANIM_OVER_LEFT/RIGHT/TOP/BOTTOM` Move the new screen over the current towards the given direction
+- `LV_SCR_LOAD_ANIM_OUT_LEFT/RIGHT/TOP/BOTTOM` Move out the old screen over the current towards the given direction
 - `LV_SCR_LOAD_ANIM_MOVE_LEFT/RIGHT/TOP/BOTTOM` Move both the current and new screens towards the given direction
-- `LV_SCR_LOAD_ANIM_FADE_ON` Fade the new screen over the old screen
+- `LV_SCR_LOAD_ANIM_FADE_IN/OUT` Fade the new screen over the old screen, or vice versa
 
 Setting `auto_del` to `true` will automatically delete the old screen when the animation is finished.
 
