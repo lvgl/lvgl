@@ -48,6 +48,7 @@
 #if LV_USE_GPU_NXP_VG_LITE
     #include "vglite/lv_draw_vglite_blend.h"
     #include "vglite/lv_draw_vglite_rect.h"
+    #include "vglite/lv_draw_vglite_arc.h"
 #endif
 
 /*********************
@@ -70,6 +71,9 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
 static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+
+static void lv_draw_nxp_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+                            uint16_t radius, uint16_t start_angle, uint16_t end_angle);
 
 /**********************
  *  STATIC VARIABLES
@@ -111,6 +115,7 @@ void lv_draw_nxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
     lv_draw_nxp_ctx_t * nxp_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
 
+    nxp_draw_ctx->base_draw.draw_arc = lv_draw_nxp_arc;
     nxp_draw_ctx->base_draw.draw_rect = lv_draw_nxp_rect;
     nxp_draw_ctx->base_draw.draw_img_decoded = lv_draw_nxp_img_decoded;
     nxp_draw_ctx->blend = lv_draw_nxp_blend;
@@ -367,6 +372,31 @@ static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
     }
 
     return LV_RES_INV;
+}
+
+static void lv_draw_nxp_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+                            uint16_t radius, uint16_t start_angle, uint16_t end_angle)
+{
+    bool done = false;
+
+#if LV_DRAW_COMPLEX
+    if(dsc->opa <= LV_OPA_MIN)
+        return;
+    if(dsc->width == 0)
+        return;
+    if(start_angle == end_angle)
+        return;
+
+#if LV_USE_GPU_NXP_VG_LITE
+    done = (lv_gpu_nxp_vglite_draw_arc(draw_ctx, dsc, center, (int32_t)radius,
+                                       (int32_t)start_angle, (int32_t)end_angle) == LV_RES_OK);
+    if(!done)
+        VG_LITE_LOG_TRACE("VG-Lite draw arc failed. Fallback.");
+#endif
+#endif/*LV_DRAW_COMPLEX*/
+
+    if(!done)
+        lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
 }
 
 #endif /*LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE*/
