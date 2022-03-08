@@ -330,7 +330,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             lv_anim_set_exec_cb(&a_old, set_y_anim);
             lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
             break;
-        case LV_SCR_LOAD_ANIM_FADE_ON:
+        case LV_SCR_LOAD_ANIM_FADE_IN:
             lv_anim_set_exec_cb(&a_new, opa_scale_anim);
             lv_anim_set_values(&a_new, LV_OPA_TRANSP, LV_OPA_COVER);
             break;
