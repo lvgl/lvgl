@@ -24,7 +24,7 @@ Several drawing features in LVGL can be offloaded to the PXP engine. The CPU is 
 #### Basic configuration:
   - Select NXP PXP engine in lv_conf.h: Set `LV_USE_GPU_NXP_PXP` to 1
   - Enable default implementation for interrupt handling, PXP start function and automatic initialization: Set `LV_USE_GPU_NXP_PXP_AUTO_INIT` to 1
-  - If `FSL_RTOS_FREE_RTOS` symbol is defined, FreeRTOS implementation will be used, otherwise bare metal code will be included
+  - If `SDK_OS_FREE_RTOS` symbol is defined, FreeRTOS implementation will be used, otherwise bare metal code will be included
 
 #### Basic initialization:
   - If `LV_USE_GPU_NXP_PXP_AUTO_INIT` is enabled, no user code is required; PXP is initialized automatically in `lv_init()`
@@ -32,14 +32,10 @@ Several drawing features in LVGL can be offloaded to the PXP engine. The CPU is 
 ```c
       #if LV_USE_GPU_NXP_PXP
         #include "lv_gpu/lv_gpu_nxp_pxp.h"
-        #include "lv_gpu/lv_gpu_nxp_pxp_osa.h"
       #endif
       . . .
       #if LV_USE_GPU_NXP_PXP
-        if (lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
-            PRINTF("PXP init error. STOP.\n");
-            for ( ; ; ) ;
-        }
+        PXP_COND_STOP(!lv_gpu_nxp_pxp_init(), "PXP init failed.");
       #endif
 ```
 

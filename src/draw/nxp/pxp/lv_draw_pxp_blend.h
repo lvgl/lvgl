@@ -1,12 +1,12 @@
 /**
- * @file lv_gpu_nxp_pxp.h
+ * @file lv_draw_pxp_blend.h
  *
  */
 
 /**
  * MIT License
  *
- * Copyright (c) 2020 NXP
+ * Copyright 2020-2022 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_
-#define LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_
+#ifndef LV_DRAW_PXP_BLEND_H
+#define LV_DRAW_PXP_BLEND_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,121 +38,89 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../../../lv_conf_internal.h"
 
 #if LV_USE_GPU_NXP_PXP
-
-#include "../misc/lv_area.h"
-#include "../misc/lv_color.h"
+#include "lv_gpu_nxp_pxp.h"
+#include "../../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-/** PXP module instance to use*/
-#define LV_GPU_NXP_PXP_ID PXP
-
-/** PXP interrupt line I*/
-#define LV_GPU_NXP_PXP_IRQ_ID PXP_IRQn
-
 #ifndef LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT
 /** Minimum area (in pixels) for image copy with 100% opacity to be handled by PXP*/
-#define LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT 32
+#define LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT 5000
 #endif
 
 #ifndef LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT
 /** Minimum area (in pixels) for image copy with transparency to be handled by PXP*/
-#define LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT 16
+#define LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT 5000
 #endif
 
 #ifndef LV_GPU_NXP_PXP_BUFF_SYNC_BLIT_SIZE_LIMIT
 /** Minimum invalidated area (in pixels) to be synchronized by PXP during buffer sync */
-#define LV_GPU_NXP_PXP_BUFF_SYNC_BLIT_SIZE_LIMIT 32
+#define LV_GPU_NXP_PXP_BUFF_SYNC_BLIT_SIZE_LIMIT 5000
 #endif
 
 #ifndef LV_GPU_NXP_PXP_FILL_SIZE_LIMIT
 /** Minimum area (in pixels) to be filled by PXP with 100% opacity*/
-#define LV_GPU_NXP_PXP_FILL_SIZE_LIMIT 64
+#define LV_GPU_NXP_PXP_FILL_SIZE_LIMIT 5000
 #endif
 
 #ifndef LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT
 /** Minimum area (in pixels) to be filled by PXP with transparency*/
-#define LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT 32
+#define LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT 5000
 #endif
 
 /**********************
  *      TYPEDEFS
  **********************/
-/**
- * NXP PXP device configuration - call-backs used for
- * interrupt init/wait/deinit.
- */
-typedef struct {
-    /** Callback for PXP interrupt initialization*/
-    lv_res_t (*pxp_interrupt_init)(void);
-
-    /** Callback for PXP interrupt de-initialization*/
-    void (*pxp_interrupt_deinit)(void);
-
-    /** Callback that should start PXP and wait for operation complete*/
-    void (*pxp_run)(void);
-} lv_nxp_pxp_cfg_t;
 
 /**********************
- *  STATIC VARIABLES
+ * GLOBAL PROTOTYPES
  **********************/
-
-/**********************
- *      MACROS
- **********************/
-
-/**********************
- *   GLOBAL FUNCTIONS
- **********************/
-
-/**
- * Reset and initialize PXP device. This function should be called as a part
- * of display init sequence.
- *
- * @return LV_RES_OK: PXP init ok; LV_RES_INV: init error. See error log for more information.
- */
-lv_res_t lv_gpu_nxp_pxp_init(lv_nxp_pxp_cfg_t * cfg);
-
-/**
- * Disable PXP device. Should be called during display deinit sequence.
- */
-void lv_gpu_nxp_pxp_deinit(void);
 
 /**
  * Fill area, with optional opacity.
  *
  * @param[in/out] dest_buf destination buffer
- * @param[in] dest_width width (stride) of destination buffer in pixels
+ * @param[in] dest_stride width (stride) of destination buffer in pixels
  * @param[in] fill_area area to fill
  * @param[in] color color
  * @param[in] opa transparency of the color
+ * @retval LV_RES_OK Fill completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
  */
-void lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_width, const lv_area_t * fill_area, lv_color_t color,
-                         lv_opa_t opa);
+lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
+                             lv_color_t color, lv_opa_t opa);
 
 /**
- * @brief BLock Image Transfer - copy rectangular image from src buffer to dst buffer with effects.
+ * @brief BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
  *
  * By default, image is copied directly, with optional opacity configured by \p opa.
  * Color keying can be enabled by calling lv_gpu_nxp_pxp_enable_color_key() before calling this function.
- * Recoloring can be enabled by calling lv_gpu_nxp_pxp_enable_recolor() before calling this function.
+ * Recoloring can be enabled by calling  lv_gpu_nxp_pxp_enable_recolor() before calling this function.
  * Note that color keying and recoloring at the same time is not supported and black rectangle is rendered.
  *
- * @param[in/out] dest destination buffer
- * @param[in] dest_width width (stride) of destination buffer in pixels
- * @param[in] src source buffer
- * @param[in] src_with width (stride) of source buffer in pixels
- * @param[in] copy_w width of area to be copied from src to dest
- * @param[in] copy_h height of area to be copied from src to dest
+ * @param[in/out] dest_buf destination buffer
+ * @param[in] dest_area destination area
+ * @param[in] dest_stride width (stride) of destination buffer in pixels
+ * @param[in] src_buf source buffer
+ * @param[in] src_area source area with absolute coordinates to draw on destination buffer
  * @param[in] opa opacity of the result
+ * @retval LV_RES_OK Fill completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
  */
-void lv_gpu_nxp_pxp_blit(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src, lv_coord_t src_width,
-                         lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa);
+lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+                             const lv_color_t * src_buf, const lv_area_t * src_area, lv_opa_t opa);
+
+/**
+ * @brief Set color keying for subsequent calls to lv_gpu_nxp_pxp_blit()
+ *
+ * Color key is defined by LV_COLOR_TRANSP symbol in lv_conf.h
+ */
+void lv_gpu_nxp_pxp_set_color_key(void);
 
 /**
  * @brief Enable color keying for subsequent calls to lv_gpu_nxp_pxp_blit()
@@ -181,7 +149,7 @@ void lv_gpu_nxp_pxp_enable_recolor(lv_color_t color, lv_opa_t opa);
 void lv_gpu_nxp_pxp_disable_recolor(void);
 
 /**********************
- *   STATIC FUNCTIONS
+ *      MACROS
  **********************/
 
 #endif /*LV_USE_GPU_NXP_PXP*/
@@ -190,4 +158,4 @@ void lv_gpu_nxp_pxp_disable_recolor(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_*/
+#endif /*LV_DRAW_PXP_BLEND_H*/

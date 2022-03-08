@@ -6,7 +6,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2020 NXP
+ * Copyright 2020, 2022 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,9 @@
  *********************/
 
 #include "lv_gpu_nxp_pxp_osa.h"
+
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-#include "../misc/lv_log.h"
-
-
-#include "lv_gpu_nxp_pxp.h"
+#include "../../../misc/lv_log.h"
 #include "fsl_pxp.h"
 
 #if defined(SDK_OS_FREE_RTOS)
@@ -55,6 +53,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
 static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void);
 static void _lv_gpu_nxp_pxp_interrupt_deinit(void);
 static void _lv_gpu_nxp_pxp_run(void);
@@ -68,6 +67,12 @@ static void _lv_gpu_nxp_pxp_run(void);
 #else
     static volatile bool s_pxpIdle;
 #endif
+
+static lv_nxp_pxp_cfg_t pxp_default_cfg = {
+    .pxp_interrupt_init = _lv_gpu_nxp_pxp_interrupt_init,
+    .pxp_interrupt_deinit = _lv_gpu_nxp_pxp_interrupt_deinit,
+    .pxp_run = _lv_gpu_nxp_pxp_run
+};
 
 /**********************
  *      MACROS
@@ -94,8 +99,12 @@ void PXP_IRQHandler(void)
 #else
         s_pxpIdle = true;
 #endif
-
     }
+}
+
+lv_nxp_pxp_cfg_t * lv_gpu_nxp_pxp_get_cfg(void)
+{
+    return &pxp_default_cfg;
 }
 
 /**********************
@@ -109,9 +118,8 @@ static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void)
 {
 #if defined(SDK_OS_FREE_RTOS)
     s_pxpIdle = xSemaphoreCreateBinary();
-    if(s_pxpIdle == NULL) {
+    if(s_pxpIdle == NULL)
         return LV_RES_INV;
-    }
 
     NVIC_SetPriority(LV_GPU_NXP_PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
 #else
@@ -147,20 +155,11 @@ static void _lv_gpu_nxp_pxp_run(void)
     PXP_Start(LV_GPU_NXP_PXP_ID);
 
 #if defined(SDK_OS_FREE_RTOS)
-    if(xSemaphoreTake(s_pxpIdle, portMAX_DELAY) != pdTRUE) {
-        LV_LOG_ERROR("xSemaphoreTake error. Task halted.");
-        for(; ;) ;
-    }
+    PXP_COND_STOP(!xSemaphoreTake(s_pxpIdle, portMAX_DELAY), "xSemaphoreTake failed.");
 #else
     while(s_pxpIdle == false) {
     }
 #endif
 }
-
-lv_nxp_pxp_cfg_t pxp_default_cfg = {
-    .pxp_interrupt_init = _lv_gpu_nxp_pxp_interrupt_init,
-    .pxp_interrupt_deinit = _lv_gpu_nxp_pxp_interrupt_deinit,
-    .pxp_run = _lv_gpu_nxp_pxp_run
-};
 
 #endif /*LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT*/
