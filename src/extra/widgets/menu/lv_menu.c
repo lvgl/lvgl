@@ -124,7 +124,15 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char * title)
     lv_obj_class_init_obj(obj);
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
-    page->title = title;
+    if(title) {
+        page->title = lv_mem_alloc(strlen(title) + 1);
+        LV_ASSERT_MALLOC(page->title);
+        if(page->title == NULL) return NULL;
+        strcpy(page->title, title);
+    }
+    else {
+        page->title = NULL;
+    }
 
     return obj;
 }
