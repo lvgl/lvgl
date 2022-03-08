@@ -803,11 +803,6 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
     if(proc->wait_until_release != 0) return;
 
     lv_disp_t * disp = indev_act->driver->disp;
-    lv_obj_t * act_scr = lv_disp_get_scr_act(disp);
-    lv_obj_t * prev_scr = lv_disp_get_scr_prev(disp);
-
-    bool consider_prev_screen = disp && act_scr && prev_scr && disp->draw_prev_over_act;
-    bool indev_obj_in_prev_screen = false;
     bool new_obj_searched = false;
 
     /*If there is no last object then search*/
@@ -815,12 +810,7 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &proc->types.pointer.act_point);
         if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp),
                                                                           &proc->types.pointer.act_point);
-        if (indev_obj_act == NULL && consider_prev_screen) {
-          indev_obj_act = lv_indev_search_obj(prev_scr,&proc->types.pointer.act_point);
-          indev_obj_in_prev_screen = indev_obj_act != NULL;
-        }
-
-        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(act_scr,
+        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp),
                                                                           &proc->types.pointer.act_point);
         new_obj_searched = true;
     }
@@ -830,11 +820,7 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &proc->types.pointer.act_point);
         if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp),
                                                                           &proc->types.pointer.act_point);
-        if (indev_obj_act == NULL && consider_prev_screen) {
-          indev_obj_act = lv_indev_search_obj(prev_scr,&proc->types.pointer.act_point);
-          indev_obj_in_prev_screen = indev_obj_act != NULL;
-        }
-        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(act_scr,
+        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp),
                                                                           &proc->types.pointer.act_point);
         new_obj_searched = true;
     }
@@ -845,12 +831,6 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         proc->types.pointer.scroll_throw_vect.y = 0;
         _lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;
-    }
-
-    /*Ignore if event reached previous screen*/
-    if (indev_obj_in_prev_screen) {
-      // TODO: Additional clean up necessary here?
-      return;
     }
 
     /*If a new object was found reset some variables and send a pressed Call the ancestor's event handler*/
