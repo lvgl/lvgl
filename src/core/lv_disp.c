@@ -475,10 +475,11 @@ static void scr_anim_ready(lv_anim_t * a)
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
 }
 
-static bool is_out_anim(lv_scr_load_anim_t anim_type) {
-  return anim_type == LV_SCR_LOAD_ANIM_FADE_OUT  ||
-         anim_type == LV_SCR_LOAD_ANIM_OUT_LEFT  ||
-         anim_type == LV_SCR_LOAD_ANIM_OUT_RIGHT ||
-         anim_type == LV_SCR_LOAD_ANIM_OUT_TOP   ||
-         anim_type == LV_SCR_LOAD_ANIM_OUT_BOTTOM;
+static bool is_out_anim(lv_scr_load_anim_t anim_type)
+{
+    return anim_type == LV_SCR_LOAD_ANIM_FADE_OUT  ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_LEFT  ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_RIGHT ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_TOP   ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_BOTTOM;
 }

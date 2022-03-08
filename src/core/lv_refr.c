@@ -669,24 +669,25 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
         }
     }
 
-    if (disp_refr->draw_prev_over_act) {
-      if(top_act_scr == NULL) top_act_scr = disp_refr->act_scr;
-      lv_refr_obj_and_children(draw_ctx, top_act_scr);
+    if(disp_refr->draw_prev_over_act) {
+        if(top_act_scr == NULL) top_act_scr = disp_refr->act_scr;
+        lv_refr_obj_and_children(draw_ctx, top_act_scr);
 
-      /*Refresh the previous screen if any*/
-      if(disp_refr->prev_scr) {
-        if(top_prev_scr == NULL) top_prev_scr = disp_refr->prev_scr;
-        lv_refr_obj_and_children(draw_ctx, top_prev_scr);
-      }
-    } else {
-      /*Refresh the previous screen if any*/
-      if(disp_refr->prev_scr) {
-        if(top_prev_scr == NULL) top_prev_scr = disp_refr->prev_scr;
-        lv_refr_obj_and_children(draw_ctx, top_prev_scr);
-      }
+        /*Refresh the previous screen if any*/
+        if(disp_refr->prev_scr) {
+            if(top_prev_scr == NULL) top_prev_scr = disp_refr->prev_scr;
+            lv_refr_obj_and_children(draw_ctx, top_prev_scr);
+        }
+    }
+    else {
+        /*Refresh the previous screen if any*/
+        if(disp_refr->prev_scr) {
+            if(top_prev_scr == NULL) top_prev_scr = disp_refr->prev_scr;
+            lv_refr_obj_and_children(draw_ctx, top_prev_scr);
+        }
 
-      if(top_act_scr == NULL) top_act_scr = disp_refr->act_scr;
-      lv_refr_obj_and_children(draw_ctx, top_act_scr);
+        if(top_act_scr == NULL) top_act_scr = disp_refr->act_scr;
+        lv_refr_obj_and_children(draw_ctx, top_act_scr);
     }
 
     /*Also refresh top and sys layer unconditionally*/
