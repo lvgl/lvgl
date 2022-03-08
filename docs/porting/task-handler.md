@@ -19,22 +19,22 @@ while(1) {
 }
 ```
 
-If you intend to use `lv_timer_handler()` in a super-loop, a helper function`lv_run_timer_handler_in_period(__ms)` is provided to simplify the porting:
+If you want to use `lv_timer_handler()` in a super-loop, a helper function`lv_timer_handler_run_in_period()` is provided to simplify the porting:
 
 ```c
 while(1) {
     ...
-    lv_timer_handler_run_period(5); /* run lv_timer_handler() every 5ms */
+    lv_timer_handler_run_in_period(5); /* run lv_timer_handler() every 5ms */
     ...
 }
 ```
 
- In OS environment, you can use it together with the delay or sleep provided by OS:
+ In an OS environment, you can use it together with the **delay** or **sleep** provided by OS to release CPU whenever possible:
 
 ```c
 while (1) {
     lv_timer_handler_run_in_period(5); /* run lv_timer_handler() every 5ms */
-    sleep(5); /* sleep 5ms */
+    my_delay_ms(5);                    /* delay 5ms to avoid unnecessary polling */
 } 
 ```
 
