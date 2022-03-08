@@ -78,6 +78,14 @@ extern "C" {
 #define PRINT_BLT(...)
 #endif
 
+/* The optimal Bezier control point offset for radial unit
+ * see: https://spencermortensen.com/articles/bezier-circle/
+ **/
+#define BEZIER_OPTIM_CIRCLE 0.551915024494f
+
+/* Draw lines for control points of Bezier curves */
+#define BEZIER_DBG_CONTROL_POINTS   0
+
 /**********************
  *      TYPEDEFS
  **********************/

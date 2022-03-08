@@ -47,6 +47,7 @@
 #endif
 #if LV_USE_GPU_NXP_VG_LITE
     #include "vglite/lv_draw_vglite_blend.h"
+    #include "vglite/lv_draw_vglite_rect.h"
 #endif
 
 /*********************
@@ -65,6 +66,10 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
 
 static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+
+static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+
+static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 /**********************
  *  STATIC VARIABLES
@@ -106,6 +111,7 @@ void lv_draw_nxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
     lv_draw_nxp_ctx_t * nxp_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
 
+    nxp_draw_ctx->base_draw.draw_rect = lv_draw_nxp_rect;
     nxp_draw_ctx->base_draw.draw_img_decoded = lv_draw_nxp_img_decoded;
     nxp_draw_ctx->blend = lv_draw_nxp_blend;
     //nxp_draw_ctx->base_draw.wait_for_finish = lv_draw_nxp_wait_cb;
@@ -283,6 +289,84 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     }
 
     blend_img_decoded = false;
+}
+
+static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+{
+    bool done = false;
+    lv_draw_rect_dsc_t nxp_dsc;
+
+    lv_memcpy(&nxp_dsc, dsc, sizeof(nxp_dsc));
+#if LV_DRAW_COMPLEX
+    /* Draw only the shadow */
+    nxp_dsc.bg_opa = 0;
+    nxp_dsc.bg_img_opa = 0;
+    nxp_dsc.border_opa = 0;
+    nxp_dsc.outline_opa = 0;
+
+    lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
+
+    /* Draw the background */
+    nxp_dsc.shadow_opa = 0;
+    nxp_dsc.bg_opa = dsc->bg_opa;
+    done = (draw_nxp_bg(draw_ctx, &nxp_dsc, coords) == LV_RES_OK);
+#endif /*LV_DRAW_COMPLEX*/
+
+    /* Draw the remaining parts */
+    nxp_dsc.shadow_opa = 0;
+    if(done)
+        nxp_dsc.bg_opa = 0;
+    nxp_dsc.bg_img_opa = dsc->bg_img_opa;
+    nxp_dsc.border_opa = dsc->border_opa;
+    nxp_dsc.outline_opa = dsc->outline_opa;
+
+    lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
+}
+
+static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+{
+    if(dsc->bg_opa <= LV_OPA_MIN)
+        return LV_RES_INV;
+
+    lv_area_t bg_coords;
+    lv_area_copy(&bg_coords, coords);
+
+    /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
+    if(dsc->border_width > 1 && dsc->border_opa >= (lv_opa_t)LV_OPA_MAX && dsc->radius != 0) {
+        bg_coords.x1 += (dsc->border_side & LV_BORDER_SIDE_LEFT) ? 1 : 0;
+        bg_coords.y1 += (dsc->border_side & LV_BORDER_SIDE_TOP) ? 1 : 0;
+        bg_coords.x2 -= (dsc->border_side & LV_BORDER_SIDE_RIGHT) ? 1 : 0;
+        bg_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
+    }
+
+    lv_area_t clipped_coords;
+    if(!_lv_area_intersect(&clipped_coords, &bg_coords, draw_ctx->clip_area))
+        return LV_RES_INV;
+
+    lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
+    lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;
+    if(bg_color.full == dsc->bg_grad.stops[1].color.full) grad_dir = LV_GRAD_DIR_NONE;
+
+    bool mask_any = lv_draw_mask_is_any(&bg_coords);
+    lv_draw_sw_blend_dsc_t blend_dsc = {0};
+    blend_dsc.blend_mode = dsc->blend_mode;
+    blend_dsc.color = bg_color;
+
+    /*
+     * Simple case: no mask OR
+     * Complex case: gradient, or radius
+     */
+    if(!mask_any || dsc->radius != 0 || (grad_dir != LV_GRAD_DIR_NONE)) {
+#if LV_USE_GPU_NXP_VG_LITE
+        lv_res_t res = lv_gpu_nxp_vglite_draw_bg(draw_ctx, dsc, &bg_coords);
+        if(res != LV_RES_OK)
+            VG_LITE_LOG_TRACE("VG-Lite draw bg failed. Fallback.");
+
+        return res;
+#endif
+    }
+
+    return LV_RES_INV;
 }
 
 #endif /*LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE*/
