@@ -119,7 +119,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
  * Open a PNG image and return the decided image
  * @param src can be file name or pointer to a C array
  * @param style style of the image object (unused now but certain formats might use it)
- * @return pointer to the decoded image or  `LV_IMG_DECODER_OPEN_FAIL` if failed
+ * @return pointer to the decoded image or `LV_IMG_DECODER_OPEN_FAIL` if failed
  */
 static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {

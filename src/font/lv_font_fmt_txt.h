@@ -170,7 +170,7 @@ typedef struct {
 
     /**
      * Store kerning values.
-     * Can be  `lv_font_fmt_txt_kern_pair_t *  or `lv_font_kern_classes_fmt_txt_t *`
+     * Can be `lv_font_fmt_txt_kern_pair_t *  or `lv_font_kern_classes_fmt_txt_t *`
      * depending on `kern_classes`
      */
     const void * kern_dsc;

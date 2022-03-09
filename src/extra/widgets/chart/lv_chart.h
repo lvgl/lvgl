@@ -339,7 +339,7 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
  * @param obj       pointer to a chart object
  * @param cursor    pointer to the cursor
  * @param ser       pointer to a series
- * @param point_id  the point's index or  `LV_CHART_POINT_NONE` to not assign to any points.
+ * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
  */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser,
                                uint16_t point_id);
