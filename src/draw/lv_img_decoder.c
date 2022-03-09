@@ -146,7 +146,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         dsc->decoder = decoder;
         res = decoder->open_cb(decoder, dsc);
 
-        /*Opened successfully. It is a good decoder to for this image source*/
+        /*Opened successfully. It is a good decoder for this image source*/
         if(res == LV_RES_OK) return res;
 
         /*Prepare for the next loop*/

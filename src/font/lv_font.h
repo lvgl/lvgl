@@ -37,7 +37,7 @@ struct _lv_font_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
     const struct _lv_font_t *
-        resolved_font; /**< Pointer to a font where the gylph was actually found after handling fallbacks*/
+        resolved_font; /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w; /**< Width of the glyph's bounding box*/
     uint16_t box_h; /**< Height of the glyph's bounding box*/
@@ -243,7 +243,7 @@ LV_FONT_CUSTOM_DECLARE
 #endif
 
 /**
- * Just a wrapper around LV_FONT_DEFAULT because it might be more convenient to use a function is some cases
+ * Just a wrapper around LV_FONT_DEFAULT because it might be more convenient to use a function in some cases
  * @return  pointer to LV_FONT_DEFAULT
  */
 static inline const lv_font_t * lv_font_default(void)

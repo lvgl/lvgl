@@ -77,7 +77,7 @@ typedef uint8_t lv_text_align_t;
  * @param letter_space letter space of the text
  * @param line_space line space of the text
  * @param flags settings for the text from ::lv_text_flag_t
- * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
+ * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid
  * line breaks
  */
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
@@ -88,7 +88,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @param txt a '\0' terminated string
  * @param font pointer to a font
  * @param letter_space letter space
- * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
+ * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid
  * line breaks
  * @param used_width When used_width != NULL, save the width of this line if
  * flag == LV_TEXT_FLAG_NONE, otherwise save -1.
