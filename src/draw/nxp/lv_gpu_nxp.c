@@ -284,14 +284,23 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 #if LV_USE_GPU_NXP_VG_LITE
     if(!blend_done && !mask_any &&
        !lv_img_cf_is_chroma_keyed(cf) && !recolor
-       && !rotation && !scale
 #if LV_COLOR_DEPTH!=32
        && !lv_img_cf_has_alpha(cf)
 #endif
       ) {
+        if(rotation)
+            lv_gpu_nxp_vglite_set_rotation(dsc->angle, dsc->pivot);
+        if(scale)
+            lv_gpu_nxp_vglite_set_scale(dsc->zoom);
+
         blend_with_vglite = true;
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
         blend_with_vglite = false;
+
+        if(rotation)
+            lv_gpu_nxp_vglite_clear_rotation();
+        if(scale)
+            lv_gpu_nxp_vglite_clear_scale();
     }
 #endif
 

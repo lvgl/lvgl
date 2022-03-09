@@ -122,6 +122,30 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
  */
 lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
 
+/**
+ * @brief Set rotation for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_set_rotation(uint32_t angle, lv_point_t pivot);
+
+/**
+ * @brief Clear rotation for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_clear_rotation(void);
+
+/**
+ * @brief Set scale for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_set_scale(uint32_t zoom);
+
+/**
+ * @brief Clear scale for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_clear_scale(void);
+
 /**********************
  *      MACROS
  **********************/

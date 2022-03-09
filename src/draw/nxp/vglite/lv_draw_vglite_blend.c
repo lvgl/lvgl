@@ -78,6 +78,13 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
  *  STATIC VARIABLES
  **********************/
 
+/**< Rotation angle (1/10 of degree)*/
+static uint32_t angle = 0;
+/**< The coordinates of rotation pivot in source image buffer*/
+static lv_point_t pivot = {.x = 0, .y = 0};
+/**< 256 = no zoom (1:1 scale ratio)*/
+static uint32_t zoom = LV_IMG_ZOOM_NONE;
+
 /**********************
  *      MACROS
  **********************/
@@ -220,6 +227,46 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
 
     /* Just pass down */
     return _lv_gpu_nxp_vglite_blit_single(blit);
+}
+
+/**
+ * @brief Set rotation for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_set_rotation(uint32_t img_angle, lv_point_t img_pivot)
+{
+    angle = img_angle;
+    pivot.x = img_pivot.x;
+    pivot.y = img_pivot.y;
+}
+
+/**
+ * @brief Clear rotation for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_clear_rotation(void)
+{
+    angle = 0;
+    pivot.x = 0;
+    pivot.y = 0;
+}
+
+/**
+ * @brief Set scale for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_set_scale(uint32_t img_zoom)
+{
+    zoom = img_zoom;
+}
+
+/**
+ * @brief Clear scale for subsequent calls to lv_gpu_nxp_vglite_blit()
+ *
+ */
+void lv_gpu_nxp_vglite_clear_scale(void)
+{
+    zoom = LV_IMG_ZOOM_NONE;
 }
 
 /**********************
@@ -407,6 +454,7 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     vg_lite_buffer_t src_vgbuf, dst_vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
     uint32_t rect[4];
+    vg_lite_float_t scale = 1.0;
 
     if(blit == NULL) {
         /*Wrong parameter*/
@@ -434,6 +482,14 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
     vg_lite_translate((vg_lite_float_t)blit->dst_area.x1, (vg_lite_float_t)blit->dst_area.y1, &matrix);
+
+    if((angle != 0) || (zoom != LV_IMG_ZOOM_NONE)) {
+        vg_lite_translate(pivot.x, pivot.y, &matrix);
+        vg_lite_rotate(angle / 10.0f, &matrix);   /* angle is 1/10 degree */
+        scale = 1.0f * zoom / LV_IMG_ZOOM_NONE;
+        vg_lite_scale(scale, scale, &matrix);
+        vg_lite_translate(0.0f - pivot.x, 0.0f - pivot.y, &matrix);
+    }
 
     /*Clean & invalidate cache*/
     lv_vglite_invalidate_cache();
