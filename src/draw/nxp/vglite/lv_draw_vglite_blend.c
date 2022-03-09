@@ -132,7 +132,12 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         /*Clean & invalidate cache*/
         lv_vglite_invalidate_cache();
 
+#if LV_COLOR_DEPTH==16
         vgcol = col32.full;
+#else /*LV_COLOR_DEPTH==32*/
+        vgcol = ((uint32_t)col32.ch.alpha << 24) | ((uint32_t)col32.ch.blue << 16) | ((uint32_t)col32.ch.green << 8) |
+                (uint32_t)col32.ch.red;
+#endif
 
         err = vg_lite_clear(&vgbuf, &rect, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Clear failed.");
@@ -162,7 +167,12 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         colMix.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
         colMix.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
         colMix.ch.alpha = opa;
+#if LV_COLOR_DEPTH==16
         vgcol = colMix.full;
+#else /*LV_COLOR_DEPTH==32*/
+        vgcol = ((uint32_t)colMix.ch.alpha << 24) | ((uint32_t)colMix.ch.blue << 16) | ((uint32_t)colMix.ch.green << 8) |
+                (uint32_t)colMix.ch.red;
+#endif
 
         /*Clean & invalidate cache*/
         lv_vglite_invalidate_cache();

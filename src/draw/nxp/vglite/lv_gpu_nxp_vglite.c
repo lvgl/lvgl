@@ -42,8 +42,10 @@
 
 #if LV_COLOR_DEPTH==16
     #define VG_LITE_PX_FMT VG_LITE_RGB565
+#elif LV_COLOR_DEPTH==32
+    #define VG_LITE_PX_FMT VG_LITE_BGRA8888
 #else
-    #error Only 16bit color depth are supported. Set LV_COLOR_DEPTH to 16.
+    #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
 #endif
 
 /**********************
