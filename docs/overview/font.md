@@ -209,8 +209,8 @@ To do this, a custom `lv_font_t` variable needs to be created:
 ```c
 /*Describe the properties of a font*/
 lv_font_t my_font;
-my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /*Set a callback to get info about gylphs*/
-my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /*Set a callback to get bitmap of a glyp*/
+my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /*Set a callback to get info about glyphs*/
+my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /*Set a callback to get bitmap of a glyph*/
 my_font.line_height = height;                       /*The real line height where any text fits*/
 my_font.base_line = base_line;                      /*Base line measured from the top of line_height*/
 my_font.dsc = something_required;                   /*Store any implementation specific data here*/
