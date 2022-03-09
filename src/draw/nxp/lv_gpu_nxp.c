@@ -186,7 +186,7 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
 #if LV_USE_GPU_NXP_PXP
             if(!blend_with_vglite) {
                 blend_done = (lv_gpu_nxp_pxp_blit(dest_buf, &blend_area, dest_stride, src_buf, dsc->blend_area,
-                                                  dsc->opa) == LV_RES_OK);
+                                                  dsc->opa, LV_DISP_ROT_NONE) == LV_RES_OK);
                 if(!blend_done)
                     PXP_LOG_TRACE("PXP blit failed. Fallback.");
             }

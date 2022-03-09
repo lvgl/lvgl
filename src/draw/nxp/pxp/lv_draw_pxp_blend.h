@@ -109,11 +109,12 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
  * @param[in] src_buf source buffer
  * @param[in] src_area source area with absolute coordinates to draw on destination buffer
  * @param[in] opa opacity of the result
+ * @param[in] angle display rotation angle (90x)
  * @retval LV_RES_OK Fill completed
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
  */
 lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-                             const lv_color_t * src_buf, const lv_area_t * src_area, lv_opa_t opa);
+                             const lv_color_t * src_buf, const lv_area_t * src_area, lv_opa_t opa, lv_disp_rot_t angle);
 
 /**
  * @brief Set color keying for subsequent calls to lv_gpu_nxp_pxp_blit()

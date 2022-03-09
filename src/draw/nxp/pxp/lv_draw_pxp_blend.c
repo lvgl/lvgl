@@ -195,11 +195,12 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
  * @param[in] src_buf source buffer
  * @param[in] src_area source area with absolute coordinates to draw on destination buffer
  * @param[in] opa opacity of the result
+ * @param[in] angle display rotation angle (90x)
  * @retval LV_RES_OK Fill completed
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
  */
 lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-                             const lv_color_t * src_buf, const lv_area_t * src_area, lv_opa_t opa)
+                             const lv_color_t * src_buf, const lv_area_t * src_area, lv_opa_t opa, lv_disp_rot_t angle)
 {
     uint32_t dest_size = lv_area_get_size(dest_area);
     lv_coord_t dest_w = lv_area_get_width(dest_area);
@@ -224,6 +225,27 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
     PXP_Init(LV_GPU_NXP_PXP_ID);
     PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
     PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*block size 16x16 for higher performance*/
+
+    /* convert rotation angle */
+    pxp_rotate_degree_t pxp_rot;
+    switch(angle) {
+        case LV_DISP_ROT_NONE:
+            pxp_rot = kPXP_Rotate0;
+            break;
+        case LV_DISP_ROT_90:
+            pxp_rot = kPXP_Rotate90;
+            break;
+        case LV_DISP_ROT_180:
+            pxp_rot = kPXP_Rotate180;
+            break;
+        case LV_DISP_ROT_270:
+            pxp_rot = kPXP_Rotate270;
+            break;
+        default:
+            pxp_rot = kPXP_Rotate0;
+            break;
+    }
+    PXP_SetRotateConfig(PXP, kPXP_RotateOutputBuffer, pxp_rot, kPXP_FlipDisable);
 
     pxp_as_blend_config_t asBlendConfig = {
         .alpha = opa,
@@ -476,7 +498,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest_buf, const lv_area
 
         /*Step 2: BLIT temporary results with required opacity to output*/
         lv_gpu_nxp_pxp_disable_recolor(); /*make sure to take BLIT path, not the recolor*/
-        res = lv_gpu_nxp_pxp_blit(dest_buf, dest_area, dest_stride, tmp_buf, &tmp_area, opa);
+        res = lv_gpu_nxp_pxp_blit(dest_buf, dest_area, dest_stride, tmp_buf, &tmp_area, opa, LV_DISP_ROT_NONE);
         lv_gpu_nxp_pxp_enable_recolor(recolor, recolorOpa); /*restore state*/
 
         /*Step 3: Clean-up memory*/
