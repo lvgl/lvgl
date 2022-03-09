@@ -47,8 +47,12 @@
     #define PXP_OUT_PIXEL_FORMAT kPXP_OutputPixelFormatRGB565
     #define PXP_AS_PIXEL_FORMAT kPXP_AsPixelFormatRGB565
     #define PXP_PS_PIXEL_FORMAT kPXP_PsPixelFormatRGB565
-#else
-    #error Only 16bit color depth are supported. Set LV_COLOR_DEPTH to 16.
+#elif LV_COLOR_DEPTH==32
+    #define PXP_OUT_PIXEL_FORMAT kPXP_OutputPixelFormatARGB8888
+    #define PXP_AS_PIXEL_FORMAT kPXP_AsPixelFormatARGB8888
+    #define PXP_PS_PIXEL_FORMAT kPXP_PsPixelFormatRGB888
+#elif
+    #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
 #endif
 
 /**********************
@@ -72,6 +76,9 @@ static uint32_t colorKey = 0x0;
 static bool recolorEnabled = false;
 static lv_color_t recolor = { .full = 0x0 };
 static lv_opa_t recolorOpa = 0x0;
+
+static bool alphaChannelEnabled = false;
+static bool alphaChannelEnabledSaved = false;
 
 /**********************
  *      MACROS
@@ -225,7 +232,7 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
         .ropMode = kPXP_RopMergeAs
     };
 
-    if(opa >= (lv_opa_t)LV_OPA_MAX && !colorKeyEnabled) {
+    if(opa >= (lv_opa_t)LV_OPA_MAX && !colorKeyEnabled && !alphaChannelEnabled) {
         /*Simple blit, no effect - Disable PS buffer*/
         PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
     }
@@ -241,10 +248,10 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
             .pitchBytes = dest_stride * sizeof(lv_color_t)
         };
         if(opa >= (lv_opa_t)LV_OPA_MAX) {
-            asBlendConfig.alphaMode = kPXP_AlphaOverride;
+            asBlendConfig.alphaMode = alphaChannelEnabled ? kPXP_AlphaEmbedded : kPXP_AlphaOverride;
         }
         else {
-            asBlendConfig.alphaMode = kPXP_AlphaOverride;
+            asBlendConfig.alphaMode = alphaChannelEnabled ? kPXP_AlphaMultiply : kPXP_AlphaOverride;
         }
         PXP_SetProcessSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &psBufferConfig);
         PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, dest_w - 1, dest_h - 1);
@@ -334,6 +341,23 @@ void lv_gpu_nxp_pxp_disable_recolor(void)
     recolorEnabled = false;
 }
 
+/**
+ * @brief Enable per pixel alpha blending for subsequent calls to lv_gpu_nxp_pxp_blit()
+ */
+void lv_gpu_nxp_pxp_enable_alpha_channel(void)
+{
+    alphaChannelEnabled = true;
+}
+
+/**
+ * @brief Disable per pixel alpha blending for subsequent calls to lv_gpu_nxp_pxp_blit()
+ *
+ */
+void lv_gpu_nxp_pxp_disable_alpha_channel(void)
+{
+    alphaChannelEnabled = false;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -368,7 +392,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest_buf, const lv_area
     }
 
     /*Recoloring without color keying*/
-    if(opa >= (lv_opa_t)LV_OPA_MAX) {
+    if(opa >= (lv_opa_t)LV_OPA_MAX && !alphaChannelEnabled) {
         /*Recolor with full opacity - AS source image, PS color generator, OUT destination*/
         PXP_Init(LV_GPU_NXP_PXP_ID);
         PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
@@ -402,18 +426,18 @@ static lv_res_t lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest_buf, const lv_area
         /*Configure Porter-Duff blending*/
         pxp_porter_duff_config_t pdConfig = {
             .enable = 1,
-            .dstColorMode = kPXP_PorterDuffColorNoAlpha,
+            .dstColorMode = kPXP_PorterDuffColorWithAlpha,
             .srcColorMode = kPXP_PorterDuffColorNoAlpha,
             .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
-            .srcGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
+            .srcGlobalAlphaMode = alphaChannelEnabledSaved ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
             /* srcFactorMode and dstFactorMode are inverted in fsl_pxp.h
              * srcFactorMode is actually applied on PS alpha value
              * dstFactorMode is actually applied on AS alpha value */
-            .srcFactorMode = kPXP_PorterDuffFactorStraight,
+            .srcFactorMode = kPXP_PorterDuffFactorInversed,
             .dstFactorMode = kPXP_PorterDuffFactorStraight,
-            .srcGlobalAlpha = recolorOpa,
-            .dstGlobalAlpha = 255 - recolorOpa,
-            .srcAlphaMode = kPXP_PorterDuffAlphaStraight, /*don't care*/
+            .srcGlobalAlpha = 255,
+            .dstGlobalAlpha = recolorOpa,
+            .srcAlphaMode = kPXP_PorterDuffAlphaStraight,
             .dstAlphaMode = kPXP_PorterDuffAlphaStraight /*don't care*/
         };
         PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
@@ -434,6 +458,9 @@ static lv_res_t lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest_buf, const lv_area
             .y2 = dest_h - 1
         };
 
+        alphaChannelEnabledSaved = alphaChannelEnabled;
+        lv_gpu_nxp_pxp_disable_alpha_channel();
+
         lv_res_t res = lv_gpu_nxp_pxp_blit_recolor(tmp_buf, &tmp_area, dest_w, src_buf, src_area, LV_OPA_COVER, recolor,
                                                    recolorOpa);
 
@@ -442,6 +469,10 @@ static lv_res_t lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest_buf, const lv_area
             lv_mem_buf_release(tmp_buf);
             return res;
         }
+
+        /*Restore the previous state*/
+        alphaChannelEnabled = alphaChannelEnabledSaved;
+        alphaChannelEnabledSaved = false;
 
         /*Step 2: BLIT temporary results with required opacity to output*/
         lv_gpu_nxp_pxp_disable_recolor(); /*make sure to take BLIT path, not the recolor*/

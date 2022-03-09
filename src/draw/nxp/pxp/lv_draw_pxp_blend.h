@@ -148,6 +148,17 @@ void lv_gpu_nxp_pxp_enable_recolor(lv_color_t color, lv_opa_t opa);
  */
 void lv_gpu_nxp_pxp_disable_recolor(void);
 
+/**
+ * @brief Enable per pixel alpha blending for subsequent calls to lv_gpu_nxp_pxp_blit()
+ */
+void lv_gpu_nxp_pxp_enable_alpha_channel(void);
+
+/**
+ * @brief Disable per pixel alpha blending for subsequent calls to lv_gpu_nxp_pxp_blit()
+ *
+ */
+void lv_gpu_nxp_pxp_disable_alpha_channel(void);
+
 /**********************
  *      MACROS
  **********************/

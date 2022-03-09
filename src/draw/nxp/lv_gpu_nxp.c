@@ -258,12 +258,16 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 
 #if LV_USE_GPU_NXP_PXP
     if(!mask_any && !rotation && !scale
+#if LV_COLOR_DEPTH!=32
        && !lv_img_cf_has_alpha(cf)
+#endif
       ) {
         if(lv_img_cf_is_chroma_keyed(cf))
             lv_gpu_nxp_pxp_enable_color_key();
         if(recolor)
             lv_gpu_nxp_pxp_enable_recolor(dsc->recolor, dsc->recolor_opa);
+        if(lv_img_cf_has_alpha(cf))
+            lv_gpu_nxp_pxp_enable_alpha_channel();
 
         blend_with_pxp = true;
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -273,6 +277,8 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
             lv_gpu_nxp_pxp_disable_color_key();
         if(recolor)
             lv_gpu_nxp_pxp_disable_recolor();
+        if(lv_img_cf_has_alpha(cf))
+            lv_gpu_nxp_pxp_disable_alpha_channel();
     }
 #endif
 #if LV_USE_GPU_NXP_VG_LITE
