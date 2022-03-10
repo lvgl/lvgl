@@ -75,14 +75,15 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     /*Handle reset query before processing the point*/
     indev_proc_reset_query_handler(indev_act);
 
-    if(indev_act->proc.disabled) return;
+    if(indev_act->proc.disabled ||
+       indev_act->driver->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
     bool continue_reading;
     do {
         /*Read the data*/
         _lv_indev_read(indev_act, &data);
         continue_reading = data.continue_reading;
 
-        /*The active object might deleted even in the read function*/
+        /*The active object might be deleted even in the read function*/
         indev_proc_reset_query_handler(indev_act);
         indev_obj_act = NULL;
 
