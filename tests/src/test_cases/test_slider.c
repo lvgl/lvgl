@@ -9,6 +9,7 @@ static lv_obj_t * slider = NULL;
 static lv_obj_t * sliderRangeMode = NULL;
 static lv_obj_t * sliderNormalMode = NULL;
 static lv_obj_t * sliderSymmetricalMode = NULL;
+static lv_group_t * g = NULL;
 
 void setUp(void)
 {
@@ -21,6 +22,9 @@ void setUp(void)
     lv_slider_set_mode(sliderRangeMode, LV_SLIDER_MODE_RANGE);
     lv_slider_set_mode(sliderNormalMode, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_mode(sliderSymmetricalMode, LV_SLIDER_MODE_SYMMETRICAL);
+
+    g = lv_group_create();
+    lv_indev_set_group(lv_test_encoder_indev, g);
 }
 
 void tearDown(void)
@@ -88,8 +92,6 @@ void test_slider_range_mode_should_leave_edit_mode_if_released(void)
     ptr->left_knob_focus = 1;
 
     /* Setup group and encoder indev */
-    lv_group_t * g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, g);
     lv_group_add_obj(g, sliderNormalMode);
     lv_group_set_editing(g, true);
 
@@ -111,8 +113,6 @@ void test_slider_range_mode_should_not_leave_edit_mode_if_released_with_no_left_
     ptr->left_knob_focus = 0;
 
     /* Setup group and encoder indev */
-    lv_group_t * g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, g);
     lv_group_add_obj(g, sliderRangeMode);
     lv_group_set_editing(g, true);
 
@@ -139,8 +139,6 @@ void test_slider_normal_mode_should_leave_edit_mode_if_released(void)
     ptr->left_knob_focus = 1;
 
     /* Setup group and encoder indev */
-    lv_group_t * g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, g);
     lv_group_add_obj(g, sliderNormalMode);
     lv_group_set_editing(g, true);
 
@@ -163,8 +161,6 @@ void test_slider_normal_mode_value_to_set_points_to_bar_cur_value_when_pressed(v
     lv_slider_set_value(slider, value, LV_ANIM_OFF);
 
     /* Setup group and encoder indev */
-    lv_group_t * g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, g);
     lv_group_add_obj(g, sliderNormalMode);
     lv_group_set_editing(g, true);
 
@@ -183,8 +179,6 @@ void test_slider_symmetrical_mode_value_to_set_points_to_bar_cur_value_when_pres
     lv_slider_set_value(slider, value, LV_ANIM_OFF);
 
     /* Setup group and encoder indev */
-    lv_group_t * g = lv_group_create();
-    lv_indev_set_group(lv_test_encoder_indev, g);
     lv_group_add_obj(g, sliderSymmetricalMode);
     lv_group_set_editing(g, true);
 
