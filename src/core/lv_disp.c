@@ -27,6 +27,7 @@ static void opa_scale_anim(void * obj, int32_t v);
 static void set_x_anim(void * obj, int32_t v);
 static void set_y_anim(void * obj, int32_t v);
 static void scr_anim_ready(lv_anim_t * a);
+static bool is_out_anim(lv_scr_load_anim_t a);
 
 /**********************
  *  STATIC VARIABLES
@@ -252,6 +253,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
         d->prev_scr = NULL;
     }
 
+    d->draw_prev_over_act = is_out_anim(anim_type);
     d->del_prev = auto_del;
 
     /*Be sure there is no other animation on the screens*/
@@ -328,10 +330,29 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             lv_anim_set_exec_cb(&a_old, set_y_anim);
             lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
             break;
-
-        case LV_SCR_LOAD_ANIM_FADE_ON:
+        case LV_SCR_LOAD_ANIM_FADE_IN:
             lv_anim_set_exec_cb(&a_new, opa_scale_anim);
             lv_anim_set_values(&a_new, LV_OPA_TRANSP, LV_OPA_COVER);
+            break;
+        case LV_SCR_LOAD_ANIM_FADE_OUT:
+            lv_anim_set_exec_cb(&a_old, opa_scale_anim);
+            lv_anim_set_values(&a_old, LV_OPA_COVER, LV_OPA_TRANSP);
+            break;
+        case LV_SCR_LOAD_ANIM_OUT_LEFT:
+            lv_anim_set_exec_cb(&a_old, set_x_anim);
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_hor_res(d));
+            break;
+        case LV_SCR_LOAD_ANIM_OUT_RIGHT:
+            lv_anim_set_exec_cb(&a_old, set_x_anim);
+            lv_anim_set_values(&a_old, 0, lv_disp_get_hor_res(d));
+            break;
+        case LV_SCR_LOAD_ANIM_OUT_TOP:
+            lv_anim_set_exec_cb(&a_old, set_y_anim);
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_ver_res(d));
+            break;
+        case LV_SCR_LOAD_ANIM_OUT_BOTTOM:
+            lv_anim_set_exec_cb(&a_old, set_y_anim);
+            lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
             break;
     }
 
@@ -449,6 +470,16 @@ static void scr_anim_ready(lv_anim_t * a)
 
     if(d->prev_scr && d->del_prev) lv_obj_del(d->prev_scr);
     d->prev_scr = NULL;
+    d->draw_prev_over_act = false;
     d->scr_to_load = NULL;
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
+}
+
+static bool is_out_anim(lv_scr_load_anim_t anim_type)
+{
+    return anim_type == LV_SCR_LOAD_ANIM_FADE_OUT  ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_LEFT  ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_RIGHT ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_TOP   ||
+           anim_type == LV_SCR_LOAD_ANIM_OUT_BOTTOM;
 }
