@@ -17,6 +17,7 @@ extern "C" {
 #include "monkey/lv_example_monkey.h"
 #include "gridnav/lv_example_gridnav.h"
 #include "fragment/lv_example_fragment.h"
+#include "imgfont/lv_example_imgfont.h"
 
 /*********************
  *      DEFINES
