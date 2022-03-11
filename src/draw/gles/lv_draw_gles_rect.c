@@ -275,8 +275,8 @@ void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
 
     mat4 model;
     glm_mat4_identity(model);
-    glm_translate(model, (vec3) {coords->x1, coords->y2});
-    glm_scale(model, (vec3) {coords->x2 - coords->x1, coords->y1 - coords->y2});
+    glm_translate(model, (vec3) {coords->x1, coords->y1});
+    glm_scale(model, (vec3) {coords->x2 - coords->x1, coords->y2 - coords->y1});
     LV_LOG_USER("coords: x1 :%d x2: %d y1 : %d y2 : %d", coords->x1,
                 coords->x2,
                 coords->y1,
@@ -318,12 +318,12 @@ void opengl_draw_corner_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
 
     mat4 model;
     glm_mat4_identity(model);
-    glm_translate(model, (vec3) {coords->x1, coords->y2});
-    glm_scale(model, (vec3) {coords->x2 - coords->x1, coords->y1 - coords->y2});
+    glm_translate(model, (vec3) {coords->x1, coords->y1});
+    glm_scale(model, (vec3) {coords->x2 - coords->x1, coords->y2 - coords->y1});
 
     vec2 corner;
     corner[0] = (float)x;
-    corner[1] = (float)y;
+    corner[1] = LV_VER_RES - (float)y;
 
     float r = (float) radius;
 

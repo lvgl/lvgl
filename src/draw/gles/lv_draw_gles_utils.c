@@ -198,8 +198,8 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     glm_mat4_identity(projection);
     glm_ortho(0.0f,
               (float)LV_GPU_SDL_GLES_HOR_RES,
-              0.0f,
               (float)LV_GPU_SDL_GLES_VER_RES,
+              0.0f,
               -1.0f, 1.0f,
               projection);
     glm_mat4_ucopy(projection, internals->projection);
