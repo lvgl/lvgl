@@ -779,7 +779,7 @@ static void draw_main(lv_event_t * e)
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) symbol_to_left = true;
 
     if(dropdown->symbol) {
-        lv_img_src_t symbol_type = lv_img_src_get_type(dropdown->symbol);
+        lv_img_src_type_t symbol_type = lv_img_src_get_type(dropdown->symbol);
         lv_coord_t symbol_w;
         lv_coord_t symbol_h;
         if(symbol_type == LV_IMG_SRC_SYMBOL) {

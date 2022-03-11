@@ -333,8 +333,12 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
     if(dsc->bg_img_src == NULL) return;
     if(dsc->bg_img_opa <= LV_OPA_MIN) return;
 
-    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
-    if(src_type == LV_IMG_SRC_SYMBOL) {
+    lv_img_src_type_t src_type = lv_img_src_get_type(dsc->bg_img_src);
+    if(src_type == LV_IMG_SRC_SYMBOL
+#if LVGL_IMG_ALLOW_TYPELESS_SRC
+       || (src_type == LV_IMG_SRC_OBJ && ((lv_img_src_t *)dsc->bg_img_src)->type == LV_IMG_SRC_SYMBOL)
+#endif
+      ) {
         lv_point_t size;
         lv_txt_get_size(&size, dsc->bg_img_src, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_area_t a;

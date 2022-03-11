@@ -203,7 +203,7 @@ void lv_img_cache_invalidate_src(const void * src)
 #if LV_IMG_CACHE_DEF_SIZE
 static bool lv_img_cache_match(const void * src1, const void * src2)
 {
-    lv_img_src_t src_type = lv_img_src_get_type(src1);
+    lv_img_src_type_t src_type = lv_img_src_get_type(src1);
     if(src_type == LV_IMG_SRC_VARIABLE)
         return src1 == src2;
     if(src_type != LV_IMG_SRC_FILE)

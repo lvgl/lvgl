@@ -10,14 +10,6 @@
 extern "C" {
 #endif
 
-/***************************
- * CURRENT VERSION OF LVGL
- ***************************/
-#define LVGL_VERSION_MAJOR 8
-#define LVGL_VERSION_MINOR 3
-#define LVGL_VERSION_PATCH 0
-#define LVGL_VERSION_INFO "dev"
-
 /*********************
  *      INCLUDES
  *********************/
@@ -32,6 +24,7 @@ extern "C" {
 
 #include "src/hal/lv_hal.h"
 
+#include "src/core/lv_version.h"
 #include "src/core/lv_obj.h"
 #include "src/core/lv_group.h"
 #include "src/core/lv_indev.h"

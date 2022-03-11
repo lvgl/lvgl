@@ -65,7 +65,7 @@ void lv_png_init(void)
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
     (void) decoder; /*Unused*/
-    lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
+    lv_img_src_type_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
 
     /*If it's a PNG file...*/
     if(src_type == LV_IMG_SRC_FILE) {

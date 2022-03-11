@@ -152,7 +152,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     /*Check whether the type `src` is known by the decoder*/
     /* Read the SJPG/JPG header and find `width` and `height` */
 
-    lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
+    lv_img_src_type_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
 
     lv_res_t ret = LV_RES_OK;
 

@@ -8,9 +8,9 @@
  *********************/
 #include "lv_img_decoder.h"
 #include "../misc/lv_assert.h"
-#include "../draw/lv_draw_img.h"
 #include "../misc/lv_ll.h"
 #include "../misc/lv_gc.h"
+#include "lv_draw_img.h" /* For lv_img_cf_get_px_size in builtin decoder */
 
 /*********************
  *      DEFINES
@@ -86,7 +86,15 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 
     if(src == NULL) return LV_RES_INV;
 
-    lv_img_src_t src_type = lv_img_src_get_type(src);
+    lv_img_src_type_t src_type = lv_img_src_get_type(src);
+#if LVGL_IMG_ALLOW_TYPELESS_SRC
+    if(src_type == LV_IMG_SRC_OBJ) {
+        lv_img_src_t * src_obj = ((lv_img_src_t *)src);
+        src_type = src_obj->type;
+        src = src_obj->uri;
+    }
+#endif
+
     if(src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = src;
         if(img_dsc->data == NULL) return LV_RES_INV;
@@ -109,7 +117,14 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
 
     if(src == NULL) return LV_RES_INV;
-    lv_img_src_t src_type = lv_img_src_get_type(src);
+    lv_img_src_type_t src_type = lv_img_src_get_type(src);
+#if LVGL_IMG_ALLOW_TYPELESS_SRC
+    if(src_type == LV_IMG_SRC_OBJ) {
+        lv_img_src_t * src_obj = ((lv_img_src_t *)src);
+        src_type = src_obj->type;
+        src = src_obj->uri;
+    }
+#endif
     if(src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = src;
         if(img_dsc->data == NULL) return LV_RES_INV;
@@ -274,7 +289,8 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
 {
     LV_UNUSED(decoder); /*Unused*/
 
-    lv_img_src_t src_type = lv_img_src_get_type(src);
+    lv_img_src_type_t src_type = lv_img_src_get_type(src);
+
     if(src_type == LV_IMG_SRC_VARIABLE) {
         lv_img_cf_t cf = ((lv_img_dsc_t *)src)->header.cf;
         if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
@@ -325,13 +341,15 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
  */
 lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
+    const void * src = dsc->src;
+    lv_img_src_type_t src_type = dsc->src_type;
     /*Open the file if it's a file*/
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
+    if(src_type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
-        if(strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RES_INV;
+        if(strcmp(lv_fs_get_ext(src), "bin")) return LV_RES_INV;
 
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->src, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) {
             LV_LOG_WARN("Built-in image decoder can't open the file");
             return LV_RES_INV;
@@ -352,9 +370,9 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
         lv_memcpy_small(&user_data->f, &f, sizeof(f));
     }
-    else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
+    else if(src_type == LV_IMG_SRC_VARIABLE) {
         /*The variables should have valid data*/
-        if(((lv_img_dsc_t *)dsc->src)->data == NULL) {
+        if(((lv_img_dsc_t *)src)->data == NULL) {
             return LV_RES_INV;
         }
     }
@@ -362,10 +380,10 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     lv_img_cf_t cf = dsc->header.cf;
     /*Process true color formats*/
     if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA || cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
-        if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
+        if(src_type == LV_IMG_SRC_VARIABLE) {
             /*In case of uncompressed formats the image stored in the ROM/RAM.
              *So simply give its pointer*/
-            dsc->img_data = ((lv_img_dsc_t *)dsc->src)->data;
+            dsc->img_data = ((lv_img_dsc_t *)src)->data;
             return LV_RES_OK;
         }
         else {
@@ -401,7 +419,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             return LV_RES_INV;
         }
 
-        if(dsc->src_type == LV_IMG_SRC_FILE) {
+        if(src_type == LV_IMG_SRC_FILE) {
             /*Read the palette from file*/
             lv_fs_seek(&user_data->f, 4, LV_FS_SEEK_SET); /*Skip the header*/
             lv_color32_t cur_color;
@@ -414,7 +432,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
         else {
             /*The palette begins in the beginning of the image data. Just point to it.*/
-            lv_color32_t * palette_p = (lv_color32_t *)((lv_img_dsc_t *)dsc->src)->data;
+            lv_color32_t * palette_p = (lv_color32_t *)((lv_img_dsc_t *)src)->data;
 
             uint32_t i;
             for(i = 0; i < palette_size; i++) {

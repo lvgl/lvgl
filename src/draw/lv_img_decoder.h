@@ -17,6 +17,7 @@ extern "C" {
 
 #include <stdint.h>
 #include "lv_img_buf.h"
+#include "lv_img_src.h"
 #include "../misc/lv_fs.h"
 #include "../misc/lv_types.h"
 #include "../misc/lv_area.h"
@@ -28,17 +29,44 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+#if defined(LV_IMG_FRAME_INDEX_LARGE_SIZE)
+typedef uint32_t lv_frame_index_t;
+#else
+typedef uint16_t lv_frame_index_t;
+#endif
 
 /**
- * Source of image.*/
-enum {
-    LV_IMG_SRC_VARIABLE, /** Binary/C variable*/
-    LV_IMG_SRC_FILE, /** File in filesystem*/
-    LV_IMG_SRC_SYMBOL, /** Symbol (@ref lv_symbol_def.h)*/
-    LV_IMG_SRC_UNKNOWN, /** Unknown source*/
-};
+ * Capabilities of an image decoder context.
+ * Set by the decoder when extracting info or being opened */
+typedef enum {
+    LV_IMG_DEC_DEFAULT      = 0x00, /**!< Default format, no specificities */
+    LV_IMG_DEC_VECTOR       = 0x01, /**!< Image format is vector based, size independant */
+    LV_IMG_DEC_ANIMATED     = 0x02, /**!< Image format stores an animation */
+    LV_IMG_DEC_SEEKABLE     = 0x04, /**!< Animation is seekable */
+    LV_IMG_DEC_CACHED       = 0x08, /**!< The complete image can be cached (used for rotation and zoom) */
+    LV_IMG_DEC_VFR          = 0x10, /**!< The animation has a variable frame rate */
+    LV_IMG_DEC_LOOPING      = 0x20, /**!< The animation is looping */
+} lv_img_decoder_caps_t;
 
-typedef uint8_t lv_img_src_t;
+typedef enum {
+    LV_IMG_DEC_ALL          = 0,    /**!< Decode everything */
+    LV_IMG_DEC_ONLYMETA     = 1,    /**!< Only decode metadata (like width & height, color format, frame count...) */
+} lv_img_dec_flags_t;
+
+/**
+ * Base type for a decoder context.
+ * You'll likely bootstrap from this to make your own, if you need too
+ */
+typedef struct {
+    uint16_t  auto_allocated : 1; /**!< Is is self allocated (and should be freed by the decoder close function) */
+    uint16_t  frame_rate : 15;    /**!< The number of frames per second, if applicable (can be 0 for VFR) */
+    lv_frame_index_t   current_frame;  /**!< The current frame index */
+    lv_frame_index_t   total_frames;   /**!< The number of frames (likely filled by the decoder) */
+    lv_frame_index_t   dest_frame;     /**!< The destination frame (if appropriate) */
+    uint16_t     last_rendering; /**!< The last rendering time */
+    uint16_t     frame_delay;    /**!< The delay for the current frame in ms */
+    void    *    user_data;      /**!< Available for per-decoder features */
+} lv_img_dec_ctx_t;
 
 /*Decoder function definitions*/
 struct _lv_img_decoder_dsc_t;
@@ -110,7 +138,7 @@ typedef struct _lv_img_decoder_dsc_t {
     int32_t frame_id;
 
     /**Type of the source: file or variable. Can be set in `open` function if required*/
-    lv_img_src_t src_type;
+    lv_img_src_type_t src_type;
 
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
     lv_img_header_t header;

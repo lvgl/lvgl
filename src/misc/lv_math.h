@@ -136,6 +136,11 @@ uint32_t lv_rand(uint32_t min, uint32_t max);
 #define LV_SMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
 #define LV_MAX_OF(t) ((unsigned long)(LV_IS_SIGNED(t) ? LV_SMAX_OF(t) : LV_UMAX_OF(t)))
 
+/* Bit-flag test true */
+#define LV_BT(v, b) ((v) & (b)) == (b)
+/* Bit-flag test false */
+#define LV_BN(v, b) ((v) & (b)) != (b)
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

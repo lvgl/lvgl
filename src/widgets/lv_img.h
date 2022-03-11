@@ -17,40 +17,61 @@ extern "C" {
 
 #if LV_USE_IMG != 0
 
-/*Testing of dependencies*/
-#if LV_USE_LABEL == 0
-#error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL 1)"
-#endif
-
 #include "../core/lv_obj.h"
 #include "../misc/lv_fs.h"
 #include "../draw/lv_draw.h"
+#include "../draw/lv_img_src.h"
+#include "../misc/lv_timer.h"
 
 /*********************
  *      DEFINES
  *********************/
+/** Use this macro to declare an image in a C file*/
+#define LV_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 
 /**********************
  *      TYPEDEFS
  **********************/
 
+/** Some image are animated.
+ *  In that case, you might want to control the animation with `lv_img_set_play_mode`
+ *  These are flags you'll combine with | to express your need */
+typedef enum {
+    LV_IMG_CTRL_FORWARD  = 0,   /**< Let the animation play forward. */
+    LV_IMG_CTRL_BACKWARD = 1,   /**< Let the animation play backward, if supported */
+    LV_IMG_CTRL_PAUSE    = 2,   /**< Pause the animation at the next frame */
+    LV_IMG_CTRL_PLAY     = 0,   /**< Play the animation */
+    LV_IMG_CTRL_LOOP     = 8,   /**< When reached the destination frame, loop back */
+    LV_IMG_CTRL_STOPAT   = 4,   /**< Stop at a given frame */
+
+
+    LV_IMG_CTRL_MARKED = 0x80,  /**< Internal, don't use this */
+} lv_img_ctrl_t;
+
+
 /**
- * Data of image
+ * Descriptor of an image
  */
 typedef struct {
-    lv_obj_t obj;
-    const void * src; /*Image source: Pointer to an array or a file or a symbol*/
-    lv_point_t offset;
-    lv_coord_t w;          /*Width of the image (Handled by the library)*/
-    lv_coord_t h;          /*Height of the image (Handled by the library)*/
-    uint16_t angle;    /*rotation angle of the image*/
-    lv_point_t pivot;     /*rotation center of the image*/
-    uint16_t zoom;         /*256 means no zoom, 512 double size, 128 half size*/
-    uint8_t src_type : 2;  /*See: lv_img_src_t*/
-    uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
-    uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
-    uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
+    lv_obj_t            obj;
+    lv_img_src_t        src;        /**< Image source*/
+    lv_point_t          offset;
+    lv_coord_t          w;          /**< Width of the image in px (Handled by the library)*/
+    lv_coord_t          h;          /**< Height of the image in px (Handled by the library)*/
+    lv_point_t          pivot;      /**< rotation center of the image, in px*/
+    uint16_t            angle;      /**< rotation angle in 1/10th of degree of the image*/
+    uint16_t            zoom;       /**< 256 means no zoom, 512 double size, 128 half size*/
+    uint8_t             cf : 5;        /**< Color format from `lv_img_color_format_t`*/
+    uint8_t             antialias : 1; /**< Apply anti-aliasing in transformations (rotate, zoom)*/
+    uint8_t             obj_size_mode: 2; /**< Image size mode if image and object sizes differ */
+
+    uint8_t             ctrl;       /**< The current control flags */
+    lv_img_dec_ctx_t  * dec_ctx;    /**< Additional decoder context */
+    uint8_t             caps;       /**< Decoder capabilities */
+    lv_timer_t     *    anim_timer; /**< The timer task for animated images */
 } lv_img_t;
+
+
 
 extern const lv_obj_class_t lv_img_class;
 
@@ -87,13 +108,60 @@ lv_obj_t * lv_img_create(lv_obj_t * parent);
  *====================*/
 
 /**
- * Set the image data to display on the object
+ * Some image format support animation. In that case, you might want to control it.
  * @param obj       pointer to an image object
- * @param src_img   1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
+ * @param ctrl      A ORed mask of lv_img_ctrl_t flags you want
+ */
+void lv_img_set_play_mode(lv_obj_t * obj, const lv_img_ctrl_t ctrl);
+
+/**
+ * Set the current frame of the animation
+ * @param obj       pointer to an image object
+ * @param index     Index of the frame to reach
+ * @warning This will only work once the source of the image is set and the image is animated
+ */
+lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index);
+
+/**
+ * Set the stop frame for the animation
+ * @param obj       pointer to an image object
+ * @param index     Index of the frame to stop at. Will emit a EVENT_READY when reached.
+ * @param forward   If 1, the animation plays forward, else plays backward
+ * @warning This will only work once the source of the image is set and the image is animated
+ */
+lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward);
+
+/**
+ * Parse the image source to display on the the object
+ *
+ * @param obj       pointer to an image object
+ * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
  *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
+ *                  4) pointer to a lv_img_src_t instance
+ *
+ * @deprecated This function is deprecated in favor of lv_img_accept_src
+ *             You can create a lv_img_src_t * from a file, symbol or plain data via lv_img_src_set_file/symbol/data
+ *
  */
 void lv_img_set_src(lv_obj_t * obj, const void * src);
+
+
+/** Set the source of this image to a lv_img_src_t and check if it's usable.
+ *
+ * Some picture don't have intrinsic size (like a vector based format, SVG, Lottie), or contain multiple
+ * parts (like multiple frames for animated format, GIF, Lottie).
+ * If you need to deal with such format, you might have to call other function
+ * (like `lv_obj_set_size` for vector format) before calling this
+ *
+ * @param obj           pointer to an image object
+ * @param src           pointer to an image source object
+ * @param skip_cache    if 1, the image will only be parsed to extract its metadata but it'll skip
+ *                      the image cache until it's actually used.
+ *                      You might only need to set this if you are preparing your screen at once on start
+ * @return LV_RES_OK    If the image was correctly parsed
+ */
+lv_res_t lv_img_accept_src(lv_obj_t * obj, const lv_img_src_t * src, int skip_cache);
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.
@@ -156,6 +224,7 @@ void lv_img_set_antialias(lv_obj_t * obj, bool antialias);
  * @param mode      the new size mode.
  */
 void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -163,9 +232,31 @@ void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode);
 /**
  * Get the source of the image
  * @param obj       pointer to an image object
- * @return          the image source (symbol, file name or ::lv-img_dsc_t for C arrays)
+ * @return          the image source uri (symbol, file name or data for C arrays)
  */
-const void * lv_img_get_src(lv_obj_t * obj);
+lv_img_src_t * lv_img_get_src(lv_obj_t * obj);
+
+
+/**
+ * Get the current play control mode for this image.
+ * @param obj       pointer to an image object
+ * @return          the image play control mode if applicable
+ */
+lv_img_ctrl_t lv_img_get_play_mode(lv_obj_t * obj);
+
+/**
+ * Get the total number of frames in the animation
+ * @param obj       pointer to an image object
+ * @return          the total number of frames in the animation (or 1 if it's not animated)
+ */
+size_t lv_img_get_totalframes(lv_obj_t * obj);
+
+/**
+ * Get the current frame of the animation
+ * @param obj       pointer to an image object
+ * @return          the total number of frames in the animation (or 1 if it's not animated)
+ */
+size_t lv_img_get_current_frame(lv_obj_t * obj);
 
 /**
  * Get the offset's x attribute of the image object.
@@ -219,9 +310,6 @@ lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
-
-/** Use this macro to declare an image in a C file*/
-#define LV_IMG_DECLARE(var_name) extern const lv_img_dsc_t var_name;
 
 #endif /*LV_USE_IMG*/
 
