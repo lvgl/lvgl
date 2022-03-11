@@ -36,7 +36,12 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
   
   <releases>
-    <release date="2022-02-26" version="1.0.1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.1.pack">
+    <release date="2022-03-11" version="1.0.2-alpha1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.2-alpha1.pack">
+      - LVGL 8.3.0-dev
+      - Monthly update for March
+      - Add GPU support for Arm-2D library
+    </release>
+    <release date="2022-02-26" version="1.0.1" url="https://github.com/lvgl/lvgl/raw/44f6f752386617a8812228b9c1357f180e73e4ff/env_support/cmsis-pack/LVGL.lvgl.1.0.1.pack">
       - LVGL 8.3.0-dev
       - Monthly update for February
     </release>
@@ -119,6 +124,11 @@
         <condition id="LVGL-Essential">
             <description>Require LVGL Essential Service</description>
             <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        </condition>
+        
+        <condition id="Arm-2D">
+            <description>Require Arm-2D Support</description>
+            <require Cclass="Acceleration" Cgroup="Arm-2D"/>
         </condition>
         
     </conditions>
@@ -314,6 +324,20 @@
                 <file category="header"     name="examples/porting/lv_port_fs_template.h" attr="config" version="1.0.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_fs_template.c" attr="config" version="1.0.0" />
               </files>
+            </component>
+
+            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.0.0-dev">
+              <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
+              <files>
+              <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable Arm-2D support*/
+#define LV_USE_GPU_ARM2D 1
+              </RTE_Components_h>
+              
             </component>
 
             <component Cgroup="lvgl" Csub="GPU STM32-DMA2D"  condition="LVGL-Essential">
