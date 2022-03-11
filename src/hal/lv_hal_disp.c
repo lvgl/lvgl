@@ -110,9 +110,9 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
 #elif LV_USE_GPU_ARM2D
-    disp_drv.draw_ctx_init = lv_draw_arm2d_ctx_init;
-    disp_drv.draw_ctx_deinit = lv_draw_arm2d_ctx_init;
-    disp_drv.draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
+    driver->draw_ctx_init = lv_draw_arm2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_arm2d_ctx_init;
+    driver->draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
 #else
     driver->draw_ctx_init = lv_draw_sw_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
