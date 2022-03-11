@@ -4,6 +4,8 @@
 #include "unity/unity.h"
 #include "lv_test_indev.h"
 
+extern const lv_img_dsc_t img_caret_down;
+
 void setUp(void)
 {
     /* Function run before every test */
@@ -366,7 +368,6 @@ void test_dropdown_render_1(void)
 
 void test_dropdown_render_2(void)
 {
-#if 0
     lv_obj_clean(lv_scr_act());
     LV_IMG_DECLARE(img_caret_down);
     lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
@@ -422,7 +423,6 @@ void test_dropdown_render_2(void)
     lv_dropdown_open(dd7);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("dropdown_2.png");
-#endif
 }
 
 /* See #2893 */

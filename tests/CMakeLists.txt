@@ -321,9 +321,9 @@ set(TEST_INCLUDE_DIRS
 
 add_library(test_common
     STATIC
-        src/img_caret_down.c
         src/lv_test_indev.c
         src/lv_test_init.c
+        src/test_assets/img_caret_down.c
         src/test_fonts/font_1.c
         src/test_fonts/font_2.c
         src/test_fonts/font_3.c
