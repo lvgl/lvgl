@@ -163,7 +163,7 @@ void test_ranged_mode_adjust_with_encoder(void)
     /* Setup group and encoder indev */
     lv_group_add_obj(g, sliderRangeMode);
     lv_group_set_editing(g, false);
-    
+
     /*Go the edit mode*/
     lv_test_encoder_click();
 
