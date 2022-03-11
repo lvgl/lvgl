@@ -45,9 +45,9 @@ extern lv_font_t font_3;
 
 void test_font_loader(void)
 {
-    lv_font_t * font_1_bin = lv_font_load("F:src/test_fonts/font_1.fnt");
-    lv_font_t * font_2_bin = lv_font_load("F:src/test_fonts/font_2.fnt");
-    lv_font_t * font_3_bin = lv_font_load("F:src/test_fonts/font_3.fnt");
+    lv_font_t * font_1_bin = lv_font_load("F:src/test_refs/font_1.fnt");
+    lv_font_t * font_2_bin = lv_font_load("F:src/test_refs/font_2.fnt");
+    lv_font_t * font_3_bin = lv_font_load("F:src/test_refs/font_3.fnt");
 
     compare_fonts(&font_1, font_1_bin);
     compare_fonts(&font_2, font_2_bin);
