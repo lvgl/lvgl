@@ -154,6 +154,34 @@ void test_normal_mode_slider_should_leave_edit_mode_when_released(void)
     TEST_ASSERT_FALSE(lv_group_get_editing(g));
 }
 
+
+void test_ranged_mode_adjust_with_encoder(void)
+{
+    lv_slider_set_value(sliderRangeMode, 90, LV_ANIM_OFF);
+    lv_slider_set_left_value(sliderRangeMode, 10, LV_ANIM_OFF);
+
+    /* Setup group and encoder indev */
+    lv_group_add_obj(g, sliderRangeMode);
+    lv_group_set_editing(g, false);
+    
+    /*Go the edit mode*/
+    lv_test_encoder_click();
+
+    /*Adjust the right knob*/
+    lv_test_encoder_turn(-10);
+    TEST_ASSERT_EQUAL(80, lv_slider_get_value(sliderRangeMode));  /*Updated?*/
+    TEST_ASSERT_EQUAL(10, lv_slider_get_left_value(sliderRangeMode));     /*Maintained?*/
+
+    /*Focus the left knob*/
+    lv_test_encoder_click();
+
+    /*Adjust the left knob*/
+    lv_test_encoder_turn(5);
+    TEST_ASSERT_EQUAL(80, lv_slider_get_value(sliderRangeMode));  /*Maintained?*/
+    TEST_ASSERT_EQUAL(15, lv_slider_get_left_value(sliderRangeMode));  /*Updated?*/
+
+}
+
 void test_normal_mode_slider_hit_test(void)
 {
     /* Validate if point 0,0 can click in the slider */

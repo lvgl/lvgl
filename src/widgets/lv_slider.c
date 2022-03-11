@@ -343,7 +343,8 @@ static void draw_knob(lv_event_t * e)
     }
     else {
         bool is_symmetrical = false;
-        if(slider->bar.mode == LV_BAR_MODE_SYMMETRICAL && slider->bar.min_value < 0 && slider->bar.max_value > 0) is_symmetrical = true;
+        if(slider->bar.mode == LV_BAR_MODE_SYMMETRICAL && slider->bar.min_value < 0 &&
+           slider->bar.max_value > 0) is_symmetrical = true;
 
         knob_size = lv_obj_get_width(obj);
         if(is_symmetrical && slider->bar.cur_value < 0) knob_area.y1 = slider->bar.indic_area.y2;
