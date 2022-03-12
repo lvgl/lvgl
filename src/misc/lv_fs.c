@@ -95,6 +95,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         file_p->cache = lv_mem_alloc(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
         lv_memset_00(file_p->cache, sizeof(lv_fs_file_cache_t));
+        file_p->cache->start = UINT32_MAX;	/*Set an invalid range by default*/
+        file_p->cache->end = UINT32_MAX - 1;
     }
 
     return LV_FS_RES_OK;
