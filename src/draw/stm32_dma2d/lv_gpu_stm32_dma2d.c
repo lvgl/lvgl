@@ -103,6 +103,7 @@ void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     dma2d_draw_ctx->blend = lv_draw_stm32_dma2d_blend;
     //    dma2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_stm32_dma2d_img_decoded;
     dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_stm32_dma2d_wait_cb;
+    dma2d_draw_ctx->base_draw.buffer_copy = lv_draw_stm32_dma2d_buffer_copy;
 
 }
 
@@ -144,6 +145,14 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     }
 
     if(!done) lv_draw_sw_blend_basic(draw_ctx, dsc);
+}
+
+void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx,
+                                     void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
+                                     void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
+{
+    LV_UNUSED(draw_ctx);
+    lv_draw_stm32_dma2d_blend_map(dest_buf, dest_area, dest_stride, src_buf, src_stride, LV_OPA_MAX);
 }
 
 
