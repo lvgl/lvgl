@@ -94,6 +94,9 @@ typedef struct {
     int32_t dst_stride;      /**< Destination buffer stride in bytes (must be aligned on 16 px)*/
 
     lv_opa_t opa;            /**< Opacity - alpha mix (0 = source not copied, 255 = 100% opaque)*/
+    uint32_t angle;          /**< Rotation angle (1/10 of degree)*/
+    uint32_t zoom;           /**< 256 = no zoom (1:1 scale ratio)*/
+    lv_point_t pivot;        /**< The coordinates of rotation pivot in source image buffer*/
 } lv_gpu_nxp_vglite_blit_info_t;
 
 /**********************
@@ -122,29 +125,13 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
  */
 lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
 
-/**
- * @brief Set rotation for subsequent calls to lv_gpu_nxp_vglite_blit()
- *
+/***
+ * BLock Image Transfer.
+ * @param[in] blit Description of the transfer
+ * @retval LV_RES_OK Transfer complete
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-void lv_gpu_nxp_vglite_set_rotation(uint32_t angle, lv_point_t pivot);
-
-/**
- * @brief Clear rotation for subsequent calls to lv_gpu_nxp_vglite_blit()
- *
- */
-void lv_gpu_nxp_vglite_clear_rotation(void);
-
-/**
- * @brief Set scale for subsequent calls to lv_gpu_nxp_vglite_blit()
- *
- */
-void lv_gpu_nxp_vglite_set_scale(uint32_t zoom);
-
-/**
- * @brief Clear scale for subsequent calls to lv_gpu_nxp_vglite_blit()
- *
- */
-void lv_gpu_nxp_vglite_clear_scale(void);
+lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_gpu_nxp_vglite_blit_info_t * blit);
 
 /**********************
  *      MACROS

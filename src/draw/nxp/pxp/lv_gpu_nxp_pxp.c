@@ -35,7 +35,6 @@
 
 #if LV_USE_GPU_NXP_PXP
 #include "lv_gpu_nxp_pxp_osa.h"
-#include "lv_draw_pxp_blend.h"
 #include "../../../core/lv_refr.h"
 
 /*********************
@@ -88,8 +87,6 @@ lv_res_t lv_gpu_nxp_pxp_init(void)
         PXP_Deinit(LV_GPU_NXP_PXP_ID);
         PXP_RETURN_INV("PXP interrupt init failed.");
     }
-
-    lv_gpu_nxp_pxp_set_color_key();
 
     return LV_RES_OK;
 }
