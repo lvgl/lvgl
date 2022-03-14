@@ -89,7 +89,6 @@ void test_slider_event_invalid_key_should_not_change_values(void)
 void test_range_mode_slider_should_leave_edit_mode_when_released(void)
 {
     lv_slider_t * ptr = (lv_slider_t *) sliderNormalMode;
-    ptr->left_knob_focus = 1;
 
     /* Setup group and encoder indev */
     lv_group_add_obj(g, sliderNormalMode);
@@ -106,7 +105,6 @@ void test_range_mode_slider_should_leave_edit_mode_when_released(void)
 void test_range_mode_slider_should_not_leave_edit_mode_when_released_with_no_left_knob_focus(void)
 {
     lv_slider_t * ptr = (lv_slider_t *) sliderRangeMode;
-    ptr->left_knob_focus = 0;
 
     /* Setup group and encoder indev */
     lv_group_add_obj(g, sliderRangeMode);
@@ -120,12 +118,6 @@ void test_range_mode_slider_should_not_leave_edit_mode_when_released_with_no_lef
     TEST_ASSERT_FALSE(lv_slider_is_dragged(slider));
     TEST_ASSERT_NULL(ptr->value_to_set);
 
-    /* Group leaved edit mode */
-
-    /* NOTE: This assert should be checking against 1U instead of 0U
-     * The reason why left_knob_focus is being set to 0U remains unknown
-     * at the lv_slider event handler level. */
-    TEST_ASSERT_EQUAL(0U, ptr->left_knob_focus);
     TEST_ASSERT(lv_group_get_editing(g));
 }
 
