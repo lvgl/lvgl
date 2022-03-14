@@ -31,11 +31,16 @@ LVGL has registered as a [software package](https://packages.rt-thread.org/en/de
 
 | BSP                                                          | Note |
 | ------------------------------------------------------------ | ---- |
-| [QEMU simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/qemu-vexpress-a9) |      |
-| [Visual Studio simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/simulator) |      |
+| [QEMU simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/qemu-vexpress-a9/applications/lvgl) |      |
+| [Visual Studio simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/simulator/applications/lvgl) |      |
+| [Nuvoton numaker-iot-m487](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m487/applications/lvgl) |      |
+| [Nuvoton numaker-pfm-m487](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-pfm-m487/applications/lvgl) |      |
 | [Nuvoton nk-980iot](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-980iot/applications/lvgl) |      |
+| [Nuvoton numaker-m2354](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m2354/applications/lvgl) |      |
 | [Nuvoton nk-n9h30](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-n9h30/applications/lvgl) |      |
-| [STM32L475 pandora](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora) |      |
+| [Nuvoton numaker-m032ki](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m032ki/applications/lvgl) |      |
+| [NXP imxrt1060-evk](https://github.com/RT-Thread/rt-thread/tree/master/bsp/imxrt/imxrt1060-nxp-evk/applications/lvgl) |      |
+| [STM32L475 pandora](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora/applications/lvgl) |      |
 | [STM32F407 explorer](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-atk-explorer/applications/lvgl) |      |
 | [STM32F469 Discovery](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f469-st-disco/applications/lvgl) |      |
 | [Raspberry PICO](https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/applications/lvgl) |      |
