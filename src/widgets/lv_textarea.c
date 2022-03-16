@@ -954,9 +954,9 @@ static void pwd_char_hider(lv_obj_t * obj)
 }
 
 /**
- * Test an unicode character if it is accepted or not. Checks max length and accepted char list.
+ * Test a unicode character if it is accepted or not. Checks max length and accepted char list.
  * @param ta pointer to a test area object
- * @param c an unicode character
+ * @param c a unicode character
  * @return true: accepted; false: rejected
  */
 static bool char_is_accepted(lv_obj_t * obj, uint32_t c)

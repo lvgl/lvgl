@@ -780,6 +780,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
         bool is_end_line = false;
         bool ellipsis_valid = false;
         lv_coord_t max_line_h = 0;  /* the max height of span-font when a line have a lot of span */
+        lv_coord_t max_baseline = 0; /*baseline of the highest span*/
         lv_snippet_clear();
 
         /* the loop control to find a line and push the relevant span info into stack  */
@@ -860,6 +861,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
             cur_txt_ofs += next_ofs;
             if(max_line_h < snippet.line_h) {
                 max_line_h = snippet.line_h;
+                max_baseline = snippet.font->base_line;
             }
 
             lv_snippet_push(&snippet);
@@ -908,7 +910,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
             lv_point_t pos;
             pos.x = txt_pos.x;
-            pos.y = txt_pos.y + max_line_h - pinfo->line_h;
+            pos.y = txt_pos.y + max_line_h - pinfo->line_h - (max_baseline - pinfo->font->base_line);
             label_draw_dsc.color = lv_span_get_style_text_color(obj, pinfo->span);
             label_draw_dsc.opa = lv_span_get_style_text_opa(obj, pinfo->span);
             label_draw_dsc.font = lv_span_get_style_text_font(obj, pinfo->span);

@@ -2,7 +2,7 @@ class ScrollExample_3():
     def __init__(self):
         self.btn_cnt = 1
         #
-        # Create a list a with a floating button
+        # Create a list with a floating button
         #
 
         list = lv.list(lv.scr_act())
