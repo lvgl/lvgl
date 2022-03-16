@@ -373,6 +373,15 @@
  * GPU
  *-----------*/
 
+/*Use Arm's 2D acceleration library Arm-2D */
+#ifndef LV_USE_GPU_ARM2D
+    #ifdef CONFIG_LV_USE_GPU_ARM2D
+        #define LV_USE_GPU_ARM2D CONFIG_LV_USE_GPU_ARM2D
+    #else
+        #define LV_USE_GPU_ARM2D 0
+    #endif
+#endif
+
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #ifndef LV_USE_GPU_STM32_DMA2D
     #ifdef CONFIG_LV_USE_GPU_STM32_DMA2D

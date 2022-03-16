@@ -207,9 +207,15 @@ menu "LVGL configuration"
         menu "GPU"
             config LV_USE_EXTERNAL_RENDERER
                 bool
-
+                
+            config LV_USE_GPU_ARM2D
+                bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors."
             config LV_USE_GPU_STM32_DMA2D
                 bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
+                default n
+                help
+                    Must deploy arm-2d library to your project and add include PATH for "arm_2d.h".
+                
             config LV_GPU_DMA2D_CMSIS_INCLUDE
                 string "include path of CMSIS header of target processor"
                 depends on LV_USE_GPU_STM32_DMA2D
