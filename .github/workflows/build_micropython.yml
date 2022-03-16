@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     name: Build ${{ matrix.port }} port
     runs-on: ubuntu-latest
     continue-on-error: true

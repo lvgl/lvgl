@@ -31,13 +31,15 @@ extern "C" {
 #define LV_STYLE_SENTINEL_VALUE     0xAABBCCDD
 
 /**
- * Flags for style properties
+ * Flags for style behavior
+ *
+ * The rest of the flags will have _FLAG added to their name in v9.
  */
-#define LV_STYLE_PROP_INHERIT               (1 << 10)  /*Inherited*/
-#define LV_STYLE_PROP_EXT_DRAW              (1 << 11)  /*Requires ext. draw size update when changed*/
-#define LV_STYLE_PROP_LAYOUT_REFR           (1 << 12)  /*Requires layout update when changed*/
-#define LV_STYLE_PROP_PARENT_LAYOUT_REFR    (1 << 13)  /*Requires layout update on parent when changed*/
-#define LV_STYLE_PROP_FILTER                (1 << 14)  /*Apply color filter*/
+#define LV_STYLE_PROP_FLAG_NONE             (0)
+#define LV_STYLE_PROP_INHERIT               (1 << 0)  /*Inherited*/
+#define LV_STYLE_PROP_EXT_DRAW              (1 << 1)  /*Requires ext. draw size update when changed*/
+#define LV_STYLE_PROP_LAYOUT_REFR           (1 << 2)  /*Requires layout update when changed*/
+#define LV_STYLE_PROP_PARENT_LAYOUT_REFR    (1 << 3)  /*Requires layout update on parent when changed*/
 
 /**
  * Other constants
@@ -153,123 +155,110 @@ typedef union {
 
 /**
  * Enumeration of all built in style properties
+ *
+ * Props are split into groups of 16. When adding a new prop to a group, ensure it does not overflow into the next one.
  */
 typedef enum {
-    LV_STYLE_PROP_INV                = 0,
+    LV_STYLE_PROP_INV,
 
     /*Group 0*/
-    LV_STYLE_WIDTH                   = 1 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MIN_WIDTH               = 2 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MAX_WIDTH               = 3 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_HEIGHT                  = 4 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MIN_HEIGHT              = 5 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_MAX_HEIGHT              = 6 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_X                       = 7 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_Y                       = 8 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_ALIGN                   = 9 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_WIDTH         = 10 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSFORM_HEIGHT        = 11 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_TRANSLATE_X             = 12 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSLATE_Y             = 13 | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_ZOOM          = 14 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
-    LV_STYLE_TRANSFORM_ANGLE         = 15 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR | LV_STYLE_PROP_PARENT_LAYOUT_REFR,
+    LV_STYLE_WIDTH                  = 1,
+    LV_STYLE_MIN_WIDTH              = 2,
+    LV_STYLE_MAX_WIDTH              = 3,
+    LV_STYLE_HEIGHT                 = 4,
+    LV_STYLE_MIN_HEIGHT             = 5,
+    LV_STYLE_MAX_HEIGHT             = 6,
+    LV_STYLE_X                      = 7,
+    LV_STYLE_Y                      = 8,
+    LV_STYLE_ALIGN                  = 9,
+    LV_STYLE_TRANSFORM_WIDTH        = 10,
+    LV_STYLE_TRANSFORM_HEIGHT       = 11,
+    LV_STYLE_TRANSLATE_X            = 12,
+    LV_STYLE_TRANSLATE_Y            = 13,
+    LV_STYLE_TRANSFORM_ZOOM         = 14,
+    LV_STYLE_TRANSFORM_ANGLE        = 15,
 
     /*Group 1*/
-    LV_STYLE_PAD_TOP                 = 16 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_PAD_BOTTOM              = 17 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_PAD_LEFT                = 18 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_PAD_RIGHT               = 19 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_PAD_ROW                 = 20 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_PAD_COLUMN              = 21 | LV_STYLE_PROP_EXT_DRAW | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_PAD_TOP                = 16,
+    LV_STYLE_PAD_BOTTOM             = 17,
+    LV_STYLE_PAD_LEFT               = 18,
+    LV_STYLE_PAD_RIGHT              = 19,
+    LV_STYLE_PAD_ROW                = 20,
+    LV_STYLE_PAD_COLUMN             = 21,
 
     /*Group 2*/
-    LV_STYLE_BG_COLOR                = 32,
-    LV_STYLE_BG_COLOR_FILTERED       = 32 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BG_OPA                  = 33,
-    LV_STYLE_BG_GRAD_COLOR           = 34,
-    LV_STYLE_BG_GRAD_COLOR_FILTERED  = 34 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BG_GRAD_DIR             = 35,
-    LV_STYLE_BG_MAIN_STOP            = 36,
-    LV_STYLE_BG_GRAD_STOP            = 37,
-    LV_STYLE_BG_GRAD                 = 38,
-    LV_STYLE_BG_DITHER_MODE          = 39,
-
-
-    LV_STYLE_BG_IMG_SRC              = 40 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_BG_IMG_OPA              = 41,
-    LV_STYLE_BG_IMG_RECOLOR          = 42,
-    LV_STYLE_BG_IMG_RECOLOR_FILTERED = 42 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BG_IMG_RECOLOR_OPA      = 43,
-    LV_STYLE_BG_IMG_TILED            = 44,
+    LV_STYLE_BG_COLOR               = 32,
+    LV_STYLE_BG_OPA                 = 33,
+    LV_STYLE_BG_GRAD_COLOR          = 34,
+    LV_STYLE_BG_GRAD_DIR            = 35,
+    LV_STYLE_BG_MAIN_STOP           = 36,
+    LV_STYLE_BG_GRAD_STOP           = 37,
+    LV_STYLE_BG_GRAD                = 38,
+    LV_STYLE_BG_DITHER_MODE         = 39,
+    LV_STYLE_BG_IMG_SRC             = 40,
+    LV_STYLE_BG_IMG_OPA             = 41,
+    LV_STYLE_BG_IMG_RECOLOR         = 42,
+    LV_STYLE_BG_IMG_RECOLOR_OPA     = 43,
+    LV_STYLE_BG_IMG_TILED           = 44,
 
     /*Group 3*/
-    LV_STYLE_BORDER_COLOR            = 48,
-    LV_STYLE_BORDER_COLOR_FILTERED   = 48 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_BORDER_OPA              = 49,
-    LV_STYLE_BORDER_WIDTH            = 50 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_BORDER_SIDE             = 51,
-    LV_STYLE_BORDER_POST             = 52,
-
-    LV_STYLE_OUTLINE_WIDTH           = 58 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_OUTLINE_COLOR           = 59,
-    LV_STYLE_OUTLINE_COLOR_FILTERED  = 59 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_OUTLINE_OPA             = 60 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_OUTLINE_PAD             = 61 | LV_STYLE_PROP_EXT_DRAW,
+    LV_STYLE_BORDER_COLOR           = 48,
+    LV_STYLE_BORDER_OPA             = 49,
+    LV_STYLE_BORDER_WIDTH           = 50,
+    LV_STYLE_BORDER_SIDE            = 51,
+    LV_STYLE_BORDER_POST            = 52,
+    LV_STYLE_OUTLINE_WIDTH          = 53,
+    LV_STYLE_OUTLINE_COLOR          = 54,
+    LV_STYLE_OUTLINE_OPA            = 55,
+    LV_STYLE_OUTLINE_PAD            = 56,
 
     /*Group 4*/
-    LV_STYLE_SHADOW_WIDTH            = 64 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_OFS_X            = 65 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_OFS_Y            = 66 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_SPREAD           = 67 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_SHADOW_COLOR            = 68,
-    LV_STYLE_SHADOW_COLOR_FILTERED   = 68 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_SHADOW_OPA              = 69 | LV_STYLE_PROP_EXT_DRAW,
-
-    LV_STYLE_IMG_OPA                 = 70,
-    LV_STYLE_IMG_RECOLOR             = 71,
-    LV_STYLE_IMG_RECOLOR_FILTERED    = 71 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_IMG_RECOLOR_OPA         = 72,
-
-    LV_STYLE_LINE_WIDTH              = 73 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_LINE_DASH_WIDTH         = 74,
-    LV_STYLE_LINE_DASH_GAP           = 75,
-    LV_STYLE_LINE_ROUNDED            = 76,
-    LV_STYLE_LINE_COLOR              = 77,
-    LV_STYLE_LINE_COLOR_FILTERED     = 77 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_LINE_OPA                = 78,
+    LV_STYLE_SHADOW_WIDTH           = 64,
+    LV_STYLE_SHADOW_OFS_X           = 65,
+    LV_STYLE_SHADOW_OFS_Y           = 66,
+    LV_STYLE_SHADOW_SPREAD          = 67,
+    LV_STYLE_SHADOW_COLOR           = 68,
+    LV_STYLE_SHADOW_OPA             = 69,
+    LV_STYLE_IMG_OPA                = 70,
+    LV_STYLE_IMG_RECOLOR            = 71,
+    LV_STYLE_IMG_RECOLOR_OPA        = 72,
+    LV_STYLE_LINE_WIDTH             = 73,
+    LV_STYLE_LINE_DASH_WIDTH        = 74,
+    LV_STYLE_LINE_DASH_GAP          = 75,
+    LV_STYLE_LINE_ROUNDED           = 76,
+    LV_STYLE_LINE_COLOR             = 77,
+    LV_STYLE_LINE_OPA               = 78,
 
     /*Group 5*/
-    LV_STYLE_ARC_WIDTH               = 80 | LV_STYLE_PROP_EXT_DRAW,
-    LV_STYLE_ARC_ROUNDED             = 81,
-    LV_STYLE_ARC_COLOR               = 82,
-    LV_STYLE_ARC_COLOR_FILTERED      = 82 | LV_STYLE_PROP_FILTER,
-    LV_STYLE_ARC_OPA                 = 83,
-    LV_STYLE_ARC_IMG_SRC             = 84,
-
-    LV_STYLE_TEXT_COLOR              = 87 | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_COLOR_FILTERED     = 87 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_FILTER,
-    LV_STYLE_TEXT_OPA                = 88 | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_FONT               = 89 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_TEXT_LETTER_SPACE       = 90 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_TEXT_LINE_SPACE         = 91 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_TEXT_DECOR              = 92 | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_TEXT_ALIGN              = 93 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_ARC_WIDTH              = 80,
+    LV_STYLE_ARC_ROUNDED            = 81,
+    LV_STYLE_ARC_COLOR              = 82,
+    LV_STYLE_ARC_OPA                = 83,
+    LV_STYLE_ARC_IMG_SRC            = 84,
+    LV_STYLE_TEXT_COLOR             = 85,
+    LV_STYLE_TEXT_OPA               = 86,
+    LV_STYLE_TEXT_FONT              = 87,
+    LV_STYLE_TEXT_LETTER_SPACE      = 88,
+    LV_STYLE_TEXT_LINE_SPACE        = 89,
+    LV_STYLE_TEXT_DECOR             = 90,
+    LV_STYLE_TEXT_ALIGN             = 91,
 
     /*Group 6*/
-    LV_STYLE_RADIUS                  = 96,
-    LV_STYLE_CLIP_CORNER             = 97,
-    LV_STYLE_OPA                     = 98 | LV_STYLE_PROP_INHERIT,
-    LV_STYLE_COLOR_FILTER_DSC        = 99,
-    LV_STYLE_COLOR_FILTER_OPA        = 100,
-    LV_STYLE_ANIM                    = 101,
-    LV_STYLE_ANIM_TIME               = 102,
-    LV_STYLE_ANIM_SPEED              = 103,
-    LV_STYLE_TRANSITION              = 104,
-    LV_STYLE_BLEND_MODE              = 105,
-    LV_STYLE_LAYOUT                  = 106 | LV_STYLE_PROP_LAYOUT_REFR,
-    LV_STYLE_BASE_DIR                = 107 | LV_STYLE_PROP_INHERIT | LV_STYLE_PROP_LAYOUT_REFR,
+    LV_STYLE_RADIUS                 = 96,
+    LV_STYLE_CLIP_CORNER            = 97,
+    LV_STYLE_OPA                    = 98,
+    LV_STYLE_COLOR_FILTER_DSC       = 99,
+    LV_STYLE_COLOR_FILTER_OPA       = 100,
+    LV_STYLE_ANIM                   = 101,
+    LV_STYLE_ANIM_TIME              = 102,
+    LV_STYLE_ANIM_SPEED             = 103,
+    LV_STYLE_TRANSITION             = 104,
+    LV_STYLE_BLEND_MODE             = 105,
+    LV_STYLE_LAYOUT                 = 106,
+    LV_STYLE_BASE_DIR               = 107,
 
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
+    _LV_STYLE_NUM_BUILT_IN_PROPS     = _LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
     LV_STYLE_PROP_ANY                = 0xFFFF
 } lv_style_prop_t;
@@ -340,7 +329,7 @@ void lv_style_reset(lv_style_t * style);
 
 /**
  * Register a new style property for custom usage
- * @return a new property ID.
+ * @return a new property ID, or LV_STYLE_PROP_INV if there are no more available.
  * @example
  * lv_style_prop_t MY_PROP;
  * static inline void lv_style_set_my_prop(lv_style_t * style, lv_color_t value) {
@@ -351,7 +340,12 @@ void lv_style_reset(lv_style_t * style);
  * ...
  * lv_style_set_my_prop(&style1, lv_palette_main(LV_PALETTE_RED));
  */
-lv_style_prop_t lv_style_register_prop(void);
+lv_style_prop_t lv_style_register_prop(uint8_t flag);
+
+/**
+ * Get the number of custom properties that have been registered thus far.
+ */
+lv_style_prop_t lv_style_get_num_custom_props(void);
 
 /**
  * Remove a property from a style
@@ -466,6 +460,14 @@ bool lv_style_is_empty(const lv_style_t * style);
  */
 uint8_t _lv_style_get_prop_group(lv_style_prop_t prop);
 
+/**
+ * Get the flags of a built-in or custom property.
+ *
+ * @param prop a style property
+ * @return the flags of the property
+ */
+uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop);
+
 #include "lv_style_gen.h"
 
 static inline void lv_style_set_size(lv_style_t * style, lv_coord_t value)
@@ -500,6 +502,20 @@ static inline void lv_style_set_pad_gap(lv_style_t * style, lv_coord_t value)
     lv_style_set_pad_column(style, value);
 }
 
+/**
+ * @brief Check if the style property has a specified behavioral flag.
+ *
+ * Do not pass multiple flags to this function as backwards-compatibility is not guaranteed
+ * for that.
+ *
+ * @param prop Property ID
+ * @param flag Flag
+ * @return true if the flag is set for this property
+ */
+static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
+{
+    return _lv_style_prop_lookup_flags(prop) & flag;
+}
 
 /*************************
  *    GLOBAL VARIABLES
