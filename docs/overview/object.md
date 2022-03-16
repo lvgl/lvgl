@@ -215,7 +215,7 @@ The object can be in a combination of the following states:
 - `LV_STATE_USER_3` Custom state
 - `LV_STATE_USER_4` Custom state
 
-The states are usually automatically changed by the library as the userinteracts qith an object (presses, releases, focuses, etc.). 
+The states are usually automatically changed by the library as the user interacts with an object (presses, releases, focuses, etc.). 
 However, the states can be changed manually too. 
 To set or clear given state (but leave the other states untouched) use `lv_obj_add/clear_state(obj, LV_STATE_...)`
 In both cases OR-ed state values can be used as well. E.g. `lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.

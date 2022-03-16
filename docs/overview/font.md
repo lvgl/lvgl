@@ -75,7 +75,7 @@ The symbols can be used singly as:
 lv_label_set_text(my_label, LV_SYMBOL_OK);
 ```
 
-Or with together with strings (compile time string concatenation):
+Or together with strings (compile time string concatenation):
 ```c
 lv_label_set_text(my_label, LV_SYMBOL_OK "Apply");
 ```
@@ -120,11 +120,11 @@ This list summarizes the effect of RTL base direction on objects:
 
 ### Arabic and Persian support
 There are some special rules to display Arabic and Persian characters: the *form* of a character depends on its position in the text. 
-A different form of the same letter needs to be used if is isolated, at start, middle or end positions. Besides these, some conjunction rules should also be taken into account.
+A different form of the same letter needs to be used when it is isolated, at start, middle or end positions. Besides these, some conjunction rules should also be taken into account.
 
 LVGL supports these rules if `LV_USE_ARABIC_PERSIAN_CHARS` is enabled.
 
-However, there some limitations:
+However, there are some limitations:
 - Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
 - Static text (i.e. const) is not processed. E.g. texts set by `lv_label_set_text()` will be "Arabic processed" but `lv_lable_set_text_static()` won't.
 - Text get functions (e.g. `lv_label_get_text()`) will return the processed text.
@@ -137,7 +137,7 @@ For subpixel rendering, the fonts need to be generated with special settings:
 - In the online converter tick the `Subpixel` box
 - In the command line tool use `--lcd` flag. Note that the generated font needs about three times more memory.
 
-Subpixel rendering works only if the color channels of the pixels have a horizontal layout. That is the R, G, B channels are next each other and not above each other. 
+Subpixel rendering works only if the color channels of the pixels have a horizontal layout. That is the R, G, B channels are next to each other and not above each other. 
 The order of color channels also needs to match with the library settings. By default, LVGL assumes `RGB` order, however this can be swapped by setting `LV_SUBPX_BGR  1` in *lv_conf.h*.
 
 ### Compressed fonts
@@ -146,7 +146,7 @@ The bitmaps of fonts can be compressed by
 - not passing the `--no-compress` flag to the offline converter (compression is applied by default) 
 
 Compression is more effective with larger fonts and higher bpp. However, it's about 30% slower to render compressed fonts.
-Therefore it's recommended to compress only the largest fonts of a user interface, because
+Therefore, it's recommended to compress only the largest fonts of a user interface, because
 - they need the most memory 
 - they can be compressed better
 - and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
@@ -161,7 +161,7 @@ There are several ways to add a new font to your project:
 
 To declare a font in a file, use `LV_FONT_DECLARE(my_font_name)`.
 
-To make fonts globally available (like the builtin fonts), add them to `LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
+To make fonts globally available (like the built-in fonts), add them to `LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
 
 ## Add new symbols
 The built-in symbols are created from the [FontAwesome](https://fontawesome.com/) font. 
@@ -209,8 +209,8 @@ To do this, a custom `lv_font_t` variable needs to be created:
 ```c
 /*Describe the properties of a font*/
 lv_font_t my_font;
-my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /*Set a callback to get info about gylphs*/
-my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /*Set a callback to get bitmap of a glyp*/
+my_font.get_glyph_dsc = my_get_glyph_dsc_cb;        /*Set a callback to get info about glyphs*/
+my_font.get_glyph_bitmap = my_get_glyph_bitmap_cb;  /*Set a callback to get bitmap of a glyph*/
 my_font.line_height = height;                       /*The real line height where any text fits*/
 my_font.base_line = base_line;                      /*Base line measured from the top of line_height*/
 my_font.dsc = something_required;                   /*Store any implementation specific data here*/
