@@ -227,7 +227,7 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
 
 #if LV_USE_GPU_NXP_PXP
-    if(!mask_any && !rotation && !scale
+    if(!mask_any && !scale
 #if LV_COLOR_DEPTH!=32
        && !lv_img_cf_has_alpha(cf)
 #endif
