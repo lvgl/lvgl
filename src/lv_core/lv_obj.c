@@ -3602,7 +3602,7 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
         lv_opa_t value_opa = lv_obj_get_style_value_opa(obj, part);
         if(value_opa > LV_OPA_MIN) {
             lv_style_int_t letter_space = lv_obj_get_style_value_letter_space(obj, part);
-            lv_style_int_t line_space = lv_obj_get_style_value_letter_space(obj, part);
+            lv_style_int_t line_space = lv_obj_get_style_value_line_space(obj, part);
             const lv_font_t * font = lv_obj_get_style_value_font(obj, part);
 
             lv_point_t txt_size;
