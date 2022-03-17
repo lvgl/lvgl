@@ -93,7 +93,7 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
 
         lv_color_t re_color;
         if (draw_dsc->recolor_opa > LV_OPA_TRANSP) {
-            re_color = lv_color_mix(draw_dsc->recolor, lv_color_white(), 255);
+            re_color = lv_color_mix(draw_dsc->recolor, lv_color_white(), draw_dsc->recolor_opa);
         } else {
             re_color = lv_color_white();
         }
@@ -102,7 +102,7 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
         color[0] = (float)re_color.ch.red/255.0f;
         color[1] = (float)re_color.ch.green/255.0f;
         color[2] = (float)re_color.ch.blue/255.0f;
-        color[3] = (float)draw_dsc->opa/255.0f;
+        color[3] = (float)draw_dsc->recolor_opa/255.0f;
 
         static GLfloat vertices[] = {
             0.0f, 1.0f, 0.0f, 1.0f,

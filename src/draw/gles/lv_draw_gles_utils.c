@@ -156,9 +156,9 @@ static char simple_img_fragment_shader_str[] =
     "void main() \n"
     "{\n"
     "    vec4 texture_color = texture2D(s_texture, v_uv); \n"
-    "    if (texture_color.a == 0.0) discard;\n"
-    "    vec4 mix_color =  u_color * vec4(texture_color.rgb, 1.0); \n"
-    "    gl_FragColor = u_color; \n"
+    "    if(texture_color.a < 0.1) discard; \n"
+    "    vec4 mix_color =  mix(vec4(texture_color.rgb, 1.0), vec4(u_color.rgb,1.0), u_color.a); \n"
+    "    gl_FragColor = mix_color; \n"
     "}\n";
 /**********************
  *      MACROS
