@@ -2167,6 +2167,15 @@
     #endif
 #endif
 
+/*draw img in label or span obj */
+#ifndef LV_USE_IMGFONT
+    #ifdef CONFIG_LV_USE_IMGFONT
+        #define LV_USE_IMGFONT CONFIG_LV_USE_IMGFONT
+    #else
+        #define LV_USE_IMGFONT 0
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
