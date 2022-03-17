@@ -964,9 +964,6 @@ menu "LVGL configuration"
             endmenu
         endif
 
-        config LV_USE_IMGFONT
-            bool "draw img in label or span obj"
-
         config LV_USE_RLOTTIE
             bool "Lottie library"
 
@@ -985,6 +982,10 @@ menu "LVGL configuration"
 
         config LV_USE_MONKEY
             bool "Enable Monkey test"
+            default n
+
+        config LV_USE_IMGFONT
+            bool "draw img in label or span obj"
             default n
     endmenu
 
