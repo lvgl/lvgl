@@ -151,10 +151,14 @@ static char simple_img_fragment_shader_str[] =
     "precision mediump float;\n"
     "varying vec2 v_uv; \n"
     "uniform sampler2D s_texture;   \n"
+    "uniform vec4 u_color;   \n"
 
     "void main() \n"
     "{\n"
-    "    gl_FragColor = texture2D(s_texture, v_uv); \n"
+    "    vec4 texture_color = texture2D(s_texture, v_uv); \n"
+    "    if (texture_color.a == 0.0) discard;\n"
+    "    vec4 mix_color =  u_color * vec4(texture_color.rgb, 1.0); \n"
+    "    gl_FragColor = u_color; \n"
     "}\n";
 /**********************
  *      MACROS
@@ -243,6 +247,7 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     internals->simple_img_shader_uv_location = glGetAttribLocation(internals->simple_img_shader, "a_uv");
     internals->simple_img_shader_projection_location = glGetUniformLocation(internals->simple_img_shader, "u_projection");
     internals->simple_img_shader_model_location = glGetUniformLocation(internals->simple_img_shader, "u_model");
+    internals->simple_img_shader_color_location = glGetUniformLocation(internals->simple_img_shader, "u_color");
     internals->simple_img_shader_texture_location = glGetUniformLocation(internals->simple_img_shader, "s_texture");
     glUniformMatrix4fv(internals->simple_img_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);

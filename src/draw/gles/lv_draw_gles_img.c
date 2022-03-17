@@ -14,6 +14,7 @@
 #include "lv_draw_gles_img.h"
 #include "lv_draw_gles.h"
 #include "lv_draw_gles_utils.h"
+#include "../../misc/lv_color.h"
 
 #include LV_GPU_SDL_GLES_GLAD_INCLUDE_PATH
 
@@ -29,6 +30,7 @@
  *  STATIC PROTOTYPES
  **********************/
 void *bgra_to_rgba(void *data, int w, int h);
+//draw_img_simple(ctx, texture, header, draw_dsc, &t_coords, &t_clip);
 /**********************
  *      MACROS
  **********************/
@@ -88,6 +90,20 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
 
         //draw_img_simple(ctx, texture, header, draw_dsc, &t_coords, &t_clip);
 
+
+        lv_color_t re_color;
+        if (draw_dsc->recolor_opa > LV_OPA_TRANSP) {
+            re_color = lv_color_mix(draw_dsc->recolor, lv_color_white(), 255);
+        } else {
+            re_color = lv_color_white();
+        }
+
+        vec4 color;
+        color[0] = (float)re_color.ch.red/255.0f;
+        color[1] = (float)re_color.ch.green/255.0f;
+        color[2] = (float)re_color.ch.blue/255.0f;
+        color[3] = (float)draw_dsc->opa/255.0f;
+
         static GLfloat vertices[] = {
             0.0f, 1.0f, 0.0f, 1.0f,
             1.0f, 0.0f, 1.0f, 0.0f,
@@ -110,6 +126,7 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
+        glUniform4f(internals->simple_img_shader_color_location, color[0], color[1], color[2], color[3]);
         glVertexAttribPointer(internals->simple_img_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), vertices);
         glEnableVertexAttribArray(internals->simple_img_shader);
         glVertexAttribPointer(internals->simple_img_shader_uv_location, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), &vertices[2]);

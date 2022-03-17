@@ -42,6 +42,7 @@
 #if LV_USE_GPU_SDL_GLES
 
 #include "../lv_draw.h"
+#include "lv_draw_gles_utils.h"
 
 
 
@@ -69,6 +70,7 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
                               uint32_t letter)
 {
     lv_draw_sw_letter(draw_ctx, dsc, pos_p, letter);
+    lv_draw_gles_utils_upload_texture(draw_ctx);
 }
 
 
