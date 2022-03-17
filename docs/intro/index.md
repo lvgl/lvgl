@@ -102,7 +102,7 @@ The core repositories have at least the following branches:
 The changes are recorded in [CHANGELOG.md](/CHANGELOG).
 
 ### Version support
-Before v8 every minor release of major releases is supported for 1 year.
+Before v8 the last minor release of each major series was supported for 1 year.
 Starting from v8, every minor release is supported for 1 year.
 
 | Version | Release date | Support end | Active |
