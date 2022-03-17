@@ -237,7 +237,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 0 || q->end_quarter == 0) {
@@ -252,7 +252,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 0) {
@@ -265,7 +265,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -282,7 +282,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     q->draw_ctx->clip_area = clip_area_ori;
@@ -304,7 +304,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 1 || q->end_quarter == 1) {
@@ -319,7 +319,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 1) {
@@ -332,7 +332,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -349,7 +349,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     q->draw_ctx->clip_area = clip_area_ori;
@@ -371,7 +371,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 2 || q->end_quarter == 2) {
@@ -386,7 +386,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 2) {
@@ -399,7 +399,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -416,7 +416,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     q->draw_ctx->clip_area = clip_area_ori;
@@ -438,7 +438,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 3 || q->end_quarter == 3) {
@@ -453,7 +453,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 3) {
@@ -466,7 +466,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -483,7 +483,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
 
