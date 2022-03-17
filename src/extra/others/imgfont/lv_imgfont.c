@@ -88,6 +88,7 @@ void lv_imgfont_destroy(lv_font_t * font)
 
 static const uint8_t * imgfont_get_glyph_bitmap(const lv_font_t * font, uint32_t unicode)
 {
+    LV_UNUSED(unicode);
     LV_ASSERT_NULL(font);
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
     return (uint8_t *)dsc->path;

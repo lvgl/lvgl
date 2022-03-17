@@ -4,7 +4,7 @@
 #if LV_BUILD_EXAMPLES
 #if LV_USE_IMGFONT
 
-LV_IMG_DECLARE(emoji_F617);
+LV_IMG_DECLARE(emoji_F617)
 static bool get_imgfont_path(const lv_font_t * font, void * img_src,
                              uint16_t len, uint32_t unicode, uint32_t unicode_next)
 {
