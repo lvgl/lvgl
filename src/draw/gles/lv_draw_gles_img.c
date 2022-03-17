@@ -121,6 +121,7 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
 #endif
         LV_LOG_USER("%d", glGetError());
         lv_draw_gles_utils_download_texture(draw_ctx);
+        return LV_RES_OK;
     }
 }
 
