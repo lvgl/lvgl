@@ -114,7 +114,7 @@ html_theme_options = {
     'logo_only': True,
 }
 # For site map generation
-html_baseurl = 'https://docs.lvgl.io/' + version + "/"
+html_baseurl = 'https://docs.lvgl.io/master/en/html/'
 sitemap_url_scheme = "{link}"
 
 # Add any paths that contain custom static files (such as style sheets) here,

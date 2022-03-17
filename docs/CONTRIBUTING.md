@@ -183,7 +183,7 @@ So with this, you already helped a lot!
 
 ### Tell what you have achieved
 
-Have you already started using LVGL in a [Simulator](/get-started/pc-simulator), a development board, or on your custom hardware? 
+Have you already started using LVGL in a [Simulator](/get-started/platforms/pc-simulator), a development board, or on your custom hardware? 
 Was it easy or were there some obstacles? Are you happy with the result? 
 Showing your project to others is a win-win situation because it increases your and LVGL's reputation at the same time.
 

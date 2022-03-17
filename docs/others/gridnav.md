@@ -10,10 +10,10 @@ If the children are arranged into a grid-like layout then the up, down, left and
 in the respective direction.
 
 It doesn't matter how the children are positioned, as only the current x and y coordinates are considered.
-This means that gridnav works with manually positioned children, as well as [Flex](/layouts/flex.html) and [Grid](/layouts/grid.html) layouts.
+This means that gridnav works with manually positioned children, as well as [Flex](/layouts/flex) and [Grid](/layouts/grid) layouts.
 
 Gridnav also works if the children are arranged into a single row or column.
-That makes it useful, for example, to simplify navigation on a [List widget](/widgets/extra/list.html).
+That makes it useful, for example, to simplify navigation on a [List widget](/widgets/extra/list).
 
 Gridnav assumes that the object to which gridnav is added is part of a [group](/overview/indev.html#groups). 
 This way, if the object with gridnav is focused, the arrow key presses are automatically forwarded to the object

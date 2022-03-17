@@ -10,8 +10,8 @@
    :maxdepth: 2
 
    pc-simulator
-   stm32
    nxp
+   stm32
    espressif
    arduino
    tasmota-berry
