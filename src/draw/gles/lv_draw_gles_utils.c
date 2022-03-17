@@ -285,7 +285,7 @@ static void lvgl_buf_to_opengl_buf(GLubyte *opengl_buf, const void *lvgl_buf)
     lv_color_t *buf = (lv_color_t*)lvgl_buf;
     for (uint32_t y=0; y<LV_GPU_SDL_GLES_VER_RES; y++) {
         for (uint32_t x=0; x<LV_GPU_SDL_GLES_HOR_RES; x++) {
-            uint32_t index = (y * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+            uint32_t index = ((LV_GPU_SDL_GLES_VER_RES - y - 1) * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
             opengl_buf[index++] = buf->ch.red;
             opengl_buf[index++] = buf->ch.green;
             opengl_buf[index++] = buf->ch.blue;
@@ -300,7 +300,8 @@ static void opengl_buf_to_lvgl_buf(void *lvgl_buf, const GLubyte *opengl_buf)
     lv_color_t *buf = (lv_color_t*)lvgl_buf;
     for (uint32_t y=0; y<LV_GPU_SDL_GLES_VER_RES; y++) {
         for (uint32_t x=0; x<LV_GPU_SDL_GLES_HOR_RES; x++) {
-            uint32_t index = (y * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+            //uint32_t index = (y * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+            uint32_t index = ((LV_GPU_SDL_GLES_VER_RES - y - 1) * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
             buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.red = opengl_buf[index++];
             buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.green = opengl_buf[index++];
             buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.blue = opengl_buf[index++];

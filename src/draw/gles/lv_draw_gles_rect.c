@@ -47,10 +47,11 @@ void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, c
 
 void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
+    LV_LOG_USER("RECT");
     /* Do software drawing */
- //   lv_draw_sw_rect(draw_ctx, dsc, coords);
+    //lv_draw_sw_rect(draw_ctx, dsc, coords);
 
-   // lv_draw_gles_utils_upload_texture(draw_ctx);
+    //lv_draw_gles_utils_upload_texture(draw_ctx);
     /* Do opengl drawing */
     opengl_draw_rect(draw_ctx, dsc, coords);
     lv_draw_gles_utils_download_texture(draw_ctx);
@@ -62,6 +63,7 @@ void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
 
 void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
+    //if(coords->x2 - coords->x1 <799) return;
     lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
     lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
 
