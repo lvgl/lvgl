@@ -663,6 +663,9 @@
 /*1: Enable lv_obj fragment*/
 #define LV_USE_FRAGMENT 0
 
+/*draw img in label or span obj */
+#define LV_USE_IMGFONT 0
+
 /*==================
 * EXAMPLES
 *==================*/
