@@ -55,6 +55,13 @@ void lv_fragment_del(lv_fragment_t * fragment)
     lv_mem_free(fragment);
 }
 
+lv_fragment_manager_t * lv_fragment_get_manager(lv_fragment_t * fragment)
+{
+    LV_ASSERT_NULL(fragment);
+    LV_ASSERT_NULL(fragment->managed);
+    return fragment->managed->manager;
+}
+
 lv_obj_t * const * lv_fragment_get_container(lv_fragment_t * fragment)
 {
     LV_ASSERT_NULL(fragment);
