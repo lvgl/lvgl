@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/get-started/tasmota-berry.md
+:github_url: |github_link_base|/get-started/platforms/tasmota-berry.md
 ```
 # Tasmota and berry
 

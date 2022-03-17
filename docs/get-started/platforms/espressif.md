@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/get-started/espressif.md
+:github_url: |github_link_base|/get-started/platforms/espressif.md
 ```
 
 # Espressif (ESP32 chip series)

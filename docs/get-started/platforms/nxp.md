@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst
-:github_url: |github_link_base|/get-started/nxp.md
+:github_url: |github_link_base|/get-started/platforms/nxp.md
 ```
 # NXP
 NXP has integrated LVGL into the MCUXpresso SDK packages for several of their general
