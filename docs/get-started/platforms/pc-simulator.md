@@ -1,6 +1,6 @@
 ```eval_rst
 .. include:: /header.rst 
-:github_url: |github_link_base|/get-started/pc-simulator.md
+:github_url: |github_link_base|/get-started/platoforms/simulator.md
 ```
 # Simulator on PC
 

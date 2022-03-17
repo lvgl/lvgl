@@ -8,7 +8,7 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
 2. Read the [Introduction](https://docs.lvgl.io/latest/en/html/intro/index.html) page of the documentation (5 minutes)
 3. Read the [Quick overview](https://docs.lvgl.io/master/get-started/quick-overview.html) page of the documentation (15 minutes)
-4. Set up a [Simulator](https://docs.lvgl.io/master/get-started/pc-simulator.html) (10 minutes)
+4. Set up a [Simulator](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) (10 minutes)
 5. Try out some [Examples](https://docs.lvgl.io/master/examples.html)
 6. Check out the Platform-specific tutorials. (in this section below). (10 minutes) 
 7. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_&type=&language=)
@@ -23,16 +23,8 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 .. toctree::
    :maxdepth: 2
 
-   quick-overview
-   pc-simulator
-   stm32
-   nxp
-   espressif
-   arduino
-   micropython
-   tasmota-berry
-   nuttx
-   rt-thread
-   cmake
+   platforms/index
+   os/index
+   bindings/index
 ```
 
