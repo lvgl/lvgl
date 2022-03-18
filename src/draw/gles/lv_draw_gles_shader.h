@@ -22,14 +22,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define RECT_VERTEX_SHADER_SRC  \
-    "attribute vec2 a_position;"  \
-    "uniform mat4 u_projection;"\
-    "uniform mat4 u_model;"\
-    "void main()"\
-    "{"\
-    "   gl_Position = u_projection * u_model * vec4(a_position.x, a_position.y, 0.0, 1.0);"\
-    "}"
 
 #define PLAIN_RECT_VERTEX_SHADER_SRC  \
     "attribute vec2 a_position;"  \

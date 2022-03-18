@@ -91,17 +91,6 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
               projection);
     lv_draw_gles_math_mat4_copy(projection, internals->projection);
 
-    internals->rect_shader = shader_program_create( RECT_VERTEX_SHADER_SRC, PLAIN_RECT_FRAGMENT_SHADER_SRC);
-    glUseProgram(internals->rect_shader);
-    internals->rect_shader_pos_location = glGetAttribLocation(internals->rect_shader, "a_position");
-    internals->rect_shader_projection_location = glGetUniformLocation(internals->rect_shader, "u_projection");
-    internals->rect_shader_model_location = glGetUniformLocation(internals->rect_shader, "u_model");
-    internals->rect_shader_color_location = glGetUniformLocation(internals->rect_shader, "u_color");
-    internals->rect_shader_resolution_location = glGetUniformLocation(internals->rect_shader, "u_resolution");
-    internals->rect_shader_radius_location = glGetUniformLocation(internals->rect_shader, "u_radius");
-    internals->rect_shader_coords_location = glGetUniformLocation(internals->rect_shader, "u_coords");
-    glUniformMatrix4fv(internals->rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
-    glUseProgram(0);
 
     internals->plain_rect_shader = shader_program_create(PLAIN_RECT_VERTEX_SHADER_SRC, PLAIN_RECT_FRAGMENT_SHADER_SRC);
     glUseProgram(internals->plain_rect_shader);
@@ -109,7 +98,7 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     internals->plain_rect_shader_projection_location = glGetUniformLocation(internals->plain_rect_shader, "u_projection");
     internals->plain_rect_shader_model_location = glGetUniformLocation(internals->plain_rect_shader, "u_model");
     internals->plain_rect_shader_color_location = glGetUniformLocation(internals->plain_rect_shader, "u_color");
-    glUniformMatrix4fv(internals->rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
+    glUniformMatrix4fv(internals->plain_rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);
 
     internals->corner_rect_shader = shader_program_create(CORNER_RECT_VERTEX_SHADER_SRC, CORNER_RECT_FRAGMENT_SHADER_SRC);

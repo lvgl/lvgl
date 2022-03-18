@@ -195,62 +195,9 @@ void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, 
         //lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
        // mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
 
+    } else {
+        /* TODO(tan): handle it */
     }
-#if 0
-    vec2 resolution;
-    resolution[0] = (float)coords->x2 - (float)coords->x1;
-    resolution[1] = (float)coords->y2 - (float)coords->y1;
-
-    vec4 color;
-    color[0] = (float)bg_color.ch.red/255.0f;
-    color[1] = (float)bg_color.ch.green/255.0f;
-    color[2] = (float)bg_color.ch.blue/255.0f;
-    color[3] = (float)bg_color.ch.alpha/255.0f;
-
-    vec4 shader_coords;
-    shader_coords[0] = (float)coords->x1;
-    shader_coords[1] = (float)coords->x2;
-    shader_coords[2] = (float)coords->y1;
-    shader_coords[3] = (float)coords->y2;
-
-    static GLfloat vertices[] = {
-        0.0f, 1.0f,
-        1.0f, 0.0f,
-        0.0f, 0.0f,
-
-        0.0f, 1.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-    };
-
-    mat4 model;
-    glm_mat4_identity(model);
-    glm_translate(model, (vec3) {coords->x1, coords->y2});
-    glm_scale(model, (vec3) {coords->x2 - coords->x1, coords->y1 - coords->y2});
-    LV_LOG_USER("coords: x1 :%d x2: %d y1 : %d y2 : %d", coords->x1,
-                                                         coords->x2,
-                coords->y1,
-                coords->y2);
-
-
-
-                glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
-    //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(internals->rect_shader);
-
-    glUniform4f(internals->rect_shader_color_location, color[0], color[1], color[2], color[3]);
-    glUniform4f(internals->rect_shader_coords_location, shader_coords[0], shader_coords[1], shader_coords[2], shader_coords[3]);
-    glUniform2f(internals->rect_shader_resolution_location, resolution[0], resolution[1]);
-
-    glUniform1f(internals->rect_shader_radius_location, (float)rout);
-    glUniformMatrix4fv(internals->rect_shader_model_location, 1, GL_FALSE, &model[0][0]);
-    glVertexAttribPointer(internals->rect_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices);
-    glEnableVertexAttribArray(internals->rect_shader_pos_location);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-#endif
 }
 
 void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
