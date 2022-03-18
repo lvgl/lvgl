@@ -19,10 +19,6 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-/**
-* @file lv_draw_sdl_rect.c
-*
-*/
 
 /*********************
  *      INCLUDES
@@ -70,4 +66,4 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_SDL_GLES*/
+#endif /*LV_USE_GPU_GLES*/

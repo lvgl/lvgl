@@ -42,7 +42,7 @@ void lv_draw_gles_utils_download_texture(lv_draw_ctx_t * draw_ctx);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL_GLES*/
+#endif /*LV_USE_GPU_GLES*/
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

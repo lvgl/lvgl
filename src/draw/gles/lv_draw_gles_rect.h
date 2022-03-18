@@ -21,7 +21,6 @@ extern "C" {
 
 #include "../lv_draw.h"
 
-//#include "lv_draw_sdl_texture_cache.h"
 
 /*********************
  *      DEFINES
@@ -56,10 +55,10 @@ extern "C" {
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_GPU_GLES*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_SDL_RECT_H*/
+#endif /*LV_DRAW_GLES_RECT_H*/

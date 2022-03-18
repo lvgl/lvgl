@@ -98,7 +98,7 @@ typedef struct lv_draw_gles_context_internals_t {
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL_GLES*/
+#endif /*LV_USE_GPU_GLES*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

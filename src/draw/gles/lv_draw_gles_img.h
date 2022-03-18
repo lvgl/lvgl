@@ -40,7 +40,7 @@ lv_res_t lv_draw_gles_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_i
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_GPU_GLES*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

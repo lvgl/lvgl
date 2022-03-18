@@ -171,4 +171,4 @@ void *bgra_to_rgba(void *data, int w, int h)
 
     return res;
 }
-#endif /*LV_USE_GPU_SDL_GLES*/
+#endif /*LV_USE_GPU_GLES*/

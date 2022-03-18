@@ -348,4 +348,4 @@ void opengl_draw_corner_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }
-#endif /*LV_USE_GPU_SDL_GLES*/
+#endif /*LV_USE_GPU_GLES*/

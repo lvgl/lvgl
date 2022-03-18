@@ -367,4 +367,4 @@ static GLuint shader_program_create(const char *vertex_src, const char *fragment
     return program;
 }
 
-#endif /*LV_USE_GPU_SDL_GLES*/
+#endif /*LV_USE_GPU_GLES*/
