@@ -102,7 +102,7 @@ void lv_draw_sdl_texture_cache_put_advanced(lv_draw_sdl_ctx_t * ctx, const void 
     }
     if(flags & LV_DRAW_SDL_CACHE_FLAG_MANAGED) {
         /* Managed texture doesn't count into cache size */
-        LV_LOG_INFO("cache texture %p, %d*%d@%dbpp", texture, width, height, SDL_BITSPERPIXEL(format));
+        LV_LOG_INFO("cache texture %p", texture);
         lv_lru_set(lru, key, key_length, value, 1);
         return;
     }
