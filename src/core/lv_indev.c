@@ -47,6 +47,7 @@ static bool indev_reset_check(_lv_indev_proc_t * proc);
  **********************/
 static lv_indev_t * indev_act;
 static lv_obj_t * indev_obj_act = NULL;
+static bool indev_disabled = false;
 
 /**********************
  *      MACROS
@@ -76,6 +77,7 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     indev_proc_reset_query_handler(indev_act);
 
     if(indev_act->proc.disabled ||
+       indev_disabled ||
        indev_act->driver->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
     bool continue_reading;
     do {
@@ -118,6 +120,11 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     indev_obj_act = NULL;
 
     INDEV_TRACE("finished");
+}
+
+void lv_indev_enable(bool en)
+{
+    indev_disabled = en ? false : true;
 }
 
 void lv_indev_enable(lv_indev_t * indev, bool en)

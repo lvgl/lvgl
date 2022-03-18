@@ -36,6 +36,12 @@ extern "C" {
 void lv_indev_read_timer_cb(lv_timer_t * timer);
 
 /**
+ * Enable or disable all input devices (default enabled)
+ * @param en true to enable, false to disable
+ */
+void lv_indev_globally_enable(bool en);
+
+/**
  * Enable or disable an input device (default enabled)
  * @param indev pointer to an input device
  * @param en true to enable, false to disable
