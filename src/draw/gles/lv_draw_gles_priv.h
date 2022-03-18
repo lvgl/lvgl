@@ -15,10 +15,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
+#include "../../misc/lv_area.h"
 
-#if LV_USE_GPU_SDL_GLES
+#if LV_USE_GPU_GLES
 
-#include LV_GPU_SDL_GLES_GLAD_INCLUDE_PATH
+#include LV_GPU_GLES_GLAD_INCLUDE_PATH
 
 #include <cglm/cglm.h>
 
@@ -32,6 +33,9 @@ extern "C" {
  **********************/
 
 typedef struct lv_draw_gles_context_internals_t {
+    lv_coord_t hor;
+    lv_coord_t ver;
+
     GLubyte *gpu_texture_pixels;
     GLuint gpu_texture;
     GLuint framebuffer;

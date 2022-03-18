@@ -8,7 +8,7 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL_GLES
+#if LV_USE_GPU_GLES
 
 #include "lv_draw_gles.h"
 #include "lv_draw_gles_utils.h"
@@ -160,6 +160,9 @@ static char simple_img_fragment_shader_str[] =
     "    vec4 mix_color =  mix(vec4(texture_color.rgb, 1.0), vec4(u_color.rgb,1.0), u_color.a); \n"
     "    gl_FragColor = mix_color; \n"
     "}\n";
+
+static lv_coord_t hor;
+static lv_coord_t ver;
 /**********************
  *      MACROS
  **********************/
@@ -170,7 +173,7 @@ static char simple_img_fragment_shader_str[] =
 void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * internals)
 {
     /* Generate buffer for temp gpu texture */
-    internals->gpu_texture_pixels = malloc(LV_GPU_SDL_GLES_HOR_RES * LV_GPU_SDL_GLES_VER_RES * BYTES_PER_PIXEL * sizeof(GLubyte));
+    internals->gpu_texture_pixels = malloc(internals->hor *  internals->ver * BYTES_PER_PIXEL * sizeof(GLubyte));
     /* Maybe initialize with all zeros? */
 
     /* Generate temp gpu texture */
@@ -188,7 +191,7 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
     glBindTexture(GL_TEXTURE_2D, internals->gpu_texture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, LV_GPU_SDL_GLES_HOR_RES, LV_GPU_SDL_GLES_VER_RES, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, internals->hor, internals->ver, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, internals->gpu_texture, 0);
@@ -201,8 +204,8 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     mat4 projection;
     glm_mat4_identity(projection);
     glm_ortho(0.0f,
-              (float)LV_GPU_SDL_GLES_HOR_RES,
-              (float)LV_GPU_SDL_GLES_VER_RES,
+              (float)internals->hor,
+              (float)internals->ver,
               0.0f,
               -1.0f, 1.0f,
               projection);
@@ -251,6 +254,11 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     internals->simple_img_shader_texture_location = glGetUniformLocation(internals->simple_img_shader, "s_texture");
     glUniformMatrix4fv(internals->simple_img_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);
+
+    /* TODO(tan): It's dumb change later. */
+    hor = internals->hor;
+    ver = internals->ver;
+
 }
 
 void lv_draw_gles_utils_upload_texture(lv_draw_ctx_t * draw_ctx)
@@ -261,7 +269,7 @@ void lv_draw_gles_utils_upload_texture(lv_draw_ctx_t * draw_ctx)
     lvgl_buf_to_opengl_buf(internals->gpu_texture_pixels, draw_gles_ctx->base_draw.buf);
 
     glBindTexture(GL_TEXTURE_2D, internals->gpu_texture);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, LV_GPU_SDL_GLES_HOR_RES, LV_GPU_SDL_GLES_VER_RES, GL_RGBA, GL_UNSIGNED_BYTE, internals->gpu_texture_pixels);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, internals->hor, ver, GL_RGBA, GL_UNSIGNED_BYTE, internals->gpu_texture_pixels);
     glBindTexture(GL_TEXTURE_2D,0);
 
 }
@@ -273,7 +281,7 @@ void lv_draw_gles_utils_download_texture(lv_draw_ctx_t * draw_ctx)
 
     glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
 
-    glReadPixels(0, 0, LV_GPU_SDL_GLES_HOR_RES, LV_GPU_SDL_GLES_VER_RES,
+    glReadPixels(0, 0, internals->hor, ver,
                  GL_RGBA, GL_UNSIGNED_BYTE,
                  internals->gpu_texture_pixels);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -288,9 +296,9 @@ void lv_draw_gles_utils_download_texture(lv_draw_ctx_t * draw_ctx)
 static void lvgl_buf_to_opengl_buf(GLubyte *opengl_buf, const void *lvgl_buf)
 {
     lv_color_t *buf = (lv_color_t*)lvgl_buf;
-    for (uint32_t y=0; y<LV_GPU_SDL_GLES_VER_RES; y++) {
-        for (uint32_t x=0; x<LV_GPU_SDL_GLES_HOR_RES; x++) {
-            uint32_t index = ((LV_GPU_SDL_GLES_VER_RES - y - 1) * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+    for (uint32_t y=0; y<ver; y++) {
+        for (uint32_t x=0; x<hor; x++) {
+            uint32_t index = ((ver - y - 1) * hor * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
             opengl_buf[index++] = buf->ch.red;
             opengl_buf[index++] = buf->ch.green;
             opengl_buf[index++] = buf->ch.blue;
@@ -303,14 +311,14 @@ static void lvgl_buf_to_opengl_buf(GLubyte *opengl_buf, const void *lvgl_buf)
 static void opengl_buf_to_lvgl_buf(void *lvgl_buf, const GLubyte *opengl_buf)
 {
     lv_color_t *buf = (lv_color_t*)lvgl_buf;
-    for (uint32_t y=0; y<LV_GPU_SDL_GLES_VER_RES; y++) {
-        for (uint32_t x=0; x<LV_GPU_SDL_GLES_HOR_RES; x++) {
-            //uint32_t index = (y * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
-            uint32_t index = ((LV_GPU_SDL_GLES_VER_RES - y - 1) * LV_GPU_SDL_GLES_HOR_RES * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
-            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.red = opengl_buf[index++];
-            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.green = opengl_buf[index++];
-            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.blue = opengl_buf[index++];
-            buf[y*LV_GPU_SDL_GLES_HOR_RES + x].ch.alpha = opengl_buf[index++];
+    for (uint32_t y=0; y<ver; y++) {
+        for (uint32_t x=0; x<hor; x++) {
+            //uint32_t index = (y * internals->hor * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+            uint32_t index = ((ver - y - 1) * hor * BYTES_PER_PIXEL) + (x * BYTES_PER_PIXEL);
+            buf[y*hor + x].ch.red = opengl_buf[index++];
+            buf[y*hor + x].ch.green = opengl_buf[index++];
+            buf[y*hor + x].ch.blue = opengl_buf[index++];
+            buf[y*hor + x].ch.alpha = opengl_buf[index++];
         }
     }
 }

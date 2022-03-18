@@ -16,7 +16,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL_GLES
+#if LV_USE_GPU_GLES
 #include "../lv_draw.h"
 
 

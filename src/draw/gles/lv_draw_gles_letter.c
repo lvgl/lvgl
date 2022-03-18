@@ -3,14 +3,6 @@
  *
  */
 
-/*********************
- *      INCLUDES
- *********************/
-
-#include "../../lv_conf_internal.h"
-
-#if LV_USE_GPU_SDL_GLES
-
 
 /*********************
  *      DEFINES
@@ -39,14 +31,14 @@
 #include "../../lv_conf_internal.h"
 
 
-#if LV_USE_GPU_SDL_GLES
+#if LV_USE_GPU_GLES
 
 #include "../lv_draw.h"
 #include "lv_draw_gles_utils.h"
 
 
 
-#include LV_GPU_SDL_GLES_GLAD_INCLUDE_PATH
+#include LV_GPU_GLES_GLAD_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -73,12 +65,6 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     lv_draw_gles_utils_upload_texture(draw_ctx);
 }
 
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-#endif /*LV_USE_GPU_SDL_GLES*/
 
 /**********************
  *   STATIC FUNCTIONS

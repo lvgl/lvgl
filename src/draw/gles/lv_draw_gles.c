@@ -10,7 +10,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL_GLES
+#if LV_USE_GPU_GLES
 
 #include "lv_draw_gles.h"
 #include <src/draw/sw/lv_draw_sw.h>
@@ -89,6 +89,9 @@ void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_gles_ctx->internals = lv_mem_alloc(sizeof(lv_draw_gles_context_internals_t));
     /* TODO(tan): maybe use the standard memset? */
     lv_memset_00(draw_gles_ctx->internals, sizeof(lv_draw_gles_context_internals_t));
+    draw_gles_ctx->internals->hor = disp_drv->hor_res;
+    draw_gles_ctx->internals->ver = disp_drv->ver_res;
+
     lv_draw_gles_utils_internals_init(draw_gles_ctx->internals);
 
     draw_gles_ctx->base_draw.draw_rect = lv_draw_gles_draw_rect;
