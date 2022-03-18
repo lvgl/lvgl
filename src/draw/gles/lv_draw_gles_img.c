@@ -14,7 +14,6 @@
 #include "lv_draw_gles_img.h"
 #include "lv_draw_gles.h"
 #include "lv_draw_gles_utils.h"
-#include "../../misc/lv_color.h"
 
 #include LV_GPU_GLES_GLAD_INCLUDE_PATH
 
@@ -115,9 +114,9 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
         };
 
         mat4 model;
-        glm_mat4_identity(model);
-        glm_translate(model, (vec3) {t_coords.x1, t_coords.y1});
-        glm_scale(model, (vec3) {t_coords.x2 - t_coords.x1, t_coords.y2 - t_coords.y1});
+        lv_draw_gles_math_mat4_identity(model);
+        lv_draw_gles_math_translate(model, (vec3) {t_coords.x1, t_coords.y1});
+        lv_draw_gles_math_scale(model, (vec3) {t_coords.x2 - t_coords.x1, t_coords.y2 - t_coords.y1});
 #if 1
         glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
         glUseProgram(internals->simple_img_shader);
@@ -136,7 +135,6 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
-        LV_LOG_USER("%d", glGetError());
         lv_draw_gles_utils_download_texture(draw_ctx);
         return LV_RES_OK;
     }
@@ -154,7 +152,7 @@ void lv_draw_gles_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_im
 void *bgra_to_rgba(void *data, int w, int h)
 {
     uint8_t *input = (uint8_t*) data;
-    uint8_t *res = malloc(w * h * 4 * sizeof(uint8_t));
+    uint8_t *res = lv_mem_alloc(w * h * 4 * sizeof(uint8_t));
 
     uint32_t offset = 0;
 

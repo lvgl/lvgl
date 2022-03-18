@@ -21,8 +21,7 @@ extern "C" {
 
 #include LV_GPU_GLES_GLAD_INCLUDE_PATH
 
-#include <cglm/cglm.h>
-
+#include "lv_draw_gles_math.h"
 
 /*********************
  *      DEFINES

@@ -12,6 +12,7 @@
 
 #include "lv_draw_gles.h"
 #include "lv_draw_gles_utils.h"
+#include "lv_draw_gles_math.h"
 #include "../../misc/lv_log.h"
 #include "../../core/lv_refr.h"
 
@@ -173,7 +174,7 @@ static lv_coord_t ver;
 void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * internals)
 {
     /* Generate buffer for temp gpu texture */
-    internals->gpu_texture_pixels = malloc(internals->hor *  internals->ver * BYTES_PER_PIXEL * sizeof(GLubyte));
+    internals->gpu_texture_pixels = lv_mem_alloc(internals->hor *  internals->ver * BYTES_PER_PIXEL * sizeof(GLubyte));
     /* Maybe initialize with all zeros? */
 
     /* Generate temp gpu texture */
@@ -202,14 +203,14 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
 
 
     mat4 projection;
-    glm_mat4_identity(projection);
-    glm_ortho(0.0f,
+    lv_draw_gles_math_mat4_identity(projection);
+    lv_draw_gles_math_ortho(0.0f,
               (float)internals->hor,
               (float)internals->ver,
               0.0f,
               -1.0f, 1.0f,
               projection);
-    glm_mat4_ucopy(projection, internals->projection);
+    lv_draw_gles_math_mat4_copy(projection, internals->projection);
 
     internals->rect_shader = shader_program_create(rect_vertex_shader_str, rect_fragment_shader_str);
     glUseProgram(internals->rect_shader);
@@ -339,12 +340,12 @@ static GLuint shader_create(GLenum type, const char *src)
         GLint info_log_len = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &info_log_len);
 
-        char *info_log = malloc(info_log_len+1);
+        char *info_log = lv_mem_alloc(info_log_len+1);
         info_log[info_log_len] = '\0';
 
         glGetShaderInfoLog(shader, info_log_len, NULL, info_log);
-        fprintf(stderr, "Failed to compile shader : %s", info_log);
-        free(info_log);
+        LV_LOG_ERROR("Failed to compile shader : %s", info_log);
+        lv_mem_free(info_log);
     }
 
     return shader;
