@@ -233,7 +233,8 @@ static void style_init(void)
 #endif
 
     style_init_reset(&styles->scrollbar);
-    lv_color_t sb_color = (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY, 2) : lv_palette_main(LV_PALETTE_GREY);
+    lv_color_t sb_color = (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY,
+                                                                        2) : lv_palette_main(LV_PALETTE_GREY);
     lv_style_set_bg_color(&styles->scrollbar, sb_color);
 
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
