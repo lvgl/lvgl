@@ -88,8 +88,6 @@ void test_slider_event_invalid_key_should_not_change_values(void)
 
 void test_range_mode_slider_should_leave_edit_mode_when_released(void)
 {
-    lv_slider_t * ptr = (lv_slider_t *) sliderNormalMode;
-
     /* Setup group and encoder indev */
     lv_group_add_obj(g, sliderNormalMode);
     lv_group_set_editing(g, true);
