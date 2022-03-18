@@ -746,7 +746,7 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
         x_scroll = left_diff;
         /*Do not let scrolling in*/
         lv_coord_t sl = lv_obj_get_scroll_left(parent);
-        if(sl + x_scroll > 0) x_scroll = 0;
+        if(sl - x_scroll < 0) x_scroll = 0;
     }
     else if(right_diff > 0) {
         x_scroll = -right_diff;
