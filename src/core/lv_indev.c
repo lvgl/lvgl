@@ -122,7 +122,7 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     INDEV_TRACE("finished");
 }
 
-void lv_indev_enable(bool en)
+void lv_indev_globally_enable(bool en)
 {
     indev_disabled = en ? false : true;
 }
