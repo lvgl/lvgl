@@ -63,7 +63,7 @@ typedef uint16_t lv_state_t;
  * The possible parts of widgets.
  * The parts can be considered as the internal building block of the widgets.
  * E.g. slider = background + indicator + knob
- * Note every part is used by every widget
+ * Not all parts are used by every widget
  */
 enum {
     LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
