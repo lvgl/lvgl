@@ -685,7 +685,7 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
         item->coords.y1 += diff_y;
         item->coords.y2 += diff_y;
         lv_obj_invalidate(item);
-        lv_obj_move_children_by(item, diff_x, diff_y, true);
+        lv_obj_move_children_by(item, diff_x, diff_y, false);
     }
 }
 
