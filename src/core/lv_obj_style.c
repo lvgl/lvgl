@@ -666,18 +666,20 @@ static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, tran
         tr_prev = _lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
         if(tr->obj == obj && (part == tr->selector || part == LV_PART_ANY) && (prop == tr->prop || prop == LV_STYLE_PROP_ANY)) {
-            /*Remove the transitioned property from trans. style
+            /*Remove any transitioned properties from the trans. style
              *to allow changing it by normal styles*/
             uint32_t i;
             for(i = 0; i < obj->style_cnt; i++) {
                 if(obj->styles[i].is_trans && (part == LV_PART_ANY || obj->styles[i].selector == part)) {
                     lv_style_remove_prop(obj->styles[i].style, tr->prop);
-                    lv_anim_del(tr, NULL);
-                    _lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
-                    lv_mem_free(tr);
-                    removed = true;
                 }
             }
+
+            /*Free the transition descriptor too*/
+            lv_anim_del(tr, NULL);
+            _lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
+            lv_mem_free(tr);
+            removed = true;
 
         }
         tr = tr_prev;
