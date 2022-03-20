@@ -54,7 +54,7 @@ In this case LVGL will attempt to include `lv_conf.h` simply with `#include "lv_
 You can even use a different name for `lv_conf.h`. The custom path can be set via the `LV_CONF_PATH` define.
 For example `-DLV_CONF_PATH="/home/joe/my_project/my_custom_conf.h"`
 
-If `LV_CONF_SKIP` is defined, LVGL will not try to include `lv_conf.h`. Instead you can pass the config defines using build options. For example `"-DLV_COLOR_DEPTH=32 -DLV_USE_BTN 1"`. The unset options will get a default value which is the same as the ones in `lv_conf_template.h`.
+If `LV_CONF_SKIP` is defined, LVGL will not try to include `lv_conf.h`. Instead you can pass the config defines using build options. For example `"-DLV_COLOR_DEPTH=32 -DLV_USE_BTN=1"`. The unset options will get a default value which is the same as the ones in `lv_conf_template.h`.
 
 LVGL also can be used via `Kconfig` and `menuconfig`.  You can use `lv_conf.h` together with Kconfig, but keep in mind that the value from `lv_conf.h` or build settings (`-D...`) overwrite the values set in Kconfig. To ignore the configs from `lv_conf.h` simply remove its content, or define `LV_CONF_SKIP`. 
 
