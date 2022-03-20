@@ -71,23 +71,13 @@ target_link_libraries(MyFirmware PRIVATE lvgl::lvgl lvgl::examples)
 ```
 
 ## Building LVGL drivers and demos with CMake
-Exactly the same goes for the [drivers](https://github.com/lvgl/lv_drivers) and the [demos](https://github.com/lvgl/lv_demos).
+Exactly the same goes for the [drivers](https://github.com/lvgl/lv_drivers) and the [demos](https://github.com/lvgl/lvgl/demos).
 
 ```cmake
-# Specify path to own LVGL demos config header
-set(LV_DEMO_CONF_PATH
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/lv_demo_conf.h
-    CACHE STRING "" FORCE)
-
 FetchContent_Declare(lv_drivers
                      GIT_REPOSITORY https://github.com/lvgl/lv_drivers)
 FetchContent_MakeAvailable(lv_drivers)
-FetchContent_Declare(lv_demos
-                     GIT_REPOSITORY https://github.com/lvgl/lv_demos.git)
-FetchContent_MakeAvailable(lv_demos)
 
 # The target "MyFirmware" depends on LVGL, drivers and demos
 target_link_libraries(MyFirmware PRIVATE lvgl::lvgl lvgl::drivers lvgl::examples)
 ```
-
-Just like the [lv_conf.h](https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h) header demos comes with its own config header called [lv_demo_conf.h](https://github.com/lvgl/lv_demos/blob/master/lv_demo_conf_template.h). Analogous to `LV_CONF_PATH` its path can be set by using the option `LV_DEMO_CONF_PATH`.
