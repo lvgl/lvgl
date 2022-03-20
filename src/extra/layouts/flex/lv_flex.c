@@ -525,7 +525,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
             item->coords.y1 += diff_y;
             item->coords.y2 += diff_y;
             lv_obj_invalidate(item);
-            lv_obj_move_children_by(item, diff_x, diff_y, true);
+            lv_obj_move_children_by(item, diff_x, diff_y, false);
         }
 
         if(!(f->row && rtl)) main_pos += area_get_main_size(&item->coords) + item_gap + place_gap;
