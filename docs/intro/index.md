@@ -65,8 +65,7 @@ You can choose from [many different ways of contributing](/CONTRIBUTING) such as
 All repositories of the LVGL project are hosted on GitHub: https://github.com/lvgl
 
 You will find these repositories there:
-- [lvgl](https://github.com/lvgl/lvgl) The library itself with many [examples](https://github.com/lvgl/lvgl/blob/master/examples/).
-- [lv_demos](https://github.com/lvgl/lv_demos) Demos created with LVGL.
+- [lvgl](https://github.com/lvgl/lvgl) The library itself with many [examples](https://github.com/lvgl/lvgl/blob/master/examples/) and [demos](https://github.com/lvgl/lvgl/blob/master/demos/).
 - [lv_drivers](https://github.com/lvgl/lv_drivers) Display and input device drivers
 - [blog](https://github.com/lvgl/blog) Source of the blog's site (https://blog.lvgl.io)
 - [sim](https://github.com/lvgl/sim) Source of the online simulator's site (https://sim.lvgl.io)
