@@ -59,7 +59,7 @@ def slider_y_event_cb(e):
 # Display 1000 data points with zooming and scrolling.
 # See how the chart changes drawing mode (draw only vertical lines) when
 # the points get too crowded.
- 
+
 # Create a chart
 chart = lv.chart(lv.scr_act())
 chart.set_size(200, 150)

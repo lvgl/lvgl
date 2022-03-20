@@ -102,13 +102,13 @@ static void hal_init(void)
     disp_drv.hor_res = HOR_RES;
     disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
-    
+
     static lv_indev_drv_t indev_mouse_drv;
     lv_indev_drv_init(&indev_mouse_drv);
     indev_mouse_drv.type = LV_INDEV_TYPE_POINTER;
     indev_mouse_drv.read_cb = lv_test_mouse_read_cb;
     lv_test_mouse_indev = lv_indev_drv_register(&indev_mouse_drv);
-    
+
     static lv_indev_drv_t indev_keypad_drv;
     lv_indev_drv_init(&indev_keypad_drv);
     indev_keypad_drv.type = LV_INDEV_TYPE_KEYPAD;

@@ -21,7 +21,7 @@ panel.set_scroll_snap_x(lv.SCROLL_SNAP.CENTER)
 panel.set_flex_flow(lv.FLEX_FLOW.ROW)
 panel.center()
 
-for i in range(10): 
+for i in range(10):
     btn = lv.btn(panel)
     btn.set_size(150, 100)
 

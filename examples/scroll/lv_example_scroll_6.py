@@ -7,7 +7,7 @@ def scroll_event_cb(e):
     cont_y_center = cont_a.y1 + cont_a.get_height() // 2
 
     r = cont.get_height() * 7 // 10
-    
+
     child_cnt = cont.get_child_cnt()
     for i in range(child_cnt):
         child = cont.get_child(i)
@@ -20,7 +20,7 @@ def scroll_event_cb(e):
         diff_y = abs(diff_y)
 
         # Get the x of diff_y on a circle.
-        
+
         # If diff_y is out of the circle use the last point of the circle (the radius)
         if diff_y >= r:
             x = r
@@ -56,7 +56,7 @@ cont.set_scrollbar_mode(lv.SCROLLBAR_MODE.OFF)
 for i in range(20):
     btn = lv.btn(cont)
     btn.set_width(lv.pct(100))
-    
+
     label = lv.label(btn)
     label.set_text("Button " + str(i))
 

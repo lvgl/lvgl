@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/get-started/platforms/tasmota-berry.md
 ```
 # Tasmota and berry
@@ -39,10 +39,10 @@ Versions supported: LVGL v8.0.2, LodePNG v20201017, Freetype 2.10.4
 
 ### Tasmota + Berry + LVGL could be used for:
 
-- Fast prototyping GUI.  
+- Fast prototyping GUI.
 - Shortening the cycle of changing and fine-tuning the GUI.
 - Modelling the GUI in a more abstract way by defining reusable composite objects, taking advantage of Berry's language features such as Inheritance, Closures, Exception Handling...
-- Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.  
+- Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.
 
 A higher level interface compatible with [OpenHASP](https://github.com/HASwitchPlate/openHASP) is also under development.
 
@@ -53,7 +53,7 @@ A higher level interface compatible with [OpenHASP](https://github.com/HASwitchP
 > TL;DR:
 > Similar to MicroPython, it's very much like the C API, but Object-Oriented for LVGL components.
 
-Let's dive right into an example!  
+Let's dive right into an example!
 
 ### A simple example
 

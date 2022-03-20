@@ -7,7 +7,7 @@ def slider_event_cb(evt):
 #
 # Create a slider and write its value on a label.
 #
-            
+
 # Create a slider in the center of the display
 slider = lv.slider(lv.scr_act())
 slider.set_width(200)                                              # Set the width

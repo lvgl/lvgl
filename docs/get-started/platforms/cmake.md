@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/get-started/platforms/cmake.md
 ```
 
@@ -46,14 +46,14 @@ This configuration declares a dependency between the two targets **MyFirmware** 
 
 ### Additional CMake options
 Besides `LV_CONF_PATH` there are two additional CMake options to specify include paths.
-  
-`LV_LVGL_H_INCLUDE_SIMPLE` which specifies whether to `#include "lvgl.h"` absolut or relative 
+
+`LV_LVGL_H_INCLUDE_SIMPLE` which specifies whether to `#include "lvgl.h"` absolut or relative
 
 | ON (default) | OFF            |
 | ------------ | -------------- |
 | "lvgl.h"     | "../../lvgl.h" |
 
-`LV_CONF_INCLUDE_SIMPLE` which specifies whether to `#include "lv_conf.h"` and `"lv_drv_conf.h"` absolut or relative  
+`LV_CONF_INCLUDE_SIMPLE` which specifies whether to `#include "lv_conf.h"` and `"lv_drv_conf.h"` absolut or relative
 
 | ON (default)    | OFF                   |
 | --------------- | --------------------- |

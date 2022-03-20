@@ -13,10 +13,10 @@ try:
 except:
     print("Could not find animimg001.png")
     sys.exit()
-    
+
 anim_imgs[0] = lv.img_dsc_t({
   'data_size': len(anim001_data),
-  'data': anim001_data 
+  'data': anim001_data
 })
 
 try:
@@ -25,10 +25,10 @@ try:
 except:
     print("Could not find animimg002.png")
     sys.exit()
-    
+
 anim_imgs[1] = lv.img_dsc_t({
   'data_size': len(anim002_data),
-  'data': anim002_data 
+  'data': anim002_data
 })
 
 try:
@@ -37,10 +37,10 @@ try:
 except:
     print("Could not find animimg003.png")
     sys.exit()
-    
+
 anim_imgs[2] = lv.img_dsc_t({
   'data_size': len(anim003_data),
-  'data': anim003_data 
+  'data': anim003_data
 })
 
 animimg0 = lv.animimg(lv.scr_act())

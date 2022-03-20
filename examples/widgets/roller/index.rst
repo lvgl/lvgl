@@ -1,10 +1,10 @@
 
-Simple Roller 
+Simple Roller
 """"""""""""""""
 
 .. lv_example:: widgets/roller/lv_example_roller_1
   :language: c
-  
+
 Styling the roller
 """"""""""""""""""
 

@@ -12,10 +12,10 @@ try:
 except:
     print("Could not find imgbtn_left.png")
     sys.exit()
-    
+
 imgbtn_left_dsc = lv.img_dsc_t({
   'data_size': len(imgbtn_left_data),
-  'data': imgbtn_left_data 
+  'data': imgbtn_left_data
 })
 
 try:
@@ -24,10 +24,10 @@ try:
 except:
     print("Could not find imgbtn_mid.png")
     sys.exit()
-    
+
 imgbtn_mid_dsc = lv.img_dsc_t({
   'data_size': len(imgbtn_mid_data),
-  'data': imgbtn_mid_data 
+  'data': imgbtn_mid_data
 })
 
 try:
@@ -36,10 +36,10 @@ try:
 except:
     print("Could not find imgbtn_right.png")
     sys.exit()
-    
+
 imgbtn_right_dsc = lv.img_dsc_t({
   'data_size': len(imgbtn_right_data),
-  'data': imgbtn_right_data 
+  'data': imgbtn_right_data
 })
 
 # Create a transition animation on width transformation and recolor.

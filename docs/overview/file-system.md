@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/overview/file-system.md
 ```
 # File system
@@ -54,7 +54,7 @@ void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 
 `path` is the path after the drive letter (e.g. "S:path/to/file.txt" -> "path/to/file.txt"). `mode` can be `LV_FS_MODE_WR` or `LV_FS_MODE_RD` to open for writes or reads.
 
-The return value is a pointer to a *file object* that describes the opened file or `NULL` if there were any issues (e.g. the file wasn't found). 
+The return value is a pointer to a *file object* that describes the opened file or `NULL` if there were any issues (e.g. the file wasn't found).
 The returned file object will be passed to other file system related callbacks. (see below)
 
 ### Other callbacks
@@ -63,7 +63,7 @@ The other callbacks are quite similar. For example `write_cb` looks like this:
 lv_fs_res_t (*write_cb)(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
 ```
 
-For `file_p`, LVGL passes the return value of `open_cb`, `buf` is the data to write, `btw` is the Bytes To Write, `bw` is the actually written bytes. 
+For `file_p`, LVGL passes the return value of `open_cb`, `buf` is the data to write, `btw` is the Bytes To Write, `bw` is the actually written bytes.
 
 For a template of these callbacks see [lv_fs_template.c](https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_fs_template.c).
 

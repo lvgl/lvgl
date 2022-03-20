@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#include <stdbool.h> 
+#include <stdbool.h>
 #include "../../lvgl.h"
 
 bool lv_test_assert_img_eq(const char * fn_ref);
@@ -21,14 +21,14 @@ bool lv_test_assert_img_eq(const char * fn_ref);
                                                               TEST_IGNORE_MESSAGE("Requires 800x480 resolution"); \
                                                             } else {                                              \
                                                               TEST_ASSERT(lv_test_assert_img_eq(path));            \
-                                                            }                                                      
-                                                      
+                                                            }
+
 #  define TEST_ASSERT_EQUAL_SCREENSHOT_MESSAGE(path, msg)    if(LV_HOR_RES != 800 || LV_VER_RES != 480) {             \
                                                               TEST_PRINTF(msg);                                       \
                                                               TEST_IGNORE_MESSAGE("Requires 800x480 resolution");     \
                                                             } else {                                                  \
                                                               TEST_ASSERT_MESSAGE(lv_test_assert_img_eq(path), msg);  \
-                                                            }   
+                                                            }
 #endif
 
 #  define TEST_ASSERT_EQUAL_COLOR(c1, c2)                   TEST_ASSERT_EQUAL_UINT32(c1.full, c2.full)
