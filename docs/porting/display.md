@@ -38,7 +38,7 @@ Therefore it's recommended to choose the size of the draw buffer(s) to be at lea
 
 There are several settings to adjust the number draw buffers and buffering/refreshing modes.
 
-You can measure the performance of different configurations using the [benchmark example](https://github.com/lvgl/lv_demos/tree/master/src/lv_demo_benchmark).
+You can measure the performance of different configurations using the [benchmark example](https://github.com/lvgl/lvgl/tree/master/demos/benchmark).
 
 ### One buffer
 If only one buffer is used LVGL draws the content of the screen into that draw buffer and sends it to the display.

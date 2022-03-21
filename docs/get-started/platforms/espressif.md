@@ -10,7 +10,7 @@ More information about ESP-IDF build system can be found [here](https://docs.esp
 
 ## LVGL demo project for ESP32
 
-We've created [lv_port_esp32](https://github.com/lvgl/lv_port_esp32), a project using ESP-IDF and LVGL to show one of the demos from [lv_demos](https://github.com/lvgl/lv_demos).
+We've created [lv_port_esp32](https://github.com/lvgl/lv_port_esp32), a project using ESP-IDF and LVGL to show one of the demos from [demos](https://github.com/lvgl/lvgl/demos).
 You can configure the project to use one of the many supported display controllers and targets (chips).
 
 See [lvgl_esp32_drivers](https://github.com/lvgl/lvgl_esp32_drivers) repository for a complete list
