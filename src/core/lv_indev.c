@@ -77,7 +77,6 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     indev_proc_reset_query_handler(indev_act);
 
     if(indev_act->proc.disabled ||
-       indev_disabled ||
        indev_act->driver->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
     bool continue_reading;
     do {
@@ -122,16 +121,20 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     INDEV_TRACE("finished");
 }
 
-void lv_indev_globally_enable(bool en)
-{
-    indev_disabled = en ? false : true;
-}
-
 void lv_indev_enable(lv_indev_t * indev, bool en)
 {
-    if(!indev) return;
+    uint8_t enable = en ? 0 : 1
 
-    indev->proc.disabled = en ? 0 : 1;
+    if(indev) {
+        indev->proc.disabled = enable;
+    }
+    else {
+        lv_indev_t * i = lv_indev_get_next(NULL);
+        while(i) {
+            indev->proc.disabled = enable;
+            i = lv_indev_get_next(i);
+        }
+    }
 }
 
 lv_indev_t * lv_indev_get_act(void)
