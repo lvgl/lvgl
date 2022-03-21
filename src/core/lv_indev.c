@@ -47,7 +47,6 @@ static bool indev_reset_check(_lv_indev_proc_t * proc);
  **********************/
 static lv_indev_t * indev_act;
 static lv_obj_t * indev_obj_act = NULL;
-static bool indev_disabled = false;
 
 /**********************
  *      MACROS
