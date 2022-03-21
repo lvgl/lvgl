@@ -4,7 +4,7 @@ def anim_x_cb(label, v):
 def sw_event_cb(e,label):
     sw = e.get_target()
 
-    if sw.has_state(lv.STATE.CHECKED): 
+    if sw.has_state(lv.STATE.CHECKED):
         a = lv.anim_t()
         a.init()
         a.set_var(label)

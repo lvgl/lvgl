@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/get-started/platoforms/simulator.md
 ```
 # Simulator on PC
@@ -9,7 +9,7 @@ You can try out LVGL **using only your PC** (i.e. without any development boards
 
 Using the simulator on a PC has the following advantages:
 - Hardware independent - Write code, run it on the PC and see the result on a monitor.
-- Cross-platform - Any Windows, Linux or macOS system can run the PC simulator.  
+- Cross-platform - Any Windows, Linux or macOS system can run the PC simulator.
 - Portability - The written code is portable, which means you can simply copy it when migrating to embedded hardware.
 - Easy Validation - The simulator is also very useful to report bugs because it provides a common platform for every user. So it's a good idea to reproduce a bug in the simulator and use that code snippet in the [Forum](https://forum.lvgl.io).
 
@@ -34,7 +34,7 @@ The following section describes the set-up guide of Eclipse CDT in more detail.
 
 [Eclipse CDT](https://eclipse.org/cdt/) is a C/C++ IDE.
 
-Eclipse is a Java-based tool so be sure **Java Runtime Environment** is installed on your system.   
+Eclipse is a Java-based tool so be sure **Java Runtime Environment** is installed on your system.
 
 On Debian-based distros (e.g. Ubuntu): `sudo apt-get install default-jre`
 
@@ -45,7 +45,7 @@ You can download Eclipse's CDT from: [https://www.eclipse.org/cdt/downloads.php]
 
 ### Install SDL 2
 
-The PC simulator uses the [SDL 2](https://www.libsdl.org/download-2.0.php) cross-platform library to simulate a TFT display and a touchpad. 
+The PC simulator uses the [SDL 2](https://www.libsdl.org/download-2.0.php) cross-platform library to simulate a TFT display and a touchpad.
 
 #### Linux
 On **Linux** you can easily install SDL2 using a terminal:
@@ -58,14 +58,14 @@ On **Linux** you can easily install SDL2 using a terminal:
 #### Windows
 If you are using **Windows** firstly you need to install MinGW ([64 bit version](http://mingw-w64.org/doku.php/download)). After installing MinGW, do the following steps to add SDL2:
 
-1. Download the development libraries of SDL.   
+1. Download the development libraries of SDL.
 Go to [https://www.libsdl.org/download-2.0.php](https://www.libsdl.org/download-2.0.php) and download _Development Libraries: SDL2-devel-2.0.5-mingw.tar.gz_
 2. Decompress the file and go to _x86_64-w64-mingw32_ directory (for 64 bit MinGW) or to _i686-w64-mingw32_ (for 32 bit MinGW)
 3. Copy _..._mingw32/include/SDL2_ folder to _C:/MinGW/.../x86_64-w64-mingw32/include_
 4. Copy _..._mingw32/lib/_ content to _C:/MinGW/.../x86_64-w64-mingw32/lib_
-5. Copy _..._mingw32/bin/SDL2.dll_ to _{eclipse_workspace}/pc_simulator/Debug/_.  Do it later when Eclipse is installed. 
+5. Copy _..._mingw32/bin/SDL2.dll_ to _{eclipse_workspace}/pc_simulator/Debug/_.  Do it later when Eclipse is installed.
 
-Note: If you are using **Microsoft Visual Studio** instead of Eclipse then you don't have to install MinGW. 
+Note: If you are using **Microsoft Visual Studio** instead of Eclipse then you don't have to install MinGW.
 
 #### OSX
 On **OSX** you can easily install SDL2 with brew: `brew install sdl2`
@@ -74,9 +74,9 @@ If something is not working, then please refer [this tutorial](http://lazyfoo.ne
 
 ### Pre-configured project
 
-A pre-configured graphics library project (based on the latest release) is always available to get started easily. 
+A pre-configured graphics library project (based on the latest release) is always available to get started easily.
 You can find the latest one on [GitHub](https://github.com/lvgl/lv_sim_eclipse_sdl).
-(Please note that, the project is configured for Eclipse CDT). 
+(Please note that, the project is configured for Eclipse CDT).
 
 ### Add the pre-configured project to Eclipse CDT
 
@@ -86,7 +86,7 @@ Close the start-up window and go to **File-&gt;Import** and choose **General-&gt
 
 On **Windows** you have to do two additional things:
 
-- Copy the **SDL2.dll** into the project's Debug folder 
+- Copy the **SDL2.dll** into the project's Debug folder
 - Right-click on the project -&gt; Project properties -&gt; C/C++ Build -&gt; Settings -&gt; Libraries -&gt; Add ... and add _mingw32_ above SDLmain and SDL. (The order is important: mingw32, SDLmain, SDL)
 
 ### Compile and Run

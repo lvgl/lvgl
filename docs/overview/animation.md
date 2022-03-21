@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/overview/animation.md
 ```
 # Animations
@@ -29,10 +29,10 @@ lv_anim_init(&a);
  *------------------*/
 
 /*Set the "animator" function*/
-lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_x); 
+lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_x);
 
 /*Set target of the animation*/
-lv_anim_set_var(&a, obj); 
+lv_anim_set_var(&a, obj);
 
 /*Length of the animation [ms]*/
 lv_anim_set_time(&a, duration);

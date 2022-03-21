@@ -1,5 +1,5 @@
 
-Nested scrolling 
+Nested scrolling
 """"""""""""""""
 
 .. lv_example:: scroll/lv_example_scroll_1
@@ -19,15 +19,15 @@ Styling the scrollbars
 """"""""""""""""""""""""
 .. lv_example:: scroll/lv_example_scroll_4
   :language: c
-  
+
 Right to left scrolling
 """"""""""""""""""""""""
 .. lv_example:: scroll/lv_example_scroll_5
   :language: c
-  
+
 Translate on scroll
 """"""""""""""""""""""""
 .. lv_example:: scroll/lv_example_scroll_6
   :language: c
-  
-  
+
+

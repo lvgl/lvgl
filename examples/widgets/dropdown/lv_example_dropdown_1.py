@@ -1,7 +1,7 @@
 def event_handler(e):
     code = e.get_code()
     obj = e.get_target()
-    if code == lv.EVENT.VALUE_CHANGED: 
+    if code == lv.EVENT.VALUE_CHANGED:
         option = " "*10 # should be large enough to store the option
         obj.get_selected_str(option, len(option))
         # .strip() removes trailing spaces
