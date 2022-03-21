@@ -171,6 +171,7 @@ A new screen can be loaded with animation by using `lv_scr_load_anim(scr, transi
 Setting `auto_del` to `true` will automatically delete the old screen when the animation is finished.
 
 The new screen will become active (returned by `lv_scr_act()`) when the animation starts after `delay` time.
+All inputs are disabled during the screen animation.
 
 ### Handling multiple displays
 Screens are created on the currently selected *default display*.
