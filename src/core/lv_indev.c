@@ -123,7 +123,7 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
 
 void lv_indev_enable(lv_indev_t * indev, bool en)
 {
-    uint8_t enable = en ? 0 : 1
+    uint8_t enable = en ? 0 : 1;
 
     if(indev) {
         indev->proc.disabled = enable;
