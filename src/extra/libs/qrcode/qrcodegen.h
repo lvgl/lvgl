@@ -1,9 +1,9 @@
-/* 
+/*
  * QR Code generator library (C)
- * 
+ *
  * Copyright (c) Project Nayuki. (MIT License)
  * https://www.nayuki.io/page/qr-code-generator-library
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
  * the Software without restriction, including without limitation the rights to
@@ -33,14 +33,14 @@ extern "C" {
 #endif
 
 
-/* 
+/*
  * This library creates QR Code symbols, which is a type of two-dimension barcode.
  * Invented by Denso Wave and described in the ISO/IEC 18004 standard.
  * A QR Code structure is an immutable square grid of black and white cells.
  * The library provides functions to create a QR Code from text or binary data.
  * The library covers the QR Code Model 2 specification, supporting all versions (sizes)
  * from 1 to 40, all 4 error correction levels, and 4 character encoding modes.
- * 
+ *
  * Ways to create a QR Code object:
  * - High level: Take the payload data and call qrcodegen_encodeText() or qrcodegen_encodeBinary().
  * - Low level: Custom-make the list of segments and call
@@ -51,7 +51,7 @@ extern "C" {
 
 /*---- Enum and struct types----*/
 
-/* 
+/*
  * The error correction level in a QR Code symbol.
  */
 enum qrcodegen_Ecc {
@@ -64,7 +64,7 @@ enum qrcodegen_Ecc {
 };
 
 
-/* 
+/*
  * The mask pattern used in a QR Code symbol.
  */
 enum qrcodegen_Mask {
@@ -83,7 +83,7 @@ enum qrcodegen_Mask {
 };
 
 
-/* 
+/*
  * Describes how a segment's data bits are interpreted.
  */
 enum qrcodegen_Mode {
@@ -95,7 +95,7 @@ enum qrcodegen_Mode {
 };
 
 
-/* 
+/*
  * A segment of character/binary/control data in a QR Code symbol.
  * The mid-level way to create a segment is to take the payload data
  * and call a factory function such as qrcodegen_makeNumeric().
@@ -147,7 +147,7 @@ struct qrcodegen_Segment {
 
 /*---- Functions (high level) to generate QR Codes ----*/
 
-/* 
+/*
  * Encodes the given text string to a QR Code, returning true if encoding succeeded.
  * If the data is too long to fit in any version in the given range
  * at the given ECC level, then false is returned.
@@ -170,7 +170,7 @@ bool qrcodegen_encodeText(const char *text, uint8_t tempBuffer[], uint8_t qrcode
 	enum qrcodegen_Ecc ecl, int minVersion, int maxVersion, enum qrcodegen_Mask mask, bool boostEcl);
 
 
-/* 
+/*
  * Encodes the given binary data to a QR Code, returning true if encoding succeeded.
  * If the data is too long to fit in any version in the given range
  * at the given ECC level, then false is returned.
@@ -194,7 +194,7 @@ bool qrcodegen_encodeBinary(uint8_t dataAndTemp[], size_t dataLen, uint8_t qrcod
 
 /*---- Functions (low level) to generate QR Codes ----*/
 
-/* 
+/*
  * Renders a QR Code representing the given segments at the given error correction level.
  * The smallest possible QR Code version is automatically chosen for the output. Returns true if
  * QR Code creation succeeded, or false if the data is too long to fit in any version. The ECC level
@@ -210,7 +210,7 @@ bool qrcodegen_encodeSegments(const struct qrcodegen_Segment segs[], size_t len,
 	enum qrcodegen_Ecc ecl, uint8_t tempBuffer[], uint8_t qrcode[]);
 
 
-/* 
+/*
  * Renders a QR Code representing the given segments with the given encoding parameters.
  * Returns true if QR Code creation succeeded, or false if the data is too long to fit in the range of versions.
  * The smallest possible QR Code version within the given range is automatically
@@ -229,7 +229,7 @@ bool qrcodegen_encodeSegmentsAdvanced(const struct qrcodegen_Segment segs[], siz
 	int minVersion, int maxVersion, int mask, bool boostEcl, uint8_t tempBuffer[], uint8_t qrcode[]);
 
 
-/* 
+/*
  * Tests whether the given string can be encoded as a segment in alphanumeric mode.
  * A string is encodable iff each character is in the following set: 0 to 9, A to Z
  * (uppercase only), space, dollar, percent, asterisk, plus, hyphen, period, slash, colon.
@@ -237,14 +237,14 @@ bool qrcodegen_encodeSegmentsAdvanced(const struct qrcodegen_Segment segs[], siz
 bool qrcodegen_isAlphanumeric(const char *text);
 
 
-/* 
+/*
  * Tests whether the given string can be encoded as a segment in numeric mode.
  * A string is encodable iff each character is in the range 0 to 9.
  */
 bool qrcodegen_isNumeric(const char *text);
 
 
-/* 
+/*
  * Returns the number of bytes (uint8_t) needed for the data buffer of a segment
  * containing the given number of characters using the given mode. Notes:
  * - Returns SIZE_MAX on failure, i.e. numChars > INT16_MAX or
@@ -258,7 +258,7 @@ bool qrcodegen_isNumeric(const char *text);
 size_t qrcodegen_calcSegmentBufferSize(enum qrcodegen_Mode mode, size_t numChars);
 
 
-/* 
+/*
  * Returns a segment representing the given binary data encoded in
  * byte mode. All input byte arrays are acceptable. Any text string
  * can be converted to UTF-8 bytes and encoded as a byte mode segment.
@@ -266,13 +266,13 @@ size_t qrcodegen_calcSegmentBufferSize(enum qrcodegen_Mode mode, size_t numChars
 struct qrcodegen_Segment qrcodegen_makeBytes(const uint8_t data[], size_t len, uint8_t buf[]);
 
 
-/* 
+/*
  * Returns a segment representing the given string of decimal digits encoded in numeric mode.
  */
 struct qrcodegen_Segment qrcodegen_makeNumeric(const char *digits, uint8_t buf[]);
 
 
-/* 
+/*
  * Returns a segment representing the given text string encoded in alphanumeric mode.
  * The characters allowed are: 0 to 9, A to Z (uppercase only), space,
  * dollar, percent, asterisk, plus, hyphen, period, slash, colon.
@@ -280,7 +280,7 @@ struct qrcodegen_Segment qrcodegen_makeNumeric(const char *digits, uint8_t buf[]
 struct qrcodegen_Segment qrcodegen_makeAlphanumeric(const char *text, uint8_t buf[]);
 
 
-/* 
+/*
  * Returns a segment representing an Extended Channel Interpretation
  * (ECI) designator with the given assignment value.
  */
@@ -289,7 +289,7 @@ struct qrcodegen_Segment qrcodegen_makeEci(long assignVal, uint8_t buf[]);
 
 /*---- Functions to extract raw data from QR Codes ----*/
 
-/* 
+/*
  * Returns the side length of the given QR Code, assuming that encoding succeeded.
  * The result is in the range [21, 177]. Note that the length of the array buffer
  * is related to the side length - every 'uint8_t qrcode[]' must have length at least
@@ -298,18 +298,18 @@ struct qrcodegen_Segment qrcodegen_makeEci(long assignVal, uint8_t buf[]);
 int qrcodegen_getSize(const uint8_t qrcode[]);
 
 
-/* 
+/*
  * Returns the color of the module (pixel) at the given coordinates, which is false
  * for white or true for black. The top left corner has the coordinates (x=0, y=0).
  * If the given coordinates are out of bounds, then false (white) is returned.
  */
 bool qrcodegen_getModule(const uint8_t qrcode[], int x, int y);
 
-/* 
+/*
  * Returns the qrcode size of the specified version. Returns -1 on failure
  */
 int qrcodegen_version2size(int version);
-/* 
+/*
  * Returns the min version of the data that can be stored. Returns -1 on failure
  */
 int qrcodegen_getMinFitVersion(enum qrcodegen_Ecc ecl, size_t dataLen);

@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/overview/indev.md
 ```
 # Input devices
@@ -124,9 +124,9 @@ Don't forget to assign one or more input devices to the default group with ` lv_
 
 ### Styling
 
-If an object is focused either by clicking it via touchpad or focused via an encoder or keypad it goes to the `LV_STATE_FOCUSED` state. Hence, focused styles will be applied to it. 
+If an object is focused either by clicking it via touchpad or focused via an encoder or keypad it goes to the `LV_STATE_FOCUSED` state. Hence, focused styles will be applied to it.
 
-If an object switches to edit mode it enters the `LV_STATE_FOCUSED | LV_STATE_EDITED` states so these style properties will be shown. 
+If an object switches to edit mode it enters the `LV_STATE_FOCUSED | LV_STATE_EDITED` states so these style properties will be shown.
 
 For a more detailed description read the [Style](https://docs.lvgl.io/v7/en/html/overview/style.html) section.
 

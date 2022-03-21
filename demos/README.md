@@ -1,7 +1,7 @@
 # Demos for LVGL
 
 ## Add the examples to your projects
-1. demos can be found in the 'demos' folder once you clone the lvgl. 
+1. demos can be found in the 'demos' folder once you clone the lvgl.
 
 2. In the ***lv_conf.h*** or equivalent places, you can find demo related macros, change its value to enable or disable specified demos:
 
@@ -38,7 +38,7 @@
 ...
 ```
 
-3. If your development environment or toolchain does not add source files inside '***lvgl***' folder automatically, ensure the `demos` folder is included for compilation.  
+3. If your development environment or toolchain does not add source files inside '***lvgl***' folder automatically, ensure the `demos` folder is included for compilation.
 4. Include "***demos/lv_demos.h***" in your application source file, for example:
 
 ```c
@@ -53,7 +53,7 @@
 ## Demos
 
 ### Widgets
-Shows how the widgets look like out of the box using the built-in material theme.  
+Shows how the widgets look like out of the box using the built-in material theme.
 
 See in [widgets](https://github.com/lvgl/lvgl/tree/master/demos/widgets) folder.
 
@@ -68,14 +68,14 @@ For running this demo properly, please make sure **LV_MEM_SIZE** is at least **3
 
 
 ### Music player
-The music player demo shows what kind of modern, smartphone-like user interfaces can be created on LVGL. It works the best with display with 480x272 or 272x480 resolution. 
+The music player demo shows what kind of modern, smartphone-like user interfaces can be created on LVGL. It works the best with display with 480x272 or 272x480 resolution.
 
 See in [music](https://github.com/lvgl/lvgl/tree/master/demos/music) folder.
 
 <img src="https://github.com/lvgl/lvgl/tree/master/demos/music/screenshot1.gif?raw=true" width=600px alt="Music player demo with LVGL">
 
 ### Keypad and encoder
-LVGL allows you to control the widgets with a keypad and/or encoder without a touchpad. This demo shows how to handle buttons, drop-down lists, rollers, sliders, switches, and text inputs without touchpad. 
+LVGL allows you to control the widgets with a keypad and/or encoder without a touchpad. This demo shows how to handle buttons, drop-down lists, rollers, sliders, switches, and text inputs without touchpad.
 Learn more about the touchpad-less usage of LVGL [here](https://docs.lvgl.io/master/overview/indev.html#keypad-and-encoder).
 
 See in [keypad_encoder](https://github.com/lvgl/lvgl/tree/master/demos/keypad_encoder) folder.
@@ -83,12 +83,12 @@ See in [keypad_encoder](https://github.com/lvgl/lvgl/tree/master/demos/keypad_en
 <img src="https://github.com/lvgl/lvgl/tree/master/demos/keypad_encoder/screenshot1.png?raw=true" width=600px alt="Keypad and encoder navigation in LVGL embedded GUI library">
 
 ### Benchmark
-A demo to measure the performance of LVGL or to compare different settings. 
+A demo to measure the performance of LVGL or to compare different settings.
 See in [benchmark](https://github.com/lvgl/lvgl/tree/master/demos/benchmark) folder.
 <img src="https://github.com/lvgl/lvgl/tree/master/demos/benchmark/screenshot1.png?raw=true" width=600px alt="Benchmark demo with LVGL embedded GUI library">
 
 ### Stress
-A stress test for LVGL. It contains a lot of object creation, deletion, animations, style usage, and so on. It can be used if there is any memory corruption during heavy usage or any memory leaks. 
+A stress test for LVGL. It contains a lot of object creation, deletion, animations, style usage, and so on. It can be used if there is any memory corruption during heavy usage or any memory leaks.
 See in [stress](https://github.com/lvgl/lvgl/tree/master/demos/stress) folder.
 <img src="https://github.com/lvgl/lvgl/tree/master/demos/stress/screenshot1.png?raw=true" width=600px alt="Stress test for LVGL">
 

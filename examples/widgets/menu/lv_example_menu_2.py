@@ -3,7 +3,7 @@ def back_event_handler(e):
     if menu.back_btn_is_root(obj):
         mbox1 = lv.msgbox(lv.scr_act(), "Hello", "Root back btn click.", None, True)
         mbox1.center()
-       
+
 # Create a menu object
 menu = lv.menu(lv.scr_act())
 menu.set_mode_root_back_btn(lv.menu.ROOT_BACK_BTN.ENABLED)

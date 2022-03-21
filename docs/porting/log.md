@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/porting/log.md
 ```
 # Logging
@@ -24,7 +24,7 @@ If your system supports `printf`, you just need to enable `LV_LOG_PRINTF` in `lv
 
 
 ### Custom log function
-If you can't use `printf` or want to use a custom function to log, you can register a "logger" callback with `lv_log_register_print_cb()`. 
+If you can't use `printf` or want to use a custom function to log, you can register a "logger" callback with `lv_log_register_print_cb()`.
 
 For example:
 

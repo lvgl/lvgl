@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/porting/project.md
 ```
 
@@ -16,7 +16,7 @@ You can clone it or [Download](https://github.com/lvgl/lvgl/archive/refs/heads/m
 The graphics library itself is the `lvgl` directory. It contains a couple of folders but to use `lvgl` you only need `.c` and `.h` files from the `src` folder.
 
 ### Automatically add files
-If your IDE automatically adds the files from the folders copied to the project folder (as Eclipse or VSCode does), you can simply copy the `lvgl` folder as it is into your project. 
+If your IDE automatically adds the files from the folders copied to the project folder (as Eclipse or VSCode does), you can simply copy the `lvgl` folder as it is into your project.
 
 ### Make and CMake
 LVGL also supports `make` and `CMake` build systems out of the box. To add LVGL to your Makefile based build system add these lines to your main Makefile:
@@ -48,7 +48,7 @@ To get `lv_conf.h` **copy lvgl/lv_conf_template.h** next to the `lvgl` directory
 
 Comments in the config file explain the meaning of the options. Be sure to set at least `LV_COLOR_DEPTH` according to your display's color depth. Note that, the examples and demos explicitly need to be enabled in `lv_conf.h`.
 
-Alternatively, `lv_conf.h` can be copied to another place but then you should add the `LV_CONF_INCLUDE_SIMPLE` define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the include path manually (e.g. `-I../include/gui`). 
+Alternatively, `lv_conf.h` can be copied to another place but then you should add the `LV_CONF_INCLUDE_SIMPLE` define to your compiler options (e.g. `-DLV_CONF_INCLUDE_SIMPLE` for GCC compiler) and set the include path manually (e.g. `-I../include/gui`).
 In this case LVGL will attempt to include `lv_conf.h` simply with `#include "lv_conf.h"`.
 
 You can even use a different name for `lv_conf.h`. The custom path can be set via the `LV_CONF_PATH` define.

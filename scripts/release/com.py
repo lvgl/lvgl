@@ -66,7 +66,7 @@ def get_lvgl_version():
             if m: ver[2] = m.group(1)
 
     f.close()
-    
+
     print("Version found: " + ver_format(ver))
 
     return ver
@@ -103,6 +103,6 @@ def update_version(ver):
       define_set("./lvgl.h", "LVGL_VERSION_MINOR", str(ver[1]))
       define_set("./lvgl.h", "LVGL_VERSION_PATCH", str(ver[2]))
       define_set("./lvgl.h", "LVGL_VERSION_INFO", "\"" + ver[3] + "\"")
-        
+
   cmd("git commit -am 'Update versions to " + ver_str + "'")
-  
+

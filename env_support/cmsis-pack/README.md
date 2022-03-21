@@ -27,7 +27,7 @@
 ...
 ```
 
-4. Remove macro definitions for 
+4. Remove macro definitions for
    - LV_USE_GPU_STM32_DMA2D
    - LV_USE_GPU_NXP_PXP
    - LV_USE_GPU_NXP_VG_LITE
@@ -72,8 +72,8 @@
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h" 
-        
+        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
+
         #if __PER_COUNTER_VER__ < 10902ul
             #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
         #else
@@ -116,9 +116,9 @@ echo " "
 
 Update the '**CMSIS_PACK_PATH**' accordingly (Usually just replace the name gabriel with your own windows account name is sufficient.).
 
-Update the '**PATH_TO_ADD**' to point to the installation folders of **7Zip** and **xmllint**. 
+Update the '**PATH_TO_ADD**' to point to the installation folders of **7Zip** and **xmllint**.
 
-Launch the git-bash and go to the cmsis-pack folder. 
+Launch the git-bash and go to the cmsis-pack folder.
 
 enter the following command:
 
@@ -130,9 +130,9 @@ enter the following command:
 
 ### B. For Linux Users
 
-Update '**PATH_TO_ADD**' if necessary. 
+Update '**PATH_TO_ADD**' if necessary.
 
-go to the **cmsis-pack** folder. 
+go to the **cmsis-pack** folder.
 
 enter the following command:
 

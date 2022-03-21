@@ -1,8 +1,8 @@
 # Create an array for the points of the line
-line_points = [ {"x":5, "y":5}, 
-                {"x":70, "y":70}, 
-                {"x":120, "y":10}, 
-                {"x":180, "y":60}, 
+line_points = [ {"x":5, "y":5},
+                {"x":70, "y":70},
+                {"x":120, "y":10},
+                {"x":180, "y":60},
                 {"x":240, "y":10}]
 
 # Create style

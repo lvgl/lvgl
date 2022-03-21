@@ -1,12 +1,12 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/get-started/bindings/micropython.md
 ```
 # Micropython
 
 ## What is Micropython?
 
-[Micropython](http://micropython.org/) is Python for microcontrollers.  
+[Micropython](http://micropython.org/) is Python for microcontrollers.
 Using Micropython, you can write Python3 code and run it even on a bare metal architecture with limited resources.
 
 ### Highlights of Micropython
@@ -27,15 +27,15 @@ Currently, Micropython [does not have a good high-level GUI library](https://for
 ### Here are some advantages of using LVGL in Micropython:
 
 - Develop GUI in Python, a very popular high level language. Use paradigms such as Object-Oriented Programming.
-- Usually, GUI development requires multiple iterations to get things right. With C, each iteration consists of **`Change code` > `Build` > `Flash` > `Run`**.  
+- Usually, GUI development requires multiple iterations to get things right. With C, each iteration consists of **`Change code` > `Build` > `Flash` > `Run`**.
 In Micropython it's just **`Change code` > `Run`** ! You can even run commands interactively using the [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) (the interactive prompt)
 
 ### Micropython + LVGL could be used for:
 
-- Fast prototyping GUI.  
+- Fast prototyping GUI.
 - Shortening the cycle of changing and fine-tuning the GUI.
 - Modelling the GUI in a more abstract way by defining reusable composite objects, taking advantage of Python's language features such as Inheritance, Closures, List Comprehension, Generators, Exception Handling, Arbitrary Precision Integers and others.
-- Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.  
+- Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.
 This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to-circuitpython/what-is-circuitpython). CircuitPython was designed with education in mind, to make it easier for new or inexperienced users to get started with embedded development.
 - Creating tools to work with LVGL at a higher level (e.g. drag-and-drop designer).
 
@@ -46,7 +46,7 @@ This goes well with [CircuitPython vision](https://learn.adafruit.com/welcome-to
 > TL;DR:
 > It's very much like the C API, but Object-Oriented for LVGL components.
 
-Let's dive right into an example!  
+Let's dive right into an example!
 
 ### A simple example
 
@@ -65,7 +65,7 @@ lv.scr_load(scr)
 
 ### Online Simulator
 
-If you want to experiment with LVGL + Micropython without downloading anything - you can use our online simulator!  
+If you want to experiment with LVGL + Micropython without downloading anything - you can use our online simulator!
 It's a fully functional LVGL + Micropython that runs entirely in the browser and allows you to edit a python script and run it.
 
 [Click here to experiment on the online simulator](https://sim.lvgl.io/)
@@ -76,14 +76,14 @@ Note: the online simulator is available for lvgl v6 and v7.
 
 ### PC Simulator
 
-Micropython is ported to many platforms. One notable port is "unix", which allows you to build and run Micropython (+LVGL) on a Linux machine. (On a Windows machine you might need Virtual Box or WSL or MinGW or Cygwin etc.)  
+Micropython is ported to many platforms. One notable port is "unix", which allows you to build and run Micropython (+LVGL) on a Linux machine. (On a Windows machine you might need Virtual Box or WSL or MinGW or Cygwin etc.)
 
 [Click here to know more information about building and running the unix port](https://github.com/lvgl/lv_micropython)
 
 ### Embedded platform
 
-In the end, the goal is to run it all on an embedded platform.  
-Both Micropython and LVGL can be used on many embedded architectures, such as stm32, ESP32 etc.  
+In the end, the goal is to run it all on an embedded platform.
+Both Micropython and LVGL can be used on many embedded architectures, such as stm32, ESP32 etc.
 You would also need display and input drivers. We have some sample drivers (ESP32+ILI9341, as well as some other examples), but chances are you would want to create your own input/display drivers for your specific hardware.
 Drivers can be implemented either in C as a Micropython module, or in pure Micropython!
 

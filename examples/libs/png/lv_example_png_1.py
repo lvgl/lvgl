@@ -29,7 +29,7 @@ except:
 
 wink_argb = lv.img_dsc_t({
   'data_size': len(png_data),
-  'data': png_data 
+  'data': png_data
 })
 
 img2 = lv.img(lv.scr_act())

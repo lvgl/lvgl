@@ -1,12 +1,12 @@
 
-Simple Arc 
+Simple Arc
 """"""""""""""""
 
 .. lv_example:: widgets/arc/lv_example_arc_1
   :language: c
   :description: A simple example to demonstrate the use of an arc.
 
-Loader with Arc 
+Loader with Arc
 """"""""""""""""
 
 .. lv_example:: widgets/arc/lv_example_arc_2

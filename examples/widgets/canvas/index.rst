@@ -1,5 +1,5 @@
 
-Drawing on the Canvas and rotate 
+Drawing on the Canvas and rotate
 """"""""""""""""""""""""""""""""""
 
 .. lv_example:: widgets/canvas/lv_example_canvas_1

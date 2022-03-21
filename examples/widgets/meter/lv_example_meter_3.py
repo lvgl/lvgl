@@ -16,10 +16,10 @@ try:
 except:
     print("Could not find img_hand_min.png")
     sys.exit()
-    
+
 img_hand_min_dsc = lv.img_dsc_t({
   'data_size': len(img_hand_min_data),
-  'data': img_hand_min_data 
+  'data': img_hand_min_data
 })
 
 # Create an image from the png file
@@ -29,10 +29,10 @@ try:
 except:
     print("Could not find img_hand_hour.png")
     sys.exit()
-    
+
 img_hand_hour_dsc = lv.img_dsc_t({
   'data_size': len(img_hand_hour_data),
-  'data': img_hand_hour_data 
+  'data': img_hand_hour_data
 })
 
 def set_value(indic, v):
@@ -78,6 +78,6 @@ a2.init()
 a2.set_var(indic_hour)
 a2.set_time(24000)       # 24 sec for 1 turn of the hour hand
 a2.set_values(0, 60)
-a2.set_custom_exec_cb(lambda a2,val: set_value(indic_hour,val))            
+a2.set_custom_exec_cb(lambda a2,val: set_value(indic_hour,val))
 lv.anim_t.start(a2)
 

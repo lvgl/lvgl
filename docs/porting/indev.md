@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/porting/indev.md
 ```
 # Input device interface
@@ -45,7 +45,7 @@ void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
     data->point.y = touchpad_y;
     data->state = LV_INDEV_STATE_PRESSED;
   } else {
-    data->state = LV_INDEV_STATE_RELEASED; 
+    data->state = LV_INDEV_STATE_RELEASED;
   }
 }
 ```
@@ -108,7 +108,7 @@ void encoder_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
 ```
 
 #### Using buttons with Encoder logic
-In addition to standard encoder behavior, you can also utilize its logic to navigate(focus) and edit widgets using buttons. 
+In addition to standard encoder behavior, you can also utilize its logic to navigate(focus) and edit widgets using buttons.
 This is especially handy if you have only few buttons available, or you want to use other buttons in addition to encoder wheel.
 
 You need to have 3 buttons available:
@@ -141,7 +141,7 @@ void encoder_with_keys_read(lv_indev_drv_t * drv, lv_indev_data_t*data){
 *Buttons* mean external "hardware" buttons next to the screen which are assigned to specific coordinates of the screen.
 If a button is pressed it will simulate the pressing on the assigned coordinate. (Similarly to a touchpad)
 
-To assign buttons to coordinates use `lv_indev_set_button_points(my_indev, points_array)`.   
+To assign buttons to coordinates use `lv_indev_set_button_points(my_indev, points_array)`.
 `points_array` should look like `const lv_point_t points_array[] = { {12,30},{60,90}, ...}`
 
 ``` important::  The points_array can't go out of scope. Either declare it as a global variable or as a static variable inside a function.
@@ -189,9 +189,9 @@ Every input device is associated with a display. By default, a new input device 
 The associated display is stored and can be changed in `disp` field of the driver.
 
 ### Buffered reading
-By default, LVGL calls `read_cb` periodically. Because of this intermittent polling there is a chance that some user gestures are missed. 
+By default, LVGL calls `read_cb` periodically. Because of this intermittent polling there is a chance that some user gestures are missed.
 
-To solve this you can write an event driven driver for your input device that buffers measured data. In `read_cb` you can report the buffered data instead of directly reading the input device. 
+To solve this you can write an event driven driver for your input device that buffers measured data. In `read_cb` you can report the buffered data instead of directly reading the input device.
 Setting the `data->continue_reading` flag will tell LVGL there is more data to read and it should call `read_cb` again.
 
 ## Further reading

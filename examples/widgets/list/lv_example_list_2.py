@@ -81,7 +81,7 @@ def event_handler_swap(evt):
     global list1
     code = evt.get_code()
     obj = evt.get_target()
-    if code == lv.EVENT.CLICKED:    
+    if code == lv.EVENT.CLICKED:
         cnt = list1.get_child_cnt()
         for i in range(100):
             if cnt > 1:
@@ -89,7 +89,7 @@ def event_handler_swap(evt):
                 obj.move_to_index(urandom.getrandbits(32) % cnt)
         if currentButton != None:
             currentButton.scroll_to_view(lv.ANIM.ON)
-                
+
 #Create a list with buttons that can be sorted
 list1 = lv.list(lv.scr_act())
 list1.set_size(lv.pct(60), lv.pct(100))

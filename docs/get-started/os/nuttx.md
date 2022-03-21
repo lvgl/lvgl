@@ -1,12 +1,12 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/get-started/os/nuttx.md
 ```
 # NuttX RTOS
 
 ## What is NuttX?
 
-[NuttX](https://nuttx.apache.org/) is a mature and secure real-time operating system (RTOS) with an emphasis on technical standards compliance and small size. 
+[NuttX](https://nuttx.apache.org/) is a mature and secure real-time operating system (RTOS) with an emphasis on technical standards compliance and small size.
 It is scalable from 8-bit to 64-bit microcontrollers and microprocessors and compliant with the Portable Operating System Interface (POSIX) and the American National Standards Institute (ANSI) standards and with many Linux-like subsystems.
 The best way to think about NuttX is to think of it as a small Unix/Linux for microcontrollers.
 
@@ -23,8 +23,8 @@ The best way to think about NuttX is to think of it as a small Unix/Linux for mi
 
 ## Why NuttX + LVGL?
 
-Although NuttX has its own graphic library called [NX](https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=139629474), LVGL is a good alternative because users could find more eye-candy demos and they can reuse code from previous projects. 
-LVGL is an [Object-Oriented Component Based](https://blog.lvgl.io/2018-12-13/extend-lvgl-objects) high-level GUI library, that could fit very well for a RTOS with advanced features like NuttX. 
+Although NuttX has its own graphic library called [NX](https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=139629474), LVGL is a good alternative because users could find more eye-candy demos and they can reuse code from previous projects.
+LVGL is an [Object-Oriented Component Based](https://blog.lvgl.io/2018-12-13/extend-lvgl-objects) high-level GUI library, that could fit very well for a RTOS with advanced features like NuttX.
 LVGL is implemented in C and its APIs are in C.
 
 ### Here are some advantages of using LVGL in NuttX
@@ -80,7 +80,7 @@ $ make
 If everything went fine you should have now the file `nuttx.bin` to flash on your board:
 
 ```shell
-$ ls -l nuttx.bin 
+$ ls -l nuttx.bin
 -rwxrwxr-x 1 alan alan 287144 Jun 27 09:26 nuttx.bin
 ```
 

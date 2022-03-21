@@ -1,9 +1,9 @@
 from imagetools import get_png_info, open_png
 
-def ofs_y_anim(img, v):    
+def ofs_y_anim(img, v):
     img.set_offset_y(v)
     # print(img,v)
-    
+
 # Register PNG image decoder
 decoder = lv.img.decoder_create()
 decoder.info_cb = get_png_info
@@ -16,10 +16,10 @@ try:
 except:
     print("Could not find img_skew_strip.png")
     sys.exit()
-    
+
 img_skew_strip = lv.img_dsc_t({
   'data_size': len(png_data),
-  'data': png_data 
+  'data': png_data
 })
 
 #
