@@ -69,10 +69,8 @@ You will find these repositories there:
 - [lv_drivers](https://github.com/lvgl/lv_drivers) Display and input device drivers
 - [blog](https://github.com/lvgl/blog) Source of the blog's site (https://blog.lvgl.io)
 - [sim](https://github.com/lvgl/sim) Source of the online simulator's site (https://sim.lvgl.io)
-- [lv_sim_...](https://github.com/lvgl?q=lv_sim&type=&language=) Simulator projects for various IDEs and platforms
-- [lv_port_...](https://github.com/lvgl?q=lv_port&type=&language=) LVGL ports to development boards
+- [lv_port_...](https://github.com/lvgl?q=lv_port&type=&language=) LVGL ports to development boards or environments
 - [lv_binding_..](https://github.com/lvgl?q=lv_binding&type=&language=l) Bindings to other languages
-- [lv_...](https://github.com/lvgl?q=lv_&type=&language=) Ports to other platforms
 
 ## Release policy
 
