@@ -138,6 +138,9 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
         return;
     }
 
+	if(NULL == g.resolved_font){
+		g.resolved_font = dsc->font;
+	}
     const uint8_t * map_p = lv_font_get_glyph_bitmap(g.resolved_font, letter);
     if(map_p == NULL) {
         LV_LOG_WARN("lv_draw_letter: character's bitmap not found");
