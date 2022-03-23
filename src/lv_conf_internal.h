@@ -2118,11 +2118,11 @@
 #endif
 #if LV_USE_FFMPEG
     /*Dump input information to stderr*/
-    #ifndef LV_FFMPEG_AV_DUMP_FORMAT
-        #ifdef CONFIG_LV_FFMPEG_AV_DUMP_FORMAT
-            #define LV_FFMPEG_AV_DUMP_FORMAT CONFIG_LV_FFMPEG_AV_DUMP_FORMAT
+    #ifndef LV_FFMPEG_DUMP_FORMAT
+        #ifdef CONFIG_LV_FFMPEG_DUMP_FORMAT
+            #define LV_FFMPEG_DUMP_FORMAT CONFIG_LV_FFMPEG_DUMP_FORMAT
         #else
-            #define LV_FFMPEG_AV_DUMP_FORMAT 0
+            #define LV_FFMPEG_DUMP_FORMAT 0
         #endif
     #endif
 #endif
