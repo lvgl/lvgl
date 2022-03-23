@@ -40,6 +40,7 @@ extern "C" {
 #define LV_STYLE_PROP_EXT_DRAW              (1 << 1)  /*Requires ext. draw size update when changed*/
 #define LV_STYLE_PROP_LAYOUT_REFR           (1 << 2)  /*Requires layout update when changed*/
 #define LV_STYLE_PROP_PARENT_LAYOUT_REFR    (1 << 3)  /*Requires layout update on parent when changed*/
+#define LV_STYLE_PROP_ALL    				(0xf)  	  /*Indicating all flags*/
 
 /**
  * Other constants
