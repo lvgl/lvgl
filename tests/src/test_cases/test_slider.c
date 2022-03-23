@@ -86,7 +86,7 @@ void test_slider_event_invalid_key_should_not_change_values(void)
     TEST_ASSERT_EQUAL_INT32(value, lv_slider_get_value(slider));
 }
 
-void test_range_mode_slider_should_leave_edit_mode_when_released(void)
+void test_slider_range_mode_should_leave_edit_mode_if_released(void)
 {
     /* Setup group and encoder indev */
     lv_group_add_obj(g, sliderNormalMode);
@@ -94,13 +94,17 @@ void test_range_mode_slider_should_leave_edit_mode_when_released(void)
 
     lv_test_encoder_click();
 
-    TEST_ASSERT_FALSE(lv_slider_is_dragged(slider));
+    /* Always executed when handling LV_EVENT_RELEASED or
+     * LV_EVENT_PRESS_LOST */
+    TEST_ASSERT_FALSE(ptr->dragging);
+    TEST_ASSERT_NULL(ptr->value_to_set);
+    TEST_ASSERT_EQUAL(0U, ptr->left_knob_focus);
 
     /* Group leaved edit mode */
     TEST_ASSERT_FALSE(lv_group_get_editing(g));
 }
 
-void test_range_mode_slider_should_not_leave_edit_mode_when_released_with_no_left_knob_focus(void)
+void test_slider_range_mode_should_not_leave_edit_mode_if_released_with_no_left_knob_focus(void)
 {
     lv_slider_t * ptr = (lv_slider_t *) sliderRangeMode;
 
@@ -113,37 +117,32 @@ void test_range_mode_slider_should_not_leave_edit_mode_when_released_with_no_lef
 
     /* Always executed when handling LV_EVENT_RELEASED or
      * LV_EVENT_PRESS_LOST */
-    TEST_ASSERT_FALSE(lv_slider_is_dragged(slider));
+    TEST_ASSERT_FALSE(ptr->dragging);
     TEST_ASSERT_NULL(ptr->value_to_set);
 
     TEST_ASSERT(lv_group_get_editing(g));
 }
 
-void test_normal_mode_slider_should_leave_edit_mode_when_released(void)
+void test_slider_normal_mode_should_leave_edit_mode_if_released(void)
 {
-    int32_t rotations_right = 5U;
-    int32_t rotations_left = 3U;
-    int32_t expected_final_value = rotations_right - rotations_left;
+    lv_slider_t * ptr = (lv_slider_t *) sliderNormalMode;
+    ptr->left_knob_focus = 1;
 
     /* Setup group and encoder indev */
     lv_group_add_obj(g, sliderNormalMode);
+    lv_group_set_editing(g, true);
 
-    /* Enter edit mode */
     lv_test_encoder_click();
 
-    lv_test_encoder_turn(rotations_right);
-    TEST_ASSERT_EQUAL(rotations_right, lv_slider_get_value(sliderNormalMode));
-
-    lv_test_encoder_turn(-rotations_left);
-    TEST_ASSERT_EQUAL(expected_final_value, lv_slider_get_value(sliderNormalMode));
-
-    /* Leave edit mode */
-    lv_test_encoder_click();
+    /* Always executed when handling LV_EVENT_RELEASED or
+     * LV_EVENT_PRESS_LOST */
+    TEST_ASSERT_FALSE(ptr->dragging);
+    TEST_ASSERT_NULL(ptr->value_to_set);
+    TEST_ASSERT_EQUAL(0U, ptr->left_knob_focus);
 
     /* Group leaved edit mode */
     TEST_ASSERT_FALSE(lv_group_get_editing(g));
 }
-
 
 void test_ranged_mode_adjust_with_encoder(void)
 {
@@ -175,14 +174,14 @@ void test_ranged_mode_adjust_with_encoder(void)
 void test_normal_mode_slider_hit_test(void)
 {
     /* Validate if point 0,0 can click in the slider */
-    lv_point_t top_left_point = {
+    lv_point_t point = {
         .x = 0,
         .y = 0
     };
 
     lv_hit_test_info_t info = {
         .res = false,
-        .point = &top_left_point
+        .point = &point
     };
 
     lv_slider_set_value(sliderNormalMode, 100, LV_ANIM_OFF);
@@ -192,7 +191,7 @@ void test_normal_mode_slider_hit_test(void)
     TEST_ASSERT(info.res);
 }
 
-void test_range_mode_slider_hit_test(void)
+void test_slider_range_event_hit_test(void)
 {
     /* Validate if point 0,0 can click in the slider */
     lv_point_t point = {
