@@ -80,11 +80,15 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
             lv_fs_file_t f;
             lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) return LV_RES_INV;
+
             lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
+
             uint32_t rn;
             lv_fs_read(&f, &size, 8, &rn);
-            if(rn != 8) return LV_RES_INV;
             lv_fs_close(&f);
+
+            if(rn != 8) return LV_RES_INV;
+
             /*Save the data in the header*/
             header->always_zero = 0;
             header->cf = LV_IMG_CF_RAW_ALPHA;
