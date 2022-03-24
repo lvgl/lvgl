@@ -67,4 +67,4 @@ To use the graphics library you have to initialize it and setup required compone
 2. Initialize your drivers.
 3. Register the display and input devices drivers in LVGL.  Learn more about [Display](/porting/display) and [Input device](/porting/indev) registration.
 4. Call `lv_tick_inc(x)` every `x` milliseconds in an interrupt to report the elapsed time to LVGL. [Learn more](/porting/tick).
-5. Call `lv_timer_handler()` every few milliseconds to handle LVGL related tasks. [Learn more](/porting/task-handler).
+5. Call `lv_timer_handler()` every few milliseconds to handle LVGL related tasks. [Learn more](/porting/timer-handler).

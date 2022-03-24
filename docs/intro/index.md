@@ -158,7 +158,7 @@ See the [Porting](/porting/display) section to learn more.
 ### My display driver is not called. What have I missed?
 Be sure you are calling `lv_tick_inc(x)` in an interrupt and `lv_timer_handler()` in your main `while(1)`.
 
-Learn more in the [Tick](/porting/tick) and [Task handler](/porting/task-handler) sections.
+Learn more in the [Tick](/porting/tick) and [Timer handler](/porting/timer-handler) sections.
 
 ### Why is the display driver called only once? Only the upper part of the display is refreshed.
 Be sure you are calling `lv_disp_flush_ready(drv)` at the end of your "*display flush callback*".
