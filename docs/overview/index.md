@@ -27,6 +27,7 @@
    animation
    timer
    drawing
+   renderers/index
    new_widget
 ```
 
