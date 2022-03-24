@@ -345,10 +345,12 @@ static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
     blend_dsc.color = bg_color;
 
     /*
-     * Simple case: no mask OR
-     * Complex case: gradient, or radius
+     * Most simple case: just a plain rectangle (no mask, no radius, no gradient)
+     * shall fallback to lv_draw_sw_blend().
+     *
+     * Complex case: gradient or radius but no mask.
      */
-    if(!mask_any || dsc->radius != 0 || (grad_dir != LV_GRAD_DIR_NONE)) {
+    if(!mask_any && ((dsc->radius != 0) || (grad_dir != LV_GRAD_DIR_NONE))) {
 #if LV_USE_GPU_NXP_VG_LITE
         lv_res_t res = lv_gpu_nxp_vglite_draw_bg(draw_ctx, dsc, &bg_coords);
         if(res != LV_RES_OK)
