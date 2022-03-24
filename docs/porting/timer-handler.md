@@ -1,8 +1,8 @@
 ```eval_rst
 .. include:: /header.rst
-:github_url: |github_link_base|/porting/task-handler.md
+:github_url: |github_link_base|/porting/timer-handler.md
 ```
-# Task Handler
+# Timer Handler
 
 To handle the tasks of LVGL you need to call `lv_timer_handler()` periodically in one of the following:
 - *while(1)* of *main()* function

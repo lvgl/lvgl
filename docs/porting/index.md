@@ -14,7 +14,7 @@
    display
    indev
    tick
-   task-handler
+   timer-handler
    sleep
    os
    log
