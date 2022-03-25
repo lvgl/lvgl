@@ -28,6 +28,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                               const lv_area_t * coords, const void * src);
 void *bgra_to_rgba(void *data, int w, int h);
 //draw_img_simple(ctx, texture, header, draw_dsc, &t_coords, &t_clip);
 /**********************
@@ -42,6 +44,27 @@ void *bgra_to_rgba(void *data, int w, int h);
 #include "../sw/lv_draw_sw.h"
 lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
                                const lv_area_t * coords, const void * src)
+{
+    opengl_draw_img(draw_ctx, draw_dsc, coords, src);
+#if LV_USE_GPU_GLES_SW_MIXED
+    lv_draw_gles_utils_download_texture(draw_ctx);
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
+}
+
+
+void lv_draw_gles_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+                              const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
+{
+#if LV_USE_GPU_GLES_SW_MIXED
+    lv_draw_gles_utils_upload_texture(draw_ctx);
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
+}
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+                                const lv_area_t * coords, const void * src)
 {
     lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
     lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
@@ -135,20 +158,12 @@ lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
-        lv_draw_gles_utils_download_texture(draw_ctx);
         return LV_RES_OK;
     }
+
 }
 
 
-void lv_draw_gles_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                              const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
-{
-    lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
-}
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 void *bgra_to_rgba(void *data, int w, int h)
 {
     uint8_t *input = (uint8_t*) data;

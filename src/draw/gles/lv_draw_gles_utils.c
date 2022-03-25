@@ -14,14 +14,14 @@
 #include "lv_draw_gles_utils.h"
 #include "lv_draw_gles_math.h"
 #include "lv_draw_gles_shader.h"
-#include "../../misc/lv_log.h"
-#include "../../core/lv_refr.h"
 
 
 /*********************
  *      DEFINES
  *********************/
-#define BYTES_PER_PIXEL 4
+#if LV_USE_GPU_GLES_SW_MIXED
+  #define BYTES_PER_PIXEL 4
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
 /**********************
  *      TYPEDEFS
  **********************/
@@ -29,8 +29,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if LV_USE_GPU_GLES_SW_MIXED
 static void lvgl_buf_to_opengl_buf(GLubyte *opengl_buf, const void *lvgl_buf);
 static void opengl_buf_to_lvgl_buf(void *lvgl_buf, const GLubyte *opengl_buf);
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
 static GLuint shader_create(GLenum type, const char *src);
 static GLuint shader_program_create(const char *vertex_src, const char *fragment_src);
 
@@ -40,9 +42,11 @@ static GLuint shader_program_create(const char *vertex_src, const char *fragment
 /**********************
  *  STATIC VARIABLES
  **********************/
-
+#if LV_USE_GPU_GLES_SW_MIXED
 static lv_coord_t hor;
 static lv_coord_t ver;
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
+
 /**********************
  *      MACROS
  **********************/
@@ -52,6 +56,7 @@ static lv_coord_t ver;
  **********************/
 void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * internals)
 {
+#if LV_USE_GPU_GLES_SW_MIXED
     /* Generate buffer for temp gpu texture */
     internals->gpu_texture_pixels = lv_mem_alloc(internals->hor *  internals->ver * BYTES_PER_PIXEL * sizeof(GLubyte));
     /* Maybe initialize with all zeros? */
@@ -78,6 +83,8 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glBindTexture(GL_TEXTURE_2D, 0);
+#endif
+
 
 
 
@@ -111,7 +118,6 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     internals->corner_rect_shader_radius_location= glGetUniformLocation(internals->corner_rect_shader, "u_radius");
     glUniformMatrix4fv(internals->corner_rect_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);
-    LV_LOG_USER("%d", glGetError());
 
     internals->simple_img_shader = shader_program_create(SIMPLE_IMG_VERTEX_SHADER_SRC, SIMPLE_IMG_FRAGMENT_SHADER_SRC);
     glUseProgram(internals->simple_img_shader);
@@ -124,12 +130,15 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     glUniformMatrix4fv(internals->simple_img_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);
 
+#if LV_USE_GPU_GLES_SW_MIXED
     /* TODO(tan): It's dumb change later. */
     hor = internals->hor;
     ver = internals->ver;
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
 
 }
 
+#if LV_USE_GPU_GLES_SW_MIXED
 void lv_draw_gles_utils_upload_texture(lv_draw_ctx_t * draw_ctx)
 {
     lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
@@ -157,11 +166,13 @@ void lv_draw_gles_utils_download_texture(lv_draw_ctx_t * draw_ctx)
 
     opengl_buf_to_lvgl_buf(draw_ctx->buf,  internals->gpu_texture_pixels);
 }
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
+#if LV_USE_GPU_GLES_SW_MIXED
 static void lvgl_buf_to_opengl_buf(GLubyte *opengl_buf, const void *lvgl_buf)
 {
     lv_color_t *buf = (lv_color_t*)lvgl_buf;
@@ -191,6 +202,7 @@ static void opengl_buf_to_lvgl_buf(void *lvgl_buf, const GLubyte *opengl_buf)
         }
     }
 }
+#endif
 
 static GLuint shader_create(GLenum type, const char *src)
 {

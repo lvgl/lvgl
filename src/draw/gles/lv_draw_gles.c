@@ -93,16 +93,19 @@ void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_gles_ctx->internals->ver = disp_drv->ver_res;
 
     lv_draw_gles_utils_internals_init(draw_gles_ctx->internals);
-
+#if !LV_USE_GPU_GLES_SW_MIXED
+    draw_gles_ctx->internals->framebuffer = *(GLuint*)disp_drv->user_data;
+#endif /* !LV_USE_GPU_GLES_SW_MIXED */
     draw_gles_ctx->base_draw.draw_rect = lv_draw_gles_draw_rect;
     draw_gles_ctx->base_draw.draw_img = lv_draw_gles_draw_img;
-    //draw_gles_ctx->base_draw.draw_img_decoded = lv_draw_gles_img_decoded;
     draw_gles_ctx->base_draw.draw_letter = lv_draw_gles_draw_letter;
     draw_gles_ctx->base_draw.draw_line = lv_draw_gles_draw_line;
     draw_gles_ctx->base_draw.draw_arc = lv_draw_gles_draw_arc;
     draw_gles_ctx->base_draw.draw_polygon = lv_draw_gles_polygon;
     draw_gles_ctx->base_draw.draw_bg = lv_draw_gles_draw_bg;
+#if LV_USE_GPU_GLES_SW_MIXED
     draw_gles_ctx->blend = lv_draw_sw_blend_basic;
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
 
 }
 

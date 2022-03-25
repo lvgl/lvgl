@@ -53,8 +53,12 @@ void lv_draw_gles_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
 
     //lv_draw_gles_utils_upload_texture(draw_ctx);
     /* Do opengl drawing */
+#if LV_USE_GPU_GLES_SW_MIXED
     opengl_draw_rect(draw_ctx, dsc, coords);
     lv_draw_gles_utils_download_texture(draw_ctx);
+#else
+    opengl_draw_rect(draw_ctx, dsc, coords);
+#endif
 }
 
 /**********************

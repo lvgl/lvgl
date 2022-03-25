@@ -57,8 +57,10 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
 void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                               uint32_t letter)
 {
+#if LV_USE_GPU_GLES_SW_MIXED
     lv_draw_sw_letter(draw_ctx, dsc, pos_p, letter);
     lv_draw_gles_utils_upload_texture(draw_ctx);
+#endif /* LV_USE_GPU_GLES_SW_MIXED */
 }
 
 
