@@ -721,6 +721,7 @@ menu "LVGL configuration"
             default y if !LV_CONF_MINIMAL
         config LV_USE_CANVAS
             bool "Canvas. Dependencies: lv_img."
+            select LV_USE_IMG
             default y if !LV_CONF_MINIMAL
         config LV_USE_CHECKBOX
             bool "Check Box"
