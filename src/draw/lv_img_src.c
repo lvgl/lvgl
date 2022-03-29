@@ -39,11 +39,9 @@ lv_img_src_type_t lv_img_src_get_type(const void * src)
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
         return LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
     }
-#if LVGL_IMG_ALLOW_TYPELESS_SRC
     else if(u8_p[0] == 0xFF) {
         return LV_IMG_SRC_OBJ;
     }
-#endif
     else if(u8_p[0] >= 0x80) {
         return LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
     }
@@ -69,12 +67,10 @@ lv_res_t lv_img_src_parse(lv_img_src_t * obj, const void * src)
                 lv_img_src_set_data(obj, (const uint8_t *)src, id->data_size);
             }
             break;
-#if LVGL_IMG_ALLOW_TYPELESS_SRC
         case LV_IMG_SRC_OBJ:
             LV_LOG_TRACE("lv_img_src_parse: `LV_IMG_SRC_OBJ` type found");
             lv_img_src_copy(obj, (lv_img_src_t *)src);
             break;
-#endif
         case LV_IMG_SRC_SYMBOL:
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
             LV_LOG_TRACE("lv_img_src_parse: `LV_IMG_SRC_SYMBOL` type found");

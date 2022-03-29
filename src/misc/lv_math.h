@@ -139,7 +139,7 @@ uint32_t lv_rand(uint32_t min, uint32_t max);
 /* Bit-flag test true */
 #define LV_BT(v, b) ((v) & (b)) == (b)
 /* Bit-flag test false */
-#define LV_BN(v, b) ((v) & (b)) != (b)
+#define LV_BF(v, b) ((v) & (b)) != (b)
 
 #ifdef __cplusplus
 } /*extern "C"*/

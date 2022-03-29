@@ -74,7 +74,7 @@ void lv_img_set_play_mode(lv_obj_t * obj, const lv_img_ctrl_t ctrl)
     img->ctrl = ctrl;
 
     if(img->anim_timer && (img->dec_ctx->dest_frame != img->dec_ctx->current_frame ||
-                           LV_BN(img->ctrl, LV_IMG_CTRL_PAUSE))) {
+                           LV_BF(img->ctrl, LV_IMG_CTRL_PAUSE))) {
         lv_timer_resume(img->anim_timer);
     }
 }
@@ -87,17 +87,17 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index)
     /* Allow rewinding the animation to the beginning, even if not seekable */
     if(!index)
         img->dec_ctx->current_frame = index;
-    else if(LV_BN(img->caps, LV_IMG_DEC_SEEKABLE))
+    else if(LV_BF(img->caps, LV_IMG_DEC_SEEKABLE))
         return LV_RES_INV;
 
     img->dec_ctx->current_frame = LV_MIN(index, img->dec_ctx->total_frames - 1);
     return LV_RES_OK;
 }
 
-lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward)
+lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward)
 {
     lv_img_t * img = (lv_img_t *)obj;
-    if(img->dec_ctx == NULL || LV_BN(img->caps, LV_IMG_DEC_SEEKABLE))
+    if(img->dec_ctx == NULL || LV_BF(img->caps, LV_IMG_DEC_SEEKABLE))
         return LV_RES_INV;
 
     img->dec_ctx->dest_frame = LV_MIN(index, img->dec_ctx->total_frames - 1);
@@ -109,7 +109,7 @@ lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, c
     return LV_RES_OK;
 }
 
-lv_res_t lv_img_set_src_obj(lv_obj_t * obj, const lv_img_src_t * data)
+lv_res_t lv_img_set_src_ext(lv_obj_t * obj, const lv_img_src_t * data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

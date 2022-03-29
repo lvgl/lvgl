@@ -68,7 +68,7 @@ typedef struct {
     uint8_t             ctrl;       /**< The current control flags */
     lv_img_dec_ctx_t  * dec_ctx;    /**< Additional decoder context */
     uint8_t             caps;       /**< Decoder capabilities */
-    lv_timer_t        * anim_timer; /**< The timer task for animated images */
+    lv_timer_t     *    anim_timer; /**< The timer task for animated images */
 } lv_img_t;
 
 
@@ -129,10 +129,10 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index);
  * @param forward   If 1, the animation plays forward, else plays backward
  * @warning This will only work once the source of the image is set and the image is animated
  */
-lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward);
+lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward);
 
 /**
- * Parse the image source to display on the the object
+ * Parse the given data as an image source to display on the the object
  *
  * @param obj       pointer to an image object
  * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
@@ -140,7 +140,7 @@ lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, c
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
  *                  4) pointer to a lv_img_src_t instance
  *
- * @deprecated This function is deprecated in favor of lv_img_accept_src
+ * @deprecated This function is deprecated in favor of lv_img_set_src_ext
  *             You can create a lv_img_src_t * from a file, symbol or plain data via lv_img_src_set_file/symbol/data
  *
  */
@@ -159,7 +159,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src);
  * @return LV_RES_OK    If the image was correctly parsed
  * @note This will replace lv_img_set_src in LVGL9
  */
-lv_res_t lv_img_set_src_obj(lv_obj_t * obj, const lv_img_src_t * src);
+lv_res_t lv_img_set_src_ext(lv_obj_t * obj, const lv_img_src_t * src);
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.

@@ -24,9 +24,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
-static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_info(struct _lv_img_dec_t * decoder, const void * src, lv_img_header_t * header);
+static lv_res_t decoder_open(lv_img_dec_t * dec, lv_img_dec_dsc_t * dsc);
+static void decoder_close(lv_img_dec_t * dec, lv_img_dec_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 
 /**********************
@@ -46,7 +46,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
  */
 void lv_png_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_info_cb(dec, decoder_info);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -62,7 +62,7 @@ void lv_png_init(void)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(struct _lv_img_dec_t * decoder, const void * src, lv_img_header_t * header)
 {
     (void) decoder; /*Unused*/
     lv_img_src_type_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
@@ -121,9 +121,9 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
  * Open a PNG image and return the decided image
  * @param src can be file name or pointer to a C array
  * @param style style of the image object (unused now but certain formats might use it)
- * @return pointer to the decoded image or `LV_IMG_DECODER_OPEN_FAIL` if failed
+ * @return pointer to the decoded image or  `LV_IMG_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_res_t decoder_open(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
 {
 
     (void) decoder; /*Unused*/
@@ -191,7 +191,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
     if(dsc->img_data) {

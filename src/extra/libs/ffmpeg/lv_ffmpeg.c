@@ -69,9 +69,9 @@ struct lv_img_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
-static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_header_t * header);
+static lv_res_t decoder_open(lv_img_dec_t * dec, lv_img_dec_dsc_t * dsc);
+static void decoder_close(lv_img_dec_t * dec, lv_img_dec_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
@@ -113,7 +113,7 @@ const lv_obj_class_t lv_ffmpeg_player_class = {
 
 void lv_ffmpeg_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_info_cb(dec, decoder_info);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -258,7 +258,7 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_header_t * header)
 {
     /* Get the source type */
     lv_img_src_type_t src_type = lv_img_src_get_type(src);
@@ -278,7 +278,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     return LV_RES_INV;
 }
 
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_res_t decoder_open(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
 {
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         const char * path = dsc->src;
@@ -321,7 +321,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     return LV_RES_INV;
 }
 
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
 {
     struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
     ffmpeg_close(ffmpeg_ctx);
