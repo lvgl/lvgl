@@ -716,7 +716,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         p.x -= obj->coords.x1;
         uint32_t id = get_index_from_x(obj, p.x + lv_obj_get_scroll_left(obj));
-        if(id != chart->pressed_point_id) {
+        if(id != (uint32_t)chart->pressed_point_id) {
             invalidate_point(obj, id);
             invalidate_point(obj, chart->pressed_point_id);
             chart->pressed_point_id = id;
@@ -904,7 +904,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     if(LV_MIN(point_w, point_h) > line_dsc_default.width / 2) line_dsc_default.raw_end = 1;
     if(line_dsc_default.width == 1) line_dsc_default.raw_end = 1;
 
-    /*If there are mire points than pixels draw only vertical lines*/
+    /*If there are more points than pixels draw only vertical lines*/
     bool crowded_mode = chart->point_cnt >= w ? true : false;
 
     /*Go through all data lines*/
