@@ -105,11 +105,11 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
-static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_header_t * header);
+static lv_res_t decoder_open(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc);
+static lv_res_t decoder_read_line(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                   lv_coord_t len, uint8_t * buf);
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
+static void decoder_close(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc);
 static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata);
 static int is_jpg(const uint8_t * raw_data);
 static void lv_sjpg_cleanup(SJPEG * sjpeg);
@@ -128,7 +128,7 @@ static void lv_sjpg_free(SJPEG * sjpeg);
  **********************/
 void lv_split_jpeg_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_info_cb(dec, decoder_info);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -145,7 +145,7 @@ void lv_split_jpeg_init(void)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_header_t * header)
 {
     LV_UNUSED(decoder);
 
@@ -340,7 +340,7 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
  * @param dsc pointer to a descriptor which describes this decoding session
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_res_t decoder_open(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
     lv_res_t lv_ret = LV_RES_OK;
@@ -717,7 +717,7 @@ end:
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
 
-static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t decoder_read_line(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                   lv_coord_t len, uint8_t * buf)
 {
     LV_UNUSED(decoder);
@@ -865,7 +865,7 @@ end:
  * @param decoder pointer to the decoder where this function belongs
  * @param dsc pointer to a descriptor which describes this decoding session
  */
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
     /*Free all allocated data*/

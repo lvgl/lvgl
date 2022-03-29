@@ -25,17 +25,9 @@ extern "C" {
  *      MACROS
  *********************/
 
-#if LVGL_VERSION_MAJOR <= 8  /* Backporting to current API level */
-#define LVGL_IMG_ALLOW_TYPELESS_SRC 1
 /* Useful macro to declare a symbol source */
 #define LV_DECLARE_SYMBOL_SRC(symbol) \
-    static lv_img_src_t symbol ## _src = { ._fixed_hdr = 0xFF, .type = LV_IMG_SRC_SYMBOL, .uri_len = sizeof(symbol) - 1, .uri = symbol, .ext = 0 }
-#else
-/* Useful macro to declare a symbol source */
-#define LV_DECLARE_SYMBOL_SRC(symbol) \
-    static lv_img_src_t symbol ## _src = { .type = LV_IMG_SRC_SYMBOL, .uri_len = sizeof(symbol) - 1, .uri = symbol, .ext = 0 }
-
-#endif
+    static lv_img_src_t symbol ## _src = { ._fixed_hdr = 0xFF, .type = LV_IMG_SRC_SYMBOL, .data_len = sizeof(symbol) - 1, .data = symbol, .ext = 0 }
 
 /**********************
  *      TYPEDEFS
@@ -49,9 +41,7 @@ enum {
     LV_IMG_SRC_VARIABLE = 1,    /** Binary/C variable */
     LV_IMG_SRC_FILE     = 2,    /** File in filesystem*/
     LV_IMG_SRC_SYMBOL   = 3,    /** Symbol (@ref lv_symbol_def.h)*/
-#if LVGL_IMG_ALLOW_TYPELESS_SRC
     LV_IMG_SRC_OBJ      = 4,    /** Deprecated: This means the void* points to a lv_img_src_t */
-#endif
 };
 
 typedef uint8_t lv_img_src_type_t;
@@ -64,19 +54,10 @@ typedef uint8_t lv_img_src_type_t;
  * specific header to each image data (which might already have their own header)
  * Instead, this is straightforward to use */
 typedef struct {
-#if LVGL_IMG_ALLOW_TYPELESS_SRC
     uint8_t         _fixed_hdr;     /**< Using 0xFF to mark the type of the source to this */
     uint8_t         type;           /**< See `lv_img_src_type_t` above */
-    size_t          uri_len;        /**< The next URI length in bytes */
-#else
-    size_t          type : 3;       /**< See `lv_img_src_type_t` above */
-#if UINTPTR_MAX == 0xffffffffffffffff
-    size_t          uri_len : 61;   /**< The next URI length in bytes */
-#else
-    size_t          uri_len : 29;   /**< The next URI length in bytes */
-#endif
-#endif
-    const void   *  uri;            /**< A pointer on the given unique resource identifier */
+    size_t          data_len;       /**< The data's length in bytes */
+    const void   *  data;            /**< A pointer on the given unique resource identifier */
     const char   *  ext;            /**< If the URI points to a file, this will point to the extension */
 } lv_img_src_t;
 
@@ -100,7 +81,7 @@ typedef struct {
 lv_img_src_type_t lv_img_src_get_type(const void * src);
 
 /** Build a source descriptor from the old void * format.
- *  @param uri  On output, will be filled with the decoded src
+ *  @param obj  On output, will be filled with the decoded src
  *  @param src  The src format to parse
  *  @return LV_RES_OK if parsing was possible, LV_RES_INV else.
  *  @warning This does not mean that a source can be actually decoded, only that the parsing
@@ -109,7 +90,7 @@ lv_img_src_type_t lv_img_src_get_type(const void * src);
  *  @deprecated This function is deprecated. If your code is still using it, consider
  *              upgrading to the lv_img_src_t format instead.
  */
-lv_res_t lv_img_src_parse(lv_img_src_t * uri, const void * src);
+lv_res_t lv_img_src_parse(lv_img_src_t * obj, const void * src);
 
 /** Free a source descriptor.
  *  Only to be called if allocated via lv_img_src_parse

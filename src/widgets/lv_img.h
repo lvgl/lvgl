@@ -68,7 +68,7 @@ typedef struct {
     uint8_t             ctrl;       /**< The current control flags */
     lv_img_dec_ctx_t  * dec_ctx;    /**< Additional decoder context */
     uint8_t             caps;       /**< Decoder capabilities */
-    lv_timer_t     *    anim_timer; /**< The timer task for animated images */
+    lv_timer_t        * anim_timer; /**< The timer task for animated images */
 } lv_img_t;
 
 
@@ -156,12 +156,10 @@ void lv_img_set_src(lv_obj_t * obj, const void * src);
  *
  * @param obj           pointer to an image object
  * @param src           pointer to an image source object
- * @param skip_cache    if 1, the image will only be parsed to extract its metadata but it'll skip
- *                      the image cache until it's actually used.
- *                      You might only need to set this if you are preparing your screen at once on start
  * @return LV_RES_OK    If the image was correctly parsed
+ * @note This will replace lv_img_set_src in LVGL9
  */
-lv_res_t lv_img_accept_src(lv_obj_t * obj, const lv_img_src_t * src, int skip_cache);
+lv_res_t lv_img_set_src_obj(lv_obj_t * obj, const lv_img_src_t * src);
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.
@@ -232,7 +230,7 @@ void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode);
 /**
  * Get the source of the image
  * @param obj       pointer to an image object
- * @return          the image source uri (symbol, file name or data for C arrays)
+ * @return          the image source data (symbol, file name or data for C arrays)
  */
 lv_img_src_t * lv_img_get_src(lv_obj_t * obj);
 

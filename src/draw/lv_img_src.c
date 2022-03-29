@@ -37,28 +37,20 @@ lv_img_src_type_t lv_img_src_get_type(const void * src)
 
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        img_src_type = LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
+        return LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
     }
 #if LVGL_IMG_ALLOW_TYPELESS_SRC
     else if(u8_p[0] == 0xFF) {
-        img_src_type = LV_IMG_SRC_OBJ;
+        return LV_IMG_SRC_OBJ;
     }
 #endif
     else if(u8_p[0] >= 0x80) {
-        img_src_type = LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
+        return LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
     }
-    else {
-        img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is draw to the first byte < 0x20*/
-    }
-
-    if(LV_IMG_SRC_UNKNOWN == img_src_type) {
-        LV_LOG_WARN("lv_img_src_get_type: unknown image type");
-    }
-
-    return img_src_type;
+    return LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is draw to the first byte < 0x20*/
 }
 
-lv_res_t lv_img_src_parse(lv_img_src_t * uri, const void * src)
+lv_res_t lv_img_src_parse(lv_img_src_t * obj, const void * src)
 {
     lv_img_src_type_t src_type = lv_img_src_get_type(src);
 
@@ -67,31 +59,31 @@ lv_res_t lv_img_src_parse(lv_img_src_t * uri, const void * src)
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
             LV_LOG_TRACE("lv_img_src_parse: `LV_IMG_SRC_FILE` type found");
 #endif
-            lv_img_src_set_file(uri, src);
+            lv_img_src_set_file(obj, src);
             break;
         case LV_IMG_SRC_VARIABLE: {
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
                 LV_LOG_TRACE("lv_img_src_parse: `LV_IMG_SRC_VARIABLE` type found");
 #endif
                 lv_img_dsc_t * id = (lv_img_dsc_t *) src; /*This might break if given any raw data here*/
-                lv_img_src_set_data(uri, (const uint8_t *)src, id->data_size);
+                lv_img_src_set_data(obj, (const uint8_t *)src, id->data_size);
             }
             break;
 #if LVGL_IMG_ALLOW_TYPELESS_SRC
         case LV_IMG_SRC_OBJ:
             LV_LOG_TRACE("lv_img_src_parse: `LV_IMG_SRC_OBJ` type found");
-            lv_img_src_copy(uri, (lv_img_src_t *)src);
+            lv_img_src_copy(obj, (lv_img_src_t *)src);
             break;
 #endif
         case LV_IMG_SRC_SYMBOL:
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
             LV_LOG_TRACE("lv_img_src_parse: `LV_IMG_SRC_SYMBOL` type found");
 #endif
-            lv_img_src_set_symbol(uri, src);
+            lv_img_src_set_symbol(obj, src);
             break;
         default:
             LV_LOG_WARN("lv_img_src_parse: unknown image type");
-            lv_img_src_free(uri);
+            lv_img_src_free(obj);
             return LV_RES_INV;
     }
     return LV_RES_OK;
@@ -105,7 +97,7 @@ lv_res_t lv_img_src_parse(lv_img_src_t * uri, const void * src)
 void lv_img_src_free(lv_img_src_t * src)
 {
     if(src->type == LV_IMG_SRC_SYMBOL || src->type == LV_IMG_SRC_FILE) {
-        lv_mem_free((void *)src->uri);
+        lv_mem_free((void *)src->data);
     }
     lv_memset_00(src, sizeof(*src));
 }
@@ -118,7 +110,7 @@ void lv_img_src_set_file(lv_img_src_t * obj, const char * file_path)
     if(alloc_str_src(obj, file_path) == LV_RES_INV)
         return;
 
-    obj->ext = find_ext(obj->uri); /* stm32 does not have strrchr */
+    obj->ext = find_ext(obj->data); /* stm32 does not have strrchr */
 }
 
 void lv_img_src_set_data(lv_img_src_t * obj, const uint8_t * data, const size_t len)
@@ -127,8 +119,8 @@ void lv_img_src_set_data(lv_img_src_t * obj, const uint8_t * data, const size_t 
 
     obj->_fixed_hdr = 0xFF;
     obj->type = LV_IMG_SRC_VARIABLE;
-    obj->uri = data;
-    obj->uri_len = len;
+    obj->data = data;
+    obj->data_len = len;
 }
 
 void lv_img_src_set_raw(lv_img_src_t * obj, const lv_img_dsc_t * data)
@@ -137,8 +129,8 @@ void lv_img_src_set_raw(lv_img_src_t * obj, const lv_img_dsc_t * data)
 
     obj->_fixed_hdr = 0xFF;
     obj->type = LV_IMG_SRC_VARIABLE;
-    obj->uri = data;
-    obj->uri_len = sizeof(*data);
+    obj->data = data;
+    obj->data_len = sizeof(*data);
 }
 
 void lv_img_src_set_symbol(lv_img_src_t * obj, const char * symbol)
@@ -155,15 +147,15 @@ void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
     lv_img_src_free(dest);
     dest->_fixed_hdr = 0xFF;
     dest->type = LV_IMG_SRC_UNKNOWN;
-    dest->uri = src->uri;
-    dest->uri_len = src->uri_len;
+    dest->data = src->data;
+    dest->data_len = src->data_len;
     dest->ext = NULL;
-    if(src->type != LV_IMG_SRC_VARIABLE && alloc_str_src(dest, (const char *)src->uri) == LV_RES_INV) {
+    if(src->type != LV_IMG_SRC_VARIABLE && alloc_str_src(dest, (const char *)src->data) == LV_RES_INV) {
         return;
     }
     dest->type = src->type;
     if(src->type == LV_IMG_SRC_FILE) {
-        dest->ext = find_ext(dest->uri); /* stm32 does not have strrchr */
+        dest->ext = find_ext(dest->data); /* stm32 does not have strrchr */
     }
 }
 
@@ -171,15 +163,15 @@ void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
 static lv_res_t alloc_str_src(lv_img_src_t * src, const char * str)
 {
     src->_fixed_hdr = 0xFF;
-    src->uri_len = strlen(str);
-    src->uri = lv_mem_alloc(src->uri_len + 1);
-    LV_ASSERT_MALLOC(src->uri);
-    if(src->uri == NULL) {
-        src->uri_len = 0;
+    src->data_len = strlen(str);
+    src->data = lv_mem_alloc(src->data_len + 1);
+    LV_ASSERT_MALLOC(src->data);
+    if(src->data == NULL) {
+        src->data_len = 0;
         return LV_RES_INV;
     }
 
-    lv_memcpy((void *)src->uri, str, src->uri_len + 1);
+    lv_memcpy((void *)src->data, str, src->data_len + 1);
     return LV_RES_OK;
 }
 

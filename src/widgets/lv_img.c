@@ -32,7 +32,7 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_img(lv_event_t * e);
-static lv_res_t get_metadata(lv_img_t * img, int skip_cache);
+static lv_res_t get_metadata(lv_img_t * img);
 
 
 /**********************
@@ -109,15 +109,15 @@ lv_res_t lv_img_set_stopat_frame(lv_obj_t * obj, const lv_frame_index_t index, c
     return LV_RES_OK;
 }
 
-lv_res_t lv_img_accept_src(lv_obj_t * obj, const lv_img_src_t * uri, int skip_cache)
+lv_res_t lv_img_set_src_obj(lv_obj_t * obj, const lv_img_src_t * data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_img_t * img = (lv_img_t *)obj;
-    if(&img->src != uri)
-        lv_img_src_copy(&img->src, uri);
+    if(&img->src != data)
+        lv_img_src_copy(&img->src, data);
 
-    return get_metadata(img, skip_cache);
+    return get_metadata(img);
 }
 
 
@@ -128,14 +128,14 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
 
     lv_obj_invalidate(obj);
 
-    LV_LOG_WARN("Deprecated usage of lv_img_set_src. Please use lv_img_accept_src or lv_img_set_src_file/data/symbol instead");
+    LV_LOG_WARN("Deprecated usage of lv_img_set_src. Upcoming version will use lv_img_src_t objects instead");
     /* Deprecated API with numerous limitations:
        1. Force to add a LVGL image header on raw encoded image data while there's already such header in the encoded data
        2. Prevent using LV_SYMBOL in the middle of some text, since it use the first byte of the data to figure out if it's a symbol or not
        3. Messy interface hiding the actual type, and requiring multiple deduction each time the source type is required
     */
     if(lv_img_src_parse(&img->src, src) == LV_RES_OK) {
-        get_metadata(img, 1);
+        get_metadata(img);
     }
 }
 void lv_img_set_offset_x(lv_obj_t * obj, lv_coord_t x)
@@ -389,9 +389,8 @@ lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t get_metadata(lv_img_t * img, int skip_cache)
+static lv_res_t get_metadata(lv_img_t * img)
 {
-    LV_UNUSED(skip_cache);
     lv_obj_t * obj = (lv_obj_t *)img;
 
     lv_img_header_t header;
@@ -405,7 +404,7 @@ static lv_res_t get_metadata(lv_img_t * img, int skip_cache)
         lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
         lv_point_t size;
-        lv_txt_get_size(&size, img->src.uri, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_txt_get_size(&size, img->src.data, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         header.w = size.x;
         header.h = size.y;
         header.cf = LV_IMG_CF_ALPHA_1BIT;
@@ -733,7 +732,7 @@ static void draw_img(lv_event_t * e)
                     coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
                     for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
-                        lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src.uri);
+                        lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src.data);
                     }
                 }
                 draw_ctx->clip_area = clip_area_ori;
@@ -743,7 +742,7 @@ static void draw_img(lv_event_t * e)
                 lv_draw_label_dsc_init(&label_dsc);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
-                lv_draw_label(draw_ctx, &label_dsc, &obj->coords, (const char *)img->src.uri, NULL);
+                lv_draw_label(draw_ctx, &label_dsc, &obj->coords, (const char *)img->src.data, NULL);
             }
             else {
                 /*Trigger the error handler of image draw*/
