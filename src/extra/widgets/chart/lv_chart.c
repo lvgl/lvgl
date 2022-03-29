@@ -716,7 +716,7 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         p.x -= obj->coords.x1;
         uint32_t id = get_index_from_x(obj, p.x + lv_obj_get_scroll_left(obj));
-        if(id != chart->pressed_point_id) {
+        if(id != (uint32_t)chart->pressed_point_id) {
             invalidate_point(obj, id);
             invalidate_point(obj, chart->pressed_point_id);
             chart->pressed_point_id = id;
