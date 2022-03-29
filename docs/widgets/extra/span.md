@@ -58,6 +58,9 @@ Use `lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP)` to set object 
 ### first line indent
 Use `lv_spangroup_set_indent(spangroup, 20)` to set the indent of the first line. all modes support pixel units, in addition to LV_SPAN_MODE_FIXED and LV_SPAN_MODE_BREAK mode supports percentage units too.
 
+### lines
+Use `lv_spangroup_set_lines(spangroup, 10)` to set the maximum number of lines to be displayed in LV_SPAN_MODE_BREAK mode, negative values indicate no limit.
+
 ## Events
 No special events are sent by this widget.
 
