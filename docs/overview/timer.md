@@ -1,11 +1,11 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/overview/timer.md
 ```
 # Timers
 
 LVGL has a built-in timer system. You can register a function to have it be called periodically. The timers are handled and called in `lv_timer_handler()`, which needs to be called every few milliseconds.
-See [Porting](/porting/task-handler) for more information.
+See [Porting](/porting/timer-handler) for more information.
 
 Timers are non-preemptive, which means a timer cannot interrupt another timer. Therefore, you can call any LVGL related function in a timer.
 
@@ -52,7 +52,7 @@ You can modify some timer parameters later:
 
 ## Repeat count
 
-You can make a timer repeat only a given number of times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after it's called the defined number of times. Set the count to `-1` to repeat indefinitely. 
+You can make a timer repeat only a given number of times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after it's called the defined number of times. Set the count to `-1` to repeat indefinitely.
 
 
 ## Measure idle time
@@ -73,7 +73,7 @@ void my_screen_clean_up(void * scr)
   /*Free some resources related to `scr`*/
 
   /*Finally delete the screen*/
-  lv_obj_del(scr);  
+  lv_obj_del(scr);
 }
 
 ...

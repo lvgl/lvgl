@@ -35,7 +35,13 @@ typedef enum {
     LV_SCR_LOAD_ANIM_MOVE_RIGHT,
     LV_SCR_LOAD_ANIM_MOVE_TOP,
     LV_SCR_LOAD_ANIM_MOVE_BOTTOM,
-    LV_SCR_LOAD_ANIM_FADE_ON,
+    LV_SCR_LOAD_ANIM_FADE_IN,
+    LV_SCR_LOAD_ANIM_FADE_ON = LV_SCR_LOAD_ANIM_FADE_IN, /*For backward compatibility*/
+    LV_SCR_LOAD_ANIM_FADE_OUT,
+    LV_SCR_LOAD_ANIM_OUT_LEFT,
+    LV_SCR_LOAD_ANIM_OUT_RIGHT,
+    LV_SCR_LOAD_ANIM_OUT_TOP,
+    LV_SCR_LOAD_ANIM_OUT_BOTTOM,
 } lv_scr_load_anim_t;
 
 /**********************
@@ -116,7 +122,7 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
 /**
  * Switch screen with animation
  * @param scr pointer to the new screen to load
- * @param anim_type type of the animation from `lv_scr_load_anim_t`. E.g.  `LV_SCR_LOAD_ANIM_MOVE_LEFT`
+ * @param anim_type type of the animation from `lv_scr_load_anim_t`, e.g. `LV_SCR_LOAD_ANIM_MOVE_LEFT`
  * @param time time of the animation
  * @param delay delay before the transition
  * @param auto_del true: automatically delete the old screen

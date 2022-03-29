@@ -3,7 +3,7 @@
 # Dependencies: (PYTHON-3)
 ##################################################################
 SJPG_FILE_FORMAT_VERSION = "V1.00"  #
-JPEG_SPLIT_HEIGHT   = 16 
+JPEG_SPLIT_HEIGHT   = 16
 ##################################################################
 import math, os, sys, time
 from PIL import Image

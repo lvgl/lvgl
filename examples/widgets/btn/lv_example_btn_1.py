@@ -5,7 +5,7 @@ def event_handler(evt):
             print("Clicked event seen")
     elif code == lv.EVENT.VALUE_CHANGED:
         print("Value changed seen")
-        
+
 # create a simple button
 btn1 = lv.btn(lv.scr_act())
 

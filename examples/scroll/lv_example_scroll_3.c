@@ -22,7 +22,7 @@ static void float_btn_event_cb(lv_event_t * e)
 }
 
 /**
- * Create a list a with a floating button
+ * Create a list with a floating button
  */
 void lv_example_scroll_3(void)
 {

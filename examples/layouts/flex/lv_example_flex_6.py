@@ -12,7 +12,7 @@ cont.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)
 for i in range(20):
     obj = lv.obj(cont)
     obj.set_size(70, lv.SIZE.CONTENT)
-    
+
     label = lv.label(obj)
     label.set_text(str(i))
     label.center()

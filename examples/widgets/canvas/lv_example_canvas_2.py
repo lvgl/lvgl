@@ -1,6 +1,6 @@
 CANVAS_WIDTH   = 50
 CANVAS_HEIGHT  = 50
-LV_COLOR_CHROMA_KEY = lv.color_hex(0x00ff00) 
+LV_COLOR_CHROMA_KEY = lv.color_hex(0x00ff00)
 
 def LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h):
     return int(((w / 8) + 1) * h)
@@ -13,7 +13,7 @@ def LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h):
 
 #
 # Create a transparent canvas with Chroma keying and indexed color format (palette).
-# 
+#
 
 # Create a button to better see the transparency
 btn=lv.btn(lv.scr_act())

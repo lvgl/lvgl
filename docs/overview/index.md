@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/overview/index.md
 ```
 
@@ -27,6 +27,7 @@
    animation
    timer
    drawing
+   renderers/index
    new_widget
 ```
 

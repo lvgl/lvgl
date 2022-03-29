@@ -496,7 +496,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(code == LV_EVENT_STYLE_CHANGED) {
         /*Refresh the file name to refresh the symbol text size*/
         if(img->src.type == LV_IMG_SRC_SYMBOL) {
-            get_metadata(img, 0);
+            get_metadata(img);
         }
         else {
             /*With transformation it might change*/

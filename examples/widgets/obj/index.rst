@@ -1,11 +1,11 @@
 
-Base objects with custom styles 
+Base objects with custom styles
 """"""""""""""""""""""""""""""""
 
 .. lv_example:: widgets/obj/lv_example_obj_1
   :language: c
-  
-Make an object draggable 
+
+Make an object draggable
 """"""""""""""""""""""""""""
 
 .. lv_example:: widgets/obj/lv_example_obj_2

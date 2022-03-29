@@ -13,5 +13,5 @@
 # - Update the simulator and lv_port projects
 #
 # USAGE:
-# release.py <type>  
+# release.py <type>
 # - <type>: -minor or -major

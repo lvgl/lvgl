@@ -373,6 +373,15 @@
  * GPU
  *-----------*/
 
+/*Use Arm's 2D acceleration library Arm-2D */
+#ifndef LV_USE_GPU_ARM2D
+    #ifdef CONFIG_LV_USE_GPU_ARM2D
+        #define LV_USE_GPU_ARM2D CONFIG_LV_USE_GPU_ARM2D
+    #else
+        #define LV_USE_GPU_ARM2D 0
+    #endif
+#endif
+
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #ifndef LV_USE_GPU_STM32_DMA2D
     #ifdef CONFIG_LV_USE_GPU_STM32_DMA2D
@@ -2109,11 +2118,11 @@
 #endif
 #if LV_USE_FFMPEG
     /*Dump input information to stderr*/
-    #ifndef LV_FFMPEG_AV_DUMP_FORMAT
-        #ifdef CONFIG_LV_FFMPEG_AV_DUMP_FORMAT
-            #define LV_FFMPEG_AV_DUMP_FORMAT CONFIG_LV_FFMPEG_AV_DUMP_FORMAT
+    #ifndef LV_FFMPEG_DUMP_FORMAT
+        #ifdef CONFIG_LV_FFMPEG_DUMP_FORMAT
+            #define LV_FFMPEG_DUMP_FORMAT CONFIG_LV_FFMPEG_DUMP_FORMAT
         #else
-            #define LV_FFMPEG_AV_DUMP_FORMAT 0
+            #define LV_FFMPEG_DUMP_FORMAT 0
         #endif
     #endif
 #endif
@@ -2155,6 +2164,15 @@
         #define LV_USE_FRAGMENT CONFIG_LV_USE_FRAGMENT
     #else
         #define LV_USE_FRAGMENT 0
+    #endif
+#endif
+
+/*draw img in label or span obj */
+#ifndef LV_USE_IMGFONT
+    #ifdef CONFIG_LV_USE_IMGFONT
+        #define LV_USE_IMGFONT CONFIG_LV_USE_IMGFONT
+    #else
+        #define LV_USE_IMGFONT 0
     #endif
 #endif
 

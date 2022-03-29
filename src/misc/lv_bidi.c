@@ -339,7 +339,7 @@ static uint32_t lv_bidi_get_next_paragraph(const char * txt)
 
 /**
  * Get the direction of a character
- * @param letter an Unicode character
+ * @param letter a Unicode character
  * @return `LV_BASE_DIR_RTL/LTR/WEAK/NEUTRAL`
  */
 static lv_base_dir_t lv_bidi_get_letter_dir(uint32_t letter)
@@ -352,7 +352,7 @@ static lv_base_dir_t lv_bidi_get_letter_dir(uint32_t letter)
 }
 /**
  * Tell whether a character is weak or not
- * @param letter an Unicode character
+ * @param letter a Unicode character
  * @return true/false
  */
 static bool lv_bidi_letter_is_weak(uint32_t letter)
@@ -371,7 +371,7 @@ static bool lv_bidi_letter_is_weak(uint32_t letter)
 }
 /**
  * Tell whether a character is RTL or not
- * @param letter an Unicode character
+ * @param letter a Unicode character
  * @return true/false
  */
 static bool lv_bidi_letter_is_rtl(uint32_t letter)
@@ -389,7 +389,7 @@ static bool lv_bidi_letter_is_rtl(uint32_t letter)
 
 /**
  * Tell whether a character is neutral or not
- * @param letter an Unicode character
+ * @param letter a Unicode character
  * @return true/false
  */
 static bool lv_bidi_letter_is_neutral(uint32_t letter)

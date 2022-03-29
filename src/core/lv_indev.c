@@ -75,14 +75,15 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     /*Handle reset query before processing the point*/
     indev_proc_reset_query_handler(indev_act);
 
-    if(indev_act->proc.disabled) return;
+    if(indev_act->proc.disabled ||
+       indev_act->driver->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
     bool continue_reading;
     do {
         /*Read the data*/
         _lv_indev_read(indev_act, &data);
         continue_reading = data.continue_reading;
 
-        /*The active object might deleted even in the read function*/
+        /*The active object might be deleted even in the read function*/
         indev_proc_reset_query_handler(indev_act);
         indev_obj_act = NULL;
 
@@ -121,9 +122,18 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
 
 void lv_indev_enable(lv_indev_t * indev, bool en)
 {
-    if(!indev) return;
+    uint8_t enable = en ? 0 : 1;
 
-    indev->proc.disabled = en ? 0 : 1;
+    if(indev) {
+        indev->proc.disabled = enable;
+    }
+    else {
+        lv_indev_t * i = lv_indev_get_next(NULL);
+        while(i) {
+            indev->proc.disabled = enable;
+            i = lv_indev_get_next(i);
+        }
+    }
 }
 
 lv_indev_t * lv_indev_get_act(void)
@@ -410,7 +420,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Key press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_RELEASED) {
-        LV_LOG_INFO("%d key is pressed", data->key);
+        LV_LOG_INFO("%" LV_PRIu32 " key is pressed", data->key);
         i->proc.pr_timestamp = lv_tick_get();
 
         /*Simulate a press on the object if ENTER was pressed*/
@@ -497,7 +507,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Release happened*/
     else if(data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
-        LV_LOG_INFO("%d key is released", data->key);
+        LV_LOG_INFO("%" LV_PRIu32 " key is released", data->key);
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
         if(data->key == LV_KEY_ENTER) {
@@ -760,10 +770,10 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     static lv_indev_state_t prev_state = LV_INDEV_STATE_RELEASED;
     if(prev_state != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {
-            LV_LOG_INFO("button %d is pressed (x:%d y:%d)", data->btn_id, x, y);
+            LV_LOG_INFO("button %" LV_PRIu32 " is pressed (x:%d y:%d)", data->btn_id, x, y);
         }
         else {
-            LV_LOG_INFO("button %d is released (x:%d y:%d)", data->btn_id, x, y);
+            LV_LOG_INFO("button %" LV_PRIu32 " is released (x:%d y:%d)", data->btn_id, x, y);
         }
     }
 

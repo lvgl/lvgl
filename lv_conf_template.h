@@ -157,6 +157,9 @@
  * GPU
  *-----------*/
 
+/*Use Arm's 2D acceleration library Arm-2D */
+#define LV_USE_GPU_ARM2D 0
+
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #define LV_USE_GPU_STM32_DMA2D 0
 #if LV_USE_GPU_STM32_DMA2D
@@ -641,7 +644,7 @@
 #define LV_USE_FFMPEG  0
 #if LV_USE_FFMPEG
     /*Dump input information to stderr*/
-    #define LV_FFMPEG_AV_DUMP_FORMAT 0
+    #define LV_FFMPEG_DUMP_FORMAT 0
 #endif
 
 /*-----------
@@ -659,6 +662,9 @@
 
 /*1: Enable lv_obj fragment*/
 #define LV_USE_FRAGMENT 0
+
+/*draw img in label or span obj */
+#define LV_USE_IMGFONT 0
 
 /*==================
 * EXAMPLES

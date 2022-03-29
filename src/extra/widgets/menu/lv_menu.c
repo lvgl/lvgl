@@ -360,8 +360,9 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
 {
     LV_ASSERT_OBJ(menu, MY_CLASS);
 
-    /* Make the object clickable */
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     /* Remove old event */
     if(lv_obj_remove_event_cb(obj, lv_menu_load_page_event_cb)) {
@@ -683,6 +684,11 @@ static void lv_menu_load_page_event_cb(lv_event_t * e)
     }
 
     lv_menu_set_page((lv_obj_t *)menu, page);
+
+    if(lv_group_get_default() != NULL && menu->sidebar_page == NULL) {
+        /* Sidebar is not supported for now*/
+        lv_group_focus_next(lv_group_get_default());
+    }
 }
 
 static void lv_menu_obj_del_event_cb(lv_event_t * e)

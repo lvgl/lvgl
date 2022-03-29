@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/porting/index.md
 ```
 
@@ -14,11 +14,11 @@
    display
    indev
    tick
-   task-handler
+   timer-handler
    sleep
    os
    log
    gpu
-   
+
 ```
 

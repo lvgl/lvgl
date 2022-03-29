@@ -954,28 +954,22 @@ static void pwd_char_hider(lv_obj_t * obj)
 }
 
 /**
- * Test an unicode character if it is accepted or not. Checks max length and accepted char list.
+ * Test a unicode character if it is accepted or not. Checks max length and accepted char list.
  * @param ta pointer to a test area object
- * @param c an unicode character
+ * @param c a unicode character
  * @return true: accepted; false: rejected
  */
 static bool char_is_accepted(lv_obj_t * obj, uint32_t c)
 {
     lv_textarea_t * ta = (lv_textarea_t *)obj;
 
-    /*If the accepted char list in not specified the accept the character*/
-    if(ta->accepted_chars == NULL) return true;
-
-    /*If no restriction accept it*/
-    if((ta->accepted_chars == NULL || ta->accepted_chars[0] == '\0') && ta->max_length == 0) return true;
-
     /*Too many characters?*/
     if(ta->max_length > 0 && _lv_txt_get_encoded_length(lv_textarea_get_text(obj)) >= ta->max_length) {
         return false;
     }
 
+    if(ta->accepted_chars == NULL || ta->accepted_chars[0] == '\0') return true;
     /*Accepted character?*/
-    /*We're sure ta->accepted_chars != NULL*/
     uint32_t i = 0;
 
     while(ta->accepted_chars[i] != '\0') {

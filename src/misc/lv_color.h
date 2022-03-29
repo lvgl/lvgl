@@ -676,7 +676,7 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8);
 lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 
 /**
- * Just a wrapper around LV_COLOR_CHROMA_KEY because it might be more convenient to use a function is some cases
+ * Just a wrapper around LV_COLOR_CHROMA_KEY because it might be more convenient to use a function in some cases
  * @return LV_COLOR_CHROMA_KEY
  */
 static inline lv_color_t lv_color_chroma_key(void)

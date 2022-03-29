@@ -91,7 +91,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
     if(src_type == LV_IMG_SRC_OBJ) {
         lv_img_src_t * src_obj = ((lv_img_src_t *)src);
         src_type = src_obj->type;
-        src = src_obj->uri;
+        src = src_obj->data;
     }
 #endif
 
@@ -122,7 +122,7 @@ lv_res_t lv_img_decoder_open(lv_img_dec_dsc_t * dsc, const void * src, lv_color_
     if(src_type == LV_IMG_SRC_OBJ) {
         lv_img_src_t * src_obj = ((lv_img_src_t *)src);
         src_type = src_obj->type;
-        src = src_obj->uri;
+        src = src_obj->data;
     }
 #endif
     if(src_type == LV_IMG_SRC_VARIABLE) {

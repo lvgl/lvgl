@@ -12,10 +12,10 @@ try:
 except:
     print("Could not find star.png")
     sys.exit()
-    
+
 img_star_argb = lv.img_dsc_t({
   'data_size': len(png_data),
-  'data': png_data 
+  'data': png_data
 })
 
 def event_cb(e):
@@ -44,7 +44,7 @@ def event_cb(e):
                 dsc.rect_dsc.bg_color = lv.palette_darken(lv.PALETTE.RED, 3)
             else:
                 dsc.rect_dsc.bg_color = lv.palette_main(lv.PALETTE.RED)
-                
+
                 dsc.label_dsc.color = lv.color_white()
         elif dsc.id == 3:
             dsc.label_dsc.opa = lv.OPA.TRANSP  # Hide the text if any

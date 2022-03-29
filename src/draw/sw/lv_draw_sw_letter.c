@@ -172,6 +172,24 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     uint32_t shades;
     if(bpp == 3) bpp = 4;
 
+#if LV_USE_IMGFONT
+    if(bpp == LV_IMGFONT_BPP) { //is imgfont
+        lv_area_t fill_area;
+        fill_area.x1 = pos->x;
+        fill_area.y1 = pos->y;
+        fill_area.x2 = pos->x + g->box_w - 1;
+        fill_area.y2 = pos->y + g->box_h - 1;
+        lv_draw_img_dsc_t img_dsc;
+        lv_draw_img_dsc_init(&img_dsc);
+        img_dsc.angle = 0;
+        img_dsc.zoom = LV_IMG_ZOOM_NONE;
+        img_dsc.opa = dsc->opa;
+        img_dsc.blend_mode = dsc->blend_mode;
+        lv_draw_img(draw_ctx, &img_dsc, &fill_area, map_p);
+        return;
+    }
+#endif
+
     switch(bpp) {
         case 1:
             bpp_opa_table_p = _lv_bpp1_opa_table;

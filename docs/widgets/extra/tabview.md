@@ -1,5 +1,5 @@
 ```eval_rst
-.. include:: /header.rst 
+.. include:: /header.rst
 :github_url: |github_link_base|/widgets/extra/tabview.md
 ```
 
@@ -14,7 +14,7 @@ The Tab view is built from other widgets:
   - Container for the tabs: [lv_obj](/widgets/obj)
      - Content of the tabs: [lv_obj](/widgets/obj)
 
-The tab buttons can be positioned on the top, bottom, left and right side of the Tab view. 
+The tab buttons can be positioned on the top, bottom, left and right side of the Tab view.
 
 A new tab can be selected either by clicking on a tab button or by sliding horizontally on the content.
 
@@ -25,7 +25,7 @@ There are no special parts on the Tab view but the `lv_obj` and `lv_btnnmatrix` 
 
 ### Create a Tab view
 
-`lv_tabview_create(parent, tab_pos, tab_size);` creates a new empty Tab view.  `tab_pos` can be `LV_DIR_TOP/BOTTOM/LEFT/RIGHT` to position the tab buttons to a side. 
+`lv_tabview_create(parent, tab_pos, tab_size);` creates a new empty Tab view.  `tab_pos` can be `LV_DIR_TOP/BOTTOM/LEFT/RIGHT` to position the tab buttons to a side.
 `tab_size` is the height (in case of `LV_DIR_TOP/BOTTOM`) or width (in case of `LV_DIR_LEFT/RIGHT`) tab buttons.
 
 ### Add tabs

@@ -5,7 +5,7 @@ def slider_event_cb(e):
     # Provide some extra space for the value
     if code == lv.EVENT.REFR_EXT_DRAW_SIZE:
         e.set_ext_draw_size(50)
-        
+
     elif code == lv.EVENT.DRAW_PART_END:
         # print("DRAW_PART_END")
         dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())

@@ -21,6 +21,7 @@
 #include "../draw/sw/lv_draw_sw.h"
 #include "../draw/sdl/lv_draw_sdl.h"
 #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
+#include "../draw/arm2d/lv_gpu_arm2d.h"
 
 #if LV_USE_THEME_DEFAULT
     #include "../extra/themes/default/lv_theme_default.h"
@@ -108,6 +109,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_sdl_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
+#elif LV_USE_GPU_ARM2D
+    driver->draw_ctx_init = lv_draw_arm2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_arm2d_ctx_init;
+    driver->draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
 #else
     driver->draw_ctx_init = lv_draw_sw_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
