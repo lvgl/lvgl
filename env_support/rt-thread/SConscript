@@ -52,16 +52,13 @@ if GetDepend('PKG_USING_LVGL_DEMOS'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-cflags = ''
+LOCAL_CFLAGS = ''
 if rtconfig.PLATFORM == 'gcc' or rtconfig.PLATFORM == 'armclang': # GCC or Keil AC6
-    cflags = cflags + ' -std=c99'
+    LOCAL_CFLAGS += ' -std=c99'
 elif rtconfig.PLATFORM == 'armcc': # Keil AC5
-    cflags = cflags + ' --c99 --gnu'
+    LOCAL_CFLAGS += ' --c99 --gnu'
 
-print(rtconfig.PLATFORM)
-print(cflags)
-
-group = group + DefineGroup('LVGL', src, depend = ['PKG_USING_LVGL'], CPPPATH = inc, LOCAL_CFLAGS = cflags)
+group = group + DefineGroup('LVGL', src, depend = ['PKG_USING_LVGL'], CPPPATH = inc, LOCAL_CFLAGS = LOCAL_CFLAGS)
 
 list = os.listdir(cwd)
 for d in list:
