@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include "../core/lv_version.h"
 
 #include <stdint.h>
 #include <stddef.h>
