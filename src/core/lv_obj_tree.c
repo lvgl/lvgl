@@ -65,6 +65,7 @@ void lv_obj_del(lv_obj_t * obj)
 
     /*Call the ancestor's event handler to the parent to notify it about the child delete*/
     if(par) {
+        lv_obj_update_layout(par);
         lv_obj_readjust_scroll(par, LV_ANIM_OFF);
         lv_obj_scrollbar_invalidate(par);
         lv_event_send(par, LV_EVENT_CHILD_CHANGED, NULL);
