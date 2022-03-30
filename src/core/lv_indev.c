@@ -130,7 +130,7 @@ void lv_indev_enable(lv_indev_t * indev, bool en)
     else {
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
-            indev->proc.disabled = enable;
+            i->proc.disabled = enable;
             i = lv_indev_get_next(i);
         }
     }
