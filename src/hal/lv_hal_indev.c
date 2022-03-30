@@ -75,7 +75,6 @@ void lv_indev_drv_init(lv_indev_drv_t * driver)
  */
 lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
 {
-
     if(driver->disp == NULL) driver->disp = lv_disp_get_default();
 
     if(driver->disp == NULL) {
@@ -85,8 +84,8 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     }
 
     lv_indev_t * indev = _lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
+    LV_ASSERT_MALLOC(indev);
     if(!indev) {
-        LV_ASSERT_MALLOC(indev);
         return NULL;
     }
 
