@@ -433,7 +433,8 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
         int16_t inner_act_mask_id = LV_MASK_ID_INV; /*Will be added later*/
 
         uint32_t minor_cnt = scale->tick_major_nth ? scale->tick_major_nth - 1 : 0xFFFF;
-        for(uint16_t i = 0; i < scale->tick_cnt; i++) {
+        uint16_t i;
+        for(i = 0; i < scale->tick_cnt; i++) {
             minor_cnt++;
             bool major = false;
             if(minor_cnt == scale->tick_major_nth) {
