@@ -73,7 +73,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     return obj;
 }
 
-lv_obj_t * lv_list_add_btn(lv_obj_t * list, const char * icon, const char * txt)
+lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_btn_class, list);
