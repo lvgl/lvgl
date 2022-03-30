@@ -91,7 +91,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
 
             /*Save the data in the header*/
             header->always_zero = 0;
-            header->cf = LV_IMG_CF_RAW_ALPHA;
+            header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
             /*The width and height are stored in Big endian format so convert them to little endian*/
             header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
             header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
