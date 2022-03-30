@@ -1717,9 +1717,6 @@ static void invalidate_point(lv_obj_t * obj, uint16_t i)
 
         lv_obj_invalidate_area(obj, &col_a);
     }
-    else if(chart->type == LV_CHART_TYPE_SCATTER) {
-        lv_obj_invalidate(obj);
-    }
     else {
         lv_obj_invalidate(obj);
     }
