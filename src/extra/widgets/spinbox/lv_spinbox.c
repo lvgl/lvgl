@@ -105,7 +105,6 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint8_t digit_count, uint8_t se
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
 
     if(separator_position >= digit_count) separator_position = 0;
-    if(separator_position > LV_SPINBOX_MAX_DIGIT_COUNT) separator_position = LV_SPINBOX_MAX_DIGIT_COUNT;
 
     if(digit_count < LV_SPINBOX_MAX_DIGIT_COUNT) {
         int64_t max_val = lv_pow(10, digit_count);
