@@ -135,15 +135,12 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
     PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputConfig);
 
     if(opa >= (lv_opa_t)LV_OPA_MAX) {
-        /*Simple color fill without opacity - AS disabled, PS as color generator*/
-        PXP_SetAlphaSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U); /*Disable AS.*/
-        PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U); /*Disable PS.*/
-        PXP_SetProcessSurfaceBackGroundColor(LV_GPU_NXP_PXP_ID, lv_color_to32(color));
+        /*Simple color fill without opacity - AS disabled*/
+        PXP_SetAlphaSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
+
     }
     else {
-        /*Fill with opacity - AS used as source (same as OUT), PS used as color generator, blended together*/
-
-        /*Set AS to OUT*/
+        /*Fill with opacity - AS used as source (same as OUT)*/
         pxp_as_buffer_config_t asBufferConfig = {
             .pixelFormat = PXP_AS_PIXEL_FORMAT,
             .bufferAddr = (uint32_t)outputConfig.buffer0Addr,
@@ -152,27 +149,28 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
 
         PXP_SetAlphaSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &asBufferConfig);
         PXP_SetAlphaSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, area_w, area_h);
-
-        /*Disable PS, use as color generator*/
-        PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
-        PXP_SetProcessSurfaceBackGroundColor(LV_GPU_NXP_PXP_ID, lv_color_to32(color));
-
-        /*Configure Porter-Duff blending*/
-        pxp_porter_duff_config_t pdConfig = {
-            .enable = 1,
-            .dstColorMode = kPXP_PorterDuffColorNoAlpha,
-            .srcColorMode = kPXP_PorterDuffColorNoAlpha,
-            .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
-            .srcGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
-            .srcFactorMode = kPXP_PorterDuffFactorStraight,
-            .dstFactorMode = kPXP_PorterDuffFactorStraight,
-            .srcGlobalAlpha = opa,
-            .dstGlobalAlpha = 0xff - opa,
-            .srcAlphaMode = kPXP_PorterDuffAlphaStraight, /*don't care*/
-            .dstAlphaMode = kPXP_PorterDuffAlphaStraight /*don't care*/
-        };
-        PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
     }
+
+    /*Disable PS, use as color generator*/
+    PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
+    PXP_SetProcessSurfaceBackGroundColor(LV_GPU_NXP_PXP_ID, lv_color_to32(color));
+
+    /*Configure Porter-Duff blending - src settings are unused for fill without opacity*/
+    pxp_porter_duff_config_t pdConfig = {
+        .enable = 1,
+        .dstColorMode = kPXP_PorterDuffColorNoAlpha,
+        .srcColorMode = kPXP_PorterDuffColorNoAlpha,
+        .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
+        .srcGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
+        .dstFactorMode = kPXP_PorterDuffFactorStraight,
+        .srcFactorMode = kPXP_PorterDuffFactorStraight,
+        .dstGlobalAlpha = opa,
+        .srcGlobalAlpha = opa,
+        .dstAlphaMode = (opa >= (lv_opa_t)LV_OPA_MAX) ? kPXP_PorterDuffAlphaStraight : kPXP_PorterDuffAlphaInversed,
+        .srcAlphaMode = kPXP_PorterDuffAlphaStraight
+    };
+
+    PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
 
     lv_gpu_nxp_pxp_run(); /*Start PXP task*/
 
