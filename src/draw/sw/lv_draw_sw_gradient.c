@@ -324,6 +324,8 @@ LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_gradient_calculate(const lv_grad_dsc_t 
         }
     }
 
+    LV_ASSERT(d != 0);
+
     /*Then interpolate*/
     frac -= min;
     lv_opa_t mix = (frac * 255) / d;
