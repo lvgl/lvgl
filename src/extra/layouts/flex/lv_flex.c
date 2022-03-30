@@ -428,6 +428,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
         for(i = 0; i < t->grow_item_cnt; i++) {
             if(t->grow_dsc[i].clamped == 0) {
+                LV_ASSERT(grow_value_sum != 0);
                 grow_unit = grow_max_size / grow_value_sum;
                 lv_coord_t size = grow_unit * t->grow_dsc[i].grow_value;
                 lv_coord_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
