@@ -327,28 +327,25 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     if(tr == NULL) return;
     tr->start_value = v1;
     tr->end_value = v2;
+    tr->obj = obj;
+    tr->prop = tr_dsc->prop;
+    tr->selector = part;
 
-    if(tr) {
-        tr->obj = obj;
-        tr->prop = tr_dsc->prop;
-        tr->selector = part;
-
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, tr);
-        lv_anim_set_exec_cb(&a, trans_anim_cb);
-        lv_anim_set_start_cb(&a, trans_anim_start_cb);
-        lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
-        lv_anim_set_values(&a, 0x00, 0xFF);
-        lv_anim_set_time(&a, tr_dsc->time);
-        lv_anim_set_delay(&a, tr_dsc->delay);
-        lv_anim_set_path_cb(&a, tr_dsc->path_cb);
-        lv_anim_set_early_apply(&a, false);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, tr);
+    lv_anim_set_exec_cb(&a, trans_anim_cb);
+    lv_anim_set_start_cb(&a, trans_anim_start_cb);
+    lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
+    lv_anim_set_values(&a, 0x00, 0xFF);
+    lv_anim_set_time(&a, tr_dsc->time);
+    lv_anim_set_delay(&a, tr_dsc->delay);
+    lv_anim_set_path_cb(&a, tr_dsc->path_cb);
+    lv_anim_set_early_apply(&a, false);
 #if LV_USE_USER_DATA
-        a.user_data = tr_dsc->user_data;
+    a.user_data = tr_dsc->user_data;
 #endif
-        lv_anim_start(&a);
-    }
+    lv_anim_start(&a);
 }
 
 
