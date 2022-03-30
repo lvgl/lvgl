@@ -120,7 +120,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     d.month = calendar->showed_date.month;
     d.day = calendar->showed_date.day;
 
-    uint8_t i;
+    uint32_t i;
 
     /*Remove the disabled state but revert it for day names*/
     lv_btnmatrix_clear_btn_ctrl_all(calendar->btnm, LV_BTNMATRIX_CTRL_DISABLED);
