@@ -446,9 +446,6 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
     if(start_angle >= 0 && start_angle < 180) {
         start_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
     }
-    else if(start_angle >= 180 && start_angle < 360) {
-        start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
-    }
     else
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /*silence compiler*/
 
