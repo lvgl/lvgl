@@ -547,6 +547,9 @@ static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
         bytes[2] = ((letter_uni >> 6) & 0x3F) | 0x80;
         bytes[3] = ((letter_uni >> 0) & 0x3F) | 0x80;
     }
+    else {
+        return 0;
+    }
 
     uint32_t * res_p = (uint32_t *)bytes;
     return *res_p;
