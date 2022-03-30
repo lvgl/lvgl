@@ -379,8 +379,6 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
     p_center.x = scale_area->x1 + r_edge;
     p_center.y = scale_area->y1 + r_edge;
 
-    uint8_t i;
-
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &line_dsc);
@@ -435,6 +433,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
         int16_t inner_act_mask_id = LV_MASK_ID_INV; /*Will be added later*/
 
         uint32_t minor_cnt = scale->tick_major_nth ? scale->tick_major_nth - 1 : 0xFFFF;
+        uint16_t i;
         for(i = 0; i < scale->tick_cnt; i++) {
             minor_cnt++;
             bool major = false;
