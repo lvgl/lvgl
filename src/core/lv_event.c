@@ -436,7 +436,7 @@ static lv_res_t event_send_core(lv_event_t * e)
     }
 
     lv_res_t res = LV_RES_OK;
-    lv_event_dsc_t * event_dsc = res == LV_RES_INV ? NULL : lv_obj_get_event_dsc(e->current_target, 0);
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(e->current_target, 0);
 
     uint32_t i = 0;
     while(event_dsc && res == LV_RES_OK) {
