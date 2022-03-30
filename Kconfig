@@ -721,6 +721,7 @@ menu "LVGL configuration"
             default y if !LV_CONF_MINIMAL
         config LV_USE_CANVAS
             bool "Canvas. Dependencies: lv_img."
+            select LV_USE_IMG
             default y if !LV_CONF_MINIMAL
         config LV_USE_CHECKBOX
             bool "Check Box"
@@ -881,52 +882,52 @@ menu "LVGL configuration"
             bool "File system on top of stdio API"
         config LV_FS_STDIO_LETTER
             string "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )"
-            depends on LV_USE_FS_STDIO != 0
+            depends on LV_USE_FS_STDIO
         config LV_FS_STDIO_PATH
             string "Set the working directory"
-            depends on LV_USE_FS_STDIO != 0
+            depends on LV_USE_FS_STDIO
         config LV_FS_STDIO_CACHE_SIZE
             string ">0 to cache this number of bytes in lv_fs_read()"
-            depends on LV_USE_FS_STDIO != 0
+            depends on LV_USE_FS_STDIO
 
         config LV_USE_FS_POSIX
             bool "File system on top of posix API"
         config LV_FS_POSIX_LETTER
             int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
             default 0
-            depends on LV_USE_FS_POSIX != 0
+            depends on LV_USE_FS_POSIX
         config LV_FS_POSIX_PATH
             string "Set the working directory"
-            depends on LV_USE_FS_POSIX != 0
+            depends on LV_USE_FS_POSIX
         config LV_FS_POSIX_CACHE_SIZE
             int ">0 to cache this number of bytes in lv_fs_read()"
             default 0
-            depends on LV_USE_FS_POSIX != 0
+            depends on LV_USE_FS_POSIX
 
         config LV_USE_FS_WIN32
             bool "File system on top of Win32 API"
         config LV_FS_WIN32_LETTER
             int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
             default 0
-            depends on LV_USE_FS_WIN32 != 0
+            depends on LV_USE_FS_WIN32
         config LV_FS_WIN32_PATH
             string "Set the working directory"
-            depends on LV_USE_FS_WIN32 != 0
+            depends on LV_USE_FS_WIN32
         config LV_FS_WIN32_CACHE_SIZE
             int ">0 to cache this number of bytes in lv_fs_read()"
             default 0
-            depends on LV_USE_FS_WIN32 != 0
+            depends on LV_USE_FS_WIN32
 
         config LV_USE_FS_FATFS
             bool "File system on top of FatFS"
         config LV_FS_FATFS_LETTER
             int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65)"
             default 0
-            depends on LV_USE_FS_FATFS != 0
+            depends on LV_USE_FS_FATFS
         config LV_FS_FATFS_CACHE_SIZE
             int ">0 to cache this number of bytes in lv_fs_read()"
             default 0
-            depends on LV_USE_FS_FATFS != 0
+            depends on LV_USE_FS_FATFS
 
         config LV_USE_PNG
             bool "PNG decoder library"
