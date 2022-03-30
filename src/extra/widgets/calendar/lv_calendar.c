@@ -262,7 +262,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
         if(i != 0 && (i + 1) % 8 == 0) {
             calendar->map[i] = "\n";
         }
-        else if(i < 8) {
+        else if(i < 7) {
             calendar->map[i] = day_names_def[i];
         }
         else {
