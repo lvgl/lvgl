@@ -16,10 +16,16 @@
 /*********************
  *      DEFINES
  *********************/
+#define MAX_PATH_LEN 256
 
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    HANDLE dir_p;
+    char next_fn[MAX_PATH_LEN];
+    lv_fs_res_t next_error;
+} dir_handle_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -344,9 +350,6 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
     }
 }
 
-static char next_fn[256];
-static lv_fs_res_t next_error = LV_FS_RES_OK;
-
 /**
  * Initialize a 'DIR' or 'HANDLE' variable for directory reading
  * @param drv pointer to a driver where this function belongs
@@ -356,38 +359,45 @@ static lv_fs_res_t next_error = LV_FS_RES_OK;
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
-
-    HANDLE d = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATAA fdata;
+    dir_handle_t * handle = (dir_handle_t *)lv_mem_alloc(sizeof(dir_handle_t));
+    handle->dir_p = INVALID_HANDLE_VALUE;
+    handle->next_error = LV_FS_RES_OK;
+    WIN32_FIND_DATA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
-    char buf[256];
+    char buf[MAX_PATH_LEN];
 #ifdef LV_FS_WIN32_PATH
     lv_snprintf(buf, sizeof(buf), LV_FS_WIN32_PATH "%s\\*", path);
 #else
     lv_snprintf(buf, sizeof(buf), "%s\\*", path);
 #endif
 
-    strcpy(next_fn, "");
-    d = FindFirstFileA(buf, &fdata);
+    strcpy(handle->next_fn, "");
+    handle->dir_p = FindFirstFile(buf, &fdata);
     do {
         if(is_dots_name(fdata.cFileName)) {
             continue;
         }
         else {
             if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                sprintf(next_fn, "/%s", fdata.cFileName);
+                lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "/%s", fdata.cFileName);
             }
             else {
-                sprintf(next_fn, "%s", fdata.cFileName);
+                lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "%s", fdata.cFileName);
             }
             break;
         }
+    } while(FindNextFileA(handle->dir_p, &fdata));
 
-    } while(FindNextFileA(d, &fdata));
-
-    next_error = fs_error_from_win32(GetLastError());
-    return d;
+    if(handle->dir_p == INVALID_HANDLE_VALUE) {
+        lv_mem_free(handle);
+        handle->next_error = fs_error_from_win32(GetLastError());
+        return INVALID_HANDLE_VALUE;
+    }
+    else {
+        handle->next_error = LV_FS_RES_OK;
+        return handle;
+    }
 }
 
 /**
@@ -401,31 +411,30 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 {
     LV_UNUSED(drv);
+    dir_handle_t * handle = (dir_handle_t *)dir_p;
+    strcpy(fn, handle->next_fn);
+    lv_fs_res_t current_error = handle->next_error;
+    strcpy(handle->next_fn, "");
 
-    strcpy(fn, next_fn);
-    lv_fs_res_t current_error = next_error;
-    next_error = LV_FS_RES_OK;
+    WIN32_FIND_DATA fdata;
 
-    strcpy(next_fn, "");
-    WIN32_FIND_DATAA fdata;
-
-    while(FindNextFileA(dir_p, &fdata)) {
+    while(FindNextFileA(handle->dir_p, &fdata)) {
         if(is_dots_name(fdata.cFileName)) {
             continue;
         }
         else {
             if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-                sprintf(next_fn, "/%s", fdata.cFileName);
+                lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "/%s", fdata.cFileName);
             }
             else {
-                sprintf(next_fn, "%s", fdata.cFileName);
+                lv_snprintf(handle->next_fn, sizeof(handle->next_fn), "%s", fdata.cFileName);
             }
             break;
         }
     }
 
-    if(next_fn[0] == '\0') {
-        next_error = fs_error_from_win32(GetLastError());
+    if(handle->next_fn[0] == '\0') {
+        handle->next_error = fs_error_from_win32(GetLastError());
     }
 
     return current_error;
@@ -440,9 +449,12 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
     LV_UNUSED(drv);
-    return FindClose((HANDLE)dir_p)
-           ? LV_FS_RES_OK
-           : fs_error_from_win32(GetLastError());
+    dir_handle_t * handle = (dir_handle_t *)dir_p;
+    lv_fs_res_t res = FindClose(handle->dir_p)
+                      ? LV_FS_RES_OK
+                      : fs_error_from_win32(GetLastError());
+    lv_mem_free(handle);
+    return res;
 }
 
 #else /*LV_USE_FS_WIN32 == 0*/
