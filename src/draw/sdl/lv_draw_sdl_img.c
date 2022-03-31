@@ -57,9 +57,9 @@ enum {
  *  STATIC PROTOTYPES
  **********************/
 
-static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc);
+static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_dec_dsc_t * dsc);
 
-static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc);
+static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_dec_dsc_t * dsc);
 
 static bool check_mask_simple_radius(const lv_area_t * coords, lv_coord_t * radius);
 
@@ -187,7 +187,7 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
     SDL_Rect rect;
     SDL_memset(&rect, 0, sizeof(SDL_Rect));
     if(cdsc) {
-        lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;
+        lv_img_dec_dsc_t * dsc = &cdsc->dec_dsc;
         if(dsc->user_data && SDL_memcmp(dsc->user_data, LV_DRAW_SDL_DEC_DSC_TEXTURE_HEAD, 8) == 0) {
             lv_draw_sdl_dec_dsc_userdata_t * ptr = (lv_draw_sdl_dec_dsc_userdata_t *) dsc->user_data;
             *texture = ptr->texture;
@@ -221,7 +221,7 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
  *   STATIC FUNCTIONS
  **********************/
 
-static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc)
+static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_dec_dsc_t * dsc)
 {
     if(!dsc->img_data) {
         return upload_img_texture_fallback(renderer, dsc);
@@ -245,7 +245,7 @@ static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_
     return texture;
 }
 
-static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_decoder_dsc_t * dsc)
+static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img_dec_dsc_t * dsc)
 {
     lv_coord_t h = (lv_coord_t) dsc->header.h;
     lv_coord_t w = (lv_coord_t) dsc->header.w;

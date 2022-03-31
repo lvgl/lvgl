@@ -165,7 +165,7 @@ First, you need to create a new image decoder and set some functions to open/clo
 
 ```c
 /*Create a new decoder and register functions */
-lv_img_decoder_t * dec = lv_img_decoder_create();
+lv_img_dec_t * dec = lv_img_decoder_create();
 lv_img_decoder_set_info_cb(dec, decoder_info);
 lv_img_decoder_set_open_cb(dec, decoder_open);
 lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -178,7 +178,7 @@ lv_img_decoder_set_close_cb(dec, decoder_close);
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_header_t * header)
 {
   /*Check whether the type `src` is known by the decoder*/
   if(is_png(src) == false) return LV_RES_INV;
@@ -197,7 +197,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
  * @param dsc pointer to a descriptor which describes this decoding session
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_res_t decoder_open(lv_img_dec_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
 
   /*Check whether the type `src` is known by the decoder*/
@@ -226,7 +226,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
  * @param buf a buffer to store the decoded pixels
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
-lv_res_t decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
+lv_res_t decoder_built_in_read_line(lv_img_dec_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
                                                   lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
    /*With PNG it's usually not required*/
@@ -240,7 +240,7 @@ lv_res_t decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_d
  * @param decoder pointer to the decoder where this function belongs
  * @param dsc pointer to a descriptor which describes this decoding session
  */
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
   /*Free all allocated data*/
 

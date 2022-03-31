@@ -67,16 +67,6 @@ void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
 /**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
- *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
- */
-lv_img_src_t lv_img_src_get_type(const void * src);
-
-/**
  * Get the pixel size of a color format in bits
  * @param cf a color format (`LV_IMG_CF_...`)
  * @return the pixel size in bits
