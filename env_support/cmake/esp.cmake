@@ -22,7 +22,7 @@ if(LV_MICROPYTHON)
   endif()
 else()
   idf_component_register(SRCS ${SOURCES} INCLUDE_DIRS ${LVGL_ROOT_DIR}
-                         ${LVGL_ROOT_DIR}/src ${LVGL_ROOT_DIR}/../)
+                         ${LVGL_ROOT_DIR}/src ${LVGL_ROOT_DIR}/../ REQUIRES main)
 
   target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 
