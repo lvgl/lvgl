@@ -14,6 +14,7 @@ On to top of the screen the title of the current test step, and the result of th
 - In `lv_conf.h` or equivalent places set `LV_USE_DEMO_BENCHMARK 1`
 - After `lv_init()` and initializing the drivers call `lv_demo_benchmark()`
 - If you only want to run a specific scene for any purpose (e.g. debug, performance optimization etc.), you can call `lv_demo_benchmark_run_scene()` instead of `lv_demo_benchmark()`and pass the scene number.
+- If you enabled trace output by setting macro `LV_USE_LOG` to `1` and trace level `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER` or higher, benchmark results are printed out in `csv` format.
 
 
 ## Interpret the result
@@ -32,6 +33,32 @@ In other words, the benchmark shows the FPS from the pure rendering time.
 By default, only the changed areas are refreshed. It means if only a few pixels are changed in 1 ms the benchmark will show 1000 FPS. To measure the performance with full screen refresh uncomment `lv_obj_invalidate(lv_scr_act())` in `monitor_cb()` in `lv_demo_benchmark.c`.
 
 ![LVGL benchmark running](https://github.com/lvgl/lvgl/tree/master/demos/benchmark/screenshot1.png?raw=true)
+
+If you are doing performance analysis for 2D image processing optimization, LCD latency (flushing data to LCD) introduced by `disp_flush()` might dilute the performance results of the LVGL drawing process, hence make it harder to see your optimization results (gain or loss). To avoid such problem, please:
+
+1. Temporarily remove the code for flushing data to LCD inside `disp_flush()`. For example:
+
+```c
+static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+{
+#if 0 //!< remove LCD latency
+    GLCD_DrawBitmap(area->x1,               //!< x
+                    area->y1,               //!< y
+                    area->x2 - area->x1 + 1,    //!< width
+                    area->y2 - area->y1 + 1,    //!< height
+                    (const uint8_t *)color_p);
+#endif
+    /*IMPORTANT!!!
+     *Inform the graphics library that you are ready with the flushing*/
+    lv_disp_flush_ready(disp_drv);
+}
+```
+
+2. Use trace output to get the benchmark results by:
+   - Setting macro `LV_USE_LOG` to `1` 
+   - Setting trace level `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER` or higher.
+
+
 
 
 ## Result summary
