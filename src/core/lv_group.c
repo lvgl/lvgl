@@ -373,12 +373,6 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
     bool can_move            = true;
     bool can_begin           = true;
 
-    if(group->obj_focus) {
-        lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_DEFOCUSED, get_indev(group));
-        if(res != LV_RES_OK) return;
-        lv_obj_invalidate(*group->obj_focus);
-    }
-
     for(;;) {
         if(obj_next == NULL) {
             if(group->wrap || obj_sentinel == NULL) {
@@ -422,6 +416,14 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
 
         /*If we got her a good candidate is found*/
         break;
+    }
+
+    if(obj_next == group->obj_focus) return; /*There's only one visible object and it's already focused*/
+
+    if(group->obj_focus) {
+        lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_DEFOCUSED, get_indev(group));
+        if(res != LV_RES_OK) return;
+        lv_obj_invalidate(*group->obj_focus);
     }
 
     group->obj_focus = obj_next;
