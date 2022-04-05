@@ -875,15 +875,17 @@ static void report_cb(lv_timer_t * timer)
     if(opa_mode) {
         lv_label_set_text_fmt(subtitle, "Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
                               scenes[scene_act].fps_normal);
+        LV_LOG("Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
+               scenes[scene_act].fps_normal);
+    }
+    else if(scene_act > 0) {
+        lv_label_set_text_fmt(subtitle, "Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
+                              scenes[scene_act - 1].fps_opa);
+        LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
+               scenes[scene_act - 1].fps_opa);
     }
     else {
-        if(scene_act > 0) {
-            lv_label_set_text_fmt(subtitle, "Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
-                                  scenes[scene_act - 1].fps_opa);
-        }
-        else {
-            lv_label_set_text(subtitle, "");
-        }
+        lv_label_set_text(subtitle, "");
     }
 }
 
