@@ -28,9 +28,9 @@ extern "C" {
  **********************/
 
 typedef enum {
-  LV_GIF_LOOP_DEFAULT, // play gif as many times as is defined in the actual file
-  LV_GIF_LOOP_SINGLE, // play only one loop
-  LV_GIF_LOOP_ON // loop indefinitely
+    LV_GIF_LOOP_DEFAULT, // play gif as many times as is defined in the actual file
+    LV_GIF_LOOP_SINGLE, // play only one loop
+    LV_GIF_LOOP_ON // loop indefinitely
 } lv_gif_loop_t;
 
 typedef struct {
