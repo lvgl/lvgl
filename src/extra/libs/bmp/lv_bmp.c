@@ -79,7 +79,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     /*If it's a BMP file...*/
     if(src_type == LV_IMG_SRC_FILE) {
         const char * fn = src;
-        if(!strcmp(&fn[strlen(fn) - 3], "bmp")) {              /*Check the extension*/
+        if(strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
             /*Save the data in the header*/
             lv_fs_file_t f;
             lv_fs_res_t res = lv_fs_open(&f, src, LV_FS_MODE_RD);
@@ -129,7 +129,9 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         const char * fn = dsc->src;
 
-        if(strcmp(&fn[strlen(fn) - 3], "bmp")) return LV_RES_INV;       /*Check the extension*/
+        if(strcmp(lv_fs_get_ext(fn), "bmp") != 0) {
+            return LV_RES_INV;       /*Check the extension*/
+        }
 
         bmp_dsc_t b;
         memset(&b, 0x00, sizeof(b));
