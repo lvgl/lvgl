@@ -211,7 +211,7 @@ end:
     }
     else if(src_type == LV_IMG_SRC_FILE) {
         const char * fn = src;
-        if(!strcmp(&fn[strlen(fn) - 5], ".sjpg")) {
+        if(strcmp(lv_fs_get_ext(fn), "sjpg") == 0) {
 
             uint8_t buff[22];
             memset(buff, 0, sizeof(buff));
@@ -246,7 +246,7 @@ end:
 
             }
         }
-        else if(!strcmp(&fn[strlen(fn) - 4], ".jpg")) {
+        else if(strcmp(lv_fs_get_ext(fn), "jpg") == 0) {
             lv_fs_file_t file;
             lv_fs_res_t res = lv_fs_open(&file, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) return 78;
@@ -503,7 +503,7 @@ end:
         const char * fn = dsc->src;
         uint8_t * data;
 
-        if(!strcmp(&fn[strlen(fn) - 5], ".sjpg")) {
+        if(strcmp(lv_fs_get_ext(fn), "sjpg") == 0) {
 
             uint8_t buff[22];
             memset(buff, 0, sizeof(buff));
@@ -606,7 +606,7 @@ end:
                 return LV_RES_OK;
             }
         }
-        else if(!strcmp(&fn[strlen(fn) - 4], ".jpg")) {
+        else if(strcmp(lv_fs_get_ext(fn), "jpg") == 0) {
 
             lv_fs_file_t lv_file;
             lv_fs_res_t res = lv_fs_open(&lv_file, fn, LV_FS_MODE_RD);

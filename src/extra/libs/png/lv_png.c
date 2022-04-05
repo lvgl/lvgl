@@ -70,7 +70,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
     /*If it's a PNG file...*/
     if(src_type == LV_IMG_SRC_FILE) {
         const char * fn = src;
-        if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
+        if(strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
 
             /* Read the width and height from the file. They have a constant location:
              * [16..23]: width
@@ -134,8 +134,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     /*If it's a PNG file...*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         const char * fn = dsc->src;
-
-        if(!strcmp(&fn[strlen(fn) - 3], "png")) {              /*Check the extension*/
+        if(strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
 
             /*Load the PNG file into buffer. It's still compressed (not decoded)*/
             unsigned char * png_data;      /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
