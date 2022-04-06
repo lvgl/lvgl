@@ -999,6 +999,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->pad_small, 0);
+        lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &styles->outline_secondary, LV_STATE_EDITED);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
