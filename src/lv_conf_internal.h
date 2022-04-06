@@ -2167,12 +2167,21 @@
     #endif
 #endif
 
-/*draw img in label or span obj */
+/*1: Support using images as font in label or span widgets */
 #ifndef LV_USE_IMGFONT
     #ifdef CONFIG_LV_USE_IMGFONT
         #define LV_USE_IMGFONT CONFIG_LV_USE_IMGFONT
     #else
         #define LV_USE_IMGFONT 0
+    #endif
+#endif
+
+/*1: Enable a published subscriber based messaging system */
+#ifndef LV_USE_MSG
+    #ifdef CONFIG_LV_USE_MSG
+        #define LV_USE_MSG CONFIG_LV_USE_MSG
+    #else
+        #define LV_USE_MSG 0
     #endif
 #endif
 

@@ -14,5 +14,6 @@
    monkey
    gridnav
    fragment
+   msg
 ```
 
