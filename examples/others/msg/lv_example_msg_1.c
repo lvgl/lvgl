@@ -2,7 +2,7 @@
 #if LV_USE_MSG && LV_USE_SLIDER && LV_USE_LABEL && LV_BUILD_EXAMPLES
 
 /*Define a message ID*/
-#define MSG_NEW_TEMPERATURE 	1
+#define MSG_NEW_TEMPERATURE     1
 
 static void slider_event_cb(lv_event_t * e);
 static void label_event_cb(lv_event_t * e);
@@ -29,7 +29,7 @@ void lv_example_msg_1(void)
 
 static void slider_event_cb(lv_event_t * e)
 {
-	/*Notify all subscribers (only the label now) that the slider value has been changed*/
+    /*Notify all subscribers (only the label now) that the slider value has been changed*/
     lv_obj_t * slider = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(slider);
     lv_msg_send(MSG_NEW_TEMPERATURE, &v);
