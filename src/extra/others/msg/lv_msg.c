@@ -39,7 +39,6 @@ static void obj_delete_event_cb(lv_event_t * e);
  *  STATIC VARIABLES
  **********************/
 static lv_ll_t subs_ll;
-static lv_ll_t reqs_ll;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -93,12 +92,6 @@ void lv_msg_unsubscribe(void * s)
     LV_ASSERT_NULL(s);
     _lv_ll_remove(&subs_ll, s);
     lv_mem_free(s);
-}
-
-uint32_t lv_msg_id_range(uint32_t start, uint32_t end)
-{
-    if(start == end) return start;
-    else return start + (end << 16);
 }
 
 void lv_msg_send(uint32_t msg_id, const void * payload)
