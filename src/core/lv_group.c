@@ -279,6 +279,9 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
 {
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return LV_RES_OK;
+
+    if(lv_obj_has_state(act, LV_STATE_DISABLED)) return LV_RES_OK;
+
     return lv_event_send(act, LV_EVENT_KEY, &c);
 }
 

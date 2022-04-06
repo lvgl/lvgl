@@ -405,6 +405,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     indev_obj_act = lv_group_get_focused(g);
     if(indev_obj_act == NULL) return;
 
+    bool dis = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
     /*Save the last key to compare it with the current latter on RELEASE*/
     uint32_t prev_key = i->proc.types.keypad.last_key;
 
@@ -423,25 +425,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_INFO("%" LV_PRIu32 " key is pressed", data->key);
         i->proc.pr_timestamp = lv_tick_get();
 
-        /*Simulate a press on the object if ENTER was pressed*/
-        if(data->key == LV_KEY_ENTER) {
-            /*Send the ENTER as a normal KEY*/
-            lv_group_send_data(g, LV_KEY_ENTER);
-            if(indev_reset_check(&i->proc)) return;
-
-            lv_event_send(indev_obj_act, LV_EVENT_PRESSED, indev_act);
-            if(indev_reset_check(&i->proc)) return;
-        }
-        else if(data->key == LV_KEY_ESC) {
-            /*Send the ESC as a normal KEY*/
-            lv_group_send_data(g, LV_KEY_ESC);
-            if(indev_reset_check(&i->proc)) return;
-
-            lv_event_send(indev_obj_act, LV_EVENT_CANCEL, indev_act);
-            if(indev_reset_check(&i->proc)) return;
-        }
         /*Move the focus on NEXT*/
-        else if(data->key == LV_KEY_NEXT) {
+        if(data->key == LV_KEY_NEXT) {
             lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_next(g);
             if(indev_reset_check(&i->proc)) return;
@@ -452,14 +437,33 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             lv_group_focus_prev(g);
             if(indev_reset_check(&i->proc)) return;
         }
-        /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
-        else {
-            lv_group_send_data(g, data->key);
-            if(indev_reset_check(&i->proc)) return;
+        else if(!dis) {
+            /*Simulate a press on the object if ENTER was pressed*/
+            if(data->key == LV_KEY_ENTER) {
+                /*Send the ENTER as a normal KEY*/
+                lv_group_send_data(g, LV_KEY_ENTER);
+                if(indev_reset_check(&i->proc)) return;
+
+                if(!dis) lv_event_send(indev_obj_act, LV_EVENT_PRESSED, indev_act);
+                if(indev_reset_check(&i->proc)) return;
+            }
+            else if(data->key == LV_KEY_ESC) {
+                /*Send the ESC as a normal KEY*/
+                lv_group_send_data(g, LV_KEY_ESC);
+                if(indev_reset_check(&i->proc)) return;
+
+                lv_event_send(indev_obj_act, LV_EVENT_CANCEL, indev_act);
+                if(indev_reset_check(&i->proc)) return;
+            }
+            /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
+            else {
+                lv_group_send_data(g, data->key);
+                if(indev_reset_check(&i->proc)) return;
+            }
         }
     }
     /*Pressing*/
-    else if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(!dis && data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
 
         if(data->key == LV_KEY_ENTER) {
             lv_event_send(indev_obj_act, LV_EVENT_PRESSING, indev_act);
@@ -506,7 +510,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Release happened*/
-    else if(data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(!dis && data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
         LV_LOG_INFO("%" LV_PRIu32 " key is released", data->key);
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
