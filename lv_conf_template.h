@@ -663,8 +663,11 @@
 /*1: Enable lv_obj fragment*/
 #define LV_USE_FRAGMENT 0
 
-/*draw img in label or span obj */
+/*1: Support using images as font in label or span widgets */
 #define LV_USE_IMGFONT 0
+
+/*1: Enable a published subscriber based messaging system */
+#define LV_USE_MSG 0
 
 /*==================
 * EXAMPLES
