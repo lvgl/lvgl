@@ -150,7 +150,7 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
         glBindTexture(GL_TEXTURE_2D, texture);
         glUniform4f(internals->simple_img_shader_color_location, color[0], color[1], color[2], color[3]);
         glVertexAttribPointer(internals->simple_img_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), vertices);
-        glEnableVertexAttribArray(internals->simple_img_shader);
+        glEnableVertexAttribArray(internals->simple_img_shader_pos_location);
         glVertexAttribPointer(internals->simple_img_shader_uv_location, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), &vertices[2]);
         glEnableVertexAttribArray(internals->simple_img_shader_uv_location);
         glDrawArrays(GL_TRIANGLES, 0, 6);
