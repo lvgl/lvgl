@@ -39,7 +39,7 @@ static bool is_transiting(lv_animbtn_t * animbtn, lv_animbtn_state_t current_sta
  *  STATIC VARIABLES
  **********************/
 const lv_obj_class_t lv_animbtn_class = {
-    .base_class = &lv_obj_class,
+    .base_class = &lv_img_class,
     .instance_size = sizeof(lv_animbtn_t),
     .constructor_cb = lv_animbtn_constructor,
     .destructor_cb = lv_animbtn_destructor,
@@ -54,22 +54,13 @@ const lv_obj_class_t lv_animbtn_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Create an image button object
- * @param parent pointer to an object, it will be the parent of the new image button
- * @return pointer to the created image button
- */
-lv_obj_t * lv_animbtn_create(lv_obj_t * parent, lv_obj_t * anim)
+lv_obj_t * lv_animbtn_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
-    /*Capture the animation picture*/
-    ((lv_animbtn_t *)obj)->img = anim;
-    lv_obj_set_parent(anim, obj);
-    lv_obj_add_flag(anim, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_img_t * img = (lv_img_t *)anim;
+    lv_img_t * img = (lv_img_t *)obj;
     lv_obj_set_size(obj, img->w, img->h);
     return obj;
 }
@@ -188,14 +179,6 @@ static bool is_transiting(lv_animbtn_t * animbtn, lv_animbtn_state_t current_sta
 static void lv_animbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
-    lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
-    /*Initialize the allocated 'ext'*/
-    lv_memset_00(animbtn->state_desc, sizeof(animbtn->state_desc));
-    animbtn->img = NULL;
-    animbtn->prev_state = 0;
-    animbtn->trans_count = 0;
-    animbtn->trans_desc = 0;
-
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
 }
@@ -237,7 +220,7 @@ static void lv_animbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         case LV_EVENT_GET_SELF_SIZE: {
                 lv_point_t * p = lv_event_get_self_size_info(e);
-                p->x = LV_MAX(p->x, ((lv_img_t *)animbtn->img)->w);
+                p->x = LV_MAX(p->x, ((lv_img_t *)animbtn)->w);
                 break;
             }
         default:
@@ -251,17 +234,18 @@ static void setup_anim(lv_animbtn_t * animbtn, lv_animbtn_state_desc_t * desc)
     int backward = LV_BT(desc->control, LV_IMG_CTRL_BACKWARD);
     if(backward && desc->first_frame < desc->last_frame) {
         /*Play in reverse means start from last to first*/
-        lv_img_set_current_frame(animbtn->img, desc->last_frame);
-        lv_img_set_stop_at_frame(animbtn->img, desc->first_frame, !backward);
+        lv_img_set_current_frame((lv_obj_t *)animbtn, desc->last_frame);
+        lv_img_set_stop_at_frame((lv_obj_t *)animbtn, desc->first_frame, !backward);
     }
     else {
-        lv_img_set_current_frame(animbtn->img, desc->first_frame);
-        lv_img_set_stop_at_frame(animbtn->img, desc->last_frame, !backward);
+        lv_img_set_current_frame((lv_obj_t *)animbtn, desc->first_frame);
+        lv_img_set_stop_at_frame((lv_obj_t *)animbtn, desc->last_frame, !backward);
     }
 }
 
 static void loop_state(lv_obj_t * obj)
 {
+    if(!obj) return;
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
     lv_animbtn_state_t current_state = get_state(obj);
     lv_animbtn_state_t state  = suggest_state(obj, current_state);
@@ -270,7 +254,7 @@ static void loop_state(lv_obj_t * obj)
         animbtn->prev_state = state;
     }
 
-    if(animbtn->prev_state != state || animbtn->img == NULL || !is_state_valid(&animbtn->state_desc[state - 1])) return;
+    if(animbtn->prev_state != state || !is_state_valid(&animbtn->state_desc[state - 1])) return;
 
     /*Set the logic for the current state*/
     if(LV_BT(animbtn->state_desc[state - 1].control, LV_IMG_CTRL_LOOP)) {
@@ -281,6 +265,7 @@ static void loop_state(lv_obj_t * obj)
 
 static void apply_state(lv_obj_t * obj, bool skip_transition)
 {
+    if(!obj) return;
     lv_animbtn_t * animbtn = (lv_animbtn_t *)obj;
     lv_animbtn_state_t current_state = get_state(obj);
     lv_animbtn_state_t state  = suggest_state(obj, current_state);
@@ -296,7 +281,7 @@ static void apply_state(lv_obj_t * obj, bool skip_transition)
         }
     }
 
-    if(state == animbtn->prev_state || animbtn->img == NULL || !is_state_valid(&animbtn->state_desc[state - 1])) return;
+    if(state == animbtn->prev_state || !is_state_valid(&animbtn->state_desc[state - 1])) return;
 
     /*Set the logic for the current state*/
     setup_anim(animbtn, &animbtn->state_desc[state - 1]);

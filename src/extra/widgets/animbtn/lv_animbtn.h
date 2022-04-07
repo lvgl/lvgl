@@ -21,12 +21,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef enum {
-    LV_ANIMBTN_STATE_RELEASED = 1,          /* 0001 */
-    LV_ANIMBTN_STATE_PRESSED  = 2,          /* 0010 */
-    LV_ANIMBTN_STATE_DISABLED = 3,          /* 0100 */
-    LV_ANIMBTN_STATE_CHECKED_RELEASED = 4,  /* 1001 */
-    LV_ANIMBTN_STATE_CHECKED_PRESSED  = 5,  /* 1010 */
-    LV_ANIMBTN_STATE_CHECKED_DISABLED = 6,  /* 1100 */
+    LV_ANIMBTN_STATE_RELEASED = 1,
+    LV_ANIMBTN_STATE_PRESSED  = 2,
+    LV_ANIMBTN_STATE_DISABLED = 3,
+    LV_ANIMBTN_STATE_CHECKED_RELEASED = 4,
+    LV_ANIMBTN_STATE_CHECKED_PRESSED  = 5,
+    LV_ANIMBTN_STATE_CHECKED_DISABLED = 6,
     _LV_ANIMBTN_STATE_NUM = 6,
 } lv_animbtn_state_t;
 
@@ -53,9 +53,8 @@ typedef struct {
 
 /*Data of anim button*/
 typedef struct {
-    lv_obj_t obj;
+    lv_img_t                  img;
     lv_animbtn_state_desc_t   state_desc[_LV_ANIMBTN_STATE_NUM];
-    lv_obj_t         *        img;
     lv_animbtn_state_t        prev_state;
     lv_animbtn_transition_t * trans_desc;
     uint8_t                   trans_count;
@@ -70,10 +69,9 @@ extern const lv_obj_class_t lv_animbtn_class;
 /**
  * Create an animated button object
  * @param parent pointer to an object, it will be the parent of the new animation button
- * @param anim  pointer to a lv_rlottie object used as backend of this button
  * @return pointer to the created anim button
  */
-lv_obj_t * lv_animbtn_create(lv_obj_t * parent, lv_obj_t * anim);
+lv_obj_t * lv_animbtn_create(lv_obj_t * parent);
 
 /*======================
  * Add/remove functions
