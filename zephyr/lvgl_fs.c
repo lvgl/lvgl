@@ -127,9 +127,22 @@ static lv_fs_res_t lvgl_fs_write(struct _lv_fs_drv_t *drv, void *file,
 static lv_fs_res_t lvgl_fs_seek(struct _lv_fs_drv_t *drv, void *file,
 				uint32_t pos, lv_fs_whence_t whence)
 {
-	int err;
+	int err, fs_whence;
 
-	err = fs_seek((struct fs_file_t *)file, pos, FS_SEEK_SET);
+	switch (whence) {
+	case LV_FS_SEEK_END:
+		fs_whence = FS_SEEK_END;
+		break;
+	case LV_FS_SEEK_CUR:
+		fs_whence = FS_SEEK_CUR;
+		break;
+	case LV_FS_SEEK_SET:
+	default:
+		fs_whence = FS_SEEK_SET;
+		break;
+	}
+
+	err = fs_seek((struct fs_file_t *)file, pos, fs_whence);
 	return errno_to_lv_fs_res(err);
 }
 
