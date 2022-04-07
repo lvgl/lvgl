@@ -130,6 +130,17 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     glUniformMatrix4fv(internals->simple_img_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
     glUseProgram(0);
 
+    internals->letter_shader = shader_program_create(LETTER_VERTEX_SHADER_SRC, LETTER_FRAGMENT_SHADER_SRC);
+    glUseProgram(internals->letter_shader);
+    internals->letter_shader_pos_location = glGetAttribLocation(internals->letter_shader, "a_position");
+    internals->letter_shader_uv_location = glGetAttribLocation(internals->letter_shader, "a_uv");
+    internals->letter_shader_projection_location = glGetUniformLocation(internals->letter_shader, "u_projection");
+    internals->letter_shader_model_location = glGetUniformLocation(internals->letter_shader, "u_model");
+    internals->letter_shader_color_location = glGetUniformLocation(internals->letter_shader, "u_color");
+    internals->letter_shader_texture_location = glGetUniformLocation(internals->letter_shader, "s_texture");
+    glUniformMatrix4fv(internals->letter_shader_projection_location, 1, GL_FALSE, &internals->projection[0][0]);
+    glUseProgram(0);
+
 #if LV_USE_GPU_GLES_SW_MIXED
     /* TODO(tan): It's dumb change later. */
     hor = internals->hor;

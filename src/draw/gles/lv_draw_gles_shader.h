@@ -87,6 +87,30 @@ extern "C" {
     "    gl_FragColor = mix_color;" \
     "}"
 
+#define LETTER_VERTEX_SHADER_SRC \
+    "attribute vec2 a_position;" \
+    "attribute vec2 a_uv;" \
+    "varying vec2 v_uv;" \
+    "uniform mat4 u_projection;" \
+    "uniform mat4 u_model;" \
+    "void main()" \
+    "{" \
+    "   gl_Position = u_projection * u_model * vec4(a_position.x, a_position.y, 0.0, 1.0);" \
+    "   v_uv = a_uv;" \
+    "}"
+
+
+#define LETTER_FRAGMENT_SHADER_SRC \
+    "precision mediump float;" \
+    "varying vec2 v_uv;" \
+    "uniform sampler2D s_texture;" \
+    "uniform vec4 u_color;" \
+    "void main()" \
+    "{" \
+    "    vec4 sampled =  vec4(1.0, 1.0, 1.0, texture2D(s_texture, v_uv).r);" \
+    "    gl_FragColor =  u_color* sampled;" \
+    "}"
+
 /**********************
  *      TYPEDEFS
  **********************/

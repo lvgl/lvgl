@@ -62,6 +62,16 @@ typedef struct lv_draw_gles_context_internals_t {
     GLint simple_img_shader_model_location;
     GLint simple_img_shader_color_location;
     GLint simple_img_shader_texture_location;
+
+
+    GLuint letter_shader;
+    GLint letter_shader_pos_location;
+    GLint letter_shader_uv_location;
+    GLint letter_shader_projection_location;
+    GLint letter_shader_model_location;
+    GLint letter_shader_color_location;
+    GLint letter_shader_texture_location;
+
 } lv_draw_gles_context_internals_t;
 
 /**********************
