@@ -212,10 +212,7 @@ void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
     lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;
     vec4 color;
-    color[0] = (float)bg_color.ch.red/255.0f;
-    color[1] = (float)bg_color.ch.green/255.0f;
-    color[2] = (float)bg_color.ch.blue/255.0f;
-    color[3] = (float)dsc->bg_opa/255.0f;
+    lv_color_to_vec4_color_with_opacity(&bg_color, dsc->bg_opa, color);
     static GLfloat vertices[] = {
         0.0f, 1.0f,
         1.0f, 0.0f,
@@ -255,10 +252,7 @@ void opengl_draw_corner_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
     lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;
     vec4 color;
-    color[0] = (float)bg_color.ch.red/255.0f;
-    color[1] = (float)bg_color.ch.green/255.0f;
-    color[2] = (float)bg_color.ch.blue/255.0f;
-    color[3] = (float)dsc->bg_opa/255.0f;
+    lv_color_to_vec4_color_with_opacity(&bg_color, dsc->bg_opa, color);
     static GLfloat vertices[] = {
         0.0f, 1.0f,
         1.0f, 0.0f,

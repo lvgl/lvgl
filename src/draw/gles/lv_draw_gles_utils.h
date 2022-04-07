@@ -34,6 +34,8 @@ extern "C" {
  **********************/
 
 void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * internals);
+void lv_color_to_vec4_color(const lv_color_t * in, vec4 out);
+void lv_color_to_vec4_color_with_opacity(const lv_color_t * in, lv_opa_t opa, vec4 out);
 
 #ifdef LV_USE_GPU_GLES_SW_MIXED
 /* upload lvgl buffer to opengl texture */

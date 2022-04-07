@@ -149,6 +149,22 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
 
 }
 
+void lv_color_to_vec4_color(const lv_color_t * in, vec4 out)
+{
+    out[0] = (float)in->ch.red/255.0f;
+    out[1] = (float)in->ch.green/255.0f;
+    out[2] = (float)in->ch.blue/255.0f;
+    out[3] = (float)in->ch.alpha/255.0f;
+}
+
+void lv_color_to_vec4_color_with_opacity(const lv_color_t * in, lv_opa_t opa, vec4 out)
+{
+    out[0] = (float)in->ch.red/255.0f;
+    out[1] = (float)in->ch.green/255.0f;
+    out[2] = (float)in->ch.blue/255.0f;
+    out[3] = (float)opa/255.0f;
+}
+
 #if LV_USE_GPU_GLES_SW_MIXED
 void lv_draw_gles_utils_upload_texture(lv_draw_ctx_t * draw_ctx)
 {

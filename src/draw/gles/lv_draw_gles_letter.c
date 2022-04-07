@@ -59,7 +59,6 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     const lv_area_t * clip_area = draw_ctx->clip_area;
     const lv_font_t * font_p = dsc->font;
     lv_opa_t opa = dsc->opa;
-    lv_color_t color = dsc->color;
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
@@ -133,11 +132,8 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
         1.0f, 0.0f, 1.0f, 0.0f
     };
 
-    vec4 o_color;
-    o_color[0] = (float)color.ch.red/255.0f;
-    o_color[1] = (float)color.ch.green/255.0f;
-    o_color[2] = (float)color.ch.blue/255.0f;
-    o_color[3] = (float)opa/255.0f;
+    vec4 color;
+    lv_color_to_vec4_color_with_opacity(&dsc->color, opa, color);
 
     mat4 model;
     lv_draw_gles_math_mat4_identity(model);
@@ -151,7 +147,7 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glUniform4f(internals->letter_shader_color_location, o_color[0], o_color[1], o_color[2], o_color[3]);
+    glUniform4f(internals->letter_shader_color_location, color[0], color[1], color[2], color[3]);
     glVertexAttribPointer(internals->letter_shader_pos_location, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), vertices);
     glEnableVertexAttribArray(internals->letter_shader_pos_location);
     glVertexAttribPointer(internals->letter_shader_uv_location, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), &vertices[2]);

@@ -121,10 +121,7 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
         }
 
         vec4 color;
-        color[0] = (float)re_color.ch.red/255.0f;
-        color[1] = (float)re_color.ch.green/255.0f;
-        color[2] = (float)re_color.ch.blue/255.0f;
-        color[3] = (float)draw_dsc->recolor_opa/255.0f;
+        lv_color_to_vec4_color_with_opacity(&re_color, draw_dsc->recolor_opa, color);
 
         static GLfloat vertices[] = {
             0.0f, 1.0f, 0.0f, 1.0f,
