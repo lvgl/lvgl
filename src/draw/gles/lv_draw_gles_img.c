@@ -14,6 +14,7 @@
 #include "lv_draw_gles_img.h"
 #include "lv_draw_gles.h"
 #include "lv_draw_gles_utils.h"
+#include "lv_draw_gles_texture_cache.h"
 
 #include LV_GPU_GLES_GLAD_INCLUDE_PATH
 
@@ -32,6 +33,7 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
                                const lv_area_t * coords, const void * src);
 void *bgra_to_rgba(void *data, int w, int h);
 //draw_img_simple(ctx, texture, header, draw_dsc, &t_coords, &t_clip);
+
 /**********************
  *      MACROS
  **********************/
@@ -59,6 +61,32 @@ void lv_draw_gles_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_im
     lv_draw_gles_utils_upload_texture(draw_ctx);
 #endif /* LV_USE_GPU_GLES_SW_MIXED */
 }
+
+
+void lv_draw_gles_img_load_texture(lv_draw_gles_ctx_t * ctx, lv_draw_gles_cache_key_head_img_t * key, size_t key_size,
+                               const void * src, int32_t frame_id, GLuint *texture)
+{
+
+    _lv_img_cache_entry_t  *cdsc = _lv_img_cache_open(src, lv_color_white(), frame_id);
+    lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;
+
+    int w = (int) dsc->header.w;
+    int h = (int) dsc->header.h;
+    void *data = bgra_to_rgba((void*)dsc->img_data, w, h);
+    glGenTextures(1, texture);
+    glBindTexture(GL_TEXTURE_2D, *texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    lv_mem_free(data);
+
+    lv_draw_gles_texture_cache_put(ctx, key, key_size, *texture);
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -72,21 +100,15 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
 
 
     /* TODO : Find texture */
-    _lv_img_cache_entry_t  *cdsc = _lv_img_cache_open(src, lv_color_white(), draw_dsc->frame_id);
-    lv_img_decoder_dsc_t * dsc = &cdsc->dec_dsc;
+    size_t key_size;
+    lv_draw_gles_cache_key_head_img_t * key = lv_draw_gles_texture_img_key_create(src, draw_dsc->frame_id, &key_size);
+    bool texture_found = false;
+    GLuint texture = lv_draw_gles_texture_cache_get(draw_gles_ctx, key, key_size, &texture_found);
 
-    int w = (int) dsc->header.w;
-    int h = (int) dsc->header.h;
-    void *data = bgra_to_rgba((void*)dsc->img_data, w, h);
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    if (!texture_found) {
+        lv_draw_gles_img_load_texture(draw_gles_ctx, key, key_size, src, draw_dsc->frame_id, &texture);
+    }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data );
 
 
 
@@ -181,4 +203,9 @@ void *bgra_to_rgba(void *data, int w, int h)
 
     return res;
 }
+
+
+
+
+
 #endif /*LV_USE_GPU_GLES*/

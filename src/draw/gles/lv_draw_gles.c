@@ -16,6 +16,7 @@
 #include <src/draw/sw/lv_draw_sw.h>
 #include "lv_draw_gles_utils.h"
 #include "lv_draw_gles_priv.h"
+#include "lv_draw_gles_texture_cache.h"
 
 /*********************
  *      DEFINES
@@ -103,6 +104,7 @@ void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_gles_ctx->base_draw.draw_arc = lv_draw_gles_draw_arc;
     draw_gles_ctx->base_draw.draw_polygon = lv_draw_gles_polygon;
     draw_gles_ctx->base_draw.draw_bg = lv_draw_gles_draw_bg;
+    lv_draw_gles_texture_cache_init(draw_gles_ctx);
 #if LV_USE_GPU_GLES_SW_MIXED
     draw_gles_ctx->blend = lv_draw_sw_blend_basic;
 #endif /* LV_USE_GPU_GLES_SW_MIXED */
@@ -112,6 +114,7 @@ void lv_draw_gles_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 void lv_draw_gles_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
 
+    /*TODO: deinit texture cache */
 }
 
 /**********************

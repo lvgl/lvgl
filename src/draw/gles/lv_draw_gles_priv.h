@@ -16,6 +16,7 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 #include "../../misc/lv_area.h"
+#include "../../misc/lv_lru.h"
 
 #if LV_USE_GPU_GLES
 
@@ -72,6 +73,7 @@ typedef struct lv_draw_gles_context_internals_t {
     GLint letter_shader_color_location;
     GLint letter_shader_texture_location;
 
+    lv_lru_t *texture_cache;
 } lv_draw_gles_context_internals_t;
 
 /**********************

@@ -147,6 +147,7 @@ void lv_draw_gles_utils_internals_init(lv_draw_gles_context_internals_t * intern
     ver = internals->ver;
 #endif /* LV_USE_GPU_GLES_SW_MIXED */
 
+
 }
 
 void lv_color_to_vec4_color(const lv_color_t * in, vec4 out)

@@ -17,6 +17,7 @@
 #include "../lv_draw.h"
 #include "lv_draw_gles.h"
 #include "lv_draw_gles_utils.h"
+#include "lv_draw_gles_texture_cache.h"
 
 #include <stdint.h>
 
@@ -34,6 +35,12 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    lv_gles_cache_key_magic_t magic;
+    const lv_font_t * font_p;
+    uint32_t letter;
+} lv_font_glyph_key_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -42,6 +49,7 @@ extern const uint8_t _lv_bpp1_opa_table[2];
 extern const uint8_t _lv_bpp2_opa_table[4];
 extern const uint8_t _lv_bpp4_opa_table[16];
 extern const uint8_t _lv_bpp8_opa_table[256];
+static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint32_t letter);
 static void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, int stride, uint8_t bpp);
 /**********************
  *   GLOBAL FUNCTIONS
@@ -94,19 +102,32 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
         return;
     }
 
-    GLuint texture;
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-    const uint8_t * bmp = lv_font_get_glyph_bitmap(font_p, letter);
-    uint8_t * buf = lv_mem_alloc(g.box_w * g.box_h);
-    lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED_EXT, g.box_w, g.box_h, 0, GL_RED_EXT, GL_UNSIGNED_BYTE, buf);
+    lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
+    bool glyph_found = false;
+    GLuint texture = lv_draw_gles_texture_cache_get(draw_gles_ctx, &glyph_key, sizeof(glyph_key), &glyph_found);
+    if (!glyph_found) {
+        if (g.resolved_font) {
+            font_p = g.resolved_font;
+            GLuint tmp_texture;
+            glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+            glGenTextures(1, &tmp_texture);
+            glBindTexture(GL_TEXTURE_2D, tmp_texture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);	// set texture wrapping to GL_REPEAT (default wrapping method)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+            const uint8_t * bmp = lv_font_get_glyph_bitmap(font_p, letter);
+            uint8_t * buf = lv_mem_alloc(g.box_w * g.box_h);
+            lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RED_EXT, g.box_w, g.box_h, 0, GL_RED_EXT, GL_UNSIGNED_BYTE, buf);
+
+            lv_draw_gles_texture_cache_put(draw_gles_ctx, &glyph_key, sizeof(glyph_key), tmp_texture);
+            texture = tmp_texture;
+        }
+    }
+
 
     lv_area_t t_letter = letter_area, t_clip = *clip_area, apply_area;
 
@@ -205,7 +226,16 @@ static void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int h
     }
 }
 
-
+static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint32_t letter)
+{
+    lv_font_glyph_key_t key;
+    /* VERY IMPORTANT! Padding between members is uninitialized, so we have to wipe them manually */
+    lv_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_FONT_GLYPH;
+    key.font_p = font_p;
+    key.letter = letter;
+    return key;
+}
 
 
 #endif /*LV_USE_GPU_GLES*/
