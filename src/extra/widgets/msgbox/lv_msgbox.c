@@ -74,8 +74,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
 
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_msgbox_class, parent);
     LV_ASSERT_MALLOC(obj);
-    lv_obj_class_init_obj(obj);
     if(obj == NULL) return NULL;
+    lv_obj_class_init_obj(obj);
     lv_msgbox_t * mbox = (lv_msgbox_t *)obj;
 
     if(auto_parent) lv_obj_add_flag(obj, LV_MSGBOX_FLAG_AUTO_PARENT);
