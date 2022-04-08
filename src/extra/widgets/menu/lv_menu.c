@@ -204,6 +204,7 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page)
         /* Add a new node */
         lv_ll_t * history_ll = &(menu->history_ll);
         lv_menu_history_t * new_node = _lv_ll_ins_head(history_ll);
+        LV_ASSERT_MALLOC(new_node);
         new_node->page = page;
         menu->cur_depth++;
 
