@@ -99,7 +99,7 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
     const lv_area_t * clip = draw_ctx->clip_area;
 
 
-    /* TODO : Find texture */
+    /* Find texture */
     size_t key_size;
     lv_draw_gles_cache_key_head_img_t * key = lv_draw_gles_texture_img_key_create(src, draw_dsc->frame_id, &key_size);
     bool texture_found = false;
@@ -108,6 +108,8 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
     if (!texture_found) {
         lv_draw_gles_img_load_texture(draw_gles_ctx, key, key_size, src, draw_dsc->frame_id, &texture);
     }
+
+    lv_mem_free(key);
 
 
 
