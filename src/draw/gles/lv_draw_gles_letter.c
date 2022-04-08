@@ -142,16 +142,24 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     srcrect.h = dstrect.h;
 #endif
 
+    vec2 uv;
+    vec2 uv2;
 
-    static GLfloat vertices[] = {
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f,
+    uv[0] = (float)(draw_area.x1 - t_letter.x1) / (float)(g.box_w);
+    uv[1] = (float)(draw_area.y1 - t_letter.y1) / (float)(g.box_h);
+    uv2[0] = 1.0;
+    uv2[1] = 1.0;
 
-        0.0f, 1.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 1.0f, 1.0f,
-        1.0f, 0.0f, 1.0f, 0.0f
+    GLfloat vertices[] = {
+        0.0f, 1.0f, uv[0], uv2[1],
+        1.0f, 0.0f, uv2[0], uv[1],
+        0.0f, 0.0f, uv[0], uv[1],
+
+        0.0f, 1.0f, uv[0], uv2[1],
+        1.0f, 1.0f, uv2[0], uv2[1],
+        1.0f, 0.0f, uv2[0], uv[1]
     };
+
 
     vec4 color;
     lv_color_to_vec4_color_with_opacity(&dsc->color, opa, color);
