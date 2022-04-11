@@ -632,6 +632,9 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
 
     /*Draw a display background if there is no top object*/
     if(top_act_scr == NULL && top_prev_scr == NULL) {
+        lv_area_t a;
+        lv_area_set(&a, 0, 0,
+                    lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
         if(draw_ctx->draw_bg) {
             lv_draw_rect_dsc_t dsc;
             lv_draw_rect_dsc_init(&dsc);
@@ -639,15 +642,12 @@ static void lv_refr_area_part(lv_draw_ctx_t * draw_ctx)
             dsc.bg_img_opa = disp_refr->bg_opa;
             dsc.bg_color = disp_refr->bg_color;
             dsc.bg_opa = disp_refr->bg_opa;
-            draw_ctx->draw_bg(draw_ctx, &dsc, draw_ctx->buf_area);
+            draw_ctx->draw_bg(draw_ctx, &dsc, &a);
         }
         else if(disp_refr->bg_img) {
             lv_img_header_t header;
-            lv_res_t res;
-            res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
+            lv_res_t res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
             if(res == LV_RES_OK) {
-                lv_area_t a;
-                lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
                 lv_draw_img_dsc_t dsc;
                 lv_draw_img_dsc_init(&dsc);
                 dsc.opa = disp_refr->bg_opa;
