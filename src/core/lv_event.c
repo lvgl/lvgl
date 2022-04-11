@@ -254,7 +254,7 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
 void * lv_obj_get_event_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->spec_attr == NULL) return false;
+    if(obj->spec_attr == NULL) return NULL;
 
     int32_t i = 0;
     for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
