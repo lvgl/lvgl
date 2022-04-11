@@ -59,9 +59,6 @@ lv_obj_t * lv_animbtn_create(lv_obj_t * parent)
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
-
-    lv_img_t * img = (lv_img_t *)obj;
-    lv_obj_set_size(obj, img->w, img->h);
     return obj;
 }
 
