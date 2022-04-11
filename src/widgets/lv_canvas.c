@@ -76,6 +76,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.data      = buf;
 
     lv_img_set_src(obj, &canvas->dsc);
+    lv_img_cache_invalidate_src(&canvas->dsc);
 }
 
 void lv_canvas_set_px_color(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t c)
