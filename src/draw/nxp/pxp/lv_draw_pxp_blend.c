@@ -333,12 +333,7 @@ lv_res_t lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, const lv_area_t * 
     bool rotation = (dsc->angle != 0);
 
     if(recolor || rotation) {
-        if(lv_img_cf_is_chroma_keyed(cf)) {
-            PXP_LOG_TRACE("Recolor/rotation + chroma key not supported.");
-            return LV_RES_INV;
-        }
-
-        if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_has_alpha(cf))
+        if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_has_alpha(cf) && !lv_img_cf_is_chroma_keyed(cf))
             return lv_gpu_nxp_pxp_blit_cover(dest_buf, dest_area, dest_stride, src_buf, src_area, dsc, cf);
         else
             /*Recolor and/or rotation with alpha or opacity is done in two steps.*/
@@ -570,9 +565,28 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
     PXP_SetAlphaSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, dest_w - 1U, dest_h - 1U);
     PXP_SetAlphaSurfaceBlendConfig(LV_GPU_NXP_PXP_ID, &asBlendConfig);
 
-    if(lv_img_cf_is_chroma_keyed(cf))
-        PXP_SetAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_color_to32(LV_COLOR_CHROMA_KEY),
-                                           lv_color_to32(LV_COLOR_CHROMA_KEY));
+    if(lv_img_cf_is_chroma_keyed(cf)) {
+        lv_color_t colorKeyLow = LV_COLOR_CHROMA_KEY;
+        lv_color_t colorKeyHigh = LV_COLOR_CHROMA_KEY;
+
+        bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+
+        if(recolor) {
+            /* New color key after recoloring */
+            lv_color_t colorKey =  lv_color_mix(LV_COLOR_CHROMA_KEY, dsc->recolor, dsc->recolor_opa);
+
+            colorKeyLow = lv_color_make(colorKey.ch.red != 0 ? colorKey.ch.red - 1 : 0,
+                                        colorKey.ch.green != 0 ? colorKey.ch.green - 1 : 0,
+                                        colorKey.ch.blue != 0 ? colorKey.ch.blue - 1 : 0);
+
+            colorKeyHigh = lv_color_make(colorKey.ch.red != 255 ? colorKey.ch.red + 1 : 255,
+                                         colorKey.ch.green != 255 ? colorKey.ch.green + 1 : 255,
+                                         colorKey.ch.blue != 255 ? colorKey.ch.blue + 1 : 255);
+        }
+
+        PXP_SetAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_color_to32(colorKeyLow),
+                                           lv_color_to32(colorKeyHigh));
+    }
 
     PXP_EnableAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_img_cf_is_chroma_keyed(cf));
 
