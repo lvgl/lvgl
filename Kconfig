@@ -985,6 +985,14 @@ menu "LVGL configuration"
             bool "Enable Monkey test"
             default n
 
+        config LV_USE_GRIDNAV
+            bool "Enable grid navigation"
+            default n 
+
+        config LV_USE_FRAGMENT
+            bool "Enable lv_obj fragment"
+            default n 
+
         config LV_USE_IMGFONT
             bool "draw img in label or span obj"
             default n
