@@ -974,6 +974,14 @@ menu "LVGL configuration"
         config LV_USE_MONKEY
             bool "Enable Monkey test"
             default n
+        config LV_USE_GRIDNAV
+            bool "Enable grid navigation"
+            default n 
+
+        config LV_USE_FRAGMENT
+            bool "Enable lv_obj fragment"
+            default n 
+
     endmenu
 
     menu "Examples"
