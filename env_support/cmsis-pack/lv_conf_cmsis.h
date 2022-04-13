@@ -3,14 +3,6 @@
  * Configuration file for v8.3.0-dev
  */
 
-/*
- * Copy this file as `lv_conf.h`
- * 1. simply next to the `lvgl` folder
- * 2. or any other places and
- *    - define `LV_CONF_INCLUDE_SIMPLE`
- *    - add the path as include path
- */
-
 /* clang-format off */
 #if 1 /*Set it to "1" to enable content*/
 
@@ -596,6 +588,12 @@
 
 /*1: Enable lv_obj fragment*/
 #define LV_USE_FRAGMENT 0
+
+/*1: Support using images as font in label or span widgets */
+#define LV_USE_IMGFONT 0
+
+/*1: Enable a published subscriber based messaging system */
+#define LV_USE_MSG 0
 
 /*==================
 * EXAMPLES
