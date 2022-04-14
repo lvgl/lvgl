@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-03-27" version="1.0.2" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.2.pack">
+    <release date="2022-04-13" version="1.0.3-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.3-alpha.pack">
+      - LVGL 8.3.0-dev
+      - Monthly update for April
+    </release>
+    <release date="2022-03-27" version="1.0.2" url="https://github.com/lvgl/lvgl/raw/a5b9a1c210821f122fb7582378a9f1819b1dc821/env_support/cmsis-pack/LVGL.lvgl.1.0.2.pack">
       - LVGL 8.3.0-dev
       - Monthly update for March
       - Add GPU support for Arm-2D library
@@ -326,7 +330,7 @@
               </files>
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.0.1">
+            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.0.2">
               <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
               <files>
               <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
@@ -337,10 +341,6 @@
 /*! \brief enable Arm-2D support*/
 #define LV_USE_GPU_ARM2D 1
 
-/*! \brief disable asynchronouse mode by default */
-#ifndef __ARM_2D_HAS_ASYNC__
-#    define __ARM_2D_HAS_ASYNC__    0
-#endif
               </RTE_Components_h>
 
             </component>
