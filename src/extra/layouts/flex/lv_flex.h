@@ -57,7 +57,7 @@ typedef enum {
 /**********************
  * GLOBAL VARIABLES
  **********************/
-extern uint32_t LV_LAYOUT_FLEX;
+extern uint16_t LV_LAYOUT_FLEX;
 extern lv_style_prop_t LV_STYLE_FLEX_FLOW;
 extern lv_style_prop_t LV_STYLE_FLEX_MAIN_PLACE;
 extern lv_style_prop_t LV_STYLE_FLEX_CROSS_PLACE;
