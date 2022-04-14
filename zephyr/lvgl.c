@@ -198,7 +198,7 @@ static void lvgl_pointer_kscan_callback(const struct device *dev,
 	};
 
 	if (k_msgq_put(&kscan_msgq, &data, K_NO_WAIT) != 0) {
-		LOG_ERR("Could put input data into queue");
+		LOG_DBG("Could not put input data into queue");
 	}
 }
 
