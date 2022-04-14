@@ -271,6 +271,21 @@ static void lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 		prev.point.y = x;
 	}
 
+    /* filter readings within display */
+    if (prev.point.x <= 0) {
+        prev.point.x = 0;
+    }
+    else if (prev.point.x >= cap.x_resolution) {
+        prev.point.x = cap.x_resolution - 1;
+    }
+
+    if (prev.point.y <= 0) {
+        prev.point.y = 0;
+    }
+    else if (prev.point.y >= cap.y_resolution) {
+        prev.point.y = cap.y_resolution - 1;
+    }
+
 set_and_release:
 	*data = prev;
 
