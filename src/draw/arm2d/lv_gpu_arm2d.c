@@ -78,7 +78,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-#if __ARM_2D_HAS_ASYNC__
+#if __ARM_2D_HAS_HW_ACC__
 LV_ATTRIBUTE_FAST_MEM
 static bool lv_draw_arm2d_fill_colour(const arm_2d_tile_t * target_tile,
                                       const arm_2d_region_t * region,
@@ -227,7 +227,7 @@ void lv_draw_arm2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     arm2d_draw_ctx->blend = lv_draw_arm2d_blend;
     arm2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_arm2d_wait_cb;
 
-#if !__ARM_2D_HAS_ASYNC__
+#if !__ARM_2D_HAS_HW_ACC__
     arm2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_arm2d_img_decoded;
 #endif
 
@@ -241,7 +241,7 @@ void lv_draw_arm2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
 extern void test_flush(lv_color_t * color_p);
 
-#if __ARM_2D_HAS_ASYNC__
+#if __ARM_2D_HAS_HW_ACC__
 LV_ATTRIBUTE_FAST_MEM
 static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
