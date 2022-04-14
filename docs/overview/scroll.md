@@ -55,8 +55,8 @@ or on the object's or any parent's main part to make a scrollbar inherit the bas
 
 ### Events
 The following events are related to scrolling:
-- `LV_EVENT_SCROLL_BEGIN` Scrolling begins
-- `LV_EVENT_SCROLL_END` Scrolling ends
+- `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required.
+- `LV_EVENT_SCROLL_END` Scrolling ends.
 - `LV_EVENT_SCROLL` Scroll happened. Triggered on every position change.
 Scroll events
 
