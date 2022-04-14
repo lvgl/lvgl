@@ -65,7 +65,7 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-uint32_t LV_LAYOUT_FLEX;
+uint16_t LV_LAYOUT_FLEX;
 lv_style_prop_t LV_STYLE_FLEX_FLOW;
 lv_style_prop_t LV_STYLE_FLEX_MAIN_PLACE;
 lv_style_prop_t LV_STYLE_FLEX_CROSS_PLACE;
