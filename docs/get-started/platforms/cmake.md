@@ -81,3 +81,13 @@ FetchContent_MakeAvailable(lv_drivers)
 # The target "MyFirmware" depends on LVGL, drivers and demos
 target_link_libraries(MyFirmware PRIVATE lvgl::lvgl lvgl::drivers lvgl::examples)
 ```
+
+# Build shared libraries with CMake
+By default, LVGL will be built as a static library (archive). CMake can instead be instructed to build LVGL as shared library (.so/.dll/etc.):
+```cmake
+set(BUILD_SHARED_LIBS ON)
+```
+OR
+```
+$ cmake "-DBUILD_SHARED_LIBS=ON" .
+```
