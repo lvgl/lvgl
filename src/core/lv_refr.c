@@ -521,7 +521,7 @@ static void lv_refr_areas(void)
 
     /*Notify the display driven rendering has started*/
     if(disp_refr->driver->render_start_cb) {
-        disp_refr->driver->render_start_cb(disp_refr->driver, disp_refr);
+        disp_refr->driver->render_start_cb(disp_refr->driver);
     }
 
     disp_refr->driver->draw_buf->last_area = 0;
