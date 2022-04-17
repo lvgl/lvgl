@@ -66,12 +66,16 @@ typedef void (*lv_anim_start_cb_t)(struct _lv_anim_t *);
 /** Callback used when the animation values are relative to get the current value*/
 typedef int32_t (*lv_anim_get_value_cb_t)(struct _lv_anim_t *);
 
+/** Callback used when the animation is deleted*/
+typedef void (*lv_anim_deleted_cb_t)(struct _lv_anim_t *);
+
 /** Describes an animation*/
 typedef struct _lv_anim_t {
     void * var;                          /**<Variable to animate*/
     lv_anim_exec_xcb_t exec_cb;          /**< Function to execute to animate*/
     lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
     lv_anim_ready_cb_t ready_cb;         /**< Call it when the animation is ready*/
+    lv_anim_deleted_cb_t deleted_cb;     /**< Call it when the animation is deleted*/
     lv_anim_get_value_cb_t get_value_cb; /**< Get the current value in relative mode*/
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom user data*/
@@ -223,6 +227,16 @@ static inline void lv_anim_set_get_value_cb(lv_anim_t * a, lv_anim_get_value_cb_
 static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_cb)
 {
     a->ready_cb = ready_cb;
+}
+
+/**
+ * Set a function call when the animation is deleted.
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param deleted_cb  a function call when the animation is deleted
+ */
+static inline void lv_anim_set_deleted_cb(lv_anim_t * a, lv_anim_deleted_cb_t deleted_cb)
+{
+    a->deleted_cb = deleted_cb;
 }
 
 /**
