@@ -881,7 +881,8 @@ menu "LVGL configuration"
         config LV_USE_FS_STDIO
             bool "File system on top of stdio API"
         config LV_FS_STDIO_LETTER
-            string "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )"
+            int "Set an upper cased letter on which the drive will accessible (e.g. 'A' i.e. 65 )"
+            default 0
             depends on LV_USE_FS_STDIO
         config LV_FS_STDIO_PATH
             string "Set the working directory"
