@@ -4,5 +4,9 @@ codecov:
 comment: off
 coverage:
   status:
-    patch: off
-    project: off
+    patch:
+      default:
+        informational: true
+    project:
+      default:
+        informational: true
