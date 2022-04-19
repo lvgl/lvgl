@@ -519,6 +519,11 @@ static void lv_refr_areas(void)
         }
     }
 
+    /*Notify the display driven rendering has started*/
+    if(disp_refr->driver->render_start_cb) {
+        disp_refr->driver->render_start_cb(disp_refr->driver);
+    }
+
     disp_refr->driver->draw_buf->last_area = 0;
     disp_refr->driver->draw_buf->last_part = 0;
     disp_refr->rendering_in_progress = true;
