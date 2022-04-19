@@ -13,8 +13,16 @@ jobs:
         with:
           repo-token: ${{ secrets.LVGL_BOT_TOKEN }}
           stale-issue-message: 'This issue is stale because it has been open 14 days with no activity. Remove stale label or comment or this will be closed in 7 days.'
-          stale-pr-message: 'This PR is stale because it has been open 14 days with no activity. Remove stale label or comment or this will be closed in 7 days.'
-          close-issue-message: 'This issue was closed because it has been stalled for 7 days with no activity.'
+          stale-pr-message: |
+            We need some feedback on this issue.
+            
+            Now we mark this as "stale" because there was no activity here for 14 days. 
+            
+            Remove the "stale" label or comment else this will be closed in 7 days.
+          close-issue-message: |
+            As there was no activity here for a while we close this issue. But don't worry, the conversation is still here and you can get back to it at any time.
+            
+            So feel free to comment if you have remarks or ideas on this topic.
           days-before-stale: 14
           days-before-close: 7
           exempt-issue-labels: 'pinned'
