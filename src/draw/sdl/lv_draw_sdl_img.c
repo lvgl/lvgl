@@ -182,7 +182,8 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
                                   const void * src, int32_t frame_id, SDL_Texture ** texture,
                                   lv_draw_sdl_img_header_t ** header)
 {
-    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, lv_color_white(), frame_id);
+    lv_color32_t white = { .full = 0xFFFFFFFF };
+    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, white, frame_id);
     lv_draw_sdl_cache_flag_t tex_flags = 0;
     SDL_Rect rect;
     SDL_memset(&rect, 0, sizeof(SDL_Rect));

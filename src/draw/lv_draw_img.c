@@ -13,6 +13,7 @@
 #include "../core/lv_refr.h"
 #include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
+#include "../misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -232,7 +233,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
-    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, draw_dsc->recolor, draw_dsc->frame_id);
+    lv_color32_t recolor = { .full = lv_color_to32(draw_dsc->recolor) };
+    LV_COLOR_SET_A32(recolor, draw_dsc->recolor_opa);
+    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, recolor, draw_dsc->frame_id);
 
     if(cdsc == NULL) return LV_RES_INV;
 
