@@ -190,6 +190,14 @@ uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj);
 void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size);
 
 /**
+ * Get the index of an option.
+ * @param obj       pointer to drop-down object
+ * @param option    an option as string
+ * @return          index of `option` in the list of all options. -1 if not found.
+ */
+int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option);
+
+/**
  * Get the symbol on the drop-down list. Typically a down caret or arrow.
  * @param obj       pointer to drop-down list object
  * @return          the symbol or NULL if not enabled
