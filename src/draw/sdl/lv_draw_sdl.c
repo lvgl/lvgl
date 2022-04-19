@@ -70,7 +70,7 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_ctx->draw_polygon = lv_draw_sdl_polygon;
     draw_ctx->draw_bg = lv_draw_sdl_draw_bg;
     lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
-    draw_ctx_sdl->renderer = (lv_draw_sdl_drv_param_t *) disp_drv->user_data;
+    draw_ctx_sdl->renderer = ((lv_draw_sdl_drv_param_t *) disp_drv->user_data)->renderer;
     draw_ctx_sdl->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_internals_t));
     lv_memset_00(draw_ctx_sdl->internals, sizeof(lv_draw_sdl_context_internals_t));
     lv_draw_sdl_texture_cache_init(draw_ctx_sdl);
