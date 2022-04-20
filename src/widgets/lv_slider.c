@@ -384,7 +384,8 @@ static void draw_knob(lv_event_t * e)
 
         /*Calculate the second knob area*/
         if(is_horizontal) {
-            knob_area.x1 = LV_SLIDER_KNOB_COORD(is_rtl, slider->bar.indic_area);
+            /*use !is_rtl to get the other knob*/
+            knob_area.x1 = LV_SLIDER_KNOB_COORD(!is_rtl, slider->bar.indic_area);
         }
         else {
             knob_area.y1 = slider->bar.indic_area.y2;
