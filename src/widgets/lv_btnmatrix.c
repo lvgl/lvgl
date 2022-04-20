@@ -22,7 +22,7 @@
  *********************/
 #define MY_CLASS &lv_btnmatrix_class
 
-#define BTN_EXTRA_CLICK_AREA_MAX ((lv_disp_get_dpi(lv_obj_get_disp(obj)) / 10)
+#define BTN_EXTRA_CLICK_AREA_MAX ((lv_disp_get_dpi(lv_obj_get_disp(obj)) / 10))
 #define LV_BTNMATRIX_WIDTH_MASK 0x0007U
 
 /**********************
