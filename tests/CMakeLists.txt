@@ -230,6 +230,12 @@ set(LVGL_TEST_OPTIONS_TEST_COMMON
     -DLV_USE_BIDI=1
     -DLV_USE_ARABIC_PERSIAN_CHARS=1
     -DLV_LABEL_TEXT_SELECTION=1
+    -DLV_USE_FS_STDIO=1
+    -DLV_FS_STDIO_LETTER='A'
+    -DLV_FS_STDIO_CACHE_SIZE=100
+    -DLV_USE_FS_POSIX=1
+    -DLV_FS_POSIX_LETTER='B'
+    -DLV_FS_POSIX_CACHE_SIZE=0
     ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
