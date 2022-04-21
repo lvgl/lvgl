@@ -42,6 +42,10 @@ void lv_extra_init(void)
     lv_grid_init();
 #endif
 
+#if LV_USE_MSG
+    lv_msg_init();
+#endif
+
 #if LV_USE_FS_FATFS != '\0'
     lv_fs_fatfs_init();
 #endif
@@ -59,6 +63,7 @@ void lv_extra_init(void)
 #endif
 
 #if LV_USE_FFMPEG
+    /* Must be first so it's the second last in the decoder's list to try */
     lv_ffmpeg_init();
 #endif
 
@@ -72,6 +77,10 @@ void lv_extra_init(void)
 
 #if LV_USE_BMP
     lv_bmp_init();
+#endif
+
+#if LV_USE_GIF
+    lv_gif_init();
 #endif
 
 #if LV_USE_FREETYPE

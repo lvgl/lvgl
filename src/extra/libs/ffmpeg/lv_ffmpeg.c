@@ -33,10 +33,6 @@
     #error Unsupported  LV_COLOR_DEPTH
 #endif
 
-#define MY_CLASS &lv_ffmpeg_player_class
-
-#define FRAME_DEF_REFR_PERIOD   33  /*[ms]*/
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -54,6 +50,7 @@ struct ffmpeg_context_s {
     int video_dst_linesize[4];
     enum AVPixelFormat video_dst_pix_fmt;
     bool has_alpha;
+    lv_frame_index_t last_rendered_frame;
 };
 
 #pragma pack(1)
@@ -69,9 +66,9 @@ struct lv_img_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_dec_t * dec, lv_img_dec_dsc_t * dsc);
-static void decoder_close(lv_img_dec_t * dec, lv_img_dec_dsc_t * dsc);
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
+static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static void decoder_close(lv_img_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
@@ -86,9 +83,6 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx);
 static bool ffmpeg_pix_fmt_has_alpha(enum AVPixelFormat pix_fmt);
 static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt);
 
-static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-
 #if LV_COLOR_DEPTH != 32
     static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 #endif
@@ -96,12 +90,6 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p, lv_obj_t
 /**********************
  *  STATIC VARIABLES
  **********************/
-const lv_obj_class_t lv_ffmpeg_player_class = {
-    .constructor_cb = lv_ffmpeg_player_constructor,
-    .destructor_cb = lv_ffmpeg_player_destructor,
-    .instance_size = sizeof(lv_ffmpeg_player_t),
-    .base_class = &lv_img_class
-};
 
 /**********************
  *      MACROS
@@ -113,8 +101,8 @@ const lv_obj_class_t lv_ffmpeg_player_class = {
 
 void lv_ffmpeg_init(void)
 {
-    lv_img_dec_t * dec = lv_img_decoder_create();
-    lv_img_decoder_set_info_cb(dec, decoder_info);
+    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
 
@@ -123,154 +111,23 @@ void lv_ffmpeg_init(void)
 #endif
 }
 
-int lv_ffmpeg_get_frame_num(const char * path)
-{
-    int ret = -1;
-    struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path);
-
-    if(ffmpeg_ctx) {
-        ret = ffmpeg_ctx->video_stream->nb_frames;
-        ffmpeg_close(ffmpeg_ctx);
-    }
-
-    return ret;
-}
-
-lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent)
-{
-    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
-    lv_obj_class_init_obj(obj);
-    return obj;
-}
-
-lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_res_t res = LV_RES_INV;
-
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
-
-    if(player->ffmpeg_ctx) {
-        ffmpeg_close(player->ffmpeg_ctx);
-        player->ffmpeg_ctx = NULL;
-    }
-
-    lv_timer_pause(player->timer);
-
-    player->ffmpeg_ctx = ffmpeg_open_file(path);
-
-    if(!player->ffmpeg_ctx) {
-        LV_LOG_ERROR("ffmpeg file open failed: %s", path);
-        goto failed;
-    }
-
-    if(ffmpeg_image_allocate(player->ffmpeg_ctx) < 0) {
-        LV_LOG_ERROR("ffmpeg image allocate failed");
-        ffmpeg_close(player->ffmpeg_ctx);
-        goto failed;
-    }
-
-    bool has_alpha = player->ffmpeg_ctx->has_alpha;
-    int width = player->ffmpeg_ctx->video_dec_ctx->width;
-    int height = player->ffmpeg_ctx->video_dec_ctx->height;
-    uint32_t data_size = 0;
-
-    if(has_alpha) {
-        data_size = width * height * LV_IMG_PX_SIZE_ALPHA_BYTE;
-    }
-    else {
-        data_size = width * height * LV_COLOR_SIZE / 8;
-    }
-
-    player->imgdsc.header.always_zero = 0;
-    player->imgdsc.header.w = width;
-    player->imgdsc.header.h = height;
-    player->imgdsc.data_size = data_size;
-    player->imgdsc.header.cf = has_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
-    player->imgdsc.data = ffmpeg_get_img_data(player->ffmpeg_ctx);
-
-    lv_img_set_src(&player->img.obj, &(player->imgdsc));
-
-    int period = ffmpeg_get_frame_refr_period(player->ffmpeg_ctx);
-
-    if(period > 0) {
-        LV_LOG_INFO("frame refresh period = %d ms, rate = %d fps",
-                    period, 1000 / period);
-        lv_timer_set_period(player->timer, period);
-    }
-    else {
-        LV_LOG_WARN("unable to get frame refresh period");
-    }
-
-    res = LV_RES_OK;
-
-failed:
-    return res;
-}
-
-void lv_ffmpeg_player_set_cmd(lv_obj_t * obj, lv_ffmpeg_player_cmd_t cmd)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
-
-    if(!player->ffmpeg_ctx) {
-        LV_LOG_ERROR("ffmpeg_ctx is NULL");
-        return;
-    }
-
-    lv_timer_t * timer = player->timer;
-
-    switch(cmd) {
-        case LV_FFMPEG_PLAYER_CMD_START:
-            av_seek_frame(player->ffmpeg_ctx->fmt_ctx,
-                          0, 0, AVSEEK_FLAG_BACKWARD);
-            lv_timer_resume(timer);
-            LV_LOG_INFO("ffmpeg player start");
-            break;
-        case LV_FFMPEG_PLAYER_CMD_STOP:
-            av_seek_frame(player->ffmpeg_ctx->fmt_ctx,
-                          0, 0, AVSEEK_FLAG_BACKWARD);
-            lv_timer_pause(timer);
-            LV_LOG_INFO("ffmpeg player stop");
-            break;
-        case LV_FFMPEG_PLAYER_CMD_PAUSE:
-            lv_timer_pause(timer);
-            LV_LOG_INFO("ffmpeg player pause");
-            break;
-        case LV_FFMPEG_PLAYER_CMD_RESUME:
-            lv_timer_resume(timer);
-            LV_LOG_INFO("ffmpeg player resume");
-            break;
-        default:
-            LV_LOG_ERROR("Error cmd: %d", cmd);
-            break;
-    }
-}
-
-void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
-    player->auto_restart = en;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 {
-    /* Get the source type */
-    lv_img_src_type_t src_type = lv_img_src_get_type(src);
-
-    if(src_type == LV_IMG_SRC_FILE) {
-        const char * fn = src;
-
-        if(ffmpeg_get_img_header(fn, header) < 0) {
+    if(src->type == LV_IMG_SRC_FILE) {
+        lv_img_header_t header;
+        /* Sorry here, there's no other way to accept this source without trying to open it*/
+        if(ffmpeg_get_img_header((const char *)src->uri, &header) < 0) {
             LV_LOG_ERROR("ffmpeg can't get image header");
             return LV_RES_INV;
         }
 
+        if(caps != NULL) {
+            *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_CACHED;
+        }
         return LV_RES_OK;
     }
 
@@ -278,53 +135,93 @@ static lv_res_t decoder_info(lv_img_dec_t * decoder, const void * src, lv_img_he
     return LV_RES_INV;
 }
 
-static lv_res_t decoder_open(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
+static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
-        const char * path = dsc->src;
+    if(dsc->input.src->type != LV_IMG_SRC_FILE) {
+        return LV_RES_INV;
+    }
 
-        struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path);
+    const char * fn = (const char *)dsc->input.src->uri;
+    if(!dsc->dec_ctx) {
+        LV_ZERO_ALLOC(dsc->dec_ctx);
+        if(!dsc->dec_ctx)
+            return LV_RES_INV;
+
+        dsc->dec_ctx->auto_allocated = 1;
+    }
+
+    struct ffmpeg_context_s * ffmpeg_ctx = (struct ffmpeg_context_s *)dsc->dec_ctx->user_data;
+    if(!ffmpeg_ctx) {
+        ffmpeg_ctx = ffmpeg_open_file(fn);
 
         if(ffmpeg_ctx == NULL) {
+            decoder_close(dsc);
             return LV_RES_INV;
         }
+        dsc->dec_ctx->user_data = ffmpeg_ctx;
+    }
+    /* Extract metadata */
+    dsc->dec_ctx->total_frames = ffmpeg_ctx->video_stream->nb_frames;
+    dsc->dec_ctx->frame_rate = ffmpeg_ctx->video_stream->avg_frame_rate.num / ffmpeg_ctx->video_stream->avg_frame_rate.den;
+    dsc->dec_ctx->frame_delay = (1000 * ffmpeg_ctx->video_stream->avg_frame_rate.den) /
+                                ffmpeg_ctx->video_stream->avg_frame_rate.num;
+    dsc->caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_CACHED;
+    dsc->header.w = ffmpeg_ctx->video_dec_ctx->width;
+    dsc->header.h = ffmpeg_ctx->video_dec_ctx->height;
+    dsc->header.always_zero = 0;
+    dsc->header.cf = ffmpeg_ctx->has_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
 
-        if(ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
-            LV_LOG_ERROR("ffmpeg image allocate failed");
-            ffmpeg_close(ffmpeg_ctx);
-            return LV_RES_INV;
-        }
+    if(flags == LV_IMG_DEC_ONLYMETA) {
+        decoder_close(dsc);
+        return LV_RES_OK;
+    }
 
+    if(ffmpeg_ctx->video_src_data[0] == NULL && ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
+        LV_LOG_ERROR("ffmpeg image allocate failed");
+        decoder_close(dsc);
+        return LV_RES_INV;
+    }
+
+    if(dsc->dec_ctx->current_frame == 0) {
+        av_seek_frame(ffmpeg_ctx->fmt_ctx, 0, 0, AVSEEK_FLAG_BACKWARD);
+        LV_LOG_INFO("ffmpeg seeking to 0");
+    }
+
+    if(dsc->dec_ctx->current_frame != ffmpeg_ctx->last_rendered_frame
+       && dsc->dec_ctx->current_frame < dsc->dec_ctx->total_frames) {
         if(ffmpeg_update_next_frame(ffmpeg_ctx) < 0) {
-            ffmpeg_close(ffmpeg_ctx);
+            decoder_close(dsc);
             LV_LOG_ERROR("ffmpeg update frame failed");
             return LV_RES_INV;
         }
 
-        ffmpeg_close_src_ctx(ffmpeg_ctx);
-        uint8_t * img_data = ffmpeg_get_img_data(ffmpeg_ctx);
+        dsc->dec_ctx->last_rendering = lv_tick_get();
+        ffmpeg_ctx->last_rendered_frame = dsc->dec_ctx->current_frame;
+    }
+    uint8_t * img_data = ffmpeg_get_img_data(ffmpeg_ctx);
 
 #if LV_COLOR_DEPTH != 32
-        if(ffmpeg_ctx->has_alpha) {
-            convert_color_depth(img_data, dsc->header.w * dsc->header.h);
-        }
+    if(ffmpeg_ctx->has_alpha) {
+        convert_color_depth(img_data, dsc->header.w * dsc->header.h);
+    }
 #endif
 
-        dsc->user_data = ffmpeg_ctx;
-        dsc->img_data = img_data;
+    dsc->img_data = img_data;
 
-        /* The image is fully decoded. Return with its pointer */
-        return LV_RES_OK;
-    }
-
-    /* If not returned earlier then it failed */
-    return LV_RES_INV;
+    /* The image is fully decoded. Return with its pointer */
+    return LV_RES_OK;
 }
 
-static void decoder_close(lv_img_dec_t * decoder, lv_img_dec_dsc_t * dsc)
+static void decoder_close(lv_img_decoder_dsc_t * dsc)
 {
-    struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
-    ffmpeg_close(ffmpeg_ctx);
+    if(dsc->dec_ctx && dsc->dec_ctx->auto_allocated) {
+        struct ffmpeg_context_s * ffmpeg_ctx = (struct ffmpeg_context_s *)dsc->dec_ctx->user_data;
+        if(ffmpeg_ctx != NULL) ffmpeg_close(ffmpeg_ctx);
+        dsc->dec_ctx->user_data = 0;
+
+        lv_mem_free(dsc->dec_ctx);
+        dsc->dec_ctx = 0;
+    }
 }
 
 #if LV_COLOR_DEPTH != 32
@@ -486,7 +383,7 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
     }
 
     /* get all the available frames from the decoder */
-    while(ret >= 0) {
+    while(ret <= 0) {
         ret = avcodec_receive_frame(dec, ffmpeg_ctx->frame);
         if(ret < 0) {
 
@@ -495,7 +392,7 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
              * but there were no errors during decoding
              */
             if(ret == AVERROR_EOF || ret == AVERROR(EAGAIN)) {
-                return 0;
+                return 0; /* No image captured */
             }
 
             LV_LOG_ERROR("Error during decoding (%s)", av_err2str(ret));
@@ -514,7 +411,7 @@ static int ffmpeg_decode_packet(AVCodecContext * dec, const AVPacket * pkt,
         }
     }
 
-    return 0;
+    return ret;
 }
 
 static int ffmpeg_open_codec_context(int * stream_idx,
@@ -616,17 +513,6 @@ failed:
     return ret;
 }
 
-static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx)
-{
-    int avg_frame_rate_num = ffmpeg_ctx->video_stream->avg_frame_rate.num;
-    if(avg_frame_rate_num > 0) {
-        int period = 1000 * (int64_t)ffmpeg_ctx->video_stream->avg_frame_rate.den
-                     / avg_frame_rate_num;
-        return period;
-    }
-
-    return -1;
-}
 
 static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 {
@@ -644,7 +530,7 @@ static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
             if(ffmpeg_ctx->pkt.stream_index == ffmpeg_ctx->video_stream_idx) {
                 ret = ffmpeg_decode_packet(ffmpeg_ctx->video_dec_ctx,
                                            &(ffmpeg_ctx->pkt), ffmpeg_ctx);
-                is_image = true;
+                is_image = ret > 0;
             }
 
             av_packet_unref(&(ffmpeg_ctx->pkt));
@@ -718,6 +604,7 @@ struct ffmpeg_context_s * ffmpeg_open_file(const char * path)
         goto failed;
     }
 
+    ffmpeg_ctx->last_rendered_frame = (lv_frame_index_t) -1;
     return ffmpeg_ctx;
 
 failed:
@@ -809,67 +696,5 @@ static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx)
     LV_LOG_INFO("ffmpeg_ctx closed");
 }
 
-static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
-{
-    lv_obj_t * obj = (lv_obj_t *)timer->user_data;
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
-
-    if(!player->ffmpeg_ctx) {
-        return;
-    }
-
-    int has_next = ffmpeg_update_next_frame(player->ffmpeg_ctx);
-
-    if(has_next < 0) {
-        lv_ffmpeg_player_set_cmd(obj, player->auto_restart ? LV_FFMPEG_PLAYER_CMD_START : LV_FFMPEG_PLAYER_CMD_STOP);
-        return;
-    }
-
-#if LV_COLOR_DEPTH != 32
-    if(player->ffmpeg_ctx->has_alpha) {
-        convert_color_depth((uint8_t *)(player->imgdsc.data),
-                            player->imgdsc.header.w * player->imgdsc.header.h);
-    }
-#endif
-
-    lv_img_cache_invalidate_src(lv_img_get_src(obj));
-    lv_obj_invalidate(obj);
-}
-
-static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
-                                         lv_obj_t * obj)
-{
-    LV_TRACE_OBJ_CREATE("begin");
-
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
-
-    player->auto_restart = false;
-    player->ffmpeg_ctx = NULL;
-    player->timer = lv_timer_create(lv_ffmpeg_player_frame_update_cb,
-                                    FRAME_DEF_REFR_PERIOD, obj);
-    lv_timer_pause(player->timer);
-
-    LV_TRACE_OBJ_CREATE("finished");
-}
-
-static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
-                                        lv_obj_t * obj)
-{
-    LV_TRACE_OBJ_CREATE("begin");
-
-    lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
-
-    if(player->timer) {
-        lv_timer_del(player->timer);
-        player->timer = NULL;
-    }
-
-    lv_img_cache_invalidate_src(lv_img_get_src(obj));
-
-    ffmpeg_close(player->ffmpeg_ctx);
-    player->ffmpeg_ctx = NULL;
-
-    LV_TRACE_OBJ_CREATE("finished");
-}
 
 #endif /*LV_USE_FFMPEG*/

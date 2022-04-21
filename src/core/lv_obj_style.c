@@ -241,7 +241,12 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
                 cls = cls->base_class;
             }
 
-            value_act.num = prop == LV_STYLE_WIDTH ? cls->width_def : cls->height_def;
+            if(cls) {
+                value_act.num = prop == LV_STYLE_WIDTH ? cls->width_def : cls->height_def;
+            }
+            else {
+                value_act.num = 0;
+            }
         }
         else {
             value_act = lv_style_prop_get_default(prop);
@@ -693,7 +698,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
     for(i = 0; i < obj->style_cnt; i++) {
         if(obj->styles[i].is_trans == 0 || obj->styles[i].selector != tr->selector) continue;
 
-        lv_style_value_t value_final;
+        lv_style_value_t value_final = {0};
         switch(tr->prop) {
 
             case LV_STYLE_BORDER_SIDE:
@@ -731,7 +736,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 break;
         }
 
-        lv_style_value_t old_value;
+        lv_style_value_t old_value = {0};
         bool refr = true;
         if(lv_style_get_prop(obj->styles[i].style, tr->prop, &old_value)) {
             if(value_final.ptr == old_value.ptr && value_final.color.full == old_value.color.full &&

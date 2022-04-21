@@ -110,7 +110,8 @@ typedef struct {
 
     uint32_t h : 11; /*Height of the image map*/
     uint32_t w : 11; /*Width of the image map*/
-    uint32_t reserved : 2; /*Reserved to be used later*/
+    uint32_t v : 1;  /*Is vector image?*/
+    uint32_t reserved : 1; /*Reserved to be used later*/
     uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
                                  non-printable character*/
     uint32_t cf : 5;          /*Color format: See `lv_img_color_format_t`*/
@@ -123,7 +124,8 @@ typedef struct {
     uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
                                  non-printable character*/
 
-    uint32_t reserved : 2; /*Reserved to be used later*/
+    uint32_t reserved : 1; /*Reserved to be used later*/
+    uint32_t v : 1; /*Is vector image?*/
 
     uint32_t w : 11; /*Width of the image map*/
     uint32_t h : 11; /*Height of the image map*/
@@ -132,7 +134,7 @@ typedef struct {
 
 /** Image header it is compatible with
  * the result from image converter utility*/
-typedef struct {
+typedef struct _lv_img_dsc_t {
     lv_img_header_t header; /**< A header describing the basics of the image*/
     uint32_t data_size;     /**< Size of the image in bytes*/
     const uint8_t * data;   /**< Pointer to the data of the image*/
