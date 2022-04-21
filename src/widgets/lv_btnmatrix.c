@@ -309,22 +309,20 @@ const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    if(btn_id == LV_BTNMATRIX_BTN_NONE) return NULL;
-
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
-    if(btn_id > btnm->btn_cnt) return NULL;
+    if((btn_id == LV_BTNMATRIX_BTN_NONE) || (btnm->btn_cnt < btn_id)) return NULL;
 
     uint16_t txt_i = 0;
     uint16_t btn_i = 0;
 
-    /*Search the text of btnm->btn_pr the buttons text in the map
-     *Skip "\n"-s*/
+    /* Search the buttons text in the btnmatrix map, skip "\n"-s*/
     while(btn_i != btn_id) {
         btn_i++;
         txt_i++;
         if(strcmp(btnm->map_p[txt_i], "\n") == 0) txt_i++;
     }
 
+    /* What are we testing here? */
     if(btn_i == btnm->btn_cnt) return NULL;
 
     return btnm->map_p[txt_i];

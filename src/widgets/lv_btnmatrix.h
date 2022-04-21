@@ -25,6 +25,8 @@ extern "C" {
 #define LV_BTNMATRIX_BTN_NONE 0xFFFF
 LV_EXPORT_CONST_INT(LV_BTNMATRIX_BTN_NONE);
 
+#define LV_BTNMATRIX_END_OF_MAP_MARKER  ""
+
 /**********************
  *      TYPEDEFS
  **********************/
