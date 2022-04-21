@@ -68,7 +68,7 @@ void test_switch_should_not_leak_memory_after_deletion(void)
     lv_mem_monitor(&monitor);
     final_available_memory = monitor.free_size;
 
-    LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, final_available_memory));
+    LV_HEAP_CHECK(TEST_ASSERT_LESS_OR_EQUAL(initial_available_memory, final_available_memory));
 }
 
 void test_switch_animation(void)
