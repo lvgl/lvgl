@@ -55,12 +55,13 @@ void lv_draw_gles_texture_cache_init(lv_draw_gles_ctx_t * ctx);
 
 void lv_draw_gles_texture_cache_deinit(lv_draw_gles_ctx_t * ctx);
 
-GLuint lv_draw_gles_texture_cache_get(lv_draw_gles_ctx_t * ctx,
-                                      const void * key,
-                                      size_t key_length,
-                                      bool * found);
+void lv_draw_gles_texture_cache_get(lv_draw_gles_ctx_t * ctx, const void * key,
+                                    size_t key_length,
+                                    bool * found,
+                                    GLuint *texture, uint32_t *width, uint32_t *height);
 
-void lv_draw_gles_texture_cache_put(lv_draw_gles_ctx_t * ctx, const void * key, size_t key_length, GLuint texture);
+
+void lv_draw_gles_texture_cache_put(lv_draw_gles_ctx_t * ctx, const void * key, size_t key_length, GLuint texture, uint32_t width, uint32_t height);
 
 lv_draw_gles_cache_key_head_img_t * lv_draw_gles_texture_img_key_create(const void * src, int32_t frame_id,
                                                                       size_t * size);

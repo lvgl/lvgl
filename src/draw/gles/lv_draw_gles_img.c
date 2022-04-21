@@ -64,7 +64,7 @@ void lv_draw_gles_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_im
 
 
 void lv_draw_gles_img_load_texture(lv_draw_gles_ctx_t * ctx, lv_draw_gles_cache_key_head_img_t * key, size_t key_size,
-                               const void * src, int32_t frame_id, GLuint *texture)
+                               const void * src, int32_t frame_id, GLuint *texture, uint32_t *width, uint32_t *height)
 {
 
     _lv_img_cache_entry_t  *cdsc = _lv_img_cache_open(src, lv_color_white(), frame_id);
@@ -83,7 +83,9 @@ void lv_draw_gles_img_load_texture(lv_draw_gles_ctx_t * ctx, lv_draw_gles_cache_
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     lv_mem_free(data);
 
-    lv_draw_gles_texture_cache_put(ctx, key, key_size, *texture);
+    lv_draw_gles_texture_cache_put(ctx, key, key_size, *texture, (uint32_t) w, (uint32_t) h);
+    *width = (uint32_t)w;
+    *height = (uint32_t)h;
 }
 
 
@@ -103,10 +105,13 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
     size_t key_size;
     lv_draw_gles_cache_key_head_img_t * key = lv_draw_gles_texture_img_key_create(src, draw_dsc->frame_id, &key_size);
     bool texture_found = false;
-    GLuint texture = lv_draw_gles_texture_cache_get(draw_gles_ctx, key, key_size, &texture_found);
+    GLuint texture = 0;
+    uint32_t texture_width = 0;
+    uint32_t texture_height = 0;
+    lv_draw_gles_texture_cache_get(draw_gles_ctx, key, key_size, &texture_found, &texture, &texture_width, &texture_height);
 
     if (!texture_found) {
-        lv_draw_gles_img_load_texture(draw_gles_ctx, key, key_size, src, draw_dsc->frame_id, &texture);
+        lv_draw_gles_img_load_texture(draw_gles_ctx, key, key_size, src, draw_dsc->frame_id, &texture, &texture_width, &texture_height);
     }
 
     lv_mem_free(key);
@@ -147,20 +152,28 @@ static lv_res_t opengl_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_
         vec4 color;
         lv_color_to_vec4_color_with_opacity(&re_color, draw_dsc->recolor_opa, color);
 
-        static GLfloat vertices[] = {
-            0.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0f,
+        vec2 uv;
+        vec2 uv2;
 
-            0.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 1.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 0.0f
+        uv[0] = (float)(clipped_area.x1 - zoomed_cords.x1) / (float)(texture_width);
+        uv[1] = (float)(clipped_area.y1 - zoomed_cords.y1) / (float)(texture_height);
+        uv2[0] = 1.0f - (float)(zoomed_cords.x1 - clipped_area.x1) / (float)(texture_width);
+        uv2[1] = 1.0f - (float)(zoomed_cords.y2 - clipped_area.y2) / (float)(texture_height);
+
+        GLfloat vertices[] = {
+            0.0f, 1.0f, uv[0], uv2[1],
+            1.0f, 0.0f, uv2[0], uv[1],
+            0.0f, 0.0f, uv[0], uv[1],
+
+            0.0f, 1.0f, uv[0], uv2[1],
+            1.0f, 1.0f, uv2[0], uv2[1],
+            1.0f, 0.0f, uv2[0], uv[1]
         };
 
         mat4 model;
         lv_draw_gles_math_mat4_identity(model);
-        lv_draw_gles_math_translate(model, (vec3) {t_coords.x1, t_coords.y1});
-        lv_draw_gles_math_scale(model, (vec3) {t_coords.x2 - t_coords.x1, t_coords.y2 - t_coords.y1});
+        lv_draw_gles_math_translate(model, (vec3) {clipped_area.x1, clipped_area.y1});
+        lv_draw_gles_math_scale(model, (vec3) {clipped_area.x2 - clipped_area.x1, clipped_area.y2 - clipped_area.y1});
 #if 1
         glBindFramebuffer(GL_FRAMEBUFFER, internals->framebuffer);
         glUseProgram(internals->simple_img_shader);

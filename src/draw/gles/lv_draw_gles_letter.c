@@ -105,7 +105,10 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);
     bool glyph_found = false;
-    GLuint texture = lv_draw_gles_texture_cache_get(draw_gles_ctx, &glyph_key, sizeof(glyph_key), &glyph_found);
+    GLuint texture = 0;
+    uint32_t texture_width = 0;
+    uint32_t texture_height = 0;
+    lv_draw_gles_texture_cache_get(draw_gles_ctx, &glyph_key, sizeof(glyph_key), &glyph_found, &texture, &texture_width, &texture_height);
     if (!glyph_found) {
         if (g.resolved_font) {
             font_p = g.resolved_font;
@@ -123,7 +126,7 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RED_EXT, g.box_w, g.box_h, 0, GL_RED_EXT, GL_UNSIGNED_BYTE, buf);
 
-            lv_draw_gles_texture_cache_put(draw_gles_ctx, &glyph_key, sizeof(glyph_key), tmp_texture);
+            lv_draw_gles_texture_cache_put(draw_gles_ctx, &glyph_key, sizeof(glyph_key), tmp_texture, g.box_w, g.box_h);
             texture = tmp_texture;
         }
     }
@@ -147,8 +150,8 @@ void lv_draw_gles_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
     uv[0] = (float)(draw_area.x1 - t_letter.x1) / (float)(g.box_w);
     uv[1] = (float)(draw_area.y1 - t_letter.y1) / (float)(g.box_h);
-    uv2[0] = 1.0;
-    uv2[1] = 1.0;
+    uv2[0] = 1.0 - (float)(t_letter.x2 - draw_area.x2) / (float)(g.box_w);
+    uv2[1] = 1.0 - (float)(t_letter.y2 - draw_area.y2) / (float)(g.box_h);
 
     GLfloat vertices[] = {
         0.0f, 1.0f, uv[0], uv2[1],

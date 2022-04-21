@@ -24,6 +24,8 @@
 
 typedef struct {
     GLuint texture;
+    uint32_t width;
+    uint32_t height;
 } draw_cache_value_t;
 
 /**********************
@@ -50,7 +52,7 @@ static draw_cache_value_t * draw_cache_get_entry(lv_draw_gles_ctx_t * ctx,
 void lv_draw_gles_texture_cache_init(lv_draw_gles_ctx_t * ctx)
 {
     ctx->internals->texture_cache = lv_lru_create(LV_GPU_GLES_LRU_SIZE,
-                                                  sizeof(unsigned int),
+                                                  sizeof(draw_cache_value_t),
                                                   (lv_lru_free_t *) draw_cache_free_value, NULL);
 }
 
@@ -60,20 +62,28 @@ void lv_draw_gles_texture_cache_deinit(lv_draw_gles_ctx_t * ctx)
     lv_lru_del(ctx->internals->texture_cache);
 }
 
-GLuint lv_draw_gles_texture_cache_get(lv_draw_gles_ctx_t * ctx, const void * key, size_t key_length, bool * found)
+void lv_draw_gles_texture_cache_get(lv_draw_gles_ctx_t * ctx, const void * key,
+                                    size_t key_length,
+                                    bool * found,
+                                    GLuint *texture, uint32_t *width, uint32_t *height)
 {
     draw_cache_value_t * value = draw_cache_get_entry(ctx, key, key_length, found);
-    if(!value) return 0;
-    return value->texture;
+    if(!value) return ;
+    *texture = value->texture;
+    *width = value->width;
+    *height = value->height;
 }
 
-void lv_draw_gles_texture_cache_put(lv_draw_gles_ctx_t * ctx, const void * key, size_t key_length, GLuint texture)
+void lv_draw_gles_texture_cache_put(lv_draw_gles_ctx_t * ctx, const void * key, size_t key_length, GLuint texture, uint32_t width, uint32_t height)
 {
 
     lv_lru_t * lru = ctx->internals->texture_cache;
     draw_cache_value_t * value = lv_mem_alloc(sizeof(draw_cache_value_t));
     value->texture = texture;
+    value->width = width;
+    value->height = height;
     lv_lru_set(lru, key, key_length, value, sizeof(*value));
+
 }
 
 lv_draw_gles_cache_key_head_img_t * lv_draw_gles_texture_img_key_create(const void * src, int32_t frame_id,
