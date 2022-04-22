@@ -359,6 +359,20 @@
 
             </component>
 
+            <component Cgroup="lvgl" Csub="GPU SWM341-DMA2D"  condition="LVGL-Essential">
+              <description>An hardware acceleration from SWM341-DMA2D</description>
+              <files>
+              <file category="sourceC"            name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable SWM341 DMA2D */
+#define LV_USE_GPU_SWM341_DMA2D      1
+              </RTE_Components_h>
+              
+            </component>
+            
             <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-Essential">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
