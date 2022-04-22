@@ -18,7 +18,7 @@ extern "C" {
 
 #if LV_USE_GPU_GLES
 
-#include LV_GPU_GLES_GLAD_INCLUDE_PATH
+#include LV_GPU_GLES_LOADER_INCLUDE_PATH
 
 #include "../lv_draw.h"
 #include "../sw/lv_draw_sw_blend.h"

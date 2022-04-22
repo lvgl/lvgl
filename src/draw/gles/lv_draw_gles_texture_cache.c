@@ -12,7 +12,7 @@
 #if LV_USE_GPU_GLES
 
 #include "lv_draw_gles_texture_cache.h"
-#include LV_GPU_GLES_GLAD_INCLUDE_PATH
+#include LV_GPU_GLES_LOADER_INCLUDE_PATH
 
 /*********************
  *      DEFINES
