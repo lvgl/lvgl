@@ -47,7 +47,7 @@ void *bgra_to_rgba(void *data, int w, int h);
 lv_res_t lv_draw_gles_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
                                const lv_area_t * coords, const void * src)
 {
-    opengl_draw_img(draw_ctx, draw_dsc, coords, src);
+    return opengl_draw_img(draw_ctx, draw_dsc, coords, src);
 #if LV_USE_GPU_GLES_SW_MIXED
     lv_draw_gles_utils_download_texture(draw_ctx);
 #endif /* LV_USE_GPU_GLES_SW_MIXED */
