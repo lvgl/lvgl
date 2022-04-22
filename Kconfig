@@ -229,7 +229,7 @@ menu "LVGL configuration"
             config LV_GPU_SWM341_DMA2D_INCLUDE
                 string "include path of CMSIS header of target processor"
                 depends on LV_USE_GPU_SWM341_DMA2D
-                default ""SWM341.h""
+                default "SWM341.h"
                 help
                     Must be defined to include path of CMSIS header of target processor
                     e.g. "SWM341.h"
