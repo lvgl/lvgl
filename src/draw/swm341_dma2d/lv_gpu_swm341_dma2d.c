@@ -106,7 +106,7 @@ void lv_draw_swm341_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
 
     bool done = false;
 
-    if (dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&blend_area) > 100) {
+    if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&blend_area) > 100) {
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
 
         lv_color_t * dest_buf = draw_ctx->buf;
@@ -132,15 +132,15 @@ void lv_draw_swm341_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
     if(!done) lv_draw_sw_blend_basic(draw_ctx, dsc);
 }
 
-static void lv_draw_swm341_dma2d_img_decoded(lv_draw_ctx_t *draw_ctx, const lv_draw_img_dsc_t *dsc,
-                                             const lv_area_t *coords, const uint8_t *map_p, lv_img_cf_t color_format)
+static void lv_draw_swm341_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+                                             const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
 {
     /*TODO basic ARGB8888 image can be handles here*/
 
     lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
 }
 
-static void lv_draw_swm341_dma2d_blend_fill(lv_color_t *dest_buf, lv_coord_t dest_stride, const lv_area_t *fill_area,
+static void lv_draw_swm341_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
                                             lv_color_t color)
 {
     /*Simply fill an area*/
