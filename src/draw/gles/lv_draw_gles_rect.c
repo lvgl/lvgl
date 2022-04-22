@@ -121,75 +121,75 @@ void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, 
 
         /*** top-mid part ***/
         lv_area_t top_mid_coords;
-        top_mid_coords.x1 = clipped_coords.x1 + rout;
-        top_mid_coords.x2 = clipped_coords.x2 - rout;
-        top_mid_coords.y1 = clipped_coords.y1;
-        top_mid_coords.y2 = clipped_coords.y1 + rout;
+        top_mid_coords.x1 = coords->x1 + rout;
+        top_mid_coords.x2 = coords->x2 - rout;
+        top_mid_coords.y1 = coords->y1;
+        top_mid_coords.y2 = coords->y1 + rout;
         opengl_draw_plain_rect(draw_ctx, dsc, &top_mid_coords);
 
         /*** center part ***/
         lv_area_t center_coords;
-        center_coords.x1 = clipped_coords.x1 + rout;
-        center_coords.x2 = clipped_coords.x2 - rout;
-        center_coords.y1 = clipped_coords.y1 + rout;
-        center_coords.y2 = clipped_coords.y2 - rout;
+        center_coords.x1 = coords->x1 + rout;
+        center_coords.x2 = coords->x2 - rout;
+        center_coords.y1 = coords->y1 + rout;
+        center_coords.y2 = coords->y2 - rout;
         opengl_draw_plain_rect(draw_ctx, dsc, &center_coords);
 
         /*** bottom-mid part ***/
         lv_area_t bottom_mid_coords;
-        bottom_mid_coords.x1 = clipped_coords.x1 + rout;
-        bottom_mid_coords.x2 = clipped_coords.x2 - rout;
-        bottom_mid_coords.y1 = clipped_coords.y2 - rout;
-        bottom_mid_coords.y2 = clipped_coords.y2;
+        bottom_mid_coords.x1 = coords->x1 + rout;
+        bottom_mid_coords.x2 = coords->x2 - rout;
+        bottom_mid_coords.y1 = coords->y2 - rout;
+        bottom_mid_coords.y2 = coords->y2;
         opengl_draw_plain_rect(draw_ctx, dsc, &bottom_mid_coords);
 
         /*** left-mid part ***/
         lv_area_t left_mid_coords;
-        left_mid_coords.x1 = clipped_coords.x1;
-        left_mid_coords.x2 = clipped_coords.x1 + rout;
-        left_mid_coords.y1 = clipped_coords.y1 + rout;
-        left_mid_coords.y2 = clipped_coords.y2 - rout;
+        left_mid_coords.x1 = coords->x1;
+        left_mid_coords.x2 = coords->x1 + rout;
+        left_mid_coords.y1 = coords->y1 + rout;
+        left_mid_coords.y2 = coords->y2 - rout;
         opengl_draw_plain_rect(draw_ctx, dsc, &left_mid_coords);
 
         /*** right-mid part ***/
         lv_area_t right_mid_coords;
-        right_mid_coords.x1 = clipped_coords.x2-rout;
-        right_mid_coords.x2 = clipped_coords.x2;
-        right_mid_coords.y1 = clipped_coords.y1 + rout;
-        right_mid_coords.y2 = clipped_coords.y2 - rout;
+        right_mid_coords.x1 = coords->x2-rout;
+        right_mid_coords.x2 = coords->x2;
+        right_mid_coords.y1 = coords->y1 + rout;
+        right_mid_coords.y2 = coords->y2 - rout;
         opengl_draw_plain_rect(draw_ctx, dsc, &right_mid_coords);
 
         /*** top-left part ***/
         lv_area_t top_left_coords;
-        top_left_coords.x1 = clipped_coords.x1;
-        top_left_coords.x2 = clipped_coords.x1 + rout;
-        top_left_coords.y1 = clipped_coords.y1;
-        top_left_coords.y2 = clipped_coords.y1  + rout;
+        top_left_coords.x1 = coords->x1;
+        top_left_coords.x2 = coords->x1 + rout;
+        top_left_coords.y1 = coords->y1;
+        top_left_coords.y2 = coords->y1  + rout;
         opengl_draw_corner_rect(draw_ctx, dsc, &top_left_coords,
                                 top_left_coords.x2, top_left_coords.y2, rout);
 
         /*** bottom-left part ***/
         lv_area_t bottom_left_coords;
-        bottom_left_coords.x1 = clipped_coords.x1;
-        bottom_left_coords.x2 = clipped_coords.x1 + rout;
-        bottom_left_coords.y1 = clipped_coords.y2 - rout;
-        bottom_left_coords.y2 = clipped_coords.y2;
+        bottom_left_coords.x1 = coords->x1;
+        bottom_left_coords.x2 = coords->x1 + rout;
+        bottom_left_coords.y1 = coords->y2 - rout;
+        bottom_left_coords.y2 = coords->y2;
         opengl_draw_corner_rect(draw_ctx, dsc, &bottom_left_coords,
                                 top_left_coords.x2, bottom_left_coords.y1, rout);
         /*** top-right part ***/
         lv_area_t top_right_coords;
-        top_right_coords.x1 = clipped_coords.x2 - rout;
-        top_right_coords.x2 = clipped_coords.x2;
-        top_right_coords.y1 = clipped_coords.y1;
-        top_right_coords.y2 = clipped_coords.y1  + rout;
+        top_right_coords.x1 = coords->x2 - rout;
+        top_right_coords.x2 = coords->x2;
+        top_right_coords.y1 = coords->y1;
+        top_right_coords.y2 = coords->y1  + rout;
         opengl_draw_corner_rect(draw_ctx, dsc, &top_right_coords,
                                 top_right_coords.x1, top_left_coords.y2, rout);
         /*** bottom-right part ***/
         lv_area_t bottom_right_coords;
-        bottom_right_coords.x1 = clipped_coords.x2 - rout;
-        bottom_right_coords.x2 = clipped_coords.x2;
-        bottom_right_coords.y1 = clipped_coords.y2 - rout;
-        bottom_right_coords.y2 = clipped_coords.y2;
+        bottom_right_coords.x1 = coords->x2 - rout;
+        bottom_right_coords.x2 = coords->x2;
+        bottom_right_coords.y1 = coords->y2 - rout;
+        bottom_right_coords.y2 = coords->y2;
         opengl_draw_corner_rect(draw_ctx, dsc, &bottom_right_coords,
                                 bottom_right_coords.x1, bottom_right_coords.y1, rout);
 
@@ -206,6 +206,8 @@ void opengl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, 
 
 void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
+    /* TODO(tan): quick and dirty fix refactor later */
+    if(!_lv_area_intersect(coords, coords, draw_ctx->clip_area)) return;
     lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
     lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
 
@@ -246,6 +248,8 @@ void opengl_draw_plain_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
 
 void opengl_draw_corner_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords, int x, int y, int radius)
 {
+    /* TODO(tan): quick and dirty fix refactor later */
+    if(!_lv_area_intersect(coords, coords, draw_ctx->clip_area)) return;
     lv_draw_gles_ctx_t *draw_gles_ctx = (lv_draw_gles_ctx_t*) draw_ctx;
     lv_draw_gles_context_internals_t *internals = draw_gles_ctx->internals;
 
