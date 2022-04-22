@@ -222,8 +222,8 @@ static void lv_draw_stm32_dma2d_blend_map(lv_color_t * dest_buf, const lv_area_t
         DMA2D->FGMAR = (uint32_t)src_buf;
         DMA2D->FGOR = src_stride - dest_w;
 
-        DMA2D->OMAR = (uint32_t)src_buf;
-        DMA2D->OOR = src_stride - dest_w;
+        DMA2D->OMAR = (uint32_t)dest_buf;
+        DMA2D->OOR = dest_stride - dest_w;
         DMA2D->NLR = (dest_w << DMA2D_NLR_PL_Pos) | (dest_h << DMA2D_NLR_NL_Pos);
 
         /*start transfer*/
