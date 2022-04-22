@@ -415,7 +415,7 @@
         #ifdef CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
             #define LV_GPU_SWM341_DMA2D_INCLUDE CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
         #else
-            #define LV_GPU_SWM341_DMA2D_INCLUDE
+            #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
         #endif
     #endif
 #endif
