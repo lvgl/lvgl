@@ -67,8 +67,8 @@ struct lv_img_pixel_color_s {
  **********************/
 
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
-static void decoder_close(lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static void decoder_close(lv_img_dec_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
@@ -101,7 +101,7 @@ static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt);
 
 void lv_ffmpeg_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -120,7 +120,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
     if(src->type == LV_IMG_SRC_FILE) {
         lv_img_header_t header;
         /* Sorry here, there's no other way to accept this source without trying to open it*/
-        if(ffmpeg_get_img_header((const char *)src->uri, &header) < 0) {
+        if(ffmpeg_get_img_header((const char *)src->data, &header) < 0) {
             LV_LOG_ERROR("ffmpeg can't get image header");
             return LV_RES_INV;
         }
@@ -135,13 +135,13 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
     return LV_RES_INV;
 }
 
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     if(dsc->input.src->type != LV_IMG_SRC_FILE) {
         return LV_RES_INV;
     }
 
-    const char * fn = (const char *)dsc->input.src->uri;
+    const char * fn = (const char *)dsc->input.src->data;
     if(!dsc->dec_ctx) {
         LV_ZERO_ALLOC(dsc->dec_ctx);
         if(!dsc->dec_ctx)
@@ -212,7 +212,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     return LV_RES_OK;
 }
 
-static void decoder_close(lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc)
 {
     if(dsc->dec_ctx && dsc->dec_ctx->auto_allocated) {
         struct ffmpeg_context_s * ffmpeg_ctx = (struct ffmpeg_context_s *)dsc->dec_ctx->user_data;

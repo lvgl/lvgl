@@ -269,10 +269,10 @@ static bool lv_img_cache_match(const lv_img_src_t * src1, const lv_img_src_t * s
     if(!src1 || !src2) return false;
     if(src1->type != src2->type)
         return false;
-    if(src1->type == LV_IMG_SRC_VARIABLE && (src1->uri != src2->uri || src1->uri_len != src2->uri_len))
+    if(src1->type == LV_IMG_SRC_VARIABLE && (src1->data != src2->data || src1->data_len != src2->data_len))
         return false;
     if(src1->type == LV_IMG_SRC_FILE)
-        return strcmp(src1->uri, src2->uri) == 0;
+        return memcmp(src1->data, src2->data, src1->data_len) == 0;
     return false;
 }
 

@@ -82,13 +82,13 @@ typedef struct Table {
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
-static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
+static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
-static void decoder_close(lv_img_decoder_dsc_t * dsc);
+static void decoder_close(lv_img_dec_dsc_t * dsc);
 
 static gd_GIF * gd_open_gif_file(const char *fname, const bool skip_alloc);
 
@@ -132,7 +132,7 @@ void lv_gif_init(void)
     if(gif_init)
         return;
 
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_read_line_cb(dec, decoder_read_line);
@@ -799,7 +799,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
     }
     /* GIF as raw data */
     else if(src->type == LV_IMG_SRC_VARIABLE) {
-        const char * str = (const char *)src->uri;
+        const char * str = (const char *)src->data;
         if (memcmp(str, "GIF89a", 6) == 0) {
             set_caps(caps);
             return LV_RES_OK;
@@ -813,16 +813,16 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
  * @param dsc Decoded descriptor for the animation
  * @return LV_RES_OK: no error; LV_RES_INV: can't decode the picture
  */
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     gd_GIF * gif = dsc->dec_ctx ? (gd_GIF *)dsc->dec_ctx->user_data : NULL;
 
     if(gif == NULL) {
         /* Unfortunately, creating a context here is absolutely required */
         if(dsc->input.src->type == LV_IMG_SRC_FILE) {
-            gif = gd_open_gif_file(dsc->input.src->uri, flags == LV_IMG_DEC_ONLYMETA);
+            gif = gd_open_gif_file(dsc->input.src->data, flags == LV_IMG_DEC_ONLYMETA);
         } else {
-            gif = gd_open_gif_data(dsc->input.src->uri, flags == LV_IMG_DEC_ONLYMETA);
+            gif = gd_open_gif_data(dsc->input.src->data, flags == LV_IMG_DEC_ONLYMETA);
         }
         if (!gif) return LV_RES_INV;
 
@@ -875,7 +875,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     return LV_RES_OK;
 }
 
-static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
+static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
     LV_UNUSED(dsc);
@@ -886,7 +886,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
     return LV_RES_INV;
 }
 
-static void decoder_close(lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc)
 {
     lv_img_dec_ctx_t * dec_ctx = dsc->dec_ctx;
     if(dec_ctx && dec_ctx->auto_allocated) {

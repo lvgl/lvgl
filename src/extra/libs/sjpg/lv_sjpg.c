@@ -106,13 +106,13 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
-static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
+static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
-static void decoder_close(lv_img_decoder_dsc_t * dsc);
+static void decoder_close(lv_img_dec_dsc_t * dsc);
 static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata);
 static int is_jpg(const uint8_t * raw_data, size_t len);
 static void lv_sjpg_cleanup(SJPEG * sjpeg);
@@ -136,7 +136,7 @@ static lv_res_t decode_sjpeg_header(SJPEG * sjpeg, lv_fs_file_t * fd);
  **********************/
 void lv_split_jpeg_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -150,7 +150,6 @@ static void set_caps(uint8_t * caps)
 {
     if(caps != NULL) {
         *caps = LV_IMG_DEC_DEFAULT;
-        const uint32_t raw_sjpeg_data_size = img_dsc->data_size;
     }
 }
 
@@ -159,7 +158,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 {
     /* Read the SJPG/JPG header to assert it's the right format */
     if(src->type == LV_IMG_SRC_VARIABLE) {
-        uint8_t * raw_sjpeg_data = (uint8_t *)src->uri;
+        uint8_t * raw_sjpeg_data = (uint8_t *)src->data;
         if(!strncmp((char *)raw_sjpeg_data, "_SJPG__", strlen("_SJPG__"))) {
             set_caps(caps);
             return LV_RES_OK;
@@ -172,7 +171,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 
         /*Check file exists*/
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
         lv_fs_close(&f);
 
@@ -202,7 +201,6 @@ static lv_res_t extract_sjpeg_meta(lv_img_header_t * header, uint8_t * raw_sjpeg
 static lv_res_t decode_sjpeg_header(SJPEG * sjpeg, lv_fs_file_t * fd)
 {
     uint8_t * data = sjpeg->sjpeg_data;
-        const uint32_t raw_sjpeg_data_size = ((lv_img_dsc_t *)dsc->src)->data_size;
     data += 14;
 
     sjpeg->sjpeg_x_res = *data++;
@@ -322,20 +320,20 @@ static lv_res_t decode_jpg_header(JDEC * jd_tmp, SJPEG * sjpeg, bool is_file)
     return LV_RES_OK;
 }
 
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     uint8_t * caps = &dsc->caps;
 
     if(flags == LV_IMG_DEC_ONLYMETA) {
         if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
-            uint8_t * raw_sjpeg_data = (uint8_t *)dsc->input.src->uri;
-            const uint32_t raw_sjpeg_data_size = dsc->input.src->uri_len;
+            uint8_t * raw_sjpeg_data = (uint8_t *)dsc->input.src->data;
+            const uint32_t raw_sjpeg_data_size = dsc->input.src->data_len;
 
             if(extract_sjpeg_meta(&dsc->header, raw_sjpeg_data) == LV_RES_OK) {
                 set_caps(caps);
                 return LV_RES_OK;
             }
-            else if(is_jpg(raw_sjpeg_data) == true) {
+            else if(is_jpg(raw_sjpeg_data, raw_sjpeg_data_size) == true) {
                 set_caps(caps);
                 dsc->header.always_zero = 0;
                 dsc->header.cf = LV_IMG_CF_RAW;
@@ -368,7 +366,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
                 memset(buff, 0, sizeof(buff));
 
                 lv_fs_file_t file;
-                lv_fs_res_t res = lv_fs_open(&file, (const char *)dsc->input.src->uri, LV_FS_MODE_RD);
+                lv_fs_res_t res = lv_fs_open(&file, (const char *)dsc->input.src->data, LV_FS_MODE_RD);
                 if(res != LV_FS_RES_OK) return LV_RES_INV;
 
                 uint32_t rn;
@@ -381,7 +379,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             }
             else if(!strcmp(dsc->input.src->ext, ".jpg")) {
                 lv_fs_file_t file;
-                lv_fs_res_t res = lv_fs_open(&file, (const char *)dsc->input.src->uri, LV_FS_MODE_RD);
+                lv_fs_res_t res = lv_fs_open(&file, (const char *)dsc->input.src->data, LV_FS_MODE_RD);
                 if(res != LV_FS_RES_OK) return LV_RES_INV;
 
                 uint8_t * workb_temp = lv_mem_alloc(TJPGD_WORKBUFF_SIZE);
@@ -425,8 +423,8 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     dec_ctx->user_data = sjpeg;
 
     if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
-        sjpeg->sjpeg_data = (uint8_t *)dsc->input.src->uri;
-        sjpeg->sjpeg_data_size = dsc->input.src->uri_len;
+        sjpeg->sjpeg_data = (uint8_t *)dsc->input.src->data;
+        sjpeg->sjpeg_data_size = dsc->input.src->data_len;
 
         if(!strncmp((char *) sjpeg->sjpeg_data, "_SJPG__", strlen("_SJPG__"))) {
             if(decode_sjpeg_header(sjpeg, NULL) == LV_RES_INV) {
@@ -436,7 +434,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             sjpeg->io.type = SJPEG_IO_SOURCE_C_ARRAY;
             sjpeg->io.lv_file.file_d = NULL;
         }
-        else if(is_jpg(sjpeg->sjpeg_data) == true) {
+        else if(is_jpg(sjpeg->sjpeg_data, sjpeg->sjpeg_data_size) == true) {
             uint8_t * workb_temp = lv_mem_alloc(TJPGD_WORKBUFF_SIZE);
             if(!workb_temp) {
                 decoder_close(dsc);
@@ -477,7 +475,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             memset(buff, 0, sizeof(buff));
 
             lv_fs_file_t lv_file;
-            lv_fs_res_t res = lv_fs_open(&lv_file, (const char *)dsc->input.src->uri, LV_FS_MODE_RD);
+            lv_fs_res_t res = lv_fs_open(&lv_file, (const char *)dsc->input.src->data, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
                 decoder_close(dsc);
                 return LV_RES_INV;
@@ -509,7 +507,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         }
         else if(!strcmp(dsc->input.src->ext, ".jpg")) {
             lv_fs_file_t lv_file;
-            lv_fs_res_t res = lv_fs_open(&lv_file, (const char *)dsc->input.src->uri, LV_FS_MODE_RD);
+            lv_fs_res_t res = lv_fs_open(&lv_file, (const char *)dsc->input.src->data, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
                 return LV_RES_INV;
             }
@@ -627,7 +625,7 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
 
-static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                   lv_coord_t len, uint8_t * buf)
 {
     SJPEG * sjpeg = (SJPEG *) dsc->dec_ctx->user_data;
@@ -773,7 +771,7 @@ end:
  * @param decoder pointer to the decoder where this function belongs
  * @param dsc pointer to a descriptor which describes this decoding session
  */
-static void decoder_close(lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc)
 {
     /*Free all allocated data*/
     if(!dsc->dec_ctx || dsc->dec_ctx->auto_allocated == 0) {

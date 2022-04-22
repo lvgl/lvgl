@@ -30,21 +30,21 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                         lv_coord_t len, uint8_t * buf);
-static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                    lv_coord_t len, uint8_t * buf);
-static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                      lv_coord_t len, uint8_t * buf);
 
 static lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps);
 
-static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
-static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_dsc_t * dsc,
+static lv_res_t lv_img_decoder_built_in_read_line(lv_img_dec_dsc_t * dsc,
                                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
-static void lv_img_decoder_built_in_close(lv_img_decoder_dsc_t * dsc);
+static void lv_img_decoder_built_in_close(lv_img_dec_dsc_t * dsc);
 
 void lv_bin_init(void);
 
@@ -52,7 +52,7 @@ void lv_bin_init(void);
 void lv_bin_init()
 {
     /*Create a decoder for the built in color format*/
-    lv_img_decoder_t * decoder = lv_img_decoder_create();
+    lv_img_dec_t * decoder = lv_img_decoder_create();
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) {
         LV_LOG_WARN("lv_img_decoder_init: out of memory");
@@ -78,7 +78,7 @@ static lv_res_t init_dec_ctx(uint8_t * caps)
 lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps)
 {
     if(src->type == LV_IMG_SRC_VARIABLE) {
-        lv_img_cf_t cf = ((lv_img_dsc_t *)src->uri)->header.cf;
+        lv_img_cf_t cf = ((lv_img_dsc_t *)src->data)->header.cf;
         if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
         if(init_dec_ctx(caps) != LV_RES_OK) return LV_RES_INV;
         return LV_RES_OK;
@@ -90,7 +90,7 @@ lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps
 
         /*Check file exists*/
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
         lv_fs_close(&f);
 
@@ -101,12 +101,12 @@ lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps
     return LV_RES_INV;
 }
 
-lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
+lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     /* Only extract metadata ?*/
     if(flags == LV_IMG_DEC_ONLYMETA) {
         if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
-            lv_img_header_t header = ((lv_img_dsc_t *)dsc->input.src->uri)->header;
+            lv_img_header_t header = ((lv_img_dsc_t *)dsc->input.src->data)->header;
 
             dsc->header.w  = header.w;
             dsc->header.h  = header.h;
@@ -116,7 +116,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_dsc_t * dsc, const lv_img_d
         }
 
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->data, LV_FS_MODE_RD);
         if(res == LV_FS_RES_OK) {
             uint32_t rn;
             res = lv_fs_read(&f, &dsc->header, sizeof(lv_img_header_t), &rn);
@@ -135,7 +135,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_dsc_t * dsc, const lv_img_d
     if(dsc->input.src->type == LV_IMG_SRC_FILE) {
 
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) {
             LV_LOG_WARN("Built-in image decoder can't open the file");
             return LV_RES_INV;
@@ -168,7 +168,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_dsc_t * dsc, const lv_img_d
     }
     else if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
         /*The variables should have valid data*/
-        lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->input.src->uri;
+        lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->input.src->data;
         if(img_dsc->data == NULL) {
             return LV_RES_INV;
         }
@@ -184,7 +184,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_dsc_t * dsc, const lv_img_d
         if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
             /*In case of uncompressed formats the image stored in the ROM/RAM.
              *So simply give its pointer*/
-            dsc->img_data = ((lv_img_dsc_t *)dsc->input.src->uri)->data;
+            dsc->img_data = ((lv_img_dsc_t *)dsc->input.src->data)->data;
             return LV_RES_OK;
         }
         else {
@@ -269,7 +269,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_dsc_t * dsc, const lv_img_d
  * @param buf a buffer to store the decoded pixels
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
-lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x,
+lv_res_t lv_img_decoder_built_in_read_line(lv_img_dec_dsc_t * dsc, lv_coord_t x,
                                            lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
     lv_res_t res = LV_RES_INV;
@@ -303,7 +303,7 @@ lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
  */
-void lv_img_decoder_built_in_close(lv_img_decoder_dsc_t * dsc)
+void lv_img_decoder_built_in_close(lv_img_dec_dsc_t * dsc)
 {
     lv_img_decoder_built_in_data_t * user_data = dsc->dec_ctx->user_data;
     if(user_data) {
@@ -326,7 +326,7 @@ void lv_img_decoder_built_in_close(lv_img_decoder_dsc_t * dsc)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                         lv_coord_t len, uint8_t * buf)
 {
     lv_img_decoder_built_in_data_t * user_data = dsc->dec_ctx->user_data;
@@ -351,7 +351,7 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
     return LV_RES_OK;
 }
 
-static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                    lv_coord_t len, uint8_t * buf)
 {
     const lv_opa_t alpha1_opa_table[2]  = {0, 255};          /*Opacity mapping with bpp = 1 (Just for compatibility)*/
@@ -416,7 +416,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
     const uint8_t * data_tmp = NULL;
     if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = (const lv_img_dsc_t *)dsc->input.src->uri;
+        const lv_img_dsc_t * img_dsc = (const lv_img_dsc_t *)dsc->input.src->data;
 
         data_tmp = img_dsc->data + ofs;
     }
@@ -442,7 +442,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
     return LV_RES_OK;
 }
 
-static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
+static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                      lv_coord_t len, uint8_t * buf)
 {
     uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf);
@@ -484,7 +484,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     if(fs_buf == NULL) return LV_RES_INV;
     const uint8_t * data_tmp = NULL;
     if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = (const lv_img_dsc_t *)dsc->input.src->uri;
+        const lv_img_dsc_t * img_dsc = (const lv_img_dsc_t *)dsc->input.src->data;
         data_tmp                     = img_dsc->data + ofs;
     }
     else {

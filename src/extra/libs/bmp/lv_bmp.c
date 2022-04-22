@@ -32,13 +32,13 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
-static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
+static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
-static void decoder_close(lv_img_decoder_dsc_t * dsc);
+static void decoder_close(lv_img_dec_dsc_t * dsc);
 
 static lv_res_t check_colordepth(int bpp);
 
@@ -55,7 +55,7 @@ static lv_res_t check_colordepth(int bpp);
  **********************/
 void lv_bmp_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_read_line_cb(dec, decoder_read_line);
@@ -82,7 +82,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 
         /*Check file exists*/
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
         lv_fs_close(&f);
 
@@ -117,13 +117,13 @@ static lv_res_t check_colordepth(int bpp)
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or `LV_IMG_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     /* Only extract metadata ?*/
     if(flags == LV_IMG_DEC_ONLYMETA) {
         /*Save the data in the header*/
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
         uint8_t headers[54];
 
@@ -151,7 +151,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     if(dsc->input.src->type == LV_IMG_SRC_FILE) {
 
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, dsc->input.src->data, LV_FS_MODE_RD);
         if(res == LV_RES_OK) return LV_RES_INV;
 
         uint8_t header[54];
@@ -196,7 +196,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
 }
 
 
-static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
+static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
     bmp_dsc_t * b = dsc->dec_ctx->user_data;
@@ -242,7 +242,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_dsc_t * dsc,
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc)
 {
     bmp_dsc_t * b = dsc->dec_ctx->user_data;
     lv_fs_close(&b->f);

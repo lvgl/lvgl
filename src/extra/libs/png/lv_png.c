@@ -25,8 +25,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags);
-static void decoder_close(lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static void decoder_close(lv_img_dec_dsc_t * dsc);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 
 /**********************
@@ -46,7 +46,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
  */
 void lv_png_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
+    lv_img_dec_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -66,23 +66,20 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
 
         /*Check file exists*/
         lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, src->uri, LV_FS_MODE_RD);
+        lv_fs_res_t res = lv_fs_open(&f, src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
 
 
         lv_fs_close(&f);
-        if(rn != 8) return LV_RES_INV;
-
         return LV_RES_OK;
     }
     else if(src->type == LV_IMG_SRC_VARIABLE) {
-        const uint32_t data_size = img_dsc->data_size;
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
-        if(src->uri_len > sizeof(magic) || memcmp(magic, src->uri, sizeof(magic)) == 0) return LV_RES_OK;
+        if(src->data_len > sizeof(magic) || memcmp(magic, src->data, sizeof(magic)) == 0) return LV_RES_OK;
     }
     return LV_RES_INV;
 }
-static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     uint8_t * caps = &dsc->caps;
 
@@ -102,7 +99,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
             * [24..27]: height
             */
             lv_fs_file_t f;
-            lv_fs_res_t res = lv_fs_open(&f, (const char *)dsc->input.src->uri, LV_FS_MODE_RD);
+            lv_fs_res_t res = lv_fs_open(&f, (const char *)dsc->input.src->data, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) return LV_RES_INV;
             lv_fs_seek(&f, 16, LV_FS_SEEK_SET);
             uint32_t rn;
@@ -112,7 +109,7 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
         }
         else {
             /*Load the PNG file into buffer. It's still compressed (not decoded)*/
-            error = lodepng_load_file(&png_data, &png_data_size, dsc->input.src->uri);   /*Load the file*/
+            error = lodepng_load_file(&png_data, &png_data_size, dsc->input.src->data);   /*Load the file*/
             if(error) {
                 LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
@@ -122,11 +119,11 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     }
     else if(dsc->input.src->type == LV_IMG_SRC_VARIABLE) {
         if(flags == LV_IMG_DEC_ONLYMETA) {
-            memcpy(size, (const char *)dsc->input.src->uri + 16, 8);
+            memcpy(size, (const char *)dsc->input.src->data + 16, 8);
         }
         else {
-            png_data_size = dsc->input.src->uri_len;
-            png_data = (unsigned char *)dsc->input.src->uri;
+            png_data_size = dsc->input.src->data_len;
+            png_data = (unsigned char *)dsc->input.src->data;
         }
     }
     *caps = LV_IMG_DEC_CACHED;
@@ -149,9 +146,6 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
     if(free_data) lv_mem_free(png_data); /*Free the loaded file*/
     if(error) {
-                if(img_data != NULL) {
-                    lv_mem_free(img_data);
-                }
         LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
         return LV_RES_INV;
     }
@@ -164,14 +158,11 @@ static lv_res_t decoder_open(lv_img_decoder_dsc_t * dsc, const lv_img_dec_flags_
     dsc->img_data = img_data;
     return LV_RES_OK;
 }
-            if(img_data != NULL) {
-                lv_mem_free(img_data);
-            }
 
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc)
 {
     if(dsc->img_data) {
         lv_mem_free((uint8_t *)dsc->img_data); /*Not sure here it's allocated with lv_mem_alloc ?*/
