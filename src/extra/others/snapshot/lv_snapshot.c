@@ -45,6 +45,7 @@
  */
 uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
 {
+    LV_ASSERT_NULL(obj);
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
         case LV_IMG_CF_ALPHA_1BIT:
@@ -81,8 +82,9 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
  */
 lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buf, uint32_t buff_size)
 {
-    LV_ASSERT(dsc);
-    LV_ASSERT(buf);
+    LV_ASSERT_NULL(obj);
+    LV_ASSERT_NULL(dsc);
+    LV_ASSERT_NULL(buf);
 
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
@@ -160,14 +162,17 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
  */
 lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
 {
+    LV_ASSERT_NULL(obj);
     uint32_t buff_size = lv_snapshot_buf_size_needed(obj, cf);
 
     void * buf = lv_mem_alloc(buff_size);
+    LV_ASSERT_MALLOC(buf);
     if(buf == NULL) {
         return NULL;
     }
 
     lv_img_dsc_t * dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
+    LV_ASSERT_MALLOC(buf);
     if(dsc == NULL) {
         lv_mem_free(buf);
         return NULL;
