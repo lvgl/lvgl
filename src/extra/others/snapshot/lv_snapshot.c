@@ -205,7 +205,7 @@ void lv_snapshot_free(lv_img_src_t * dsc)
         return;
 
     if(dsc->type == LV_IMG_SRC_VARIABLE) {
-        lv_img_dsc_t * data = (lv_img_dsc_t *)dsc->uri;
+        lv_img_dsc_t * data = (lv_img_dsc_t *)dsc->data;
         if(data->data)
             lv_mem_free((void *)data->data);
         lv_mem_free(data);

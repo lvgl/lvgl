@@ -217,7 +217,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param draw_dsc pointer to a valid label descriptor `lv_draw_img_dsc_t`
  */
 void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
-                        const lv_draw_img_dsc_t * draw_dsc);
+                        lv_draw_img_dsc_t * draw_dsc);
 
 /**
  * Draw a line on the canvas

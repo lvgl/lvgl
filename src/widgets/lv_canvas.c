@@ -630,8 +630,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_obj_invalidate(canvas);
 }
 
-void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
-                        const lv_draw_img_dsc_t * draw_dsc)
+void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src, lv_draw_img_dsc_t * draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, MY_CLASS);
 
@@ -825,7 +824,7 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    lv_img_cache_invalidate_src(&canvas->dsc);
+    lv_img_cache_invalidate_src(&canvas->img.src);
 }
 
 

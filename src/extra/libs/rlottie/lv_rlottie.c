@@ -46,8 +46,8 @@ lv_res_t lv_rlottie_from_file(lv_obj_t * obj, lv_coord_t width, lv_coord_t heigh
     dec_ctx->ctx.auto_allocated = 0;
 
     lv_img_src_t src = {};
-    lv_img_src_set_file(&src, (const uint8_t *)path);
-    lv_img_set_src(img, &src);
+    lv_img_src_set_file(&src, path);
+    lv_img_set_src(obj, &src);
     return img->dec_ctx == NULL || dec_ctx->cache == NULL ? LV_RES_INV : LV_RES_OK;
 }
 
@@ -65,7 +65,7 @@ lv_res_t lv_rlottie_from_raw(lv_obj_t * obj, lv_coord_t width, lv_coord_t height
 
     lv_img_src_t src = {};
     lv_img_src_set_data(&src, (const uint8_t *)desc, len);
-    lv_img_set_src(img, &src);
+    lv_img_set_src(obj, &src);
     return img->dec_ctx == NULL || dec_ctx->cache == NULL ? LV_RES_INV : LV_RES_OK;
 }
 
