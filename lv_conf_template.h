@@ -168,6 +168,12 @@
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*Use SWM341's DMA2D GPU*/
+#define LV_USE_GPU_SWM341_DMA2D 0
+#if LV_USE_GPU_SWM341_DMA2D
+    #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
+#endif
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_PXP 0
 #if LV_USE_GPU_NXP_PXP

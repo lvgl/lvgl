@@ -40,7 +40,7 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 * Multi-language support with UTF-8 handling, CJK, Bidirectional and Arabic script support
 * Fully customizable graphical elements via [CSS-like styles](https://docs.lvgl.io/master/overview/style.html)
 * Powerful layouts inspired by CSS: [Flexbox](https://docs.lvgl.io/master/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/layouts/grid.html)
-* OS, External memory and GPU are supported but not required. (built in support for STM32 DMA2D, and NXP PXP and VGLite)
+* OS, External memory and GPU are supported but not required. (built in support for STM32 DMA2D, SWM341 DMA2D, and NXP PXP and VGLite)
 * Smooth rendering even with a [single frame buffer](https://docs.lvgl.io/master/porting/display.html)
 * Written in C and compatible with C++
 * Micropython Binding exposes [LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
@@ -104,6 +104,7 @@ Just to mention some platforms:
 - [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
 - Nordic NRF52 Bluetooth modules
 - Quectel modems
+- [SYNWIT SWM341](https://www.synwit.cn/)
 
 LVGL is also available as:
 - [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
