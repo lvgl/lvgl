@@ -171,6 +171,11 @@
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*Use SWM341's DMA2D GPU*/
+#if LV_USE_GPU_SWM341_DMA2D
+    #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
+#endif
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #if LV_USE_GPU_NXP_PXP
     /*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)

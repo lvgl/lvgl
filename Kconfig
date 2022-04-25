@@ -210,12 +210,12 @@ menu "LVGL configuration"
                 
             config LV_USE_GPU_ARM2D
                 bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors."
-            config LV_USE_GPU_STM32_DMA2D
-                bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
                 default n
                 help
                     Must deploy arm-2d library to your project and add include PATH for "arm_2d.h".
                 
+            config LV_USE_GPU_STM32_DMA2D
+                bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
             config LV_GPU_DMA2D_CMSIS_INCLUDE
                 string "include path of CMSIS header of target processor"
                 depends on LV_USE_GPU_STM32_DMA2D
@@ -224,6 +224,16 @@ menu "LVGL configuration"
                     Must be defined to include path of CMSIS header of target processor
                     e.g. "stm32f769xx.h" or "stm32f429xx.h"
 
+            config LV_USE_GPU_SWM341_DMA2D
+                bool "Enable SWM341 DMA2D GPU."
+            config LV_GPU_SWM341_DMA2D_INCLUDE
+                string "include path of CMSIS header of target processor"
+                depends on LV_USE_GPU_SWM341_DMA2D
+                default "SWM341.h"
+                help
+                    Must be defined to include path of CMSIS header of target processor
+                    e.g. "SWM341.h"
+                    
             config LV_USE_GPU_NXP_PXP
                 bool "Use NXP's PXP GPU iMX RTxxx platforms."
             config LV_USE_GPU_NXP_PXP_AUTO_INIT

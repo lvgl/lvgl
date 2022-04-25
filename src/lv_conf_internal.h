@@ -402,6 +402,24 @@
     #endif
 #endif
 
+/*Use SWM341's DMA2D GPU*/
+#ifndef LV_USE_GPU_SWM341_DMA2D
+    #ifdef CONFIG_LV_USE_GPU_SWM341_DMA2D
+        #define LV_USE_GPU_SWM341_DMA2D CONFIG_LV_USE_GPU_SWM341_DMA2D
+    #else
+        #define LV_USE_GPU_SWM341_DMA2D 0
+    #endif
+#endif
+#if LV_USE_GPU_SWM341_DMA2D
+    #ifndef LV_GPU_SWM341_DMA2D_INCLUDE
+        #ifdef CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
+            #define LV_GPU_SWM341_DMA2D_INCLUDE CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
+        #else
+            #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
+        #endif
+    #endif
+#endif
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #ifndef LV_USE_GPU_NXP_PXP
     #ifdef CONFIG_LV_USE_GPU_NXP_PXP
