@@ -219,14 +219,14 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     return handle;
 #else
     handle->dir_p = INVALID_HANDLE_VALUE;
-    WIN32_FIND_DATA fdata;
+    WIN32_FIND_DATAA fdata;
 
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s\\*", path);
 
     strcpy(handle->next_fn, "");
-    handle->dir_p = FindFirstFile(buf, &fdata);
+    handle->dir_p = FindFirstFileA(buf, &fdata);
     do {
         if(strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
             continue;
@@ -278,9 +278,9 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
     strcpy(fn, handle->next_fn);
 
     strcpy(handle->next_fn, "");
-    WIN32_FIND_DATA fdata;
+    WIN32_FIND_DATAA fdata;
 
-    if(FindNextFile(handle->dir_p, &fdata) == false) return LV_FS_RES_OK;
+    if(FindNextFileA(handle->dir_p, &fdata) == false) return LV_FS_RES_OK;
     do {
         if(strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
             continue;
@@ -294,7 +294,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
             }
             break;
         }
-    } while(FindNextFile(handle->dir_p, &fdata));
+    } while(FindNextFileA(handle->dir_p, &fdata));
 
 #endif
     return LV_FS_RES_OK;
