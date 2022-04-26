@@ -26,6 +26,7 @@
 static lv_coord_t calc_content_width(lv_obj_t * obj);
 static lv_coord_t calc_content_height(lv_obj_t * obj);
 static void layout_update_core(lv_obj_t * obj);
+static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv);
 
 /**********************
  *  STATIC VARIABLES
@@ -205,6 +206,8 @@ bool lv_obj_refr_size(lv_obj_t * obj)
      *If it wasn't out of the parent but out now, also invalidate the scrollbars*/
     bool on2 = _lv_area_is_in(&obj->coords, &parent_fit_area, 0);
     if(on1 || (!on1 && on2)) lv_obj_scrollbar_invalidate(parent);
+
+    lv_obj_refresh_ext_draw_size(obj);
 
     return true;
 }
@@ -627,6 +630,7 @@ void lv_obj_refr_pos(lv_obj_t * obj)
 {
     if(lv_obj_is_layout_positioned(obj)) return;
 
+
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
     lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
@@ -791,6 +795,41 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
     }
 }
 
+void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
+{
+    if(obj) {
+        if(inv) {
+            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
+            transform_point(obj, p, inv);
+        }
+        else {
+            transform_point(obj, p, inv);
+            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
+        }
+    }
+}
+
+void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool recursive,
+                                 bool inv)
+{
+    lv_point_t p[4] = {
+        {area->x1, area->y1},
+        {area->x1, area->y2},
+        {area->x2, area->y1},
+        {area->x2, area->y2},
+    };
+    lv_obj_transform_point(obj, &p[0], recursive, inv);
+    lv_obj_transform_point(obj, &p[1], recursive, inv);
+    lv_obj_transform_point(obj, &p[2], recursive, inv);
+    lv_obj_transform_point(obj, &p[3], recursive, inv);
+
+    area->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
+    area->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
+    area->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
+    area->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
+    lv_area_increase(area, 5, 5);
+}
+
 
 void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
@@ -798,20 +837,14 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
-    bool visible = lv_obj_area_is_visible(obj, &area_tmp);
+    if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
 
-    if(visible) _lv_inv_area(lv_obj_get_disp(obj), &area_tmp);
+    _lv_inv_area(lv_obj_get_disp(obj),  &area_tmp);
 }
 
 void lv_obj_invalidate(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    /*If the object has overflow visible it can be drawn anywhere on its parent
-     *It needs to be checked recursively*/
-    while(lv_obj_get_parent(obj) && lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-        obj = lv_obj_get_parent(obj);
-    }
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
@@ -841,7 +874,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     }
 
     /*Truncate the area to the object*/
-    if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+    if(!lv_obj_has_flag_any(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
         lv_area_t obj_coords;
         lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
         lv_area_copy(&obj_coords, &obj->coords);
@@ -854,6 +887,9 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
         if(!_lv_area_intersect(area, area, &obj_coords)) return false;
     }
 
+    lv_obj_get_transformed_area(obj, area, true, false);
+
+
     /*Truncate recursively to the parents*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     while(par != NULL) {
@@ -861,8 +897,10 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
         if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false;
 
         /*Truncate to the parent and if no common parts break*/
-        if(!lv_obj_has_flag(par, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-            if(!_lv_area_intersect(area, area, &par->coords)) return false;
+        if(!lv_obj_has_flag_any(par, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+            lv_area_t par_area = par->coords;
+            lv_obj_get_transformed_area(par, &par_area, true, false);
+            if(!_lv_area_intersect(area, area, &par_area)) return false;
         }
 
         par = lv_obj_get_parent(par);
@@ -1107,4 +1145,20 @@ static void layout_update_core(lv_obj_t * obj)
             LV_GC_ROOT(_lv_layout_list)[layout_id - 1].cb(obj, user_data);
         }
     }
+}
+
+static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv)
+{
+    lv_point_t pivot;
+    pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
+    pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0);
+    int16_t angle = lv_obj_get_style_transform_angle(obj, 0);
+    int16_t zoom = lv_obj_get_style_transform_zoom(obj, 0);
+
+    if(inv) {
+        angle = -angle;
+        zoom = (256 * 256) / zoom;
+    }
+
+    lv_point_transform(p, angle, zoom, &pivot);
 }

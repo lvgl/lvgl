@@ -41,17 +41,6 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
 
 #if LV_DRAW_COMPLEX
     draw_dsc->radius = lv_obj_get_style_radius(obj, part);
-
-    lv_opa_t main_opa = part != LV_PART_MAIN ? lv_obj_get_style_opa(obj, part) : LV_OPA_COVER;
-    lv_opa_t opa = lv_obj_get_style_opa(obj, part);
-    if(opa <= LV_OPA_MIN || main_opa <= LV_OPA_MIN) {
-        draw_dsc->bg_opa = LV_OPA_TRANSP;
-        draw_dsc->border_opa = LV_OPA_TRANSP;
-        draw_dsc->shadow_opa = LV_OPA_TRANSP;
-        draw_dsc->outline_opa = LV_OPA_TRANSP;
-        return;
-    }
-
     draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 
     if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
@@ -130,17 +119,6 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
         }
     }
 
-    if(main_opa < LV_OPA_MAX) {
-        opa = (uint16_t)((uint16_t) main_opa * opa) >> 8;
-    }
-
-    if(opa < LV_OPA_MAX) {
-        draw_dsc->bg_opa = (uint16_t)((uint16_t)draw_dsc->bg_opa * opa) >> 8;
-        draw_dsc->bg_img_opa = (uint16_t)((uint16_t)draw_dsc->bg_img_opa * opa) >> 8;
-        draw_dsc->border_opa = (uint16_t)((uint16_t)draw_dsc->border_opa * opa) >> 8;
-        draw_dsc->shadow_opa = (uint16_t)((uint16_t)draw_dsc->shadow_opa * opa) >> 8;
-        draw_dsc->outline_opa = (uint16_t)((uint16_t)draw_dsc->outline_opa * opa) >> 8;
-    }
 #else /*LV_DRAW_COMPLEX*/
     if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
         draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
@@ -196,12 +174,6 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
     draw_dsc->opa = lv_obj_get_style_text_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
-    lv_opa_t opa = lv_obj_get_style_opa(obj, part);
-    if(opa < LV_OPA_MAX) {
-        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa) >> 8;
-    }
-    if(draw_dsc->opa <= LV_OPA_MIN) return;
-
     draw_dsc->color = lv_obj_get_style_text_color_filtered(obj, part);
     draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
     draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
@@ -222,12 +194,6 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
 void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc)
 {
     draw_dsc->opa = lv_obj_get_style_img_opa(obj, part);
-    if(draw_dsc->opa <= LV_OPA_MIN)  return;
-
-    lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part);
-    if(opa_scale < LV_OPA_MAX) {
-        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa_scale) >> 8;
-    }
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 
     draw_dsc->angle = 0;
@@ -252,12 +218,6 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t
     draw_dsc->opa = lv_obj_get_style_line_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 
-    lv_opa_t opa = lv_obj_get_style_opa(obj, part);
-    if(opa < LV_OPA_MAX) {
-        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa) >> 8;
-    }
-    if(draw_dsc->opa <= LV_OPA_MIN)  return;
-
     draw_dsc->color = lv_obj_get_style_line_color_filtered(obj, part);
 
     draw_dsc->dash_width = lv_obj_get_style_line_dash_width(obj, part);
@@ -279,12 +239,6 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t *
     if(draw_dsc->width == 0) return;
 
     draw_dsc->opa = lv_obj_get_style_arc_opa(obj, part);
-    if(draw_dsc->opa <= LV_OPA_MIN)  return;
-
-    lv_opa_t opa = lv_obj_get_style_opa(obj, part);
-    if(opa < LV_OPA_MAX) {
-        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa) >> 8;
-    }
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 
     draw_dsc->color = lv_obj_get_style_arc_color_filtered(obj, part);
@@ -371,6 +325,14 @@ lv_coord_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 {
     if(obj->spec_attr) return obj->spec_attr->ext_draw_size;
     else return 0;
+}
+
+lv_intermediate_layer_type_t _lv_obj_is_intermediate_layer(const lv_obj_t * obj)
+{
+    if(lv_obj_get_style_transform_angle(obj, 0) != 0) return LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_zoom(obj, 0) != 256) return LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_opa(obj, 0) != LV_OPA_COVER) return LV_INTERMEDIATE_LAYER_TYPE_SIMPLE;
+    return LV_INTERMEDIATE_LAYER_TYPE_NONE;
 }
 
 /**********************

@@ -27,6 +27,7 @@ extern "C" {
 #include "lv_draw_triangle.h"
 #include "lv_draw_arc.h"
 #include "lv_draw_mask.h"
+#include "lv_draw_transform.h"
 
 /*********************
  *      DEFINES
@@ -79,6 +80,24 @@ typedef struct _lv_draw_ctx_t  {
 
     void (*draw_polygon)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc,
                          const lv_point_t * points, uint16_t point_cnt);
+
+
+    /**
+     * Get an area of a transformed image (zoomed and/or rotated)
+     * @param draw_ctx      pointer to a draw context
+     * @param dest_area     get this area of the result image. It assumes that the original image is placed to the 0;0 position.
+     * @param src_buf       the source image
+     * @param src_w         width of the source image in [px]
+     * @param src_h         height of the source image in [px]
+     * @param src_stride    the stride in [px].
+     * @param draw_dsc      an `lv_draw_img_dsc_t` descriptor containing the transformation parameters
+     * @param cf            the color format of `src_buf`
+     * @param cbuf          place the colors of the pixels on `dest_area` here in RGB format
+     * @param abuf          place the opacity of the pixels on `dest_area` here
+     */
+    void (*draw_transform)(struct _lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
+                           lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                           const lv_draw_img_dsc_t * draw_dsc, lv_img_cf_t cf, lv_color_t * cbuf, lv_opa_t * abuf);
 
     /**
      * Replace the buffer with a rect without decoration like radius or borders

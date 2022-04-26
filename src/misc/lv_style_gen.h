@@ -13,6 +13,8 @@ void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value);
 void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value);
 void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t value);
 void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value);
+void lv_style_set_transform_pivot_x(lv_style_t * style, lv_coord_t value);
+void lv_style_set_transform_pivot_y(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value);
@@ -154,6 +156,16 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_TRANSFORM_ANGLE(val) \
     { \
         .prop = LV_STYLE_TRANSFORM_ANGLE, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_TRANSFORM_PIVOT_X(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_PIVOT_X, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_TRANSFORM_PIVOT_Y(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_PIVOT_Y, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_PAD_TOP(val) \

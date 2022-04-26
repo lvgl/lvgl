@@ -507,18 +507,6 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
  */
 LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
 {
-    /*If the screen is transparent initialize it when the flushing is ready*/
-#if LV_COLOR_SCREEN_TRANSP
-    if(disp_drv->screen_transp) {
-        if(disp_drv->clear_cb) {
-            disp_drv->clear_cb(disp_drv, disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size);
-        }
-        else {
-            lv_memset_00(disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size * sizeof(lv_color32_t));
-        }
-    }
-#endif
-
     disp_drv->draw_buf->flushing = 0;
     disp_drv->draw_buf->flushing_last = 0;
 }
@@ -687,28 +675,35 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
     lv_img_buf_set_px_alpha(d, x, y, br);
 }
 
-static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
-                                    lv_coord_t y,
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w,
+                                    lv_coord_t x, lv_coord_t y,
                                     lv_color_t color, lv_opa_t opa)
 {
     (void) disp_drv; /*Unused*/
 
-    if(opa <= LV_OPA_MIN) return;
-    lv_img_dsc_t d;
-    d.data = buf;
-    d.header.always_zero = 0;
-    d.header.h = 1;    /*Doesn't matter*/;
-    d.header.w = buf_w;
-    d.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    uint8_t * buf_px = buf + (buf_w * y * LV_IMG_PX_SIZE_ALPHA_BYTE + x * LV_IMG_PX_SIZE_ALPHA_BYTE);
 
-    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, lv_color_black());
-    lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y);
-
-    lv_opa_t res_opa;
+    lv_color_t bg_color;
     lv_color_t res_color;
+    lv_opa_t bg_opa = buf_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+    bg_color.full = buf_px[0];
+    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf_px[2]);
+    if(buf_px[1] <= LV_OPA_MIN) return;
+    buf_px[0] = res_color.full;
+#elif LV_COLOR_DEPTH == 16
+    bg_color.full = buf_px[0] + (buf_px[1] << 8);
+    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf_px[2]);
+    if(buf_px[2] <= LV_OPA_MIN) return;
+    buf_px[0] = res_color.full & 0xff;
+    buf_px[1] = res_color.full >> 8;
+#elif LV_COLOR_DEPTH == 32
+    bg_color = *((lv_color_t *)buf_px);
+    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf_px[3]);
+    if(buf_px[3] <= LV_OPA_MIN) return;
+    buf_px[0] = res_color.ch.blue;
+    buf_px[1] = res_color.ch.green;
+    buf_px[2] = res_color.ch.red;
+#endif
 
-    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &res_opa);
-
-    lv_img_buf_set_px_alpha(&d, x, y, res_opa);
-    lv_img_buf_set_px_color(&d, x, y, res_color);
 }

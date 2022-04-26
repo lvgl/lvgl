@@ -120,6 +120,22 @@ void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_TRANSFORM_ANGLE, v);
 }
 
+void lv_style_set_transform_pivot_x(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_PIVOT_X, v);
+}
+
+void lv_style_set_transform_pivot_y(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_PIVOT_Y, v);
+}
+
 void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {

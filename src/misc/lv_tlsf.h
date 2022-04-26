@@ -66,7 +66,7 @@ void lv_tlsf_remove_pool(lv_tlsf_t tlsf, lv_pool_t pool);
 void * lv_tlsf_malloc(lv_tlsf_t tlsf, size_t bytes);
 void * lv_tlsf_memalign(lv_tlsf_t tlsf, size_t align, size_t bytes);
 void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size);
-void lv_tlsf_free(lv_tlsf_t tlsf, const void * ptr);
+size_t lv_tlsf_free(lv_tlsf_t tlsf, const void * ptr);
 
 /* Returns internal block size, not original request size */
 size_t lv_tlsf_block_size(void * ptr);
