@@ -925,6 +925,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         draw_dsc.opa = opa;
         draw_dsc.angle = lv_obj_get_style_transform_angle(obj, 0);
         draw_dsc.zoom = lv_obj_get_style_transform_zoom(obj, 0);
+        draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
         draw_dsc.antialias = disp_refr->driver->antialiasing;
 
         lv_point_t pivot;

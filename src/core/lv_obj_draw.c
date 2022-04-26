@@ -41,7 +41,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
 
 #if LV_DRAW_COMPLEX
     draw_dsc->radius = lv_obj_get_style_radius(obj, part);
-    draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
+    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 
     if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
         draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
@@ -179,7 +179,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
     draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
     draw_dsc->decor = lv_obj_get_style_text_decor(obj, part);
 #if LV_DRAW_COMPLEX
-    draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
+    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 #endif
 
     draw_dsc->font = lv_obj_get_style_text_font(obj, part);
@@ -206,7 +206,7 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t *
         draw_dsc->recolor = lv_obj_get_style_img_recolor_filtered(obj, part);
     }
 #if LV_DRAW_COMPLEX
-    draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
+    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 #endif
 }
 
@@ -229,7 +229,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t
     draw_dsc->round_end = draw_dsc->round_start;
 
 #if LV_DRAW_COMPLEX
-    draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
+    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 #endif
 }
 
@@ -247,7 +247,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t *
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
 
 #if LV_DRAW_COMPLEX
-    draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
+    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 #endif
 }
 
@@ -332,6 +332,10 @@ lv_intermediate_layer_type_t _lv_obj_is_intermediate_layer(const lv_obj_t * obj)
     if(lv_obj_get_style_transform_angle(obj, 0) != 0) return LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_transform_zoom(obj, 0) != 256) return LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_opa(obj, 0) != LV_OPA_COVER) return LV_INTERMEDIATE_LAYER_TYPE_SIMPLE;
+
+#if LV_DRAW_COMPLEX
+    if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_INTERMEDIATE_LAYER_TYPE_SIMPLE;
+#endif
     return LV_INTERMEDIATE_LAYER_TYPE_NONE;
 }
 
