@@ -89,7 +89,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->offset_x         = 0;
     driver->offset_y         = 0;
     driver->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
-    driver->screen_transp    = LV_COLOR_SCREEN_TRANSP;
+    driver->screen_transp    = 0;
     driver->dpi              = LV_DPI_DEF;
     driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
 
