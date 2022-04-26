@@ -108,7 +108,7 @@ Just to mention some platforms:
 
 LVGL is also available as:
 - [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
-- [PlatformIO package](https://platformio.org/lib/show/12440/lvgl)
+- [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
 - [Zephyr library](https://docs.zephyrproject.org/latest/reference/kconfig/CONFIG_LVGL.html)
 - [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
