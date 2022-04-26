@@ -108,7 +108,10 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     }
 
     lv_img_header_t header;
-    if(lv_img_decoder_get_info(dsc->path, &header) != LV_RES_OK) {
+    lv_img_src_t src;
+    lv_img_src_set_file(&src, dsc->path);
+    lv_img_dec_dsc_in_t idsc = { .src = &src };
+    if(lv_img_decoder_get_info(&idsc, &header) != LV_RES_OK) {
         return false;
     }
 

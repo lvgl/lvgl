@@ -15,7 +15,6 @@
 /*********************
 *      DEFINES
 *********************/
-#define MY_CLASS &lv_rlottie_class
 #define LV_ARGB32   32
 
 /**********************

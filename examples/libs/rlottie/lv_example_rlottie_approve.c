@@ -27,4 +27,6 @@ const uint8_t lv_example_rlottie_approve[] = {
     0x00 /*Close the string*/
 };
 
+const size_t lv_example_rlottie_approve_size = sizeof(lv_example_rlottie_approve);
+
 #endif

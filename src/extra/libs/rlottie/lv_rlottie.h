@@ -29,8 +29,6 @@ typedef struct {
     size_t     max_buf_size;
 } lv_rlottie_t;
 
-extern const lv_obj_class_t lv_rlottie_class;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

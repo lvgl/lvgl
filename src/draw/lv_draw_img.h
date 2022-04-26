@@ -57,7 +57,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
  * Draw an image
  * @param draw_ctx A pointer on a draw context
  * @param coords the coordinates of the image
- * @param src pointer to an image source uri descriptor
+ * @param src pointer to an image source descriptor
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
 void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,

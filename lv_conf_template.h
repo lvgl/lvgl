@@ -439,6 +439,8 @@
 
 #define LV_USE_ANIMIMG    1
 
+#define LV_USE_ANIMBTN    1
+
 #define LV_USE_BAR        1
 
 #define LV_USE_BTN        1

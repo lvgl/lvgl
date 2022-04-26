@@ -67,7 +67,6 @@ typedef struct {
 struct _lv_img_dec_dsc_t;
 struct _lv_img_dec_t;
 
-
 /**
  * Check if this decoder accepts the given format
  * @param src the image source

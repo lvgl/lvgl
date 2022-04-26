@@ -39,22 +39,21 @@ static void event_cb(lv_event_t * e)
         /*Add custom content to the 4th button when the button itself was drawn*/
         if(dsc->id == 3) {
             LV_IMG_DECLARE(img_star);
-            lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(&img_star, &header);
-            if(res != LV_RES_OK) return;
+            lv_img_src_t src;
+            lv_img_src_set_raw(&src, &img_star);
 
             lv_area_t a;
-            a.x1 = dsc->draw_area->x1 + (lv_area_get_width(dsc->draw_area) - header.w) / 2;
-            a.x2 = a.x1 + header.w - 1;
-            a.y1 = dsc->draw_area->y1 + (lv_area_get_height(dsc->draw_area) - header.h) / 2;
-            a.y2 = a.y1 + header.h - 1;
+            a.x1 = dsc->draw_area->x1 + (lv_area_get_width(dsc->draw_area) - img_star.header.w) / 2;
+            a.x2 = a.x1 + img_star.header.w - 1;
+            a.y1 = dsc->draw_area->y1 + (lv_area_get_height(dsc->draw_area) - img_star.header.h) / 2;
+            a.y2 = a.y1 + img_star.header.h - 1;
 
             lv_draw_img_dsc_t img_draw_dsc;
             lv_draw_img_dsc_init(&img_draw_dsc);
             img_draw_dsc.recolor = lv_color_black();
             if(lv_btnmatrix_get_selected_btn(obj) == dsc->id)  img_draw_dsc.recolor_opa = LV_OPA_30;
 
-            lv_draw_img(dsc->draw_ctx, &img_draw_dsc, &a, &img_star);
+            lv_draw_img(dsc->draw_ctx, &img_draw_dsc, &a, &src);
         }
     }
 }

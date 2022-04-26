@@ -791,7 +791,10 @@ static void draw_main(lv_event_t * e)
         }
         else {
             lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &header);
+            lv_img_src_t src;
+            lv_img_src_parse(&src, dropdown->symbol); /*TODO Use a src for the symbol here directly */
+            lv_img_dec_dsc_in_t dsc = {.src = &src };
+            lv_res_t res = lv_img_decoder_get_info(&dsc, &header);
             if(res == LV_RES_OK) {
                 symbol_w = header.w;
                 symbol_h = header.h;
@@ -826,7 +829,9 @@ static void draw_main(lv_event_t * e)
             img_dsc.pivot.x = symbol_w / 2;
             img_dsc.pivot.y = symbol_h / 2;
             img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_INDICATOR);
-            lv_draw_img(draw_ctx, &img_dsc, &symbol_area, dropdown->symbol);
+            lv_img_src_t src;
+            lv_img_src_parse(&src, dropdown->symbol);
+            lv_draw_img(draw_ctx, &img_dsc, &symbol_area, &src);
         }
     }
 

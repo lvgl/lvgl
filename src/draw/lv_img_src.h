@@ -56,8 +56,8 @@ typedef struct {
     uint8_t         _fixed_hdr;     /**< Using 0xFF to mark the type of the source to this */
     uint8_t         type;           /**< See `lv_img_src_type_t` above */
     size_t          data_len;       /**< The data's length in bytes */
-    const void   *  data;            /**< A pointer on the given unique resource identifier */
-    const char   *  ext;            /**< If the URI points to a file, this will point to the extension */
+    const void   *  data;           /**< A pointer on the given unique resource identifier */
+    const char   *  ext;            /**< If the data points to a file, this will point to the extension */
 } lv_img_src_t;
 
 
