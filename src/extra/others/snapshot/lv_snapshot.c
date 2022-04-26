@@ -47,6 +47,7 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
 {
     LV_ASSERT_NULL(obj);
     switch(cf) {
+        case LV_IMG_CF_TRUE_COLOR:
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
         case LV_IMG_CF_ALPHA_1BIT:
         case LV_IMG_CF_ALPHA_2BIT:
@@ -87,6 +88,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     LV_ASSERT_NULL(buf);
 
     switch(cf) {
+        case LV_IMG_CF_TRUE_COLOR:
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
         case LV_IMG_CF_ALPHA_1BIT:
         case LV_IMG_CF_ALPHA_2BIT:
@@ -126,7 +128,6 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     lv_memset_00(&fake_disp, sizeof(lv_disp_t));
     fake_disp.driver = &driver;
 
-
     lv_draw_ctx_t * draw_ctx = lv_mem_alloc(obj_disp->driver->draw_ctx_size);
     LV_ASSERT_MALLOC(draw_ctx);
     if(draw_ctx == NULL) return LV_RES_INV;
@@ -140,7 +141,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&fake_disp);
 
-    lv_refr_obj(draw_ctx, obj);
+    lv_obj_redraw(draw_ctx, obj);
 
     _lv_refr_set_disp_refreshing(refr_ori);
     obj_disp->driver->draw_ctx_deinit(fake_disp.driver, draw_ctx);

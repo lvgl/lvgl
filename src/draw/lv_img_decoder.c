@@ -15,8 +15,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define CF_BUILT_IN_FIRST LV_IMG_CF_TRUE_COLOR
-#define CF_BUILT_IN_LAST LV_IMG_CF_ALPHA_8BIT
+#define CF_BUILT_IN_FIRST   LV_IMG_CF_TRUE_COLOR
+#define CF_BUILT_IN_LAST    LV_IMG_CF_RGB565A8
 
 /**********************
  *      TYPEDEFS

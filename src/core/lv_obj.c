@@ -273,6 +273,7 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
         lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
     }
+
 }
 
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
@@ -503,11 +504,6 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 #endif
-        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
-            info->res = LV_COVER_RES_NOT_COVER;
-            return;
-        }
-
         info->res = LV_COVER_RES_COVER;
 
     }
@@ -538,7 +534,6 @@ static void lv_obj_draw(lv_event_t * e)
         part_dsc.draw_area = &coords;
         part_dsc.part = LV_PART_MAIN;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-
 
 #if LV_DRAW_COMPLEX
         /*With clip corner enabled draw the bg img separately to make it clipped*/
@@ -854,9 +849,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param(e);
         lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
-        *s = LV_MAX(*s, d);
+        lv_event_set_ext_draw_size(e, d);
     }
     else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {
         lv_obj_draw(e);

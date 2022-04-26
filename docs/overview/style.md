@@ -268,6 +268,20 @@ lv_style_transition_dsc_init(&trans1, trans_props, lv_anim_path_ease_out, durati
 lv_style_set_transition(&style1, &trans1);
 ```
 
+## Opacity and Transformations
+If the 'opa ', `transform_angle`, or `transform_zoom` properties are set their non-default value LVGL creates a snapshot about the widget and all its children in order to blend the whole widget with the set opacity and transformation properties.
+
+These properties have this effect only on the `MAIN` part of the widget.
+
+The created snapshot is called "intermediate layer" or simply "layer". If only `opa` is set to a value different from 255 LVGL can build the layer from smaller chunks. The size of these chunks can be configured by the following properties in `lv_conf.h`:
+ - `LV_LAYER_SIMPLE_BUF_SIZE`: [bytes] the optimal target buffer size. LVGL will try to allocate this size of memory.
+ - `LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE`: [bytes]  used if `LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
+
+If transformation properties were also used the layer can not be rendered in chunks, but one larger memory needs to be allocated. The required memory depends on the angle, zoom and pivot parameters, and the size of the area to redraw, but it's never larger than the size of the widget (including the extra draw size used for shadow, outline, etc).
+
+If the widget can fully cover the area to redraw, LVGL creates an RGB layer (which is faster to render and uses less memory). If the opposite case ARGB rendering needs to be used. A widget might not cover its area if it has radius, `bg_opa != 255`, shadow, outline, etc.
+
+The click area of the widget is also transformed accordingly.
 ## Color filter
 TODO
 

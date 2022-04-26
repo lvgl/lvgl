@@ -160,7 +160,7 @@ typedef union {
  * Props are split into groups of 16. When adding a new prop to a group, ensure it does not overflow into the next one.
  */
 typedef enum {
-    LV_STYLE_PROP_INV,
+    LV_STYLE_PROP_INV               = 0,
 
     /*Group 0*/
     LV_STYLE_WIDTH                  = 1,
@@ -172,12 +172,8 @@ typedef enum {
     LV_STYLE_X                      = 7,
     LV_STYLE_Y                      = 8,
     LV_STYLE_ALIGN                  = 9,
-    LV_STYLE_TRANSFORM_WIDTH        = 10,
-    LV_STYLE_TRANSFORM_HEIGHT       = 11,
-    LV_STYLE_TRANSLATE_X            = 12,
-    LV_STYLE_TRANSLATE_Y            = 13,
-    LV_STYLE_TRANSFORM_ZOOM         = 14,
-    LV_STYLE_TRANSFORM_ANGLE        = 15,
+    LV_STYLE_LAYOUT                 = 10,
+    LV_STYLE_RADIUS                 = 11,
 
     /*Group 1*/
     LV_STYLE_PAD_TOP                = 16,
@@ -186,6 +182,8 @@ typedef enum {
     LV_STYLE_PAD_RIGHT              = 19,
     LV_STYLE_PAD_ROW                = 20,
     LV_STYLE_PAD_COLUMN             = 21,
+    LV_STYLE_BASE_DIR               = 22,
+    LV_STYLE_CLIP_CORNER            = 23,
 
     /*Group 2*/
     LV_STYLE_BG_COLOR               = 32,
@@ -245,18 +243,22 @@ typedef enum {
     LV_STYLE_TEXT_ALIGN             = 91,
 
     /*Group 6*/
-    LV_STYLE_RADIUS                 = 96,
-    LV_STYLE_CLIP_CORNER            = 97,
-    LV_STYLE_OPA                    = 98,
-    LV_STYLE_COLOR_FILTER_DSC       = 99,
-    LV_STYLE_COLOR_FILTER_OPA       = 100,
-    LV_STYLE_ANIM                   = 101,
-    LV_STYLE_ANIM_TIME              = 102,
-    LV_STYLE_ANIM_SPEED             = 103,
-    LV_STYLE_TRANSITION             = 104,
-    LV_STYLE_BLEND_MODE             = 105,
-    LV_STYLE_LAYOUT                 = 106,
-    LV_STYLE_BASE_DIR               = 107,
+    LV_STYLE_OPA                    = 96,
+    LV_STYLE_COLOR_FILTER_DSC       = 97,
+    LV_STYLE_COLOR_FILTER_OPA       = 98,
+    LV_STYLE_ANIM                   = 99,
+    LV_STYLE_ANIM_TIME              = 100,
+    LV_STYLE_ANIM_SPEED             = 101,
+    LV_STYLE_TRANSITION             = 102,
+    LV_STYLE_BLEND_MODE             = 103,
+    LV_STYLE_TRANSFORM_WIDTH        = 104,
+    LV_STYLE_TRANSFORM_HEIGHT       = 105,
+    LV_STYLE_TRANSLATE_X            = 106,
+    LV_STYLE_TRANSLATE_Y            = 107,
+    LV_STYLE_TRANSFORM_ZOOM         = 108,
+    LV_STYLE_TRANSFORM_ANGLE        = 109,
+    LV_STYLE_TRANSFORM_PIVOT_X      = 110,
+    LV_STYLE_TRANSFORM_PIVOT_Y      = 111,
 
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
     _LV_STYLE_NUM_BUILT_IN_PROPS     = _LV_STYLE_LAST_BUILT_IN_PROP + 1,

@@ -31,7 +31,7 @@ extern "C" {
 
 typedef struct {
 
-    uint16_t angle;
+    int16_t angle;
     uint16_t zoom;
     lv_point_t pivot;
 

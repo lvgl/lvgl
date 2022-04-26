@@ -92,6 +92,11 @@ In other words transformations work only on true color images stored as C array,
 
 Note that the real coordinates of image objects won't change during transformation. That is `lv_obj_get_width/height/x/y()` will return the original, non-zoomed coordinates.
 
+**IMPORTANT**
+The transformation of the image is independent of the transformation properties coming from styles. (See [here](/overview/style#opacity-and-transformations)). The main differences are that pure image widget transformation
+- doesn't transform the children of the image widget
+- image is transformed directly without creating an intermediate layer (buffer) to snapshot the widget
+
 ### Size mode
 
 By default, when the image is zoomed or rotated the real coordinates of the image object are not changed.

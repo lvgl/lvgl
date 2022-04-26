@@ -236,6 +236,8 @@ bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b);
  */
 void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, lv_coord_t ofs_x, lv_coord_t ofs_y);
 
+void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom, const lv_point_t * pivot);
+
 /**********************
  *      MACROS
  **********************/
