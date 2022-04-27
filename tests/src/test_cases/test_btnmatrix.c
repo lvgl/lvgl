@@ -58,7 +58,6 @@ void test_btnmatrix_oneline_should_return_button_text_btn_id_not_valid(void)
 
 void test_btnmatrix_single_line_map_should_return_button_text(void)
 {
-    lv_btnmatrix_t * p = (lv_btnmatrix_t *) btnmatrix;
     uint16_t valid_btn_id = 0U;
     char * btn_txt = NULL;
 
@@ -69,7 +68,6 @@ void test_btnmatrix_single_line_map_should_return_button_text(void)
 
 void test_btnmatrix_multi_line_map_should_return_button_text(void)
 {
-    lv_btnmatrix_t * p = (lv_btnmatrix_t *) btnmatrix;
     uint16_t valid_btn_id = 2U;
     char * btn_txt = NULL;
 
