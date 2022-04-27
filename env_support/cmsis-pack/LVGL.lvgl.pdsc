@@ -36,9 +36,10 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-04-13" version="1.0.3-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.3-alpha.pack">
+    <release date="2022-04-27" version="1.0.3" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.3.pack">
       - LVGL 8.3.0-dev
       - Monthly update for April
+      - Add GPU support for SWM341-DMA2D
     </release>
     <release date="2022-03-27" version="1.0.2" url="https://github.com/lvgl/lvgl/raw/a5b9a1c210821f122fb7582378a9f1819b1dc821/env_support/cmsis-pack/LVGL.lvgl.1.0.2.pack">
       - LVGL 8.3.0-dev
@@ -198,6 +199,7 @@
                 <file category="sourceC"            name="src/draw/lv_draw_line.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_mask.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_transform.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
                 <file category="sourceC"            name="src/draw/lv_img_buf.c" />
                 <file category="sourceC"            name="src/draw/lv_img_cache.c" />
@@ -214,6 +216,7 @@
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_line.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_polygon.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_rect.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_transform.c" />
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_font.c" />
@@ -330,7 +333,7 @@
               </files>
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.0.2">
+            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.0.3-dev">
               <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
               <files>
               <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
