@@ -35,7 +35,8 @@ static void lv_arc_draw(lv_event_t * e);
 static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, lv_part_t part);
 static void inv_knob_area(lv_obj_t * obj);
-static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
+static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
+static lv_coord_t get_angle(const lv_obj_t * obj);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
 static void value_update(lv_obj_t * arc);
 
@@ -317,6 +318,60 @@ lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj)
     return ((lv_arc_t *) obj)->type;
 }
 
+/*=====================
+ * Other functions
+ *====================*/
+
+
+void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, lv_coord_t r_offset)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(obj_to_align);
+
+    lv_obj_update_layout(obj);
+
+    lv_point_t center;
+    lv_coord_t arc_r;
+    get_center(obj, &center, &arc_r);
+    lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
+    lv_coord_t indic_width_half = indic_width / 2;
+    arc_r -= indic_width_half;
+    arc_r += r_offset;
+
+    uint16_t angle = get_angle(obj);
+    lv_coord_t knob_x = (arc_r * lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT;
+    lv_coord_t knob_y = (arc_r * lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT;
+    lv_obj_align_to(obj_to_align, obj, LV_ALIGN_CENTER, knob_x, knob_y);
+}
+
+void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, lv_coord_t r_offset)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(obj_to_rotate);
+
+    lv_obj_update_layout(obj);
+
+    lv_point_t center;
+    lv_coord_t arc_r;
+    get_center(obj, &center, &arc_r);
+    lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
+    lv_coord_t indic_width_half = indic_width / 2;
+    arc_r -= indic_width_half;
+
+    arc_r += r_offset;
+    lv_obj_align_to(obj_to_rotate, obj, LV_ALIGN_CENTER, 0, -arc_r);
+
+    lv_obj_update_layout(obj);
+
+    uint16_t angle = get_angle(obj);
+    lv_coord_t pivot_x = obj_to_rotate->coords.x1 - center.x;
+    lv_coord_t pivot_y = obj_to_rotate->coords.y1 - center.y;
+    lv_obj_set_style_transform_pivot_x(obj_to_rotate, -pivot_x, 0);
+    lv_obj_set_style_transform_pivot_y(obj_to_rotate, -pivot_y, 0);
+    lv_obj_set_style_transform_angle(obj_to_rotate, angle * 10 + 900, 0);
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -345,7 +400,7 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     arc->last_angle = arc->indic_angle_end;
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_ext_click_area(obj, LV_DPI_DEF / 10);
 
 
@@ -675,7 +730,7 @@ static void inv_knob_area(lv_obj_t * obj)
     lv_obj_invalidate_area(obj, &a);
 }
 
-static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
+static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
 {
     lv_coord_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
     lv_coord_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
@@ -691,15 +746,9 @@ static void get_center(lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
     if(arc_r) *arc_r = r;
 }
 
-static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area)
+static lv_coord_t get_angle(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
-
-    lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
-    lv_coord_t indic_width_half = indic_width / 2;
-    r -= indic_width_half;
-
     uint16_t angle = arc->rotation;
     if(arc->type == LV_ARC_MODE_NORMAL) {
         angle += arc->indic_angle_end;
@@ -712,6 +761,18 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t 
         if(arc->value < range_midpoint) angle += arc->indic_angle_start;
         else angle += arc->indic_angle_end;
     }
+
+    return angle;
+}
+
+
+static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area)
+{
+    lv_coord_t indic_width = lv_obj_get_style_arc_width(obj, LV_PART_INDICATOR);
+    lv_coord_t indic_width_half = indic_width / 2;
+    r -= indic_width_half;
+
+    lv_coord_t angle = get_angle(obj);
     lv_coord_t knob_x = (r * lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT;
     lv_coord_t knob_y = (r * lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT;
 
@@ -765,6 +826,7 @@ static void value_update(lv_obj_t * obj)
         case LV_ARC_MODE_NORMAL:
             angle = lv_map(arc->value, arc->min_value, arc->max_value, arc->bg_angle_start, bg_end);
             lv_arc_set_angles(obj, arc->bg_angle_start, angle);
+
             break;
         default:
             LV_LOG_WARN("Invalid mode: %d", arc->type);
