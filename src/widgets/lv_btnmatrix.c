@@ -444,7 +444,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         void * param = lv_event_get_param(e);
         uint16_t btn_pr = LV_BTNMATRIX_BTN_NONE;
         /*Search the pressed area*/
-        lv_indev_t * indev = lv_indev_get_act();
+        const lv_indev_t * indev = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) return;
 
@@ -518,16 +518,18 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
     else if(code == LV_EVENT_FOCUSED) {
+        lv_indev_type_t indev_type = LV_INDEV_TYPE_NONE;
+
         lv_indev_t * indev = lv_event_get_param(e);
-        lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
         /*If not focused by an input device assume the last input device*/
         if(indev == NULL) {
             indev = lv_indev_get_next(NULL);
-            indev_type = lv_indev_get_type(indev);
         }
 
-        bool editing = lv_group_get_editing(lv_obj_get_group(obj));
+        indev_type = lv_indev_get_type(indev);
+
+        const bool editing = lv_group_get_editing(lv_obj_get_group(obj));
         /*Focus the first button if there is not selected button*/
         if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE) {
             if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER && editing)) {
@@ -552,14 +554,14 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
     else if(code == LV_EVENT_KEY) {
-
         invalidate_button_area(obj, btnm->btn_id_sel);
         const lv_coord_t area_width = lv_area_get_width(&btnm->button_areas[btnm->btn_id_sel]);
 
         char c = *((char *)lv_event_get_param(e));
         if(c == LV_KEY_RIGHT) {
-            if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE)  btnm->btn_id_sel = 0;
+            if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE) btnm->btn_id_sel = 0;
             else btnm->btn_id_sel++;
+
             if(btnm->btn_id_sel >= btnm->btn_cnt) btnm->btn_id_sel = 0;
 
             while(button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) || button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel])) {
@@ -578,7 +580,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
         else if(c == LV_KEY_DOWN) {
-            lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+            const lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
             /*Find the area below the current*/
             if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE) {
                 btnm->btn_id_sel = 0;
@@ -605,7 +607,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
         else if(c == LV_KEY_UP) {
-            lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
+            const lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
             /*Find the area below the current*/
             if(btnm->btn_id_sel == LV_BTNMATRIX_BTN_NONE) {
                 btnm->btn_id_sel = 0;
@@ -657,7 +659,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_t draw_rect_dsc_def;
     lv_draw_label_dsc_t draw_label_dsc_def;
 
-    lv_state_t state_ori = obj->state;
+    const lv_state_t original_state = obj->state;
     obj->state = LV_STATE_DEFAULT;
     obj->skip_trans = 1;
     lv_draw_rect_dsc_init(&draw_rect_dsc_def);
@@ -665,7 +667,7 @@ static void draw_main(lv_event_t * e)
     lv_obj_init_draw_rect_dsc(obj, LV_PART_ITEMS, &draw_rect_dsc_def);
     lv_obj_init_draw_label_dsc(obj, LV_PART_ITEMS, &draw_label_dsc_def);
     obj->skip_trans = 0;
-    obj->state = state_ori;
+    obj->state = original_state;
 
     lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
     lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
@@ -702,10 +704,10 @@ static void draw_main(lv_event_t * e)
 
         if(button_is_inactive(btnm->ctrl_bits[btn_i])) btn_state |= LV_STATE_DISABLED;
         else if(btn_i == btnm->btn_id_sel) {
-            if(state_ori & LV_STATE_PRESSED) btn_state |= LV_STATE_PRESSED;
-            if(state_ori & LV_STATE_FOCUSED) btn_state |= LV_STATE_FOCUSED;
-            if(state_ori & LV_STATE_FOCUS_KEY) btn_state |= LV_STATE_FOCUS_KEY;
-            if(state_ori & LV_STATE_EDITED) btn_state |= LV_STATE_EDITED;
+            if(original_state & LV_STATE_PRESSED) btn_state |= LV_STATE_PRESSED;
+            if(original_state & LV_STATE_FOCUSED) btn_state |= LV_STATE_FOCUSED;
+            if(original_state & LV_STATE_FOCUS_KEY) btn_state |= LV_STATE_FOCUS_KEY;
+            if(original_state & LV_STATE_EDITED) btn_state |= LV_STATE_EDITED;
         }
 
         /*Get the button's area*/
@@ -750,7 +752,7 @@ static void draw_main(lv_event_t * e)
             if(btn_area.y2 == obj->coords.y2 - pbottom) draw_rect_dsc_act.border_side &= ~LV_BORDER_SIDE_BOTTOM;
         }
 
-        lv_coord_t btn_height = lv_area_get_height(&btn_area);
+        const lv_coord_t btn_height = lv_area_get_height(&btn_area);
 
         if((btn_state & LV_STATE_PRESSED) && (btnm->ctrl_bits[btn_i] & LV_BTNMATRIX_CTRL_POPOVER)) {
             /*Push up the upper boundary of the btn area to create the popover*/
@@ -796,6 +798,7 @@ static void draw_main(lv_event_t * e)
     }
 
     obj->skip_trans = 0;
+
 #if LV_USE_ARABIC_PERSIAN_CHARS
     lv_mem_buf_release(txt_ap);
 #endif
