@@ -43,9 +43,11 @@ remove the misleading guide above this code segment.
    - LV_USE_GPU_STM32_DMA2D
    - LV_USE_GPU_NXP_PXP
    - LV_USE_GPU_NXP_VG_LITE
-5. Update macro LV_ATTRIBUTE_MEM_ALIGN to force a WORD alignment.
+   - LV_USE_GPU_SWM341_DMA2D
+5. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
-#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
+#define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
 6. Update Theme related macros:
 
