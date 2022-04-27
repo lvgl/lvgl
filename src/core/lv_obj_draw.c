@@ -38,7 +38,7 @@
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
-    lv_opa_t opa;
+    lv_opa_t opa = LV_OPA_COVER;
     if(part != LV_PART_MAIN) {
         opa = lv_obj_get_style_opa(obj, part);
         if(opa <= LV_OPA_MIN) {
