@@ -476,9 +476,13 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom, const lv_po
     static int32_t sinma;
     static int32_t cosma;
     if(angle_prev != angle) {
-        int32_t angle_low = angle / 10;
+        int32_t angle_limited = angle;
+        if(angle_limited > 3600) angle_limited -= 3600;
+        if(angle_limited < 0) angle_limited += 3600;
+
+        int32_t angle_low = angle_limited / 10;
         int32_t angle_high = angle_low + 1;
-        int32_t angle_rem = angle  - (angle_low * 10);
+        int32_t angle_rem = angle_limited  - (angle_low * 10);
 
         int32_t s1 = lv_trigo_sin(angle_low);
         int32_t s2 = lv_trigo_sin(angle_high);

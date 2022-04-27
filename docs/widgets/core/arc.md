@@ -63,7 +63,14 @@ lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 If the `LV_OBJ_FLAG_ADV_HITTEST` flag is enabled the arc can be clicked through in the middle. Clicks are recognized only on the ring of the background arc. `lv_obj_set_ext_click_size()` makes the sensitive area larger inside and outside with the given number of pixels.
 
 
+### Place another object to the knob
 
+Another object can be positioned according to the current position of the arc in order to follow the arc's current value (angle).
+To do this use `lv_arc_align_obj_to_angle(arc, obj_to_align, radius_offset)`.
+
+Similarly `lv_arc_rotate_obj_to_angle(arc, obj_to_rotate, radius_offset)` can be used to rotate the object to the current value of the arc.
+
+It's a typical use case to call these functions in the `VALUE_CHANGED` event of the arc.
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to set a new value.

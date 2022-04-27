@@ -924,6 +924,9 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         lv_draw_img_dsc_init(&draw_dsc);
         draw_dsc.opa = opa;
         draw_dsc.angle = lv_obj_get_style_transform_angle(obj, 0);
+        if(draw_dsc.angle > 3600) draw_dsc.angle -= 3600;
+        if(draw_dsc.angle < 0) draw_dsc.angle += 3600;
+
         draw_dsc.zoom = lv_obj_get_style_transform_zoom(obj, 0);
         draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
         draw_dsc.antialias = disp_refr->driver->antialiasing;
