@@ -42,13 +42,40 @@ void test_btnmatrix_should_have_map_multi_row(void)
 
 void test_btnmatrix_oneline_should_return_button_text_btn_id_not_valid(void)
 {
+    lv_btnmatrix_t * p = (lv_btnmatrix_t *) btnmatrix;
+    uint16_t invalid_btn_id = 0U;
+    char * btn_txt = NULL;
+
     lv_btnmatrix_set_map(btnmatrix, one_row_map);
-    /* ToDo Remove magic number */
-    const char * btn_txt = lv_btnmatrix_get_btn_text(btnmatrix, 4);
+    invalid_btn_id = p->btn_cnt + 1;
+
+    btn_txt = lv_btnmatrix_get_btn_text(btnmatrix, invalid_btn_id);
     TEST_ASSERT_NULL(btn_txt);
 
     btn_txt = lv_btnmatrix_get_btn_text(btnmatrix, LV_BTNMATRIX_BTN_NONE);
     TEST_ASSERT_NULL(btn_txt);
+}
+
+void test_btnmatrix_single_line_map_should_return_button_text(void)
+{
+    lv_btnmatrix_t * p = (lv_btnmatrix_t *) btnmatrix;
+    uint16_t valid_btn_id = 0U;
+    char * btn_txt = NULL;
+
+    lv_btnmatrix_set_map(btnmatrix, one_row_map);
+    btn_txt = lv_btnmatrix_get_btn_text(btnmatrix, valid_btn_id);
+    TEST_ASSERT_EQUAL(btn_txt, one_row_map[valid_btn_id]);
+}
+
+void test_btnmatrix_multi_line_map_should_return_button_text(void)
+{
+    lv_btnmatrix_t * p = (lv_btnmatrix_t *) btnmatrix;
+    uint16_t valid_btn_id = 2U;
+    char * btn_txt = NULL;
+
+    lv_btnmatrix_set_map(btnmatrix, multi_row_map);
+    btn_txt = lv_btnmatrix_get_btn_text(btnmatrix, valid_btn_id);
+    TEST_ASSERT_EQUAL(btn_txt, one_row_map[valid_btn_id]);
 }
 
 #endif
