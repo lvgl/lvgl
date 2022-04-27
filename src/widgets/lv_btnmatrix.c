@@ -394,9 +394,10 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t * s = lv_event_get_param(e);
-        if(has_popovers_in_top_row(obj)) {
-            /*reserve one row worth of extra space to account for popovers in the top row*/
-            *s = btnm->row_cnt > 0 ? lv_obj_get_content_height(obj) / btnm->row_cnt : 0;
+
+        /*reserve one row worth of extra space to account for popovers in the top row*/
+        if(has_popovers_in_top_row(obj) && (0U != btnm->row_cnt)) {
+            *s = lv_obj_get_content_height(obj) / btnm->row_cnt;
         }
         else {
             *s = 0;
