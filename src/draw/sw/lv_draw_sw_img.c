@@ -127,6 +127,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                 lv_opa_t recolor_opa = draw_dsc->recolor_opa;
                 lv_color_t recolor = draw_dsc->recolor;
                 lv_color_premult(recolor, recolor_opa, premult_v);
+                recolor_opa = 255 - recolor_opa;
                 uint32_t i;
                 for(i = 0; i < buf_size; i++) {
                     rgb_buf[i] = lv_color_mix_premult(premult_v, rgb_buf[i], recolor_opa);
