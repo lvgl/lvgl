@@ -310,7 +310,7 @@ const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
-    if((btn_id == LV_BTNMATRIX_BTN_NONE) || (btnm->btn_cnt < btn_id)) return NULL;
+    if((btn_id == LV_BTNMATRIX_BTN_NONE) || (btnm->btn_cnt = < btn_id)) return NULL;
 
     uint16_t txt_i = 0;
     uint16_t btn_i = 0;
@@ -321,9 +321,6 @@ const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id)
         txt_i++;
         if(strcmp(btnm->map_p[txt_i], "\n") == 0) txt_i++;
     }
-
-    /* What are we testing here? */
-    if(btn_i == btnm->btn_cnt) return NULL;
 
     return btnm->map_p[txt_i];
 }
