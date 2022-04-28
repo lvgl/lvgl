@@ -26,16 +26,16 @@ struct _lv_dev_sdl_mouse_priv_t;
 
 typedef struct {
     struct _lv_dev_sdl_mouse_priv_t * _priv;
-} lv_dev_sdl_mouse_dsc_t;
+} lv_dev_sdl_mouse_t;
 
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_sdl_mouse_init(lv_dev_sdl_mouse_dsc_t * dsc);
+void lv_dev_sdl_mouse_init(lv_dev_sdl_mouse_t * dev);
 
-lv_indev_t * lv_dev_sdl_mouse_create(lv_dev_sdl_mouse_dsc_t * dsc);
+lv_indev_t * lv_dev_sdl_mouse_create(lv_dev_sdl_mouse_t * dev);
 
 /**********************
  *      MACROS

@@ -29,32 +29,32 @@ typedef struct _lv_dev_sdl_mousewheel_priv_t {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_dev_sdl_mousewheel_init(lv_dev_sdl_mousewheel_dsc_t * dsc)
+void lv_dev_sdl_mousewheel_init(lv_dev_sdl_mousewheel_t * dev)
 {
-    lv_memset_00(dsc, sizeof(lv_dev_sdl_mousewheel_dsc_t));
+    lv_memset_00(dev, sizeof(lv_dev_sdl_mousewheel_t));
     return;
 }
 
-lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_dsc_t * dsc)
+lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_t * dev)
 {
-    dsc->_priv = lv_mem_alloc(sizeof(lv_dev_sdl_mousewheel_dsc_t));
-    LV_ASSERT_MALLOC(dsc->_priv);
+    dev->_priv = lv_mem_alloc(sizeof(lv_dev_sdl_mousewheel_t));
+    LV_ASSERT_MALLOC(dev->_priv);
 
     lv_indev_drv_t * indev_drv = lv_mem_alloc(sizeof(lv_indev_drv_t));
     LV_ASSERT_MALLOC(indev_drv);
 
-    if(dsc->_priv == NULL || indev_drv == NULL) {
-        lv_mem_free(dsc->_priv);
+    if(dev->_priv == NULL || indev_drv == NULL) {
+        lv_mem_free(dev->_priv);
         lv_mem_free(indev_drv);
         return NULL;
     }
 
-    lv_memset_00(dsc->_priv, sizeof(_lv_drv_sdl_mousewheel_priv_t));
+    lv_memset_00(dev->_priv, sizeof(_lv_drv_sdl_mousewheel_priv_t));
 
     lv_indev_drv_init(indev_drv);
     indev_drv->type = LV_INDEV_TYPE_ENCODER;
     indev_drv->read_cb = sdl_mousewheel_read;
-    indev_drv->user_data = dsc;
+    indev_drv->user_data = dev;
     lv_indev_t * indev = lv_indev_drv_register(indev_drv);
 
     return indev;
@@ -66,11 +66,11 @@ lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_dsc_t * dsc)
 
 static void sdl_mousewheel_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
-    lv_dev_sdl_mousewheel_dsc_t * dsc = indev_drv->user_data;
+    lv_dev_sdl_mousewheel_t * dev = indev_drv->user_data;
 
-    data->state = dsc->_priv->state;
-    data->enc_diff = dsc->_priv->diff;
-    dsc->_priv->diff = 0;
+    data->state = dev->_priv->state;
+    data->enc_diff = dev->_priv->diff;
+    dev->_priv->diff = 0;
 }
 
 void _lv_sdl_mousewheel_handler(SDL_Event * event)
@@ -100,8 +100,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
     }
 
     if(indev == NULL) return;
-    lv_dev_sdl_mousewheel_dsc_t * indev_dsc = indev->driver->user_data;
-    lv_dev_sdl_window_dsc_t * disp_dsc = indev->driver->disp->driver->user_data;
+    lv_dev_sdl_mousewheel_t * indev_dev = indev->driver->user_data;
 
     switch(event->type) {
         case SDL_MOUSEWHEEL:
@@ -109,20 +108,20 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
             // so invert it
 #ifdef __EMSCRIPTEN__
             /*Escripten scales it wrong*/
-            if(event->wheel.y < 0) indev_dsc->_priv->diff++;
-            if(event->wheel.y > 0) indev_dsc->_priv->diff--;
+            if(event->wheel.y < 0) indev_dev->_priv->diff++;
+            if(event->wheel.y > 0) indev_dev->_priv->diff--;
 #else
-            indev_dsc->_priv->diff = -event->wheel.y;
+            indev_dev->_priv->diff = -event->wheel.y;
 #endif
             break;
         case SDL_MOUSEBUTTONDOWN:
             if(event->button.button == SDL_BUTTON_MIDDLE) {
-                indev_dsc->_priv->state = LV_INDEV_STATE_PRESSED;
+                indev_dev->_priv->state = LV_INDEV_STATE_PRESSED;
             }
             break;
         case SDL_MOUSEBUTTONUP:
             if(event->button.button == SDL_BUTTON_MIDDLE) {
-                indev_dsc->_priv->state = LV_INDEV_STATE_RELEASED;
+                indev_dev->_priv->state = LV_INDEV_STATE_RELEASED;
             }
             break;
         default:

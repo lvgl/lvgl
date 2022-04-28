@@ -31,15 +31,15 @@ typedef struct {
     uint32_t buf_size;
     uint8_t zoom;
     struct _lv_drv_sdl_disp_priv_t * _priv;
-} lv_dev_sdl_window_dsc_t;
+} lv_dev_sdl_window_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_sdl_window_init(lv_dev_sdl_window_dsc_t * dsc);
+void lv_dev_sdl_window_init(lv_dev_sdl_window_t * dev);
 
-lv_disp_t * lv_dev_sdl_window_create(lv_dev_sdl_window_dsc_t * dsc);
+lv_disp_t * lv_dev_sdl_window_create(lv_dev_sdl_window_t * dev);
 
 lv_disp_t * lv_dev_sdl_get_from_win_id(uint32_t win_id);
 
