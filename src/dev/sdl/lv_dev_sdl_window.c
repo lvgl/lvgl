@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_drv_sdl_disp.h"
-#include "lv_drv_sdl_indev.h"
+#include <lvgl/src/dev/sdl/lv_dev_sdl_mouse.h>
+#include <lvgl/src/dev/sdl/lv_dev_sdl_window.h>
 #if LV_USE_DRV_SDL
 
 #include LV_PLATFORM_SDL_INCLUDE_PATH
@@ -23,7 +23,6 @@ typedef struct _lv_drv_sdl_disp_priv_t {
     SDL_Window * window;
     SDL_Renderer * renderer;
     SDL_Texture * texture;
-    volatile bool sdl_quit_qry;
     lv_color_t * tft_fb;
 } _lv_drv_sdl_disp_priv_t;
 
@@ -31,21 +30,23 @@ typedef struct _lv_drv_sdl_disp_priv_t {
  *  STATIC PROTOTYPES
  **********************/
 static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
-static void window_create(lv_drv_sdl_disp_dsc_t * dsc);
-static void window_update(lv_drv_sdl_disp_dsc_t * dsc);
-static void monitor_sdl_clean_up(lv_drv_sdl_disp_dsc_t * dsc);
+static void window_create(lv_dev_sdl_window_dsc_t * dsc);
+static void window_update(lv_dev_sdl_window_dsc_t * dsc);
+static void monitor_sdl_clean_up(lv_dev_sdl_window_dsc_t * dsc);
 static void sdl_event_handler(lv_timer_t * t);
-static int quit_filter(void * userdata, SDL_Event * event);
+lv_disp_t * lv_dev_sdl_get_from_win_id(uint32_t win_id);
 
 /***********************
  *   GLOBAL PROTOTYPES
  ***********************/
-void _lv_sdl_mouse_handler(SDL_Event * event, lv_disp_t * disp);
-void _lv_sdl_mousewheel_handler(SDL_Event * event, lv_disp_t * disp);
+void _lv_sdl_mouse_handler(SDL_Event * event);
+void _lv_sdl_mousewheel_handler(SDL_Event * event);
+void _lv_sdl_keyboard_handler(SDL_Event * event);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+lv_timer_t * event_handler_timer;
 
 /**********************
  *      MACROS
@@ -55,16 +56,23 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event, lv_disp_t * disp);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_drv_sdl_disp_init(lv_drv_sdl_disp_dsc_t * dsc)
+void lv_dev_sdl_window_init(lv_dev_sdl_window_dsc_t * dsc)
 {
-    lv_memset_00(dsc, sizeof(lv_drv_sdl_disp_dsc_t));
+    static bool inited = false;
+    if(!inited) {
+        SDL_Init(SDL_INIT_VIDEO);
+        SDL_StartTextInput();
+        event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
+        inited = true;
+    }
+
+    lv_memset_00(dsc, sizeof(lv_dev_sdl_window_dsc_t));
     dsc->hor_res = 800;
     dsc->ver_res = 480;
     dsc->zoom = 1;
 }
 
-
-lv_disp_t * lv_drv_sdl_disp_create(lv_drv_sdl_disp_dsc_t * dsc)
+lv_disp_t * lv_dev_sdl_window_create(lv_dev_sdl_window_dsc_t * dsc)
 {
     dsc->_priv = lv_mem_alloc(sizeof(_lv_drv_sdl_disp_priv_t));
     LV_ASSERT_MALLOC(dsc->_priv);
@@ -97,10 +105,6 @@ lv_disp_t * lv_drv_sdl_disp_create(lv_drv_sdl_disp_dsc_t * dsc)
     disp_drv->user_data = dsc;
     lv_disp_t * disp = lv_disp_drv_register(disp_drv);
 
-    lv_timer_create(sdl_event_handler, 10, disp);
-
-    SDL_SetEventFilter(quit_filter, dsc);
-
     return disp;
 }
 
@@ -116,7 +120,7 @@ static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
     if(lv_disp_flush_is_last(disp_drv)) {
-        lv_drv_sdl_disp_dsc_t * dsc = disp_drv->user_data;
+        lv_dev_sdl_window_dsc_t * dsc = disp_drv->user_data;
         window_update(dsc);
     }
 
@@ -128,52 +132,55 @@ static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
  * SDL main thread. All SDL related task have to be handled here!
  * It initializes SDL, handles drawing and the mouse.
  */
-
 static void sdl_event_handler(lv_timer_t * t)
 {
-    lv_disp_t * disp = t->user_data;
-    lv_drv_sdl_disp_dsc_t * dsc = disp->driver->user_data;
+    LV_UNUSED(t);
 
     /*Refresh handling*/
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
-        _lv_sdl_mouse_handler(&event, disp);
-        _lv_sdl_mousewheel_handler(&event, disp);
-        //        keyboard_handler(&event);
+        _lv_sdl_mouse_handler(&event);
+        _lv_sdl_mousewheel_handler(&event);
+        _lv_sdl_keyboard_handler(&event);
 
-        if((&event)->type == SDL_WINDOWEVENT) {
-            switch((&event)->window.event) {
+        lv_disp_t * disp;
+
+        lv_dev_sdl_window_dsc_t * dsc;
+        if(event.type == SDL_WINDOWEVENT) {
+            disp = lv_dev_sdl_get_from_win_id(event.window.windowID);
+            if(disp == NULL) continue;
+            dsc = disp->driver->user_data;
+            switch(event.window.event) {
 #if SDL_VERSION_ATLEAST(2, 0, 5)
                 case SDL_WINDOWEVENT_TAKE_FOCUS:
 #endif
                 case SDL_WINDOWEVENT_EXPOSED:
                     window_update(dsc);
                     break;
+                case SDL_WINDOWEVENT_CLOSE:
+                    monitor_sdl_clean_up(dsc);
+                    break;
                 default:
                     break;
             }
         }
-    }
-
-    /*Run until quit event not arrives*/
-    if(dsc->_priv->sdl_quit_qry) {
-        monitor_sdl_clean_up(dsc);
-        exit(0);
+        if(event.type == SDL_QUIT) {
+            SDL_Quit();
+            lv_timer_del(event_handler_timer);
+            exit(0);
+        }
     }
 }
 
-static void monitor_sdl_clean_up(lv_drv_sdl_disp_dsc_t * dsc)
+static void monitor_sdl_clean_up(lv_dev_sdl_window_dsc_t * dsc)
 {
     SDL_DestroyTexture(dsc->_priv->texture);
     SDL_DestroyRenderer(dsc->_priv->renderer);
     SDL_DestroyWindow(dsc->_priv->window);
-
-    SDL_Quit();
 }
 
-static void window_create(lv_drv_sdl_disp_dsc_t * dsc)
+static void window_create(lv_dev_sdl_window_dsc_t * dsc)
 {
-
     int flag = 0;
 #if SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
@@ -193,10 +200,9 @@ static void window_create(lv_drv_sdl_disp_dsc_t * dsc)
     lv_memset_ff(dsc->_priv->tft_fb, dsc->hor_res * dsc->ver_res * sizeof(lv_color_t));
 }
 
-static void window_update(lv_drv_sdl_disp_dsc_t * dsc)
+static void window_update(lv_dev_sdl_window_dsc_t * dsc)
 {
     SDL_UpdateTexture(dsc->_priv->texture, NULL, dsc->_priv->tft_fb, dsc->hor_res * sizeof(lv_color_t));
-
     SDL_RenderClear(dsc->_priv->renderer);
 
     /*Update the renderer with the texture containing the rendered image*/
@@ -204,13 +210,17 @@ static void window_update(lv_drv_sdl_disp_dsc_t * dsc)
     SDL_RenderPresent(dsc->_priv->renderer);
 }
 
-static int quit_filter(void * userdata, SDL_Event * event)
+lv_disp_t * lv_dev_sdl_get_from_win_id(uint32_t win_id)
 {
-    lv_drv_sdl_disp_dsc_t * dsc = userdata;
-    if(event->type == SDL_QUIT) {
-        dsc->_priv->sdl_quit_qry = true;
+    lv_disp_t * disp = lv_disp_get_next(NULL);
+    while(disp) {
+        lv_dev_sdl_window_dsc_t * dsc = disp->driver->user_data;
+        if(SDL_GetWindowID(dsc->_priv->window) == win_id) {
+            return disp;
+        }
+        disp = lv_disp_get_next(disp);
     }
-
-    return 1;
+    return NULL;
 }
+
 #endif /*LV_DRV_SDL_DISP*/
