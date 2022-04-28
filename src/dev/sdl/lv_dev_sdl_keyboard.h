@@ -26,15 +26,15 @@ struct _lv_dev_sdl_keyboard_priv_t;
 
 typedef struct {
     struct _lv_dev_sdl_keyboard_priv_t * _priv;
-} lv_dev_sdl_keyboard_dsc_t;
+} lv_dev_sdl_keyboard_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_sdl_keyboard_init(lv_dev_sdl_keyboard_dsc_t * dsc);
+void lv_dev_sdl_keyboard_init(lv_dev_sdl_keyboard_t * dev);
 
-lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_dsc_t * dsc);
+lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_t * dev);
 
 /**********************
  *      MACROS

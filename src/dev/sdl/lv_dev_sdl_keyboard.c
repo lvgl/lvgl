@@ -35,32 +35,32 @@ typedef struct _lv_dev_sdl_keyboard_priv_t {
  **********************/
 
 
-void lv_dev_sdl_keyboard_init(lv_dev_sdl_keyboard_dsc_t * dsc)
+void lv_dev_sdl_keyboard_init(lv_dev_sdl_keyboard_t * dev)
 {
-    lv_memset_00(dsc, sizeof(lv_dev_sdl_keyboard_dsc_t));
+    lv_memset_00(dev, sizeof(lv_dev_sdl_keyboard_t));
     return;
 }
 
-lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_dsc_t * dsc)
+lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_t * dev)
 {
-    dsc->_priv = lv_mem_alloc(sizeof(_lv_dev_sdl_keyboard_priv_t));
-    LV_ASSERT_MALLOC(dsc->_priv);
+    dev->_priv = lv_mem_alloc(sizeof(_lv_dev_sdl_keyboard_priv_t));
+    LV_ASSERT_MALLOC(dev->_priv);
 
     lv_indev_drv_t * indev_drv = lv_mem_alloc(sizeof(lv_indev_drv_t));
     LV_ASSERT_MALLOC(indev_drv);
 
-    if(dsc->_priv == NULL || indev_drv == NULL) {
-        lv_mem_free(dsc->_priv);
+    if(dev->_priv == NULL || indev_drv == NULL) {
+        lv_mem_free(dev->_priv);
         lv_mem_free(indev_drv);
         return NULL;
     }
 
-    lv_memset_00(dsc->_priv, sizeof(_lv_dev_sdl_keyboard_priv_t));
+    lv_memset_00(dev->_priv, sizeof(_lv_dev_sdl_keyboard_priv_t));
 
     lv_indev_drv_init(indev_drv);
     indev_drv->type = LV_INDEV_TYPE_KEYPAD;
     indev_drv->read_cb = sdl_keyboard_read;
-    indev_drv->user_data = dsc;
+    indev_drv->user_data = dev;
     lv_indev_t * indev = lv_indev_drv_register(indev_drv);
 
     return indev;
@@ -72,22 +72,22 @@ lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_dsc_t * dsc)
 
 static void sdl_keyboard_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
-    lv_dev_sdl_keyboard_dsc_t * dsc = indev_drv->user_data;
+    lv_dev_sdl_keyboard_t * dev = indev_drv->user_data;
 
-    const size_t len = strlen(dsc->_priv->buf);
+    const size_t len = strlen(dev->_priv->buf);
 
     /*Send a release manually*/
-    if(dsc->_priv->dummy_read) {
-        dsc->_priv->dummy_read = false;
+    if(dev->_priv->dummy_read) {
+        dev->_priv->dummy_read = false;
         data->state = LV_INDEV_STATE_RELEASED;
         data->continue_reading = len > 0;
     }
     /*Send the pressed character*/
     else if(len > 0) {
-        dsc->_priv->dummy_read = true;
+        dev->_priv->dummy_read = true;
         data->state = LV_INDEV_STATE_PRESSED;
-        data->key = dsc->_priv->buf[0];
-        memmove(dsc->_priv->buf, dsc->_priv->buf + 1, len);
+        data->key = dev->_priv->buf[0];
+        memmove(dev->_priv->buf, dev->_priv->buf + 1, len);
         data->continue_reading = true;
     }
 }
@@ -118,7 +118,7 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
     }
 
     if(indev == NULL) return;
-    lv_dev_sdl_keyboard_dsc_t * indev_dsc = indev->driver->user_data;
+    lv_dev_sdl_keyboard_t * indev_dev = indev->driver->user_data;
 
 
     /* We only care about SDL_KEYDOWN and SDL_TEXTINPUT events */
@@ -127,17 +127,17 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
                 const uint32_t ctrl_key = keycode_to_ctrl_key(event->key.keysym.sym);
                 if(ctrl_key == '\0')
                     return;
-                const size_t len = strlen(indev_dsc->_priv->buf);
+                const size_t len = strlen(indev_dev->_priv->buf);
                 if(len < KEYBOARD_BUFFER_SIZE - 1) {
-                    indev_dsc->_priv->buf[len] = ctrl_key;
-                    indev_dsc->_priv->buf[len + 1] = '\0';
+                    indev_dev->_priv->buf[len] = ctrl_key;
+                    indev_dev->_priv->buf[len + 1] = '\0';
                 }
                 break;
             }
         case SDL_TEXTINPUT: {                   /*Text input*/
-                const size_t len = strlen(indev_dsc->_priv->buf) + strlen(event->text.text);
+                const size_t len = strlen(indev_dev->_priv->buf) + strlen(event->text.text);
                 if(len < KEYBOARD_BUFFER_SIZE - 1)
-                    strcat(indev_dsc->_priv->buf, event->text.text);
+                    strcat(indev_dev->_priv->buf, event->text.text);
             }
             break;
         default:

@@ -27,16 +27,16 @@ struct _lv_dev_sdl_mousewheel_priv_t;
 
 typedef struct {
     struct _lv_dev_sdl_mousewheel_priv_t * _priv;
-} lv_dev_sdl_mousewheel_dsc_t;
+} lv_dev_sdl_mousewheel_t;
 
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_sdl_mousewheel_init(lv_dev_sdl_mousewheel_dsc_t * dsc);
+void lv_dev_sdl_mousewheel_init(lv_dev_sdl_mousewheel_t * dev);
 
-lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_dsc_t * dsc);
+lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_t * dev);
 
 /**********************
  *      MACROS
