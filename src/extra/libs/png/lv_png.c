@@ -147,8 +147,8 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
             }
 
             /*Decode the PNG image*/
-            uint32_t png_width;             /*Will be the width of the decoded image*/
-            uint32_t png_height;            /*Will be the width of the decoded image*/
+            unsigned png_width;             /*Will be the width of the decoded image*/
+            unsigned png_height;            /*Will be the width of the decoded image*/
 
             /*Decode the loaded image in ARGB8888 */
             error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
@@ -170,8 +170,8 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     /*If it's a PNG file in a  C array...*/
     else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = dsc->src;
-        uint32_t png_width;             /*No used, just required by he decoder*/
-        uint32_t png_height;            /*No used, just required by he decoder*/
+        unsigned png_width;             /*No used, just required by he decoder*/
+        unsigned png_height;            /*No used, just required by he decoder*/
 
         /*Decode the image in ARGB8888 */
         error = lodepng_decode32(&img_data, &png_width, &png_height, img_dsc->data, img_dsc->data_size);
