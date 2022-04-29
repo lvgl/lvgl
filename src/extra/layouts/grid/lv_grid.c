@@ -561,6 +561,8 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
         if(IS_FR(x)) {
             lv_coord_t f = GET_FR(x);
             c->h[i] = (free_h * f) / row_fr_cnt;
+            last_fr_i = i;
+            last_fr_x = f;
         }
     }
 
