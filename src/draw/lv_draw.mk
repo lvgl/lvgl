@@ -5,6 +5,7 @@ CSRCS += lv_draw_label.c
 CSRCS += lv_draw_line.c
 CSRCS += lv_draw_mask.c
 CSRCS += lv_draw_rect.c
+CSRCS += lv_draw_transform.c
 CSRCS += lv_draw_triangle.c
 CSRCS += lv_img_buf.c
 CSRCS += lv_img_cache.c
