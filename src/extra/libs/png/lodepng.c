@@ -5754,7 +5754,7 @@ static unsigned preProcessScanlines(unsigned char** out, size_t* outsize, const 
     adam7 = (unsigned char*)lodepng_malloc(passstart[7]);
     if(!adam7 && passstart[7]) error = 83; /*alloc fail*/
 
-    if(!error) {
+    if(!error && adam7) {
       unsigned i;
 
       Adam7_interlace(adam7, in, w, h, bpp);
