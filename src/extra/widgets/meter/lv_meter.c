@@ -497,8 +497,8 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
             p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
             p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
 
-            part_draw_dsc.p1 = &p_outer;
             part_draw_dsc.p1 = &p_center;
+            part_draw_dsc.p2 = &p_outer;
             part_draw_dsc.id = i;
             part_draw_dsc.label_dsc = &label_dsc;
 
