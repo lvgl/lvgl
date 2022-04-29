@@ -16,6 +16,6 @@ jobs:
     - uses: ammaraskar/gcc-problem-matcher@master
     - name: Install prerequisites
       run: scripts/install-prerequisites.sh
-     - name: Build
+    - name: Build
       working-directory: tests/makefile
       run: make test_file
