@@ -461,8 +461,6 @@
 
 #define LV_USE_ARC        1
 
-#define LV_USE_ANIMIMG    1
-
 #define LV_USE_BAR        1
 
 #define LV_USE_BTN        1
@@ -508,6 +506,8 @@
 /*-----------
  * Widgets
  *----------*/
+#define LV_USE_ANIMIMG    1
+
 #define LV_USE_CALENDAR   1
 #if LV_USE_CALENDAR
     #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
@@ -540,6 +540,12 @@
 
 #define LV_USE_MSGBOX     1
 
+#define LV_USE_SPAN       1
+#if LV_USE_SPAN
+    /*A line text can contain maximum num of span descriptor */
+    #define LV_SPAN_SNIPPET_STACK_SIZE 64
+#endif
+
 #define LV_USE_SPINBOX    1
 
 #define LV_USE_SPINNER    1
@@ -549,12 +555,6 @@
 #define LV_USE_TILEVIEW   1
 
 #define LV_USE_WIN        1
-
-#define LV_USE_SPAN       1
-#if LV_USE_SPAN
-    /*A line text can contain maximum num of span descriptor */
-    #define LV_SPAN_SNIPPET_STACK_SIZE 64
-#endif
 
 /*-----------
  * Themes
