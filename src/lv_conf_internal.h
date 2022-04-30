@@ -141,8 +141,20 @@
     #endif
     /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
     #if LV_MEM_ADR == 0
-        //#define LV_MEM_POOL_INCLUDE your_alloc_library  /* Uncomment if using an external allocator*/
-        //#define LV_MEM_POOL_ALLOC   your_alloc          /* Uncomment if using an external allocator*/
+        #ifndef LV_MEM_POOL_INCLUDE
+            #ifdef CONFIG_LV_MEM_POOL_INCLUDE
+                #define LV_MEM_POOL_INCLUDE CONFIG_LV_MEM_POOL_INCLUDE
+            #else
+                #undef LV_MEM_POOL_INCLUDE
+            #endif
+        #endif
+        #ifndef LV_MEM_POOL_ALLOC
+            #ifdef CONFIG_LV_MEM_POOL_ALLOC
+                #define LV_MEM_POOL_ALLOC CONFIG_LV_MEM_POOL_ALLOC
+            #else
+                #undef LV_MEM_POOL_ALLOC
+            #endif
+        #endif
     #endif
 
 #else       /*LV_MEM_CUSTOM*/
