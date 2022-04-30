@@ -319,14 +319,14 @@
     #ifdef CONFIG_LV_LAYER_SIMPLE_BUF_SIZE
         #define LV_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_LAYER_SIMPLE_BUF_SIZE
     #else
-        #define LV_LAYER_SIMPLE_BUF_SIZE  		   (24 * 1024)
+        #define LV_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)
     #endif
 #endif
 #ifndef LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE
     #ifdef CONFIG_LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE
         #define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE CONFIG_LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE
     #else
-        #define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE  LV_MAX(lv_area_get_width(&draw_area) * px_size, 2048)
+        #define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE LV_MAX(lv_area_get_width(&draw_area) * px_size, 2048)
     #endif
 #endif
 
@@ -339,7 +339,7 @@
     #ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
         #define LV_IMG_CACHE_DEF_SIZE CONFIG_LV_IMG_CACHE_DEF_SIZE
     #else
-        #define LV_IMG_CACHE_DEF_SIZE   0
+        #define LV_IMG_CACHE_DEF_SIZE 0
     #endif
 #endif
 
@@ -349,7 +349,7 @@
     #ifdef CONFIG_LV_GRADIENT_MAX_STOPS
         #define LV_GRADIENT_MAX_STOPS CONFIG_LV_GRADIENT_MAX_STOPS
     #else
-        #define LV_GRADIENT_MAX_STOPS       2
+        #define LV_GRADIENT_MAX_STOPS 2
     #endif
 #endif
 
@@ -362,7 +362,7 @@
     #ifdef CONFIG_LV_GRAD_CACHE_DEF_SIZE
         #define LV_GRAD_CACHE_DEF_SIZE CONFIG_LV_GRAD_CACHE_DEF_SIZE
     #else
-        #define LV_GRAD_CACHE_DEF_SIZE      0
+        #define LV_GRAD_CACHE_DEF_SIZE 0
     #endif
 #endif
 
@@ -373,7 +373,7 @@
     #ifdef CONFIG_LV_DITHER_GRADIENT
         #define LV_DITHER_GRADIENT CONFIG_LV_DITHER_GRADIENT
     #else
-        #define LV_DITHER_GRADIENT      0
+        #define LV_DITHER_GRADIENT 0
     #endif
 #endif
 #if LV_DITHER_GRADIENT
@@ -384,7 +384,7 @@
         #ifdef CONFIG_LV_DITHER_ERROR_DIFFUSION
             #define LV_DITHER_ERROR_DIFFUSION CONFIG_LV_DITHER_ERROR_DIFFUSION
         #else
-            #define LV_DITHER_ERROR_DIFFUSION   0
+            #define LV_DITHER_ERROR_DIFFUSION 0
         #endif
     #endif
 #endif
@@ -1959,7 +1959,7 @@
         #ifdef CONFIG_LV_FS_STDIO_CACHE_SIZE
             #define LV_FS_STDIO_CACHE_SIZE CONFIG_LV_FS_STDIO_CACHE_SIZE
         #else
-            #define LV_FS_STDIO_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
+            #define LV_FS_STDIO_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
@@ -1991,7 +1991,7 @@
         #ifdef CONFIG_LV_FS_POSIX_CACHE_SIZE
             #define LV_FS_POSIX_CACHE_SIZE CONFIG_LV_FS_POSIX_CACHE_SIZE
         #else
-            #define LV_FS_POSIX_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
+            #define LV_FS_POSIX_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
@@ -2009,7 +2009,7 @@
         #ifdef CONFIG_LV_FS_WIN32_LETTER
             #define LV_FS_WIN32_LETTER CONFIG_LV_FS_WIN32_LETTER
         #else
-            #define LV_FS_WIN32_LETTER  '\0'    /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+            #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
         #endif
     #endif
     #ifndef LV_FS_WIN32_PATH
@@ -2033,7 +2033,7 @@
     #ifdef CONFIG_LV_USE_FS_FATFS
         #define LV_USE_FS_FATFS CONFIG_LV_USE_FS_FATFS
     #else
-        #define LV_USE_FS_FATFS  0
+        #define LV_USE_FS_FATFS 0
     #endif
 #endif
 #if LV_USE_FS_FATFS
@@ -2161,7 +2161,7 @@
     #ifdef CONFIG_LV_USE_FFMPEG
         #define LV_USE_FFMPEG CONFIG_LV_USE_FFMPEG
     #else
-        #define LV_USE_FFMPEG  0
+        #define LV_USE_FFMPEG 0
     #endif
 #endif
 #if LV_USE_FFMPEG
@@ -2193,7 +2193,7 @@
     #ifdef CONFIG_LV_USE_MONKEY
         #define LV_USE_MONKEY CONFIG_LV_USE_MONKEY
     #else
-        #define LV_USE_MONKEY   0
+        #define LV_USE_MONKEY 0
     #endif
 #endif
 
@@ -2202,7 +2202,7 @@
     #ifdef CONFIG_LV_USE_GRIDNAV
         #define LV_USE_GRIDNAV CONFIG_LV_USE_GRIDNAV
     #else
-        #define LV_USE_GRIDNAV  0
+        #define LV_USE_GRIDNAV 0
     #endif
 #endif
 
@@ -2259,7 +2259,7 @@
     #ifdef CONFIG_LV_USE_DEMO_WIDGETS
         #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
     #else
-        #define LV_USE_DEMO_WIDGETS        0
+        #define LV_USE_DEMO_WIDGETS 0
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
@@ -2267,7 +2267,7 @@
     #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
         #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
     #else
-        #define LV_DEMO_WIDGETS_SLIDESHOW  0
+        #define LV_DEMO_WIDGETS_SLIDESHOW 0
     #endif
 #endif
 #endif
@@ -2277,7 +2277,7 @@
     #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
         #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
     #else
-        #define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
+        #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
     #endif
 #endif
 
@@ -2286,7 +2286,7 @@
     #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
         #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
     #else
-        #define LV_USE_DEMO_BENCHMARK   0
+        #define LV_USE_DEMO_BENCHMARK 0
     #endif
 #endif
 
@@ -2295,7 +2295,7 @@
     #ifdef CONFIG_LV_USE_DEMO_STRESS
         #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
     #else
-        #define LV_USE_DEMO_STRESS      0
+        #define LV_USE_DEMO_STRESS 0
     #endif
 #endif
 
@@ -2304,45 +2304,45 @@
     #ifdef CONFIG_LV_USE_DEMO_MUSIC
         #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
     #else
-        #define LV_USE_DEMO_MUSIC       0
+        #define LV_USE_DEMO_MUSIC 0
     #endif
 #endif
 #if LV_USE_DEMO_MUSIC
-#ifndef LV_DEMO_MUSIC_SQUARE
-    #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-        #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-    #else
-        #define LV_DEMO_MUSIC_SQUARE       0
+    #ifndef LV_DEMO_MUSIC_SQUARE
+        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+        #else
+            #define LV_DEMO_MUSIC_SQUARE    0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LANDSCAPE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-        #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-    #else
-        #define LV_DEMO_MUSIC_LANDSCAPE    0
+    #ifndef LV_DEMO_MUSIC_LANDSCAPE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+        #else
+            #define LV_DEMO_MUSIC_LANDSCAPE 0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_ROUND
-    #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-        #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-    #else
-        #define LV_DEMO_MUSIC_ROUND        0
+    #ifndef LV_DEMO_MUSIC_ROUND
+        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+        #else
+            #define LV_DEMO_MUSIC_ROUND     0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LARGE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-        #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-    #else
-        #define LV_DEMO_MUSIC_LARGE        0
+    #ifndef LV_DEMO_MUSIC_LARGE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+        #else
+            #define LV_DEMO_MUSIC_LARGE     0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_AUTO_PLAY
-    #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-        #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-    #else
-        #define LV_DEMO_MUSIC_AUTO_PLAY    0
+    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
+        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+        #else
+            #define LV_DEMO_MUSIC_AUTO_PLAY 0
+        #endif
     #endif
-#endif
 #endif
 
 
