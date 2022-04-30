@@ -214,9 +214,6 @@ menu "LVGL configuration"
         endmenu
 
         menu "GPU"
-            config LV_USE_EXTERNAL_RENDERER
-                bool
-                
             config LV_USE_GPU_ARM2D
                 bool "Enable Arm's 2D image processing library (Arm-2D) for all Cortex-M processors."
                 default n
@@ -263,7 +260,6 @@ menu "LVGL configuration"
 
             config LV_USE_GPU_SDL
                 bool "Use SDL renderer API"
-                select LV_USE_EXTERNAL_RENDERER
                 default n
             config LV_GPU_SDL_INCLUDE_PATH
                 string "include path of SDL header"
