@@ -109,7 +109,7 @@ Starting from v8, every minor release is supported for 1 year.
 | v7.11   | Mar 16, 2021 |Mar 16, 2022 | No     |
 | v8.0    | 1 Jun, 2021  |1 Jun, 2022  | Yes    |
 | v8.1    | 10 Nov, 2021 |10 Nov, 2022 | Yes    |
-| v8.2    | In progress  |             |        |
+| v8.2    | 31 Jan, 2022 |             | Yes    |
 
 
 ## FAQ
@@ -206,7 +206,7 @@ It swaps the upper and lower bytes of the pixels.
 ### How to reduce flash/ROM usage?
 You can disable all the unused features (such as animations, file system, GPU etc.) and object types in *lv_conf.h*.
 
-If you are using GCC you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary.
+If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary.
 
 ### How to reduce the RAM usage
 - Lower the size of the *Display buffer*
