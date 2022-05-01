@@ -107,10 +107,10 @@ Starting from v8, every minor release is supported for 1 year.
 | v5.3    | Feb 1, 2019  |Feb 1, 2020  | No     |
 | v6.1    | Nov 26, 2019 |Nov 26, 2020 | No     |
 | v7.11   | Mar 16, 2021 |Mar 16, 2022 | No     |
-| v8.0    | 1 Jun, 2021  |1 Jun, 2022  | Yes    |
+| v8.0    | 1 Jun, 2021  |1 Jun, 2022  | No     |
 | v8.1    | 10 Nov, 2021 |10 Nov, 2022 | Yes    |
-| v8.2    | 31 Jan, 2022 |             | Yes    |
-
+| v8.2    | 31 Jan, 2022 |31 Jan, 2023 | Yes    |
+| v8.3    | In progress  |             | Yes    |
 
 ## FAQ
 
