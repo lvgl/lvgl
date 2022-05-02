@@ -341,6 +341,13 @@ lv_res_t lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, const lv_area_t * 
     bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
     bool rotation = (dsc->angle != 0);
 
+    if(rotation) {
+        if(dsc->angle != 0 && dsc->angle != 900 && dsc->angle != 1800 && dsc->angle != 2700) {
+            PXP_LOG_TRACE("Rotation angle %d is not supported. PXP can rotate only 90x angle.", dsc->angle);
+            return LV_RES_INV;
+        }
+    }
+
     if(recolor || rotation) {
         if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_has_alpha(cf) && !lv_img_cf_is_chroma_keyed(cf))
             return lv_gpu_nxp_pxp_blit_cover(dest_buf, dest_area, dest_stride, src_buf, src_area, dsc, cf);
@@ -430,35 +437,54 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
                                           const lv_color_t * src_buf, const lv_area_t * src_area,
                                           const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf)
 {
-    int32_t dest_w = lv_area_get_width(dest_area);
-    int32_t dest_h = lv_area_get_height(dest_area);
-    lv_coord_t src_stride = lv_area_get_width(src_area);
+    lv_coord_t dest_w = lv_area_get_width(dest_area);
+    lv_coord_t dest_h = lv_area_get_height(dest_area);
+
     bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+    bool rotation = (dsc->angle != 0);
 
     PXP_Init(LV_GPU_NXP_PXP_ID);
     PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
     PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*block size 16x16 for higher performance*/
 
-    /*Convert rotation angle*/
-    pxp_rotate_degree_t pxp_rot;
-    switch(dsc->angle) {
-        case 0:
-            pxp_rot = kPXP_Rotate0;
-            break;
-        case 900:
-            pxp_rot = kPXP_Rotate90;
-            break;
-        case 1800:
-            pxp_rot = kPXP_Rotate180;
-            break;
-        case 2700:
-            pxp_rot = kPXP_Rotate270;
-            break;
-        default:
-            PXP_LOG_TRACE("Rotation angle %d is not supported. PXP can rotate only 90x angle.", dsc->angle);
+    if(rotation) {
+        /*
+         * PXP is set to process 16x16 blocks to optimize the system for memory
+         * bandwidth and image processing time.
+         * The output engine essentially truncates any output pixels after the
+         * desired number of pixels has been written.
+         * When rotating a source image and the output is not divisible by the block
+         * size, the incorrect pixels could be truncated and the final output image
+         * can look shifted.
+         */
+        if(lv_area_get_width(src_area) % 16 || lv_area_get_height(src_area) % 16) {
+            PXP_LOG_TRACE("Rotation is not supported for image w/o alignment to block size 16x16.");
             return LV_RES_INV;
+        }
+
+        /*Convert rotation angle*/
+        pxp_rotate_degree_t pxp_rot;
+        switch(dsc->angle) {
+            case 0:
+                pxp_rot = kPXP_Rotate0;
+                break;
+            case 900:
+                pxp_rot = kPXP_Rotate90;
+                break;
+            case 1800:
+                pxp_rot = kPXP_Rotate180;
+                break;
+            case 2700:
+                pxp_rot = kPXP_Rotate270;
+                break;
+            default:
+                PXP_LOG_TRACE("Rotation angle %d is not supported. PXP can rotate only 90x angle.", dsc->angle);
+                return LV_RES_INV;
+        }
+        PXP_SetRotateConfig(LV_GPU_NXP_PXP_ID, kPXP_RotateOutputBuffer, pxp_rot, kPXP_FlipDisable);
     }
-    PXP_SetRotateConfig(LV_GPU_NXP_PXP_ID, kPXP_RotateOutputBuffer, pxp_rot, kPXP_FlipDisable);
+
+    lv_coord_t src_stride = lv_area_get_width(src_area);
 
     /*AS buffer - source image*/
     pxp_as_buffer_config_t asBufferConfig = {
@@ -487,24 +513,26 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
     };
     PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
 
-    /*Configure Porter-Duff blending*/
-    pxp_porter_duff_config_t pdConfig = {
-        .enable = 1,
-        .dstColorMode = kPXP_PorterDuffColorWithAlpha,
-        .srcColorMode = kPXP_PorterDuffColorNoAlpha,
-        .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
-        .srcGlobalAlphaMode = lv_img_cf_has_alpha(cf) ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
-        /* srcFactorMode and dstFactorMode are inverted in fsl_pxp.h
-         * srcFactorMode is actually applied on PS alpha value
-         * dstFactorMode is actually applied on AS alpha value */
-        .dstFactorMode = kPXP_PorterDuffFactorStraight,
-        .srcFactorMode = kPXP_PorterDuffFactorInversed,
-        .srcGlobalAlpha = 0xff,
-        .dstGlobalAlpha = recolor ? dsc->recolor_opa : 0x00,
-        .srcAlphaMode = kPXP_PorterDuffAlphaStraight,
-        .dstAlphaMode = kPXP_PorterDuffAlphaStraight /*don't care*/
-    };
-    PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
+    if(recolor || lv_img_cf_has_alpha(cf)) {
+        /*Configure Porter-Duff blending*/
+        pxp_porter_duff_config_t pdConfig = {
+            .enable = 1,
+            .dstColorMode = kPXP_PorterDuffColorWithAlpha,
+            .srcColorMode = kPXP_PorterDuffColorNoAlpha,
+            .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
+            .srcGlobalAlphaMode = lv_img_cf_has_alpha(cf) ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
+            /* srcFactorMode and dstFactorMode are inverted in fsl_pxp.h
+             * srcFactorMode is actually applied on PS alpha value
+             * dstFactorMode is actually applied on AS alpha value */
+            .dstFactorMode = kPXP_PorterDuffFactorStraight,
+            .srcFactorMode = kPXP_PorterDuffFactorInversed,
+            .srcGlobalAlpha = 0xff,
+            .dstGlobalAlpha = recolor ? dsc->recolor_opa : 0x00,
+            .srcAlphaMode = kPXP_PorterDuffAlphaStraight,
+            .dstAlphaMode = kPXP_PorterDuffAlphaStraight /*don't care*/
+        };
+        PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
+    }
 
     lv_gpu_nxp_pxp_run(); /*Start PXP task*/
 
