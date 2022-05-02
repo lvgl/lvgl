@@ -36,7 +36,7 @@ Basically, every modern controller which is able to drive a display is suitable 
   <ul>
     <li> Static RAM usage: ~2 kB depending on the used features and object types</li>
     <li> Stack: &gt; 2kB (&gt; 8 kB is recommended)</li>
-    <li> Dynamic data (heap): &gt; 4 KB (&gt; 32 kB is recommended if using several objects).
+    <li> Dynamic data (heap): &gt; 4 KB (&gt; 48 kB is recommended if using several objects).
 	    Set by <em>LV_MEM_SIZE</em> in <em>lv_conf.h</em>. </li>
     <li> Display buffer:  &gt; <em>"Horizontal resolution"</em> pixels (&gt; 10 &times; <em>"Horizontal resolution"</em> is recommended) </li>
     <li> One frame buffer in the MCU or in an external display controller</li>
@@ -109,8 +109,8 @@ Starting from v8, every minor release is supported for 1 year.
 | v7.11   | Mar 16, 2021 |Mar 16, 2022 | No     |
 | v8.0    | 1 Jun, 2021  |1 Jun, 2022  | Yes    |
 | v8.1    | 10 Nov, 2021 |10 Nov, 2022 | Yes    |
-| v8.2    | In progress  |             |        |
-
+| v8.2    | 31 Jan, 2022 |31 Jan, 2023 | Yes    |
+| v8.3    | In progress  |             |        |
 
 ## FAQ
 
@@ -206,7 +206,7 @@ It swaps the upper and lower bytes of the pixels.
 ### How to reduce flash/ROM usage?
 You can disable all the unused features (such as animations, file system, GPU etc.) and object types in *lv_conf.h*.
 
-If you are using GCC you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary.
+If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG. 
 
 ### How to reduce the RAM usage
 - Lower the size of the *Display buffer*
