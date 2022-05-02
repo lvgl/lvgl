@@ -55,6 +55,13 @@
     #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
 #endif
 
+#if defined (__alpha__) || defined (__ia64__) || defined (__x86_64__) \
+    || defined (_WIN64) || defined (__LP64__) || defined (__LLP64__)
+    #define ALIGN_SIZE 8
+#else
+    #define ALIGN_SIZE 4
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -84,6 +91,8 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
 /**********************
  *      MACROS
  **********************/
+
+#define ROUND_UP(x, align) ((x + (align - 1)) & ~(align - 1))
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -368,8 +377,15 @@ static lv_res_t lv_gpu_nxp_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t *
     lv_coord_t dest_w = lv_area_get_width(dest_area);
     lv_coord_t dest_h = lv_area_get_height(dest_area);
     lv_res_t res;
+    uint32_t size = dest_w * dest_h * sizeof(lv_color_t);
 
-    lv_color_t * tmp_buf = (lv_color_t *)lv_mem_buf_get(dest_w * dest_h * sizeof(lv_color_t));
+    if(ROUND_UP(size, ALIGN_SIZE) >= LV_MEM_SIZE)
+        PXP_RETURN_INV("Insufficient memory for temporary buffer. Please increase LV_MEM_SIZE.");
+
+    lv_color_t * tmp_buf = (lv_color_t *)lv_mem_buf_get(size);
+    if(!tmp_buf)
+        PXP_RETURN_INV("Allocating temporary buffer failed.");
+
     const lv_area_t tmp_area = {
         .x1 = 0,
         .y1 = 0,
