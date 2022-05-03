@@ -12,7 +12,6 @@
 #if LV_USE_GPU_ARM2D
 #include "arm_2d.h"
 #include "__arm_2d_impl.h"
-#include "__arm_2d_direct.h"
 
 /*********************
  *      DEFINES
@@ -43,6 +42,9 @@
 #define __arm_2d_impl_alpha_blending    __arm_2d_impl_rgb565_alpha_blending
 #define __arm_2d_impl_src_msk_copy      __arm_2d_impl_rgb565_src_msk_copy
 #define __arm_2d_impl_src_chn_msk_copy  __arm_2d_impl_rgb565_src_chn_msk_copy
+#define __arm_2d_impl_cl_key_copy       __arm_2d_impl_rgb16_cl_key_copy
+#define __arm_2d_impl_alpha_blending_colour_keying                              \
+    __arm_2d_impl_rgb565_alpha_blending_colour_keying
 #define color_int                       uint16_t
 
 #elif LV_COLOR_DEPTH == 32
@@ -68,6 +70,10 @@
 #define __arm_2d_impl_alpha_blending    __arm_2d_impl_cccn888_alpha_blending
 #define __arm_2d_impl_src_msk_copy      __arm_2d_impl_cccn888_src_msk_copy
 #define __arm_2d_impl_src_chn_msk_copy  __arm_2d_impl_cccn888_src_chn_msk_copy
+#define __arm_2d_impl_cl_key_copy       __arm_2d_impl_rgb32_cl_key_copy
+#define __arm_2d_impl_alpha_blending_colour_keying                              \
+    __arm_2d_impl_cccn888_alpha_blending_colour_keying
+    
 #define color_int                       uint32_t
 
 #else
@@ -763,7 +769,58 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                                           LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 
-        while(blend_area.y1 <= y_last) {
+        if ((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf) || (!transform)) {
+            /* copy with colour keying */
+            
+            /*Go to the first displayed pixel of the map*/
+            int32_t src_stride = lv_area_get_width(coords);
+
+            /*The pixel size in byte is different if an alpha byte is added too*/
+            uint8_t px_size_byte = cf == LV_IMG_CF_TRUE_COLOR_ALPHA ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
+            
+            const uint8_t * src_buf_tmp = src_buf;
+            src_buf_tmp += src_stride * (draw_area.y1 - coords->y1) * px_size_byte;
+            src_buf_tmp += (draw_area.x1 - coords->x1) * px_size_byte;
+            
+            lv_area_t blend_area2;
+            if(!_lv_area_intersect(&blend_area2, &draw_area, draw_ctx->clip_area)) return;
+
+            int32_t w = lv_area_get_width(&blend_area2);
+            int32_t h = lv_area_get_height(&blend_area2);
+
+            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
+            lv_color_t * dest_buf = draw_ctx->buf;
+            dest_buf += dest_stride * (blend_area2.y1 - draw_ctx->buf_area->y1)
+                        + (blend_area2.x1 - draw_ctx->buf_area->x1);
+
+            arm_2d_size_t copy_size = {
+                .iWidth = lv_area_get_width(&blend_area2),
+                .iHeight = lv_area_get_height(&blend_area2),
+            };
+
+            //lv_area_move(&blend_area2, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+            if (blend_dsc.opa >= LV_OPA_MAX) {
+                __arm_2d_impl_cl_key_copy(
+                    (color_int *)src_buf_tmp,
+                    src_stride,
+                    (color_int *)dest_buf,
+                    dest_stride,
+                    &copy_size,
+                    LV_COLOR_CHROMA_KEY.full);
+            }
+            else {
+                __arm_2d_impl_alpha_blending_colour_keying(
+                    (color_int *)src_buf_tmp,
+                    src_stride,
+                    (color_int *)dest_buf,
+                    dest_stride,
+                    &copy_size,
+                    blend_dsc.opa,
+                    LV_COLOR_CHROMA_KEY.full);
+            }
+        }
+        else while(blend_area.y1 <= y_last) {
             /*Apply transformations if any or separate the channels*/
             lv_area_t transform_area;
             lv_area_copy(&transform_area, &blend_area);
@@ -782,6 +839,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 lv_opa_t recolor_opa = draw_dsc->recolor_opa;
                 lv_color_t recolor = draw_dsc->recolor;
                 lv_color_premult(recolor, recolor_opa, premult_v);
+                recolor_opa = 255 - recolor_opa;
                 uint32_t i;
                 for(i = 0; i < buf_size; i++) {
                     rgb_buf[i] = lv_color_mix_premult(premult_v, rgb_buf[i], recolor_opa);
