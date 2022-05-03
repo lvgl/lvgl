@@ -6,12 +6,49 @@
 /*********************
  *      INCLUDES
  *********************/
+#if defined(__clang__)
+#   pragma clang diagnostic ignored "-Wunknown-warning-option"
+#   pragma clang diagnostic ignored "-Wreserved-identifier"
+#   pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#   pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#   pragma clang diagnostic ignored "-Wcast-qual"
+#   pragma clang diagnostic ignored "-Wcast-align"
+#   pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#   pragma clang diagnostic ignored "-Wsign-conversion"
+#   pragma clang diagnostic ignored "-Wunused-function"
+#   pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+#   pragma clang diagnostic ignored "-Wdouble-promotion"
+#   pragma clang diagnostic ignored "-Wunused-parameter"
+#   pragma clang diagnostic ignored "-Wimplicit-float-conversion"
+#   pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+#   pragma clang diagnostic ignored "-Wtautological-pointer-compare"
+#   pragma clang diagnostic ignored "-Wsign-compare"
+#   pragma clang diagnostic ignored "-Wfloat-conversion"
+#   pragma clang diagnostic ignored "-Wmissing-prototypes"
+#   pragma clang diagnostic ignored "-Wpadded"
+#   pragma clang diagnostic ignored "-Wundef"
+#   pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+#   pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+#   pragma clang diagnostic ignored "-Wunused-variable"
+#   pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#endif
+ 
+ 
 #include "lv_gpu_arm2d.h"
 #include "../../core/lv_refr.h"
 
 #if LV_USE_GPU_ARM2D
 #include "arm_2d.h"
 #include "__arm_2d_impl.h"
+
+
+#if defined(__IS_COMPILER_ARM_COMPILER_5__)
+#   pragma diag_suppress 174,177,188,68,513,144,1296
+#elif defined(__IS_COMPILER_IAR__)
+#   pragma diag_suppress=Pa093
+#elif defined(__IS_COMPILER_GCC__)
+#   pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#endif
 
 /*********************
  *      DEFINES
@@ -79,6 +116,39 @@
 #else
 #error The specified LV_COLOR_DEPTH is not supported by this version of lv_gpu_arm2d.c.
 #endif
+
+
+#define __ACCELERATE_PREPARE__()                                                \
+            int32_t src_stride = lv_area_get_width(coords);                     \
+                                                                                \
+            uint8_t px_size_byte = cf == LV_IMG_CF_TRUE_COLOR_ALPHA             \
+                                      ?  LV_IMG_PX_SIZE_ALPHA_BYTE              \
+                                      :  sizeof(lv_color_t);                    \
+                                                                                \
+            const uint8_t * src_buf_tmp = src_buf;                              \
+            src_buf_tmp += src_stride                                           \
+                         * (draw_area.y1 - coords->y1)                          \
+                         * px_size_byte;                                        \
+            src_buf_tmp += (draw_area.x1 - coords->x1) * px_size_byte;          \
+                                                                                \
+            lv_area_t blend_area2;                                              \
+            if(!_lv_area_intersect(&blend_area2,                                \
+                                   &draw_area,                                  \
+                                   draw_ctx->clip_area)) return;                \
+                                                                                \
+            int32_t w = lv_area_get_width(&blend_area2);                        \
+            int32_t h = lv_area_get_height(&blend_area2);                       \
+                                                                                \
+            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);     \
+                                                                                \
+            lv_color_t * dest_buf = draw_ctx->buf;                              \
+            dest_buf += dest_stride * (blend_area2.y1 - draw_ctx->buf_area->y1) \
+                        + (blend_area2.x1 - draw_ctx->buf_area->x1);            \
+                                                                                \
+            arm_2d_size_t copy_size = {                                         \
+                .iWidth = lv_area_get_width(&blend_area2),                      \
+                .iHeight = lv_area_get_height(&blend_area2),                    \
+            }
 
 /**********************
  *      TYPEDEFS
@@ -769,35 +839,10 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                                           LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 
-        if ((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf) || (!transform)) {
+        if ((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf) && (!transform)) {
             /* copy with colour keying */
-            
-            /*Go to the first displayed pixel of the map*/
-            int32_t src_stride = lv_area_get_width(coords);
 
-            /*The pixel size in byte is different if an alpha byte is added too*/
-            uint8_t px_size_byte = cf == LV_IMG_CF_TRUE_COLOR_ALPHA ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
-            
-            const uint8_t * src_buf_tmp = src_buf;
-            src_buf_tmp += src_stride * (draw_area.y1 - coords->y1) * px_size_byte;
-            src_buf_tmp += (draw_area.x1 - coords->x1) * px_size_byte;
-            
-            lv_area_t blend_area2;
-            if(!_lv_area_intersect(&blend_area2, &draw_area, draw_ctx->clip_area)) return;
-
-            int32_t w = lv_area_get_width(&blend_area2);
-            int32_t h = lv_area_get_height(&blend_area2);
-
-            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
-            lv_color_t * dest_buf = draw_ctx->buf;
-            dest_buf += dest_stride * (blend_area2.y1 - draw_ctx->buf_area->y1)
-                        + (blend_area2.x1 - draw_ctx->buf_area->x1);
-
-            arm_2d_size_t copy_size = {
-                .iWidth = lv_area_get_width(&blend_area2),
-                .iHeight = lv_area_get_height(&blend_area2),
-            };
+            __ACCELERATE_PREPARE__();
 
             //lv_area_move(&blend_area2, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
             if (blend_dsc.opa >= LV_OPA_MAX) {
@@ -807,7 +852,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                     (color_int *)dest_buf,
                     dest_stride,
                     &copy_size,
-                    LV_COLOR_CHROMA_KEY.full);
+                    (color_int)LV_COLOR_CHROMA_KEY.full);
             }
             else {
                 __arm_2d_impl_alpha_blending_colour_keying(
@@ -817,8 +862,28 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                     dest_stride,
                     &copy_size,
                     blend_dsc.opa,
-                    LV_COLOR_CHROMA_KEY.full);
+                    (color_int)LV_COLOR_CHROMA_KEY.full);
             }
+        } 
+        else if (   (LV_COLOR_DEPTH == 32)
+             &&     !mask_any
+             &&     !transform
+             &&     (draw_dsc->recolor_opa == LV_OPA_TRANSP)
+             &&     (cf == LV_IMG_CF_TRUE_COLOR_ALPHA)
+             &&     (blend_dsc.opa >= LV_OPA_MAX)) {
+            /* accelerate copy-with-source-masks-and-opacity */
+
+            __ACCELERATE_PREPARE__();
+
+            __arm_2d_impl_src_chn_msk_copy(
+                    (color_int *)src_buf_tmp,
+                    src_stride,
+                    (uint32_t *)((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
+                    src_stride,
+                    &copy_size,
+                    (color_int *)dest_buf,
+                    dest_stride,
+                    &copy_size);
         }
         else while(blend_area.y1 <= y_last) {
             /*Apply transformations if any or separate the channels*/
