@@ -760,6 +760,8 @@ static void generate_report(void)
            "LVGL v%d.%d.%d " LVGL_VERSION_INFO
            " Benchmark (in csv format)\r\n",
            LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
+    LV_LOG("Weighted FPS: %"LV_PRIu32"\r\n", fps_weighted);
+    LV_LOG("Opa. speed: %"LV_PRIu32"%%\r\n", opa_speed_pct);
 
     row++;
     char buf[256];
