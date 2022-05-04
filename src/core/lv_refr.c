@@ -902,7 +902,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
             return;
         }
 
-        int32_t row_cnt;
+        int32_t row_cnt = 0;
         lv_draw_ctx_t * new_draw_ctx = lv_mem_alloc(disp_refr->driver->draw_ctx_size);
         LV_ASSERT_MALLOC(new_draw_ctx);
         if(new_draw_ctx == NULL) {
