@@ -6,13 +6,49 @@
 /*********************
  *      INCLUDES
  *********************/
+#if defined(__clang__)
+    #pragma clang diagnostic ignored "-Wunknown-warning-option"
+    #pragma clang diagnostic ignored "-Wreserved-identifier"
+    #pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+    #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+    #pragma clang diagnostic ignored "-Wcast-qual"
+    #pragma clang diagnostic ignored "-Wcast-align"
+    #pragma clang diagnostic ignored "-Wextra-semi-stmt"
+    #pragma clang diagnostic ignored "-Wsign-conversion"
+    #pragma clang diagnostic ignored "-Wunused-function"
+    #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+    #pragma clang diagnostic ignored "-Wdouble-promotion"
+    #pragma clang diagnostic ignored "-Wunused-parameter"
+    #pragma clang diagnostic ignored "-Wimplicit-float-conversion"
+    #pragma clang diagnostic ignored "-Wimplicit-int-conversion"
+    #pragma clang diagnostic ignored "-Wtautological-pointer-compare"
+    #pragma clang diagnostic ignored "-Wsign-compare"
+    #pragma clang diagnostic ignored "-Wfloat-conversion"
+    #pragma clang diagnostic ignored "-Wmissing-prototypes"
+    #pragma clang diagnostic ignored "-Wpadded"
+    #pragma clang diagnostic ignored "-Wundef"
+    #pragma clang diagnostic ignored "-Wdeclaration-after-statement"
+    #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+    #pragma clang diagnostic ignored "-Wunused-variable"
+    #pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
+
 #include "lv_gpu_arm2d.h"
 #include "../../core/lv_refr.h"
 
 #if LV_USE_GPU_ARM2D
 #include "arm_2d.h"
 #include "__arm_2d_impl.h"
-#include "__arm_2d_direct.h"
+
+
+#if defined(__IS_COMPILER_ARM_COMPILER_5__)
+    #pragma diag_suppress 174,177,188,68,513,144,1296
+#elif defined(__IS_COMPILER_IAR__)
+    #pragma diag_suppress=Pa093
+#elif defined(__IS_COMPILER_GCC__)
+    #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#endif
 
 /*********************
  *      DEFINES
@@ -43,6 +79,9 @@
 #define __arm_2d_impl_alpha_blending    __arm_2d_impl_rgb565_alpha_blending
 #define __arm_2d_impl_src_msk_copy      __arm_2d_impl_rgb565_src_msk_copy
 #define __arm_2d_impl_src_chn_msk_copy  __arm_2d_impl_rgb565_src_chn_msk_copy
+#define __arm_2d_impl_cl_key_copy       __arm_2d_impl_rgb16_cl_key_copy
+#define __arm_2d_impl_alpha_blending_colour_keying                              \
+    __arm_2d_impl_rgb565_alpha_blending_colour_keying
 #define color_int                       uint16_t
 
 #elif LV_COLOR_DEPTH == 32
@@ -68,11 +107,43 @@
 #define __arm_2d_impl_alpha_blending    __arm_2d_impl_cccn888_alpha_blending
 #define __arm_2d_impl_src_msk_copy      __arm_2d_impl_cccn888_src_msk_copy
 #define __arm_2d_impl_src_chn_msk_copy  __arm_2d_impl_cccn888_src_chn_msk_copy
+#define __arm_2d_impl_cl_key_copy       __arm_2d_impl_rgb32_cl_key_copy
+#define __arm_2d_impl_alpha_blending_colour_keying                              \
+    __arm_2d_impl_cccn888_alpha_blending_colour_keying
+
 #define color_int                       uint32_t
 
 #else
 #error The specified LV_COLOR_DEPTH is not supported by this version of lv_gpu_arm2d.c.
 #endif
+
+
+/* *INDENT-OFF* */
+#define __ACCELERATE_PREPARE__()                                                \
+    int32_t src_stride = lv_area_get_width(coords);                             \
+    uint8_t px_size_byte = cf == LV_IMG_CF_TRUE_COLOR_ALPHA                     \
+                           ?  LV_IMG_PX_SIZE_ALPHA_BYTE                         \
+                           :  sizeof(lv_color_t);                               \
+    const uint8_t * src_buf_tmp = src_buf;                                      \
+    src_buf_tmp += src_stride                                                   \
+                   * (draw_area.y1 - coords->y1)                                \
+                   * px_size_byte;                                              \
+    src_buf_tmp += (draw_area.x1 - coords->x1) * px_size_byte;                  \
+    lv_area_t blend_area2;                                                      \
+    if(!_lv_area_intersect(&blend_area2,                                        \
+                           &draw_area,                                          \
+                           draw_ctx->clip_area)) return;                        \
+    int32_t w = lv_area_get_width(&blend_area2);                                \
+    int32_t h = lv_area_get_height(&blend_area2);                               \
+    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);             \
+    lv_color_t * dest_buf = draw_ctx->buf;                                      \
+    dest_buf += dest_stride * (blend_area2.y1 - draw_ctx->buf_area->y1)         \
+                + (blend_area2.x1 - draw_ctx->buf_area->x1);                    \
+    arm_2d_size_t copy_size = {                                                 \
+        .iWidth = lv_area_get_width(&blend_area2),                              \
+        .iHeight = lv_area_get_height(&blend_area2),                            \
+    }
+/* *INDENT-ON* */
 
 /**********************
  *      TYPEDEFS
@@ -763,59 +834,106 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                                           LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 
-        while(blend_area.y1 <= y_last) {
-            /*Apply transformations if any or separate the channels*/
-            lv_area_t transform_area;
-            lv_area_copy(&transform_area, &blend_area);
-            lv_area_move(&transform_area, -coords->x1, -coords->y1);
-            if(transform) {
-                lv_draw_transform(draw_ctx, &transform_area, src_buf, src_w, src_h, src_w,
-                                  draw_dsc, cf, rgb_buf, mask_buf);
+        if((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf) && (!transform)) {
+            /* copy with colour keying */
+
+            __ACCELERATE_PREPARE__();
+
+            //lv_area_move(&blend_area2, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+            if(blend_dsc.opa >= LV_OPA_MAX) {
+                __arm_2d_impl_cl_key_copy(
+                    (color_int *)src_buf_tmp,
+                    src_stride,
+                    (color_int *)dest_buf,
+                    dest_stride,
+                    &copy_size,
+                    (color_int)LV_COLOR_CHROMA_KEY.full);
             }
             else {
-                convert_cb(&transform_area, src_buf, src_w, src_h, src_w, draw_dsc, cf, rgb_buf, mask_buf);
+                __arm_2d_impl_alpha_blending_colour_keying(
+                    (color_int *)src_buf_tmp,
+                    src_stride,
+                    (color_int *)dest_buf,
+                    dest_stride,
+                    &copy_size,
+                    blend_dsc.opa,
+                    (color_int)LV_COLOR_CHROMA_KEY.full);
             }
+        }
+        else if((LV_COLOR_DEPTH == 32)
+                &&     !mask_any
+                &&     !transform
+                && (draw_dsc->recolor_opa == LV_OPA_TRANSP)
+                && (cf == LV_IMG_CF_TRUE_COLOR_ALPHA)
+                && (blend_dsc.opa >= LV_OPA_MAX)) {
+            /* accelerate copy-with-source-masks-and-opacity */
 
-            /*Apply recolor*/
-            if(draw_dsc->recolor_opa > LV_OPA_MIN) {
-                uint16_t premult_v[3];
-                lv_opa_t recolor_opa = draw_dsc->recolor_opa;
-                lv_color_t recolor = draw_dsc->recolor;
-                lv_color_premult(recolor, recolor_opa, premult_v);
-                uint32_t i;
-                for(i = 0; i < buf_size; i++) {
-                    rgb_buf[i] = lv_color_mix_premult(premult_v, rgb_buf[i], recolor_opa);
+            __ACCELERATE_PREPARE__();
+
+            __arm_2d_impl_src_chn_msk_copy(
+                (color_int *)src_buf_tmp,
+                src_stride,
+                (uint32_t *)((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
+                src_stride,
+                &copy_size,
+                (color_int *)dest_buf,
+                dest_stride,
+                &copy_size);
+        }
+        else while(blend_area.y1 <= y_last) {
+                /*Apply transformations if any or separate the channels*/
+                lv_area_t transform_area;
+                lv_area_copy(&transform_area, &blend_area);
+                lv_area_move(&transform_area, -coords->x1, -coords->y1);
+                if(transform) {
+                    lv_draw_transform(draw_ctx, &transform_area, src_buf, src_w, src_h, src_w,
+                                      draw_dsc, cf, rgb_buf, mask_buf);
                 }
-            }
+                else {
+                    convert_cb(&transform_area, src_buf, src_w, src_h, src_w, draw_dsc, cf, rgb_buf, mask_buf);
+                }
+
+                /*Apply recolor*/
+                if(draw_dsc->recolor_opa > LV_OPA_MIN) {
+                    uint16_t premult_v[3];
+                    lv_opa_t recolor_opa = draw_dsc->recolor_opa;
+                    lv_color_t recolor = draw_dsc->recolor;
+                    lv_color_premult(recolor, recolor_opa, premult_v);
+                    recolor_opa = 255 - recolor_opa;
+                    uint32_t i;
+                    for(i = 0; i < buf_size; i++) {
+                        rgb_buf[i] = lv_color_mix_premult(premult_v, rgb_buf[i], recolor_opa);
+                    }
+                }
 #if LV_DRAW_COMPLEX
-            /*Apply the masks if any*/
-            if(mask_any) {
-                lv_coord_t y;
-                lv_opa_t * mask_buf_tmp = mask_buf;
-                for(y = blend_area.y1; y <= blend_area.y2; y++) {
-                    lv_draw_mask_res_t mask_res_line;
-                    mask_res_line = lv_draw_mask_apply(mask_buf_tmp, blend_area.x1, y, blend_w);
+                /*Apply the masks if any*/
+                if(mask_any) {
+                    lv_coord_t y;
+                    lv_opa_t * mask_buf_tmp = mask_buf;
+                    for(y = blend_area.y1; y <= blend_area.y2; y++) {
+                        lv_draw_mask_res_t mask_res_line;
+                        mask_res_line = lv_draw_mask_apply(mask_buf_tmp, blend_area.x1, y, blend_w);
 
-                    if(mask_res_line == LV_DRAW_MASK_RES_TRANSP) {
-                        lv_memset_00(mask_buf_tmp, blend_w);
-                        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                        if(mask_res_line == LV_DRAW_MASK_RES_TRANSP) {
+                            lv_memset_00(mask_buf_tmp, blend_w);
+                            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                        }
+                        else if(mask_res_line == LV_DRAW_MASK_RES_CHANGED) {
+                            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                        }
+                        mask_buf_tmp += blend_w;
                     }
-                    else if(mask_res_line == LV_DRAW_MASK_RES_CHANGED) {
-                        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-                    }
-                    mask_buf_tmp += blend_w;
                 }
-            }
 #endif
 
-            /*Blend*/
-            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                /*Blend*/
+                lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
-            /*Go the the next lines*/
-            blend_area.y1 = blend_area.y2 + 1;
-            blend_area.y2 = blend_area.y1 + buf_h - 1;
-            if(blend_area.y2 > y_last) blend_area.y2 = y_last;
-        }
+                /*Go the the next lines*/
+                blend_area.y1 = blend_area.y2 + 1;
+                blend_area.y2 = blend_area.y1 + buf_h - 1;
+                if(blend_area.y2 > y_last) blend_area.y2 = y_last;
+            }
 
         lv_mem_buf_release(mask_buf);
         lv_mem_buf_release(rgb_buf);
