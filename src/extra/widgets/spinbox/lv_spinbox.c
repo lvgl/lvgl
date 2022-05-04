@@ -157,7 +157,7 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max)
  * @param spinbox pointer to spinbox
  * @param pos selected position in spinbox
  */
-void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos)
+void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint8_t pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
