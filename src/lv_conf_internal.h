@@ -1345,18 +1345,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_ANIMIMG
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ANIMIMG
-            #define LV_USE_ANIMIMG CONFIG_LV_USE_ANIMIMG
-        #else
-            #define LV_USE_ANIMIMG 0
-        #endif
-    #else
-        #define LV_USE_ANIMIMG    1
-    #endif
-#endif
-
 #ifndef LV_USE_BAR
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_BAR
@@ -1574,6 +1562,18 @@
 /*-----------
  * Widgets
  *----------*/
+#ifndef LV_USE_ANIMIMG
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ANIMIMG
+            #define LV_USE_ANIMIMG CONFIG_LV_USE_ANIMIMG
+        #else
+            #define LV_USE_ANIMIMG 0
+        #endif
+    #else
+        #define LV_USE_ANIMIMG    1
+    #endif
+#endif
+
 #ifndef LV_USE_CALENDAR
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CALENDAR
@@ -1750,6 +1750,28 @@
     #endif
 #endif
 
+#ifndef LV_USE_SPAN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SPAN
+            #define LV_USE_SPAN CONFIG_LV_USE_SPAN
+        #else
+            #define LV_USE_SPAN 0
+        #endif
+    #else
+        #define LV_USE_SPAN       1
+    #endif
+#endif
+#if LV_USE_SPAN
+    /*A line text can contain maximum num of span descriptor */
+    #ifndef LV_SPAN_SNIPPET_STACK_SIZE
+        #ifdef CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
+            #define LV_SPAN_SNIPPET_STACK_SIZE CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
+        #else
+            #define LV_SPAN_SNIPPET_STACK_SIZE 64
+        #endif
+    #endif
+#endif
+
 #ifndef LV_USE_SPINBOX
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SPINBOX
@@ -1807,28 +1829,6 @@
         #endif
     #else
         #define LV_USE_WIN        1
-    #endif
-#endif
-
-#ifndef LV_USE_SPAN
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SPAN
-            #define LV_USE_SPAN CONFIG_LV_USE_SPAN
-        #else
-            #define LV_USE_SPAN 0
-        #endif
-    #else
-        #define LV_USE_SPAN       1
-    #endif
-#endif
-#if LV_USE_SPAN
-    /*A line text can contain maximum num of span descriptor */
-    #ifndef LV_SPAN_SNIPPET_STACK_SIZE
-        #ifdef CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
-            #define LV_SPAN_SNIPPET_STACK_SIZE CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
-        #else
-            #define LV_SPAN_SNIPPET_STACK_SIZE 64
-        #endif
     #endif
 #endif
 
