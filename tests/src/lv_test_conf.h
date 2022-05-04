@@ -20,6 +20,9 @@ extern "C" {
  *      DEFINES
  *********************/
 
+void lv_test_assert_fail(void);
+#define LV_ASSERT_HANDLER lv_test_assert_fail();
+
 /**********************
  *      TYPEDEFS
  **********************/
