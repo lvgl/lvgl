@@ -118,6 +118,7 @@
 #endif
 
 
+/* *INDENT-OFF* */
 #define __ACCELERATE_PREPARE__()                                                \
     int32_t src_stride = lv_area_get_width(coords);                             \
     uint8_t px_size_byte = cf == LV_IMG_CF_TRUE_COLOR_ALPHA                     \
@@ -142,6 +143,7 @@
         .iWidth = lv_area_get_width(&blend_area2),                              \
         .iHeight = lv_area_get_height(&blend_area2),                            \
     }
+/* *INDENT-ON* */
 
 /**********************
  *      TYPEDEFS
