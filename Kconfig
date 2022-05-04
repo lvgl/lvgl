@@ -390,7 +390,7 @@ menu "LVGL configuration"
                     bool "Left middle"
                 config LV_PERF_MONITOR_ALIGN_RIGHT_MID
                     bool "Right middle"
-                config LV_PERF_MONITOR_ALIGN_BOTTOM_CENTER
+                config LV_PERF_MONITOR_ALIGN_CENTER
                     bool "Center"
             endchoice
 
@@ -419,7 +419,7 @@ menu "LVGL configuration"
                     bool "Left middle"
                 config LV_MEM_MONITOR_ALIGN_RIGHT_MID
                     bool "Right middle"
-                config LV_MEM_MONITOR_ALIGN_BOTTOM_CENTER
+                config LV_MEM_MONITOR_ALIGN_CENTER
                     bool "Center"
             endchoice
 
