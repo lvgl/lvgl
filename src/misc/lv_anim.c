@@ -78,6 +78,11 @@ void lv_anim_set_refr_period(uint32_t period)
     lv_timer_set_period(_lv_anim_tmr, period);
 }
 
+uint32_t lv_anim_get_refr_period(void)
+{
+    return _lv_anim_tmr->period;
+}
+
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
     TRACE_ANIM("begin");
