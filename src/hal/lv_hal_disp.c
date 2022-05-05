@@ -331,9 +331,24 @@ void lv_disp_set_default(lv_disp_t * disp)
 void lv_disp_set_refr_period(lv_disp_t * disp, uint32_t period)
 {
     if(!disp->refr_timer) {
+        LV_LOG_WARN("disp->refr_timer is NULL");
         return;
     }
     lv_timer_set_period(disp->refr_timer, period);
+}
+
+/**
+ * Get display refresh period.
+ * @param disp pointer to a display
+ * @return display refresh period
+ */
+uint32_t lv_disp_get_refr_period(lv_disp_t * disp)
+{
+    if(!disp->refr_timer) {
+        LV_LOG_WARN("disp->refr_timer is NULL");
+        return LV_DISP_DEF_REFR_PERIOD;
+    }
+    return disp->refr_timer->period;
 }
 
 /**

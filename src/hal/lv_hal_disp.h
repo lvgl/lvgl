@@ -256,6 +256,13 @@ void lv_disp_set_default(lv_disp_t * disp);
 void lv_disp_set_refr_period(lv_disp_t * disp, uint32_t period);
 
 /**
+ * Get display refresh period.
+ * @param disp pointer to a display
+ * @return display refresh period
+ */
+uint32_t lv_disp_get_refr_period(lv_disp_t * disp);
+
+/**
  * Get the default display
  * @return pointer to the default display
  */
