@@ -249,6 +249,13 @@ void lv_disp_remove(lv_disp_t * disp);
 void lv_disp_set_default(lv_disp_t * disp);
 
 /**
+ * Set display refresh period.
+ * @param disp pointer to a display
+ * @param period display refresh period in ms unit
+ */
+void lv_disp_set_refr_period(lv_disp_t * disp, uint32_t period);
+
+/**
  * Get the default display
  * @return pointer to the default display
  */
