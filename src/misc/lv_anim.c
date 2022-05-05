@@ -73,6 +73,11 @@ void lv_anim_init(lv_anim_t * a)
     a->early_apply = 1;
 }
 
+void lv_anim_set_refr_period(uint32_t period)
+{
+    lv_timer_set_period(_lv_anim_tmr, period);
+}
+
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
     TRACE_ANIM("begin");

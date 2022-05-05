@@ -114,6 +114,12 @@ void _lv_anim_core_init(void);
 void lv_anim_init(lv_anim_t * a);
 
 /**
+ * Set global animation refresh period.
+ * @param period animate refresh period in ms unit
+ */
+void lv_anim_set_refr_period(uint32_t period);
+
+/**
  * Set a variable to animate
  * @param a     pointer to an initialized `lv_anim_t` variable
  * @param var   pointer to a variable to animate
