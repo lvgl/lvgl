@@ -246,7 +246,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     if(cf == LV_IMG_CF_ALPHA_8BIT) {
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE || draw_dsc->recolor_opa != LV_OPA_TRANSP) {
             /* resume normal method */
-            cf = LV_IMG_CF_TRUE_COLOR;
+            cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
             cdsc->dec_dsc.img_data = NULL;
         }
     }
