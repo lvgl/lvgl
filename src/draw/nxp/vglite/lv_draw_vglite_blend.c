@@ -51,9 +51,10 @@
 #define VG_LITE_BLIT_SPLIT_ENABLED 0
 #endif
 
-/* BLIT split threshold - BLITs with width or height higher than this value will be done
+/**
+ * BLIT split threshold - BLITs with width or height higher than this value will be done
  * in multiple steps. Value must be 16-aligned. Don't change.
- * */
+ */
 #define LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR 352
 
 
@@ -65,12 +66,57 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/**
+ * BLock Image Transfer - single direct BLIT.
+ *
+ * @param[in] blit Description of the transfer
+ * @retval LV_RES_OK Transfer complete
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ */
 static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * blit);
+
 #if VG_LITE_BLIT_SPLIT_ENABLED
+
+    /**
+    * Move buffer pointer as close as possible to area, but with respect to alignment requirements. X-axis only.
+    *
+    * @param[in,out] area Area to be updated
+    * @param[in,out] buf Pointer to be updated
+    */
     static void _align_x(lv_area_t * area, lv_color_t ** buf);
+
+    /**
+    * Move buffer pointer to the area start and update variables, Y-axis only.
+    *
+    * @param[in,out] area Area to be updated
+    * @param[in,out] buf Pointer to be updated
+    * @param[in] stridePx Buffer stride in pixels
+    */
     static void _align_y(lv_area_t * area, lv_color_t ** buf, uint32_t stridePx);
+
+    /**
+    * Software BLIT as a fall-back scenario.
+    *
+    * @param[in] blit BLIT configuration
+    */
     static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
+
+    /**
+    * Verify BLIT structure - widths, stride, pointer alignment
+    *
+    * @param[in] blit BLIT configuration
+    * @retval LV_RES_OK
+    * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+    */
     static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
+
+    /**
+    * BLock Image Transfer - split BLIT.
+    *
+    * @param[in] blit BLIT configuration
+    * @retval LV_RES_OK Transfer complete
+    * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+    */
     static lv_res_t _lv_gpu_nxp_vglite_blit_split(lv_gpu_nxp_vglite_blit_info_t * blit);
 #endif
 
@@ -86,17 +132,6 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
  *   GLOBAL FUNCTIONS
  **********************/
 
-/***
- * Fill area, with optional opacity.
- * @param[in/out] dest_buf Destination buffer pointer (must be aligned on 32 bytes)
- * @param[in] dest_width Destination buffer width in pixels (must be aligned on 16 px)
- * @param[in] dest_height Destination buffer height in pixels
- * @param[in] fill_area Area to be filled
- * @param[in] color Fill color
- * @param[in] opa Opacity (255 = full, 128 = 50% background/50% color, 0 = no fill)
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- */
 lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
                                 const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa)
 {
@@ -194,12 +229,6 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
     return LV_RES_OK;
 }
 
-/***
- * BLock Image Transfer.
- * @param[in] blit Description of the transfer
- * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- */
 lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
     uint32_t dest_size = lv_area_get_size(&blit->dst_area);
@@ -221,12 +250,6 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
     return _lv_gpu_nxp_vglite_blit_single(blit);
 }
 
-/***
- * BLock Image Transfer.
- * @param[in] blit Description of the transfer
- * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- */
 lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
     uint32_t dest_size = lv_area_get_size(&blit->dst_area);
@@ -248,12 +271,6 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_gpu_nxp_vglite_blit_info_t * blit)
  **********************/
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
-/***
- * BLock Image Transfer - split BLIT.
- * @param[in] blit Description of the transfer
- * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- */
 static lv_res_t _lv_gpu_nxp_vglite_blit_split(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
     lv_res_t rv = LV_RES_INV;
@@ -417,12 +434,6 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_split(lv_gpu_nxp_vglite_blit_info_t * bl
 }
 #endif /* VG_LITE_BLIT_SPLIT_ENABLED */
 
-/***
- * BLock Image Transfer - single direct BLIT.
- * @param[in] blit Description of the transfer
- * @retval LV_RES_OK Transfer complete
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
- */
 static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
     vg_lite_buffer_t src_vgbuf, dst_vgbuf;
@@ -494,10 +505,6 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
 
-/**
- * Software BLIT as a fall-back scenario
- * @param[in] blit BLIT configuration
- */
 static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
     int x, y;
@@ -531,11 +538,6 @@ static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
     }
 }
 
-/**
- * Verify BLIT structure - widths, stride, pointer alignment
- * @param[in] blit
- * @return
- */
 static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
 
@@ -572,11 +574,6 @@ static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * bl
     return LV_RES_OK;
 }
 
-/***
- * Move buffer pointer as close as possible to area, but with respect to alignment requirements. X-axis only.
- * @param[in,out] area Area to be updated
- * @param[in,out] buf Pointer to be updated
- */
 static void _align_x(lv_area_t * area, lv_color_t ** buf)
 {
 
@@ -588,12 +585,6 @@ static void _align_x(lv_area_t * area, lv_color_t ** buf)
     *buf += alignedAreaStartPx;
 }
 
-/***
- * Move buffer pointer to the area start and update variables, Y-axis only.
- * @param[in,out] area Area to be updated
- * @param[in,out] buf Pointer to be updated
- * @param[in] stridePx Buffer stride in pixels
- */
 static void _align_y(lv_area_t * area, lv_color_t ** buf, uint32_t stridePx)
 {
     int LineToAlignMem;

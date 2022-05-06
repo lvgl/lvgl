@@ -94,8 +94,9 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/***
+/**
  * Fills vg_lite_buffer_t structure according given parameters.
+ *
  * @param[in/out] vgbuf Buffer structure to be filled
  * @param[in] width Width of buffer in pixels
  * @param[in] height Height of buffer in pixels
@@ -107,8 +108,17 @@ lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t h
                             const lv_color_t * ptr, bool source);
 
 #if BLIT_DBG_AREAS
+/**
+ * Draw a simple rectangle, 1 px line width.
+ *
+ * @param dest_buf Destination buffer
+ * @param dest_width Destination buffer width (must be aligned on 16px)
+ * @param dest_height Destination buffer height
+ * @param fill_area Rectangle coordinates
+ * @param color Rectangle color
+ */
 void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
-                                  lv_area_t * fill_area, lv_color_t color)
+                                  lv_area_t * fill_area, lv_color_t color);
 #endif
 
 /**

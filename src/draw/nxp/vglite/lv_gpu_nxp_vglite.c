@@ -68,15 +68,6 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/***
- * Fills vg_lite_buffer_t structure according given parameters.
- * @param[in/out] vgbuf Buffer structure to be filled
- * @param[in] width Width of buffer in pixels
- * @param[in] height Height of buffer in pixels
- * @param[in] stride Stride of the buffer in bytes
- * @param[in] ptr Pointer to the buffer (must be aligned according VG-Lite requirements)
- * @param[in] source Boolean to check if this is a source buffer
- */
 lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t height, uint32_t stride,
                             const lv_color_t * ptr, bool source)
 {
@@ -109,18 +100,9 @@ lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t h
 }
 
 #if BLIT_DBG_AREAS
-/***
- * Draws a simple rectangle, 1 px line width.
- * @param dest_buf Destination buffer
- * @param dest_width Destination buffer width (must be aligned on 16px)
- * @param dest_height Destination buffer height
- * @param fill_area Rectangle coordinates
- * @param color Rectangle color
- */
 void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
                                   lv_area_t * fill_area, lv_color_t color)
 {
-
     lv_area_t a;
 
     /* top line */
@@ -154,9 +136,6 @@ void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, 
 }
 #endif /* BLIT_DBG_AREAS */
 
-/**
- * Clean & invalidate cache.
- */
 void lv_vglite_invalidate_cache(void)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();

@@ -103,8 +103,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-/***
+/**
  * Fill area, with optional opacity.
+ *
  * @param[in/out] dest_buf Destination buffer pointer (must be aligned on 32 bytes)
  * @param[in] dest_width Destination buffer width in pixels (must be aligned on 16 px)
  * @param[in] dest_height Destination buffer height in pixels
@@ -117,16 +118,18 @@ typedef struct {
 lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
                                 const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa);
 
-/***
+/**
  * BLock Image Transfer.
+ *
  * @param[in] blit Description of the transfer
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
 lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
 
-/***
- * BLock Image Transfer.
+/**
+ * BLock Image Transfer with transformation.
+ *
  * @param[in] blit Description of the transfer
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)

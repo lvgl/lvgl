@@ -70,15 +70,59 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/**
+ * BLock Image Transfer - copy rectangular image from src buffer to dst buffer
+ * with combination of transformation (rotation, scale, recolor) and opacity, alpha channel
+ * or color keying. This requires two steps. First step is used for transformation into
+ * a temporary buffer and the second one will handle the color format or opacity.
+ *
+ * @param[in/out] dest_buf destination buffer
+ * @param[in] dest_area area to be copied from src_buf to dst_buf
+ * @param[in] dest_stride width (stride) of destination buffer in pixels
+ * @param[in] src_buf source buffer
+ * @param[in] src_area source area with absolute coordinates to draw on destination buffer
+ * @param[in] dsc image descriptor
+ * @param[in] cf color format
+ * @retval LV_RES_OK Fill completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
+ */
 static lv_res_t lv_gpu_nxp_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                         const lv_color_t * src_buf, const lv_area_t * src_area,
                                         const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf);
 
+/**
+ * BLock Image Transfer - copy rectangular image from src buffer to dst buffer
+ * with transformation and full opacity.
+ *
+ * @param[in/out] dest_buf destination buffer
+ * @param[in] dest_area area to be copied from src_buf to dst_buf
+ * @param[in] dest_stride width (stride) of destination buffer in pixels
+ * @param[in] src_buf source buffer
+ * @param[in] src_area source area with absolute coordinates to draw on destination buffer
+ * @param[in] dsc image descriptor
+ * @param[in] cf color format
+ * @retval LV_RES_OK Fill completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
+ */
 static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                           lv_coord_t dest_stride,
                                           const lv_color_t * src_buf, const lv_area_t * src_area,
                                           const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf);
 
+/**
+ * BLock Image Transfer - copy rectangular image from src buffer to dst buffer
+ * without transformation but handling color format or opacity.
+ *
+ * @param[in/out] dest_buf destination buffer
+ * @param[in] dest_area area to be copied from src_buf to dst_buf
+ * @param[in] dest_stride width (stride) of destination buffer in pixels
+ * @param[in] src_buf source buffer
+ * @param[in] src_area source area with absolute coordinates to draw on destination buffer
+ * @param[in] dsc image descriptor
+ * @param[in] cf color format
+ * @retval LV_RES_OK Fill completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
+ */
 static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                        lv_coord_t dest_stride,
                                        const lv_color_t * src_buf, const lv_area_t * src_area,
@@ -98,17 +142,6 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Fill area, with optional opacity.
- *
- * @param[in/out] dest_buf destination buffer
- * @param[in] dest_stride width (stride) of destination buffer in pixels
- * @param[in] fill_area area to fill
- * @param[in] color color
- * @param[in] opa transparency of the color
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
- */
 lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
                              lv_color_t color, lv_opa_t opa)
 {
@@ -189,21 +222,6 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
     return LV_RES_OK;
 }
 
-/**
- * @brief BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
- *
- * By default, image is copied directly, with optional opacity configured by \p opa.
- *
- * @param[in/out] dest_buf destination buffer
- * @param[in] dest_area destination area
- * @param[in] dest_stride width (stride) of destination buffer in pixels
- * @param[in] src_buf source buffer
- * @param[in] src_area source area with absolute coordinates to draw on destination buffer
- * @param[in] opa opacity of the result
- * @param[in] angle display rotation angle (90x)
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
- */
 lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                              const lv_color_t * src_buf, const lv_area_t * src_area, lv_opa_t opa, lv_disp_rot_t angle)
 {
@@ -306,19 +324,6 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
     return LV_RES_OK;
 }
 
-/**
- * @brief BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
- *
- * @param[in/out] dest_buf destination buffer
- * @param[in] dest_area destination area
- * @param[in] dest_stride width (stride) of destination buffer in pixels
- * @param[in] src_buf source buffer
- * @param[in] src_area source area with absolute coordinates to draw on destination buffer
- * @param[in] dsc image descriptor
- * @param[in] cf color format
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
- */
 lv_res_t lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                        const lv_color_t * src_buf, const lv_area_t * src_area,
                                        const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf)
@@ -363,20 +368,6 @@ lv_res_t lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, const lv_area_t * 
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * @brief BLock Image Transfer - copy rectangular image from src buffer to dst buffer
- * with transformation and opacity or alpha channel. This requires two steps.
- *
- * @param[in/out] dest_buf destination buffer
- * @param[in] dest_area area to be copied from src_buf to dst_buf
- * @param[in] dest_stride width (stride) of destination buffer in pixels
- * @param[in] src_buf source buffer
- * @param[in] src_area source area with absolute coordinates to draw on destination buffer
- * @param[in] dsc image descriptor
- * @param[in] cf color format
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
- */
 static lv_res_t lv_gpu_nxp_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                         const lv_color_t * src_buf, const lv_area_t * src_area,
                                         const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf)
@@ -418,20 +409,6 @@ static lv_res_t lv_gpu_nxp_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t *
     return res;
 }
 
-/**
- * @brief BLock Image Transfer - copy rectangular image from src buffer to dst buffer
- * with transformation and full opacity.
- *
- * @param[in/out] dest_buf destination buffer
- * @param[in] dest_area area to be copied from src_buf to dst_buf
- * @param[in] dest_stride width (stride) of destination buffer in pixels
- * @param[in] src_buf source buffer
- * @param[in] src_area source area with absolute coordinates to draw on destination buffer
- * @param[in] dsc image descriptor
- * @param[in] cf color format
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
- */
 static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                           lv_coord_t dest_stride,
                                           const lv_color_t * src_buf, const lv_area_t * src_area,
@@ -539,20 +516,6 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
     return LV_RES_OK;
 }
 
-/**
- * @brief BLock Image Transfer - copy rectangular image from src buffer to dst buffer
- * without transformation but with opacity.
- *
- * @param[in/out] dest_buf destination buffer
- * @param[in] dest_area area to be copied from src_buf to dst_buf
- * @param[in] dest_stride width (stride) of destination buffer in pixels
- * @param[in] src_buf source buffer
- * @param[in] src_area source area with absolute coordinates to draw on destination buffer
- * @param[in] dsc image descriptor
- * @param[in] cf color format
- * @retval LV_RES_OK Fill completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
- */
 static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * dest_area,
                                        lv_coord_t dest_stride,
                                        const lv_color_t * src_buf, const lv_area_t * src_area,

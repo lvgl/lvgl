@@ -55,8 +55,9 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/***
+/**
  * Draw rectangle shape with effects (rounded corners, gradient)
+ *
  * @param draw_ctx drawing context
  * @param dsc description of the rectangle
  * @param coords the area where rectangle is clipped

@@ -54,8 +54,19 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/**
+ * PXP interrupt initialization.
+ */
 static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void);
+
+/**
+ * PXP interrupt de-initialization.
+ */
 static void _lv_gpu_nxp_pxp_interrupt_deinit(void);
+
+/**
+ * Start the PXP job and wait for task completion.
+ */
 static void _lv_gpu_nxp_pxp_run(void);
 
 /**********************
@@ -82,9 +93,6 @@ static lv_nxp_pxp_cfg_t pxp_default_cfg = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * PXP device interrupt handler. Used to check PXP task completion status.
- */
 void PXP_IRQHandler(void)
 {
 #if defined(SDK_OS_FREE_RTOS)
@@ -111,9 +119,6 @@ lv_nxp_pxp_cfg_t * lv_gpu_nxp_pxp_get_cfg(void)
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * PXP interrupt initialization.
- */
 static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void)
 {
 #if defined(SDK_OS_FREE_RTOS)
@@ -131,9 +136,6 @@ static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void)
     return LV_RES_OK;
 }
 
-/**
- * PXP interrupt de-initialization.
- */
 static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
 {
     NVIC_DisableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
@@ -142,9 +144,6 @@ static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
 #endif
 }
 
-/**
- * Function to start PXP job. This function must wait for task complete.
- */
 static void _lv_gpu_nxp_pxp_run(void)
 {
 #if !defined(SDK_OS_FREE_RTOS)

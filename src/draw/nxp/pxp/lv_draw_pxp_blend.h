@@ -96,9 +96,9 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
                              lv_color_t color, lv_opa_t opa);
 
 /**
- * @brief BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
- *
- * By default, image is copied directly, with optional opacity configured by \p opa.
+ * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
+ * By default, image is copied directly, with optional opacity. This function can also
+ * rotate the display output buffer to a specified angle (90x step).
  *
  * @param[in/out] dest_buf destination buffer
  * @param[in] dest_area destination area
@@ -114,7 +114,7 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
                              const lv_color_t * src_buf, const lv_area_t * src_area, lv_opa_t opa, lv_disp_rot_t angle);
 
 /**
- * @brief BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
+ * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
  *
  *
  * @param[in/out] dest_buf destination buffer

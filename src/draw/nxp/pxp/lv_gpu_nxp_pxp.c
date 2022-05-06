@@ -49,6 +49,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/**
+ * Clean & invalidate cache.
+ */
 static void invalidate_cache(void);
 
 /**********************
@@ -65,13 +68,6 @@ static lv_nxp_pxp_cfg_t * pxp_cfg;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Reset and initialize PXP device. This function should be called as a part
- * of display init sequence.
- *
- * @retval LV_RES_OK PXP init completed
- * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
- */
 lv_res_t lv_gpu_nxp_pxp_init(void)
 {
     pxp_cfg = lv_gpu_nxp_pxp_get_cfg();
@@ -91,9 +87,6 @@ lv_res_t lv_gpu_nxp_pxp_init(void)
     return LV_RES_OK;
 }
 
-/**
- * Disable PXP device. Should be called during display deinit sequence.
- */
 void lv_gpu_nxp_pxp_deinit(void)
 {
     pxp_cfg->pxp_interrupt_deinit();
@@ -101,9 +94,6 @@ void lv_gpu_nxp_pxp_deinit(void)
     PXP_Deinit(LV_GPU_NXP_PXP_ID);
 }
 
-/**
- * Start PXP job and wait for completion.
- */
 void lv_gpu_nxp_pxp_run(void)
 {
     /*Clean & invalidate cache*/
@@ -116,9 +106,6 @@ void lv_gpu_nxp_pxp_run(void)
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * Clean & invalidate cache.
- */
 static void invalidate_cache(void)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();

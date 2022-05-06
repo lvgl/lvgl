@@ -271,8 +271,9 @@ static void copy_arc(vg_arc * dst, vg_arc * src)
     dst->p3y = src->p3y;
 }
 
-/* Rotate the point according given rotation angle
- * rotation center is 0,0 */
+/**
+ * Rotate the point according given rotation angle rotation center is 0,0
+ */
 static void rotate_point(int32_t angle, int32_t * x, int32_t * y)
 {
     int32_t ori_x = *x;
@@ -282,13 +283,14 @@ static void rotate_point(int32_t angle, int32_t * x, int32_t * y)
     *y = ((lv_trigo_sin(alpha) * ori_x) / LV_TRIGO_SIN_MAX) + ((lv_trigo_cos(alpha) * ori_y) / LV_TRIGO_SIN_MAX);
 }
 
-/* Set full arc control points depending on quarter.
+/**
+ * Set full arc control points depending on quarter.
  * Control points match the best approximation of a circle.
  * Arc Quarter position is:
  * Q2 | Q3
  * ---+---
  * Q1 | Q0
- **/
+ */
 static void set_full_arc(vg_arc * fullarc)
 {
     /* the tangent lenght for the bezier circle approx */
@@ -344,16 +346,19 @@ static void set_full_arc(vg_arc * fullarc)
     }
 }
 
-/* linear interpolation between two points 'a' and 'b'
+/**
+ * Linear interpolation between two points 'a' and 'b'
  * 't' parameter is the proportion ratio expressed in range [0 ; T_FRACTION ]
- **/
+ */
 static inline float lerp(float coord_a, float coord_b, uint16_t t)
 {
     float tf = (float)t;
     return ((T_FRACTION - tf) * coord_a + tf * coord_b) / T_FRACTION;
 }
 
-/* computes a point of bezier curve given 't' param */
+/**
+ * Computes a point of bezier curve given 't' param
+ */
 static inline float comp_bezier_point(float t, cubic_cont_pt cp)
 {
     float t_sq = t * t;
@@ -363,11 +368,13 @@ static inline float comp_bezier_point(float t, cubic_cont_pt cp)
     return apt;
 }
 
-/* find parameter 't' in curve at point 'pt'
+/**
+ * Find parameter 't' in curve at point 'pt'
  * proceed by dichotomy on only 1 dimension,
  * works only if the curve is monotonic
  * bezier curve is defined by control points [p0 p1 p2 p3]
- * 'dec' tells if curve is decreasing (true) or increasing (false) */
+ * 'dec' tells if curve is decreasing (true) or increasing (false)
+ */
 static uint16_t get_bez_t_from_pos(float pt, cubic_cont_pt cp, bool dec)
 {
     /* initialize dichotomy with boundary 't' values */
@@ -392,8 +399,10 @@ static uint16_t get_bez_t_from_pos(float pt, cubic_cont_pt cp, bool dec)
     return (uint16_t)floorf(t_mid * T_FRACTION + 0.5f);
 }
 
-/* gives relative coords of the control points
- * for the sub-arc starting at angle with given angle span */
+/**
+ * Gives relative coords of the control points
+ * for the sub-arc starting at angle with given angle span
+ */
 static void get_subarc_control_points(vg_arc * arc, int32_t span)
 {
     vg_arc fullarc;
@@ -484,7 +493,9 @@ static void get_subarc_control_points(vg_arc * arc, int32_t span)
     arc->p3y = (int32_t)floorf(0.5f + pt2y);
 }
 
-/* gives relative coords of the control points */
+/**
+ * Gives relative coords of the control points
+ */
 static void get_arc_control_points(vg_arc * arc, bool start)
 {
     vg_arc fullarc;
@@ -541,14 +552,15 @@ static void get_arc_control_points(vg_arc * arc, bool start)
     }
 }
 
-/* add the arc control points into the path data for vglite,
+/**
+ * Add the arc control points into the path data for vglite,
  * taking into account the real center of the arc (translation).
  * arc_path: (in/out) the path data array for vglite
  * pidx: (in/out) index of last element added in arc_path
  * q_arc: (in) the arc data containing control points
  * center: (in) the center of the circle in draw coordinates
  * cw: (in) true if arc is clockwise
- **/
+ */
 static void add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, lv_point_t center, bool cw)
 {
     /* assumes first control point already in array arc_path[] */

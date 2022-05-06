@@ -93,7 +93,8 @@ typedef struct {
  * Reset and initialize PXP device. This function should be called as a part
  * of display init sequence.
  *
- * @return LV_RES_OK: PXP init ok; LV_RES_INV: init error. See error log for more information.
+ * @retval LV_RES_OK PXP init completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_PXP_LOG_ERRORS)
  */
 lv_res_t lv_gpu_nxp_pxp_init(void);
 
@@ -106,11 +107,6 @@ void lv_gpu_nxp_pxp_deinit(void);
  * Start PXP job and wait for completion.
  */
 void lv_gpu_nxp_pxp_run(void);
-
-/**
- * Clean & invalidate cache.
- */
-void lv_gpu_nxp_pxp_invalidate_cache(void);
 
 /**********************
  *      MACROS
