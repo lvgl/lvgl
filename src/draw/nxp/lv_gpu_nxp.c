@@ -102,8 +102,7 @@ void lv_draw_nxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
 void lv_draw_nxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 {
-    LV_UNUSED(drv);
-    LV_UNUSED(draw_ctx);
+    lv_draw_sw_deinit_ctx(drv, draw_ctx);
 }
 
 /**********************
