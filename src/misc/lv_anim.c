@@ -73,16 +73,6 @@ void lv_anim_init(lv_anim_t * a)
     a->early_apply = 1;
 }
 
-void lv_anim_set_refr_period(uint32_t period)
-{
-    lv_timer_set_period(_lv_anim_tmr, period);
-}
-
-uint32_t lv_anim_get_refr_period(void)
-{
-    return _lv_anim_tmr->period;
-}
-
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
     TRACE_ANIM("begin");
@@ -185,6 +175,11 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
     }
 
     return NULL;
+}
+
+struct _lv_timer_t * lv_anim_get_timer(void)
+{
+    return _lv_anim_tmr;
 }
 
 uint16_t lv_anim_count_running(void)
