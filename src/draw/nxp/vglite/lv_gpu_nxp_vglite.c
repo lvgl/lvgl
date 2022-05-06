@@ -35,6 +35,9 @@
 
 #if LV_USE_GPU_NXP_VG_LITE
 #include "../../../core/lv_refr.h"
+#if BLIT_DBG_AREAS
+    #include "lv_draw_vglite_blend.h"
+#endif
 
 /*********************
  *      DEFINES

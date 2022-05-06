@@ -206,7 +206,6 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 
     bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
     bool scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
-    bool rotation = (dsc->angle != 0);
     bool done = false;
 
     lv_area_t blend_area;
@@ -340,9 +339,6 @@ static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
     if(bg_color.full == dsc->bg_grad.stops[1].color.full) grad_dir = LV_GRAD_DIR_NONE;
 
     bool mask_any = lv_draw_mask_is_any(&bg_coords);
-    lv_draw_sw_blend_dsc_t blend_dsc = {0};
-    blend_dsc.blend_mode = dsc->blend_mode;
-    blend_dsc.color = bg_color;
 
     /*
      * Most simple case: just a plain rectangle (no mask, no radius, no gradient)
