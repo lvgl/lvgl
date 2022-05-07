@@ -51,6 +51,7 @@ static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, tran
 static void trans_anim_cb(void * _tr, int32_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
+static lv_layer_type_t calculate_layer_type(lv_obj_t * obj);
 static void fade_anim_cb(void * obj, int32_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 
@@ -176,6 +177,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYOUT_REFR);
     bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_EXT_DRAW);
     bool is_inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
+    bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYER_REFR);
 
     if(is_layout_refr) {
         if(part == LV_PART_ANY ||
@@ -189,6 +191,16 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     if((part == LV_PART_ANY || part == LV_PART_MAIN) && (prop == LV_STYLE_PROP_ANY || is_layout_refr)) {
         lv_obj_t * parent = lv_obj_get_parent(obj);
         if(parent) lv_obj_mark_layout_as_dirty(parent);
+    }
+
+    /*Cache the layer type*/
+    if((part == LV_PART_ANY || part == LV_PART_MAIN) && is_layer_refr) {
+        lv_layer_type_t layer_type = calculate_layer_type(obj);
+        if(obj->spec_attr) obj->spec_attr->layer_type = layer_type;
+        else if(layer_type != LV_LAYER_TYPE_NONE) {
+            lv_obj_allocate_spec_attr(obj);
+            obj->spec_attr->layer_type = layer_type;
+        }
     }
 
     if(prop == LV_STYLE_PROP_ANY || is_ext_draw) {
@@ -808,6 +820,18 @@ static void trans_anim_ready_cb(lv_anim_t * a)
             }
         }
     }
+}
+
+static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
+{
+    if(lv_obj_get_style_transform_angle(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_zoom(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_opa(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
+
+#if LV_DRAW_COMPLEX
+    if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
+#endif
+    return LV_LAYER_TYPE_NONE;
 }
 
 static void fade_anim_cb(void * obj, int32_t v)
