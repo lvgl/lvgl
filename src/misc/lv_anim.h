@@ -40,6 +40,7 @@ typedef enum {
 } lv_anim_enable_t;
 
 struct _lv_anim_t;
+struct _lv_timer_t;
 
 /** Get the current value during an animation*/
 typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
@@ -344,6 +345,12 @@ void lv_anim_del_all(void);
  * @return          pointer to the animation.
  */
 lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb);
+
+/**
+ * Get global animation refresher timer.
+ * @return pointer to the animation refresher timer.
+ */
+struct _lv_timer_t * lv_anim_get_timer(void);
 
 /**
  * Delete an animation by getting the animated variable from `a`.
