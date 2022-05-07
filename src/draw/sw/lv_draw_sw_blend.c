@@ -142,7 +142,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
     lv_coord_t mask_stride;
     if(mask) {
         mask_stride = lv_area_get_width(dsc->mask_area);
-        mask += mask_stride * (dsc->mask_area->y1 - blend_area.y1) + (dsc->mask_area->x1 - blend_area.x1);
+        mask += mask_stride * (blend_area.y1 - dsc->mask_area->y1) + (blend_area.x1 - dsc->mask_area->x1);
     }
     else {
         mask_stride = 0;
