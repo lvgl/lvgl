@@ -167,7 +167,8 @@ typedef struct {
     lv_scroll_snap_t scroll_snap_x : 2;     /**< Where to align the snappable children horizontally*/
     lv_scroll_snap_t scroll_snap_y : 2;     /**< Where to align the snappable children vertically*/
     lv_dir_t scroll_dir : 4;                /**< The allowed scroll direction(s)*/
-    uint8_t event_dsc_cnt;                  /**< Number of event callbacks stored in `event_dsc` array*/
+    uint8_t event_dsc_cnt : 6;              /**< Number of event callbacks stored in `event_dsc` array*/
+    uint8_t layer_type : 2;    /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
 } _lv_obj_spec_attr_t;
 
 typedef struct _lv_obj_t {

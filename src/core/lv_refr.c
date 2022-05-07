@@ -731,7 +731,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
     if(_lv_area_is_in(area_p, &obj->coords, 0) == false) return NULL;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
-    if(_lv_obj_is_intermediate_layer(obj)) return NULL;
+    if(_lv_obj_get_layer_type(obj)) return NULL;
 
     /*If this object is fully cover the draw area then check the children too*/
     lv_cover_check_info_t info;
@@ -815,8 +815,8 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 {
     /*Do not refresh hidden objects*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
-    lv_intermediate_layer_type_t inlayer = _lv_obj_is_intermediate_layer(obj);
-    if(inlayer == LV_INTERMEDIATE_LAYER_TYPE_NONE) {
+    lv_layer_type_t inlayer = _lv_obj_get_layer_type(obj);
+    if(inlayer == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(draw_ctx, obj);
     }
     else {
@@ -831,7 +831,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
         uint32_t buf_size_sub;
 
-        if(inlayer == LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM) {
+        if(inlayer == LV_LAYER_TYPE_TRANSFORM) {
             lv_area_t clip_coords_for_obj;
             lv_area_t tranf_coords = obj_coords_ext;
             lv_obj_get_transformed_area(obj, &tranf_coords, false, false);
@@ -847,7 +847,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
             draw_area = inverse_clip_coords_for_obj;
         }
-        else if(inlayer == LV_INTERMEDIATE_LAYER_TYPE_SIMPLE) {
+        else if(inlayer == LV_LAYER_TYPE_SIMPLE) {
             lv_area_t clip_coords_for_obj;
             if(!_lv_area_intersect(&clip_coords_for_obj, clip_area_ori, &obj_coords_ext)) {
                 return;
@@ -875,7 +875,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
         uint32_t px_size = full_cover ? sizeof(lv_color_t) : LV_IMG_PX_SIZE_ALPHA_BYTE;
 
-        if(inlayer == LV_INTERMEDIATE_LAYER_TYPE_SIMPLE) {
+        if(inlayer == LV_LAYER_TYPE_SIMPLE) {
             buf_size_sub = LV_LAYER_SIMPLE_BUF_SIZE;
         }
         else {
@@ -887,7 +887,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
         uint8_t * layer_buf = lv_mem_alloc(buf_size_sub);
         /*Try again with a smaller buf size*/
-        if(inlayer == LV_INTERMEDIATE_LAYER_TYPE_SIMPLE) {
+        if(inlayer == LV_LAYER_TYPE_SIMPLE) {
             if(layer_buf == NULL) {
                 LV_LOG_WARN("Cannot allocate %"LV_PRIu32" bytes for layer buffer. Allocating %"LV_PRIu32" bytes instead. (Reduced performance)",
                             (uint32_t)buf_size_sub * px_size, (uint32_t)LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE * px_size);

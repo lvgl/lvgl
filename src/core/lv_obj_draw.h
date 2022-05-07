@@ -34,10 +34,10 @@ typedef enum {
 } lv_cover_res_t;
 
 typedef enum {
-    LV_INTERMEDIATE_LAYER_TYPE_NONE,
-    LV_INTERMEDIATE_LAYER_TYPE_SIMPLE,
-    LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM,
-} lv_intermediate_layer_type_t;
+    LV_LAYER_TYPE_NONE,
+    LV_LAYER_TYPE_SIMPLE,
+    LV_LAYER_TYPE_TRANSFORM,
+} lv_layer_type_t;
 
 typedef struct {
     lv_draw_ctx_t * draw_ctx;           /**< Draw context*/
@@ -159,7 +159,7 @@ void lv_obj_refresh_ext_draw_size(struct _lv_obj_t * obj);
 lv_coord_t _lv_obj_get_ext_draw_size(const struct _lv_obj_t * obj);
 
 
-lv_intermediate_layer_type_t _lv_obj_is_intermediate_layer(const struct _lv_obj_t * obj);
+lv_layer_type_t _lv_obj_get_layer_type(const struct _lv_obj_t * obj);
 
 /**********************
  *      MACROS
