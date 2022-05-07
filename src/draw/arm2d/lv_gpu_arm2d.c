@@ -1195,7 +1195,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                         draw_dsc->recolor_opa);
                 }
 #if LV_DRAW_COMPLEX
-                /*Apply the masrecoks if any*/
+                /*Apply the masks if any*/
                 if(mask_any) {
                     lv_coord_t y;
                     lv_opa_t * mask_buf_tmp = mask_buf;
