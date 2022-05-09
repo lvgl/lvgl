@@ -6,7 +6,7 @@
  */
 
 #include "lvgl_mem.h"
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 #include <zephyr/init.h>
 #include <zephyr/sys/sys_heap.h>
 

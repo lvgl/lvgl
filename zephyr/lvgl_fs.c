@@ -5,7 +5,7 @@
  */
 
 #include <lvgl.h>
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 #include <zephyr/fs/fs.h>
 #include <stdlib.h>
 #include "lvgl_fs.h"

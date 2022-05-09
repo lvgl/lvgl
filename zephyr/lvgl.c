@@ -5,7 +5,7 @@
  */
 
 #include <zephyr/init.h>
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 #include <lvgl.h>
 #include "lvgl_display.h"
 #ifdef CONFIG_LV_Z_USE_FILESYSTEM
