@@ -1,5 +1,3 @@
-```eval_rst
-```
 # List (lv_list)
 
 ## Overview

@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Timer Handler
 
 To handle the tasks of LVGL you need to call `lv_timer_handler()` periodically in one of the following:

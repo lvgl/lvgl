@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Message box (lv_msgbox)
 
 ## Overview

@@ -1,5 +1,3 @@
-```eval_rst
-```
 # 3rd party libraries
 
 

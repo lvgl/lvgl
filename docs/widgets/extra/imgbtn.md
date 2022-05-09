@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Image button (lv_imgbtn)
 
 ## Overview

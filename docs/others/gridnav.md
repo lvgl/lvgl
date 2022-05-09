@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Grid navigation
 
 Grid navigation (gridnav for short) is a feature that changes the currently focused child object as arrow keys are pressed.

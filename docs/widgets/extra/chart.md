@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Chart (lv_chart)
 
 ## Overview

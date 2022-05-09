@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Line (lv_line)
 
 ## Overview

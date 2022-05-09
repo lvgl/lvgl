@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Display interface
 
 To register a display for LVGL, a `lv_disp_draw_buf_t` and a `lv_disp_drv_t` variable have to be initialized.

@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Image (lv_img)
 
 

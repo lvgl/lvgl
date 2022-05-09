@@ -1,5 +1,3 @@
-```eval_rst
-```
 # File system
 
 LVGL has a 'File system' abstraction module that enables you to attach any type of file system.

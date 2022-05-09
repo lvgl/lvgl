@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # File System Interfaces
 

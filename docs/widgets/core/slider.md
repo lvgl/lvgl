@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Slider (lv_slider)
 
 ## Overview

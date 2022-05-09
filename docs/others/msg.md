@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Messaging
 
 Messaging (`lv_msg`) is a classic []publisher subscriber](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) implementation for LVGL.

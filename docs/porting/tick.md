@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Tick interface
 
 LVGL needs a system tick to know elapsed time for animations and other tasks.

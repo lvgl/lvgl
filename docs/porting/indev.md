@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Input device interface
 
 ## Types of input devices

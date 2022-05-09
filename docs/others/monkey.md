@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Monkey
 
 A simple monkey test. Use random input to stress test the application.

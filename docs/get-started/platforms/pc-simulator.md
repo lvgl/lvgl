@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Simulator on PC
 
 

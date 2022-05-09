@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Drop-down list (lv_dropdown)
 
 

@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Bar (lv_bar)
 
 ## Overview

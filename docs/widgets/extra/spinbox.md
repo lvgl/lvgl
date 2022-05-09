@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Spinbox (lv_spinbox)
 
 ## Overview

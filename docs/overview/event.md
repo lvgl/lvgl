@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Events
 
 Events are triggered in LVGL when something happens which might be interesting to the user, e.g. when an object

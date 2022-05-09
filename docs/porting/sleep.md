@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Sleep management
 
 The MCU can go to sleep when no user input happens. In this case, the main `while(1)` should look like this:

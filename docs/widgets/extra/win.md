@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Window (lv_win)
 
 ## Overview

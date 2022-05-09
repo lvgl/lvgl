@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # CMake
 LVGL supports integrating with [CMake](https://cmake.org/). It comes with preconfigured targets for:

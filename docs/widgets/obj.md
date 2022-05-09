@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Base object (lv_obj)
 
 ## Overview

@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Meter (lv_meter)
 
 ## Overview

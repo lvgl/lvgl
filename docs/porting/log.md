@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Logging
 
 LVGL has a built-in *Log* module to inform the user about what is happening in the library.

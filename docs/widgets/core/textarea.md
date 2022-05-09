@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Text area (lv_textarea)
 
 ## Overview

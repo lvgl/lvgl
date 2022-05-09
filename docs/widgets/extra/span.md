@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Span (lv_span)
 
 ## Overview

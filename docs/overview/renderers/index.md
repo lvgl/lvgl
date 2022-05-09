@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # Renderers and GPUs
 

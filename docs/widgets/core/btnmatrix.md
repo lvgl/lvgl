@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Button matrix (lv_btnmatrix)
 
 ## Overview

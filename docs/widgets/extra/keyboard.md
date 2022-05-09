@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 
 # Keyboard (lv_keyboard)

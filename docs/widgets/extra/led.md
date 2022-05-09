@@ -1,5 +1,3 @@
-```eval_rst
-```
 # LED (lv_led)
 
 ## Overview
