@@ -1,6 +1,4 @@
 ```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/widgets/extra/msgbox.md
 ```
 # Message box (lv_msgbox)
 

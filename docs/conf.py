@@ -114,8 +114,22 @@ html_theme_options = {
     'logo_only': True,
 }
 # For site map generation
-html_baseurl = 'https://docs.lvgl.io/master/en/html/'
+html_baseurl = f"https://docs.lvgl.io/{os.environ['LVGL_URLPATH']}/en/html/"
+
 sitemap_url_scheme = "{link}"
+
+#lvgl_github_url = f"https://github.com/lvgl/lvgl/blob/{os.environ['LVGL_GITCOMMIT']}/docs"
+
+#extlinks = {'github_link_base': (github_url + '%s', github_url)}
+
+html_context = {
+    'github_version': os.environ['LVGL_GITCOMMIT'],
+    'github_user': 'lvgl',
+    'github_repo': 'lvgl',
+    'display_github': True,
+    'conf_py_path': '/docs/'
+}
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

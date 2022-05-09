@@ -1,6 +1,4 @@
 ```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/others/imgfont.md
 ```
 ## Image font (imgfont)
 Draw image in label or span obj with imgfont.
