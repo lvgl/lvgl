@@ -1,6 +1,4 @@
 ```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/widgets/core/dropdown.md
 ```
 # Drop-down list (lv_dropdown)
 
