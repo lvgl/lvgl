@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Extra widgets
 
 ```eval_rst

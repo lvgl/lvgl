@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Fonts
 
 In LVGL fonts are collections of bitmaps and other information required to render images of individual letters (glyph).

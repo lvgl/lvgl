@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Calendar (lv_calendar)
 
 ## Overview

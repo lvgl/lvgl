@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Checkbox (lv_checkbox)
 
 

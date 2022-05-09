@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # Set up a project
 

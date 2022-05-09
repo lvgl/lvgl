@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Images
 
 An image can be a file or a variable which stores the bitmap itself and some metadata.

@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Tasmota and berry
 
 ## What is Tasmota?

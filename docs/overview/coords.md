@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Positions, sizes, and layouts
 
 ## Overview

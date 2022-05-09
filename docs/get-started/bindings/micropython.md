@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Micropython
 
 ## What is Micropython?

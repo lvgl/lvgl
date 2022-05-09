@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Roller (lv_roller)
 
 ## Overview

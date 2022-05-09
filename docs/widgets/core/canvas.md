@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Canvas (lv_canvas)
 
 

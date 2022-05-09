@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Colors
 
 The color module handles all color-related functions like changing color depth, creating colors from hex code, converting between color depths, mixing colors, etc.

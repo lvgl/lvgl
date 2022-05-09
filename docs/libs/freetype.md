@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # FreeType support
 Interface to [FreeType](https://www.freetype.org/) to generate font bitmaps run time.

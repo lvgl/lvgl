@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Button (lv_btn)
 
 ## Overview

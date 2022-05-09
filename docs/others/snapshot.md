@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Snapshot
 
 Snapshot provides APIs to take snapshot image for LVGL object together with its children. The image will look exactly like the object.

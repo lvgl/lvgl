@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Animations
 
 You can automatically change the value of a variable between a start and an end value using animations.

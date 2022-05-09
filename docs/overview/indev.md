@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Input devices
 
 An input device usually means:

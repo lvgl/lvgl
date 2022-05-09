@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # GIF decoder
 Allow using GIF images in LVGL. Based on https://github.com/lecram/gifdec

@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # FFmpeg support
 [FFmpeg](https://www.ffmpeg.org/) A complete, cross-platform solution to record, convert and stream audio and video.

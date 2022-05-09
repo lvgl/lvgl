@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Operating system and interrupts
 
 LVGL is **not thread-safe** by default.

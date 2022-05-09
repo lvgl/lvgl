@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # Espressif (ESP32 chip series)
 LVGL can be used and configured as a standard [ESP-IDF](https://github.com/espressif/esp-idf) component.

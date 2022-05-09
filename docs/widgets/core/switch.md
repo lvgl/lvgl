@@ -1,5 +1,3 @@
-```eval_rst
-```
 
 # Switch (lv_switch)
 

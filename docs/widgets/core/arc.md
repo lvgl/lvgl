@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Arc (lv_arc)
 
 ## Overview

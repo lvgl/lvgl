@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Label (lv_label)
 
 ## Overview

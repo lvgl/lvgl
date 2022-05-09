@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Tile view (lv_tileview)
 
 ## Overview

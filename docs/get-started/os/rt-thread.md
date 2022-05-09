@@ -1,5 +1,3 @@
-```eval_rst
-```
 # RT-Thread RTOS
 
 <img src="https://raw.githubusercontent.com/RT-Thread/rt-thread/master/documentation/figures/logo.png" width=40% style="float: center;" >

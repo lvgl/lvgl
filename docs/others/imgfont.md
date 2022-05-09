@@ -1,5 +1,3 @@
-```eval_rst
-```
 ## Image font (imgfont)
 Draw image in label or span obj with imgfont.
 This is often used to display Unicode emoji icons in text.

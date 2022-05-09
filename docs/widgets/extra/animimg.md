@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Animation Image (lv_animimg)
 
 ## Overview

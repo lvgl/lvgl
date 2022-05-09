@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Styles
 
 *Styles* are used to set the appearance of objects. Styles in lvgl are heavily inspired by CSS. The concept in a nutshell is as follows:

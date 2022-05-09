@@ -1,5 +1,3 @@
-```eval_rst
-```
 # Color wheel (lv_colorwheel)
 
 ## Overview

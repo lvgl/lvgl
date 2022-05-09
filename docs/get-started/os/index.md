@@ -1,5 +1,3 @@
-```eval_rst
-```
 # (RT)OS
 
 ```eval_rst

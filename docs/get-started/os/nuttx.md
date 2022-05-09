@@ -1,5 +1,3 @@
-```eval_rst
-```
 # NuttX RTOS
 
 ## What is NuttX?
