@@ -109,6 +109,27 @@ void lv_draw_nxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
  *   STATIC FUNCTIONS
  **********************/
 
+/**
+ * During rendering, LVGL might initializes new draw_ctxs and start drawing into
+ * a separate buffer (called layer). If the content to be rendered has "holes",
+ * e.g. rounded corner, LVGL temporarily sets the disp_drv.screen_transp flag.
+ * It means the renderers should draw into an ARGB buffer.
+ * With 32 bit color depth it's not a big problem but with 16 bit color depth
+ * the target pixel format is ARGB8565 which is not supported by the GPU.
+ * In this case, the NXP callbacks should fallback to SW rendering.
+ */
+static inline bool need_argb8565_support()
+{
+#if LV_COLOR_DEPTH != 32
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+
+    if(disp->driver->screen_transp == 1)
+        return true;
+#endif
+
+    return false;
+}
+
 static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
     lv_area_t blend_area;
@@ -123,7 +144,7 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
     bool done = false;
 
     /*Fill/Blend only non masked, normal blended*/
-    if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
+    if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && !need_argb8565_support()) {
         lv_color_t * dest_buf = draw_ctx->buf;
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
@@ -225,7 +246,7 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
 
 #if LV_USE_GPU_NXP_PXP
-    if(!mask_any && !scale
+    if(!mask_any && !scale && !need_argb8565_support()
 #if LV_COLOR_DEPTH!=32
        && !lv_img_cf_has_alpha(cf)
 #endif
@@ -238,7 +259,7 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 #endif
 
 #if LV_USE_GPU_NXP_VG_LITE
-    if(!done && !mask_any &&
+    if(!done && !mask_any && !need_argb8565_support() &&
        !lv_img_cf_is_chroma_keyed(cf) && !recolor
 #if LV_COLOR_DEPTH!=32
        && !lv_img_cf_has_alpha(cf)
@@ -345,7 +366,7 @@ static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
      *
      * Complex case: gradient or radius but no mask.
      */
-    if(!mask_any && ((dsc->radius != 0) || (grad_dir != LV_GRAD_DIR_NONE))) {
+    if(!mask_any && ((dsc->radius != 0) || (grad_dir != LV_GRAD_DIR_NONE)) && !need_argb8565_support()) {
 #if LV_USE_GPU_NXP_VG_LITE
         lv_res_t res = lv_gpu_nxp_vglite_draw_bg(draw_ctx, dsc, &bg_coords);
         if(res != LV_RES_OK)
@@ -372,10 +393,12 @@ static void lv_draw_nxp_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * 
         return;
 
 #if LV_USE_GPU_NXP_VG_LITE
-    done = (lv_gpu_nxp_vglite_draw_arc(draw_ctx, dsc, center, (int32_t)radius,
-                                       (int32_t)start_angle, (int32_t)end_angle) == LV_RES_OK);
-    if(!done)
-        VG_LITE_LOG_TRACE("VG-Lite draw arc failed. Fallback.");
+    if(!need_argb8565_support()) {
+        done = (lv_gpu_nxp_vglite_draw_arc(draw_ctx, dsc, center, (int32_t)radius,
+                                           (int32_t)start_angle, (int32_t)end_angle) == LV_RES_OK);
+        if(!done)
+            VG_LITE_LOG_TRACE("VG-Lite draw arc failed. Fallback.");
+    }
 #endif
 #endif/*LV_DRAW_COMPLEX*/
 
