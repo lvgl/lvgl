@@ -35,7 +35,7 @@ void lv_example_style_15(void)
      *The button and the label is rendered to a layer first and that layer is transformed*/
     btn = lv_btn_create(lv_scr_act());
     lv_obj_set_size(btn, 100, 40);
-    lv_obj_set_style_transform_angle(btn, 150, 0);        /*150 deg*/
+    lv_obj_set_style_transform_angle(btn, 150, 0);        /*15 deg*/
     lv_obj_set_style_transform_zoom(btn, 256 + 64, 0);   /*1.25x*/
     lv_obj_set_style_transform_pivot_x(btn, 50, 0);
     lv_obj_set_style_transform_pivot_y(btn, 20, 0);

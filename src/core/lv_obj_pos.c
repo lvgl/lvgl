@@ -798,12 +798,14 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
 void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
 {
     if(obj) {
+        lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
+        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
         if(inv) {
             if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
-            transform_point(obj, p, inv);
+            if(do_tranf) transform_point(obj, p, inv);
         }
         else {
-            transform_point(obj, p, inv);
+            if(do_tranf) transform_point(obj, p, inv);
             if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
         }
     }
@@ -818,6 +820,7 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
         {area->x2, area->y1},
         {area->x2, area->y2},
     };
+
     lv_obj_transform_point(obj, &p[0], recursive, inv);
     lv_obj_transform_point(obj, &p[1], recursive, inv);
     lv_obj_transform_point(obj, &p[2], recursive, inv);
