@@ -4,20 +4,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <init.h>
-#include <zephyr.h>
+#include <zephyr/init.h>
+#include <zephyr/zephyr.h>
 #include <lvgl.h>
 #include "lvgl_display.h"
 #ifdef CONFIG_LV_Z_USE_FILESYSTEM
 #include "lvgl_fs.h"
 #endif
 #ifdef CONFIG_LV_Z_POINTER_KSCAN
-#include <drivers/kscan.h>
+#include <zephyr/drivers/kscan.h>
 #endif
 #include LV_MEM_CUSTOM_INCLUDE
 
 #define LOG_LEVEL CONFIG_LV_LOG_LEVEL
-#include <logging/log.h>
+#include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(lvgl);
 
 static lv_disp_drv_t disp_drv;

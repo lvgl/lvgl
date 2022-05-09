@@ -5,8 +5,8 @@
  */
 
 #include "lvgl_mem.h"
-#include <zephyr.h>
-#include <init.h>
+#include <zephyr/zephyr.h>
+#include <zephyr/init.h>
 
 K_HEAP_DEFINE(lvgl_mem_pool, CONFIG_LV_Z_MEM_POOL_MAX_SIZE *
 	      CONFIG_LV_Z_MEM_POOL_NUMBER_BLOCKS);

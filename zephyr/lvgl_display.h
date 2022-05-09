@@ -7,7 +7,7 @@
 #ifndef ZEPHYR_LIB_GUI_LVGL_LVGL_DISPLAY_H_
 #define ZEPHYR_LIB_GUI_LVGL_LVGL_DISPLAY_H_
 
-#include <drivers/display.h>
+#include <zephyr/drivers/display.h>
 #include <lvgl.h>
 
 #ifdef __cplusplus

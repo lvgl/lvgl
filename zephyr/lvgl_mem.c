@@ -6,9 +6,9 @@
  */
 
 #include "lvgl_mem.h"
-#include <zephyr.h>
-#include <init.h>
-#include <sys/sys_heap.h>
+#include <zephyr/zephyr.h>
+#include <zephyr/init.h>
+#include <zephyr/sys/sys_heap.h>
 
 
 #define HEAP_BYTES (CONFIG_LV_Z_MEM_POOL_MAX_SIZE * \
