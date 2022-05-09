@@ -18,14 +18,16 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
 import subprocess
+import sys
+
 sys.path.insert(0, os.path.abspath('./_ext'))
+
+from subprocess import PIPE, Popen
 
 import recommonmark
 from recommonmark.transform import AutoStructify
 from sphinx.builders.html import StandaloneHTMLBuilder
-from subprocess import Popen, PIPE
 
 # -- General configuration ------------------------------------------------
 
@@ -147,6 +149,10 @@ html_sidebars = {
         'searchbox.html',
     ]
 }
+
+html_js_files = [
+    'js/custom.js'
+]
 
 html_favicon = 'favicon.png'
 html_logo = 'logo_lvgl.png'

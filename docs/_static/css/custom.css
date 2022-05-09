@@ -111,3 +111,23 @@ code.sig-name
 .lv-example-link-button:visited {
     color: white;
 }
+
+dl.cpp.unexpanded dd {
+    display: none;
+}
+
+.lv-api-expansion-button {
+    padding: 4px;
+}
+.lv-api-expansion-button::before {
+    font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+    display: inline-block;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+.unexpanded .lv-api-expansion-button::before {
+    content: "\f0da \00a0";
+}
+.expanded .lv-api-expansion-button::before {
+    content: "\f0d7 \00a0";
+}
