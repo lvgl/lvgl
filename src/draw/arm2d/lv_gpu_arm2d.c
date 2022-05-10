@@ -1224,7 +1224,6 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
             blend_area.y2 = blend_area.y1 + buf_h - 1;
             if(blend_area.y2 > y_last) blend_area.y2 = y_last;
         }
-        /* *INDENT-ON* */
 
         lv_mem_buf_release(mask_buf);
         lv_mem_buf_release(rgb_buf);
