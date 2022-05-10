@@ -798,7 +798,7 @@ static uint32_t lv_txt_iso8859_1_conv_wc(uint32_t c)
  */
 static uint32_t lv_txt_iso8859_1_next(const char * txt, uint32_t * i)
 {
-    if(i == NULL) return txt[1]; /*Get the next char*/
+    if(i == NULL) return txt[0]; /*Get the next char*/
 
     uint8_t letter = txt[*i];
     (*i)++;
