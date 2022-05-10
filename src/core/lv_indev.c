@@ -955,6 +955,9 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
 static void indev_proc_release(_lv_indev_proc_t * proc)
 {
     if(proc->wait_until_release != 0) {
+        lv_event_send(proc->types.pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
+        if(indev_reset_check(proc)) return;
+
         proc->types.pointer.act_obj  = NULL;
         proc->types.pointer.last_obj = NULL;
         proc->pr_timestamp           = 0;
