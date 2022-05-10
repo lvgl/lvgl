@@ -67,6 +67,19 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
         blend_dsc.blend_area = coords;
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
+    else if(!mask_any && !transform && cf == LV_IMG_CF_ALPHA_8BIT) {
+        lv_area_t clipped_coords;
+        if(!_lv_area_intersect(&clipped_coords, coords, draw_ctx->clip_area)) return;
+
+        blend_dsc.mask_buf = (lv_opa_t *)src_buf;
+        blend_dsc.mask_area = coords;
+        blend_dsc.src_buf = NULL;
+        blend_dsc.color = draw_dsc->recolor;
+        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+
+        blend_dsc.blend_area = coords;
+        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+    }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
         blend_area.x1 = draw_ctx->clip_area->x1;
