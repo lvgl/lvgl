@@ -13,6 +13,7 @@
 #include "../core/lv_refr.h"
 #include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
+#include "../misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -233,9 +234,16 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     size_hint.x =  lv_area_get_width(coords);
     size_hint.y =  lv_area_get_height(coords);
 
-    lv_img_dec_dsc_in_t dsc = {.src = src, .color = draw_dsc->recolor, .size_hint = size_hint };
+    lv_img_dec_dsc_in_t dsc;
+    lv_color32_t recolor = { .full = lv_color_to32(draw_dsc->recolor) };
+    LV_COLOR_SET_A32(recolor, draw_dsc->recolor_opa);
+    lv_img_dec_dsc_in_init(&dsc, src, &recolor, &size_hint);
     lv_img_cache_entry_t * cdsc = lv_img_cache_open(&dsc, draw_dsc->dec_ctx);
-    if(!cdsc) return LV_RES_INV;
+    if(!cdsc) {
+        LV_LOG_WARN("Image type detection error");
+
+        return LV_RES_INV;
+    }
     lv_res_t res = decode_and_draw_cached(draw_ctx, draw_dsc, coords, cdsc);
     lv_img_cache_cleanup(cdsc);
     return res;

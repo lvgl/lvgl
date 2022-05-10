@@ -125,9 +125,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
             return LV_RES_INV;
         }
 
-        if(caps != NULL) {
-            *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_CACHED;
-        }
+        *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_CACHED;
         return LV_RES_OK;
     }
 

@@ -419,7 +419,7 @@ static lv_res_t get_metadata(lv_img_t * img)
         lv_img_dec_dsc_in_t dsc = {0};
         dsc.src = &img->src;
         /*Don't waste a cached entry for a different color, use the color that'll be drawn*/
-        dsc.color = lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN);
+        dsc.color.full = lv_color_to32(lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN));
         dsc.size_hint.x = lv_obj_get_style_width(obj, LV_PART_MAIN);
         dsc.size_hint.y = lv_obj_get_style_height(obj, LV_PART_MAIN);
 

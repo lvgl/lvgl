@@ -119,7 +119,7 @@ typedef struct _lv_img_dec_dsc_in_t {
     const lv_img_src_t * src;
 
     /**Color to draw the image. Used when the image has alpha channel only*/
-    lv_color_t color;
+    lv_color32_t color;
 
     /**Size hint for decoders with user settable output size*/
     lv_point_t size_hint;
@@ -179,7 +179,7 @@ void _lv_img_decoder_init(void);
  * @param src   The source of the image to use for this descriptor
  * @param color If not NULL, will be used in color corrected images
  * @param size_hint if not NULL, will be used to set a size hint for the decoder */
-void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src, lv_color_t * color,
+void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src, lv_color32_t * color,
                             lv_point_t * size_hint);
 
 /**
@@ -187,8 +187,8 @@ void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src
  * This is a wrapper over lv_img_decoder_accept/lv_img_decoder_open calls.
  * This is not very efficient since it's creating a decoder instance to fetch the information required.
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
- * @param header    Will be filled with the capabilities for the selected decoder
  * @param dsc       Pointer to  decoder specific construction information
+ * @param header    Will be filled with the capabilities for the selected decoder
  * @return LV_RES_OK if the header was filled
  */
 lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header);

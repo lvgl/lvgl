@@ -793,7 +793,8 @@ static void draw_main(lv_event_t * e)
             lv_img_header_t header;
             lv_img_src_t src;
             lv_img_src_parse(&src, dropdown->symbol); /*TODO Use a src for the symbol here directly */
-            lv_img_dec_dsc_in_t dsc = {.src = &src };
+            lv_img_dec_dsc_in_t dsc;
+            lv_img_dec_dsc_in_init(&dsc, &src, NULL, NULL);
             lv_res_t res = lv_img_decoder_get_info(&dsc, &header);
             if(res == LV_RES_OK) {
                 symbol_w = header.w;

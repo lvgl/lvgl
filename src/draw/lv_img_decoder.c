@@ -38,7 +38,7 @@ void _lv_img_decoder_init(void)
     lv_bin_init();
 }
 
-void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src, lv_color_t * color,
+void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src, lv_color32_t * color,
                             lv_point_t * size_hint)
 {
     lv_memset_00(desc, sizeof(*desc));
@@ -68,6 +68,8 @@ lv_img_dec_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps)
     lv_img_dec_t * d;
     _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
         if(d->accept_cb) {
+            uint8_t dummy_caps;
+            if(caps == NULL) caps = &dummy_caps;
             res = d->accept_cb(src, caps);
             if(res == LV_RES_OK) return d;
         }
@@ -85,10 +87,12 @@ lv_res_t lv_img_decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     lv_img_dec_t * decoder = dsc->decoder;
     if(decoder == NULL) {
         _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), decoder) {
+            uint8_t dummy_caps;
+
             /*Accept is required to find the decoder that would accept this*/
             if(decoder->accept_cb == NULL) continue;
 
-            res = decoder->accept_cb(dsc->input.src, NULL);
+            res = decoder->accept_cb(dsc->input.src, &dummy_caps);
             if(res == LV_RES_OK) break;
         }
     }

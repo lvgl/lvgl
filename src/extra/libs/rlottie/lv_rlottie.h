@@ -33,8 +33,15 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+void lv_rlottie_init(void);
+
 /** Load a rlottie animation from a file
  *  This acts like lv_img_set_src but with specific parameters, like creation size and caching attributes.
+ *  If buf_size is 0, this is functionaly equivalent to:
+ *  @code
+ *    lv_obj_set_size(img, width, height);
+ *    lv_img_set_src(img, "/path/to/file");
+ *  @endcode
  *  @param img      The pointer to a lv_img_t instance that's modified
  *  @param width    The image rendering width in pixels
  *  @param height   The image rendering height in pixels
@@ -47,6 +54,13 @@ lv_res_t lv_rlottie_from_file(lv_obj_t * img, lv_coord_t width, lv_coord_t heigh
 
 /** Load a rlottie animation from readonly data
  *  This acts like lv_img_set_src but with specific parameters, like creation size and caching attributes.
+ *  If buf_size is 0, this is functionaly equivalent to:
+ *  @code
+ *    lv_obj_set_size(img, width, height);
+ *    lv_img_src_t src;
+ *    lv_img_src_set_data(&src, json_data, strlen(json_data));
+ *    lv_img_set_src(img, &src);
+ *  @endcode
  *  @param img      The pointer to a lv_img_t instance that's modified
  *  @param width    The image width in pixels
  *  @param height   The image height in pixels

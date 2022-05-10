@@ -148,9 +148,7 @@ void lv_split_jpeg_init(void)
  **********************/
 static void set_caps(uint8_t * caps)
 {
-    if(caps != NULL) {
-        *caps = LV_IMG_DEC_DEFAULT;
-    }
+    *caps = LV_IMG_DEC_DEFAULT;
 }
 
 
@@ -165,9 +163,9 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
         }
     }
     else if(src->type == LV_IMG_SRC_FILE) {
-        /*Support only "*.png" files*/
+        /*Support only "*.jpg" & ".sjpg" files*/
         if(!src->ext || (strcmp(src->ext, ".jpg") && strcmp(src->ext, ".sjpg"))) return LV_RES_INV;
-        if(caps) *caps = LV_IMG_DEC_CACHED;
+        *caps = LV_IMG_DEC_CACHED;
 
         /*Check file exists*/
         lv_fs_file_t f;

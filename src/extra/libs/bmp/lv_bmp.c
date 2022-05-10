@@ -78,7 +78,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
         if(!src->ext || strcmp(src->ext, ".bmp")) return LV_RES_INV;
-        if(caps) *caps = LV_IMG_DEC_DEFAULT;  /*Image is not cached for files*/
+        *caps = LV_IMG_DEC_DEFAULT;  /*Image is not cached for files*/
 
         /*Check file exists*/
         lv_fs_file_t f;

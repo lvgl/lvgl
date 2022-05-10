@@ -182,7 +182,13 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
                                   const void * src, int32_t frame_id, SDL_Texture ** texture,
                                   lv_draw_sdl_img_header_t ** header)
 {
-    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, lv_color_white(), frame_id);
+    lv_img_dec_dsc_in_t dsc;
+    lv_color32_t recolor = { .full = 0xFFFFFFFF };
+    LV_COLOR_SET_A32(recolor, draw_dsc->recolor_opa);
+    lv_img_src_t isrc;
+    lv_img_src_parse(&isrc, src);
+    lv_img_dec_dsc_in_init(&dsc, &isrc, &recolor, NULL);
+    lv_img_cache_entry_t * cdsc = lv_img_cache_open(&dsc, NULL);
     lv_draw_sdl_cache_flag_t tex_flags = 0;
     SDL_Rect rect;
     SDL_memset(&rect, 0, sizeof(SDL_Rect));
@@ -200,9 +206,6 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
         else {
             *texture = upload_img_texture(ctx->renderer, dsc);
         }
-#if LV_IMG_CACHE_DEF_SIZE == 0
-        lv_img_decoder_close(dsc);
-#endif
     }
     if(texture && cdsc) {
         *header = SDL_malloc(sizeof(lv_draw_sdl_img_header_t));
@@ -214,6 +217,7 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
         lv_draw_sdl_texture_cache_put(ctx, key, key_size, NULL);
         return false;
     }
+    lv_img_cache_cleanup(cdsc);
     return true;
 }
 

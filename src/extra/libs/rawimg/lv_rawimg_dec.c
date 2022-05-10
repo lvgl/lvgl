@@ -69,10 +69,9 @@ void lv_bin_init()
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t init_dec_ctx(uint8_t * caps)
+static void init_dec_ctx(uint8_t * caps)
 {
-    if(caps != NULL) *caps = LV_IMG_DEC_CACHED;
-    return LV_RES_OK;
+    *caps = LV_IMG_DEC_CACHED;
 }
 
 lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps)
@@ -80,13 +79,13 @@ lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps
     if(src->type == LV_IMG_SRC_VARIABLE) {
         lv_img_cf_t cf = ((lv_img_dsc_t *)src->data)->header.cf;
         if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
-        if(init_dec_ctx(caps) != LV_RES_OK) return LV_RES_INV;
+        init_dec_ctx(caps);
         return LV_RES_OK;
     }
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
         if(!src->ext || strcmp(src->ext, ".bin")) return LV_RES_INV;
-        if(caps) *caps = LV_IMG_DEC_DEFAULT;  /*Image is not cached for files*/
+        *caps = LV_IMG_DEC_DEFAULT;  /*Image is not cached for files*/
 
         /*Check file exists*/
         lv_fs_file_t f;
@@ -173,7 +172,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_f
             return LV_RES_INV;
         }
         LV_ZERO_ALLOC(dsc->dec_ctx);
-        if(init_dec_ctx(&dsc->caps) != LV_RES_OK) return LV_RES_INV;
+        init_dec_ctx(&dsc->caps);
         dsc->header = img_dsc->header;
         dsc->caps = LV_IMG_DEC_CACHED;
     }
@@ -361,7 +360,9 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_dec_dsc_t * dsc, lv_co
                                           };
 
     /*Simply fill the buffer with the color. Later only the alpha value will be modified.*/
-    lv_color_t bg_color = dsc->input.color;
+#if LV_COLOR_DEPTH != 32
+    lv_color_t bg_color = lv_color_hex(dsc->input.color.full);
+#endif
     lv_coord_t i;
     for(i = 0; i < len; i++) {
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
@@ -371,7 +372,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_dec_dsc_t * dsc, lv_co
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full & 0xFF;
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = (bg_color.full >> 8) & 0xFF;
 #elif LV_COLOR_DEPTH == 32
-        *((uint32_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = bg_color.full;
+        *((uint32_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = dsc->input.color.full; /*Don't loose alpha here*/
 #else
 #error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
 #endif

@@ -780,7 +780,7 @@ static void f_gif_close(gd_GIF * gif)
  **********************/
 static void set_caps(uint8_t * caps)
 {
-    if(caps != NULL) *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_VFR | LV_IMG_DEC_CACHED;
+    *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_VFR | LV_IMG_DEC_CACHED;
 }
 /**
  * Get info about a rlottie image

@@ -36,7 +36,7 @@
 //#if LV_IMG_CACHE_DEF_SIZE
 static bool lv_img_cache_match(const lv_img_src_t * src1, const lv_img_src_t * src2);
 //#endif
-static bool find_entry(const lv_img_src_t * src, const lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
+static bool find_entry(const lv_img_src_t * src, const lv_color32_t * color, lv_img_dec_ctx_t * dec_ctx,
                        lv_img_cache_entry_t ** out);
 
 /**********************
@@ -193,7 +193,7 @@ void lv_img_cache_invalidate_src(const lv_img_src_t * src)
  *   STATIC FUNCTIONS
  **********************/
 
-static bool find_entry(const lv_img_src_t * src, const lv_color_t * color, lv_img_dec_ctx_t * dec_ctx,
+static bool find_entry(const lv_img_src_t * src, const lv_color32_t * color, lv_img_dec_ctx_t * dec_ctx,
                        lv_img_cache_entry_t ** out)
 {
     /*Is the image cached?*/

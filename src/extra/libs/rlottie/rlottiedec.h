@@ -25,7 +25,7 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_rlottie_init(void);
+
 
 /**********************
  *      MACROS
