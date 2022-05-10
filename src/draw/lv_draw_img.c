@@ -236,12 +236,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
     if(cdsc == NULL) return LV_RES_INV;
 
-
-    lv_img_cf_t cf;
-    if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    else if(LV_IMG_CF_ALPHA_8BIT == cdsc->dec_dsc.header.cf) cf = LV_IMG_CF_ALPHA_8BIT;
-    else if(lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-    else cf = LV_IMG_CF_TRUE_COLOR;
+    lv_img_cf_t cf = cdsc->dec_dsc.header.cf;
 
     if(cf == LV_IMG_CF_ALPHA_8BIT) {
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {

@@ -54,7 +54,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
     uint8_t * buf_u8 = (uint8_t *)dsc->data;
 
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED ||
-       dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
+       dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA || dsc->header.cf == LV_IMG_CF_RGB565A8) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
         lv_memcpy_small(&p_color, &buf_u8[px], sizeof(lv_color_t));
@@ -386,6 +386,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
         case LV_IMG_CF_TRUE_COLOR:
             return LV_IMG_BUF_SIZE_TRUE_COLOR(w, h);
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
+        case LV_IMG_CF_RGB565A8:
             return LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h);
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
             return LV_IMG_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h);
