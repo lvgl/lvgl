@@ -1049,6 +1049,11 @@ static void line_create(lv_style_t * style)
 }
 
 
+static void arc_anim_end_angle_cb(void * var, int32_t v)
+{
+    lv_arc_set_end_angle(var, v);
+}
+
 static void arc_create(lv_style_t * style)
 {
     uint32_t i;
@@ -1066,7 +1071,7 @@ static void arc_create(lv_style_t * style)
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_arc_set_end_angle);
+        lv_anim_set_exec_cb(&a, arc_anim_end_angle_cb);
         lv_anim_set_values(&a, 0, 359);
         lv_anim_set_time(&a, t);
         lv_anim_set_playback_time(&a, t);
@@ -1078,6 +1083,11 @@ static void arc_create(lv_style_t * style)
 }
 
 
+static void fall_anim_y_cb(void * var, int32_t v)
+{
+    lv_obj_set_y(var, v);
+}
+
 static void fall_anim(lv_obj_t * obj)
 {
     lv_obj_set_x(obj, rnd_next(0, lv_obj_get_width(scene_bg) - lv_obj_get_width(obj)));
@@ -1087,7 +1097,7 @@ static void fall_anim(lv_obj_t * obj)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
+    lv_anim_set_exec_cb(&a, fall_anim_y_cb);
     lv_anim_set_values(&a, 0, lv_obj_get_height(scene_bg) - lv_obj_get_height(obj));
     lv_anim_set_time(&a, t);
     lv_anim_set_playback_time(&a, t);
