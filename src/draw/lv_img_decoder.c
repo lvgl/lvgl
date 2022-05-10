@@ -361,7 +361,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
     lv_img_cf_t cf = dsc->header.cf;
     /*Process true color formats*/
-    if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA || cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED ||
+    if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
+       cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED || cf == LV_IMG_CF_RGB565A8 ||
        cf == LV_IMG_CF_ALPHA_8BIT) {
         if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
             /*In case of uncompressed formats the image stored in the ROM/RAM.

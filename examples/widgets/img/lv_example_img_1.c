@@ -4,11 +4,14 @@
 
 void lv_example_img_1(void)
 {
-    LV_IMG_DECLARE(img_cogwheel_argb);
+    LV_IMG_DECLARE(rgb565a8);
     lv_obj_t * img1 = lv_img_create(lv_scr_act());
-    lv_img_set_src(img1, &img_cogwheel_argb);
+    lv_img_set_src(img1, &rgb565a8);
     lv_obj_align(img1, LV_ALIGN_CENTER, 0, -20);
-    lv_obj_set_size(img1, 200, 200);
+//    lv_obj_set_size(img1, 200, 200);
+
+    lv_img_set_angle(img1, 100);
+    lv_img_set_antialias(img1, 0);
 
     lv_obj_t * img2 = lv_img_create(lv_scr_act());
     lv_img_set_src(img2, LV_SYMBOL_OK "Accept");
