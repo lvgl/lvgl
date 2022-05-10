@@ -626,7 +626,7 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
         lv_coord_t mask_stride;
         if(mask) {
             mask_stride = lv_area_get_width(dsc->mask_area);
-            mask += mask_stride * (dsc->mask_area->y1 - blend_area.y1) + (dsc->mask_area->x1 - blend_area.x1);
+            mask += mask_stride * (blend_area.y1 - dsc->mask_area->y1) + (blend_area.x1 - dsc->mask_area->x1);
         }
         else {
             mask_stride = 0;
@@ -858,17 +858,11 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
         blend_dsc.blend_area = coords;
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
-    else if(!mask_any && !transform && cf == LV_IMG_CF_ALPHA_8BIT && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
-        lv_area_t clipped_coords;
-        if(!_lv_area_intersect(&clipped_coords, coords, draw_ctx->clip_area)) return;
-
-        /* apply offset */
-        clipped_coords.x1 += clipped_coords.x1 - coords->x1;
-        clipped_coords.y1 += clipped_coords.y1 - coords->y1;
-
+    else if(!mask_any && !transform && cf == LV_IMG_CF_ALPHA_8BIT) {
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
-        blend_dsc.mask_area = &clipped_coords;
+        blend_dsc.mask_area = coords;
         blend_dsc.src_buf = NULL;
+        blend_dsc.color = draw_dsc->recolor;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
 
         blend_dsc.blend_area = coords;
