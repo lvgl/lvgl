@@ -69,7 +69,7 @@ typedef struct {
 
 static lv_style_t style_common;
 static bool opa_mode = true;
-static finished_cb_t *benchmark_finished_cb = NULL;
+static finished_cb_t * benchmark_finished_cb = NULL;
 
 LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
@@ -692,7 +692,7 @@ void lv_demo_benchmark_run_scene(int_fast16_t scene_no)
 }
 
 
-void lv_demo_benchmark_register_finished_handler(finished_cb_t *finished_cb)
+void lv_demo_benchmark_register_finished_handler(finished_cb_t * finished_cb)
 {
     benchmark_finished_cb = finished_cb;
 }
