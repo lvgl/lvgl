@@ -200,7 +200,13 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
     PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
     PXP_SetProcessSurfaceBackGroundColor(LV_GPU_NXP_PXP_ID, lv_color_to32(color));
 
-    /*Configure Porter-Duff blending - src settings are unused for fill without opacity*/
+    /**
+     * Configure Porter-Duff blending - src settings are unused for fill without opacity (opa = 0xff).
+     *
+     * Note: srcFactorMode and dstFactorMode are inverted in fsl_pxp.h:
+     * srcFactorMode is actually applied on PS alpha value
+     * dstFactorMode is actually applied on AS alpha value
+     */
     pxp_porter_duff_config_t pdConfig = {
         .enable = 1,
         .dstColorMode = kPXP_PorterDuffColorNoAlpha,
@@ -208,11 +214,11 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
         .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
         .srcGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
         .dstFactorMode = kPXP_PorterDuffFactorStraight,
-        .srcFactorMode = kPXP_PorterDuffFactorStraight,
+        .srcFactorMode = (opa >= (lv_opa_t)LV_OPA_MAX) ? kPXP_PorterDuffFactorStraight : kPXP_PorterDuffFactorInversed,
         .dstGlobalAlpha = opa,
         .srcGlobalAlpha = opa,
-        .dstAlphaMode = (opa >= (lv_opa_t)LV_OPA_MAX) ? kPXP_PorterDuffAlphaStraight : kPXP_PorterDuffAlphaInversed,
-        .srcAlphaMode = kPXP_PorterDuffAlphaStraight
+        .dstAlphaMode = kPXP_PorterDuffAlphaStraight, /*don't care*/
+        .srcAlphaMode = kPXP_PorterDuffAlphaStraight  /*don't care*/
     };
 
     PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
@@ -491,22 +497,25 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
     PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
 
     if(recolor || lv_img_cf_has_alpha(cf)) {
-        /*Configure Porter-Duff blending*/
+        /**
+         * Configure Porter-Duff blending.
+         *
+         * Note: srcFactorMode and dstFactorMode are inverted in fsl_pxp.h:
+         * srcFactorMode is actually applied on PS alpha value
+         * dstFactorMode is actually applied on AS alpha value
+         */
         pxp_porter_duff_config_t pdConfig = {
             .enable = 1,
             .dstColorMode = kPXP_PorterDuffColorWithAlpha,
             .srcColorMode = kPXP_PorterDuffColorNoAlpha,
             .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
             .srcGlobalAlphaMode = lv_img_cf_has_alpha(cf) ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
-            /* srcFactorMode and dstFactorMode are inverted in fsl_pxp.h
-             * srcFactorMode is actually applied on PS alpha value
-             * dstFactorMode is actually applied on AS alpha value */
             .dstFactorMode = kPXP_PorterDuffFactorStraight,
             .srcFactorMode = kPXP_PorterDuffFactorInversed,
-            .srcGlobalAlpha = 0xff,
             .dstGlobalAlpha = recolor ? dsc->recolor_opa : 0x00,
-            .srcAlphaMode = kPXP_PorterDuffAlphaStraight,
-            .dstAlphaMode = kPXP_PorterDuffAlphaStraight /*don't care*/
+            .srcGlobalAlpha = 0xff,
+            .dstAlphaMode = kPXP_PorterDuffAlphaStraight, /*don't care*/
+            .srcAlphaMode = kPXP_PorterDuffAlphaStraight
         };
         PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
     }
@@ -580,7 +589,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
 
         if(recolor) {
             /* New color key after recoloring */
-            lv_color_t colorKey =  lv_color_mix(LV_COLOR_CHROMA_KEY, dsc->recolor, dsc->recolor_opa);
+            lv_color_t colorKey =  lv_color_mix(LV_COLOR_CHROMA_KEY, dsc->recolor, 0xff - dsc->recolor_opa);
 
             colorKeyLow = lv_color_make(colorKey.ch.red != 0 ? colorKey.ch.red - 1 : 0,
                                         colorKey.ch.green != 0 ? colorKey.ch.green - 1 : 0,
