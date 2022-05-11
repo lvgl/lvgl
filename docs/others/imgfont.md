@@ -1,4 +1,4 @@
-## Image font (imgfont)
+# Image font (imgfont)
 Draw image in label or span obj with imgfont.
 This is often used to display Unicode emoji icons in text.
 Supported image formats: determined by LVGL image decoder.
