@@ -11,5 +11,6 @@
    gridnav
    fragment
    msg
+   imgfont
 ```
 
