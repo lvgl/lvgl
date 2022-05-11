@@ -70,6 +70,8 @@ typedef struct {
 static lv_style_t style_common;
 static bool opa_mode = true;
 static finished_cb_t * benchmark_finished_cb = NULL;
+static uint32_t disp_ori_timer_period;
+static uint32_t anim_ori_timer_period;
 
 LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
@@ -635,6 +637,14 @@ static void benchmark_init(void)
 {
     lv_disp_t * disp = lv_disp_get_default();
     disp->driver->monitor_cb = monitor_cb;
+    if(disp->refr_timer) {
+        disp_ori_timer_period = disp->refr_timer->period;
+        lv_timer_set_period(disp->refr_timer, 1);
+    }
+
+    lv_timer_t * anim_timer = lv_anim_get_timer();
+    anim_ori_timer_period = anim_timer->period;
+    lv_timer_set_period(anim_timer, 1);
 
     lv_obj_t * scr = lv_scr_act();
     lv_obj_remove_style_all(scr);
@@ -981,6 +991,15 @@ static void scene_next_task_cb(lv_timer_t * timer)
     }
     /*Ready*/
     else {
+        lv_timer_t * anim_timer = lv_anim_get_timer();
+        lv_timer_set_period(anim_timer, anim_ori_timer_period);
+
+        lv_disp_t * disp = lv_disp_get_default();
+        lv_timer_t * refr_timer = _lv_disp_get_refr_timer(disp);
+        if(refr_timer) {
+            lv_timer_set_period(refr_timer, disp_ori_timer_period);
+        }
+
         generate_report();      /* generate report */
     }
 }
