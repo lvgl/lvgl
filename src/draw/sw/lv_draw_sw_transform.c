@@ -122,8 +122,8 @@ void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area,
             xs_step_256 = (256 * xs_diff) / (dest_w - 1);
             ys_step_256 = (256 * ys_diff) / (dest_w - 1);
         }
-        int32_t xs_ups = xs1_ups + 1 * xs_step_256 / 2 / 256;     /*Init. + go the center of the pixel*/
-        int32_t ys_ups = ys1_ups + 1 * ys_step_256 / 2 / 256;
+        int32_t xs_ups = xs1_ups;
+        int32_t ys_ups = ys1_ups;
 
         if(draw_dsc->antialias == 0) {
             switch(cf) {
@@ -176,7 +176,7 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
         int32_t xs_int = xs_ups >> 8;
         int32_t ys_int = ys_ups >> 8;
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
-            abuf[x] = 0;
+            abuf[x] = 0x00;
         }
         else {
 
