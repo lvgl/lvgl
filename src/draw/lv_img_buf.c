@@ -434,9 +434,9 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
 
     lv_point_t p[4] = {
         {0, 0},
-        {w - 1, 0},
-        {0, h - 1},
-        {w - 1, h - 1},
+        {w, 0},
+        {0, h},
+        {w, h},
     };
     lv_point_transform(&p[0], angle, zoom, pivot);
     lv_point_transform(&p[1], angle, zoom, pivot);
