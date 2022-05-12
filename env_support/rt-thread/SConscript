@@ -32,7 +32,7 @@ for root, dirs, files in os.walk(lvgl_src_cwd):
             inc = inc + [current_path]
 
 
-if GetDepend('PKG_USING_LVGL_EXAMPLES'):
+if GetDepend('PKG_LVGL_USING_EXAMPLES'):
     lvgl_src_cwd = lvgl_cwd + 'examples/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):
@@ -42,7 +42,7 @@ if GetDepend('PKG_USING_LVGL_EXAMPLES'):
             if check_h_hpp_exsit(current_path):
                 inc = inc + [current_path]
 
-if GetDepend('PKG_USING_LVGL_DEMOS'):
+if GetDepend('PKG_LVGL_USING_DEMOS'):
     lvgl_src_cwd = lvgl_cwd + 'demos/'
     inc = inc + [lvgl_src_cwd]
     for root, dirs, files in os.walk(lvgl_src_cwd):

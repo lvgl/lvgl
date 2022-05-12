@@ -18,20 +18,20 @@
 #define DBG_LVL    DBG_INFO
 #include <rtdbg.h>
 
-#ifndef LVGL_THREAD_STACK_SIZE
-#define LVGL_THREAD_STACK_SIZE 4096
-#endif /* LVGL_THREAD_STACK_SIZE */
+#ifndef PKG_LVGL_THREAD_STACK_SIZE
+#define PKG_LVGL_THREAD_STACK_SIZE 4096
+#endif /* PKG_LVGL_THREAD_STACK_SIZE */
 
-#ifndef LVGL_THREAD_PRIO
-#define LVGL_THREAD_PRIO (RT_THREAD_PRIORITY_MAX*2/3)
-#endif /* LVGL_THREAD_PRIO */
+#ifndef PKG_LVGL_THREAD_PRIO
+#define PKG_LVGL_THREAD_PRIO (RT_THREAD_PRIORITY_MAX*2/3)
+#endif /* PKG_LVGL_THREAD_PRIO */
 
 extern void lv_port_disp_init(void);
 extern void lv_port_indev_init(void);
 extern void lv_user_gui_init(void);
 
 static struct rt_thread lvgl_thread;
-static rt_uint8_t lvgl_thread_stack[LVGL_THREAD_STACK_SIZE];
+static rt_uint8_t lvgl_thread_stack[PKG_LVGL_THREAD_STACK_SIZE];
 
 #if LV_USE_LOG
 static void lv_rt_log(const char *buf)
@@ -63,7 +63,7 @@ static int lvgl_thread_init(void)
     rt_err_t err;
 
     err = rt_thread_init(&lvgl_thread, "LVGL", lvgl_thread_entry, RT_NULL,
-           &lvgl_thread_stack[0], sizeof(lvgl_thread_stack), LVGL_THREAD_PRIO, 0);
+           &lvgl_thread_stack[0], sizeof(lvgl_thread_stack), PKG_LVGL_THREAD_PRIO, 0);
     if(err != RT_EOK)
     {
         LOG_E("Failed to create LVGL thread");
