@@ -265,6 +265,12 @@ menu "LVGL configuration"
                 string "include path of SDL header"
                 depends on LV_USE_GPU_SDL
                 default "SDL2/SDL.h"
+            config LV_GPU_SDL_LRU_SIZE
+                int "Maximum buffer size to allocate for rotation"
+                depends on LV_USE_GPU_SDL
+                default 8388608
+                help
+                    Texture cache size, 8MB by default.
         endmenu
 
         menu "Logging"
