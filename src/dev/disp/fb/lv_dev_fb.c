@@ -20,6 +20,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -40,10 +41,10 @@ void lv_dev_fb_init(lv_dev_fb_t * dev)
 
 lv_disp_t * lv_dev_fb_create(lv_dev_fb_t * dev, lv_disp_drv_t * disp_drv)
 {
-    lv_disp_t * disp = lv_disp_drv_register(disp_drv);
     disp_drv->flush_cb = flush_cb;
     disp_drv->hor_res = dev->hor_res;
     disp_drv->ver_res = dev->ver_res;
+    lv_disp_t * disp = lv_disp_drv_register(disp_drv);
     disp->user_data = dev;
 
     return disp;

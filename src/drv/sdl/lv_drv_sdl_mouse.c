@@ -2,7 +2,7 @@
 // Created by Mariotaku on 2021/10/14.
 //
 
-#include <lvgl/src/dev/sdl/lv_dev_sdl_mouse.h>
+#include "lv_drv_sdl_mouse.h"
 #include "../../../src/hal/lv_hal_indev.h"
 #include "../../../src/core/lv_group.h"
 
