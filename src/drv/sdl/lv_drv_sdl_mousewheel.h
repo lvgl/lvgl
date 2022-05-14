@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/src/dev/sdl/lv_dev_sdl_window.h>
+#include "lv_drv_sdl_window.h"
 
 /*********************
  *      DEFINES

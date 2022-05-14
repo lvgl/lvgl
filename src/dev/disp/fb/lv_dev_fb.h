@@ -30,9 +30,6 @@ struct _lv_drv_sdl_disp_priv_t;
 typedef struct {
     lv_coord_t hor_res;
     lv_coord_t ver_res;
-    lv_color_t * buf1;
-    lv_color_t * buf2;
-    uint32_t buf_size;
     lv_drv_t * drv;
 } lv_dev_fb_t;
 

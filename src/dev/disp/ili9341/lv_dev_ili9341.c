@@ -109,7 +109,7 @@ static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
     lv_drv_send_cmd(drv, 102, &window[2], 2);
     lv_drv_send_cmd(drv, 103, &window[3], 2);
 
-    lv_drv_disp_flush(drv, disp_drv, area, color_p);
+    lv_drv_send_image(drv, disp_drv, area, color_p);
 }
 
 

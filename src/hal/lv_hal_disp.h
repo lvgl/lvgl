@@ -191,6 +191,9 @@ uint8_t del_prev  :
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/
+#if LV_USE_USER_DATA
+    void * user_data;
+#endif
 } lv_disp_t;
 
 /**********************
