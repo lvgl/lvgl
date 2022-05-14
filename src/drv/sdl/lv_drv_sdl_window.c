@@ -92,6 +92,7 @@ lv_disp_drv_t * lv_drv_sdl_window_create(lv_drv_sdl_window_t * drv)
     lv_memset_00(drv->_priv, sizeof(_lv_drv_sdl_disp_priv_t));
 
     window_create(drv);
+    lv_disp_drv_init(disp_drv);
 
     lv_disp_draw_buf_init(draw_buf, drv->_priv->fb, NULL, drv->hor_res * drv->ver_res);
     disp_drv->draw_buf = draw_buf;
