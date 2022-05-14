@@ -1208,6 +1208,10 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
         const size_t cursize = block_size(block);
         const size_t combined = cursize + block_size(next) + block_header_overhead;
         const size_t adjust = adjust_request_size(size, ALIGN_SIZE);
+        if(size > cursize && adjust == 0) {
+            /* The request is probably too large, fail */
+            return NULL;
+        }
 
         tlsf_assert(!block_is_free(block) && "block already marked as free");
 
