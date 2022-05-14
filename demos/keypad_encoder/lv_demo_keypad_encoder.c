@@ -166,9 +166,6 @@ static void msgbox_create(void)
     lv_obj_add_event_cb(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
     lv_group_focus_obj(lv_msgbox_get_btns(mbox));
     lv_obj_add_state(lv_msgbox_get_btns(mbox), LV_STATE_FOCUS_KEY);
-#if LV_EX_MOUSEWHEEL
-    lv_group_set_editing(g, true);
-#endif
     lv_group_focus_freeze(g, true);
 
     lv_obj_align(mbox, LV_ALIGN_CENTER, 0, 0);
