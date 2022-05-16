@@ -22,6 +22,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef void finished_cb_t(void);
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -29,6 +31,8 @@ extern "C" {
 void lv_demo_benchmark(void);
 
 void lv_demo_benchmark_run_scene(int_fast16_t scene_no);
+
+void lv_demo_benchmark_set_finished_cb(finished_cb_t * finished_cb);
 
 /**********************
  *      MACROS

@@ -15,6 +15,7 @@ On to top of the screen the title of the current test step, and the result of th
 - After `lv_init()` and initializing the drivers call `lv_demo_benchmark()`
 - If you only want to run a specific scene for any purpose (e.g. debug, performance optimization etc.), you can call `lv_demo_benchmark_run_scene()` instead of `lv_demo_benchmark()`and pass the scene number.
 - If you enabled trace output by setting macro `LV_USE_LOG` to `1` and trace level `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER` or higher, benchmark results are printed out in `csv` format.
+- If you want to know when the testing is finished, you can register a callback function via `lv_demo_benchmark_register_finished_handler()` before calling `lv_demo_benchmark()` or `lv_demo_benchmark_run_scene()`. 
 
 
 ## Interpret the result
@@ -36,25 +37,72 @@ By default, only the changed areas are refreshed. It means if only a few pixels 
 
 If you are doing performance analysis for 2D image processing optimization, LCD latency (flushing data to LCD) introduced by `disp_flush()` might dilute the performance results of the LVGL drawing process, hence make it harder to see your optimization results (gain or loss). To avoid such problem, please:
 
-1. Temporarily remove the code for flushing data to LCD inside `disp_flush()`. For example:
+1. Use a flag to control the LCD flushing inside `disp_flush()`. For example:
 
 ```c
+static volatile bool is_flush_enabled = true;
+
+void disp_enable(void)
+{
+    is_flush_enabled = true;
+}
+
+void disp_disable(void)
+{
+    is_flush_enabled = false;
+}
+
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-#if 0 //!< remove LCD latency
-    GLCD_DrawBitmap(area->x1,               //!< x
-                    area->y1,               //!< y
-                    area->x2 - area->x1 + 1,    //!< width
-                    area->y2 - area->y1 + 1,    //!< height
-                    (const uint8_t *)color_p);
-#endif
+    if(is_flush_enabled) {
+        GLCD_DrawBitmap(area->x1,                   //!< x
+                        area->y1,                   //!< y
+                        area->x2 - area->x1 + 1,    //!< width
+                        area->y2 - area->y1 + 1,    //!< height
+                        (const uint8_t *)color_p);
+    }
+
     /*IMPORTANT!!!
      *Inform the graphics library that you are ready with the flushing*/
     lv_disp_flush_ready(disp_drv);
 }
 ```
 
-2. Use trace output to get the benchmark results by:
+2. Disable flushing before calling `lv_demo_benchmark()` or `lv_demo_benchmark_run_scene()`, for example:
+
+```c
+extern void disp_enable(void);
+extern void disp_disable(void);
+
+static void on_benchmark_finished(void)
+{
+    disp_enable();
+}
+
+int main(void)
+{    
+    lv_init();
+    lv_port_disp_init();
+    lv_port_indev_init();
+
+    LV_LOG("Running LVGL Benchmark...");
+    LV_LOG("Please stand by...");
+    LV_LOG("NOTE: You will NOT see anything until the end.");
+
+    disp_disable();
+    
+    lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
+    lv_demo_benchmark();
+    
+    //lv_demo_benchmark_run_scene(43);      // run scene no 31
+
+    ...
+}
+```
+
+
+
+3. Alternatively, you can use trace output to get the benchmark results in csv format by:
    - Setting macro `LV_USE_LOG` to `1` 
    - Setting trace level `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER` or higher.
 

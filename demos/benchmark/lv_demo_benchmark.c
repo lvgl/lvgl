@@ -69,6 +69,7 @@ typedef struct {
 
 static lv_style_t style_common;
 static bool opa_mode = true;
+static finished_cb_t * benchmark_finished_cb = NULL;
 
 LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
@@ -90,6 +91,7 @@ static void arc_create(lv_style_t * style);
 static void fall_anim(lv_obj_t * obj);
 static void rnd_reset(void);
 static int32_t rnd_next(int32_t min, int32_t max);
+static void report_cb(lv_timer_t * timer);
 
 static void rectangle_cb(void)
 {
@@ -663,6 +665,39 @@ void lv_demo_benchmark(void)
     scene_next_task_cb(NULL);
 }
 
+
+void lv_demo_benchmark_run_scene(int_fast16_t scene_no)
+{
+    benchmark_init();
+
+    if(((scene_no >> 1) >= dimof(scenes))) {
+        /* invalid scene number */
+        return ;
+    }
+
+    opa_mode = scene_no & 0x01;
+    scene_act = scene_no >> 1;
+
+    if(scenes[scene_act].create_cb) {
+        lv_label_set_text_fmt(title, "%"LV_PRId32"/%d: %s%s", scene_act * 2 + (opa_mode ? 1 : 0), (int)(dimof(scenes) * 2) - 2,
+                              scenes[scene_act].name, opa_mode ? " + opa" : "");
+        lv_label_set_text(subtitle, "");
+
+        rnd_reset();
+        scenes[scene_act].create_cb();
+
+        lv_timer_t * t = lv_timer_create(report_cb, SCENE_TIME, NULL);
+        lv_timer_set_repeat_count(t, 1);
+    }
+}
+
+
+void lv_demo_benchmark_set_finished_cb(finished_cb_t * finished_cb);
+{
+    benchmark_finished_cb = finished_cb;
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -710,6 +745,10 @@ static void generate_report(void)
     uint32_t fps_opa_unweighted = fps_opa_sum / weight_opa_sum;
 
     uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
+
+    if(NULL != benchmark_finished_cb) {
+        (*benchmark_finished_cb)();
+    }
 
     lv_obj_clean(lv_scr_act());
     scene_bg = NULL;
@@ -857,6 +896,10 @@ static void generate_report(void)
 
 static void report_cb(lv_timer_t * timer)
 {
+    if(NULL != benchmark_finished_cb) {
+        (*benchmark_finished_cb)();
+    }
+
     if(opa_mode) {
         if(scene_act >= 0) {
             if(scenes[scene_act].time_sum_opa == 0) scenes[scene_act].time_sum_opa = 1;
@@ -888,31 +931,6 @@ static void report_cb(lv_timer_t * timer)
     }
     else {
         lv_label_set_text(subtitle, "");
-    }
-}
-
-void lv_demo_benchmark_run_scene(int_fast16_t scene_no)
-{
-    benchmark_init();
-
-    if(((scene_no >> 1) >= dimof(scenes))) {
-        /* invalid scene number */
-        return ;
-    }
-
-    opa_mode = scene_no & 0x01;
-    scene_act = scene_no >> 1;
-
-    if(scenes[scene_act].create_cb) {
-        lv_label_set_text_fmt(title, "%"LV_PRId32"/%d: %s%s", scene_act * 2 + (opa_mode ? 1 : 0), (int)(dimof(scenes) * 2) - 2,
-                              scenes[scene_act].name, opa_mode ? " + opa" : "");
-        lv_label_set_text(subtitle, "");
-
-        rnd_reset();
-        scenes[scene_act].create_cb();
-
-        lv_timer_t * t = lv_timer_create(report_cb, SCENE_TIME, NULL);
-        lv_timer_set_repeat_count(t, 1);
     }
 }
 
