@@ -384,6 +384,11 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                         a_hor = 0xff;
                     }
                 }
+                else {
+                    a_base = 0xff;
+                    a_ver = 0xff;
+                    a_hor = 0xff;
+                }
 
                 if(a_ver != a_base) a_ver = ((a_ver * ys_fract) + (a_base * (0x100 - ys_fract))) >> 8;
                 if(a_hor != a_base) a_hor = ((a_hor * xs_fract) + (a_base * (0x100 - xs_fract))) >> 8;
