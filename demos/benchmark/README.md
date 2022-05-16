@@ -91,7 +91,7 @@ int main(void)
 
     disp_disable();
     
-    lv_demo_benchmark_register_finished_handler(&on_benchmark_finished);
+    lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
     lv_demo_benchmark();
     
     //lv_demo_benchmark_run_scene(43);      // run scene no 31
