@@ -36,7 +36,15 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-04-27" version="1.0.3" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.3.pack">
+    <release date="2022-05-16" version="1.0.4-alpha5" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.4-alpha5.pack">
+      - LVGL 8.3.0-dev
+      - Monthly update for May
+      - Update drawing service
+      - Update GPU support for Arm-2D library
+      - Improving the methodology used in the benchmark. 
+      - Add new colour support for RGB565A8
+    </release>
+    <release date="2022-04-27" version="1.0.3" url="https://github.com/lvgl/lvgl/raw/b81437e96423826272cd42d5555373f15bfdf03a/env_support/cmsis-pack/LVGL.lvgl.1.0.3.pack">
       - LVGL 8.3.0-dev
       - Monthly update for April
       - Add GPU support for SWM341-DMA2D
