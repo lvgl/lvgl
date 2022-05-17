@@ -14,7 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../hal/lv_hal_disp.h"
 #include "../../../drv/lv_drv.h"
 
 #if LV_USE_DRV_SDL
@@ -30,9 +29,6 @@ struct _lv_drv_sdl_disp_priv_t;
 typedef struct {
     lv_coord_t hor_res;
     lv_coord_t ver_res;
-    lv_color_t * buf1;
-    lv_color_t * buf2;
-    uint32_t buf_size;
     lv_drv_t * drv;
 } lv_dev_fb_t;
 
@@ -40,9 +36,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_stm32_fb_init(lv_dev_fb_t * dev);
+void lv_dev_fb_init(lv_dev_fb_t * dev);
 
-lv_disp_t * lv_dev_stm32_fb_create(lv_dev_fb_t * dev);
+lv_disp_t * lv_dev_fb_create(lv_dev_fb_t * dev, lv_disp_drv_t * disp_drv);
 
 /**********************
  *      MACROS

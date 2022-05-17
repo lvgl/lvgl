@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_DEV_SDL_KEYBOARD_H
-#define LV_DEV_SDL_KEYBOARD_H
+#ifndef LV_DEV_SDL_MOUSE_H
+#define LV_DEV_SDL_MOUSE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/src/dev/sdl/lv_dev_sdl_window.h>
+#include "lv_drv_sdl_window.h"
 
 /*********************
  *      DEFINES
@@ -22,19 +22,20 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_dev_sdl_keyboard_priv_t;
+struct _lv_dev_sdl_mouse_priv_t;
 
 typedef struct {
-    struct _lv_dev_sdl_keyboard_priv_t * _priv;
-} lv_dev_sdl_keyboard_t;
+    struct _lv_dev_sdl_mouse_priv_t * _priv;
+} lv_dev_sdl_mouse_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_sdl_keyboard_init(lv_dev_sdl_keyboard_t * dev);
+void lv_dev_sdl_mouse_init(lv_dev_sdl_mouse_t * dev);
 
-lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_t * dev);
+lv_indev_t * lv_dev_sdl_mouse_create(lv_dev_sdl_mouse_t * dev);
 
 /**********************
  *      MACROS
@@ -44,4 +45,4 @@ lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_t * dev);
 } /* extern "C" */
 #endif
 
-#endif /* LV_DRV_SDL_INDEV_H */
+#endif /* LV_DEV_SDL_MOUSE_H */

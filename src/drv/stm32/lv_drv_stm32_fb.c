@@ -8,6 +8,7 @@
  *********************/
 #include "lv_drv_stm32_fb.h"
 #include "stm32f7xx_hal.h"
+#if LV_USE_DRV_STM32_LTDC
 
 /*********************
  *      DEFINES
@@ -48,7 +49,21 @@ static lv_drv_stm32_fb_t * 	fb_drv_to_flush;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_drv_stm32_fb_init(lv_drv_stm32_fb_t * drv)
+void lv_drv_stm32_ltdc_init(lv_drv_stm32_ltdc_t * ltdc)
+{
+    lv_memset_00(ltdc, sizeof(*ltdc));
+    ltdc->base = LTDC;
+    /*Set some sane values as reference*/
+    ltdc->width = 480;
+    ltdc->height = 272;
+}
+
+void lv_drv_stm32_ltdc_create(lv_drv_stm32_ltdc_t * ltdc)
+{
+	/*Init?*/
+}
+
+void lv_drv_stm32_layer_init(lv_drv_stm32_layer_t * drv)
 {
 	static bool inited = false;
 	if(!inited) {
@@ -59,9 +74,9 @@ void lv_drv_stm32_fb_init(lv_drv_stm32_fb_t * drv)
     lv_memset_00(drv, sizeof(*drv));
 }
 
-void lv_drv_stm32_fb_create(lv_drv_stm32_fb_t * drv)
+lv_disp_drv_t * lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv,  lv_drv_stm32_ltdc_t * ltdc)
 {
-	drv->base.disp_flush_cb = flush_cb;
+    drv->base.send_image_cb = send_image;
 
 	LTDC_LayerCfgTypeDef  layer_cfg;
 
@@ -89,14 +104,33 @@ void lv_drv_stm32_fb_create(lv_drv_stm32_fb_t * drv)
 	layer_cfg.ImageHeight = lv_area_get_height(&drv->area);
 
 	HAL_LTDC_ConfigLayer(drv->ltdc_handler, &layer_cfg, drv->index);
+
+    lv_disp_drv_t * disp_drv = lv_mem_alloc(sizeof(lv_disp_drv_t));
+    LV_ASSERT_MALLOC(disp_drv);
+
+    lv_disp_draw_buf_t * draw_buf = lv_mem_alloc(sizeof(lv_disp_draw_buf_t));
+    LV_ASSERT_MALLOC(draw_buf);
+
+    if(disp_drv == NULL || draw_buf == NULL) {
+        lv_mem_free(disp_drv);
+        lv_mem_free(draw_buf);
+        return NULL;
+    }
+
+    lv_disp_drv_init(disp_drv);
+
+    lv_disp_draw_buf_init(draw_buf, drv->draw_buf1, drv->draw_buf2, drv->draw_buf_size);
+    disp_drv->draw_buf = draw_buf;
+    disp_drv->user_data = drv;
+
+    return disp_drv;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-
-static lv_res_t flush_cb(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area_t * area, const void * buf)
+static lv_res_t send_image(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area_t * area, const void * buf)
 {
 	/*Wait until DMA is busy*/
 	while(disp_drv_to_flush);
@@ -111,9 +145,7 @@ static lv_res_t flush_cb(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area
 
     SCB_CleanInvalidateDCache();
     SCB_InvalidateICache();
-    /*##-7- Start the DMA transfer using the interrupt mode #*/
-    /* Configure the source, destination and buffer size DMA fields and Start DMA Stream transfer */
-    /* Enable All the DMA interrupts */
+
     HAL_StatusTypeDef err;
     uint32_t length = lv_area_get_width(area);
 #if LV_COLOR_DEPTH == 32
@@ -169,7 +201,7 @@ static void DMA_TransferComplete(DMA_HandleTypeDef * han)
   */
 static void DMA_TransferError(DMA_HandleTypeDef * han)
 {
-
+	LV_ASSERT_MSG(0, "DMA transfer error");
 }
 
 
@@ -220,3 +252,5 @@ void DMA2_Stream0_IRQHandler(void)
     /* Check the interrupt and clear flag */
     HAL_DMA_IRQHandler(&DmaHandle);
 }
+
+#endif

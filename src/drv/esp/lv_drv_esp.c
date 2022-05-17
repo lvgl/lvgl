@@ -43,7 +43,7 @@ void lv_drv_esp_init(lv_drv_esp_t * drv)
     drv->base.send_cmd_cb = reset_dev;
     drv->base.send_cmd_cb = send_cmd;
     drv->base.read_data_cb = read_data;
-    drv->base.disp_flush_cb = disp_flush;
+    drv->base.send_image_cb = disp_flush;
 }
 
 void lv_drv_esp_create(lv_drv_esp_t * drv)

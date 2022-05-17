@@ -2,7 +2,7 @@
 // Created by Mariotaku on 2021/10/14.
 //
 
-#include <lvgl/src/dev/sdl/lv_dev_sdl_mouse.h>
+#include "lv_drv_sdl_mouse.h"
 #include "../../../src/hal/lv_hal_indev.h"
 #include "../../../src/core/lv_group.h"
 
@@ -109,7 +109,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
             return;
     }
 
-    lv_disp_t * disp = lv_dev_sdl_get_from_win_id(win_id);
+    lv_disp_t * disp = lv_drv_sdl_get_disp_from_win_id(win_id);
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
@@ -122,7 +122,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 
     if(indev == NULL) return;
     lv_dev_sdl_mouse_t * indev_dev = indev->driver->user_data;
-    lv_dev_sdl_window_t * disp_dev = indev->driver->disp->driver->user_data;
+    lv_drv_sdl_window_t * disp_dev = indev->driver->disp->driver->user_data;
 
     switch(event->type) {
         case SDL_MOUSEBUTTONUP:
