@@ -25,33 +25,15 @@ extern "C" {
 
 typedef struct {
     lv_drv_t base;
-    uint16_t width;
-    uint16_t height;
-    uint16_t hsync;
-    uint16_t hbp;
-    uint16_t hfp;
-    uint16_t vsync;
-    uint16_t vbp;
-    uint16_t vfp;
-    uint16_t hs_polarity : 1;
-    uint16_t vs_polarity : 1;
-    uint16_t de_polarity : 1;
-    uint16_t pc_polarity : 1;
-    void * ltdc;
-} lv_drv_stm32_ltdc_t;
-
-
-typedef struct {
     lv_color_t * frame_buffer;
     lv_area_t area;
     uint8_t index;
-    lv_drv_stm32_ltdc_t * ltdc_drv;
-} lv_drv_stm32_layer_t;
+    void * ltdc_handler;	/*LTDC_HandleTypeDef*/
+} lv_drv_stm32_fb_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 void lv_drv_stm32_ltdc_init(lv_drv_stm32_ltdc_t * drv);
 
