@@ -249,6 +249,14 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
             lv_color_t last_dest_color = lv_color_black();
             lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
 
+#if LV_COLOR_MIX_ROUND_OFS == 0 && LV_COLOR_DEPTH == 16
+            /*lv_color_mix work with an optimized algorithm with 16 bit color depth.
+             *However, it introduces some rounded error on opa.
+             *Introduce the same error here too to make lv_color_premult produces the same result */
+            opa = (uint32_t)((uint32_t)opa + 4) >> 3;
+            opa = opa << 3;
+#endif
+
             uint16_t color_premult[3];
             lv_color_premult(color, opa, color_premult);
             lv_opa_t opa_inv = 255 - opa;
