@@ -183,7 +183,6 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
     else {   /*fill with transparency*/
 
         vg_lite_path_t path;
-        lv_color32_t colMix;
         int32_t path_data[] = { /*VG rectangular path*/
             VLC_OP_MOVE, fill_area->x1,  fill_area->y1,
             VLC_OP_LINE, fill_area->x2 + 1,  fill_area->y1,
@@ -198,15 +197,19 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
                                 ((vg_lite_float_t) fill_area->x2) + 1.0f, ((vg_lite_float_t) fill_area->y2) + 1.0f);
         VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
 
-        colMix.ch.red = (uint8_t)(((uint16_t)col32.ch.red * opa) >> 8); /*Pre-multiply color*/
-        colMix.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
-        colMix.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
-        colMix.ch.alpha = opa;
+        /* Only pre-multiply color if hardware pre-multiplication is not present */
+        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
+            col32.ch.red = (uint8_t)(((uint16_t)col32.ch.red * opa) >> 8);
+            col32.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
+            col32.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
+        }
+        col32.ch.alpha = opa;
+
 #if LV_COLOR_DEPTH==16
-        vgcol = colMix.full;
+        vgcol = col32.full;
 #else /*LV_COLOR_DEPTH==32*/
-        vgcol = ((uint32_t)colMix.ch.alpha << 24) | ((uint32_t)colMix.ch.blue << 16) | ((uint32_t)colMix.ch.green << 8) |
-                (uint32_t)colMix.ch.red;
+        vgcol = ((uint32_t)col32.ch.alpha << 24) | ((uint32_t)col32.ch.blue << 16) | ((uint32_t)col32.ch.green << 8) |
+                (uint32_t)col32.ch.red;
 #endif
 
         /*Clean & invalidate cache*/
@@ -488,7 +491,12 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     }
     else {
         uint32_t opa = (uint32_t)blit->opa;
-        color = (opa << 24) | (opa << 16) | (opa << 8) | opa;
+        if(vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
+            color = (opa << 24) | 0x00FFFFFFU;
+        }
+        else {
+            color = (opa << 24) | (opa << 16) | (opa << 8) | opa;
+        }
         blend = VG_LITE_BLEND_SRC_OVER;
         src_vgbuf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
         src_vgbuf.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;

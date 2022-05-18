@@ -223,9 +223,12 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
     vg_lite_identity(&matrix);
 
     if(opa <= (lv_opa_t)LV_OPA_MAX) {
-        col32.ch.red = (uint8_t)(((uint16_t)col32.ch.red * opa) >> 8); /*Pre-multiply color*/
-        col32.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
-        col32.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
+        /* Only pre-multiply color if hardware pre-multiplication is not present */
+        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
+            col32.ch.red = (uint8_t)(((uint16_t)col32.ch.red * opa) >> 8);
+            col32.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
+            col32.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
+        }
         col32.ch.alpha = opa;
     }
 

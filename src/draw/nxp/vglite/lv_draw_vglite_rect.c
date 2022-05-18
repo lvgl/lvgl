@@ -195,9 +195,12 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     lv_opa_t bg_opa = dsc->bg_opa;
     lv_color32_t bg_col32 = {.full = lv_color_to32(dsc->bg_color)}; /*Convert color to RGBA8888*/
     if(bg_opa <= (lv_opa_t)LV_OPA_MAX) {
-        bg_col32.ch.red = (uint8_t)(((uint16_t)bg_col32.ch.red * bg_opa) >> 8); /*Pre-multiply color*/
-        bg_col32.ch.green = (uint8_t)(((uint16_t)bg_col32.ch.green * bg_opa) >> 8);
-        bg_col32.ch.blue = (uint8_t)(((uint16_t)bg_col32.ch.blue * bg_opa) >> 8);
+        /* Only pre-multiply color if hardware pre-multiplication is not present */
+        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
+            bg_col32.ch.red = (uint8_t)(((uint16_t)bg_col32.ch.red * bg_opa) >> 8);
+            bg_col32.ch.green = (uint8_t)(((uint16_t)bg_col32.ch.green * bg_opa) >> 8);
+            bg_col32.ch.blue = (uint8_t)(((uint16_t)bg_col32.ch.blue * bg_opa) >> 8);
+        }
         bg_col32.ch.alpha = bg_opa;
     }
 
