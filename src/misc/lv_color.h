@@ -440,7 +440,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 {
     lv_color_t ret;
 
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 0
+#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 0 && LV_COLOR_MIX_ROUND_OFS == 0
     /*Source: https://stackoverflow.com/a/50012418/1999969*/
     mix = (mix + 4) >> 3;
     uint32_t bg = (uint32_t)((uint32_t)c2.full | ((uint32_t)c2.full << 16)) &
