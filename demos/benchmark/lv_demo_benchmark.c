@@ -904,33 +904,21 @@ static void report_cb(lv_timer_t * timer)
         if(scene_act >= 0) {
             if(scenes[scene_act].time_sum_opa == 0) scenes[scene_act].time_sum_opa = 1;
             scenes[scene_act].fps_opa = (1000 * scenes[scene_act].refr_cnt_opa) / scenes[scene_act].time_sum_opa;
-            if(scenes[scene_act].create_cb) scene_act++;    /*If still there are scenes go to the next*/
         }
-        else {
-            scene_act++;
-        }
-        opa_mode = false;
+
+        lv_label_set_text_fmt(subtitle, "Result : %"LV_PRId32" FPS",
+                              scenes[scene_act].fps_opa);
+        LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act].name,
+               scenes[scene_act].fps_opa);
     }
     else {
         if(scenes[scene_act].time_sum_normal == 0) scenes[scene_act].time_sum_normal = 1;
         scenes[scene_act].fps_normal = (1000 * scenes[scene_act].refr_cnt_normal) / scenes[scene_act].time_sum_normal;
-        opa_mode = true;
-    }
 
-    if(opa_mode) {
         lv_label_set_text_fmt(subtitle, "Result : %"LV_PRId32" FPS",
                               scenes[scene_act].fps_normal);
         LV_LOG("Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
                scenes[scene_act].fps_normal);
-    }
-    else if(scene_act > 0) {
-        lv_label_set_text_fmt(subtitle, "Result : %"LV_PRId32" FPS",
-                              scenes[scene_act - 1].fps_opa);
-        LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
-               scenes[scene_act - 1].fps_opa);
-    }
-    else {
-        lv_label_set_text(subtitle, "");
     }
 }
 
