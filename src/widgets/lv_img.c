@@ -33,6 +33,7 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_img(lv_event_t * e);
 static lv_res_t get_metadata(lv_img_t * img);
+static void decode_img(lv_img_t * img, lv_point_t * size_hint);
 static void next_frame_task_cb(lv_timer_t * t);
 static void next_frame_task_seekable_cb(lv_timer_t * t);
 static void start_animation(lv_img_t * img, lv_img_dec_ctx_t * dec_ctx);
@@ -414,29 +415,56 @@ static lv_res_t get_metadata(lv_img_t * img)
         header.cf = LV_IMG_CF_ALPHA_1BIT;
     }
     else {
-        /*Query the image cache now, since it's very likely we'll draw the image later on,
-          so don't waste opening a decoder and closing it if it'll be reused */
-        lv_img_dec_dsc_in_t dsc = {0};
-        dsc.src = &img->src;
-        /*Don't waste a cached entry for a different color, use the color that'll be drawn*/
-        dsc.color.full = lv_color_to32(lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN));
-        dsc.size_hint.x = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        dsc.size_hint.y = lv_obj_get_style_height(obj, LV_PART_MAIN);
-
-        lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, img->dec_ctx);
-        if(entry == NULL) return LV_RES_INV;
-
-        /* Take ownership of the decoder context for animated pictures, since it saves decoding time */
-        if(LV_BT(entry->dec_dsc.caps, LV_IMG_DEC_ANIMATED)) {
-            img->dec_ctx = entry->dec_dsc.dec_ctx;
-            img->dec_ctx->auto_allocated = 0;
-            img->caps = entry->dec_dsc.caps;
-            start_animation(img, entry->dec_dsc.dec_ctx);
-        }
-
-        header = entry->dec_dsc.header;
-        lv_img_cache_cleanup(entry);
+        /*Try to see if we find a decoder that's able to decode the picture. Decoding is delayed until rendering*/
+        lv_img_dec_t * img_dec = lv_img_decoder_accept(&img->src, &img->caps);
+        if(img_dec == NULL) return LV_RES_INV;
+        /*Lie a bit here, we assume we'll be able to decode it later correctly*/
+        return LV_RES_OK;
     }
+
+    img->w       = header.w;
+    img->h       = header.h;
+    img->cf      = header.cf;
+    img->pivot.x = header.w / 2;
+    img->pivot.y = header.h / 2;
+
+    lv_obj_refresh_self_size(obj);
+
+    /*Provide enough room for the rotated corners*/
+    if(img->angle || img->zoom != LV_IMG_ZOOM_NONE) lv_obj_refresh_ext_draw_size(obj);
+
+    lv_obj_invalidate(obj);
+    return LV_RES_OK;
+}
+
+static void decode_img(lv_img_t * img, lv_point_t * size_hint)
+{
+    lv_obj_t * obj = (lv_obj_t *)img;
+    lv_img_header_t header;
+    lv_memset_00(&header, sizeof(header));
+    if(img->src.type == LV_IMG_SRC_UNKNOWN) return;
+
+    /*Query the image cache now, since it's very likely we'll draw the image later on,
+        so don't waste opening a decoder and closing it if it'll be reused */
+    lv_img_dec_dsc_in_t dsc = {0};
+    dsc.src = &img->src;
+    /*Don't waste a cached entry for a different color, use the color that'll be drawn*/
+    dsc.color.full = lv_color_to32(lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN));
+    dsc.size_hint = *size_hint;
+
+    lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, img->dec_ctx);
+    if(entry == NULL) return LV_RES_INV;
+
+    /* Take ownership of the decoder context for animated pictures, since it saves decoding time */
+    if(LV_BT(entry->dec_dsc.caps, LV_IMG_DEC_ANIMATED)) {
+        img->dec_ctx = entry->dec_dsc.dec_ctx;
+        img->dec_ctx->auto_allocated = 0;
+        img->caps = entry->dec_dsc.caps;
+        start_animation(img, entry->dec_dsc.dec_ctx);
+    }
+
+    header = entry->dec_dsc.header;
+    lv_img_cache_cleanup(entry);
 
     img->w       = header.w;
     img->h       = header.h;
@@ -590,6 +618,15 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
+        if(img->cf == LV_IMG_CF_UNKNOWN) {
+            lv_point_t size = { lv_obj_get_style_width(obj, LV_PART_MAIN),
+                                lv_obj_get_style_height(obj, LV_PART_MAIN)
+                              };
+            if(size.x == LV_SIZE_CONTENT || size.y == LV_SIZE_CONTENT)
+                /*Image is not decoded yet, so let's decode it to figure out its size, if required*/
+                decode_img(img, &size);
+        }
+
         lv_point_t * p = lv_event_get_param(e);
         if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
             *p = lv_img_get_transformed_size(obj);
