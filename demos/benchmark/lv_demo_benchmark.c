@@ -905,7 +905,7 @@ static void report_cb(lv_timer_t * timer)
             if(scenes[scene_act].time_sum_opa == 0) scenes[scene_act].time_sum_opa = 1;
             scenes[scene_act].fps_opa = (1000 * scenes[scene_act].refr_cnt_opa) / scenes[scene_act].time_sum_opa;
         }
-        
+
         lv_label_set_text_fmt(subtitle, "Result : %"LV_PRId32" FPS",
                               scenes[scene_act].fps_opa);
         LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act].name,
@@ -914,7 +914,7 @@ static void report_cb(lv_timer_t * timer)
     else {
         if(scenes[scene_act].time_sum_normal == 0) scenes[scene_act].time_sum_normal = 1;
         scenes[scene_act].fps_normal = (1000 * scenes[scene_act].refr_cnt_normal) / scenes[scene_act].time_sum_normal;
-        
+
         lv_label_set_text_fmt(subtitle, "Result : %"LV_PRId32" FPS",
                               scenes[scene_act].fps_normal);
         LV_LOG("Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
