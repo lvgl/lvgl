@@ -54,7 +54,7 @@ static void lvgl_thread_entry(void *parameter)
     while(1)
     {
         lv_task_handler();
-        rt_thread_mdelay(10);
+        rt_thread_mdelay(LV_DISP_DEF_REFR_PERIOD);
     }
 }
 
