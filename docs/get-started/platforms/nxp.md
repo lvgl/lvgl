@@ -127,7 +127,20 @@ task or suspend the CPU for power savings.
 #### Basic configuration:
   - Select NXP VGLite engine in lv_conf.h: Set `LV_USE_GPU_NXP_VG_LITE` to 1
   - `SDK_OS_FREE_RTOS` symbol needs to be defined so that the FreeRTOS implementation will be used
-  - No extra initialization is required on `lv_init()` in order to use VGLite
+
+#### Basic initialization:
+  - Initialize VGLite before calling `lv_init()` by specifying the width/height of tessellation window. Value should be
+  a multiple of 16; minimum value is 16 pixels, maximum cannot be greater than frame width. If less than or equal to 0,
+  then no tessellation buffer is created, in which case the function is used for a blit init.
+```c
+      #if LV_USE_GPU_NXP_VG_LITE
+        #include "vg_lite.h"
+      #endif
+      . . .
+      #if LV_USE_GPU_NXP_VG_LITE
+        VG_LITE_COND_STOP(vg_lite_init(64, 64) != VG_LITE_SUCCESS, "VGLite init failed.");
+      #endif
+```
 
 #### Project setup:
   - Add VGLite related files to project:
