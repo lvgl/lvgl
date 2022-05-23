@@ -147,8 +147,10 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
     if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && !need_argb8565_support()) {
         lv_color_t * dest_buf = draw_ctx->buf;
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+#if LV_USE_GPU_NXP_VG_LITE
         lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
+#endif
 
         const lv_color_t * src_buf = dsc->src_buf;
 
@@ -223,9 +225,12 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     lv_area_t draw_area;
     lv_area_copy(&draw_area, draw_ctx->clip_area);
     bool mask_any = lv_draw_mask_is_any(&draw_area);
-
+#if LV_USE_GPU_NXP_VG_LITE
     bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+#endif
+#if LV_USE_GPU_NXP_PXP
     bool scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
+#endif
     bool done = false;
 
     lv_area_t blend_area;
