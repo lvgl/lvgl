@@ -34,6 +34,12 @@ void lv_demo_benchmark_run_scene(int_fast16_t scene_no);
 
 void lv_demo_benchmark_set_finished_cb(finished_cb_t * finished_cb);
 
+/**
+ * Make the benchmark work at the highest frame rate
+ * @param en true: highest frame rate; false: default frame rate
+ */
+void lv_demo_benchmark_set_max_speed(bool en);
+
 /**********************
  *      MACROS
  **********************/

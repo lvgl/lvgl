@@ -16,7 +16,7 @@ On to top of the screen the title of the current test step, and the result of th
 - If you only want to run a specific scene for any purpose (e.g. debug, performance optimization etc.), you can call `lv_demo_benchmark_run_scene()` instead of `lv_demo_benchmark()`and pass the scene number.
 - If you enabled trace output by setting macro `LV_USE_LOG` to `1` and trace level `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER` or higher, benchmark results are printed out in `csv` format.
 - If you want to know when the testing is finished, you can register a callback function via `lv_demo_benchmark_register_finished_handler()` before calling `lv_demo_benchmark()` or `lv_demo_benchmark_run_scene()`. 
-
+- If you want to know the maximum rendering performance of the system, call `lv_demo_benchmark_set_max_speed(true)` before `lv_demo_benchmark()`.
 
 ## Interpret the result
 
