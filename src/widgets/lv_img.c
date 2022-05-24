@@ -453,7 +453,7 @@ static void decode_img(lv_img_t * img, lv_point_t * size_hint)
     dsc.size_hint = *size_hint;
 
     lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, img->dec_ctx);
-    if(entry == NULL) return LV_RES_INV;
+    if(entry == NULL) return;
 
     /* Take ownership of the decoder context for animated pictures, since it saves decoding time */
     if(LV_BT(entry->dec_dsc.caps, LV_IMG_DEC_ANIMATED)) {
@@ -478,7 +478,7 @@ static void decode_img(lv_img_t * img, lv_point_t * size_hint)
     if(img->angle || img->zoom != LV_IMG_ZOOM_NONE) lv_obj_refresh_ext_draw_size(obj);
 
     lv_obj_invalidate(obj);
-    return LV_RES_OK;
+    return;
 }
 
 
@@ -647,9 +647,8 @@ static void draw_img(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_img_t * img = (lv_img_t *)obj;
 
-
-    /* Deferred opening of the animated pictures */
-    if(LV_BT(img->ctrl, LV_IMG_CTRL_MARKED) && img->dec_ctx == NULL) {
+    /* Deferred opening of the pictures with context */
+    if((LV_BT(img->ctrl, LV_IMG_CTRL_MARKED) && img->dec_ctx == NULL) || img->cf == LV_IMG_CF_UNKNOWN) {
         lv_img_dec_dsc_in_t dsc = {
             .src = &img->src,
             .color = {.full = 0},
@@ -662,6 +661,11 @@ static void draw_img(lv_event_t * e)
             img->dec_ctx->auto_allocated = 0;
             entry->dec_dsc.dec_ctx = 0;
             img->ctrl ^= LV_IMG_CTRL_MARKED;
+            /* Save size and type metadata since we can have deferred decoding */
+            img->w = entry->dec_dsc.header.w;
+            img->h = entry->dec_dsc.header.h;
+            img->cf = entry->dec_dsc.header.cf;
+
             lv_img_cache_cleanup(entry);
         }
     }
