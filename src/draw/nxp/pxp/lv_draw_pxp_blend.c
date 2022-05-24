@@ -589,15 +589,21 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
 
         if(recolor) {
             /* New color key after recoloring */
-            lv_color_t colorKey =  lv_color_mix(LV_COLOR_CHROMA_KEY, dsc->recolor, 0xff - dsc->recolor_opa);
+            lv_color_t colorKey =  lv_color_mix(dsc->recolor, LV_COLOR_CHROMA_KEY, dsc->recolor_opa);
 
-            colorKeyLow = lv_color_make(colorKey.ch.red != 0 ? colorKey.ch.red - 1 : 0,
-                                        colorKey.ch.green != 0 ? colorKey.ch.green - 1 : 0,
-                                        colorKey.ch.blue != 0 ? colorKey.ch.blue - 1 : 0);
+            LV_COLOR_SET_R(colorKeyLow, colorKey.ch.red != 0 ? colorKey.ch.red - 1 : 0);
+            LV_COLOR_SET_G(colorKeyLow, colorKey.ch.green != 0 ? colorKey.ch.green - 1 : 0);
+            LV_COLOR_SET_B(colorKeyLow, colorKey.ch.blue != 0 ? colorKey.ch.blue - 1 : 0);
 
-            colorKeyHigh = lv_color_make(colorKey.ch.red != 255 ? colorKey.ch.red + 1 : 255,
-                                         colorKey.ch.green != 255 ? colorKey.ch.green + 1 : 255,
-                                         colorKey.ch.blue != 255 ? colorKey.ch.blue + 1 : 255);
+#if LV_COLOR_DEPTH==16
+            LV_COLOR_SET_R(colorKeyHigh, colorKey.ch.red != 0x1f ? colorKey.ch.red + 1 : 0x1f);
+            LV_COLOR_SET_G(colorKeyHigh, colorKey.ch.green != 0x3f ? colorKey.ch.green + 1 : 0x3f);
+            LV_COLOR_SET_B(colorKeyHigh, colorKey.ch.blue != 0x1f ? colorKey.ch.blue + 1 : 0x1f);
+#else /*LV_COLOR_DEPTH==32*/
+            LV_COLOR_SET_R(colorKeyHigh, colorKey.ch.red != 0xff ? colorKey.ch.red + 1 : 0xff);
+            LV_COLOR_SET_G(colorKeyHigh, colorKey.ch.green != 0xff ? colorKey.ch.green + 1 : 0xff);
+            LV_COLOR_SET_B(colorKeyHigh, colorKey.ch.blue != 0xff ? colorKey.ch.blue + 1 : 0xff);
+#endif
         }
 
         PXP_SetAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_color_to32(colorKeyLow),
