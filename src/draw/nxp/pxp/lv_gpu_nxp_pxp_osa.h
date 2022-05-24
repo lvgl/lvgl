@@ -6,7 +6,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2020 NXP
+ * Copyright 2020, 2022 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,21 +27,52 @@
  *
  */
 
-#ifndef LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_
-#define LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_
+#ifndef LV_GPU_NXP_PXP_OSA_H
+#define LV_GPU_NXP_PXP_OSA_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "../../lv_conf_internal.h"
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "../../../lv_conf_internal.h"
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-extern lv_nxp_pxp_cfg_t pxp_default_cfg;
-#endif
+#include "lv_gpu_nxp_pxp.h"
+
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
+
+/**
+ * PXP device interrupt handler. Used to check PXP task completion status.
+ */
+void PXP_IRQHandler(void);
+
+/**
+ * Helper function to get the PXP default configuration.
+ */
+lv_nxp_pxp_cfg_t * lv_gpu_nxp_pxp_get_cfg(void);
+
+/**********************
+ *      MACROS
+ **********************/
+
+#endif /*LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_*/
+#endif /*LV_GPU_NXP_PXP_OSA_H*/
