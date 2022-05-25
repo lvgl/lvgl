@@ -838,6 +838,9 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
+    lv_disp_t * disp   = lv_obj_get_disp(obj);
+    if(!lv_disp_is_invalidation_enabled(disp)) return;
+
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
     if(!lv_obj_area_is_visible(obj, &area_tmp)) return;
