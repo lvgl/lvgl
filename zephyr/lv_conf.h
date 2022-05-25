@@ -31,7 +31,7 @@
 /* HAL settings */
 
 #define LV_TICK_CUSTOM			1
-#define LV_TICK_CUSTOM_INCLUDE		"kernel.h"
+#define LV_TICK_CUSTOM_INCLUDE		<zephyr/kernel.h>
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR	(k_uptime_get_32())
 
 /* Misc settings */
