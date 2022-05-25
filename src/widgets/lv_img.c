@@ -207,9 +207,9 @@ void lv_img_set_angle(lv_obj_t * obj, int16_t angle)
     /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
      * the whole ext draw area */
     lv_disp_t * disp = lv_obj_get_disp(obj);
-    //    lv_disp_enable_invalidation(disp, false);
+    lv_disp_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
-    //    lv_disp_enable_invalidation(disp, true);
+    lv_disp_enable_invalidation(disp, true);
 
     _lv_img_buf_get_transformed_area(&a, w, h, img->angle, img->zoom, &img->pivot);
     a.x1 += obj->coords.x1;
