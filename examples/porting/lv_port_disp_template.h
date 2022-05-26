@@ -31,6 +31,14 @@ extern "C" {
  **********************/
 void lv_port_disp_init(void);
 
+/* Enable the flushing process when disp_flush() is called by LVGL
+ */
+void disp_enable(void);
+
+/* Disable the flushing process when disp_flush() is called by LVGL
+ */
+void disp_disable(void);
+
 /**********************
  *      MACROS
  **********************/
