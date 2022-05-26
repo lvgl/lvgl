@@ -177,6 +177,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     disp->driver = driver;
 
+    disp->inv_en_cnt = 1;
+
     lv_disp_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/

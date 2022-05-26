@@ -187,6 +187,7 @@ uint8_t del_prev  :
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint16_t inv_p;
+    int32_t inv_en_cnt;
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/

@@ -414,6 +414,38 @@ void lv_disp_clean_dcache(lv_disp_t * disp)
 }
 
 /**
+ * Temporarily enable and disable the invalidation of the display.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @param en true: enable invalidation; false: invalidation
+ */
+void lv_disp_enable_invalidation(lv_disp_t * disp, bool en)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("no display registered");
+        return;
+    }
+
+    disp->inv_en_cnt += en ? 1 : -1;
+}
+
+/**
+ * Get display invalidation is enabled.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return return true if invalidation is enabled
+ */
+bool lv_disp_is_invalidation_enabled(lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("no display registered");
+        return false;
+    }
+
+    return (disp->inv_en_cnt > 0);
+}
+
+/**
  * Get a pointer to the screen refresher timer to
  * modify its parameters with `lv_timer_...` functions.
  * @param disp pointer to a display

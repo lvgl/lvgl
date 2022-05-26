@@ -9,6 +9,7 @@
 #include "lv_img.h"
 #if LV_USE_IMG != 0
 
+#include "../core/lv_disp.h"
 #include "../misc/lv_assert.h"
 #include "../draw/lv_img_decoder.h"
 #include "../misc/lv_fs.h"
@@ -202,7 +203,13 @@ void lv_img_set_angle(lv_obj_t * obj, int16_t angle)
     lv_obj_invalidate_area(obj, &a);
 
     img->angle = angle;
+
+    /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
+     * the whole ext draw area */
+    lv_disp_t * disp = lv_obj_get_disp(obj);
+    lv_disp_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
+    lv_disp_enable_invalidation(disp, true);
 
     _lv_img_buf_get_transformed_area(&a, w, h, img->angle, img->zoom, &img->pivot);
     a.x1 += obj->coords.x1;
@@ -230,7 +237,13 @@ void lv_img_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 
     img->pivot.x = x;
     img->pivot.y = y;
+
+    /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
+     * the whole ext draw area */
+    lv_disp_t * disp = lv_obj_get_disp(obj);
+    lv_disp_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
+    lv_disp_enable_invalidation(disp, true);
 
     _lv_img_buf_get_transformed_area(&a, w, h, img->angle, img->zoom, &img->pivot);
     a.x1 += obj->coords.x1;
@@ -259,7 +272,13 @@ void lv_img_set_zoom(lv_obj_t * obj, uint16_t zoom)
     lv_obj_invalidate_area(obj, &a);
 
     img->zoom = zoom;
+
+    /* Disable invalidations because lv_obj_refresh_ext_draw_size would invalidate
+     * the whole ext draw area */
+    lv_disp_t * disp = lv_obj_get_disp(obj);
+    lv_disp_enable_invalidation(disp, false);
     lv_obj_refresh_ext_draw_size(obj);
+    lv_disp_enable_invalidation(disp, true);
 
     _lv_img_buf_get_transformed_area(&a, w, h, img->angle, img->zoom, &img->pivot);
     a.x1 += obj->coords.x1 - 1;
