@@ -968,7 +968,7 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
  */
 static void indev_proc_reset_query_handler(lv_indev_t * indev)
 {
-    if(indev->proc.reset_query) {
+    if(indev && indev->proc.reset_query) {
         indev->proc.types.pointer.act_obj           = NULL;
         indev->proc.types.pointer.last_obj          = NULL;
         indev->proc.types.pointer.scroll_obj          = NULL;
