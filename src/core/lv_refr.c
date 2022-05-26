@@ -206,6 +206,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) return;
+    if(!lv_disp_is_invalidation_enabled(disp)) return;
 
     if(disp->rendering_in_progress) {
         LV_LOG_ERROR("detected modifying dirty areas in render");
