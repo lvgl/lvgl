@@ -51,6 +51,10 @@
     #include "vglite/lv_draw_vglite_arc.h"
 #endif
 
+#if LV_COLOR_DEPTH != 32
+    #include "../../core/lv_refr.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
