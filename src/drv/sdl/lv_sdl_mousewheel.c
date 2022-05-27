@@ -1,8 +1,14 @@
-//
-// Created by Mariotaku on 2021/10/14.
-//
+/**
+ * @file lv_sdl_mousewheel.c
+ *
+ */
 
-#include "lv_drv_sdl_mousewheel.h"
+/*********************
+ *      INCLUDES
+ *********************/
+#include "lv_sdl_mousewheel.h"
+#if LV_USE_SDL
+
 #include "../../../src/hal/lv_hal_indev.h"
 #include "../../../src/core/lv_group.h"
 
@@ -20,24 +26,24 @@ static void sdl_mousewheel_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * da
  *  STATIC VARIABLES
  **********************/
 
-typedef struct _lv_dev_sdl_mousewheel_priv_t {
+typedef struct _lv_sdl_mousewheel_priv_t {
     int16_t diff;
     lv_indev_state_t state;
-} _lv_drv_sdl_mousewheel_priv_t;
+} _lv_sdl_mousewheel_priv_t;
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_dev_sdl_mousewheel_init(lv_dev_sdl_mousewheel_t * dev)
+void lv_sdl_mousewheel_init(lv_sdl_mousewheel_t * dev)
 {
-    lv_memset_00(dev, sizeof(lv_dev_sdl_mousewheel_t));
+    lv_memset_00(dev, sizeof(lv_sdl_mousewheel_t));
     return;
 }
 
-lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_t * dev)
+lv_indev_t * lv_sdl_mousewheel_create(lv_sdl_mousewheel_t * dev)
 {
-    dev->_priv = lv_mem_alloc(sizeof(lv_dev_sdl_mousewheel_t));
+    dev->_priv = lv_mem_alloc(sizeof(lv_sdl_mousewheel_t));
     LV_ASSERT_MALLOC(dev->_priv);
 
     lv_indev_drv_t * indev_drv = lv_mem_alloc(sizeof(lv_indev_drv_t));
@@ -49,7 +55,7 @@ lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_t * dev)
         return NULL;
     }
 
-    lv_memset_00(dev->_priv, sizeof(_lv_drv_sdl_mousewheel_priv_t));
+    lv_memset_00(dev->_priv, sizeof(_lv_sdl_mousewheel_priv_t));
 
     lv_indev_drv_init(indev_drv);
     indev_drv->type = LV_INDEV_TYPE_ENCODER;
@@ -66,7 +72,7 @@ lv_indev_t * lv_dev_sdl_mousewheel_create(lv_dev_sdl_mousewheel_t * dev)
 
 static void sdl_mousewheel_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
-    lv_dev_sdl_mousewheel_t * dev = indev_drv->user_data;
+    lv_sdl_mousewheel_t * dev = indev_drv->user_data;
 
     data->state = dev->_priv->state;
     data->enc_diff = dev->_priv->diff;
@@ -100,7 +106,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
     }
 
     if(indev == NULL) return;
-    lv_dev_sdl_mousewheel_t * indev_dev = indev->driver->user_data;
+    lv_sdl_mousewheel_t * indev_dev = indev->driver->user_data;
 
     switch(event->type) {
         case SDL_MOUSEWHEEL:
@@ -128,3 +134,6 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
             break;
     }
 }
+
+#endif /*LV_USE_SDL*/
+

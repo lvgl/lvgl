@@ -1,13 +1,13 @@
 /**
- * @file sdl.h
+ * @file lv_sdl_window.h
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_drv_sdl_window.h"
-#if LV_USE_DRV_SDL
+#include "lv_sdl_window.h"
+#if LV_USE_SDL
 
 #include LV_PLATFORM_SDL_INCLUDE_PATH
 
@@ -18,20 +18,20 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_drv_sdl_disp_priv_t {
+typedef struct _lv_sdl_disp_priv_t {
     SDL_Window * window;
     SDL_Renderer * renderer;
     SDL_Texture * texture;
     lv_color_t * fb;
-} _lv_drv_sdl_disp_priv_t;
+} _lv_sdl_disp_priv_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t send_image(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area_t * area, void * color_p);
-static void window_create(lv_drv_sdl_window_t * drv);
-static void window_update(lv_drv_sdl_window_t * drv);
-static void monitor_sdl_clean_up(lv_drv_sdl_window_t * dev);
+static void window_create(lv_sdl_window_t * drv);
+static void window_update(lv_sdl_window_t * drv);
+static void monitor_sdl_clean_up(lv_sdl_window_t * dev);
 static void sdl_event_handler(lv_timer_t * t);
 
 /***********************
@@ -55,7 +55,7 @@ lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_drv_sdl_window_init(lv_drv_sdl_window_t * drv)
+void lv_drv_sdl_window_init(lv_sdl_window_t * drv)
 {
     static bool inited = false;
     if(!inited) {
@@ -65,15 +65,15 @@ void lv_drv_sdl_window_init(lv_drv_sdl_window_t * drv)
         inited = true;
     }
 
-    lv_memset_00(drv, sizeof(lv_drv_sdl_window_t));
+    lv_memset_00(drv, sizeof(lv_sdl_window_t));
     drv->hor_res = 800;
     drv->ver_res = 480;
     drv->zoom = 1;
 }
 
-lv_disp_drv_t * lv_drv_sdl_window_create(lv_drv_sdl_window_t * drv)
+lv_disp_drv_t * lv_drv_sdl_window_create(lv_sdl_window_t * drv)
 {
-    drv->_priv = lv_mem_alloc(sizeof(_lv_drv_sdl_disp_priv_t));
+    drv->_priv = lv_mem_alloc(sizeof(_lv_sdl_disp_priv_t));
     LV_ASSERT_MALLOC(drv->_priv);
 
     lv_disp_drv_t * disp_drv = lv_mem_alloc(sizeof(lv_disp_drv_t));
@@ -89,7 +89,7 @@ lv_disp_drv_t * lv_drv_sdl_window_create(lv_drv_sdl_window_t * drv)
         return NULL;
     }
 
-    lv_memset_00(drv->_priv, sizeof(_lv_drv_sdl_disp_priv_t));
+    lv_memset_00(drv->_priv, sizeof(_lv_sdl_disp_priv_t));
 
     window_create(drv);
     lv_disp_drv_init(disp_drv);
@@ -117,7 +117,7 @@ static lv_res_t send_image(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_ar
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
     if(lv_disp_flush_is_last(disp_drv)) {
-        window_update((lv_drv_sdl_window_t *)drv);
+        window_update((lv_sdl_window_t *)drv);
     }
 
     /*IMPORTANT! It must be called to tell the system the flush is ready*/
@@ -142,7 +142,7 @@ static void sdl_event_handler(lv_timer_t * t)
 
         lv_disp_t * disp;
 
-        lv_drv_sdl_window_t * dev;
+        lv_sdl_window_t * dev;
         if(event.type == SDL_WINDOWEVENT) {
             disp = lv_drv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
@@ -169,14 +169,14 @@ static void sdl_event_handler(lv_timer_t * t)
     }
 }
 
-static void monitor_sdl_clean_up(lv_drv_sdl_window_t * dev)
+static void monitor_sdl_clean_up(lv_sdl_window_t * dev)
 {
     SDL_DestroyTexture(dev->_priv->texture);
     SDL_DestroyRenderer(dev->_priv->renderer);
     SDL_DestroyWindow(dev->_priv->window);
 }
 
-static void window_create(lv_drv_sdl_window_t * drv)
+static void window_create(lv_sdl_window_t * drv)
 {
     int flag = 0;
 #if SDL_FULLSCREEN
@@ -206,7 +206,7 @@ static void window_create(lv_drv_sdl_window_t * drv)
     lv_memset_ff(drv->_priv->fb, drv->hor_res * drv->ver_res * sizeof(lv_color_t));
 }
 
-static void window_update(lv_drv_sdl_window_t * drv)
+static void window_update(lv_sdl_window_t * drv)
 {
     SDL_UpdateTexture(drv->_priv->texture, NULL, drv->_priv->fb, drv->hor_res * sizeof(lv_color_t));
     SDL_RenderClear(drv->_priv->renderer);
@@ -220,7 +220,7 @@ lv_disp_t * lv_drv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
     while(disp) {
-        lv_drv_sdl_window_t * drv = disp->driver->user_data;
+        lv_sdl_window_t * drv = disp->driver->user_data;
         if(SDL_GetWindowID(drv->_priv->window) == win_id) {
             return disp;
         }
@@ -229,4 +229,4 @@ lv_disp_t * lv_drv_sdl_get_disp_from_win_id(uint32_t win_id)
     return NULL;
 }
 
-#endif /*LV_DRV_SDL_DISP*/
+#endif /*LV_USE_SDL*/

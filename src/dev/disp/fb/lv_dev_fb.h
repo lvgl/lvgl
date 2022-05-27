@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../../drv/lv_drv.h"
 
-#if LV_USE_DRV_SDL
+#if LV_USE_SDL
 
 /*********************
  *      DEFINES

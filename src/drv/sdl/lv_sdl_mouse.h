@@ -1,10 +1,10 @@
 /**
- * @file sdl_common.h
+ * @file Lv_sdl_mouse.h
  *
  */
 
-#ifndef LV_DEV_SDL_MOUSE_H
-#define LV_DEV_SDL_MOUSE_H
+#ifndef LV_SDL_MOUSE_H
+#define LV_SDL_MOUSE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_drv_sdl_window.h"
+#include "lv_sdl_window.h"
+#if LV_USE_SDL
 
 /*********************
  *      DEFINES
@@ -22,27 +23,29 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_dev_sdl_mouse_priv_t;
+struct _lv_sdl_mouse_priv_t;
 
 typedef struct {
-    struct _lv_dev_sdl_mouse_priv_t * _priv;
-} lv_dev_sdl_mouse_t;
+    struct _lv_sdl_mouse_priv_t * _priv;
+} lv_sdl_mouse_t;
 
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_sdl_mouse_init(lv_dev_sdl_mouse_t * dev);
+void lv_dev_sdl_mouse_init(lv_sdl_mouse_t * dev);
 
-lv_indev_t * lv_dev_sdl_mouse_create(lv_dev_sdl_mouse_t * dev);
+lv_indev_t * lv_dev_sdl_mouse_create(lv_sdl_mouse_t * dev);
 
 /**********************
  *      MACROS
  **********************/
 
+#endif /*LV_USE_SDL*/
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* LV_DEV_SDL_MOUSE_H */
+#endif /* LV_SDL_MOUSE_H */

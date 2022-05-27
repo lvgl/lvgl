@@ -1,8 +1,14 @@
-//
-// Created by Mariotaku on 2021/10/14.
-//
+/**
+ * @file lv_sdl_keyboard.c
+ *
+ */
 
-#include "lv_drv_sdl_keyboard.h"
+/*********************
+ *      INCLUDES
+ *********************/
+#include "lv_sdl_keyboard.h"
+#if LV_USE_SDL
+
 #include "../../../src/hal/lv_hal_indev.h"
 #include "../../../src/core/lv_group.h"
 
@@ -25,25 +31,25 @@ static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key);
  *  STATIC VARIABLES
  **********************/
 
-typedef struct _lv_dev_sdl_keyboard_priv_t {
+typedef struct _lv_sdl_keyboard_priv_t {
     char buf[KEYBOARD_BUFFER_SIZE];
     bool dummy_read;
-} _lv_dev_sdl_keyboard_priv_t;
+} _lv_sdl_keyboard_priv_t;
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
 
-void lv_dev_sdl_keyboard_init(lv_dev_sdl_keyboard_t * dev)
+void lv_dev_sdl_keyboard_init(lv_sdl_keyboard_t * dev)
 {
-    lv_memset_00(dev, sizeof(lv_dev_sdl_keyboard_t));
+    lv_memset_00(dev, sizeof(lv_sdl_keyboard_t));
     return;
 }
 
-lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_t * dev)
+lv_indev_t * lv_dev_sdl_keyboard_create(lv_sdl_keyboard_t * dev)
 {
-    dev->_priv = lv_mem_alloc(sizeof(_lv_dev_sdl_keyboard_priv_t));
+    dev->_priv = lv_mem_alloc(sizeof(_lv_sdl_keyboard_priv_t));
     LV_ASSERT_MALLOC(dev->_priv);
 
     lv_indev_drv_t * indev_drv = lv_mem_alloc(sizeof(lv_indev_drv_t));
@@ -55,7 +61,7 @@ lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_t * dev)
         return NULL;
     }
 
-    lv_memset_00(dev->_priv, sizeof(_lv_dev_sdl_keyboard_priv_t));
+    lv_memset_00(dev->_priv, sizeof(_lv_sdl_keyboard_priv_t));
 
     lv_indev_drv_init(indev_drv);
     indev_drv->type = LV_INDEV_TYPE_KEYPAD;
@@ -72,7 +78,7 @@ lv_indev_t * lv_dev_sdl_keyboard_create(lv_dev_sdl_keyboard_t * dev)
 
 static void sdl_keyboard_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
-    lv_dev_sdl_keyboard_t * dev = indev_drv->user_data;
+    lv_sdl_keyboard_t * dev = indev_drv->user_data;
 
     const size_t len = strlen(dev->_priv->buf);
 
@@ -118,7 +124,7 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
     }
 
     if(indev == NULL) return;
-    lv_dev_sdl_keyboard_t * indev_dev = indev->driver->user_data;
+    lv_sdl_keyboard_t * indev_dev = indev->driver->user_data;
 
 
     /* We only care about SDL_KEYDOWN and SDL_TEXTINPUT events */
@@ -195,4 +201,4 @@ static uint32_t keycode_to_ctrl_key(SDL_Keycode sdl_key)
     }
 }
 
-
+#endif /*LV_USE_SDL*/
