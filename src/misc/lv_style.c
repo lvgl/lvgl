@@ -169,6 +169,9 @@ void lv_style_reset(lv_style_t * style)
 
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
 {
+    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) == NULL) {
+        _lv_style_custom_prop_flag_lookup_table_size = 0;
+    }
     /*
      * Allocate the lookup table if it's not yet available.
      */
