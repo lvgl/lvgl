@@ -540,6 +540,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             map_area.y2 ++;
         }
         else {
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
             map_area.y1 = map_area.y2 + 1;
@@ -559,6 +560,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     /*Flush the last part*/
     if(map_area.y1 != map_area.y2) {
         map_area.y2--;
+        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
 
