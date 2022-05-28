@@ -783,7 +783,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_FOCUSED) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS)) {
-            lv_obj_scroll_to_view_recursive(obj, LV_ANIM_ON);
+            lv_obj_scroll_to_view_recursive(obj, LV_ANIM_OFF);
         }
 
         bool editing = false;
