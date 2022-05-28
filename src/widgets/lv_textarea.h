@@ -42,6 +42,7 @@ typedef struct {
     lv_obj_t * label;            /*Label of the text area*/
     char * placeholder_txt;      /*Place holder label. only visible if text is an empty string*/
     char * pwd_tmp;              /*Used to store the original text in password mode*/
+    char * pwd_bullet;           /*Replacement characters displayed in password mode*/
     const char * accepted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint32_t max_length;         /*The max. number of characters. 0: no limit*/
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*'*/
@@ -155,6 +156,13 @@ void lv_textarea_set_cursor_click_pos(lv_obj_t * obj, bool en);
 void lv_textarea_set_password_mode(lv_obj_t * obj, bool en);
 
 /**
+ * Set the replacement characters to show in password mode
+ * @param obj       pointer to a text area object
+ * @param bullet    pointer to the replacement text
+ */
+void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet);
+
+/**
  * Configure the text area to one line or back to normal
  * @param obj       pointer to a text area object
  * @param en        true: one line, false: normal
@@ -253,6 +261,13 @@ bool lv_textarea_get_cursor_click_pos(lv_obj_t * obj);
  * @return          true: password mode is enabled, false: disabled
  */
 bool lv_textarea_get_password_mode(const lv_obj_t * obj);
+
+/**
+ * Get the replacement characters to show in password mode
+ * @param obj       pointer to a text area object
+ * @return          pointer to the replacement text
+ */
+const char * lv_textarea_get_password_bullet(lv_obj_t * obj);
 
 /**
  * Get the one line configuration attribute

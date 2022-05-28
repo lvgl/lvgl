@@ -435,6 +435,36 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
     refr_cursor_area(obj);
 }
 
+void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(bullet);
+
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+
+    if(!bullet && (ta->pwd_bullet)) {
+        lv_mem_free(ta->pwd_bullet);
+        ta->pwd_bullet = NULL;
+    }
+    else {
+        size_t txt_len = strlen(bullet);
+
+        /*Allocate memory for the pwd_bullet text*/
+        /*NOTE: Using special realloc behavior, malloc-like when data_p is NULL*/
+        ta->pwd_bullet = lv_mem_realloc(ta->pwd_bullet, txt_len + 1);
+        LV_ASSERT_MALLOC(ta->pwd_bullet);
+        if(ta->pwd_bullet == NULL) {
+            LV_LOG_ERROR("lv_textarea_set_password_bullet: couldn't allocate memory for bullet");
+            return;
+        }
+
+        strcpy(ta->pwd_bullet, bullet);
+        ta->pwd_bullet[txt_len] = '\0';
+    }
+
+    lv_obj_invalidate(obj);
+}
+
 void lv_textarea_set_one_line(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -588,6 +618,23 @@ bool lv_textarea_get_password_mode(const lv_obj_t * obj)
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     return ta->pwd_mode == 1U;
+}
+
+const char * lv_textarea_get_password_bullet(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+
+    if(ta->pwd_bullet) return ta->pwd_bullet;
+
+    lv_font_glyph_dsc_t g;
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+
+    /*If the textarea's font has the bullet character use it else fallback to "*"*/
+    if(lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0))
+        return LV_SYMBOL_BULLET;
+    return "*";
 }
 
 bool lv_textarea_get_one_line(const lv_obj_t * obj)
@@ -764,6 +811,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     ta->pwd_mode          = 0;
     ta->pwd_tmp           = NULL;
+    ta->pwd_bullet        = NULL;
     ta->pwd_show_time     = LV_TEXTAREA_DEF_PWD_SHOW_TIME;
     ta->accepted_chars    = NULL;
     ta->max_length        = 0;
@@ -799,6 +847,10 @@ static void lv_textarea_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     if(ta->pwd_tmp != NULL) {
         lv_mem_free(ta->pwd_tmp);
         ta->pwd_tmp = NULL;
+    }
+    if(ta->pwd_bullet != NULL) {
+        lv_mem_free(ta->pwd_bullet);
+        ta->pwd_bullet = NULL;
     }
     if(ta->placeholder_txt != NULL) {
         lv_mem_free(ta->placeholder_txt);
@@ -931,13 +983,7 @@ static void pwd_char_hider(lv_obj_t * obj)
     uint32_t enc_len = _lv_txt_get_encoded_length(txt);
     if(enc_len == 0) return;
 
-    /*If the textarea's font has "bullet" character use it else fallback to "*"*/
-    lv_font_glyph_dsc_t g;
-    const char * bullet = "*";
-
-    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    if(lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0)) bullet = LV_SYMBOL_BULLET;
-
+    const char * bullet = lv_textarea_get_password_bullet(obj);
     const size_t bullet_len = strlen(bullet);
     char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
 
