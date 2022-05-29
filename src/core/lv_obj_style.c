@@ -44,7 +44,7 @@ typedef enum {
  **********************/
 static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector);
 static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part);
-static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v);
+static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
@@ -224,14 +224,14 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
 {
     lv_style_value_t value_act;
     bool inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
-    bool found = false;
+    lv_style_res_t found = LV_STYLE_RES_NOT_FOUND;
     while(obj) {
         found = get_prop_core(obj, part, prop, &value_act);
-        if(found) break;
+        if(found == LV_STYLE_RES_FOUND) break;
         if(!inherit) break;
 
         /*If not found, check the `MAIN` style first*/
-        if(part != LV_PART_MAIN) {
+        if(found != LV_STYLE_RES_INHERIT && part != LV_PART_MAIN) {
             part = LV_PART_MAIN;
             continue;
         }
@@ -240,7 +240,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
         obj = lv_obj_get_parent(obj);
     }
 
-    if(!found) {
+    if(found != LV_STYLE_RES_FOUND) {
         if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
             const lv_obj_class_t * cls = obj->class_p;
             while(cls) {
@@ -556,7 +556,7 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t se
 }
 
 
-static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v)
+static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v)
 {
     uint8_t group = 1 << _lv_style_get_prop_group(prop);
     int32_t weight = -1;
@@ -565,7 +565,7 @@ static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     lv_style_value_t value_tmp;
     bool skip_trans = obj->skip_trans;
     uint32_t i;
-    bool found;
+    lv_style_res_t found;
     for(i = 0; i < obj->style_cnt; i++) {
         _lv_obj_style_t * obj_style = &obj->styles[i];
         if(obj_style->is_trans == false) break;
@@ -576,9 +576,11 @@ static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         if(part_act != part) continue;
         if((obj_style->style->has_group & group) == 0) continue;
         found = lv_style_get_prop(obj_style->style, prop, &value_tmp);
-        if(found) {
+        if(found == LV_STYLE_RES_FOUND) {
             *v = value_tmp;
-            return true;
+            return LV_STYLE_RES_FOUND;
+        } else if(found == LV_STYLE_RES_INHERIT) {
+            return LV_STYLE_RES_INHERIT;
         }
     }
 
@@ -598,23 +600,25 @@ static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
 
         found = lv_style_get_prop(obj_style->style, prop, &value_tmp);
 
-        if(found) {
+        if(found == LV_STYLE_RES_FOUND) {
             if(state_act == state) {
                 *v = value_tmp;
-                return true;
+                return LV_STYLE_RES_FOUND;
             }
             if(weight < state_act) {
                 weight = state_act;
                 *v = value_tmp;
             }
+        } else if(found == LV_STYLE_RES_INHERIT) {
+            return LV_STYLE_RES_INHERIT;
         }
     }
 
     if(weight >= 0) {
         *v = value_tmp;
-        return true;
+        return LV_STYLE_RES_FOUND;
     }
-    else return false;
+    else return LV_STYLE_RES_NOT_FOUND;
 }
 
 /**

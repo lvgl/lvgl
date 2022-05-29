@@ -50,9 +50,9 @@ extern "C" {
 LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 
 #if LV_USE_ASSERT_STYLE
-#define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .sentinel = LV_STYLE_SENTINEL_VALUE, .v_p = { .const_props = prop_array }, .has_group = 0xFF, .is_const = 1 }
+#define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .sentinel = LV_STYLE_SENTINEL_VALUE, .v_p = { .const_props = prop_array }, .has_group = 0xFF, .prop1 = LV_STYLE_PROP_ANY }
 #else
-#define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .v_p = { .const_props = prop_array }, .has_group = 0xFF, .is_const = 1 }
+#define LV_STYLE_CONST_INIT(var_name, prop_array) const lv_style_t var_name = { .v_p = { .const_props = prop_array }, .has_group = 0xFF, .prop1 = LV_STYLE_PROP_ANY }
 #endif
 
 /** On simple system, don't waste resources on gradients */
@@ -60,6 +60,9 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 #define LV_GRADIENT_MAX_STOPS 2
 #endif
 
+#define LV_STYLE_PROP_META_INHERIT 0x8000
+
+#define LV_STYLE_PROP_ID_MASK(prop) ((prop) & ~(LV_STYLE_PROP_META_INHERIT))
 
 /**********************
  *      TYPEDEFS
@@ -267,6 +270,14 @@ typedef enum {
     LV_STYLE_PROP_ANY                = 0xFFFF
 } lv_style_prop_t;
 
+enum {
+    LV_STYLE_RES_NOT_FOUND,
+    LV_STYLE_RES_FOUND,
+    LV_STYLE_RES_INHERIT
+};
+
+typedef uint8_t lv_style_res_t;
+
 /**
  * Descriptor for style transitions
  */
@@ -305,8 +316,7 @@ typedef struct {
         const lv_style_const_prop_t * const_props;
     } v_p;
 
-    uint16_t prop1 : 15;
-    uint16_t is_const : 1;
+    uint16_t prop1;
     uint8_t has_group;
     uint8_t prop_cnt;
 } lv_style_t;
@@ -370,6 +380,15 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop);
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);
 
 /**
+ * Set a special meta state for a property in a style.
+ * This function shouldn't be used directly by the user.
+ * @param style pointer to style
+ * @param prop the ID of a property (e.g. `LV_STYLE_BG_COLOR`)
+ * @param meta the meta value to attach to the property in the style
+ */
+void lv_style_set_prop_meta(lv_style_t * style, lv_style_prop_t prop, uint16_t meta);
+
+/**
  * Get the value of a property
  * @param style pointer to a style
  * @param prop  the ID of a property
@@ -378,7 +397,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
  *         LV_RES_OK: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
  */
-lv_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
+lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
 
 
 /**
@@ -391,13 +410,13 @@ lv_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_st
  * @note For performance reasons there are no sanity check on `style`
  * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
  */
-static inline lv_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_style_prop_t prop,
+static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_style_prop_t prop,
                                                  lv_style_value_t * value)
 {
-    if(style->is_const) {
+    if(style->prop1 == LV_STYLE_PROP_ANY) {
         const lv_style_const_prop_t * const_prop;
         for(const_prop = style->v_p.const_props; const_prop->prop != LV_STYLE_PROP_INV; const_prop++) {
-            if(const_prop->prop == prop) {
+            if(LV_STYLE_PROP_ID_MASK(const_prop->prop) == prop) {
                 *value = const_prop->value;
                 return LV_RES_OK;
             }
@@ -412,14 +431,14 @@ static inline lv_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_st
         uint16_t * props = (uint16_t *)tmp;
         uint32_t i;
         for(i = 0; i < style->prop_cnt; i++) {
-            if(props[i] == prop) {
+            if(LV_STYLE_PROP_ID_MASK(props[i]) == prop) {
                 lv_style_value_t * values = (lv_style_value_t *)style->v_p.values_and_props;
                 *value = values[i];
                 return LV_RES_OK;
             }
         }
     }
-    else if(style->prop1 == prop) {
+    else if(LV_STYLE_PROP_ID_MASK(style->prop1) == prop) {
         *value = style->v_p.value1;
         return LV_RES_OK;
     }
