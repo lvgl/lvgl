@@ -275,8 +275,16 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
     lv_obj_refresh_style(obj, selector, prop);
 }
 
+void lv_obj_set_local_style_prop_meta(lv_obj_t * obj, lv_style_prop_t prop, uint16_t meta,
+                                 lv_style_selector_t selector)
+{
+    lv_style_t * style = get_local_style(obj, selector);
+    lv_style_set_prop_meta(style, prop, meta);
+    lv_obj_refresh_style(obj, selector, prop);
+}
 
-lv_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
+
+lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
                                      lv_style_selector_t selector)
 {
     uint32_t i;
@@ -287,7 +295,7 @@ lv_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_st
         }
     }
 
-    return LV_RES_INV;
+    return LV_STYLE_RES_NOT_FOUND;
 }
 
 bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)

@@ -9,6 +9,8 @@
 #include "lv_style.h"
 #include "../misc/lv_gc.h"
 #include "../misc/lv_mem.h"
+#include "lv_assert.h"
+#include "lv_types.h"
 
 /*********************
  *      DEFINES
@@ -176,14 +178,22 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
 {
     if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) == NULL) {
         _lv_style_custom_prop_flag_lookup_table_size = 0;
+        last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     }
+
+    if(((last_custom_prop_id+1) & LV_STYLE_PROP_META_MASK) != 0) {
+        LV_LOG_ERROR("No more custom property IDs available");
+        return LV_STYLE_PROP_INV;
+    }
+    
     /*
      * Allocate the lookup table if it's not yet available.
      */
-    uint8_t required_size = (last_custom_prop_id + 1 - _LV_STYLE_LAST_BUILT_IN_PROP);
+    size_t required_size = (last_custom_prop_id + 1 - _LV_STYLE_LAST_BUILT_IN_PROP);
     if(_lv_style_custom_prop_flag_lookup_table_size < required_size) {
         /* Round required_size up to the nearest 32-byte value */
         required_size = (required_size + 31) & ~31;
+        LV_ASSERT_MSG(required_size > 0, "required size has become 0?");
         uint8_t * old_p = LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table);
         uint8_t * new_p = lv_mem_realloc(old_p, required_size * sizeof(uint8_t));
         if(new_p == NULL) {
@@ -390,6 +400,8 @@ static void lv_style_set_prop_helper(lv_style_prop_t prop, lv_style_value_t valu
 
 static void lv_style_set_prop_meta_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t *prop_storage, lv_style_value_t * value_storage)
 {
+    LV_UNUSED(value);
+    LV_UNUSED(value_storage);
     *prop_storage = prop; /* meta is OR-ed into the prop ID already */
 }
 

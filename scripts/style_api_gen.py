@@ -176,7 +176,7 @@ props = [
 {'section': 'Outline', 'dsc':'Properties to describe the outline. It\'s like a border but drawn outside of the rectangles.' },
 {'name': 'OUTLINE_WIDTH',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set the width of the outline in pixels. "},
+ 'dsc': "Set the width of the outline in pixels."},
 
 {'name': 'OUTLINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -197,11 +197,11 @@ props = [
 
 {'name': 'SHADOW_OFS_X',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set an offset on the shadow in pixels in X direction. "},
+ 'dsc': "Set an offset on the shadow in pixels in X direction."},
 
 {'name': 'SHADOW_OFS_Y',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set an offset on the shadow in pixels in Y direction. "},
+ 'dsc': "Set an offset on the shadow in pixels in Y direction."},
 
 {'name': 'SHADOW_SPREAD',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 1,
@@ -243,7 +243,7 @@ props = [
 
 {'name': 'LINE_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending "},
+ 'dsc': "Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending"},
 
 {'name': 'LINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -260,7 +260,7 @@ props = [
 
 {'name': 'ARC_ROUNDED',
  'style_type': 'num',   'var_type': 'bool' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending "},
+ 'dsc': "Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending"},
 
 {'name': 'ARC_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -285,7 +285,7 @@ props = [
 
 {'name': 'TEXT_FONT',
  'style_type': 'ptr',   'var_type': 'const lv_font_t *',  'default':'`LV_FONT_DEFAULT`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the font of the text (a pointer `lv_font_t *`). "},
+ 'dsc': "Set the font of the text (a pointer `lv_font_t *`)."},
 
 {'name': 'TEXT_LETTER_SPACE',
 'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 1, 'layout': 1, 'ext_draw': 0,
@@ -353,6 +353,7 @@ props = [
  'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
 ]
 
+meta_types = ['inherit', 'initial']
 
 def style_get_cast(style_type, var_type):
   cast = ""
@@ -402,11 +403,21 @@ def style_set_c(p):
   print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
   print("}")
 
+  for meta in meta_types:
+    print("")
+    print("void lv_style_set_" + p['name'].lower() + "_" + meta + "(lv_style_t * style)")
+    print("{")
+    print("    lv_style_set_prop_meta(style, LV_STYLE_" + p['name'] +", LV_STYLE_PROP_META_" + meta.upper() + ");")
+    print("}")
+
 
 def style_set_h(p):
   if 'section' in p: return
 
   print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
+
+  for meta in meta_types:
+    print("void lv_style_set_" + p['name'].lower() + "_" + meta + "(lv_style_t * style);")
 
 
 def local_style_set_c(p):
@@ -422,10 +433,20 @@ def local_style_set_c(p):
   print("    lv_obj_set_local_style_prop(obj, LV_STYLE_" + p['name'] +", v, selector);")
   print("}")
 
+  for meta in meta_types:
+    print("")
+    print("void lv_obj_set_style_" + p['name'].lower() + "_" + meta + "(struct _lv_obj_t * obj, lv_style_selector_t selector)")
+    print("{")
+    print("    lv_obj_set_local_style_prop_meta(obj, LV_STYLE_" + p['name'] +", LV_STYLE_PROP_META_" + meta.upper() + ", selector);")
+    print("}")
+
 
 def local_style_set_h(p):
   if 'section' in p: return
   print("void lv_obj_set_style_" + p['name'].lower() + "(struct _lv_obj_t * obj, " + p['var_type'] +" value, lv_style_selector_t selector);")
+
+  for meta in meta_types:
+    print("void lv_obj_set_style_" + p['name'].lower() + "_" + meta + "(struct _lv_obj_t * obj, lv_style_selector_t selector);")
 
 
 def style_const_set(p):
