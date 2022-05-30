@@ -153,7 +153,7 @@ void disp_enable_update(void)
 
 /* Disable the flushing process when disp_flush() is called by LVGL
  */
-void disp_disable(void)
+void disp_disable_update(void)
 {
     disp_flush_enabled = false;
 }
