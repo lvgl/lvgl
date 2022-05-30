@@ -29,15 +29,16 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/* Initialize low level display driver */
 void lv_port_disp_init(void);
 
-/* Enable the flushing process when disp_flush() is called by LVGL
+/* Enable updating the screen (the flushing process) when disp_flush() is called by LVGL
  */
-void disp_enable(void);
+void disp_enable_update(void);
 
 /* Disable the flushing process when disp_flush() is called by LVGL
  */
-void disp_disable(void);
+void disp_disable_update(void);
 
 /**********************
  *      MACROS
