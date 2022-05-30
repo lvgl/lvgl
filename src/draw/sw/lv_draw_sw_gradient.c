@@ -22,9 +22,9 @@
 #endif
 
 #if defined(LV_ARCH_64)
-    #define ALIGN(X)    (((X) + 7) & ~7)
+    #define LV_ALIGN(X)    (((X) + 7) & ~7)
 #else
-    #define ALIGN(X)    (((X) + 3) & ~3)
+    #define LV_ALIGN(X)    (((X) + 3) & ~3)
 #endif
 
 #if LV_GRAD_CACHE_DEF_SIZE != 0 && LV_GRAD_CACHE_DEF_SIZE < 256
@@ -70,11 +70,11 @@ static uint32_t compute_key(const lv_grad_dsc_t * g, lv_coord_t size, lv_coord_t
 
 static size_t get_cache_item_size(lv_grad_t * c)
 {
-    size_t s = ALIGN(sizeof(*c)) + ALIGN(c->alloc_size * sizeof(lv_color_t));
+    size_t s = LV_ALIGN(sizeof(*c)) + LV_ALIGN(c->alloc_size * sizeof(lv_color_t));
 #if _DITHER_GRADIENT
-    s += ALIGN(c->size * sizeof(lv_color32_t));
+    s += LV_ALIGN(c->size * sizeof(lv_color32_t));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-    s += ALIGN(c->w * sizeof(lv_scolor24_t));
+    s += LV_ALIGN(c->w * sizeof(lv_scolor24_t));
 #endif
 #endif
     return s;
@@ -160,11 +160,11 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
     lv_coord_t map_size = LV_MAX(w, h); /* The map is being used horizontally (width) unless
                                            no dithering is selected where it's used vertically */
 
-    size_t req_size = ALIGN(sizeof(lv_grad_t)) + ALIGN(map_size * sizeof(lv_color_t));
+    size_t req_size = LV_ALIGN(sizeof(lv_grad_t)) + LV_ALIGN(map_size * sizeof(lv_color_t));
 #if _DITHER_GRADIENT
-    req_size += ALIGN(size * sizeof(lv_color32_t));
+    req_size += LV_ALIGN(size * sizeof(lv_color32_t));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-    req_size += ALIGN(w * sizeof(lv_scolor24_t));
+    req_size += LV_ALIGN(w * sizeof(lv_scolor24_t));
 #endif
 #endif
 
@@ -202,23 +202,23 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
     item->size = size;
     if(item->not_cached) {
         uint8_t * p = (uint8_t *)item;
-        item->map = (lv_color_t *)(p + ALIGN(sizeof(*item)));
+        item->map = (lv_color_t *)(p + LV_ALIGN(sizeof(*item)));
 #if _DITHER_GRADIENT
-        item->hmap = (lv_color32_t *)(p + ALIGN(sizeof(*item)) + ALIGN(map_size * sizeof(lv_color_t)));
+        item->hmap = (lv_color32_t *)(p + LV_ALIGN(sizeof(*item)) + LV_ALIGN(map_size * sizeof(lv_color_t)));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-        item->error_acc = (lv_scolor24_t *)(p + ALIGN(sizeof(*item)) + ALIGN(size * sizeof(lv_grad_color_t)) +
-                                            ALIGN(map_size * sizeof(lv_color_t)));
+        item->error_acc = (lv_scolor24_t *)(p + LV_ALIGN(sizeof(*item)) + LV_ALIGN(size * sizeof(lv_grad_color_t)) +
+                                            LV_ALIGN(map_size * sizeof(lv_color_t)));
         item->w = w;
 #endif
 #endif
     }
     else {
-        item->map = (lv_color_t *)(grad_cache_end + ALIGN(sizeof(*item)));
+        item->map = (lv_color_t *)(grad_cache_end + LV_ALIGN(sizeof(*item)));
 #if _DITHER_GRADIENT
-        item->hmap = (lv_color32_t *)(grad_cache_end + ALIGN(sizeof(*item)) + ALIGN(map_size * sizeof(lv_color_t)));
+        item->hmap = (lv_color32_t *)(grad_cache_end + LV_ALIGN(sizeof(*item)) + LV_ALIGN(map_size * sizeof(lv_color_t)));
 #if LV_DITHER_ERROR_DIFFUSION == 1
-        item->error_acc = (lv_scolor24_t *)(grad_cache_end + ALIGN(sizeof(*item)) + ALIGN(size * sizeof(lv_grad_color_t)) +
-                                            ALIGN(map_size * sizeof(lv_color_t)));
+        item->error_acc = (lv_scolor24_t *)(grad_cache_end + LV_ALIGN(sizeof(*item)) + LV_ALIGN(size * sizeof(lv_grad_color_t)) +
+                                            LV_ALIGN(map_size * sizeof(lv_color_t)));
         item->w = w;
 #endif
 #endif
