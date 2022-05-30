@@ -398,23 +398,12 @@ static lv_res_t get_metadata(lv_img_t * img)
 {
     lv_obj_t * obj = (lv_obj_t *)img;
 
-    lv_img_header_t header;
-    lv_memset_00(&header, sizeof(header));
+    /*Reset the decoded flag here*/
+    img->cf = LV_IMG_CF_UNKNOWN;
     if(img->src.type == LV_IMG_SRC_UNKNOWN)
         return LV_RES_INV;
 
-    if(img->src.type == LV_IMG_SRC_SYMBOL) {
-        /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        lv_point_t size;
-        lv_txt_get_size(&size, img->src.data, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-        header.w = size.x;
-        header.h = size.y;
-        header.cf = LV_IMG_CF_ALPHA_1BIT;
-    }
-    else {
+    if(img->src.type != LV_IMG_SRC_SYMBOL) {
         /*Try to see if we find a decoder that's able to decode the picture. Decoding is delayed until rendering*/
         lv_img_dec_t * img_dec = lv_img_decoder_accept(&img->src, &img->caps);
         if(img_dec == NULL) return LV_RES_INV;
@@ -422,11 +411,17 @@ static lv_res_t get_metadata(lv_img_t * img)
         return LV_RES_OK;
     }
 
-    img->w       = header.w;
-    img->h       = header.h;
-    img->cf      = header.cf;
-    img->pivot.x = header.w / 2;
-    img->pivot.y = header.h / 2;
+    /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    lv_point_t size;
+    lv_txt_get_size(&size, img->src.data, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    img->w  = size.x;
+    img->h  = size.y;
+    img->cf = LV_IMG_CF_ALPHA_1BIT;
+    img->pivot.x = size.x / 2;
+    img->pivot.y = size.y / 2;
 
     lv_obj_refresh_self_size(obj);
 
@@ -478,7 +473,6 @@ static void decode_img(lv_img_t * img, lv_point_t * size_hint)
     if(img->angle || img->zoom != LV_IMG_ZOOM_NONE) lv_obj_refresh_ext_draw_size(obj);
 
     lv_obj_invalidate(obj);
-    return;
 }
 
 
@@ -940,6 +934,12 @@ static void next_frame_task_cb(lv_timer_t * t)
 {
     lv_obj_t * obj = t->user_data;
     lv_img_t * img = (lv_img_t *) obj;
+
+    /* If the object isn't visible, just end this iteration */
+    if(!lv_obj_is_visible(obj)) {
+        img->dec_ctx->last_rendering = lv_tick_get();
+        return;
+    }
 
     /* Variable frame rate animation are usually more complex to deal with*/
     uint16_t now = lv_tick_get(); /*Using 16bits to save memory in the decoder context */
