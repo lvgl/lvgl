@@ -63,8 +63,7 @@ In this mode the height is set automatically to show only one line, line break c
 ### Password mode
 The text area supports password mode which can be enabled with `lv_textarea_set_password_mode(textarea, true)`.
 
-If the `•` ([Bullet, U+2022](http://www.fileformat.info/info/unicode/char/2022/index.htm)) character exists in the font, the entered characters are converted to it after some time or when a new character is entered.
-If `•` not exists, `*` will be used.
+By default, if the `•` ([Bullet, U+2022](http://www.fileformat.info/info/unicode/char/2022/index.htm)) character exists in the font, the entered characters are converted to it after some time or when a new character is entered. If `•` does not exist in the font, `*` will be used. You can override the default character with `lv_textarea_set_password_bullet(textarea, "x")`.
 
 In password mode `lv_textarea_get_text(textarea)` returns the actual text entered, not the bullet characters.
 
