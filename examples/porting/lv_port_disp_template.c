@@ -144,7 +144,7 @@ static void disp_init(void)
 
 volatile bool disp_flush_enabled = true;
 
-/* Enable the flushing process when disp_flush() is called by LVGL
+/* Enable updating the screen (the flushing process) when disp_flush() is called by LVGL
  */
 void disp_enable_update(void)
 {
