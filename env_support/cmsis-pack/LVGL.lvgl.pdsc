@@ -36,12 +36,13 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-05-16" version="1.0.4-alpha5" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.4-alpha5.pack">
+    <release date="2022-05-31" version="1.0.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.4.pack">
       - LVGL 8.3.0-dev
       - Monthly update for May
       - Update drawing service
       - Update GPU support for Arm-2D library
-      - Improving the methodology used in the benchmark. 
+      - Update GPU support for NXP PXP/VGLite
+      - Improving the accuracy of benchmark. 
       - Add new colour support for RGB565A8
     </release>
     <release date="2022-04-27" version="1.0.3" url="https://github.com/lvgl/lvgl/raw/b81437e96423826272cd42d5555373f15bfdf03a/env_support/cmsis-pack/LVGL.lvgl.1.0.3.pack">
@@ -306,7 +307,7 @@
                 <file category="sourceC"            name="src/widgets/lv_textarea.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.0" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.1" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -341,7 +342,7 @@
               </files>
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.0.3-dev">
+            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.0.3">
               <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
               <files>
               <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
@@ -387,8 +388,10 @@
             <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-Essential">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
-              <file category="sourceC"            name="src/draw/nxp_pxp/lv_gpu_nxp_pxp.c" />
-              <file category="sourceC"            name="src/draw/nxp_pxp/lv_gpu_nxp_pxp_osa.c" />
+              <file category="sourceC"            name="src/draw/nxp/lv_gpu_nxp.c" />
+              <file category="sourceC"            name="src/draw/nxp/pxp/lv_draw_pxp_blend.c" />
+              <file category="sourceC"            name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c" />
+              <file category="sourceC"            name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c" />
               </files>
 
               <RTE_Components_h>
@@ -402,7 +405,11 @@
             <component Cgroup="lvgl" Csub="GPU NXP-VGLite"  condition="LVGL-Essential">
               <description>An hardware acceleration from NXP-VGLite</description>
               <files>
-              <file category="sourceC"            name="src/draw/nxp_vglite/lv_gpu_nxp_vglite.c" />
+              <file category="sourceC"            name="src/draw/nxp/lv_gpu_nxp.c" />
+              <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
+              <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_blend.c" />
+              <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_rect.c" />
+              <file category="sourceC"            name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c" />
               </files>
 
               <RTE_Components_h>
