@@ -253,6 +253,9 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         lv_obj_invalidate(obj);
 
+        res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        if(res != LV_RES_OK) return;
+
         /*Leave edit mode if released. (No need to wait for LONG_PRESS)*/
         lv_group_t * g   = lv_obj_get_group(obj);
         bool editing     = lv_group_get_editing(g);
