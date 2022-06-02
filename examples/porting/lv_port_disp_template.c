@@ -151,7 +151,7 @@ void disp_enable_update(void)
     disp_flush_enabled = true;
 }
 
-/* Disable the flushing process when disp_flush() is called by LVGL
+/* Disable updating the screen (the flushing process) when disp_flush() is called by LVGL
  */
 void disp_disable_update(void)
 {
