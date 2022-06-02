@@ -48,7 +48,8 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
 
 #if LV_COLOR_SCREEN_TRANSP
 LV_ATTRIBUTE_FAST_MEM static void map_argb(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-                                           const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride);
+                                           const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
+                                           const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode);
 
 #endif /*LV_COLOR_SCREEN_TRANSP*/
 
@@ -165,7 +166,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
             fill_argb(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
         }
         else {
-            map_argb(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride);
+            map_argb(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa, mask, mask_stride, dsc->blend_mode);
         }
     }
 #endif
@@ -386,7 +387,32 @@ static inline void set_px_argb(uint8_t * buf, lv_color_t color, lv_opa_t opa)
     buf[1] = res_color.ch.green;
     buf[2] = res_color.ch.red;
 #endif
+}
 
+static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t opa, lv_color_t (*blend_fp)(lv_color_t,
+                                                                                                           lv_color_t, lv_opa_t))
+{
+    lv_color_t bg_color;
+    lv_color_t res_color;
+#if LV_COLOR_DEPTH == 8
+    if(buf[1] <= LV_OPA_MIN) return;
+    bg_color.full = buf[0];
+    res_color = blend_fp(color, bg_color, opa);
+    buf[0] = res_color.full;
+#elif LV_COLOR_DEPTH == 16
+    if(buf[2] <= LV_OPA_MIN) return;
+    bg_color.full = buf[0] + (buf[1] << 8);
+    res_color = blend_fp(color, bg_color, opa);
+    buf[0] = res_color.full & 0xff;
+    buf[1] = res_color.full >> 8;
+#elif LV_COLOR_DEPTH == 32
+    if(buf[3] <= LV_OPA_MIN) return;
+    bg_color = *((lv_color_t *)buf);
+    res_color = blend_fp(color, bg_color, opa);
+    buf[0] = res_color.ch.blue;
+    buf[1] = res_color.ch.green;
+    buf[2] = res_color.ch.red;
+#endif
 }
 
 LV_ATTRIBUTE_FAST_MEM static void fill_argb(lv_color_t * dest_buf, const lv_area_t * dest_area,
@@ -677,10 +703,10 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
 
 #if LV_COLOR_SCREEN_TRANSP
 LV_ATTRIBUTE_FAST_MEM static void map_argb(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-                                           const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa, const lv_opa_t * mask, lv_coord_t mask_stride)
+                                           const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa,
+                                           const lv_opa_t * mask, lv_coord_t mask_stride, lv_blend_mode_t blend_mode)
 
 {
-
     uint8_t * dest_buf8 = (uint8_t *) dest_buf;
 
     int32_t w = lv_area_get_width(dest_area);
@@ -688,6 +714,21 @@ LV_ATTRIBUTE_FAST_MEM static void map_argb(lv_color_t * dest_buf, const lv_area_
 
     int32_t x;
     int32_t y;
+
+    lv_color_t (*blend_fp)(lv_color_t, lv_color_t, lv_opa_t);
+    switch(blend_mode) {
+        case LV_BLEND_MODE_ADDITIVE:
+            blend_fp = color_blend_true_color_additive;
+            break;
+        case LV_BLEND_MODE_SUBTRACTIVE:
+            blend_fp = color_blend_true_color_subtractive;
+            break;
+        case LV_BLEND_MODE_MULTIPLY:
+            blend_fp = color_blend_true_color_multiply;
+            break;
+        default:
+            blend_fp = NULL;
+    }
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask == NULL) {
@@ -701,9 +742,17 @@ LV_ATTRIBUTE_FAST_MEM static void map_argb(lv_color_t * dest_buf, const lv_area_
 #else
             uint8_t * dest_buf8_row = dest_buf8;
             for(y = 0; y < h; y++) {
-                for(x = 0; x < w; x++) {
-                    set_px_argb(dest_buf8, src_buf[x], LV_OPA_COVER);
-                    dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                if(blend_fp == NULL) {
+                    for(x = 0; x < w; x++) {
+                        set_px_argb(dest_buf8, src_buf[x], LV_OPA_COVER);
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    }
+                }
+                else {
+                    for(x = 0; x < w; x++) {
+                        set_px_argb_blend(dest_buf8, src_buf[x], LV_OPA_COVER, blend_fp);
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    }
                 }
 
                 dest_buf8_row += dest_stride * LV_IMG_PX_SIZE_ALPHA_BYTE;
@@ -715,9 +764,17 @@ LV_ATTRIBUTE_FAST_MEM static void map_argb(lv_color_t * dest_buf, const lv_area_
         else {
             uint8_t * dest_buf8_row = dest_buf8;
             for(y = 0; y < h; y++) {
-                for(x = 0; x < w; x++) {
-                    set_px_argb(dest_buf8, src_buf[x], opa);
-                    dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                if(blend_fp == NULL) {
+                    for(x = 0; x < w; x++) {
+                        set_px_argb(dest_buf8, src_buf[x], opa);
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    }
+                }
+                else {
+                    for(x = 0; x < w; x++) {
+                        set_px_argb_blend(dest_buf8, src_buf[x], opa, blend_fp);
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    }
                 }
 
                 dest_buf8_row += dest_stride * LV_IMG_PX_SIZE_ALPHA_BYTE;
@@ -732,10 +789,17 @@ LV_ATTRIBUTE_FAST_MEM static void map_argb(lv_color_t * dest_buf, const lv_area_
         if(opa > LV_OPA_MAX) {
             uint8_t * dest_buf8_row = dest_buf8;
             for(y = 0; y < h; y++) {
-                for(x = 0; x < w; x++) {
-                    set_px_argb(dest_buf8, src_buf[x], mask[x]);
-                    dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
-
+                if(blend_fp == NULL) {
+                    for(x = 0; x < w; x++) {
+                        set_px_argb(dest_buf8, src_buf[x], mask[x]);
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    }
+                }
+                else {
+                    for(x = 0; x < w; x++) {
+                        set_px_argb_blend(dest_buf8, src_buf[x], mask[x], blend_fp);
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    }
                 }
                 dest_buf8_row += dest_stride * LV_IMG_PX_SIZE_ALPHA_BYTE;
                 dest_buf8 = dest_buf8_row;
@@ -747,14 +811,23 @@ LV_ATTRIBUTE_FAST_MEM static void map_argb(lv_color_t * dest_buf, const lv_area_
         else {
             uint8_t * dest_buf8_row = dest_buf8;
             for(y = 0; y < h; y++) {
-                for(x = 0; x < w; x++) {
-                    if(mask[x]) {
-                        lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : ((opa * mask[x]) >> 8);
-
-                        set_px_argb(dest_buf8, src_buf[x], opa_tmp);
-
+                if(blend_fp == NULL) {
+                    for(x = 0; x < w; x++) {
+                        if(mask[x]) {
+                            lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : ((opa * mask[x]) >> 8);
+                            set_px_argb(dest_buf8, src_buf[x], opa_tmp);
+                        }
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
                     }
-                    dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                }
+                else {
+                    for(x = 0; x < w; x++) {
+                        if(mask[x]) {
+                            lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : ((opa * mask[x]) >> 8);
+                            set_px_argb_blend(dest_buf8, src_buf[x], opa_tmp, blend_fp);
+                        }
+                        dest_buf8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                    }
                 }
                 dest_buf8_row += dest_stride * LV_IMG_PX_SIZE_ALPHA_BYTE;
                 dest_buf8 = dest_buf8_row;
