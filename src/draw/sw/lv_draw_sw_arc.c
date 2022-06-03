@@ -118,7 +118,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
 
         lv_draw_mask_free_param(&mask_out_param);
         if(mask_in_param_valid) {
-           lv_draw_mask_free_param(&mask_in_param);
+            lv_draw_mask_free_param(&mask_in_param);
         }
 
         return;
@@ -167,7 +167,7 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
     lv_draw_mask_free_param(&mask_angle_param);
     lv_draw_mask_free_param(&mask_out_param);
     if(mask_in_param_valid) {
-       lv_draw_mask_free_param(&mask_in_param);
+        lv_draw_mask_free_param(&mask_in_param);
     }
 
     lv_draw_mask_remove_id(mask_angle_id);
