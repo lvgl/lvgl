@@ -48,6 +48,9 @@ lv_anim_set_path(&a, lv_anim_path_ease_in);
 /*Set a callback to indicate when the animation is ready (idle).*/
 lv_anim_set_ready_cb(&a, ready_cb);
 
+/*Set a callback to indicate when the animation is deleted (idle).*/
+lv_anim_set_deleted_cb(&a, deleted_cb);
+
 /*Set a callback to indicate when the animation is started (after delay).*/
 lv_anim_set_start_cb(&a, start_cb);
 
