@@ -108,6 +108,8 @@ lv_disp_drv_t * lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv)
     lv_disp_draw_buf_init(draw_buf, drv->draw_buf1, drv->draw_buf2, drv->draw_buf_size);
     disp_drv->draw_buf = draw_buf;
     disp_drv->user_data = drv;
+    disp_drv->hor_res = lv_area_get_width(&drv->area);
+    disp_drv->ver_res = lv_area_get_width(&drv->area);
 
     return disp_drv;
 }
