@@ -11,10 +11,20 @@
  *********************/
 #include "lv_port_disp_template.h"
 #include "../../lvgl.h"
+#include <stdbool.h>
 
 /*********************
  *      DEFINES
  *********************/
+#ifndef MY_DISP_HOR_RES
+    #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen width, default value 320 is used for now.
+    #define MY_DISP_HOR_RES    320
+#endif
+
+#ifndef MY_DISP_VER_RES
+    #warning Please define or replace the macro MY_DISP_HOR_RES with the actual screen height, default value 240 is used for now.
+    #define MY_DISP_VER_RES    240
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -132,20 +142,38 @@ static void disp_init(void)
     /*You code here*/
 }
 
+volatile bool disp_flush_enabled = true;
+
+/* Enable updating the screen (the flushing process) when disp_flush() is called by LVGL
+ */
+void disp_enable_update(void)
+{
+    disp_flush_enabled = true;
+}
+
+/* Disable updating the screen (the flushing process) when disp_flush() is called by LVGL
+ */
+void disp_disable_update(void)
+{
+    disp_flush_enabled = false;
+}
+
 /*Flush the content of the internal buffer the specific area on the display
  *You can use DMA or any hardware acceleration to do this operation in the background but
  *'lv_disp_flush_ready()' has to be called when finished.*/
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
+    if(disp_flush_enabled) {
+        /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
 
-    int32_t x;
-    int32_t y;
-    for(y = area->y1; y <= area->y2; y++) {
-        for(x = area->x1; x <= area->x2; x++) {
-            /*Put a pixel to the display. For example:*/
-            /*put_px(x, y, *color_p)*/
-            color_p++;
+        int32_t x;
+        int32_t y;
+        for(y = area->y1; y <= area->y2; y++) {
+            for(x = area->x1; x <= area->x2; x++) {
+                /*Put a pixel to the display. For example:*/
+                /*put_px(x, y, *color_p)*/
+                color_p++;
+            }
         }
     }
 
