@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/widgets/core/bar.md
-```
 # Bar (lv_bar)
 
 ## Overview

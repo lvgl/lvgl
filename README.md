@@ -17,7 +17,7 @@ LVGL provides everything you need to create an embedded GUI with easy-to-use gra
 </h4>
 
 
-**English** | [中文](./README_zh.md) |
+**English** | [中文](./README_zh.md) | [Português do Brasil](./README_pt_BR.md)
 
 
 ---

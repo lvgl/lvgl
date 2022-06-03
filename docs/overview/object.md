@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/object.md
-```
 # Objects
 
 In LVGL the **basic building blocks** of a user interface are the objects, also called *Widgets*.

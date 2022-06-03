@@ -38,7 +38,7 @@
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
-    lv_opa_t opa;
+    lv_opa_t opa = LV_OPA_COVER;
     if(part != LV_PART_MAIN) {
         opa = lv_obj_get_style_opa(obj, part);
         if(opa <= LV_OPA_MIN) {
@@ -394,16 +394,11 @@ lv_coord_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj)
     else return 0;
 }
 
-lv_intermediate_layer_type_t _lv_obj_is_intermediate_layer(const lv_obj_t * obj)
+lv_layer_type_t _lv_obj_get_layer_type(const lv_obj_t * obj)
 {
-    if(lv_obj_get_style_transform_angle(obj, 0) != 0) return LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_transform_zoom(obj, 0) != 256) return LV_INTERMEDIATE_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_opa(obj, 0) != LV_OPA_COVER) return LV_INTERMEDIATE_LAYER_TYPE_SIMPLE;
 
-#if LV_DRAW_COMPLEX
-    if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_INTERMEDIATE_LAYER_TYPE_SIMPLE;
-#endif
-    return LV_INTERMEDIATE_LAYER_TYPE_NONE;
+    if(obj->spec_attr) return obj->spec_attr->layer_type;
+    else return LV_LAYER_TYPE_NONE;
 }
 
 /**********************

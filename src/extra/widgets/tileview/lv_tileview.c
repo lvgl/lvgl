@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_tileview.h"
+#include "../../../core/lv_indev.h"
 #if LV_USE_TILEVIEW
 
 /*********************
@@ -157,6 +158,11 @@ static void tileview_event_cb(lv_event_t * e)
     lv_tileview_t * tv = (lv_tileview_t *) obj;
 
     if(code == LV_EVENT_SCROLL_END) {
+        lv_indev_t * indev = lv_indev_get_act();
+        if(indev && indev->proc.state == LV_INDEV_STATE_PRESSED) {
+            return;
+        }
+
         lv_coord_t w = lv_obj_get_content_width(obj);
         lv_coord_t h = lv_obj_get_content_height(obj);
 

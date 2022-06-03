@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/timer.md
-```
 # Timers
 
 LVGL has a built-in timer system. You can register a function to have it be called periodically. The timers are handled and called in `lv_timer_handler()`, which needs to be called every few milliseconds.

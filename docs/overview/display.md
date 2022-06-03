@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/display.md
-```
 # Displays
 
 ``` important:: The basic concept of a *display* in LVGL is explained in the [Porting](/porting/display) section. So before reading further, please read the [Porting](/porting/display) section first.

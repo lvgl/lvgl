@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/others/gridnav.md
-```
 # Grid navigation
 
 Grid navigation (gridnav for short) is a feature that changes the currently focused child object as arrow keys are pressed.

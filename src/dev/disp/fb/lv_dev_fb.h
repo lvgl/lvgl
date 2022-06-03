@@ -1,10 +1,10 @@
 /**
- * @file lv_dev_fb.h
+ * @file lv_dev_stm32_fb.h
  *
  */
 
-#ifndef LV_DEV_FB_H
-#define LV_DEV_FB_H
+#ifndef LV_DEV_STM32_FB_H
+#define LV_DEV_STM32_FB_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../../../drv/lv_drv.h"
 
-#if LV_USE_DEV_FB
+#if LV_USE_SDL
 
 /*********************
  *      DEFINES
@@ -44,10 +44,10 @@ lv_disp_t * lv_dev_fb_create(lv_dev_fb_t * dev, lv_disp_drv_t * disp_drv);
  *      MACROS
  **********************/
 
-#endif /* LV_USE_DEV_FB */
+#endif /* LV_USE_DEV_STM32_FB */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* LV_DEV_FB_H */
+#endif /* LV_DEV_STM32_FB_H */

@@ -69,6 +69,10 @@ typedef struct {
 
 static lv_style_t style_common;
 static bool opa_mode = true;
+static bool run_max_speed = false;
+static finished_cb_t * benchmark_finished_cb = NULL;
+static uint32_t disp_ori_timer_period;
+static uint32_t anim_ori_timer_period;
 
 LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
@@ -90,6 +94,7 @@ static void arc_create(lv_style_t * style);
 static void fall_anim(lv_obj_t * obj);
 static void rnd_reset(void);
 static int32_t rnd_next(int32_t min, int32_t max);
+static void report_cb(lv_timer_t * timer);
 
 static void rectangle_cb(void)
 {
@@ -634,6 +639,18 @@ static void benchmark_init(void)
     lv_disp_t * disp = lv_disp_get_default();
     disp->driver->monitor_cb = monitor_cb;
 
+    /*Force to run at maximum frame rate*/
+    if(run_max_speed) {
+        if(disp->refr_timer) {
+            disp_ori_timer_period = disp->refr_timer->period;
+            lv_timer_set_period(disp->refr_timer, 1);
+        }
+
+        lv_timer_t * anim_timer = lv_anim_get_timer();
+        anim_ori_timer_period = anim_timer->period;
+        lv_timer_set_period(anim_timer, 1);
+    }
+
     lv_obj_t * scr = lv_scr_act();
     lv_obj_remove_style_all(scr);
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
@@ -661,6 +678,43 @@ void lv_demo_benchmark(void)
 
     /*Manually start scenes*/
     scene_next_task_cb(NULL);
+}
+
+
+void lv_demo_benchmark_run_scene(int_fast16_t scene_no)
+{
+    benchmark_init();
+
+    if(((scene_no >> 1) >= dimof(scenes))) {
+        /* invalid scene number */
+        return ;
+    }
+
+    opa_mode = scene_no & 0x01;
+    scene_act = scene_no >> 1;
+
+    if(scenes[scene_act].create_cb) {
+        lv_label_set_text_fmt(title, "%"LV_PRId32"/%d: %s%s", scene_act * 2 + (opa_mode ? 1 : 0), (int)(dimof(scenes) * 2) - 2,
+                              scenes[scene_act].name, opa_mode ? " + opa" : "");
+        lv_label_set_text(subtitle, "");
+
+        rnd_reset();
+        scenes[scene_act].create_cb();
+
+        lv_timer_t * t = lv_timer_create(report_cb, SCENE_TIME, NULL);
+        lv_timer_set_repeat_count(t, 1);
+    }
+}
+
+
+void lv_demo_benchmark_set_finished_cb(finished_cb_t * finished_cb)
+{
+    benchmark_finished_cb = finished_cb;
+}
+
+void lv_demo_benchmark_set_max_speed(bool en)
+{
+    run_max_speed = en;
 }
 
 /**********************
@@ -711,6 +765,10 @@ static void generate_report(void)
 
     uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
 
+    if(NULL != benchmark_finished_cb) {
+        (*benchmark_finished_cb)();
+    }
+
     lv_obj_clean(lv_scr_act());
     scene_bg = NULL;
 
@@ -760,6 +818,8 @@ static void generate_report(void)
            "LVGL v%d.%d.%d " LVGL_VERSION_INFO
            " Benchmark (in csv format)\r\n",
            LVGL_VERSION_MAJOR, LVGL_VERSION_MINOR, LVGL_VERSION_PATCH);
+    LV_LOG("Weighted FPS: %"LV_PRIu32"\r\n", fps_weighted);
+    LV_LOG("Opa. speed: %"LV_PRIu32"%%\r\n", opa_speed_pct);
 
     row++;
     char buf[256];
@@ -855,74 +915,29 @@ static void generate_report(void)
 
 static void report_cb(lv_timer_t * timer)
 {
+    if(NULL != benchmark_finished_cb) {
+        (*benchmark_finished_cb)();
+    }
+
     if(opa_mode) {
         if(scene_act >= 0) {
             if(scenes[scene_act].time_sum_opa == 0) scenes[scene_act].time_sum_opa = 1;
             scenes[scene_act].fps_opa = (1000 * scenes[scene_act].refr_cnt_opa) / scenes[scene_act].time_sum_opa;
-            if(scenes[scene_act].create_cb) scene_act++;    /*If still there are scenes go to the next*/
         }
-        else {
-            scene_act++;
-        }
-        opa_mode = false;
+
+        lv_label_set_text_fmt(subtitle, "Result : %"LV_PRId32" FPS",
+                              scenes[scene_act].fps_opa);
+        LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act].name,
+               scenes[scene_act].fps_opa);
     }
     else {
         if(scenes[scene_act].time_sum_normal == 0) scenes[scene_act].time_sum_normal = 1;
         scenes[scene_act].fps_normal = (1000 * scenes[scene_act].refr_cnt_normal) / scenes[scene_act].time_sum_normal;
-        opa_mode = true;
-    }
 
-    if(opa_mode) {
-        lv_label_set_text_fmt(subtitle, "Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
+        lv_label_set_text_fmt(subtitle, "Result : %"LV_PRId32" FPS",
                               scenes[scene_act].fps_normal);
         LV_LOG("Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
                scenes[scene_act].fps_normal);
-    }
-    else if(scene_act > 0) {
-        lv_label_set_text_fmt(subtitle, "Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
-                              scenes[scene_act - 1].fps_opa);
-        LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
-               scenes[scene_act - 1].fps_opa);
-    }
-    else {
-        lv_label_set_text(subtitle, "");
-    }
-}
-
-void lv_demo_benchmark_run_scene(int_fast16_t scene_no)
-{
-    benchmark_init();
-
-    if(((scene_no >> 1) >= dimof(scenes))) {
-        /* invalid scene number */
-        return ;
-    }
-
-    opa_mode = scene_no & 0x01;
-    scene_act = scene_no >> 1;
-
-    if(scenes[scene_act].create_cb) {
-        lv_label_set_text_fmt(title, "%"LV_PRId32"/%d: %s%s", scene_act * 2 + (opa_mode ? 1 : 0), (int)(dimof(scenes) * 2) - 2,
-                              scenes[scene_act].name, opa_mode ? " + opa" : "");
-        if(opa_mode) {
-            lv_label_set_text_fmt(subtitle, "Result of \"%s\": %"LV_PRId32" FPS", scenes[scene_act].name,
-                                  scenes[scene_act].fps_normal);
-        }
-        else {
-            if(scene_act > 0) {
-                lv_label_set_text_fmt(subtitle, "Result of \"%s + opa\": %"LV_PRId32" FPS", scenes[scene_act - 1].name,
-                                      scenes[scene_act - 1].fps_opa);
-            }
-            else {
-                lv_label_set_text(subtitle, "");
-            }
-        }
-
-        rnd_reset();
-        scenes[scene_act].create_cb();
-
-        lv_timer_t * t = lv_timer_create(report_cb, SCENE_TIME, NULL);
-        lv_timer_set_repeat_count(t, 1);
     }
 }
 
@@ -973,6 +988,19 @@ static void scene_next_task_cb(lv_timer_t * timer)
     }
     /*Ready*/
     else {
+
+        /*Restore original frame rate*/
+        if(run_max_speed) {
+            lv_timer_t * anim_timer = lv_anim_get_timer();
+            lv_timer_set_period(anim_timer, anim_ori_timer_period);
+
+            lv_disp_t * disp = lv_disp_get_default();
+            lv_timer_t * refr_timer = _lv_disp_get_refr_timer(disp);
+            if(refr_timer) {
+                lv_timer_set_period(refr_timer, disp_ori_timer_period);
+            }
+        }
+
         generate_report();      /* generate report */
     }
 }
@@ -1059,6 +1087,11 @@ static void line_create(lv_style_t * style)
 }
 
 
+static void arc_anim_end_angle_cb(void * var, int32_t v)
+{
+    lv_arc_set_end_angle(var, v);
+}
+
 static void arc_create(lv_style_t * style)
 {
     uint32_t i;
@@ -1076,7 +1109,7 @@ static void arc_create(lv_style_t * style)
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_arc_set_end_angle);
+        lv_anim_set_exec_cb(&a, arc_anim_end_angle_cb);
         lv_anim_set_values(&a, 0, 359);
         lv_anim_set_time(&a, t);
         lv_anim_set_playback_time(&a, t);
@@ -1088,6 +1121,11 @@ static void arc_create(lv_style_t * style)
 }
 
 
+static void fall_anim_y_cb(void * var, int32_t v)
+{
+    lv_obj_set_y(var, v);
+}
+
 static void fall_anim(lv_obj_t * obj)
 {
     lv_obj_set_x(obj, rnd_next(0, lv_obj_get_width(scene_bg) - lv_obj_get_width(obj)));
@@ -1097,7 +1135,7 @@ static void fall_anim(lv_obj_t * obj)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_var(&a, obj);
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_y);
+    lv_anim_set_exec_cb(&a, fall_anim_y_cb);
     lv_anim_set_values(&a, 0, lv_obj_get_height(scene_bg) - lv_obj_get_height(obj));
     lv_anim_set_time(&a, t);
     lv_anim_set_playback_time(&a, t);

@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/get-started/platforms/cmake.md
-```
 
 # CMake
 LVGL supports integrating with [CMake](https://cmake.org/). It comes with preconfigured targets for:

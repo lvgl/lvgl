@@ -21,7 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+static void scr_load_internal(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
 static void set_x_anim(void * obj, int32_t v);
@@ -81,20 +81,7 @@ lv_obj_t * lv_disp_get_scr_prev(lv_disp_t * disp)
  */
 void lv_disp_load_scr(lv_obj_t * scr)
 {
-    lv_disp_t * d = lv_obj_get_disp(scr);
-    if(!d) return;  /*Shouldn't happen, just to be sure*/
-
-    lv_obj_t * old_scr = d->act_scr;
-
-    if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
-    if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
-
-    d->act_scr = scr;
-
-    if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOADED, NULL);
-    if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
-
-    lv_obj_invalidate(scr);
+    lv_scr_load_anim(scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
 }
 
 /**
@@ -240,7 +227,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     /*If an other screen load animation is in progress
      *make target screen loaded immediately. */
     if(d->scr_to_load && act_scr != d->scr_to_load) {
-        lv_disp_load_scr(d->scr_to_load);
+        scr_load_internal(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
         lv_obj_remove_local_style_prop(d->scr_to_load, LV_STYLE_OPA, 0);
@@ -270,6 +257,13 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     lv_obj_set_pos(lv_scr_act(), 0, 0);
     lv_obj_remove_local_style_prop(new_scr, LV_STYLE_OPA, 0);
     lv_obj_remove_local_style_prop(lv_scr_act(), LV_STYLE_OPA, 0);
+
+
+    /*Shortcut for immediate load*/
+    if(time == 0 && delay == 0) {
+        scr_load_internal(new_scr);
+        return;
+    }
 
     lv_anim_t a_new;
     lv_anim_init(&a_new);
@@ -365,7 +359,6 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
 
     lv_anim_start(&a_new);
     lv_anim_start(&a_old);
-
 }
 
 /**
@@ -421,6 +414,38 @@ void lv_disp_clean_dcache(lv_disp_t * disp)
 }
 
 /**
+ * Temporarily enable and disable the invalidation of the display.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @param en true: enable invalidation; false: invalidation
+ */
+void lv_disp_enable_invalidation(lv_disp_t * disp, bool en)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("no display registered");
+        return;
+    }
+
+    disp->inv_en_cnt += en ? 1 : -1;
+}
+
+/**
+ * Get display invalidation is enabled.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return return true if invalidation is enabled
+ */
+bool lv_disp_is_invalidation_enabled(lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("no display registered");
+        return false;
+    }
+
+    return (disp->inv_en_cnt > 0);
+}
+
+/**
  * Get a pointer to the screen refresher timer to
  * modify its parameters with `lv_timer_...` functions.
  * @param disp pointer to a display
@@ -440,6 +465,24 @@ lv_timer_t * _lv_disp_get_refr_timer(lv_disp_t * disp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void scr_load_internal(lv_obj_t * scr)
+{
+    lv_disp_t * d = lv_obj_get_disp(scr);
+    if(!d) return;  /*Shouldn't happen, just to be sure*/
+
+    lv_obj_t * old_scr = d->act_scr;
+
+    if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+
+    d->act_scr = scr;
+
+    if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOADED, NULL);
+    if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+
+    lv_obj_invalidate(scr);
+}
 
 static void scr_load_anim_start(lv_anim_t * a)
 {
@@ -478,6 +521,7 @@ static void scr_anim_ready(lv_anim_t * a)
     d->draw_prev_over_act = false;
     d->scr_to_load = NULL;
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
+    lv_obj_invalidate(d->act_scr);
 }
 
 static bool is_out_anim(lv_scr_load_anim_t anim_type)

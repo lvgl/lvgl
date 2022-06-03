@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/image.md
-```
 # Images
 
 An image can be a file or a variable which stores the bitmap itself and some metadata.

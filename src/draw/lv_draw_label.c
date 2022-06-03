@@ -202,7 +202,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;
     uint32_t par_start = 0;
-    lv_color_t recolor;
+    lv_color_t recolor  = lv_color_black();
     lv_color_t color = lv_color_black();
     int32_t letter_w;
 

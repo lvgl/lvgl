@@ -36,19 +36,13 @@
 #define LV_TICK_CUSTOM_INCLUDE LV_RTTHREAD_INCLUDE
 #define LV_TICK_CUSTOM_SYS_TIME_EXPR (rt_tick_get_millisecond())    /*Expression evaluating to current system time in ms*/
 
+#ifdef PKG_LVGL_DISP_REFR_PERIOD
+#define LV_DISP_DEF_REFR_PERIOD   PKG_LVGL_DISP_REFR_PERIOD
+#endif
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
-
-/*-------------
- * Logging
- *-----------*/
-
-#ifdef PKG_LVGL_ENABLE_LOG
-#  define LV_USE_LOG 1
-#else
-#  define LV_USE_LOG 0
-#endif
 
 /*-------------
  * Asserts
@@ -83,7 +77,7 @@
 * EXAMPLES
 *==================*/
 
-#ifdef PKG_USING_LVGL_EXAMPLES
+#ifdef PKG_LVGL_USING_EXAMPLES
 #  define LV_BUILD_EXAMPLES 1
 #endif
 

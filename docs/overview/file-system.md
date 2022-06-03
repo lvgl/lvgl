@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/file-system.md
-```
 # File system
 
 LVGL has a 'File system' abstraction module that enables you to attach any type of file system.

@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/widgets/extra/spinbox.md
-```
 # Spinbox (lv_spinbox)
 
 ## Overview
@@ -20,7 +16,7 @@ The parts of the Spinbox are identical to the [Text area](/widgets/core/textarea
 
 `lv_spinbox_set_step(spinbox, 100)` sets which digits to change on increment/decrement. Only multiples of ten can be set, and not for example 3.
 
-`lv_spinbox_set_pos(spinbox, 1)` sets the cursor to a specific digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
+`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
 
 If an encoder is used as input device, the selected digit is shifted to the right by default whenever the encoder button is clicked. To change this behaviour to shifting to the left, the `lv_spinbox_set_digit_step_direction(spinbox, LV_DIR_LEFT)` can be used
 

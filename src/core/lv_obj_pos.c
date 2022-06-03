@@ -798,12 +798,14 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
 void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv)
 {
     if(obj) {
+        lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
+        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
         if(inv) {
             if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
-            transform_point(obj, p, inv);
+            if(do_tranf) transform_point(obj, p, inv);
         }
         else {
-            transform_point(obj, p, inv);
+            if(do_tranf) transform_point(obj, p, inv);
             if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
         }
     }
@@ -818,6 +820,7 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
         {area->x2, area->y1},
         {area->x2, area->y2},
     };
+
     lv_obj_transform_point(obj, &p[0], recursive, inv);
     lv_obj_transform_point(obj, &p[1], recursive, inv);
     lv_obj_transform_point(obj, &p[2], recursive, inv);
@@ -834,6 +837,9 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
 void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_disp_t * disp   = lv_obj_get_disp(obj);
+    if(!lv_disp_is_invalidation_enabled(disp)) return;
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
@@ -1149,12 +1155,14 @@ static void layout_update_core(lv_obj_t * obj)
 
 static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv)
 {
-    lv_point_t pivot;
-    pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
-    pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0);
     int16_t angle = lv_obj_get_style_transform_angle(obj, 0);
     int16_t zoom = lv_obj_get_style_transform_zoom(obj, 0);
 
+    if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) return;
+
+    lv_point_t pivot;
+    pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
+    pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0);
     if(inv) {
         angle = -angle;
         zoom = (256 * 256) / zoom;

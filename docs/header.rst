@@ -1,1 +1,0 @@
-.. |github_link_base| replace:: https://github.com/lvgl/lvgl/blob/8a8153219163b689e8f96d6a97c1f128eefd7ce2/docs

@@ -35,8 +35,7 @@
 #endif
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    #include "../gpu/lv_gpu_nxp_pxp.h"
-    #include "../gpu/lv_gpu_nxp_pxp_osa.h"
+    #include "../draw/nxp/pxp/lv_gpu_nxp_pxp.h"
 #endif
 
 /*********************
@@ -126,10 +125,7 @@ void lv_init(void)
 #endif
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    if(lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
-        LV_LOG_ERROR("PXP init error. STOP.\n");
-        for(; ;) ;
-    }
+    PXP_COND_STOP(!lv_gpu_nxp_pxp_init(), "PXP init failed.");
 #endif
 
     _lv_obj_style_init();
@@ -494,6 +490,10 @@ static void lv_obj_draw(lv_event_t * e)
         }
 
         if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_COVER_RES_NOT_COVER;
+            return;
+        }
+        if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }

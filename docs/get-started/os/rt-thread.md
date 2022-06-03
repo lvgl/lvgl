@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/get-started/os/rt-thread.md
-```
 # RT-Thread RTOS
 
 <img src="https://raw.githubusercontent.com/RT-Thread/rt-thread/master/documentation/figures/logo.png" width=40% style="float: center;" >

@@ -904,7 +904,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     if(LV_MIN(point_w, point_h) > line_dsc_default.width / 2) line_dsc_default.raw_end = 1;
     if(line_dsc_default.width == 1) line_dsc_default.raw_end = 1;
 
-    /*If there are more points than pixels draw only vertical lines*/
+    /*If there are at least as much points as pixels then draw only vertical lines*/
     bool crowded_mode = chart->point_cnt >= w ? true : false;
 
     /*Go through all data lines*/
@@ -1325,7 +1325,8 @@ static void draw_cursors(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
         cy += obj->coords.y1;
 
         lv_area_t point_area;
-        if(point_w && point_h) {
+        bool draw_point = point_w && point_h;
+        if(draw_point) {
             point_area.x1 = cx - point_w;
             point_area.x2 = cx + point_w;
             point_area.y1 = cy - point_h;
@@ -1345,7 +1346,11 @@ static void draw_cursors(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(draw_ctx, &line_dsc_tmp, &p1, &p2);
-            lv_draw_rect(draw_ctx, &point_dsc_tmp, &point_area);
+
+            if(draw_point) {
+                lv_draw_rect(draw_ctx, &point_dsc_tmp, &point_area);
+            }
+
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
 
@@ -1357,7 +1362,11 @@ static void draw_cursors(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(draw_ctx, &line_dsc_tmp, &p1, &p2);
-            lv_draw_rect(draw_ctx, &point_dsc_tmp, &point_area);
+
+            if(draw_point) {
+                lv_draw_rect(draw_ctx, &point_dsc_tmp, &point_area);
+            }
+
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
     }

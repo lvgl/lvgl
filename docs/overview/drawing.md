@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/drawing.md
-```
 # Drawing
 
 With LVGL, you don't need to draw anything manually. Just create objects (like buttons, labels, arc, etc.), move and change them, and LVGL will refresh and redraw what is required.

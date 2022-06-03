@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../unity/unity.h"
 
 #define HOR_RES 800
 #define VER_RES 480
@@ -89,6 +90,11 @@ uint32_t custom_tick_get(void)
 
     uint32_t time_ms = now_ms - start_ms;
     return time_ms;
+}
+
+void lv_test_assert_fail(void)
+{
+    TEST_FAIL();
 }
 
 #endif

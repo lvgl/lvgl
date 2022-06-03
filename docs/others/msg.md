@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/others/msg.md
-```
 # Messaging
 
 Messaging (`lv_msg`) is a classic []publisher subscriber](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) implementation for LVGL.

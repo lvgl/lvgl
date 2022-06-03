@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_fs_win32.c
  *
  */
@@ -64,7 +64,7 @@ void lv_fs_win32_init(void)
      * Register the file system interface in LVGL
      *--------------------------------------------------*/
 
-    /*Add a simple drive to open images*/
+    /*Add a simple driver to open images*/
     static lv_fs_drv_t fs_drv; /*A driver descriptor*/
     lv_fs_drv_init(&fs_drv);
 
