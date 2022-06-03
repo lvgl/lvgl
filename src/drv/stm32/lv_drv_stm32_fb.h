@@ -55,13 +55,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_drv_stm32_ltdc_init(lv_drv_stm32_ltdc_t * drv);
-
-void lv_drv_stm32_ltdc_create(lv_drv_stm32_ltdc_t * drv);
-
 void lv_drv_stm32_layer_init(lv_drv_stm32_layer_t * drv);
 
-void lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv,  lv_drv_stm32_ltdc_t * ltdc);
+lv_disp_drv_t * lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv);
 
 #endif
 

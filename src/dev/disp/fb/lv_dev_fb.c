@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_dev_fb.h"
-#if LV_USE_DRV_SDL
+#if LV_USE_DEV_FB
 
 /*********************
  *      DEFINES
