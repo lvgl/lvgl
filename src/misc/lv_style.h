@@ -269,7 +269,8 @@ typedef enum {
     _LV_STYLE_LAST_BUILT_IN_PROP     = 111,
     _LV_STYLE_NUM_BUILT_IN_PROPS     = _LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
-    LV_STYLE_PROP_ANY                = 0xFFFF
+    LV_STYLE_PROP_ANY                = 0xFFFF,
+    _LV_STYLE_PROP_CONST             = 0xFFFF /* magic value for const styles */
 } lv_style_prop_t;
 
 enum {

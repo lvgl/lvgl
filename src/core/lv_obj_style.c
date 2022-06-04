@@ -176,7 +176,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYOUT_REFR);
     bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_EXT_DRAW);
-    bool is_inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
+    bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
     bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYER_REFR);
 
     if(is_layout_refr) {
@@ -208,7 +208,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     }
     lv_obj_invalidate(obj);
 
-    if(prop == LV_STYLE_PROP_ANY || (is_inherit && (is_ext_draw || is_layout_refr))) {
+    if(prop == LV_STYLE_PROP_ANY || (is_inheritable && (is_ext_draw || is_layout_refr))) {
         if(part != LV_PART_SCROLLBAR) {
             refresh_children_style(obj);
         }
@@ -223,12 +223,12 @@ void lv_obj_enable_style_refresh(bool en)
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     lv_style_value_t value_act;
-    bool inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
+    bool inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
     lv_style_res_t found = LV_STYLE_RES_NOT_FOUND;
     while(obj) {
         found = get_prop_core(obj, part, prop, &value_act);
         if(found == LV_STYLE_RES_FOUND) break;
-        if(!inherit) break;
+        if(!inheritable) break;
 
         /*If not found, check the `MAIN` style first*/
         if(found != LV_STYLE_RES_INHERIT && part != LV_PART_MAIN) {
