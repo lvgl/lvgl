@@ -24,9 +24,12 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_and_meta, lv_style_value_t value, void (*value_adjustment_helper)(lv_style_prop_t, lv_style_value_t, uint16_t *, lv_style_value_t *));
-static void lv_style_set_prop_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t *prop_storage, lv_style_value_t * value_storage);
-static void lv_style_set_prop_meta_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t *prop_storage, lv_style_value_t * value_storage);
+static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_and_meta, lv_style_value_t value,
+                                       void (*value_adjustment_helper)(lv_style_prop_t, lv_style_value_t, uint16_t *, lv_style_value_t *));
+static void lv_style_set_prop_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t * prop_storage,
+                                     lv_style_value_t * value_storage);
+static void lv_style_set_prop_meta_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t * prop_storage,
+                                          lv_style_value_t * value_storage);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -181,11 +184,11 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
         last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     }
 
-    if(((last_custom_prop_id+1) & LV_STYLE_PROP_META_MASK) != 0) {
+    if(((last_custom_prop_id + 1) & LV_STYLE_PROP_META_MASK) != 0) {
         LV_LOG_ERROR("No more custom property IDs available");
         return LV_STYLE_PROP_INV;
     }
-    
+
     /*
      * Allocate the lookup table if it's not yet available.
      */
@@ -392,20 +395,23 @@ uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_style_set_prop_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t *prop_storage, lv_style_value_t * value_storage)
+static void lv_style_set_prop_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t * prop_storage,
+                                     lv_style_value_t * value_storage)
 {
     *prop_storage = prop;
     *value_storage = value;
 }
 
-static void lv_style_set_prop_meta_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t *prop_storage, lv_style_value_t * value_storage)
+static void lv_style_set_prop_meta_helper(lv_style_prop_t prop, lv_style_value_t value, uint16_t * prop_storage,
+                                          lv_style_value_t * value_storage)
 {
     LV_UNUSED(value);
     LV_UNUSED(value_storage);
     *prop_storage = prop; /* meta is OR-ed into the prop ID already */
 }
 
-static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_and_meta, lv_style_value_t value, void (*value_adjustment_helper)(lv_style_prop_t, lv_style_value_t, uint16_t *, lv_style_value_t *))
+static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_and_meta, lv_style_value_t value,
+                                       void (*value_adjustment_helper)(lv_style_prop_t, lv_style_value_t, uint16_t *, lv_style_value_t *))
 {
     LV_ASSERT_STYLE(style);
 

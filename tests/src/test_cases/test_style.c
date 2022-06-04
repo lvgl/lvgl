@@ -80,7 +80,8 @@ void test_inherit_meta(void)
     TEST_ASSERT_EQUAL_HEX(lv_color_hex(0xff0000).full, lv_obj_get_style_text_color(grandchild, LV_PART_MAIN).full);
 }
 
-void test_id_meta_overrun(void) {
+void test_id_meta_overrun(void)
+{
     /* Test that property ID registration is blocked once the ID reaches into the meta bits */
     lv_style_prop_t prop_id;
     do {

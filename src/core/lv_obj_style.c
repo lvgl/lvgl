@@ -276,7 +276,7 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
 }
 
 void lv_obj_set_local_style_prop_meta(lv_obj_t * obj, lv_style_prop_t prop, uint16_t meta,
-                                 lv_style_selector_t selector)
+                                      lv_style_selector_t selector)
 {
     lv_style_t * style = get_local_style(obj, selector);
     lv_style_set_prop_meta(style, prop, meta);
@@ -285,7 +285,7 @@ void lv_obj_set_local_style_prop_meta(lv_obj_t * obj, lv_style_prop_t prop, uint
 
 
 lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
-                                     lv_style_selector_t selector)
+                                           lv_style_selector_t selector)
 {
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
@@ -587,7 +587,8 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_sty
         if(found == LV_STYLE_RES_FOUND) {
             *v = value_tmp;
             return LV_STYLE_RES_FOUND;
-        } else if(found == LV_STYLE_RES_INHERIT) {
+        }
+        else if(found == LV_STYLE_RES_INHERIT) {
             return LV_STYLE_RES_INHERIT;
         }
     }
@@ -617,7 +618,8 @@ static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_sty
                 weight = state_act;
                 *v = value_tmp;
             }
-        } else if(found == LV_STYLE_RES_INHERIT) {
+        }
+        else if(found == LV_STYLE_RES_INHERIT) {
             return LV_STYLE_RES_INHERIT;
         }
     }

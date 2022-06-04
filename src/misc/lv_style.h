@@ -436,7 +436,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
  * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
  */
 static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_style_prop_t prop,
-                                                 lv_style_value_t * value)
+                                                       lv_style_value_t * value)
 {
     if(style->prop1 == LV_STYLE_PROP_ANY) {
         const lv_style_const_prop_t * const_prop;
@@ -476,7 +476,8 @@ static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style,
     else if(LV_STYLE_PROP_ID_MASK(style->prop1) == prop) {
         if(style->prop1 & LV_STYLE_PROP_META_INHERIT)
             return LV_STYLE_RES_INHERIT;
-        *value = (style->prop1 & LV_STYLE_PROP_META_INITIAL) ? lv_style_prop_get_default(LV_STYLE_PROP_ID_MASK(style->prop1)) : style->v_p.value1;
+        *value = (style->prop1 & LV_STYLE_PROP_META_INITIAL) ? lv_style_prop_get_default(LV_STYLE_PROP_ID_MASK(
+                                                                                             style->prop1)) : style->v_p.value1;
         return LV_STYLE_RES_FOUND;
     }
     return LV_STYLE_RES_NOT_FOUND;
