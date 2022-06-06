@@ -8,7 +8,6 @@
  *********************/
 #include <stddef.h>
 #include "../../core/lv_refr.h"
-#include "../../core/lv_disp.h"
 
 #include "lv_draw_sdl.h"
 #include "lv_draw_sdl_priv.h"
@@ -39,57 +38,74 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_refr_obj_transformed(struct _lv_draw_ctx_t * draw_ctx, struct _lv_obj_t * obj)
+void lv_draw_sdl_refr_obj_transformed(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 {
+    lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
+    if(opa < LV_OPA_MIN) return;
+
     lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
 
-    const lv_area_t buf_area_backup = *draw_ctx->buf_area;
-    const lv_area_t * clip_area_backup = draw_ctx->clip_area;
-
-
+    /* Calculate full coords first, let's optimize later... */
+    lv_area_t draw_area;
+    const lv_area_t buf_area_ori = *draw_ctx->buf_area;
+    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
     lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
 
-    SDL_Rect srcrect = {0, 0, lv_area_get_width(&obj_coords_ext), lv_area_get_height(&obj_coords_ext)};
+    draw_area = obj_coords_ext;
 
-    lv_point_t offset = {-obj_coords_ext.x1, -obj_coords_ext.y1};
+    lv_area_t trans_coords_ext = obj_coords_ext;
+    lv_obj_get_transformed_area(obj, &trans_coords_ext, false, false);
 
-    SDL_Rect dstrect;
+    lv_area_t trans_area = trans_coords_ext;
 
-    lv_area_t transf_coords = obj_coords_ext;
-    lv_obj_get_transformed_area(obj, &transf_coords, false, false);
-    lv_area_to_sdl_rect(&transf_coords, &dstrect);
+    SDL_Rect draw_rect = {0, 0, lv_area_get_width(&draw_area), lv_area_get_height(&draw_area)};
+    SDL_Rect trans_rect;
+    lv_area_to_sdl_rect(&trans_area, &trans_rect);
 
+    lv_point_t trans_offset = {-draw_area.x1, -draw_area.y1};
 
     SDL_Renderer * renderer = draw_ctx_sdl->renderer;
     SDL_Texture * target = lv_draw_sdl_composite_texture_obtain(draw_ctx_sdl, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET1,
-                                                                srcrect.w, srcrect.h);
+                                                                draw_rect.w, draw_rect.h);
+    SDL_SetTextureBlendMode(target, SDL_BLENDMODE_BLEND);
 
     SDL_Texture * old_target = SDL_GetRenderTarget(renderer);
     SDL_SetRenderTarget(renderer, target);
     SDL_RenderClear(renderer);
 
-    draw_ctx_sdl->internals->transform_offset = &offset;
+    /* Set proper drawing context for transform layer */
+    draw_ctx_sdl->internals->transform_offset = &trans_offset;
+    *draw_ctx->buf_area = draw_area;
+    draw_ctx->clip_area = &draw_area;
 
+    /* Draw object on transform layer */
     lv_obj_redraw(draw_ctx, obj);
 
+    /* Reset drawing context */
+    *draw_ctx->buf_area = buf_area_ori;
+    draw_ctx->clip_area = clip_area_ori;
     draw_ctx_sdl->internals->transform_offset = NULL;
 
     SDL_SetRenderTarget(renderer, old_target);
 
-    SDL_Rect clip_rect;
-    lv_area_to_sdl_rect(clip_area_backup, &clip_rect);
-    SDL_RenderSetClipRect(renderer, &clip_rect);
-    SDL_RenderCopy(renderer, target, &srcrect, &dstrect);
-    SDL_RenderSetClipRect(renderer, NULL);
+    /*Render off-screen texture, transformed*/
 
-    SDL_SetRenderDrawColor(renderer, lv_rand(128, 255), lv_rand(128, 255), lv_rand(128, 255), 255);
-    SDL_Rect highlight_rect;
-    lv_area_to_sdl_rect(&buf_area_backup, &clip_rect);
-    SDL_RenderDrawRect(renderer, &highlight_rect);
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    lv_point_t pivot = {
+        .x = ext_draw_size + lv_obj_get_style_transform_pivot_x(obj, 0),
+        .y = ext_draw_size + lv_obj_get_style_transform_pivot_y(obj, 0)
+    };
+    lv_obj_transform_point(obj, &pivot, false, false);
+
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(clip_area_ori, &clip_rect);
+    SDL_Point center = {.x = pivot.x, .y = pivot.y};
+    lv_coord_t angle = lv_obj_get_style_transform_angle(obj, 0);
+    SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_RenderCopyEx(renderer, target, &draw_rect, &trans_rect, angle, &center, SDL_FLIP_NONE);
+    SDL_RenderSetClipRect(renderer, NULL);
 }
 
 void lv_draw_sdl_refr_areas_offset(lv_draw_sdl_ctx_t * ctx, bool has_composite, lv_area_t * apply_area,
