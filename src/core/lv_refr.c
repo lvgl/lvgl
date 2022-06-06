@@ -820,6 +820,9 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     if(inlayer == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(draw_ctx, obj);
     }
+    else if(draw_ctx->refr_obj_transformed) {
+        draw_ctx->refr_obj_transformed(draw_ctx, obj);
+    }
     else {
         lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
         if(opa < LV_OPA_MIN) return;
