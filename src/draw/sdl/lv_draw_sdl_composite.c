@@ -84,15 +84,16 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
     const bool draw_blend = blend_mode != LV_BLEND_MODE_NORMAL;
     if(draw_mask || draw_blend) {
         lv_draw_sdl_context_internals_t * internals = ctx->internals;
-        LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
+        LV_ASSERT(internals->mask == NULL && internals->composition == NULL && internals->target_backup == NULL);
 
         lv_coord_t w = lv_area_get_width(apply_area), h = lv_area_get_height(apply_area);
         internals->composition = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0, w, h);
-        /* Don't need to worry about overflow */
+        /* Don't need to worry about integral overflow */
         lv_coord_t ofs_x = (lv_coord_t) - apply_area->x1, ofs_y = (lv_coord_t) - apply_area->y1;
         /* Offset draw area to start with (0,0) of coords */
         lv_area_move(coords_out, ofs_x, ofs_y);
         lv_area_move(clip_out, ofs_x, ofs_y);
+        internals->target_backup = SDL_GetRenderTarget(ctx->renderer);
         SDL_SetRenderTarget(ctx->renderer, internals->composition);
         SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 0);
         SDL_RenderClear(ctx->renderer);
@@ -140,7 +141,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(apply_area, &dst_rect);
 
-        SDL_SetRenderTarget(ctx->renderer, ctx->base_draw.buf);
+        SDL_SetRenderTarget(ctx->renderer, internals->target_backup);
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL:
                 SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
@@ -173,7 +174,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
         SDL_RenderCopy(ctx->renderer, internals->composition, &src_rect, &dst_rect);
     }
 
-    internals->mask = internals->composition = NULL;
+    internals->mask = internals->composition = internals->target_backup = NULL;
 }
 
 SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_texture_id_t id,

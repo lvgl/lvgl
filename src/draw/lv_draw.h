@@ -126,6 +126,9 @@ typedef struct _lv_draw_ctx_t  {
     void (*buffer_copy)(struct _lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
                         const lv_area_t * dest_area,
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
+
+    void (*refr_obj_transformed)(struct _lv_draw_ctx_t * draw_ctx, struct _lv_obj_t * obj);
+
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
