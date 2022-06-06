@@ -126,10 +126,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
         }
 
         const lv_font_t * font = lv_obj_get_style_text_font(mbox->btns, LV_PART_ITEMS);
-        /* Prevent low values of LV_DPI_DEF breaking button padding */
-        lv_coord_t btn_pad = (LV_DPI_DEF < 130) ? 130 : LV_DPI_DEF;
-        lv_coord_t btn_h = lv_font_get_line_height(font) + btn_pad / 10;
-        lv_obj_set_size(mbox->btns, btn_cnt * (2 * btn_pad / 3), btn_h);
+        lv_coord_t btn_h = lv_font_get_line_height(font) + LV_DPI_DEF / 10;
+        lv_obj_set_size(mbox->btns, btn_cnt * (2 * LV_DPI_DEF / 3), btn_h);
         lv_obj_set_style_max_width(mbox->btns, lv_pct(100), 0);
         lv_obj_add_flag(mbox->btns, LV_OBJ_FLAG_EVENT_BUBBLE);    /*To see the event directly on the message box*/
     }
