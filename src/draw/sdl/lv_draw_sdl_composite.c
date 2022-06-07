@@ -13,7 +13,6 @@
 #include "../../misc/lv_gc.h"
 #include "../../core/lv_refr.h"
 #include "lv_draw_sdl_composite.h"
-#include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_priv.h"
 #include "lv_draw_sdl_texture_cache.h"

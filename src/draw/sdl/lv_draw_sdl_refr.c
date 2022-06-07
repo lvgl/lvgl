@@ -6,7 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stddef.h>
+#include "../../lv_conf_internal.h"
+
+#if LV_USE_GPU_SDL
+
 #include "../../core/lv_refr.h"
 
 #include "lv_draw_sdl.h"
@@ -123,3 +126,5 @@ void lv_draw_sdl_refr_areas_offset(lv_draw_sdl_ctx_t * ctx, bool has_composite, 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /*LV_USE_GPU_SDL*/
