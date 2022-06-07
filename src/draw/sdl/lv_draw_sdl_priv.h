@@ -36,7 +36,7 @@ typedef struct lv_draw_sdl_context_internals_t {
     SDL_Texture * mask;
     SDL_Texture * composition;
     SDL_Texture * target_backup;
-    const lv_point_t * transform_offset;
+    bool in_transform;
 } lv_draw_sdl_context_internals_t;
 
 /**********************

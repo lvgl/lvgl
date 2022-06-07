@@ -65,8 +65,6 @@ void lv_draw_sdl_refr_obj_transformed(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     SDL_Rect trans_rect;
     lv_area_to_sdl_rect(&trans_area, &trans_rect);
 
-    lv_point_t trans_offset = {-draw_area.x1, -draw_area.y1};
-
     SDL_Renderer * renderer = draw_ctx_sdl->renderer;
     SDL_Texture * target = lv_draw_sdl_composite_texture_obtain(draw_ctx_sdl, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET1,
                                                                 draw_rect.w, draw_rect.h);
@@ -77,7 +75,7 @@ void lv_draw_sdl_refr_obj_transformed(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     SDL_RenderClear(renderer);
 
     /* Set proper drawing context for transform layer */
-    draw_ctx_sdl->internals->transform_offset = &trans_offset;
+    draw_ctx_sdl->internals->in_transform = true;
     *draw_ctx->buf_area = draw_area;
     draw_ctx->clip_area = &draw_area;
 
@@ -87,7 +85,7 @@ void lv_draw_sdl_refr_obj_transformed(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     /* Reset drawing context */
     *draw_ctx->buf_area = buf_area_ori;
     draw_ctx->clip_area = clip_area_ori;
-    draw_ctx_sdl->internals->transform_offset = NULL;
+    draw_ctx_sdl->internals->in_transform = false;
 
     SDL_SetRenderTarget(renderer, old_target);
 
@@ -111,16 +109,14 @@ void lv_draw_sdl_refr_obj_transformed(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 void lv_draw_sdl_refr_areas_offset(lv_draw_sdl_ctx_t * ctx, bool has_composite, lv_area_t * apply_area,
                                    lv_area_t * coords, lv_area_t * clip)
 {
-    const lv_point_t * offset = ctx->internals->transform_offset;
-    if(!offset) {
+    if(!ctx->internals->in_transform) {
         return;
     }
+    lv_area_t * area = ctx->base_draw.buf_area;
+    lv_area_move(coords, -area->x1, -area->y1);
+    lv_area_move(clip, -area->x1, -area->y1);
     if(has_composite) {
-        lv_area_move(apply_area, offset->x, offset->y);
-    }
-    else {
-        lv_area_move(coords, offset->x, offset->y);
-        lv_area_move(clip, offset->x, offset->y);
+        lv_area_move(apply_area, -area->x1, -area->y1);
     }
 }
 
