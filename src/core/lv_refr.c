@@ -820,8 +820,26 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     if(inlayer == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(draw_ctx, obj);
     }
-    else if(draw_ctx->refr_obj_transformed) {
-        draw_ctx->refr_obj_transformed(draw_ctx, obj);
+    else if(draw_ctx->transform_begin) {
+        lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+        lv_area_t obj_coords_ext;
+        lv_obj_get_coords(obj, &obj_coords_ext);
+        lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
+
+        lv_area_t trans_coords = obj_coords_ext;
+        lv_obj_get_transformed_area(obj, &trans_coords, false, false);
+
+        lv_point_t pivot = {
+            .x = lv_obj_get_style_transform_pivot_x(obj, 0),
+            .y = lv_obj_get_style_transform_pivot_y(obj, 0)
+        };
+        lv_obj_transform_point(obj, &pivot, false, false);
+
+        lv_coord_t angle = lv_obj_get_style_transform_angle(obj, 0);
+
+        lv_draw_transform_ctx_t * trans_ctx = draw_ctx->transform_begin(draw_ctx, &obj_coords_ext);
+        lv_obj_redraw(draw_ctx, obj);
+        draw_ctx->transform_finish(draw_ctx, trans_ctx, &trans_coords, &pivot, angle);
     }
     else {
         lv_opa_t opa = lv_obj_get_style_opa(obj, 0);

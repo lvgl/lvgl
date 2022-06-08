@@ -186,7 +186,10 @@ SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_d
     if(!result || tex_size->x < w || tex_size->y < h) {
         lv_coord_t size = next_pow_of_2(LV_MAX(w, h));
         int access = SDL_TEXTUREACCESS_STREAMING;
-        if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0) {
+        if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TRANSFORM0) {
+            access = SDL_TEXTUREACCESS_TARGET;
+        }
+        else if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0) {
             access = SDL_TEXTUREACCESS_TARGET;
         }
         result = SDL_CreateTexture(ctx->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, access, size, size);

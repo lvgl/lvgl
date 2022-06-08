@@ -22,7 +22,7 @@
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_rect.h"
-#include "lv_draw_sdl_refr.h"
+#include "lv_draw_sdl_transform.h"
 
 /*********************
  *      DEFINES
@@ -131,7 +131,7 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
                                                     &t_coords, &t_clip, &apply_area);
     }
 
-    lv_draw_sdl_refr_areas_offset(ctx, has_composite, &apply_area, &t_coords, &t_clip);
+    lv_draw_sdl_transform_areas_offset(ctx, has_composite, &apply_area, &t_coords, &t_clip);
 
     SDL_Rect clip_rect, coords_rect;
     lv_area_to_sdl_rect(&t_clip, &clip_rect);

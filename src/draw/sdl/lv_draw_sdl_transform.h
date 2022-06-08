@@ -26,8 +26,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_draw_sdl_refr_areas_offset(lv_draw_sdl_ctx_t * ctx, bool has_composite, lv_area_t * apply_area,
-                                   lv_area_t * coords, lv_area_t * clip);
+void lv_draw_sdl_transform_areas_offset(lv_draw_sdl_ctx_t * ctx, bool has_composite, lv_area_t * apply_area,
+                                        lv_area_t * coords, lv_area_t * clip);
 /**********************
  *      MACROS
  **********************/

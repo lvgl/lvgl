@@ -41,6 +41,7 @@ typedef struct {
     void * user_data;
 } lv_draw_mask_t;
 
+typedef struct _lv_draw_transform_ctx_t lv_draw_transform_ctx_t;
 
 typedef struct _lv_draw_ctx_t  {
     /**
@@ -127,7 +128,25 @@ typedef struct _lv_draw_ctx_t  {
                         const lv_area_t * dest_area,
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
-    void (*refr_obj_transformed)(struct _lv_draw_ctx_t * draw_ctx, struct _lv_obj_t * obj);
+    /**
+     * Prepare context for transformed drawing
+     * @param draw_ctx pointer to the draw context
+     * @param src_area area of the source to draw
+     * @return draw backend defined context
+     */
+    struct _lv_draw_transform_ctx_t * (*transform_begin)(struct _lv_draw_ctx_t * draw_ctx,
+                                                         const lv_area_t * src_area);
+
+    /**
+     * Draw transformed target on screen
+     * @param draw_ctx pointer to the draw context
+     * @param transform_ctx transform context returned in @code transform_begin @endcode
+     * @param trans_area area of the drawing source after transformation
+     * @param trans_pivot pivot of the drawing source for rotation
+     * @param trans_angle rotation angle for transformation
+     */
+    void (*transform_finish)(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_transform_ctx_t * transform_ctx,
+                             const lv_area_t * trans_area, const lv_point_t * trans_pivot, lv_coord_t trans_angle);
 
 #if LV_USE_USER_DATA
     void * user_data;
