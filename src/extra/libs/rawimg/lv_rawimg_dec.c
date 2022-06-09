@@ -69,9 +69,11 @@ void lv_bin_init()
  *   STATIC FUNCTIONS
  **********************/
 
-static void init_dec_ctx(uint8_t * caps)
+static void init_dec_ctx(lv_img_cf_t cf, uint8_t * caps)
 {
     *caps = LV_IMG_DEC_CACHED;
+    if(cf != LV_IMG_CF_TRUE_COLOR && cf != LV_IMG_CF_RAW)
+        *caps |= LV_IMG_DEC_TRANSPARENT;
 }
 
 lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps)
@@ -79,7 +81,7 @@ lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps
     if(src->type == LV_IMG_SRC_VARIABLE) {
         lv_img_cf_t cf = ((lv_img_dsc_t *)src->data)->header.cf;
         if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
-        init_dec_ctx(caps);
+        init_dec_ctx(cf, caps);
         return LV_RES_OK;
     }
     if(src->type == LV_IMG_SRC_FILE) {
@@ -91,6 +93,10 @@ lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
+        lv_img_header_t header = {};
+        res = lv_fs_read(&f, &header, sizeof(header), NULL);
+        init_dec_ctx(header.cf, caps);
+
         lv_fs_close(&f);
 
         return LV_RES_OK;
@@ -172,9 +178,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_f
             return LV_RES_INV;
         }
         LV_ZERO_ALLOC(dsc->dec_ctx);
-        init_dec_ctx(&dsc->caps);
+        init_dec_ctx(img_dsc->header.cf, &dsc->caps);
         dsc->header = img_dsc->header;
-        dsc->caps = LV_IMG_DEC_CACHED;
     }
 
     lv_img_cf_t cf = dsc->header.cf;

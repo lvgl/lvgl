@@ -53,7 +53,7 @@ lv_img_cache_entry_t * lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img
 
 /**
  * Query the image decoder interface to find a decoder that's able to open the given source and extract the
- * image metadata. The decoder will stay in the cache.
+ * image metadata. If such a decoder is found in the cache, use it, else it's not stored in the cache.
  * @param dsc       A pointer on decoder initialization descriptor.
  * @param header    On output will be filled with the image native dimension
  * @param caps      Optional parameter that'll be filled with the decoder's caps. Can be NULL

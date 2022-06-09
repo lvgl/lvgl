@@ -121,7 +121,7 @@ void lv_rlottie_init(void)
  **********************/
 static void set_caps(uint8_t * caps)
 {
-    *caps = LV_IMG_DEC_VECTOR | LV_IMG_DEC_ANIMATED | LV_IMG_DEC_SEEKABLE;
+    *caps = LV_IMG_DEC_VECTOR | LV_IMG_DEC_ANIMATED | LV_IMG_DEC_TRANSPARENT | LV_IMG_DEC_SEEKABLE;
 }
 
 static lv_res_t init_dec_ctx(rlottiedec_ctx_t * dec_ctx)

@@ -243,29 +243,30 @@ static gd_GIF * gif_open(gd_GIF * gif_base, bool skip_alloc)
 
         if(gif->bgindex && !skip_alloc)
             memset(gif->frame, gif->bgindex, gif->width * gif->height);
-    }
+
         bgcolor = &gif->palette->colors[gif->bgindex*3];
 
-    for (i = 0; i < gif->width * gif->height; i++) {
-#if LV_COLOR_DEPTH == 32
-        gif->canvas[i*4 + 0] = *(bgcolor + 2);
-        gif->canvas[i*4 + 1] = *(bgcolor + 1);
-        gif->canvas[i*4 + 2] = *(bgcolor + 0);
-        gif->canvas[i*4 + 3] = 0xff;
-#elif LV_COLOR_DEPTH == 16
-        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-        gif->canvas[i*3 + 0] = c.full & 0xff;
-        gif->canvas[i*3 + 1] = (c.full >> 8) & 0xff;
-        gif->canvas[i*3 + 2] = 0xff;
-#elif LV_COLOR_DEPTH == 8
-        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-        gif->canvas[i*2 + 0] = c.full;
-        gif->canvas[i*2 + 1] = 0xff;
-#elif LV_COLOR_DEPTH == 1
-        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-        gif->canvas[i*2 + 0] = c.ch.red > 128 ? 1 : 0;
-        gif->canvas[i*2 + 1] = 0xff;
-#endif
+        for (i = 0; i < gif->width * gif->height; i++) {
+    #if LV_COLOR_DEPTH == 32
+            gif->canvas[i*4 + 0] = *(bgcolor + 2);
+            gif->canvas[i*4 + 1] = *(bgcolor + 1);
+            gif->canvas[i*4 + 2] = *(bgcolor + 0);
+            gif->canvas[i*4 + 3] = 0xff;
+    #elif LV_COLOR_DEPTH == 16
+            lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+            gif->canvas[i*3 + 0] = c.full & 0xff;
+            gif->canvas[i*3 + 1] = (c.full >> 8) & 0xff;
+            gif->canvas[i*3 + 2] = 0xff;
+    #elif LV_COLOR_DEPTH == 8
+            lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+            gif->canvas[i*2 + 0] = c.full;
+            gif->canvas[i*2 + 1] = 0xff;
+    #elif LV_COLOR_DEPTH == 1
+            lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+            gif->canvas[i*2 + 0] = c.ch.red > 128 ? 1 : 0;
+            gif->canvas[i*2 + 1] = 0xff;
+    #endif
+        }
     }
 
     gif->anim_start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
@@ -780,7 +781,7 @@ static void f_gif_close(gd_GIF * gif)
  **********************/
 static void set_caps(uint8_t * caps)
 {
-    *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_VFR | LV_IMG_DEC_CACHED;
+    *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_VFR | LV_IMG_DEC_TRANSPARENT | LV_IMG_DEC_CACHED;
 }
 /**
  * Get info about a rlottie image

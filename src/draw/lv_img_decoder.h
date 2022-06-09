@@ -41,6 +41,7 @@ typedef enum {
     LV_IMG_DEC_CACHED       = 0x08, /**!< The complete image can be cached (used for rotation and zoom) */
     LV_IMG_DEC_VFR          = 0x10, /**!< The animation has a variable frame rate */
     LV_IMG_DEC_LOOPING      = 0x20, /**!< The animation is looping */
+    LV_IMG_DEC_TRANSPARENT  = 0x40, /**!< The image might have transparent area */
 } lv_img_dec_caps_t;
 
 typedef enum {

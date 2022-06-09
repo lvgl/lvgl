@@ -31,6 +31,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void set_caps(lv_fs_file_t * f, uint8_t * caps);
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
 static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
@@ -66,6 +67,18 @@ void lv_bmp_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
+void set_caps(lv_fs_file_t * f, uint8_t * caps)
+{
+#if LV_COLOR_DEPTH == 32
+    lv_fs_seek(f, 28, LV_FS_SEEK_SET);
+    uint16_t bpp = 0;
+    lv_fs_read(f, &bpp, sizeof(bpp), NULL);
+    *caps = bpp == 32 ? LV_IMG_DEC_TRANSPARENT : LV_IMG_DEC_DEFAULT;
+#else
+    *caps = LV_IMG_DEC_DEFAULT;
+#endif
+}
+
 /**
  * Get info about a PNG image
  * @param src can be file name or pointer to a C array
@@ -78,12 +91,12 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
         if(!src->ext || strcmp(src->ext, ".bmp")) return LV_RES_INV;
-        *caps = LV_IMG_DEC_DEFAULT;  /*Image is not cached for files*/
 
         /*Check file exists*/
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
+        set_caps(&f, caps);
         lv_fs_close(&f);
 
         return LV_RES_OK;
@@ -140,10 +153,11 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
         memcpy(&bpp, headers + 28, 2);
 #if LV_COLOR_DEPTH == 32
         dsc->header.cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+        dsc->caps = bpp == 32 ? LV_IMG_DEC_TRANSPARENT : LV_IMG_DEC_DEFAULT;
 #else
         dsc->header.cf = LV_IMG_CF_TRUE_COLOR;
-#endif
         dsc->caps = LV_IMG_DEC_DEFAULT;
+#endif
         return check_colordepth(bpp);
     }
 
@@ -244,6 +258,8 @@ static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
  */
 static void decoder_close(lv_img_dec_dsc_t * dsc)
 {
+    if(!dsc || !dsc->dec_ctx) return;
+
     bmp_dsc_t * b = dsc->dec_ctx->user_data;
     lv_fs_close(&b->f);
     lv_mem_free(dsc->dec_ctx->user_data);

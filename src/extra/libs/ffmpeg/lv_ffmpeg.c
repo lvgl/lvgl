@@ -124,7 +124,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
             LV_LOG_ERROR("ffmpeg can't get image header");
             return LV_RES_INV;
         }
-
+        /* We don't fill the TRANSPARENT cap here since it involves too much computation later on */
         *caps = LV_IMG_DEC_ANIMATED | LV_IMG_DEC_CACHED;
         return LV_RES_OK;
     }

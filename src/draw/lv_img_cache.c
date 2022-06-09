@@ -62,6 +62,7 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
     lv_img_cache_entry_t * cached_src = NULL;
     if(find_entry(dsc->src, NULL, dec_ctx, &cached_src)) {
         lv_memcpy(header, &cached_src->dec_dsc.header, sizeof(*header));
+        if(caps != NULL) *caps = cached_src->dec_dsc.caps;
         return LV_RES_OK;
     }
     if(!cached_src) return LV_RES_INV;

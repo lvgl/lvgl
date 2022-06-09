@@ -62,7 +62,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.png" files*/
         if(!src->ext || strcmp(src->ext, ".png")) return LV_RES_INV;
-        *caps = LV_IMG_DEC_CACHED;  /*Image is not cached for files*/
+        *caps = LV_IMG_DEC_TRANSPARENT | LV_IMG_DEC_CACHED;  /*Image is not cached for files*/
 
         /*Check file exists*/
         lv_fs_file_t f;
@@ -126,7 +126,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
             png_data = (unsigned char *)dsc->input.src->data;
         }
     }
-    *caps = LV_IMG_DEC_CACHED;
+    *caps = LV_IMG_DEC_TRANSPARENT | LV_IMG_DEC_CACHED;
 
     if(flags == LV_IMG_DEC_ONLYMETA) {
         dsc->header.always_zero = 0;
