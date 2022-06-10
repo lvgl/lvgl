@@ -70,4 +70,40 @@ void test_custom_prop_ids(void)
     TEST_ASSERT_EQUAL(_lv_style_custom_prop_flag_lookup_table_size, 96);
 }
 
+void test_inherit_meta(void)
+{
+    lv_obj_t * parent = lv_obj_create(lv_scr_act());
+    lv_obj_t * child = lv_obj_create(parent);
+    lv_obj_t * grandchild = lv_label_create(child);
+    lv_obj_set_style_text_color(parent, lv_color_hex(0xff0000), LV_PART_MAIN);
+    lv_obj_set_local_style_prop_meta(child, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_HEX(lv_color_hex(0xff0000).full, lv_obj_get_style_text_color(grandchild, LV_PART_MAIN).full);
+}
+
+void test_id_meta_overrun(void)
+{
+    /* Test that property ID registration is blocked once the ID reaches into the meta bits */
+    lv_style_prop_t prop_id;
+    do {
+        prop_id = lv_style_register_prop(0);
+        if(prop_id != LV_STYLE_PROP_INV) {
+            TEST_ASSERT_EQUAL(0, prop_id & LV_STYLE_PROP_META_MASK);
+        }
+    } while(prop_id != LV_STYLE_PROP_INV);
+}
+
+void test_inherit_meta_with_lower_precedence_style(void)
+{
+    lv_obj_t * parent = lv_obj_create(lv_scr_act());
+    lv_obj_t * child = lv_obj_create(parent);
+    lv_obj_t * grandchild = lv_label_create(child);
+    lv_obj_set_style_text_color(parent, lv_color_hex(0xff0000), LV_PART_MAIN);
+    lv_style_t style;
+    lv_style_init(&style);
+    lv_style_set_text_color(&style, lv_color_hex(0xffffff));
+    lv_obj_set_local_style_prop_meta(child, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT, LV_PART_MAIN);
+    lv_obj_add_style(child, &style, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL_HEX(lv_color_hex(0xff0000).full, lv_obj_get_style_text_color(grandchild, LV_PART_MAIN).full);
+}
+
 #endif

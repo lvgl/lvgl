@@ -44,7 +44,7 @@ typedef enum {
  **********************/
 static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector);
 static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part);
-static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v);
+static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
@@ -176,7 +176,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYOUT_REFR);
     bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_EXT_DRAW);
-    bool is_inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
+    bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
     bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYER_REFR);
 
     if(is_layout_refr) {
@@ -208,7 +208,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
     }
     lv_obj_invalidate(obj);
 
-    if(prop == LV_STYLE_PROP_ANY || (is_inherit && (is_ext_draw || is_layout_refr))) {
+    if(prop == LV_STYLE_PROP_ANY || (is_inheritable && (is_ext_draw || is_layout_refr))) {
         if(part != LV_PART_SCROLLBAR) {
             refresh_children_style(obj);
         }
@@ -223,15 +223,15 @@ void lv_obj_enable_style_refresh(bool en)
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     lv_style_value_t value_act;
-    bool inherit = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
-    bool found = false;
+    bool inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
+    lv_style_res_t found = LV_STYLE_RES_NOT_FOUND;
     while(obj) {
         found = get_prop_core(obj, part, prop, &value_act);
-        if(found) break;
-        if(!inherit) break;
+        if(found == LV_STYLE_RES_FOUND) break;
+        if(!inheritable) break;
 
         /*If not found, check the `MAIN` style first*/
-        if(part != LV_PART_MAIN) {
+        if(found != LV_STYLE_RES_INHERIT && part != LV_PART_MAIN) {
             part = LV_PART_MAIN;
             continue;
         }
@@ -240,7 +240,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
         obj = lv_obj_get_parent(obj);
     }
 
-    if(!found) {
+    if(found != LV_STYLE_RES_FOUND) {
         if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
             const lv_obj_class_t * cls = obj->class_p;
             while(cls) {
@@ -275,9 +275,17 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
     lv_obj_refresh_style(obj, selector, prop);
 }
 
+void lv_obj_set_local_style_prop_meta(lv_obj_t * obj, lv_style_prop_t prop, uint16_t meta,
+                                      lv_style_selector_t selector)
+{
+    lv_style_t * style = get_local_style(obj, selector);
+    lv_style_set_prop_meta(style, prop, meta);
+    lv_obj_refresh_style(obj, selector, prop);
+}
 
-lv_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
-                                     lv_style_selector_t selector)
+
+lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
+                                           lv_style_selector_t selector)
 {
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
@@ -287,7 +295,7 @@ lv_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_st
         }
     }
 
-    return LV_RES_INV;
+    return LV_STYLE_RES_NOT_FOUND;
 }
 
 bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_selector_t selector)
@@ -556,7 +564,7 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t se
 }
 
 
-static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v)
+static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v)
 {
     uint8_t group = 1 << _lv_style_get_prop_group(prop);
     int32_t weight = -1;
@@ -565,7 +573,7 @@ static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     lv_style_value_t value_tmp;
     bool skip_trans = obj->skip_trans;
     uint32_t i;
-    bool found;
+    lv_style_res_t found;
     for(i = 0; i < obj->style_cnt; i++) {
         _lv_obj_style_t * obj_style = &obj->styles[i];
         if(obj_style->is_trans == false) break;
@@ -576,9 +584,12 @@ static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
         if(part_act != part) continue;
         if((obj_style->style->has_group & group) == 0) continue;
         found = lv_style_get_prop(obj_style->style, prop, &value_tmp);
-        if(found) {
+        if(found == LV_STYLE_RES_FOUND) {
             *v = value_tmp;
-            return true;
+            return LV_STYLE_RES_FOUND;
+        }
+        else if(found == LV_STYLE_RES_INHERIT) {
+            return LV_STYLE_RES_INHERIT;
         }
     }
 
@@ -598,23 +609,26 @@ static bool get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
 
         found = lv_style_get_prop(obj_style->style, prop, &value_tmp);
 
-        if(found) {
+        if(found == LV_STYLE_RES_FOUND) {
             if(state_act == state) {
                 *v = value_tmp;
-                return true;
+                return LV_STYLE_RES_FOUND;
             }
             if(weight < state_act) {
                 weight = state_act;
                 *v = value_tmp;
             }
         }
+        else if(found == LV_STYLE_RES_INHERIT) {
+            return LV_STYLE_RES_INHERIT;
+        }
     }
 
     if(weight >= 0) {
         *v = value_tmp;
-        return true;
+        return LV_STYLE_RES_FOUND;
     }
-    else return false;
+    else return LV_STYLE_RES_NOT_FOUND;
 }
 
 /**
