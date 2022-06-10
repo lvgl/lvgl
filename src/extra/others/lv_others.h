@@ -19,6 +19,7 @@ extern "C" {
 #include "fragment/lv_fragment.h"
 #include "imgfont/lv_imgfont.h"
 #include "msg/lv_msg.h"
+#include "ime/lv_pinyin_ime.h"
 
 /*********************
  *      DEFINES

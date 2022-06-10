@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "lv_msg.h": "c",
+        "lv_pinyin_ime.h": "c"
+    }
+}
