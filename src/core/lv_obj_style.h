@@ -140,8 +140,11 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, lv_part_t p
 void lv_obj_set_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
                                  lv_style_selector_t selector);
 
-lv_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
-                                     lv_style_selector_t selector);
+void lv_obj_set_local_style_prop_meta(struct _lv_obj_t * obj, lv_style_prop_t prop, uint16_t meta,
+                                      lv_style_selector_t selector);
+
+lv_style_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
+                                           lv_style_selector_t selector);
 
 /**
  * Remove a local style property from a part of an object with a given state.
