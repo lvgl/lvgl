@@ -38,10 +38,10 @@ void lv_draw_sdl_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dr
 
 void lv_draw_sdl_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-lv_draw_transform_ctx_t * lv_draw_sdl_transform_begin(lv_draw_ctx_t * draw_ctx, const lv_area_t * src_area);
+lv_draw_layer_ctx_t * lv_draw_sdl_create_layer(lv_draw_ctx_t * draw_ctx, const lv_area_t * src_area);
 
-void lv_draw_sdl_transform_finish(lv_draw_ctx_t * draw_ctx, lv_draw_transform_ctx_t * transform_ctx,
-                                  const lv_area_t * trans_area, const lv_point_t * trans_pivot, lv_coord_t trans_angle);
+void lv_draw_sdl_blend_layer(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * transform_ctx,
+                             const lv_area_t * trans_area, const lv_point_t * trans_pivot, lv_coord_t trans_angle);
 
 /**********************
  *      TYPEDEFS
@@ -74,8 +74,8 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     draw_ctx->draw_arc = lv_draw_sdl_draw_arc;
     draw_ctx->draw_polygon = lv_draw_sdl_polygon;
     draw_ctx->draw_bg = lv_draw_sdl_draw_bg;
-    draw_ctx->transform_begin = lv_draw_sdl_transform_begin;
-    draw_ctx->transform_finish = lv_draw_sdl_transform_finish;
+    draw_ctx->create_layer = lv_draw_sdl_create_layer;
+    draw_ctx->blend_layer = lv_draw_sdl_blend_layer;
     lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
     draw_ctx_sdl->renderer = ((lv_draw_sdl_drv_param_t *) disp_drv->user_data)->renderer;
     draw_ctx_sdl->internals = lv_mem_alloc(sizeof(lv_draw_sdl_context_internals_t));
