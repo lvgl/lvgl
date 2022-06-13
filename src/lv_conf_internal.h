@@ -338,7 +338,7 @@
     #ifdef CONFIG_LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE
         #define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE CONFIG_LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE
     #else
-        #define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE 3200
+        #define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE LV_MAX(lv_area_get_width(&draw_area) * px_size, 2048)
     #endif
 #endif
 
