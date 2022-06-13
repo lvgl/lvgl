@@ -309,6 +309,7 @@ lv_res_t lv_img_decoder_built_in_read_line(lv_img_dec_dsc_t * dsc, lv_coord_t x,
  */
 void lv_img_decoder_built_in_close(lv_img_dec_dsc_t * dsc)
 {
+    if(!dsc || !dsc->dec_ctx) return;
     lv_img_decoder_built_in_data_t * user_data = dsc->dec_ctx->user_data;
     if(user_data) {
         if(dsc->input.src->type == LV_IMG_SRC_FILE) {

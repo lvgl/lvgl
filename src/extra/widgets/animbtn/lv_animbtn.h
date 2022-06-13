@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_ANIMBTN_H
-#define LV_ANIMBTN_H
+#ifndef LV_ANIM_BTN_H
+#define LV_ANIM_BTN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,4 +138,4 @@ const lv_animbtn_state_desc_t * lv_animbtn_get_state_desc(lv_obj_t * animbtn, lv
 } /*extern "C"*/
 #endif
 
-#endif /*LV_ANIMBTN_H*/
+#endif /*LV_ANIM_BTN_H*/
