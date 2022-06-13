@@ -121,7 +121,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     return page;
 }
 
-void lv_tabview_rename_tab(lv_obj_t *obj, uint32_t id, const char *new_name)
+void lv_tabview_rename_tab(lv_obj_t *obj, uint32_t id, const char * new_name)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
