@@ -30,7 +30,7 @@ New tabs can be added with `lv_tabview_add_tab(tabview, "Tab name")`. This will 
 
 ### Rename tabs
 
-A tab can be renamed with `lv_tabview_rename_tab( tabview, tab_id, "New Name" )`.
+A tab can be renamed with `lv_tabview_rename_tab(tabview, tab_id, "New Name")`.
 
 ### Change tab
 
