@@ -40,21 +40,25 @@ If you are doing performance analysis for 2D image processing optimization, LCD 
 1. Use a flag to control the LCD flushing inside `disp_flush()`. For example:
 
 ```c
-static volatile bool is_flush_enabled = true;
+volatile bool disp_flush_enabled = true;
 
-void disp_enable(void)
+/* Enable updating the screen (the flushing process) when disp_flush() is called by LVGL
+ */
+void disp_enable_update(void)
 {
-    is_flush_enabled = true;
+    disp_flush_enabled = true;
 }
 
-void disp_disable(void)
+/* Disable updating the screen (the flushing process) when disp_flush() is called by LVGL
+ */
+void disp_disable_update(void)
 {
-    is_flush_enabled = false;
+    disp_flush_enabled = false;
 }
 
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-    if(is_flush_enabled) {
+    if(disp_flush_enabled) {
         GLCD_DrawBitmap(area->x1,                   //!< x
                         area->y1,                   //!< y
                         area->x2 - area->x1 + 1,    //!< width
@@ -71,12 +75,12 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 2. Disable flushing before calling `lv_demo_benchmark()` or `lv_demo_benchmark_run_scene()`, for example:
 
 ```c
-extern void disp_enable(void);
-extern void disp_disable(void);
+extern void disp_enable_update(void);
+extern void disp_disable_update(void);
 
 static void on_benchmark_finished(void)
 {
-    disp_enable();
+    disp_enable_update();
 }
 
 int main(void)
@@ -89,14 +93,18 @@ int main(void)
     LV_LOG("Please stand by...");
     LV_LOG("NOTE: You will NOT see anything until the end.");
 
-    disp_disable();
+    disp_disable_update();
     
     lv_demo_benchmark_set_finished_cb(&on_benchmark_finished);
+    lv_demo_benchmark_set_max_speed(true);
     lv_demo_benchmark();
     
     //lv_demo_benchmark_run_scene(43);      // run scene no 31
 
     ...
+    while(1){
+        lv_timer_handler();                 //! run lv task at the max speed
+    }
 }
 ```
 
