@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-05-31" version="1.0.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.4.pack">
+    <release date="2022-06-13" version="1.0.5-alpha1" url="https://github.com/lvgl/lvgl/raw/ce0605182c31e43abc8137ba21f237ec442735bc/env_support/cmsis-pack/LVGL.lvgl.1.0.5-alpha1.pack">
+      - LVGL 8.3.0-dev
+      - Monthly update for June
+    </release>
+    <release date="2022-05-31" version="1.0.4" url="https://github.com/lvgl/lvgl/raw/ce0605182c31e43abc8137ba21f237ec442735bc/env_support/cmsis-pack/LVGL.lvgl.1.0.4.pack">
       - LVGL 8.3.0-dev
       - Monthly update for May
       - Update drawing service
@@ -331,8 +335,8 @@
             <component Cgroup="lvgl" Csub="Porting"  condition="LVGL-Essential">
               <description>Porting Templates</description>
               <files>
-                <file category="header"     name="examples/porting/lv_port_disp_template.h" attr="config" version="1.0.0" />
-                <file category="sourceC"    name="examples/porting/lv_port_disp_template.c" attr="config" version="1.0.0" />
+                <file category="header"     name="examples/porting/lv_port_disp_template.h" attr="config" version="1.0.1" />
+                <file category="sourceC"    name="examples/porting/lv_port_disp_template.c" attr="config" version="1.0.1" />
 
                 <file category="header"     name="examples/porting/lv_port_indev_template.h" attr="config" version="1.0.0" />
                 <file category="sourceC"    name="examples/porting/lv_port_indev_template.c" attr="config" version="1.0.0" />
