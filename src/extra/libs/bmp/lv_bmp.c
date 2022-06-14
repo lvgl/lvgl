@@ -204,7 +204,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
     lv_fs_read(&b->f, buf, len * (b->bpp / 8), NULL);
 
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 1
-    for (int i = 0; i < len * (b->bpp / 8); i+=2) {
+    for(int i = 0; i < len * (b->bpp / 8); i += 2) {
         buf[i] = buf[i] ^ buf[i + 1];
         buf[i + 1] = buf[i] ^ buf[i + 1];
         buf[i] = buf[i] ^ buf[i + 1];
