@@ -834,7 +834,7 @@ static void generate_report(void)
             //                lv_table_set_cell_type(table, row, 0, 2);
             //                lv_table_set_cell_type(table, row, 1, 2);
 
-            LV_LOG("%s,%s\r\n", scenes[i].name, buf);
+            //LV_LOG("%s,%s\r\n", scenes[i].name, buf);
 
             row++;
         }
@@ -843,14 +843,14 @@ static void generate_report(void)
             lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
             lv_table_set_cell_value(table, row, 0, buf);
 
-            LV_LOG("%s,", buf);
+            //LV_LOG("%s,", buf);
 
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
             lv_table_set_cell_value(table, row, 1, buf);
 
             //                lv_table_set_cell_type(table, row, 0, 2);
             //                lv_table_set_cell_type(table, row, 1, 2);
-            LV_LOG("%s\r\n", buf);
+            //LV_LOG("%s\r\n", buf);
 
             row++;
         }
