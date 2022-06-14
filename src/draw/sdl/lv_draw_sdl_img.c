@@ -22,7 +22,7 @@
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_rect.h"
-#include "lv_draw_sdl_transform.h"
+#include "lv_draw_sdl_layer.h"
 
 /*********************
  *      DEFINES

@@ -21,7 +21,7 @@
 #include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_stack_blur.h"
-#include "lv_draw_sdl_transform.h"
+#include "lv_draw_sdl_layer.h"
 
 /*********************
  *      DEFINES
