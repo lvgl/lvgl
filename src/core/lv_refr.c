@@ -957,7 +957,8 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
             if((flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) == 0) break;
 
-            lv_area_move(&layer_ctx->area_act, 0, layer_ctx->max_row_with_no_alpha);
+            layer_ctx->area_act.y1 = layer_ctx->area_act.y2 + 1;
+            layer_ctx->area_act.y2 += layer_ctx->area_act.y1 + layer_ctx->max_row_with_no_alpha;
         }
 
         lv_draw_layer_destroy(draw_ctx, layer_ctx);
