@@ -12,5 +12,6 @@
    fragment
    msg
    imgfont
+   ime_pinyin
 ```
 
