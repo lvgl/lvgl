@@ -21,7 +21,7 @@
 #include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_stack_blur.h"
-#include "lv_draw_sdl_img.h"
+#include "lv_draw_sdl_layer.h"
 
 /*********************
  *      DEFINES
@@ -124,7 +124,11 @@ void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * 
     }
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_coords = *coords, t_clip = *clip, apply_area, t_area;
-    lv_draw_sdl_composite_begin(ctx, coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip, &apply_area);
+    bool has_composite = lv_draw_sdl_composite_begin(ctx, coords, clip, &extension, dsc->blend_mode, &t_coords, &t_clip,
+                                                     &apply_area);
+
+    lv_draw_sdl_transform_areas_offset(ctx, has_composite, &apply_area, &t_coords, &t_clip);
+
     bool has_content = _lv_area_intersect(&t_area, &t_coords, &t_clip);
 
     SDL_Rect clip_rect;

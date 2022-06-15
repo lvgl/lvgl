@@ -56,7 +56,12 @@ void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 #endif
     draw_sw_ctx->base_draw.wait_for_finish = lv_draw_sw_wait_for_finish;
     draw_sw_ctx->base_draw.buffer_copy = lv_draw_sw_buffer_copy;
+    draw_sw_ctx->base_draw.layer_init = lv_draw_sw_layer_create;
+    draw_sw_ctx->base_draw.layer_adjust = lv_draw_sw_layer_adjust;
+    draw_sw_ctx->base_draw.layer_blend = lv_draw_sw_layer_blend;
+    draw_sw_ctx->base_draw.layer_destroy = lv_draw_sw_layer_destroy;
     draw_sw_ctx->blend = lv_draw_sw_blend_basic;
+    draw_ctx->layer_instance_size = sizeof(lv_draw_sw_layer_ctx_t);
 }
 
 void lv_draw_sw_deinit_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
@@ -96,7 +101,6 @@ void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
         dest_bufc += dest_stride;
         src_bufc += src_stride;
     }
-
 }
 
 /**********************
