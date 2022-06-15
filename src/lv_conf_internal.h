@@ -2245,6 +2245,31 @@
     #endif
 #endif
 
+/*1: Enable Pinyin input method */
+#ifndef LV_USE_IME_PINYIN
+    #ifdef CONFIG_LV_USE_IME_PINYIN
+        #define LV_USE_IME_PINYIN CONFIG_LV_USE_IME_PINYIN
+    #else
+        #define LV_USE_IME_PINYIN 0
+    #endif
+#endif
+#if LV_USE_IME_PINYIN
+    #ifndef LV_IME_PINYIN_USE_DEFAULT_DICT
+        #ifdef CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+            #define LV_IME_PINYIN_USE_DEFAULT_DICT CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+        #else
+            #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
+        #endif
+    #endif
+    #ifndef LV_IME_PINYIN_CAND_TEXT_NUM
+        #ifdef CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
+            #define LV_IME_PINYIN_CAND_TEXT_NUM CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
+        #else
+            #define LV_IME_PINYIN_CAND_TEXT_NUM 6
+        #endif
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
