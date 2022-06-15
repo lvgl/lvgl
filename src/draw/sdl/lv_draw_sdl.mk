@@ -11,6 +11,7 @@ CSRCS += lv_draw_sdl_rect.c
 CSRCS += lv_draw_sdl_stack_blur.c
 CSRCS += lv_draw_sdl_texture_cache.c
 CSRCS += lv_draw_sdl_utils.c
+CSRCS += lv_draw_sdl_layer.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/sdl
 VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/sdl
