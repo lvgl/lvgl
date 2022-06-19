@@ -404,7 +404,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
     _LV_LL_READ_BACK(&meter->scale_ll, scale) {
         part_draw_dsc.sub_part_ptr = scale;
 
-        lv_coord_t r_out = r_edge + scale->r_mod;
+        lv_coord_t r_out = r_edge;
         lv_coord_t r_in_minor = r_out - scale->tick_length;
         lv_coord_t r_in_major = r_out - scale->tick_major_length;
 
@@ -473,29 +473,17 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
                 }
             }
 
-            /*`* 256` for extra precision*/
-            int32_t angle_upscale = ((i * scale->angle_range) << 8) / (scale->tick_cnt - 1);
-
-            int32_t angle_low = (angle_upscale >> 8);
-            int32_t angle_high = angle_low + 1;
-            int32_t angle_rem = angle_upscale & 0xFF;
-
-            /*Interpolate sine and cos*/
-            int32_t sin_low = lv_trigo_sin(angle_low + scale->rotation);
-            int32_t sin_high = lv_trigo_sin(angle_high + scale->rotation);
-            int32_t sin_mid = (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
-
-            int32_t cos_low = lv_trigo_cos(angle_low + scale->rotation);
-            int32_t cos_high = lv_trigo_cos(angle_high + scale->rotation);
-            int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
+            int32_t angle_upscale = ((i * scale->angle_range) * 10) / (scale->tick_cnt - 1) +  + scale->rotation * 10;
 
             line_dsc.color = line_color;
             line_dsc.width = line_width;
-            /*Use the interpolated angle to get the outer x and y coordinates.
-             *Draw a little bit longer lines to be sure the mask will clip them correctly*/
+
+            /*Draw a little bit longer lines to be sure the mask will clip them correctly
+             *and to get a better precision*/
             lv_point_t p_outer;
-            p_outer.x = (int32_t)(((int32_t)cos_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.x;
-            p_outer.y = (int32_t)(((int32_t)sin_mid * (r_out + line_width) + 127) >> (LV_TRIGO_SHIFT)) + p_center.y;
+            p_outer.x = p_center.x + r_out + LV_MAX(LV_DPI_DEF, r_out);
+            p_outer.y = p_center.y;
+            lv_point_transform(&p_outer, angle_upscale, 256, &p_center);
 
             part_draw_dsc.p1 = &p_center;
             part_draw_dsc.p2 = &p_outer;
@@ -507,8 +495,9 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
                 lv_draw_mask_remove_id(outer_mask_id);
                 uint32_t r_text = r_in_major - scale->label_gap;
                 lv_point_t p;
-                p.x = (int32_t)((int32_t)((int32_t)cos_mid * r_text + 127) >> LV_TRIGO_SHIFT) + p_center.x;
-                p.y = (int32_t)((int32_t)((int32_t)sin_mid * r_text + 127) >> LV_TRIGO_SHIFT) + p_center.y;
+                p.x = p_center.x + r_text;
+                p.y = p_center.y;
+                lv_point_transform(&p, angle_upscale, 256, &p_center);
 
                 lv_draw_label_dsc_t label_dsc_tmp;
                 lv_memcpy(&label_dsc_tmp, &label_dsc, sizeof(label_dsc_tmp));
