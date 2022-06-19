@@ -19,6 +19,7 @@ There are several ways to get your feet wet with LVGL. Here is one recommended o
 .. toctree::
    :maxdepth: 2
 
+   quick-overview
    platforms/index
    os/index
    bindings/index
