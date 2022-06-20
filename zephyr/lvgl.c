@@ -64,16 +64,16 @@ static void lvgl_log(const char *buf)
 	 */
 	switch (buf[1]) {
 	case 'E':
-		LOG_ERR("%s", log_strdup(buf + strlen("[Error] ")));
+		LOG_ERR("%s", buf + strlen("[Error] "));
 		break;
 	case 'W':
-		LOG_WRN("%s", log_strdup(buf + strlen("Warn] ")));
+		LOG_WRN("%s", buf + strlen("Warn] "));
 		break;
 	case 'I':
-		LOG_INF("%s", log_strdup(buf + strlen("[Info] ")));
+		LOG_INF("%s", buf + strlen("[Info] "));
 		break;
 	case 'T':
-		LOG_DBG("%s", log_strdup(buf + strlen("[Trace] ")));
+		LOG_DBG("%s", buf + strlen("[Trace] "));
 		break;
 	}
 }
