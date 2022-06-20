@@ -535,7 +535,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
             lv_obj_align(label, LV_ALIGN_TOP_RIGHT, 0, 0);
             break;
         case LV_TEXT_ALIGN_CENTER:
-            lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+            lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 0);
             break;
 
     }
