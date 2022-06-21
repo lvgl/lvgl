@@ -306,8 +306,8 @@ lv_pinyin_dict_t lv_ime_pinyin_def_dict[] = {
 			{ "tuan", "團" },
 			{ "tui", "推退" },
 			{ "tuo", "脱駄" },
-            { "u", "" },
-            { "v", "" },
+			{ "u", "" },
+			{ "v", "" },
 			{ "wai", "外" },
 			{ "wan", "完万玩晩腕灣" },
 			{ "wang", "忘望亡往網" },
@@ -373,7 +373,7 @@ lv_pinyin_dict_t lv_ime_pinyin_def_dict[] = {
 			{ "zu", "足祖族卒組" },
 			{ "zui", "最酔" },
 			{ "zou", "走" },
-            {NULL, NULL}
+			{NULL, NULL}
 };
 #endif
 
