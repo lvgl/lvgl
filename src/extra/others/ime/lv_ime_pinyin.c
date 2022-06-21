@@ -306,7 +306,7 @@ lv_pinyin_dict_t lv_ime_pinyin_def_dict[] = {
 			{ "tuan", "團" },
 			{ "tui", "推退" },
 			{ "tuo", "脱駄" },
-			{ "u", "" },
+            { "u", "" },
             { "v", "" },
 			{ "wai", "外" },
 			{ "wan", "完万玩晩腕灣" },
