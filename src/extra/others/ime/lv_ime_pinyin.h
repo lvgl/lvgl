@@ -23,11 +23,10 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
+typedef struct {
     const char * const py;
     const char * const py_mb;
-}lv_pinyin_dict_t;
+} lv_pinyin_dict_t;
 
 /*Data of lv_ime_pinyin*/
 typedef struct {
