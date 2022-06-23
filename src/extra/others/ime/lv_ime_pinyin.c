@@ -562,10 +562,10 @@ static void lv_ime_pinyin_destructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    if(lv_obj_is_valid(pinyin_ime->kb)) 
+    if(lv_obj_is_valid(pinyin_ime->kb))
         lv_obj_del(pinyin_ime->kb);
     
-    if(lv_obj_is_valid(pinyin_ime->cand_panel)) 
+    if(lv_obj_is_valid(pinyin_ime->cand_panel))
         lv_obj_del(pinyin_ime->cand_panel);
 }
 
@@ -749,14 +749,14 @@ static void init_pinyin_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict)
     pinyin_ime->dict = dict;
 
     for(uint16_t i = 0; ; i++) {
-       if((NULL == (dict[i].py)) || (NULL == (dict[i].py_mb))) {
+        if((NULL == (dict[i].py)) || (NULL == (dict[i].py_mb))) {
             headletter = dict[i - 1].py[0];
             letter_calc = headletter - 'a';
             pinyin_ime->py_num[letter_calc] = offset_count;
             break;
         }
 
-       if(headletter == (dict[i].py[0])) {
+        if(headletter == (dict[i].py[0])) {
             offset_count++;
         }
         else {
@@ -802,8 +802,8 @@ static char * pinyin_search_matching(lv_obj_t * obj, char * strInput_py_str, uin
         if(cInputStrLength == 1 || i == cInputStrLength) {
             // The Chinese character in UTF-8 encoding format is 3 bytes
             * cand_num = strlen((const char *)(cpHZ->py_mb)) / 3;
-           return (char *)(cpHZ->py_mb);
-        }   
+            return (char *)(cpHZ->py_mb);
+        }
         cpHZ++;
     }
     return NULL;
