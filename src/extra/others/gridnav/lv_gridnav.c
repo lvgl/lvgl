@@ -348,7 +348,7 @@ static lv_obj_t * find_last_focusable(lv_obj_t * obj)
 {
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     int32_t i;
-    for(i = child_cnt - 1; i >= 0; i++) {
+    for(i = child_cnt - 1; i >= 0; i--) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(obj_is_focuable(child)) return child;
     }
