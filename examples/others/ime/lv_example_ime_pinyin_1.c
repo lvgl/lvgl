@@ -41,7 +41,7 @@ void lv_example_ime_pinyin_1(void)
     /* ta2 */
     lv_obj_t * ta2 = lv_textarea_create(lv_scr_act());
     lv_obj_set_style_text_font(ta2, &lv_font_simsun_16_cjk, 0);
-    lv_obj_align_to(ta2, ta1,LV_ALIGN_OUT_RIGHT_MID, 10, 0);
+    lv_obj_align_to(ta2, ta1, LV_ALIGN_OUT_RIGHT_MID, 10, 0);
 
     lv_obj_add_event_cb(ta2, ta_event_cb, LV_EVENT_ALL, kb);
 
