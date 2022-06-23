@@ -74,7 +74,11 @@ static finished_cb_t * benchmark_finished_cb = NULL;
 static uint32_t disp_ori_timer_period;
 static uint32_t anim_ori_timer_period;
 
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+LV_IMG_DECLARE(img_benchmark_cogwheel_rgb565a8);
+#else
 LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+#endif
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_chroma_keyed);
 LV_IMG_DECLARE(img_benchmark_cogwheel_indexed16);
@@ -258,8 +262,12 @@ static void img_argb_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
 
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
+#else
+    img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
+#endif
 }
 
 static void img_ckey_cb(void)
@@ -300,7 +308,11 @@ static void img_argb_recolor_cb(void)
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
     lv_style_set_img_recolor_opa(&style_common, LV_OPA_50);
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
+#else
     img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
+#endif
 }
 
 static void img_ckey_recolor_cb(void)
@@ -338,14 +350,22 @@ static void img_argb_rot_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, true, false, false);
+#else
     img_create(&style_common, &img_benchmark_cogwheel_argb, true, false, false);
+#endif
 }
 
 static void img_argb_rot_aa_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, true, false, true);
+#else
     img_create(&style_common, &img_benchmark_cogwheel_argb, true, false, true);
+#endif
 }
 
 static void img_rgb_zoom_cb(void)
@@ -369,7 +389,11 @@ static void img_argb_zoom_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, true, false);
+#else
     img_create(&style_common, &img_benchmark_cogwheel_argb, false, true, false);
+#endif
 }
 
 
@@ -377,7 +401,11 @@ static void img_argb_zoom_aa_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, true, true);
+#else
     img_create(&style_common, &img_benchmark_cogwheel_argb, false, true, true);
+#endif
 }
 
 static void txt_small_cb(void)
@@ -501,8 +529,11 @@ static void sub_img_cb(void)
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, opa_mode ? LV_OPA_50 : LV_OPA_COVER);
     lv_style_set_blend_mode(&style_common, LV_BLEND_MODE_SUBTRACTIVE);
+#if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
+    img_create(&style_common, &img_benchmark_cogwheel_rgb565a8, false, false, false);
+#else
     img_create(&style_common, &img_benchmark_cogwheel_argb, false, false, false);
-
+#endif
 }
 static void sub_line_cb(void)
 {
