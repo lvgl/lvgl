@@ -75,9 +75,9 @@ static uint32_t disp_ori_timer_period;
 static uint32_t anim_ori_timer_period;
 
 #if LV_DEMO_BENCHMARK_RGB565A8 && LV_COLOR_DEPTH == 16
-LV_IMG_DECLARE(img_benchmark_cogwheel_rgb565a8);
+    LV_IMG_DECLARE(img_benchmark_cogwheel_rgb565a8);
 #else
-LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
+    LV_IMG_DECLARE(img_benchmark_cogwheel_argb);
 #endif
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_chroma_keyed);
