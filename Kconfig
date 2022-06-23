@@ -219,7 +219,7 @@ menu "LVGL configuration"
                 default n
                 help
                     Must deploy arm-2d library to your project and add include PATH for "arm_2d.h".
-                
+
             config LV_USE_GPU_STM32_DMA2D
                 bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
             config LV_GPU_DMA2D_CMSIS_INCLUDE
@@ -239,7 +239,7 @@ menu "LVGL configuration"
                 help
                     Must be defined to include path of CMSIS header of target processor
                     e.g. "SWM341.h"
-                    
+
             config LV_USE_GPU_NXP_PXP
                 bool "Use NXP's PXP GPU iMX RTxxx platforms."
             config LV_USE_GPU_NXP_PXP_AUTO_INIT
@@ -1009,11 +1009,11 @@ menu "LVGL configuration"
 
         config LV_USE_GRIDNAV
             bool "Enable grid navigation"
-            default n 
+            default n
 
         config LV_USE_FRAGMENT
             bool "Enable lv_obj fragment"
-            default n 
+            default n
 
         config LV_USE_IMGFONT
             bool "draw img in label or span obj"
@@ -1041,6 +1041,10 @@ menu "LVGL configuration"
 
         config LV_USE_DEMO_BENCHMARK
             bool "Benchmark your system"
+            default n
+        config LV_USE_DEMO_BENCHMARK
+            bool "Use RGB565A8 images with 16 bit color depth instead of ARGB8565"
+            depends on LV_USE_DEMO_BENCHMARK
             default n
 
         config LV_USE_DEMO_STRESS
