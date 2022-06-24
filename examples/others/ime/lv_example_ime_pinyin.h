@@ -1,10 +1,10 @@
 /**
- * @file lv_others.h
+ * @file lv_example_ime_pinyin.h
  *
  */
 
-#ifndef LV_OTHERS_H
-#define LV_OTHERS_H
+#ifndef LV_EX_IME_PINYIN_H
+#define LV_EX_IME_PINYIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,13 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "snapshot/lv_snapshot.h"
-#include "monkey/lv_monkey.h"
-#include "gridnav/lv_gridnav.h"
-#include "fragment/lv_fragment.h"
-#include "imgfont/lv_imgfont.h"
-#include "msg/lv_msg.h"
-#include "ime/lv_ime_pinyin.h"
 
 /*********************
  *      DEFINES
@@ -32,6 +25,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_ime_pinyin_1(void);
 
 /**********************
  *      MACROS
@@ -41,4 +35,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_OTHERS_H*/
+#endif /*LV_EX_IME_PINYIN_H*/
