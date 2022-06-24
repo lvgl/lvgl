@@ -2243,6 +2243,40 @@
     #endif
 #endif
 
+/*1: Enable Pinyin input method*/
+/*Requires: lv_keyboard*/
+#ifndef LV_USE_IME_PINYIN
+    #ifdef CONFIG_LV_USE_IME_PINYIN
+        #define LV_USE_IME_PINYIN CONFIG_LV_USE_IME_PINYIN
+    #else
+        #define LV_USE_IME_PINYIN 0
+    #endif
+#endif
+#if LV_USE_IME_PINYIN
+    /*1: Use default thesaurus*/
+    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
+    #ifndef LV_IME_PINYIN_USE_DEFAULT_DICT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+                #define LV_IME_PINYIN_USE_DEFAULT_DICT CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+            #else
+                #define LV_IME_PINYIN_USE_DEFAULT_DICT 0
+            #endif
+        #else
+            #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
+        #endif
+    #endif
+    /*Set the maximum number of candidate panels that can be displayed*/
+    /*This needs to be adjusted according to the size of the screen*/
+    #ifndef LV_IME_PINYIN_CAND_TEXT_NUM
+        #ifdef CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
+            #define LV_IME_PINYIN_CAND_TEXT_NUM CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
+        #else
+            #define LV_IME_PINYIN_CAND_TEXT_NUM 6
+        #endif
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/
