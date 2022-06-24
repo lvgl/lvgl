@@ -691,6 +691,18 @@
 /*1: Enable a published subscriber based messaging system */
 #define LV_USE_MSG 0
 
+/*1: Enable Pinyin input method*/
+/*Requires: lv_keyboard*/
+#define LV_USE_IME_PINYIN 0
+#if LV_USE_IME_PINYIN
+    /*1: Use default thesaurus*/
+    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
+    #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
+    /*Set the maximum number of candidate panels that can be displayed*/
+    /*This needs to be adjusted according to the size of the screen*/
+    #define LV_IME_PINYIN_CAND_TEXT_NUM 6
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/

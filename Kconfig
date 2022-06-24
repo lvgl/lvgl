@@ -1018,6 +1018,27 @@ menu "LVGL configuration"
         config LV_USE_IMGFONT
             bool "draw img in label or span obj"
             default n
+
+        config LV_USE_MSG
+            bool "Enable a published subscriber based messaging system"
+            default n
+
+        config LV_USE_IME_PINYIN
+            bool "Enable Pinyin input method"
+            default n
+        config LV_IME_PINYIN_USE_DEFAULT_DICT
+            bool "Use built-in Thesaurus"
+            depends on LV_USE_IME_PINYIN
+            default y
+            help
+                If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss
+        config LV_IME_PINYIN_CAND_TEXT_NUM
+            int "maximum number of candidate panels"
+            depends on LV_USE_IME_PINYIN
+            default 6
+            help
+                Set the maximum number of candidate panels that can be displayed.
+                This needs to be adjusted according to the size of the screen.
     endmenu
 
     menu "Examples"
