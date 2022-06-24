@@ -564,7 +564,7 @@ static void lv_ime_pinyin_destructor(const lv_obj_class_t * class_p, lv_obj_t * 
 
     if(lv_obj_is_valid(pinyin_ime->kb))
         lv_obj_del(pinyin_ime->kb);
-    
+
     if(lv_obj_is_valid(pinyin_ime->cand_panel))
         lv_obj_del(pinyin_ime->cand_panel);
 }
@@ -688,7 +688,7 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
     uint16_t page_num = pinyin_ime->cand_num / LV_IME_PINYIN_CAND_TEXT_NUM;
     uint16_t sur = pinyin_ime->cand_num % LV_IME_PINYIN_CAND_TEXT_NUM;
-    
+
     if(dir == 0) {
         if(pinyin_ime->py_page) {
             pinyin_ime->py_page--;
@@ -797,7 +797,7 @@ static char * pinyin_search_matching(lv_obj_t * obj, char * strInput_py_str, uin
                 break;
             }
         }
-        
+
         // perfect match
         if(cInputStrLength == 1 || i == cInputStrLength) {
             // The Chinese character in UTF-8 encoding format is 3 bytes
