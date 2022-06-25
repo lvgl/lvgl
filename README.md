@@ -104,7 +104,7 @@ Just to mention some platforms:
 - [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
 - Nordic NRF52 Bluetooth modules
 - Quectel modems
-- [SYNWIT SWM341](https://www.synwit.cn/)
+- [SYNWIT SWM341](http://www.synwit.cn/)
 
 LVGL is also available as:
 - [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
