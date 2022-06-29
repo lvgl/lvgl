@@ -10,7 +10,6 @@
  *      INCLUDES
  *********************/
 #include "lv_port_disp_template.h"
-#include "../../lvgl.h"
 #include <stdbool.h>
 
 /*********************
@@ -121,7 +120,7 @@ void lv_port_disp_init(void)
     disp_drv.draw_buf = &draw_buf_dsc_1;
 
     /*Required for Example 3)*/
-    //disp_drv.full_refresh = 1
+    //disp_drv.full_refresh = 1;
 
     /* Fill a memory array with a color if you have GPU.
      * Note that, in lv_conf.h you can enable GPUs that has built-in support in LVGL.
