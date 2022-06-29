@@ -26,31 +26,31 @@ void lv_example_ime_pinyin_1(void)
     lv_obj_set_style_text_font(pinyin_ime, &lv_font_simsun_16_cjk, 0);
     //lv_ime_pinyin_set_dict(pinyin_ime, your_dict); // Use a custom dictionary. If it is not set, the built-in thesaurus will be used.
 
-    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
-    lv_ime_pinyin_set_keyboard(pinyin_ime, kb);
-
     /* ta1 */
     lv_obj_t * ta1 = lv_textarea_create(lv_scr_act());
+    lv_textarea_set_one_line(ta1, true);
     lv_obj_set_style_text_font(ta1, &lv_font_simsun_16_cjk, 0);
-    lv_obj_align(ta1, LV_ALIGN_TOP_LEFT, 10, 10);
+    lv_obj_align(ta1, LV_ALIGN_TOP_LEFT, 0, 0);
 
+    /*Create a keyboard and add it to ime_pinyin*/
+    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
+    lv_ime_pinyin_set_keyboard(pinyin_ime, kb);
     lv_keyboard_set_textarea(kb, ta1);
 
     lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
 
-    /* ta2 */
-    lv_obj_t * ta2 = lv_textarea_create(lv_scr_act());
-    lv_obj_set_style_text_font(ta2, &lv_font_simsun_16_cjk, 0);
-    lv_obj_align_to(ta2, ta1, LV_ALIGN_OUT_RIGHT_MID, 10, 0);
+    /*Get the cand_panel, and adjust its size and position*/
+    lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(pinyin_ime);
+    lv_obj_set_size(cand_panel, LV_PCT(100), LV_PCT(10));
+    lv_obj_align_to(cand_panel, kb, LV_ALIGN_OUT_TOP_MID, 0, 0);
 
-    lv_obj_add_event_cb(ta2, ta_event_cb, LV_EVENT_ALL, kb);
-
+    /*Try using ime_pinyin to output the Chinese below in the ta1 above*/
     lv_obj_t * cz_label = lv_label_create(lv_scr_act());
     lv_label_set_text(cz_label,
                       "嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。");
     lv_obj_set_style_text_font(cz_label, &lv_font_simsun_16_cjk, 0);
     lv_obj_set_width(cz_label, 310);
-    lv_obj_align_to(cz_label, ta1, LV_ALIGN_OUT_BOTTOM_LEFT, 5, 5);
+    lv_obj_align_to(cz_label, ta1, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 }
 
 #endif
