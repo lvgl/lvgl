@@ -1335,6 +1335,28 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
             src_tmp8 += src_new_line_step_byte;
         }
     }
+    else if(cf == LV_IMG_CF_RGB565A8) {
+        src_tmp8 += (src_stride * dest_area->y1 * sizeof(lv_color_t)) + dest_area->x1 * sizeof(lv_color_t);
+
+        lv_coord_t src_stride_byte = src_stride * sizeof(lv_color_t);
+
+        lv_coord_t dest_h = lv_area_get_height(dest_area);
+        lv_coord_t dest_w = lv_area_get_width(dest_area);
+        for(y = 0; y < dest_h; y++) {
+            lv_memcpy(cbuf, src_tmp8, dest_w * sizeof(lv_color_t));
+            cbuf += dest_w;
+            src_tmp8 += src_stride_byte;
+        }
+
+        src_tmp8 = (const uint8_t *)src_buf;
+        src_tmp8 += sizeof(lv_color_t) * src_w * src_h;
+        src_tmp8 += src_stride * dest_area->y1 + dest_area->x1;
+        for(y = 0; y < dest_h; y++) {
+            lv_memcpy(abuf, src_tmp8, dest_w);
+            abuf += dest_w;
+            src_tmp8 += src_stride;
+        }
+    }
 }
 
 #if 0
