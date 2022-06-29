@@ -99,7 +99,7 @@ Just to mention some platforms:
 - STM32F1, STM32F3, STM32F4, STM32F7, STM32L4, STM32L5, STM32H7
 - Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 - [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
-- [Raspberry Pi](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
+- [Raspberry Pi](https://github.com/lvgl/lv_port_linux_frame_buffer)
 - [Espressif ESP32](https://github.com/lvgl/lv_port_esp32)
 - [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
 - Nordic NRF52 Bluetooth modules
