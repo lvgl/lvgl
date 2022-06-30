@@ -43,7 +43,7 @@
 struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx,
                                                       lv_draw_layer_flags_t flags)
 {
-    do{
+    do {
         if(LV_COLOR_SCREEN_TRANSP == 0 && (flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA)) {
             LV_LOG_WARN("Rendering this widget needs LV_COLOR_SCREEN_TRANSP 1");
             break;
