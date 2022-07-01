@@ -43,6 +43,14 @@ typedef void (*lv_async_cb_t)(void *);
  */
 lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data);
 
+/**
+ * Cancel an asynchronous function call
+ * **before** the call actually happens!
+ * @param async_xcb a callback which is the task itself.
+ * @param user_data custom parameter
+ */
+lv_res_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data);
+
 /**********************
  *      MACROS
  **********************/
