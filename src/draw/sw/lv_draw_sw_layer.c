@@ -61,7 +61,6 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
             layer_sw_ctx->buf_size_bytes = LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE;
             layer_sw_ctx->base_draw.buf = lv_mem_alloc(layer_sw_ctx->buf_size_bytes);
             if(layer_sw_ctx->base_draw.buf == NULL) {
-                lv_mem_free(layer_ctx);
                 return NULL;
             }
         }
@@ -78,7 +77,6 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
         lv_memset_00(layer_sw_ctx->base_draw.buf, layer_sw_ctx->buf_size_bytes);
         layer_sw_ctx->has_alpha = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? 1 : 0;
         if(layer_sw_ctx->base_draw.buf == NULL) {
-            lv_mem_free(layer_ctx);
             return NULL;
         }
 

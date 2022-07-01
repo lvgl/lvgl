@@ -55,7 +55,11 @@ lv_draw_layer_ctx_t * lv_draw_layer_create(lv_draw_ctx_t * draw_ctx, const lv_ar
     layer_ctx->original.screen_transp = disp_refr->driver->screen_transp;
     layer_ctx->area_full = *layer_area;
 
-    return draw_ctx->layer_init(draw_ctx, layer_ctx, flags);
+    lv_draw_layer_ctx_t * init_layer_ctx =  draw_ctx->layer_init(draw_ctx, layer_ctx, flags);
+    if(NULL == init_layer_ctx) {
+        lv_mem_free(layer_ctx);
+    }
+    return init_layer_ctx;
 }
 
 void lv_draw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
