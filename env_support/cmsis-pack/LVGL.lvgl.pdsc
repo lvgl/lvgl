@@ -36,9 +36,12 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-06-13" version="1.0.5-alpha1" url="https://github.com/lvgl/lvgl/raw/ce0605182c31e43abc8137ba21f237ec442735bc/env_support/cmsis-pack/LVGL.lvgl.1.0.5-alpha1.pack">
+    <release date="2022-06-29" version="1.0.5" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.5.pack">
       - LVGL 8.3.0-dev
       - Monthly update for June
+      - Add Pinyin as input method
+      - Update benchmark to support RGB565-A8
+      - Update support for layers
     </release>
     <release date="2022-05-31" version="1.0.4" url="https://github.com/lvgl/lvgl/raw/ce0605182c31e43abc8137ba21f237ec442735bc/env_support/cmsis-pack/LVGL.lvgl.1.0.4.pack">
       - LVGL 8.3.0-dev
@@ -209,6 +212,7 @@
                 <file category="sourceC"            name="src/draw/lv_draw_arc.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_img.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_label.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_layer.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_line.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_mask.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
@@ -225,11 +229,13 @@
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_dither.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_gradient.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_img.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_layer.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_letter.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_line.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_polygon.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_rect.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_transform.c" />
+                
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_font.c" />
@@ -311,7 +317,7 @@
                 <file category="sourceC"            name="src/widgets/lv_textarea.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.1" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.2" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -322,6 +328,7 @@
 
 /*! \brief use lv_config_cmsis.h which will be pre-included */
 #define LV_CONF_SKIP
+#define LV_LVGL_H_INCLUDE_SIMPLE    1
               </Pre_Include_Global_h>
 
                <RTE_Components_h>
@@ -603,6 +610,21 @@
 
             </component>
 
+            <component Cgroup="lvgl" Csub="Pinyin"  condition="LVGL-Essential">
+              <description>Add Pinyin input method</description>
+              <files>
+                <!-- src/extra/others/ime -->
+                <file category="sourceC"            name="src/extra/others/ime/lv_ime_pinyin.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable ffmpeg support */
+#define LV_USE_IME_PINYIN         1
+              </RTE_Components_h>
+
+            </component>
+
             <component Cgroup="lvgl" Csub="Benchmark"  condition="LVGL-Essential">
               <description>Add the official benchmark.</description>
               <files>
@@ -615,6 +637,8 @@
                 <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_chroma_keyed.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
+                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb565a8.c" />
+                
                 <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c" />

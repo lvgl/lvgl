@@ -45,6 +45,7 @@ remove the misleading guide above this code segment.
    - LV_USE_GPU_NXP_VG_LITE
    - LV_USE_GPU_SWM341_DMA2D
    - LV_USE_GPU_ARM2D
+   - LV_USE_IME_PINYIN
 5. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
