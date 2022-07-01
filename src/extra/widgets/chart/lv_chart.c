@@ -1197,11 +1197,13 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     int32_t block_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
                                                               LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the column on ~adjacent X*/
     lv_coord_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
-    lv_coord_t col_w = block_w / ser_cnt;
     int32_t ser_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
-                                                            LV_PART_ITEMS) * chart->zoom_x) >> 8; /*Gap between the column on the ~same X*/
-    lv_coord_t x_ofs = pad_left - lv_obj_get_scroll_left(obj);
-    lv_coord_t y_ofs = pad_top - lv_obj_get_scroll_top(obj);
+                                                            LV_PART_ITEMS) * chart->zoom_x) >> 8; /*Gap between the columns on the ~same X*/
+    lv_coord_t col_w = (block_w - (ser_cnt - 1) * ser_gap) / ser_cnt;
+
+    lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t x_ofs = pad_left - lv_obj_get_scroll_left(obj) + border_w;
+    lv_coord_t y_ofs = pad_top - lv_obj_get_scroll_top(obj) + border_w;
 
     lv_draw_rect_dsc_t col_dsc;
     lv_draw_rect_dsc_init(&col_dsc);
@@ -1220,7 +1222,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
     /*Go through all points*/
     for(i = 0; i < chart->point_cnt; i++) {
-        lv_coord_t x_act = (int32_t)((int32_t)(w + block_gap) * i) / (chart->point_cnt) + obj->coords.x1 + x_ofs;
+        lv_coord_t x_act = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1) + obj->coords.x1 + x_ofs;
 
         part_draw_dsc.id = i;
 
@@ -1230,8 +1232,8 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
             lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;
-            col_a.x2 = col_a.x1 + col_w - ser_gap - 1;
-            x_act += col_w;
+            col_a.x2 = col_a.x1 + col_w - 1;
+            x_act += col_w + ser_gap;
 
             if(col_a.x2 < clip_area.x1) continue;
             if(col_a.x1 > clip_area.x2) break;
@@ -1520,7 +1522,6 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t w     = ((int32_t)lv_obj_get_content_width(obj) * chart->zoom_x) >> 8;
 
-
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_TICKS, &label_dsc);
@@ -1564,6 +1565,7 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
         int32_t block_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
                                                                   LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the columns on ~adjacent X*/
         lv_coord_t block_w = (w + block_gap) / (chart->point_cnt);
+
         x_ofs += (block_w - block_gap) / 2;
         w -= block_w - block_gap;
     }
@@ -1713,11 +1715,13 @@ static void invalidate_point(lv_obj_t * obj, uint16_t i)
         lv_area_t col_a;
         int32_t block_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
                                                                   LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the column on ~adjacent X*/
+
         lv_coord_t block_w = (w + block_gap) / chart->point_cnt;
 
+        lv_coord_t bwidth = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         lv_coord_t x_act;
         x_act = (int32_t)((int32_t)(block_w) * i) ;
-        x_act += obj->coords.x1 + lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        x_act += obj->coords.x1 + bwidth + lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
 
         lv_obj_get_coords(obj, &col_a);
         col_a.x1 = x_act - scroll_left;
