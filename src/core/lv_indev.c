@@ -902,11 +902,8 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
     proc->types.pointer.vect.x = proc->types.pointer.act_point.x - proc->types.pointer.last_point.x;
     proc->types.pointer.vect.y = proc->types.pointer.act_point.y - proc->types.pointer.last_point.y;
 
-    proc->types.pointer.scroll_throw_vect.x = (proc->types.pointer.scroll_throw_vect.x * 4) >> 3;
-    proc->types.pointer.scroll_throw_vect.y = (proc->types.pointer.scroll_throw_vect.y * 4) >> 3;
-
-    proc->types.pointer.scroll_throw_vect.x += (proc->types.pointer.vect.x * 4) >> 3;
-    proc->types.pointer.scroll_throw_vect.y += (proc->types.pointer.vect.y * 4) >> 3;
+    proc->types.pointer.scroll_throw_vect.x = (proc->types.pointer.scroll_throw_vect.x + proc->types.pointer.vect.x) / 2;
+    proc->types.pointer.scroll_throw_vect.y = (proc->types.pointer.scroll_throw_vect.y + proc->types.pointer.vect.y) / 2;
 
     proc->types.pointer.scroll_throw_vect_ori = proc->types.pointer.scroll_throw_vect;
 
