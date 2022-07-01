@@ -31,7 +31,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 static void scroll_x_anim(void * obj, int32_t v);
 static void scroll_y_anim(void * obj, int32_t v);
 static void scroll_anim_ready_cb(lv_anim_t * a);
@@ -352,7 +351,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enab
         res = lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, NULL);
         if(res != LV_RES_OK) return;
 
-        res = scroll_by_raw(obj, dx, dy);
+        res = _lv_obj_scroll_by_raw(obj, dx, dy);
         if(res != LV_RES_OK) return;
 
         res = lv_event_send(obj, LV_EVENT_SCROLL_END, NULL);
@@ -409,6 +408,23 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
         parent = lv_obj_get_parent(parent);
     }
 }
+
+lv_res_t _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+{
+    if(x == 0 && y == 0) return LV_RES_OK;
+
+    lv_obj_allocate_spec_attr(obj);
+
+    obj->spec_attr->scroll.x += x;
+    obj->spec_attr->scroll.y += y;
+
+    lv_obj_move_children_by(obj, x, y, true);
+    lv_res_t res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);
+    if(res != LV_RES_OK) return res;
+    lv_obj_invalidate(obj);
+    return LV_RES_OK;
+}
+
 
 bool lv_obj_is_scrolling(const lv_obj_t * obj)
 {
@@ -652,30 +668,15 @@ void lv_obj_readjust_scroll(lv_obj_t * obj, lv_anim_enable_t anim_en)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
-{
-    if(x == 0 && y == 0) return LV_RES_OK;
-
-    lv_obj_allocate_spec_attr(obj);
-
-    obj->spec_attr->scroll.x += x;
-    obj->spec_attr->scroll.y += y;
-
-    lv_obj_move_children_by(obj, x, y, true);
-    lv_res_t res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);
-    if(res != LV_RES_OK) return res;
-    lv_obj_invalidate(obj);
-    return LV_RES_OK;
-}
 
 static void scroll_x_anim(void * obj, int32_t v)
 {
-    scroll_by_raw(obj, v + lv_obj_get_scroll_x(obj), 0);
+    _lv_obj_scroll_by_raw(obj, v + lv_obj_get_scroll_x(obj), 0);
 }
 
 static void scroll_y_anim(void * obj, int32_t v)
 {
-    scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
+    _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }
 
 static void scroll_anim_ready_cb(lv_anim_t * a)
