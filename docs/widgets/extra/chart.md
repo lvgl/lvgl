@@ -12,11 +12,11 @@ Charts can have:
 - scrolling and zooming
 
 ## Parts and Styles
-- `LV_PART_MAIN` The background of the chart. Uses all the typical background and *line* (for the division lines) related style properties. *Padding* makes the series area smaller.
+- `LV_PART_MAIN` The background of the chart. Uses all the typical background and *line* (for the division lines) related style properties. *Padding* makes the series area smaller. For column charts `pad_column` sets the space between the columns of the adjacent indices.
 - `LV_PART_SCROLLBAR` The scrollbar used if the chart is zoomed. See the [Base object](/widgets/obj)'s documentation for details.
 - `LV_PART_ITEMS` Refers to the line or bar series.
     - Line chart: The *line* properties are used by the lines. `width`, `height`, `bg_color` and `radius` is used to set the appearance of points.
-    - Bar chart: The typical background properties are used to style the bars.
+    - Bar chart: The typical background properties are used to style the bars. `pad_column` sets the space between the columns on the same index.
 - `LV_PART_INDICATOR` Refers to the points on line and scatter chart (small circles or squares).
 - `LV_PART_CURSOR` *Line* properties are used to style the cursors.  `width`, `height`, `bg_color` and `radius` are used to set the appearance of points.
 - `LV_PART_TICKS` *Line* and *Text* style properties are used to style the ticks
