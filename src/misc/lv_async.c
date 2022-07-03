@@ -65,6 +65,33 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
     return LV_RES_OK;
 }
 
+lv_res_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data)
+{
+    lv_timer_t * timer = lv_timer_get_next(NULL);
+    lv_res_t res = LV_RES_INV;
+
+    while(timer != NULL) {
+        /*Find the next timer node*/
+        lv_timer_t * timer_next = lv_timer_get_next(timer);
+
+        /*Find async timer callback*/
+        if(timer->timer_cb == lv_async_timer_cb) {
+            lv_async_info_t * info = (lv_async_info_t *)timer->user_data;
+
+            /*Match user function callback and user data*/
+            if(info->cb == async_xcb && info->user_data == user_data) {
+                lv_timer_del(timer);
+                lv_mem_free(info);
+                res = LV_RES_OK;
+            }
+        }
+
+        timer = timer_next;
+    }
+
+    return res;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
