@@ -333,6 +333,14 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
     if(dsc->bg_img_src == NULL) return;
     if(dsc->bg_img_opa <= LV_OPA_MIN) return;
 
+    lv_area_t clip_area;
+    if(!_lv_area_intersect(&clip_area, coords, draw_ctx->clip_area)) {
+        return;
+    }
+
+    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    draw_ctx->clip_area = &clip_area;
+
     lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
     if(src_type == LV_IMG_SRC_SYMBOL) {
         lv_point_t size;
@@ -353,43 +361,45 @@ static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
     else {
         lv_img_header_t header;
         lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
-        if(res != LV_RES_OK) {
-            LV_LOG_WARN("Couldn't read the background image");
-            return;
-        }
+        if(res == LV_RES_OK) {
+            lv_draw_img_dsc_t img_dsc;
+            lv_draw_img_dsc_init(&img_dsc);
+            img_dsc.blend_mode = dsc->blend_mode;
+            img_dsc.recolor = dsc->bg_img_recolor;
+            img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
+            img_dsc.opa = dsc->bg_img_opa;
 
-        lv_draw_img_dsc_t img_dsc;
-        lv_draw_img_dsc_init(&img_dsc);
-        img_dsc.blend_mode = dsc->blend_mode;
-        img_dsc.recolor = dsc->bg_img_recolor;
-        img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
-        img_dsc.opa = dsc->bg_img_opa;
-
-        /*Center align*/
-        if(dsc->bg_img_tiled == false) {
-            lv_area_t area;
-            area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
-            area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
-            area.x2 = area.x1 + header.w - 1;
-            area.y2 = area.y1 + header.h - 1;
-
-            lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
-        }
-        else {
-            lv_area_t area;
-            area.y1 = coords->y1;
-            area.y2 = area.y1 + header.h - 1;
-
-            for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
-
-                area.x1 = coords->x1;
+            /*Center align*/
+            if(dsc->bg_img_tiled == false) {
+                lv_area_t area;
+                area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
+                area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
                 area.x2 = area.x1 + header.w - 1;
-                for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-                    lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+                area.y2 = area.y1 + header.h - 1;
+
+                lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+            }
+            else {
+                lv_area_t area;
+                area.y1 = coords->y1;
+                area.y2 = area.y1 + header.h - 1;
+
+                for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
+
+                    area.x1 = coords->x1;
+                    area.x2 = area.x1 + header.w - 1;
+                    for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
+                        lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+                    }
                 }
             }
         }
+        else {
+            LV_LOG_WARN("Couldn't read the background image");
+        }
     }
+
+    draw_ctx->clip_area = clip_area_ori;
 }
 
 static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
