@@ -127,23 +127,25 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
     bool was_top = false;
     if(states->in_stack) {
         void * stack_top = _lv_ll_get_tail(&manager->stack);
-        lv_fragment_stack_item_t * stack = NULL;
-        _LV_LL_READ_BACK(&manager->stack, stack) {
-            if(stack->states == states) {
-                was_top = stack_top == stack;
-                void * stack_prev = _lv_ll_get_prev(&manager->stack, stack);
+        lv_fragment_stack_item_t * item = NULL;
+        _LV_LL_READ_BACK(&manager->stack, item) {
+            if(item->states == states) {
+                was_top = stack_top == item;
+                void * stack_prev = _lv_ll_get_prev(&manager->stack, item);
                 if(!stack_prev) break;
                 prev = ((lv_fragment_stack_item_t *) stack_prev)->states;
                 break;
             }
         }
-        if(stack) {
-            _lv_ll_remove(&manager->stack, stack);
+        if(item) {
+            _lv_ll_remove(&manager->stack, item);
+            lv_mem_free(item);
         }
     }
     item_del_obj(states);
     item_del_fragment(states);
     _lv_ll_remove(&manager->attached, states);
+    lv_mem_free(states);
     if(prev && was_top) {
         item_create_obj(prev);
     }
@@ -262,17 +264,17 @@ static lv_fragment_managed_states_t * fragment_attach(lv_fragment_manager_t * ma
     LV_ASSERT(manager);
     LV_ASSERT(fragment);
     LV_ASSERT(fragment->managed == NULL);
-    lv_fragment_managed_states_t * item = _lv_ll_ins_tail(&manager->attached);
-    lv_memset_00(item, sizeof(lv_fragment_managed_states_t));
-    item->cls = fragment->cls;
-    item->manager = manager;
-    item->container = container;
-    item->instance = fragment;
-    fragment->managed = item;
+    lv_fragment_managed_states_t * states = _lv_ll_ins_tail(&manager->attached);
+    lv_memset_00(states, sizeof(lv_fragment_managed_states_t));
+    states->cls = fragment->cls;
+    states->manager = manager;
+    states->container = container;
+    states->instance = fragment;
+    fragment->managed = states;
     if(fragment->cls->attached_cb) {
         fragment->cls->attached_cb(fragment);
     }
-    return item;
+    return states;
 }
 
 #endif /*LV_USE_FRAGMENT*/
