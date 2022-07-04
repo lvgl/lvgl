@@ -246,8 +246,8 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
     err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw arc failed.");
 
-    err = vg_lite_finish();
-    VG_LITE_ERR_RETURN_INV(err, "Finish failed.");
+    err = vg_lite_flush();
+    VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");

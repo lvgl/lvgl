@@ -177,8 +177,8 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         err = vg_lite_clear(&vgbuf, &rect, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Clear failed.");
 
-        err = vg_lite_finish();
-        VG_LITE_ERR_RETURN_INV(err, "Finish failed.");
+        err = vg_lite_flush();
+        VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
     }
     else {   /*fill with transparency*/
 
@@ -222,8 +222,8 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Draw rectangle failed.");
 
-        err = vg_lite_finish();
-        VG_LITE_ERR_RETURN_INV(err, "Finish failed.");
+        err = vg_lite_flush();
+        VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
 
         err = vg_lite_clear_path(&path);
         VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
@@ -505,8 +505,8 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     err = vg_lite_blit_rect(&dst_vgbuf, &src_vgbuf, rect, &matrix, blend, color, VG_LITE_FILTER_POINT);
     VG_LITE_ERR_RETURN_INV(err, "Blit rectangle failed.");
 
-    err = vg_lite_finish();
-    VG_LITE_ERR_RETURN_INV(err, "Finish failed.");
+    err = vg_lite_flush();
+    VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
 
     return LV_RES_OK;
 }
