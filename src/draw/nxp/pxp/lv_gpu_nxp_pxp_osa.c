@@ -65,9 +65,14 @@ static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void);
 static void _lv_gpu_nxp_pxp_interrupt_deinit(void);
 
 /**
- * Start the PXP job and wait for task completion.
+ * Start the PXP job.
  */
 static void _lv_gpu_nxp_pxp_run(void);
+
+/**
+ * Wait for PXP completion.
+ */
+static void _lv_gpu_nxp_pxp_wait(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -82,7 +87,8 @@ static void _lv_gpu_nxp_pxp_run(void);
 static lv_nxp_pxp_cfg_t pxp_default_cfg = {
     .pxp_interrupt_init = _lv_gpu_nxp_pxp_interrupt_init,
     .pxp_interrupt_deinit = _lv_gpu_nxp_pxp_interrupt_deinit,
-    .pxp_run = _lv_gpu_nxp_pxp_run
+    .pxp_run = _lv_gpu_nxp_pxp_run,
+    .pxp_wait = _lv_gpu_nxp_pxp_wait,
 };
 
 /**********************
@@ -144,6 +150,9 @@ static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
 #endif
 }
 
+/**
+ * Function to start PXP job.
+ */
 static void _lv_gpu_nxp_pxp_run(void)
 {
 #if !defined(SDK_OS_FREE_RTOS)
@@ -152,7 +161,13 @@ static void _lv_gpu_nxp_pxp_run(void)
 
     PXP_EnableInterrupts(LV_GPU_NXP_PXP_ID, kPXP_CompleteInterruptEnable);
     PXP_Start(LV_GPU_NXP_PXP_ID);
+}
 
+/**
+ * Function to wait for PXP completion.
+ */
+static void _lv_gpu_nxp_pxp_wait(void)
+{
 #if defined(SDK_OS_FREE_RTOS)
     PXP_COND_STOP(!xSemaphoreTake(s_pxpIdle, portMAX_DELAY), "xSemaphoreTake failed.");
 #else
