@@ -176,8 +176,8 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
     LV_UNUSED(drv);
-    lseek((lv_uintptr_t)file_p, pos, whence);
-    return LV_FS_RES_OK;
+    off_t offset = lseek((lv_uintptr_t)file_p, pos, whence);
+    return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }
 
 /**
@@ -191,8 +191,9 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    *pos_p = lseek((lv_uintptr_t)file_p, 0, SEEK_CUR);
-    return LV_FS_RES_OK;
+    off_t offset = lseek((lv_uintptr_t)file_p, 0, SEEK_CUR);
+    *pos_p = offset;
+    return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }
 
 #ifdef WIN32
