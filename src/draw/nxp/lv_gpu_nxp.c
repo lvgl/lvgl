@@ -67,6 +67,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static void lv_draw_nxp_wait_cb(lv_draw_ctx_t * draw_ctx);
+
 static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
 
@@ -101,7 +103,7 @@ void lv_draw_nxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     nxp_draw_ctx->base_draw.draw_rect = lv_draw_nxp_rect;
     nxp_draw_ctx->base_draw.draw_img_decoded = lv_draw_nxp_img_decoded;
     nxp_draw_ctx->blend = lv_draw_nxp_blend;
-    //nxp_draw_ctx->base_draw.wait_for_finish = lv_draw_nxp_wait_cb;
+    nxp_draw_ctx->base_draw.wait_for_finish = lv_draw_nxp_wait_cb;
 }
 
 void lv_draw_nxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
@@ -129,6 +131,19 @@ static inline bool need_argb8565_support(lv_draw_ctx_t * draw_ctx)
 #endif
 
     return false;
+}
+
+static void lv_draw_nxp_wait_cb(lv_draw_ctx_t * draw_ctx)
+{
+#if LV_USE_GPU_NXP_PXP
+    lv_gpu_nxp_pxp_wait();
+#endif
+#if LV_USE_GPU_NXP_VG_LITE
+    if(vg_lite_finish() != VG_LITE_SUCCESS)
+        VG_LITE_LOG_TRACE("VG-Lite finish failed.");
+#endif
+
+    lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
 static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)

@@ -219,7 +219,7 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
 
     PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
 
-    lv_gpu_nxp_pxp_run(); /*Start PXP task*/
+    lv_gpu_nxp_pxp_run();
 
     return LV_RES_OK;
 }
@@ -321,7 +321,7 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
     };
     PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
 
-    lv_gpu_nxp_pxp_run(); /* Start PXP task */
+    lv_gpu_nxp_pxp_run();
 
     return LV_RES_OK;
 }
@@ -516,7 +516,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
         PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
     }
 
-    lv_gpu_nxp_pxp_run(); /*Start PXP task*/
+    lv_gpu_nxp_pxp_run();
 
     return LV_RES_OK;
 }
@@ -620,7 +620,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
     };
     PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
 
-    lv_gpu_nxp_pxp_run(); /* Start PXP task */
+    lv_gpu_nxp_pxp_run();
 
     return LV_RES_OK;
 }
