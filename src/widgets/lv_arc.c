@@ -820,7 +820,7 @@ static void value_update(lv_obj_t * obj)
             }
             break;
         case LV_ARC_MODE_REVERSE:
-            angle = lv_map(arc->value, arc->min_value, arc->max_value, arc->bg_angle_start, bg_end);
+            angle = lv_map(arc->value, arc->min_value, arc->max_value, bg_end, arc->bg_angle_start);
             lv_arc_set_angles(obj, angle, arc->bg_angle_end);
             break;
         case LV_ARC_MODE_NORMAL:

@@ -105,7 +105,7 @@ void test_arc_should_update_angles_when_changing_to_symmetrical_mode_value_more_
 /* See #2522 for more information */
 void test_arc_angles_when_reversed(void)
 {
-    uint16_t expected_start_angle = 36;
+    uint16_t expected_start_angle = 54;
     uint16_t expected_end_angle = 90;
     int16_t expected_value = 40;
 
