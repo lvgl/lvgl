@@ -223,8 +223,8 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     }
     VG_LITE_ERR_RETURN_INV(err, "Draw gradient failed.");
 
-    err = vg_lite_finish();
-    VG_LITE_ERR_RETURN_INV(err, "Finish failed.");
+    err = vg_lite_flush();
+    VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
