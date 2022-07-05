@@ -105,6 +105,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" PRIX32, letter);
 
+#if LV_USE_FONT_PLACEHOLDER
             /* draw placeholder */
             lv_area_t glyph_coords;
             lv_draw_rect_dsc_t glyph_dsc;
@@ -119,6 +120,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
             glyph_dsc.border_color = dsc->color;
             glyph_dsc.border_width = 1;
             draw_ctx->draw_rect(draw_ctx, &glyph_dsc, &glyph_coords);
+#endif
         }
         return;
     }

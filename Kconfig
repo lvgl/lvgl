@@ -655,6 +655,10 @@ menu "LVGL configuration"
                 Set the pixel order of the display.
                 Important only if "subpx fonts" are used.
                 With "normal" font it doesn't matter.
+
+        config LV_USE_FONT_PLACEHOLDER
+            bool "Enable drawing placeholders when glyph dsc is not found."
+            default y
     endmenu
 
     menu "Text Settings"

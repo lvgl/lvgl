@@ -1225,6 +1225,19 @@
     #endif
 #endif
 
+/*Enable drawing placeholders when glyph dsc is not found*/
+#ifndef LV_USE_FONT_PLACEHOLDER
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_FONT_PLACEHOLDER
+            #define LV_USE_FONT_PLACEHOLDER CONFIG_LV_USE_FONT_PLACEHOLDER
+        #else
+            #define LV_USE_FONT_PLACEHOLDER 0
+        #endif
+    #else
+        #define LV_USE_FONT_PLACEHOLDER 1
+    #endif
+#endif
+
 /*=================
  *  TEXT SETTINGS
  *=================*/
