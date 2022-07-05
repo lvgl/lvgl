@@ -657,8 +657,8 @@ menu "LVGL configuration"
                 With "normal" font it doesn't matter.
 
         config LV_USE_FONT_PLACEHOLDER
-            bool "Enable drawing placeholders when glyph dsc is not found"
-            default n
+            bool "Enable drawing placeholders when glyph dsc is not found."
+            default y
     endmenu
 
     menu "Text Settings"
