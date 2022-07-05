@@ -38,7 +38,7 @@ void lv_example_ime_pinyin_2(void)
 
     lv_ime_pinyin_set_keyboard(pinyin_ime, kb);
     lv_ime_pinyin_set_mode(pinyin_ime,
-                           LV_IME_PINYIN_MODE_K9);  // Set mode, 1: 26 key input(k26), 0: 9 key input(k9). Default: 1
+                           LV_IME_PINYIN_MODE_K9);  // Set to 9-key input mode. Default: 26-key input(k26) mode.
     lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
 
     /*Get the cand_panel, and adjust its size and position*/
