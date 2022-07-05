@@ -1,6 +1,6 @@
 # Pinyin IME
 
-Pinyin IME provides API to provide Chinese Pinyin input method (Chinese input) for keyboard object. You can think of `lv_ime_pinyin` as a Pinyin input method plug-in for keyboard objects.
+Pinyin IME provides API to provide Chinese Pinyin input method (Chinese input) for keyboard object, which supports 26 key and 9 key input modes. You can think of `lv_ime_pinyin` as a Pinyin input method plug-in for keyboard objects.
 
 Normally, an environment where [lv_keyboard](/widgets/extra/keyboard) can run can also run `lv_ime_pinyin`. There are two main influencing factors: the size of the font file and the size of the dictionary.
 
@@ -8,7 +8,7 @@ Normally, an environment where [lv_keyboard](/widgets/extra/keyboard) can run ca
 <summary>中文</summary>
 <p>
             
-`lv_ime_pinyin`为[键盘](/widgets/extra/keyboard)组件提供汉语拼音输入法（中文输入）的功能(后文简称为拼音输入法)。您可以将 `lv_ime_pinyin` 看成是键盘组件的汉语拼音输入法插件。
+`lv_ime_pinyin`为[键盘](/widgets/extra/keyboard)组件提供汉语拼音输入法（中文输入）的功能(后文简称为拼音输入法)，支持26键和9键输入模式。您可以将 `lv_ime_pinyin` 看成是键盘组件的汉语拼音输入法插件。
  
 一般情况下，只要是[键盘](/widgets/extra/keyboard)组件能运行的环境 `lv_ime_pinyin` 也能运行。有两个影响因素：字库的大小和词库的大小。
             
@@ -117,6 +117,20 @@ After writing a dictionary according to the above dictionary format, you only ne
     lv_obj_t * pinyin_ime = lv_100ask_pinyin_ime_create(lv_scr_act());
     lv_100ask_pinyin_ime_set_dict(pinyin_ime, your_pinyin_dict);
 ```
+
+## Input modes
+
+`lv_ime_pinyin` supports 26 key and 9 key input modes. The mode switching is very simple, just call the function `lv_ime_pinyin_set_mode`. If the second parameter of function `lv_ime_pinyin_set_mode` is' 1 ', switch to 26 key input mode; if it is' 0', switch to 9 key input mode, and the default is' 1 '.
+
+<details>
+<summary>中文</summary>
+<p>
+
+`lv_ime_pinyin` 支持26键和9键输入模式。模式的切换非常简单，只需调用函数 `lv_ime_pinyin_set_mode` 即可。如果函数 `lv_ime_pinyin_set_mode` 的第2个参数为 `1` 则切换到 26 键输入模式，如果为 `0` 则切换到 9 键输入法模式，默认为 `1` 。
+
+</p>
+</details>
+
 
 ## Example
 
