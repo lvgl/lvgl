@@ -21,6 +21,7 @@
     #define GRAD_CONV(t, x) t = x
 #endif
 
+#undef ALIGN
 #if defined(LV_ARCH_64)
     #define ALIGN(X)    (((X) + 7) & ~7)
 #else
