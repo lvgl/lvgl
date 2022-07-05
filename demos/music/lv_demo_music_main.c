@@ -62,6 +62,7 @@ static void timer_cb(lv_timer_t * t);
 static void track_load(uint32_t id);
 static void stop_start_anim(lv_timer_t * t);
 static void spectrum_end_cb(lv_anim_t * a);
+static void album_fade_anim_cb(void * var, int32_t v);
 static int32_t get_cos(int32_t deg, int32_t a);
 static int32_t get_sin(int32_t deg, int32_t a);
 
@@ -667,9 +668,14 @@ static void track_load(uint32_t id)
     lv_label_set_text(artist_label, _lv_demo_music_get_artist(track_id));
     lv_label_set_text(genre_label, _lv_demo_music_get_genre(track_id));
 
-    lv_obj_fade_out(album_img_obj, 500, 0);
-
     lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, album_img_obj);
+    lv_anim_set_values(&a, lv_obj_get_style_img_opa(album_img_obj, 0), LV_OPA_TRANSP);
+    lv_anim_set_exec_cb(&a, album_fade_anim_cb);
+    lv_anim_set_time(&a, 500);
+    lv_anim_start(&a);
+
     lv_anim_init(&a);
     lv_anim_set_var(&a, album_img_obj);
     lv_anim_set_time(&a, 500);
@@ -702,7 +708,6 @@ static void track_load(uint32_t id)
     lv_anim_start(&a);
 
     album_img_obj = album_img_create(spectrum_obj);
-    lv_obj_fade_in(album_img_obj, 500, 100);
 
     lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
     lv_anim_set_var(&a, album_img_obj);
@@ -711,6 +716,14 @@ static void track_load(uint32_t id)
     lv_anim_set_values(&a, LV_IMG_ZOOM_NONE / 4, LV_IMG_ZOOM_NONE);
     lv_anim_set_exec_cb(&a, _img_set_zoom_anim_cb);
     lv_anim_set_ready_cb(&a, NULL);
+    lv_anim_start(&a);
+
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, album_img_obj);
+    lv_anim_set_values(&a, 0, LV_OPA_COVER);
+    lv_anim_set_exec_cb(&a, album_fade_anim_cb);
+    lv_anim_set_time(&a, 500);
+    lv_anim_set_delay(&a, 100);
     lv_anim_start(&a);
 }
 
@@ -982,6 +995,11 @@ static void stop_start_anim(lv_timer_t * t)
     LV_UNUSED(t);
     start_anim = false;
     lv_obj_refresh_ext_draw_size(spectrum_obj);
+}
+
+static void album_fade_anim_cb(void * var, int32_t v)
+{
+    lv_obj_set_style_img_opa(var, v, 0);
 }
 #endif /*LV_USE_DEMO_MUSIC*/
 
