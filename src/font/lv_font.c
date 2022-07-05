@@ -102,7 +102,11 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     }
     else {
         dsc_out->box_w = font_p->line_height / 2;
+#if LV_USE_FONT_PLACEHOLDER
         dsc_out->adv_w = dsc_out->box_w + 2;
+#else
+        dsc_out->adv_w = 0;
+#endif
     }
 
     dsc_out->resolved_font = NULL;
