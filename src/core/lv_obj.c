@@ -493,10 +493,6 @@ static void lv_obj_draw(lv_event_t * e)
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
-        if(lv_obj_get_style_blend_mode(obj, LV_PART_MAIN) != LV_BLEND_MODE_NORMAL) {
-            info->res = LV_COVER_RES_NOT_COVER;
-            return;
-        }
 
         info->res = LV_COVER_RES_COVER;
 
