@@ -96,6 +96,8 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
                        uint32_t letter)
 {
     lv_font_glyph_dsc_t g;
+    memset(&g, 0, sizeof(g));
+
     bool g_ret = lv_font_get_glyph_dsc(dsc->font, &g, letter, '\0');
     if(g_ret == false) {
         /*Add warning if the dsc is not found
