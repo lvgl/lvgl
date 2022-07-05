@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_LABEL && LV_USE_TEXTAREA && LV_FONT_SIMSUN_16_CJK  && LV_USE_IME_PINYIN && LV_BUILD_EXAMPLES
+#if LV_USE_LABEL && LV_USE_TEXTAREA && LV_FONT_SIMSUN_16_CJK && LV_USE_IME_PINYIN && LV_BUILD_EXAMPLES
 
 static void ta_event_cb(lv_event_t * e)
 {
@@ -13,7 +13,7 @@ static void ta_event_cb(lv_event_t * e)
             lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
         }
     }
-    else if(code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
+    else if(code == LV_EVENT_CANCEL) {
         lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_state(ta, LV_STATE_FOCUSED);
         lv_indev_reset(NULL, ta);   /*To forget the last clicked object to make it focusable again*/
@@ -24,7 +24,7 @@ void lv_example_ime_pinyin_1(void)
 {
     lv_obj_t * pinyin_ime = lv_ime_pinyin_create(lv_scr_act());
     lv_obj_set_style_text_font(pinyin_ime, &lv_font_simsun_16_cjk, 0);
-    //lv_ime_pinyin_set_dict(pinyin_ime, your_dict); // Use a custom dictionary. If it is not set, the built-in thesaurus will be used.
+    //lv_ime_pinyin_set_dict(pinyin_ime, your_dict); // Use a custom dictionary. If it is not set, the built-in dictionary will be used.
 
     /* ta1 */
     lv_obj_t * ta1 = lv_textarea_create(lv_scr_act());

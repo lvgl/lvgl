@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_LABEL && LV_USE_TEXTAREA && LV_FONT_SIMSUN_16_CJK && LV_USE_IME_PINYIN  && LV_IME_PINYIN_USE_K9_MODE && LV_BUILD_EXAMPLES
+#if LV_USE_LABEL && LV_USE_TEXTAREA && LV_FONT_SIMSUN_16_CJK && LV_USE_IME_PINYIN && LV_IME_PINYIN_USE_K9_MODE && LV_BUILD_EXAMPLES
 
 static void ta_event_cb(lv_event_t * e)
 {
@@ -24,7 +24,7 @@ void lv_example_ime_pinyin_2(void)
 {
     lv_obj_t * pinyin_ime = lv_ime_pinyin_create(lv_scr_act());
     lv_obj_set_style_text_font(pinyin_ime, &lv_font_simsun_16_cjk, 0);
-    //lv_ime_pinyin_set_dict(pinyin_ime, your_dict); // Use a custom dictionary. If it is not set, the built-in thesaurus will be used.
+    //lv_ime_pinyin_set_dict(pinyin_ime, your_dict); // Use a custom dictionary. If it is not set, the built-in dictionary will be used.
 
     /* ta1 */
     lv_obj_t * ta1 = lv_textarea_create(lv_scr_act());
@@ -37,7 +37,8 @@ void lv_example_ime_pinyin_2(void)
     lv_keyboard_set_textarea(kb, ta1);
 
     lv_ime_pinyin_set_keyboard(pinyin_ime, kb);
-    lv_ime_pinyin_set_mode(pinyin_ime, 0);  // Set mode, 1: 26 key input(k26), 0: 9 key input(k9). Default: 1
+    lv_ime_pinyin_set_mode(pinyin_ime,
+                           LV_IME_PINYIN_MODE_K9);  // Set mode, 1: 26 key input(k26), 0: 9 key input(k9). Default: 1
     lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
 
     /*Get the cand_panel, and adjust its size and position*/
