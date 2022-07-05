@@ -128,7 +128,6 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     if(!mask_any && dsc->radius == 0 && (grad_dir == LV_GRAD_DIR_NONE)) {
         blend_dsc.blend_area = &bg_coords;
         blend_dsc.opa = dsc->bg_opa;
-
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
         return;
     }

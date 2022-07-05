@@ -438,9 +438,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         uint32_t max_kb_tenth = (max_size - (max_kb * 1024)) / 102;
         lv_label_set_text_fmt(mem_label,
                               "%"LV_PRIu32 ".%"LV_PRIu32 " kB used (%d %%)\n"
-                              "%"LV_PRIu32 ".%"LV_PRIu32 " kB max, %d%% frag.",
+                              "%d%% frag.",
                               used_kb, used_kb_tenth, mon.used_pct,
-                              max_kb, max_kb_tenth, mon.frag_pct);
+                              mon.frag_pct);
     }
 #endif
 
@@ -958,7 +958,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
             if((flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) == 0) break;
 
             layer_ctx->area_act.y1 = layer_ctx->area_act.y2 + 1;
-            layer_ctx->area_act.y2 += layer_ctx->area_act.y1 + layer_ctx->max_row_with_no_alpha;
+            layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_no_alpha - 1;
         }
 
         lv_draw_layer_destroy(draw_ctx, layer_ctx);
