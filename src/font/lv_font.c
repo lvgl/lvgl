@@ -68,7 +68,10 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
     LV_ASSERT_NULL(font_p);
     LV_ASSERT_NULL(dsc_out);
 
+#if LV_USE_FONT_PLACEHOLDER
     const lv_font_t * placeholder_font = NULL;
+#endif
+
     const lv_font_t * f = font_p;
 
     dsc_out->resolved_font = NULL;
@@ -80,19 +83,22 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
                 dsc_out->resolved_font = f;
                 return true;
             }
+#if LV_USE_FONT_PLACEHOLDER
             else if(placeholder_font == NULL) {
                 placeholder_font = f;
             }
+#endif
         }
         f = f->fallback;
     }
 
+#if LV_USE_FONT_PLACEHOLDER
     if(placeholder_font != NULL) {
         placeholder_font->get_glyph_dsc(placeholder_font, dsc_out, letter, letter_next);
         dsc_out->resolved_font = placeholder_font;
         return true;
     }
-
+#endif
 
     if(letter < 0x20 ||
        letter == 0xf8ff || /*LV_SYMBOL_DUMMY*/
@@ -101,8 +107,13 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
         dsc_out->adv_w = 0;
     }
     else {
+#if LV_USE_FONT_PLACEHOLDER
         dsc_out->box_w = font_p->line_height / 2;
         dsc_out->adv_w = dsc_out->box_w + 2;
+#else
+        dsc_out->box_w = 0;
+        dsc_out->adv_w = 0;
+#endif
     }
 
     dsc_out->resolved_font = NULL;
