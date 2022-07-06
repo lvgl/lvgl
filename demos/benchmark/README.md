@@ -33,7 +33,7 @@ In other words, the benchmark shows the FPS from the pure rendering time.
 
 By default, only the changed areas are refreshed. It means if only a few pixels are changed in 1 ms the benchmark will show 1000 FPS. To measure the performance with full screen refresh uncomment `lv_obj_invalidate(lv_scr_act())` in `monitor_cb()` in `lv_demo_benchmark.c`.
 
-![LVGL benchmark running](https://github.com/lvgl/lvgl/tree/master/demos/benchmark/screenshot1.png?raw=true)
+![LVGL benchmark running](screenshot1.png)
 
 If you are doing performance analysis for 2D image processing optimization, LCD latency (flushing data to LCD) introduced by `disp_flush()` might dilute the performance results of the LVGL drawing process, hence make it harder to see your optimization results (gain or loss). To avoid such problem, please:
 
