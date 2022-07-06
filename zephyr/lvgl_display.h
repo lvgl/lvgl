@@ -17,6 +17,7 @@ extern "C" {
 struct lvgl_disp_data {
 	const struct device *display_dev;
 	struct display_capabilities cap;
+	bool blanking_on;
 };
 
 void lvgl_flush_cb_mono(lv_disp_drv_t *disp_drv,

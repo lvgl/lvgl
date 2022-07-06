@@ -17,6 +17,19 @@ void lvgl_flush_cb_mono(lv_disp_drv_t *disp_drv,
 		(struct lvgl_disp_data *)disp_drv->user_data;
 	const struct device *display_dev = data->display_dev;
 	struct display_buffer_descriptor desc;
+	const bool is_epd = data->cap.screen_info & SCREEN_INFO_EPD;
+	const bool is_last = lv_disp_flush_is_last(disp_drv);
+
+	if (is_epd && !data->blanking_on && !is_last) {
+		/*
+		 * Turn on display blanking when using an EPD
+		 * display. This prevents updates and the associated
+		 * flicker if the screen is rendered in multiple
+		 * steps.
+		 */
+		display_blanking_on(display_dev);
+		data->blanking_on = true;
+	}
 
 	desc.buf_size = (w * h)/8U;
 	desc.width = w;
@@ -26,6 +39,15 @@ void lvgl_flush_cb_mono(lv_disp_drv_t *disp_drv,
 	if (data->cap.screen_info & SCREEN_INFO_DOUBLE_BUFFER) {
 		display_write(display_dev, area->x1, area->y1, &desc,
 				(void *) color_p);
+	}
+
+	if (is_epd && is_last && data->blanking_on) {
+		/*
+		 * The entire screen has now been rendered. Update the
+		 * display by disabling blanking.
+		 */
+		display_blanking_off(display_dev);
+		data->blanking_on = false;
 	}
 
 	lv_disp_flush_ready(disp_drv);

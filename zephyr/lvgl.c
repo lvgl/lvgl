@@ -21,7 +21,9 @@
 LOG_MODULE_REGISTER(lvgl);
 
 static lv_disp_drv_t disp_drv;
-struct lvgl_disp_data disp_data;
+struct lvgl_disp_data disp_data = {
+	.blanking_on = false,
+};
 #ifdef CONFIG_LV_Z_POINTER_KSCAN
 static lv_indev_drv_t indev_drv;
 #endif /* CONFIG_LV_Z_POINTER_KSCAN */
