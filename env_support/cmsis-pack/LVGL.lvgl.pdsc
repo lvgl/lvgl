@@ -36,7 +36,13 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-06-29" version="1.0.5" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.5.pack">
+    <release date="2022-07-05" version="1.0.6" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.6.pack">
+      - LVGL 8.3.0
+      - Apply patch for memory leaking issue
+      - Apply patch to speed up non normal blend mode
+      - Other minor changes
+    </release>
+    <release date="2022-06-29" version="1.0.5" url="https://github.com/GorgonMeducer/lvgl/raw/922108dbbe6d1c0be1069c342ca8693afee8c169/env_support/cmsis-pack/LVGL.lvgl.1.0.5.pack">
       - LVGL 8.3.0-dev
       - Monthly update for June
       - Add Pinyin as input method
@@ -184,7 +190,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.0-dev">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.0">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
