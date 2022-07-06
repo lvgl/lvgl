@@ -1030,14 +1030,22 @@ menu "LVGL configuration"
         config LV_USE_IME_PINYIN
             bool "Enable Pinyin input method"
             default n
+        config LV_IME_PINYIN_USE_K9_MODE
+            bool "Enable Pinyin input method 9 key input mode"
+            depends on LV_USE_IME_PINYIN
+            default n
+        config LV_IME_PINYIN_K9_CAND_TEXT_NUM
+            int "Maximum number of candidate panels for 9-key input mode"
+            depends on LV_IME_PINYIN_USE_K9_MODE
+            default 3
         config LV_IME_PINYIN_USE_DEFAULT_DICT
             bool "Use built-in Thesaurus"
             depends on LV_USE_IME_PINYIN
             default y
             help
-                If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss
+                If you do not use the default thesaurus, be sure to use lv_ime_pinyin after setting the thesauruss
         config LV_IME_PINYIN_CAND_TEXT_NUM
-            int "maximum number of candidate panels"
+            int "Maximum number of candidate panels"
             depends on LV_USE_IME_PINYIN
             default 6
             help
