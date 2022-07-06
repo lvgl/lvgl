@@ -39,9 +39,6 @@ lv_img_src_type_t lv_img_src_get_type(const void * src)
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
         return LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
     }
-    else if(u8_p[0] == 0xFF) {
-        return LV_IMG_SRC_OBJ;
-    }
     else if(u8_p[0] >= 0x80) {
         return LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
     }
@@ -66,10 +63,6 @@ lv_res_t lv_img_src_parse(lv_img_src_t * obj, const void * src)
                 lv_img_dsc_t * id = (lv_img_dsc_t *) src; /*This might break if given any raw data here*/
                 lv_img_src_set_data(obj, (const uint8_t *)src, id->data_size);
             }
-            break;
-        case LV_IMG_SRC_OBJ:
-            LV_LOG_TRACE("lv_img_src_parse: `LV_IMG_SRC_OBJ` type found");
-            lv_img_src_copy(obj, (lv_img_src_t *)src);
             break;
         case LV_IMG_SRC_SYMBOL:
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
@@ -113,7 +106,6 @@ void lv_img_src_set_data(lv_img_src_t * obj, const uint8_t * data, const size_t 
 {
     lv_img_src_free(obj);
 
-    obj->_fixed_hdr = 0xFF;
     obj->type = LV_IMG_SRC_VARIABLE;
     obj->data = data;
     obj->data_len = len;
@@ -123,7 +115,6 @@ void lv_img_src_set_raw(lv_img_src_t * obj, const lv_img_dsc_t * data)
 {
     lv_img_src_free(obj);
 
-    obj->_fixed_hdr = 0xFF;
     obj->type = LV_IMG_SRC_VARIABLE;
     obj->data = data;
     obj->data_len = sizeof(*data);
@@ -138,10 +129,41 @@ void lv_img_src_set_symbol(lv_img_src_t * obj, const char * symbol)
         return;
 }
 
+lv_img_src_move_t lv_img_src_from_symbol(const char * symbol)
+{
+    lv_img_src_move_t obj;
+    lv_img_src_set_symbol((lv_img_src_t *)&obj, symbol);
+    obj._src.type |= _LV_IMG_SRC_MOVABLE;
+    return obj;
+}
+
+lv_img_src_move_t lv_img_src_from_data(const uint8_t * data, const size_t len)
+{
+    lv_img_src_move_t obj;
+    lv_img_src_set_data((lv_img_src_t *)&obj, data, len);
+    obj._src.type |= _LV_IMG_SRC_MOVABLE;
+    return obj;
+}
+
+lv_img_src_move_t lv_img_src_from_file(const char * file_path)
+{
+    lv_img_src_move_t obj;
+    lv_img_src_set_file((lv_img_src_t *)&obj, file_path);
+    obj._src.type |= _LV_IMG_SRC_MOVABLE;
+    return obj;
+}
+
+lv_img_src_move_t lv_img_src_from_raw(const lv_img_dsc_t * raw)
+{
+    lv_img_src_move_t obj;
+    lv_img_src_set_raw((lv_img_src_t *)&obj, raw);
+    obj._src.type |= _LV_IMG_SRC_MOVABLE;
+    return obj;
+}
+
 void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
 {
     lv_img_src_free(dest);
-    dest->_fixed_hdr = 0xFF;
     dest->type = LV_IMG_SRC_UNKNOWN;
     dest->data = src->data;
     dest->data_len = src->data_len;
@@ -155,10 +177,26 @@ void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
     }
 }
 
+void lv_img_src_capture(lv_img_src_t * dest, lv_img_src_move_t * src)
+{
+    /*Make sure the type is actually moveable */
+    if(LV_BF(src->_src.type, _LV_IMG_SRC_MOVABLE)) {
+        lv_img_src_copy(dest, (const lv_img_src_t *)src);
+        return;
+    }
+    lv_img_src_free(dest);
+    dest->type = src->_src.type & 0x7F; /*Remove moveable flag*/
+    dest->data = src->_src.data;
+    dest->data_len = src->_src.data_len;
+    dest->ext = src->_src.ext;
+
+    /*Finish moving the type by making it empty*/
+    lv_memset(src, 0, sizeof(*src));
+}
+
 
 static lv_res_t alloc_str_src(lv_img_src_t * src, const char * str)
 {
-    src->_fixed_hdr = 0xFF;
     src->data_len = strlen(str);
     src->data = lv_mem_alloc(src->data_len + 1);
     LV_ASSERT_MALLOC(src->data);

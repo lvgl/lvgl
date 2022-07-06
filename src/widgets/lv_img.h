@@ -132,32 +132,32 @@ lv_res_t lv_img_set_current_frame(lv_obj_t * obj, const lv_frame_index_t index);
 lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, const int forward);
 
 /**
- * Parse the given data as an image source to display on the the object
+ * Set the image source to display on the the object
  *
  * @param obj       pointer to an image object
- * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
- *                  2) path to an image file (e.g. "S:/dir/img.bin")or
- *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
- *                  4) pointer to a lv_img_src_t instance
+ * @param src       an image source instance that can be created from:
+ *                  1. from a file: lv_img_src_from_file("S:/path/to/file")
+ *                  2. from encoded image data: lv_img_src_from_data(&some_data, data_length)
+ *                  3. from symbol: lv_img_src_from_symbol("Ok " LV_SYMBOL_OK)
+ *                  4. from raw image converter: lv_img_src_from_raw(&img_bin)
+ *                  5. from a void* as previous LVGL version code: lv_img_src_parse(void*)
  *
- * @deprecated This function is deprecated in favor of lv_img_set_src_ext
- *             You can create a lv_img_src_t * from a file, symbol or plain data via lv_img_src_set_file/symbol/data
- *
- */
-void lv_img_set_src(lv_obj_t * obj, const void * src);
-
-
-/** Set the source of this image to a lv_img_src_t and check if it's usable.
- *
- * Some picture don't have intrinsic size (like a vector based format, SVG, Lottie), or contain multiple
- * parts (like multiple frames for animated format, GIF, Lottie).
- * If you need to deal with such format, you might have to call other function
- * (like `lv_obj_set_size` for vector format) before calling this
- *
- * @param obj           pointer to an image object
- * @param src           pointer to an image source object
  * @return LV_RES_OK    If the image was correctly parsed
- * @note This will replace lv_img_set_src in LVGL9
+ */
+lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_move_t src);
+
+/**
+ * Set the image source to display on the the object
+ *
+ * @param obj       pointer to an image object
+ * @param src       an image source instance that can be created from:
+ *                  1. from a file: lv_img_src_from_file("S:/path/to/file")
+ *                  2. from encoded image data: lv_img_src_from_data(&some_data, data_length)
+ *                  3. from symbol: lv_img_src_from_symbol("Ok " LV_SYMBOL_OK)
+ *                  4. from raw image converter: lv_img_src_from_raw(&img_bin)
+ *                  5. from a void* as previous LVGL version code: lv_img_src_parse(void*)
+ *
+ * @return LV_RES_OK    If the image was correctly parsed
  */
 lv_res_t lv_img_set_src_ext(lv_obj_t * obj, const lv_img_src_t * src);
 

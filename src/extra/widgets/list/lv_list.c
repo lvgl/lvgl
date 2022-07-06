@@ -73,7 +73,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     return obj;
 }
 
-lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
+lv_obj_t * lv_list_add_btn(lv_obj_t * list, lv_img_src_move_t icon, const char * txt)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_btn_class, list);
@@ -82,7 +82,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
 
 #if LV_USE_IMG == 1
-    if(icon) {
+    if(icon._src.type != LV_IMG_SRC_UNKNOWN) {
         lv_obj_t * img = lv_img_create(obj);
         lv_img_set_src(img, icon);
     }

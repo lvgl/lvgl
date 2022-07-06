@@ -75,7 +75,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.header.h  = h;
     canvas->dsc.data      = buf;
 
-    lv_img_set_src(obj, &canvas->dsc);
+    lv_img_set_src(obj, lv_img_src_from_raw(&canvas->dsc));
 }
 
 void lv_canvas_set_px_color(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t c)
@@ -813,7 +813,7 @@ static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     canvas->dsc.data_size          = 0;
     canvas->dsc.data               = NULL;
 
-    lv_img_set_src(obj, &canvas->dsc);
+    lv_img_set_src(obj, lv_img_src_from_raw(&canvas->dsc));
 
     LV_TRACE_OBJ_CREATE("finished");
 }

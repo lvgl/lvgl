@@ -40,26 +40,37 @@ enum {
     LV_IMG_SRC_VARIABLE = 1,    /** Binary/C variable */
     LV_IMG_SRC_FILE     = 2,    /** File in filesystem*/
     LV_IMG_SRC_SYMBOL   = 3,    /** Symbol (@ref lv_symbol_def.h)*/
-    LV_IMG_SRC_OBJ      = 4,    /** Deprecated: This means the void* points to a lv_img_src_t */
+
+
+    _LV_IMG_SRC_MOVABLE = 0x80, /** A bit flag to tell if an object is a temporary and that can be captured */
 };
 
 typedef uint8_t lv_img_src_type_t;
 
 /**
  * A generic image source descriptor.
- * You can build an image source via `lv_imgsrc_set_xxx` functions.
- * If using the legacy API `lv_img_set_src`, LVGL will try to deduce the image source type from its content
- * but it's not reliable and waste some resources for binary source since it adds a
- * specific header to each image data (which might already have their own header)
- * Instead, this is straightforward to use */
+ * You can build an image source via `lv_img_src_from_xxx` or `lv_img_src_set_src` functions.
+ */
 typedef struct {
-    uint8_t         _fixed_hdr;     /**< Using 0xFF to mark the type of the source to this */
     uint8_t         type;           /**< See `lv_img_src_type_t` above */
     size_t          data_len;       /**< The data's length in bytes */
     const void   *  data;           /**< A pointer on the given unique resource identifier */
     const char   *  ext;            /**< If the data points to a file, this will point to the extension */
 } lv_img_src_t;
 
+/**
+ * When using `lv_img_src_from_xxx` function, you're creating a temporary that must be freed with
+ * `lv_img_src_free`. This is costly because for most usage, the temporary object will immediately be
+ * copied to an internal member of a larger object.
+ *
+ * So in order to avoid this, `lv_img_src_from_xxx` functions mark an object as movable and if moved,
+ * there's no need to call `lv_img_src_free` on the instance anymore.
+ * To avoid confusion with the base object, this structure is used in the API where movable semantic
+ * is expected.
+ */
+typedef struct {
+    lv_img_src_t   _src;
+} lv_img_src_move_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -113,19 +124,50 @@ void lv_img_src_set_data(lv_img_src_t * obj, const uint8_t * data, const size_t 
  *  @param path Path to the file containing the image
  */
 void lv_img_src_set_file(lv_img_src_t * obj, const char * file_path);
-/** Set the source of the descriptor to a file
+/** Set the source of the descriptor to an image descriptor
  *  @param src  The src descriptor to fill
  *  @param raw  Pointer to a lv_img_dsc_t instance
  */
 void lv_img_src_set_raw(lv_img_src_t * obj, const lv_img_dsc_t * raw);
 
-
-/** Copy the source of the descriptor to another descriptor
+/** Set the source of the descriptor to a text with any symbol in it
+ *  @param src  The src descriptor to fill
+ *  @param symbol An textual strings with symbols
+ *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+*/
+lv_img_src_move_t lv_img_src_from_symbol(const char * symbol);
+/** Set the source of the descriptor to a byte array containing the image encoded data
+ *  @param src  The src descriptor to fill
+ *  @param data A pointer to the image's data
+ *  @param len  The length pointed by data in bytes
+ *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+*/
+lv_img_src_move_t lv_img_src_from_data(const uint8_t * data, const size_t len);
+/** Set the source of the descriptor to a file
  *  @param src  The src descriptor to fill
  *  @param path Path to the file containing the image
+ *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+ */
+lv_img_src_move_t lv_img_src_from_file(const char * file_path);
+/** Set the source of the descriptor to a file
+ *  @param src  The src descriptor to fill
+ *  @param raw  Pointer to a lv_img_dsc_t instance
+ *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+ */
+lv_img_src_move_t lv_img_src_from_raw(const lv_img_dsc_t * raw);
+
+
+
+/** Copy the source of the descriptor to another descriptor
+ *  @param dest The dest object to fill
+ *  @param src  The source object to read from
  */
 void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src);
-
+/** Capture  the source of the descriptor and move to another descriptor
+ *  @param dest The dest object to fill
+ *  @param src  The source object to move from
+ */
+void lv_img_src_capture(lv_img_src_t * dest, lv_img_src_move_t * src);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -114,35 +114,29 @@ lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, 
     return LV_RES_OK;
 }
 
-lv_res_t lv_img_set_src_ext(lv_obj_t * obj, const lv_img_src_t * data)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    lv_img_t * img = (lv_img_t *)obj;
-    if(&img->src != data)
-        lv_img_src_copy(&img->src, data);
-
-    return get_caps(img);
-}
-
-
-void lv_img_set_src(lv_obj_t * obj, const void * src)
+lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_move_t src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
 
     lv_obj_invalidate(obj);
 
-    LV_LOG_WARN("Deprecated usage of lv_img_set_src. Upcoming version will use lv_img_src_t objects instead");
-    /* Deprecated API with numerous limitations:
-       1. Force to add a LVGL image header on raw encoded image data while there's already such header in the encoded data
-       2. Prevent using LV_SYMBOL in the middle of some text, since it use the first byte of the data to figure out if it's a symbol or not
-       3. Messy interface hiding the actual type, and requiring multiple deduction each time the source type is required
-    */
-    if(lv_img_src_parse(&img->src, src) == LV_RES_OK) {
-        get_caps(img);
-    }
+    lv_img_src_capture(&img->src, &src);
+    return get_caps(img);
 }
+
+lv_res_t lv_img_set_src_ext(lv_obj_t * obj, const lv_img_src_t * src)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_img_t * img = (lv_img_t *)obj;
+
+    lv_obj_invalidate(obj);
+
+    lv_img_src_copy(&img->src, src);
+    return get_caps(img);
+}
+
+
 void lv_img_set_offset_x(lv_obj_t * obj, lv_coord_t x)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
