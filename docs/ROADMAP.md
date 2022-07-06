@@ -50,7 +50,6 @@
  ### Animations
 - [ ] Consider `anim` events to replace many callbacks with one
 - [ ] `lv_anim_time_to_speed` should work differently to remove `style_anim_speed`. E.g. on large values of anim time store the speed.   Besides all widgets should use the `style_anim` property. `anim` should clamp the time if it's calculated from speed, e.g `lv_clamp(200, t, 2000)`. (maybe `a->min_time/max_time`). 
-- [ ] Consider [stagger animations](https://greensock.com/docs/v3/Staggers).
   
 
 ## Planned in general
@@ -86,7 +85,8 @@
 - [ ] Scene support. See [this comment](https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911)
 - [ ] Circle layout. #2871
 - [ ] Variable binding. I.e create properties which can be bound to objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
-
+- [ ] Consider [stagger animations](https://greensock.com/docs/v3/Staggers).
+  
 ## Ideas
 - Consider direct binary font format support
 - Improve groups. [Discussion](https://forum.lvgl.io/t/lv-group-tabindex/2927/3). Reconsider focusing logic. Allow having no widget selected (on web it's possible)
