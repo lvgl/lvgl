@@ -94,7 +94,7 @@ void lv_ime_pinyin_set_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict);
 /**
  * Set mode, 26-key input(k26) or 9-key input(k9).
  * @param obj  pointer to a Pinyin input method object
- * @param mode   the mode from 'lv_keyboard_mode_t'
+ * @param mode   the mode from 'lv_ime_pinyin_mode_t'
  */
 void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode);
 
