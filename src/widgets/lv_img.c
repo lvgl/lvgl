@@ -399,7 +399,7 @@ static lv_res_t get_caps(lv_img_t * img)
 
     if(img->src.type != LV_IMG_SRC_SYMBOL) {
         /*Try to see if we find a decoder that's able to decode the picture. Decoding is delayed until rendering*/
-        lv_img_dec_t * img_dec = lv_img_decoder_accept(&img->src, &img->caps);
+        lv_img_dec_t * img_dec = lv_img_decoder_accept(&img->src, &img->caps, img->dec_ctx ? img->dec_ctx->user_data : NULL);
         if(img_dec == NULL) return LV_RES_INV;
         /*Lie a bit here, we assume we'll be able to decode it later correctly*/
         return LV_RES_OK;
@@ -479,7 +479,7 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     /* If we have captured the context in the animation, we need to release it */
     if(img->dec_ctx && img->dec_ctx->auto_allocated == 0) {
-        lv_img_dec_t * decoder = lv_img_decoder_accept(&img->src, NULL);
+        lv_img_dec_t * decoder = lv_img_decoder_accept(&img->src, NULL, img->dec_ctx->user_data);
         lv_img_dec_dsc_t dsc = { .decoder = decoder, .dec_ctx = img->dec_ctx };
         img->dec_ctx->auto_allocated = 1;
         lv_img_decoder_close(&dsc);

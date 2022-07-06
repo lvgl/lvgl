@@ -32,7 +32,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void set_caps(lv_fs_file_t * f, uint8_t * caps);
-static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
 static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
@@ -86,8 +86,10 @@ void set_caps(lv_fs_file_t * f, uint8_t * caps)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     /*If it's a BMP file...*/
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/

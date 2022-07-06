@@ -105,7 +105,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
 static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
@@ -152,8 +152,10 @@ static void set_caps(uint8_t * caps)
 }
 
 
-static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     /* Read the SJPG/JPG header to assert it's the right format */
     if(src->type == LV_IMG_SRC_VARIABLE) {
         uint8_t * raw_sjpeg_data = (uint8_t *)src->data;

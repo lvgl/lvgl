@@ -58,7 +58,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps);
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
 static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
 
@@ -132,14 +132,10 @@ static lv_res_t init_dec_ctx(rlottiedec_ctx_t * dec_ctx)
     }
     return LV_RES_OK;
 }
-/**
- * Get info about a rlottie image
- * @param src can be file name or pointer to a C array
- * @param header store the info here
- * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
- */
-static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps)
+static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     /*If it's a rlottie json file...*/
     if(src->type == LV_IMG_SRC_FILE) {
         if(!strncmp(src->ext, ".json", 5)) {              /*Check the extension*/
@@ -250,11 +246,6 @@ static void set_desc_size(lv_img_dec_dsc_t * dsc, size_t w, size_t h)
     }
 }
 
-/**
- * Open a rlottie animation image and return the decoded image
- * @param dsc Decoded descriptor for the animation
- * @return LV_RES_OK: no error; LV_RES_INV: can't decode the picture
- */
 static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
 {
     rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->dec_ctx;
@@ -414,8 +405,6 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     return LV_RES_OK;
 }
 
-
-
 static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
                                   lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
@@ -455,10 +444,6 @@ static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
     return LV_RES_OK;
 }
 
-
-/**
- * Free the allocated resources
- */
 static void decoder_close(lv_img_dec_dsc_t * dsc)
 {
     rlottiedec_ctx_t * dec_ctx = (rlottiedec_ctx_t *)dsc->dec_ctx;

@@ -60,7 +60,7 @@ lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc_in, lv_img_head
     return LV_RES_INV;
 }
 
-lv_img_dec_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps)
+lv_img_dec_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data)
 {
     if(src == NULL) return NULL;
 
@@ -70,7 +70,7 @@ lv_img_dec_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps)
         if(d->accept_cb) {
             uint8_t dummy_caps;
             if(caps == NULL) caps = &dummy_caps;
-            res = d->accept_cb(src, caps);
+            res = d->accept_cb(src, caps, user_data);
             if(res == LV_RES_OK) return d;
         }
     }
@@ -92,7 +92,7 @@ lv_res_t lv_img_decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
             /*Accept is required to find the decoder that would accept this*/
             if(decoder->accept_cb == NULL) continue;
 
-            res = decoder->accept_cb(dsc->input.src, &dummy_caps);
+            res = decoder->accept_cb(dsc->input.src, &dummy_caps, dsc->dec_ctx ? dsc->dec_ctx->user_data : NULL);
             if(res == LV_RES_OK) break;
         }
     }

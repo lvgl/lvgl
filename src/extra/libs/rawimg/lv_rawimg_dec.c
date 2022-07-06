@@ -37,7 +37,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_dec_dsc_t * dsc, lv_co
 static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                      lv_coord_t len, uint8_t * buf);
 
-static lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps);
+static lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
 
 static lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
 
@@ -76,8 +76,10 @@ static void init_dec_ctx(lv_img_cf_t cf, uint8_t * caps)
         *caps |= LV_IMG_DEC_TRANSPARENT;
 }
 
-lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps)
+lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data)
 {
+    LV_UNUSED(user_data);
+
     if(src->type == LV_IMG_SRC_VARIABLE) {
         lv_img_cf_t cf = ((lv_img_dsc_t *)src->data)->header.cf;
         if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;

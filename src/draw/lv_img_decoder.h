@@ -74,7 +74,7 @@ struct _lv_img_dec_t;
  * @param caps If provided will the filled with the decoder capabilities
  * @return LV_RES_OK: the decoder can decode the given source; LV_RES_INV: it can't decode the source
  */
-typedef lv_res_t (*lv_img_decoder_accept_f_t)(const lv_img_src_t * src, uint8_t * caps);
+typedef lv_res_t (*lv_img_decoder_accept_f_t)(const lv_img_src_t * src, uint8_t * caps, void * user_data);
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
@@ -200,9 +200,10 @@ lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc, lv_img_header_
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src   the image source.
  * @param caps  If not null, will be filled with the capabilities for the selected decoder
+ * @param user_data     Not used.
  * @return A pointer to the decoder that's able to decode the image or NULL if none found
  */
-lv_img_dec_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps);
+lv_img_dec_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
 
 /**
  * Open an image.
