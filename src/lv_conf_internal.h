@@ -1225,6 +1225,19 @@
     #endif
 #endif
 
+/*Enable drawing placeholders when glyph dsc is not found*/
+#ifndef LV_USE_FONT_PLACEHOLDER
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_FONT_PLACEHOLDER
+            #define LV_USE_FONT_PLACEHOLDER CONFIG_LV_USE_FONT_PLACEHOLDER
+        #else
+            #define LV_USE_FONT_PLACEHOLDER 0
+        #endif
+    #else
+        #define LV_USE_FONT_PLACEHOLDER 1
+    #endif
+#endif
+
 /*=================
  *  TEXT SETTINGS
  *=================*/
@@ -2275,6 +2288,28 @@
             #define LV_IME_PINYIN_CAND_TEXT_NUM 6
         #endif
     #endif
+
+    /*Use 9 key input(k9)*/
+    #ifndef LV_IME_PINYIN_USE_K9_MODE
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_IME_PINYIN_USE_K9_MODE
+                #define LV_IME_PINYIN_USE_K9_MODE CONFIG_LV_IME_PINYIN_USE_K9_MODE
+            #else
+                #define LV_IME_PINYIN_USE_K9_MODE 0
+            #endif
+        #else
+            #define LV_IME_PINYIN_USE_K9_MODE      1
+        #endif
+    #endif
+    #if LV_IME_PINYIN_USE_K9_MODE == 1
+        #ifndef LV_IME_PINYIN_K9_CAND_TEXT_NUM
+            #ifdef CONFIG_LV_IME_PINYIN_K9_CAND_TEXT_NUM
+                #define LV_IME_PINYIN_K9_CAND_TEXT_NUM CONFIG_LV_IME_PINYIN_K9_CAND_TEXT_NUM
+            #else
+                #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
+            #endif
+        #endif
+    #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
 
 /*==================
