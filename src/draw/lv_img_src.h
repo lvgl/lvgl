@@ -130,31 +130,31 @@ void lv_img_src_set_file(lv_img_src_t * obj, const char * file_path);
  */
 void lv_img_src_set_raw(lv_img_src_t * obj, const lv_img_dsc_t * raw);
 
-/** Set the source of the descriptor to a text with any symbol in it
- *  @param src  The src descriptor to fill
+/** Get an image source to a text with any symbol in it
  *  @param symbol An textual strings with symbols
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
 */
 lv_img_src_move_t lv_img_src_from_symbol(const char * symbol);
-/** Set the source of the descriptor to a byte array containing the image encoded data
- *  @param src  The src descriptor to fill
+/** Get an image source to a byte array containing the image encoded data
  *  @param data A pointer to the image's data
  *  @param len  The length pointed by data in bytes
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
 */
 lv_img_src_move_t lv_img_src_from_data(const uint8_t * data, const size_t len);
-/** Set the source of the descriptor to a file
- *  @param src  The src descriptor to fill
+/**Get an image source to a file
  *  @param path Path to the file containing the image
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
  */
 lv_img_src_move_t lv_img_src_from_file(const char * file_path);
-/** Set the source of the descriptor to a file
- *  @param src  The src descriptor to fill
+/** Get an image source to an image descriptor
  *  @param raw  Pointer to a lv_img_dsc_t instance
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
  */
 lv_img_src_move_t lv_img_src_from_raw(const lv_img_dsc_t * raw);
+/** Get an image source to an empty object (no image)
+ *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+ */
+lv_img_src_move_t lv_img_src_empty(void);
 
 
 

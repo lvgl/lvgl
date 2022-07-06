@@ -172,7 +172,7 @@ void lv_demo_widgets(void)
         lv_obj_set_style_pad_left(tab_btns, LV_HOR_RES / 2, 0);
         lv_obj_t * logo = lv_img_create(tab_btns);
         LV_IMG_DECLARE(img_lvgl_logo);
-        lv_img_set_src(logo, &img_lvgl_logo);
+        lv_img_set_src(logo, lv_img_src_from_raw(&img_lvgl_logo));
         lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
         lv_obj_t * label = lv_label_create(tab_btns);
@@ -207,7 +207,7 @@ static void profile_create(lv_obj_t * parent)
 
     LV_IMG_DECLARE(img_demo_widgets_avatar);
     lv_obj_t * avatar = lv_img_create(panel1);
-    lv_img_set_src(avatar, &img_demo_widgets_avatar);
+    lv_img_set_src(avatar, lv_img_src_from_raw(&img_demo_widgets_avatar));
 
     lv_obj_t * name = lv_label_create(panel1);
     lv_label_set_text(name, "Elena Smith");
@@ -1179,7 +1179,9 @@ static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, cons
     lv_obj_set_grid_dsc_array(cont, grid_col_dsc, grid_row_dsc);
 
     lv_obj_t * img = lv_img_create(cont);
-    lv_img_set_src(img, img_src);
+    lv_img_src_t src;
+    lv_img_src_parse(&src, img_src);
+    lv_img_set_src_ext(img, &src);
     lv_obj_set_grid_cell(img, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 2);
 
     lv_obj_t * label;

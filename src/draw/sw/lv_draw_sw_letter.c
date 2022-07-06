@@ -185,7 +185,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
         img_dsc.zoom = LV_IMG_ZOOM_NONE;
         img_dsc.opa = dsc->opa;
         img_dsc.blend_mode = dsc->blend_mode;
-        lv_img_src_t src = { ._fixed_hdr = 0xFF, .type = LV_IMG_SRC_VARIABLE, .data = map_p, .data_len = g->box_w * g->box_h * g->bpp / 8, .ext = 0 };
+        lv_img_src_t src = { .type = LV_IMG_SRC_VARIABLE, .data = map_p, .data_len = g->box_w * g->box_h * g->bpp / 8, .ext = 0 };
         lv_draw_img(draw_ctx, &img_dsc, &fill_area, &src);
         return;
     }

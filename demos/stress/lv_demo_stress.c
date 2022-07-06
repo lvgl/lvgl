@@ -186,8 +186,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
             lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
             lv_win_add_title(obj, "Window title");
-            lv_win_add_btn(obj, LV_SYMBOL_CLOSE, 40);
-            lv_win_add_btn(obj, LV_SYMBOL_DOWN, 40);
+            lv_win_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_CLOSE), 40);
+            lv_win_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_DOWN), 40);
             auto_del(obj, LV_DEMO_STRESS_TIME_STEP * 3 + 5);
 
             obj = lv_calendar_create(lv_win_get_content(obj));
@@ -281,15 +281,15 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             obj = lv_list_create(main_page);
             {
                 lv_obj_t * b;
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "1. Some very long text to scroll");
+                b = lv_list_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_OK), "1. Some very long text to scroll");
                 auto_del(b, 10);
-                lv_list_add_btn(obj, LV_SYMBOL_OK, "2. Some very long text to scroll");
-                lv_list_add_btn(obj, LV_SYMBOL_OK, "3. Some very long text to scroll");
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "4. Some very long text to scroll");
+                lv_list_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_OK), "2. Some very long text to scroll");
+                lv_list_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_OK), "3. Some very long text to scroll");
+                b = lv_list_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_OK), "4. Some very long text to scroll");
                 auto_del(b, LV_DEMO_STRESS_TIME_STEP);
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "5. Some very long text to scroll");
+                b = lv_list_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_OK), "5. Some very long text to scroll");
                 auto_del(b, LV_DEMO_STRESS_TIME_STEP + 90);
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "6. Some very long text to scroll");
+                b = lv_list_add_btn(obj, lv_img_src_from_symbol(LV_SYMBOL_OK), "6. Some very long text to scroll");
                 auto_del(b, LV_DEMO_STRESS_TIME_STEP + 10);
                 lv_obj_scroll_to_view(lv_obj_get_child(obj, -1),  LV_ANIM_ON);
             }

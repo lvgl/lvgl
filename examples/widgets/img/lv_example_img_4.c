@@ -22,7 +22,7 @@ void lv_example_img_4(void)
 
     lv_obj_t * img = lv_img_create(lv_scr_act());
     lv_obj_add_style(img, &style, 0);
-    lv_img_set_src(img, &img_skew_strip);
+    lv_img_set_src(img, lv_img_src_from_raw(&img_skew_strip));
     lv_obj_set_size(img, 150, 100);
     lv_obj_center(img);
 

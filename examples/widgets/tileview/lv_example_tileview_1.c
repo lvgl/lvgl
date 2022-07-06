@@ -33,16 +33,16 @@ void lv_example_tileview_1(void)
     lv_obj_t * list = lv_list_create(tile3);
     lv_obj_set_size(list, LV_PCT(100), LV_PCT(100));
 
-    lv_list_add_btn(list, NULL, "One");
-    lv_list_add_btn(list, NULL, "Two");
-    lv_list_add_btn(list, NULL, "Three");
-    lv_list_add_btn(list, NULL, "Four");
-    lv_list_add_btn(list, NULL, "Five");
-    lv_list_add_btn(list, NULL, "Six");
-    lv_list_add_btn(list, NULL, "Seven");
-    lv_list_add_btn(list, NULL, "Eight");
-    lv_list_add_btn(list, NULL, "Nine");
-    lv_list_add_btn(list, NULL, "Ten");
+    lv_list_add_btn(list, lv_img_src_empty(), "One");
+    lv_list_add_btn(list, lv_img_src_empty(), "Two");
+    lv_list_add_btn(list, lv_img_src_empty(), "Three");
+    lv_list_add_btn(list, lv_img_src_empty(), "Four");
+    lv_list_add_btn(list, lv_img_src_empty(), "Five");
+    lv_list_add_btn(list, lv_img_src_empty(), "Six");
+    lv_list_add_btn(list, lv_img_src_empty(), "Seven");
+    lv_list_add_btn(list, lv_img_src_empty(), "Eight");
+    lv_list_add_btn(list, lv_img_src_empty(), "Nine");
+    lv_list_add_btn(list, lv_img_src_empty(), "Ten");
 
 }
 

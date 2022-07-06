@@ -75,6 +75,7 @@ void set_caps(lv_fs_file_t * f, uint8_t * caps)
     lv_fs_read(f, &bpp, sizeof(bpp), NULL);
     *caps = bpp == 32 ? LV_IMG_DEC_TRANSPARENT : LV_IMG_DEC_DEFAULT;
 #else
+    LV_UNUSED(f);
     *caps = LV_IMG_DEC_DEFAULT;
 #endif
 }

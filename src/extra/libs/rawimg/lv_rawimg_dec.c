@@ -93,7 +93,7 @@ lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, src->data, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) return LV_RES_INV;
-        lv_img_header_t header = {};
+        lv_img_header_t header;
         res = lv_fs_read(&f, &header, sizeof(header), NULL);
         init_dec_ctx(header.cf, caps);
 

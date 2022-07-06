@@ -161,6 +161,14 @@ lv_img_src_move_t lv_img_src_from_raw(const lv_img_dsc_t * raw)
     return obj;
 }
 
+lv_img_src_move_t lv_img_src_empty()
+{
+    lv_img_src_move_t obj;
+    lv_memset(&obj, 0, sizeof(obj));
+    obj._src.type = LV_IMG_SRC_UNKNOWN | _LV_IMG_SRC_MOVABLE;
+    return obj;
+}
+
 void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
 {
     lv_img_src_free(dest);
