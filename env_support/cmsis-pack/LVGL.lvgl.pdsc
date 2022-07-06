@@ -36,10 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-07-05" version="1.0.6" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.6.pack">
-      - LVGL 8.3.0
+    <release date="2022-07-06" version="1.0.6" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.6.pack">
+      - LVGL 8.3.0 release
       - Apply patch for memory leaking issue
       - Apply patch to speed up non normal blend mode
+      - Add 9-key input mode to pinyin
       - Other minor changes
     </release>
     <release date="2022-06-29" version="1.0.5" url="https://github.com/GorgonMeducer/lvgl/raw/922108dbbe6d1c0be1069c342ca8693afee8c169/env_support/cmsis-pack/LVGL.lvgl.1.0.5.pack">
