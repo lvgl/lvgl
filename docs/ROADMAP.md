@@ -12,6 +12,7 @@
 - [ ] Update canvas API (https://github.com/lvgl/lvgl/issues/3393)
 - [ ] `LV_STYLE_PROP_INHERIT` -> `LV_STYLE_PROP_FLAG_INHERITABLE` [LINK](https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769)
 - [ ] Replace `disp_drv->direct_mode/full_refresh` with enum.
+- [ ] Consider flat directory structure. E.g. `extra/widgets` to `widgets`
   
 
 ### Architecture
