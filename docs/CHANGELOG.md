@@ -10,7 +10,7 @@
 - **inherit and initial style properties** Besides setting "normal values" for style properties now you can set them to `inherit` (inherit the parent's value) and `initial` (set the system default). See more [here](https://docs.lvgl.io/master/overview/style.html#forced-value-inheritance-default-value)
 - **NXP-PXP and VGLITE GPU support** The support for NXP GPUs are added again
 - **Color font support** You can use emojis and images in texts with this great new features. See more [here](https://docs.lvgl.io/master/others/imgfont.html).
-- **ARM2D GPU support** Get support for ARM's own GPU.
+- **ARM2D GPU support** Get support for Arm's Microcontroller 2D Graphics Acceleration, e.g. Helium based acceleration, DMA-350 based acceleration etc.
 - **PubSub messaging** A publisher-subscriber based messaging system is added to make communication between components easier. See more [here](https://docs.lvgl.io/master/others/msg.html).
 - **Pinyin IME** Add support for Pinyin IME Chinese input. See more [here](https://docs.lvgl.io/master/others/ime_pinyin.html).
 - **render_start_cb** A new callback is added to `lv_disp_drv_t` to indicate when the rendering starts. It's useful to make synchronization, e.g. wait for a TE signal.
