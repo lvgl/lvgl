@@ -341,6 +341,13 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
     lv_obj_invalidate(obj);
 }
 
+void lv_textarea_set_readonly_mode(lv_obj_t * obj, bool en)
+{
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+    ta->readonly_mode = en;
+    ta->cursor.show = ~en;
+}
+
 void lv_textarea_set_cursor_pos(lv_obj_t * obj, int32_t pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -821,6 +828,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->cursor.click_pos  = 1;
     ta->cursor.valid_x    = 0;
     ta->one_line          = 0;
+    ta->readonly_mode     = 0;
 #if LV_LABEL_TEXT_SELECTION
     ta->text_sel_en = 0;
 #endif
@@ -869,6 +877,9 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
+
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+    if(ta->readonly_mode) return;
 
     if(code == LV_EVENT_FOCUSED) {
         start_cursor_blink(obj);

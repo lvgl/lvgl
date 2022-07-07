@@ -64,6 +64,7 @@ typedef struct {
 #endif
     uint8_t pwd_mode : 1; /*Replace characters with '*'*/
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
+    uint8_t readonly_mode : 1; /*Read only mode*/
 } lv_textarea_t;
 
 extern const lv_obj_class_t lv_textarea_class;
@@ -131,6 +132,13 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt);
  * @param txt       pointer to the text
  */
 void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt);
+
+/**
+ * Enable/Disable read only mode
+ * @param obj       pointer to a text area object
+ * @param en        true: enable, false: disable
+ */
+void lv_textarea_set_readonly_mode(lv_obj_t * obj, bool en);
 
 /**
  * Set the cursor position
