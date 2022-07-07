@@ -132,6 +132,8 @@ void lv_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
+    _lv_async_init();
+
     /*Initialize the screen refresh system*/
     _lv_refr_init();
 

@@ -50,6 +50,11 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data);
  */
 lv_res_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data);
 
+void _lv_async_init(void);
+void _lv_async_after_render(void);
+lv_res_t lv_async_after_render_call(lv_async_cb_t async_xcb, void * user_data);
+lv_res_t lv_async_after_render_call_cancel(lv_async_cb_t async_xcb, void * user_data);
+
 /**********************
  *      MACROS
  **********************/

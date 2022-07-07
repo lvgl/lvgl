@@ -11,6 +11,7 @@
 #include "lv_disp.h"
 #include "../hal/lv_hal_tick.h"
 #include "../hal/lv_hal_disp.h"
+#include "../misc/lv_async.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
@@ -346,6 +347,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         }
     }
 
+    _lv_async_after_render();
     lv_mem_buf_free_all();
     _lv_font_clean_up_fmt_txt();
 
