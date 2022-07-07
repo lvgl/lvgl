@@ -58,7 +58,7 @@ const lv_obj_class_t lv_ime_pinyin_class = {
 
 #if LV_IME_PINYIN_USE_K9_MODE
 static char * lv_btnm_def_pinyin_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 21] = {\
-                                                                                ",\0", "1#\0",  "abc \0", "def\0",  LV_SYMBOL_BACKSPACE"\0", "\n\0",
+                                                                                ",\0", "123\0",  "abc \0", "def\0",  LV_SYMBOL_BACKSPACE"\0", "\n\0",
                                                                                 ".\0", "ghi\0", "jkl\0", "mno\0",  LV_SYMBOL_KEYBOARD"\0", "\n\0",
                                                                                 "?\0", "pqrs\0", "tuv\0", "wxyz\0",  LV_SYMBOL_NEW_LINE"\0", "\n\0",
                                                                                 LV_SYMBOL_LEFT"\0", "\0"
@@ -647,12 +647,13 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
         const char * txt = lv_btnmatrix_get_btn_text(kb, lv_btnmatrix_get_selected_btn(kb));
         if(txt == NULL) return;
 
+        lv_obj_t * ta = lv_keyboard_get_textarea(pinyin_ime->kb);
+
 #if LV_IME_PINYIN_USE_K9_MODE
         if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K9) {
-            lv_obj_t * ta = lv_keyboard_get_textarea(pinyin_ime->kb);
+
             uint16_t tmp_btn_str_len = strlen(pinyin_ime->input_char);
             if((btn_id >= 16) && (tmp_btn_str_len > 0) && (btn_id < (16 + LV_IME_PINYIN_K9_CAND_TEXT_NUM))) {
-                tmp_btn_str_len = strlen(pinyin_ime->input_char);
                 lv_memset_00(pinyin_ime->input_char, sizeof(pinyin_ime->input_char));
                 strcat(pinyin_ime->input_char, txt);
                 pinyin_input_proc(obj);
@@ -703,21 +704,32 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 #endif
             }
         }
-        else if((strcmp(txt, "ABC") == 0) || (strcmp(txt, "abc") == 0) || (strcmp(txt, "1#") == 0)) {
+        else if((strcmp(txt, "ABC") == 0) || (strcmp(txt, "abc") == 0) || (strcmp(txt, "1#") == 0) ||
+                (strcmp(txt, LV_SYMBOL_OK) == 0)) {
             pinyin_ime_clear_data(obj);
             return;
+        }
+        else if(strcmp(txt, "123") == 0) {
+            for(uint16_t i = 0; i < strlen(txt); i++)
+                lv_textarea_del_char(ta);
+
+            pinyin_ime_clear_data(obj);
+            lv_textarea_set_cursor_pos(ta, LV_TEXTAREA_CURSOR_LAST);
+            lv_ime_pinyin_set_mode(obj, LV_IME_PINYIN_MODE_K9_NUMBER);
+            lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_NUMBER);
+            lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
         }
         else if(strcmp(txt, LV_SYMBOL_KEYBOARD) == 0) {
             if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K26) {
                 lv_ime_pinyin_set_mode(obj, LV_IME_PINYIN_MODE_K9);
             }
-            else {
+            else if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K9) {
                 lv_ime_pinyin_set_mode(obj, LV_IME_PINYIN_MODE_K26);
                 lv_keyboard_set_mode(pinyin_ime->kb, LV_KEYBOARD_MODE_TEXT_LOWER);
             }
-            pinyin_ime_clear_data(obj);
-        }
-        else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
+            else if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K9_NUMBER) {
+                lv_ime_pinyin_set_mode(obj, LV_IME_PINYIN_MODE_K9);
+            }
             pinyin_ime_clear_data(obj);
         }
         else if((pinyin_ime->mode == LV_IME_PINYIN_MODE_K26) && ((txt[0] >= 'a' && txt[0] <= 'z') || (txt[0] >= 'A' &&
@@ -939,7 +951,6 @@ static char * pinyin_search_matching(lv_obj_t * obj, char * py_str, uint16_t * c
 static void pinyin_ime_clear_data(lv_obj_t * obj)
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
-
 
 #if LV_IME_PINYIN_USE_K9_MODE
     if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K9) {
