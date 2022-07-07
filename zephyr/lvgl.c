@@ -21,6 +21,7 @@
 LOG_MODULE_REGISTER(lvgl);
 
 static lv_disp_drv_t disp_drv;
+struct lvgl_disp_data disp_data;
 #ifdef CONFIG_LV_Z_POINTER_KSCAN
 static lv_indev_drv_t indev_drv;
 #endif /* CONFIG_LV_Z_POINTER_KSCAN */
@@ -89,21 +90,19 @@ static void lvgl_log(const char *buf)
 
 static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 {
-	struct display_capabilities cap;
-	const struct device *display_dev = (const struct device *)disp_drv->user_data;
+	struct lvgl_disp_data *data =
+		(struct lvgl_disp_data *)disp_drv->user_data;
 	int err = 0;
 
-	display_get_capabilities(display_dev, &cap);
-
-	if (cap.x_resolution <= DISPLAY_WIDTH) {
-		disp_drv->hor_res = cap.x_resolution;
+	if (data->cap.x_resolution <= DISPLAY_WIDTH) {
+		disp_drv->hor_res = data->cap.x_resolution;
 	} else {
 		LOG_ERR("Horizontal resolution is larger than maximum");
 		err = -ENOTSUP;
 	}
 
-	if (cap.y_resolution <= DISPLAY_HEIGHT) {
-		disp_drv->ver_res = cap.y_resolution;
+	if (data->cap.y_resolution <= DISPLAY_HEIGHT) {
+		disp_drv->ver_res = data->cap.y_resolution;
 	} else {
 		LOG_ERR("Vertical resolution is larger than maximum");
 		err = -ENOTSUP;
@@ -127,13 +126,11 @@ static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 	void *buf1 = NULL;
 	uint16_t buf_nbr_pixels;
 	uint32_t buf_size;
-	struct display_capabilities cap;
-	const struct device *display_dev = (const struct device *)disp_drv->user_data;
+	struct lvgl_disp_data *data =
+		(struct lvgl_disp_data *)disp_drv->user_data;
 
-	display_get_capabilities(display_dev, &cap);
-
-	disp_drv->hor_res = cap.x_resolution;
-	disp_drv->ver_res = cap.y_resolution;
+	disp_drv->hor_res = data->cap.x_resolution;
+	disp_drv->ver_res = data->cap.y_resolution;
 
 	buf_nbr_pixels = (CONFIG_LV_Z_VDB_SIZE * disp_drv->hor_res *
 			disp_drv->ver_res) / 100;
@@ -142,7 +139,7 @@ static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 		buf_nbr_pixels = disp_drv->hor_res;
 	}
 
-	switch (cap.current_pixel_format) {
+	switch (data->cap.current_pixel_format) {
 	case PIXEL_FORMAT_ARGB_8888:
 		buf_size = 4 * buf_nbr_pixels;
 		break;
@@ -211,8 +208,8 @@ static void lvgl_pointer_kscan_callback(const struct device *dev,
 static void lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 {
 	lv_disp_t *disp;
-	const struct device *disp_dev;
-	struct display_capabilities cap;
+	struct lvgl_disp_data *disp_data;
+	struct display_capabilities *cap;
 	lv_indev_data_t curr;
 
 	static lv_indev_data_t prev = {
@@ -228,9 +225,8 @@ static void lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 	prev = curr;
 
 	disp = lv_disp_get_default();
-	disp_dev = disp->driver->user_data;
-
-	display_get_capabilities(disp_dev, &cap);
+	disp_data = disp->driver->user_data;
+	cap = &disp_data->cap;
 
 	/* adjust kscan coordinates */
 	if (IS_ENABLED(CONFIG_LV_Z_POINTER_KSCAN_SWAP_XY)) {
@@ -242,38 +238,38 @@ static void lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 	}
 
 	if (IS_ENABLED(CONFIG_LV_Z_POINTER_KSCAN_INVERT_X)) {
-		if (cap.current_orientation == DISPLAY_ORIENTATION_NORMAL ||
-		    cap.current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
-			prev.point.x = cap.x_resolution - prev.point.x;
+		if (cap->current_orientation == DISPLAY_ORIENTATION_NORMAL ||
+		    cap->current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
+			prev.point.x = cap->x_resolution - prev.point.x;
 		} else {
-			prev.point.x = cap.y_resolution - prev.point.x;
+			prev.point.x = cap->y_resolution - prev.point.x;
 		}
 	}
 
 	if (IS_ENABLED(CONFIG_LV_Z_POINTER_KSCAN_INVERT_Y)) {
-		if (cap.current_orientation == DISPLAY_ORIENTATION_NORMAL ||
-		    cap.current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
-			prev.point.y = cap.y_resolution - prev.point.y;
+		if (cap->current_orientation == DISPLAY_ORIENTATION_NORMAL ||
+		    cap->current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
+			prev.point.y = cap->y_resolution - prev.point.y;
 		} else {
-			prev.point.y = cap.x_resolution - prev.point.y;
+			prev.point.y = cap->x_resolution - prev.point.y;
 		}
 	}
 
 	/* rotate touch point to match display rotation */
-	if (cap.current_orientation == DISPLAY_ORIENTATION_ROTATED_90) {
+	if (cap->current_orientation == DISPLAY_ORIENTATION_ROTATED_90) {
 		lv_coord_t x;
 
 		x = prev.point.x;
 		prev.point.x = prev.point.y;
-		prev.point.y = cap.y_resolution - x;
-	} else if (cap.current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
-		prev.point.x = cap.x_resolution - prev.point.x;
-		prev.point.y = cap.y_resolution - prev.point.y;
-	} else if (cap.current_orientation == DISPLAY_ORIENTATION_ROTATED_270) {
+		prev.point.y = cap->y_resolution - x;
+	} else if (cap->current_orientation == DISPLAY_ORIENTATION_ROTATED_180) {
+		prev.point.x = cap->x_resolution - prev.point.x;
+		prev.point.y = cap->y_resolution - prev.point.y;
+	} else if (cap->current_orientation == DISPLAY_ORIENTATION_ROTATED_270) {
 		lv_coord_t x;
 
 		x = prev.point.x;
-		prev.point.x = cap.x_resolution - prev.point.y;
+		prev.point.x = cap->x_resolution - prev.point.y;
 		prev.point.y = x;
 	}
 
@@ -281,15 +277,15 @@ static void lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
     if (prev.point.x <= 0) {
         prev.point.x = 0;
     }
-    else if (prev.point.x >= cap.x_resolution) {
-        prev.point.x = cap.x_resolution - 1;
+    else if (prev.point.x >= cap->x_resolution) {
+        prev.point.x = cap->x_resolution - 1;
     }
 
     if (prev.point.y <= 0) {
         prev.point.y = 0;
     }
-    else if (prev.point.y >= cap.y_resolution) {
-        prev.point.y = cap.y_resolution - 1;
+    else if (prev.point.y >= cap->y_resolution) {
+        prev.point.y = cap->y_resolution - 1;
     }
 
 set_and_release:
@@ -350,8 +346,11 @@ static int lvgl_init(const struct device *dev)
 	lvgl_fs_init();
 #endif
 
+	disp_data.display_dev = display_dev;
+	display_get_capabilities(display_dev, &disp_data.cap);
+
 	lv_disp_drv_init(&disp_drv);
-	disp_drv.user_data = (void *) display_dev;
+	disp_drv.user_data = (void *)&disp_data;
 
 	err = lvgl_allocate_rendering_buffers(&disp_drv);
 	if (err != 0) {

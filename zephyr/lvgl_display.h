@@ -14,6 +14,11 @@
 extern "C" {
 #endif
 
+struct lvgl_disp_data {
+	const struct device *display_dev;
+	struct display_capabilities cap;
+};
+
 void lvgl_flush_cb_mono(lv_disp_drv_t *disp_drv,
 		const lv_area_t *area, lv_color_t *color_p);
 void lvgl_flush_cb_16bit(lv_disp_drv_t *disp_drv,

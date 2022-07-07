@@ -9,12 +9,10 @@
 int set_lvgl_rendering_cb(lv_disp_drv_t *disp_drv)
 {
 	int err = 0;
-	const struct device *display_dev = (const struct device *)disp_drv->user_data;
-	struct display_capabilities cap;
+	struct lvgl_disp_data *data =
+		(struct lvgl_disp_data *)disp_drv->user_data;
 
-	display_get_capabilities(display_dev, &cap);
-
-	switch (cap.current_pixel_format) {
+	switch (data->cap.current_pixel_format) {
 	case PIXEL_FORMAT_ARGB_8888:
 		disp_drv->flush_cb = lvgl_flush_cb_32bit;
 		disp_drv->rounder_cb = NULL;
