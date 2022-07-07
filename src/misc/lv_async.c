@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_async.h"
+#include "lv_assert.h"
 #include "lv_gc.h"
 #include "lv_mem.h"
 #include "lv_timer.h"
@@ -109,12 +110,14 @@ void _lv_async_after_render(void)
     _LV_LL_READ(&LV_GC_ROOT(_lv_async_ll), info) {
         info->cb(info->user_data);
     }
+
     _lv_ll_clear(&LV_GC_ROOT(_lv_async_ll));
 }
 
 lv_res_t lv_async_after_render_call(lv_async_cb_t async_xcb, void * user_data)
 {
     lv_async_info_t * info = _lv_ll_ins_tail(&LV_GC_ROOT(_lv_async_ll));
+    LV_ASSERT_MALLOC(info);
 
     if(info == NULL) {
         return LV_RES_INV;

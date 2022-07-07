@@ -50,9 +50,28 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data);
  */
 lv_res_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data);
 
+/**
+ * Initialize async call.
+ */
 void _lv_async_init(void);
+
+/**
+ * Asynchronous call after rendering.
+ */
 void _lv_async_after_render(void);
+
+/**
+ * Call an asynchronous function after next render.
+ * @param async_xcb a callback which is the task itself.
+ * @param user_data custom parameter
+ */
 lv_res_t lv_async_after_render_call(lv_async_cb_t async_xcb, void * user_data);
+
+/**
+ * Cancel calling the async function after the next render.
+ * @param async_xcb a callback which is the task itself.
+ * @param user_data custom parameter
+ */
 lv_res_t lv_async_after_render_call_cancel(lv_async_cb_t async_xcb, void * user_data);
 
 /**********************
