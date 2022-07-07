@@ -61,7 +61,7 @@ typedef struct {
     uint16_t py_page;           /* Current pinyin map pages(k26) */
     uint16_t py_num[26];        /* Number and length of Pinyin */
     uint16_t py_pos[26];        /* Pinyin position */
-    uint8_t  mode : 1;          /* Set mode, 1: 26-key input(k26), 0: 9-key input(k9). Default: 1. */
+    lv_ime_pinyin_mode_t  mode; /* Set mode, 1: 26-key input(k26), 0: 9-key input(k9). Default: 1. */
 } lv_ime_pinyin_t;
 
 /***********************
@@ -141,5 +141,4 @@ lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj);
 #endif
 
 #endif /*LV_USE_IME_PINYIN*/
-
 
