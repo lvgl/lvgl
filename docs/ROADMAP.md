@@ -7,13 +7,13 @@
 - [ ] `lv_img_set_src()` use "type-aware" parameter. See [here](https://github.com/lvgl/lvgl/tree/arch/img-decode-rework)
 - [ ] Rename `LV_IMG_CF_TRUE_COLOR_*` to `LV_IMG_CF_RGB/RGBA`etc
 - [ ] `angle` ->`rotation`, `zoom` -> `scale`
-- [ ] More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/alpha`, `scr/screen`, `finsh/complete`
+- [ ] More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/alpha`, `scr/screen`, `finished/complete/completed/ready`
 - [ ] Reconsider the use of `has`, `is`, `enable` "action" keywords
 - [ ] Update canvas API (https://github.com/lvgl/lvgl/issues/3393)
 - [ ] `LV_STYLE_PROP_INHERIT` -> `LV_STYLE_PROP_FLAG_INHERITABLE` [LINK](https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769)
 - [ ] Replace `disp_drv->direct_mode/full_refresh` with enum.
 - [ ] Consider flat directory structure. E.g. `extra/widgets` to `widgets`
-- [ ] Rename `disp_drv->monitor_cb` to `render_completed` or `render_finished` 
+- [ ] Rename `disp_drv->monitor_cb` to `render_completed/finished/ready` 
 
 ### Architecture
 - [ ] Consider merging `lv_disp_t`, `lv_disp_drv_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
