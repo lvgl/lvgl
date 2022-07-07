@@ -1,4 +1,8 @@
+
 <h1 align="center"> LVGL - Light and Versatile Graphics Library</h1>
+
+**IMPORTANT NOTE** The next major version (v9.0.0) is developed in the master branch. 
+The last stable version is available in the [release/v8.3](https://github.com/lvgl/lvgl/tree/release/v8.3) branch.
 
 <p align="center">
 <img src="https://lvgl.io/assets/images/lvgl_widgets_demo.gif">
