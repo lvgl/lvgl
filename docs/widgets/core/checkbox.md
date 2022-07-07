@@ -30,6 +30,8 @@ lv_obj_clear_state(cb, LV_STATE_CHECKED); /*MAke the checkbox unchecked*/
 lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /*Make the checkbox checked and disabled*/
 ```
 
+To get whether the checkbox is cehcked or not use: `lv_obj_has_state(cb, LV_STATE_CHECKED)`.
+
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when the checkbox is toggled.
 - `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following types:
