@@ -56,6 +56,9 @@ If `lv_textarea_set_cursor_click_pos(textarea, true)` is applied the cursor will
 ### Hide the cursor
 The cursor is always visible, however it can be a good idea to style it to be visible only in `LV_STATE_FOCUSED` state.
 
+### Read-only mode
+The text area can be configured to be a read-only mode with `lv_textarea_set_readonly_mode(textarea, true)`.
+
 ### One line mode
 The Text area can be configured to be on a single line with `lv_textarea_set_one_line(textarea, true)`.
 In this mode the height is set automatically to show only one line, line break characters are ignored, and word wrap is disabled.
