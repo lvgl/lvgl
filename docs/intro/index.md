@@ -98,15 +98,16 @@ The changes are recorded in [CHANGELOG.md](/CHANGELOG).
 Before v8 the last minor release of each major series was supported for 1 year.
 Starting from v8, every minor release is supported for 1 year.
 
-| Version | Release date | Support end | Active |
-|---------|--------------|-------------|--------|
-| v5.3    | Feb 1, 2019  |Feb 1, 2020  | No     |
-| v6.1    | Nov 26, 2019 |Nov 26, 2020 | No     |
-| v7.11   | Mar 16, 2021 |Mar 16, 2022 | No     |
-| v8.0    | 1 Jun, 2021  |1 Jun, 2022  | Yes    |
-| v8.1    | 10 Nov, 2021 |10 Nov, 2022 | Yes    |
-| v8.2    | 31 Jan, 2022 |31 Jan, 2023 | Yes    |
-| v8.3    | In progress  |             |        |
+| Version | Release date | Support end  | Active |
+| ------- | ------------ | ------------ | ------ |
+| v5.3    | Feb 1, 2019  | Feb 1, 2020  | No     |
+| v6.1    | Nov 26, 2019 | Nov 26, 2020 | No     |
+| v7.11   | Mar 16, 2021 | Mar 16, 2022 | No     |
+| v8.0    | 1 Jun, 2021  | 1 Jun, 2022  | No     |
+| v8.1    | 10 Nov, 2021 | 10 Nov, 2022 | Yes    |
+| v8.2    | 31 Jan, 2022 | 31 Jan, 2023 | Yes    |
+| v8.3    | 6 July, 2022 | 6 July, 2023 | Yes    |
+| v9.0    | In progress  |              |        |
 
 ## FAQ
 
@@ -123,7 +124,7 @@ Every MCU which is capable of driving a display via parallel port, SPI, RGB inte
 
 This includes:
 - "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, dsPIC33, PIC32, SWM341 etc.
-- Bluetooth, GSM, Wi-Fi modules like Nordic NRF and Espressif ESP32
+- Bluetooth, GSM, Wi-Fi modules like Nordic NRF, Espressif ESP32 and Raspberry Pi Pico W
 - Linux with frame buffer device such as /dev/fb0. This includes Single-board computers like the Raspberry Pi
 - Anything else with a strong enough MCU and a peripheral to drive a display
 

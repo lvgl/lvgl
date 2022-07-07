@@ -100,6 +100,7 @@ Just to mention some platforms:
 - Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 - [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
 - [Raspberry Pi](https://github.com/lvgl/lv_port_linux_frame_buffer)
+- [Raspberry Pi Pico](https://github.com/lvgl/lv_port_raspberry_pi_pico_mdk)
 - [Espressif ESP32](https://github.com/lvgl/lv_port_esp32)
 - [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
 - Nordic NRF52 Bluetooth modules
@@ -114,6 +115,7 @@ LVGL is also available as:
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
 - [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/os/rt-thread.html)
+- CMSIS-Pack
 
 
 ## Get started
