@@ -48,38 +48,6 @@ typedef struct {
  **********************/
 
 /**
- * Initialize the dyn_mem module (work memory and other variables)
- */
-void lv_mem_init(void);
-
-/**
- * Clean up the memory buffer which frees all the allocated memories.
- * @note It work only if `LV_MEM_CUSTOM == 0`
- */
-void lv_mem_deinit(void);
-
-
-void * lv_builtin_malloc(size_t size);
-void * lv_builtin_realloc(void * p, size_t new_size);
-void lv_builtin_free(void * p);
-
-/**
- * Same as `memcpy` but optimized for 4 byte operation.
- * @param dst pointer to the destination buffer
- * @param src pointer to the source buffer
- * @param len number of byte to copy
- */
-LV_ATTRIBUTE_FAST_MEM void * lv_builtin_memcpy(void * dst, const void * src, size_t len);
-
-/**
- * Same as `memset` but optimized for 4 byte operation.
- * @param dst pointer to the destination buffer
- * @param v value to set [0..255]
- * @param len number of byte to set
- */
-LV_ATTRIBUTE_FAST_MEM void lv_builtin_memset(void * dst, uint8_t v, size_t len);
-
-/**
  * Allocate a memory dynamically
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
@@ -114,18 +82,9 @@ lv_res_t lv_mem_test(void);
  */
 void lv_mem_monitor(lv_mem_monitor_t * mon_p);
 
-//! @cond Doxygen_Suppress
+void * lv_memcpy(void * dst, const void * src, size_t len);
 
-
-static inline void * lv_memcpy(void * dst, const void * src, size_t len)
-{
-    return LV_MEMCPY(dst, src, len);
-}
-
-static inline  void lv_memset(void * dst, uint8_t v, size_t len)
-{
-    return LV_MEMSET(dst, v, len);
-}
+void lv_memset(void * dst, uint8_t v, size_t len);
 
 /**
  * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.

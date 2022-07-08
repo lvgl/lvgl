@@ -21,6 +21,9 @@
 #include "../misc/lv_gc.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
+#if LV_USE_BUILTIN_MALLOC
+    #include "../misc/lv_mem_builtin.h"
+#endif
 #include "../hal/lv_hal.h"
 #include "../extra/lv_extra.h"
 #include <stdint.h>
@@ -102,8 +105,9 @@ void lv_init(void)
     LV_LOG_INFO("begin");
 
     /*Initialize the misc modules*/
-    lv_mem_init();
-
+#if LV_USE_BUILTIN_MALLOC
+    lv_mem_init_builtin();
+#endif
     _lv_timer_core_init();
 
     _lv_fs_init();
@@ -190,7 +194,10 @@ void lv_deinit(void)
     _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
-    lv_mem_deinit();
+
+#if LV_USE_BUILTIN_MALLOC
+    lv_mem_deinit_builtin();
+#endif
     lv_initialized = false;
 
     LV_LOG_INFO("lv_deinit done");
