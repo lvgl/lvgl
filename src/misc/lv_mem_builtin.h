@@ -58,6 +58,10 @@ LV_ATTRIBUTE_FAST_MEM void * lv_memcpy_builtin(void * dst, const void * src, siz
  */
 LV_ATTRIBUTE_FAST_MEM void lv_memset_builtin(void * dst, uint8_t v, size_t len);
 
+size_t lv_strlen_builtin(const char * str);
+
+size_t lv_strncpy_builtin(char * dst, size_t dest_size, const char * src);;
+
 /**
  *
  * @return

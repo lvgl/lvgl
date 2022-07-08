@@ -69,6 +69,27 @@ void lv_free(void * data);
  */
 void * lv_realloc(void * data_p, size_t new_size);
 
+
+void * lv_memcpy(void * dst, const void * src, size_t len);
+
+void lv_memset(void * dst, uint8_t v, size_t len);
+
+/**
+ * Same as `memset(dst, 0x00, len)`.
+ * @param dst pointer to the destination buffer
+ * @param len number of byte to set
+ */
+static inline void lv_memzero(void * dst, size_t len)
+{
+    lv_memset(dst, 0x00, len);
+}
+
+size_t lv_strlenn(const char * str);
+
+size_t lv_strncpy(char * dst, size_t dest_size, const char * src);
+
+
+
 /**
  *
  * @return
@@ -81,20 +102,6 @@ lv_res_t lv_mem_test(void);
  *              the result of the analysis will be stored here
  */
 void lv_mem_monitor(lv_mem_monitor_t * mon_p);
-
-void * lv_memcpy(void * dst, const void * src, size_t len);
-
-void lv_memset(void * dst, uint8_t v, size_t len);
-
-/**
- * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.
- * @param dst pointer to the destination buffer
- * @param len number of byte to set
- */
-static inline void lv_memzero(void * dst, size_t len)
-{
-    lv_memset(dst, 0x00, len);
-}
 
 /**********************
  *      MACROS

@@ -242,6 +242,24 @@ LV_ATTRIBUTE_FAST_MEM void lv_memset_builtin(void * dst, uint8_t v, size_t len)
     }
 }
 
+size_t lv_strlen_builtin(const char * str)
+{
+    size_t i = 0;
+    while(str[i]) i++;
+
+    return i + 1;
+}
+
+size_t lv_strncpy_builtin(char * dst, size_t dest_size, const char * src)
+{
+    size_t i;
+    for(i = 0; i < dest_size - 1 && *src; i++) {
+        dst[i] = src[i];
+    }
+    dst[i] = '\0';
+    return i;
+}
+
 lv_res_t lv_mem_test_builtin(void)
 {
     if(lv_tlsf_check(tlsf)) {

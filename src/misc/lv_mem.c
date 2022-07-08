@@ -138,6 +138,16 @@ void lv_memset(void * dst, uint8_t v, size_t len)
     return LV_MEMSET(dst, v, len);
 }
 
+size_t lv_strlen(const char * str)
+{
+    return LV_STRLEN(str);
+}
+
+size_t lv_strncpy(char * dst, size_t dest_size, const char * src)
+{
+    return LV_STRNCPY(dst, dest_size, src);
+}
+
 lv_res_t lv_mem_test(void)
 {
     if(zero_mem != ZERO_MEM_SENTINEL) {
