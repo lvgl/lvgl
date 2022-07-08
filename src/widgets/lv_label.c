@@ -393,7 +393,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     pos->y = y;
 
 #if LV_USE_BIDI
-    if(mutable_bidi_txt) lv_mem_buf_release(mutable_bidi_txt);
+    if(mutable_bidi_txt) lv_mem_free(mutable_bidi_txt);
 #endif
 }
 
@@ -447,7 +447,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     }
 
 #if LV_USE_BIDI
-    bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
+    bidi_txt = lv_mem_alloc(new_line_start - line_start + 1);
     uint32_t txt_len = new_line_start - line_start;
     if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
     _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), NULL, 0);
@@ -513,7 +513,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
                                                txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), cid, &is_rtl);
         if(is_rtl) logical_pos++;
     }
-    lv_mem_buf_release(bidi_txt);
+    lv_mem_free(bidi_txt);
 #else
     logical_pos = _lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif

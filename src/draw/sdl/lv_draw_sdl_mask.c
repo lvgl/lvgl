@@ -8,7 +8,7 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "../../misc/lv_gc.h"
 #include "lv_draw_sdl_mask.h"
@@ -46,7 +46,7 @@ lv_opa_t * lv_draw_sdl_mask_dump_opa(const lv_area_t * coords, const int16_t * i
     SDL_assert(coords->x2 >= coords->x1);
     SDL_assert(coords->y2 >= coords->y1);
     lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
-    lv_opa_t * mask_buf = lv_mem_buf_get(w * h);
+    lv_opa_t * mask_buf = lv_mem_alloc(w * h);
     for(lv_coord_t y = 0; y < h; y++) {
         lv_opa_t * line_buf = &mask_buf[y * w];
         lv_memset_ff(line_buf, w);
@@ -71,7 +71,7 @@ SDL_Texture * lv_draw_sdl_mask_dump_texture(SDL_Renderer * renderer, const lv_ar
     lv_coord_t w = lv_area_get_width(coords), h = lv_area_get_height(coords);
     lv_opa_t * mask_buf = lv_draw_sdl_mask_dump_opa(coords, ids, ids_count);
     SDL_Surface * surface = lv_sdl_create_opa_surface(mask_buf, w, h, w);
-    lv_mem_buf_release(mask_buf);
+    lv_mem_free(mask_buf);
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
     return texture;
@@ -81,4 +81,4 @@ SDL_Texture * lv_draw_sdl_mask_dump_texture(SDL_Renderer * renderer, const lv_ar
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

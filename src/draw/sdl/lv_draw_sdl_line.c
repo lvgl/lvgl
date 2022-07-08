@@ -8,7 +8,7 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "lv_draw_sdl.h"
 #include "lv_draw_sdl_utils.h"
@@ -151,4 +151,4 @@ static SDL_Texture * line_texture_create(lv_draw_sdl_ctx_t * sdl_ctx, const lv_d
     return texture;
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

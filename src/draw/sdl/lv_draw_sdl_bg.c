@@ -9,7 +9,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "../lv_draw_rect.h"
 #include "../lv_draw_img.h"
@@ -103,4 +103,4 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
     lv_draw_rect((lv_draw_ctx_t *) ctx, dsc, coords);
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

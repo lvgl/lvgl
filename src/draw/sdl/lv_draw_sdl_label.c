@@ -9,9 +9,9 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DARW_SDL_INCLUDE_PATH
 
 #include "../lv_draw_label.h"
 #include "../../misc/lv_utils.h"
@@ -173,4 +173,4 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
     return key;
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

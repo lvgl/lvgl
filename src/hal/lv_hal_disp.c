@@ -109,7 +109,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_nxp_ctx_init;
     driver->draw_ctx_deinit = lv_draw_nxp_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_nxp_ctx_t);
-#elif LV_USE_GPU_SDL
+#elif LV_USE_DRAW_SDL
     driver->draw_ctx_init = lv_draw_sdl_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
@@ -183,7 +183,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh timer*/
-    disp->refr_timer = lv_timer_create(_lv_disp_refr_timer, LV_DISP_DEF_REFR_PERIOD, disp);
+    disp->refr_timer = lv_timer_create(_lv_disp_refr_timer, LV_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MALLOC(disp->refr_timer);
     if(disp->refr_timer == NULL) {
         lv_mem_free(disp);
@@ -196,11 +196,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     }
 
     disp->bg_color = lv_color_white();
-#if LV_COLOR_SCREEN_TRANSP
-    disp->bg_opa = LV_OPA_TRANSP;
-#else
     disp->bg_opa = LV_OPA_COVER;
-#endif
 
 #if LV_USE_THEME_DEFAULT
     if(lv_theme_default_is_inited() == false) {

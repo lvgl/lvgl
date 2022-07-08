@@ -350,7 +350,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-        lv_memcpy_small(&user_data->f, &f, sizeof(f));
+        lv_memcpy(&user_data->f, &f, sizeof(f));
     }
     else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         /*The variables should have valid data*/
@@ -594,7 +594,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
     }
 
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-    uint8_t * fs_buf = lv_mem_buf_get(w);
+    uint8_t * fs_buf = lv_mem_alloc(w);
     if(fs_buf == NULL) return LV_RES_INV;
 
     const uint8_t * data_tmp = NULL;
@@ -621,7 +621,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
             data_tmp++;
         }
     }
-    lv_mem_buf_release(fs_buf);
+    lv_mem_free(fs_buf);
     return LV_RES_OK;
 }
 
@@ -663,7 +663,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
-    uint8_t * fs_buf = lv_mem_buf_get(w);
+    uint8_t * fs_buf = lv_mem_alloc(w);
     if(fs_buf == NULL) return LV_RES_INV;
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
@@ -700,6 +700,6 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
             data_tmp++;
         }
     }
-    lv_mem_buf_release(fs_buf);
+    lv_mem_free(fs_buf);
     return LV_RES_OK;
 }

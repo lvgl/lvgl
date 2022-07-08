@@ -10,7 +10,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "lv_draw_sdl.h"
 #include "lv_draw_sdl_utils.h"
@@ -100,4 +100,4 @@ SDL_Texture * lv_draw_sdl_create_screen_texture(SDL_Renderer * renderer, lv_coor
  *   STATIC FUNCTIONS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

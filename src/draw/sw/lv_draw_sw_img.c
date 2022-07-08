@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw.h"
+#if LV_USE_DRAW_SW
+
 #include "../lv_img_cache.h"
 #include "../../hal/lv_hal_disp.h"
 #include "../../misc/lv_log.h"
@@ -120,8 +122,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
         /*Create buffers and masks*/
         uint32_t buf_size = buf_w * buf_h;
 
-        lv_color_t * rgb_buf = lv_mem_buf_get(buf_size * sizeof(lv_color_t));
-        lv_opa_t * mask_buf = lv_mem_buf_get(buf_size);
+        lv_color_t * rgb_buf = lv_mem_alloc(buf_size * sizeof(lv_color_t));
+        lv_opa_t * mask_buf = lv_mem_alloc(buf_size);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
@@ -159,7 +161,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                     rgb_buf[i] = lv_color_mix_premult(premult_v, rgb_buf[i], recolor_opa);
                 }
             }
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
             /*Apply the masks if any*/
             if(mask_any) {
                 lv_coord_t y;
@@ -189,8 +191,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
             if(blend_area.y2 > y_last) blend_area.y2 = y_last;
         }
 
-        lv_mem_buf_release(mask_buf);
-        lv_mem_buf_release(rgb_buf);
+        lv_mem_free(mask_buf);
+        lv_mem_free(rgb_buf);
     }
 }
 
@@ -295,3 +297,5 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
         }
     }
 }
+
+#endif /*LV_USE_DRAW_SW*/

@@ -985,7 +985,7 @@ static void pwd_char_hider(lv_obj_t * obj)
 
     const char * bullet = lv_textarea_get_password_bullet(obj);
     const size_t bullet_len = strlen(bullet);
-    char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
+    char * txt_tmp = lv_mem_alloc(enc_len * bullet_len + 1);
 
     uint32_t i;
     for(i = 0; i < enc_len; i++) {
@@ -994,7 +994,7 @@ static void pwd_char_hider(lv_obj_t * obj)
     txt_tmp[i * bullet_len] = '\0';
 
     lv_label_set_text(ta->label, txt_tmp);
-    lv_mem_buf_release(txt_tmp);
+    lv_mem_free(txt_tmp);
 
     refr_cursor_area(obj);
 }

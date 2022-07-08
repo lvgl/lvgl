@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_assert.h"
@@ -231,7 +231,7 @@ void lv_draw_mask_free_param(void * p)
 void _lv_draw_mask_cleanup(void)
 {
     uint8_t i;
-    for(i = 0; i < LV_CIRCLE_CACHE_SIZE; i++) {
+    for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
         if(LV_GC_ROOT(_lv_circle_cache[i]).buf) {
             lv_mem_free(LV_GC_ROOT(_lv_circle_cache[i]).buf);
         }
@@ -493,7 +493,7 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
     uint32_t i;
 
     /*Try to reuse a circle cache entry*/
-    for(i = 0; i < LV_CIRCLE_CACHE_SIZE; i++) {
+    for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
         if(LV_GC_ROOT(_lv_circle_cache[i]).radius == radius) {
             LV_GC_ROOT(_lv_circle_cache[i]).used_cnt++;
             CIRCLE_CACHE_AGING(LV_GC_ROOT(_lv_circle_cache[i]).life, radius);
@@ -504,7 +504,7 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
 
     /*If not found find a free entry with lowest life*/
     _lv_draw_mask_radius_circle_dsc_t * entry = NULL;
-    for(i = 0; i < LV_CIRCLE_CACHE_SIZE; i++) {
+    for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
         if(LV_GC_ROOT(_lv_circle_cache[i]).used_cnt == 0) {
             if(!entry) entry = &LV_GC_ROOT(_lv_circle_cache[i]);
             else if(LV_GC_ROOT(_lv_circle_cache[i]).life < entry->life) entry = &LV_GC_ROOT(_lv_circle_cache[i]);
@@ -1384,7 +1384,7 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
         return;
     }
 
-    lv_coord_t * cir_x = lv_mem_buf_get((radius + 1) * 2 * 2 * sizeof(lv_coord_t));
+    lv_coord_t * cir_x = lv_mem_alloc((radius + 1) * 2 * 2 * sizeof(lv_coord_t));
     lv_coord_t * cir_y = &cir_x[(radius + 1) * 2];
 
     uint32_t y_8th_cnt = 0;
@@ -1506,7 +1506,7 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
         y++;
     }
 
-    lv_mem_buf_release(cir_x);
+    lv_mem_free(cir_x);
 }
 
 static lv_opa_t * get_next_line(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t y, lv_coord_t * len,
@@ -1527,4 +1527,4 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 }
 
 
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_DRAW_SW_COMPLEX*/

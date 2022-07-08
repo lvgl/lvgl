@@ -9,6 +9,7 @@
 #include "lv_anim.h"
 
 #include "../hal/lv_hal_tick.h"
+#include "../hal/lv_hal_disp.h"
 #include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
@@ -57,7 +58,7 @@ static lv_timer_t * _lv_anim_tmr;
 void _lv_anim_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
-    _lv_anim_tmr = lv_timer_create(anim_timer, LV_DISP_DEF_REFR_PERIOD, NULL);
+    _lv_anim_tmr = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation timer*/
     anim_list_changed = false;
 }

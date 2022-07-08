@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "../lv_draw.h"
+#if LV_USE_DRAW_SW
+
 #include "lv_draw_sw.h"
 
 /*********************
@@ -51,7 +53,7 @@ void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     draw_sw_ctx->base_draw.draw_img_decoded = lv_draw_sw_img_decoded;
     draw_sw_ctx->base_draw.draw_line = lv_draw_sw_line;
     draw_sw_ctx->base_draw.draw_polygon = lv_draw_sw_polygon;
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     draw_sw_ctx->base_draw.draw_transform = lv_draw_sw_transform;
 #endif
     draw_sw_ctx->base_draw.wait_for_finish = lv_draw_sw_wait_for_finish;
@@ -106,3 +108,5 @@ void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /*LV_USE_DRAW_SW*/

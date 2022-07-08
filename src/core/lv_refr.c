@@ -346,10 +346,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         }
     }
 
-    lv_mem_buf_free_all();
     _lv_font_clean_up_fmt_txt();
 
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     _lv_draw_mask_cleanup();
 #endif
 
@@ -628,7 +627,6 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
         }
 
         /*If the screen is transparent initialize it when the flushing is ready*/
-#if LV_COLOR_SCREEN_TRANSP
         if(disp_refr->driver->screen_transp) {
             if(disp_refr->driver->clear_cb) {
                 disp_refr->driver->clear_cb(disp_refr->driver, disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size);
@@ -637,7 +635,6 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
                 lv_memset_00(disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size * LV_IMG_PX_SIZE_ALPHA_BYTE);
             }
         }
-#endif
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -1142,7 +1139,7 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
             }
             else {
                 /*Rotate other areas using a maximum buffer size*/
-                if(rot_buf == NULL) rot_buf = lv_mem_buf_get(LV_DISP_ROT_MAX_BUF);
+                if(rot_buf == NULL) rot_buf = lv_mem_alloc(LV_DISP_ROT_MAX_BUF);
                 draw_buf_rotate_90(drv->rotated == LV_DISP_ROT_270, area_w, height, color_p, rot_buf);
 
                 if(drv->rotated == LV_DISP_ROT_90) {
@@ -1174,7 +1171,7 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
             row += height;
         }
         /*Free the allocated buffer at the end if necessary*/
-        if(rot_buf != NULL) lv_mem_buf_release(rot_buf);
+        if(rot_buf != NULL) lv_mem_free(rot_buf);
     }
 }
 
@@ -1197,7 +1194,6 @@ static void draw_buf_flush(lv_disp_t * disp)
         }
 
         /*If the screen is transparent initialize it when the flushing is ready*/
-#if LV_COLOR_SCREEN_TRANSP
         if(disp_refr->driver->screen_transp) {
             if(disp_refr->driver->clear_cb) {
                 disp_refr->driver->clear_cb(disp_refr->driver, disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size);
@@ -1206,7 +1202,6 @@ static void draw_buf_flush(lv_disp_t * disp)
                 lv_memset_00(disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size * LV_IMG_PX_SIZE_ALPHA_BYTE);
             }
         }
-#endif
     }
 
     draw_buf->flushing = 1;

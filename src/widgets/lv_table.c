@@ -142,7 +142,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
-    char * raw_txt = lv_mem_buf_get(len + 1);
+    char * raw_txt = lv_mem_alloc(len + 1);
     LV_ASSERT_MALLOC(raw_txt);
     if(raw_txt == NULL) {
         va_end(ap2);
@@ -161,7 +161,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     }
     _lv_txt_ap_proc(raw_txt, &table->cell_data[cell][1]);
 
-    lv_mem_buf_release(raw_txt);
+    lv_mem_free(raw_txt);
 #else
     table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len + 2); /*+1: trailing '\0; +1: format byte*/
     LV_ASSERT_MALLOC(table->cell_data[cell]);
@@ -248,8 +248,8 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
         old_col_start = row * old_col_cnt;
         new_col_start = row * col_cnt;
 
-        lv_memcpy_small(&new_cell_data[new_col_start], &table->cell_data[old_col_start],
-                        sizeof(new_cell_data[0]) * min_col_cnt);
+        lv_memcpy(&new_cell_data[new_col_start], &table->cell_data[old_col_start],
+                  sizeof(new_cell_data[0]) * min_col_cnt);
 
         /*Free the old cells (only if the table becomes smaller)*/
         int32_t i;

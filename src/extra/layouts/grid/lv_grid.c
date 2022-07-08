@@ -424,10 +424,10 @@ static void calc(lv_obj_t * cont, _lv_grid_calc_t * calc_out)
  */
 static void calc_free(_lv_grid_calc_t * calc)
 {
-    lv_mem_buf_release(calc->x);
-    lv_mem_buf_release(calc->y);
-    lv_mem_buf_release(calc->w);
-    lv_mem_buf_release(calc->h);
+    lv_mem_free(calc->x);
+    lv_mem_free(calc->y);
+    lv_mem_free(calc->w);
+    lv_mem_free(calc->h);
 }
 
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
@@ -436,8 +436,8 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     lv_coord_t cont_w = lv_obj_get_content_width(cont);
 
     c->col_num = count_tracks(col_templ);
-    c->x = lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
-    c->w = lv_mem_buf_get(sizeof(lv_coord_t) * c->col_num);
+    c->x = lv_mem_alloc(sizeof(lv_coord_t) * c->col_num);
+    c->w = lv_mem_alloc(sizeof(lv_coord_t) * c->col_num);
 
     /*Set sizes for CONTENT cells*/
     uint32_t i;
@@ -507,8 +507,8 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     uint32_t i;
     const lv_coord_t * row_templ = get_row_dsc(cont);
     c->row_num = count_tracks(row_templ);
-    c->y = lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
-    c->h = lv_mem_buf_get(sizeof(lv_coord_t) * c->row_num);
+    c->y = lv_mem_alloc(sizeof(lv_coord_t) * c->row_num);
+    c->h = lv_mem_alloc(sizeof(lv_coord_t) * c->row_num);
     /*Set sizes for CONTENT cells*/
     for(i = 0; i < c->row_num; i++) {
         lv_coord_t size = LV_COORD_MIN;

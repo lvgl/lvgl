@@ -83,7 +83,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     /*top or bottom dir*/
     if(tabview->tab_pos & LV_DIR_VER) {
         new_map = lv_mem_alloc((tab_id + 1) * sizeof(const char *));
-        lv_memcpy_small(new_map, old_map, sizeof(const char *) * (tab_id - 1));
+        lv_memcpy(new_map, old_map, sizeof(const char *) * (tab_id - 1));
         new_map[tab_id - 1] = lv_mem_alloc(strlen(name) + 1);
         strcpy((char *)new_map[tab_id - 1], name);
         new_map[tab_id] = "";
@@ -91,7 +91,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     /*left or right dir*/
     else {
         new_map = lv_mem_alloc((tab_id * 2) * sizeof(const char *));
-        lv_memcpy_small(new_map, old_map, sizeof(const char *) * (tab_id - 1) * 2);
+        lv_memcpy(new_map, old_map, sizeof(const char *) * (tab_id - 1) * 2);
         if(tabview->tab_cnt == 0) {
             new_map[0] = lv_mem_alloc(strlen(name) + 1);
             strcpy((char *)new_map[0], name);

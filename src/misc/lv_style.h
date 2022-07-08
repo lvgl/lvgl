@@ -56,7 +56,7 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 #endif
 
 /** On simple system, don't waste resources on gradients */
-#if !defined(LV_DRAW_COMPLEX) || !defined(LV_GRADIENT_MAX_STOPS)
+#if !defined(LV_DRAW_SW_COMPLEX) || !defined(LV_GRADIENT_MAX_STOPS)
 #define LV_GRADIENT_MAX_STOPS 2
 #endif
 
@@ -123,7 +123,7 @@ typedef uint8_t lv_grad_dir_t;
 
 /**
  * The dithering algorithm for the gradient
- * Depends on LV_DITHER_GRADIENT
+ * Depends on LV_DRAW_SW_GRADIENT_DITHER
  */
 enum {
     LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/

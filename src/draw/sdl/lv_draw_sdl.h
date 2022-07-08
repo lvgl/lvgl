@@ -16,9 +16,9 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DARW_SDL_INCLUDE_PATH
 
 #include "../lv_draw.h"
 #include "../../core/lv_disp.h"
@@ -87,7 +87,7 @@ SDL_Texture * lv_draw_sdl_create_screen_texture(SDL_Renderer * renderer, lv_coor
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

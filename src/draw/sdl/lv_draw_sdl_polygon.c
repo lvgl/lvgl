@@ -8,7 +8,7 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "lv_draw_sdl.h"
 #include "lv_draw_sdl_utils.h"
@@ -106,7 +106,7 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords)
     int pitch;
     if(SDL_LockTexture(texture, &rect, (void **) &pixels, &pitch) != 0) return;
 
-    lv_opa_t * line_buf = lv_mem_buf_get(rect.w);
+    lv_opa_t * line_buf = lv_mem_alloc(rect.w);
     for(lv_coord_t y = 0; y < rect.h; y++) {
         lv_memset_ff(line_buf, rect.w);
         lv_coord_t abs_x = (lv_coord_t) coords->x1, abs_y = (lv_coord_t)(y + coords->y1), len = (lv_coord_t) rect.w;
@@ -126,8 +126,8 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords)
             }
         }
     }
-    lv_mem_buf_release(line_buf);
+    lv_mem_free(line_buf);
     SDL_UnlockTexture(texture);
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

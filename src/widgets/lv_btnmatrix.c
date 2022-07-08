@@ -683,7 +683,7 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     const size_t txt_ap_size = 256 ;
-    char * txt_ap = lv_mem_buf_get(txt_ap_size);
+    char * txt_ap = lv_mem_alloc(txt_ap_size);
 #endif
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
@@ -804,7 +804,7 @@ static void draw_main(lv_event_t * e)
 
     obj->skip_trans = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    lv_mem_buf_release(txt_ap);
+    lv_mem_free(txt_ap);
 #endif
 }
 /**

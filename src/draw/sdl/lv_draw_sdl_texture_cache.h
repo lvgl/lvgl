@@ -16,9 +16,9 @@ extern "C" {
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DARW_SDL_INCLUDE_PATH
 #include "lv_draw_sdl.h"
 #include "lv_draw_sdl_priv.h"
 #include "../../draw/lv_img_decoder.h"
@@ -93,7 +93,7 @@ lv_draw_sdl_cache_key_head_img_t * lv_draw_sdl_texture_img_key_create(const void
 /**********************
  *      MACROS
  **********************/
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

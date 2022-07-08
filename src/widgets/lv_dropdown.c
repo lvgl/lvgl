@@ -239,7 +239,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
         _lv_txt_ins(dropdown->options, _lv_txt_encoded_get_char_id(dropdown->options, insert_pos++), "\n");
 
     /*Insert the new option, adding \n if necessary*/
-    char * ins_buf = lv_mem_buf_get(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
+    char * ins_buf = lv_mem_alloc(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
     LV_ASSERT_MALLOC(ins_buf);
     if(ins_buf == NULL) return;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
@@ -250,7 +250,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     if(pos < dropdown->option_cnt) strcat(ins_buf, "\n");
 
     _lv_txt_ins(dropdown->options, _lv_txt_encoded_get_char_id(dropdown->options, insert_pos), ins_buf);
-    lv_mem_buf_release(ins_buf);
+    lv_mem_free(ins_buf);
 
     dropdown->option_cnt++;
 
@@ -789,7 +789,7 @@ static void draw_main(lv_event_t * e)
     const char * opt_txt;
     if(dropdown->text) opt_txt = dropdown->text;
     else {
-        char * buf = lv_mem_buf_get(128);
+        char * buf = lv_mem_alloc(128);
         lv_dropdown_get_selected_str(obj, buf, 128);
         opt_txt = buf;
     }
@@ -880,7 +880,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_label(draw_ctx, &label_dsc, &txt_area, opt_txt, NULL);
 
     if(dropdown->text == NULL) {
-        lv_mem_buf_release((char *)opt_txt);
+        lv_mem_free((char *)opt_txt);
     }
 }
 

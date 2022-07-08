@@ -8,6 +8,8 @@
  *********************/
 #include <stdbool.h>
 #include "lv_draw_sw.h"
+#if LV_USE_DRAW_SW
+
 #include "../../misc/lv_math.h"
 #include "../../core/lv_refr.h"
 
@@ -141,7 +143,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_draw_ctx_t * draw_ctx
     if(simple_mode) {
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     /*If there other mask apply it*/
     else {
 
@@ -155,7 +157,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_draw_ctx_t * draw_ctx
             dash_start = (blend_area.x1) % (dsc->dash_gap + dsc->dash_width);
         }
 
-        lv_opa_t * mask_buf = lv_mem_buf_get(blend_area_w);
+        lv_opa_t * mask_buf = lv_mem_alloc(blend_area_w);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
         int32_t h;
@@ -190,9 +192,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_draw_ctx_t * draw_ctx
             blend_area.y1++;
             blend_area.y2++;
         }
-        lv_mem_buf_release(mask_buf);
+        lv_mem_free(mask_buf);
     }
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_DRAW_SW_COMPLEX*/
 }
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
@@ -228,7 +230,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_draw_ctx_t * draw_ctx
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
 
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     /*If there other mask apply it*/
     else {
         int32_t draw_area_w = lv_area_get_width(&blend_area);
@@ -236,7 +238,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_draw_ctx_t * draw_ctx
         lv_coord_t y2 = blend_area.y2;
         blend_area.y2 = blend_area.y1;
 
-        lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
+        lv_opa_t * mask_buf = lv_mem_alloc(draw_area_w);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
 
@@ -270,15 +272,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_draw_ctx_t * draw_ctx
             blend_area.y1++;
             blend_area.y2++;
         }
-        lv_mem_buf_release(mask_buf);
+        lv_mem_free(mask_buf);
     }
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_DRAW_SW_COMPLEX*/
 }
 
 LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
                                                  const lv_point_t * point1, const lv_point_t * point2)
 {
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     /*Keep the great y in p1*/
     lv_point_t p1;
     lv_point_t p2;
@@ -377,7 +379,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ct
     int32_t h;
     uint32_t hor_res = (uint32_t)lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
     size_t mask_buf_size = LV_MIN(lv_area_get_size(&blend_area), hor_res);
-    lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
+    lv_opa_t * mask_buf = lv_mem_alloc(mask_buf_size);
 
     lv_coord_t y2 = blend_area.y2;
     blend_area.y2 = blend_area.y1;
@@ -422,7 +424,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ct
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
 
-    lv_mem_buf_release(mask_buf);
+    lv_mem_free(mask_buf);
 
     lv_draw_mask_free_param(&mask_left_param);
     lv_draw_mask_free_param(&mask_right_param);
@@ -437,7 +439,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ct
     LV_UNUSED(point2);
     LV_UNUSED(draw_ctx);
     LV_UNUSED(dsc);
-    LV_LOG_WARN("Can't draw skewed line with LV_DRAW_COMPLEX == 0");
-#endif /*LV_DRAW_COMPLEX*/
+    LV_LOG_WARN("Can't draw skewed line with LV_DRAW_SW_COMPLEX == 0");
+#endif /*LV_DRAW_SW_COMPLEX*/
 }
 
+#endif /*LV_USE_DRAW_SW*/

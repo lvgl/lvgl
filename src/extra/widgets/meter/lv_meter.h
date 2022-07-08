@@ -18,8 +18,8 @@ extern "C" {
 #if LV_USE_METER != 0
 
 /*Testing of dependencies*/
-#if LV_DRAW_COMPLEX == 0
-#error "lv_meter: Complex drawing is required. Enable it in lv_conf.h (LV_DRAW_COMPLEX 1)"
+#if LV_DRAW_SW_COMPLEX == 0
+#error "lv_meter: Complex drawing is required. Enable it in lv_conf.h (LV_DRAW_SW_COMPLEX 1)"
 #endif
 
 /*********************

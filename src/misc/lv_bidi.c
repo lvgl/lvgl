@@ -138,12 +138,12 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
                                   uint32_t visual_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    char * buf = lv_mem_buf_get(len + 1);
+    char * buf = lv_mem_alloc(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_mem_alloc(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
-        lv_mem_buf_release(buf);
+        lv_mem_free(buf);
         return (uint16_t) -1;
     }
 
@@ -153,9 +153,9 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
 
     if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
 
-    if(bidi_txt == NULL) lv_mem_buf_release(buf);
+    if(bidi_txt == NULL) lv_mem_free(buf);
     uint16_t res = GET_POS(pos_conv_buf[visual_pos]);
-    lv_mem_buf_release(pos_conv_buf);
+    lv_mem_free(pos_conv_buf);
     return res;
 }
 
@@ -175,12 +175,12 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
                                  uint32_t logical_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    char * buf = lv_mem_buf_get(len + 1);
+    char * buf = lv_mem_alloc(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_mem_alloc(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
-        lv_mem_buf_release(buf);
+        lv_mem_free(buf);
         return (uint16_t) -1;
     }
 
@@ -192,14 +192,14 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
         if(GET_POS(pos_conv_buf[i]) == logical_pos) {
 
             if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
-            lv_mem_buf_release(pos_conv_buf);
+            lv_mem_free(pos_conv_buf);
 
-            if(bidi_txt == NULL) lv_mem_buf_release(buf);
+            if(bidi_txt == NULL) lv_mem_free(buf);
             return i;
         }
     }
-    lv_mem_buf_release(pos_conv_buf);
-    if(bidi_txt == NULL) lv_mem_buf_release(buf);
+    lv_mem_free(pos_conv_buf);
+    if(bidi_txt == NULL) lv_mem_free(buf);
     return (uint16_t) -1;
 }
 

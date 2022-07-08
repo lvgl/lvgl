@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw.h"
+#if LV_USE_DRAW_SW
+
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_txt_ap.h"
 #include "../../core/lv_refr.h"
@@ -34,7 +36,7 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
 
 static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords);
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t s,
@@ -52,8 +54,8 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if defined(LV_SHADOW_CACHE_SIZE) && LV_SHADOW_CACHE_SIZE > 0
-    static uint8_t sh_cache[LV_SHADOW_CACHE_SIZE * LV_SHADOW_CACHE_SIZE];
+#if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
+    static uint8_t sh_cache[LV_DRAW_SW_SHADOW_CACHE_SIZE * LV_DRAW_SW_SHADOW_CACHE_SIZE];
     static int32_t sh_cache_size = -1;
     static int32_t sh_cache_r = -1;
 #endif
@@ -68,7 +70,7 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
 
 void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     draw_shadow(draw_ctx, dsc, coords);
 #endif
 
@@ -84,8 +86,11 @@ void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, c
 
 void lv_draw_sw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-#if LV_COLOR_SCREEN_TRANSP && LV_COLOR_DEPTH == 32
-    lv_memset_00(draw_ctx->buf, lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t));
+#if LV_COLOR_DEPTH == 32
+    lv_disp_t * d = _lv_refr_get_disp_refreshing();
+    if(d->driver->screen_transp) {
+        lv_memset_00(draw_ctx->buf, lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t));
+    }
 #endif
 
     draw_bg(draw_ctx, dsc, coords);
@@ -133,8 +138,8 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     }
 
     /*Complex case: there is gradient, mask, or radius*/
-#if LV_DRAW_COMPLEX == 0
-    LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_COMPLEX = 0");
+#if LV_DRAW_SW_COMPLEX == 0
+    LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_SW_COMPLEX = 0");
 #else
     lv_opa_t opa = dsc->bg_opa >= LV_OPA_MAX ? LV_OPA_COVER : dsc->bg_opa;
 
@@ -150,7 +155,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     lv_opa_t * mask_buf = NULL;
     lv_draw_mask_radius_param_t mask_rout_param;
     if(rout > 0 || mask_any) {
-        mask_buf = lv_mem_buf_get(clipped_w);
+        mask_buf = lv_mem_alloc(clipped_w);
         lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
         mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
     }
@@ -188,7 +193,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
             grad_size = coords_bg_h;
     }
     else
-#if LV_DITHER_ERROR_DIFFUSION
+#if LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
         if(dither_mode == LV_DITHER_ORDERED)
 #endif
             switch(grad_dir) {
@@ -202,7 +207,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
                     dither_func = NULL;
             }
 
-#if LV_DITHER_ERROR_DIFFUSION
+#if LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
         else if(dither_mode == LV_DITHER_ERR_DIFF)
             switch(grad_dir) {
                 case LV_GRAD_DIR_HOR:
@@ -315,7 +320,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
 
 
 bg_clean_up:
-    if(mask_buf) lv_mem_buf_release(mask_buf);
+    if(mask_buf) lv_mem_free(mask_buf);
     if(mask_rout_id != LV_MASK_ID_INV) {
         lv_draw_mask_remove_id(mask_rout_id);
         lv_draw_mask_free_param(&mask_rout_param);
@@ -429,7 +434,7 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
 
 }
 
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords)
 {
@@ -485,15 +490,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
 
     lv_opa_t * sh_buf;
 
-#if LV_SHADOW_CACHE_SIZE
+#if LV_DRAW_SW_SHADOW_CACHE_SIZE
     if(sh_cache_size == corner_size && sh_cache_r == r_sh) {
         /*Use the cache if available*/
-        sh_buf = lv_mem_buf_get(corner_size * corner_size);
+        sh_buf = lv_mem_alloc(corner_size * corner_size);
         lv_memcpy(sh_buf, sh_cache, corner_size * corner_size);
     }
     else {
         /*A larger buffer is required for calculation*/
-        sh_buf = lv_mem_buf_get(corner_size * corner_size * sizeof(uint16_t));
+        sh_buf = lv_mem_alloc(corner_size * corner_size * sizeof(uint16_t));
         shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
 
         /*Cache the corner if it fits into the cache size*/
@@ -504,7 +509,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
         }
     }
 #else
-    sh_buf = lv_mem_buf_get(corner_size * corner_size * sizeof(uint16_t));
+    sh_buf = lv_mem_alloc(corner_size * corner_size * sizeof(uint16_t));
     shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
 #endif
 
@@ -521,7 +526,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
         lv_draw_mask_radius_init(&mask_rout_param, &bg_area, r_bg, true);
         mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
     }
-    lv_opa_t * mask_buf = lv_mem_buf_get(lv_area_get_width(&shadow_area));
+    lv_opa_t * mask_buf = lv_mem_alloc(lv_area_get_width(&shadow_area));
     lv_area_t blend_area;
     lv_area_t clip_area_sub;
     lv_opa_t * sh_buf_tmp;
@@ -939,8 +944,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
         lv_draw_mask_free_param(&mask_rout_param);
         lv_draw_mask_remove_id(mask_rout_id);
     }
-    lv_mem_buf_release(sh_buf);
-    lv_mem_buf_release(mask_buf);
+    lv_mem_free(sh_buf);
+    lv_mem_free(mask_buf);
 }
 
 /**
@@ -974,7 +979,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
 #endif
 
     int32_t y;
-    lv_opa_t * mask_line = lv_mem_buf_get(size);
+    lv_opa_t * mask_line = lv_mem_alloc(size);
     uint16_t * sh_ups_tmp_buf = (uint16_t *)sh_buf;
     for(y = 0; y < size; y++) {
         lv_memset_ff(mask_line, size);
@@ -993,7 +998,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
 
         sh_ups_tmp_buf += size;
     }
-    lv_mem_buf_release(mask_line);
+    lv_mem_free(mask_line);
 
     lv_draw_mask_free_param(&mask_param);
 
@@ -1044,7 +1049,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
     if((sw & 1) == 0) s_left--;
 
     /*Horizontal blur*/
-    uint16_t * sh_ups_blur_buf = lv_mem_buf_get(size * sizeof(uint16_t));
+    uint16_t * sh_ups_blur_buf = lv_mem_alloc(size * sizeof(uint16_t));
 
     int32_t x;
     int32_t y;
@@ -1107,7 +1112,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
         }
     }
 
-    lv_mem_buf_release(sh_ups_blur_buf);
+    lv_mem_free(sh_ups_blur_buf);
 }
 #endif
 
@@ -1164,7 +1169,7 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
         return;
     }
 
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `coords`*/
     lv_area_t draw_area;
@@ -1173,7 +1178,7 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
 
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memset_00(&blend_dsc, sizeof(blend_dsc));
-    blend_dsc.mask_buf = lv_mem_buf_get(draw_area_w);;
+    blend_dsc.mask_buf = lv_mem_alloc(draw_area_w);;
 
 
     /*Create mask for the outer area*/
@@ -1230,7 +1235,7 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
             lv_draw_mask_free_param(&mask_rout_param);
             lv_draw_mask_remove_id(mask_rout_id);
         }
-        lv_mem_buf_release(blend_dsc.mask_buf);
+        lv_mem_free(blend_dsc.mask_buf);
         return;
     }
 
@@ -1371,11 +1376,11 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
     lv_draw_mask_remove_id(mask_rin_id);
     lv_draw_mask_free_param(&mask_rout_param);
     lv_draw_mask_remove_id(mask_rout_id);
-    lv_mem_buf_release(blend_dsc.mask_buf);
+    lv_mem_free(blend_dsc.mask_buf);
 
-#else /*LV_DRAW_COMPLEX*/
+#else /*LV_DRAW_SW_COMPLEX*/
     LV_UNUSED(blend_mode);
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_DRAW_SW_COMPLEX*/
 }
 static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                lv_color_t color, lv_opa_t opa)
@@ -1426,3 +1431,4 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
     }
 }
 
+#endif /*LV_USE_DRAW_SW*/

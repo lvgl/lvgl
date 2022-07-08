@@ -90,6 +90,7 @@ void lv_obj_add_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t se
     /*Allocate space for the new style and shift the rest of the style to the end*/
     obj->style_cnt++;
     obj->styles = lv_mem_realloc(obj->styles, obj->style_cnt * sizeof(_lv_obj_style_t));
+    LV_ASSERT_MALLOC(obj->styles);
 
     uint32_t j;
     for(j = obj->style_cnt - 1; j > i ; j--) {
@@ -842,7 +843,7 @@ static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
     if(lv_obj_get_style_transform_zoom(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_opa(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
 
-#if LV_DRAW_COMPLEX
+#if LV_DRAW_SW_COMPLEX
     if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
 #endif
     return LV_LAYER_TYPE_NONE;

@@ -16,9 +16,9 @@ extern "C" {
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DARW_SDL_INCLUDE_PATH
 
 #include "../lv_draw.h"
 
@@ -63,7 +63,7 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
