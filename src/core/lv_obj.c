@@ -343,11 +343,11 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
     if(obj->spec_attr == NULL) {
         static uint32_t x = 0;
         x++;
-        obj->spec_attr = lv_mem_alloc(sizeof(_lv_obj_spec_attr_t));
+        obj->spec_attr = lv_malloc(sizeof(_lv_obj_spec_attr_t));
         LV_ASSERT_MALLOC(obj->spec_attr);
         if(obj->spec_attr == NULL) return;
 
-        lv_memset_00(obj->spec_attr, sizeof(_lv_obj_spec_attr_t));
+        lv_memzero(obj->spec_attr, sizeof(_lv_obj_spec_attr_t));
 
         obj->spec_attr->scroll_dir = LV_DIR_ALL;
         obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
@@ -448,15 +448,15 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     if(obj->spec_attr) {
         if(obj->spec_attr->children) {
-            lv_mem_free(obj->spec_attr->children);
+            lv_free(obj->spec_attr->children);
             obj->spec_attr->children = NULL;
         }
         if(obj->spec_attr->event_dsc) {
-            lv_mem_free(obj->spec_attr->event_dsc);
+            lv_free(obj->spec_attr->event_dsc);
             obj->spec_attr->event_dsc = NULL;
         }
 
-        lv_mem_free(obj->spec_attr);
+        lv_free(obj->spec_attr);
         obj->spec_attr = NULL;
     }
 }
@@ -539,7 +539,7 @@ static void lv_obj_draw(lv_event_t * e)
 
 #if LV_DRAW_SW_COMPLEX
         if(clip_corner) {
-            lv_draw_mask_radius_param_t * mp = lv_mem_alloc(sizeof(lv_draw_mask_radius_param_t));
+            lv_draw_mask_radius_param_t * mp = lv_malloc(sizeof(lv_draw_mask_radius_param_t));
             lv_draw_mask_radius_init(mp, &obj->coords, draw_dsc.radius, false);
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
             lv_draw_mask_add(mp, obj + 8);
@@ -566,7 +566,7 @@ static void lv_obj_draw(lv_event_t * e)
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
             if(param) {
                 lv_draw_mask_free_param(param);
-                lv_mem_free(param);
+                lv_free(param);
             }
         }
 #endif
@@ -866,8 +866,8 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
-    _lv_obj_style_transition_dsc_t * ts = lv_mem_alloc(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
-    lv_memset_00(ts, sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    _lv_obj_style_transition_dsc_t * ts = lv_malloc(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
+    lv_memzero(ts, sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     uint32_t tsi = 0;
     uint32_t i;
     for(i = 0; i < obj->style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
@@ -912,7 +912,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         _lv_obj_style_create_transition(obj, part_act, prev_state, new_state, &ts[i]);
     }
 
-    lv_mem_free(ts);
+    lv_free(ts);
 
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) {
         lv_obj_invalidate(obj);

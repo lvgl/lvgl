@@ -52,9 +52,9 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_get_imgfont_path_cb_t path_cb)
                   "LV_IMGFONT_PATH_MAX_LEN must be greater than sizeof(lv_img_dsc_t)");
 
     size_t size = sizeof(imgfont_dsc_t) + sizeof(lv_font_t);
-    imgfont_dsc_t * dsc = (imgfont_dsc_t *)lv_mem_alloc(size);
+    imgfont_dsc_t * dsc = (imgfont_dsc_t *)lv_malloc(size);
     if(dsc == NULL) return NULL;
-    lv_memset_00(dsc, size);
+    lv_memzero(dsc, size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(imgfont_dsc_t));
     dsc->path_cb = path_cb;
@@ -79,7 +79,7 @@ void lv_imgfont_destroy(lv_font_t * font)
     }
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
-    lv_mem_free(dsc);
+    lv_free(dsc);
 }
 
 /**********************

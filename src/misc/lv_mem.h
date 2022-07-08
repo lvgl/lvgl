@@ -84,13 +84,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_builtin_memset(void * dst, uint8_t v, size_t len);
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
  */
-void * lv_mem_alloc(size_t size);
+void * lv_malloc(size_t size);
 
 /**
  * Free an allocated data
  * @param data pointer to an allocated memory
  */
-void lv_mem_free(void * data);
+void lv_free(void * data);
 
 /**
  * Reallocate a memory with a new size. The old content will be kept.
@@ -99,7 +99,7 @@ void lv_mem_free(void * data);
  * @param new_size the desired new size in byte
  * @return pointer to the new memory, NULL on failure
  */
-void * lv_mem_realloc(void * data_p, size_t new_size);
+void * lv_realloc(void * data_p, size_t new_size);
 
 /**
  *
@@ -132,16 +132,10 @@ static inline  void lv_memset(void * dst, uint8_t v, size_t len)
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
-LV_ATTRIBUTE_FAST_MEM void lv_memset_00(void * dst, size_t len);
-
-/**
- * Same as `memset(dst, 0xFF, len)` but optimized for 4 byte operation.
- * @param dst pointer to the destination buffer
- * @param len number of byte to set
- */
-LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len);
-
-
+static inline void lv_memzero(void * dst, size_t len)
+{
+    lv_memset(dst, 0x00, len);
+}
 
 /**********************
  *      MACROS

@@ -254,7 +254,7 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
 {
     lv_coord_t h = (lv_coord_t) dsc->header.h;
     lv_coord_t w = (lv_coord_t) dsc->header.w;
-    uint8_t * data = lv_mem_alloc(w * h * sizeof(lv_color_t));
+    uint8_t * data = lv_malloc(w * h * sizeof(lv_color_t));
     for(lv_coord_t y = 0; y < h; y++) {
         lv_img_decoder_read_line(dsc, 0, y, w, &data[y * w * sizeof(lv_color_t)]);
     }
@@ -267,7 +267,7 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
     SDL_SetColorKey(surface, SDL_TRUE, lv_color_to32(LV_COLOR_CHROMA_KEY));
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
-    lv_mem_free(data);
+    lv_free(data);
     return texture;
 }
 

@@ -330,26 +330,26 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
 lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 {
     /*Allocate image descriptor*/
-    lv_img_dsc_t * dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
+    lv_img_dsc_t * dsc = lv_malloc(sizeof(lv_img_dsc_t));
     if(dsc == NULL)
         return NULL;
 
-    lv_memset_00(dsc, sizeof(lv_img_dsc_t));
+    lv_memzero(dsc, sizeof(lv_img_dsc_t));
 
     /*Get image data size*/
     dsc->data_size = lv_img_buf_get_img_size(w, h, cf);
     if(dsc->data_size == 0) {
-        lv_mem_free(dsc);
+        lv_free(dsc);
         return NULL;
     }
 
     /*Allocate raw buffer*/
-    dsc->data = lv_mem_alloc(dsc->data_size);
+    dsc->data = lv_malloc(dsc->data_size);
     if(dsc->data == NULL) {
-        lv_mem_free(dsc);
+        lv_free(dsc);
         return NULL;
     }
-    lv_memset_00((uint8_t *)dsc->data, dsc->data_size);
+    lv_memzero((uint8_t *)dsc->data, dsc->data_size);
 
     /*Fill in header*/
     dsc->header.always_zero = 0;
@@ -367,9 +367,9 @@ void lv_img_buf_free(lv_img_dsc_t * dsc)
 {
     if(dsc != NULL) {
         if(dsc->data != NULL)
-            lv_mem_free((void *)dsc->data);
+            lv_free((void *)dsc->data);
 
-        lv_mem_free(dsc);
+        lv_free(dsc);
     }
 }
 

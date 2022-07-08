@@ -424,7 +424,7 @@ static void draw_shadow(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
                                 sw / 2 + sw % 2);
         texture = lv_sdl_create_opa_texture(ctx->renderer, mask_buf, blur_frag_size, blur_frag_size,
                                             lv_area_get_width(&mask_area_blurred));
-        lv_mem_free(mask_buf);
+        lv_free(mask_buf);
         lv_draw_mask_remove_id(mask_id);
         SDL_assert(texture);
         lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), texture);

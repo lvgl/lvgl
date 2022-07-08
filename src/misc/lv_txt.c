@@ -458,7 +458,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     char * text = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
-    char * raw_txt = lv_mem_alloc(len + 1);
+    char * raw_txt = lv_malloc(len + 1);
     LV_ASSERT_MALLOC(raw_txt);
     if(raw_txt == NULL) {
         return NULL;
@@ -468,16 +468,16 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
-    text = lv_mem_alloc(len_ap + 1);
+    text = lv_malloc(len_ap + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;
     }
     _lv_txt_ap_proc(raw_txt, text);
 
-    lv_mem_free(raw_txt);
+    lv_free(raw_txt);
 #else
-    text = lv_mem_alloc(len + 1);
+    text = lv_malloc(len + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;

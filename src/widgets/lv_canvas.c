@@ -185,8 +185,8 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
     dest_area.y1 = 0;
     dest_area.y2 = 0;
 
-    lv_color_t * cbuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_color_t));
-    lv_opa_t * abuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_opa_t));
+    lv_color_t * cbuf = lv_malloc(dest_img->header.w * sizeof(lv_color_t));
+    lv_opa_t * abuf = lv_malloc(dest_img->header.w * sizeof(lv_opa_t));
     for(y = 0; y < dest_img->header.h; y++) {
         if(y + offset_y >= 0) {
             lv_draw_sw_transform(NULL, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
@@ -206,8 +206,8 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
             dest_area.y2++;
         }
     }
-    lv_mem_free(cbuf);
-    lv_mem_free(abuf);
+    lv_free(cbuf);
+    lv_free(abuf);
 
     lv_obj_invalidate(obj);
 
@@ -258,7 +258,7 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
     bool has_alpha = lv_img_cf_has_alpha(canvas->dsc.header.cf);
 
     lv_coord_t line_w = lv_img_buf_get_img_size(canvas->dsc.header.w, 1, canvas->dsc.header.cf);
-    uint8_t * line_buf = lv_mem_alloc(line_w);
+    uint8_t * line_buf = lv_malloc(line_w);
 
     lv_img_dsc_t line_img;
     line_img.data = line_buf;
@@ -350,7 +350,7 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
     }
     lv_obj_invalidate(obj);
 
-    lv_mem_free(line_buf);
+    lv_free(line_buf);
 }
 
 void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
@@ -385,7 +385,7 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 
     bool has_alpha = lv_img_cf_has_alpha(canvas->dsc.header.cf);
     lv_coord_t col_w = lv_img_buf_get_img_size(1, canvas->dsc.header.h, canvas->dsc.header.cf);
-    uint8_t * col_buf = lv_mem_alloc(col_w);
+    uint8_t * col_buf = lv_malloc(col_w);
     lv_img_dsc_t line_img;
 
     line_img.data = col_buf;
@@ -483,7 +483,7 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 
     lv_obj_invalidate(obj);
 
-    lv_mem_free(col_buf);
+    lv_free(col_buf);
 }
 
 void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa)
@@ -804,14 +804,14 @@ static void init_fake_disp(lv_obj_t * canvas, lv_disp_t * disp, lv_disp_drv_t * 
     clip_area->y2 = dsc->header.h - 1;
 
     /*Allocate the fake driver on the stack as the entire display doesn't outlive this function*/
-    lv_memset_00(disp, sizeof(lv_disp_t));
+    lv_memzero(disp, sizeof(lv_disp_t));
     disp->driver = drv;
 
     lv_disp_drv_init(disp->driver);
     disp->driver->hor_res = dsc->header.w;
     disp->driver->ver_res = dsc->header.h;
 
-    lv_draw_ctx_t * draw_ctx = lv_mem_alloc(sizeof(lv_draw_sw_ctx_t));
+    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_sw_ctx_t));
     LV_ASSERT_MALLOC(draw_ctx);
     if(draw_ctx == NULL)  return;
     lv_draw_sw_init_ctx(drv, draw_ctx);
@@ -829,7 +829,7 @@ static void deinit_fake_disp(lv_obj_t * canvas, lv_disp_t * disp)
 {
     LV_UNUSED(canvas);
     lv_draw_sw_deinit_ctx(disp->driver, disp->driver->draw_ctx);
-    lv_mem_free(disp->driver->draw_ctx);
+    lv_free(disp->driver->draw_ctx);
 }
 
 

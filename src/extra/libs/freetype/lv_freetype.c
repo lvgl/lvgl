@@ -353,9 +353,9 @@ static const uint8_t * get_glyph_bitmap_cb_cache(const lv_font_t * font, uint32_
 static bool lv_ft_font_init_cache(lv_ft_info_t * info)
 {
     size_t need_size = sizeof(lv_font_fmt_ft_dsc_t) + sizeof(lv_font_t);
-    lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(need_size);
+    lv_font_fmt_ft_dsc_t * dsc = lv_malloc(need_size);
     if(dsc == NULL) return false;
-    lv_memset_00(dsc, need_size);
+    lv_memzero(dsc, need_size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(lv_font_fmt_ft_dsc_t));
     dsc->mem = info->mem;
@@ -396,7 +396,7 @@ static bool lv_ft_font_init_cache(lv_ft_info_t * info)
     return true;
 
 Fail:
-    lv_mem_free(dsc);
+    lv_free(dsc);
     return false;
 }
 
@@ -410,7 +410,7 @@ void lv_ft_font_destroy_cache(lv_font_t * font)
     if(dsc) {
         FTC_Manager_RemoveFaceID(cache_manager, (FTC_FaceID)dsc);
         name_refer_del(dsc->name);
-        lv_mem_free(dsc);
+        lv_free(dsc);
     }
 }
 #else/* LV_FREETYPE_CACHE_SIZE */
@@ -443,7 +443,7 @@ static void face_remove_from_list(FT_Face face)
     while(pface) {
         if(*pface == face) {
             _lv_ll_remove(&face_control.face_ll, pface);
-            lv_mem_free(pface);
+            lv_free(pface);
             break;
         }
         pface = _lv_ll_get_next(&face_control.face_ll, pface);
@@ -534,9 +534,9 @@ static const uint8_t * get_glyph_bitmap_cb_nocache(const lv_font_t * font, uint3
 static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
 {
     size_t need_size = sizeof(lv_font_fmt_ft_dsc_t) + sizeof(lv_font_t);
-    lv_font_fmt_ft_dsc_t * dsc = lv_mem_alloc(need_size);
+    lv_font_fmt_ft_dsc_t * dsc = lv_malloc(need_size);
     if(dsc == NULL) return false;
-    lv_memset_00(dsc, need_size);
+    lv_memzero(dsc, need_size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(lv_font_fmt_ft_dsc_t));
     dsc->mem = info->mem;
@@ -594,7 +594,7 @@ static bool lv_ft_font_init_nocache(lv_ft_info_t * info)
     return true;
 
 Fail:
-    lv_mem_free(dsc);
+    lv_free(dsc);
     return false;
 }
 
@@ -610,7 +610,7 @@ static void lv_ft_font_destroy_nocache(lv_font_t * font)
         FT_Done_Size(dsc->size);
         FT_Done_Face(face);
         name_refer_del(dsc->name);
-        lv_mem_free(dsc);
+        lv_free(dsc);
     }
 }
 
@@ -645,8 +645,8 @@ static void name_refer_del(const char * name)
             refer->cnt -= 1;
             if(refer->cnt <= 0) {
                 _lv_ll_remove(&names_ll, refer);
-                lv_mem_free((void *)refer->name);
-                lv_mem_free(refer);
+                lv_free((void *)refer->name);
+                lv_free(refer);
             }
             return;
         }
@@ -671,14 +671,14 @@ static const char * name_refer_save(const char * name)
     name_refer_t * refer = _lv_ll_ins_tail(&names_ll);
     if(refer) {
         uint32_t len = strlen(name) + 1;
-        refer->name = lv_mem_alloc(len);
+        refer->name = lv_malloc(len);
         if(refer->name) {
             lv_memcpy((void *)refer->name, name, len);
             refer->cnt = 1;
             return refer->name;
         }
         _lv_ll_remove(&names_ll, refer);
-        lv_mem_free(refer);
+        lv_free(refer);
     }
     LV_LOG_WARN("save_name_to_names error(not memory).");
     return "";

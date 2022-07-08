@@ -36,7 +36,7 @@
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 {
-    lv_memset_00(dsc, sizeof(lv_draw_line_dsc_t));
+    lv_memzero(dsc, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
     dsc->color = lv_color_black();

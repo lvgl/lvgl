@@ -96,7 +96,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMG_SRC_UNKNOWN) {
         LV_LOG_WARN("lv_img_set_src: unknown image type");
         if(img->src_type == LV_IMG_SRC_SYMBOL || img->src_type == LV_IMG_SRC_FILE) {
-            lv_mem_free((void *)img->src);
+            lv_free((void *)img->src);
         }
         img->src      = NULL;
         img->src_type = LV_IMG_SRC_UNKNOWN;
@@ -110,7 +110,7 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     if(src_type == LV_IMG_SRC_VARIABLE) {
         /*If memory was allocated because of the previous `src_type` then free it*/
         if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-            lv_mem_free((void *)img->src);
+            lv_free((void *)img->src);
         }
         img->src = src;
     }
@@ -124,13 +124,13 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
             if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
                 old_src = img->src;
             }
-            char * new_str = lv_mem_alloc(strlen(src) + 1);
+            char * new_str = lv_malloc(strlen(src) + 1);
             LV_ASSERT_MALLOC(new_str);
             if(new_str == NULL) return;
             strcpy(new_str, src);
             img->src = new_str;
 
-            if(old_src) lv_mem_free((void *)old_src);
+            if(old_src) lv_free((void *)old_src);
         }
     }
 
@@ -417,7 +417,7 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_img_t * img = (lv_img_t *)obj;
     if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
-        lv_mem_free((void *)img->src);
+        lv_free((void *)img->src);
         img->src      = NULL;
         img->src_type = LV_IMG_SRC_UNKNOWN;
     }

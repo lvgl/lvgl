@@ -55,7 +55,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  * Set a buffer for the canvas.
  * @param buf a buffer where the content of the canvas will be.
  * The required size is (lv_img_color_format_get_px_size(cf) * w) / 8 * h)
- * It can be allocated with `lv_mem_alloc()` or
+ * It can be allocated with `lv_malloc()` or
  * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
  * it can be an address in RAM or external SRAM
  * @param canvas pointer to a canvas object

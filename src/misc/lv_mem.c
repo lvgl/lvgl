@@ -258,7 +258,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_builtin_memset(void * dst, uint8_t v, size_t len)
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
  */
-void * lv_mem_alloc(size_t size)
+void * lv_malloc(size_t size)
 {
     MEM_TRACE("allocating %lu bytes", (unsigned long)size);
     if(size == 0) {
@@ -295,7 +295,7 @@ void * lv_mem_alloc(size_t size)
  * Free an allocated data
  * @param data pointer to an allocated memory
  */
-void lv_mem_free(void * data)
+void lv_free(void * data)
 {
     MEM_TRACE("freeing %p", data);
     if(data == &zero_mem) return;
@@ -311,16 +311,16 @@ void lv_mem_free(void * data)
  * @param new_size the desired new size in byte
  * @return pointer to the new memory
  */
-void * lv_mem_realloc(void * data_p, size_t new_size)
+void * lv_realloc(void * data_p, size_t new_size)
 {
     MEM_TRACE("reallocating %p with %lu size", data_p, (unsigned long)new_size);
     if(new_size == 0) {
         MEM_TRACE("using zero_mem");
-        lv_mem_free(data_p);
+        lv_free(data_p);
         return &zero_mem;
     }
 
-    if(data_p == &zero_mem) return lv_mem_alloc(new_size);
+    if(data_p == &zero_mem) return lv_malloc(new_size);
 
     void * new_p = LV_REALLOC(data_p, new_size);
     if(new_p == NULL) {
@@ -384,44 +384,6 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
 #endif
 }
 
-
-/**
- * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.
- * @param dst pointer to the destination buffer
- * @param len number of byte to set
- */
-LV_ATTRIBUTE_FAST_MEM void lv_memset_00(void * dst, size_t len)
-{
-    uint8_t * d8 = (uint8_t *)dst;
-    uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
-
-    /*Make the address aligned*/
-    if(d_align) {
-        d_align = ALIGN_MASK + 1 - d_align;
-        while(d_align && len) {
-            SET8(0);
-            len--;
-            d_align--;
-        }
-    }
-
-    uint32_t * d32 = (uint32_t *)d8;
-    while(len > 32) {
-        REPEAT8(SET32(0));
-        len -= 32;
-    }
-
-    while(len > 4) {
-        SET32(0);
-        len -= 4;
-    }
-
-    d8 = (uint8_t *)d32;
-    while(len) {
-        SET8(0);
-        len--;
-    }
-}
 
 /**
  * Same as `memset(dst, 0xFF, len)` but optimized for 4 byte operation.

@@ -95,7 +95,7 @@
     #endif
 #endif
 #if LV_USE_BUILTIN_MALLOC
-    /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
+    /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
     #ifndef LV_MEM_SIZE
         #ifdef CONFIG_LV_MEM_SIZE
             #define LV_MEM_SIZE CONFIG_LV_MEM_SIZE

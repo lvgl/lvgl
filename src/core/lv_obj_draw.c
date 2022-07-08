@@ -354,7 +354,7 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
 
 void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw_ctx)
 {
-    lv_memset_00(dsc, sizeof(lv_obj_draw_part_dsc_t));
+    lv_memzero(dsc, sizeof(lv_obj_draw_part_dsc_t));
     dsc->draw_ctx = draw_ctx;
 }
 

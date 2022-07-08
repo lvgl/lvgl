@@ -173,7 +173,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
             return LV_RES_INV;
         }
 
-        dsc->user_data = lv_mem_alloc(sizeof(bmp_dsc_t));
+        dsc->user_data = lv_malloc(sizeof(bmp_dsc_t));
         LV_ASSERT_MALLOC(dsc->user_data);
         if(dsc->user_data == NULL) return LV_RES_INV;
         memcpy(dsc->user_data, &b, sizeof(b));
@@ -251,7 +251,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
     LV_UNUSED(decoder);
     bmp_dsc_t * b = dsc->user_data;
     lv_fs_close(&b->f);
-    lv_mem_free(dsc->user_data);
+    lv_free(dsc->user_data);
 
 }
 

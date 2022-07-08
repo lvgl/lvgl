@@ -110,7 +110,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     else if(mode == LV_FS_MODE_RD) flags = FA_READ;
     else if(mode == (LV_FS_MODE_WR | LV_FS_MODE_RD)) flags = FA_READ | FA_WRITE | FA_OPEN_ALWAYS;
 
-    FIL * f = lv_mem_alloc(sizeof(FIL));
+    FIL * f = lv_malloc(sizeof(FIL));
     if(f == NULL) return NULL;
 
     FRESULT res = f_open(f, path, flags);
@@ -118,7 +118,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
         return f;
     }
     else {
-        lv_mem_free(f);
+        lv_free(f);
         return NULL;
     }
 }
@@ -134,7 +134,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
     LV_UNUSED(drv);
     f_close(file_p);
-    lv_mem_free(file_p);
+    lv_free(file_p);
     return LV_FS_RES_OK;
 }
 
@@ -225,12 +225,12 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
-    DIR * d = lv_mem_alloc(sizeof(DIR));
+    DIR * d = lv_malloc(sizeof(DIR));
     if(d == NULL) return NULL;
 
     FRESULT res = f_opendir(d, path);
     if(res != FR_OK) {
-        lv_mem_free(d);
+        lv_free(d);
         d = NULL;
     }
     return d;
@@ -276,7 +276,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
     LV_UNUSED(drv);
     f_closedir(dir_p);
-    lv_mem_free(dir_p);
+    lv_free(dir_p);
     return LV_FS_RES_OK;
 }
 

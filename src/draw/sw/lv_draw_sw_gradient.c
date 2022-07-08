@@ -135,7 +135,7 @@ static void free_item(lv_grad_t * c)
 #endif
             c = (lv_grad_t *)(((uint8_t *)c) + get_cache_item_size(c));
         }
-        lv_memset_00(old + next_items_size, size);
+        lv_memzero(old + next_items_size, size);
     }
 }
 
@@ -191,7 +191,7 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
         }
         else {
             /*The cache is too small. Allocate the item manually and free it later.*/
-            item = lv_mem_alloc(req_size);
+            item = lv_malloc(req_size);
             LV_ASSERT_MALLOC(item);
             if(item == NULL) return NULL;
             item->not_cached = 1;
@@ -236,17 +236,17 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
  **********************/
 void lv_gradient_free_cache(void)
 {
-    lv_mem_free(LV_GC_ROOT(_lv_grad_cache_mem));
+    lv_free(LV_GC_ROOT(_lv_grad_cache_mem));
     LV_GC_ROOT(_lv_grad_cache_mem) = grad_cache_end = NULL;
     grad_cache_size = 0;
 }
 
 void lv_gradient_set_cache_size(size_t max_bytes)
 {
-    lv_mem_free(LV_GC_ROOT(_lv_grad_cache_mem));
-    grad_cache_end = LV_GC_ROOT(_lv_grad_cache_mem) = lv_mem_alloc(max_bytes);
+    lv_free(LV_GC_ROOT(_lv_grad_cache_mem));
+    grad_cache_end = LV_GC_ROOT(_lv_grad_cache_mem) = lv_malloc(max_bytes);
     LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_grad_cache_mem));
-    lv_memset_00(LV_GC_ROOT(_lv_grad_cache_mem), max_bytes);
+    lv_memzero(LV_GC_ROOT(_lv_grad_cache_mem), max_bytes);
     grad_cache_size = max_bytes;
 }
 
@@ -284,7 +284,7 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h)
         item->hmap[i] = lv_gradient_calculate(g, item->size, i);
     }
 #if LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION == 1
-    lv_memset_00(item->error_acc, w * sizeof(lv_scolor24_t));
+    lv_memzero(item->error_acc, w * sizeof(lv_scolor24_t));
 #endif
 #else
     for(lv_coord_t i = 0; i < item->size; i++) {
@@ -343,7 +343,7 @@ LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_gradient_calculate(const lv_grad_dsc_t 
 void lv_gradient_cleanup(lv_grad_t * grad)
 {
     if(grad->not_cached) {
-        lv_mem_free(grad);
+        lv_free(grad);
     }
 }
 

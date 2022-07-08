@@ -35,7 +35,7 @@
 /*Enable and configure the built-in memory manager*/
 #define LV_USE_BUILTIN_MALLOC 1
 #if LV_USE_BUILTIN_MALLOC
-    /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
+    /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
     #define LV_MEM_SIZE (128U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
@@ -53,7 +53,7 @@
     #define LV_SPRINTF_USE_FLOAT 0
 #endif  /*LV_USE_BUILTIN_SNPRINTF*/
 
-#define LV_STDLIB_INCLUDE <stdlib.h>
+#define LV_STDLIB_INCLUDE <stdint.h>
 #define LV_MALLOC       lv_builtin_malloc
 #define LV_REALLOC      lv_builtin_realloc
 #define LV_FREE         lv_builtin_free
@@ -91,16 +91,15 @@
      *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
     #define LV_DRAW_SW_COMPLEX 1
 
-    /* "Simple layers" are used when a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc)
-     * or not NORMAL blend mode to buffer the widget into a layer before rendering.
-     * The widget can be buffered in smaller chunks to avoid using large buffers.
-     * Note that "Transformed layers" (where transform_angle/zoom properties are used) use larger buffers
+    /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
      * and can't be drawn in chunks. */
 
-    /*The optimal target buffer size for simple layer chunks. LVGL will try to allocate it*/
+    /*The target buffer size for simple layer chunks.*/
     #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)   /*[bytes]*/
 
-    /*Used if `LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.*/
+    /*Used if `LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.*/
     #define LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)    /*[bytes]*/
 
     /*Allow buffering some shadow calculation.
@@ -151,7 +150,6 @@
     #define LV_DARW_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
-
 /*=====================
  * GPU CONFIGURATION
  *=====================*/
@@ -167,12 +165,6 @@
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
-/*Use SWM341's DMA2D GPU*/
-#define LV_USE_GPU_SWM341_DMA2D 0
-#if LV_USE_GPU_SWM341_DMA2D
-    #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
-#endif
-
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_PXP 0
 #if LV_USE_GPU_NXP_PXP
@@ -186,6 +178,12 @@
 
 /*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_VG_LITE 0
+
+/*Use SWM341's DMA2D GPU*/
+#define LV_USE_GPU_SWM341_DMA2D 0
+#if LV_USE_GPU_SWM341_DMA2D
+    #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
+#endif
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -251,7 +249,7 @@
 #endif
 
 /*1: Show the used memory and the memory fragmentation
- * Requires LV_MEM_CUSTOM = 0*/
+ * Requires `LV_USE_BUILTIN_MALLOC = 1`*/
 #define LV_USE_MEM_MONITOR 0
 #if LV_USE_MEM_MONITOR
     #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
@@ -273,10 +271,10 @@
     #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
 #endif /*LV_ENABLE_GC*/
 
-/*Default image cache size. Image caching keeps the images opened.
- *If only the built-in image formats are used there is no real advantage of caching. (I.e. if no new image decoder is added)
- *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
- *However the opened images might consume additional RAM.
+/*Default image cache size. Image caching keeps some images opened.
+ *If only the built-in image formats are used there is no real advantage of caching.
+ *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
+ *However the opened images consume additional RAM.
  *0: to disable caching*/
 #define LV_IMG_CACHE_DEF_SIZE 0
 
@@ -321,8 +319,6 @@
 /*Place performance critical functions into a faster memory (e.g RAM)*/
 #define LV_ATTRIBUTE_FAST_MEM
 
-/*Prefix variables that are used in GPU accelerated operations, often these need to be placed in RAM sections that are DMA accessible*/
-#define LV_ATTRIBUTE_DMA
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
  *should also appear on LVGL binding API such as Micropython.*/
