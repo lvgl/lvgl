@@ -54,15 +54,15 @@
 #endif  /*LV_USE_BUILTIN_SNPRINTF*/
 
 #define LV_STDLIB_INCLUDE <stdint.h>
-#define LV_MALLOC       lv_builtin_malloc
-#define LV_REALLOC      lv_builtin_realloc
-#define LV_FREE         lv_builtin_free
-#define LV_SNPRINTF     lv_builtin_snprintf
-#define LV_VSNPRINTF    lv_builtin_vsnprintf
-#define LV_MEMSET       lv_builtin_memset
-#define LV_MEMCPY       lv_builtin_memcpy
-#define LV_STRLEN       lv_builtin_strlen
-#define LV_STRNCPY      lv_builtin_strncpy
+#define LV_MALLOC       lv_malloc_builtin
+#define LV_REALLOC      lv_realloc_builtin
+#define LV_FREE         lv_free_builtin
+#define LV_MEMSET       lv_memset_builtin
+#define LV_MEMCPY       lv_memcpy_builtin
+#define LV_SNPRINTF     lv_snprintf_builtin
+#define LV_VSNPRINTF    lv_vsnprintf_builtin
+#define LV_STRLEN       lv_strlen_builtin
+#define LV_STRNCPY      lv_strncpy_builtin
 
 /*====================
    HAL SETTINGS

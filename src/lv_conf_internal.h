@@ -157,70 +157,70 @@
     #ifdef CONFIG_LV_STDLIB_INCLUDE
         #define LV_STDLIB_INCLUDE CONFIG_LV_STDLIB_INCLUDE
     #else
-        #define LV_STDLIB_INCLUDE <stdlib.h>
+        #define LV_STDLIB_INCLUDE <stdint.h>
     #endif
 #endif
 #ifndef LV_MALLOC
     #ifdef CONFIG_LV_MALLOC
         #define LV_MALLOC CONFIG_LV_MALLOC
     #else
-        #define LV_MALLOC       lv_builtin_malloc
+        #define LV_MALLOC       lv_malloc_builtin
     #endif
 #endif
 #ifndef LV_REALLOC
     #ifdef CONFIG_LV_REALLOC
         #define LV_REALLOC CONFIG_LV_REALLOC
     #else
-        #define LV_REALLOC      lv_builtin_realloc
+        #define LV_REALLOC      lv_realloc_builtin
     #endif
 #endif
 #ifndef LV_FREE
     #ifdef CONFIG_LV_FREE
         #define LV_FREE CONFIG_LV_FREE
     #else
-        #define LV_FREE         lv_builtin_free
-    #endif
-#endif
-#ifndef LV_SNPRINTF
-    #ifdef CONFIG_LV_SNPRINTF
-        #define LV_SNPRINTF CONFIG_LV_SNPRINTF
-    #else
-        #define LV_SNPRINTF     lv_builtin_snprintf
-    #endif
-#endif
-#ifndef LV_VSNPRINTF
-    #ifdef CONFIG_LV_VSNPRINTF
-        #define LV_VSNPRINTF CONFIG_LV_VSNPRINTF
-    #else
-        #define LV_VSNPRINTF    lv_builtin_vsnprintf
+        #define LV_FREE         lv_free_builtin
     #endif
 #endif
 #ifndef LV_MEMSET
     #ifdef CONFIG_LV_MEMSET
         #define LV_MEMSET CONFIG_LV_MEMSET
     #else
-        #define LV_MEMSET       lv_builtin_memset
+        #define LV_MEMSET       lv_memset_builtin
     #endif
 #endif
 #ifndef LV_MEMCPY
     #ifdef CONFIG_LV_MEMCPY
         #define LV_MEMCPY CONFIG_LV_MEMCPY
     #else
-        #define LV_MEMCPY       lv_builtin_memcpy
+        #define LV_MEMCPY       lv_memcpy_builtin
+    #endif
+#endif
+#ifndef LV_SNPRINTF
+    #ifdef CONFIG_LV_SNPRINTF
+        #define LV_SNPRINTF CONFIG_LV_SNPRINTF
+    #else
+        #define LV_SNPRINTF     lv_snprintf_builtin
+    #endif
+#endif
+#ifndef LV_VSNPRINTF
+    #ifdef CONFIG_LV_VSNPRINTF
+        #define LV_VSNPRINTF CONFIG_LV_VSNPRINTF
+    #else
+        #define LV_VSNPRINTF    lv_vsnprintf_builtin
     #endif
 #endif
 #ifndef LV_STRLEN
     #ifdef CONFIG_LV_STRLEN
         #define LV_STRLEN CONFIG_LV_STRLEN
     #else
-        #define LV_STRLEN       lv_builtin_strlen
+        #define LV_STRLEN       lv_strlen_builtin
     #endif
 #endif
 #ifndef LV_STRNCPY
     #ifdef CONFIG_LV_STRNCPY
         #define LV_STRNCPY CONFIG_LV_STRNCPY
     #else
-        #define LV_STRNCPY      lv_builtin_strncpy
+        #define LV_STRNCPY      lv_strncpy_builtin
     #endif
 #endif
 
@@ -295,13 +295,12 @@
         #endif
     #endif
 
-    /* "Simple layers" are used when a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc)
-     * or not NORMAL blend mode to buffer the widget into a layer before rendering.
-     * The widget can be buffered in smaller chunks to avoid using large buffers.
-     * Note that "Transformed layers" (where transform_angle/zoom properties are used) use larger buffers
+    /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
      * and can't be drawn in chunks. */
 
-    /*The optimal target buffer size for simple layer chunks. LVGL will try to allocate it*/
+    /*The target buffer size for simple layer chunks.*/
     #ifndef LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
         #ifdef CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
             #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
@@ -310,7 +309,7 @@
         #endif
     #endif
 
-    /*Used if `LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.*/
+    /*Used if `LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.*/
     #ifndef LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE
         #ifdef CONFIG_LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE
             #define LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE CONFIG_LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE
@@ -433,7 +432,6 @@
     #endif
 #endif
 
-
 /*=====================
  * GPU CONFIGURATION
  *=====================*/
@@ -467,24 +465,6 @@
     #endif
 #endif
 
-/*Use SWM341's DMA2D GPU*/
-#ifndef LV_USE_GPU_SWM341_DMA2D
-    #ifdef CONFIG_LV_USE_GPU_SWM341_DMA2D
-        #define LV_USE_GPU_SWM341_DMA2D CONFIG_LV_USE_GPU_SWM341_DMA2D
-    #else
-        #define LV_USE_GPU_SWM341_DMA2D 0
-    #endif
-#endif
-#if LV_USE_GPU_SWM341_DMA2D
-    #ifndef LV_GPU_SWM341_DMA2D_INCLUDE
-        #ifdef CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
-            #define LV_GPU_SWM341_DMA2D_INCLUDE CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
-        #else
-            #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
-        #endif
-    #endif
-#endif
-
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #ifndef LV_USE_GPU_NXP_PXP
     #ifdef CONFIG_LV_USE_GPU_NXP_PXP
@@ -514,6 +494,24 @@
         #define LV_USE_GPU_NXP_VG_LITE CONFIG_LV_USE_GPU_NXP_VG_LITE
     #else
         #define LV_USE_GPU_NXP_VG_LITE 0
+    #endif
+#endif
+
+/*Use SWM341's DMA2D GPU*/
+#ifndef LV_USE_GPU_SWM341_DMA2D
+    #ifdef CONFIG_LV_USE_GPU_SWM341_DMA2D
+        #define LV_USE_GPU_SWM341_DMA2D CONFIG_LV_USE_GPU_SWM341_DMA2D
+    #else
+        #define LV_USE_GPU_SWM341_DMA2D 0
+    #endif
+#endif
+#if LV_USE_GPU_SWM341_DMA2D
+    #ifndef LV_GPU_SWM341_DMA2D_INCLUDE
+        #ifdef CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
+            #define LV_GPU_SWM341_DMA2D_INCLUDE CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
+        #else
+            #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
+        #endif
     #endif
 #endif
 
@@ -741,7 +739,7 @@
 #endif
 
 /*1: Show the used memory and the memory fragmentation
- * Requires LV_MEM_CUSTOM = 0*/
+ * Requires `LV_USE_BUILTIN_MALLOC = 1`*/
 #ifndef LV_USE_MEM_MONITOR
     #ifdef CONFIG_LV_USE_MEM_MONITOR
         #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
@@ -809,10 +807,10 @@
     #endif
 #endif /*LV_ENABLE_GC*/
 
-/*Default image cache size. Image caching keeps the images opened.
- *If only the built-in image formats are used there is no real advantage of caching. (I.e. if no new image decoder is added)
- *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
- *However the opened images might consume additional RAM.
+/*Default image cache size. Image caching keeps some images opened.
+ *If only the built-in image formats are used there is no real advantage of caching.
+ *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
+ *However the opened images consume additional RAM.
  *0: to disable caching*/
 #ifndef LV_IMG_CACHE_DEF_SIZE
     #ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
@@ -933,14 +931,6 @@
     #endif
 #endif
 
-/*Prefix variables that are used in GPU accelerated operations, often these need to be placed in RAM sections that are DMA accessible*/
-#ifndef LV_ATTRIBUTE_DMA
-    #ifdef CONFIG_LV_ATTRIBUTE_DMA
-        #define LV_ATTRIBUTE_DMA CONFIG_LV_ATTRIBUTE_DMA
-    #else
-        #define LV_ATTRIBUTE_DMA
-    #endif
-#endif
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
  *should also appear on LVGL binding API such as Micropython.*/
