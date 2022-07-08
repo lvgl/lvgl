@@ -44,7 +44,6 @@ typedef void (*lv_dither_func_t)(struct _lv_gradient_cache_t * grad, lv_coord_t 
 /**********************
  *    PROTOTYPES
  **********************/
-#if LV_DRAW_SW_COMPLEX
 #if _DITHER_GRADIENT
 LV_ATTRIBUTE_FAST_MEM void lv_dither_none(struct _lv_gradient_cache_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w);
 
@@ -62,9 +61,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_ver(struct _lv_gradient_cache_t * 
 
 #endif /* _DITHER_GRADIENT */
 #endif
-
-
-#endif /*LV_USE_DRAW_SW*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -8,7 +8,6 @@
  *********************/
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
-#if LV_DRAW_SW_COMPLEX
 
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_area.h"
@@ -494,6 +493,5 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
     }
 }
 
-#endif /*LV_DRAW_SW_COMPLEX*/
 #endif /*LV_USE_DRAW_SW*/
 

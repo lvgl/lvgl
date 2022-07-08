@@ -36,7 +36,7 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
 
 static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords);
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t s,
@@ -70,7 +70,7 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
 
 void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     draw_shadow(draw_ctx, dsc, coords);
 #endif
 
@@ -138,8 +138,8 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     }
 
     /*Complex case: there is gradient, mask, or radius*/
-#if LV_DRAW_SW_COMPLEX == 0
-    LV_LOG_WARN("Can't draw complex rectangle because LV_DRAW_SW_COMPLEX = 0");
+#if LV_USE_DRAW_MASKS == 0
+    LV_LOG_WARN("Can't draw complex rectangle because LV_USE_DRAW_MASKS = 0");
 #else
     lv_opa_t opa = dsc->bg_opa >= LV_OPA_MAX ? LV_OPA_COVER : dsc->bg_opa;
 
@@ -434,7 +434,7 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
 
 }
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords)
 {
@@ -1169,7 +1169,7 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
         return;
     }
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `coords`*/
     lv_area_t draw_area;
@@ -1378,9 +1378,9 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
     lv_draw_mask_remove_id(mask_rout_id);
     lv_free(blend_dsc.mask_buf);
 
-#else /*LV_DRAW_SW_COMPLEX*/
+#else /*LV_USE_DRAW_MASKS*/
     LV_UNUSED(blend_mode);
-#endif /*LV_DRAW_SW_COMPLEX*/
+#endif /*LV_USE_DRAW_MASKS*/
 }
 static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                lv_color_t color, lv_opa_t opa)

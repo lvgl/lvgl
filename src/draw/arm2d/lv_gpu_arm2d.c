@@ -645,7 +645,7 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
                                                     mask,
                                                     mask_stride);
             }
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
             else {
                 break;
             }
@@ -663,7 +663,7 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
                                                     mask,
                                                     mask_stride);
             }
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
             else {
                 break;
             }
@@ -1208,7 +1208,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                     (color_int)draw_dsc->recolor.full,
                     draw_dsc->recolor_opa);
             }
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
             /*Apply the masks if any*/
             if(mask_any) {
                 lv_coord_t y;

@@ -348,7 +348,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     _lv_font_clean_up_fmt_txt();
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     _lv_draw_mask_cleanup();
 #endif
 

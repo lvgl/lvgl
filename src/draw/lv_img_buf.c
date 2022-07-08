@@ -423,7 +423,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
                                       const lv_point_t * pivot)
 {
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) {
         res->x1 = 0;
         res->y1 = 0;

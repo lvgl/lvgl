@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_assert.h"
@@ -1527,4 +1527,4 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 }
 
 
-#endif /*LV_DRAW_SW_COMPLEX*/
+#endif /*LV_USE_DRAW_MASKS*/

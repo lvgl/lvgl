@@ -532,7 +532,7 @@ static void lv_obj_draw(lv_event_t * e)
         part_dsc.part = LV_PART_MAIN;
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
         /*With clip corner enabled draw the bg img separately to make it clipped*/
         bool clip_corner = (lv_obj_get_style_clip_corner(obj, LV_PART_MAIN) && draw_dsc.radius != 0) ? true : false;
         const void * bg_img_src = draw_dsc.bg_img_src;
@@ -544,7 +544,7 @@ static void lv_obj_draw(lv_event_t * e)
         lv_draw_rect(draw_ctx, &draw_dsc, &coords);
 
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
         if(clip_corner) {
             lv_draw_mask_radius_param_t * mp = lv_malloc(sizeof(lv_draw_mask_radius_param_t));
             lv_draw_mask_radius_init(mp, &obj->coords, draw_dsc.radius, false);
@@ -568,7 +568,7 @@ static void lv_obj_draw(lv_event_t * e)
         lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
         draw_scrollbar(obj, draw_ctx);
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
             if(param) {
@@ -672,7 +672,7 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         }
     }
 
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, LV_PART_SCROLLBAR);
     if(dsc->shadow_opa > LV_OPA_MIN) {
         dsc->shadow_width = lv_obj_get_style_shadow_width(obj, LV_PART_SCROLLBAR);

@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_ROLLER && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES
+#if LV_USE_ROLLER && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES
 
 static void mask_event_cb(lv_event_t * e)
 {

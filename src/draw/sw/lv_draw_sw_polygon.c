@@ -49,7 +49,7 @@
 void lv_draw_sw_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t * points,
                         uint16_t point_cnt)
 {
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     if(point_cnt < 3) return;
     if(points == NULL) return;
 
@@ -200,8 +200,8 @@ void lv_draw_sw_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dra
     LV_UNUSED(point_cnt);
     LV_UNUSED(draw_ctx);
     LV_UNUSED(draw_dsc);
-    LV_LOG_WARN("Can't draw polygon with LV_DRAW_SW_COMPLEX == 0");
-#endif /*LV_DRAW_SW_COMPLEX*/
+    LV_LOG_WARN("Can't draw polygon with LV_USE_DRAW_MASKS == 0");
+#endif /*LV_USE_DRAW_MASKS*/
 }
 
 /**********************

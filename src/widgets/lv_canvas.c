@@ -161,7 +161,7 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
                          lv_coord_t offset_y,
                          int32_t pivot_x, int32_t pivot_y, bool antialias)
 {
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(src_img);
 
@@ -221,7 +221,7 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
     LV_UNUSED(pivot_x);
     LV_UNUSED(pivot_y);
     LV_UNUSED(antialias);
-    LV_LOG_WARN("Can't transform canvas with LV_DRAW_SW_COMPLEX == 0");
+    LV_LOG_WARN("Can't transform canvas with LV_USE_DRAW_MASKS == 0");
 #endif
 }
 
@@ -721,7 +721,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
 void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle,
                         int32_t end_angle, const lv_draw_arc_dsc_t * draw_dsc)
 {
-#if LV_DRAW_SW_COMPLEX
+#if LV_USE_DRAW_MASKS
     LV_ASSERT_OBJ(canvas, MY_CLASS);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
@@ -757,7 +757,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     LV_UNUSED(start_angle);
     LV_UNUSED(end_angle);
     LV_UNUSED(draw_dsc);
-    LV_LOG_WARN("Can't draw arc with LV_DRAW_SW_COMPLEX == 0");
+    LV_LOG_WARN("Can't draw arc with LV_USE_DRAW_MASKS == 0");
 #endif
 }
 

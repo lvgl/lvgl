@@ -53,9 +53,7 @@ void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     draw_sw_ctx->base_draw.draw_img_decoded = lv_draw_sw_img_decoded;
     draw_sw_ctx->base_draw.draw_line = lv_draw_sw_line;
     draw_sw_ctx->base_draw.draw_polygon = lv_draw_sw_polygon;
-#if LV_DRAW_SW_COMPLEX
     draw_sw_ctx->base_draw.draw_transform = lv_draw_sw_transform;
-#endif
     draw_sw_ctx->base_draw.wait_for_finish = lv_draw_sw_wait_for_finish;
     draw_sw_ctx->base_draw.buffer_copy = lv_draw_sw_buffer_copy;
     draw_sw_ctx->base_draw.layer_init = lv_draw_sw_layer_create;
