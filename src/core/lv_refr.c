@@ -738,9 +738,9 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_event_send(obj, LV_EVENT_COVER_CHECK, &info);
     if(info.res == LV_COVER_RES_MASKED) return NULL;
 
-    uint32_t i;
-    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
-    for(i = 0; i < child_cnt; i++) {
+    int32_t i;
+    int32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for(i = child_cnt - 1; i >= 0; i--) {
         lv_obj_t * child = obj->spec_attr->children[i];
         found_p = lv_refr_get_top_obj(area_p, child);
 
