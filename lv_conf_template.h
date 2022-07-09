@@ -84,6 +84,10 @@
  * DRAW CONFIGURATION
  *========================*/
 
+/*Enable the built in mask engine.
+ *Required to draw shadow, rounded corners, circles, arc, skew lines, or any other masks*/
+#define LV_USE_DRAW_MASKS 1
+
 #define LV_USE_DRAW_SW  1
 #if LV_USE_DRAW_SW
 

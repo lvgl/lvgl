@@ -268,6 +268,20 @@
  * DRAW CONFIGURATION
  *========================*/
 
+/*Enable the built in mask engine.
+ *Required to draw shadow, rounded corners, circles, arc, skew lines, or any other masks*/
+#ifndef LV_USE_DRAW_MASKS
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_DRAW_MASKS
+            #define LV_USE_DRAW_MASKS CONFIG_LV_USE_DRAW_MASKS
+        #else
+            #define LV_USE_DRAW_MASKS 0
+        #endif
+    #else
+        #define LV_USE_DRAW_MASKS 1
+    #endif
+#endif
+
 #ifndef LV_USE_DRAW_SW
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_DRAW_SW
