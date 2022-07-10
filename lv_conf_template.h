@@ -160,8 +160,8 @@
 #define LV_DITHER_GRADIENT 0
 #if LV_DITHER_GRADIENT
     /*Add support for error diffusion dithering.
-     *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-     *The increase in memory consumption is (24 bits * object's width)*/
+    *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+    *The increase in memory consumption is (24 bits * object's width)*/
     #define LV_DITHER_ERROR_DIFFUSION 0
 #endif
 
@@ -726,7 +726,7 @@
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #define LV_USE_DEMO_WIDGETS 0
 #if LV_USE_DEMO_WIDGETS
-#define LV_DEMO_WIDGETS_SLIDESHOW 0
+    #define LV_DEMO_WIDGETS_SLIDESHOW 0
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -735,8 +735,8 @@
 /*Benchmark your system*/
 #define LV_USE_DEMO_BENCHMARK 0
 #if LV_USE_DEMO_BENCHMARK
-/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-#define LV_DEMO_BENCHMARK_RGB565A8 0
+    /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+    #define LV_DEMO_BENCHMARK_RGB565A8 0
 #endif
 
 /*Stress test for LVGL*/

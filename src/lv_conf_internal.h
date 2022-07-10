@@ -388,8 +388,8 @@
 #endif
 #if LV_DITHER_GRADIENT
     /*Add support for error diffusion dithering.
-     *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-     *The increase in memory consumption is (24 bits * object's width)*/
+    *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+    *The increase in memory consumption is (24 bits * object's width)*/
     #ifndef LV_DITHER_ERROR_DIFFUSION
         #ifdef CONFIG_LV_DITHER_ERROR_DIFFUSION
             #define LV_DITHER_ERROR_DIFFUSION CONFIG_LV_DITHER_ERROR_DIFFUSION
@@ -2342,13 +2342,13 @@
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
-#ifndef LV_DEMO_WIDGETS_SLIDESHOW
-    #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-    #else
-        #define LV_DEMO_WIDGETS_SLIDESHOW 0
+    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
+        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #else
+            #define LV_DEMO_WIDGETS_SLIDESHOW 0
+        #endif
     #endif
-#endif
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -2369,14 +2369,14 @@
     #endif
 #endif
 #if LV_USE_DEMO_BENCHMARK
-/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-#ifndef LV_DEMO_BENCHMARK_RGB565A8
-    #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-        #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-    #else
-        #define LV_DEMO_BENCHMARK_RGB565A8 0
+    /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+    #ifndef LV_DEMO_BENCHMARK_RGB565A8
+        #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
+            #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
+        #else
+            #define LV_DEMO_BENCHMARK_RGB565A8 0
+        #endif
     #endif
-#endif
 #endif
 
 /*Stress test for LVGL*/
