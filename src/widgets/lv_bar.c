@@ -124,6 +124,11 @@ void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max)
 
     lv_bar_t * bar = (lv_bar_t *)obj;
 
+    if(max < min) {
+        LV_LOG_WARN("error range: min = %" LV_PRId32 ", max = %" LV_PRId32, min, max);
+        return;
+    }
+
     if(bar->min_value == min && bar->max_value == max) return;
 
     bar->max_value = max;
@@ -259,6 +264,12 @@ static void draw_indic(lv_event_t * e)
     lv_coord_t barw = lv_area_get_width(&bar_coords);
     lv_coord_t barh = lv_area_get_height(&bar_coords);
     int32_t range = bar->max_value - bar->min_value;
+
+    /*Prevent division by 0*/
+    if(range == 0) {
+        range = 1;
+    }
+
     bool hor = barw >= barh ? true : false;
     bool sym = false;
     if(bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
