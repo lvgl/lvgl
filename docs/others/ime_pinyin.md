@@ -126,7 +126,7 @@ The lv_ime_pinyin have the following modes:
 - `LV_IME_PINYIN_MODE_K9` Pinyin 9 key input mode
 - `LV_IME_PINYIN_MODE_K9_NUMBER` Numeric keypad mode
 
-The TEXT modes' layout contains buttons to change mode.
+The `TEXT` modes' layout contains buttons to change mode.
 
 To set the mode manually, use lv_ime_pinyin_set_mode(pinyin_ime, mode). The default mode is LV_IME_PINYIN_MODE_K26.
 
