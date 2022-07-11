@@ -128,7 +128,7 @@ The lv_ime_pinyin have the following modes:
 
 The `TEXT` modes' layout contains buttons to change mode.
 
-To set the mode manually, use lv_ime_pinyin_set_mode(pinyin_ime, mode). The default mode is LV_IME_PINYIN_MODE_K26.
+To set the mode manually, use `lv_ime_pinyin_set_mode(pinyin_ime, mode)` . The default mode is `LV_IME_PINYIN_MODE_K26` .
 
 <details>
 <summary>中文</summary>
