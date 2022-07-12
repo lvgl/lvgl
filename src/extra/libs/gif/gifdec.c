@@ -82,13 +82,13 @@ typedef struct Table {
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data);
 
 
 static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
-                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf, void * user_data);
 
-static void decoder_close(lv_img_dec_dsc_t * dsc);
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data);
 
 static gd_GIF * gd_open_gif_file(const char *fname, const bool skip_alloc);
 
@@ -132,7 +132,7 @@ void lv_gif_init(void)
     if(gif_init)
         return;
 
-    lv_img_dec_t * dec = lv_img_decoder_create();
+    lv_img_decoder_t * dec = lv_img_decoder_create(NULL);
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_read_line_cb(dec, decoder_read_line);
@@ -815,8 +815,9 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
  * @param dsc Decoded descriptor for the animation
  * @return LV_RES_OK: no error; LV_RES_INV: can't decode the picture
  */
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data)
 {
+    LV_UNUSED(user_data);
     gd_GIF * gif = dsc->dec_ctx ? (gd_GIF *)dsc->dec_ctx->user_data : NULL;
 
     if(gif == NULL) {
@@ -878,8 +879,9 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
 }
 
 static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
-                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
+                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf, void * user_data)
 {
+    LV_UNUSED(user_data);
     LV_UNUSED(dsc);
     LV_UNUSED(x);
     LV_UNUSED(y);
@@ -888,8 +890,9 @@ static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
     return LV_RES_INV;
 }
 
-static void decoder_close(lv_img_dec_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data)
 {
+    LV_UNUSED(user_data);
     lv_img_dec_ctx_t * dec_ctx = dsc->dec_ctx;
     if(dec_ctx && dec_ctx->auto_allocated) {
         /*Only free if allocated by ourselves.*/

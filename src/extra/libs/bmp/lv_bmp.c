@@ -33,13 +33,13 @@ typedef struct {
  **********************/
 static void set_caps(lv_fs_file_t * f, uint8_t * caps);
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data);
 
 
 static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
-                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf, void * user_data);
 
-static void decoder_close(lv_img_dec_dsc_t * dsc);
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data);
 
 static lv_res_t check_colordepth(int bpp);
 
@@ -56,7 +56,7 @@ static lv_res_t check_colordepth(int bpp);
  **********************/
 void lv_bmp_init(void)
 {
-    lv_img_dec_t * dec = lv_img_decoder_create();
+    lv_img_decoder_t * dec = lv_img_decoder_create(NULL);
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_read_line_cb(dec, decoder_read_line);
@@ -133,8 +133,9 @@ static lv_res_t check_colordepth(int bpp)
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or `LV_IMG_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data)
 {
+    LV_UNUSED(user_data);
     /* Only extract metadata ?*/
     if(flags == LV_IMG_DEC_ONLYMETA) {
         /*Save the data in the header*/
@@ -214,8 +215,9 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
 
 
 static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
-                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
+                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf, void * user_data)
 {
+    LV_UNUSED(user_data);
     bmp_dsc_t * b = dsc->dec_ctx->user_data;
     y = (b->px_height - 1) - y; /*BMP images are stored upside down*/
     uint32_t p = b->px_offset + b->row_size_bytes * y;
@@ -259,8 +261,9 @@ static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc,
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_dec_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data)
 {
+    LV_UNUSED(user_data);
     if(!dsc || !dsc->dec_ctx) return;
 
     bmp_dsc_t * b = dsc->dec_ctx->user_data;

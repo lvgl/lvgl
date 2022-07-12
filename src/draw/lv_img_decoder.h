@@ -72,6 +72,7 @@ struct _lv_img_dec_t;
  * Check if this decoder accepts the given format
  * @param src the image source
  * @param caps If provided will the filled with the decoder capabilities
+ * @param user_data A pointer to a user opaque data. Used by Micropython
  * @return LV_RES_OK: the decoder can decode the given source; LV_RES_INV: it can't decode the source
  */
 typedef lv_res_t (*lv_img_decoder_accept_f_t)(const lv_img_src_t * src, uint8_t * caps, void * user_data);
@@ -80,8 +81,10 @@ typedef lv_res_t (*lv_img_decoder_accept_f_t)(const lv_img_src_t * src, uint8_t 
  * Open an image for decoding. Prepare it as it is required to read it later
  * @param dsc   pointer to decoder descriptor. `src`, `color` are already initialized in it.
  * @param flags decoding flags used when decoding is long and only few data required. Might be ignored by decoder.
+ * @param user_data A pointer to a user opaque data. Used by Micropython
  */
-typedef lv_res_t (*lv_img_decoder_open_f_t)(struct _lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
+typedef lv_res_t (*lv_img_decoder_open_f_t)(struct _lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags,
+                                            void * user_data);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
@@ -91,17 +94,19 @@ typedef lv_res_t (*lv_img_decoder_open_f_t)(struct _lv_img_dec_dsc_t * dsc, cons
  * @param y start y coordinate
  * @param len number of pixels to decode
  * @param buf a buffer to store the decoded pixels
+ * @param user_data A pointer to a user opaque data. Used by Micropython
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
 typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_dec_dsc_t * dsc,
-                                                 lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+                                                 lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf, void * user_data);
 
 /**
  * Close the pending decoding. Free resources etc.
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
+ * @param user_data A pointer to a user opaque data. Used by Micropython
  */
-typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_dec_dsc_t * dsc);
+typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_dec_dsc_t * dsc, void * user_data);
 
 
 typedef struct _lv_img_dec_t {
@@ -109,7 +114,8 @@ typedef struct _lv_img_dec_t {
     lv_img_decoder_open_f_t         open_cb;
     lv_img_decoder_read_line_f_t    read_line_cb;
     lv_img_decoder_close_f_t        close_cb;
-} lv_img_dec_t;
+    void              *             user_data; /*Used by Micropython bindings*/
+} lv_img_decoder_t;
 
 /** The input members of an image decoder descriptor.
  *  These are the fields that are expected to be filled when calling the image decoder
@@ -131,7 +137,7 @@ typedef struct _lv_img_dec_dsc_in_t {
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_img_dec_dsc_t {
     /**The decoder which was able to open the image source*/
-    lv_img_dec_t * decoder;
+    lv_img_decoder_t * decoder;
 
     /** How much time did it take to open the image. [ms]
      *  If not set `lv_img_cache` will measure and set the time to open*/
@@ -200,10 +206,9 @@ lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc, lv_img_header_
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src   the image source.
  * @param caps  If not null, will be filled with the capabilities for the selected decoder
- * @param user_data     Not used.
  * @return A pointer to the decoder that's able to decode the image or NULL if none found
  */
-lv_img_dec_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
+lv_img_decoder_t * lv_img_decoder_accept(const lv_img_src_t * src, uint8_t * caps);
 
 /**
  * Open an image.
@@ -235,43 +240,44 @@ void lv_img_decoder_close(lv_img_dec_dsc_t * dsc);
 
 /**
  * Create a new image decoder
+ * @param user_data   A pointer to some opaque user controller data that's passed to all callback functions
  * @return pointer to the new image decoder
  */
-lv_img_dec_t * lv_img_decoder_create(void);
+lv_img_decoder_t * lv_img_decoder_create(void * user_data);
 
 /**
  * Delete an image decoder
  * @param decoder pointer to an image decoder
  */
-void lv_img_decoder_delete(lv_img_dec_t * decoder);
+void lv_img_decoder_delete(lv_img_decoder_t * decoder);
 
 /**
  * Set a callback to check if a decoder is able to decode the image
  * @param decoder pointer to an image decoder
  * @param accept_cb a function to accept an image (assert if this decoder can decode the image)
  */
-void lv_img_decoder_set_accept_cb(lv_img_dec_t * decoder, lv_img_decoder_accept_f_t accept_cb);
+void lv_img_decoder_set_accept_cb(lv_img_decoder_t * decoder, lv_img_decoder_accept_f_t accept_cb);
 
 /**
  * Set a callback to open an image
  * @param decoder pointer to an image decoder
  * @param open_cb a function to open an image
  */
-void lv_img_decoder_set_open_cb(lv_img_dec_t * decoder, lv_img_decoder_open_f_t open_cb);
+void lv_img_decoder_set_open_cb(lv_img_decoder_t * decoder, lv_img_decoder_open_f_t open_cb);
 
 /**
  * Set a callback to a decoded line of an image
  * @param decoder pointer to an image decoder
  * @param read_line_cb a function to read a line of an image
  */
-void lv_img_decoder_set_read_line_cb(lv_img_dec_t * decoder, lv_img_decoder_read_line_f_t read_line_cb);
+void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_read_line_f_t read_line_cb);
 
 /**
  * Set a callback to close a decoding session. E.g. close files and free other resources.
  * @param decoder pointer to an image decoder
  * @param close_cb a function to close a decoding session
  */
-void lv_img_decoder_set_close_cb(lv_img_dec_t * decoder, lv_img_decoder_close_f_t close_cb);
+void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_close_f_t close_cb);
 
 /**
  * Check if a valid size hint was provided
@@ -282,7 +288,7 @@ bool lv_img_decoder_has_size_hint(const lv_img_dec_dsc_in_t * dsc);
 /**
  * Check if it's the raw decoder
  */
-bool _lv_is_raw_decoder(lv_img_dec_t * decoder);
+bool _lv_is_raw_decoder(lv_img_decoder_t * decoder);
 
 /**********************
  *      MACROS

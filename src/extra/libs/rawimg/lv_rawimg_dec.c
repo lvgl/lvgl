@@ -39,12 +39,12 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_dec_dsc_t * dsc, lv_
 
 static lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
 
-static lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
+static lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data);
 
 static lv_res_t lv_img_decoder_built_in_read_line(lv_img_dec_dsc_t * dsc,
-                                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+                                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf, void * user_data);
 
-static void lv_img_decoder_built_in_close(lv_img_dec_dsc_t * dsc);
+static void lv_img_decoder_built_in_close(lv_img_dec_dsc_t * dsc, void * user_data);
 
 void lv_bin_init(void);
 
@@ -52,7 +52,7 @@ void lv_bin_init(void);
 void lv_bin_init()
 {
     /*Create a decoder for the built in color format*/
-    lv_img_dec_t * decoder = lv_img_decoder_create();
+    lv_img_decoder_t * decoder = lv_img_decoder_create(NULL);
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) {
         LV_LOG_WARN("lv_img_decoder_init: out of memory");
@@ -108,7 +108,7 @@ lv_res_t lv_img_decoder_built_in_accept(const lv_img_src_t * src, uint8_t * caps
     return LV_RES_INV;
 }
 
-lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
+lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * opaque)
 {
     /* Only extract metadata ?*/
     if(flags == LV_IMG_DEC_ONLYMETA) {
@@ -221,7 +221,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_f
             LV_ASSERT_MALLOC(user_data->opa);
             if(user_data->palette == NULL || user_data->opa == NULL) {
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
-                lv_img_decoder_built_in_close(dsc);
+                lv_img_decoder_built_in_close(dsc, opaque);
                 return LV_RES_INV;
             }
 
@@ -256,7 +256,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_f
     /*Unknown format. Can't decode it.*/
     else {
         /*Free the potentially allocated memories*/
-        lv_img_decoder_built_in_close(dsc);
+        lv_img_decoder_built_in_close(dsc, opaque);
 
         LV_LOG_WARN("Image decoder open: unknown color format");
         return LV_RES_INV;
@@ -276,8 +276,9 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_f
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
 lv_res_t lv_img_decoder_built_in_read_line(lv_img_dec_dsc_t * dsc, lv_coord_t x,
-                                           lv_coord_t y, lv_coord_t len, uint8_t * buf)
+                                           lv_coord_t y, lv_coord_t len, uint8_t * buf, void * user_data)
 {
+    LV_UNUSED(user_data);
     lv_res_t res = LV_RES_INV;
 
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
@@ -309,8 +310,9 @@ lv_res_t lv_img_decoder_built_in_read_line(lv_img_dec_dsc_t * dsc, lv_coord_t x,
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
  */
-void lv_img_decoder_built_in_close(lv_img_dec_dsc_t * dsc)
+void lv_img_decoder_built_in_close(lv_img_dec_dsc_t * dsc, void * opaque)
 {
+    LV_UNUSED(opaque);
     if(!dsc || !dsc->dec_ctx) return;
     lv_img_decoder_built_in_data_t * user_data = dsc->dec_ctx->user_data;
     if(user_data) {

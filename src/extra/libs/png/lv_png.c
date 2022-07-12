@@ -25,8 +25,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
-static void decoder_close(lv_img_dec_dsc_t * dsc);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data);
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data);
 static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
 
 /**********************
@@ -46,7 +46,7 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
  */
 void lv_png_init(void)
 {
-    lv_img_dec_t * dec = lv_img_decoder_create();
+    lv_img_decoder_t * dec = lv_img_decoder_create(NULL);
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -80,8 +80,9 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
     }
     return LV_RES_INV;
 }
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data)
 {
+    LV_UNUSED(user_data);
     uint8_t * caps = &dsc->caps;
 
     /*If it's a PNG file...*/
@@ -163,8 +164,9 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_dec_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data)
 {
+    LV_UNUSED(user_data);
     if(dsc->img_data) {
         lv_mem_free((uint8_t *)dsc->img_data); /*Not sure here it's allocated with lv_mem_alloc ?*/
         dsc->img_data = NULL;

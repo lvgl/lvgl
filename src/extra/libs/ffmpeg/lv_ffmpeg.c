@@ -67,8 +67,8 @@ struct lv_img_pixel_color_s {
  **********************/
 
 static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * user_data);
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags);
-static void decoder_close(lv_img_dec_dsc_t * dsc);
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data);
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
@@ -101,7 +101,7 @@ static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt);
 
 void lv_ffmpeg_init(void)
 {
-    lv_img_dec_t * dec = lv_img_decoder_create();
+    lv_img_decoder_t * dec = lv_img_decoder_create(NULL);
     lv_img_decoder_set_accept_cb(dec, decoder_accept);
     lv_img_decoder_set_open_cb(dec, decoder_open);
     lv_img_decoder_set_close_cb(dec, decoder_close);
@@ -134,7 +134,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
     return LV_RES_INV;
 }
 
-static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags)
+static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t flags, void * user_data)
 {
     if(dsc->input.src->type != LV_IMG_SRC_FILE) {
         return LV_RES_INV;
@@ -153,10 +153,8 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     if(!ffmpeg_ctx) {
         ffmpeg_ctx = ffmpeg_open_file(fn);
 
-        if(ffmpeg_ctx == NULL) {
-            decoder_close(dsc);
-            return LV_RES_INV;
-        }
+        if(ffmpeg_ctx == NULL) goto error_out;
+
         dsc->dec_ctx->user_data = ffmpeg_ctx;
     }
     /* Extract metadata */
@@ -171,14 +169,13 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     dsc->header.cf = ffmpeg_ctx->has_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
 
     if(flags == LV_IMG_DEC_ONLYMETA) {
-        decoder_close(dsc);
+        decoder_close(dsc, user_data);
         return LV_RES_OK;
     }
 
     if(ffmpeg_ctx->video_src_data[0] == NULL && ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
         LV_LOG_ERROR("ffmpeg image allocate failed");
-        decoder_close(dsc);
-        return LV_RES_INV;
+        goto error_out;
     }
 
     if(dsc->dec_ctx->current_frame == 0) {
@@ -189,9 +186,8 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     if(dsc->dec_ctx->current_frame != ffmpeg_ctx->last_rendered_frame
        && dsc->dec_ctx->current_frame < dsc->dec_ctx->total_frames) {
         if(ffmpeg_update_next_frame(ffmpeg_ctx) < 0) {
-            decoder_close(dsc);
             LV_LOG_ERROR("ffmpeg update frame failed");
-            return LV_RES_INV;
+            goto error_out;
         }
 
         dsc->dec_ctx->last_rendering = lv_tick_get();
@@ -209,10 +205,14 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
 
     /* The image is fully decoded. Return with its pointer */
     return LV_RES_OK;
+error_out:
+    decoder_close(dsc, user_data);
+    return LV_RES_INV;
 }
 
-static void decoder_close(lv_img_dec_dsc_t * dsc)
+static void decoder_close(lv_img_dec_dsc_t * dsc, void * user_data)
 {
+    LV_UNUSED(user_data);
     if(dsc->dec_ctx && dsc->dec_ctx->auto_allocated) {
         struct ffmpeg_context_s * ffmpeg_ctx = (struct ffmpeg_context_s *)dsc->dec_ctx->user_data;
         if(ffmpeg_ctx != NULL) ffmpeg_close(ffmpeg_ctx);
