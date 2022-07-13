@@ -66,7 +66,7 @@ Our team is ready to help you with **UI design, implementation and consulting se
 
 - **No custom build sysstem** LVGL is distributed as an organized collection of C files that can be easily integrated into any build system. Support for Make and CMake is included out of the box.
 
-- **Develop on PC** Use the same UI code on PC and on the embedded hardware. 
+- **Develop on PC** Use the same UI code on PC and embedded hardware. 
 
 - **Convert the UI to HTML** You can compile the C UI code to a single HTML file with our [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
