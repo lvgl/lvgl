@@ -11,9 +11,11 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 
   <h1 align="center">Light and Versatile Graphics Library</h1>
   <br>
-<p align="center">
-  <img src="https://lvgl.io/assets/images/lvgl_widgets_demo.gif">
-</p>
+<div align="center">
+  <img src="https://github.com/kisvegabor/test/raw/master/smartwatch_demo.gif">
+  &nbsp;
+  <img border="1px" src="https://lvgl.io/assets/images/lvgl_widgets_demo.gif">
+</div>
 <br>
 <p align="center">
   <a href="https://lvgl.io" title="Homepage of LVGL">Website </a> |
