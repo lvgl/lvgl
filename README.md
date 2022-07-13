@@ -41,7 +41,7 @@ Our team is ready to help you with **UI design, implementation and consulting se
 ### Free and Portable
 - **Fully portable** LVGL is a C (C++ compatible) library with no external dependencies. It can be compiled to any microcontrollers or microprocessors, with any (RT)OS to drive monochrome, ePaper, OLED or TFT displays, or even monitors.
 
-- **Free** LVGL comes with MIT licence you can easily use it in commercial projects too
+- **Free** LVGL is distributed under the MIT licence, so you can easily use it in commercial projects too.
 
 - **Minimal requirements** C99 or newer compiler, minimum 32kB RAM and 128 kB flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering. OS, External memory and GPU are supported but not required. 
 
