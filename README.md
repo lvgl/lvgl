@@ -46,8 +46,8 @@ Our team is ready to help you with graphics design, UI implementation and consul
 
 **Free and Portable**
   - A fully portable C (C++ compatible) library with no external dependencies. 
-  - It can be compiled to any MCU or MPU, with any (RT)OS
-  - Support monochrome, ePaper, OLED or TFT displays, or even monitors.
+  - Can be compiled to any MCU or MPU, with any (RT)OS
+  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors.
   - Distributed under the MIT licence, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128 kB Flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering. 
   - OS, External memory and GPU are supported but not required. 
@@ -59,8 +59,8 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - Texts are rendered with UTF-8 encoding supporting CJK, Thai, Hindi, Arabic, Persian writing systems. 
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
-  - Supporting mouse, touchpad, Keypad, keyboard, external buttons, encoder. 
-  - Multiple display support
+  - Supports Mouse, Touchpad, Keypad, keyboard, External buttons, Encoder input devices. 
+  - Multiple display support.
   
 **Binding and Build Support**
   - [Micropython binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
@@ -70,14 +70,15 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - Convert C UI code to HTML file with our [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
 **Docs, Tools, and Services**
-  - Detailed docs with [100+ simple examples](https://docs.lvgl.io/master/index.html)
+  - Detailed documentation with [100+ simple examples](https://docs.lvgl.io/master/index.html)
   - [SquareLine Studio](https://squareline.io/) - A professional and easy-to-use UI editor software to speed up and simplify the UI development.
-  - [Services](https://lvgl.io/services) such as user interface design, implementation and consulting to make UI development simpler and faster.
+  - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
 
 ## :arrow_forward: Get started
 This list will guide you to get started with LVGL step-by-step.
 
 **Get Familiar with LVGL**
+
   1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
   2. Read the [Introduction](https://docs.lvgl.io/master/intro/index.html) page of the documentation (5 minutes)
   3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/get-started/quick-overview.html) page (15 minutes)
@@ -99,6 +100,7 @@ This list will guide you to get started with LVGL step-by-step.
   10. Read the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) guide to see how you can help to improve LVGL (15 minutes)
 
 **Go for More**
+
   11. Download and try out [SquareLine Studio](https://squareline.io/).
   12. Contact us for [Services](https://lvgl.io/services).
 
