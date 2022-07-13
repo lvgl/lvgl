@@ -29,7 +29,7 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 
 LVGL is the most popular free and open source embedded graphics library to create beautiful UIs for any MCU, MPU and display type. It's supported by industry leading vendors and projects like  **Arm, STM32, NXP, Espressif, Nuvoton, Arduino, RT-Thread, Zephyr, NuttX, Adafruit and many more**.
 
-It has all the features to create modern and beautiful GUIs: 30+ built-in widgets, powerful style system, web inspired layout managers, and typography system supporting many languages. To integrate LVGL into your platform all you need is at least **32kB RAM and 128 kB flash**, a C compiler, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
+It has all the features to create modern and beautiful GUIs: 30+ built-in widgets, a powerful style system, web inspired layout managers, and a typography system supporting many languages. To integrate LVGL into your platform, all you need is at least **32kB RAM and 128 kB flash**, a C compiler, a frame buffer, and at least an 1/10 screen sized buffer for rendering.
 
 **SquareLine Studio** is a professional yet affordable **drag and drop UI editor** for LVGL. It runs on Windows, Linux and MacOS too and you can try it out even without registering to the website. 
 
