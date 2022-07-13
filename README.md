@@ -56,21 +56,21 @@ Our team is ready to help you with **UI design, implementation and consulting se
 
 - **Fast rendering engine** Supporting animations, anti-aliasing, opacity, smooth scrolling, blending modes, rounded rectangles, image transformation, etc  
 
-- **Various input devices** Supporting mouse, touchpad, Keypad, keyboard, external buttons, encoder. 
+- **Various Input Devices** Supporting mouse, touchpad, Keypad, keyboard, external buttons, encoder. 
 
 - **Multiple display support** Use one MCU to drive more screens. 
 
-### Binding and build support
+### Binding and Build Support
 
-- **Micropython Binding** Exposes [LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
+- **Micropython binding** Exposes [LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
 
-- **No custom build sysstem** LVGL is distributed as an organized collection of C files that can be easily integrated into any build system. Support for Make and CMake is included out of the box.
+- **No custom build system** LVGL is distributed as an organized collection of C files that can be easily integrated into any build system. Support for Make and CMake is included out of the box.
 
 - **Develop on PC** Use the same UI code on PC and embedded hardware. 
 
 - **Convert the UI to HTML** You can compile the C UI code to a single HTML file with our [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
-### Docs, tools, and services
+### Docs, Tools, and Services
 - **Detailed docs** with [100+ simple examples](https://docs.lvgl.io/master/index.html)
 
 - **SquareLine Studio** A professional and easy-to-use UI editor software to speed up and simplify the UI development.
