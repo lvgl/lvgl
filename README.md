@@ -64,7 +64,7 @@ Our team is ready to help you with **UI design, implementation and consulting se
 
 - **Micropython Binding** Exposes [LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
 
-- **No custom build sysstem** LVGL is just a bunch of C files that can be easily integrated into any build system (built in support for Make and CMake)
+- **No custom build sysstem** LVGL is distributed as an organized collection of C files that can be easily integrated into any build system. Support for Make and CMake is included out of the box.
 
 - **Develop on PC** Use the same UI code on PC and on the embedded hardware. 
 
