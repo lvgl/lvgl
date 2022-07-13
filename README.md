@@ -3,7 +3,7 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 
 ---
 
-<p align="right"><b>English</b> | <a href="./README_zh.md">中文</a> | <a href="/README_pt_BR.md">Português do Brasil]</a></p>
+<p align="right"><b>English</b> | <a href="./README_zh.md">中文</a> | <a href="/README_pt_BR.md">Português do Brasil</a></p>
 
 <p align="center">
   <img src="https://lvgl.io/assets/images/logo_lvgl.png">
