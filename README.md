@@ -18,12 +18,12 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 </div>
 <br>
 <p align="center">
-  <a href="https://lvgl.io" title="Homepage of LVGL">Website </a> |
-  <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
-  <a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
-  <a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
-  <a href="https:/lvgl.io/demos" title="Demos running in your browser">Demos</a> |
-  <a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
+<a href="https://lvgl.io" title="Homepage of LVGL">Website </a> |
+<a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
+<a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
+<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
+<a href="https:/lvgl.io/demos" title="Demos running in your browser">Demos</a> |
+<a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
 </p>
 <br>
 
@@ -113,9 +113,10 @@ LVGL is available as:
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
 - [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/os/rt-thread.html)
+- NXP MCUXpresso library
 - CMSIS-Pack
 
-## :man_technologist: Examples
+## :robot: Examples
 
 See how to create a button with a click event in C and MicroPython. For more examples see the [Examples](https://github.com/lvgl/lvgl/tree/master/examples) folder.
 
@@ -171,6 +172,12 @@ Check out our [Demos](https://lvgl.io/demos) as reference. For more information 
 
 
 ## :star2: Contributing
-LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs to hosting your own project under the LVGL organization.
+LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs or even hosting your own project under the LVGL organization.
 
 For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) section of the documentation.
+
+More than 300 people already left their fingerprint in LVGL. Be one them! See your here! :slightly_smiling_face: 
+
+<a href="https://github.com/lvgl/lvgl/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=lvgl/lvgl" />
+</a>
