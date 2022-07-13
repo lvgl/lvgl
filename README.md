@@ -48,7 +48,7 @@ Our team is ready to help you with **UI design, implementation and consulting se
 ### Widgets, Styles, Layouts and more
 - **30+ built-in widgets**  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
 
-- **Flexible style system**  ~100 style properties (e.g. radius, opacity, gradient, border, shadow, etc.) allows you to customize any part of the widgets (e.g. background, scrollbar, indicator, knob, etc) in any state (normal, pressed, check, focused, etc).
+- **Flexible style system**  ~100 style properties (e.g. radius, opacity, gradient, border, shadow, etc.) allow you to customize any part of the widgets (e.g. background, scrollbar, indicator, knob, etc) in any state (normal, pressed, check, focused, etc).
 
 - **Powerful layout engine** Flexbox and Grid-like layouts to automatically size and position the widgets in a responsive way
 
