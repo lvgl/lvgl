@@ -104,7 +104,12 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
     }
 
     lv_img_header_t header;
-    lv_img_decoder_get_info(src, &header);
+    lv_res_t get_info_res = lv_img_decoder_get_info(src, &header);
+#if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
+    if(get_info_res != LV_RES_OK) {
+        LV_LOG_WARN("lv_img_decoder_get_info: wasn't able to get info about the image");
+    }
+#endif
 
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
