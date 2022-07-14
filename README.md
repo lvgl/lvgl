@@ -75,36 +75,6 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - [SquareLine Studio](https://squareline.io/) - A professional and easy-to-use UI editor software to speed up and simplify the UI development.
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
 
-## :arrow_forward: Get started
-This list will guide you to get started with LVGL step-by-step.
-
-**Get Familiar with LVGL**
-
-  1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
-  2. Read the [Introduction](https://docs.lvgl.io/master/intro/index.html) page of the documentation (5 minutes)
-  3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/get-started/quick-overview.html) page (15 minutes)
-
-**Start to Use LVGL**
-  
-  4. Set up a [Simulator](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) (10 minutes)
-  5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples)
-  6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_)
-
-**Become a Pro**
-
-  7. Read the [Overview](https://docs.lvgl.io/master/overview/index.html) page to get a better understanding of the library (2-3 hours)
-  8. Check the documentation of the [Widgets](https://docs.lvgl.io/master/widgets/index.html) to see their features and usage
-
-**Get Help and Help Others**
-
-  9. If you have questions go to the [Forum](http://forum.lvgl.io/)
-  10. Read the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) guide to see how you can help to improve LVGL (15 minutes)
-
-**Go for More**
-
-  11. Download and try out [SquareLine Studio](https://squareline.io/).
-  12. Contact us for [Services](https://lvgl.io/services).
-
 ## :package: Packages 
 LVGL is available as:
 - [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
@@ -119,7 +89,9 @@ LVGL is available as:
 
 ## :robot: Examples
 
-See how to create a button with a click event in C and MicroPython. For more examples see the [Examples](https://github.com/lvgl/lvgl/tree/master/examples) folder.
+See some examples of creating widgets, using layouts and applying styles. You will find C and MicroPython code, and links to try out or edit the examples in an online MicroPython editor.
+
+For more examples check out the [Examples](https://github.com/lvgl/lvgl/tree/master/examples) folder.
 
 ### Button with Click Event
 
@@ -360,7 +332,6 @@ lv_obj_align(cz_label, LV_ALIGN_BOTTOM_LEFT, 5, -5);
 
 </details>
 
-
 <details>
   <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842">Online Simulator</a></summary>
   
@@ -389,6 +360,37 @@ cz_label.align(lv.ALIGN.BOTTOM_LEFT, 5, -5)
 
 ```
 </details>
+
+## :arrow_forward: Get started
+This list will guide you to get started with LVGL step-by-step.
+
+**Get Familiar with LVGL**
+
+  1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
+  2. Read the [Introduction](https://docs.lvgl.io/master/intro/index.html) page of the documentation (5 minutes)
+  3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/master/get-started/quick-overview.html) page (15 minutes)
+
+**Start to Use LVGL**
+  
+  4. Set up a [Simulator](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) (10 minutes)
+  5. Try out some [Examples](https://github.com/lvgl/lvgl/tree/master/examples)
+  6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/master/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_)
+
+**Become a Pro**
+
+  7. Read the [Overview](https://docs.lvgl.io/master/overview/index.html) page to get a better understanding of the library (2-3 hours)
+  8. Check the documentation of the [Widgets](https://docs.lvgl.io/master/widgets/index.html) to see their features and usage
+
+**Get Help and Help Others**
+
+  9. If you have questions go to the [Forum](http://forum.lvgl.io/)
+  10. Read the [Contributing](https://docs.lvgl.io/master/CONTRIBUTING.html) guide to see how you can help to improve LVGL (15 minutes)
+
+**Go for More**
+
+  11. Download and try out [SquareLine Studio](https://squareline.io/).
+  12. Contact us for [Services](https://lvgl.io/services).
+
 
 ## :handshake: Services
 LVGL LLC was established to provide a solid background for LVGL library and to offer several type of services to help you in UI development. With 15+ years of experience in the user interface and graphics industry we can help you the bring your UI to the next level.
