@@ -47,31 +47,31 @@ Our team is ready to help you with graphics design, UI implementation and consul
 
 **Free and Portable**
   - A fully portable C (C++ compatible) library with no external dependencies. 
-  - Can be compiled to any MCU or MPU, with any (RT)OS
-  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors.
+  - Can be compiled to any MCU or MPU, with any (RT)OS.
+  - Supports monochrome, ePaper, OLED or TFT displays, or even monitors. [Porting Guide](https://docs.lvgl.io/master/porting/project.html)
   - Distributed under the MIT licence, so you can easily use it in commercial projects too.
   - Needs only 32kB RAM and 128 kB Flash, a frame buffer, and at least an 1/10 screen sized buffer for rendering. 
   - OS, External memory and GPU are supported but not required. 
 
 **Widgets, Styles, Layouts and more**
-  - 30+ built-in widgets:  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
-  - Flexible style system with  ~100 style properties to customize any part of the widgets in any state.
-  - Flexbox and Grid-like layouts engines to automatically size and position the widgets in a responsive way.
+  - 30+ built-in [Widgets](https://docs.lvgl.io/master/widgets/index.html):  Button, Label, Slider, Chart, Keyboard, Meter, Arc, Table and many more.
+  - Flexible [Style system](https://docs.lvgl.io/master/overview/style.html) with  ~100 style properties to customize any part of the widgets in any state.
+  - [Flexbox](https://docs.lvgl.io/master/layouts/flex.html) and [Grid](https://docs.lvgl.io/master/layouts/grid.html)-like layouts engines to automatically size and position the widgets in a responsive way.
   - Texts are rendered with UTF-8 encoding supporting CJK, Thai, Hindi, Arabic, Persian writing systems. 
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
-  - Supports Mouse, Touchpad, Keypad, keyboard, External buttons, Encoder input devices. 
-  - Multiple display support.
+  - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/porting/indev.html). 
+  - [Multiple display](https://docs.lvgl.io/master/overview/display.html) support.
   
 **Binding and Build Support**
-  - [Micropython binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
+  - [Micropython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
   - No custom build system is used. You can build LVGL as you build the other files of your project.
-  - Support for Make and CMake is included out of the box.
-  - Develop on PC and use the same UI code on embedded hardware. 
-  - Convert C UI code to HTML file with our [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
+  - Support for Make and [CMake](https://docs.lvgl.io/master/get-started/platforms/cmake.html) is included out of the box.
+  - [Develop on PC](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) and use the same UI code on embedded hardware. 
+  - Convert the C UI code to HTML file with our [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
 **Docs, Tools, and Services**
-  - Detailed documentation with [100+ simple examples](https://docs.lvgl.io/master/index.html)
+  - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/index.html)
   - [SquareLine Studio](https://squareline.io/) - A professional and easy-to-use UI editor software to speed up and simplify the UI development.
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
 
@@ -119,7 +119,7 @@ void btn_event_cb(lv_event_t * e)
 </details>
   
 <details>
-  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=926bde43ec7af0146c486de470c53f11f167491e">Online Simulator</a></summary>
+  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=926bde43ec7af0146c486de470c53f11f167491e" target="_blank">Online Simulator</a></summary>
   
 ```python
 def btn_event_cb(e):
@@ -173,7 +173,7 @@ lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
 </details>
 
 <details>
-  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=311d37e5f70daf1cb0d2cad24c7f72751b5f1792">Online Simulator</a></summary>
+  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=311d37e5f70daf1cb0d2cad24c7f72751b5f1792" target="_blank">Online Simulator</a></summary>
 
 ```python
 def event_handler(e):
@@ -260,7 +260,7 @@ lv_obj_set_style_shadow_spread(slider, 2, LV_PART_KNOB);
 
 <details>
   <summary>MicroPython code | 
-<a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=c431c7b4dfd2cc0dd9c392b74365d5af6ea986f0">Online Simulator</a>
+<a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=c431c7b4dfd2cc0dd9c392b74365d5af6ea986f0" target="_blank">Online Simulator</a>
 </summary>
   
   
@@ -333,7 +333,7 @@ lv_obj_align(cz_label, LV_ALIGN_BOTTOM_LEFT, 5, -5);
 </details>
 
 <details>
-  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842">Online Simulator</a></summary>
+  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/0d9ab4ee0e591aad1970e3c9164fd7c544ecce70/examples/widgets/slider/lv_example_slider_2.py&script_direct=18bb38200a64e10ead1aa17a65c977fc18131842" target="_blank">Online Simulator</a></summary>
   
 ```python
 ltr_label = lv.label(lv.scr_act())
@@ -398,7 +398,7 @@ LVGL LLC was established to provide a solid background for LVGL library and to o
 - **Graphics design** Our in-house graphics designers are experts in creating beautiful modern designs which fit to your product and the resources of your hardware.
 - **UI implementation** We can also implement your UI based on the design you or we have created. You can be sure that we will make the most out of your hardware and LVGL. If a feature or widget is missing from LVGL, don't worry, we will implement it for you.
 - **Consulting and Support** We can support you with consulting as well to avoid pricey and time consuming mistakes during the UI development.
-- **Board certificate** For companies who are offering development boards, or production ready kits we do board certification which shows how board can run LVGL.
+- **Board certification** For companies who are offering development boards, or production ready kits we do board certification which shows how board can run LVGL.
 
 
 Check out our [Demos](https://lvgl.io/demos) as reference. For more information take look at the [Services page](https://lvgl.io/services). 
