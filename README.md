@@ -5,6 +5,7 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 
 <p align="right"><b>English</b> | <a href="./README_zh.md">中文</a> | <a href="/README_pt_BR.md">Português do Brasil</a></p>
 
+  <br>
 <p align="center">
   <img src="https://lvgl.io/assets/images/logo_lvgl.png">
 </p>
@@ -21,13 +22,13 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 <a href="https://lvgl.io" title="Homepage of LVGL">Website </a> |
 <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
 <a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
-<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
 <a href="https:/lvgl.io/demos" title="Demos running in your browser">Demos</a> |
+<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
 <a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
 </p>
 <br>
 
-## :monocle_face: Overview
+## :ledger: Overview
 
 **Mature and Well-known**<br>
 LVGL is the most popular free and open source embedded graphics library to create beautiful UIs for any MCU, MPU and display type. It's supported by industry leading vendors and projects like  Arm, STM32, NXP, Espressif, Nuvoton, Arduino, RT-Thread, Zephyr, NuttX, Adafruit and many more.
@@ -179,5 +180,7 @@ For a detailed description of contribution opportunities visit the [Contributing
 More than 300 people already left their fingerprint in LVGL. Be one them! See your here! :slightly_smiling_face: 
 
 <a href="https://github.com/lvgl/lvgl/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=lvgl/lvgl" />
+  <img src="https://contrib.rocks/image?repo=lvgl/lvgl&max=48" />
 </a>
+
+... and many other.
