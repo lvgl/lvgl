@@ -41,7 +41,7 @@
 ### Widgets
 - [ ] `lv_img`: Reconsider image sizing models (when the image size is not content): center, top-left, zoom, tile, other?
 - [ ] `lv_tabview` Replace button matrix with real buttons for more flexibility
-- [ ] `lv_label` reconsider label long modes
+- [ ] `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
 - [ ] Improve `lv_label_align_t` #1656
   
 ### Drawing and rendering
