@@ -32,7 +32,8 @@
 - [ ] Reconsider how to handle UTF-8 characters (allow different encoding too) and Bidi. Maybe create an abstraction for typesetting.     
 - [ ] Generic `lv_data_t` and `lv_time_t`?  
 - [ ] Update the `lv_img_dsc_t` to support images larger than 2048x2048
-- [ ] More color formats: 24 bit, ARGB1555, etc    
+- [ ] More color formats: 24 bit, ARGB1555, ARGB4444 etc    
+- [ ] Unified caching #3116 #3415
   
 ### Styles
 - [ ] Make `style_bg_img` support `9patch` images
@@ -46,13 +47,11 @@
   
 ### Drawing and rendering
 - [ ] Allow selecting between the layered (new) and not layered (old) rendering. 
-
   
  ### Animations
 - [ ] Consider `anim` events to replace many callbacks with one
 - [ ] `lv_anim_time_to_speed` should work differently to remove `style_anim_speed`. E.g. on large values of anim time store the speed.   Besides all widgets should use the `style_anim` property. `anim` should clamp the time if it's calculated from speed, e.g `lv_clamp(200, t, 2000)`. (maybe `a->min_time/max_time`). 
   
-
 ## Planned in general
   
 ### CI
@@ -65,7 +64,6 @@
 ### Architecture
 - [ ] C++ binding: https://github.com/lvgl/lv_binding_cpp
 - [ ] Markup language #2428
-
 
 ### Styles
 - [ ] Hover
