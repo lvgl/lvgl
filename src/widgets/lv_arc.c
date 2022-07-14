@@ -757,9 +757,15 @@ static lv_coord_t get_angle(const lv_obj_t * obj)
         angle += arc->indic_angle_start;
     }
     else if(arc->type == LV_ARC_MODE_SYMMETRICAL) {
-        int32_t range_midpoint = (int32_t)(arc->min_value + arc->max_value) / 2;
-        if(arc->value < range_midpoint) angle += arc->indic_angle_start;
-        else angle += arc->indic_angle_end;
+        int16_t bg_end = arc->bg_angle_end;
+        if(arc->bg_angle_end < arc->bg_angle_start) bg_end = arc->bg_angle_end + 360;
+        int16_t indic_end = arc->indic_angle_end;
+        if(arc->indic_angle_end < arc->indic_angle_start) indic_end = arc->indic_angle_end + 360;
+
+        int32_t angle_midpoint = (int32_t)(arc->bg_angle_start + bg_end) / 2;
+        if(arc->indic_angle_start < angle_midpoint) angle += arc->indic_angle_start;
+        else if(indic_end > angle_midpoint) angle += arc->indic_angle_end;
+        else angle += angle_midpoint;
     }
 
     return angle;
