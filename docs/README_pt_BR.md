@@ -13,7 +13,7 @@
     <a href="https://docs.lvgl.io/master/examples.html">Exemplos interativos</a>
 </h4>
 
-[English](./README.md) | [中文](./README_zh.md) | **Português do Brasil**
+[English](../README.md) | [中文](./README_zh.md) | **Português do Brasil**
 
 ---
 
