@@ -164,7 +164,7 @@ void lv_obj_tree_walk(struct _lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, vo
  * Reset all input devices if the object used.
  * @param obj           pointer to an object
  */
-void lv_obj_reset_input(const struct _lv_obj_t * obj);
+void lv_obj_reset_input(struct _lv_obj_t * obj);
 
 /**********************
  *      MACROS

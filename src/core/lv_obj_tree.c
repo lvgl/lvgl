@@ -343,7 +343,7 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
     walk_core(start_obj, cb, user_data);
 }
 
-void lv_obj_reset_input(const struct _lv_obj_t * obj)
+void lv_obj_reset_input(struct _lv_obj_t * obj)
 {
     lv_group_t * group = lv_obj_get_group(obj);
     lv_indev_t * indev = lv_indev_get_next(NULL);
