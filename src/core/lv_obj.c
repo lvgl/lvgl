@@ -280,7 +280,7 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     if(obj->state != new_state) {
 
         if(new_state & LV_STATE_DISABLED) {
-            lv_obj_reset_input(obj);
+            lv_indev_reset(NULL, obj);
         }
 
         lv_obj_set_state(obj, new_state);

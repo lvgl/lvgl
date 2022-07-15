@@ -343,26 +343,6 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
     walk_core(start_obj, cb, user_data);
 }
 
-void lv_obj_reset_input(struct _lv_obj_t * obj)
-{
-    lv_group_t * group = lv_obj_get_group(obj);
-    lv_indev_t * indev = lv_indev_get_next(NULL);
-
-    while(indev) {
-        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
-            lv_indev_reset(indev, obj);
-        }
-        if(indev->proc.types.pointer.last_pressed == obj) {
-            indev->proc.types.pointer.last_pressed = NULL;
-        }
-
-        if(indev->group == group && obj == lv_indev_get_obj_act()) {
-            lv_indev_reset(indev, obj);
-        }
-        indev = lv_indev_get_next(indev);
-    }
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -387,8 +367,23 @@ static void obj_del_core(lv_obj_t * obj)
         child = lv_obj_get_child(obj, 0);
     }
 
+    lv_group_t * group = lv_obj_get_group(obj);
+
     /*Reset all input devices if the object to delete is used*/
-    lv_obj_reset_input(obj);
+    lv_indev_t * indev = lv_indev_get_next(NULL);
+    while(indev) {
+        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
+            lv_indev_reset(indev, obj);
+        }
+        if(indev->proc.types.pointer.last_pressed == obj) {
+            indev->proc.types.pointer.last_pressed = NULL;
+        }
+
+        if(indev->group == group && obj == lv_indev_get_obj_act()) {
+            lv_indev_reset(indev, obj);
+        }
+        indev = lv_indev_get_next(indev);
+    }
 
     /*All children deleted. Now clean up the object specific data*/
     _lv_obj_destruct(obj);
