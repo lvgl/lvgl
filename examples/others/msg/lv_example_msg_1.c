@@ -24,7 +24,7 @@ void lv_example_msg_1(void)
     lv_obj_align(label, LV_ALIGN_CENTER, 0, 30);
 
     /*Subscribe the label to a message. Also use the user_data to set a format string here.*/
-    lv_msg_subsribe_obj(MSG_NEW_TEMPERATURE, label, "%d °C");
+    lv_msg_subscribe_obj(MSG_NEW_TEMPERATURE, label, "%d °C");
 }
 
 static void slider_event_cb(lv_event_t * e)

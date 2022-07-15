@@ -59,7 +59,7 @@ void lv_msg_init(void)
     _lv_ll_init(&LV_GC_ROOT(_subs_ll), sizeof(sub_dsc_t));
 }
 
-void * lv_msg_subsribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
+void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
 {
     sub_dsc_t * s = _lv_ll_ins_tail(&LV_GC_ROOT(_subs_ll));
     LV_ASSERT_MALLOC(s);
@@ -73,9 +73,9 @@ void * lv_msg_subsribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_da
     return s;
 }
 
-void * lv_msg_subsribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data)
+void * lv_msg_subscribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data)
 {
-    sub_dsc_t * s = lv_msg_subsribe(msg_id, obj_notify_cb, user_data);
+    sub_dsc_t * s = lv_msg_subscribe(msg_id, obj_notify_cb, user_data);
     if(s == NULL) return NULL;
     s->_priv_data = obj;
 
