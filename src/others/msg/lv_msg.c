@@ -32,7 +32,7 @@ typedef struct {
  **********************/
 
 static void notify(lv_msg_t * m);
-static void obj_notify_cb(void * s, lv_msg_t * m);
+static void obj_notify_cb(lv_msg_t * m);
 static void obj_delete_event_cb(lv_event_t * e);
 
 /**********************
@@ -142,14 +142,13 @@ static void notify(lv_msg_t * m)
         if(s->msg_id == m->id && s->callback) {
             m->user_data = s->user_data;
             m->_priv_data = s->_priv_data;
-            s->callback(s, m);
+            s->callback(m);
         }
     }
 }
 
-static void obj_notify_cb(void * s, lv_msg_t * m)
+static void obj_notify_cb(lv_msg_t * m)
 {
-    LV_UNUSED(s);
     lv_event_send(m->_priv_data, LV_EVENT_MSG_RECEIVED, m);
 }
 

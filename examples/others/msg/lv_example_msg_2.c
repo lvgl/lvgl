@@ -7,7 +7,7 @@
 #define MSG_LOGIN_ERROR     3
 #define MSG_LOGIN_OK        4
 
-static void auth_manager(void * s, lv_msg_t * m);
+static void auth_manager(lv_msg_t * m);
 static void textarea_event_cb(lv_event_t * e);
 static void log_out_event_cb(lv_event_t * e);
 static void start_engine_msg_event_cb(lv_event_t * e);
@@ -72,9 +72,8 @@ void lv_example_msg_2(void)
     lv_msg_send(MSG_LOG_OUT, NULL);
 }
 
-static void auth_manager(void * s, lv_msg_t * m)
+static void auth_manager(lv_msg_t * m)
 {
-    LV_UNUSED(s);
     const char * pin_act = lv_msg_get_payload(m);
     const char * pin_expexted = lv_msg_get_user_data(m);
     if(strcmp(pin_act, pin_expexted) == 0) {

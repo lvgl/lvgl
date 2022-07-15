@@ -31,9 +31,8 @@ typedef struct {
     const void * payload;   /*Pointer to the data of the message*/
 } lv_msg_t;
 
-typedef void (*lv_msg_subscribe_cb_t)(void * s, lv_msg_t * msg);
 
-typedef void (*lv_msg_request_cb_t)(void * r, uint32_t msg_id);
+typedef void (*lv_msg_subscribe_cb_t)(lv_msg_t * msg);
 
 /**********************
  * GLOBAL PROTOTYPES

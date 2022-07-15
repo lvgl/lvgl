@@ -8,8 +8,7 @@
 #define MSG_UPDATE          4
 #define MSG_UPDATE_REQUEST  5
 
-static void value_handler(void * s, lv_msg_t * m);
-static void value_handler(void * s, lv_msg_t * m);
+static void value_handler(lv_msg_t * m);
 static void btn_event_cb(lv_event_t * e);
 static void label_event_cb(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
@@ -76,10 +75,8 @@ void lv_example_msg_3(void)
 }
 
 
-static void value_handler(void * s, lv_msg_t * m)
+static void value_handler(lv_msg_t * m)
 {
-    LV_UNUSED(s);
-
     static int32_t value = 10;
     int32_t old_value = value;
     switch(lv_msg_get_id(m)) {
