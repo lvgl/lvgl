@@ -1,6 +1,6 @@
 # Roadmap
 
-## Plannel for v9
+## Planned for v9
 
 ### Naming and API  
 - [ ] `lv_style_set_size()` should have separate width and height parameters
