@@ -20,7 +20,7 @@ LVGL是一个高度可裁剪、低资源占用、界面美观且易用的嵌入�
 </h4>
 
 
-[English](../README.md) | **中文** | [Português do Brasil](./README_pt_BR.md)
+[English](../README.md) | **中文** | [Português do Brasil](./README_pt_BR.md) | [日本語](./README_jp.md)
 
 
 ---
