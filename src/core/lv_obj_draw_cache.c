@@ -173,6 +173,8 @@ void _lv_obj_draw_cache_free(lv_obj_t * obj)
     }
 
     lv_mem_free(draw_cache);
+
+    obj->spec_attr->draw_cache = NULL;
 }
 
 /**********************
