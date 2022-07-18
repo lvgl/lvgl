@@ -1,6 +1,6 @@
 # Messaging
 
-Messaging (`lv_msg`) is a classic []publisher subscriber](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) implementation for LVGL.
+Messaging (`lv_msg`) is a classic [publisher subscriber](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) implementation for LVGL.
 
 ## IDs
 Both the publishers and the subscribers needs to know the message identifiers.
@@ -33,9 +33,8 @@ lv_msg_send(MSG_USER_NAME_CHANGED, "John Smith");
 The callback should look like this:
 ```c
 
-static void user_name_subscriber_cb(void * s, lv_msg_t * m)
+static void user_name_subscriber_cb(lv_msg_t * m)
 {
-    /*s: a subscriber obeject, can be used to unscubscribe*/
     /*m: a message object with the msg_id, payload, and user_data (set durung subscription)*/
 
     ...do something...
