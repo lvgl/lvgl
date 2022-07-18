@@ -118,10 +118,10 @@ lv_res_t _lv_obj_draw_cache(lv_event_t * e)
             img_dsc->data_size = buf_size;
         }
 
-        LV_LOG_INFO("obj(%p) take snapshot: buffer = %p, size = %d",
-                    obj,
-                    img_dsc->data,
-                    img_dsc->data_size);
+        LV_LOG_TRACE("obj(%p) take snapshot: buffer = %p, size = %d",
+                     obj,
+                     img_dsc->data,
+                     img_dsc->data_size);
 
         draw_cache->draw_normal = true;
 
@@ -153,7 +153,7 @@ lv_res_t _lv_obj_draw_cache(lv_event_t * e)
     lv_draw_img_dsc_init(&draw_img_dsc);
     lv_draw_img(draw_ctx, &draw_img_dsc, &coords, img_dsc);
 
-    LV_LOG_INFO("obj(%p) draw cache", obj);
+    LV_LOG_TRACE("obj(%p) draw cache", obj);
 
     return LV_RES_OK;
 }
