@@ -118,6 +118,11 @@ lv_res_t _lv_obj_draw_cache(lv_event_t * e)
             img_dsc->data_size = buf_size;
         }
 
+        if(img_dsc->data == NULL) {
+            LV_LOG_WARN("can't alloc buffer for snapshot");
+            return LV_RES_INV;
+        }
+
         LV_LOG_TRACE("obj(%p) take snapshot: buffer = %p, size = %d",
                      obj,
                      img_dsc->data,
