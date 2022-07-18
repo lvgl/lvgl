@@ -5,6 +5,7 @@ CSRCS += lv_indev.c
 CSRCS += lv_indev_scroll.c
 CSRCS += lv_obj.c
 CSRCS += lv_obj_class.c
+CSRCS += lv_obj_draw_cache.c
 CSRCS += lv_obj_draw.c
 CSRCS += lv_obj_pos.c
 CSRCS += lv_obj_scroll.c

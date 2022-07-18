@@ -409,6 +409,16 @@
     #endif
 #endif
 
+/*Buffer the image after drawing the object to improve the rendering performance of complex objects.
+ *Need to enable 'LV_USE_SNAPSHOT'*/
+#ifndef LV_USE_OBJ_DRAW_CACHE
+    #ifdef CONFIG_LV_USE_OBJ_DRAW_CACHE
+        #define LV_USE_OBJ_DRAW_CACHE CONFIG_LV_USE_OBJ_DRAW_CACHE
+    #else
+        #define LV_USE_OBJ_DRAW_CACHE   0
+    #endif
+#endif
+
 /*-------------
  * GPU
  *-----------*/

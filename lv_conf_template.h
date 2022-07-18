@@ -169,6 +169,10 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
+/*Buffer the image after drawing the object to improve the rendering performance of complex objects.
+ *Need to enable 'LV_USE_SNAPSHOT'*/
+#define LV_USE_OBJ_DRAW_CACHE   0
+
 /*-------------
  * GPU
  *-----------*/

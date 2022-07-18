@@ -33,6 +33,7 @@ extern "C" {
 #include "src/hal/lv_hal.h"
 
 #include "src/core/lv_obj.h"
+#include "src/core/lv_obj_draw_cache.h"
 #include "src/core/lv_group.h"
 #include "src/core/lv_indev.h"
 #include "src/core/lv_refr.h"

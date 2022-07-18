@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "lv_obj_draw_cache.h"
 #include "lv_indev.h"
 #include "lv_refr.h"
 #include "lv_group.h"
@@ -56,6 +57,7 @@
 static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_draw(lv_event_t * e);
+static void lv_obj_cover_check(lv_event_t * e);
 static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
@@ -447,6 +449,11 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     /*Remove the animations from this object*/
     lv_anim_del(obj, NULL);
 
+#if LV_USE_OBJ_DRAW_CACHE
+    /*Free the image from the draw cache*/
+    _lv_obj_draw_cache_free(obj);
+#endif
+
     /*Delete from the group*/
     lv_group_t * group = lv_obj_get_group(obj);
     if(group) lv_group_remove_obj(obj);
@@ -466,44 +473,46 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     }
 }
 
+static void lv_obj_cover_check(lv_event_t * e)
+{
+    lv_obj_t * obj = lv_event_get_target(e);
+    lv_cover_check_info_t * info = lv_event_get_param(e);
+    if(info->res == LV_COVER_RES_MASKED) return;
+    if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
+        info->res = LV_COVER_RES_MASKED;
+        return;
+    }
+
+    /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
+    lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+    lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    lv_area_t coords;
+    lv_area_copy(&coords, &obj->coords);
+    coords.x1 -= w;
+    coords.x2 += w;
+    coords.y1 -= h;
+    coords.y2 += h;
+
+    if(_lv_area_is_in(info->area, &coords, r) == false) {
+        info->res = LV_COVER_RES_NOT_COVER;
+        return;
+    }
+
+    if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+        info->res = LV_COVER_RES_NOT_COVER;
+        return;
+    }
+
+    info->res = LV_COVER_RES_COVER;
+}
+
 static void lv_obj_draw(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
-    if(code == LV_EVENT_COVER_CHECK) {
-        lv_cover_check_info_t * info = lv_event_get_param(e);
-        if(info->res == LV_COVER_RES_MASKED) return;
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
-            info->res = LV_COVER_RES_MASKED;
-            return;
-        }
-
-        /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
-        lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-        lv_area_t coords;
-        lv_area_copy(&coords, &obj->coords);
-        coords.x1 -= w;
-        coords.x2 += w;
-        coords.y1 -= h;
-        coords.y2 += h;
-
-        if(_lv_area_is_in(info->area, &coords, r) == false) {
-            info->res = LV_COVER_RES_NOT_COVER;
-            return;
-        }
-
-        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
-            info->res = LV_COVER_RES_NOT_COVER;
-            return;
-        }
-
-        info->res = LV_COVER_RES_COVER;
-
-    }
-    else if(code == LV_EVENT_DRAW_MAIN) {
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    if(code == LV_EVENT_DRAW_MAIN) {
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -563,7 +572,6 @@ static void lv_obj_draw(lv_event_t * e)
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     else if(code == LV_EVENT_DRAW_POST) {
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
         draw_scrollbar(obj, draw_ctx);
 
 #if LV_DRAW_COMPLEX
@@ -612,7 +620,6 @@ static void lv_obj_draw(lv_event_t * e)
 
 static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 {
-
     lv_area_t hor_area;
     lv_area_t ver_area;
     lv_obj_get_scrollbar_area(obj, &hor_area, &ver_area);
@@ -847,8 +854,17 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t d = lv_obj_calculate_ext_draw_size(obj, LV_PART_MAIN);
         lv_event_set_ext_draw_size(e, d);
     }
-    else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {
-        lv_obj_draw(e);
+    else if(code == LV_EVENT_COVER_CHECK) {
+        lv_obj_cover_check(e);
+    }
+    else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST) {
+#if LV_USE_OBJ_DRAW_CACHE
+        if(_lv_obj_draw_cache(e) != LV_RES_OK) {
+#endif /*LV_USE_OBJ_DRAW_CACHE*/
+            lv_obj_draw(e);
+#if LV_USE_OBJ_DRAW_CACHE
+        }
+#endif /*LV_USE_OBJ_DRAW_CACHE*/
     }
 }
 

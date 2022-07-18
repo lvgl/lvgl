@@ -211,6 +211,10 @@ menu "LVGL configuration"
                 default 10240
                 help
                     Only used if software rotation is enabled in the display driver.
+
+            config LV_USE_OBJ_DRAW_CACHE
+                bool "Buffer the image after drawing the object to improve the rendering performance of complex objects."
+                depends on LV_USE_SNAPSHOT
         endmenu
 
         menu "GPU"
