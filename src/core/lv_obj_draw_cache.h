@@ -51,6 +51,7 @@ void lv_obj_draw_cache_invalidate(lv_obj_t * obj);
 /**
  * Cache mode drawing processing
  * @param e      darw event parameters
+ * @return       whether the buffer drawing is successful
  */
 lv_res_t _lv_obj_draw_cache(lv_event_t * e);
 
