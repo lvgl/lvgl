@@ -540,12 +540,6 @@ menu "LVGL configuration"
                 default y if LV_CONF_MINIMAL
             config LV_FONT_UNSCII_16
                 bool "Enable UNSCII 16 (Perfect monospace font)"
-
-            config LV_FONT_CUSTOM
-                bool "Enable the custom font"
-            config LV_FONT_CUSTOM_DECLARE
-                string "Header to include for the custom font"
-                depends on LV_FONT_CUSTOM
         endmenu
 
         choice LV_FONT_DEFAULT
