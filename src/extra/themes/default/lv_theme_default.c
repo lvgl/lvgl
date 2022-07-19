@@ -448,12 +448,12 @@ static void style_init(void)
     style_init_reset(&styles->chart_series);
     lv_style_set_line_width(&styles->chart_series, lv_disp_dpx(theme.disp, 3));
     lv_style_set_radius(&styles->chart_series, lv_disp_dpx(theme.disp, 3));
-    lv_style_set_size(&styles->chart_series, lv_disp_dpx(theme.disp, 8));
+    lv_style_set_size(&styles->chart_series, lv_disp_dpx(theme.disp, 8), lv_disp_dpx(theme.disp, 8));
     lv_style_set_pad_column(&styles->chart_series, lv_disp_dpx(theme.disp, 2));
 
     style_init_reset(&styles->chart_indic);
     lv_style_set_radius(&styles->chart_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_size(&styles->chart_indic, lv_disp_dpx(theme.disp, 8));
+    lv_style_set_size(&styles->chart_indic, lv_disp_dpx(theme.disp, 8), lv_disp_dpx(theme.disp, 8));
     lv_style_set_bg_color(&styles->chart_indic, theme.color_primary);
     lv_style_set_bg_opa(&styles->chart_indic, LV_OPA_COVER);
 
@@ -529,14 +529,14 @@ static void style_init(void)
     style_init_reset(&styles->meter_marker);
     lv_style_set_line_width(&styles->meter_marker, lv_disp_dpx(theme.disp, 5));
     lv_style_set_line_color(&styles->meter_marker, color_text);
-    lv_style_set_size(&styles->meter_marker, lv_disp_dpx(theme.disp, 20));
+    lv_style_set_size(&styles->meter_marker, lv_disp_dpx(theme.disp, 20), lv_disp_dpx(theme.disp, 20));
     lv_style_set_pad_left(&styles->meter_marker, lv_disp_dpx(theme.disp, 15));
 
     style_init_reset(&styles->meter_indic);
     lv_style_set_radius(&styles->meter_indic, LV_RADIUS_CIRCLE);
     lv_style_set_bg_color(&styles->meter_indic, color_text);
     lv_style_set_bg_opa(&styles->meter_indic, LV_OPA_COVER);
-    lv_style_set_size(&styles->meter_indic, lv_disp_dpx(theme.disp, 15));
+    lv_style_set_size(&styles->meter_indic, lv_disp_dpx(theme.disp, 15), lv_disp_dpx(theme.disp, 15));
 #endif
 
 #if LV_USE_TABLE
