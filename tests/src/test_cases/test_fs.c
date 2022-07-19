@@ -17,13 +17,22 @@ void tearDown(void)
     /* Function run after every test */
 }
 #include <stdio.h>
+#include <errno.h>
+#include <unistd.h>
 void test_read(void)
 {
     lv_fs_res_t res;
 
+    char cur[512];
+    getcwd(cur, 512);
+    errno = 0;
+    void * a = fopen("src/test_files/readtest.txt", "rd");
+    printf("%s, %d, %p\n", cur, errno, a);
+    fclose(a);
+
     /*'A' has cache*/
     lv_fs_file_t fa;
-    res = lv_fs_open(&fa, "A:readtest.txt", LV_FS_MODE_RD);
+    res = lv_fs_open(&fa, "A:src/test_files/readtest.txt", LV_FS_MODE_RD);
     TEST_ASSERT_EQUAL(LV_FS_RES_OK, res);
 
     /*'B' has no cache*/
