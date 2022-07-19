@@ -35,13 +35,13 @@ extern "C" {
  *
  * The rest of the flags will have _FLAG added to their name in v9.
  */
-#define LV_STYLE_PROP_FLAG_NONE             (0)
-#define LV_STYLE_PROP_INHERIT               (1 << 0)  /*Inherited*/
-#define LV_STYLE_PROP_EXT_DRAW              (1 << 1)  /*Requires ext. draw size update when changed*/
-#define LV_STYLE_PROP_LAYOUT_REFR           (1 << 2)  /*Requires layout update when changed*/
-#define LV_STYLE_PROP_PARENT_LAYOUT_REFR    (1 << 3)  /*Requires layout update on parent when changed*/
-#define LV_STYLE_PROP_LAYER_REFR            (1 << 4)  /*Affects layer handling*/
-#define LV_STYLE_PROP_ALL                   (0x1F)     /*Indicating all flags*/
+#define LV_STYLE_PROP_FLAG_NONE                     (0)
+#define LV_STYLE_PROP_FLAG_INHERITABLE              (1 << 0)  /*Inherited*/
+#define LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE          (1 << 1)  /*Requires ext. draw size update when changed*/
+#define LV_STYLE_PROP_FLAG_LAYOUT_UPDATE            (1 << 2)  /*Requires layout update when changed*/
+#define LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE     (1 << 3)  /*Requires layout update on parent when changed*/
+#define LV_STYLE_PROP_FLAG_LAYER_UPDATE             (1 << 4)  /*Affects layer handling*/
+#define LV_STYLE_PROP_FLAG_ALL                      (0x1F)     /*Indicating all flags*/
 
 /**
  * Other constants
