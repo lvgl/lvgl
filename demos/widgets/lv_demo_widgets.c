@@ -705,7 +705,7 @@ static void analytics_create(lv_obj_t * parent)
 
     /*Add a special circle to the needle's pivot*/
     lv_obj_set_style_pad_hor(meter3, 10, 0);
-    lv_obj_set_style_size(meter3, 10, LV_PART_INDICATOR);
+    lv_obj_set_style_size(meter3, 10, 10, LV_PART_INDICATOR);
     lv_obj_set_style_radius(meter3, LV_RADIUS_CIRCLE, LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(meter3, LV_OPA_COVER, LV_PART_INDICATOR);
     lv_obj_set_style_bg_color(meter3, lv_palette_darken(LV_PALETTE_GREY, 4), LV_PART_INDICATOR);

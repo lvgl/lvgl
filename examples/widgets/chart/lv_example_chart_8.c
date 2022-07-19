@@ -86,7 +86,7 @@ void lv_example_chart_8(void)
     lv_chart_set_axis_tick(stacked_area_chart.obj, LV_CHART_AXIS_PRIMARY_Y, 3, 0, 5, 1, true, 30);
 
     /*Set point size to 0 so the lines are smooth */
-    lv_obj_set_style_size(stacked_area_chart.obj, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_size(stacked_area_chart.obj, 0, 0, LV_PART_INDICATOR);
 
     /*Add some data series*/
     stacked_area_chart.series_list[0] = lv_chart_add_series(stacked_area_chart.obj, lv_palette_main(LV_PALETTE_RED),
