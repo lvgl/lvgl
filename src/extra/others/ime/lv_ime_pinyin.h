@@ -28,6 +28,7 @@ extern "C" {
 typedef enum {
     LV_IME_PINYIN_MODE_K26,
     LV_IME_PINYIN_MODE_K9,
+    LV_IME_PINYIN_MODE_K9_NUMBER,
 } lv_ime_pinyin_mode_t;
 
 /*Data of pinyin_dict*/
@@ -141,4 +142,3 @@ lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj);
 #endif
 
 #endif /*LV_USE_IME_PINYIN*/
-

@@ -141,7 +141,6 @@
         /*Set the pixel order of the display. Physical order of RGB channels. Doesn't matter with "normal" fonts.*/
         #define LV_DRAW_SW_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
     #endif
-
 #endif
 
 /*Use SDL renderer API*/
@@ -706,7 +705,7 @@
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #define LV_USE_DEMO_WIDGETS 1
 #if LV_USE_DEMO_WIDGETS
-#define LV_DEMO_WIDGETS_SLIDESHOW 0
+    #define LV_DEMO_WIDGETS_SLIDESHOW 0
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -715,8 +714,8 @@
 /*Benchmark your system*/
 #define LV_USE_DEMO_BENCHMARK 0
 #if LV_USE_DEMO_BENCHMARK
-/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-#define LV_DEMO_BENCHMARK_RGB565A8 0
+    /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+    #define LV_DEMO_BENCHMARK_RGB565A8 0
 #endif
 
 /*Stress test for LVGL*/

@@ -2330,13 +2330,13 @@
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
-#ifndef LV_DEMO_WIDGETS_SLIDESHOW
-    #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-    #else
-        #define LV_DEMO_WIDGETS_SLIDESHOW 0
+    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
+        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #else
+            #define LV_DEMO_WIDGETS_SLIDESHOW 0
+        #endif
     #endif
-#endif
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -2357,14 +2357,14 @@
     #endif
 #endif
 #if LV_USE_DEMO_BENCHMARK
-/*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-#ifndef LV_DEMO_BENCHMARK_RGB565A8
-    #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-        #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
-    #else
-        #define LV_DEMO_BENCHMARK_RGB565A8 0
+    /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+    #ifndef LV_DEMO_BENCHMARK_RGB565A8
+        #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
+            #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
+        #else
+            #define LV_DEMO_BENCHMARK_RGB565A8 0
+        #endif
     #endif
-#endif
 #endif
 
 /*Stress test for LVGL*/

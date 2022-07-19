@@ -73,7 +73,7 @@ void _lv_obj_style_init(void)
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(trans_t));
 }
 
-void lv_obj_add_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
+void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
     trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
@@ -104,7 +104,7 @@ void lv_obj_add_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t se
     lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
 }
 
-void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector)
+void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
 {
     lv_state_t state = lv_obj_style_get_selector_state(selector);
     lv_part_t part = lv_obj_style_get_selector_part(selector);
@@ -128,8 +128,8 @@ void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t
         }
 
         if(obj->styles[i].is_local || obj->styles[i].is_trans) {
-            lv_style_reset(obj->styles[i].style);
-            lv_free(obj->styles[i].style);
+            if(obj->styles[i].style) lv_style_reset((lv_style_t *)obj->styles[i].style);
+            lv_free((lv_style_t *)obj->styles[i].style);
             obj->styles[i].style = NULL;
         }
 
@@ -315,7 +315,7 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
     /*The style is not found*/
     if(i == obj->style_cnt) return false;
 
-    return lv_style_remove_prop(obj->styles[i].style, prop);
+    return lv_style_remove_prop((lv_style_t *)obj->styles[i].style, prop);
 }
 
 void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t prev_state, lv_state_t new_state,
@@ -337,7 +337,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     obj->state = new_state;
 
     _lv_obj_style_t * style_trans = get_trans_style(obj, part);
-    lv_style_set_prop(style_trans->style, tr_dsc->prop, v1);   /*Be sure `trans_style` has a valid value*/
+    lv_style_set_prop((lv_style_t *)style_trans->style, tr_dsc->prop, v1);  /*Be sure `trans_style` has a valid value*/
 
     if(tr_dsc->prop == LV_STYLE_RADIUS) {
         if(v1.num == LV_RADIUS_CIRCLE || v2.num == LV_RADIUS_CIRCLE) {
@@ -400,7 +400,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
         bool valid1 = state_act & (~state1) ? false : true;
         bool valid2 = state_act & (~state2) ? false : true;
         if(valid1 != valid2) {
-            lv_style_t * style = obj->styles[i].style;
+            const lv_style_t * style = obj->styles[i].style;
             lv_style_value_t v;
             /*If there is layout difference on the main part, return immediately. There is no more serious difference*/
             bool layout_diff = false;
@@ -509,7 +509,7 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
     for(i = 0; i < obj->style_cnt; i++) {
         if(obj->styles[i].is_local &&
            obj->styles[i].selector == selector) {
-            return obj->styles[i].style;
+            return (lv_style_t *)obj->styles[i].style;
         }
     }
 
@@ -526,10 +526,11 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
 
     lv_memzero(&obj->styles[i], sizeof(_lv_obj_style_t));
     obj->styles[i].style = lv_malloc(sizeof(lv_style_t));
-    lv_style_init(obj->styles[i].style);
+    lv_style_init((lv_style_t *)obj->styles[i].style);
+
     obj->styles[i].is_local = 1;
     obj->styles[i].selector = selector;
-    return obj->styles[i].style;
+    return (lv_style_t *)obj->styles[i].style;
 }
 
 /**
@@ -556,9 +557,11 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t se
         obj->styles[i] = obj->styles[i - 1];
     }
 
+
     lv_memzero(&obj->styles[0], sizeof(_lv_obj_style_t));
     obj->styles[0].style = lv_malloc(sizeof(lv_style_t));
-    lv_style_init(obj->styles[0].style);
+    lv_style_init((lv_style_t *)obj->styles[0].style);
+
     obj->styles[0].is_trans = 1;
     obj->styles[0].selector = selector;
     return &obj->styles[0];
@@ -699,7 +702,7 @@ static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, tran
             uint32_t i;
             for(i = 0; i < obj->style_cnt; i++) {
                 if(obj->styles[i].is_trans && (part == LV_PART_ANY || obj->styles[i].selector == part)) {
-                    lv_style_remove_prop(obj->styles[i].style, tr->prop);
+                    lv_style_remove_prop((lv_style_t *)obj->styles[i].style, tr->prop);
                 }
             }
 
@@ -770,7 +773,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 refr = false;
             }
         }
-        lv_style_set_prop(obj->styles[i].style, tr->prop, value_final);
+        lv_style_set_prop((lv_style_t *)obj->styles[i].style, tr->prop, value_final);
         if(refr) lv_obj_refresh_style(tr->obj, tr->selector, tr->prop);
         break;
 
@@ -795,7 +798,8 @@ static void trans_anim_start_cb(lv_anim_t * a)
     tr->prop = prop_tmp;
 
     _lv_obj_style_t * style_trans = get_trans_style(tr->obj, tr->selector);
-    lv_style_set_prop(style_trans->style, tr->prop, tr->start_value);   /*Be sure `trans_style` has a valid value*/
+    lv_style_set_prop((lv_style_t *)style_trans->style, tr->prop,
+                      tr->start_value);  /*Be sure `trans_style` has a valid value*/
 
 }
 
@@ -825,10 +829,10 @@ static void trans_anim_ready_cb(lv_anim_t * a)
                 lv_free(tr);
 
                 _lv_obj_style_t * obj_style = &obj->styles[i];
-                lv_style_remove_prop(obj_style->style, prop);
+                lv_style_remove_prop((lv_style_t *)obj_style->style, prop);
 
                 if(lv_style_is_empty(obj->styles[i].style)) {
-                    lv_obj_remove_style(obj, obj_style->style, obj_style->selector);
+                    lv_obj_remove_style(obj, (lv_style_t *)obj_style->style, obj_style->selector);
 
                 }
                 break;
