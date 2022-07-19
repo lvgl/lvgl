@@ -35,12 +35,23 @@ extern "C" {
  */
 void lv_obj_draw_cache_set_enable(lv_obj_t * obj, bool en);
 
+void lv_obj_draw_cache_set_img_cf(lv_obj_t * obj, lv_img_cf_t cf);
+
 /**
  * Get object draw cache enable
  * @param obj   pointer to an object
  * @return      return true if enabled
  */
 bool lv_obj_draw_cache_get_enable(lv_obj_t * obj);
+
+lv_img_cf_t lv_obj_draw_cache_get_img_cf(lv_obj_t * obj);
+
+const lv_img_dsc_t * lv_obj_draw_cache_get_img_dsc(lv_obj_t * obj);
+
+static inline bool lv_obj_has_draw_cache(lv_obj_t * obj)
+{
+    return (obj->spec_attr && obj->spec_attr->draw_cache);
+}
 
 /**
  * Mark the object as invalid to update cache
@@ -50,10 +61,11 @@ void lv_obj_draw_cache_invalidate(lv_obj_t * obj);
 
 /**
  * Cache mode drawing processing
- * @param e      darw event parameters
- * @return       whether the buffer drawing is successful
+ * @param obj      pointer to an object
+ * @param draw_ctx pointer to an initialized draw context
+ * @return         whether the buffer drawing is successful
  */
-lv_res_t _lv_obj_draw_cache(lv_event_t * e);
+lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx);
 
 /**
  * Free the image from the draw cache

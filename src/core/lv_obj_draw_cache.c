@@ -24,6 +24,7 @@
 
 typedef struct _lv_obj_draw_cache_t {
     lv_img_dsc_t img_dsc;
+    lv_img_cf_t cf;
     bool invalidate;
     bool draw_normal;
     bool enable;
@@ -59,26 +60,57 @@ void lv_obj_draw_cache_set_enable(lv_obj_t * obj, bool en)
         }
 
         lv_memset_00(draw_cache, sizeof(lv_obj_draw_cache_t));
+        draw_cache->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
         obj->spec_attr->draw_cache = draw_cache;
     }
 
     obj->spec_attr->draw_cache->enable = en;
 }
 
+void lv_obj_draw_cache_set_img_cf(lv_obj_t * obj, lv_img_cf_t cf)
+{
+    LV_ASSERT_NULL(obj);
+    if(!lv_obj_has_draw_cache(obj)) {
+        return;
+    }
+
+    obj->spec_attr->draw_cache->cf = cf;
+}
+
 bool lv_obj_draw_cache_get_enable(lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
-    if(obj->spec_attr == NULL || obj->spec_attr->draw_cache == NULL) {
+    if(!lv_obj_has_draw_cache(obj)) {
         return false;
     }
 
     return obj->spec_attr->draw_cache->enable;
 }
 
+lv_img_cf_t lv_obj_draw_cache_get_img_cf(lv_obj_t * obj)
+{
+    LV_ASSERT_NULL(obj);
+    if(!lv_obj_has_draw_cache(obj)) {
+        return LV_IMG_CF_UNKNOWN;
+    }
+
+    return obj->spec_attr->draw_cache->cf;
+}
+
+const lv_img_dsc_t * lv_obj_draw_cache_get_img_dsc(lv_obj_t * obj)
+{
+    LV_ASSERT_NULL(obj);
+    if(!lv_obj_has_draw_cache(obj)) {
+        return NULL;
+    }
+
+    return &obj->spec_attr->draw_cache->img_dsc;
+}
+
 void lv_obj_draw_cache_invalidate(lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
-    if(obj->spec_attr == NULL || obj->spec_attr->draw_cache == NULL) {
+    if(!lv_obj_has_draw_cache(obj)) {
         return;
     }
 
@@ -86,11 +118,9 @@ void lv_obj_draw_cache_invalidate(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 }
 
-lv_res_t _lv_obj_draw_cache(lv_event_t * e)
+lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 {
-    lv_obj_t * obj = lv_event_get_current_target(e);
-
-    if(obj->spec_attr == NULL || obj->spec_attr->draw_cache == NULL) {
+    if(!lv_obj_has_draw_cache(obj)) {
         return LV_RES_INV;
     }
 
@@ -101,12 +131,11 @@ lv_res_t _lv_obj_draw_cache(lv_event_t * e)
     }
 
     lv_img_dsc_t * img_dsc = &draw_cache->img_dsc;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
     if(draw_cache->invalidate) {
         draw_cache->invalidate = false;
 
-        uint32_t buf_size = lv_snapshot_buf_size_needed(obj, LV_IMG_CF_TRUE_COLOR_ALPHA);
+        uint32_t buf_size = lv_snapshot_buf_size_needed(obj, draw_cache->cf);
 
         if(buf_size == 0) {
             LV_LOG_WARN("can't get snapshot buffer size");
@@ -124,15 +153,15 @@ lv_res_t _lv_obj_draw_cache(lv_event_t * e)
         }
 
         LV_LOG_TRACE("obj(%p) take snapshot: buffer = %p, size = %d",
-                     obj,
-                     img_dsc->data,
-                     img_dsc->data_size);
+                    obj,
+                    img_dsc->data,
+                    img_dsc->data_size);
 
         draw_cache->draw_normal = true;
 
         lv_res_t res = lv_snapshot_take_to_buf(
                            obj,
-                           LV_IMG_CF_TRUE_COLOR_ALPHA,
+                           draw_cache->cf,
                            img_dsc,
                            img_dsc->data,
                            img_dsc->data_size);
@@ -166,7 +195,7 @@ lv_res_t _lv_obj_draw_cache(lv_event_t * e)
 void _lv_obj_draw_cache_free(lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
-    if(obj->spec_attr == NULL || obj->spec_attr->draw_cache == NULL) {
+    if(!lv_obj_has_draw_cache(obj)) {
         return;
     }
 

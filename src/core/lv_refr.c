@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include "lv_refr.h"
 #include "lv_disp.h"
+#include "lv_obj_draw_cache.h"
 #include "../hal/lv_hal_tick.h"
 #include "../hal/lv_hal_disp.h"
 #include "../misc/lv_timer.h"
@@ -142,6 +143,12 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     bool should_draw = com_clip_res || lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
     if(should_draw) {
         draw_ctx->clip_area = &clip_coords_for_obj;
+
+#if LV_USE_OBJ_DRAW_CACHE
+        if(_lv_obj_draw_cache(obj, draw_ctx) == LV_RES_OK) {
+            return;
+        }
+#endif
 
         lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
         lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
