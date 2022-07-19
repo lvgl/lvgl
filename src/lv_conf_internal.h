@@ -2229,6 +2229,25 @@
         #define LV_USE_IMGFONT 0
     #endif
 #endif
+#if LV_USE_IMGFONT
+    /*Imgfont image file path maximum length*/
+    #ifndef LV_IMGFONT_PATH_MAX_LEN
+        #ifdef CONFIG_LV_IMGFONT_PATH_MAX_LEN
+            #define LV_IMGFONT_PATH_MAX_LEN CONFIG_LV_IMGFONT_PATH_MAX_LEN
+        #else
+            #define LV_IMGFONT_PATH_MAX_LEN 64
+        #endif
+    #endif
+
+    /*1: Use img cache to buffer header information*/
+    #ifndef LV_IMGFONT_USE_IMG_CACHE_HEADER
+        #ifdef CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
+            #define LV_IMGFONT_USE_IMG_CACHE_HEADER CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
+        #else
+            #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+        #endif
+    #endif
+#endif
 
 /*1: Enable a published subscriber based messaging system */
 #ifndef LV_USE_MSG
