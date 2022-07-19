@@ -201,7 +201,7 @@ typedef struct _lv_obj_t {
  */
 void lv_init(void);
 
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+#if LV_ENABLE_GC || LV_USE_BUILTIN_MALLOC
 
 /**
  * Deinit the 'lv' library

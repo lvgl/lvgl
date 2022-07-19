@@ -14,6 +14,7 @@
 #ifndef WIN32
     #include <dirent.h>
     #include <unistd.h>
+    #include <errno.h>
 #else
     #include <windows.h>
 #endif
@@ -117,7 +118,17 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     char buf[MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
 
-    return fopen(buf, flags);
+    void * a = fopen(buf, flags);
+
+    printf("%s\n", path);
+    printf("%d\n", errno);
+
+    char buf2[512];
+    getcwd(buf2, 512);
+    printf("%s\n", buf2);
+    printf("%p\n", a);
+
+    return a;
 }
 
 /**

@@ -39,10 +39,6 @@
  *      DEFINES
  *********************/
 
-#if LV_COLOR_16_SWAP
-    #error Color swap not implemented. Disable LV_COLOR_16_SWAP feature.
-#endif
-
 #if LV_COLOR_DEPTH==16
     #define PXP_OUT_PIXEL_FORMAT kPXP_OutputPixelFormatRGB565
     #define PXP_AS_PIXEL_FORMAT kPXP_AsPixelFormatRGB565

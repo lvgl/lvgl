@@ -289,11 +289,7 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
             rsum += c.ch.red;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-            gsum += (c.ch.green_h << 3) + c.ch.green_l;
-#else
             gsum += c.ch.green;
-#endif
             bsum += c.ch.blue;
             if(has_alpha) asum += opa;
         }
@@ -305,13 +301,7 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 
             if(asum) {
                 c.ch.red = rsum / r;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-                uint8_t gtmp = gsum / r;
-                c.ch.green_h = gtmp >> 3;
-                c.ch.green_l = gtmp & 0x7;
-#else
                 c.ch.green = gsum / r;
-#endif
                 c.ch.blue = bsum / r;
                 if(has_alpha) opa = asum / r;
 
@@ -325,11 +315,7 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
             rsum -= c.ch.red;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-            gsum -= (c.ch.green_h << 3) + c.ch.green_l;
-#else
             gsum -= c.ch.green;
-#endif
             bsum -= c.ch.blue;
             if(has_alpha) asum -= opa;
 
@@ -339,11 +325,7 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
             rsum += c.ch.red;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-            gsum += (c.ch.green_h << 3) + c.ch.green_l;
-#else
             gsum += c.ch.green;
-#endif
             bsum += c.ch.blue;
             if(has_alpha) asum += opa;
         }
@@ -418,11 +400,7 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
 
             rsum += c.ch.red;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-            gsum += (c.ch.green_h << 3) + c.ch.green_l;
-#else
             gsum += c.ch.green;
-#endif
             bsum += c.ch.blue;
             if(has_alpha) asum += opa;
         }
@@ -433,13 +411,7 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
         for(y = a.y1; y <= a.y2; y++) {
             if(asum) {
                 c.ch.red = rsum / r;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-                uint8_t gtmp = gsum / r;
-                c.ch.green_h = gtmp >> 3;
-                c.ch.green_l = gtmp & 0x7;
-#else
                 c.ch.green = gsum / r;
-#endif
                 c.ch.blue = bsum / r;
                 if(has_alpha) opa = asum / r;
 
@@ -453,11 +425,7 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, 0, y_safe);
 
             rsum -= c.ch.red;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-            gsum -= (c.ch.green_h << 3) + c.ch.green_l;
-#else
             gsum -= c.ch.green;
-#endif
             bsum -= c.ch.blue;
             if(has_alpha) asum -= opa;
 
@@ -471,11 +439,7 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
 
             rsum += c.ch.red;
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-            gsum += (c.ch.green_h << 3) + c.ch.green_l;
-#else
             gsum += c.ch.green;
-#endif
             bsum += c.ch.blue;
             if(has_alpha) asum += opa;
         }

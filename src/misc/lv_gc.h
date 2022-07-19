@@ -65,9 +65,9 @@ extern "C" {
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)
 
 #if LV_ENABLE_GC == 1
-#if LV_MEM_CUSTOM != 1
+#if LV_USE_BUILTIN_MALLOC
 #error "GC requires CUSTOM_MEM"
-#endif /*LV_MEM_CUSTOM*/
+#endif /*LV_USE_BUILTIN_MALLOC*/
 #include LV_GC_INCLUDE
 #else  /*LV_ENABLE_GC*/
 #define LV_GC_ROOT(x) x

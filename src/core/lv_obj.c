@@ -187,7 +187,7 @@ void lv_init(void)
     LV_LOG_TRACE("finished");
 }
 
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+#if LV_ENABLE_GC || LV_USE_BUILTIN_MALLOC
 
 void lv_deinit(void)
 {

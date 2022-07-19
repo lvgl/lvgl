@@ -1,5 +1,5 @@
 #include "../lv_conf_internal.h"
-#if LV_MEM_CUSTOM == 0
+#if LV_USE_BUILTIN_MALLOC
 
 #ifndef LV_TLSF_H
 #define LV_TLSF_H
@@ -92,4 +92,4 @@ int lv_tlsf_check_pool(lv_pool_t pool);
 
 #endif /*LV_TLSF_H*/
 
-#endif /* LV_MEM_CUSTOM == 0 */
+#endif /* LV_USE_BUILTIN_MALLOC */

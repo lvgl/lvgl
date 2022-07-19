@@ -16,7 +16,7 @@ void tearDown(void)
 /* #3324 */
 void test_mem_buf_realloc(void)
 {
-#if LV_MEM_CUSTOM == 0
+#if LV_USE_BUILTIN_MALLOC
     void * buf1 = lv_malloc(20);
     void * buf2 = lv_realloc(buf1, LV_MEM_SIZE + 16384);
     TEST_ASSERT_NULL(buf2);

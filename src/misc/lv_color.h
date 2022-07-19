@@ -23,17 +23,12 @@ extern "C" {
 #error "LV_COLOR_DEPTH 24 is deprecated. Use LV_COLOR_DEPTH 32 instead (lv_conf.h)"
 #endif
 
-#if LV_COLOR_DEPTH != 16 && LV_COLOR_16_SWAP != 0
-#error "LV_COLOR_16_SWAP requires LV_COLOR_DEPTH == 16. Set it in lv_conf.h"
-#endif
-
 #include <stdint.h>
 
 /*********************
  *      DEFINES
  *********************/
 LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
-LV_EXPORT_CONST_INT(LV_COLOR_16_SWAP);
 
 /**
  * Opacity percentages.
@@ -128,30 +123,17 @@ enum {
 # define LV_COLOR_MAKE8(r8, g8, b8) {{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}}
 
 # define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)((v) & 0x1FU)
-#if LV_COLOR_16_SWAP == 0
 # define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint8_t)((v) & 0x3FU)
-#else
-# define LV_COLOR_SET_G16(c, v) {(c).ch.green_h = (uint8_t)(((v) >> 3) & 0x7); (c).ch.green_l = (uint8_t)((v) & 0x7);}
-#endif
 # define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint8_t)((v) & 0x1FU)
 # define LV_COLOR_SET_A16(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R16(c) (c).ch.red
-#if LV_COLOR_16_SWAP == 0
 # define LV_COLOR_GET_G16(c) (c).ch.green
-#else
-# define LV_COLOR_GET_G16(c) (((c).ch.green_h << 3) + (c).ch.green_l)
-#endif
 # define LV_COLOR_GET_B16(c) (c).ch.blue
 # define LV_COLOR_GET_A16(c) 0xFF
 
-#if LV_COLOR_16_SWAP == 0
 # define _LV_COLOR_ZERO_INITIALIZER16  {{0x00, 0x00, 0x00}}
 # define LV_COLOR_MAKE16(r8, g8, b8) {{(uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x3FU), (uint8_t)((r8 >> 3) & 0x1FU)}}
-#else
-# define _LV_COLOR_ZERO_INITIALIZER16 {{0x00, 0x00, 0x00, 0x00}}
-# define LV_COLOR_MAKE16(r8, g8, b8) {{(uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 3) & 0x1FU), (uint8_t)((b8 >> 3) & 0x1FU), (uint8_t)((g8 >> 2) & 0x7U)}}
-#endif
 
 # define LV_COLOR_SET_R32(c, v) (c).ch.red = (uint8_t)((v) & 0xFF)
 # define LV_COLOR_SET_G32(c, v) (c).ch.green = (uint8_t)((v) & 0xFF)
@@ -207,16 +189,9 @@ typedef union {
 
 typedef union {
     struct {
-#if LV_COLOR_16_SWAP == 0
         uint16_t blue : 5;
         uint16_t green : 6;
         uint16_t red : 5;
-#else
-        uint16_t green_h : 3;
-        uint16_t red : 5;
-        uint16_t blue : 5;
-        uint16_t green_l : 3;
-#endif
     } ch;
     uint16_t full;
 } lv_color16_t;
@@ -440,7 +415,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 {
     lv_color_t ret;
 
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 0 && LV_COLOR_MIX_ROUND_OFS == 0
+#if LV_COLOR_DEPTH == 16 && LV_COLOR_MIX_ROUND_OFS == 0
     /*Source: https://stackoverflow.com/a/50012418/1999969*/
     mix = (uint32_t)((uint32_t)mix + 4) >> 3;
     uint32_t bg = (uint32_t)((uint32_t)c2.full | ((uint32_t)c2.full << 16)) &
@@ -594,7 +569,6 @@ static inline lv_color_t lv_color_hex(uint32_t c)
 {
 #if LV_COLOR_DEPTH == 16
     lv_color_t r;
-#if LV_COLOR_16_SWAP == 0
     /* Convert a 4 bytes per pixel in format ARGB32 to R5G6B5 format
         naive way (by calling lv_color_make with components):
                     r = ((c & 0xFF0000) >> 19)
@@ -610,10 +584,6 @@ static inline lv_color_t lv_color_hex(uint32_t c)
                     rgb565 = r | g | b
         That's 3 mask, 3 bitshifts and 2 or operations */
     r.full = (uint16_t)(((c & 0xF80000) >> 8) | ((c & 0xFC00) >> 5) | ((c & 0xFF) >> 3));
-#else
-    /* We want: rrrr rrrr GGGg gggg bbbb bbbb => gggb bbbb rrrr rGGG */
-    r.full = (uint16_t)(((c & 0xF80000) >> 16) | ((c & 0xFC00) >> 13) | ((c & 0x1C00) << 3) | ((c & 0xF8) << 5));
-#endif
     return r;
 #elif LV_COLOR_DEPTH == 32
     lv_color_t r;

@@ -2337,14 +2337,10 @@
 
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #ifndef LV_USE_DEMO_WIDGETS
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_DEMO_WIDGETS
-            #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
-        #else
-            #define LV_USE_DEMO_WIDGETS 0
-        #endif
+    #ifdef CONFIG_LV_USE_DEMO_WIDGETS
+        #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
     #else
-        #define LV_USE_DEMO_WIDGETS 1
+        #define LV_USE_DEMO_WIDGETS 0
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
