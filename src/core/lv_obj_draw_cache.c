@@ -153,9 +153,9 @@ lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
         }
 
         LV_LOG_TRACE("obj(%p) take snapshot: buffer = %p, size = %d",
-                    obj,
-                    img_dsc->data,
-                    img_dsc->data_size);
+                     obj,
+                     img_dsc->data,
+                     img_dsc->data_size);
 
         draw_cache->draw_normal = true;
 
