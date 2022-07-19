@@ -441,6 +441,10 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 #endif
 
+    if(disp_refr->driver->refr_finish_cb) {
+        disp_refr->driver->refr_finish_cb(disp_refr->driver);
+    }
+
     REFR_TRACE("finished");
 }
 

@@ -136,6 +136,9 @@ typedef struct _lv_disp_drv_t {
     /** OPTIONAL: called when start rendering */
     void (*render_start_cb)(struct _lv_disp_drv_t * disp_drv);
 
+    /** OPTIONAL: called when refresh finish */
+    void (*refr_finish_cb)(struct _lv_disp_drv_t * disp_drv);
+
     /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
