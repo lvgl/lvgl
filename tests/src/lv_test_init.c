@@ -2,6 +2,7 @@
 #if LV_BUILD_TEST
 #include "lv_test_init.h"
 #include "lv_test_indev.h"
+#include "../../src/misc/lv_mem_builtin.h"
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +29,7 @@ void lv_test_init(void)
 
 void lv_test_deinit(void)
 {
-    lv_mem_deinit();
+    lv_mem_deinit_builtin();
 }
 
 static void hal_init(void)

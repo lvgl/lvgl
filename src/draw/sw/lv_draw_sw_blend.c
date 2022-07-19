@@ -356,7 +356,7 @@ static inline void set_px_argb(uint8_t * buf, lv_color_t color, lv_opa_t opa)
     lv_color_t bg_color;
     lv_color_t res_color;
     lv_opa_t bg_opa = buf[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
     bg_color.full = buf[0];
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf[1]);
     if(buf[1] <= LV_OPA_MIN) return;
@@ -388,7 +388,7 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
     lv_color_t bg_color;
 
     /*Get the BG color*/
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
     if(buf[1] <= LV_OPA_MIN) return;
     bg_color.full = buf[0];
 #elif LV_COLOR_DEPTH == 16
@@ -408,8 +408,8 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
     }
 
     /*Set the result color*/
-#if LV_COLOR_DEPTH == 8
-    buf[0] = res_color.full;
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+    buf[0] = last_res_color.full;
 #elif LV_COLOR_DEPTH == 16
     buf[0] = last_res_color.full & 0xff;
     buf[1] = last_res_color.full >> 8;
@@ -936,16 +936,8 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MIN(tmp, 7);
 #elif LV_COLOR_DEPTH == 16
-#if LV_COLOR_16_SWAP == 0
     tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MIN(tmp, 63);
-#else
-    tmp = (bg.ch.green_h << 3) + bg.ch.green_l + (fg.ch.green_h << 3) + fg.ch.green_l;
-    tmp = LV_MIN(tmp, 63);
-    fg.ch.green_h = tmp >> 3;
-    fg.ch.green_l = tmp & 0x7;
-#endif
-
 #elif LV_COLOR_DEPTH == 32
     tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MIN(tmp, 255);
@@ -974,15 +966,8 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
     tmp = bg.ch.red - fg.ch.red;
     fg.ch.red = LV_MAX(tmp, 0);
 
-#if LV_COLOR_16_SWAP == 0
     tmp = bg.ch.green - fg.ch.green;
     fg.ch.green = LV_MAX(tmp, 0);
-#else
-    tmp = (bg.ch.green_h << 3) + bg.ch.green_l + (fg.ch.green_h << 3) + fg.ch.green_l;
-    tmp = LV_MAX(tmp, 0);
-    fg.ch.green_h = tmp >> 3;
-    fg.ch.green_l = tmp & 0x7;
-#endif
 
     tmp = bg.ch.blue - fg.ch.blue;
     fg.ch.blue = LV_MAX(tmp, 0);

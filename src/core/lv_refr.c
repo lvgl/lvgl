@@ -384,7 +384,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
             fps_limit = 1000 / disp_refr->refr_timer->period;
         }
         else {
-            fps_limit = 1000 / LV_DISP_DEF_REFR_PERIOD;
+            fps_limit = 1000 / 33;
         }
 
         if(perf_monitor.elaps_sum == 0) {
@@ -409,7 +409,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 #endif
 
-#if LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
+#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC && LV_USE_LABEL
     lv_obj_t * mem_label = mem_monitor.mem_label;
     if(mem_label == NULL) {
         mem_label = lv_label_create(lv_layer_sys());

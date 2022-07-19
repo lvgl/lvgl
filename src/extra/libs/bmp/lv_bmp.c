@@ -203,14 +203,8 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
     lv_fs_seek(&b->f, p, LV_FS_SEEK_SET);
     lv_fs_read(&b->f, buf, len * (b->bpp / 8), NULL);
 
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP == 1
-    for(unsigned int i = 0; i < len * (b->bpp / 8); i += 2) {
-        buf[i] = buf[i] ^ buf[i + 1];
-        buf[i + 1] = buf[i] ^ buf[i + 1];
-        buf[i] = buf[i] ^ buf[i + 1];
-    }
 
-#elif LV_COLOR_DEPTH == 32
+#if LV_COLOR_DEPTH == 32
     if(b->bpp == 32) {
         lv_coord_t i;
         for(i = 0; i < len; i++) {

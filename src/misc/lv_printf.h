@@ -55,9 +55,6 @@ extern "C" {
 #endif
 
 #include "../lv_conf_internal.h"
-
-#if LV_SPRINTF_CUSTOM == 0
-
 #include <stdarg.h>
 #include <stddef.h>
 
@@ -67,6 +64,9 @@ typedef struct {
     const char * fmt;
     va_list * va;
 } lv_vaformat_t;
+
+int lv_snprintf_builtin(char * buffer, size_t count, const char * format, ...);
+int lv_vsnprintf_builtin(char * buffer, size_t count, const char * format, va_list va);
 
 /**
  * Tiny snprintf/vsnprintf implementation
@@ -78,12 +78,29 @@ typedef struct {
  *         null character. A value equal or larger than count indicates truncation. Only when the returned value
  *         is non-negative and less than count, the string has been completely written.
  */
-int  lv_snprintf(char * buffer, size_t count, const char * format, ...) LV_FORMAT_ATTRIBUTE(3, 4);
-int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va) LV_FORMAT_ATTRIBUTE(3, 0);
+LV_FORMAT_ATTRIBUTE(3, 4) static inline int  lv_snprintf(char * buffer, size_t count, const char * format, ...)
+{
 
-#else
-#include LV_SPRINTF_INCLUDE
-#endif
+    /* Declare a va_list type variable */
+    va_list args;
+
+    /* Initialise the va_list variable with the ... after fmt */
+    va_start(args, format);
+
+    /* Forward the '...' to vprintf */
+    int ret = LV_SNPRINTF(buffer, count, format, args);
+
+    /* Clean up the va_list */
+    va_end(args);
+
+    return ret;
+}
+
+LV_FORMAT_ATTRIBUTE(3, 0) static inline int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
+{
+    return  LV_VSNPRINTF(buffer, count, format, va);
+}
+
 
 #ifdef __cplusplus
 } /*extern "C"*/
