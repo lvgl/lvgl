@@ -114,7 +114,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     lv_area_increase(&snapshot_area, ext_size, ext_size);
 
     lv_memset(buf, 0x00, buff_size);
-    lv_memset_00(dsc, sizeof(lv_img_dsc_t));
+    lv_memzero(dsc, sizeof(lv_img_dsc_t));
 
     lv_disp_t * obj_disp = lv_obj_get_disp(obj);
     lv_disp_drv_t driver;
@@ -125,10 +125,10 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     lv_disp_drv_use_generic_set_px_cb(&driver, cf);
 
     lv_disp_t fake_disp;
-    lv_memset_00(&fake_disp, sizeof(lv_disp_t));
+    lv_memzero(&fake_disp, sizeof(lv_disp_t));
     fake_disp.driver = &driver;
 
-    lv_draw_ctx_t * draw_ctx = lv_mem_alloc(obj_disp->driver->draw_ctx_size);
+    lv_draw_ctx_t * draw_ctx = lv_malloc(obj_disp->driver->draw_ctx_size);
     LV_ASSERT_MALLOC(draw_ctx);
     if(draw_ctx == NULL) return LV_RES_INV;
     obj_disp->driver->draw_ctx_init(fake_disp.driver, draw_ctx);
@@ -145,7 +145,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     _lv_refr_set_disp_refreshing(refr_ori);
     obj_disp->driver->draw_ctx_deinit(fake_disp.driver, draw_ctx);
-    lv_mem_free(draw_ctx);
+    lv_free(draw_ctx);
 
     dsc->data = buf;
     dsc->header.w = w;
@@ -166,22 +166,22 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_img_cf_t cf)
     LV_ASSERT_NULL(obj);
     uint32_t buff_size = lv_snapshot_buf_size_needed(obj, cf);
 
-    void * buf = lv_mem_alloc(buff_size);
+    void * buf = lv_malloc(buff_size);
     LV_ASSERT_MALLOC(buf);
     if(buf == NULL) {
         return NULL;
     }
 
-    lv_img_dsc_t * dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
+    lv_img_dsc_t * dsc = lv_malloc(sizeof(lv_img_dsc_t));
     LV_ASSERT_MALLOC(buf);
     if(dsc == NULL) {
-        lv_mem_free(buf);
+        lv_free(buf);
         return NULL;
     }
 
     if(lv_snapshot_take_to_buf(obj, cf, dsc, buf, buff_size) == LV_RES_INV) {
-        lv_mem_free(buf);
-        lv_mem_free(dsc);
+        lv_free(buf);
+        lv_free(dsc);
         return NULL;
     }
 
@@ -201,9 +201,9 @@ void lv_snapshot_free(lv_img_dsc_t * dsc)
         return;
 
     if(dsc->data)
-        lv_mem_free((void *)dsc->data);
+        lv_free((void *)dsc->data);
 
-    lv_mem_free(dsc);
+    lv_free(dsc);
 }
 
 /**********************

@@ -155,7 +155,7 @@ void lv_style_init(lv_style_t * style)
     }
 #endif
 
-    lv_memset_00(style, sizeof(lv_style_t));
+    lv_memzero(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
@@ -170,8 +170,8 @@ void lv_style_reset(lv_style_t * style)
         return;
     }
 
-    if(style->prop_cnt > 1) lv_mem_free(style->v_p.values_and_props);
-    lv_memset_00(style, sizeof(lv_style_t));
+    if(style->prop_cnt > 1) lv_free(style->v_p.values_and_props);
+    lv_memzero(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_STYLE_SENTINEL_VALUE;
 #endif
@@ -198,7 +198,7 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
         required_size = (required_size + 31) & ~31;
         LV_ASSERT_MSG(required_size > 0, "required size has become 0?");
         uint8_t * old_p = LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table);
-        uint8_t * new_p = lv_mem_realloc(old_p, required_size * sizeof(uint8_t));
+        uint8_t * new_p = lv_realloc(old_p, required_size * sizeof(uint8_t));
         if(new_p == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
@@ -252,7 +252,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
             }
             else {
                 size_t size = (style->prop_cnt - 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-                uint8_t * new_values_and_props = lv_mem_alloc(size);
+                uint8_t * new_values_and_props = lv_malloc(size);
                 if(new_values_and_props == NULL) return false;
                 style->v_p.values_and_props = new_values_and_props;
                 style->prop_cnt--;
@@ -271,7 +271,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
                 }
             }
 
-            lv_mem_free(old_values);
+            lv_free(old_values);
             return true;
         }
     }
@@ -297,7 +297,7 @@ lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop,
 void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style_prop_t props[],
                                   lv_anim_path_cb_t path_cb, uint32_t time, uint32_t delay, void * user_data)
 {
-    lv_memset_00(tr, sizeof(lv_style_transition_dsc_t));
+    lv_memzero(tr, sizeof(lv_style_transition_dsc_t));
     tr->props = props;
     tr->path_xcb = path_cb == NULL ? lv_anim_path_linear : path_cb;
     tr->time = time;
@@ -435,7 +435,7 @@ static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_
         }
 
         size_t size = (style->prop_cnt + 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-        uint8_t * values_and_props = lv_mem_realloc(style->v_p.values_and_props, size);
+        uint8_t * values_and_props = lv_realloc(style->v_p.values_and_props, size);
         if(values_and_props == NULL) return;
         style->v_p.values_and_props = values_and_props;
 
@@ -461,7 +461,7 @@ static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_
             return;
         }
         size_t size = (style->prop_cnt + 1) * (sizeof(lv_style_value_t) + sizeof(uint16_t));
-        uint8_t * values_and_props = lv_mem_alloc(size);
+        uint8_t * values_and_props = lv_malloc(size);
         if(values_and_props == NULL) return;
         lv_style_value_t value_tmp = style->v_p.value1;
         style->v_p.values_and_props = values_and_props;

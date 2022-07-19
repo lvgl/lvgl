@@ -116,7 +116,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         }
 
         if(last_buf_size < buf_size) {
-            uint8_t * tmp = lv_mem_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
+            uint8_t * tmp = lv_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
             LV_ASSERT_MALLOC(tmp);
             if(tmp == NULL) return NULL;
             LV_GC_ROOT(_lv_font_decompr_buf) = tmp;
@@ -196,7 +196,7 @@ void _lv_font_clean_up_fmt_txt(void)
 {
 #if LV_USE_FONT_COMPRESSED
     if(LV_GC_ROOT(_lv_font_decompr_buf)) {
-        lv_mem_free(LV_GC_ROOT(_lv_font_decompr_buf));
+        lv_free(LV_GC_ROOT(_lv_font_decompr_buf));
         LV_GC_ROOT(_lv_font_decompr_buf) = NULL;
     }
 #endif
@@ -361,12 +361,12 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     rle_init(in, bpp);
 
-    uint8_t * line_buf1 = lv_mem_buf_get(w);
+    uint8_t * line_buf1 = lv_malloc(w);
 
     uint8_t * line_buf2 = NULL;
 
     if(prefilter) {
-        line_buf2 = lv_mem_buf_get(w);
+        line_buf2 = lv_malloc(w);
     }
 
     decompress_line(line_buf1, w);
@@ -399,8 +399,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
         }
     }
 
-    lv_mem_buf_release(line_buf1);
-    lv_mem_buf_release(line_buf2);
+    lv_free(line_buf1);
+    lv_free(line_buf2);
 }
 
 /**

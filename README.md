@@ -3,7 +3,7 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 
 ---
 
-<p align="right"><b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a></p>
+<p align="right"><b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a></p>
 
   <br>
 <p align="center">
@@ -22,7 +22,7 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 <a href="https://lvgl.io" title="Homepage of LVGL">Website </a> |
 <a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">Docs</a> |
 <a href="https://forum.lvgl.io" title="Get help and help others">Forum</a> |
-<a href="https:/lvgl.io/demos" title="Demos running in your browser">Demos</a> |
+<a href="https://lvgl.io/demos" title="Demos running in your browser">Demos</a> |
 <a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">Services</a> |
 <a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
 </p>

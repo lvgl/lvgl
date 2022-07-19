@@ -317,7 +317,7 @@ static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
     lv_draw_rect_dsc_t nxp_dsc;
 
     lv_memcpy(&nxp_dsc, dsc, sizeof(nxp_dsc));
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     /* Draw only the shadow */
     nxp_dsc.bg_opa = 0;
     nxp_dsc.bg_img_opa = 0;
@@ -330,7 +330,7 @@ static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
     nxp_dsc.shadow_opa = 0;
     nxp_dsc.bg_opa = dsc->bg_opa;
     done = (draw_nxp_bg(draw_ctx, &nxp_dsc, coords) == LV_RES_OK);
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_USE_DRAW_MASKS*/
 
     /* Draw the remaining parts */
     nxp_dsc.shadow_opa = 0;
@@ -393,7 +393,7 @@ static void lv_draw_nxp_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * 
 {
     bool done = false;
 
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     if(dsc->opa <= LV_OPA_MIN)
         return;
     if(dsc->width == 0)
@@ -409,7 +409,7 @@ static void lv_draw_nxp_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * 
             VG_LITE_LOG_TRACE("VG-Lite draw arc failed. Fallback.");
     }
 #endif
-#endif/*LV_DRAW_COMPLEX*/
+#endif/*LV_USE_DRAW_MASKS*/
 
     if(!done)
         lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);

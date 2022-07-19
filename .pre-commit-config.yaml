@@ -19,12 +19,9 @@ repos:
       verbose: true
       files: |
         (?x)^(
+            demos/ |
+            examples/ |
             src/ |
-            tests/src/test_cases/
-        )
-      exclude: |
-        (?x)^(
-            src/extra/libs/ |
-            src/lv_conf_internal.h
+            tests/
         )
       types_or: ["c", "header"]

@@ -12,14 +12,6 @@ if(LV_MICROPYTHON)
     ${LVGL_ROOT_DIR}/../
     REQUIRES
     main)
-
-  target_compile_definitions(${COMPONENT_LIB}
-                             INTERFACE "-DLV_CONF_INCLUDE_SIMPLE")
-
-  if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
-    target_compile_definitions(${COMPONENT_LIB}
-                               INTERFACE "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
-  endif()
 else()
   if(CONFIG_LV_BUILD_EXAMPLES)
     file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
@@ -49,11 +41,11 @@ else()
   idf_component_register(SRCS ${SOURCES} ${EXAMPLE_SOURCES} ${DEMO_SOURCES}
       INCLUDE_DIRS ${LVGL_ROOT_DIR} ${LVGL_ROOT_DIR}/src ${LVGL_ROOT_DIR}/../
                    ${LVGL_ROOT_DIR}/examples ${LVGL_ROOT_DIR}/demos)
+endif()
 
-  target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
+target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_CONF_INCLUDE_SIMPLE")
 
-  if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
-    target_compile_definitions(${COMPONENT_LIB}
-                               PUBLIC "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
-  endif()
+if(CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
+  target_compile_definitions(${COMPONENT_LIB}
+                             PUBLIC "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
 endif()

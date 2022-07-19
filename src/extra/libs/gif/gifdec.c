@@ -108,11 +108,11 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
     f_gif_read(gif_base, &aspect, 1);
     /* Create gd_GIF Structure. */
 #if LV_COLOR_DEPTH == 32
-    gif = lv_mem_alloc(sizeof(gd_GIF) + 5 * width * height);
+    gif = lv_malloc(sizeof(gd_GIF) + 5 * width * height);
 #elif LV_COLOR_DEPTH == 16
-    gif = lv_mem_alloc(sizeof(gd_GIF) + 4 * width * height);
+    gif = lv_malloc(sizeof(gd_GIF) + 4 * width * height);
 #elif LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-    gif = lv_mem_alloc(sizeof(gd_GIF) + 3 * width * height);
+    gif = lv_malloc(sizeof(gd_GIF) + 3 * width * height);
 #endif
 
     if (!gif) goto fail;
@@ -291,7 +291,7 @@ new_table(int key_size)
 {
     int key;
     int init_bulk = MAX(1 << (key_size + 1), 0x100);
-    Table *table = lv_mem_alloc(sizeof(*table) + sizeof(Entry) * init_bulk);
+    Table *table = lv_malloc(sizeof(*table) + sizeof(Entry) * init_bulk);
     if (table) {
         table->bulk = init_bulk;
         table->nentries = (1 << key_size) + 2;
@@ -312,7 +312,7 @@ add_entry(Table **tablep, uint16_t length, uint16_t prefix, uint8_t suffix)
     Table *table = *tablep;
     if (table->nentries == table->bulk) {
         table->bulk *= 2;
-        table = lv_mem_realloc(table, sizeof(*table) + sizeof(Entry) * table->bulk);
+        table = lv_realloc(table, sizeof(*table) + sizeof(Entry) * table->bulk);
         if (!table) return -1;
         table->entries = (Entry *) &table[1];
         *tablep = table;
@@ -413,7 +413,7 @@ read_image_data(gd_GIF *gif, int interlace)
         } else if (!table_is_full) {
             ret = add_entry(&table, str_len + 1, key, entry.suffix);
             if (ret == -1) {
-                lv_mem_free(table);
+                lv_free(table);
                 return -1;
             }
             if (table->nentries == 0x1000) {
@@ -443,7 +443,7 @@ read_image_data(gd_GIF *gif, int interlace)
         if (key < table->nentries - 1 && !table_is_full)
             table->entries[table->nentries - 1].suffix = entry.suffix;
     }
-    lv_mem_free(table);
+    lv_free(table);
     if (key == stop) f_gif_read(gif, &sub_len, 1); /* Must be zero! */
     f_gif_seek(gif, end, LV_FS_SEEK_SET);
     return 0;
@@ -605,7 +605,7 @@ void
 gd_close_gif(gd_GIF *gif)
 {
     f_gif_close(gif);
-    lv_mem_free(gif);
+    lv_free(gif);
 }
 
 static bool f_gif_open(gd_GIF * gif, const void * path, bool is_file)

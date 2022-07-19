@@ -168,7 +168,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
 #endif
         }
 
-        lv_memset_00(&gradient, sizeof(vg_lite_linear_gradient_t));
+        lv_memzero(&gradient, sizeof(vg_lite_linear_gradient_t));
 
         err = vg_lite_init_grad(&gradient);
         VG_LITE_ERR_RETURN_INV(err, "Init gradient failed");

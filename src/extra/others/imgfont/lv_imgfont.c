@@ -13,7 +13,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_IMGFONT_PATH_MAX_LEN 64
 
 /**********************
  *      TYPEDEFS
@@ -52,9 +51,9 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_get_imgfont_path_cb_t path_cb)
                   "LV_IMGFONT_PATH_MAX_LEN must be greater than sizeof(lv_img_dsc_t)");
 
     size_t size = sizeof(imgfont_dsc_t) + sizeof(lv_font_t);
-    imgfont_dsc_t * dsc = (imgfont_dsc_t *)lv_mem_alloc(size);
+    imgfont_dsc_t * dsc = (imgfont_dsc_t *)lv_malloc(size);
     if(dsc == NULL) return NULL;
-    lv_memset_00(dsc, size);
+    lv_memzero(dsc, size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(imgfont_dsc_t));
     dsc->path_cb = path_cb;
@@ -79,7 +78,7 @@ void lv_imgfont_destroy(lv_font_t * font)
     }
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
-    lv_mem_free(dsc);
+    lv_free(dsc);
 }
 
 /**********************
@@ -107,15 +106,30 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
         return false;
     }
 
+    const lv_img_header_t * img_header;
+#if LV_IMGFONT_USE_IMG_CACHE_HEADER
+    lv_color_t color = { 0 };
+    _lv_img_cache_entry_t * entry = _lv_img_cache_open(dsc->path, color, 0);
+
+    if(entry == NULL) {
+        return false;
+    }
+
+    img_header = &entry->dec_dsc.header;
+#else
     lv_img_header_t header;
+
     if(lv_img_decoder_get_info(dsc->path, &header) != LV_RES_OK) {
         return false;
     }
 
+    img_header = &header;
+#endif
+
     dsc_out->is_placeholder = 0;
-    dsc_out->adv_w = header.w;
-    dsc_out->box_w = header.w;
-    dsc_out->box_h = header.h;
+    dsc_out->adv_w = img_header->w;
+    dsc_out->box_w = img_header->w;
+    dsc_out->box_h = img_header->h;
     dsc_out->bpp = LV_IMGFONT_BPP;   /* is image identifier */
     dsc_out->ofs_x = 0;
     dsc_out->ofs_y = 0;

@@ -544,12 +544,6 @@ menu "LVGL configuration"
                 default y if LV_CONF_MINIMAL
             config LV_FONT_UNSCII_16
                 bool "Enable UNSCII 16 (Perfect monospace font)"
-
-            config LV_FONT_CUSTOM
-                bool "Enable the custom font"
-            config LV_FONT_CUSTOM_DECLARE
-                string "Header to include for the custom font"
-                depends on LV_FONT_CUSTOM
         endmenu
 
         choice LV_FONT_DEFAULT
@@ -1025,6 +1019,14 @@ menu "LVGL configuration"
 
         config LV_USE_IMGFONT
             bool "draw img in label or span obj"
+            default n
+        config LV_IMGFONT_PATH_MAX_LEN
+            int "Imgfont image file path maximum length"
+            depends on LV_USE_IMGFONT
+            default 64
+        config LV_IMGFONT_USE_IMG_CACHE_HEADER
+            bool "Use img cache to buffer header information"
+            depends on LV_USE_IMGFONT
             default n
 
         config LV_USE_MSG

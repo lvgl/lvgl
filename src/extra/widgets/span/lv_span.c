@@ -127,10 +127,10 @@ void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span)
         if(cur_span == span) {
             _lv_ll_remove(&spans->child_ll, cur_span);
             if(cur_span->txt && cur_span->static_flag == 0) {
-                lv_mem_free(cur_span->txt);
+                lv_free(cur_span->txt);
             }
             lv_style_reset(&cur_span->style);
-            lv_mem_free(cur_span);
+            lv_free(cur_span);
             break;
         }
     }
@@ -149,10 +149,10 @@ void lv_span_set_text(lv_span_t * span, const char * text)
     }
 
     if(span->txt == NULL || span->static_flag == 1) {
-        span->txt = lv_mem_alloc(strlen(text) + 1);
+        span->txt = lv_malloc(strlen(text) + 1);
     }
     else {
-        span->txt = lv_mem_realloc(span->txt, strlen(text) + 1);
+        span->txt = lv_realloc(span->txt, strlen(text) + 1);
     }
     span->static_flag = 0;
     strcpy(span->txt, text);
@@ -167,7 +167,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
     }
 
     if(span->txt && span->static_flag == 0) {
-        lv_mem_free(span->txt);
+        lv_free(span->txt);
     }
     span->static_flag = 1;
     span->txt = (char *)text;
@@ -520,10 +520,10 @@ static void lv_spangroup_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     while(cur_span) {
         _lv_ll_remove(&spans->child_ll, cur_span);
         if(cur_span->txt && cur_span->static_flag == 0) {
-            lv_mem_free(cur_span->txt);
+            lv_free(cur_span->txt);
         }
         lv_style_reset(&cur_span->style);
-        lv_mem_free(cur_span);
+        lv_free(cur_span);
         cur_span = _lv_ll_get_head(&spans->child_ll);
     }
 }
@@ -791,7 +791,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     span_text_check(&cur_txt);
     uint32_t cur_txt_ofs = 0;
     lv_snippet_t snippet;   /* use to save cur_span info and push it to stack */
-    lv_memset_00(&snippet, sizeof(snippet));
+    lv_memzero(&snippet, sizeof(snippet));
 
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);

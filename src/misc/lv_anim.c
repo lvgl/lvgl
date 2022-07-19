@@ -9,6 +9,7 @@
 #include "lv_anim.h"
 
 #include "../hal/lv_hal_tick.h"
+#include "../hal/lv_hal_disp.h"
 #include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
@@ -57,14 +58,14 @@ static lv_timer_t * _lv_anim_tmr;
 void _lv_anim_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
-    _lv_anim_tmr = lv_timer_create(anim_timer, LV_DISP_DEF_REFR_PERIOD, NULL);
+    _lv_anim_tmr = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation timer*/
     anim_list_changed = false;
 }
 
 void lv_anim_init(lv_anim_t * a)
 {
-    lv_memset_00(a, sizeof(lv_anim_t));
+    lv_memzero(a, sizeof(lv_anim_t));
     a->time = 500;
     a->start_value = 0;
     a->end_value = 100;
@@ -148,7 +149,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
-            lv_mem_free(a);
+            lv_free(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
                                        the linked list*/
             del = true;
@@ -436,7 +437,7 @@ static void anim_ready_handler(lv_anim_t * a)
         /*Call the callback function at the end*/
         if(a->ready_cb != NULL) a->ready_cb(a);
         if(a->deleted_cb != NULL) a->deleted_cb(a);
-        lv_mem_free(a);
+        lv_free(a);
     }
     /*If the animation is not deleted then restart it*/
     else {

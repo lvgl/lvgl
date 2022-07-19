@@ -45,7 +45,7 @@ static void lv_async_timer_cb(lv_timer_t * timer);
 lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
 {
     /*Allocate an info structure*/
-    lv_async_info_t * info = lv_mem_alloc(sizeof(lv_async_info_t));
+    lv_async_info_t * info = lv_malloc(sizeof(lv_async_info_t));
 
     if(info == NULL)
         return LV_RES_INV;
@@ -54,7 +54,7 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data)
     lv_timer_t * timer = lv_timer_create(lv_async_timer_cb, 0, info);
 
     if(timer == NULL) {
-        lv_mem_free(info);
+        lv_free(info);
         return LV_RES_INV;
     }
 
@@ -81,7 +81,7 @@ lv_res_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data)
             /*Match user function callback and user data*/
             if(info->cb == async_xcb && info->user_data == user_data) {
                 lv_timer_del(timer);
-                lv_mem_free(info);
+                lv_free(info);
                 res = LV_RES_OK;
             }
         }
@@ -101,5 +101,5 @@ static void lv_async_timer_cb(lv_timer_t * timer)
     lv_async_info_t * info = (lv_async_info_t *)timer->user_data;
 
     info->cb(info->user_data);
-    lv_mem_free(info);
+    lv_free(info);
 }

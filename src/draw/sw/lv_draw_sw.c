@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "../lv_draw.h"
+#if LV_USE_DRAW_SW
+
 #include "lv_draw_sw.h"
 
 /*********************
@@ -42,7 +44,7 @@ void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     LV_UNUSED(drv);
 
     lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
-    lv_memset_00(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
+    lv_memzero(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
 
     draw_sw_ctx->base_draw.draw_arc = lv_draw_sw_arc;
     draw_sw_ctx->base_draw.draw_rect = lv_draw_sw_rect;
@@ -51,9 +53,7 @@ void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     draw_sw_ctx->base_draw.draw_img_decoded = lv_draw_sw_img_decoded;
     draw_sw_ctx->base_draw.draw_line = lv_draw_sw_line;
     draw_sw_ctx->base_draw.draw_polygon = lv_draw_sw_polygon;
-#if LV_DRAW_COMPLEX
     draw_sw_ctx->base_draw.draw_transform = lv_draw_sw_transform;
-#endif
     draw_sw_ctx->base_draw.wait_for_finish = lv_draw_sw_wait_for_finish;
     draw_sw_ctx->base_draw.buffer_copy = lv_draw_sw_buffer_copy;
     draw_sw_ctx->base_draw.layer_init = lv_draw_sw_layer_create;
@@ -69,7 +69,7 @@ void lv_draw_sw_deinit_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     LV_UNUSED(drv);
 
     lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
-    lv_memset_00(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
+    lv_memzero(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
 }
 
 void lv_draw_sw_wait_for_finish(lv_draw_ctx_t * draw_ctx)
@@ -106,3 +106,5 @@ void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#endif /*LV_USE_DRAW_SW*/

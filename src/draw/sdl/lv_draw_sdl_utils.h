@@ -14,13 +14,13 @@ extern "C" {
  *********************/
 
 #include "../../lv_conf_internal.h"
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "lv_draw_sdl.h"
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_area.h"
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DARW_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
@@ -57,7 +57,7 @@ void lv_sdl_to_8bpp(uint8_t * dest, const uint8_t * src, int width, int height, 
  *      MACROS
  **********************/
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

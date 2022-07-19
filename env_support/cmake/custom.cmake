@@ -4,7 +4,7 @@ option(LV_LVGL_H_INCLUDE_SIMPLE
 
 # Option to define LV_CONF_INCLUDE_SIMPLE, default: ON
 option(LV_CONF_INCLUDE_SIMPLE
-       "Simple include of \"lv_conf.h\" and \"lv_drv_conf.h\"" ON)
+       "Use #include \"lv_conf.h\" instead of #include \"../../lv_conf.h\"" ON)
 
 # Option to set LV_CONF_PATH, if set parent path LV_CONF_DIR is added to
 # includes

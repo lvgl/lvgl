@@ -101,7 +101,8 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
  * @param fmt           `printf`-like format
  * @note                New roes/columns are added automatically if required
  */
-void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt, ...);
+void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, const char * fmt,
+                                 ...) LV_FORMAT_ATTRIBUTE(4, 5);
 
 /**
  * Set the number of rows

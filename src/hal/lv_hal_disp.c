@@ -83,7 +83,7 @@ static lv_disp_t * disp_def;
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
-    lv_memset_00(driver, sizeof(lv_disp_drv_t));
+    lv_memzero(driver, sizeof(lv_disp_drv_t));
 
     driver->hor_res          = 320;
     driver->ver_res          = 240;
@@ -109,7 +109,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_nxp_ctx_init;
     driver->draw_ctx_deinit = lv_draw_nxp_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_nxp_ctx_t);
-#elif LV_USE_GPU_SDL
+#elif LV_USE_DRAW_SDL
     driver->draw_ctx_init = lv_draw_sdl_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
@@ -142,7 +142,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
  */
 void lv_disp_draw_buf_init(lv_disp_draw_buf_t * draw_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt)
 {
-    lv_memset_00(draw_buf, sizeof(lv_disp_draw_buf_t));
+    lv_memzero(draw_buf, sizeof(lv_disp_draw_buf_t));
 
     draw_buf->buf1    = buf1;
     draw_buf->buf2    = buf2;
@@ -166,14 +166,14 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     /*Create a draw context if not created yet*/
     if(driver->draw_ctx == NULL) {
-        lv_draw_ctx_t * draw_ctx = lv_mem_alloc(driver->draw_ctx_size);
+        lv_draw_ctx_t * draw_ctx = lv_malloc(driver->draw_ctx_size);
         LV_ASSERT_MALLOC(draw_ctx);
         if(draw_ctx == NULL) return NULL;
         driver->draw_ctx_init(driver, draw_ctx);
         driver->draw_ctx = draw_ctx;
     }
 
-    lv_memset_00(disp, sizeof(lv_disp_t));
+    lv_memzero(disp, sizeof(lv_disp_t));
 
     disp->driver = driver;
 
@@ -183,10 +183,10 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh timer*/
-    disp->refr_timer = lv_timer_create(_lv_disp_refr_timer, LV_DISP_DEF_REFR_PERIOD, disp);
+    disp->refr_timer = lv_timer_create(_lv_disp_refr_timer, LV_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MALLOC(disp->refr_timer);
     if(disp->refr_timer == NULL) {
-        lv_mem_free(disp);
+        lv_free(disp);
         return NULL;
     }
 
@@ -196,11 +196,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     }
 
     disp->bg_color = lv_color_white();
-#if LV_COLOR_SCREEN_TRANSP
-    disp->bg_opa = LV_OPA_TRANSP;
-#else
     disp->bg_opa = LV_OPA_COVER;
-#endif
 
 #if LV_USE_THEME_DEFAULT
     if(lv_theme_default_is_inited() == false) {
@@ -265,8 +261,8 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
      * The object invalidated its previous area. That area is now out of the screen area
      * so we reset all invalidated areas and invalidate the active screen's new area only.
      */
-    lv_memset_00(disp->inv_areas, sizeof(disp->inv_areas));
-    lv_memset_00(disp->inv_area_joined, sizeof(disp->inv_area_joined));
+    lv_memzero(disp->inv_areas, sizeof(disp->inv_areas));
+    lv_memzero(disp->inv_area_joined, sizeof(disp->inv_area_joined));
     disp->inv_p = 0;
     if(disp->act_scr != NULL) lv_obj_invalidate(disp->act_scr);
 
@@ -310,7 +306,7 @@ void lv_disp_remove(lv_disp_t * disp)
 
     _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
     if(disp->refr_timer) lv_timer_del(disp->refr_timer);
-    lv_mem_free(disp);
+    lv_free(disp);
 
     if(was_default) lv_disp_set_default(_lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
 }

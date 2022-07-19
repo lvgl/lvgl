@@ -37,11 +37,11 @@ Note that popovers for keys in the top row will draw outside the widget boundari
 The popovers currently are merely a visual effect and don't allow selecting additional characters such as accents yet.
 
 ### New Keymap
-You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, map)` and `lv_keyboard_set_ctrl_map(kb, ctrl_map)`.
-Learn more about the [Button matrix](/widgets/core/btnmatrix) object.
+You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_..., kb_map, kb_ctrl);`. See the [Button matrix](/widgets/core/btnmatrix) for more information about creating new maps a ctrls.
+
 Keep in mind that using following keywords will have the same effect as with the original map:
-- `LV_SYMBOL_OK` Apply.
-- `LV_SYMBOL_CLOSE` or `LV_SYMBOL_KEYBOARD` Close.
+- `LV_SYMBOL_OK` Send `LV_EVENT_RADY` to the assigend Text area.
+- `LV_SYMBOL_CLOSE` or `LV_SYMBOL_KEYBOARD` Send `LV_EVENT_CANCEL` to the assigend Text area.
 - `LV_SYMBOL_BACKSPACE` Delete on the left.
 - `LV_SYMBOL_LEFT` Move the cursor left.
 - `LV_SYMBOL_RIGHT` Move the cursor right.

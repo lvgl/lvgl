@@ -8,7 +8,7 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "lv_draw_sdl.h"
 #include "lv_draw_sdl_utils.h"
@@ -110,7 +110,7 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
 static lv_draw_line_key_t line_key_create(const lv_draw_line_dsc_t * dsc, lv_coord_t length)
 {
     lv_draw_line_key_t key;
-    lv_memset_00(&key, sizeof(lv_draw_line_key_t));
+    lv_memzero(&key, sizeof(lv_draw_line_key_t));
     key.magic = LV_GPU_CACHE_KEY_MAGIC_LINE;
     key.length = length;
     key.width = dsc->width;
@@ -151,4 +151,4 @@ static SDL_Texture * line_texture_create(lv_draw_sdl_ctx_t * sdl_ctx, const lv_d
     return texture;
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

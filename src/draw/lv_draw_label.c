@@ -54,7 +54,7 @@ static uint8_t hex_char_to_num(char hex);
 
 void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
-    lv_memset_00(dsc, sizeof(lv_draw_label_dsc_t));
+    lv_memzero(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = lv_color_black();
     dsc->font = LV_FONT_DEFAULT;
@@ -219,7 +219,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
         cmd_state = CMD_STATE_WAIT;
         i         = 0;
 #if LV_USE_BIDI
-        char * bidi_txt = lv_mem_buf_get(line_end - line_start + 1);
+        char * bidi_txt = lv_malloc(line_end - line_start + 1);
         _lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, base_dir, NULL, 0);
 #else
         const char * bidi_txt = txt + line_start;
@@ -263,7 +263,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
                         /*Get the parameter*/
                         if(i - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
                             char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
-                            lv_memcpy_small(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
+                            lv_memcpy(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r, g, b;
                             r       = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
@@ -329,7 +329,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
         }
 
 #if LV_USE_BIDI
-        lv_mem_buf_release(bidi_txt);
+        lv_free(bidi_txt);
         bidi_txt = NULL;
 #endif
         /*Go to next line*/

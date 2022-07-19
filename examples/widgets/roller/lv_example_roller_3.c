@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_ROLLER && LV_DRAW_COMPLEX && LV_BUILD_EXAMPLES
+#if LV_USE_ROLLER && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES
 
 static void mask_event_cb(lv_event_t * e)
 {
@@ -28,14 +28,14 @@ static void mask_event_cb(lv_event_t * e)
         rect_area.y1 = roller_coords.y1;
         rect_area.y2 = roller_coords.y1 + (lv_obj_get_height(obj) - font_h - line_space) / 2;
 
-        lv_draw_mask_fade_param_t * fade_mask_top = lv_mem_buf_get(sizeof(lv_draw_mask_fade_param_t));
+        lv_draw_mask_fade_param_t * fade_mask_top = lv_malloc(sizeof(lv_draw_mask_fade_param_t));
         lv_draw_mask_fade_init(fade_mask_top, &rect_area, LV_OPA_TRANSP, rect_area.y1, LV_OPA_COVER, rect_area.y2);
         mask_top_id = lv_draw_mask_add(fade_mask_top, NULL);
 
         rect_area.y1 = rect_area.y2 + font_h + line_space - 1;
         rect_area.y2 = roller_coords.y2;
 
-        lv_draw_mask_fade_param_t * fade_mask_bottom = lv_mem_buf_get(sizeof(lv_draw_mask_fade_param_t));
+        lv_draw_mask_fade_param_t * fade_mask_bottom = lv_malloc(sizeof(lv_draw_mask_fade_param_t));
         lv_draw_mask_fade_init(fade_mask_bottom, &rect_area, LV_OPA_COVER, rect_area.y1, LV_OPA_TRANSP, rect_area.y2);
         mask_bottom_id = lv_draw_mask_add(fade_mask_bottom, NULL);
 
@@ -45,8 +45,8 @@ static void mask_event_cb(lv_event_t * e)
         lv_draw_mask_fade_param_t * fade_mask_bottom = lv_draw_mask_remove_id(mask_bottom_id);
         lv_draw_mask_free_param(fade_mask_top);
         lv_draw_mask_free_param(fade_mask_bottom);
-        lv_mem_buf_release(fade_mask_top);
-        lv_mem_buf_release(fade_mask_bottom);
+        lv_free(fade_mask_top);
+        lv_free(fade_mask_bottom);
         mask_top_id = -1;
         mask_bottom_id = -1;
     }

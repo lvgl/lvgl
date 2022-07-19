@@ -25,8 +25,8 @@
 - [ ] Reconsider how themes should work. See [here](https://github.com/lvgl/lvgl/pull/3390#pullrequestreview-990710921).
 - [ ] Consider to prepare LVGL to render independent areas in parallel. 
 - [ ] Introduce a pipeline in renderer to support multi-GPUs/Accelerators, such as 2D-capable-DMAs, 2D GPUs, dedicated processor cores for 2D tasks etc.
-- [ ] More conscious `<std*.h>` wrapper API 
-- [ ] Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too. Fragmentation is also lower if processes can completely clean up after themselves.  
+- [x] More conscious `<std*.h>` wrapper API 
+- [x] Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too. Fragmentation is also lower if processes can completely clean up after themselves.  
 - [ ] Use `(u)int32_t` in API where possible. Consider hardcoding `lv_coord_t` as `int32_t`. 
 - [ ] `lv_array`: replace linked lists with array where possible (arrays are faster and uses less memory)
 - [ ] Reconsider how to handle UTF-8 characters (allow different encoding too) and Bidi. Maybe create an abstraction for typesetting.     

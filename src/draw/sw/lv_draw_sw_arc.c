@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw.h"
+#if LV_USE_DRAW_SW
+
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_mem.h"
@@ -37,13 +39,13 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     static void draw_quarter_0(quarter_draw_dsc_t * q);
     static void draw_quarter_1(quarter_draw_dsc_t * q);
     static void draw_quarter_2(quarter_draw_dsc_t * q);
     static void draw_quarter_3(quarter_draw_dsc_t * q);
     static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness, lv_area_t * res_area);
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_USE_DRAW_MASKS*/
 
 /**********************
  *  STATIC VARIABLES
@@ -60,7 +62,7 @@ typedef struct {
 void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,
                     uint16_t start_angle, uint16_t end_angle)
 {
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
     if(start_angle == end_angle) return;
@@ -212,21 +214,21 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
         draw_ctx->clip_area = clip_area_ori;
     }
 #else
-    LV_LOG_WARN("Can't draw arc with LV_DRAW_COMPLEX == 0");
+    LV_LOG_WARN("Can't draw arc with LV_USE_DRAW_MASKS == 0");
     LV_UNUSED(center);
     LV_UNUSED(radius);
     LV_UNUSED(start_angle);
     LV_UNUSED(end_angle);
     LV_UNUSED(draw_ctx);
     LV_UNUSED(dsc);
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_USE_DRAW_MASKS*/
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
 static void draw_quarter_0(quarter_draw_dsc_t * q)
 {
     const lv_area_t * clip_area_ori = q->draw_ctx->clip_area;
@@ -534,4 +536,5 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness
     }
 }
 
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_USE_DRAW_MASKS*/
+#endif /*LV_USE_DRAW_SW*/

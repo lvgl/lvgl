@@ -59,7 +59,7 @@ static void lv_monkey_timer_cb(lv_timer_t * timer);
 
 void lv_monkey_config_init(lv_monkey_config_t * config)
 {
-    lv_memset_00(config, sizeof(lv_monkey_config_t));
+    lv_memzero(config, sizeof(lv_monkey_config_t));
     config->type = LV_INDEV_TYPE_POINTER;
     config->period_range.min = MONKEY_PERIOD_RANGE_MIN_DEF;
     config->period_range.max = MONKEY_PERIOD_RANGE_MAX_DEF;
@@ -67,10 +67,10 @@ void lv_monkey_config_init(lv_monkey_config_t * config)
 
 lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 {
-    lv_monkey_t * monkey = lv_mem_alloc(sizeof(lv_monkey_t));
+    lv_monkey_t * monkey = lv_malloc(sizeof(lv_monkey_t));
     LV_ASSERT_MALLOC(monkey);
 
-    lv_memset_00(monkey, sizeof(lv_monkey_t));
+    lv_memzero(monkey, sizeof(lv_monkey_t));
 
     monkey->config = *config;
 
@@ -128,7 +128,7 @@ void lv_monkey_del(lv_monkey_t * monkey)
 
     lv_timer_del(monkey->timer);
     lv_indev_delete(monkey->indev);
-    lv_mem_free(monkey);
+    lv_free(monkey);
 }
 
 /**********************
