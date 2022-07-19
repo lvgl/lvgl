@@ -1016,6 +1016,14 @@ menu "LVGL configuration"
         config LV_USE_IMGFONT
             bool "draw img in label or span obj"
             default n
+        config LV_IMGFONT_PATH_MAX_LEN
+            int "Imgfont image file path maximum length"
+            depends on LV_USE_IMGFONT
+            default 64
+        config LV_IMGFONT_USE_IMG_CACHE_HEADER
+            bool "Use img cache to buffer header information"
+            depends on LV_USE_IMGFONT
+            default n
 
         config LV_USE_MSG
             bool "Enable a published subscriber based messaging system"

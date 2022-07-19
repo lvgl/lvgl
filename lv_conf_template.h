@@ -669,6 +669,13 @@
 
 /*1: Support using images as font in label or span widgets */
 #define LV_USE_IMGFONT 0
+#if LV_USE_IMGFONT
+    /*Imgfont image file path maximum length*/
+    #define LV_IMGFONT_PATH_MAX_LEN 64
+
+    /*1: Use img cache to buffer header information*/
+    #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+#endif
 
 /*1: Enable a published subscriber based messaging system */
 #define LV_USE_MSG 0
