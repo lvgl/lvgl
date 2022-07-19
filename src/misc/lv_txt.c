@@ -428,7 +428,7 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     }
 
     /*Copy the text into the new space*/
-    lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
+    lv_memcpy(txt_buf + pos, ins_txt, ins_len);
 }
 
 void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
@@ -458,7 +458,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     char * text = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
-    char * raw_txt = lv_mem_buf_get(len + 1);
+    char * raw_txt = lv_malloc(len + 1);
     LV_ASSERT_MALLOC(raw_txt);
     if(raw_txt == NULL) {
         return NULL;
@@ -468,16 +468,16 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
-    text = lv_mem_alloc(len_ap + 1);
+    text = lv_malloc(len_ap + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;
     }
     _lv_txt_ap_proc(raw_txt, text);
 
-    lv_mem_buf_release(raw_txt);
+    lv_free(raw_txt);
 #else
-    text = lv_mem_alloc(len + 1);
+    text = lv_malloc(len + 1);
     LV_ASSERT_MALLOC(text);
     if(text == NULL) {
         return NULL;
@@ -567,7 +567,7 @@ static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
     if((c & 0x80) != 0) {
         uint32_t swapped;
         uint8_t c8[4];
-        lv_memcpy_small(c8, &c, 4);
+        lv_memcpy(c8, &c, 4);
         swapped = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
         uint8_t i;
         for(i = 0; i < 4; i++) {

@@ -259,7 +259,7 @@ static void draw_disc_grad(lv_event_t * e)
     uint32_t a = 0;
     lv_coord_t cir_w = lv_obj_get_style_arc_width(obj, LV_PART_MAIN);
 
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     /*Mask outer and inner ring of widget to tidy up ragged edges of lines while drawing outer ring*/
     lv_draw_mask_radius_param_t mask_out_param;
     lv_draw_mask_radius_init(&mask_out_param, &obj->coords, LV_RADIUS_CIRCLE, false);
@@ -295,7 +295,7 @@ static void draw_disc_grad(lv_event_t * e)
         lv_draw_line(draw_ctx, &line_dsc, &p[0], &p[1]);
     }
 
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     lv_draw_mask_free_param(&mask_out_param);
     lv_draw_mask_free_param(&mask_in_param);
     lv_draw_mask_remove_id(mask_out_id);

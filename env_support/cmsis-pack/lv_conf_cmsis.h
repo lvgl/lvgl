@@ -38,10 +38,10 @@
    MEMORY SETTINGS
  *=========================*/
 
-/*1: use custom malloc/free, 0: use the built-in `lv_mem_alloc()` and `lv_mem_free()`*/
+/*1: use custom malloc/free, 0: use the built-in `lv_malloc()` and `lv_free()`*/
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
-    /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
+    /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
     #define LV_MEM_SIZE (64U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
@@ -112,20 +112,20 @@
 
 /*Enable complex draw engine.
  *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
-#define LV_DRAW_COMPLEX 1
-#if LV_DRAW_COMPLEX != 0
+#define LV_DRAW_SW_COMPLEX 1
+#if LV_DRAW_SW_COMPLEX != 0
 
     /*Allow buffering some shadow calculation.
-    *LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
-    *Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
-    #define LV_SHADOW_CACHE_SIZE 0
+    *LV_DRAW_SW_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
+    *Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost*/
+    #define LV_DRAW_SW_SHADOW_CACHE_SIZE 0
 
     /* Set number of maximally cached circle data.
     * The circumference of 1/4 circle are saved for anti-aliasing
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
-    #define LV_CIRCLE_CACHE_SIZE 4
-#endif /*LV_DRAW_COMPLEX*/
+    #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
+#endif /*LV_DRAW_SW_COMPLEX*/
 
 /**
  * "Simple layers" are used when a widget has `style_opa < 255` to buffer the widget into a layer
@@ -133,15 +133,15 @@
  * Note that `bg_opa`, `text_opa` etc don't require buffering into layer)
  * The widget can be buffered in smaller chunks to avoid using large buffers.
  *
- * - LV_LAYER_SIMPLE_BUF_SIZE: [bytes] the optimal target buffer size. LVGL will try to allocate it
- * - LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE: [bytes]  used if `LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
+ * - LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE: [bytes] the optimal target buffer size. LVGL will try to allocate it
+ * - LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE: [bytes]  used if `LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
  *
  * Both buffer sizes are in bytes.
  * "Transformed layers" (where transform_angle/zoom properties are used) use larger buffers
  * and can't be drawn in chunks. So these settings affects only widgets with opacity.
  */
-#define LV_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)
-#define LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)
+#define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)
+#define LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)
 
 /*Default image cache size. Image caching keeps the images opened.
  *If only the built-in image formats are used there is no real advantage of caching. (I.e. if no new image decoder is added)
@@ -156,20 +156,20 @@
 
 /*Default gradient buffer size.
  *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
- *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
+ *LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE sets the size of this cache in bytes.
  *If the cache is too small the map will be allocated only while it's required for the drawing.
  *0 mean no caching.*/
-#define LV_GRAD_CACHE_DEF_SIZE 0
+#define LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE 0
 
 /*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
- *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
+ *LV_DRAW_SW_GRADIENT_DITHER implies allocating one or two more lines of the object's rendering surface
  *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-#define LV_DITHER_GRADIENT 0
-#if LV_DITHER_GRADIENT
+#define LV_DRAW_SW_GRADIENT_DITHER 0
+#if LV_DRAW_SW_GRADIENT_DITHER
     /*Add support for error diffusion dithering.
      *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
      *The increase in memory consumption is (24 bits * object's width)*/
-    #define LV_DITHER_ERROR_DIFFUSION 0
+    #define LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION 0
 #endif
 
 /*Maximum buffer size to allocate for rotation.
@@ -203,13 +203,13 @@
 #endif
 
 /*Use SDL renderer API*/
-#define LV_USE_GPU_SDL 0
-#if LV_USE_GPU_SDL
-    #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+#define LV_USE_DRAW_SDL 0
+#if LV_USE_DRAW_SDL
+    #define LV_DARW_SDL_INCLUDE_PATH <SDL2/SDL.h>
     /*Texture cache size, 8MB by default*/
-    #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+    #define LV_DARW_SDL_LRU_SIZE (1024 * 1024 * 8)
     /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
-    #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+    #define LV_DARW_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
 /*-------------
@@ -397,10 +397,10 @@
 #define LV_USE_FONT_COMPRESSED 0
 
 /*Enable subpixel rendering*/
-#define LV_USE_FONT_SUBPX 0
-#if LV_USE_FONT_SUBPX
+#define LV_DRAW_SW_FONT_SUBPX 0
+#if LV_DRAW_SW_FONT_SUBPX
     /*Set the pixel order of the display. Physical order of RGB channels. Doesn't matter with "normal" fonts.*/
-    #define LV_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
+    #define LV_DRAW_SW_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
 #endif
 
 /*Enable drawing placeholders when glyph dsc is not found*/

@@ -35,6 +35,9 @@ extern "C" {
 #define LV_ATTRIBUTE_FLUSH_READY
 #endif
 
+/*Default display refresh, input device read and animation step period.*/
+#define LV_DEF_REFR_PERIOD  33      /*[ms]*/
+
 /**********************
  *      TYPEDEFS
  **********************/

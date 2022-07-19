@@ -206,14 +206,14 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
-    dir_handle_t * handle = (dir_handle_t *)lv_mem_alloc(sizeof(dir_handle_t));
+    dir_handle_t * handle = (dir_handle_t *)lv_malloc(sizeof(dir_handle_t));
 #ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
     char buf[MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s", path);
     handle->dir_p = opendir(buf);
     if(handle->dir_p == NULL) {
-        lv_mem_free(handle);
+        lv_free(handle);
         return NULL;
     }
     return handle;
@@ -243,7 +243,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     } while(FindNextFileA(handle->dir_p, &fdata));
 
     if(handle->dir_p == INVALID_HANDLE_VALUE) {
-        lv_mem_free(handle);
+        lv_free(handle);
         return INVALID_HANDLE_VALUE;
     }
     return handle;
@@ -315,7 +315,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 #else
     FindClose(handle->dir_p);
 #endif
-    lv_mem_free(handle);
+    lv_free(handle);
     return LV_FS_RES_OK;
 }
 

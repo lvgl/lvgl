@@ -57,7 +57,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
        dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA || dsc->header.cf == LV_IMG_CF_RGB565A8) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        lv_memcpy_small(&p_color, &buf_u8[px], sizeof(lv_color_t));
+        lv_memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
 #if LV_COLOR_SIZE == 32
         p_color.ch.alpha = 0xFF; /*Only the color should be get so use a default alpha value*/
 #endif
@@ -244,12 +244,12 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        lv_memcpy_small(&buf_u8[px], &c, px_size);
+        lv_memcpy(&buf_u8[px], &c, px_size);
     }
     else if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        lv_memcpy_small(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
+        lv_memcpy(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
         buf_u8 += sizeof(lv_color32_t) * 2; /*Skip the palette*/
@@ -317,7 +317,7 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
     lv_color32_t c32;
     c32.full      = lv_color_to32(c);
     uint8_t * buf = (uint8_t *)dsc->data;
-    lv_memcpy_small(&buf[id * sizeof(c32)], &c32, sizeof(c32));
+    lv_memcpy(&buf[id * sizeof(c32)], &c32, sizeof(c32));
 }
 
 /**
@@ -330,26 +330,26 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
 lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 {
     /*Allocate image descriptor*/
-    lv_img_dsc_t * dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
+    lv_img_dsc_t * dsc = lv_malloc(sizeof(lv_img_dsc_t));
     if(dsc == NULL)
         return NULL;
 
-    lv_memset_00(dsc, sizeof(lv_img_dsc_t));
+    lv_memzero(dsc, sizeof(lv_img_dsc_t));
 
     /*Get image data size*/
     dsc->data_size = lv_img_buf_get_img_size(w, h, cf);
     if(dsc->data_size == 0) {
-        lv_mem_free(dsc);
+        lv_free(dsc);
         return NULL;
     }
 
     /*Allocate raw buffer*/
-    dsc->data = lv_mem_alloc(dsc->data_size);
+    dsc->data = lv_malloc(dsc->data_size);
     if(dsc->data == NULL) {
-        lv_mem_free(dsc);
+        lv_free(dsc);
         return NULL;
     }
-    lv_memset_00((uint8_t *)dsc->data, dsc->data_size);
+    lv_memzero((uint8_t *)dsc->data, dsc->data_size);
 
     /*Fill in header*/
     dsc->header.always_zero = 0;
@@ -367,9 +367,9 @@ void lv_img_buf_free(lv_img_dsc_t * dsc)
 {
     if(dsc != NULL) {
         if(dsc->data != NULL)
-            lv_mem_free((void *)dsc->data);
+            lv_free((void *)dsc->data);
 
-        lv_mem_free(dsc);
+        lv_free(dsc);
     }
 }
 
@@ -423,7 +423,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
                                       const lv_point_t * pivot)
 {
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) {
         res->x1 = 0;
         res->y1 = 0;

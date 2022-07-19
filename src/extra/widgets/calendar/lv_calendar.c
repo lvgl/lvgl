@@ -254,7 +254,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->highlighted_dates      = NULL;
     calendar->highlighted_dates_num  = 0;
 
-    lv_memset_00(calendar->nums, sizeof(calendar->nums));
+    lv_memzero(calendar->nums, sizeof(calendar->nums));
     uint8_t i;
     uint8_t j = 0;
     for(i = 0; i < 8 * 7; i++) {

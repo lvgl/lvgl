@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_dither.h"
+#if LV_USE_DRAW_SW
+
 #include "lv_draw_sw_gradient.h"
 #include "../../misc/lv_color.h"
 
@@ -98,7 +100,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_ver(lv_grad_t * grad, lv_coord_t x,
 }
 
 
-#if LV_DITHER_ERROR_DIFFUSION == 1
+#if LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION == 1
 LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(lv_grad_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
 {
     LV_UNUSED(xs);
@@ -211,3 +213,4 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_ver(lv_grad_t * grad, lv_coord_t x
 }
 #endif
 #endif
+#endif /*LV_USE_DRAW_SW*/

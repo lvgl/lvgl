@@ -119,6 +119,8 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
  */
 void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
 
+lv_color_t lv_disp_get_chroma_key_color(lv_disp_t * disp);
+
 /**
  * Switch screen with animation
  * @param scr pointer to the new screen to load

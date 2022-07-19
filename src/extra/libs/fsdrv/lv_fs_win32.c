@@ -359,7 +359,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
     LV_UNUSED(drv);
-    dir_handle_t * handle = (dir_handle_t *)lv_mem_alloc(sizeof(dir_handle_t));
+    dir_handle_t * handle = (dir_handle_t *)lv_malloc(sizeof(dir_handle_t));
     handle->dir_p = INVALID_HANDLE_VALUE;
     handle->next_error = LV_FS_RES_OK;
     WIN32_FIND_DATAA fdata;
@@ -390,7 +390,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     } while(FindNextFileA(handle->dir_p, &fdata));
 
     if(handle->dir_p == INVALID_HANDLE_VALUE) {
-        lv_mem_free(handle);
+        lv_free(handle);
         handle->next_error = fs_error_from_win32(GetLastError());
         return INVALID_HANDLE_VALUE;
     }
@@ -453,7 +453,7 @@ static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
     lv_fs_res_t res = FindClose(handle->dir_p)
                       ? LV_FS_RES_OK
                       : fs_error_from_win32(GetLastError());
-    lv_mem_free(handle);
+    lv_free(handle);
     return res;
 }
 

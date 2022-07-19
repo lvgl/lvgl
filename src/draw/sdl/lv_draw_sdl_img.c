@@ -9,7 +9,7 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "../lv_draw_img.h"
 #include "../lv_img_cache.h"
@@ -254,7 +254,7 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
 {
     lv_coord_t h = (lv_coord_t) dsc->header.h;
     lv_coord_t w = (lv_coord_t) dsc->header.w;
-    uint8_t * data = lv_mem_buf_get(w * h * sizeof(lv_color_t));
+    uint8_t * data = lv_malloc(w * h * sizeof(lv_color_t));
     for(lv_coord_t y = 0; y < h; y++) {
         lv_img_decoder_read_line(dsc, 0, y, w, &data[y * w * sizeof(lv_color_t)]);
     }
@@ -267,7 +267,7 @@ static SDL_Texture * upload_img_texture_fallback(SDL_Renderer * renderer, lv_img
     SDL_SetColorKey(surface, SDL_TRUE, lv_color_to32(LV_COLOR_CHROMA_KEY));
     SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
-    lv_mem_buf_release(data);
+    lv_free(data);
     return texture;
 }
 
@@ -398,7 +398,7 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
 
         SDL_SetTextureAlphaMod(texture, 0xFF);
         SDL_SetTextureColorMod(texture, 0xFF, 0xFF, 0xFF);
-#if LV_GPU_SDL_CUSTOM_BLEND_MODE
+#if LV_DARW_SDL_CUSTOM_BLEND_MODE
         SDL_BlendMode blend_mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ZERO,
                                                               SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_DST_ALPHA,
                                                               SDL_BLENDFACTOR_ZERO, SDL_BLENDOPERATION_ADD);
@@ -461,4 +461,4 @@ static lv_draw_img_rounded_key_t rounded_key_create(const SDL_Texture * texture,
     return key;
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

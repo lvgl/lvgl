@@ -98,13 +98,13 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
         /*Get the size of the text and process it*/
         size_t len = _lv_txt_ap_calc_bytes_cnt(text);
 
-        label->text = lv_mem_realloc(label->text, len);
+        label->text = lv_realloc(label->text, len);
         LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
 
         _lv_txt_ap_proc(label->text, label->text);
 #else
-        label->text = lv_mem_realloc(label->text, strlen(label->text) + 1);
+        label->text = lv_realloc(label->text, strlen(label->text) + 1);
 #endif
 
         LV_ASSERT_MALLOC(label->text);
@@ -113,7 +113,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
     else {
         /*Free the old text*/
         if(label->text != NULL && label->static_txt == 0) {
-            lv_mem_free(label->text);
+            lv_free(label->text);
             label->text = NULL;
         }
 
@@ -121,7 +121,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
         /*Get the size of the text and process it*/
         size_t len = _lv_txt_ap_calc_bytes_cnt(text);
 
-        label->text = lv_mem_alloc(len);
+        label->text = lv_malloc(len);
         LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
 
@@ -131,7 +131,7 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
         size_t len = strlen(text) + 1;
 
         /*Allocate space for the new text*/
-        label->text = lv_mem_alloc(len);
+        label->text = lv_malloc(len);
         LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
         strcpy(label->text, text);
@@ -159,7 +159,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...)
     }
 
     if(label->text != NULL && label->static_txt == 0) {
-        lv_mem_free(label->text);
+        lv_free(label->text);
         label->text = NULL;
     }
 
@@ -178,7 +178,7 @@ void lv_label_set_text_static(lv_obj_t * obj, const char * text)
     lv_label_t * label = (lv_label_t *)obj;
 
     if(label->static_txt == 0 && label->text != NULL) {
-        lv_mem_free(label->text);
+        lv_free(label->text);
         label->text = NULL;
     }
 
@@ -393,7 +393,7 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     pos->y = y;
 
 #if LV_USE_BIDI
-    if(mutable_bidi_txt) lv_mem_buf_release(mutable_bidi_txt);
+    if(mutable_bidi_txt) lv_free(mutable_bidi_txt);
 #endif
 }
 
@@ -447,7 +447,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     }
 
 #if LV_USE_BIDI
-    bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
+    bidi_txt = lv_malloc(new_line_start - line_start + 1);
     uint32_t txt_len = new_line_start - line_start;
     if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
     _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), NULL, 0);
@@ -513,7 +513,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
                                                txt_len, lv_obj_get_style_base_dir(obj, LV_PART_MAIN), cid, &is_rtl);
         if(is_rtl) logical_pos++;
     }
-    lv_mem_buf_release(bidi_txt);
+    lv_free(bidi_txt);
 #else
     logical_pos = _lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif
@@ -651,7 +651,7 @@ void lv_label_ins_text(lv_obj_t * obj, uint32_t pos, const char * txt)
     size_t old_len = strlen(label->text);
     size_t ins_len = strlen(txt);
     size_t new_len = ins_len + old_len;
-    label->text        = lv_mem_realloc(label->text, new_len + 1);
+    label->text        = lv_realloc(label->text, new_len + 1);
     LV_ASSERT_MALLOC(label->text);
     if(label->text == NULL) return;
 
@@ -727,7 +727,7 @@ static void lv_label_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_label_t * label = (lv_label_t *)obj;
 
     lv_label_dot_tmp_free(obj);
-    if(!label->static_txt) lv_mem_free(label->text);
+    if(!label->static_txt) lv_free(label->text);
     label->text = NULL;
 }
 
@@ -1207,7 +1207,7 @@ static bool lv_label_set_dot_tmp(lv_obj_t * obj, char * data, uint32_t len)
     if(len > sizeof(char *)) {
         /*Memory needs to be allocated. Allocates an additional byte
          *for a NULL-terminator so it can be copied.*/
-        label->dot.tmp_ptr = lv_mem_alloc(len + 1);
+        label->dot.tmp_ptr = lv_malloc(len + 1);
         if(label->dot.tmp_ptr == NULL) {
             LV_LOG_ERROR("Failed to allocate memory for dot_tmp_ptr");
             return false;
@@ -1249,7 +1249,7 @@ static void lv_label_dot_tmp_free(lv_obj_t * obj)
 {
     lv_label_t * label = (lv_label_t *)obj;
     if(label->dot_tmp_alloc && label->dot.tmp_ptr) {
-        lv_mem_free(label->dot.tmp_ptr);
+        lv_free(label->dot.tmp_ptr);
     }
     label->dot_tmp_alloc = false;
     label->dot.tmp_ptr   = NULL;

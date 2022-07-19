@@ -125,7 +125,7 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char * title)
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
     if(title) {
-        page->title = lv_mem_alloc(strlen(title) + 1);
+        page->title = lv_malloc(strlen(title) + 1);
         LV_ASSERT_MALLOC(page->title);
         if(page->title == NULL) return NULL;
         strcpy(page->title, title);
@@ -177,7 +177,7 @@ void lv_menu_refr(lv_obj_t * obj)
         page = act_hist->page;
         /* Delete the current item from the history */
         _lv_ll_remove(history_ll, act_hist);
-        lv_mem_free(act_hist);
+        lv_free(act_hist);
         menu->cur_depth--;
     }
 
@@ -371,7 +371,7 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
         lv_obj_remove_event_cb(obj, lv_menu_obj_del_event_cb);
     }
 
-    lv_menu_load_page_event_data_t * event_data = lv_mem_alloc(sizeof(lv_menu_load_page_event_data_t));
+    lv_menu_load_page_event_data_t * event_data = lv_malloc(sizeof(lv_menu_load_page_event_data_t));
     event_data->menu = menu;
     event_data->page = page;
 
@@ -560,7 +560,7 @@ static void lv_menu_page_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
 
     if(page->title != NULL) {
-        lv_mem_free(page->title);
+        lv_free(page->title);
         page->title = NULL;
     }
 }
@@ -695,7 +695,7 @@ static void lv_menu_load_page_event_cb(lv_event_t * e)
 static void lv_menu_obj_del_event_cb(lv_event_t * e)
 {
     lv_menu_load_page_event_data_t * event_data = lv_event_get_user_data(e);
-    lv_mem_free(event_data);
+    lv_free(event_data);
 }
 
 static void lv_menu_back_event_cb(lv_event_t * e)
@@ -724,7 +724,7 @@ static void lv_menu_back_event_cb(lv_event_t * e)
             /* Previous menu exists */
             /* Delete the current item from the history */
             _lv_ll_remove(history_ll, act_hist);
-            lv_mem_free(act_hist);
+            lv_free(act_hist);
             menu->cur_depth--;
             /* Create the previous menu.
             *  Remove it from the history because `lv_menu_set_page` will add it again */
@@ -732,7 +732,7 @@ static void lv_menu_back_event_cb(lv_event_t * e)
             menu->cur_depth--;
             lv_menu_set_page(&(menu->obj), prev_hist->page);
 
-            lv_mem_free(prev_hist);
+            lv_free(prev_hist);
         }
     }
 }

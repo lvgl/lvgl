@@ -66,7 +66,7 @@ lv_base_dir_t _lv_bidi_detect_base_dir(const char * txt);
  * Get the logical position of a character in a line
  * @param str_in the input string. Can be only one line.
  * @param bidi_txt internally the text is bidi processed which buffer can be get here.
- * If not required anymore has to freed with `lv_mem_free()`
+ * If not required anymore has to freed with `lv_free()`
  * Can be `NULL` is unused
  * @param len length of the line in character count
  * @param base_dir base direction of the text: `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`
@@ -81,7 +81,7 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
  * Get the visual position of a character in a line
  * @param str_in the input string. Can be only one line.
  * @param bidi_txt internally the text is bidi processed which buffer can be get here.
- * If not required anymore has to freed with `lv_mem_free()`
+ * If not required anymore has to freed with `lv_free()`
  * Can be `NULL` is unused
  * @param len length of the line in character count
  * @param base_dir base direction of the text: `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`

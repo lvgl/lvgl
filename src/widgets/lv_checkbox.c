@@ -74,8 +74,8 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
     size_t len = strlen(txt);
 #endif
 
-    if(!cb->static_txt) cb->txt = lv_mem_realloc(cb->txt, len + 1);
-    else  cb->txt = lv_mem_alloc(len + 1);
+    if(!cb->static_txt) cb->txt = lv_realloc(cb->txt, len + 1);
+    else  cb->txt = lv_malloc(len + 1);
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(txt, cb->txt);
 #else
@@ -92,7 +92,7 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt)
 {
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
-    if(!cb->static_txt) lv_mem_free(cb->txt);
+    if(!cb->static_txt) lv_free(cb->txt);
 
     cb->txt = (char *)txt;
     cb->static_txt = 1;
@@ -138,7 +138,7 @@ static void lv_checkbox_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
     if(!cb->static_txt) {
-        lv_mem_free(cb->txt);
+        lv_free(cb->txt);
         cb->txt = NULL;
     }
     LV_TRACE_OBJ_CREATE("finished");

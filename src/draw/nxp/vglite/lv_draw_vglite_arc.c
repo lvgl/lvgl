@@ -120,7 +120,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
 
     /* path: max size = 16 cubic bezier (7 words each) */
     int32_t arc_path[16 * 7];
-    lv_memset_00(arc_path, sizeof(arc_path));
+    lv_memzero(arc_path, sizeof(arc_path));
 
     /*** Init destination buffer ***/
     if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width * sizeof(lv_color_t),

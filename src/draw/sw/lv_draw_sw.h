@@ -14,6 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_draw_sw_blend.h"
+#if LV_USE_DRAW_SW
+
 #include "../lv_draw.h"
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
@@ -96,6 +98,8 @@ void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * la
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_DRAW_SW*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

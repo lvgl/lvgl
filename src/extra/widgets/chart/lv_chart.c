@@ -82,7 +82,7 @@ void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
     if(chart->type == LV_CHART_TYPE_SCATTER) {
         lv_chart_series_t * ser;
         _LV_LL_READ_BACK(&chart->series_ll, ser) {
-            lv_mem_free(ser->x_points);
+            lv_free(ser->x_points);
             ser->x_points = NULL;
         }
     }
@@ -90,7 +90,7 @@ void lv_chart_set_type(lv_obj_t * obj, lv_chart_type_t type)
     if(type == LV_CHART_TYPE_SCATTER) {
         lv_chart_series_t * ser;
         _LV_LL_READ_BACK(&chart->series_ll, ser) {
-            ser->x_points = lv_mem_alloc(sizeof(lv_point_t) * chart->point_cnt);
+            ser->x_points = lv_malloc(sizeof(lv_point_t) * chart->point_cnt);
             LV_ASSERT_MALLOC(ser->x_points);
             if(ser->x_points == NULL) return;
         }
@@ -352,16 +352,16 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     lv_coord_t def = LV_CHART_POINT_NONE;
 
     ser->color  = color;
-    ser->y_points = lv_mem_alloc(sizeof(lv_coord_t) * chart->point_cnt);
+    ser->y_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
     LV_ASSERT_MALLOC(ser->y_points);
 
     if(chart->type == LV_CHART_TYPE_SCATTER) {
-        ser->x_points = lv_mem_alloc(sizeof(lv_coord_t) * chart->point_cnt);
+        ser->x_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
         LV_ASSERT_MALLOC(ser->x_points);
     }
     if(ser->y_points == NULL) {
         _lv_ll_remove(&chart->series_ll, ser);
-        lv_mem_free(ser);
+        lv_free(ser);
         return NULL;
     }
 
@@ -387,10 +387,10 @@ void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
     LV_ASSERT_NULL(series);
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
-    if(!series->y_ext_buf_assigned && series->y_points) lv_mem_free(series->y_points);
+    if(!series->y_ext_buf_assigned && series->y_points) lv_free(series->y_points);
 
     _lv_ll_remove(&chart->series_ll, series);
-    lv_mem_free(series);
+    lv_free(series);
 
     return;
 }
@@ -598,7 +598,7 @@ void lv_chart_set_ext_y_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
-    if(!ser->y_ext_buf_assigned && ser->y_points) lv_mem_free(ser->y_points);
+    if(!ser->y_ext_buf_assigned && ser->y_points) lv_free(ser->y_points);
     ser->y_ext_buf_assigned = true;
     ser->y_points = array;
     lv_obj_invalidate(obj);
@@ -609,7 +609,7 @@ void lv_chart_set_ext_x_array(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(ser);
 
-    if(!ser->x_ext_buf_assigned && ser->x_points) lv_mem_free(ser->x_points);
+    if(!ser->x_ext_buf_assigned && ser->x_points) lv_free(ser->x_points);
     ser->x_ext_buf_assigned = true;
     ser->x_points = array;
     lv_obj_invalidate(obj);
@@ -682,10 +682,10 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     while(chart->series_ll.head) {
         ser = _lv_ll_get_head(&chart->series_ll);
 
-        if(!ser->y_ext_buf_assigned) lv_mem_free(ser->y_points);
+        if(!ser->y_ext_buf_assigned) lv_free(ser->y_points);
 
         _lv_ll_remove(&chart->series_ll, ser);
-        lv_mem_free(ser);
+        lv_free(ser);
     }
     _lv_ll_clear(&chart->series_ll);
 
@@ -693,7 +693,7 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     while(chart->cursor_ll.head) {
         cur = _lv_ll_get_head(&chart->cursor_ll);
         _lv_ll_remove(&chart->cursor_ll, cur);
-        lv_mem_free(cur);
+        lv_free(cur);
     }
     _lv_ll_clear(&chart->cursor_ll);
 
@@ -1749,7 +1749,7 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
     uint32_t i;
 
     if(ser->start_point != 0) {
-        lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * cnt);
+        lv_coord_t * new_points = lv_malloc(sizeof(lv_coord_t) * cnt);
         LV_ASSERT_MALLOC(new_points);
         if(new_points == NULL) return;
 
@@ -1770,11 +1770,11 @@ static void new_points_alloc(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t c
         }
 
         /*Switch over pointer from old to new*/
-        lv_mem_free((*a));
+        lv_free((*a));
         (*a) = new_points;
     }
     else {
-        (*a) = lv_mem_realloc((*a), sizeof(lv_coord_t) * cnt);
+        (*a) = lv_realloc((*a), sizeof(lv_coord_t) * cnt);
         LV_ASSERT_MALLOC((*a));
         if((*a) == NULL) return;
         /*Initialize the new points*/

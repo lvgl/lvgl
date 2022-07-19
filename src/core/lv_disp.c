@@ -210,6 +210,18 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa)
     _lv_inv_area(disp, &a);
 }
 
+lv_color_t lv_disp_get_chroma_key_color(lv_disp_t * disp)
+{
+
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("no display registered");
+        return lv_color_hex(0x00ff00);
+    }
+
+    return disp->driver->color_chroma_key;
+}
+
 /**
  * Switch screen with animation
  * @param scr pointer to the new screen to load

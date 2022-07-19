@@ -70,7 +70,7 @@ lv_meter_scale_t * lv_meter_add_scale(lv_obj_t * obj)
 
     lv_meter_scale_t * scale = _lv_ll_ins_head(&meter->scale_ll);
     LV_ASSERT_MALLOC(scale);
-    lv_memset_00(scale, sizeof(lv_meter_scale_t));
+    lv_memzero(scale, sizeof(lv_meter_scale_t));
 
     scale->angle_range = 270;
     scale->rotation = 90 + (360 - scale->angle_range) / 2;
@@ -126,7 +126,7 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, lv_meter_scale_t
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
-    lv_memset_00(indic, sizeof(lv_meter_indicator_t));
+    lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->scale = scale;
     indic->opa = LV_OPA_COVER;
 
@@ -146,7 +146,7 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, lv_meter_scale_t 
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
-    lv_memset_00(indic, sizeof(lv_meter_indicator_t));
+    lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->scale = scale;
     indic->opa = LV_OPA_COVER;
 
@@ -166,7 +166,7 @@ lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, lv_meter_scale_t * scale
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
-    lv_memset_00(indic, sizeof(lv_meter_indicator_t));
+    lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->scale = scale;
     indic->opa = LV_OPA_COVER;
 
@@ -186,7 +186,7 @@ lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_meter_scale_t
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
-    lv_memset_00(indic, sizeof(lv_meter_indicator_t));
+    lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->scale = scale;
     indic->opa = LV_OPA_COVER;
 

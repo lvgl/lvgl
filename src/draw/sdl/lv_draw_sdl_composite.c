@@ -8,7 +8,7 @@
  *********************/
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
 #include "../../misc/lv_gc.h"
 #include "../../core/lv_refr.h"
@@ -79,7 +79,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
     if(!_lv_area_intersect(apply_area, &full_coords, clip_in)) return false;
     bool has_mask = lv_draw_mask_is_any(apply_area);
 
-    const bool draw_mask = has_mask && LV_GPU_SDL_CUSTOM_BLEND_MODE;
+    const bool draw_mask = has_mask && LV_DARW_SDL_CUSTOM_BLEND_MODE;
     const bool draw_blend = blend_mode != LV_BLEND_MODE_NORMAL;
     if(draw_mask || draw_blend) {
         lv_draw_sdl_context_internals_t * internals = ctx->internals;
@@ -96,7 +96,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
         SDL_SetRenderTarget(ctx->renderer, internals->composition);
         SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 0);
         SDL_RenderClear(ctx->renderer);
-#if LV_GPU_SDL_CUSTOM_BLEND_MODE
+#if LV_DARW_SDL_CUSTOM_BLEND_MODE
         internals->mask = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0, w, h);
         dump_masks(internals->mask, apply_area);
 #endif
@@ -125,7 +125,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
 {
     lv_draw_sdl_context_internals_t * internals = ctx->internals;
     SDL_Rect src_rect = {0, 0, lv_area_get_width(apply_area), lv_area_get_height(apply_area)};
-#if LV_GPU_SDL_CUSTOM_BLEND_MODE
+#if LV_DARW_SDL_CUSTOM_BLEND_MODE
     if(internals->mask) {
         SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
                                                         SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
@@ -148,7 +148,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
             case LV_BLEND_MODE_ADDITIVE:
                 SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_ADD);
                 break;
-#if LV_GPU_SDL_CUSTOM_BLEND_MODE
+#if LV_DARW_SDL_CUSTOM_BLEND_MODE
             case LV_BLEND_MODE_SUBTRACTIVE: {
                     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE,
                                                                     SDL_BLENDOPERATION_SUBTRACT, SDL_BLENDFACTOR_ONE,
@@ -193,9 +193,9 @@ SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_d
             access = SDL_TEXTUREACCESS_TARGET;
         }
         result = SDL_CreateTexture(ctx->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, access, size, size);
-        tex_size = lv_mem_alloc(sizeof(lv_point_t));
+        tex_size = lv_malloc(sizeof(lv_point_t));
         tex_size->x = tex_size->y = size;
-        lv_draw_sdl_texture_cache_put_advanced(ctx, &mask_key, sizeof(composite_key_t), result, tex_size, lv_mem_free, 0);
+        lv_draw_sdl_texture_cache_put_advanced(ctx, &mask_key, sizeof(composite_key_t), result, tex_size, lv_free, 0);
     }
     return result;
 }
@@ -232,17 +232,17 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords)
     int pitch;
     if(SDL_LockTexture(texture, &rect, (void **) &pixels, &pitch) != 0) return;
 
-    lv_opa_t * line_buf = lv_mem_buf_get(rect.w);
+    lv_opa_t * line_buf = lv_malloc(rect.w);
     for(lv_coord_t y = 0; y < rect.h; y++) {
-        lv_memset_ff(line_buf, rect.w);
+        lv_memset(line_buf, 0xff, rect.w);
         lv_coord_t abs_x = (lv_coord_t) coords->x1, abs_y = (lv_coord_t)(y + coords->y1), len = (lv_coord_t) rect.w;
         lv_draw_mask_res_t res;
         res = lv_draw_mask_apply(line_buf, abs_x, abs_y, len);
         if(res == LV_DRAW_MASK_RES_TRANSP) {
-            lv_memset_00(&pixels[y * pitch], 4 * rect.w);
+            lv_memzero(&pixels[y * pitch], 4 * rect.w);
         }
         else if(res == LV_DRAW_MASK_RES_FULL_COVER) {
-            lv_memset_ff(&pixels[y * pitch], 4 * rect.w);
+            lv_memset(&pixels[y * pitch], 0xff, 4 * rect.w);
         }
         else {
             for(int x = 0; x < rect.w; x++) {
@@ -252,8 +252,8 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords)
             }
         }
     }
-    lv_mem_buf_release(line_buf);
+    lv_free(line_buf);
     SDL_UnlockTexture(texture);
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/
