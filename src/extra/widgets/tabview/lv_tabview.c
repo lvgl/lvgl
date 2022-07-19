@@ -82,31 +82,31 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     /*top or bottom dir*/
     if(tabview->tab_pos & LV_DIR_VER) {
-        new_map = lv_mem_alloc((tab_id + 1) * sizeof(const char *));
-        lv_memcpy_small(new_map, old_map, sizeof(const char *) * (tab_id - 1));
-        new_map[tab_id - 1] = lv_mem_alloc(strlen(name) + 1);
+        new_map = lv_malloc((tab_id + 1) * sizeof(const char *));
+        lv_memcpy(new_map, old_map, sizeof(const char *) * (tab_id - 1));
+        new_map[tab_id - 1] = lv_malloc(strlen(name) + 1);
         strcpy((char *)new_map[tab_id - 1], name);
         new_map[tab_id] = "";
     }
     /*left or right dir*/
     else {
-        new_map = lv_mem_alloc((tab_id * 2) * sizeof(const char *));
-        lv_memcpy_small(new_map, old_map, sizeof(const char *) * (tab_id - 1) * 2);
+        new_map = lv_malloc((tab_id * 2) * sizeof(const char *));
+        lv_memcpy(new_map, old_map, sizeof(const char *) * (tab_id - 1) * 2);
         if(tabview->tab_cnt == 0) {
-            new_map[0] = lv_mem_alloc(strlen(name) + 1);
+            new_map[0] = lv_malloc(strlen(name) + 1);
             strcpy((char *)new_map[0], name);
             new_map[1] = "";
         }
         else {
             new_map[tab_id * 2 - 3] = "\n";
-            new_map[tab_id * 2 - 2] = lv_mem_alloc(strlen(name) + 1);
+            new_map[tab_id * 2 - 2] = lv_malloc(strlen(name) + 1);
             new_map[tab_id * 2 - 1] = "";
             strcpy((char *)new_map[(tab_id * 2) - 2], name);
         }
     }
     tabview->map = new_map;
     lv_btnmatrix_set_map(btns, (const char **)new_map);
-    lv_mem_free(old_map);
+    lv_free(old_map);
 
     lv_btnmatrix_set_btn_ctrl_all(btns, LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CLICK_TRIG |
                                   LV_BTNMATRIX_CTRL_NO_REPEAT);
@@ -129,8 +129,8 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t id, const char * new_name)
     if(id >= tabview->tab_cnt) return;
     if(tabview->tab_pos & LV_DIR_HOR) id *= 2;
 
-    lv_mem_free(tabview->map[id]);
-    tabview->map[id] = lv_mem_alloc(strlen(new_name) + 1);
+    lv_free(tabview->map[id]);
+    tabview->map[id] = lv_malloc(strlen(new_name) + 1);
     strcpy(tabview->map[id], new_name);
     lv_obj_invalidate(obj);
 }
@@ -224,7 +224,7 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     cont = lv_obj_create(obj);
 
     lv_btnmatrix_set_one_checked(btnm, true);
-    tabview->map = lv_mem_alloc(sizeof(const char *));
+    tabview->map = lv_malloc(sizeof(const char *));
     tabview->map[0] = "";
     lv_btnmatrix_set_map(btnm, (const char **)tabview->map);
     lv_obj_add_event_cb(btnm, btns_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
@@ -271,19 +271,19 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     uint32_t i;
     if(tabview->tab_pos & LV_DIR_VER) {
         for(i = 0; i < tabview->tab_cnt; i++) {
-            lv_mem_free(tabview->map[i]);
+            lv_free(tabview->map[i]);
             tabview->map[i] = NULL;
         }
     }
     if(tabview->tab_pos & LV_DIR_HOR) {
         for(i = 0; i < tabview->tab_cnt; i++) {
-            lv_mem_free(tabview->map[i * 2]);
+            lv_free(tabview->map[i * 2]);
             tabview->map[i * 2] = NULL;
         }
     }
 
 
-    lv_mem_free(tabview->map);
+    lv_free(tabview->map);
     tabview->map = NULL;
 }
 

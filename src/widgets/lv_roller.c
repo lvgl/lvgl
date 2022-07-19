@@ -120,7 +120,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         roller->mode = LV_ROLLER_MODE_INFINITE;
 
         size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        char * opt_extra = lv_mem_buf_get(opt_len * LV_ROLLER_INF_PAGES);
+        char * opt_extra = lv_malloc(opt_len * LV_ROLLER_INF_PAGES);
         uint8_t i;
         for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {
             strcpy(&opt_extra[opt_len * i], options);
@@ -128,7 +128,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         }
         opt_extra[opt_len * LV_ROLLER_INF_PAGES - 1] = '\0';
         lv_label_set_text(label, opt_extra);
-        lv_mem_buf_release(opt_extra);
+        lv_free(opt_extra);
 
         roller->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 0) * roller->option_cnt;
 

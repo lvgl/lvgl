@@ -203,7 +203,7 @@ void lv_timer_del(lv_timer_t * timer)
     _lv_ll_remove(&LV_GC_ROOT(_lv_timer_ll), timer);
     timer_deleted = true;
 
-    lv_mem_free(timer);
+    lv_free(timer);
 }
 
 /**

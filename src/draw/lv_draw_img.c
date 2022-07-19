@@ -45,7 +45,7 @@ static void draw_cleanup(_lv_img_cache_entry_t * cache);
 
 void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
 {
-    lv_memset_00(dsc, sizeof(lv_draw_img_dsc_t));
+    lv_memzero(dsc, sizeof(lv_draw_img_dsc_t));
     dsc->recolor = lv_color_black();
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_IMG_ZOOM_NONE;
@@ -300,8 +300,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
         int32_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) *
-                                        LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
+        uint8_t  * buf = lv_malloc(lv_area_get_width(&mask_com) *
+                                   LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         lv_area_t line;
@@ -320,7 +320,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
             if(read_res != LV_RES_OK) {
                 lv_img_decoder_close(&cdsc->dec_dsc);
                 LV_LOG_WARN("Image draw can't read the line");
-                lv_mem_buf_release(buf);
+                lv_free(buf);
                 draw_cleanup(cdsc);
                 draw_ctx->clip_area = clip_area_ori;
                 return LV_RES_INV;
@@ -333,7 +333,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
             y++;
         }
         draw_ctx->clip_area = clip_area_ori;
-        lv_mem_buf_release(buf);
+        lv_free(buf);
     }
 
     draw_cleanup(cdsc);

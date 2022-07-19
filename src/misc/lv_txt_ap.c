@@ -150,8 +150,8 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
 
     txt_length = _lv_txt_get_encoded_length(txt);
 
-    ch_enc = (uint32_t *)lv_mem_alloc(sizeof(uint32_t) * (txt_length + 1));
-    ch_fin = (uint32_t *)lv_mem_alloc(sizeof(uint32_t) * (txt_length + 1));
+    ch_enc = (uint32_t *)lv_malloc(sizeof(uint32_t) * (txt_length + 1));
+    ch_fin = (uint32_t *)lv_malloc(sizeof(uint32_t) * (txt_length + 1));
 
     i = 0;
     j = 0;
@@ -219,7 +219,7 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
         ch_enc[i] = 0;
     for(i = 0; i < j; i++)
         ch_enc[i] = ch_fin[i];
-    lv_mem_free(ch_fin);
+    lv_free(ch_fin);
 
     txt_out_temp = txt_out;
     i = 0;
@@ -247,7 +247,7 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
         i++;
     }
     *(txt_out_temp) = '\0';
-    lv_mem_free(ch_enc);
+    lv_free(ch_enc);
 }
 /**********************
 *   STATIC FUNCTIONS

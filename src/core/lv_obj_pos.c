@@ -323,7 +323,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
 uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 {
     layout_cnt++;
-    LV_GC_ROOT(_lv_layout_list) = lv_mem_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_dsc_t));
+    LV_GC_ROOT(_lv_layout_list) = lv_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_dsc_t));
     LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
 
     LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].cb = cb;

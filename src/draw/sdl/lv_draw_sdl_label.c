@@ -9,9 +9,9 @@
 
 #include "../../lv_conf_internal.h"
 
-#if LV_USE_GPU_SDL
+#if LV_USE_DRAW_SDL
 
-#include LV_GPU_SDL_INCLUDE_PATH
+#include LV_DARW_SDL_INCLUDE_PATH
 
 #include "../lv_draw_label.h"
 #include "../../misc/lv_utils.h"
@@ -122,12 +122,12 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
             font_p = g.resolved_font;
         }
         const uint8_t * bmp = lv_font_get_glyph_bitmap(font_p, letter);
-        uint8_t * buf = lv_mem_alloc(g.box_w * g.box_h);
+        uint8_t * buf = lv_malloc(g.box_w * g.box_h);
         lv_sdl_to_8bpp(buf, bmp, g.box_w, g.box_h, g.box_w, g.bpp);
         SDL_Surface * mask = lv_sdl_create_opa_surface(buf, g.box_w, g.box_h, g.box_w);
         texture = SDL_CreateTextureFromSurface(renderer, mask);
         SDL_FreeSurface(mask);
-        lv_mem_free(buf);
+        lv_free(buf);
         lv_draw_sdl_texture_cache_put(ctx, &glyph_key, sizeof(glyph_key), texture);
     }
     if(!texture) {
@@ -173,4 +173,4 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
     return key;
 }
 
-#endif /*LV_USE_GPU_SDL*/
+#endif /*LV_USE_DRAW_SDL*/

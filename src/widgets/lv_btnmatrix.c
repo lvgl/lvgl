@@ -376,8 +376,8 @@ static void lv_btnmatrix_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
     LV_TRACE_OBJ_CREATE("begin");
     LV_UNUSED(class_p);
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
-    lv_mem_free(btnm->button_areas);
-    lv_mem_free(btnm->ctrl_bits);
+    lv_free(btnm->button_areas);
+    lv_free(btnm->ctrl_bits);
     btnm->button_areas = NULL;
     btnm->ctrl_bits = NULL;
     LV_TRACE_OBJ_CREATE("finished");
@@ -684,7 +684,7 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     const size_t txt_ap_size = 256 ;
-    char * txt_ap = lv_mem_buf_get(txt_ap_size);
+    char * txt_ap = lv_malloc(txt_ap_size);
 #endif
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
@@ -805,7 +805,7 @@ static void draw_main(lv_event_t * e)
 
     obj->skip_trans = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    lv_mem_buf_release(txt_ap);
+    lv_free(txt_ap);
 #endif
 }
 /**
@@ -834,21 +834,21 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * obj, const char ** 
     if(btn_cnt == btnm->btn_cnt) return;
 
     if(btnm->button_areas != NULL) {
-        lv_mem_free(btnm->button_areas);
+        lv_free(btnm->button_areas);
         btnm->button_areas = NULL;
     }
     if(btnm->ctrl_bits != NULL) {
-        lv_mem_free(btnm->ctrl_bits);
+        lv_free(btnm->ctrl_bits);
         btnm->ctrl_bits = NULL;
     }
 
-    btnm->button_areas = lv_mem_alloc(sizeof(lv_area_t) * btn_cnt);
+    btnm->button_areas = lv_malloc(sizeof(lv_area_t) * btn_cnt);
     LV_ASSERT_MALLOC(btnm->button_areas);
-    btnm->ctrl_bits = lv_mem_alloc(sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
+    btnm->ctrl_bits = lv_malloc(sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
     LV_ASSERT_MALLOC(btnm->ctrl_bits);
     if(btnm->button_areas == NULL || btnm->ctrl_bits == NULL) btn_cnt = 0;
 
-    lv_memset_00(btnm->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
+    lv_memzero(btnm->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
 
     btnm->btn_cnt = btn_cnt;
 }

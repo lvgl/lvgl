@@ -291,7 +291,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
         }
         children_repos(cont, &f, track_first_item, next_track_first_item, abs_x, abs_y, max_main_size, item_gap, &t);
         track_first_item = next_track_first_item;
-        lv_mem_buf_release(t.grow_dsc);
+        lv_free(t.grow_dsc);
         t.grow_dsc = NULL;
         if(rtl && !f.row) {
             *cross_pos -= gap + track_gap;
@@ -346,13 +346,13 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                 t->grow_item_cnt++;
                 t->track_fix_main_size += item_gap;
                 if(t->grow_dsc_calc) {
-                    grow_dsc_t * new_dsc = lv_mem_buf_get(sizeof(grow_dsc_t) * (t->grow_item_cnt));
+                    grow_dsc_t * new_dsc = lv_malloc(sizeof(grow_dsc_t) * (t->grow_item_cnt));
                     LV_ASSERT_MALLOC(new_dsc);
                     if(new_dsc == NULL) return item_id;
 
                     if(t->grow_dsc) {
                         lv_memcpy(new_dsc, t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt - 1));
-                        lv_mem_buf_release(t->grow_dsc);
+                        lv_free(t->grow_dsc);
                     }
                     new_dsc[t->grow_item_cnt - 1].item = item;
                     new_dsc[t->grow_item_cnt - 1].min_size = f->row ? lv_obj_get_style_min_width(item,

@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw.h"
+#if LV_USE_DRAW_SW
+
 #include "../lv_img_cache.h"
 #include "../../hal/lv_hal_disp.h"
 #include "../../misc/lv_log.h"
@@ -55,7 +57,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
     lv_area_t blend_area;
     lv_draw_sw_blend_dsc_t blend_dsc;
 
-    lv_memset_00(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
+    lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;
     blend_dsc.blend_mode = draw_dsc->blend_mode;
     blend_dsc.blend_area = &blend_area;
@@ -120,8 +122,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
         /*Create buffers and masks*/
         uint32_t buf_size = buf_w * buf_h;
 
-        lv_color_t * rgb_buf = lv_mem_buf_get(buf_size * sizeof(lv_color_t));
-        lv_opa_t * mask_buf = lv_mem_buf_get(buf_size);
+        lv_color_t * rgb_buf = lv_malloc(buf_size * sizeof(lv_color_t));
+        lv_opa_t * mask_buf = lv_malloc(buf_size);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
@@ -159,7 +161,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                     rgb_buf[i] = lv_color_mix_premult(premult_v, rgb_buf[i], recolor_opa);
                 }
             }
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
             /*Apply the masks if any*/
             if(mask_any) {
                 lv_coord_t y;
@@ -169,7 +171,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                     mask_res_line = lv_draw_mask_apply(mask_buf_tmp, blend_area.x1, y, blend_w);
 
                     if(mask_res_line == LV_DRAW_MASK_RES_TRANSP) {
-                        lv_memset_00(mask_buf_tmp, blend_w);
+                        lv_memzero(mask_buf_tmp, blend_w);
                         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
                     }
                     else if(mask_res_line == LV_DRAW_MASK_RES_CHANGED) {
@@ -178,7 +180,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                     mask_buf_tmp += blend_w;
                 }
             }
-#endif
+#endif /*LV_USE_DRAW_MASKS*/
 
             /*Blend*/
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
@@ -189,8 +191,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
             if(blend_area.y2 > y_last) blend_area.y2 = y_last;
         }
 
-        lv_mem_buf_release(mask_buf);
-        lv_mem_buf_release(rgb_buf);
+        lv_free(mask_buf);
+        lv_free(rgb_buf);
     }
 }
 
@@ -212,7 +214,7 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
 
     if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         uint32_t px_cnt = lv_area_get_size(dest_area);
-        lv_memset_ff(abuf, px_cnt);
+        lv_memset(abuf, 0xff, px_cnt);
 
         src_tmp8 += (src_stride * dest_area->y1 * sizeof(lv_color_t)) + dest_area->x1 * sizeof(lv_color_t);
         uint32_t dest_w = lv_area_get_width(dest_area);
@@ -295,3 +297,5 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
         }
     }
 }
+
+#endif /*LV_USE_DRAW_SW*/

@@ -7,11 +7,12 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw.h"
+#if LV_USE_DRAW_SW
+
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_area.h"
 #include "../../core/lv_refr.h"
 
-#if LV_DRAW_COMPLEX
 /*********************
  *      DEFINES
  *********************/
@@ -166,7 +167,7 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
     lv_disp_t * d = _lv_refr_get_disp_refreshing();
     lv_color_t ck = d->driver->color_chroma_key;
 
-    lv_memset_ff(abuf, x_end);
+    lv_memset(abuf,  0xff, x_end);
 
     lv_coord_t x;
     for(x = 0; x < x_end; x++) {
@@ -492,5 +493,5 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
     }
 }
 
-#endif
+#endif /*LV_USE_DRAW_SW*/
 

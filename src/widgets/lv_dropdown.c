@@ -136,11 +136,11 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 #endif
 
     if(dropdown->options != NULL && dropdown->static_txt == 0) {
-        lv_mem_free(dropdown->options);
+        lv_free(dropdown->options);
         dropdown->options = NULL;
     }
 
-    dropdown->options = lv_mem_alloc(len);
+    dropdown->options = lv_malloc(len);
 
     LV_ASSERT_MALLOC(dropdown->options);
     if(dropdown->options == NULL) return;
@@ -176,7 +176,7 @@ void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
     dropdown->sel_opt_id_orig = 0;
 
     if(dropdown->static_txt == 0 && dropdown->options != NULL) {
-        lv_mem_free(dropdown->options);
+        lv_free(dropdown->options);
         dropdown->options = NULL;
     }
 
@@ -199,7 +199,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
         char * static_options = dropdown->options;
         size_t len = strlen(static_options) + 1;
 
-        dropdown->options = lv_mem_alloc(len);
+        dropdown->options = lv_malloc(len);
         LV_ASSERT_MALLOC(dropdown->options);
         if(dropdown->options == NULL) return;
 
@@ -216,7 +216,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 #endif
 
     size_t new_len = ins_len + old_len + 2; /*+2 for terminating NULL and possible \n*/
-    dropdown->options        = lv_mem_realloc(dropdown->options, new_len + 1);
+    dropdown->options        = lv_realloc(dropdown->options, new_len + 1);
     LV_ASSERT_MALLOC(dropdown->options);
     if(dropdown->options == NULL) return;
 
@@ -239,7 +239,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
         _lv_txt_ins(dropdown->options, _lv_txt_encoded_get_char_id(dropdown->options, insert_pos++), "\n");
 
     /*Insert the new option, adding \n if necessary*/
-    char * ins_buf = lv_mem_buf_get(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
+    char * ins_buf = lv_malloc(ins_len + 2); /*+ 2 for terminating NULL and possible \n*/
     LV_ASSERT_MALLOC(ins_buf);
     if(ins_buf == NULL) return;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
@@ -250,7 +250,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     if(pos < dropdown->option_cnt) strcat(ins_buf, "\n");
 
     _lv_txt_ins(dropdown->options, _lv_txt_encoded_get_char_id(dropdown->options, insert_pos), ins_buf);
-    lv_mem_buf_release(ins_buf);
+    lv_free(ins_buf);
 
     dropdown->option_cnt++;
 
@@ -265,7 +265,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     if(dropdown->options == NULL) return;
 
     if(dropdown->static_txt == 0)
-        lv_mem_free(dropdown->options);
+        lv_free(dropdown->options);
 
     dropdown->options = NULL;
     dropdown->static_txt = 0;
@@ -615,7 +615,7 @@ static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 
     if(!dropdown->static_txt) {
-        lv_mem_free(dropdown->options);
+        lv_free(dropdown->options);
         dropdown->options = NULL;
     }
 }
@@ -789,7 +789,7 @@ static void draw_main(lv_event_t * e)
     const char * opt_txt;
     if(dropdown->text) opt_txt = dropdown->text;
     else {
-        char * buf = lv_mem_buf_get(128);
+        char * buf = lv_malloc(128);
         lv_dropdown_get_selected_str(obj, buf, 128);
         opt_txt = buf;
     }
@@ -880,7 +880,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_label(draw_ctx, &label_dsc, &txt_area, opt_txt, NULL);
 
     if(dropdown->text == NULL) {
-        lv_mem_buf_release((char *)opt_txt);
+        lv_free((char *)opt_txt);
     }
 }
 

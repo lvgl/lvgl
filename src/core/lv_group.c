@@ -94,7 +94,7 @@ void lv_group_del(lv_group_t * group)
 
     _lv_ll_clear(&(group->obj_ll));
     _lv_ll_remove(&LV_GC_ROOT(_lv_group_ll), group);
-    lv_mem_free(group);
+    lv_free(group);
 }
 
 void lv_group_set_default(lv_group_t * group)
@@ -201,7 +201,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
     _LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {
             _lv_ll_remove(&g->obj_ll, i);
-            lv_mem_free(i);
+            lv_free(i);
             if(obj->spec_attr) obj->spec_attr->group_p = NULL;
             break;
         }

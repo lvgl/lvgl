@@ -1342,7 +1342,7 @@ static void chart_event_cb(lv_event_t * e)
 
         /*Add the faded area before the lines are drawn */
         else if(dsc->part == LV_PART_ITEMS) {
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
             /*Add  a line mask that keeps the area below the line*/
             if(dsc->p1 && dsc->p2) {
                 lv_draw_mask_line_param_t line_mask_param;

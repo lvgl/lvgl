@@ -93,7 +93,7 @@ lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t h
     vgbuf->height = (int32_t)height;
     vgbuf->stride = (int32_t)stride;
 
-    lv_memset_00(&vgbuf->yuv, sizeof(vgbuf->yuv));
+    lv_memzero(&vgbuf->yuv, sizeof(vgbuf->yuv));
 
     vgbuf->memory = (void *)ptr;
     vgbuf->address = (uint32_t)vgbuf->memory;

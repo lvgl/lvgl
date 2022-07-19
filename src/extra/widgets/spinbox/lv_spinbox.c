@@ -445,7 +445,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
     char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
-    lv_memset_00(buf, sizeof(buf));
+    lv_memzero(buf, sizeof(buf));
     char * buf_p = buf;
     uint8_t cur_shift_left = 0;
 

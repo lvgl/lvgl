@@ -101,7 +101,7 @@ void lv_table_set_cell_value(lv_obj_t * obj, uint16_t row, uint16_t col, const c
 
     size_t to_allocate = get_cell_txt_len(txt);
 
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], to_allocate);
+    table->cell_data[cell] = lv_realloc(table->cell_data[cell], to_allocate);
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) return;
 
@@ -142,7 +142,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
-    char * raw_txt = lv_mem_buf_get(len + 1);
+    char * raw_txt = lv_malloc(len + 1);
     LV_ASSERT_MALLOC(raw_txt);
     if(raw_txt == NULL) {
         va_end(ap2);
@@ -153,7 +153,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
 
     /*Get the size of the Arabic text and process it*/
     size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len_ap + 1);
+    table->cell_data[cell] = lv_realloc(table->cell_data[cell], len_ap + 1);
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
@@ -161,9 +161,9 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     }
     _lv_txt_ap_proc(raw_txt, &table->cell_data[cell][1]);
 
-    lv_mem_buf_release(raw_txt);
+    lv_free(raw_txt);
 #else
-    table->cell_data[cell] = lv_mem_realloc(table->cell_data[cell], len + 2); /*+1: trailing '\0; +1: format byte*/
+    table->cell_data[cell] = lv_realloc(table->cell_data[cell], len + 2); /*+1: trailing '\0; +1: format byte*/
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
@@ -193,7 +193,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
     uint16_t old_row_cnt = table->row_cnt;
     table->row_cnt         = row_cnt;
 
-    table->row_h = lv_mem_realloc(table->row_h, table->row_cnt * sizeof(table->row_h[0]));
+    table->row_h = lv_realloc(table->row_h, table->row_cnt * sizeof(table->row_h[0]));
     LV_ASSERT_MALLOC(table->row_h);
     if(table->row_h == NULL) return;
 
@@ -203,11 +203,11 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
         uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
         uint32_t i;
         for(i = new_cell_cnt; i < old_cell_cnt; i++) {
-            lv_mem_free(table->cell_data[i]);
+            lv_free(table->cell_data[i]);
         }
     }
 
-    table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
+    table->cell_data = lv_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
     LV_ASSERT_MALLOC(table->cell_data);
     if(table->cell_data == NULL) return;
 
@@ -215,7 +215,7 @@ void lv_table_set_row_cnt(lv_obj_t * obj, uint16_t row_cnt)
     if(old_row_cnt < row_cnt) {
         uint32_t old_cell_cnt = old_row_cnt * table->col_cnt;
         uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
-        lv_memset_00(&table->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(table->cell_data[0]));
+        lv_memzero(&table->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(table->cell_data[0]));
     }
 
     refr_size_form_row(obj, 0);
@@ -232,12 +232,12 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
     uint16_t old_col_cnt = table->col_cnt;
     table->col_cnt         = col_cnt;
 
-    char ** new_cell_data = lv_mem_alloc(table->row_cnt * table->col_cnt * sizeof(char *));
+    char ** new_cell_data = lv_malloc(table->row_cnt * table->col_cnt * sizeof(char *));
     LV_ASSERT_MALLOC(new_cell_data);
     if(new_cell_data == NULL) return;
     uint32_t new_cell_cnt = table->col_cnt * table->row_cnt;
 
-    lv_memset_00(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
+    lv_memzero(new_cell_data, new_cell_cnt * sizeof(table->cell_data[0]));
 
     /*The new column(s) messes up the mapping of `cell_data`*/
     uint32_t old_col_start;
@@ -248,23 +248,23 @@ void lv_table_set_col_cnt(lv_obj_t * obj, uint16_t col_cnt)
         old_col_start = row * old_col_cnt;
         new_col_start = row * col_cnt;
 
-        lv_memcpy_small(&new_cell_data[new_col_start], &table->cell_data[old_col_start],
-                        sizeof(new_cell_data[0]) * min_col_cnt);
+        lv_memcpy(&new_cell_data[new_col_start], &table->cell_data[old_col_start],
+                  sizeof(new_cell_data[0]) * min_col_cnt);
 
         /*Free the old cells (only if the table becomes smaller)*/
         int32_t i;
         for(i = 0; i < (int32_t)old_col_cnt - col_cnt; i++) {
             uint32_t idx = old_col_start + min_col_cnt + i;
-            lv_mem_free(table->cell_data[idx]);
+            lv_free(table->cell_data[idx]);
             table->cell_data[idx] = NULL;
         }
     }
 
-    lv_mem_free(table->cell_data);
+    lv_free(table->cell_data);
     table->cell_data = new_cell_data;
 
     /*Initialize the new column widths if any*/
-    table->col_w = lv_mem_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
+    table->col_w = lv_realloc(table->col_w, col_cnt * sizeof(table->col_w[0]));
     LV_ASSERT_MALLOC(table->col_w);
     if(table->col_w == NULL) return;
 
@@ -303,7 +303,7 @@ void lv_table_add_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
     uint32_t cell = row * table->col_cnt + col;
 
     if(is_cell_empty(table->cell_data[cell])) {
-        table->cell_data[cell]    = lv_mem_alloc(2); /*+1: trailing '\0; +1: format byte*/
+        table->cell_data[cell]    = lv_malloc(2); /*+1: trailing '\0; +1: format byte*/
         LV_ASSERT_MALLOC(table->cell_data[cell]);
         if(table->cell_data[cell] == NULL) return;
 
@@ -327,7 +327,7 @@ void lv_table_clear_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_tab
     uint32_t cell = row * table->col_cnt + col;
 
     if(is_cell_empty(table->cell_data[cell])) {
-        table->cell_data[cell]    = lv_mem_alloc(2); /*+1: trailing '\0; +1: format byte*/
+        table->cell_data[cell]    = lv_malloc(2); /*+1: trailing '\0; +1: format byte*/
         LV_ASSERT_MALLOC(table->cell_data[cell]);
         if(table->cell_data[cell] == NULL) return;
 
@@ -423,11 +423,11 @@ static void lv_table_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     table->col_cnt = 1;
     table->row_cnt = 1;
-    table->col_w = lv_mem_alloc(table->col_cnt * sizeof(table->col_w[0]));
-    table->row_h = lv_mem_alloc(table->row_cnt * sizeof(table->row_h[0]));
+    table->col_w = lv_malloc(table->col_cnt * sizeof(table->col_w[0]));
+    table->row_h = lv_malloc(table->row_cnt * sizeof(table->row_h[0]));
     table->col_w[0] = LV_DPI_DEF;
     table->row_h[0] = LV_DPI_DEF;
-    table->cell_data = lv_mem_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
+    table->cell_data = lv_realloc(table->cell_data, table->row_cnt * table->col_cnt * sizeof(char *));
     table->cell_data[0] = NULL;
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -441,14 +441,14 @@ static void lv_table_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     uint16_t i;
     for(i = 0; i < table->col_cnt * table->row_cnt; i++) {
         if(table->cell_data[i]) {
-            lv_mem_free(table->cell_data[i]);
+            lv_free(table->cell_data[i]);
             table->cell_data[i] = NULL;
         }
     }
 
-    if(table->cell_data) lv_mem_free(table->cell_data);
-    if(table->row_h) lv_mem_free(table->row_h);
-    if(table->col_w) lv_mem_free(table->col_w);
+    if(table->cell_data) lv_free(table->cell_data);
+    if(table->row_h) lv_free(table->row_h);
+    if(table->col_w) lv_free(table->col_w);
 }
 
 static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)

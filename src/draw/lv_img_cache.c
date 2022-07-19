@@ -123,7 +123,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
     lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, color, frame_id);
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
-        lv_memset_00(cached_src, sizeof(_lv_img_cache_entry_t));
+        lv_memzero(cached_src, sizeof(_lv_img_cache_entry_t));
         cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its us*/
         return NULL;
     }
@@ -155,11 +155,11 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     if(LV_GC_ROOT(_lv_img_cache_array) != NULL) {
         /*Clean the cache before free it*/
         lv_img_cache_invalidate_src(NULL);
-        lv_mem_free(LV_GC_ROOT(_lv_img_cache_array));
+        lv_free(LV_GC_ROOT(_lv_img_cache_array));
     }
 
     /*Reallocate the cache*/
-    LV_GC_ROOT(_lv_img_cache_array) = lv_mem_alloc(sizeof(_lv_img_cache_entry_t) * new_entry_cnt);
+    LV_GC_ROOT(_lv_img_cache_array) = lv_malloc(sizeof(_lv_img_cache_entry_t) * new_entry_cnt);
     LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_img_cache_array));
     if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
         entry_cnt = 0;
@@ -168,7 +168,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     entry_cnt = new_entry_cnt;
 
     /*Clean the cache*/
-    lv_memset_00(LV_GC_ROOT(_lv_img_cache_array), entry_cnt * sizeof(_lv_img_cache_entry_t));
+    lv_memzero(LV_GC_ROOT(_lv_img_cache_array), entry_cnt * sizeof(_lv_img_cache_entry_t));
 #endif
 }
 
@@ -190,7 +190,7 @@ void lv_img_cache_invalidate_src(const void * src)
                 lv_img_decoder_close(&cache[i].dec_dsc);
             }
 
-            lv_memset_00(&cache[i], sizeof(_lv_img_cache_entry_t));
+            lv_memzero(&cache[i], sizeof(_lv_img_cache_entry_t));
         }
     }
 #endif

@@ -65,7 +65,7 @@ void * lv_msg_subsribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_da
     LV_ASSERT_MALLOC(s);
     if(s == NULL) return NULL;
 
-    lv_memset_00(s, sizeof(*s));
+    lv_memzero(s, sizeof(*s));
 
     s->msg_id = msg_id;
     s->callback = cb;
@@ -91,13 +91,13 @@ void lv_msg_unsubscribe(void * s)
 {
     LV_ASSERT_NULL(s);
     _lv_ll_remove(&subs_ll, s);
-    lv_mem_free(s);
+    lv_free(s);
 }
 
 void lv_msg_send(uint32_t msg_id, const void * payload)
 {
     lv_msg_t m;
-    lv_memset_00(&m, sizeof(m));
+    lv_memzero(&m, sizeof(m));
     m.id = msg_id;
     m.payload = payload;
     notify(&m);
