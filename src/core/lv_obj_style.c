@@ -175,10 +175,10 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
-    bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYOUT_REFR);
-    bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_EXT_DRAW);
-    bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
-    bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_LAYER_REFR);
+    bool is_layout_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
+    bool is_ext_draw = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE);
+    bool is_inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_INHERITABLE);
+    bool is_layer_refr = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_LAYER_UPDATE);
 
     if(is_layout_refr) {
         if(part == LV_PART_ANY ||
@@ -224,7 +224,7 @@ void lv_obj_enable_style_refresh(bool en)
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     lv_style_value_t value_act;
-    bool inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_INHERIT);
+    bool inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_INHERITABLE);
     lv_style_res_t found = LV_STYLE_RES_NOT_FOUND;
     while(obj) {
         found = get_prop_core(obj, part, prop, &value_act);
