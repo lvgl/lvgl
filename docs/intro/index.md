@@ -189,9 +189,6 @@ my_flush_cb(NULL, &a, buf);
 ### Why do I see nonsense colors on the screen?
 Probably LVGL's color format is not compatible with your display's color format. Check `LV_COLOR_DEPTH` in *lv_conf.h*.
 
-If you are using 16-bit colors with SPI (or another byte-oriented interface) you probably need to set `LV_COLOR_16_SWAP  1` in *lv_conf.h*.
-It swaps the upper and lower bytes of the pixels.
-
 ### How to speed up my UI?
 - Turn on compiler optimization and enable cache if your MCU has it
 - Increase the size of the display buffer
