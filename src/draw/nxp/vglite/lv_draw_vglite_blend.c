@@ -164,9 +164,6 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         rect.width = area_w;
         rect.height = area_h;
 
-        /*Clean & invalidate cache*/
-        lv_vglite_invalidate_cache();
-
 #if LV_COLOR_DEPTH==16
         vgcol = col32.full;
 #else /*LV_COLOR_DEPTH==32*/
@@ -177,8 +174,8 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         err = vg_lite_clear(&vgbuf, &rect, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Clear failed.");
 
-        err = vg_lite_flush();
-        VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
+        if(lv_vglite_run() != LV_RES_OK)
+            VG_LITE_RETURN_INV("Run failed.");
     }
     else {   /*fill with transparency*/
 
@@ -212,9 +209,6 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
                 (uint32_t)col32.ch.red;
 #endif
 
-        /*Clean & invalidate cache*/
-        lv_vglite_invalidate_cache();
-
         vg_lite_matrix_t matrix;
         vg_lite_identity(&matrix);
 
@@ -222,8 +216,8 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Draw rectangle failed.");
 
-        err = vg_lite_flush();
-        VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
+        if(lv_vglite_run() != LV_RES_OK)
+            VG_LITE_RETURN_INV("Run failed.");
 
         err = vg_lite_clear_path(&path);
         VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
@@ -479,9 +473,6 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
         vg_lite_translate(0.0f - blit->pivot.x, 0.0f - blit->pivot.y, &matrix);
     }
 
-    /*Clean & invalidate cache*/
-    lv_vglite_invalidate_cache();
-
     uint32_t color;
     vg_lite_blend_t blend;
     if(blit->opa >= (lv_opa_t)LV_OPA_MAX) {
@@ -505,8 +496,8 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     err = vg_lite_blit_rect(&dst_vgbuf, &src_vgbuf, rect, &matrix, blend, color, VG_LITE_FILTER_POINT);
     VG_LITE_ERR_RETURN_INV(err, "Blit rectangle failed.");
 
-    err = vg_lite_flush();
-    VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
+    if(lv_vglite_run() != LV_RES_OK)
+        VG_LITE_RETURN_INV("Run failed.");
 
     return LV_RES_OK;
 }

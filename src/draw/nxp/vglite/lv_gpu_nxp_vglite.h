@@ -122,9 +122,9 @@ void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, 
 #endif
 
 /**
- * Clean & invalidate cache.
+ * Clear cache and flush command to VG-Lite.
  */
-void lv_vglite_invalidate_cache(void);
+lv_res_t lv_vglite_run(void);
 
 /**********************
  *      MACROS
