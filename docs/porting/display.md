@@ -93,7 +93,7 @@ There are some optional display driver data fields:
 - `color_chroma_key` A color which will be drawn as transparent on chrome keyed images. Set to `LV_COLOR_CHROMA_KEY` from `lv_conf.h` by default.
 - `anti_aliasing` use anti-aliasing (edge smoothing). Enabled by default if `LV_COLOR_DEPTH` is set to at least 16 in `lv_conf.h`.
 - `rotated` and `sw_rotate` See the [Rotation](#rotation) section below.
-- `screen_transp` if `1` the screen itself can have transparency as well. `LV_COLOR_SCREEN_TRANSP` must be enabled in `lv_conf.h` and `LV_COLOR_DEPTH` must be 32.
+- `screen_transp` if `1` the screen itself can have transparency as well. `LV_COLOR_DEPTH` must be 32.
 - `user_data` A custom `void` user data for the driver.
 - `full_refresh` always redrawn the whole screen (see above)
 - `direct_mode` draw directly into the frame buffer (see above)

@@ -36,18 +36,6 @@ menu "LVGL configuration"
             default 16 if LV_COLOR_DEPTH_16
             default 32 if LV_COLOR_DEPTH_32
 
-        config LV_COLOR_16_SWAP
-            bool "Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)."
-            depends on LV_COLOR_DEPTH_16
-
-        config LV_COLOR_SCREEN_TRANSP
-            bool "Enable more complex drawing routines to manage screens transparency."
-            depends on LV_COLOR_DEPTH_32
-            help
-                Can be used if the UI is above another layer, e.g. an OSD menu or video player.
-                Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to
-                non LV_OPA_COVER value
-
         config LV_COLOR_MIX_ROUND_OFS
             int "Adjust color mix functions rounding"
             default 128 if !LV_COLOR_DEPTH_32
