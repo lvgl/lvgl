@@ -211,9 +211,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
             ((uint32_t)bg_col32.ch.green << 8) | (uint32_t)bg_col32.ch.red;
 #endif
 
-    /*Clean & invalidate cache*/
-    lv_vglite_invalidate_cache();
-
     /*** Draw rectangle ***/
     if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
         err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
@@ -223,8 +220,8 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     }
     VG_LITE_ERR_RETURN_INV(err, "Draw gradient failed.");
 
-    err = vg_lite_flush();
-    VG_LITE_ERR_RETURN_INV(err, "Flush failed.");
+    if(lv_vglite_run() != LV_RES_OK)
+        VG_LITE_RETURN_INV("Run failed.");
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");

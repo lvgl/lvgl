@@ -59,6 +59,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/**
+ * Clean and invalidate cache.
+ */
+static void invalidate_cache(void);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -139,15 +144,24 @@ void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, 
 }
 #endif /* BLIT_DBG_AREAS */
 
-void lv_vglite_invalidate_cache(void)
+lv_res_t lv_vglite_run(void)
 {
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    if(disp->driver->clean_dcache_cb)
-        disp->driver->clean_dcache_cb(disp->driver);
+    invalidate_cache();
+
+    VG_LITE_ERR_RETURN_INV(vg_lite_flush(), "Flush failed.");
+
+    return LV_RES_OK;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void invalidate_cache(void)
+{
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    if(disp->driver->clean_dcache_cb)
+        disp->driver->clean_dcache_cb(disp->driver);
+}
 
 #endif /*LV_USE_GPU_NXP_VG_LITE*/
