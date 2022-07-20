@@ -17,10 +17,10 @@
 #include "../misc/lv_gc.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
-#include "../extra/others/snapshot/lv_snapshot.h"
+#include "../others/snapshot/lv_snapshot.h"
 
 #if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
-    #include "../widgets/lv_label.h"
+    #include "../widgets/label/lv_label.h"
 #endif
 
 /*********************

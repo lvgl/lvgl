@@ -28,7 +28,7 @@
 #endif
 
 #if LV_USE_THEME_DEFAULT
-    #include "../extra/themes/default/lv_theme_default.h"
+    #include "../themes/default/lv_theme_default.h"
 #endif
 
 /*********************
