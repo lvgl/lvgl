@@ -61,6 +61,8 @@ LV_EXPORT_CONST_INT(LV_IMG_ZOOM_NONE);
 
 #define LV_STYLE_PROP_ID_MASK(prop) ((lv_style_prop_t)((prop) & ~LV_STYLE_PROP_META_MASK))
 
+#define LV_STYLE_CONST_PROPS_END { .prop_ptr = &lv_style_const_prop_id_inv, .value = { .num = 0 } }
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -160,7 +162,7 @@ typedef union {
  *
  * Props are split into groups of 16. When adding a new prop to a group, ensure it does not overflow into the next one.
  */
-typedef enum {
+enum {
     LV_STYLE_PROP_INV               = 0,
 
     /*Group 0*/
@@ -266,7 +268,9 @@ typedef enum {
 
     LV_STYLE_PROP_ANY                = 0xFFFF,
     _LV_STYLE_PROP_CONST             = 0xFFFF /* magic value for const styles */
-} lv_style_prop_t;
+};
+
+typedef uint16_t lv_style_prop_t;
 
 enum {
     LV_STYLE_RES_NOT_FOUND,
@@ -293,7 +297,7 @@ typedef struct {
  * Descriptor of a constant style property.
  */
 typedef struct {
-    lv_style_prop_t prop;
+    const lv_style_prop_t * prop_ptr;
     lv_style_value_t value;
 } lv_style_const_prop_t;
 
@@ -435,12 +439,13 @@ static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style,
 {
     if(style->prop1 == LV_STYLE_PROP_ANY) {
         const lv_style_const_prop_t * const_prop;
-        for(const_prop = style->v_p.const_props; const_prop->prop != LV_STYLE_PROP_INV; const_prop++) {
-            lv_style_prop_t prop_id = LV_STYLE_PROP_ID_MASK(const_prop->prop);
+        for(const_prop = style->v_p.const_props; *const_prop->prop_ptr != LV_STYLE_PROP_INV; const_prop++) {
+            lv_style_prop_t prop_id_and_meta = *const_prop->prop_ptr;
+            lv_style_prop_t prop_id = LV_STYLE_PROP_ID_MASK(prop_id_and_meta);
             if(prop_id == prop) {
-                if(const_prop->prop & LV_STYLE_PROP_META_INHERIT)
+                if(prop_id_and_meta & LV_STYLE_PROP_META_INHERIT)
                     return LV_STYLE_RES_INHERIT;
-                *value = (const_prop->prop & LV_STYLE_PROP_META_INITIAL) ? lv_style_prop_get_default(prop_id) : const_prop->value;
+                *value = (prop_id_and_meta & LV_STYLE_PROP_META_INITIAL) ? lv_style_prop_get_default(prop_id) : const_prop->value;
                 return LV_STYLE_RES_FOUND;
             }
         }
@@ -553,6 +558,8 @@ static inline bool lv_style_prop_has_flag(lv_style_prop_t prop, uint8_t flag)
 /*************************
  *    GLOBAL VARIABLES
  *************************/
+
+extern const lv_style_prop_t lv_style_const_prop_id_inv;
 
 /**********************
  *      MACROS
