@@ -56,7 +56,7 @@
       - Update drawing service
       - Update GPU support for Arm-2D library
       - Update GPU support for NXP PXP/VGLite
-      - Improving the accuracy of benchmark. 
+      - Improving the accuracy of benchmark.
       - Add new colour support for RGB565A8
     </release>
     <release date="2022-04-27" version="1.0.3" url="https://github.com/lvgl/lvgl/raw/b81437e96423826272cd42d5555373f15bfdf03a/env_support/cmsis-pack/LVGL.lvgl.1.0.3.pack">
@@ -198,51 +198,74 @@
               <description>The Essential services of LVGL (without extra content)</description>
               <files>
                 <!-- src/core -->
-                <file category="sourceC"            name="src/core/lv_disp.c" />
-                <file category="sourceC"            name="src/core/lv_event.c" />
-                <file category="sourceC"            name="src/core/lv_group.c" />
-                <file category="sourceC"            name="src/core/lv_indev.c" />
+                <file category="sourceC"            name="src/core/lv_theme.c" />
                 <file category="sourceC"            name="src/core/lv_indev_scroll.c" />
                 <file category="sourceC"            name="src/core/lv_obj.c" />
-                <file category="sourceC"            name="src/core/lv_obj_class.c" />
-                <file category="sourceC"            name="src/core/lv_obj_draw.c" />
-                <file category="sourceC"            name="src/core/lv_obj_pos.c" />
-                <file category="sourceC"            name="src/core/lv_obj_scroll.c" />
-                <file category="sourceC"            name="src/core/lv_obj_style.c" />
-                <file category="sourceC"            name="src/core/lv_obj_style_gen.c" />
-                <file category="sourceC"            name="src/core/lv_obj_tree.c" />
                 <file category="sourceC"            name="src/core/lv_refr.c" />
-                <file category="sourceC"            name="src/core/lv_theme.c" />
+                <file category="sourceC"            name="src/core/lv_obj_pos.c" />
+                <file category="sourceC"            name="src/core/lv_obj_style_gen.c" />
+                <file category="sourceC"            name="src/core/lv_obj_class.c" />
+                <file category="sourceC"            name="src/core/lv_obj_tree.c" />
+                <file category="sourceC"            name="src/core/lv_indev.c" />
+                <file category="sourceC"            name="src/core/lv_disp.c" />
+                <file category="sourceC"            name="src/core/lv_obj_scroll.c" />
+                <file category="sourceC"            name="src/core/lv_event.c" />
+                <file category="sourceC"            name="src/core/lv_obj_draw.c" />
+                <file category="sourceC"            name="src/core/lv_group.c" />
+                <file category="sourceC"            name="src/core/lv_obj_style.c" />
+
 
                 <!-- src/draw -->
-                <file category="sourceC"            name="src/draw/lv_draw.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_arc.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_img.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_label.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_layer.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_line.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_mask.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_transform.c" />
-                <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
-                <file category="sourceC"            name="src/draw/lv_img_buf.c" />
-                <file category="sourceC"            name="src/draw/lv_img_cache.c" />
                 <file category="sourceC"            name="src/draw/lv_img_decoder.c" />
-
-                <!-- src/draw/sw -->
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_arc.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_blend.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_dither.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_gradient.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_rect.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_label.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_arc.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_img.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_mask.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_bg.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_texture_cache.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_rect.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_polygon.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_layer.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_stack_blur.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_line.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_composite.c" />
+                <file category="sourceC"            name="src/draw/sdl/lv_draw_sdl_utils.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_transform.c" />
+                <file category="sourceC"            name="src/draw/lv_img_buf.c" />
+                <file category="sourceC"            name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c" />
+                <file category="sourceC"            name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_mask.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_img.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_layer.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_letter.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_line.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_polygon.c" />
-                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_rect.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_line.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_letter.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_arc.c" />
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_transform.c" />
-                
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_blend.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_gradient.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_layer.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_rect.c" />
+                <file category="sourceC"            name="src/draw/sw/lv_draw_sw_dither.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_img.c" />
+                <file category="sourceC"            name="src/draw/lv_img_cache.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_line.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
+                <file category="sourceC"            name="src/draw/lv_draw.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_layer.c" />
+                <file category="sourceC"            name="src/draw/arm2d/lv_gpu_arm2d.c" />
+                <file category="sourceC"            name="src/draw/lv_draw_arc.c" />
+                <file category="sourceC"            name="src/draw/nxp/lv_gpu_nxp.c" />
+                <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
+                <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_rect.c" />
+                <file category="sourceC"            name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c" />
+                <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_blend.c" />
+                <file category="sourceC"            name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c" />
+                <file category="sourceC"            name="src/draw/nxp/pxp/lv_draw_pxp_blend.c" />
+                <file category="sourceC"            name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c" />
 
                 <!-- src/font -->
                 <file category="sourceC"            name="src/font/lv_font.c" />
@@ -281,47 +304,97 @@
                 <file category="sourceC"            name="src/hal/lv_hal_indev.c" />
                 <file category="sourceC"            name="src/hal/lv_hal_tick.c" />
 
+                <!-- src/others -->
+                <file category="sourceC"            name="src/others/monkey/lv_monkey.c" />
+                <file category="sourceC"            name="src/others/msg/lv_msg.c" />
+                <file category="sourceC"            name="src/others/ime/lv_ime_pinyin.c" />
+                <file category="sourceC"            name="src/others/fragment/lv_fragment_manager.c" />
+                <file category="sourceC"            name="src/others/fragment/lv_fragment.c" />
+                <file category="sourceC"            name="src/others/snapshot/lv_snapshot.c" />
+                <file category="sourceC"            name="src/others/imgfont/lv_imgfont.c" />
+                <file category="sourceC"            name="src/others/gridnav/lv_gridnav.c" />
+
                 <!-- src/misc-->
-                <file category="sourceC"            name="src/misc/lv_anim.c" />
-                <file category="sourceC"            name="src/misc/lv_anim_timeline.c" />
-                <file category="sourceC"            name="src/misc/lv_area.c" />
-                <file category="sourceC"            name="src/misc/lv_async.c" />
-                <file category="sourceC"            name="src/misc/lv_bidi.c" />
-                <file category="sourceC"            name="src/misc/lv_color.c" />
+                <file category="sourceC"            name="src/misc/lv_style_gen.c" />
                 <file category="sourceC"            name="src/misc/lv_fs.c" />
+                <file category="sourceC"            name="src/misc/lv_mem_builtin.c" />
+                <file category="sourceC"            name="src/misc/lv_async.c" />
+                <file category="sourceC"            name="src/misc/lv_txt_ap.c" />
                 <file category="sourceC"            name="src/misc/lv_gc.c" />
-                <file category="sourceC"            name="src/misc/lv_ll.c" />
+                <file category="sourceC"            name="src/misc/lv_tlsf.c" />
                 <file category="sourceC"            name="src/misc/lv_log.c" />
                 <file category="sourceC"            name="src/misc/lv_lru.c" />
+                <file category="sourceC"            name="src/misc/lv_area.c" />
+                <file category="sourceC"            name="src/misc/lv_bidi.c" />
+                <file category="sourceC"            name="src/misc/lv_ll.c" />
+                <file category="sourceC"            name="src/misc/lv_anim_timeline.c" />
                 <file category="sourceC"            name="src/misc/lv_math.c" />
-                <file category="sourceC"            name="src/misc/lv_mem.c" />
-                <file category="sourceC"            name="src/misc/lv_printf.c" />
-                <file category="sourceC"            name="src/misc/lv_style.c" />
-                <file category="sourceC"            name="src/misc/lv_style_gen.c" />
-                <file category="sourceC"            name="src/misc/lv_templ.c" />
-                <file category="sourceC"            name="src/misc/lv_timer.c" />
-                <file category="sourceC"            name="src/misc/lv_tlsf.c" />
+                <file category="sourceC"            name="src/misc/lv_anim.c" />
                 <file category="sourceC"            name="src/misc/lv_txt.c" />
-                <file category="sourceC"            name="src/misc/lv_txt_ap.c" />
+                <file category="sourceC"            name="src/misc/lv_mem.c" />
                 <file category="sourceC"            name="src/misc/lv_utils.c" />
+                <file category="sourceC"            name="src/misc/lv_timer.c" />
+                <file category="sourceC"            name="src/misc/lv_style.c" />
+                <file category="sourceC"            name="src/misc/lv_color.c" />
+                <file category="sourceC"            name="src/misc/lv_printf.c" />
 
                 <!-- src/widgets -->
-                <file category="sourceC"            name="src/widgets/lv_arc.c" />
-                <file category="sourceC"            name="src/widgets/lv_bar.c" />
-                <file category="sourceC"            name="src/widgets/lv_btn.c" />
-                <file category="sourceC"            name="src/widgets/lv_btnmatrix.c" />
-                <file category="sourceC"            name="src/widgets/lv_canvas.c" />
-                <file category="sourceC"            name="src/widgets/lv_checkbox.c" />
-                <file category="sourceC"            name="src/widgets/lv_dropdown.c" />
-                <file category="sourceC"            name="src/widgets/lv_img.c" />
-                <file category="sourceC"            name="src/widgets/lv_label.c" />
-                <file category="sourceC"            name="src/widgets/lv_line.c" />
-                <file category="sourceC"            name="src/widgets/lv_objx_templ.c" />
-                <file category="sourceC"            name="src/widgets/lv_roller.c" />
-                <file category="sourceC"            name="src/widgets/lv_slider.c" />
-                <file category="sourceC"            name="src/widgets/lv_switch.c" />
-                <file category="sourceC"            name="src/widgets/lv_table.c" />
-                <file category="sourceC"            name="src/widgets/lv_textarea.c" />
+                <file category="sourceC"            name="src/widgets/spinner/lv_spinner.c" />
+                <file category="sourceC"            name="src/widgets/animimg/lv_animimg.c" />
+                <file category="sourceC"            name="src/widgets/bar/lv_bar.c" />
+                <file category="sourceC"            name="src/widgets/label/lv_label.c" />
+                <file category="sourceC"            name="src/widgets/canvas/lv_canvas.c" />
+                <file category="sourceC"            name="src/widgets/msgbox/lv_msgbox.c" />
+                <file category="sourceC"            name="src/widgets/imgbtn/lv_imgbtn.c" />
+                <file category="sourceC"            name="src/widgets/colorwheel/lv_colorwheel.c" />
+                <file category="sourceC"            name="src/widgets/menu/lv_menu.c" />
+                <file category="sourceC"            name="src/widgets/chart/lv_chart.c" />
+                <file category="sourceC"            name="src/widgets/dropdown/lv_dropdown.c" />
+                <file category="sourceC"            name="src/widgets/arc/lv_arc.c" />
+                <file category="sourceC"            name="src/widgets/table/lv_table.c" />
+                <file category="sourceC"            name="src/widgets/checkbox/lv_checkbox.c" />
+                <file category="sourceC"            name="src/widgets/tabview/lv_tabview.c" />
+                <file category="sourceC"            name="src/widgets/tileview/lv_tileview.c" />
+                <file category="sourceC"            name="src/widgets/objx_templ/lv_objx_templ.c" />
+                <file category="sourceC"            name="src/widgets/keyboard/lv_keyboard.c" />
+                <file category="sourceC"            name="src/widgets/btnmatrix/lv_btnmatrix.c" />
+                <file category="sourceC"            name="src/widgets/switch/lv_switch.c" />
+                <file category="sourceC"            name="src/widgets/calendar/lv_calendar_header_arrow.c" />
+                <file category="sourceC"            name="src/widgets/calendar/lv_calendar.c" />
+                <file category="sourceC"            name="src/widgets/calendar/lv_calendar_header_dropdown.c" />
+                <file category="sourceC"            name="src/widgets/span/lv_span.c" />
+                <file category="sourceC"            name="src/widgets/img/lv_img.c" />
+                <file category="sourceC"            name="src/widgets/meter/lv_meter.c" />
+                <file category="sourceC"            name="src/widgets/win/lv_win.c" />
+                <file category="sourceC"            name="src/widgets/spinbox/lv_spinbox.c" />
+                <file category="sourceC"            name="src/widgets/roller/lv_roller.c" />
+                <file category="sourceC"            name="src/widgets/btn/lv_btn.c" />
+                <file category="sourceC"            name="src/widgets/led/lv_led.c" />
+                <file category="sourceC"            name="src/widgets/textarea/lv_textarea.c" />
+                <file category="sourceC"            name="src/widgets/slider/lv_slider.c" />
+                <file category="sourceC"            name="src/widgets/line/lv_line.c" />
+                <file category="sourceC"            name="src/widgets/list/lv_list.c" />
+                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_posix.c" />
+                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_fatfs.c" />
+                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_stdio.c" />
+                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_win32.c" />
+                <file category="sourceC"            name="src/libs/freetype/lv_freetype.c" />
+                <file category="sourceC"            name="src/libs/ffmpeg/lv_ffmpeg.c" />
+                <file category="sourceC"            name="src/libs/png/lv_png.c" />
+                <file category="sourceC"            name="src/libs/png/lodepng.c" />
+                <file category="sourceC"            name="src/libs/gif/gifdec.c" />
+                <file category="sourceC"            name="src/libs/gif/lv_gif.c" />
+                <file category="sourceC"            name="src/libs/rlottie/lv_rlottie.c" />
+                <file category="sourceC"            name="src/libs/qrcode/lv_qrcode.c" />
+                <file category="sourceC"            name="src/libs/qrcode/qrcodegen.c" />
+                <file category="sourceC"            name="src/libs/sjpg/tjpgd.c" />
+                <file category="sourceC"            name="src/libs/sjpg/lv_sjpg.c" />
+                <file category="sourceC"            name="src/libs/bmp/lv_bmp.c" />
+                <file category="sourceC"            name="src/layouts/grid/lv_grid.c" />
+                <file category="sourceC"            name="src/layouts/flex/lv_flex.c" />
+                <file category="sourceC"            name="src/themes/mono/lv_theme_mono.c" />
+                <file category="sourceC"            name="src/themes/basic/lv_theme_basic.c" />
+                <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
 
                 <!-- general -->
                 <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.2" />
@@ -394,15 +467,15 @@
               <files>
               <file category="sourceC"            name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c" />
               </files>
-              
+
               <RTE_Components_h>
-              
+
 /*! \brief enable SWM341 DMA2D */
 #define LV_USE_GPU_SWM341_DMA2D      1
               </RTE_Components_h>
-              
+
             </component>
-            
+
             <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-Essential">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
@@ -645,7 +718,7 @@
                 <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb565a8.c" />
-                
+
                 <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c" />
                 <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c" />
