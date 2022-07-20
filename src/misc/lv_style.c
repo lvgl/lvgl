@@ -35,6 +35,8 @@ static void lv_style_set_prop_meta_helper(lv_style_prop_t prop, lv_style_value_t
  *  GLOBAL VARIABLES
  **********************/
 
+const lv_style_prop_t lv_style_const_prop_id_inv = LV_STYLE_PROP_INV;
+
 const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PROPS] = {
     [LV_STYLE_WIDTH] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_MIN_WIDTH] =                LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,

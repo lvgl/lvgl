@@ -176,7 +176,7 @@ Styles can be built as `const` too to save RAM:
 const lv_style_const_prop_t style1_props[] = {
    LV_STYLE_CONST_WIDTH(50),
    LV_STYLE_CONST_HEIGHT(50),
-   LV_STYLE_PROP_INV,
+   LV_STYLE_CONST_PROPS_END
 };
 
 LV_STYLE_CONST_INIT(style1, style1_props);

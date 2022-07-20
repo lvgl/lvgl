@@ -106,4 +106,20 @@ void test_inherit_meta_with_lower_precedence_style(void)
     TEST_ASSERT_EQUAL_HEX(lv_color_hex(0xff0000).full, lv_obj_get_style_text_color(grandchild, LV_PART_MAIN).full);
 }
 
+const lv_style_const_prop_t const_style_props[] = {
+    LV_STYLE_CONST_WIDTH(51),
+    LV_STYLE_CONST_HEIGHT(50),
+    LV_STYLE_CONST_PROPS_END
+};
+
+LV_STYLE_CONST_INIT(const_style, const_style_props);
+
+void test_const_style(void)
+{
+    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_add_style(obj, &const_style, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(51, lv_obj_get_style_width(obj, LV_PART_MAIN));
+    TEST_ASSERT_EQUAL(50, lv_obj_get_style_height(obj, LV_PART_MAIN));
+}
+
 #endif
