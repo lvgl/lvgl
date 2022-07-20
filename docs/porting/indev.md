@@ -173,7 +173,7 @@ The default value of the following parameters can be changed in `lv_indev_drv_t`
 - `scroll_throw`  Scroll throw (momentum) slow-down in [%]. Greater value means faster slow-down.
 - `long_press_time` Press time to send `LV_EVENT_LONG_PRESSED` (in milliseconds)
 - `long_press_rep_time` Interval of sending `LV_EVENT_LONG_PRESSED_REPEAT` (in milliseconds)
-- `read_timer` pointer to the `lv_timer` which reads the input device. Its parameters can be changed by `lv_timer_...()` functions. `LV_INDEV_DEF_READ_PERIOD` in `lv_conf.h` sets the default read period.
+- `read_timer` pointer to the `lv_timer` which reads the input device. Its parameters can be changed by `lv_timer_...()` functions. `LV_DEF_REFR_PERIOD` in `lv_hal_disp.h` sets the default read period.
 
 ### Feedback
 

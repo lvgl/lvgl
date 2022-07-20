@@ -89,10 +89,6 @@ menu "LVGL configuration"
     endmenu
 
     menu "HAL Settings"
-        config LV_INDEV_DEF_READ_PERIOD
-            int "Input device read period [ms]."
-            default 30
-
         config LV_TICK_CUSTOM
             bool "Use a custom tick source"
 
