@@ -680,7 +680,8 @@ static void draw_img(lv_event_t * e)
                 lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
                 lv_draw_label(draw_ctx, &label_dsc, &obj->coords, img->src, NULL);
-            } else if (img->src == NULL) {
+            }
+            else if(img->src == NULL) {
                 /*Do not need to draw image when src is NULL*/
                 LV_LOG_WARN("draw_img: image source is NULL");
             }
