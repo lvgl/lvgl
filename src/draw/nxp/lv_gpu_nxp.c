@@ -122,13 +122,10 @@ void lv_draw_nxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
  * the target pixel format is ARGB8565 which is not supported by the GPU.
  * In this case, the NXP callbacks should fallback to SW rendering.
  */
-static inline bool need_argb8565_support()
+static inline bool need_argb8565_support(lv_draw_ctx_t * draw_ctx)
 {
 #if LV_COLOR_DEPTH != 32
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
-    if(disp->driver->screen_transp == 1)
-        return true;
+    if(draw_ctx->render_with_alpha) return true;
 #endif
 
     return false;

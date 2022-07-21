@@ -48,11 +48,10 @@ lv_draw_layer_ctx_t * lv_draw_layer_create(lv_draw_ctx_t * draw_ctx, const lv_ar
 
     lv_memzero(layer_ctx, draw_ctx->layer_instance_size);
 
-    lv_disp_t * disp_refr = _lv_refr_get_disp_refreshing();
     layer_ctx->original.buf = draw_ctx->buf;
     layer_ctx->original.buf_area = draw_ctx->buf_area;
     layer_ctx->original.clip_area = draw_ctx->clip_area;
-    layer_ctx->original.screen_transp = disp_refr->driver->screen_transp;
+    layer_ctx->original.render_with_alpha = draw_ctx->render_with_alpha;
     layer_ctx->area_full = *layer_area;
 
     lv_draw_layer_ctx_t * init_layer_ctx =  draw_ctx->layer_init(draw_ctx, layer_ctx, flags);
@@ -81,8 +80,7 @@ void lv_draw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer
     draw_ctx->buf = layer_ctx->original.buf;
     draw_ctx->buf_area = layer_ctx->original.buf_area;
     draw_ctx->clip_area = layer_ctx->original.clip_area;
-    lv_disp_t * disp_refr = _lv_refr_get_disp_refreshing();
-    disp_refr->driver->screen_transp = layer_ctx->original.screen_transp;
+    draw_ctx->render_with_alpha = layer_ctx->original.render_with_alpha;
 
     if(draw_ctx->layer_destroy) draw_ctx->layer_destroy(draw_ctx, layer_ctx);
     lv_free(layer_ctx);

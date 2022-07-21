@@ -319,6 +319,11 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
+    if(disp_refr->driver->direct_mode && disp_refr->driver->draw_ctx->color_format > _LV_COLOR_FORMAT_NATIVE_END) {
+        LV_LOG_WARN("In direct_mode the color_format must be LV_COLOR_FORMAT_NATIVE_...");
+        return;
+    }
+
     lv_refr_join_area();
 
     refr_invalid_areas();
@@ -1240,6 +1245,8 @@ static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_
         .x2 = area->x2 + drv->offset_x,
         .y2 = area->y2 + drv->offset_y
     };
+
+    if(drv->draw_ctx->buffer_convert) drv->draw_ctx->buffer_convert(drv->draw_ctx);
 
     drv->flush_cb(drv, &offset_area, color_p);
 }
