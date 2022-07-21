@@ -2,7 +2,7 @@
 #if LV_BUILD_TEST
 #include "lv_test_init.h"
 #include "lv_test_indev.h"
-#include "../../src/misc/lv_mem_builtin.h"
+#include "../../src/misc/lv_malloc_builtin.h"
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
