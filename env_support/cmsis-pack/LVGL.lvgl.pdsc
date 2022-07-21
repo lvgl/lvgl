@@ -317,7 +317,8 @@
                 <!-- src/misc-->
                 <file category="sourceC"            name="src/misc/lv_style_gen.c" />
                 <file category="sourceC"            name="src/misc/lv_fs.c" />
-                <file category="sourceC"            name="src/misc/lv_mem_builtin.c" />
+                <file category="sourceC"            name="src/misc/lv_malloc_builtin.c" />
+                <file category="sourceC"            name="src/misc/lv_memcpy_builtin.c" />
                 <file category="sourceC"            name="src/misc/lv_async.c" />
                 <file category="sourceC"            name="src/misc/lv_txt_ap.c" />
                 <file category="sourceC"            name="src/misc/lv_gc.c" />

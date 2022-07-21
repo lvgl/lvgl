@@ -32,7 +32,7 @@
 #include "../layouts/grid/lv_grid.h"
 
 #if LV_USE_BUILTIN_MALLOC
-    #include "../misc/lv_mem_builtin.h"
+    #include "../misc/lv_malloc_builtin.h"
 #endif
 #include "../hal/lv_hal.h"
 #include <stdint.h>
