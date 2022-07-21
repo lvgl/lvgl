@@ -1,5 +1,5 @@
 /**
- * @file lv_mem_builtin.c
+ * @file lv_malloc_builtin.c
  */
 
 /*********************
@@ -7,7 +7,7 @@
  *********************/
 #include "lv_mem.h"
 #if LV_USE_BUILTIN_MALLOC
-#include "lv_mem_builtin.h"
+#include "lv_malloc_builtin.h"
 #include "lv_tlsf.h"
 #include "lv_assert.h"
 #include "lv_log.h"
