@@ -86,7 +86,7 @@ def lv_example_chart_8():
     stacked_area_chart.obj.set_axis_tick(lv.chart.AXIS.PRIMARY_Y, 3, 0, 5, 1, True, 30)
 
     #Set point size to 0 so the lines are smooth
-    stacked_area_chart.obj.set_style_size(0, lv.PART.INDICATOR)
+    stacked_area_chart.obj.set_style_size(0, 0, lv.PART.INDICATOR)
 
     # Add some data series
     stacked_area_chart.series_list[0] = stacked_area_chart.obj.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)

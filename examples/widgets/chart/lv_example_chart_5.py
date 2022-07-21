@@ -67,7 +67,7 @@ chart.align(lv.ALIGN.CENTER, -30, -30)
 chart.set_range(lv.chart.AXIS.PRIMARY_Y, -1000, 1000)
 
 # Do not display points on the data
-chart.set_style_size(0, lv.PART.INDICATOR)
+chart.set_style_size(0, 0, lv.PART.INDICATOR)
 
 ser = chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)
 
