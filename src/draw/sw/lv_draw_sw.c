@@ -112,6 +112,7 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
         return;
     }
 
+#if LV_COLOR_DEPTH == 16
     /*Make both the clip and buf area relative to the buf area*/
     lv_area_t clip_area = *draw_ctx->clip_area;
     lv_area_t buf_area = *draw_ctx->buf_area;
@@ -121,7 +122,6 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
     int32_t a_h_px = lv_area_get_height(&clip_area);
     int32_t buf_w_px = lv_area_get_width(&buf_area);
 
-#if LV_COLOR_DEPTH == 16
     if(draw_ctx->color_format == LV_COLOR_FORMAT_RGB565) return;
     else if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSE) {
         int32_t buf_w_byte = buf_w_px * 2;
