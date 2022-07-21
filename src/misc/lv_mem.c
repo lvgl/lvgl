@@ -13,7 +13,11 @@
 #include "lv_log.h"
 #include LV_STDLIB_INCLUDE
 #if LV_USE_BUILTIN_MALLOC
-    #include "lv_mem_builtin.h"
+    #include "lv_malloc_builtin.h"
+#endif
+
+#if LV_USE_BUILTIN_MEMCPY
+    #include "lv_memcpy_builtin.h"
 #endif
 
 /*********************
