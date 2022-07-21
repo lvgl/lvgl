@@ -71,18 +71,15 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
         layer_sw_ctx->base_draw.area_act = layer_sw_ctx->base_draw.area_full;
         layer_sw_ctx->buf_size_bytes = lv_area_get_size(&layer_sw_ctx->base_draw.area_full) * px_size;
         layer_sw_ctx->base_draw.buf = lv_malloc(layer_sw_ctx->buf_size_bytes);
+        LV_ASSERT_MALLOC(layer_sw_ctx->base_draw.buf);
+        if(layer_sw_ctx->base_draw.buf == NULL) return NULL;
+
         lv_memzero(layer_sw_ctx->base_draw.buf, layer_sw_ctx->buf_size_bytes);
-        layer_sw_ctx->has_alpha = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? 1 : 0;
-        if(layer_sw_ctx->base_draw.buf == NULL) {
-            return NULL;
-        }
 
         draw_ctx->buf = layer_sw_ctx->base_draw.buf;
         draw_ctx->buf_area = &layer_sw_ctx->base_draw.area_act;
         draw_ctx->clip_area = &layer_sw_ctx->base_draw.area_act;
-
-        lv_disp_t * disp_refr = _lv_refr_get_disp_refreshing();
-        disp_refr->driver->screen_transp = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? 1 : 0;
+        draw_ctx->render_with_alpha = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? 1 : 0;
     }
 
     return layer_ctx;
@@ -93,15 +90,12 @@ void lv_draw_sw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_l
 {
 
     lv_draw_sw_layer_ctx_t * layer_sw_ctx = (lv_draw_sw_layer_ctx_t *) layer_ctx;
-    lv_disp_t * disp_refr = _lv_refr_get_disp_refreshing();
     if(flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA) {
         lv_memzero(layer_ctx->buf, layer_sw_ctx->buf_size_bytes);
-        layer_sw_ctx->has_alpha = 1;
-        disp_refr->driver->screen_transp = 1;
+        draw_ctx->render_with_alpha = 1;
     }
     else {
-        layer_sw_ctx->has_alpha = 0;
-        disp_refr->driver->screen_transp = 0;
+        draw_ctx->render_with_alpha = 0;
     }
 
     draw_ctx->buf = layer_ctx->buf;
@@ -112,22 +106,19 @@ void lv_draw_sw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_l
 void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
                             const lv_draw_img_dsc_t * draw_dsc)
 {
-    lv_draw_sw_layer_ctx_t * layer_sw_ctx = (lv_draw_sw_layer_ctx_t *) layer_ctx;
-
     lv_img_dsc_t img;
     img.data = draw_ctx->buf;
     img.header.always_zero = 0;
     img.header.w = lv_area_get_width(draw_ctx->buf_area);
     img.header.h = lv_area_get_height(draw_ctx->buf_area);
-    img.header.cf = layer_sw_ctx->has_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+    img.header.cf = draw_ctx->render_with_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
     lv_img_cache_invalidate_src(&img);
 
     /*Restore the original draw_ctx*/
     draw_ctx->buf = layer_ctx->original.buf;
     draw_ctx->buf_area = layer_ctx->original.buf_area;
     draw_ctx->clip_area = layer_ctx->original.clip_area;
-    lv_disp_t * disp_refr = _lv_refr_get_disp_refreshing();
-    disp_refr->driver->screen_transp = layer_ctx->original.screen_transp;
+    draw_ctx->render_with_alpha = layer_ctx->original.render_with_alpha;
 
     /*Blend the layer*/
     lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, &img);

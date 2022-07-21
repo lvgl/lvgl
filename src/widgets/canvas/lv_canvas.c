@@ -784,9 +784,25 @@ static void init_fake_disp(lv_obj_t * canvas, lv_disp_t * disp, lv_disp_drv_t * 
     draw_ctx->buf_area = clip_area;
     draw_ctx->buf = (void *)dsc->data;
 
-    lv_disp_drv_use_generic_set_px_cb(disp->driver, dsc->header.cf);
-    if(dsc->header.cf != LV_IMG_CF_TRUE_COLOR_ALPHA) drv->screen_transp = 0;
-    else drv->screen_transp = 1;
+    switch(dsc->header.cf) {
+        case LV_IMG_CF_ALPHA_1BIT:
+            draw_ctx->color_format = LV_COLOR_FORMAT_L1;
+            break;
+        case LV_IMG_CF_ALPHA_2BIT:
+            draw_ctx->color_format = LV_COLOR_FORMAT_L2;
+            break;
+        case LV_IMG_CF_ALPHA_4BIT:
+            draw_ctx->color_format = LV_COLOR_FORMAT_L4;
+            break;
+        case LV_IMG_CF_ALPHA_8BIT:
+            draw_ctx->color_format = LV_COLOR_FORMAT_L8;
+            break;
+        default:
+            break;
+    }
+
+    if(dsc->header.cf != LV_IMG_CF_TRUE_COLOR_ALPHA) draw_ctx->render_with_alpha = false;
+    else draw_ctx->render_with_alpha = true;
 }
 
 static void deinit_fake_disp(lv_obj_t * canvas, lv_disp_t * disp)

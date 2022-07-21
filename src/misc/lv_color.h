@@ -231,6 +231,46 @@ typedef struct _lv_color_filter_dsc_t {
 
 
 typedef enum {
+    LV_COLOR_FORMAT_NATIVE = 0,       /*Keep original format. Used in color conversation*/
+    LV_COLOR_FORMAT_NATIVE_REVERSE,   /*Change endianess*/
+
+    _LV_COLOR_FORMAT_NATIVE_END = 16,
+    LV_COLOR_FORMAT_RGB232,
+    LV_COLOR_FORMAT_RGBA2328,
+    LV_COLOR_FORMAT_RGBA2222,
+
+    LV_COLOR_FORMAT_RGB565,
+    LV_COLOR_FORMAT_RGBA5658,
+    LV_COLOR_FORMAT_RGBA5551,
+    LV_COLOR_FORMAT_RGBA4444,
+    LV_COLOR_FORMAT_RGB565A8,
+
+    LV_COLOR_FORMAT_RGB888,
+    LV_COLOR_FORMAT_RGBA8888,
+    LV_COLOR_FORMAT_RGBX8888,
+
+    LV_COLOR_FORMAT_L1,
+    LV_COLOR_FORMAT_L2,
+    LV_COLOR_FORMAT_L4,
+    LV_COLOR_FORMAT_L8,
+
+    LV_COLOR_FORMAT_A1,
+    LV_COLOR_FORMAT_A2,
+    LV_COLOR_FORMAT_A4,
+    LV_COLOR_FORMAT_A8,
+
+    LV_COLOR_FORMAT_I1,
+    LV_COLOR_FORMAT_I2,
+    LV_COLOR_FORMAT_I4,
+    LV_COLOR_FORMAT_I8,
+
+
+    LV_COLOR_FORMAT_CUSTOM_START = 0xff, /*Custom formats can be added from here*/
+
+} lv_color_format_t;
+
+
+typedef enum {
     LV_PALETTE_RED,
     LV_PALETTE_PINK,
     LV_PALETTE_PURPLE,
