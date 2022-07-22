@@ -31,8 +31,11 @@ static lv_indev_drv_t indev_drv;
 
 static lv_disp_draw_buf_t disp_buf;
 
+#define DISPLAY_WIDTH DT_PROP(DISPLAY_NODE, width)
+#define DISPLAY_HEIGHT DT_PROP(DISPLAY_NODE, height)
+
 #define BUFFER_SIZE (CONFIG_LV_Z_BITS_PER_PIXEL * ((CONFIG_LV_Z_VDB_SIZE * \
-			CONFIG_LV_Z_HOR_RES_MAX * CONFIG_LV_Z_VER_RES_MAX) / 100) / 8)
+			DISPLAY_WIDTH * DISPLAY_HEIGHT) / 100) / 8)
 
 #define NBR_PIXELS_IN_BUFFER (BUFFER_SIZE * 8 / CONFIG_LV_Z_BITS_PER_PIXEL)
 
@@ -91,14 +94,14 @@ static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 
 	display_get_capabilities(display_dev, &cap);
 
-	if (cap.x_resolution <= CONFIG_LV_Z_HOR_RES_MAX) {
+	if (cap.x_resolution <= DISPLAY_WIDTH) {
 		disp_drv->hor_res = cap.x_resolution;
 	} else {
 		LOG_ERR("Horizontal resolution is larger than maximum");
 		err = -ENOTSUP;
 	}
 
-	if (cap.y_resolution <= CONFIG_LV_Z_VER_RES_MAX) {
+	if (cap.y_resolution <= DISPLAY_HEIGHT) {
 		disp_drv->ver_res = cap.y_resolution;
 	} else {
 		LOG_ERR("Vertical resolution is larger than maximum");

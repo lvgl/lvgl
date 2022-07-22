@@ -19,7 +19,6 @@ config LV_Z_USE_FILESYSTEM
 	  Enable LittlevGL file system
 
 rsource "../Kconfig"
-rsource "Kconfig.graphical"
 rsource "Kconfig.memory"
 rsource "Kconfig.input"
 
