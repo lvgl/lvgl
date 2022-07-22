@@ -9,13 +9,6 @@ DT_CZD_PATH:= $(dt_chosen_path,$(DT_CHOSEN_ZEPHYR_DISPLAY))
 DT_CZD_HOR_RES_MAX := $(dt_node_int_prop_int,$(DT_CZD_PATH),width)
 DT_CZD_VER_RES_MAX := $(dt_node_int_prop_int,$(DT_CZD_PATH),height)
 
-config LV_Z_DISPLAY_DEV_NAME
-	string "Display device name"
-	default "$(dt_chosen_label,$(DT_CHOSEN_ZEPHYR_DISPLAY))" if HAS_DTS
-	default "DISPLAY"
-	help
-	  Name of the display device to use for rendering.
-
 config LV_Z_HOR_RES_MAX
 	int "Horizontal Screen Resolution"
 	default "$(DT_CZD_HOR_RES_MAX)" if HAS_DTS
