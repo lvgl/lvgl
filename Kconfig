@@ -89,16 +89,6 @@ menu "LVGL configuration"
     endmenu
 
     menu "HAL Settings"
-        config LV_DISP_DEF_REFR_PERIOD
-            int "Default display refresh period (ms)."
-            default 30
-            help
-                Can be changed in the display driver (`lv_disp_drv_t`).
-
-        config LV_INDEV_DEF_READ_PERIOD
-            int "Input device read period [ms]."
-            default 30
-
         config LV_TICK_CUSTOM
             bool "Use a custom tick source"
 

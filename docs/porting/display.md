@@ -207,7 +207,7 @@ Display rotation can also be changed at runtime using the `lv_disp_set_rotation(
 Support for software rotation is a new feature, so there may be some glitches/bugs depending on your configuration. If you encounter a problem please open an issue on [GitHub](https://github.com/lvgl/lvgl/issues).
 
 ### Decoupling the display refresh timer
-Normally the dirty (a.k.a invalid) areas are checked and redrawn in every `LV_DISP_DEF_REFR_PERIOD` milliseconds (set in `lv_conf.h`).
+Normally the dirty (a.k.a invalid) areas are checked and redrawn in every `LV_DEF_REFR_PERIOD` milliseconds (set in `lv_hal_disp.h`).
 However, in some cases you might need more control on when the display refreshing happen, for example to synchronize rendering with VSYNC or the TE signal.
 
 You can do this in the following way:
@@ -225,7 +225,7 @@ If you have multiple displays call `lv_disp_set_deafult(disp1);` to select the d
 
 Note that `lv_timer_handler()` and `_lv_disp_refr_timer()` can not run at the same time.
 
-If the performance monitor is enabled, the value of `LV_DISP_DEF_REFR_PERIOD` needs to be set to be consistent with the refresh period of the display to ensure that the statistical results are correct.
+If the performance monitor is enabled, the value of `LV_DEF_REFR_PERIOD` needs to be set to be consistent with the refresh period of the display to ensure that the statistical results are correct.
 
 ## Further reading
 
