@@ -681,6 +681,10 @@ static void draw_img(lv_event_t * e)
 
                 lv_draw_label(draw_ctx, &label_dsc, &obj->coords, img->src, NULL);
             }
+            else if(img->src == NULL) {
+                /*Do not need to draw image when src is NULL*/
+                LV_LOG_WARN("draw_img: image source is NULL");
+            }
             else {
                 /*Trigger the error handler of image draw*/
                 LV_LOG_WARN("draw_img: image source type is unknown");
