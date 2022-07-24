@@ -4,7 +4,7 @@ import display_driver
 import fs_driver
 
 info = lv.ft_info_t()
-info.name ="./arial.ttf"
+info.name ="./Lato-Regular.ttf"
 info.weight = 24
 info.style = lv.FT_FONT_STYLE.NORMAL
 info.font_init()
