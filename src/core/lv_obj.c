@@ -933,11 +933,19 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_state_t prev_state = obj->state;
-    obj->state = new_state;
 
     _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
     /*If there is no difference in styles there is nothing else to do*/
-    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
+    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) {
+        obj->state = new_state;
+        return;
+    }
+
+    /*Invalidate the object in their current state*/
+    lv_obj_invalidate(obj);
+
+    obj->state = new_state;
+
 
     _lv_obj_style_transition_dsc_t * ts = lv_malloc(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     lv_memzero(ts, sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
