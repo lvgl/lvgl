@@ -11,7 +11,7 @@
 
 #if LV_USE_DRAW_SDL
 
-#include LV_DARW_SDL_INCLUDE_PATH
+#include LV_DRAW_SDL_INCLUDE_PATH
 
 #include "../lv_draw_label.h"
 #include "../../misc/lv_utils.h"

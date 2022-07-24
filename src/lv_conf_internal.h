@@ -433,27 +433,27 @@
     #endif
 #endif
 #if LV_USE_DRAW_SDL
-    #ifndef LV_DARW_SDL_INCLUDE_PATH
-        #ifdef CONFIG_LV_DARW_SDL_INCLUDE_PATH
-            #define LV_DARW_SDL_INCLUDE_PATH CONFIG_LV_DARW_SDL_INCLUDE_PATH
+    #ifndef LV_DRAW_SDL_INCLUDE_PATH
+        #ifdef CONFIG_LV_DRAW_SDL_INCLUDE_PATH
+            #define LV_DRAW_SDL_INCLUDE_PATH CONFIG_LV_DRAW_SDL_INCLUDE_PATH
         #else
-            #define LV_DARW_SDL_INCLUDE_PATH <SDL2/SDL.h>
+            #define LV_DRAW_SDL_INCLUDE_PATH <SDL2/SDL.h>
         #endif
     #endif
     /*Texture cache size, 8MB by default*/
-    #ifndef LV_DARW_SDL_LRU_SIZE
-        #ifdef CONFIG_LV_DARW_SDL_LRU_SIZE
-            #define LV_DARW_SDL_LRU_SIZE CONFIG_LV_DARW_SDL_LRU_SIZE
+    #ifndef LV_DRAW_SDL_LRU_SIZE
+        #ifdef CONFIG_LV_DRAW_SDL_LRU_SIZE
+            #define LV_DRAW_SDL_LRU_SIZE CONFIG_LV_DRAW_SDL_LRU_SIZE
         #else
-            #define LV_DARW_SDL_LRU_SIZE (1024 * 1024 * 8)
+            #define LV_DRAW_SDL_LRU_SIZE (1024 * 1024 * 8)
         #endif
     #endif
     /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
-    #ifndef LV_DARW_SDL_CUSTOM_BLEND_MODE
-        #ifdef CONFIG_LV_DARW_SDL_CUSTOM_BLEND_MODE
-            #define LV_DARW_SDL_CUSTOM_BLEND_MODE CONFIG_LV_DARW_SDL_CUSTOM_BLEND_MODE
+    #ifndef LV_DRAW_SDL_CUSTOM_BLEND_MODE
+        #ifdef CONFIG_LV_DRAW_SDL_CUSTOM_BLEND_MODE
+            #define LV_DRAW_SDL_CUSTOM_BLEND_MODE CONFIG_LV_DRAW_SDL_CUSTOM_BLEND_MODE
         #else
-            #define LV_DARW_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+            #define LV_DRAW_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
         #endif
     #endif
 #endif
