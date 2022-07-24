@@ -49,12 +49,10 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR:
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
-        case LV_IMG_CF_ALPHA_1BIT:
-        case LV_IMG_CF_ALPHA_2BIT:
-        case LV_IMG_CF_ALPHA_4BIT:
         case LV_IMG_CF_ALPHA_8BIT:
             break;
         default:
+            LV_LOG_WARN("Not supported color format");
             return 0;
     }
 
@@ -66,9 +64,11 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
     lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
     w += ext_size * 2;
     h += ext_size * 2;
+    uint8_t px_size;
+    if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA) px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
+    else px_size = sizeof(lv_color_t);
 
-    uint8_t px_size = lv_img_cf_get_px_size(cf);
-    return w * h * ((px_size + 7) >> 3);
+    return w * h * px_size;
 }
 
 /** Take snapshot for object with its children, save image info to provided buffer.
@@ -90,17 +90,14 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR:
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
-        case LV_IMG_CF_ALPHA_1BIT:
-        case LV_IMG_CF_ALPHA_2BIT:
-        case LV_IMG_CF_ALPHA_4BIT:
         case LV_IMG_CF_ALPHA_8BIT:
             break;
         default:
+            LV_LOG_WARN("Not supported color format");
             return LV_RES_INV;
     }
 
-    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size)
-        return LV_RES_INV;
+    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size) return LV_RES_INV;
 
     /*Width and height determine snapshot image size.*/
     lv_coord_t w = lv_obj_get_width(obj);
@@ -115,6 +112,11 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     lv_memset(buf, 0x00, buff_size);
     lv_memzero(dsc, sizeof(lv_img_dsc_t));
+    dsc->data = buf;
+    dsc->header.w = w;
+    dsc->header.h = h;
+    dsc->header.cf = cf;
+
 
     lv_disp_t * obj_disp = lv_obj_get_disp(obj);
     lv_disp_drv_t driver;
@@ -122,7 +124,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     /*In lack of a better idea use the resolution of the object's display*/
     driver.hor_res = lv_disp_get_hor_res(obj_disp);
     driver.ver_res = lv_disp_get_hor_res(obj_disp);
-    lv_disp_drv_use_generic_set_px_cb(&driver, cf);
+
 
     lv_disp_t fake_disp;
     lv_memzero(&fake_disp, sizeof(lv_disp_t));
@@ -136,6 +138,10 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     draw_ctx->clip_area = &snapshot_area;
     draw_ctx->buf_area = &snapshot_area;
     draw_ctx->buf = (void *)buf;
+    if(dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) draw_ctx->color_format = LV_COLOR_FORMAT_L8;
+    else if(dsc->header.cf != LV_IMG_CF_TRUE_COLOR_ALPHA) draw_ctx->render_with_alpha = false;
+    else draw_ctx->render_with_alpha = true;
+
     driver.draw_ctx = draw_ctx;
 
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
@@ -143,14 +149,12 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
 
     lv_obj_redraw(draw_ctx, obj);
 
+    if(draw_ctx->buffer_convert) draw_ctx->buffer_convert(draw_ctx);
+
     _lv_refr_set_disp_refreshing(refr_ori);
     obj_disp->driver->draw_ctx_deinit(fake_disp.driver, draw_ctx);
     lv_free(draw_ctx);
 
-    dsc->data = buf;
-    dsc->header.w = w;
-    dsc->header.h = h;
-    dsc->header.cf = cf;
     return LV_RES_OK;
 }
 
