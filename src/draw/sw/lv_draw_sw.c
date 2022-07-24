@@ -116,34 +116,37 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
     if(draw_ctx->color_format == LV_COLOR_FORMAT_RGB565) return;
 
     /*Make both the clip and buf area relative to the buf area*/
-    lv_area_t clip_area = *draw_ctx->clip_area;
-    lv_area_t buf_area = *draw_ctx->buf_area;
-    lv_area_move(&clip_area, -buf_area.x1, -buf_area.y1);
-    lv_area_move(&buf_area, -buf_area.x1, -buf_area.y1);
-
-    int32_t a_h_px = lv_area_get_height(&clip_area);
-    int32_t buf_w_px = lv_area_get_width(&buf_area);
 
     if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSE) {
-        /*Consider the buffers as an area because in direct mode it might happen that
-         *only a small area is redrawn from a larger buffer */
-        int32_t buf_w_byte = buf_w_px * 2;
-        int32_t a_w_byte = lv_area_get_width(&clip_area) * 2;
-
-        /*Go to the first byte on buf*/
-        uint8_t * buf8 = draw_ctx->buf;
-        buf8 += clip_area.y1 * buf_w_byte + clip_area.x1 * 2;
+        uint32_t px_cnt = lv_area_get_size(draw_ctx->buf_area);
+        uint32_t u32_cnt = px_cnt / 2;
+        uint16_t * buf16 = draw_ctx->buf;
+        uint32_t * buf32 = (uint32_t *) buf16 ;
 
         /*Swap all byte pairs*/
-        int32_t y;
-        for(y = 0; y < a_h_px; y++) {
-            int32_t x;
-            for(x = 0; x < a_w_byte - 1; x += 2) {
-                uint8_t tmp = buf8[x];
-                buf8[x] = buf8[x + 1];
-                buf8[x + 1] = tmp;
-            }
-            buf8 += buf_w_byte;
+
+        while(u32_cnt >= 8) {
+            buf32[0] = ((uint32_t)(buf32[0] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[0] & 0x00ff00ff) << 8);
+            buf32[1] = ((uint32_t)(buf32[1] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[1] & 0x00ff00ff) << 8);
+            buf32[2] = ((uint32_t)(buf32[2] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[2] & 0x00ff00ff) << 8);
+            buf32[3] = ((uint32_t)(buf32[3] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[3] & 0x00ff00ff) << 8);
+            buf32[4] = ((uint32_t)(buf32[4] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[4] & 0x00ff00ff) << 8);
+            buf32[5] = ((uint32_t)(buf32[5] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[5] & 0x00ff00ff) << 8);
+            buf32[6] = ((uint32_t)(buf32[6] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[6] & 0x00ff00ff) << 8);
+            buf32[7] = ((uint32_t)(buf32[7] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[7] & 0x00ff00ff) << 8);
+            buf32 += 8;
+            u32_cnt -= 8;
+        }
+
+        while(u32_cnt) {
+            *buf32 = ((uint32_t)(*buf32 & 0xff00ff00) >> 8) + ((uint32_t)(*buf32 & 0x00ff00ff) << 8);
+            buf32++;
+            u32_cnt--;
+        }
+
+        if(px_cnt & 0x1) {
+            uint32_t e = px_cnt - 1;
+            buf16[e] = ((buf16[e] & 0xff00) >> 8) + ((buf16[e] & 0x00ff) << 8);
         }
 
         return;
