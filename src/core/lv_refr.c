@@ -319,8 +319,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    if(disp_refr->driver->direct_mode && disp_refr->driver->draw_ctx->color_format > _LV_COLOR_FORMAT_NATIVE_END) {
-        LV_LOG_WARN("In direct_mode the color_format must be LV_COLOR_FORMAT_NATIVE_...");
+    if(disp_refr->driver->direct_mode && disp_refr->driver->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
+        LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
         return;
     }
 
