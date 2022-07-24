@@ -113,6 +113,8 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
     }
 
 #if LV_COLOR_DEPTH == 16
+    if(draw_ctx->color_format == LV_COLOR_FORMAT_RGB565) return;
+
     /*Make both the clip and buf area relative to the buf area*/
     lv_area_t clip_area = *draw_ctx->clip_area;
     lv_area_t buf_area = *draw_ctx->buf_area;
@@ -122,8 +124,9 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
     int32_t a_h_px = lv_area_get_height(&clip_area);
     int32_t buf_w_px = lv_area_get_width(&buf_area);
 
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_RGB565) return;
-    else if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSE) {
+    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSE) {
+        /*Consider the buffers as an area because in direct mode it might happen that
+         *only a small area is redrawn from a larger buffer */
         int32_t buf_w_byte = buf_w_px * 2;
         int32_t a_w_byte = lv_area_get_width(&clip_area) * 2;
 
@@ -145,25 +148,16 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
 
         return;
     }
-    else if(draw_ctx->color_format == LV_COLOR_FORMAT_RGBX8888) {
-        /*Go to the last byte on buf*/
-        lv_color_t * buf_in = draw_ctx->buf;
-        buf_in += clip_area.y2 * buf_w_px + clip_area.x1;
+    else if(draw_ctx->color_format == LV_COLOR_FORMAT_L8) {
+        size_t buf_size_px = lv_area_get_size(draw_ctx->buf_area);
 
-        uint32_t * buf_out = draw_ctx->buf;
-        buf_out += clip_area.y2 * buf_w_px + clip_area.x1;
+        uint8_t * buf8 = draw_ctx->buf;
+        lv_color_t * bufc = draw_ctx->buf;
 
-        int32_t a_w_px = lv_area_get_width(&clip_area);
-        int32_t y;
-        for(y = 0; y < a_h_px; y++) {
-            int32_t x;
-            for(x = a_w_px - 1; x >= 0; x--) {
-                buf_out[x] = lv_color_to32(buf_in[x]);
-            }
-            buf_in -= buf_w_px;
-            buf_out -= buf_w_px;
+        uint32_t i;
+        for(i = 0; i < buf_size_px; i++) {
+            buf8[i] = lv_color_brightness(bufc[i]);
         }
-
         return;
     }
 #endif

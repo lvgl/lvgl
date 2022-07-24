@@ -66,6 +66,9 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                             int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                             int32_t x_end, lv_color_t * cbuf, uint8_t * abuf, lv_img_cf_t cf);
 
+static void a8_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                  int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                  int32_t x_end, uint8_t * abuf);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -123,6 +126,7 @@ void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area,
             xs_step_256 = (256 * xs_diff) / (dest_w - 1);
             ys_step_256 = (256 * ys_diff) / (dest_w - 1);
         }
+
         int32_t xs_ups = xs1_ups;
         int32_t ys_ups = ys1_ups;
 
@@ -146,7 +150,14 @@ void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area,
             }
         }
         else {
-            argb_and_rgb_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf, cf);
+            switch(cf) {
+                case LV_IMG_CF_ALPHA_8BIT:
+                    a8_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, abuf);
+                    break;
+                default:
+                    argb_and_rgb_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf, cf);
+                    break;
+            }
         }
 
         cbuf += dest_w;
@@ -167,7 +178,7 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
     lv_disp_t * d = _lv_refr_get_disp_refreshing();
     lv_color_t ck = d->driver->color_chroma_key;
 
-    lv_memset(abuf,  0xff, x_end);
+    lv_memset(abuf, 0xff, x_end);
 
     lv_coord_t x;
     for(x = 0; x < x_end; x++) {
@@ -181,7 +192,7 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
         }
         else {
 
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
             const uint8_t * src_tmp = src;
             src_tmp += ys_int * src_stride + xs_int;
             cbuf[x].full = src_tmp[0];
@@ -222,7 +233,7 @@ static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, 
             const uint8_t * src_tmp = src;
             src_tmp += (ys_int * src_stride * LV_IMG_PX_SIZE_ALPHA_BYTE) + xs_int * LV_IMG_PX_SIZE_ALPHA_BYTE;
 
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
             cbuf[x].full = src_tmp[0];
 #elif LV_COLOR_DEPTH == 16
             cbuf[x].full = src_tmp[0] + (src_tmp[1] << 8);
@@ -397,7 +408,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
 
                 if(abuf[x] == 0x00) continue;
 
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
                 c_base.full = px_base[0];
                 c_ver.full = px_ver[0];
                 c_hor.full = px_hor[0];
@@ -430,7 +441,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
         }
         /*Partially out of the image*/
         else {
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
             cbuf[x].full = src_tmp[0];
 #elif LV_COLOR_DEPTH == 16
             cbuf[x].full = src_tmp[0] + (src_tmp[1] << 8);
@@ -467,6 +478,83 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
     }
 }
 
+static void a8_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                  int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                  int32_t x_end, uint8_t * abuf)
+{
+    int32_t xs_ups_start = xs_ups;
+    int32_t ys_ups_start = ys_ups;
+
+    lv_coord_t x;
+    for(x = 0; x < x_end; x++) {
+        xs_ups = xs_ups_start + ((xs_step * x) >> 8);
+        ys_ups = ys_ups_start + ((ys_step * x) >> 8);
+
+        int32_t xs_int = xs_ups >> 8;
+        int32_t ys_int = ys_ups >> 8;
+
+        /*Fully out of the image*/
+        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+            abuf[x] = 0x00;
+            continue;
+        }
+
+        /*Get the direction the hor and ver neighbor
+         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
+        int32_t xs_fract = xs_ups & 0xFF;
+        int32_t ys_fract = ys_ups & 0xFF;
+
+        int32_t x_next;
+        int32_t y_next;
+        if(xs_fract < 0x80) {
+            x_next = -1;
+            xs_fract = (0x7F - xs_fract) * 2;
+        }
+        else {
+            x_next = 1;
+            xs_fract = (xs_fract - 0x80) * 2;
+        }
+        if(ys_fract < 0x80) {
+            y_next = -1;
+            ys_fract = (0x7F - ys_fract) * 2;
+        }
+        else {
+            y_next = 1;
+            ys_fract = (ys_fract - 0x80) * 2;
+        }
+
+        const uint8_t * src_tmp = src;
+        src_tmp += ys_int * src_stride + xs_int;
+
+        if(xs_int + x_next >= 0 &&
+           xs_int + x_next <= src_w - 1 &&
+           ys_int + y_next >= 0 &&
+           ys_int + y_next <= src_h - 1) {
+
+            lv_opa_t a_base = src_tmp[0];
+            lv_opa_t a_ver = src_tmp[x_next];
+            lv_opa_t a_hor = src_tmp[y_next * src_stride];
+
+            if(a_ver != a_base) a_ver = ((a_ver * ys_fract) + (a_base * (0x100 - ys_fract))) >> 8;
+            if(a_hor != a_base) a_hor = ((a_hor * xs_fract) + (a_base * (0x100 - xs_fract))) >> 8;
+            abuf[x] = (a_ver + a_hor) >> 1;
+        }
+        else {
+            /*Partially out of the image*/
+            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
+                abuf[x] = (src_tmp[0] * (0xFF - xs_fract)) >> 8;
+            }
+            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
+                abuf[x] = (src_tmp[0] * (0xFF - ys_fract)) >> 8;
+            }
+            else {
+                abuf[x] = 0x00;
+            }
+        }
+    }
+}
+
+
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)
 {
@@ -494,4 +582,3 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
 }
 
 #endif /*LV_USE_DRAW_SW*/
-
