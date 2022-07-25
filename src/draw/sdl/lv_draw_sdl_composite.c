@@ -79,7 +79,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
     if(!_lv_area_intersect(apply_area, &full_coords, clip_in)) return false;
     bool has_mask = lv_draw_mask_is_any(apply_area);
 
-    const bool draw_mask = has_mask && LV_DARW_SDL_CUSTOM_BLEND_MODE;
+    const bool draw_mask = has_mask && LV_DRAW_SDL_CUSTOM_BLEND_MODE;
     const bool draw_blend = blend_mode != LV_BLEND_MODE_NORMAL;
     if(draw_mask || draw_blend) {
         lv_draw_sdl_context_internals_t * internals = ctx->internals;
@@ -96,7 +96,7 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
         SDL_SetRenderTarget(ctx->renderer, internals->composition);
         SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 0);
         SDL_RenderClear(ctx->renderer);
-#if LV_DARW_SDL_CUSTOM_BLEND_MODE
+#if LV_DRAW_SDL_CUSTOM_BLEND_MODE
         internals->mask = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0, w, h);
         dump_masks(internals->mask, apply_area);
 #endif
@@ -125,7 +125,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
 {
     lv_draw_sdl_context_internals_t * internals = ctx->internals;
     SDL_Rect src_rect = {0, 0, lv_area_get_width(apply_area), lv_area_get_height(apply_area)};
-#if LV_DARW_SDL_CUSTOM_BLEND_MODE
+#if LV_DRAW_SDL_CUSTOM_BLEND_MODE
     if(internals->mask) {
         SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
                                                         SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
@@ -148,7 +148,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
             case LV_BLEND_MODE_ADDITIVE:
                 SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_ADD);
                 break;
-#if LV_DARW_SDL_CUSTOM_BLEND_MODE
+#if LV_DRAW_SDL_CUSTOM_BLEND_MODE
             case LV_BLEND_MODE_SUBTRACTIVE: {
                     SDL_BlendMode mode = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE, SDL_BLENDFACTOR_ONE,
                                                                     SDL_BLENDOPERATION_SUBTRACT, SDL_BLENDFACTOR_ONE,
