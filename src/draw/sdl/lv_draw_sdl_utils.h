@@ -20,7 +20,7 @@ extern "C" {
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_area.h"
 
-#include LV_DARW_SDL_INCLUDE_PATH
+#include LV_DRAW_SDL_INCLUDE_PATH
 
 /*********************
  *      DEFINES
