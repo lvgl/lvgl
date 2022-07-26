@@ -108,8 +108,6 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e);
  * GLOBAL VARIABLES
  **********************/
 
-extern lv_event_code_t LV_EVENT_MSG_RECEIVED;
-
 /**********************
  *      MACROS
  **********************/

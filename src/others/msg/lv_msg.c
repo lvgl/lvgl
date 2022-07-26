@@ -43,7 +43,6 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-lv_event_code_t LV_EVENT_MSG_RECEIVED;
 
 /**********************
  *      MACROS
@@ -55,7 +54,6 @@ lv_event_code_t LV_EVENT_MSG_RECEIVED;
 
 void lv_msg_init(void)
 {
-    LV_EVENT_MSG_RECEIVED = lv_event_register_id();
     _lv_ll_init(&LV_GC_ROOT(_subs_ll), sizeof(sub_dsc_t));
 }
 

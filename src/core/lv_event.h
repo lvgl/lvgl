@@ -84,6 +84,13 @@ typedef enum {
     LV_EVENT_LAYOUT_CHANGED,      /**< The children position has changed due to a layout recalculation*/
     LV_EVENT_GET_SELF_SIZE,       /**< Get the internal size of a widget*/
 
+    /** Events of optional LVGL components*/
+#if LV_USE_MSG
+
+    LV_EVENT_MSG_RECEIVED,
+
+#endif // LV_USE_MSG
+
     _LV_EVENT_LAST,               /** Number of default events*/
 
 

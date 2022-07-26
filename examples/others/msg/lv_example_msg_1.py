@@ -31,7 +31,7 @@ slider.add_event_cb(slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
 
 # Create a label below the slider
 label = lv.label(lv.scr_act())
-label.add_event_cb(label_event_cb, lv.EVENT_MSG_RECEIVED.value, None)
+label.add_event_cb(label_event_cb, lv.EVENT.MSG_RECEIVED, None)
 label.set_text("0%")
 label.align(lv.ALIGN.CENTER, 0, 30)
 
