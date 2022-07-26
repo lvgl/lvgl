@@ -3,7 +3,7 @@
 MSG_NEW_TEMPERATURE = const(1)
 
 # Define the object that will be sent as msg payload
-class Temprature:
+class Temperature:
     def __init__(self, value):
         self.value = value
     def __repr__(self):
@@ -13,11 +13,12 @@ def slider_event_cb(e):
     slider = e.get_target()
     v = slider.get_value()
     # Notify all subscribers (only the label now) that the slider value has been changed
-    lv.msg_send(MSG_NEW_TEMPERATURE, Temprature(v))
+    lv.msg_send(MSG_NEW_TEMPERATURE, Temperature(v))
 
 def label_event_cb(e):
     label = e.get_target()
     msg = e.get_msg()
+    # Respond only to MSG_NEW_TEMPERATURE message
     if msg.get_id() == MSG_NEW_TEMPERATURE:
         payload = msg.get_payload()
         temprature = payload.__cast__()
@@ -34,5 +35,5 @@ label.add_event_cb(label_event_cb, lv.EVENT_MSG_RECEIVED.value, None)
 label.set_text("0%")
 label.align(lv.ALIGN.CENTER, 0, 30)
 
-# Subscribe the label to a message. Also use the user_data to set a format string here.
+# Subscribe the label to a message
 lv.msg_subscribe_obj(MSG_NEW_TEMPERATURE, label, None)
