@@ -9,9 +9,9 @@
 #include "lv_msg.h"
 #if LV_USE_MSG
 
-#include "../../../misc/lv_assert.h"
-#include "../../../misc/lv_ll.h"
-#include "../../../misc/lv_gc.h"
+#include "../../misc/lv_assert.h"
+#include "../../misc/lv_ll.h"
+#include "../../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
