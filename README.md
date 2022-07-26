@@ -3,9 +3,14 @@ The last stable version is available in the [release/v8.3](https://github.com/lv
 
 ---
 
-<p align="right"><b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a></p>
+<a href="https://opencollective.com/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
 
-  <br>
+<p align="right">
+  <b>English</b> | <a href="./docs/README_zh.md">中文</a> | <a href="./docs/README_pt_BR.md">Português do Brasil</a> | <a href="./docs/README_jp.md">日本語</a>
+</p>
+
+<br>
+
 <p align="center">
   <img src="https://lvgl.io/assets/images/logo_lvgl.png">
 </p>
@@ -74,6 +79,25 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - Detailed [Documentation](https://docs.lvgl.io/) with [100+ simple examples](https://docs.lvgl.io/master/index.html)
   - [SquareLine Studio](https://squareline.io/) - A professional and easy-to-use UI editor software to speed up and simplify the UI development.
   - [Services](https://lvgl.io/services) such as User interface design, Implementation and Consulting to make UI development simpler and faster.
+
+## :heart: Sponsor
+
+If LVGL saved you a lot of time and money or you just had fun using it, consider [Supporting its Development](https://opencollective.com/lvgl).
+
+**How do we spend the donations?**<br>
+Our goal is to provide financial compensation for people who do the most for LVGL. It means not only the maintainers but anyone who implements a great feature should get a payment from the accumulated money. We use the donations to cover our operational costs like servers and related services.
+
+**How to donate?**<br>
+We use [Open Collective](https://opencollective.com/lvgl) where you can easily send one time or recurring donations. You can also see all of our expenses  in a transparent way. 
+
+**How to get paid for your contribution?**<br>
+If someone implements or fixes an issue labeled as [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) he or she will get a payment for that work. We estimate the required time, complexity and importance of the issue and set a price accordingly. To jump in just comment on a [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) issue saying *"Hi, I'd like to deal with it. This is how I'm planning to fix/implement it...". A work is considered ready when it's approved and merged by a maintainer. After that you can submit and expense at [opencollective.com](https://opencollective.com/lvgl) and you payment will be sent in a few days.
+
+**Organizations supporting LVGL**<br>
+[![Sponsors of LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
+
+**Individuals supporting LVGL**<br>
+[![Backers of LVGL](https://opencollective.com/lvgl/individuals.svg?width=600)](https://opencollective.com/lvgl)
 
 ## :package: Packages
 LVGL is available as:
