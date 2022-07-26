@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj_draw_cache.h"
-#include "../extra/others/snapshot/lv_snapshot.h"
+#include "../others/snapshot/lv_snapshot.h"
 
 /*********************
  *      DEFINES
@@ -25,8 +25,8 @@
 typedef struct _lv_obj_draw_cache_t {
     lv_img_dsc_t img_dsc;
     lv_img_cf_t cf;
-    bool invalidate;
-    bool draw_normal;
+    bool invalid;
+    bool skip_cache;
     bool enable;
 } lv_obj_draw_cache_t;
 
@@ -52,14 +52,14 @@ void lv_obj_draw_cache_set_enable(lv_obj_t * obj, bool en)
     lv_obj_allocate_spec_attr(obj);
 
     if(obj->spec_attr->draw_cache == NULL) {
-        lv_obj_draw_cache_t * draw_cache = lv_mem_alloc(sizeof(lv_obj_draw_cache_t));
+        lv_obj_draw_cache_t * draw_cache = lv_malloc(sizeof(lv_obj_draw_cache_t));
         LV_ASSERT_MALLOC(draw_cache);
 
         if(draw_cache == NULL) {
             return;
         }
 
-        lv_memset_00(draw_cache, sizeof(lv_obj_draw_cache_t));
+        lv_memset(draw_cache, 0, sizeof(lv_obj_draw_cache_t));
         draw_cache->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
         obj->spec_attr->draw_cache = draw_cache;
     }
@@ -114,7 +114,7 @@ void lv_obj_draw_cache_invalidate(lv_obj_t * obj)
         return;
     }
 
-    obj->spec_attr->draw_cache->invalidate = true;
+    obj->spec_attr->draw_cache->invalid = true;
     lv_obj_invalidate(obj);
 }
 
@@ -126,14 +126,14 @@ lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
     lv_obj_draw_cache_t * draw_cache = obj->spec_attr->draw_cache;
 
-    if(draw_cache->draw_normal || !draw_cache->enable) {
+    if(draw_cache->skip_cache || !draw_cache->enable) {
         return LV_RES_INV;
     }
 
     lv_img_dsc_t * img_dsc = &draw_cache->img_dsc;
 
-    if(draw_cache->invalidate) {
-        draw_cache->invalidate = false;
+    if(draw_cache->invalid) {
+        draw_cache->invalid = false;
 
         uint32_t buf_size = lv_snapshot_buf_size_needed(obj, draw_cache->cf);
 
@@ -143,7 +143,7 @@ lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
         }
 
         if(buf_size != img_dsc->data_size) {
-            img_dsc->data = lv_mem_realloc(img_dsc->data, buf_size);
+            img_dsc->data = lv_realloc(img_dsc->data, buf_size);
             img_dsc->data_size = buf_size;
         }
 
@@ -157,7 +157,7 @@ lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                      img_dsc->data,
                      img_dsc->data_size);
 
-        draw_cache->draw_normal = true;
+        draw_cache->skip_cache = true;
 
         lv_res_t res = lv_snapshot_take_to_buf(
                            obj,
@@ -166,7 +166,7 @@ lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                            img_dsc->data,
                            img_dsc->data_size);
 
-        draw_cache->draw_normal = false;
+        draw_cache->skip_cache = false;
 
         if(res != LV_RES_OK) {
             LV_LOG_WARN("snapshot failed");
@@ -202,11 +202,11 @@ void _lv_obj_draw_cache_free(lv_obj_t * obj)
     lv_obj_draw_cache_t * draw_cache = obj->spec_attr->draw_cache;
 
     if(draw_cache->img_dsc.data) {
-        lv_mem_free(draw_cache->img_dsc.data);
+        lv_free(draw_cache->img_dsc.data);
         draw_cache->img_dsc.data = NULL;
     }
 
-    lv_mem_free(draw_cache);
+    lv_free(draw_cache);
 
     obj->spec_attr->draw_cache = NULL;
 }

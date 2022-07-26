@@ -31,10 +31,15 @@ extern "C" {
 /**
  * Enable object draw cache function
  * @param obj   pointer to an object
- * @param en    true to enable, false to disable
+ * @param en    true: enable cache, false: disable cache
  */
 void lv_obj_draw_cache_set_enable(lv_obj_t * obj, bool en);
 
+/**
+ * Set the color format of the cache image
+ * @param obj   pointer to an object
+ * @param cf    color format for generated image
+ */
 void lv_obj_draw_cache_set_img_cf(lv_obj_t * obj, lv_img_cf_t cf);
 
 /**
@@ -44,10 +49,25 @@ void lv_obj_draw_cache_set_img_cf(lv_obj_t * obj, lv_img_cf_t cf);
  */
 bool lv_obj_draw_cache_get_enable(lv_obj_t * obj);
 
+/**
+ * Get the color format of the cache image
+ * @param obj   pointer to an object
+ * @return      color format for generated image
+ */
 lv_img_cf_t lv_obj_draw_cache_get_img_cf(lv_obj_t * obj);
 
+/**
+ * Get the image descriptor of the cache image
+ * @param obj   pointer to an object
+ * @return      image descriptor
+ */
 const lv_img_dsc_t * lv_obj_draw_cache_get_img_dsc(lv_obj_t * obj);
 
+/**
+ * Check if an object is cacheable
+ * @param obj   pointer to an object
+ * @return      true: are cacheable, false: are uncacheable
+ */
 static inline bool lv_obj_has_draw_cache(lv_obj_t * obj)
 {
     return (obj->spec_attr && obj->spec_attr->draw_cache);
