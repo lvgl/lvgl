@@ -243,14 +243,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     else if(lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
     else cf = LV_IMG_CF_TRUE_COLOR;
 
-    if(cf == LV_IMG_CF_ALPHA_8BIT) {
-        if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
-            /* resume normal method */
-            cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-            cdsc->dec_dsc.img_data = NULL;
-        }
-    }
-
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
 
@@ -300,9 +292,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
         int32_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = lv_malloc(lv_area_get_width(&mask_com) *
-                                   LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
-
+        uint8_t  * buf = lv_malloc(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         lv_area_t line;
         lv_area_copy(&line, &mask_com);

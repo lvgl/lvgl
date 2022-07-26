@@ -73,7 +73,7 @@ class LvExampleAnim_3():
 
         self.chart = lv.chart(par)
         self.chart.set_style_pad_all(0, lv.PART.MAIN)
-        self.chart.set_style_size(0, lv.PART.INDICATOR)
+        self.chart.set_style_size(0, 0, lv.PART.INDICATOR)
         self.chart.set_type(lv.chart.TYPE.SCATTER)
         self.ser1 = self.chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)
         self.chart.set_range(lv.chart.AXIS.PRIMARY_Y, 0, 1024)

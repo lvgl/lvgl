@@ -93,7 +93,7 @@ There are some optional display driver data fields:
 - `color_chroma_key` A color which will be drawn as transparent on chrome keyed images. Set to `LV_COLOR_CHROMA_KEY` from `lv_conf.h` by default.
 - `anti_aliasing` use anti-aliasing (edge smoothing). Enabled by default if `LV_COLOR_DEPTH` is set to at least 16 in `lv_conf.h`.
 - `rotated` and `sw_rotate` See the [Rotation](#rotation) section below.
-- `screen_transp` if `1` the screen itself can have transparency as well. `LV_COLOR_SCREEN_TRANSP` must be enabled in `lv_conf.h` and `LV_COLOR_DEPTH` must be 32.
+- `screen_transp` if `1` the screen itself can have transparency as well. `LV_COLOR_DEPTH` must be 32.
 - `user_data` A custom `void` user data for the driver.
 - `full_refresh` always redrawn the whole screen (see above)
 - `direct_mode` draw directly into the frame buffer (see above)
@@ -207,7 +207,7 @@ Display rotation can also be changed at runtime using the `lv_disp_set_rotation(
 Support for software rotation is a new feature, so there may be some glitches/bugs depending on your configuration. If you encounter a problem please open an issue on [GitHub](https://github.com/lvgl/lvgl/issues).
 
 ### Decoupling the display refresh timer
-Normally the dirty (a.k.a invalid) areas are checked and redrawn in every `LV_DISP_DEF_REFR_PERIOD` milliseconds (set in `lv_conf.h`).
+Normally the dirty (a.k.a invalid) areas are checked and redrawn in every `LV_DEF_REFR_PERIOD` milliseconds (set in `lv_hal_disp.h`).
 However, in some cases you might need more control on when the display refreshing happen, for example to synchronize rendering with VSYNC or the TE signal.
 
 You can do this in the following way:
@@ -225,7 +225,7 @@ If you have multiple displays call `lv_disp_set_deafult(disp1);` to select the d
 
 Note that `lv_timer_handler()` and `_lv_disp_refr_timer()` can not run at the same time.
 
-If the performance monitor is enabled, the value of `LV_DISP_DEF_REFR_PERIOD` needs to be set to be consistent with the refresh period of the display to ensure that the statistical results are correct.
+If the performance monitor is enabled, the value of `LV_DEF_REFR_PERIOD` needs to be set to be consistent with the refresh period of the display to ensure that the statistical results are correct.
 
 ## Further reading
 

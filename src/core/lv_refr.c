@@ -18,10 +18,10 @@
 #include "../misc/lv_gc.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
-#include "../extra/others/snapshot/lv_snapshot.h"
+#include "../others/snapshot/lv_snapshot.h"
 
 #if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
-    #include "../widgets/lv_label.h"
+    #include "../widgets/label/lv_label.h"
 #endif
 
 /*********************
@@ -326,6 +326,11 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
+    if(disp_refr->driver->direct_mode && disp_refr->driver->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
+        LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
+        return;
+    }
+
     lv_refr_join_area();
 
     refr_invalid_areas();
@@ -391,7 +396,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
             fps_limit = 1000 / disp_refr->refr_timer->period;
         }
         else {
-            fps_limit = 1000 / LV_DISP_DEF_REFR_PERIOD;
+            fps_limit = 1000 / 33;
         }
 
         if(perf_monitor.elaps_sum == 0) {
@@ -416,7 +421,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 #endif
 
-#if LV_USE_MEM_MONITOR && LV_MEM_CUSTOM == 0 && LV_USE_LABEL
+#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC && LV_USE_LABEL
     lv_obj_t * mem_label = mem_monitor.mem_label;
     if(mem_label == NULL) {
         mem_label = lv_label_create(lv_layer_sys());
@@ -1247,6 +1252,8 @@ static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_
         .x2 = area->x2 + drv->offset_x,
         .y2 = area->y2 + drv->offset_y
     };
+
+    if(drv->draw_ctx->buffer_convert) drv->draw_ctx->buffer_convert(drv->draw_ctx);
 
     drv->flush_cb(drv, &offset_area, color_p);
 }

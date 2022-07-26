@@ -17,11 +17,6 @@
  *      DEFINES
  *********************/
 
-#if LV_COLOR_16_SWAP
-    // TODO: F7 has red blue swap bit in control register for all layers and output
-    #error "Can't use DMA2D with LV_COLOR_16_SWAP 1"
-#endif
-
 #if LV_COLOR_DEPTH == 8
     #error "Can't use DMA2D with LV_COLOR_DEPTH == 8"
 #endif

@@ -228,10 +228,11 @@ static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj, lv_coord_t v
     lv_obj_set_style_pad_column(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t width, lv_coord_t height,
+                                         lv_style_selector_t selector)
 {
-    lv_obj_set_style_width(obj, value, selector);
-    lv_obj_set_style_height(obj, value, selector);
+    lv_obj_set_style_width(obj, width, selector);
+    lv_obj_set_style_height(obj, height, selector);
 }
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);

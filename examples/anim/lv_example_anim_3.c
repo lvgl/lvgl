@@ -153,7 +153,7 @@ static void page_obj_init(lv_obj_t * par)
 
     ginfo.chart = lv_chart_create(par);
     lv_obj_set_style_pad_all(ginfo.chart, 0, LV_PART_MAIN);
-    lv_obj_set_style_size(ginfo.chart, 0, LV_PART_INDICATOR);
+    lv_obj_set_style_size(ginfo.chart, 0, 0, LV_PART_INDICATOR);
     lv_chart_set_type(ginfo.chart, LV_CHART_TYPE_SCATTER);
     ginfo.ser1 = lv_chart_add_series(ginfo.chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     lv_chart_set_range(ginfo.chart, LV_CHART_AXIS_PRIMARY_Y, 0, 1024);

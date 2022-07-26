@@ -136,6 +136,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                                           LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 
+        if(cf == LV_IMG_CF_ALPHA_8BIT) {
+            lv_color_fill(rgb_buf, draw_dsc->recolor, buf_size);
+        }
+
         while(blend_area.y1 <= y_last) {
             /*Apply transformations if any or separate the channels*/
             lv_area_t transform_area;

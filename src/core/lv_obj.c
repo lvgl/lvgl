@@ -21,11 +21,20 @@
 #include "../misc/lv_gc.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
+#include "../libs/bmp/lv_bmp.h"
+#include "../libs/ffmpeg/lv_ffmpeg.h"
+#include "../libs/freetype/lv_freetype.h"
+#include "../libs/fsdrv/lv_fsdrv.h"
+#include "../libs/gif/lv_gif.h"
+#include "../libs/png/lv_png.h"
+#include "../libs/sjpg/lv_sjpg.h"
+#include "../layouts/flex/lv_flex.h"
+#include "../layouts/grid/lv_grid.h"
+
 #if LV_USE_BUILTIN_MALLOC
-    #include "../misc/lv_mem_builtin.h"
+    #include "../misc/lv_malloc_builtin.h"
 #endif
 #include "../hal/lv_hal.h"
-#include "../extra/lv_extra.h"
 #include <stdint.h>
 #include <string.h>
 
@@ -180,14 +189,66 @@ void lv_init(void)
     LV_LOG_WARN("Log level is set to 'Trace' which makes LVGL much slower");
 #endif
 
-    lv_extra_init();
+
+#if LV_USE_FLEX
+    lv_flex_init();
+#endif
+
+#if LV_USE_GRID
+    lv_grid_init();
+#endif
+
+#if LV_USE_MSG
+    lv_msg_init();
+#endif
+
+#if LV_USE_FS_FATFS != '\0'
+    lv_fs_fatfs_init();
+#endif
+
+#if LV_USE_FS_STDIO != '\0'
+    lv_fs_stdio_init();
+#endif
+
+#if LV_USE_FS_POSIX != '\0'
+    lv_fs_posix_init();
+#endif
+
+#if LV_USE_FS_WIN32 != '\0'
+    lv_fs_win32_init();
+#endif
+
+#if LV_USE_FFMPEG
+    lv_ffmpeg_init();
+#endif
+
+#if LV_USE_PNG
+    lv_png_init();
+#endif
+
+#if LV_USE_SJPG
+    lv_split_jpeg_init();
+#endif
+
+#if LV_USE_BMP
+    lv_bmp_init();
+#endif
+
+#if LV_USE_FREETYPE
+    /*Init freetype library*/
+#  if LV_FREETYPE_CACHE_SIZE >= 0
+    lv_freetype_init(LV_FREETYPE_CACHE_FT_FACES, LV_FREETYPE_CACHE_FT_SIZES, LV_FREETYPE_CACHE_SIZE);
+#  else
+    lv_freetype_init(0, 0, 0);
+#  endif
+#endif
 
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
 }
 
-#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+#if LV_ENABLE_GC || LV_USE_BUILTIN_MALLOC
 
 void lv_deinit(void)
 {
@@ -877,11 +938,19 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_state_t prev_state = obj->state;
-    obj->state = new_state;
 
     _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
     /*If there is no difference in styles there is nothing else to do*/
-    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
+    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) {
+        obj->state = new_state;
+        return;
+    }
+
+    /*Invalidate the object in their current state*/
+    lv_obj_invalidate(obj);
+
+    obj->state = new_state;
+
 
     _lv_obj_style_transition_dsc_t * ts = lv_malloc(sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);
     lv_memzero(ts, sizeof(_lv_obj_style_transition_dsc_t) * STYLE_TRANSITION_MAX);

@@ -84,7 +84,7 @@ static inline void lv_memzero(void * dst, size_t len)
     lv_memset(dst, 0x00, len);
 }
 
-size_t lv_strlenn(const char * str);
+size_t lv_strlen(const char * str);
 
 size_t lv_strncpy(char * dst, size_t dest_size, const char * src);
 

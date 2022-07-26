@@ -10,7 +10,7 @@
 
 #if LV_USE_DEMO_WIDGETS
 
-#if LV_MEM_CUSTOM == 0 && LV_MEM_SIZE < (38ul * 1024ul)
+#if LV_USE_BUILTIN_MALLOC && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
 #endif
 
@@ -705,7 +705,7 @@ static void analytics_create(lv_obj_t * parent)
 
     /*Add a special circle to the needle's pivot*/
     lv_obj_set_style_pad_hor(meter3, 10, 0);
-    lv_obj_set_style_size(meter3, 10, LV_PART_INDICATOR);
+    lv_obj_set_style_size(meter3, 10, 10, LV_PART_INDICATOR);
     lv_obj_set_style_radius(meter3, LV_RADIUS_CIRCLE, LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(meter3, LV_OPA_COVER, LV_PART_INDICATOR);
     lv_obj_set_style_bg_color(meter3, lv_palette_darken(LV_PALETTE_GREY, 4), LV_PART_INDICATOR);

@@ -104,6 +104,8 @@ typedef struct _lv_disp_drv_t {
 
     uint32_t dpi : 10;              /** DPI (dot per inch) of the display. Default value is `LV_DPI_DEF`.*/
 
+    lv_color_format_t   color_format;
+
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished*/
     void (*flush_cb)(struct _lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
@@ -112,14 +114,8 @@ typedef struct _lv_disp_drv_t {
      * E.g. round `y` to, 8, 16 ..) on a monochrome display*/
     void (*rounder_cb)(struct _lv_disp_drv_t * disp_drv, lv_area_t * area);
 
-    /** OPTIONAL: Set a pixel in a buffer according to the special requirements of the display
-     * Can be used for color format not supported in LittelvGL. E.g. 2 bit -> 4 gray scales
-     * @note Much slower then drawing with supported color formats.*/
-    void (*set_px_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa);
 
     void (*clear_cb)(struct _lv_disp_drv_t * disp_drv, uint8_t * buf, uint32_t size);
-
 
     /** OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
      * number of flushed pixels*/
@@ -360,8 +356,6 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp);
  * @return pointer to the internal buffers
  */
 lv_disp_draw_buf_t * lv_disp_get_draw_buf(lv_disp_t * disp);
-
-void lv_disp_drv_use_generic_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
 /**********************
  *      MACROS

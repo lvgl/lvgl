@@ -13,7 +13,11 @@
 #include "lv_log.h"
 #include LV_STDLIB_INCLUDE
 #if LV_USE_BUILTIN_MALLOC
-    #include "lv_mem_builtin.h"
+    #include "lv_malloc_builtin.h"
+#endif
+
+#if LV_USE_BUILTIN_MEMCPY
+    #include "lv_memcpy_builtin.h"
 #endif
 
 /*********************
@@ -135,7 +139,7 @@ void * lv_memcpy(void * dst, const void * src, size_t len)
 
 void lv_memset(void * dst, uint8_t v, size_t len)
 {
-    return LV_MEMSET(dst, v, len);
+    LV_MEMSET(dst, v, len);
 }
 
 size_t lv_strlen(const char * str)

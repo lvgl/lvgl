@@ -52,7 +52,7 @@ typedef struct _lv_draw_layer_ctx_t {
         const lv_area_t * clip_area;
         lv_area_t * buf_area;
         void * buf;
-        bool screen_transp;
+        bool render_with_alpha;
     } original;
 } lv_draw_layer_ctx_t;
 
@@ -72,6 +72,17 @@ typedef struct _lv_draw_ctx_t  {
      */
     const lv_area_t * clip_area;
 
+    /**
+     * If true and Alpha byte will be appended to the colors.
+     * It might make rendering slower.
+     */
+    bool render_with_alpha;
+
+    /**
+     * The rendered image in draw_ctx->buf will be converted to this format
+     * using draw_ctx->buffer_convert.
+     */
+    lv_color_format_t color_format;
 
     void (*draw_rect)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
@@ -140,6 +151,12 @@ typedef struct _lv_draw_ctx_t  {
     void (*buffer_copy)(struct _lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
                         const lv_area_t * dest_area,
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
+
+    /**
+     * Convert the content of `draw_ctx->buf` to `draw_ctx->output_color_format`
+     * @param draw_ctx
+     */
+    void (*buffer_convert)(struct _lv_draw_ctx_t * draw_ctx);
 
     /**
      * Initialize a new layer context.
