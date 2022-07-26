@@ -402,14 +402,14 @@ def style_set_c(p):
   print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
   print("}")
   print("")
-  print("const lv_style_prop_t lv_style_const_prop_id_" + p['name'] + " = LV_STYLE_" + p['name'] + ";")
+  print("const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + " = LV_STYLE_" + p['name'] + ";")
 
 
 def style_set_h(p):
   if 'section' in p: return
 
   print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
-  print("extern const lv_style_prop_t lv_style_const_prop_id_" + p['name'] + ";")
+  print("extern const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + ";")
 
 
 def local_style_set_c(p):
@@ -438,7 +438,7 @@ def style_const_set(p):
   print("")
   print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
   print("    { \\")
-  print("        .prop_ptr = &lv_style_const_prop_id_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
+  print("        .prop_ptr = &_lv_style_const_prop_id_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
   print("    }")
 
 
