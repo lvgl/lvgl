@@ -43,13 +43,6 @@ void lv_obj_draw_cache_set_enable(lv_obj_t * obj, bool en);
 void lv_obj_draw_cache_set_img_cf(lv_obj_t * obj, lv_img_cf_t cf);
 
 /**
- * Get object draw cache enable
- * @param obj   pointer to an object
- * @return      return true if enabled
- */
-bool lv_obj_draw_cache_get_enable(lv_obj_t * obj);
-
-/**
  * Get the color format of the cache image
  * @param obj   pointer to an object
  * @return      color format for generated image

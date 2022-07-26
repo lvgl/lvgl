@@ -27,7 +27,6 @@ typedef struct _lv_obj_draw_cache_t {
     lv_img_cf_t cf;
     bool invalid;
     bool skip_cache;
-    bool enable;
 } lv_obj_draw_cache_t;
 
 /**********************
@@ -49,22 +48,28 @@ typedef struct _lv_obj_draw_cache_t {
 void lv_obj_draw_cache_set_enable(lv_obj_t * obj, bool en)
 {
     LV_ASSERT_NULL(obj);
-    lv_obj_allocate_spec_attr(obj);
 
-    if(obj->spec_attr->draw_cache == NULL) {
-        lv_obj_draw_cache_t * draw_cache = lv_malloc(sizeof(lv_obj_draw_cache_t));
-        LV_ASSERT_MALLOC(draw_cache);
+    if(en) {
+        lv_obj_allocate_spec_attr(obj);
 
-        if(draw_cache == NULL) {
-            return;
+        if(obj->spec_attr->draw_cache == NULL) {
+            lv_obj_draw_cache_t * draw_cache = lv_malloc(sizeof(lv_obj_draw_cache_t));
+            LV_ASSERT_MALLOC(draw_cache);
+
+            if(draw_cache == NULL) {
+                return;
+            }
+
+            lv_memset(draw_cache, 0, sizeof(lv_obj_draw_cache_t));
+            draw_cache->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+            obj->spec_attr->draw_cache = draw_cache;
         }
-
-        lv_memset(draw_cache, 0, sizeof(lv_obj_draw_cache_t));
-        draw_cache->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-        obj->spec_attr->draw_cache = draw_cache;
+    }
+    else {
+        _lv_obj_draw_cache_free(obj);
     }
 
-    obj->spec_attr->draw_cache->enable = en;
+    lv_obj_invalidate(obj);
 }
 
 void lv_obj_draw_cache_set_img_cf(lv_obj_t * obj, lv_img_cf_t cf)
@@ -75,16 +80,6 @@ void lv_obj_draw_cache_set_img_cf(lv_obj_t * obj, lv_img_cf_t cf)
     }
 
     obj->spec_attr->draw_cache->cf = cf;
-}
-
-bool lv_obj_draw_cache_get_enable(lv_obj_t * obj)
-{
-    LV_ASSERT_NULL(obj);
-    if(!lv_obj_has_draw_cache(obj)) {
-        return false;
-    }
-
-    return obj->spec_attr->draw_cache->enable;
 }
 
 lv_img_cf_t lv_obj_draw_cache_get_img_cf(lv_obj_t * obj)
@@ -126,7 +121,7 @@ lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
     lv_obj_draw_cache_t * draw_cache = obj->spec_attr->draw_cache;
 
-    if(draw_cache->skip_cache || !draw_cache->enable) {
+    if(draw_cache->skip_cache) {
         return LV_RES_INV;
     }
 

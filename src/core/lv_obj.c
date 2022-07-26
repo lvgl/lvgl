@@ -908,7 +908,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
 #if LV_USE_OBJ_DRAW_CACHE
-        if(lv_obj_draw_cache_get_enable(obj)) {
+        if(lv_obj_has_draw_cache(obj)) {
             lv_obj_draw_cache_invalidate(obj);
         }
 #endif
