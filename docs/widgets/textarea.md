@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Text Area is a [Base object](widgets/obj) with a [Label](/widgets/core/label) and a cursor on it.
+The Text Area is a [Base object](widgets/obj) with a [Label](/widgets/label) and a cursor on it.
 Texts or characters can be added to it.
 Long lines are wrapped and when the text becomes long enough the Text area can be scrolled.
 
@@ -11,7 +11,7 @@ One line mode and password modes are supported.
 ## Parts and Styles
 - `LV_PART_MAIN` The background of the text area. Uses all the typical background style properties and the text related style properties including `text_align` to align the text to the left, right or center.
 - `LV_PART_SCROLLBAR` The scrollbar that is shown when the text is too long.
-- `LV_PART_SELECTED` Determines the style of the [selected text](/widgets/core/label.html#text-selection). Only `text_color` and `bg_color` style properties can be used. `bg_color` should be set directly on the label of the text area.
+- `LV_PART_SELECTED` Determines the style of the [selected text](/widgets/label.html#text-selection). Only `text_color` and `bg_color` style properties can be used. `bg_color` should be set directly on the label of the text area.
 - `LV_PART_CURSOR` Marks the position where the characters are inserted. The cursor's area is always the bounding box of the current character.
 A block cursor can be created by adding a background color and background opacity to `LV_PART_CURSOR`'s style. The create line cursor leave the cursor transparent and set a left border.
 The `anim_time` style property sets the cursor's blink time.

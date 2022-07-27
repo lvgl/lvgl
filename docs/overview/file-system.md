@@ -110,7 +110,7 @@ lv_fs_dir_close(&dir);
 
 ## Use drives for images
 
-[Image](/widgets/core/img) objects can be opened from files too (besides variables stored in the compiled program).
+[Image](/widgets/img) objects can be opened from files too (besides variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:
 - open

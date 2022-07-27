@@ -4,7 +4,7 @@
 The Spinner object is a spinning arc over a ring.
 
 ## Parts and Styles
-The parts are identical to the parts of [lv_arc](/widgets/core/arc).
+The parts are identical to the parts of [lv_arc](/widgets/arc).
 
 ## Usage
 
@@ -15,7 +15,7 @@ To create a spinner use `lv_spinner_create(parent, spin_time, arc_length)`. `spi
 ## Events
 No special events are sent to the Spinner.
 
-See the events of the [Arc](/widgets/core/arc) too.
+See the events of the [Arc](/widgets/arc) too.
 
 Learn more about [Events](/overview/event).
 

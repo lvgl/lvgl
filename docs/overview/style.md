@@ -117,7 +117,7 @@ The following predefined parts exist in LVGL:
 - `LV_PART_CUSTOM_FIRST` Custom part identifiers can be added starting from here.
 
 
-For example a [Slider](/widgets/core/slider) has three parts:
+For example a [Slider](/widgets/slider) has three parts:
 - Background
 - Indicator
 - Knob

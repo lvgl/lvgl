@@ -2,10 +2,10 @@
 
 ## Overview
 The Spinbox contains a number as text which can be increased or decreased by *Keys* or API functions.
-Under the hood the Spinbox is a modified [Text area](/widgets/core/textarea).
+Under the hood the Spinbox is a modified [Text area](/widgets/textarea).
 
 ## Parts and Styles
-The parts of the Spinbox are identical to the [Text area](/widgets/core/textarea).
+The parts of the Spinbox are identical to the [Text area](/widgets/textarea).
 
 ### Value, range and step
 `lv_spinbox_set_value(spinbox, 1234)` sets a new value on the Spinbox.
@@ -31,7 +31,7 @@ If an encoder is used as input device, the selected digit is shifted to the righ
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when the value has changed.
 
-See the events of the [Text area](/widgets/core/textarea) too.
+See the events of the [Text area](/widgets/textarea) too.
 
 Learn more about [Events](/overview/event).
 

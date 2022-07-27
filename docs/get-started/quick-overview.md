@@ -152,7 +152,7 @@ To learn all features of the events go to the [Event overview](/overview/event) 
 
 ### Parts
 Widgets might be built from one or more *parts*. For example, a button has only one part called `LV_PART_MAIN`.
-However, a [Slider](/widgets/core/slider) has `LV_PART_MAIN`, `LV_PART_INDICATOR` and `LV_PART_KNOB`.
+However, a [Slider](/widgets/slider) has `LV_PART_MAIN`, `LV_PART_INDICATOR` and `LV_PART_KNOB`.
 
 By using parts you can apply different styles to sub-elements of a widget. (See below)
 

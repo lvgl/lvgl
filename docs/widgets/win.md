@@ -8,8 +8,8 @@ The Window is container-like object built from a header with title and buttons a
 The Window is built from other widgets so you can check their documentation for details:
 - Background: [lv_obj](/widgets/obj)
 - Header on the background: [lv_obj](/widgets/obj)
-- Title on the header: [lv_label](/widgets/core/label)
-- Buttons on the header: [lv_btn](/widgets/core/btn)
+- Title on the header: [lv_label](/widgets/label)
+- Buttons on the header: [lv_btn](/widgets/btn)
 - Content area on the background: [lv_obj](/widgets/obj)
 
 

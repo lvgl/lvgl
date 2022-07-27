@@ -13,7 +13,7 @@ The Calendar is added to the default group (if it is set). Calendar is an editab
 To make the Calendar flexible, by default it doesn't show the current year or month. Instead, there are optional "headers" that can be attached to the calendar.
 
 ## Parts and Styles
-The calendar object uses the [Button matrix](/widgets/core/btnmatrix) object under the hood to arrange the days into a matrix.
+The calendar object uses the [Button matrix](/widgets/btnmatrix) object under the hood to arrange the days into a matrix.
 - `LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.
 - `LV_PART_ITEMS` Refers to the dates and day names. Button matrix control flags are set to differentiate the buttons and a custom drawer event is added modify the properties of the buttons as follows:
    - day names have no border, no background and drawn with a gray color

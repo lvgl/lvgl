@@ -10,7 +10,7 @@ The List is basically a rectangle with vertical layout to which Buttons and Text
 - `LV_PART_SCROLLBAR` The scrollbar. See the [Base objects](/widgets/obj) documentation for details.
 
 **Buttons and Texts**
-See the [Button](/widgets/core/btn)'s and [Label](/widgets/core/label)'s documentation.
+See the [Button](/widgets/btn)'s and [Label](/widgets/label)'s documentation.
 
 ## Usage
 

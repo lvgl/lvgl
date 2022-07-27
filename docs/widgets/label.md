@@ -48,7 +48,7 @@ This feature can be enabled individually for each label by `lv_label_set_recolor
 
 ### Text selection
 If enabled by `LV_LABEL_TEXT_SELECTION` part of the text can be selected. It's similar to when you use your mouse on a PC to select a text.
-The whole mechanism (click and select the text as you drag your finger/mouse) is implemented in [Text area](/widgets/core/textarea) and the Label widget only allows manual text selection with
+The whole mechanism (click and select the text as you drag your finger/mouse) is implemented in [Text area](/widgets/textarea) and the Label widget only allows manual text selection with
 `lv_label_get_text_selection_start(label, start_char_index)` and `lv_label_get_text_selection_start(label, end_char_index)`.
 
 ### Very long texts
