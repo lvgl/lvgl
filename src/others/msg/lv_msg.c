@@ -11,6 +11,7 @@
 
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_ll.h"
+#include "../../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -32,18 +33,16 @@ typedef struct {
  **********************/
 
 static void notify(lv_msg_t * m);
-static void obj_notify_cb(void * s, lv_msg_t * m);
+static void obj_notify_cb(lv_msg_t * m);
 static void obj_delete_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_ll_t subs_ll;
 
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-lv_event_code_t LV_EVENT_MSG_RECEIVED;
 
 /**********************
  *      MACROS
@@ -55,13 +54,12 @@ lv_event_code_t LV_EVENT_MSG_RECEIVED;
 
 void lv_msg_init(void)
 {
-    LV_EVENT_MSG_RECEIVED = lv_event_register_id();
-    _lv_ll_init(&subs_ll, sizeof(sub_dsc_t));
+    _lv_ll_init(&LV_GC_ROOT(_subs_ll), sizeof(sub_dsc_t));
 }
 
-void * lv_msg_subsribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
+void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
 {
-    sub_dsc_t * s = _lv_ll_ins_tail(&subs_ll);
+    sub_dsc_t * s = _lv_ll_ins_tail(&LV_GC_ROOT(_subs_ll));
     LV_ASSERT_MALLOC(s);
     if(s == NULL) return NULL;
 
@@ -73,9 +71,9 @@ void * lv_msg_subsribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_da
     return s;
 }
 
-void * lv_msg_subsribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data)
+void * lv_msg_subscribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data)
 {
-    sub_dsc_t * s = lv_msg_subsribe(msg_id, obj_notify_cb, user_data);
+    sub_dsc_t * s = lv_msg_subscribe(msg_id, obj_notify_cb, user_data);
     if(s == NULL) return NULL;
     s->_priv_data = obj;
 
@@ -90,7 +88,7 @@ void * lv_msg_subsribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data)
 void lv_msg_unsubscribe(void * s)
 {
     LV_ASSERT_NULL(s);
-    _lv_ll_remove(&subs_ll, s);
+    _lv_ll_remove(&LV_GC_ROOT(_subs_ll), s);
     lv_free(s);
 }
 
@@ -138,18 +136,17 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e)
 static void notify(lv_msg_t * m)
 {
     sub_dsc_t * s;
-    _LV_LL_READ(&subs_ll, s) {
+    _LV_LL_READ(&LV_GC_ROOT(_subs_ll), s) {
         if(s->msg_id == m->id && s->callback) {
             m->user_data = s->user_data;
             m->_priv_data = s->_priv_data;
-            s->callback(s, m);
+            s->callback(m);
         }
     }
 }
 
-static void obj_notify_cb(void * s, lv_msg_t * m)
+static void obj_notify_cb(lv_msg_t * m)
 {
-    LV_UNUSED(s);
     lv_event_send(m->_priv_data, LV_EVENT_MSG_RECEIVED, m);
 }
 
@@ -157,11 +154,11 @@ static void obj_delete_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
 
-    sub_dsc_t * s = _lv_ll_get_head(&subs_ll);
+    sub_dsc_t * s = _lv_ll_get_head(&LV_GC_ROOT(_subs_ll));
     sub_dsc_t * s_next;
     while(s) {
         /*On unsubscribe the list changes s becomes invalid so get next item while it's surely valid*/
-        s_next = _lv_ll_get_next(&subs_ll, s);
+        s_next = _lv_ll_get_next(&LV_GC_ROOT(_subs_ll), s);
         if(s->_priv_data == obj) {
             lv_msg_unsubscribe(s);
         }

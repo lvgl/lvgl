@@ -8,8 +8,7 @@
 #define MSG_UPDATE          4
 #define MSG_UPDATE_REQUEST  5
 
-static void value_handler(void * s, lv_msg_t * m);
-static void value_handler(void * s, lv_msg_t * m);
+static void value_handler(lv_msg_t * m);
 static void btn_event_cb(lv_event_t * e);
 static void label_event_cb(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
@@ -23,11 +22,11 @@ static void slider_event_cb(lv_event_t * e);
 void lv_example_msg_3(void)
 {
 
-    lv_msg_subsribe(MSG_INC, value_handler, NULL);
-    lv_msg_subsribe(MSG_DEC, value_handler, NULL);
-    lv_msg_subsribe(MSG_SET, value_handler, NULL);
-    lv_msg_subsribe(MSG_UPDATE, value_handler, NULL);
-    lv_msg_subsribe(MSG_UPDATE_REQUEST, value_handler, NULL);
+    lv_msg_subscribe(MSG_INC, value_handler, NULL);
+    lv_msg_subscribe(MSG_DEC, value_handler, NULL);
+    lv_msg_subscribe(MSG_SET, value_handler, NULL);
+    lv_msg_subscribe(MSG_UPDATE, value_handler, NULL);
+    lv_msg_subscribe(MSG_UPDATE_REQUEST, value_handler, NULL);
 
     lv_obj_t * panel = lv_obj_create(lv_scr_act());
     lv_obj_set_size(panel, 250, LV_SIZE_CONTENT);
@@ -51,7 +50,7 @@ void lv_example_msg_3(void)
     lv_obj_set_flex_grow(label, 2);
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(label, "?");
-    lv_msg_subsribe_obj(MSG_UPDATE, label, NULL);
+    lv_msg_subscribe_obj(MSG_UPDATE, label, NULL);
     lv_obj_add_event_cb(label, label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
 
     /*Down button*/
@@ -67,7 +66,7 @@ void lv_example_msg_3(void)
     lv_obj_set_flex_grow(slider, 1);
     lv_obj_add_flag(slider, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
     lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_ALL, NULL);
-    lv_msg_subsribe_obj(MSG_UPDATE, slider, NULL);
+    lv_msg_subscribe_obj(MSG_UPDATE, slider, NULL);
 
 
     /* As there are new UI elements that don't know the system's state
@@ -76,10 +75,8 @@ void lv_example_msg_3(void)
 }
 
 
-static void value_handler(void * s, lv_msg_t * m)
+static void value_handler(lv_msg_t * m)
 {
-    LV_UNUSED(s);
-
     static int32_t value = 10;
     int32_t old_value = value;
     switch(lv_msg_get_id(m)) {
