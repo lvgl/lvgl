@@ -73,6 +73,12 @@ static inline bool lv_obj_has_draw_cache(lv_obj_t * obj)
 void lv_obj_draw_cache_invalidate(lv_obj_t * obj);
 
 /**
+ * Cancel object draw cache invalidation
+ * @param obj    pointer to an object
+ */
+void lv_obj_draw_cache_invalidate_cancel(lv_obj_t * obj);
+
+/**
  * Cache mode drawing processing
  * @param obj      pointer to an object
  * @param draw_ctx pointer to an initialized draw context

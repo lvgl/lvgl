@@ -906,13 +906,6 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_t * child = obj->spec_attr->children[i];
             lv_obj_mark_layout_as_dirty(child);
         }
-
-#if LV_USE_OBJ_DRAW_CACHE
-        if(lv_obj_has_draw_cache(obj)) {
-            lv_obj_draw_cache_invalidate(obj);
-        }
-#endif
-
     }
     else if(code == LV_EVENT_CHILD_CHANGED) {
         lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_MAIN);

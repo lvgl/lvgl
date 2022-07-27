@@ -1,4 +1,5 @@
 #include "lv_obj.h"
+#include "lv_obj_draw_cache.h"
 
 void lv_obj_set_style_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
 {
@@ -54,6 +55,9 @@ void lv_obj_set_style_x(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selec
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_X, v, selector);
+#if LV_USE_OBJ_DRAW_CACHE
+    lv_obj_draw_cache_invalidate_cancel(obj);
+#endif
 }
 
 void lv_obj_set_style_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
@@ -62,6 +66,9 @@ void lv_obj_set_style_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selec
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_Y, v, selector);
+#if LV_USE_OBJ_DRAW_CACHE
+    lv_obj_draw_cache_invalidate_cancel(obj);
+#endif
 }
 
 void lv_obj_set_style_align(struct _lv_obj_t * obj, lv_align_t value, lv_style_selector_t selector)

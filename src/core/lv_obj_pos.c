@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "lv_obj_draw_cache.h"
 #include "lv_disp.h"
 #include "lv_refr.h"
 #include "../misc/lv_gc.h"
@@ -862,7 +863,9 @@ void lv_obj_invalidate(const lv_obj_t * obj)
     obj_coords.y2 += ext_size;
 
     lv_obj_invalidate_area(obj, &obj_coords);
-
+#if LV_USE_OBJ_DRAW_CACHE
+    lv_obj_draw_cache_invalidate(obj);
+#endif
 }
 
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)

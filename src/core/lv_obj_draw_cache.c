@@ -110,7 +110,16 @@ void lv_obj_draw_cache_invalidate(lv_obj_t * obj)
     }
 
     obj->spec_attr->draw_cache->invalid = true;
-    lv_obj_invalidate(obj);
+}
+
+void lv_obj_draw_cache_invalidate_cancel(lv_obj_t * obj)
+{
+    LV_ASSERT_NULL(obj);
+    if(!lv_obj_has_draw_cache(obj)) {
+        return;
+    }
+
+    obj->spec_attr->draw_cache->invalid = false;
 }
 
 lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
@@ -182,7 +191,11 @@ lv_res_t _lv_obj_draw_cache(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     lv_draw_img_dsc_init(&draw_img_dsc);
     lv_draw_img(draw_ctx, &draw_img_dsc, &coords, img_dsc);
 
-    LV_LOG_TRACE("obj(%p) draw cache", obj);
+    LV_LOG_TRACE("obj(%p) draw cached img(%d x %d, cf = %d)",
+                 obj,
+                 lv_area_get_width(&coords),
+                 lv_area_get_height(&coords),
+                 draw_cache->cf);
 
     return LV_RES_OK;
 }
