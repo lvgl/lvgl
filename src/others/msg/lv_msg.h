@@ -31,9 +31,8 @@ typedef struct {
     const void * payload;   /*Pointer to the data of the message*/
 } lv_msg_t;
 
-typedef void (*lv_msg_subscribe_cb_t)(void * s, lv_msg_t * msg);
 
-typedef void (*lv_msg_request_cb_t)(void * r, uint32_t msg_id);
+typedef void (*lv_msg_subscribe_cb_t)(lv_msg_t * msg);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -51,7 +50,7 @@ void lv_msg_init(void);
  * @param user_data     arbitrary data which will be available in `cb` too
  * @return              pointer to a "subscribe object". It can be used the unsubscribe.
  */
-void * lv_msg_subsribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data);
+void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data);
 
 /**
  * Subscribe an `lv_obj` to a message.
@@ -61,12 +60,12 @@ void * lv_msg_subsribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_da
  * @param user_data     arbitrary data which will be available in `cb` too
  * @return              pointer to a "subscribe object". It can be used the unsubscribe.
  */
-void * lv_msg_subsribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data);
+void * lv_msg_subscribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data);
 
 /**
  * Cancel a previous subscription
  * @param s             pointer to a "subscibe object".
- *                      Return value of `lv_msg_subsribe` or `lv_msg_subsribe_obj`
+ *                      Return value of `lv_msg_subscribe` or `lv_msg_subscribe_obj`
  */
 void lv_msg_unsubscribe(void * s);
 
@@ -108,8 +107,6 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e);
 /**********************
  * GLOBAL VARIABLES
  **********************/
-
-extern lv_event_code_t LV_EVENT_MSG_RECEIVED;
 
 /**********************
  *      MACROS
