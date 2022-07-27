@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Slider object looks like a [Bar](/widgets/core/bar) supplemented with a knob. The knob can be dragged to set a value. Just like Bar, Slider can be vertical or horizontal.
+The Slider object looks like a [Bar](/widgets/bar) supplemented with a knob. The knob can be dragged to set a value. Just like Bar, Slider can be vertical or horizontal.
 
 
 ## Parts and Styles
@@ -46,7 +46,7 @@ The extended click area (set by `lv_obj_set_ext_click_area(slider, value)`) incr
         - `rect_dsc`
         - `id`: 1
 
-See the events of the [Bar](/widgets/core/bar) too.
+See the events of the [Bar](/widgets/bar) too.
 
 Learn more about [Events](/overview/event).
 

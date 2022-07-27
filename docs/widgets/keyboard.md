@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Keyboard object is a special [Button matrix](/widgets/core/btnmatrix) with predefined keymaps and other features to realize a virtual keyboard to write texts into a [Text area](/widgets/core/textarea).
+The Keyboard object is a special [Button matrix](/widgets/btnmatrix) with predefined keymaps and other features to realize a virtual keyboard to write texts into a [Text area](/widgets/textarea).
 
 ## Parts and Styles
 Similarly to Button matrices Keyboards consist of 2 part:
@@ -26,7 +26,7 @@ The `TEXT` modes' layout contains buttons to change mode.
 To set the mode manually, use `lv_keyboard_set_mode(kb, mode)`. The default mode is  `LV_KEYBOARD_MODE_TEXT_UPPER`.
 
 ### Assign Text area
-You can assign a [Text area](/widgets/core/textarea) to the Keyboard to automatically put the clicked characters there.
+You can assign a [Text area](/widgets/textarea) to the Keyboard to automatically put the clicked characters there.
 To assign the text area, use `lv_keyboard_set_textarea(kb, ta)`.
 
 ### Key Popovers
@@ -37,7 +37,7 @@ Note that popovers for keys in the top row will draw outside the widget boundari
 The popovers currently are merely a visual effect and don't allow selecting additional characters such as accents yet.
 
 ### New Keymap
-You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_..., kb_map, kb_ctrl);`. See the [Button matrix](/widgets/core/btnmatrix) for more information about creating new maps a ctrls.
+You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_..., kb_map, kb_ctrl);`. See the [Button matrix](/widgets/btnmatrix) for more information about creating new maps a ctrls.
 
 Keep in mind that using following keywords will have the same effect as with the original map:
 - `LV_SYMBOL_OK` Send `LV_EVENT_RADY` to the assigend Text area.

@@ -7,13 +7,13 @@ The menu widget can be used to easily create multi-level menus. It handles the t
 The menu widget is built from the following objects:
 - Main container: lv_menu_main_cont
   - Main header: lv_menu_main_header_cont
-    - Back btn: [lv_btn](/widgets/core/btn)
-      - Back btn icon: [lv_img](/widgets/core/img)
+    - Back btn: [lv_btn](/widgets/btn)
+      - Back btn icon: [lv_img](/widgets/img)
   - Main page: lv_menu_page
 - Sidebar container: lv_menu_sidebar_cont
   - Sidebar header: lv_menu_sidebar_header_cont
-    - Back btn: [lv_btn](/widgets/core/btn)
-      - Back btn icon: [lv_img](/widgets/core/img)
+    - Back btn: [lv_btn](/widgets/btn)
+      - Back btn icon: [lv_img](/widgets/img)
   - Sidebar page: lv_menu_page
 
 ## Usage

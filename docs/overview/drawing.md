@@ -101,7 +101,7 @@ Although widgets can be easily customized by styles there might be cases when so
 To ensure a great level of flexibility LVGL sends a lot of events during drawing with parameters that tell what LVGL is about to draw.
 Some fields of these parameters can be modified to draw something else or any custom drawing operations can be added manually.
 
-A good use case for this is the [Button matrix](/widgets/core/btnmatrix) widget. By default, its buttons can be styled in different states, but you can't style the buttons one by one.
+A good use case for this is the [Button matrix](/widgets/btnmatrix) widget. By default, its buttons can be styled in different states, but you can't style the buttons one by one.
 However, an event is sent for every button and you can, for example, tell LVGL to use different colors on a specific button or to manually draw an image on some buttons.
 
 Each of these events is described in detail below.

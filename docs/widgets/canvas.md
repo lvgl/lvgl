@@ -3,7 +3,7 @@
 
 ## Overview
 
-A Canvas inherits from [Image](/widgets/core/img) where the user can draw anything.
+A Canvas inherits from [Image](/widgets/img) where the user can draw anything.
 Rectangles, texts, images, lines, arcs can be drawn here using lvgl's drawing engine.
 Additionally "effects" can be applied, such as rotation, zoom and blur.
 
@@ -77,7 +77,7 @@ A given area of the canvas can be blurred horizontally with `lv_canvas_blur_hor(
 No special events are sent by canvas objects.
 The same events are sent as for the
 
-See the events of the [Images](/widgets/core/img) too.
+See the events of the [Images](/widgets/img) too.
 
 Learn more about [Events](/overview/event).
 

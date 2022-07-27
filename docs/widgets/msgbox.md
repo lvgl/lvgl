@@ -11,9 +11,9 @@ The message box can be modal (blocking clicks on the rest of the screen) or not 
 ## Parts and Styles
 The message box is built from other widgets, so you can check these widgets' documentation for details.
 - Background: [lv_obj](/widgets/obj)
-- Close button: [lv_btn](/widgets/core/btn)
-- Title and text: [lv_label](/widgets/core/label)
-- Buttons: [lv_btnmatrix](/widgets/core/btnmatrix)
+- Close button: [lv_btn](/widgets/btn)
+- Title and text: [lv_label](/widgets/label)
+- Buttons: [lv_btnmatrix](/widgets/btnmatrix)
 
 ## Usage
 

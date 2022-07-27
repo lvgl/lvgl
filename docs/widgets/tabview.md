@@ -6,7 +6,7 @@
 The Tab view object can be used to organize content in tabs.
 The Tab view is built from other widgets:
 - Main container: [lv_obj](/widgets/obj))
-  - Tab buttons: [lv_btnmatrix](/widgets/core/btnmatrix)
+  - Tab buttons: [lv_btnmatrix](/widgets/btnmatrix)
   - Container for the tabs: [lv_obj](/widgets/obj)
      - Content of the tabs: [lv_obj](/widgets/obj)
 
@@ -41,7 +41,7 @@ To select a new tab you can:
 
 ### Get the parts
 
-`lv_tabview_get_content(tabview)` returns the container for the tabs, `lv_tabview_get_tab_btns(tabview)` returns the Tab buttons object which is a [Button matrix](/widgets/core/btnmatrix).
+`lv_tabview_get_content(tabview)` returns the container for the tabs, `lv_tabview_get_tab_btns(tabview)` returns the Tab buttons object which is a [Button matrix](/widgets/btnmatrix).
 
 ## Events
 - `LV_EVENT_VALUE_CHANGED` Sent when a new tab is selected by sliding or clicking the tab button. `lv_tabview_get_tab_act(tabview)` returns the zero based index of the current tab.

@@ -28,7 +28,7 @@ To use external files, you also need to convert the image files using the online
 You also need to use LVGL's file system module and register a driver with some functions for the basic file operation. Go to the [File system](/overview/file-system) to learn more.
 To set an image sourced from a file, use `lv_img_set_src(img, "S:folder1/my_img.bin")`.
 
-You can also set a symbol similarly to [Labels](/widgets/core/label). In this case, the image will be rendered as text according to the *font* specified in the style.  It enables to use of light-weight monochrome "letters" instead of real images. You can set symbol like `lv_img_set_src(img1, LV_SYMBOL_OK)`.
+You can also set a symbol similarly to [Labels](/widgets/label). In this case, the image will be rendered as text according to the *font* specified in the style.  It enables to use of light-weight monochrome "letters" instead of real images. You can set symbol like `lv_img_set_src(img1, LV_SYMBOL_OK)`.
 
 ### Label as an image
 Images and labels are sometimes used to convey the same thing. For example, to describe what a button does.
