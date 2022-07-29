@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_DRAW_COMPLEX && LV_BUILD_EXAMPLES
+#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES
 
 static lv_obj_t * chart1;
 static lv_chart_series_t * ser1;

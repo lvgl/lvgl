@@ -71,7 +71,7 @@ class LvExample(Directive):
 
         if not 'c' in excluded_languages:
             if env.app.tags.has('html'):
-                iframe_html = f"<div class='lv-example' data-real-src='/{env.config.version}/_static/built_lv_examples?example={example_name}&w=320&h=240'></div>"
+                iframe_html = f"<div class='lv-example' data-real-src='/{env.config.version}/_static/built_lv_examples/index.html?example={example_name}&w=320&h=240'></div>"
 
         description_html = f"<div class='lv-example-description'>{self.options.get('description', '')}</div>"
         layout_node = nodes.raw(text=f"<div class='lv-example-container'>{iframe_html}{description_html}</div>", format='html')

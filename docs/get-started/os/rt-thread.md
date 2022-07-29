@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/get-started/os/rt-thread.md
-```
 # RT-Thread RTOS
 
 <img src="https://raw.githubusercontent.com/RT-Thread/rt-thread/master/documentation/figures/logo.png" width=40% style="float: center;" >
@@ -46,3 +42,7 @@ LVGL has registered as a [software package](https://packages.rt-thread.org/en/de
 | [STM32F469 Discovery](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f469-st-disco/applications/lvgl) |      |
 | [Raspberry PICO](https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/applications/lvgl) |      |
 
+
+### Import a BSP project into RT-Thread Studio
+
+Clone the latest code from RT-Thread official repository. Open the RT-Thread Studio and select `File -> Import`. In the Import menu, please select `RT-Thread BSP Project into Workspace`, and click `next` button. In the `BSP location area`, please select the root path of the BSP which you prefer to import, such as `C:\Users\xxx\Desktop\rt-thread\bsp\stm32\stm32l475-atk-pandora`. In the `Project Name area`, please type a name for this project, then, press `Finish` button.

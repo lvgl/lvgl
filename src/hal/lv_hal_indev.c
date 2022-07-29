@@ -56,7 +56,7 @@
  */
 void lv_indev_drv_init(lv_indev_drv_t * driver)
 {
-    lv_memset_00(driver, sizeof(lv_indev_drv_t));
+    lv_memzero(driver, sizeof(lv_indev_drv_t));
 
     driver->type                 = LV_INDEV_TYPE_NONE;
     driver->scroll_limit         = LV_INDEV_DEF_SCROLL_LIMIT;
@@ -89,11 +89,11 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
         return NULL;
     }
 
-    lv_memset_00(indev, sizeof(lv_indev_t));
+    lv_memzero(indev, sizeof(lv_indev_t));
     indev->driver = driver;
 
     indev->proc.reset_query  = 1;
-    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_INDEV_DEF_READ_PERIOD, indev);
+    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
 
     return indev;
 }
@@ -122,7 +122,7 @@ void lv_indev_drv_update(lv_indev_t * indev, lv_indev_drv_t * new_drv)
     }
 
     indev->driver = new_drv;
-    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_INDEV_DEF_READ_PERIOD, indev);
+    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
     indev->proc.reset_query   = 1;
 }
 
@@ -140,7 +140,7 @@ void lv_indev_delete(lv_indev_t * indev)
     /*Remove the input device from the list*/
     _lv_ll_remove(&LV_GC_ROOT(_lv_indev_ll), indev);
     /*Free the memory of the input device*/
-    lv_mem_free(indev);
+    lv_free(indev);
 }
 
 /**
@@ -164,7 +164,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
  */
 void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_memset_00(data, sizeof(lv_indev_data_t));
+    lv_memzero(data, sizeof(lv_indev_data_t));
 
     /* For touchpad sometimes users don't set the last pressed coordinate on release.
      * So be sure a coordinates are initialized to the last point */

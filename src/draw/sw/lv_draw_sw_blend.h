@@ -13,10 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_draw_mask.h"
+#if LV_USE_DRAW_SW
+
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_style.h"
-#include "../lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -61,6 +63,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(struct _lv_draw_ctx_t * draw_c
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_DRAW_SW*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

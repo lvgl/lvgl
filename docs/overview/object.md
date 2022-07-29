@@ -1,11 +1,7 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/object.md
-```
 # Objects
 
 In LVGL the **basic building blocks** of a user interface are the objects, also called *Widgets*.
-For example a [Button](/widgets/core/btn), [Label](/widgets/core/label), [Image](/widgets/core/img), [List](/widgets/extra/list), [Chart](/widgets/extra/chart) or [Text area](/widgets/core/textarea).
+For example a [Button](/widgets/btn), [Label](/widgets/label), [Image](/widgets/img), [List](/widgets/list), [Chart](/widgets/chart) or [Text area](/widgets/textarea).
 
 You can see all the [Object types](/widgets/index) here.
 
@@ -183,7 +179,7 @@ Visit [Multi-display support](/overview/display) to learn more.
 
 ## Parts
 
-The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scrollbar parts but a [Slider](/widgets/core/slider) uses the main, indicator and knob parts.
+The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scrollbar parts but a [Slider](/widgets/slider) uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
 The following predefined parts exist in LVGL:

@@ -1,14 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.3.0-dev
- */
-
-/*
- * Copy this file as `lv_conf.h`
- * 1. simply next to the `lvgl` folder
- * 2. or any other places and
- *    - define `LV_CONF_INCLUDE_SIMPLE`
- *    - add the path as include path
+ * Configuration file for v8.3.0
  */
 
 /* clang-format off */
@@ -27,17 +19,9 @@
 /*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
 #define LV_COLOR_DEPTH 16
 
-/*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/
-#define LV_COLOR_16_SWAP 0
-
-/*Enable more complex drawing routines to manage screens transparency.
- *Can be used if the UI is above another layer, e.g. an OSD menu or video player.
- *Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to non LV_OPA_COVER value*/
-#define LV_COLOR_SCREEN_TRANSP 0
-
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#define LV_COLOR_MIX_ROUND_OFS (LV_COLOR_DEPTH == 32 ? 0: 128)
+#define LV_COLOR_MIX_ROUND_OFS 0
 
 /*Images pixels with this color will not be drawn if they are chroma keyed)*/
 #define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)         /*pure green*/
@@ -46,18 +30,18 @@
    MEMORY SETTINGS
  *=========================*/
 
-/*1: use custom malloc/free, 0: use the built-in `lv_mem_alloc()` and `lv_mem_free()`*/
+/*1: use custom malloc/free, 0: use the built-in `lv_malloc()` and `lv_free()`*/
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
-    /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
+    /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
+    #define LV_MEM_SIZE (64U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
     /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
     #if LV_MEM_ADR == 0
-        //#define LV_MEM_POOL_INCLUDE your_alloc_library  /* Uncomment if using an external allocator*/
-        //#define LV_MEM_POOL_ALLOC   your_alloc          /* Uncomment if using an external allocator*/
+        #undef LV_MEM_POOL_INCLUDE
+        #undef LV_MEM_POOL_ALLOC
     #endif
 
 #else       /*LV_MEM_CUSTOM*/
@@ -78,19 +62,13 @@
    HAL SETTINGS
  *====================*/
 
-/*Default display refresh period. LVG will redraw changed areas with this period time*/
-#define LV_DISP_DEF_REFR_PERIOD 30      /*[ms]*/
-
-/*Input device read period in milliseconds*/
-#define LV_INDEV_DEF_READ_PERIOD 30     /*[ms]*/
-
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
 #ifdef __PERF_COUNTER__
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE              "perf_counter.h"
+        #define LV_TICK_CUSTOM_INCLUDE             "perf_counter.h"
 
         #if __PER_COUNTER_VER__ < 10902ul
             #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
@@ -120,48 +98,64 @@
 
 /*Enable complex draw engine.
  *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
-#define LV_DRAW_COMPLEX 1
-#if LV_DRAW_COMPLEX != 0
+#define LV_DRAW_SW_COMPLEX 1
+#if LV_DRAW_SW_COMPLEX != 0
 
     /*Allow buffering some shadow calculation.
-    *LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
-    *Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
-    #define LV_SHADOW_CACHE_SIZE 0
+    *LV_DRAW_SW_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
+    *Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost*/
+    #define LV_DRAW_SW_SHADOW_CACHE_SIZE 0
 
     /* Set number of maximally cached circle data.
     * The circumference of 1/4 circle are saved for anti-aliasing
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
-    #define LV_CIRCLE_CACHE_SIZE 4
-#endif /*LV_DRAW_COMPLEX*/
+    #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
+#endif /*LV_DRAW_SW_COMPLEX*/
+
+/**
+ * "Simple layers" are used when a widget has `style_opa < 255` to buffer the widget into a layer
+ * and blend it as an image with the given opacity.
+ * Note that `bg_opa`, `text_opa` etc don't require buffering into layer)
+ * The widget can be buffered in smaller chunks to avoid using large buffers.
+ *
+ * - LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE: [bytes] the optimal target buffer size. LVGL will try to allocate it
+ * - LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE: [bytes]  used if `LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
+ *
+ * Both buffer sizes are in bytes.
+ * "Transformed layers" (where transform_angle/zoom properties are used) use larger buffers
+ * and can't be drawn in chunks. So these settings affects only widgets with opacity.
+ */
+#define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)
+#define LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)
 
 /*Default image cache size. Image caching keeps the images opened.
  *If only the built-in image formats are used there is no real advantage of caching. (I.e. if no new image decoder is added)
  *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  *However the opened images might consume additional RAM.
  *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE   0
+#define LV_IMG_CACHE_DEF_SIZE 0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-#define LV_GRADIENT_MAX_STOPS       2
+#define LV_GRADIENT_MAX_STOPS 2
 
 /*Default gradient buffer size.
  *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
- *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
+ *LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE sets the size of this cache in bytes.
  *If the cache is too small the map will be allocated only while it's required for the drawing.
  *0 mean no caching.*/
-#define LV_GRAD_CACHE_DEF_SIZE      0
+#define LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE 0
 
 /*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
- *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
+ *LV_DRAW_SW_GRADIENT_DITHER implies allocating one or two more lines of the object's rendering surface
  *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-#define LV_DITHER_GRADIENT      0
-#if LV_DITHER_GRADIENT
+#define LV_DRAW_SW_GRADIENT_DITHER 0
+#if LV_DRAW_SW_GRADIENT_DITHER
     /*Add support for error diffusion dithering.
      *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
      *The increase in memory consumption is (24 bits * object's width)*/
-    #define LV_DITHER_ERROR_DIFFUSION   0
+    #define LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION 0
 #endif
 
 /*Maximum buffer size to allocate for rotation.
@@ -179,6 +173,11 @@
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*Use SWM341's DMA2D GPU*/
+#if LV_USE_GPU_SWM341_DMA2D
+    #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
+#endif
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #if LV_USE_GPU_NXP_PXP
     /*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
@@ -189,16 +188,14 @@
     #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
 
-/*Use NXP's VG-Lite GPU iMX RTxxx platforms*/
-
 /*Use SDL renderer API*/
-#define LV_USE_GPU_SDL 0
-#if LV_USE_GPU_SDL
-    #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
+#define LV_USE_DRAW_SDL 0
+#if LV_USE_DRAW_SDL
+    #define LV_DRAW_SDL_INCLUDE_PATH <SDL2/SDL.h>
     /*Texture cache size, 8MB by default*/
-    #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
+    #define LV_DRAW_SDL_LRU_SIZE (1024 * 1024 * 8)
     /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
-    #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+    #define LV_DRAW_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
 #endif
 
 /*-------------
@@ -306,11 +303,11 @@
 #define LV_ATTRIBUTE_FLUSH_READY
 
 /*Required alignment size for buffers*/
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE 1
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE 4
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN __attribute__((aligned(4)))
 
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
@@ -386,11 +383,14 @@
 #define LV_USE_FONT_COMPRESSED 0
 
 /*Enable subpixel rendering*/
-#define LV_USE_FONT_SUBPX 0
-#if LV_USE_FONT_SUBPX
+#define LV_DRAW_SW_FONT_SUBPX 0
+#if LV_DRAW_SW_FONT_SUBPX
     /*Set the pixel order of the display. Physical order of RGB channels. Doesn't matter with "normal" fonts.*/
-    #define LV_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
+    #define LV_DRAW_SW_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
 #endif
+
+/*Enable drawing placeholders when glyph dsc is not found*/
+#define LV_USE_FONT_PLACEHOLDER 1
 
 /*=================
  *  TEXT SETTINGS
@@ -446,8 +446,6 @@
 
 #define LV_USE_ARC        1
 
-#define LV_USE_ANIMIMG    1
-
 #define LV_USE_BAR        1
 
 #define LV_USE_BTN        1
@@ -493,6 +491,8 @@
 /*-----------
  * Widgets
  *----------*/
+#define LV_USE_ANIMIMG    1
+
 #define LV_USE_CALENDAR   1
 #if LV_USE_CALENDAR
     #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
@@ -525,6 +525,12 @@
 
 #define LV_USE_MSGBOX     1
 
+#define LV_USE_SPAN       1
+#if LV_USE_SPAN
+    /*A line text can contain maximum num of span descriptor */
+    #define LV_SPAN_SNIPPET_STACK_SIZE 64
+#endif
+
 #define LV_USE_SPINBOX    1
 
 #define LV_USE_SPINNER    1
@@ -534,12 +540,6 @@
 #define LV_USE_TILEVIEW   1
 
 #define LV_USE_WIN        1
-
-#define LV_USE_SPAN       1
-#if LV_USE_SPAN
-    /*A line text can contain maximum num of span descriptor */
-    #define LV_SPAN_SNIPPET_STACK_SIZE 64
-#endif
 
 /*-----------
  * Themes
@@ -589,13 +589,36 @@
 #define LV_USE_SNAPSHOT 0
 
 /*1: Enable Monkey test*/
-#define LV_USE_MONKEY   0
+#define LV_USE_MONKEY 0
 
 /*1: Enable grid navigation*/
-#define LV_USE_GRIDNAV  0
+#define LV_USE_GRIDNAV 0
 
 /*1: Enable lv_obj fragment*/
 #define LV_USE_FRAGMENT 0
+
+/*1: Support using images as font in label or span widgets */
+#define LV_USE_IMGFONT 0
+
+/*1: Enable a published subscriber based messaging system */
+#define LV_USE_MSG 0
+
+/*1: Enable Pinyin input method*/
+/*Requires: lv_keyboard*/
+#if LV_USE_IME_PINYIN
+    /*1: Use default thesaurus*/
+    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
+    #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
+    /*Set the maximum number of candidate panels that can be displayed*/
+    /*This needs to be adjusted according to the size of the screen*/
+    #define LV_IME_PINYIN_CAND_TEXT_NUM 6
+
+    /*Use 9 key input(k9)*/
+    #define LV_IME_PINYIN_USE_K9_MODE      1
+    #if LV_IME_PINYIN_USE_K9_MODE == 1
+        #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
+    #endif // LV_IME_PINYIN_USE_K9_MODE
+#endif
 
 /*==================
 * EXAMPLES
@@ -603,6 +626,7 @@
 
 /*Enable the examples to be built with the library*/
 #define LV_BUILD_EXAMPLES 1
+
 
 /*--END OF LV_CONF_H--*/
 

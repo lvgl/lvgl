@@ -14,13 +14,13 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "bmp/lv_example_bmp.h"
+#include "ffmpeg/lv_example_ffmpeg.h"
+#include "freetype/lv_example_freetype.h"
 #include "gif/lv_example_gif.h"
 #include "png/lv_example_png.h"
-#include "sjpg/lv_example_sjpg.h"
 #include "qrcode/lv_example_qrcode.h"
-#include "freetype/lv_example_freetype.h"
 #include "rlottie/lv_example_rlottie.h"
-#include "ffmpeg/lv_example_ffmpeg.h"
+#include "sjpg/lv_example_sjpg.h"
 
 /*********************
  *      DEFINES

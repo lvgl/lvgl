@@ -70,64 +70,37 @@
     #endif
 #endif
 
-/*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/
-#ifndef LV_COLOR_16_SWAP
-    #ifdef CONFIG_LV_COLOR_16_SWAP
-        #define LV_COLOR_16_SWAP CONFIG_LV_COLOR_16_SWAP
-    #else
-        #define LV_COLOR_16_SWAP 0
-    #endif
-#endif
-
-/*Enable more complex drawing routines to manage screens transparency.
- *Can be used if the UI is above another layer, e.g. an OSD menu or video player.
- *Requires `LV_COLOR_DEPTH = 32` colors and the screen's `bg_opa` should be set to non LV_OPA_COVER value*/
-#ifndef LV_COLOR_SCREEN_TRANSP
-    #ifdef CONFIG_LV_COLOR_SCREEN_TRANSP
-        #define LV_COLOR_SCREEN_TRANSP CONFIG_LV_COLOR_SCREEN_TRANSP
-    #else
-        #define LV_COLOR_SCREEN_TRANSP 0
-    #endif
-#endif
-
-/* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
- * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#ifndef LV_COLOR_MIX_ROUND_OFS
-    #ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
-        #define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
-    #else
-        #define LV_COLOR_MIX_ROUND_OFS (LV_COLOR_DEPTH == 32 ? 0: 128)
-    #endif
-#endif
-
-/*Images pixels with this color will not be drawn if they are chroma keyed)*/
 #ifndef LV_COLOR_CHROMA_KEY
     #ifdef CONFIG_LV_COLOR_CHROMA_KEY
         #define LV_COLOR_CHROMA_KEY CONFIG_LV_COLOR_CHROMA_KEY
     #else
-        #define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)         /*pure green*/
+        #define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)
     #endif
 #endif
 
 /*=========================
-   MEMORY SETTINGS
+   STDLIB WRAPPER SETTINGS
  *=========================*/
 
-/*1: use custom malloc/free, 0: use the built-in `lv_mem_alloc()` and `lv_mem_free()`*/
-#ifndef LV_MEM_CUSTOM
-    #ifdef CONFIG_LV_MEM_CUSTOM
-        #define LV_MEM_CUSTOM CONFIG_LV_MEM_CUSTOM
+/*Enable and configure the built-in memory manager*/
+#ifndef LV_USE_BUILTIN_MALLOC
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_BUILTIN_MALLOC
+            #define LV_USE_BUILTIN_MALLOC CONFIG_LV_USE_BUILTIN_MALLOC
+        #else
+            #define LV_USE_BUILTIN_MALLOC 0
+        #endif
     #else
-        #define LV_MEM_CUSTOM 0
+        #define LV_USE_BUILTIN_MALLOC 1
     #endif
 #endif
-#if LV_MEM_CUSTOM == 0
-    /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
+#if LV_USE_BUILTIN_MALLOC
+    /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
     #ifndef LV_MEM_SIZE
         #ifdef CONFIG_LV_MEM_SIZE
             #define LV_MEM_SIZE CONFIG_LV_MEM_SIZE
         #else
-            #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
+            #define LV_MEM_SIZE (128U * 1024U)          /*[bytes]*/
         #endif
     #endif
 
@@ -141,81 +114,132 @@
     #endif
     /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
     #if LV_MEM_ADR == 0
-        //#define LV_MEM_POOL_INCLUDE your_alloc_library  /* Uncomment if using an external allocator*/
-        //#define LV_MEM_POOL_ALLOC   your_alloc          /* Uncomment if using an external allocator*/
+        #ifndef LV_MEM_POOL_INCLUDE
+            #ifdef CONFIG_LV_MEM_POOL_INCLUDE
+                #define LV_MEM_POOL_INCLUDE CONFIG_LV_MEM_POOL_INCLUDE
+            #else
+                #undef LV_MEM_POOL_INCLUDE
+            #endif
+        #endif
+        #ifndef LV_MEM_POOL_ALLOC
+            #ifdef CONFIG_LV_MEM_POOL_ALLOC
+                #define LV_MEM_POOL_ALLOC CONFIG_LV_MEM_POOL_ALLOC
+            #else
+                #undef LV_MEM_POOL_ALLOC
+            #endif
+        #endif
     #endif
+#endif  /*LV_USE_BUILTIN_MALLOC*/
 
-#else       /*LV_MEM_CUSTOM*/
-    #ifndef LV_MEM_CUSTOM_INCLUDE
-        #ifdef CONFIG_LV_MEM_CUSTOM_INCLUDE
-            #define LV_MEM_CUSTOM_INCLUDE CONFIG_LV_MEM_CUSTOM_INCLUDE
+/*Enable lv_memcpy_builtin, lv_memset_builtin, lv_strlen_builtin, lv_strncpy_builtin*/
+#ifndef LV_USE_BUILTIN_MEMCPY
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_BUILTIN_MEMCPY
+            #define LV_USE_BUILTIN_MEMCPY CONFIG_LV_USE_BUILTIN_MEMCPY
         #else
-            #define LV_MEM_CUSTOM_INCLUDE <stdlib.h>   /*Header for the dynamic memory function*/
+            #define LV_USE_BUILTIN_MEMCPY 0
         #endif
-    #endif
-    #ifndef LV_MEM_CUSTOM_ALLOC
-        #ifdef CONFIG_LV_MEM_CUSTOM_ALLOC
-            #define LV_MEM_CUSTOM_ALLOC CONFIG_LV_MEM_CUSTOM_ALLOC
-        #else
-            #define LV_MEM_CUSTOM_ALLOC   malloc
-        #endif
-    #endif
-    #ifndef LV_MEM_CUSTOM_FREE
-        #ifdef CONFIG_LV_MEM_CUSTOM_FREE
-            #define LV_MEM_CUSTOM_FREE CONFIG_LV_MEM_CUSTOM_FREE
-        #else
-            #define LV_MEM_CUSTOM_FREE    free
-        #endif
-    #endif
-    #ifndef LV_MEM_CUSTOM_REALLOC
-        #ifdef CONFIG_LV_MEM_CUSTOM_REALLOC
-            #define LV_MEM_CUSTOM_REALLOC CONFIG_LV_MEM_CUSTOM_REALLOC
-        #else
-            #define LV_MEM_CUSTOM_REALLOC realloc
-        #endif
-    #endif
-#endif     /*LV_MEM_CUSTOM*/
-
-/*Number of the intermediate memory buffer used during rendering and other internal processing mechanisms.
- *You will see an error log message if there wasn't enough buffers. */
-#ifndef LV_MEM_BUF_MAX_NUM
-    #ifdef CONFIG_LV_MEM_BUF_MAX_NUM
-        #define LV_MEM_BUF_MAX_NUM CONFIG_LV_MEM_BUF_MAX_NUM
     #else
-        #define LV_MEM_BUF_MAX_NUM 16
+        #define LV_USE_BUILTIN_MEMCPY 1
     #endif
 #endif
 
-/*Use the standard `memcpy` and `memset` instead of LVGL's own functions. (Might or might not be faster).*/
-#ifndef LV_MEMCPY_MEMSET_STD
-    #ifdef CONFIG_LV_MEMCPY_MEMSET_STD
-        #define LV_MEMCPY_MEMSET_STD CONFIG_LV_MEMCPY_MEMSET_STD
+/*Enable and configure the built-in (v)snprintf */
+#ifndef LV_USE_BUILTIN_SNPRINTF
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_BUILTIN_SNPRINTF
+            #define LV_USE_BUILTIN_SNPRINTF CONFIG_LV_USE_BUILTIN_SNPRINTF
+        #else
+            #define LV_USE_BUILTIN_SNPRINTF 0
+        #endif
     #else
-        #define LV_MEMCPY_MEMSET_STD 0
+        #define LV_USE_BUILTIN_SNPRINTF 1
+    #endif
+#endif
+#if LV_USE_BUILTIN_SNPRINTF
+    #ifndef LV_SPRINTF_USE_FLOAT
+        #ifdef CONFIG_LV_SPRINTF_USE_FLOAT
+            #define LV_SPRINTF_USE_FLOAT CONFIG_LV_SPRINTF_USE_FLOAT
+        #else
+            #define LV_SPRINTF_USE_FLOAT 0
+        #endif
+    #endif
+#endif  /*LV_USE_BUILTIN_SNPRINTF*/
+
+#ifndef LV_STDLIB_INCLUDE
+    #ifdef CONFIG_LV_STDLIB_INCLUDE
+        #define LV_STDLIB_INCLUDE CONFIG_LV_STDLIB_INCLUDE
+    #else
+        #define LV_STDLIB_INCLUDE <stdint.h>
+    #endif
+#endif
+#ifndef LV_MALLOC
+    #ifdef CONFIG_LV_MALLOC
+        #define LV_MALLOC CONFIG_LV_MALLOC
+    #else
+        #define LV_MALLOC       lv_malloc_builtin
+    #endif
+#endif
+#ifndef LV_REALLOC
+    #ifdef CONFIG_LV_REALLOC
+        #define LV_REALLOC CONFIG_LV_REALLOC
+    #else
+        #define LV_REALLOC      lv_realloc_builtin
+    #endif
+#endif
+#ifndef LV_FREE
+    #ifdef CONFIG_LV_FREE
+        #define LV_FREE CONFIG_LV_FREE
+    #else
+        #define LV_FREE         lv_free_builtin
+    #endif
+#endif
+#ifndef LV_MEMSET
+    #ifdef CONFIG_LV_MEMSET
+        #define LV_MEMSET CONFIG_LV_MEMSET
+    #else
+        #define LV_MEMSET       lv_memset_builtin
+    #endif
+#endif
+#ifndef LV_MEMCPY
+    #ifdef CONFIG_LV_MEMCPY
+        #define LV_MEMCPY CONFIG_LV_MEMCPY
+    #else
+        #define LV_MEMCPY       lv_memcpy_builtin
+    #endif
+#endif
+#ifndef LV_SNPRINTF
+    #ifdef CONFIG_LV_SNPRINTF
+        #define LV_SNPRINTF CONFIG_LV_SNPRINTF
+    #else
+        #define LV_SNPRINTF     lv_snprintf_builtin
+    #endif
+#endif
+#ifndef LV_VSNPRINTF
+    #ifdef CONFIG_LV_VSNPRINTF
+        #define LV_VSNPRINTF CONFIG_LV_VSNPRINTF
+    #else
+        #define LV_VSNPRINTF    lv_vsnprintf_builtin
+    #endif
+#endif
+#ifndef LV_STRLEN
+    #ifdef CONFIG_LV_STRLEN
+        #define LV_STRLEN CONFIG_LV_STRLEN
+    #else
+        #define LV_STRLEN       lv_strlen_builtin
+    #endif
+#endif
+#ifndef LV_STRNCPY
+    #ifdef CONFIG_LV_STRNCPY
+        #define LV_STRNCPY CONFIG_LV_STRNCPY
+    #else
+        #define LV_STRNCPY      lv_strncpy_builtin
     #endif
 #endif
 
 /*====================
    HAL SETTINGS
  *====================*/
-
-/*Default display refresh period. LVG will redraw changed areas with this period time*/
-#ifndef LV_DISP_DEF_REFR_PERIOD
-    #ifdef CONFIG_LV_DISP_DEF_REFR_PERIOD
-        #define LV_DISP_DEF_REFR_PERIOD CONFIG_LV_DISP_DEF_REFR_PERIOD
-    #else
-        #define LV_DISP_DEF_REFR_PERIOD 30      /*[ms]*/
-    #endif
-#endif
-
-/*Input device read period in milliseconds*/
-#ifndef LV_INDEV_DEF_READ_PERIOD
-    #ifdef CONFIG_LV_INDEV_DEF_READ_PERIOD
-        #define LV_INDEV_DEF_READ_PERIOD CONFIG_LV_INDEV_DEF_READ_PERIOD
-    #else
-        #define LV_INDEV_DEF_READ_PERIOD 30     /*[ms]*/
-    #endif
-#endif
 
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
@@ -253,37 +277,82 @@
     #endif
 #endif
 
-/*=======================
- * FEATURE CONFIGURATION
- *=======================*/
+/*========================
+ * DRAW CONFIGURATION
+ *========================*/
 
-/*-------------
- * Drawing
- *-----------*/
-
-/*Enable complex draw engine.
- *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
-#ifndef LV_DRAW_COMPLEX
+/*Enable the built in mask engine.
+ *Required to draw shadow, rounded corners, circles, arc, skew lines, or any other masks*/
+#ifndef LV_USE_DRAW_MASKS
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_DRAW_COMPLEX
-            #define LV_DRAW_COMPLEX CONFIG_LV_DRAW_COMPLEX
+        #ifdef CONFIG_LV_USE_DRAW_MASKS
+            #define LV_USE_DRAW_MASKS CONFIG_LV_USE_DRAW_MASKS
         #else
-            #define LV_DRAW_COMPLEX 0
+            #define LV_USE_DRAW_MASKS 0
         #endif
     #else
-        #define LV_DRAW_COMPLEX 1
+        #define LV_USE_DRAW_MASKS 1
     #endif
 #endif
-#if LV_DRAW_COMPLEX != 0
+
+#ifndef LV_USE_DRAW_SW
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_DRAW_SW
+            #define LV_USE_DRAW_SW CONFIG_LV_USE_DRAW_SW
+        #else
+            #define LV_USE_DRAW_SW 0
+        #endif
+    #else
+        #define LV_USE_DRAW_SW  1
+    #endif
+#endif
+#if LV_USE_DRAW_SW
+
+    /*Enable complex draw engine.
+     *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
+    #ifndef LV_DRAW_SW_COMPLEX
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_DRAW_SW_COMPLEX
+                #define LV_DRAW_SW_COMPLEX CONFIG_LV_DRAW_SW_COMPLEX
+            #else
+                #define LV_DRAW_SW_COMPLEX 0
+            #endif
+        #else
+            #define LV_DRAW_SW_COMPLEX 1
+        #endif
+    #endif
+
+    /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
+     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
+     * and can't be drawn in chunks. */
+
+    /*The target buffer size for simple layer chunks.*/
+    #ifndef LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
+        #ifdef CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
+            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE CONFIG_LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
+        #else
+            #define LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE          (24 * 1024)   /*[bytes]*/
+        #endif
+    #endif
+
+    /*Used if `LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.*/
+    #ifndef LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE
+        #ifdef CONFIG_LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE
+            #define LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE CONFIG_LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE
+        #else
+            #define LV_DRAW_SW_LAYER_SIMPLE_FALLBACK_BUF_SIZE (3 * 1024)    /*[bytes]*/
+        #endif
+    #endif
 
     /*Allow buffering some shadow calculation.
-    *LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
-    *Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
-    #ifndef LV_SHADOW_CACHE_SIZE
-        #ifdef CONFIG_LV_SHADOW_CACHE_SIZE
-            #define LV_SHADOW_CACHE_SIZE CONFIG_LV_SHADOW_CACHE_SIZE
+    *LV_DRAW_SW_SHADOW_CACHE_SIZE is the max. shadow size to buffer, where shadow size is `shadow_width + radius`
+    *Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost*/
+    #ifndef LV_DRAW_SW_SHADOW_CACHE_SIZE
+        #ifdef CONFIG_LV_DRAW_SW_SHADOW_CACHE_SIZE
+            #define LV_DRAW_SW_SHADOW_CACHE_SIZE CONFIG_LV_DRAW_SW_SHADOW_CACHE_SIZE
         #else
-            #define LV_SHADOW_CACHE_SIZE 0
+            #define LV_DRAW_SW_SHADOW_CACHE_SIZE 0
         #endif
     #endif
 
@@ -291,87 +360,107 @@
     * The circumference of 1/4 circle are saved for anti-aliasing
     * radius * 4 bytes are used per circle (the most often used radiuses are saved)
     * 0: to disable caching */
-    #ifndef LV_CIRCLE_CACHE_SIZE
-        #ifdef CONFIG_LV_CIRCLE_CACHE_SIZE
-            #define LV_CIRCLE_CACHE_SIZE CONFIG_LV_CIRCLE_CACHE_SIZE
+    #ifndef LV_DRAW_SW_CIRCLE_CACHE_SIZE
+        #ifdef CONFIG_LV_DRAW_SW_CIRCLE_CACHE_SIZE
+            #define LV_DRAW_SW_CIRCLE_CACHE_SIZE CONFIG_LV_DRAW_SW_CIRCLE_CACHE_SIZE
         #else
-            #define LV_CIRCLE_CACHE_SIZE 4
+            #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
         #endif
     #endif
-#endif /*LV_DRAW_COMPLEX*/
 
-/*Default image cache size. Image caching keeps the images opened.
- *If only the built-in image formats are used there is no real advantage of caching. (I.e. if no new image decoder is added)
- *With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
- *However the opened images might consume additional RAM.
- *0: to disable caching*/
-#ifndef LV_IMG_CACHE_DEF_SIZE
-    #ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
-        #define LV_IMG_CACHE_DEF_SIZE CONFIG_LV_IMG_CACHE_DEF_SIZE
-    #else
-        #define LV_IMG_CACHE_DEF_SIZE   0
-    #endif
-#endif
-
-/*Number of stops allowed per gradient. Increase this to allow more stops.
- *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
-#ifndef LV_GRADIENT_MAX_STOPS
-    #ifdef CONFIG_LV_GRADIENT_MAX_STOPS
-        #define LV_GRADIENT_MAX_STOPS CONFIG_LV_GRADIENT_MAX_STOPS
-    #else
-        #define LV_GRADIENT_MAX_STOPS       2
-    #endif
-#endif
-
-/*Default gradient buffer size.
- *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
- *LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
- *If the cache is too small the map will be allocated only while it's required for the drawing.
- *0 mean no caching.*/
-#ifndef LV_GRAD_CACHE_DEF_SIZE
-    #ifdef CONFIG_LV_GRAD_CACHE_DEF_SIZE
-        #define LV_GRAD_CACHE_DEF_SIZE CONFIG_LV_GRAD_CACHE_DEF_SIZE
-    #else
-        #define LV_GRAD_CACHE_DEF_SIZE      0
-    #endif
-#endif
-
-/*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
- *LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
- *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
-#ifndef LV_DITHER_GRADIENT
-    #ifdef CONFIG_LV_DITHER_GRADIENT
-        #define LV_DITHER_GRADIENT CONFIG_LV_DITHER_GRADIENT
-    #else
-        #define LV_DITHER_GRADIENT      0
-    #endif
-#endif
-#if LV_DITHER_GRADIENT
-    /*Add support for error diffusion dithering.
-     *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-     *The increase in memory consumption is (24 bits * object's width)*/
-    #ifndef LV_DITHER_ERROR_DIFFUSION
-        #ifdef CONFIG_LV_DITHER_ERROR_DIFFUSION
-            #define LV_DITHER_ERROR_DIFFUSION CONFIG_LV_DITHER_ERROR_DIFFUSION
+    /*Default gradient buffer size.
+     *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
+     *LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE sets the size of this cache in bytes.
+     *If the cache is too small the map will be allocated only while it's required for the drawing.
+     *0 mean no caching.*/
+    #ifndef LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE
+        #ifdef CONFIG_LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE
+            #define LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE CONFIG_LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE
         #else
-            #define LV_DITHER_ERROR_DIFFUSION   0
+            #define LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE 0
+        #endif
+    #endif
+
+    /*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
+     *LV_DRAW_SW_GRADIENT_DITHER implies allocating one or two more lines of the object's rendering surface
+     *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
+    #ifndef LV_DRAW_SW_GRADIENT_DITHER
+        #ifdef CONFIG_LV_DRAW_SW_GRADIENT_DITHER
+            #define LV_DRAW_SW_GRADIENT_DITHER CONFIG_LV_DRAW_SW_GRADIENT_DITHER
+        #else
+            #define LV_DRAW_SW_GRADIENT_DITHER 0
+        #endif
+    #endif
+    #if LV_DRAW_SW_GRADIENT_DITHER
+        /*Add support for error diffusion dithering.
+         *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+         *The increase in memory consumption is (24 bits * object's width)*/
+        #ifndef LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
+            #ifdef CONFIG_LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
+                #define LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION CONFIG_LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
+            #else
+                #define LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION 0
+            #endif
+        #endif
+    #endif
+
+    /*Enable subpixel rendering*/
+    #ifndef LV_DRAW_SW_FONT_SUBPX
+        #ifdef CONFIG_LV_DRAW_SW_FONT_SUBPX
+            #define LV_DRAW_SW_FONT_SUBPX CONFIG_LV_DRAW_SW_FONT_SUBPX
+        #else
+            #define LV_DRAW_SW_FONT_SUBPX 0
+        #endif
+    #endif
+    #if LV_DRAW_SW_FONT_SUBPX
+        /*Set the pixel order of the display. Physical order of RGB channels. Doesn't matter with "normal" fonts.*/
+        #ifndef LV_DRAW_SW_FONT_SUBPX_BGR
+            #ifdef CONFIG_LV_DRAW_SW_FONT_SUBPX_BGR
+                #define LV_DRAW_SW_FONT_SUBPX_BGR CONFIG_LV_DRAW_SW_FONT_SUBPX_BGR
+            #else
+                #define LV_DRAW_SW_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
+            #endif
         #endif
     #endif
 #endif
 
-/*Maximum buffer size to allocate for rotation.
- *Only used if software rotation is enabled in the display driver.*/
-#ifndef LV_DISP_ROT_MAX_BUF
-    #ifdef CONFIG_LV_DISP_ROT_MAX_BUF
-        #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
+/*Use SDL renderer API*/
+#ifndef LV_USE_DRAW_SDL
+    #ifdef CONFIG_LV_USE_DRAW_SDL
+        #define LV_USE_DRAW_SDL CONFIG_LV_USE_DRAW_SDL
     #else
-        #define LV_DISP_ROT_MAX_BUF (10*1024)
+        #define LV_USE_DRAW_SDL 0
+    #endif
+#endif
+#if LV_USE_DRAW_SDL
+    #ifndef LV_DRAW_SDL_INCLUDE_PATH
+        #ifdef CONFIG_LV_DRAW_SDL_INCLUDE_PATH
+            #define LV_DRAW_SDL_INCLUDE_PATH CONFIG_LV_DRAW_SDL_INCLUDE_PATH
+        #else
+            #define LV_DRAW_SDL_INCLUDE_PATH <SDL2/SDL.h>
+        #endif
+    #endif
+    /*Texture cache size, 8MB by default*/
+    #ifndef LV_DRAW_SDL_LRU_SIZE
+        #ifdef CONFIG_LV_DRAW_SDL_LRU_SIZE
+            #define LV_DRAW_SDL_LRU_SIZE CONFIG_LV_DRAW_SDL_LRU_SIZE
+        #else
+            #define LV_DRAW_SDL_LRU_SIZE (1024 * 1024 * 8)
+        #endif
+    #endif
+    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
+    #ifndef LV_DRAW_SDL_CUSTOM_BLEND_MODE
+        #ifdef CONFIG_LV_DRAW_SDL_CUSTOM_BLEND_MODE
+            #define LV_DRAW_SDL_CUSTOM_BLEND_MODE CONFIG_LV_DRAW_SDL_CUSTOM_BLEND_MODE
+        #else
+            #define LV_DRAW_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+        #endif
     #endif
 #endif
 
-/*-------------
- * GPU
- *-----------*/
+/*=====================
+ * GPU CONFIGURATION
+ *=====================*/
 
 /*Use Arm's 2D acceleration library Arm-2D */
 #ifndef LV_USE_GPU_ARM2D
@@ -434,39 +523,27 @@
     #endif
 #endif
 
-/*Use SDL renderer API*/
-#ifndef LV_USE_GPU_SDL
-    #ifdef CONFIG_LV_USE_GPU_SDL
-        #define LV_USE_GPU_SDL CONFIG_LV_USE_GPU_SDL
+/*Use SWM341's DMA2D GPU*/
+#ifndef LV_USE_GPU_SWM341_DMA2D
+    #ifdef CONFIG_LV_USE_GPU_SWM341_DMA2D
+        #define LV_USE_GPU_SWM341_DMA2D CONFIG_LV_USE_GPU_SWM341_DMA2D
     #else
-        #define LV_USE_GPU_SDL 0
+        #define LV_USE_GPU_SWM341_DMA2D 0
     #endif
 #endif
-#if LV_USE_GPU_SDL
-    #ifndef LV_GPU_SDL_INCLUDE_PATH
-        #ifdef CONFIG_LV_GPU_SDL_INCLUDE_PATH
-            #define LV_GPU_SDL_INCLUDE_PATH CONFIG_LV_GPU_SDL_INCLUDE_PATH
+#if LV_USE_GPU_SWM341_DMA2D
+    #ifndef LV_GPU_SWM341_DMA2D_INCLUDE
+        #ifdef CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
+            #define LV_GPU_SWM341_DMA2D_INCLUDE CONFIG_LV_GPU_SWM341_DMA2D_INCLUDE
         #else
-            #define LV_GPU_SDL_INCLUDE_PATH <SDL2/SDL.h>
-        #endif
-    #endif
-    /*Texture cache size, 8MB by default*/
-    #ifndef LV_GPU_SDL_LRU_SIZE
-        #ifdef CONFIG_LV_GPU_SDL_LRU_SIZE
-            #define LV_GPU_SDL_LRU_SIZE CONFIG_LV_GPU_SDL_LRU_SIZE
-        #else
-            #define LV_GPU_SDL_LRU_SIZE (1024 * 1024 * 8)
-        #endif
-    #endif
-    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
-    #ifndef LV_GPU_SDL_CUSTOM_BLEND_MODE
-        #ifdef CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
-            #define LV_GPU_SDL_CUSTOM_BLEND_MODE CONFIG_LV_GPU_SDL_CUSTOM_BLEND_MODE
-        #else
-            #define LV_GPU_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
+            #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
         #endif
     #endif
 #endif
+
+/*=======================
+ * FEATURE CONFIGURATION
+ *=======================*/
 
 /*-------------
  * Logging
@@ -688,7 +765,7 @@
 #endif
 
 /*1: Show the used memory and the memory fragmentation
- * Requires LV_MEM_CUSTOM = 0*/
+ * Requires `LV_USE_BUILTIN_MALLOC = 1`*/
 #ifndef LV_USE_MEM_MONITOR
     #ifdef CONFIG_LV_USE_MEM_MONITOR
         #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
@@ -715,45 +792,15 @@
     #endif
 #endif
 
-/*Change the built in (v)snprintf functions*/
-#ifndef LV_SPRINTF_CUSTOM
-    #ifdef CONFIG_LV_SPRINTF_CUSTOM
-        #define LV_SPRINTF_CUSTOM CONFIG_LV_SPRINTF_CUSTOM
+/*Maximum buffer size to allocate for rotation.
+ *Only used if software rotation is enabled in the display driver.*/
+#ifndef LV_DISP_ROT_MAX_BUF
+    #ifdef CONFIG_LV_DISP_ROT_MAX_BUF
+        #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
     #else
-        #define LV_SPRINTF_CUSTOM 0
+        #define LV_DISP_ROT_MAX_BUF (10*1024)
     #endif
 #endif
-#if LV_SPRINTF_CUSTOM
-    #ifndef LV_SPRINTF_INCLUDE
-        #ifdef CONFIG_LV_SPRINTF_INCLUDE
-            #define LV_SPRINTF_INCLUDE CONFIG_LV_SPRINTF_INCLUDE
-        #else
-            #define LV_SPRINTF_INCLUDE <stdio.h>
-        #endif
-    #endif
-    #ifndef lv_snprintf
-        #ifdef CONFIG_LV_SNPRINTF
-            #define lv_snprintf CONFIG_LV_SNPRINTF
-        #else
-            #define lv_snprintf  snprintf
-        #endif
-    #endif
-    #ifndef lv_vsnprintf
-        #ifdef CONFIG_LV_VSNPRINTF
-            #define lv_vsnprintf CONFIG_LV_VSNPRINTF
-        #else
-            #define lv_vsnprintf vsnprintf
-        #endif
-    #endif
-#else   /*LV_SPRINTF_CUSTOM*/
-    #ifndef LV_SPRINTF_USE_FLOAT
-        #ifdef CONFIG_LV_SPRINTF_USE_FLOAT
-            #define LV_SPRINTF_USE_FLOAT CONFIG_LV_SPRINTF_USE_FLOAT
-        #else
-            #define LV_SPRINTF_USE_FLOAT 0
-        #endif
-    #endif
-#endif  /*LV_SPRINTF_CUSTOM*/
 
 #ifndef LV_USE_USER_DATA
     #ifdef _LV_KCONFIG_PRESENT
@@ -785,6 +832,40 @@
         #endif
     #endif
 #endif /*LV_ENABLE_GC*/
+
+/*Default image cache size. Image caching keeps some images opened.
+ *If only the built-in image formats are used there is no real advantage of caching.
+ *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
+ *However the opened images consume additional RAM.
+ *0: to disable caching*/
+#ifndef LV_IMG_CACHE_DEF_SIZE
+    #ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
+        #define LV_IMG_CACHE_DEF_SIZE CONFIG_LV_IMG_CACHE_DEF_SIZE
+    #else
+        #define LV_IMG_CACHE_DEF_SIZE 0
+    #endif
+#endif
+
+
+/*Number of stops allowed per gradient. Increase this to allow more stops.
+ *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
+#ifndef LV_GRADIENT_MAX_STOPS
+    #ifdef CONFIG_LV_GRADIENT_MAX_STOPS
+        #define LV_GRADIENT_MAX_STOPS CONFIG_LV_GRADIENT_MAX_STOPS
+    #else
+        #define LV_GRADIENT_MAX_STOPS 2
+    #endif
+#endif
+
+/* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
+ * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
+#ifndef LV_COLOR_MIX_ROUND_OFS
+    #ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
+        #define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
+    #else
+        #define LV_COLOR_MIX_ROUND_OFS 0
+    #endif
+#endif
 
 /*=====================
  *  COMPILER SETTINGS
@@ -876,14 +957,6 @@
     #endif
 #endif
 
-/*Prefix variables that are used in GPU accelerated operations, often these need to be placed in RAM sections that are DMA accessible*/
-#ifndef LV_ATTRIBUTE_DMA
-    #ifdef CONFIG_LV_ATTRIBUTE_DMA
-        #define LV_ATTRIBUTE_DMA CONFIG_LV_ATTRIBUTE_DMA
-    #else
-        #define LV_ATTRIBUTE_DMA
-    #endif
-#endif
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
  *should also appear on LVGL binding API such as Micropython.*/
@@ -1148,22 +1221,16 @@
     #endif
 #endif
 
-/*Enable subpixel rendering*/
-#ifndef LV_USE_FONT_SUBPX
-    #ifdef CONFIG_LV_USE_FONT_SUBPX
-        #define LV_USE_FONT_SUBPX CONFIG_LV_USE_FONT_SUBPX
-    #else
-        #define LV_USE_FONT_SUBPX 0
-    #endif
-#endif
-#if LV_USE_FONT_SUBPX
-    /*Set the pixel order of the display. Physical order of RGB channels. Doesn't matter with "normal" fonts.*/
-    #ifndef LV_FONT_SUBPX_BGR
-        #ifdef CONFIG_LV_FONT_SUBPX_BGR
-            #define LV_FONT_SUBPX_BGR CONFIG_LV_FONT_SUBPX_BGR
+/*Enable drawing placeholders when glyph dsc is not found*/
+#ifndef LV_USE_FONT_PLACEHOLDER
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_FONT_PLACEHOLDER
+            #define LV_USE_FONT_PLACEHOLDER CONFIG_LV_USE_FONT_PLACEHOLDER
         #else
-            #define LV_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
+            #define LV_USE_FONT_PLACEHOLDER 0
         #endif
+    #else
+        #define LV_USE_FONT_PLACEHOLDER 1
     #endif
 #endif
 
@@ -1268,22 +1335,10 @@
 #endif
 
 /*==================
- *  WIDGET USAGE
+ * WIDGETS
  *================*/
 
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
-
-#ifndef LV_USE_ARC
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ARC
-            #define LV_USE_ARC CONFIG_LV_USE_ARC
-        #else
-            #define LV_USE_ARC 0
-        #endif
-    #else
-        #define LV_USE_ARC        1
-    #endif
-#endif
 
 #ifndef LV_USE_ANIMIMG
     #ifdef _LV_KCONFIG_PRESENT
@@ -1294,6 +1349,18 @@
         #endif
     #else
         #define LV_USE_ANIMIMG    1
+    #endif
+#endif
+
+#ifndef LV_USE_ARC
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ARC
+            #define LV_USE_ARC CONFIG_LV_USE_ARC
+        #else
+            #define LV_USE_ARC 0
+        #endif
+    #else
+        #define LV_USE_ARC        1
     #endif
 #endif
 
@@ -1333,187 +1400,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_CANVAS
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_CANVAS
-            #define LV_USE_CANVAS CONFIG_LV_USE_CANVAS
-        #else
-            #define LV_USE_CANVAS 0
-        #endif
-    #else
-        #define LV_USE_CANVAS     1
-    #endif
-#endif
-
-#ifndef LV_USE_CHECKBOX
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_CHECKBOX
-            #define LV_USE_CHECKBOX CONFIG_LV_USE_CHECKBOX
-        #else
-            #define LV_USE_CHECKBOX 0
-        #endif
-    #else
-        #define LV_USE_CHECKBOX   1
-    #endif
-#endif
-
-#ifndef LV_USE_DROPDOWN
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_DROPDOWN
-            #define LV_USE_DROPDOWN CONFIG_LV_USE_DROPDOWN
-        #else
-            #define LV_USE_DROPDOWN 0
-        #endif
-    #else
-        #define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
-    #endif
-#endif
-
-#ifndef LV_USE_IMG
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_IMG
-            #define LV_USE_IMG CONFIG_LV_USE_IMG
-        #else
-            #define LV_USE_IMG 0
-        #endif
-    #else
-        #define LV_USE_IMG        1   /*Requires: lv_label*/
-    #endif
-#endif
-
-#ifndef LV_USE_LABEL
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_LABEL
-            #define LV_USE_LABEL CONFIG_LV_USE_LABEL
-        #else
-            #define LV_USE_LABEL 0
-        #endif
-    #else
-        #define LV_USE_LABEL      1
-    #endif
-#endif
-#if LV_USE_LABEL
-    #ifndef LV_LABEL_TEXT_SELECTION
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_LABEL_TEXT_SELECTION
-                #define LV_LABEL_TEXT_SELECTION CONFIG_LV_LABEL_TEXT_SELECTION
-            #else
-                #define LV_LABEL_TEXT_SELECTION 0
-            #endif
-        #else
-            #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
-        #endif
-    #endif
-    #ifndef LV_LABEL_LONG_TXT_HINT
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_LABEL_LONG_TXT_HINT
-                #define LV_LABEL_LONG_TXT_HINT CONFIG_LV_LABEL_LONG_TXT_HINT
-            #else
-                #define LV_LABEL_LONG_TXT_HINT 0
-            #endif
-        #else
-            #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
-        #endif
-    #endif
-#endif
-
-#ifndef LV_USE_LINE
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_LINE
-            #define LV_USE_LINE CONFIG_LV_USE_LINE
-        #else
-            #define LV_USE_LINE 0
-        #endif
-    #else
-        #define LV_USE_LINE       1
-    #endif
-#endif
-
-#ifndef LV_USE_ROLLER
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ROLLER
-            #define LV_USE_ROLLER CONFIG_LV_USE_ROLLER
-        #else
-            #define LV_USE_ROLLER 0
-        #endif
-    #else
-        #define LV_USE_ROLLER     1   /*Requires: lv_label*/
-    #endif
-#endif
-#if LV_USE_ROLLER
-    #ifndef LV_ROLLER_INF_PAGES
-        #ifdef CONFIG_LV_ROLLER_INF_PAGES
-            #define LV_ROLLER_INF_PAGES CONFIG_LV_ROLLER_INF_PAGES
-        #else
-            #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
-        #endif
-    #endif
-#endif
-
-#ifndef LV_USE_SLIDER
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SLIDER
-            #define LV_USE_SLIDER CONFIG_LV_USE_SLIDER
-        #else
-            #define LV_USE_SLIDER 0
-        #endif
-    #else
-        #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
-    #endif
-#endif
-
-#ifndef LV_USE_SWITCH
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SWITCH
-            #define LV_USE_SWITCH CONFIG_LV_USE_SWITCH
-        #else
-            #define LV_USE_SWITCH 0
-        #endif
-    #else
-        #define LV_USE_SWITCH     1
-    #endif
-#endif
-
-#ifndef LV_USE_TEXTAREA
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_TEXTAREA
-            #define LV_USE_TEXTAREA CONFIG_LV_USE_TEXTAREA
-        #else
-            #define LV_USE_TEXTAREA 0
-        #endif
-    #else
-        #define LV_USE_TEXTAREA   1   /*Requires: lv_label*/
-    #endif
-#endif
-#if LV_USE_TEXTAREA != 0
-    #ifndef LV_TEXTAREA_DEF_PWD_SHOW_TIME
-        #ifdef CONFIG_LV_TEXTAREA_DEF_PWD_SHOW_TIME
-            #define LV_TEXTAREA_DEF_PWD_SHOW_TIME CONFIG_LV_TEXTAREA_DEF_PWD_SHOW_TIME
-        #else
-            #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
-        #endif
-    #endif
-#endif
-
-#ifndef LV_USE_TABLE
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_TABLE
-            #define LV_USE_TABLE CONFIG_LV_USE_TABLE
-        #else
-            #define LV_USE_TABLE 0
-        #endif
-    #else
-        #define LV_USE_TABLE      1
-    #endif
-#endif
-
-/*==================
- * EXTRA COMPONENTS
- *==================*/
-
-/*-----------
- * Widgets
- *----------*/
 #ifndef LV_USE_CALENDAR
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CALENDAR
@@ -1582,6 +1468,18 @@
     #endif
 #endif  /*LV_USE_CALENDAR*/
 
+#ifndef LV_USE_CANVAS
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CANVAS
+            #define LV_USE_CANVAS CONFIG_LV_USE_CANVAS
+        #else
+            #define LV_USE_CANVAS 0
+        #endif
+    #else
+        #define LV_USE_CANVAS     1
+    #endif
+#endif
+
 #ifndef LV_USE_CHART
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_CHART
@@ -1594,6 +1492,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_CHECKBOX
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_CHECKBOX
+            #define LV_USE_CHECKBOX CONFIG_LV_USE_CHECKBOX
+        #else
+            #define LV_USE_CHECKBOX 0
+        #endif
+    #else
+        #define LV_USE_CHECKBOX   1
+    #endif
+#endif
+
 #ifndef LV_USE_COLORWHEEL
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_COLORWHEEL
@@ -1603,6 +1513,30 @@
         #endif
     #else
         #define LV_USE_COLORWHEEL 1
+    #endif
+#endif
+
+#ifndef LV_USE_DROPDOWN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_DROPDOWN
+            #define LV_USE_DROPDOWN CONFIG_LV_USE_DROPDOWN
+        #else
+            #define LV_USE_DROPDOWN 0
+        #endif
+    #else
+        #define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
+    #endif
+#endif
+
+#ifndef LV_USE_IMG
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_IMG
+            #define LV_USE_IMG CONFIG_LV_USE_IMG
+        #else
+            #define LV_USE_IMG 0
+        #endif
+    #else
+        #define LV_USE_IMG        1   /*Requires: lv_label*/
     #endif
 #endif
 
@@ -1630,6 +1564,42 @@
     #endif
 #endif
 
+#ifndef LV_USE_LABEL
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_LABEL
+            #define LV_USE_LABEL CONFIG_LV_USE_LABEL
+        #else
+            #define LV_USE_LABEL 0
+        #endif
+    #else
+        #define LV_USE_LABEL      1
+    #endif
+#endif
+#if LV_USE_LABEL
+    #ifndef LV_LABEL_TEXT_SELECTION
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LABEL_TEXT_SELECTION
+                #define LV_LABEL_TEXT_SELECTION CONFIG_LV_LABEL_TEXT_SELECTION
+            #else
+                #define LV_LABEL_TEXT_SELECTION 0
+            #endif
+        #else
+            #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
+        #endif
+    #endif
+    #ifndef LV_LABEL_LONG_TXT_HINT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LABEL_LONG_TXT_HINT
+                #define LV_LABEL_LONG_TXT_HINT CONFIG_LV_LABEL_LONG_TXT_HINT
+            #else
+                #define LV_LABEL_LONG_TXT_HINT 0
+            #endif
+        #else
+            #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
+        #endif
+    #endif
+#endif
+
 #ifndef LV_USE_LED
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_LED
@@ -1639,6 +1609,18 @@
         #endif
     #else
         #define LV_USE_LED        1
+    #endif
+#endif
+
+#ifndef LV_USE_LINE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_LINE
+            #define LV_USE_LINE CONFIG_LV_USE_LINE
+        #else
+            #define LV_USE_LINE 0
+        #endif
+    #else
+        #define LV_USE_LINE       1
     #endif
 #endif
 
@@ -1690,6 +1672,61 @@
     #endif
 #endif
 
+#ifndef LV_USE_ROLLER
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ROLLER
+            #define LV_USE_ROLLER CONFIG_LV_USE_ROLLER
+        #else
+            #define LV_USE_ROLLER 0
+        #endif
+    #else
+        #define LV_USE_ROLLER     1   /*Requires: lv_label*/
+    #endif
+#endif
+#if LV_USE_ROLLER
+    #ifndef LV_ROLLER_INF_PAGES
+        #ifdef CONFIG_LV_ROLLER_INF_PAGES
+            #define LV_ROLLER_INF_PAGES CONFIG_LV_ROLLER_INF_PAGES
+        #else
+            #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
+        #endif
+    #endif
+#endif
+
+#ifndef LV_USE_SLIDER
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SLIDER
+            #define LV_USE_SLIDER CONFIG_LV_USE_SLIDER
+        #else
+            #define LV_USE_SLIDER 0
+        #endif
+    #else
+        #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
+    #endif
+#endif
+
+#ifndef LV_USE_SPAN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SPAN
+            #define LV_USE_SPAN CONFIG_LV_USE_SPAN
+        #else
+            #define LV_USE_SPAN 0
+        #endif
+    #else
+        #define LV_USE_SPAN       1
+    #endif
+#endif
+#if LV_USE_SPAN
+    /*A line text can contain maximum num of span descriptor */
+    #ifndef LV_SPAN_SNIPPET_STACK_SIZE
+        #ifdef CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
+            #define LV_SPAN_SNIPPET_STACK_SIZE CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
+        #else
+            #define LV_SPAN_SNIPPET_STACK_SIZE 64
+        #endif
+    #endif
+#endif
+
 #ifndef LV_USE_SPINBOX
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SPINBOX
@@ -1711,6 +1748,51 @@
         #endif
     #else
         #define LV_USE_SPINNER    1
+    #endif
+#endif
+
+#ifndef LV_USE_SWITCH
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SWITCH
+            #define LV_USE_SWITCH CONFIG_LV_USE_SWITCH
+        #else
+            #define LV_USE_SWITCH 0
+        #endif
+    #else
+        #define LV_USE_SWITCH     1
+    #endif
+#endif
+
+#ifndef LV_USE_TEXTAREA
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_TEXTAREA
+            #define LV_USE_TEXTAREA CONFIG_LV_USE_TEXTAREA
+        #else
+            #define LV_USE_TEXTAREA 0
+        #endif
+    #else
+        #define LV_USE_TEXTAREA   1   /*Requires: lv_label*/
+    #endif
+#endif
+#if LV_USE_TEXTAREA != 0
+    #ifndef LV_TEXTAREA_DEF_PWD_SHOW_TIME
+        #ifdef CONFIG_LV_TEXTAREA_DEF_PWD_SHOW_TIME
+            #define LV_TEXTAREA_DEF_PWD_SHOW_TIME CONFIG_LV_TEXTAREA_DEF_PWD_SHOW_TIME
+        #else
+            #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
+        #endif
+    #endif
+#endif
+
+#ifndef LV_USE_TABLE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_TABLE
+            #define LV_USE_TABLE CONFIG_LV_USE_TABLE
+        #else
+            #define LV_USE_TABLE 0
+        #endif
+    #else
+        #define LV_USE_TABLE      1
     #endif
 #endif
 
@@ -1750,31 +1832,9 @@
     #endif
 #endif
 
-#ifndef LV_USE_SPAN
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SPAN
-            #define LV_USE_SPAN CONFIG_LV_USE_SPAN
-        #else
-            #define LV_USE_SPAN 0
-        #endif
-    #else
-        #define LV_USE_SPAN       1
-    #endif
-#endif
-#if LV_USE_SPAN
-    /*A line text can contain maximum num of span descriptor */
-    #ifndef LV_SPAN_SNIPPET_STACK_SIZE
-        #ifdef CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
-            #define LV_SPAN_SNIPPET_STACK_SIZE CONFIG_LV_SPAN_SNIPPET_STACK_SIZE
-        #else
-            #define LV_SPAN_SNIPPET_STACK_SIZE 64
-        #endif
-    #endif
-#endif
-
-/*-----------
- * Themes
- *----------*/
+/*==================
+ * THEMES
+ *==================*/
 
 /*A simple, impressive and very complete theme*/
 #ifndef LV_USE_THEME_DEFAULT
@@ -1848,9 +1908,9 @@
     #endif
 #endif
 
-/*-----------
- * Layouts
- *----------*/
+/*==================
+ * LAYOUTS
+ *==================*/
 
 /*A layout similar to Flexbox in CSS.*/
 #ifndef LV_USE_FLEX
@@ -1878,9 +1938,9 @@
     #endif
 #endif
 
-/*---------------------
- * 3rd party libraries
- *--------------------*/
+/*====================
+ * 3RD PARTS LIBRARIES
+ *====================*/
 
 /*File system interfaces for common APIs */
 
@@ -1911,7 +1971,7 @@
         #ifdef CONFIG_LV_FS_STDIO_CACHE_SIZE
             #define LV_FS_STDIO_CACHE_SIZE CONFIG_LV_FS_STDIO_CACHE_SIZE
         #else
-            #define LV_FS_STDIO_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
+            #define LV_FS_STDIO_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
@@ -1943,7 +2003,7 @@
         #ifdef CONFIG_LV_FS_POSIX_CACHE_SIZE
             #define LV_FS_POSIX_CACHE_SIZE CONFIG_LV_FS_POSIX_CACHE_SIZE
         #else
-            #define LV_FS_POSIX_CACHE_SIZE  0   /*>0 to cache this number of bytes in lv_fs_read()*/
+            #define LV_FS_POSIX_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
         #endif
     #endif
 #endif
@@ -1961,7 +2021,7 @@
         #ifdef CONFIG_LV_FS_WIN32_LETTER
             #define LV_FS_WIN32_LETTER CONFIG_LV_FS_WIN32_LETTER
         #else
-            #define LV_FS_WIN32_LETTER  '\0'    /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+            #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
         #endif
     #endif
     #ifndef LV_FS_WIN32_PATH
@@ -1985,7 +2045,7 @@
     #ifdef CONFIG_LV_USE_FS_FATFS
         #define LV_USE_FS_FATFS CONFIG_LV_USE_FS_FATFS
     #else
-        #define LV_USE_FS_FATFS  0
+        #define LV_USE_FS_FATFS 0
     #endif
 #endif
 #if LV_USE_FS_FATFS
@@ -2113,7 +2173,7 @@
     #ifdef CONFIG_LV_USE_FFMPEG
         #define LV_USE_FFMPEG CONFIG_LV_USE_FFMPEG
     #else
-        #define LV_USE_FFMPEG  0
+        #define LV_USE_FFMPEG 0
     #endif
 #endif
 #if LV_USE_FFMPEG
@@ -2127,9 +2187,9 @@
     #endif
 #endif
 
-/*-----------
- * Others
- *----------*/
+/*==================
+ * OTHERS
+ *==================*/
 
 /*1: Enable API to take snapshot for object*/
 #ifndef LV_USE_SNAPSHOT
@@ -2145,7 +2205,7 @@
     #ifdef CONFIG_LV_USE_MONKEY
         #define LV_USE_MONKEY CONFIG_LV_USE_MONKEY
     #else
-        #define LV_USE_MONKEY   0
+        #define LV_USE_MONKEY 0
     #endif
 #endif
 
@@ -2154,7 +2214,7 @@
     #ifdef CONFIG_LV_USE_GRIDNAV
         #define LV_USE_GRIDNAV CONFIG_LV_USE_GRIDNAV
     #else
-        #define LV_USE_GRIDNAV  0
+        #define LV_USE_GRIDNAV 0
     #endif
 #endif
 
@@ -2167,13 +2227,97 @@
     #endif
 #endif
 
-/*draw img in label or span obj */
+/*1: Support using images as font in label or span widgets */
 #ifndef LV_USE_IMGFONT
     #ifdef CONFIG_LV_USE_IMGFONT
         #define LV_USE_IMGFONT CONFIG_LV_USE_IMGFONT
     #else
         #define LV_USE_IMGFONT 0
     #endif
+#endif
+#if LV_USE_IMGFONT
+    /*Imgfont image file path maximum length*/
+    #ifndef LV_IMGFONT_PATH_MAX_LEN
+        #ifdef CONFIG_LV_IMGFONT_PATH_MAX_LEN
+            #define LV_IMGFONT_PATH_MAX_LEN CONFIG_LV_IMGFONT_PATH_MAX_LEN
+        #else
+            #define LV_IMGFONT_PATH_MAX_LEN 64
+        #endif
+    #endif
+
+    /*1: Use img cache to buffer header information*/
+    #ifndef LV_IMGFONT_USE_IMG_CACHE_HEADER
+        #ifdef CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
+            #define LV_IMGFONT_USE_IMG_CACHE_HEADER CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
+        #else
+            #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+        #endif
+    #endif
+#endif
+
+/*1: Enable a published subscriber based messaging system */
+#ifndef LV_USE_MSG
+    #ifdef CONFIG_LV_USE_MSG
+        #define LV_USE_MSG CONFIG_LV_USE_MSG
+    #else
+        #define LV_USE_MSG 0
+    #endif
+#endif
+
+/*1: Enable Pinyin input method*/
+/*Requires: lv_keyboard*/
+#ifndef LV_USE_IME_PINYIN
+    #ifdef CONFIG_LV_USE_IME_PINYIN
+        #define LV_USE_IME_PINYIN CONFIG_LV_USE_IME_PINYIN
+    #else
+        #define LV_USE_IME_PINYIN 0
+    #endif
+#endif
+#if LV_USE_IME_PINYIN
+    /*1: Use default thesaurus*/
+    /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
+    #ifndef LV_IME_PINYIN_USE_DEFAULT_DICT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+                #define LV_IME_PINYIN_USE_DEFAULT_DICT CONFIG_LV_IME_PINYIN_USE_DEFAULT_DICT
+            #else
+                #define LV_IME_PINYIN_USE_DEFAULT_DICT 0
+            #endif
+        #else
+            #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
+        #endif
+    #endif
+    /*Set the maximum number of candidate panels that can be displayed*/
+    /*This needs to be adjusted according to the size of the screen*/
+    #ifndef LV_IME_PINYIN_CAND_TEXT_NUM
+        #ifdef CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
+            #define LV_IME_PINYIN_CAND_TEXT_NUM CONFIG_LV_IME_PINYIN_CAND_TEXT_NUM
+        #else
+            #define LV_IME_PINYIN_CAND_TEXT_NUM 6
+        #endif
+    #endif
+
+    /*Use 9 key input(k9)*/
+    #ifndef LV_IME_PINYIN_USE_K9_MODE
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_IME_PINYIN_USE_K9_MODE
+                #define LV_IME_PINYIN_USE_K9_MODE CONFIG_LV_IME_PINYIN_USE_K9_MODE
+            #else
+                #define LV_IME_PINYIN_USE_K9_MODE 0
+            #endif
+        #else
+            #define LV_IME_PINYIN_USE_K9_MODE      1
+        #endif
+    #endif
+    #if LV_IME_PINYIN_USE_K9_MODE == 1
+        #ifndef LV_IME_PINYIN_K9_CAND_TEXT_NUM
+            #ifdef CONFIG_LV_IME_PINYIN_K9_CAND_TEXT_NUM
+                #define LV_IME_PINYIN_K9_CAND_TEXT_NUM CONFIG_LV_IME_PINYIN_K9_CAND_TEXT_NUM
+            #else
+                #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
+            #endif
+        #endif
+    #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
 
 /*==================
@@ -2202,17 +2346,17 @@
     #ifdef CONFIG_LV_USE_DEMO_WIDGETS
         #define LV_USE_DEMO_WIDGETS CONFIG_LV_USE_DEMO_WIDGETS
     #else
-        #define LV_USE_DEMO_WIDGETS        0
+        #define LV_USE_DEMO_WIDGETS 0
     #endif
 #endif
 #if LV_USE_DEMO_WIDGETS
-#ifndef LV_DEMO_WIDGETS_SLIDESHOW
-    #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-        #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
-    #else
-        #define LV_DEMO_WIDGETS_SLIDESHOW  0
+    #ifndef LV_DEMO_WIDGETS_SLIDESHOW
+        #ifdef CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+            #define LV_DEMO_WIDGETS_SLIDESHOW CONFIG_LV_DEMO_WIDGETS_SLIDESHOW
+        #else
+            #define LV_DEMO_WIDGETS_SLIDESHOW 0
+        #endif
     #endif
-#endif
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -2220,7 +2364,7 @@
     #ifdef CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
         #define LV_USE_DEMO_KEYPAD_AND_ENCODER CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
     #else
-        #define LV_USE_DEMO_KEYPAD_AND_ENCODER     0
+        #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
     #endif
 #endif
 
@@ -2229,7 +2373,17 @@
     #ifdef CONFIG_LV_USE_DEMO_BENCHMARK
         #define LV_USE_DEMO_BENCHMARK CONFIG_LV_USE_DEMO_BENCHMARK
     #else
-        #define LV_USE_DEMO_BENCHMARK   0
+        #define LV_USE_DEMO_BENCHMARK 0
+    #endif
+#endif
+#if LV_USE_DEMO_BENCHMARK
+    /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+    #ifndef LV_DEMO_BENCHMARK_RGB565A8
+        #ifdef CONFIG_LV_DEMO_BENCHMARK_RGB565A8
+            #define LV_DEMO_BENCHMARK_RGB565A8 CONFIG_LV_DEMO_BENCHMARK_RGB565A8
+        #else
+            #define LV_DEMO_BENCHMARK_RGB565A8 0
+        #endif
     #endif
 #endif
 
@@ -2238,7 +2392,7 @@
     #ifdef CONFIG_LV_USE_DEMO_STRESS
         #define LV_USE_DEMO_STRESS CONFIG_LV_USE_DEMO_STRESS
     #else
-        #define LV_USE_DEMO_STRESS      0
+        #define LV_USE_DEMO_STRESS 0
     #endif
 #endif
 
@@ -2247,45 +2401,45 @@
     #ifdef CONFIG_LV_USE_DEMO_MUSIC
         #define LV_USE_DEMO_MUSIC CONFIG_LV_USE_DEMO_MUSIC
     #else
-        #define LV_USE_DEMO_MUSIC       0
+        #define LV_USE_DEMO_MUSIC 0
     #endif
 #endif
 #if LV_USE_DEMO_MUSIC
-#ifndef LV_DEMO_MUSIC_SQUARE
-    #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
-        #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
-    #else
-        #define LV_DEMO_MUSIC_SQUARE       0
+    #ifndef LV_DEMO_MUSIC_SQUARE
+        #ifdef CONFIG_LV_DEMO_MUSIC_SQUARE
+            #define LV_DEMO_MUSIC_SQUARE CONFIG_LV_DEMO_MUSIC_SQUARE
+        #else
+            #define LV_DEMO_MUSIC_SQUARE    0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LANDSCAPE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-        #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
-    #else
-        #define LV_DEMO_MUSIC_LANDSCAPE    0
+    #ifndef LV_DEMO_MUSIC_LANDSCAPE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+            #define LV_DEMO_MUSIC_LANDSCAPE CONFIG_LV_DEMO_MUSIC_LANDSCAPE
+        #else
+            #define LV_DEMO_MUSIC_LANDSCAPE 0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_ROUND
-    #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
-        #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
-    #else
-        #define LV_DEMO_MUSIC_ROUND        0
+    #ifndef LV_DEMO_MUSIC_ROUND
+        #ifdef CONFIG_LV_DEMO_MUSIC_ROUND
+            #define LV_DEMO_MUSIC_ROUND CONFIG_LV_DEMO_MUSIC_ROUND
+        #else
+            #define LV_DEMO_MUSIC_ROUND     0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_LARGE
-    #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
-        #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
-    #else
-        #define LV_DEMO_MUSIC_LARGE        0
+    #ifndef LV_DEMO_MUSIC_LARGE
+        #ifdef CONFIG_LV_DEMO_MUSIC_LARGE
+            #define LV_DEMO_MUSIC_LARGE CONFIG_LV_DEMO_MUSIC_LARGE
+        #else
+            #define LV_DEMO_MUSIC_LARGE     0
+        #endif
     #endif
-#endif
-#ifndef LV_DEMO_MUSIC_AUTO_PLAY
-    #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-        #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
-    #else
-        #define LV_DEMO_MUSIC_AUTO_PLAY    0
+    #ifndef LV_DEMO_MUSIC_AUTO_PLAY
+        #ifdef CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+            #define LV_DEMO_MUSIC_AUTO_PLAY CONFIG_LV_DEMO_MUSIC_AUTO_PLAY
+        #else
+            #define LV_DEMO_MUSIC_AUTO_PLAY 0
+        #endif
     #endif
-#endif
 #endif
 
 

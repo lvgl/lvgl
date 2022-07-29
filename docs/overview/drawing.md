@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/drawing.md
-```
 # Drawing
 
 With LVGL, you don't need to draw anything manually. Just create objects (like buttons, labels, arc, etc.), move and change them, and LVGL will refresh and redraw what is required.
@@ -33,7 +29,7 @@ LVGL refreshes the screen in the following steps:
     - Objects completely out of their parent are not added.
     - Areas partially out of the parent are cropped to the parent's area.
     - Objects on other screens are not added.
-3. In every `LV_DISP_DEF_REFR_PERIOD` (set in `lv_conf.h`) the following happens:
+3. In every `LV_DEF_REFR_PERIOD` (set in `lv_hal_disp.h`) the following happens:
     - LVGL checks the invalid areas and joins those that are adjacent or intersecting.
     - Takes the first joined area, if it's smaller than the *draw buffer*, then simply renders the area's content into the *draw buffer*.
       If the area doesn't fit into the buffer, draw as many lines as possible to the *draw buffer*.
@@ -105,7 +101,7 @@ Although widgets can be easily customized by styles there might be cases when so
 To ensure a great level of flexibility LVGL sends a lot of events during drawing with parameters that tell what LVGL is about to draw.
 Some fields of these parameters can be modified to draw something else or any custom drawing operations can be added manually.
 
-A good use case for this is the [Button matrix](/widgets/core/btnmatrix) widget. By default, its buttons can be styled in different states, but you can't style the buttons one by one.
+A good use case for this is the [Button matrix](/widgets/btnmatrix) widget. By default, its buttons can be styled in different states, but you can't style the buttons one by one.
 However, an event is sent for every button and you can, for example, tell LVGL to use different colors on a specific button or to manually draw an image on some buttons.
 
 Each of these events is described in detail below.

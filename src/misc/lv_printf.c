@@ -33,9 +33,6 @@
 /*Original repository: https://github.com/mpaland/printf*/
 
 #include "lv_printf.h"
-
-#if LV_SPRINTF_CUSTOM == 0
-
 #include <stdbool.h>
 
 #define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_SPRINTF_USE_FLOAT)
@@ -862,7 +859,7 @@ static int _vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, cons
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int lv_snprintf(char * buffer, size_t count, const char * format, ...)
+int lv_snprintf_builtin(char * buffer, size_t count, const char * format, ...)
 {
     va_list va;
     va_start(va, format);
@@ -871,9 +868,7 @@ int lv_snprintf(char * buffer, size_t count, const char * format, ...)
     return ret;
 }
 
-int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va)
+int lv_vsnprintf_builtin(char * buffer, size_t count, const char * format, va_list va)
 {
     return _vsnprintf(_out_buffer, buffer, count, format, va);
 }
-
-#endif /*LV_SPRINTF_CUSTOM*/

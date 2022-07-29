@@ -26,7 +26,7 @@ void lv_example_span_1(void)
     lv_span_t * span = lv_spangroup_new_span(spans);
     lv_span_set_text(span, "China is a beautiful country.");
     lv_style_set_text_color(&span->style, lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_text_decor(&span->style, LV_TEXT_DECOR_STRIKETHROUGH | LV_TEXT_DECOR_UNDERLINE);
+    lv_style_set_text_decor(&span->style, LV_TEXT_DECOR_UNDERLINE);
     lv_style_set_text_opa(&span->style, LV_OPA_50);
 
     span = lv_spangroup_new_span(spans);
@@ -50,6 +50,7 @@ void lv_example_span_1(void)
 
     span = lv_spangroup_new_span(spans);
     lv_span_set_text(span, "I have a dream that hope to come true.");
+    lv_style_set_text_decor(&span->style, LV_TEXT_DECOR_STRIKETHROUGH);
 
     lv_spangroup_refr_mode(spans);
 }

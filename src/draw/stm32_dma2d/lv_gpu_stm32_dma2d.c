@@ -17,11 +17,6 @@
  *      DEFINES
  *********************/
 
-#if LV_COLOR_16_SWAP
-    // TODO: F7 has red blue swap bit in control register for all layers and output
-    #error "Can't use DMA2D with LV_COLOR_16_SWAP 1"
-#endif
-
 #if LV_COLOR_DEPTH == 8
     #error "Can't use DMA2D with LV_COLOR_DEPTH == 8"
 #endif
@@ -222,8 +217,8 @@ static void lv_draw_stm32_dma2d_blend_map(lv_color_t * dest_buf, const lv_area_t
         DMA2D->FGMAR = (uint32_t)src_buf;
         DMA2D->FGOR = src_stride - dest_w;
 
-        DMA2D->OMAR = (uint32_t)src_buf;
-        DMA2D->OOR = src_stride - dest_w;
+        DMA2D->OMAR = (uint32_t)dest_buf;
+        DMA2D->OOR = dest_stride - dest_w;
         DMA2D->NLR = (dest_w << DMA2D_NLR_PL_Pos) | (dest_h << DMA2D_NLR_NL_Pos);
 
         /*start transfer*/

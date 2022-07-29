@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/CONTRIBUTING.md
-```
 
 # Contributing
 
@@ -206,7 +202,7 @@ If you don't want to speak about your project publicly, feel free to use [Contac
 ### Write examples
 As you learn LVGL you will probably play with the features of widgets. Why not publish your experiments?
 
-Each widgets' documentation contains examples. For instance, here are the examples of the [Drop-down list](/widgets/core/dropdown#examples) widget.
+Each widgets' documentation contains examples. For instance, here are the examples of the [Drop-down list](/widgets/dropdown#examples) widget.
 The examples are directly loaded from the [lvgl/examples](https://github.com/lvgl/lvgl/tree/master/examples) folder.
 
 So all you need to do is send a [Pull request](#pull-request) to the [lvgl](https://github.com/lvgl/lvgl) repository and follow some conventions:
