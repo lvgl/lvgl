@@ -107,9 +107,3 @@ _ARMABI time_t time(time_t * time)
 }
 #endif
 
-/* when people don't want to use src/extra */
-__attribute__((weak))
-void lv_extra_init(void)
-{
-}
-

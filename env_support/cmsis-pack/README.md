@@ -51,7 +51,10 @@ remove the misleading guide above this code segment.
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
-Update macro `LV_MEM_SIZE` to `(64*1024U)`.
+Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
+
+
+
 6. Update Theme related macros:
 
 ```c
@@ -105,9 +108,26 @@ Update macro `LV_MEM_SIZE` to `(64*1024U)`.
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
 ```
-9. Thoroughly remove the `DEMO USAGE` section.
-10. Thoroughly remove the '3rd party libraries' section.
-10. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+9. Thoroughly remove the `DEMO USAGE` section and add following code:
+
+   ```c
+   /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
+   #if LV_USE_DEMO_WIDGETS
+       #define LV_DEMO_WIDGETS_SLIDESHOW 0
+   #endif
+   
+   /*Benchmark your system*/
+   #if LV_USE_DEMO_BENCHMARK
+       /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+       #define LV_DEMO_BENCHMARK_RGB565A8 0
+   #endif
+   ```
+
+   
+
+10. Thoroughly remove the `3rd party libraries` section.
+
+11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 
