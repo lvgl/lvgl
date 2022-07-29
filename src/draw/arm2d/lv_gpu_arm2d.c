@@ -696,15 +696,11 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
         }
         /*Has opacity*/
         else {
-//#if LV_COLOR_SCREEN_TRANSP
-//            return false;
-//#else
             __arm_2d_impl_colour_filling_with_opacity((color_int *)dest_buf,
                                                       dest_stride,
                                                       &target_size,
                                                       color.full,
                                                       opa);
-//#endif
         }
     }
     /*Masked*/
@@ -720,9 +716,6 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
         }
         /*With opacity*/
         else {
-//#if LV_COLOR_SCREEN_TRANSP
-//            return false;
-//#else
             __arm_2d_impl_colour_filling_mask_opacity((color_int *)dest_buf,
                                                       dest_stride,
                                                       (uint8_t *)mask,
@@ -730,7 +723,6 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
                                                       &target_size,
                                                       color.full,
                                                       opa);
-//#endif
         }
     }
 
@@ -757,10 +749,6 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
         .iHeight = lv_area_get_height(dest_area),
     };
 
-//#if LV_COLOR_SCREEN_TRANSP
-//    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-//#endif
-
     /*Simple fill (maybe with opacity), no masking*/
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
@@ -771,25 +759,18 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
                                &copy_size);
         }
         else {
-//#if LV_COLOR_SCREEN_TRANSP
-//            return false;
-//#else
             __arm_2d_impl_alpha_blending((color_int *)src_buf,
                                          src_stride,
                                          (color_int *)dest_buf,
                                          dest_stride,
                                          &copy_size,
                                          opa);
-//#endif
         }
     }
     /*Masked*/
     else {
         /*Only the mask matters*/
         if(opa > LV_OPA_MAX) {
-//#if LV_COLOR_SCREEN_TRANSP
-//            return false;
-//#else
             __arm_2d_impl_src_msk_copy((color_int *)src_buf,
                                        src_stride,
                                        (uint8_t *)mask,
@@ -798,13 +779,9 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
                                        (color_int *)dest_buf,
                                        dest_stride,
                                        &copy_size);
-//#endif
         }
         /*Handle opa and mask values too*/
         else {
-//#if LV_COLOR_SCREEN_TRANSP
-//            return false;
-//#else
             __arm_2d_impl_gray8_alpha_blending((uint8_t *)mask,
                                                mask_stride,
                                                (uint8_t *)mask,
@@ -820,7 +797,6 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
                                        (color_int *)dest_buf,
                                        dest_stride,
                                        &copy_size);
-//#endif
         }
     }
 
