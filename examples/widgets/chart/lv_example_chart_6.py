@@ -42,7 +42,7 @@ class ExampleChart_6():
         if code == lv.EVENT.VALUE_CHANGED:
             # print("last_id: ",self.last_id)
             self.last_id = chart.get_pressed_point()
-            if self.last_id != lv.CHART_POINT.NONE:
+            if self.last_id != lv.CHART_POINT_NONE:
                 p = lv.point_t()
                 chart.get_point_pos_by_id(self.ser, self.last_id, p)
                 chart.set_cursor_point(self.cursor, None, self.last_id)
