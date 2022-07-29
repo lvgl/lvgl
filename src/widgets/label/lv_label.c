@@ -735,16 +735,14 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
-
     /*Call the ancestor's event handler*/
-    res = lv_obj_event_base(MY_CLASS, e);
+    const lv_res_t res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    lv_event_code_t code = lv_event_get_code(e);
+    const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_STYLE_CHANGED) {
+    if((code == LV_EVENT_STYLE_CHANGED) || (code == LV_EVENT_SIZE_CHANGED)) {
         /*Revert dots for proper refresh*/
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
@@ -755,19 +753,16 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
          * To avoid this add some extra draw area.
          * font_h / 4 is an empirical value. */
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t font_h = lv_font_get_line_height(font);
+        const lv_coord_t font_h = lv_font_get_line_height(font);
         lv_event_set_ext_draw_size(e, font_h / 4);
     }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
-        lv_label_revert_dots(obj);
-        lv_label_refr_text(obj);
-    }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
-        lv_point_t size;
         lv_label_t * label = (lv_label_t *)obj;
+
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+        const lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+        const lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+
         lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
         if(label->recolor) flag |= LV_TEXT_FLAG_RECOLOR;
         if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
@@ -776,6 +771,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
         else w = lv_obj_get_content_width(obj);
 
+        lv_point_t size;
         lv_txt_get_size(&size, label->text, font, letter_space, line_space, w, flag);
 
         lv_point_t * self_size = lv_event_get_param(e);
