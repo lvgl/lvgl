@@ -68,6 +68,8 @@ static void *lvgl_fs_open(struct _lv_fs_drv_t *drv, const char *path,
 	if (!file)
 		return NULL;
 
+	fs_file_t_init((struct fs_file_t *)file);
+
 	err = fs_open((struct fs_file_t *)file, path, zmode);
 	if (err)
 		return NULL;
