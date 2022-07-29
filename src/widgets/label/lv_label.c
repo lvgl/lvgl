@@ -48,6 +48,8 @@ static char * lv_label_get_dot_tmp(lv_obj_t * label);
 static void lv_label_dot_tmp_free(lv_obj_t * label);
 static void set_ofs_x_anim(void * obj, int32_t v);
 static void set_ofs_y_anim(void * obj, int32_t v);
+static size_t get_text_length(const char * text);
+static void copy_text_to_label(lv_label_t * label, const char * text);
 
 /**********************
  *  STATIC VARIABLES
@@ -92,23 +94,18 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
     /*If text is NULL then just refresh with the current text*/
     if(text == NULL) text = label->text;
 
-    if(label->text == text && label->static_txt == 0) {
-        /*If set its own text then reallocate it (maybe its size changed)*/
-#if LV_USE_ARABIC_PERSIAN_CHARS
-        /*Get the size of the text and process it*/
-        size_t len = _lv_txt_ap_calc_bytes_cnt(text);
+    const size_t text_len = get_text_length(text);
 
-        label->text = lv_realloc(label->text, len);
+    /*If set its own text then reallocate it (maybe its size changed)*/
+    if(label->text == text && label->static_txt == 0) {
+        label->text = lv_realloc(label->text, text_len);
         LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
 
+#if LV_USE_ARABIC_PERSIAN_CHARS
         _lv_txt_ap_proc(label->text, label->text);
-#else
-        label->text = lv_realloc(label->text, strlen(label->text) + 1);
 #endif
 
-        LV_ASSERT_MALLOC(label->text);
-        if(label->text == NULL) return;
     }
     else {
         /*Free the old text*/
@@ -117,25 +114,11 @@ void lv_label_set_text(lv_obj_t * obj, const char * text)
             label->text = NULL;
         }
 
-#if LV_USE_ARABIC_PERSIAN_CHARS
-        /*Get the size of the text and process it*/
-        size_t len = _lv_txt_ap_calc_bytes_cnt(text);
-
-        label->text = lv_malloc(len);
+        label->text = lv_malloc(text_len);
         LV_ASSERT_MALLOC(label->text);
         if(label->text == NULL) return;
 
-        _lv_txt_ap_proc(text, label->text);
-#else
-        /*Get the size of the text*/
-        size_t len = strlen(text) + 1;
-
-        /*Allocate space for the new text*/
-        label->text = lv_malloc(len);
-        LV_ASSERT_MALLOC(label->text);
-        if(label->text == NULL) return;
-        strcpy(label->text, text);
-#endif
+        copy_text_to_label(label, text);
 
         /*Now the text is dynamically allocated*/
         label->static_txt = 0;
@@ -611,7 +594,6 @@ uint32_t lv_label_get_text_selection_start(const lv_obj_t * obj)
 #if LV_LABEL_TEXT_SELECTION
     lv_label_t * label = (lv_label_t *)obj;
     return label->sel_start;
-
 #else
     LV_UNUSED(obj); /*Unused*/
     return LV_LABEL_TEXT_SELECTION_OFF;
@@ -1266,5 +1248,25 @@ static void set_ofs_y_anim(void * obj, int32_t v)
     lv_obj_invalidate(obj);
 }
 
+static size_t get_text_length(const char * text)
+{
+    size_t len = 0;
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    len = _lv_txt_ap_calc_bytes_cnt(text);
+#else
+    len = strlen(text) + 1;
+#endif
+
+    return len;
+}
+
+static void copy_text_to_label(lv_label_t * label, const char * text)
+{
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    _lv_txt_ap_proc(text, label->text);
+#else
+    (void) strcpy(label->text, text);
+#endif
+}
 
 #endif

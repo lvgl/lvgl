@@ -32,4 +32,23 @@ void test_label_recolor(void)
     TEST_ASSERT_FALSE(lv_label_get_recolor(label));
 }
 
+void test_label_set_text(void)
+{
+    const char * new_text = "Hello world";
+
+    /* Refresh with the current text. */
+    lv_label_set_text(label, NULL);
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), LV_LABEL_DEFAULT_TEXT);
+
+    /* '\0' terminated character string to set new text. */
+    lv_label_set_text(label, new_text);
+    TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), new_text);
+}
+
+void test_label_long_mode(void)
+{
+    /* LV_LABEL_LONG_WRAP, LV_LABEL_LONG_DOT, LV_LABEL_LONG_SCROLL, LV_LABEL_LONG_SCROLL_CIRCULAR, LV_LABEL_LONG_CLIP */
+    lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
+}
+
 #endif
