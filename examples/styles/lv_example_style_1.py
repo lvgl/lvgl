@@ -7,7 +7,7 @@ style.set_radius(5)
 
 # Make a gradient
 style.set_width(150)
-style.set_height(lv.SIZE.CONTENT)
+style.set_height(lv.SIZE_CONTENT)
 
 style.set_pad_ver(20)
 style.set_pad_left(5)
