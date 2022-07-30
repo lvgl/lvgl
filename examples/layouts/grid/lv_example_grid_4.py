@@ -2,8 +2,8 @@
 # Demonstrate track placement
 #
 
-col_dsc = [60, 60, 60, lv.GRID_TEMPLATE.LAST]
-row_dsc = [40, 40, 40, lv.GRID_TEMPLATE.LAST]
+col_dsc = [60, 60, 60, lv.GRID_TEMPLATE_LAST]
+row_dsc = [40, 40, 40, lv.GRID_TEMPLATE_LAST]
 
 
 # Add space between the columns and move the rows to the bottom (end)

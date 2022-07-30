@@ -6,13 +6,13 @@
 # Column 2: 1 unit from the remaining free space
 # Column 3: 2 unit from the remaining free space
 
-col_dsc = [60, lv.grid_fr(1), lv.grid_fr(2), lv.GRID_TEMPLATE.LAST]
+col_dsc = [60, lv.grid_fr(1), lv.grid_fr(2), lv.GRID_TEMPLATE_LAST]
 
 # Row 1: fix width 60 px
 # Row 2: 1 unit from the remaining free space
 # Row 3: fix width 60 px
 
-row_dsc = [40, lv.grid_fr(1), 40, lv.GRID_TEMPLATE.LAST]
+row_dsc = [40, lv.grid_fr(1), 40, lv.GRID_TEMPLATE_LAST]
 
 # Create a container with grid
 cont = lv.obj(lv.scr_act())

@@ -45,7 +45,7 @@ a.set_var(img)
 a.set_values(0, 100)
 a.set_time(3000)
 a.set_playback_time(500)
-a.set_repeat_count(lv.ANIM_REPEAT.INFINITE)
+a.set_repeat_count(lv.ANIM_REPEAT_INFINITE)
 a.set_custom_exec_cb(lambda a,val: ofs_y_anim(img,val))
 lv.anim_t.start(a)
 
