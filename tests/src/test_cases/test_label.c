@@ -468,4 +468,73 @@ void test_label_long_text_get_letter_pos_align_center(void)
     TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
 }
 
+void test_label_is_char_under_pos_align_left(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_LEFT, _LV_STYLE_STATE_CMP_SAME);
+    bool expected_result = true;
+    bool result = false;
+    lv_point_t last_letter_point;
+
+    /* Getting the last letter point */
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    /* We should get true, since we know the last letter is in this coordinate */
+    result = lv_label_is_char_under_pos(label, &last_letter_point);
+    TEST_ASSERT_EQUAL(expected_result, result);
+
+    /* If we test a move away from the last letter then we should get false */
+    expected_result = false;
+    last_letter_point.x += 50;
+
+    result = lv_label_is_char_under_pos(label, &last_letter_point);
+    TEST_ASSERT_EQUAL(expected_result, result);
+}
+
+void test_label_is_char_under_pos_align_right(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_RIGHT, _LV_STYLE_STATE_CMP_SAME);
+    bool expected_result = true;
+    bool result = false;
+    lv_point_t last_letter_point;
+
+    /* Getting the last letter point */
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    /* We should get true, since we know the last letter is in this coordinate */
+    result = lv_label_is_char_under_pos(label, &last_letter_point);
+    TEST_ASSERT_EQUAL(expected_result, result);
+
+    /* If we test a move away from the last letter then we should get false */
+    expected_result = false;
+    last_letter_point.x -= 50;
+
+    result = lv_label_is_char_under_pos(label, &last_letter_point);
+    TEST_ASSERT_EQUAL(expected_result, result);
+}
+
+void test_label_is_char_under_pos_align_center(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, _LV_STYLE_STATE_CMP_SAME);
+    bool expected_result = true;
+    bool result = false;
+    lv_point_t last_letter_point;
+
+    /* Getting the last letter point */
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    /* We should get true, since we know the last letter is in this coordinate */
+    result = lv_label_is_char_under_pos(label, &last_letter_point);
+    TEST_ASSERT_EQUAL(expected_result, result);
+
+    /* If we test a move away from the last letter then we should get false */
+    expected_result = false;
+    last_letter_point.x -= 50;
+
+    result = lv_label_is_char_under_pos(label, &last_letter_point);
+    TEST_ASSERT_EQUAL(expected_result, result);
+}
+
 #endif
