@@ -3,18 +3,37 @@
 
 #include "unity/unity.h"
 
+static const char * long_text =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras malesuada ultrices magna in rutrum.";
+static const char * long_text_multiline =
+    "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit.\nCras malesuada ultrices magna in rutrum.\n";
+static const char * empty_text = "";
+
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * label;
+static lv_obj_t * long_label;
+static lv_obj_t * long_label_multiline;
+static lv_obj_t * empty_label;
 
 void setUp(void)
 {
     active_screen = lv_scr_act();
     label = lv_label_create(active_screen);
+    long_label = lv_label_create(active_screen);
+    long_label_multiline = lv_label_create(active_screen);
+    empty_label = lv_label_create(active_screen);
+
+    lv_label_set_text(long_label, long_text);
+    lv_label_set_text(long_label_multiline, long_text_multiline);
+    lv_label_set_text(empty_label, empty_text);
 }
 
 void tearDown(void)
 {
     lv_obj_del(label);
+    lv_obj_del(long_label);
+    lv_obj_del(long_label_multiline);
+    lv_obj_del(empty_label);
 }
 
 void test_label_creation(void)
@@ -49,6 +68,404 @@ void test_label_long_mode(void)
 {
     /* LV_LABEL_LONG_WRAP, LV_LABEL_LONG_DOT, LV_LABEL_LONG_SCROLL, LV_LABEL_LONG_SCROLL_CIRCULAR, LV_LABEL_LONG_CLIP */
     lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
+    /* Test behavior of label with text longer than the object size */
+    /* In LV_LONG_WRAP/DOT/SCROLL/SCROLL_CIRC the size of the label should be set AFTER this function */
+    /* LV_LABEL_LONG_WRAP generates new lines */
+}
+
+void test_label_long_mode_dot(void)
+{
+    /* Replaces last 3 characters with dots with a separated buffer */
+    lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
+
+    // when dots replace more than 4 characters then we allocate memory for them
+    // otherwise we store then, see the dot union
+
+    /* When text is static the text must be writable */
+    // lv_label_set_text
+    // lv_label_set_array_text
+    // lv_label_set_text_static
+}
+
+void test_label_get_letter_pos_align_left(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_LEFT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 29,
+        .y = 0
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label_multiline)) - 1; /* char index starts at 0 */
+
+    lv_label_get_letter_pos(label, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_get_letter_pos_align_left_on_empty_text(void)
+{
+    lv_obj_set_style_text_align(empty_label, LV_TEXT_ALIGN_LEFT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(empty_label)) - 1;
+
+    lv_label_get_letter_pos(empty_label, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(empty_label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_long_text_multiline_get_letter_pos_align_left(void)
+{
+    lv_obj_set_style_text_align(long_label_multiline, LV_TEXT_ALIGN_LEFT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    lv_point_t last_letter_after_new_line_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 305,
+        .y = 32
+    };
+    const lv_point_t expected_last_letter_after_new_line_point = {
+        .x = 0,
+        .y = 48
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label_multiline)) - 1; /* char index starts at 0 */
+    const uint32_t last_letter_after_new_line = strlen(lv_label_get_text(long_label_multiline));
+
+    lv_label_get_letter_pos(long_label_multiline, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(long_label_multiline, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+
+    lv_label_get_letter_pos(long_label_multiline, last_letter_after_new_line, &last_letter_after_new_line_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_after_new_line_point.x, last_letter_after_new_line_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_after_new_line_point.y, last_letter_after_new_line_point.y);
+}
+
+void test_label_long_text_get_letter_pos_align_left(void)
+{
+    lv_label_set_long_mode(long_label, LV_LABEL_LONG_WRAP);
+    lv_obj_set_width(long_label, 150);
+    lv_obj_set_height(long_label, 500);
+    lv_obj_set_style_text_align(long_label, LV_TEXT_ALIGN_LEFT, _LV_STYLE_STATE_CMP_SAME);
+
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 0,
+        .y = 1536
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label)) - 1; /* char index starts at 0 */
+
+    lv_label_get_letter_pos(long_label, 0, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(long_label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_get_letter_pos_align_right(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_RIGHT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = -29,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label_multiline)) - 1; /* char index starts at 0 */
+
+    lv_label_get_letter_pos(label, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_get_letter_pos_align_right_on_empty_text(void)
+{
+    lv_obj_set_style_text_align(empty_label, LV_TEXT_ALIGN_RIGHT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(empty_label)) - 1;
+
+    lv_label_get_letter_pos(empty_label, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(empty_label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_long_text_multiline_get_letter_pos_align_right(void)
+{
+    lv_obj_set_style_text_align(long_label_multiline, LV_TEXT_ALIGN_RIGHT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    lv_point_t last_letter_after_new_line_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = -205,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 0,
+        .y = 32
+    };
+    const lv_point_t expected_last_letter_after_new_line_point = {
+        .x = 0,
+        .y = 48
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label_multiline)) - 1; /* char index starts at 0 */
+    const uint32_t last_letter_after_new_line = strlen(lv_label_get_text(long_label_multiline));
+
+    lv_label_get_letter_pos(long_label_multiline, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(long_label_multiline, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+
+    lv_label_get_letter_pos(long_label_multiline, last_letter_after_new_line, &last_letter_after_new_line_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_after_new_line_point.x, last_letter_after_new_line_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_after_new_line_point.y, last_letter_after_new_line_point.y);
+}
+
+void test_label_long_text_get_letter_pos_align_right(void)
+{
+    lv_label_set_long_mode(long_label, LV_LABEL_LONG_WRAP);
+    lv_obj_set_width(long_label, 150);
+    lv_obj_set_height(long_label, 500);
+    lv_obj_set_style_text_align(long_label, LV_TEXT_ALIGN_RIGHT, _LV_STYLE_STATE_CMP_SAME);
+
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = -8,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = -3,
+        .y = 1536
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label)) - 1; /* char index starts at 0 */
+
+    lv_label_get_letter_pos(long_label, 0, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(long_label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_get_letter_pos_align_center(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = -14,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 15,
+        .y = 0
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label_multiline)) - 1; /* char index starts at 0 */
+
+    lv_label_get_letter_pos(label, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_get_letter_pos_align_center_on_empty_text(void)
+{
+    lv_obj_set_style_text_align(empty_label, LV_TEXT_ALIGN_CENTER, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 0,
+        .y = 0
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(empty_label)) - 1;
+
+    lv_label_get_letter_pos(empty_label, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(empty_label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+}
+
+void test_label_long_text_multiline_get_letter_pos_align_center(void)
+{
+    lv_obj_set_style_text_align(long_label_multiline, LV_TEXT_ALIGN_CENTER, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    lv_point_t last_letter_after_new_line_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = -102,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = 153,
+        .y = 32
+    };
+    const lv_point_t expected_last_letter_after_new_line_point = {
+        .x = 0,
+        .y = 48
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label_multiline)) - 1; /* char index starts at 0 */
+    const uint32_t last_letter_after_new_line = strlen(lv_label_get_text(long_label_multiline));
+
+    lv_label_get_letter_pos(long_label_multiline, first_letter_idx, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(long_label_multiline, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
+
+    lv_label_get_letter_pos(long_label_multiline, last_letter_after_new_line, &last_letter_after_new_line_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_after_new_line_point.x, last_letter_after_new_line_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_after_new_line_point.y, last_letter_after_new_line_point.y);
+}
+
+void test_label_long_text_get_letter_pos_align_center(void)
+{
+    lv_label_set_long_mode(long_label, LV_LABEL_LONG_WRAP);
+    lv_obj_set_width(long_label, 150);
+    lv_obj_set_height(long_label, 500);
+    lv_obj_set_style_text_align(long_label, LV_TEXT_ALIGN_CENTER, _LV_STYLE_STATE_CMP_SAME);
+
+    lv_point_t first_letter_point;
+    lv_point_t last_letter_point;
+    const lv_point_t expected_first_letter_point = {
+        .x = -4,
+        .y = 0
+    };
+    const lv_point_t expected_last_letter_point = {
+        .x = -1,
+        .y = 1536
+    };
+
+    const uint32_t first_letter_idx = 0;
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label)) - 1; /* char index starts at 0 */
+
+    lv_label_get_letter_pos(long_label, 0, &first_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
+
+    lv_label_get_letter_pos(long_label, last_letter_idx, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(expected_last_letter_point.x, last_letter_point.x);
+    TEST_ASSERT_EQUAL(expected_last_letter_point.y, last_letter_point.y);
 }
 
 #endif
