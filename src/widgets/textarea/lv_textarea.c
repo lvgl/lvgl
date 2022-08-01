@@ -208,6 +208,18 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
     lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
+uint32_t lv_textarea_get_right_char(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+    const char * txt = lv_textarea_get_text(ta);
+    int pos = ta->cursor.pos;
+    if(_lv_txt_get_encoded_length(txt) >= pos && pos > 0)
+        return _lv_txt_encoded_prev(txt, &pos);
+    else
+        return 0;
+}
+
 void lv_textarea_del_char(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
