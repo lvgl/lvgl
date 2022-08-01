@@ -50,6 +50,7 @@ static void set_ofs_x_anim(void * obj, int32_t v);
 static void set_ofs_y_anim(void * obj, int32_t v);
 static size_t get_text_length(const char * text);
 static void copy_text_to_label(lv_label_t * label, const char * text);
+static lv_text_flag_t get_label_flags(lv_label_t * label);
 
 /**********************
  *  STATIC VARIABLES
@@ -272,8 +273,8 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     LV_ASSERT_NULL(pos);
 
     lv_label_t * label = (lv_label_t *)obj;
-    const char * txt         = lv_label_get_text(obj);
-    lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, txt);
+    const char * txt = lv_label_get_text(obj);
+    const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, txt);
 
     if(txt[0] == '\0') {
         pos->y = 0;
@@ -287,30 +288,30 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
             case LV_TEXT_ALIGN_CENTER:
                 pos->x = lv_obj_get_content_width(obj) / 2;
                 break;
+            default:
+                break;
         }
         return;
     }
 
-    lv_area_t txt_coords;
-    lv_obj_get_content_coords(obj, &txt_coords);
-
-    uint32_t line_start      = 0;
-    uint32_t new_line_start  = 0;
-    lv_coord_t max_w         = lv_area_get_width(&txt_coords);
-    const lv_font_t * font   = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-    lv_coord_t letter_height    = lv_font_get_line_height(font);
-    lv_coord_t y             = 0;
-    lv_text_flag_t flag       = LV_TEXT_FLAG_NONE;
-
-    if(label->recolor) flag |= LV_TEXT_FLAG_RECOLOR;
-    if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
+    lv_text_flag_t flag = get_label_flags(label);
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
 
-    uint32_t byte_id = _lv_txt_encoded_get_byte_id(txt, char_id);
+    const uint32_t byte_id = _lv_txt_encoded_get_byte_id(txt, char_id);
+    /*Search the line of the index letter*/
+    const lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    const lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
-    /*Search the line of the index letter*/;
+    const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+    const lv_coord_t letter_height = lv_font_get_line_height(font);
+
+    lv_area_t txt_coords;
+    lv_obj_get_content_coords(obj, &txt_coords);
+    const lv_coord_t max_w = lv_area_get_width(&txt_coords);
+
+    lv_coord_t y = 0;
+    uint32_t line_start = 0;
+    uint32_t new_line_start = 0;
     while(txt[new_line_start] != '\0') {
         new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, NULL, flag);
         if(byte_id < new_line_start || txt[new_line_start] == '\0')
@@ -361,15 +362,12 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     if(char_id != line_start) x += letter_space;
 
     if(align == LV_TEXT_ALIGN_CENTER) {
-        lv_coord_t line_w;
-        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        const lv_coord_t line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
 
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        lv_coord_t line_w;
-        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
-
+        const lv_coord_t line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) - line_w;
     }
     pos->x = x;
@@ -1267,6 +1265,16 @@ static void copy_text_to_label(lv_label_t * label, const char * text)
 #else
     (void) strcpy(label->text, text);
 #endif
+}
+
+static lv_text_flag_t get_label_flags(lv_label_t * label)
+{
+    lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
+
+    if(label->recolor) flag |= LV_TEXT_FLAG_RECOLOR;
+    if(label->expand) flag |= LV_TEXT_FLAG_EXPAND;
+
+    return flag;
 }
 
 #endif
