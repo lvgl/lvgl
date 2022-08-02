@@ -1143,22 +1143,23 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
 static void lv_label_revert_dots(lv_obj_t * obj)
 {
-
     lv_label_t * label = (lv_label_t *)obj;
 
     if(label->long_mode != LV_LABEL_LONG_DOT) return;
     if(label->dot_end == LV_LABEL_DOT_END_INV) return;
-    uint32_t letter_i = label->dot_end - LV_LABEL_DOT_NUM;
-    uint32_t byte_i   = _lv_txt_encoded_get_byte_id(label->text, letter_i);
+
+    const uint32_t letter_i = label->dot_end - LV_LABEL_DOT_NUM;
+    const uint32_t byte_i = _lv_txt_encoded_get_byte_id(label->text, letter_i);
 
     /*Restore the characters*/
-    uint8_t i      = 0;
+    uint8_t i = 0;
     char * dot_tmp = lv_label_get_dot_tmp(obj);
     while(label->text[byte_i + i] != '\0') {
         label->text[byte_i + i] = dot_tmp[i];
         i++;
     }
     label->text[byte_i + i] = dot_tmp[i];
+
     lv_label_dot_tmp_free(obj);
 
     label->dot_end = LV_LABEL_DOT_END_INV;
