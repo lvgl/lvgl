@@ -100,13 +100,6 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c);
 void lv_textarea_add_text(lv_obj_t * obj, const char * txt);
 
 /**
- * Get a the right character from the current cursor position
- * @param obj       pointer to a text area object
- * @return          a the right character or 0
- */
-uint32_t lv_textarea_get_right_char(lv_obj_t * obj);
-    
-/**
  * Delete a the left character from the current cursor position
  * @param obj       pointer to a text area object
  */
@@ -314,6 +307,13 @@ bool lv_textarea_get_text_selection(lv_obj_t * obj);
  * @return          show time in milliseconds. 0: hide immediately.
  */
 uint16_t lv_textarea_get_password_show_time(lv_obj_t * obj);
+
+/**
+ * Get a the right character from the current cursor position
+ * @param obj       pointer to a text area object
+ * @return          a the right character or 0
+ */
+uint32_t lv_textarea_get_right_char(lv_obj_t * obj);
 
 /*=====================
  * Other functions
