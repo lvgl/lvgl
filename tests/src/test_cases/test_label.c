@@ -537,4 +537,13 @@ void test_label_is_char_under_pos_align_center(void)
     TEST_ASSERT_EQUAL(expected_result, result);
 }
 
+void test_label_cut_text(void)
+{
+    const char * expected_text = "Te";
+    /* label has the default text which is "Text", let's remove "xt" from it */
+    lv_label_cut_text(label, 2, 2);
+
+    TEST_ASSERT_EQUAL_STRING(expected_text, lv_label_get_text(label));
+}
+
 #endif

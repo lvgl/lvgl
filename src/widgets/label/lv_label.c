@@ -645,7 +645,7 @@ void lv_label_cut_text(lv_obj_t * obj, uint32_t pos, uint32_t cnt)
     lv_label_t * label = (lv_label_t *)obj;
 
     /*Can not append to static text*/
-    if(label->static_txt != 0) return;
+    if(label->static_txt) return;
 
     lv_obj_invalidate(obj);
 
