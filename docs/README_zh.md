@@ -1,34 +1,44 @@
-<h1 align="center"> LVGL - Light and Versatile Graphics Library</h1>
-<h2 align="center"> LVGL - 轻量级通用型图形库</h2>
+<a href="https://opencollective.com/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
 
-
-
-<p align="center">
-<img src="https://lvgl.io/assets/images/lvgl_widgets_demo.gif">
-</p>
-<p align="center">
-LVGL是一个高度可裁剪、低资源占用、界面美观且易用的嵌入式系统图形库
+<p align="right">
+  <a href="../README.md">English</a>  |  <b>中文</b> | <a href="./README_pt_BR.md">Português do Brasil</a> | <a href="./README_jp.md">日本語</a>
 </p>
 
+<br>
 
-<h4 align="center">
-<a href="https://lvgl.io">官网</a> &middot;
-<a href="https://docs.lvgl.io/">文档</a> &middot;
-<a href="https://forum.lvgl.io">论坛</a>  &middot;
-<a href="https://lvgl.io/services">服务</a>  &middot;
-<a href="https://docs.lvgl.io/master/examples.html">例程</a>
-</h4>
+<p align="center">
+  <img src="https://lvgl.io/assets/images/logo_lvgl.png">
+</p>
 
+  <h1 align="center">Light and Versatile Graphics Library</h1>
+  <h1 align="center">轻量级通用型图形库</h1>
+  <br>
+<div align="center">
+  <img src="https://github.com/kisvegabor/test/raw/master/smartwatch_demo.gif">
+  &nbsp;
+  <img border="1px" src="https://lvgl.io/assets/images/lvgl_widgets_demo.gif">
+</div>
+<br>
+<p align="center">
+<a href="https://lvgl.io" title="Homepage of LVGL">官网 </a> |
+<a href="https://docs.lvgl.io/" title="Detailed documentation with 100+ examples">文档</a> |
+<a href="https://forum.lvgl.io" title="Get help and help others">论坛</a> |
+<a href="https://lvgl.io/demos" title="Demos running in your browser">示例</a> |
+<a href="https://lvgl.io/services" title="Graphics design, UI implementation and consulting">服务</a> |
+<a href="https://squareline.io/" title="UI Editor for LVGL">SquareLine Studio</a>
+</p>
+<br>
 
-[English](../README.md) | **中文** | [Português do Brasil](./README_pt_BR.md) | [日本語](./README_jp.md)
-
-
----
 
 #### 目录
 - [概况与总览](#概况与总览)
+  - [特性](#特性)
+  - [硬件要求](#硬件要求)
+  - [已经支持的平台](#已经支持的平台)
 - [如何入门](#如何入门)
 - [例程](#例程)
+  - [C](#c)
+  - [Micropython](#micropython)
 - [服务](#服务)
 - [如何向社区贡献](#如何向社区贡献)
 
