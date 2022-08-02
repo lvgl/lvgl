@@ -1262,7 +1262,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_polygon(lv_opa_t * 
     for(i = 0; i < param->cfg.point_cnt; i++) {
         lv_point_t p1 = param->cfg.points[i];
         lv_point_t p2 = param->cfg.points[i + 1 < param->cfg.point_cnt ? i + 1 : 0];
-        int pdiff = p1.y - p2.y, psign = pdiff / LV_ABS(pdiff);
+        int pdiff = p1.y - p2.y;
+        int psign = (pdiff != 0) ? (pdiff / LV_ABS(pdiff)) : -1;
         if(pdiff > 0) {
             if(abs_y > p1.y || abs_y < p2.y) continue;
             lines[line_cnt].p1 = p2;
