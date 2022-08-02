@@ -203,7 +203,7 @@ void test_label_long_text_get_letter_pos_align_left(void)
     const uint32_t first_letter_idx = 0;
     const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label)) - 1; /* char index starts at 0 */
 
-    lv_label_get_letter_pos(long_label, 0, &first_letter_point);
+    lv_label_get_letter_pos(long_label, first_letter_idx, &first_letter_point);
 
     TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
     TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
@@ -330,7 +330,7 @@ void test_label_long_text_get_letter_pos_align_right(void)
     const uint32_t first_letter_idx = 0;
     const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label)) - 1; /* char index starts at 0 */
 
-    lv_label_get_letter_pos(long_label, 0, &first_letter_point);
+    lv_label_get_letter_pos(long_label, first_letter_idx, &first_letter_point);
 
     TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
     TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
@@ -457,7 +457,7 @@ void test_label_long_text_get_letter_pos_align_center(void)
     const uint32_t first_letter_idx = 0;
     const uint32_t last_letter_idx = strlen(lv_label_get_text(long_label)) - 1; /* char index starts at 0 */
 
-    lv_label_get_letter_pos(long_label, 0, &first_letter_point);
+    lv_label_get_letter_pos(long_label, first_letter_idx, &first_letter_point);
 
     TEST_ASSERT_EQUAL(expected_first_letter_point.x, first_letter_point.x);
     TEST_ASSERT_EQUAL(expected_first_letter_point.y, first_letter_point.y);
