@@ -402,8 +402,6 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     const lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
     const lv_coord_t letter_height = lv_font_get_line_height(font);
     lv_coord_t y = 0;
-    uint32_t logical_pos;
-    char * bidi_txt;
 
     lv_text_flag_t flag = get_label_flags(label);
     if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) flag |= LV_TEXT_FLAG_FIT;
@@ -425,6 +423,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 
         line_start = new_line_start;
     }
+
+    char * bidi_txt;
 
 #if LV_USE_BIDI
     bidi_txt = lv_malloc(new_line_start - line_start + 1);
@@ -474,6 +474,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
         }
     }
 
+    uint32_t logical_pos;
 #if LV_USE_BIDI
     /*Handle Bidi*/
     uint32_t cid = _lv_txt_encoded_get_char_id(bidi_txt, i);
