@@ -364,15 +364,8 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
     lv_coord_t x = lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
     if(char_id != line_start) x += letter_space;
 
-    if(align == LV_TEXT_ALIGN_CENTER) {
-        const lv_coord_t line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
-        x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
-
-    }
-    else if(align == LV_TEXT_ALIGN_RIGHT) {
-        const lv_coord_t line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
-        x += lv_area_get_width(&txt_coords) - line_w;
-    }
+    uint32_t length = new_line_start - line_start;
+    calculate_x_coordinate(&x, align, bidi_txt, length, font, letter_space, flag, &txt_coords);
     pos->x = x;
     pos->y = y;
 
