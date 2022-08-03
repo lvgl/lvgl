@@ -51,6 +51,9 @@ static void set_ofs_y_anim(void * obj, int32_t v);
 static size_t get_text_length(const char * text);
 static void copy_text_to_label(lv_label_t * label, const char * text);
 static lv_text_flag_t get_label_flags(lv_label_t * label);
+static void calculate_x_coordinate(lv_coord_t * x, const lv_text_align_t align, const char * txt,
+                                   uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
+                                   lv_text_flag_t flag, lv_area_t * txt_coords);
 
 /**********************
  *  STATIC VARIABLES
@@ -1268,6 +1271,23 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
     if(label->expand) flag |= LV_TEXT_FLAG_EXPAND;
 
     return flag;
+}
+
+/* Function created because of this pattern be used in multiple functions */
+static void calculate_x_coordinate(lv_coord_t * x, const lv_text_align_t align, const char * txt, uint32_t length,
+                                   const lv_font_t * font, lv_coord_t letter_space, lv_text_flag_t flag, lv_area_t * txt_coords)
+{
+    if(align == LV_TEXT_ALIGN_CENTER) {
+        const lv_coord_t line_w = lv_txt_get_width(txt, length, font, letter_space, flag);
+        *x += lv_area_get_width(txt_coords) / 2 - line_w / 2;
+    }
+    else if(align == LV_TEXT_ALIGN_RIGHT) {
+        const lv_coord_t line_w = lv_txt_get_width(txt, length, font, letter_space, flag);
+        *x += lv_area_get_width(txt_coords) - line_w;
+    }
+    else {
+        /* Nothing to do */
+    }
 }
 
 #endif
