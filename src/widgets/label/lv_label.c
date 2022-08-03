@@ -436,17 +436,10 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
 #endif
 
     /*Calculate the x coordinate*/
-    const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
-
     lv_coord_t x = 0;
-    if(align == LV_TEXT_ALIGN_CENTER) {
-        const lv_coord_t line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
-        x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
-    }
-    else if(align == LV_TEXT_ALIGN_RIGHT) {
-        const lv_coord_t line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
-        x += lv_area_get_width(&txt_coords) - line_w;
-    }
+    const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
+    uint32_t length = new_line_start - line_start;
+    calculate_x_coordinate(&x, align, bidi_txt, length, font, letter_space, flag, &txt_coords);
 
     lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
