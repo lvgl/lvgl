@@ -546,4 +546,43 @@ void test_label_cut_text(void)
     TEST_ASSERT_EQUAL_STRING(expected_text, lv_label_get_text(label));
 }
 
+void test_label_get_letter_on_left(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_LEFT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t last_letter_point;
+
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
+}
+
+void test_label_get_letter_on_center(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t last_letter_point;
+
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
+}
+
+void test_label_get_letter_on_right(void)
+{
+    lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_RIGHT, _LV_STYLE_STATE_CMP_SAME);
+    lv_point_t last_letter_point;
+
+    const uint32_t last_letter_idx = strlen(lv_label_get_text(label)) - 1;
+    lv_label_get_letter_pos(label, last_letter_idx, &last_letter_point);
+
+    uint32_t letter_idx_result = lv_label_get_letter_on(label, &last_letter_point);
+
+    TEST_ASSERT_EQUAL(last_letter_idx, letter_idx_result);
+}
+
 #endif
