@@ -308,6 +308,13 @@ bool lv_textarea_get_text_selection(lv_obj_t * obj);
  */
 uint16_t lv_textarea_get_password_show_time(lv_obj_t * obj);
 
+/**
+ * Get a the character from the current cursor position
+ * @param obj       pointer to a text area object
+ * @return          a the character or 0
+ */
+uint32_t lv_textarea_get_current_char(lv_obj_t * obj);
+
 /*=====================
  * Other functions
  *====================*/
