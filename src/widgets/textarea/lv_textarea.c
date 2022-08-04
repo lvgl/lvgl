@@ -704,6 +704,19 @@ uint16_t lv_textarea_get_password_show_time(lv_obj_t * obj)
     return ta->pwd_show_time;
 }
 
+uint32_t lv_textarea_get_current_char(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    const char * txt = lv_textarea_get_text(obj);
+    lv_textarea_t * ta = (lv_textarea_t *)obj;
+    uint32_t pos = ta->cursor.pos;
+    if(_lv_txt_get_encoded_length(txt) >= pos && pos > 0)
+        return _lv_txt_encoded_prev(txt, &pos);
+    else
+        return 0;
+}
+
 /*=====================
  * Other functions
  *====================*/
