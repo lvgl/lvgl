@@ -889,8 +889,10 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
+            int32_t start = 0;
+            int32_t end = 0;
+
 #if LV_USE_BIDI
-            int32_t start, end;
             lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
             if(base_dir == LV_BASE_DIR_AUTO)
@@ -904,12 +906,11 @@ static void lv_label_refr_text(lv_obj_t * obj)
                 start = 0;
                 end = lv_area_get_width(&txt_coords) - size.x;
             }
+#else
+            end = lv_area_get_width(&txt_coords) - size.x;
+#endif
 
             lv_anim_set_values(&a, start, end);
-#else
-            lv_anim_set_values(&a, 0, lv_area_get_width(&txt_coords) - size.x);
-            lv_anim_set_exec_cb(&a, set_ofs_x_anim);
-#endif
             lv_anim_set_exec_cb(&a, set_ofs_x_anim);
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
