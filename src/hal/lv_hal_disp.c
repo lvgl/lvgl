@@ -88,11 +88,11 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 
 #if LV_USE_GPU_STM32_DMA2D
     driver->draw_ctx_init = lv_draw_stm32_dma2d_ctx_init;
-    driver->draw_ctx_deinit = lv_draw_stm32_dma2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_stm32_dma2d_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_stm32_dma2d_ctx_t);
 #elif LV_USE_GPU_SWM341_DMA2D
     driver->draw_ctx_init = lv_draw_swm341_dma2d_ctx_init;
-    driver->draw_ctx_deinit = lv_draw_swm341_dma2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_swm341_dma2d_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_swm341_dma2d_ctx_t);
 #elif LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE
     driver->draw_ctx_init = lv_draw_nxp_ctx_init;
@@ -104,11 +104,11 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
 #elif LV_USE_GPU_ARM2D
     driver->draw_ctx_init = lv_draw_arm2d_ctx_init;
-    driver->draw_ctx_deinit = lv_draw_arm2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_arm2d_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
 #else
     driver->draw_ctx_init = lv_draw_sw_init_ctx;
-    driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
+    driver->draw_ctx_deinit = lv_draw_sw_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_sw_ctx_t);
 #endif
 
