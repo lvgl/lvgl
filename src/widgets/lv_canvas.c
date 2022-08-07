@@ -181,10 +181,10 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
     draw_dsc.antialias = antialias;
 
     lv_area_t dest_area;
-    dest_area.x1 = 0;
-    dest_area.x2 = dest_img->header.w - 1;
-    dest_area.y1 = 0;
-    dest_area.y2 = 0;
+    dest_area.x1 = -offset_x;
+    dest_area.x2 = dest_area.x1 + dest_img->header.w - 1;
+    dest_area.y1 = -offset_y;
+    dest_area.y2 = -offset_y;
 
     lv_color_t * cbuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_color_t));
     lv_opa_t * abuf = lv_mem_alloc(dest_img->header.w * sizeof(lv_opa_t));
@@ -194,15 +194,12 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
                                  &draw_dsc, canvas->dsc.header.cf, cbuf, abuf);
 
             for(x = 0; x < dest_img->header.w; x++) {
-                if(x + offset_x < 0) continue;
-                if(x + offset_x >= dest_img->header.w) break;
                 if(abuf[x]) {
-                    lv_img_buf_set_px_color(dest_img, x + offset_x, y + offset_y, cbuf[x]);
-                    lv_img_buf_set_px_alpha(dest_img, x + offset_x, y + offset_y, abuf[x]);
+                    lv_img_buf_set_px_color(dest_img, x, y, cbuf[x]);
+                    lv_img_buf_set_px_alpha(dest_img, x, y, abuf[x]);
                 }
             }
 
-            if(y + offset_y >= dest_img->header.h) break;
             dest_area.y1++;
             dest_area.y2++;
         }
