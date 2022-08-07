@@ -613,7 +613,6 @@ static lv_res_t double_click_reset(lv_obj_t * obj)
  * We replace division by 255 by a division by 256, a.k.a a shift right by 8 bits.
  * This is wrong, but since this is only used to compute the pixels on the screen and not the final color, it's ok.
  */
-static void fast_hsv2rgb(uint16_t h, uint8_t s, uint8_t v, uint8_t * r, uint8_t * g, uint8_t * b);
 static void fast_hsv2rgb(uint16_t h, uint8_t s, uint8_t v, uint8_t * r, uint8_t * g, uint8_t * b)
 {
     if(!s) {
@@ -652,6 +651,11 @@ static lv_color_t angle_to_mode_color_fast(lv_obj_t * obj, uint16_t angle)
     uint8_t r = 0, g = 0, b = 0;
     static uint16_t h = 0;
     static uint8_t s = 0, v = 0, m = 255;
+    static uint16_t angle_saved = 0xffff;
+
+    /*If the angle is different recalculate scaling*/
+    if(angle_saved != angle) m = 255;
+    angle_saved = angle;
 
     switch(ext->mode) {
         default:
