@@ -143,11 +143,6 @@ static inline uint8_t lv_obj_get_style_flex_grow(const lv_obj_t * obj, uint32_t 
  *      MACROS
  **********************/
 
-#define LV_STYLE_CONST_FLEX_FLOW(val) \
-    { \
-        .prop_ptr = &LV_STYLE_FLEX_FLOW, .value = { .num = (lv_flex_flow_t)val } \
-    }
-
 #endif  /*LV_USE_FLEX*/
 
 #ifdef __cplusplus
