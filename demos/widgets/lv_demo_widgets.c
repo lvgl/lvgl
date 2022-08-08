@@ -37,7 +37,7 @@ static void color_changer_create(lv_obj_t * parent);
 
 static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const char * text1, const char * text2,
                                    const char * text3);
-static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, const char * name, const char * category,
+static lv_obj_t * create_shop_item(lv_obj_t * parent, lv_img_src_t img_src, const char * name, const char * category,
                                    const char * price);
 
 static void color_changer_event_cb(lv_event_t * e);
@@ -911,11 +911,12 @@ void shop_create(lv_obj_t * parent)
     lv_obj_add_style(title, &style_title, 0);
 
     LV_IMG_DECLARE(img_clothes);
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$722");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$411");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$917");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$64");
-    create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$805");
+    lv_img_src_t img_src = lv_img_src_from_raw(&img_clothes);
+    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$722");
+    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$411");
+    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$917");
+    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$64");
+    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$805");
 
     lv_obj_t * notifications = lv_obj_create(parent);
     if(disp_size == DISP_SMALL) {
@@ -1167,7 +1168,7 @@ static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const 
 
 }
 
-static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, const char * name, const char * category,
+static lv_obj_t * create_shop_item(lv_obj_t * parent, lv_img_src_t img_src, const char * name, const char * category,
                                    const char * price)
 {
     static lv_coord_t grid_col_dsc[] = {LV_GRID_CONTENT, 5, LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
@@ -1179,9 +1180,7 @@ static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, cons
     lv_obj_set_grid_dsc_array(cont, grid_col_dsc, grid_row_dsc);
 
     lv_obj_t * img = lv_img_create(cont);
-    lv_img_src_t src;
-    lv_img_src_parse(&src, img_src);
-    lv_img_set_src_ext(img, &src);
+    lv_img_set_src(img, img_src);
     lv_obj_set_grid_cell(img, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 2);
 
     lv_obj_t * label;

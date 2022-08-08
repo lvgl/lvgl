@@ -62,7 +62,7 @@ lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt)
     return title;
 }
 
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, lv_img_src_move_t icon, lv_coord_t btn_w)
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, lv_img_src_t icon, lv_coord_t btn_w)
 {
     lv_obj_t * header = lv_win_get_header(win);
     lv_obj_t * btn = lv_btn_create(header);

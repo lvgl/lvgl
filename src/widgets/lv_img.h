@@ -144,22 +144,7 @@ lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, 
  *
  * @return LV_RES_OK    If the image was correctly parsed
  */
-lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_move_t src);
-
-/**
- * Set the image source to display on the the object
- *
- * @param obj       pointer to an image object
- * @param src       an image source instance that can be created from:
- *                  1. from a file: lv_img_src_from_file("S:/path/to/file")
- *                  2. from encoded image data: lv_img_src_from_data(&some_data, data_length)
- *                  3. from symbol: lv_img_src_from_symbol("Ok " LV_SYMBOL_OK)
- *                  4. from raw image converter: lv_img_src_from_raw(&img_bin)
- *                  5. from a void* as previous LVGL version code: lv_img_src_parse(void*)
- *
- * @return LV_RES_OK    If the image was correctly parsed
- */
-lv_res_t lv_img_set_src_ext(lv_obj_t * obj, const lv_img_src_t * src);
+lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_t src);
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.

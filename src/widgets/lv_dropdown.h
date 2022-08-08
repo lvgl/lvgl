@@ -39,7 +39,7 @@ typedef struct {
     lv_obj_t obj;
     lv_obj_t * list;                /**< The dropped down list*/
     const char * text;              /**< Text to display on the dropdown's button*/
-    const void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
+    lv_img_src_t symbol;            /**< Arrow or other icon when the drop-down list is closed*/
     char * options;                 /**< Options in a '\n' separated list*/
     uint16_t option_cnt;            /**< Number of options*/
     uint16_t sel_opt_id;            /**< Index of the currently selected option*/
@@ -133,7 +133,7 @@ void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir);
  * @note angle and zoom transformation can be applied if the symbol is an image.
  * E.g. when drop down is checked (opened) rotate the symbol by 180 degree
  */
-void lv_dropdown_set_symbol(lv_obj_t * obj, const void * symbol);
+void lv_dropdown_set_symbol(lv_obj_t * obj, lv_img_src_t symbol);
 
 /**
  * Set whether the selected option in the list should be highlighted or not
@@ -192,9 +192,9 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
 /**
  * Get the symbol on the drop-down list. Typically a down caret or arrow.
  * @param obj       pointer to drop-down list object
- * @return          the symbol or NULL if not enabled
+ * @return          an image source
  */
-const char * lv_dropdown_get_symbol(lv_obj_t * obj);
+lv_img_src_t lv_dropdown_get_symbol(lv_obj_t * obj);
 
 /**
  * Get whether the selected option in the list should be highlighted or not

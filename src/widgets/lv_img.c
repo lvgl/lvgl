@@ -114,7 +114,7 @@ lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, 
     return LV_RES_OK;
 }
 
-lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_move_t src)
+lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_t src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
@@ -122,17 +122,6 @@ lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_move_t src)
     lv_obj_invalidate(obj);
 
     lv_img_src_capture(&img->src, &src);
-    return get_caps(img);
-}
-
-lv_res_t lv_img_set_src_ext(lv_obj_t * obj, const lv_img_src_t * src)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_img_t * img = (lv_img_t *)obj;
-
-    lv_obj_invalidate(obj);
-
-    lv_img_src_copy(&img->src, src);
     return get_caps(img);
 }
 

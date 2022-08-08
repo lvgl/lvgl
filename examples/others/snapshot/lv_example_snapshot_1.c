@@ -8,15 +8,12 @@ static void event_cb(lv_event_t * e)
 
     if(snapshot_obj) {
         lv_img_src_t * snapshot = (void *)lv_img_get_src(snapshot_obj);
-        if(snapshot) {
-            lv_snapshot_free(snapshot);
-        }
+        if(snapshot) lv_snapshot_free(snapshot);
 
         /*Update the snapshot, we know parent of object is the container.*/
         snapshot = lv_snapshot_take(img->parent, LV_IMG_CF_TRUE_COLOR_ALPHA);
-        if(snapshot == NULL)
-            return;
-        lv_img_set_src_ext(snapshot_obj, snapshot);
+        if(snapshot == NULL) return;
+        lv_img_set_src(snapshot_obj, *snapshot);
     }
 }
 
