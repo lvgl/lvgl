@@ -4,8 +4,6 @@
 
 ## What is RT-Thread?
 
-[Introduce about RT-Thread and how to run LVGL on RT-Thread in simulators](https://www.youtube.com/watch?v=k7QYk6hSwnc)
-
 [**RT-Thread**](https://www.rt-thread.io/) is an [open source](https://github.com/RT-Thread/rt-thread), neutral, and community-based real-time operating system (RTOS). RT-Thread has **Standard version** and **Nano version**. For resource-constrained microcontroller (MCU) systems, the Nano version that requires only 3 KB Flash and 1.2 KB RAM memory resources can be tailored with easy-to-use tools. For resource-rich IoT devices, RT-Thread can use the **online software package** management tool, together with system configuration tools, to achieve intuitive and rapid modular cutting, seamlessly import rich software packages; thus, achieving complex functions like Android's graphical interface and touch sliding effects, smart voice interaction effects, and so on.
 
 ### Key features
@@ -43,6 +41,10 @@ LVGL has registered as a [software package](https://packages.rt-thread.org/en/de
 | [Raspberry PICO](https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/applications/lvgl) |      |
 
 
-### Import a BSP project into RT-Thread Studio
+### Tutorials
 
-Clone the latest code from RT-Thread official repository. Open the RT-Thread Studio and select `File -> Import`. In the Import menu, please select `RT-Thread BSP Project into Workspace`, and click `next` button. In the `BSP location area`, please select the root path of the BSP which you prefer to import, such as `C:\Users\xxx\Desktop\rt-thread\bsp\stm32\stm32l475-atk-pandora`. In the `Project Name area`, please type a name for this project, then, press `Finish` button.
+- [Introduce about RT-Thread and how to run LVGL on RT-Thread in simulators](https://www.youtube.com/watch?v=k7QYk6hSwnc)
+- [How to import a BSP project with latest code into RT-Thread Studio](https://www.youtube.com/watch?v=fREPLuh-h8k)
+- [How to Use LVGL with RT-Thread Studio in STM32F469 Discovery Board](https://www.youtube.com/watch?v=O_QA99BxnOE)
+- [RT-Thread Youtube Channel](https://www.youtube.com/channel/UCdDHtIfSYPq4002r27ffqPw)
+- [RT-Thread documentation center](https://www.rt-thread.io/document/site/)
