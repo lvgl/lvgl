@@ -76,7 +76,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
     }
     else if(src->type == LV_IMG_SRC_VARIABLE) {
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
-        if(src->data_len > sizeof(magic) || memcmp(magic, src->data, sizeof(magic)) == 0) return LV_RES_OK;
+        if(src->data_len > sizeof(magic) && memcmp(magic, src->data, sizeof(magic)) == 0) return LV_RES_OK;
     }
     return LV_RES_INV;
 }
