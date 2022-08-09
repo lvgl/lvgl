@@ -187,7 +187,7 @@ typedef struct _lv_draw_ctx_t  {
      * @param draw_dsc      pointer to an image draw descriptor
      */
     void (*layer_blend)(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
-                        const lv_draw_img_dsc_t * draw_dsc);
+                        lv_draw_img_dsc_t * draw_dsc);
 
     /**
      * Destroy a layer context. The original buffer and area data of the `draw_ctx` will be restored

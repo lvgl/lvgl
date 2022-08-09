@@ -110,7 +110,7 @@ void lv_draw_sw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_l
 }
 
 void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
-                            const lv_draw_img_dsc_t * draw_dsc)
+                            lv_draw_img_dsc_t * draw_dsc)
 {
     lv_img_dsc_t img;
     img.data = draw_ctx->buf;
