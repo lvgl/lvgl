@@ -52,7 +52,7 @@
 /**
  * Clean and invalidate cache.
  */
-static void invalidate_cache(void);
+static inline void invalidate_cache(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -115,7 +115,7 @@ void lv_gpu_nxp_pxp_wait(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void invalidate_cache(void)
+static inline void invalidate_cache(void)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     if(disp->driver->clean_dcache_cb)
