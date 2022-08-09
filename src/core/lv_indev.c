@@ -286,14 +286,14 @@ lv_obj_t * lv_indev_get_obj_act(void)
     return indev_obj_act;
 }
 
-lv_timer_t * lv_indev_get_read_timer(lv_disp_t * indev)
+lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
 {
     if(!indev) {
         LV_LOG_WARN("lv_indev_get_read_timer: indev was NULL");
         return NULL;
     }
 
-    return indev->refr_timer;
+    return indev->driver->read_timer;
 }
 
 
