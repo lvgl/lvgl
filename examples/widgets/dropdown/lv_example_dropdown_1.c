@@ -30,6 +30,8 @@ void lv_example_dropdown_1(void)
 
     lv_obj_align(dd, LV_ALIGN_TOP_MID, 0, 20);
     lv_obj_add_event_cb(dd, event_handler, LV_EVENT_ALL, NULL);
+
+    lv_dropdown_set_symbol(dd, lv_img_src_from_symbol(LV_SYMBOL_PLAY, 0));
 }
 
 #endif

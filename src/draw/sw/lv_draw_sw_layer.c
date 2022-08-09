@@ -47,6 +47,12 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
 {
     lv_draw_sw_layer_ctx_t * layer_sw_ctx = (lv_draw_sw_layer_ctx_t *) layer_ctx;
     uint32_t px_size = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
+    layer_ctx->img_src = lv_img_src_create(LV_IMG_SRC_FLAG_PERMANENT);
+    if(layer_ctx->img_src == NULL) {
+        LV_ASSERT_MALLOC(layer_ctx->img_src);
+        return NULL;
+    }
+
     if(flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
         layer_sw_ctx->buf_size_bytes = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE;
         uint32_t full_size = lv_area_get_size(&layer_sw_ctx->base_draw.area_full) * px_size;
@@ -112,7 +118,8 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     img.header.w = lv_area_get_width(draw_ctx->buf_area);
     img.header.h = lv_area_get_height(draw_ctx->buf_area);
     img.header.cf = draw_ctx->render_with_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
-    lv_img_cache_invalidate_src(&img);
+    lv_img_src_set_raw(layer_ctx->img_src, &img);
+    lv_img_cache_invalidate_src(layer_ctx->img_src);
 
     /*Restore the original draw_ctx*/
     draw_ctx->buf = layer_ctx->original.buf;
@@ -121,7 +128,7 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     draw_ctx->render_with_alpha = layer_ctx->original.render_with_alpha;
 
     /*Blend the layer*/
-    lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, &img);
+    lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, layer_ctx->img_src);
     lv_draw_wait_for_finish(draw_ctx);
 }
 
@@ -129,6 +136,7 @@ void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * la
 {
     LV_UNUSED(draw_ctx);
 
+    lv_img_src_free(layer_ctx->img_src);
     lv_free(layer_ctx->buf);
 }
 

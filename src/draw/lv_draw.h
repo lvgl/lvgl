@@ -48,6 +48,7 @@ typedef struct _lv_draw_layer_ctx_t {
     lv_coord_t max_row_with_alpha;
     lv_coord_t max_row_with_no_alpha;
     void * buf;
+    lv_img_src_t * img_src;
     struct {
         const lv_area_t * clip_area;
         lv_area_t * buf_area;

@@ -618,6 +618,12 @@ static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         lv_free(dropdown->options);
         dropdown->options = NULL;
     }
+
+    if(dropdown->symbol) {
+        if(LV_BT(dropdown->symbol->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
+            lv_img_src_free(dropdown->symbol);
+        }
+    }
 }
 
 static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
@@ -798,7 +804,7 @@ static void draw_main(lv_event_t * e)
     if(dropdown->dir == LV_DIR_LEFT) symbol_to_left = true;
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) symbol_to_left = true;
 
-    if(dropdown->symbol->type) {
+    if(dropdown->symbol && dropdown->symbol->type) {
         lv_coord_t symbol_w;
         lv_coord_t symbol_h;
         if(dropdown->symbol->type == LV_IMG_SRC_SYMBOL) {
@@ -864,7 +870,7 @@ static void draw_main(lv_event_t * e)
     txt_area.y1 = obj->coords.y1 + top;
     txt_area.y2 = txt_area.y1 + size.y;
     /*Center align the text if no symbol*/
-    if(!dropdown->symbol->type) {
+    if(dropdown->symbol == NULL || !dropdown->symbol->type) {
         txt_area.x1 = obj->coords.x1 + (lv_obj_get_width(obj) - size.x) / 2;
         txt_area.x2 = txt_area.x1 + size.x;
     }

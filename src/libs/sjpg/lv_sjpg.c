@@ -644,7 +644,7 @@ static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord
             uint16_t col_16bit = (*cache++ & 0xf8) << 8;
             col_16bit |= (*cache++ & 0xFC) << 3;
             col_16bit |= (*cache++ >> 3);
-#if  LV_BIG_ENDIAN_SYSTEM == 1 || LV_COLOR_16_SWAP == 1
+#if  LV_BIG_ENDIAN_SYSTEM == 1
             buf[offset++] = col_16bit >> 8;
             buf[offset++] = col_16bit & 0xff;
 #else
@@ -707,7 +707,7 @@ static lv_res_t decoder_read_line(lv_img_dec_dsc_t * dsc, lv_coord_t x, lv_coord
             uint16_t col_8bit = (*cache++ & 0xf8) << 8;
             col_8bit |= (*cache++ & 0xFC) << 3;
             col_8bit |= (*cache++ >> 3);
-#if  LV_BIG_ENDIAN_SYSTEM == 1 || LV_COLOR_16_SWAP == 1
+#if  LV_BIG_ENDIAN_SYSTEM == 1
             buf[offset++] = col_8bit >> 8;
             buf[offset++] = col_8bit & 0xff;
 #else

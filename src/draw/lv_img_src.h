@@ -61,6 +61,11 @@ enum {
      * 1: attached to an object, can't be attached again
      */
     _LV_IMG_SRC_FLAG_CAPTURED = 0x02,
+
+    /**
+     * 1: The image source was created by lv_img_src_create() so it should be freed in lv_img_src_free
+     */
+    _LV_IMG_SRC_FLAG_MALLOCED = 0x04,
 };
 
 typedef uint8_t lv_img_src_flag_t;
@@ -70,8 +75,8 @@ typedef uint8_t lv_img_src_flag_t;
  * You can build an image source via `lv_img_src_from_xxx` or `lv_img_src_set_src` functions.
  */
 typedef struct {
-    uint8_t         type: 6;          /**< See `lv_img_src_type_t` above */
-    uint8_t         flag: 2;          /**< See `lv_img_src_flag_t` above */
+    uint8_t         type: 5;          /**< See `lv_img_src_type_t` above */
+    uint8_t         flag: 3;          /**< See `lv_img_src_flag_t` above */
     size_t          data_len;       /**< The data's length in bytes */
     const void   *  data;           /**< A pointer on the given unique resource identifier */
     const char   *  ext;            /**< If the data points to a file, this will point to the extension */
