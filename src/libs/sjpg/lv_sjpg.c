@@ -166,7 +166,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
     }
     else if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.jpg" & ".sjpg" files*/
-        if(!src->ext || (strcmp(src->ext, ".jpg") && strcmp(src->ext, ".sjpg"))) return LV_RES_INV;
+        if(!src->ext || (strcmp(src->ext, "jpg") && strcmp(src->ext, "sjpg"))) return LV_RES_INV;
         *caps = LV_IMG_DEC_CACHED;
 
         /*Check file exists*/
@@ -361,7 +361,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
         }
         else if(dsc->input.src->type == LV_IMG_SRC_FILE) {
             if(!dsc->input.src->ext) return LV_RES_INV;
-            if(!strcmp(dsc->input.src->ext, ".sjpg")) {
+            if(!strcmp(dsc->input.src->ext, "sjpg")) {
                 uint8_t buff[32];
                 memset(buff, 0, sizeof(buff));
 
@@ -377,7 +377,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
                 }
                 return extract_sjpeg_meta(&dsc->header, buff);
             }
-            else if(!strcmp(dsc->input.src->ext, ".jpg")) {
+            else if(!strcmp(dsc->input.src->ext, "jpg")) {
                 lv_fs_file_t file;
                 lv_fs_res_t res = lv_fs_open(&file, (const char *)dsc->input.src->data, LV_FS_MODE_RD);
                 if(res != LV_FS_RES_OK) return LV_RES_INV;
@@ -458,7 +458,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     }
     else if(dsc->input.src->type == LV_IMG_SRC_FILE) {
         /* If all fine, then the file will be kept open */
-        if(!strcmp(dsc->input.src->ext, ".sjpg")) {
+        if(!strcmp(dsc->input.src->ext, "sjpg")) {
             uint8_t buff[22];
             memset(buff, 0, sizeof(buff));
 
@@ -481,7 +481,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
             }
             else goto error_out;
         }
-        else if(!strcmp(dsc->input.src->ext, ".jpg")) {
+        else if(!strcmp(dsc->input.src->ext, "jpg")) {
             lv_fs_file_t lv_file;
             lv_fs_res_t res = lv_fs_open(&lv_file, (const char *)dsc->input.src->data, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {

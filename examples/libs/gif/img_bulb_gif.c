@@ -1122,7 +1122,7 @@ const lv_img_dsc_t img_bulb_gif = {
     .header.always_zero = 0,
     .header.w = 0,
     .header.h = 0,
-    .data_size = 0,
+    .data_size = sizeof(img_blub_gif_map),
     .header.cf = LV_IMG_CF_RAW,
     .data = img_blub_gif_map,
 };

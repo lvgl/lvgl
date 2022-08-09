@@ -138,7 +138,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
 
     /*If it's a rlottie json file...*/
     if(src->type == LV_IMG_SRC_FILE) {
-        if(!strncmp(src->ext, ".json", 5)) {              /*Check the extension*/
+        if(!strncmp(src->ext, "json", 4)) {              /*Check the extension*/
             set_caps(caps);
             return LV_RES_OK;
         }
@@ -146,7 +146,10 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
     /* rlottie as raw data */
     else if(src->type == LV_IMG_SRC_VARIABLE) {
         const char * str = (const char *)src->data;
-        if(src->data_len > 2 && str[0] == '{' && str[src->data_len - 1] == '}') {  /*Is JSON*/
+        /*Lokks like JSON? data_len might or might not include the trailing '\0' so check both cases*/
+        if(src->data_len > 2 && str[0] == '{' &&
+                (str[src->data_len - 1] == '}' || str[src->data_len - 2] == '}'))
+        {
             set_caps(caps);
             return LV_RES_OK;
         }
@@ -295,7 +298,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     if(animation == NULL) {
         /*If it's a rlottie json file...*/
         if(dsc->input.src->type == LV_IMG_SRC_FILE) {
-            if(!strncmp(dsc->input.src->ext, ".json", 5)) {              /*Check the extension*/
+            if(!strncmp(dsc->input.src->ext, "json", 4)) {              /*Check the extension*/
                 animation = lottie_animation_from_file(dsc->input.src->data);
             }
         }

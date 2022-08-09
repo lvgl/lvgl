@@ -93,7 +93,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
     /*If it's a BMP file...*/
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
-        if(!src->ext || strcmp(src->ext, ".bmp")) return LV_RES_INV;
+        if(!src->ext || strcmp(src->ext, "bmp")) return LV_RES_INV;
 
         /*Check file exists*/
         lv_fs_file_t f;
@@ -112,7 +112,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
 
 static lv_res_t check_colordepth(int bpp)
 {
-    if(LV_COLOR_DEPTH == 32 && (bpp != 32 || bpp != 24)) {
+    if(LV_COLOR_DEPTH == 32 && bpp != 32 && bpp != 24) {
         LV_LOG_WARN("LV_COLOR_DEPTH == 32 but bpp is %d (should be 32 or 24)", bpp);
         return LV_RES_INV;
     }

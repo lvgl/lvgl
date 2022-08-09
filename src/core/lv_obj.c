@@ -28,6 +28,8 @@
 #include "../libs/gif/lv_gif.h"
 #include "../libs/png/lv_png.h"
 #include "../libs/sjpg/lv_sjpg.h"
+#include "../libs/rlottie/rlottiedec.h"
+#include "../libs/gif/gifdec.h"
 #include "../layouts/flex/lv_flex.h"
 #include "../layouts/grid/lv_grid.h"
 
@@ -232,6 +234,14 @@ void lv_init(void)
 
 #if LV_USE_BMP
     lv_bmp_init();
+#endif
+
+#if LV_USE_RLOTTIE
+    lv_rlottie_init();
+#endif
+
+#if LV_USE_GIF
+    lv_gif_init();
 #endif
 
 #if LV_USE_FREETYPE

@@ -62,7 +62,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
     /*If it's a PNG file...*/
     if(src->type == LV_IMG_SRC_FILE) {
         /*Support only "*.png" files*/
-        if(!src->ext || strcmp(src->ext, ".png")) return LV_RES_INV;
+        if(!src->ext || strcmp(src->ext, "png")) return LV_RES_INV;
         *caps = LV_IMG_DEC_TRANSPARENT | LV_IMG_DEC_CACHED;  /*Image is not cached for files*/
 
         /*Check file exists*/
@@ -93,7 +93,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     size_t png_data_size;          /*Size of `png_data` in bytes*/
     bool   free_data = false;
     if(dsc->input.src->type == LV_IMG_SRC_FILE) {
-        if(!dsc->input.src->ext || strcmp(dsc->input.src->ext, ".png")) return LV_RES_INV;
+        if(!dsc->input.src->ext || strcmp(dsc->input.src->ext, "png")) return LV_RES_INV;
 
         if(flags == LV_IMG_DEC_ONLYMETA) {
             /* Read the width and height from the file. They have a constant location:

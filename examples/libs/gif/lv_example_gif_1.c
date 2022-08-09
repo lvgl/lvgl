@@ -10,7 +10,7 @@ void lv_example_gif_1(void)
     lv_obj_t * img;
 
     img = lv_img_create(lv_scr_act());
-    lv_img_set_src(img, lv_img_src_from_raw(&img_bulb_gif, 0));
+    lv_img_set_src(img, lv_img_src_from_data(img_bulb_gif.data, img_bulb_gif.data_size, 0));
     lv_obj_align(img, LV_ALIGN_LEFT_MID, 20, 0);
 
     img = lv_img_create(lv_scr_act());
