@@ -444,11 +444,9 @@
 
 #define LV_USE_ANIMIMG    1
 
-<<<<<<< HEAD
 #define LV_USE_ANIMBTN    1
-=======
+
 #define LV_USE_ARC        1
->>>>>>> master
 
 #define LV_USE_BAR        1
 

@@ -1352,18 +1352,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_ARC
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_ARC
-            #define LV_USE_ARC CONFIG_LV_USE_ARC
-        #else
-            #define LV_USE_ARC 0
-        #endif
-    #else
-        #define LV_USE_ARC        1
-    #endif
-#endif
-
 #ifndef LV_USE_ANIMBTN
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ANIMBTN
@@ -1373,6 +1361,18 @@
         #endif
     #else
         #define LV_USE_ANIMBTN    1
+    #endif
+#endif
+
+#ifndef LV_USE_ARC
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_ARC
+            #define LV_USE_ARC CONFIG_LV_USE_ARC
+        #else
+            #define LV_USE_ARC 0
+        #endif
+    #else
+        #define LV_USE_ARC        1
     #endif
 #endif
 
