@@ -168,7 +168,7 @@ void lv_img_src_capture(lv_img_src_t ** dest, lv_img_src_t * src)
 {
 
     if(src && LV_BF(src->flag, LV_IMG_SRC_FLAG_PERMANENT) && LV_BT(src->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
-        LV_LOG_WARN("src (%p) is already captured.", (void*)src);
+        LV_LOG_WARN("src (%p) is already captured.", (void *)src);
         return;
     }
 
