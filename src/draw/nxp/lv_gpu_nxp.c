@@ -139,8 +139,7 @@ static void lv_draw_nxp_wait_cb(lv_draw_ctx_t * draw_ctx)
     lv_gpu_nxp_pxp_wait();
 #endif
 #if LV_USE_GPU_NXP_VG_LITE
-    if(vg_lite_finish() != VG_LITE_SUCCESS)
-        VG_LITE_LOG_TRACE("VG-Lite finish failed.");
+    vg_lite_finish();
 #endif
 
     lv_draw_sw_wait_for_finish(draw_ctx);
