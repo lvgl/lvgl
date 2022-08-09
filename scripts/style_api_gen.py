@@ -60,11 +60,19 @@ props = [
 
 {'name': 'TRANSFORM_ZOOM',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom an objects. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_ANGLE',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree units. E.g. 45 deg. = 450"},
+ 'dsc': "Rotate an objects. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
+
+{'name': 'TRANSFORM_PIVOT_X',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the pivot point's X coordinate for transformations. Relative to the object's top left corner'"},
+
+{'name': 'TRANSFORM_PIVOT_Y',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the pivot point's Y coordinate for transformations. Relative to the object's top left corner'"},
 
 {'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML."},
 {'name': 'PAD_TOP',
@@ -393,12 +401,15 @@ def style_set_c(p):
   print("    };")
   print("    lv_style_set_prop(style, LV_STYLE_" + p['name'] +", v);")
   print("}")
+  print("")
+  print("const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + " = LV_STYLE_" + p['name'] + ";")
 
 
 def style_set_h(p):
   if 'section' in p: return
 
   print("void lv_style_set_" + p['name'].lower() +"(lv_style_t * style, "+ p['var_type'] +" value);")
+  print("extern const lv_style_prop_t _lv_style_const_prop_id_" + p['name'] + ";")
 
 
 def local_style_set_c(p):
@@ -427,7 +438,7 @@ def style_const_set(p):
   print("")
   print("#define LV_STYLE_CONST_" + p['name'] + "(val) \\")
   print("    { \\")
-  print("        .prop = LV_STYLE_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
+  print("        .prop_ptr = &_lv_style_const_prop_id_" + p['name'] + ", .value = { ." + p['style_type'] +" = " + cast + "val } \\")
   print("    }")
 
 

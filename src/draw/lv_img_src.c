@@ -64,7 +64,7 @@ void lv_img_src_free(lv_img_src_t * src)
     if(src == NULL) return;
 
     if(src->type == LV_IMG_SRC_SYMBOL || src->type == LV_IMG_SRC_FILE) {
-        lv_mem_free((void *)src->data);
+        lv_free((void *)src->data);
     }
 
     src->data_len = 0;
@@ -141,7 +141,7 @@ lv_img_src_t * lv_img_src_from_raw(const lv_img_dsc_t * raw, lv_img_src_flag_t f
 
 lv_img_src_t * lv_img_src_create(lv_img_src_flag_t flags)
 {
-    lv_img_src_t * img_src = lv_mem_alloc(sizeof(lv_img_src_t));
+    lv_img_src_t * img_src = lv_malloc(sizeof(lv_img_src_t));
     if(img_src == NULL) {
         LV_ASSERT_MALLOC(img_src);
         return NULL;
@@ -193,7 +193,7 @@ void lv_img_src_capture(lv_img_src_t ** dest, lv_img_src_t * src)
 static lv_res_t alloc_str_src(lv_img_src_t * src, const char * str)
 {
     src->data_len = strlen(str);
-    src->data = lv_mem_alloc(src->data_len + 1);
+    src->data = lv_malloc(src->data_len + 1);
     LV_ASSERT_MALLOC(src->data);
     if(src->data == NULL) {
         src->data_len = 0;

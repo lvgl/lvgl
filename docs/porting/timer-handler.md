@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/porting/timer-handler.md
-```
 # Timer Handler
 
 To handle the tasks of LVGL you need to call `lv_timer_handler()` periodically in one of the following:

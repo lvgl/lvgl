@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/libs/ffmpeg.md
-```
 
 # FFmpeg support
 [FFmpeg](https://www.ffmpeg.org/) A complete, cross-platform solution to record, convert and stream audio and video.

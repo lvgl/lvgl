@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/event.md
-```
 # Events
 
 Events are triggered in LVGL when something happens which might be interesting to the user, e.g. when an object

@@ -5,7 +5,7 @@
 A stress test for LVGL.
 It contains a lot of object creation, deletion, animations, styles usage, and so on. It can be used if there is any memory corruption during heavy usage or any memory leaks.
 
-![Stress demo with LVGL embedded GUI library](https://github.com/lvgl/lvgl/tree/master/demos/stress/screenshot1.gif?raw=true)
+![Stress demo with LVGL embedded GUI library](screenshot1.gif)
 
 ## Run the demo
 - In `lv_conf.h` or equivalent places set `LV_USE_DEMO_STRESS 1`

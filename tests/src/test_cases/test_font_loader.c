@@ -45,9 +45,23 @@ extern lv_font_t font_3;
 
 void test_font_loader(void)
 {
-    lv_font_t * font_1_bin = lv_font_load("F:src/test_fonts/font_1.fnt");
-    lv_font_t * font_2_bin = lv_font_load("F:src/test_fonts/font_2.fnt");
-    lv_font_t * font_3_bin = lv_font_load("F:src/test_fonts/font_3.fnt");
+    /*Test with cahce ('A' has cache)*/
+    lv_font_t * font_1_bin = lv_font_load("A:src/test_fonts/font_1.fnt");
+    lv_font_t * font_2_bin = lv_font_load("A:src/test_fonts/font_2.fnt");
+    lv_font_t * font_3_bin = lv_font_load("A:src/test_fonts/font_3.fnt");
+
+    compare_fonts(&font_1, font_1_bin);
+    compare_fonts(&font_2, font_2_bin);
+    compare_fonts(&font_3, font_3_bin);
+
+    lv_font_free(font_1_bin);
+    lv_font_free(font_2_bin);
+    lv_font_free(font_3_bin);
+
+    /*Test with cahce ('B' has NO cache)*/
+    font_1_bin = lv_font_load("B:src/test_fonts/font_1.fnt");
+    font_2_bin = lv_font_load("B:src/test_fonts/font_2.fnt");
+    font_3_bin = lv_font_load("B:src/test_fonts/font_3.fnt");
 
     compare_fonts(&font_1, font_1_bin);
     compare_fonts(&font_2, font_2_bin);
@@ -64,7 +78,7 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
     TEST_ASSERT_NOT_NULL_MESSAGE(f2, "font not null");
 
     //    Skip these test because -Wpedantic tells
-    //    ISO C forbids passing argument 1 of ‘lv_test_assert_ptr_eq’ between function pointer and ‘void *’
+    //    ISO C forbids passing argument 1 of ‘TEST_ASSERT_EQUAL_PTR_MESSAGE’ between function pointer and ‘void *’
     //    TEST_ASSERT_EQUAL_PTR_MESSAGE(f1->get_glyph_dsc, f2->get_glyph_dsc, "glyph_dsc");
     //    TEST_ASSERT_EQUAL_PTR_MESSAGE(f1->get_glyph_bitmap, f2->get_glyph_bitmap, "glyph_bitmap");
 

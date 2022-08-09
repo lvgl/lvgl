@@ -50,11 +50,11 @@ static void lv_anim_timeline_virtual_exec_cb(void * var, int32_t v);
 
 lv_anim_timeline_t * lv_anim_timeline_create(void)
 {
-    lv_anim_timeline_t * at = (lv_anim_timeline_t *)lv_mem_alloc(sizeof(lv_anim_timeline_t));
+    lv_anim_timeline_t * at = (lv_anim_timeline_t *)lv_malloc(sizeof(lv_anim_timeline_t));
 
     LV_ASSERT_MALLOC(at);
 
-    if(at) lv_memset_00(at, sizeof(lv_anim_timeline_t));
+    if(at) lv_memzero(at, sizeof(lv_anim_timeline_t));
 
     return at;
 }
@@ -65,8 +65,8 @@ void lv_anim_timeline_del(lv_anim_timeline_t * at)
 
     lv_anim_timeline_stop(at);
 
-    lv_mem_free(at->anim_dsc);
-    lv_mem_free(at);
+    lv_free(at->anim_dsc);
+    lv_free(at);
 }
 
 void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, lv_anim_t * a)
@@ -74,7 +74,7 @@ void lv_anim_timeline_add(lv_anim_timeline_t * at, uint32_t start_time, lv_anim_
     LV_ASSERT_NULL(at);
 
     at->anim_dsc_cnt++;
-    at->anim_dsc = lv_mem_realloc(at->anim_dsc, at->anim_dsc_cnt * sizeof(lv_anim_timeline_dsc_t));
+    at->anim_dsc = lv_realloc(at->anim_dsc, at->anim_dsc_cnt * sizeof(lv_anim_timeline_dsc_t));
 
     LV_ASSERT_MALLOC(at->anim_dsc);
 

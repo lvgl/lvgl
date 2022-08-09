@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/display.md
-```
 # Displays
 
 ``` important:: The basic concept of a *display* in LVGL is explained in the [Porting](/porting/display) section. So before reading further, please read the [Porting](/porting/display) section first.
@@ -51,7 +47,7 @@ Be sure not to confuse displays and screens:
 Screens can be considered the highest level containers which have no parent.
 A screen's size is always equal to its display and their origin is (0;0). Therefore, a screen's coordinates can't be changed, i.e. `lv_obj_set_pos()`, `lv_obj_set_size()` or similar functions can't be used on screens.
 
-A screen can be created from any object type but the two most typical types are [Base object](/widgets/obj) and [Image](/widgets/core/img) (to create a wallpaper).
+A screen can be created from any object type but the two most typical types are [Base object](/widgets/obj) and [Image](/widgets/img) (to create a wallpaper).
 
 To create a screen, use `lv_obj_t * scr = lv_<type>_create(NULL, copy)`. `copy` can be an existing screen copied into the new screen.
 
@@ -66,11 +62,9 @@ See the [Display background](#display-background) section for more details. If t
 
 This configuration (transparent screen and display) could be used to create for example OSD menus where a video is played on a lower layer, and a menu is overlayed on an upper layer.
 
-To handle transparent displays, special (slower) color mixing algorithms need to be used by LVGL so this feature needs to enabled with `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`.
 As this mode operates on the Alpha channel of the pixels `LV_COLOR_DEPTH = 32` is also required. The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 where there are solid objects.
 
 In summary, to enable transparent screens and displays for OSD menu-like UIs:
-- Enable `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`
 - Be sure to use `LV_COLOR_DEPTH 32`
 - Set the screen's opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP)`
 - Set the display opacity to `LV_OPA_TRANSP` with `lv_disp_set_bg_opa(NULL, LV_OPA_TRANSP);`

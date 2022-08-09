@@ -25,7 +25,7 @@ for i in range(10):
 
     # Add items to the column
     obj = lv.btn(cont_col)
-    obj.set_size(lv.pct(100), lv.SIZE.CONTENT)
+    obj.set_size(lv.pct(100), lv.SIZE_CONTENT)
 
     label = lv.label(obj)
     label.set_text("Item: {:d}".format(i))

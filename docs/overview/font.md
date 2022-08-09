@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/font.md
-```
 # Fonts
 
 In LVGL fonts are collections of bitmaps and other information required to render images of individual letters (glyph).

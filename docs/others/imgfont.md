@@ -1,8 +1,4 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/others/imgfont.md
-```
-## Image font (imgfont)
+# Image font (imgfont)
 Draw image in label or span obj with imgfont.
 This is often used to display Unicode emoji icons in text.
 Supported image formats: determined by LVGL image decoder.

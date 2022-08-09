@@ -296,6 +296,7 @@ lv_timer_t * lv_indev_get_read_timer(lv_disp_t * indev)
     return indev->refr_timer;
 }
 
+
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 {
     lv_obj_t * found_p = NULL;
@@ -303,16 +304,20 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     /*If this obj is hidden the children are hidden too so return immediately*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
 
-    bool hit_test_ok = lv_obj_hit_test(obj, point);
+    lv_point_t p_trans = *point;
+    lv_obj_transform_point(obj, &p_trans, false, true);
+
+    bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
     /*If the point is on this object or has overflow visible check its children too*/
-    if(_lv_area_is_point_on(&obj->coords, point, 0) || lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+    if(_lv_area_is_point_on(&obj->coords, &p_trans, 0) || lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+
         /*If a child matches use it*/
         for(i = child_cnt - 1; i >= 0; i--) {
             lv_obj_t * child = obj->spec_attr->children[i];
-            found_p = lv_indev_search_obj(child, point);
+            found_p = lv_indev_search_obj(child, &p_trans);
             if(found_p) return found_p;
         }
     }
@@ -405,6 +410,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     indev_obj_act = lv_group_get_focused(g);
     if(indev_obj_act == NULL) return;
 
+    bool dis = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
     /*Save the last key to compare it with the current latter on RELEASE*/
     uint32_t prev_key = i->proc.types.keypad.last_key;
 
@@ -423,25 +430,8 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         LV_LOG_INFO("%" LV_PRIu32 " key is pressed", data->key);
         i->proc.pr_timestamp = lv_tick_get();
 
-        /*Simulate a press on the object if ENTER was pressed*/
-        if(data->key == LV_KEY_ENTER) {
-            /*Send the ENTER as a normal KEY*/
-            lv_group_send_data(g, LV_KEY_ENTER);
-            if(indev_reset_check(&i->proc)) return;
-
-            lv_event_send(indev_obj_act, LV_EVENT_PRESSED, indev_act);
-            if(indev_reset_check(&i->proc)) return;
-        }
-        else if(data->key == LV_KEY_ESC) {
-            /*Send the ESC as a normal KEY*/
-            lv_group_send_data(g, LV_KEY_ESC);
-            if(indev_reset_check(&i->proc)) return;
-
-            lv_event_send(indev_obj_act, LV_EVENT_CANCEL, indev_act);
-            if(indev_reset_check(&i->proc)) return;
-        }
         /*Move the focus on NEXT*/
-        else if(data->key == LV_KEY_NEXT) {
+        if(data->key == LV_KEY_NEXT) {
             lv_group_set_editing(g, false); /*Editing is not used by KEYPAD is be sure it is disabled*/
             lv_group_focus_next(g);
             if(indev_reset_check(&i->proc)) return;
@@ -452,14 +442,33 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             lv_group_focus_prev(g);
             if(indev_reset_check(&i->proc)) return;
         }
-        /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
-        else {
-            lv_group_send_data(g, data->key);
-            if(indev_reset_check(&i->proc)) return;
+        else if(!dis) {
+            /*Simulate a press on the object if ENTER was pressed*/
+            if(data->key == LV_KEY_ENTER) {
+                /*Send the ENTER as a normal KEY*/
+                lv_group_send_data(g, LV_KEY_ENTER);
+                if(indev_reset_check(&i->proc)) return;
+
+                if(!dis) lv_event_send(indev_obj_act, LV_EVENT_PRESSED, indev_act);
+                if(indev_reset_check(&i->proc)) return;
+            }
+            else if(data->key == LV_KEY_ESC) {
+                /*Send the ESC as a normal KEY*/
+                lv_group_send_data(g, LV_KEY_ESC);
+                if(indev_reset_check(&i->proc)) return;
+
+                lv_event_send(indev_obj_act, LV_EVENT_CANCEL, indev_act);
+                if(indev_reset_check(&i->proc)) return;
+            }
+            /*Just send other keys to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT`)*/
+            else {
+                lv_group_send_data(g, data->key);
+                if(indev_reset_check(&i->proc)) return;
+            }
         }
     }
     /*Pressing*/
-    else if(data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(!dis && data->state == LV_INDEV_STATE_PRESSED && prev_state == LV_INDEV_STATE_PRESSED) {
 
         if(data->key == LV_KEY_ENTER) {
             lv_event_send(indev_obj_act, LV_EVENT_PRESSING, indev_act);
@@ -506,7 +515,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         }
     }
     /*Release happened*/
-    else if(data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
+    else if(!dis && data->state == LV_INDEV_STATE_RELEASED && prev_state == LV_INDEV_STATE_PRESSED) {
         LV_LOG_INFO("%" LV_PRIu32 " key is released", data->key);
         /*The user might clear the key when it was released. Always release the pressed key*/
         data->key = prev_key;
@@ -843,7 +852,9 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
     }
 
-    /*If a new object was found reset some variables and send a pressed Call the ancestor's event handler*/
+    lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, true, true);
+
+    /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != proc->types.pointer.act_obj) {
         proc->types.pointer.last_point.x = proc->types.pointer.act_point.x;
         proc->types.pointer.last_point.y = proc->types.pointer.act_point.y;
@@ -891,11 +902,8 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
     proc->types.pointer.vect.x = proc->types.pointer.act_point.x - proc->types.pointer.last_point.x;
     proc->types.pointer.vect.y = proc->types.pointer.act_point.y - proc->types.pointer.last_point.y;
 
-    proc->types.pointer.scroll_throw_vect.x = (proc->types.pointer.scroll_throw_vect.x * 4) >> 3;
-    proc->types.pointer.scroll_throw_vect.y = (proc->types.pointer.scroll_throw_vect.y * 4) >> 3;
-
-    proc->types.pointer.scroll_throw_vect.x += (proc->types.pointer.vect.x * 4) >> 3;
-    proc->types.pointer.scroll_throw_vect.y += (proc->types.pointer.vect.y * 4) >> 3;
+    proc->types.pointer.scroll_throw_vect.x = (proc->types.pointer.scroll_throw_vect.x + proc->types.pointer.vect.x) / 2;
+    proc->types.pointer.scroll_throw_vect.y = (proc->types.pointer.scroll_throw_vect.y + proc->types.pointer.vect.y) / 2;
 
     proc->types.pointer.scroll_throw_vect_ori = proc->types.pointer.scroll_throw_vect;
 
@@ -944,6 +952,9 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
 static void indev_proc_release(_lv_indev_proc_t * proc)
 {
     if(proc->wait_until_release != 0) {
+        lv_event_send(proc->types.pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
+        if(indev_reset_check(proc)) return;
+
         proc->types.pointer.act_obj  = NULL;
         proc->types.pointer.last_obj = NULL;
         proc->pr_timestamp           = 0;

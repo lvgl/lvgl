@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/style.md
-```
 # Styles
 
 *Styles* are used to set the appearance of objects. Styles in lvgl are heavily inspired by CSS. The concept in a nutshell is as follows:
@@ -88,6 +84,23 @@ Inheritance is applied only if the given property is not set in the object's sty
 In this case, if the property is inheritable, the property's value will be searched in the parents until an object specifies a value for the property. The parents will use their own state to determine the value.
 So if a button is pressed, and the text color comes from here, the pressed text color will be used.
 
+## Forced value inheritance/default value
+Sometimes you may want to force a child object to use the parent's value for a given style property. To do this you can use
+one of the following (depending on what type of style you're using):
+
+```c
+/* regular style */
+lv_style_set_prop_meta(&style, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT);
+/* local style */
+lv_obj_set_local_style_prop_meta(child, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT, LV_PART_MAIN);
+```
+
+This acts like a value has been set on the style, so setting the value of the property afterwards will remove the flag.
+
+You may also want to force the default value of a property to be used, without needing to hardcode it in your application.
+To do this you can use the same API but with `LV_STYLE_PROP_META_INITIAL` instead. In future versions of LVGL, this
+will use the value based upon the current theme, but for now it just selects the internal default regardless of theme.
+
 
 ## Parts
 Objects can be composed of *parts* which may each have their own styles.
@@ -104,7 +117,7 @@ The following predefined parts exist in LVGL:
 - `LV_PART_CUSTOM_FIRST` Custom part identifiers can be added starting from here.
 
 
-For example a [Slider](/widgets/core/slider) has three parts:
+For example a [Slider](/widgets/slider) has three parts:
 - Background
 - Indicator
 - Knob
@@ -163,7 +176,7 @@ Styles can be built as `const` too to save RAM:
 const lv_style_const_prop_t style1_props[] = {
    LV_STYLE_CONST_WIDTH(50),
    LV_STYLE_CONST_HEIGHT(50),
-   LV_STYLE_PROP_INV,
+   LV_STYLE_CONST_PROPS_END
 };
 
 LV_STYLE_CONST_INIT(style1, style1_props);
@@ -267,6 +280,22 @@ lv_style_transition_dsc_init(&trans1, trans_props, lv_anim_path_ease_out, durati
 
 lv_style_set_transition(&style1, &trans1);
 ```
+
+## Opacity, Blend modes and Transformations
+If the `opa`, `blend_mode`, `transform_angle`, or `transform_zoom` properties are set to their non-default value LVGL creates a snapshot about the widget and all its children in order to blend the whole widget with the set opacity, blend mode and transformation properties.
+
+These properties have this effect only on the `MAIN` part of the widget.
+
+The created snapshot is called "intermediate layer" or simply "layer". If only `opa` and/or `blend_mode` is set to a non-default value LVGL can build the layer from smaller chunks. The size of these chunks can be configured by the following properties in `lv_conf.h`:
+ - `LV_LAYER_SIMPLE_BUF_SIZE`: [bytes] the optimal target buffer size. LVGL will try to allocate this size of memory.
+ - `LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE`: [bytes]  used if `LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
+
+If transformation properties were also used the layer can not be rendered in chunks, but one larger memory needs to be allocated. The required memory depends on the angle, zoom and pivot parameters, and the size of the area to redraw, but it's never larger than the size of the widget (including the extra draw size used for shadow, outline, etc).
+
+If the widget can fully cover the area to redraw, LVGL creates an RGB layer (which is faster to render and uses less memory). If the opposite case ARGB rendering needs to be used. A widget might not cover its area if it has radius, `bg_opa != 255`, has shadow, outline, etc.
+
+The click area of the widget is also transformed accordingly.
+
 
 ## Color filter
 TODO

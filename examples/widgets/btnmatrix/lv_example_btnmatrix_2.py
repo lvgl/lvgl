@@ -39,7 +39,7 @@ def event_cb(e):
         # Change the draw descriptor the 3rd button
 
         elif dsc.id == 2:
-            dsc.rect_dsc.radius = lv.RADIUS.CIRCLE
+            dsc.rect_dsc.radius = lv.RADIUS_CIRCLE
             if obj.get_selected_btn() == dsc.id:
                 dsc.rect_dsc.bg_color = lv.palette_darken(lv.PALETTE.RED, 3)
             else:

@@ -1,0 +1,21 @@
+name: Check Makefile
+
+on:
+  push:
+    branches: [ master, release/v8.* ]
+  pull_request:
+    branches: [ master, release/v8.* ]
+
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    name: Build using Makefile
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ammaraskar/gcc-problem-matcher@master
+    - name: Install prerequisites
+      run: scripts/install-prerequisites.sh
+    - name: Build
+      working-directory: tests/makefile
+      run: make test_file

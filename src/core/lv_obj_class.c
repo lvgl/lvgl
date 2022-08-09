@@ -44,9 +44,9 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
 {
     LV_TRACE_OBJ_CREATE("Creating object with %p class on %p parent", (void *)class_p, (void *)parent);
     uint32_t s = get_instance_size(class_p);
-    lv_obj_t * obj = lv_mem_alloc(s);
+    lv_obj_t * obj = lv_malloc(s);
     if(obj == NULL) return NULL;
-    lv_memset_00(obj, s);
+    lv_memzero(obj, s);
     obj->class_p = class_p;
     obj->parent = parent;
 
@@ -56,18 +56,18 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         lv_disp_t * disp = lv_disp_get_default();
         if(!disp) {
             LV_LOG_WARN("No display created yet. No place to assign the new screen");
-            lv_mem_free(obj);
+            lv_free(obj);
             return NULL;
         }
 
         if(disp->screens == NULL) {
-            disp->screens = lv_mem_alloc(sizeof(lv_obj_t *));
+            disp->screens = lv_malloc(sizeof(lv_obj_t *));
             disp->screens[0] = obj;
             disp->screen_cnt = 1;
         }
         else {
             disp->screen_cnt++;
-            disp->screens = lv_mem_realloc(disp->screens, sizeof(lv_obj_t *) * disp->screen_cnt);
+            disp->screens = lv_realloc(disp->screens, sizeof(lv_obj_t *) * disp->screen_cnt);
             disp->screens[disp->screen_cnt - 1] = obj;
         }
 
@@ -86,14 +86,14 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         }
 
         if(parent->spec_attr->children == NULL) {
-            parent->spec_attr->children = lv_mem_alloc(sizeof(lv_obj_t *));
+            parent->spec_attr->children = lv_malloc(sizeof(lv_obj_t *));
             parent->spec_attr->children[0] = obj;
             parent->spec_attr->child_cnt = 1;
         }
         else {
             parent->spec_attr->child_cnt++;
-            parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children,
-                                                         sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
+            parent->spec_attr->children = lv_realloc(parent->spec_attr->children,
+                                                     sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
             parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
         }
     }

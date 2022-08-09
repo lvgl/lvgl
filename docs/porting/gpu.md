@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/porting/gpu.md
-```
 # Add custom GPU
 LVGL has a flexible and extendable draw pipeline. You can hook it to do some rendering with a GPU or even completely replace the built-in software renderer.
 

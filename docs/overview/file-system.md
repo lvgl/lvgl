@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/overview/file-system.md
-```
 # File system
 
 LVGL has a 'File system' abstraction module that enables you to attach any type of file system.
@@ -114,7 +110,7 @@ lv_fs_dir_close(&dir);
 
 ## Use drives for images
 
-[Image](/widgets/core/img) objects can be opened from files too (besides variables stored in the compiled program).
+[Image](/widgets/img) objects can be opened from files too (besides variables stored in the compiled program).
 
 To use files in image widgets the following callbacks are required:
 - open

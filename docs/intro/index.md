@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/intro/index.md
-```
 
 # Introduction
 
@@ -36,7 +32,7 @@ Basically, every modern controller which is able to drive a display is suitable 
   <ul>
     <li> Static RAM usage: ~2 kB depending on the used features and object types</li>
     <li> Stack: &gt; 2kB (&gt; 8 kB is recommended)</li>
-    <li> Dynamic data (heap): &gt; 4 KB (&gt; 32 kB is recommended if using several objects).
+    <li> Dynamic data (heap): &gt; 4 KB (&gt; 48 kB is recommended if using several objects).
 	    Set by <em>LV_MEM_SIZE</em> in <em>lv_conf.h</em>. </li>
     <li> Display buffer:  &gt; <em>"Horizontal resolution"</em> pixels (&gt; 10 &times; <em>"Horizontal resolution"</em> is recommended) </li>
     <li> One frame buffer in the MCU or in an external display controller</li>
@@ -102,15 +98,16 @@ The changes are recorded in [CHANGELOG.md](/CHANGELOG).
 Before v8 the last minor release of each major series was supported for 1 year.
 Starting from v8, every minor release is supported for 1 year.
 
-| Version | Release date | Support end | Active |
-|---------|--------------|-------------|--------|
-| v5.3    | Feb 1, 2019  |Feb 1, 2020  | No     |
-| v6.1    | Nov 26, 2019 |Nov 26, 2020 | No     |
-| v7.11   | Mar 16, 2021 |Mar 16, 2022 | No     |
-| v8.0    | 1 Jun, 2021  |1 Jun, 2022  | Yes    |
-| v8.1    | 10 Nov, 2021 |10 Nov, 2022 | Yes    |
-| v8.2    | In progress  |             |        |
-
+| Version | Release date | Support end  | Active |
+| ------- | ------------ | ------------ | ------ |
+| v5.3    | Feb 1, 2019  | Feb 1, 2020  | No     |
+| v6.1    | Nov 26, 2019 | Nov 26, 2020 | No     |
+| v7.11   | Mar 16, 2021 | Mar 16, 2022 | No     |
+| v8.0    | 1 Jun, 2021  | 1 Jun, 2022  | No     |
+| v8.1    | 10 Nov, 2021 | 10 Nov, 2022 | Yes    |
+| v8.2    | 31 Jan, 2022 | 31 Jan, 2023 | Yes    |
+| v8.3    | 6 July, 2022 | 6 July, 2023 | Yes    |
+| v9.0    | In progress  |              |        |
 
 ## FAQ
 
@@ -126,8 +123,8 @@ Before posting a question, please ready this FAQ section as you might find answe
 Every MCU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the [Requirements](#requirements) is supported by LVGL.
 
 This includes:
-- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, dsPIC33, PIC32 etc.
-- Bluetooth, GSM, Wi-Fi modules like Nordic NRF and Espressif ESP32
+- "Common" MCUs like STM32F, STM32H, NXP Kinetis, LPC, iMX, dsPIC33, PIC32, SWM341 etc.
+- Bluetooth, GSM, Wi-Fi modules like Nordic NRF, Espressif ESP32 and Raspberry Pi Pico W
 - Linux with frame buffer device such as /dev/fb0. This includes Single-board computers like the Raspberry Pi
 - Anything else with a strong enough MCU and a peripheral to drive a display
 
@@ -192,9 +189,6 @@ my_flush_cb(NULL, &a, buf);
 ### Why do I see nonsense colors on the screen?
 Probably LVGL's color format is not compatible with your display's color format. Check `LV_COLOR_DEPTH` in *lv_conf.h*.
 
-If you are using 16-bit colors with SPI (or another byte-oriented interface) you probably need to set `LV_COLOR_16_SWAP  1` in *lv_conf.h*.
-It swaps the upper and lower bytes of the pixels.
-
 ### How to speed up my UI?
 - Turn on compiler optimization and enable cache if your MCU has it
 - Increase the size of the display buffer
@@ -206,7 +200,7 @@ It swaps the upper and lower bytes of the pixels.
 ### How to reduce flash/ROM usage?
 You can disable all the unused features (such as animations, file system, GPU etc.) and object types in *lv_conf.h*.
 
-If you are using GCC you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary.
+If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG. 
 
 ### How to reduce the RAM usage
 - Lower the size of the *Display buffer*

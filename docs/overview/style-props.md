@@ -121,7 +121,7 @@ Move the object with this value in Y direction. Applied after layouts, aligns an
 </ul>
 
 ### transform_zoom
-Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on
+Zoom an objects. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -130,12 +130,30 @@ Zoom image-like objects. Multiplied with the zoom set on the object. The value 2
 </ul>
 
 ### transform_angle
-Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree units. E.g. 45 deg. = 450
+Rotate an objects. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
+</ul>
+
+### transform_pivot_x
+Set the pivot point's X coordinate for transformations. Relative to the object's top left corner'
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### transform_pivot_y
+Set the pivot point's Y coordinate for transformations. Relative to the object's top left corner'
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
 ## Padding
@@ -367,7 +385,7 @@ Sets whether the border should be drawn before or after the children are drawn. 
 Properties to describe the outline. It's like a border but drawn outside of the rectangles.
 
 ### outline_width
-Set the width of the outline in pixels.
+Set the width of the outline in pixels. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -415,7 +433,7 @@ Set the width of the shadow in pixels. The value should be >= 0.
 </ul>
 
 ### shadow_ofs_x
-Set an offset on the shadow in pixels in X direction.
+Set an offset on the shadow in pixels in X direction. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -424,7 +442,7 @@ Set an offset on the shadow in pixels in X direction.
 </ul>
 
 ### shadow_ofs_y
-Set an offset on the shadow in pixels in Y direction.
+Set an offset on the shadow in pixels in Y direction. 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -520,7 +538,7 @@ Set the gap between dashes in pixel. Note that dash works only on horizontal and
 </ul>
 
 ### line_rounded
-Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending
+Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -559,7 +577,7 @@ Set the width (thickness) of the arcs in pixel.
 </ul>
 
 ### arc_rounded
-Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending
+Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -616,7 +634,7 @@ Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 </ul>
 
 ### text_font
-Set the font of the text (a pointer `lv_font_t *`).
+Set the font of the text (a pointer `lv_font_t *`). 
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_FONT_DEFAULT`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>

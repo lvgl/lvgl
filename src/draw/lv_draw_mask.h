@@ -23,7 +23,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_MASK_ID_INV  (-1)
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
 # define _LV_MASK_MAX_NUM     16
 #else
 # define _LV_MASK_MAX_NUM     1
@@ -51,7 +51,7 @@ typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
 
 
 
-#if LV_DRAW_COMPLEX == 0
+#if LV_USE_DRAW_MASKS == 0
 static inline  uint8_t lv_draw_mask_get_cnt(void)
 {
     return 0;
@@ -65,7 +65,7 @@ static inline bool lv_draw_mask_is_any(const lv_area_t * a)
 
 #endif
 
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
 
 enum {
     LV_DRAW_MASK_TYPE_LINE,
@@ -163,7 +163,7 @@ typedef struct  {
     lv_coord_t radius;          /*The radius of the entry*/
 } _lv_draw_mask_radius_circle_dsc_t;
 
-typedef _lv_draw_mask_radius_circle_dsc_t _lv_draw_mask_radius_circle_dsc_arr_t[LV_CIRCLE_CACHE_SIZE];
+typedef _lv_draw_mask_radius_circle_dsc_t _lv_draw_mask_radius_circle_dsc_arr_t[LV_DRAW_SW_CIRCLE_CACHE_SIZE];
 
 typedef struct {
     /*The first element must be the common descriptor*/
@@ -381,7 +381,7 @@ void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * c
 
 void lv_draw_mask_polygon_init(lv_draw_mask_polygon_param_t * param, const lv_point_t * points, uint16_t point_cnt);
 
-#endif /*LV_DRAW_COMPLEX*/
+#endif /*LV_USE_DRAW_MASKS*/
 
 /**********************
  *      MACROS

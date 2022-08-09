@@ -12,6 +12,15 @@
 #include "../misc/lv_ll.h"
 #include "../misc/lv_gc.h"
 
+/*********************
+ *      DEFINES
+ *********************/
+#define CF_BUILT_IN_FIRST   LV_IMG_CF_TRUE_COLOR
+#define CF_BUILT_IN_LAST    LV_IMG_CF_RGB565A8
+
+/**********************
+ *      TYPEDEFS
+ **********************/
 
 
 /**********************
@@ -41,12 +50,11 @@ void _lv_img_decoder_init(void)
 void lv_img_dec_dsc_in_init(lv_img_dec_dsc_in_t * desc, const lv_img_src_t * src, lv_color32_t * color,
                             lv_point_t * size_hint)
 {
-    lv_memset_00(desc, sizeof(*desc));
+    lv_memzero(desc, sizeof(*desc));
     desc->src = src;
     if(color) desc->color = *color;
     if(size_hint) desc->size_hint = *size_hint;
 }
-
 
 lv_res_t lv_img_decoder_get_info(const lv_img_dec_dsc_in_t * dsc_in, lv_img_header_t * header)
 {
@@ -127,7 +135,7 @@ lv_img_decoder_t * lv_img_decoder_create(void * user_data)
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) return NULL;
 
-    lv_memset_00(decoder, sizeof(lv_img_decoder_t));
+    lv_memzero(decoder, sizeof(lv_img_decoder_t));
     decoder->user_data = user_data;
     return decoder;
 }
@@ -136,7 +144,7 @@ lv_img_decoder_t * lv_img_decoder_create(void * user_data)
 void lv_img_decoder_delete(lv_img_decoder_t * decoder)
 {
     _lv_ll_remove(&LV_GC_ROOT(_lv_img_decoder_ll), decoder);
-    lv_mem_free(decoder);
+    lv_free(decoder);
 }
 
 void lv_img_decoder_set_accept_cb(lv_img_decoder_t * decoder, lv_img_decoder_accept_f_t accept_cb)

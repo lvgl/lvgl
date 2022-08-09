@@ -10,7 +10,7 @@
 
 #if LV_USE_DEMO_WIDGETS
 
-#if LV_MEM_CUSTOM == 0 && LV_MEM_SIZE < (38ul * 1024ul)
+#if LV_USE_BUILTIN_MALLOC && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
 #endif
 
@@ -705,7 +705,7 @@ static void analytics_create(lv_obj_t * parent)
 
     /*Add a special circle to the needle's pivot*/
     lv_obj_set_style_pad_hor(meter3, 10, 0);
-    lv_obj_set_style_size(meter3, 10, LV_PART_INDICATOR);
+    lv_obj_set_style_size(meter3, 10, 10, LV_PART_INDICATOR);
     lv_obj_set_style_radius(meter3, LV_RADIUS_CIRCLE, LV_PART_INDICATOR);
     lv_obj_set_style_bg_opa(meter3, LV_OPA_COVER, LV_PART_INDICATOR);
     lv_obj_set_style_bg_color(meter3, lv_palette_darken(LV_PALETTE_GREY, 4), LV_PART_INDICATOR);
@@ -1084,10 +1084,10 @@ static void color_event_cb(lv_event_t * e)
         lv_palette_t * palette_primary = lv_event_get_user_data(e);
         lv_palette_t palette_secondary = (*palette_primary) + 3; /*Use another palette as secondary*/
         if(palette_secondary >= _LV_PALETTE_LAST) palette_secondary = 0;
-
+#if LV_USE_THEME_DEFAULT
         lv_theme_default_init(NULL, lv_palette_main(*palette_primary), lv_palette_main(palette_secondary),
                               LV_THEME_DEFAULT_DARK, font_normal);
-
+#endif
         lv_color_t color = lv_palette_main(*palette_primary);
         lv_style_set_text_color(&style_icon, color);
         lv_chart_set_series_color(chart1, ser1, color);
@@ -1343,7 +1343,7 @@ static void chart_event_cb(lv_event_t * e)
 
         /*Add the faded area before the lines are drawn */
         else if(dsc->part == LV_PART_ITEMS) {
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
             /*Add  a line mask that keeps the area below the line*/
             if(dsc->p1 && dsc->p2) {
                 lv_draw_mask_line_param_t line_mask_param;

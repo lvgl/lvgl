@@ -24,7 +24,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 void lv_example_fragment_1(void);
-
 void lv_example_fragment_2(void);
 
 /**********************

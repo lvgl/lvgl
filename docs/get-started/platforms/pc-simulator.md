@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/get-started/platoforms/simulator.md
-```
 # Simulator on PC
 
 
@@ -22,9 +18,15 @@ The simulator is ported to various IDEs (Integrated Development Environments). C
 - [VisualStudio with SDL driver](https://github.com/lvgl/lv_sim_visual_studio_sdl): For Windows
 - [VSCode with SDL driver](https://github.com/lvgl/lv_sim_vscode_sdl): Recommended on Linux and Mac
 - [PlatformIO with SDL driver](https://github.com/lvgl/lv_platformio): Recommended on Linux and Mac
+- [MDK with FastModel](https://github.com/lvgl/lv_port_an547_cm55_sim): For Windows
+
+External project not maintained by the LVGL organization:
+- [QT Creator](https://github.com/Varanda-Labs/lvgl-qt-sim): Cross platform
 
 You can use any IDE for development but, for simplicity, the configuration for Eclipse CDT is what we'll focus on in this tutorial.
 The following section describes the set-up guide of Eclipse CDT in more detail.
+
+
 
 **Note: If you are on Windows, it's usually better to use the Visual Studio or CodeBlocks projects instead. They work out of the box without requiring extra steps.**
 

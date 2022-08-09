@@ -30,7 +30,7 @@ style_bg.init()
 style_bg.set_pad_all(0)
 style_bg.set_pad_gap(0)
 style_bg.set_clip_corner(True)
-style_bg.set_radius(lv.RADIUS.CIRCLE)
+style_bg.set_radius(lv.RADIUS_CIRCLE)
 style_bg.set_border_width(0)
 
 

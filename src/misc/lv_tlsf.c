@@ -1,5 +1,5 @@
 #include "../lv_conf_internal.h"
-#if LV_MEM_CUSTOM == 0
+#if LV_USE_BUILTIN_MALLOC
 
 #include <limits.h>
 #include "lv_tlsf.h"
@@ -1157,18 +1157,22 @@ void * lv_tlsf_memalign(lv_tlsf_t tlsf, size_t align, size_t size)
     return block_prepare_used(control, block, adjust);
 }
 
-void lv_tlsf_free(lv_tlsf_t tlsf, const void * ptr)
+size_t lv_tlsf_free(lv_tlsf_t tlsf, const void * ptr)
 {
+    size_t size = 0;
     /* Don't attempt to free a NULL pointer. */
     if(ptr) {
         control_t * control = tlsf_cast(control_t *, tlsf);
         block_header_t * block = block_from_ptr(ptr);
         tlsf_assert(!block_is_free(block) && "block already marked as free");
+        size = block->size;
         block_mark_as_free(block);
         block = block_merge_prev(control, block);
         block = block_merge_next(control, block);
         block_insert(control, block);
     }
+
+    return size;
 }
 
 /*
@@ -1204,6 +1208,10 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
         const size_t cursize = block_size(block);
         const size_t combined = cursize + block_size(next) + block_header_overhead;
         const size_t adjust = adjust_request_size(size, ALIGN_SIZE);
+        if(size > cursize && adjust == 0) {
+            /* The request is probably too large, fail */
+            return NULL;
+        }
 
         tlsf_assert(!block_is_free(block) && "block already marked as free");
 
@@ -1235,4 +1243,4 @@ void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size)
     return p;
 }
 
-#endif /* LV_MEM_CUSTOM == 0 */
+#endif /* LV_USE_BUILTIN_MALLOC */

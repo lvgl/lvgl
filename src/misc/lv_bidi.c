@@ -126,7 +126,7 @@ lv_base_dir_t _lv_bidi_detect_base_dir(const char * txt)
  * Get the logical position of a character in a line
  * @param str_in the input string. Can be only one line.
  * @param bidi_txt internally the text is bidi processed which buffer can be get here.
- * If not required anymore has to freed with `lv_mem_free()`
+ * If not required anymore has to freed with `lv_free()`
  * Can be `NULL` is unused
  * @param len length of the line in character count
  * @param base_dir base direction of the text: `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`
@@ -138,12 +138,12 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
                                   uint32_t visual_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    char * buf = lv_mem_buf_get(len + 1);
+    char * buf = lv_malloc(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_malloc(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
-        lv_mem_buf_release(buf);
+        lv_free(buf);
         return (uint16_t) -1;
     }
 
@@ -153,9 +153,9 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
 
     if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
 
-    if(bidi_txt == NULL) lv_mem_buf_release(buf);
+    if(bidi_txt == NULL) lv_free(buf);
     uint16_t res = GET_POS(pos_conv_buf[visual_pos]);
-    lv_mem_buf_release(pos_conv_buf);
+    lv_free(pos_conv_buf);
     return res;
 }
 
@@ -163,7 +163,7 @@ uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_
  * Get the visual position of a character in a line
  * @param str_in the input string. Can be only one line.
  * @param bidi_txt internally the text is bidi processed which buffer can be get here.
- * If not required anymore has to freed with `lv_mem_free()`
+ * If not required anymore has to freed with `lv_free()`
  * Can be `NULL` is unused
  * @param len length of the line in character count
  * @param base_dir base direction of the text: `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL`
@@ -175,12 +175,12 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
                                  uint32_t logical_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    char * buf = lv_mem_buf_get(len + 1);
+    char * buf = lv_malloc(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_malloc(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
-        lv_mem_buf_release(buf);
+        lv_free(buf);
         return (uint16_t) -1;
     }
 
@@ -192,14 +192,14 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
         if(GET_POS(pos_conv_buf[i]) == logical_pos) {
 
             if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
-            lv_mem_buf_release(pos_conv_buf);
+            lv_free(pos_conv_buf);
 
-            if(bidi_txt == NULL) lv_mem_buf_release(buf);
+            if(bidi_txt == NULL) lv_free(buf);
             return i;
         }
     }
-    lv_mem_buf_release(pos_conv_buf);
-    if(bidi_txt == NULL) lv_mem_buf_release(buf);
+    lv_free(pos_conv_buf);
+    if(bidi_txt == NULL) lv_free(buf);
     return (uint16_t) -1;
 }
 

@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/porting/project.md
-```
 
 # Set up a project
 
