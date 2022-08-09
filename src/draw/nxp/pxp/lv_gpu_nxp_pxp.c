@@ -70,7 +70,9 @@ static lv_nxp_pxp_cfg_t * pxp_cfg;
 
 lv_res_t lv_gpu_nxp_pxp_init(void)
 {
+#if LV_USE_GPU_NXP_PXP_AUTO_INIT
     pxp_cfg = lv_gpu_nxp_pxp_get_cfg();
+#endif
 
     if(!pxp_cfg || !pxp_cfg->pxp_interrupt_deinit || !pxp_cfg->pxp_interrupt_init ||
        !pxp_cfg->pxp_run || !pxp_cfg->pxp_wait)
