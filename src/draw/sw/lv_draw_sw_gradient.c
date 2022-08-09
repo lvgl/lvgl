@@ -218,7 +218,7 @@ static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord
     else {
         item->map = (lv_color_t *)(grad_cache_end + LV_ALIGN(sizeof(*item)));
 #if _DITHER_GRADIENT
-<<<<<<< HEAD
+        <<< <<< < HEAD
         item->hmap = (lv_color32_t *)(grad_cache_end + LV_ALIGN(sizeof(*item)) + LV_ALIGN(map_size * sizeof(lv_color_t)));
 #if LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION == 1
         item->error_acc = (lv_scolor24_t *)(grad_cache_end + LV_ALIGN(sizeof(*item)) +

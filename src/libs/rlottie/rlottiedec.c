@@ -148,8 +148,7 @@ static lv_res_t decoder_accept(const lv_img_src_t * src, uint8_t * caps, void * 
         const char * str = (const char *)src->data;
         /*Lokks like JSON? data_len might or might not include the trailing '\0' so check both cases*/
         if(src->data_len > 2 && str[0] == '{' &&
-                (str[src->data_len - 1] == '}' || str[src->data_len - 2] == '}'))
-        {
+           (str[src->data_len - 1] == '}' || str[src->data_len - 2] == '}')) {
             set_caps(caps);
             return LV_RES_OK;
         }

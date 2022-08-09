@@ -803,7 +803,8 @@ static void draw_main(lv_event_t * e)
         lv_coord_t symbol_h;
         if(dropdown->symbol->type == LV_IMG_SRC_SYMBOL) {
             lv_point_t size;
-            lv_txt_get_size(&size, dropdown->symbol->data, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX,
+            lv_txt_get_size(&size, dropdown->symbol->data, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space,
+                            LV_COORD_MAX,
                             symbol_dsc.flag);
             symbol_w = size.x;
             symbol_h = size.y;

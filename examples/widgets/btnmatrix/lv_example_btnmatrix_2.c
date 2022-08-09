@@ -41,7 +41,7 @@ static void event_cb(lv_event_t * e)
 
         /*When the button matrix draws the buttons...*/
         if(dsc->class_p == &lv_btnmatrix_class && dsc->type == LV_BTNMATRIX_DRAW_PART_BTN) {
-        /*Add custom content to the 4th button when the button itself was drawn*/
+            /*Add custom content to the 4th button when the button itself was drawn*/
             if(dsc->id == 3) {
                 LV_IMG_DECLARE(img_star);
                 lv_img_src_t src;

@@ -106,7 +106,7 @@ void lv_animbtn_set_transition_desc(lv_obj_t * obj, lv_animbtn_state_t from_stat
     }
     /* Allocate a transition array now */
     animbtn->trans_desc = (lv_animbtn_transition_t *)lv_realloc(animbtn->trans_desc,
-                                                                    (animbtn->trans_count + 1) * sizeof(*animbtn->trans_desc));
+                                                                (animbtn->trans_count + 1) * sizeof(*animbtn->trans_desc));
     LV_ASSERT_MALLOC(animbtn->trans_desc);
     animbtn->trans_desc[animbtn->trans_count].from = from_state;
     animbtn->trans_desc[animbtn->trans_count].to = to_state;

@@ -70,8 +70,8 @@ typedef uint8_t lv_img_src_flag_t;
  * You can build an image source via `lv_img_src_from_xxx` or `lv_img_src_set_src` functions.
  */
 typedef struct {
-    uint8_t         type:6;           /**< See `lv_img_src_type_t` above */
-    uint8_t         flag:2;           /**< See `lv_img_src_flag_t` above */
+    uint8_t         type: 6;          /**< See `lv_img_src_type_t` above */
+    uint8_t         flag: 2;          /**< See `lv_img_src_flag_t` above */
     size_t          data_len;       /**< The data's length in bytes */
     const void   *  data;           /**< A pointer on the given unique resource identifier */
     const char   *  ext;            /**< If the data points to a file, this will point to the extension */
