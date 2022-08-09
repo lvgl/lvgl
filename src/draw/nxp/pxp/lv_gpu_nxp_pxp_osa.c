@@ -79,10 +79,9 @@ static void _lv_gpu_nxp_pxp_wait(void);
  **********************/
 
 #if defined(SDK_OS_FREE_RTOS)
-    static SemaphoreHandle_t s_pxpIdle;
-#else
-    static volatile bool s_pxpIdle;
+    static SemaphoreHandle_t s_pxpIdleSem;
 #endif
+static volatile bool s_pxpIdle;
 
 static lv_nxp_pxp_cfg_t pxp_default_cfg = {
     .pxp_interrupt_init = _lv_gpu_nxp_pxp_interrupt_init,
@@ -108,7 +107,7 @@ void PXP_IRQHandler(void)
     if(kPXP_CompleteFlag & PXP_GetStatusFlags(LV_GPU_NXP_PXP_ID)) {
         PXP_ClearStatusFlags(LV_GPU_NXP_PXP_ID, kPXP_CompleteFlag);
 #if defined(SDK_OS_FREE_RTOS)
-        xSemaphoreGiveFromISR(s_pxpIdle, &taskAwake);
+        xSemaphoreGiveFromISR(s_pxpIdleSem, &taskAwake);
         portYIELD_FROM_ISR(taskAwake);
 #else
         s_pxpIdle = true;
@@ -128,14 +127,13 @@ lv_nxp_pxp_cfg_t * lv_gpu_nxp_pxp_get_cfg(void)
 static lv_res_t _lv_gpu_nxp_pxp_interrupt_init(void)
 {
 #if defined(SDK_OS_FREE_RTOS)
-    s_pxpIdle = xSemaphoreCreateBinary();
-    if(s_pxpIdle == NULL)
+    s_pxpIdleSem = xSemaphoreCreateBinary();
+    if(s_pxpIdleSem == NULL)
         return LV_RES_INV;
 
     NVIC_SetPriority(LV_GPU_NXP_PXP_IRQ_ID, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1);
-#else
-    s_pxpIdle = true;
 #endif
+    s_pxpIdle = true;
 
     NVIC_EnableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
 
@@ -146,7 +144,7 @@ static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
 {
     NVIC_DisableIRQ(LV_GPU_NXP_PXP_IRQ_ID);
 #if defined(SDK_OS_FREE_RTOS)
-    vSemaphoreDelete(s_pxpIdle);
+    vSemaphoreDelete(s_pxpIdleSem);
 #endif
 }
 
@@ -155,9 +153,7 @@ static void _lv_gpu_nxp_pxp_interrupt_deinit(void)
  */
 static void _lv_gpu_nxp_pxp_run(void)
 {
-#if !defined(SDK_OS_FREE_RTOS)
     s_pxpIdle = false;
-#endif
 
     PXP_EnableInterrupts(LV_GPU_NXP_PXP_ID, kPXP_CompleteInterruptEnable);
     PXP_Start(LV_GPU_NXP_PXP_ID);
@@ -169,7 +165,12 @@ static void _lv_gpu_nxp_pxp_run(void)
 static void _lv_gpu_nxp_pxp_wait(void)
 {
 #if defined(SDK_OS_FREE_RTOS)
-    PXP_COND_STOP(!xSemaphoreTake(s_pxpIdle, portMAX_DELAY), "xSemaphoreTake failed.");
+    /* Return if PXP was never started, otherwise the semaphore will lock forever. */
+    if(s_pxpIdle == true)
+        return;
+
+    PXP_COND_STOP(!xSemaphoreTake(s_pxpIdleSem, portMAX_DELAY), "xSemaphoreTake failed.");
+    s_pxpIdle = true;
 #else
     while(s_pxpIdle == false) {
     }
