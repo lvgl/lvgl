@@ -763,24 +763,27 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_label_refr_text(obj);
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
-        lv_point_t size;
         lv_label_t * label = (lv_label_t *)obj;
-        const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
-        lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-        lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
-        if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
-        if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
 
-        lv_coord_t w = lv_obj_get_content_width(obj);
-        if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
-        else w = lv_obj_get_content_width(obj);
+        if(label->invalid_size_cache) {
+            const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
+            lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
+            lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+            lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
+            if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
+            if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
 
-        lv_txt_get_size(&size, label->text, font, letter_space, line_space, w, flag);
+            lv_coord_t w = lv_obj_get_content_width(obj);
+            if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
+            else w = lv_obj_get_content_width(obj);
+
+            lv_txt_get_size(&label->size_cache, label->text, font, letter_space, line_space, w, flag);
+            label->invalid_size_cache = false;
+        }
 
         lv_point_t * self_size = lv_event_get_param(e);
-        self_size->x = LV_MAX(self_size->x, size.x);
-        self_size->y = LV_MAX(self_size->y, size.y);
+        self_size->x = LV_MAX(self_size->x, label->size_cache.x);
+        self_size->y = LV_MAX(self_size->y, label->size_cache.y);
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
@@ -899,6 +902,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
 #if LV_LABEL_LONG_TXT_HINT
     label->hint.line_start = -1; /*The hint is invalid if the text changes*/
 #endif
+    label->invalid_size_cache = true;
 
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
