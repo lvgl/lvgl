@@ -169,7 +169,7 @@ static void _lv_gpu_nxp_pxp_wait(void)
     if(s_pxpIdle == true)
         return;
 
-    PXP_COND_STOP(!xSemaphoreTake(s_pxpIdleSem, portMAX_DELAY), "xSemaphoreTake failed.");
+    xSemaphoreTake(s_pxpIdleSem, portMAX_DELAY);
     s_pxpIdle = true;
 #else
     while(s_pxpIdle == false) {
