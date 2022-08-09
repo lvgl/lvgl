@@ -54,7 +54,7 @@ typedef enum {
  */
 typedef struct {
     lv_obj_t            obj;
-    lv_img_src_t        src;        /**< Image source*/
+    lv_img_src_t    *   src;        /**< Image source*/
     lv_point_t          offset;
     lv_coord_t          w;          /**< Width of the image in px (Handled by the library)*/
     lv_coord_t          h;          /**< Height of the image in px (Handled by the library)*/
@@ -144,7 +144,7 @@ lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, 
  *
  * @return LV_RES_OK    If the image was correctly parsed
  */
-lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_t src);
+lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_t * src);
 
 /**
  * Set an offset for the source of an image so the image will be displayed from the new origin.

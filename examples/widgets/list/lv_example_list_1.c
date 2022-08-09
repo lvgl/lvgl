@@ -22,31 +22,31 @@ void lv_example_list_1(void)
     lv_obj_t * btn;
 
     lv_list_add_text(list1, "File");
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_FILE), "New");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_FILE, 0), "New");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_DIRECTORY), "Open");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_DIRECTORY, 0), "Open");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_SAVE), "Save");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_SAVE, 0), "Save");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_CLOSE), "Delete");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_CLOSE, 0), "Delete");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_EDIT), "Edit");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_EDIT, 0), "Edit");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
 
     lv_list_add_text(list1, "Connectivity");
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_BLUETOOTH), "Bluetooth");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_BLUETOOTH, 0), "Bluetooth");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_GPS), "Navigation");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_GPS, 0), "Navigation");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_USB), "USB");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_USB, 0), "USB");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_BATTERY_FULL), "Battery");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_BATTERY_FULL, 0), "Battery");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
 
     lv_list_add_text(list1, "Exit");
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_OK), "Apply");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_OK, 0), "Apply");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_CLOSE), "Close");
+    btn = lv_list_add_btn(list1, lv_img_src_from_symbol(LV_SYMBOL_CLOSE, 0), "Close");
     lv_obj_add_event_cb(btn, event_handler, LV_EVENT_CLICKED, NULL);
 }
 

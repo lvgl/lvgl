@@ -25,7 +25,7 @@ void lv_example_style_6(void)
     lv_obj_add_style(obj, &style, 0);
 
     LV_IMG_DECLARE(img_cogwheel_argb);
-    lv_img_set_src(obj, lv_img_src_from_raw(&img_cogwheel_argb));
+    lv_img_set_src(obj, lv_img_src_from_raw(&img_cogwheel_argb, 0));
 
     lv_obj_center(obj);
 }

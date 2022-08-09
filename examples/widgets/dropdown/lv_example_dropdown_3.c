@@ -31,7 +31,7 @@ void lv_example_dropdown_3(void)
 
     /*Use a custom image as down icon and flip it when the list is opened*/
     LV_IMG_DECLARE(img_caret_down)
-    lv_dropdown_set_symbol(dropdown, lv_img_src_from_raw(&img_caret_down));
+    lv_dropdown_set_symbol(dropdown, lv_img_src_from_raw(&img_caret_down, 0));
     lv_obj_set_style_transform_angle(dropdown, 1800, LV_PART_INDICATOR | LV_STATE_CHECKED);
 
     /*In a menu we don't need to show the last clicked item*/

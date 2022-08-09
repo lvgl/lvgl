@@ -61,10 +61,15 @@ lv_img_src_type_t lv_img_src_get_type(const void * src)
  */
 void lv_img_src_free(lv_img_src_t * src)
 {
+    if(src == NULL) return;
+
     if(src->type == LV_IMG_SRC_SYMBOL || src->type == LV_IMG_SRC_FILE) {
         lv_mem_free((void *)src->data);
     }
-    lv_memset_00(src, sizeof(*src));
+
+    src->data_len = 0;
+    src->ext = NULL;
+    src->type = LV_IMG_SRC_UNKNOWN;
 }
 
 void lv_img_src_set_file(lv_img_src_t * src, const char * file_path)
@@ -106,44 +111,45 @@ void lv_img_src_set_symbol(lv_img_src_t * src, const char * symbol)
         return;
 }
 
-lv_img_src_t lv_img_src_from_symbol(const char * symbol)
+lv_img_src_t * lv_img_src_from_symbol(const char * symbol, lv_img_src_flag_t flags)
 {
-    lv_img_src_t obj = lv_img_src_empty();
-    lv_img_src_set_symbol((lv_img_src_t *)&obj, symbol);
-    obj.type |= _LV_IMG_SRC_MOVABLE;
-    return obj;
+    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_set_symbol((lv_img_src_t *)img_src, symbol);
+    return img_src;
 }
 
-lv_img_src_t lv_img_src_from_data(const uint8_t * data, const size_t len)
+lv_img_src_t * lv_img_src_from_data(const uint8_t * data, const size_t len, lv_img_src_flag_t flags)
 {
-    lv_img_src_t obj = lv_img_src_empty();
-    lv_img_src_set_data((lv_img_src_t *)&obj, data, len);
-    obj.type |= _LV_IMG_SRC_MOVABLE;
-    return obj;
+    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_set_data((lv_img_src_t *)img_src, data, len);
+    return img_src;
 }
 
-lv_img_src_t lv_img_src_from_file(const char * file_path)
+lv_img_src_t * lv_img_src_from_file(const char * file_path, lv_img_src_flag_t flags)
 {
-    lv_img_src_t obj = lv_img_src_empty();
-    lv_img_src_set_file((lv_img_src_t *)&obj, file_path);
-    obj.type |= _LV_IMG_SRC_MOVABLE;
-    return obj;
+    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_set_file((lv_img_src_t *)img_src, file_path);
+    return img_src;
 }
 
-lv_img_src_t lv_img_src_from_raw(const lv_img_dsc_t * raw)
+lv_img_src_t * lv_img_src_from_raw(const lv_img_dsc_t * raw, lv_img_src_flag_t flags)
 {
-    lv_img_src_t obj = lv_img_src_empty();
-    lv_img_src_set_raw((lv_img_src_t *)&obj, raw);
-    obj.type |= _LV_IMG_SRC_MOVABLE;
-    return obj;
+    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_set_raw((lv_img_src_t *)img_src, raw);
+    return img_src;
 }
 
-lv_img_src_t lv_img_src_empty(void)
+lv_img_src_t * lv_img_src_create(lv_img_src_flag_t flags)
 {
-    lv_img_src_t obj;
-    lv_memset(&obj, 0, sizeof(obj));
-    obj.type = LV_IMG_SRC_UNKNOWN | _LV_IMG_SRC_MOVABLE;
-    return obj;
+    lv_img_src_t * img_src = lv_mem_alloc(sizeof(lv_img_src_t));
+    if(img_src == NULL) {
+        LV_ASSERT_MALLOC(img_src);
+        return NULL;
+    }
+    lv_memset(img_src, 0, sizeof(img_src));
+    img_src->type = LV_IMG_SRC_UNKNOWN;
+    img_src->flag = flags;
+    return img_src;
 }
 
 void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
@@ -162,22 +168,24 @@ void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
     }
 }
 
-void lv_img_src_capture(lv_img_src_t * dest, lv_img_src_t * src)
+void lv_img_src_capture(lv_img_src_t ** dest, lv_img_src_t * src)
 {
-    /*Non-moveable objects should be copied*/
-    if(LV_BF(src->type, _LV_IMG_SRC_MOVABLE)) {
-        lv_img_src_copy(dest, (const lv_img_src_t *)src);
-    }
-    /*Move movable objects. `src` will be invalid after it.*/
-    else {
-        lv_img_src_free(dest);
-        dest->type = src->type & 0x7F; /*Remove moveable flag*/
-        dest->data = src->data;
-        dest->data_len = src->data_len;
-        dest->ext = src->ext;
 
-        /*Finish moving the type by making it empty*/
-        lv_memset(src, 0, sizeof(*src));
+    if(src && LV_BF(src->flag, LV_IMG_SRC_FLAG_PERMANENT) && LV_BT(src->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
+        LV_LOG_WARN("src (%p) is already captured.", src);
+        return;
+    }
+
+    /*Free the current img_src is required*/
+    if(*dest && LV_BF((*dest)->flag, LV_IMG_SRC_FLAG_PERMANENT) && LV_BT((*dest)->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
+        lv_img_src_free(*dest);
+        *dest = NULL;
+    }
+
+    *dest = src;
+
+    if((*dest) && LV_BF((*dest)->flag, LV_IMG_SRC_FLAG_PERMANENT)) {
+        (*dest)->flag |= _LV_IMG_SRC_FLAG_CAPTURED;
     }
 }
 

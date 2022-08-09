@@ -114,14 +114,14 @@ lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, 
     return LV_RES_OK;
 }
 
-lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_t src)
+lv_res_t lv_img_set_src(lv_obj_t * obj, lv_img_src_t * src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
 
     lv_obj_invalidate(obj);
 
-    lv_img_src_capture(&img->src, &src);
+    lv_img_src_capture(&img->src, src);
     return get_caps(img);
 }
 
@@ -309,7 +309,7 @@ lv_img_src_t * lv_img_get_src(lv_obj_t * obj)
 
     lv_img_t * img = (lv_img_t *)obj;
 
-    return &img->src;
+    return img->src;
 }
 
 lv_coord_t lv_img_get_offset_x(lv_obj_t * obj)
@@ -383,12 +383,12 @@ static lv_res_t get_caps(lv_img_t * img)
 
     /*Reset the decoded flag here*/
     img->cf = LV_IMG_CF_UNKNOWN;
-    if(img->src.type == LV_IMG_SRC_UNKNOWN)
+    if(img->src->type == LV_IMG_SRC_UNKNOWN)
         return LV_RES_INV;
 
-    if(img->src.type != LV_IMG_SRC_SYMBOL) {
+    if(img->src->type != LV_IMG_SRC_SYMBOL) {
         /*Try to see if we find a decoder that's able to decode the picture. Decoding is delayed until rendering*/
-        lv_img_decoder_t * img_dec = lv_img_decoder_accept(&img->src, &img->caps);
+        lv_img_decoder_t * img_dec = lv_img_decoder_accept(img->src, &img->caps);
         if(img_dec == NULL) return LV_RES_INV;
         /*Lie a bit here, we assume we'll be able to decode it later correctly*/
         return LV_RES_OK;
@@ -399,7 +399,7 @@ static lv_res_t get_caps(lv_img_t * img)
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_point_t size;
-    lv_txt_get_size(&size, img->src.data, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    lv_txt_get_size(&size, img->src->data, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
     img->w  = size.x;
     img->h  = size.y;
     img->cf = LV_IMG_CF_ALPHA_1BIT;
@@ -418,12 +418,12 @@ static void extract_metadata(lv_img_t * img, lv_point_t * size_hint)
     lv_obj_t * obj = (lv_obj_t *)img;
     lv_img_header_t header;
     lv_memset_00(&header, sizeof(header));
-    if(img->src.type == LV_IMG_SRC_UNKNOWN) return;
+    if(img->src->type == LV_IMG_SRC_UNKNOWN) return;
 
     /*Query the image cache now, since it's very likely we'll draw the image later on,
         so don't waste opening a decoder and closing it if it'll be reused */
     lv_img_dec_dsc_in_t dsc = {0};
-    dsc.src = &img->src;
+    dsc.src = img->src;
     /*Don't waste a cached entry for a different color, use the color that'll be drawn*/
     dsc.color.full = lv_color_to32(lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN));
     dsc.size_hint = *size_hint;
@@ -468,14 +468,14 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     /* If we have captured the context in the animation, we need to release it */
     if(img->dec_ctx && img->dec_ctx->auto_allocated == 0) {
-        lv_img_decoder_t * decoder = lv_img_decoder_accept(&img->src, NULL);
+        lv_img_decoder_t * decoder = lv_img_decoder_accept(img->src, NULL);
         lv_img_dec_dsc_t dsc = { .decoder = decoder, .dec_ctx = img->dec_ctx };
         img->dec_ctx->auto_allocated = 1;
         lv_img_decoder_close(&dsc);
         img->dec_ctx = NULL;
     }
 
-    lv_img_src_free(&img->src);
+    lv_img_src_free(img->src);
     if(img->anim_timer) {
         lv_timer_del(img->anim_timer);
         img->anim_timer = NULL;
@@ -519,7 +519,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
     if(code == LV_EVENT_STYLE_CHANGED) {
         /*Refresh the file name to refresh the symbol text size*/
-        if(img->src.type == LV_IMG_SRC_SYMBOL) {
+        if(img->src && img->src->type == LV_IMG_SRC_SYMBOL) {
             get_caps(img);
         }
         else {
@@ -613,7 +613,7 @@ static void draw_img(lv_event_t * e)
         /*Cover check only need to know the size and if the picture is transparent*/
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res == LV_COVER_RES_MASKED) return;
-        if(img->src.type == LV_IMG_SRC_UNKNOWN || img->src.type == LV_IMG_SRC_SYMBOL) {
+        if(img->src->type == LV_IMG_SRC_UNKNOWN || img->src->type == LV_IMG_SRC_SYMBOL) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
@@ -665,7 +665,7 @@ static void draw_img(lv_event_t * e)
     /* Deferred opening of the pictures for animation or not yet queried picture */
     if((img->dec_ctx == NULL && LV_BT(img->caps, LV_IMG_DEC_ANIMATED)) || img->cf == LV_IMG_CF_UNKNOWN) {
         lv_img_dec_dsc_in_t dsc = {
-            .src = &img->src,
+            .src = img->src,
             .color = {.full = 0},
             .size_hint = {.x = lv_obj_get_width(obj), .y = lv_obj_get_height(obj)}
         };
@@ -767,7 +767,7 @@ static void draw_img(lv_event_t * e)
         img_max_area.x2 -= pright;
         img_max_area.y2 -= pbottom;
 
-        if(img->src.type == LV_IMG_SRC_FILE || img->src.type == LV_IMG_SRC_VARIABLE) {
+        if(img->src->type == LV_IMG_SRC_FILE || img->src->type == LV_IMG_SRC_VARIABLE) {
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
             img_dsc.dec_ctx = img->dec_ctx;
@@ -800,17 +800,17 @@ static void draw_img(lv_event_t * e)
                 coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
                 for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
-                    lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, &img->src);
+                    lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src);
                 }
             }
             draw_ctx->clip_area = clip_area_ori;
         }
-        else if(img->src.type == LV_IMG_SRC_SYMBOL) {
+        else if(img->src->type == LV_IMG_SRC_SYMBOL) {
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
 
-            lv_draw_label(draw_ctx, &label_dsc, &obj->coords, (const char *)img->src.data, NULL);
+            lv_draw_label(draw_ctx, &label_dsc, &obj->coords, (const char *)img->src->data, NULL);
         }
         else {
             /*Trigger the error handler of image draw*/

@@ -150,7 +150,7 @@ static lv_obj_t * create_text(lv_obj_t * parent, const char * icon, const char *
 
     if(icon) {
         img = lv_img_create(obj);
-        lv_img_set_src(img, lv_img_src_from_symbol(icon));
+        lv_img_set_src(img, lv_img_src_from_symbol(icon, 0));
     }
 
     if(txt) {

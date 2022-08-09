@@ -13,7 +13,7 @@ static void event_cb(lv_event_t * e)
         /*Update the snapshot, we know parent of object is the container.*/
         snapshot = lv_snapshot_take(img->parent, LV_IMG_CF_TRUE_COLOR_ALPHA);
         if(snapshot == NULL) return;
-        lv_img_set_src(snapshot_obj, *snapshot);
+        lv_img_set_src(snapshot_obj, snapshot);
     }
 }
 
@@ -42,7 +42,7 @@ void lv_example_snapshot_1(void)
     int i;
     for(i = 0; i < 4; i++) {
         img = lv_img_create(container);
-        lv_img_set_src(img,  lv_img_src_from_raw(&img_star));
+        lv_img_set_src(img,  lv_img_src_from_raw(&img_star, 0));
         lv_obj_set_style_bg_color(img, lv_color_black(), 0);
         lv_obj_set_style_bg_opa(img, LV_OPA_COVER, 0);
         lv_obj_set_style_transform_zoom(img, 400, LV_STATE_PRESSED);

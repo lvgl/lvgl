@@ -34,25 +34,44 @@ extern "C" {
 struct _lv_img_dsc_t;
 
 /**
- * Source type of image.*/
+ * Image source types.*/
 enum {
     LV_IMG_SRC_UNKNOWN  = 0,    /** Unknown source*/
     LV_IMG_SRC_VARIABLE = 1,    /** Binary/C variable */
     LV_IMG_SRC_FILE     = 2,    /** File in filesystem*/
     LV_IMG_SRC_SYMBOL   = 3,    /** Symbol (@ref lv_symbol_def.h)*/
-
-
-    _LV_IMG_SRC_MOVABLE = 0x80, /** A bit flag to tell if an object is a temporary and that can be captured */
 };
 
 typedef uint8_t lv_img_src_type_t;
+
+
+
+/**
+ * Image source flags.*/
+enum {
+    /**
+     * 0: can be attached to a single object which frees it if required
+     * 1: can be attached to any number of object and none of them will try to free it
+     */
+    LV_IMG_SRC_FLAG_PERMANENT = 0x01,
+
+    /**
+     * only if loose == 1
+     * 0: not attached to any objects yet
+     * 1: attached to an object, can't be attached again
+     */
+    _LV_IMG_SRC_FLAG_CAPTURED = 0x02,
+};
+
+typedef uint8_t lv_img_src_flag_t;
 
 /**
  * A generic image source descriptor.
  * You can build an image source via `lv_img_src_from_xxx` or `lv_img_src_set_src` functions.
  */
 typedef struct {
-    uint8_t         type;           /**< See `lv_img_src_type_t` above */
+    uint8_t         type:6;           /**< See `lv_img_src_type_t` above */
+    uint8_t         flag:2;           /**< See `lv_img_src_flag_t` above */
     size_t          data_len;       /**< The data's length in bytes */
     const void   *  data;           /**< A pointer on the given unique resource identifier */
     const char   *  ext;            /**< If the data points to a file, this will point to the extension */
@@ -109,33 +128,38 @@ void lv_img_src_set_raw(lv_img_src_t * src, const lv_img_dsc_t * raw);
 
 /** Get an image source to a text with any symbol in it
  *  @param symbol An textual strings with symbols
+ *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
 */
-lv_img_src_t lv_img_src_from_symbol(const char * symbol);
+lv_img_src_t * lv_img_src_from_symbol(const char * symbol, lv_img_src_flag_t flags);
 
 /** Get an image source to a byte array containing the image encoded data
  *  @param data A pointer to the image's data
  *  @param len  The length pointed by data in bytes
+ *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
 */
-lv_img_src_t lv_img_src_from_data(const uint8_t * data, const size_t len);
+lv_img_src_t * lv_img_src_from_data(const uint8_t * data, const size_t len, lv_img_src_flag_t flags);
 
 /**Get an image source to a file
  *  @param path Path to the file containing the image
+ *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
  */
-lv_img_src_t lv_img_src_from_file(const char * file_path);
+lv_img_src_t * lv_img_src_from_file(const char * file_path, lv_img_src_flag_t flags);
 
 /** Get an image source to an image descriptor
  *  @param raw  Pointer to a lv_img_dsc_t instance
+ *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
  */
-lv_img_src_t lv_img_src_from_raw(const lv_img_dsc_t * raw);
+lv_img_src_t * lv_img_src_from_raw(const lv_img_dsc_t * raw, lv_img_src_flag_t flags);
 
 /** Get an image source to an empty object (no image)
+ *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
  *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
  */
-lv_img_src_t lv_img_src_empty(void);
+lv_img_src_t * lv_img_src_create(lv_img_src_flag_t flags);
 
 /** Copy the source of the descriptor to another descriptor
  *  @param dest The dest object to fill
@@ -147,7 +171,7 @@ void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src);
  *  @param dest The dest object to fill
  *  @param src  The source object to move from
  */
-void lv_img_src_capture(lv_img_src_t * dest, lv_img_src_t * src);
+void lv_img_src_capture(lv_img_src_t ** dest, lv_img_src_t * src);
 
 #ifdef __cplusplus
 } /*extern "C"*/
