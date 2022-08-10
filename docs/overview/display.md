@@ -63,11 +63,10 @@ See the [Display background](#display-background) section for more details. If t
 This configuration (transparent screen and display) could be used to create for example OSD menus where a video is played on a lower layer, and a menu is overlayed on an upper layer.
 
 To handle transparent displays, special (slower) color mixing algorithms need to be used by LVGL so this feature needs to enabled with `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`.
-As this mode operates on the Alpha channel of the pixels `LV_COLOR_DEPTH = 32` is also required. The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 where there are solid objects.
+The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 where there are solid objects.
 
 In summary, to enable transparent screens and displays for OSD menu-like UIs:
 - Enable `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`
-- Be sure to use `LV_COLOR_DEPTH 32`
 - Set the screen's opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP)`
 - Set the display opacity to `LV_OPA_TRANSP` with `lv_disp_set_bg_opa(NULL, LV_OPA_TRANSP);`
 
