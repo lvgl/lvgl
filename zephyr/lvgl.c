@@ -26,6 +26,7 @@ static lv_indev_drv_t indev_drv;
 #endif /* CONFIG_LV_Z_POINTER_KSCAN */
 
 #define DISPLAY_NODE DT_CHOSEN(zephyr_display)
+#define KSCAN_NODE DT_CHOSEN(zephyr_keyboard_scan)
 
 #ifdef CONFIG_LV_Z_BUFFER_ALLOC_STATIC
 
@@ -299,11 +300,10 @@ set_and_release:
 
 static int lvgl_pointer_kscan_init(void)
 {
-	const struct device *kscan_dev =
-		device_get_binding(CONFIG_LV_Z_POINTER_KSCAN_DEV_NAME);
+	const struct device *kscan_dev = DEVICE_DT_GET(KSCAN_NODE);
 
-	if (kscan_dev == NULL) {
-		LOG_ERR("Keyboard scan device not found.");
+	if (!device_is_ready(kscan_dev)) {
+		LOG_ERR("Keyboard scan device not ready.");
 		return -ENODEV;
 	}
 

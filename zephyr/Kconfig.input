@@ -12,12 +12,6 @@ config LV_Z_POINTER_KSCAN
 
 if LV_Z_POINTER_KSCAN
 
-config LV_Z_POINTER_KSCAN_DEV_NAME
-	string "Keyboard scan device name for pointer input"
-	default "KSCAN"
-	help
-	  Name of the keyboard scan device to use for pointer input.
-
 config LV_Z_POINTER_KSCAN_MSGQ_COUNT
 	int "Keyboard scan message queue count maximum"
 	default 10
