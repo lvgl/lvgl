@@ -76,13 +76,27 @@ extern "C" {
 #include "src/widgets/tileview/lv_tileview.h"
 #include "src/widgets/win/lv_win.h"
 
-#include "src/others/snapshot/lv_snapshot.h"
-#include "src/others/monkey/lv_monkey.h"
-#include "src/others/gridnav/lv_gridnav.h"
-#include "src/others/fragment/lv_fragment.h"
-#include "src/others/imgfont/lv_imgfont.h"
-#include "src/others/msg/lv_msg.h"
-#include "src/others/ime/lv_ime_pinyin.h"
+#if LV_USE_SNAPSHOT
+    #include "src/others/snapshot/lv_snapshot.h"
+#endif
+#if LV_USE_MONKEY != 0
+    #include "src/others/monkey/lv_monkey.h"
+#endif
+#if LV_USE_GRIDNAV
+    #include "src/others/gridnav/lv_gridnav.h"
+#endif
+#if LV_USE_FRAGMENT
+    #include "src/others/fragment/lv_fragment.h"
+#endif
+#if LV_USE_IMGFONT
+    #include "src/others/imgfont/lv_imgfont.h"
+#endif
+#if LV_USE_MSG
+    #include "src/others/msg/lv_msg.h"
+#endif
+#if LV_USE_IME_PINYIN != 0
+    #include "src/others/ime/lv_ime_pinyin.h"
+#endif
 
 #include "src/libs/bmp/lv_bmp.h"
 #include "src/libs/fsdrv/lv_fsdrv.h"
@@ -165,7 +179,7 @@ static inline int lv_version_patch(void)
     return LVGL_VERSION_PATCH;
 }
 
-static inline const char *lv_version_info(void)
+static inline const char * lv_version_info(void)
 {
     return LVGL_VERSION_INFO;
 }
