@@ -20,9 +20,18 @@
 #include "../draw/sdl/lv_draw_sdl.h"
 #include "../draw/sw/lv_draw_sw.h"
 #include "../draw/sdl/lv_draw_sdl.h"
-#include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
-#include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
-#include "../draw/arm2d/lv_gpu_arm2d.h"
+#if LV_USE_GPU_STM32_DMA2D
+    #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
+#endif
+
+#if LV_USE_GPU_SWM341_DMA2D
+    #include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
+#endif
+
+#if LV_USE_GPU_ARM2D
+    #include "../draw/arm2d/lv_gpu_arm2d.h"
+#endif
+
 #if LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE
     #include "../draw/nxp/lv_gpu_nxp.h"
 #endif
