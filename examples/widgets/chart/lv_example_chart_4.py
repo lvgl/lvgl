@@ -10,7 +10,7 @@ def event_cb(e):
 
     elif code == lv.EVENT.DRAW_POST_END:
         id = lv.chart.get_pressed_point(chart)
-        if id == lv.CHART_POINT.NONE:
+        if id == lv.CHART_POINT_NONE:
             return
         # print("Selected point ", id)
         for i in range(len(series)):

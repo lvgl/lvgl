@@ -19,7 +19,7 @@ btn = lv.btn(tile2)
 label = lv.label(btn)
 label.set_text("Scroll up or right")
 
-btn.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
+btn.set_size(lv.SIZE_CONTENT, lv.SIZE_CONTENT)
 btn.center()
 
 # Tile3: a list

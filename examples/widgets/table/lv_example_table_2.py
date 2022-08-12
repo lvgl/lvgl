@@ -18,7 +18,7 @@ def draw_event_cb(e):
         else:
             rect_dsc.bg_color = lv.palette_lighten(lv.PALETTE.GREY, 2)
 
-        rect_dsc.radius = lv.RADIUS.CIRCLE
+        rect_dsc.radius = lv.RADIUS_CIRCLE
 
         sw_area = lv.area_t()
         sw_area.x1 = dsc.draw_area.x2 - 50

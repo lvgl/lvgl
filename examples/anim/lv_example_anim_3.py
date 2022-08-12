@@ -14,8 +14,8 @@ class LvExampleAnim_3():
     #
     def __init__(self):
         # Create a container with grid
-        col_dsc = [lv.grid_fr(1), 200, lv.grid_fr(1), lv.GRID_TEMPLATE.LAST]
-        row_dsc = [30, 10, 10, lv.grid_fr(1),lv.GRID_TEMPLATE.LAST]
+        col_dsc = [lv.grid_fr(1), 200, lv.grid_fr(1), lv.GRID_TEMPLATE_LAST]
+        row_dsc = [30, 10, 10, lv.grid_fr(1),lv.GRID_TEMPLATE_LAST]
 
         self.p1 = 0
         self.p2 = 0
