@@ -64,29 +64,6 @@ void test_label_set_text(void)
     TEST_ASSERT_EQUAL_STRING(lv_label_get_text(label), new_text);
 }
 
-void test_label_long_mode(void)
-{
-    /* LV_LABEL_LONG_WRAP, LV_LABEL_LONG_DOT, LV_LABEL_LONG_SCROLL, LV_LABEL_LONG_SCROLL_CIRCULAR, LV_LABEL_LONG_CLIP */
-    lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
-    /* Test behavior of label with text longer than the object size */
-    /* In LV_LONG_WRAP/DOT/SCROLL/SCROLL_CIRC the size of the label should be set AFTER this function */
-    /* LV_LABEL_LONG_WRAP generates new lines */
-}
-
-void test_label_long_mode_dot(void)
-{
-    /* Replaces last 3 characters with dots with a separated buffer */
-    lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
-
-    // when dots replace more than 4 characters then we allocate memory for them
-    // otherwise we store then, see the dot union
-
-    /* When text is static the text must be writable */
-    // lv_label_set_text
-    // lv_label_set_array_text
-    // lv_label_set_text_static
-}
-
 void test_label_get_letter_pos_align_left(void)
 {
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_LEFT, _LV_STYLE_STATE_CMP_SAME);
