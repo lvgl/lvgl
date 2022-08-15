@@ -81,7 +81,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/btnmatrix/index.rst
+.. include:: ../../examples/widgets/btnmatrix/index.rst
 
 ```
 

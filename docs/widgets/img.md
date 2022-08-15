@@ -125,7 +125,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/img/index.rst
+.. include:: ../../examples/widgets/img/index.rst
 
 ```
 

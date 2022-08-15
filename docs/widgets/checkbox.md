@@ -60,7 +60,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/checkbox/index.rst
+.. include:: ../../examples/widgets/checkbox/index.rst
 
 ```
 
