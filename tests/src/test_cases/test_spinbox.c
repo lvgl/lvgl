@@ -35,8 +35,9 @@ void test_spinbox_decrement_when_min_range_is_negative(void)
     const int32_t expected_value = -11;
     lv_spinbox_set_value(spinbox_negative_min_range, 2);
 
-    /* Move to decimal position and decrement */
-    lv_spinbox_set_pos(spinbox_negative_min_range, SPINBOX_DECIMAL_POSITION);
+    /* Change cursor position of spinbox to 10 */
+    lv_spinbox_set_cursor_pos(spinbox_negative_min_range, SPINBOX_DECIMAL_POSITION);
+    lv_spinbox_decrement(spinbox_negative_min_range);
     lv_spinbox_decrement(spinbox_negative_min_range);
 
     /* We expect value now being -11 */
@@ -51,8 +52,9 @@ void test_spinbox_decrement_when_min_range_is_zero(void)
     const int32_t expected_value = 0;
     lv_spinbox_set_value(spinbox_zero_min_range, 2);
 
-    /* Move to decimal position and decrement */
-    lv_spinbox_set_pos(spinbox_zero_min_range, SPINBOX_DECIMAL_POSITION);
+    /* Change cursor position of spinbox to 10 */
+    lv_spinbox_set_cursor_pos(spinbox_zero_min_range, SPINBOX_DECIMAL_POSITION);
+    lv_spinbox_decrement(spinbox_zero_min_range);
     lv_spinbox_decrement(spinbox_zero_min_range);
 
     /* We expect value now being 0 */
