@@ -89,7 +89,7 @@ Learn more about [Keys](/overview/indev).
 ## Example
 ```eval_rst
 
-.. include:: ../../../examples/widgets/canvas/index.rst
+.. include:: ../../examples/widgets/canvas/index.rst
 
 ```
 

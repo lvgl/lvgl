@@ -44,7 +44,7 @@ Learn more about [Events](/overview/event).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/roller/index.rst
+.. include:: ../../examples/widgets/roller/index.rst
 
 ```
 

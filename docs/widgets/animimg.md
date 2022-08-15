@@ -35,7 +35,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/animimg/index.rst
+.. include:: ../../examples/widgets/animimg/index.rst
 
 ```
 
