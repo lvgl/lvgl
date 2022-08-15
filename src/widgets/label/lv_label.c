@@ -727,7 +727,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_text_flag_t flag = LV_TEXT_FLAG_NONE;
             if(label->recolor != 0) flag |= LV_TEXT_FLAG_RECOLOR;
             if(label->expand != 0) flag |= LV_TEXT_FLAG_EXPAND;
-            
+
             lv_coord_t w = lv_obj_get_content_width(obj);
             if(lv_obj_get_style_width(obj, LV_PART_MAIN) == LV_SIZE_CONTENT && !obj->w_layout) w = LV_COORD_MAX;
             else w = lv_obj_get_content_width(obj);
