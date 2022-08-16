@@ -584,6 +584,20 @@
         #endif
     #endif
 
+    /*1: Enable print timestamp;
+    *0: Disable print timestamp*/
+    #ifndef LV_LOG_USE_TIMESTAMP
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LOG_USE_TIMESTAMP
+                #define LV_LOG_USE_TIMESTAMP CONFIG_LV_LOG_USE_TIMESTAMP
+            #else
+                #define LV_LOG_USE_TIMESTAMP 0
+            #endif
+        #else
+            #define LV_LOG_USE_TIMESTAMP 1
+        #endif
+    #endif
+
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #ifndef LV_LOG_TRACE_MEM
         #ifdef _LV_KCONFIG_PRESENT
