@@ -23,7 +23,7 @@
  *********************/
 
 #if LV_LOG_USE_TIMESTAMP
-    #define LOG_TIMESTAMP_FMT  "(%" LV_PRId32 ".%03" LV_PRId32 ", +%" LV_PRId32 ")\t "
+    #define LOG_TIMESTAMP_FMT  "\t(%" LV_PRId32 ".%03" LV_PRId32 ", +%" LV_PRId32 ")\t"
     #define LOG_TIMESTAMP_EXPR t / 1000, t % 1000, t - last_log_time,
 #else
     #define LOG_TIMESTAMP_FMT
@@ -97,7 +97,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
         static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error", "User"};
 
 #if LV_LOG_PRINTF
-        printf("[%s]\t" LOG_TIMESTAMP_FMT "%s: ",
+        printf("[%s]" LOG_TIMESTAMP_FMT " %s: ",
                lvl_prefix[level], LOG_TIMESTAMP_EXPR func);
         vprintf(format, args);
         printf(" \t(in %s line #%d)\n", &file[p], line);
@@ -106,7 +106,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
             char buf[512];
             char msg[256];
             lv_vsnprintf(msg, sizeof(msg), format, args);
-            lv_snprintf(buf, sizeof(buf), "[%s]\t" LOG_TIMESTAMP_FMT "%s: %s \t(in %s line #%d)\n",
+            lv_snprintf(buf, sizeof(buf), "[%s]" LOG_TIMESTAMP_FMT " %s: %s \t(in %s line #%d)\n",
                         lvl_prefix[level], LOG_TIMESTAMP_EXPR func, msg, &file[p], line);
             custom_print_cb(buf);
         }
