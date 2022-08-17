@@ -31,6 +31,7 @@ extern "C" {
 #define LV_LABEL_DOT_NUM 3
 #define LV_LABEL_POS_LAST 0xFFFF
 #define LV_LABEL_TEXT_SELECTION_OFF LV_DRAW_LABEL_NO_TXT_SEL
+#define LV_LABEL_DEFAULT_TEXT "Text"
 
 LV_EXPORT_CONST_INT(LV_LABEL_DOT_NUM);
 LV_EXPORT_CONST_INT(LV_LABEL_POS_LAST);
@@ -42,7 +43,7 @@ LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SELECTION_OFF);
 
 /** Long mode behaviors. Used in 'lv_label_ext_t'*/
 enum {
-    LV_LABEL_LONG_WRAP,             /**< Keep the object width, wrap the too long lines and expand the object height*/
+    LV_LABEL_LONG_WRAP,             /**< Keep the object width, wrap lines longer than object width and expand the object height*/
     LV_LABEL_LONG_DOT,              /**< Keep the size and write dots at the end if the text is too long*/
     LV_LABEL_LONG_SCROLL,           /**< Keep the size and roll the text back and forth*/
     LV_LABEL_LONG_SCROLL_CIRCULAR,  /**< Keep the size and roll the text circularly*/
@@ -119,7 +120,7 @@ void lv_label_set_text_fmt(lv_obj_t * obj, const char * fmt, ...) LV_FORMAT_ATTR
 void lv_label_set_text_static(lv_obj_t * obj, const char * text);
 
 /**
- * Set the behavior of the label with longer text then the object size
+ * Set the behavior of the label with text longer than the object size
  * @param obj           pointer to a label object
  * @param long_mode     the new mode from 'lv_label_long_mode' enum.
  *                      In LV_LONG_WRAP/DOT/SCROLL/SCROLL_CIRC the size of the label should be set AFTER this function
