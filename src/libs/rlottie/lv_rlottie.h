@@ -62,19 +62,19 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
 
 void lv_rlottie_set_play_mode(lv_obj_t * rlottie, const lv_rlottie_ctrl_t ctrl);
 void lv_rlottie_set_current_frame(lv_obj_t * rlottie, const size_t goto_frame);
-void lv_rlottie_set_framerate(lv_obj_t* obj, const int framerate);
-void lv_rlottie_set_render_width(lv_obj_t* obj, const int width);
-void lv_rlottie_set_render_height(lv_obj_t* obj, const int height);
-void lv_rlottie_set_dest_frame(lv_obj_t* obj, const int dest_frame);
-void lv_rlottie_set_start_frame(lv_obj_t* obj, const int start_frame);
+void lv_rlottie_set_framerate(lv_obj_t * obj, const int framerate);
+void lv_rlottie_set_render_width(lv_obj_t * obj, const int width);
+void lv_rlottie_set_render_height(lv_obj_t * obj, const int height);
+void lv_rlottie_set_dest_frame(lv_obj_t * obj, const int dest_frame);
+void lv_rlottie_set_start_frame(lv_obj_t * obj, const int start_frame);
 
-int lv_rlottie_get_framerate(lv_obj_t* obj);
-int lv_rlottie_get_render_width(lv_obj_t* obj);
-int lv_rlottie_get_render_height(lv_obj_t* obj);
-size_t lv_rlottie_get_start_frame(lv_obj_t* obj);
-size_t lv_rlottie_get_dest_frame(lv_obj_t* obj);
-size_t lv_rlottie_get_current_frame(lv_obj_t* obj);
-lv_rlottie_ctrl_t lv_rlottie_get_play_mode(lv_obj_t* obj);
+int lv_rlottie_get_framerate(lv_obj_t * obj);
+int lv_rlottie_get_render_width(lv_obj_t * obj);
+int lv_rlottie_get_render_height(lv_obj_t * obj);
+size_t lv_rlottie_get_start_frame(lv_obj_t * obj);
+size_t lv_rlottie_get_dest_frame(lv_obj_t * obj);
+size_t lv_rlottie_get_current_frame(lv_obj_t * obj);
+lv_rlottie_ctrl_t lv_rlottie_get_play_mode(lv_obj_t * obj);
 
 /**********************
  *      MACROS
