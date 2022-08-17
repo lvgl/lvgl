@@ -217,7 +217,7 @@
     #define LV_LOG_PRINTF 0
 
     /*1: Enable print timestamp;
-    *0: Disable print timestamp*/
+     *0: Disable print timestamp*/
     #define LV_LOG_USE_TIMESTAMP 1
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
