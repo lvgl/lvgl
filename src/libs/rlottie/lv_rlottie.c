@@ -83,6 +83,11 @@ lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_co
     return obj;
 }
 
+/**
+ * Sets a new playmode for the animation (PAUSE/PLAY/LOOP/etc)
+ * @param obj pointer to lv_rlottie obj
+ * @param lv_rlottie_ctrl_t the new playmode to be set 
+ */
 void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
@@ -94,12 +99,16 @@ void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
     }
 }
 
+/**
+ * Sets the current frame of the animation to goto_frame
+ * @param obj pointer to lv_rlottie obj
+ * @param goto_frame the new frame to render
+ */
 void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->current_frame = goto_frame < rlottie->dest_frame ? goto_frame : rlottie->dest_frame - 1;
     
-    //Render the current frame that has been set by this call
     lottie_animation_render(
         rlottie->animation,
         rlottie->current_frame,
@@ -116,12 +125,16 @@ void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
     lv_obj_invalidate(obj);
 }
 
+/**
+ * Adjusts the framerate of the lottie animation post-creation
+ * @param obj pointer to lv_rlottie obj
+ * @param framerate the new frame rate to set
+ */
 void lv_rlottie_set_framerate(lv_obj_t* obj, const int framerate)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->framerate = framerate;
 
-    //When setting a new frame rate, must delete the existing lv_timer and create a new one with the updated frame rate
     if(rlottie->task) {
         lv_timer_del(rlottie->task);
         rlottie->task = NULL;
@@ -130,6 +143,11 @@ void lv_rlottie_set_framerate(lv_obj_t* obj, const int framerate)
 
 }
 
+/**
+ * Adjusts the render width of the lottie animation post-creation
+ * @param obj pointer to lv_rlottie obj
+ * @param width the new width to render the lottie animation at
+ */
 void lv_rlottie_set_render_width(lv_obj_t* obj, const int width)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
@@ -140,9 +158,6 @@ void lv_rlottie_set_render_width(lv_obj_t* obj, const int width)
     if(rlottie->task) {
         size_t allocaled_buf_size = (width * rlottie->imgdsc.header.h * LV_ARGB32 / 8);
 
-        //In order to resize the width and render properly, the allocated buffer must be resized according to the new width
-        //This operation can result in minor flickering when the rendering first begins
-        //Changing render width of the lottie can be done with an lvgl animation over a range of widths
         rlottie->allocated_buf = lv_realloc(rlottie->allocated_buf, allocaled_buf_size+1);
         
         rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
@@ -156,6 +171,11 @@ void lv_rlottie_set_render_width(lv_obj_t* obj, const int width)
     }
 }
 
+/**
+ * Adjusts the render height of the lottie animation post-creation
+ * @param obj pointer to lv_rlottie obj
+ * @param height the new height to render the lottie animation at
+ */
 void lv_rlottie_set_render_height(lv_obj_t* obj, const int height)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
@@ -163,10 +183,6 @@ void lv_rlottie_set_render_height(lv_obj_t* obj, const int height)
 
     if(rlottie->task) {
         size_t allocaled_buf_size = (rlottie->imgdsc.header.w * height * LV_ARGB32 / 8);
-
-        //In order to resize the height and render properly, the allocated buffer must be resized according to the new height
-        //This operation can result in minor flickering when the rendering first begins
-        //Changing render width of the lottie can be done with an lvgl animation over a range of widths
 
         rlottie->allocated_buf = lv_realloc(rlottie->allocated_buf, allocaled_buf_size+1);
 
@@ -182,64 +198,98 @@ void lv_rlottie_set_render_height(lv_obj_t* obj, const int height)
     
 }
 
+/**
+ * When looping, dest_frame is the value to determine when to reset to start_frame
+ * @param obj pointer to lv_rlottie obj
+ * @param dest_frame sets a new ending frame for a looping lottie animation
+ */
 void lv_rlottie_set_dest_frame(lv_obj_t* obj, const int dest_frame)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->dest_frame = dest_frame;
 
-    //Adjusts the end frame of the lottie animation
-    //i.e. set the animation to run from 0-15 instead of 0-30
-
     if(rlottie->task && (rlottie->dest_frame != rlottie->current_frame ||
                          (rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PLAY)) {
         lv_timer_resume(rlottie->task);
     }
 }
 
+/**
+ * When looping, start_frame is the first frame of the loop
+ * @param obj pointer to lv_rlottie obj
+ * @param start_frame sets a new start frame for a looping lottie animation
+ */
 void lv_rlottie_set_start_frame(lv_obj_t* obj, const int start_frame)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     rlottie->start_frame = start_frame;
 
-    //Adjusts the start frame of the lottie animation
-    //i.e. sets the animation to run from 15-30 instead of 0-30
-
     if(rlottie->task && (rlottie->dest_frame != rlottie->current_frame ||
                          (rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PLAY)) {
         lv_timer_resume(rlottie->task);
     }
 }
 
+/**
+ * Return with the current active rlottie playmode
+ * @param obj pointer to an object
+ * @return the current active rlottie_ctrl
+ */
 lv_rlottie_ctrl_t lv_rlottie_get_play_mode(lv_obj_t* obj)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     return rlottie->play_ctrl;
 }
 
+/**
+ * Returns the current frame of the lottie animation
+ * @param obj pointer to an object
+ * @return the current frame
+ */
 size_t lv_rlottie_get_current_frame(lv_obj_t* obj)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     return rlottie->current_frame;   
 }
 
+/**
+ * Return with the current end frame of the animation loop
+ * @param obj pointer to an object
+ * @return the current end frame of the animation
+ */
 size_t lv_rlottie_get_dest_frame(lv_obj_t* obj)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     return rlottie->dest_frame;   
 }
 
+/**
+ * Return with the current start frame of the animation loop
+ * @param obj pointer to an object
+ * @return the current start frame of the animation
+ */
 size_t lv_rlottie_get_start_frame(lv_obj_t* obj)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     return rlottie->start_frame;   
 }
 
+/**
+ * Return with the current render height of the animation loop
+ * @param obj pointer to an object
+ * @return the current render height of the animation
+ */
 int lv_rlottie_get_render_height(lv_obj_t* obj)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
     return rlottie->imgdsc.header.h;
 }
 
+/**
+ * Return with the current render width of the animation loop
+ * @param obj pointer to an object
+ * @return the current render width of the animation
+ */
 int lv_rlottie_get_render_width(lv_obj_t* obj)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
@@ -247,6 +297,11 @@ int lv_rlottie_get_render_width(lv_obj_t* obj)
     return rlottie->imgdsc.header.w;
 }
 
+/**
+ * Return with the current framerate of the animation loop
+ * @param obj pointer to an object
+ * @return the current render framerate of the animation
+ */
 int lv_rlottie_get_framerate(lv_obj_t* obj)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
