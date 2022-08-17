@@ -224,11 +224,11 @@ int16_t lv_arc_get_max_value(const lv_obj_t * obj);
 lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj);
 
 /**
- * Get whether the arc is type or not.
+ * Get the rotation for the whole arc
  * @param arc       pointer to an arc object
  * @return          arc's current rotation
  */
-int16_t lv_arc_get_rotation(const lv_obj_t * obj)
+int16_t lv_arc_get_rotation(const lv_obj_t * obj);
 
 /*=====================
  * Other functions
