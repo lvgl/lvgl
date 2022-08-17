@@ -799,7 +799,7 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t 
     r -= indic_width_half;
 
     lv_coord_t angle = get_angle(obj);
-    lv_coord_t knob_offset lv_arc_get_knob_offset(obj);
+    lv_coord_t knob_offset = lv_arc_get_knob_offset(obj);
     lv_coord_t knob_x = (r * lv_trigo_sin(knob_offset + angle + 90)) >> LV_TRIGO_SHIFT;
     lv_coord_t knob_y = (r * lv_trigo_sin(knob_offset + angle)) >> LV_TRIGO_SHIFT;
 
