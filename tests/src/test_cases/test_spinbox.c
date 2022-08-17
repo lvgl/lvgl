@@ -63,4 +63,23 @@ void test_spinbox_decrement_when_min_range_is_zero(void)
     TEST_ASSERT_EQUAL_INT32(expected_value, actual_value);
 }
 
+void test_spinbox_position_selection(void)
+{
+    /* Assert step is 1 when selecting the lowest possible position */
+    lv_spinbox_set_cursor_pos(spinbox_zero_min_range, 0);
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(spinbox_zero_min_range));
+
+    /* The other branch in the if */
+    lv_spinbox_set_cursor_pos(spinbox_zero_min_range, 1);
+    TEST_ASSERT_EQUAL(10, lv_spinbox_get_step(spinbox_zero_min_range));
+
+    /* When not possible to select the indicated position */
+    lv_obj_t * tmp;
+    tmp = lv_spinbox_create(active_screen);
+    lv_spinbox_set_range(tmp, 0, 10);
+    lv_spinbox_set_cursor_pos(tmp, 2);
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(tmp));
+    lv_obj_clean(tmp);
+}
+
 #endif
