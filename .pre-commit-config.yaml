@@ -4,7 +4,10 @@ repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
-    -   id: trailing-whitespace
+    - id: trailing-whitespace
+      stages: [ commit ]
+      # Run this hook on the files found in:
+      exclude: 'src/lv_conf_internal.h'
 
 -   repo: local
     hooks:
@@ -12,7 +15,7 @@ repos:
     # listed in the files regex pattern. Ignoring the files in the exclude pattern.
     - id: format-source
       name: Formatting source files
-      entry: astyle --options=scripts/code-format.cfg --ignore-exclude-errors
+      entry: astyle --options=scripts/code-format.cfg --ignore-exclude-errors --verbose
       stages: [ commit ]
       language: system
       pass_filenames: true

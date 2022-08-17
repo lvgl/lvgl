@@ -4,6 +4,8 @@
  * Make sure all the defines of lv_conf.h have a default value
 **/
 
+/* *INDENT-OFF* */
+
 #ifndef LV_CONF_INTERNAL_H
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
@@ -14,7 +16,7 @@
 #ifndef LV_KCONFIG_IGNORE
     #include "lv_conf_kconfig.h"
     #ifdef CONFIG_LV_CONF_SKIP
-        #define LV_CONF_SKIP
+        #define LV_CONF_SKIP 
     #endif
 #endif
 
@@ -2489,3 +2491,5 @@ LV_EXPORT_CONST_INT(LV_DPI_DEF);
 #endif  /*defined(LV_CONF_SKIP)*/
 
 #endif  /*LV_CONF_INTERNAL_H*/
+
+/* *INDENT-ON* */
