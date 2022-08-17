@@ -50,6 +50,7 @@ typedef struct {
     uint16_t chg_rate;          /*Drag angle rate of change of the arc (degrees/sec)*/
     uint32_t last_tick;         /*Last dragging event timestamp of the arc*/
     int16_t last_angle;         /*Last dragging angle of the arc*/
+    int16_t knob_offset;        /*knob offset from the main arc*/
 } lv_arc_t;
 
 extern const lv_obj_class_t lv_arc_class;
@@ -163,6 +164,13 @@ void lv_arc_set_range(lv_obj_t * obj, int16_t min, int16_t max);
  */
 void lv_arc_set_change_rate(lv_obj_t * obj, uint16_t rate);
 
+/**
+ * Set an offset for the knob from the main arc object
+ * @param arc       pointer to an arc object
+ * @param offset    knob offset from main arc
+ */
+void lv_arc_set_knob_offset(lv_obj_t * arc, int16_t offset);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -229,6 +237,13 @@ lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj);
  * @return          arc's current rotation
  */
 int16_t lv_arc_get_rotation(const lv_obj_t * obj);
+
+/**
+ * Get the current knob offset
+ * @param arc       pointer to an arc object
+ * @return          arc's current knob offset
+ */
+int16_t lv_arc_get_knob_offset(const lv_obj_t * obj);
 
 /*=====================
  * Other functions
