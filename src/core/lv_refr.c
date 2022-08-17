@@ -288,7 +288,6 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     REFR_TRACE("begin");
 
     uint32_t start = lv_tick_get();
-    volatile uint32_t elaps = 0;
 
     if(tmr) {
         disp_refr = tmr->user_data;
@@ -303,6 +302,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     else {
         disp_refr = lv_disp_get_default();
     }
+
+    uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
+    disp_refr->last_render_start_time = start;
 
     /*Refresh the screen's layout if required*/
     lv_obj_update_layout(disp_refr->act_scr);
@@ -342,8 +344,6 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
         lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
-
-        elaps = lv_tick_elaps(start);
 
         /*Call monitor cb if present*/
         if(disp_refr->driver->monitor_cb) {

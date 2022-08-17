@@ -190,6 +190,9 @@ uint8_t del_prev  :
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/
+
+    /** Last render start time(ms) on this display */
+    uint32_t last_render_start_time;
 } lv_disp_t;
 
 /**********************
