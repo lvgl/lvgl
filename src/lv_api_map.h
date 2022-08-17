@@ -56,7 +56,7 @@ static inline void lv_obj_move_foreground(lv_obj_t * obj)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(!parent) {
-        LV_LOG_ERROR("parent is NULL");
+        LV_LOG_WARN("parent is NULL");
         return;
     }
 
