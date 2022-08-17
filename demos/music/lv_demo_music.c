@@ -225,7 +225,7 @@ static void auto_step_cb(lv_timer_t * t)
                 lv_obj_t * num = lv_label_create(bg);
                 lv_obj_set_style_text_font(num, font_large, 0);
 #if LV_USE_PERF_MONITOR
-                lv_label_set_text_fmt(num, "%d", lv_refr_get_fps_avg());
+                lv_label_set_text_fmt(num, "%" LV_PRIu32, lv_refr_get_fps_avg());
 #endif
                 lv_obj_align(num, LV_ALIGN_TOP_MID, 0, 120);
 
