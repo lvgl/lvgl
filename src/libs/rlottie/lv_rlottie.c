@@ -97,7 +97,160 @@ void lv_rlottie_set_play_mode(lv_obj_t * obj, const lv_rlottie_ctrl_t ctrl)
 void lv_rlottie_set_current_frame(lv_obj_t * obj, const size_t goto_frame)
 {
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
-    rlottie->current_frame = goto_frame < rlottie->total_frames ? goto_frame : rlottie->total_frames - 1;
+    rlottie->current_frame = goto_frame < rlottie->dest_frame ? goto_frame : rlottie->dest_frame - 1;
+    
+    //Render the current frame that has been set by this call
+    lottie_animation_render(
+        rlottie->animation,
+        rlottie->current_frame,
+        rlottie->allocated_buf,
+        rlottie->imgdsc.header.w,
+        rlottie->imgdsc.header.h,
+        rlottie->scanline_width
+    );
+
+#if LV_COLOR_DEPTH == 16
+    convert_to_rgba5658(rlottie->allocated_buf, rlottie->imgdsc.header.w, rlottie->imgdsc.header.h);
+#endif
+
+    lv_obj_invalidate(obj);
+}
+
+void lv_rlottie_set_framerate(lv_obj_t* obj, const int framerate)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->framerate = framerate;
+
+    //When setting a new frame rate, must delete the existing lv_timer and create a new one with the updated frame rate
+    if(rlottie->task) {
+        lv_timer_del(rlottie->task);
+        rlottie->task = NULL;
+        rlottie->task = lv_timer_create(next_frame_task_cb, 1000 / rlottie->framerate, obj);
+    }
+
+}
+
+void lv_rlottie_set_render_width(lv_obj_t* obj, const int width)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->imgdsc.header.w = width;
+
+    rlottie->scanline_width = width * LV_ARGB32 / 8;
+
+    if(rlottie->task) {
+        size_t allocaled_buf_size = (width * rlottie->imgdsc.header.h * LV_ARGB32 / 8);
+
+        //In order to resize the width and render properly, the allocated buffer must be resized according to the new width
+        //This operation can result in minor flickering when the rendering first begins
+        //Changing render width of the lottie can be done with an lvgl animation over a range of widths
+        rlottie->allocated_buf = lv_realloc(rlottie->allocated_buf, allocaled_buf_size+1);
+        
+        rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
+        rlottie->imgdsc.data_size = allocaled_buf_size;
+        lv_img_set_src(obj, &rlottie->imgdsc);
+        
+        if(rlottie->allocated_buf != NULL) {
+            rlottie->allocated_buffer_size = allocaled_buf_size;
+            memset(rlottie->allocated_buf, 0, allocaled_buf_size);
+        }
+    }
+}
+
+void lv_rlottie_set_render_height(lv_obj_t* obj, const int height)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->imgdsc.header.h = height;
+
+    if(rlottie->task) {
+        size_t allocaled_buf_size = (rlottie->imgdsc.header.w * height * LV_ARGB32 / 8);
+
+        //In order to resize the height and render properly, the allocated buffer must be resized according to the new height
+        //This operation can result in minor flickering when the rendering first begins
+        //Changing render width of the lottie can be done with an lvgl animation over a range of widths
+
+        rlottie->allocated_buf = lv_realloc(rlottie->allocated_buf, allocaled_buf_size+1);
+
+        rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
+        rlottie->imgdsc.data_size = allocaled_buf_size;
+        lv_img_set_src(obj, &rlottie->imgdsc);
+
+        if(rlottie->allocated_buf != NULL) {
+            rlottie->allocated_buffer_size = allocaled_buf_size;
+            memset(rlottie->allocated_buf, 0, allocaled_buf_size);
+        }
+    }
+    
+}
+
+void lv_rlottie_set_dest_frame(lv_obj_t* obj, const int dest_frame)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->dest_frame = dest_frame;
+
+    //Adjusts the end frame of the lottie animation
+    //i.e. set the animation to run from 0-15 instead of 0-30
+
+    if(rlottie->task && (rlottie->dest_frame != rlottie->current_frame ||
+                         (rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PLAY)) {
+        lv_timer_resume(rlottie->task);
+    }
+}
+
+void lv_rlottie_set_start_frame(lv_obj_t* obj, const int start_frame)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    rlottie->start_frame = start_frame;
+
+    //Adjusts the start frame of the lottie animation
+    //i.e. sets the animation to run from 15-30 instead of 0-30
+
+    if(rlottie->task && (rlottie->dest_frame != rlottie->current_frame ||
+                         (rlottie->play_ctrl & LV_RLOTTIE_CTRL_PAUSE) == LV_RLOTTIE_CTRL_PLAY)) {
+        lv_timer_resume(rlottie->task);
+    }
+}
+
+lv_rlottie_ctrl_t lv_rlottie_get_play_mode(lv_obj_t* obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    return rlottie->play_ctrl;
+}
+
+size_t lv_rlottie_get_current_frame(lv_obj_t* obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    return rlottie->current_frame;   
+}
+
+size_t lv_rlottie_get_dest_frame(lv_obj_t* obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    return rlottie->dest_frame;   
+}
+
+size_t lv_rlottie_get_start_frame(lv_obj_t* obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    return rlottie->start_frame;   
+}
+
+int lv_rlottie_get_render_height(lv_obj_t* obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    return rlottie->imgdsc.header.h;
+}
+
+int lv_rlottie_get_render_width(lv_obj_t* obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+
+    return rlottie->imgdsc.header.w;
+}
+
+int lv_rlottie_get_framerate(lv_obj_t* obj)
+{
+    lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
+    return rlottie->framerate;
 }
 
 /**********************
@@ -123,6 +276,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     rlottie->total_frames = lottie_animation_get_totalframe(rlottie->animation);
     rlottie->framerate = (size_t)lottie_animation_get_framerate(rlottie->animation);
     rlottie->current_frame = 0;
+    rlottie->start_frame = 0;
 
     rlottie->scanline_width = create_width * LV_ARGB32 / 8;
 
@@ -237,7 +391,7 @@ static void next_frame_task_cb(lv_timer_t * t)
                 --rlottie->current_frame;
             else { /* Looping ? */
                 if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
-                    rlottie->current_frame = rlottie->total_frames - 1;
+                    rlottie->current_frame = rlottie->dest_frame - 1;
                 else {
                     lv_event_send(obj, LV_EVENT_READY, NULL);
                     lv_timer_pause(t);
@@ -246,7 +400,7 @@ static void next_frame_task_cb(lv_timer_t * t)
             }
         }
         else {
-            if(rlottie->current_frame < rlottie->total_frames)
+            if(rlottie->current_frame < rlottie->dest_frame)
                 ++rlottie->current_frame;
             else { /* Looping ? */
                 if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
