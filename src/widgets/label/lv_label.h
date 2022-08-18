@@ -140,14 +140,14 @@ void lv_label_set_recolor(lv_obj_t * obj, bool en);
  * @param obj       pointer to a label object
  * @param index     character index from where selection should start. `LV_LABEL_TEXT_SELECTION_OFF` for no selection
  */
-void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index);
+void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index);
 
 /**
  * Set where text selection should end
  * @param obj       pointer to a label object
  * @param index     character index where selection should end. `LV_LABEL_TEXT_SELECTION_OFF` for no selection
  */
-void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index);
+void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index);
 
 /*=====================
  * Getter functions
