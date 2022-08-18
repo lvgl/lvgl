@@ -567,8 +567,8 @@ void test_label_text_selection(void)
     const uint32_t selection_start = 0;
     const uint32_t selection_end = strlen(lv_label_get_text(label)) - 1;
 
-    lv_label_set_text_sel_start(label, selection_start);
-    lv_label_set_text_sel_end(label, selection_end);
+    lv_label_set_text_selection_start(label, selection_start);
+    lv_label_set_text_selection_end(label, selection_end);
 
     uint32_t start = lv_label_get_text_selection_start(label);
     uint32_t end = lv_label_get_text_selection_end(label);

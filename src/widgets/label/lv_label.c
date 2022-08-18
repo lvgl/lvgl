@@ -216,7 +216,7 @@ void lv_label_set_recolor(lv_obj_t * obj, bool en)
     lv_label_refr_text(obj);
 }
 
-void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index)
+void lv_label_set_text_selection_start(lv_obj_t * obj, uint32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -230,7 +230,7 @@ void lv_label_set_text_sel_start(lv_obj_t * obj, uint32_t index)
 #endif
 }
 
-void lv_label_set_text_sel_end(lv_obj_t * obj, uint32_t index)
+void lv_label_set_text_selection_end(lv_obj_t * obj, uint32_t index)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
