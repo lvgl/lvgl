@@ -730,8 +730,8 @@ void lv_textarea_clear_selection(lv_obj_t * obj)
 
     if(lv_label_get_text_selection_start(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL ||
        lv_label_get_text_selection_end(ta->label) != LV_DRAW_LABEL_NO_TXT_SEL) {
-        lv_label_set_text_sel_start(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
-        lv_label_set_text_sel_end(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
+        lv_label_set_text_selection_start(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
+        lv_label_set_text_selection_end(ta->label, LV_DRAW_LABEL_NO_TXT_SEL);
     }
 #else
     LV_UNUSED(obj); /*Unused*/
