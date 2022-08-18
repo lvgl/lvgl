@@ -82,4 +82,28 @@ void test_spinbox_position_selection(void)
     lv_obj_clean(tmp);
 }
 
+void test_spinbox_set_range(void)
+{
+    int32_t range_max = 40;
+    int32_t range_min = 20;
+
+    lv_obj_t * tmp;
+    tmp = lv_spinbox_create(active_screen);
+    lv_spinbox_set_range(tmp, 0, 100);
+    lv_spinbox_set_value(tmp, 50);
+
+    /* Validate value gets updated when range_max is smaller */
+    lv_spinbox_set_range(tmp, 0, range_max);
+
+    TEST_ASSERT_EQUAL(range_max, lv_spinbox_get_value(tmp));
+
+    /* Validate value gets updated when range_min is bigger */
+    lv_spinbox_set_value(tmp, 5);
+    lv_spinbox_set_range(tmp, range_min, range_max);
+
+    TEST_ASSERT_EQUAL(range_min, lv_spinbox_get_value(tmp));
+
+    lv_obj_clean(tmp);
+}
+
 #endif
