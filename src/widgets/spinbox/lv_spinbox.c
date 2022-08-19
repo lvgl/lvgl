@@ -388,18 +388,23 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
          * Set `step` accordingly*/
         else {
             const char * txt = lv_textarea_get_text(obj);
-            size_t txt_len = strlen(txt);
+            const size_t txt_len = strlen(txt);
 
+            /* Check cursor position */
+            /* Cursor is in '.' digit */
             if(txt[spinbox->ta.cursor.pos] == '.') {
                 lv_textarea_cursor_left(obj);
             }
+            /* Cursor is already in the right-most digit */
             else if(spinbox->ta.cursor.pos == (uint32_t)txt_len) {
                 lv_textarea_set_cursor_pos(obj, txt_len - 1);
             }
+            /* Cursor is already in the left-most digit AND range_min is negative */
             else if(spinbox->ta.cursor.pos == 0 && spinbox->range_min < 0) {
                 lv_textarea_set_cursor_pos(obj, 1);
             }
 
+            /* Handle spinbox with decimal point (spinbox->dec_point_pos != 0) */
             uint16_t cp = spinbox->ta.cursor.pos;
             if(spinbox->ta.cursor.pos > spinbox->dec_point_pos && spinbox->dec_point_pos != 0) cp--;
 

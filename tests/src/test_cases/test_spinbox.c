@@ -31,6 +31,8 @@ void setUp(void)
 
 void tearDown(void)
 {
+    lv_group_remove_obj(spinbox_events);
+
     lv_obj_del(spinbox_negative_min_range);
     lv_obj_del(spinbox_zero_min_range);
     lv_obj_del(spinbox_events);
@@ -210,6 +212,18 @@ void test_spinbox_event_key_encoder_indev_turn_left(void)
     lv_test_encoder_click();
     lv_test_encoder_turn(-1);
     TEST_ASSERT_EQUAL(value - 1, lv_spinbox_get_value(spinbox_events));
+}
+
+void test_spinbox_event_release(void)
+{
+    lv_spinbox_set_value(spinbox_events, 0);
+    lv_spinbox_set_digit_format(spinbox_events, 5, 2);
+
+    /* Set cursor in least significant decimal digit */
+    lv_spinbox_set_cursor_pos(spinbox_events, 0);
+    lv_event_send(spinbox_events, LV_EVENT_RELEASED, NULL);
+
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(spinbox_events));
 }
 
 #endif
