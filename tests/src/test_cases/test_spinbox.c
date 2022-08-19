@@ -2,10 +2,13 @@
 #include "../lvgl.h"
 
 #include "unity/unity.h"
+#include "lv_test_indev.h"
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * spinbox_negative_min_range = NULL;
 static lv_obj_t * spinbox_zero_min_range = NULL;
+static lv_obj_t * spinbox_events = NULL;
+static lv_group_t * g = NULL;
 
 static const int32_t SPINBOX_NEGATIVE_MIN_RANGE_VALUE = -11;
 static const int32_t SPINBOX_ZERO_MIN_RANGE_VALUE = 0;
@@ -17,15 +20,22 @@ void setUp(void)
     active_screen = lv_scr_act();
     spinbox_negative_min_range = lv_spinbox_create(active_screen);
     spinbox_zero_min_range = lv_spinbox_create(active_screen);
+    spinbox_events = lv_spinbox_create(active_screen);
 
     lv_spinbox_set_range(spinbox_negative_min_range, SPINBOX_NEGATIVE_MIN_RANGE_VALUE, SPINBOX_NEGATIVE_MAX_RANGE_VALUE);
     lv_spinbox_set_range(spinbox_zero_min_range, SPINBOX_ZERO_MIN_RANGE_VALUE, SPINBOX_NEGATIVE_MAX_RANGE_VALUE);
+
+    g = lv_group_create();
+    lv_indev_set_group(lv_test_encoder_indev, g);
 }
 
 void tearDown(void)
 {
     lv_obj_del(spinbox_negative_min_range);
     lv_obj_del(spinbox_zero_min_range);
+    lv_obj_del(spinbox_events);
+
+    lv_obj_clean(active_screen);
 }
 
 /* See issue #3559 for more info */
@@ -128,6 +138,78 @@ void test_spinbox_step_prev(void)
     TEST_ASSERT_EQUAL(10, lv_spinbox_get_step(tmp));
 
     lv_obj_clean(tmp);
+}
+
+void test_spinbox_rollover(void)
+{
+    lv_obj_t * tmp = lv_spinbox_create(active_screen);
+
+    lv_spinbox_set_rollover(tmp, true);
+    TEST_ASSERT_TRUE(lv_spinbox_get_rollover(tmp));
+
+    lv_spinbox_set_rollover(tmp, false);
+    TEST_ASSERT_FALSE(lv_spinbox_get_rollover(tmp));
+
+    lv_obj_clean(tmp);
+}
+
+void test_spinbox_event_key(void)
+{
+    /* Spinbox should increment it's value by one after receiving the LV_KEY_UP event */
+    lv_spinbox_set_value(spinbox_events, 0);
+    uint32_t key = LV_KEY_UP;
+    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_value(spinbox_events));
+
+    /* Spinbox should decrement it's value by one after receiving the LV_KEY_DOWN event */
+    key = LV_KEY_DOWN;
+    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+
+    TEST_ASSERT_EQUAL(0, lv_spinbox_get_value(spinbox_events));
+
+    /* Spinbox should multiply it's step vale by 10 after receiving the LV_KEY_LEFT event */
+    int32_t step = lv_spinbox_get_step(spinbox_events);
+    key = LV_KEY_LEFT;
+    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+
+    TEST_ASSERT_EQUAL(step * 10, lv_spinbox_get_step(spinbox_events));
+
+    /* Spinbox should divide it's step vale by 10 after receiving the LV_KEY_RIGHT event */
+    step = lv_spinbox_get_step(spinbox_events);
+    key = LV_KEY_RIGHT;
+    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+
+    TEST_ASSERT_EQUAL(step / 10, lv_spinbox_get_step(spinbox_events));
+}
+
+void test_spinbox_event_key_encoder_indev_turn_right(void)
+{
+    /* Setup group and encoder indev */
+    lv_group_add_obj(g, spinbox_events);
+
+    /* Spinbox should increment it's value by one step after receiving the LV_KEY_UP event */
+    lv_spinbox_set_value(spinbox_events, 0);
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(1);
+
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_value(spinbox_events));
+}
+
+void test_spinbox_event_key_encoder_indev_turn_left(void)
+{
+    int32_t value = 10;
+    /* Setup group and encoder indev */
+    lv_group_add_obj(g, spinbox_events);
+
+    /* Spinbox should decrement it's value by one step after receiving the LV_KEY_UP event */
+    lv_spinbox_set_value(spinbox_events, value);
+    lv_spinbox_set_cursor_pos(spinbox_events, 0);
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(-1);
+    TEST_ASSERT_EQUAL(value - 1, lv_spinbox_get_value(spinbox_events));
 }
 
 #endif
