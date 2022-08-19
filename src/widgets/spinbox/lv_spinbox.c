@@ -400,10 +400,10 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 lv_textarea_set_cursor_pos(obj, 1);
             }
 
-            size_t len = spinbox->digit_count - 1;
             uint16_t cp = spinbox->ta.cursor.pos;
-
             if(spinbox->ta.cursor.pos > spinbox->dec_point_pos && spinbox->dec_point_pos != 0) cp--;
+
+            const size_t len = spinbox->digit_count - 1;
             uint32_t pos = len - cp;
 
             if(spinbox->range_min < 0) pos++;
@@ -448,8 +448,8 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
     lv_memzero(buf, sizeof(buf));
     char * buf_p = buf;
-    uint8_t cur_shift_left = 0;
 
+    uint8_t cur_shift_left = 0;
     if(spinbox->range_min < 0) {  // hide sign if there are only positive values
         /*Add the sign*/
         (*buf_p) = spinbox->value >= 0 ? '+' : '-';
@@ -460,12 +460,12 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         cur_shift_left++;
     }
 
-    int32_t i;
     char digits[LV_SPINBOX_MAX_DIGIT_COUNT + 4];
     /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
     lv_snprintf(digits, sizeof(digits), "%" LV_PRId32, LV_ABS(spinbox->value));
 
     /*Add leading zeros*/
+    int32_t i;
     int lz_cnt = spinbox->digit_count - (int)strlen(digits);
     if(lz_cnt > 0) {
         for(i = (uint16_t)strlen(digits); i >= 0; i--) {
@@ -476,8 +476,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         }
     }
 
-    int32_t intDigits;
-    intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
+    int32_t intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
 
     /*Add the decimal part*/
     for(i = 0; i < intDigits && digits[i] != '\0'; i++) {
@@ -500,7 +499,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     lv_textarea_set_text(obj, (char *)buf);
 
     /*Set the cursor position*/
-    int32_t step    = spinbox->step;
+    int32_t step = spinbox->step;
     uint8_t cur_pos = (uint8_t)spinbox->digit_count;
     while(step >= 10) {
         step /= 10;
