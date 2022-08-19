@@ -350,34 +350,32 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    lv_event_code_t code = lv_event_get_code(e);
+    const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     if(code == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
         lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
-            if(lv_group_get_editing(lv_obj_get_group(obj))) {
-                if(spinbox->digit_count > 1) {
-                    if(spinbox->digit_step_dir == LV_DIR_RIGHT) {
-                        if(spinbox->step > 1) {
-                            lv_spinbox_step_next(obj);
-                        }
-                        else {
-                            /*Restart from the MSB*/
-                            spinbox->step = lv_pow(10, spinbox->digit_count - 2);
-                            lv_spinbox_step_prev(obj);
-                        }
+        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(obj))) {
+            if(spinbox->digit_count > 1) {
+                if(spinbox->digit_step_dir == LV_DIR_RIGHT) {
+                    if(spinbox->step > 1) {
+                        lv_spinbox_step_next(obj);
                     }
                     else {
-                        if(spinbox->step < lv_pow(10, spinbox->digit_count - 1)) {
-                            lv_spinbox_step_prev(obj);
-                        }
-                        else {
-                            /*Restart from the LSB*/
-                            spinbox->step = 10;
-                            lv_spinbox_step_next(obj);
-                        }
+                        /*Restart from the MSB*/
+                        spinbox->step = lv_pow(10, spinbox->digit_count - 2);
+                        lv_spinbox_step_prev(obj);
+                    }
+                }
+                else {
+                    if(spinbox->step < lv_pow(10, spinbox->digit_count - 1)) {
+                        lv_spinbox_step_prev(obj);
+                    }
+                    else {
+                        /*Restart from the LSB*/
+                        spinbox->step = 10;
+                        lv_spinbox_step_next(obj);
                     }
                 }
             }
