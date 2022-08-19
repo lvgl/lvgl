@@ -229,11 +229,8 @@ void lv_spinbox_step_next(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    int32_t new_step = spinbox->step / 10;
-    if((new_step) > 0)
-        spinbox->step = new_step;
-    else
-        spinbox->step = 1;
+    const int32_t new_step = spinbox->step / 10;
+    spinbox->step = (new_step > 0) ? new_step : 1;
 
     lv_spinbox_updatevalue(obj);
 }
@@ -246,9 +243,9 @@ void lv_spinbox_step_prev(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
-    int32_t step_limit;
-    step_limit       = LV_MAX(spinbox->range_max, (spinbox->range_min < 0 ? (-spinbox->range_min) : spinbox->range_min));
-    int32_t new_step = spinbox->step * 10;
+
+    const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
+    const int32_t new_step = spinbox->step * 10;
     if(new_step <= step_limit) spinbox->step = new_step;
 
     lv_spinbox_updatevalue(obj);

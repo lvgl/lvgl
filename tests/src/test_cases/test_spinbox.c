@@ -106,4 +106,28 @@ void test_spinbox_set_range(void)
     lv_obj_clean(tmp);
 }
 
+void test_spinbox_step_prev(void)
+{
+    lv_obj_t * tmp = lv_spinbox_create(active_screen);
+
+    /* When next step is bigger than biggest range */
+    lv_spinbox_set_range(tmp, 0, 5);
+    lv_spinbox_step_prev(tmp);
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(tmp));
+
+    lv_spinbox_step_next(tmp);
+    /* When next step is smaller than range_max */
+    lv_spinbox_set_range(tmp, 0, 20);
+    lv_spinbox_step_prev(tmp);
+    TEST_ASSERT_EQUAL(10, lv_spinbox_get_step(tmp));
+
+    lv_spinbox_step_next(tmp);
+    /* When next step is smaller than abs(range_min) */
+    lv_spinbox_set_range(tmp, -25, 5);
+    lv_spinbox_step_prev(tmp);
+    TEST_ASSERT_EQUAL(10, lv_spinbox_get_step(tmp));
+
+    lv_obj_clean(tmp);
+}
+
 #endif
