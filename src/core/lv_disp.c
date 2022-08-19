@@ -488,11 +488,16 @@ static void scr_load_internal(lv_obj_t * scr)
     if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
     if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 
+    d->prev_scr = old_scr;
     d->act_scr = scr;
 
     if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOADED, NULL);
     if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
 
+    if(d->prev_scr && d->del_prev) lv_obj_del(d->prev_scr);
+    d->prev_scr = NULL;
+    d->draw_prev_over_act = false;
+    d->scr_to_load = NULL;
     lv_obj_invalidate(scr);
 }
 
