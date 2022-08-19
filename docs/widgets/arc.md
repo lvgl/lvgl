@@ -43,7 +43,7 @@ The change rate is defined in degree/second unit and can be set with `lv_arc_set
 
 ### Knob offset
 Changing the knob offset allows the location of the knob to be moved relative to the end of the arc
-The knob offset can be set by `lv_arc_set_knob_offset(arc, offset)`, will only be visible if LV_PART_KNOB is visible
+The knob offset can be set by `lv_arc_set_knob_offset(arc, offset_angle)`, will only be visible if LV_PART_KNOB is visible
 
 
 ### Setting the indicator manually
