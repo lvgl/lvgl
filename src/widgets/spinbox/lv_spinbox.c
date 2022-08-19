@@ -108,9 +108,9 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint8_t digit_count, uint8_t se
     if(separator_position >= digit_count) separator_position = 0;
 
     if(digit_count < LV_SPINBOX_MAX_DIGIT_COUNT) {
-        int64_t max_val = lv_pow(10, digit_count);
+        const int64_t max_val = lv_pow(10, digit_count);
         if(spinbox->range_max > max_val - 1) spinbox->range_max = max_val - 1;
-        if(spinbox->range_min < - max_val  + 1) spinbox->range_min = - max_val  + 1;
+        if(spinbox->range_min < -max_val  + 1) spinbox->range_min = -max_val  + 1;
     }
 
     spinbox->digit_count   = digit_count;
@@ -163,9 +163,7 @@ void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint8_t pos)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    /* NOTE: Consider using LV_MATH_ABS when dealing with the spinbox->range_min value */
-    const int32_t step_limit = LV_MAX(spinbox->range_max,
-                                      (spinbox->range_min < 0 ? (-spinbox->range_min) : spinbox->range_min));
+    const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
     const int32_t new_step = lv_pow(10, pos);
 
     if(pos <= 0) spinbox->step = 1;
