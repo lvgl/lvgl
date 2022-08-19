@@ -20,6 +20,7 @@
  *********************/
 #define MY_CLASS &lv_roller_class
 #define MY_CLASS_LABEL &lv_roller_label_class
+#define EXTRA_INF_SIZE      1000 /*[px]: add the options multiple times until getting this height*/
 
 /**********************
  *      TYPEDEFS
@@ -119,20 +120,26 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
     else {
         roller->mode = LV_ROLLER_MODE_INFINITE;
 
+        const lv_font_t * font = lv_obj_get_style_text_font(obj, 0);
+        lv_coord_t normal_h = roller->option_cnt * (lv_font_get_line_height(font) + lv_obj_get_style_text_letter_space(obj, 0));
+        roller->inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
+        if(!roller->inf_page_cnt & 1) roller->inf_page_cnt++;   /*Make it odd*/
+        LV_LOG_INFO("Using %d pages to make the roller look infinite", roller->inf_page_cnt);
+
         size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        char * opt_extra = lv_malloc(opt_len * LV_ROLLER_INF_PAGES);
+        char * opt_extra = lv_malloc(opt_len * roller->inf_page_cnt);
         uint8_t i;
-        for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {
+        for(i = 0; i < roller->inf_page_cnt; i++) {
             strcpy(&opt_extra[opt_len * i], options);
             opt_extra[opt_len * (i + 1) - 1] = '\n';
         }
-        opt_extra[opt_len * LV_ROLLER_INF_PAGES - 1] = '\0';
+        opt_extra[opt_len * roller->inf_page_cnt - 1] = '\0';
         lv_label_set_text(label, opt_extra);
         lv_free(opt_extra);
 
-        roller->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 0) * roller->option_cnt;
+        roller->sel_opt_id = ((roller->inf_page_cnt / 2) + 0) * roller->option_cnt;
 
-        roller->option_cnt = roller->option_cnt * LV_ROLLER_INF_PAGES;
+        roller->option_cnt = roller->option_cnt * roller->inf_page_cnt;
         inf_normalize(obj);
     }
 
@@ -161,7 +168,7 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
 
     /*In infinite mode interpret the new ID relative to the currently visible "page"*/
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
-        uint32_t real_option_cnt = roller->option_cnt / LV_ROLLER_INF_PAGES;
+        uint32_t real_option_cnt = roller->option_cnt / roller->inf_page_cnt;
         uint16_t current_page = roller->sel_opt_id / real_option_cnt;
         /*Set by the user to e.g. 0, 1, 2, 3...
          *Upscale the value to the current page*/
@@ -213,7 +220,7 @@ uint16_t lv_roller_get_selected(const lv_obj_t * obj)
 
     lv_roller_t * roller = (lv_roller_t *)obj;
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
-        uint16_t real_id_cnt = roller->option_cnt / LV_ROLLER_INF_PAGES;
+        uint16_t real_id_cnt = roller->option_cnt / roller->inf_page_cnt;
         return roller->sel_opt_id % real_id_cnt;
     }
     else {
@@ -279,7 +286,7 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
 
     lv_roller_t * roller = (lv_roller_t *)obj;
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
-        return roller->option_cnt / LV_ROLLER_INF_PAGES;
+        return roller->option_cnt / roller->inf_page_cnt;
     }
     else {
         return roller->option_cnt;
@@ -729,12 +736,12 @@ static void inf_normalize(lv_obj_t * obj)
     lv_roller_t * roller = (lv_roller_t *)obj;
 
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
-        uint16_t real_id_cnt = roller->option_cnt / LV_ROLLER_INF_PAGES;
+        uint16_t real_id_cnt = roller->option_cnt / roller->inf_page_cnt;
         roller->sel_opt_id = roller->sel_opt_id % real_id_cnt;
-        roller->sel_opt_id += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
+        roller->sel_opt_id += (roller->inf_page_cnt / 2) * real_id_cnt; /*Select the middle page*/
 
         roller->sel_opt_id_ori = roller->sel_opt_id % real_id_cnt;
-        roller->sel_opt_id_ori += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
+        roller->sel_opt_id_ori += (roller->inf_page_cnt / 2) * real_id_cnt; /*Select the middle page*/
 
         /*Move to the new id*/
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
