@@ -113,6 +113,9 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
     LV_LOG_TRACE("begin");
 
+    /*Be sure the object is removed from its current group*/
+    lv_group_remove_obj(obj);
+
     /*Do not add the object twice*/
     lv_obj_t ** obj_i;
     _LV_LL_READ(&group->obj_ll, obj_i) {
