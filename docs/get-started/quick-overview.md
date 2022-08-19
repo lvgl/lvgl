@@ -9,7 +9,7 @@ You should read this first to get a general impression and read the detailed [Po
 Instead of porting LVGL to embedded hardware straight away, it's highly recommended to get started in a simulator first.
 
 LVGL is ported to many IDEs to be sure you will find your favorite one.
-Go to the [Simulators](/get-started/pc-simulator) section to get ready-to-use projects that can be run on your PC.
+Go to the [Simulators](/get-started/platforms/pc-simulator) section to get ready-to-use projects that can be run on your PC.
 This way you can save the time of porting for now and get some experience with LVGL immediately.
 
 ## Add LVGL into your project
@@ -251,7 +251,7 @@ The theme for your application is a compile time configuration set in `lv_conf.h
 ```
 
 ## Micropython
-Learn more about [Micropython](/get-started/micropython).
+Learn more about [Micropython](/get-started/bindings/micropython).
 ```python
 # Create a Button and a Label
 scr = lv.obj()
