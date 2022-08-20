@@ -91,7 +91,7 @@ You can use `lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_XX)` to s
 
 When an item in the file list is clicked, a `LV_EVENT_VALUE_CHANGED` event will be sent.
 
-You can use `lv_100ask_file_explorer_get_cur_path` to get the current path and `lv_100ask_file_explorer_get_sel_fn` to get the name of the currently selected file in the event processing function. For example:
+You can use `lv_file_explorer_get_cur_path` to get the current path and `lv_file_explorer_get_sel_fn` to get the name of the currently selected file in the event processing function. For example:
 
 ```c
 static void file_explorer_event_handler(lv_event_t * e)
@@ -100,8 +100,8 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
-        char * cur_path =  lv_100ask_file_explorer_get_cur_path(obj);
-        char * sel_fn = lv_100ask_file_explorer_get_sel_fn(obj);
+        char * cur_path =  lv_file_explorer_get_cur_path(obj);
+        char * sel_fn = lv_file_explorer_get_sel_fn(obj);
         LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
 }
@@ -115,7 +115,7 @@ You can also save the obtained **path** and **file** name into an array through 
 
 当文件列表中的项目被点击时会发送 `LV_EVENT_VALUE_CHANGED` 事件。
 
-可以在事件处理函数中通过 `lv_100ask_file_explorer_get_cur_path` 获取当前所在的路径，通过 `lv_100ask_file_explorer_get_sel_fn` 获取当前选中的文件的名称。比如：
+可以在事件处理函数中通过 `lv_file_explorer_get_cur_path` 获取当前所在的路径，通过 `lv_file_explorer_get_sel_fn` 获取当前选中的文件的名称。比如：
 
 ```c
 static void file_explorer_event_handler(lv_event_t * e)
@@ -124,8 +124,8 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
-        char * cur_path =  lv_100ask_file_explorer_get_cur_path(obj);
-        char * sel_fn = lv_100ask_file_explorer_get_sel_fn(obj);
+        char * cur_path =  lv_file_explorer_get_cur_path(obj);
+        char * sel_fn = lv_file_explorer_get_sel_fn(obj);
         LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
 }
