@@ -309,7 +309,7 @@
 #if LV_USE_DRAW_SW
 
     /*Enable complex draw engine.
-    *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
+     *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
     #ifndef LV_DRAW_SW_COMPLEX
         #ifdef _LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_DRAW_SW_COMPLEX
@@ -323,9 +323,9 @@
     #endif
 
     /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
-    * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
-    * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
-    * and can't be drawn in chunks. */
+     * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
+     * "Transformed layers" (if `transform_angle/zoom` are set) use larger buffers
+     * and can't be drawn in chunks. */
 
     /*The target buffer size for simple layer chunks.*/
     #ifndef LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
@@ -369,10 +369,10 @@
     #endif
 
     /*Default gradient buffer size.
-    *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
-    *LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE sets the size of this cache in bytes.
-    *If the cache is too small the map will be allocated only while it's required for the drawing.
-    *0 mean no caching.*/
+     *When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
+     *LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE sets the size of this cache in bytes.
+     *If the cache is too small the map will be allocated only while it's required for the drawing.
+     *0 mean no caching.*/
     #ifndef LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE
         #ifdef CONFIG_LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE
             #define LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE CONFIG_LV_DRAW_SW_GRADIENT_CACHE_DEF_SIZE
@@ -382,8 +382,8 @@
     #endif
 
     /*Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
-    *LV_DRAW_SW_GRADIENT_DITHER implies allocating one or two more lines of the object's rendering surface
-    *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
+     *LV_DRAW_SW_GRADIENT_DITHER implies allocating one or two more lines of the object's rendering surface
+     *The increase in memory consumption is (32 bits * object width) plus 24 bits * object width if using error diffusion */
     #ifndef LV_DRAW_SW_GRADIENT_DITHER
         #ifdef CONFIG_LV_DRAW_SW_GRADIENT_DITHER
             #define LV_DRAW_SW_GRADIENT_DITHER CONFIG_LV_DRAW_SW_GRADIENT_DITHER
@@ -393,8 +393,8 @@
     #endif
     #if LV_DRAW_SW_GRADIENT_DITHER
         /*Add support for error diffusion dithering.
-        *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
-        *The increase in memory consumption is (24 bits * object's width)*/
+         *Error diffusion dithering gets a much better visual result, but implies more CPU consumption and memory when drawing.
+         *The increase in memory consumption is (24 bits * object's width)*/
         #ifndef LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
             #ifdef CONFIG_LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
                 #define LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION CONFIG_LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION
@@ -585,7 +585,7 @@
     #endif
 
     /*1: Enable print timestamp;
-    *0: Disable print timestamp*/
+     *0: Disable print timestamp*/
     #ifndef LV_LOG_USE_TIMESTAMP
         #ifdef _LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_USE_TIMESTAMP
@@ -2324,6 +2324,43 @@
         #endif
     #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
+
+/*1: Enable Pinyin input method*/
+/*Requires: lv_table*/
+#ifndef LV_USE_FILE_EXPLORER
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_FILE_EXPLORER
+            #define LV_USE_FILE_EXPLORER CONFIG_LV_USE_FILE_EXPLORER
+        #else
+            #define LV_USE_FILE_EXPLORER 0
+        #endif
+    #else
+        #define LV_USE_FILE_EXPLORER                     1
+    #endif
+#endif
+#if LV_USE_FILE_EXPLORER
+    /*Maximum length of path*/
+    #ifndef LV_FILE_EXPLORER_PATH_MAX_LEN
+        #ifdef CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
+            #define LV_FILE_EXPLORER_PATH_MAX_LEN CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
+        #else
+            #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
+        #endif
+    #endif
+    /*Quick access bar, 1:use, 0:not use*/
+    /*Requires: lv_list*/
+    #ifndef LV_FILE_EXPLORER_QUICK_ACCESS
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
+                #define LV_FILE_EXPLORER_QUICK_ACCESS CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
+            #else
+                #define LV_FILE_EXPLORER_QUICK_ACCESS 0
+            #endif
+        #else
+            #define LV_FILE_EXPLORER_QUICK_ACCESS        1
+        #endif
+    #endif
+#endif  
 
 /*==================
 * EXAMPLES
