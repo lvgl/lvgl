@@ -246,7 +246,7 @@ lv_obj_t * lv_file_explorer_get_quick_access_ctrl_btn(lv_obj_t * obj)
  *====================*/
 void lv_file_explorer_open_dir(lv_obj_t * obj, char * dir)
 {
-    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     show_dir(obj, dir);
 }
@@ -550,14 +550,13 @@ static void browser_file_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_user_data(e);
-    lv_obj_t * btn = lv_event_get_target(e);
 
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         //struct stat stat_buf;
-        char * file_name[LV_FILE_EXPLORER_PATH_MAX_LEN];
-        char * str_fn = NULL;
+        char file_name[LV_FILE_EXPLORER_PATH_MAX_LEN];
+        const char * str_fn = NULL;
         uint16_t row;
         uint16_t col;
 
@@ -571,18 +570,18 @@ static void browser_file_event_handler(lv_event_t * e)
         if((strcmp(str_fn, "..") == 0) && (strlen(explorer->cur_path) > 3)) {
             strip_ext(explorer->cur_path);
             strip_ext(explorer->cur_path); // Remove the last '/' character
-            lv_snprintf(file_name, sizeof(file_name), "%s", explorer->cur_path);
+            lv_snprintf_builtin((char *)file_name, sizeof(file_name), "%s", explorer->cur_path);
         }
         else {
             if(strcmp(str_fn, "..") != 0) {
-                lv_snprintf(file_name, sizeof(file_name), "%s%s", explorer->cur_path, str_fn);
+                lv_snprintf_builtin((char *)file_name, sizeof(file_name), "%s%s", explorer->cur_path, str_fn);
             }
         }
 
         lv_fs_dir_t dir;
         if(lv_fs_dir_open(&dir, file_name) == LV_FS_RES_OK) {
             lv_fs_dir_close(&dir);
-            show_dir(obj, file_name);
+            show_dir(obj, (char *)file_name);
         }
         else {
             if(strcmp(str_fn, "..") != 0) {
