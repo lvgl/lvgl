@@ -31,7 +31,7 @@ extern void lv_port_indev_init(void);
 extern void lv_user_gui_init(void);
 
 static struct rt_thread lvgl_thread;
-static rt_uint8_t lvgl_thread_stack[PKG_LVGL_THREAD_STACK_SIZE];
+static ALIGN(8) rt_uint8_t lvgl_thread_stack[PKG_LVGL_THREAD_STACK_SIZE];
 
 #if LV_USE_LOG
 static void lv_rt_log(const char *buf)
