@@ -27,7 +27,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static void lv_file_explorer_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
 static void browser_file_event_handler(lv_event_t * e);
 #if LV_FILE_EXPLORER_QUICK_ACCESS
@@ -41,7 +40,6 @@ static void strip_ext(char * dir);
 static void file_explorer_sort(lv_obj_t * obj);
 static void sort_table_items(lv_obj_t * tb, int16_t lo, int16_t hi);
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j);
-static bool is_begin_with(const char * str1, const char * str2);
 static bool is_end_with(const char * str1, const char * str2);
 
 /**********************
@@ -49,7 +47,6 @@ static bool is_end_with(const char * str1, const char * str2);
  **********************/
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,
-    .destructor_cb  = lv_file_explorer_destructor,
     .width_def      = LV_SIZE_CONTENT,
     .height_def     = LV_SIZE_CONTENT,
     .instance_size  = sizeof(lv_file_explorer_t),
@@ -166,7 +163,7 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 /*=====================
  * Getter functions
  *====================*/
-char * lv_file_explorer_get_sel_fn(lv_obj_t * obj)
+const char * lv_file_explorer_get_sel_fn(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -361,11 +358,6 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     LV_TRACE_OBJ_CREATE("finished");
 }
 
-static void lv_file_explorer_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
-{
-    LV_UNUSED(class_p);
-    LV_TRACE_OBJ_CREATE("begin");
-}
 
 static void init_style(lv_obj_t * obj)
 {
@@ -763,31 +755,6 @@ static void sort_table_items(lv_obj_t * tb, int16_t lo, int16_t hi)
     sort_table_items(tb, lo, lt - 1);
     sort_table_items(tb, gt + 1, hi);
 }
-
-
-static bool is_begin_with(const char * str1, const char * str2)
-{
-    if(str1 == NULL || str2 == NULL)
-        return false;
-
-    uint16_t len1 = strlen(str1);
-    uint16_t len2 = strlen(str2);
-    if((len1 < len2) || (len1 == 0 || len2 == 0))
-        return false;
-
-    uint16_t i = 0;
-    char * p = str2;
-    while(*p != '\0') {
-        if(*p != str1[i])
-            return false;
-
-        p++;
-        i++;
-    }
-
-    return true;
-}
-
 
 
 static bool is_end_with(const char * str1, const char * str2)

@@ -61,7 +61,7 @@ typedef struct {
     char * video_dir;
     char * docs_dir;
 #endif
-    char * sel_fp;
+    const char * sel_fp;
     char   cur_path[LV_FILE_EXPLORER_PATH_MAX_LEN];
     lv_file_explorer_sort_t sort;
 } lv_file_explorer_t;
@@ -112,7 +112,7 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer selected file
  */
-char * lv_file_explorer_get_sel_fn(lv_obj_t * obj);
+const char * lv_file_explorer_get_sel_fn(lv_obj_t * obj);
 
 /**
  * Get file explorer cur path
@@ -126,7 +126,7 @@ char * lv_file_explorer_get_cur_path(lv_obj_t * obj);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer head area obj
  */
-lv_obj_t * lv_file_explorer_get_head_area(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_head(lv_obj_t * obj);
 
 /**
  * Get file explorer path obj(label)
