@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_file_explorer.h"
-#define LV_FILE_EXPLORER_QUICK_ACCESS 1
-#if 1//LV_USE_FILE_EXPLORER != 0
+#if LV_USE_FILE_EXPLORER != 0
+
 #include <string.h>
 
 /*********************
