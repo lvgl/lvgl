@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/layouts/grid.md
-```
 
 # Grid
 
@@ -14,11 +10,11 @@ The track's size can be set in pixel, to the largest item (`LV_GRID_CONTENT`) or
 
 To make an object a grid container call `lv_obj_set_layout(obj, LV_LAYOUT_GRID)`.
 
-Note that the grid layout feature of LVGL needs to be globally enabled with `LV_USE_GRID` in `lv_conf.h`. 
+Note that the grid layout feature of LVGL needs to be globally enabled with `LV_USE_GRID` in `lv_conf.h`.
 
 ## Terms
 - tracks: the rows or columns
-- free unit (FR): if set on track's size is set in `FR` it will grow to fill the remaining space on the parent. 
+- free unit (FR): if set on track's size is set in `FR` it will grow to fill the remaining space on the parent.
 - gap: the space between the rows and columns or the items on a track
 
 ## Simple interface
@@ -42,7 +38,7 @@ Besides simple settings the size in pixel you can use two special values:
 - `LV_GRID_FR(X)` tell what portion of the remaining space should be used by this track. Larger value means larger space.
 
 ### Grid items
-By default, the children are not added to the grid. They need to be added manually to a cell. 
+By default, the children are not added to the grid. They need to be added manually to a cell.
 
 To do this call `lv_obj_set_grid_cell(child, column_align, column_pos, column_span, row_align, row_pos, row_span)`.
 
@@ -51,9 +47,9 @@ To do this call `lv_obj_set_grid_cell(child, column_align, column_pos, column_sp
 - `LV_GRID_ALIGN_END` means right on a horizontally and bottom vertically
 - `LV_GRID_ALIGN_CENTER` simply center
 
-`colum_pos` and `row_pos` means the zero based index of the cell into the item should be placed. 
+`colum_pos` and `row_pos` means the zero based index of the cell into the item should be placed.
 
-`colum_span` and `row_span` means how many tracks should the item involve from the start cell. Must be &gt; 1. 
+`colum_span` and `row_span` means how many tracks should the item involve from the start cell. Must be &gt; 1.
 
 ### Grid align
 
@@ -62,8 +58,8 @@ If there are some empty space the track can be aligned several ways:
 - `LV_GRID_ALIGN_END` means right on a horizontally and bottom vertically
 - `LV_GRID_ALIGN_CENTER` simply center
 - `LV_GRID_ALIGN_SPACE_EVENLY` items are distributed so that the spacing between any two items (and the space to the edges) is equal. Not applies to `track_cross_place`.
-- `LV_GRID_ALIGN_SPACE_AROUND` items are evenly distributed in the track with equal space around them. 
-Note that visually the spaces aren’t equal, since all the items have equal space on both sides. 
+- `LV_GRID_ALIGN_SPACE_AROUND` items are evenly distributed in the track with equal space around them.
+Note that visually the spaces aren’t equal, since all the items have equal space on both sides.
 The first item will have one unit of space against the container edge, but two units of space between the next item because that next item has its own spacing that applies. Not applies to `track_cross_place`.
 - `LV_GRID_ALIGN_SPACE_BETWEEN` items are evenly distributed in the track: first item is on the start line, last item on the end line. Not applies to `track_cross_place`.
 
@@ -88,10 +84,10 @@ All the Grid related values are style properties under the hood and you can use 
 
 To modify the minimum space Grid inserts between objects, the following properties can be set on the Grid container style:
 
-- `pad_row` Sets the padding between the rows. 
+- `pad_row` Sets the padding between the rows.
 - `pad_column` Sets the padding between the columns.
 
-## Other features 
+## Other features
 
 ### RTL
 If the base direction of the container is set to `LV_BASE_DIR_RTL`, the meaning of `LV_GRID_ALIGN_START` and `LV_GRID_ALIGN_END` is swapped. I.e. `START` will mean right-most.

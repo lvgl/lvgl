@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst
-:github_url: |github_link_base|/libs/rlottie.md
-```
 
 
 # Lottie player
@@ -93,7 +89,7 @@ The default animation mode is **play forward with loop**.
 
 If you don't enable looping, a `LV_EVENT_READY` is sent when the animation can not make more progress without looping.
 
-To get the number of frames in an animation or the current frame index, you can cast the `lv_obj_t` instance to a `lv_rlottie_t` instance and inspect the `current_frame` and `total_frames` members. 
+To get the number of frames in an animation or the current frame index, you can cast the `lv_obj_t` instance to a `lv_rlottie_t` instance and inspect the `current_frame` and `total_frames` members.
 
 ## Example
 ```eval_rst

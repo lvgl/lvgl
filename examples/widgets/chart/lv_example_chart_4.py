@@ -10,7 +10,7 @@ def event_cb(e):
 
     elif code == lv.EVENT.DRAW_POST_END:
         id = lv.chart.get_pressed_point(chart)
-        if id == lv.CHART_POINT.NONE:
+        if id == lv.CHART_POINT_NONE:
             return
         # print("Selected point ", id)
         for i in range(len(series)):
@@ -18,7 +18,7 @@ def event_cb(e):
             chart.get_point_pos_by_id(series[i], id, p)
             value = series_points[i][id]
             buf = lv.SYMBOL.DUMMY + "$" + str(value)
-            
+
             draw_rect_dsc = lv.draw_rect_dsc_t()
             draw_rect_dsc.init()
             draw_rect_dsc.bg_color = lv.color_black()
@@ -26,7 +26,7 @@ def event_cb(e):
             draw_rect_dsc.radius = 3
             draw_rect_dsc.bg_img_src = buf
             draw_rect_dsc.bg_img_recolor = lv.color_white()
-            
+
             a = lv.area_t()
             coords = lv.area_t()
             chart.get_coords(coords)
@@ -34,14 +34,14 @@ def event_cb(e):
             a.x2 = coords.x1 + p.x + 20
             a.y1 = coords.y1 + p.y - 30
             a.y2 = coords.y1 + p.y - 10
-            
+
             clip_area = lv.area_t.__cast__(e.get_param())
             lv.draw_rect(a, clip_area, draw_rect_dsc)
-            
+
     elif code == lv.EVENT.RELEASED:
         chart.invalidate()
-            
-# 
+
+#
 # Add ticks and labels to the axis and demonstrate scrolling
 #
 

@@ -1,17 +1,44 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/object-types/index.md
-```
 # Widgets
 
 ```eval_rst
 
 .. toctree::
    :maxdepth: 1
-   
+
    obj
-   core/index
-   extra/index
+   arc
+   animimg
+   bar
+   btn
+   btnmatrix
+   calendar
+   chart
+   colorwheel
+   canvas
+   checkbox
+   dropdown
+   img
+   imgbtn
+   keyboard
+   label
+   led
+   line
+   list
+   menu
+   meter
+   msgbox
+   roller
+   slider
+   span
+   spinbox
+   spinner
+   switch
+   table
+   tabview
+   textarea
+   tileview
+   win
+
 ```
 
 

@@ -1,8 +1,8 @@
 #
 # Demonstrate RTL direction on grid
 #
-col_dsc = [60, 60, 60, lv.GRID_TEMPLATE.LAST]
-row_dsc = [40, 40, 40, lv.GRID_TEMPLATE.LAST]
+col_dsc = [60, 60, 60, lv.GRID_TEMPLATE_LAST]
+row_dsc = [40, 40, 40, lv.GRID_TEMPLATE_LAST]
 
 # Create a container with grid
 cont = lv.obj(lv.scr_act())
@@ -20,7 +20,7 @@ for i in range(9):
     # Set span to 1 to make the cell 1 column/row sized
     obj.set_grid_cell(lv.GRID_ALIGN.STRETCH, col, 1,
                       lv.GRID_ALIGN.STRETCH, row, 1)
-    
+
     label = lv.label(obj)
     label.set_text("{:d},{:d}".format(col, row))
     label.center()

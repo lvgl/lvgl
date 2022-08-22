@@ -1,5 +1,5 @@
 #include "../lv_conf_internal.h"
-#if LV_MEM_CUSTOM == 0
+#if LV_USE_BUILTIN_MALLOC
 
 #ifndef LV_TLSF_H
 #define LV_TLSF_H
@@ -66,7 +66,7 @@ void lv_tlsf_remove_pool(lv_tlsf_t tlsf, lv_pool_t pool);
 void * lv_tlsf_malloc(lv_tlsf_t tlsf, size_t bytes);
 void * lv_tlsf_memalign(lv_tlsf_t tlsf, size_t align, size_t bytes);
 void * lv_tlsf_realloc(lv_tlsf_t tlsf, void * ptr, size_t size);
-void lv_tlsf_free(lv_tlsf_t tlsf, const void * ptr);
+size_t lv_tlsf_free(lv_tlsf_t tlsf, const void * ptr);
 
 /* Returns internal block size, not original request size */
 size_t lv_tlsf_block_size(void * ptr);
@@ -92,4 +92,4 @@ int lv_tlsf_check_pool(lv_pool_t pool);
 
 #endif /*LV_TLSF_H*/
 
-#endif /* LV_MEM_CUSTOM == 0 */
+#endif /* LV_USE_BUILTIN_MALLOC */

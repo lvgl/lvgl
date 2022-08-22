@@ -14,7 +14,7 @@ style_base.set_shadow_ofs_y(5)
 style_base.set_shadow_opa(lv.OPA._50)
 style_base.set_text_color(lv.color_white())
 style_base.set_width(100)
-style_base.set_height(lv.SIZE.CONTENT)
+style_base.set_height(lv.SIZE_CONTENT)
 
 # Set only the properties that should be different
 style_warning = lv.style_t()

@@ -51,7 +51,7 @@ btn1 = lv.btn(lv.scr_act())
 btn1.remove_style_all()                          # Remove the style coming from the theme
 btn1.add_style(style, 0)
 btn1.add_style(style_pr, lv.STATE.PRESSED)
-btn1.set_size(lv.SIZE.CONTENT, lv.SIZE.CONTENT)
+btn1.set_size(lv.SIZE_CONTENT, lv.SIZE_CONTENT)
 btn1.center()
 
 label = lv.label(btn1)

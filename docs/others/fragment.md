@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/others/fragment.md
-```
 
 # Fragment
 
@@ -15,7 +11,7 @@ to, the host’s view hierarchy.
 Such concept also has some similarities
 to [UiViewController on iOS](https://developer.apple.com/documentation/uikit/uiviewcontroller).
 
-Fragment Manager is a manager holding references to fragments attached to it, and has an internal stack to achieve 
+Fragment Manager is a manager holding references to fragments attached to it, and has an internal stack to achieve
 navigation. You can use fragment manager to build navigation stack, or multi pane application easily.
 
 ## Usage

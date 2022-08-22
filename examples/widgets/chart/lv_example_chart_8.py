@@ -81,12 +81,12 @@ def lv_example_chart_8():
     stacked_area_chart.obj.set_div_line_count(5, 7)
     stacked_area_chart.obj.add_event_cb( draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
 
-    # Set range to 0 to 100 for percentages. Draw ticks 
+    # Set range to 0 to 100 for percentages. Draw ticks
     stacked_area_chart.obj.set_range(lv.chart.AXIS.PRIMARY_Y,0,100)
     stacked_area_chart.obj.set_axis_tick(lv.chart.AXIS.PRIMARY_Y, 3, 0, 5, 1, True, 30)
 
     #Set point size to 0 so the lines are smooth
-    stacked_area_chart.obj.set_style_size(0, lv.PART.INDICATOR)
+    stacked_area_chart.obj.set_style_size(0, 0, lv.PART.INDICATOR)
 
     # Add some data series
     stacked_area_chart.series_list[0] = stacked_area_chart.obj.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)

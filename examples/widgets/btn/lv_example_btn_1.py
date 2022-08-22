@@ -5,7 +5,7 @@ def event_handler(evt):
             print("Clicked event seen")
     elif code == lv.EVENT.VALUE_CHANGED:
         print("Value changed seen")
-        
+
 # create a simple button
 btn1 = lv.btn(lv.scr_act())
 
@@ -25,7 +25,7 @@ btn2.add_event_cb(event_handler,lv.EVENT.ALL, None)
 
 btn2.align(lv.ALIGN.CENTER,0,40)
 btn2.add_flag(lv.obj.FLAG.CHECKABLE)
-btn2.set_height(lv.SIZE.CONTENT)
+btn2.set_height(lv.SIZE_CONTENT)
 
 label=lv.label(btn2)
 label.set_text("Toggle")

@@ -12,8 +12,8 @@ style.set_line_rounded(True)
 # Create an object with the new style
 obj = lv.line(lv.scr_act())
 obj.add_style(style, 0)
-p =  [ {"x":10, "y":30}, 
-       {"x":30, "y":50}, 
+p =  [ {"x":10, "y":30},
+       {"x":30, "y":50},
        {"x":100, "y":0}]
 
 obj.set_points(p, 3)

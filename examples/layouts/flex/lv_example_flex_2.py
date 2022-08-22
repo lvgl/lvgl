@@ -14,7 +14,7 @@ cont.add_style(style, 0)
 
 for i in range(8):
     obj = lv.obj(cont)
-    obj.set_size(70, lv.SIZE.CONTENT)
+    obj.set_size(70, lv.SIZE_CONTENT)
 
     label = lv.label(obj)
     label.set_text("{:d}".format(i))

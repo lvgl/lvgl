@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/obj.md
-```
 # Base object (lv_obj)
 
 ## Overview
@@ -13,7 +9,7 @@ The 'Base Object' implements the basic properties of widgets on a screen, such a
 - contains the styles
 - attributes like *Clickable*, *Scrollable*, etc.
 
-In object-oriented thinking, it is the base class from which all other objects in LVGL are inherited. 
+In object-oriented thinking, it is the base class from which all other objects in LVGL are inherited.
 
 The functions and functionalities of the Base object can be used with other widgets too. For example `lv_obj_set_width(slider, 100)`
 
@@ -69,7 +65,7 @@ for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
 
 You can bring an object to the foreground or send it to the background with `lv_obj_move_foreground(obj)` and `lv_obj_move_background(obj)`.
 
-You can change the index of an object in its parent using  `lv_obj_move_to_index(obj, index)`. 
+You can change the index of an object in its parent using  `lv_obj_move_to_index(obj, index)`.
 
 You can swap the position of two objects with `lv_obj_swap(obj1, obj2)`.
 
@@ -95,10 +91,10 @@ Read the [Event overview](/overview/event) to learn more about events.
 ### Styles
 Be sure to read the [Style overview](/overview/style). Here only the most essential functions are described.
 
-A new style can be added to an object with the `lv_obj_add_style(obj, &new_style, selector)` function. 
+A new style can be added to an object with the `lv_obj_add_style(obj, &new_style, selector)` function.
 `selector` is an ORed combination of part and state(s). E.g. `LV_PART_SCROLLBAR | LV_STATE_PRESSED`.
 
-The base objects use `LV_PART_MAIN` style properties and `LV_PART_SCROLLBAR` with the typical background style properties. 
+The base objects use `LV_PART_MAIN` style properties and `LV_PART_SCROLLBAR` with the typical background style properties.
 
 
 ### Flags

@@ -16,10 +16,10 @@ try:
 except:
     print("Could not find img_cogwheel_argb.png")
     sys.exit()
-    
+
 img_cogwheel_argb = lv.img_dsc_t({
   'data_size': len(png_data),
-  'data': png_data 
+  'data': png_data
 })
 
 def set_angle(img, v):
@@ -45,7 +45,7 @@ a1.set_var(img)
 a1.set_custom_exec_cb(lambda a,val: set_angle(img,val))
 a1.set_values(0, 3600)
 a1.set_time(5000)
-a1.set_repeat_count(lv.ANIM_REPEAT.INFINITE)
+a1.set_repeat_count(lv.ANIM_REPEAT_INFINITE)
 lv.anim_t.start(a1)
 
 a2 = lv.anim_t()
@@ -55,7 +55,7 @@ a2.set_custom_exec_cb(lambda a,val: set_zoom(img,val))
 a2.set_values(128, 256)
 a2.set_time(5000)
 a2.set_playback_time(3000)
-a2.set_repeat_count(lv.ANIM_REPEAT.INFINITE)
+a2.set_repeat_count(lv.ANIM_REPEAT_INFINITE)
 lv.anim_t.start(a2)
 
 

@@ -166,8 +166,8 @@ struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event
     lv_obj_allocate_spec_attr(obj);
 
     obj->spec_attr->event_dsc_cnt++;
-    obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc,
-                                               obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+    obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
+                                           obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
     LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
 
     obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].cb = event_cb;
@@ -190,8 +190,8 @@ bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
                 obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i + 1];
             }
             obj->spec_attr->event_dsc_cnt--;
-            obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc,
-                                                       obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+            obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
+                                                   obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
             LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
             return true;
         }
@@ -215,8 +215,8 @@ bool lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_c
                 obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i + 1];
             }
             obj->spec_attr->event_dsc_cnt--;
-            obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc,
-                                                       obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+            obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
+                                                   obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
             LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
             return true;
         }
@@ -240,8 +240,8 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
                 obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i + 1];
             }
             obj->spec_attr->event_dsc_cnt--;
-            obj->spec_attr->event_dsc = lv_mem_realloc(obj->spec_attr->event_dsc,
-                                                       obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
+            obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
+                                                   obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
             LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
             return true;
         }
@@ -254,7 +254,7 @@ bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
 void * lv_obj_get_event_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->spec_attr == NULL) return false;
+    if(obj->spec_attr == NULL) return NULL;
 
     int32_t i = 0;
     for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
@@ -436,7 +436,7 @@ static lv_res_t event_send_core(lv_event_t * e)
     }
 
     lv_res_t res = LV_RES_OK;
-    lv_event_dsc_t * event_dsc = res == LV_RES_INV ? NULL : lv_obj_get_event_dsc(e->current_target, 0);
+    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(e->current_target, 0);
 
     uint32_t i = 0;
     while(event_dsc && res == LV_RES_OK) {

@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/others/snapshot.md
-```
 # Snapshot
 
 Snapshot provides APIs to take snapshot image for LVGL object together with its children. The image will look exactly like the object.
@@ -12,12 +8,9 @@ Simply call API `lv_snapshot_take` to generate the image descriptor which can be
 
 
 Note, only below color formats are supported for now:
+ - LV_IMG_CF_TRUE_COLOR
  - LV_IMG_CF_TRUE_COLOR_ALPHA
- - LV_IMG_CF_ALPHA_1BIT
- - LV_IMG_CF_ALPHA_2BIT
- - LV_IMG_CF_ALPHA_4BIT
  - LV_IMG_CF_ALPHA_8BIT
-
 
 ### Free the Image
 The memory `lv_snapshot_take` uses are dynamically allocated using `lv_mem_alloc`. Use API `lv_snapshot_free` to free the memory it takes. This will firstly free memory the image data takes, then the image descriptor.

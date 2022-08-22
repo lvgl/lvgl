@@ -14,7 +14,7 @@ def ta_event_cb(e):
         rest = txt[colon_pos:]
         if len(rest) > 3:
             ta.del_char()
-            
+
     if len(txt) < 2:
         return
     if ":" in txt:

@@ -59,7 +59,7 @@ def slider_y_event_cb(e):
 # Display 1000 data points with zooming and scrolling.
 # See how the chart changes drawing mode (draw only vertical lines) when
 # the points get too crowded.
- 
+
 # Create a chart
 chart = lv.chart(lv.scr_act())
 chart.set_size(200, 150)
@@ -67,7 +67,7 @@ chart.align(lv.ALIGN.CENTER, -30, -30)
 chart.set_range(lv.chart.AXIS.PRIMARY_Y, -1000, 1000)
 
 # Do not display points on the data
-chart.set_style_size(0, lv.PART.INDICATOR)
+chart.set_style_size(0, 0, lv.PART.INDICATOR)
 
 ser = chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)
 
@@ -76,13 +76,13 @@ chart.set_point_count(pcnt)
 chart.set_ext_y_array(ser, ecg_sample)
 
 slider = lv.slider(lv.scr_act())
-slider.set_range(lv.IMG_ZOOM.NONE, lv.IMG_ZOOM.NONE * 10)
+slider.set_range(lv.IMG_ZOOM_NONE, lv.IMG_ZOOM_NONE * 10)
 slider.add_event_cb(slider_x_event_cb, lv.EVENT.VALUE_CHANGED, None)
 slider.set_size(200,10)
 slider.align_to(chart, lv.ALIGN.OUT_BOTTOM_MID, 0, 20)
 
 slider = lv.slider(lv.scr_act())
-slider.set_range(lv.IMG_ZOOM.NONE, lv.IMG_ZOOM.NONE * 10)
+slider.set_range(lv.IMG_ZOOM_NONE, lv.IMG_ZOOM_NONE * 10)
 slider.add_event_cb(slider_y_event_cb, lv.EVENT.VALUE_CHANGED, None)
 slider.set_size(10, 150)
 slider.align_to(chart, lv.ALIGN.OUT_RIGHT_MID, 20, 0)

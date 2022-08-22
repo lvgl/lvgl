@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/layer.md
-```
 
 # Layers
 
@@ -12,7 +8,7 @@ By default, LVGL draws new objects on top of old objects.
 For example, assume we add a button to a parent object named button1 and then another button named button2. Then button1 (along with its child object(s)) will be in the background and can be covered by button2 and its children.
 
 
-![](/misc/layers.png "Creating graphical objects in LVGL")  
+![](/misc/layers.png "Creating graphical objects in LVGL")
 
 ```c
 /*Create a screen*/
@@ -42,7 +38,7 @@ lv_obj_del(label2);
 
 There are four explicit ways to bring an object to the foreground:
 - Use `lv_obj_move_foreground(obj)` to bring an object to the foreground. Similarly, use `lv_obj_move_background(obj)` to move it to the background.
-- Use `lv_obj_move_up(obj)` to move an object one position up in the hierarchy, Similarly, use `lv_obj_move_down(obj)` to move an object one position down in the hierarchy. 
+- Use `lv_obj_move_up(obj)` to move an object one position up in the hierarchy, Similarly, use `lv_obj_move_down(obj)` to move an object one position down in the hierarchy.
 - Use `lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
 - When `lv_obj_set_parent(obj, new_parent)` is used, `obj` will be on the foreground of the `new_parent`.
 

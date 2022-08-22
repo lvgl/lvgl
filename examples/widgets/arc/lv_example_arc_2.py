@@ -4,7 +4,7 @@
 class ArcLoader():
     def __init__(self):
         self.a = 270
-        
+
     def arc_loader_cb(self,tim,arc):
         # print(tim,arc)
         self.a += 5
@@ -33,5 +33,5 @@ arc_loader = ArcLoader()
 timer = lv.timer_create_basic()
 timer.set_period(20)
 timer.set_cb(lambda src: arc_loader.arc_loader_cb(timer,arc))
-  
+
 

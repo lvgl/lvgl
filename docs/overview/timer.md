@@ -1,11 +1,7 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/timer.md
-```
 # Timers
 
 LVGL has a built-in timer system. You can register a function to have it be called periodically. The timers are handled and called in `lv_timer_handler()`, which needs to be called every few milliseconds.
-See [Porting](/porting/task-handler) for more information.
+See [Porting](/porting/timer-handler) for more information.
 
 Timers are non-preemptive, which means a timer cannot interrupt another timer. Therefore, you can call any LVGL related function in a timer.
 
@@ -52,7 +48,7 @@ You can modify some timer parameters later:
 
 ## Repeat count
 
-You can make a timer repeat only a given number of times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after it's called the defined number of times. Set the count to `-1` to repeat indefinitely. 
+You can make a timer repeat only a given number of times with `lv_timer_set_repeat_count(timer, count)`. The timer will automatically be deleted after it's called the defined number of times. Set the count to `-1` to repeat indefinitely.
 
 
 ## Measure idle time
@@ -65,6 +61,7 @@ It can be misleading if you use an operating system and call `lv_timer_handler` 
 In some cases, you can't perform an action immediately. For example, you can't delete an object because something else is still using it, or you don't want to block the execution now.
 For these cases, `lv_async_call(my_function, data_p)` can be used to call `my_function` on the next invocation of `lv_timer_handler`. `data_p` will be passed to the function when it's called.
 Note that only the data pointer is saved, so you need to ensure that the variable will be "alive" while the function is called. It can be *static*, global or dynamically allocated data.
+If you want to cancel an asynchronous call, call `lv_async_call_cancel(my_function, data_p)`, which will clear all asynchronous calls matching `my_function` and `data_p`.
 
 For example:
 ```c
@@ -73,7 +70,7 @@ void my_screen_clean_up(void * scr)
   /*Free some resources related to `scr`*/
 
   /*Finally delete the screen*/
-  lv_obj_del(scr);  
+  lv_obj_del(scr);
 }
 
 ...

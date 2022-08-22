@@ -6,13 +6,25 @@
 
 1. Copy the **lv_conf_template.h** to '**cmsis-pack**' directory
 
-2. Set the macro protector to '1'
+2. Set the macro protector to '1' 
 
 ```c
 ...
 /* clang-format off */
 #if 1 /*Set it to "1" to enable content*/
 ...
+```
+
+remove the misleading guide above this code segment.
+
+```c
+/*
+ * Copy this file as `lv_conf.h`
+ * 1. simply next to the `lvgl` folder
+ * 2. or any other places and
+ *    - define `LV_CONF_INCLUDE_SIMPLE`
+ *    - add the path as include path
+ */
 ```
 
 
@@ -27,14 +39,22 @@
 ...
 ```
 
-4. Remove macro definitions for 
+4. Remove macro definitions for
    - LV_USE_GPU_STM32_DMA2D
    - LV_USE_GPU_NXP_PXP
    - LV_USE_GPU_NXP_VG_LITE
-5. Update macro LV_ATTRIBUTE_MEM_ALIGN to force a WORD alignment.
+   - LV_USE_GPU_SWM341_DMA2D
+   - LV_USE_GPU_ARM2D
+   - LV_USE_IME_PINYIN
+5. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
-#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
+#define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
 ```
+Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
+
+
+
 6. Update Theme related macros:
 
 ```c
@@ -72,8 +92,8 @@
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h" 
-        
+        #define LV_TICK_CUSTOM_INCLUDE             "perf_counter.h"
+
         #if __PER_COUNTER_VER__ < 10902ul
             #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
         #else
@@ -88,9 +108,26 @@
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
 ```
-9. Thoroughly remove the `DEMO USAGE` section.
-10. Thoroughly remove the '3rd party libraries' section.
-10. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+9. Thoroughly remove the `DEMO USAGE` section and add following code:
+
+   ```c
+   /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
+   #if LV_USE_DEMO_WIDGETS
+       #define LV_DEMO_WIDGETS_SLIDESHOW 0
+   #endif
+   
+   /*Benchmark your system*/
+   #if LV_USE_DEMO_BENCHMARK
+       /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
+       #define LV_DEMO_BENCHMARK_RGB565A8 0
+   #endif
+   ```
+
+   
+
+10. Thoroughly remove the `3rd party libraries` section.
+
+11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 
@@ -116,9 +153,9 @@ echo " "
 
 Update the '**CMSIS_PACK_PATH**' accordingly (Usually just replace the name gabriel with your own windows account name is sufficient.).
 
-Update the '**PATH_TO_ADD**' to point to the installation folders of **7Zip** and **xmllint**. 
+Update the '**PATH_TO_ADD**' to point to the installation folders of **7Zip** and **xmllint**.
 
-Launch the git-bash and go to the cmsis-pack folder. 
+Launch the git-bash and go to the cmsis-pack folder.
 
 enter the following command:
 
@@ -130,9 +167,9 @@ enter the following command:
 
 ### B. For Linux Users
 
-Update '**PATH_TO_ADD**' if necessary. 
+Update '**PATH_TO_ADD**' if necessary.
 
-go to the **cmsis-pack** folder. 
+go to the **cmsis-pack** folder.
 
 enter the following command:
 

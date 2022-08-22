@@ -13,9 +13,11 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw_sw_dither.h"
+#if LV_USE_DRAW_SW
+
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_style.h"
-#include "lv_draw_sw_dither.h"
 
 /*********************
  *      DEFINES
@@ -51,7 +53,7 @@ typedef struct _lv_gradient_cache_t {
 #if _DITHER_GRADIENT
     lv_color32_t  * hmap;         /**< If dithering, we need to store the current, high bitdepth gradient
                                    * map too, points to the cache's buffer, no free needed */
-#if LV_DITHER_ERROR_DIFFUSION == 1
+#if LV_DRAW_SW_GRADIENT_DITHER_ERROR_DIFFUSION == 1
     lv_scolor24_t * error_acc;    /**< Error diffusion dithering algorithm requires storing the last error
                                    * drawn, points to the cache's buffer, no free needed  */
     lv_coord_t      w;            /**< The error array width in pixels */
@@ -89,6 +91,8 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * gradient, lv_coord_t w, lv_coo
  * @param grad      pointer to a gradient
  */
 void lv_gradient_cleanup(lv_grad_t * grad);
+
+#endif /*LV_USE_DRAW_SW*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

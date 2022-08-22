@@ -37,7 +37,7 @@ typedef enum {
 typedef uint32_t lv_style_selector_t;
 
 typedef struct {
-    lv_style_t * style;
+    const lv_style_t * style;
     uint32_t selector : 24;
     uint32_t is_local : 1;
     uint32_t is_trans : 1;
@@ -72,7 +72,7 @@ void _lv_obj_style_init(void);
  * @example         lv_obj_add_style(btn, &style_btn, 0); //Default button style
  * @example         lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED); //Overwrite only some colors to red when pressed
  */
-void lv_obj_add_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector);
+void lv_obj_add_style(struct _lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
  * Add a style to an object.
@@ -83,7 +83,7 @@ void lv_obj_add_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selec
  * @example lv_obj_remove_style(obj, NULL, LV_PART_MAIN | LV_STATE_ANY); //Remove all styles from the main part
  * @example lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY); //Remove all styles
  */
-void lv_obj_remove_style(struct _lv_obj_t * obj, lv_style_t * style, lv_style_selector_t selector);
+void lv_obj_remove_style(struct _lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
  * Remove all styles from an object
@@ -140,8 +140,11 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, lv_part_t p
 void lv_obj_set_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t value,
                                  lv_style_selector_t selector);
 
-lv_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
-                                     lv_style_selector_t selector);
+void lv_obj_set_local_style_prop_meta(struct _lv_obj_t * obj, lv_style_prop_t prop, uint16_t meta,
+                                      lv_style_selector_t selector);
+
+lv_style_res_t lv_obj_get_local_style_prop(struct _lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
+                                           lv_style_selector_t selector);
 
 /**
  * Remove a local style property from a part of an object with a given state.
@@ -225,10 +228,11 @@ static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj, lv_coord_t v
     lv_obj_set_style_pad_column(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t width, lv_coord_t height,
+                                         lv_style_selector_t selector)
 {
-    lv_obj_set_style_width(obj, value, selector);
-    lv_obj_set_style_height(obj, value, selector);
+    lv_obj_set_style_width(obj, width, selector);
+    lv_obj_set_style_height(obj, height, selector);
 }
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);

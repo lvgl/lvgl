@@ -12,10 +12,10 @@ try:
 except:
     print("Could not find img_caret_down.png")
     sys.exit()
-    
+
 img_caret_down_argb = lv.img_dsc_t({
   'data_size': len(png_data),
-  'data': png_data 
+  'data': png_data
 })
 
 def event_cb(e):

@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/image.md
-```
 # Images
 
 An image can be a file or a variable which stores the bitmap itself and some metadata.
@@ -108,11 +104,11 @@ static lv_img_dsc_t my_img_dsc = {
 
 If the color format is `LV_IMG_CF_TRUE_COLOR_ALPHA` you can set `data_size` like `80 * 60 * LV_IMG_PX_SIZE_ALPHA_BYTE`.
 
-Another (possibly simpler) option to create and display an image at run-time is to use the [Canvas](/widgets/core/canvas) object.
+Another (possibly simpler) option to create and display an image at run-time is to use the [Canvas](/widgets/canvas) object.
 
 ### Use images
 
-The simplest way to use an image in LVGL is to display it with an [lv_img](/widgets/core/img) object:
+The simplest way to use an image in LVGL is to display it with an [lv_img](/widgets/img) object:
 
 ```c
 lv_obj_t * icon = lv_img_create(lv_scr_act(), NULL);
@@ -267,8 +263,8 @@ To indicate that the *line read* function should be used, set `dsc->img_data = N
 
 LVGL will use registered image decoders automatically if you try and draw a raw image (i.e. using the `lv_img` object) but you can use them manually too. Create an `lv_img_decoder_dsc_t` variable to describe the decoding session and call `lv_img_decoder_open()`.
 
-The `color` parameter is used only with `LV_IMG_CF_ALPHA_1/2/4/8BIT` images to tell color of the image. 
-`frame_id` can be used if the image to open is an animation. 
+The `color` parameter is used only with `LV_IMG_CF_ALPHA_1/2/4/8BIT` images to tell color of the image.
+`frame_id` can be used if the image to open is an animation.
 
 
 ```c

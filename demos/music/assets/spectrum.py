@@ -18,7 +18,7 @@ fs = int(len(S) / fn)
 fout.write("const uint16_t spectrum[][4] = {\n")
 for t in range(0,len(S[0]-1)):
   fout.write("{ ")
-  f_prev = 0 
+  f_prev = 0
   for f in [8, 45, 300, 600]:
     v = 0
     for i in range(f_prev, f): v += S[i][t]

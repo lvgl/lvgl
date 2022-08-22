@@ -1,22 +1,18 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/porting/gpu.md
-```
 # Add custom GPU
 LVGL has a flexible and extendable draw pipeline. You can hook it to do some rendering with a GPU or even completely replace the built-in software renderer.
 
 ## Draw context
-The core structure of drawing is `lv_draw_ctx_t`. 
-It contains a pointer to a buffer where drawing should happen and a couple of callbacks to draw rectangles, texts, and other primitives. 
+The core structure of drawing is `lv_draw_ctx_t`.
+It contains a pointer to a buffer where drawing should happen and a couple of callbacks to draw rectangles, texts, and other primitives.
 
 ### Fields
 `lv_draw_ctx_t` has the following fields:
 - `void * buf` Pointer to a buffer to draw into
 - `lv_area_t * buf_area` The position and size of `buf` (absolute coordinates)
 - `const lv_area_t * clip_area` The current clip area with absolute coordinates, always the same or smaller than `buf_area`. All drawings should be clipped to this area.
-- `void (*draw_rect)()` Draw a rectangle with shadow, gradient, border, etc. 
+- `void (*draw_rect)()` Draw a rectangle with shadow, gradient, border, etc.
 - `void (*draw_arc)()` Draw an arc
-- `void (*draw_img_decoded)()` Draw an (A)RGB image that is already decoded by LVGL. 
+- `void (*draw_img_decoded)()` Draw an (A)RGB image that is already decoded by LVGL.
 - `lv_res_t (*draw_img)()` Draw an image before decoding it (it bypasses LVGL's internal image decoders)
 - `void (*draw_letter)()` Draw a letter
 - `void (*draw_line)()` Draw a line
@@ -28,22 +24,22 @@ It contains a pointer to a buffer where drawing should happen and a couple of ca
 (For the sake of simplicity the parameters of the callbacks are not shown here.)
 
 All `draw_*` callbacks receive a pointer to the current `draw_ctx` as their first parameter. Among the other parameters there is a descriptor that tells what to draw,
-e.g. for `draw_rect` it's called [lv_draw_rect_dsc_t](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_rect.h), 
-for `lv_draw_line` it's called [lv_draw_line_dsc_t](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_line.h), etc. 
+e.g. for `draw_rect` it's called [lv_draw_rect_dsc_t](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_rect.h),
+for `lv_draw_line` it's called [lv_draw_line_dsc_t](https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_line.h), etc.
 
 To correctly render according to a `draw_dsc` you need to be familiar with the [Boxing model](https://docs.lvgl.io/master/overview/coords.html#boxing-model) of LVGL and the meanings of the fields. The name and meaning of the fields are identical to name and meaning of the [Style properties](https://docs.lvgl.io/master/overview/style-props.html).
 
 ### Initialization
 The `lv_disp_drv_t` has 4 fields related to the draw context:
-- `lv_draw_ctx_t * draw_ctx` Pointer to the `draw_ctx` of this display 
-- `void (*draw_ctx_init)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)` Callback to initialize a `draw_ctx` 
+- `lv_draw_ctx_t * draw_ctx` Pointer to the `draw_ctx` of this display
+- `void (*draw_ctx_init)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)` Callback to initialize a `draw_ctx`
 - `void (*draw_ctx_deinit)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)` Callback to de-initialize a `draw_ctx`
 - `size_t draw_ctx_size` Size of the draw context structure. E.g. `sizeof(lv_draw_sw_ctx_t)`
 
 When you ignore these fields, LVGL will set default values for callbacks and size in `lv_disp_drv_init()` based on the configuration in `lv_conf.h`.
 `lv_disp_drv_register()` will allocate a `draw_ctx` based on `draw_ctx_size` and call `draw_ctx_init()` on it.
 
-However, you can overwrite the callbacks and the size values before calling `lv_disp_drv_register()`. 
+However, you can overwrite the callbacks and the size values before calling `lv_disp_drv_register()`.
 It makes it possible to use your own `draw_ctx` with your own callbacks.
 
 
@@ -67,7 +63,7 @@ draw_sw_ctx->base_draw.draw_letter = lv_draw_sw_letter;
 ```
 
 ### Blend callback
-As you saw above the software renderer adds the `blend` callback field. It's a special callback related to how the software renderer works. 
+As you saw above the software renderer adds the `blend` callback field. It's a special callback related to how the software renderer works.
 All draw operations end up in the `blend` callback which can either fill an area or copy an image to an area by considering an optional mask.
 
 The `lv_draw_sw_blend_dsc_t` parameter describes what and how to blend. It has the following fields:
@@ -81,11 +77,11 @@ The `lv_draw_sw_blend_dsc_t` parameter describes what and how to blend. It has t
 - `lv_blend_mode_t blend_mode` E.g. `LV_BLEND_MODE_ADDITIVE`
 
 
-## Extend the software renderer 
+## Extend the software renderer
 
 ### New blend callback
 
-Let's take a practical example: you would like to use your MCUs GPU for color fill operations only. 
+Let's take a practical example: you would like to use your MCUs GPU for color fill operations only.
 
 As all draw callbacks call `blend` callback to fill an area in the end only the `blend` callback needs to be overwritten.
 
@@ -142,10 +138,10 @@ void my_draw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 
         /*Make the blend area relative to the buffer*/      
         lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-        
+       
         /*Call your custom gou fill function to fill blend_area, on dest_buf with dsc->color*/  
         my_gpu_fill(dest_buf, dest_stride, &blend_area, dsc->color);
-    } 
+    }
     /*Fallback: the GPU doesn't support these settings. Call the SW renderer.*/
     else {
       lv_draw_sw_blend_basic(draw_ctx, dsc);
@@ -158,7 +154,7 @@ The implementation of wait callback is much simpler:
 void my_gpu_wait(lv_draw_ctx_t * draw_ctx)
 {
     while(my_gpu_is_working());
-    
+   
     /*Call SW renderer's wait callback too*/
     lv_draw_sw_wait_for_finish(draw_ctx);
 }
@@ -171,21 +167,21 @@ A custom `draw_rect` callback might look like this:
 void my_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
   if(lv_draw_mask_is_any(coords) == false && dsc->grad == NULL && dsc->bg_img_src == NULL &&
-     dsc->shadow_width == 0 && dsc->blend_mode = LV_BLEND_MODE_NORMAL) 
+     dsc->shadow_width == 0 && dsc->blend_mode = LV_BLEND_MODE_NORMAL)
   {
     /*Draw the background*/
     my_bg_drawer(draw_ctx, coords, dsc->bg_color, dsc->radius);
-    
+   
     /*Draw the border if any*/
     if(dsc->border_width) {
       my_border_drawer(draw_ctx, coords, dsc->border_width, dsc->border_color, dsc->border_opa)
     }
-    
+   
     /*Draw the outline if any*/
     if(dsc->outline_width) {
       my_outline_drawer(draw_ctx, coords, dsc->outline_width, dsc->outline_color, dsc->outline_opa, dsc->outline_pad)
     }
-  } 
+  }
   /*Fallback*/
   else {
     lv_draw_sw_rect(draw_ctx, dsc, coords);
@@ -197,6 +193,6 @@ void my_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, cons
 
 ## Fully custom draw engine
 
-For example if your MCU/MPU supports a powerful vector graphics engine you might use only that instead of LVGL's SW renderer. 
+For example if your MCU/MPU supports a powerful vector graphics engine you might use only that instead of LVGL's SW renderer.
 In this case, you need to base the renderer on the basic `lv_draw_ctx_t` (instead of `lv_draw_sw_ctx_t`) and extend/initialize it as you wish.
 

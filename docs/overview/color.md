@@ -1,14 +1,8 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/color.md
-```
 # Colors
 
 The color module handles all color-related functions like changing color depth, creating colors from hex code, converting between color depths, mixing colors, etc.
 
 The type `lv_color_t` is used to store a color. Its fields are set according to `LV_COLOR_DEPTH` in `lv_conf.h`. (See below)
-
-You may set `LV_COLOR_16_SWAP` in `lv_conf.h` to swap bytes of *RGB565* colors. You may need this when sending 16-bit colors via a byte-oriented interface like SPI. As 16-bit numbers are stored in little-endian format (lower byte at the lower address), the interface will send the lower byte first. However, displays usually need the higher byte first. A mismatch in the byte order will result in highly distorted colors.
 
 ## Creating colors
 
@@ -19,10 +13,10 @@ Create colors from Red, Green and Blue channel values:
 lv_color_t c = lv_color_make(red, green, blue);
 
 //From hex code 0x000000..0xFFFFFF interpreted as RED + GREEN + BLUE
-lv_color_t c = lv_color_hex(0x123456); 
+lv_color_t c = lv_color_hex(0x123456);
 
 //From 3 digits. Same as lv_color_hex(0x112233)
-lv_color_t c = lv_color_hex3(0x123); 
+lv_color_t c = lv_color_hex3(0x123);
 ```
 
 ### HSV

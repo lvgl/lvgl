@@ -16,10 +16,10 @@ try:
 except:
     print("Could not find img_cogwheel_argb.png")
     sys.exit()
-    
+
 img_cogwheel_argb = lv.img_dsc_t({
   'data_size': len(png_data),
-  'data': png_data 
+  'data': png_data
 })
 
 img1 = lv.img(lv.scr_act())

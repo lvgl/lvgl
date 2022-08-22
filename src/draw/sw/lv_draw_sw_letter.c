@@ -7,6 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_sw.h"
+#if LV_USE_DRAW_SW
+
 #include "../../hal/lv_hal_disp.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_assert.h"
@@ -31,10 +33,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
                                                      const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
 
 
-#if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
+#if LV_DRAW_SW_FONT_SUBPX
 static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos,
                               lv_font_glyph_dsc_t * g, const uint8_t * map_p);
-#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
+#endif /*LV_DRAW_SW_FONT_SUBPX*/
 
 /**********************
  *  STATIC VARIABLES
@@ -103,8 +105,9 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" PRIX32, letter);
+            LV_LOG_INFO("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
 
+#if LV_USE_FONT_PLACEHOLDER
             /* draw placeholder */
             lv_area_t glyph_coords;
             lv_draw_rect_dsc_t glyph_dsc;
@@ -119,6 +122,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
             glyph_dsc.border_color = dsc->color;
             glyph_dsc.border_width = 1;
             draw_ctx->draw_rect(draw_ctx, &glyph_dsc, &glyph_coords);
+#endif
         }
         return;
     }
@@ -145,10 +149,10 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
     }
 
     if(g.resolved_font->subpx) {
-#if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
+#if LV_DRAW_SW_FONT_SUBPX
         draw_letter_subpx(draw_ctx, dsc, &gpos, &g, map_p);
 #else
-        LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
+        LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_DRAW_SW_FONT_SUBPX == 0 in lv_conf.h");
 #endif
     }
     else {
@@ -171,6 +175,24 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     lv_opa_t opa = dsc->opa;
     uint32_t shades;
     if(bpp == 3) bpp = 4;
+
+#if LV_USE_IMGFONT
+    if(bpp == LV_IMGFONT_BPP) { //is imgfont
+        lv_area_t fill_area;
+        fill_area.x1 = pos->x;
+        fill_area.y1 = pos->y;
+        fill_area.x2 = pos->x + g->box_w - 1;
+        fill_area.y2 = pos->y + g->box_h - 1;
+        lv_draw_img_dsc_t img_dsc;
+        lv_draw_img_dsc_init(&img_dsc);
+        img_dsc.angle = 0;
+        img_dsc.zoom = LV_IMG_ZOOM_NONE;
+        img_dsc.opa = dsc->opa;
+        img_dsc.blend_mode = dsc->blend_mode;
+        lv_draw_img(draw_ctx, &img_dsc, &fill_area, map_p);
+        return;
+    }
+#endif
 
     switch(bpp) {
         case 1:
@@ -233,14 +255,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     col_bit = bit_ofs & 0x7; /*"& 0x7" equals to "% 8" just faster*/
 
     lv_draw_sw_blend_dsc_t blend_dsc;
-    lv_memset_00(&blend_dsc, sizeof(blend_dsc));
+    lv_memzero(&blend_dsc, sizeof(blend_dsc));
     blend_dsc.color = dsc->color;
     blend_dsc.opa = dsc->opa;
     blend_dsc.blend_mode = dsc->blend_mode;
 
     lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
     uint32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : box_w * box_h;
-    lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
+    lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
     blend_dsc.mask_buf = mask_buf;
     int32_t mask_p = 0;
 
@@ -249,7 +271,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     fill_area.x2 = col_end  + pos->x - 1;
     fill_area.y1 = row_start + pos->y;
     fill_area.y2 = fill_area.y1;
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
     lv_coord_t fill_w = lv_area_get_width(&fill_area);
     lv_area_t mask_area;
     lv_area_copy(&mask_area, &fill_area);
@@ -263,7 +285,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     uint32_t col_bit_row_ofs = (box_w + col_start - col_end) * bpp;
 
     for(row = row_start ; row < row_end; row++) {
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
         int32_t mask_p_start = mask_p;
 #endif
         bitmask = bitmask_init >> col_bit;
@@ -292,13 +314,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
             mask_p++;
         }
 
-#if LV_DRAW_COMPLEX
+#if LV_USE_DRAW_MASKS
         /*Apply masks if any*/
         if(mask_any) {
             blend_dsc.mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
                                                     fill_w);
             if(blend_dsc.mask_res == LV_DRAW_MASK_RES_TRANSP) {
-                lv_memset_00(mask_buf + mask_p_start, fill_w);
+                lv_memzero(mask_buf + mask_p_start, fill_w);
             }
         }
 #endif
@@ -328,10 +350,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
         mask_p = 0;
     }
 
-    lv_mem_buf_release(mask_buf);
+    lv_free(mask_buf);
 }
 
-#if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
+#if LV_DRAW_SW_FONT_SUBPX
 static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos,
                               lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
@@ -395,10 +417,10 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
     lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
     int32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : g->box_w * g->box_h;
-    lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
+    lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
     int32_t mask_p = 0;
 
-    lv_color_t * color_buf = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
+    lv_color_t * color_buf = lv_malloc(mask_buf_size * sizeof(lv_color_t));
 
     int32_t dest_buf_stride = lv_area_get_width(draw_ctx->buf_area);
     lv_color_t * dest_buf_tmp = draw_ctx->buf;
@@ -416,14 +438,10 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     uint8_t font_rgb[3];
 
     lv_color_t color = dsc->color;
-#if LV_COLOR_16_SWAP == 0
     uint8_t txt_rgb[3] = {color.ch.red, color.ch.green, color.ch.blue};
-#else
-    uint8_t txt_rgb[3] = {color.ch.red, (color.ch.green_h << 3) + color.ch.green_l, color.ch.blue};
-#endif
 
     lv_draw_sw_blend_dsc_t blend_dsc;
-    lv_memset_00(&blend_dsc, sizeof(&blend_dsc));
+    lv_memzero(&blend_dsc, sizeof(blend_dsc));
     blend_dsc.blend_area = &map_area;
     blend_dsc.mask_area = &map_area;
     blend_dsc.src_buf = color_buf;
@@ -459,16 +477,9 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
                 subpx_cnt = 0;
 
                 lv_color_t res_color;
-#if LV_COLOR_16_SWAP == 0
                 uint8_t bg_rgb[3] = {dest_buf_tmp->ch.red, dest_buf_tmp->ch.green, dest_buf_tmp->ch.blue};
-#else
-                uint8_t bg_rgb[3] = {dest_buf_tmp->ch.red,
-                                     (dest_buf_tmp->ch.green_h << 3) + dest_buf_tmp->ch.green_l,
-                                     dest_buf_tmp->ch.blue
-                                    };
-#endif
 
-#if LV_FONT_SUBPX_BGR
+#if LV_DRAW_SW_FONT_SUBPX_BGR
                 res_color.ch.blue = (uint32_t)((uint32_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
                 res_color.ch.red = (uint32_t)((uint32_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
 #else
@@ -476,13 +487,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
                 res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
 #endif
 
-#if LV_COLOR_16_SWAP == 0
                 res_color.ch.green = (uint32_t)((uint32_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
-#else
-                uint8_t green = (uint32_t)((uint32_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
-                res_color.ch.green_h = green >> 3;
-                res_color.ch.green_l = green & 0x7;
-#endif
 
 #if LV_COLOR_DEPTH == 32
                 res_color.ch.alpha = 0xff;
@@ -509,19 +514,21 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             }
         }
 
+#if LV_USE_DRAW_MASKS
         /*Apply masks if any*/
         if(mask_any) {
             blend_dsc.mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
                                                     lv_area_get_width(&map_area));
             if(blend_dsc.mask_res == LV_DRAW_MASK_RES_TRANSP) {
-                lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&map_area));
+                lv_memzero(mask_buf + mask_p_start, lv_area_get_width(&map_area));
             }
         }
-
+#endif
         if((int32_t) mask_p + (col_end - col_start) < mask_buf_size) {
             map_area.y2 ++;
         }
         else {
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
             map_area.y1 = map_area.y2 + 1;
@@ -541,11 +548,13 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     /*Flush the last part*/
     if(map_area.y1 != map_area.y2) {
         map_area.y2--;
+        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
 
-    lv_mem_buf_release(mask_buf);
-    lv_mem_buf_release(color_buf);
+    lv_free(mask_buf);
+    lv_free(color_buf);
 }
-#endif /*LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX*/
+#endif /*LV_DRAW_SW_FONT_SUBPX*/
 
+#endif /*LV_USE_DRAW_SW*/

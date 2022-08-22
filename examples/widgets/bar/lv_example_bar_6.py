@@ -49,6 +49,6 @@ a.set_values(0, 100)
 a.set_custom_exec_cb(lambda a,val: set_value(bar,val))
 a.set_time(2000)
 a.set_playback_time(2000)
-a.set_repeat_count(lv.ANIM_REPEAT.INFINITE)
+a.set_repeat_count(lv.ANIM_REPEAT_INFINITE)
 lv.anim_t.start(a)
 

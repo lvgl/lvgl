@@ -17,10 +17,10 @@ class ScrollExample_3():
         float_btn.add_flag(lv.obj.FLAG.FLOATING)
         float_btn.align(lv.ALIGN.BOTTOM_RIGHT, 0, -list.get_style_pad_right(lv.PART.MAIN))
         float_btn.add_event_cb(lambda evt: self.float_btn_event_cb(evt,list), lv.EVENT.ALL, None)
-        float_btn.set_style_radius(lv.RADIUS.CIRCLE, 0)
+        float_btn.set_style_radius(lv.RADIUS_CIRCLE, 0)
         float_btn.set_style_bg_img_src(lv.SYMBOL.PLUS, 0)
         float_btn.set_style_text_font(lv.theme_get_font_large(float_btn), 0)
-            
+
     def float_btn_event_cb(self,e,list):
         code = e.get_code()
         float_btn = e.get_target()
@@ -32,7 +32,7 @@ class ScrollExample_3():
             float_btn.move_foreground()
 
             list_btn.scroll_to_view(lv.ANIM.ON)
-            
+
 scroll_example_3 = ScrollExample_3()
 
 

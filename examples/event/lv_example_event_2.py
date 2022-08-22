@@ -7,7 +7,7 @@ def event_cb(e,label):
     elif code == lv.EVENT.LONG_PRESSED:
         label.set_text("The last button event:\nLV_EVENT_LONG_PRESSED")
     elif code == lv.EVENT.LONG_PRESSED_REPEAT:
-        label.set_text("The last button event:\nLV_EVENT_LONG_PRESSED_REPEAT")        
+        label.set_text("The last button event:\nLV_EVENT_LONG_PRESSED_REPEAT")
 btn = lv.btn(lv.scr_act())
 btn.set_size(100, 50)
 btn.center()

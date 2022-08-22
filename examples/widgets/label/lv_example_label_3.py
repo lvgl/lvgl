@@ -15,7 +15,7 @@ try:
 except:
     font_montserrat_16 = lv.font_load("S:../../assets/font/montserrat-16.fnt")
     ltr_label.set_style_text_font(font_montserrat_16, 0)
-    
+
 ltr_label.set_width(310)
 ltr_label.align(lv.ALIGN.TOP_LEFT, 5, 5)
 
@@ -30,7 +30,7 @@ font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.fnt
 
 cz_label = lv.label(lv.scr_act())
 cz_label.set_style_text_font(font_simsun_16_cjk, 0)
-cz_label.set_text("嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。")    
+cz_label.set_text("嵌入式系统（Embedded System），\n是一种嵌入机械或电气系统内部、具有专一功能和实时计算性能的计算机系统。")
 cz_label.set_width(310)
 cz_label.align(lv.ALIGN.BOTTOM_LEFT, 5, -5)
 

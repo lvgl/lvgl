@@ -1,9 +1,6 @@
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/demos/lv_demos.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/examples/examples.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/core/lv_core.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/draw/lv_draw.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/extra/extra.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/font/lv_font.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/hal/lv_hal.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/misc/lv_misc.mk
-include $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/widgets/lv_widgets.mk
+LVGL_PATH ?= ${shell pwd}/lvgl
+
+CSRCS += $(shell find $(LVGL_PATH)/src -type f -name '*.c')
+CSRCS += $(shell find $(LVGL_PATH)/demos -type f -name '*.c')
+CSRCS += $(shell find $(LVGL_PATH)/examples -type f -name '*.c')
+CFLAGS += "-I$(LVGL_PATH)"

@@ -105,7 +105,7 @@ void test_arc_should_update_angles_when_changing_to_symmetrical_mode_value_more_
 /* See #2522 for more information */
 void test_arc_angles_when_reversed(void)
 {
-    uint16_t expected_start_angle = 36;
+    uint16_t expected_start_angle = 54;
     uint16_t expected_end_angle = 90;
     int16_t expected_value = 40;
 
@@ -129,7 +129,7 @@ void test_arc_click_area_with_adv_hittest(void)
     lv_obj_set_size(arc, 100, 100);
     lv_obj_set_style_arc_width(arc, 10, 0);
     lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
     lv_obj_set_ext_click_area(arc, 5);
 
     /*No click detected at the middle*/

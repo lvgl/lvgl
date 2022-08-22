@@ -7,12 +7,12 @@ td {
   text-align:center;
 }
 span.pre
-{  
+{
   padding-right:8px;
 }
 
 span.pre:first-child
-{  
+{
   padding-right:0px;
 }
 
@@ -26,18 +26,18 @@ code.sig-name
     display: block;
     clear: both;
     cursor: pointer;
-    font-weight: bold; 
+    font-weight: bold;
 }
 
 .toggle .header:before {
    font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
-   content: "\f0da \00a0 Show "; 
+   content: "\f0da \00a0 Show ";
    display: inline-block;
    font-size: 1.1em;
 }
 
 .toggle .header.open:before {
-   content: "\f0d7 \00a0 Hide "; 
+   content: "\f0d7 \00a0 Hide ";
 }
 
 .header p {
@@ -56,7 +56,7 @@ code.sig-name
 
 
 .home-img {
-  width:32%; 
+  width:32%;
   transition: transform .3s ease-out;
 }
 
@@ -110,4 +110,24 @@ code.sig-name
 
 .lv-example-link-button:visited {
     color: white;
+}
+
+dl.cpp.unexpanded dd {
+    display: none;
+}
+
+.lv-api-expansion-button {
+    padding: 4px;
+}
+.lv-api-expansion-button::before {
+    font-family: FontAwesome, "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+    display: inline-block;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+.unexpanded .lv-api-expansion-button::before {
+    content: "\f0da \00a0";
+}
+.expanded .lv-api-expansion-button::before {
+    content: "\f0d7 \00a0";
 }
