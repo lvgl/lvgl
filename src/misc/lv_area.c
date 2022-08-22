@@ -326,7 +326,7 @@ bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b)
 
 /**
  * Align an area to an other
- * @param base an are where the other will be aligned
+ * @param base an area where the other will be aligned
  * @param to_align the area to align
  * @param align `LV_ALIGN_...`
  * @param res x/y coordinates where `to_align` align area should be placed

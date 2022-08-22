@@ -88,7 +88,7 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period
 }
 
 /**
- * Create an "empty" timer. It needs to initialized with at least
+ * Create an "empty" timer. It needs to be initialized with at least
  * `lv_timer_set_cb` and `lv_timer_set_period`
  * @return pointer to the created timer
  */
@@ -120,7 +120,7 @@ void lv_timer_pause(lv_timer_t * timer);
 void lv_timer_resume(lv_timer_t * timer);
 
 /**
- * Set the callback the timer (the function to call periodically)
+ * Set the callback to the timer (the function to call periodically)
  * @param timer pointer to a timer
  * @param timer_cb the function to call periodically
  */
