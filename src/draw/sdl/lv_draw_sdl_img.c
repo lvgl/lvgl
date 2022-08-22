@@ -390,7 +390,10 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
         SDL_Texture * old_target = SDL_GetRenderTarget(ctx->renderer);
         SDL_SetRenderTarget(ctx->renderer, img_frag);
         SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 0);
-        SDL_RenderClear(ctx->renderer);
+        /* SDL_RenderClear is not working properly, so we overwrite the target with solid color */
+        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_NONE);
+        SDL_RenderFillRect(ctx->renderer, NULL);
+        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
 
         lv_area_t coords = {0, 0, w - 1, h - 1}, clip;
         lv_area_t frag_coords = {0, 0, full_frag_size - 1, full_frag_size - 1};
