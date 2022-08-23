@@ -126,7 +126,10 @@ static SDL_Texture * line_texture_create(lv_draw_sdl_ctx_t * sdl_ctx, const lv_d
     SDL_SetRenderTarget(sdl_ctx->renderer, texture);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(sdl_ctx->renderer, 0xFF, 0xFF, 0xFF, 0x0);
-    SDL_RenderClear(sdl_ctx->renderer);
+    /* SDL_RenderClear is not working properly, so we overwrite the target with solid color */
+    SDL_SetRenderDrawBlendMode(sdl_ctx->renderer, SDL_BLENDMODE_NONE);
+    SDL_RenderFillRect(sdl_ctx->renderer, NULL);
+    SDL_SetRenderDrawBlendMode(sdl_ctx->renderer, SDL_BLENDMODE_BLEND);
     SDL_SetRenderDrawColor(sdl_ctx->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_Rect line_rect = {1 + dsc->width / 2, 1, length, dsc->width};
     SDL_RenderFillRect(sdl_ctx->renderer, &line_rect);

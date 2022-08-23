@@ -139,10 +139,30 @@ static inline uint8_t lv_obj_get_style_flex_grow(const lv_obj_t * obj, uint32_t 
     return (uint8_t)v.num;
 }
 
-
 /**********************
  *      MACROS
  **********************/
+
+#define LV_STYLE_CONST_FLEX_FLOW(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_FLOW, .value = { .num = (lv_flex_flow_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_MAIN_PLACE(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_MAIN_PLACE, .value = { .num = (lv_flex_flow_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_TRACK_PLACE(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_TRACK_PLACE, .value = { .num = (lv_flex_flow_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_CROSS_PLACE(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_CROSS_PLACE, .value = { .num = (lv_flex_flow_t)val } \
+    }
+
 
 #endif  /*LV_USE_FLEX*/
 

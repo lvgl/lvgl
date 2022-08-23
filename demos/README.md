@@ -57,7 +57,7 @@ Shows how the widgets look like out of the box using the built-in material theme
 
 See in [widgets](https://github.com/lvgl/lvgl/tree/master/demos/widgets) folder.
 
-<img src="https://github.com/lvgl/lvgl/tree/master/demos/widgets/screenshot1.png?raw=true" width=600px alt="Basic demo to show the widgets of LVGL">
+![Basic demo to show the widgets of LVGL](widgets/screenshot1.png)
 
 For running this demo properly, please make sure **LV_MEM_SIZE** is at least **38KB** (and **48KB** is recommended):
 
@@ -72,7 +72,7 @@ The music player demo shows what kind of modern, smartphone-like user interfaces
 
 See in [music](https://github.com/lvgl/lvgl/tree/master/demos/music) folder.
 
-<img src="https://github.com/lvgl/lvgl/tree/master/demos/music/screenshot1.gif?raw=true" width=600px alt="Music player demo with LVGL">
+![Music player demo with LVGL](music/screenshot1.gif)
 
 ### Keypad and encoder
 LVGL allows you to control the widgets with a keypad and/or encoder without a touchpad. This demo shows how to handle buttons, drop-down lists, rollers, sliders, switches, and text inputs without touchpad.
@@ -80,17 +80,17 @@ Learn more about the touchpad-less usage of LVGL [here](https://docs.lvgl.io/mas
 
 See in [keypad_encoder](https://github.com/lvgl/lvgl/tree/master/demos/keypad_encoder) folder.
 
-<img src="https://github.com/lvgl/lvgl/tree/master/demos/keypad_encoder/screenshot1.png?raw=true" width=600px alt="Keypad and encoder navigation in LVGL embedded GUI library">
+![Keypad and encoder navigation in LVGL embedded GUI library](keypad_encoder/screenshot1.png)
 
 ### Benchmark
 A demo to measure the performance of LVGL or to compare different settings.
 See in [benchmark](https://github.com/lvgl/lvgl/tree/master/demos/benchmark) folder.
-<img src="https://github.com/lvgl/lvgl/tree/master/demos/benchmark/screenshot1.png?raw=true" width=600px alt="Benchmark demo with LVGL embedded GUI library">
+![Benchmark demo with LVGL embedded GUI library](benchmark/screenshot1.png)
 
 ### Stress
 A stress test for LVGL. It contains a lot of object creation, deletion, animations, style usage, and so on. It can be used if there is any memory corruption during heavy usage or any memory leaks.
 See in [stress](https://github.com/lvgl/lvgl/tree/master/demos/stress) folder.
-<img src="https://github.com/lvgl/lvgl/tree/master/demos/stress/screenshot1.png?raw=true" width=600px alt="Stress test for LVGL">
+![Stress test for LVGL](stress/screenshot1.png)
 
 ## Contributing
 For contribution and coding style guidelines, please refer to the file docs/CONTRIBUTING.md in the main LVGL repo:

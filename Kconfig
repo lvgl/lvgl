@@ -290,6 +290,11 @@ menu "LVGL configuration"
                     Use printf for log output.
                     If not set the user needs to register a callback with `lv_log_register_print_cb`.
 
+            config LV_LOG_USE_TIMESTAMP
+                bool "Enable print timestamp"
+                default y
+                depends on LV_USE_LOG
+
             config LV_LOG_TRACE_MEM
                 bool "Enable/Disable LV_LOG_TRACE in mem module"
                 default y

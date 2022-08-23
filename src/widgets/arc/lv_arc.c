@@ -318,6 +318,12 @@ lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj)
     return ((lv_arc_t *) obj)->type;
 }
 
+int16_t lv_arc_get_rotation(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    return ((lv_arc_t *)obj)->rotation;
+}
+
 /*=====================
  * Other functions
  *====================*/

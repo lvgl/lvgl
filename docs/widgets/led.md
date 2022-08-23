@@ -40,7 +40,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/led/index.rst
+.. include:: ../../examples/widgets/led/index.rst
 
 ```
 

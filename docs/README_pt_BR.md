@@ -3,7 +3,14 @@ A última versão estável está disponível na branch [release/v8.3](https://gi
 
 ---
 
-<p align="right"><a href="../README.md">English</a> | <a href="./README_zh.md">中文</a> | <b>Português do Brasil</b> | <a href="./README_jp.md">日本語</a></p>
+<a href="https://opencollective.com/lvgl" target="_blank"><img align="left" src="https://lvgl.io/assets/images/sponsor.png" height="32px"></a>
+
+<p align="right">
+  <a href="../README.md">English</a> |
+  <a href="./README_zh.md">中文</a> |
+  <b>Português do Brasil</b> |
+  <a href="./README_jp.md">日本語</a>
+</p>
 
 <p align="center">
   <img src="https://lvgl.io/assets/images/logo_lvgl.png">
@@ -51,7 +58,7 @@ Nossa equipe está pronta para ajudá-lo com design gráfico, implementação de
 
   - Uma biblioteca C totalmente portátil (compatível com C++) sem dependências externas.
   - Pode ser compilado para qualquer display MCU ou MPU, e qualquer sistema operacional de tempo real (RT-OS).
-  - Suporta monitores monocromáticos, ePaper, OLED ou TFT.
+  - Suporta monitores monocromáticos, ePaper, OLED ou TFT. [Guia de portabilidade](https://docs.lvgl.io/master/porting/project.html)
   - Distribuído sob a licença do MIT, para que você também possa usá-lo facilmente em projetos comerciais.
   - Precisa de apenas 32 kB de RAM e 128 kB de Flash, um frame buffer e pelo menos uma tela de tamanho 1/10 para renderização.
   - Sistemas operacionais, memória externa e GPU são suportados, mas não obrigatórios.
@@ -67,12 +74,12 @@ Nossa equipe está pronta para ajudá-lo com design gráfico, implementação de
   - Suporta mouse, touchpad, teclado, botões externos, dispositivos de entrada codificadores (encoders).
   - Suporta vários monitores.
   
-**Suporte de vinculação e compilação de arquivos**
+**Suporte de vinculação (binding) e compilação de arquivos**
 
-  - Expondo a API do LVGL com o [Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
+  - Exposição da API do LVGL com o [Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
   - Nenhum sistema de compilação personalizado é usado. Você pode construir o LVGL enquanto constrói os outros arquivos do seu projeto.
-  - O suporte para Make e CMake já vem incluído.
-  - Desenvolva no PC e use o mesmo código de interface do usuário em hardwares incorporados (embedded hardware).
+  - O suporte para Make e [CMake](https://docs.lvgl.io/master/get-started/platforms/cmake.html) já vem incluído.
+  - [Desenvolva no PC](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) e use o mesmo código de interface do usuário em hardwares incorporados (embedded hardware).
   - Converta o código C para um arquivo HTML com o [Emscripten port](https://github.com/lvgl/lv_web_emscripten).
 
 **Documentação, ferramentas e serviços**
@@ -80,6 +87,25 @@ Nossa equipe está pronta para ajudá-lo com design gráfico, implementação de
   - Documentação detalhada com [+100 exemplos simples](https://docs.lvgl.io/master/index.html)
   - [SquareLine Studio](https://squareline.io) - Um software editor UI profissional e fácil de usar, para acelerar e simplificar o desenvolvimento da interface do usuário.
   - [Serviços](https://lvgl.io/services) como design de UI, implementação e consultoria para tornar o desenvolvimento de UI mais simples e rápido.
+
+## :heart: Patrocinador
+
+Se o LVGL economizou muito tempo e dinheiro ou você apenas se divertiu ao usá-lo, considere Apoiar o desenvolvimento.
+
+**Como e com o que utilizamos os recursos doados?**
+Nosso objetivo é fornecer compensação financeira para as pessoas que mais fazem pelo LVGL. Isso significa que não apenas os mantenedores, mas qualquer pessoa que implemente um ótimo recurso deve receber um pagamento com o dinheiro acumulado. Usamos as doações para cobrir nossos custos operacionais, como servidores e serviços relacionados.
+
+**Como doar?**
+Usamos o [Open Collective](https://opencollective.com/lvgl), onde você pode enviar facilmente doações únicas ou recorrentes. Você também pode ver todas as nossas despesas de forma transparente.
+
+**Como receber o pagamento de sua contribuição?**
+Se alguém implementar ou corrigir um problema rotulado como [Patrocinado](https://github.com/lvgl/lvgl/labels/Sponsored), essa pessoa receberá um pagamento por esse trabalho. Estimamos o tempo necessário, a complexidade e a importância da questão e definimos um preço de acordo. Para entrar, apenas comente sobre um problema patrocinado dizendo "Olá, gostaria de lidar com isso. É assim que estou planejando corrigi-lo/implementá-lo...". Um trabalho é considerado pronto quando é aprovado e mesclado por um mantenedor. Depois disso, você pode enviar uma "despesa" (expense) pela plataforma [opencollective.com](https://opencollective.com/lvgl) e então receberá o pagamento em alguns dias.
+
+**Organizações que apoiam o projeto LVGL**<br>
+[![Patrocinadores do LVGL](https://opencollective.com/lvgl/organizations.svg?width=600)](https://opencollective.com/lvgl)
+
+**Pessoas que apoiam o projeto LVGL**<br>
+[![Backers of LVGL](https://opencollective.com/lvgl/individuals.svg?width=600)](https://opencollective.com/lvgl)
 
 ## :package: Pacotes 
 

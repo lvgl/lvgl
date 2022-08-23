@@ -32,7 +32,7 @@ Learn more about [Keys](/overview/indev).
 ## Example
 ```eval_rst
 
-.. include:: ../../../examples/widgets/btn/index.rst
+.. include:: ../../examples/widgets/btn/index.rst
 
 ```
 
