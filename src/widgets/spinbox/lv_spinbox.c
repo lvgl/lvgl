@@ -272,21 +272,28 @@ void lv_spinbox_increment(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    if(spinbox->value + spinbox->step <= spinbox->range_max) {
-        /*Special mode when zero crossing*/
-        if((spinbox->value + spinbox->step) > 0 && spinbox->value < 0) spinbox->value = -spinbox->value;
-        spinbox->value += spinbox->step;
+    int32_t v = spinbox->value;
+    /* Special mode when zero crossing. E.g -3+10 should be 3, not 7.
+     * Pretend we are on -7 now.*/
+    if((spinbox->value < 0) && (spinbox->value + spinbox->step) > 0) {
+        v = -(spinbox->step + spinbox->value);
+    }
 
+    if(v + spinbox->step <= spinbox->range_max) {
+        v += spinbox->step;
     }
     else {
-        // Rollover?
+        /*Rollover?*/
         if((spinbox->rollover) && (spinbox->value == spinbox->range_max))
-            spinbox->value = spinbox->range_min;
+            v = spinbox->range_min;
         else
-            spinbox->value = spinbox->range_max;
+            v = spinbox->range_max;
     }
 
-    lv_spinbox_updatevalue(obj);
+    if(v != spinbox->value) {
+        spinbox->value = v;
+        lv_spinbox_updatevalue(obj);
+    }
 }
 
 /**
@@ -298,20 +305,28 @@ void lv_spinbox_decrement(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    if(spinbox->value - spinbox->step >= spinbox->range_min) {
-        /*Special mode when zero crossing*/
-        if((spinbox->value - spinbox->step) < 0 && spinbox->value > 0) spinbox->value = -spinbox->value;
-        spinbox->value -= spinbox->step;
+    int32_t v = spinbox->value;
+    /* Special mode when zero crossing. E.g 3-10 should be -3, not -7.
+     * Pretend we are on 7 now.*/
+    if((spinbox->value > 0) && (spinbox->value - spinbox->step) < 0) {
+        v = spinbox->step - spinbox->value;
+    }
+
+    if(v - spinbox->step >= spinbox->range_min) {
+        v -= spinbox->step;
     }
     else {
         /*Rollover?*/
         if((spinbox->rollover) && (spinbox->value == spinbox->range_min))
-            spinbox->value = spinbox->range_max;
+            v = spinbox->range_max;
         else
-            spinbox->value = spinbox->range_min;
+            v = spinbox->range_min;
     }
 
-    lv_spinbox_updatevalue(obj);
+    if(v != spinbox->value) {
+        spinbox->value = v;
+        lv_spinbox_updatevalue(obj);
+    }
 }
 
 /**********************
