@@ -135,12 +135,12 @@ Now, Rlottie is available as a component in the IDF, but it requires some additi
 ## Rlottie patch file
 Rlottie relies on a dynamic linking for an image loader lib. This needs to be disabled as the IDF doesn't play nice with dynamic linking.
 
-A patch file is available in lvgl as: /src/libs/rlottie/esp-idf-compilation/0001-changes-to-compile-with-esp-idf.patch
+A patch file is available in lvgl uner: /env_support/esp/rlottie/0001-changes-to-compile-with-esp-idf.patch
 
 Apply the patch file to your rlottie submodule.
 
 ## CMakeLists for IDF
-An example CMakeLists file has been provided at /src/libs/rlottie/esp-idf-compilation/CMakeLists.txt
+An example CMakeLists file has been provided at /env_support/esp/rlottie/CMakeLists.txt
 
 Copy this CMakeLists file to 'your-project-directory'/components/rlottie/
 
