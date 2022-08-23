@@ -123,7 +123,6 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     img.header.w = lv_area_get_width(draw_ctx->buf_area);
     img.header.h = lv_area_get_height(draw_ctx->buf_area);
     img.header.cf = layer_sw_ctx->has_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
-    lv_img_cache_invalidate_src(&img);
 
     /*Restore the original draw_ctx*/
     draw_ctx->buf = layer_ctx->original.buf;
@@ -135,6 +134,7 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     /*Blend the layer*/
     lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, &img);
     lv_draw_wait_for_finish(draw_ctx);
+    lv_img_cache_invalidate_src(&img);
 }
 
 void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx)
