@@ -16,6 +16,8 @@
  *      DEFINES
  *********************/
 #define MY_CLASS    &lv_spinbox_class
+#define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 8U)
+#define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 4U)
 
 /**********************
  *      TYPEDEFS
@@ -446,9 +448,9 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
 {
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
-    lv_memzero(buf, sizeof(buf));
-    char * buf_p = buf;
+    /* LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES (18): Max possible digit_count value (15) + sign + decimal point + NULL terminator */
+    char textarea_txt[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES] = {0U};
+    char * buf_p = textarea_txt;
 
     uint8_t cur_shift_left = 0;
     if(spinbox->range_min < 0) {  // hide sign if there are only positive values
@@ -461,32 +463,34 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         cur_shift_left++;
     }
 
-    char digits[LV_SPINBOX_MAX_DIGIT_COUNT + 4];
     /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
-    lv_snprintf(digits, sizeof(digits), "%" LV_PRId32, LV_ABS(spinbox->value));
+    char digits[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES];
+    lv_snprintf(digits, LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES, "%" LV_PRId32, LV_ABS(spinbox->value));
 
     /*Add leading zeros*/
     int32_t i;
-    int lz_cnt = spinbox->digit_count - (int)strlen(digits);
-    if(lz_cnt > 0) {
-        for(i = (uint16_t)strlen(digits); i >= 0; i--) {
-            digits[i + lz_cnt] = digits[i];
+    const int digits_len = (int)strlen(digits);
+
+    const int leading_zeros_cnt = spinbox->digit_count - digits_len;
+    if(leading_zeros_cnt) {
+        for(i = (uint16_t) digits_len; i >= 0; i--) {
+            digits[i + leading_zeros_cnt] = digits[i];
         }
-        for(i = 0; i < lz_cnt; i++) {
+        /* NOTE: Substitute with memset? */
+        for(i = 0; i < leading_zeros_cnt; i++) {
             digits[i] = '0';
         }
     }
 
-    int32_t intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
-
     /*Add the decimal part*/
+    const int32_t intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
     for(i = 0; i < intDigits && digits[i] != '\0'; i++) {
         (*buf_p) = digits[i];
         buf_p++;
     }
 
-    if(spinbox->dec_point_pos != 0) {
-        /*Insert the decimal point*/
+    /*Insert the decimal point*/
+    if(spinbox->dec_point_pos) {
         (*buf_p) = '.';
         buf_p++;
 
@@ -497,7 +501,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     }
 
     /*Refresh the text*/
-    lv_textarea_set_text(obj, (char *)buf);
+    lv_textarea_set_text(obj, (char *)textarea_txt);
 
     /*Set the cursor position*/
     int32_t step = spinbox->step;
