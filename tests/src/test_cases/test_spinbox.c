@@ -214,6 +214,63 @@ void test_spinbox_event_key_encoder_indev_turn_left(void)
     TEST_ASSERT_EQUAL(value - 1, lv_spinbox_get_value(spinbox_events));
 }
 
+void test_spinbox_event_key_encoder_indev_editing_group(void)
+{
+    int32_t value = 10;
+    /* Setup group and encoder indev */
+    lv_spinbox_set_range(spinbox_events, 0, 20);
+    lv_group_add_obj(g, spinbox_events);
+    lv_group_set_editing(g, true);
+
+    lv_spinbox_set_value(spinbox_events, value);
+    lv_spinbox_set_cursor_pos(spinbox_events, 0);
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(-1);
+    TEST_ASSERT_EQUAL(0, lv_spinbox_get_value(spinbox_events));
+    /* digit_count is 5, so we expect to be in the position of the MSB digit */
+    TEST_ASSERT_EQUAL(1000, lv_spinbox_get_step(spinbox_events));
+
+    /* Test with digit_count == 1 */
+    lv_spinbox_set_digit_format(spinbox_events, 1, 2);
+    lv_spinbox_set_cursor_pos(spinbox_events, 0);
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(-1);
+    TEST_ASSERT_EQUAL(0, lv_spinbox_get_value(spinbox_events));
+    /* digit_count is 1, so we expect to be in the same position */
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(spinbox_events));
+}
+
+void test_spinbox_event_key_encoder_indev_editing_group_left_step_direction(void)
+{
+    int32_t value = 10;
+    /* Setup group and encoder indev */
+    lv_spinbox_set_digit_step_direction(spinbox_events, LV_DIR_LEFT);
+    lv_spinbox_set_range(spinbox_events, 0, 20);
+    lv_group_add_obj(g, spinbox_events);
+    lv_group_set_editing(g, true);
+
+    lv_spinbox_set_value(spinbox_events, value);
+    lv_spinbox_set_cursor_pos(spinbox_events, 0);
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(-1);
+    TEST_ASSERT_EQUAL(0, lv_spinbox_get_value(spinbox_events));
+    /* digit_count is 5, we expect to be in the position next to the left */
+    TEST_ASSERT_EQUAL(10, lv_spinbox_get_step(spinbox_events));
+
+    /* Test with digit_count == 1 */
+    lv_spinbox_set_digit_format(spinbox_events, 2, 2);
+    lv_spinbox_set_cursor_pos(spinbox_events, 1);
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(-1);
+    TEST_ASSERT_EQUAL(0, lv_spinbox_get_value(spinbox_events));
+    /* digit_count is 1, so we expect to be in the same position */
+    TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(spinbox_events));
+}
+
 void test_spinbox_event_release(void)
 {
     lv_spinbox_set_value(spinbox_events, 0);
