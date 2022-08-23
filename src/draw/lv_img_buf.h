@@ -34,9 +34,9 @@ extern "C" {
 #define LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
 
 /*+ 1: to be sure no fractional row*/
-#define LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h) ((((w / 8) + 1) * h))
-#define LV_IMG_BUF_SIZE_ALPHA_2BIT(w, h) ((((w / 4) + 1) * h))
-#define LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h) ((((w / 2) + 1) * h))
+#define LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h) ((((w + 7) / 8) * h))
+#define LV_IMG_BUF_SIZE_ALPHA_2BIT(w, h) ((((w + 3) / 4) * h))
+#define LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h) ((((w + 1 ) / 2) * h))
 #define LV_IMG_BUF_SIZE_ALPHA_8BIT(w, h) ((w * h))
 
 /*4 * X: for palette*/
