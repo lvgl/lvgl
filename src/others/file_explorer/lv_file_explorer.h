@@ -133,7 +133,7 @@ lv_obj_t * lv_file_explorer_get_head(lv_obj_t * obj);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer path obj(label)
  */
-lv_obj_t * lv_file_explorer_get_path_obj(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
 /**
