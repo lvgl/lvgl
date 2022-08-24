@@ -1,9 +1,11 @@
+import math
+
 CANVAS_WIDTH   = 50
 CANVAS_HEIGHT  = 50
 LV_COLOR_CHROMA_KEY = lv.color_hex(0x00ff00)
 
 def LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h):
-    return int(((w / 8) + 1) * h)
+    return int(math.floor((w + 7) / 8 ) * h)
 
 def LV_IMG_BUF_SIZE_INDEXED_1BIT(w, h):
     return LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h) + 4 * 2
