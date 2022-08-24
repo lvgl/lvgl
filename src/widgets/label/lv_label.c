@@ -846,6 +846,31 @@ static void draw_main(lv_event_t * e)
     draw_ctx->clip_area = clip_area_ori;
 }
 
+static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_label_long_mode_t mode)
+{
+    switch(mode) {
+        case LV_LABEL_LONG_SCROLL:
+            /** If the dest animation is already running, overwrite is not allowed */
+            if(dest->act_time <= 0)
+                dest->act_time = src->act_time;
+            dest->repeat_cnt = src->repeat_cnt;
+            dest->repeat_delay = src->repeat_delay;
+            dest->ready_cb = src->ready_cb;
+            dest->playback_delay = src->playback_delay;
+            break;
+        case LV_LABEL_LONG_SCROLL_CIRCULAR:
+            /** If the dest animation is already running, overwrite is not allowed */
+            if(dest->act_time <= 0)
+                dest->act_time = src->act_time;
+            dest->repeat_cnt = src->repeat_cnt;
+            dest->repeat_delay = src->repeat_delay;
+            dest->ready_cb = src->ready_cb;
+            break;
+        default:
+            break;
+    }
+}
+
 /**
  * Refresh the label with its text stored in its extended data
  * @param label pointer to a label object
@@ -879,6 +904,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
     /*In scroll mode start an offset animation*/
     if(label->long_mode == LV_LABEL_LONG_SCROLL) {
+        const lv_anim_t * anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
         uint16_t anim_speed = lv_obj_get_style_anim_speed(obj, LV_PART_MAIN);
         if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
@@ -936,6 +962,10 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
             lv_anim_set_playback_time(&a, a.time);
+
+            /*If a template animation exists, overwrite some property*/
+            if(anim_template)
+                overwrite_anim_property(&a, anim_template, label->long_mode);
             lv_anim_start(&a);
             hor_anim = true;
         }
@@ -971,6 +1001,10 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             lv_anim_set_time(&a, lv_anim_speed_to_time(anim_speed, a.start_value, a.end_value));
             lv_anim_set_playback_time(&a, a.time);
+
+            /*If a template animation exists, overwrite some property*/
+            if(anim_template)
+                overwrite_anim_property(&a, anim_template, label->long_mode);
             lv_anim_start(&a);
         }
         else {
@@ -1017,10 +1051,9 @@ static void lv_label_refr_text(lv_obj_t * obj)
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
 
-            /*If a template animation exists, consider it's start delay and repeat delay*/
+            /*If a template animation exists, overwrite some property*/
             if(anim_template) {
-                a.act_time = anim_template->act_time;
-                a.repeat_delay = anim_template->repeat_delay;
+                overwrite_anim_property(&a, anim_template, label->long_mode);
             }
             else if(act_time < a.time) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
@@ -1044,10 +1077,9 @@ static void lv_label_refr_text(lv_obj_t * obj)
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
 
-            /*If a template animation exists, consider it's start delay and repeat delay*/
+            /*If a template animation exists, overwrite some property*/
             if(anim_template) {
-                a.act_time = anim_template->act_time;
-                a.repeat_delay = anim_template->repeat_delay;
+                overwrite_anim_property(&a, anim_template, label->long_mode);
             }
             else if(act_time < a.time) {
                 a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
