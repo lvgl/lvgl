@@ -552,7 +552,7 @@ static void browser_file_event_handler(lv_event_t * e)
         uint16_t row;
         uint16_t col;
 
-        memset(file_name, 0, sizeof(file_name));
+        lv_memzero(file_name, sizeof(file_name));
         lv_table_get_selected_cell(explorer->file_table, &row, &col);
         str_fn = lv_table_get_cell_value(explorer->file_table, row, col);
 
