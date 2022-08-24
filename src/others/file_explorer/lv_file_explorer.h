@@ -112,7 +112,7 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer selected file
  */
-const char * lv_file_explorer_get_sel_fn(lv_obj_t * obj);
+const char * lv_file_explorer_get_selected_fn(lv_obj_t * obj);
 
 /**
  * Get file explorer cur path
