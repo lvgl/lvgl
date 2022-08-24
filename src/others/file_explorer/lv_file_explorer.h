@@ -175,7 +175,7 @@ lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj);
  * @param obj   pointer to a file explorer object
  * @param dir   pointer to the path
  */
-void lv_file_explorer_open_dir(lv_obj_t * obj, char * dir);
+void lv_file_explorer_open_dir(lv_obj_t * obj, const char * dir);
 
 /**********************
  *      MACROS
