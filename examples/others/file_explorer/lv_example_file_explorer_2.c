@@ -52,8 +52,8 @@ static void dd_event_handler(lv_event_t * e)
             LV_LOG_USER("111111111");
             lv_file_explorer_set_sort(fe_quick_access_obj, LV_EXPLORER_SORT_NONE);
         }
-        else if(strcmp(buf, "KIND") == 0){
-             LV_LOG_USER("2222222");
+        else if(strcmp(buf, "KIND") == 0) {
+            LV_LOG_USER("2222222");
             lv_file_explorer_set_sort(fe_quick_access_obj, LV_EXPLORER_SORT_KIND);
         }
     }
@@ -107,7 +107,7 @@ void lv_example_file_explorer_2(void)
 
     /*Sort control*/
     static const char * opts = "NONE\n"
-                               "KIND";       
+                               "KIND";
 
     lv_obj_t * dd = lv_dropdown_create(fe_header_obj);
     lv_obj_set_style_radius(dd, 4, 0);

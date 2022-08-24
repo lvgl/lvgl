@@ -322,7 +322,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_table_set_col_width(explorer->file_table, 0, LV_PCT(100));
     lv_table_set_col_cnt(explorer->file_table, 1);
     lv_obj_add_event_cb(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
-    
+
     /*only scroll up and down*/
     lv_obj_set_scroll_dir(explorer->file_table, LV_DIR_TOP | LV_DIR_BOTTOM);
 
@@ -509,7 +509,7 @@ static void browser_file_event_handler(lv_event_t * e)
         if((strcmp(str_fn, "..") == 0) && (strlen(explorer->current_path) > 3)) {
             strip_ext(explorer->current_path);
             /*Remove the last '/' character*/
-            strip_ext(explorer->current_path); 
+            strip_ext(explorer->current_path);
             lv_snprintf_builtin((char *)file_name, sizeof(file_name), "%s", explorer->current_path);
         }
         else {
