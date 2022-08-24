@@ -35,7 +35,7 @@ static void browser_file_event_handler(lv_event_t * e);
 #endif
 
 static void init_style(lv_obj_t * obj);
-static void show_dir(lv_obj_t * obj, char * path);
+static void show_dir(lv_obj_t * obj, const char * path);
 static void strip_ext(char * dir);
 static void file_explorer_sort(lv_obj_t * obj);
 static void sort_table_items(lv_obj_t * tb, int16_t lo, int16_t hi);
@@ -539,7 +539,7 @@ static void browser_file_event_handler(lv_event_t * e)
 }
 
 
-static void show_dir(lv_obj_t * obj, char * path)
+static void show_dir(lv_obj_t * obj, const char * path)
 {
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
