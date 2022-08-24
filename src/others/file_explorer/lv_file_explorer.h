@@ -119,7 +119,7 @@ const char * lv_file_explorer_get_selected_fn(lv_obj_t * obj);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer cur path
  */
-char * lv_file_explorer_get_cur_path(lv_obj_t * obj);
+char * lv_file_explorer_get_current_path(lv_obj_t * obj);
 
 /**
  * Get file explorer head area obj
