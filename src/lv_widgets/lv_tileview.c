@@ -221,7 +221,13 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
         }
     }
 
-    if(valid == false) return; /*Don't load not valid tiles*/
+    if(valid == false)  /*if not valid tiles, load the last valid tiles*/
+    {
+        x = (x < ext->valid_pos[0].x) ? ext->valid_pos[0].x : x;
+        x = (x > ext->valid_pos[ext->valid_pos_cnt-1].x) ? ext->valid_pos[ext->valid_pos_cnt-1].x : x;
+        y = (y < ext->valid_pos[0].y) ? ext->valid_pos[0].y : y;
+        y = (y > ext->valid_pos[ext->valid_pos_cnt-1].y) ? ext->valid_pos[ext->valid_pos_cnt-1].y : y;
+    }
 
     ext->act_id.x = x;
     ext->act_id.y = y;
