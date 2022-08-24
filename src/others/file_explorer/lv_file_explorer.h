@@ -37,7 +37,6 @@ typedef enum {
     LV_EXPLORER_PICTURES_DIR,
     LV_EXPLORER_VIDEO_DIR,
     LV_EXPLORER_DOCS_DIR,
-    LV_EXPLORER_MNT_DIR,
     LV_EXPLORER_FS_DIR,
 } lv_file_explorer_dir_t;
 #endif
@@ -49,7 +48,6 @@ typedef struct {
     lv_obj_t * head_area;
     lv_obj_t * browser_area;
     lv_obj_t * file_table;
-    lv_obj_t * quick_access_ctrl_btn;
     lv_obj_t * path_label;
 #if LV_FILE_EXPLORER_QUICK_ACCESS
     lv_obj_t * quick_access_area;
@@ -60,9 +58,10 @@ typedef struct {
     char * pictures_dir;
     char * video_dir;
     char * docs_dir;
+    char * fs_dir;
 #endif
-    const char * sel_fp;
-    char   cur_path[LV_FILE_EXPLORER_PATH_MAX_LEN];
+    const char * sel_fn;
+    char   current_path[LV_FILE_EXPLORER_PATH_MAX_LEN];
     lv_file_explorer_sort_t sort;
 } lv_file_explorer_t;
 
@@ -86,13 +85,6 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent);
  * @param dir   the dir from 'lv_file_explorer_dir_t' enum.
  */
 void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, char * path);
-
-/**
- * Set file_explorer quick access state
- * @param obj   pointer to a label object
- * @param state true:display, false: hide
- */
-void lv_file_explorer_set_quick_access_state(lv_obj_t * obj, bool state);
 #endif
 
 
@@ -119,30 +111,30 @@ const char * lv_file_explorer_get_selected_fn(lv_obj_t * obj);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer cur path
  */
-char * lv_file_explorer_get_current_path(lv_obj_t * obj);
+const char * lv_file_explorer_get_current_path(lv_obj_t * obj);
 
 /**
  * Get file explorer head area obj
  * @param obj   pointer to a file explorer object
- * @return      pointer to the file explorer head area obj
+ * @return      pointer to the file explorer head area obj(lv_obj)
  */
 lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj);
 
 /**
+ * Get file explorer head area obj
+ * @param obj   pointer to a file explorer object
+ * @return      pointer to the file explorer quick access area obj(lv_obj)
+ */
+lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj);
+
+/**
  * Get file explorer path obj(label)
  * @param obj   pointer to a file explorer object
- * @return      pointer to the file explorer path obj(label)
+ * @return      pointer to the file explorer path obj(lv_label)
  */
 lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
-/**
- * Get file explorer quick access ctrl btn obj(lv_btn)
- * @param obj   pointer to a file explorer object
- * @return      pointer to the file explorer quick access ctrl btn obj(lv_btn)
- */
-lv_obj_t * lv_file_explorer_get_quick_access_ctrl_btn(lv_obj_t * obj);
-
 /**
  * Get file explorer places list obj(lv_list)
  * @param obj   pointer to a file explorer object
@@ -161,7 +153,7 @@ lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj);
 /**
  * Get file explorer file list obj(lv_table)
  * @param obj   pointer to a file explorer object
- * @return      pointer to the file explorer device obj(lv_table)
+ * @return      pointer to the file explorer file table obj(lv_table)
  */
 lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj);
 
