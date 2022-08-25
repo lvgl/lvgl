@@ -1,0 +1,216 @@
+#if LV_BUILD_TEST
+#include "../lvgl.h"
+
+#include "unity/unity.h"
+
+static lv_obj_t * active_screen = NULL;
+static lv_obj_t * btnm;
+
+void setUp(void)
+{
+    active_screen = lv_scr_act();
+    btnm = lv_btnmatrix_create(active_screen);
+    TEST_ASSERT_NOT_NULL(btnm);
+}
+
+void tearDown(void)
+{
+    lv_obj_clean(active_screen);
+}
+
+void test_btn_matrix_creation(void)
+{
+    const char ** map;
+
+    /* Verify the default map. */
+    map = lv_btnmatrix_get_map(btnm);
+    TEST_ASSERT_EQUAL_STRING(map[0], "Btn1");
+    TEST_ASSERT_EQUAL_STRING(map[1], "Btn2");
+    TEST_ASSERT_EQUAL_STRING(map[2], "Btn3");
+    TEST_ASSERT_EQUAL_STRING(map[3], "\n");
+    TEST_ASSERT_EQUAL_STRING(map[4], "Btn4");
+    TEST_ASSERT_EQUAL_STRING(map[5], "Btn5");
+}
+
+void test_btn_matrix_set_map_works(void)
+{
+    const char ** ret_map;
+    static const char * exp_map[] = {"A", "B", "\n", "C", "D", ""};
+
+    lv_btnmatrix_set_map(btnm, exp_map);
+
+    /* Verify if the map was set correctly. */
+    ret_map = lv_btnmatrix_get_map(btnm);
+    TEST_ASSERT_EQUAL_STRING(exp_map[0], ret_map[0]);
+    TEST_ASSERT_EQUAL_STRING(exp_map[1], ret_map[1]);
+    TEST_ASSERT_EQUAL_STRING(exp_map[2], ret_map[2]);
+    TEST_ASSERT_EQUAL_STRING(exp_map[3], ret_map[3]);
+    TEST_ASSERT_EQUAL_STRING(exp_map[4], ret_map[4]);
+    TEST_ASSERT_EQUAL_STRING(exp_map[5], ret_map[5]);
+}
+
+void test_btn_matrix_set_ctrl_map_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    lv_btnmatrix_ctrl_t ctrl_map[4];
+    ctrl_map[0] = 1 | LV_BTNMATRIX_CTRL_DISABLED;
+    ctrl_map[1] = 1 | LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CHECKED;
+    ctrl_map[2] = 1 | LV_BTNMATRIX_CTRL_HIDDEN;
+    ctrl_map[3] = 1 | LV_BTNMATRIX_CTRL_CHECKABLE;
+    lv_btnmatrix_set_ctrl_map(btnm, ctrl_map);
+
+    /* Verify if the ctrl map was set correctly. */
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_DISABLED));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 1,
+                                               LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CHECKED));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKABLE));
+
+    /* Also checking randomly that no other flags are set. */
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_CHECKABLE));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_DISABLED));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKED));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 4, LV_BTNMATRIX_CTRL_HIDDEN));
+}
+
+void test_btn_matrix_set_btn_ctrl_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    /* Set btn control map using individual APIs. */
+    lv_btnmatrix_set_btn_ctrl(btnm, 0, 1 | LV_BTNMATRIX_CTRL_DISABLED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 1, 1 | LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 2, 1 | LV_BTNMATRIX_CTRL_HIDDEN);
+    lv_btnmatrix_set_btn_ctrl(btnm, 3, 1 | LV_BTNMATRIX_CTRL_CHECKABLE);
+
+    /* Verify if the ctrl map was set correctly. */
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_DISABLED));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 1,
+                                               LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CHECKED));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKABLE));
+
+    /* Also checking randomly that no other flags are set. */
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_CHECKABLE));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_DISABLED));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKED));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 4, LV_BTNMATRIX_CTRL_HIDDEN));
+}
+
+void test_btn_matrix_clear_btn_ctrl_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    /* Set btn control map using individual APIs. */
+    lv_btnmatrix_set_btn_ctrl(btnm, 0, 1 | LV_BTNMATRIX_CTRL_DISABLED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 1, 1 | LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 2, 1 | LV_BTNMATRIX_CTRL_HIDDEN);
+    lv_btnmatrix_set_btn_ctrl(btnm, 3, 1 | LV_BTNMATRIX_CTRL_CHECKABLE);
+
+    lv_btnmatrix_clear_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_DISABLED);
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_DISABLED));
+    lv_btnmatrix_clear_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED);
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED));
+    lv_btnmatrix_clear_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_HIDDEN);
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_HIDDEN));
+    lv_btnmatrix_clear_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKABLE);
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKABLE));
+}
+
+void test_btn_matrix_set_selected_btn_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    lv_btnmatrix_set_selected_btn(btnm, 2);
+    TEST_ASSERT_EQUAL_UINT16(2, lv_btnmatrix_get_selected_btn(btnm));
+
+    lv_btnmatrix_set_selected_btn(btnm, 0);
+    TEST_ASSERT_EQUAL_UINT16(0, lv_btnmatrix_get_selected_btn(btnm));
+
+    lv_btnmatrix_set_selected_btn(btnm, 3);
+    TEST_ASSERT_EQUAL_UINT16(3, lv_btnmatrix_get_selected_btn(btnm));
+
+    lv_btnmatrix_set_selected_btn(btnm, 1);
+    TEST_ASSERT_EQUAL_UINT16(1, lv_btnmatrix_get_selected_btn(btnm));
+}
+
+void test_btn_matrix_set_btn_ctrl_all_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_HIDDEN);
+
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_HIDDEN));
+}
+
+void test_btn_matrix_clear_btn_ctrl_all_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_HIDDEN);
+    lv_btnmatrix_clear_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_HIDDEN);
+
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_HIDDEN));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_HIDDEN));
+}
+
+void test_btn_matrix_set_btn_width_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    lv_btnmatrix_set_btn_width(btnm, 1, 3);
+    lv_btnmatrix_set_btn_width(btnm, 2, 2);
+
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 1, 3));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 2, 2));
+}
+
+void test_btn_matrix_set_one_checked_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_one_checked(btnm, true);
+
+    lv_btnmatrix_set_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKED);
+
+    TEST_ASSERT_TRUE(lv_btnmatrix_get_one_checked(btnm));
+
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_CHECKED));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED));
+    TEST_ASSERT_FALSE(lv_btnmatrix_has_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_CHECKED));
+    TEST_ASSERT_TRUE(lv_btnmatrix_has_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKED));
+}
+
+void test_btn_matrix_get_btn_text_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+
+    const char * lv_btnmatrix_get_btn_text(const lv_obj_t * obj, uint16_t btn_id);
+
+    TEST_ASSERT_EQUAL_STRING("A", lv_btnmatrix_get_btn_text(btnm, 0));
+    TEST_ASSERT_EQUAL_STRING("B", lv_btnmatrix_get_btn_text(btnm, 1));
+    TEST_ASSERT_EQUAL_STRING("C", lv_btnmatrix_get_btn_text(btnm, 2));
+    TEST_ASSERT_EQUAL_STRING("D", lv_btnmatrix_get_btn_text(btnm, 3));
+}
+
+
+#endif
