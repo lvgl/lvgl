@@ -1,6 +1,6 @@
 # PikaScript
 
-# What is PikaScript ?
+## What is PikaScript ?
 
 [PikaScript](https://github.com/pikasTech/pikascript) is a Python interpreter designed specifically for microcontrollers, and it supports a subset of the common Python3 syntax.
 
@@ -12,7 +12,7 @@ It's smarter, with a unique C module mechanism that allows you to generate bindi
 
 ---
 
-# Why PikaScript + LVGL ?
+## Why PikaScript + LVGL ?
 
 PikaScript now supports the main features of LVGL8, and these APIs are fully compatible with Micropython!
 
@@ -22,11 +22,11 @@ Enjoy detailed code hints down to the parameter type for a better programming ex
 
 Use a more convenient IDE, such as vs-based simulation projects
 
-# So how does it look like?
+## So how does it look like?
 
 Here are some examples of lvgl that PikaScript can already run, they are mainly from the lvgl documentation examples
 
-## LV_ARC
+### LV_ARC
 
 ```python
 import pika_lvgl as lv
@@ -41,7 +41,7 @@ print('mem used max: %0.2f kB' % (mem.getMax()))
 print('mem used now: %0.2f kB' % (mem.getNow()))
 ```
 
-## LV_BAR
+### LV_BAR
 
 ``` python
 import pika_lvgl as lv
@@ -55,7 +55,7 @@ print('mem used max: %0.2f kB' % (mem.getMax()))
 print('mem used now: %0.2f kB' % (mem.getNow()))
 ```
 
-## LV_BTN
+### LV_BTN
 
 ``` python
 import pika_lvgl as lv
@@ -77,7 +77,7 @@ print('mem used max: %0.2f kB' % (mem.getMax()))
 print('mem used now: %0.2f kB' % (mem.getNow()))
 ```
 
-## LV_CHECKBOX
+### LV_CHECKBOX
 
 ``` python
 import pika_lvgl as lv
@@ -104,7 +104,7 @@ print('mem used now: %0.2f kB' % (mem.getNow()))
 
 ---
 
-# How does it work?
+## How does it work?
 
 PikaScript has a unique C module smart binding tool
 
@@ -155,7 +155,7 @@ In addition to binding C modules, the precompiler compiles Python scripts to byt
 
 ---
 
-# How can I use it?
+## How can I use it?
 
 The simulation repo on vs is available on https://github.com/pikasTech/lv_pikascript
 
