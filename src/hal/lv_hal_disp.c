@@ -24,6 +24,10 @@
     #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
 #endif
 
+#if LV_USE_GPU_GD32_IPA
+    #include "../draw/gd32_ipa/lv_gpu_gd32_ipa.h"
+#endif
+
 #if LV_USE_GPU_SWM341_DMA2D
     #include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
 #endif
@@ -99,6 +103,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_stm32_dma2d_ctx_init;
     driver->draw_ctx_deinit = lv_draw_stm32_dma2d_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_stm32_dma2d_ctx_t);
+#elif LV_USE_GPU_GD32_IPA
+    driver->draw_ctx_init = lv_draw_gd32_ipa_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_gd32_ipa_ctx_deinit;
+    driver->draw_ctx_size = sizeof(lv_draw_gd32_ipa_ctx_t);
 #elif LV_USE_GPU_SWM341_DMA2D
     driver->draw_ctx_init = lv_draw_swm341_dma2d_ctx_init;
     driver->draw_ctx_deinit = lv_draw_swm341_dma2d_ctx_deinit;

@@ -171,6 +171,9 @@
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*Use GD32 IPA GPU*/
+#define LV_USE_GPU_GD32_IPA 0
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #define LV_USE_GPU_NXP_PXP 0
 #if LV_USE_GPU_NXP_PXP
