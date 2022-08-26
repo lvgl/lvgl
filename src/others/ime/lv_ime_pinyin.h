@@ -25,6 +25,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+const lv_obj_class_t lv_ime_pinyin_class;
+
 typedef enum {
     LV_IME_PINYIN_MODE_K26,
     LV_IME_PINYIN_MODE_K9,
