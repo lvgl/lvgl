@@ -45,6 +45,8 @@ static bool is_end_with(const char * str1, const char * str2);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_style_t quick_access_list_btn_style;
+
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,
     .width_def      = LV_SIZE_CONTENT,
@@ -337,84 +339,68 @@ static void init_style(lv_obj_t * obj)
 {
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
-    /*main container style*/
-    static lv_style_t cont_style;
-    lv_style_init(&cont_style);
-    lv_style_set_radius(&cont_style, 0);
-    lv_style_set_bg_opa(&cont_style, LV_OPA_0);
-    lv_style_set_border_width(&cont_style, 0);
-    lv_style_set_outline_width(&cont_style, 0);
-    lv_style_set_pad_column(&cont_style, 0);
-    lv_style_set_pad_row(&cont_style, 0);
-    lv_style_set_flex_flow(&cont_style, LV_FLEX_FLOW_ROW);
-    lv_style_set_pad_all(&cont_style, 0);
-    lv_style_set_layout(&cont_style, LV_LAYOUT_FLEX);
-
-#if LV_FILE_EXPLORER_QUICK_ACCESS
-    /*Quick access bar container style*/
-    static lv_style_t quick_access_area_style;
-    lv_style_init(&quick_access_area_style);
-    lv_style_set_pad_all(&quick_access_area_style, 0);
-    lv_style_set_pad_row(&quick_access_area_style, 20);
-    lv_style_set_radius(&quick_access_area_style, 0);
-    lv_style_set_border_width(&quick_access_area_style, 1);
-    lv_style_set_outline_width(&quick_access_area_style, 0);
-    lv_style_set_bg_color(&quick_access_area_style, lv_color_hex(0xf2f1f6));
-#endif
-
-    /*File browser container style*/
-    static lv_style_t browser_area_style;
-    lv_style_init(&browser_area_style);
-    lv_style_set_pad_all(&browser_area_style, 0);
-    lv_style_set_pad_row(&browser_area_style, 0);
-    lv_style_set_radius(&browser_area_style, 0);
-    lv_style_set_border_width(&browser_area_style, 0);
-    lv_style_set_outline_width(&browser_area_style, 0);
-    lv_style_set_bg_color(&browser_area_style, lv_color_hex(0xffffff));
-
-#if LV_FILE_EXPLORER_QUICK_ACCESS
-    /*Style of the list in the quick access bar*/
-    static lv_style_t quick_access_list_style;
-    lv_style_init(&quick_access_list_style);
-    lv_style_set_border_width(&quick_access_list_style, 0);
-    lv_style_set_outline_width(&quick_access_list_style, 0);
-    lv_style_set_radius(&quick_access_list_style, 0);
-    lv_style_set_pad_all(&quick_access_list_style, 0);
-
-    static lv_style_t quick_access_list_btn_style;
-    lv_style_init(&quick_access_list_btn_style);
-    lv_style_set_border_width(&quick_access_list_btn_style, 0);
-    lv_style_set_bg_color(&quick_access_list_btn_style, lv_color_hex(0xf2f1f6));
-#endif
-
-    /*Style of the table in the quick access bar*/
-    static lv_style_t file_table_style;
-    lv_style_init(&file_table_style);
-    lv_style_set_bg_color(&file_table_style, lv_color_hex(0xffffff));
-    lv_style_set_pad_all(&file_table_style, 0);
-    lv_style_set_radius(&file_table_style, 0);
-    lv_style_set_border_width(&file_table_style, 0);
-    lv_style_set_outline_width(&file_table_style, 0);
-
     /*lv_file_explorer obj style*/
     lv_obj_set_style_radius(obj, 0, 0);
     lv_obj_set_style_bg_color(obj, lv_color_hex(0xf2f1f6), 0);
+
+    /*main container style*/
+    lv_obj_set_style_radius(explorer->cont, 0, 0);
+    lv_obj_set_style_bg_opa(explorer->cont, LV_OPA_0, 0);
+    lv_obj_set_style_border_width(explorer->cont, 0, 0);
+    lv_obj_set_style_outline_width(explorer->cont, 0, 0);
+    lv_obj_set_style_pad_column(explorer->cont, 0, 0);
+    lv_obj_set_style_pad_row(explorer->cont, 0, 0);
+    lv_obj_set_style_flex_flow(explorer->cont, LV_FLEX_FLOW_ROW, 0);
+    lv_obj_set_style_pad_all(explorer->cont, 0, 0);
+    lv_obj_set_style_layout(explorer->cont, LV_LAYOUT_FLEX, 0);
 
     /*head cont style*/
     lv_obj_set_style_radius(explorer->head_area, 0, 0);
     lv_obj_set_style_border_width(explorer->head_area, 0, 0);
     lv_obj_set_style_pad_top(explorer->head_area, 0, 0);
 
-    lv_obj_add_style(explorer->cont, &cont_style, 0);
-    lv_obj_add_style(explorer->browser_area, &browser_area_style, 0);
 #if LV_FILE_EXPLORER_QUICK_ACCESS
-    lv_obj_add_style(explorer->quick_access_area, &quick_access_area_style, 0);
-    lv_obj_add_style(explorer->list_device, &quick_access_list_style, 0);
-    lv_obj_add_style(explorer->list_places, &quick_access_list_style, 0);
+    /*Quick access bar container style*/
+    lv_obj_set_style_pad_all(explorer->quick_access_area, 0, 0);
+    lv_obj_set_style_pad_row(explorer->quick_access_area, 20, 0);
+    lv_obj_set_style_radius(explorer->quick_access_area, 0, 0);
+    lv_obj_set_style_border_width(explorer->quick_access_area, 1, 0);
+    lv_obj_set_style_outline_width(explorer->quick_access_area, 0, 0);
+    lv_obj_set_style_bg_color(explorer->quick_access_area, lv_color_hex(0xf2f1f6), 0);
 #endif
-    lv_obj_add_style(explorer->file_table, &file_table_style, 0);
+    
+    /*File browser container style*/
+    lv_obj_set_style_pad_all(explorer->browser_area, 0, 0);
+    lv_obj_set_style_pad_row(explorer->browser_area, 0, 0);
+    lv_obj_set_style_radius(explorer->browser_area, 0, 0);
+    lv_obj_set_style_border_width(explorer->browser_area, 0, 0);
+    lv_obj_set_style_outline_width(explorer->browser_area, 0, 0);
+    lv_obj_set_style_bg_color(explorer->browser_area, lv_color_hex(0xffffff), 0);
+
+    /*Style of the table in the browser container*/
+    lv_obj_set_style_bg_color(explorer->file_table, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_pad_all(explorer->file_table, 0, 0);
+    lv_obj_set_style_radius(explorer->file_table, 0, 0);
+    lv_obj_set_style_border_width(explorer->file_table, 0, 0);
+    lv_obj_set_style_outline_width(explorer->file_table, 0, 0);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
+    /*Style of the list in the quick access bar*/
+    lv_obj_set_style_border_width(explorer->list_device, 0, 0);
+    lv_obj_set_style_outline_width(explorer->list_device, 0, 0);
+    lv_obj_set_style_radius(explorer->list_device, 0, 0);
+    lv_obj_set_style_pad_all(explorer->list_device, 0, 0);
+
+    lv_obj_set_style_border_width(explorer->list_places, 0, 0);
+    lv_obj_set_style_outline_width(explorer->list_places, 0, 0);
+    lv_obj_set_style_radius(explorer->list_places, 0, 0);
+    lv_obj_set_style_pad_all(explorer->list_places, 0, 0);
+
+    /*Style of the quick access list btn in the quick access bar*/
+    lv_style_init(&quick_access_list_btn_style);
+    lv_style_set_border_width(&quick_access_list_btn_style, 0);
+    lv_style_set_bg_color(&quick_access_list_btn_style, lv_color_hex(0xf2f1f6));
+
     uint32_t i, j;
     for(i = 0; i < lv_obj_get_child_cnt(explorer->quick_access_area); i++) {
         lv_obj_t * child = lv_obj_get_child(explorer->quick_access_area, i);
