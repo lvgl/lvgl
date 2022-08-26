@@ -391,8 +391,7 @@ void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title )
         page->static_title = false;
         
         LV_ASSERT_MALLOC( page->title );
-        if(page->title == NULL)
-        {
+        if(page->title == NULL) {
             return;
         }
         strcpy(page->title, title);
@@ -409,8 +408,7 @@ void lv_menu_set_page_title_static(lv_obj_t * page_obj, char const * const title
     lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
     
     // Cleanup any previous set titles
-    if( (!page->static_title) && page->title )
-    {
+    if( (!page->static_title) && page->title ) {
         lv_free( page->title );
         page->title = NULL;
     }
@@ -607,8 +605,7 @@ static void lv_menu_page_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
 
-    if( (!page->static_title) && page->title != NULL)
-    {
+    if( (!page->static_title) && page->title != NULL) {
         lv_free(page->title);
     }
     page->title        = NULL;
