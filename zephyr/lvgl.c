@@ -293,7 +293,7 @@ static void lvgl_pointer_kscan_read(lv_indev_drv_t *drv, lv_indev_data_t *data)
 set_and_release:
 	*data = prev;
 
-	k_msgq_num_used_get(&kscan_msgq);
+	data->continue_reading = k_msgq_num_used_get(&kscan_msgq) > 0;
 }
 
 static int lvgl_pointer_kscan_init(void)
