@@ -73,8 +73,8 @@ typedef struct {
 
 typedef struct {
     lv_obj_t obj;
-    char * title;
-    bool   static_title;
+    char *   title;
+    bool     static_title;
 } lv_menu_page_t;
 
 extern const lv_obj_class_t lv_menu_class;
@@ -140,7 +140,7 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page);
  * @param page pointer to the menu page
  * @param title pointer to text for title in header (NULL to not display title)
  */
-void lv_menu_set_page_title(lv_obj_t * page, char const * const title );
+void lv_menu_set_page_title(lv_obj_t * page, char const * const title);
 
 /**
  * Set menu page title with a static text. It will not be saved by the label so the 'text' variable
@@ -148,7 +148,7 @@ void lv_menu_set_page_title(lv_obj_t * page, char const * const title );
  * @param page pointer to the menu page
  * @param title pointer to text for title in header (NULL to not display title)
  */
-void lv_menu_set_page_title_static(lv_obj_t * page, char const * const title );
+void lv_menu_set_page_title_static(lv_obj_t * page, char const * const title);
 
 /**
  * Set menu page to display in sidebar
