@@ -89,6 +89,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
     /*Allocate space for the new style and shift the rest of the style to the end*/
     obj->style_cnt++;
+    LV_ASSERT(obj->style_cnt != 0);
     obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(_lv_obj_style_t));
     LV_ASSERT_MALLOC(obj->styles);
 
@@ -519,6 +520,7 @@ static lv_style_t * get_local_style(lv_obj_t * obj, lv_style_selector_t selector
     }
 
     obj->style_cnt++;
+    LV_ASSERT(obj->style_cnt != 0);
     obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(_lv_obj_style_t));
     LV_ASSERT_MALLOC(obj->styles);
 
@@ -556,6 +558,7 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj,  lv_style_selector_t se
     if(i != obj->style_cnt) return &obj->styles[i];
 
     obj->style_cnt++;
+    LV_ASSERT(obj->style_cnt != 0);
     obj->styles = lv_realloc(obj->styles, obj->style_cnt * sizeof(_lv_obj_style_t));
 
     for(i = obj->style_cnt - 1; i > 0 ; i--) {
