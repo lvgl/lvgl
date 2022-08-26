@@ -378,18 +378,17 @@ void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
 {
     LV_LOG_INFO("begin");
     lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
-    
+
     // Cleanup any previous set titles
-    if((!page->static_title) && page->title)
-    {
-        lv_free( page->title );
+    if((!page->static_title) && page->title) {
+        lv_free(page->title);
         page->title = NULL;
     }
 
     if(title) {
         page->title        = lv_malloc(strlen(title) + 1);
         page->static_title = false;
-        
+
         LV_ASSERT_MALLOC(page->title);
         if(page->title == NULL) {
             return;
@@ -406,10 +405,10 @@ void lv_menu_set_page_title_static(lv_obj_t * page_obj, char const * const title
 {
     LV_LOG_INFO("begin");
     lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
-    
+
     // Cleanup any previous set titles
     if((!page->static_title) && page->title) {
-        lv_free( page->title );
+        lv_free(page->title);
         page->title = NULL;
     }
 

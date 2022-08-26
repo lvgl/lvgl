@@ -73,7 +73,7 @@ typedef struct {
 
 typedef struct {
     lv_obj_t obj;
-    char *   title;
+    char  *  title;
     bool     static_title;
 } lv_menu_page_t;
 
