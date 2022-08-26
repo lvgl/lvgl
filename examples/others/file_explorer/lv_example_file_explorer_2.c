@@ -110,7 +110,7 @@ void lv_example_file_explorer_2(void)
     lv_obj_t * dd = lv_dropdown_create(fe_header_obj);
     lv_obj_set_style_radius(dd, 4, 0);
     lv_obj_set_style_pad_all(dd, 0, 0);
-    lv_obj_set_size(dd, LV_PCT(30), LV_PCT(100));
+    lv_obj_set_size(dd, LV_PCT(30), LV_SIZE_CONTENT);
     lv_dropdown_set_options_static(dd, opts);
     lv_obj_align(dd, LV_ALIGN_RIGHT_MID, 0, 0);
     //lv_obj_align_to(dd, btn, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
