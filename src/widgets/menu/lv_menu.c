@@ -116,23 +116,18 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent)
     lv_obj_class_init_obj(obj);
     return obj;
 }
-
-lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char * title)
+ 
+lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_menu_page_class, parent);
     lv_obj_class_init_obj(obj);
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
-    if(title) {
-        page->title = lv_malloc(strlen(title) + 1);
-        LV_ASSERT_MALLOC(page->title);
-        if(page->title == NULL) return NULL;
-        strcpy(page->title, title);
-    }
-    else {
-        page->title = NULL;
-    }
+    // Initialise
+    page->title        = NULL;
+    page->static_title = false;
+    lv_menu_set_page_title( page, title );
 
     return obj;
 }
@@ -378,6 +373,59 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
     lv_obj_add_event_cb(obj, lv_menu_load_page_event_cb, LV_EVENT_CLICKED, event_data);
     lv_obj_add_event_cb(obj, lv_menu_obj_del_event_cb, LV_EVENT_DELETE, event_data);
 }
+
+void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title )
+{
+    LV_LOG_INFO("begin");
+    lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
+    
+    // Cleanup any previous set titles
+    if( (!page->static_title) && page->title )
+    {
+        lv_free( page->title );
+        page->title = NULL;
+    }
+
+    if( title ) {
+        page->title        = lv_malloc(strlen(title) + 1);
+        page->static_title = false;
+        
+        LV_ASSERT_MALLOC( page->title );
+        if(page->title == NULL)
+        {
+            return NULL;
+        }
+        strcpy(page->title, title);
+    }
+    else {
+        page->title        = NULL;
+        page->static_title = false;
+    }
+}
+
+void lv_menu_set_page_title_static(lv_obj_t * page_obj, char const * const title )
+{
+    LV_LOG_INFO("begin");
+    lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
+    
+    // Cleanup any previous set titles
+    if( (!page->static_title) && page->title )
+    {
+        lv_free( page->title );
+        page->title = NULL;
+    }
+
+    // Set or clear the static title text
+    if( title ) {
+        page->title        = title;
+        page->static_title = true;
+    }
+    else {
+        page->title        = NULL;
+        page->static_title = false;
+    }
+}
+
 
 /*=====================
  * Getter functions
