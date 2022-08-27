@@ -368,7 +368,7 @@ static void init_style(lv_obj_t * obj)
     lv_obj_set_style_outline_width(explorer->quick_access_area, 0, 0);
     lv_obj_set_style_bg_color(explorer->quick_access_area, lv_color_hex(0xf2f1f6), 0);
 #endif
-    
+
     /*File browser container style*/
     lv_obj_set_style_pad_all(explorer->browser_area, 0, 0);
     lv_obj_set_style_pad_row(explorer->browser_area, 0, 0);
