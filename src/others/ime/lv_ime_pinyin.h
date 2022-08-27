@@ -69,6 +69,8 @@ typedef struct {
  * GLOBAL VARIABLES
  ***********************/
 
+extern const lv_obj_class_t lv_ime_pinyin_class;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
