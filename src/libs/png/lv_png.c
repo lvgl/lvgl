@@ -117,7 +117,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
         }
 
         if(img_dsc->header.w) {
-            header->w = img_dsc->header.w;         /*Save the color width*/
+            header->w = img_dsc->header.w;         /*Save the image width*/
         }
         else {
             header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
