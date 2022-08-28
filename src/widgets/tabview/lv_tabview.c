@@ -72,7 +72,6 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     lv_obj_t * page = lv_obj_create(cont);
     lv_obj_set_size(page, LV_PCT(100), LV_PCT(100));
-    lv_obj_clear_flag(page, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     uint32_t tab_id = lv_obj_get_child_cnt(cont);
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
