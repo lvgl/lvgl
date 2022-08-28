@@ -44,7 +44,7 @@ struct ffmpeg_context_s {
     uint8_t * video_dst_data[4];
     struct SwsContext * sws_ctx;
     AVFrame * frame;
-    AVPacket pkt;
+    AVPacket * pkt;
     int video_stream_idx;
     int video_src_linesize[4];
     int video_dst_linesize[4];
@@ -520,7 +520,7 @@ static int ffmpeg_open_codec_context(int * stream_idx,
     int ret;
     int stream_index;
     AVStream * st;
-    const AVCodec * dec = NULL;
+    AVCodec * dec = NULL;
     AVDictionary * opts = NULL;
 
     ret = av_find_best_stream(fmt_ctx, type, -1, -1, NULL, 0);
@@ -631,19 +631,19 @@ static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
     while(1) {
 
         /* read frames from the file */
-        if(av_read_frame(ffmpeg_ctx->fmt_ctx, &(ffmpeg_ctx->pkt)) >= 0) {
+        if(av_read_frame(ffmpeg_ctx->fmt_ctx, ffmpeg_ctx->pkt) >= 0) {
             bool is_image = false;
 
             /* check if the packet belongs to a stream we are interested in,
              * otherwise skip it
              */
-            if(ffmpeg_ctx->pkt.stream_index == ffmpeg_ctx->video_stream_idx) {
+            if(ffmpeg_ctx->pkt->stream_index == ffmpeg_ctx->video_stream_idx) {
                 ret = ffmpeg_decode_packet(ffmpeg_ctx->video_dec_ctx,
-                                           &(ffmpeg_ctx->pkt), ffmpeg_ctx);
+                                           ffmpeg_ctx->pkt, ffmpeg_ctx);
                 is_image = true;
             }
 
-            av_packet_unref(&(ffmpeg_ctx->pkt));
+            av_packet_unref(ffmpeg_ctx->pkt);
 
             if(ret < 0) {
                 LV_LOG_WARN("video frame is empty %d", ret);
@@ -763,18 +763,16 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
         return -1;
     }
 
-    /* initialize packet, set data to NULL, let the demuxer fill it */
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    av_init_packet(&ffmpeg_ctx->pkt);
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
-#endif
-    ffmpeg_ctx->pkt.data = NULL;
-    ffmpeg_ctx->pkt.size = 0;
+    /* allocate packet, set data to NULL, let the demuxer fill it */
 
+    ffmpeg_ctx->pkt = av_packet_alloc();
+    if (ffmpeg_ctx->pkt == NULL) {
+      LV_LOG_ERROR("av_packet_alloc failed");
+      return -1;
+    }
+    ffmpeg_ctx->pkt->data = NULL;
+    ffmpeg_ctx->pkt->size = 0;
+    
     return 0;
 }
 
