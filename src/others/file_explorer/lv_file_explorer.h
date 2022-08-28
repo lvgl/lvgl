@@ -90,7 +90,7 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
 
 /**
  * Set file_explorer sort
- * @param obj   pointer to a label object
+ * @param obj   pointer to a file explorer object
  * @param sort  the sort from 'lv_file_explorer_sort_t' enum.
  */
 void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort);
@@ -102,37 +102,37 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort);
 /**
  * Get file explorer Selected file
  * @param obj   pointer to a file explorer object
- * @return      pointer to the file explorer selected file
+ * @return      pointer to the file explorer selected file name
  */
-const char * lv_file_explorer_get_selected_fn(lv_obj_t * obj);
+const char * lv_file_explorer_get_selected_fn(const lv_obj_t * obj);
 
 /**
  * Get file explorer cur path
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer cur path
  */
-const char * lv_file_explorer_get_current_path(lv_obj_t * obj);
+const char * lv_file_explorer_get_current_path(const lv_obj_t * obj);
 
 /**
  * Get file explorer head area obj
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer head area obj(lv_obj)
  */
-lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_header(const lv_obj_t * obj);
 
 /**
  * Get file explorer head area obj
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer quick access area obj(lv_obj)
  */
-lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_quick_access_area(const lv_obj_t * obj);
 
 /**
  * Get file explorer path obj(label)
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer path obj(lv_label)
  */
-lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_path_label(const lv_obj_t * obj);
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
 /**
@@ -140,14 +140,14 @@ lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer places list obj(lv_list)
  */
-lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_places_list(const lv_obj_t * obj);
 
 /**
  * Get file explorer device list obj(lv_list)
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer device list obj(lv_list)
  */
-lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_device_list(const lv_obj_t * obj);
 #endif
 
 /**
@@ -155,8 +155,14 @@ lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj);
  * @param obj   pointer to a file explorer object
  * @return      pointer to the file explorer file table obj(lv_table)
  */
-lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj);
+lv_obj_t * lv_file_explorer_get_file_table(const lv_obj_t * obj);
 
+/**
+ * Set file_explorer sort
+ * @param obj   pointer to a file explorer object
+ * @return the current mode from 'lv_file_explorer_sort_t'
+ */
+lv_file_explorer_sort_t lv_file_explorer_get_sort(const lv_obj_t * obj);
 
 /*=====================
  * Other functions
@@ -173,10 +179,10 @@ void lv_file_explorer_open_dir(lv_obj_t * obj, const char * dir);
  *      MACROS
  **********************/
 
-#endif  /*LV_USE_SKETCHPAD*/
+#endif  /*LV_USE_FILE_EXPLORER*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_SKETCHPAD_H*/
+#endif /*LV_FILE_EXPLORER_H*/

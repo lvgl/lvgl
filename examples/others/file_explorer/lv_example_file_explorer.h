@@ -27,6 +27,7 @@ extern "C" {
  **********************/
 void lv_example_file_explorer_1(void);
 void lv_example_file_explorer_2(void);
+void lv_example_file_explorer_3(void);
 
 /**********************
  *      MACROS

@@ -695,7 +695,7 @@
     #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
 
-/*1: Enable Pinyin input method*/
+/*1: Enable file explorer*/
 /*Requires: lv_table*/
 #define LV_USE_FILE_EXPLORER                     1
 #if LV_USE_FILE_EXPLORER

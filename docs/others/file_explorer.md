@@ -9,7 +9,7 @@ The file list in `lv_file_explorer` is based on [lv_table](/widgets/table), and 
 <summary>中文</summary>
 <p>
 
-`lv_file_explorer` 提供API让我们可以浏览文件系统中的内容。`lv_file_explorer` 只提供了文件浏览功能，并不提供实际的文件操作功能，也就是说，不能像PC那样点击一个图片文件就可以打开查看该图片。`lv_file_explorer` 会告诉你当前点击的文件的完整路径和名称，文件操作功能需要用户自己实现。
+`lv_file_explorer` 提供API让我们可以浏览文件系统中的内容。`lv_file_explorer` 只提供了文件浏览功能，并不提供实际的文件操作功能，也就是说，不能像PC那样点击一个图片文件就可以打开查看该图片。`lv_file_explorer` 会告诉您当前点击的文件的完整路径和名称，文件操作功能需要用户自己实现。
 
 `lv_file_explorer` 中的文件列表基于 [lv_table](/widgets/table) 实现，快速访问栏基于 [lv_list](/widgets/list) 实现。因此，要注意确保使能了 `lv_table` 和 `lv_list`。
 
@@ -53,7 +53,7 @@ You can use `lv_file_explorer_set_quick_access_path(file_explorer, LV_FILE_EXPLO
 <summary>中文</summary>
 <p>
 
-快速访问栏是可选的，你可以在 `lv_conf.h` 中关闭 `LV_FILE_EXPLORER_QUICK_ACCESS`，这样快速访问栏就不会被创建出来，这能节省一些内存，但并不是很多。快速访问栏被创建出来之后，可以通过点击浏览区域顶部左上角的按钮隐藏起来，这对于小屏幕设备非常有用。
+快速访问栏是可选的，您可以在 `lv_conf.h` 中关闭 `LV_FILE_EXPLORER_QUICK_ACCESS`，这样快速访问栏就不会被创建出来，这能节省一些内存，但并不是很多。快速访问栏被创建出来之后，可以通过点击浏览区域顶部左上角的按钮隐藏起来，这对于小屏幕设备非常有用。
 
 可以通过 `lv_file_explorer_set_quick_access_path(file_explorer, LV_FILE_EXPLORER_QA_XX, "path")` 设置快速访问栏的路径，快速访问栏的项目是固定的，目前有以下项目：
 
@@ -75,6 +75,8 @@ You can use `lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_XX)` to s
 - `LV_EXPLORER_SORT_NONE`
 - `LV_EXPLORER_SORT_KIND`
 
+You can customize the sorting. Before custom sort, please set the default sorting to `LV_EXPLORER_SORT_NONE`. The default is `LV_EXPLORER_SORT_NONE`.
+
 <details>
 <summary>中文</summary>
 <p>
@@ -84,12 +86,16 @@ You can use `lv_file_explorer_set_sort(file_explorer, LV_EXPLORER_SORT_XX)` to s
 - `LV_EXPLORER_SORT_NONE`
 - `LV_EXPLORER_SORT_KIND`
 
+您可以自定义排序规则，在这之前请先将排序规则设置为 `LV_EXPLORER_SORT_NONE` 然后在 `LV_EVENT_READY` 事件中处理。默认的排序规则是 `LV_EXPLORER_SORT_NONE`
+
 </p>
 </details>
 
 ## Event
 
-When an item in the file list is clicked, a `LV_EVENT_VALUE_CHANGED` event will be sent.
+- `LV_EVENT_READY` sent shen a directory is opened. You can customize the sort.
+
+- `LV_EVENT_VALUE_CHANGED` sent when an item(file) in the file list is clicked.
 
 You can use `lv_file_explorer_get_cur_path` to get the current path and `lv_file_explorer_get_sel_fn` to get the name of the currently selected file in the event processing function. For example:
 
@@ -113,7 +119,8 @@ You can also save the obtained **path** and **file** name into an array through 
 <summary>中文</summary>
 <p>
 
-当文件列表中的项目被点击时会发送 `LV_EVENT_VALUE_CHANGED` 事件。
+- 当打开一个目录后会发送 `LV_EVENT_READY` 事件。您可以在这里自定义排序规则。
+- 当文件列表中的项目（文件）被点击时会发送 `LV_EVENT_VALUE_CHANGED` 事件。
 
 可以在事件处理函数中通过 `lv_file_explorer_get_cur_path` 获取当前所在的路径，通过 `lv_file_explorer_get_sel_fn` 获取当前选中的文件的名称。比如：
 
@@ -131,7 +138,7 @@ static void file_explorer_event_handler(lv_event_t * e)
 }
 ```
 
-你还可以将获取到的 **路径** 和 **文件名称** 通过例如 strcpy 和 strcat 函数保存到一个数组中，方便后续使用。 
+您还可以将获取到的 **路径** 和 **文件名称** 通过例如 strcpy 和 strcat 函数保存到一个数组中，方便后续使用。 
 
 </p>
 </details>

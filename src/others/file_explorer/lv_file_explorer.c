@@ -9,8 +9,6 @@
 #include "lv_file_explorer.h"
 #if LV_USE_FILE_EXPLORER != 0
 
-#include <string.h>
-
 /*********************
  *      DEFINES
  *********************/
@@ -38,7 +36,7 @@ static void init_style(lv_obj_t * obj);
 static void show_dir(lv_obj_t * obj, const char * path);
 static void strip_ext(char * dir);
 static void file_explorer_sort(lv_obj_t * obj);
-static void sort_table_items(lv_obj_t * tb, int16_t lo, int16_t hi);
+static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi);
 static void exch_table_item(lv_obj_t * tb, int16_t i, int16_t j);
 static bool is_end_with(const char * str1, const char * str2);
 
@@ -146,7 +144,7 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 /*=====================
  * Getter functions
  *====================*/
-const char * lv_file_explorer_get_selected_fn(lv_obj_t * obj)
+const char * lv_file_explorer_get_selected_fn(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -155,7 +153,7 @@ const char * lv_file_explorer_get_selected_fn(lv_obj_t * obj)
     return explorer->sel_fn;
 }
 
-const char * lv_file_explorer_get_current_path(lv_obj_t * obj)
+const char * lv_file_explorer_get_current_path(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -164,7 +162,7 @@ const char * lv_file_explorer_get_current_path(lv_obj_t * obj)
     return explorer->current_path;
 }
 
-lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_file_table(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -173,7 +171,7 @@ lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj)
     return explorer->file_table;
 }
 
-lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_header(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -182,7 +180,7 @@ lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
     return explorer->head_area;
 }
 
-lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_quick_access_area(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -191,7 +189,7 @@ lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
     return explorer->quick_access_area;
 }
 
-lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_path_label(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -201,7 +199,7 @@ lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 }
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
-lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_places_list(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -210,7 +208,7 @@ lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
     return explorer->list_places;
 }
 
-lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_device_list(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -221,6 +219,14 @@ lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj)
 
 #endif
 
+lv_file_explorer_sort_t lv_file_explorer_get_sort(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
+
+    return explorer->sort;
+}
 
 /*=====================
  * Other functions
@@ -368,7 +374,7 @@ static void init_style(lv_obj_t * obj)
     lv_obj_set_style_outline_width(explorer->quick_access_area, 0, 0);
     lv_obj_set_style_bg_color(explorer->quick_access_area, lv_color_hex(0xf2f1f6), 0);
 #endif
-    
+
     /*File browser container style*/
     lv_obj_set_style_pad_all(explorer->browser_area, 0, 0);
     lv_obj_set_style_pad_row(explorer->browser_area, 0, 0);
@@ -593,6 +599,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
 
     lv_table_set_row_cnt(explorer->file_table, index);
     file_explorer_sort(obj);
+    lv_event_send(obj, LV_EVENT_READY, NULL);
 
     /*Move the table to the top*/
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);
@@ -655,7 +662,7 @@ static void file_explorer_sort(lv_obj_t * obj)
             case LV_EXPLORER_SORT_NONE:
                 break;
             case LV_EXPLORER_SORT_KIND:
-                sort_table_items(explorer->file_table, 0, sum - 1);
+                sort_by_file_kind(explorer->file_table, 0, (sum - 1));
                 break;
             default:
                 break;
@@ -664,7 +671,7 @@ static void file_explorer_sort(lv_obj_t * obj)
 }
 
 /*Quick sort 3 way*/
-static void sort_table_items(lv_obj_t * tb, int16_t lo, int16_t hi)
+static void sort_by_file_kind(lv_obj_t * tb, int16_t lo, int16_t hi)
 {
     if(lo >= hi) return;
 
@@ -681,8 +688,8 @@ static void sort_table_items(lv_obj_t * tb, int16_t lo, int16_t hi)
             i++;
     }
 
-    sort_table_items(tb, lo, lt - 1);
-    sort_table_items(tb, gt + 1, hi);
+    sort_by_file_kind(tb, lo, lt - 1);
+    sort_by_file_kind(tb, gt + 1, hi);
 }
 
 
@@ -706,6 +713,5 @@ static bool is_end_with(const char * str1, const char * str2)
 
     return true;
 }
-
 
 #endif  /*LV_USE_FILE_EXPLORER*/
