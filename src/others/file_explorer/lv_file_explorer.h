@@ -65,6 +65,8 @@ typedef struct {
     lv_file_explorer_sort_t sort;
 } lv_file_explorer_t;
 
+extern const lv_obj_class_t lv_file_explorer_class;
+
 /***********************
  * GLOBAL VARIABLES
  ***********************/
