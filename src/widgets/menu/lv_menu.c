@@ -124,7 +124,7 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title)
     lv_obj_class_init_obj(obj);
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
-    // Initialise
+    /* Initialise the object */
     page->title        = NULL;
     page->static_title = false;
     lv_menu_set_page_title(obj, title);
@@ -379,7 +379,7 @@ void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
     LV_LOG_INFO("begin");
     lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
 
-    // Cleanup any previous set titles
+    /* Cleanup any previous set titles */
     if((!page->static_title) && page->title) {
         lv_free(page->title);
         page->title = NULL;
@@ -406,13 +406,13 @@ void lv_menu_set_page_title_static(lv_obj_t * page_obj, char const * const title
     LV_LOG_INFO("begin");
     lv_menu_page_t * page = (lv_menu_page_t *)page_obj;
 
-    // Cleanup any previous set titles
+    /* Cleanup any previous set titles */
     if((!page->static_title) && page->title) {
         lv_free(page->title);
         page->title = NULL;
     }
 
-    // Set or clear the static title text
+    /* Set or clear the static title text */
     if(title) {
         page->title        = (char *) title;
         page->static_title = true;
