@@ -1,7 +1,8 @@
-﻿#include "pika_lvgl_lv_obj.h"
+﻿#include "lvgl.h"
+#ifdef PIKASCRIPT
+#include "pika_lvgl_lv_obj.h"
 #include "BaseObj.h"
 #include "dataStrs.h"
-#include "lvgl.h"
 #include "pika_lvgl.h"
 #include "pika_lvgl_arc.h"
 #include "pika_lvgl_lv_event.h"
@@ -106,3 +107,4 @@ void pika_lvgl_lv_obj_set_pos(PikaObj *self, int x, int y){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_obj_set_pos(lv_obj, x, y);
 }
+#endif

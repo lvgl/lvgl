@@ -1,4 +1,5 @@
 #include "lvgl.h"
+#ifdef PIKASCRIPT
 #include "pika_lvgl_point_t.h"
 
 void pika_lvgl_point_t___init__(PikaObj* self) {
@@ -6,3 +7,4 @@ void pika_lvgl_point_t___init__(PikaObj* self) {
     args_setStruct(self->list, "lv_point_struct", lv_point);
     obj_setPtr(self, "lv_point", args_getStruct(self->list, "lv_point_struct"));
 }
+#endif

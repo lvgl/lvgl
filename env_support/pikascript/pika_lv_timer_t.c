@@ -1,4 +1,5 @@
 #include "lvgl.h"
+#ifdef PIKASCRIPT
 #include "pika_lvgl_lv_timer_t.h"
 
 PikaEventListener* g_pika_lv_timer_event_listener;
@@ -34,3 +35,4 @@ void pika_lvgl_lv_timer_t__del(PikaObj* self) {
     lv_timer_t* lv_timer = obj_getPtr(self, "lv_timer");
     lv_timer_del(lv_timer);
 }
+#endif

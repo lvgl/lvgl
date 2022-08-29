@@ -1,5 +1,6 @@
-﻿#include "BaseObj.h"
-#include "lvgl.h"
+﻿#include "lvgl.h"
+#ifdef PIKASCRIPT
+#include "BaseObj.h"
 #include "pika_lvgl.h"
 #include "pika_lvgl_arc.h"
 #include "pika_lvgl_bar.h"
@@ -355,3 +356,4 @@ void pika_lvgl_textarea_set_one_line(PikaObj* self, int en) {
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     lv_textarea_set_one_line(lv_obj, en);
 }
+#endif

@@ -1,6 +1,7 @@
-﻿#include "pika_lvgl.h"
+﻿#include "lvgl.h"
+#ifdef PIKASCRIPT
+#include "pika_lvgl.h"
 #include "BaseObj.h"
-#include "lvgl.h"
 #include "pika_lvgl_ALIGN.h"
 #include "pika_lvgl_ANIM.h"
 #include "pika_lvgl_EVENT.h"
@@ -190,4 +191,4 @@ PikaObj* pika_lvgl_timer_create_basic(PikaObj *self){
     obj_setPtr(new_obj,"lv_timer", lv_timer);
     return new_obj;
 }
-
+#endif
