@@ -144,7 +144,7 @@ void lv_file_explorer_set_sort(lv_obj_t * obj, lv_file_explorer_sort_t sort)
 /*=====================
  * Getter functions
  *====================*/
-const char * lv_file_explorer_get_selected_fn(const lv_obj_t * obj)
+const char * lv_file_explorer_get_selected_file_name(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 

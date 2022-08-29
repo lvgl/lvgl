@@ -48,7 +48,7 @@ static void file_explorer_event_handler(lv_event_t * e)
 
     if(code == LV_EVENT_VALUE_CHANGED) {
         char * cur_path =  lv_file_explorer_get_current_path(obj);
-        const char * sel_fn = lv_file_explorer_get_selected_fn(obj);
+        const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
         uint16_t path_len = strlen(cur_path);
         uint16_t fn_len = strlen(sel_fn);
 
