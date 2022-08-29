@@ -1,12 +1,7 @@
 #!/opt/bin/lv_micropython -i
 import lvgl as lv
 import display_driver
-from imagetools import get_png_info, open_png
 from img_wink_png import img_wink_png_map
-# Register PNG image decoder
-decoder = lv.img.decoder_create()
-decoder.info_cb = get_png_info
-decoder.open_cb = open_png
 
 img_wink_png = lv.img_dsc_t(
     {

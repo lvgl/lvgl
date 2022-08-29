@@ -1,13 +1,7 @@
-from imagetools import get_png_info, open_png
 
 def ofs_y_anim(img, v):
     img.set_offset_y(v)
     # print(img,v)
-
-# Register PNG image decoder
-decoder = lv.img.decoder_create()
-decoder.info_cb = get_png_info
-decoder.open_cb = open_png
 
 # Create an image from the png file
 try:
