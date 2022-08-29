@@ -2328,14 +2328,10 @@
 /*1: Enable file explorer*/
 /*Requires: lv_table*/
 #ifndef LV_USE_FILE_EXPLORER
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_FILE_EXPLORER
-            #define LV_USE_FILE_EXPLORER CONFIG_LV_USE_FILE_EXPLORER
-        #else
-            #define LV_USE_FILE_EXPLORER 0
-        #endif
+    #ifdef CONFIG_LV_USE_FILE_EXPLORER
+        #define LV_USE_FILE_EXPLORER CONFIG_LV_USE_FILE_EXPLORER
     #else
-        #define LV_USE_FILE_EXPLORER                     1
+        #define LV_USE_FILE_EXPLORER                     0
     #endif
 #endif
 #if LV_USE_FILE_EXPLORER
