@@ -766,13 +766,13 @@ static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx)
     /* allocate packet, set data to NULL, let the demuxer fill it */
 
     ffmpeg_ctx->pkt = av_packet_alloc();
-    if (ffmpeg_ctx->pkt == NULL) {
-      LV_LOG_ERROR("av_packet_alloc failed");
-      return -1;
+    if(ffmpeg_ctx->pkt == NULL) {
+        LV_LOG_ERROR("av_packet_alloc failed");
+        return -1;
     }
     ffmpeg_ctx->pkt->data = NULL;
     ffmpeg_ctx->pkt->size = 0;
-    
+
     return 0;
 }
 
