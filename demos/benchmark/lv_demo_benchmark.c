@@ -769,12 +769,12 @@ static void benchmark_init(void)
         disp->driver->flush_cb = dummy_flush_cb;
         if(disp->refr_timer) {
             disp_ori_timer_period = disp->refr_timer->period;
-            lv_timer_set_period(disp->refr_timer, 1);
+            lv_timer_set_period(disp->refr_timer, 2);
         }
 
         lv_timer_t * anim_timer = lv_anim_get_timer();
         anim_ori_timer_period = anim_timer->period;
-        lv_timer_set_period(anim_timer, 1);
+        lv_timer_set_period(anim_timer, 2);
     }
 
     lv_obj_t * scr = lv_scr_act();
