@@ -587,7 +587,7 @@
               <RTE_Components_h>
 
 /*! \brief enable PikaScrit Binding */
-#define LV_USE_PIKASCRITP_BINDING          1
+#define LV_USE_PIKASCRIPT_BINDING          1
               </RTE_Components_h>
 
             </component>
