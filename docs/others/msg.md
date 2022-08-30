@@ -4,7 +4,7 @@ Messaging (`lv_msg`) is a classic [publisher subscriber](https://en.wikipedia.or
 
 ## IDs
 Both the publishers and the subscribers needs to know the message identifiers.
-In `lv_msg` these are simple `uint32_t` integers. For example:
+In `lv_msg` these are simple integers. For example:
 ```c
 #define MSG_DOOR_OPENED             1
 #define MSG_DOOR_CLOSED             2
@@ -12,30 +12,38 @@ In `lv_msg` these are simple `uint32_t` integers. For example:
 #define MSG_USER_AVATAR_CHANGED     101
 ```
 
-You can orgnaize the message IDs as you wish.
+You can organize the message IDs as you wish.
 
-Both parties also need to know about the format of teh payload. E.g. in the above example
-`MSG_DOOR_OPENED` and `MSG_DOOR_CLOSED` has no payload but `MSG_USER_NAME_CHANGED` can have a `const char *` payload containing the user name, and `MSG_USER_AVATAR_CHANGED` a `const void *` image source with the new avatar image.
+Both parties also need to know about the format of the payload. E.g. in the above example
+`MSG_DOOR_OPENED` and `MSG_DOOR_CLOSED` might have no payload but `MSG_USER_NAME_CHANGED` can have a `const char *` payload containing the user name, and `MSG_USER_AVATAR_CHANGED` a `const void *` image source with the new avatar image.
 
-
-## Send message
-
-Messages can be sent with `lv_msg_send(msg_id, payload)`. E.g.
+To be more precise the message ID`s type is declared like this:
 ```c
-lv_msg_send(MSG_USER_DOOR_OPENED, NULL);
-lv_msg_send(MSG_USER_NAME_CHANGED, "John Smith");
+typedef lv_uintptr_t lv_msg_id_t;
 ```
+
+This way, if you a value in stored in a global variable (e.g. the current temperature) then the address of that variable can be used as message ID too by simply casting it to `lv_msg_id_t`. It saves the creation of message IDs manually as the variable itself serves as message ID too.
+
 
 ## Subscribe to a message
 
 `lv_msg_subscribe(msg_id, callback, user_data)` can be used to subscribe to message.
+
+
+Don't forget that `msg_id` can be a constant or a variable address too:
+```c
+lv_msg_subscribe(45, my_callback_1, NULL);
+
+int v;
+lv_msg_subscribe((lv_msg_id_t)&v, my_callback_2, NULL);
+```
 
 The callback should look like this:
 ```c
 
 static void user_name_subscriber_cb(lv_msg_t * m)
 {
-    /*m: a message object with the msg_id, payload, and user_data (set durung subscription)*/
+    /*m: a message object with the msg_id, payload, and user_data (set during subscription)*/
 
     ...do something...
 }
@@ -67,6 +75,12 @@ void user_name_label_event_cb(lv_event_t * e)
 
 ```
 
+Here `msg_id` also can be a variable's address:
+```c
+char name[64];
+lv_msg_subsribe_obj(name, user_name_label, NULL);
+```
+
 ### Unsubscribe
 `lv_msg_subscribe` returns a pointer which can be used to unsubscribe:
 ```c
@@ -77,6 +91,16 @@ s1 = lv_msg_subscribe(MSG_USER_DOOR_OPENED, some_callback, NULL);
 
 lv_msg_unsubscribe(s1);
 ```
+
+## Send message
+
+Messages can be sent with `lv_msg_send(msg_id, payload)`. E.g.
+```c
+lv_msg_send(MSG_USER_DOOR_OPENED, NULL);
+lv_msg_send(MSG_USER_NAME_CHANGED, "John Smith");
+```
+
+To update a variable
 
 ## Example
 

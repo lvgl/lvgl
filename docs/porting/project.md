@@ -25,7 +25,7 @@ include $(LVGL_DIR)/$(LVGL_DIR_NAME)/lvgl.mk
 For integration with CMake take a look this section of the [Documentation](/get-started/platforms/cmake).
 
 ### Other platforms and tools
-The [Get started](/get-started/index.html) section contains many platform specific descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX, etc.
+The [Get started](/get-started/index) section contains many platform specific descriptions e.g. for ESP32, Arduino, NXP, RT-Thread, NuttX, etc.
 
 ### Demos and Examples
 

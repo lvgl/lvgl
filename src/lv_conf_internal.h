@@ -584,6 +584,20 @@
         #endif
     #endif
 
+    /*1: Enable print timestamp;
+     *0: Disable print timestamp*/
+    #ifndef LV_LOG_USE_TIMESTAMP
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LOG_USE_TIMESTAMP
+                #define LV_LOG_USE_TIMESTAMP CONFIG_LV_LOG_USE_TIMESTAMP
+            #else
+                #define LV_LOG_USE_TIMESTAMP 0
+            #endif
+        #else
+            #define LV_LOG_USE_TIMESTAMP 1
+        #endif
+    #endif
+
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #ifndef LV_LOG_TRACE_MEM
         #ifdef _LV_KCONFIG_PRESENT
@@ -1681,15 +1695,6 @@
         #endif
     #else
         #define LV_USE_ROLLER     1   /*Requires: lv_label*/
-    #endif
-#endif
-#if LV_USE_ROLLER
-    #ifndef LV_ROLLER_INF_PAGES
-        #ifdef CONFIG_LV_ROLLER_INF_PAGES
-            #define LV_ROLLER_INF_PAGES CONFIG_LV_ROLLER_INF_PAGES
-        #else
-            #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
-        #endif
     #endif
 #endif
 

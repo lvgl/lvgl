@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-07-29" version="1.0.7" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.7.pack">
+    <release date="2022-08-15" version="1.0.8-alpha1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.8-alpha1.pack">
+      - LVGL 9.0.0-dev
+      - Montyly update for August
+    </release>
+    <release date="2022-07-29" version="1.0.7" url="https://github.com/lvgl/lvgl/raw/b454a66e0be85976385c81cf9c9025f272a66f5d/env_support/cmsis-pack/LVGL.lvgl.1.0.7.pack">
       - LVGL 9.0.0-dev
       - Renderer refactory
       - Update GPU-Arm-2D

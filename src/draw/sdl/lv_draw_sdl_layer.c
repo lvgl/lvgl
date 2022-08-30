@@ -64,9 +64,17 @@ lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_draw_ctx_t * draw_ctx, lv_draw_l
     transform_ctx->target_rect.w = target_w;
     transform_ctx->target_rect.h = target_h;
 
+    layer_ctx->max_row_with_alpha = target_h;
+    layer_ctx->max_row_with_no_alpha = target_h;
+
     SDL_SetTextureBlendMode(transform_ctx->target, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, transform_ctx->target);
-    SDL_RenderClear(renderer);
+
+    /* SDL_RenderClear is not working properly, so we overwrite the target with solid color */
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderFillRect(renderer, NULL);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     /* Set proper drawing context for transform layer */
     ctx->internals->transform_count += 1;
@@ -100,6 +108,7 @@ void lv_draw_sdl_layer_blend(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * lay
     lv_area_to_sdl_rect(layer_ctx->original.clip_area, &clip_rect);
     SDL_Point center = {.x = draw_dsc->pivot.x, .y = draw_dsc->pivot.y};
     SDL_RenderSetClipRect(renderer, &clip_rect);
+    SDL_SetTextureAlphaMod(transform_ctx->target, draw_dsc->opa);
     SDL_RenderCopyEx(renderer, transform_ctx->target, &transform_ctx->target_rect, &trans_rect,
                      draw_dsc->angle, &center, SDL_FLIP_NONE);
     SDL_RenderSetClipRect(renderer, NULL);

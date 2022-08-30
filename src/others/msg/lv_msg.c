@@ -22,7 +22,7 @@
  **********************/
 
 typedef struct {
-    uint32_t msg_id;
+    lv_msg_id_t msg_id;
     lv_msg_subscribe_cb_t callback;
     void * user_data;
     void * _priv_data;      /*Internal: used only store 'obj' in lv_obj_subscribe*/
@@ -57,7 +57,7 @@ void lv_msg_init(void)
     _lv_ll_init(&LV_GC_ROOT(_subs_ll), sizeof(sub_dsc_t));
 }
 
-void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
+void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
 {
     sub_dsc_t * s = _lv_ll_ins_tail(&LV_GC_ROOT(_subs_ll));
     LV_ASSERT_MALLOC(s);
@@ -71,7 +71,7 @@ void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_d
     return s;
 }
 
-void * lv_msg_subscribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data)
+void * lv_msg_subscribe_obj(lv_msg_id_t msg_id, lv_obj_t * obj, void * user_data)
 {
     sub_dsc_t * s = lv_msg_subscribe(msg_id, obj_notify_cb, user_data);
     if(s == NULL) return NULL;
@@ -92,7 +92,7 @@ void lv_msg_unsubscribe(void * s)
     lv_free(s);
 }
 
-void lv_msg_send(uint32_t msg_id, const void * payload)
+void lv_msg_send(lv_msg_id_t msg_id, const void * payload)
 {
     lv_msg_t m;
     lv_memzero(&m, sizeof(m));
@@ -101,7 +101,12 @@ void lv_msg_send(uint32_t msg_id, const void * payload)
     notify(&m);
 }
 
-uint32_t lv_msg_get_id(lv_msg_t * m)
+void lv_msg_update_value(void * v)
+{
+    lv_msg_send((lv_msg_id_t)v, v);
+}
+
+lv_msg_id_t lv_msg_get_id(lv_msg_t * m)
 {
     return m->id;
 }
@@ -126,8 +131,6 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e)
         return NULL;
     }
 }
-
-
 
 /**********************
  *   STATIC FUNCTIONS

@@ -497,7 +497,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t 
 }
 
 /**
- * Mix two colors with a given ratio. It runs faster then `lv_color_mix` but requires some pre computation.
+ * Mix two colors with a given ratio. It runs faster than `lv_color_mix` but requires some pre computation.
  * @param premult_c1 The first color. Should be preprocessed with `lv_color_premult(c1)`
  * @param c2 The second color. As it is no pre computation required on it
  * @param mix The ratio of the colors. 0: full `c1`, 255: full `c2`, 127: half `c1` and half `c2`.
