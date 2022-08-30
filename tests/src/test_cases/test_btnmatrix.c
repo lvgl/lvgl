@@ -1,16 +1,20 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-
+#include "lv_test_indev.h"
 #include "unity/unity.h"
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * btnm;
+static bool event_triggered = false;
+lv_event_code_t exp_evt_code;
 
 void setUp(void)
 {
     active_screen = lv_scr_act();
     btnm = lv_btnmatrix_create(active_screen);
     TEST_ASSERT_NOT_NULL(btnm);
+    event_triggered = false;
+    exp_evt_code = 0;
 }
 
 void tearDown(void)
@@ -210,6 +214,180 @@ void test_btn_matrix_get_btn_text_works(void)
     TEST_ASSERT_EQUAL_STRING("B", lv_btnmatrix_get_btn_text(btnm, 1));
     TEST_ASSERT_EQUAL_STRING("C", lv_btnmatrix_get_btn_text(btnm, 2));
     TEST_ASSERT_EQUAL_STRING("D", lv_btnmatrix_get_btn_text(btnm, 3));
+}
+
+/* Common event handler for all the consecutive test cases. */
+static void event_handler(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == exp_evt_code) {
+        event_triggered = true;
+    }
+}
+
+void test_btn_matrix_pressed_event_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_PRESSED, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_PRESSED;
+    /* Click button index 0. */
+    lv_test_mouse_click_at(10, 10);
+    TEST_ASSERT_TRUE(event_triggered);
+}
+
+void test_btn_matrix_release_event_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_RELEASED, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_RELEASED;
+
+    /* Click button index 0. */
+    lv_test_mouse_click_at(65, 35);
+    TEST_ASSERT_TRUE(event_triggered);
+    event_triggered = false;
+    /* This will increase test coverage by unchecking the
+     same button. */
+    lv_btnmatrix_set_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_POPOVER);
+    /* Click button index 0. */
+    lv_test_mouse_click_at(65, 35);
+    TEST_ASSERT_TRUE(event_triggered);
+}
+
+void test_btn_matrix_size_changed_event_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_SIZE_CHANGED, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_SIZE_CHANGED;
+    lv_event_send(btnm, LV_EVENT_SIZE_CHANGED, NULL);
+    TEST_ASSERT_TRUE(event_triggered);
+}
+
+void test_btn_matrix_key_event_works(void)
+{
+    char keyCode;
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_KEY, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_KEY;
+
+    keyCode = LV_KEY_RIGHT;
+    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    TEST_ASSERT_TRUE(event_triggered);
+    event_triggered = false;
+
+    keyCode = LV_KEY_LEFT;
+    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    TEST_ASSERT_TRUE(event_triggered);
+    event_triggered = false;
+
+    keyCode = LV_KEY_DOWN;
+    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    TEST_ASSERT_TRUE(event_triggered);
+    event_triggered = false;
+
+    keyCode = LV_KEY_UP;
+    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    TEST_ASSERT_TRUE(event_triggered);
+
+    /* Added this code to increase code coverage. */
+    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
+    btnmObj->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
+    lv_btnmatrix_set_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_HIDDEN);
+    keyCode = LV_KEY_DOWN;
+    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    TEST_ASSERT_TRUE(event_triggered);
+    event_triggered = false;
+}
+
+void test_btn_matrix_pressing_event_works(void)
+{
+    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
+    lv_indev_t dummyIndev = {0};
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_PRESSING, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_PRESSING;
+    /* Select a button before raising a simulated event.
+     * This is done to increase code coverage. */
+    btnmObj->btn_id_sel = 3;
+    /* Send a dummy lv_indev_t object as param to avoid crashing during build. */
+    lv_event_send(btnm, LV_EVENT_PRESSING, &dummyIndev);
+    TEST_ASSERT_TRUE(event_triggered);
+}
+
+void test_btn_matrix_long_press_repeat_event_works(void)
+{
+    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_LONG_PRESSED_REPEAT;
+    /* Select a button before raising a simulated event.
+     * This is done to increase code coverage. */
+    btnmObj->btn_id_sel = 0;
+    lv_event_send(btnm, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
+    TEST_ASSERT_TRUE(event_triggered);
+}
+
+void test_btn_matrix_press_lost_event_works(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_PRESS_LOST, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_PRESS_LOST;
+    lv_event_send(btnm, LV_EVENT_PRESS_LOST, NULL);
+    TEST_ASSERT_TRUE(event_triggered);
+}
+
+void test_btn_matrix_defocused_event_works(void)
+{
+    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_DEFOCUSED, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_DEFOCUSED;
+    /* Select a button before raising a simulated event.
+     * This is done to increase code coverage. */
+    btnmObj->btn_id_sel = 0;
+    lv_event_send(btnm, LV_EVENT_DEFOCUSED, NULL);
+    TEST_ASSERT_TRUE(event_triggered);
+}
+
+void test_btn_matrix_focused_event_works(void)
+{
+    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_FOCUSED, NULL);
+    /* Set expected event code before the event is raised. */
+    exp_evt_code = LV_EVENT_FOCUSED;
+    /* Select a button before raising a simulated event.
+     * This is done to increase code coverage. */
+    //btnmObj->btn_id_sel = 0;
+    lv_event_send(btnm, LV_EVENT_FOCUSED, NULL);
+    TEST_ASSERT_TRUE(event_triggered);
 }
 
 
