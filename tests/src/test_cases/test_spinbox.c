@@ -283,4 +283,26 @@ void test_spinbox_event_release(void)
     TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(spinbox_events));
 }
 
+void test_spinbox_zero_crossing(void)
+{
+    int32_t value = -13;
+    /* Setup group and encoder indev */
+    lv_spinbox_set_digit_step_direction(spinbox_events, LV_DIR_LEFT);
+    lv_spinbox_set_range(spinbox_events, -20, 20);
+    lv_group_add_obj(g, spinbox_events);
+
+    lv_spinbox_set_value(spinbox_events, value);
+    lv_spinbox_set_cursor_pos(spinbox_events, 1);
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(1);
+    TEST_ASSERT_EQUAL(-3, lv_spinbox_get_value(spinbox_events));
+
+    lv_test_encoder_turn(1);
+    TEST_ASSERT_EQUAL(3, lv_spinbox_get_value(spinbox_events));
+
+    lv_test_encoder_turn(1);
+    TEST_ASSERT_EQUAL(13, lv_spinbox_get_value(spinbox_events));
+}
+
 #endif
