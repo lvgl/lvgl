@@ -46,6 +46,7 @@ PACK_DIRS="
   ../../src
   ../../docs
   ../../demos
+  ../../evn_support/pikascript
 "
 
 
