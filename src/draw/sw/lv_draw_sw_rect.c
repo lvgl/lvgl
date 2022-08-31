@@ -1159,12 +1159,13 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
 
     bool mask_any = lv_draw_mask_is_any(outer_area);
 
+#if LV_DRAW_COMPLEX
+
     if(!mask_any && rout == 0 && rin == 0) {
         draw_border_simple(draw_ctx, outer_area, inner_area, color, opa);
         return;
     }
 
-#if LV_DRAW_COMPLEX
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `coords`*/
     lv_area_t draw_area;
@@ -1375,6 +1376,11 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
 
 #else /*LV_DRAW_COMPLEX*/
     LV_UNUSED(blend_mode);
+    if(!mask_any) {
+        draw_border_simple(draw_ctx, outer_area, inner_area, color, opa);
+        return;
+    }
+
 #endif /*LV_DRAW_COMPLEX*/
 }
 static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
