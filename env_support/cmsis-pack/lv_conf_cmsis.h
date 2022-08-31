@@ -214,6 +214,10 @@
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
     #define LV_LOG_PRINTF 0
 
+    /*1: Enable print timestamp;
+     *0: Disable print timestamp*/
+    #define LV_LOG_USE_TIMESTAMP 1
+
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #define LV_LOG_TRACE_MEM        1
     #define LV_LOG_TRACE_TIMER      1
@@ -499,9 +503,6 @@
 #define LV_USE_MSGBOX     1
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
-#if LV_USE_ROLLER
-    #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
-#endif
 
 #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
 

@@ -36,8 +36,9 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-08-15" version="1.0.8-alpha1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.8-alpha1.pack">
+    <release date="2022-08-30" version="1.0.8" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.8.pack">
       - LVGL 9.0.0-dev
+      - Add the binding for pikascript (an ultra-light-weight python VM) 
       - Montyly update for August
     </release>
     <release date="2022-07-29" version="1.0.7" url="https://github.com/lvgl/lvgl/raw/b454a66e0be85976385c81cf9c9025f272a66f5d/env_support/cmsis-pack/LVGL.lvgl.1.0.7.pack">
@@ -561,6 +562,32 @@
 
 /*! \brief use extra themes, widgets and layouts */
 #define RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="PikaScript Binding" Cversion="0.2.0" condition="LVGL-Essential">
+              <description>Add the binding for PikaScript, an ultra-light-weight python VM.</description>
+              <files>
+                <file category="doc"      name="pikascript/README.md"/>
+                <file category="sourceC"  name="pikascript/pika_lvgl.c" />
+                <file category="sourceC"  name="pikascript/pika_lvgl_indev_t.c" />
+                <file category="sourceC"  name="pikascript/pika_lvgl_lv_event.c" />
+                <file category="sourceC"  name="pikascript/pika_lvgl_lv_obj.c" />
+                <file category="sourceC"  name="pikascript/pika_lvgl_lv_style_t.c" />
+                <file category="sourceC"  name="pikascript/pika_lv_point_t.c" />
+                <file category="sourceC"  name="pikascript/pika_lv_timer_t.c" />
+                <file category="sourceC"  name="pikascript/pika_lv_wegit.c" />
+              </files>
+              <Pre_Include_Local_Component_h>
+
+/* enabling PikaScript Binding */
+#define PIKASCRIPT     1
+              </Pre_Include_Local_Component_h>
+              <RTE_Components_h>
+
+/*! \brief enable PikaScrit Binding */
+#define LV_USE_PIKASCRIPT_BINDING          1
               </RTE_Components_h>
 
             </component>
