@@ -266,6 +266,14 @@ void lv_arc_set_change_rate(lv_obj_t * obj, uint16_t rate)
     arc->chg_rate = rate;
 }
 
+void lv_arc_set_knob_offset(lv_obj_t * obj, int16_t offset)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_arc_t * arc = (lv_arc_t *)obj;
+
+    arc->knob_offset = offset;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -322,6 +330,12 @@ int16_t lv_arc_get_rotation(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     return ((lv_arc_t *)obj)->rotation;
+}
+
+int16_t lv_arc_get_knob_offset(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    return ((lv_arc_t *)obj)->knob_offset;
 }
 
 /*=====================
@@ -785,8 +799,9 @@ static void get_knob_area(lv_obj_t * obj, const lv_point_t * center, lv_coord_t 
     r -= indic_width_half;
 
     lv_coord_t angle = get_angle(obj);
-    lv_coord_t knob_x = (r * lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT;
-    lv_coord_t knob_y = (r * lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT;
+    lv_coord_t knob_offset = lv_arc_get_knob_offset(obj);
+    lv_coord_t knob_x = (r * lv_trigo_sin(knob_offset + angle + 90)) >> LV_TRIGO_SHIFT;
+    lv_coord_t knob_y = (r * lv_trigo_sin(knob_offset + angle)) >> LV_TRIGO_SHIFT;
 
     lv_coord_t left_knob = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
     lv_coord_t right_knob = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
