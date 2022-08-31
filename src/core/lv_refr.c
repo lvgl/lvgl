@@ -616,7 +616,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     /* Below the `area_p` area will be redrawn into the draw buffer.
      * In single buffered mode wait here until the buffer is freed.
      * In full double buffered mode wait here while the buffers are swapped and a buffer becomes available*/
-    bool full_sized = draw_buf->size == disp_refr->driver->hor_res * disp_refr->driver->ver_res;
+    bool full_sized = draw_buf->size == (uint32_t)disp_refr->driver->hor_res * disp_refr->driver->ver_res;
     if((draw_buf->buf1 && !draw_buf->buf2) ||
        (draw_buf->buf1 && draw_buf->buf2 && full_sized)) {
         while(draw_buf->flushing) {
@@ -1183,7 +1183,7 @@ static void draw_buf_flush(lv_disp_t * disp)
 
     /* In partial double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer */
-    bool full_sized = draw_buf->size == disp_refr->driver->hor_res * disp_refr->driver->ver_res;
+    bool full_sized = draw_buf->size == (uint32_t)disp_refr->driver->hor_res * disp_refr->driver->ver_res;
     if(draw_buf->buf1 && draw_buf->buf2 && !full_sized) {
         while(draw_buf->flushing) {
             if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
