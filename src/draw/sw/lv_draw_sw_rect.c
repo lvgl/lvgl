@@ -1376,6 +1376,8 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
 
 #else /*LV_DRAW_COMPLEX*/
     LV_UNUSED(blend_mode);
+    LV_UNUSED(rout);
+    LV_UNUSED(rin);
     if(!mask_any) {
         draw_border_simple(draw_ctx, outer_area, inner_area, color, opa);
         return;
