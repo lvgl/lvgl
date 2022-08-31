@@ -323,15 +323,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     refr_invalid_areas();
 
-
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
-        if(disp_refr->driver->full_refresh) {
-            lv_area_t disp_area;
-            lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
-            disp_refr->driver->draw_ctx->buf_area = &disp_area;
-            draw_buf_flush(disp_refr);
-        }
 
         /*Clean up*/
         lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
@@ -621,8 +614,11 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
 
     /* Below the `area_p` area will be redrawn into the draw buffer.
-     * In single buffered mode wait here until the buffer is freed.*/
-    if(draw_buf->buf1 && !draw_buf->buf2) {
+     * In single buffered mode wait here until the buffer is freed.
+     * In full double buffered mode wait here while the buffers are swapped and a buffer becomes available*/
+    bool full_sized = draw_buf->size == disp_refr->driver->hor_res * disp_refr->driver->ver_res;
+    if((draw_buf->buf1 && !draw_buf->buf2) ||
+       (draw_buf->buf1 && draw_buf->buf2 && full_sized)) {
         while(draw_buf->flushing) {
             if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
         }
@@ -710,11 +706,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     refr_obj_and_children(draw_ctx, lv_disp_get_layer_top(disp_refr));
     refr_obj_and_children(draw_ctx, lv_disp_get_layer_sys(disp_refr));
 
-    /*In true double buffered mode flush only once when all areas were rendered.
-     *In normal mode flush after every area*/
-    if(disp_refr->driver->full_refresh == false) {
-        draw_buf_flush(disp_refr);
-    }
+    draw_buf_flush(disp_refr);
 }
 
 /**
@@ -1189,24 +1181,13 @@ static void draw_buf_flush(lv_disp_t * disp)
     lv_draw_ctx_t * draw_ctx = disp->driver->draw_ctx;
     if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
 
-    /* In double buffered mode wait until the other buffer is freed
+    /* In partial double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer */
-    if(draw_buf->buf1 && draw_buf->buf2) {
+    bool full_sized = draw_buf->size == disp_refr->driver->hor_res * disp_refr->driver->ver_res;
+    if(draw_buf->buf1 && draw_buf->buf2 && !full_sized) {
         while(draw_buf->flushing) {
             if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
         }
-
-        /*If the screen is transparent initialize it when the flushing is ready*/
-#if LV_COLOR_SCREEN_TRANSP
-        if(disp_refr->driver->screen_transp) {
-            if(disp_refr->driver->clear_cb) {
-                disp_refr->driver->clear_cb(disp_refr->driver, disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size);
-            }
-            else {
-                lv_memset_00(disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size * LV_IMG_PX_SIZE_ALPHA_BYTE);
-            }
-        }
-#endif
     }
 
     draw_buf->flushing = 1;
@@ -1225,6 +1206,7 @@ static void draw_buf_flush(lv_disp_t * disp)
             call_flush_cb(disp->driver, draw_ctx->buf_area, draw_ctx->buf);
         }
     }
+
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
     if(draw_buf->buf1 && draw_buf->buf2 && (!disp->driver->direct_mode || flushing_last)) {
         if(draw_buf->buf_act == draw_buf->buf1)
