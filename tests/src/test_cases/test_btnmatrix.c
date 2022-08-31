@@ -375,7 +375,6 @@ void test_btn_matrix_defocused_event_works(void)
 
 void test_btn_matrix_focused_event_works(void)
 {
-    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
 
     lv_btnmatrix_set_map(btnm, btn_map);
@@ -383,9 +382,6 @@ void test_btn_matrix_focused_event_works(void)
     lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_FOCUSED, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_EVENT_FOCUSED;
-    /* Select a button before raising a simulated event.
-     * This is done to increase code coverage. */
-    //btnmObj->btn_id_sel = 0;
     lv_event_send(btnm, LV_EVENT_FOCUSED, NULL);
     TEST_ASSERT_TRUE(event_triggered);
 }
