@@ -16,6 +16,8 @@
  *      DEFINES
  *********************/
 #define MY_CLASS    &lv_spinbox_class
+#define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 8U)
+#define LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES (LV_SPINBOX_MAX_DIGIT_COUNT + 4U)
 
 /**********************
  *      TYPEDEFS
@@ -108,9 +110,9 @@ void lv_spinbox_set_digit_format(lv_obj_t * obj, uint8_t digit_count, uint8_t se
     if(separator_position >= digit_count) separator_position = 0;
 
     if(digit_count < LV_SPINBOX_MAX_DIGIT_COUNT) {
-        int64_t max_val = lv_pow(10, digit_count);
+        const int64_t max_val = lv_pow(10, digit_count);
         if(spinbox->range_max > max_val - 1) spinbox->range_max = max_val - 1;
-        if(spinbox->range_min < - max_val  + 1) spinbox->range_min = - max_val  + 1;
+        if(spinbox->range_min < -max_val  + 1) spinbox->range_min = -max_val  + 1;
     }
 
     spinbox->digit_count   = digit_count;
@@ -162,9 +164,10 @@ void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint8_t pos)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
-    int32_t step_limit;
-    step_limit       = LV_MAX(spinbox->range_max, (spinbox->range_min < 0 ? (-spinbox->range_min) : spinbox->range_min));
-    int32_t new_step = lv_pow(10, pos);
+
+    const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
+    const int32_t new_step = lv_pow(10, pos);
+
     if(pos <= 0) spinbox->step = 1;
     else if(new_step <= step_limit) spinbox->step = new_step;
 
@@ -226,11 +229,8 @@ void lv_spinbox_step_next(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    int32_t new_step = spinbox->step / 10;
-    if((new_step) > 0)
-        spinbox->step = new_step;
-    else
-        spinbox->step = 1;
+    const int32_t new_step = spinbox->step / 10;
+    spinbox->step = (new_step > 0) ? new_step : 1;
 
     lv_spinbox_updatevalue(obj);
 }
@@ -243,9 +243,9 @@ void lv_spinbox_step_prev(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
-    int32_t step_limit;
-    step_limit       = LV_MAX(spinbox->range_max, (spinbox->range_min < 0 ? (-spinbox->range_min) : spinbox->range_min));
-    int32_t new_step = spinbox->step * 10;
+
+    const int32_t step_limit = LV_MAX(spinbox->range_max, LV_ABS(spinbox->range_min));
+    const int32_t new_step = spinbox->step * 10;
     if(new_step <= step_limit) spinbox->step = new_step;
 
     lv_spinbox_updatevalue(obj);
@@ -367,34 +367,32 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    lv_event_code_t code = lv_event_get_code(e);
+    const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
     if(code == LV_EVENT_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
         lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
-            if(lv_group_get_editing(lv_obj_get_group(obj))) {
-                if(spinbox->digit_count > 1) {
-                    if(spinbox->digit_step_dir == LV_DIR_RIGHT) {
-                        if(spinbox->step > 1) {
-                            lv_spinbox_step_next(obj);
-                        }
-                        else {
-                            /*Restart from the MSB*/
-                            spinbox->step = lv_pow(10, spinbox->digit_count - 2);
-                            lv_spinbox_step_prev(obj);
-                        }
+        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(obj))) {
+            if(spinbox->digit_count > 1) {
+                if(spinbox->digit_step_dir == LV_DIR_RIGHT) {
+                    if(spinbox->step > 1) {
+                        lv_spinbox_step_next(obj);
                     }
                     else {
-                        if(spinbox->step < lv_pow(10, spinbox->digit_count - 1)) {
-                            lv_spinbox_step_prev(obj);
-                        }
-                        else {
-                            /*Restart from the LSB*/
-                            spinbox->step = 10;
-                            lv_spinbox_step_next(obj);
-                        }
+                        /*Restart from the MSB*/
+                        spinbox->step = lv_pow(10, spinbox->digit_count - 2);
+                        lv_spinbox_step_prev(obj);
+                    }
+                }
+                else {
+                    if(spinbox->step < lv_pow(10, spinbox->digit_count - 1)) {
+                        lv_spinbox_step_prev(obj);
+                    }
+                    else {
+                        /*Restart from the LSB*/
+                        spinbox->step = 10;
+                        lv_spinbox_step_next(obj);
                     }
                 }
             }
@@ -403,22 +401,27 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
          * Set `step` accordingly*/
         else {
             const char * txt = lv_textarea_get_text(obj);
-            size_t txt_len = strlen(txt);
+            const size_t txt_len = strlen(txt);
 
+            /* Check cursor position */
+            /* Cursor is in '.' digit */
             if(txt[spinbox->ta.cursor.pos] == '.') {
                 lv_textarea_cursor_left(obj);
             }
+            /* Cursor is already in the right-most digit */
             else if(spinbox->ta.cursor.pos == (uint32_t)txt_len) {
                 lv_textarea_set_cursor_pos(obj, txt_len - 1);
             }
+            /* Cursor is already in the left-most digit AND range_min is negative */
             else if(spinbox->ta.cursor.pos == 0 && spinbox->range_min < 0) {
                 lv_textarea_set_cursor_pos(obj, 1);
             }
 
-            size_t len = spinbox->digit_count - 1;
+            /* Handle spinbox with decimal point (spinbox->dec_point_pos != 0) */
             uint16_t cp = spinbox->ta.cursor.pos;
-
             if(spinbox->ta.cursor.pos > spinbox->dec_point_pos && spinbox->dec_point_pos != 0) cp--;
+
+            const size_t len = spinbox->digit_count - 1;
             uint32_t pos = len - cp;
 
             if(spinbox->range_min < 0) pos++;
@@ -460,11 +463,11 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
 {
     lv_spinbox_t * spinbox = (lv_spinbox_t *)obj;
 
-    char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
-    lv_memzero(buf, sizeof(buf));
-    char * buf_p = buf;
-    uint8_t cur_shift_left = 0;
+    /* LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES (18): Max possible digit_count value (15) + sign + decimal point + NULL terminator */
+    char textarea_txt[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_8BYTES] = {0U};
+    char * buf_p = textarea_txt;
 
+    uint8_t cur_shift_left = 0;
     if(spinbox->range_min < 0) {  // hide sign if there are only positive values
         /*Add the sign*/
         (*buf_p) = spinbox->value >= 0 ? '+' : '-';
@@ -475,33 +478,34 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         cur_shift_left++;
     }
 
-    int32_t i;
-    char digits[LV_SPINBOX_MAX_DIGIT_COUNT + 4];
     /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
-    lv_snprintf(digits, sizeof(digits), "%" LV_PRId32, LV_ABS(spinbox->value));
+    char digits[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES];
+    lv_snprintf(digits, LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES, "%" LV_PRId32, LV_ABS(spinbox->value));
 
     /*Add leading zeros*/
-    int lz_cnt = spinbox->digit_count - (int)strlen(digits);
-    if(lz_cnt > 0) {
-        for(i = (uint16_t)strlen(digits); i >= 0; i--) {
-            digits[i + lz_cnt] = digits[i];
+    int32_t i;
+    const int digits_len = (int)strlen(digits);
+
+    const int leading_zeros_cnt = spinbox->digit_count - digits_len;
+    if(leading_zeros_cnt) {
+        for(i = (uint16_t) digits_len; i >= 0; i--) {
+            digits[i + leading_zeros_cnt] = digits[i];
         }
-        for(i = 0; i < lz_cnt; i++) {
+        /* NOTE: Substitute with memset? */
+        for(i = 0; i < leading_zeros_cnt; i++) {
             digits[i] = '0';
         }
     }
 
-    int32_t intDigits;
-    intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
-
     /*Add the decimal part*/
+    const int32_t intDigits = (spinbox->dec_point_pos == 0) ? spinbox->digit_count : spinbox->dec_point_pos;
     for(i = 0; i < intDigits && digits[i] != '\0'; i++) {
         (*buf_p) = digits[i];
         buf_p++;
     }
 
-    if(spinbox->dec_point_pos != 0) {
-        /*Insert the decimal point*/
+    /*Insert the decimal point*/
+    if(spinbox->dec_point_pos) {
         (*buf_p) = '.';
         buf_p++;
 
@@ -512,10 +516,10 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
     }
 
     /*Refresh the text*/
-    lv_textarea_set_text(obj, (char *)buf);
+    lv_textarea_set_text(obj, (char *)textarea_txt);
 
     /*Set the cursor position*/
-    int32_t step    = spinbox->step;
+    int32_t step = spinbox->step;
     uint8_t cur_pos = (uint8_t)spinbox->digit_count;
     while(step >= 10) {
         step /= 10;
