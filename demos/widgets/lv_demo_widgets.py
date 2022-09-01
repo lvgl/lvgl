@@ -5,8 +5,14 @@ import fs_driver
 import time,os,sys
 from imagetools import get_png_info, open_png
 
+SCREEN_SIZE_SMALL  = (320,240)
+SCREEN_SIZE_MEDIUM = (480,320)
+SCREEN_SIZE_LARGE  = (800,600)
+SCREEN_SIZE        = SCREEN_SIZE_LARGE
+
 LV_THEME_DEFAULT_DARK = 0
 LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = 1<<23
+LV_USE_DRAW_MASKS = False
 
 global session_desktop,session_tablet,session_mobile
 global down1,down2,down2
@@ -108,7 +114,6 @@ def profile_create(parent):
     user_name = lv.textarea(panel2)
     user_name.set_one_line(True)
     user_name.set_placeholder_text("Your name")
-    # user_name.add_event_cb(ta_event_cb, lv.event.ALL, None)
     user_name.add_event_cb(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
                         
     password_label = lv.label(panel2)
@@ -119,9 +124,7 @@ def profile_create(parent):
     password.set_one_line(True);
     password.set_password_mode(True)
     password.set_placeholder_text("Min. 8 chars.")
-    # user_name.add_event_cb(ta_event_cb, lv.event.ALL, None)
     password.add_event_cb(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
-    # password.add_event_cb(ta_event_cb, lv.event.ALL, kb)
 
     gender_label = lv.label(panel2)
     gender_label.set_text("Gender")
@@ -166,10 +169,133 @@ def profile_create(parent):
     sw2 = lv.switch(panel3)
     
     if disp_size == DISP_LARGE:
-        print("large")
+        grid_main_col_dsc = [LV_GRID_FR(1), LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
+        grid_main_row_dsc = [lv.GRID_CONTENT, lv.GRID_CONTENT, lv.GRID_TEMPLATE_LAST]
 
-    else:
+        # Create the top panel
+        grid_1_col_dsc = [lv.GRID_CONTENT, 5, lv.GRID_CONTENT, LV_GRID_FR(2), LV_GRID_FR(1), LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
+        grid_1_row_dsc = [lv.GRID_CONTENT, lv.GRID_CONTENT, 10, lv.GRID_CONTENT, lv.GRID_CONTENT, lv.GRID_TEMPLATE_LAST]
+
+        grid_2_col_dsc = [LV_GRID_FR(1), LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
+        grid_2_row_dsc = [
+            lv.GRID_CONTENT,  # Title
+            5,                # Separator
+            lv.GRID_CONTENT,  # Box title
+            30,               # Boxes
+            5,                # Separator
+            lv.GRID_CONTENT,  # Box title
+            30,               # Boxes
+            lv.GRID_TEMPLATE_LAST]
+
+
+        parent.set_grid_dsc_array(grid_main_col_dsc, grid_main_row_dsc)
+
+        panel1.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+
+        panel1.set_grid_dsc_array(grid_1_col_dsc, grid_1_row_dsc)
+        avatar.set_grid_cell(lv.GRID_ALIGN.CENTER, 0, 1, lv.GRID_ALIGN.CENTER, 0, 5)
+        name.set_grid_cell(lv.GRID_ALIGN.START, 2, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+        dsc.set_grid_cell(lv.GRID_ALIGN.STRETCH, 2, 4, lv.GRID_ALIGN.START, 1, 1)
+        email_icn.set_grid_cell(lv.GRID_ALIGN.CENTER, 2, 1, lv.GRID_ALIGN.CENTER, 3, 1)
+        email_label.set_grid_cell(lv.GRID_ALIGN.START, 3, 1, lv.GRID_ALIGN.CENTER, 3, 1)
+        call_icn.set_grid_cell(lv.GRID_ALIGN.CENTER, 2, 1, lv.GRID_ALIGN.CENTER, 4, 1)
+        call_label.set_grid_cell(lv.GRID_ALIGN.START, 3, 1, lv.GRID_ALIGN.CENTER, 4, 1)
+        log_out_btn.set_grid_cell(lv.GRID_ALIGN.STRETCH, 4, 1, lv.GRID_ALIGN.CENTER, 3, 2)
+        invite_btn.set_grid_cell(lv.GRID_ALIGN.STRETCH, 5, 1, lv.GRID_ALIGN.CENTER, 3, 2)
+
+        panel2.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 1, lv.GRID_ALIGN.START, 1, 1)
+        panel2.set_grid_dsc_array(grid_2_col_dsc, grid_2_row_dsc)
+        panel2_title.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+        user_name.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 1, lv.GRID_ALIGN.CENTER, 3, 1)
+        user_name_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 2, 1)
+        password.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1, lv.GRID_ALIGN.CENTER, 3, 1)
+        password_label.set_grid_cell(lv.GRID_ALIGN.START, 1, 1, lv.GRID_ALIGN.START, 2, 1)
+        birthdate.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1, lv.GRID_ALIGN.CENTER, 6, 1)
+        birthday_label.set_grid_cell(lv.GRID_ALIGN.START, 1, 1, lv.GRID_ALIGN.START, 5, 1)
+        gender.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 1, lv.GRID_ALIGN.CENTER, 6, 1)
+        gender_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 5, 1)
+
+        panel3.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1, lv.GRID_ALIGN.STRETCH, 1, 1)
+        panel3.set_grid_dsc_array(grid_2_col_dsc, grid_2_row_dsc)
+        panel3_title.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+        slider1.set_grid_cell(lv.GRID_ALIGN.CENTER, 0, 2, lv.GRID_ALIGN.CENTER, 3, 1)
+        experience_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 2, 1)
+        sw2.set_grid_cell(lv.GRID_ALIGN.START, 1, 1, lv.GRID_ALIGN.CENTER, 6, 1)
+        hard_working_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 5, 1)
+        sw1.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.CENTER, 6, 1)
+        team_player_label.set_grid_cell(lv.GRID_ALIGN.START, 1, 1, lv.GRID_ALIGN.START, 5, 1)
         
+    elif disp_size == DISP_MEDIUM :
+        grid_main_col_dsc = [LV_GRID_FR(1), LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
+        grid_main_row_dsc = [lv.GRID_CONTENT, lv.GRID_CONTENT, lv.GRID_TEMPLATE_LAST]
+
+
+        # Create the top panel
+        grid_1_col_dsc = [lv.GRID_CONTENT, 1, lv.GRID_CONTENT, LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
+        grid_1_row_dsc = [
+            lv.GRID_CONTENT, # Name
+            lv.GRID_CONTENT, # Description
+            lv.GRID_CONTENT, # Email
+            -20,
+            lv.GRID_CONTENT, # Phone
+            lv.GRID_CONTENT, # Buttons
+            lv.GRID_TEMPLATE_LAST]
+
+        grid_2_col_dsc= [LV_GRID_FR(1), LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
+        grid_2_row_dsc = [
+            lv.GRID_CONTENT,  # Title
+            5,                # Separator
+            lv.GRID_CONTENT,  # Box title
+            40,               # Box
+            lv.GRID_CONTENT,  # Box title
+            40,               # Box
+            lv.GRID_CONTENT,  # Box title
+            40,               # Box
+            lv.GRID_CONTENT,  # Box title
+            40,               # Box
+            lv.GRID_TEMPLATE_LAST]
+
+
+        parent.set_grid_dsc_array(grid_main_col_dsc, grid_main_row_dsc)
+        panel1.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+
+        log_out_btn.set_width(120)
+        invite_btn.set_width(120)
+
+        panel1.set_grid_dsc_array(grid_1_col_dsc, grid_1_row_dsc)
+        avatar.set_grid_cell(lv.GRID_ALIGN.CENTER, 0, 1, lv.GRID_ALIGN.START, 0, 4)
+        name.set_grid_cell(lv.GRID_ALIGN.START, 2, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+        dsc.set_grid_cell(lv.GRID_ALIGN.STRETCH, 2, 2, lv.GRID_ALIGN.START, 1, 1)
+        email_label.set_grid_cell(lv.GRID_ALIGN.START, 3, 1, lv.GRID_ALIGN.CENTER, 2, 1)
+        email_icn.set_grid_cell(lv.GRID_ALIGN.CENTER, 2, 1, lv.GRID_ALIGN.CENTER, 2, 1)
+        call_icn.set_grid_cell(lv.GRID_ALIGN.CENTER, 2, 1, lv.GRID_ALIGN.CENTER, 4, 1)
+        call_label.set_grid_cell(lv.GRID_ALIGN.START, 3, 1, lv.GRID_ALIGN.CENTER, 4, 1)
+        log_out_btn.set_grid_cell(lv.GRID_ALIGN.START, 1, 1, lv.GRID_ALIGN.CENTER, 5, 1)
+        invite_btn.set_grid_cell(lv.GRID_ALIGN.END, 3, 1, lv.GRID_ALIGN.CENTER, 5, 1)
+
+        panel2.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 1, lv.GRID_ALIGN.START, 1, 1)
+        panel2.set_grid_dsc_array(grid_2_col_dsc, grid_2_row_dsc)
+        panel2_title.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+        user_name_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 2, 1)
+        user_name.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 3, 1)
+        password_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 4, 1)
+        password.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 5, 1)
+        birthday_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 6, 1)
+        birthdate.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 7, 1)
+        gender_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 8, 1)
+        gender.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 9, 1)
+
+        panel3.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1, lv.GRID_ALIGN.STRETCH, 1, 1)
+        panel3.set_grid_dsc_array(grid_2_col_dsc, grid_2_row_dsc)
+        panel3_title.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.CENTER, 0, 1)
+        slider1.set_grid_cell(lv.GRID_ALIGN.CENTER, 0, 2, lv.GRID_ALIGN.CENTER, 3, 1)
+        experience_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 2, 1)
+        hard_working_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 4, 1)
+        sw2.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 5, 1)
+        team_player_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 6, 1)
+        sw1.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 7, 1)
+
+    else :        
         grid_main_col_dsc = [LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
         grid_main_row_dsc = [lv.GRID_CONTENT, lv.GRID_CONTENT, lv.GRID_CONTENT, lv.GRID_TEMPLATE_LAST]
         parent.set_grid_dsc_array(grid_main_col_dsc, grid_main_row_dsc)
@@ -259,16 +385,14 @@ def analytics_create(parent):
     title.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 0, 1)
 
     chart1 = lv.chart(chart1_cont)
-    #lv.group_add_obj(lv.group_get_default(), chart1)
-    # group = lv.group_get_default()
-
+    lv.group_get_default().add_obj(chart1)
     chart1.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS)
     chart1.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1, lv.GRID_ALIGN.STRETCH, 1, 1)
     chart1.set_axis_tick(lv.chart.AXIS.PRIMARY_Y, 0, 0, 5, 1, True, 80)
     chart1.set_axis_tick(lv.chart.AXIS.PRIMARY_X, 0, 0, 12, 1, True, 50)
     chart1.set_div_line_count(0, 12)
     chart1.set_point_count(12)
-    # chart1.add_event_cb(chart_event_cb, lv.event.ALL, None)
+    chart1.add_event_cb(chart_event_cb, lv.EVENT.ALL, None)
     if disp_size == DISP_SMALL:
         chart1.set_zoom_x(256 * 3)
     elif disp_size == DISP_MEDIUM:
@@ -307,7 +431,7 @@ def analytics_create(parent):
     title.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 0, 1)
 
     chart2 = lv.chart(chart2_cont)
-    # lv.group_add_obj(lv.group_get_default(), chart2)
+    lv.group_get_default().add_obj(chart2)
     chart2.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS)
 
     chart2.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1, lv.GRID_ALIGN.STRETCH, 1, 1)
@@ -317,7 +441,7 @@ def analytics_create(parent):
     chart2.set_type(lv.chart.TYPE.BAR)
     chart2.set_div_line_count(6, 0)
     chart2.set_point_count(12)
-    # chart2.add_event_cb(chart_event_cb, lv.event.ALL, None)
+    chart2.add_event_cb(chart_event_cb, lv.EVENT.ALL, None)
     chart2.set_zoom_x(256 * 2)
     chart2.set_style_border_side(lv.BORDER_SIDE.LEFT | lv.BORDER_SIDE.BOTTOM, 0)
     chart2.set_style_radius(0, 0)
@@ -594,7 +718,7 @@ def shop_create(parent):
     chart3.set_type(lv.chart.TYPE.BAR)
     chart3.set_div_line_count(6, 0)
     chart3.set_point_count(7)
-    #chart3.add_event_cb(chart3, shop_chart_event_cb, LV_EVENT_ALL, NULL);
+    chart3.add_event_cb(shop_chart_event_cb, lv.EVENT.ALL, None)
 
     ser4 = chart3.add_series(lv.theme_get_color_primary(chart3), lv.chart.AXIS.PRIMARY_Y)
     chart3.set_next_value(ser4, lv.rand(60, 90))
@@ -620,20 +744,21 @@ def shop_create(parent):
             lv.GRID_CONTENT,  # Hint
             lv.GRID_TEMPLATE_LAST]
 
-        chart3.set_size(lv_pct(100), lv_pct(100))
+        chart3.set_size(lv.pct(100), lv.pct(100))
         chart3.set_style_pad_column(lv.dpx(30), 0)
 
-        panel1.grid_dsc_array(grid1,col_dsc, grid1_row_dsc)
+        panel1.set_grid_dsc_array(grid1_col_dsc, grid1_row_dsc)
         title.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 0, 1)
         date.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 1, 1)
         amount.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 3, 1)
         hint.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 4, 1)
         chart3.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1, lv.GRID_ALIGN.STRETCH, 0, 5)
+        
     elif disp_size == DISP_MEDIUM :
         grid1_col_dsc = [LV_GRID_FR(1), LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
         grid1_row_dsc = [
                 lv.GRID_CONTENT,  # Title + Date
-                Llv.GRID_CONTENT, # Amount + Hint
+                lv.GRID_CONTENT,  # Amount + Hint
                 200,              # Chart
                 lv.GRID_TEMPLATE_LAST ]
 
@@ -782,7 +907,7 @@ except:
 print("System name: ",osVersion)
 
 # Initialize the display driver
-driver = display_driver_utils.driver(width=320,height=240,orientation=display_driver_utils.ORIENT_LANDSCAPE)
+driver = display_driver_utils.driver(width=SCREEN_SIZE[0],height=SCREEN_SIZE[1],orientation=display_driver_utils.ORIENT_LANDSCAPE)
 
     
 # Create a screen and load it
@@ -821,13 +946,13 @@ if disp_size == DISP_LARGE:
         font_large = lv.font_montserrat_24
     except:
         print("Dynamically loading font_montserrat_24")
-        font_large = lv.font_load("S:assets/font/montserrat-24.fnt")
+        font_large = lv.font_load("S:../../assets/font/montserrat-24.fnt")
         
     try:
         font_normal = lv.font_montserrat_16
     except:
         print("Dynamically loading font_montserrat_16")
-        font_normal = lv.font_load("S:assets/font/montserrat-16.fnt")
+        font_normal = lv.font_load("S:../../assets/font/montserrat-16.fnt")
 
 elif disp_size == DISP_MEDIUM:
     tab_h = 45
@@ -835,13 +960,13 @@ elif disp_size == DISP_MEDIUM:
         font_large = lv.font_montserrat_20
     except:
         print("Dynamically loading font_montserrat_20")
-        font_large = lv.font_load("S:assets/font/montserrat-20.fnt")
+        font_large = lv.font_load("S:../../assets/font/montserrat-20.fnt")
             
     try:
         font_normal = lv.font_montserrat_14
     except:
         print("Dynamically loading font_montserrat_14")
-        font_normal = lv.font_load("S:assets/font/montserrat-14.fnt")
+        font_normal = lv.font_load("S:../../assets/font/montserrat-14.fnt")
 
 else:  # disp_size == DISP_SMALL 
     tab_h = 45
@@ -852,7 +977,7 @@ else:  # disp_size == DISP_SMALL
         if osVersion == "esp32":
             font_large = lv.font_load("S:/font/montserrat-18.fnt")
         else:
-            font_large = lv.font_load("S:assets/font/montserrat-18.fnt")
+            font_large = lv.font_load("S:../../assets/font/montserrat-18.fnt")
         
     try:
         font_normal = lv.font_montserrat_12
@@ -861,7 +986,7 @@ else:  # disp_size == DISP_SMALL
         if osVersion == "esp32":        
             font_normal = lv.font_load("S:/font/montserrat-12.fnt")            
         else:
-            font_normal = lv.font_load("S:assets/font/montserrat-12.fnt")            
+            font_normal = lv.font_load("S:../../assets/font/montserrat-12.fnt")            
 
 if not font_large or not font_normal:
     print("font loading failed")
@@ -893,11 +1018,29 @@ lv.scr_act().set_style_text_font(font_normal, 0)
 
 if disp_size == DISP_LARGE:
     tab_btns = tv.get_tab_btns()
-    tab_btns.set_style_pad_left(LV_HOR_RES / 2, 0)
-    # logo = lv_img_create(tab_btns);
-    #    LV_IMG_DECLARE(img_lvgl_logo);
-    #    lv_img_set_src(logo, &img_lvgl_logo);
-    #    lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
+    tab_btns.set_style_pad_left(LV_HOR_RES // 2, 0)
+
+    # Create an image from the png file
+    try:
+        if osVersion == "unix":
+            with open('assets/lvgl_logo.png','rb') as f:
+                png_data = f.read()
+        else:
+            with open('images/lvgl_logo.png','rb') as f:
+                png_data = f.read()
+    except:
+        print("Could not find lvgl_logo.png")
+        sys.exit()
+    
+    lvgl_logo_argb = lv.img_dsc_t({
+        'data_size': len(png_data),
+        'data': png_data 
+    })
+
+    logo = lv.img(tab_btns)
+
+    logo.set_src(lvgl_logo_argb)
+    logo.align(lv.ALIGN.LEFT_MID, -LV_HOR_RES // 2 + 25, 0)
 
     label = lv.label(tab_btns)
     label.add_style(style_title, 0)
@@ -959,8 +1102,58 @@ def color_changer_create(parent):
          btn.set_size(lv.dpx(42), lv.dpx(42))
          btn.align(lv.ALIGN.BOTTOM_RIGHT, -lv.dpx(15), -lv.dpx(15))
     else :
-         btn.set_size(lv.dpx(50), lv.dpv(50))
+         btn.set_size(lv.dpx(50), lv.dpx(50))
          btn.align(lv.ALIGN.BOTTOM_RIGHT, -lv.dpx(15), -lv.dpx(15))
+
+def shop_chart_event_cb(e) :
+
+    code = e.get_code()
+    if code == lv.EVENT.DRAW_PART_BEGIN :
+        dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
+        # Set the markers' text
+        if dsc.part == lv.PART.TICKS and dsc.id == lv.chart.AXIS.PRIMARY_X :
+            month = ["Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
+            dsc.text = month[dsc.value]
+
+        if dsc.part == lv.PART.ITEMS:
+            dsc.rect_dsc.bg_opa = lv.OPA.TRANSP  # We will draw it later
+
+    if code == lv.EVENT.DRAW_PART_END :
+        dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
+        # Add the faded area before the lines are drawn 
+        if dsc.part == lv.PART.ITEMS :
+            devices = [32, 43, 21, 56, 29, 36, 19, 25, 62, 35]
+            clothes = [12, 19, 23, 31, 27, 32, 32, 11, 21, 32]
+            services = [56, 38, 56, 13, 44, 32, 49, 64, 17, 33]
+
+            draw_rect_dsc = lv.draw_rect_dsc_t()
+            draw_rect_dsc.init()
+
+            h = dsc.draw_area.get_height()
+
+            a = lv.area_t()
+            a.x1 = dsc.draw_area.x1
+            a.x2 = dsc.draw_area.x2
+
+            a.y1 = dsc.draw_area.y1
+            a.y2 = a.y1 + 4 + (devices[dsc.id] * h) // 100 # +4 to overlap the radius
+            draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.RED)
+            draw_rect_dsc.radius = 4
+            dsc.draw_ctx.rect(draw_rect_dsc,a)
+            # lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
+
+            a.y1 = a.y2 - 4;                                    # -4 to overlap the radius
+            a.y2 = a.y1 + (clothes[dsc.id] * h) // 100
+            draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.BLUE)
+            draw_rect_dsc.radius = 0
+            dsc.draw_ctx.rect(draw_rect_dsc,a)
+            # lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
+
+            a.y1 = a.y2;
+            a.y2 = a.y1 + (services[dsc.id] * h) // 100
+            draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.GREEN)
+            dsc.draw_ctx.rect(draw_rect_dsc,a)
+            # lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
 
 def meter1_indic1_anim_cb(meter,indic,val):
     
@@ -1052,7 +1245,7 @@ def meter3_anim_cb(meter,indic, label, val) :
     meter.set_indicator_value(indic, val)
 
     # label = lv.obj.get_child(lv.obj.__cast__(meter), -0)
-    label.set_text(str(val) + "Mbps")
+    label.set_text("      "+str(val) + "Mbps")
 
 def ta_event_cb(e,kb,tv) :
 
@@ -1074,13 +1267,15 @@ def ta_event_cb(e,kb,tv) :
         kb.set_textarea(None)
         tv.set_height(LV_VER_RES)
         kb.add_flag(lv.obj.FLAG.HIDDEN)
-        indev.reset(None)
+        if indev != None:
+            indev.reset(None)
 
     elif code == lv.EVENT.READY or code == lv.EVENT.CANCEL:
         tv.set_height(LV_VER_RES)
         kb.add_flag(lv.obj.FLAG.HIDDEN)
         ta.clear_state(lv.STATE.FOCUSED)
-        indev.reset(None)    # To forget the last clicked object to make it focusable again
+        if indev != None:
+            indev.reset(None)    # To forget the last clicked object to make it focusable again
 
 def birthday_event_cb(e):
     global calendar
@@ -1123,7 +1318,140 @@ def calendar_event_cb(e,ta) :
         calendar = None
         lv.layer_top().clear_flag(lv.obj.FLAG.CLICKABLE)
         lv.layer_top().set_style_bg_opa(lv.OPA.TRANSP, 0)
-   
+
+def _lv_area_intersect(a1_p, a2_p) :
+
+    # Get the smaller area from 'a1_p' and 'a2_p'
+    res_p = lv.area_t()
+    res_p.x1 = max(a1_p.x1, a2_p.x1)
+    res_p.y1 = max(a1_p.y1, a2_p.y1)
+    res_p.x2 = max(a1_p.x2, a2_p.x2)
+    res_p.y2 = max(a1_p.y2, a2_p.y2)
+
+    # If x1 or y1 greater than x2 or y2 then the areas union is empty
+
+    if res_p.x1 > res_p.x2 or res_p.y1 > res_p.y2:
+        return None
+    return res_p
+
+def chart_event_cb(e):
+
+    code = e.get_code()
+    obj = e.get_target()
+    dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
+
+    if code == lv.EVENT.PRESSED or code == lv.EVENT.RELEASED :
+        obj.invalidate()  #To make the value boxes visible
+
+    elif code == lv.EVENT.DRAW_PART_BEGIN:
+        # Set the markers' text
+        if dsc.part == lv.PART.TICKS and dsc.id == lv.chart.AXIS.PRIMARY_X:
+            if obj.get_type() == lv.chart.TYPE.BAR: 
+                month = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"]
+                dsc.text = month[dsc.value]
+            else :
+                month = ["Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
+                dsc.text = month[dsc.value]
+
+        # Add the faded area before the lines are drawn 
+
+        elif dsc.part == lv.PART.ITEMS:
+            if LV_USE_DRAW_MASKS:
+                # Add  a line mask that keeps the area below the line
+                if dsc.p1 and dsc.p2:
+                    line_mask_param = lv.draw_mask_line_param_t()
+                    # print("dsc.p1.x: {:d}, dsc.p1.y: {:d}, dsc.p2.x: {:d}, dsc.p2.y: {:d}".format(
+                    #     dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y))
+                    line_mask_param.points_init(dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y,
+                                                lv.DRAW_MASK_LINE_SIDE.BOTTOM)
+                
+                    line_mask_id = lv.draw_mask_add(line_mask_param, None)              
+
+                    # Add a fade effect: transparent bottom covering top
+                    h = obj.get_height()
+                    coords = lv.area_t()
+                    obj.get_coords(coords)
+                    print("coords: x1: {:d}, x2: {:d}, y1: {:d}, y2: {:d}".format(
+                          coords.x1,coords.x2,coords.y1,coords.y2))
+                    fade_mask_param = lv.draw_mask_fade_param_t()
+                    fade_mask_param.init(coords, lv.OPA.COVER, coords.y1 + h // 8, lv.OPA.TRANSP,coords.y2)
+                    fade_mask_id = lv.draw_mask_add(fade_mask_param,None)
+                    
+                    # Draw a rectangle that will be affected by the mask
+                    draw_rect_dsc = lv.draw_rect_dsc_t()
+                    draw_rect_dsc.init()
+                    draw_rect_dsc.bg_opa = lv.OPA._50;
+                    draw_rect_dsc.bg_color = dsc.line_dsc.color
+                    obj_clip_area = lv.area_t() 
+                    obj_clip_area = _lv_area_intersect(dsc.draw_ctx.clip_area, coords)
+                    clip_area_ori = dsc.draw_ctx.clip_area
+                    dsc.draw_ctx.clip_area = obj_clip_area
+                    a = lv.area_t()
+                    a.x1 = dsc.p1.x;
+                    a.x2 = dsc.p2.x - 1;
+                    a.y1 = min(dsc.p1.y, dsc.p2.y)
+                    a.y2 = coords.y2
+                
+                    dsc.draw_ctx.rect(draw_rect_dsc,a)
+                    # lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
+                    dsc.draw_ctx.clip_area = clip_area_ori
+                    # Remove the masks 
+                    lv.draw_mask_remove_id(line_mask_id)
+                    lv.draw_mask_remove_id(fade_mask_id)
+
+            ser = lv.chart_series_t.__cast__(dsc.sub_part_ptr)
+                                             
+            if obj.get_pressed_point() == dsc.id :
+                if obj.get_type() == lv.chart.TYPE.LINE:
+                    dsc.rect_dsc.outline_color = lv.color_white()
+                    dsc.rect_dsc.outline_width = 2
+                else :
+                    dsc.rect_dsc.shadow_color = ser.color
+                    dsc.rect_dsc.shadow_width = 15
+                    dsc.rect_dsc.shadow_spread = 0
+            
+                buf = "{:2d}".format(dsc.value) 
+                text_size = lv.point_t() 
+                lv.txt_get_size(text_size, buf, font_normal, 0, 0, lv.COORD.MAX, lv.TEXT_FLAG.NONE)
+
+                txt_area = lv.area_t()
+                if obj.get_type() == lv.chart.TYPE.BAR :
+                    txt_area.y2 = dsc.draw_area.y1 - lv.dpx(15)
+                    txt_area.y1 = txt_area.y2 - text_size.y
+                    if ser == obj.get_series_next(None) :
+                        txt_area.x1 = dsc.draw_area.x1 + dsc.draw_area.get_width() // 2
+                        txt_area.x2 = txt_area.x1 + text_size.x
+                    else :
+                        txt_area.x2 = dsc.draw_area.x1 + dsc.draw_area.get_width() // 2
+                        txt_area.x1 = txt_area.x2 - text_size.x;
+                else :
+                    txt_area.x1 = dsc.draw_area.x1 + dsc.draw_area.get_width() // 2 - text_size.x // 2
+                    txt_area.x2 = txt_area.x1 + text_size.x
+                    txt_area.y2 = dsc.draw_area.y1 - lv.dpx(15)
+                    txt_area.y1 = txt_area.y2 - text_size.y
+
+                bg_area = lv.area_t()
+                bg_area.x1 = txt_area.x1 - lv.dpx(8)
+                bg_area.x2 = txt_area.x2 + lv.dpx(8)
+                bg_area.y1 = txt_area.y1 - lv.dpx(8)
+                bg_area.y2 = txt_area.y2 + lv.dpx(8)
+
+                rect_dsc = lv.draw_rect_dsc_t()
+                rect_dsc.init()
+                rect_dsc.bg_color = ser.color
+                rect_dsc.radius = lv.dpx(5)
+                dsc.draw_ctx.rect(rect_dsc,bg_area)
+
+                label_dsc = lv.draw_label_dsc_t()
+                label_dsc.init()
+                label_dsc.color = lv.color_white()
+                label_dsc.font = font_normal
+                dsc.draw_ctx.label(label_dsc,txt_area,buf,None)
+
+            else :
+                dsc.rect_dsc.outline_width = 0
+                dsc.rect_dsc.shadow_width = 0
+
 t1 = tv.add_tab("Profile")
 t2 = tv.add_tab("Analytics")
 t3 = tv.add_tab("Shop")
@@ -1133,7 +1461,3 @@ analytics_create(t2)
 shop_create(t3)
 
 color_changer_create(tv)
-
-while True:
-    lv.timer_handler()
-    time.sleep(1)
