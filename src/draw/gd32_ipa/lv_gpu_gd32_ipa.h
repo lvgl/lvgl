@@ -55,8 +55,6 @@ void lv_draw_gd32_ipa_buffer_copy(lv_draw_ctx_t * draw_ctx,
                                      void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
                                      void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
-void lv_gpu_gd32_ipa_wait_cb(lv_draw_ctx_t * draw_ctx);
-
 /**********************
  *      MACROS
  **********************/
