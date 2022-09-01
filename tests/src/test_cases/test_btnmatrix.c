@@ -258,17 +258,6 @@ void test_btn_matrix_release_event_works(void)
     TEST_ASSERT_TRUE(event_triggered);
 }
 
-void test_btn_matrix_size_changed_event_works(void)
-{
-    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
-    lv_btnmatrix_set_map(btnm, btn_map);
-    lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_SIZE_CHANGED, NULL);
-    /* Set expected event code before the event is raised. */
-    exp_evt_code = LV_EVENT_SIZE_CHANGED;
-    lv_event_send(btnm, LV_EVENT_SIZE_CHANGED, NULL);
-    TEST_ASSERT_TRUE(event_triggered);
-}
-
 void test_btn_matrix_key_event_works(void)
 {
     char keyCode;
