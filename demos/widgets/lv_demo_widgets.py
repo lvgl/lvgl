@@ -7,11 +7,11 @@ import time,os,sys
 SCREEN_SIZE_SMALL  = (320,240)
 SCREEN_SIZE_MEDIUM = (480,320)
 SCREEN_SIZE_LARGE  = (800,600)
-SCREEN_SIZE        = SCREEN_SIZE_LARGE
+SCREEN_SIZE        = SCREEN_SIZE_MEDIUM
 
 LV_THEME_DEFAULT_DARK = 0
 LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = 1<<23
-LV_USE_DRAW_MASKS = False
+LV_USE_DRAW_MASKS = True
 
 global session_desktop,session_tablet,session_mobile
 global down1,down2,down2
@@ -116,11 +116,11 @@ def profile_create(parent):
     user_name.add_event_cb(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
                         
     password_label = lv.label(panel2)
-    password_label.set_text("Password");
+    password_label.set_text("Password")
     password_label.add_style(style_text_muted, 0)
 
     password = lv.textarea(panel2)
-    password.set_one_line(True);
+    password.set_one_line(True)
     password.set_password_mode(True)
     password.set_placeholder_text("Min. 8 chars.")
     password.add_event_cb(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
@@ -147,7 +147,7 @@ def profile_create(parent):
     panel3_title.add_style(style_title, 0)
 
     experience_label = lv.label(panel3)
-    experience_label.set_text("Experience");
+    experience_label.set_text("Experience")
     experience_label.add_style(style_text_muted, 0)
 
     slider1 = lv.slider(panel3)
@@ -162,7 +162,7 @@ def profile_create(parent):
     sw1 = lv.switch(panel3)
 
     hard_working_label = lv.label(panel3)
-    hard_working_label.set_text("Hard-working");
+    hard_working_label.set_text("Hard-working")
     hard_working_label.add_style(style_text_muted, 0)
 
     sw2 = lv.switch(panel3)
@@ -310,7 +310,7 @@ def profile_create(parent):
                           lv.GRID_CONTENT, # Button2
                           lv.GRID_TEMPLATE_LAST]
 
-        panel1.set_grid_dsc_array(grid_1_col_dsc, grid_1_row_dsc);
+        panel1.set_grid_dsc_array(grid_1_col_dsc, grid_1_row_dsc)
 
 
         grid_2_col_dsc = [LV_GRID_FR(1), LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
@@ -352,8 +352,8 @@ def profile_create(parent):
         password.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 5, 1)
         birthday_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 6, 1)
         birthdate.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 7, 1)
-        gender_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 8, 1);
-        gender.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 9, 1);
+        gender_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 8, 1)
+        gender.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 2, lv.GRID_ALIGN.START, 9, 1)
 
         panel3.set_height(lv.SIZE_CONTENT)
         panel3.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 1, lv.GRID_ALIGN.START, 2, 1)
@@ -361,7 +361,7 @@ def profile_create(parent):
         experience_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 2, 1)
         slider1.set_grid_cell(lv.GRID_ALIGN.CENTER, 0, 2, lv.GRID_ALIGN.CENTER, 3, 1)
         hard_working_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 4, 1)
-        sw1.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 5, 1);
+        sw1.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 5, 1)
         team_player_label.set_grid_cell(lv.GRID_ALIGN.START, 1, 1, lv.GRID_ALIGN.START, 4, 1)
         sw2.set_grid_cell(lv.GRID_ALIGN.START, 1, 1, lv.GRID_ALIGN.START, 5, 1)
         
@@ -373,13 +373,13 @@ def analytics_create(parent):
 
     chart1_cont = lv.obj(parent)
     chart1_cont.set_flex_grow(1)
-    chart1_cont.set_grid_dsc_array(grid_chart_col_dsc, grid_chart_row_dsc);
+    chart1_cont.set_grid_dsc_array(grid_chart_col_dsc, grid_chart_row_dsc)
 
     chart1_cont.set_height(lv.pct(100))
     chart1_cont.set_style_max_height(300, 0)
 
     title = lv.label(chart1_cont)
-    title.set_text("Unique visitors");
+    title.set_text("Unique visitors")
     title.add_style(style_title, 0)
     title.set_grid_cell(lv.GRID_ALIGN.START, 0, 2, lv.GRID_ALIGN.START, 0, 1)
 
@@ -400,7 +400,7 @@ def analytics_create(parent):
     chart1.set_style_border_side(lv.BORDER_SIDE.LEFT | lv.BORDER_SIDE.BOTTOM, 0)
     chart1.set_style_radius(0, 0)
 
-    ser1 = chart1.add_series(lv.theme_get_color_primary(chart1), lv.chart.AXIS.PRIMARY_Y);
+    ser1 = chart1.add_series(lv.theme_get_color_primary(chart1), lv.chart.AXIS.PRIMARY_Y)
     chart1.set_next_value(ser1, lv.rand(10, 80))
     chart1.set_next_value(ser1, lv.rand(10, 80))
     chart1.set_next_value(ser1, lv.rand(10, 80))
@@ -482,10 +482,10 @@ def analytics_create(parent):
     chart2.set_next_value(ser3, lv.rand(10, 80))
     chart2.set_next_value(ser3, lv.rand(10, 80))
     
-    meter1 = create_meter_box(parent, "Monthly Target", "Revenue: 63%", "Sales: 44%", "Costs: 58%");
+    meter1 = create_meter_box(parent, "Monthly Target", "Revenue: 63%", "Sales: 44%", "Costs: 58%")
     lv.obj.get_parent(lv.obj.__cast__(meter1)).add_flag(LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)
     scale = meter1.add_scale()
-    meter1.set_scale_range(scale, 0, 100, 270, 90);
+    meter1.set_scale_range(scale, 0, 100, 270, 90)
     meter1.set_scale_ticks(scale, 0, 0, 0, lv.color_black())
     indic1 = meter1.add_arc(scale, 15, lv.palette_main(lv.PALETTE.BLUE), 0)
     indic2 = meter1.add_arc(scale, 15, lv.palette_main(lv.PALETTE.RED), -20)
@@ -554,7 +554,7 @@ def analytics_create(parent):
     meter3.set_style_radius(lv.RADIUS_CIRCLE, lv.PART.INDICATOR)
     meter3.set_style_bg_opa(lv.OPA.COVER, lv.PART.INDICATOR)
     meter3.set_style_bg_color(lv.palette_darken(lv.PALETTE.GREY, 4), lv.PART.INDICATOR)
-    meter3.set_style_outline_color(lv.color_white(), lv.PART.INDICATOR);
+    meter3.set_style_outline_color(lv.color_white(), lv.PART.INDICATOR)
     meter3.set_style_outline_width(3, lv.PART.INDICATOR)
     meter3.set_style_text_color(lv.palette_darken(lv.PALETTE.GREY, 1), lv.PART.TICKS)
 
@@ -641,7 +641,7 @@ def create_meter_box(parent, title, text1, text2, text3):
     bullet1.add_style(style_bullet, 0)
     bullet1.set_style_bg_color(lv.palette_main(lv.PALETTE.RED), 0)
     label1 = lv.label(cont)
-    label1.set_text(text1);
+    label1.set_text(text1)
 
     bullet2 = lv.obj(cont)
     bullet2.set_size(13, 13)
@@ -663,7 +663,7 @@ def create_meter_box(parent, title, text1, text2, text3):
         grid_col_dsc = [lv.GRID_CONTENT, LV_GRID_FR(1), lv.GRID_CONTENT,LV_GRID_FR(8), lv.GRID_TEMPLATE_LAST]
         grid_row_dsc = [lv.GRID_CONTENT, LV_GRID_FR(1), lv.GRID_CONTENT, lv.GRID_CONTENT, lv.GRID_CONTENT, LV_GRID_FR(1), lv.GRID_TEMPLATE_LAST]
 
-        cont.set_grid_dsc_array(grid_col_dsc, grid_row_dsc);
+        cont.set_grid_dsc_array(grid_col_dsc, grid_row_dsc)
         title_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 4, lv.GRID_ALIGN.START, 0, 1)
         meter.set_grid_cell(lv.GRID_ALIGN.START, 0, 1, lv.GRID_ALIGN.START, 1, 3)
         bullet1.set_grid_cell(lv.GRID_ALIGN.START, 2, 1, lv.GRID_ALIGN.CENTER, 2, 1)
@@ -827,9 +827,9 @@ def shop_create(parent):
     })
 
     create_shop_item(list, clothes_argb, "Blue jeans", "Clothes", "$722")    
-    create_shop_item(list, clothes_argb, "Blue jeans", "Clothes", "$917");
-    create_shop_item(list, clothes_argb, "Blue jeans", "Clothes", "$64");
-    create_shop_item(list, clothes_argb, "Blue jeans", "Clothes", "$805");
+    create_shop_item(list, clothes_argb, "Blue jeans", "Clothes", "$917")
+    create_shop_item(list, clothes_argb, "Blue jeans", "Clothes", "$64")
+    create_shop_item(list, clothes_argb, "Blue jeans", "Clothes", "$805")
 
     notifications = lv.obj(parent)
     if disp_size == DISP_SMALL:
@@ -937,10 +937,10 @@ if LV_HOR_RES <= 320:
 elif LV_HOR_RES < 720:
     disp_size = DISP_MEDIUM
 else:
-    disp_size = DISP_LARGE;
+    disp_size = DISP_LARGE
 
 if disp_size == DISP_LARGE:
-    tab_h = 70;
+    tab_h = 70
     try:
         font_large = lv.font_montserrat_24
     except:
@@ -1084,7 +1084,7 @@ def color_changer_create(parent):
     color_cont.set_style_radius(lv.RADIUS_CIRCLE, 0)
 
     if disp_size == DISP_SMALL:
-        color_cont.set_size(lv.dpx(52), lv.dpx(52));
+        color_cont.set_size(lv.dpx(52), lv.dpx(52))
     else:
         color_cont.set_size(lv.dpx(60), lv.dpx(60))
 
@@ -1093,8 +1093,8 @@ def color_changer_create(parent):
     for i in palette:
     # for(i = 0; palette[i] != _LV_PALETTE_LAST; i++) {
         c = lv.btn(color_cont)
-        c.set_style_bg_color(lv.palette_main(i), 0);
-        c.set_style_radius(lv.RADIUS_CIRCLE, 0);
+        c.set_style_bg_color(lv.palette_main(i), 0)
+        c.set_style_radius(lv.RADIUS_CIRCLE, 0)
         c.set_style_opa(lv.OPA.TRANSP, 0)
         c.set_size(20, 20)
         # c.add_event_cb(c, color_event_cb, LV_EVENT_ALL, &palette[i])
@@ -1153,14 +1153,14 @@ def shop_chart_event_cb(e) :
             dsc.draw_ctx.rect(draw_rect_dsc,a)
             # lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
 
-            a.y1 = a.y2 - 4;                                    # -4 to overlap the radius
+            a.y1 = a.y2 - 4                                    # -4 to overlap the radius
             a.y2 = a.y1 + (clothes[dsc.id] * h) // 100
             draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.BLUE)
             draw_rect_dsc.radius = 0
             dsc.draw_ctx.rect(draw_rect_dsc,a)
             # lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
 
-            a.y1 = a.y2;
+            a.y1 = a.y2
             a.y2 = a.y1 + (services[dsc.id] * h) // 100
             draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.GREEN)
             dsc.draw_ctx.rect(draw_rect_dsc,a)
@@ -1184,7 +1184,7 @@ def meter1_indic2_anim_cb(meter,indic,val) :
 
 def meter1_indic3_anim_cb(meter, indic, val) :
     
-    meter.set_indicator_end_value(indic, val);
+    meter.set_indicator_end_value(indic, val)
     
     card = lv.obj.get_parent(lv.obj.__cast__(meter))
     label = lv.obj.get_child(lv.obj.__cast__(card), -1)
@@ -1197,20 +1197,20 @@ def meter2_timer_cb(timer,meter,indics) :
     global down1,down2,down3
     
     if down1 : 
-        session_desktop -= 137;
+        session_desktop -= 137
         if session_desktop < 1400:
             down1 = False
         else :
-            session_desktop += 116;
+            session_desktop += 116
         if session_desktop > 4500:
             down1 = True
 
     if down2:
-        session_tablet -= 3;
+        session_tablet -= 3
         if session_tablet < 1400 :
             down2 = False
     else :
-        session_tablet += 9;
+        session_tablet += 9
         if session_tablet > 450:
             down2 = True
 
@@ -1223,7 +1223,7 @@ def meter2_timer_cb(timer,meter,indics) :
         if session_mobile > 4500:
             down3 = True
 
-    all = session_desktop + session_tablet + session_mobile;
+    all = session_desktop + session_tablet + session_mobile
     pct1 = (session_desktop * 97) // all
     pct2 = (session_tablet * 97) // all
 
@@ -1318,7 +1318,7 @@ def birthday_event_cb(e):
 
 def calendar_event_cb(e,ta) :
     global calendar
-    code = e.get_code();
+    code = e.get_code()
     obj = lv.calendar.__cast__(e.get_current_target())
     if code == lv.EVENT.VALUE_CHANGED:
         d = lv.calendar_date_t()
@@ -1334,15 +1334,17 @@ def _lv_area_intersect(a1_p, a2_p) :
 
     # Get the smaller area from 'a1_p' and 'a2_p'
     res_p = lv.area_t()
+
     res_p.x1 = max(a1_p.x1, a2_p.x1)
     res_p.y1 = max(a1_p.y1, a2_p.y1)
-    res_p.x2 = max(a1_p.x2, a2_p.x2)
-    res_p.y2 = max(a1_p.y2, a2_p.y2)
+    res_p.x2 = min(a1_p.x2, a2_p.x2)
+    res_p.y2 = min(a1_p.y2, a2_p.y2)
 
     # If x1 or y1 greater than x2 or y2 then the areas union is empty
 
     if res_p.x1 > res_p.x2 or res_p.y1 > res_p.y2:
         return None
+    
     return res_p
 
 def chart_event_cb(e):
@@ -1371,42 +1373,40 @@ def chart_event_cb(e):
                 # Add  a line mask that keeps the area below the line
                 if dsc.p1 and dsc.p2:
                     line_mask_param = lv.draw_mask_line_param_t()
-                    # print("dsc.p1.x: {:d}, dsc.p1.y: {:d}, dsc.p2.x: {:d}, dsc.p2.y: {:d}".format(
-                    #     dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y))
-                    line_mask_param.points_init(dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y,
-                                                lv.DRAW_MASK_LINE_SIDE.BOTTOM)
+                    line_mask_param.points_init(dsc.p1.x, dsc.p1.y, dsc.p2.x, dsc.p2.y, lv.DRAW_MASK_LINE_SIDE.BOTTOM)
                 
                     line_mask_id = lv.draw_mask_add(line_mask_param, None)              
-
                     # Add a fade effect: transparent bottom covering top
                     h = obj.get_height()
                     coords = lv.area_t()
                     obj.get_coords(coords)
-                    print("coords: x1: {:d}, x2: {:d}, y1: {:d}, y2: {:d}".format(
-                          coords.x1,coords.x2,coords.y1,coords.y2))
+
                     fade_mask_param = lv.draw_mask_fade_param_t()
                     fade_mask_param.init(coords, lv.OPA.COVER, coords.y1 + h // 8, lv.OPA.TRANSP,coords.y2)
                     fade_mask_id = lv.draw_mask_add(fade_mask_param,None)
-                    
+
                     # Draw a rectangle that will be affected by the mask
                     draw_rect_dsc = lv.draw_rect_dsc_t()
                     draw_rect_dsc.init()
-                    draw_rect_dsc.bg_opa = lv.OPA._50;
+                    draw_rect_dsc.bg_opa = lv.OPA._50
                     draw_rect_dsc.bg_color = dsc.line_dsc.color
-                    obj_clip_area = lv.area_t() 
+                    # obj_clip_area = lv.area_t() 
                     obj_clip_area = _lv_area_intersect(dsc.draw_ctx.clip_area, coords)
+                    
                     clip_area_ori = dsc.draw_ctx.clip_area
                     dsc.draw_ctx.clip_area = obj_clip_area
+
                     a = lv.area_t()
-                    a.x1 = dsc.p1.x;
-                    a.x2 = dsc.p2.x - 1;
+                    a.x1 = dsc.p1.x
+                    a.x2 = dsc.p2.x - 1
                     a.y1 = min(dsc.p1.y, dsc.p2.y)
                     a.y2 = coords.y2
                 
                     dsc.draw_ctx.rect(draw_rect_dsc,a)
-                    # lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
                     dsc.draw_ctx.clip_area = clip_area_ori
+
                     # Remove the masks 
+                    lv.draw_mask_free_param(line_mask_param)
                     lv.draw_mask_remove_id(line_mask_id)
                     lv.draw_mask_remove_id(fade_mask_id)
 
@@ -1434,7 +1434,7 @@ def chart_event_cb(e):
                         txt_area.x2 = txt_area.x1 + text_size.x
                     else :
                         txt_area.x2 = dsc.draw_area.x1 + dsc.draw_area.get_width() // 2
-                        txt_area.x1 = txt_area.x2 - text_size.x;
+                        txt_area.x1 = txt_area.x2 - text_size.x
                 else :
                     txt_area.x1 = dsc.draw_area.x1 + dsc.draw_area.get_width() // 2 - text_size.x // 2
                     txt_area.x2 = txt_area.x1 + text_size.x
