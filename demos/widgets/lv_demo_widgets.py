@@ -945,13 +945,19 @@ if disp_size == DISP_LARGE:
         font_large = lv.font_montserrat_24
     except:
         print("Dynamically loading font_montserrat_24")
-        font_large = lv.font_load("S:../../assets/font/montserrat-24.fnt")
+        if osVersion == "esp32":
+            font_large = lv.font_load("S:font/montserrat-24.fnt")
+        else:
+            font_large = lv.font_load("S:" + script_path + "/assets/font/montserrat-24.fnt")
         
     try:
         font_normal = lv.font_montserrat_16
     except:
         print("Dynamically loading font_montserrat_16")
-        font_normal = lv.font_load("S:../../assets/font/montserrat-16.fnt")
+        if osVersion == "esp32":
+            font_normal = lv.font_load("S:/font/montserrat-16.fnt")
+        else :
+            font_normal = lv.font_load("S:" + script_path + "/assets/font/montserrat-16.fnt")
 
 elif disp_size == DISP_MEDIUM:
     tab_h = 45
@@ -959,13 +965,19 @@ elif disp_size == DISP_MEDIUM:
         font_large = lv.font_montserrat_20
     except:
         print("Dynamically loading font_montserrat_20")
-        font_large = lv.font_load("S:../../assets/font/montserrat-20.fnt")
+        if osVersion == "esp32":
+            font_large = lv.font_load("S:/font/montserrat-20.fnt")
+        else:
+            font_large = lv.font_load("S:" + script_path + "/assets/font/montserrat-20.fnt")
             
     try:
         font_normal = lv.font_montserrat_14
     except:
         print("Dynamically loading font_montserrat_14")
-        font_normal = lv.font_load("S:../../assets/font/montserrat-14.fnt")
+        if osVersion == "esp32":
+            font_normal = lv.font_load("S:/font/montserrat-14.fnt")
+        else:
+            font_normal = lv.font_load("S:" + script_path + "/assets/font/montserrat-14.fnt")
 
 else:  # disp_size == DISP_SMALL 
     tab_h = 45
