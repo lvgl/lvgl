@@ -1285,12 +1285,12 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
     /*Draw the corners*/
     lv_coord_t blend_w;
 
-    /*Left and right corner together is they close to eachother*/
+    /*Left and right corner together if they are close to each other*/
     if(!split_hor) {
         /*Calculate the top corner and mirror it to the bottom*/
         blend_area.x1 = draw_area.x1;
         blend_area.x2 = draw_area.x2;
-        lv_coord_t max_h = LV_MAX(rout, outer_area->y1 - inner_area->y1);
+        lv_coord_t max_h = LV_MAX(rout, inner_area->y1 - outer_area->y1);
         for(h = 0; h < max_h; h++) {
             lv_coord_t top_y = outer_area->y1 + h;
             lv_coord_t bottom_y = outer_area->y2 - h;
