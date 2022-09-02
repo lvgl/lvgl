@@ -51,14 +51,14 @@
  **********************/
 
 static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                                           lv_color_t color);
+                                        lv_color_t color);
 
 
 static void lv_draw_gd32_ipa_blend_map(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-                                          const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa);
+                                       const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa);
 
 static void lv_draw_gd32_ipa_img_decoded(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc,
-                                            const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
+                                         const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
 
 static void ipa_wait(void);
@@ -146,8 +146,8 @@ void lv_draw_gd32_ipa_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc
 }
 
 void lv_draw_gd32_ipa_buffer_copy(lv_draw_ctx_t * draw_ctx,
-                                     void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
-                                     void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
+                                  void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
+                                  void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
     LV_UNUSED(draw_ctx);
     lv_draw_gd32_ipa_blend_map(dest_buf, dest_area, dest_stride, src_buf, src_stride, LV_OPA_MAX);
@@ -155,7 +155,7 @@ void lv_draw_gd32_ipa_buffer_copy(lv_draw_ctx_t * draw_ctx,
 
 
 static void lv_draw_gd32_ipa_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                                            const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
+                                         const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
 {
     /*TODO basic ARGB8888 image can be handles here*/
 
@@ -163,7 +163,7 @@ static void lv_draw_gd32_ipa_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw
 }
 
 static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
-                                           lv_color_t color)
+                                        lv_color_t color)
 {
     volatile lv_color_t backup[2];
 
@@ -171,7 +171,7 @@ static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_s
     int32_t area_w = lv_area_get_width(fill_area);
     int32_t area_h = lv_area_get_height(fill_area);
     uint32_t offset = ((area_w) + (dest_stride - area_w)) * area_h;
-    volatile lv_color_t *end_ptr = (volatile lv_color_t *)(dest_buf + offset);
+    volatile lv_color_t * end_ptr = (volatile lv_color_t *)(dest_buf + offset);
 
     invalidate_cache();
 
@@ -191,7 +191,7 @@ static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_s
     /*start transfer*/
     IPA_CTL |= IPA_CTL_TEN;
     /*have to wait for draw to finish here, can't call external functions because IPA trashes the stack*/
-    while (IPA_CTL & IPA_CTL_TEN);
+    while(IPA_CTL & IPA_CTL_TEN);
 
     end_ptr[0] = backup[0];
     end_ptr[1] = backup[1];
@@ -199,7 +199,7 @@ static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_s
 
 
 static void lv_draw_gd32_ipa_blend_map(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-                                          const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa)
+                                       const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa)
 {
     /*Simple copy*/
     int32_t dest_w = lv_area_get_width(dest_area);

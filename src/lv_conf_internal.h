@@ -491,6 +491,15 @@
     #endif
 #endif
 
+/*Use GD32 IPA GPU*/
+#ifndef LV_USE_GPU_GD32_IPA
+    #ifdef CONFIG_LV_USE_GPU_GD32_IPA
+        #define LV_USE_GPU_GD32_IPA CONFIG_LV_USE_GPU_GD32_IPA
+    #else
+        #define LV_USE_GPU_GD32_IPA 0
+    #endif
+#endif
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #ifndef LV_USE_GPU_NXP_PXP
     #ifdef CONFIG_LV_USE_GPU_NXP_PXP
