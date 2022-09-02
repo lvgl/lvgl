@@ -129,7 +129,7 @@ static void label_event_cb(lv_event_t * e)
         lv_msg_t * m = lv_event_get_msg(e);
         if(lv_msg_get_id(m) == MSG_UPDATE) {
             const int32_t * v = lv_msg_get_payload(m);
-            lv_label_set_text_fmt(label, "%d %%", *v);
+            lv_label_set_text_fmt(label, "%ld %%", *v);
         }
     }
 }
