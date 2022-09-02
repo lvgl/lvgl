@@ -3,7 +3,6 @@ import lvgl as lv
 import display_driver_utils
 import fs_driver
 import time,os,sys
-from imagetools import get_png_info, open_png
 
 SCREEN_SIZE_SMALL  = (320,240)
 SCREEN_SIZE_MEDIUM = (480,320)
@@ -39,7 +38,7 @@ def profile_create(parent):
     # Create an image from the png file
     try:
         if osVersion == "unix":
-            with open('assets/avatar.png','rb') as f:
+            with open(script_path + '/assets/avatar.png','rb') as f:
                 png_data = f.read()
         else:
             with open('images/avatar.png','rb') as f:
@@ -906,9 +905,14 @@ except:
 
 print("System name: ",osVersion)
 
+# get the directory in which the script is running
+try:
+    script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
+except NameError: 
+    script_path = ''
+
 # Initialize the display driver
 driver = display_driver_utils.driver(width=SCREEN_SIZE[0],height=SCREEN_SIZE[1],orientation=display_driver_utils.ORIENT_LANDSCAPE)
-
     
 # Create a screen and load it
 scr=lv.obj()
@@ -917,11 +921,6 @@ lv.scr_load(scr)
 # needed for dynamic font loading
 fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
-
-# Register PNG image decoder
-decoder = lv.img.decoder_create()
-decoder.info_cb = get_png_info
-decoder.open_cb = open_png
 
 # get the display size
 LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
@@ -1267,14 +1266,14 @@ def ta_event_cb(e,kb,tv) :
         kb.set_textarea(None)
         tv.set_height(LV_VER_RES)
         kb.add_flag(lv.obj.FLAG.HIDDEN)
-        if indev != None:
+        if (not indev) :
             indev.reset(None)
 
     elif code == lv.EVENT.READY or code == lv.EVENT.CANCEL:
         tv.set_height(LV_VER_RES)
         kb.add_flag(lv.obj.FLAG.HIDDEN)
         ta.clear_state(lv.STATE.FOCUSED)
-        if indev != None:
+        if (not indev) :
             indev.reset(None)    # To forget the last clicked object to make it focusable again
 
 def birthday_event_cb(e):
