@@ -92,9 +92,9 @@ void lv_example_table_2(void)
     uint32_t elaps = lv_tick_elaps(t);
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(label, "%"LV_PRId32" items were created in %"LV_PRIu32" ms\n"
+    lv_label_set_text_fmt(label, "%"LV_PRIu32" items were created in %"LV_PRIu32" ms\n"
                           "using %"LV_PRIu32" bytes of memory",
-                          ITEM_CNT, elaps, mem_used);
+                          (uint32_t)ITEM_CNT, elaps, mem_used);
 
     lv_obj_align(label, LV_ALIGN_BOTTOM_MID, 0, -10);
 
