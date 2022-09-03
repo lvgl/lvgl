@@ -74,7 +74,7 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 #if LV_FILE_EXPLORER_QUICK_ACCESS
-void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, char * path)
+void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, const char * path)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -162,7 +162,7 @@ const char * lv_file_explorer_get_current_path(const lv_obj_t * obj)
     return explorer->current_path;
 }
 
-lv_obj_t * lv_file_explorer_get_file_table(const lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_file_table(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -171,7 +171,7 @@ lv_obj_t * lv_file_explorer_get_file_table(const lv_obj_t * obj)
     return explorer->file_table;
 }
 
-lv_obj_t * lv_file_explorer_get_header(const lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_header(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -180,7 +180,7 @@ lv_obj_t * lv_file_explorer_get_header(const lv_obj_t * obj)
     return explorer->head_area;
 }
 
-lv_obj_t * lv_file_explorer_get_quick_access_area(const lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_quick_access_area(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -189,7 +189,7 @@ lv_obj_t * lv_file_explorer_get_quick_access_area(const lv_obj_t * obj)
     return explorer->quick_access_area;
 }
 
-lv_obj_t * lv_file_explorer_get_path_label(const lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_path_label(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -199,7 +199,7 @@ lv_obj_t * lv_file_explorer_get_path_label(const lv_obj_t * obj)
 }
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
-lv_obj_t * lv_file_explorer_get_places_list(const lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_places_list(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -208,7 +208,7 @@ lv_obj_t * lv_file_explorer_get_places_list(const lv_obj_t * obj)
     return explorer->list_places;
 }
 
-lv_obj_t * lv_file_explorer_get_device_list(const lv_obj_t * obj)
+lv_obj_t * lv_file_explorer_get_device_list(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
