@@ -2325,6 +2325,39 @@
     #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
 
+/*1: Enable file explorer*/
+/*Requires: lv_table*/
+#ifndef LV_USE_FILE_EXPLORER
+    #ifdef CONFIG_LV_USE_FILE_EXPLORER
+        #define LV_USE_FILE_EXPLORER CONFIG_LV_USE_FILE_EXPLORER
+    #else
+        #define LV_USE_FILE_EXPLORER                     0
+    #endif
+#endif
+#if LV_USE_FILE_EXPLORER
+    /*Maximum length of path*/
+    #ifndef LV_FILE_EXPLORER_PATH_MAX_LEN
+        #ifdef CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
+            #define LV_FILE_EXPLORER_PATH_MAX_LEN CONFIG_LV_FILE_EXPLORER_PATH_MAX_LEN
+        #else
+            #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
+        #endif
+    #endif
+    /*Quick access bar, 1:use, 0:not use*/
+    /*Requires: lv_list*/
+    #ifndef LV_FILE_EXPLORER_QUICK_ACCESS
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
+                #define LV_FILE_EXPLORER_QUICK_ACCESS CONFIG_LV_FILE_EXPLORER_QUICK_ACCESS
+            #else
+                #define LV_FILE_EXPLORER_QUICK_ACCESS 0
+            #endif
+        #else
+            #define LV_FILE_EXPLORER_QUICK_ACCESS        1
+        #endif
+    #endif
+#endif  
+
 /*==================
 * EXAMPLES
 *==================*/

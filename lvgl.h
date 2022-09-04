@@ -83,6 +83,7 @@ extern "C" {
 #include "src/others/imgfont/lv_imgfont.h"
 #include "src/others/msg/lv_msg.h"
 #include "src/others/ime/lv_ime_pinyin.h"
+#include "src/others/file_explorer/lv_file_explorer.h"
 
 #include "src/libs/bmp/lv_bmp.h"
 #include "src/libs/fsdrv/lv_fsdrv.h"
