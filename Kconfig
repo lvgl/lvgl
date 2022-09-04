@@ -1036,6 +1036,20 @@ menu "LVGL configuration"
             help
                 Set the maximum number of candidate panels that can be displayed.
                 This needs to be adjusted according to the size of the screen.
+        
+        config LV_USE_FILE_EXPLORER
+            bool "Enable file explorer"
+            default n
+        config LV_FILE_EXPLORER_PATH_MAX_LEN
+            int "Maximum length of path"
+            depends on LV_USE_FILE_EXPLORER
+            default 128
+        config LV_FILE_EXPLORER_QUICK_ACCESS
+            bool "Enable quick access bar"
+            depends on LV_USE_FILE_EXPLORER
+            default y
+            help
+                This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
     endmenu
 
     menu "Examples"

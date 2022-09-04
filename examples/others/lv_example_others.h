@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "file_explorer/lv_example_file_explorer.h"
 #include "fragment/lv_example_fragment.h"
 #include "gridnav/lv_example_gridnav.h"
 #include "ime/lv_example_ime_pinyin.h"
