@@ -7,7 +7,7 @@ import time,os,sys
 SCREEN_SIZE_SMALL  = (320,240)
 SCREEN_SIZE_MEDIUM = (480,320)
 SCREEN_SIZE_LARGE  = (800,600)
-SCREEN_SIZE        = SCREEN_SIZE_MEDIUM
+SCREEN_SIZE        = SCREEN_SIZE_LARGE
 
 LV_THEME_DEFAULT_DARK = 0
 LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = 1<<23
@@ -1266,7 +1266,7 @@ def ta_event_cb(e,kb,tv) :
     
     indev = lv.indev_get_act()
     if code == lv.EVENT.FOCUSED :
-        if indev.get_type() != lv.INDEV_TYPE.KEYPAD :
+        if (not indev) or indev.get_type() != lv.INDEV_TYPE.KEYPAD :
             kb.set_textarea(ta)
             kb.set_style_max_height(LV_HOR_RES * 2 // 3, 0)
             tv.update_layout()   # Be sure the sizes are recalculated
@@ -1278,14 +1278,14 @@ def ta_event_cb(e,kb,tv) :
         kb.set_textarea(None)
         tv.set_height(LV_VER_RES)
         kb.add_flag(lv.obj.FLAG.HIDDEN)
-        if (not indev) :
+        if (indev) :
             indev.reset(None)
 
     elif code == lv.EVENT.READY or code == lv.EVENT.CANCEL:
         tv.set_height(LV_VER_RES)
         kb.add_flag(lv.obj.FLAG.HIDDEN)
         ta.clear_state(lv.STATE.FOCUSED)
-        if (not indev) :
+        if (indev) :
             indev.reset(None)    # To forget the last clicked object to make it focusable again
 
 def birthday_event_cb(e):
@@ -1295,7 +1295,7 @@ def birthday_event_cb(e):
 
     if code == lv.EVENT.FOCUSED :
         indev = lv.indev_get_act()
-        if indev.get_type() == lv.INDEV_TYPE.POINTER:
+        if (not indev) or indev.get_type() == lv.INDEV_TYPE.POINTER:
             if calendar == None:
                 top_layer = lv.layer_top()
                 top_layer.add_flag(lv.obj.FLAG.CLICKABLE)
