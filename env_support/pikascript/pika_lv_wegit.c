@@ -1,4 +1,4 @@
-﻿#include "lvgl.h"
+﻿#include "../../lvgl.h"
 #ifdef PIKASCRIPT
 #include "BaseObj.h"
 #include "pika_lvgl.h"
