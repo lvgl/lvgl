@@ -75,6 +75,7 @@ The following event codes exist:
 - `LV_EVENT_CLICKED`      Called on release if an object did not scroll (regardless of long press)
 - `LV_EVENT_RELEASED`     Called in every case when an object has been released
 - `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required.
+- `LV_EVENT_SCROLL_THROW_BEGIN` Sent once when the object is released while scrolling but the "momentum" still keeps the content scrolling. 
 - `LV_EVENT_SCROLL_END`   Scrolling ends.
 - `LV_EVENT_SCROLL`       An object was scrolled
 - `LV_EVENT_GESTURE`      A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());`
