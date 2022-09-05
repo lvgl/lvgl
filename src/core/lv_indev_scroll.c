@@ -99,7 +99,6 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
     if(scroll_obj == NULL) return;
     if(proc->types.pointer.scroll_dir == LV_DIR_NONE) return;
 
-
     lv_indev_t * indev_act = lv_indev_get_act();
     lv_coord_t scroll_throw = indev_act->driver->scroll_throw;
 
@@ -124,7 +123,8 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
             proc->types.pointer.scroll_throw_vect.y = elastic_diff(scroll_obj, proc->types.pointer.scroll_throw_vect.y, st, sb,
                                                                    LV_DIR_VER);
 
-            lv_obj_scroll_by(scroll_obj, 0, proc->types.pointer.scroll_throw_vect.y, LV_ANIM_OFF);
+            _lv_obj_scroll_by_raw(scroll_obj, 0,  proc->types.pointer.scroll_throw_vect.y);
+            if(proc->reset_query) return;
         }
         /*With snapping find the nearest snap point and scroll there*/
         else {
@@ -133,6 +133,7 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
             scroll_limit_diff(proc, NULL, &diff_y);
             lv_coord_t y = find_snap_point_y(scroll_obj, LV_COORD_MIN, LV_COORD_MAX, diff_y);
             lv_obj_scroll_by(scroll_obj, 0, diff_y + y, LV_ANIM_ON);
+            if(proc->reset_query) return;
         }
     }
     else if(proc->types.pointer.scroll_dir == LV_DIR_HOR) {
@@ -148,7 +149,8 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
             proc->types.pointer.scroll_throw_vect.x = elastic_diff(scroll_obj, proc->types.pointer.scroll_throw_vect.x, sl, sr,
                                                                    LV_DIR_HOR);
 
-            lv_obj_scroll_by(scroll_obj, proc->types.pointer.scroll_throw_vect.x, 0, LV_ANIM_OFF);
+            _lv_obj_scroll_by_raw(scroll_obj, proc->types.pointer.scroll_throw_vect.x, 0);
+            if(proc->reset_query) return;
         }
         /*With snapping find the nearest snap point and scroll there*/
         else {
@@ -157,6 +159,7 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
             scroll_limit_diff(proc, &diff_x, NULL);
             lv_coord_t x = find_snap_point_x(scroll_obj, LV_COORD_MIN, LV_COORD_MAX, diff_x);
             lv_obj_scroll_by(scroll_obj, x + diff_x, 0, LV_ANIM_ON);
+            if(proc->reset_query) return;
         }
     }
 
@@ -170,9 +173,11 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
             if(st > 0 || sb > 0) {
                 if(st < 0) {
                     lv_obj_scroll_by(scroll_obj, 0, st, LV_ANIM_ON);
+                    if(proc->reset_query) return;
                 }
                 else if(sb < 0) {
                     lv_obj_scroll_by(scroll_obj, 0, -sb, LV_ANIM_ON);
+                    if(proc->reset_query) return;
                 }
             }
         }
@@ -184,9 +189,11 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
             if(sl > 0 || sr > 0) {
                 if(sl < 0) {
                     lv_obj_scroll_by(scroll_obj, sl, 0, LV_ANIM_ON);
+                    if(proc->reset_query) return;
                 }
                 else if(sr < 0) {
                     lv_obj_scroll_by(scroll_obj, -sr, 0, LV_ANIM_ON);
+                    if(proc->reset_query) return;
                 }
             }
         }
