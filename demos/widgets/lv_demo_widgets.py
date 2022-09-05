@@ -7,7 +7,7 @@ import time,os,sys
 SCREEN_SIZE_SMALL  = (320,240)
 SCREEN_SIZE_MEDIUM = (480,320)
 SCREEN_SIZE_LARGE  = (800,600)
-SCREEN_SIZE        = SCREEN_SIZE_LARGE
+SCREEN_SIZE        = SCREEN_SIZE_MEDIUM
 
 LV_THEME_DEFAULT_DARK = 0
 LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = 1<<23
@@ -37,11 +37,11 @@ def profile_create(parent):
 
     # Create an image from the png file
     try:
-        if osVersion == "unix":
-            with open(script_path + '/assets/avatar.png','rb') as f:
+        if osVersion == "esp32":
+            with open('images/avatar.png','rb') as f:
                 png_data = f.read()
         else:
-            with open('images/avatar.png','rb') as f:
+            with open(script_path + '/assets/avatar.png','rb') as f:
                 png_data = f.read()
     except:
         print("Could not find avatar.png")
@@ -811,11 +811,11 @@ def shop_create(parent):
                                     
     # Create an image from the png file
     try:
-        if osVersion == "unix":
-            with open('assets/clothes.png','rb') as f:
+        if osVersion == "esp32":
+            with open('images/clothes.png','rb') as f:
                 png_data = f.read()
         else:
-            with open('images/clothes.png','rb') as f:
+            with open(script_path + '/assets/clothes.png','rb') as f:
                 png_data = f.read()
     except:
         print("Could not find clothes.png")
@@ -988,7 +988,7 @@ else:  # disp_size == DISP_SMALL
         if osVersion == "esp32":
             font_large = lv.font_load("S:/font/montserrat-18.fnt")
         else:
-            font_large = lv.font_load("S:../../assets/font/montserrat-18.fnt")
+            font_large = lv.font_load("S:" + script_path + "/assets/font/montserrat-18.fnt")
         
     try:
         font_normal = lv.font_montserrat_12
@@ -997,7 +997,7 @@ else:  # disp_size == DISP_SMALL
         if osVersion == "esp32":        
             font_normal = lv.font_load("S:/font/montserrat-12.fnt")            
         else:
-            font_normal = lv.font_load("S:../../assets/font/montserrat-12.fnt")            
+            font_normal = lv.font_load("S:" + script_path + "/assets/font/montserrat-12.fnt")            
 
 if not font_large or not font_normal:
     print("font loading failed")
@@ -1033,11 +1033,11 @@ if disp_size == DISP_LARGE:
 
     # Create an image from the png file
     try:
-        if osVersion == "unix":
-            with open('assets/lvgl_logo.png','rb') as f:
+        if osVersion == "esp32":
+            with open('images/lvgl_logo.png','rb') as f:
                 png_data = f.read()
         else:
-            with open('images/lvgl_logo.png','rb') as f:
+            with open(script_path + '/assets/lvgl_logo.png','rb') as f:
                 png_data = f.read()
     except:
         print("Could not find lvgl_logo.png")
