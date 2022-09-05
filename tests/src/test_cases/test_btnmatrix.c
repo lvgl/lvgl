@@ -42,7 +42,6 @@ void test_btn_matrix_set_map_works(void)
     static const char * exp_map[] = {"A", "B", "\n", "C", "D", ""};
 
     lv_btnmatrix_set_map(btnm, exp_map);
-
     /* Verify if the map was set correctly. */
     ret_map = lv_btnmatrix_get_map(btnm);
     TEST_ASSERT_EQUAL_STRING(exp_map[0], ret_map[0]);
@@ -51,6 +50,8 @@ void test_btn_matrix_set_map_works(void)
     TEST_ASSERT_EQUAL_STRING(exp_map[3], ret_map[3]);
     TEST_ASSERT_EQUAL_STRING(exp_map[4], ret_map[4]);
     TEST_ASSERT_EQUAL_STRING(exp_map[5], ret_map[5]);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("btnm_1.png");
 }
 
 void test_btn_matrix_set_ctrl_map_works(void)
@@ -268,27 +269,37 @@ void test_btn_matrix_key_event_works(void)
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_EVENT_KEY;
 
+    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
+    /* Select the first button. */
+    lv_btnmatrix_set_selected_btn(btnm, 0);
     keyCode = LV_KEY_RIGHT;
     lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
-    event_triggered = false;
+    uint16_t btnId = lv_btnmatrix_get_selected_btn(btnm);
+    TEST_ASSERT_EQUAL_INT(1, btnId);
 
+    event_triggered = false;
     keyCode = LV_KEY_LEFT;
     lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
-    event_triggered = false;
+    btnId = lv_btnmatrix_get_selected_btn(btnm);
+    TEST_ASSERT_EQUAL_INT(0, btnId);
 
+    event_triggered = false;
     keyCode = LV_KEY_DOWN;
     lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
-    event_triggered = false;
+    btnId = lv_btnmatrix_get_selected_btn(btnm);
+    TEST_ASSERT_EQUAL_INT(2, btnId);
 
+    event_triggered = false;
     keyCode = LV_KEY_UP;
     lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
+    btnId = lv_btnmatrix_get_selected_btn(btnm);
+    TEST_ASSERT_EQUAL_INT(0, btnId);
 
     /* Added this code to increase code coverage. */
-    lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
     btnmObj->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     lv_btnmatrix_set_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_HIDDEN);
     keyCode = LV_KEY_DOWN;
