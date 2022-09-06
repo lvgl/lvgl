@@ -983,6 +983,10 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
             lv_event_send(indev_obj_act, LV_EVENT_CLICKED, indev_act);
             if(indev_reset_check(proc)) return;
         }
+        else {
+            lv_event_send(scroll_obj, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
+            if(indev_reset_check(proc)) return;
+        }
 
         proc->types.pointer.act_obj = NULL;
         proc->pr_timestamp          = 0;
@@ -990,8 +994,6 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
 
     }
 
-    /*The reset can be set in the Call the ancestor's event handler function.
-     * In case of reset query ignore the remaining parts.*/
     if(scroll_obj) {
         _lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;

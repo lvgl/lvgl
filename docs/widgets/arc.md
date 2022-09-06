@@ -41,6 +41,10 @@ The mode can be set by `lv_arc_set_mode(arc, LV_ARC_MODE_...)` and used only if 
 If the arc is pressed the current value will set with a limited speed according to the set *change rate*.
 The change rate is defined in degree/second unit and can be set with `lv_arc_set_change_rage(arc, rate)`
 
+### Knob offset
+Changing the knob offset allows the location of the knob to be moved relative to the end of the arc
+The knob offset can be set by `lv_arc_set_knob_offset(arc, offset_angle)`, will only be visible if LV_PART_KNOB is visible
+
 
 ### Setting the indicator manually
 It's also possible to set the angles of the indicator arc directly with `lv_arc_set_angles(arc, start_angle, end_angle)` function or `lv_arc_set_start/end_angle(arc, start_angle)`.

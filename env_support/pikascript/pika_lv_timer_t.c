@@ -1,4 +1,4 @@
-#include "lvgl.h"
+#include "../../lvgl.h"
 #ifdef PIKASCRIPT
 #include "pika_lvgl_lv_timer_t.h"
 

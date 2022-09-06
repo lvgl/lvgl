@@ -90,7 +90,7 @@ static void label_event_cb(lv_event_t * e)
     if(code == LV_EVENT_MSG_RECEIVED) {
         lv_msg_t * m = lv_event_get_msg(e);
         const int32_t * v = lv_msg_get_payload(m);
-        lv_label_set_text_fmt(label, "%d %%", *v);
+        lv_label_set_text_fmt(label, "%"LV_PRId32" %%", *v);
     }
 }
 

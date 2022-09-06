@@ -19,7 +19,7 @@ static bool get_imgfont_path(const lv_font_t * font, void * img_src,
     }
     else {
         char * path = (char *)img_src;
-        snprintf(path, len, "%s/%04X.%s", "A:lvgl/examples/assets/emoji", unicode, "png");
+        snprintf(path, len, "%s/%04"LV_PRIX32".%s", "A:lvgl/examples/assets/emoji", unicode, "png");
         path[len - 1] = '\0';
     }
 
