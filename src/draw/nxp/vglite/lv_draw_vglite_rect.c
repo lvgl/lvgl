@@ -90,12 +90,11 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
                           (const lv_color_t *)draw_ctx->buf, false) != LV_RES_OK)
         VG_LITE_RETURN_INV("Init buffer failed.");
 
-    /*** Init path ***/
-    int32_t rad = dsc->radius;
-    if(dsc->radius == LV_RADIUS_CIRCLE) {
-        rad = (width > height) ? height / 2 : width / 2;
-    }
+    /*Get the real radius. Can't be larger than the half of the shortest side */
+    int32_t short_side = LV_MIN(width, height);
+    int32_t rad = LV_MIN(dsc->radius, short_side >> 1);
 
+    /*** Init path ***/
     if((dsc->radius == LV_RADIUS_CIRCLE) && (width == height)) {
         float tang = ((float)rad * BEZIER_OPTIM_CIRCLE);
         int32_t cpoff = (int32_t)tang;
@@ -154,7 +153,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
         lv_color32_t col32[2];
 
         /* Gradient setup */
-        uint8_t cnt = MAX(dsc->bg_grad.stops_count, 2);
+        uint8_t cnt = LV_MAX(dsc->bg_grad.stops_count, 2);
         for(uint8_t i = 0; i < cnt; i++) {
             col32[i].full = lv_color_to32(dsc->bg_grad.stops[i].color); /*Convert color to RGBA8888*/
             stops[i] = dsc->bg_grad.stops[i].frac;
