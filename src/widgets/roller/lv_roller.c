@@ -597,45 +597,50 @@ static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)
 /**
  * Refresh the position of the roller. It uses the id stored in: roller->ddlist.selected_option_id
  * @param roller pointer to a roller object
- * @param anim_en LV_ANIM_ON: refresh with animation; LV_ANOM_OFF: without animation
+ * @param anim_en LV_ANIM_ON: refresh with animation; LV_ANIM_OFF: without animation
  */
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return;
 
-    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
+    const lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
 
+    lv_coord_t x = 0;
     switch(align) {
         case LV_TEXT_ALIGN_CENTER:
-            lv_obj_set_x(label, (lv_obj_get_content_width(obj) - lv_obj_get_width(label)) / 2);
+            x = (lv_obj_get_content_width(obj) - lv_obj_get_width(label)) / 2;
             break;
         case LV_TEXT_ALIGN_RIGHT:
-            lv_obj_set_x(label, lv_obj_get_content_width(obj) - lv_obj_get_width(label));
+            x = lv_obj_get_content_width(obj) - lv_obj_get_width(label);
             break;
         case LV_TEXT_ALIGN_LEFT:
-            lv_obj_set_x(label, 0);
+            x = 0;
+            break;
+        default:
+            /* Invalid alignment */
             break;
     }
+    lv_obj_set_x(label, x);
 
-    lv_roller_t * roller = (lv_roller_t *)obj;
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_coord_t h                   = lv_obj_get_content_height(obj);
-    uint16_t anim_time             = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+    const lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    const lv_coord_t font_h = lv_font_get_line_height(font);
+    const lv_coord_t h = lv_obj_get_content_height(obj);
+    uint16_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
     /*Normally the animation's `end_cb` sets correct position of the roller if infinite.
-     *But without animations do it manually*/
+     *But without animations we have to do it manually*/
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         inf_normalize(obj);
     }
 
+    /* Calculate animation configuration */
+    lv_roller_t * roller = (lv_roller_t *)obj;
     int32_t id = roller->sel_opt_id;
-    lv_coord_t sel_y1 = id * (font_h + line_space);
-    lv_coord_t mid_y1 = h / 2 - font_h / 2;
-
-    lv_coord_t new_y = mid_y1 - sel_y1;
+    const lv_coord_t sel_y1 = id * (font_h + line_space);
+    const lv_coord_t mid_y1 = h / 2 - font_h / 2;
+    const lv_coord_t new_y = mid_y1 - sel_y1;
 
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         lv_anim_del(label, set_y_anim);
