@@ -329,7 +329,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    lv_event_code_t code = lv_event_get_code(e);
+    const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_roller_t * roller = (lv_roller_t *)obj;
 
@@ -366,26 +366,27 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_FOCUSED) {
         lv_group_t * g             = lv_obj_get_group(obj);
-        bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            /*In navigate mode revert the original value*/
-            if(!editing) {
+            const bool editing = lv_group_get_editing(g);
+
+            /*Save the current state when entered to edit mode*/
+            if(editing) {
+                roller->sel_opt_id_ori = roller->sel_opt_id;
+            }
+            else { /*In navigate mode revert the original value*/
                 if(roller->sel_opt_id != roller->sel_opt_id_ori) {
                     roller->sel_opt_id = roller->sel_opt_id_ori;
                     refr_position(obj, LV_ANIM_ON);
                 }
             }
-            /*Save the current state when entered to edit mode*/
-            else {
-                roller->sel_opt_id_ori = roller->sel_opt_id;
-            }
         }
         else {
-            roller->sel_opt_id_ori = roller->sel_opt_id; /*Save the current value. Used to revert this state if
-                                                                    ENTER won't be pressed*/
+            /*Save the current value. Used to revert this
+             *state if ENTER won't be pressed*/
+            roller->sel_opt_id_ori = roller->sel_opt_id;
         }
     }
     else if(code == LV_EVENT_DEFOCUSED) {
@@ -407,7 +408,6 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(roller->sel_opt_id > 0) {
                 uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
-
                 lv_roller_set_selected(obj, roller->sel_opt_id - 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
             }
