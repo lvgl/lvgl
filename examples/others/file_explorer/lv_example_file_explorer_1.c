@@ -50,28 +50,28 @@ void lv_example_file_explorer_1(void)
     lv_file_explorer_open_dir(file_explorer, "A:/");
 
 #if LV_FILE_EXPLORER_QUICK_ACCESS
-    char *envvar = "HOME";
+    char * envvar = "HOME";
     char home_dir[LV_FS_MAX_PATH_LENGTH];
-    strcpy(home_dir,"A:");
+    strcpy(home_dir, "A:");
     // get the user's home directory from the HOME enviroment variable
-    strcat(home_dir,getenv(envvar));
-    LV_LOG_USER("home_dir: %s\n",home_dir);
+    strcat(home_dir, getenv(envvar));
+    LV_LOG_USER("home_dir: %s\n", home_dir);
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_HOME_DIR, home_dir);
     char video_dir[LV_FS_MAX_PATH_LENGTH];
-    strcpy(video_dir,home_dir);
-    strcat(video_dir,"/Videos");
+    strcpy(video_dir, home_dir);
+    strcat(video_dir, "/Videos");
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_VIDEO_DIR, video_dir);
     char picture_dir[LV_FS_MAX_PATH_LENGTH];
-    strcpy(picture_dir,home_dir);
-    strcat(picture_dir,"/Pictures");    
+    strcpy(picture_dir, home_dir);
+    strcat(picture_dir, "/Pictures");
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_PICTURES_DIR, picture_dir);
     char music_dir[LV_FS_MAX_PATH_LENGTH];
-    strcpy(music_dir,home_dir);
-    strcat(music_dir,"/Music");
+    strcpy(music_dir, home_dir);
+    strcat(music_dir, "/Music");
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_MUSIC_DIR, music_dir);
     char document_dir[LV_FS_MAX_PATH_LENGTH];
-    strcpy(document_dir,home_dir);
-    strcat(document_dir,"/Documents");
+    strcpy(document_dir, home_dir);
+    strcat(document_dir, "/Documents");
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_DOCS_DIR, document_dir);
 
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_FS_DIR, "A:/");
