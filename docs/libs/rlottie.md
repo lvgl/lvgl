@@ -24,6 +24,7 @@ And finally add the `-lrlottie` flag to your linker.
 
 On embedded systems you need to take care of integrating Rlottie to the given build system.
 
+### ESP-IDF example at bottom
 
 ## Usage
 
@@ -90,6 +91,93 @@ The default animation mode is **play forward with loop**.
 If you don't enable looping, a `LV_EVENT_READY` is sent when the animation can not make more progress without looping.
 
 To get the number of frames in an animation or the current frame index, you can cast the `lv_obj_t` instance to a `lv_rlottie_t` instance and inspect the `current_frame` and `total_frames` members.
+
+
+# ESP-IDF Example
+## Background
+Rlottie can be expensive to render on embedded hardware. Lottie animations tend to use a large amount of CPU time and can use large portions of RAM. This will vary from lottie to lottie but in general for best performance:
+* Limit total # of frames in the animation
+* Where possible, try to avoid bezier type animations
+* Limit animation render size
+
+If your ESP32 chip does not have SPIRAM you will face severe limitations in render size.
+
+To give a better idea on this, lets assume you want to render a 240x320 lottie animation.
+
+In order to pass initialization of the lv_rlottie_t object, you need 240x320x32/8 (307k) available memory. The latest ESP32-S3 has 256kb RAM available for this (before freeRtos and any other initialization starts taking chunks out). So while you can probably start to render a 50x50 animation without SPIRAM, PSRAM is highly recommended.
+
+Additionally, while you might be able to pass initialization of the lv_rlottie_t object, as rlottie renders frame to frame, this consumes additional memory. A 30 frame animation that plays over 1 second probably has minimal issues, but a 300 frame animation playing over 10 seconds could very easily crash due to lack of memory as rlottie renders, depending on the complexity of the animation.
+
+Rlottie will not compile for the IDF using the -02 compiler option at this time.
+
+For stability in lottie animations, I found that they run best in the IDF when enabling LV_MEM_CUSTOM (using stdlib.h)
+
+For all its faults, when running right-sized animations, they provide a wonderful utility to LVGL on embedded LCDs and can look really good when done properly.
+
+When picking/designing a lottie animation consider the following limitations:
+- Build the lottie animation to be sized for the intended size - it can scale/resize, but performance will be best when the base lottie size is as intended
+- Limit total number of frames, the longer the lottie animation is, the more memory it will consume for rendering (rlottie consumes IRAM for rendering)
+- Build the lottie animation for the intended frame rate - default lottie is 60fps, embedded LCDs likely wont go above 30fps
+
+## IDF Setup
+Where the LVGL simulator uses the installed rlottie lib, the IDF works best when using rlottie as a submodule under the components directory.
+
+```
+cd 'your/project/directory'
+git add submodule 
+git add submodule https://github.com/Samsung/rlottie.git ./components/rlottie/rlottie
+git submodule update --init --recursive
+```
+
+Now, Rlottie is available as a component in the IDF, but it requires some additional changes and a CMakeLists file to tell the IDF how to compile.
+
+
+## Rlottie patch file
+Rlottie relies on a dynamic linking for an image loader lib. This needs to be disabled as the IDF doesn't play nice with dynamic linking.
+
+A patch file is available in lvgl uner: /env_support/esp/rlottie/0001-changes-to-compile-with-esp-idf.patch
+
+Apply the patch file to your rlottie submodule.
+
+## CMakeLists for IDF
+An example CMakeLists file has been provided at /env_support/esp/rlottie/CMakeLists.txt
+
+Copy this CMakeLists file to 'your-project-directory'/components/rlottie/
+
+In addition to the component CMakeLists file, you'll also need to tell your project level CMakeLists in your IDF project to require rlottie:
+
+```
+REQUIRES "lvgl" "rlottie"
+```
+
+From here, you should be able to use lv_rlottie objects in your ESP-IDF project as any other widget in LVGL ESP examples. Please remember that these animations can be highly resource constrained and this does not guarantee that every animation will work.
+
+## Additional Rlottie considerations in ESP-IDF
+While unecessary, removing the rlottie/rlottie/example folder can remove many un-needed files for this embedded LVGL application
+
+From here, you can use the relevant LVGL lv_rlottie functions to create lottie animations in LVGL on embedded hardware!
+
+Please note, that while lottie animations are capable of running on many ESP chips, below is recommended for best performance. 
+
+* ESP32-S3-WROOM-1-N16R8
+  * 16mb quad spi flash
+  * 8mb octal spi PSRAM
+* IDF4.4 or higher
+
+The Esp-box devkit meets this spec and https://github.com/espressif/esp-box is a great starting point to adding lottie animations.
+
+you'll need to enable LV_USE_RLOTTIE through idf.py menuconfig under LVGL component settings.
+
+## Additional changes to make use of SPIRAM
+
+lv_alloc/realloc do not make use of SPIRAM. Given the high memory usage of lottie animations, it is recommended to shift as much out of internal DRAM into SPIRAM as possible. In order to do so, SPIRAM will need to be enabled in the menuconfig options for your given espressif chip.
+
+There may be a better solution for this, but for the moment the recommendation is to make local modifications to the lvgl component in your espressif project. This is as simple as swapping lv_alloc/lv_realloc calls in lv_rlottie.c with heap_caps_malloc (for IDF) with the appropriate MALLOC_CAP call - for SPIRAM usage this is MALLOC_CAP_SPIRAM.
+
+```c
+rlottie->allocated_buf = heap_caps_malloc(allocaled_buf_size+1, MALLOC_CAP_SPIRAM);
+```
+
 
 ## Example
 ```eval_rst
