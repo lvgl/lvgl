@@ -23,10 +23,8 @@ def file_explorer_event_handler(e) :
         else:
             print(cur_path + sel_fn)
 
-
 file_explorer = lv.file_explorer(lv.scr_act())
 file_explorer.explorer_set_sort(lv.EXPLORER_SORT.KIND)
-
 
 if LV_USE_FS_WIN32 :
     file_explorer.explorer_open_dir("D:")
