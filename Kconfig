@@ -654,7 +654,7 @@ menu "LVGL configuration"
 
         config LV_TXT_BREAK_CHARS
             string "Can break (wrap) texts on these chars"
-            default " ,.;:-_"
+            default " ,.;:-_)]}"
 
         config LV_TXT_LINE_BREAK_LONG_LEN
             int "Line break long length"
