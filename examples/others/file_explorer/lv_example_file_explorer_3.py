@@ -48,15 +48,8 @@ def file_explorer_event_handler(e) :
 
     if code == lv.EVENT.VALUE_CHANGED:
         cur_path =  obj.explorer_get_current_path()
-        sel_fn = obj.get_selected_file_name()
-        path_len = len(cur_path)
-        fn_len = len(sel_fn)
-
-        if path_len + fn_len <= LV_FILE_EXPLORER_PATH_MAX_LEN:
-            file_info = cur_path + sel_fn
-            print(file_info)
-        else:
-            print(cur_path + sel_fn)
+        sel_fn = obj.explorer_get_selected_file_name()
+        print(str(cur_path) + str(sel_fn))
 
     elif code == lv.EVENT.READY :
         tb = obj.explorer_get_file_table()

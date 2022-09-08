@@ -13,18 +13,12 @@ def file_explorer_event_handler(e) :
     if code == lv.EVENT.VALUE_CHANGED:
         cur_path =  obj.explorer_get_current_path()
         sel_fn = obj.explorer_get_selected_file_name()
-        print("cur_path: " + cur_path, " sel_fn: " + sel_fn)
-        path_len = len(cur_path)
-        fn_len = len(sel_fn)
-        
-        if path_len + fn_len <= LV_FILE_EXPLORER_PATH_MAX_LEN :
-            file_info = cur_path + sel_fn
-            print(file_info);
-        else:
-            print(cur_path + sel_fn)
+        # print("cur_path: " + str(cur_path), " sel_fn: " + str(sel_fn))
+        print(str(cur_path) + str(sel_fn))
 
 file_explorer = lv.file_explorer(lv.scr_act())
 file_explorer.explorer_set_sort(lv.EXPLORER_SORT.KIND)
+
 
 if LV_USE_FS_WIN32 :
     file_explorer.explorer_open_dir("D:")
