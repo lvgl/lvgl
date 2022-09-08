@@ -1,5 +1,4 @@
 from micropython import const
-import sys,struct
 
 # Define a message ID
 MSG_LOGIN_ATTEMPT = const(1)

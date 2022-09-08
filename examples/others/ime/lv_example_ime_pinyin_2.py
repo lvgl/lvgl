@@ -34,7 +34,7 @@ kb = lv.keyboard(lv.scr_act())
 kb.set_textarea(ta1)
 
 pinyin_ime.pinyin_set_keyboard(kb)
-pinyin_ime.pinyin_set_mode(1)    #  Set to 9-key input mode. Default: 26-key input(k26) mode.
+pinyin_ime.pinyin_set_mode(lv.ime_pinyin.PINYIN_MODE.K9)    #  Set to 9-key input mode. Default: 26-key input(k26) mode.
 
 ta1.add_event_cb(lambda evt: ta_event_cb(evt,kb), lv.EVENT.ALL, None)
 

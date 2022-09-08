@@ -23,14 +23,14 @@ for i in range(20):
         # lv_snprintf(buf, sizeof(buf), "Section %d", i / 5 + 1);
         list.add_text(txt)
 
-        txt = "File {:d}".format(i + 1)
-        #lv_snprintf(buf, sizeof(buf), "File %d", i + 1);
-        item = list.add_btn(lv.SYMBOL.FILE, txt)
-        item.add_event_cb(event_handler, lv.EVENT.CLICKED, None)
-        lv.group_remove_obj(item)  # The default group adds it automatically
+    txt = "File {:d}".format(i + 1)
+    #lv_snprintf(buf, sizeof(buf), "File %d", i + 1);
+    item = list.add_btn(lv.SYMBOL.FILE, txt)
+    item.add_event_cb(event_handler, lv.EVENT.CLICKED, None)
+    lv.group_remove_obj(item)  # The default group adds it automatically
 
-    btn = lv.btn(lv.scr_act())
-    btn.align(lv.ALIGN.RIGHT_MID, 0, -10)
-    label = lv.label(btn)
-    label.set_text("Button")
+btn = lv.btn(lv.scr_act())
+btn.align(lv.ALIGN.RIGHT_MID, 0, -10)
+label = lv.label(btn)
+label.set_text("Button")
 

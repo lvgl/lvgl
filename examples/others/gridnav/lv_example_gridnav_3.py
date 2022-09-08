@@ -5,7 +5,7 @@ def cont_sub_event_cb(e):
         lv.group_focus_obj(obj)
 
     elif k == lv.KEY.ESC:
-        obj.get_group().focus_next()
+        lv.grout_t.__cast__(obj.get_group()).focus_next()
 
 #
 # Nested grid navigations
