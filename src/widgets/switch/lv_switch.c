@@ -191,7 +191,7 @@ static void draw_main(lv_event_t * e)
 
     lv_area_t knob_area;
     knob_area.x1 = obj->coords.x1 + anim_value_x;
-    knob_area.x2 = knob_area.x1 + knob_size;
+    knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
 
     knob_area.y1 = obj->coords.y1;
     knob_area.y2 = obj->coords.y2;
