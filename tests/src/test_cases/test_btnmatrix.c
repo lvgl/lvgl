@@ -54,6 +54,78 @@ void test_btn_matrix_set_map_works(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("btnm_1.png");
 }
 
+void test_btn_matrix_render_2(void)
+{
+    static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
+    lv_btnmatrix_set_map(btnm, btn_map);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_obj_set_pos(btnm, 10, 10);
+
+    static const char * btn_map2[] = {"A", "\n", "B", "\n", "C", "\n", "D", ""};
+    btnm = lv_btnmatrix_create(active_screen);
+    TEST_ASSERT_NOT_NULL(btnm);
+    lv_obj_set_width(btnm, 150);
+    lv_obj_set_height(btnm, 250);
+    lv_btnmatrix_set_map(btnm, btn_map2);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_one_checked(btnm, true);
+    lv_btnmatrix_set_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 2, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_obj_set_pos(btnm, 10, 160);
+
+    static const char * btn_map3[] = {"A", "B", "C", "\n", "D", "E", "F", ""};
+    btnm = lv_btnmatrix_create(active_screen);
+    TEST_ASSERT_NOT_NULL(btnm);
+    lv_btnmatrix_set_map(btnm, btn_map3);
+    lv_obj_set_width(btnm, 400);
+    lv_btnmatrix_set_btn_width(btnm, 0, 3);
+    lv_btnmatrix_set_btn_width(btnm, 1, 2);
+    lv_btnmatrix_set_btn_width(btnm, 2, 1);
+    lv_btnmatrix_set_btn_width(btnm, 3, 1);
+    lv_btnmatrix_set_btn_width(btnm, 4, 2);
+    lv_btnmatrix_set_btn_width(btnm, 5, 3);
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 4, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_obj_set_pos(btnm, 300, 10);
+
+    static const char * btn_map4[] = {"A", "B", "C", "D", "E", "F", "G", "\n",
+                                      "G", "F", "E", "D", "C", "B", "A", ""
+                                     };
+    btnm = lv_btnmatrix_create(active_screen);
+    lv_btnmatrix_set_map(btnm, btn_map4);
+    lv_obj_set_width(btnm, 600);
+    lv_obj_set_height(btnm, 150);
+    lv_btnmatrix_set_btn_width(btnm, 0, 1);
+    lv_btnmatrix_set_btn_width(btnm, 1, 2);
+    lv_btnmatrix_set_btn_width(btnm, 2, 3);
+    lv_btnmatrix_set_btn_width(btnm, 3, 4);
+    lv_btnmatrix_set_btn_width(btnm, 4, 5);
+    lv_btnmatrix_set_btn_width(btnm, 5, 6);
+    lv_btnmatrix_set_btn_width(btnm, 6, 7);
+
+    lv_btnmatrix_set_btn_width(btnm, 7, 7);
+    lv_btnmatrix_set_btn_width(btnm, 8, 6);
+    lv_btnmatrix_set_btn_width(btnm, 9, 5);
+    lv_btnmatrix_set_btn_width(btnm, 10, 4);
+    lv_btnmatrix_set_btn_width(btnm, 11, 3);
+    lv_btnmatrix_set_btn_width(btnm, 12, 2);
+    lv_btnmatrix_set_btn_width(btnm, 13, 1);
+
+    lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_btn_ctrl(btnm, 1, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 3, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 5, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 7, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 9, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_btnmatrix_set_btn_ctrl(btnm, 11, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_obj_set_pos(btnm, 180, 160);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("btnm_2.png");
+}
+
 void test_btn_matrix_set_ctrl_map_works(void)
 {
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
