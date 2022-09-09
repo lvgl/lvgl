@@ -5,7 +5,7 @@ def ta_event_cb(e,kb):
     ta = e.get_target()
 
     if code == lv.EVENT.FOCUSED:
-        if lv.indev_get_act().get_type() != lv.INDEV_TYPE.KEYPAD :
+        if lv.indev_get_act() != None and lv.indev_get_act().get_type() != lv.INDEV_TYPE.KEYPAD :
             kb.set_textarea(ta)
             kb.clear_flag(lv.obj.FLAG.HIDDEN)
         elif code == lv.EVENT.READY:
