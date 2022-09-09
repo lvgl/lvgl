@@ -261,10 +261,11 @@ void test_btn_matrix_release_event_works(void)
 
 void test_btn_matrix_key_event_works(void)
 {
-    char keyCode;
+    uint32_t keyCode;
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_update_layout(btnm);         /*The force calculating the button areas*/
     lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_KEY, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_EVENT_KEY;
