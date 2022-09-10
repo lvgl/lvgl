@@ -2070,6 +2070,29 @@
     #endif
 #endif
 
+/*API for const buffer filesystem emulator */
+#ifndef LV_USE_FS_CBFS
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_FS_CBFS
+            #define LV_USE_FS_CBFS CONFIG_LV_USE_FS_CBFS
+        #else
+            #define LV_USE_FS_CBFS 0
+        #endif
+    #else
+        #define LV_USE_FS_CBFS 1
+    #endif
+#endif
+#if LV_USE_FS_CBFS
+    // unless set it will auto assign a drive letter
+    #ifndef LV_FS_CBFS_LETTER
+        #ifdef CONFIG_LV_FS_CBFS_LETTER
+            #define LV_FS_CBFS_LETTER CONFIG_LV_FS_CBFS_LETTER
+        #else
+            #define LV_FS_CBFS_LETTER '\0'
+        #endif
+    #endif
+#endif
+
 /*PNG decoder library*/
 #ifndef LV_USE_PNG
     #ifdef CONFIG_LV_USE_PNG
