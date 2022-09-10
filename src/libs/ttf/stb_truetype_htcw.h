@@ -560,12 +560,12 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
       STBTT_DEF void stbtt_GetFontBoundingBox(const stbtt_fontinfo *info, int *x0, int *y0, int *x1, int *y1);
       // the bounding box around all possible characters
 
-      STBTT_DEF void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info, int codepoint, int *advanceWidth, int *leftSideBearing);
+      //STBTT_DEF void stbtt_GetCodepointHMetrics(const stbtt_fontinfo *info, int codepoint, int *advanceWidth, int *leftSideBearing);
       // leftSideBearing is the offset from the current horizontal position to the left edge of the character
       // advanceWidth is the offset from the current horizontal position to the next horizontal position
       //   these are expressed in unscaled coordinates
 
-      STBTT_DEF int stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2);
+      //STBTT_DEF int stbtt_GetCodepointKernAdvance(const stbtt_fontinfo *info, int ch1, int ch2);
       // an additional amount to add to the 'advance' value between ch1 and ch2
 
       //STBTT_DEF int stbtt_GetCodepointBox(const stbtt_fontinfo *info, int codepoint, int *x0, int *y0, int *x1, int *y1);
@@ -680,7 +680,7 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
       // (Note that the bitmap uses y-increases-down, but the shape uses
       // y-increases-up, so CodepointBitmapBox and CodepointBox are inverted.)
 
-      STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1);
+      //STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1);
       // same as stbtt_GetCodepointBitmapBox, but you can specify a subpixel
       // shift for the character
 

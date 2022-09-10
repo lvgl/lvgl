@@ -655,6 +655,10 @@
     #define LV_FFMPEG_DUMP_FORMAT 0
 #endif
 
+/* Built-in TTF decoder */
+#define LV_USE_TTF 0
+
+
 /*==================
  * OTHERS
  *==================*/

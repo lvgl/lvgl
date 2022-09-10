@@ -2215,6 +2215,16 @@
     #endif
 #endif
 
+/* Built-in TTF decoder */
+#ifndef LV_USE_TTF
+    #ifdef CONFIG_LV_USE_TTF
+        #define LV_USE_TTF CONFIG_LV_USE_TTF
+    #else
+        #define LV_USE_TTF 0
+    #endif
+#endif
+
+
 /*==================
  * OTHERS
  *==================*/
