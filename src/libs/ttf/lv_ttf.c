@@ -1,6 +1,6 @@
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
-#include <lv_ttf.h>
+#include "lv_ttf.h"
 #include <stdio.h>
 
 #include "stb_rect_pack.h"
