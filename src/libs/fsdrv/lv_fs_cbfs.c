@@ -168,7 +168,7 @@ lv_fs_res_t lv_fs_cbfs_create_file(char * out_path, size_t out_path_size, const 
         return LV_FS_RES_INV_PARAM;
     }
     snprintf(out_path, out_path_size, "%c:/0x%lx-%li", drive, (long)data, (long)data_size);
-    return LV_FS_RES_INV_PARAM;
+    return LV_FS_RES_OK;
 
 
 }
