@@ -397,7 +397,7 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
     return obj->state & state ? true : false;
 }
 
-void * lv_obj_get_group(const lv_obj_t * obj)
+lv_group_t * lv_obj_get_group(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
