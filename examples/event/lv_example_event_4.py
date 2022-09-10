@@ -26,7 +26,7 @@ class LV_Example_Event_4:
 
     def event_cb(self,e) :
         obj = e.get_target()
-        dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_draw_part_dsc())
+        dsc = e.get_draw_part_dsc()
         if dsc.class_p == lv.obj_class and dsc.part == lv.PART.MAIN :
             draw_dsc = lv.draw_rect_dsc_t()
             draw_dsc.init()
