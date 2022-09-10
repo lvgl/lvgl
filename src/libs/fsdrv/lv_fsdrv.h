@@ -43,6 +43,10 @@ void lv_fs_posix_init(void);
 void lv_fs_win32_init(void);
 #endif
 
+#if LV_USE_FS_CBFS != '\0'
+void lv_fs_cbfs_init(void);
+#endif
+
 /**********************
  *      MACROS
  **********************/

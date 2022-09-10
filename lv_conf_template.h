@@ -604,6 +604,13 @@
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
+/*API for const buffer filesystem emulator */
+#define LV_USE_FS_CBFS 1
+#if LV_USE_FS_CBFS
+    // unless set it will auto assign a drive letter
+    #define LV_FS_CBFS_LETTER '\0'
+#endif
+
 /*PNG decoder library*/
 #define LV_USE_PNG 0
 

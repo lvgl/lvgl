@@ -1,14 +1,15 @@
 #ifndef LV_FS_CBFS_H
 #define LV_FS_CBFS_H
+#ifdef LV_USE_FS_CBFS
+#include <stddef.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <stddef.h>
-#ifndef CONST_BUFFER_FS_DRV_MAX_SLOTS
-#define CONST_BUFFER_FS_DRV_MAX_SLOTS 3
-#endif
-void lv_fs_cbfs_init(size_t slot,char drive,const void* data, size_t size);
+// declared in lv_fsdrv.h:
+//void lv_fs_cbfs_init();
+lv_fs_res_t lv_fs_cbfs_create_file(char* out_path,size_t out_path_size, const void* data, size_t data_size);
 #ifdef __cplusplus
 }
 #endif
+#endif // LV_USE_FS_CBFS
 #endif // LV_FS_CBFS_H
