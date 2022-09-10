@@ -6,16 +6,16 @@ extern "C" {
 #include "../../../lvgl.h"
 // private structure
 typedef struct lv_ttf_buf {
-    lv_fs_file_t *stream;
+    lv_fs_file_t * stream;
     size_t offset;
     int cursor;
     int size;
 } lv_ttf_buf_t;
 
 typedef struct lv_ttf {
-    void *userdata;
+    void * userdata;
     //unsigned char *data; // pointer to .ttf file
-    lv_fs_file_t *stream; // stream of .ttf file
+    lv_fs_file_t * stream; // stream of .ttf file
     int fontstart;      // offset of start of font
 
     int numGlyphs; // number of glyphs, needed for range checking
@@ -39,10 +39,11 @@ enum {
     LV_TTF_RES_MEM = 3, /* Out of memory*/
 };
 typedef uint8_t lv_ttf_res_t;
-lv_ttf_res_t lv_ttf_open(lv_ttf_t* out_ttf, lv_fs_file_t* file);
-lv_ttf_res_t lv_ttf_create_font(lv_font_t* out_font,const lv_ttf_t* ttf, lv_coord_t line_height, const lv_font_t* fallback);
-void lv_ttf_destroy_font(lv_font_t* font);
+lv_ttf_res_t lv_ttf_open(lv_ttf_t * out_ttf, lv_fs_file_t * file);
+lv_ttf_res_t lv_ttf_create_font(lv_font_t * out_font, const lv_ttf_t * ttf, lv_coord_t line_height,
+                                const lv_font_t * fallback);
+void lv_ttf_destroy_font(lv_font_t * font);
 #ifdef __cplusplus
 }
-#endif 
+#endif
 #endif // LV_TTF_H

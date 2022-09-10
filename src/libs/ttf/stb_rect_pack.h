@@ -62,9 +62,9 @@
 #define STB_RECT_PACK_VERSION  1
 
 #ifdef STBRP_STATIC
-#define STBRP_DEF static
+    #define STBRP_DEF static
 #else
-#define STBRP_DEF extern
+    #define STBRP_DEF extern
 #endif
 
 #ifdef __cplusplus
@@ -106,17 +106,16 @@ typedef unsigned short stbrp_coord;
 // The function returns 1 if all of the rectangles were successfully
 // packed and 0 otherwise.
 
-struct stbrp_rect
-{
-   // reserved for your use:
-   int            id;
+struct stbrp_rect {
+    // reserved for your use:
+    int            id;
 
-   // input:
-   stbrp_coord    w, h;
+    // input:
+    stbrp_coord    w, h;
 
-   // output:
-   stbrp_coord    x, y;
-   int            was_packed;  // non-zero if valid packing
+    // output:
+    stbrp_coord    x, y;
+    int            was_packed;  // non-zero if valid packing
 
 }; // 16 bytes, nominally
 
@@ -153,11 +152,10 @@ struct stbrp_rect
 // heuristics will produce better/worse results for different data sets.
 // If you call init again, this will be reset to the default.
 
-enum
-{
-   STBRP_HEURISTIC_Skyline_default=0,
-   STBRP_HEURISTIC_Skyline_BL_sortHeight = STBRP_HEURISTIC_Skyline_default,
-   STBRP_HEURISTIC_Skyline_BF_sortHeight
+enum {
+    STBRP_HEURISTIC_Skyline_default = 0,
+    STBRP_HEURISTIC_Skyline_BL_sortHeight = STBRP_HEURISTIC_Skyline_default,
+    STBRP_HEURISTIC_Skyline_BF_sortHeight
 };
 
 
@@ -166,23 +164,21 @@ enum
 // the details of the following structures don't matter to you, but they must
 // be visible so you can handle the memory allocations for them
 
-struct stbrp_node
-{
-   stbrp_coord  x,y;
-   stbrp_node  *next;
+struct stbrp_node {
+    stbrp_coord  x, y;
+    stbrp_node * next;
 };
 
-struct stbrp_context
-{
-   int width;
-   int height;
-   int align;
-   int init_mode;
-   int heuristic;
-   int num_nodes;
-   stbrp_node *active_head;
-   stbrp_node *free_head;
-   stbrp_node extra[2]; // we allocate two extra nodes so optimal user-node-count is 'width' not 'width+2'
+struct stbrp_context {
+    int width;
+    int height;
+    int align;
+    int init_mode;
+    int heuristic;
+    int num_nodes;
+    stbrp_node * active_head;
+    stbrp_node * free_head;
+    stbrp_node extra[2]; // we allocate two extra nodes so optimal user-node-count is 'width' not 'width+2'
 };
 
 #ifdef __cplusplus
@@ -198,24 +194,23 @@ struct stbrp_context
 
 #ifdef STB_RECT_PACK_IMPLEMENTATION
 #ifndef STBRP_SORT
-#include <stdlib.h>
-#define STBRP_SORT qsort
+    #include <stdlib.h>
+    #define STBRP_SORT qsort
 #endif
 
 #ifndef STBRP_ASSERT
-#include <assert.h>
-#define STBRP_ASSERT assert
+    #include <assert.h>
+    #define STBRP_ASSERT assert
 #endif
 
 #ifdef _MSC_VER
-#define STBRP__NOTUSED(v)  (void)(v)
+    #define STBRP__NOTUSED(v)  (void)(v)
 #else
-#define STBRP__NOTUSED(v)  (void)sizeof(v)
+    #define STBRP__NOTUSED(v)  (void)sizeof(v)
 #endif
 
-enum
-{
-   STBRP__INIT_skyline = 1
+enum {
+    STBRP__INIT_skyline = 1
 };
 
 /*STBRP_DEF void stbrp_setup_heuristic(stbrp_context *context, int heuristic)
@@ -333,10 +328,9 @@ enum
    return min_y;
 }*/
 
-typedef struct
-{
-   int x,y;
-   stbrp_node **prev_link;
+typedef struct {
+    int x, y;
+    stbrp_node ** prev_link;
 } stbrp__findresult;
 
 /*static stbrp__findresult stbrp__skyline_find_best_pos(stbrp_context *c, int width, int height)
@@ -539,9 +533,9 @@ typedef struct
 }*/
 
 #ifdef STBRP_LARGE_RECTS
-#define STBRP__MAXVAL  0xffffffff
+    #define STBRP__MAXVAL  0xffffffff
 #else
-#define STBRP__MAXVAL  0xffff
+    #define STBRP__MAXVAL  0xffff
 #endif
 
 /*STBRP_DEF int stbrp_pack_rects(stbrp_context *context, stbrp_rect *rects, int num_rects)
