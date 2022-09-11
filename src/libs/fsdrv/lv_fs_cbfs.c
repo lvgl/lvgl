@@ -187,7 +187,6 @@ void lv_fs_cbfs_init()
     i = LV_FS_CBFS_LETTER;
 #else
     char drives[27];
-    size_t drive_count = strlen(drives);
     lv_fs_get_letters(drives);
     for(i = 'A'; i <= 'Z'; ++i) {
         int found = 0;

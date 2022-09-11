@@ -644,6 +644,9 @@
     #endif
 #endif
 
+/* Built-in TTF decoder */
+#define LV_USE_TINY_TTF 0
+
 /*Rlottie library*/
 #define LV_USE_RLOTTIE 0
 
