@@ -41,8 +41,8 @@
 // #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h
 #ifndef STBTT_malloc
     #include <stdlib.h>
-    #define STBTT_malloc(x, u) ((void)(u), lv_mem_alloc(x))
-    #define STBTT_free(x, u) ((void)(u), lv_mem_free(x))
+    #define STBTT_malloc(x, u) ((void)(u), lv_malloc(x))
+    #define STBTT_free(x, u) ((void)(u), lv_free(x))
 #endif
 
 #ifndef STBTT_assert

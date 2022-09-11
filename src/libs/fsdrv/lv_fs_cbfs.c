@@ -14,10 +14,12 @@ typedef struct cbfs_handle {
 static char drive = '\0';
 static bool ready_cb(lv_fs_drv_t * drv)
 {
+    LV_UNUSED(drv);
     return true;
 }
 static void * open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
+    LV_UNUSED(drv);
     if(mode != LV_FS_MODE_RD) {
         return NULL;
     }
@@ -67,7 +69,7 @@ static void * open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
         ch = *sz;
     }
     size_t size = (size_t)l;
-    cbfs_handle_t * h = (cbfs_handle_t *)lv_mem_alloc(sizeof(cbfs_handle_t));
+    cbfs_handle_t * h = (cbfs_handle_t *)lv_malloc(sizeof(cbfs_handle_t));
     h->data = p;
     h->size = size;
     h->position = 0;
@@ -75,14 +77,16 @@ static void * open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 }
 static lv_fs_res_t close_cb(lv_fs_drv_t * drv, void * handle)
 {
+    LV_UNUSED(drv);
     if(handle != NULL) {
-        lv_mem_free(handle);
+        lv_free(handle);
         return LV_FS_RES_OK;
     }
     return LV_FS_RES_INV_PARAM;
 }
 static lv_fs_res_t read_cb(lv_fs_drv_t * drv, void * handle, void * buf, uint32_t btr, uint32_t * br)
 {
+    LV_UNUSED(drv);
     if(handle == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
@@ -100,7 +104,8 @@ static lv_fs_res_t read_cb(lv_fs_drv_t * drv, void * handle, void * buf, uint32_
         *dst++ = pgm_read_byte(src++);
     }
 #else
-    memcpy(buf, h->data + h->position, btr);
+
+    memcpy(buf, ((const uint8_t*)h->data) + h->position, btr);
 #endif
     h->position += (size_t)btr;
     *br = btr;
@@ -108,10 +113,16 @@ static lv_fs_res_t read_cb(lv_fs_drv_t * drv, void * handle, void * buf, uint32_
 }
 static lv_fs_res_t write_cb(lv_fs_drv_t * drv, void * handle, const void * buf, uint32_t btw, uint32_t * bw)
 {
+    LV_UNUSED(drv);
+    LV_UNUSED(handle);
+    LV_UNUSED(buf);
+    LV_UNUSED(btw);
+    LV_UNUSED(bw);
     return LV_FS_RES_DENIED;
 }
 static lv_fs_res_t seek_cb(lv_fs_drv_t * drv, void * handle, uint32_t pos, lv_fs_whence_t whence)
 {
+    LV_UNUSED(drv);
     if(handle == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
@@ -144,6 +155,7 @@ static lv_fs_res_t seek_cb(lv_fs_drv_t * drv, void * handle, uint32_t pos, lv_fs
 
 static lv_fs_res_t tell_cb(lv_fs_drv_t * drv, void * handle, uint32_t * pos)
 {
+    LV_UNUSED(drv);
     if(handle == NULL) {
         return LV_FS_RES_INV_PARAM;
     }
@@ -153,14 +165,21 @@ static lv_fs_res_t tell_cb(lv_fs_drv_t * drv, void * handle, uint32_t * pos)
 }
 static void * dir_open_cb(lv_fs_drv_t * drv, const char * path)
 {
+    LV_UNUSED(drv);
+    LV_UNUSED(path);
     return NULL;
 }
 static lv_fs_res_t dir_read_cb(lv_fs_drv_t * drv, void * handle, char * fn)
 {
+    LV_UNUSED(drv);
+    LV_UNUSED(handle);
+    LV_UNUSED(fn);
     return LV_FS_RES_NOT_IMP;
 }
 static lv_fs_res_t dir_close_cb(lv_fs_drv_t * drv, void * handle)
 {
+    LV_UNUSED(drv);
+    LV_UNUSED(handle);
     return LV_FS_RES_NOT_IMP;
 }
 lv_fs_res_t lv_fs_cbfs_create(char * out_path, size_t out_path_size, const void * data, size_t data_size)
@@ -183,11 +202,12 @@ void lv_fs_cbfs_init()
         return;
     }
     int i;
-#if defined(LV_FS_CBFS_LETTER) && LV_FS_CBFS_LETTER >= 'A' && LV_FS_CBFS_LETTER >= 'Z'
+#if defined(LV_FS_CBFS_LETTER) && LV_FS_CBFS_LETTER >= 'A' && LV_FS_CBFS_LETTER <= 'Z'
     i = LV_FS_CBFS_LETTER;
 #else
     char drives[27];
     lv_fs_get_letters(drives);
+    int drive_count = strlen(drives);
     for(i = 'A'; i <= 'Z'; ++i) {
         int found = 0;
         for(int j = 0; j < drive_count; ++j) {
