@@ -105,7 +105,7 @@ static lv_fs_res_t read_cb(lv_fs_drv_t * drv, void * handle, void * buf, uint32_
     }
 #else
 
-    memcpy(buf, ((const uint8_t*)h->data) + h->position, btr);
+    memcpy(buf, ((const uint8_t *)h->data) + h->position, btr);
 #endif
     h->position += (size_t)btr;
     *br = btr;

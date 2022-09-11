@@ -415,19 +415,6 @@ STBTT_DEF void stbtt_GetFontVMetrics(stbtt_fontinfo * info, int * ascent, int * 
 //   these are expressed in unscaled coordinates, so you must multiply by
 //   the scale factor for a given size
 
-
-STBTT_DEF void stbtt_GetFontBoundingBox(stbtt_fontinfo * info, int * x0, int * y0, int * x1, int * y1);
-// the bounding box around all possible characters
-
-STBTT_DEF void stbtt_GetCodepointHMetrics(stbtt_fontinfo * info, int codepoint, int * advanceWidth,
-                                          int * leftSideBearing);
-// leftSideBearing is the offset from the current horizontal position to the left edge of the character
-// advanceWidth is the offset from the current horizontal position to the next horizontal position
-//   these are expressed in unscaled coordinates
-
-STBTT_DEF int stbtt_GetCodepointKernAdvance(stbtt_fontinfo * info, int ch1, int ch2);
-// an additional amount to add to the 'advance' value between ch1 and ch2
-
 STBTT_DEF void stbtt_GetGlyphHMetrics(stbtt_fontinfo * info, int glyph_index, int * advanceWidth,
                                       int * leftSideBearing);
 STBTT_DEF int stbtt_GetGlyphKernAdvance(stbtt_fontinfo * info, int glyph1, int glyph2);
@@ -483,12 +470,6 @@ STBTT_DEF int stbtt_GetGlyphShape(stbtt_fontinfo * info, int glyph_index, stbtt_
 //
 // BITMAP RENDERING
 //
-
-
-STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(stbtt_fontinfo * font, int codepoint, float scale_x, float scale_y,
-                                                   float shift_x, float shift_y, int * ix0, int * iy0, int * ix1, int * iy1);
-// same as stbtt_GetCodepointBitmapBox, but you can specify a subpixel
-// shift for the character
 
 STBTT_DEF void stbtt_GetGlyphBitmapBoxSubpixel(stbtt_fontinfo * font, int glyph, float scale_x, float scale_y,
                                                float shift_x, float shift_y, int * ix0, int * iy0, int * ix1, int * iy1);

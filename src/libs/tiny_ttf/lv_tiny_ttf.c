@@ -1735,19 +1735,6 @@ STBTT_DEF int stbtt_GetGlyphKernAdvance(stbtt_fontinfo * info, int g1, int g2)
     return xAdvance;
 }
 
-STBTT_DEF int stbtt_GetCodepointKernAdvance(stbtt_fontinfo * info, int ch1, int ch2)
-{
-    if(!info->kern && !info->gpos)   // if no kerning table, don't waste time looking up both codepoint->glyphs
-        return 0;
-    return stbtt_GetGlyphKernAdvance(info, stbtt_FindGlyphIndex(info, ch1), stbtt_FindGlyphIndex(info, ch2));
-}
-
-STBTT_DEF void stbtt_GetCodepointHMetrics(stbtt_fontinfo * info, int codepoint, int * advanceWidth,
-                                          int * leftSideBearing)
-{
-    stbtt_GetGlyphHMetrics(info, stbtt_FindGlyphIndex(info, codepoint), advanceWidth, leftSideBearing);
-}
-
 STBTT_DEF void stbtt_GetFontVMetrics(stbtt_fontinfo * info, int * ascent, int * descent, int * lineGap)
 {
     if(ascent) {
@@ -1762,15 +1749,6 @@ STBTT_DEF void stbtt_GetFontVMetrics(stbtt_fontinfo * info, int * ascent, int * 
         lv_fs_seek(&info->stream, info->hhea + 8, LV_FS_SEEK_SET);
         *lineGap = read_int16(&info->stream);
     }
-}
-
-STBTT_DEF void stbtt_GetFontBoundingBox(stbtt_fontinfo * info, int * x0, int * y0, int * x1, int * y1)
-{
-    lv_fs_seek(&info->stream, info->head + 36, LV_FS_SEEK_SET);
-    *x0 = read_int16(&info->stream);
-    *y0 = read_int16(&info->stream);
-    *x1 = read_int16(&info->stream);
-    *y1 = read_int16(&info->stream);
 }
 
 STBTT_DEF float stbtt_ScaleForPixelHeight(stbtt_fontinfo * info, float height)
@@ -1819,12 +1797,6 @@ STBTT_DEF void stbtt_GetGlyphBitmapBox(stbtt_fontinfo * font, int glyph, float s
     stbtt_GetGlyphBitmapBoxSubpixel(font, glyph, scale_x, scale_y, 0.0f, 0.0f, ix0, iy0, ix1, iy1);
 }
 
-STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(stbtt_fontinfo * font, int codepoint, float scale_x, float scale_y,
-                                                   float shift_x, float shift_y, int * ix0, int * iy0, int * ix1, int * iy1)
-{
-    stbtt_GetGlyphBitmapBoxSubpixel(font, stbtt_FindGlyphIndex(font, codepoint), scale_x, scale_y, shift_x, shift_y, ix0,
-                                    iy0, ix1, iy1);
-}
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -2256,7 +2228,7 @@ static void stbtt__fill_active_edges_new(float * scanline, float * scanline_fill
                     }
                     y_crossing += dy * (x2 - (x1 + 1));
 
-                    STBTT_assert(STBTT_fabs(area) <= 1.01f);
+                    STBTT_assert(STBTT_fabs(area) <= (double)1.01f);
 
                     scanline[x2] += area + sign * (1 - ((x2 - x2) + (x_bottom - x2)) / 2) * (sy1 - y_crossing);
 
@@ -2777,6 +2749,7 @@ STBTT_DEF void stbtt_MakeGlyphBitmapSubpixel(stbtt_fontinfo * info, stbtt_render
                                              void * callback_state, int out_w, int out_h, int out_stride, float scale_x, float scale_y, float shift_x, float shift_y,
                                              int glyph)
 {
+    STBTT__NOTUSED(out_stride);
     int ix0, iy0;
     stbtt_vertex * vertices;
     int num_verts = stbtt_GetGlyphShape(info, glyph, &vertices);
@@ -2899,7 +2872,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     int advw, lsb;
     stbtt_GetGlyphHMetrics(info, g1, &advw, &lsb);
     int k = stbtt_GetGlyphKernAdvance(info, g1, g2);
-    dsc_out->adv_w = (((float)advw + (float)k) * info->scale) + 0.5; /*Horizontal space required by the glyph in [px]*/
+    dsc_out->adv_w = (((float)advw + (float)k) * info->scale) + 0.5f; /*Horizontal space required by the glyph in [px]*/
     dsc_out->box_w = (x2 - x1 + 1);                                /*width of the bitmap in [px]*/
     dsc_out->box_h = (y2 - y1 + 1);                                /*height of the bitmap in [px]*/
     dsc_out->ofs_x = x1;                                           /*X offset of the bitmap in [pf]*/
@@ -2930,8 +2903,8 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     int w = x2 - x1 + 1;
     int h = y2 - y1 + 1;
     if(buffer == NULL) {
-        buffer_size = w * h;
-        buffer = (uint8_t *)lv_mem_alloc(buffer_size);
+        buffer_size = (size_t)(w * h);
+        buffer = (uint8_t *)lv_malloc(buffer_size);
         if(buffer == NULL) {
             buffer_size = 0;
             return NULL;
@@ -2942,7 +2915,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
         size_t s = w * h;
         if(s > buffer_size) {
             buffer_size = s;
-            buffer = (uint8_t *)lv_mem_realloc(buffer, buffer_size);
+            buffer = (uint8_t *)lv_realloc(buffer, buffer_size);
             if(buffer == NULL) {
                 buffer_size = 0;
                 return NULL;
@@ -2963,20 +2936,20 @@ lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_fon
         LV_LOG_ERROR("tiny_ttf: invalid argument");
         return NULL;
     }
-    lv_tiny_ttf_font_t * ttf = (lv_tiny_ttf_font_t *)lv_mem_alloc(sizeof(lv_tiny_ttf_font_t));
+    lv_tiny_ttf_font_t * ttf = (lv_tiny_ttf_font_t *)lv_malloc(sizeof(lv_tiny_ttf_font_t));
     if(ttf == NULL) {
         LV_LOG_ERROR("tiny_ttf: out of memory");
         return NULL;
     }
     if(0 == stbtt_InitFont(ttf, path, 0)) {
-        lv_mem_free(ttf);
+        lv_free(ttf);
         LV_LOG_ERROR("tiny_ttf: init failed");
         return NULL;
     }
     float scale = stbtt_ScaleForPixelHeight(ttf, line_height);
-    lv_font_t * out_font = (lv_font_t *)lv_mem_alloc(sizeof(lv_font_t));
+    lv_font_t * out_font = (lv_font_t *)lv_malloc(sizeof(lv_font_t));
     if(out_font == NULL) {
-        lv_mem_free(ttf);
+        lv_free(ttf);
         LV_LOG_ERROR("tiny_ttf: out of memory");
         return NULL;
     }
@@ -2990,7 +2963,6 @@ lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_fon
     out_font->underline_position = (uint8_t)line_height - ttf->descent;
     out_font->underline_thickness = 0;
     out_font->subpx = 0;
-    out_font->user_data = NULL;
     out_font->get_glyph_dsc = ttf_get_glyph_dsc_cb;
     out_font->get_glyph_bitmap = ttf_get_glyph_bitmap_cb;
     return out_font;
@@ -3001,9 +2973,9 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
         if(font->dsc != NULL) {
             lv_tiny_ttf_font_t * ttf = (lv_tiny_ttf_font_t *)font->dsc;
             lv_fs_close(&ttf->stream);
-            lv_mem_free(ttf);
+            lv_free(ttf);
         }
-        lv_mem_free(font);
+        lv_free(font);
     }
 }
 #endif
