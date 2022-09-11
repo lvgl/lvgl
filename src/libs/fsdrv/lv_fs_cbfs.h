@@ -1,5 +1,6 @@
 #ifndef LV_FS_CBFS_H
 #define LV_FS_CBFS_H
+#include "../../../lvgl.h"
 #include <stddef.h>
 #ifdef __cplusplus
 extern "C" {

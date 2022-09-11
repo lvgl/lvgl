@@ -1,5 +1,4 @@
 #if LV_USE_FS_CBFS != '\0'
-#include "../../../lvgl.h"
 #include <stdio.h>
 #include "lv_fs_cbfs.h"
 #if defined(ARDUINO) && !defined(ESP32)
