@@ -99,7 +99,6 @@ void test_led_toggle_works(void)
 void test_led_get_brightness_works(void)
 {
     lv_obj_t * led  = lv_led_create(active_screen);
-    lv_led_t * ledObj = (lv_led_t *)led;
 
     lv_led_on(led);
     TEST_ASSERT_EQUAL(LV_LED_BRIGHT_MAX, lv_led_get_brightness(led));
