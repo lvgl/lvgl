@@ -7,9 +7,9 @@ class KeyboardEncoder:
 
         cur_drv = lv.indev_t.__cast__(None)
         while True:
-            cur_drv = lv.indev_t.__cast__(cur_drv.get_next())
-            # print(cur_drv)
-            if cur_drv == lv.indev_t.__cast__(None):
+            cur_drv = cur_drv.get_next()
+
+            if not cur_drv :
                 break
             if cur_drv.driver.type == lv.INDEV_TYPE.KEYPAD:
                 print("Found keypad")
