@@ -1,3 +1,5 @@
+#include "../../../lvgl.h"
+#if LV_USE_TINY_TTF
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
 #include "lv_tiny_ttf.h"
@@ -3004,3 +3006,4 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
         lv_mem_free(font);
     }
 }
+#endif
