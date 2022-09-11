@@ -2186,7 +2186,7 @@
     #endif
 #endif
 
-/*Tiny TTF Library */
+/* Built-in TTF decoder */
 #ifndef LV_USE_TINY_TTF
     #ifdef CONFIG_LV_USE_TINY_TTF
         #define LV_USE_TINY_TTF CONFIG_LV_USE_TINY_TTF
