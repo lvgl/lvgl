@@ -195,7 +195,7 @@ lv_fs_res_t lv_fs_cbfs_create(char * out_path, size_t out_path_size, const void 
 
 
 }
-void lv_fs_cbfs_init()
+void lv_fs_cbfs_init(void)
 {
     if(drive != '\0') {
         LV_LOG_ERROR("CBFS is already initialized");
