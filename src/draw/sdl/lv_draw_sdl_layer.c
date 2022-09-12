@@ -69,7 +69,12 @@ lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_draw_ctx_t * draw_ctx, lv_draw_l
 
     SDL_SetTextureBlendMode(transform_ctx->target, SDL_BLENDMODE_BLEND);
     SDL_SetRenderTarget(renderer, transform_ctx->target);
-    SDL_RenderClear(renderer);
+
+    /* SDL_RenderClear is not working properly, so we overwrite the target with solid color */
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderFillRect(renderer, NULL);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     /* Set proper drawing context for transform layer */
     ctx->internals->transform_count += 1;
