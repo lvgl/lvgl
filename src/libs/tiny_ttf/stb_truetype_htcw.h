@@ -4616,11 +4616,11 @@ STBTT_DEF void stbtt_PackFontRangesPackRects(stbtt_pack_context * spc, stbrp_rec
     stbrp_pack_rects((stbrp_context *)spc->pack_info, rects, num_rects);
 }
 #ifdef STBTT_STREAM_TYPE
-    STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context * spc, STBTT_STREAM_TYPE fontdata, int font_index,
-    stbtt_pack_range * ranges, int num_ranges)
+STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context * spc, STBTT_STREAM_TYPE fontdata, int font_index,
+                                   stbtt_pack_range * ranges, int num_ranges)
 #else
-    STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context * spc, const unsigned char * fontdata, int font_index,
-    stbtt_pack_range * ranges, int num_ranges)
+STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context * spc, const unsigned char * fontdata, int font_index,
+                                   stbtt_pack_range * ranges, int num_ranges)
 #endif
 {
     stbtt_fontinfo info;
@@ -4674,11 +4674,11 @@ STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context * spc, const unsigned char 
     return stbtt_PackFontRanges(spc, fontdata, font_index, &range, 1);
 }
 #ifdef STBTT_STREAM_TYPE
-    STBTT_DEF void stbtt_GetScaledFontVMetrics(STBTT_STREAM_TYPE fontdata, int index, float size, float * ascent,
-    float * descent, float * lineGap)
+STBTT_DEF void stbtt_GetScaledFontVMetrics(STBTT_STREAM_TYPE fontdata, int index, float size, float * ascent,
+                                           float * descent, float * lineGap)
 #else
-    STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char * fontdata, int index, float size, float * ascent,
-    float * descent, float * lineGap)
+STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char * fontdata, int index, float size, float * ascent,
+                                           float * descent, float * lineGap)
 #endif
 {
     int i_ascent, i_descent, i_lineGap;
@@ -5122,11 +5122,11 @@ STBTT_DEF void stbtt_FreeSDF(unsigned char * bitmap, void * userdata)
 
 // check if a utf8 string contains a prefix which is the utf16 string; if so return length of matching utf8 string
 #ifdef STBTT_STREAM_TYPE
-    static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 * s1, stbtt_int32 len1, STBTT_STREAM_TYPE s2,
-    stbtt_uint32 s2offs, stbtt_int32 len2)
+static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 * s1, stbtt_int32 len1, STBTT_STREAM_TYPE s2,
+                                                              stbtt_uint32 s2offs, stbtt_int32 len2)
 #else
-    static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 * s1, stbtt_int32 len1, stbtt_uint8 * s2,
-    stbtt_uint32 s2offs, stbtt_int32 len2)
+static stbtt_int32 stbtt__CompareUTF8toUTF16_bigendian_prefix(stbtt_uint8 * s1, stbtt_int32 len1, stbtt_uint8 * s2,
+                                                              stbtt_uint32 s2offs, stbtt_int32 len2)
 #endif
 {
     stbtt_int32 i = 0;
@@ -5204,11 +5204,11 @@ STBTT_DEF stbtt_uint32 stbtt_GetFontNameString(const stbtt_fontinfo * font, int 
     return 0;
 }
 #ifdef STBTT_STREAM_TYPE
-    static int stbtt__matchpair(STBTT_STREAM_TYPE fc, stbtt_uint32 nm, stbtt_uint8 * name, stbtt_int32 nlen,
-    stbtt_int32 target_id, stbtt_int32 next_id)
+static int stbtt__matchpair(STBTT_STREAM_TYPE fc, stbtt_uint32 nm, stbtt_uint8 * name, stbtt_int32 nlen,
+                            stbtt_int32 target_id, stbtt_int32 next_id)
 #else
-    static int stbtt__matchpair(stbtt_uint8 * fc, stbtt_uint32 nm, stbtt_uint8 * name, stbtt_int32 nlen,
-    stbtt_int32 target_id, stbtt_int32 next_id)
+static int stbtt__matchpair(stbtt_uint8 * fc, stbtt_uint32 nm, stbtt_uint8 * name, stbtt_int32 nlen,
+                            stbtt_int32 target_id, stbtt_int32 next_id)
 #endif
 {
     stbtt_int32 i;
