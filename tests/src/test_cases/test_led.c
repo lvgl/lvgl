@@ -74,10 +74,10 @@ void test_led_on_off_works(void)
     TEST_ASSERT_EQUAL(LV_LED_BRIGHT_MAX, lv_led_get_brightness(led));
 
     lv_led_off(led);
-    TEST_ASSERT_EQUAL(LV_LED_BRIGHT_MIN, lv_led_get_brightness(led);
+    TEST_ASSERT_EQUAL(LV_LED_BRIGHT_MIN, lv_led_get_brightness(led));
 
-                      lv_led_on(led);
-                      TEST_ASSERT_EQUAL(LV_LED_BRIGHT_MAX, lv_led_get_brightness(led));
+    lv_led_on(led);
+    TEST_ASSERT_EQUAL(LV_LED_BRIGHT_MAX, lv_led_get_brightness(led));
 }
 
 void test_led_toggle_works(void)
