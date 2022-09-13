@@ -42,11 +42,12 @@ void lv_fs_posix_init(void);
 #if LV_USE_FS_WIN32 != '\0'
 void lv_fs_win32_init(void);
 #endif
-
+// #ifdef is workaround for micropython binding generator
+#ifdef LV_USE_FS_CBFS
 #if LV_USE_FS_CBFS != '\0'
 void lv_fs_cbfs_init(void);
 #endif
-
+#endif
 /**********************
  *      MACROS
  **********************/
