@@ -2,7 +2,7 @@
 #ifndef LV_USE_TINY_TTF
     #define LV_USE_TINY_TTF 1
 #endif
-#if LV_USE_TINY_TTF
+#if LV_USE_TINY_TTF !=0
 #include <stdio.h>
 #include "lv_tiny_ttf.h"
 #define STB_RECT_PACK_IMPLEMENTATION
