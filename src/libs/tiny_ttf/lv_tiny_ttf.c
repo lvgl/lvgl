@@ -1,6 +1,6 @@
 #include "../../../lvgl.h"
 #ifndef LV_USE_TINY_TTF
-#define LV_USE_TINY_TTF 1
+    #define LV_USE_TINY_TTF 1
 #endif
 #if LV_USE_TINY_TTF
 #include <stdio.h>
@@ -11,8 +11,8 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_STREAM_TYPE lv_fs_file_t*
 #define STBTT_STREAM_READ(s,x,y) uint32_t stream_br;\
-                                lv_fs_read((STBTT_STREAM_TYPE)(s),(void*)(x),(uint32_t)(y),&stream_br);\
-                                STBTT_assert((y)==stream_br);
+    lv_fs_read((STBTT_STREAM_TYPE)(s),(void*)(x),(uint32_t)(y),&stream_br);\
+    STBTT_assert((y)==stream_br);
 
 #define STBTT_STREAM_SEEK(s,x)  lv_fs_seek((STBTT_STREAM_TYPE)(s),(uint32_t)(x),LV_FS_SEEK_SET);
 
@@ -64,15 +64,15 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
 static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
 {
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
-    const stbtt_fontinfo* info = (const stbtt_fontinfo*)&dsc->info;
+    const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
     static char * buffer = NULL;
     static size_t buffer_size = 0;
     int g1 = stbtt_FindGlyphIndex(info, (int)unicode_letter);
     int x1, y1, x2, y2;
     stbtt_GetGlyphBitmapBox(info, g1, dsc->scale, dsc->scale, &x1, &y1, &x2, &y2);
-    int w,h,xoff,yoff;
-    w=x2-x1+1;
-    h=y2-y1+1;
+    int w, h, xoff, yoff;
+    w = x2 - x1 + 1;
+    h = y2 - y1 + 1;
     if(buffer == NULL) {
         buffer_size = (size_t)(w * h);
         buffer = (uint8_t *)lv_mem_alloc(buffer_size);
@@ -94,7 +94,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
             memset(buffer, 0, buffer_size);
         }
     }
-    stbtt_MakeGlyphBitmap(info,buffer,w,h,w,dsc->scale,dsc->scale,g1);
+    stbtt_MakeGlyphBitmap(info, buffer, w, h, w, dsc->scale, dsc->scale, g1);
     return buffer; /*Or NULL if not found*/
 }
 lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_font_t * fallback)
@@ -108,8 +108,8 @@ lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_fon
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
         return NULL;
     }
-    if(LV_FS_RES_OK!=lv_fs_open(&dsc->file,path,LV_FS_MODE_RD)) {
-        LV_LOG_ERROR("tiny_ttf: unable to open %s\n",path);
+    if(LV_FS_RES_OK != lv_fs_open(&dsc->file, path, LV_FS_MODE_RD)) {
+        LV_LOG_ERROR("tiny_ttf: unable to open %s\n", path);
         return NULL;
     }
     if(0 == stbtt_InitFont(&dsc->info, &dsc->file, 0)) {
