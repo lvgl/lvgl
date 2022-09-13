@@ -142,4 +142,31 @@ void test_roller_keypad_events(void)
     TEST_ASSERT_EQUAL(expected_index, actual_index);
 }
 
+void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void)
+{
+    char actual_str[OPTION_BUFFER_SZ] = {0x00};
+
+    lv_group_remove_obj(roller);
+    lv_group_add_obj(g, roller_infinite);
+
+    /* Select the last option of page 2 */
+    uint16_t option_count = lv_roller_get_option_cnt(roller_infinite);
+    option_count = (option_count * 2) - 1;
+    lv_roller_set_selected(roller_infinite, option_count, LV_ANIM_OFF);
+
+    /* Get the index string */
+    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
+
+    TEST_ASSERT_EQUAL_STRING("Ten", actual_str);
+    memset(actual_str, 0x00, OPTION_BUFFER_SZ);
+
+    lv_test_key_hit(LV_KEY_DOWN);
+
+    /* Get the index string */
+    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
+    TEST_ASSERT_EQUAL_STRING("One", actual_str);
+
+    lv_group_remove_obj(roller_infinite);
+}
+
 #endif
