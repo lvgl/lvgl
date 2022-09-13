@@ -1,5 +1,6 @@
 #include "../../../lvgl.h"
-#if LV_USE_FS_CBFS
+#ifdef LV_USE_FS_CBFS
+#if LV_USE_FS_CBFS !=0
 #include <stdio.h>
 #include "lv_fs_cbfs.h"
 #if defined(ARDUINO) && !defined(ESP32)
@@ -246,3 +247,4 @@ void lv_fs_cbfs_init(void)
     lv_fs_drv_register(&drv);                 /*Finally register the drive*/
 }
 #endif // LV_USE_FS_CBFS != 0 
+#endif // #ifdef LV_USE_FS_CBFS
