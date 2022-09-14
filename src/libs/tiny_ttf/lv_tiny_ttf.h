@@ -6,6 +6,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "../../lv_conf_internal.h"
 // create a font from the specified file or path with the specified line height.
 lv_font_t * lv_tiny_ttf_create_file(const char * path, lv_coord_t line_height);
 // create a font from the specified data pointer with the specified line height.
