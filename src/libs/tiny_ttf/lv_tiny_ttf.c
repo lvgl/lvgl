@@ -113,7 +113,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     h = y2 - y1 + 1;
     if(buffer == NULL) {
         buffer_size = (size_t)(w * h);
-        buffer = (uint8_t *)lv_mem_alloc(buffer_size);
+        buffer = (uint8_t *)lv_malloc(buffer_size);
         if(buffer == NULL) {
             buffer_size = 0;
             return NULL;
@@ -124,7 +124,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
         size_t s = w * h;
         if(s > buffer_size) {
             buffer_size = s;
-            buffer = (uint8_t *)lv_mem_realloc(buffer, buffer_size);
+            buffer = (uint8_t *)lv_realloc(buffer, buffer_size);
             if(buffer == NULL) {
                 buffer_size = 0;
                 return NULL;
@@ -142,7 +142,7 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
         LV_LOG_ERROR("tiny_ttf: invalid argument\n");
         return NULL;
     }
-    ttf_font_desc_t * dsc = (ttf_font_desc_t *)lv_mem_alloc(sizeof(ttf_font_desc_t));
+    ttf_font_desc_t * dsc = (ttf_font_desc_t *)lv_malloc(sizeof(ttf_font_desc_t));
     if(dsc == NULL) {
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
         return NULL;
@@ -161,14 +161,14 @@ static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size
         dsc->stream.position = 0;
     }
     if(0 == stbtt_InitFont(&dsc->info, &dsc->stream, stbtt_GetFontOffsetForIndex(&dsc->stream, 0))) {
-        lv_mem_free(dsc);
+        lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
         return NULL;
     }
     float scale = stbtt_ScaleForPixelHeight(&dsc->info, line_height);
-    lv_font_t * out_font = (lv_font_t *)lv_mem_alloc(sizeof(lv_font_t));
+    lv_font_t * out_font = (lv_font_t *)lv_malloc(sizeof(lv_font_t));
     if(out_font == NULL) {
-        lv_mem_free(dsc);
+        lv_free(dsc);
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
         return NULL;
     }
@@ -203,9 +203,9 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
             if(ttf->stream.file != NULL) {
                 lv_fs_close(&ttf->file);
             }
-            lv_mem_free(ttf);
+            lv_free(ttf);
         }
-        lv_mem_free(font);
+        lv_free(font);
     }
 }
 #endif
