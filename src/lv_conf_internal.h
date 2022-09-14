@@ -1686,6 +1686,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_RADIOBTN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_RADIOBTN
+            #define LV_USE_RADIOBTN CONFIG_LV_USE_RADIOBTN
+        #else
+            #define LV_USE_RADIOBTN 0
+        #endif
+    #else
+        #define LV_USE_RADIOBTN   1
+    #endif
+#endif
+
 #ifndef LV_USE_ROLLER
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ROLLER

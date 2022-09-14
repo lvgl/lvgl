@@ -97,6 +97,10 @@ typedef struct {
     lv_style_t cb_marker, cb_marker_checked;
 #endif
 
+#if LV_USE_RADIOBTN
+    lv_style_t rb_marker, rb_marker_checked, rb_marker_inner, rb_marker_inner_checked;
+#endif
+
 #if LV_USE_SWITCH
     lv_style_t switch_knob;
 #endif
@@ -425,6 +429,30 @@ static void style_init(void)
     lv_style_set_bg_img_src(&styles->cb_marker_checked, LV_SYMBOL_OK);
     lv_style_set_text_color(&styles->cb_marker_checked, lv_color_white());
     lv_style_set_text_font(&styles->cb_marker_checked, theme.font_small);
+#endif
+
+#if LV_USE_RADIOBTN
+    style_init_reset(&styles->rb_marker);
+    lv_style_set_pad_all(&styles->rb_marker, lv_disp_dpx(theme.disp, 3));
+    lv_style_set_border_width(&styles->rb_marker, BORDER_WIDTH);
+    lv_style_set_border_color(&styles->rb_marker, theme.color_primary);
+    lv_style_set_bg_color(&styles->rb_marker, color_card);
+    lv_style_set_bg_opa(&styles->rb_marker, LV_OPA_COVER);
+    lv_style_set_radius(&styles->rb_marker, LV_RADIUS_CIRCLE);
+
+    style_init_reset(&styles->rb_marker_checked);
+    lv_style_set_bg_color(&styles->rb_marker_checked, color_card);
+    lv_style_set_bg_opa(&styles->rb_marker_checked, LV_OPA_COVER);
+
+    style_init_reset(&styles->rb_marker_inner);
+    lv_style_set_border_opa(&styles->rb_marker_inner, LV_OPA_TRANSP);
+    lv_style_set_bg_opa(&styles->rb_marker_inner, LV_OPA_TRANSP);
+    lv_style_set_radius(&styles->rb_marker_inner, LV_RADIUS_CIRCLE);
+
+    style_init_reset(&styles->rb_marker_inner_checked);
+    lv_style_set_border_opa(&styles->rb_marker_inner_checked, LV_OPA_TRANSP);
+    lv_style_set_bg_color(&styles->rb_marker_inner_checked, theme.color_primary);
+    lv_style_set_bg_opa(&styles->rb_marker_inner_checked, LV_OPA_COVER);
 #endif
 
 #if LV_USE_SWITCH
@@ -891,6 +919,25 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->bg_color_primary, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->cb_marker_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->pressed, LV_PART_INDICATOR | LV_STATE_PRESSED);
+#if LV_THEME_DEFAULT_GROW
+        lv_obj_add_style(obj, &styles->grow, LV_PART_INDICATOR | LV_STATE_PRESSED);
+#endif
+        lv_obj_add_style(obj, &styles->transition_normal, LV_PART_INDICATOR | LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &styles->transition_delayed, LV_PART_INDICATOR);
+    }
+#endif
+
+#if LV_USE_RADIOBTN
+    else if(lv_obj_check_type(obj, &lv_radiobtn_item_class)) {
+        lv_obj_add_style(obj, &styles->pad_gap, 0);
+        lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
+        lv_obj_add_style(obj, &styles->disabled, LV_PART_INDICATOR | LV_STATE_DISABLED);
+        lv_obj_add_style(obj, &styles->rb_marker, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &styles->rb_marker_inner, LV_PART_CUSTOM_FIRST);
+        lv_obj_add_style(obj, &styles->rb_marker_checked, LV_PART_INDICATOR | LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &styles->rb_marker_inner_checked, LV_PART_CUSTOM_FIRST | LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &styles->pressed, LV_PART_INDICATOR | LV_STATE_PRESSED);
+        lv_obj_add_style(obj, &styles->pressed, LV_PART_CUSTOM_FIRST | LV_STATE_PRESSED);
 #if LV_THEME_DEFAULT_GROW
         lv_obj_add_style(obj, &styles->grow, LV_PART_INDICATOR | LV_STATE_PRESSED);
 #endif
