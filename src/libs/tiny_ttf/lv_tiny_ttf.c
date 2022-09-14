@@ -8,24 +8,60 @@
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
 #define STBTT_STATIC
+#define STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_HEAP_FACTOR_SIZE_32 50
 #define STBTT_HEAP_FACTOR_SIZE_128 20
 #define STBTT_HEAP_FACTOR_SIZE_DEFAULT 10
-#define STBTT_malloc(x,u)  ((void)(u),lv_mem_alloc(x))
-#define STBTT_free(x,u)    ((void)(u),lv_mem_free(x))
-#define STB_TRUETYPE_IMPLEMENTATION
-#define STBTT_STREAM_TYPE lv_fs_file_t*
-#define STBTT_STREAM_READ(s,x,y) uint32_t stream_br;\
-    lv_fs_read((STBTT_STREAM_TYPE)(s),(void*)(x),(uint32_t)(y),&stream_br);\
-    STBTT_assert((y)==stream_br);
+#define STBTT_malloc(x,u)  ((void)(u),lv_malloc(x))
+#define STBTT_free(x,u)    ((void)(u),lv_free(x))
 
-#define STBTT_STREAM_SEEK(s,x)  lv_fs_seek((STBTT_STREAM_TYPE)(s),(uint32_t)(x),LV_FS_SEEK_SET);
+// a hydra stream that can be in memory or from a file
+typedef struct ttf_cb_stream {
+    lv_fs_file_t * file;
+    const void * data;
+    size_t size;
+    size_t position;
+} ttf_cb_stream_t;
+
+static void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read)
+{
+    if(stream->file != NULL) {
+        uint32_t br;
+        lv_fs_read(stream->file, data, to_read, &br);
+    }
+    else {
+        if(to_read + stream->position >= stream->size) {
+            to_read = stream->size - stream->position;
+        }
+        memcpy(data, ((const unsigned char *)stream->data + stream->position), to_read);
+        stream->position += to_read;
+    }
+}
+static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position)
+{
+    if(stream->file != NULL) {
+        lv_fs_seek(stream->file, position, LV_FS_SEEK_SET);
+    }
+    else {
+        if(position > stream->size) {
+            stream->position = stream->size;
+        }
+        else {
+            stream->position = position;
+        }
+    }
+}
+
+#define STBTT_STREAM_TYPE ttf_cb_stream_t*
+#define STBTT_STREAM_SEEK(s,x) ttf_cb_stream_seek(s,x);
+#define STBTT_STREAM_READ(s,x,y) ttf_cb_stream_read(s,x,y);
 
 #include "stb_rect_pack.h"
 #include "stb_truetype_htcw.h"
 
 typedef struct ttf_font_desc {
     lv_fs_file_t file;
+    ttf_cb_stream_t stream;
     stbtt_fontinfo info;
     float scale;
     int ascent;
@@ -102,9 +138,10 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     stbtt_MakeGlyphBitmap(info, buffer, w, h, w, dsc->scale, dsc->scale, g1);
     return buffer; /*Or NULL if not found*/
 }
-lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_font_t * fallback)
+
+static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size,  lv_coord_t line_height)
 {
-    if(path == NULL || 0 >= line_height) {
+    if((path == NULL && data == NULL) || 0 >= line_height) {
         LV_LOG_ERROR("tiny_ttf: invalid argument\n");
         return NULL;
     }
@@ -113,11 +150,20 @@ lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_fon
         LV_LOG_ERROR("tiny_ttf: out of memory\n");
         return NULL;
     }
-    if(LV_FS_RES_OK != lv_fs_open(&dsc->file, path, LV_FS_MODE_RD)) {
-        LV_LOG_ERROR("tiny_ttf: unable to open %s\n", path);
-        return NULL;
+    if(path != NULL) {
+        if(LV_FS_RES_OK != lv_fs_open(&dsc->file, path, LV_FS_MODE_RD)) {
+            LV_LOG_ERROR("tiny_ttf: unable to open %s\n", path);
+            return NULL;
+        }
+        dsc->stream.file = &dsc->file;
     }
-    if(0 == stbtt_InitFont(&dsc->info, &dsc->file, 0)) {
+    else {
+        dsc->stream.file = NULL;
+        dsc->stream.data = (uint8_t *)data;
+        dsc->stream.size = data_size;
+        dsc->stream.position = 0;
+    }
+    if(0 == stbtt_InitFont(&dsc->info, &dsc->stream, stbtt_GetFontOffsetForIndex(&dsc->stream, 0))) {
         lv_mem_free(dsc);
         LV_LOG_ERROR("tiny_ttf: init failed\n");
         return NULL;
@@ -130,7 +176,7 @@ lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_fon
         return NULL;
     }
     out_font->line_height = line_height;
-    out_font->fallback = fallback;
+    out_font->fallback = NULL;
     out_font->dsc = dsc;
     int line_gap;
     int descent;
@@ -144,12 +190,22 @@ lv_font_t * lv_tiny_ttf_create(const char * path, lv_coord_t line_height, lv_fon
     out_font->get_glyph_bitmap = ttf_get_glyph_bitmap_cb;
     return out_font;
 }
+lv_font_t * lv_tiny_ttf_create_file(const char * path, lv_coord_t line_height)
+{
+    return lv_tiny_ttf_create(path, NULL, 0, line_height);
+}
+lv_font_t * lv_tiny_ttf_create_data(const void * data, size_t data_size, lv_coord_t line_height)
+{
+    return lv_tiny_ttf_create(NULL, data, data_size, line_height);
+}
 void lv_tiny_ttf_destroy(lv_font_t * font)
 {
     if(font != NULL) {
         if(font->dsc != NULL) {
             ttf_font_desc_t * ttf = (ttf_font_desc_t *)font->dsc;
-            lv_fs_close(&ttf->file);
+            if(ttf->stream.file != NULL) {
+                lv_fs_close(&ttf->file);
+            }
             lv_mem_free(ttf);
         }
         lv_mem_free(font);
