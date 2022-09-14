@@ -8,6 +8,11 @@
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
 #define STBTT_STATIC
+#define STBTT_HEAP_FACTOR_SIZE_32 50
+#define STBTT_HEAP_FACTOR_SIZE_128 20
+#define STBTT_HEAP_FACTOR_SIZE_DEFAULT 10
+#define STBTT_malloc(x,u)  ((void)(u),lv_mem_alloc(x))
+#define STBTT_free(x,u)    ((void)(u),lv_mem_free(x))
 #define STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_STREAM_TYPE lv_fs_file_t*
 #define STBTT_STREAM_READ(s,x,y) uint32_t stream_br;\
