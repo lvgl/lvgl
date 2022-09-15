@@ -5,9 +5,9 @@
  *
  * Hardware is BUGGY and in FILL mode has an errata where it adds one pixel at
  * the end of the fill buffer, but in reality, it can also add two pixels,
- * if the end of buffer is aligned on 32bits or not. If its not, only one 
- * additional pixel will be clobbered. If it is, two pixels will be added. 
- * This likely only affects 16 and 24 bit modes (since 32bit/ARGB will always 
+ * if the end of buffer is aligned on 32bits or not. If its not, only one
+ * additional pixel will be clobbered. If it is, two pixels will be added.
+ * This likely only affects 16 and 24 bit modes (since 32bit/ARGB will always
  * be aligned).
  *
  * Solution is during the fill to backup 2 memory locations, do the fill,
