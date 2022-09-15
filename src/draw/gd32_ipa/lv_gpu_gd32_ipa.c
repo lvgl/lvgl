@@ -3,10 +3,18 @@
  *
  * Support for GD32F4x0 IPA 2D accelerator.
  *
- * Hardware is BUGGY and adds an extra pixel per arrata, but in reality,
- * it adds TWO pixels at the end of a fill (sometimes?)
+ * Hardware is BUGGY and in FILL mode has an errata where it adds one pixel at
+ * the end of the fill buffer, but in reality, it can also add two pixels,
+ * if the end of buffer is aligned on 32bits or not. If its not, only one 
+ * additional pixel will be clobbered. If it is, two pixels will be added. 
+ * This likely only affects 16 and 24 bit modes (since 32bit/ARGB will always 
+ * be aligned).
+ *
  * Solution is during the fill to backup 2 memory locations, do the fill,
- * do NOT call any other LVGL functions, and restore.
+ * do NOT call any other LVGL functions, and restore affected memory block.
+ * The more complex solution of checking whether end address is aligned or not
+ * is likely to be slower than simply backing up 2 locations regardless.
+ *
  * Errata: https://www.gd32mcu.com/download/down/document_id/378/path_type/1
  * Alpha blend/2D copy seems to be unaffected.
  *
@@ -61,7 +69,7 @@ static void lv_draw_gd32_ipa_img_decoded(lv_draw_ctx_t * draw, const lv_draw_img
                                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
 
-static void ipa_wait(void);
+static void lv_gpu_gd32_ipa_wait_cb(lv_draw_ctx_t * draw_ctx);
 static void invalidate_cache(void);
 
 /**********************
@@ -101,6 +109,7 @@ void lv_draw_gd32_ipa_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     lv_draw_gd32_ipa_ctx_t * ipa_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
 
     ipa_draw_ctx->blend = lv_draw_gd32_ipa_blend;
+    ipa_draw_ctx->base_draw.wait_for_finish = lv_gpu_gd32_ipa_wait_cb;
     ipa_draw_ctx->base_draw.buffer_copy = lv_draw_gd32_ipa_buffer_copy;
 
 }
@@ -184,15 +193,16 @@ static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_s
     IPA_DLOFF = (dest_stride - area_w);
     IPA_IMS = ((area_w << 16U) | (area_h));
 
-    /*Work around hardware bug in IPA which clobbers 2 pixels after the fill*/
+    /*Work around hardware bug in IPA which clobbers 1 or 2 pixels after the fill*/
     backup[0] = end_ptr[0];
     backup[1] = end_ptr[1];
 
-    /*start transfer*/
+    /*start fill*/
     IPA_CTL |= IPA_CTL_TEN;
-    /*have to wait for draw to finish here, can't call external functions because IPA trashes the stack*/
+    /*have to wait for draw to finish here, can't call external functions because IPA may trash stack or data behind buffer*/
     while(IPA_CTL & IPA_CTL_TEN);
 
+    /*Restore two backed up pixels*/
     end_ptr[0] = backup[0];
     end_ptr[1] = backup[1];
 }
@@ -219,7 +229,6 @@ static void lv_draw_gd32_ipa_blend_map(lv_color_t * dest_buf, const lv_area_t * 
 
         /*start transfer*/
         IPA_CTL |= IPA_CTL_TEN;
-        ipa_wait();
     }
     else {
         IPA_CTL = IPA_FGBGTODE;
@@ -239,7 +248,6 @@ static void lv_draw_gd32_ipa_blend_map(lv_color_t * dest_buf, const lv_area_t * 
 
         /*start transfer*/
         IPA_CTL |= IPA_CTL_TEN;
-        ipa_wait();
     }
 }
 
@@ -248,12 +256,18 @@ static void lv_draw_gd32_ipa_blend_map(lv_color_t * dest_buf, const lv_area_t * 
  *   STATIC FUNCTIONS
  **********************/
 
-static void ipa_wait(void)
+static void lv_gpu_gd32_ipa_wait_cb(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    while(IPA_CTL & IPA_CTL_TEN) {
-        if(disp->driver->wait_cb) disp->driver->wait_cb(disp->driver);
+    if(disp->driver && disp->driver->wait_cb) {
+        while(IPA_CTL & IPA_CTL_TEN) {
+            if(disp->driver->wait_cb) disp->driver->wait_cb(disp->driver);
+        }
     }
+    else {
+        while(IPA_CTL & IPA_CTL_TEN);
+    }
+    lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
 
