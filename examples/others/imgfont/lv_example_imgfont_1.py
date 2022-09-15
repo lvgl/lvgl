@@ -2,9 +2,29 @@ import fs_driver
 import sys
 
 LV_FONT_DEFAULT = lv.font_montserrat_14
-# Create an image from the png file
+
+# get the directory in which the script is running
 try:
-    with open('../../assets/emoji/emoji_F617.png','rb') as f:
+    script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
+except NameError: 
+    script_path = ''
+    
+# Create an image from the png file
+
+try:
+    with open(script_path + '/../../assets/emoji/F600.png','rb') as f:
+        png_data = f.read()
+except:
+    print("Could not find F600.png")
+    sys.exit()
+
+img_emoji_F600_argb = lv.img_dsc_t({
+  'data_size': len(png_data),
+  'data': png_data
+})
+
+try:
+    with open(script_path + '/../../assets/emoji/emoji_F617.png','rb') as f:
         png_data = f.read()
 except:
     print("Could not find emoji_F617.png")
@@ -15,16 +35,13 @@ img_emoji_F617_argb = lv.img_dsc_t({
   'data': png_data
 })
 
-def get_imgfont_path(font, img_src, len, unicode, unicode_next) :
-    print("get_imgfont_path")
-    if unicode == 0xF617: 
-        img_src = img_emoji_F617_argb 
-    else :
-        path = img_src
-        path="../lvgl/examples/assets/emoji/{:04x}.png".format(unicode)
-        print("Image path: ",path)
-        # snprintf(path, len, "%s/%04X.%s", "A:lvgl/examples/assets/emoji", unicode, "png");
+def get_imgfont_path(font, img_src, length, unicode, unicode_next,user_data) :
+    path = bytes(script_path + "/../../assets/emoji/emoji_{:04X}.png".format(unicode) + "\0","ascii")
+    # print("image path: ",path)
+    length = len(path)
+    img_src.__dereference__(len(path))[0:len(path)] = path
 
+    # snprintf(path, len, "%s/%04X.%s", "A:lvgl/examples/assets/emoji", unicode, "png");
     return True
 
 #
