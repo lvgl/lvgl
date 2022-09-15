@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include "lv_tiny_ttf.h"
 #define STB_RECT_PACK_IMPLEMENTATION
-#define STBRP_STATIC
-#define STBTT_STATIC
 #define STB_TRUETYPE_IMPLEMENTATION
 #define STBTT_HEAP_FACTOR_SIZE_32 50
 #define STBTT_HEAP_FACTOR_SIZE_128 20
@@ -20,7 +18,7 @@ typedef struct ttf_cb_stream {
     size_t position;
 } ttf_cb_stream_t;
 
-static void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read)
+void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read)
 {
     if(stream->file != NULL) {
         uint32_t br;
@@ -34,7 +32,7 @@ static void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_
         stream->position += to_read;
     }
 }
-static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position)
+void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position)
 {
     if(stream->file != NULL) {
         lv_fs_seek(stream->file, position, LV_FS_SEEK_SET);
@@ -103,17 +101,17 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
 {
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
     const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
-    static char * buffer = NULL;
+    static unsigned char * buffer = NULL;
     static size_t buffer_size = 0;
     int g1 = stbtt_FindGlyphIndex(info, (int)unicode_letter);
     int x1, y1, x2, y2;
     stbtt_GetGlyphBitmapBox(info, g1, dsc->scale, dsc->scale, &x1, &y1, &x2, &y2);
-    int w, h, xoff, yoff;
+    int w, h;
     w = x2 - x1 + 1;
     h = y2 - y1 + 1;
     if(buffer == NULL) {
         buffer_size = (size_t)(w * h);
-        buffer = (uint8_t *)lv_malloc(buffer_size);
+        buffer = (unsigned char *)lv_malloc(buffer_size);
         if(buffer == NULL) {
             buffer_size = 0;
             return NULL;
@@ -124,7 +122,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
         size_t s = w * h;
         if(s > buffer_size) {
             buffer_size = s;
-            buffer = (uint8_t *)lv_realloc(buffer, buffer_size);
+            buffer = (unsigned char *)lv_realloc(buffer, buffer_size);
             if(buffer == NULL) {
                 buffer_size = 0;
                 return NULL;
