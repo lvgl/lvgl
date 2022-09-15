@@ -75,6 +75,8 @@ Learn more about [Events](/overview/event).
 - `LV_KEY_RIGHT/UP/LEFT/RIGHT` To navigate among the buttons to select one
 - `LV_KEY_ENTER` To press/release the selected button
 
+Note that long pressing the button matrix with an encoder can mean to enter/leave edit mode and simply long pressing a button to make it repeat as well. To avoid this contradiction it's suggested to add `lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);` to the button matrix if used with encoder. This way, the pressed button repeat feature is disabled and on leaving edit mode the selected button won't be activated.
+
 Learn more about [Keys](/overview/indev).
 
 ## Example
