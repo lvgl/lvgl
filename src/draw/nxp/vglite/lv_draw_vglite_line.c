@@ -59,7 +59,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
-                                     const lv_point_t * point1, const lv_point_t * point2)
+                                     const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip_line)
 {
     vg_lite_buffer_t vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
@@ -91,7 +91,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
     lv_point_t rel_point2 = { point2->x - draw_ctx->buf_area->x1, point2->y - draw_ctx->buf_area->y1 };
 
     lv_area_t rel_clip;
-    lv_area_copy(&rel_clip, draw_ctx->clip_area);
+    lv_area_copy(&rel_clip, clip_line);
     lv_area_move(&rel_clip, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
     /* Choose vglite blend mode based on given lvgl blend mode */

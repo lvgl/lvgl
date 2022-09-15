@@ -64,7 +64,7 @@ extern "C"
  * @param point2 the coordinates of the ending point of the line
  */
 lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
-                                     const lv_point_t * point1, const lv_point_t * point2);
+                                     const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip_line);
 
 /**********************
  *      MACROS
