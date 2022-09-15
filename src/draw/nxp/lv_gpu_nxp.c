@@ -102,7 +102,6 @@ void lv_draw_nxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     lv_draw_sw_init_ctx(drv, draw_ctx);
 
     lv_draw_nxp_ctx_t * nxp_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
-
     nxp_draw_ctx->base_draw.draw_line = lv_draw_nxp_line;
     nxp_draw_ctx->base_draw.draw_arc = lv_draw_nxp_arc;
     nxp_draw_ctx->base_draw.draw_rect = lv_draw_nxp_rect;
@@ -335,10 +334,12 @@ static void lv_draw_nxp_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t 
 {
     bool done = false;
 
-    if(dsc->width == 0) return;
-    if(dsc->opa <= LV_OPA_MIN) return;
-
-    if(point1->x == point2->x && point1->y == point2->y) return;
+    if(dsc->width == 0)
+        return;
+    if(dsc->opa <= LV_OPA_MIN)
+        return;
+    if(point1->x == point2->x && point1->y == point2->y)
+        return;
 
     lv_area_t clip_line;
     clip_line.x1 = LV_MIN(point1->x, point2->x) - dsc->width / 2;
@@ -348,13 +349,12 @@ static void lv_draw_nxp_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t 
 
     bool is_common;
     is_common = _lv_area_intersect(&clip_line, &clip_line, draw_ctx->clip_area);
-    if(!is_common) return;
-    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-    draw_ctx->clip_area = &clip_line;
+    if(!is_common)
+        return;
 
 #if LV_USE_GPU_NXP_VG_LITE
     if(!need_argb8565_support()) {
-        done = (lv_gpu_nxp_vglite_draw_line(draw_ctx, dsc, point1, point2) == LV_RES_OK);
+        done = (lv_gpu_nxp_vglite_draw_line(draw_ctx, dsc, point1, point2, &clip_line) == LV_RES_OK);
         if(!done)
             VG_LITE_LOG_TRACE("VG-Lite draw line failed. Fallback.");
     }
