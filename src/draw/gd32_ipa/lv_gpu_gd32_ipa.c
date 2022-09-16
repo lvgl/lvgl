@@ -8,7 +8,7 @@
  * if the end of buffer is aligned on 32bits or not. If its not, only one
  * additional pixel will be clobbered. If it is, two pixels will be added.
  * This likely only affects 16 and 24 bit modes (since 32bit/ARGB will always
- * be aligned).
+ * be aligned). This bug is present in GD32F450, and is not present on GD32F470.
  *
  * Solution is during the fill to backup 2 memory locations, do the fill,
  * do NOT call any other LVGL functions, and restore affected memory block.
@@ -16,7 +16,7 @@
  * is likely to be slower than simply backing up 2 locations regardless.
  *
  * Errata: https://www.gd32mcu.com/download/down/document_id/378/path_type/1
- * Alpha blend/2D copy seems to be unaffected.
+ * Alpha blend/2D copy is unaffected.
  *
  */
 
@@ -90,13 +90,13 @@ static void invalidate_cache(void);
 void lv_draw_gd32_ipa_init(void)
 {
     /*Enable IPA clock*/
-#if defined(GD32F450)
+#if defined(GD32F450) || defined(GD32F470)
     RCU_REG_VAL(RCU_IPA) |= BIT(RCU_BIT_POS(RCU_IPA));
     __DSB();
     RCU_REG_VAL(RCU_IPARST) |= BIT(RCU_BIT_POS(RCU_IPARST));
     RCU_REG_VAL(RCU_IPARST) &= ~BIT(RCU_BIT_POS(RCU_IPARST));
 #else
-# warning "LVGL can't enable the clock of IPA"
+# #error "LVGL IPA support is only available on GD32F450 and GD32F470"
 #endif
 }
 
@@ -174,13 +174,14 @@ static void lv_draw_gd32_ipa_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw
 static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
                                         lv_color_t color)
 {
-    volatile lv_color_t backup[2];
-
     /*Simply fill an area*/
     int32_t area_w = lv_area_get_width(fill_area);
     int32_t area_h = lv_area_get_height(fill_area);
+#ifdef GD32F450
+    volatile lv_color_t backup[2];
     uint32_t offset = ((area_w) + (dest_stride - area_w)) * area_h;
     volatile lv_color_t * end_ptr = (volatile lv_color_t *)(dest_buf + offset);
+#endif
 
     invalidate_cache();
 
@@ -193,18 +194,23 @@ static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_s
     IPA_DLOFF = (dest_stride - area_w);
     IPA_IMS = ((area_w << 16U) | (area_h));
 
-    /*Work around hardware bug in IPA which clobbers 1 or 2 pixels after the fill*/
+#ifdef GD32F450
+    /*Work around hardware bug on GD32F450 IPA which clobbers 1 or 2 pixels after the fill*/
     backup[0] = end_ptr[0];
     backup[1] = end_ptr[1];
+#endif
 
     /*start fill*/
     IPA_CTL |= IPA_CTL_TEN;
+
+#ifdef GD32F450
     /*have to wait for draw to finish here, can't call external functions because IPA may trash stack or data behind buffer*/
     while(IPA_CTL & IPA_CTL_TEN);
 
     /*Restore two backed up pixels*/
     end_ptr[0] = backup[0];
     end_ptr[1] = backup[1];
+#endif
 }
 
 
