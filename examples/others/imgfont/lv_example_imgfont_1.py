@@ -9,32 +9,6 @@ try:
 except NameError: 
     script_path = ''
     
-# Create an image from the png file
-
-try:
-    with open(script_path + '/../../assets/emoji/F600.png','rb') as f:
-        png_data = f.read()
-except:
-    print("Could not find F600.png")
-    sys.exit()
-
-img_emoji_F600_argb = lv.img_dsc_t({
-  'data_size': len(png_data),
-  'data': png_data
-})
-
-try:
-    with open(script_path + '/../../assets/emoji/emoji_F617.png','rb') as f:
-        png_data = f.read()
-except:
-    print("Could not find emoji_F617.png")
-    sys.exit()
-
-img_emoji_F617_argb = lv.img_dsc_t({
-  'data_size': len(png_data),
-  'data': png_data
-})
-
 def get_imgfont_path(font, img_src, length, unicode, unicode_next,user_data) :
     path = bytes(script_path + "/../../assets/emoji/emoji_{:04X}.png".format(unicode) + "\0","ascii")
     # print("image path: ",path)
