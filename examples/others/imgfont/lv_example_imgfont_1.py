@@ -12,10 +12,7 @@ except NameError:
 def get_imgfont_path(font, img_src, length, unicode, unicode_next,user_data) :
     path = bytes(script_path + "/../../assets/emoji/emoji_{:04X}.png".format(unicode) + "\0","ascii")
     # print("image path: ",path)
-    length = len(path)
-    img_src.__dereference__(len(path))[0:len(path)] = path
-
-    # snprintf(path, len, "%s/%04X.%s", "A:lvgl/examples/assets/emoji", unicode, "png");
+    img_src.__dereference__(length)[0:len(path)] = path
     return True
 
 #
@@ -31,14 +28,3 @@ label1 = lv.label(lv.scr_act())
 label1.set_text("12\uF600\uF617AB")
 label1.set_style_text_font(imgfont, lv.PART.MAIN)
 label1.center()
-'''
-#else
-
-void lv_example_imgfont_1(void)
-{
-    lv_obj_t * label = lv_label_create(lv_scr_act());
-    lv_label_set_text(label, "imgfont is not installed");
-    lv_obj_center(label);
-}
-'''
-
