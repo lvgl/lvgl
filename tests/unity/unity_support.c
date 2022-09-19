@@ -41,12 +41,12 @@ typedef struct {
     png_infop info_ptr;
     int number_of_passes;
     png_bytep * row_pointers;
-}png_img_t;
+} png_img_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static int read_png_file(png_img_t * p, const char* file_name);
+static int read_png_file(png_img_t * p, const char * file_name);
 static void png_release(png_img_t * p);
 
 /**********************
@@ -63,95 +63,95 @@ static void png_release(png_img_t * p);
 
 bool lv_test_assert_img_eq(const char * fn_ref)
 {
-  char fn_ref_full[512];
-  sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
+    char fn_ref_full[512];
+    sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
-  png_img_t p;
-  int res = read_png_file(&p, fn_ref_full);
-  if(res < 0) return false;
-  uint8_t * screen_buf;
+    png_img_t p;
+    int res = read_png_file(&p, fn_ref_full);
+    if(res < 0) return false;
+    uint8_t * screen_buf;
 
-  lv_obj_invalidate(lv_scr_act());
-  lv_refr_now(NULL);
+    lv_obj_invalidate(lv_scr_act());
+    lv_refr_now(NULL);
 
-  extern lv_color_t test_fb[];
+    extern lv_color_t test_fb[];
 
-  screen_buf = (uint8_t *)test_fb;
+    screen_buf = (uint8_t *)test_fb;
 
-  uint8_t * ptr_act = NULL;
-  const png_byte* ptr_ref = NULL;
+    uint8_t * ptr_act = NULL;
+    const png_byte * ptr_ref = NULL;
 
-  bool err = false;
-  int x, y, i_buf = 0;
-  for (y = 0; y < p.height; y++) {
-    png_byte* row = p.row_pointers[y];
+    bool err = false;
+    int x, y, i_buf = 0;
+    for(y = 0; y < p.height; y++) {
+        png_byte * row = p.row_pointers[y];
 
-    for (x = 0; x < p.width; x++) {
-      ptr_ref = &(row[x*3]);
-      ptr_act = &(screen_buf[i_buf*4]);
+        for(x = 0; x < p.width; x++) {
+            ptr_ref = &(row[x * 3]);
+            ptr_act = &(screen_buf[i_buf * 4]);
 
-      uint32_t ref_px = 0;
-      uint32_t act_px = 0;
-      memcpy(&ref_px, ptr_ref, 3);
-      memcpy(&act_px, ptr_act, 3);
-      //printf("0xFF%06x, ", act_px);
+            uint32_t ref_px = 0;
+            uint32_t act_px = 0;
+            memcpy(&ref_px, ptr_ref, 3);
+            memcpy(&act_px, ptr_act, 3);
+            //printf("0xFF%06x, ", act_px);
 
-      uint8_t act_swap[3] = {ptr_act[2], ptr_act[1], ptr_act[0]};
+            uint8_t act_swap[3] = {ptr_act[2], ptr_act[1], ptr_act[0]};
 
-      if(memcmp(act_swap, ptr_ref, 3) != 0) {
-        err = true;
-        break;
-      }
-      i_buf++;
-    }
-    if(err) break;
-  }
-
-  if(err) {
-      uint32_t ref_px = 0;
-      uint32_t act_px = 0;
-      memcpy(&ref_px, ptr_ref, 3);
-      memcpy(&act_px, ptr_act, 3);
-
-      FILE * f = fopen("../test_screenshot_error.h", "w");
-
-      fprintf(f, "//Diff in %s at (%d;%d), %x instead of %x)\n\n", fn_ref, x, y, act_px, ref_px);
-      fprintf(f, "static const uint32_t test_screenshot_error_data[] = {\n");
-
-      i_buf = 0;
-      for (y = 0; y < 480; y++) {
-        fprintf(f, "\n");
-        for (x = 0; x < 800; x++) {
-          ptr_act = &(screen_buf[i_buf * 4]);
-          act_px = 0;
-          memcpy(&act_px, ptr_act, 3);
-          fprintf(f, "0xFF%06X, ", act_px);
-          i_buf++;
+            if(memcmp(act_swap, ptr_ref, 3) != 0) {
+                err = true;
+                break;
+            }
+            i_buf++;
         }
-      }
-      fprintf(f, "};\n\n");
+        if(err) break;
+    }
 
-      fprintf(f, "static lv_img_dsc_t test_screenshot_error_dsc = { \n"
-      "  .header.w = 800,\n"
-      "  .header.h = 480,\n"
-      "  .header.always_zero = 0,\n"
-      "  .header.cf = LV_IMG_CF_TRUE_COLOR,\n"
-      "  .data_size = 800 * 480 * 4,\n"
-      "  .data = test_screenshot_error_data};\n\n"
-      "static inline void test_screenshot_error_show(void)\n"
-      "{\n"
-      "  lv_obj_t * img = lv_img_create(lv_scr_act());\n"
-      "  lv_img_set_src(img, &test_screenshot_error_dsc);\n"
-      "}\n");
+    if(err) {
+        uint32_t ref_px = 0;
+        uint32_t act_px = 0;
+        memcpy(&ref_px, ptr_ref, 3);
+        memcpy(&act_px, ptr_act, 3);
 
-      fclose(f);
+        FILE * f = fopen("../test_screenshot_error.h", "w");
 
-  }
+        fprintf(f, "//Diff in %s at (%d;%d), %x instead of %x)\n\n", fn_ref, x, y, act_px, ref_px);
+        fprintf(f, "static const uint32_t test_screenshot_error_data[] = {\n");
+
+        i_buf = 0;
+        for(y = 0; y < 480; y++) {
+            fprintf(f, "\n");
+            for(x = 0; x < 800; x++) {
+                ptr_act = &(screen_buf[i_buf * 4]);
+                act_px = 0;
+                memcpy(&act_px, ptr_act, 3);
+                fprintf(f, "0xFF%06X, ", act_px);
+                i_buf++;
+            }
+        }
+        fprintf(f, "};\n\n");
+
+        fprintf(f, "static lv_img_dsc_t test_screenshot_error_dsc = { \n"
+                "  .header.w = 800,\n"
+                "  .header.h = 480,\n"
+                "  .header.always_zero = 0,\n"
+                "  .header.cf = LV_IMG_CF_TRUE_COLOR,\n"
+                "  .data_size = 800 * 480 * 4,\n"
+                "  .data = (const uint8_t *) test_screenshot_error_data};\n\n"
+                "static inline void test_screenshot_error_show(void)\n"
+                "{\n"
+                "  lv_obj_t * img = lv_img_create(lv_scr_act());\n"
+                "  lv_img_set_src(img, &test_screenshot_error_dsc);\n"
+                "}\n");
+
+        fclose(f);
+
+    }
 
 
-  png_release(&p);
+    png_release(&p);
 
-  return !err;
+    return !err;
 
 }
 
@@ -159,19 +159,19 @@ bool lv_test_assert_img_eq(const char * fn_ref)
  *   STATIC FUNCTIONS
  **********************/
 
-static int read_png_file(png_img_t * p, const char* file_name)
+static int read_png_file(png_img_t * p, const char * file_name)
 {
     char header[8];    // 8 is the maximum size that can be checked
 
     /*open file and test for it being a png*/
-    FILE *fp = fopen(file_name, "rb");
-    if (!fp) {
-       TEST_PRINTF("%s", "PNG file %s could not be opened for reading");
+    FILE * fp = fopen(file_name, "rb");
+    if(!fp) {
+        TEST_PRINTF("%s", "PNG file %s could not be opened for reading");
         return -1;
     }
 
     size_t rcnt = fread(header, 1, 8, fp);
-    if (rcnt != 8 || png_sig_cmp((png_const_bytep)header, 0, 8)) {
+    if(rcnt != 8 || png_sig_cmp((png_const_bytep)header, 0, 8)) {
         TEST_PRINTF("%s is not recognized as a PNG file", file_name);
         return -1;
     }
@@ -179,17 +179,17 @@ static int read_png_file(png_img_t * p, const char* file_name)
     /*initialize stuff*/
     p->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
-    if (!p->png_ptr) {
+    if(!p->png_ptr) {
         TEST_PRINTF("%s", "png_create_read_struct failed");
         return -1;
     }
 
     p->info_ptr = png_create_info_struct(p->png_ptr);
-    if (!p->info_ptr) {
+    if(!p->info_ptr) {
         TEST_PRINTF("%s", "png_create_info_struct failed");
         return -1;
     }
-    if (setjmp(png_jmpbuf(p->png_ptr))) {
+    if(setjmp(png_jmpbuf(p->png_ptr))) {
         TEST_PRINTF("%s", "Error during init_io");
         return -1;
     }
@@ -207,15 +207,15 @@ static int read_png_file(png_img_t * p, const char* file_name)
     png_read_update_info(p->png_ptr, p->info_ptr);
 
     /*read file*/
-    if (setjmp(png_jmpbuf(p->png_ptr))) {
+    if(setjmp(png_jmpbuf(p->png_ptr))) {
         TEST_PRINTF("%s", "Error during read_image");
         return -1;
     }
-    p->row_pointers = (png_bytep*) malloc(sizeof(png_bytep) * p->height);
+    p->row_pointers = (png_bytep *) malloc(sizeof(png_bytep) * p->height);
 
     int y;
-    for (y=0; y<p->height; y++)
-        p->row_pointers[y] = (png_byte*) malloc(png_get_rowbytes(p->png_ptr,p->info_ptr));
+    for(y = 0; y < p->height; y++)
+        p->row_pointers[y] = (png_byte *) malloc(png_get_rowbytes(p->png_ptr, p->info_ptr));
 
     png_read_image(p->png_ptr, p->row_pointers);
 
@@ -226,7 +226,7 @@ static int read_png_file(png_img_t * p, const char* file_name)
 static void png_release(png_img_t * p)
 {
     int y;
-    for (y=0; y<p->height; y++) free(p->row_pointers[y]);
+    for(y = 0; y < p->height; y++) free(p->row_pointers[y]);
 
     free(p->row_pointers);
 
