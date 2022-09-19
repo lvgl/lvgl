@@ -3,7 +3,9 @@
 #else
 #include "../../lvgl.h"
 #endif
+
 #ifdef PIKASCRIPT
+
 #include "pika_lvgl_point_t.h"
 
 void pika_lvgl_point_t___init__(PikaObj* self) {
