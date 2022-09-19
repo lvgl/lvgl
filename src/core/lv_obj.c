@@ -153,7 +153,7 @@ void lv_init(void)
     lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
 #endif
     /*Test if the IDE has UTF-8 encoding*/
-    char * txt = "Á";
+    const char * txt = "Á";
 
     uint8_t * txt_u8 = (uint8_t *)txt;
     if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
