@@ -686,8 +686,7 @@ void lv_demo_benchmark(lv_demo_benchmark_mode_t _mode)
             for(i = 0; i < RENDER_REPEAT_CNT; i++) {
                 /*Wait a little to be sure something happens with the animations*/
                 uint32_t t = lv_tick_get();
-                while(lv_tick_elaps(t) > 20);
-
+                while(lv_tick_elaps(t) < 20);
                 lv_refr_now(NULL);
             }
 
