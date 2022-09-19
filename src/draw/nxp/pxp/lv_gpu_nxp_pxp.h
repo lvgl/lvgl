@@ -107,6 +107,11 @@ lv_res_t lv_gpu_nxp_pxp_init(void);
 void lv_gpu_nxp_pxp_deinit(void);
 
 /**
+ * Reset PXP device.
+ */
+void lv_gpu_nxp_pxp_reset(void);
+
+/**
  * Clear cache and start PXP.
  */
 void lv_gpu_nxp_pxp_run(void);

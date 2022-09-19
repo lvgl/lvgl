@@ -79,8 +79,10 @@ lv_res_t lv_gpu_nxp_pxp_init(void)
         PXP_RETURN_INV("PXP configuration error.");
 
     PXP_Init(LV_GPU_NXP_PXP_ID);
+
     PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
     PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*Block size 16x16 for higher performance*/
+
     PXP_EnableInterrupts(LV_GPU_NXP_PXP_ID, kPXP_CompleteInterruptEnable);
 
     if(pxp_cfg->pxp_interrupt_init() != LV_RES_OK) {
@@ -97,6 +99,17 @@ void lv_gpu_nxp_pxp_deinit(void)
     pxp_cfg->pxp_interrupt_deinit();
     PXP_DisableInterrupts(LV_GPU_NXP_PXP_ID, kPXP_CompleteInterruptEnable);
     PXP_Deinit(LV_GPU_NXP_PXP_ID);
+}
+
+void lv_gpu_nxp_pxp_reset(void)
+{
+    /* Wait for previous command to complete before resetting the registers. */
+    lv_gpu_nxp_pxp_wait();
+
+    PXP_ResetControl(LV_GPU_NXP_PXP_ID);
+
+    PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
+    PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*Block size 16x16 for higher performance*/
 }
 
 void lv_gpu_nxp_pxp_run(void)

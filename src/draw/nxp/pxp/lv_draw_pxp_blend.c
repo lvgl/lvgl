@@ -158,10 +158,7 @@ lv_res_t lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, cons
         }
     }
 
-    lv_gpu_nxp_pxp_wait();
-    PXP_Init(LV_GPU_NXP_PXP_ID);
-    PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
-    PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*Block size 16x16 for higher performance*/
+    lv_gpu_nxp_pxp_reset();
 
     /*OUT buffer configure*/
     pxp_output_buffer_config_t outputConfig = {
@@ -245,10 +242,7 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
         }
     }
 
-    lv_gpu_nxp_pxp_wait();
-    PXP_Init(LV_GPU_NXP_PXP_ID);
-    PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
-    PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*Block size 16x16 for higher performance*/
+    lv_gpu_nxp_pxp_reset();
 
     /* convert rotation angle */
     pxp_rotate_degree_t pxp_rot;
@@ -424,10 +418,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
     bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
     bool rotation = (dsc->angle != 0);
 
-    lv_gpu_nxp_pxp_wait();
-    PXP_Init(LV_GPU_NXP_PXP_ID);
-    PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
-    PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*Block size 16x16 for higher performance*/
+    lv_gpu_nxp_pxp_reset();
 
     if(rotation) {
         /*
@@ -532,10 +523,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
     lv_coord_t dest_w = lv_area_get_width(dest_area);
     lv_coord_t dest_h = lv_area_get_height(dest_area);
 
-    lv_gpu_nxp_pxp_wait();
-    PXP_Init(LV_GPU_NXP_PXP_ID);
-    PXP_EnableCsc1(LV_GPU_NXP_PXP_ID, false); /*Disable CSC1, it is enabled by default.*/
-    PXP_SetProcessBlockSize(LV_GPU_NXP_PXP_ID, kPXP_BlockSize16); /*Block size 16x16 for higher performance*/
+    lv_gpu_nxp_pxp_reset();
 
     pxp_as_blend_config_t asBlendConfig = {
         .alpha = dsc->opa,
