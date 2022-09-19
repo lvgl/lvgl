@@ -244,7 +244,6 @@ set(LVGL_TEST_OPTIONS_TEST_COMMON
     ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
-    -Wno-unused-variable
 )
 
 set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
@@ -298,7 +297,6 @@ set(COMPILE_OPTIONS
     -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
-    -Wno-discarded-qualifiers
     -Wpedantic
     -Wreturn-type
     -Wshadow
