@@ -477,7 +477,7 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
 
 #ifndef STBTT_sqrt
     #include <math.h>
-    #define STBTT_sqrt(x)      sqrt(x)
+    #define STBTT_sqrt(x)      (float)sqrt(x)
     #define STBTT_pow(x,y)     pow(x,y)
 #endif
 
@@ -494,7 +494,7 @@ typedef char stbtt__check_size16[sizeof(stbtt_int16) == 2 ? 1 : -1];
 
 #ifndef STBTT_fabs
     #include <math.h>
-    #define STBTT_fabs(x)      fabs(x)
+    #define STBTT_fabs(x)      (float)fabs(x)
 #endif
 
 // #define your own functions "STBTT_malloc" / "STBTT_free" to avoid malloc.h
@@ -4612,6 +4612,15 @@ STBTT_DEF int stbtt_PackFontRangesRenderIntoRects(stbtt_pack_context * spc, cons
     return return_value;
 }
 
+#ifdef STBTT_STREAM_TYPE
+STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context * spc, STBTT_STREAM_TYPE fontdata, int font_index,
+                                   stbtt_pack_range * ranges, int num_ranges);
+#else
+STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context * spc, const unsigned char * fontdata, int font_index,
+                                   stbtt_pack_range * ranges, int num_ranges);
+#endif
+
+
 STBTT_DEF void stbtt_PackFontRangesPackRects(stbtt_pack_context * spc, stbrp_rect * rects, int num_rects)
 {
     stbrp_pack_rects((stbrp_context *)spc->pack_info, rects, num_rects);
@@ -4657,6 +4666,16 @@ STBTT_DEF int stbtt_PackFontRanges(stbtt_pack_context * spc, const unsigned char
     STBTT_free(rects, spc->user_allocator_context);
     return return_value;
 }
+
+#ifdef STBTT_STREAM_TYPE
+STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context * spc, STBTT_STREAM_TYPE fontdata, int font_index, float font_size,
+                                  int first_unicode_codepoint_in_range, int num_chars_in_range, stbtt_packedchar * chardata_for_range);
+#else
+STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context * spc, const unsigned char * fontdata, int font_index,
+                                  float font_size,
+                                  int first_unicode_codepoint_in_range, int num_chars_in_range, stbtt_packedchar * chardata_for_range);
+#endif
+
 #ifdef STBTT_STREAM_TYPE
 STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context * spc, STBTT_STREAM_TYPE fontdata, int font_index, float font_size,
                                   int first_unicode_codepoint_in_range, int num_chars_in_range, stbtt_packedchar * chardata_for_range)
@@ -4674,6 +4693,17 @@ STBTT_DEF int stbtt_PackFontRange(stbtt_pack_context * spc, const unsigned char 
     range.font_size = font_size;
     return stbtt_PackFontRanges(spc, fontdata, font_index, &range, 1);
 }
+
+
+#ifdef STBTT_STREAM_TYPE
+STBTT_DEF void stbtt_GetScaledFontVMetrics(STBTT_STREAM_TYPE fontdata, int index, float size, float * ascent,
+                                           float * descent, float * lineGap);
+#else
+STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char * fontdata, int index, float size, float * ascent,
+                                           float * descent, float * lineGap);
+#endif
+
+
 #ifdef STBTT_STREAM_TYPE
 STBTT_DEF void stbtt_GetScaledFontVMetrics(STBTT_STREAM_TYPE fontdata, int index, float size, float * ascent,
                                            float * descent, float * lineGap)
@@ -4745,16 +4775,16 @@ static int stbtt__ray_intersect_bezier(float orig[2], float ray[2], float q0[2],
     float s0 = 0., s1 = 0.;
     int num_s = 0;
 
-    if(a != 0.0) {
+    if(a != 0.0f) {
         float discr = b * b - a * c;
-        if(discr > 0.0) {
+        if(discr > 0.0f) {
             float rcpna = -1 / a;
             float d = (float)STBTT_sqrt(discr);
             s0 = (b + d) * rcpna;
             s1 = (b - d) * rcpna;
-            if(s0 >= 0.0 && s0 <= 1.0)
+            if(s0 >= 0.0f && s0 <= 1.0f)
                 num_s = 1;
-            if(d > 0.0 && s1 >= 0.0 && s1 <= 1.0) {
+            if(d > 0.0f && s1 >= 0.0f && s1 <= 1.0f) {
                 if(num_s == 0) s0 = s1;
                 ++num_s;
             }
@@ -4764,7 +4794,7 @@ static int stbtt__ray_intersect_bezier(float orig[2], float ray[2], float q0[2],
         // 2*b*s + c = 0
         // s = -c / (2*b)
         s0 = c / (-2 * b);
-        if(s0 >= 0.0 && s0 <= 1.0)
+        if(s0 >= 0.0f && s0 <= 1.0f)
             num_s = 1;
     }
 
@@ -4900,7 +4930,7 @@ static int stbtt__solve_cubic(float a, float b, float c, float * r)
         float u = (float)STBTT_sqrt(-p / 3);
         float v = (float)STBTT_acos(-STBTT_sqrt(-27 / p3) * q / 2) / 3; // p3 must be negative, since d is negative
         float m = (float)STBTT_cos(v);
-        float n = (float)STBTT_cos(v - 3.141592 / 2) * 1.732050808f;
+        float n = (float)STBTT_cos(v - 3.141592f / 2) * 1.732050808f;
         r[0] = s + u * 2 * m;
         r[1] = s - u * (m + n);
         r[2] = s - u * (m - n);
@@ -5030,12 +5060,12 @@ STBTT_DEF unsigned char * stbtt_GetGlyphSDF(const stbtt_fontinfo * info, float s
                             float res[3] = { 0.f, 0.f, 0.f };
                             float px, py, t, it, dist2;
                             float a_inv = precompute[i];
-                            if(a_inv == 0.0) {  // if a_inv is 0, it's 2nd degree so use quadratic formula
+                            if(a_inv == 0.0f) {  // if a_inv is 0, it's 2nd degree so use quadratic formula
                                 float a = 3 * (ax * bx + ay * by);
                                 float b = 2 * (ax * ax + ay * ay) + (mx * bx + my * by);
                                 float c = mx * ax + my * ay;
-                                if(a == 0.0) {  // if a is 0, it's linear
-                                    if(b != 0.0) {
+                                if(a == 0.0f) {  // if a is 0, it's linear
+                                    if(b != 0.0f) {
                                         res[num++] = -c / b;
                                     }
                                 }
@@ -5324,6 +5354,18 @@ static int stbtt__matchpair(stbtt_uint8 * fc, stbtt_uint32 nm, stbtt_uint8 * nam
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wcast-qual"
 #endif
+
+
+#ifdef STBTT_STREAM_TYPE
+STBTT_DEF int stbtt_BakeFontBitmap(STBTT_STREAM_TYPE data, int offset,
+                                   float pixel_height, unsigned char * pixels, int pw, int ph,
+                                   int first_char, int num_chars, stbtt_bakedchar * chardata);
+#else
+STBTT_DEF int stbtt_BakeFontBitmap(const unsigned char * data, int offset,
+                                   float pixel_height, unsigned char * pixels, int pw, int ph,
+                                   int first_char, int num_chars, stbtt_bakedchar * chardata);
+#endif
+
 #ifdef STBTT_STREAM_TYPE
 STBTT_DEF int stbtt_BakeFontBitmap(STBTT_STREAM_TYPE data, int offset,
                                    float pixel_height, unsigned char * pixels, int pw, int ph,

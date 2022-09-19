@@ -18,34 +18,8 @@ typedef struct ttf_cb_stream {
     size_t position;
 } ttf_cb_stream_t;
 
-void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read)
-{
-    if(stream->file != NULL) {
-        uint32_t br;
-        lv_fs_read(stream->file, data, to_read, &br);
-    }
-    else {
-        if(to_read + stream->position >= stream->size) {
-            to_read = stream->size - stream->position;
-        }
-        memcpy(data, ((const unsigned char *)stream->data + stream->position), to_read);
-        stream->position += to_read;
-    }
-}
-void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position)
-{
-    if(stream->file != NULL) {
-        lv_fs_seek(stream->file, position, LV_FS_SEEK_SET);
-    }
-    else {
-        if(position > stream->size) {
-            stream->position = stream->size;
-        }
-        else {
-            stream->position = position;
-        }
-    }
-}
+static void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read);
+static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position);
 
 #define STBTT_STREAM_TYPE ttf_cb_stream_t*
 #define STBTT_STREAM_SEEK(s,x) ttf_cb_stream_seek(s,x);
@@ -206,4 +180,35 @@ void lv_tiny_ttf_destroy(lv_font_t * font)
         lv_free(font);
     }
 }
+
+
+static void ttf_cb_stream_read(ttf_cb_stream_t * stream, void * data, size_t to_read)
+{
+    if(stream->file != NULL) {
+        uint32_t br;
+        lv_fs_read(stream->file, data, to_read, &br);
+    }
+    else {
+        if(to_read + stream->position >= stream->size) {
+            to_read = stream->size - stream->position;
+        }
+        memcpy(data, ((const unsigned char *)stream->data + stream->position), to_read);
+        stream->position += to_read;
+    }
+}
+static void ttf_cb_stream_seek(ttf_cb_stream_t * stream, size_t position)
+{
+    if(stream->file != NULL) {
+        lv_fs_seek(stream->file, position, LV_FS_SEEK_SET);
+    }
+    else {
+        if(position > stream->size) {
+            stream->position = stream->size;
+        }
+        else {
+            stream->position = position;
+        }
+    }
+}
+
 #endif
