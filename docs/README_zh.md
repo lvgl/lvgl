@@ -121,7 +121,7 @@ LVGL本身并不依赖特定的硬件平台，任何满足LVGL硬件配置要求
 
 LVGL也支持：
 - [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
-- [PlatformIO package](https://platformio.org/lib/show/12440/lvgl)
+- [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
 - [Zephyr library](https://docs.zephyrproject.org/latest/kconfig.html#CONFIG_LVGL)
 - [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
