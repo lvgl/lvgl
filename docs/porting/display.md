@@ -60,11 +60,11 @@ Therefore the 2 buffers needs to synchronized in `flush_cb` like this:
 1. Display the frame buffer pointed by `color_p`
 2. Copy the redrawn areas from `color_p` to the other buffer.
 
-The get the redrawn areas to copy use the following functions
-`_lv_refr_get_disp_refreshing()` returns the display being refreshed
-`disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
-`disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into another one and should be ignored
-`disp->inv_p` number of valid elements in `inv_areas`
+To get the redrawn areas to copy use the following functions:
+- `_lv_refr_get_disp_refreshing()` returns the display being refreshed
+- `disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
+- `disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into another one and should be ignored
+- `disp->inv_p` number of valid elements in `inv_areas`
 
 ## Display driver
 
