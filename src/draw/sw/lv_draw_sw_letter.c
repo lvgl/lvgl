@@ -257,7 +257,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(blend_dsc));
     blend_dsc.color = dsc->color;
-    blend_dsc.opa = dsc->opa;
+    blend_dsc.opa = LV_OPA_COVER;
     blend_dsc.blend_mode = dsc->blend_mode;
 
     lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
