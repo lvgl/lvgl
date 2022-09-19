@@ -1,9 +1,11 @@
-﻿#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
 #else
 #include "../../lvgl.h"
 #endif
+
 #ifdef PIKASCRIPT
+
 #include "pika_lvgl_lv_obj.h"
 #include "BaseObj.h"
 #include "dataStrs.h"
@@ -93,7 +95,7 @@ void pika_lvgl_lv_obj_add_event_cb(PikaObj* self,
 
 void pika_lvgl_lv_obj_add_style(PikaObj *self, PikaObj* style, int selector){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    lv_state_t* lv_style = obj_getPtr(style, "lv_style");
+    lv_style_t* lv_style = obj_getPtr(style, "lv_style");
     lv_obj_add_style(lv_obj, lv_style, selector);
 }
 

@@ -1,8 +1,9 @@
-﻿#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
 #else
 #include "../../lvgl.h"
 #endif
+
 #ifdef PIKASCRIPT
 #include "BaseObj.h"
 #include "pika_lvgl.h"
@@ -181,7 +182,7 @@ void pika_lvgl_checkbox_set_text_static(PikaObj *self, char* txt){
 
 char* pika_lvgl_checkbox_get_text(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_checkbox_get_text(lv_obj);
+    return (char*) lv_checkbox_get_text(lv_obj);
 }
 
 void pika_lvgl_dropdown___init__(PikaObj* self, PikaObj* parent) {
@@ -225,7 +226,7 @@ int pika_lvgl_dropdown_get_option_index(PikaObj *self, char* txt){
 }
 char* pika_lvgl_dropdown_get_options(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_dropdown_get_options(lv_obj);
+    return (char*) lv_dropdown_get_options(lv_obj);
 }
 int pika_lvgl_dropdown_get_selected(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
@@ -239,17 +240,17 @@ int pika_lvgl_dropdown_get_selected_highlight(PikaObj *self){
 char* pika_lvgl_dropdown_get_selected_str(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
     obj_setBytes(self, "_buff",NULL, 128);
-    char* _buff = obj_getBytes(self, "_buff");
+    char* _buff = (char*)obj_getBytes(self, "_buff");
     lv_dropdown_get_selected_str(lv_obj, _buff, 128);
     return _buff;
 }
-int pika_lvgl_dropdown_get_symbol(PikaObj *self){
+char* pika_lvgl_dropdown_get_symbol(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_dropdown_get_symbol(lv_obj);
+    return (char*)lv_dropdown_get_symbol(lv_obj);
 }
 char* pika_lvgl_dropdown_get_text(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_dropdown_get_text(lv_obj);
+    return (char*)lv_dropdown_get_text(lv_obj);
 }
 int pika_lvgl_dropdown_is_open(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");

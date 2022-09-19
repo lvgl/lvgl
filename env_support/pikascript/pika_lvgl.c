@@ -1,8 +1,9 @@
-﻿#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
+#if defined(LV_LVGL_H_INCLUDE_SIMPLE)
 #include "lvgl.h"
 #else
 #include "../../lvgl.h"
 #endif
+
 #ifdef PIKASCRIPT
 #include "pika_lvgl.h"
 #include "BaseObj.h"
