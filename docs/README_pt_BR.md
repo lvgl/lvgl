@@ -52,7 +52,7 @@ SquareLine Studio é um editor de interface do usuário de (arrasta e solta) pro
 
 Nossa equipe está pronta para ajudá-lo com design gráfico, implementação de UI e serviços de consultoria. Entre em contato conosco se precisar de algum suporte durante o desenvolvimento de seu próximo projeto de GUI.
 
-## :rocket: Recursos 
+## :rocket: Recursos
 
 **Gratuito e portátil**
 
@@ -73,7 +73,7 @@ Nossa equipe está pronta para ajudá-lo com design gráfico, implementação de
   - Mecanismo de renderização que suporta animações, anti-aliasing, opacidade, rolagem suave (smooth scroll), sombras, transformação de imagens, etc.
   - Suporta mouse, touchpad, teclado, botões externos, dispositivos de entrada codificadores (encoders).
   - Suporta vários monitores.
-  
+
 **Suporte de vinculação (binding) e compilação de arquivos**
 
   - Exposição da API do LVGL com o [Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
@@ -107,13 +107,13 @@ Se alguém implementar ou corrigir um problema rotulado como [Patrocinado](https
 **Pessoas que apoiam o projeto LVGL**<br>
 [![Backers of LVGL](https://opencollective.com/lvgl/individuals.svg?width=600)](https://opencollective.com/lvgl)
 
-## :package: Pacotes 
+## :package: Pacotes
 
 LVGL está disponível para:
 
 - [Arduino library](https://docs.lvgl.io/master/get-started/platforms/arduino.html)
 - [PlatformIO package](https://registry.platformio.org/libraries/lvgl/lvgl)
-- [Zephyr library](https://docs.zephyrproject.org/latest/reference/kconfig/CONFIG_LVGL.html)
+- [Zephyr library](https://docs.zephyrproject.org/latest/kconfig.html#CONFIG_LVGL)
 - [ESP32 component](https://docs.lvgl.io/master/get-started/platforms/espressif.html)
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
@@ -405,7 +405,7 @@ Esta lista irá guiá-lo para começar com o LVGL passo a passo.
   3. Familiarize-se com o básico na página de [visão geral rápida](https://docs.lvgl.io/master/get-started/quick-overview.html) (~15 minutos)
 
 **Começando a usar o LVGL**
-  
+
   4. Configure um [simulador](https://docs.lvgl.io/master/get-started/platforms/pc-simulator.html) (~10 minutos)
   5. Experimente alguns [exemplos](https://github.com/lvgl/lvgl/tree/master/examples)
   6. Porte o LVGL para uma placa. Veja o guia [portando o LVGL](https://docs.lvgl.io/master/porting/index.html) ou veja um projeto pronto para usar em [projetos](https://github.com/lvgl?q=lv_port_)
