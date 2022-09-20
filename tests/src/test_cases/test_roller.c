@@ -11,6 +11,7 @@ static lv_obj_t * active_screen = NULL;
 static lv_obj_t * roller = NULL;
 static lv_obj_t * roller_infinite = NULL;
 static lv_group_t * g = NULL;
+static lv_group_t * encoder_g = NULL;
 
 static const char * default_roller_options = "One\nTwo\nThree";
 static const char * default_infinite_roller_options = "One\nTwo\nThree\nFour\nFive\nSix\nSeven\nEight\nNine\nTen";
@@ -27,12 +28,17 @@ void setUp(void)
     g = lv_group_create();
     lv_indev_set_group(lv_test_keypad_indev, g);
 
+    encoder_g = lv_group_create();
+    lv_indev_set_group(lv_test_encoder_indev, encoder_g);
+
     lv_group_add_obj(g, roller);
+    lv_group_add_obj(encoder_g, roller_infinite);
 }
 
 void tearDown(void)
 {
     lv_group_remove_obj(roller);
+    lv_group_remove_obj(roller_infinite);
     lv_obj_clean(active_screen);
 }
 
@@ -171,11 +177,8 @@ void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void
 
 void test_roller_rendering_test(void)
 {
-    <<< <<< < HEAD
-    == == == =
 #if LV_FONT_MONTSERRAT_24
-        >>> >>> > 4b41c5a220dfad34c8b6eaf2869d532131f721af
-        static lv_style_t style_sel;
+    static lv_style_t style_sel;
     lv_style_init(&style_sel);
     lv_style_set_text_font(&style_sel, &lv_font_montserrat_24);
     lv_style_set_bg_color(&style_sel, lv_color_hex3(0xf88));
@@ -183,18 +186,29 @@ void test_roller_rendering_test(void)
     lv_style_set_border_color(&style_sel, lv_color_hex3(0xf00));
 
     lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
-    <<< <<< < HEAD
-    == == == =
-        lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_RIGHT, 0);
     lv_roller_set_options(roller, "One\nTwo\nThree\nFour\nFive", LV_ROLLER_MODE_NORMAL);
     lv_roller_set_selected(roller, 1, LV_ANIM_OFF);
     lv_obj_center(roller);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("roller_1.png");
 #else
-        TEST_PASS();
+    TEST_PASS();
 #endif
-    >>> >>> > 4b41c5a220dfad34c8b6eaf2869d532131f721af
+}
+
+void test_roller_select_option_with_click(void)
+{
+    char actual_str[OPTION_BUFFER_SZ] = {0x00};
+
+    lv_test_encoder_click();
+    lv_test_encoder_turn(1);
+
+    /* Get the index string */
+    lv_roller_get_selected_str(roller_infinite, actual_str, OPTION_BUFFER_SZ);
+
+    TEST_ASSERT_EQUAL_STRING("Two", actual_str);
+    memset(actual_str, 0x00, OPTION_BUFFER_SZ);
 }
 
 #endif
