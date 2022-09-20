@@ -14,7 +14,6 @@ def get_imgfont_path(font, img_src, length, unicode, unicode_next,user_data) :
     # print("image path: ",path)
     img_src.__dereference__(length)[0:len(path)] = path
     return True
-
 #
 # draw img in label or span obj
 #
