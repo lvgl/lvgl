@@ -311,7 +311,7 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state);
  * @param       obj pointer to an object
  * @return      the pointer to group of the object
  */
-void * lv_obj_get_group(const lv_obj_t * obj);
+lv_group_t * lv_obj_get_group(const lv_obj_t * obj);
 
 /**
  * Get the user_data field of the object

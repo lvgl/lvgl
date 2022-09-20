@@ -171,7 +171,11 @@ void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void
 
 void test_roller_rendering_test(void)
 {
-    static lv_style_t style_sel;
+    <<< <<< < HEAD
+    == == == =
+#if LV_FONT_MONTSERRAT_24
+        >>> >>> > 4b41c5a220dfad34c8b6eaf2869d532131f721af
+        static lv_style_t style_sel;
     lv_style_init(&style_sel);
     lv_style_set_text_font(&style_sel, &lv_font_montserrat_24);
     lv_style_set_bg_color(&style_sel, lv_color_hex3(0xf88));
@@ -179,6 +183,18 @@ void test_roller_rendering_test(void)
     lv_style_set_border_color(&style_sel, lv_color_hex3(0xf00));
 
     lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
+    <<< <<< < HEAD
+    == == == =
+        lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_roller_set_options(roller, "One\nTwo\nThree\nFour\nFive", LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_selected(roller, 1, LV_ANIM_OFF);
+    lv_obj_center(roller);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("roller_1.png");
+#else
+        TEST_PASS();
+#endif
+    >>> >>> > 4b41c5a220dfad34c8b6eaf2869d532131f721af
 }
 
 #endif

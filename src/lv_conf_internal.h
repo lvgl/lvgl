@@ -1271,7 +1271,7 @@
     #ifdef CONFIG_LV_TXT_BREAK_CHARS
         #define LV_TXT_BREAK_CHARS CONFIG_LV_TXT_BREAK_CHARS
     #else
-        #define LV_TXT_BREAK_CHARS " ,.;:-_"
+        #define LV_TXT_BREAK_CHARS " ,.;:-_)]}"
     #endif
 #endif
 
