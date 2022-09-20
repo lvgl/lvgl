@@ -1,10 +1,10 @@
 /**
- * @file lv_drv_stm32_fb.h
+ * @file lv_drv_stm32_ltdc_layer.h
  *
  */
 
-#ifndef LV_DRV_STM32_FB_H
-#define LV_DRV_STM32_FB_H
+#ifndef LV_DRV_STM32_LTDC_LAYER_H
+#define LV_DRV_STM32_LTDC_LAYER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_drv.h"
-#if LV_USE_DRV_STM32_LTDC
+#if LV_USE_STM32_LTDC_LAYER
 
 /*********************
  *      DEFINES
@@ -49,7 +49,7 @@ typedef struct {
     uint32_t draw_buf_size;
     lv_area_t area;
     uint8_t index;
-    void * ltdc_handler;	/*LTDC_HandleTypeDef*/
+    void * ltdc_handler;    /*LTDC_HandleTypeDef*/
 } lv_drv_stm32_layer_t;
 
 /**********************
@@ -60,7 +60,7 @@ void lv_drv_stm32_layer_init(lv_drv_stm32_layer_t * drv);
 
 lv_disp_drv_t * lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv);
 
-#endif
+#endif /*LV_USE_STM32_LTDC_LAYER*/
 
 /**********************
  *      MACROS
@@ -70,4 +70,4 @@ lv_disp_drv_t * lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRV_ESP_H*/
+#endif /*LV_DRV_STM32_LTDC_LAYER_H*/

@@ -1,14 +1,14 @@
 /**
- * @file lv_drv_stm32_fb.c
+ * @file lv_stm32_ltdc_laye.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_drv_stm32_fb.h"
+#include "lv_stm32_ltdc_layer.h"
+#if LV_USE_STM32_LTDC_LAYER
 #include "stm32f7xx_hal.h"
-#if LV_USE_DRV_STM32_LTDC
 
 /*********************
  *      DEFINES
@@ -36,10 +36,10 @@ static void DMA_Config(void);
 #endif
 
 static DMA_HandleTypeDef      DmaHandle;
-static int32_t            	  y_to_flush;
-static lv_area_t			  area_to_flush;
-static const lv_color_t * 	  buf_to_flush;
-static lv_disp_drv_t * 		  disp_drv_to_flush;
+static int32_t                y_to_flush;
+static lv_area_t              area_to_flush;
+static const lv_color_t   *   buf_to_flush;
+static lv_disp_drv_t     *    disp_drv_to_flush;
 
 /**********************
  *      MACROS
@@ -51,55 +51,55 @@ static lv_disp_drv_t * 		  disp_drv_to_flush;
 
 void lv_drv_stm32_layer_init(lv_drv_stm32_layer_t * drv)
 {
-	static bool inited = false;
-	if(!inited) {
-		DMA_Config();
-		inited = true;
-	}
+    static bool inited = false;
+    if(!inited) {
+        DMA_Config();
+        inited = true;
+    }
 
-    lv_memset_00(drv, sizeof(*drv));
+    lv_memzero(drv, sizeof(*drv));
 }
 
 lv_disp_drv_t * lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv)
 {
     drv->base.send_image_cb = send_image;
 
-	LTDC_LayerCfgTypeDef  layer_cfg;
+    LTDC_LayerCfgTypeDef  layer_cfg;
 
-	/* Layer Init */
-	layer_cfg.WindowX0 = drv->area.x1;
-	layer_cfg.WindowX1 = drv->area.x2;
-	layer_cfg.WindowY0 = drv->area.y1;
-	layer_cfg.WindowY1 = drv->area.y2;
+    /* Layer Init */
+    layer_cfg.WindowX0 = drv->area.x1;
+    layer_cfg.WindowX1 = drv->area.x2;
+    layer_cfg.WindowY0 = drv->area.y1;
+    layer_cfg.WindowY1 = drv->area.y2;
 
 #if LV_COLOR_DEPTH == 16
-	layer_cfg.PixelFormat = LTDC_PIXEL_FORMAT_RGB565;
+    layer_cfg.PixelFormat = LTDC_PIXEL_FORMAT_RGB565;
 #elif LV_COLOR_DEPTH == 32
-	layer_cfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
+    layer_cfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
 #endif
 
-	layer_cfg.FBStartAdress = (uint32_t)drv->frame_buffer;
-	layer_cfg.Alpha = 255;
-	layer_cfg.Alpha0 = 0;
-	layer_cfg.Backcolor.Blue = 0;
-	layer_cfg.Backcolor.Green = 0;
-	layer_cfg.Backcolor.Red = 0;
-	layer_cfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
-	layer_cfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
-	layer_cfg.ImageWidth = lv_area_get_width(&drv->area);
-	layer_cfg.ImageHeight = lv_area_get_height(&drv->area);
+    layer_cfg.FBStartAdress = (uint32_t)drv->frame_buffer;
+    layer_cfg.Alpha = 255;
+    layer_cfg.Alpha0 = 0;
+    layer_cfg.Backcolor.Blue = 0;
+    layer_cfg.Backcolor.Green = 0;
+    layer_cfg.Backcolor.Red = 0;
+    layer_cfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
+    layer_cfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
+    layer_cfg.ImageWidth = lv_area_get_width(&drv->area);
+    layer_cfg.ImageHeight = lv_area_get_height(&drv->area);
 
-	HAL_LTDC_ConfigLayer(drv->ltdc_handler, &layer_cfg, drv->index);
+    HAL_LTDC_ConfigLayer(drv->ltdc_handler, &layer_cfg, drv->index);
 
-    lv_disp_drv_t * disp_drv = lv_mem_alloc(sizeof(lv_disp_drv_t));
+    lv_disp_drv_t * disp_drv = lv_malloc(sizeof(lv_disp_drv_t));
     LV_ASSERT_MALLOC(disp_drv);
 
-    lv_disp_draw_buf_t * draw_buf = lv_mem_alloc(sizeof(lv_disp_draw_buf_t));
+    lv_disp_draw_buf_t * draw_buf = lv_malloc(sizeof(lv_disp_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
 
     if(disp_drv == NULL || draw_buf == NULL) {
-        lv_mem_free(disp_drv);
-        lv_mem_free(draw_buf);
+        lv_free(disp_drv);
+        lv_free(draw_buf);
         return NULL;
     }
 
@@ -120,8 +120,8 @@ lv_disp_drv_t * lv_drv_stm32_layer_create(lv_drv_stm32_layer_t * drv)
 
 static lv_res_t send_image(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area_t * area, const void * buf)
 {
-	/*Wait until DMA is busy*/
-	while(disp_drv_to_flush);
+    /*Wait until DMA is busy*/
+    while(disp_drv_to_flush);
 
     lv_drv_stm32_layer_t * layer_drv = (lv_drv_stm32_layer_t *) drv;
 
@@ -173,8 +173,9 @@ static void DMA_TransferComplete(DMA_HandleTypeDef * han)
         length *= 2; /* STM32 DMA uses 16-bit chunks so multiply by 2 for 32-bit color */
 #endif
         lv_drv_stm32_layer_t * layer_drv = disp_drv_to_flush->user_data;
-		lv_coord_t fb_w = lv_area_get_width(&layer_drv->area);
-        if(HAL_DMA_Start_IT(han, (uint32_t)buf_to_flush, (uint32_t)&layer_drv->frame_buffer[y_to_flush * fb_w + area_to_flush.x1],
+        lv_coord_t fb_w = lv_area_get_width(&layer_drv->area);
+        if(HAL_DMA_Start_IT(han, (uint32_t)buf_to_flush,
+                            (uint32_t)&layer_drv->frame_buffer[y_to_flush * fb_w + area_to_flush.x1],
                             length) != HAL_OK) {
             while(1);   /*Halt on error*/
         }
@@ -189,7 +190,7 @@ static void DMA_TransferComplete(DMA_HandleTypeDef * han)
   */
 static void DMA_TransferError(DMA_HandleTypeDef * han)
 {
-	LV_ASSERT_MSG(0, "DMA transfer error");
+    LV_ASSERT_MSG(0, "DMA transfer error");
 }
 
 static void DMA_Config(void)
@@ -235,4 +236,4 @@ void DMA2_Stream0_IRQHandler(void)
     HAL_DMA_IRQHandler(&DmaHandle);
 }
 
-#endif
+#endif /*LV_USE_STM32_LTDC_LAYER*/

@@ -43,25 +43,25 @@ typedef struct _lv_sdl_keyboard_priv_t {
 
 void lv_dev_sdl_keyboard_init(lv_sdl_keyboard_t * dev)
 {
-    lv_memset_00(dev, sizeof(lv_sdl_keyboard_t));
+    lv_memzero(dev, sizeof(lv_sdl_keyboard_t));
     return;
 }
 
 lv_indev_t * lv_dev_sdl_keyboard_create(lv_sdl_keyboard_t * dev)
 {
-    dev->_priv = lv_mem_alloc(sizeof(_lv_sdl_keyboard_priv_t));
+    dev->_priv = lv_malloc(sizeof(_lv_sdl_keyboard_priv_t));
     LV_ASSERT_MALLOC(dev->_priv);
 
-    lv_indev_drv_t * indev_drv = lv_mem_alloc(sizeof(lv_indev_drv_t));
+    lv_indev_drv_t * indev_drv = lv_malloc(sizeof(lv_indev_drv_t));
     LV_ASSERT_MALLOC(indev_drv);
 
     if(dev->_priv == NULL || indev_drv == NULL) {
-        lv_mem_free(dev->_priv);
-        lv_mem_free(indev_drv);
+        lv_free(dev->_priv);
+        lv_free(indev_drv);
         return NULL;
     }
 
-    lv_memset_00(dev->_priv, sizeof(_lv_sdl_keyboard_priv_t));
+    lv_memzero(dev->_priv, sizeof(_lv_sdl_keyboard_priv_t));
 
     lv_indev_drv_init(indev_drv);
     indev_drv->type = LV_INDEV_TYPE_KEYPAD;

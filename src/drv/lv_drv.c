@@ -34,7 +34,7 @@
 
 void lv_drv_init(lv_drv_t * drv)
 {
-    lv_memset_00(drv, sizeof(*drv));
+    lv_memzero(drv, sizeof(*drv));
 }
 
 lv_res_t lv_drv_reset_dev(lv_drv_t * drv)

@@ -42,22 +42,22 @@ static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
 
 void lv_dev_ili9341_init(lv_dev_ili9341_t * dev)
 {
-    lv_memset_00(dev, sizeof(lv_dev_ili9341_t));
+    lv_memzero(dev, sizeof(lv_dev_ili9341_t));
     dev->hor_res = 320;
     dev->ver_res = 240;
 }
 
 lv_disp_t * lv_dev_ili9341_create(lv_dev_ili9341_t * dev)
 {
-    lv_disp_drv_t * disp_drv = lv_mem_alloc(sizeof(lv_disp_drv_t));
+    lv_disp_drv_t * disp_drv = lv_malloc(sizeof(lv_disp_drv_t));
     LV_ASSERT_MALLOC(disp_drv);
 
-    lv_disp_draw_buf_t * draw_buf = lv_mem_alloc(sizeof(lv_disp_draw_buf_t));
+    lv_disp_draw_buf_t * draw_buf = lv_malloc(sizeof(lv_disp_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
 
     if(disp_drv == NULL || draw_buf == NULL) {
-        lv_mem_free(disp_drv);
-        lv_mem_free(draw_buf);
+        lv_free(disp_drv);
+        lv_free(draw_buf);
         return NULL;
     }
 

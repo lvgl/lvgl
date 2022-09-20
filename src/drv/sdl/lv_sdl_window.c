@@ -65,7 +65,7 @@ void lv_drv_sdl_window_init(lv_sdl_window_t * drv)
         inited = true;
     }
 
-    lv_memset_00(drv, sizeof(lv_sdl_window_t));
+    lv_memzero(drv, sizeof(lv_sdl_window_t));
     drv->hor_res = 800;
     drv->ver_res = 480;
     drv->zoom = 1;
@@ -73,23 +73,23 @@ void lv_drv_sdl_window_init(lv_sdl_window_t * drv)
 
 lv_disp_drv_t * lv_drv_sdl_window_create(lv_sdl_window_t * drv)
 {
-    drv->_priv = lv_mem_alloc(sizeof(_lv_sdl_disp_priv_t));
+    drv->_priv = lv_malloc(sizeof(_lv_sdl_disp_priv_t));
     LV_ASSERT_MALLOC(drv->_priv);
 
-    lv_disp_drv_t * disp_drv = lv_mem_alloc(sizeof(lv_disp_drv_t));
+    lv_disp_drv_t * disp_drv = lv_malloc(sizeof(lv_disp_drv_t));
     LV_ASSERT_MALLOC(disp_drv);
 
-    lv_disp_draw_buf_t * draw_buf = lv_mem_alloc(sizeof(lv_disp_draw_buf_t));
+    lv_disp_draw_buf_t * draw_buf = lv_malloc(sizeof(lv_disp_draw_buf_t));
     LV_ASSERT_MALLOC(draw_buf);
 
     if(drv->_priv == NULL || disp_drv == NULL || draw_buf == NULL) {
-        lv_mem_free(drv->_priv);
-        lv_mem_free(disp_drv);
-        lv_mem_free(draw_buf);
+        lv_free(drv->_priv);
+        lv_free(disp_drv);
+        lv_free(draw_buf);
         return NULL;
     }
 
-    lv_memset_00(drv->_priv, sizeof(_lv_sdl_disp_priv_t));
+    lv_memzero(drv->_priv, sizeof(_lv_sdl_disp_priv_t));
 
     window_create(drv);
     lv_disp_drv_init(disp_drv);
@@ -203,7 +203,7 @@ static void window_create(lv_sdl_window_t * drv)
 
     /*Initialize the frame buffer to gray (77 is an empirical value) */
     drv->_priv->fb = (lv_color_t *)malloc(sizeof(lv_color_t) * drv->hor_res * drv->ver_res);
-    lv_memset_ff(drv->_priv->fb, drv->hor_res * drv->ver_res * sizeof(lv_color_t));
+    lv_memset(drv->_priv->fb, 0xff, drv->hor_res * drv->ver_res * sizeof(lv_color_t));
 }
 
 static void window_update(lv_sdl_window_t * drv)

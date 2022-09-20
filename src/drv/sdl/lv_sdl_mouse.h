@@ -34,9 +34,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_dev_sdl_mouse_init(lv_sdl_mouse_t * dev);
+void lv_sdl_mouse_init(lv_sdl_mouse_t * dev);
 
-lv_indev_t * lv_dev_sdl_mouse_create(lv_sdl_mouse_t * dev);
+lv_indev_t * lv_sdl_mouse_create(lv_sdl_mouse_t * dev);
 
 /**********************
  *      MACROS

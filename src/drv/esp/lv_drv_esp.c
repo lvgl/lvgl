@@ -39,7 +39,7 @@ static lv_res_t disp_flush(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_ar
 
 void lv_drv_esp_init(lv_drv_esp_t * drv)
 {
-    lv_memset_00(drv, sizeof(*drv));
+    lv_memzero(drv, sizeof(*drv));
     drv->base.send_cmd_cb = reset_dev;
     drv->base.send_cmd_cb = send_cmd;
     drv->base.read_data_cb = read_data;

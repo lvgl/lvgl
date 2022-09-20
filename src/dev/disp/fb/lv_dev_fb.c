@@ -36,7 +36,7 @@ static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_
 
 void lv_dev_fb_init(lv_dev_fb_t * dev)
 {
-    lv_memset_00(dev, sizeof(lv_dev_fb_t));
+    lv_memzero(dev, sizeof(lv_dev_fb_t));
 }
 
 lv_disp_t * lv_dev_fb_create(lv_dev_fb_t * dev, lv_disp_drv_t * disp_drv)
