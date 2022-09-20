@@ -169,4 +169,16 @@ void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void
     lv_group_remove_obj(roller_infinite);
 }
 
+void test_roller_rendering_test(void)
+{
+    static lv_style_t style_sel;
+    lv_style_init(&style_sel);
+    lv_style_set_text_font(&style_sel, &lv_font_montserrat_24);
+    lv_style_set_bg_color(&style_sel, lv_color_hex3(0xf88));
+    lv_style_set_border_width(&style_sel, 2);
+    lv_style_set_border_color(&style_sel, lv_color_hex3(0xf00));
+
+    lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
+}
+
 #endif
