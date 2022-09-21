@@ -1,7 +1,12 @@
 import fs_driver
 import sys
 
+# set LV_USE_FFMPEG to True if it is enabled in lv_conf.h
+LV_USE_FFMPEG = True
 LV_FONT_DEFAULT = lv.font_montserrat_14
+
+fs_drv = lv.fs_drv_t()
+fs_driver.fs_register(fs_drv, 'A')
 
 # get the directory in which the script is running
 try:
@@ -10,10 +15,16 @@ except NameError:
     script_path = ''
     
 def get_imgfont_path(font, img_src, length, unicode, unicode_next,user_data) :
-    path = bytes(script_path + "/../../assets/emoji/emoji_{:04X}.png".format(unicode) + "\0","ascii")
+    if unicode < 0xf600:
+        return
+    if LV_USE_FFMPEG:
+        path = bytes(script_path + "/../../assets/emoji/{:04X}.png".format(unicode) + "\0","ascii")
+    else:
+        path = bytes("A:"+ script_path + "/../../assets/emoji/{:04X}.png".format(unicode) + "\0","ascii")
     # print("image path: ",path)
     img_src.__dereference__(length)[0:len(path)] = path
     return True
+
 #
 # draw img in label or span obj
 #
