@@ -172,10 +172,8 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
     err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw line failed.");
 
-    if(lv_vglite_run() != LV_RES_OK) {
-        LV_LOG_ERROR("Run failed.");
-        return LV_RES_INV;
-    }
+    if(lv_vglite_run() != LV_RES_OK)
+        VG_LITE_RETURN_INV("Run failed.");
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
