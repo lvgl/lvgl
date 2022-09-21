@@ -61,8 +61,11 @@ extern "C" {
  * @param draw_ctx drawing context
  * @param dsc description of the rectangle
  * @param coords the area where rectangle is clipped
+ * @param border true for border, false for outline
  */
 lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+                                               const lv_area_t * coords, bool border);
 
 /**********************
  *      MACROS
