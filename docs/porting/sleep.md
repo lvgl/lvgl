@@ -11,7 +11,7 @@ while(1) {
   /*Sleep after 1 sec inactivity*/
   else {
 	  timer_stop();   /*Stop the timer where lv_tick_inc() is called*/
-	  sleep();		    /*Sleep the MCU*/
+	  sleep();        /*Sleep the MCU*/
   }
   my_delay_ms(5);
 }

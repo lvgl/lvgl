@@ -1682,7 +1682,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 ## v7.0.0 (18.05.2020)
 
 ### Documentation
-The docs for v7 is available at https://docs.littlevgl.com/v7/en/html/index.html
+The docs for v7 is available at https://docs.lvgl.io/7.11/index.html
 
 ### Legal changes
 
@@ -1721,7 +1721,7 @@ As part of these updates, a lot of objects were reworked and the APIs have been 
 - *value* display a text which is stored in the style. It can be used e.g. as a light-weighted text on buttons too.
 - *margin*: similar to *padding* but used to keep space outside the object
 
-Read the [Style](https://docs.littlevgl.com/v7/en/html/overview/style.html) section of the documentation to learn how the new styles system works.
+Read the [Style](https://docs.lvgl.io/7.11/overview/style.html) section of the documentation to learn how the new styles system works.
 
 ### GPU integration
 To better utilize GPUs, from this version GPU usage can be integrated into LVGL. In `lv_conf.h` any supported GPUs can be enabled with a single configuration option.

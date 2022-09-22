@@ -41,7 +41,7 @@ You can simply pass the path to the font as usual on your operating system or pl
 
 ## Learn more
 - FreeType [tutorial](https://www.freetype.org/freetype2/docs/tutorial/step1.html)
-- LVGL's [font interface](https://docs.lvgl.io/v7/en/html/overview/font.html#add-a-new-font-engine)
+- LVGL's [font interface](https://docs.lvgl.io/master/overview/font.html#add-a-new-font-engine)
 
 
 ## API
