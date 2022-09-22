@@ -218,10 +218,6 @@ void lv_init(void)
     lv_fs_win32_init();
 #endif
 
-#if LV_USE_FFMPEG
-    lv_ffmpeg_init();
-#endif
-
 #if LV_USE_PNG
     lv_png_init();
 #endif
@@ -232,6 +228,12 @@ void lv_init(void)
 
 #if LV_USE_BMP
     lv_bmp_init();
+#endif
+
+    /*Make FFMPEG last because the last converter will be checked first and
+     *it's superior to any other */
+#if LV_USE_FFMPEG
+    lv_ffmpeg_init();
 #endif
 
 #if LV_USE_FREETYPE
