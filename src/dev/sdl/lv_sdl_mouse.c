@@ -125,7 +125,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 
     if(indev == NULL) return;
     lv_sdl_mouse_t * indev_dev = indev->driver->user_data;
-    lv_sdl_window_t * disp_dev = indev->driver->disp->driver->user_data;
+    lv_sdl_window_t * disp_dev = indev->driver->disp->user_data;
 
     switch(event->type) {
         case SDL_MOUSEBUTTONUP:

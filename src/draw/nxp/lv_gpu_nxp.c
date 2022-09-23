@@ -91,7 +91,7 @@ static void lv_draw_nxp_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * 
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_nxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_nxp_ctx_init(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
     lv_draw_sw_init_ctx(drv, draw_ctx);
 
@@ -104,7 +104,7 @@ void lv_draw_nxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     //nxp_draw_ctx->base_draw.wait_for_finish = lv_draw_nxp_wait_cb;
 }
 
-void lv_draw_nxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_nxp_ctx_deinit(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
     lv_draw_sw_deinit_ctx(drv, draw_ctx);
 }

@@ -23,7 +23,7 @@ static lv_res_t reset_dev(lv_drv_t * drv, uint32_t t);
 static lv_res_t send_cmd(lv_drv_t * drv, uint8_t cmd, const void * params, uint32_t len);
 static lv_res_t read_data(lv_drv_t * drv, uint8_t cmd, const void * params, uint32_t params_len, void * rxbuf,
                           uint32_t rxbuf_len);
-static lv_res_t disp_flush(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area_t * area, const void * buf);
+static lv_res_t disp_flush(lv_drv_t * drv, lv_disp_t * disp, const lv_area_t * area, const void * buf);
 
 /**********************
  *  STATIC VARIABLES
@@ -114,7 +114,7 @@ static lv_res_t read_data(lv_drv_t * drv, uint8_t cmd, const void * params, uint
     return LV_RES_OK;
 }
 
-static lv_res_t disp_flush(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area_t * area, const void * buf)
+static lv_res_t disp_flush(lv_drv_t * drv, lv_disp_t * disp, const lv_area_t * area, const void * buf)
 {
     lv_drv_esp_t * esp_drv = (lv_drv_esp_t *) drv;
 
@@ -129,7 +129,7 @@ static lv_res_t disp_flush(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_ar
             break;
     }
 
-    lv_disp_flush_ready(disp_drv);
+    lv_disp_flush_ready(disp);
     return LV_RES_OK;
 
 }

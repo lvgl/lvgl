@@ -29,7 +29,7 @@ typedef struct _lv_sdl_disp_priv_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
+static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
 static void window_create(lv_sdl_window_t * drv);
 static void window_update(lv_sdl_window_t * drv);
 static void monitor_sdl_clean_up(lv_sdl_window_t * dev);
@@ -91,31 +91,21 @@ lv_sdl_window_t * lv_sdl_window_create(void)
 
 lv_disp_t * lv_sdl_window_register(lv_sdl_window_t * cfg)
 {
-    lv_disp_drv_t * disp_drv = lv_malloc(sizeof(lv_disp_drv_t));
-    LV_ASSERT_MALLOC(disp_drv);
-
-    lv_disp_draw_buf_t * draw_buf = lv_malloc(sizeof(lv_disp_draw_buf_t));
-    LV_ASSERT_MALLOC(draw_buf);
-
-    if(disp_drv == NULL || draw_buf == NULL) {
-        lv_free(disp_drv);
-        lv_free(draw_buf);
-        return NULL;
-    }
-
+    lv_disp_t * disp = lv_disp_create();
+    if(disp == NULL) return NULL;
 
     window_create(cfg);
-    lv_disp_drv_init(disp_drv);
 
-    lv_disp_draw_buf_init(draw_buf, cfg->_priv->fb, NULL, cfg->hor_res * cfg->ver_res);
-    disp_drv->draw_buf = draw_buf;
-    disp_drv->direct_mode = 1;
-    disp_drv->user_data = cfg;
-    disp_drv->flush_cb = flush_cb;
-    disp_drv->hor_res = cfg->hor_res;
-    disp_drv->ver_res = cfg->ver_res;
+    disp->hor_res = cfg->hor_res;
+    disp->ver_res = cfg->ver_res;
+    disp->buf1 = cfg->_priv->fb;
+    disp->buf_act = disp->buf1;
+    disp->draw_buf_size = cfg->hor_res * cfg->ver_res;
+    disp->direct_mode = 1;
+    disp->user_data = cfg;
+    disp->flush_cb = flush_cb;
 
-    return lv_disp_drv_register(disp_drv);
+    return disp;
 }
 
 
@@ -123,8 +113,8 @@ lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
     while(disp) {
-        lv_sdl_window_t * drv = disp->driver->user_data;
-        if(SDL_GetWindowID(drv->_priv->window) == win_id) {
+        lv_sdl_window_t * cfg = disp->user_data;
+        if(SDL_GetWindowID(cfg->_priv->window) == win_id) {
             return disp;
         }
         disp = lv_disp_get_next(disp);
@@ -137,19 +127,19 @@ lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
  **********************/
 
 
-static void flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
 {
     LV_UNUSED(area);
     LV_UNUSED(color_p);
 
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
-    if(lv_disp_flush_is_last(disp_drv)) {
-        window_update((lv_sdl_window_t *)disp_drv->user_data);
+    if(lv_disp_flush_is_last(disp)) {
+        window_update((lv_sdl_window_t *)disp->user_data);
     }
 
     /*IMPORTANT! It must be called to tell the system the flush is ready*/
-    lv_disp_flush_ready(disp_drv);
+    lv_disp_flush_ready(disp);
 }
 
 /**
@@ -173,7 +163,7 @@ static void sdl_event_handler(lv_timer_t * t)
         if(event.type == SDL_WINDOWEVENT) {
             disp = _lv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
-            dev = disp->driver->user_data;
+            dev = disp->user_data;
             switch(event.window.event) {
 #if SDL_VERSION_ATLEAST(2, 0, 5)
                 case SDL_WINDOWEVENT_TAKE_FOCUS:

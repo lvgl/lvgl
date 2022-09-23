@@ -59,11 +59,11 @@ lv_res_t lv_drv_read_data(lv_drv_t * drv, uint8_t cmd, const void * params, uint
     return drv->read_data_cb(drv, cmd, params, params_len, rxbuf, rxbuf_len);
 }
 
-lv_res_t lv_drv_send_image(lv_drv_t * drv, lv_disp_drv_t * disp_drv, const lv_area_t * area, const void * buf)
+lv_res_t lv_drv_send_image(lv_drv_t * drv, lv_disp_t * disp, const lv_area_t * area, const void * buf)
 {
     if(drv->send_image_cb == NULL) return LV_RES_INV;
 
-    return drv->send_image_cb(drv, disp_drv, area, buf);
+    return drv->send_image_cb(drv, disp, area, buf);
 }
 
 

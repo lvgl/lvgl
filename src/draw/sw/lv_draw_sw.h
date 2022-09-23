@@ -29,8 +29,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_disp_drv_t;
-
 typedef struct {
     lv_draw_ctx_t base_draw;
 
@@ -47,8 +45,8 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_sw_init_ctx(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
-void lv_draw_sw_deinit_ctx(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_sw_init_ctx(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_sw_deinit_ctx(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
 
 void lv_draw_sw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
 

@@ -101,7 +101,7 @@ void lv_fs_posix_init(void)
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
 
     uint32_t flags = 0;
     if(mode == LV_FS_MODE_WR) flags = O_WRONLY;
@@ -127,7 +127,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
     close((lv_uintptr_t)file_p);
     return LV_FS_RES_OK;
 }
@@ -144,7 +144,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
     *br = read((lv_uintptr_t)file_p, buf, btr);
     return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
@@ -160,7 +160,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
     *bw = write((lv_uintptr_t)file_p, buf, btw);
     return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
@@ -175,7 +175,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
     off_t offset = lseek((lv_uintptr_t)file_p, pos, whence);
     return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }
@@ -190,7 +190,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
     off_t offset = lseek((lv_uintptr_t)file_p, 0, SEEK_CUR);
     *pos_p = offset;
     return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
@@ -208,7 +208,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
  */
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
 
 #ifndef WIN32
     /*Make the path relative to the current directory (the projects root folder)*/
@@ -254,7 +254,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
  */
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
 
 #ifndef WIN32
     struct dirent * entry;
@@ -302,7 +302,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
  */
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
 #ifndef WIN32
     closedir(dir_p);
 #else

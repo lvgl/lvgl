@@ -219,7 +219,7 @@ lv_color_t lv_disp_get_chroma_key_color(lv_disp_t * disp)
         return lv_color_hex(0x00ff00);
     }
 
-    return disp->driver->color_chroma_key;
+    return disp->color_chroma_key;
 }
 
 /**
@@ -422,8 +422,9 @@ void lv_disp_clean_dcache(lv_disp_t * disp)
         return;
     }
 
-    if(disp->driver->clean_dcache_cb)
-        disp->driver->clean_dcache_cb(disp->driver);
+    return;
+    //    if(disp->driver->clean_dcache_cb)
+    //        disp->driver->clean_dcache_cb(disp->driver);
 }
 
 /**

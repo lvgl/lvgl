@@ -382,7 +382,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_arm2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_arm2d_ctx_init(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
     arm_2d_init();
 
@@ -399,9 +399,9 @@ void lv_draw_arm2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
 }
 
-void lv_draw_arm2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_arm2d_ctx_deinit(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
     LV_UNUSED(draw_ctx);
 }
 

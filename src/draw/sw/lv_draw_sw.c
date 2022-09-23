@@ -39,9 +39,9 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
 
     lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
     lv_memzero(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));
@@ -65,9 +65,9 @@ void lv_draw_sw_init_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     draw_ctx->layer_instance_size = sizeof(lv_draw_sw_layer_ctx_t);
 }
 
-void lv_draw_sw_deinit_ctx(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_sw_deinit_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
 
     lv_draw_sw_ctx_t * draw_sw_ctx = (lv_draw_sw_ctx_t *) draw_ctx;
     lv_memzero(draw_sw_ctx, sizeof(lv_draw_sw_ctx_t));

@@ -55,9 +55,9 @@ typedef lv_draw_sw_ctx_t lv_draw_nxp_ctx_t;
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_nxp_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_nxp_ctx_init(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
 
-void lv_draw_nxp_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_nxp_ctx_deinit(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
 
 /**********************
  *      MACROS
