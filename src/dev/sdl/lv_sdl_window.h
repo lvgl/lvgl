@@ -14,7 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lv_drv.h"
+#include "../../hal/lv_hal_disp.h"
+
 #if LV_USE_SDL
 
 /*********************
@@ -26,7 +27,6 @@ extern "C" {
  **********************/
 struct _lv_sdl_disp_priv_t;
 typedef struct {
-    lv_drv_t base;
     lv_coord_t hor_res;
     lv_coord_t ver_res;
     uint8_t zoom;
@@ -37,11 +37,11 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_drv_sdl_window_init(lv_sdl_window_t * dev);
+lv_sdl_window_t * lv_sdl_window_create(void);
 
-lv_disp_drv_t * lv_drv_sdl_window_create(lv_sdl_window_t * drv);
+lv_disp_t * lv_sdl_window_register(lv_sdl_window_t * dev);
 
-lv_disp_t * lv_drv_sdl_get_disp_from_win_id(uint32_t win_id);
+lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id);
 
 /**********************
  *      MACROS

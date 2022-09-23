@@ -9,10 +9,10 @@
 #include "lv_sdl_mousewheel.h"
 #if LV_USE_SDL
 
-#include "../../../src/hal/lv_hal_indev.h"
-#include "../../../src/core/lv_group.h"
+#include "../../hal/lv_hal_indev.h"
+#include "../../core/lv_group.h"
+#include LV_SDL_INCLUDE_PATH
 
-#include LV_PLATFORM_SDL_INCLUDE_PATH
 /*********************
  *      DEFINES
  *********************/
@@ -35,32 +35,36 @@ typedef struct _lv_sdl_mousewheel_priv_t {
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_sdl_mousewheel_init(lv_sdl_mousewheel_t * dev)
+lv_sdl_mousewheel_t * lv_sdl_mousewheel_create(void)
 {
-    lv_memzero(dev, sizeof(lv_sdl_mousewheel_t));
-    return;
+    lv_sdl_mousewheel_t * cfg = lv_malloc(sizeof(lv_sdl_mousewheel_t));
+    LV_ASSERT_MALLOC(cfg);
+    if(cfg == NULL) return NULL;
+
+    lv_memzero(cfg, sizeof(lv_sdl_mousewheel_t));
+
+    cfg->_priv = lv_malloc(sizeof(_lv_sdl_mousewheel_priv_t));
+    LV_ASSERT_MALLOC(cfg->_priv);
+
+    if(cfg->_priv == NULL) {
+        lv_free(cfg);
+        return NULL;
+    }
+    lv_memzero(cfg->_priv, sizeof(_lv_sdl_mousewheel_priv_t));
+    return cfg;
 }
 
-lv_indev_t * lv_sdl_mousewheel_create(lv_sdl_mousewheel_t * dev)
+lv_indev_t * lv_sdl_mousewheel_register(lv_sdl_mousewheel_t * cfg)
 {
-    dev->_priv = lv_malloc(sizeof(lv_sdl_mousewheel_t));
-    LV_ASSERT_MALLOC(dev->_priv);
-
     lv_indev_drv_t * indev_drv = lv_malloc(sizeof(lv_indev_drv_t));
     LV_ASSERT_MALLOC(indev_drv);
 
-    if(dev->_priv == NULL || indev_drv == NULL) {
-        lv_free(dev->_priv);
-        lv_free(indev_drv);
-        return NULL;
-    }
-
-    lv_memzero(dev->_priv, sizeof(_lv_sdl_mousewheel_priv_t));
+    if(indev_drv == NULL) return NULL;
 
     lv_indev_drv_init(indev_drv);
     indev_drv->type = LV_INDEV_TYPE_ENCODER;
     indev_drv->read_cb = sdl_mousewheel_read;
-    indev_drv->user_data = dev;
+    indev_drv->user_data = cfg;
     lv_indev_t * indev = lv_indev_drv_register(indev_drv);
 
     return indev;
@@ -94,7 +98,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
             return;
     }
 
-    lv_disp_t * disp = lv_drv_sdl_get_disp_from_win_id(win_id);
+    lv_disp_t * disp = _lv_sdl_get_disp_from_win_id(win_id);
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);

@@ -1,10 +1,10 @@
 /**
- * @file lv_sdl_mousewheel.h
+ * @file Lv_sdl_mouse.h
  *
  */
 
-#ifndef LV_SDL_MOUSEWHEEL_H
-#define LV_SDL_MOUSEWHEEL_H
+#ifndef LV_SDL_MOUSE_H
+#define LV_SDL_MOUSE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,21 +23,20 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-struct _lv_sdl_mousewheel_priv_t;
+struct _lv_sdl_mouse_priv_t;
 
 typedef struct {
-    struct _lv_sdl_mousewheel_priv_t * _priv;
-} lv_sdl_mousewheel_t;
+    struct _lv_sdl_mouse_priv_t * _priv;
+} lv_sdl_mouse_t;
 
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_sdl_mousewheel_init(lv_sdl_mousewheel_t * dev);
+lv_sdl_mouse_t * lv_sdl_mouse_create(void);
 
-lv_indev_t * lv_sdl_mousewheel_create(lv_sdl_mousewheel_t * dev);
+lv_indev_t * lv_sdl_mouse_register(lv_sdl_mouse_t * dev);
 
 /**********************
  *      MACROS
@@ -49,4 +48,4 @@ lv_indev_t * lv_sdl_mousewheel_create(lv_sdl_mousewheel_t * dev);
 } /* extern "C" */
 #endif
 
-#endif /* LV_DEV_SDL_MOUSEWHEEL_H */
+#endif /* LV_SDL_MOUSE_H */
