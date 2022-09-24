@@ -75,8 +75,8 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         /*Set coordinates to full screen size*/
         obj->coords.x1 = 0;
         obj->coords.y1 = 0;
-        obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
-        obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
+        obj->coords.x2 = lv_disp_get_horizonal_resolution(NULL) - 1;
+        obj->coords.y2 = lv_disp_get_vertical_resolution(NULL) - 1;
     }
     /*Create a normal object*/
     else {

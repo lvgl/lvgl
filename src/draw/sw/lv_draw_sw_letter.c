@@ -260,7 +260,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     blend_dsc.opa = dsc->opa;
     blend_dsc.blend_mode = dsc->blend_mode;
 
-    lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
+    lv_coord_t hor_res = lv_disp_get_horizonal_resolution(_lv_refr_get_disp_refreshing());
     uint32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : box_w * box_h;
     lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
     blend_dsc.mask_buf = mask_buf;
@@ -415,7 +415,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
     if(map_area.x2 <= map_area.x1) return;
 
-    lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
+    lv_coord_t hor_res = lv_disp_get_horizonal_resolution(_lv_refr_get_disp_refreshing());
     int32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : g->box_w * g->box_h;
     lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
     int32_t mask_p = 0;

@@ -48,6 +48,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
+static void update_resolution(lv_disp_t * disp);
 static void scr_load_internal(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
@@ -69,12 +70,6 @@ static lv_disp_t * disp_def;
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Initialize a display driver with default values.
- * It is used to ensure all fields have known values and not memory junk.
- * After it you can set the fields.
- * @param driver pointer to driver variable to initialize
- */
 lv_disp_t * lv_disp_create(void)
 {
     lv_disp_t * disp = _lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
@@ -160,11 +155,6 @@ void lv_disp_init(lv_disp_t * disp)
         return;
     }
 
-    if(disp->full_refresh && disp->draw_buf_size < (uint32_t)disp->hor_res * disp->ver_res) {
-        disp->full_refresh = 0;
-        LV_LOG_WARN("full_refresh requires at least screen sized draw buffer(s)");
-    }
-
     disp->bg_color = lv_color_white();
     disp->bg_opa = LV_OPA_COVER;
 
@@ -197,48 +187,6 @@ void lv_disp_init(lv_disp_t * disp)
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
 
     return;
-}
-
-/**
- * Update the driver in run time.
- * @param disp pointer to a display. (return value of `lv_disp_drv_register`)
- * @param new_drv pointer to the new driver
- */
-void lv_disp_drv_update(lv_disp_t * disp)
-{
-    //    disp->driver = new_drv;
-    //
-    //    if(disp->driver->full_refresh &&
-    //       disp->driver->draw_buf->draw_buf_size < (uint32_t)disp->driver->hor_res * disp->driver->ver_res) {
-    //        disp->driver->full_refresh = 0;
-    //        LV_LOG_WARN("full_refresh requires at least screen sized draw buffer(s)");
-    //    }
-    //
-    //    lv_coord_t w = lv_disp_get_hor_res(disp);
-    //    lv_coord_t h = lv_disp_get_ver_res(disp);
-    //    uint32_t i;
-    //    for(i = 0; i < disp->screen_cnt; i++) {
-    //        lv_area_t prev_coords;
-    //        lv_obj_get_coords(disp->screens[i], &prev_coords);
-    //        lv_area_set_width(&disp->screens[i]->coords, w);
-    //        lv_area_set_height(&disp->screens[i]->coords, h);
-    //        lv_event_send(disp->screens[i], LV_EVENT_SIZE_CHANGED, &prev_coords);
-    //    }
-    //
-    //    /*
-    //     * This method is usually called upon orientation change, thus the screen is now a
-    //     * different size.
-    //     * The object invalidated its previous area. That area is now out of the screen area
-    //     * so we reset all invalidated areas and invalidate the active screen's new area only.
-    //     */
-    //    lv_memzero(disp->inv_areas, sizeof(disp->inv_areas));
-    //    lv_memzero(disp->inv_area_joined, sizeof(disp->inv_area_joined));
-    //    disp->inv_p = 0;
-    //    if(disp->act_scr != NULL) lv_obj_invalidate(disp->act_scr);
-    //
-    //    lv_obj_tree_walk(NULL, invalidate_layout_cb, NULL);
-    //
-    //    if(disp->driver->drv_update_cb) disp->driver->drv_update_cb(disp->driver);
 }
 
 /**
@@ -365,7 +313,7 @@ void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color)
     disp->bg_color = color;
 
     lv_area_t a;
-    lv_area_set(&a, 0, 0, lv_disp_get_hor_res(disp) - 1, lv_disp_get_ver_res(disp) - 1);
+    lv_area_set(&a, 0, 0, lv_disp_get_horizonal_resolution(disp) - 1, lv_disp_get_vertical_resolution(disp) - 1);
     _lv_inv_area(disp, &a);
 
 }
@@ -386,7 +334,7 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src)
     disp->bg_img = img_src;
 
     lv_area_t a;
-    lv_area_set(&a, 0, 0, lv_disp_get_hor_res(disp) - 1, lv_disp_get_ver_res(disp) - 1);
+    lv_area_set(&a, 0, 0, lv_disp_get_horizonal_resolution(disp) - 1, lv_disp_get_vertical_resolution(disp) - 1);
     _lv_inv_area(disp, &a);
 }
 
@@ -406,7 +354,7 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa)
     disp->bg_opa = opa;
 
     lv_area_t a;
-    lv_area_set(&a, 0, 0, lv_disp_get_hor_res(disp) - 1, lv_disp_get_ver_res(disp) - 1);
+    lv_area_set(&a, 0, 0, lv_disp_get_horizonal_resolution(disp) - 1, lv_disp_get_vertical_resolution(disp) - 1);
     _lv_inv_area(disp, &a);
 }
 
@@ -500,47 +448,47 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             break;
         case LV_SCR_LOAD_ANIM_OVER_LEFT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, lv_disp_get_horizonal_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_OVER_RIGHT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_disp_get_horizonal_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_OVER_TOP:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, lv_disp_get_vertical_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_OVER_BOTTOM:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_disp_get_vertical_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_MOVE_LEFT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, lv_disp_get_horizonal_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_horizonal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_MOVE_RIGHT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_disp_get_horizonal_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, lv_disp_get_horizonal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_MOVE_TOP:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, lv_disp_get_vertical_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_vertical_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_MOVE_BOTTOM:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_disp_get_vertical_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, lv_disp_get_vertical_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_FADE_IN:
             lv_anim_set_exec_cb(&a_new, opa_scale_anim);
@@ -552,19 +500,19 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             break;
         case LV_SCR_LOAD_ANIM_OUT_LEFT:
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_horizonal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_OUT_RIGHT:
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, lv_disp_get_horizonal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_OUT_TOP:
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_vertical_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_OUT_BOTTOM:
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, lv_disp_get_vertical_resolution(d));
             break;
     }
 
@@ -717,12 +665,62 @@ lv_disp_t * lv_disp_get_default(void)
     return disp_def;
 }
 
-/**
- * Get the horizontal resolution of a display
- * @param disp pointer to a display (NULL to use the default display)
- * @return the horizontal resolution of the display
- */
-lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
+lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
+{
+    if(disp == NULL)
+        return _lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
+    else
+        return _lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
+}
+
+/*---------------------
+ * RESOLUTION
+ *--------------------*/
+
+void lv_disp_set_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->hor_res = hor_res;
+    disp->ver_res = ver_res;
+
+    update_resolution(disp);
+}
+
+void lv_disp_set_physical_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->physical_hor_res = hor_res;
+    disp->physical_ver_res = ver_res;
+
+    lv_obj_invalidate(disp->sys_layer);
+
+}
+
+void lv_disp_set_offset(lv_disp_t * disp, lv_coord_t x, lv_coord_t y)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->offset_x = x;
+    disp->offset_y = y;
+
+    lv_obj_invalidate(disp->sys_layer);
+
+}
+
+void lv_disp_set_dpi(lv_disp_t * disp, lv_coord_t dpi)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->dpi = dpi;
+}
+
+lv_coord_t lv_disp_get_horizonal_resolution(const lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
@@ -740,12 +738,7 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
     }
 }
 
-/**
- * Get the vertical resolution of a display
- * @param disp pointer to a display (NULL to use the default display)
- * @return the vertical resolution of the display
- */
-lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
+lv_coord_t lv_disp_get_vertical_resolution(const lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
@@ -763,12 +756,7 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
     }
 }
 
-/**
- * Get the full / physical horizontal resolution of a display
- * @param disp pointer to a display (NULL to use the default display)
- * @return the full / physical horizontal resolution of the display
- */
-lv_coord_t lv_disp_get_physical_hor_res(lv_disp_t * disp)
+lv_coord_t lv_disp_get_physical_horizontal_resolution(const lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
@@ -786,12 +774,7 @@ lv_coord_t lv_disp_get_physical_hor_res(lv_disp_t * disp)
     }
 }
 
-/**
- * Get the full / physical vertical resolution of a display
- * @param disp pointer to a display (NULL to use the default display)
- * @return the full / physical vertical resolution of the display
- */
-lv_coord_t lv_disp_get_physical_ver_res(lv_disp_t * disp)
+lv_coord_t lv_disp_get_physical_vertical_resolution(const lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
@@ -809,12 +792,7 @@ lv_coord_t lv_disp_get_physical_ver_res(lv_disp_t * disp)
     }
 }
 
-/**
- * Get the horizontal offset from the full / physical display
- * @param disp pointer to a display (NULL to use the default display)
- * @return the horizontal offset from the full / physical display
- */
-lv_coord_t lv_disp_get_offset_x(lv_disp_t * disp)
+lv_coord_t lv_disp_get_offset_x(const lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
@@ -826,21 +804,16 @@ lv_coord_t lv_disp_get_offset_x(lv_disp_t * disp)
             case LV_DISP_ROTATION_90:
                 return disp->offset_y;
             case LV_DISP_ROTATION_180:
-                return lv_disp_get_physical_hor_res(disp) - disp->offset_x;
+                return lv_disp_get_physical_horizontal_resolution(disp) - disp->offset_x;
             case LV_DISP_ROTATION_270:
-                return lv_disp_get_physical_hor_res(disp) - disp->offset_y;
+                return lv_disp_get_physical_horizontal_resolution(disp) - disp->offset_y;
             default:
                 return disp->offset_x;
         }
     }
 }
 
-/**
- * Get the vertical offset from the full / physical display
- * @param disp pointer to a display (NULL to use the default display)
- * @return the horizontal offset from the full / physical display
- */
-lv_coord_t lv_disp_get_offset_y(lv_disp_t * disp)
+lv_coord_t lv_disp_get_offset_y(const lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
 
@@ -852,14 +825,65 @@ lv_coord_t lv_disp_get_offset_y(lv_disp_t * disp)
             case LV_DISP_ROTATION_90:
                 return disp->offset_x;
             case LV_DISP_ROTATION_180:
-                return lv_disp_get_physical_ver_res(disp) - disp->offset_y;
+                return lv_disp_get_physical_vertical_resolution(disp) - disp->offset_y;
             case LV_DISP_ROTATION_270:
-                return lv_disp_get_physical_ver_res(disp) - disp->offset_x;
+                return lv_disp_get_physical_vertical_resolution(disp) - disp->offset_x;
             default:
                 return disp->offset_y;
         }
     }
 }
+
+lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return LV_DPI_DEF;  /*Do not return 0 because it might be a divider*/
+    return disp->dpi;
+}
+
+/*---------------------
+ * BUFFERING
+ *--------------------*/
+
+void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_px,
+                              lv_disp_render_mode_t render_mode)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->draw_buf_1 = buf1;
+    disp->draw_buf_2 = buf2;
+    disp->draw_buf_act = buf1;
+    disp->draw_buf_size = buf_size_px;
+    disp->render_mode = render_mode;
+}
+
+void lv_disp_set_flush_cb(lv_disp_t * disp, void (*flush_cb)(struct _lv_disp_t * disp, const lv_area_t * area,
+                                                             lv_color_t * color_p))
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->flush_cb = flush_cb;
+}
+
+void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->color_format = color_format;
+}
+
+
+void lv_disp_set_antialaising(lv_disp_t * disp, bool en)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return;
+
+    disp->antialiasing = en;
+}
+
 
 /**
  * Get if anti-aliasing is enabled for a display or not
@@ -874,51 +898,18 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
     return disp->antialiasing ? true : false;
 }
 
-/**
- * Get the DPI of the display
- * @param disp pointer to a display (NULL to use the default display)
- * @return dpi of the display
- */
-lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
-{
-    if(disp == NULL) disp = lv_disp_get_default();
-    if(disp == NULL) return LV_DPI_DEF;  /*Do not return 0 because it might be a divider*/
-    return disp->dpi;
-}
 
-/**
- * Call in the display driver's `flush_cb` function when the flushing is finished
- * @param disp_drv pointer to display driver in `flush_cb` where this function is called
- */
 LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_t * disp)
 {
     disp->flushing = 0;
     disp->flushing_last = 0;
 }
 
-/**
- * Tell if it's the last area of the refreshing process.
- * Can be called from `flush_cb` to execute some special display refreshing if needed when all areas area flushed.
- * @param disp_drv pointer to display driver
- * @return true: it's the last area to flush; false: there are other areas too which will be refreshed soon
- */
 LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp)
 {
     return disp->flushing_last;
 }
 
-/**
- * Get the next display.
- * @param disp pointer to the current display. NULL to initialize.
- * @return the next display or NULL if no more. Give the first display when the parameter is NULL
- */
-lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
-{
-    if(disp == NULL)
-        return _lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
-    else
-        return _lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
-}
 
 /**
  * Set the rotation of this display.
@@ -949,6 +940,33 @@ lv_disp_rotation_t lv_disp_get_rotation(lv_disp_t * disp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void update_resolution(lv_disp_t * disp)
+{
+    lv_area_t prev_coords;
+    lv_obj_get_coords(disp->sys_layer, &prev_coords);
+    uint32_t i;
+    for(i = 0; i < disp->screen_cnt; i++) {
+        lv_area_set_width(&disp->screens[i]->coords, disp->hor_res);
+        lv_area_set_height(&disp->screens[i]->coords, disp->ver_res);
+        lv_event_send(disp->screens[i], LV_EVENT_SIZE_CHANGED, &prev_coords);
+    }
+
+    lv_area_set_width(&disp->top_layer->coords, disp->hor_res);
+    lv_area_set_height(&disp->top_layer->coords, disp->ver_res);
+    lv_event_send(disp->top_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+
+    lv_area_set_width(&disp->sys_layer->coords, disp->hor_res);
+    lv_area_set_height(&disp->sys_layer->coords, disp->ver_res);
+    lv_event_send(disp->sys_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+
+    lv_memzero(disp->inv_areas, sizeof(disp->inv_areas));
+    lv_memzero(disp->inv_area_joined, sizeof(disp->inv_area_joined));
+    disp->inv_p = 0;
+    lv_obj_invalidate(disp->sys_layer);
+
+    lv_obj_tree_walk(NULL, invalidate_layout_cb, NULL);
+}
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)
 {

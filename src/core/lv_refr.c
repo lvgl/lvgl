@@ -221,8 +221,8 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     lv_area_t scr_area;
     scr_area.x1 = 0;
     scr_area.y1 = 0;
-    scr_area.x2 = lv_disp_get_hor_res(disp) - 1;
-    scr_area.y2 = lv_disp_get_ver_res(disp) - 1;
+    scr_area.x2 = lv_disp_get_horizonal_resolution(disp) - 1;
+    scr_area.y2 = lv_disp_get_vertical_resolution(disp) - 1;
 
     lv_area_t com_area;
     bool suc;
@@ -231,7 +231,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     if(suc == false)  return; /*Out of the screen*/
 
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
-    if(disp->full_refresh) {
+    if(disp->render_mode == LV_DISP_RENDER_MODE_FULL) {
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
         if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
@@ -318,7 +318,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    if(disp_refr->direct_mode && disp_refr->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
+    if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT &&
+       disp_refr->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
         LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
         return;
     }
@@ -330,9 +331,10 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
-        if(disp_refr->full_refresh) {
+        if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL) {
             lv_area_t disp_area;
-            lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
+            lv_area_set(&disp_area, 0, 0, lv_disp_get_horizonal_resolution(disp_refr) - 1,
+                        lv_disp_get_vertical_resolution(disp_refr) - 1);
             disp_refr->draw_ctx->buf_area = &disp_area;
             draw_buf_flush(disp_refr);
         }
@@ -552,16 +554,17 @@ static void refr_invalid_areas(void)
 static void refr_area(const lv_area_t * area_p)
 {
     lv_draw_ctx_t * draw_ctx = disp_refr->draw_ctx;
-    draw_ctx->buf = disp_refr->buf_act;
+    draw_ctx->buf = disp_refr->draw_buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
-    if(disp_refr->full_refresh || disp_refr->direct_mode) {
+    if(disp_refr->render_mode != LV_DISP_RENDER_MODE_PARTIAL) {
         lv_area_t disp_area;
-        lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
+        lv_area_set(&disp_area, 0, 0, lv_disp_get_horizonal_resolution(disp_refr) - 1,
+                    lv_disp_get_vertical_resolution(disp_refr) - 1);
         draw_ctx->buf_area = &disp_area;
 
-        if(disp_refr->full_refresh) {
+        if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL) {
             disp_refr->last_part = 1;
             draw_ctx->clip_area = &disp_area;
             refr_area_part(draw_ctx);
@@ -578,8 +581,8 @@ static void refr_area(const lv_area_t * area_p)
     /*Calculate the max row num*/
     lv_coord_t w = lv_area_get_width(area_p);
     lv_coord_t h = lv_area_get_height(area_p);
-    lv_coord_t y2 = area_p->y2 >= lv_disp_get_ver_res(disp_refr) ?
-                    lv_disp_get_ver_res(disp_refr) - 1 : area_p->y2;
+    lv_coord_t y2 = area_p->y2 >= lv_disp_get_vertical_resolution(disp_refr) ?
+                    lv_disp_get_vertical_resolution(disp_refr) - 1 : area_p->y2;
 
     int32_t max_row = get_max_row(disp_refr, w, h);
 
@@ -594,7 +597,7 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.y2 = row + max_row - 1;
         draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
-        draw_ctx->buf = disp_refr->buf_act;
+        draw_ctx->buf = disp_refr->draw_buf_act;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
         if(y2 == row_last) disp_refr->last_part = 1;
@@ -610,7 +613,7 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.y2 = y2;
         draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
-        draw_ctx->buf = disp_refr->buf_act;
+        draw_ctx->buf = disp_refr->draw_buf_act;
         disp_refr->last_part = 1;
         refr_area_part(draw_ctx);
     }
@@ -620,7 +623,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
 {
     /* Below the `area_p` area will be redrawn into the draw buffer.
      * In single buffered mode wait here until the buffer is freed.*/
-    if(disp_refr->buf1 && !disp_refr->buf2) {
+    if(disp_refr->draw_buf_1 && !disp_refr->draw_buf_2) {
         while(disp_refr->flushing) {
             if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
         }
@@ -631,7 +634,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
             //                disp_refr->clear_cb(disp_refr, disp_refr->buf_act, disp_refr->size);
             //            }
             //            else {
-            lv_memzero(disp_refr->buf_act, disp_refr->draw_buf_size * LV_IMG_PX_SIZE_ALPHA_BYTE);
+            lv_memzero(disp_refr->draw_buf_act, disp_refr->draw_buf_size * LV_IMG_PX_SIZE_ALPHA_BYTE);
             //            }
         }
     }
@@ -649,7 +652,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     if(top_act_scr == NULL && top_prev_scr == NULL) {
         lv_area_t a;
         lv_area_set(&a, 0, 0,
-                    lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
+                    lv_disp_get_horizonal_resolution(disp_refr) - 1, lv_disp_get_vertical_resolution(disp_refr) - 1);
         if(draw_ctx->draw_bg) {
             lv_draw_rect_dsc_t dsc;
             lv_draw_rect_dsc_init(&dsc);
@@ -708,7 +711,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
 
     /*In true double buffered mode flush only once when all areas were rendered.
      *In normal mode flush after every area*/
-    if(disp_refr->full_refresh == false) {
+    if(disp_refr->render_mode != LV_DISP_RENDER_MODE_FULL) {
         draw_buf_flush(disp_refr);
     }
 }
@@ -1091,7 +1094,7 @@ static void draw_buf_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * color
  */
 static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
 {
-    if(disp_refr->full_refresh && disp_refr->sw_rotate) {
+    if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL && disp_refr->sw_rotate) {
         LV_LOG_ERROR("cannot rotate a full refreshed display!");
         return;
     }
@@ -1184,7 +1187,7 @@ static void draw_buf_flush(lv_disp_t * disp)
 
     /* In double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer */
-    if(disp->buf1 && disp->buf2) {
+    if(disp->draw_buf_1 && disp->draw_buf_2) {
         while(disp->flushing) {
             if(disp->wait_cb) disp_refr->wait_cb(disp);
         }
@@ -1195,7 +1198,7 @@ static void draw_buf_flush(lv_disp_t * disp)
             //                disp_refr->clear_cb(disp_refr->driver, disp_refr->buf_act, disp_refr->size);
             //            }
             //            else {
-            lv_memzero(disp_refr->buf_act, disp_refr->draw_buf_size * LV_IMG_PX_SIZE_ALPHA_BYTE);
+            lv_memzero(disp_refr->draw_buf_act, disp_refr->draw_buf_size * LV_IMG_PX_SIZE_ALPHA_BYTE);
             //            }
         }
     }
@@ -1217,11 +1220,11 @@ static void draw_buf_flush(lv_disp_t * disp)
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
-    if(disp->buf1 && disp->buf2 && (!disp->direct_mode || flushing_last)) {
-        if(disp->buf_act == disp->buf1)
-            disp->buf_act = disp->buf2;
+    if(disp->draw_buf_1 && disp->draw_buf_2 && (disp->render_mode != LV_DISP_RENDER_MODE_DIRECT || flushing_last)) {
+        if(disp->draw_buf_act == disp->draw_buf_1)
+            disp->draw_buf_act = disp->draw_buf_2;
         else
-            disp->buf_act = disp->buf1;
+            disp->draw_buf_act = disp->draw_buf_1;
     }
 }
 

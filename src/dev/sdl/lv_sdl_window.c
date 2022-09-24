@@ -95,15 +95,10 @@ lv_disp_t * lv_sdl_window_register(lv_sdl_window_t * cfg)
     if(disp == NULL) return NULL;
 
     window_create(cfg);
-
-    disp->hor_res = cfg->hor_res;
-    disp->ver_res = cfg->ver_res;
-    disp->buf1 = cfg->_priv->fb;
-    disp->buf_act = disp->buf1;
-    disp->draw_buf_size = cfg->hor_res * cfg->ver_res;
-    disp->direct_mode = 1;
+    lv_disp_set_resolution(disp, cfg->hor_res, cfg->ver_res);
+    lv_disp_set_flush_cb(disp, flush_cb);
+    lv_disp_set_draw_buffers(disp, cfg->_priv->fb, NULL, cfg->hor_res * cfg->ver_res, LV_DISP_RENDER_MODE_DIRECT);
     disp->user_data = cfg;
-    disp->flush_cb = flush_cb;
 
     return disp;
 }
