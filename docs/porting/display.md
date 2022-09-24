@@ -60,11 +60,11 @@ Therefore the 2 buffers needs to synchronized in `flush_cb` like this:
 1. Display the frame buffer pointed by `color_p`
 2. Copy the redrawn areas from `color_p` to the other buffer.
 
-The get the redrawn areas to copy use the following functions
-`_lv_refr_get_disp_refreshing()` returns the display being refreshed
-`disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
-`disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into another one and should be ignored
-`disp->inv_p` number of valid elements in `inv_areas`
+To get the redrawn areas to copy use the following functions:
+- `_lv_refr_get_disp_refreshing()` returns the display being refreshed
+- `disp->inv_areas[LV_INV_BUF_SIZE]` contains the invalidated areas
+- `disp->inv_area_joined[LV_INV_BUF_SIZE]` if 1 that area was joined into another one and should be ignored
+- `disp->inv_p` number of valid elements in `inv_areas`
 
 ## Display driver
 
@@ -200,7 +200,9 @@ There is a noticeable amount of overhead to performing rotation in software. Har
 
 The default rotation of your display when it is initialized can be set using the `rotated` flag. The available options are `LV_DISP_ROT_NONE`, `LV_DISP_ROT_90`, `LV_DISP_ROT_180`, or `LV_DISP_ROT_270`. The rotation values are relative to how you would rotate the physical display in the clockwise direction. Thus, `LV_DISP_ROT_90` means you rotate the hardware 90 degrees clockwise, and the display rotates 90 degrees counterclockwise to compensate.
 
-(Note for users upgrading from 7.10.0 and older: these new rotation enum values match up with the old 0/1 system for rotating 90 degrees, so legacy code should continue to work as expected. Software rotation is also disabled by default for compatibility.)
+
+```note::  For users upgrading from 7.10.0 and older: these new rotation enum values match up with the old 0/1 system for rotating 90 degrees, so legacy code should continue to work as expected. Software rotation is also disabled by default for compatibility.
+```
 
 Display rotation can also be changed at runtime using the `lv_disp_set_rotation(disp, rot)` API.
 

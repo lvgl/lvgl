@@ -58,7 +58,7 @@ On **Linux** you can easily install SDL2 using a terminal:
 4. If build essentials are not installed yet: `sudo apt-get install build-essential`
 
 #### Windows
-If you are using **Windows** firstly you need to install MinGW ([64 bit version](http://mingw-w64.org/doku.php/download)). After installing MinGW, do the following steps to add SDL2:
+If you are using **Windows** firstly you need to install MinGW ([64 bit version](https://www.mingw-w64.org/downloads/#msys2)). After installing MinGW, do the following steps to add SDL2:
 
 1. Download the development libraries of SDL.
 Go to [https://www.libsdl.org/download-2.0.php](https://www.libsdl.org/download-2.0.php) and download _Development Libraries: SDL2-devel-2.0.5-mingw.tar.gz_

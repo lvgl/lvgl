@@ -115,7 +115,7 @@ Along with the basic attributes, widgets can have type specific parameters which
 lv_slider_set_value(slider1, 70, LV_ANIM_ON);
 ```
 
-To see the full API visit the documentation of the widgets or the related header file (e.g. [lvgl/src/widgets/lv_slider.h](https://github.com/lvgl/lvgl/blob/master/src/widgets/lv_slider.h)).
+To see the full API visit the documentation of the widgets or the related header file (e.g. [lvgl/src/widgets/slider/lv_slider.h](https://github.com/lvgl/lvgl/blob/master/src/widgets/slider/lv_slider.h)).
 
 
 

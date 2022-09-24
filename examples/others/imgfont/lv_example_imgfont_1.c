@@ -14,12 +14,18 @@ static bool get_imgfont_path(const lv_font_t * font, void * img_src,
     LV_UNUSED(user_data);
     LV_ASSERT_NULL(img_src);
 
+    if(unicode < 0xF000) return false;
+
     if(unicode == 0xF617) {
         memcpy(img_src, &emoji_F617, sizeof(lv_img_dsc_t));
     }
     else {
         char * path = (char *)img_src;
-        snprintf(path, len, "%s/%04"LV_PRIX32".%s", "A:lvgl/examples/assets/emoji", unicode, "png");
+#if LV_USE_FFMPEG
+        snprintf(path, len, "%s/%04X.%s", "lvgl/examples/assets/emoji", unicode, "png");
+#elif LV_USE_PNG
+        snprintf(path, len, "%s/%04X.%s", "A:lvgl/examples/assets/emoji", unicode, "png");
+#endif
         path[len - 1] = '\0';
     }
 

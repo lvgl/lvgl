@@ -937,7 +937,6 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
             layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_no_alpha - 1;
             if(layer_ctx->area_act.y2 > layer_ctx->area_full.y2) layer_ctx->area_act.y2 = layer_ctx->area_full.y2;
         }
-
         while(layer_ctx->area_act.y1 <= layer_area_full.y2) {
             if(flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
                 layer_alpha_test(obj, draw_ctx, layer_ctx, flags);

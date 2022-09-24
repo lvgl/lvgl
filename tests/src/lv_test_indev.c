@@ -17,7 +17,7 @@ static bool enc_pressed;
 
 void lv_test_mouse_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     data->point.x = x_act;
     data->point.y = y_act;
     data->state = mouse_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
@@ -59,7 +59,7 @@ void lv_test_mouse_click_at(lv_coord_t x, lv_coord_t y)
 
 void lv_test_keypad_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     data->key = key_act;
     data->state = key_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
@@ -88,7 +88,7 @@ void lv_test_key_hit(uint32_t k)
 
 void lv_test_encoder_read_cb(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     data->enc_diff = diff_act;
     data->state = enc_pressed ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
     diff_act = 0;

@@ -204,7 +204,7 @@ static lv_fs_res_t fs_error_from_win32(DWORD error)
  */
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
 
     DWORD desired_access = 0;
 
@@ -240,7 +240,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
  */
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     return CloseHandle((HANDLE)file_p)
            ? LV_FS_RES_OK
            : fs_error_from_win32(GetLastError());
@@ -258,7 +258,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
  */
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     return ReadFile((HANDLE)file_p, buf, btr, (LPDWORD)br, NULL)
            ? LV_FS_RES_OK
            : fs_error_from_win32(GetLastError());
@@ -275,7 +275,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  */
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     return WriteFile((HANDLE)file_p, buf, btw, (LPDWORD)bw, NULL)
            ? LV_FS_RES_OK
            : fs_error_from_win32(GetLastError());
@@ -291,7 +291,7 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
  */
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
 
     DWORD move_method = (DWORD) -1;
     if(whence == LV_FS_SEEK_SET) {
@@ -321,7 +321,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
  */
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
 
     if(!pos_p) {
         return LV_FS_RES_INV_PARAM;
@@ -358,7 +358,7 @@ static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
  */
 static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     dir_handle_t * handle = (dir_handle_t *)lv_malloc(sizeof(dir_handle_t));
     handle->dir_p = INVALID_HANDLE_VALUE;
     handle->next_error = LV_FS_RES_OK;
@@ -410,7 +410,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
  */
 static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     dir_handle_t * handle = (dir_handle_t *)dir_p;
     strcpy(fn, handle->next_fn);
     lv_fs_res_t current_error = handle->next_error;
@@ -448,7 +448,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
  */
 static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     dir_handle_t * handle = (dir_handle_t *)dir_p;
     lv_fs_res_t res = FindClose(handle->dir_p)
                       ? LV_FS_RES_OK

@@ -28,6 +28,8 @@
  *********************/
 //#define REF_IMGS_PATH "lvgl/tests/lv_test_ref_imgs/"
 #define REF_IMGS_PATH "ref_imgs/"
+#define ERR_FILE_NOT_FOUND  -1
+#define ERR_PNG             -2
 
 /**********************
  *      TYPEDEFS
@@ -47,6 +49,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static int read_png_file(png_img_t * p, const char * file_name);
+static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
 static void png_release(png_img_t * p);
 
 /**********************
@@ -66,9 +69,6 @@ bool lv_test_assert_img_eq(const char * fn_ref)
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
-    png_img_t p;
-    int res = read_png_file(&p, fn_ref_full);
-    if(res < 0) return false;
     uint8_t * screen_buf;
 
     lv_obj_invalidate(lv_scr_act());
@@ -77,6 +77,18 @@ bool lv_test_assert_img_eq(const char * fn_ref)
     extern lv_color_t test_fb[];
 
     screen_buf = (uint8_t *)test_fb;
+
+    png_img_t p;
+    int res = read_png_file(&p, fn_ref_full);
+    if(res == ERR_FILE_NOT_FOUND) {
+        TEST_PRINTF("%s%s", fn_ref_full, " was not found, creating is now from the rendered screen");
+        fflush(stderr);
+        write_png_file(screen_buf, 800, 480, fn_ref_full);
+        return true;
+    }
+    else if(res == ERR_PNG) {
+        return false;
+    }
 
     uint8_t * ptr_act = NULL;
     const png_byte * ptr_ref = NULL;
@@ -167,13 +179,13 @@ static int read_png_file(png_img_t * p, const char * file_name)
     FILE * fp = fopen(file_name, "rb");
     if(!fp) {
         TEST_PRINTF("%s", "PNG file %s could not be opened for reading");
-        return -1;
+        return ERR_FILE_NOT_FOUND;
     }
 
     size_t rcnt = fread(header, 1, 8, fp);
     if(rcnt != 8 || png_sig_cmp((png_const_bytep)header, 0, 8)) {
         TEST_PRINTF("%s is not recognized as a PNG file", file_name);
-        return -1;
+        return ERR_PNG;
     }
 
     /*initialize stuff*/
@@ -181,17 +193,17 @@ static int read_png_file(png_img_t * p, const char * file_name)
 
     if(!p->png_ptr) {
         TEST_PRINTF("%s", "png_create_read_struct failed");
-        return -1;
+        return ERR_PNG;
     }
 
     p->info_ptr = png_create_info_struct(p->png_ptr);
     if(!p->info_ptr) {
         TEST_PRINTF("%s", "png_create_info_struct failed");
-        return -1;
+        return ERR_PNG;
     }
     if(setjmp(png_jmpbuf(p->png_ptr))) {
         TEST_PRINTF("%s", "Error during init_io");
-        return -1;
+        return ERR_PNG;
     }
     png_init_io(p->png_ptr, fp);
     png_set_sig_bytes(p->png_ptr, 8);
@@ -209,7 +221,7 @@ static int read_png_file(png_img_t * p, const char * file_name)
     /*read file*/
     if(setjmp(png_jmpbuf(p->png_ptr))) {
         TEST_PRINTF("%s", "Error during read_image");
-        return -1;
+        return ERR_PNG;
     }
     p->row_pointers = (png_bytep *) malloc(sizeof(png_bytep) * p->height);
 
@@ -222,6 +234,91 @@ static int read_png_file(png_img_t * p, const char * file_name)
     fclose(fp);
     return 0;
 }
+
+
+static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name)
+{
+    png_structp png_ptr;
+    png_infop info_ptr;
+
+    /* create file */
+    FILE * fp = fopen(file_name, "wb");
+    if(!fp) {
+        TEST_PRINTF("%s", "[write_png_file] File %s could not be opened for writing", file_name);
+        return -1;
+    }
+
+    /* initialize stuff */
+    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+
+    if(!png_ptr) {
+        TEST_PRINTF("%s", "[write_png_file] png_create_write_struct failed");
+        return -1;
+    }
+
+    info_ptr = png_create_info_struct(png_ptr);
+    if(!info_ptr) {
+        TEST_PRINTF("%s", "[write_png_file] png_create_info_struct failed");
+        return -1;
+    }
+
+    if(setjmp(png_jmpbuf(png_ptr))) {
+        TEST_PRINTF("%s", "[write_png_file] Error during init_io");
+        return -1;
+    }
+
+    png_init_io(png_ptr, fp);
+
+    /* write header */
+    if(setjmp(png_jmpbuf(png_ptr))) {
+        TEST_PRINTF("%s", "[write_png_file] Error during writing header");
+        return -1;
+    }
+
+    png_set_IHDR(png_ptr, info_ptr, width, height,
+                 8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,
+                 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+    png_write_info(png_ptr, info_ptr);
+
+
+    /* write bytes */
+    if(setjmp(png_jmpbuf(png_ptr))) {
+        TEST_PRINTF("%s", "[write_png_file] Error during writing bytes");
+        return -1;
+    }
+
+    uint8_t * raw_img8 = (uint8_t *)raw_img;
+    png_bytep * row_pointers = (png_bytep *) malloc(sizeof(png_bytep) * height);
+    for(uint32_t y = 0; y < height; y++) {
+        row_pointers[y] = malloc(3 * width);
+        uint8_t * line = raw_img8 + y * width * 4;
+        for(uint32_t x = 0; x < width; x++) {
+            row_pointers[y][x * 3 + 0] = line[x * 4 + 2];
+            row_pointers[y][x * 3 + 1] = line[x * 4 + 1];
+            row_pointers[y][x * 3 + 2] = line[x * 4 + 0];
+        }
+    }
+    png_write_image(png_ptr, row_pointers);
+
+
+    /* end write */
+    if(setjmp(png_jmpbuf(png_ptr))) {
+        TEST_PRINTF("%s", "[write_png_file] Error during end of write");
+        return -1;
+    }
+    png_write_end(png_ptr, NULL);
+
+    /* cleanup heap allocation */
+    for(uint32_t y = 0; y < height; y++) free(row_pointers[y]);
+    free(row_pointers);
+
+    png_destroy_write_struct(&png_ptr, &info_ptr);
+
+    fclose(fp);
+    return 0;
+}
+
 
 static void png_release(png_img_t * p)
 {

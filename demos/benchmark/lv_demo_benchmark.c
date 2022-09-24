@@ -97,9 +97,9 @@ static void calc_scene_statistics(void);
 static lv_res_t load_next_scene(void);
 static void next_scene_timer_cb(lv_timer_t * timer);
 static void single_scene_finsih_timer_cb(lv_timer_t * timer);
-static void monitor_cb(lv_disp_t * disp, uint32_t time, uint32_t px);
-static void render_start_cb(lv_disp_t * disp);
-static void dummy_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colors);
+static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px);
+static void render_start_cb(lv_disp_drv_t * drv);
+static void dummy_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * colors);
 static void generate_report(void);
 
 static void rect_create(lv_style_t * style);
@@ -881,9 +881,9 @@ static void single_scene_finsih_timer_cb(lv_timer_t * timer)
     lv_obj_invalidate(lv_scr_act());
 }
 
-static void monitor_cb(lv_disp_t * disp, uint32_t time, uint32_t px)
+static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     LV_UNUSED(px);
 
     if(scene_with_opa) {
@@ -897,13 +897,13 @@ static void monitor_cb(lv_disp_t * disp, uint32_t time, uint32_t px)
 }
 
 
-static void render_start_cb(lv_disp_t * disp)
+static void render_start_cb(lv_disp_drv_t * drv)
 {
-    LV_UNUSED(disp);
+    LV_UNUSED(drv);
     render_start_time = lv_tick_get();
 }
 
-static void dummy_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colors)
+static void dummy_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * colors)
 {
     LV_UNUSED(area);
     LV_UNUSED(colors);

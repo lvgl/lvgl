@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../hal/lv_hal.h"
 #include "lv_obj.h"
 #include "lv_theme.h"
 
@@ -461,6 +460,8 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
  * @param opa opacity (0..255)
  */
 void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
+
+lv_color_t lv_disp_get_chroma_key_color(lv_disp_t * disp);
 
 /**
  * Set the background color of a display

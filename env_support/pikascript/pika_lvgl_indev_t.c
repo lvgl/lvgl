@@ -3,7 +3,9 @@
 #else
 #include "../../lvgl.h"
 #endif
+
 #ifdef PIKASCRIPT
+
 #include "pika_lvgl_indev_t.h"
 
 void pika_lvgl_indev_t_get_vect(PikaObj* self, PikaObj* point) {
