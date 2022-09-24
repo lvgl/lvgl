@@ -10,7 +10,7 @@
 #if LV_USE_DRAW_SW
 
 #include "../lv_img_cache.h"
-#include "../../hal/lv_hal_disp.h"
+#include "../../core/lv_disp.h"
 #include "../../misc/lv_log.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_mem.h"

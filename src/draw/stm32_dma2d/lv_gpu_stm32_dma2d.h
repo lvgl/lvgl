@@ -13,11 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_color.h"
-#include "../../hal/lv_hal_disp.h"
-#include "../sw/lv_draw_sw.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_STM32_DMA2D
+#include "../../misc/lv_color.h"
+#include "../../core/lv_disp.h"
+#include "../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES

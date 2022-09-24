@@ -10,7 +10,6 @@
 #include "lv_refr.h"
 #include "lv_disp.h"
 #include "../hal/lv_hal_tick.h"
-#include "../hal/lv_hal_disp.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"

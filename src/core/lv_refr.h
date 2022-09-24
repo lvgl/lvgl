@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "lv_disp.h"
 #include <stdbool.h>
 
 /*********************

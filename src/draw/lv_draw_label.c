@@ -9,7 +9,7 @@
 #include "lv_draw.h"
 #include "lv_draw_label.h"
 #include "../misc/lv_math.h"
-#include "../hal/lv_hal_disp.h"
+#include "../core/lv_disp.h"
 #include "../core/lv_refr.h"
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_assert.h"

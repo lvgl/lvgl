@@ -10,7 +10,7 @@
 #if LV_USE_DRAW_SW
 
 #include "../../misc/lv_math.h"
-#include "../../hal/lv_hal_disp.h"
+#include "../../core/lv_disp.h"
 #include "../../core/lv_refr.h"
 
 /*********************

@@ -8,6 +8,7 @@
  *********************/
 #include "lv_obj.h"
 #include "lv_theme.h"
+#include "lv_disp.h"
 
 /*********************
  *      DEFINES
