@@ -10,6 +10,7 @@
 #include "../misc/lv_math.h"
 #include "../core/lv_refr.h"
 #include "../core/lv_disp.h"
+#include "../core/lv_disp_priv.h"
 #include "../misc/lv_gc.h"
 
 #if LV_USE_DRAW_SW
@@ -890,10 +891,7 @@ bool lv_disp_is_invalidation_enabled(lv_disp_t * disp)
 lv_timer_t * _lv_disp_get_refr_timer(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("lv_disp_get_refr_timer: no display registered");
-        return NULL;
-    }
+    if(!disp) return NULL;
 
     return disp->refr_timer;
 }
@@ -909,6 +907,24 @@ lv_color_t lv_disp_get_chroma_key_color(lv_disp_t * disp)
     }
 
     return disp->color_chroma_key;
+}
+
+
+void lv_disp_set_user_data(lv_disp_t * disp, void * user_data)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) return;
+
+    disp->user_data = user_data;
+}
+
+void * lv_disp_get_user_data(lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) return NULL;
+
+    return disp->user_data;
+
 }
 
 /**********************

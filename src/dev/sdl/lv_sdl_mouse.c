@@ -9,7 +9,7 @@
 #include "lv_sdl_mouse.h"
 #if LV_USE_SDL
 
-#include "../../hal/lv_hal_indev.h"
+#include "../../core/lv_indev_priv.h"
 #include "../../core/lv_group.h"
 
 #include LV_SDL_INCLUDE_PATH

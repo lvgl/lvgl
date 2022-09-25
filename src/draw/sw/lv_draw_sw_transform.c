@@ -176,7 +176,7 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
     lv_disp_t * d = _lv_refr_get_disp_refreshing();
-    lv_color_t ck = d->color_chroma_key;
+    lv_color_t ck = lv_disp_get_chroma_key_color(d);
 
     lv_memset(abuf, 0xff, x_end);
 
@@ -299,7 +299,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                 has_alpha = true;
                 px_size = sizeof(lv_color_t);
                 lv_disp_t * d = _lv_refr_get_disp_refreshing();
-                ck = d->color_chroma_key;
+                ck = lv_disp_get_chroma_key_color(d);
                 break;
             }
 #if LV_COLOR_DEPTH == 16

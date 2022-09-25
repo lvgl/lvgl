@@ -7,7 +7,9 @@
  *      INCLUDES
  ********************/
 #include "lv_indev.h"
+#include "lv_indev_priv.h"
 #include "lv_disp.h"
+#include "lv_disp_priv.h"
 #include "lv_obj.h"
 #include "lv_indev_scroll.h"
 #include "lv_group.h"
@@ -16,10 +18,32 @@
 #include "../hal/lv_hal_tick.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
+#include "../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
  *********************/
+/*Drag threshold in pixels*/
+#define LV_INDEV_DEF_SCROLL_LIMIT         10
+
+/*Drag throw slow-down in [%]. Greater value -> faster slow-down*/
+#define LV_INDEV_DEF_SCROLL_THROW         10
+
+/*Long press time in milliseconds.
+ *Time to send `LV_OBJ_EVENT_LONG_PRESSSED`)*/
+#define LV_INDEV_DEF_LONG_PRESS_TIME      400
+
+/*Repeated trigger period in long press [ms]
+ *Time between `LV_OBJ_EVENT_LONG_PRESSED_REPEAT*/
+#define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
+
+
+/*Gesture threshold in pixels*/
+#define LV_INDEV_DEF_GESTURE_LIMIT        50
+
+/*Gesture min velocity at release before swipe (pixels)*/
+#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+
 #if LV_INDEV_DEF_SCROLL_THROW <= 0
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
@@ -60,6 +84,106 @@ static lv_obj_t * indev_obj_act = NULL;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+lv_indev_t * lv_indev_create(void)
+{
+    lv_disp_t * disp = lv_disp_get_default();
+    if(disp == NULL) {
+        LV_LOG_WARN("no display was created so far");
+    }
+
+    lv_indev_t * indev = _lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
+    LV_ASSERT_MALLOC(indev);
+    if(!indev) {
+        return NULL;
+    }
+
+    lv_memzero(indev, sizeof(lv_indev_t));
+    indev->reset_query  = 1;
+    indev->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
+
+    indev->type                 = LV_INDEV_TYPE_NONE;
+    indev->scroll_limit         = LV_INDEV_DEF_SCROLL_LIMIT;
+    indev->scroll_throw         = LV_INDEV_DEF_SCROLL_THROW;
+    indev->long_press_time      = LV_INDEV_DEF_LONG_PRESS_TIME;
+    indev->long_press_repeat_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
+    indev->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
+    indev->gesture_min_velocity = LV_INDEV_DEF_GESTURE_MIN_VELOCITY;
+
+    return indev;
+}
+
+void lv_indev_drv_update(lv_indev_t * indev, lv_indev_t * new_drv)
+{
+    //    LV_ASSERT_NULL(indev);
+    //    LV_ASSERT_NULL(indev->driver);
+    //    LV_ASSERT_NULL(indev->driver->read_timer);
+    //    lv_timer_del(indev->driver->read_timer);
+    //
+    //    LV_ASSERT_NULL(new_drv);
+    //    if(new_drv->disp == NULL) {
+    //        new_drv->disp = lv_disp_get_default();
+    //    }
+    //    if(new_drv->disp == NULL) {
+    //        LV_LOG_WARN("lv_indev_drv_register: no display registered hence can't attach the indev to "
+    //                    "a display");
+    //        indev->disabled = true;
+    //        return;
+    //    }
+    //
+    //    indev->driver = new_drv;
+    //    indev->driver->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
+    //    indev->reset_query   = 1;
+}
+
+void lv_indev_delete(lv_indev_t * indev)
+{
+    //    LV_ASSERT_NULL(indev);
+    //    LV_ASSERT_NULL(indev->driver);
+    //    LV_ASSERT_NULL(indev->driver->read_timer);
+    //    /*Clean up the read timer first*/
+    //    lv_timer_del(indev->driver->read_timer);
+    //    /*Remove the input device from the list*/
+    //    _lv_ll_remove(&LV_GC_ROOT(_lv_indev_ll), indev);
+    //    /*Free the memory of the input device*/
+    //    lv_free(indev);
+}
+
+lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
+{
+    if(indev == NULL)
+        return _lv_ll_get_head(&LV_GC_ROOT(_lv_indev_ll));
+    else
+        return _lv_ll_get_next(&LV_GC_ROOT(_lv_indev_ll), indev);
+}
+
+void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
+{
+    lv_memzero(data, sizeof(lv_indev_data_t));
+
+    /* For touchpad sometimes users don't set the last pressed coordinate on release.
+     * So be sure a coordinates are initialized to the last point */
+    if(indev->type == LV_INDEV_TYPE_POINTER) {
+        data->point.x = indev->pointer.last_raw_point.x;
+        data->point.y = indev->pointer.last_raw_point.y;
+    }
+    /*Similarly set at least the last key in case of the user doesn't set it on release*/
+    else if(indev->type == LV_INDEV_TYPE_KEYPAD) {
+        data->key = indev->keypad.last_key;
+    }
+    /*For compatibility assume that used button was enter (encoder push)*/
+    else if(indev->type == LV_INDEV_TYPE_ENCODER) {
+        data->key = LV_KEY_ENTER;
+    }
+
+    if(indev->read_cb) {
+        INDEV_TRACE("calling indev_read_cb");
+        indev->read_cb(indev, data);
+    }
+    else {
+        LV_LOG_WARN("indev_read_cb is not registered");
+    }
+}
 
 void lv_indev_read_timer_cb(lv_timer_t * timer)
 {

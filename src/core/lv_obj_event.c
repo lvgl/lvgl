@@ -8,6 +8,7 @@
  *********************/
 #include "lv_obj.h"
 #include "lv_indev.h"
+#include "lv_indev_priv.h"
 
 /*********************
  *      DEFINES

@@ -8,6 +8,7 @@
  *********************/
 #include "lv_tileview.h"
 #include "../../core/lv_indev.h"
+#include "../../core/lv_indev_priv.h"
 #if LV_USE_TILEVIEW
 
 /*********************

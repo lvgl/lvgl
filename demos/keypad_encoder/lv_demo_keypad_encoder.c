@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_keypad_encoder.h"
+#include "../../src/core/lv_indev_priv.h"
 
 #if LV_USE_DEMO_KEYPAD_AND_ENCODER
 

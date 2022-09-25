@@ -27,11 +27,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    char buf[KEYBOARD_BUFFER_SIZE];
-    bool dummy_read;
-} lv_sdl_keyboard_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

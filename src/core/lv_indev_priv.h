@@ -1,12 +1,10 @@
 /**
- * @file lv_hal_indev.h
- *
- * @description Input Device HAL interface layer header file
+ * @file lv_indev_priv.h
  *
  */
 
-#ifndef LV_HAL_INDEV_H
-#define LV_HAL_INDEV_H
+#ifndef LV_INDEV_PRIV_H
+#define LV_INDEV_PRIV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,78 +13,15 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
-
-#include <stdbool.h>
-#include <stdint.h>
-#include "../misc/lv_area.h"
-#include "../misc/lv_timer.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-/*Drag threshold in pixels*/
-#define LV_INDEV_DEF_SCROLL_LIMIT         10
-
-/*Drag throw slow-down in [%]. Greater value -> faster slow-down*/
-#define LV_INDEV_DEF_SCROLL_THROW         10
-
-/*Long press time in milliseconds.
- *Time to send `LV_OBJ_EVENT_LONG_PRESSSED`)*/
-#define LV_INDEV_DEF_LONG_PRESS_TIME      400
-
-/*Repeated trigger period in long press [ms]
- *Time between `LV_OBJ_EVENT_LONG_PRESSED_REPEAT*/
-#define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
-
-
-/*Gesture threshold in pixels*/
-#define LV_INDEV_DEF_GESTURE_LIMIT        50
-
-/*Gesture min velocity at release before swipe (pixels)*/
-#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
-
-
 /**********************
  *      TYPEDEFS
  **********************/
 
-struct _lv_obj_t;
-struct _lv_disp_t;
-struct _lv_group_t;
-struct _lv_indev_t;
-struct _lv_disp_t;
-
-/** Possible input device types*/
-typedef enum {
-    LV_INDEV_TYPE_NONE,    /**< Uninitialized state*/
-    LV_INDEV_TYPE_POINTER, /**< Touch pad, mouse, external button*/
-    LV_INDEV_TYPE_KEYPAD,  /**< Keypad or keyboard*/
-    LV_INDEV_TYPE_BUTTON,  /**< External (hardware button) which is assigned to a specific point of the screen*/
-    LV_INDEV_TYPE_ENCODER, /**< Encoder with only Left, Right turn and a Button*/
-} lv_indev_type_t;
-
-/** States for input devices*/
-typedef enum {
-    LV_INDEV_STATE_RELEASED = 0,
-    LV_INDEV_STATE_PRESSED
-} lv_indev_state_t;
-
-/** Data structure passed to an input driver to fill*/
-typedef struct {
-    lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
-    uint32_t key;     /**< For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
-    uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
-    int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
-
-    lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
-    bool continue_reading;  /**< If set to true, the read callback is invoked again*/
-} lv_indev_data_t;
-
-
-/** The main input device descriptor with driver, runtime data ('proc') and some additional
- * information*/
 typedef struct _lv_indev_t {
     /**< Input device type*/
     lv_indev_type_t type;
@@ -169,33 +104,9 @@ typedef struct _lv_indev_t {
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
 } lv_indev_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-lv_indev_t * lv_indev_create(void);
-
-/**
-* Remove the provided input device. Make sure not to use the provided input device afterwards anymore.
-* @param indev pointer to delete
-*/
-void lv_indev_delete(lv_indev_t * indev);
-
-/**
- * Get the next input device.
- * @param indev pointer to the current input device. NULL to initialize.
- * @return the next input device or NULL if there are no more. Provide the first input device when
- * the parameter is NULL
- */
-lv_indev_t * lv_indev_get_next(lv_indev_t * indev);
-
-/**
- * Read data from an input device.
- * @param indev pointer to an input device
- * @param data input device will write its data here
- */
-void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  *      MACROS
@@ -205,4 +116,4 @@ void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
 } /*extern "C"*/
 #endif
 
-#endif
+#endif /*LV_INDEV_PRIV_H*/

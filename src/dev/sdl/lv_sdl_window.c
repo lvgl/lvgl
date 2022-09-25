@@ -79,7 +79,7 @@ lv_disp_t * lv_sdl_window_create(void)
         lv_free(dsc);
         return NULL;
     }
-    disp->user_data = dsc;
+    lv_disp_set_user_data(disp, dsc);
     window_create(disp);
 
     lv_disp_set_flush_cb(disp, flush_cb);
@@ -92,7 +92,7 @@ lv_disp_t * lv_sdl_window_create(void)
 
 void lv_sdl_window_set_zoom(lv_disp_t * disp, uint8_t zoom)
 {
-    lv_sdl_window_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
     dsc->zoom = zoom;
     texture_resize(disp);
     lv_refr_now(disp);
@@ -100,7 +100,7 @@ void lv_sdl_window_set_zoom(lv_disp_t * disp, uint8_t zoom)
 
 uint8_t lv_sdl_window_get_zoom(lv_disp_t * disp)
 {
-    lv_sdl_window_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
     return dsc->zoom;
 }
 
@@ -110,7 +110,7 @@ lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
     while(disp) {
-        lv_sdl_window_t * dsc = disp->user_data;
+        lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
         if(SDL_GetWindowID(dsc->window) == win_id) {
             return disp;
         }
@@ -157,7 +157,7 @@ static void sdl_event_handler(lv_timer_t * t)
         if(event.type == SDL_WINDOWEVENT) {
             lv_disp_t * disp = _lv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
-            lv_sdl_window_t * dsc = disp->user_data;
+            lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
 
             switch(event.window.event) {
 #if SDL_VERSION_ATLEAST(2, 0, 5)
@@ -187,7 +187,7 @@ static void sdl_event_handler(lv_timer_t * t)
 
 static void clean_up(lv_disp_t * disp)
 {
-    lv_sdl_window_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
     SDL_DestroyTexture(dsc->texture);
     SDL_DestroyRenderer(dsc->renderer);
     SDL_DestroyWindow(dsc->window);
@@ -195,7 +195,7 @@ static void clean_up(lv_disp_t * disp)
 
 static void window_create(lv_disp_t * disp)
 {
-    lv_sdl_window_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
     dsc->zoom = 1;
 
     int flag = SDL_WINDOW_RESIZABLE;
@@ -216,7 +216,7 @@ static void window_create(lv_disp_t * disp)
 
 static void window_update(lv_disp_t * disp)
 {
-    lv_sdl_window_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
     lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
 
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb, hor_res * sizeof(lv_color_t));
@@ -232,7 +232,7 @@ static void texture_resize(lv_disp_t * disp)
 {
     lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
     lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
-    lv_sdl_window_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
 
     dsc->fb = (lv_color_t *)realloc(dsc->fb, sizeof(lv_color_t) * hor_res * ver_res);
     lv_disp_set_draw_buffers(disp, dsc->fb, NULL, hor_res / ver_res, LV_DISP_RENDER_MODE_DIRECT);

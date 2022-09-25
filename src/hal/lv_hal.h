@@ -13,7 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_hal_indev.h"
 #include "lv_hal_tick.h"
 
 /*********************

@@ -9,7 +9,7 @@
 #include "lv_sdl_keyboard.h"
 #if LV_USE_SDL
 
-#include "../../hal/lv_hal_indev.h"
+#include "../../core/lv_indev_priv.h"
 #include "../../core/lv_indev.h"
 #include "../../core/lv_group.h"
 #include LV_SDL_INCLUDE_PATH
@@ -17,6 +17,14 @@
 /*********************
  *      DEFINES
  *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+typedef struct {
+    char buf[KEYBOARD_BUFFER_SIZE];
+    bool dummy_read;
+} lv_sdl_keyboard_t;
 
 /**********************
  *  STATIC PROTOTYPES
