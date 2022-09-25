@@ -288,7 +288,6 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     REFR_TRACE("begin");
 
     uint32_t start = lv_tick_get();
-    volatile uint32_t elaps = 0;
 
     if(tmr) {
         disp_refr = tmr->user_data;
@@ -304,58 +303,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         disp_refr = lv_disp_get_default();
     }
 
-    /*Refresh the screen's layout if required*/
-    lv_obj_update_layout(disp_refr->act_scr);
-    if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
-
-    lv_obj_update_layout(disp_refr->top_layer);
-    lv_obj_update_layout(disp_refr->sys_layer);
-
-    /*Do nothing if there is no active screen*/
-    if(disp_refr->act_scr == NULL) {
-        disp_refr->inv_p = 0;
-        LV_LOG_WARN("there is no active screen");
-        REFR_TRACE("finished");
-        return;
-    }
-
-    if(disp_refr->driver->direct_mode && disp_refr->driver->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
-        LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
-        return;
-    }
-
-    lv_refr_join_area();
-
-    refr_invalid_areas();
-
-
-    /*If refresh happened ...*/
-    if(disp_refr->inv_p != 0) {
-        if(disp_refr->driver->full_refresh) {
-            lv_area_t disp_area;
-            lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
-            disp_refr->driver->draw_ctx->buf_area = &disp_area;
-            draw_buf_flush(disp_refr);
-        }
-
-        /*Clean up*/
-        lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
-        lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
-        disp_refr->inv_p = 0;
-
-        elaps = lv_tick_elaps(start);
-
-        /*Call monitor cb if present*/
-        if(disp_refr->driver->monitor_cb) {
-            disp_refr->driver->monitor_cb(disp_refr->driver, elaps, px_num);
-        }
-    }
-
-    _lv_font_clean_up_fmt_txt();
-
-#if LV_USE_DRAW_MASKS
-    _lv_draw_mask_cleanup();
-#endif
+    uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
+    disp_refr->last_render_start_time = start;
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
     lv_obj_t * perf_label = perf_monitor.perf_label;
@@ -443,6 +392,57 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
                               used_kb, used_kb_tenth, mon.used_pct,
                               mon.frag_pct);
     }
+#endif
+
+    /*Refresh the screen's layout if required*/
+    lv_obj_update_layout(disp_refr->act_scr);
+    if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
+
+    lv_obj_update_layout(disp_refr->top_layer);
+    lv_obj_update_layout(disp_refr->sys_layer);
+
+    /*Do nothing if there is no active screen*/
+    if(disp_refr->act_scr == NULL) {
+        disp_refr->inv_p = 0;
+        LV_LOG_WARN("there is no active screen");
+        REFR_TRACE("finished");
+        return;
+    }
+
+    if(disp_refr->driver->direct_mode && disp_refr->driver->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
+        LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
+        return;
+    }
+
+    lv_refr_join_area();
+
+    refr_invalid_areas();
+
+
+    /*If refresh happened ...*/
+    if(disp_refr->inv_p != 0) {
+        if(disp_refr->driver->full_refresh) {
+            lv_area_t disp_area;
+            lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
+            disp_refr->driver->draw_ctx->buf_area = &disp_area;
+            draw_buf_flush(disp_refr);
+        }
+
+        /*Clean up*/
+        lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
+        lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
+        disp_refr->inv_p = 0;
+
+        /*Call monitor cb if present*/
+        if(disp_refr->driver->monitor_cb) {
+            disp_refr->driver->monitor_cb(disp_refr->driver, elaps, px_num);
+        }
+    }
+
+    _lv_font_clean_up_fmt_txt();
+
+#if LV_USE_DRAW_MASKS
+    _lv_draw_mask_cleanup();
 #endif
 
     REFR_TRACE("finished");
@@ -1272,4 +1272,3 @@ static void mem_monitor_init(mem_monitor_t * _mem_monitor)
     _mem_monitor->mem_label = NULL;
 }
 #endif
-
