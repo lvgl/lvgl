@@ -25,7 +25,7 @@ typedef struct {
     SDL_Texture * texture;
     lv_color_t * fb;
     uint8_t zoom;
-} lv_sdl_disp_t;
+} lv_sdl_window_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -34,7 +34,7 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
 static void window_create(lv_disp_t * disp);
 static void window_update(lv_disp_t * disp);
 static void clean_up(lv_disp_t * disp);
-static void texture_update(lv_disp_t * disp);
+static void texture_resize(lv_disp_t * disp);
 static void sdl_event_handler(lv_timer_t * t);
 
 /***********************
@@ -59,8 +59,7 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
-
-lv_disp_t * lv_sdl_disp_create(void)
+lv_disp_t * lv_sdl_window_create(void)
 {
     static bool inited = false;
     if(!inited) {
@@ -70,10 +69,10 @@ lv_disp_t * lv_sdl_disp_create(void)
         inited = true;
     }
 
-    lv_sdl_disp_t * dsc = lv_malloc(sizeof(lv_sdl_disp_t));
+    lv_sdl_window_t * dsc = lv_malloc(sizeof(lv_sdl_window_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
-    lv_memzero(dsc, sizeof(lv_sdl_disp_t));
+    lv_memzero(dsc, sizeof(lv_sdl_window_t));
 
     lv_disp_t * disp = lv_disp_create();
     if(disp == NULL) {
@@ -91,18 +90,27 @@ lv_disp_t * lv_sdl_disp_create(void)
     return disp;
 }
 
-uint8_t lv_sdl_disp_get_zoom(lv_disp_t * disp)
+void lv_sdl_window_set_zoom(lv_disp_t * disp, uint8_t zoom)
 {
-    lv_sdl_disp_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = disp->user_data;
+    dsc->zoom = zoom;
+    texture_resize(disp);
+    lv_refr_now(disp);
+}
+
+uint8_t lv_sdl_window_get_zoom(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = disp->user_data;
     return dsc->zoom;
 }
+
 
 
 lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
     while(disp) {
-        lv_sdl_disp_t * dsc = disp->user_data;
+        lv_sdl_window_t * dsc = disp->user_data;
         if(SDL_GetWindowID(dsc->window) == win_id) {
             return disp;
         }
@@ -149,6 +157,7 @@ static void sdl_event_handler(lv_timer_t * t)
         if(event.type == SDL_WINDOWEVENT) {
             lv_disp_t * disp = _lv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
+            lv_sdl_window_t * dsc = disp->user_data;
 
             switch(event.window.event) {
 #if SDL_VERSION_ATLEAST(2, 0, 5)
@@ -158,7 +167,7 @@ static void sdl_event_handler(lv_timer_t * t)
                     window_update(disp);
                     break;
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    lv_disp_set_resolution(disp, event.window.data1, event.window.data2);
+                    lv_disp_set_resolution(disp, event.window.data1 / dsc->zoom, event.window.data2 / dsc->zoom);
                     lv_refr_now(disp);
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
@@ -178,7 +187,7 @@ static void sdl_event_handler(lv_timer_t * t)
 
 static void clean_up(lv_disp_t * disp)
 {
-    lv_sdl_disp_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = disp->user_data;
     SDL_DestroyTexture(dsc->texture);
     SDL_DestroyRenderer(dsc->renderer);
     SDL_DestroyWindow(dsc->window);
@@ -186,7 +195,7 @@ static void clean_up(lv_disp_t * disp)
 
 static void window_create(lv_disp_t * disp)
 {
-    lv_sdl_disp_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = disp->user_data;
     dsc->zoom = 1;
 
     int flag = SDL_WINDOW_RESIZABLE;
@@ -201,13 +210,13 @@ static void window_create(lv_disp_t * disp)
                                    hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
-    texture_update(disp);
+    texture_resize(disp);
     lv_memset(dsc->fb, 0xff, hor_res * ver_res * sizeof(lv_color_t));
 }
 
 static void window_update(lv_disp_t * disp)
 {
-    lv_sdl_disp_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = disp->user_data;
     lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
 
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb, hor_res * sizeof(lv_color_t));
@@ -219,16 +228,16 @@ static void window_update(lv_disp_t * disp)
 }
 
 
-static void texture_update(lv_disp_t * disp)
+static void texture_resize(lv_disp_t * disp)
 {
     lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
     lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
-    lv_sdl_disp_t * dsc = disp->user_data;
+    lv_sdl_window_t * dsc = disp->user_data;
 
     dsc->fb = (lv_color_t *)realloc(dsc->fb, sizeof(lv_color_t) * hor_res * ver_res);
     lv_disp_set_draw_buffers(disp, dsc->fb, NULL, hor_res / ver_res, LV_DISP_RENDER_MODE_DIRECT);
 
-    SDL_SetWindowSize(dsc->window, hor_res, ver_res);
+    SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 
 #if LV_COLOR_DEPTH == 32
@@ -244,13 +253,10 @@ static void texture_update(lv_disp_t * disp)
     SDL_SetTextureBlendMode(dsc->texture, SDL_BLENDMODE_BLEND);
 }
 
-
 static void res_chg_event_cb(lv_event_t * e)
 {
     lv_disp_t * disp = lv_event_get_target(e);
-    texture_update(disp);
+    texture_resize(disp);
 }
-
-
 
 #endif /*LV_USE_SDL*/

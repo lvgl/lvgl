@@ -128,7 +128,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 
     lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
     lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
-    uint8_t zoom = lv_sdl_disp_get_zoom(disp);
+    uint8_t zoom = lv_sdl_window_get_zoom(disp);
 
     switch(event->type) {
         case SDL_MOUSEBUTTONUP:
