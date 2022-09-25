@@ -29,7 +29,7 @@ The bar can be one of the following modes:
 - `LV_BAR_MODE_RANGE` Allows setting the start value too by `lv_bar_set_start_value(bar, new_value, LV_ANIM_ON/OFF)`. The start value always has to be smaller than the end value.
 
 ## Events
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following parts:
+- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` are sent for the following parts:
     - `LV_BAR_DRAW_PART_INDICATOR` The indicator of the bar
         - `part`: `LV_PART_INDICATOR`
         - `draw_area`: area of the indicator

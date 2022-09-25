@@ -38,7 +38,7 @@ lv_obj_t * lv_msgbox_get_btns(lv_obj_t * mbox);
 `lv_msgbox_close(msgbox)` closes (deletes) the message box.
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` is sent by the buttons if one of them is clicked. `LV_OBJ_FLAG_EVENT_BUBBLE` is enabled on the buttons so you can add events to the message box itself.
+- `LV_OBJ_EVENT_VALUE_CHANGED` is sent by the buttons if one of them is clicked. `LV_OBJ_FLAG_EVENT_BUBBLE` is enabled on the buttons so you can add events to the message box itself.
 In the event handler, `lv_event_get_target(e)` will return the button matrix and `lv_event_get_current_target(e)` will return the message box. `lv_msgbox_get_active_btn(msgbox)` and `lv_msgbox_get_active_btn_text(msgbox)` can be used to get the index and text of the clicked button.
 
 Learn more about [Events](/overview/event).

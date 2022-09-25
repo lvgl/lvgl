@@ -26,7 +26,7 @@ The current color mode can be manually selected with `lv_colorwheel_set_mode(col
 The color mode can be fixed (so as to not change with long press) using `lv_colorwheel_set_mode_fixed(colorwheel, true)`
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` Sent if a new color is selected.
+- `LV_OBJ_EVENT_VALUE_CHANGED` Sent if a new color is selected.
 
 Learn more about [Events](/overview/event).
 

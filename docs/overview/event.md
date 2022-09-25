@@ -11,7 +11,7 @@ Events are triggered in LVGL when something happens which might be interesting t
 The user can assign callback functions to an object to see its events. In practice, it looks like this:
 ```c
 lv_obj_t * btn = lv_btn_create(lv_scr_act());
-lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
+lv_obj_add_event_cb(btn, my_event_cb, LV_OBJ_EVENT_CLICKED, NULL);   /*Assign an event callback*/
 
 ...
 
@@ -20,22 +20,22 @@ static void my_event_cb(lv_event_t * event)
     printf("Clicked\n");
 }
 ```
-In the example `LV_EVENT_CLICKED` means that only the click event will call `my_event_cb`. See the [list of event codes](#event-codes) for all the options.
-`LV_EVENT_ALL` can be used to receive all events.
+In the example `LV_OBJ_EVENT_CLICKED` means that only the click event will call `my_event_cb`. See the [list of event codes](#event-codes) for all the options.
+`LV_OBJ_EVENT_ALL` can be used to receive all events.
 
 The last parameter of `lv_obj_add_event_cb` is a pointer to any custom data that will be available in the event. It will be described later in more detail.
 
 More events can be added to an object, like this:
 ```c
-lv_obj_add_event_cb(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
-lv_obj_add_event_cb(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
-lv_obj_add_event_cb(obj, my_event_cb_3, LV_EVENT_ALL, NULL);		/*No filtering, receive all events*/
+lv_obj_add_event_cb(obj, my_event_cb_1, LV_OBJ_EVENT_CLICKED, NULL);
+lv_obj_add_event_cb(obj, my_event_cb_2, LV_OBJ_EVENT_PRESSED, NULL);
+lv_obj_add_event_cb(obj, my_event_cb_3, LV_OBJ_EVENT_ALL, NULL);		/*No filtering, receive all events*/
 ```
 
 Even the same event callback can be used on an object with different `user_data`. For example:
 ```c
-lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
-lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
+lv_obj_add_event_cb(obj, increment_on_click, LV_OBJ_EVENT_CLICKED, &num1);
+lv_obj_add_event_cb(obj, increment_on_click, LV_OBJ_EVENT_CLICKED, &num2);
 ```
 
 The events will be called in the order as they were added.
@@ -66,61 +66,61 @@ However, the *Special events* are specific to a particular widget type. See the 
 The following event codes exist:
 
 ### Input device events
-- `LV_EVENT_PRESSED`      An object has been pressed
-- `LV_EVENT_PRESSING`     An object is being pressed (called continuously while pressing)
-- `LV_EVENT_PRESS_LOST`   An object is still being pressed but slid cursor/finger off of the object
-- `LV_EVENT_SHORT_CLICKED`    An object was pressed for a short period of time, then released. Not called if scrolled.
-- `LV_EVENT_LONG_PRESSED` An object has been pressed for at least the `long_press_time` specified in the input device driver.  Not called if scrolled.
-- `LV_EVENT_LONG_PRESSED_REPEAT`  Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.
-- `LV_EVENT_CLICKED`      Called on release if an object did not scroll (regardless of long press)
-- `LV_EVENT_RELEASED`     Called in every case when an object has been released
-- `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required.
-- `LV_EVENT_SCROLL_THROW_BEGIN` Sent once when the object is released while scrolling but the "momentum" still keeps the content scrolling. 
-- `LV_EVENT_SCROLL_END`   Scrolling ends.
-- `LV_EVENT_SCROLL`       An object was scrolled
-- `LV_EVENT_GESTURE`      A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());`
-- `LV_EVENT_KEY`          A key is sent to an object. Get the key with `lv_indev_get_key(lv_indev_get_act());`
-- `LV_EVENT_FOCUSED`      An object is focused
-- `LV_EVENT_DEFOCUSED`    An object is unfocused
-- `LV_EVENT_LEAVE`        An object is unfocused but still selected
-- `LV_EVENT_HIT_TEST`     Perform advanced hit-testing. Use `lv_hit_test_info_t * a = lv_event_get_hit_test_info(e)` and check if `a->point` can click the object or not. If not set `a->res = false`
+- `LV_OBJ_EVENT_PRESSED`      An object has been pressed
+- `LV_OBJ_EVENT_PRESSING`     An object is being pressed (called continuously while pressing)
+- `LV_OBJ_EVENT_PRESS_LOST`   An object is still being pressed but slid cursor/finger off of the object
+- `LV_OBJ_EVENT_SHORT_CLICKED`    An object was pressed for a short period of time, then released. Not called if scrolled.
+- `LV_OBJ_EVENT_LONG_PRESSED` An object has been pressed for at least the `long_press_time` specified in the input device driver.  Not called if scrolled.
+- `LV_OBJ_EVENT_LONG_PRESSED_REPEAT`  Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.
+- `LV_OBJ_EVENT_CLICKED`      Called on release if an object did not scroll (regardless of long press)
+- `LV_OBJ_EVENT_RELEASED`     Called in every case when an object has been released
+- `LV_OBJ_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required.
+- `LV_OBJ_EVENT_SCROLL_THROW_BEGIN` Sent once when the object is released while scrolling but the "momentum" still keeps the content scrolling.
+- `LV_OBJ_EVENT_SCROLL_END`   Scrolling ends.
+- `LV_OBJ_EVENT_SCROLL`       An object was scrolled
+- `LV_OBJ_EVENT_GESTURE`      A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());`
+- `LV_OBJ_EVENT_KEY`          A key is sent to an object. Get the key with `lv_indev_get_key(lv_indev_get_act());`
+- `LV_OBJ_EVENT_FOCUSED`      An object is focused
+- `LV_OBJ_EVENT_DEFOCUSED`    An object is unfocused
+- `LV_OBJ_EVENT_LEAVE`        An object is unfocused but still selected
+- `LV_OBJ_EVENT_HIT_TEST`     Perform advanced hit-testing. Use `lv_hit_test_info_t * a = lv_event_get_hit_test_info(e)` and check if `a->point` can click the object or not. If not set `a->res = false`
 
 
 ### Drawing events
-- `LV_EVENT_COVER_CHECK` Check if an object fully covers an area. The event parameter is `lv_cover_check_info_t *`.
-- `LV_EVENT_REFR_EXT_DRAW_SIZE`  Get the required extra draw area around an object (e.g. for a shadow). The event parameter is `lv_coord_t *` to store the size. Only overwrite it with a larger value.
-- `LV_EVENT_DRAW_MAIN_BEGIN` Starting the main drawing phase.
-- `LV_EVENT_DRAW_MAIN`   Perform the main drawing
-- `LV_EVENT_DRAW_MAIN_END`   Finishing the main drawing phase
-- `LV_EVENT_DRAW_POST_BEGIN` Starting the post draw phase (when all children are drawn)
-- `LV_EVENT_DRAW_POST`   Perform the post draw phase (when all children are drawn)
-- `LV_EVENT_DRAW_POST_END`   Finishing the post draw phase (when all children are drawn)
-- `LV_EVENT_DRAW_PART_BEGIN` Starting to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
-- `LV_EVENT_DRAW_PART_END`   Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
+- `LV_OBJ_EVENT_COVER_CHECK` Check if an object fully covers an area. The event parameter is `lv_cover_check_info_t *`.
+- `LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE`  Get the required extra draw area around an object (e.g. for a shadow). The event parameter is `lv_coord_t *` to store the size. Only overwrite it with a larger value.
+- `LV_OBJ_EVENT_DRAW_MAIN_BEGIN` Starting the main drawing phase.
+- `LV_OBJ_EVENT_DRAW_MAIN`   Perform the main drawing
+- `LV_OBJ_EVENT_DRAW_MAIN_END`   Finishing the main drawing phase
+- `LV_OBJ_EVENT_DRAW_POST_BEGIN` Starting the post draw phase (when all children are drawn)
+- `LV_OBJ_EVENT_DRAW_POST`   Perform the post draw phase (when all children are drawn)
+- `LV_OBJ_EVENT_DRAW_POST_END`   Finishing the post draw phase (when all children are drawn)
+- `LV_OBJ_EVENT_DRAW_PART_BEGIN` Starting to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
+- `LV_OBJ_EVENT_DRAW_PART_END`   Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
 
-In `LV_EVENT_DRAW_...` events it's not allowed to adjust the widgets' properties. E.g. you can not call `lv_obj_set_width()`.
+In `LV_OBJ_EVENT_DRAW_...` events it's not allowed to adjust the widgets' properties. E.g. you can not call `lv_obj_set_width()`.
 In other words only `get` functions can be called.
 
 ### Other events
-- `LV_EVENT_DELETE`       Object is being deleted
-- `LV_EVENT_CHILD_CHANGED`    Child was removed/added
-- `LV_EVENT_CHILD_CREATED`    Child was created, always bubbles up to all parents
-- `LV_EVENT_CHILD_DELETED`    Child was deleted, always bubbles up to all parents
-- `LV_EVENT_SIZE_CHANGED`    Object coordinates/size have changed
-- `LV_EVENT_STYLE_CHANGED`    Object's style has changed
-- `LV_EVENT_BASE_DIR_CHANGED` The base dir has changed
-- `LV_EVENT_GET_SELF_SIZE`    Get the internal size of a widget
-- `LV_EVENT_SCREEN_UNLOAD_START` A screen unload started, fired immediately when lv_scr_load/lv_scr_load_anim is called
-- `LV_EVENT_SCREEN_LOAD_START` A screen load started, fired when the screen change delay is expired
-- `LV_EVENT_SCREEN_LOADED`    A screen was loaded, called when all animations are finished
-- `LV_EVENT_SCREEN_UNLOADED`  A screen was unloaded, called when all animations are finished
+- `LV_OBJ_EVENT_DELETE`       Object is being deleted
+- `LV_OBJ_EVENT_CHILD_CHANGED`    Child was removed/added
+- `LV_OBJ_EVENT_CHILD_CREATED`    Child was created, always bubbles up to all parents
+- `LV_OBJ_EVENT_CHILD_DELETED`    Child was deleted, always bubbles up to all parents
+- `LV_OBJ_EVENT_SIZE_CHANGED`    Object coordinates/size have changed
+- `LV_OBJ_EVENT_STYLE_CHANGED`    Object's style has changed
+- `LV_OBJ_EVENT_BASE_DIR_CHANGED` The base dir has changed
+- `LV_OBJ_EVENT_GET_SELF_SIZE`    Get the internal size of a widget
+- `LV_OBJ_EVENT_SCREEN_UNLOAD_START` A screen unload started, fired immediately when lv_scr_load/lv_scr_load_anim is called
+- `LV_OBJ_EVENT_SCREEN_LOAD_START` A screen load started, fired when the screen change delay is expired
+- `LV_OBJ_EVENT_SCREEN_LOADED`    A screen was loaded, called when all animations are finished
+- `LV_OBJ_EVENT_SCREEN_UNLOADED`  A screen was unloaded, called when all animations are finished
 
 ### Special events
-- `LV_EVENT_VALUE_CHANGED`    The object's value has changed (i.e. slider moved)
-- `LV_EVENT_INSERT`       Text is being inserted into the object. The event data is `char *` being inserted.
-- `LV_EVENT_REFRESH`      Notify the object to refresh something on it (for the user)
-- `LV_EVENT_READY`        A process has finished
-- `LV_EVENT_CANCEL`       A process has been canceled
+- `LV_OBJ_EVENT_VALUE_CHANGED`    The object's value has changed (i.e. slider moved)
+- `LV_OBJ_EVENT_INSERT`       Text is being inserted into the object. The event data is `char *` being inserted.
+- `LV_OBJ_EVENT_REFRESH`      Notify the object to refresh something on it (for the user)
+- `LV_OBJ_EVENT_READY`        A process has finished
+- `LV_OBJ_EVENT_CANCEL`       A process has been canceled
 
 
 ### Custom events
@@ -136,12 +136,12 @@ For example, this can be used to manually close a message box by simulating a bu
 ```c
 /*Simulate the press of the first button (indexes start from zero)*/
 uint32_t btn_id = 0;
-lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
+lv_event_send(mbox, LV_OBJ_EVENT_VALUE_CHANGED, &btn_id);
 ```
 
 ### Refresh event
 
-`LV_EVENT_REFRESH` is a special event because it's designed to let the user notify an object to refresh itself. Some examples:
+`LV_OBJ_EVENT_REFRESH` is a special event because it's designed to let the user notify an object to refresh itself. Some examples:
 - notify a label to refresh its text according to one or more variables (e.g. current time)
 - refresh a label when the language changes
 - enable a button if some conditions are met (e.g. the correct PIN is entered)

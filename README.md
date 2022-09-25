@@ -89,7 +89,7 @@ If LVGL saved you a lot of time and money or you just had fun using it, consider
 Our goal is to provide financial compensation for people who do the most for LVGL. It means not only the maintainers but anyone who implements a great feature should get a payment from the accumulated money. We use the donations to cover our operational costs like servers and related services.
 
 **How to donate?**<br>
-We use [Open Collective](https://opencollective.com/lvgl) where you can easily send one time or recurring donations. You can also see all of our expenses  in a transparent way. 
+We use [Open Collective](https://opencollective.com/lvgl) where you can easily send one time or recurring donations. You can also see all of our expenses  in a transparent way.
 
 **How to get paid for your contribution?**<br>
 If someone implements or fixes an issue labeled as [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) he or she will get a payment for that work. We estimate the required time, complexity and importance of the issue and set a price accordingly. To jump in just comment on a [Sponsored](https://github.com/lvgl/lvgl/labels/Sponsored) issue saying "Hi, I'd like to deal with it. This is how I'm planning to fix/implement it...". A work is considered ready when it's approved and merged by a maintainer. After that you can submit and expense at [opencollective.com](https://opencollective.com/lvgl) and you will receive teh payment in a few days.
@@ -129,7 +129,7 @@ For more examples check out the [Examples](https://github.com/lvgl/lvgl/tree/mas
 lv_obj_t * btn = lv_btn_create(lv_scr_act());                   /*Add a button to the current screen*/
 lv_obj_center(btn);                                             /*Set its position*/
 lv_obj_set_size(btn, 100, 50);                                  /*Set its size*/
-lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+lv_obj_add_event_cb(btn, btn_event_cb, LV_OBJ_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
 
 lv_obj_t * label = lv_label_create(btn);                        /*Add a label to the button*/
 lv_label_set_text(label, "Button");                             /*Set the labels text*/
@@ -177,22 +177,22 @@ lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, L
 lv_obj_t * cb;
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Apple");
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Banana");
 lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Lemon");
 lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melon\nand a new line");
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 ```
 
 </details>

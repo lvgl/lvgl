@@ -36,7 +36,7 @@ Instead of the regular `lv_obj_add/clear_state()` functions the `lv_imgbtn_set_s
 
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` Sent when the button is toggled.
+- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when the button is toggled.
 
 Learn more about [Events](/overview/event).
 

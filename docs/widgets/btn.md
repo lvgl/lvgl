@@ -17,13 +17,13 @@ Buttons, by default, differ from Base object in the following ways:
 There are no new features compared to [Base object](/widgets/obj).
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` when the `LV_OBJ_FLAG_CHECKABLE` flag is enabled and the object is clicked. The event happens on transition to/from the checked state.
+- `LV_OBJ_EVENT_VALUE_CHANGED` when the `LV_OBJ_FLAG_CHECKABLE` flag is enabled and the object is clicked. The event happens on transition to/from the checked state.
 
 
 Learn more about [Events](/overview/event).
 
 ## Keys
-Note that the state of `LV_KEY_ENTER` is translated to `LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
+Note that the state of `LV_KEY_ENTER` is translated to `LV_OBJ_EVENT_PRESSED/PRESSING/RELEASED` etc.
 
 See the events of the [Base object](/widgets/obj) too.
 

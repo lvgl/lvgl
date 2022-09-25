@@ -27,7 +27,7 @@ The Tile view can scroll to a tile with `lv_obj_set_tile(tileview, tile_obj, LV_
 
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` Sent when a new tile loaded by scrolling. `lv_tileview_get_tile_act(tabview)` can be used to get current tile.
+- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when a new tile loaded by scrolling. `lv_tileview_get_tile_act(tabview)` can be used to get current tile.
 
 ## Keys
 *Keys* are not handled by the Tile view.

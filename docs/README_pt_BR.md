@@ -138,7 +138,7 @@ Veja como criar um botão com um evento de clique em C e MicroPython. Para mais 
 lv_obj_t * btn = lv_btn_create(lv_scr_act());                   /* Adiciona o botão a tela atual */
 lv_obj_center(btn);                                             /* Define a posição do botão */
 lv_obj_set_size(btn, 100, 50);                                  /* Define o tamanho do botão */
-lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /* Atribui um retorno de chamada (callback) ao botão */
+lv_obj_add_event_cb(btn, btn_event_cb, LV_OBJ_EVENT_CLICKED, NULL); /* Atribui um retorno de chamada (callback) ao botão */
 
 lv_obj_t * label = lv_label_create(btn);                        /* Adiciona um rótulo (label) */
 lv_label_set_text(label, "Botão");                              /* Define um texto para o rótulo (label) */
@@ -186,22 +186,22 @@ lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, L
 lv_obj_t * cb;
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Maça");
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Banana");
 lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Limão");
 lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melão\ne uma nova linha");
-lv_obj_add_event_cb(cb, event_handler, LV_EVENT_ALL, NULL);
+lv_obj_add_event_cb(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
 ```
 </details>
 

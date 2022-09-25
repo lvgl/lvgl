@@ -30,7 +30,7 @@ Note that the cursor object should have `lv_obj_clear_flag(cursor_obj, LV_OBJ_FL
 For images, *clicking* is disabled by default.
 
 ### Gestures
-Pointer input devices can detect basic gestures. By default, most of the widgets send the gestures to its parent, so finally the gestures can be detected on the screen object in a form of an `LV_EVENT_GESTURE` event. For example:
+Pointer input devices can detect basic gestures. By default, most of the widgets send the gestures to its parent, so finally the gestures can be detected on the screen object in a form of an `LV_OBJ_EVENT_GESTURE` event. For example:
 
 ```c
 void my_event(lv_event_t * e)
@@ -55,7 +55,7 @@ void my_event(lv_event_t * e)
 
 ...
 
-lv_obj_add_event_cb(screen1, my_event, LV_EVENT_GESTURE, NULL);
+lv_obj_add_event_cb(screen1, my_event, LV_OBJ_EVENT_GESTURE, NULL);
 ```
 
 To prevent passing the gesture event to the parent from an object use `lv_obj_clear_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.
@@ -85,7 +85,7 @@ To associate a group with an input device use `lv_indev_set_group(indev, g)`, wh
 There are some predefined keys which have special meaning:
 - **LV_KEY_NEXT** Focus on the next object
 - **LV_KEY_PREV** Focus on the previous object
-- **LV_KEY_ENTER** Triggers `LV_EVENT_PRESSED/CLICKED/LONG_PRESSED` etc. events
+- **LV_KEY_ENTER** Triggers `LV_OBJ_EVENT_PRESSED/CLICKED/LONG_PRESSED` etc. events
 - **LV_KEY_UP** Increase value or move upwards
 - **LV_KEY_DOWN** Decrease value or move downwards
 - **LV_KEY_RIGHT** Increase value or move to the right

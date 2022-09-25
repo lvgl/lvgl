@@ -86,16 +86,16 @@ You can customize the sorting. Before custom sort, please set the default sortin
 - `LV_EXPLORER_SORT_NONE`
 - `LV_EXPLORER_SORT_KIND`
 
-您可以自定义排序规则，在这之前请先将排序规则设置为 `LV_EXPLORER_SORT_NONE` 然后在 `LV_EVENT_READY` 事件中处理。默认的排序规则是 `LV_EXPLORER_SORT_NONE`
+您可以自定义排序规则，在这之前请先将排序规则设置为 `LV_EXPLORER_SORT_NONE` 然后在 `LV_OBJ_EVENT_READY` 事件中处理。默认的排序规则是 `LV_EXPLORER_SORT_NONE`
 
 </p>
 </details>
 
 ## Event
 
-- `LV_EVENT_READY` sent shen a directory is opened. You can customize the sort.
+- `LV_OBJ_EVENT_READY` sent shen a directory is opened. You can customize the sort.
 
-- `LV_EVENT_VALUE_CHANGED` sent when an item(file) in the file list is clicked.
+- `LV_OBJ_EVENT_VALUE_CHANGED` sent when an item(file) in the file list is clicked.
 
 You can use `lv_file_explorer_get_cur_path` to get the current path and `lv_file_explorer_get_sel_fn` to get the name of the currently selected file in the event processing function. For example:
 
@@ -105,7 +105,7 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
+    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
         char * cur_path =  lv_file_explorer_get_cur_path(obj);
         char * sel_fn = lv_file_explorer_get_sel_fn(obj);
         LV_LOG_USER("%s%s", cur_path, sel_fn);
@@ -119,8 +119,8 @@ You can also save the obtained **path** and **file** name into an array through 
 <summary>中文</summary>
 <p>
 
-- 当打开一个目录后会发送 `LV_EVENT_READY` 事件。您可以在这里自定义排序规则。
-- 当文件列表中的项目（文件）被点击时会发送 `LV_EVENT_VALUE_CHANGED` 事件。
+- 当打开一个目录后会发送 `LV_OBJ_EVENT_READY` 事件。您可以在这里自定义排序规则。
+- 当文件列表中的项目（文件）被点击时会发送 `LV_OBJ_EVENT_VALUE_CHANGED` 事件。
 
 可以在事件处理函数中通过 `lv_file_explorer_get_cur_path` 获取当前所在的路径，通过 `lv_file_explorer_get_sel_fn` 获取当前选中的文件的名称。比如：
 
@@ -130,7 +130,7 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
+    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
         char * cur_path =  lv_file_explorer_get_cur_path(obj);
         char * sel_fn = lv_file_explorer_get_sel_fn(obj);
         LV_LOG_USER("%s%s", cur_path, sel_fn);
@@ -138,7 +138,7 @@ static void file_explorer_event_handler(lv_event_t * e)
 }
 ```
 
-您还可以将获取到的 **路径** 和 **文件名称** 通过例如 strcpy 和 strcat 函数保存到一个数组中，方便后续使用。 
+您还可以将获取到的 **路径** 和 **文件名称** 通过例如 strcpy 和 strcat 函数保存到一个数组中，方便后续使用。
 
 </p>
 </details>

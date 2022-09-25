@@ -116,7 +116,7 @@ void lv_obj_del(lv_obj_t * obj);
 
 `lv_obj_del` will delete the object immediately.
 If for any reason you can't delete the object immediately you can use `lv_obj_del_async(obj)` which will perform the deletion on the next call of `lv_timer_handler()`.
-This is useful e.g. if you want to delete the parent of an object in the child's `LV_EVENT_DELETE` handler.
+This is useful e.g. if you want to delete the parent of an object in the child's `LV_OBJ_EVENT_DELETE` handler.
 
 You can remove all the children of an object (but not the object itself) using `lv_obj_clean(obj)`.
 

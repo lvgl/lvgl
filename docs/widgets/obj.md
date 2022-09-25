@@ -81,9 +81,9 @@ To get an object's screen use the `lv_obj_get_screen(obj)` function.
 
 ### Events
 
-To set an event callback for an object, use `lv_obj_add_event_cb(obj, event_cb, LV_EVENT_..., user_data)`,
+To set an event callback for an object, use `lv_obj_add_event_cb(obj, event_cb, LV_OBJ_EVENT_..., user_data)`,
 
-To manually send an event to an object, use `lv_event_send(obj, LV_EVENT_..., param)`
+To manually send an event to an object, use `lv_event_send(obj, LV_OBJ_EVENT_..., param)`
 
 Read the [Event overview](/overview/event) to learn more about events.
 
@@ -155,8 +155,8 @@ Objects are added to a *group* with `lv_group_add_obj(group, obj)`, and you can 
 By default, the objects can be clicked only within their bounding area. However, this can be extended with `lv_obj_set_ext_click_area(obj, size)`.
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` when the `LV_OBJ_FLAG_CHECKABLE` flag is enabled and the object clicked (on transition to/from the checked state)
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` is sent for the following types:
+- `LV_OBJ_EVENT_VALUE_CHANGED` when the `LV_OBJ_FLAG_CHECKABLE` flag is enabled and the object clicked (on transition to/from the checked state)
+- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` is sent for the following types:
     - `LV_OBJ_DRAW_PART_RECTANGLE` The main rectangle
        - `part`: `LV_PART_MAIN`
        - `rect_dsc`

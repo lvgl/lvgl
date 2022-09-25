@@ -88,7 +88,7 @@ lv_rlottie_set_play_mode(lottie, LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_FORWARD)
 
 The default animation mode is **play forward with loop**.
 
-If you don't enable looping, a `LV_EVENT_READY` is sent when the animation can not make more progress without looping.
+If you don't enable looping, a `LV_OBJ_EVENT_READY` is sent when the animation can not make more progress without looping.
 
 To get the number of frames in an animation or the current frame index, you can cast the `lv_obj_t` instance to a `lv_rlottie_t` instance and inspect the `current_frame` and `total_frames` members.
 
@@ -124,7 +124,7 @@ Where the LVGL simulator uses the installed rlottie lib, the IDF works best when
 
 ```
 cd 'your/project/directory'
-git add submodule 
+git add submodule
 git add submodule https://github.com/Samsung/rlottie.git ./components/rlottie/rlottie
 git submodule update --init --recursive
 ```
@@ -157,7 +157,7 @@ While unecessary, removing the rlottie/rlottie/example folder can remove many un
 
 From here, you can use the relevant LVGL lv_rlottie functions to create lottie animations in LVGL on embedded hardware!
 
-Please note, that while lottie animations are capable of running on many ESP chips, below is recommended for best performance. 
+Please note, that while lottie animations are capable of running on many ESP chips, below is recommended for best performance.
 
 * ESP32-S3-WROOM-1-N16R8
   * 16mb quad spi flash

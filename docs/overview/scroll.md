@@ -51,9 +51,9 @@ or on the object's or any parent's main part to make a scrollbar inherit the bas
 
 ### Events
 The following events are related to scrolling:
-- `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required.
-- `LV_EVENT_SCROLL_END` Scrolling ends.
-- `LV_EVENT_SCROLL` Scroll happened. Triggered on every position change.
+- `LV_OBJ_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required.
+- `LV_OBJ_EVENT_SCROLL_END` Scrolling ends.
+- `LV_OBJ_EVENT_SCROLL` Scroll happened. Triggered on every position change.
 Scroll events
 
 ## Basic example
@@ -149,7 +149,7 @@ static void store_scroll_value_event_cb(lv_event_t* e) {
 }
 
 lv_obj_t* container = lv_obj_create(NULL);
-lv_obj_add_event_cb(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
+lv_obj_add_event_cb(container, store_scroll_value_event_cb, LV_OBJ_EVENT_SCROLL, NULL);
 ```
 
 Scrool coordinates can be retrieve from differents axes with these functions:
@@ -170,9 +170,9 @@ If the user sets only 200 px height for the table LVGL will see that the self si
 
 This means not only the children can make an object scrollable but a larger self size will too.
 
-LVGL uses the `LV_EVENT_GET_SELF_SIZE` event to get the self size of an object. Here is an example to see how to handle the event:
+LVGL uses the `LV_OBJ_EVENT_GET_SELF_SIZE` event to get the self size of an object. Here is an example to see how to handle the event:
 ```c
-if(event_code == LV_EVENT_GET_SELF_SIZE) {
+if(event_code == LV_OBJ_EVENT_GET_SELF_SIZE) {
 	lv_point_t * p = lv_event_get_param(e);
 
   //If x or y < 0 then it doesn't neesd to be calculated now

@@ -33,7 +33,7 @@ In addition to the width, each button can be customized with the following param
 - `LV_BTNMATRIX_CTRL_DISABLED` Makes a button disabled Like `LV_STATE_DISABLED` on normal objects
 - `LV_BTNMATRIX_CTRL_CHECKABLE` Enable toggling of a button. I.e. `LV_STATE_CHECHED` will be added/removed as the button is clicked
 - `LV_BTNMATRIX_CTRL_CHECKED` Make the button checked. It will use the `LV_STATE_CHECHKED` styles.
-- `LV_BTNMATRIX_CTRL_CLICK_TRIG` Enabled: send LV_EVENT_VALUE_CHANGE on CLICK, Disabled: send LV_EVENT_VALUE_CHANGE on PRESS
+- `LV_BTNMATRIX_CTRL_CLICK_TRIG` Enabled: send LV_OBJ_EVENT_VALUE_CHANGE on CLICK, Disabled: send LV_OBJ_EVENT_VALUE_CHANGE on PRESS
 - `LV_BTNMATRIX_CTRL_POPOVER` Show the button label in a popover when pressing this key
 - `LV_BTNMATRIX_CTRL_RECOLOR` Enable recoloring of button texts with `#`. E.g. `"It's #ff0000 red#"`
 - `LV_BTNMATRIX_CTRL_CUSTOM_1` Custom free to use flag
@@ -55,8 +55,8 @@ The number of elements should be equal to the number of buttons (excluding newli
 The "One check" feature can be enabled with `lv_btnmatrix_set_one_checked(btnm, true)` to allow only one button to be checked at a time.
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` Sent when a button is pressed/released or repeated after long press. The event parameter is set to the ID of the pressed/released button.
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following types:
+- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when a button is pressed/released or repeated after long press. The event parameter is set to the ID of the pressed/released button.
+- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` are sent for the following types:
     - `LV_BTNMATRIX_DRAW_PART_BTN` The individual buttons.
         - `part`: `LV_PART_ITEMS`
         - `id`:index of the button being drawn

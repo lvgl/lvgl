@@ -126,8 +126,8 @@ The possible values of `dir`  `LV_DIR_NONE/RIGHT/UP/LEFT/DOWN/HOR/VER/ALL` or th
 `lv_chart_set_cursor_point(chart, cursor, series, point_id)` sticks the cursor at a point. If the point's position changes (new value or scrolling) the cursor will move with the point.
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` Sent when a new point is clicked pressed.  `lv_chart_get_pressed_point(chart)` returns the zero-based index of the pressed point.
-- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent with the following types:
+- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when a new point is clicked pressed.  `lv_chart_get_pressed_point(chart)` returns the zero-based index of the pressed point.
+- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` are sent with the following types:
    - `LV_CHART_DRAW_PART_DIV_LINE_INIT`  Used before/after drawn the div lines to add masks to any extra drawings. The following fields are set:
        -  `part`: `LV_PART_MAIN`
        - `line_dsc`
