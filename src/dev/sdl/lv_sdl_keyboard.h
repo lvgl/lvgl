@@ -19,22 +19,24 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#ifndef KEYBOARD_BUFFER_SIZE
+#define KEYBOARD_BUFFER_SIZE 32
+#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_sdl_keyboard_priv_t;
 
 typedef struct {
-    struct _lv_sdl_keyboard_priv_t * _priv;
+    char buf[KEYBOARD_BUFFER_SIZE];
+    bool dummy_read;
 } lv_sdl_keyboard_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_sdl_keyboard_t * lv_dev_sdl_keyboard_create(void);
-lv_indev_t * lv_dev_sdl_keyboard_register(lv_sdl_keyboard_t * dev);
+lv_indev_t * lv_sdl_keyboard_create(void);
 
 /**********************
  *      MACROS

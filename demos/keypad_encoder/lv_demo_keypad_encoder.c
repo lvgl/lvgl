@@ -56,11 +56,11 @@ void lv_demo_keypad_encoder(void)
             break;
         }
 
-        if(cur_drv->driver->type == LV_INDEV_TYPE_KEYPAD) {
+        if(cur_drv->type == LV_INDEV_TYPE_KEYPAD) {
             lv_indev_set_group(cur_drv, g);
         }
 
-        if(cur_drv->driver->type == LV_INDEV_TYPE_ENCODER) {
+        if(cur_drv->type == LV_INDEV_TYPE_ENCODER) {
             lv_indev_set_group(cur_drv, g);
         }
     }

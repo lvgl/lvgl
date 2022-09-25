@@ -23,20 +23,12 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_sdl_mouse_priv_t;
-
-typedef struct {
-    struct _lv_sdl_mouse_priv_t * _priv;
-} lv_sdl_mouse_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_sdl_mouse_t * lv_sdl_mouse_create(void);
-
-lv_indev_t * lv_sdl_mouse_register(lv_sdl_mouse_t * dev);
+lv_indev_t * lv_sdl_mouse_create(void);
 
 /**********************
  *      MACROS

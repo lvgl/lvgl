@@ -24,54 +24,39 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void sdl_mouse_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-typedef struct _lv_sdl_mouse_priv_t {
+typedef struct {
     int16_t last_x;
     int16_t last_y;
     bool left_button_down;
-} _lv_sdl_mouse_priv_t;
+} lv_sdl_mouse_t;
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_sdl_mouse_t * lv_sdl_mouse_create(void)
+lv_indev_t * lv_sdl_mouse_create(void)
 {
-    lv_sdl_mouse_t * cfg = lv_malloc(sizeof(lv_sdl_mouse_t));
-    LV_ASSERT_MALLOC(cfg);
-    if(cfg == NULL) return NULL;
+    lv_sdl_mouse_t * dsc = lv_malloc(sizeof(lv_sdl_mouse_t));
+    LV_ASSERT_MALLOC(dsc);
+    if(dsc == NULL) return NULL;
+    lv_memzero(dsc, sizeof(lv_sdl_mouse_t));
 
-    lv_memzero(cfg, sizeof(lv_sdl_mouse_t));
-
-    cfg->_priv = lv_malloc(sizeof(_lv_sdl_mouse_priv_t));
-    LV_ASSERT_MALLOC(cfg->_priv);
-
-    if(cfg->_priv == NULL) {
-        lv_free(cfg);
+    lv_indev_t * indev = lv_indev_create();
+    LV_ASSERT_MALLOC(indev);
+    if(indev == NULL) {
+        lv_free(dsc);
         return NULL;
     }
 
-    lv_memzero(cfg->_priv, sizeof(_lv_sdl_mouse_priv_t));
-    return cfg;
-}
-
-lv_indev_t * lv_sdl_mouse_register(lv_sdl_mouse_t * cfg)
-{
-    lv_indev_drv_t * indev_drv = lv_malloc(sizeof(lv_indev_drv_t));
-    LV_ASSERT_MALLOC(indev_drv);
-
-    if(indev_drv == NULL) return NULL;
-
-    lv_indev_drv_init(indev_drv);
-    indev_drv->type = LV_INDEV_TYPE_POINTER;
-    indev_drv->read_cb = sdl_mouse_read;
-    indev_drv->user_data = cfg;
-    lv_indev_t * indev = lv_indev_drv_register(indev_drv);
+    indev->type = LV_INDEV_TYPE_POINTER;
+    indev->read_cb = sdl_mouse_read;
+    indev->user_data = dsc;
 
     return indev;
 }
@@ -80,14 +65,14 @@ lv_indev_t * lv_sdl_mouse_register(lv_sdl_mouse_t * cfg)
  *   STATIC FUNCTIONS
  **********************/
 
-static void sdl_mouse_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_sdl_mouse_t * dev = indev_drv->user_data;
+    lv_sdl_mouse_t * dev = indev->user_data;
 
     /*Store the collected data*/
-    data->point.x = dev->_priv->last_x;
-    data->point.y = dev->_priv->last_y;
-    data->state = dev->_priv->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+    data->point.x = dev->last_x;
+    data->point.y = dev->last_y;
+    data->state = dev->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 
 
@@ -117,14 +102,14 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(indev->driver->disp == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
+        if(indev->disp == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
             break;
         }
         indev = lv_indev_get_next(indev);
     }
 
     if(indev == NULL) return;
-    lv_sdl_mouse_t * indev_dev = indev->driver->user_data;
+    lv_sdl_mouse_t * indev_dev = indev->user_data;
 
     lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
     lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
@@ -133,33 +118,33 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
     switch(event->type) {
         case SDL_MOUSEBUTTONUP:
             if(event->button.button == SDL_BUTTON_LEFT)
-                indev_dev->_priv->left_button_down = false;
+                indev_dev->left_button_down = false;
             break;
         case SDL_MOUSEBUTTONDOWN:
             if(event->button.button == SDL_BUTTON_LEFT) {
-                indev_dev->_priv->left_button_down = true;
-                indev_dev->_priv->last_x = event->motion.x / zoom;
-                indev_dev->_priv->last_y = event->motion.y / zoom;
+                indev_dev->left_button_down = true;
+                indev_dev->last_x = event->motion.x / zoom;
+                indev_dev->last_y = event->motion.y / zoom;
             }
             break;
         case SDL_MOUSEMOTION:
-            indev_dev->_priv->last_x = event->motion.x / zoom;
-            indev_dev->_priv->last_y = event->motion.y / zoom;
+            indev_dev->last_x = event->motion.x / zoom;
+            indev_dev->last_y = event->motion.y / zoom;
             break;
 
         case SDL_FINGERUP:
-            indev_dev->_priv->left_button_down = false;
-            indev_dev->_priv->last_x = hor_res * event->tfinger.x / zoom;
-            indev_dev->_priv->last_y = ver_res * event->tfinger.y / zoom;
+            indev_dev->left_button_down = false;
+            indev_dev->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->last_y = ver_res * event->tfinger.y / zoom;
             break;
         case SDL_FINGERDOWN:
-            indev_dev->_priv->left_button_down = true;
-            indev_dev->_priv->last_x = hor_res * event->tfinger.x / zoom;
-            indev_dev->_priv->last_y = ver_res * event->tfinger.y / zoom;
+            indev_dev->left_button_down = true;
+            indev_dev->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->last_y = ver_res * event->tfinger.y / zoom;
             break;
         case SDL_FINGERMOTION:
-            indev_dev->_priv->last_x = hor_res * event->tfinger.x / zoom;
-            indev_dev->_priv->last_y = ver_res * event->tfinger.y / zoom;
+            indev_dev->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->last_y = ver_res * event->tfinger.y / zoom;
             break;
     }
 }

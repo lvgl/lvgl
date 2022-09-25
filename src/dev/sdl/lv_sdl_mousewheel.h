@@ -24,19 +24,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_sdl_mousewheel_priv_t;
-
-typedef struct {
-    struct _lv_sdl_mousewheel_priv_t * _priv;
-} lv_sdl_mousewheel_t;
-
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_sdl_mousewheel_t * lv_sdl_mousewheel_create(void);
-lv_indev_t * lv_sdl_mousewheel_register(lv_sdl_mousewheel_t * cfg);
+lv_indev_t * lv_sdl_mousewheel_create(void);
 
 /**********************
  *      MACROS

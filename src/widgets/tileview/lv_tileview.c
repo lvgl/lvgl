@@ -159,7 +159,7 @@ static void tileview_event_cb(lv_event_t * e)
 
     if(code == LV_OBJ_EVENT_SCROLL_END) {
         lv_indev_t * indev = lv_indev_get_act();
-        if(indev && indev->proc.state == LV_INDEV_STATE_PRESSED) {
+        if(indev && indev->state == LV_INDEV_STATE_PRESSED) {
             return;
         }
 
