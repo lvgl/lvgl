@@ -256,13 +256,6 @@ void lv_disp_set_offset(lv_disp_t * disp, lv_coord_t x, lv_coord_t y);
 void lv_disp_set_dpi(lv_disp_t * disp, lv_coord_t dpi);
 
 /**
- * Get the DPI of the display
- * @param disp pointer to a display (NULL to use the default display)
- * @return dpi of the display
- */
-lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp);
-
-/**
  * Get the horizontal resolution of a display
  * @param disp pointer to a display (NULL to use the default display)
  * @return the horizontal resolution of the display
@@ -303,6 +296,13 @@ lv_coord_t lv_disp_get_offset_x(const lv_disp_t * disp);
  * @return the horizontal offset from the full / physical display
  */
 lv_coord_t lv_disp_get_offset_y(const lv_disp_t * disp);
+
+/**
+ * Get the DPI of the display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return dpi of the display
+ */
+lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp);
 
 /*---------------------
  * BUFFERING
@@ -354,8 +354,8 @@ void lv_disp_set_draw_ctx(lv_disp_t * disp,
                           size_t draw_ctx_size);
 
 /*---------------------
-  * SCREENS
-  *--------------------*/
+ * SCREENS
+ *--------------------*/
 
 /**
  * Return with a pointer to the active screen
@@ -437,7 +437,7 @@ static inline void lv_scr_load(lv_obj_t * scr)
 }
 
 /*---------------------
- * Background
+ * BACKGROUND
  *--------------------*/
 
 /**
@@ -460,8 +460,6 @@ void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
  * @param opa opacity (0..255)
  */
 void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
-
-lv_color_t lv_disp_get_chroma_key_color(lv_disp_t * disp);
 
 /**
  * Set the background color of a display
@@ -486,7 +484,7 @@ lv_opa_t lv_disp_get_bg_opa(lv_disp_t * disp);
 
 
 /*---------------------
- * Others
+ * OTHERS
  *--------------------*/
 
 /**
