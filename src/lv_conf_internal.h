@@ -2172,7 +2172,7 @@
     #endif
 #endif
 #if LV_USE_TINY_TTF
-    /*Enable loading TTF files*/
+    /* Enable loading TTF data from files */
     #ifndef LV_TINY_TTF_FILE_SUPPORT
         #ifdef CONFIG_LV_TINY_TTF_FILE_SUPPORT
             #define LV_TINY_TTF_FILE_SUPPORT CONFIG_LV_TINY_TTF_FILE_SUPPORT
@@ -2375,7 +2375,7 @@
             #define LV_FILE_EXPLORER_QUICK_ACCESS        1
         #endif
     #endif
-#endif  
+#endif
 
 /*==================
 * EXAMPLES
