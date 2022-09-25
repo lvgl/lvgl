@@ -42,7 +42,6 @@ set(LVGL_TEST_OPTIONS_MINIMAL_MONOCHROME
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
     -DLV_USE_MSG=1
-    -DLV_USE_TINY_TTF=1
 )
 
 set(LVGL_TEST_OPTIONS_NORMAL_8BIT
@@ -66,7 +65,6 @@ set(LVGL_TEST_OPTIONS_NORMAL_8BIT
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
     -DLV_USE_SJPG=1
-    -DLV_USE_TTF=1
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
     -DLV_USE_MSG=1
@@ -94,7 +92,6 @@ set(LVGL_TEST_OPTIONS_16BIT
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
     -DLV_USE_SJPG=1
-    -DLV_USE_TTF=1
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
     -DLV_USE_MSG=1
@@ -124,7 +121,6 @@ set(LVGL_TEST_OPTIONS_16BIT_SWAP
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
     -DLV_USE_SJPG=1
-    -DLV_USE_TTF=1
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
     -DLV_USE_MSG=1
@@ -193,7 +189,6 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
     -DLV_USE_SJPG=1
-    -DLV_USE_TTF=1
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
     -DLV_USE_FRAGMENT=1
@@ -201,6 +196,7 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_USE_IME_PINYIN=1
     -DLV_USE_MSG=1
     -DLV_USE_FILE_EXPLORER=1
+    -DLV_USE_TINY_TTF=1
 )
 
 set(LVGL_TEST_OPTIONS_TEST_COMMON
@@ -249,7 +245,6 @@ set(LVGL_TEST_OPTIONS_TEST_COMMON
     ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
-    -Wno-unused-variable
 )
 
 set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
@@ -303,7 +298,6 @@ set(COMPILE_OPTIONS
     -Wmissing-prototypes
     -Wpointer-arith
     -Wmultichar
-    -Wno-discarded-qualifiers
     -Wpedantic
     -Wreturn-type
     -Wshadow

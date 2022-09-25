@@ -122,7 +122,7 @@ static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
 
-    cb->txt = "Check box";
+    cb->txt = (char *)"Check box";
     cb->static_txt = 1;
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);

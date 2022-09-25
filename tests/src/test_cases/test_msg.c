@@ -18,13 +18,13 @@ static uint32_t value_received;
 
 static void msg_cb(lv_msg_t * msg)
 {
-    uint32_t * v = lv_msg_get_payload(msg);
+    const uint32_t * v = lv_msg_get_payload(msg);
     value_received = *v;
 }
 static void event_cb(lv_event_t * e)
 {
     lv_msg_t * msg = lv_event_get_msg(e);
-    uint32_t * v = lv_msg_get_payload(msg);
+    const uint32_t * v = lv_msg_get_payload(msg);
     lv_label_set_text_fmt(lv_event_get_target(e), "%d", *v);
 }
 

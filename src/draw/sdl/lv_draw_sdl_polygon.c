@@ -40,7 +40,7 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_sdl_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t * points,
+void lv_draw_sdl_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[],
                          uint16_t point_cnt)
 {
     if(point_cnt < 3) return;

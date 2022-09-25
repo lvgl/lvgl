@@ -70,13 +70,9 @@
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE             "perf_counter.h"
+        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
 
-        #if __PER_COUNTER_VER__ < 10902ul
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
-        #else
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
-        #endif
+        #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
     #endif   /*LV_TICK_CUSTOM*/
 #else
     #define LV_TICK_CUSTOM 0
@@ -405,7 +401,7 @@
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
 /*Can break (wrap) texts on these chars*/
-#define LV_TXT_BREAK_CHARS " ,.;:-_"
+#define LV_TXT_BREAK_CHARS " ,.;:-_)]}"
 
 /*If a word is at least this long, will break wherever "prettiest"
  *To disable, set to a value <= 0*/
@@ -617,6 +613,16 @@
     #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
 
+/*1: Enable file explorer*/
+/*Requires: lv_table*/
+#if LV_USE_FILE_EXPLORER
+    /*Maximum length of path*/
+    #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
+    /*Quick access bar, 1:use, 0:not use*/
+    /*Requires: lv_list*/
+    #define LV_FILE_EXPLORER_QUICK_ACCESS        1
+#endif 
+
 /*==================
 * EXAMPLES
 *==================*/
@@ -636,7 +642,7 @@
 /*Benchmark your system*/
 #if LV_USE_DEMO_BENCHMARK
     /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-    #define LV_DEMO_BENCHMARK_RGB565A8 0
+    #define LV_DEMO_BENCHMARK_RGB565A8 1
 #endif
 
 /*--END OF LV_CONF_H--*/

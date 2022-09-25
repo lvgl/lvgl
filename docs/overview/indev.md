@@ -126,7 +126,7 @@ If an object is focused either by clicking it via touchpad or focused via an enc
 
 If an object switches to edit mode it enters the `LV_STATE_FOCUSED | LV_STATE_EDITED` states so these style properties will be shown.
 
-For a more detailed description read the [Style](https://docs.lvgl.io/v7/en/html/overview/style.html) section.
+For a more detailed description read the [Style](https://docs.lvgl.io/master/overview/style.html) section.
 
 ## API
 
