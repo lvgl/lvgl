@@ -261,6 +261,9 @@ void lv_disp_set_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return;
 
+    if(disp->hor_res == hor_res && disp->ver_res == ver_res) return;
+
+
     disp->hor_res = hor_res;
     disp->ver_res = ver_res;
 
@@ -940,6 +943,8 @@ static void update_resolution(lv_disp_t * disp)
     lv_obj_invalidate(disp->sys_layer);
 
     lv_obj_tree_walk(NULL, invalidate_layout_cb, NULL);
+
+    lv_disp_send_event(disp, LV_DISP_EVENT_RESOLUTION_CHANGED, NULL);
 }
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)

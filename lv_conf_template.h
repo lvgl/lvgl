@@ -704,7 +704,7 @@
     /*Quick access bar, 1:use, 0:not use*/
     /*Requires: lv_list*/
     #define LV_FILE_EXPLORER_QUICK_ACCESS        1
-#endif  
+#endif
 
 /*==================
 * EXAMPLES

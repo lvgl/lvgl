@@ -125,7 +125,10 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 
     if(indev == NULL) return;
     lv_sdl_mouse_t * indev_dev = indev->driver->user_data;
-    lv_sdl_window_t * disp_dev = indev->driver->disp->user_data;
+
+    lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
+    lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
+    uint8_t zoom = lv_sdl_disp_get_zoom(disp);
 
     switch(event->type) {
         case SDL_MOUSEBUTTONUP:
@@ -135,28 +138,28 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
         case SDL_MOUSEBUTTONDOWN:
             if(event->button.button == SDL_BUTTON_LEFT) {
                 indev_dev->_priv->left_button_down = true;
-                indev_dev->_priv->last_x = event->motion.x / disp_dev->zoom;
-                indev_dev->_priv->last_y = event->motion.y / disp_dev->zoom;
+                indev_dev->_priv->last_x = event->motion.x / zoom;
+                indev_dev->_priv->last_y = event->motion.y / zoom;
             }
             break;
         case SDL_MOUSEMOTION:
-            indev_dev->_priv->last_x = event->motion.x / disp_dev->zoom;
-            indev_dev->_priv->last_y = event->motion.y / disp_dev->zoom;
+            indev_dev->_priv->last_x = event->motion.x / zoom;
+            indev_dev->_priv->last_y = event->motion.y / zoom;
             break;
 
         case SDL_FINGERUP:
             indev_dev->_priv->left_button_down = false;
-            indev_dev->_priv->last_x = disp_dev->hor_res * event->tfinger.x / disp_dev->zoom;
-            indev_dev->_priv->last_y = disp_dev->ver_res * event->tfinger.y / disp_dev->zoom;
+            indev_dev->_priv->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->_priv->last_y = ver_res * event->tfinger.y / zoom;
             break;
         case SDL_FINGERDOWN:
             indev_dev->_priv->left_button_down = true;
-            indev_dev->_priv->last_x = disp_dev->hor_res * event->tfinger.x / disp_dev->zoom;
-            indev_dev->_priv->last_y = disp_dev->ver_res * event->tfinger.y / disp_dev->zoom;
+            indev_dev->_priv->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->_priv->last_y = ver_res * event->tfinger.y / zoom;
             break;
         case SDL_FINGERMOTION:
-            indev_dev->_priv->last_x = disp_dev->hor_res * event->tfinger.x / disp_dev->zoom;
-            indev_dev->_priv->last_y = disp_dev->ver_res * event->tfinger.y / disp_dev->zoom;
+            indev_dev->_priv->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->_priv->last_y = ver_res * event->tfinger.y / zoom;
             break;
     }
 }
