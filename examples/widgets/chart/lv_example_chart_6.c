@@ -11,13 +11,13 @@ static void event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
+    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
         last_id = lv_chart_get_pressed_point(obj);
         if(last_id != LV_CHART_POINT_NONE) {
             lv_chart_set_cursor_point(obj, cursor, NULL, last_id);
         }
     }
-    else if(code == LV_EVENT_DRAW_PART_END) {
+    else if(code == LV_OBJ_EVENT_DRAW_PART_END) {
         lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
         if(!lv_obj_draw_part_check_type(dsc, &lv_chart_class, LV_CHART_DRAW_PART_CURSOR)) return;
         if(dsc->p1 == NULL || dsc->p2 == NULL || dsc->p1->y != dsc->p2->y || last_id < 0) return;
@@ -66,7 +66,7 @@ void lv_example_chart_6(void)
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 5, true, 40);
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 10, 5, 10, 1, true, 30);
 
-    lv_obj_add_event_cb(chart, event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(chart, event_cb, LV_OBJ_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(chart);
 
     cursor = lv_chart_add_cursor(chart, lv_palette_main(LV_PALETTE_BLUE), LV_DIR_LEFT | LV_DIR_BOTTOM);

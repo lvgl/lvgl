@@ -12,15 +12,15 @@ static void add_mask_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_opa_t * mask_map = lv_event_get_user_data(e);
-    if(code == LV_EVENT_COVER_CHECK) {
+    if(code == LV_OBJ_EVENT_COVER_CHECK) {
         lv_event_set_cover_res(e, LV_COVER_RES_MASKED);
     }
-    else if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
+    else if(code == LV_OBJ_EVENT_DRAW_MAIN_BEGIN) {
         lv_draw_mask_map_init(&m, &obj->coords, mask_map);
         mask_id = lv_draw_mask_add(&m, NULL);
 
     }
-    else if(code == LV_EVENT_DRAW_MAIN_END) {
+    else if(code == LV_OBJ_EVENT_DRAW_MAIN_END) {
         lv_draw_mask_free_param(&m);
         lv_draw_mask_remove_id(mask_id);
     }
@@ -57,7 +57,7 @@ void lv_example_label_4(void)
     lv_obj_set_style_bg_color(grad, lv_color_hex(0xff0000), 0);
     lv_obj_set_style_bg_grad_color(grad, lv_color_hex(0x0000ff), 0);
     lv_obj_set_style_bg_grad_dir(grad, LV_GRAD_DIR_HOR, 0);
-    lv_obj_add_event_cb(grad, add_mask_event_cb, LV_EVENT_ALL, mask_map);
+    lv_obj_add_event_cb(grad, add_mask_event_cb, LV_OBJ_EVENT_ALL, mask_map);
 }
 
 #endif

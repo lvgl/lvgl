@@ -33,11 +33,11 @@ extern "C" {
 #define LV_INDEV_DEF_SCROLL_THROW         10
 
 /*Long press time in milliseconds.
- *Time to send `LV_EVENT_LONG_PRESSSED`)*/
+ *Time to send `LV_OBJ_EVENT_LONG_PRESSSED`)*/
 #define LV_INDEV_DEF_LONG_PRESS_TIME      400
 
 /*Repeated trigger period in long press [ms]
- *Time between `LV_EVENT_LONG_PRESSED_REPEAT*/
+ *Time between `LV_OBJ_EVENT_LONG_PRESSED_REPEAT*/
 #define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
 
 

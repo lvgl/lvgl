@@ -366,7 +366,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
 
-    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
         lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
         lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
@@ -376,7 +376,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, knob_pad);
     }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
+    else if(code == LV_OBJ_EVENT_SIZE_CHANGED) {
         void * param = lv_event_get_param(e);
         /*Refresh extended draw area to make knob visible*/
         if(lv_obj_get_width(obj) != lv_area_get_width(param) ||
@@ -384,11 +384,11 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             refr_knob_pos(obj);
         }
     }
-    else if(code == LV_EVENT_STYLE_CHANGED) {
+    else if(code == LV_OBJ_EVENT_STYLE_CHANGED) {
         /*Refresh extended draw area to make knob visible*/
         refr_knob_pos(obj);
     }
-    else if(code == LV_EVENT_KEY) {
+    else if(code == LV_OBJ_EVENT_KEY) {
         uint32_t c = *((uint32_t *)lv_event_get_param(e)); /*uint32_t because can be UTF-8*/
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -408,7 +408,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -429,18 +429,18 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return;
             }
         }
     }
-    else if(code == LV_EVENT_PRESSED) {
+    else if(code == LV_OBJ_EVENT_PRESSED) {
         colorwheel->last_change_time = lv_tick_get();
         lv_indev_get_point(lv_indev_get_act(), &colorwheel->last_press_point);
         res = double_click_reset(obj);
         if(res != LV_RES_OK) return;
     }
-    else if(code == LV_EVENT_PRESSING) {
+    else if(code == LV_OBJ_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return;
 
@@ -516,21 +516,21 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
     }
-    else if(code == LV_EVENT_HIT_TEST) {
+    else if(code == LV_OBJ_EVENT_HIT_TEST) {
         lv_hit_test_info_t * info = lv_event_get_param(e);;
 
         /*Valid clicks can be only in the circle*/
         info->res = _lv_area_is_point_on(&obj->coords, info->point, LV_RADIUS_CIRCLE);
     }
-    else if(code == LV_EVENT_DRAW_MAIN) {
+    else if(code == LV_OBJ_EVENT_DRAW_MAIN) {
         draw_disc_grad(e);
         draw_knob(e);
     }
-    else if(code == LV_EVENT_COVER_CHECK) {
+    else if(code == LV_OBJ_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res != LV_COVER_RES_MASKED) info->res = LV_COVER_RES_NOT_COVER;
     }
@@ -588,7 +588,7 @@ static lv_res_t double_click_reset(lv_obj_t * obj)
         lv_indev_wait_release(indev);
 
         if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-            lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            lv_res_t res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     }

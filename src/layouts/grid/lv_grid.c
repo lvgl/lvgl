@@ -381,7 +381,7 @@ static void grid_update(lv_obj_t * cont, void * user_data)
         lv_obj_refr_size(cont);
     }
 
-    lv_obj_send_event(cont, LV_EVENT_LAYOUT_CHANGED, NULL);
+    lv_obj_send_event(cont, LV_OBJ_EVENT_LAYOUT_CHANGED, NULL);
 
     LV_TRACE_LAYOUT("finished");
 }
@@ -666,8 +666,8 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
         lv_area_set_width(&item->coords, item_w);
         lv_area_set_height(&item->coords, item_h);
         lv_obj_invalidate(item);
-        lv_obj_send_event(item, LV_EVENT_SIZE_CHANGED, &old_coords);
-        lv_obj_send_event(lv_obj_get_parent(item), LV_EVENT_CHILD_CHANGED, item);
+        lv_obj_send_event(item, LV_OBJ_EVENT_SIZE_CHANGED, &old_coords);
+        lv_obj_send_event(lv_obj_get_parent(item), LV_OBJ_EVENT_CHILD_CHANGED, item);
 
     }
 

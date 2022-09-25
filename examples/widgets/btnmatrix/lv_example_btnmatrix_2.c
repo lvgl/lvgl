@@ -6,7 +6,7 @@ static void event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
-    if(code == LV_EVENT_DRAW_PART_BEGIN) {
+    if(code == LV_OBJ_EVENT_DRAW_PART_BEGIN) {
         lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
 
         /*When the button matrix draws the buttons...*/
@@ -36,7 +36,7 @@ static void event_cb(lv_event_t * e)
             }
         }
     }
-    if(code == LV_EVENT_DRAW_PART_END) {
+    if(code == LV_OBJ_EVENT_DRAW_PART_END) {
         lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
 
         /*When the button matrix draws the buttons...*/
@@ -71,7 +71,7 @@ static void event_cb(lv_event_t * e)
 void lv_example_btnmatrix_2(void)
 {
     lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act());
-    lv_obj_add_event_cb(btnm, event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(btnm, event_cb, LV_OBJ_EVENT_ALL, NULL);
     lv_obj_center(btnm);
 }
 

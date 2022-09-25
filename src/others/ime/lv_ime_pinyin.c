@@ -434,7 +434,7 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     pinyin_ime->kb = kb;
-    lv_obj_add_event_cb(pinyin_ime->kb, lv_ime_pinyin_kb_event, LV_EVENT_VALUE_CHANGED, obj);
+    lv_obj_add_event_cb(pinyin_ime->kb, lv_ime_pinyin_kb_event, LV_OBJ_EVENT_VALUE_CHANGED, obj);
     lv_obj_align_to(pinyin_ime->cand_panel, pinyin_ime->kb, LV_ALIGN_OUT_TOP_MID, 0, 0);
 }
 
@@ -597,8 +597,8 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_obj_set_style_bg_color(pinyin_ime->cand_panel, lv_color_white(), LV_PART_ITEMS | LV_STATE_PRESSED);
 
     /* event handler */
-    lv_obj_add_event_cb(pinyin_ime->cand_panel, lv_ime_pinyin_cand_panel_event, LV_EVENT_VALUE_CHANGED, obj);
-    lv_obj_add_event_cb(obj, lv_ime_pinyin_style_change_event, LV_EVENT_STYLE_CHANGED, NULL);
+    lv_obj_add_event_cb(pinyin_ime->cand_panel, lv_ime_pinyin_cand_panel_event, LV_OBJ_EVENT_VALUE_CHANGED, obj);
+    lv_obj_add_event_cb(obj, lv_ime_pinyin_style_change_event, LV_OBJ_EVENT_STYLE_CHANGED, NULL);
 
 #if LV_IME_PINYIN_USE_K9_MODE
     pinyin_ime->k9_input_str_len = 0;
@@ -639,7 +639,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
     static const char * k9_py_map[8] = {"abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
 #endif
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
+    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
         uint16_t btn_id  = lv_btnmatrix_get_selected_btn(kb);
         if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
 
@@ -771,7 +771,7 @@ static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
+    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
         uint32_t id = lv_btnmatrix_get_selected_btn(cand_panel);
         if(id == 0) {
             pinyin_page_proc(obj, 0);
@@ -868,7 +868,7 @@ static void lv_ime_pinyin_style_change_event(lv_event_t * e)
 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    if(code == LV_EVENT_STYLE_CHANGED) {
+    if(code == LV_OBJ_EVENT_STYLE_CHANGED) {
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         lv_obj_set_style_text_font(pinyin_ime->cand_panel, font, 0);
     }

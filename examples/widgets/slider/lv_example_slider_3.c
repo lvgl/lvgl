@@ -18,7 +18,7 @@ void lv_example_slider_3(void)
     lv_slider_set_value(slider, 70, LV_ANIM_OFF);
     lv_slider_set_left_value(slider, 20, LV_ANIM_OFF);
 
-    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(slider, slider_event_cb, LV_OBJ_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(slider);
 }
 
@@ -28,10 +28,10 @@ static void slider_event_cb(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     /*Provide some extra space for the value*/
-    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_event_set_ext_draw_size(e, 50);
     }
-    else if(code == LV_EVENT_DRAW_PART_END) {
+    else if(code == LV_OBJ_EVENT_DRAW_PART_END) {
         lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
         if(dsc->part == LV_PART_INDICATOR) {
             char buf[16];

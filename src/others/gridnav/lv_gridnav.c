@@ -67,14 +67,14 @@ void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
     LV_ASSERT_MALLOC(dsc);
     dsc->ctrl = ctrl;
     dsc->focused_obj = NULL;
-    lv_obj_add_event_cb(obj, gridnav_event_cb, LV_EVENT_ALL, dsc);
+    lv_obj_add_event_cb(obj, gridnav_event_cb, LV_OBJ_EVENT_ALL, dsc);
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
 }
 
 void lv_gridnav_remove(lv_obj_t * obj)
 {
-    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(obj, gridnav_event_cb);
+    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data_of_cb(obj, gridnav_event_cb);
     if(dsc == NULL) return; /* no gridnav on this object */
 
     lv_free(dsc);
@@ -84,7 +84,7 @@ void lv_gridnav_remove(lv_obj_t * obj)
 void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_NULL(to_focus);
-    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(cont, gridnav_event_cb);
+    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data_of_cb(cont, gridnav_event_cb);
     if(dsc == NULL) {
         LV_LOG_WARN("`cont` is not a gridnav container");
         return;
@@ -115,7 +115,7 @@ static void gridnav_event_cb(lv_event_t * e)
     lv_gridnav_dsc_t * dsc = lv_event_get_user_data(e);
     lv_event_code_t code = lv_event_get_code(e);
 
-    if(code == LV_EVENT_KEY) {
+    if(code == LV_OBJ_EVENT_KEY) {
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
         if(child_cnt == 0) return;
 
@@ -205,7 +205,7 @@ static void gridnav_event_cb(lv_event_t * e)
         }
         else {
             if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
-                lv_obj_send_event(dsc->focused_obj, LV_EVENT_KEY, &key);
+                lv_obj_send_event(dsc->focused_obj, LV_OBJ_EVENT_KEY, &key);
             }
         }
 
@@ -216,19 +216,19 @@ static void gridnav_event_cb(lv_event_t * e)
             dsc->focused_obj = guess;
         }
     }
-    else if(code == LV_EVENT_FOCUSED) {
+    else if(code == LV_OBJ_EVENT_FOCUSED) {
         if(dsc->focused_obj == NULL)  dsc->focused_obj = find_first_focusable(obj);
         if(dsc->focused_obj) {
             lv_obj_add_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
             lv_obj_scroll_to_view(dsc->focused_obj, LV_ANIM_OFF);
         }
     }
-    else if(code == LV_EVENT_DEFOCUSED) {
+    else if(code == LV_OBJ_EVENT_DEFOCUSED) {
         if(dsc->focused_obj) {
             lv_obj_clear_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
         }
     }
-    else if(code == LV_EVENT_CHILD_CREATED) {
+    else if(code == LV_OBJ_EVENT_CHILD_CREATED) {
         lv_obj_t * child = lv_event_get_target(e);
         if(lv_obj_get_parent(child) == obj) {
             if(dsc->focused_obj == NULL) {
@@ -240,7 +240,7 @@ static void gridnav_event_cb(lv_event_t * e)
             }
         }
     }
-    else if(code == LV_EVENT_CHILD_DELETED) {
+    else if(code == LV_OBJ_EVENT_CHILD_DELETED) {
         /*This event bubble, so be sure this object's child was deleted.
          *As we don't know which object was deleted we can't make the next focused.
          *So make the first object focused*/
@@ -249,12 +249,12 @@ static void gridnav_event_cb(lv_event_t * e)
             dsc->focused_obj = find_first_focusable(obj);
         }
     }
-    else if(code == LV_EVENT_DELETE) {
+    else if(code == LV_OBJ_EVENT_DELETE) {
         lv_gridnav_remove(obj);
     }
-    else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING || code == LV_EVENT_PRESS_LOST ||
-            code == LV_EVENT_LONG_PRESSED || code == LV_EVENT_LONG_PRESSED_REPEAT ||
-            code == LV_EVENT_CLICKED || code == LV_EVENT_RELEASED) {
+    else if(code == LV_OBJ_EVENT_PRESSED || code == LV_OBJ_EVENT_PRESSING || code == LV_OBJ_EVENT_PRESS_LOST ||
+            code == LV_OBJ_EVENT_LONG_PRESSED || code == LV_OBJ_EVENT_LONG_PRESSED_REPEAT ||
+            code == LV_OBJ_EVENT_CLICKED || code == LV_OBJ_EVENT_RELEASED) {
         if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
             /*Forward press/release related event too*/
             lv_indev_type_t t = lv_indev_get_type(lv_indev_get_act());

@@ -398,20 +398,20 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     lv_point_t p;
 
-    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
         if(has_popovers_in_top_row(obj)) {
             /*reserve one row worth of extra space to account for popovers in the top row*/
             lv_coord_t s = btnm->row_cnt > 0 ? lv_obj_get_content_height(obj) / btnm->row_cnt : 0;
             lv_event_set_ext_draw_size(e, s);
         }
     }
-    if(code == LV_EVENT_STYLE_CHANGED) {
+    if(code == LV_OBJ_EVENT_STYLE_CHANGED) {
         lv_btnmatrix_set_map(obj, btnm->map_p);
     }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
+    else if(code == LV_OBJ_EVENT_SIZE_CHANGED) {
         lv_btnmatrix_set_map(obj, btnm->map_p);
     }
-    else if(code == LV_EVENT_PRESSED) {
+    else if(code == LV_OBJ_EVENT_PRESSED) {
         void * param = lv_event_get_param(e);
         invalidate_button_area(obj, btnm->btn_id_sel);
 
@@ -438,12 +438,12 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
-                res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
+                res        = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, &b);
                 if(res != LV_RES_OK) return;
             }
         }
     }
-    else if(code == LV_EVENT_PRESSING) {
+    else if(code == LV_OBJ_EVENT_PRESSING) {
         void * param = lv_event_get_param(e);
         uint16_t btn_pr = LV_BTNMATRIX_BTN_NONE;
         /*Search the pressed area*/
@@ -470,13 +470,13 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 if(button_is_click_trig(btnm->ctrl_bits[btn_pr]) == false &&
                    button_is_popover(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                     uint32_t b = btn_pr;
-                    res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
+                    res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, &b);
                     if(res != LV_RES_OK) return;
                 }
             }
         }
     }
-    else if(code == LV_EVENT_RELEASED) {
+    else if(code == LV_OBJ_EVENT_RELEASED) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
             /*Toggle the button if enabled*/
             if(button_is_checkable(btnm->ctrl_bits[btnm->btn_id_sel]) &&
@@ -496,7 +496,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
-                res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
+                res        = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, &b);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -505,22 +505,22 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         invalidate_button_area(obj, btnm->btn_id_sel);
 
     }
-    else if(code == LV_EVENT_LONG_PRESSED_REPEAT) {
+    else if(code == LV_OBJ_EVENT_LONG_PRESSED_REPEAT) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
             if(button_is_repeat_disabled(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
-                res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
+                res        = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, &b);
                 if(res != LV_RES_OK) return;
             }
         }
     }
-    else if(code == LV_EVENT_PRESS_LOST) {
+    else if(code == LV_OBJ_EVENT_PRESS_LOST) {
         invalidate_button_area(obj, btnm->btn_id_sel);
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
-    else if(code == LV_EVENT_FOCUSED) {
+    else if(code == LV_OBJ_EVENT_FOCUSED) {
         lv_indev_t * indev = lv_event_get_param(e);
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
@@ -550,11 +550,11 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
     }
-    else if(code == LV_EVENT_DEFOCUSED || code == LV_EVENT_LEAVE) {
+    else if(code == LV_OBJ_EVENT_DEFOCUSED || code == LV_OBJ_EVENT_LEAVE) {
         if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) invalidate_button_area(obj, btnm->btn_id_sel);
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
-    else if(code == LV_EVENT_KEY) {
+    else if(code == LV_OBJ_EVENT_KEY) {
 
         invalidate_button_area(obj, btnm->btn_id_sel);
 
@@ -638,7 +638,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         invalidate_button_area(obj, btnm->btn_id_sel);
     }
-    else if(code == LV_EVENT_DRAW_MAIN) {
+    else if(code == LV_OBJ_EVENT_DRAW_MAIN) {
         draw_main(e);
     }
 
@@ -747,7 +747,7 @@ static void draw_main(lv_event_t * e)
 
         part_draw_dsc.draw_area = &btn_area;
         part_draw_dsc.id = btn_i;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
@@ -800,7 +800,7 @@ static void draw_main(lv_event_t * e)
         /*Draw the text*/
         lv_draw_label(draw_ctx, &draw_label_dsc_act, &btn_area, txt, NULL);
 
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 
     obj->skip_trans = 0;

@@ -142,9 +142,9 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     if(should_draw) {
         draw_ctx->clip_area = &clip_coords_for_obj;
 
-        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN, draw_ctx);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN_END, draw_ctx);
 #if LV_USE_REFR_DEBUG
         lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
         lv_draw_rect_dsc_t draw_dsc;
@@ -186,9 +186,9 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         draw_ctx->clip_area = &clip_coords_for_obj;
 
         /*If all the children are redrawn make 'post draw' draw*/
-        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, draw_ctx);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_POST, draw_ctx);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, draw_ctx);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_POST_BEGIN, draw_ctx);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_POST, draw_ctx);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_POST_END, draw_ctx);
     }
 
     draw_ctx->clip_area = clip_area_ori;
@@ -238,7 +238,8 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
         return;
     }
 
-    //    lv_disp_send_event(disp, LV_DISP_EVENT_INVALIDATED_AREA, &com_area);
+    lv_res_t res = lv_disp_send_event(disp, LV_DISP_EVENT_INVALIDATE_AREA, &com_area);
+    if(res != LV_RES_OK) return;
 
     /*Save only if this area is not in one of the saved areas*/
     uint16_t i;
@@ -347,8 +348,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         elaps = lv_tick_elaps(start);
 
         /*Call monitor cb if present*/
-        //            disp_refr->monitor_cb(disp_refr->driver, elaps, px_num);
-        //        lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_READY, NULL);
+        lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_READY, NULL);
     }
 
     _lv_font_clean_up_fmt_txt();
@@ -526,7 +526,7 @@ static void refr_invalid_areas(void)
     }
 
     /*Notify the display driven rendering has started*/
-    //    lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_START, NULL);
+    lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_START, NULL);
 
     disp_refr->last_area = 0;
     disp_refr->last_part = 0;
@@ -734,7 +734,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_cover_check_info_t info;
     info.res = LV_COVER_RES_COVER;
     info.area = area_p;
-    lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
+    lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
     if(info.res == LV_COVER_RES_MASKED) return NULL;
 
     int32_t i;
@@ -796,9 +796,9 @@ static void refr_obj_and_children(lv_draw_ctx_t * draw_ctx, lv_obj_t * top_obj)
         }
 
         /*Call the post draw draw function of the parents of the to object*/
-        lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)draw_ctx);
-        lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)draw_ctx);
-        lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_OBJ_EVENT_DRAW_POST_BEGIN, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_OBJ_EVENT_DRAW_POST, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_OBJ_EVENT_DRAW_POST_END, (void *)draw_ctx);
 
         /*The new border will be the last parents,
          *so the 'younger' brothers of parent will be refreshed*/
@@ -866,7 +866,7 @@ static void layer_alpha_test(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_draw_l
             lv_cover_check_info_t info;
             info.res = LV_COVER_RES_COVER;
             info.area = &layer_ctx->area_act;
-            lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
+            lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
             if(info.res == LV_COVER_RES_COVER) has_alpha = false;
         }
 
@@ -905,7 +905,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
             lv_cover_check_info_t info;
             info.res = LV_COVER_RES_COVER;
             info.area = &layer_area_full;
-            lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
+            lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
             if(info.res == LV_COVER_RES_COVER) flags &= ~LV_DRAW_LAYER_FLAG_HAS_ALPHA;
         }
 
@@ -967,35 +967,32 @@ static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area
 
     if(max_row > area_h) max_row = area_h;
 
-    //    TODO
-    //    /*Round down the lines of draw_buf if rounding is added*/
-    //    if(disp_refr->rounder_cb) {
-    //        lv_area_t tmp;
-    //        tmp.x1 = 0;
-    //        tmp.x2 = 0;
-    //        tmp.y1 = 0;
-    //
-    //        lv_coord_t h_tmp = max_row;
-    //        do {
-    //            tmp.y2 = h_tmp - 1;
-    //            lv_disp_send_event(disp_refr, LV_DISP_EVENT_INVALIDATED_AREA, &tmp);
-    //
-    //            /*If this height fits into `max_row` then fine*/
-    //            if(lv_area_get_height(&tmp) <= max_row) break;
-    //
-    //            /*Decrement the height of the area until it fits into `max_row` after rounding*/
-    //            h_tmp--;
-    //        } while(h_tmp > 0);
-    //
-    //        if(h_tmp <= 0) {
-    //            LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or to "
-    //                        "small draw_buf)");
-    //            return 0;
-    //        }
-    //        else {
-    //            max_row = tmp.y2 + 1;
-    //        }
-    //    }
+    /*Round down the lines of draw_buf if rounding is added*/
+    lv_area_t tmp;
+    tmp.x1 = 0;
+    tmp.x2 = 0;
+    tmp.y1 = 0;
+
+    lv_coord_t h_tmp = max_row;
+    do {
+        tmp.y2 = h_tmp - 1;
+        lv_disp_send_event(disp_refr, LV_DISP_EVENT_INVALIDATE_AREA, &tmp);
+
+        /*If this height fits into `max_row` then fine*/
+        if(lv_area_get_height(&tmp) <= max_row) break;
+
+        /*Decrement the height of the area until it fits into `max_row` after rounding*/
+        h_tmp--;
+    } while(h_tmp > 0);
+
+    if(h_tmp <= 0) {
+        LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or too "
+                    "small draw_buf)");
+        return 0;
+    }
+    else {
+        max_row = tmp.y2 + 1;
+    }
 
     return max_row;
 }

@@ -7,13 +7,13 @@ static void ta_event_cb(lv_event_t * e)
     lv_obj_t * ta = lv_event_get_target(e);
     lv_obj_t * kb = lv_event_get_user_data(e);
 
-    if(code == LV_EVENT_FOCUSED) {
+    if(code == LV_OBJ_EVENT_FOCUSED) {
         if(lv_indev_get_type(lv_indev_get_act()) != LV_INDEV_TYPE_KEYPAD) {
             lv_keyboard_set_textarea(kb, ta);
             lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
         }
     }
-    else if(code == LV_EVENT_READY) {
+    else if(code == LV_OBJ_EVENT_READY) {
         lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_state(ta, LV_STATE_FOCUSED);
         lv_indev_reset(NULL, ta);   /*To forget the last clicked object to make it focusable again*/
@@ -39,7 +39,7 @@ void lv_example_ime_pinyin_2(void)
     lv_ime_pinyin_set_keyboard(pinyin_ime, kb);
     lv_ime_pinyin_set_mode(pinyin_ime,
                            LV_IME_PINYIN_MODE_K9);  // Set to 9-key input mode. Default: 26-key input(k26) mode.
-    lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event_cb(ta1, ta_event_cb, LV_OBJ_EVENT_ALL, kb);
 
     /*Get the cand_panel, and adjust its size and position*/
     lv_obj_t * cand_panel = lv_ime_pinyin_get_cand_panel(pinyin_ime);

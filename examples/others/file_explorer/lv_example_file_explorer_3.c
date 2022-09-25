@@ -50,7 +50,7 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_VALUE_CHANGED) {
+    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
         uint16_t path_len = strlen(cur_path);
@@ -66,7 +66,7 @@ static void file_explorer_event_handler(lv_event_t * e)
         }
         else    LV_LOG_USER("%s%s", cur_path, sel_fn);
     }
-    else if(code == LV_EVENT_READY) {
+    else if(code == LV_OBJ_EVENT_READY) {
         lv_obj_t * tb = lv_file_explorer_get_file_table(obj);
         uint16_t sum = lv_table_get_row_cnt(tb);
 
@@ -123,7 +123,7 @@ void lv_example_file_explorer_3(void)
 #endif
 #endif
 
-    lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_OBJ_EVENT_ALL, NULL);
 }
 
 #endif

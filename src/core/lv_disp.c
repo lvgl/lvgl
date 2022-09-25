@@ -252,7 +252,6 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
         return _lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
 }
 
-
 /*---------------------
  * RESOLUTION
  *--------------------*/
@@ -686,7 +685,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             break;
     }
 
-    lv_obj_send_event(act_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    lv_obj_send_event(act_scr, LV_OBJ_EVENT_SCREEN_UNLOAD_START, NULL);
 
     lv_anim_start(&a_new);
     lv_anim_start(&a_old);
@@ -745,6 +744,55 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa)
 /*---------------------
  * OTHERS
  *--------------------*/
+
+void lv_disp_add_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+{
+    LV_ASSERT_NULL(disp);
+
+    lv_event_add_callback(&disp->event_list, event_cb, filter, user_data);
+}
+
+bool lv_disp_remove_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb)
+{
+    LV_ASSERT_NULL(disp);
+
+    return lv_event_remove_callback(&disp->event_list, event_cb);
+}
+
+bool lv_disp_remove_event_cb_with_user_data(lv_disp_t * disp, lv_event_cb_t event_cb, const void * user_data)
+{
+    LV_ASSERT_NULL(disp);
+
+    return lv_event_remove_callback_with_user_data(&disp->event_list, event_cb, user_data);
+}
+
+
+void * lv_disp_get_event_user_data_of_cb(lv_disp_t * disp, lv_event_cb_t event_cb)
+{
+    LV_ASSERT_NULL(disp);
+
+    return lv_event_get_user_data_of_callback(&disp->event_list, event_cb);
+}
+
+
+lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_data)
+{
+
+    lv_event_t e;
+    lv_memzero(&e, sizeof(e));
+    e.code = code;
+    e.target = disp;
+    e.current_target = disp;
+    e.param = user_data;
+    lv_res_t res;
+    res = lv_event_send(&disp->event_list, &e, true);
+    if(res != LV_RES_OK) return res;
+
+    res = lv_event_send(&disp->event_list, &e, false);
+    if(res != LV_RES_OK) return res;
+
+    return res;
+}
 
 void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rotation_t rotation)
 {
@@ -875,16 +923,16 @@ static void update_resolution(lv_disp_t * disp)
     for(i = 0; i < disp->screen_cnt; i++) {
         lv_area_set_width(&disp->screens[i]->coords, hor_res);
         lv_area_set_height(&disp->screens[i]->coords, ver_res);
-        lv_obj_send_event(disp->screens[i], LV_EVENT_SIZE_CHANGED, &prev_coords);
+        lv_obj_send_event(disp->screens[i], LV_OBJ_EVENT_SIZE_CHANGED, &prev_coords);
     }
 
     lv_area_set_width(&disp->top_layer->coords, hor_res);
     lv_area_set_height(&disp->top_layer->coords, ver_res);
-    lv_obj_send_event(disp->top_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    lv_obj_send_event(disp->top_layer, LV_OBJ_EVENT_SIZE_CHANGED, &prev_coords);
 
     lv_area_set_width(&disp->sys_layer->coords, hor_res);
     lv_area_set_height(&disp->sys_layer->coords, ver_res);
-    lv_obj_send_event(disp->sys_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    lv_obj_send_event(disp->sys_layer, LV_OBJ_EVENT_SIZE_CHANGED, &prev_coords);
 
     lv_memzero(disp->inv_areas, sizeof(disp->inv_areas));
     lv_memzero(disp->inv_area_joined, sizeof(disp->inv_area_joined));
@@ -908,13 +956,13 @@ static void scr_load_internal(lv_obj_t * scr)
 
     lv_obj_t * old_scr = d->act_scr;
 
-    if(d->act_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
-    if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+    if(d->act_scr) lv_obj_send_event(old_scr, LV_OBJ_EVENT_SCREEN_UNLOAD_START, NULL);
+    if(d->act_scr) lv_obj_send_event(scr, LV_OBJ_EVENT_SCREEN_LOAD_START, NULL);
 
     d->act_scr = scr;
 
-    if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
-    if(d->act_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+    if(d->act_scr) lv_obj_send_event(scr, LV_OBJ_EVENT_SCREEN_LOADED, NULL);
+    if(d->act_scr) lv_obj_send_event(old_scr, LV_OBJ_EVENT_SCREEN_UNLOADED, NULL);
 
     lv_obj_invalidate(scr);
 }
@@ -926,7 +974,7 @@ static void scr_load_anim_start(lv_anim_t * a)
     d->prev_scr = lv_scr_act();
     d->act_scr = a->var;
 
-    lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+    lv_obj_send_event(d->act_scr, LV_OBJ_EVENT_SCREEN_LOAD_START, NULL);
 }
 
 static void opa_scale_anim(void * obj, int32_t v)
@@ -948,8 +996,8 @@ static void scr_anim_ready(lv_anim_t * a)
 {
     lv_disp_t * d = lv_obj_get_disp(a->var);
 
-    lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
-    lv_obj_send_event(d->prev_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+    lv_obj_send_event(d->act_scr, LV_OBJ_EVENT_SCREEN_LOADED, NULL);
+    lv_obj_send_event(d->prev_scr, LV_OBJ_EVENT_SCREEN_UNLOADED, NULL);
 
     if(d->prev_scr && d->del_prev) lv_obj_del(d->prev_scr);
     d->prev_scr = NULL;

@@ -42,13 +42,6 @@ typedef enum {
 } lv_disp_rotation_t;
 
 typedef enum {
-    LV_DISP_EVENT_INVALIDATED_AREA,
-    LV_DISP_EVENT_RENDER_START,
-    LV_DISP_EVENT_RENDER_READY,
-    LV_DISP_EVENT_PARAMETER_CHANGED,
-} lv_disp_even_t;
-
-typedef enum {
     LV_DISP_RENDER_MODE_PARTIAL,
     LV_DISP_RENDER_MODE_DIRECT,
     LV_DISP_RENDER_MODE_FULL,
@@ -167,6 +160,8 @@ typedef struct _lv_disp_t {
 #if LV_USE_USER_DATA
     void * user_data; /**< Custom display driver user data*/
 #endif
+
+    lv_event_list_t event_list;
 
     uint32_t sw_rotate : 1;          /**< 1: use software rotation (slower)*/
     uint32_t rotated : 2;            /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
@@ -486,6 +481,18 @@ lv_opa_t lv_disp_get_bg_opa(lv_disp_t * disp);
 /*---------------------
  * OTHERS
  *--------------------*/
+
+void lv_disp_add_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+
+bool lv_disp_remove_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb);
+
+bool lv_disp_remove_event_cb_with_user_data(lv_disp_t * disp, lv_event_cb_t event_cb, const void * user_data);
+
+
+void * lv_disp_get_event_user_data_of_cb(lv_disp_t * disp, lv_event_cb_t event_cb);
+
+
+lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_data);
 
 /**
  * Set the rotation of this display.

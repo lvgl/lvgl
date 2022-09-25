@@ -252,11 +252,11 @@ void lv_obj_scroll_to_view_recursive(struct _lv_obj_t * obj, lv_anim_enable_t an
 
 /**
  * Low level function to scroll by given x and y coordinates.
- * `LV_EVENT_SCROLL` is sent.
+ * `LV_OBJ_EVENT_SCROLL` is sent.
  * @param obj       pointer to an object to scroll
  * @param x         pixels to scroll horizontally
  * @param y         pixels to scroll vertically
- * @return          `LV_RES_INV`: to object was deleted in `LV_EVENT_SCROLL`;
+ * @return          `LV_RES_INV`: to object was deleted in `LV_OBJ_EVENT_SCROLL`;
  *                  `LV_RES_OK`: if the object is still valid
  */
 lv_res_t _lv_obj_scroll_by_raw(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);

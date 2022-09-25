@@ -530,7 +530,7 @@ static lv_obj_t * create_spectrum_obj(lv_obj_t * parent)
     lv_obj_set_height(obj, 250);
 #endif
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_event_cb(obj, spectrum_draw_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(obj, spectrum_draw_event_cb, LV_OBJ_EVENT_ALL, NULL);
     lv_obj_refresh_ext_draw_size(obj);
     album_img_obj = album_img_create(obj);
     return obj;
@@ -570,7 +570,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     icon = lv_img_create(cont);
     lv_img_set_src(icon, &img_lv_demo_music_btn_prev);
     lv_obj_set_grid_cell(icon, LV_GRID_ALIGN_CENTER, 2, 1, LV_GRID_ALIGN_CENTER, 0, 1);
-    lv_obj_add_event_cb(icon, prev_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(icon, prev_click_event_cb, LV_OBJ_EVENT_CLICKED, NULL);
 
     play_obj = lv_imgbtn_create(cont);
     lv_imgbtn_set_src(play_obj, LV_IMGBTN_STATE_RELEASED, NULL, &img_lv_demo_music_btn_play, NULL);
@@ -578,14 +578,14 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_obj_add_flag(play_obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_set_grid_cell(play_obj, LV_GRID_ALIGN_CENTER, 3, 1, LV_GRID_ALIGN_CENTER, 0, 1);
 
-    lv_obj_add_event_cb(play_obj, play_event_click_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(play_obj, play_event_click_cb, LV_OBJ_EVENT_CLICKED, NULL);
     lv_obj_add_flag(play_obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_width(play_obj, img_lv_demo_music_btn_play.header.w);
 
     icon = lv_img_create(cont);
     lv_img_set_src(icon, &img_lv_demo_music_btn_next);
     lv_obj_set_grid_cell(icon, LV_GRID_ALIGN_CENTER, 4, 1, LV_GRID_ALIGN_CENTER, 0, 1);
-    lv_obj_add_event_cb(icon, next_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(icon, next_click_event_cb, LV_OBJ_EVENT_CLICKED, NULL);
     lv_obj_add_flag(icon, LV_OBJ_FLAG_CLICKABLE);
 
     LV_IMG_DECLARE(img_lv_demo_music_slider_knob);
@@ -748,17 +748,17 @@ static void spectrum_draw_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
 
-    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
 #if LV_DEMO_MUSIC_LANDSCAPE
         lv_event_set_ext_draw_size(e, LV_HOR_RES);
 #else
         lv_event_set_ext_draw_size(e, LV_VER_RES);
 #endif
     }
-    else if(code == LV_EVENT_COVER_CHECK) {
+    else if(code == LV_OBJ_EVENT_COVER_CHECK) {
         lv_event_set_cover_res(e, LV_COVER_RES_NOT_COVER);
     }
-    else if(code == LV_EVENT_DRAW_POST) {
+    else if(code == LV_OBJ_EVENT_DRAW_POST) {
         lv_obj_t * obj = lv_event_get_target(e);
         lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
@@ -934,7 +934,7 @@ static lv_obj_t * album_img_create(lv_obj_t * parent)
     }
     lv_img_set_antialias(img, false);
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_add_event_cb(img, album_gesture_event_cb, LV_EVENT_GESTURE, NULL);
+    lv_obj_add_event_cb(img, album_gesture_event_cb, LV_OBJ_EVENT_GESTURE, NULL);
     lv_obj_clear_flag(img, LV_OBJ_FLAG_GESTURE_BUBBLE);
     lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
 
@@ -969,7 +969,7 @@ static void prev_click_event_cb(lv_event_t * e)
 static void next_click_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    if(code == LV_EVENT_CLICKED) {
+    if(code == LV_OBJ_EVENT_CLICKED) {
         _lv_demo_music_album_next(true);
     }
 }

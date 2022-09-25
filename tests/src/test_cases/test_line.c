@@ -67,7 +67,7 @@ static void line_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
 
-    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
         /* Set the new line extra draw size */
         lv_event_set_ext_draw_size(e, initial_extra_draw_size);
     }
@@ -76,7 +76,7 @@ static void line_event_cb(lv_event_t * e)
 void test_line_should_update_extra_draw_size_based_on_style(void)
 {
     /* Setup an event handler for line extra draw size event */
-    lv_obj_add_event_cb(line, line_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(line, line_event_cb, LV_OBJ_EVENT_ALL, NULL);
     /* Trigger the extra draw size event */
     lv_obj_refresh_ext_draw_size(line);
 

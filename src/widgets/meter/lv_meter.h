@@ -101,7 +101,7 @@ extern const lv_obj_class_t lv_meter_class;
 
 /**
  * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_meter_class`
- * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
+ * Used in `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END`
  */
 typedef enum {
     LV_METER_DRAW_PART_ARC,             /**< The arc indicator*/

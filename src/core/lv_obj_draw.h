@@ -130,7 +130,7 @@ lv_coord_t lv_obj_calculate_ext_draw_size(struct _lv_obj_t * obj, uint32_t part)
 
 /**
  * Initialize a draw descriptor used in events.
- * @param dsc       pointer to a descriptor. Later it should be passed as parameter to an `LV_EVENT_DRAW_PART_BEGIN/END` event.
+ * @param dsc       pointer to a descriptor. Later it should be passed as parameter to an `LV_OBJ_EVENT_DRAW_PART_BEGIN/END` event.
  * @param           draw the current draw context. (usually returned by `lv_event_get_draw_ctx(e)`)
  */
 void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw_ctx);
@@ -145,7 +145,7 @@ void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw_ctx
 bool lv_obj_draw_part_check_type(lv_obj_draw_part_dsc_t * dsc, const struct _lv_obj_class_t * class_p, uint32_t type);
 
 /**
- * Send a 'LV_EVENT_REFR_EXT_DRAW_SIZE' Call the ancestor's event handler to the object to refresh the value of the extended draw size.
+ * Send a 'LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE' Call the ancestor's event handler to the object to refresh the value of the extended draw size.
  * The result will be saved in `obj`.
  * @param obj       pointer to an object
  */

@@ -108,7 +108,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_slider_mode_t type = lv_slider_get_mode(obj);
 
     /*Advanced hit testing: react only on dragging the knob(s)*/
-    if(code == LV_EVENT_HIT_TEST) {
+    if(code == LV_OBJ_EVENT_HIT_TEST) {
         lv_hit_test_info_t * info = lv_event_get_param(e);
         lv_coord_t ext_click_area = obj->spec_attr ? obj->spec_attr->ext_click_pad : 0;
 
@@ -125,7 +125,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             info->res = _lv_area_is_point_on(&a, info->point, 0);
         }
     }
-    else if(code == LV_EVENT_PRESSED) {
+    else if(code == LV_OBJ_EVENT_PRESSED) {
         lv_obj_invalidate(obj);
 
         lv_point_t p;
@@ -189,7 +189,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
     }
-    else if(code == LV_EVENT_PRESSING && slider->value_to_set != NULL) {
+    else if(code == LV_OBJ_EVENT_PRESSING && slider->value_to_set != NULL) {
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) != LV_INDEV_TYPE_POINTER) return;
 
@@ -243,12 +243,12 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(*slider->value_to_set != new_value) {
             *slider->value_to_set = new_value;
             lv_obj_invalidate(obj);
-            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
 
     }
-    else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
+    else if(code == LV_OBJ_EVENT_RELEASED || code == LV_OBJ_EVENT_PRESS_LOST) {
         slider->dragging = false;
         slider->value_to_set = NULL;
 
@@ -274,16 +274,16 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
     }
-    else if(code == LV_EVENT_FOCUSED) {
+    else if(code == LV_OBJ_EVENT_FOCUSED) {
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
             slider->left_knob_focus = 0;
         }
     }
-    else if(code == LV_EVENT_SIZE_CHANGED) {
+    else if(code == LV_OBJ_EVENT_SIZE_CHANGED) {
         lv_obj_refresh_ext_draw_size(obj);
     }
-    else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    else if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
         lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
         lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
@@ -304,7 +304,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         *s  = LV_MAX(*s, knob_size);
 
     }
-    else if(code == LV_EVENT_KEY) {
+    else if(code == LV_OBJ_EVENT_KEY) {
         char c = *((char *)lv_event_get_param(e));
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -319,10 +319,10 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             return;
         }
 
-        res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return;
     }
-    else if(code == LV_EVENT_DRAW_MAIN) {
+    else if(code == LV_OBJ_EVENT_DRAW_MAIN) {
         draw_knob(e);
     }
 }
@@ -371,18 +371,18 @@ static void draw_knob(lv_event_t * e)
     part_draw_dsc.rect_dsc = &knob_rect_dsc;
 
     if(lv_slider_get_mode(obj) != LV_SLIDER_MODE_RANGE) {
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
     else {
         /*Save the draw part_draw_dsc. because it can be modified in the event*/
         lv_draw_rect_dsc_t knob_rect_dsc_tmp;
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
         /* Draw the right knob */
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         /*Calculate the second knob area*/
         if(is_horizontal) {
@@ -401,9 +401,9 @@ static void draw_knob(lv_event_t * e)
         part_draw_dsc.rect_dsc = &knob_rect_dsc;
         part_draw_dsc.id = 1;
 
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->left_knob_area);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 

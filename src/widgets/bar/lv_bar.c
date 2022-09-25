@@ -406,8 +406,8 @@ static void draw_indic(lv_event_t * e)
         part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
         part_draw_dsc.draw_area = &bar->indic_area;
 
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_END, &part_draw_dsc);
         return;
     }
 
@@ -426,7 +426,7 @@ static void draw_indic(lv_event_t * e)
     part_draw_dsc.rect_dsc = &draw_rect_dsc;
     part_draw_dsc.draw_area = &bar->indic_area;
 
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+    lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
     lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     lv_coord_t short_side = LV_MIN(barw, barh);
@@ -513,7 +513,7 @@ static void draw_indic(lv_event_t * e)
     lv_draw_mask_remove_id(mask_bg_id);
 #endif
 
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+    lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_PART_END, &part_draw_dsc);
 }
 
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
@@ -529,7 +529,7 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
         lv_coord_t indic_size;
         indic_size = lv_obj_calculate_ext_draw_size(obj, LV_PART_INDICATOR);
 
@@ -548,11 +548,11 @@ static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)
             *s = LV_MAX(*s, -pad);
         }
     }
-    else if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
+    else if(code == LV_OBJ_EVENT_PRESSED || code == LV_OBJ_EVENT_RELEASED) {
         lv_bar_t * bar = (lv_bar_t *)obj;
         lv_obj_invalidate_area(obj, &bar->indic_area);
     }
-    else if(code == LV_EVENT_DRAW_MAIN) {
+    else if(code == LV_OBJ_EVENT_DRAW_MAIN) {
         draw_indic(e);
     }
 }

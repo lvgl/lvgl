@@ -186,7 +186,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_selector_t selector, lv_style
            part == LV_PART_MAIN ||
            lv_obj_get_style_height(obj, 0) == LV_SIZE_CONTENT ||
            lv_obj_get_style_width(obj, 0) == LV_SIZE_CONTENT) {
-            lv_obj_send_event(obj, LV_EVENT_STYLE_CHANGED, NULL);
+            lv_obj_send_event(obj, LV_OBJ_EVENT_STYLE_CHANGED, NULL);
             lv_obj_mark_layout_as_dirty(obj);
         }
     }
@@ -676,7 +676,7 @@ static void refresh_children_style(lv_obj_t * obj)
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         lv_obj_invalidate(child);
-        lv_obj_send_event(child, LV_EVENT_STYLE_CHANGED, NULL);
+        lv_obj_send_event(child, LV_OBJ_EVENT_STYLE_CHANGED, NULL);
         lv_obj_invalidate(child);
 
         refresh_children_style(child); /*Check children too*/
