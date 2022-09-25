@@ -438,7 +438,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
-                res        = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
+                res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -470,7 +470,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 if(button_is_click_trig(btnm->ctrl_bits[btn_pr]) == false &&
                    button_is_popover(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                     uint32_t b = btn_pr;
-                    res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
+                    res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
                     if(res != LV_RES_OK) return;
                 }
             }
@@ -496,7 +496,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
-                res        = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
+                res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -511,7 +511,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
                button_is_inactive(btnm->ctrl_bits[btnm->btn_id_sel]) == false &&
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
-                res        = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &b);
+                res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -747,7 +747,7 @@ static void draw_main(lv_event_t * e)
 
         part_draw_dsc.draw_area = &btn_area;
         part_draw_dsc.id = btn_i;
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
@@ -800,7 +800,7 @@ static void draw_main(lv_event_t * e)
         /*Draw the text*/
         lv_draw_label(draw_ctx, &draw_label_dsc_act, &btn_area, txt, NULL);
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 
     obj->skip_trans = 0;

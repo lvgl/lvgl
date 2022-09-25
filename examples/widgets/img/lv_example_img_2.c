@@ -35,7 +35,7 @@ void lv_example_img_2(void)
     lv_img_set_src(img1, &img_cogwheel_argb);
     lv_obj_align(img1, LV_ALIGN_RIGHT_MID, -20, 0);
 
-    lv_event_send(intense_slider, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(intense_slider, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 static void slider_event_cb(lv_event_t * e)

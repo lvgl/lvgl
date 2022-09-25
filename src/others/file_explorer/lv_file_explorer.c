@@ -518,7 +518,7 @@ static void browser_file_event_handler(lv_event_t * e)
         else {
             if(strcmp(str_fn, "..") != 0) {
                 explorer->sel_fn = str_fn;
-                lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             }
         }
     }
@@ -526,7 +526,7 @@ static void browser_file_event_handler(lv_event_t * e)
         lv_table_set_col_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
     }
     else if((code == LV_EVENT_CLICKED) || (code == LV_EVENT_RELEASED)) {
-        lv_event_send(obj, LV_EVENT_CLICKED, NULL);
+        lv_obj_send_event(obj, LV_EVENT_CLICKED, NULL);
     }
 }
 
@@ -599,7 +599,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
 
     lv_table_set_row_cnt(explorer->file_table, index);
     file_explorer_sort(obj);
-    lv_event_send(obj, LV_EVENT_READY, NULL);
+    lv_obj_send_event(obj, LV_EVENT_READY, NULL);
 
     /*Move the table to the top*/
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);

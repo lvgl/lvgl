@@ -184,7 +184,7 @@ static void tileview_event_cb(lv_event_t * e)
                 lv_tileview_tile_t * tile = (lv_tileview_tile_t *)tile_obj;
                 tv->tile_act = (lv_obj_t *)tile;
                 dir = tile->dir;
-                lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 break;
             }
         }

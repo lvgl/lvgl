@@ -455,7 +455,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     /*To allow styling the list*/
-    lv_event_send(dropdown_obj, LV_EVENT_READY, NULL);
+    lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
 
     lv_obj_t * label = get_label(dropdown_obj);
     lv_label_set_text_static(label, dropdown->options);
@@ -551,7 +551,7 @@ void lv_dropdown_close(lv_obj_t * obj)
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
     lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
-    lv_event_send(obj, LV_EVENT_CANCEL, NULL);
+    lv_obj_send_event(obj, LV_EVENT_CANCEL, NULL);
 }
 
 bool lv_dropdown_is_open(lv_obj_t * obj)
@@ -1016,7 +1016,7 @@ static lv_res_t btn_release_handler(lv_obj_t * obj)
                 dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
                 lv_res_t res;
                 uint32_t id  = dropdown->sel_opt_id; /*Just to use uint32_t in event data*/
-                res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &id);
+                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
                 if(res != LV_RES_OK) return res;
                 lv_obj_invalidate(obj);
             }
@@ -1071,7 +1071,7 @@ static lv_res_t list_release_handler(lv_obj_t * list_obj)
     if(dropdown->text == NULL) lv_obj_invalidate(dropdown_obj);
 
     uint32_t id  = dropdown->sel_opt_id; /*Just to use uint32_t in event data*/
-    lv_res_t res = lv_event_send(dropdown_obj, LV_EVENT_VALUE_CHANGED, &id);
+    lv_res_t res = lv_obj_send_event(dropdown_obj, LV_EVENT_VALUE_CHANGED, &id);
     if(res != LV_RES_OK) return res;
 
     return LV_RES_OK;

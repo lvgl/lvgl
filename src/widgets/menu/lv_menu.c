@@ -259,7 +259,7 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page)
         }
     }
 
-    lv_event_send((lv_obj_t *)menu, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event((lv_obj_t *)menu, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_menu_refr_main_header_mode(obj);
 }
@@ -362,7 +362,7 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
 
     /* Remove old event */
     if(lv_obj_remove_event_cb(obj, lv_menu_load_page_event_cb)) {
-        lv_event_send(obj, LV_EVENT_DELETE, NULL);
+        lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
         lv_obj_remove_event_cb(obj, lv_menu_obj_del_event_cb);
     }
 

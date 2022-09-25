@@ -56,7 +56,7 @@ void _lv_indev_scroll_handler(_lv_indev_proc_t * proc)
 
         init_scroll_limits(proc);
 
-        lv_event_send(scroll_obj, LV_EVENT_SCROLL_BEGIN, NULL);
+        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_BEGIN, NULL);
         if(proc->reset_query) return;
     }
 
@@ -198,7 +198,7 @@ void _lv_indev_scroll_throw_handler(_lv_indev_proc_t * proc)
             }
         }
 
-        lv_event_send(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
+        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
         if(proc->reset_query) return;
 
         proc->types.pointer.scroll_dir = LV_DIR_NONE;

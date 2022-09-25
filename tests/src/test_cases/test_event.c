@@ -21,7 +21,7 @@ static const lv_obj_class_t event_object_deletion_class = {
 void test_event_object_deletion(void)
 {
     lv_obj_t * obj = lv_obj_class_create_obj(&event_object_deletion_class, lv_scr_act());
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 #endif

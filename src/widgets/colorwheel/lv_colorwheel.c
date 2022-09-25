@@ -408,7 +408,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-                res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -429,7 +429,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-                res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -516,7 +516,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
     }
@@ -588,7 +588,7 @@ static lv_res_t double_click_reset(lv_obj_t * obj)
         lv_indev_wait_release(indev);
 
         if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     }

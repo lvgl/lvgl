@@ -161,7 +161,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(child == calendar->btnm) continue;
-        lv_event_send(child, LV_EVENT_VALUE_CHANGED, obj);
+        lv_obj_send_event(child, LV_EVENT_VALUE_CHANGED, obj);
     }
 }
 

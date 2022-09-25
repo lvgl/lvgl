@@ -124,8 +124,8 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     if(parent) {
         /*Call the ancestor's event handler to the parent to notify it about the new child.
          *Also triggers layout update*/
-        lv_event_send(parent, LV_EVENT_CHILD_CHANGED, obj);
-        lv_event_send(parent, LV_EVENT_CHILD_CREATED, obj);
+        lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
+        lv_obj_send_event(parent, LV_EVENT_CHILD_CREATED, obj);
 
         /*Invalidate the area if not screen created*/
         lv_obj_invalidate(obj);

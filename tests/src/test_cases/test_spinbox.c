@@ -160,27 +160,27 @@ void test_spinbox_event_key(void)
     /* Spinbox should increment it's value by one after receiving the LV_KEY_UP event */
     lv_spinbox_set_value(spinbox_events, 0);
     uint32_t key = LV_KEY_UP;
-    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(spinbox_events, LV_EVENT_KEY, (void *) &key);
 
     TEST_ASSERT_EQUAL(1, lv_spinbox_get_value(spinbox_events));
 
     /* Spinbox should decrement it's value by one after receiving the LV_KEY_DOWN event */
     key = LV_KEY_DOWN;
-    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(spinbox_events, LV_EVENT_KEY, (void *) &key);
 
     TEST_ASSERT_EQUAL(0, lv_spinbox_get_value(spinbox_events));
 
     /* Spinbox should multiply it's step vale by 10 after receiving the LV_KEY_LEFT event */
     int32_t step = lv_spinbox_get_step(spinbox_events);
     key = LV_KEY_LEFT;
-    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(spinbox_events, LV_EVENT_KEY, (void *) &key);
 
     TEST_ASSERT_EQUAL(step * 10, lv_spinbox_get_step(spinbox_events));
 
     /* Spinbox should divide it's step vale by 10 after receiving the LV_KEY_RIGHT event */
     step = lv_spinbox_get_step(spinbox_events);
     key = LV_KEY_RIGHT;
-    lv_event_send(spinbox_events, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(spinbox_events, LV_EVENT_KEY, (void *) &key);
 
     TEST_ASSERT_EQUAL(step / 10, lv_spinbox_get_step(spinbox_events));
 }
@@ -278,7 +278,7 @@ void test_spinbox_event_release(void)
 
     /* Set cursor in least significant decimal digit */
     lv_spinbox_set_cursor_pos(spinbox_events, 0);
-    lv_event_send(spinbox_events, LV_EVENT_RELEASED, NULL);
+    lv_obj_send_event(spinbox_events, LV_EVENT_RELEASED, NULL);
 
     TEST_ASSERT_EQUAL(1, lv_spinbox_get_step(spinbox_events));
 }

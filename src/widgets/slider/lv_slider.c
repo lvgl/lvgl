@@ -243,7 +243,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(*slider->value_to_set != new_value) {
             *slider->value_to_set = new_value;
             lv_obj_invalidate(obj);
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
 
@@ -319,7 +319,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
             return;
         }
 
-        res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
@@ -371,18 +371,18 @@ static void draw_knob(lv_event_t * e)
     part_draw_dsc.rect_dsc = &knob_rect_dsc;
 
     if(lv_slider_get_mode(obj) != LV_SLIDER_MODE_RANGE) {
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
     else {
         /*Save the draw part_draw_dsc. because it can be modified in the event*/
         lv_draw_rect_dsc_t knob_rect_dsc_tmp;
         lv_memcpy(&knob_rect_dsc_tmp, &knob_rect_dsc, sizeof(lv_draw_rect_dsc_t));
         /* Draw the right knob */
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->right_knob_area);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
         /*Calculate the second knob area*/
         if(is_horizontal) {
@@ -401,9 +401,9 @@ static void draw_knob(lv_event_t * e)
         part_draw_dsc.rect_dsc = &knob_rect_dsc;
         part_draw_dsc.id = 1;
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_rect(draw_ctx, &knob_rect_dsc, &slider->left_knob_area);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 

@@ -71,7 +71,7 @@ void lv_example_scroll_6(void)
     }
 
     /*Update the buttons position manually for first*/
-    lv_event_send(cont, LV_EVENT_SCROLL, NULL);
+    lv_obj_send_event(cont, LV_EVENT_SCROLL, NULL);
 
     /*Be sure the fist button is in the middle*/
     lv_obj_scroll_to_view(lv_obj_get_child(cont, 0), LV_ANIM_OFF);

@@ -155,7 +155,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
     /*Move the cursor after the new character*/
     lv_textarea_set_cursor_pos(obj, lv_textarea_get_cursor_pos(obj) + 1);
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
@@ -205,7 +205,7 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
     /*Move the cursor after the new text*/
     lv_textarea_set_cursor_pos(obj, lv_textarea_get_cursor_pos(obj) + _lv_txt_get_encoded_length(txt));
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 void lv_textarea_del_char(lv_obj_t * obj)
@@ -248,7 +248,7 @@ void lv_textarea_del_char(lv_obj_t * obj)
     /*Move the cursor to the place of the deleted character*/
     lv_textarea_set_cursor_pos(obj, ta->cursor.pos - 1);
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 
 }
 
@@ -309,7 +309,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
         auto_hide_characters(obj);
     }
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
@@ -905,7 +905,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(c == LV_KEY_END)
             lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
         else if(c == LV_KEY_ENTER && lv_textarea_get_one_line(obj))
-            lv_event_send(obj, LV_EVENT_READY, NULL);
+            lv_obj_send_event(obj, LV_EVENT_READY, NULL);
         else {
             lv_textarea_add_char(obj, c);
         }
@@ -1263,7 +1263,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
 static lv_res_t insert_handler(lv_obj_t * obj, const char * txt)
 {
     ta_insert_replace = NULL;
-    lv_event_send(obj, LV_EVENT_INSERT, (char *)txt);
+    lv_obj_send_event(obj, LV_EVENT_INSERT, (char *)txt);
 
     /* Drop txt if insert replace is set to '\0' */
     if(ta_insert_replace && ta_insert_replace[0] == '\0')

@@ -150,7 +150,7 @@ static void notify(lv_msg_t * m)
 
 static void obj_notify_cb(lv_msg_t * m)
 {
-    lv_event_send(m->_priv_data, LV_EVENT_MSG_RECEIVED, m);
+    lv_obj_send_event(m->_priv_data, LV_EVENT_MSG_RECEIVED, m);
 }
 
 static void obj_delete_event_cb(lv_event_t * e)

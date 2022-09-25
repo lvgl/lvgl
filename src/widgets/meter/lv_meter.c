@@ -364,9 +364,9 @@ static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t 
         part_draw_dsc.sub_part_ptr = indic;
         part_draw_dsc.p1 = &scale_center;
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_arc(draw_ctx, &arc_dsc, &scale_center, part_draw_dsc.radius, start_angle, end_angle);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
 
@@ -508,7 +508,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
                 lv_snprintf(buf, sizeof(buf), "%" LV_PRId32, value_of_line);
                 part_draw_dsc.text = buf;
 
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+                lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
                 lv_point_t label_size;
                 lv_txt_get_size(&label_size, part_draw_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
@@ -527,13 +527,13 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
             else {
                 part_draw_dsc.label_dsc = NULL;
                 part_draw_dsc.text = NULL;
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+                lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             }
 
             inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
             lv_draw_line(draw_ctx, &line_dsc, &p_outer, &p_center);
             lv_draw_mask_remove_id(inner_act_mask_id);
-            lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
 
             line_dsc.color = line_color_ori;
             line_dsc.width = line_width_ori;
@@ -589,9 +589,9 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             part_draw_dsc.line_dsc = &line_dsc;
             part_draw_dsc.p2 = &p_end;
 
-            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(draw_ctx, &line_dsc, &scale_center, &p_end);
-            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
         else if(indic->type == LV_METER_INDICATOR_TYPE_NEEDLE_IMG) {
             if(indic->type_data.needle_img.src == NULL) continue;
@@ -614,9 +614,9 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
 
             part_draw_dsc.img_dsc = &img_dsc;
 
-            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_img(draw_ctx, &img_dsc, &a, indic->type_data.needle_img.src);
-            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
     }
 }

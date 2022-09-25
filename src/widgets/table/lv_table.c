@@ -496,7 +496,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_indev_t * indev = lv_indev_get_act();
         lv_obj_t * scroll_obj = lv_indev_get_scroll_obj(indev);
         if(table->col_act != LV_TABLE_CELL_NONE && table->row_act != LV_TABLE_CELL_NONE && scroll_obj == NULL) {
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
 
@@ -560,7 +560,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
             table->row_act = row;
             lv_obj_invalidate(obj);
 
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
     }
@@ -716,7 +716,7 @@ static void draw_main(lv_event_t * e)
 
             part_draw_dsc.draw_area = &cell_area_border;
             part_draw_dsc.id = row * table->col_cnt + col;
-            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
             lv_draw_rect(draw_ctx, &rect_dsc_act, &cell_area_border);
 
@@ -757,7 +757,7 @@ static void draw_main(lv_event_t * e)
                 }
             }
 
-            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
             cell += col_merge + 1;
             col += col_merge;

@@ -18,7 +18,7 @@ void lv_example_arc_1(void)
     lv_obj_add_event_cb(arc, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, label);
 
     /*Manually update the label for the first time*/
-    lv_event_send(arc, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(arc, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 static void value_changed_event_cb(lv_event_t * e)

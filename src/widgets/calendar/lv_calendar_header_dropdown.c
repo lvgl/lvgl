@@ -92,7 +92,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_obj_add_event_cb(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     /*Refresh the drop downs*/
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 static void month_event_cb(lv_event_t * e)

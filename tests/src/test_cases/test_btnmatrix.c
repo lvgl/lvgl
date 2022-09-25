@@ -346,28 +346,28 @@ void test_btn_matrix_key_event_works(void)
     /* Select the first button. */
     lv_btnmatrix_set_selected_btn(btnm, 0);
     keyCode = LV_KEY_RIGHT;
-    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
     uint16_t btnId = lv_btnmatrix_get_selected_btn(btnm);
     TEST_ASSERT_EQUAL_INT(1, btnId);
 
     event_triggered = false;
     keyCode = LV_KEY_LEFT;
-    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
     btnId = lv_btnmatrix_get_selected_btn(btnm);
     TEST_ASSERT_EQUAL_INT(0, btnId);
 
     event_triggered = false;
     keyCode = LV_KEY_DOWN;
-    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
     btnId = lv_btnmatrix_get_selected_btn(btnm);
     TEST_ASSERT_EQUAL_INT(2, btnId);
 
     event_triggered = false;
     keyCode = LV_KEY_UP;
-    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
     btnId = lv_btnmatrix_get_selected_btn(btnm);
     TEST_ASSERT_EQUAL_INT(0, btnId);
@@ -376,7 +376,7 @@ void test_btn_matrix_key_event_works(void)
     btnmObj->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     lv_btnmatrix_set_btn_ctrl(btnm, 0, LV_BTNMATRIX_CTRL_HIDDEN);
     keyCode = LV_KEY_DOWN;
-    lv_event_send(btnm, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(btnm, LV_EVENT_KEY, &keyCode);
     TEST_ASSERT_TRUE(event_triggered);
     event_triggered = false;
 }
@@ -395,7 +395,7 @@ void test_btn_matrix_pressing_event_works(void)
      * This is done to increase code coverage. */
     btnmObj->btn_id_sel = 3;
     /* Send a dummy lv_indev_t object as param to avoid crashing during build. */
-    lv_event_send(btnm, LV_EVENT_PRESSING, &dummyIndev);
+    lv_obj_send_event(btnm, LV_EVENT_PRESSING, &dummyIndev);
     TEST_ASSERT_TRUE(event_triggered);
 }
 
@@ -412,7 +412,7 @@ void test_btn_matrix_long_press_repeat_event_works(void)
     /* Select a button before raising a simulated event.
      * This is done to increase code coverage. */
     btnmObj->btn_id_sel = 0;
-    lv_event_send(btnm, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
+    lv_obj_send_event(btnm, LV_EVENT_LONG_PRESSED_REPEAT, NULL);
     TEST_ASSERT_TRUE(event_triggered);
 }
 
@@ -425,7 +425,7 @@ void test_btn_matrix_press_lost_event_works(void)
     lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_PRESS_LOST, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_EVENT_PRESS_LOST;
-    lv_event_send(btnm, LV_EVENT_PRESS_LOST, NULL);
+    lv_obj_send_event(btnm, LV_EVENT_PRESS_LOST, NULL);
     TEST_ASSERT_TRUE(event_triggered);
 }
 
@@ -442,7 +442,7 @@ void test_btn_matrix_defocused_event_works(void)
     /* Select a button before raising a simulated event.
      * This is done to increase code coverage. */
     btnmObj->btn_id_sel = 0;
-    lv_event_send(btnm, LV_EVENT_DEFOCUSED, NULL);
+    lv_obj_send_event(btnm, LV_EVENT_DEFOCUSED, NULL);
     TEST_ASSERT_TRUE(event_triggered);
 }
 
@@ -455,7 +455,7 @@ void test_btn_matrix_focused_event_works(void)
     lv_obj_add_event_cb(btnm, event_handler, LV_EVENT_FOCUSED, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_EVENT_FOCUSED;
-    lv_event_send(btnm, LV_EVENT_FOCUSED, NULL);
+    lv_obj_send_event(btnm, LV_EVENT_FOCUSED, NULL);
     TEST_ASSERT_TRUE(event_triggered);
 }
 

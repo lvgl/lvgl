@@ -686,7 +686,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             break;
     }
 
-    lv_event_send(act_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    lv_obj_send_event(act_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
 
     lv_anim_start(&a_new);
     lv_anim_start(&a_old);
@@ -875,16 +875,16 @@ static void update_resolution(lv_disp_t * disp)
     for(i = 0; i < disp->screen_cnt; i++) {
         lv_area_set_width(&disp->screens[i]->coords, hor_res);
         lv_area_set_height(&disp->screens[i]->coords, ver_res);
-        lv_event_send(disp->screens[i], LV_EVENT_SIZE_CHANGED, &prev_coords);
+        lv_obj_send_event(disp->screens[i], LV_EVENT_SIZE_CHANGED, &prev_coords);
     }
 
     lv_area_set_width(&disp->top_layer->coords, hor_res);
     lv_area_set_height(&disp->top_layer->coords, ver_res);
-    lv_event_send(disp->top_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    lv_obj_send_event(disp->top_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
 
     lv_area_set_width(&disp->sys_layer->coords, hor_res);
     lv_area_set_height(&disp->sys_layer->coords, ver_res);
-    lv_event_send(disp->sys_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
+    lv_obj_send_event(disp->sys_layer, LV_EVENT_SIZE_CHANGED, &prev_coords);
 
     lv_memzero(disp->inv_areas, sizeof(disp->inv_areas));
     lv_memzero(disp->inv_area_joined, sizeof(disp->inv_area_joined));
@@ -908,13 +908,13 @@ static void scr_load_internal(lv_obj_t * scr)
 
     lv_obj_t * old_scr = d->act_scr;
 
-    if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
-    if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+    if(d->act_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOAD_START, NULL);
+    if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 
     d->act_scr = scr;
 
-    if(d->act_scr) lv_event_send(scr, LV_EVENT_SCREEN_LOADED, NULL);
-    if(d->act_scr) lv_event_send(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+    if(d->act_scr) lv_obj_send_event(scr, LV_EVENT_SCREEN_LOADED, NULL);
+    if(d->act_scr) lv_obj_send_event(old_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
 
     lv_obj_invalidate(scr);
 }
@@ -926,7 +926,7 @@ static void scr_load_anim_start(lv_anim_t * a)
     d->prev_scr = lv_scr_act();
     d->act_scr = a->var;
 
-    lv_event_send(d->act_scr, LV_EVENT_SCREEN_LOAD_START, NULL);
+    lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOAD_START, NULL);
 }
 
 static void opa_scale_anim(void * obj, int32_t v)
@@ -948,8 +948,8 @@ static void scr_anim_ready(lv_anim_t * a)
 {
     lv_disp_t * d = lv_obj_get_disp(a->var);
 
-    lv_event_send(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
-    lv_event_send(d->prev_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
+    lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
+    lv_obj_send_event(d->prev_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
 
     if(d->prev_scr && d->del_prev) lv_obj_del(d->prev_scr);
     d->prev_scr = NULL;

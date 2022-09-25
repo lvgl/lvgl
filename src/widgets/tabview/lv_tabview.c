@@ -345,7 +345,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         if(t != lv_tabview_get_tab_act(tv)) new_tab = true;
         lv_tabview_set_act(tv, t, LV_ANIM_ON);
 
-        if(new_tab) lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
+        if(new_tab) lv_obj_send_event(tv, LV_EVENT_VALUE_CHANGED, NULL);
     }
 }
 #endif /*LV_USE_TABVIEW*/
