@@ -104,13 +104,13 @@ extern "C" {
 
 #include "src/lv_api_map.h"
 
-/*-----------------
- * EXTRAS
- *----------------*/
 
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_USE_DEV_VERSION
+#error "You are using the development version of LVGL which is not stable at this moment. For production use the release/v8.3 branch. To develop LVGL add #define LV_USE_DEV_VERSION to lv_conf.h"
+#endif
 
 /**********************
  *      TYPEDEFS
