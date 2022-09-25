@@ -12,7 +12,6 @@
 #include "../misc/lv_gc.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_indev.h"
-#include "../core/lv_indev_priv.h"
 
 /*********************
  *      DEFINES
@@ -87,7 +86,7 @@ void lv_group_del(lv_group_t * group)
     /*Remove the group from any indev devices */
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(indev->group == group) {
+        if(lv_indev_get_group(indev) == group) {
             lv_indev_set_group(indev, NULL);
         }
         indev = lv_indev_get_next(indev);
@@ -483,7 +482,7 @@ static lv_indev_t * get_indev(const lv_group_t * g)
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
-        if(indev->group == g) {
+        if(lv_indev_get_group(indev) == g) {
             /*Prefer KEYPAD*/
             if(indev_type == LV_INDEV_TYPE_KEYPAD) return indev;
             if(indev_type == LV_INDEV_TYPE_ENCODER) indev_encoder = indev;

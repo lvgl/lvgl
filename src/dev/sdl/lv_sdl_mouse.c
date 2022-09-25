@@ -9,7 +9,6 @@
 #include "lv_sdl_mouse.h"
 #if LV_USE_SDL
 
-#include "../../core/lv_indev_priv.h"
 #include "../../core/lv_group.h"
 
 #include LV_SDL_INCLUDE_PATH
@@ -54,9 +53,9 @@ lv_indev_t * lv_sdl_mouse_create(void)
         return NULL;
     }
 
-    indev->type = LV_INDEV_TYPE_POINTER;
-    indev->read_cb = sdl_mouse_read;
-    indev->user_data = dsc;
+    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(indev, sdl_mouse_read);
+    lv_indev_set_user_data(indev, dsc);
 
     return indev;
 }
@@ -67,12 +66,12 @@ lv_indev_t * lv_sdl_mouse_create(void)
 
 static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_sdl_mouse_t * dev = indev->user_data;
+    lv_sdl_mouse_t * dsc = lv_indev_get_user_data(indev);
 
     /*Store the collected data*/
-    data->point.x = dev->last_x;
-    data->point.y = dev->last_y;
-    data->state = dev->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
+    data->point.x = dsc->last_x;
+    data->point.y = dsc->last_y;
+    data->state = dsc->left_button_down ? LV_INDEV_STATE_PRESSED : LV_INDEV_STATE_RELEASED;
 }
 
 
@@ -102,14 +101,14 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(indev->disp == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
+        if(lv_indev_get_disp(indev) == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER) {
             break;
         }
         indev = lv_indev_get_next(indev);
     }
 
     if(indev == NULL) return;
-    lv_sdl_mouse_t * indev_dev = indev->user_data;
+    lv_sdl_mouse_t * indev_dev = lv_indev_get_user_data(indev);
 
     lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
     lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);

@@ -9,7 +9,6 @@
 #include "lv_sdl_keyboard.h"
 #if LV_USE_SDL
 
-#include "../../core/lv_indev_priv.h"
 #include "../../core/lv_indev.h"
 #include "../../core/lv_group.h"
 #include LV_SDL_INCLUDE_PATH
@@ -54,9 +53,9 @@ lv_indev_t * lv_sdl_keyboard_create(void)
         return NULL;
     }
 
-    indev->type = LV_INDEV_TYPE_KEYPAD;
-    indev->read_cb = sdl_keyboard_read;
-    indev->user_data = dsc;
+    lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
+    lv_indev_set_read_cb(indev, sdl_keyboard_read);
+    lv_indev_set_user_data(indev, dsc);
 
     return indev;
 }
@@ -67,7 +66,7 @@ lv_indev_t * lv_sdl_keyboard_create(void)
 
 static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_sdl_keyboard_t * dev = indev->user_data;
+    lv_sdl_keyboard_t * dev = lv_indev_get_user_data(indev);
 
     const size_t len = strlen(dev->buf);
 
@@ -106,14 +105,14 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(indev->disp == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_KEYPAD) {
+        if(lv_indev_get_disp(indev) == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_KEYPAD) {
             break;
         }
         indev = lv_indev_get_next(indev);
     }
 
     if(indev == NULL) return;
-    lv_sdl_keyboard_t * indev_dev = indev->user_data;
+    lv_sdl_keyboard_t * dsc = lv_indev_get_user_data(indev);
 
 
     /* We only care about SDL_KEYDOWN and SDL_TEXTINPUT events */
@@ -122,17 +121,17 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
                 const uint32_t ctrl_key = keycode_to_ctrl_key(event->key.keysym.sym);
                 if(ctrl_key == '\0')
                     return;
-                const size_t len = strlen(indev_dev->buf);
+                const size_t len = strlen(dsc->buf);
                 if(len < KEYBOARD_BUFFER_SIZE - 1) {
-                    indev_dev->buf[len] = ctrl_key;
-                    indev_dev->buf[len + 1] = '\0';
+                    dsc->buf[len] = ctrl_key;
+                    dsc->buf[len + 1] = '\0';
                 }
                 break;
             }
         case SDL_TEXTINPUT: {                   /*Text input*/
-                const size_t len = strlen(indev_dev->buf) + strlen(event->text.text);
+                const size_t len = strlen(dsc->buf) + strlen(event->text.text);
                 if(len < KEYBOARD_BUFFER_SIZE - 1)
-                    strcat(indev_dev->buf, event->text.text);
+                    strcat(dsc->buf, event->text.text);
             }
             break;
         default:

@@ -265,11 +265,61 @@ lv_indev_t * lv_indev_get_act(void)
     return indev_act;
 }
 
+void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type)
+{
+    if(indev == NULL) return;
+
+    indev->type = indev_type;
+    indev->reset_query = 1;
+}
+
+void lv_indev_set_read_cb(lv_indev_t * indev,  void (*read_cb)(struct _lv_indev_t * indev, lv_indev_data_t * data))
+{
+    if(indev == NULL) return;
+
+    indev->read_cb = read_cb;
+}
+
+void lv_indev_set_user_data(lv_indev_t * indev, void * user_data)
+{
+    if(indev == NULL) return;
+    indev->user_data = user_data;
+}
+
+
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
     if(indev == NULL) return LV_INDEV_TYPE_NONE;
 
     return indev->type;
+}
+
+lv_indev_state_t lv_indev_get_state(const lv_indev_t * indev)
+{
+    if(indev == NULL) return LV_INDEV_STATE_RELEASED;
+
+    return indev->state;
+}
+
+lv_group_t * lv_indev_get_group(const lv_indev_t * indev)
+{
+    if(indev == NULL) return NULL;
+
+    return indev->group;
+}
+
+lv_disp_t * lv_indev_get_disp(const lv_indev_t * indev)
+{
+    if(indev == NULL) return LV_INDEV_TYPE_NONE;
+
+    return indev->disp;
+}
+
+void * lv_indev_get_user_data(const lv_indev_t * indev)
+{
+    if(indev == NULL) return NULL;
+
+    return indev->user_data;
 }
 
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)

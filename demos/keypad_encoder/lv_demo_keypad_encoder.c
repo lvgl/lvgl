@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_demo_keypad_encoder.h"
-#include "../../src/core/lv_indev_priv.h"
 
 #if LV_USE_DEMO_KEYPAD_AND_ENCODER
 
@@ -50,19 +49,20 @@ void lv_demo_keypad_encoder(void)
     g = lv_group_create();
     lv_group_set_default(g);
 
-    lv_indev_t * cur_drv = NULL;
+    lv_indev_t * indev = NULL;
     for(;;) {
-        cur_drv = lv_indev_get_next(cur_drv);
-        if(!cur_drv) {
+        indev = lv_indev_get_next(indev);
+        if(!indev) {
             break;
         }
 
-        if(cur_drv->type == LV_INDEV_TYPE_KEYPAD) {
-            lv_indev_set_group(cur_drv, g);
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type == LV_INDEV_TYPE_KEYPAD) {
+            lv_indev_set_group(indev, g);
         }
 
-        if(cur_drv->type == LV_INDEV_TYPE_ENCODER) {
-            lv_indev_set_group(cur_drv, g);
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            lv_indev_set_group(indev, g);
         }
     }
 

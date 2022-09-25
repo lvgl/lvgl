@@ -380,11 +380,14 @@ static void obj_del_core(lv_obj_t * obj)
     /*Reset all input devices if the object to delete is used*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(indev->pointer.act_obj == obj || indev->pointer.last_obj == obj) {
-            lv_indev_reset(indev, obj);
-        }
-        if(indev->pointer.last_pressed == obj) {
-            indev->pointer.last_pressed = NULL;
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
+            if(indev->pointer.act_obj == obj || indev->pointer.last_obj == obj) {
+                lv_indev_reset(indev, obj);
+            }
+            if(indev->pointer.last_pressed == obj) {
+                indev->pointer.last_pressed = NULL;
+            }
         }
 
         if(indev->group == group && obj == lv_indev_get_obj_act()) {

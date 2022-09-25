@@ -9,9 +9,7 @@
 #include "lv_sdl_mousewheel.h"
 #if LV_USE_SDL
 
-#include "../../core/lv_indev.h"
 #include "../../core/lv_group.h"
-#include "../../core/lv_indev_priv.h"
 #include LV_SDL_INCLUDE_PATH
 
 /*********************
@@ -49,9 +47,9 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
         return NULL;
     }
 
-    indev->type = LV_INDEV_TYPE_ENCODER;
-    indev->read_cb = sdl_mousewheel_read;
-    indev->user_data = dsc;
+    lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
+    lv_indev_set_read_cb(indev, sdl_mousewheel_read);
+    lv_indev_set_user_data(indev, dsc);
 
     return indev;
 }
@@ -62,11 +60,11 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
 
 static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_sdl_mousewheel_t * dev = indev->user_data;
+    lv_sdl_mousewheel_t * dsc = lv_indev_get_user_data(indev);
 
-    data->state = dev->state;
-    data->enc_diff = dev->diff;
-    dev->diff = 0;
+    data->state = dsc->state;
+    data->enc_diff = dsc->diff;
+    dsc->diff = 0;
 }
 
 void _lv_sdl_mousewheel_handler(SDL_Event * event)
@@ -89,14 +87,14 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
-        if(indev->disp == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+        if(lv_indev_get_disp(indev) == disp && lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
             break;
         }
         indev = lv_indev_get_next(indev);
     }
 
     if(indev == NULL) return;
-    lv_sdl_mousewheel_t * indev_dev = indev->user_data;
+    lv_sdl_mousewheel_t * dsc = lv_indev_get_user_data(indev);
 
     switch(event->type) {
         case SDL_MOUSEWHEEL:
@@ -104,20 +102,20 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
             // so invert it
 #ifdef __EMSCRIPTEN__
             /*Escripten scales it wrong*/
-            if(event->wheel.y < 0) indev_dev->diff++;
-            if(event->wheel.y > 0) indev_dev->diff--;
+            if(event->wheel.y < 0) dsc->diff++;
+            if(event->wheel.y > 0) dsc->diff--;
 #else
-            indev_dev->diff = -event->wheel.y;
+            dsc->diff = -event->wheel.y;
 #endif
             break;
         case SDL_MOUSEBUTTONDOWN:
             if(event->button.button == SDL_BUTTON_MIDDLE) {
-                indev_dev->state = LV_INDEV_STATE_PRESSED;
+                dsc->state = LV_INDEV_STATE_PRESSED;
             }
             break;
         case SDL_MOUSEBUTTONUP:
             if(event->button.button == SDL_BUTTON_MIDDLE) {
-                indev_dev->state = LV_INDEV_STATE_RELEASED;
+                dsc->state = LV_INDEV_STATE_RELEASED;
             }
             break;
         default:
