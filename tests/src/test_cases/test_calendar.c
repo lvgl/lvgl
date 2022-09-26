@@ -3,9 +3,6 @@
 
 #include "unity/unity.h"
 
-//#include "../test_screenshot_error.h"
-//test_screenshot_error_show();
-
 /* This function runs before each test */
 void setUp(void);
 /* This function runs after every test */
