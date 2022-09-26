@@ -280,6 +280,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     uint32_t start = lv_tick_get();
     volatile uint32_t elaps = 0;
 
+
     if(tmr) {
         disp_refr = tmr->user_data;
 #if LV_USE_PERF_MONITOR == 0 && LV_USE_MEM_MONITOR == 0
@@ -292,6 +293,16 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
     else {
         disp_refr = lv_disp_get_default();
+    }
+
+    if(disp_refr->draw_buf_size == 0) {
+        LV_LOG_WARN("draw_buf_size == 0");
+        return;
+    }
+
+    if(disp_refr->draw_buf_1 == NULL) {
+        LV_LOG_WARN("No draw buffer");
+        return;
     }
 
     /*Refresh the screen's layout if required*/
