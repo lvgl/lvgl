@@ -235,7 +235,7 @@ static void texture_resize(lv_disp_t * disp)
     lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
 
     dsc->fb = (lv_color_t *)realloc(dsc->fb, sizeof(lv_color_t) * hor_res * ver_res);
-    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, hor_res / ver_res, LV_DISP_RENDER_MODE_DIRECT);
+    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, hor_res * ver_res, LV_DISP_RENDER_MODE_DIRECT);
 
     SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
