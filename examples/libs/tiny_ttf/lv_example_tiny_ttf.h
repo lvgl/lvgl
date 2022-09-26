@@ -1,10 +1,10 @@
 /**
- * @file lvgl.h
- * This file exists only to be compatible with Arduino's library structure
+ * @file lv_example_tiny_ttf.h
+ *
  */
 
-#ifndef LVGL_SRC_H
-#define LVGL_SRC_H
+#ifndef LV_EXAMPLE_TINY_TTF_H
+#define LV_EXAMPLE_TINY_TTF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,8 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lvgl.h"
-#include "lv_conf_internal.h"
 /*********************
  *      DEFINES
  *********************/
@@ -27,6 +25,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_example_tiny_ttf_1(void);
 
 /**********************
  *      MACROS
@@ -36,4 +35,4 @@ extern "C" {
 } /*extern "C"*/
 #endif
 
-#endif /*LVGL_SRC_H*/
+#endif /*LV_EXAMPLE_TINY_TTF_H*/

@@ -2163,6 +2163,25 @@
     #endif
 #endif
 
+/* Built-in TTF decoder */
+#ifndef LV_USE_TINY_TTF
+    #ifdef CONFIG_LV_USE_TINY_TTF
+        #define LV_USE_TINY_TTF CONFIG_LV_USE_TINY_TTF
+    #else
+        #define LV_USE_TINY_TTF 0
+    #endif
+#endif
+#if LV_USE_TINY_TTF
+    /* Enable loading TTF data from files */
+    #ifndef LV_TINY_TTF_FILE_SUPPORT
+        #ifdef CONFIG_LV_TINY_TTF_FILE_SUPPORT
+            #define LV_TINY_TTF_FILE_SUPPORT CONFIG_LV_TINY_TTF_FILE_SUPPORT
+        #else
+            #define LV_TINY_TTF_FILE_SUPPORT 0
+        #endif
+    #endif
+#endif
+
 /*Rlottie library*/
 #ifndef LV_USE_RLOTTIE
     #ifdef CONFIG_LV_USE_RLOTTIE
@@ -2356,7 +2375,7 @@
             #define LV_FILE_EXPLORER_QUICK_ACCESS        1
         #endif
     #endif
-#endif  
+#endif
 
 /*==================
 * EXAMPLES
