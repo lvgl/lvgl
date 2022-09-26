@@ -126,9 +126,9 @@ static void * ttf_cache_add(ttf_cache_handle_t handle, int key, int size)
             break;
         }
         for(int i = 0; i < cache->bucket_size; ++i) {
-            ttf_cache_bucket_t * bucket = &cache->buckets[i];
-            for(int j = 0; j < bucket->capacity; ++j) {
-                ttf_cache_entry_t * entry = &bucket->entries[j];
+            ttf_cache_bucket_t * bucket2 = &cache->buckets[i];
+            for(int j = 0; j < bucket2->capacity; ++j) {
+                ttf_cache_entry_t * entry = &bucket2->entries[j];
                 if(entry->age == oldest) {
                     if(entry->data != NULL) {
                         TTF_CACHE_FREE(entry->data);
@@ -315,12 +315,12 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
 {
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
     const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
-    char * buffer = (char *)ttf_cache_get(dsc->cache, unicode_letter);
+    uint8_t * buffer = (uint8_t *)ttf_cache_get(dsc->cache, unicode_letter);
     if(buffer == NULL) {
         int g1 = stbtt_FindGlyphIndex(info, (int)unicode_letter);
         int x1, y1, x2, y2;
         stbtt_GetGlyphBitmapBox(info, g1, dsc->scale, dsc->scale, &x1, &y1, &x2, &y2);
-        int w, h, xoff, yoff;
+        int w, h;
         w = x2 - x1 + 1;
         h = y2 - y1 + 1;
         int buffer_size = w * h;
@@ -337,6 +337,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size,  lv_coord_t line_height,
                                       size_t cache_size)
 {
+    LV_UNUSED(data_size);
     if((path == NULL && data == NULL) || 0 >= line_height) {
         LV_LOG_ERROR("tiny_ttf: invalid argument\n");
         return NULL;
