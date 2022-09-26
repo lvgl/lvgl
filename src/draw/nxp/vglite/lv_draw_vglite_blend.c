@@ -493,11 +493,30 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
         src_vgbuf.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
 
-    err = vg_lite_blit_rect(&dst_vgbuf, &src_vgbuf, rect, &matrix, blend, color, VG_LITE_FILTER_POINT);
-    VG_LITE_ERR_RETURN_INV(err, "Blit rectangle failed.");
+    bool scissoring = lv_area_get_width(&blit->dst_area) < lv_area_get_width(&blit->src_area) ||
+                      lv_area_get_height(&blit->dst_area) < lv_area_get_height(&blit->src_area);
+    if(scissoring) {
+        vg_lite_enable_scissor();
+        vg_lite_set_scissor((int32_t)blit->dst_area.x1, (int32_t)blit->dst_area.y1,
+                            (int32_t)lv_area_get_width(&blit->dst_area),
+                            (int32_t)lv_area_get_height(&blit->dst_area));
+    }
 
-    if(lv_vglite_run() != LV_RES_OK)
+    err = vg_lite_blit_rect(&dst_vgbuf, &src_vgbuf, rect, &matrix, blend, color, VG_LITE_FILTER_POINT);
+    if(err != VG_LITE_SUCCESS) {
+        if(scissoring)
+            vg_lite_disable_scissor();
+        VG_LITE_RETURN_INV("Blit rectangle failed.");
+    }
+
+    if(lv_vglite_run() != LV_RES_OK) {
+        if(scissoring)
+            vg_lite_disable_scissor();
         VG_LITE_RETURN_INV("Run failed.");
+    }
+
+    if(scissoring)
+        vg_lite_disable_scissor();
 
     return LV_RES_OK;
 }
@@ -525,7 +544,7 @@ static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
             dst += dstStridePx;
         }
     }
-    else if(blit->opa >= LV_OPA_MIN) {
+    else if(blit->opa >= (lv_opa_t)LV_OPA_MIN) {
         /* alpha blending */
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {
