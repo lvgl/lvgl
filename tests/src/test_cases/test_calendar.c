@@ -50,7 +50,7 @@ void test_calendar_set_today_date(void)
     today.day = 21;
 
     lv_calendar_set_today_date(calendar, today.year, today.month, today.day);
-    
+
     const lv_calendar_date_t * date_after_test = lv_calendar_get_today_date(calendar);
 
     TEST_ASSERT_EQUAL_INT16(today.year, date_after_test->year);
@@ -77,7 +77,7 @@ void test_calendar_set_showed_date_gui(void)
     lv_calendar_set_showed_date(calendar, 2022, 9);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("calendar_02.png");
-}    
+}
 
 void test_calendar_set_highlighted_dates(void)
 {
@@ -99,7 +99,7 @@ void test_calendar_set_highlighted_dates(void)
 
     const lv_calendar_date_t * highlighted_days_after_test = lv_calendar_get_highlighted_dates(calendar);
 
-    for (int i = 0; i < 3; i++) {
+    for(int i = 0; i < 3; i++) {
         TEST_ASSERT_EQUAL_INT16(highlighted_days[i].year, highlighted_days_after_test[i].year);
         TEST_ASSERT_EQUAL_INT16(highlighted_days[i].month, highlighted_days_after_test[i].month);
         TEST_ASSERT_EQUAL_INT16(highlighted_days[i].day, highlighted_days_after_test[i].day);
@@ -174,7 +174,7 @@ void test_calendar_header_arrow_create_gui(void)
 {
     lv_calendar_header_arrow_create(calendar);
 
-    lv_calendar_set_showed_date(calendar, 2022, 10);	// Use October to avoid month name sliding
+    lv_calendar_set_showed_date(calendar, 2022, 10);    // Use October to avoid month name sliding
 
     TEST_ASSERT_EQUAL_SCREENSHOT("calendar_06.png");
 }
