@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../core/lv_disp.h"
+#include "../../../core/lv_disp.h"
 
 #if LV_USE_TFT_ESPI
 
@@ -28,9 +28,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_disp_t * lv_tft_espi_create(void);
-
-void lv_tft_espi_set_file(lv_disp_t * disp, const char * file);
+lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res);
 
 /**********************
  *      MACROS
