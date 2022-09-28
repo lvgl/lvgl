@@ -553,6 +553,11 @@ typedef struct {
     int size;
 } stbtt__buf;
 
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // TEXTURE BAKING API
@@ -5442,6 +5447,7 @@ STBTT_DEF int stbtt_CompareUTF8toUTF16_bigendian(const char * s1, int len1, cons
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
+    #pragma GCC diagnostic pop
     #pragma GCC diagnostic pop
 #endif
 
