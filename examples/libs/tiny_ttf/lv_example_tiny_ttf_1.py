@@ -1,5 +1,4 @@
 from ubuntu_font import ubuntu_font
-
 # 
 # Load a font with Tiny_TTF
 #
