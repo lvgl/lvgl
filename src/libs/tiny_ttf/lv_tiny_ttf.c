@@ -96,12 +96,13 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     int advw, lsb;
     stbtt_GetGlyphHMetrics(&dsc->info, g1, &advw, &lsb);
     int k = stbtt_GetGlyphKernAdvance(&dsc->info, g1, g2);
-    dsc_out->adv_w = (((float)advw + (float)k) * dsc->scale) + 0.5f; /*Horizontal space required by the glyph in [px]*/
+    dsc_out->adv_w = (uint16_t)floor((((float)advw + (float)k) * dsc->scale) + 0.5f); /*Horizontal space required by the glyph in [px]*/
     dsc_out->box_w = (x2 - x1 + 1);                                /*width of the bitmap in [px]*/
     dsc_out->box_h = (y2 - y1 + 1);                                /*height of the bitmap in [px]*/
     dsc_out->ofs_x = x1;                                           /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = -y2; /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;     /*Bits per pixel: 1/2/4/8*/
+    dsc_out->is_placeholder = false;
     return true;          /*true: glyph found; false: glyph was not found*/
 }
 
