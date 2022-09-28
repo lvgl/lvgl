@@ -87,6 +87,12 @@ typedef int            stbrp_coord;
 #define STBRP__MAXVAL  0x7fffffff
 // Mostly for internal use, but this is the maximum supported coordinate value.
 
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
+
 STBRP_DEF int stbrp_pack_rects(stbrp_context * context, stbrp_rect * rects, int num_rects);
 // Assign packed locations to rectangles. The rectangles are of type
 // 'stbrp_rect' defined below, stored in the array 'rects', and there
@@ -577,6 +583,10 @@ STBRP_DEF int stbrp_pack_rects(stbrp_context * context, stbrp_rect * rects, int 
     // return the all_rects_packed status
     return all_rects_packed;
 }
+#endif
+
+#if defined(__GNUC__) || defined(__clang__)
+    #pragma GCC diagnostic pop
 #endif
 
 /*
