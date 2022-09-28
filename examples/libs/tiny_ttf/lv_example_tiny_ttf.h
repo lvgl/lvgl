@@ -26,6 +26,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 void lv_example_tiny_ttf_1(void);
+void lv_example_tiny_ttf_2(void);
 
 /**********************
  *      MACROS
