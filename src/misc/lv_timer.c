@@ -141,7 +141,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
     already_running = false; /*Release the mutex*/
 
-    TIMER_TRACE("finished (%d ms until the next timer call)", time_till_next);
+    TIMER_TRACE("finished (%ld ms until the next timer call)", time_till_next);
     return time_till_next;
 }
 

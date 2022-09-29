@@ -277,7 +277,7 @@ void * lv_mem_buf_get(uint32_t size)
 {
     if(size == 0) return NULL;
 
-    MEM_TRACE("begin, getting %d bytes", size);
+    MEM_TRACE("begin, getting %ld bytes", size);
 
     /*Try to find a free buffer with suitable size*/
     int8_t i_guess = -1;
