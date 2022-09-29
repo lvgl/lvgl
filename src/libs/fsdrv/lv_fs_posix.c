@@ -13,6 +13,7 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <sys/types.h>
 #ifndef WIN32
     #include <dirent.h>
     #include <unistd.h>

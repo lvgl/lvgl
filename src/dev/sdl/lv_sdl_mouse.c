@@ -110,8 +110,8 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
     if(indev == NULL) return;
     lv_sdl_mouse_t * indev_dev = lv_indev_get_user_data(indev);
 
-    lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
-    lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
+    lv_coord_t hor_res = lv_disp_get_hor_res(disp);
+    lv_coord_t ver_res = lv_disp_get_ver_res(disp);
     uint8_t zoom = lv_sdl_window_get_zoom(disp);
 
     switch(event->type) {

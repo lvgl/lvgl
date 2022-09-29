@@ -1,5 +1,41 @@
 # Changelog
 
+## [v8.3.2](https://github.com/lvgl/lvgl/compare/v8.3.1...v8.3.2) 27 September 2022
+
+### Fixes
+
+- fix(fragment): fixed child fragment event dispatch [`3683`](https://github.com/lvgl/lvgl/pull/3683)
+- fix(sdl): clear streaming/target texture with FillRect [`3682`](https://github.com/lvgl/lvgl/pull/3682)
+- fix(sdl): transformation with alpha (#3576) [`3678`](https://github.com/lvgl/lvgl/pull/3678)
+- fix(draw_sw): fix image cache to access the freed stack space [`3584`](https://github.com/lvgl/lvgl/pull/3584)
+- fix(style): use compile time prop_cnt for const styles [`3609`](https://github.com/lvgl/lvgl/pull/3609)
+- fix(demo): can not found lvgl.h file [`3477`](https://github.com/lvgl/lvgl/pull/3477)
+- fix(ci) checkout lv_micropython release/v8 branch [`3524`](https://github.com/lvgl/lvgl/pull/3524)
+- fix(canvas): fix clipéping on transformation [`b884aba`](https://github.com/lvgl/lvgl/commit/b884abae26f3824b27783a85d18ed51e550347c1)
+- fix(draw): allow drawing outline with LV_DRAW_COMPLEX == 0 too [`ece3495`](https://github.com/lvgl/lvgl/commit/ece34950040e218fc73605a4e88f1060c2a274f8)
+- fix(colorwheel): fix updating color when using lv_colorwheel_set_hsv [`d59bba1`](https://github.com/lvgl/lvgl/commit/d59bba12db115afb4b6aa53eed2625221dfff2fd)
+- fix(slider): find the nearest value on click instead of floor [`dfd14fa`](https://github.com/lvgl/lvgl/commit/dfd14fa778aef25d0db61748a58aa9989ce5e2c8)
+- fix(draw): fix border drawing with thick borders [`d5b2a9b`](https://github.com/lvgl/lvgl/commit/d5b2a9b2562cbfa327bf0ec03c11d28576037a14)
+- fix(refr): fix true double double buffering logic with transparent screens [`8b605cc`](https://github.com/lvgl/lvgl/commit/8b605cc48224d0497cdd936fa77229e0c3d606d2)
+- fix(group): be sure obj is removed from its current group in lv_group_add_obj [`5156ee0`](https://github.com/lvgl/lvgl/commit/5156ee058d5de674a00ffd84d15d460de7f0e53b)
+- fix(style): add missing invalidation in lv_obj_remove_local_style_prop [`a0515ba`](https://github.com/lvgl/lvgl/commit/a0515ba30dd74b8b22a6709d334eb03782ee1a4d)
+
+### Docs
+
+- docs(draw) remove reference to old lv_fs_add_drv function [`3564`](https://github.com/lvgl/lvgl/pull/3564)
+- docs(disp): LV_COLOR_SCREEN_TRANSP remove dependency on LV_COLOR_DEPTH_32 as transparency is supported across all color depths [`3556`](https://github.com/lvgl/lvgl/pull/3556)
+
+### CI and tests
+
+- ci: protect test.c with #if LV_BUILD_TEST [`be485d7`](https://github.com/lvgl/lvgl/commit/be485d7605136d2a5d6a633c7cb5b7c525cae7ee)
+
+### Others
+
+- chore(rt-thread) backport fixes from v9 [`3604`](https://github.com/lvgl/lvgl/pull/3604)
+
+- chore: fix warnings [`7640950`](https://github.com/lvgl/lvgl/commit/76409502163ffe67cfbab9c7f24f2226cc8a5941)
+- remove accidentally added code [`5022476`](https://github.com/lvgl/lvgl/commit/5022476edc8676f2a6ef7b919d3578159edeef7c)
+
 ## [v8.3.1](https://github.com/lvgl/lvgl/compare/v8.3.0...v8.3.1) 25 July 2022
 
 ### Fixes

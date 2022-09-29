@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MAX_BUF_SIZE (uint32_t) lv_disp_get_horizonal_resolution(_lv_refr_get_disp_refreshing())
+#define MAX_BUF_SIZE (uint32_t) lv_disp_get_hor_res(_lv_refr_get_disp_refreshing())
 
 /**********************
  *      TYPEDEFS

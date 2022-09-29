@@ -84,7 +84,7 @@ lv_disp_t * lv_sdl_window_create(void)
 
     lv_disp_set_flush_cb(disp, flush_cb);
     lv_disp_set_draw_buffers(disp, dsc->fb, NULL,
-                             lv_disp_get_horizonal_resolution(disp) * lv_disp_get_horizonal_resolution(disp), LV_DISP_RENDER_MODE_DIRECT);
+                             lv_disp_get_hor_res(disp) * lv_disp_get_hor_res(disp), LV_DISP_RENDER_MODE_DIRECT);
     lv_disp_add_event_cb(disp, res_chg_event_cb, LV_DISP_EVENT_RESOLUTION_CHANGED, NULL);
 
     return disp;
@@ -203,8 +203,8 @@ static void window_create(lv_disp_t * disp)
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
 
-    lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
-    lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
+    lv_coord_t hor_res = lv_disp_get_hor_res(disp);
+    lv_coord_t ver_res = lv_disp_get_ver_res(disp);
     dsc->window = SDL_CreateWindow("TFT Simulator",
                                    SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
@@ -217,7 +217,7 @@ static void window_create(lv_disp_t * disp)
 static void window_update(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
-    lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
+    lv_coord_t hor_res = lv_disp_get_hor_res(disp);
 
     SDL_UpdateTexture(dsc->texture, NULL, dsc->fb, hor_res * sizeof(lv_color_t));
     SDL_RenderClear(dsc->renderer);
@@ -230,8 +230,8 @@ static void window_update(lv_disp_t * disp)
 
 static void texture_resize(lv_disp_t * disp)
 {
-    lv_coord_t hor_res = lv_disp_get_horizonal_resolution(disp);
-    lv_coord_t ver_res = lv_disp_get_vertical_resolution(disp);
+    lv_coord_t hor_res = lv_disp_get_hor_res(disp);
+    lv_coord_t ver_res = lv_disp_get_ver_res(disp);
     lv_sdl_window_t * dsc = lv_disp_get_user_data(disp);
 
     dsc->fb = (lv_color_t *)realloc(dsc->fb, sizeof(lv_color_t) * hor_res * ver_res);

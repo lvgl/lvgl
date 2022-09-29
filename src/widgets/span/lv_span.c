@@ -606,7 +606,14 @@ static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font,
         return false;
     }
 
-    uint32_t ofs = _lv_txt_get_next_line(txt, font, letter_space, max_width, use_width, flag);
+    lv_coord_t real_max_width = max_width;
+#if !LV_USE_FONT_PLACEHOLDER
+    /* fix incomplete text display when disable the placeholder. */
+    /* workaround by: https://github.com/lvgl/lvgl/issues/3685 */
+    real_max_width++;
+#endif
+
+    uint32_t ofs = _lv_txt_get_next_line(txt, font, letter_space, real_max_width, use_width, flag);
     *end_ofs = ofs;
 
     if(txt[ofs] == '\0' && *use_width < max_width) {

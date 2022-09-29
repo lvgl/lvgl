@@ -46,9 +46,9 @@ extern lv_font_t font_3;
 void test_font_loader(void)
 {
     /*Test with cahce ('A' has cache)*/
-    lv_font_t * font_1_bin = lv_font_load("A:src/test_fonts/font_1.fnt");
-    lv_font_t * font_2_bin = lv_font_load("A:src/test_fonts/font_2.fnt");
-    lv_font_t * font_3_bin = lv_font_load("A:src/test_fonts/font_3.fnt");
+    lv_font_t * font_1_bin = lv_font_load("A:src/test_assets/font_1.fnt");
+    lv_font_t * font_2_bin = lv_font_load("A:src/test_assets/font_2.fnt");
+    lv_font_t * font_3_bin = lv_font_load("A:src/test_assets/font_3.fnt");
 
     compare_fonts(&font_1, font_1_bin);
     compare_fonts(&font_2, font_2_bin);
@@ -59,9 +59,9 @@ void test_font_loader(void)
     lv_font_free(font_3_bin);
 
     /*Test with cahce ('B' has NO cache)*/
-    font_1_bin = lv_font_load("B:src/test_fonts/font_1.fnt");
-    font_2_bin = lv_font_load("B:src/test_fonts/font_2.fnt");
-    font_3_bin = lv_font_load("B:src/test_fonts/font_3.fnt");
+    font_1_bin = lv_font_load("B:src/test_assets/font_1.fnt");
+    font_2_bin = lv_font_load("B:src/test_assets/font_2.fnt");
+    font_3_bin = lv_font_load("B:src/test_assets/font_3.fnt");
 
     compare_fonts(&font_1, font_1_bin);
     compare_fonts(&font_2, font_2_bin);
