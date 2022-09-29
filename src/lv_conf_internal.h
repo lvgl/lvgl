@@ -2519,20 +2519,29 @@
     #endif
 #endif
 #if LV_USE_SDL
-#ifndef LV_SDL_INCLUDE_PATH
-    #ifdef CONFIG_LV_SDL_INCLUDE_PATH
-        #define LV_SDL_INCLUDE_PATH CONFIG_LV_SDL_INCLUDE_PATH
-    #else
-        #  define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+    #ifndef LV_SDL_INCLUDE_PATH
+        #ifdef CONFIG_LV_SDL_INCLUDE_PATH
+            #define LV_SDL_INCLUDE_PATH CONFIG_LV_SDL_INCLUDE_PATH
+        #else
+            #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+        #endif
     #endif
-#endif
 #endif
 
 #ifndef LV_USE_LINUX_FBDEV
     #ifdef CONFIG_LV_USE_LINUX_FBDEV
         #define LV_USE_LINUX_FBDEV CONFIG_LV_USE_LINUX_FBDEV
     #else
-        #define LV_USE_LINUX_FBDEV  0
+        #define LV_USE_LINUX_FBDEV      0
+    #endif
+#endif
+#if LV_USE_LINUX_FBDEV
+    #ifndef LV_LINUX_FBDEV_BSD
+        #ifdef CONFIG_LV_LINUX_FBDEV_BSD
+            #define LV_LINUX_FBDEV_BSD CONFIG_LV_LINUX_FBDEV_BSD
+        #else
+            #define LV_LINUX_FBDEV_BSD   0
+        #endif
     #endif
 #endif
 
