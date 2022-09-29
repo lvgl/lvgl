@@ -158,8 +158,10 @@ static void lv_draw_nxp_wait_cb(lv_draw_ctx_t * draw_ctx)
 
 static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    if(need_argb8565_support())
-        return lv_draw_sw_blend_basic(draw_ctx, dsc);
+    if(need_argb8565_support()) {
+        lv_draw_sw_blend_basic(draw_ctx, dsc);
+        return;
+    }
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
@@ -248,8 +250,10 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
 static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf)
 {
-    if(need_argb8565_support())
-        return lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+    if(need_argb8565_support()) {
+        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+        return;
+    }
 
     /*Use the clip area as draw area*/
     lv_area_t draw_area;
@@ -340,8 +344,10 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 static void lv_draw_nxp_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
                              const lv_point_t * point2)
 {
-    if(need_argb8565_support())
-        return lv_draw_sw_line(draw_ctx, dsc, point1, point2);
+    if(need_argb8565_support()) {
+        lv_draw_sw_line(draw_ctx, dsc, point1, point2);
+        return;
+    }
 
     if(dsc->width == 0)
         return;
@@ -374,8 +380,10 @@ static void lv_draw_nxp_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t 
 
 static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(need_argb8565_support())
-        return lv_draw_sw_rect(draw_ctx, dsc, coords);
+    if(need_argb8565_support()) {
+        lv_draw_sw_rect(draw_ctx, dsc, coords);
+        return;
+    }
 
     lv_draw_rect_dsc_t nxp_dsc;
 
@@ -520,8 +528,10 @@ static lv_res_t draw_nxp_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_ds
 static void lv_draw_nxp_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                             uint16_t radius, uint16_t start_angle, uint16_t end_angle)
 {
-    if(need_argb8565_support())
-        return lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
+    if(need_argb8565_support()) {
+        lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
+        return;
+    }
 
     bool done = false;
 

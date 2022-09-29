@@ -76,7 +76,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
 
     bool is_dashed = (dsc->dash_width && dsc->dash_gap);
 
-    vg_lite_float_t stroke_dash_pattern[2] = {};
+    vg_lite_float_t stroke_dash_pattern[2] = {0, 0};
     uint32_t stroke_dash_count = 0;
     vg_lite_float_t stroke_dash_phase = 0;
     if(is_dashed) {
