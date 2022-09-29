@@ -89,10 +89,7 @@ void lv_obj_remove_style(struct _lv_obj_t * obj, const lv_style_t * style, lv_st
  * Remove all styles from an object
  * @param obj       pointer to an object
  */
-static inline void lv_obj_remove_style_all(struct _lv_obj_t * obj)
-{
-    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
-}
+void lv_obj_remove_style_all(struct _lv_obj_t * obj);
 
 /**
  * Notify all object if a style is modified
