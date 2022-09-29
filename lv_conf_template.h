@@ -71,6 +71,9 @@
    HAL SETTINGS
  *====================*/
 
+/*Default display refresh, input device read and animation step period.*/
+#define LV_DEF_REFR_PERIOD  33      /*[ms]*/
+
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
 #define LV_TICK_CUSTOM 0
@@ -752,6 +755,21 @@
     #define LV_DEMO_MUSIC_LARGE     0
     #define LV_DEMO_MUSIC_AUTO_PLAY 0
 #endif
+
+/*==================
+ * DEVICES
+ *==================*/
+#define LV_USE_SDL          0
+#if LV_USE_SDL
+    #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+#endif
+
+#define LV_USE_LINUX_FBDEV      0
+#if LV_USE_LINUX_FBDEV
+    #define LV_LINUX_FBDEV_BSD   0
+#endif
+
+#define LV_USE_TFT_ESPI     0
 
 /*--END OF LV_CONF_H--*/
 

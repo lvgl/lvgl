@@ -46,7 +46,7 @@ lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, u
     if(dsc == NULL) return NULL;
     lv_memzero(dsc, sizeof(lv_tft_espi_t));
 
-    lv_disp_t * disp = lv_disp_create();
+    lv_disp_t * disp = lv_disp_create(hor_res, ver_res);
     if(disp == NULL) {
         lv_free(dsc);
         return NULL;

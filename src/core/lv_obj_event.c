@@ -33,7 +33,6 @@ static bool event_is_bubbled(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_event_t * event_head;
 
 /**********************
  *      MACROS
@@ -64,17 +63,13 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
     e.stop_bubbling = 0;
     e.stop_processing = 0;
 
-    /*Build a simple linked list from the objects used in the events
-     *It's important to know if this object was deleted by a nested event
-     *called from this `event_cb`.*/
-    e.prev = event_head;
-    event_head = &e;
+    _lv_event_push(&e);
 
     /*Send the event*/
     lv_res_t res = event_send_core(&e);
 
     /*Remove this element from the list*/
-    event_head = e.prev;
+    _lv_event_pop(&e);
 
     return res;
 }

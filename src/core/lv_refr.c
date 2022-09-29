@@ -304,7 +304,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
+#if LV_USE_PERF_MONITOR && LV_USE_LABEL
+    volatile uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
+#endif
     disp_refr->last_render_start_time = start;
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL

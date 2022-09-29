@@ -71,23 +71,23 @@ static lv_disp_t * disp_def;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_disp_create(void)
+lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 {
     lv_disp_t * disp = _lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
     LV_ASSERT_MALLOC(disp);
     if(!disp) return NULL;
 
-    lv_disp_init(disp);
+    lv_disp_init(disp, hor_res, ver_res);
 
     return disp;
 }
 
-void lv_disp_init(lv_disp_t * disp)
+void lv_disp_init(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
 {
     lv_memzero(disp, sizeof(lv_disp_t));
 
-    disp->hor_res          = 320;
-    disp->ver_res          = 240;
+    disp->hor_res          = hor_res;
+    disp->ver_res          = ver_res;
     disp->physical_hor_res = -1;
     disp->physical_ver_res = -1;
     disp->offset_x         = 0;
@@ -106,39 +106,20 @@ void lv_disp_init(lv_disp_t * disp)
 #endif
 
 #if LV_USE_GPU_STM32_DMA2D
-    disp->draw_ctx_init = lv_draw_stm32_dma2d_ctx_init;
-    disp->draw_ctx_deinit = lv_draw_stm32_dma2d_ctx_deinit;
-    disp->draw_ctx_size = sizeof(lv_draw_stm32_dma2d_ctx_t);
+    lv_disp_set_draw_ctx(disp, lv_draw_stm32_dma2d_ctx_init, lv_draw_stm32_dma2d_ctx_deinit,
+                         sizeof(lv_draw_stm32_dma2d_ctx_t));
 #elif LV_USE_GPU_SWM341_DMA2D
-    disp->draw_ctx_init = lv_draw_swm341_dma2d_ctx_init;
-    disp->draw_ctx_deinit = lv_draw_swm341_dma2d_ctx_deinit;
-    disp->draw_ctx_size = sizeof(lv_draw_swm341_dma2d_ctx_t);
+    lv_disp_set_draw_ctx(disp, lv_draw_swm341_dma2d_ctx_init, lv_draw_swm341_dma2d_ctx_deinit,
+                         sizeof(lv_draw_swm341_dma2d_ctx_t));
 #elif LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE
-    disp->draw_ctx_init = lv_draw_nxp_ctx_init;
-    disp->draw_ctx_deinit = lv_draw_nxp_ctx_deinit;
-    disp->draw_ctx_size = sizeof(lv_draw_nxp_ctx_t);
+    lv_disp_set_draw_ctx(disp, lv_draw_nxp_ctx_init, lv_draw_nxp_ctx_deinit, sizeof(lv_draw_nxp_ctx_t));
 #elif LV_USE_DRAW_SDL
-    disp->draw_ctx_init = lv_draw_sdl_init_ctx;
-    disp->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
-    disp->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
+    lv_disp_set_draw_ctx(disp, lv_draw_sdl_init_ctx, lv_draw_sdl_deinit_ctx, sizeof(lv_draw_sdl_ctx_t));
 #elif LV_USE_GPU_ARM2D
-    disp->draw_ctx_init = lv_draw_arm2d_ctx_init;
-    disp->draw_ctx_deinit = lv_draw_arm2d_ctx_deinit;
-    disp->draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
+    lv_disp_set_draw_ctx(disp, lv_draw_arm2d_ctx_init, lv_draw_arm2d_ctx_deinit, sizeof(lv_draw_arm2d_ctx_t));
 #else
-    disp->draw_ctx_init = lv_draw_sw_init_ctx;
-    disp->draw_ctx_deinit = lv_draw_sw_deinit_ctx;
-    disp->draw_ctx_size = sizeof(lv_draw_sw_ctx_t);
+    lv_disp_set_draw_ctx(disp, lv_draw_sw_init_ctx, lv_draw_sw_deinit_ctx, sizeof(lv_draw_sw_ctx_t));
 #endif
-
-    /*Create a draw context if not created yet*/
-    if(disp->draw_ctx == NULL) {
-        lv_draw_ctx_t * draw_ctx = lv_malloc(disp->draw_ctx_size);
-        LV_ASSERT_MALLOC(draw_ctx);
-        if(draw_ctx == NULL) return;
-        disp->draw_ctx_init(disp, draw_ctx);
-        disp->draw_ctx = draw_ctx;
-    }
 
     disp->draw_ctx->color_format = disp->color_format;
     disp->draw_ctx->render_with_alpha = disp->screen_transp;
@@ -193,38 +174,38 @@ void lv_disp_init(lv_disp_t * disp)
 
 void lv_disp_remove(lv_disp_t * disp)
 {
-    //    bool was_default = false;
-    //    if(disp == lv_disp_get_default()) was_default = true;
-    //
-    //    /*Detach the input devices*/
-    //    lv_indev_t * indev;
-    //    indev = lv_indev_get_next(NULL);
-    //    while(indev) {
-    //        if(indev->driver->disp == disp) {
-    //            indev->driver->disp = NULL;
-    //        }
-    //        indev = lv_indev_get_next(indev);
-    //    }
-    //
-    //    /** delete screen and other obj */
-    //    if(disp->sys_layer) {
-    //        lv_obj_del(disp->sys_layer);
-    //        disp->sys_layer = NULL;
-    //    }
-    //    if(disp->top_layer) {
-    //        lv_obj_del(disp->top_layer);
-    //        disp->top_layer = NULL;
-    //    }
-    //    while(disp->screen_cnt != 0) {
-    //        /*Delete the screenst*/
-    //        lv_obj_del(disp->screens[0]);
-    //    }
-    //
-    //    _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
-    //    if(disp->refr_timer) lv_timer_del(disp->refr_timer);
-    //    lv_free(disp);
-    //
-    //    if(was_default) lv_disp_set_default(_lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
+    bool was_default = false;
+    if(disp == lv_disp_get_default()) was_default = true;
+
+    /*Detach the input devices*/
+    lv_indev_t * indev;
+    indev = lv_indev_get_next(NULL);
+    while(indev) {
+        if(lv_indev_get_disp(indev) == disp) {
+            lv_indev_set_disp(indev, NULL);
+        }
+        indev = lv_indev_get_next(indev);
+    }
+
+    /* Delete screen and other obj */
+    if(disp->sys_layer) {
+        lv_obj_del(disp->sys_layer);
+        disp->sys_layer = NULL;
+    }
+    if(disp->top_layer) {
+        lv_obj_del(disp->top_layer);
+        disp->top_layer = NULL;
+    }
+    while(disp->screen_cnt != 0) {
+        /*Delete the screenst*/
+        lv_obj_del(disp->screens[0]);
+    }
+
+    _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
+    if(disp->refr_timer) lv_timer_del(disp->refr_timer);
+    lv_free(disp);
+
+    if(was_default) lv_disp_set_default(_lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
 }
 
 /**
@@ -495,7 +476,21 @@ void lv_disp_set_draw_ctx(lv_disp_t * disp,
                           void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx),
                           size_t draw_ctx_size)
 {
-    /*TODO*/
+    if(disp->draw_ctx) {
+        if(disp->draw_ctx_deinit) disp->draw_ctx_deinit(disp, disp->draw_ctx);
+        lv_free(disp->draw_ctx);
+        disp->draw_ctx = NULL;
+    }
+
+    disp->draw_ctx_init = draw_ctx_init;
+    disp->draw_ctx_deinit = draw_ctx_deinit;
+    disp->draw_ctx_size = draw_ctx_size;
+
+    lv_draw_ctx_t * draw_ctx = lv_malloc(disp->draw_ctx_size);
+    LV_ASSERT_MALLOC(draw_ctx);
+    if(draw_ctx == NULL) return;
+    disp->draw_ctx_init(disp, draw_ctx);
+    disp->draw_ctx = draw_ctx;
 }
 
 /*---------------------
@@ -915,7 +910,12 @@ void lv_disp_set_user_data(lv_disp_t * disp, void * user_data)
     if(!disp) disp = lv_disp_get_default();
     if(!disp) return;
 
+#if LV_USE_USER_DATA
     disp->user_data = user_data;
+#else
+    LV_UNUSED(user_data);
+    LV_LOG_WARN("LV_USE_USER_DATA is not enabled");
+#endif
 }
 
 void * lv_disp_get_user_data(lv_disp_t * disp)
@@ -923,7 +923,12 @@ void * lv_disp_get_user_data(lv_disp_t * disp)
     if(!disp) disp = lv_disp_get_default();
     if(!disp) return NULL;
 
+#if LV_USE_USER_DATA
     return disp->user_data;
+#else
+    LV_LOG_WARN("LV_USE_USER_DATA is no enabled");
+    return NULL;
+#endif
 
 }
 

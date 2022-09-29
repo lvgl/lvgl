@@ -384,7 +384,6 @@ void test_btn_matrix_key_event_works(void)
 void test_btn_matrix_pressing_event_works(void)
 {
     lv_btnmatrix_t * btnmObj = (lv_btnmatrix_t *)btnm;
-    lv_indev_t dummyIndev = {0};
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
@@ -395,7 +394,7 @@ void test_btn_matrix_pressing_event_works(void)
      * This is done to increase code coverage. */
     btnmObj->btn_id_sel = 3;
     /* Send a dummy lv_indev_t object as param to avoid crashing during build. */
-    lv_obj_send_event(btnm, LV_OBJ_EVENT_PRESSING, &dummyIndev);
+    lv_obj_send_event(btnm, LV_OBJ_EVENT_PRESSING, lv_test_mouse_indev);
     TEST_ASSERT_TRUE(event_triggered);
 }
 

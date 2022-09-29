@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../drv/lv_drv.h"
+#include "../../../core/lv_disp.h"
 
 #if LV_USE_LINUX_FBDEV
 

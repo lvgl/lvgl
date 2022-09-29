@@ -1,1 +1,0 @@
-Vendor or platform specific drivers.

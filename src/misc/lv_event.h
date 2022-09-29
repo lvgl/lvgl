@@ -132,6 +132,9 @@ typedef void (*lv_event_cb_t)(lv_event_t * e);
  * GLOBAL PROTOTYPES
  **********************/
 
+void _lv_event_push(lv_event_t * e);
+
+void _lv_event_pop(lv_event_t * e);
 
 lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess);
 

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_linux_fbdev.h"
-#if LV_USE_LINUX_FBDEV || USE_BSD_FBDEV
+#if LV_USE_LINUX_FBDEV
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,14 +17,14 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 
-#if USE_BSD_FBDEV
+#if LV_LINUX_FBDEV_BSD
     #include <sys/fcntl.h>
     #include <sys/time.h>
     #include <sys/consio.h>
     #include <sys/fbio.h>
-#else  /* USE_BSD_FBDEV */
+#else  /* LV_LINUX_FBDEV_BSD */
     #include <linux/fb.h>
-#endif /* USE_BSD_FBDEV */
+#endif /* LV_LINUX_FBDEV_BSD */
 
 /*********************
  *      DEFINES
@@ -50,13 +50,13 @@ struct bsd_fb_fix_info {
 typedef struct {
     const char * devname;
     lv_color_format_t color_format;
-#if USE_BSD_FBDEV
+#if LV_LINUX_FBDEV_BSD
     struct bsd_fb_var_info vinfo;
     struct bsd_fb_fix_info finfo;
 #else
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
-#endif /* USE_BSD_FBDEV */
+#endif /* LV_LINUX_FBDEV_BSD */
     char * fbp;
     long int screensize;
     int fbfd;
@@ -74,9 +74,9 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
 /**********************
  *      MACROS
  **********************/
-#if USE_BSD_FBDEV
+#if LV_LINUX_FBDEV_BSD
     #define FBIOBLANK FBIO_BLANK
-#endif /* USE_BSD_FBDEV */
+#endif /* LV_LINUX_FBDEV_BSD */
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -89,7 +89,7 @@ lv_disp_t * lv_linux_fbdev_create(void)
     if(dsc == NULL) return NULL;
     lv_memzero(dsc, sizeof(lv_linux_fb_t));
 
-    lv_disp_t * disp = lv_disp_create();
+    lv_disp_t * disp = lv_disp_create(800, 480);
     if(disp == NULL) {
         lv_free(dsc);
         return NULL;
@@ -127,7 +127,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
         // Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.
     }
 
-#if USE_BSD_FBDEV
+#if LV_LINUX_FBDEV_BSD
     struct fbtype fb;
     unsigned line_length;
 
@@ -150,7 +150,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     dsc->vinfo.yoffset = 0;
     dsc->finfo.line_length = line_length;
     dsc->finfo.smem_len = dsc->finfo.line_length * dsc->vinfo.yres;
-#else /* USE_BSD_FBDEV */
+#else /* LV_LINUX_FBDEV_BSD */
 
     // Get fixed screen information
     if(ioctl(dsc->fbfd, FBIOGET_FSCREENINFO, &dsc->finfo) == -1) {
@@ -163,7 +163,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
         perror("Error reading variable information");
         return;
     }
-#endif /* USE_BSD_FBDEV */
+#endif /* LV_LINUX_FBDEV_BSD */
 
     LV_LOG_INFO("%dx%d, %dbpp", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
 
@@ -291,4 +291,4 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
     lv_disp_flush_ready(disp);
 }
 
-#endif /*LV_USE_LINUX_FBDEV || USE_BSD_FBDEV*/
+#endif /*LV_USE_LINUX_FBDEV*/

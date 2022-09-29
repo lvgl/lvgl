@@ -47,6 +47,21 @@ static lv_event_t * event_head;
  *   GLOBAL FUNCTIONS
  **********************/
 
+void _lv_event_push(lv_event_t * e)
+{
+    /*Build a simple linked list from the objects used in the events
+     *It's important to know if this object was deleted by a nested event
+     *called from this `event_cb`.*/
+    e->prev = event_head;
+    event_head = e;
+
+}
+
+void _lv_event_pop(lv_event_t * e)
+{
+    event_head = e->prev;
+}
+
 lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess)
 {
     if(list == NULL) return LV_RES_OK;

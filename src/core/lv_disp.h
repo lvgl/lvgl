@@ -70,9 +70,9 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_disp_t * lv_disp_create(void);
+lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res);
 
-void lv_disp_init(lv_disp_t * disp);
+void lv_disp_init(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res);
 
 /**
  * Remove a display

@@ -59,7 +59,7 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_sdl_window_create(void)
+lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
 {
     static bool inited = false;
     if(!inited) {
@@ -74,7 +74,7 @@ lv_disp_t * lv_sdl_window_create(void)
     if(dsc == NULL) return NULL;
     lv_memzero(dsc, sizeof(lv_sdl_window_t));
 
-    lv_disp_t * disp = lv_disp_create();
+    lv_disp_t * disp = lv_disp_create(hor_res, ver_res);
     if(disp == NULL) {
         lv_free(dsc);
         return NULL;
