@@ -1,4 +1,5 @@
 #include "../../../lvgl.h"
+#include "../../misc/lv_gc.h"
 #if LV_USE_TINY_TTF
 #include <stdio.h>
 #include "lv_tiny_ttf.h"
@@ -114,7 +115,6 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
 {
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
     const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
-    static uint8_t * buffer = NULL;
     static size_t buffer_size = 0;
     int g1 = stbtt_FindGlyphIndex(info, (int)unicode_letter);
     int x1, y1, x2, y2;
@@ -122,29 +122,29 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
     int w, h;
     w = x2 - x1 + 1;
     h = y2 - y1 + 1;
-    if(buffer == NULL) {
+    if(LV_GC_ROOT(_ttf_glyph_bitmap_buffer) == NULL) {
         buffer_size = (size_t)(w * h);
-        buffer = (uint8_t *)lv_malloc(buffer_size);
-        if(buffer == NULL) {
+        LV_GC_ROOT(_ttf_glyph_bitmap_buffer) = (uint8_t *)lv_malloc(buffer_size);
+        if(LV_GC_ROOT(_ttf_glyph_bitmap_buffer) == NULL) {
             buffer_size = 0;
             return NULL;
         }
-        memset(buffer, 0, buffer_size);
+        memset(LV_GC_ROOT(_ttf_glyph_bitmap_buffer), 0, buffer_size);
     }
     else {
         size_t s = w * h;
         if(s > buffer_size) {
             buffer_size = s;
-            buffer = (uint8_t *)lv_realloc(buffer, buffer_size);
-            if(buffer == NULL) {
+            LV_GC_ROOT(_ttf_glyph_bitmap_buffer) = (uint8_t *)lv_realloc(LV_GC_ROOT(_ttf_glyph_bitmap_buffer), buffer_size);
+            if(LV_GC_ROOT(_ttf_glyph_bitmap_buffer) == NULL) {
                 buffer_size = 0;
                 return NULL;
             }
-            memset(buffer, 0, buffer_size);
+            memset(LV_GC_ROOT(_ttf_glyph_bitmap_buffer), 0, buffer_size);
         }
     }
-    stbtt_MakeGlyphBitmap(info, buffer, w, h, w, dsc->scale, dsc->scale, g1);
-    return buffer; /*Or NULL if not found*/
+    stbtt_MakeGlyphBitmap(info, LV_GC_ROOT(_ttf_glyph_bitmap_buffer), w, h, w, dsc->scale, dsc->scale, g1);
+    return LV_GC_ROOT(_ttf_glyph_bitmap_buffer); /*Or NULL if not found*/
 }
 
 static lv_font_t * lv_tiny_ttf_create(const char * path, const void * data, size_t data_size,  lv_coord_t line_height)
