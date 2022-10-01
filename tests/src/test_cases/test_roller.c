@@ -10,8 +10,10 @@
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * roller = NULL;
 static lv_obj_t * roller_infinite = NULL;
+static lv_obj_t * roller_mouse = NULL;
 static lv_group_t * g = NULL;
 static lv_group_t * encoder_g = NULL;
+static lv_group_t * mouse_g = NULL;
 
 static const char * default_roller_options = "One\nTwo\nThree";
 static const char * default_infinite_roller_options = "One\nTwo\nThree\nFour\nFive\nSix\nSeven\nEight\nNine\nTen";
@@ -21,9 +23,11 @@ void setUp(void)
     active_screen = lv_scr_act();
     roller = lv_roller_create(active_screen);
     roller_infinite = lv_roller_create(active_screen);
+    roller_mouse = lv_roller_create(active_screen);
 
     lv_roller_set_options(roller, default_roller_options, LV_ROLLER_MODE_NORMAL);
     lv_roller_set_options(roller_infinite, default_infinite_roller_options, LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_options(roller_mouse, default_roller_options, LV_ROLLER_MODE_NORMAL);
 
     g = lv_group_create();
     lv_indev_set_group(lv_test_keypad_indev, g);
@@ -31,14 +35,19 @@ void setUp(void)
     encoder_g = lv_group_create();
     lv_indev_set_group(lv_test_encoder_indev, encoder_g);
 
+    mouse_g = lv_group_create();
+    lv_indev_set_group(lv_test_mouse_indev, mouse_g);
+
     lv_group_add_obj(g, roller);
     lv_group_add_obj(encoder_g, roller_infinite);
+    lv_group_add_obj(mouse_g, roller_mouse);
 }
 
 void tearDown(void)
 {
     lv_group_remove_obj(roller);
     lv_group_remove_obj(roller_infinite);
+    lv_group_remove_obj(roller_mouse);
     lv_obj_clean(active_screen);
 }
 
@@ -209,6 +218,19 @@ void test_roller_select_option_with_click(void)
 
     TEST_ASSERT_EQUAL_STRING("Two", actual_str);
     memset(actual_str, 0x00, OPTION_BUFFER_SZ);
+}
+
+void test_roller_release_handler_pointer_indev(void)
+{
+    /* Clic in the widget */
+    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 5);
+    /* Check which is the selected option */
+    TEST_ASSERT_EQUAL(0, lv_roller_get_selected(roller_mouse));
+
+    /* Clic further down the roller */
+    lv_test_mouse_click_at(roller_mouse->coords.x1 + 5, roller_mouse->coords.y1 + 100);
+    /* Check which is the selected option */
+    TEST_ASSERT_NOT_EQUAL(0, lv_roller_get_selected(roller_mouse));
 }
 
 #endif
