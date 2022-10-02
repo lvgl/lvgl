@@ -7,7 +7,7 @@ static lv_obj_t * win = NULL;
 static lv_obj_t * header = NULL;
 static lv_obj_t * content = NULL;
 
- const char * dummy_text = "Hello LVGL!";
+const char * dummy_text = "Hello LVGL!";
 
 void setUp(void)
 {
@@ -145,7 +145,6 @@ void test_win_add_multiple_elements(void)
     header = lv_win_get_header(win);
     lv_obj_update_layout(win);
 
-
     // Check that no additional children have been created under win
     // Instead the child should be created under header
     TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(win));
@@ -160,7 +159,7 @@ void test_win_add_multiple_elements(void)
     title = lv_obj_get_child(header, 1);
     TEST_ASSERT_EQUAL_STRING(dummy_text, lv_label_get_text(title));
     TEST_ASSERT_EQUAL(1, lv_label_get_long_mode(title));
-    
+
     // Check that the right button has been created properly
     btn = lv_obj_get_child(header, 2);
     TEST_ASSERT_EQUAL(1, lv_obj_get_child_cnt(btn));
