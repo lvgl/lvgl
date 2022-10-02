@@ -1,15 +1,14 @@
-#include "../../../lvgl.h"
-#ifndef LV_USE_TINY_TTF
-    #define LV_USE_TINY_TTF 1
-#endif
+#include "lv_tiny_ttf.h"
+#if LV_USE_TINY_TTF
+#include <stdio.h>
+
 #ifndef LV_TINY_TTF_DEFAULT_CACHE_SIZE
     #define LV_TINY_TTF_DEFAULT_CACHE_SIZE 4096
 #endif
 #ifndef LV_TINY_TTF_CACHE_BUCKETS
     #define LV_TINY_TTF_CACHE_BUCKETS 16
 #endif
-#if LV_USE_TINY_TTF !=0
-#include "lv_tiny_ttf.h"
+
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
 #define STBTT_STATIC

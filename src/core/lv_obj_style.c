@@ -152,6 +152,11 @@ void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_sele
     }
 }
 
+void lv_obj_remove_style_all(struct _lv_obj_t * obj)
+{
+    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
+}
+
 void lv_obj_report_style_change(lv_style_t * style)
 {
     if(!style_refr) return;
