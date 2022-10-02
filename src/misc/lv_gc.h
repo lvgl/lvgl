@@ -60,8 +60,7 @@ extern "C" {
     LV_DISPATCH_COND(f, uint8_t *, _lv_font_decompr_buf, LV_USE_FONT_COMPRESSED, 1)                    \
     LV_DISPATCH(f, uint8_t * , _lv_grad_cache_mem)                                                     \
     LV_DISPATCH(f, uint8_t * , _lv_style_custom_prop_flag_lookup_table)                                \
-    LV_DISPATCH(f, lv_ll_t, _subs_ll)                                                                  \
-    LV_DISPATCH(f, uint8_t *, _ttf_glyph_bitmap_buffer)
+    LV_DISPATCH(f, lv_ll_t, _subs_ll)
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)
