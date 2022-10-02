@@ -44,7 +44,7 @@ void test_win_should_have_valid_documented_defualt_values(void)
     // Check that the header is correctly sized and empty
     TEST_ASSERT_EQUAL(win_header_height, lv_obj_get_height(header));
     TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(header));
-    
+
     // Check that the content is empty
     TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(content));
 }
@@ -61,7 +61,6 @@ void test_win_add_title_single(void)
 
     // Add a title to the window
     lv_win_add_title(win, dummy_text);
-
 
     // Check that no additional children have been created under win
     // Instead the child should be created under header
@@ -88,7 +87,6 @@ void test_win_add_title_multiple(void)
     lv_win_add_title(win, dummy_text);
     lv_win_add_title(win, dummy_text);
 
-
     // Check that no additional children have been created under win
     // Instead the child should be created under header
     TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(win));
@@ -109,7 +107,6 @@ void test_win_add_btn(void)
     // Add a button to the window header
     lv_win_add_btn(win, LV_SYMBOL_OK, win_btn_width);
     lv_obj_update_layout(win);
-
 
     // Check that no additional children have been created under win
     // Instead the child should be created under header
