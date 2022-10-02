@@ -423,7 +423,7 @@ lv_font_t * lv_tiny_ttf_create_file_ex(const char * path, lv_coord_t line_height
 {
     return lv_tiny_ttf_create(path, NULL, 0, line_height, cache_size);
 }
-lv_font_t * lv_tiny_ttf_create_file(const char * path, lv_coord_t line_height,)
+lv_font_t * lv_tiny_ttf_create_file(const char * path, lv_coord_t line_height)
 {
     return lv_tiny_ttf_create(path, NULL, 0, line_height, 0);
 }
