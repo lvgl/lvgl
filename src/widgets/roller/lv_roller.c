@@ -329,7 +329,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
-    lv_event_code_t code = lv_event_get_code(e);
+    const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_roller_t * roller = (lv_roller_t *)obj;
 
@@ -366,26 +366,27 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_FOCUSED) {
         lv_group_t * g             = lv_obj_get_group(obj);
-        bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            /*In navigate mode revert the original value*/
-            if(!editing) {
+            const bool editing = lv_group_get_editing(g);
+
+            /*Save the current state when entered to edit mode*/
+            if(editing) {
+                roller->sel_opt_id_ori = roller->sel_opt_id;
+            }
+            else { /*In navigate mode revert the original value*/
                 if(roller->sel_opt_id != roller->sel_opt_id_ori) {
                     roller->sel_opt_id = roller->sel_opt_id_ori;
                     refr_position(obj, LV_ANIM_ON);
                 }
             }
-            /*Save the current state when entered to edit mode*/
-            else {
-                roller->sel_opt_id_ori = roller->sel_opt_id;
-            }
         }
         else {
-            roller->sel_opt_id_ori = roller->sel_opt_id; /*Save the current value. Used to revert this state if
-                                                                    ENTER won't be pressed*/
+            /*Save the current value. Used to revert this
+             *state if ENTER won't be pressed*/
+            roller->sel_opt_id_ori = roller->sel_opt_id;
         }
     }
     else if(code == LV_EVENT_DEFOCUSED) {
@@ -407,7 +408,6 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(roller->sel_opt_id > 0) {
                 uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
-
                 lv_roller_set_selected(obj, roller->sel_opt_id - 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
             }
@@ -597,45 +597,50 @@ static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area)
 /**
  * Refresh the position of the roller. It uses the id stored in: roller->ddlist.selected_option_id
  * @param roller pointer to a roller object
- * @param anim_en LV_ANIM_ON: refresh with animation; LV_ANOM_OFF: without animation
+ * @param anim_en LV_ANIM_ON: refresh with animation; LV_ANIM_OFF: without animation
  */
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_obj_t * label = get_label(obj);
     if(label == NULL) return;
 
-    lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
+    const lv_text_align_t align = lv_obj_calculate_style_text_align(label, LV_PART_MAIN, lv_label_get_text(label));
 
+    lv_coord_t x = 0;
     switch(align) {
         case LV_TEXT_ALIGN_CENTER:
-            lv_obj_set_x(label, (lv_obj_get_content_width(obj) - lv_obj_get_width(label)) / 2);
+            x = (lv_obj_get_content_width(obj) - lv_obj_get_width(label)) / 2;
             break;
         case LV_TEXT_ALIGN_RIGHT:
-            lv_obj_set_x(label, lv_obj_get_content_width(obj) - lv_obj_get_width(label));
+            x = lv_obj_get_content_width(obj) - lv_obj_get_width(label);
             break;
         case LV_TEXT_ALIGN_LEFT:
-            lv_obj_set_x(label, 0);
+            x = 0;
+            break;
+        default:
+            /* Invalid alignment */
             break;
     }
+    lv_obj_set_x(label, x);
 
-    lv_roller_t * roller = (lv_roller_t *)obj;
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-    lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
-    lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_coord_t h                   = lv_obj_get_content_height(obj);
-    uint16_t anim_time             = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+    const lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
+    const lv_coord_t font_h = lv_font_get_line_height(font);
+    const lv_coord_t h = lv_obj_get_content_height(obj);
+    uint16_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
     /*Normally the animation's `end_cb` sets correct position of the roller if infinite.
-     *But without animations do it manually*/
+     *But without animations we have to do it manually*/
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         inf_normalize(obj);
     }
 
+    /* Calculate animation configuration */
+    lv_roller_t * roller = (lv_roller_t *)obj;
     int32_t id = roller->sel_opt_id;
-    lv_coord_t sel_y1 = id * (font_h + line_space);
-    lv_coord_t mid_y1 = h / 2 - font_h / 2;
-
-    lv_coord_t new_y = mid_y1 - sel_y1;
+    const lv_coord_t sel_y1 = id * (font_h + line_space);
+    const lv_coord_t mid_y1 = h / 2 - font_h / 2;
+    const lv_coord_t new_y = mid_y1 - sel_y1;
 
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         lv_anim_del(label, set_y_anim);
