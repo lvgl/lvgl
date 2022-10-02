@@ -491,6 +491,20 @@
     #endif
 #endif
 
+/*Use GD32 IPA GPU
+ * This adds support for Image Processing Accelerator on GD32F450 and GD32F470 series MCUs
+ *
+ * NOTE: IPA on GD32F450 has a bug where the fill operation overwrites data beyond the
+ * framebuffer. This driver works around it by saving and restoring affected memory, but
+ * this makes it not thread-safe. GD32F470 is not affected. */
+#ifndef LV_USE_GPU_GD32_IPA
+    #ifdef CONFIG_LV_USE_GPU_GD32_IPA
+        #define LV_USE_GPU_GD32_IPA CONFIG_LV_USE_GPU_GD32_IPA
+    #else
+        #define LV_USE_GPU_GD32_IPA 0
+    #endif
+#endif
+
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
 #ifndef LV_USE_GPU_NXP_PXP
     #ifdef CONFIG_LV_USE_GPU_NXP_PXP
