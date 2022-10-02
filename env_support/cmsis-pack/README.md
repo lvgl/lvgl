@@ -44,9 +44,11 @@ remove the misleading guide above this code segment.
    - LV_USE_GPU_NXP_PXP
    - LV_USE_GPU_NXP_VG_LITE
    - LV_USE_GPU_SWM341_DMA2D
+   - LV_USE_GPU_GD32_IPA
    - LV_USE_GPU_ARM2D
    - LV_USE_IME_PINYIN
    - LV_USE_FILE_EXPLORER
+   - LV_USE_TINY_TTF
 5. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
@@ -94,7 +96,6 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
         #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
-
         #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
     #endif   /*LV_TICK_CUSTOM*/
 #else
