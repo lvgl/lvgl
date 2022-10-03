@@ -21,6 +21,7 @@ void test_tabview_get_content(void);
 void test_tabview_get_tab_btns(void);
 void test_tabview_set_act_non_existent(void);
 void test_tabview_tab2_selected_event(void);
+void test_tabview_update_on_external_scroll(void);
 
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * tabview = NULL;
@@ -224,6 +225,39 @@ void test_tabview_tab2_selected_event(void)
     lv_tabview_set_act(tabview, 1, LV_ANIM_OFF);
 
     TEST_ASSERT_EQUAL_UINT16(1, lv_tabview_get_tab_act(tabview));
+}
+
+void test_tabview_update_on_external_scroll(void)
+{
+    tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
+
+    lv_obj_t * tab1 = lv_tabview_add_tab(tabview, "Tab 1");
+    lv_obj_t * tab2 = lv_tabview_add_tab(tabview, "Tab 2");
+    lv_obj_t * tab3 = lv_tabview_add_tab(tabview, "Tab 3");
+    lv_obj_t * tab4 = lv_tabview_add_tab(tabview, "Tab 4");
+
+    // avoid compiler error: unused variable
+    LV_UNUSED(tab1);
+    LV_UNUSED(tab2);
+    LV_UNUSED(tab4);
+
+    lv_obj_t * cont = lv_obj_create(tab3);
+    lv_obj_set_size(cont, 200, 300);
+    lv_obj_set_pos(cont, 1000, 200);
+
+    lv_obj_t * label1 = lv_label_create(cont);
+    lv_obj_set_pos(label1, 400, 400);
+    lv_label_set_text(label1, "Label1");
+
+    lv_obj_t * label2 = lv_label_create(cont);
+    lv_obj_set_pos(label2, 600, 600);
+    lv_label_set_text(label1, "Label2");
+
+    lv_obj_scroll_to_view_recursive(label1, LV_ANIM_OFF);
+
+    TEST_ASSERT_TRUE(lv_obj_is_visible(label1));
+    TEST_ASSERT_FALSE(lv_obj_is_visible(label2));
+    TEST_ASSERT_EQUAL_UINT16(2, lv_tabview_get_tab_act(tabview));
 }
 
 #endif
