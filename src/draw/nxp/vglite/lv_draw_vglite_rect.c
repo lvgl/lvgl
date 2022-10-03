@@ -72,6 +72,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     lv_coord_t height = lv_area_get_height(coords);
     vg_lite_linear_gradient_t gradient;
     vg_lite_matrix_t * grad_matrix;
+    lv_opa_t bg_opa = dsc->bg_opa;
 
     if(dsc->radius < 0)
         return LV_RES_INV;
@@ -156,6 +157,17 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
         uint8_t cnt = LV_MAX(dsc->bg_grad.stops_count, 2);
         for(uint8_t i = 0; i < cnt; i++) {
             col32[i].full = lv_color_to32(dsc->bg_grad.stops[i].color); /*Convert color to RGBA8888*/
+
+            if(bg_opa <= (lv_opa_t)LV_OPA_MAX) {
+                /* Only pre-multiply color if hardware pre-multiplication is not present */
+                if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
+                    col32[i].ch.red = (uint8_t)(((uint16_t)col32[i].ch.red * bg_opa) >> 8);
+                    col32[i].ch.green = (uint8_t)(((uint16_t)col32[i].ch.green * bg_opa) >> 8);
+                    col32[i].ch.blue = (uint8_t)(((uint16_t)col32[i].ch.blue * bg_opa) >> 8);
+                }
+                col32[i].ch.alpha = bg_opa;
+            }
+
             stops[i] = dsc->bg_grad.stops[i].frac;
 #if LV_COLOR_DEPTH==16
             colors[i] = ((uint32_t)col32[i].ch.alpha << 24) | ((uint32_t)col32[i].ch.blue << 16) |
@@ -191,7 +203,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
         }
     }
 
-    lv_opa_t bg_opa = dsc->bg_opa;
     lv_color32_t bg_col32 = {.full = lv_color_to32(dsc->bg_color)}; /*Convert color to RGBA8888*/
     if(bg_opa <= (lv_opa_t)LV_OPA_MAX) {
         /* Only pre-multiply color if hardware pre-multiplication is not present */
