@@ -231,7 +231,7 @@ void test_colorwheel_event_pressing(void)
 
 void test_colorwheel_event_pressed_mode_hue(void)
 {
-    lv_test_mouse_click_at(50,50);
+    lv_test_mouse_click_at(50, 50);
 
     // the effect of that event is reset of value
     lv_color_hsv_t hsv_cur = lv_colorwheel_get_hsv(colorwheel);
@@ -243,7 +243,7 @@ void test_colorwheel_event_pressed_mode_saturation(void)
 {
     lv_colorwheel_set_mode(colorwheel, LV_COLORWHEEL_MODE_SATURATION);
 
-    lv_test_mouse_click_at(50,50);
+    lv_test_mouse_click_at(50, 50);
 
     // the effect of that event is reset of value
     lv_color_hsv_t hsv_cur = lv_colorwheel_get_hsv(colorwheel);
@@ -255,7 +255,7 @@ void test_colorwheel_event_pressed_mode_value(void)
 {
     lv_colorwheel_set_mode(colorwheel, LV_COLORWHEEL_MODE_VALUE);
 
-    lv_test_mouse_click_at(50,50);
+    lv_test_mouse_click_at(50, 50);
 
     // the effect of that event is reset of value
     lv_color_hsv_t hsv_cur = lv_colorwheel_get_hsv(colorwheel);
