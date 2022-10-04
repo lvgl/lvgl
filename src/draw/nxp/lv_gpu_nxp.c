@@ -388,37 +388,39 @@ static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
     lv_draw_rect_dsc_t nxp_dsc;
 
     lv_memcpy(&nxp_dsc, dsc, sizeof(nxp_dsc));
-#if LV_DRAW_COMPLEX
-    /* Draw only the shadow with CPU */
     nxp_dsc.bg_opa = 0;
     nxp_dsc.bg_img_opa = 0;
     nxp_dsc.border_opa = 0;
     nxp_dsc.outline_opa = 0;
+#if LV_DRAW_COMPLEX
+    /* Draw the shadow with CPU */
     lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
+    nxp_dsc.shadow_opa = 0;
 #endif /*LV_DRAW_COMPLEX*/
 
     /* Draw the background */
-    nxp_dsc.shadow_opa = 0;
     nxp_dsc.bg_opa = dsc->bg_opa;
-    if(draw_nxp_bg(draw_ctx, &nxp_dsc, coords) == LV_RES_OK)
-        nxp_dsc.bg_opa = 0;
+    if(draw_nxp_bg(draw_ctx, &nxp_dsc, coords) != LV_RES_OK)
+        lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
+    nxp_dsc.bg_opa = 0;
+
+    /* Draw the background image will be done once draw_ctx->draw_img_decoded()
+    * callback gets called from lv_draw_sw_rect().
+    */
+    nxp_dsc.bg_img_opa = dsc->bg_img_opa;
+    lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
+    nxp_dsc.bg_img_opa = 0;
 
     /* Draw the border */
     nxp_dsc.border_opa = dsc->border_opa;
-    if(draw_nxp_border(draw_ctx, &nxp_dsc, coords) == LV_RES_OK)
-        nxp_dsc.border_opa = 0;
+    if(draw_nxp_border(draw_ctx, &nxp_dsc, coords) != LV_RES_OK)
+        lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
+    nxp_dsc.border_opa = 0;
 
     /* Draw the outline */
     nxp_dsc.outline_opa = dsc->outline_opa;
-    if(draw_nxp_outline(draw_ctx, &nxp_dsc, coords) == LV_RES_OK)
-        nxp_dsc.outline_opa = 0;
-
-    /* Draw the background image will be done once draw_ctx->draw_img_decoded()
-     * callback gets called from lv_draw_sw_rect().
-     * Any elements that failed will be handled by CPU.
-     */
-    nxp_dsc.bg_img_opa = dsc->bg_img_opa;
-    lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
+    if(draw_nxp_outline(draw_ctx, &nxp_dsc, coords) != LV_RES_OK)
+        lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
 }
 
 static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
