@@ -64,7 +64,7 @@ void test_animimg_set_repeat_count_infinite(void)
 
 void test_animimg_start(void)
 {
-    // for lv_animimg_start() to actually work, 
+    // for lv_animimg_start() to actually work,
     // we need to properly setup the widget beforehand
     lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, 3);
     lv_animimg_set_duration(animimg, 1000);
