@@ -146,9 +146,7 @@ def generate_code_coverage_report():
     cmd = ['gcovr', '--root', root_dir, '--html-details', '--output',
            html_report_file, '--xml', 'report/coverage.xml',
            '-j', str(os.cpu_count()), '--print-summary',
-           '--html-title', 'LVGL Test Coverage']
-    for d in ('.*\\bexamples/.*', '\\bsrc/test_.*', '\\bsrc/lv_test.*', '\\bunity\\b'):
-        cmd.extend(['--exclude', d])
+           '--html-title', 'LVGL Test Coverage', '--filter', '../src/.*/lv_.*\.c']
 
     subprocess.check_call(cmd)
     print("Done: See %s" % html_report_file, flush=True)
