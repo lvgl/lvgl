@@ -17,6 +17,8 @@
 #include "../../misc/lv_txt.h"
 #include "../../misc/lv_txt_ap.h"
 
+#include <stdio.h>
+
 /*********************
  *      DEFINES
  *********************/
@@ -109,6 +111,11 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
     lv_coord_t prow = lv_obj_get_style_pad_row(obj, LV_PART_MAIN);
     lv_coord_t pcol = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, LV_PART_MAIN);
+    lv_coord_t border_top = border_side & LV_BORDER_SIDE_TOP ? border_width : 0;
+    lv_coord_t border_left = border_side & LV_BORDER_SIDE_LEFT ? border_width : 0;
+
     lv_coord_t max_w            = lv_obj_get_content_width(obj);
     lv_coord_t max_h            = lv_obj_get_content_height(obj);
 
@@ -138,8 +145,8 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
             continue;
         }
 
-        lv_coord_t row_y1 = ptop + (max_h_no_gap * row) / btnm->row_cnt + row * prow;
-        lv_coord_t row_y2 = ptop + (max_h_no_gap * (row + 1)) / btnm->row_cnt + row * prow - 1;
+        lv_coord_t row_y1 = ptop + border_top + (max_h_no_gap * row) / btnm->row_cnt + row * prow;
+        lv_coord_t row_y2 = ptop + border_top + (max_h_no_gap * (row + 1)) / btnm->row_cnt + row * prow - 1;
 
         /*Set the button size and positions*/
         lv_coord_t max_w_no_gap = max_w - (pcol * (btn_cnt - 1));
@@ -163,8 +170,8 @@ void lv_btnmatrix_set_map(lv_obj_t * obj, const char * map[])
                 btn_x2 = max_w - btn_x2;
             }
 
-            btn_x1 += pleft;
-            btn_x2 += pleft;
+            btn_x1 += pleft + border_left;
+            btn_x2 += pleft + border_left;
 
             lv_area_set(&btnm->button_areas[btn_tot_i], btn_x1, row_y1, btn_x2, row_y2);
 
