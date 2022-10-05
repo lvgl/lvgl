@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <errno.h>
+
 #include "lvgl_display.h"
 
 int set_lvgl_rendering_cb(lv_disp_drv_t *disp_drv)
