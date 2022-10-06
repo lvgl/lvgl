@@ -122,6 +122,18 @@ void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, 
 #endif
 
 /**
+ * Premultiplies and swizzles given LVGL 32bit color to obtain vglite color.
+ *
+ * @param[in/out] vg_col32 The obtained vglite color
+ * @param[in] lv_col32 The initial LVGL 32bit color
+ * @param[in] opa The opacity to premultiply with
+ * @param[in] vg_col_format The format of the resulting vglite color
+
+ */
+lv_res_t lv_vglite_premult_and_swizzle(vg_lite_color_t * vg_col32, lv_color32_t lv_col32, lv_opa_t opa,
+                                       vg_lite_buffer_format_t vg_col_format);
+
+/**
  * Clear cache and flush command to VG-Lite.
  */
 lv_res_t lv_vglite_run(void);
