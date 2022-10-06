@@ -1,12 +1,13 @@
+/*Using LVGL with Arduino requires some extra steps:
+ * Be sure to read the docs here: https://docs.lvgl.io/master/get-started/platforms/arduino.html  */
+
 #include <lvgl.h>
 #include <TFT_eSPI.h>
-/*If you want to use the LVGL examples,
-  make sure to install the lv_examples Arduino library
-  and uncomment the following line.
-#include <lv_examples.h>
-*/
 
-#include <lv_demo.h>
+/*To use the built-in examples and demos of LVGL uncomment the includes below respectively.
+ *You also need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`.*/
+//#include <lv_demos.h>
+//#include <lv_exampless.h>
 
 /*Change to your screen resolution*/
 static const uint16_t screenWidth  = 480;
