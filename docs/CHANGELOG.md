@@ -1,5 +1,9 @@
 # Changelog
 
+## [v8.3.3](https://github.com/lvgl/lvgl/compare/v8.3.2...v8.3.3) 06 October 2022
+
+v8.3.3 is the same as v8.3.2. It was released only because the version number was set incorrectly in lvgl.h.
+
 ## [v8.3.2](https://github.com/lvgl/lvgl/compare/v8.3.1...v8.3.2) 27 September 2022
 
 ### Fixes
