@@ -66,13 +66,12 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
     lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
     vg_lite_path_t path;
-    vg_lite_color_t vgcol; /* vglite takes ABGR */
     vg_lite_matrix_t matrix;
     lv_coord_t width = lv_area_get_width(coords);
     lv_coord_t height = lv_area_get_height(coords);
     vg_lite_linear_gradient_t gradient;
     vg_lite_matrix_t * grad_matrix;
-    lv_opa_t bg_opa = dsc->bg_opa;
+    vg_lite_color_t vgcol;
 
     if(dsc->radius < 0)
         return LV_RES_INV;
@@ -157,26 +156,11 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
         uint8_t cnt = LV_MAX(dsc->bg_grad.stops_count, 2);
         for(uint8_t i = 0; i < cnt; i++) {
             col32[i].full = lv_color_to32(dsc->bg_grad.stops[i].color); /*Convert color to RGBA8888*/
-
-            if(bg_opa <= (lv_opa_t)LV_OPA_MAX) {
-                /* Only pre-multiply color if hardware pre-multiplication is not present */
-                if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-                    col32[i].ch.red = (uint8_t)(((uint16_t)col32[i].ch.red * bg_opa) >> 8);
-                    col32[i].ch.green = (uint8_t)(((uint16_t)col32[i].ch.green * bg_opa) >> 8);
-                    col32[i].ch.blue = (uint8_t)(((uint16_t)col32[i].ch.blue * bg_opa) >> 8);
-                }
-                col32[i].ch.alpha = bg_opa;
-            }
-
             stops[i] = dsc->bg_grad.stops[i].frac;
-#if LV_COLOR_DEPTH==16
-            colors[i] = ((uint32_t)col32[i].ch.alpha << 24) | ((uint32_t)col32[i].ch.blue << 16) |
-                        ((uint32_t)col32[i].ch.green << 8) | (uint32_t)col32[i].ch.red;
-#else /*LV_COLOR_DEPTH==32*/
-            /* watchout: red and blue color components are inverted versus vg_lite_color_t order */
-            colors[i] = ((uint32_t)col32[i].ch.alpha << 24) | ((uint32_t)col32[i].ch.red << 16) |
-                        ((uint32_t)col32[i].ch.green << 8) | (uint32_t)col32[i].ch.blue;
-#endif
+
+            vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_ABGR8888 : VG_LITE_ARGB8888;
+            if(lv_vglite_premult_and_swizzle(&colors[i], col32[i], dsc->bg_opa, color_format) != LV_RES_OK)
+                VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
         }
 
         lv_memset_00(&gradient, sizeof(vg_lite_linear_gradient_t));
@@ -204,22 +188,9 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     }
 
     lv_color32_t bg_col32 = {.full = lv_color_to32(dsc->bg_color)}; /*Convert color to RGBA8888*/
-    if(bg_opa <= (lv_opa_t)LV_OPA_MAX) {
-        /* Only pre-multiply color if hardware pre-multiplication is not present */
-        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-            bg_col32.ch.red = (uint8_t)(((uint16_t)bg_col32.ch.red * bg_opa) >> 8);
-            bg_col32.ch.green = (uint8_t)(((uint16_t)bg_col32.ch.green * bg_opa) >> 8);
-            bg_col32.ch.blue = (uint8_t)(((uint16_t)bg_col32.ch.blue * bg_opa) >> 8);
-        }
-        bg_col32.ch.alpha = bg_opa;
-    }
-
-#if LV_COLOR_DEPTH==16
-    vgcol = bg_col32.full;
-#else /*LV_COLOR_DEPTH==32*/
-    vgcol = ((uint32_t)bg_col32.ch.alpha << 24) | ((uint32_t)bg_col32.ch.blue << 16) |
-            ((uint32_t)bg_col32.ch.green << 8) | (uint32_t)bg_col32.ch.red;
-#endif
+    vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_BGRA8888 : VG_LITE_ABGR8888;
+    if(lv_vglite_premult_and_swizzle(&vgcol, bg_col32, dsc->bg_opa, color_format) != LV_RES_OK)
+        VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
 
     /*** Draw rectangle ***/
     if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
@@ -378,22 +349,9 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
         line_width = dsc->outline_width;
     }
 
-    if(opa <= (lv_opa_t)LV_OPA_MAX) {
-        /* Only pre-multiply color if hardware pre-multiplication is not present */
-        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-            col32.ch.red = (uint8_t)(((uint16_t)col32.ch.red * opa) >> 8);
-            col32.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
-            col32.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
-        }
-        col32.ch.alpha = opa;
-    }
-
-#if LV_COLOR_DEPTH==16
-    vgcol = col32.full;
-#else /*LV_COLOR_DEPTH==32*/
-    vgcol = ((uint32_t)col32.ch.alpha << 24) | ((uint32_t)col32.ch.blue << 16) |
-            ((uint32_t)col32.ch.green << 8) | (uint32_t)col32.ch.red;
-#endif
+    vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_BGRA8888 : VG_LITE_ABGR8888;
+    if(lv_vglite_premult_and_swizzle(&vgcol, col32, opa, color_format) != LV_RES_OK)
+        VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
 
     /*** Draw border ***/
     err = vg_lite_set_draw_path_type(&path, VG_LITE_DRAW_STROKE_PATH);

@@ -158,18 +158,16 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
                           (const lv_color_t *)dest_buf, false) != LV_RES_OK)
         VG_LITE_RETURN_INV("Init buffer failed.");
 
+
+    vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_BGRA8888 : VG_LITE_ABGR8888;
+    if(lv_vglite_premult_and_swizzle(&vgcol, col32, opa, color_format) != LV_RES_OK)
+        VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
+
     if(opa >= (lv_opa_t)LV_OPA_MAX) {   /*Opaque fill*/
         rect.x = fill_area->x1;
         rect.y = fill_area->y1;
         rect.width = area_w;
         rect.height = area_h;
-
-#if LV_COLOR_DEPTH==16
-        vgcol = col32.full;
-#else /*LV_COLOR_DEPTH==32*/
-        vgcol = ((uint32_t)col32.ch.alpha << 24) | ((uint32_t)col32.ch.blue << 16) | ((uint32_t)col32.ch.green << 8) |
-                (uint32_t)col32.ch.red;
-#endif
 
         err = vg_lite_clear(&vgbuf, &rect, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Clear failed.");
@@ -193,21 +191,6 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
                                 (vg_lite_float_t) fill_area->x1, (vg_lite_float_t) fill_area->y1,
                                 ((vg_lite_float_t) fill_area->x2) + 1.0f, ((vg_lite_float_t) fill_area->y2) + 1.0f);
         VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
-
-        /* Only pre-multiply color if hardware pre-multiplication is not present */
-        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-            col32.ch.red = (uint8_t)(((uint16_t)col32.ch.red * opa) >> 8);
-            col32.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
-            col32.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
-        }
-        col32.ch.alpha = opa;
-
-#if LV_COLOR_DEPTH==16
-        vgcol = col32.full;
-#else /*LV_COLOR_DEPTH==32*/
-        vgcol = ((uint32_t)col32.ch.alpha << 24) | ((uint32_t)col32.ch.blue << 16) | ((uint32_t)col32.ch.green << 8) |
-                (uint32_t)col32.ch.red;
-#endif
 
         vg_lite_matrix_t matrix;
         vg_lite_identity(&matrix);
