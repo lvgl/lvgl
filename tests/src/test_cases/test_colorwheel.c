@@ -201,7 +201,7 @@ void test_colorwheel_angle_to_mode_color_fast_in_mode_value(void)
 {
     lv_colorwheel_set_mode(colorwheel, LV_COLORWHEEL_MODE_VALUE);
 
-    lv_colorwheel_set_hsv(colorwheel, lv_color_rgb_to_hsv(63, 63, 63));
+    lv_colorwheel_set_hsv(colorwheel, lv_color_rgb_to_hsv(64, 255, 128));
 
     TEST_ASSERT_EQUAL_SCREENSHOT("colorwheel_02.png");
 }
@@ -210,7 +210,7 @@ void test_colorwheel_angle_to_mode_color_fast_in_mode_saturation(void)
 {
     lv_colorwheel_set_mode(colorwheel, LV_COLORWHEEL_MODE_SATURATION);
 
-    lv_colorwheel_set_hsv(colorwheel, lv_color_rgb_to_hsv(63, 63, 63));
+    lv_colorwheel_set_hsv(colorwheel, lv_color_rgb_to_hsv(64, 255, 128));
 
     TEST_ASSERT_EQUAL_SCREENSHOT("colorwheel_03.png");
 }
