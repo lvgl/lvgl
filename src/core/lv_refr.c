@@ -1096,11 +1096,11 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
         LV_LOG_ERROR("cannot rotate a full refreshed display!");
         return;
     }
-    if(disp_refr->rotated == LV_DISP_ROTATION_180) {
+    if(disp_refr->rotation == LV_DISP_ROTATION_180) {
         draw_buf_rotate_180(disp_refr, area, color_p);
         call_flush_cb(disp_refr, area, color_p);
     }
-    else if(disp_refr->rotated == LV_DISP_ROTATION_90 || disp_refr->rotated == LV_DISP_ROTATION_270) {
+    else if(disp_refr->rotation == LV_DISP_ROTATION_90 || disp_refr->rotation == LV_DISP_ROTATION_270) {
         /*Allocate a temporary buffer to store rotated image*/
         lv_color_t * rot_buf = NULL;
         lv_coord_t area_w = lv_area_get_width(area);
@@ -1109,7 +1109,7 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
         lv_coord_t max_row = LV_MIN((lv_coord_t)((LV_DISP_ROT_MAX_BUF / sizeof(lv_color_t)) / area_w), area_h);
         lv_coord_t init_y_off;
         init_y_off = area->y1;
-        if(disp_refr->rotated == LV_DISP_ROTATION_90) {
+        if(disp_refr->rotation == LV_DISP_ROTATION_90) {
             area->y2 = disp_refr->ver_res - area->x1 - 1;
             area->y1 = area->y2 - area_w + 1;
         }
@@ -1126,8 +1126,8 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
             if((row == 0) && (area_h >= area_w)) {
                 /*Rotate the initial area as a square*/
                 height = area_w;
-                draw_buf_rotate_90_sqr(disp_refr->rotated == LV_DISP_ROTATION_270, area_w, color_p);
-                if(disp_refr->rotated == LV_DISP_ROTATION_90) {
+                draw_buf_rotate_90_sqr(disp_refr->rotation == LV_DISP_ROTATION_270, area_w, color_p);
+                if(disp_refr->rotation == LV_DISP_ROTATION_90) {
                     area->x1 = init_y_off;
                     area->x2 = init_y_off + area_w - 1;
                 }
@@ -1139,9 +1139,9 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
             else {
                 /*Rotate other areas using a maximum buffer size*/
                 if(rot_buf == NULL) rot_buf = lv_malloc(LV_DISP_ROT_MAX_BUF);
-                draw_buf_rotate_90(disp_refr->rotated == LV_DISP_ROTATION_270, area_w, height, color_p, rot_buf);
+                draw_buf_rotate_90(disp_refr->rotation == LV_DISP_ROTATION_270, area_w, height, color_p, rot_buf);
 
-                if(disp_refr->rotated == LV_DISP_ROTATION_90) {
+                if(disp_refr->rotation == LV_DISP_ROTATION_90) {
                     area->x1 = init_y_off + row;
                     area->x2 = init_y_off + row + height - 1;
                 }
@@ -1210,7 +1210,7 @@ static void draw_buf_flush(lv_disp_t * disp)
 
     if(disp->flush_cb) {
         /*Rotate the buffer to the display's native orientation if necessary*/
-        if(disp->rotated != LV_DISP_ROTATION_NONE && disp->sw_rotate) {
+        if(disp->rotation != LV_DISP_ROTATION_0 && disp->sw_rotate) {
             draw_buf_rotate(draw_ctx->buf_area, draw_ctx->buf);
         }
         else {

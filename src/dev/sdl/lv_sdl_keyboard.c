@@ -55,7 +55,7 @@ lv_indev_t * lv_sdl_keyboard_create(void)
 
     lv_indev_set_type(indev, LV_INDEV_TYPE_KEYPAD);
     lv_indev_set_read_cb(indev, sdl_keyboard_read);
-    lv_indev_set_user_data(indev, dsc);
+    lv_indev_set_driver_data(indev, dsc);
 
     return indev;
 }
@@ -66,7 +66,7 @@ lv_indev_t * lv_sdl_keyboard_create(void)
 
 static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_sdl_keyboard_t * dev = lv_indev_get_user_data(indev);
+    lv_sdl_keyboard_t * dev = lv_indev_get_driver_data(indev);
 
     const size_t len = strlen(dev->buf);
 
@@ -112,7 +112,7 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
     }
 
     if(indev == NULL) return;
-    lv_sdl_keyboard_t * dsc = lv_indev_get_user_data(indev);
+    lv_sdl_keyboard_t * dsc = lv_indev_get_driver_data(indev);
 
 
     /* We only care about SDL_KEYDOWN and SDL_TEXTINPUT events */

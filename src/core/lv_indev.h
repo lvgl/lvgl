@@ -116,13 +116,14 @@ void lv_indev_set_read_cb(lv_indev_t * indev,  void (*read_cb)(struct _lv_indev_
 
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data);
 
+void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);
+
 /**
  * Get the type of an input device
  * @param indev pointer to an input device
  * @return the type of the input device from `lv_hal_indev_type_t` (`LV_INDEV_TYPE_...`)
  */
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
-
 
 lv_indev_state_t lv_indev_get_state(const lv_indev_t * indev);
 
@@ -133,6 +134,8 @@ struct _lv_disp_t * lv_indev_get_disp(const lv_indev_t * indev);
 void lv_indev_set_disp(lv_indev_t * indev, struct _lv_disp_t * disp);
 
 void * lv_indev_get_user_data(const lv_indev_t * indev);
+
+void * lv_indev_get_driver_data(const lv_indev_t * indev);
 
 /**
  * Reset one or all input devices

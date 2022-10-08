@@ -131,14 +131,16 @@ typedef struct _lv_disp_t {
      * Others
      *--------------------*/
 
+    void * driver_data; /**< Custom user data*/
+
 #if LV_USE_USER_DATA
-    void * user_data; /**< Custom display driver user data*/
+    void * user_data; /**< Custom user data*/
 #endif
 
     lv_event_list_t event_list;
 
-    uint32_t sw_rotate : 1;          /**< 1: use software rotation (slower)*/
-    uint32_t rotated : 2;            /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
+    uint32_t sw_rotate : 1; /**< 1: use software rotation (slower)*/
+    uint32_t rotation  : 2; /**< Element of  @lv_disp_rotation_t*/
 
     /**< The theme assigned to the screen*/
     struct _lv_theme_t * theme;

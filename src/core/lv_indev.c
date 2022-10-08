@@ -267,6 +267,12 @@ void lv_indev_set_user_data(lv_indev_t * indev, void * user_data)
 #endif
 }
 
+void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data)
+{
+    if(indev == NULL) return;
+    indev->driver_data = driver_data;
+}
+
 
 lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 {
@@ -303,8 +309,6 @@ void lv_indev_set_disp(lv_indev_t * indev, lv_disp_t * disp)
     indev->disp = disp;
 }
 
-
-
 void * lv_indev_get_user_data(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
@@ -315,6 +319,13 @@ void * lv_indev_get_user_data(const lv_indev_t * indev)
     LV_LOG_WARN("LV_USE_USER_DATA is no enabled");
     return NULL;
 #endif
+}
+
+void * lv_indev_get_driver_data(const lv_indev_t * indev)
+{
+    if(indev == NULL) return NULL;
+
+    return indev->driver_data;
 }
 
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
@@ -513,11 +524,11 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(disp->rotated == LV_DISP_ROTATION_180 || disp->rotated == LV_DISP_ROTATION_270) {
+    if(disp->rotation == LV_DISP_ROTATION_180 || disp->rotation == LV_DISP_ROTATION_270) {
         data->point.x = disp->hor_res - data->point.x - 1;
         data->point.y = disp->ver_res - data->point.y - 1;
     }
-    if(disp->rotated == LV_DISP_ROTATION_90 || disp->rotated == LV_DISP_ROTATION_270) {
+    if(disp->rotation == LV_DISP_ROTATION_90 || disp->rotation == LV_DISP_ROTATION_270) {
         lv_coord_t tmp = data->point.y;
         data->point.y = data->point.x;
         data->point.x = disp->ver_res - tmp - 1;

@@ -44,6 +44,8 @@ typedef struct _lv_indev_t {
     uint32_t pr_timestamp;         /**< Pressed time stamp*/
     uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
 
+    void * driver_data;
+
 #if LV_USE_USER_DATA
     void * user_data;
 #endif

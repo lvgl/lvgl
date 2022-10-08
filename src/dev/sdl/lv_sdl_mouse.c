@@ -55,7 +55,7 @@ lv_indev_t * lv_sdl_mouse_create(void)
 
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER);
     lv_indev_set_read_cb(indev, sdl_mouse_read);
-    lv_indev_set_user_data(indev, dsc);
+    lv_indev_set_driver_data(indev, dsc);
 
     return indev;
 }
@@ -66,7 +66,7 @@ lv_indev_t * lv_sdl_mouse_create(void)
 
 static void sdl_mouse_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_sdl_mouse_t * dsc = lv_indev_get_user_data(indev);
+    lv_sdl_mouse_t * dsc = lv_indev_get_driver_data(indev);
 
     /*Store the collected data*/
     data->point.x = dsc->last_x;
@@ -108,7 +108,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
     }
 
     if(indev == NULL) return;
-    lv_sdl_mouse_t * indev_dev = lv_indev_get_user_data(indev);
+    lv_sdl_mouse_t * indev_dev = lv_indev_get_driver_data(indev);
 
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
     lv_coord_t ver_res = lv_disp_get_ver_res(disp);

@@ -95,7 +95,7 @@ lv_disp_t * lv_linux_fbdev_create(void)
         return NULL;
     }
     dsc->fbfd = -1;
-    lv_disp_set_user_data(disp, dsc);
+    lv_disp_set_driver_data(disp, dsc);
     lv_disp_set_flush_cb(disp, flush_cb);
 
     return disp;
@@ -108,7 +108,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     if(devname == NULL) return;
     strcpy(devname, file);
 
-    lv_linux_fb_t * dsc = lv_disp_get_user_data(disp);
+    lv_linux_fb_t * dsc = lv_disp_get_driver_data(disp);
     dsc->devname = devname;
 
     if(dsc->fbfd > 0) close(dsc->fbfd);
@@ -199,7 +199,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
 
 static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
 {
-    lv_linux_fb_t * dsc = lv_disp_get_user_data(disp);
+    lv_linux_fb_t * dsc = lv_disp_get_driver_data(disp);
 
     if(dsc->fbp == NULL ||
        area->x2 < 0 || area->y2 < 0 ||

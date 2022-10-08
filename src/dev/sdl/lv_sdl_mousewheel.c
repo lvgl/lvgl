@@ -49,7 +49,7 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
 
     lv_indev_set_type(indev, LV_INDEV_TYPE_ENCODER);
     lv_indev_set_read_cb(indev, sdl_mousewheel_read);
-    lv_indev_set_user_data(indev, dsc);
+    lv_indev_set_driver_data(indev, dsc);
 
     return indev;
 }
@@ -60,7 +60,7 @@ lv_indev_t * lv_sdl_mousewheel_create(void)
 
 static void sdl_mousewheel_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_sdl_mousewheel_t * dsc = lv_indev_get_user_data(indev);
+    lv_sdl_mousewheel_t * dsc = lv_indev_get_driver_data(indev);
 
     data->state = dsc->state;
     data->enc_diff = dsc->diff;
@@ -94,7 +94,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
     }
 
     if(indev == NULL) return;
-    lv_sdl_mousewheel_t * dsc = lv_indev_get_user_data(indev);
+    lv_sdl_mousewheel_t * dsc = lv_indev_get_driver_data(indev);
 
     switch(event->type) {
         case SDL_MOUSEWHEEL:
