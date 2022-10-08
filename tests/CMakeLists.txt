@@ -9,6 +9,11 @@ else()
 cmake_minimum_required(VERSION 3.13)
 project(lvgl_tests LANGUAGES C)
 
+find_program(VALGRIND_EXECUTABLE valgrind)
+if (VALGRIND_EXECUTABLE)
+    set(MEMORYCHECK_COMMAND ${VALGRIND_EXECUTABLE})
+    set(MEMORYCHECK_COMMAND_OPTIONS --error-exitcode=1)
+endif()
 include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -200,7 +205,6 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
 )
 
 set(LVGL_TEST_OPTIONS_TEST_COMMON
-    --coverage
     -DLV_COLOR_DEPTH=32
     -DLV_MEM_SIZE=2097152
     -DLV_SHADOW_CACHE_SIZE=10240
@@ -252,7 +256,6 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
     ${LVGL_TEST_OPTIONS_TEST_COMMON}
     -DLVGL_CI_USING_SYS_HEAP
     -DLV_MEM_CUSTOM=1
-    -fsanitize=address
 )
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
@@ -260,6 +263,7 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLVGL_CI_USING_DEF_HEAP
     -DLV_MEM_SIZE=2097152
     -fsanitize=address
+    --coverage
 )
 
 if (OPTIONS_MINIMAL_MONOCHROME)
@@ -273,11 +277,15 @@ elseif (OPTIONS_16BIT_SWAP)
 elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address --coverage)
     set (TEST_LIBS --coverage -fsanitize=address)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     set (TEST_LIBS --coverage -fsanitize=address)
+elseif (OPTIONS_TEST_MEMORYCHECK)
+    # sanitizer is disabled because valgrind uses LD_PRELOAD and the
+    # sanitizer lib needs to load first
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
