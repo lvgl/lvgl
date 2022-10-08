@@ -742,7 +742,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
     for(i = 0; i < obj->style_cnt; i++) {
         if(obj->styles[i].is_trans == 0 || obj->styles[i].selector != tr->selector) continue;
 
-        lv_style_value_t value_final;
+        lv_style_value_t value_final = {0};
         switch(tr->prop) {
 
             case LV_STYLE_BORDER_SIDE:
