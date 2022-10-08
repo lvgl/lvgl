@@ -328,7 +328,7 @@ const lv_img_dsc_t img_benchmark_cogwheel_chroma_keyed = {
     .header.w = 100,
     .header.h = 100,
     .data_size = 10000 * LV_COLOR_DEPTH / 8,
-    .header.cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED,
+    .header.cf = LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED,
     .data = img_benchmark_cogwheel_chroma_keyed_map,
 };
 

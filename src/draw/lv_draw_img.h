@@ -64,7 +64,7 @@ void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
 
 
 void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                         const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
+                         const lv_area_t * coords, const uint8_t * map_p, lv_color_format_t color_format);
 
 /**
  * Get the type of an image source
@@ -81,21 +81,14 @@ lv_img_src_t lv_img_src_get_type(const void * src);
  * @param cf a color format (`LV_IMG_CF_...`)
  * @return the pixel size in bits
  */
-uint8_t lv_img_cf_get_px_size(lv_img_cf_t cf);
-
-/**
- * Check if a color format is chroma keyed or not
- * @param cf a color format (`LV_IMG_CF_...`)
- * @return true: chroma keyed; false: not chroma keyed
- */
-bool lv_img_cf_is_chroma_keyed(lv_img_cf_t cf);
+uint8_t lv_img_cf_get_px_size(lv_color_format_t cf);
 
 /**
  * Check if a color format has alpha channel or not
  * @param cf a color format (`LV_IMG_CF_...`)
  * @return true: has alpha channel; false: doesn't have alpha channel
  */
-bool lv_img_cf_has_alpha(lv_img_cf_t cf);
+bool lv_img_cf_has_alpha(lv_color_format_t cf);
 
 #ifdef __cplusplus
 } /*extern "C"*/

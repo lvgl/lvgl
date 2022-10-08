@@ -90,7 +90,7 @@ typedef struct _lv_draw_ctx_t  {
                      uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
 
     void (*draw_img_decoded)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                             const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
+                             const lv_area_t * coords, const uint8_t * map_p, lv_color_format_t color_format);
 
     lv_res_t (*draw_img)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
                          const lv_area_t * coords, const void * src);
@@ -122,7 +122,7 @@ typedef struct _lv_draw_ctx_t  {
      */
     void (*draw_transform)(struct _lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
                            lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                           const lv_draw_img_dsc_t * draw_dsc, lv_img_cf_t cf, lv_color_t * cbuf, lv_opa_t * abuf);
+                           const lv_draw_img_dsc_t * draw_dsc, lv_color_format_t cf, lv_color_t * cbuf, lv_opa_t * abuf);
 
 
     /**

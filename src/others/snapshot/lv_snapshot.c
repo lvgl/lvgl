@@ -47,8 +47,8 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
 {
     LV_ASSERT_NULL(obj);
     switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR:
-        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+        case LV_COLOR_FORMAT_NATIVE:
+        case LV_COLOR_FORMAT_NATIVE_ALPHA:
         case LV_IMG_CF_ALPHA_8BIT:
             break;
         default:
@@ -65,7 +65,7 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
     w += ext_size * 2;
     h += ext_size * 2;
     uint8_t px_size;
-    if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA) px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
+    if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
     else px_size = sizeof(lv_color_t);
 
     return w * h * px_size;
@@ -88,8 +88,8 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     LV_ASSERT_NULL(buf);
 
     switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR:
-        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+        case LV_COLOR_FORMAT_NATIVE:
+        case LV_COLOR_FORMAT_NATIVE_ALPHA:
         case LV_IMG_CF_ALPHA_8BIT:
             break;
         default:
@@ -139,7 +139,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     draw_ctx->buf_area = &snapshot_area;
     draw_ctx->buf = (void *)buf;
     if(dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) draw_ctx->color_format = LV_COLOR_FORMAT_L8;
-    else if(dsc->header.cf != LV_IMG_CF_TRUE_COLOR_ALPHA) draw_ctx->render_with_alpha = false;
+    else if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE_ALPHA) draw_ctx->render_with_alpha = false;
     else draw_ctx->render_with_alpha = true;
 
     driver.draw_ctx = draw_ctx;

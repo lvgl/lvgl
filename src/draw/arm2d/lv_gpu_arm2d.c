@@ -141,7 +141,7 @@
 #define __PREPARE_LL_ACCELERATION__()                                           \
             int32_t src_stride = lv_area_get_width(coords);                     \
                                                                                 \
-            uint8_t px_size_byte = cf == LV_IMG_CF_TRUE_COLOR_ALPHA             \
+            uint8_t px_size_byte = cf == LV_COLOR_FORMAT_NATIVE_ALPHA             \
                                       ?  LV_IMG_PX_SIZE_ALPHA_BYTE              \
                                       :  sizeof(lv_color_t);                    \
                                                                                 \
@@ -826,7 +826,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
     blend_dsc.blend_area = &blend_area;
 
     /*The simplest case just copy the pixels into the draw_buf*/
-    if(!mask_any && !transform && cf == LV_IMG_CF_TRUE_COLOR && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
+    if(!mask_any && !transform && cf == LV_COLOR_FORMAT_NATIVE && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
 
         blend_dsc.blend_area = coords;
@@ -894,7 +894,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
         lv_coord_t y_last = blend_area.y2;
         blend_area.y2 = blend_area.y1 + buf_h - 1;
 
-        lv_draw_mask_res_t mask_res_def = (cf != LV_IMG_CF_TRUE_COLOR || draw_dsc->angle ||
+        lv_draw_mask_res_t mask_res_def = (cf != LV_COLOR_FORMAT_NATIVE || draw_dsc->angle ||
                                            draw_dsc->zoom != LV_IMG_ZOOM_NONE) ?
                                           LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
@@ -919,7 +919,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
         bool is_accelerated = false;
 
         if(!transform) {
-            if(LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)  {
+            if(LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED == cf)  {
                 /* copy with colour keying */
 
                 /* *INDENT-OFF* */
@@ -962,7 +962,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
             }
             else if((LV_COLOR_DEPTH == 32)
                     &&     !mask_any
-                    && (cf == LV_IMG_CF_TRUE_COLOR_ALPHA)) {
+                    && (cf == LV_COLOR_FORMAT_NATIVE_ALPHA)) {
                 /* accelerate copy-with-source-masks-and-opacity */
 
                 /* *INDENT-OFF* */
@@ -1019,7 +1019,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 )
                 /* *INDENT-ON* */
             }
-            else if(!mask_any && (cf == LV_IMG_CF_TRUE_COLOR)) {
+            else if(!mask_any && (cf == LV_COLOR_FORMAT_NATIVE)) {
                 /* accelerate copy-with-source-masks-and-opacity */
 
                 /* *INDENT-OFF* */
@@ -1055,10 +1055,10 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 && (draw_dsc->antialias == 0)
 #endif
                 && (draw_dsc->recolor_opa == LV_OPA_TRANSP)
-                && (((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)
-                     || (LV_IMG_CF_TRUE_COLOR == cf))
+                && (((LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED == cf)
+                     || (LV_COLOR_FORMAT_NATIVE == cf))
 #if defined(__ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__) &&  __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
-                    || ((LV_IMG_CF_TRUE_COLOR_ALPHA == cf)
+                    || ((LV_COLOR_FORMAT_NATIVE_ALPHA == cf)
                         && (LV_COLOR_DEPTH == 32))
 #endif
                    )
@@ -1138,8 +1138,8 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 source_center.iY = draw_dsc->pivot.y;
 
 
-                if((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf) ||
-                   (LV_IMG_CF_TRUE_COLOR == cf)) {
+                if((LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED == cf) ||
+                   (LV_COLOR_FORMAT_NATIVE == cf)) {
                     arm_2d_tile_transform_with_opacity(
                         &source_tile,
                         &target_tile,
@@ -1154,7 +1154,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 }
     #if defined(__ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__)          \
                 &&  __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
-                else if((LV_IMG_CF_TRUE_COLOR_ALPHA == cf) &&
+                else if((LV_COLOR_FORMAT_NATIVE_ALPHA == cf) &&
                         (LV_COLOR_DEPTH == 32)) {
                     arm_2d_tile_transform_with_src_mask_and_opacity(
                         &source_tile,
@@ -1267,7 +1267,7 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
     lv_coord_t y;
     lv_coord_t x;
 
-    if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
+    if(cf == LV_COLOR_FORMAT_NATIVE || cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED) {
         uint32_t px_cnt = lv_area_get_size(dest_area);
         lv_memset(abuf, 0xff, px_cnt);
 
@@ -1284,10 +1284,10 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
         }
 
         /*Make "holes" for with Chroma keying*/
-        if(cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
+        if(cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED) {
             uint32_t i;
             lv_color_t chk = LV_COLOR_CHROMA_KEY;
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
             uint8_t * cbuf_uint = (uint8_t *)cbuf;
             uint8_t chk_v = chk.full;
 #elif LV_COLOR_DEPTH == 16
@@ -1302,7 +1302,7 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
             }
         }
     }
-    else if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
+    else if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) {
         src_tmp8 += (src_stride * dest_area->y1 * LV_IMG_PX_SIZE_ALPHA_BYTE) + dest_area->x1 * LV_IMG_PX_SIZE_ALPHA_BYTE;
 
         lv_coord_t src_new_line_step_px = (src_stride - lv_area_get_width(dest_area));
@@ -1313,7 +1313,7 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
         for(y = 0; y < dest_h; y++) {
             for(x = 0; x < dest_w; x++) {
                 abuf[x] = src_tmp8[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
                 cbuf[x].full = *src_tmp8;
 #elif LV_COLOR_DEPTH == 16
                 cbuf[x].full = *src_tmp8 + ((*(src_tmp8 + 1)) << 8);

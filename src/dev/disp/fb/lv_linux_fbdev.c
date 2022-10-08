@@ -260,25 +260,6 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
             color_p += w;
         }
     }
-    /*1 bit per pixel*/
-    else if(dsc->vinfo.bits_per_pixel == 1 && LV_COLOR_DEPTH == 1) {
-        uint8_t * fbp8 = (uint8_t *)dsc->fbp;
-        int32_t x;
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            for(x = area->x1; x <= area->x2; x++) {
-                uint32_t cint = lv_color_to_int(*color_p);
-                location = (x + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->vinfo.xres;
-                byte_location = location / 8; /* find the byte we need to change */
-                bit_location = location % 8; /* inside the byte found, find the bit we need to change */
-                fbp8[byte_location] &= ~(((uint8_t)(1)) << bit_location);
-                fbp8[byte_location] |= ((uint8_t)(cint)) << bit_location;
-                color_p++;
-            }
-
-            color_p += area->x2 - area->x2;
-        }
-    }
     else {
         char buf[256];
         lv_snprintf(buf, "Not supported color format. LV_COLOR_DEPTH == %d but FB color depth is %d\n", LV_COLOR_DEPTH,

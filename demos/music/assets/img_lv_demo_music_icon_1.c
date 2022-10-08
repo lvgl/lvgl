@@ -94,7 +94,7 @@ lv_img_dsc_t img_lv_demo_music_icon_1 = {
     .header.w = 24,
     .header.h = 24,
     .data_size = 576 * LV_COLOR_DEPTH / 8,
-    .header.cf = LV_IMG_CF_TRUE_COLOR,
+    .header.cf = LV_COLOR_FORMAT_NATIVE,
     .data = img_lv_demo_music_icon_1_map,
 };
 

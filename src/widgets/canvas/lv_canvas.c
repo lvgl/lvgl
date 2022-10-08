@@ -495,7 +495,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = lv_disp_get_chroma_key_color(lv_obj_get_disp(canvas));
-    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
+    if(dsc->header.cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED &&
        lv_color_eq(draw_dsc->bg_color, ctransp)) {
         //        draw_ctx->antialiasing = 0;
     }
@@ -597,7 +597,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = lv_disp_get_chroma_key_color(lv_obj_get_disp(canvas));
-    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
+    if(dsc->header.cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED &&
        lv_color_eq(draw_dsc->color, ctransp)) {
         //        draw_ctx->antialiasing = 0;
     }
@@ -631,7 +631,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = lv_disp_get_chroma_key_color(lv_obj_get_disp(canvas));
-    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
+    if(dsc->header.cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED &&
        lv_color_eq(draw_dsc->bg_color, ctransp)) {
         //        fake_disp.antialiasing = 0;
     }
@@ -691,7 +691,7 @@ static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
     canvas->dsc.header.always_zero = 0;
-    canvas->dsc.header.cf          = LV_IMG_CF_TRUE_COLOR;
+    canvas->dsc.header.cf          = LV_COLOR_FORMAT_NATIVE;
     canvas->dsc.header.h           = 0;
     canvas->dsc.header.w           = 0;
     canvas->dsc.data_size          = 0;
@@ -746,7 +746,7 @@ static lv_draw_ctx_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area)
             break;
     }
 
-    if(dsc->header.cf != LV_IMG_CF_TRUE_COLOR_ALPHA) draw_ctx->render_with_alpha = false;
+    if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE_ALPHA) draw_ctx->render_with_alpha = false;
     else draw_ctx->render_with_alpha = true;
     return draw_ctx;
 }

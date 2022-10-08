@@ -220,45 +220,47 @@ typedef struct _lv_color_filter_dsc_t {
 } lv_color_filter_dsc_t;
 
 
+
 typedef enum {
-    LV_COLOR_FORMAT_NATIVE = 0,       /*Keep original format. Used in color conversation*/
-    LV_COLOR_FORMAT_NATIVE_REVERSE,   /*Change endianess*/
+    LV_COLOR_FORMAT_UNKNOWN,
 
-    _LV_COLOR_FORMAT_NATIVE_END = 16,
-    LV_COLOR_FORMAT_RGB232,
-    LV_COLOR_FORMAT_RGBA2328,
-    LV_COLOR_FORMAT_RGBA2222,
+    /*Color formats in which LVGL can render*/
+    LV_COLOR_FORMAT_NATIVE,             /**< Can be L8, RGB565, RGB888 or RGBX8888*/
+    LV_COLOR_FORMAT_NATIVE_ALPHA,       /**< Can be L8A8, RGBA5658, RGBA8888*/
 
+    /*Miscellaneous formats*/
+    LV_COLOR_FORMAT_NATIVE_REVERSED,
+    LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED,
+
+    /*1 byte (+alpha) formats*/
+    LV_COLOR_FORMAT_L8,
+    LV_COLOR_FORMAT_L8A8,
+    LV_COLOR_FORMAT_A8,
+    LV_COLOR_FORMAT_I8,
+    LV_COLOR_FORMAT_I4A4,
+    LV_COLOR_FORMAT_ARGB2222,
+
+    /*2 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGB565,
-    LV_COLOR_FORMAT_RGBA5658,
-    LV_COLOR_FORMAT_RGBA5551,
-    LV_COLOR_FORMAT_RGBA4444,
+    LV_COLOR_FORMAT_RGBA1555,
+    LV_COLOR_FORMAT_RGBA2222,
     LV_COLOR_FORMAT_RGB565A8,
+    LV_COLOR_FORMAT_RGBA5658,
 
-    LV_COLOR_FORMAT_RGB888,
+    /*3 byte (+alpha) formats*/
     LV_COLOR_FORMAT_RGBA8888,
     LV_COLOR_FORMAT_RGBX8888,
 
-    LV_COLOR_FORMAT_L1,
-    LV_COLOR_FORMAT_L2,
-    LV_COLOR_FORMAT_L4,
-    LV_COLOR_FORMAT_L8,
-
-    LV_COLOR_FORMAT_A1,
-    LV_COLOR_FORMAT_A2,
-    LV_COLOR_FORMAT_A4,
-    LV_COLOR_FORMAT_A8,
-
-    LV_COLOR_FORMAT_I1,
-    LV_COLOR_FORMAT_I2,
-    LV_COLOR_FORMAT_I4,
-    LV_COLOR_FORMAT_I8,
-
-
-    LV_COLOR_FORMAT_CUSTOM_START = 0xff, /*Custom formats can be added from here*/
-
+    LV_COLOR_FORMAT_RAW,
+    LV_COLOR_FORMAT_RAW_ALPHA,
 } lv_color_format_t;
 
+static inline uint8_t lv_color_format_get_bytes(lv_color_format_t color_format)
+{
+    return (color_format & (0x3f << 18)) >> 18;
+}
+
+uint8_t lv_color_format_get_size(lv_color_format_t color_format);
 
 typedef enum {
     LV_PALETTE_RED,
@@ -354,55 +356,9 @@ static inline bool lv_color_eq(lv_color_t c1, lv_color_t c2)
     return lv_color_to_int(c1) == lv_color_to_int(c2);
 }
 
-/*In color conversations:
- * - When converting to bigger color type the LSB weight of 1 LSB is calculated
- *   E.g. 16 bit Red has 5 bits
- *         8 bit Red has 3 bits
- *        ----------------------
- *        8 bit red LSB = (2^5 - 1) / (2^3 - 1) = 31 / 7 = 4
- *
- * - When calculating to smaller color type simply shift out the LSBs
- *   E.g.  8 bit Red has 3 bits
- *        16 bit Red has 5 bits
- *        ----------------------
- *         Shift right with 5 - 3 = 2
- */
-static inline lv_color1_t lv_color_to1(lv_color_t color)
-{
-#if LV_COLOR_DEPTH == 1
-    return color;
-#elif LV_COLOR_DEPTH == 8
-    if((LV_COLOR_GET_R(color) & 0x4) || (LV_COLOR_GET_G(color) & 0x4) || (LV_COLOR_GET_B(color) & 0x2)) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
-#elif LV_COLOR_DEPTH == 16
-    if((LV_COLOR_GET_R(color) & 0x10) || (LV_COLOR_GET_G(color) & 0x20) || (LV_COLOR_GET_B(color) & 0x10)) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
-#elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
-    if((LV_COLOR_GET_R(color) & 0x80) || (LV_COLOR_GET_G(color) & 0x80) || (LV_COLOR_GET_B(color) & 0x80)) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
-#endif
-}
-
 static inline lv_color8_t lv_color_to8(lv_color_t color)
 {
-#if LV_COLOR_DEPTH == 1
-    lv_color8_t ret;
-    if(lv_color_to_int(color) == 0) ret.red = 0;
-    else ret.red = 0xff;
-    return ret;
-#elif LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8
     return color;
 #elif LV_COLOR_DEPTH == 16
     lv_color8_t ret;
@@ -421,14 +377,7 @@ static inline lv_color8_t lv_color_to8(lv_color_t color)
 
 static inline lv_color16_t lv_color_to16(lv_color_t color)
 {
-#if LV_COLOR_DEPTH == 1
-    lv_color16_t ret;
-    uint8_t lvl = lv_color_to_int(color);
-    ret.red = lvl ? 0x1F : 0;
-    ret.green = lvl ? 0x3F : 0;
-    ret.blue = lvl ? 0x1F : 0;
-    return ret;
-#elif LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8
     lv_color16_t ret;
     LV_COLOR_SET_R16(ret, LV_COLOR_GET_R(color) >> 3);
     LV_COLOR_SET_G16(ret, LV_COLOR_GET_G(color) >> 2);
@@ -447,14 +396,7 @@ static inline lv_color16_t lv_color_to16(lv_color_t color)
 
 static inline lv_color24_t lv_color_to24(lv_color_t color)
 {
-#if LV_COLOR_DEPTH == 1
-    lv_color24_t ret;
-    uint8_t lvl = lv_color_to_int(color);
-    ret.red = lvl ? 0xFF : 0;
-    ret.green = lvl ? 0xFF : 0;
-    ret.blue = lvl ? 0xFF : 0;
-    return ret;
-#elif LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8
     lv_color24_t ret;
     LV_COLOR_SET_R32(ret, LV_COLOR_GET_R(color));
     LV_COLOR_SET_G32(ret, LV_COLOR_GET_G(color));
@@ -508,15 +450,7 @@ static inline lv_color24_t lv_color_to24(lv_color_t color)
 
 static inline lv_color32_t lv_color_to32(lv_color_t color)
 {
-#if LV_COLOR_DEPTH == 1
-    lv_color32_t ret;
-    uint8_t lvl = lv_color_to_int(color);
-    ret.red = lvl ? 0xFF : 0;
-    ret.green = lvl ? 0xFF : 0;
-    ret.blue = lvl ? 0xFF : 0;
-    ret.alpha = 0xFF;
-    return ret;
-#elif LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8
     lv_color32_t ret;
     LV_COLOR_SET_R32(ret, LV_COLOR_GET_R(color));
     LV_COLOR_SET_G32(ret, LV_COLOR_GET_G(color));
@@ -601,9 +535,6 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
     LV_COLOR_SET_B(ret, LV_UDIV255((uint16_t)LV_COLOR_GET_B(c1) * mix + LV_COLOR_GET_B(c2) *
                                    (255 - mix) + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_A(ret, 0xFF);
-#else
-    /*LV_COLOR_DEPTH == 1*/
-    ret = mix > LV_OPA_50 ? c1 : c2;
 #endif
 
     return ret;
@@ -611,18 +542,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 
 LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t mix, uint16_t * out)
 {
-#if LV_COLOR_DEPTH != 1
     out[0] = (uint16_t)LV_COLOR_GET_R(c) * mix;
     out[1] = (uint16_t)LV_COLOR_GET_G(c) * mix;
     out[2] = (uint16_t)LV_COLOR_GET_B(c) * mix;
-#else
-    (void) mix;
-    /*Pre-multiplication can't be used with 1 bpp*/
-    out[0] = LV_COLOR_GET_R(c);
-    out[1] = LV_COLOR_GET_G(c);
-    out[2] = LV_COLOR_GET_B(c);
-#endif
-
 }
 
 /**
@@ -637,22 +559,11 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t 
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * premult_c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
-#if LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8 or 32*/
     LV_COLOR_SET_R(ret, LV_UDIV255(premult_c1[0] + LV_COLOR_GET_R(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_G(ret, LV_UDIV255(premult_c1[1] + LV_COLOR_GET_G(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_B(ret, LV_UDIV255(premult_c1[2] + LV_COLOR_GET_B(c2) * mix + LV_COLOR_MIX_ROUND_OFS));
     LV_COLOR_SET_A(ret, 0xFF);
-#else
-    /*LV_COLOR_DEPTH == 1*/
-    /*Restore color1*/
-    lv_color_t c1;
-    LV_COLOR_SET_R(c1, premult_c1[0]);
-    LV_COLOR_SET_G(c1, premult_c1[1]);
-    LV_COLOR_SET_B(c1, premult_c1[2]);
-    ret = mix > LV_OPA_50 ? c2 : c1;
-#endif
-
     return ret;
 }
 

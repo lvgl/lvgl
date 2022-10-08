@@ -147,7 +147,7 @@ bool lv_test_assert_img_eq(const char * fn_ref)
                 "  .header.w = 800,\n"
                 "  .header.h = 480,\n"
                 "  .header.always_zero = 0,\n"
-                "  .header.cf = LV_IMG_CF_TRUE_COLOR,\n"
+                "  .header.cf = LV_COLOR_FORMAT_NATIVE,\n"
                 "  .data_size = 800 * 480 * 4,\n"
                 "  .data = (const uint8_t *) test_screenshot_error_data};\n\n"
                 "static inline void test_screenshot_error_show(void)\n"

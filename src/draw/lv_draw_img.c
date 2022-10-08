@@ -85,104 +85,6 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
 }
 
 /**
- * Get the pixel size of a color format in bits
- * @param cf a color format (`LV_IMG_CF_...`)
- * @return the pixel size in bits
- */
-uint8_t lv_img_cf_get_px_size(lv_img_cf_t cf)
-{
-    uint8_t px_size = 0;
-
-    switch(cf) {
-        case LV_IMG_CF_UNKNOWN:
-        case LV_IMG_CF_RAW:
-            px_size = 0;
-            break;
-        case LV_IMG_CF_TRUE_COLOR:
-        case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-            px_size = LV_COLOR_DEPTH;
-            break;
-        case LV_IMG_CF_TRUE_COLOR_ALPHA:
-            px_size = LV_IMG_PX_SIZE_ALPHA_BYTE << 3;
-            break;
-        case LV_IMG_CF_INDEXED_1BIT:
-        case LV_IMG_CF_ALPHA_1BIT:
-            px_size = 1;
-            break;
-        case LV_IMG_CF_INDEXED_2BIT:
-        case LV_IMG_CF_ALPHA_2BIT:
-            px_size = 2;
-            break;
-        case LV_IMG_CF_INDEXED_4BIT:
-        case LV_IMG_CF_ALPHA_4BIT:
-            px_size = 4;
-            break;
-        case LV_IMG_CF_INDEXED_8BIT:
-        case LV_IMG_CF_ALPHA_8BIT:
-            px_size = 8;
-            break;
-        default:
-            px_size = 0;
-            break;
-    }
-
-    return px_size;
-}
-
-/**
- * Check if a color format is chroma keyed or not
- * @param cf a color format (`LV_IMG_CF_...`)
- * @return true: chroma keyed; false: not chroma keyed
- */
-bool lv_img_cf_is_chroma_keyed(lv_img_cf_t cf)
-{
-    bool is_chroma_keyed = false;
-
-    switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-        case LV_IMG_CF_RAW_CHROMA_KEYED:
-            is_chroma_keyed = true;
-            break;
-
-        default:
-            is_chroma_keyed = false;
-            break;
-    }
-
-    return is_chroma_keyed;
-}
-
-/**
- * Check if a color format has alpha channel or not
- * @param cf a color format (`LV_IMG_CF_...`)
- * @return true: has alpha channel; false: doesn't have alpha channel
- */
-bool lv_img_cf_has_alpha(lv_img_cf_t cf)
-{
-    bool has_alpha = false;
-
-    switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR_ALPHA:
-        case LV_IMG_CF_RAW_ALPHA:
-        case LV_IMG_CF_INDEXED_1BIT:
-        case LV_IMG_CF_INDEXED_2BIT:
-        case LV_IMG_CF_INDEXED_4BIT:
-        case LV_IMG_CF_INDEXED_8BIT:
-        case LV_IMG_CF_ALPHA_1BIT:
-        case LV_IMG_CF_ALPHA_2BIT:
-        case LV_IMG_CF_ALPHA_4BIT:
-        case LV_IMG_CF_ALPHA_8BIT:
-            has_alpha = true;
-            break;
-        default:
-            has_alpha = false;
-            break;
-    }
-
-    return has_alpha;
-}
-
-/**
  * Get the type of an image source
  * @param src pointer to an image source:
  *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
@@ -216,11 +118,63 @@ lv_img_src_t lv_img_src_get_type(const void * src)
 }
 
 void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                         const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
+                         const lv_area_t * coords, const uint8_t * map_p, lv_color_format_t color_format)
 {
     if(draw_ctx->draw_img_decoded == NULL) return;
 
     draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
+}
+
+uint8_t lv_img_cf_get_px_size(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_NATIVE:
+        case LV_COLOR_FORMAT_NATIVE_REVERSED:
+            return LV_COLOR_DEPTH;
+        case LV_COLOR_FORMAT_NATIVE_ALPHA:
+        case LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED:
+            return LV_IMG_PX_SIZE_ALPHA_BYTE * 8;
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_I4A4:
+        case LV_COLOR_FORMAT_ARGB2222:
+            return 8;
+        case LV_COLOR_FORMAT_L8A8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGBA1555:
+        case LV_COLOR_FORMAT_RGBA2222:
+            return 16;
+
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGBA5658:
+            return 24;
+        case LV_COLOR_FORMAT_RGBA8888:
+        case LV_COLOR_FORMAT_RGBX8888:
+            return 32;
+
+        case LV_COLOR_FORMAT_UNKNOWN:
+        default:
+            return 0;
+    }
+}
+
+bool lv_img_cf_has_alpha(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_NATIVE_ALPHA:
+        case LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_I4A4:
+        case LV_COLOR_FORMAT_ARGB2222:
+        case LV_COLOR_FORMAT_L8A8:
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGBA5658:
+        case LV_COLOR_FORMAT_RGBA8888:
+            return true;
+        default:
+            return false;
+    }
 }
 
 /**********************
@@ -236,13 +190,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
     if(cdsc == NULL) return LV_RES_INV;
 
-    lv_img_cf_t cf;
-    if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    else if(LV_IMG_CF_ALPHA_8BIT == cdsc->dec_dsc.header.cf) cf = LV_IMG_CF_ALPHA_8BIT;
-    else if(LV_IMG_CF_RGB565A8 == cdsc->dec_dsc.header.cf) cf = LV_IMG_CF_RGB565A8;
-    else if(lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-    else cf = LV_IMG_CF_TRUE_COLOR;
-
+    lv_color_format_t cf = cdsc->dec_dsc.header.cf;
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
 

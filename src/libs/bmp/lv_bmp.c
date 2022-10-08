@@ -98,9 +98,9 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
 #if LV_COLOR_DEPTH == 32
             uint16_t bpp;
             memcpy(&bpp, headers + 28, 2);
-            header->cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+            header->cf = bpp == 32 ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
 #else
-            header->cf = LV_IMG_CF_TRUE_COLOR;
+            header->cf = LV_COLOR_FORMAT_NATIVE;
 #endif
             return LV_RES_OK;
         }

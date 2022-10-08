@@ -90,13 +90,7 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp->dpi              = LV_DPI_DEF;
     disp->color_chroma_key = LV_COLOR_CHROMA_KEY;
 
-#if LV_COLOR_DEPTH == 1
-    disp->color_format = LV_COLOR_FORMAT_L1;
-#elif LV_COLOR_DEPTH == 8
-    disp->color_format = LV_COLOR_FORMAT_RGBX8888;
-#else
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
-#endif
 
 #if LV_USE_GPU_STM32_DMA2D
     lv_disp_set_draw_ctx(disp, lv_draw_stm32_dma2d_ctx_init, lv_draw_stm32_dma2d_ctx_deinit,

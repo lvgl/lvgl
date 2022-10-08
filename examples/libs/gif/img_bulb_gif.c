@@ -1123,6 +1123,6 @@ const lv_img_dsc_t img_bulb_gif = {
     .header.w = 0,
     .header.h = 0,
     .data_size = 0,
-    .header.cf = LV_IMG_CF_RAW,
+    .header.cf = LV_COLOR_FORMAT_RAW,
     .data = img_blub_gif_map,
 };

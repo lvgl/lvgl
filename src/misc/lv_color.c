@@ -272,6 +272,7 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
     return lv_color_rgb_to_hsv(color32.red, color32.green, color32.blue);
 }
 
+
 lv_color_t lv_palette_main(lv_palette_t p)
 {
     static const lv_color_t colors[] = {

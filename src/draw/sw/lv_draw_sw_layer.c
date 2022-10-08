@@ -111,7 +111,7 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     img.header.always_zero = 0;
     img.header.w = lv_area_get_width(draw_ctx->buf_area);
     img.header.h = lv_area_get_height(draw_ctx->buf_area);
-    img.header.cf = draw_ctx->render_with_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+    img.header.cf = draw_ctx->render_with_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
 
     /*Restore the original draw_ctx*/
     draw_ctx->buf = layer_ctx->original.buf;

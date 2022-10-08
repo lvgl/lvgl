@@ -79,9 +79,21 @@ LVGL will swap the horizontal and vertical resolutions internally according to t
 
 ### Color format
 
- * Set the color format of the display.
- * If set to not `LV_COLOR_FORMAT_NATIVE` the draw_ctx's `buffer_convert` function will be used
- * to convert the rendered content to the desired color format
+Set the color format of the display. The default is `LV_COLOR_FORMAT_NATIVE` which means LVGL render with the follow formats dpeneding on `LV_COLOR_DEPTH`:
+- `LV_COLOR_DEPTH 32` XRGB8888 (4 bytes/pixel)
+- `LV_COLOR_DEPTH 24` RGB888 (3 bytes/pixel)
+- `LV_COLOR_DEPTH 16` RGB565 (2 bytes/pixel)
+- `LV_COLOR_DEPTH 8` L8 (1 bytes/pixel)
+- `LV_COLOR_DEPTH 1` L1 (also 1 bytes/pixel)
+
+The `color_format` can be changed with `lv_disp_set_color_depth(disp, LV_COLOR_FORMAT_...)`.
+
+If it's set to not-native `draw_ctx->buffer_convert` function will be called before calling `flush_cb`. Learn more about `draw_ctx` [here]().
+
+Software render's `buffer_convert` doesn't support all the possible color format from all the possible color depth settings, but supports the most common ones:
+- `LV_COLOR_FORMAT_NATIVE_REVERSE` work with 16, 24 and 32 bit color depth. Usuful if the rendered image is sent to the disply via SPI and the display needs the bytes in the opposite order.
+
+It's very important that draw buffer(s) should be large enough for both the native format and the target color format. For example if `LV_COLOR_DEPTH == 16` and `LV_COLOR_FORMAT_RGBX8888` is selected LVGL will choosoe the larger to figure out how many pixel can be rendered at once.
 
 - `anti_aliasing` use anti-aliasing (edge smoothing). Enabled by default if `LV_COLOR_DEPTH` is set to at least 16 in `lv_conf.h`.
 

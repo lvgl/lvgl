@@ -307,7 +307,7 @@ static inline void set_px_argb(uint8_t * buf, lv_color_t color, lv_opa_t opa)
     lv_color_t bg_color;
     lv_color_t res_color;
     lv_opa_t bg_opa = buf[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
     lv_color_set_int(&bg_color, buf[0]);
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf[1]);
     if(buf[1] <= LV_OPA_MIN) return;
@@ -339,7 +339,7 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
     lv_color_t bg_color;
 
     /*Get the BG color*/
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
     if(buf[1] <= LV_OPA_MIN) return;
     lv_color_set_int(&bg_color, buf[0]);
 #elif LV_COLOR_DEPTH == 16
@@ -359,7 +359,7 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
     }
 
     /*Set the result color*/
-#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+#if LV_COLOR_DEPTH == 8
     buf[0] = lv_color_to_int(last_res_color);
 #elif LV_COLOR_DEPTH == 16
     buf[0] = (*((uint16_t *) &last_res_color)) & 0xff;
@@ -835,12 +835,6 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     if(opa <= LV_OPA_MIN) return bg;
 
     uint32_t tmp;
-#if LV_COLOR_DEPTH == 1
-    tmp = bg.red + fg.red;
-    fg.red = LV_MIN(tmp, 1);
-#else
-    tmp = bg.red + fg.red;
-
 #if LV_COLOR_DEPTH == 8
     fg.red = LV_MIN(tmp, 7);
 #elif LV_COLOR_DEPTH == 16
@@ -867,7 +861,6 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     fg.blue = LV_MIN(tmp, 31);
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     fg.blue = LV_MIN(tmp, 255);
-#endif
 #endif
 
     if(opa == LV_OPA_COVER) return fg;

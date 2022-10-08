@@ -170,7 +170,7 @@ static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     lv_memzero(imgbtn->img_src_left, sizeof(imgbtn->img_src_left));
     lv_memzero(imgbtn->img_src_right, sizeof(imgbtn->img_src_right));
 
-    imgbtn->act_cf = LV_IMG_CF_UNKNOWN;
+    imgbtn->act_cf = LV_COLOR_FORMAT_UNKNOWN;
 }
 
 
@@ -309,7 +309,7 @@ static void refr_img(lv_obj_t * obj)
         lv_obj_set_height(obj, header.h); /*Keep the user defined width*/
     }
     else {
-        imgbtn->act_cf = LV_IMG_CF_UNKNOWN;
+        imgbtn->act_cf = LV_COLOR_FORMAT_UNKNOWN;
     }
 
     lv_obj_invalidate(obj);
