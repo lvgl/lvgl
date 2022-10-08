@@ -341,7 +341,7 @@ class UnityTestRunnerGenerator
 
   def create_run_test(output)
     require 'erb'
-    template = ERB.new(File.read(File.join(__dir__, 'run_test.erb')), nil, '<>')
+    template = ERB.new(File.read(File.join(__dir__, 'run_test.erb')), trim_mode: '<>')
     output.puts("\n" + template.result(binding))
   end
 
