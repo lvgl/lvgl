@@ -351,9 +351,9 @@
  *https://fonts.google.com/specimen/Montserrat*/
 #define LV_FONT_MONTSERRAT_8  0
 #define LV_FONT_MONTSERRAT_10 0
-#define LV_FONT_MONTSERRAT_12 1
+#define LV_FONT_MONTSERRAT_12 0
 #define LV_FONT_MONTSERRAT_14 1
-#define LV_FONT_MONTSERRAT_16 1
+#define LV_FONT_MONTSERRAT_16 0
 #define LV_FONT_MONTSERRAT_18 0
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
@@ -449,7 +449,9 @@
 /*==================
  * WIDGETS
  *================*/
-
+#ifndef LV_USE_EXTRA_WIDGETS
+    #define LV_USE_EXTRA_WIDGETS      0
+#endif /* LV_USE_EXTRA_WIDGETS */
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
 #define LV_USE_ANIMIMG    1
@@ -542,31 +544,34 @@
 /*==================
  * THEMES
  *==================*/
+#ifndef LV_USE_THEME_DEFAULT
+    #define LV_USE_THEME_DEFAULT      0
+#endif
 
-#ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
-    /*A simple, impressive and very complete theme*/
-    #define LV_USE_THEME_DEFAULT 1
-    #if LV_USE_THEME_DEFAULT
+#if LV_USE_THEME_DEFAULT
 
-        /*0: Light mode; 1: Dark mode*/
+    /*0: Light mode; 1: Dark mode*/
+    #ifndef LV_THEME_DEFAULT_DARK
         #define LV_THEME_DEFAULT_DARK 0
+    #endif
 
-        /*1: Enable grow on press*/
-        #define LV_THEME_DEFAULT_GROW 1
+    /*1: Enable grow on press*/
+    #ifndef LV_THEME_DEFAULT_GROW
+        #define LV_THEME_DEFAULT_GROW 0
+    #endif
 
-        /*Default transition time in [ms]*/
+    /*Default transition time in [ms]*/
+    #ifndef LV_THEME_DEFAULT_TRANSITION_TIME
         #define LV_THEME_DEFAULT_TRANSITION_TIME 80
-    #endif /*LV_USE_THEME_DEFAULT*/
+    #endif
+#endif /*LV_USE_THEME_DEFAULT*/
 
-    /*A very simple theme that is a good starting point for a custom theme*/
-    #define LV_USE_THEME_BASIC 1
+#ifndef LV_USE_THEME_BASIC
+    #define LV_USE_THEME_BASIC        0
+#endif
 
-    /*A theme designed for monochrome displays*/
-    #define LV_USE_THEME_MONO 1
-#else
-    #define LV_USE_THEME_DEFAULT    0
-    #define LV_USE_THEME_BASIC      0
-    #define LV_USE_THEME_MONO       0
+#ifndef LV_USE_THEME_MONO
+    #define LV_USE_THEME_MONO         0
 #endif
 
 /*==================
@@ -574,10 +579,14 @@
  *==================*/
 
 /*A layout similar to Flexbox in CSS.*/
-#define LV_USE_FLEX 1
+#ifndef LV_USE_FLEX
+    #define LV_USE_FLEX               0
+#endif
 
 /*A layout similar to Grid in CSS.*/
-#define LV_USE_GRID 1
+#ifndef LV_USE_GRID
+    #define LV_USE_GRID               0
+#endif
 
 /*==================
  * OTHERS
