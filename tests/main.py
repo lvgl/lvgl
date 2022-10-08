@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 import os
+from itertools import chain
 
 lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -22,10 +23,6 @@ test_options = {
     'OPTIONS_TEST_SYSHEAP': 'Test config, system heap, 32 bit color depth',
     'OPTIONS_TEST_DEFHEAP': 'Test config, LVGL heap, 32 bit color depth',
 }
-
-
-def is_valid_option_name(option_name):
-    return option_name in build_only_options or option_name in test_options
 
 
 def get_option_description(option_name):
@@ -145,6 +142,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Build and/or run LVGL tests.', epilog=epilog)
     parser.add_argument('--build-options', nargs=1,
+                        choices=list(chain(build_only_options, test_options)),
                         help='''the build option name to build or run. When
                         omitted all build configurations are used.
                         ''')
@@ -167,11 +165,6 @@ if __name__ == "__main__":
                 options_to_build = build_only_options
         else:
             options_to_build = test_options
-
-    for opt in options_to_build:
-        if not is_valid_option_name(opt):
-            print('Invalid build option "%s"' % opt, file=sys.stderr)
-            sys.exit(errno.EINVAL)
 
     for options_name in options_to_build:
         is_test = options_name in test_options
