@@ -285,9 +285,9 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             c = lv_img_buf_get_px_color(&line_img, x_safe, 0, color);
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
-            rsum += c.ch.red;
-            gsum += c.ch.green;
-            bsum += c.ch.blue;
+            rsum += c.red;
+            gsum += c.green;
+            bsum += c.blue;
             if(has_alpha) asum += opa;
         }
 
@@ -297,9 +297,9 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
         for(x = a.x1; x <= a.x2; x++) {
 
             if(asum) {
-                c.ch.red = rsum / r;
-                c.ch.green = gsum / r;
-                c.ch.blue = bsum / r;
+                c.red = rsum / r;
+                c.green = gsum / r;
+                c.blue = bsum / r;
                 if(has_alpha) opa = asum / r;
 
                 lv_img_buf_set_px_color(&canvas->dsc, x, y, c);
@@ -311,9 +311,9 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             c = lv_img_buf_get_px_color(&line_img, x_safe, 0, color);
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
-            rsum -= c.ch.red;
-            gsum -= c.ch.green;
-            bsum -= c.ch.blue;
+            rsum -= c.red;
+            gsum -= c.green;
+            bsum -= c.blue;
             if(has_alpha) asum -= opa;
 
             x_safe = x + 1 + r_front;
@@ -321,9 +321,9 @@ void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             c = lv_img_buf_get_px_color(&line_img, x_safe, 0, lv_color_white());
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
-            rsum += c.ch.red;
-            gsum += c.ch.green;
-            bsum += c.ch.blue;
+            rsum += c.red;
+            gsum += c.green;
+            bsum += c.blue;
             if(has_alpha) asum += opa;
         }
     }
@@ -396,9 +396,9 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
             if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
 
-            rsum += c.ch.red;
-            gsum += c.ch.green;
-            bsum += c.ch.blue;
+            rsum += c.red;
+            gsum += c.green;
+            bsum += c.blue;
             if(has_alpha) asum += opa;
         }
 
@@ -407,9 +407,9 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 
         for(y = a.y1; y <= a.y2; y++) {
             if(asum) {
-                c.ch.red = rsum / r;
-                c.ch.green = gsum / r;
-                c.ch.blue = bsum / r;
+                c.red = rsum / r;
+                c.green = gsum / r;
+                c.blue = bsum / r;
                 if(has_alpha) opa = asum / r;
 
                 lv_img_buf_set_px_color(&canvas->dsc, x, y, c);
@@ -421,9 +421,9 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             c = lv_img_buf_get_px_color(&line_img, 0, y_safe, color);
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, 0, y_safe);
 
-            rsum -= c.ch.red;
-            gsum -= c.ch.green;
-            bsum -= c.ch.blue;
+            rsum -= c.red;
+            gsum -= c.green;
+            bsum -= c.blue;
             if(has_alpha) asum -= opa;
 
             y_safe = y + 1 + r_front;
@@ -435,9 +435,9 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
             lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
             if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
 
-            rsum += c.ch.red;
-            gsum += c.ch.green;
-            bsum += c.ch.blue;
+            rsum += c.red;
+            gsum += c.green;
+            bsum += c.blue;
             if(has_alpha) asum += opa;
         }
     }
@@ -456,7 +456,7 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa)
     if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
         uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
         /*+8 skip the palette*/
-        lv_memset((uint8_t *)dsc->data + 8, color.full ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
+        lv_memset((uint8_t *)dsc->data + 8, lv_color_to_int(color) ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
     }
     else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT) {
         uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
@@ -496,7 +496,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = lv_disp_get_chroma_key_color(lv_obj_get_disp(canvas));
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-       draw_dsc->bg_color.full == ctransp.full) {
+       lv_color_eq(draw_dsc->bg_color, ctransp)) {
         //        draw_ctx->antialiasing = 0;
     }
 
@@ -598,7 +598,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = lv_disp_get_chroma_key_color(lv_obj_get_disp(canvas));
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-       draw_dsc->color.full == ctransp.full) {
+       lv_color_eq(draw_dsc->color, ctransp)) {
         //        draw_ctx->antialiasing = 0;
     }
 
@@ -632,7 +632,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = lv_disp_get_chroma_key_color(lv_obj_get_disp(canvas));
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-       draw_dsc->bg_color.full == ctransp.full) {
+       lv_color_eq(draw_dsc->bg_color, ctransp)) {
         //        fake_disp.antialiasing = 0;
     }
 

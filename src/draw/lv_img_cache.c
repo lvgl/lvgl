@@ -82,7 +82,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
     }
 
     for(i = 0; i < entry_cnt; i++) {
-        if(color.full == cache[i].dec_dsc.color.full &&
+        if(lv_color_eq(color, cache[i].dec_dsc.color) &&
            frame_id == cache[i].dec_dsc.frame_id &&
            lv_img_cache_match(src, cache[i].dec_dsc.src)) {
             /*If opened increment its life.

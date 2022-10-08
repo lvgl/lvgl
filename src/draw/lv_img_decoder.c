@@ -410,8 +410,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             uint32_t i;
             for(i = 0; i < palette_size; i++) {
                 lv_fs_read(&user_data->f, &cur_color, sizeof(lv_color32_t), NULL);
-                user_data->palette[i] = lv_color_make(cur_color.ch.red, cur_color.ch.green, cur_color.ch.blue);
-                user_data->opa[i]     = cur_color.ch.alpha;
+                user_data->palette[i] = lv_color_make(cur_color.red, cur_color.green, cur_color.blue);
+                user_data->opa[i]     = cur_color.alpha;
             }
         }
         else {
@@ -420,8 +420,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
             uint32_t i;
             for(i = 0; i < palette_size; i++) {
-                user_data->palette[i] = lv_color_make(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
-                user_data->opa[i]     = palette_p[i].ch.alpha;
+                user_data->palette[i] = lv_color_make(palette_p[i].red, palette_p[i].green, palette_p[i].blue);
+                user_data->opa[i]     = palette_p[i].alpha;
             }
         }
 
@@ -551,10 +551,14 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full;
 #elif LV_COLOR_DEPTH == 16
         /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
-        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full & 0xFF;
-        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = (bg_color.full >> 8) & 0xFF;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = (*((uint16_t *) &bg_color)) & 0xFF;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = ((*((uint16_t *) &bg_color)) >> 8);
+#elif LV_COLOR_DEPTH == 24
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 0] = bg_color.red;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = bg_color.green;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 2] = bg_color.blue;
 #elif LV_COLOR_DEPTH == 32
-        *((uint32_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = bg_color.full;
+        *((lv_color_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = bg_color;
 #else
 #error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
 #endif
@@ -685,10 +689,14 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = color.full;
 #elif LV_COLOR_DEPTH == 16
         /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
-        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = color.full & 0xFF;
-        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = (color.full >> 8) & 0xFF;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = (*((uint16_t *) &color)) & 0xFF;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = ((*((uint16_t *) &color)) >> 8);
+#elif LV_COLOR_DEPTH == 24
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 0] = color.red;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = color.green;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 2] = color.blue;
 #elif LV_COLOR_DEPTH == 32
-        *((uint32_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = color.full;
+        *((lv_color_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = color;
 #else
 #error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
 #endif

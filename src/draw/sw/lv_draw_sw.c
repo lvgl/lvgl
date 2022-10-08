@@ -48,7 +48,6 @@ void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 
     draw_sw_ctx->base_draw.draw_arc = lv_draw_sw_arc;
     draw_sw_ctx->base_draw.draw_rect = lv_draw_sw_rect;
-    draw_sw_ctx->base_draw.draw_bg = lv_draw_sw_bg;
     draw_sw_ctx->base_draw.draw_letter = lv_draw_sw_letter;
     draw_sw_ctx->base_draw.draw_img_decoded = lv_draw_sw_img_decoded;
     draw_sw_ctx->base_draw.draw_line = lv_draw_sw_line;

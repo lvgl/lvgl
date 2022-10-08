@@ -875,6 +875,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
     if(obj_scr != lv_disp_get_scr_act(disp) &&
        obj_scr != lv_disp_get_scr_prev(disp) &&
+       obj_scr != lv_disp_get_layer_bottom(disp) &&
        obj_scr != lv_disp_get_layer_top(disp) &&
        obj_scr != lv_disp_get_layer_sys(disp)) {
         return false;

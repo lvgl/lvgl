@@ -121,7 +121,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
 
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
     lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;
-    if(bg_color.full == dsc->bg_grad.stops[1].color.full) grad_dir = LV_GRAD_DIR_NONE;
+    if(lv_color_eq(bg_color, dsc->bg_grad.stops[1].color)) grad_dir = LV_GRAD_DIR_NONE;
 
     bool mask_any = lv_draw_mask_is_any(&bg_coords);
     lv_draw_sw_blend_dsc_t blend_dsc = {0};

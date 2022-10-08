@@ -41,7 +41,16 @@ typedef enum {
 } lv_disp_rotation_t;
 
 typedef enum {
+    /**
+     * Use the buffer(s) to render the screen is smaller parts.
+     * This way the buffers can be smaller then the display to save RAM. At least 1/10 sceen size buffer(s) are recommended.
+     */
     LV_DISP_RENDER_MODE_PARTIAL,
+
+    /**
+     * The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer.
+     * This way the buffer always contain the whole image.
+     */
     LV_DISP_RENDER_MODE_DIRECT,
     LV_DISP_RENDER_MODE_FULL,
 } lv_disp_render_mode_t;
@@ -115,17 +124,17 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp);
  * @param hor_res   the new horizontal resolution
  * @param ver_res   the new vertical resolution
  */
-void lv_disp_set_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res);
+void lv_disp_set_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res);
 
 /**
- * It's mandatory to use the whole display for LVGL, however in some cases physical resolution is important.
+ * It's not mandatory to use the whole display for LVGL, however in some cases physical resolution is important.
  * For example the touchpad still sees whole resolution and the values needs to be converted
  * to the active LVGL display area.
  * @param disp      pointer to a display
  * @param hor_res   the new physical horizontal resolution, or -1 to assume it's the same as the normal hor. res.
  * @param ver_res   the new physical vertical resolution, or -1 to assume it's the same as the normal hor. res.
  */
-void lv_disp_set_physical_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res);
+void lv_disp_set_physical_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res);
 
 /**
  * If physical resolution is not the same as the normal resolution
@@ -232,7 +241,9 @@ void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32
 void lv_disp_set_flush_cb(lv_disp_t * disp, void (*flush_cb)(struct _lv_disp_t * disp, const lv_area_t * area,
                                                              lv_color_t * color_p));
 /**
- * Set the color format of the display
+ * Set the color format of the display.
+ * If set to not `LV_COLOR_FORMAT_NATIVE` the draw_ctx's `buffer_convert` function will be used
+ * to convert the rendered content to the desired color format.
  * @param disp              pointer to a display
  * @param color_format      By default `LV_COLOR_FORMAT_NATIVE` to render with RGB565, RGB888 or ARGB8888.
  *                          `LV_COLOR_FORMAT_NATIVE_REVERSE` to change endianess.
@@ -330,6 +341,16 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
  */
 lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 
+
+/**
+ * Return the bottom layer. The bottom layer is the same on all screen and it is under the normal screen layer.
+ * It's visble only if the the screen is transparent.
+ * @param disp      pointer to display (NULL to use the default screen)
+ * @return          pointer to the bottom layer object
+ */
+lv_obj_t * lv_disp_get_layer_bottom(lv_disp_t * disp);
+
+
 /**
  * Switch screen with animation
  * @param scr       pointer to the new screen to load
@@ -359,12 +380,21 @@ static inline lv_obj_t * lv_layer_top(void)
 }
 
 /**
- * Get the active screen of the default display
+ * Get the system layer  of the default display
  * @return          pointer to the sys layer
  */
 static inline lv_obj_t * lv_layer_sys(void)
 {
     return lv_disp_get_layer_sys(lv_disp_get_default());
+}
+
+/**
+ * Get the bottom layer  of the default display
+ * @return          pointer to the bottom layer
+ */
+static inline lv_obj_t * lv_layer_bottom(void)
+{
+    return lv_disp_get_layer_bottom(lv_disp_get_default());
 }
 
 /**
@@ -376,51 +406,7 @@ static inline void lv_scr_load(lv_obj_t * scr)
     lv_disp_load_scr(scr);
 }
 
-/*---------------------
- * BACKGROUND
- *--------------------*/
 
-/**
- * Set the background color of a display. Visible only if the the screen's opacity is not 255.
- * @param disp      pointer to a display
- * @param color     color of the background
- */
-void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color);
-
-/**
- * Set the background image of a display.  Visible only if the the screen's opacity is not 255.
- * @param disp      pointer to a display
- * @param img_src   path to file, or a pointer to an `lv_img_dsc_t` variable
- */
-void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
-
-/**
- * Set opacity of the background.
- * @param disp      pointer to a display
- * @param opa       opacity (0..255)
- */
-void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
-
-/**
- * Set the background color of a display
- * @param disp pointer to a display
- * @return color of the background
- */
-lv_color_t lv_disp_get_bg_color(lv_disp_t * disp);
-
-/**
- * Set the background image of a display
- * @param disp pointer to a display
- * @return path to file or pointer to an `lv_img_dsc_t` variable
- */
-const void * lv_disp_get_bg_image(lv_disp_t * disp);
-
-/**
- * Set opacity of the background
- * @param disp pointer to a display
- * @return opacity (0..255)
- */
-lv_opa_t lv_disp_get_bg_opa(lv_disp_t * disp);
 
 
 /*---------------------

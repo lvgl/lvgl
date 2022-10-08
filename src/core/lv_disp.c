@@ -130,9 +130,6 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
         return NULL;
     }
 
-    disp->bg_color = lv_color_white();
-    disp->bg_opa = LV_OPA_COVER;
-
 #if LV_USE_THEME_DEFAULT
     if(lv_theme_default_is_inited() == false) {
         disp->theme = lv_theme_default_init(disp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED),
@@ -143,14 +140,17 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     }
 #endif
 
+    disp->bottom_layer = lv_obj_create(NULL); /*Create bottom layer on the display*/
     disp->act_scr   = lv_obj_create(NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL); /*Create sys layer on the display*/
+    lv_obj_remove_style_all(disp->bottom_layer);
     lv_obj_remove_style_all(disp->top_layer);
     lv_obj_remove_style_all(disp->sys_layer);
     lv_obj_clear_flag(disp->top_layer, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_clear_flag(disp->sys_layer, LV_OBJ_FLAG_CLICKABLE);
 
+    lv_obj_set_scrollbar_mode(disp->bottom_layer, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scrollbar_mode(disp->top_layer, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scrollbar_mode(disp->sys_layer, LV_SCROLLBAR_MODE_OFF);
 
@@ -189,6 +189,11 @@ void lv_disp_remove(lv_disp_t * disp)
         lv_obj_del(disp->top_layer);
         disp->top_layer = NULL;
     }
+
+    if(disp->bottom_layer) {
+        lv_obj_del(disp->bottom_layer);
+        disp->bottom_layer = NULL;
+    }
     while(disp->screen_cnt != 0) {
         /*Delete the screenst*/
         lv_obj_del(disp->screens[0]);
@@ -223,7 +228,7 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
  * RESOLUTION
  *--------------------*/
 
-void lv_disp_set_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+void lv_disp_set_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return;
@@ -237,7 +242,7 @@ void lv_disp_set_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver
     update_resolution(disp);
 }
 
-void lv_disp_set_physical_resolution(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+void lv_disp_set_physical_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return;
@@ -531,6 +536,17 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
     return disp->sys_layer;
 }
 
+lv_obj_t * lv_disp_get_layer_bottom(lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("lv_layer_bottom: no display registered to get its bottom layer");
+        return NULL;
+    }
+
+    return disp->bottom_layer;
+}
+
 void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay, bool auto_del)
 {
     lv_disp_t * d = lv_obj_get_disp(new_scr);
@@ -673,56 +689,6 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
 
     lv_anim_start(&a_new);
     lv_anim_start(&a_old);
-}
-
-/*---------------------
- * BACKGROUND
- *--------------------*/
-
-void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color)
-{
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("no display registered");
-        return;
-    }
-
-    disp->bg_color = color;
-
-    lv_area_t a;
-    lv_area_set(&a, 0, 0, lv_disp_get_hor_res(disp) - 1, lv_disp_get_ver_res(disp) - 1);
-    _lv_inv_area(disp, &a);
-
-}
-
-void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src)
-{
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("no display registered");
-        return;
-    }
-
-    disp->bg_img = img_src;
-
-    lv_area_t a;
-    lv_area_set(&a, 0, 0, lv_disp_get_hor_res(disp) - 1, lv_disp_get_ver_res(disp) - 1);
-    _lv_inv_area(disp, &a);
-}
-
-void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa)
-{
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("no display registered");
-        return;
-    }
-
-    disp->bg_opa = opa;
-
-    lv_area_t a;
-    lv_area_set(&a, 0, 0, lv_disp_get_hor_res(disp) - 1, lv_disp_get_ver_res(disp) - 1);
-    _lv_inv_area(disp, &a);
 }
 
 /*---------------------
@@ -957,6 +923,10 @@ static void update_resolution(lv_disp_t * disp)
     lv_area_set_width(&disp->sys_layer->coords, hor_res);
     lv_area_set_height(&disp->sys_layer->coords, ver_res);
     lv_obj_send_event(disp->sys_layer, LV_OBJ_EVENT_SIZE_CHANGED, &prev_coords);
+
+    lv_area_set_width(&disp->bottom_layer->coords, hor_res);
+    lv_area_set_height(&disp->bottom_layer->coords, ver_res);
+    lv_obj_send_event(disp->bottom_layer, LV_OBJ_EVENT_SIZE_CHANGED, &prev_coords);
 
     lv_memzero(disp->inv_areas, sizeof(disp->inv_areas));
     lv_memzero(disp->inv_area_joined, sizeof(disp->inv_area_joined));

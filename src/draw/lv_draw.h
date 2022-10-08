@@ -124,10 +124,6 @@ typedef struct _lv_draw_ctx_t  {
                            lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                            const lv_draw_img_dsc_t * draw_dsc, lv_img_cf_t cf, lv_color_t * cbuf, lv_opa_t * abuf);
 
-    /**
-     * Replace the buffer with a rect without decoration like radius or borders
-     */
-    void (*draw_bg)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_area_t * coords);
 
     /**
      * Wait until all background operations are finished. (E.g. GPU operations)

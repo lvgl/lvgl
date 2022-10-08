@@ -457,7 +457,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
                 if(value_of_line >= indic->start_value && value_of_line <= indic->end_value) {
                     line_width += indic->type_data.scale_lines.width_mod;
 
-                    if(indic->type_data.scale_lines.color_start.full == indic->type_data.scale_lines.color_end.full) {
+                    if(lv_color_eq(indic->type_data.scale_lines.color_start, indic->type_data.scale_lines.color_end)) {
                         line_color = indic->type_data.scale_lines.color_start;
                     }
                     else {

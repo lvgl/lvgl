@@ -167,7 +167,7 @@ static void sdl_event_handler(lv_timer_t * t)
                     window_update(disp);
                     break;
                 case SDL_WINDOWEVENT_SIZE_CHANGED:
-                    lv_disp_set_resolution(disp, event.window.data1 / dsc->zoom, event.window.data2 / dsc->zoom);
+                    lv_disp_set_res(disp, event.window.data1 / dsc->zoom, event.window.data2 / dsc->zoom);
                     lv_refr_now(disp);
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
@@ -242,6 +242,8 @@ static void texture_resize(lv_disp_t * disp)
 
 #if LV_COLOR_DEPTH == 32
     SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_ARGB8888;
+#elif LV_COLOR_DEPTH == 24
+    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_BGR24;
 #elif LV_COLOR_DEPTH == 16
     SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_RGB565;
 #else

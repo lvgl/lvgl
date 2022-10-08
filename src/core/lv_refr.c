@@ -401,6 +401,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     lv_obj_update_layout(disp_refr->act_scr);
     if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
 
+    lv_obj_update_layout(disp_refr->bottom_layer);
     lv_obj_update_layout(disp_refr->top_layer);
     lv_obj_update_layout(disp_refr->sys_layer);
 
@@ -650,40 +651,9 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
         top_prev_scr = lv_refr_get_top_obj(draw_ctx->buf_area, disp_refr->prev_scr);
     }
 
-    /*Draw a display background if there is no top object*/
+    /*Draw a bottom layer background if there is no top object*/
     if(top_act_scr == NULL && top_prev_scr == NULL) {
-        lv_area_t a;
-        lv_area_set(&a, 0, 0,
-                    lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
-        if(draw_ctx->draw_bg) {
-            lv_draw_rect_dsc_t dsc;
-            lv_draw_rect_dsc_init(&dsc);
-            dsc.bg_img_src = disp_refr->bg_img;
-            dsc.bg_img_opa = disp_refr->bg_opa;
-            dsc.bg_color = disp_refr->bg_color;
-            dsc.bg_opa = disp_refr->bg_opa;
-            draw_ctx->draw_bg(draw_ctx, &dsc, &a);
-        }
-        else if(disp_refr->bg_img) {
-            lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
-            if(res == LV_RES_OK) {
-                lv_draw_img_dsc_t dsc;
-                lv_draw_img_dsc_init(&dsc);
-                dsc.opa = disp_refr->bg_opa;
-                lv_draw_img(draw_ctx, &dsc, &a, disp_refr->bg_img);
-            }
-            else {
-                LV_LOG_WARN("Can't draw the background image");
-            }
-        }
-        else {
-            lv_draw_rect_dsc_t dsc;
-            lv_draw_rect_dsc_init(&dsc);
-            dsc.bg_color = disp_refr->bg_color;
-            dsc.bg_opa = disp_refr->bg_opa;
-            lv_draw_rect(draw_ctx, &dsc, draw_ctx->buf_area);
-        }
+        refr_obj_and_children(draw_ctx, lv_disp_get_layer_bottom(disp_refr));
     }
 
     if(disp_refr->draw_prev_over_act) {

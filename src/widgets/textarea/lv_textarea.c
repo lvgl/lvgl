@@ -1346,7 +1346,7 @@ static void draw_cursor(lv_event_t * e)
     lv_draw_label_dsc_t cur_label_dsc;
     lv_draw_label_dsc_init(&cur_label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
-    if(cur_dsc.bg_opa > LV_OPA_MIN || cur_label_dsc.color.full != label_color.full) {
+    if(cur_dsc.bg_opa > LV_OPA_MIN || !lv_color_eq(cur_label_dsc.color, label_color)) {
         lv_draw_label(draw_ctx, &cur_label_dsc, &cur_area, letter_buf, NULL);
     }
 }

@@ -78,9 +78,9 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent, lv_coord_t size, lv_color_t dark_
  */
 lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_len)
 {
-    lv_color_t c;
-    c.full = 1;
-    lv_canvas_fill_bg(qrcode, c, LV_OPA_COVER);
+    lv_color_t c0 = lv_color_hex(0);
+    lv_color_t c1 = lv_color_hex(1);
+    lv_canvas_fill_bg(qrcode, c1, LV_OPA_COVER);
 
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RES_INV;
 
@@ -141,8 +141,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                c.full = a ? 0 : 1;
-                lv_canvas_set_px_color(qrcode, x, y, c);
+                lv_canvas_set_px_color(qrcode, x, y, a ? c0 : c1);
             }
             else {
                 if(!a) b |= (1 << (7 - p));

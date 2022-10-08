@@ -187,7 +187,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
     lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
     lv_disp_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISP_RENDER_MODE_PARTIAL);
-    lv_disp_set_resolution(disp, hor_res, ver_res);
+    lv_disp_set_res(disp, hor_res, ver_res);
 
     LV_LOG_INFO("Resolution is set to %dx%d", hor_res, ver_res);
 
@@ -267,11 +267,12 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
         int32_t y;
         for(y = area->y1; y <= area->y2; y++) {
             for(x = area->x1; x <= area->x2; x++) {
+                uint32_t cint = lv_color_to_int(*color_p);
                 location = (x + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->vinfo.xres;
                 byte_location = location / 8; /* find the byte we need to change */
                 bit_location = location % 8; /* inside the byte found, find the bit we need to change */
                 fbp8[byte_location] &= ~(((uint8_t)(1)) << bit_location);
-                fbp8[byte_location] |= ((uint8_t)(color_p->full)) << bit_location;
+                fbp8[byte_location] |= ((uint8_t)(cint)) << bit_location;
                 color_p++;
             }
 

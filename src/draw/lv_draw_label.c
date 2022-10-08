@@ -272,7 +272,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
                             recolor = lv_color_make(r, g, b);
                         }
                         else {
-                            recolor.full = dsc->color.full;
+                            recolor = dsc->color;
                         }
                         cmd_state = CMD_STATE_IN; /*After the parameter the text is in the command*/
                     }

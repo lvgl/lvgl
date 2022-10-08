@@ -200,13 +200,19 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
             const lv_color_t * src_tmp = (const lv_color_t *)src;
             src_tmp += ys_int * src_stride + xs_int;
             cbuf[x] = *src_tmp;
+#elif LV_COLOR_DEPTH == 24
+            const lv_color_t * src_tmp = (const lv_color_t *)src;
+            src_tmp += ys_int * src_stride + xs_int;
+            cbuf[x].blue = src_tmp->blue ;
+            cbuf[x].green = src_tmp->green;
+            cbuf[x].red = src_tmp->red;
 #elif LV_COLOR_DEPTH == 32
             const uint8_t * src_tmp = src;
             src_tmp += (ys_int * src_stride * sizeof(lv_color_t)) + xs_int * sizeof(lv_color_t);
-            cbuf[x].full = *((uint32_t *)src_tmp);
+            cbuf[x] = *((lv_color_t *)src_tmp);
 #endif
         }
-        if(cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED && cbuf[x].full == ck.full) {
+        if(cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED && lv_color_eq(cbuf[x], ck)) {
             abuf[x] = 0x00;
         }
     }
@@ -236,9 +242,13 @@ static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, 
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
             cbuf[x].full = src_tmp[0];
 #elif LV_COLOR_DEPTH == 16
-            cbuf[x].full = src_tmp[0] + (src_tmp[1] << 8);
+            lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8));
+#elif LV_COLOR_DEPTH == 24
+            cbuf[x].blue = *(src_tmp + 0);
+            cbuf[x].green = *(src_tmp + 1);
+            cbuf[x].red = *(src_tmp + 2);
 #elif LV_COLOR_DEPTH == 32
-            cbuf[x].full = *((uint32_t *)src_tmp);
+            cbuf[x] = *((lv_color_t *)src_tmp);
 #endif
             abuf[x] = src_tmp[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
         }
@@ -384,9 +394,9 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                 }
 #endif
                 else if(cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
-                    if(((lv_color_t *)px_base)->full == ck.full ||
-                       ((lv_color_t *)px_ver)->full == ck.full ||
-                       ((lv_color_t *)px_hor)->full == ck.full) {
+                    if(lv_color_eq(*((lv_color_t *)px_base), ck) ||
+                       lv_color_eq(*((lv_color_t *)px_hor), ck) ||
+                       lv_color_eq(*((lv_color_t *)px_ver), ck)) {
                         abuf[x] = 0x00;
                         continue;
                     }
@@ -413,13 +423,13 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                 c_ver.full = px_ver[0];
                 c_hor.full = px_hor[0];
 #elif LV_COLOR_DEPTH == 16
-                c_base.full = px_base[0] + (px_base[1] << 8);
-                c_ver.full = px_ver[0] + (px_ver[1] << 8);
-                c_hor.full = px_hor[0] + (px_hor[1] << 8);
+                lv_color_set_int(&c_base, px_base[0] + (px_base[1] << 8));
+                lv_color_set_int(&c_ver, px_ver[0] + (px_ver[1] << 8));
+                lv_color_set_int(&c_hor, px_hor[0] + (px_hor[1] << 8));
 #elif LV_COLOR_DEPTH == 32
-                c_base.full = *((uint32_t *)px_base);
-                c_ver.full = *((uint32_t *)px_ver);
-                c_hor.full = *((uint32_t *)px_hor);
+                c_base = *((lv_color_t *)px_base);
+                c_ver = *((lv_color_t *)px_ver);
+                c_hor = *((lv_color_t *)px_hor);
 #endif
             }
             /*No alpha channel -> RGB*/
@@ -430,7 +440,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                 abuf[x] = 0xff;
             }
 
-            if(c_base.full == c_ver.full && c_base.full == c_hor.full) {
+            if(lv_color_eq(c_base, c_ver) && lv_color_eq(c_base, c_hor)) {
                 cbuf[x] = c_base;
             }
             else {
@@ -444,9 +454,9 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
             cbuf[x].full = src_tmp[0];
 #elif LV_COLOR_DEPTH == 16
-            cbuf[x].full = src_tmp[0] + (src_tmp[1] << 8);
+            lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8));
 #elif LV_COLOR_DEPTH == 32
-            cbuf[x].full = *((uint32_t *)src_tmp);
+            cbuf[x] = *((lv_color_t *)src_tmp);
 #endif
             lv_opa_t a;
             switch(cf) {
@@ -454,7 +464,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                     a = src_tmp[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                     break;
                 case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-                    a = cbuf[x].full == ck.full ? 0x00 : 0xff;
+                    a = lv_color_eq(cbuf[x], ck) ? 0x00 : 0xff;
                     break;
 #if LV_COLOR_DEPTH == 16
                 case LV_IMG_CF_RGB565A8:

@@ -25,8 +25,8 @@ void lv_example_canvas_2(void)
     lv_color_t c0;
     lv_color_t c1;
 
-    c0.full = 0;
-    c1.full = 1;
+    lv_color_set_int(&c0, 0);
+    lv_color_set_int(&c1, 1);
 
     /*Red background (There is no dedicated alpha channel in indexed images so LV_OPA_COVER is ignored)*/
     lv_canvas_fill_bg(canvas, c1, LV_OPA_COVER);

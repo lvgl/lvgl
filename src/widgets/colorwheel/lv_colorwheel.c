@@ -123,10 +123,9 @@ bool lv_colorwheel_set_hsv(lv_obj_t * obj, lv_color_hsv_t hsv)
  */
 bool lv_colorwheel_set_rgb(lv_obj_t * obj, lv_color_t color)
 {
-    lv_color32_t c32;
-    c32.full = lv_color_to32(color);
+    lv_color32_t c32 = lv_color_to32(color);
 
-    return lv_colorwheel_set_hsv(obj,  lv_color_rgb_to_hsv(c32.ch.red, c32.ch.green, c32.ch.blue));
+    return lv_colorwheel_set_hsv(obj,  lv_color_rgb_to_hsv(c32.red, c32.green, c32.blue));
 }
 
 /**

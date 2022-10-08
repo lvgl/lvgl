@@ -43,7 +43,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
         px_num--;
     }
 
-    uint32_t c32 = (uint32_t)color.full + ((uint32_t)color.full << 16);
+    uint32_t cint = lv_color_to_int(color);
+    uint32_t c32 = (uint32_t)cint + ((uint32_t)cint << 16);
     uint32_t * buf32 = (uint32_t *)buf;
 
     while(px_num > 16) {
@@ -267,8 +268,8 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
 {
     lv_color32_t color32;
-    color32.full = lv_color_to32(color);
-    return lv_color_rgb_to_hsv(color32.ch.red, color32.ch.green, color32.ch.blue);
+    color32 = lv_color_to32(color);
+    return lv_color_rgb_to_hsv(color32.red, color32.green, color32.blue);
 }
 
 lv_color_t lv_palette_main(lv_palette_t p)

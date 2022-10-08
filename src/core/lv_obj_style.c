@@ -343,7 +343,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_style_value_t v2 = lv_obj_get_style_prop(obj, part, tr_dsc->prop);
     obj->skip_trans = 0;
 
-    if(v1.ptr == v2.ptr && v1.num == v2.num && v1.color.full == v2.color.full)  return;
+    if(v1.ptr == v2.ptr && v1.num == v2.num && lv_color_eq(v1.color, v2.color))  return;
     obj->state = prev_state;
     v1 = lv_obj_get_style_prop(obj, part, tr_dsc->prop);
     obj->state = new_state;
@@ -782,7 +782,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
         lv_style_value_t old_value;
         bool refr = true;
         if(lv_style_get_prop(obj->styles[i].style, tr->prop, &old_value)) {
-            if(value_final.ptr == old_value.ptr && value_final.color.full == old_value.color.full &&
+            if(value_final.ptr == old_value.ptr && lv_color_eq(value_final.color, old_value.color) &&
                value_final.num == old_value.num) {
                 refr = false;
             }

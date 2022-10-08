@@ -146,8 +146,8 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
         gif->canvas[i * 4 + 3] = 0xff;
 #elif LV_COLOR_DEPTH == 16
         lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-        gif->canvas[i * 3 + 0] = c.full & 0xff;
-        gif->canvas[i * 3 + 1] = (c.full >> 8) & 0xff;
+        gif->canvas[i * 3 + 0] = (*((uint16_t *) &c)) >> 8;
+        gif->canvas[i * 3 + 1] = (*((uint16_t *) &c)) & 0xff;
         gif->canvas[i * 3 + 2] = 0xff;
 #elif LV_COLOR_DEPTH == 8
         lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
@@ -504,8 +504,8 @@ render_frame_rect(gd_GIF * gif, uint8_t * buffer)
                 buffer[(i + k) * 4 + 3] = 0xFF;
 #elif LV_COLOR_DEPTH == 16
                 lv_color_t c = lv_color_make(*(color + 0), *(color + 1), *(color + 2));
-                buffer[(i + k) * 3 + 0] = c.full & 0xff;
-                buffer[(i + k) * 3 + 1] = (c.full >> 8) & 0xff;
+                buffer[(i + k) * 3 + 0] = (*((uint16_t *) &c)) & 0xff;
+                buffer[(i + k) * 3 + 1] = (*((uint16_t *) &c)) >> 8;
                 buffer[(i + k) * 3 + 2] = 0xff;
 #elif LV_COLOR_DEPTH == 8
                 lv_color_t c = lv_color_make(*(color + 0), *(color + 1), *(color + 2));
@@ -544,8 +544,8 @@ dispose(gd_GIF * gif)
                     gif->canvas[(i + k) * 4 + 3] = opa;
 #elif LV_COLOR_DEPTH == 16
                     lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-                    gif->canvas[(i + k) * 3 + 0] = c.full & 0xff;
-                    gif->canvas[(i + k) * 3 + 1] = (c.full >> 8) & 0xff;
+                    gif->canvas[(i + k) * 3 + 0] = (*((uint16_t *) &c)) & 0xff;
+                    gif->canvas[(i + k) * 3 + 1] = (*((uint16_t *) &c)) >> 8;
                     gif->canvas[(i + k) * 3 + 2] = opa;
 #elif LV_COLOR_DEPTH == 8
                     lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));

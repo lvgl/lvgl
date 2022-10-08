@@ -59,7 +59,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
         lv_memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
 #if LV_COLOR_SIZE == 32
-        p_color.ch.alpha = 0xFF; /*Only the color should be get so use a default alpha value*/
+        p_color.alpha = 0xFF; /*Only the color should be get so use a default alpha value*/
 #endif
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
@@ -71,7 +71,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
          *dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
          *so the possible real width are 8, 16, 24 ...*/
         uint32_t px  = ((dsc->header.w + 7) >> 3) * y + x;
-        p_color.full = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
+        lv_color_set_int(&p_color, (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit));
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
         buf_u8 += 4 * 4;
@@ -82,7 +82,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
          *dsc->header.w + 3 means rounding up to 4 because the lines are byte aligned
          *so the possible real width are 4, 8, 12 ...*/
         uint32_t px  = ((dsc->header.w + 3) >> 2) * y + x;
-        p_color.full = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
+        lv_color_set_int(&p_color, (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit));
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
         buf_u8 += 4 * 16;
@@ -93,12 +93,12 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
          *dsc->header.w + 1 means rounding up to 2 because the lines are byte aligned
          *so the possible real width are 2, 4, 6 ...*/
         uint32_t px  = ((dsc->header.w + 1) >> 1) * y + x;
-        p_color.full = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
+        lv_color_set_int(&p_color, (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit));
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
         buf_u8 += 4 * 256;
         uint32_t px  = dsc->header.w * y + x;
-        p_color.full = buf_u8[px];
+        lv_color_set_int(&p_color, buf_u8[px]);
     }
     else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT || dsc->header.cf == LV_IMG_CF_ALPHA_2BIT ||
             dsc->header.cf == LV_IMG_CF_ALPHA_4BIT || dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {
@@ -262,7 +262,7 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
          *so the possible real width are 8 ,16, 24 ...*/
         uint32_t px = ((dsc->header.w + 7) >> 3) * y + x;
         buf_u8[px]  = buf_u8[px] & ~(1 << (7 - bit));
-        buf_u8[px]  = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
+        buf_u8[px]  = buf_u8[px] | ((lv_color_to_int(c) & 0x1) << (7 - bit));
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
         buf_u8 += sizeof(lv_color32_t) * 4; /*Skip the palette*/
@@ -275,7 +275,7 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
         uint32_t px = ((dsc->header.w + 3) >> 2) * y + x;
 
         buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
-        buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
+        buf_u8[px] = buf_u8[px] | ((lv_color_to_int(c) & 0x3) << (6 - bit));
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
         buf_u8 += sizeof(lv_color32_t) * 16; /*Skip the palette*/
@@ -287,12 +287,12 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
          *so the possible real width are 2 ,4, 6 ...*/
         uint32_t px = ((dsc->header.w + 1) >> 1) * y + x;
         buf_u8[px]  = buf_u8[px] & ~(0xF << (4 - bit));
-        buf_u8[px]  = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
+        buf_u8[px]  = buf_u8[px] | ((lv_color_to_int(c) & 0xF) << (4 - bit));
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
         buf_u8 += sizeof(lv_color32_t) * 256; /*Skip the palette*/
         uint32_t px = dsc->header.w * y + x;
-        buf_u8[px]  = c.full;
+        buf_u8[px]  = lv_color_to_int(c);
     }
 }
 
@@ -314,8 +314,7 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
         return;
     }
 
-    lv_color32_t c32;
-    c32.full      = lv_color_to32(c);
+    lv_color32_t c32 = lv_color_to32(c);
     uint8_t * buf = (uint8_t *)dsc->data;
     lv_memcpy(&buf[id * sizeof(c32)], &c32, sizeof(c32));
 }
