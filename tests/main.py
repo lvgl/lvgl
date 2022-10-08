@@ -2,7 +2,6 @@
 
 import argparse
 import errno
-import glob
 import shutil
 import subprocess
 import sys
@@ -41,22 +40,6 @@ def delete_dir_ignore_missing(dir_path):
         shutil.rmtree(dir_path)
     except FileNotFoundError:
         pass
-
-
-def generate_test_runners():
-    '''Generate the test runner source code.'''
-    global lvgl_test_dir
-    os.chdir(lvgl_test_dir)
-    delete_dir_ignore_missing('src/test_runners')
-    os.mkdir('src/test_runners')
-
-    # TODO: Intermediate files should be in the build folders, not alongside
-    #       the other repo source.
-    for f in glob.glob("./src/test_cases/test_*.c"):
-        r = f[:-2] + "_Runner.c"
-        r = r.replace("/test_cases/", "/test_runners/")
-        subprocess.check_call(['ruby', 'unity/generate_test_runner.rb',
-                               f, r, 'config.yml'])
 
 
 def options_abbrev(options_name):
@@ -189,8 +172,6 @@ if __name__ == "__main__":
         if not is_valid_option_name(opt):
             print('Invalid build option "%s"' % opt, file=sys.stderr)
             sys.exit(errno.EINVAL)
-
-    generate_test_runners()
 
     for options_name in options_to_build:
         is_test = options_name in test_options
