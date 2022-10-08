@@ -548,7 +548,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
     lv_coord_t i;
     for(i = 0; i < len; i++) {
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = bg_color.full;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = lv_color_to_int(bg_color);
 #elif LV_COLOR_DEPTH == 16
         /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = (*((uint16_t *) &bg_color)) & 0xFF;
@@ -686,7 +686,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 
         lv_color_t color = user_data->palette[val_act];
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = color.full;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = lv_color_to_int(color);
 #elif LV_COLOR_DEPTH == 16
         /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = (*((uint16_t *) &color)) & 0xFF;

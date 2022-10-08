@@ -47,20 +47,6 @@ enum {
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
 
-#if LV_COLOR_DEPTH == 1
-#define LV_COLOR_SIZE 8
-#elif LV_COLOR_DEPTH == 8
-#define LV_COLOR_SIZE 8
-#elif LV_COLOR_DEPTH == 16
-#define LV_COLOR_SIZE 16
-#elif LV_COLOR_DEPTH == 24
-#define LV_COLOR_SIZE 24
-#elif LV_COLOR_DEPTH == 32
-#define LV_COLOR_SIZE 32
-#else
-#error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
-#endif
-
 #if defined(__cplusplus) && !defined(_LV_COLOR_HAS_MODERN_CPP)
 /**
 * MSVC compiler's definition of the __cplusplus indicating 199711L regardless to C++ standard version
@@ -116,8 +102,8 @@ enum {
 # define LV_COLOR_GET_B8(c) (c).blue
 # define LV_COLOR_GET_A8(c) 0xFF
 
-# define _LV_COLOR_ZERO_INITIALIZER8 {{0x00, 0x00, 0x00}}
-# define LV_COLOR_MAKE8(r8, g8, b8) {{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}}
+# define _LV_COLOR_ZERO_INITIALIZER8 {0x00}
+# define LV_COLOR_MAKE8(r8, g8, b8) {LV_MAX3(b8, g8, r8)}
 
 # define LV_COLOR_SET_R16(c, v) (c).red = (uint8_t)((v) & 0x1FU)
 # define LV_COLOR_SET_G16(c, v) (c).green = (uint8_t)((v) & 0x3FU)
@@ -185,10 +171,11 @@ typedef union {
     uint8_t red : 1;
 } lv_color1_t;
 
-typedef struct {
-    uint8_t blue : 2;
-    uint8_t green : 3;
-    uint8_t red : 3;
+typedef union {
+    uint8_t blue;
+    uint8_t green;
+    uint8_t red;
+    uint8_t level;
 } lv_color8_t;
 
 typedef struct {
@@ -301,6 +288,11 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
+static inline void lv_color1_set_int(lv_color1_t * c, uint8_t v)
+{
+    *((uint8_t *)c) = v;
+}
+
 static inline void lv_color8_set_int(lv_color8_t * c, uint8_t v)
 {
     *((uint8_t *)c) = v;
@@ -311,7 +303,7 @@ static inline void lv_color16_set_int(lv_color16_t * c, uint16_t v)
     *((uint16_t *)c) = v;
 }
 
-static inline void lv_color24_set_int(lv_color24_t * c, uint16_t v)
+static inline void lv_color24_set_int(lv_color24_t * c, uint32_t v)
 {
     lv_memcpy(c, &v, 3);
 }
@@ -326,7 +318,7 @@ static inline void lv_color_set_int(lv_color_t * c, uint32_t v)
     return LV_CONCAT3(lv_color, LV_COLOR_DEPTH, _set_int(c, v));
 }
 
-static inline uint8_t lv_color1_to_int(lv_color8_t c)
+static inline uint8_t lv_color1_to_int(lv_color1_t c)
 {
     return *((uint8_t *) &c);
 }
@@ -375,10 +367,10 @@ static inline bool lv_color_eq(lv_color_t c1, lv_color_t c2)
  *        ----------------------
  *         Shift right with 5 - 3 = 2
  */
-static inline uint8_t lv_color_to1(lv_color_t color)
+static inline lv_color1_t lv_color_to1(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
-    return color.full;
+    return color;
 #elif LV_COLOR_DEPTH == 8
     if((LV_COLOR_GET_R(color) & 0x4) || (LV_COLOR_GET_G(color) & 0x4) || (LV_COLOR_GET_B(color) & 0x2)) {
         return 1;
@@ -406,12 +398,12 @@ static inline uint8_t lv_color_to1(lv_color_t color)
 static inline lv_color8_t lv_color_to8(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
-    if(color.full == 0)
-        return 0;
-    else
-        return 0xFF;
+    lv_color8_t ret;
+    if(lv_color_to_int(color) == 0) ret.red = 0;
+    else ret.red = 0xff;
+    return ret;
 #elif LV_COLOR_DEPTH == 8
-    return color.full;
+    return color;
 #elif LV_COLOR_DEPTH == 16
     lv_color8_t ret;
     LV_COLOR_SET_R8(ret, LV_COLOR_GET_R(color) >> 2); /*5 - 3  = 2*/
@@ -430,16 +422,18 @@ static inline lv_color8_t lv_color_to8(lv_color_t color)
 static inline lv_color16_t lv_color_to16(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
-    if(color.full == 0)
-        return 0;
-    else
-        return 0xFFFF;
+    lv_color16_t ret;
+    uint8_t lvl = lv_color_to_int(color);
+    ret.red = lvl ? 0x1F : 0;
+    ret.green = lvl ? 0x3F : 0;
+    ret.blue = lvl ? 0x1F : 0;
+    return ret;
 #elif LV_COLOR_DEPTH == 8
     lv_color16_t ret;
-    LV_COLOR_SET_R16(ret, LV_COLOR_GET_R(color) * 4);  /*(2^5 - 1)/(2^3 - 1) = 31/7 = 4*/
-    LV_COLOR_SET_G16(ret, LV_COLOR_GET_G(color) * 9);  /*(2^6 - 1)/(2^3 - 1) = 63/7 = 9*/
-    LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) * 10); /*(2^5 - 1)/(2^2 - 1) = 31/3 = 10*/
-    return ret.full;
+    LV_COLOR_SET_R16(ret, LV_COLOR_GET_R(color) >> 3);
+    LV_COLOR_SET_G16(ret, LV_COLOR_GET_G(color) >> 2);
+    LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) >> 3);
+    return ret;
 #elif LV_COLOR_DEPTH == 16
     return color;
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
@@ -454,16 +448,18 @@ static inline lv_color16_t lv_color_to16(lv_color_t color)
 static inline lv_color24_t lv_color_to24(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
-    if(color.full == 0)
-        return 0x000000;
-    else
-        return 0xFFFFFF;
+    lv_color24_t ret;
+    uint8_t lvl = lv_color_to_int(color);
+    ret.red = lvl ? 0xFF : 0;
+    ret.green = lvl ? 0xFF : 0;
+    ret.blue = lvl ? 0xFF : 0;
+    return ret;
 #elif LV_COLOR_DEPTH == 8
     lv_color24_t ret;
-    LV_COLOR_SET_R32(ret, LV_COLOR_GET_R(color) * 36); /*(2^8 - 1)/(2^3 - 1) = 255/7 = 36*/
-    LV_COLOR_SET_G32(ret, LV_COLOR_GET_G(color) * 36); /*(2^8 - 1)/(2^3 - 1) = 255/7 = 36*/
-    LV_COLOR_SET_B32(ret, LV_COLOR_GET_B(color) * 85); /*(2^8 - 1)/(2^2 - 1) = 255/3 = 85*/
-    return ret.full;
+    LV_COLOR_SET_R32(ret, LV_COLOR_GET_R(color));
+    LV_COLOR_SET_G32(ret, LV_COLOR_GET_G(color));
+    LV_COLOR_SET_B32(ret, LV_COLOR_GET_B(color));
+    return ret;
 #elif LV_COLOR_DEPTH == 16
     /**
      * The floating point math for conversion is:
@@ -513,17 +509,20 @@ static inline lv_color24_t lv_color_to24(lv_color_t color)
 static inline lv_color32_t lv_color_to32(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
-    if(color.full == 0)
-        return 0xFF000000;
-    else
-        return 0xFFFFFFFF;
+    lv_color32_t ret;
+    uint8_t lvl = lv_color_to_int(color);
+    ret.red = lvl ? 0xFF : 0;
+    ret.green = lvl ? 0xFF : 0;
+    ret.blue = lvl ? 0xFF : 0;
+    ret.alpha = 0xFF;
+    return ret;
 #elif LV_COLOR_DEPTH == 8
     lv_color32_t ret;
-    LV_COLOR_SET_R32(ret, LV_COLOR_GET_R(color) * 36); /*(2^8 - 1)/(2^3 - 1) = 255/7 = 36*/
-    LV_COLOR_SET_G32(ret, LV_COLOR_GET_G(color) * 36); /*(2^8 - 1)/(2^3 - 1) = 255/7 = 36*/
-    LV_COLOR_SET_B32(ret, LV_COLOR_GET_B(color) * 85); /*(2^8 - 1)/(2^2 - 1) = 255/3 = 85*/
+    LV_COLOR_SET_R32(ret, LV_COLOR_GET_R(color));
+    LV_COLOR_SET_G32(ret, LV_COLOR_GET_G(color));
+    LV_COLOR_SET_B32(ret, LV_COLOR_GET_B(color));
     LV_COLOR_SET_A32(ret, 0xFF);
-    return ret.full;
+    return ret;
 #elif LV_COLOR_DEPTH == 16
     /**
      * The floating point math for conversion is:
@@ -604,7 +603,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
     LV_COLOR_SET_A(ret, 0xFF);
 #else
     /*LV_COLOR_DEPTH == 1*/
-    ret.full = mix > LV_OPA_50 ? c1.full : c2.full;
+    ret = mix > LV_OPA_50 ? c1 : c2;
 #endif
 
     return ret;
@@ -651,7 +650,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * p
     LV_COLOR_SET_R(c1, premult_c1[0]);
     LV_COLOR_SET_G(c1, premult_c1[1]);
     LV_COLOR_SET_B(c1, premult_c1[2]);
-    ret.full = mix > LV_OPA_50 ? c2.full : c1.full;
+    ret = mix > LV_OPA_50 ? c2 : c1;
 #endif
 
     return ret;
@@ -758,6 +757,7 @@ static inline lv_color_t lv_color_hex(uint32_t c)
 #elif LV_COLOR_DEPTH == 24
     lv_color_t r;
     lv_color_set_int(&r, c);
+    return r;
 #elif LV_COLOR_DEPTH == 32
     lv_color_t r;
     lv_color_set_int(&r, c | 0xFF000000);

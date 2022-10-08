@@ -195,7 +195,7 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
             const uint8_t * src_tmp = src;
             src_tmp += ys_int * src_stride + xs_int;
-            cbuf[x].full = src_tmp[0];
+            lv_color_set_int(&cbuf[x], src_tmp[0]);
 #elif LV_COLOR_DEPTH == 16
             const lv_color_t * src_tmp = (const lv_color_t *)src;
             src_tmp += ys_int * src_stride + xs_int;
@@ -240,7 +240,7 @@ static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, 
             src_tmp += (ys_int * src_stride * LV_IMG_PX_SIZE_ALPHA_BYTE) + xs_int * LV_IMG_PX_SIZE_ALPHA_BYTE;
 
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-            cbuf[x].full = src_tmp[0];
+            lv_color_set_int(&cbuf[x], src_tmp[0]);
 #elif LV_COLOR_DEPTH == 16
             lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8));
 #elif LV_COLOR_DEPTH == 24
@@ -419,9 +419,9 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                 if(abuf[x] == 0x00) continue;
 
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-                c_base.full = px_base[0];
-                c_ver.full = px_ver[0];
-                c_hor.full = px_hor[0];
+                lv_color_set_int(&c_base, px_base[0]);
+                lv_color_set_int(&c_ver, px_ver[0]);
+                lv_color_set_int(&c_hor, px_hor[0]);
 #elif LV_COLOR_DEPTH == 16
                 lv_color_set_int(&c_base, px_base[0] + (px_base[1] << 8));
                 lv_color_set_int(&c_ver, px_ver[0] + (px_ver[1] << 8));
@@ -452,7 +452,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
         /*Partially out of the image*/
         else {
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-            cbuf[x].full = src_tmp[0];
+            lv_color_set_int(&cbuf[x], src_tmp[0]);
 #elif LV_COLOR_DEPTH == 16
             lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8));
 #elif LV_COLOR_DEPTH == 32

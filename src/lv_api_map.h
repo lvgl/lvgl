@@ -24,6 +24,10 @@ extern "C" {
 #define LV_INDEV_STATE_PR       LV_INDEV_STATE_PRESSED
 #define LV_OBJ_FLAG_SNAPABLE    LV_OBJ_FLAG_SNAPPABLE   /*Fixed typo*/
 
+#ifndef LV_COLOR_SIZE
+#  define LV_COLOR_SIZE LV_COLOR_DEPTH
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -73,8 +77,6 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 {
     lv_obj_move_to_index(obj, 0);
 }
-
-
 
 /**********************
  * DEPRECATED FUNCTIONS

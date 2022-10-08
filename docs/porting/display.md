@@ -2,7 +2,6 @@
 
 To create a display for LVGL call `lv_disp_t * disp = lv_disp_create(hor_res, ver_res)`. You can create a multiple displays and a different driver for each (see below),
 
-
 ## Basic setup
 
 Draw buffer(s) are simple array(s) that LVGL uses to render the screen's content.
@@ -43,7 +42,7 @@ The draw buffers can be set with
 
 - `buf1` a bufer where LVGL can render
 - `buf2` a second optional buffer (see more details below)
-- `buf_size_px` size of the buffers in pixels
+- `buf_size_byte` size of the buffer(s) in bytes
 - `render_mode`
   - `LV_DISP_RENDER_MODE_PARTIAL` Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM. At least 1/10 sceen size buffer(s) are recommended. In `flush_cb` the rendered images needs to be copied to the given area of the display.
    - `LV_DISP_RENDER_MODE_DIRECT` The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image.
@@ -52,7 +51,7 @@ The draw buffers can be set with
 Example:
 ```c
 static lv_color_t buf[LCD_HOR_RES * LCD_VER_RES / 10];
-lv_disp_set_draw_buffers(disp, buf, NULL, LCD_HOR_RES * LCD_VER_RES / 10, LV_DISP_RENDER_MODE_PARTIAL);
+lv_disp_set_draw_buffers(disp, buf, NULL, sizeof(buf), LV_DISP_RENDER_MODE_PARTIAL);
 ```
 
 #### One buffer
@@ -67,12 +66,18 @@ This way, the rendering and refreshing of the display become parallel operations
 
 ## Advnaced options
 
+### Resoltion
 To set the resolution of the display after creation use `lv_disp_set_res(disp, hor_res, ver_res);`
 
 It's not mandatory to use the whole display for LVGL, however in some cases the physical resolution is important. For example the touchpad still sees the whole resolution and the values needs to be converted
 to the active LVGL display area. So the physical resoltution and the offset of the active area can be set with `lv_disp_set_physical_res(disp, hor_res, ver_res);`and `lv_disp_set_offset(disp, x, y);`
 
-The orientation of the display can be changed with `lv_disp_set_rotation(disp, LV_DISP_ROTATION_0/90/180/270, true/false)`.  LVGL will swap the horizontal and vertical resolutions internally according to the set degree. IF the last paramter is `true` LVGL will rotate the rendered image. If it's `false` the display driver should rotate the rendered image.
+### Rotation
+The orientation of the display can be changed with
+`lv_disp_set_rotation(disp, LV_DISP_ROTATION_0/90/180/270, true/false)`.
+LVGL will swap the horizontal and vertical resolutions internally according to the set degree. IF the last paramter is `true` LVGL will rotate the rendered image. If it's `false` the display driver should rotate the rendered image.
+
+### Color format
 
  * Set the color format of the display.
  * If set to not `LV_COLOR_FORMAT_NATIVE` the draw_ctx's `buffer_convert` function will be used

@@ -58,7 +58,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
         lv_memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
-#if LV_COLOR_SIZE == 32
+#if LV_COLOR_DEPTH == 32
         p_color.alpha = 0xFF; /*Only the color should be get so use a default alpha value*/
 #endif
     }

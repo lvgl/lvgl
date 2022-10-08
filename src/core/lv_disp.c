@@ -93,7 +93,7 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 #if LV_COLOR_DEPTH == 1
     disp->color_format = LV_COLOR_FORMAT_L1;
 #elif LV_COLOR_DEPTH == 8
-    disp->color_format = LV_COLOR_FORMAT_L8;
+    disp->color_format = LV_COLOR_FORMAT_RGBX8888;
 #else
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 #endif
@@ -399,7 +399,7 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
  * BUFFERING
  *--------------------*/
 
-void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_px,
+void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_byte,
                               lv_disp_render_mode_t render_mode)
 {
     if(disp == NULL) disp = lv_disp_get_default();
@@ -408,7 +408,7 @@ void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32
     disp->draw_buf_1 = buf1;
     disp->draw_buf_2 = buf2;
     disp->draw_buf_act = buf1;
-    disp->draw_buf_size = buf_size_px;
+    disp->draw_buf_size = buf_size_byte;
     disp->render_mode = render_mode;
 }
 

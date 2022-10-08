@@ -238,26 +238,26 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
             lv_color_t chk = LV_COLOR_CHROMA_KEY;
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
             uint8_t * cbuf_uint = (uint8_t *)cbuf;
-            uint8_t chk_v = chk.full;
+            uint8_t chk_v = lv_color_to_int(chk);
 #elif LV_COLOR_DEPTH == 16
             uint16_t * cbuf_uint = (uint16_t *)cbuf;
-            uint16_t chk_v = lv_color_to_int(chk);;
+            uint16_t chk_v = lv_color_to_int(chk);
 #elif LV_COLOR_DEPTH == 32
             uint32_t * cbuf_uint = (uint32_t *)cbuf;
             uint32_t chk_v = lv_color_to_int(chk);
 #endif
 #if LV_COLOR_DEPTH == 24
             for(i = 0; i < px_cnt; i++) {
-                if(lv_color_eq(chk, cbuf[i]) abuf[i] = 0x00;
+                if(lv_color_eq(chk, cbuf[i])) abuf[i] = 0x00;
             }
 #else
             for(i = 0; i < px_cnt; i++) {
                 if(chk_v == cbuf_uint[i]) abuf[i] = 0x00;
             }
 #endif
+        }
     }
-}
-else if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
+    else if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
         src_tmp8 += (src_stride * dest_area->y1 * LV_IMG_PX_SIZE_ALPHA_BYTE) + dest_area->x1 * LV_IMG_PX_SIZE_ALPHA_BYTE;
 
         lv_coord_t src_new_line_step_px = (src_stride - lv_area_get_width(dest_area));
@@ -269,7 +269,7 @@ else if(cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
             for(x = 0; x < dest_w; x++) {
                 abuf[x] = src_tmp8[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
-                cbuf[x].full = *src_tmp8;
+                lv_color_set_int(&cbuf[x], *src_tmp8);
 #elif LV_COLOR_DEPTH == 16
                 lv_color_set_int(&cbuf[x], *src_tmp8 + ((*(src_tmp8 + 1)) << 8));
 #elif LV_COLOR_DEPTH == 24

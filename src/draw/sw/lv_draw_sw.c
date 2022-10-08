@@ -110,12 +110,27 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
        draw_ctx->color_format >= LV_COLOR_FORMAT_CUSTOM_START) {
         return;
     }
+#if LV_COLOR_DEPTH == 8
+    if(draw_ctx->color_format == LV_COLOR_FORMAT_L8) return;
+    if(draw_ctx->color_format == LV_COLOR_FORMAT_RGBX8888) {
+        lv_area_t a;
+        int32_t x;
+        uint32_t px_cnt = lv_area_get_size(draw_ctx->buf_area);
+        uint8_t * buf8 = draw_ctx->buf;
+        uint32_t * buf32 = (uint32_t *) draw_ctx->buf;
+        buf8 += px_cnt - 1;
+        buf32 += px_cnt - 1;
+        for(x = px_cnt - 1; x > 0; x--) {
+            buf32[x] = (buf8[x] << 16) + (buf8[x] << 8) + (buf8[x] << 0);
+        }
+        return;
+    }
+#endif
 
 #if LV_COLOR_DEPTH == 16
     if(draw_ctx->color_format == LV_COLOR_FORMAT_RGB565) return;
 
     /*Make both the clip and buf area relative to the buf area*/
-
     if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSE) {
         uint32_t px_cnt = lv_area_get_size(draw_ctx->buf_area);
         uint32_t u32_cnt = px_cnt / 2;

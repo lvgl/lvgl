@@ -100,7 +100,7 @@ uint8_t lv_img_cf_get_px_size(lv_img_cf_t cf)
             break;
         case LV_IMG_CF_TRUE_COLOR:
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-            px_size = LV_COLOR_SIZE;
+            px_size = LV_COLOR_DEPTH;
             break;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
             px_size = LV_IMG_PX_SIZE_ALPHA_BYTE << 3;
