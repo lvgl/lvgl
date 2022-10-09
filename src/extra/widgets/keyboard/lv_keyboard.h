@@ -45,6 +45,9 @@ enum {
     LV_KEYBOARD_MODE_USER_2,
     LV_KEYBOARD_MODE_USER_3,
     LV_KEYBOARD_MODE_USER_4,
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
+    LV_KEYBOARD_MODE_TEXT_ARABIC
+#endif
 };
 typedef uint8_t lv_keyboard_mode_t;
 
