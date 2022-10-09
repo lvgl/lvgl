@@ -19,7 +19,7 @@
  **********************/
 typedef struct {
     lv_font_t * font;
-    lv_get_imgfont_path_cb_t path_cb;
+    lv_imgfont_get_dsc_cb_t get_dsc_cb;
     void * user_data;
     char path[LV_IMGFONT_PATH_MAX_LEN];
 } imgfont_dsc_t;
@@ -46,7 +46,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-lv_font_t * lv_imgfont_create(uint16_t height, lv_get_imgfont_path_cb_t path_cb, void * user_data)
+lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_dsc_cb_t get_dsc_cb, void * user_data)
 {
     LV_ASSERT_MSG(LV_IMGFONT_PATH_MAX_LEN > sizeof(lv_img_dsc_t),
                   "LV_IMGFONT_PATH_MAX_LEN must be greater than sizeof(lv_img_dsc_t)");
@@ -57,7 +57,7 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_get_imgfont_path_cb_t path_cb,
     lv_memzero(dsc, size);
 
     dsc->font = (lv_font_t *)(((char *)dsc) + sizeof(imgfont_dsc_t));
-    dsc->path_cb = path_cb;
+    dsc->get_dsc_cb = get_dsc_cb;
     dsc->user_data = user_data;
 
     lv_font_t * font = dsc->font;
@@ -102,9 +102,17 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
     LV_ASSERT_NULL(dsc);
-    if(dsc->path_cb == NULL) return false;
+    if(dsc->get_dsc_cb == NULL) return false;
 
-    if(!dsc->path_cb(dsc->font, dsc->path, LV_IMGFONT_PATH_MAX_LEN, unicode, unicode_next, dsc->user_data)) {
+    lv_imgfont_param_t param;
+    lv_memzero(&param, sizeof(param));
+    param.font = dsc->font;
+    param.img_src = dsc->path;
+    param.len = LV_IMGFONT_PATH_MAX_LEN;
+    param.unicode = unicode;
+    param.unicode_next = unicode_next;
+
+    if(!dsc->get_dsc_cb(&param, dsc->user_data)) {
         return false;
     }
 
@@ -133,8 +141,8 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     dsc_out->box_w = img_header->w;
     dsc_out->box_h = img_header->h;
     dsc_out->bpp = LV_IMGFONT_BPP;   /* is image identifier */
-    dsc_out->ofs_x = 0;
-    dsc_out->ofs_y = 0;
+    dsc_out->ofs_x = param.offset_x;
+    dsc_out->ofs_y = param.offset_y;
 
     return true;
 }
