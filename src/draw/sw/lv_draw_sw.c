@@ -123,7 +123,6 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
         uint32_t * buf32 = (uint32_t *) buf16 ;
 
         /*Swap all byte pairs*/
-
         while(u32_cnt >= 8) {
             buf32[0] = ((uint32_t)(buf32[0] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[0] & 0x00ff00ff) << 8);
             buf32[1] = ((uint32_t)(buf32[1] & 0xff00ff00) >> 8) + ((uint32_t)(buf32[1] & 0x00ff00ff) << 8);
@@ -150,15 +149,23 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
 
         return;
     }
-    else if(draw_ctx->color_format == LV_COLOR_FORMAT_L8) {
+    else {
         size_t buf_size_px = lv_area_get_size(draw_ctx->buf_area);
-
-        uint8_t * buf8 = draw_ctx->buf;
-        lv_color_t * bufc = draw_ctx->buf;
+        bool has_alpha = lv_color_format_has_alpha(draw_ctx->color_format);
+        uint8_t px_size_in = lv_color_format_get_size(has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
+        uint8_t px_size_out = lv_color_format_get_size(draw_ctx->color_format);
+        uint8_t * buf_in = draw_ctx->buf;
+        uint8_t * buf_out = draw_ctx->buf;
 
         uint32_t i;
         for(i = 0; i < buf_size_px; i++) {
-            buf8[i] = lv_color_brightness(bufc[i]);
+            lv_color_t color;
+            if(has_alpha) lv_color_set_int(&color, buf_in[0] + (buf_in[1] << 8));
+            else color = *((lv_color_t *)buf_in);
+            lv_opa_t opa = has_alpha ? buf_in[2] : 0xFF;
+            lv_color_from_native(color, opa, buf_out, draw_ctx->color_format);
+            buf_in += px_size_in;
+            buf_out += px_size_out;
         }
         return;
     }

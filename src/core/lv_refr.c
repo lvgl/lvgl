@@ -415,8 +415,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT &&
        disp_refr->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
-        //        LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
-        //        return;
+        LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
+        return;
     }
 
     lv_refr_join_area();
@@ -632,7 +632,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
         }
 
         /*If the screen is transparent initialize it when the flushing is ready*/
-        if(disp_refr->screen_transp) {
+        if(lv_color_format_has_alpha(disp_refr->color_format)) {
             //            if(disp_refr->clear_cb) {
             //                disp_refr->clear_cb(disp_refr, disp_refr->buf_act, disp_refr->size);
             //            }
@@ -935,8 +935,10 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h)
 {
-    uint32_t px_size = disp->screen_transp ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
-    int32_t max_row = (uint32_t)disp->draw_buf_size / px_size / area_w;
+    bool has_alpha = lv_color_format_has_alpha(disp->color_format);
+    uint8_t px_size_render = has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE : sizeof(lv_color_t);
+    uint32_t px_size_disp =  lv_color_format_get_size(disp->color_format);
+    int32_t max_row = (uint32_t)disp->draw_buf_size / LV_MAX(px_size_render, px_size_disp) / area_w;
 
     if(max_row > area_h) max_row = area_h;
 
@@ -1162,7 +1164,7 @@ static void draw_buf_flush(lv_disp_t * disp)
         }
 
         /*If the screen is transparent initialize it when the flushing is ready*/
-        if(disp_refr->screen_transp) {
+        if(lv_color_format_has_alpha(disp_refr->color_format)) {
             //            if(disp_refr->clear_cb) {
             //                disp_refr->clear_cb(disp_refr->driver, disp_refr->buf_act, disp_refr->size);
             //            }

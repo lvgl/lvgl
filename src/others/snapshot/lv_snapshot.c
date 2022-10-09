@@ -65,7 +65,7 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_img_cf_t cf)
     w += ext_size * 2;
     h += ext_size * 2;
     uint8_t px_size;
-    if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
+    if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) px_size = LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
     else px_size = sizeof(lv_color_t);
 
     return w * h * px_size;

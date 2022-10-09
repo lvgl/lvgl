@@ -20,18 +20,10 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/*If image pixels contains alpha we need to know how much byte is a pixel*/
-#if LV_COLOR_DEPTH == 8
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 2
-#elif LV_COLOR_DEPTH == 16
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 3
-#elif LV_COLOR_DEPTH == 24 || LV_COLOR_DEPTH == 32
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 4
-#endif
 
 #define LV_IMG_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_DEPTH / 8) * w * h)
 #define LV_IMG_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_DEPTH / 8) * w * h)
-#define LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
+#define LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE * w * h)
 
 /*+ 1: to be sure no fractional row*/
 #define LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h) ((((w + 7) / 8) * h))

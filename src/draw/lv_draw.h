@@ -52,7 +52,7 @@ typedef struct _lv_draw_layer_ctx_t {
         const lv_area_t * clip_area;
         lv_area_t * buf_area;
         void * buf;
-        bool render_with_alpha;
+        lv_color_format_t color_format;
     } original;
 } lv_draw_layer_ctx_t;
 
@@ -71,12 +71,6 @@ typedef struct _lv_draw_ctx_t  {
      * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
      */
     const lv_area_t * clip_area;
-
-    /**
-     * If true and Alpha byte will be appended to the colors.
-     * It might make rendering slower.
-     */
-    bool render_with_alpha;
 
     /**
      * The rendered image in draw_ctx->buf will be converted to this format

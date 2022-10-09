@@ -430,7 +430,7 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
 {
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     lv_fs_res_t res;
-    uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf);
+    uint8_t px_size = lv_color_format_get_size(dsc->header.cf);
 
     uint32_t pos = ((y * dsc->header.w + x) * px_size) >> 3;
     pos += 4; /*Skip the header*/
@@ -464,24 +464,24 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
     //    lv_coord_t i;
     //    for(i = 0; i < len; i++) {
     //#if LV_COLOR_DEPTH == 8
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = lv_color_to_int(bg_color);
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE] = lv_color_to_int(bg_color);
     //#elif LV_COLOR_DEPTH == 16
     //        /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = (*((uint16_t *) &bg_color)) & 0xFF;
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = ((*((uint16_t *) &bg_color)) >> 8);
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE] = (*((uint16_t *) &bg_color)) & 0xFF;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 1] = ((*((uint16_t *) &bg_color)) >> 8);
     //#elif LV_COLOR_DEPTH == 24
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 0] = bg_color.red;
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = bg_color.green;
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 2] = bg_color.blue;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 0] = bg_color.red;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 1] = bg_color.green;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 2] = bg_color.blue;
     //#elif LV_COLOR_DEPTH == 32
-    //        *((lv_color_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = bg_color;
+    //        *((lv_color_t *)&buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE]) = bg_color;
     //#else
     //#error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
     //#endif
     //    }
     //
     //    const lv_opa_t * opa_table = NULL;
-    //    uint8_t px_size            = lv_img_cf_get_px_size(dsc->header.cf);
+    //    uint8_t px_size            = lv_color_format_get_size(dsc->header.cf);
     //    uint16_t mask              = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
     //
     //    lv_coord_t w = 0;
@@ -532,7 +532,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
     //    for(i = 0; i < len; i++) {
     //        uint8_t val_act = (*data_tmp >> pos) & mask;
     //
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] =
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1] =
     //            dsc->header.cf == LV_IMG_CF_ALPHA_8BIT ? val_act : opa_table[val_act];
     //
     //        pos -= px_size;
@@ -548,7 +548,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                      lv_coord_t len, uint8_t * buf)
 {
-    //    uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf);
+    //    uint8_t px_size = lv_color_format_get_size(dsc->header.cf);
     //    uint16_t mask   = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
     //
     //    lv_coord_t w = 0;
@@ -602,21 +602,21 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     //
     //        lv_color_t color = user_data->palette[val_act];
     //#if LV_COLOR_DEPTH == 8
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = lv_color_to_int(color);
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE] = lv_color_to_int(color);
     //#elif LV_COLOR_DEPTH == 16
     //        /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = (*((uint16_t *) &color)) & 0xFF;
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = ((*((uint16_t *) &color)) >> 8);
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE] = (*((uint16_t *) &color)) & 0xFF;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 1] = ((*((uint16_t *) &color)) >> 8);
     //#elif LV_COLOR_DEPTH == 24
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 0] = color.red;
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = color.green;
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 2] = color.blue;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 0] = color.red;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 1] = color.green;
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 2] = color.blue;
     //#elif LV_COLOR_DEPTH == 32
-    //        *((lv_color_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = color;
+    //        *((lv_color_t *)&buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE]) = color;
     //#else
     //#error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
     //#endif
-    //        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] = user_data->opa[val_act];
+    //        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1] = user_data->opa[val_act];
     //
     //        pos -= px_size;
     //        if(pos < 0) {

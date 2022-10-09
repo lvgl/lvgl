@@ -356,7 +356,7 @@ lv_res_t lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, const lv_area_t * 
     }
 
     if(recolor || rotation) {
-        if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_has_alpha(cf) && !lv_img_cf_is_chroma_keyed(cf))
+        if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_color_format_has_alpha(cf) && !lv_img_cf_is_chroma_keyed(cf))
             return lv_gpu_nxp_pxp_blit_cover(dest_buf, dest_area, dest_stride, src_buf, src_area, dsc, cf);
         else
             /*Recolor and/or rotation with alpha or opacity is done in two steps.*/
@@ -492,7 +492,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
     };
     PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
 
-    if(recolor || lv_img_cf_has_alpha(cf)) {
+    if(recolor || lv_color_format_has_alpha(cf)) {
         /**
          * Configure Porter-Duff blending.
          *
@@ -505,7 +505,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
             .dstColorMode = kPXP_PorterDuffColorWithAlpha,
             .srcColorMode = kPXP_PorterDuffColorNoAlpha,
             .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
-            .srcGlobalAlphaMode = lv_img_cf_has_alpha(cf) ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
+            .srcGlobalAlphaMode = lv_color_format_has_alpha(cf) ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
             .dstFactorMode = kPXP_PorterDuffFactorStraight,
             .srcFactorMode = kPXP_PorterDuffFactorInversed,
             .dstGlobalAlpha = recolor ? dsc->recolor_opa : 0x00,
@@ -540,7 +540,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
         .ropMode = kPXP_RopMergeAs
     };
 
-    if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_is_chroma_keyed(cf) && !lv_img_cf_has_alpha(cf)) {
+    if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_is_chroma_keyed(cf) && !lv_color_format_has_alpha(cf)) {
         /*Simple blit, no effect - Disable PS buffer*/
         PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
     }
@@ -556,10 +556,10 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
             .pitchBytes = dest_stride * sizeof(lv_color_t)
         };
         if(dsc->opa >= (lv_opa_t)LV_OPA_MAX) {
-            asBlendConfig.alphaMode = lv_img_cf_has_alpha(cf) ? kPXP_AlphaEmbedded : kPXP_AlphaOverride;
+            asBlendConfig.alphaMode = lv_color_format_has_alpha(cf) ? kPXP_AlphaEmbedded : kPXP_AlphaOverride;
         }
         else {
-            asBlendConfig.alphaMode = lv_img_cf_has_alpha(cf) ? kPXP_AlphaMultiply : kPXP_AlphaOverride;
+            asBlendConfig.alphaMode = lv_color_format_has_alpha(cf) ? kPXP_AlphaMultiply : kPXP_AlphaOverride;
         }
         PXP_SetProcessSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &psBufferConfig);
         PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, dest_w - 1, dest_h - 1);

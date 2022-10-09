@@ -254,7 +254,7 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 #if LV_USE_GPU_NXP_PXP
     if(!mask_any && !scale && !need_argb8565_support()
 #if LV_COLOR_DEPTH!=32
-       && !lv_img_cf_has_alpha(cf)
+       && !lv_color_format_has_alpha(cf)
 #endif
       ) {
         done = (lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, coords,
@@ -268,7 +268,7 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     if(!done && !mask_any && !need_argb8565_support() &&
        !lv_img_cf_is_chroma_keyed(cf) && !recolor
 #if LV_COLOR_DEPTH!=32
-       && !lv_img_cf_has_alpha(cf)
+       && !lv_color_format_has_alpha(cf)
 #endif
       ) {
         lv_gpu_nxp_vglite_blit_info_t blit;

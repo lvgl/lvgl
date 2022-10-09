@@ -231,7 +231,7 @@ static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, 
         }
         else {
             const uint8_t * src_tmp = src;
-            src_tmp += (ys_int * src_stride * LV_IMG_PX_SIZE_ALPHA_BYTE) + xs_int * LV_IMG_PX_SIZE_ALPHA_BYTE;
+            src_tmp += (ys_int * src_stride * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE) + xs_int * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
 
 #if LV_COLOR_DEPTH == 8
             lv_color_set_int(&cbuf[x], src_tmp[0]);
@@ -244,7 +244,7 @@ static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, 
 #elif LV_COLOR_DEPTH == 32
             cbuf[x] = *((lv_color_t *)src_tmp);
 #endif
-            abuf[x] = src_tmp[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+            abuf[x] = src_tmp[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
         }
     }
 }
@@ -296,7 +296,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
             break;
         case LV_COLOR_FORMAT_NATIVE_ALPHA:
             has_alpha = true;
-            px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
+            px_size = LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
             break;
 #if LV_COLOR_DEPTH == 16
         case LV_COLOR_FORMAT_RGB565A8:
@@ -367,9 +367,9 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                 lv_opa_t a_ver;
                 lv_opa_t a_hor;
                 if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) {
-                    a_base = px_base[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
-                    a_ver = px_ver[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
-                    a_hor = px_hor[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+                    a_base = px_base[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
+                    a_ver = px_ver[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
+                    a_hor = px_hor[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
                 }
 #if LV_COLOR_DEPTH == 16
                 else if(cf == LV_COLOR_FORMAT_RGB565A8) {
@@ -440,7 +440,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
             lv_opa_t a;
             switch(cf) {
                 case LV_COLOR_FORMAT_NATIVE_ALPHA:
-                    a = src_tmp[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+                    a = src_tmp[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
                     break;
 #if LV_COLOR_DEPTH == 16
                 case LV_COLOR_FORMAT_RGB565A8:

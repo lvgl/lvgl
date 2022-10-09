@@ -125,58 +125,6 @@ void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
     draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
 }
 
-uint8_t lv_img_cf_get_px_size(lv_color_format_t cf)
-{
-    switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE:
-        case LV_COLOR_FORMAT_NATIVE_REVERSED:
-            return LV_COLOR_DEPTH;
-        case LV_COLOR_FORMAT_NATIVE_ALPHA:
-        case LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED:
-            return LV_IMG_PX_SIZE_ALPHA_BYTE * 8;
-        case LV_COLOR_FORMAT_L8:
-        case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_I8:
-        case LV_COLOR_FORMAT_I4A4:
-        case LV_COLOR_FORMAT_ARGB2222:
-            return 8;
-        case LV_COLOR_FORMAT_L8A8:
-        case LV_COLOR_FORMAT_RGB565:
-        case LV_COLOR_FORMAT_RGBA1555:
-        case LV_COLOR_FORMAT_RGBA2222:
-            return 16;
-
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGBA5658:
-            return 24;
-        case LV_COLOR_FORMAT_RGBA8888:
-        case LV_COLOR_FORMAT_RGBX8888:
-            return 32;
-
-        case LV_COLOR_FORMAT_UNKNOWN:
-        default:
-            return 0;
-    }
-}
-
-bool lv_img_cf_has_alpha(lv_color_format_t cf)
-{
-    switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE_ALPHA:
-        case LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED:
-        case LV_COLOR_FORMAT_A8:
-        case LV_COLOR_FORMAT_I4A4:
-        case LV_COLOR_FORMAT_ARGB2222:
-        case LV_COLOR_FORMAT_L8A8:
-        case LV_COLOR_FORMAT_RGB565A8:
-        case LV_COLOR_FORMAT_RGBA5658:
-        case LV_COLOR_FORMAT_RGBA8888:
-            return true;
-        default:
-            return false;
-    }
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -240,7 +188,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
         int32_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = lv_malloc(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);
+        uint8_t  * buf = lv_malloc(lv_area_get_width(&mask_com) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE);
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         lv_area_t line;
         lv_area_copy(&line, &mask_com);

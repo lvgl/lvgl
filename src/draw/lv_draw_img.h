@@ -76,20 +76,6 @@ void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
  */
 lv_img_src_t lv_img_src_get_type(const void * src);
 
-/**
- * Get the pixel size of a color format in bits
- * @param cf a color format (`LV_IMG_CF_...`)
- * @return the pixel size in bits
- */
-uint8_t lv_img_cf_get_px_size(lv_color_format_t cf);
-
-/**
- * Check if a color format has alpha channel or not
- * @param cf a color format (`LV_IMG_CF_...`)
- * @return true: has alpha channel; false: doesn't have alpha channel
- */
-bool lv_img_cf_has_alpha(lv_color_format_t cf);
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

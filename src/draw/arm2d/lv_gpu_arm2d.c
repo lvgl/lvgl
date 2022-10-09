@@ -142,7 +142,7 @@
             int32_t src_stride = lv_area_get_width(coords);                     \
                                                                                 \
             uint8_t px_size_byte = cf == LV_COLOR_FORMAT_NATIVE_ALPHA             \
-                                      ?  LV_IMG_PX_SIZE_ALPHA_BYTE              \
+                                      ?  LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE              \
                                       :  sizeof(lv_color_t);                    \
                                                                                 \
             const uint8_t * src_buf_tmp = src_buf;                              \
@@ -614,8 +614,8 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
         else {
             /*With LV_COLOR_DEPTH 16 it means ARGB8565 (3 bytes format)*/
             uint8_t * dest_buf8 = (uint8_t *) dest_buf;
-            dest_buf8 += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) * LV_IMG_PX_SIZE_ALPHA_BYTE;
-            dest_buf8 += (blend_area.x1 - draw_ctx->buf_area->x1) * LV_IMG_PX_SIZE_ALPHA_BYTE;
+            dest_buf8 += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            dest_buf8 += (blend_area.x1 - draw_ctx->buf_area->x1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
             dest_buf = (lv_color_t *)dest_buf8;
         }
 
@@ -984,7 +984,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                             mask_temp_buf,
                             src_stride,
                             (uint32_t *)
-                            ((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
+                            ((uintptr_t)src_buf_tmp + LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1),
                             src_stride,
                             &copy_size,
                             0xFF,
@@ -1007,7 +1007,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                             (color_int *)src_buf_tmp,
                             src_stride,
                             (uint32_t *)
-                            ((uintptr_t)src_buf_tmp + LV_IMG_PX_SIZE_ALPHA_BYTE - 1),
+                            ((uintptr_t)src_buf_tmp + LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1),
                             src_stride,
                             &copy_size,
                             (color_int *)dest_buf,
@@ -1303,16 +1303,16 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
         }
     }
     else if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) {
-        src_tmp8 += (src_stride * dest_area->y1 * LV_IMG_PX_SIZE_ALPHA_BYTE) + dest_area->x1 * LV_IMG_PX_SIZE_ALPHA_BYTE;
+        src_tmp8 += (src_stride * dest_area->y1 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE) + dest_area->x1 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
 
         lv_coord_t src_new_line_step_px = (src_stride - lv_area_get_width(dest_area));
-        lv_coord_t src_new_line_step_byte = src_new_line_step_px * LV_IMG_PX_SIZE_ALPHA_BYTE;
+        lv_coord_t src_new_line_step_byte = src_new_line_step_px * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
 
         lv_coord_t dest_h = lv_area_get_height(dest_area);
         lv_coord_t dest_w = lv_area_get_width(dest_area);
         for(y = 0; y < dest_h; y++) {
             for(x = 0; x < dest_w; x++) {
-                abuf[x] = src_tmp8[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+                abuf[x] = src_tmp8[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
 #if LV_COLOR_DEPTH == 8
                 cbuf[x].full = *src_tmp8;
 #elif LV_COLOR_DEPTH == 16
@@ -1321,7 +1321,7 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
                 cbuf[x] = *((lv_color_t *) src_tmp8);
                 cbuf[x].ch.alpha = 0xff;
 #endif
-                src_tmp8 += LV_IMG_PX_SIZE_ALPHA_BYTE;
+                src_tmp8 += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
 
             }
             cbuf += dest_w;

@@ -86,7 +86,6 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp->offset_x         = 0;
     disp->offset_y         = 0;
     disp->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
-    disp->screen_transp    = 0;
     disp->dpi              = LV_DPI_DEF;
     disp->color_chroma_key = LV_COLOR_CHROMA_KEY;
 
@@ -109,7 +108,6 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 #endif
 
     disp->draw_ctx->color_format = disp->color_format;
-    disp->draw_ctx->render_with_alpha = disp->screen_transp;
 
     disp->inv_en_cnt = 1;
 
@@ -421,6 +419,7 @@ void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format)
     if(disp == NULL) return;
 
     disp->color_format = color_format;
+    disp->draw_ctx->color_format = color_format;
 }
 
 void lv_disp_set_antialaising(lv_disp_t * disp, bool en)

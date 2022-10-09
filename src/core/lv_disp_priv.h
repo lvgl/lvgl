@@ -82,7 +82,6 @@ typedef struct _lv_disp_t {
 
     lv_disp_render_mode_t render_mode;
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
-    uint32_t screen_transp : 1;      /**Handle if the screen doesn't have a solid (opa == LV_OPA_COVER) background.*/
 
     /** 1: The current screen rendering is in progress*/
     uint32_t rendering_in_progress : 1;

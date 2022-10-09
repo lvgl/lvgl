@@ -206,7 +206,7 @@ lv_img_dsc_t img_lv_demo_music_btn_next = {
     .header.always_zero = 0,
     .header.w = 62,
     .header.h = 62,
-    .data_size = 3844 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    .data_size = 3844 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
     .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
     .data = img_lv_demo_music_btn_next_map,
 };

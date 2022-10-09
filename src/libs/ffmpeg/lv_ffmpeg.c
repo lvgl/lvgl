@@ -172,7 +172,7 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     uint32_t data_size = 0;
 
     if(has_alpha) {
-        data_size = width * height * LV_IMG_PX_SIZE_ALPHA_BYTE;
+        data_size = width * height * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
     }
     else {
         data_size = width * height * LV_COLOR_SIZE / 8;

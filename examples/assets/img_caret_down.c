@@ -50,7 +50,7 @@ const lv_img_dsc_t img_caret_down = {
     .header.always_zero = 0,
     .header.w = 13,
     .header.h = 8,
-    .data_size = 104 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    .data_size = 104 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
     .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
     .data = img_caret_down_map,
 };

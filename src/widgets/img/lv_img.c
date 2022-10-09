@@ -533,7 +533,7 @@ static void draw_img(lv_event_t * e)
         }
 
         /*Non true color format might have "holes"*/
-        if(lv_img_cf_has_alpha(img->cf)) {
+        if(lv_color_format_has_alpha(img->cf)) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }

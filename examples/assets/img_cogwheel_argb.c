@@ -325,7 +325,7 @@ const lv_img_dsc_t img_cogwheel_argb = {
     .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
-    .data_size = 10000 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    .data_size = 10000 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
     .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
     .data = img_cogwheel_argb_map,
 };

@@ -36,7 +36,7 @@ void lv_example_label_4(void)
 
     /*Create a "8 bit alpha" canvas and clear it*/
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, mask_map, MASK_WIDTH, MASK_HEIGHT, LV_IMG_CF_ALPHA_8BIT);
+    lv_canvas_set_buffer(canvas, mask_map, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_L8);
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_TRANSP);
 
     /*Draw a label to the canvas. The result "image" will be used as mask*/

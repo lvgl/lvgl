@@ -113,7 +113,7 @@ const lv_img_dsc_t img_star = {
     .header.always_zero = 0,
     .header.w = 30,
     .header.h = 29,
-    .data_size = 870 * LV_IMG_PX_SIZE_ALPHA_BYTE,
+    .data_size = 870 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
     .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
     .data = img_star_map,
 };
