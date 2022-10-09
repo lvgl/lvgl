@@ -2,11 +2,11 @@
 
 import argparse
 import errno
-import glob
 import shutil
 import subprocess
 import sys
 import os
+from itertools import chain
 
 lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -25,10 +25,6 @@ test_options = {
 }
 
 
-def is_valid_option_name(option_name):
-    return option_name in build_only_options or option_name in test_options
-
-
 def get_option_description(option_name):
     if option_name in build_only_options:
         return build_only_options[option_name]
@@ -41,22 +37,6 @@ def delete_dir_ignore_missing(dir_path):
         shutil.rmtree(dir_path)
     except FileNotFoundError:
         pass
-
-
-def generate_test_runners():
-    '''Generate the test runner source code.'''
-    global lvgl_test_dir
-    os.chdir(lvgl_test_dir)
-    delete_dir_ignore_missing('src/test_runners')
-    os.mkdir('src/test_runners')
-
-    # TODO: Intermediate files should be in the build folders, not alongside
-    #       the other repo source.
-    for f in glob.glob("./src/test_cases/test_*.c"):
-        r = f[:-2] + "_Runner.c"
-        r = r.replace("/test_cases/", "/test_runners/")
-        subprocess.check_call(['ruby', 'unity/generate_test_runner.rb',
-                               f, r, 'config.yml'])
 
 
 def options_abbrev(options_name):
@@ -162,6 +142,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Build and/or run LVGL tests.', epilog=epilog)
     parser.add_argument('--build-options', nargs=1,
+                        choices=list(chain(build_only_options, test_options)),
                         help='''the build option name to build or run. When
                         omitted all build configurations are used.
                         ''')
@@ -184,13 +165,6 @@ if __name__ == "__main__":
                 options_to_build = build_only_options
         else:
             options_to_build = test_options
-
-    for opt in options_to_build:
-        if not is_valid_option_name(opt):
-            print('Invalid build option "%s"' % opt, file=sys.stderr)
-            sys.exit(errno.EINVAL)
-
-    generate_test_runners()
 
     for options_name in options_to_build:
         is_test = options_name in test_options
