@@ -227,7 +227,6 @@ static void window_update(lv_disp_t * disp)
     SDL_RenderPresent(dsc->renderer);
 }
 
-
 static void texture_resize(lv_disp_t * disp)
 {
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);

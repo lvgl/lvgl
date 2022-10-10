@@ -763,6 +763,7 @@ static void benchmark_init(void)
     }
     /*Measure the time in monitor_cb*/
     else if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
+        disp->driver->render_start_cb = render_start_cb;
         disp->driver->monitor_cb = monitor_cb;
         flush_cb_ori = disp->driver->flush_cb;
         disp->driver->flush_cb = dummy_flush_cb;
@@ -869,6 +870,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 
 static void single_scene_finsih_timer_cb(lv_timer_t * timer)
 {
+    LV_UNUSED(timer);
     calc_scene_statistics();
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY || mode == LV_DEMO_BENCHMARK_MODE_REAL) {
@@ -885,6 +887,8 @@ static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px)
 {
     LV_UNUSED(drv);
     LV_UNUSED(px);
+
+    time = lv_tick_elaps(render_start_time);
 
     if(scene_with_opa) {
         scenes[scene_act].refr_cnt_opa ++;
@@ -1235,7 +1239,7 @@ static void arc_create(lv_style_t * style)
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
         lv_anim_set_exec_cb(&a, arc_anim_end_angle_cb);
-        lv_anim_set_values(&a, 0, 359);
+        lv_anim_set_values(&a, rnd_next(30, 300), 359);
         lv_anim_set_time(&a, t);
         lv_anim_set_playback_time(&a, t);
         lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
@@ -1253,6 +1257,8 @@ static void fall_anim_y_cb(void * var, int32_t v)
 
 static void fall_anim(lv_obj_t * obj)
 {
+    lv_obj_update_layout(obj);  /*To be sure width an height are updated*/
+
     lv_obj_set_x(obj, rnd_next(0, lv_obj_get_width(scene_bg) - lv_obj_get_width(obj)));
 
     uint32_t t = rnd_next(ANIM_TIME_MIN, ANIM_TIME_MAX);
@@ -1265,7 +1271,7 @@ static void fall_anim(lv_obj_t * obj)
     lv_anim_set_time(&a, t);
     lv_anim_set_playback_time(&a, t);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    a.act_time = a.time / 2;    /*To start fro mteh middle*/
+    a.act_time = a.time / 2;    /*To start from the middle*/
     lv_anim_start(&a);
 
 }

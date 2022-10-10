@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CANVAS && LV_BUILD_EXAMPLES
+#if LV_USE_CANVAS && LV_BUILD_EXAMPLES && 0
 
 #define CANVAS_WIDTH  50
 #define CANVAS_HEIGHT  50
@@ -36,7 +36,7 @@ void lv_example_canvas_2(void)
     uint32_t y;
     for(y = 10; y < 30; y++) {
         for(x = 5; x < 20; x++) {
-            lv_canvas_set_px_color(canvas, x, y, c0);
+            lv_canvas_set_px(canvas, x, y, c0, LV_OPA_COVER);
         }
     }
 

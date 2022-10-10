@@ -242,14 +242,21 @@ void lv_disp_set_flush_cb(lv_disp_t * disp, void (*flush_cb)(struct _lv_disp_t *
                                                              lv_color_t * color_p));
 /**
  * Set the color format of the display.
- * If set to not `LV_COLOR_FORMAT_NATIVE` the draw_ctx's `buffer_convert` function will be used
+ * If set to other than `LV_COLOR_FORMAT_NATIVE` the draw_ctx's `buffer_convert` function will be used
  * to convert the rendered content to the desired color format.
  * @param disp              pointer to a display
- * @param color_format      By default `LV_COLOR_FORMAT_NATIVE` to render with RGB565, RGB888 or ARGB8888.
+ * @param color_format      By default `LV_COLOR_FORMAT_NATIVE` to render with L8, RGB565, RGB888 or ARGB8888.
  *                          `LV_COLOR_FORMAT_NATIVE_REVERSE` to change endianess.
  *
  */
 void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format);
+
+/**
+ * Get the color format of the display
+ * @param disp              pointer to a display
+ * @return                  the color format
+ */
+lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp);
 
 /**
  * Enable anti-aliasing for the render engine

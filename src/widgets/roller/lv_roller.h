@@ -48,7 +48,6 @@ typedef struct {
     uint32_t inf_page_cnt;        /**< Number of extra pages added to make the roller look infinite */
     lv_roller_mode_t mode : 1;
     uint32_t moved : 1;
-
 } lv_roller_t;
 
 extern const lv_obj_class_t lv_roller_class;
