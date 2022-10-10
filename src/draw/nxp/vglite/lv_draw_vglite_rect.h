@@ -56,14 +56,22 @@ extern "C" {
  **********************/
 
 /**
- * Draw rectangle shape with effects (rounded corners, gradient)
+ * Draw rectangle background with effects (rounded corners, gradient)
  *
  * @param draw_ctx drawing context
- * @param dsc description of the rectangle
- * @param coords the area where rectangle is clipped
- * @param border true for border, false for outline
+ * @param dsc description of the rectangle background
+ * @param coords the area where rectangle background is clipped
  */
 lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+
+/**
+ * Draw rectangle border/outline shape with effects (rounded corners, opacity)
+ *
+ * @param draw_ctx drawing context
+ * @param dsc description of the rectangle border/outline
+ * @param coords the area where the rectangle border/outline is clipped
+ * @param border true for border, false for outline
+ */
 lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                                const lv_area_t * coords, bool border);
 
