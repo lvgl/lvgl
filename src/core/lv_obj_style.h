@@ -232,6 +232,38 @@ static inline void lv_obj_set_style_size(struct _lv_obj_t * obj, lv_coord_t widt
     lv_obj_set_style_height(obj, height, selector);
 }
 
+static inline lv_coord_t lv_obj_get_style_space_left(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_coord_t padding = lv_obj_get_style_pad_left(obj, part);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
+    return (border_side & LV_BORDER_SIDE_LEFT) ? padding + border_width : padding;
+}
+
+static inline lv_coord_t lv_obj_get_style_space_right(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_coord_t padding = lv_obj_get_style_pad_right(obj, part);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
+    return (border_side & LV_BORDER_SIDE_RIGHT) ? padding + border_width : padding;
+}
+
+static inline lv_coord_t lv_obj_get_style_space_top(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_coord_t padding = lv_obj_get_style_pad_top(obj, part);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
+    return (border_side & LV_BORDER_SIDE_TOP) ? padding + border_width : padding;
+}
+
+static inline lv_coord_t lv_obj_get_style_space_bottom(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_coord_t padding = lv_obj_get_style_pad_bottom(obj, part);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, part);
+    lv_border_side_t border_side = lv_obj_get_style_border_side(obj, part);
+    return (border_side & LV_BORDER_SIDE_BOTTOM) ? padding + border_width : padding;
+}
+
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
 
 

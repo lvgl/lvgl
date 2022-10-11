@@ -248,20 +248,16 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 
 void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w)
 {
-    lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-
-    lv_obj_set_width(obj, w + pleft + pright + 2 * border_width);
+    lv_coord_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    lv_coord_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
+    lv_obj_set_width(obj, w + left + right);
 }
 
 void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
 {
-    lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-
-    lv_obj_set_height(obj, h + ptop + pbottom + 2 * border_width);
+    lv_coord_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
+    lv_coord_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
+    lv_obj_set_height(obj, h + top + bottom);
 }
 
 void lv_obj_set_layout(lv_obj_t * obj, uint32_t layout)
@@ -570,22 +566,20 @@ lv_coord_t lv_obj_get_content_width(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
+    lv_coord_t right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
 
-    return lv_obj_get_width(obj) - left - right - 2 * border_width;
+    return lv_obj_get_width(obj) - left - right;
 }
 
 lv_coord_t lv_obj_get_content_height(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_coord_t top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
+    lv_coord_t bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
 
-    return lv_obj_get_height(obj) - top - bottom - 2 * border_width;
+    return lv_obj_get_height(obj) - top - bottom;
 }
 
 void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
