@@ -13,7 +13,7 @@ void lv_example_canvas_2(void)
     lv_btn_create(lv_scr_act());
 
     /*Create a buffer for the canvas*/
-    static lv_color_t cbuf[LV_CANVAS_BUF_SIZE_INDEXED_1BIT(CANVAS_WIDTH, CANVAS_HEIGHT)];
+    static uint8_t cbuf[LV_CANVAS_BUF_SIZE_INDEXED_1BIT(CANVAS_WIDTH, CANVAS_HEIGHT)];
 
     /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
@@ -39,6 +39,5 @@ void lv_example_canvas_2(void)
             lv_canvas_set_px_color(canvas, x, y, c0);
         }
     }
-
 }
 #endif
