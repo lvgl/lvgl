@@ -130,9 +130,21 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
     /*Don't draw anything if the character is empty. E.g. space*/
     if((g.box_h == 0) || (g.box_w == 0)) return;
 
+    lv_coord_t real_h;
+#if LV_USE_IMGFONT
+    if(g.bpp == LV_IMGFONT_BPP) {
+        /*Center imgfont's drawing position*/
+        real_h = (dsc->font->line_height - g.box_h) / 2;
+    }
+    else
+#endif
+    {
+        real_h = (dsc->font->line_height - dsc->font->base_line) - g.box_h;
+    }
+
     lv_point_t gpos;
     gpos.x = pos_p->x + g.ofs_x;
-    gpos.y = pos_p->y + (dsc->font->line_height - dsc->font->base_line) - g.box_h - g.ofs_y;
+    gpos.y = pos_p->y + real_h - g.ofs_y;
 
     /*If the letter is completely out of mask don't draw it*/
     if(gpos.x + g.box_w < draw_ctx->clip_area->x1 ||
