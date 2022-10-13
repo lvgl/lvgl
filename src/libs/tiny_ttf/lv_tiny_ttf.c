@@ -287,6 +287,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
         dsc_out->ofs_x = 0;                                           /*X offset of the bitmap in [pf]*/
         dsc_out->ofs_y = 0;                                           /*Y offset of the bitmap in [pf]*/
         dsc_out->bpp = 0;
+        dsc_out->is_placeholder = false;
         return true;
     }
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;

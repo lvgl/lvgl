@@ -18,7 +18,7 @@ The Canvas needs a buffer in which stores the drawn image.
 To assign a buffer to a Canvas, use `lv_canvas_set_buffer(canvas, buffer, width, height, LV_IMG_CF_...)`.
 Where  `buffer` is a static buffer (not just a local variable) to hold the image of the canvas.
 For example,
-`static lv_color_t buffer[LV_CANVAS_BUF_SIZE_TRUE_COLOR(width, height)]`.
+`static uint8_t buffer[LV_CANVAS_BUF_SIZE_TRUE_COLOR(width, height)]`.
 `LV_CANVAS_BUF_SIZE_...` macros help to determine the size of the buffer with different color formats.
 
 The canvas supports all the built-in color formats like `LV_IMG_CF_TRUE_COLOR` or `LV_IMG_CF_INDEXED_2BIT`.

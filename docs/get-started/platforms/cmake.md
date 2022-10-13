@@ -7,7 +7,7 @@ LVGL supports integrating with [CMake](https://cmake.org/). It comes with precon
 
 On top of the preconfigured targets you can also use "plain" CMake to integrate LVGL into any custom C/C++ project.
 
-### Prerequisites
+## Prerequisites
 - CMake ( >= 3.12.4 )
 - Compatible build tool e.g.
   - [Make](https://www.gnu.org/software/make/)
@@ -41,41 +41,44 @@ target_link_libraries(MyFirmware PRIVATE lvgl::lvgl)
 This configuration declares a dependency between the two targets **MyFirmware** and **lvgl**. Upon building the target **MyFirmware** this dependency will be resolved and **lvgl** will be built and linked with it. Since LVGL requires a config header called [lv_conf.h](https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h) to be includable by its sources we also set the option `LV_CONF_PATH` to point to our own copy of it.
 
 ### Additional CMake options
-Besides `LV_CONF_PATH` there are two additional CMake options to specify include paths.
+Besides `LV_CONF_PATH` there are few additional CMake options available.
 
-`LV_LVGL_H_INCLUDE_SIMPLE` which specifies whether to `#include "lvgl.h"` absolut or relative
+#### Include paths options
 
-| ON (default) | OFF            |
-| ------------ | -------------- |
-| "lvgl.h"     | "../../lvgl.h" |
+- `LV_LVGL_H_INCLUDE_SIMPLE`: which specifies whether to `#include "lvgl.h"` absolut or relative
 
-`LV_CONF_INCLUDE_SIMPLE` which specifies whether to `#include "lv_conf.h"` and `"lv_drv_conf.h"` absolut or relative
+    | ON (default) | OFF            |
+    | ------------ | -------------- |
+    | "lvgl.h"     | "../../lvgl.h" |
 
-| ON (default)    | OFF                   |
-| --------------- | --------------------- |
-| "lv_conf.h"     | "../../lv_conf.h"     |
-| "lv_drv_conf.h" | "../../lv_drv_conf.h" |
+- `LV_CONF_INCLUDE_SIMPLE`: which specifies whether to `#include "lv_conf.h"` and `"lv_drv_conf.h"` absolut or relative
 
-I do not recommend disabling those options unless your folder layout makes it absolutely necessary.
+    | ON (default)    | OFF                   |
+    | --------------- | --------------------- |
+    | "lv_conf.h"     | "../../lv_conf.h"     |
+    | "lv_drv_conf.h" | "../../lv_drv_conf.h" |
 
-## Building LVGL examples with CMake
-LVGL [examples](https://docs.lvgl.io/master/examples.html) have their own CMake target. If you want to build the examples simply add them to your dependencies.
+> We do not recommend disabling those options unless your folder layout makes it absolutely necessary.
 
-```cmake
-# The target "MyFirmware" depends on LVGL and examples
-target_link_libraries(MyFirmware PRIVATE lvgl::lvgl lvgl::examples)
-```
+#### Examples/demos options
 
-## Building LVGL drivers and demos with CMake
-Exactly the same goes for the [drivers](https://github.com/lvgl/lv_drivers) and the [demos](https://github.com/lvgl/lvgl/demos).
+LVGL [examples](https://docs.lvgl.io/master/examples.html) and [demos](https://github.com/lvgl/lvgl/demos) are built by default in the main CMake file.  
+To disable their built, use:
+
+- `LV_CONF_BUILD_DISABLE_EXAMPLES`: Set to `1` to disable _examples_ build
+- `LV_CONF_BUILD_DISABLE_DEMOS`: Set to `1` to disable _demos_ build
+
+## Building LVGL drivers
+
+To build [LVGL drivers](https://github.com/lvgl/lv_drivers), you can use:
 
 ```cmake
 FetchContent_Declare(lv_drivers
                      GIT_REPOSITORY https://github.com/lvgl/lv_drivers)
 FetchContent_MakeAvailable(lv_drivers)
 
-# The target "MyFirmware" depends on LVGL, drivers and demos
-target_link_libraries(MyFirmware PRIVATE lvgl::lvgl lvgl::drivers lvgl::examples)
+# The target "MyFirmware" depends on LVGL and drivers
+target_link_libraries(MyFirmware PRIVATE lvgl::lvgl lvgl::drivers)
 ```
 
 # Build shared libraries with CMake

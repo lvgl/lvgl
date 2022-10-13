@@ -9,6 +9,11 @@ else()
 cmake_minimum_required(VERSION 3.13)
 project(lvgl_tests LANGUAGES C)
 
+find_program(VALGRIND_EXECUTABLE valgrind)
+if (VALGRIND_EXECUTABLE)
+    set(MEMORYCHECK_COMMAND ${VALGRIND_EXECUTABLE})
+    set(MEMORYCHECK_COMMAND_OPTIONS --error-exitcode=1)
+endif()
 include(CTest)
 
 set(LVGL_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -179,7 +184,6 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
 )
 
 set(LVGL_TEST_OPTIONS_TEST_COMMON
-    --coverage
     -DLV_USE_DEV_VERSION
     -DLV_COLOR_DEPTH=32
     -DLV_MEM_SIZE=2097152
@@ -232,7 +236,6 @@ set(LVGL_TEST_OPTIONS_TEST_SYSHEAP
     ${LVGL_TEST_OPTIONS_TEST_COMMON}
     -DLVGL_CI_USING_SYS_HEAP
     -DLV_MEM_CUSTOM=1
-    -fsanitize=address
 )
 
 set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
@@ -240,6 +243,7 @@ set(LVGL_TEST_OPTIONS_TEST_DEFHEAP
     -DLVGL_CI_USING_DEF_HEAP
     -DLV_MEM_SIZE=2097152
     -fsanitize=address
+    --coverage
 )
 
 if (OPTIONS_NORMAL_8BIT)
@@ -251,11 +255,15 @@ elseif (OPTIONS_16BIT_SWAP)
 elseif (OPTIONS_FULL_32BIT)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_FULL_32BIT})
 elseif (OPTIONS_TEST_SYSHEAP)
-    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address --coverage)
     set (TEST_LIBS --coverage -fsanitize=address)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     set (TEST_LIBS --coverage -fsanitize=address)
+elseif (OPTIONS_TEST_MEMORYCHECK)
+    # sanitizer is disabled because valgrind uses LD_PRELOAD and the
+    # sanitizer lib needs to load first
+    set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -332,8 +340,12 @@ get_filename_component(LVGL_PARENT_DIR ${LVGL_DIR} DIRECTORY)
 target_include_directories(lvgl_examples PUBLIC $<BUILD_INTERFACE:${LVGL_PARENT_DIR}>)
 
 # Generate one test executable for each source file pair.
-# The sources in src/test_runners is auto-generated, the
+# The sources in ${CMAKE_CURRENT_BINARY_DIR} is auto-generated, the
 # sources in src/test_cases is the actual test case.
+find_package(Ruby REQUIRED)
+set(generate_test_runner_rb
+    ${CMAKE_CURRENT_SOURCE_DIR}/unity/generate_test_runner.rb)
+set(generate_test_runner_config ${CMAKE_CURRENT_SOURCE_DIR}/config.yml)
 file( GLOB TEST_CASE_FILES src/test_cases/*.c )
 foreach( test_case_fname ${TEST_CASE_FILES} )
     # If test file is foo/bar/baz.c then test_name is "baz".
@@ -342,7 +354,16 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         continue()
     endif()
     # Create path to auto-generated source file.
-    set(test_runner_fname src/test_runners/${test_name}_Runner.c)
+    set(test_runner_fname ${CMAKE_CURRENT_BINARY_DIR}/${test_name}_Runner.c)
+    # Run ruby to generate source in build directory
+    add_custom_command(
+        OUTPUT ${test_runner_fname}
+        COMMAND ${Ruby_EXECUTABLE} ${generate_test_runner_rb}
+                ${test_case_fname} ${test_runner_fname}
+                ${generate_test_runner_config}
+        DEPENDS ${generate_test_runner_rb} ${test_case_fname}
+                ${generate_test_runner_config}
+    )
     add_executable( ${test_name}
         ${test_case_fname}
         ${test_runner_fname}

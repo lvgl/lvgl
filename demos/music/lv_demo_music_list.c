@@ -52,12 +52,31 @@ LV_IMG_DECLARE(img_lv_demo_music_btn_list_pause);
 
 lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
 {
+    font_small = LV_FONT_DEFAULT;
+    font_medium = LV_FONT_DEFAULT;
+
 #if LV_DEMO_MUSIC_LARGE
+#if LV_FONT_MONTSERRAT_16
     font_small = &lv_font_montserrat_16;
+#else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_16 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
+#if LV_FONT_MONTSERRAT_22
     font_medium = &lv_font_montserrat_22;
 #else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_22 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
+#else
+#if LV_FONT_MONTSERRAT_12
     font_small = &lv_font_montserrat_12;
+#else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_12 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
+#if LV_FONT_MONTSERRAT_16
     font_medium = &lv_font_montserrat_16;
+#else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_16 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
 #endif
 
     lv_style_init(&style_scrollbar);

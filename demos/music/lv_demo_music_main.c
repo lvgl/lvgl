@@ -123,12 +123,31 @@ static void _obj_set_x_anim_cb(void * obj, int32_t x)
 
 lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 {
+    font_small = LV_FONT_DEFAULT;
+    font_large = LV_FONT_DEFAULT;
+
 #if LV_DEMO_MUSIC_LARGE
+#if LV_FONT_MONTSERRAT_22
     font_small = &lv_font_montserrat_22;
+#else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_22 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
+#if LV_FONT_MONTSERRAT_32
     font_large = &lv_font_montserrat_32;
 #else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_32 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
+#else
+#if LV_FONT_MONTSERRAT_12
     font_small = &lv_font_montserrat_12;
+#else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_12 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
+#if LV_FONT_MONTSERRAT_16
     font_large = &lv_font_montserrat_16;
+#else
+    LV_LOG_WARN("LV_FONT_MONTSERRAT_16 is not enabled for the music demo. Using LV_FONT_DEFAULT instead.");
+#endif
 #endif
 
     /*Create the content of the music player*/
