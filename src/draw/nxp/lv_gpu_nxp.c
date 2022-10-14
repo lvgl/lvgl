@@ -405,8 +405,13 @@ static void lv_draw_nxp_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t 
     nxp_dsc.bg_opa = 0;
 
     /* Draw the background image will be done once draw_ctx->draw_img_decoded()
-    * callback gets called from lv_draw_sw_rect().
-    */
+     * callback gets called from lv_draw_sw_rect().
+     * If both PXP and VG-Lite are enabled, then VG-Lite draw background
+     * might race with PXP draw background image (blit). Wait for completion.
+     */
+#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_VG_LITE
+    lv_draw_nxp_wait_cb(draw_ctx);
+#endif
     nxp_dsc.bg_img_opa = dsc->bg_img_opa;
     lv_draw_sw_rect(draw_ctx, &nxp_dsc, coords);
     nxp_dsc.bg_img_opa = 0;
