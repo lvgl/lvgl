@@ -158,7 +158,6 @@ uint8_t lv_color_format_get_size(lv_color_format_t cf)
 bool lv_color_format_has_alpha(lv_color_format_t cf)
 {
     switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE_ALPHA:
         case LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED:
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_I8:
@@ -178,11 +177,7 @@ static uint8_t bit_2_to_8[4] = {0, 85, 170, 255};
 static uint8_t bit_4_to_8[16] = {0,   17,  34,  51,  68,  85,  102, 119,
                                  136, 153, 170, 187, 204, 221, 238, 255
                                 };
-static uint8_t bit_5_to_8[32] = {0,   8,   16,  25,  33,  41,  49,  58,
-                                 66,  74,  82,  90,  99,  107, 115, 123,
-                                 132, 140, 148, 156, 165, 173, 181, 189,
-                                 197, 206, 214, 222, 230, 239, 247, 255
-                                };
+#if LV_COLOR_DEPTH == 24 || LV_COLOR_DEPTH == 32
 static uint8_t bit_6_to_8[64] = {0,   4,   8,   12,  16,  20,  24,  28,
                                  32,  36,  40,  45,  49,  53,  57,  61,
                                  65,  69,  73,  77,  81,  85,  89,  93,
@@ -192,56 +187,69 @@ static uint8_t bit_6_to_8[64] = {0,   4,   8,   12,  16,  20,  24,  28,
                                  194, 198, 202, 206, 210, 215, 219, 223,
                                  227, 231, 235, 239, 243, 247, 251, 255
                                 };
+#endif
 
-void lv_color_to_native(uint8_t * buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
+static uint8_t bit_5_to_8[32] = {0,   8,   16,  25,  33,  41,  49,  58,
+                                 66,  74,  82,  90,  99,  107, 115, 123,
+                                 132, 140, 148, 156, 165, 173, 181, 189,
+                                 197, 206, 214, 222, 230, 239, 247, 255
+                                };
+
+#if LV_COLOR_DEPTH == 8
+void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
                         lv_color_t alpha_color)
 {
     uint32_t tmp;
-#if LV_COLOR_DEPTH == 16
+    lv_color_t ctmp;
     switch(cf) {
         case LV_COLOR_FORMAT_L8:
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, *buf);
+            lv_color_set_int(c_out, *src_buf);
             *a_out = 0xFF;
             return;
         case LV_COLOR_FORMAT_A8:
             *c_out = alpha_color;
-            *a_out = *buf;
+            *a_out = *src_buf;
             return;
         case LV_COLOR_FORMAT_A8L8:
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, buf[0]);
-            *a_out = buf[1];
+            lv_color_set_int(c_out, src_buf[0]);
+            *a_out = src_buf[1];
             return;
         case LV_COLOR_FORMAT_ARGB2222:
-            *c_out = lv_color_make(bit_2_to_8[(*buf) & 0x30], bit_2_to_8[(*buf) & 0x0C], bit_2_to_8[(*buf) & 0x03]);
-            *a_out = bit_2_to_8[(*buf) & 0xC0];
+            ctmp = lv_color_make(bit_2_to_8[(*src_buf) & 0x30], bit_2_to_8[(*src_buf) & 0x0C], bit_2_to_8[(*src_buf) & 0x03]);
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
+            *a_out = bit_2_to_8[(*src_buf) & 0xC0];
             return;
         case LV_COLOR_FORMAT_RGB565:
-            *c_out = *((lv_color_t *)buf);
+            *c_out = *((lv_color_t *)src_buf);
             *a_out = 0xFF;
             return;
         case LV_COLOR_FORMAT_ARGB1555:
-            tmp = buf[0] + (buf[1] << 8);
-            *c_out = lv_color_make(bit_5_to_8[(tmp & 0x7C00) >> 10], bit_5_to_8[(tmp & 0x03E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+            tmp = src_buf[0] + (src_buf[1] << 8);
+            ctmp = lv_color_make(bit_5_to_8[(tmp & 0x7C00) >> 10], bit_5_to_8[(tmp & 0x03E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
             *a_out = tmp & 0x8000 ? 0xFF : 0x00;
             return;
         case LV_COLOR_FORMAT_ARGB4444:
-            tmp = buf[0] + (buf[1] << 8);
-            *c_out = lv_color_make(bit_4_to_8[(tmp & 0x0F00) >> 8], bit_4_to_8[(tmp & 0x00F0) >> 4], bit_4_to_8[tmp & 0x000F]);
-            *a_out = bit_2_to_8[(tmp & 0xF000) >> 12];
-            return;
+            tmp = src_buf[0] + (src_buf[1] << 8);
+            ctmp = lv_color_make(bit_4_to_8[(tmp & 0x0F00) >> 8], bit_4_to_8[(tmp & 0x00F0) >> 4], bit_4_to_8[tmp & 0x000F]);
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
+            *a_out = bit_4_to_8[(tmp & 0xF000) >> 12];
             return;
         case LV_COLOR_FORMAT_ARGB8565:
-            *c_out = *((lv_color_t *)buf);
-            *a_out = buf[2];
+            lv_color_set_int(&ctmp, src_buf[0] + (src_buf[1] << 8));
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
+            *a_out = src_buf[2];
             return;
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_RGB888:
-            *c_out = lv_color_make(buf[2], buf[1], buf[0]);
+            ctmp = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
             *a_out = 0xFF;
             return;
         case LV_COLOR_FORMAT_ARGB8888:
-            *c_out = lv_color_make(buf[2], buf[1], buf[0]);
-            *a_out = buf[3];
+            *c_out = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
+            *a_out = src_buf[3];
             return;
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565A8:
@@ -252,12 +260,84 @@ void lv_color_to_native(uint8_t * buf, lv_color_format_t cf, lv_color_t * c_out,
             return;
 
     }
-#endif
 }
+#else
+void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
+                        lv_color_t alpha_color)
+{
+    uint32_t tmp;
+    switch(cf) {
+        case LV_COLOR_FORMAT_L8:
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, *src_buf);
+            *a_out = 0xFF;
+            return;
+        case LV_COLOR_FORMAT_A8:
+            *c_out = alpha_color;
+            *a_out = *src_buf;
+            return;
+        case LV_COLOR_FORMAT_A8L8:
+            *c_out = lv_color_mix(lv_color_black(), alpha_color, src_buf[0]);
+            *a_out = src_buf[1];
+            return;
+        case LV_COLOR_FORMAT_ARGB2222:
+            *c_out = lv_color_make(bit_2_to_8[(*src_buf) & 0x30], bit_2_to_8[(*src_buf) & 0x0C], bit_2_to_8[(*src_buf) & 0x03]);
+            *a_out = bit_2_to_8[(*src_buf) & 0xC0];
+            return;
+        case LV_COLOR_FORMAT_RGB565:
+#if LV_COLOR_DEPTH == 16
+            lv_color_set_int(c_out, src_buf[0] + (src_buf[1] << 8));
+#else
+            tmp = src_buf[0] + (src_buf[1] << 8);
+            *c_out = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+#endif
+            *a_out = 0xFF;
+            return;
+        case LV_COLOR_FORMAT_ARGB1555:
+            tmp = src_buf[0] + (src_buf[1] << 8);
+            *c_out = lv_color_make(bit_5_to_8[(tmp & 0x7C00) >> 10], bit_5_to_8[(tmp & 0x03E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+            *a_out = tmp & 0x8000 ? 0xFF : 0x00;
+            return;
+        case LV_COLOR_FORMAT_ARGB4444:
+            tmp = src_buf[0] + (src_buf[1] << 8);
+            *c_out = lv_color_make(bit_4_to_8[(tmp & 0x0F00) >> 8], bit_4_to_8[(tmp & 0x00F0) >> 4], bit_4_to_8[tmp & 0x000F]);
+            *a_out = bit_4_to_8[(tmp & 0xF000) >> 12];
+            return;
+        case LV_COLOR_FORMAT_ARGB8565:
+#if LV_COLOR_DEPTH == 16
+            lv_color_set_int(c_out, src_buf[0] + (src_buf[1] << 8));
+#else
+            tmp = src_buf[0] + (src_buf[1] << 8);
+            *c_out = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+#endif
+            *a_out = src_buf[2];
+            return;
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_RGB888:
+            *c_out = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+            *a_out = 0xFF;
+            return;
+        case LV_COLOR_FORMAT_ARGB8888:
+            *c_out = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+            *a_out = src_buf[3];
+            return;
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_RGB565A8:
+        default:
+            LV_LOG_WARN("Can't convert to %d format", cf);
+            *c_out = lv_color_hex(0x000000);
+            *a_out = 0xFF;
+            return;
+
+    }
+}
+#endif
+
 
 void lv_color_from_native(lv_color_t color_in, lv_opa_t opa_in, uint8_t * buf_out, lv_color_format_t cf_out)
 {
-#if LV_COLOR_DEPTH == 16
+    lv_color24_t c24;
+    lv_color16_t c16;
+    uint32_t tmp;
     switch(cf_out) {
         case LV_COLOR_FORMAT_L8:
             *buf_out = lv_color_brightness(color_in);
@@ -270,38 +350,47 @@ void lv_color_from_native(lv_color_t color_in, lv_opa_t opa_in, uint8_t * buf_ou
             buf_out[1] = opa_in;
             return;
         case LV_COLOR_FORMAT_ARGB2222:
-            buf_out[0] = (opa_in & 0xC0) + ((color_in.red >> 3) << 4) + ((color_in.green >> 4) << 2) + (color_in.blue >> 3);
+            c16 = lv_color_to16(color_in);
+            buf_out[0] = (opa_in & 0xC0) + ((c16.red >> 3) << 4) + ((c16.green >> 4) << 2) + (c16.blue >> 3);
             return;
         case LV_COLOR_FORMAT_ARGB4444:
-            buf_out[0] = ((color_in.green >> 2) << 4) + (color_in.blue >> 1);
-            buf_out[1] = (opa_in & 0xF0) + (color_in.red >> 1);
+            c16 = lv_color_to16(color_in);
+            buf_out[0] = ((c16.green >> 2) << 4) + (c16.blue >> 1);
+            buf_out[1] = (opa_in & 0xF0) + (c16.red >> 1);
             return;
         case LV_COLOR_FORMAT_RGB565:
             *((lv_color_t *)buf_out) = color_in;
             return;
         case LV_COLOR_FORMAT_ARGB1555:
-            buf_out[0] = (((color_in.green >> 1) & 0x07) << 5) + color_in.blue;
-            buf_out[1] = (opa_in & 0x80) + (color_in.red << 2) + (color_in.green >> 4);
+            c16 = lv_color_to16(color_in);
+            buf_out[0] = (((c16.green >> 1) & 0x07) << 5) + c16.blue;
+            buf_out[1] = (opa_in & 0x80) + (c16.red << 2) + (c16.green >> 4);
             return;
         case LV_COLOR_FORMAT_ARGB8565:
-            *((lv_color_t *)buf_out) = color_in;
+            c16 = lv_color_to16(color_in);
+            tmp = *((uint16_t *)&c16);
+            buf_out[0] = tmp & 0xff;
+            buf_out[1] = tmp >> 8;
             buf_out[2] = opa_in;
             return;
         case LV_COLOR_FORMAT_RGB888:
-            buf_out[0] = bit_5_to_8[color_in.blue];
-            buf_out[1] = bit_6_to_8[color_in.green];
-            buf_out[2] = bit_5_to_8[color_in.red];
+            c24 = lv_color_to24(color_in);
+            buf_out[0] = c24.blue;
+            buf_out[1] = c24.green;
+            buf_out[2] = c24.red;
             return;
         case LV_COLOR_FORMAT_XRGB8888:
-            buf_out[0] = bit_5_to_8[color_in.blue];
-            buf_out[1] = bit_6_to_8[color_in.green];
-            buf_out[2] = bit_5_to_8[color_in.red];
+            c24 = lv_color_to24(color_in);
+            buf_out[0] = c24.blue;
+            buf_out[1] = c24.green;
+            buf_out[2] = c24.red;
             buf_out[3] = 0xFF;
             return;
         case LV_COLOR_FORMAT_ARGB8888:
-            buf_out[0] = bit_5_to_8[color_in.blue];
-            buf_out[1] = bit_6_to_8[color_in.green];
-            buf_out[2] = bit_5_to_8[color_in.red];
+            c24 = lv_color_to24(color_in);
+            buf_out[0] = c24.blue;
+            buf_out[1] = c24.green;
+            buf_out[2] = c24.red;
             buf_out[3] = opa_in;
             return;
         case LV_COLOR_FORMAT_I8:
@@ -310,8 +399,8 @@ void lv_color_from_native(lv_color_t color_in, lv_opa_t opa_in, uint8_t * buf_ou
             LV_LOG_WARN("Can't convert from %d format", cf_out);
             return;
     }
-#endif
 }
+
 
 
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl)

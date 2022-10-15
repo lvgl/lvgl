@@ -84,19 +84,6 @@ void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, c
     LV_ASSERT_MEM_INTEGRITY();
 }
 
-void lv_draw_sw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
-{
-#if LV_COLOR_DEPTH == 32
-    if(draw_ctx->render_with_alpha) {
-        lv_memzero(draw_ctx->buf, lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t));
-    }
-#endif
-
-    draw_bg(draw_ctx, dsc, coords);
-    draw_bg_img(draw_ctx, dsc, coords);
-}
-
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

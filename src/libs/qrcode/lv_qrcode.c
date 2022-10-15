@@ -141,7 +141,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_le
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                lv_canvas_set_px_color(qrcode, x, y, a ? c0 : c1);
+                lv_canvas_set_px(qrcode, x, y, a ? c0 : c1, LV_OPA_COVER);
             }
             else {
                 if(!a) b |= (1 << (7 - p));
@@ -196,7 +196,7 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_ASSERT_MALLOC(buf);
     if(buf == NULL) return;
 
-    lv_canvas_set_buffer(obj, buf, size_param, size_param, LV_IMG_CF_INDEXED_1BIT);
+    lv_canvas_set_buffer(obj, buf, size_param, size_param, LV_COLOR_FORMAT_I1);
     lv_canvas_set_palette(obj, 0, dark_color_param);
     lv_canvas_set_palette(obj, 1, light_color_param);
 }

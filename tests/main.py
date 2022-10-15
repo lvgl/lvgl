@@ -14,7 +14,7 @@ lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 build_only_options = {
     'OPTIONS_NORMAL_8BIT': 'Normal config, 8 bit color depth',
     'OPTIONS_16BIT': 'Minimal config, 16 bit color depth',
-    'OPTIONS_16BIT_SWAP': 'Normal config, 16 bit color depth swapped',
+    'OPTIONS_24BIT': 'Normal config, 24 bit color depth',
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
 }
 

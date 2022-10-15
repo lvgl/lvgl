@@ -208,7 +208,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
 static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coord_t src_w, lv_coord_t src_h,
                        lv_coord_t src_stride, const lv_draw_img_dsc_t * draw_dsc, lv_color_format_t cf, lv_color_t * cbuf, lv_opa_t * abuf)
 {
-    LV_UNUSED(draw_dsc);
     LV_UNUSED(src_h);
     LV_UNUSED(src_w);
 
@@ -286,6 +285,27 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
             abuf += dest_w;
             src_tmp8 += src_stride;
         }
+    }
+    /*Use the generic color convert functions*/
+    else {
+        uint8_t px_size = lv_color_format_get_size(cf);
+        src_tmp8 += (src_stride * dest_area->y1 * px_size) + dest_area->x1 * px_size;
+
+        lv_coord_t src_new_line_step_px = (src_stride - lv_area_get_width(dest_area));
+        lv_coord_t src_new_line_step_byte = src_new_line_step_px * px_size;
+
+        lv_coord_t dest_h = lv_area_get_height(dest_area);
+        lv_coord_t dest_w = lv_area_get_width(dest_area);
+        for(y = 0; y < dest_h; y++) {
+            for(x = 0; x < dest_w; x++) {
+                lv_color_to_native(src_tmp8, cf, cbuf, abuf, draw_dsc->recolor);
+                src_tmp8 += px_size;
+            }
+            cbuf += dest_w;
+            abuf += dest_w;
+            src_tmp8 += src_new_line_step_byte;
+        }
+
     }
 }
 

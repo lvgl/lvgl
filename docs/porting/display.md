@@ -73,6 +73,8 @@ It's not mandatory to use the whole display for LVGL, however in some cases the 
 to the active LVGL display area. So the physical resoltution and the offset of the active area can be set with `lv_disp_set_physical_res(disp, hor_res, ver_res);`and `lv_disp_set_offset(disp, x, y);`
 
 ### Rotation
+LVGL supports rotation of the display in 90 degree increments. You can select whether you'd like software rotation or hardware rotation.
+
 The orientation of the display can be changed with
 `lv_disp_set_rotation(disp, LV_DISP_ROTATION_0/90/180/270, true/false)`.
 LVGL will swap the horizontal and vertical resolutions internally according to the set degree. IF the last paramter is `true` LVGL will rotate the rendered image. If it's `false` the display driver should rotate the rendered image.
@@ -84,129 +86,46 @@ Set the color format of the display. The default is `LV_COLOR_FORMAT_NATIVE` whi
 - `LV_COLOR_DEPTH 24` RGB888 (3 bytes/pixel)
 - `LV_COLOR_DEPTH 16` RGB565 (2 bytes/pixel)
 - `LV_COLOR_DEPTH 8` L8 (1 bytes/pixel)
-- `LV_COLOR_DEPTH 1` L1 (also 1 bytes/pixel)
 
-The `color_format` can be changed with `lv_disp_set_color_depth(disp, LV_COLOR_FORMAT_...)`.
+The `color_format` can be changed with `lv_disp_set_color_depth(disp, LV_COLOR_FORMAT_...)` to the following values:
+- `LV_COLOR_FORMAT_NATIVE_ALPHA` Append an alpha byte to the native format resulting in A8L8, ARGB8565, ARGB8888 formats.
+- `LV_COLOR_FORMAT_NATIVE_REVERSE` Reverse the byte order of the native format. Useful if the rendered image is sent to the disply via SPI and the display needs the bytes in the opposite order.
+- `LV_COLOR_FORMAT_L8` Lightness only on 8 bit
+- `LV_COLOR_FORMAT_A8` Alpha only on 8 bit
+- `LV_COLOR_FORMAT_I8` Indexed (palette) 8 bit
+- `LV_COLOR_FORMAT_A8L8` Lightness on 8 bit with 8 bit alpha
+- `LV_COLOR_FORMAT_ARGB2222` ARGB with 2 bit for each channel
+- `LV_COLOR_FORMAT_RGB565` 16 bit RGB565 format without alpha channel
+- `LV_COLOR_FORMAT_ARGB8565` 16 bit RGB565 format and 8 bit alpha channel
+- `LV_COLOR_FORMAT_ARGB1555` 5 bit for each color channel and 1 bit for alpha
+- `LV_COLOR_FORMAT_ARGB4444` 4 bit for each channel
+- `LV_COLOR_FORMAT_RGB888` 8 bit for each color channel with out alpha channel
+- `LV_COLOR_FORMAT_ARGB8888`  8 bit for each channel
+- `LV_COLOR_FORMAT_XRGB8888` 8 bit for each color channel and 8 bit placholder for the alpha cannel
 
-If it's set to not-native `draw_ctx->buffer_convert` function will be called before calling `flush_cb`. Learn more about `draw_ctx` [here]().
+If the color fotmat is set to non-native `draw_ctx->buffer_convert` function will be called before calling `flush_cb` to convert the native color format to the desired, therfore rendering in non-native formats has a negative effect on peroformance. Learn more about `draw_ctx` [here](/porting/gpu).
 
-Software render's `buffer_convert` doesn't support all the possible color format from all the possible color depth settings, but supports the most common ones:
-- `LV_COLOR_FORMAT_NATIVE_REVERSE` work with 16, 24 and 32 bit color depth. Usuful if the rendered image is sent to the disply via SPI and the display needs the bytes in the opposite order.
+It's very important that draw buffer(s) should be large enough for both the native format and the target color format. For example if `LV_COLOR_DEPTH == 16` and `LV_COLOR_FORMAT_XRGB8888` is selected LVGL will choosoe the larger to figure out how many pixel can be rendered at once. Therefore with `LV_DISP_RENDER_MODE_FULL` and the larger pixel size needs to choosen.
 
-It's very important that draw buffer(s) should be large enough for both the native format and the target color format. For example if `LV_COLOR_DEPTH == 16` and `LV_COLOR_FORMAT_RGBX8888` is selected LVGL will choosoe the larger to figure out how many pixel can be rendered at once.
+`LV_DISP_RENDER_MODE_DIRECT` supports only the `LV_COLOR_FORMAT_NATIVE` format.
 
-- `anti_aliasing` use anti-aliasing (edge smoothing). Enabled by default if `LV_COLOR_DEPTH` is set to at least 16 in `lv_conf.h`.
+### Antialiasing
+`lv_disp_set_antialiasing(disp, true/false)` enables/disables the antialiasing (edge smoothing) on the given display.
 
-- `screen_transp` if `1` the screen itself can have transparency as well. `LV_COLOR_DEPTH` must be 32.
-
-- `user_data` A custom `void` user data for the driver.
-
-- color format
+### User data
+With `lv_disp_set_user_data(disp, p)` a pointer to a custom data can be stored in display object.
 
 ## Events
-- `monitor_cb` A callback function that tells how many pixels were refreshed and in how much time. Called when the last chunk is rendered and sent to the display.
-- `render_start_cb` A callback function that notifies the display driver that rendering has started. It also could be used to wait for VSYNC to start rendering. It's useful if rendering is faster than a VSYNC period.
-
-Some other optional callbacks to make it easier and more optimal to work with monochrome, grayscale or other non-standard RGB displays:
-- `rounder_cb` Round the coordinates of areas to redraw. E.g. a 2x2 px can be converted to 2x8.
-It can be used if the display controller can refresh only areas with specific height or width (usually 8 px height with monochrome displays).
-
-### Examples
-All together it looks like this:
-```c
-static lv_disp_drv_t disp_drv;          /*A variable to hold the drivers. Must be static or global.*/
-lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
-disp_drv.draw_buf = &disp_buf;          /*Set an initialized buffer*/
-disp_drv.flush_cb = my_flush_cb;        /*Set a flush callback to draw to the display*/
-disp_drv.hor_res = 320;                 /*Set the horizontal resolution in pixels*/
-disp_drv.ver_res = 240;                 /*Set the vertical resolution in pixels*/
-
-lv_disp_t * disp;
-disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
-```
-
-Here are some simple examples of the callbacks:
-```c
-void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
-{
-    /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one
-     *`put_px` is just an example, it needs to be implemented by you.*/
-    int32_t x, y;
-    for(y = area->y1; y <= area->y2; y++) {
-        for(x = area->x1; x <= area->x2; x++) {
-            put_px(x, y, *color_p);
-            color_p++;
-        }
-    }
-
-    /* IMPORTANT!!!
-     * Inform the graphics library that you are ready with the flushing*/
-    lv_disp_flush_ready(disp_drv);
-}
-
-void my_gpu_fill_cb(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, const lv_area_t * dest_area, const lv_area_t * fill_area, lv_color_t color);
-{
-    /*It's an example code which should be done by your GPU*/
-    uint32_t x, y;
-    dest_buf += dest_width * fill_area->y1; /*Go to the first line*/
-
-    for(y = fill_area->y1; y < fill_area->y2; y++) {
-        for(x = fill_area->x1; x < fill_area->x2; x++) {
-            dest_buf[x] = color;
-        }
-        dest_buf+=dest_width;    /*Go to the next line*/
-    }
-}
+`lv_disp_add_event_cb(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds an event handler to a display.
+The following events are sent:
+- `LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw). `lv_event_get_param(e)` returns a pointer to an `lv_area_t` varaible with the coordinates of the area to be invalidated. The ara can be freely modified is needed to adopt it the specialrequirement of the display. Usually needed with monoschrome displays to invalidate Nx8 lines at once.
+- `LV_DISP_EVENT_RENDER_START` Called when rendering starts.
+- `LV_DISP_EVENT_RENDER_READY` Called when rendering is ready
+- `LV_DISP_EVENT_RESOLUTION_CHANGED` CAlled when the resolution changes due to `lv_disp_set_resolution()` or `lv_disp_set_rotation()`.
 
 
-void my_rounder_cb(lv_disp_drv_t * disp_drv, lv_area_t * area)
-{
-  /* Update the areas as needed.
-   * For example it makes the area to start only on 8th rows and have Nx8 pixel height.*/
-   area->y1 = area->y1 & 0x07;
-   area->y2 = (area->y2 & 0x07) + 8;
-}
-
-void my_set_px_cb(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa)
-{
-   /* Write to the buffer as required for the display.
-    * For example it writes only 1-bit for monochrome displays mapped vertically.*/
-   buf += buf_w * (y >> 3) + x;
-   if(lv_color_brightness(color) > 128) (*buf) |= (1 << (y % 8));
-   else (*buf) &= ~(1 << (y % 8));
-}
-
-void my_monitor_cb(lv_disp_drv_t * disp_drv, uint32_t time, uint32_t px)
-{
-  printf("%d px refreshed in %d ms\n", time, ms);
-}
-
-void my_clean_dcache_cb(lv_disp_drv_t * disp_drv, uint32)
-{
-  /* Example for Cortex-M (CMSIS) */
-  SCB_CleanInvalidateDCache();
-}
-```
 
 ## Other options
-
-### Rotation
-
-LVGL supports rotation of the display in 90 degree increments. You can select whether you'd like software rotation or hardware rotation.
-
-If you select software rotation (`sw_rotate` flag set to 1), LVGL will perform the rotation for you. Your driver can and should assume that the screen width and height have not changed. Simply flush pixels to the display as normal. Software rotation requires no additional logic in your `flush_cb` callback.
-
-There is a noticeable amount of overhead to performing rotation in software. Hardware rotation is available to avoid unwanted slowdowns. In this mode, LVGL draws into the buffer as if your screen width and height were swapped. You are responsible for rotating the provided pixels yourself.
-
-The default rotation of your display when it is initialized can be set using the `rotated` flag. The available options are `LV_DISP_ROT_NONE`, `LV_DISP_ROT_90`, `LV_DISP_ROT_180`, or `LV_DISP_ROT_270`. The rotation values are relative to how you would rotate the physical display in the clockwise direction. Thus, `LV_DISP_ROT_90` means you rotate the hardware 90 degrees clockwise, and the display rotates 90 degrees counterclockwise to compensate.
-
-
-```note::  For users upgrading from 7.10.0 and older: these new rotation enum values match up with the old 0/1 system for rotating 90 degrees, so legacy code should continue to work as expected. Software rotation is also disabled by default for compatibility.
-```
-
-Display rotation can also be changed at runtime using the `lv_disp_set_rotation(disp, rot)` API.
-
-Support for software rotation is a new feature, so there may be some glitches/bugs depending on your configuration. If you encounter a problem please open an issue on [GitHub](https://github.com/lvgl/lvgl/issues).
 
 ### Decoupling the display refresh timer
 Normally the dirty (a.k.a invalid) areas are checked and redrawn in every `LV_DEF_REFR_PERIOD` milliseconds (set in `lv_hal_disp.h`).
@@ -239,7 +158,7 @@ If the performance monitor is enabled, the value of `LV_DEF_REFR_PERIOD` needs t
 
 ```eval_rst
 
-.. doxygenfile:: lv_hal_disp.h
+.. doxygenfile:: lv_disp.h
   :project: lvgl
 
 ```

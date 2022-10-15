@@ -77,7 +77,7 @@ void test_inherit_meta(void)
     lv_obj_t * grandchild = lv_label_create(child);
     lv_obj_set_style_text_color(parent, lv_color_hex(0xff0000), LV_PART_MAIN);
     lv_obj_set_local_style_prop_meta(child, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT, LV_PART_MAIN);
-    TEST_ASSERT_EQUAL_HEX(lv_color_hex(0xff0000).full, lv_obj_get_style_text_color(grandchild, LV_PART_MAIN).full);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_text_color(grandchild, LV_PART_MAIN));
 }
 
 void test_id_meta_overrun(void)
@@ -103,7 +103,7 @@ void test_inherit_meta_with_lower_precedence_style(void)
     lv_style_set_text_color(&style, lv_color_hex(0xffffff));
     lv_obj_set_local_style_prop_meta(child, LV_STYLE_TEXT_COLOR, LV_STYLE_PROP_META_INHERIT, LV_PART_MAIN);
     lv_obj_add_style(child, &style, LV_PART_MAIN);
-    TEST_ASSERT_EQUAL_HEX(lv_color_hex(0xff0000).full, lv_obj_get_style_text_color(grandchild, LV_PART_MAIN).full);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_text_color(grandchild, LV_PART_MAIN));
 }
 
 const lv_style_const_prop_t const_style_props[] = {

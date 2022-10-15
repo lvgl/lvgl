@@ -153,7 +153,7 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
                          lv_coord_t offset_y,
                          int32_t pivot_x, int32_t pivot_y, bool antialias)
 {
-#if LV_USE_DRAW_MASKS
+#if LV_USE_DRAW_MASKS && 0
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(src_img);
 
@@ -434,7 +434,7 @@ void lv_canvas_blur_ver(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
 
 void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
 {
-    LV_ASSERT_OBJ(canvas, MY_CLASS);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(obj);
 

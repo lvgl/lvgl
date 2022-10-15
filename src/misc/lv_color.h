@@ -231,9 +231,12 @@ typedef struct _lv_color_filter_dsc_t {
 typedef enum {
     LV_COLOR_FORMAT_UNKNOWN,
 
-    /*1 byte (+alpha) formats*/
+    /*<=1 byte (+alpha) formats*/
     LV_COLOR_FORMAT_L8,
     LV_COLOR_FORMAT_A8,
+    LV_COLOR_FORMAT_I1,
+    LV_COLOR_FORMAT_I2,
+    LV_COLOR_FORMAT_I4,
     LV_COLOR_FORMAT_I8,
     LV_COLOR_FORMAT_A8L8,
     LV_COLOR_FORMAT_ARGB2222,
@@ -246,7 +249,6 @@ typedef enum {
     LV_COLOR_FORMAT_ARGB8565,
 
     /*3 byte (+alpha) formats*/
-    LV_COLOR_FORMAT_RGB666,
     LV_COLOR_FORMAT_RGB888,
     LV_COLOR_FORMAT_ARGB8888,
     LV_COLOR_FORMAT_XRGB8888,
@@ -266,7 +268,7 @@ typedef enum {
     LV_COLOR_FORMAT_NATIVE_ALPHA = LV_COLOR_FORMAT_ARGB8888,
 #endif
     /*Miscellaneous formats*/
-    LV_COLOR_FORMAT_NATIVE_REVERSED = 0x10,
+    LV_COLOR_FORMAT_NATIVE_REVERSED = 0x1A,
     LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED,
 
     LV_COLOR_FORMAT_RAW,
@@ -274,7 +276,7 @@ typedef enum {
 } lv_color_format_t;
 
 
-void lv_color_to_native(uint8_t * buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
+void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
                         lv_color_t alpha_color);
 void lv_color_from_native(lv_color_t color_in, lv_opa_t opa_in, uint8_t * buf_out, lv_color_format_t cf_out);
 
@@ -541,11 +543,11 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_MIX_ROUND_OFS == 0
     /*Source: https://stackoverflow.com/a/50012418/1999969*/
     mix = (uint32_t)((uint32_t)mix + 4) >> 3;
-    uint32_t bg = (uint32_t)((uint32_t)c2.full | ((uint32_t)c2.full << 16)) &
+    uint32_t bg = (uint32_t)((uint32_t)(*(uint16_t *)&c2) | ((uint32_t)(*(uint16_t *)&c2) << 16)) &
                   0x7E0F81F; /*0b00000111111000001111100000011111*/
-    uint32_t fg = (uint32_t)((uint32_t)c1.full | ((uint32_t)c1.full << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)((uint32_t)(*(uint16_t *)&c1) | ((uint32_t)(*(uint16_t *)&c1) << 16)) & 0x7E0F81F;
     uint32_t result = ((((fg - bg) * mix) >> 5) + bg) & 0x7E0F81F;
-    ret.full = (uint16_t)((result >> 16) | result);
+    lv_color_set_int(&ret, (uint16_t)((result >> 16) | result));
 #elif LV_COLOR_DEPTH == 8
     LV_COLOR_SET_R(ret, LV_UDIV255((uint16_t)LV_COLOR_GET_R(c1) * mix + LV_COLOR_GET_R(c2) *
                                    (255 - mix) + LV_COLOR_MIX_ROUND_OFS));

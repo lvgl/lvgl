@@ -40,13 +40,13 @@ void test_led_set_color_works(void)
 
     /* Test by changing colors randomly. */
     lv_led_set_color(led, lv_palette_main(LV_PALETTE_AMBER));
-    TEST_ASSERT_EQUAL(lv_palette_main(LV_PALETTE_AMBER).full, ledObj->color.full);
+    TEST_ASSERT_EQUAL_COLOR(lv_palette_main(LV_PALETTE_AMBER), ledObj->color);
 
     lv_led_set_color(led, lv_palette_main(LV_PALETTE_GREY));
-    TEST_ASSERT_EQUAL(lv_palette_main(LV_PALETTE_GREY).full, ledObj->color.full);
+    TEST_ASSERT_EQUAL_COLOR(lv_palette_main(LV_PALETTE_GREY), ledObj->color);
 
     lv_led_set_color(led, lv_palette_main(LV_PALETTE_RED));
-    TEST_ASSERT_EQUAL(lv_palette_main(LV_PALETTE_RED).full, ledObj->color.full);
+    TEST_ASSERT_EQUAL_COLOR(lv_palette_main(LV_PALETTE_RED), ledObj->color);
 }
 
 void test_led_set_brightness_works(void)
