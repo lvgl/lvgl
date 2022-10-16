@@ -25,7 +25,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
                                                       const lv_area_t * coords, const void * src);
 
 static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg);
@@ -117,19 +117,19 @@ lv_img_src_t lv_img_src_get_type(const void * src)
     return img_src_type;
 }
 
-void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                         const lv_area_t * coords, const uint8_t * map_p, lv_color_format_t color_format)
+void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                         const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format)
 {
     if(draw_ctx->draw_img_decoded == NULL) return;
 
-    draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
+    draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, sup, color_format);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
                                                       const lv_area_t * coords, const void * src)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
@@ -141,12 +141,19 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     lv_color_format_t cf = cdsc->dec_dsc.header.cf;
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
-
         show_error(draw_ctx, coords, cdsc->dec_dsc.error_msg);
+        draw_cleanup(cdsc);
+        return LV_RES_INV;
     }
+
+    lv_draw_img_sup_t sup;
+    sup.palette = cdsc->dec_dsc.palette;
+    sup.palette_size = cdsc->dec_dsc.palette_size;
+    sup.alpha_color = cdsc->dec_dsc.color;
+
     /*The decoder could open the image and gave the entire uncompressed image.
      *Just draw it!*/
-    else if(cdsc->dec_dsc.img_data) {
+    if(cdsc->dec_dsc.img_data) {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
@@ -172,7 +179,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
-        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cf);
+        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, &sup, cf);
         draw_ctx->clip_area = clip_area_ori;
     }
     /*The whole uncompressed image is not available. Try to read it line-by-line*/
@@ -213,7 +220,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
             }
 
             draw_ctx->clip_area = &mask_line;
-            lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, cf);
+            lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, &sup, cf);
             line.y1++;
             line.y2++;
             y++;

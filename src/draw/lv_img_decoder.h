@@ -103,7 +103,7 @@ typedef struct _lv_img_decoder_dsc_t {
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_img_dsc_t` variable*/
     const void * src;
 
-    /**Color to draw the image. USed when the image has alpha channel only*/
+    /**Color to draw the image. Used when the image has alpha channel only*/
     lv_color_t color;
 
     /**Frame of the image, using with animated images*/
@@ -118,6 +118,9 @@ typedef struct _lv_img_decoder_dsc_t {
     /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
      *  MUST be set in `open` function*/
     const uint8_t * img_data;
+
+    const lv_color32_t * palette;
+    uint32_t palette_size;
 
     /** How much time did it take to open the image. [ms]
      *  If not set `lv_img_cache` will measure and set the time to open*/

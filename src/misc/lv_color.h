@@ -275,7 +275,6 @@ typedef enum {
     LV_COLOR_FORMAT_RAW_ALPHA,
 } lv_color_format_t;
 
-
 void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
                         lv_color_t alpha_color);
 void lv_color_from_native(lv_color_t color_in, lv_opa_t opa_in, uint8_t * buf_out, lv_color_format_t cf_out);

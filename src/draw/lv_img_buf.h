@@ -139,9 +139,9 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
  *   - for `LV_IMG_CF_INDEXED2`: 0..3
  *   - for `LV_IMG_CF_INDEXED4`: 0..15
  *   - for `LV_IMG_CF_INDEXED8`: 0..255
- * @param c the color to set
+ * @param c the color to set in lv_color32_t format
  */
-void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c);
+void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color32_t c);
 
 /**
  * Free an allocated image buffer

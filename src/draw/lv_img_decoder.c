@@ -29,8 +29,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-//static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-//                                                     lv_coord_t len, uint8_t * buf);
 
 /**********************
  *  STATIC VARIABLES
@@ -348,11 +346,35 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
     }
 
-    /*Process true color formats*/
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
-        /*In case of uncompressed formats the image stored in the ROM/RAM.
-         *So simply give its pointer*/
-        dsc->img_data = ((lv_img_dsc_t *)dsc->src)->data;
+        lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
+        lv_color_format_t cf = img_dsc->header.cf;
+        if(cf >= LV_COLOR_FORMAT_I1 && cf <= LV_COLOR_FORMAT_I8) {
+            switch(cf) {
+                case LV_COLOR_FORMAT_I1:
+                    dsc->palette_size = 2;
+                    break;
+                case LV_COLOR_FORMAT_I2:
+                    dsc->palette_size = 4;
+                    break;
+                case LV_COLOR_FORMAT_I4:
+                    dsc->palette_size = 16;
+                    break;
+                case LV_COLOR_FORMAT_I8:
+                    dsc->palette_size = 256;
+                    break;
+                default:
+                    LV_LOG_WARN("Unexpected color format");
+                    return LV_RES_INV;
+            }
+            dsc->img_data = img_dsc->data + sizeof(lv_color32_t) * dsc->palette_size;
+            dsc->palette = (const lv_color32_t *)img_dsc->data;
+        }
+        else {
+            /*In case of uncompressed formats the image stored in the ROM/RAM.
+             *So simply give its pointer*/
+            dsc->img_data = ((lv_img_dsc_t *)dsc->src)->data;
+        }
         return LV_RES_OK;
     }
     else {
@@ -387,86 +409,3 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-//static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-//                                                     lv_coord_t len, uint8_t * buf)
-//{
-//    uint8_t px_size = lv_color_format_get_size(dsc->header.cf);
-//    uint16_t mask   = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
-//
-//    lv_coord_t w = 0;
-//    int8_t pos   = 0;
-//    uint32_t ofs = 0;
-//    switch(dsc->header.cf) {
-//        case LV_IMG_CF_INDEXED_1BIT:
-//            w = (dsc->header.w + 7) >> 3; /*E.g. w = 20 -> w = 2 + 1*/
-//            ofs += w * y + (x >> 3); /*First pixel*/
-//            ofs += 8;                /*Skip the palette*/
-//            pos = 7 - (x & 0x7);
-//            break;
-//        case LV_IMG_CF_INDEXED_2BIT:
-//            w = (dsc->header.w + 3) >> 2; /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
-//            ofs += w * y + (x >> 2); /*First pixel*/
-//            ofs += 16;               /*Skip the palette*/
-//            pos = 6 - (x & 0x3) * 2;
-//            break;
-//        case LV_IMG_CF_INDEXED_4BIT:
-//            w = (dsc->header.w + 1) >> 1; /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
-//            ofs += w * y + (x >> 1); /*First pixel*/
-//            ofs += 64;               /*Skip the palette*/
-//            pos = 4 - (x & 0x1) * 4;
-//            break;
-//        case LV_IMG_CF_INDEXED_8BIT:
-//            w = dsc->header.w; /*E.g. x = 7 -> w = 7 (bytes)*/
-//            ofs += w * y + x;  /*First pixel*/
-//            ofs += 1024;       /*Skip the palette*/
-//            pos = 0;
-//            break;
-//    }
-//
-//    lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-//
-//    uint8_t * fs_buf = lv_malloc(w);
-//    if(fs_buf == NULL) return LV_RES_INV;
-//    const uint8_t * data_tmp = NULL;
-//    if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
-//        const lv_img_dsc_t * img_dsc = dsc->src;
-//        data_tmp                     = img_dsc->data + ofs;
-//    }
-//    else {
-//        lv_fs_seek(&user_data->f, ofs + 4, LV_FS_SEEK_SET); /*+4 to skip the header*/
-//        lv_fs_read(&user_data->f, fs_buf, w, NULL);
-//        data_tmp = fs_buf;
-//    }
-//
-//    lv_coord_t i;
-//    for(i = 0; i < len; i++) {
-//        uint8_t val_act = (*data_tmp >> pos) & mask;
-//
-//        lv_color_t color = user_data->palette[val_act];
-//#if LV_COLOR_DEPTH == 8
-//        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE] = lv_color_to_int(color);
-//#elif LV_COLOR_DEPTH == 16
-//        /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
-//        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE] = (*((uint16_t *) &color)) & 0xFF;
-//        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 1] = ((*((uint16_t *) &color)) >> 8);
-//#elif LV_COLOR_DEPTH == 24
-//        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 0] = color.red;
-//        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 1] = color.green;
-//        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + 2] = color.blue;
-//#elif LV_COLOR_DEPTH == 32
-//        *((lv_color_t *)&buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE]) = color;
-//#else
-//#error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
-//#endif
-//        buf[i * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE + LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1] = user_data->opa[val_act];
-//
-//        pos -= px_size;
-//        if(pos < 0) {
-//            pos = 8 - px_size;
-//            data_tmp++;
-//        }
-//    }
-//    lv_free(fs_buf);
-//    return LV_RES_OK;
-//}

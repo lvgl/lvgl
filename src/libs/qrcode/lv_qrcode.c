@@ -78,8 +78,10 @@ lv_obj_t * lv_qrcode_create(lv_obj_t * parent, lv_coord_t size, lv_color_t dark_
  */
 lv_res_t lv_qrcode_update(lv_obj_t * qrcode, const void * data, uint32_t data_len)
 {
-    lv_color_t c0 = lv_color_hex(0);
-    lv_color_t c1 = lv_color_hex(1);
+    lv_color_t c0;
+    lv_color_t c1;
+    lv_color_set_int(&c0, 0);
+    lv_color_set_int(&c1, 1);
     lv_canvas_fill_bg(qrcode, c1, LV_OPA_COVER);
 
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RES_INV;
@@ -197,8 +199,8 @@ static void lv_qrcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     if(buf == NULL) return;
 
     lv_canvas_set_buffer(obj, buf, size_param, size_param, LV_COLOR_FORMAT_I1);
-    lv_canvas_set_palette(obj, 0, dark_color_param);
-    lv_canvas_set_palette(obj, 1, light_color_param);
+    lv_canvas_set_palette(obj, 0, lv_color_to32(dark_color_param));
+    lv_canvas_set_palette(obj, 1, lv_color_to32(light_color_param));
 }
 
 static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

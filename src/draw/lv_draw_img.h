@@ -30,11 +30,19 @@ extern "C" {
  **********************/
 
 typedef struct {
+    lv_color_t chroma_key_color;
+    lv_color_t alpha_color;
+    const lv_color32_t * palette;
+    uint16_t palette_size;
+} lv_draw_img_sup_t;
+
+typedef struct {
 
     int16_t angle;
     uint16_t zoom;
     lv_point_t pivot;
 
+    lv_color_t chroma_key_color;
     lv_color_t recolor;
     lv_opa_t recolor_opa;
 
@@ -42,7 +50,8 @@ typedef struct {
     lv_blend_mode_t blend_mode : 4;
 
     int32_t frame_id;
-    uint8_t antialias       : 1;
+    uint16_t antialias      : 1;
+    lv_draw_img_sup_t * sup;
 } lv_draw_img_dsc_t;
 
 struct _lv_draw_ctx_t;
@@ -63,8 +72,8 @@ void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
                  const void * src);
 
 
-void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                         const lv_area_t * coords, const uint8_t * map_p, lv_color_format_t color_format);
+void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                         const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format);
 
 /**
  * Get the type of an image source

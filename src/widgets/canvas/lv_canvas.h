@@ -76,7 +76,7 @@ void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t col
  *   - for `LV_IMG_CF_INDEXED8`: 0..255
  * @param c the color to set
  */
-void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c);
+void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color32_t c);
 
 /*=====================
  * Getter functions
