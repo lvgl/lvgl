@@ -45,7 +45,6 @@ void lv_draw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, co
     }
 
     draw_ctx->draw_transform(draw_ctx, dest_area, src_buf, src_w, src_h, src_stride, draw_dsc, cf, cbuf, abuf);
-
 }
 
 

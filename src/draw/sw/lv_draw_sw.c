@@ -56,6 +56,7 @@ void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
     draw_sw_ctx->base_draw.wait_for_finish = lv_draw_sw_wait_for_finish;
     draw_sw_ctx->base_draw.buffer_copy = lv_draw_sw_buffer_copy;
     draw_sw_ctx->base_draw.buffer_convert = lv_draw_sw_buffer_convert;
+    draw_sw_ctx->base_draw.buffer_clear = lv_draw_sw_buffer_clear;
     draw_sw_ctx->base_draw.layer_init = lv_draw_sw_layer_create;
     draw_sw_ctx->base_draw.layer_adjust = lv_draw_sw_layer_adjust;
     draw_sw_ctx->base_draw.layer_blend = lv_draw_sw_layer_blend;
@@ -84,17 +85,18 @@ void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
 {
     LV_UNUSED(draw_ctx);
 
-    lv_color_t * dest_bufc =  dest_buf;
-    lv_color_t * src_bufc =  src_buf;
+    uint8_t px_size = lv_color_format_get_size(draw_ctx->color_format);
+    uint8_t * dest_bufc =  dest_buf;
+    uint8_t * src_bufc =  src_buf;
 
     /*Got the first pixel of each buffer*/
-    dest_bufc += dest_stride * dest_area->y1;
-    dest_bufc += dest_area->x1;
+    dest_bufc += dest_stride * px_size * dest_area->y1;
+    dest_bufc += dest_area->x1 * px_size;
 
-    src_bufc += src_stride * src_area->y1;
-    src_bufc += src_area->x1;
+    src_bufc += src_stride * px_size * src_area->y1;
+    src_bufc += src_area->x1 * px_size;
 
-    uint32_t line_length = lv_area_get_width(dest_area) * sizeof(lv_color_t);
+    uint32_t line_length = lv_area_get_width(dest_area) * px_size;
     lv_coord_t y;
     for(y = dest_area->y1; y <= dest_area->y2; y++) {
         lv_memcpy(dest_bufc, src_bufc, line_length);
@@ -172,6 +174,24 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
 #endif
 
     LV_LOG_WARN("Couldn't convert the image to the desired format");
+}
+
+void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx)
+{
+    uint8_t px_size = lv_color_format_get_size(draw_ctx->color_format);
+    uint8_t * buf8 = draw_ctx->buf;
+    lv_area_t a;
+    lv_area_copy(&a, draw_ctx->clip_area);
+    lv_area_move(&a, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_coord_t w = lv_area_get_width(&a);
+    buf8 += a.y1 * w * px_size;
+    buf8 += a.x1 * px_size;
+
+    lv_coord_t y;
+    for(y = a.y1; y <= a.y2; y++) {
+        lv_memzero(buf8, w * px_size);
+        buf8 += w * px_size;
+    }
 }
 
 /**********************

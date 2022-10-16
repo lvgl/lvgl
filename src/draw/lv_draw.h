@@ -118,7 +118,6 @@ typedef struct _lv_draw_ctx_t  {
                            lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                            const lv_draw_img_dsc_t * draw_dsc, lv_color_format_t cf, lv_color_t * cbuf, lv_opa_t * abuf);
 
-
     /**
      * Wait until all background operations are finished. (E.g. GPU operations)
      */
@@ -143,10 +142,12 @@ typedef struct _lv_draw_ctx_t  {
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
     /**
-     * Convert the content of `draw_ctx->buf` to `draw_ctx->output_color_format`
+     * Convert the content of `draw_ctx->buf` to `draw_ctx->color_format`
      * @param draw_ctx
      */
     void (*buffer_convert)(struct _lv_draw_ctx_t * draw_ctx);
+
+    void (*buffer_clear)(struct _lv_draw_ctx_t * draw_ctx);
 
     /**
      * Initialize a new layer context.

@@ -423,14 +423,30 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     refr_invalid_areas();
 
-
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
-        if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL) {
-            lv_area_t disp_area;
-            lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
-            disp_refr->draw_ctx->buf_area = &disp_area;
-            draw_buf_flush(disp_refr);
+        /*Call monitor cb if present*/
+        lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_READY, NULL);
+
+        /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
+        if(lv_disp_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
+            /*We need to wait for ready here to not mess up the active screen*/
+            while(disp_refr->flushing) {
+                if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
+            }
+            /*The buffers are already swapped.
+             *So the active buffer is the off screen buffer where LVGL will render*/
+            void * buf_off_screen = disp_refr->draw_buf_act;
+            void * buf_on_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
+
+            lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+            uint32_t i;
+            for(i = 0; i < disp_refr->inv_p; i++) {
+                if(disp_refr->inv_area_joined[i]) continue;
+                disp_refr->draw_ctx->buffer_copy(disp_refr->draw_ctx,
+                                                 buf_off_screen, stride, &disp_refr->inv_areas[i],
+                                                 buf_on_screen, stride, &disp_refr->inv_areas[i]);
+            }
         }
 
         /*Clean up*/
@@ -438,8 +454,6 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
 
-        /*Call monitor cb if present*/
-        lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_READY, NULL);
     }
 
     _lv_font_clean_up_fmt_txt();
@@ -572,7 +586,7 @@ static void refr_area(const lv_area_t * area_p)
             draw_ctx->clip_area = &disp_area;
             refr_area_part(draw_ctx);
         }
-        else {
+        else if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
             disp_refr->last_part = disp_refr->last_area;
             draw_ctx->clip_area = area_p;
             refr_area_part(draw_ctx);
@@ -624,22 +638,17 @@ static void refr_area(const lv_area_t * area_p)
 
 static void refr_area_part(lv_draw_ctx_t * draw_ctx)
 {
-    /* Below the `area_p` area will be redrawn into the draw buffer.
-     * In single buffered mode wait here until the buffer is freed.*/
-    if(disp_refr->draw_buf_1 && !disp_refr->draw_buf_2) {
+    /* In single buffered mode wait here until the buffer is freed.
+     * Else we would draw into the buffer while it's still being transferred to the display*/
+    if(!lv_disp_is_double_buffered(disp_refr)) {
         while(disp_refr->flushing) {
             if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
         }
+    }
 
-        /*If the screen is transparent initialize it when the flushing is ready*/
-        if(lv_color_format_has_alpha(disp_refr->color_format)) {
-            //            if(disp_refr->clear_cb) {
-            //                disp_refr->clear_cb(disp_refr, disp_refr->buf_act, disp_refr->size);
-            //            }
-            //            else {
-            lv_memzero(disp_refr->draw_buf_act, disp_refr->draw_buf_size);
-            //            }
-        }
+    /*If the screen is transparent initialize it when the flushing is ready*/
+    if(lv_color_format_has_alpha(disp_refr->color_format)) {
+        if(draw_ctx->buffer_clear) draw_ctx->buffer_clear(draw_ctx);
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -681,11 +690,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     refr_obj_and_children(draw_ctx, lv_disp_get_layer_top(disp_refr));
     refr_obj_and_children(draw_ctx, lv_disp_get_layer_sys(disp_refr));
 
-    /*In true double buffered mode flush only once when all areas were rendered.
-     *In normal mode flush after every area*/
-    if(disp_refr->render_mode != LV_DISP_RENDER_MODE_FULL) {
-        draw_buf_flush(disp_refr);
-    }
+    draw_buf_flush(disp_refr);
 }
 
 /**
@@ -1157,20 +1162,12 @@ static void draw_buf_flush(lv_disp_t * disp)
     if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
 
     /* In double buffered mode wait until the other buffer is freed
-     * and driver is ready to receive the new buffer */
-    if(disp->draw_buf_1 && disp->draw_buf_2) {
+     * and driver is ready to receive the new buffer.
+     * If we need to wait here it means that the content of one buffer is being sent to display
+     * and other buffer already contains the new rendered image. */
+    if(lv_disp_is_double_buffered(disp)) {
         while(disp->flushing) {
             if(disp->wait_cb) disp_refr->wait_cb(disp);
-        }
-
-        /*If the screen is transparent initialize it when the flushing is ready*/
-        if(lv_color_format_has_alpha(disp_refr->color_format)) {
-            //            if(disp_refr->clear_cb) {
-            //                disp_refr->clear_cb(disp_refr->driver, disp_refr->buf_act, disp_refr->size);
-            //            }
-            //            else {
-            lv_memzero(disp_refr->draw_buf_act, disp_refr->draw_buf_size);
-            //            }
         }
     }
 
@@ -1191,11 +1188,13 @@ static void draw_buf_flush(lv_disp_t * disp)
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
-    if(disp->draw_buf_1 && disp->draw_buf_2 && (disp->render_mode != LV_DISP_RENDER_MODE_DIRECT || flushing_last)) {
-        if(disp->draw_buf_act == disp->draw_buf_1)
+    if(lv_disp_is_double_buffered(disp) && (disp->render_mode != LV_DISP_RENDER_MODE_DIRECT || flushing_last)) {
+        if(disp->draw_buf_act == disp->draw_buf_1) {
             disp->draw_buf_act = disp->draw_buf_2;
-        else
+        }
+        else {
             disp->draw_buf_act = disp->draw_buf_1;
+        }
     }
 }
 

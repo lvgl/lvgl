@@ -456,6 +456,11 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp)
     return disp->flushing_last;
 }
 
+bool lv_disp_is_double_buffered(lv_disp_t * disp)
+{
+    return disp->draw_buf_2 ? true : false;
+}
+
 /*---------------------
  * DRAW CONTEXT
  *--------------------*/

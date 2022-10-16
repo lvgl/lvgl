@@ -292,6 +292,9 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp);
 
 //! @endcond
 
+
+bool lv_disp_is_double_buffered(lv_disp_t * disp);
+
 /*---------------------
  * DRAW CONTEXT
  *--------------------*/

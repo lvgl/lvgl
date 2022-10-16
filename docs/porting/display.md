@@ -45,7 +45,7 @@ The draw buffers can be set with
 - `buf_size_byte` size of the buffer(s) in bytes
 - `render_mode`
   - `LV_DISP_RENDER_MODE_PARTIAL` Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM. At least 1/10 sceen size buffer(s) are recommended. In `flush_cb` the rendered images needs to be copied to the given area of the display.
-   - `LV_DISP_RENDER_MODE_DIRECT` The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image.
+   - `LV_DISP_RENDER_MODE_DIRECT` The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image. If two buffer are used the rendered ares are automatically copied to the other buffer after flushing. Due to this in `flush_cb` typically only a frame buffer address needs to be changed and always the changed areas will be redrawn.
    - `LV_DISP_RENDER_MODE_FULL` The buffer can smaller or screen sized but LVGL will always redraw the whole screen even is only 1 pixel has been changed. If two screen sized draw buffers are provided, LVGL's display handling works like "traditional" double buffering. This means the `flush_cb` callback only has to update the address of the framebuffer (`color_p` parameter).
 
 Example:
