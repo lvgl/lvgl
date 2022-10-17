@@ -191,6 +191,29 @@ lv_res_t lv_vglite_premult_and_swizzle(vg_lite_color_t * vg_col32, lv_color32_t 
     return LV_RES_OK;
 }
 
+vg_lite_blend_t lv_vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode)
+{
+    vg_lite_blend_t vg_blend_mode;
+    switch(lv_blend_mode) {
+        case LV_BLEND_MODE_ADDITIVE:
+            vg_blend_mode = VG_LITE_BLEND_ADDITIVE;
+            break;
+        case LV_BLEND_MODE_SUBTRACTIVE:
+            vg_blend_mode = VG_LITE_BLEND_SUBTRACT;
+            break;
+        case LV_BLEND_MODE_MULTIPLY:
+            vg_blend_mode = VG_LITE_BLEND_MULTIPLY;
+            break;
+        case LV_BLEND_MODE_REPLACE:
+            vg_blend_mode = VG_LITE_BLEND_NONE;
+            break;
+        default:
+            vg_blend_mode = VG_LITE_BLEND_SRC_OVER;
+            break;
+    }
+    return vg_blend_mode;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
