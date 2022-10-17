@@ -233,25 +233,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
 
     /* Choose vglite blend mode based on given lvgl blend mode */
     lv_blend_mode_t blend_mode = dsc->blend_mode;
-    vg_lite_blend_t vglite_blend_mode = VG_LITE_BLEND_NONE;
-
-    switch(blend_mode) {
-        case LV_BLEND_MODE_NORMAL:
-            vglite_blend_mode = VG_LITE_BLEND_SRC_OVER;
-            break;
-        case LV_BLEND_MODE_ADDITIVE:
-            vglite_blend_mode = VG_LITE_BLEND_ADDITIVE;
-            break;
-        case LV_BLEND_MODE_SUBTRACTIVE:
-            vglite_blend_mode = VG_LITE_BLEND_SUBTRACT;
-            break;
-        case LV_BLEND_MODE_MULTIPLY:
-            vglite_blend_mode = VG_LITE_BLEND_MULTIPLY;
-            break;
-        case LV_BLEND_MODE_REPLACE:
-            vglite_blend_mode = VG_LITE_BLEND_NONE;
-            break;
-    }
+    vg_lite_blend_t vglite_blend_mode = lv_vglite_get_blend_mode(blend_mode);
 
     /*** Init destination buffer ***/
     if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width * sizeof(lv_color_t),

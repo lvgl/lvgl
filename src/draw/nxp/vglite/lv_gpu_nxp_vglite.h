@@ -134,6 +134,12 @@ lv_res_t lv_vglite_premult_and_swizzle(vg_lite_color_t * vg_col32, lv_color32_t 
                                        vg_lite_buffer_format_t vg_col_format);
 
 /**
+ * Generates corresponding vglite blend mode based on given LVGL blend mode
+ * @param lv_blend_mode The LVGL blend mode to be converted into vglite blend mode
+ */
+vg_lite_blend_t lv_vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
+
+/**
  * Clear cache and flush command to VG-Lite.
  */
 lv_res_t lv_vglite_run(void);
