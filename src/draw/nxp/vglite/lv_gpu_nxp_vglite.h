@@ -142,7 +142,8 @@ lv_res_t lv_vglite_run(void);
 #define VG_LITE_ERR_RETURN_INV(err, fmt, ...) \
     do {                                      \
         if(err != VG_LITE_SUCCESS) {          \
-            LV_LOG_ERROR(fmt, ##__VA_ARGS__); \
+            LV_LOG_ERROR(fmt" (err = %d)",    \
+                         err, ##__VA_ARGS__); \
             return LV_RES_INV;                \
         }                                     \
     } while (0)
