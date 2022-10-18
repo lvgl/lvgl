@@ -368,11 +368,15 @@ static void lv_draw_nxp_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t 
         return;
 
     bool done = false;
+    bool mask_any = lv_draw_mask_is_any(&clip_line);
+
+    if(!mask_any) {
 #if LV_USE_GPU_NXP_VG_LITE
-    done = (lv_gpu_nxp_vglite_draw_line(draw_ctx, dsc, point1, point2, &clip_line) == LV_RES_OK);
-    if(!done)
-        VG_LITE_LOG_TRACE("VG-Lite draw line failed. Fallback.");
+        done = (lv_gpu_nxp_vglite_draw_line(draw_ctx, dsc, point1, point2, &clip_line) == LV_RES_OK);
+        if(!done)
+            VG_LITE_LOG_TRACE("VG-Lite draw line failed. Fallback.");
 #endif
+    }
 
     if(!done)
         lv_draw_sw_line(draw_ctx, dsc, point1, point2);
