@@ -380,7 +380,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     # Run ruby to generate source in build directory
     add_custom_command(
         OUTPUT ${test_runner_fname}
-        COMMAND ${Ruby_EXECUTABLE} ${generate_test_runner_rb}
+        COMMAND ${RUBY_EXECUTABLE} ${generate_test_runner_rb}
                 ${test_case_fname} ${test_runner_fname}
                 ${generate_test_runner_config}
         DEPENDS ${generate_test_runner_rb} ${test_case_fname}
