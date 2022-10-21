@@ -57,6 +57,8 @@
 #endif  /*LV_USE_BUILTIN_SNPRINTF*/
 
 #define LV_STDLIB_INCLUDE <stdint.h>
+#define LV_STDIO_INCLUDE  <stdint.h>
+#define LV_STRING_INCLUDE <stdint.h>
 #define LV_MALLOC       lv_malloc_builtin
 #define LV_REALLOC      lv_realloc_builtin
 #define LV_FREE         lv_free_builtin
