@@ -38,6 +38,10 @@ extern "C" {
  *******************/
 
 #ifdef CONFIG_LV_MEM_SIZE_KILOBYTES
+#  if(CONFIG_LV_MEM_SIZE_KILOBYTES < 2)
+#    error "LV_MEM_SIZE >= 2kB is required"
+#  endif
+
 #  define CONFIG_LV_MEM_SIZE (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
 #endif
 
