@@ -41,6 +41,10 @@ extern "C" {
 #  define CONFIG_LV_MEM_SIZE (CONFIG_LV_MEM_SIZE_KILOBYTES * 1024U)
 #endif
 
+#ifdef CONFIG_LV_TLSF_MAX_POOL_SIZE_KILOBYTES
+#  define CONFIG_LV_TLSF_MAX_POOL_SIZE (CONFIG_LV_TLSF_MAX_POOL_SIZE_KILOBYTES * 1024U)
+#endif
+
 /*------------------
  * MONITOR POSITION
  *-----------------*/

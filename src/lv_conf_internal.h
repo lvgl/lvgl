@@ -104,6 +104,15 @@
         #endif
     #endif
 
+    /*Size of the TLSF pool maximum size(must be greater than LV_MEM_SIZE)*/
+    #ifndef LV_TLSF_MAX_POOL_SIZE
+        #ifdef CONFIG_LV_TLSF_MAX_POOL_SIZE
+            #define LV_TLSF_MAX_POOL_SIZE CONFIG_LV_TLSF_MAX_POOL_SIZE
+        #else
+            #define LV_TLSF_MAX_POOL_SIZE (128U * 1024U) /*[bytes]*/
+        #endif
+    #endif
+
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #ifndef LV_MEM_ADR
         #ifdef CONFIG_LV_MEM_ADR

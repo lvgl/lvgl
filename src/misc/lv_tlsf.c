@@ -10,7 +10,9 @@
 #undef  printf
 #define printf LV_LOG_ERROR
 
-#define TLSF_MAX_POOL_SIZE LV_MEM_SIZE
+#if (LV_TLSF_MAX_POOL_SIZE < LV_MEM_SIZE)
+    #error "LV_TLSF_MAX_POOL_SIZE >= LV_MEM_SIZE is required"
+#endif
 
 #if !defined(_DEBUG)
     #define _DEBUG 0
@@ -249,8 +251,8 @@ enum tlsf_private {
     ** blocks below that size into the 0th first-level list.
     */
 
-#if defined (TLSF_MAX_POOL_SIZE)
-    FL_INDEX_MAX = TLSF_LOG2_CEIL(TLSF_MAX_POOL_SIZE),
+#if defined (LV_TLSF_MAX_POOL_SIZE)
+    FL_INDEX_MAX = TLSF_LOG2_CEIL(LV_TLSF_MAX_POOL_SIZE),
 #elif defined (TLSF_64BIT)
     /*
     ** TODO: We can increase this to support larger sizes, at the expense
