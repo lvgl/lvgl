@@ -11,7 +11,8 @@
 #define printf LV_LOG_ERROR
 
 #if (LV_TLSF_MAX_POOL_SIZE < LV_MEM_SIZE)
-    #error "LV_TLSF_MAX_POOL_SIZE >= LV_MEM_SIZE is required"
+    #undef LV_TLSF_MAX_POOL_SIZE
+    #define LV_TLSF_MAX_POOL_SIZE LV_MEM_SIZE
 #endif
 
 #if !defined(_DEBUG)
