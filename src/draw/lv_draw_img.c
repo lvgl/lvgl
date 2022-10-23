@@ -138,7 +138,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
     if(cdsc == NULL) return LV_RES_INV;
 
-    lv_color_format_t cf = cdsc->dec_dsc.header.cf;
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
         show_error(draw_ctx, coords, cdsc->dec_dsc.error_msg);
@@ -146,10 +145,13 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
         return LV_RES_INV;
     }
 
+    lv_color_format_t cf = cdsc->dec_dsc.header.cf;
     lv_draw_img_sup_t sup;
     sup.palette = cdsc->dec_dsc.palette;
     sup.palette_size = cdsc->dec_dsc.palette_size;
     sup.alpha_color = cdsc->dec_dsc.color;
+    sup.chroma_key_color = lv_color_hex(0x00ff00);
+    sup.chroma_keyed = cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED ? 1 : 0;
 
     /*The decoder could open the image and gave the entire uncompressed image.
      *Just draw it!*/

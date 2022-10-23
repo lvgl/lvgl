@@ -148,7 +148,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
             lv_area_move(&transform_area, -coords->x1, -coords->y1);
             if(transform) {
                 lv_draw_transform(draw_ctx, &transform_area, src_buf, src_w, src_h, src_w,
-                                  draw_dsc, cf, rgb_buf, mask_buf);
+                                  draw_dsc, sup, cf, rgb_buf, mask_buf);
             }
             else {
                 convert_cb(&transform_area, src_buf, src_w, src_h, src_w, sup, cf, rgb_buf, mask_buf);
@@ -213,11 +213,14 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
     LV_UNUSED(src_w);
 
     const uint8_t * src_tmp8 = (const uint8_t *)src_buf;
+    lv_color_t * cbuf_ori = cbuf;
+    lv_opa_t * abuf_ori = abuf;
+
     lv_coord_t y;
     lv_coord_t x;
 
     /*Just get the colors from dest_area*/
-    if(cf == LV_COLOR_FORMAT_NATIVE) {
+    if(cf == LV_COLOR_FORMAT_NATIVE || cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED) {
         uint32_t px_cnt = lv_area_get_size(dest_area);
         lv_memset(abuf, 0xff, px_cnt);
 
@@ -349,7 +352,16 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
             abuf += dest_w;
             src_tmp8 += src_new_line_step_byte;
         }
+    }
 
+    bool chroma_keyed = sup->chroma_keyed;
+    lv_color_t chroma_key_color = sup->chroma_key_color;
+    if(chroma_keyed) {
+        uint32_t size = lv_area_get_size(dest_area);
+        uint32_t i;
+        for(i = 0; i < size; i++) {
+            if(lv_color_eq(cbuf_ori[i], chroma_key_color)) abuf_ori[i] = 0x00;
+        }
     }
 }
 

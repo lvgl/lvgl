@@ -56,6 +56,10 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
                       int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                       int32_t x_end, lv_color_t * cbuf, uint8_t * abuf);
 
+static void rgb_no_aa_chroma_key(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                                 int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                 int32_t x_end, lv_color_t * cbuf, uint8_t * abuf, lv_color_t chroma_key_color);
+
 #if LV_COLOR_DEPTH == 16
 static void rgb565a8_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                            int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -83,7 +87,8 @@ static void a8_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_co
 
 void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
                           lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                          const lv_draw_img_dsc_t * draw_dsc, lv_color_format_t cf, lv_color_t * cbuf, lv_opa_t * abuf)
+                          const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
+                          lv_opa_t * abuf)
 {
     LV_UNUSED(draw_ctx);
 
@@ -136,7 +141,13 @@ void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area,
                     argb_no_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf);
                     break;
                 case LV_COLOR_FORMAT_NATIVE:
-                    rgb_no_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf);
+                    if(sup->chroma_keyed) {
+                        rgb_no_aa_chroma_key(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf,
+                                             sup->chroma_key_color);
+                    }
+                    else {
+                        rgb_no_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf);
+                    }
                     break;
 
 #if LV_COLOR_DEPTH == 16
@@ -188,7 +199,52 @@ static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, l
             abuf[x] = 0x00;
         }
         else {
+#if LV_COLOR_DEPTH == 8
+            const uint8_t * src_tmp = src;
+            src_tmp += ys_int * src_stride + xs_int;
+            lv_color_set_int(&cbuf[x], src_tmp[0]);
+#elif LV_COLOR_DEPTH == 16
+            const lv_color_t * src_tmp = (const lv_color_t *)src;
+            src_tmp += ys_int * src_stride + xs_int;
+            cbuf[x] = *src_tmp;
+#elif LV_COLOR_DEPTH == 24
+            const lv_color_t * src_tmp = (const lv_color_t *)src;
+            src_tmp += ys_int * src_stride + xs_int;
+            cbuf[x].blue = src_tmp->blue ;
+            cbuf[x].green = src_tmp->green;
+            cbuf[x].red = src_tmp->red;
+#elif LV_COLOR_DEPTH == 32
+            const uint8_t * src_tmp = src;
+            src_tmp += (ys_int * src_stride * sizeof(lv_color_t)) + xs_int * sizeof(lv_color_t);
+            cbuf[x] = *((lv_color_t *)src_tmp);
+#endif
+        }
+    }
+}
 
+static void rgb_no_aa_chroma_key(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                                 int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                                 int32_t x_end, lv_color_t * cbuf, uint8_t * abuf, lv_color_t chroma_key_color)
+{
+    int32_t xs_ups_start = xs_ups;
+    int32_t ys_ups_start = ys_ups;
+
+    lv_memset(abuf, 0xff, x_end);
+
+    lv_coord_t x;
+    for(x = 0; x < x_end; x++) {
+        xs_ups = xs_ups_start + ((xs_step * x) >> 8);
+        ys_ups = ys_ups_start + ((ys_step * x) >> 8);
+
+        int32_t xs_int = xs_ups >> 8;
+        int32_t ys_int = ys_ups >> 8;
+        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+            abuf[x] = 0x00;
+        }
+        else if(lv_color_eq(cbuf[x], chroma_key_color)) {
+            abuf[x] = 0x00;
+        }
+        else {
 #if LV_COLOR_DEPTH == 8
             const uint8_t * src_tmp = src;
             src_tmp += ys_int * src_stride + xs_int;

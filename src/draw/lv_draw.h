@@ -116,7 +116,8 @@ typedef struct _lv_draw_ctx_t  {
      */
     void (*draw_transform)(struct _lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
                            lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                           const lv_draw_img_dsc_t * draw_dsc, lv_color_format_t cf, lv_color_t * cbuf, lv_opa_t * abuf);
+                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
+                           lv_opa_t * abuf);
 
     /**
      * Wait until all background operations are finished. (E.g. GPU operations)
