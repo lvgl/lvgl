@@ -88,7 +88,7 @@
 
 ## Ideas
 - Consider direct binary font format support
-- Improve groups. [Discussion](https://forum.lvgl.io/t/lv-group-tabindex/2927/3). Reconsider focusing logic. Allow having no widget selected (on web it's possible). Keep editing state in `lv_obj_t` (See [here](https://github.com/lvgl/lvgl/issues/3646))
+- Improve groups. [Discussion](https://forum.lvgl.io/t/lv-group-tabindex/2927/3). Reconsider focusing logic. Allow having no widget selected (on web it's possible). Keep editing state in `lv_obj_t` (See [here](https://github.com/lvgl/lvgl/issues/3646)). Support slider left knob focusing (see [here](https://github.com/lvgl/lvgl/issues/3246))
 - lv_mem_alloc_aligned(size, align)
 - Speed up font decompression
 - Support larger images: add support for large image #1892
