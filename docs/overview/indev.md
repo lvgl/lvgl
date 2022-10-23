@@ -18,8 +18,8 @@ Pointer input devices (like a mouse) can have a cursor.
 
 ```c
 ...
-lv_indev_t * mouse_indev = lv_indev_drv_register(&indev_drv);
-
+lv_indev_t * mouse_indev = lv_indev_create();
+...
 LV_IMG_DECLARE(mouse_cursor_icon);                          /*Declare the image source.*/
 lv_obj_t * cursor_obj = lv_img_create(lv_scr_act());       /*Create an image object for the cursor */
 lv_img_set_src(cursor_obj, &mouse_cursor_icon);             /*Set the image source*/
@@ -79,7 +79,7 @@ You need to associate an input device with a group. An input device can send key
 
 To create a group use `lv_group_t * g = lv_group_create()` and to add an object to the group use `lv_group_add_obj(g, obj)`.
 
-To associate a group with an input device use `lv_indev_set_group(indev, g)`, where `indev` is the return value of `lv_indev_drv_register()`
+To associate a group with an input device use `lv_indev_set_group(indev, g)`.
 
 #### Keys
 There are some predefined keys which have special meaning:

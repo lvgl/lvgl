@@ -27,12 +27,12 @@ E.g. `lv_disp_trig_activity(NULL)` will trigger a user activity on the default d
 
 ### Mirror display
 
-To mirror the image of a display to another display, you don't need to use multi-display support. Just transfer the buffer received in `drv.flush_cb` to the other display too.
+To mirror the image of a display to another display, you don't need to use multi-display support. Just transfer the buffer received in `flush_cb` to the other display too.
 
 ### Split image
 You can create a larger virtual display from an array of smaller ones. You can create it as below:
 1. Set the resolution of the displays to the large display's resolution.
-2. In `drv.flush_cb`, truncate and modify the `area` parameter for each display.
+2. In `flush_cb`, truncate and modify the `area` parameter for each display.
 3. Send the buffer's content to each real display with the truncated area.
 
 ## Screens
