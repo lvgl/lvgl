@@ -17,12 +17,12 @@ You can organize the message IDs as you wish.
 Both parties also need to know about the format of the payload. E.g. in the above example
 `MSG_DOOR_OPENED` and `MSG_DOOR_CLOSED` might have no payload but `MSG_USER_NAME_CHANGED` can have a `const char *` payload containing the user name, and `MSG_USER_AVATAR_CHANGED` a `const void *` image source with the new avatar image.
 
-To be more precise the message ID`s type is declared like this:
+To be more precise the message ID's type is declared like this:
 ```c
 typedef lv_uintptr_t lv_msg_id_t;
 ```
 
-This way, if you a value in stored in a global variable (e.g. the current temperature) then the address of that variable can be used as message ID too by simply casting it to `lv_msg_id_t`. It saves the creation of message IDs manually as the variable itself serves as message ID too.
+This way, if a value in stored in a global variable (e.g. the current temperature) then the address of that variable can be used as message ID too by simply casting it to `lv_msg_id_t`. It saves the creation of message IDs manually as the variable itself serves as message ID too.
 
 
 ## Subscribe to a message
@@ -100,7 +100,12 @@ lv_msg_send(MSG_USER_DOOR_OPENED, NULL);
 lv_msg_send(MSG_USER_NAME_CHANGED, "John Smith");
 ```
 
-To update a variable
+If have subscribed to a variable with `lv_msg_subscribe((lv_msg_id_t)&v, callback, NULL)` and changed the variable's value the subscribers can be notified like this:
+```c
+v = 10;
+lv_msg_update_value(&v); //Notify all the subscribers of `(lv_msg_id_t)&v`
+```
+It's handy way of creating API for the UI too. If the UI provides some global variables (e.g. `int current_tempereature;`) and anyone can read and write this variable. After writing they can notify all the elements who are interested in that value. E.g. an `lv_label` can subscribe to `(lv_msg_id_t)&current_tempereature` and update its text when it's notified about the new temperature.
 
 ## Example
 
