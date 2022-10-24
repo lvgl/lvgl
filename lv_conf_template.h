@@ -38,8 +38,8 @@
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
     #define LV_MEM_SIZE (128U * 1024U)          /*[bytes]*/
 
-    /*Size of the TLSF pool maximum size(must be greater than LV_MEM_SIZE)*/
-    #define LV_TLSF_MAX_POOL_SIZE (128U * 1024U) /*[bytes]*/
+    /*Size of the memory expand for `lv_malloc()` in bytes*/
+    #define LV_MEM_POOL_EXPAND_SIZE 0
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
