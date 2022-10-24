@@ -25,19 +25,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* gets the image description of this character */
-
-typedef struct {
-    const lv_font_t * font;
-    void * img_src;
-    uint16_t len;
-    uint32_t unicode;
-    uint32_t unicode_next;
-    int16_t offset_x;
-    int16_t offset_y;
-} lv_imgfont_param_t;
-
-typedef bool (*lv_imgfont_get_dsc_cb_t)(lv_imgfont_param_t * param, void * user_data);
+/* gets the image path name of this character */
+typedef bool (*lv_imgfont_get_path_cb_t)(const lv_font_t * font, void * img_src,
+                                         uint16_t len, uint32_t unicode, uint32_t unicode_next,
+                                         lv_coord_t * offset_y, void * user_data);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -46,10 +37,10 @@ typedef bool (*lv_imgfont_get_dsc_cb_t)(lv_imgfont_param_t * param, void * user_
 /**
  * Creates a image font with info parameter specified.
  * @param height font size
- * @param get_dsc_cb a function to get the image description of character.
+ * @param path_cb a function to get the image path name of character.
  * @return pointer to the new imgfont or NULL if create error.
  */
-lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_dsc_cb_t get_dsc_cb, void * user_data);
+lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb, void * user_data);
 
 /**
  * Destroy a image font that has been created.

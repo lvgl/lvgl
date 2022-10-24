@@ -5,18 +5,26 @@
 #if LV_USE_IMGFONT
 
 LV_IMG_DECLARE(emoji_F617)
-static bool get_imgfont_path(lv_imgfont_param_t * param,
-                             void * user_data)
+static bool get_imgfont_path(const lv_font_t * font, void * img_src,
+                             uint16_t len, uint32_t unicode, uint32_t unicode_next,
+                             lv_coord_t * offset_y, void * user_data)
 {
-    if(param->unicode == 0xF617) {
-        memcpy(param->img_src, &emoji_F617, sizeof(lv_img_dsc_t));
+    LV_UNUSED(font);
+    LV_UNUSED(unicode_next);
+    LV_UNUSED(offset_y);
+    LV_UNUSED(user_data);
+
+    LV_ASSERT_NULL(img_src);
+
+    if(unicode == 0xF617) {
+        memcpy(img_src, &emoji_F617, sizeof(lv_img_dsc_t));
     }
     else {
-        char * path = (char *)param->img_src;
+        char * path = (char *)img_src;
 #if LV_USE_FFMPEG
-        lv_snprintf(path, param->len, "%s/%04X.png", "lvgl/examples/assets/emoji", param->unicode);
+        lv_snprintf(path, len, "%s/%04X.png", "lvgl/examples/assets/emoji", unicode);
 #elif LV_USE_PNG
-        lv_snprintf(path, param->len, "%s/%04X.png", "A:lvgl/examples/assets/emoji", param->unicode);
+        lv_snprintf(path, len, "%s/%04X.png", "A:lvgl/examples/assets/emoji", unicode);
 #endif
     }
 
