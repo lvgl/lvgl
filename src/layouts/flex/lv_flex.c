@@ -241,7 +241,7 @@ static void flex_update(lv_obj_t * cont, void * user_data)
     lv_coord_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     lv_coord_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
 
-    /*Content sized objects should squeezed the gap between the children, therefore any alignment will look like `START`*/
+    /*Content sized objects should squeeze the gap between the children, therefore any alignment will look like `START`*/
     if((f.row && h_set == LV_SIZE_CONTENT && cont->h_layout == 0) ||
        (!f.row && w_set == LV_SIZE_CONTENT && cont->w_layout == 0)) {
         track_cross_place = LV_FLEX_ALIGN_START;
@@ -323,7 +323,7 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     lv_coord_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     lv_coord_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
 
-    /*Can't wrap if the size if auto (i.e. the size depends on the children)*/
+    /*Can't wrap if the size is auto (i.e. the size depends on the children)*/
     if(f->wrap && ((f->row && w_set == LV_SIZE_CONTENT) || (!f->row && h_set == LV_SIZE_CONTENT))) {
         f->wrap = false;
     }
