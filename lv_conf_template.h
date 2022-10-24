@@ -725,6 +725,25 @@
 #endif
 
 /*==================
+ * DEVICES
+ *==================*/
+
+/*Use SDL to open window on PC and handle mouse and keyboard*/
+#define LV_USE_SDL              0
+#if LV_USE_SDL
+    #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+#endif
+
+/*Driver for /dev/fb*/
+#define LV_USE_LINUX_FBDEV      0
+#if LV_USE_LINUX_FBDEV
+    #define LV_LINUX_FBDEV_BSD  0
+#endif
+
+/*Interface for TFT_eSPI*/
+#define LV_USE_TFT_ESPI         0
+
+/*==================
 * EXAMPLES
 *==================*/
 
@@ -764,20 +783,6 @@
     #define LV_DEMO_MUSIC_AUTO_PLAY 0
 #endif
 
-/*==================
- * DEVICES
- *==================*/
-#define LV_USE_SDL          0
-#if LV_USE_SDL
-    #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
-#endif
-
-#define LV_USE_LINUX_FBDEV      0
-#if LV_USE_LINUX_FBDEV
-    #define LV_LINUX_FBDEV_BSD   0
-#endif
-
-#define LV_USE_TFT_ESPI     0
 
 /*--END OF LV_CONF_H--*/
 

@@ -2401,6 +2401,55 @@
 #endif
 
 /*==================
+ * DEVICES
+ *==================*/
+
+/*Use SDL to open window on PC and handle mouse and keyboard*/
+#ifndef LV_USE_SDL
+    #ifdef CONFIG_LV_USE_SDL
+        #define LV_USE_SDL CONFIG_LV_USE_SDL
+    #else
+        #define LV_USE_SDL              0
+    #endif
+#endif
+#if LV_USE_SDL
+    #ifndef LV_SDL_INCLUDE_PATH
+        #ifdef CONFIG_LV_SDL_INCLUDE_PATH
+            #define LV_SDL_INCLUDE_PATH CONFIG_LV_SDL_INCLUDE_PATH
+        #else
+            #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+        #endif
+    #endif
+#endif
+
+/*Driver for /dev/fb*/
+#ifndef LV_USE_LINUX_FBDEV
+    #ifdef CONFIG_LV_USE_LINUX_FBDEV
+        #define LV_USE_LINUX_FBDEV CONFIG_LV_USE_LINUX_FBDEV
+    #else
+        #define LV_USE_LINUX_FBDEV      0
+    #endif
+#endif
+#if LV_USE_LINUX_FBDEV
+    #ifndef LV_LINUX_FBDEV_BSD
+        #ifdef CONFIG_LV_LINUX_FBDEV_BSD
+            #define LV_LINUX_FBDEV_BSD CONFIG_LV_LINUX_FBDEV_BSD
+        #else
+            #define LV_LINUX_FBDEV_BSD  0
+        #endif
+    #endif
+#endif
+
+/*Interface for TFT_eSPI*/
+#ifndef LV_USE_TFT_ESPI
+    #ifdef CONFIG_LV_USE_TFT_ESPI
+        #define LV_USE_TFT_ESPI CONFIG_LV_USE_TFT_ESPI
+    #else
+        #define LV_USE_TFT_ESPI         0
+    #endif
+#endif
+
+/*==================
 * EXAMPLES
 *==================*/
 
@@ -2522,50 +2571,6 @@
     #endif
 #endif
 
-/*==================
- * DEVICES
- *==================*/
-#ifndef LV_USE_SDL
-    #ifdef CONFIG_LV_USE_SDL
-        #define LV_USE_SDL CONFIG_LV_USE_SDL
-    #else
-        #define LV_USE_SDL          0
-    #endif
-#endif
-#if LV_USE_SDL
-    #ifndef LV_SDL_INCLUDE_PATH
-        #ifdef CONFIG_LV_SDL_INCLUDE_PATH
-            #define LV_SDL_INCLUDE_PATH CONFIG_LV_SDL_INCLUDE_PATH
-        #else
-            #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
-        #endif
-    #endif
-#endif
-
-#ifndef LV_USE_LINUX_FBDEV
-    #ifdef CONFIG_LV_USE_LINUX_FBDEV
-        #define LV_USE_LINUX_FBDEV CONFIG_LV_USE_LINUX_FBDEV
-    #else
-        #define LV_USE_LINUX_FBDEV      0
-    #endif
-#endif
-#if LV_USE_LINUX_FBDEV
-    #ifndef LV_LINUX_FBDEV_BSD
-        #ifdef CONFIG_LV_LINUX_FBDEV_BSD
-            #define LV_LINUX_FBDEV_BSD CONFIG_LV_LINUX_FBDEV_BSD
-        #else
-            #define LV_LINUX_FBDEV_BSD   0
-        #endif
-    #endif
-#endif
-
-#ifndef LV_USE_TFT_ESPI
-    #ifdef CONFIG_LV_USE_TFT_ESPI
-        #define LV_USE_TFT_ESPI CONFIG_LV_USE_TFT_ESPI
-    #else
-        #define LV_USE_TFT_ESPI     0
-    #endif
-#endif
 
 
 
