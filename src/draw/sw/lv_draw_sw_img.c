@@ -338,19 +338,13 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
         uint8_t px_size = lv_color_format_get_size(cf);
         src_tmp8 += (src_stride * dest_area->y1 * px_size) + dest_area->x1 * px_size;
 
-        lv_coord_t src_new_line_step_px = (src_stride - lv_area_get_width(dest_area));
-        lv_coord_t src_new_line_step_byte = src_new_line_step_px * px_size;
-
         lv_coord_t dest_h = lv_area_get_height(dest_area);
         lv_coord_t dest_w = lv_area_get_width(dest_area);
         for(y = 0; y < dest_h; y++) {
-            for(x = 0; x < dest_w; x++) {
-                lv_color_to_native(src_tmp8, cf, cbuf, abuf, sup->alpha_color);
-                src_tmp8 += px_size;
-            }
+            lv_color_to_native(src_tmp8, cf, cbuf, abuf, sup->alpha_color, dest_w);
             cbuf += dest_w;
             abuf += dest_w;
-            src_tmp8 += src_new_line_step_byte;
+            src_tmp8 += src_stride * px_size;
         }
     }
 

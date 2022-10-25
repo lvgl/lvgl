@@ -170,6 +170,8 @@ enum {
 #define LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE 4
 #endif
 
+#define LV_COLOR_FORMAT_NATIVE_ALPHA_OFS (LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -263,6 +265,7 @@ typedef enum {
     LV_COLOR_FORMAT_NATIVE_ALPHA = LV_COLOR_FORMAT_A8L8,
 #elif LV_COLOR_DEPTH == 16
     LV_COLOR_FORMAT_NATIVE =  LV_COLOR_FORMAT_RGB565,
+    LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED = LV_COLOR_FORMAT_RGB565_CHROMA_KEYED,
     LV_COLOR_FORMAT_NATIVE_ALPHA = LV_COLOR_FORMAT_ARGB8565,
 #elif LV_COLOR_DEPTH == 24
     LV_COLOR_FORMAT_NATIVE = LV_COLOR_FORMAT_RGB888,
@@ -281,23 +284,25 @@ typedef enum {
     LV_COLOR_FORMAT_RAW_ALPHA,
 } lv_color_format_t;
 
-void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
-                        lv_color_t alpha_color);
-void lv_color_from_native(lv_color_t color_in, lv_opa_t opa_in, uint8_t * buf_out, lv_color_format_t cf_out);
+void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t src_cf, lv_color_t * c_out, lv_opa_t * a_out,
+                        lv_color_t alpha_color, uint32_t px_cnt);
 
+void lv_color_from_native(const lv_color_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf, uint32_t px_cnt);
+void lv_color_from_native_alpha(const uint8_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf,
+                                uint32_t px_cnt);
 /**
  * Get the pixel size of a color format in bits
  * @param cf a color format (`LV_IMG_CF_...`)
  * @return the pixel size in bits
  */
-uint8_t lv_color_format_get_size(lv_color_format_t cf);
+uint8_t lv_color_format_get_size(lv_color_format_t src_cf);
 
 /**
  * Check if a color format has alpha channel or not
  * @param cf a color format (`LV_IMG_CF_...`)
  * @return true: has alpha channel; false: doesn't have alpha channel
  */
-bool lv_color_format_has_alpha(lv_color_format_t cf);
+bool lv_color_format_has_alpha(lv_color_format_t src_cf);
 
 typedef enum {
     LV_PALETTE_RED,
@@ -377,6 +382,35 @@ static inline uint32_t lv_color_to_int(lv_color_t c)
 {
     return LV_CONCAT3(lv_color, LV_COLOR_DEPTH, _to_int(c));
 }
+
+static inline lv_color8_t lv_color8_from_buf(const uint8_t * buf)
+{
+    return *((lv_color8_t *) buf);
+}
+
+static inline lv_color16_t lv_color16_from_buf(const uint8_t * buf)
+{
+    uint16_t tmp = buf[0] + (buf[1] << 8);
+    return *((lv_color16_t *)&tmp);
+}
+
+static inline lv_color24_t lv_color24_from_buf(const uint8_t * buf)
+{
+    lv_color24_t c;
+    lv_color24_set_int(&c, buf[0] + (buf[1] << 8) + (buf[2] << 16));
+    return c;
+}
+
+static inline lv_color32_t lv_color32_from_buf(const uint8_t * buf)
+{
+    return *((lv_color32_t *) buf);
+}
+
+static inline lv_color_t lv_color_from_buf(const uint8_t * buf)
+{
+    return LV_CONCAT3(lv_color, LV_COLOR_DEPTH, _from_buf(buf));
+}
+
 
 static inline bool lv_color_eq(lv_color_t c1, lv_color_t c2)
 {

@@ -156,18 +156,15 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
         bool has_alpha = lv_color_format_has_alpha(draw_ctx->color_format);
         uint8_t px_size_in = lv_color_format_get_size(has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
         uint8_t px_size_out = lv_color_format_get_size(draw_ctx->color_format);
-        uint8_t * buf_in = draw_ctx->buf;
-        uint8_t * buf_out = draw_ctx->buf;
 
-        uint32_t i;
-        for(i = 0; i < buf_size_px; i++) {
-            lv_color_t color;
-            if(has_alpha) lv_color_set_int(&color, buf_in[0] + (buf_in[1] << 8));
-            else color = *((lv_color_t *)buf_in);
-            lv_opa_t opa = has_alpha ? buf_in[2] : 0xFF;
-            lv_color_from_native(color, opa, buf_out, draw_ctx->color_format);
-            buf_in += px_size_in;
-            buf_out += px_size_out;
+        /*In-plpace conversation can happen only when converting to a smaller pixel size*/
+        if(px_size_in >= px_size_out) {
+            if(has_alpha) lv_color_from_native_alpha(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
+            else lv_color_from_native(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
+        }
+        else {
+            /*TODO What to to do when can't perform in-place conversion?*/
+            LV_LOG_WARN("Can't convert to the desired color format (%d)", draw_ctx->color_format);
         }
         return;
     }

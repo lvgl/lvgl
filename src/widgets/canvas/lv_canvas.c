@@ -98,7 +98,9 @@ void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t col
     else {
         uint8_t px_size = lv_color_format_get_size(canvas->dsc.header.cf);
         uint32_t px = canvas->dsc.header.w * y * px_size + x * px_size;
-        lv_color_from_native(color, opa, (uint8_t *)canvas->dsc.data + px, canvas->dsc.header.cf);
+        uint32_t native_color = lv_color_to_int(color);
+        native_color += opa << (LV_COLOR_FORMAT_NATIVE_ALPHA_OFS * 8);
+        lv_color_from_native_alpha((uint8_t *)&native_color, (uint8_t *)canvas->dsc.data + px, canvas->dsc.header.cf, 1);
     }
     lv_obj_invalidate(obj);
 }
@@ -125,7 +127,7 @@ void lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t * c
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     uint8_t px_size = lv_color_format_get_size(canvas->dsc.header.cf);
     uint32_t px = canvas->dsc.header.w * y * px_size + x * px_size;
-    lv_color_to_native((uint8_t *)canvas->dsc.data + px, canvas->dsc.header.cf, color, opa, alpha_color);
+    lv_color_to_native((uint8_t *)canvas->dsc.data + px, canvas->dsc.header.cf, color, opa, alpha_color, 1);
 }
 
 lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * obj)

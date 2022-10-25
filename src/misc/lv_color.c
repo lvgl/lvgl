@@ -177,7 +177,7 @@ static uint8_t bit_2_to_8[4] = {0, 85, 170, 255};
 static uint8_t bit_4_to_8[16] = {0,   17,  34,  51,  68,  85,  102, 119,
                                  136, 153, 170, 187, 204, 221, 238, 255
                                 };
-#if LV_COLOR_DEPTH == 24 || LV_COLOR_DEPTH == 32
+#if LV_COLOR_DEPTH != 16
 static uint8_t bit_6_to_8[64] = {0,   4,   8,   12,  16,  20,  24,  28,
                                  32,  36,  40,  45,  49,  53,  57,  61,
                                  65,  69,  73,  77,  81,  85,  89,  93,
@@ -195,208 +195,331 @@ static uint8_t bit_5_to_8[32] = {0,   8,   16,  25,  33,  41,  49,  58,
                                  197, 206, 214, 222, 230, 239, 247, 255
                                 };
 
+void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t src_cf, lv_color_t * c_out, lv_opa_t * a_out,
+                        lv_color_t alpha_color, uint32_t px_cnt)
+{
+    uint32_t i;
+    uint32_t tmp;
+    lv_color_t c;
+    switch(src_cf) {
+        case LV_COLOR_FORMAT_L8:
 #if LV_COLOR_DEPTH == 8
-void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
-                        lv_color_t alpha_color)
-{
-    uint32_t tmp;
-    lv_color_t ctmp;
-    switch(cf) {
-        case LV_COLOR_FORMAT_L8:
-            lv_color_set_int(c_out, *src_buf);
-            *a_out = 0xFF;
-            return;
-        case LV_COLOR_FORMAT_A8:
-            *c_out = alpha_color;
-            *a_out = *src_buf;
-            return;
-        case LV_COLOR_FORMAT_A8L8:
-            lv_color_set_int(c_out, src_buf[0]);
-            *a_out = src_buf[1];
-            return;
-        case LV_COLOR_FORMAT_ARGB2222:
-            ctmp = lv_color_make(bit_2_to_8[(*src_buf) & 0x30], bit_2_to_8[(*src_buf) & 0x0C], bit_2_to_8[(*src_buf) & 0x03]);
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
-            *a_out = bit_2_to_8[(*src_buf) & 0xC0];
-            return;
-        case LV_COLOR_FORMAT_RGB565:
-            *c_out = *((lv_color_t *)src_buf);
-            *a_out = 0xFF;
-            return;
-        case LV_COLOR_FORMAT_ARGB1555:
-            tmp = src_buf[0] + (src_buf[1] << 8);
-            ctmp = lv_color_make(bit_5_to_8[(tmp & 0x7C00) >> 10], bit_5_to_8[(tmp & 0x03E0) >> 5], bit_5_to_8[tmp & 0x001F]);
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
-            *a_out = tmp & 0x8000 ? 0xFF : 0x00;
-            return;
-        case LV_COLOR_FORMAT_ARGB4444:
-            tmp = src_buf[0] + (src_buf[1] << 8);
-            ctmp = lv_color_make(bit_4_to_8[(tmp & 0x0F00) >> 8], bit_4_to_8[(tmp & 0x00F0) >> 4], bit_4_to_8[tmp & 0x000F]);
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
-            *a_out = bit_4_to_8[(tmp & 0xF000) >> 12];
-            return;
-        case LV_COLOR_FORMAT_ARGB8565:
-            lv_color_set_int(&ctmp, src_buf[0] + (src_buf[1] << 8));
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
-            *a_out = src_buf[2];
-            return;
-        case LV_COLOR_FORMAT_XRGB8888:
-        case LV_COLOR_FORMAT_RGB888:
-            ctmp = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
-            *a_out = 0xFF;
-            return;
-        case LV_COLOR_FORMAT_ARGB8888:
-            *c_out = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, lv_color_brightness(ctmp));
-            *a_out = src_buf[3];
-            return;
-        case LV_COLOR_FORMAT_I8:
-        case LV_COLOR_FORMAT_RGB565A8:
-        default:
-            LV_LOG_WARN("Can't convert to %d format", cf);
-            *c_out = lv_color_hex(0x000000);
-            *a_out = 0xFF;
-            return;
-
-    }
-}
+            lv_memcpy(c_out, src_buf, px_cnt);
+            lv_memset(a_out, 0xff, px_cnt);
 #else
-void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t cf, lv_color_t * c_out, lv_opa_t * a_out,
-                        lv_color_t alpha_color)
-{
-    uint32_t tmp;
-    switch(cf) {
-        case LV_COLOR_FORMAT_L8:
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, *src_buf);
-            *a_out = 0xFF;
-            return;
+            lv_memset(a_out, 0xff, px_cnt);
+            c = lv_color_black();
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_mix(c, alpha_color, src_buf[i]);
+            }
+#endif
+            break;
         case LV_COLOR_FORMAT_A8:
-            *c_out = alpha_color;
-            *a_out = *src_buf;
-            return;
+            lv_color_fill(c_out, alpha_color, px_cnt);
+            lv_memcpy(a_out, src_buf, px_cnt);
+            break;
         case LV_COLOR_FORMAT_A8L8:
-            *c_out = lv_color_mix(lv_color_black(), alpha_color, src_buf[0]);
-            *a_out = src_buf[1];
-            return;
+            c = lv_color_black();
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_mix(c, alpha_color, src_buf[0]);
+                a_out[i] = src_buf[1];
+                src_buf += 2;
+            }
+            break;
         case LV_COLOR_FORMAT_ARGB2222:
-            *c_out = lv_color_make(bit_2_to_8[(*src_buf) & 0x30], bit_2_to_8[(*src_buf) & 0x0C], bit_2_to_8[(*src_buf) & 0x03]);
-            *a_out = bit_2_to_8[(*src_buf) & 0xC0];
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_make(bit_2_to_8[(src_buf[i]) & 0x30], bit_2_to_8[(src_buf[i]) & 0x0C],
+                                         bit_2_to_8[(src_buf[i]) & 0x03]);
+                a_out[i] = bit_2_to_8[(src_buf[i]) & 0xC0];
+            }
+            break;
         case LV_COLOR_FORMAT_RGB565:
 #if LV_COLOR_DEPTH == 16
-            lv_color_set_int(c_out, src_buf[0] + (src_buf[1] << 8));
+            lv_memcpy(c_out, src_buf, px_cnt * 2);
+            lv_memset(a_out, 0xff, px_cnt);
 #else
-            tmp = src_buf[0] + (src_buf[1] << 8);
-            *c_out = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+            for(i = 0; i < px_cnt; i++) {
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                *c_out = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+                src_buf += 2;
+            }
 #endif
-            *a_out = 0xFF;
-            return;
+            break;
         case LV_COLOR_FORMAT_ARGB1555:
-            tmp = src_buf[0] + (src_buf[1] << 8);
-            *c_out = lv_color_make(bit_5_to_8[(tmp & 0x7C00) >> 10], bit_5_to_8[(tmp & 0x03E0) >> 5], bit_5_to_8[tmp & 0x001F]);
-            *a_out = tmp & 0x8000 ? 0xFF : 0x00;
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                c_out[i] = lv_color_make(bit_5_to_8[(tmp & 0x7C00) >> 10], bit_5_to_8[(tmp & 0x03E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+                a_out[i] = tmp & 0x8000 ? 0xFF : 0x00;
+                src_buf += 2;
+            }
+            break;
         case LV_COLOR_FORMAT_ARGB4444:
-            tmp = src_buf[0] + (src_buf[1] << 8);
-            *c_out = lv_color_make(bit_4_to_8[(tmp & 0x0F00) >> 8], bit_4_to_8[(tmp & 0x00F0) >> 4], bit_4_to_8[tmp & 0x000F]);
-            *a_out = bit_4_to_8[(tmp & 0xF000) >> 12];
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                c_out[i] = lv_color_make(bit_4_to_8[(tmp & 0x0F00) >> 8], bit_4_to_8[(tmp & 0x00F0) >> 4], bit_4_to_8[tmp & 0x000F]);
+                a_out[i] = bit_4_to_8[(tmp & 0xF000) >> 12];
+                src_buf += 2;
+            }
+            break;
         case LV_COLOR_FORMAT_ARGB8565:
+            for(i = 0; i < px_cnt; i++) {
 #if LV_COLOR_DEPTH == 16
-            lv_color_set_int(c_out, src_buf[0] + (src_buf[1] << 8));
+                lv_color_set_int(&c_out[i], src_buf[0] + (src_buf[1] << 8));
 #else
-            tmp = src_buf[0] + (src_buf[1] << 8);
-            *c_out = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                c_out[i] = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
 #endif
-            *a_out = src_buf[2];
-            return;
+                a_out[i] = src_buf[2];
+                src_buf += 3;
+            }
+            break;
         case LV_COLOR_FORMAT_XRGB8888:
         case LV_COLOR_FORMAT_RGB888:
-            *c_out = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
-            *a_out = 0xFF;
-            return;
+            lv_memset(a_out, 0xFF, px_cnt);
+            tmp = LV_COLOR_FORMAT_RGB888 ? 3 : 4;
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+                src_buf += tmp;
+            }
+            break;
         case LV_COLOR_FORMAT_ARGB8888:
-            *c_out = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
-            *a_out = src_buf[3];
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+                a_out[i] = src_buf[3];
+                src_buf += 4;
+            }
+            break;
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565A8:
         default:
-            LV_LOG_WARN("Can't convert to %d format", cf);
-            *c_out = lv_color_hex(0x000000);
-            *a_out = 0xFF;
-            return;
-
+            LV_LOG_WARN("Can't convert to %d format", src_cf);
+            lv_color_fill(c_out, lv_color_hex(0x000000), px_cnt);
+            lv_memset(a_out, 0xFF, px_cnt);
+            break;
     }
 }
-#endif
 
 
-void lv_color_from_native(lv_color_t color_in, lv_opa_t opa_in, uint8_t * buf_out, lv_color_format_t cf_out)
+void lv_color_from_native(const lv_color_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf, uint32_t px_cnt)
 {
-    lv_color24_t c24;
-    lv_color16_t c16;
-    uint32_t tmp;
-    switch(cf_out) {
+    uint32_t i;
+    switch(dest_cf) {
         case LV_COLOR_FORMAT_L8:
-            *buf_out = lv_color_brightness(color_in);
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                dest_buf[i] = lv_color_brightness(src_buf[i]);
+            }
+            break;
         case LV_COLOR_FORMAT_A8:
-            *buf_out = opa_in;
-            return;
+            lv_memset(dest_buf, 0xff, px_cnt);
+            break;
         case LV_COLOR_FORMAT_A8L8:
-            buf_out[0] = lv_color_brightness(color_in);
-            buf_out[1] = opa_in;
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                dest_buf[0] = lv_color_brightness(src_buf[i]);
+                dest_buf[1] = 0xff;
+            }
+            break;
         case LV_COLOR_FORMAT_ARGB2222:
-            c16 = lv_color_to16(color_in);
-            buf_out[0] = (opa_in & 0xC0) + ((c16.red >> 3) << 4) + ((c16.green >> 4) << 2) + (c16.blue >> 3);
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                lv_color16_t c16 = lv_color_to16(src_buf[i]);
+                dest_buf[i] = 0xC0 + ((c16.red >> 3) << 4) + ((c16.green >> 4) << 2) + (c16.blue >> 3);
+            }
+            break;
         case LV_COLOR_FORMAT_ARGB4444:
-            c16 = lv_color_to16(color_in);
-            buf_out[0] = ((c16.green >> 2) << 4) + (c16.blue >> 1);
-            buf_out[1] = (opa_in & 0xF0) + (c16.red >> 1);
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                lv_color16_t c16 = lv_color_to16(src_buf[i]);
+                dest_buf[0] = ((c16.green >> 2) << 4) + (c16.blue >> 1);
+                dest_buf[1] = 0xF0 + (c16.red >> 1);
+                dest_buf += 2;
+            }
+            break;
         case LV_COLOR_FORMAT_RGB565:
-            *((lv_color_t *)buf_out) = color_in;
-            return;
+#if LV_COLOR_DEPTH == 16
+            lv_memcpy(dest_buf, src_buf, px_cnt * 2);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                *((lv_color16_t *)dest_buf) = lv_color_to16(src_buf[i]);
+                dest_buf += 2;
+            }
+#endif
+            break;
         case LV_COLOR_FORMAT_ARGB1555:
-            c16 = lv_color_to16(color_in);
-            buf_out[0] = (((c16.green >> 1) & 0x07) << 5) + c16.blue;
-            buf_out[1] = (opa_in & 0x80) + (c16.red << 2) + (c16.green >> 4);
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                lv_color16_t c16 = lv_color_to16(src_buf[i]);
+                dest_buf[0] = (((c16.green >> 1) & 0x07) << 5) + c16.blue;
+                dest_buf[1] = 0x80 + (c16.red << 2) + (c16.green >> 4);
+                dest_buf += 2;
+            }
+            break;
         case LV_COLOR_FORMAT_ARGB8565:
-            c16 = lv_color_to16(color_in);
-            tmp = *((uint16_t *)&c16);
-            buf_out[0] = tmp & 0xff;
-            buf_out[1] = tmp >> 8;
-            buf_out[2] = opa_in;
-            return;
+            for(i = 0; i < px_cnt; i++) {
+                uint16_t tmp = lv_color16_to_int(lv_color_to16(src_buf[i]));
+                dest_buf[0] = tmp & 0xff;
+                dest_buf[1] = tmp >> 8;
+                dest_buf[2] = 0xff;
+                dest_buf += 3;
+            }
+            break;
         case LV_COLOR_FORMAT_RGB888:
-            c24 = lv_color_to24(color_in);
-            buf_out[0] = c24.blue;
-            buf_out[1] = c24.green;
-            buf_out[2] = c24.red;
-            return;
+#if LV_COLOR_DEPTH == 24
+            lv_memcpy(dest_buf, src_buf, px_cnt * 3);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color24_t c24 = lv_color_to24(src_buf[i]);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf += 3;
+            }
+#endif
+            break;
         case LV_COLOR_FORMAT_XRGB8888:
-            c24 = lv_color_to24(color_in);
-            buf_out[0] = c24.blue;
-            buf_out[1] = c24.green;
-            buf_out[2] = c24.red;
-            buf_out[3] = 0xFF;
-            return;
         case LV_COLOR_FORMAT_ARGB8888:
-            c24 = lv_color_to24(color_in);
-            buf_out[0] = c24.blue;
-            buf_out[1] = c24.green;
-            buf_out[2] = c24.red;
-            buf_out[3] = opa_in;
-            return;
+#if LV_COLOR_DEPTH == 32
+            lv_memcpy(dest_buf, src_buf, px_cnt * 4);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color24_t c24 = lv_color_to24(src_buf[i]);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf[3] = 0xff;
+                dest_buf += 4;
+            }
+
+#endif
+            break;
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_RGB565A8:
         default:
-            LV_LOG_WARN("Can't convert from %d format", cf_out);
+            LV_LOG_WARN("Can't convert from %d format", dest_cf);
+            return;
+    }
+}
+
+void lv_color_from_native_alpha(const uint8_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf, uint32_t px_cnt)
+{
+    uint32_t i;
+    switch(dest_cf) {
+        case LV_COLOR_FORMAT_L8:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                dest_buf[0] = lv_color_brightness(color);
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_A8:
+            for(i = 0; i < px_cnt; i++) {
+                dest_buf[i] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_A8L8:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                dest_buf[0] = lv_color_brightness(color);
+                dest_buf[1] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB2222:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                lv_opa_t opa = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf[i] = (opa & 0xC0) + ((c16.red >> 3) << 4) + ((c16.green >> 4) << 2) + (c16.blue >> 3);
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB4444:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                lv_opa_t opa = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf[0] = ((c16.green >> 2) << 4) + (c16.blue >> 1);
+                dest_buf[1] = (opa & 0xF0) + (c16.red >> 1);
+                dest_buf += 2;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                *((uint16_t *) dest_buf) = lv_color16_to_int(c16);
+                dest_buf += 2;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB1555:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                lv_opa_t opa = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf[0] = (((c16.green >> 1) & 0x07) << 5) + c16.blue;
+                dest_buf[1] = (opa & 0x80) + (c16.red << 2) + (c16.green >> 4);
+                dest_buf += 2;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB8565:
+#if LV_COLOR_DEPTH == 16
+            lv_memcpy(dest_buf, src_buf, px_cnt * 3);
+
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                *((uint16_t *) dest_buf) = lv_color16_to_int(c16);
+                dest_buf[2] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];;
+                dest_buf += 3;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+#endif
+            break;
+        case LV_COLOR_FORMAT_RGB888:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color24_t c24 = lv_color_to24(color);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf += 3;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_XRGB8888:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color24_t c24 = lv_color_to24(color);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf[3] = 0xff;
+                dest_buf += 4;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+#if LV_COLOR_DEPTH == 24 || LV_COLOR_DEPTH == 32
+            lv_memcpy(dest_buf, src_buf, px_cnt * 4);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color24_t c24 = lv_color_to24(color);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf[3] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf += 4;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+#endif
+            break;
+
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_RGB565A8:
+        default:
+            LV_LOG_WARN("Can't convert from %d format", dest_cf);
             return;
     }
 }
