@@ -13,8 +13,9 @@ static bool get_imgfont_path(const lv_font_t * font, void * img_src,
     LV_UNUSED(unicode_next);
     LV_UNUSED(offset_y);
     LV_UNUSED(user_data);
-
     LV_ASSERT_NULL(img_src);
+
+    if(unicode < 0xF000) return false;
 
     if(unicode == 0xF617) {
         memcpy(img_src, &emoji_F617, sizeof(lv_img_dsc_t));
@@ -42,13 +43,11 @@ void lv_example_imgfont_1(void)
         return;
     }
 
-    static lv_font_t user_font;
-    user_font = *(LV_FONT_DEFAULT);
-    user_font.fallback = imgfont;
+    imgfont->fallback = LV_FONT_DEFAULT;
 
     lv_obj_t * label1 = lv_label_create(lv_scr_act());
     lv_label_set_text(label1, "12\uF600\uF617AB");
-    lv_obj_set_style_text_font(label1, &user_font, LV_PART_MAIN);
+    lv_obj_set_style_text_font(label1, imgfont, LV_PART_MAIN);
     lv_obj_center(label1);
 }
 #else
