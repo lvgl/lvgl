@@ -58,11 +58,16 @@ menu "LVGL configuration"
 
 	menu "Memory settings"
 		config LV_MEM_CUSTOM
-			bool "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc()` and `lv_mem_free()`"
+			bool "If true use custom malloc/free, otherwise use the built-in `lv_malloc()` and `lv_free()`"
 
 		config LV_MEM_SIZE_KILOBYTES
-			int "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
+			int "Size of the memory used by `lv_malloc()` in kilobytes (>= 2kB)"
 			default 32
+			depends on !LV_MEM_CUSTOM
+
+		config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
+			int "Size of the memory expand for `lv_malloc()` in kilobytes"
+			default 0
 			depends on !LV_MEM_CUSTOM
 
 		config LV_MEM_ADDR

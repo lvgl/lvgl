@@ -104,6 +104,15 @@
         #endif
     #endif
 
+    /*Size of the memory expand for `lv_malloc()` in bytes*/
+    #ifndef LV_MEM_POOL_EXPAND_SIZE
+        #ifdef CONFIG_LV_MEM_POOL_EXPAND_SIZE
+            #define LV_MEM_POOL_EXPAND_SIZE CONFIG_LV_MEM_POOL_EXPAND_SIZE
+        #else
+            #define LV_MEM_POOL_EXPAND_SIZE 0
+        #endif
+    #endif
+
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #ifndef LV_MEM_ADR
         #ifdef CONFIG_LV_MEM_ADR

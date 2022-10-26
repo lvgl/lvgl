@@ -24,6 +24,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef void * lv_mem_builtin_pool_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -37,6 +39,20 @@ void lv_mem_init_builtin(void);
  * Clean up the memory buffer which frees all the allocated memories.
  */
 void lv_mem_deinit_builtin(void);
+
+/**
+ * Add a new memory block to the builtin memory pool.
+ * @param mem pointer to a new block of memory
+ * @param bytes memory block size
+ * @return pointer to lv_mem_builtin_pool handle
+ */
+lv_mem_builtin_pool_t * lv_mem_builtin_add_pool(void * mem, size_t bytes);
+
+/**
+ * Remove the memory pool.
+ * @param lv_mem_builtin_pool_t pointer to lv_mem_builtin_pool handle
+ */
+void lv_mem_builtin_remove_pool(lv_mem_builtin_pool_t * pool);
 
 void * lv_malloc_builtin(size_t size);
 void * lv_realloc_builtin(void * p, size_t new_size);

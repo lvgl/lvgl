@@ -10,7 +10,7 @@
 #undef  printf
 #define printf LV_LOG_ERROR
 
-#define TLSF_MAX_POOL_SIZE LV_MEM_SIZE
+#define TLSF_MAX_POOL_SIZE (LV_MEM_SIZE + LV_MEM_POOL_EXPAND_SIZE)
 
 #if !defined(_DEBUG)
     #define _DEBUG 0
