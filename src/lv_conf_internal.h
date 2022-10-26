@@ -2536,6 +2536,15 @@
     #endif
 #endif
 
+/*Flex layout previewer demo*/
+#ifndef LV_USE_DEMO_LAYOUT_PREVIEWER
+    #ifdef CONFIG_LV_USE_DEMO_LAYOUT_PREVIEWER
+        #define LV_USE_DEMO_LAYOUT_PREVIEWER CONFIG_LV_USE_DEMO_LAYOUT_PREVIEWER
+    #else
+        #define LV_USE_DEMO_LAYOUT_PREVIEWER 0
+    #endif
+#endif
+
 
 
 /*----------------------------------

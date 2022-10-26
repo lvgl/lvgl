@@ -35,6 +35,10 @@ extern "C" {
 #include "widgets/lv_demo_widgets.h"
 #endif
 
+#if LV_USE_DEMO_LAYOUT_PREVIEWER
+#include "layout_previewer/lv_demo_layout_previewer.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

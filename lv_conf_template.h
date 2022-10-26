@@ -766,6 +766,9 @@
     #define LV_DEMO_MUSIC_AUTO_PLAY 0
 #endif
 
+/*Flex layout previewer demo*/
+#define LV_USE_DEMO_LAYOUT_PREVIEWER 0
+
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/
