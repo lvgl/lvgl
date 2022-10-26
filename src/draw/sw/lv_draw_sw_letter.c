@@ -480,8 +480,8 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
                 uint8_t bg_rgb[3] = {dest_buf_tmp->ch.red, dest_buf_tmp->ch.green, dest_buf_tmp->ch.blue};
 
 #if LV_DRAW_SW_FONT_SUBPX_BGR
-                res_color.ch.blue = (uint32_t)((uint32_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.red = (uint32_t)((uint32_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8;
 #else
                 res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
                 res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
