@@ -31,6 +31,7 @@ def get_imgfont_path(font, img_src, length, unicode, unicode_next, offset_y, use
 imgfont = lv.imgfont_create(80, get_imgfont_path, None)
 if imgfont == None:
     print("imgfont init error")
+    sys.exit(1)
 
 imgfont.fallback = LV_FONT_DEFAULT
 
