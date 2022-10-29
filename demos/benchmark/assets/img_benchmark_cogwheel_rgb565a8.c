@@ -1,5 +1,7 @@
 #include "../../../lvgl.h"
 
+#if LV_USE_DEMO_BENCHMARK
+
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
@@ -222,3 +224,5 @@ const lv_img_dsc_t img_benchmark_cogwheel_rgb565a8 = {
   .data_size = 30000,
   .data = img_benchmark_cogwheel_rgb565a8_map,
 };
+
+#endif
