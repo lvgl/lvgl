@@ -48,13 +48,13 @@ Besides `LV_CONF_PATH` there are few additional CMake options available.
 - `LV_LVGL_H_INCLUDE_SIMPLE`: which specifies whether to `#include "lvgl.h"` absolut or relative
 
     | ON (default) | OFF            |
-    | ------------ | -------------- |
+    |--------------|----------------|
     | "lvgl.h"     | "../../lvgl.h" |
 
 - `LV_CONF_INCLUDE_SIMPLE`: which specifies whether to `#include "lv_conf.h"` and `"lv_drv_conf.h"` absolut or relative
 
     | ON (default)    | OFF                   |
-    | --------------- | --------------------- |
+    |-----------------|-----------------------|
     | "lv_conf.h"     | "../../lv_conf.h"     |
     | "lv_drv_conf.h" | "../../lv_drv_conf.h" |
 
