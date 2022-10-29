@@ -33,6 +33,9 @@
 /*Original repository: https://github.com/mpaland/printf*/
 
 #include "lv_printf.h"
+
+#if LV_USE_BUILTIN_SNPRINTF
+
 #include <stdbool.h>
 
 #define PRINTF_DISABLE_SUPPORT_FLOAT    (!LV_SPRINTF_USE_FLOAT)
@@ -872,3 +875,5 @@ int lv_vsnprintf_builtin(char * buffer, size_t count, const char * format, va_li
 {
     return _vsnprintf(_out_buffer, buffer, count, format, va);
 }
+
+#endif /*LV_USE_BUILTIN_SNPRINTF*/
