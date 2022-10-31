@@ -489,6 +489,7 @@ static lv_res_t draw_nxp_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc
     if(dsc->border_side != (lv_border_side_t)LV_BORDER_SIDE_FULL)
         return LV_RES_INV;
 
+#if LV_USE_GPU_NXP_VG_LITE
     lv_area_t border_coords;
     lv_coord_t border_width = dsc->border_width;
 
@@ -498,7 +499,6 @@ static lv_res_t draw_nxp_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc
     border_coords.y1 = coords->y1 + border_width / 2;
     border_coords.y2 = coords->y2 - border_width / 2;
 
-#if LV_USE_GPU_NXP_VG_LITE
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(draw_ctx, dsc, &border_coords, true);
     if(res != LV_RES_OK)
         VG_LITE_LOG_TRACE("VG-Lite draw border failed. Fallback.");
@@ -517,6 +517,7 @@ static lv_res_t draw_nxp_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_ds
     if(dsc->outline_width == 0)
         return LV_RES_INV;
 
+#if LV_USE_GPU_NXP_VG_LITE
     /* Move outline outwards to align with software rendered outline */
     lv_coord_t outline_pad = dsc->outline_pad - 1 + dsc->outline_width / 2;
     lv_area_t outline_coords;
@@ -525,7 +526,6 @@ static lv_res_t draw_nxp_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_ds
     outline_coords.y1 = coords->y1 - outline_pad;
     outline_coords.y2 = coords->y2 + outline_pad;
 
-#if LV_USE_GPU_NXP_VG_LITE
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(draw_ctx, dsc, &outline_coords, false);
     if(res != LV_RES_OK)
         VG_LITE_LOG_TRACE("VG-Lite draw outline failed. Fallback.");
