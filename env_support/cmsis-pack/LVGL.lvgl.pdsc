@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-09-16" version="1.0.9" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.9.pack">
+    <release date="2022-10-31" version="1.0.10" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.10.pack">
+      - LVGL 9.0.0-dev
+      - Montyly update for October
+    </release>
+    <release date="2022-09-16" version="1.0.9" url="https://github.com/lvgl/lvgl/raw/df7d5859f4f4886cb0320f2af1898c350e0ecd2a/env_support/cmsis-pack/LVGL.lvgl.1.0.9.pack">
       - LVGL 9.0.0-dev
       - Montyly update for September
       - Introduce a new component: File Explorer
@@ -392,7 +396,7 @@
                 <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.2" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.3" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
