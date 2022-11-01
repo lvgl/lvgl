@@ -46,6 +46,7 @@
     #include "pxp/lv_draw_pxp_blend.h"
 #endif
 #if LV_USE_GPU_NXP_VG_LITE
+    #include <math.h>
     #include "vglite/lv_draw_vglite_blend.h"
     #include "vglite/lv_draw_vglite_line.h"
     #include "vglite/lv_draw_vglite_rect.h"
@@ -491,10 +492,10 @@ static lv_res_t draw_nxp_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc
     lv_coord_t border_width = dsc->border_width;
 
     /* Move border inwards to align with software rendered border */
-    border_coords.x1 = coords->x1 + border_width / 2;
-    border_coords.x2 = coords->x2 - border_width / 2;
-    border_coords.y1 = coords->y1 + border_width / 2;
-    border_coords.y2 = coords->y2 - border_width / 2;
+    border_coords.x1 = coords->x1 + ceil(border_width / 2.0f);
+    border_coords.x2 = coords->x2 - floor(border_width / 2.0f);
+    border_coords.y1 = coords->y1 + ceil(border_width / 2.0f);
+    border_coords.y2 = coords->y2 - floor(border_width / 2.0f);
 
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(draw_ctx, dsc, &border_coords, true);
     if(res != LV_RES_OK)
@@ -516,12 +517,12 @@ static lv_res_t draw_nxp_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_ds
 
 #if LV_USE_GPU_NXP_VG_LITE
     /* Move outline outwards to align with software rendered outline */
-    lv_coord_t outline_pad = dsc->outline_pad - 1 + dsc->outline_width / 2;
+    lv_coord_t outline_pad = dsc->outline_pad - 1;
     lv_area_t outline_coords;
-    outline_coords.x1 = coords->x1 - outline_pad;
-    outline_coords.x2 = coords->x2 + outline_pad;
-    outline_coords.y1 = coords->y1 - outline_pad;
-    outline_coords.y2 = coords->y2 + outline_pad;
+    outline_coords.x1 = coords->x1 - outline_pad - floor(dsc->outline_width / 2.0f);
+    outline_coords.x2 = coords->x2 + outline_pad + ceil(dsc->outline_width / 2.0f);
+    outline_coords.y1 = coords->y1 - outline_pad - floor(dsc->outline_width / 2.0f);
+    outline_coords.y2 = coords->y2 + outline_pad + ceil(dsc->outline_width / 2.0f);
 
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(draw_ctx, dsc, &outline_coords, false);
     if(res != LV_RES_OK)
