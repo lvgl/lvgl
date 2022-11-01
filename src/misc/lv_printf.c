@@ -547,7 +547,7 @@ static size_t _etoa(out_fct_type out, char * buffer, size_t idx, size_t maxlen, 
 #endif  // PRINTF_SUPPORT_FLOAT
 
 // internal vsnprintf
-static int _vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, const char * format, va_list va)
+static int _lv_vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, const char * format, va_list va)
 {
     unsigned int flags, width, precision, n;
     size_t idx = 0U;
@@ -754,7 +754,7 @@ static int _vsnprintf(out_fct_type out, char * buffer, const size_t maxlen, cons
                         va_list copy;
 
                         va_copy(copy, *vaf->va);
-                        idx += _vsnprintf(out, buffer + idx, maxlen - idx, vaf->fmt, copy);
+                        idx += _lv_vsnprintf(out, buffer + idx, maxlen - idx, vaf->fmt, copy);
                         va_end(copy);
                     }
                     else {
@@ -866,14 +866,14 @@ int lv_snprintf_builtin(char * buffer, size_t count, const char * format, ...)
 {
     va_list va;
     va_start(va, format);
-    const int ret = _vsnprintf(_out_buffer, buffer, count, format, va);
+    const int ret = _lv_vsnprintf(_out_buffer, buffer, count, format, va);
     va_end(va);
     return ret;
 }
 
 int lv_vsnprintf_builtin(char * buffer, size_t count, const char * format, va_list va)
 {
-    return _vsnprintf(_out_buffer, buffer, count, format, va);
+    return _lv_vsnprintf(_out_buffer, buffer, count, format, va);
 }
 
 #endif /*LV_USE_BUILTIN_SNPRINTF*/
