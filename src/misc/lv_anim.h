@@ -328,6 +328,26 @@ static inline uint32_t lv_anim_get_delay(lv_anim_t * a)
 uint32_t lv_anim_get_playtime(lv_anim_t * a);
 
 /**
+ * Get the duration of an animation
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @return the duration of the animation in milliseconds
+ */
+static inline uint32_t lv_anim_get_time(lv_anim_t * a)
+{
+    return a->time;
+}
+
+/**
+ * Get the repeat count of the animation.
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @return the repeat count or `LV_ANIM_REPEAT_INFINITE` for infinite repetition. 0: disabled repetition.
+ */
+static inline uint16_t lv_anim_get_repeat_count(lv_anim_t * a)
+{
+    return a->repeat_cnt;
+}
+
+/**
  * Get the user_data field of the animation
  * @param   a pointer to an initialized `lv_anim_t` variable
  * @return  the pointer to the custom user_data of the animation
