@@ -137,7 +137,7 @@ Such pointers need to be defined in a special way to make them reachable by GC
 
 ### Identify The Problem
 
-Problem happens when either **global**, **static global**  or **static local** pointer variable is allocated **dynamically** (with `lv_malloc`)
+Problem happens when an allocated memory's pointer  (return value of `lv_malloc`) is stored only in either **global**, **static global**  or **static local** pointer variable and not as part of a previously allocated `struct` or other variable.  
 
 ### Solve The Problem
 
