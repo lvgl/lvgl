@@ -74,6 +74,9 @@ void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size)
     }
 
     lv_canvas_set_buffer(obj, buf, size, size, LV_IMG_CF_INDEXED_1BIT);
+
+    /*Clear canvas buffer*/
+    lv_canvas_fill_bg(obj, lv_color_white(), LV_OPA_COVER);
 }
 
 void lv_qrcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
