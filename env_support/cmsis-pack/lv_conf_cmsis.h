@@ -31,6 +31,9 @@
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
     #define LV_MEM_SIZE (128U * 1024U)          /*[bytes]*/
 
+    /*Size of the memory expand for `lv_malloc()` in bytes*/
+    #define LV_MEM_POOL_EXPAND_SIZE 0
+
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
     /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
@@ -50,6 +53,8 @@
 #endif  /*LV_USE_BUILTIN_SNPRINTF*/
 
 #define LV_STDLIB_INCLUDE <stdint.h>
+//#define LV_STDIO_INCLUDE  <stdio.h>
+//#define LV_STRING_INCLUDE <string.h>
 #define LV_MALLOC       lv_malloc_builtin
 #define LV_REALLOC      lv_realloc_builtin
 #define LV_FREE         lv_free_builtin
