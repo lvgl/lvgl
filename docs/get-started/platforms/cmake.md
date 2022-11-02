@@ -31,7 +31,7 @@ set(LV_CONF_PATH
     CACHE STRING "" FORCE)
 
 # Fetch LVGL from GitHub
-FetchContent_Declare(lvgl URL https://github.com/lvgl/lvgl.git)
+FetchContent_Declare(lvgl GIT_REPOSITORY https://github.com/lvgl/lvgl.git)
 FetchContent_MakeAvailable(lvgl)
 
 # The target "MyFirmware" depends on LVGL
