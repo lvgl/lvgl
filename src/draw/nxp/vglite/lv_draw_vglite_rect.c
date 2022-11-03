@@ -35,6 +35,7 @@
 
 #if LV_USE_GPU_NXP_VG_LITE
 
+#include <math.h>
 /*********************
  *      DEFINES
  *********************/
@@ -70,7 +71,7 @@
  * @param[in] coords The coordinates of the rectangle to be drawn
  */
 static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
-                                            const lv_draw_rect_dsc_t * dsc,
+                                            lv_coord_t radius,
                                             const lv_area_t * coords);
 /**********************
  *  STATIC VARIABLES
@@ -96,6 +97,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     vg_lite_linear_gradient_t gradient;
     vg_lite_matrix_t * grad_matrix;
     vg_lite_color_t vgcol;
+    lv_coord_t radius = dsc->radius;
 
     if(dsc->radius < 0)
         return LV_RES_INV;
@@ -117,7 +119,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     /*** Init path ***/
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
     uint32_t path_data_size;
-    lv_vglite_create_rect_path_data(path_data, &path_data_size, dsc, &rel_coords);
+    lv_vglite_create_rect_path_data(path_data, &path_data_size, radius, &rel_coords);
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_LOW;
 
     vg_lite_path_t path;
@@ -211,12 +213,18 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
     if(radius < 0)
         return LV_RES_INV;
 
-    if(radius > 0 && radius < (lv_coord_t)LV_RADIUS_CIRCLE) {
-        if(border)
-            radius = (radius > dsc->border_width / 2) ? radius - dsc->border_width / 2 : 0;
-        else
-            radius = (radius < (lv_coord_t)LV_RADIUS_CIRCLE - dsc->outline_width / 2) ?
-                     radius + dsc->outline_width / 2 : LV_RADIUS_CIRCLE;
+    if(border) {
+        /* Draw border - only has radius if object has radius*/
+        float border_half = floor(dsc->border_width / 2.0f);
+        if(radius > border_half)
+            radius = radius - border_half;
+    }
+    else {
+        /* Draw outline - always has radius */
+        radius = radius + ceil(dsc->outline_width / 2.0f);
+
+        if(radius > (lv_coord_t)LV_RADIUS_CIRCLE)
+            radius = (lv_coord_t)LV_RADIUS_CIRCLE;
     }
 
     vg_lite_cap_style_t cap_style = (radius) ? VG_LITE_CAP_ROUND : VG_LITE_CAP_BUTT;
@@ -243,7 +251,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
     /*** Init path ***/
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
     uint32_t path_data_size;
-    lv_vglite_create_rect_path_data(path_data, &path_data_size, dsc, &rel_coords);
+    lv_vglite_create_rect_path_data(path_data, &path_data_size, radius, &rel_coords);
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_LOW;
 
     vg_lite_path_t path;
@@ -297,62 +305,58 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
 }
 
 static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
-                                            const lv_draw_rect_dsc_t * dsc,
+                                            lv_coord_t radius,
                                             const lv_area_t * coords)
 {
     lv_coord_t rect_width = lv_area_get_width(coords);
     lv_coord_t rect_height = lv_area_get_height(coords);
 
-    /* Get the real radius. Can't be larger than the half of the shortest side */
+    /* Get the final radius. Can't be larger than the half of the shortest side */
     int32_t shortest_side = LV_MIN(rect_width, rect_height);
-    int32_t received_radius = dsc->radius;
-    int32_t actual_radius = LV_MIN(received_radius, shortest_side / 2);
+    int32_t final_radius = LV_MIN(radius, shortest_side / 2);
 
-    /* Extend draw area by 1 for vglite */
-    lv_area_t actual_coords = *coords;
-    actual_coords.x2 += 1;
-    actual_coords.y2 += 1;
-
-    if((received_radius == (lv_coord_t)LV_RADIUS_CIRCLE) && (rect_width == rect_height)) {
-        float cpoff_fp = ((float)actual_radius * BEZIER_OPTIM_CIRCLE);
+    if((radius == (lv_coord_t)LV_RADIUS_CIRCLE) && (rect_width == rect_height)) {
+        float cpoff_fp = ((float)final_radius * BEZIER_OPTIM_CIRCLE);
         int32_t cpoff = (int32_t)cpoff_fp; /* Control point offset */
         int32_t circle_path_data[] = { /* Path data for circle */
-            VLC_OP_MOVE, actual_coords.x1 + actual_radius,  actual_coords.y1, /* Starting point */
-            VLC_OP_CUBIC_REL, cpoff, 0, actual_radius, actual_radius - cpoff, actual_radius, actual_radius, /* Top-right arc */
-            VLC_OP_CUBIC_REL, 0, cpoff, cpoff - actual_radius, actual_radius, 0 - actual_radius, actual_radius, /* Bottom-right arc*/
-            VLC_OP_CUBIC_REL, 0 - cpoff, 0, 0 - actual_radius, cpoff - actual_radius, 0 - actual_radius, 0 - actual_radius, /* Bottom-left arc */
-            VLC_OP_CUBIC_REL, 0, 0 - cpoff, actual_radius - cpoff, 0 - actual_radius, actual_radius, 0 - actual_radius, /* Top-left arc*/
+            VLC_OP_MOVE, coords->x1 + final_radius,  coords->y1, /* Starting point */
+            VLC_OP_CUBIC_REL, cpoff, 0, final_radius, final_radius - cpoff, final_radius, final_radius, /* Top-right arc */
+            VLC_OP_CUBIC_REL, 0, cpoff, cpoff - final_radius, final_radius, 0 - final_radius, final_radius, /* Bottom-right arc*/
+            VLC_OP_CUBIC_REL, 0 - cpoff, 0, 0 - final_radius, cpoff - final_radius, 0 - final_radius, 0 - final_radius, /* Bottom-left arc */
+            VLC_OP_CUBIC_REL, 0, 0 - cpoff, final_radius - cpoff, 0 - final_radius, final_radius, 0 - final_radius, /* Top-left arc*/
             VLC_OP_END
         };
 
         *path_data_size = sizeof(circle_path_data);
         memcpy(path_data, circle_path_data, *path_data_size);
     }
-    else if(received_radius > 0) {
-        float cpoff_fp = ((float)actual_radius * BEZIER_OPTIM_CIRCLE);
+    else if(radius > 0) {
+        float cpoff_fp = ((float)final_radius * BEZIER_OPTIM_CIRCLE);
         int32_t cpoff = (int32_t)cpoff_fp; /* Control point offset */
+        /* Draw is extended by 1 for vglite */
         int32_t rounded_path_data[] = { /* Path data for rounded rectangle */
-            VLC_OP_MOVE, actual_coords.x1 + actual_radius,  actual_coords.y1, /* Starting point */
-            VLC_OP_LINE, actual_coords.x2 - actual_radius,  actual_coords.y1, /* Top side */
-            VLC_OP_CUBIC_REL, cpoff, 0, actual_radius, actual_radius - cpoff, actual_radius, actual_radius, /* Top-right corner */
-            VLC_OP_LINE, actual_coords.x2,  actual_coords.y2 - actual_radius, /* Right side */
-            VLC_OP_CUBIC_REL, 0, cpoff, cpoff - actual_radius, actual_radius, 0 - actual_radius, actual_radius, /* Bottom-right corner*/
-            VLC_OP_LINE, actual_coords.x1 + actual_radius,  actual_coords.y2, /* Bottom side */
-            VLC_OP_CUBIC_REL, 0 - cpoff, 0, 0 - actual_radius, cpoff - actual_radius, 0 - actual_radius, 0 - actual_radius, /* Bottom-left corner */
-            VLC_OP_LINE, actual_coords.x1,  actual_coords.y1 + actual_radius, /* Left side*/
-            VLC_OP_CUBIC_REL, 0, 0 - cpoff, actual_radius - cpoff, 0 - actual_radius, actual_radius, 0 - actual_radius, /* Top-left corner */
+            VLC_OP_MOVE, coords->x1 + final_radius,  coords->y1, /* Starting point */
+            VLC_OP_LINE, coords->x2 + 1 - final_radius,  coords->y1, /* Top side */
+            VLC_OP_CUBIC_REL, cpoff, 0, final_radius, final_radius - cpoff, final_radius, final_radius, /* Top-right corner */
+            VLC_OP_LINE, coords->x2 + 1,  coords->y2 + 1 - final_radius, /* Right side */
+            VLC_OP_CUBIC_REL, 0, cpoff, cpoff - final_radius, final_radius, 0 - final_radius, final_radius, /* Bottom-right corner*/
+            VLC_OP_LINE, coords->x1 + final_radius,  coords->y2 + 1, /* Bottom side */
+            VLC_OP_CUBIC_REL, 0 - cpoff, 0, 0 - final_radius, cpoff - final_radius, 0 - final_radius, 0 - final_radius, /* Bottom-left corner */
+            VLC_OP_LINE, coords->x1,  coords->y1 + final_radius, /* Left side*/
+            VLC_OP_CUBIC_REL, 0, 0 - cpoff, final_radius - cpoff, 0 - final_radius, final_radius, 0 - final_radius, /* Top-left corner */
             VLC_OP_END
         };
         *path_data_size = sizeof(rounded_path_data);
         memcpy(path_data, rounded_path_data, *path_data_size);
     }
     else {
+        /* Draw is extended by 1 for vglite */
         int32_t rect_path_data[] = { /* Path data for simple rectangle */
-            VLC_OP_MOVE, actual_coords.x1,  actual_coords.y1, /* Starting point */
-            VLC_OP_LINE, actual_coords.x2,  actual_coords.y1, /* Top side */
-            VLC_OP_LINE, actual_coords.x2,  actual_coords.y2, /* Right side */
-            VLC_OP_LINE, actual_coords.x1,  actual_coords.y2, /* Bottom side */
-            VLC_OP_LINE, actual_coords.x1,  actual_coords.y1, /* Left side*/
+            VLC_OP_MOVE, coords->x1,  coords->y1, /* Starting point */
+            VLC_OP_LINE, coords->x2 + 1,  coords->y1, /* Top side */
+            VLC_OP_LINE, coords->x2 + 1,  coords->y2 + 1, /* Right side */
+            VLC_OP_LINE, coords->x1,  coords->y2 + 1, /* Bottom side */
+            VLC_OP_LINE, coords->x1,  coords->y1, /* Left side*/
             VLC_OP_END
         };
         *path_data_size = sizeof(rect_path_data);
