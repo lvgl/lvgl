@@ -349,8 +349,7 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                 t->grow_item_cnt++;
                 t->track_fix_main_size += item_gap;
                 if(t->grow_dsc_calc) {
-                    grow_dsc_t * new_dsc = t->grow_dsc ? lv_realloc(t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt))
-                                           : lv_malloc(sizeof(grow_dsc_t) * (t->grow_item_cnt));
+                    grow_dsc_t * new_dsc = lv_realloc(t->grow_dsc, sizeof(grow_dsc_t) * (t->grow_item_cnt));
                     LV_ASSERT_MALLOC(new_dsc);
                     if(new_dsc == NULL) return item_id;
 
