@@ -139,6 +139,30 @@ static inline lv_coord_t lv_obj_get_style_pad_column(const struct _lv_obj_t * ob
     return (lv_coord_t)v.num;
 }
 
+static inline lv_coord_t lv_obj_get_style_margin_top(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_TOP);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_margin_bottom(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_BOTTOM);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_margin_left(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_LEFT);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_margin_right(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_MARGIN_RIGHT);
+    return (lv_coord_t)v.num;
+}
+
 static inline lv_color_t lv_obj_get_style_bg_color(const struct _lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_COLOR);
@@ -588,6 +612,10 @@ void lv_obj_set_style_pad_left(struct _lv_obj_t * obj, lv_coord_t value, lv_styl
 void lv_obj_set_style_pad_right(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_pad_row(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_pad_column(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_margin_top(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_margin_bottom(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_margin_left(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_margin_right(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_bg_color(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
 void lv_obj_set_style_bg_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_bg_grad_color(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector);
