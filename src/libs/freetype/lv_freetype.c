@@ -28,6 +28,10 @@
     LV_LOG_ERROR(msg " error(%d)", (int)error_code)
 #endif
 
+#if LV_FREETYPE_CACHE_SIZE <= 0
+    #error "LV_FREETYPE_CACHE_SIZE must > 0"
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
