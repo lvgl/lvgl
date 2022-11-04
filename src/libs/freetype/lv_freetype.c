@@ -64,10 +64,10 @@ static FT_Error freetpye_face_requester(FTC_FaceID face_id,
                                         FT_Library library,
                                         FT_Pointer req_data,
                                         FT_Face * aface);
-static bool freetype_get_bold_glyph(const lv_font_t * font,
-                                    FT_Face face,
-                                    FT_UInt glyph_index,
-                                    lv_font_glyph_dsc_t * dsc_out);
+static FT_Error freetype_get_bold_glyph(const lv_font_t * font,
+                                        FT_Face face,
+                                        FT_UInt glyph_index,
+                                        lv_font_glyph_dsc_t * dsc_out);
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
                                       lv_font_glyph_dsc_t * dsc_out,
                                       uint32_t unicode_letter,
@@ -159,13 +159,21 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t weight, lv_f
     size_t need_size = sizeof(lv_freetype_font_dsc_t) + sizeof(lv_font_t);
     lv_freetype_font_dsc_t * dsc = lv_malloc(need_size);
     LV_ASSERT_MALLOC(dsc);
-    if(dsc == NULL) return false;
+    if(!dsc) {
+        LV_LOG_ERROR("malloc failed for lv_freetype_font_dsc");
+        return NULL;
+    }
     lv_memzero(dsc, need_size);
 
     dsc->font = (lv_font_t *)(((uint8_t *)dsc) + sizeof(lv_freetype_font_dsc_t));
 
     dsc->pathname = lv_malloc(pathname_len + 1);
-    LV_ASSERT_NULL(dsc->pathname);
+    LV_ASSERT_MALLOC(dsc->pathname);
+    if(!dsc->pathname) {
+        LV_LOG_ERROR("malloc failed for dsc->pathname");
+        lv_free(dsc);
+        return NULL;
+    }
     strcpy(dsc->pathname, pathname);
 
     dsc->weight = weight;
@@ -236,16 +244,16 @@ static FT_Error freetpye_face_requester(FTC_FaceID face_id,
     return error;
 }
 
-static bool freetype_get_bold_glyph(const lv_font_t * font,
-                                    FT_Face face,
-                                    FT_UInt glyph_index,
-                                    lv_font_glyph_dsc_t * dsc_out)
+static FT_Error freetype_get_bold_glyph(const lv_font_t * font,
+                                        FT_Face face,
+                                        FT_UInt glyph_index,
+                                        lv_font_glyph_dsc_t * dsc_out)
 {
     FT_Error error;
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
     if(error) {
         FT_ERROR_MSG("FT_Load_Glyph", error);
-        return false;
+        return error;
     }
 
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);
@@ -262,7 +270,7 @@ static bool freetype_get_bold_glyph(const lv_font_t * font,
     error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
     if(error) {
         FT_ERROR_MSG("FT_Render_Glyph", error);
-        return false;
+        return error;
     }
 
     dsc_out->adv_w = (face->glyph->metrics.horiAdvance >> 6);
@@ -273,7 +281,7 @@ static bool freetype_get_bold_glyph(const lv_font_t * font,
                      face->glyph->bitmap.rows;         /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;                                  /*Bit per pixel: 1/2/4/8*/
 
-    return true;
+    return FT_Err_Ok;
 }
 
 static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
@@ -296,12 +304,15 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
 
     FTC_FaceID face_id = (FTC_FaceID)dsc;
     FT_Size face_size;
+    FT_Error error;
     struct FTC_ScalerRec_ scaler;
     scaler.face_id = face_id;
     scaler.width = dsc->weight;
     scaler.height = dsc->weight;
     scaler.pixel = 1;
-    if(FTC_Manager_LookupSize(ft_ctx.cache_manager, &scaler, &face_size) != 0) {
+    error = FTC_Manager_LookupSize(ft_ctx.cache_manager, &scaler, &face_size);
+    if(error) {
+        FT_ERROR_MSG("FTC_Manager_LookupSize", error);
         return false;
     }
 
@@ -321,7 +332,8 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
 
     if(dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) {
         ft_ctx.current_face = face;
-        if(!freetype_get_bold_glyph(font, face, glyph_index, dsc_out)) {
+        error = freetype_get_bold_glyph(font, face, glyph_index, dsc_out);
+        if(error) {
             ft_ctx.current_face = NULL;
             return false;
         }
@@ -335,11 +347,11 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
     desc_type.width = dsc->weight;
 
 #if LV_FREETYPE_SBIT_CACHE
-    FT_Error error = FTC_SBitCache_Lookup(ft_ctx.sbit_cache,
-                                          &desc_type,
-                                          glyph_index,
-                                          &ft_ctx.sbit,
-                                          NULL);
+    error = FTC_SBitCache_Lookup(ft_ctx.sbit_cache,
+                                 &desc_type,
+                                 glyph_index,
+                                 &ft_ctx.sbit,
+                                 NULL);
     if(error) {
         FT_ERROR_MSG("FTC_SBitCache_Lookup", error);
         return false;
@@ -353,7 +365,11 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
     dsc_out->ofs_y = sbit->top - sbit->height; /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp = 8;               /*Bit per pixel: 1/2/4/8*/
 #else
-    FT_Error error = FTC_ImageCache_Lookup(ft_ctx.image_cache, &desc_type, glyph_index, &ft_ctx.image_glyph, NULL);
+    error = FTC_ImageCache_Lookup(ft_ctx.image_cache,
+                                  &desc_type,
+                                  glyph_index,
+                                  &ft_ctx.image_glyph,
+                                  NULL);
     if(error) {
         FT_ERROR_MSG("ImageCache_Lookup", error);
         return false;
