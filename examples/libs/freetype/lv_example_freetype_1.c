@@ -8,20 +8,19 @@
 void lv_example_freetype_1(void)
 {
     /*Create a font*/
-    static lv_ft_info_t info;
-    /*FreeType uses C standard file system, so no driver letter is required.*/
-    info.name = "./lvgl/examples/libs/freetype/Lato-Regular.ttf";
-    info.weight = 24;
-    info.style = FT_FONT_STYLE_NORMAL;
-    info.mem = NULL;
-    if(!lv_ft_font_init(&info)) {
+    lv_font_t * font = lv_freetype_font_create("/lvgl/examples/libs/freetype/Lato-Regular.ttf",
+                                               24,
+                                               LV_FREETYPE_FONT_STYLE_NORMAL);
+
+    if(!font) {
         LV_LOG_ERROR("create failed.");
+        return;
     }
 
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_style_set_text_font(&style, info.font);
+    lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
     /*Create a label with the new style*/
