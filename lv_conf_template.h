@@ -636,7 +636,7 @@
 /*FreeType library*/
 #define LV_USE_FREETYPE 0
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
+    /*Memory used by FreeType to cache characters [bytes]*/
     #define LV_FREETYPE_CACHE_SIZE (64 * 1024)
 
     /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */

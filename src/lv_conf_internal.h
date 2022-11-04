@@ -2162,7 +2162,7 @@
     #endif
 #endif
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
+    /*Memory used by FreeType to cache characters [bytes]*/
     #ifndef LV_FREETYPE_CACHE_SIZE
         #ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
             #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
