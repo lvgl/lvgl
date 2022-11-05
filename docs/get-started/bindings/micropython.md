@@ -99,12 +99,12 @@ lv_micropython already contains these drivers:
 - At Micropython: [docs](http://docs.micropython.org/en/latest/) and [forum](https://forum.micropython.org/)
 - [Blog Post](https://blog.lvgl.io/2019-02-20/micropython-bindings), a little outdated.
 
-# The Micropython Binding is auto generated!
+## The Micropython Binding is auto generated!
 
 LVGL is a git submodule inside [lv_micropython](https://github.com/lvgl/lv_micropython)  (LVGL is a git submodule of [lv_binding_micropython](https://github.com/lvgl/lv_binding_micropython) which is itself a submodule of [lv_micropython](https://github.com/lvgl/lv_micropython)).  
 When building lv_micropython, the public LVGL C API is scanned and Micropython API is auto-generated. That means that lv_micropython provides LVGL API for **any** LVGL version, and generally does not require code changes as LVGL evolves.
 
-## LVGL C API Coding Conventions
+### LVGL C API Coding Conventions
 
 To support the auto-generation of the Python API, the LVGL C API must follow some coding conventions:
 
@@ -124,7 +124,7 @@ To support the auto-generation of the Python API, the LVGL C API must follow som
 
 Most of these rules are simple and straightforward but there are two related concepts that worth a deeper look: **Memory Management** and **Callbacks**.
 
-## Memory Management
+### Memory Management
 
 When LVGL runs in Micropython, all dynamic memory allocations (`lv_malloc`) are handled by Micropython's memory manager which is [garbage-collected](https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)) (GC).  
 To prevent GC from collecting memory prematurely, all dynamic allocated RAM must be reachable by GC.  
@@ -135,26 +135,26 @@ GC is aware of most allocations, except from pointers on the [Data Segment](http
 
 Such pointers need to be defined in a special way to make them reachable by GC
 
-### Identify The Problem
+#### Identify The Problem
 
 Problem happens when an allocated memory's pointer  (return value of `lv_malloc`) is stored only in either **global**, **static global**  or **static local** pointer variable and not as part of a previously allocated `struct` or other variable.  
 
-### Solve The Problem
+#### Solve The Problem
 
 - Replace the global/static local var with `LV_GC_ROOT(_var)`
 - Include `lv_gc.h` on files that use `LV_GC_ROOT`
 - Add `_var` to `LV_ITERATE_ROOTS` on `lv_gc.h`
 
-### Example
+#### Example
 
 https://github.com/lvgl/lvgl/commit/adced46eccfa0437f84aa51aedca4895cc3c679c
 
-### More Information
+#### More Information
 
 - [In the README](https://github.com/lvgl/lv_binding_micropython#memory-management)
 - [In the Blog](https://blog.lvgl.io/2019-02-20/micropython-bindings#i-need-to-allocate-a-littlevgl-struct-such-as-style-color-etc-how-can-i-do-that-how-do-i-allocatedeallocate-memory-for-it)
 
-## Callbacks
+### Callbacks
 
 In C a callback is just a function pointer. 
 But in Micropython we need to register a *Micropython callable object* for each callback.
@@ -179,14 +179,14 @@ There are a few options for defining a callback in LVGL C API:
 
 In practice it's also possible to mix these options, for example provide a struct pointer when registering a callback (option 1) and provide `user_data` argument when calling the callback (options 2), **as long as the same `user_data` that was registered is passed to the callback when it's called**.
 
-### Examples
+#### Examples
 
 - [lv_anim_t](https://github.com/lvgl/lvgl/blob/5d50fbc066938d1a4eb43a8366cf83fbd4ce29f2/src/misc/lv_anim.h#L73-L100) contains `user_data` field. 
 [lv_anim_set_path_cb](https://github.com/lvgl/lvgl/blob/5d50fbc066938d1a4eb43a8366cf83fbd4ce29f2/src/misc/lv_anim.h#L197) registers `path_cb` callback. Both `lv_anim_set_path_cb` and [`lv_anim_path_cb_t`](https://github.com/lvgl/lvgl/blob/5d50fbc066938d1a4eb43a8366cf83fbd4ce29f2/src/misc/lv_anim.h#L46) recieve `lv_anim_t` as their first argument
 - [`path_cb` field](https://github.com/lvgl/lvgl/blob/5d50fbc066938d1a4eb43a8366cf83fbd4ce29f2/src/misc/lv_anim.h#L83) can also be assigned directly in the Python code because it's a member of `lv_anim_t` which contains `user_data` field, and [`lv_anim_path_cb_t`](https://github.com/lvgl/lvgl/blob/5d50fbc066938d1a4eb43a8366cf83fbd4ce29f2/src/misc/lv_anim.h#L46) recieve `lv_anim_t` as its first argument.
 - [`lv_imgfont_create`](https://github.com/lvgl/lvgl/blob/5d50fbc066938d1a4eb43a8366cf83fbd4ce29f2/src/others/imgfont/lv_imgfont.h#L43) registers `path_cb` and recieves `user_data` as the last argument. The callback [`lv_imgfont_get_path_cb_t`](https://github.com/lvgl/lvgl/blob/5d50fbc066938d1a4eb43a8366cf83fbd4ce29f2/src/others/imgfont/lv_imgfont.h#L29-L31) also receieves the `user_data` as the last argument.
 
-### More Information
+#### More Information
 
 - In the [Blog](https://blog.lvgl.io/2019-08-05/micropython-pure-display-driver#using-callbacks) and in the [README](https://github.com/lvgl/lv_binding_micropython#callbacks)
 - [[v6.0] Callback conventions #1036](https://github.com/lvgl/lvgl/issues/1036)
