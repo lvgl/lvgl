@@ -74,7 +74,7 @@ void test_animimg_get_src_count(void)
 void test_animimg_set_duration(void)
 {
     uint16_t expected_duration = 1000;
-    
+
     lv_animimg_set_duration(animimg, expected_duration);
 
     uint16_t actual_duration = lv_animimg_get_duration(animimg);
@@ -85,7 +85,7 @@ void test_animimg_set_duration(void)
 void test_animimg_set_repeat_count_infinite(void)
 {
     lv_animimg_set_repeat_count(animimg, LV_ANIM_REPEAT_INFINITE);
-    
+
     uint16_t actual_count = lv_animimg_get_repeat_count(animimg);
 
     TEST_ASSERT_EQUAL_UINT16(actual_count, LV_ANIM_REPEAT_INFINITE);
