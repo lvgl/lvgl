@@ -38,7 +38,7 @@
 typedef struct _lv_freetype_font_dsc_t {
     lv_font_t * font;
     lv_freetype_font_style_t style;
-    uint16_t weight;
+    uint16_t size;
     char * pathname;
 } lv_freetype_font_dsc_t;
 
@@ -145,10 +145,10 @@ void lv_freetype_uninit(void)
     FT_Done_FreeType(ft_ctx.library);
 }
 
-lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t weight, lv_freetype_font_style_t style)
+lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, lv_freetype_font_style_t style)
 {
     LV_ASSERT_NULL(pathname);
-    LV_ASSERT(weight > 0);
+    LV_ASSERT(size > 0);
 
     size_t pathname_len = lv_strlen(pathname);
     if(pathname_len == 0) {
@@ -176,15 +176,15 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t weight, lv_f
     }
     strcpy(dsc->pathname, pathname);
 
-    dsc->weight = weight;
+    dsc->size = size;
     dsc->style = style;
 
     /* use to get font info */
     FT_Size face_size;
     struct FTC_ScalerRec_ scaler;
     scaler.face_id = (FTC_FaceID)dsc;
-    scaler.width = weight;
-    scaler.height = weight;
+    scaler.width = size;
+    scaler.height = size;
     scaler.pixel = 1;
     FT_Error error = FTC_Manager_LookupSize(ft_ctx.cache_manager,
                                             &scaler,
@@ -307,8 +307,8 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
     FT_Error error;
     struct FTC_ScalerRec_ scaler;
     scaler.face_id = face_id;
-    scaler.width = dsc->weight;
-    scaler.height = dsc->weight;
+    scaler.width = dsc->size;
+    scaler.height = dsc->size;
     scaler.pixel = 1;
     error = FTC_Manager_LookupSize(ft_ctx.cache_manager, &scaler, &face_size);
     if(error) {
@@ -343,8 +343,8 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
     FTC_ImageTypeRec desc_type;
     desc_type.face_id = face_id;
     desc_type.flags = FT_LOAD_RENDER | FT_LOAD_TARGET_NORMAL;
-    desc_type.height = dsc->weight;
-    desc_type.width = dsc->weight;
+    desc_type.height = dsc->size;
+    desc_type.width = dsc->size;
 
 #if LV_FREETYPE_SBIT_CACHE
     error = FTC_SBitCache_Lookup(ft_ctx.sbit_cache,
