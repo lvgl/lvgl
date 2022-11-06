@@ -101,7 +101,6 @@ typedef struct _lv_disp_t {
     lv_draw_ctx_t * draw_ctx;
     void (*draw_ctx_init)(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
     void (*draw_ctx_deinit)(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
-    size_t draw_ctx_size;
 
     /*---------------------
      * Screens

@@ -20,6 +20,7 @@ extern "C" {
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 #include "../../core/lv_disp.h"
+#include <pthread.h>
 
 /*********************
  *      DEFINES
@@ -30,11 +31,12 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_ctx_t base_draw;
-
-    /** Fill an area of the destination buffer with a color*/
-    void (*blend)(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
-} lv_draw_sw_ctx_t;
+    lv_draw_unit_t base_unit;
+    struct _lv_draw_task_t * task_act;
+    pthread_mutex_t lock;
+    pthread_cond_t  cond;
+    int busy;
+} lv_draw_sw_unit_t;
 
 typedef struct {
     lv_draw_layer_ctx_t base_draw;
@@ -53,7 +55,9 @@ void lv_draw_sw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
 void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,
                     uint16_t start_angle, uint16_t end_angle);
 
-void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+uint32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx);
+
+void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos_p,
                        uint32_t letter);

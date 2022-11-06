@@ -689,7 +689,7 @@ static lv_draw_ctx_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area)
     clip_area->y1 = 0;
     clip_area->y2 = dsc->header.h - 1;
 
-    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_sw_ctx_t));
+    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_sw_unit_t));
     LV_ASSERT_MALLOC(draw_ctx);
     if(draw_ctx == NULL)  return NULL;
     lv_draw_sw_init_ctx(NULL, draw_ctx);

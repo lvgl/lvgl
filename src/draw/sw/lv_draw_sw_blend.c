@@ -75,21 +75,16 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * dsc)
 {
     /*Do not draw transparent things*/
     if(dsc->opa <= LV_OPA_MIN) return;
 
+    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
+
     lv_area_t blend_area;
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
 
-    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
-
-    ((lv_draw_sw_ctx_t *)draw_ctx)->blend(draw_ctx, dsc);
-}
-
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
-{
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
     if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
@@ -97,9 +92,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
     else mask = dsc->mask_buf;
 
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
-    lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
 
     lv_color_t * dest_buf = draw_ctx->buf;
     if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE) {

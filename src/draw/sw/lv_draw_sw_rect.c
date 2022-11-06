@@ -30,11 +30,11 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
-static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
-static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void draw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void draw_border(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void draw_outline(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 #if LV_USE_DRAW_MASKS
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
@@ -44,10 +44,10 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
 LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
 #endif
 
-void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
+void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
                          lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
-static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
+static void draw_border_simple(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                lv_color_t color, lv_opa_t opa);
 
 
@@ -68,18 +68,18 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 #if LV_USE_DRAW_MASKS
-    draw_shadow(draw_ctx, dsc, coords);
+    draw_shadow(draw_unit->draw_ctx, dsc);
 #endif
 
-    draw_bg(draw_ctx, dsc, coords);
-    draw_bg_img(draw_ctx, dsc, coords);
+    draw_bg(draw_unit, dsc, coords);
+    draw_bg_img(draw_unit, dsc, coords);
 
-    draw_border(draw_ctx, dsc, coords);
+    draw_border(draw_unit, dsc, coords);
 
-    draw_outline(draw_ctx, dsc, coords);
+    draw_outline(draw_unit, dsc, coords);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -88,9 +88,11 @@ void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, c
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->bg_opa <= LV_OPA_MIN) return;
+
+    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
 
     lv_area_t bg_coords;
     lv_area_copy(&bg_coords, coords);
@@ -119,7 +121,7 @@ static void draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, co
     if(!mask_any && dsc->radius == 0 && (grad_dir == LV_GRAD_DIR_NONE)) {
         blend_dsc.blend_area = &bg_coords;
         blend_dsc.opa = dsc->bg_opa;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(draw_unit, &blend_dsc);
         return;
     }
 
@@ -318,86 +320,90 @@ bg_clean_up:
 #endif
 }
 
-static void draw_bg_img(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void draw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(dsc->bg_img_src == NULL) return;
-    if(dsc->bg_img_opa <= LV_OPA_MIN) return;
-
-    lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, coords, draw_ctx->clip_area)) {
-        return;
-    }
-
-    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-    draw_ctx->clip_area = &clip_area;
-
-    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
-    if(src_type == LV_IMG_SRC_SYMBOL) {
-        lv_point_t size;
-        lv_txt_get_size(&size, dsc->bg_img_src, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-        lv_area_t a;
-        a.x1 = coords->x1 + lv_area_get_width(coords) / 2 - size.x / 2;
-        a.x2 = a.x1 + size.x - 1;
-        a.y1 = coords->y1 + lv_area_get_height(coords) / 2 - size.y / 2;
-        a.y2 = a.y1 + size.y - 1;
-
-        lv_draw_label_dsc_t label_draw_dsc;
-        lv_draw_label_dsc_init(&label_draw_dsc);
-        label_draw_dsc.font = dsc->bg_img_symbol_font;
-        label_draw_dsc.color = dsc->bg_img_recolor;
-        label_draw_dsc.opa = dsc->bg_img_opa;
-        lv_draw_label(draw_ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
-    }
-    else {
-        lv_img_header_t header;
-        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
-        if(res == LV_RES_OK) {
-            lv_draw_img_dsc_t img_dsc;
-            lv_draw_img_dsc_init(&img_dsc);
-            img_dsc.blend_mode = dsc->blend_mode;
-            img_dsc.recolor = dsc->bg_img_recolor;
-            img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
-            img_dsc.opa = dsc->bg_img_opa;
-
-            /*Center align*/
-            if(dsc->bg_img_tiled == false) {
-                lv_area_t area;
-                area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
-                area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
-                area.x2 = area.x1 + header.w - 1;
-                area.y2 = area.y1 + header.h - 1;
-
-                lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
-            }
-            else {
-                lv_area_t area;
-                area.y1 = coords->y1;
-                area.y2 = area.y1 + header.h - 1;
-
-                for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
-
-                    area.x1 = coords->x1;
-                    area.x2 = area.x1 + header.w - 1;
-                    for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-                        lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
-                    }
-                }
-            }
-        }
-        else {
-            LV_LOG_WARN("Couldn't read the background image");
-        }
-    }
-
-    draw_ctx->clip_area = clip_area_ori;
+    //    if(dsc->bg_img_src == NULL) return;
+    //    if(dsc->bg_img_opa <= LV_OPA_MIN) return;
+    //
+    //    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
+    //
+    //    lv_area_t clip_area;
+    //    if(!_lv_area_intersect(&clip_area, coords, draw_ctx->clip_area)) {
+    //        return;
+    //    }
+    //
+    //    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    //    draw_ctx->clip_area = &clip_area;
+    //
+    //    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
+    //    if(src_type == LV_IMG_SRC_SYMBOL) {
+    //        lv_point_t size;
+    //        lv_txt_get_size(&size, dsc->bg_img_src, dsc->bg_img_symbol_font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    //        lv_area_t a;
+    //        a.x1 = coords->x1 + lv_area_get_width(coords) / 2 - size.x / 2;
+    //        a.x2 = a.x1 + size.x - 1;
+    //        a.y1 = coords->y1 + lv_area_get_height(coords) / 2 - size.y / 2;
+    //        a.y2 = a.y1 + size.y - 1;
+    //
+    //        lv_draw_label_dsc_t label_draw_dsc;
+    //        lv_draw_label_dsc_init(&label_draw_dsc);
+    //        label_draw_dsc.font = dsc->bg_img_symbol_font;
+    //        label_draw_dsc.color = dsc->bg_img_recolor;
+    //        label_draw_dsc.opa = dsc->bg_img_opa;
+    //        lv_draw_label(draw_ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
+    //    }
+    //    else {
+    //        lv_img_header_t header;
+    //        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
+    //        if(res == LV_RES_OK) {
+    //            lv_draw_img_dsc_t img_dsc;
+    //            lv_draw_img_dsc_init(&img_dsc);
+    //            img_dsc.blend_mode = dsc->blend_mode;
+    //            img_dsc.recolor = dsc->bg_img_recolor;
+    //            img_dsc.recolor_opa = dsc->bg_img_recolor_opa;
+    //            img_dsc.opa = dsc->bg_img_opa;
+    //
+    //            /*Center align*/
+    //            if(dsc->bg_img_tiled == false) {
+    //                lv_area_t area;
+    //                area.x1 = coords->x1 + lv_area_get_width(coords) / 2 - header.w / 2;
+    //                area.y1 = coords->y1 + lv_area_get_height(coords) / 2 - header.h / 2;
+    //                area.x2 = area.x1 + header.w - 1;
+    //                area.y2 = area.y1 + header.h - 1;
+    //
+    //                lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+    //            }
+    //            else {
+    //                lv_area_t area;
+    //                area.y1 = coords->y1;
+    //                area.y2 = area.y1 + header.h - 1;
+    //
+    //                for(; area.y1 <= coords->y2; area.y1 += header.h, area.y2 += header.h) {
+    //
+    //                    area.x1 = coords->x1;
+    //                    area.x2 = area.x1 + header.w - 1;
+    //                    for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
+    //                        lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //        else {
+    //            LV_LOG_WARN("Couldn't read the background image");
+    //        }
+    //    }
+    //
+    //    draw_ctx->clip_area = clip_area_ori;
 }
 
-static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void draw_border(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->border_opa <= LV_OPA_MIN) return;
     if(dsc->border_width == 0) return;
     if(dsc->border_side == LV_BORDER_SIDE_NONE) return;
     if(dsc->border_post) return;
+
+    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
 
     int32_t coords_w = lv_area_get_width(coords);
     int32_t coords_h = lv_area_get_height(coords);
@@ -416,7 +422,7 @@ static void draw_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc
     lv_coord_t rin = rout - dsc->border_width;
     if(rin < 0) rin = 0;
 
-    draw_border_generic(draw_ctx, coords, &area_inner, rout, rin, dsc->border_color, dsc->border_opa, dsc->blend_mode);
+    draw_border_generic(draw_unit, coords, &area_inner, rout, rin, dsc->border_color, dsc->border_opa, dsc->blend_mode);
 
 }
 
@@ -1102,10 +1108,12 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 }
 #endif
 
-static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void draw_outline(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->outline_opa <= LV_OPA_MIN) return;
     if(dsc->outline_width == 0) return;
+
+    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
 
     lv_opa_t opa = dsc->outline_opa;
 
@@ -1139,11 +1147,11 @@ static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * ds
 
     lv_coord_t rout = rin + dsc->outline_width;
 
-    draw_border_generic(draw_ctx, &area_outer, &area_inner, rout, rin, dsc->outline_color, dsc->outline_opa,
+    draw_border_generic(draw_unit, &area_outer, &area_inner, rout, rin, dsc->outline_color, dsc->outline_opa,
                         dsc->blend_mode);
 }
 
-void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
+void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
                          lv_coord_t rout, lv_coord_t rin, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     opa = opa >= LV_OPA_COVER ? LV_OPA_COVER : opa;
@@ -1151,7 +1159,7 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
     bool mask_any = lv_draw_mask_is_any(outer_area);
 
     if(!mask_any && rout == 0 && rin == 0) {
-        draw_border_simple(draw_ctx, outer_area, inner_area, color, opa);
+        draw_border_simple(draw_unit, outer_area, inner_area, color, opa);
         return;
     }
 
@@ -1368,7 +1376,7 @@ void draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area,
     LV_UNUSED(blend_mode);
 #endif /*LV_USE_DRAW_MASKS*/
 }
-static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer_area, const lv_area_t * inner_area,
+static void draw_border_simple(lv_draw_unit_t * draw_unit, const lv_area_t * outer_area, const lv_area_t * inner_area,
                                lv_color_t color, lv_opa_t opa)
 {
     lv_area_t a;
@@ -1390,14 +1398,14 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
     a.y1 = outer_area->y1;
     a.y2 = inner_area->y1 - 1;
     if(top_side) {
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
 
     /*Bottom*/
     a.y1 = inner_area->y2 + 1;
     a.y2 = outer_area->y2;
     if(bottom_side) {
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
 
     /*Left*/
@@ -1406,14 +1414,14 @@ static void draw_border_simple(lv_draw_ctx_t * draw_ctx, const lv_area_t * outer
     a.y1 = (top_side) ? inner_area->y1 : outer_area->y1;
     a.y2 = (bottom_side) ? inner_area->y2 : outer_area->y2;
     if(left_side) {
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
 
     /*Right*/
     a.x1 = inner_area->x2 + 1;
     a.x2 = outer_area->x2;
     if(right_side) {
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
 }
 

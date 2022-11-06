@@ -1159,7 +1159,11 @@ static void draw_buf_flush(lv_disp_t * disp)
 {
     /*Flush the rendered content to the display*/
     lv_draw_ctx_t * draw_ctx = disp->draw_ctx;
-    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
+    //    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
+    while(draw_ctx->draw_task_head) {
+        lv_draw_dispatch_if_requested(draw_ctx);
+    }
+
 
     /* In double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer.
@@ -1233,6 +1237,8 @@ static void mem_monitor_init(mem_monitor_t * _mem_monitor)
 {
     LV_ASSERT_NULL(_mem_monitor);
     _mem_monitor->mem_last_time = 0;
+#if LV_USE_LABEL
     _mem_monitor->mem_label = NULL;
+#endif
 }
 #endif

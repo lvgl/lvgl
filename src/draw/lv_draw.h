@@ -38,6 +38,29 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef enum {
+    LV_DRAW_TASK_TYPE_RECTANGLE,
+    LV_DRAW_TASK_TYPE_LABEL,
+    LV_DRAW_TASK_TYPE_LINE,
+    LV_DRAW_TASK_TYPE_ARC,
+} lv_draw_task_type_t;
+
+typedef enum {
+    LV_DRAW_TASK_STATE_QUEUED,
+    LV_DRAW_TASK_STATE_IN_PRGRESS,
+    LV_DRAW_TASK_STATE_READY,
+} lv_draw_task_state_t;
+
+
+
+typedef struct _lv_draw_task_t {
+    struct _lv_draw_task_t * next;
+    lv_draw_task_type_t type;
+    lv_area_t area;
+    lv_draw_task_state_t state;
+    void * draw_dsc;
+} lv_draw_task_t;
+
 typedef struct {
     void * user_data;
 } lv_draw_mask_t;
@@ -55,6 +78,19 @@ typedef struct _lv_draw_layer_ctx_t {
         lv_color_format_t color_format;
     } original;
 } lv_draw_layer_ctx_t;
+
+typedef struct _lv_draw_unit_t {
+    struct _lv_draw_unit_t * next;
+    struct _lv_draw_ctx_t * draw_ctx;
+
+    uint32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_draw_ctx_t * draw_ctx);
+
+    /**
+     * Wait until all background operations are finished. (E.g. GPU operations)
+     */
+    void (*wait_for_finish)(struct _lv_draw_ctx_t * draw_ctx);
+} lv_draw_unit_t;
+
 
 typedef struct _lv_draw_ctx_t  {
     /**
@@ -78,51 +114,8 @@ typedef struct _lv_draw_ctx_t  {
      */
     lv_color_format_t color_format;
 
-    void (*draw_rect)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
-
-    void (*draw_arc)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
-                     uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
-
-    void (*draw_img_decoded)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                             const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format);
-
-    lv_res_t (*draw_img)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                         const lv_area_t * coords, const void * src);
-
-    void (*draw_letter)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
-                        uint32_t letter);
-
-
-    void (*draw_line)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
-                      const lv_point_t * point2);
-
-
-    void (*draw_polygon)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc,
-                         const lv_point_t points[], uint16_t point_cnt);
-
-
-    /**
-     * Get an area of a transformed image (zoomed and/or rotated)
-     * @param draw_ctx      pointer to a draw context
-     * @param dest_area     get this area of the result image. It assumes that the original image is placed to the 0;0 position.
-     * @param src_buf       the source image
-     * @param src_w         width of the source image in [px]
-     * @param src_h         height of the source image in [px]
-     * @param src_stride    the stride in [px].
-     * @param draw_dsc      an `lv_draw_img_dsc_t` descriptor containing the transformation parameters
-     * @param cf            the color format of `src_buf`
-     * @param cbuf          place the colors of the pixels on `dest_area` here in RGB format
-     * @param abuf          place the opacity of the pixels on `dest_area` here
-     */
-    void (*draw_transform)(struct _lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
-                           lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
-                           lv_opa_t * abuf);
-
-    /**
-     * Wait until all background operations are finished. (E.g. GPU operations)
-     */
-    void (*wait_for_finish)(struct _lv_draw_ctx_t * draw_ctx);
+    lv_draw_unit_t * draw_unit_head;
+    int dispatch_req;       /*`int` type to be sure it's atomic write/read*/
 
     /**
      * Copy an area from buffer to an other
@@ -193,10 +186,14 @@ typedef struct _lv_draw_ctx_t  {
      */
     size_t layer_instance_size;
 
+    /**
+     * Linked list of draw tasks
+     */
+    lv_draw_task_t * draw_task_head;
+
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
-
 } lv_draw_ctx_t;
 
 /**********************
@@ -205,8 +202,16 @@ typedef struct _lv_draw_ctx_t  {
 
 void lv_draw_init(void);
 
-
 void lv_draw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
+
+void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx);
+
+void lv_draw_dispatch_if_requested(lv_draw_ctx_t * draw_ctx);
+
+void lv_draw_dispatch_request(lv_draw_ctx_t * draw_ctx);
+
+lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_prev);
+
 
 /**********************
  *  GLOBAL VARIABLES

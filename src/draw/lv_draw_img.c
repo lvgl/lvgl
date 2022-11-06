@@ -61,27 +61,27 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  */
 void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src)
 {
-    if(src == NULL) {
-        LV_LOG_WARN("Image draw: src is NULL");
-        show_error(draw_ctx, coords, "No\ndata");
-        return;
-    }
-
-    if(dsc->opa <= LV_OPA_MIN) return;
-
-    lv_res_t res;
-    if(draw_ctx->draw_img) {
-        res = draw_ctx->draw_img(draw_ctx, dsc, coords, src);
-    }
-    else {
-        res = decode_and_draw(draw_ctx, dsc, coords, src);
-    }
-
-    if(res == LV_RES_INV) {
-        LV_LOG_WARN("Image draw error");
-        show_error(draw_ctx, coords, "No\ndata");
-        return;
-    }
+    //    if(src == NULL) {
+    //        LV_LOG_WARN("Image draw: src is NULL");
+    //        show_error(draw_ctx, coords, "No\ndata");
+    //        return;
+    //    }
+    //
+    //    if(dsc->opa <= LV_OPA_MIN) return;
+    //
+    //    lv_res_t res;
+    //    if(draw_ctx->draw_img) {
+    //        res = draw_ctx->draw_img(draw_ctx, dsc, coords, src);
+    //    }
+    //    else {
+    //        res = decode_and_draw(draw_ctx, dsc, coords, src);
+    //    }
+    //
+    //    if(res == LV_RES_INV) {
+    //        LV_LOG_WARN("Image draw error");
+    //        show_error(draw_ctx, coords, "No\ndata");
+    //        return;
+    //    }
 }
 
 /**
@@ -120,9 +120,9 @@ lv_img_src_t lv_img_src_get_type(const void * src)
 void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
                          const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format)
 {
-    if(draw_ctx->draw_img_decoded == NULL) return;
-
-    draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, sup, color_format);
+    //    if(draw_ctx->draw_img_decoded == NULL) return;
+    //
+    //    draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, sup, color_format);
 }
 
 /**********************
@@ -238,14 +238,14 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
 static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg)
 {
-    lv_draw_rect_dsc_t rect_dsc;
-    lv_draw_rect_dsc_init(&rect_dsc);
-    rect_dsc.bg_color = lv_color_white();
-    lv_draw_rect(draw_ctx, &rect_dsc, coords);
-
-    lv_draw_label_dsc_t label_dsc;
-    lv_draw_label_dsc_init(&label_dsc);
-    lv_draw_label(draw_ctx, &label_dsc, coords, msg, NULL);
+    //    lv_draw_rect_dsc_t rect_dsc;
+    //    lv_draw_rect_dsc_init(&rect_dsc);
+    //    rect_dsc.bg_color = lv_color_white();
+    //    lv_draw_rect(draw_ctx, &rect_dsc, coords);
+    //
+    //    lv_draw_label_dsc_t label_dsc;
+    //    lv_draw_label_dsc_init(&label_dsc);
+    //    lv_draw_label(draw_ctx, &label_dsc, coords, msg, NULL);
 }
 
 static void draw_cleanup(_lv_img_cache_entry_t * cache)

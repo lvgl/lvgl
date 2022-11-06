@@ -102,7 +102,7 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 #elif LV_USE_GPU_ARM2D
     lv_disp_set_draw_ctx(disp, lv_draw_arm2d_ctx_init, lv_draw_arm2d_ctx_deinit, sizeof(lv_draw_arm2d_ctx_t));
 #else
-    lv_disp_set_draw_ctx(disp, lv_draw_sw_init_ctx, lv_draw_sw_deinit_ctx, sizeof(lv_draw_sw_ctx_t));
+    lv_disp_set_draw_ctx(disp, lv_draw_sw_init_ctx, lv_draw_sw_deinit_ctx);
 #endif
 
     disp->draw_ctx->color_format = LV_COLOR_FORMAT_NATIVE;
@@ -467,8 +467,7 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp)
 
 void lv_disp_set_draw_ctx(lv_disp_t * disp,
                           void (*draw_ctx_init)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx),
-                          void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx),
-                          size_t draw_ctx_size)
+                          void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx))
 {
     if(disp->draw_ctx) {
         if(disp->draw_ctx_deinit) disp->draw_ctx_deinit(disp, disp->draw_ctx);
@@ -478,11 +477,11 @@ void lv_disp_set_draw_ctx(lv_disp_t * disp,
 
     disp->draw_ctx_init = draw_ctx_init;
     disp->draw_ctx_deinit = draw_ctx_deinit;
-    disp->draw_ctx_size = draw_ctx_size;
 
-    lv_draw_ctx_t * draw_ctx = lv_malloc(disp->draw_ctx_size);
+    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_ctx_t));
     LV_ASSERT_MALLOC(draw_ctx);
     if(draw_ctx == NULL) return;
+    lv_memzero(draw_ctx, sizeof(*draw_ctx));
     disp->draw_ctx_init(disp, draw_ctx);
     disp->draw_ctx = draw_ctx;
 }

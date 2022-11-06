@@ -304,12 +304,10 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp);
  * @param disp              pointer to a display
  * @param draw_ctx_init     init callback
  * @param draw_ctx_deinit   deinit callback
- * @param draw_ctx_size     size of the draw context instance
  */
 void lv_disp_set_draw_ctx(lv_disp_t * disp,
                           void (*draw_ctx_init)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx),
-                          void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx),
-                          size_t draw_ctx_size);
+                          void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx));
 
 /*---------------------
  * SCREENS
