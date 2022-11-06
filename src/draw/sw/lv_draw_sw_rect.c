@@ -74,12 +74,15 @@ void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
     draw_shadow(draw_unit->draw_ctx, dsc);
 #endif
 
+    //    return;
+    //    for(int i = 0; i < 100; i++) {
     draw_bg(draw_unit, dsc, coords);
     draw_bg_img(draw_unit, dsc, coords);
 
     draw_border(draw_unit, dsc, coords);
 
     draw_outline(draw_unit, dsc, coords);
+    //    }
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -106,7 +109,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
     }
 
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &bg_coords, draw_ctx->clip_area)) return;
+    if(!_lv_area_intersect(&clipped_coords, &bg_coords, draw_unit->clip_area)) return;
 
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
     lv_color_t bg_color    = grad_dir == LV_GRAD_DIR_NONE ? dsc->bg_color : dsc->bg_grad.stops[0].color;

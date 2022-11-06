@@ -51,12 +51,11 @@ typedef enum {
     LV_DRAW_TASK_STATE_READY,
 } lv_draw_task_state_t;
 
-
-
 typedef struct _lv_draw_task_t {
     struct _lv_draw_task_t * next;
     lv_draw_task_type_t type;
     lv_area_t area;
+    lv_area_t clip_area;
     lv_draw_task_state_t state;
     void * draw_dsc;
 } lv_draw_task_t;
@@ -82,6 +81,7 @@ typedef struct _lv_draw_layer_ctx_t {
 typedef struct _lv_draw_unit_t {
     struct _lv_draw_unit_t * next;
     struct _lv_draw_ctx_t * draw_ctx;
+    const lv_area_t * clip_area;
 
     uint32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_draw_ctx_t * draw_ctx);
 

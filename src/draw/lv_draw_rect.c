@@ -53,8 +53,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->border_side = LV_BORDER_SIDE_FULL;
 }
 
-extern int s;
-
 /**
  * Draw a rectangle
  * @param coords the coordinates of the rectangle
@@ -63,14 +61,8 @@ extern int s;
  */
 void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-
     lv_draw_task_t * new_task = lv_malloc(sizeof(lv_draw_task_t));
     lv_memzero(new_task, sizeof(*new_task));
-
-
-    if(s) {
-        printf("Critical add\n");
-    }
 
     new_task->draw_dsc = lv_malloc(sizeof(lv_draw_rect_dsc_t));
     lv_memcpy(new_task->draw_dsc, dsc, sizeof(*dsc));
@@ -81,6 +73,7 @@ void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, cons
     new_task->type = LV_DRAW_TASK_TYPE_RECTANGLE;
 
     new_task->area = *coords;
+    new_task->clip_area = *draw_ctx->clip_area;
 
     /*Find the tail*/
     if(draw_ctx->draw_task_head == NULL) {
@@ -94,12 +87,6 @@ void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, cons
     }
 
     lv_draw_dispatch(draw_ctx);
-
-    //    if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
-    //
-    //    draw_ctx->draw_rect(draw_ctx, dsc, coords);
-    //
-    //    LV_ASSERT_MEM_INTEGRITY();
 }
 
 /**********************

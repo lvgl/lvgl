@@ -83,7 +83,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv
     lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
 
     lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
+    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_unit->clip_area)) return;
 
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;

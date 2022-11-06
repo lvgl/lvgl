@@ -211,7 +211,7 @@ static void window_create(lv_disp_t * disp)
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
     texture_resize(disp);
-    lv_memset(dsc->fb, 0xff, hor_res * ver_res * sizeof(lv_color_t));
+    lv_color_fill(dsc->fb, lv_color_hex3(0x8ff), hor_res * ver_res);
 }
 
 static void window_update(lv_disp_t * disp)

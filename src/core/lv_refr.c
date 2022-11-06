@@ -1164,6 +1164,7 @@ static void draw_buf_flush(lv_disp_t * disp)
         lv_draw_dispatch_if_requested(draw_ctx);
     }
 
+    printf("------------------------------------------------------------------------------------------------------------\n\n");
 
     /* In double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer.
