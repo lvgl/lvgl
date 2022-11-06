@@ -75,14 +75,14 @@ void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
 #endif
 
     //    return;
-    //    for(int i = 0; i < 100; i++) {
-    draw_bg(draw_unit, dsc, coords);
-    draw_bg_img(draw_unit, dsc, coords);
+    for(int i = 0; i < 10; i++) {
+        draw_bg(draw_unit, dsc, coords);
+        draw_bg_img(draw_unit, dsc, coords);
 
-    draw_border(draw_unit, dsc, coords);
+        draw_border(draw_unit, dsc, coords);
 
-    draw_outline(draw_unit, dsc, coords);
-    //    }
+        draw_outline(draw_unit, dsc, coords);
+    }
 
     LV_ASSERT_MEM_INTEGRITY();
 }

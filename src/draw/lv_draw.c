@@ -57,7 +57,7 @@ void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx)
     while(t) {
         lv_draw_task_t * t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
-            printf("Remov(%p, %p)\n", t, t->draw_dsc);
+            printf("Remov(%p)\n", t);
             if(t_prev) t_prev->next = t->next;
             else draw_ctx->draw_task_head = t_next;
             lv_free(t->draw_dsc);

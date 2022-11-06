@@ -427,6 +427,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     if(disp_refr->inv_p != 0) {
         /*Call monitor cb if present*/
         lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_READY, NULL);
+        printf("Rendered in %dms\n", lv_tick_elaps(start));
 
         /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
         if(lv_disp_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {

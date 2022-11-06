@@ -35,6 +35,7 @@ typedef struct {
     struct _lv_draw_task_t * task_act;
     pthread_mutex_t lock;
     pthread_cond_t  cond;
+    uint32_t idx;
 } lv_draw_sw_unit_t;
 
 typedef struct {
