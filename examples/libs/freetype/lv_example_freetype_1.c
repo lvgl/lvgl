@@ -8,7 +8,7 @@
 void lv_example_freetype_1(void)
 {
     /*Create a font*/
-    lv_font_t * font = lv_freetype_font_create("/lvgl/examples/libs/freetype/Lato-Regular.ttf",
+    lv_font_t * font = lv_freetype_font_create("./lvgl/examples/libs/freetype/Lato-Regular.ttf",
                                                24,
                                                LV_FREETYPE_FONT_STYLE_NORMAL);
 
