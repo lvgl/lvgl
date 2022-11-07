@@ -481,6 +481,11 @@ static lv_res_t draw_nxp_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t *
 
 static lv_res_t draw_nxp_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
+#if !LV_USE_GPU_NXP_VG_LITE
+    LV_UNUSED(draw_ctx);
+    LV_UNUSED(coords);
+#endif
+
     if(dsc->border_opa <= (lv_opa_t)LV_OPA_MIN)
         return LV_RES_INV;
     if(dsc->border_width == 0)
@@ -512,6 +517,10 @@ static lv_res_t draw_nxp_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc
 
 static lv_res_t draw_nxp_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
+#if !LV_USE_GPU_NXP_VG_LITE
+    LV_UNUSED(draw_ctx);
+    LV_UNUSED(coords);
+#endif
 
     if(dsc->outline_opa <= (lv_opa_t)LV_OPA_MIN)
         return LV_RES_INV;
