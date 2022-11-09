@@ -33,14 +33,10 @@
 
 ## Demo
 
-### Widgets
-![Widgets demo with the JS binding of LVGL](/_static/img/js_widgets_demo.gif)
-
-### Calculator
-![Calculator demo with the JaveScript binding of LVGL](/_static/img/js_calculator.gif)
+See the [demo](https://github.com/lvgl/lv_binding_js/tree/master/demo) folder
 
 
-## building
+## Building
 
 The following are developer notes on how to build lvgljs on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
 
