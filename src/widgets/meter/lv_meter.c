@@ -350,6 +350,7 @@ static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t 
         if(indic->type != LV_METER_INDICATOR_TYPE_ARC) continue;
 
         arc_dsc.color = indic->type_data.arc.color;
+        arc_dsc.img_src = indic->type_data.arc.src;
         arc_dsc.width = indic->type_data.arc.width;
         arc_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
 
