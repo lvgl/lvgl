@@ -4,11 +4,11 @@
 
 **Code**
 
-<img src="https://github.com/lvgl/lv_binding_js/blob/master/demo/screenshoot/code.png">
+<img src="_static/img/js_code.png">
 
 
 **Code Runing on Real Device**
-<img src="https://github.com/lvgl/lv_binding_js/blob/master/demo/screenshoot/real_device.jpg" style="transform: rotate(270deg)">
+<img src="_static/img/js_on_device.jpg" style="transform: rotate(270deg); max-width:100%">
 
 ## Table of Contents
 
@@ -34,10 +34,10 @@
 ## Demo
 
 ### Widgets
-![sdl_simulator](https://github.com/lvgl/lv_binding_js/blob/master/demo/widgets/screenshoot/sdl_simulator.gif)
+![Widgets demo with the JS binding of LVGL](_static/img/js_demo_widgets.gif)
 
 ### Calculator
-![sdl_simulator](https://github.com/lvgl/lv_binding_js/blob/master/demo/calculator/screenshoot/sdl_simulator.gif)
+![Calculator demo with the JaveScript binding of LVGL](_static/img/js_calculator.gif)
 
 
 ## building
