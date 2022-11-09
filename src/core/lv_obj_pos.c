@@ -1188,17 +1188,22 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
         bmargin[3] = lv_obj_get_style_margin_bottom(base, LV_PART_MAIN);
     }
 
+    lv_point_t margin_mid = {
+        (omargin[0] - omargin[2]) / 2,
+        (omargin[1] - omargin[3]) / 2
+    };
+
     switch(align) {
         case LV_ALIGN_CENTER:
-            ofs->x = omargin[0];
-            ofs->y = omargin[1];
+            ofs->x = margin_mid.x;
+            ofs->y = margin_mid.y;
             break;
         case LV_ALIGN_TOP_LEFT:
             ofs->x = omargin[0];
             ofs->y = omargin[1];
             break;
         case LV_ALIGN_TOP_MID:
-            ofs->x = omargin[0];
+            ofs->x = margin_mid.x;
             ofs->y = omargin[1];
             break;
 
@@ -1213,7 +1218,7 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
             break;
 
         case LV_ALIGN_BOTTOM_MID:
-            ofs->x = omargin[0];
+            ofs->x = margin_mid.x;
             ofs->y = -omargin[3];
             break;
 
@@ -1224,12 +1229,12 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
 
         case LV_ALIGN_LEFT_MID:
             ofs->x = omargin[0];
-            ofs->y = omargin[1];
+            ofs->y = margin_mid.y;
             break;
 
         case LV_ALIGN_RIGHT_MID:
             ofs->x = -omargin[2];
-            ofs->y = omargin[1];
+            ofs->y = margin_mid.y;
             break;
 
         case LV_ALIGN_OUT_TOP_LEFT:
@@ -1238,7 +1243,7 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
             break;
 
         case LV_ALIGN_OUT_TOP_MID:
-            ofs->x = omargin[0];
+            ofs->x = margin_mid.x;
             ofs->y = -(omargin[3] + bmargin[1]);
             break;
 
@@ -1253,7 +1258,7 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
             break;
 
         case LV_ALIGN_OUT_BOTTOM_MID:
-            ofs->x = omargin[0];
+            ofs->x = margin_mid.x;
             ofs->y = bmargin[3] + omargin[1];
             break;
 
@@ -1269,7 +1274,7 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
 
         case LV_ALIGN_OUT_LEFT_MID:
             ofs->x = -(omargin[2] + bmargin[0]);
-            ofs->y = omargin[1];
+            ofs->y = margin_mid.y;
             break;
 
         case LV_ALIGN_OUT_LEFT_BOTTOM:
@@ -1284,7 +1289,7 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
 
         case LV_ALIGN_OUT_RIGHT_MID:
             ofs->x = bmargin[2] + omargin[0];
-            ofs->y = omargin[1];
+            ofs->y = margin_mid.y;
             break;
 
         case LV_ALIGN_OUT_RIGHT_BOTTOM:
