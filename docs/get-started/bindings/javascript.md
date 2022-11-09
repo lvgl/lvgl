@@ -34,7 +34,7 @@
 ## Demo
 
 ### Widgets
-![Widgets demo with the JS binding of LVGL](/_static/img/js_demo_widgets.gif)
+![Widgets demo with the JS binding of LVGL](/_static/img/js_widgets_demo.gif)
 
 ### Calculator
 ![Calculator demo with the JaveScript binding of LVGL](/_static/img/js_calculator.gif)
