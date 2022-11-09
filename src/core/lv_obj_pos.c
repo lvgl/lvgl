@@ -744,6 +744,7 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
     lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
+    lv_point_t margin_ofs = {0, 0};
 
     if(parent == NULL) {
         lv_obj_move_to(obj, x, y);
@@ -776,6 +777,8 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     }
 
     if(align == LV_ALIGN_TOP_LEFT) {
+        x += lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+        y += lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
         lv_obj_move_to(obj, x, y);
     }
     else {
@@ -812,6 +815,45 @@ void lv_obj_refr_pos(lv_obj_t * obj)
             default:
                 break;
         }
+
+        switch(align) {
+            case LV_ALIGN_TOP_MID:
+                margin_ofs.x = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+                margin_ofs.y = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+                break;
+            case LV_ALIGN_TOP_RIGHT:
+                margin_ofs.x = -lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+                margin_ofs.y = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+                break;
+            case LV_ALIGN_LEFT_MID:
+                margin_ofs.x = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+                margin_ofs.y = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+                break;
+            case LV_ALIGN_BOTTOM_LEFT:
+                margin_ofs.x = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+                margin_ofs.y = -lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
+                break;
+            case LV_ALIGN_BOTTOM_MID:
+                margin_ofs.x = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+                margin_ofs.y = -lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
+                break;
+            case LV_ALIGN_BOTTOM_RIGHT:
+                margin_ofs.x = -lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+                margin_ofs.y = -lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
+                break;
+            case LV_ALIGN_RIGHT_MID:
+                margin_ofs.x = -lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+                margin_ofs.y = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+                break;
+            case LV_ALIGN_CENTER:
+                margin_ofs.x = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+                margin_ofs.y = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+                break;
+            default:
+                break;
+        }
+        x += margin_ofs.x;
+        y += margin_ofs.y;
         lv_obj_move_to(obj, x, y);
     }
 }
