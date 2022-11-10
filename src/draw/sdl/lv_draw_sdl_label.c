@@ -65,7 +65,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     if(font_p == NULL) {
-        LV_LOG_WARN("lv_draw_letter: font is NULL");
+        LV_LOG_WARN("font is NULL");
         return;
     }
 
@@ -77,7 +77,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", letter);
+            LV_LOG_WARN("glyph dsc not found for U+%X", letter);
 
             /* draw placeholder */
             lv_area_t glyph_coords;

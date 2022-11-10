@@ -330,7 +330,7 @@ void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
         ta->placeholder_txt = lv_realloc(ta->placeholder_txt, txt_len + 1);
         LV_ASSERT_MALLOC(ta->placeholder_txt);
         if(ta->placeholder_txt == NULL) {
-            LV_LOG_ERROR("lv_textarea_set_placeholder_text: couldn't allocate memory for placeholder");
+            LV_LOG_ERROR("couldn't allocate memory for placeholder");
             return;
         }
 
@@ -454,7 +454,7 @@ void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet)
         ta->pwd_bullet = lv_realloc(ta->pwd_bullet, txt_len + 1);
         LV_ASSERT_MALLOC(ta->pwd_bullet);
         if(ta->pwd_bullet == NULL) {
-            LV_LOG_ERROR("lv_textarea_set_password_bullet: couldn't allocate memory for bullet");
+            LV_LOG_ERROR("couldn't allocate memory for bullet");
             return;
         }
 

@@ -79,22 +79,22 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
     switch(src_type) {
         case LV_IMG_SRC_FILE:
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found");
+            LV_LOG_TRACE("`LV_IMG_SRC_FILE` type found");
             break;
         case LV_IMG_SRC_VARIABLE:
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found");
+            LV_LOG_TRACE("`LV_IMG_SRC_VARIABLE` type found");
             break;
         case LV_IMG_SRC_SYMBOL:
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found");
+            LV_LOG_TRACE("`LV_IMG_SRC_SYMBOL` type found");
             break;
         default:
-            LV_LOG_WARN("lv_img_set_src: unknown type");
+            LV_LOG_WARN("unknown type");
     }
 #endif
 
     /*If the new source type is unknown free the memories of the old source*/
     if(src_type == LV_IMG_SRC_UNKNOWN) {
-        LV_LOG_WARN("lv_img_set_src: unknown image type");
+        LV_LOG_WARN("unknown image type");
         if(img->src_type == LV_IMG_SRC_SYMBOL || img->src_type == LV_IMG_SRC_FILE) {
             lv_free((void *)img->src);
         }
@@ -683,11 +683,11 @@ static void draw_img(lv_event_t * e)
             }
             else if(img->src == NULL) {
                 /*Do not need to draw image when src is NULL*/
-                LV_LOG_WARN("draw_img: image source is NULL");
+                LV_LOG_WARN("image source is NULL");
             }
             else {
                 /*Trigger the error handler of image draw*/
-                LV_LOG_WARN("draw_img: image source type is unknown");
+                LV_LOG_WARN("image source type is unknown");
                 lv_draw_img(draw_ctx, NULL, &obj->coords, NULL);
             }
         }
