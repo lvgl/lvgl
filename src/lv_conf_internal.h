@@ -2171,6 +2171,15 @@
         #endif
     #endif
 
+    /*Let FreeType to use LVGL memory and file porting*/
+    #ifndef LV_FREETYPE_USE_LVGL_PORT
+        #ifdef CONFIG_LV_FREETYPE_USE_LVGL_PORT
+            #define LV_FREETYPE_USE_LVGL_PORT CONFIG_LV_FREETYPE_USE_LVGL_PORT
+        #else
+            #define LV_FREETYPE_USE_LVGL_PORT 0
+        #endif
+    #endif
+
     /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
     /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
     /* if font size >= 256, must be configured as image cache */

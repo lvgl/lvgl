@@ -639,6 +639,9 @@
     /*Memory used by FreeType to cache characters [bytes]*/
     #define LV_FREETYPE_CACHE_SIZE (64 * 1024)
 
+    /*Let FreeType to use LVGL memory and file porting*/
+    #define LV_FREETYPE_USE_LVGL_PORT 0
+
     /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
     /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
     /* if font size >= 256, must be configured as image cache */

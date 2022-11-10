@@ -2,18 +2,24 @@
 #if LV_BUILD_EXAMPLES
 #if LV_USE_FREETYPE
 
+#if LV_FREETYPE_USE_LVGL_PORT
+    #define PATH_HEAD "A:"
+#else
+    #define PATH_HEAD "./"
+#endif
+
 /**
  * Load a font with FreeType
  */
 void lv_example_freetype_1(void)
 {
     /*Create a font*/
-    lv_font_t * font = lv_freetype_font_create("./lvgl/examples/libs/freetype/Lato-Regular.ttf",
+    lv_font_t * font = lv_freetype_font_create(PATH_HEAD "lvgl/examples/libs/freetype/Lato-Regular.ttf",
                                                24,
                                                LV_FREETYPE_FONT_STYLE_NORMAL);
 
     if(!font) {
-        LV_LOG_ERROR("create failed.");
+        LV_LOG_ERROR("freetype font create failed.");
         return;
     }
 
