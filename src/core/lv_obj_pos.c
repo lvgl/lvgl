@@ -468,6 +468,11 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
     }
 
     calc_align_margin_ofs(obj, base, align, &margin_ofs);
+    // In `lv_obj_refr_pos`, because of `LV_ALIGN_TOP_LEFT` setting
+    // at the end of this function, `lv_obj_refr_pos` will set margin
+    // left and top again.
+    margin_ofs.x -= lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+    margin_ofs.y -= lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
 
     x += margin_ofs.x;
     y += margin_ofs.y;
@@ -628,7 +633,7 @@ void lv_obj_refr_pos(lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_coord_t x = lv_obj_get_style_x(obj, LV_PART_MAIN);
     lv_coord_t y = lv_obj_get_style_y(obj, LV_PART_MAIN);
-    lv_point_t margin_ofs;
+    lv_point_t margin_ofs = {0, 0};
 
     if(parent == NULL) {
         lv_obj_move_to(obj, x, y);
@@ -660,52 +665,46 @@ void lv_obj_refr_pos(lv_obj_t * obj)
         else align = LV_ALIGN_TOP_LEFT;
     }
 
-    if(align == LV_ALIGN_TOP_LEFT) {
-        x += lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
-        y += lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
-        lv_obj_move_to(obj, x, y);
+    switch(align) {
+        case LV_ALIGN_TOP_LEFT:
+            break;
+        case LV_ALIGN_TOP_MID:
+            x += pw / 2 - w / 2;
+            break;
+        case LV_ALIGN_TOP_RIGHT:
+            x += pw - w;
+            break;
+        case LV_ALIGN_LEFT_MID:
+            y += ph / 2 - h / 2;
+            break;
+        case LV_ALIGN_BOTTOM_LEFT:
+            y += ph - h;
+            break;
+        case LV_ALIGN_BOTTOM_MID:
+            x += pw / 2 - w / 2;
+            y += ph - h;
+            break;
+        case LV_ALIGN_BOTTOM_RIGHT:
+            x += pw - w;
+            y += ph - h;
+            break;
+        case LV_ALIGN_RIGHT_MID:
+            x += pw - w;
+            y += ph / 2 - h / 2;
+            break;
+        case LV_ALIGN_CENTER:
+            x += pw / 2 - w / 2;
+            y += ph / 2 - h / 2;
+            break;
+        default:
+            break;
     }
-    else {
 
-        switch(align) {
-            case LV_ALIGN_TOP_MID:
-                x += pw / 2 - w / 2;
-                break;
-            case LV_ALIGN_TOP_RIGHT:
-                x += pw - w;
-                break;
-            case LV_ALIGN_LEFT_MID:
-                y += ph / 2 - h / 2;
-                break;
-            case LV_ALIGN_BOTTOM_LEFT:
-                y += ph - h;
-                break;
-            case LV_ALIGN_BOTTOM_MID:
-                x += pw / 2 - w / 2;
-                y += ph - h;
-                break;
-            case LV_ALIGN_BOTTOM_RIGHT:
-                x += pw - w;
-                y += ph - h;
-                break;
-            case LV_ALIGN_RIGHT_MID:
-                x += pw - w;
-                y += ph / 2 - h / 2;
-                break;
-            case LV_ALIGN_CENTER:
-                x += pw / 2 - w / 2;
-                y += ph / 2 - h / 2;
-                break;
-            default:
-                break;
-        }
+    calc_align_margin_ofs(obj, NULL, align, &margin_ofs);
 
-        calc_align_margin_ofs(obj, NULL, align, &margin_ofs);
-
-        x += margin_ofs.x;
-        y += margin_ofs.y;
-        lv_obj_move_to(obj, x, y);
-    }
+    x += margin_ofs.x;
+    y += margin_ofs.y;
+    lv_obj_move_to(obj, x, y);
 }
 
 void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
@@ -1024,7 +1023,9 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                          * With x!=0 circular dependency could occur. */
                         if(lv_obj_get_style_x(child, 0) == 0) {
                             child_res_tmp = lv_area_get_width(&child->coords) + space_right;
+                            child_res_tmp += lv_obj_get_style_margin_left(child, LV_PART_MAIN);
                         }
+                        break;
                 }
             }
             else {
@@ -1058,7 +1059,9 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
                          * With x!=0 circular dependency could occur. */
                         if(lv_obj_get_style_y(child, 0) == 0) {
                             child_res_tmp = lv_area_get_width(&child->coords) + space_left;
+                            child_res_tmp += lv_obj_get_style_margin_right(child, LV_PART_MAIN);
                         }
+                        break;
                 }
             }
             else {
@@ -1110,6 +1113,7 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
                      * With y!=0 circular dependency could occur. */
                     if(lv_obj_get_style_y(child, 0) == 0) {
                         child_res_tmp = lv_area_get_height(&child->coords) + space_top;
+                        child_res_tmp += lv_obj_get_style_margin_top(child, LV_PART_MAIN);
                     }
                     break;
             }
@@ -1194,13 +1198,14 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
     };
 
     switch(align) {
-        case LV_ALIGN_CENTER:
-            ofs->x = margin_mid.x;
-            ofs->y = margin_mid.y;
-            break;
         case LV_ALIGN_TOP_LEFT:
             ofs->x = omargin[0];
             ofs->y = omargin[1];
+            break;
+
+        case LV_ALIGN_CENTER:
+            ofs->x = margin_mid.x;
+            ofs->y = margin_mid.y;
             break;
         case LV_ALIGN_TOP_MID:
             ofs->x = margin_mid.x;
