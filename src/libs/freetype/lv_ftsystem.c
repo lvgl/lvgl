@@ -8,7 +8,7 @@
  *********************/
 
 #include "../../../lvgl.h"
-#if LV_FREETYPE_USE_LVGL_PORT
+#if LV_USE_FREETYPE && LV_FREETYPE_USE_LVGL_PORT
 
 #include <ft2build.h>
 #include FT_CONFIG_CONFIG_H
