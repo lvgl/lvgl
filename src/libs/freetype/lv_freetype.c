@@ -37,9 +37,9 @@
  **********************/
 typedef struct _lv_freetype_font_dsc_t {
     lv_font_t * font;
-    lv_freetype_font_style_t style;
-    uint16_t size;
     char * pathname;
+    uint16_t size;
+    uint16_t style;
 } lv_freetype_font_dsc_t;
 
 typedef struct _lv_freetype_context_t {
@@ -145,7 +145,7 @@ void lv_freetype_uninit(void)
     FT_Done_FreeType(ft_ctx.library);
 }
 
-lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, lv_freetype_font_style_t style)
+lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16_t style)
 {
     LV_ASSERT_NULL(pathname);
     LV_ASSERT(size > 0);

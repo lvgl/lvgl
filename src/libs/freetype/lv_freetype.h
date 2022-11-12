@@ -55,7 +55,7 @@ void lv_freetype_uninit(void);
  * @param style font style(see lv_freetype_font_style_t for details).
  * @return Created font, or NULL on failure.
  */
-lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, lv_freetype_font_style_t style);
+lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16_t style);
 
 /**
  * Delete a freetype font.
