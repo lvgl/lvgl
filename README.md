@@ -109,9 +109,9 @@ LVGL is available as:
 - [NXP MCUXpresso component](https://www.nxp.com/design/software/embedded-software/lvgl-open-source-graphics-library:LITTLEVGL-OPEN-SOURCE-GRAPHICS-LIBRARY)
 - [NuttX library](https://docs.lvgl.io/master/get-started/os/nuttx.html)
 - [RT-Thread RTOS](https://docs.lvgl.io/master/get-started/os/rt-thread.html)
-- [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
-- NXP MCUXpresso library
 - CMSIS-Pack
+- [RIOT OS package](https://doc.riot-os.org/group__pkg__lvgl.html#details)
+
 
 ## :robot: Examples
 
