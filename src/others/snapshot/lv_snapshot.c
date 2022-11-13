@@ -123,7 +123,8 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * 
     lv_disp_drv_init(&driver);
     /*In lack of a better idea use the resolution of the object's display*/
     driver.hor_res = lv_disp_get_hor_res(obj_disp);
-    driver.ver_res = lv_disp_get_hor_res(obj_disp);
+    driver.ver_res = lv_disp_get_ver_res(obj_disp);
+    driver.user_data = obj_disp->driver->user_data;
 
 
     lv_disp_t fake_disp;
