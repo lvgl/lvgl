@@ -210,7 +210,7 @@ void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t src_cf, lv_co
             lv_memset(a_out, 0xff, px_cnt);
             c = lv_color_black();
             for(i = 0; i < px_cnt; i++) {
-                c_out[i] = lv_color_mix(c, alpha_color, src_buf[i]);
+                c_out[i] = lv_color_mix(alpha_color, c, src_buf[i]);
             }
 #endif
             break;

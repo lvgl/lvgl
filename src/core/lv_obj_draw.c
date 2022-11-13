@@ -245,9 +245,8 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t *
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 
     draw_dsc->recolor_opa = lv_obj_get_style_img_recolor_opa(obj, part);
-    if(draw_dsc->recolor_opa > 0) {
-        draw_dsc->recolor = lv_obj_get_style_img_recolor_filtered(obj, part);
-    }
+    draw_dsc->recolor = lv_obj_get_style_img_recolor_filtered(obj, part);
+
     if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 }
 
