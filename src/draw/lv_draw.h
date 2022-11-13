@@ -83,7 +83,7 @@ typedef struct _lv_draw_unit_t {
     struct _lv_draw_ctx_t * draw_ctx;
     const lv_area_t * clip_area;
 
-    uint32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_draw_ctx_t * draw_ctx);
+    int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_draw_ctx_t * draw_ctx);
 
     /**
      * Wait until all background operations are finished. (E.g. GPU operations)

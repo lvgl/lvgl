@@ -57,7 +57,7 @@ void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
     draw_ctx->layer_instance_size = sizeof(lv_draw_sw_layer_ctx_t);
 
 
-    for(int i = 0; i < 4; i++) {
+    for(int i = 0; i < 3; i++) {
         lv_draw_sw_unit_t * draw_sw_unit = lv_malloc(sizeof(*draw_sw_unit));
         lv_memzero(draw_sw_unit, sizeof(lv_draw_sw_unit_t));
         draw_sw_unit->base_unit.draw_ctx = draw_ctx;
@@ -91,7 +91,7 @@ void lv_draw_sw_wait_for_finish(lv_draw_ctx_t * draw_ctx)
 }
 
 
-uint32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx)
+int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx)
 {
 
     lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
@@ -102,13 +102,15 @@ uint32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ct
     lv_draw_task_t * t = lv_draw_get_next_available_task(draw_ctx, NULL);
     while(t) {
         if(t->type == LV_DRAW_TASK_TYPE_RECTANGLE) {
+
             pthread_mutex_lock(&draw_sw_unit->lock);
 
             t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
             draw_sw_unit->task_act = t;
+#if DRAW_LOG
             printf("%d Taken: %d, %d, %d, %d\n", draw_sw_unit->idx, t->area.x1, t->area.y1,
                    lv_area_get_width(&t->area), lv_area_get_height(&t->area));
-
+#endif
             pthread_cond_signal(&draw_sw_unit->cond);
             pthread_mutex_unlock(&draw_sw_unit->lock);
             return 1;
@@ -116,7 +118,7 @@ uint32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ct
         t = lv_draw_get_next_available_task(draw_ctx, t);
     }
 
-    return 0;
+    return -1;
 }
 
 void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
@@ -249,15 +251,17 @@ static int thread(void * ptr)
 
         if(u->task_act->type == LV_DRAW_TASK_TYPE_RECTANGLE) {
             const lv_area_t * coords = &u->task_act->area;
+#if DRAW_LOG
             printf("%d Draw : %d, %d, %d, %d\n", u->idx, coords->x1, coords->y1,
                    lv_area_get_width(coords), lv_area_get_height(coords));
-
+#endif
             u->base_unit.clip_area = &u->task_act->clip_area;
 
             lv_draw_sw_rect((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
-
+#if DRAW_LOG
             printf("%d Ready: %d, %d, %d, %d\n", u->idx, coords->x1, coords->y1,
                    lv_area_get_width(coords), lv_area_get_height(coords));
+#endif
             u->task_act->state = LV_DRAW_TASK_STATE_READY;
             u->task_act = NULL;
             lv_draw_dispatch_request(u->base_unit.draw_ctx);

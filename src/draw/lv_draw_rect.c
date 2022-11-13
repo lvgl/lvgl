@@ -66,10 +66,10 @@ void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, cons
 
     new_task->draw_dsc = lv_malloc(sizeof(lv_draw_rect_dsc_t));
     lv_memcpy(new_task->draw_dsc, dsc, sizeof(*dsc));
-
+#if DRAW_LOG
     printf("Add  (%p, %p): %d, %d, %d, %d\n", new_task, new_task->draw_dsc, coords->x1, coords->y1,
            lv_area_get_width(coords), lv_area_get_height(coords));
-
+#endif
     new_task->type = LV_DRAW_TASK_TYPE_RECTANGLE;
 
     new_task->area = *coords;

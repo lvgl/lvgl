@@ -57,7 +57,9 @@ void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx)
     while(t) {
         lv_draw_task_t * t_next = t->next;
         if(t->state == LV_DRAW_TASK_STATE_READY) {
+#if DRAW_LOG
             printf("Remov(%p)\n", t);
+#endif
             if(t_prev) t_prev->next = t->next;
             else draw_ctx->draw_task_head = t_next;
             lv_free(t->draw_dsc);
@@ -73,7 +75,8 @@ void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx)
     /*Let all draw units to pick draw tasks*/
     lv_draw_unit_t * u = draw_ctx->draw_unit_head;
     while(u) {
-        u->dispatch(u, draw_ctx);
+        int32_t taken_cnt = u->dispatch(u, draw_ctx);
+        if(taken_cnt < 0) return;
         u = u->next;
     }
 }
@@ -91,16 +94,30 @@ void lv_draw_dispatch_request(lv_draw_ctx_t * draw_ctx)
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_prev)
 {
-    lv_draw_task_t * t = t_prev ? t_prev->next : draw_ctx->draw_task_head;
+    if(draw_ctx->draw_task_head) {
+        lv_draw_task_t * t = draw_ctx->draw_task_head;
+        if(t->state != LV_DRAW_TASK_STATE_QUEUED && t->area.x1 <= 0 && t->area.x2 >= 799 && t->area.y1 <= 0 &&
+           t->area.y2 >= 479) {
+            //            printf("screen early exit (t: %d)\n", lv_tick_get());
+            return NULL;
+        }
+    }
 
+    lv_draw_task_t * t = t_prev ? t_prev->next : draw_ctx->draw_task_head;
+    int c = 0;
     while(t) {
         if(t->state == LV_DRAW_TASK_STATE_QUEUED && is_independent(draw_ctx, t)) {
+            //            printf("available: %d\n", c);
             return t;
         }
-
+        c++;
         t = t->next;
     }
 
+    if(c > 20) {
+        //        return NULL;
+    }
+    //    printf("not available (t: %d): %d\n", lv_tick_get(), c);
     return NULL;
 }
 
@@ -112,13 +129,20 @@ static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_end)
 {
     lv_draw_task_t * t = draw_ctx->draw_task_head;
 
+    int c = 0;
     /*If t_end is outside of the older tasks then it's independent*/
     while(t && t != t_end) {
-        lv_area_t res;
-        if(_lv_area_intersect(&res, &t_end->area, &t->area)) return false;
+        c++;
+        if(t->state != LV_DRAW_TASK_STATE_READY) {
+            if(_lv_area_is_on(&t_end->area, &t->area)) {
+                //                printf("ind false: %d\n", c);
+                return false;
+            }
+        }
         t = t->next;
     }
 
+    //    printf("ind true: %d\n", c);
     return true;
 }
 
