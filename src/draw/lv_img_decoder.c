@@ -63,7 +63,7 @@ void _lv_img_decoder_init(void)
     decoder = lv_img_decoder_create();
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) {
-        LV_LOG_WARN("lv_img_decoder_init: out of memory");
+        LV_LOG_WARN("out of memory");
         return;
     }
 
@@ -124,7 +124,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         dsc->src = lv_malloc(fnlen + 1);
         LV_ASSERT_MALLOC(dsc->src);
         if(dsc->src == NULL) {
-            LV_LOG_WARN("lv_img_decoder_open: out of memory");
+            LV_LOG_WARN("out of memory");
             return LV_RES_INV;
         }
         strcpy((char *)dsc->src, src);
@@ -342,7 +342,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             dsc->user_data = lv_malloc(sizeof(lv_img_decoder_built_in_data_t));
             LV_ASSERT_MALLOC(dsc->user_data);
             if(dsc->user_data == NULL) {
-                LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
+                LV_LOG_ERROR("out of memory");
                 lv_fs_close(&f);
                 return LV_RES_INV;
             }
@@ -386,7 +386,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             dsc->user_data = lv_malloc(sizeof(lv_img_decoder_built_in_data_t));
             LV_ASSERT_MALLOC(dsc->user_data);
             if(dsc->user_data == NULL) {
-                LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
+                LV_LOG_ERROR("out of memory");
                 return LV_RES_INV;
             }
             lv_memzero(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
@@ -398,7 +398,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         user_data->opa                             = lv_malloc(palette_size * sizeof(lv_opa_t));
         LV_ASSERT_MALLOC(user_data->opa);
         if(user_data->palette == NULL || user_data->opa == NULL) {
-            LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
+            LV_LOG_ERROR("out of memory");
             lv_img_decoder_built_in_close(decoder, dsc);
             return LV_RES_INV;
         }

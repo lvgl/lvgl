@@ -209,7 +209,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
     }
 
     if(LV_IMG_SRC_UNKNOWN == img_src_type) {
-        LV_LOG_WARN("lv_img_src_get_type: unknown image type");
+        LV_LOG_WARN("unknown image type");
     }
 
     return img_src_type;

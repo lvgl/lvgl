@@ -67,7 +67,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
 
 #if LV_IMG_CACHE_DEF_SIZE
     if(entry_cnt == 0) {
-        LV_LOG_WARN("lv_img_cache_open: the cache size is 0");
+        LV_LOG_WARN("the cache size is 0");
         return NULL;
     }
 

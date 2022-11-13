@@ -105,7 +105,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_INFO("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
+            LV_LOG_INFO("glyph dsc not found for U+%" LV_PRIX32, letter);
 
 #if LV_USE_FONT_PLACEHOLDER
             /* draw placeholder */
@@ -156,7 +156,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
 
     const uint8_t * map_p = lv_font_get_glyph_bitmap(g.resolved_font, letter);
     if(map_p == NULL) {
-        LV_LOG_WARN("lv_draw_letter: character's bitmap not found");
+        LV_LOG_WARN("character's bitmap not found");
         return;
     }
 
@@ -228,7 +228,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
             shades = 256;
             break;       /*No opa table, pixel value will be used directly*/
         default:
-            LV_LOG_WARN("lv_draw_letter: invalid bpp");
+            LV_LOG_WARN("invalid bpp");
             return; /*Invalid bpp. Can't render the letter*/
     }
 
@@ -394,7 +394,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             bitmask_init  = 0xFF;
             break;       /*No opa table, pixel value will be used directly*/
         default:
-            LV_LOG_WARN("lv_draw_letter: invalid bpp not found");
+            LV_LOG_WARN("invalid bpp not found");
             return; /*Invalid bpp. Can't render the letter*/
     }
 

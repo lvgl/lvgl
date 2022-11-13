@@ -381,7 +381,7 @@ lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col)
     lv_table_t * table = (lv_table_t *)obj;
 
     if(col >= table->col_cnt) {
-        LV_LOG_WARN("lv_table_set_col_width: too big 'col_id'. Must be < LV_TABLE_COL_MAX.");
+        LV_LOG_WARN("too big 'col_id'. Must be < LV_TABLE_COL_MAX.");
         return 0;
     }
 
@@ -394,7 +394,7 @@ bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
 
     lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
-        LV_LOG_WARN("lv_table_get_cell_crop: invalid row or column");
+        LV_LOG_WARN("invalid row or column");
         return false;
     }
     uint32_t cell = row * table->col_cnt + col;
