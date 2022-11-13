@@ -37,9 +37,31 @@ typedef struct {
     int32_t life;
 } _lv_img_cache_entry_t;
 
+typedef _lv_img_cache_entry_t * (*lv_img_cache_open_xcb_t)(const void *, lv_color_t, int32_t);
+typedef void (*lv_img_cache_set_size_xcb_t)(uint16_t);
+typedef void (*lv_img_cache_invalidate_src_xcb_t)(const void *);
+
+typedef struct {
+    lv_img_cache_open_xcb_t open_cb;
+    lv_img_cache_set_size_xcb_t set_size_cb;
+    lv_img_cache_invalidate_src_xcb_t invalidate_src_cb;
+} lv_img_cache_ctx_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the img cache context
+ * @param ctx Pointer to the img cache context
+ */
+void lv_img_cache_ctx_init(lv_img_cache_ctx_t * ctx);
+
+/**
+ * Update the img cache context
+ * @param ctx Pointer to the img cache context
+ */
+void lv_img_cache_ctx_update(const lv_img_cache_ctx_t * ctx);
 
 /**
  * Open an image using the image decoder interface and cache it.
@@ -58,7 +80,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
  * E.g. if 20 PNG or JPG images are open in the RAM they consume memory while opened in the cache.
  * @param new_entry_cnt number of image to cache
  */
-void lv_img_cache_set_size(uint16_t new_slot_num);
+void lv_img_cache_set_size(uint16_t new_entry_cnt);
 
 /**
  * Invalidate an image source in the cache.
