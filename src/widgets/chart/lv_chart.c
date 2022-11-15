@@ -16,10 +16,10 @@
  *********************/
 #define MY_CLASS &lv_chart_class
 
-#define LV_CHART_HDIV_DEF 3
-#define LV_CHART_VDIV_DEF 5
-#define LV_CHART_POINT_CNT_DEF 10
-#define LV_CHART_LABEL_MAX_TEXT_LENGTH 16
+#define LV_CHART_HDIV_DEF               (3u)    /* Default horizontal divisions */
+#define LV_CHART_VDIV_DEF               (5u)    /* Default vertical divisions */
+#define LV_CHART_POINT_CNT_DEF          (10u)   /* Default points in series */
+#define LV_CHART_LABEL_MAX_TEXT_LENGTH  (16u)   /* Label max text length */
 
 /**********************
  *      TYPEDEFS
@@ -344,20 +344,24 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_chart_t * chart    = (lv_chart_t *)obj;
+    lv_chart_t * chart = (lv_chart_t *)obj;
+
+    /* Allocate space for a new series and add it to the chart series linked list */
     lv_chart_series_t * ser = _lv_ll_ins_head(&chart->series_ll);
     LV_ASSERT_MALLOC(ser);
     if(ser == NULL) return NULL;
 
-    lv_coord_t def = LV_CHART_POINT_NONE;
-
-    ser->color  = color;
+    /* Allocate memory for point_cnt points, handle failure below */
     ser->y_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
     LV_ASSERT_MALLOC(ser->y_points);
 
     if(chart->type == LV_CHART_TYPE_SCATTER) {
         ser->x_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
         LV_ASSERT_MALLOC(ser->x_points);
+        /* NOTE: Should we return if ser->x_points is NULL? Is this an out of memory error? */
+    }
+    else {
+        ser->x_points = NULL;
     }
     if(ser->y_points == NULL) {
         _lv_ll_remove(&chart->series_ll, ser);
@@ -365,13 +369,17 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
         return NULL;
     }
 
+    /* Set series properties on successful allocation */
+    ser->color = color;
     ser->start_point = 0;
     ser->y_ext_buf_assigned = false;
     ser->hidden = 0;
-    ser->x_axis_sec = axis & LV_CHART_AXIS_SECONDARY_X ? 1 : 0;
-    ser->y_axis_sec = axis & LV_CHART_AXIS_SECONDARY_Y ? 1 : 0;
+    ser->x_axis_sec = axis & LV_CHART_AXIS_SECONDARY_X;
+    ser->y_axis_sec = axis & LV_CHART_AXIS_SECONDARY_Y;
 
+    /* Set points on y axis to value LV_CHART_POINT_NONE so they do not get drawn */
     uint16_t i;
+    const lv_coord_t def = LV_CHART_POINT_NONE;
     lv_coord_t * p_tmp = ser->y_points;
     for(i = 0; i < chart->point_cnt; i++) {
         *p_tmp = def;
