@@ -24,7 +24,7 @@
  *  STATIC VARIABLES
  **********************/
 
-static lv_img_cache_ctx_t img_cache_ctx = { 0 };
+static lv_img_cache_manager_t img_cache_manager = { 0 };
 
 /**********************
  *      MACROS
@@ -34,34 +34,34 @@ static lv_img_cache_ctx_t img_cache_ctx = { 0 };
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_img_cache_ctx_init(lv_img_cache_ctx_t * ctx)
+void lv_img_cache_manager_init(lv_img_cache_manager_t * manager)
 {
-    LV_ASSERT_NULL(ctx);
-    lv_memzero(ctx, sizeof(lv_img_cache_ctx_t));
+    LV_ASSERT_NULL(manager);
+    lv_memzero(manager, sizeof(lv_img_cache_manager_t));
 }
 
-void lv_img_cache_ctx_update(const lv_img_cache_ctx_t * ctx)
+void lv_img_cache_manager_update(const lv_img_cache_manager_t * manager)
 {
-    LV_ASSERT_NULL(ctx);
-    lv_memcpy(&img_cache_ctx, ctx, sizeof(lv_img_cache_ctx_t));
+    LV_ASSERT_NULL(manager);
+    lv_memcpy(&img_cache_manager, manager, sizeof(lv_img_cache_manager_t));
 }
 
 _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, int32_t frame_id)
 {
-    LV_ASSERT_NULL(img_cache_ctx.open_cb);
-    return img_cache_ctx.open_cb(src, color, frame_id);
+    LV_ASSERT_NULL(img_cache_manager.open_cb);
+    return img_cache_manager.open_cb(src, color, frame_id);
 }
 
 void lv_img_cache_set_size(uint16_t new_entry_cnt)
 {
-    LV_ASSERT_NULL(img_cache_ctx.set_size_cb);
-    img_cache_ctx.set_size_cb(new_entry_cnt);
+    LV_ASSERT_NULL(img_cache_manager.set_size_cb);
+    img_cache_manager.set_size_cb(new_entry_cnt);
 }
 
 void lv_img_cache_invalidate_src(const void * src)
 {
-    LV_ASSERT_NULL(img_cache_ctx.invalidate_src_cb);
-    img_cache_ctx.invalidate_src_cb(src);
+    LV_ASSERT_NULL(img_cache_manager.invalidate_src_cb);
+    img_cache_manager.invalidate_src_cb(src);
 }
 
 /**********************

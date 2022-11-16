@@ -37,31 +37,27 @@ typedef struct {
     int32_t life;
 } _lv_img_cache_entry_t;
 
-typedef _lv_img_cache_entry_t * (*lv_img_cache_open_xcb_t)(const void *, lv_color_t, int32_t);
-typedef void (*lv_img_cache_set_size_xcb_t)(uint16_t);
-typedef void (*lv_img_cache_invalidate_src_xcb_t)(const void *);
-
 typedef struct {
-    lv_img_cache_open_xcb_t open_cb;
-    lv_img_cache_set_size_xcb_t set_size_cb;
-    lv_img_cache_invalidate_src_xcb_t invalidate_src_cb;
-} lv_img_cache_ctx_t;
+    _lv_img_cache_entry_t * (*open_cb)(const void * src, lv_color_t color, int32_t frame_id);
+    void (*set_size_cb)(uint16_t new_entry_cnt);
+    void (*invalidate_src_cb)(const void * src);
+} lv_img_cache_manager_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
- * Initialize the img cache context
- * @param ctx Pointer to the img cache context
+ * Initialize the img cache manager
+ * @param manager Pointer to the img cache manager
  */
-void lv_img_cache_ctx_init(lv_img_cache_ctx_t * ctx);
+void lv_img_cache_manager_init(lv_img_cache_manager_t * manager);
 
 /**
- * Update the img cache context
- * @param ctx Pointer to the img cache context
+ * Update the img cache manager
+ * @param manager Pointer to the img cache manager
  */
-void lv_img_cache_ctx_update(const lv_img_cache_ctx_t * ctx);
+void lv_img_cache_manager_update(const lv_img_cache_manager_t * manager);
 
 /**
  * Open an image using the image decoder interface and cache it.

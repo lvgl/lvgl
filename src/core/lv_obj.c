@@ -160,7 +160,7 @@ void lv_init(void)
 
     _lv_img_decoder_init();
 
-    lv_img_cache_builtin_init();
+    _lv_img_cache_builtin_init();
 
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";

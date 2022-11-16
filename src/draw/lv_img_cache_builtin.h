@@ -26,7 +26,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_img_cache_builtin_init(void);
+void _lv_img_cache_builtin_init(void);
 
 /**********************
  *      MACROS

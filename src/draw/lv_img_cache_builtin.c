@@ -58,18 +58,18 @@ static void lv_img_cache_invalidate_src_builtin(const void * src);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_img_cache_builtin_init(void)
+void _lv_img_cache_builtin_init(void)
 {
 #if LV_IMG_CACHE_DEF_SIZE
     lv_img_cache_set_size_builtin(LV_IMG_CACHE_DEF_SIZE);
 #endif
 
-    lv_img_cache_ctx_t ctx;
-    lv_img_cache_ctx_init(&ctx);
-    ctx.open_cb = _lv_img_cache_open_builtin;
-    ctx.set_size_cb = lv_img_cache_set_size_builtin;
-    ctx.invalidate_src_cb = lv_img_cache_invalidate_src_builtin;
-    lv_img_cache_ctx_update(&ctx);
+    lv_img_cache_manager_t manager;
+    lv_img_cache_manager_init(&manager);
+    manager.open_cb = _lv_img_cache_open_builtin;
+    manager.set_size_cb = lv_img_cache_set_size_builtin;
+    manager.invalidate_src_cb = lv_img_cache_invalidate_src_builtin;
+    lv_img_cache_manager_update(&manager);
 }
 
 /**********************
