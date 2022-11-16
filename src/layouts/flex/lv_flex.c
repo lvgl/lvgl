@@ -536,8 +536,6 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
         diff_x += f->row ? main_pos + get_margin_main_start(item, LV_PART_MAIN) : cross_pos;
         diff_y += f->row ? cross_pos : main_pos + get_margin_main_start(item, LV_PART_MAIN);
 
-        LV_LOG("%d %d %d %d %d %d %d\n", main_pos, diff_x, diff_y, item->coords.x1, item->coords.y1, item->coords.x2,
-               item->coords.y2);
         if(diff_x || diff_y) {
             lv_obj_invalidate(item);
             item->coords.x1 += diff_x;
@@ -555,7 +553,6 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
         item = get_next_item(cont, f->rev, &item_first_id);
     }
-    LV_LOG("# ### NEXT\n");
 }
 
 /**
