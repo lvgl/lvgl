@@ -1028,7 +1028,7 @@ static void scroll_to_selected_cell(lv_obj_t * obj)
         lv_obj_scroll_by_bounded(obj, 0, -a.y1, LV_ANIM_ON);
     }
     else if(a.y2 > lv_obj_get_height(obj)) {
-        lv_obj_scroll_by_bounded(obj, 0, lv_obj_get_height(obj) - a.y2 , LV_ANIM_ON);
+        lv_obj_scroll_by_bounded(obj, 0, lv_obj_get_height(obj) - a.y2, LV_ANIM_ON);
     }
 
 }
