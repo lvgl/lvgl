@@ -146,6 +146,8 @@ uint32_t lv_event_get_count(lv_event_list_t * list);
 
 lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index);
 
+lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc);
+
 void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc);
 
 bool lv_event_remove(lv_event_list_t * list, uint32_t index);

@@ -112,6 +112,12 @@ lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
     else return &list->dsc[index];
 }
 
+lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc)
+{
+    LV_ASSERT_NULL(dsc);
+    return dsc->cb;
+}
+
 void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc)
 {
     LV_ASSERT_NULL(dsc);

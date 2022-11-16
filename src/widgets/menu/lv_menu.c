@@ -361,9 +361,15 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     /* Remove old event */
-    if(lv_obj_remove_event_cb(obj, lv_menu_load_page_event_cb)) {
-        lv_obj_send_event(obj, LV_OBJ_EVENT_DELETE, NULL);
-        lv_obj_remove_event_cb(obj, lv_menu_obj_del_event_cb);
+    uint32_t i;
+    uint32_t event_cnt = lv_obj_get_event_count(obj);
+    for(i = 0; i < event_cnt; i++) {
+        lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(obj, i);
+        if(lv_event_dsc_get_cb(event_dsc) == lv_menu_load_page_event_cb) {
+            lv_obj_send_event(obj, LV_OBJ_EVENT_DELETE, NULL);
+            lv_obj_remove_event(obj, i);
+            break;
+        }
     }
 
     lv_menu_load_page_event_data_t * event_data = lv_malloc(sizeof(lv_menu_load_page_event_data_t));
