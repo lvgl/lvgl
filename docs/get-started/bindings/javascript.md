@@ -4,11 +4,11 @@
 
 **Code**
 
-<img src="/_static/img/js_code.png">
+<img src="../..//_static/img/js_code.png">
 
 
 **Code Runing on Real Device**
-<img src="/_static/img/js_on_device.jpg" style="transform: rotate(270deg); max-width:100%">
+<img src="../../_static/img/js_on_device.jpg" style="transform: rotate(270deg); max-width:100%">
 
 ## Table of Contents
 
