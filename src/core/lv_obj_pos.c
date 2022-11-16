@@ -27,7 +27,7 @@ static lv_coord_t calc_content_width(lv_obj_t * obj);
 static lv_coord_t calc_content_height(lv_obj_t * obj);
 static void layout_update_core(lv_obj_t * obj);
 static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv);
-static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_point_t * ofs);
+static void calc_align_margin_ofs(const lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_point_t * ofs);
 
 /**********************
  *  STATIC VARIABLES
@@ -468,9 +468,9 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
     }
 
     calc_align_margin_ofs(obj, base, align, &margin_ofs);
-    // In `lv_obj_refr_pos`, because of `LV_ALIGN_TOP_LEFT` setting
-    // at the end of this function, `lv_obj_refr_pos` will set margin
-    // left and top again.
+    /* In `lv_obj_refr_pos`, because of `LV_ALIGN_TOP_LEFT` setting
+     * at the end of this function, `lv_obj_refr_pos` will set margin
+     * left and top again. */
     margin_ofs.x -= lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
     margin_ofs.y -= lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
 
@@ -1077,7 +1077,7 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
     }
 
     if(child_res == LV_COORD_MIN) return self_w;
-    else return LV_MAX(child_res, self_w);
+    return LV_MAX(child_res, self_w);
 }
 
 static lv_coord_t calc_content_height(lv_obj_t * obj)
@@ -1126,7 +1126,7 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
     }
 
     if(child_res == LV_COORD_MIN) return self_h;
-    else return LV_MAX(self_h, child_res + space_bottom);
+    return LV_MAX(self_h, child_res + space_bottom);
 }
 
 static void layout_update_core(lv_obj_t * obj)
@@ -1174,14 +1174,13 @@ static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv)
     lv_point_transform(p, angle, zoom, &pivot);
 }
 
-static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_point_t * ofs)
+static void calc_align_margin_ofs(const lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_point_t * ofs)
 {
-    lv_coord_t omargin[] = {
-        lv_obj_get_style_margin_left(obj, LV_PART_MAIN),
-        lv_obj_get_style_margin_top(obj, LV_PART_MAIN),
-        lv_obj_get_style_margin_right(obj, LV_PART_MAIN),
-        lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN)
-    };
+    lv_coord_t omargin[4];
+    omargin[0] = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+    omargin[1] = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+    omargin[2] = lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+    omargin[3] = lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 
     lv_coord_t bmargin[] = {0, 0, 0, 0};
     lv_point_t bmargin_average = {0, 0};
@@ -1196,10 +1195,9 @@ static void calc_align_margin_ofs(lv_obj_t * obj, const lv_obj_t * base, lv_alig
         bmargin_average.y = (bmargin[3] - bmargin[1]) / 2;
     }
 
-    lv_point_t omargin_mid = {
-        (omargin[0] - omargin[2]) / 2,
-        (omargin[1] - omargin[3]) / 2
-    };
+    lv_point_t omargin_mid;
+    omargin_mid.x = (omargin[0] - omargin[2]) / 2;
+    omargin_mid.y = (omargin[1] - omargin[3]) / 2;
 
     switch(align) {
         case LV_ALIGN_TOP_LEFT:
