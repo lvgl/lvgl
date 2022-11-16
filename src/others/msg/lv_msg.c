@@ -80,7 +80,7 @@ void * lv_msg_subscribe_obj(lv_msg_id_t msg_id, lv_obj_t * obj, void * user_data
     /*If not added yet, add a delete event cb which automatically unsubcribes the object*/
     sub_dsc_t * s_first = lv_obj_get_event_user_data_of_cb(obj, obj_delete_event_cb);
     if(s_first == NULL) {
-        lv_obj_add_event_cb(obj, obj_delete_event_cb, LV_OBJ_EVENT_DELETE, s);
+        lv_obj_add_event(obj, obj_delete_event_cb, LV_OBJ_EVENT_DELETE, s);
     }
     return s;
 }

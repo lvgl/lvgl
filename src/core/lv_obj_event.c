@@ -8,7 +8,7 @@
  *********************/
 #include "lv_obj.h"
 #include "lv_indev.h"
-#include "lv_indev_priv.h"
+#include "lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -98,38 +98,35 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     return res;
 }
 
-void lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
-                         void * user_data)
+void lv_obj_add_event(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
+                      void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_allocate_spec_attr(obj);
 
-    lv_event_add_callback(&obj->spec_attr->event_list, event_cb, filter, user_data);
+    lv_event_add(&obj->spec_attr->event_list, event_cb, filter, user_data);
 }
 
-bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
+uint32_t lv_objget_event_count(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->spec_attr == NULL) return false;
-
-    return lv_event_remove_callback(&obj->spec_attr->event_list, event_cb);
-}
-
-bool lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, const void * user_data)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->spec_attr == NULL) return false;
-
-    return lv_event_remove_callback_with_user_data(&obj->spec_attr->event_list, event_cb, user_data);
+    LV_ASSERT_NULL(obj);
+    if(obj->spec_attr == NULL) return 0;
+    return lv_event_get_count(&obj->spec_attr->event_list);
 }
 
 
-void * lv_obj_get_event_user_data_of_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb)
+lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(obj);
     if(obj->spec_attr == NULL) return NULL;
+    return lv_event_get_dsc(&obj->spec_attr->event_list, index);
+}
 
-    return lv_event_get_user_data_of_callback(&obj->spec_attr->event_list, event_cb);
+bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
+{
+    LV_ASSERT_NULL(obj);
+    if(obj->spec_attr == NULL) return false;
+    return lv_event_remove(&obj->spec_attr->event_list, index);
 }
 
 lv_obj_t * lv_event_get_target_obj(lv_event_t * e)

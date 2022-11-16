@@ -9,7 +9,7 @@
 #include "lv_obj.h"
 #include "lv_theme.h"
 #include "lv_disp.h"
-#include "lv_disp_priv.h"
+#include "lv_disp_private.h"
 
 /*********************
  *      DEFINES

@@ -294,7 +294,7 @@ void lv_menu_set_sidebar_page(lv_obj_t * obj, lv_obj_t * page)
             menu->sidebar_header = sidebar_header;
 
             lv_obj_t * sidebar_header_back_btn = lv_btn_create(menu->sidebar_header);
-            lv_obj_add_event_cb(sidebar_header_back_btn, lv_menu_back_event_cb, LV_OBJ_EVENT_CLICKED, menu);
+            lv_obj_add_event(sidebar_header_back_btn, lv_menu_back_event_cb, LV_OBJ_EVENT_CLICKED, menu);
             lv_obj_add_flag(sidebar_header_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
             lv_obj_set_flex_flow(sidebar_header_back_btn, LV_FLEX_FLOW_ROW);
             menu->sidebar_header_back_btn = sidebar_header_back_btn;
@@ -370,8 +370,8 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
     event_data->menu = menu;
     event_data->page = page;
 
-    lv_obj_add_event_cb(obj, lv_menu_load_page_event_cb, LV_OBJ_EVENT_CLICKED, event_data);
-    lv_obj_add_event_cb(obj, lv_menu_obj_del_event_cb, LV_OBJ_EVENT_DELETE, event_data);
+    lv_obj_add_event(obj, lv_menu_load_page_event_cb, LV_OBJ_EVENT_CLICKED, event_data);
+    lv_obj_add_event(obj, lv_menu_obj_del_event_cb, LV_OBJ_EVENT_DELETE, event_data);
 }
 
 void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
@@ -553,7 +553,7 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     /* Create the default simple back btn and title */
     lv_obj_t * main_header_back_btn = lv_btn_create(menu->main_header);
-    lv_obj_add_event_cb(main_header_back_btn, lv_menu_back_event_cb, LV_OBJ_EVENT_CLICKED, menu);
+    lv_obj_add_event(main_header_back_btn, lv_menu_back_event_cb, LV_OBJ_EVENT_CLICKED, menu);
     lv_obj_add_flag(main_header_back_btn, LV_OBJ_FLAG_EVENT_BUBBLE);
     lv_obj_set_flex_flow(main_header_back_btn, LV_FLEX_FLOW_ROW);
     menu->main_header_back_btn = main_header_back_btn;
@@ -568,7 +568,7 @@ static void lv_menu_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     menu->main_page = NULL;
     menu->selected_tab = NULL;
 
-    lv_obj_add_event_cb(obj, lv_menu_value_changed_event_cb, LV_OBJ_EVENT_VALUE_CHANGED, menu);
+    lv_obj_add_event(obj, lv_menu_value_changed_event_cb, LV_OBJ_EVENT_VALUE_CHANGED, menu);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

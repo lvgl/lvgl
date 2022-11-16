@@ -302,7 +302,7 @@ void test_btn_matrix_pressed_event_works(void)
 {
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
     lv_btnmatrix_set_map(btnm, btn_map);
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_PRESSED, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_PRESSED, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_PRESSED;
     /* Click button index 0. */
@@ -315,7 +315,7 @@ void test_btn_matrix_release_event_works(void)
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_RELEASED, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_RELEASED, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_RELEASED;
 
@@ -338,7 +338,7 @@ void test_btn_matrix_key_event_works(void)
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
     lv_obj_update_layout(btnm);         /*The force calculating the button areas*/
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_KEY, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_KEY, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_KEY;
 
@@ -387,7 +387,7 @@ void test_btn_matrix_pressing_event_works(void)
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_PRESSING, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_PRESSING, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_PRESSING;
     /* Select a button before raising a simulated event.
@@ -405,7 +405,7 @@ void test_btn_matrix_long_press_repeat_event_works(void)
 
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_LONG_PRESSED_REPEAT, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_LONG_PRESSED_REPEAT, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_LONG_PRESSED_REPEAT;
     /* Select a button before raising a simulated event.
@@ -421,7 +421,7 @@ void test_btn_matrix_press_lost_event_works(void)
 
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_PRESS_LOST, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_PRESS_LOST, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_PRESS_LOST;
     lv_obj_send_event(btnm, LV_OBJ_EVENT_PRESS_LOST, NULL);
@@ -435,7 +435,7 @@ void test_btn_matrix_defocused_event_works(void)
 
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_DEFOCUSED, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_DEFOCUSED, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_DEFOCUSED;
     /* Select a button before raising a simulated event.
@@ -451,7 +451,7 @@ void test_btn_matrix_focused_event_works(void)
 
     lv_btnmatrix_set_map(btnm, btn_map);
     lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
-    lv_obj_add_event_cb(btnm, event_handler, LV_OBJ_EVENT_FOCUSED, NULL);
+    lv_obj_add_event(btnm, event_handler, LV_OBJ_EVENT_FOCUSED, NULL);
     /* Set expected event code before the event is raised. */
     exp_evt_code = LV_OBJ_EVENT_FOCUSED;
     lv_obj_send_event(btnm, LV_OBJ_EVENT_FOCUSED, NULL);

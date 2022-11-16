@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include "../../core/lv_disp.h"
 #include "../../core/lv_refr.h"
-#include "../../core/lv_disp_priv.h"
+#include "../../core/lv_disp_private.h"
 
 /*********************
  *      DEFINES

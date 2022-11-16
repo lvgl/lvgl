@@ -11,7 +11,7 @@
 #if LV_USE_COLORWHEEL
 
 #include "../../misc/lv_assert.h"
-#include "../../core/lv_indev_priv.h"
+#include "../../core/lv_indev_private.h"
 
 /*********************
  *      DEFINES
