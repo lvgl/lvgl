@@ -867,8 +867,8 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
     blend_dsc.opa = draw_dsc->opa;
     blend_dsc.blend_mode = draw_dsc->blend_mode;
     blend_dsc.blend_area = &blend_area;
-    
-    
+
+
     /*The simplest case just copy the pixels into the draw_buf*/
     if(!mask_any && !transform && cf == LV_IMG_CF_TRUE_COLOR && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
@@ -890,7 +890,8 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
 #if LV_COLOR_DEPTH == 16
-    else if(!mask_any && !transform && cf == LV_IMG_CF_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP && blend_dsc.opa >= LV_OPA_MAX) {
+    else if(!mask_any && !transform && cf == LV_IMG_CF_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP &&
+            blend_dsc.opa >= LV_OPA_MAX) {
         lv_coord_t src_w = lv_area_get_width(coords);
         lv_coord_t src_h = lv_area_get_height(coords);
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
@@ -1063,7 +1064,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 )
                 /* *INDENT-ON* */
             }
-            else if(   !mask_any
+            else if(!mask_any
                     && (LV_IMG_CF_RGB565A8 == cf)) {
                 /* accelerate copy-with-source-masks-and-opacity */
 
@@ -1158,9 +1159,9 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 && (draw_dsc->recolor_opa == LV_OPA_TRANSP)
                 && (((LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED == cf)
                      || (LV_IMG_CF_TRUE_COLOR == cf))
-                     || (LV_IMG_CF_RGB565A8 == cf)
+                    || (LV_IMG_CF_RGB565A8 == cf)
 #if defined(__ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__) &&  __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
-                     || ((LV_IMG_CF_TRUE_COLOR_ALPHA == cf)
+                    || ((LV_IMG_CF_TRUE_COLOR_ALPHA == cf)
                         && (LV_COLOR_DEPTH == 32))
 #endif
                    )
