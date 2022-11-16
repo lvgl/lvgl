@@ -148,8 +148,7 @@ lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index);
 
 void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc);
 
-void * lv_event_dsc_remove(lv_event_list_t list, lv_event_dsc_t * dsc);
-
+bool lv_event_remove(lv_event_list_t * list, uint32_t index);
 
 /**
  * Get the object originally targeted by the event. It's the same even if the event is bubbled.

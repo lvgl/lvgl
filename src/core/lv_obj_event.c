@@ -107,7 +107,7 @@ void lv_obj_add_event(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t fi
     lv_event_add(&obj->spec_attr->event_list, event_cb, filter, user_data);
 }
 
-uint32_t lv_objget_event_count(lv_obj_t * obj)
+uint32_t lv_obj_get_event_count(lv_obj_t * obj)
 {
     LV_ASSERT_NULL(obj);
     if(obj->spec_attr == NULL) return 0;
