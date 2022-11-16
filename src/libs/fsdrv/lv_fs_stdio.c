@@ -267,7 +267,7 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
     do {
         entry = readdir(handle->dir_p);
         if(entry) {
-            if(entry->d_type == DT_DIR) lv_snprintf(fn, MAX_PATH_LEN, "/%s", entry->d_name);
+            if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
             else strcpy(fn, entry->d_name);
         }
         else {
