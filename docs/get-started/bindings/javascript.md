@@ -1,14 +1,17 @@
 # JavaScript
 
-[lv_binding_js](https://github.com/lvgl/lv_binding_js) can Write lvgl with JavaScript. It uses React's virtual DOM concept to manipulate lvgl UI components, providing a familiar experience to users.
+With [lv_binding_js](https://github.com/lvgl/lv_binding_js) you can write lvgl with JavaScript.
+
+It uses React's virtual DOM concept to manipulate lvgl UI components, providing a familiar React-like experience to users.
 
 **Code**
 
-<img src="../..//_static/img/js_code.png">
+<img src="../../_static/img/js_code.png">
 
 
 **Code Runing on Real Device**
-<img src="../../_static/img/js_on_device.jpg" style="transform: rotate(270deg); max-width:100%">
+
+<img src="../../_static/img/js_on_device.jpg" style="transform: rotate(270deg); max-width: 400px; padding-left: 100px;">
 
 ## Table of Contents
 
