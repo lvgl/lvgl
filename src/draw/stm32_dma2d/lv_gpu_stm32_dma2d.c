@@ -49,8 +49,8 @@ static void lv_draw_stm32_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t des
 static void lv_draw_stm32_dma2d_blend_map(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                           const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa);
 
-static void lv_draw_stm32_dma2d_img_decoded(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc,
-                                            const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
+static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc,
+                                            const lv_area_t * coords, const void * src);
 
 
 static void invalidate_cache(void);
@@ -101,7 +101,7 @@ void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     lv_draw_stm32_dma2d_ctx_t * dma2d_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
 
     dma2d_draw_ctx->blend = lv_draw_stm32_dma2d_blend;
-    //    dma2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_stm32_dma2d_img_decoded;
+    dma2d_draw_ctx->base_draw.draw_img = lv_draw_stm32_dma2d_img;
     dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_stm32_dma2d_wait_cb;
     dma2d_draw_ctx->base_draw.buffer_copy = lv_draw_stm32_dma2d_buffer_copy;
 
@@ -156,12 +156,38 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx,
 }
 
 
-static void lv_draw_stm32_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                                            const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
+static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+                                            const lv_area_t * coords, const void * src)
 {
-    /*TODO basic ARGB8888 image can be handles here*/
+	if(lv_img_src_get_type(src) == LV_IMG_SRC_VARIABLE) {
+	    lv_area_t blend_area;
+	    /*Return if fully clipped*/
+	    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area)) return LV_RES_OK;
 
-    lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
+
+		const lv_img_dsc_t * dsc = src;
+		if(dsc->header.cf == LV_IMG_CF_RGBA8888) {
+			/*TODO Blend here. Perform a fill as example*/
+			lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
+			/*Go to first pixel on the buffer*/
+			lv_color_t * dest_buf = draw_ctx->buf;
+			dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
+
+			/*Make the blend area relative to the draw buffer's area*/
+			lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+			/*Wait for previous operation*/
+			while(DMA2D->CR & DMA2D_CR_START_Msk);
+
+			lv_draw_stm32_dma2d_blend_fill(dest_buf, dest_stride, &blend_area, lv_color_hex3(lv_rand(0x000, 0xfff)));
+
+			return LV_RES_OK;
+		}
+	}
+
+	return LV_RES_INV;
+
 }
 
 static void lv_draw_stm32_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
