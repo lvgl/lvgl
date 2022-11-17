@@ -21,7 +21,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_obj_t * btn_create(lv_obj_t * par, const char * str);
+static lv_obj_t * btn_create(lv_obj_t * par, const char * str, lv_color_t color);
 static void obj_child_node_def_style_init(lv_style_t * style);
 static void obj_child_node_checked_style_init(lv_style_t * style);
 
@@ -64,8 +64,8 @@ void view_create(lv_obj_t * par, view_t * ui)
     lv_obj_set_style_radius(obj, 10, 0);
     lv_obj_set_style_clip_corner(obj, true, 0);
     lv_obj_set_style_border_width(obj, 0, 0);
-    lv_obj_set_style_shadow_color(obj, lv_color_hex3(0x888), 0);
-    lv_obj_set_style_shadow_width(obj, 10, 0);
+    lv_obj_set_style_shadow_color(obj, lv_color_hex3(0xaaa), 0);
+    lv_obj_set_style_shadow_width(obj, 20, 0);
     lv_obj_set_style_shadow_ofs_y(obj, 2, 0);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
@@ -96,8 +96,8 @@ void view_create(lv_obj_t * par, view_t * ui)
         LV_FLEX_ALIGN_CENTER
     );
     ui->ctrl_pad.btn.cont = obj;
-    ui->ctrl_pad.btn.add = btn_create(obj, "Add");
-    ui->ctrl_pad.btn.remove = btn_create(obj, "Remove");
+    ui->ctrl_pad.btn.add = btn_create(obj, "Add", lv_palette_main(LV_PALETTE_BLUE_GREY));
+    ui->ctrl_pad.btn.remove = btn_create(obj, "Remove", lv_palette_main(LV_PALETTE_RED));
 
     lv_event_send(ui->root, LV_EVENT_CLICKED, NULL); /*Make it active by default*/
 
@@ -110,10 +110,14 @@ void view_create(lv_obj_t * par, view_t * ui)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_obj_t * btn_create(lv_obj_t * par, const char * str)
+static lv_obj_t * btn_create(lv_obj_t * par, const char * str, lv_color_t color)
 {
     lv_obj_t * btn = lv_btn_create(par);
     lv_obj_set_width(btn, lv_pct(30));
+    lv_obj_set_height(btn, 30);
+    lv_obj_set_style_border_width(btn, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(btn, color, LV_PART_MAIN);
+    lv_obj_set_style_radius(btn, 5, LV_PART_MAIN);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, str);
@@ -135,7 +139,7 @@ static void obj_child_node_checked_style_init(lv_style_t * style)
 {
     lv_style_init(style);
     lv_style_set_border_color(style, lv_palette_main(LV_PALETTE_BLUE));
-    lv_style_set_shadow_color(style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_shadow_color(style, lv_palette_main(LV_PALETTE_GREY));
     lv_style_set_shadow_width(style, 20);
 
     static lv_style_transition_dsc_t tran;

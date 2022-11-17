@@ -58,6 +58,13 @@ void view_ctrl_pad_create(lv_obj_t * par, view_t * ui)
     lv_obj_set_flex_grow(tv, 1);
     lv_obj_set_style_radius(tv, 0, 0);
     lv_obj_set_style_bg_color(tv, lv_color_hex(0xffffff), 0);
+
+    lv_obj_t * btns = lv_tabview_get_tab_btns(tv);
+    lv_obj_set_style_outline_width(btns, 0,  LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_outline_width(btns, 0,   LV_STATE_FOCUS_KEY);
+    lv_obj_set_style_bg_color(btns, lv_color_white(), LV_PART_ITEMS | LV_STATE_CHECKED);
+    lv_obj_set_height(btns, 40);
+
     ui->ctrl_pad.tab.view = tv;
 
     ui->ctrl_pad.tab.flex.tab = lv_tabview_add_tab(tv, "Flex");
@@ -165,23 +172,54 @@ static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, const char * txt, lv_style
 
     lv_obj_t * cont_spinbox = lv_obj_create(cont_main);
     lv_obj_remove_style_all(cont_spinbox);
+    lv_obj_set_height(cont_spinbox, LV_SIZE_CONTENT);
     lv_obj_set_width(cont_spinbox, lv_pct(100));
+    lv_obj_set_style_radius(cont_spinbox, 5, LV_PART_MAIN);
+    lv_obj_set_style_clip_corner(cont_spinbox, true, LV_PART_MAIN);
+    lv_obj_set_style_outline_width(cont_spinbox, 3, LV_PART_MAIN);
+    lv_obj_set_style_outline_color(cont_spinbox, lv_color_hex3(0xddd), LV_PART_MAIN);
+
     lv_obj_set_flex_flow(cont_spinbox, LV_FLEX_FLOW_ROW);
+    lv_obj_set_style_flex_main_place(cont_spinbox, LV_FLEX_ALIGN_CENTER, LV_PART_MAIN);
+
+    static lv_style_t btn_style;
+    if(btn_style.prop_cnt < 1) {
+        lv_style_init(&btn_style);
+        lv_style_set_radius(&btn_style, 0);
+        lv_style_set_outline_width(&btn_style, 1);
+        lv_style_set_outline_pad(&btn_style, 1);
+        lv_style_set_outline_color(&btn_style, lv_color_hex3(0xddd));
+        lv_style_set_shadow_width(&btn_style, 0);
+        lv_style_set_bg_color(&btn_style, lv_color_white());
+        lv_style_set_text_color(&btn_style, lv_theme_get_color_primary(par));
+    }
 
     lv_obj_t * btn_inc = lv_btn_create(cont_spinbox);
+    lv_obj_set_width(btn_inc, 30);
+    lv_obj_add_style(btn_inc, &btn_style, LV_PART_MAIN);
     label = lv_label_create(btn_inc);
     lv_label_set_text(label, "+");
+    lv_obj_center(label);
 
     lv_obj_t * spinbox = lv_spinbox_create(cont_spinbox);
-    lv_obj_set_width(spinbox, lv_pct(50));
+    lv_obj_set_flex_grow(spinbox, 1);
+    lv_obj_set_style_shadow_width(spinbox, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(spinbox, 0, LV_PART_MAIN);
+    lv_obj_set_style_outline_width(spinbox, 1, LV_PART_MAIN);
+    lv_obj_set_style_outline_pad(spinbox, 1, LV_PART_MAIN);
+    lv_obj_set_style_outline_color(spinbox, lv_color_hex3(0xddd), LV_PART_MAIN);
+    lv_obj_set_style_radius(spinbox, 0, LV_PART_MAIN);
     lv_obj_set_user_data(spinbox, (void *)(lv_uintptr_t)prop);
     lv_spinbox_set_range(spinbox, LV_COORD_MIN, LV_COORD_MAX);
     lv_spinbox_set_digit_format(spinbox, 4, 0);
     lv_spinbox_step_prev(spinbox);
 
     lv_obj_t * btn_dec = lv_btn_create(cont_spinbox);
+    lv_obj_set_width(btn_dec, 30);
+    lv_obj_add_style(btn_dec, &btn_style, LV_PART_MAIN);
     label = lv_label_create(btn_dec);
     lv_label_set_text(label, "-");
+    lv_obj_center(label);
 
     lv_obj_add_event_cb(btn_inc, btn_inc_event_handler, LV_EVENT_ALL, spinbox);
     lv_obj_add_event_cb(btn_dec, btn_dec_event_handler, LV_EVENT_ALL, spinbox);
@@ -198,6 +236,7 @@ static void tab_layout_create(lv_obj_t * tab, view_t * ui)
         LV_FLEX_ALIGN_CENTER,
         LV_FLEX_ALIGN_CENTER
     );
+
 
     ui->ctrl_pad.tab.layout.spinbox_width = spinbox_ctrl_create(tab, "width", LV_STYLE_WIDTH);
     ui->ctrl_pad.tab.layout.spinbox_height = spinbox_ctrl_create(tab, "height", LV_STYLE_HEIGHT);
