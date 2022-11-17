@@ -470,8 +470,14 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                 }
             }
 
-            if(f->row) item->w_layout = 1;
-            else item->h_layout = 1;
+            if(f->row) {
+                item->w_layout = 1;
+                item->h_layout = 0;
+            }
+            else {
+                item->h_layout = 1;
+                item->w_layout = 0;
+            }
 
             if(s != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
