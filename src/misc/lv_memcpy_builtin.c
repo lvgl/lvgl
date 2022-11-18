@@ -158,14 +158,14 @@ size_t lv_strlen_builtin(const char * str)
     return i + 1;
 }
 
-size_t lv_strncpy_builtin(char * dst, size_t dest_size, const char * src)
+char * lv_strncpy_builtin(char * dst, const char * src, size_t dest_size)
 {
     size_t i;
     for(i = 0; i < dest_size - 1 && *src; i++) {
         dst[i] = src[i];
     }
     dst[i] = '\0';
-    return i;
+    return dst;
 }
 
 /**********************

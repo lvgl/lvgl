@@ -173,6 +173,20 @@
         #define LV_STDLIB_INCLUDE <stdint.h>
     #endif
 #endif
+#ifndef LV_STDIO_INCLUDE
+    #ifdef CONFIG_LV_STDIO_INCLUDE
+        #define LV_STDIO_INCLUDE CONFIG_LV_STDIO_INCLUDE
+    #else
+        #define LV_STDIO_INCLUDE  <stdint.h>
+    #endif
+#endif
+#ifndef LV_STRING_INCLUDE
+    #ifdef CONFIG_LV_STRING_INCLUDE
+        #define LV_STRING_INCLUDE CONFIG_LV_STRING_INCLUDE
+    #else
+        #define LV_STRING_INCLUDE <stdint.h>
+    #endif
+#endif
 #ifndef LV_MALLOC
     #ifdef CONFIG_LV_MALLOC
         #define LV_MALLOC CONFIG_LV_MALLOC
