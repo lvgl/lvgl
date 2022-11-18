@@ -40,7 +40,7 @@ void lv_img_cache_manager_init(lv_img_cache_manager_t * manager)
     lv_memzero(manager, sizeof(lv_img_cache_manager_t));
 }
 
-void lv_img_cache_manager_update(const lv_img_cache_manager_t * manager)
+void lv_img_cache_manager_apply(const lv_img_cache_manager_t * manager)
 {
     LV_ASSERT_NULL(manager);
     lv_memcpy(&img_cache_manager, manager, sizeof(lv_img_cache_manager_t));

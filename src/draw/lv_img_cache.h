@@ -54,10 +54,10 @@ typedef struct {
 void lv_img_cache_manager_init(lv_img_cache_manager_t * manager);
 
 /**
- * Update the img cache manager
+ * Apply the img cache manager
  * @param manager Pointer to the img cache manager
  */
-void lv_img_cache_manager_update(const lv_img_cache_manager_t * manager);
+void lv_img_cache_manager_apply(const lv_img_cache_manager_t * manager);
 
 /**
  * Open an image using the image decoder interface and cache it.

@@ -69,7 +69,7 @@ void _lv_img_cache_builtin_init(void)
     manager.open_cb = _lv_img_cache_open_builtin;
     manager.set_size_cb = lv_img_cache_set_size_builtin;
     manager.invalidate_src_cb = lv_img_cache_invalidate_src_builtin;
-    lv_img_cache_manager_update(&manager);
+    lv_img_cache_manager_apply(&manager);
 }
 
 /**********************
