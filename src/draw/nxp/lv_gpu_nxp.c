@@ -202,8 +202,16 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
 #endif
         }
         else {
+            lv_area_t src_area;
+            lv_coord_t src_width = lv_area_get_width(dsc->blend_area);
+            lv_coord_t src_height = lv_area_get_height(dsc->blend_area);
+            src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1);
+            src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1);
+            src_area.x2 = src_area.x1 + src_width - 1;
+            src_area.y2 = src_area.y1 + src_height - 1;
+
 #if LV_USE_GPU_NXP_PXP
-            done = (lv_gpu_nxp_pxp_blit(dest_buf, &blend_area, dest_stride, src_buf, dsc->blend_area,
+            done = (lv_gpu_nxp_pxp_blit(dest_buf, &blend_area, dest_stride, src_buf, &src_area,
                                         dsc->opa, LV_DISP_ROT_NONE) == LV_RES_OK);
             if(!done)
                 PXP_LOG_TRACE("PXP blit failed. Fallback.");
@@ -214,13 +222,10 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
                 lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
 
                 blit.src = src_buf;
-                blit.src_width = lv_area_get_width(dsc->blend_area);
-                blit.src_height = lv_area_get_height(dsc->blend_area);
+                blit.src_width = src_width;
+                blit.src_height = src_height;
                 blit.src_stride = src_stride * (int32_t)sizeof(lv_color_t);
-                blit.src_area.x1 = (blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1));
-                blit.src_area.y1 = (blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1));
-                blit.src_area.x2 = blit.src_area.x1 + blit.src_width - 1;
-                blit.src_area.y2 = blit.src_area.y1 + blit.src_height - 1;
+                blit.src_area = src_area;
 
                 blit.dst = dest_buf;
                 blit.dst_width = dest_width;
@@ -283,6 +288,15 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 
     lv_color_t * dest_buf = draw_ctx->buf;
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
+    lv_area_t src_area;
+    lv_coord_t src_width = lv_area_get_width(coords);
+    lv_coord_t src_height = lv_area_get_height(coords);
+    src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
+    src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
+    src_area.x2 = src_area.x1 + src_width - 1;
+    src_area.y2 = src_area.y1 + src_height - 1;
+
     bool done = false;
 
 #if LV_USE_GPU_NXP_PXP
@@ -291,7 +305,8 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
        && !lv_img_cf_has_alpha(cf)
 #endif
       ) {
-        done = (lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, coords,
+
+        done = (lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, &src_area,
                                               dsc, cf) == LV_RES_OK);
         if(!done)
             PXP_LOG_TRACE("PXP blit transform failed. Fallback.");
@@ -309,13 +324,10 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
         lv_coord_t src_stride = lv_area_get_width(coords);
 
         blit.src = src_buf;
-        blit.src_width = lv_area_get_width(coords);
-        blit.src_height = lv_area_get_height(coords);
+        blit.src_width = src_width;
+        blit.src_height = src_height;
         blit.src_stride = src_stride * (int32_t)sizeof(lv_color_t);
-        blit.src_area.x1 = (blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1));
-        blit.src_area.y1 = (blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1));
-        blit.src_area.x2 = blit.src_area.x1 + blit.src_width - 1;
-        blit.src_area.y2 = blit.src_area.y1 + blit.src_height - 1;
+        blit.src_area = src_area;
 
         blit.dst = dest_buf;
         blit.dst_width = lv_area_get_width(draw_ctx->buf_area);
