@@ -73,9 +73,33 @@ typedef enum {
     LV_INDEV_STATE_PRESSED
 } lv_indev_state_t;
 
+#if LV_USE_ADDITIONAL_PTR_BTNS
+typedef enum {
+    LV_INDEV_MOUSE_BTN_1,
+    LV_INDEV_MOUSE_BTN_2,
+    LV_INDEV_MOUSE_BTN_3,
+    LV_INDEV_MOUSE_BTN_4,
+    LV_INDEV_MOUSE_BTN_5,
+
+    LV_INDEV_MOUSE_BTN_MAX
+} lv_indev_btn_id;
+#endif
+
+#if LV_USE_ADDITIONAL_PTR_BTNS
+typedef struct {
+#if LV_USE_ADDITIONAL_PTR_BTNS
+    /* mbtns[0] is reserved as a copy of standard left click. Not currently used */
+    lv_indev_state_t mbtns[LV_INDEV_MOUSE_BTN_MAX];
+#endif
+} lv_indev_mouse_data_t;
+#endif
+
 /** Data structure passed to an input driver to fill*/
 typedef struct {
     lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
+#if LV_USE_ADDITIONAL_PTR_BTNS
+    lv_indev_mouse_data_t mouse; /** For LV_INDEV_TYPE_POINTER to store additional mouse buttons and scroll data*/
+#endif
     uint32_t key;     /**< For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
     uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
     int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
@@ -147,6 +171,9 @@ typedef struct _lv_indev_proc_t {
             lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
             lv_point_t scroll_throw_vect;
             lv_point_t scroll_throw_vect_ori;
+#if LV_USE_ADDITIONAL_PTR_BTNS
+	    lv_indev_mouse_data_t mouse_state; /* Current state of additional mouse buttons*/
+#endif
             struct _lv_obj_t * act_obj;      /*The object being pressed*/
             struct _lv_obj_t * last_obj;     /*The last object which was pressed*/
             struct _lv_obj_t * scroll_obj;   /*The object being scrolled*/

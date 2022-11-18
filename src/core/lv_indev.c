@@ -36,6 +36,10 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(_lv_indev_proc_t * proc);
+#if LV_USE_ADDITIONAL_PTR_BTNS
+static void indev_proc_mouse_press(_lv_indev_proc_t * proc, lv_indev_btn_id btn_id);
+static void indev_proc_mouse_release(_lv_indev_proc_t * proc, lv_indev_btn_id btn_id);
+#endif
 static void indev_proc_release(_lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_click_focus(_lv_indev_proc_t * proc);
@@ -339,6 +343,9 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
  */
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
+#if LV_USE_ADDITIONAL_PTR_BTNS
+    int btn_id;
+#endif
     lv_disp_t * disp = i->driver->disp;
     /*Save the raw points so they can be used again in _lv_indev_read*/
     i->proc.types.pointer.last_raw_point.x = data->point.x;
@@ -383,6 +390,17 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     else {
         indev_proc_release(&i->proc);
     }
+
+#if LV_USE_ADDITIONAL_PTR_BTNS
+    for (btn_id = LV_INDEV_MOUSE_BTN_2; btn_id < LV_INDEV_MOUSE_BTN_MAX; btn_id++)
+    {
+	if (data->mouse.mbtns[btn_id] == LV_INDEV_STATE_PRESSED)
+	    indev_proc_mouse_press(&i->proc, btn_id);
+
+	if (data->mouse.mbtns[btn_id] == LV_INDEV_STATE_RELEASED)
+	    indev_proc_mouse_release(&i->proc, btn_id);
+    }
+#endif
 
     i->proc.types.pointer.last_point.x = i->proc.types.pointer.act_point.x;
     i->proc.types.pointer.last_point.y = i->proc.types.pointer.act_point.y;
@@ -808,6 +826,87 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->proc.types.pointer.last_point.x = i->proc.types.pointer.act_point.x;
     i->proc.types.pointer.last_point.y = i->proc.types.pointer.act_point.y;
 }
+
+#if LV_USE_ADDITIONAL_PTR_BTNS
+static lv_obj_t * indev_obj_under_cursor(_lv_indev_proc_t *proc)
+{
+    lv_obj_t *act = proc->types.pointer.act_obj;
+
+    lv_disp_t * disp = indev_act->driver->disp;
+
+    /*If there is no last object then search*/
+    if(act == NULL) {
+        act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &proc->types.pointer.act_point);
+        if(act == NULL) act = lv_indev_search_obj(lv_disp_get_layer_top(disp),
+                                                                          &proc->types.pointer.act_point);
+        if(act == NULL) act = lv_indev_search_obj(lv_disp_get_scr_act(disp),
+                                                                          &proc->types.pointer.act_point);
+    }
+    /*If there is last object but it is not scrolled and not protected also search*/
+    else if(proc->types.pointer.scroll_obj == NULL &&
+            lv_obj_has_flag(act, LV_OBJ_FLAG_PRESS_LOCK) == false) {
+        act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &proc->types.pointer.act_point);
+        if(act == NULL) act = lv_indev_search_obj(lv_disp_get_layer_top(disp),
+                                                                          &proc->types.pointer.act_point);
+        if(act == NULL) act = lv_indev_search_obj(lv_disp_get_scr_act(disp),
+                                                                          &proc->types.pointer.act_point);
+    }
+
+    lv_obj_transform_point(act, &proc->types.pointer.act_point, true, true);
+
+    return act;
+}
+
+/**
+ * Process the pressed state of LV_INDEV_TYPE_POINTER input devices with additional mouse buttons
+ * @param indev pointer to an input device 'proc'
+ * @param indev mouse data pointer to additional mouse button states
+ * @return LV_RES_OK: no indev reset required; LV_RES_INV: indev reset is required
+ */
+static void indev_proc_mouse_press(_lv_indev_proc_t * proc, lv_indev_btn_id btn_id)
+{
+    LV_LOG_INFO("mouse button %d pressed at x:%d y:%d", btn_id + 1, (int)proc->types.pointer.act_point.x,
+                (int)proc->types.pointer.act_point.y);
+
+    if (proc->types.pointer.mouse_state.mbtns[btn_id] != LV_INDEV_STATE_PRESSED)
+    {
+	proc->types.pointer.mouse_state.mbtns[btn_id] = LV_INDEV_STATE_PRESSED;
+
+	indev_obj_act = indev_obj_under_cursor(proc);
+	if(indev_obj_act)
+	{
+	    indev_click_focus(&indev_act->proc);
+	    lv_event_send(indev_obj_act, LV_EVENT_CLICKED + btn_id, indev_act);
+	}
+    }
+
+
+    indev_reset_check(proc);
+}
+
+/**
+ * Process the pressed state of LV_INDEV_TYPE_POINTER input devices with additional mouse buttons
+ * @param indev pointer to an input device 'proc'
+ * @param indev mouse data pointer to additional mouse button states
+ * @return LV_RES_OK: no indev reset required; LV_RES_INV: indev reset is required
+ */
+static void indev_proc_mouse_release(_lv_indev_proc_t * proc, lv_indev_btn_id btn_id)
+{
+
+    LV_LOG_INFO("mouse button %d released", btn_id + 1);
+
+    if (proc->types.pointer.mouse_state.mbtns[btn_id] != LV_INDEV_STATE_RELEASED)
+    {
+	proc->types.pointer.mouse_state.mbtns[btn_id] = LV_INDEV_STATE_RELEASED;
+
+	indev_obj_act = indev_obj_under_cursor(proc);
+	if (indev_obj_act)
+	{
+	    lv_event_send(indev_obj_act, LV_EVENT_RELEASED + btn_id, indev_act);
+	}
+    }
+}
+#endif
 
 /**
  * Process the pressed state of LV_INDEV_TYPE_POINTER input devices

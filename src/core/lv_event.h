@@ -40,7 +40,19 @@ typedef enum {
     LV_EVENT_LONG_PRESSED,        /**< Object has been pressed for at least `long_press_time`.  Not called if scrolled.*/
     LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.*/
     LV_EVENT_CLICKED,             /**< Called on release if not scrolled (regardless to long press)*/
+#if LV_USE_ADDITIONAL_PTR_BTNS
+    LV_EVENT_CLICKED_2,		  /**< The object has been right clicked by mouse button*/
+    LV_EVENT_CLICKED_3,		  /**< The object has been middle clicked by mouse button*/
+    LV_EVENT_CLICKED_4,		  /**< The object has been clicked by mouse button 4*/
+    LV_EVENT_CLICKED_5,		  /**< The object has been clicked by mouse button 5*/
+#endif
     LV_EVENT_RELEASED,            /**< Called in every cases when the object has been released*/
+#if LV_USE_ADDITIONAL_PTR_BTNS
+    LV_EVENT_RELEASED_2,	  /**< The object has been right click released by mouse button*/
+    LV_EVENT_RELEASED_3,	  /**< The object has been middle click released by mouse button*/
+    LV_EVENT_RELEASED_4,	  /**< The object has been click released by mouse button 4*/
+    LV_EVENT_RELEASED_5,	  /**< The object has been click released by mouse button 5*/
+#endif
     LV_EVENT_SCROLL_BEGIN,        /**< Scrolling begins. The event parameter is a pointer to the animation of the scroll. Can be modified*/
     LV_EVENT_SCROLL_THROW_BEGIN,
     LV_EVENT_SCROLL_END,          /**< Scrolling ends*/

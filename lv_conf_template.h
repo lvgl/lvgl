@@ -88,6 +88,9 @@
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
 
+/*Get CLICKED/RELEASED events from additional buttons on POINTER type input devices*/
+#define LV_USE_ADDITIONAL_PTR_BTNS 0
+
 /*========================
  * DRAW CONFIGURATION
  *========================*/
