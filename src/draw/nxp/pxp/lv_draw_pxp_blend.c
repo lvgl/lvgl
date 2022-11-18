@@ -288,7 +288,7 @@ lv_res_t lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area,
     /*AS buffer - source image*/
     pxp_as_buffer_config_t asBufferConfig = {
         .pixelFormat = PXP_AS_PIXEL_FORMAT,
-        .bufferAddr = (uint32_t)src_buf,
+        .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_area->x1),
         .pitchBytes = src_stride * sizeof(lv_color_t)
     };
     PXP_SetAlphaSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &asBufferConfig);
@@ -450,7 +450,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t
     /*AS buffer - source image*/
     pxp_as_buffer_config_t asBufferConfig = {
         .pixelFormat = PXP_AS_PIXEL_FORMAT,
-        .bufferAddr = (uint32_t)src_buf,
+        .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_area->x1),
         .pitchBytes = src_stride * sizeof(lv_color_t)
     };
     PXP_SetAlphaSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &asBufferConfig);
@@ -550,7 +550,7 @@ static lv_res_t lv_gpu_nxp_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * 
     /*AS buffer - source image*/
     pxp_as_buffer_config_t asBufferConfig = {
         .pixelFormat = PXP_AS_PIXEL_FORMAT,
-        .bufferAddr = (uint32_t)src_buf,
+        .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_area->x1),
         .pitchBytes = src_stride * sizeof(lv_color_t)
     };
     PXP_SetAlphaSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &asBufferConfig);
