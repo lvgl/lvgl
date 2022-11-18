@@ -300,6 +300,15 @@
     #endif
 #endif
 
+/*Get CLICKED/RELEASED events from additional buttons on POINTER type input devices*/
+#ifndef LV_USE_ADDITIONAL_PTR_BTNS
+    #ifdef CONFIG_LV_USE_ADDITIONAL_PTR_BTNS
+        #define LV_USE_ADDITIONAL_PTR_BTNS CONFIG_LV_USE_ADDITIONAL_PTR_BTNS
+    #else
+        #define LV_USE_ADDITIONAL_PTR_BTNS 0
+    #endif
+#endif
+
 /*========================
  * DRAW CONFIGURATION
  *========================*/
