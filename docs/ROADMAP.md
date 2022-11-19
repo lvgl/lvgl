@@ -68,6 +68,7 @@
 
 ### Styles
 - [ ] Hover
+- [ ] Global states in selectors. E.g. `LV_STATE_PRESSED | SMALL_SCREEN` like media quarry in CSS 
 
 ### Drawing and rendering
 - [ ] Different radius on each corner #2800
