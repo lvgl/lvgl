@@ -52,6 +52,7 @@
  ### Animations
 - [ ] Consider `anim` events to replace many callbacks with one
 - [ ] `lv_anim_time_to_speed` should work differently to remove `style_anim_speed`. E.g. on large values of anim time store the speed.   Besides all widgets should use the `style_anim` property. `anim` should clamp the time if it's calculated from speed, e.g `lv_clamp(200, t, 2000)`. (maybe `a->min_time/max_time`).
+- [ ] Use dedicated `lv_anim_custom_exec_cb_t`. See [here](https://forum.lvgl.io/t/custom-exec-cb-prevents-lv-anim-del-obj-null/10266).
 
 ## Planned in general
 
