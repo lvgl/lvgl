@@ -238,8 +238,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
             obj = lv_meter_create(main_page);
             lv_obj_scroll_to_view(obj, LV_ANIM_ON);
-            lv_meter_scale_t * scale = lv_meter_add_scale(obj);
-            lv_meter_add_needle_line(obj, scale, 3, lv_palette_main(LV_PALETTE_RED), -10);
+            lv_meter_add_needle_line(obj, 3, lv_palette_main(LV_PALETTE_RED), -10);
 
             auto_del(obj, LV_DEMO_STRESS_TIME_STEP * 6 + 30);
             break;
