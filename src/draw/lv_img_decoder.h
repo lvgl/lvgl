@@ -246,20 +246,6 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
 lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
 
 /**
- * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
- * Required only if the "open" function can't return with the whole decoded pixel array.
- * @param decoder pointer to the decoder the function associated with
- * @param dsc pointer to decoder descriptor
- * @param x start x coordinate
- * @param y start y coordinate
- * @param len number of pixels to decode
- * @param buf a buffer to store the decoded pixels
- * @return LV_RES_OK: ok; LV_RES_INV: failed
- */
-lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
-                                           lv_coord_t y, lv_coord_t len, uint8_t * buf);
-
-/**
  * Close the pending decoding. Free resources etc.
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor
