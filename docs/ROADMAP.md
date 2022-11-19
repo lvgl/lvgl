@@ -82,6 +82,7 @@
 
 ### Others
 - [ ] More grid features. E.g. repeat(auto-fill, minmax( <value> px, 1fr))
+- [ ] Named grid cells to allow updating layouts without touching the children (like CSS `grid-template-areas`)
 - [ ] Scene support. See [this comment](https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911)
 - [ ] Circle layout. #2871
 - [ ] Variable binding. I.e create properties which can be bound to objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
