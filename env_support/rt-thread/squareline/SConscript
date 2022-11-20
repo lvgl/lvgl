@@ -7,7 +7,8 @@ CPPPATH =[]
 
 src += Glob(cwd + '/ui/*.c')
 CPPPATH += [cwd+'/ui']
+CPPDEFINES = ['DLV_LVGL_H_INCLUDE_SIMPLE']
 
-group = group + DefineGroup('LVGL-SquareLine', src, depend = ['PKG_USING_LVGL_SQUARELINE'], CPPPATH = CPPPATH)
+group = group + DefineGroup('LVGL-SquareLine', src, depend = ['PKG_USING_LVGL_SQUARELINE'], CPPPATH = CPPPATH, CPPDEFINES=CPPDEFINES)
 
 Return('group')
