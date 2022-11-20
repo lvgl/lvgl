@@ -9,7 +9,7 @@ First, Download FreeType from [here](https://sourceforge.net/projects/freetype/f
 There are two ways to use FreeType:
 ### For UNIX
 For UNIX systems, it is recommended to use the way of compiling and installing libraries.
-- Enter the FreeType source code directory
+- Enter the FreeType source code directory.
 - `make`
 - `sudo make install`
 - Add include path: `/usr/include/freetype2` (for GCC: `-I/usr/include/freetype2 -L/usr/local/lib`)
@@ -18,7 +18,7 @@ For UNIX systems, it is recommended to use the way of compiling and installing l
 ### For Embedded Devices
 For embedded devices, it is more recommended to use the FreeType configuration file provided by LVGL, which only includes the most commonly used functions, which is very meaningful for saving limited FLASH space.
 
-- Copy the FreeType source code to your project directory
+- Copy the FreeType source code to your project directory.
 - Refer to the following `Makefile` for configuration:
 
 ```make
@@ -59,10 +59,10 @@ You can simply pass the path to the font as usual on your operating system or pl
 
 If you want FreeType to use lvgl's memory allocation and file system interface, you can enable `LV_FREETYPE_USE_LVGL_PORT` in `lv_conf.h`, convenient for unified management.
 
-The font style supports `Italic` and `Bold` fonts processed by software, and can be set with reference to the following values:
+The font style supports *Italic* and **Bold** fonts processed by software, and can be set with reference to the following values:
 - `LV_FREETYPE_FONT_STYLE_NORMAL` - Default style.
-- `LV_FREETYPE_FONT_STYLE_ITALIC` - Italic style
-- `LV_FREETYPE_FONT_STYLE_BOLD` - Bold style
+- `LV_FREETYPE_FONT_STYLE_ITALIC` - Italic style.
+- `LV_FREETYPE_FONT_STYLE_BOLD` - Bold style.
 
 They can be combined.eg: `LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
 
