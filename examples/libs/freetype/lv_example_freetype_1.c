@@ -3,9 +3,9 @@
 #if LV_USE_FREETYPE
 
 #if LV_FREETYPE_USE_LVGL_PORT
-    #define PATH_HEAD "A:"
+    #define PATH_PREFIX "A:"
 #else
-    #define PATH_HEAD "./"
+    #define PATH_PREFIX "./"
 #endif
 
 /**
@@ -14,7 +14,7 @@
 void lv_example_freetype_1(void)
 {
     /*Create a font*/
-    lv_font_t * font = lv_freetype_font_create(PATH_HEAD "lvgl/examples/libs/freetype/Lato-Regular.ttf",
+    lv_font_t * font = lv_freetype_font_create(PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
                                                24,
                                                LV_FREETYPE_FONT_STYLE_NORMAL);
 

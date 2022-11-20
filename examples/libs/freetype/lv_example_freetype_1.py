@@ -3,7 +3,7 @@ import lvgl as lv
 import display_driver
 import fs_driver
 
-font = freetype_font_create("./Lato-Regular.ttf", 24, lv.FREETYPE_FONT_STYLE.NORMAL)
+font = lv.freetype_font_create("./Lato-Regular.ttf", 24, lv.FREETYPE_FONT_STYLE.NORMAL)
 
 # Create style with the new font
 style = lv.style_t()
