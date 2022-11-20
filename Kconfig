@@ -951,6 +951,9 @@ menu "LVGL configuration"
 		config LV_USE_QRCODE
 			bool "QR code library"
 
+		config LV_USE_BARCODE
+			bool "Barcode library"
+
 		config LV_USE_FREETYPE
 			bool "FreeType library"
 		if LV_USE_FREETYPE
