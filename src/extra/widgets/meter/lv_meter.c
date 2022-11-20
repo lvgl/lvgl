@@ -612,6 +612,7 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             if(angle > 3600) angle -= 3600;
             img_dsc.angle = angle;
 
+            part_draw_dsc.id = LV_METER_DRAW_PART_NEEDLE_IMG;
             part_draw_dsc.img_dsc = &img_dsc;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
