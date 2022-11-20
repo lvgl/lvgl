@@ -62,8 +62,8 @@ meter.set_scale_major_ticks(5, 2, 20, lv.color_black(), 10)         # Every tick
 meter.set_scale_range(0, 59, 354, 270)
 
 # Add the hands from images
-indic_min = meter.add_needle_img(scale_min, img_hand_min_dsc, 5, 5)
-indic_hour = meter.add_needle_img(scale_min, img_hand_hour_dsc, 5, 5)
+indic_min = meter.add_needle_img(img_hand_min_dsc, 5, 5)
+indic_hour = meter.add_needle_img(img_hand_hour_dsc, 5, 5)
 
 #Add an event to set the numbers of hours
 meter.add_event_cb(tick_label_event, lv.EVENT.DRAW_PART_BEGIN, None)
