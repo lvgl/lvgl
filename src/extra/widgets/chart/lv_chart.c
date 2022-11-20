@@ -1182,7 +1182,6 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     const lv_area_t * clip_area_ori = draw_ctx->clip_area;
     draw_ctx->clip_area = &clip_area;
 
-
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
     uint16_t i;
@@ -1200,6 +1199,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     int32_t ser_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
                                                             LV_PART_ITEMS) * chart->zoom_x) >> 8; /*Gap between the columns on the ~same X*/
     lv_coord_t col_w = (block_w - (ser_cnt - 1) * ser_gap) / ser_cnt;
+    if(col_w < 1) col_w  = 1;
 
     lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t x_ofs = pad_left - lv_obj_get_scroll_left(obj) + border_w;
@@ -1531,16 +1531,16 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
     lv_coord_t label_gap;
     if(axis == LV_CHART_AXIS_PRIMARY_X) {
         label_gap = t->label_en ? lv_obj_get_style_pad_bottom(obj, LV_PART_TICKS) : 0;
-        y_ofs = obj->coords.y2;
+        y_ofs = obj->coords.y2 + 1;
     }
     else {
         label_gap = t->label_en ? lv_obj_get_style_pad_top(obj, LV_PART_TICKS) : 0;
-        y_ofs = obj->coords.y1;
+        y_ofs = obj->coords.y1 - 1;
     }
 
     if(axis == LV_CHART_AXIS_PRIMARY_X) {
         if(y_ofs > draw_ctx->clip_area->y2) return;
-        if(y_ofs + label_gap  + label_dsc.font->line_height + t->major_len < draw_ctx->clip_area->y1) return;
+        if(y_ofs + label_gap + label_dsc.font->line_height + t->major_len < draw_ctx->clip_area->y1) return;
     }
 
     lv_draw_line_dsc_t line_dsc;
@@ -1633,7 +1633,6 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
             part_draw_dsc.text_length = 0;
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         }
-
 
         if(p1.x + line_dsc.width / 2  >= obj->coords.x1 &&
            p2.x - line_dsc.width / 2  <= obj->coords.x2) {
