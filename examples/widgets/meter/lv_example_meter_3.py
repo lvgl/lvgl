@@ -35,27 +35,38 @@ def set_value(indic, v):
 # A clock from a meter
 #
 
+def tick_label_event(e):
+    draw_part_dsc = e.get_draw_part_dsc();
+
+    # Be sure it's drawing the ticks
+    if draw_part_dsc.type != lv.meter.DRAW_PART.TICK: return
+
+    # Be sure it's a major ticks
+    if draw_part_dsc.id % 5:  return
+
+    # The order of numbers on the clock is tricky: 12, 1, 2, 3...*/
+    txt = ["12", "1", "2as", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
+    # dsc.text is defined char text[16], I must therefore convert the Python string to a byte_array
+
+    idx = int(draw_part_dsc.id / 5)
+    draw_part_dsc.text = bytes(txt[idx],"ascii")
+
 meter = lv.meter(lv.scr_act())
 meter.set_size(220, 220)
 meter.center()
 
 # Create a scale for the minutes
-# 61 ticks in a 360 degrees range (the last and the first line overlaps)
-scale_min = meter.add_scale()
-meter.set_scale_ticks(scale_min, 61, 1, 10, lv.palette_main(lv.PALETTE.GREY))
-meter.set_scale_range(scale_min, 0, 60, 360, 270)
-
-# Create another scale for the hours. It's only visual and contains only major ticks
-scale_hour = meter.add_scale()
-meter.set_scale_ticks(scale_hour, 12, 0, 0, lv.palette_main(lv.PALETTE.GREY))  # 12 ticks
-meter.set_scale_major_ticks(scale_hour, 1, 2, 20, lv.color_black(), 10)         # Every tick is major
-meter.set_scale_range(scale_hour, 1, 12, 330, 300)                             # [1..12] values in an almost full circle
-
-#    LV_IMG_DECLARE(img_hand)
+# 60 ticks in a 354 degrees range
+meter.set_scale_ticks(60, 1, 10, lv.palette_main(lv.PALETTE.GREY))
+meter.set_scale_major_ticks(5, 2, 20, lv.color_black(), 10)         # Every tick is major
+meter.set_scale_range(0, 59, 354, 270)
 
 # Add the hands from images
 indic_min = meter.add_needle_img(scale_min, img_hand_min_dsc, 5, 5)
 indic_hour = meter.add_needle_img(scale_min, img_hand_hour_dsc, 5, 5)
+
+#Add an event to set the numbers of hours
+meter.add_event_cb(tick_label_event, lv.EVENT.DRAW_PART_BEGIN, None)
 
 # Create an animation to set the value
 a1 = lv.anim_t()
