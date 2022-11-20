@@ -358,7 +358,12 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     if(chart->type == LV_CHART_TYPE_SCATTER) {
         ser->x_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
         LV_ASSERT_MALLOC(ser->x_points);
-        /* NOTE: Should we return if ser->x_points is NULL? Is this an out of memory error? */
+        if(ser->x_points == NULL) {
+            lv_free(ser->y_points);
+            _lv_ll_remove(&chart->series_ll, ser);
+            lv_free(ser);
+            return NULL;
+        }
     }
     else {
         ser->x_points = NULL;
@@ -374,8 +379,8 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     ser->start_point = 0;
     ser->y_ext_buf_assigned = false;
     ser->hidden = 0;
-    ser->x_axis_sec = axis & LV_CHART_AXIS_SECONDARY_X;
-    ser->y_axis_sec = axis & LV_CHART_AXIS_SECONDARY_Y;
+    ser->x_axis_sec = axis & LV_CHART_AXIS_SECONDARY_X ? 1u : 0u;
+    ser->y_axis_sec = axis & LV_CHART_AXIS_SECONDARY_Y ? 1u : 0u;
 
     /* Set points on y axis to value LV_CHART_POINT_NONE so they do not get drawn */
     uint16_t i;
