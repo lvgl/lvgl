@@ -15,7 +15,7 @@
 - [ ] Rename `disp_drv->monitor_cb` to `render_completed/finished/ready`
 
 ### Architecture
-- [ ] Consider merging `lv_disp_t`, `lv_disp_drv_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
+- [ ] Consider merging `lv_disp_t`, `lv_disp_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
 - [ ] Better way to reset global variables in `lv_deinit()` #3385
 - [ ] New driver architecture #2720
 - [x] `draw_ctx->buffer_convert`? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1147954592).  Also remove 16 SWAPPED color format? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1140886258).

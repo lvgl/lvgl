@@ -35,7 +35,7 @@ extern "C" {
  **********************/
 typedef lv_draw_sw_ctx_t lv_draw_stm32_dma2d_ctx_t;
 
-struct _lv_disp_drv_t;
+struct _lv_disp_t;
 
 /**********************
  * GLOBAL PROTOTYPES

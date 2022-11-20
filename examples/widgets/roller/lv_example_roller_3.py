@@ -51,7 +51,7 @@ class Lv_Roller_3():
 
         roller1.center()
         roller1.set_visible_row_count(3)
-        roller1.add_event_cb(self.mask_event_cb, lv.EVENT.ALL, None)
+        roller1.add_event(self.mask_event_cb, lv.EVENT.ALL, None)
 
     def mask_event_cb(self,e):
 
