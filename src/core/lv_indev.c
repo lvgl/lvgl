@@ -305,7 +305,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return NULL;
 
     lv_point_t p_trans = *point;
-    lv_obj_transform_point(obj, &p_trans, false, true);
+    lv_obj_transform_point(obj, &p_trans, NULL, false, true);
 
     bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
@@ -383,7 +383,9 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     else {
         indev_proc_release(&i->proc);
     }
-
+    
+	i->proc.types.pointer.indev_point.x = data->point.x;
+	i->proc.types.pointer.indev_point.y = data->point.y;
     i->proc.types.pointer.last_point.x = i->proc.types.pointer.act_point.x;
     i->proc.types.pointer.last_point.y = i->proc.types.pointer.act_point.y;
 }
@@ -816,6 +818,8 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_proc_press(_lv_indev_proc_t * proc)
 {
+    uint8_t indev_flag = false;
+    
     LV_LOG_INFO("pressed at x:%d y:%d", proc->types.pointer.act_point.x, proc->types.pointer.act_point.y);
     indev_obj_act = proc->types.pointer.act_obj;
 
@@ -852,7 +856,16 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
     }
 
-    lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, true, true);
+    if((proc->types.pointer.act_point.x == proc->types.pointer.indev_point.x) && (proc->types.pointer.act_point.y == proc->types.pointer.indev_point.y))
+    	indev_flag = true;
+    	
+    lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, &proc->types.pointer.indev_point, true, true);
+    
+	if(indev_flag)
+    {
+		proc->types.pointer.last_point.x = proc->types.pointer.act_point.x;
+		proc->types.pointer.last_point.y = proc->types.pointer.act_point.y;
+    }
 
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != proc->types.pointer.act_obj) {
