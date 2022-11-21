@@ -524,20 +524,19 @@ def analytics_create(parent):
     if disp_size < DISP_LARGE:
         lv.obj.get_parent(lv.obj.__cast__(meter2)).add_flag(LV_OBJ_FLAG_FLEX_IN_NEW_TRACK)
 
-    scale = meter2.add_scale()
-    meter2.set_scale_range(scale, 0, 100, 360, 90)
-    meter2.set_scale_ticks(scale, 0, 0, 0, lv.color_black())
+    meter2.set_scale_range(0, 100, 360, 90)
+    meter2.set_scale_ticks(0, 0, 0, lv.color_black())
 
     meter2_indic= [None]*3
-    meter2_indic[0] = meter2.add_arc(scale, 20, lv.palette_main(lv.PALETTE.RED), -10)
+    meter2_indic[0] = meter2.add_arc(20, lv.palette_main(lv.PALETTE.RED), -10)
     meter2.set_indicator_start_value(meter2_indic[0], 0)
     meter2.set_indicator_end_value(meter2_indic[0], 39)
 
-    meter2_indic[1] = meter2.add_arc(scale, 30, lv.palette_main(lv.PALETTE.BLUE), 0)
+    meter2_indic[1] = meter2.add_arc(30, lv.palette_main(lv.PALETTE.BLUE), 0)
     meter2.set_indicator_start_value(meter2_indic[1], 40)
     meter2.set_indicator_end_value(meter2_indic[1], 69)
 
-    meter2_indic[2] = meter2.add_arc(scale, 10, lv.palette_main(lv.PALETTE.GREEN), -20)
+    meter2_indic[2] = meter2.add_arc(10, lv.palette_main(lv.PALETTE.GREEN), -20)
     meter2.set_indicator_start_value(meter2_indic[2], 70)
     meter2.set_indicator_end_value(meter2_indic[2], 99)
 
@@ -557,36 +556,35 @@ def analytics_create(parent):
     meter3.set_style_outline_width(3, lv.PART.INDICATOR)
     meter3.set_style_text_color(lv.palette_darken(lv.PALETTE.GREY, 1), lv.PART.TICKS)
 
-    scale = meter3.add_scale()
-    meter2.set_scale_range(scale, 10, 60, 220, 360 - 220)
-    meter3.set_scale_ticks(scale, 21, 3, 17, lv.color_white())
-    meter3.set_scale_major_ticks(scale, 4, 4, 22, lv.color_white(), 15)
+    meter2.set_scale_range(10, 60, 220, 360 - 220)
+    meter3.set_scale_ticks(21, 3, 17, lv.color_white())
+    meter3.set_scale_major_ticks(4, 4, 22, lv.color_white(), 15)
 
-    indic4 = meter3.add_arc(scale, 10, lv.palette_main(lv.PALETTE.RED), 0)
+    indic4 = meter3.add_arc(10, lv.palette_main(lv.PALETTE.RED), 0)
     meter3.set_indicator_start_value(indic4, 0)
     meter3.set_indicator_end_value(indic4, 20)
 
-    indic5 = meter3.add_scale_lines(scale, lv.palette_darken(lv.PALETTE.RED, 3), lv.palette_darken(lv.PALETTE.RED, 3), True, 0)
+    indic5 = meter3.add_scale_lines(lv.palette_darken(lv.PALETTE.RED, 3), lv.palette_darken(lv.PALETTE.RED, 3), True, 0)
     meter3.set_indicator_start_value(indic5, 0)
     meter3.set_indicator_end_value(indic5, 20)
 
-    indic6 = meter3.add_arc(scale, 12, lv.palette_main(lv.PALETTE.BLUE), 0)
+    indic6 = meter3.add_arc(12, lv.palette_main(lv.PALETTE.BLUE), 0)
     meter3.set_indicator_start_value(indic6, 20)
     meter3.set_indicator_end_value(indic6, 40)
 
-    indic7 = meter3.add_scale_lines(scale, lv.palette_darken(lv.PALETTE.BLUE, 3), lv.palette_darken(lv.PALETTE.BLUE, 3), True, 0)
+    indic7 = meter3.add_scale_lines(lv.palette_darken(lv.PALETTE.BLUE, 3), lv.palette_darken(lv.PALETTE.BLUE, 3), True, 0)
     meter3.set_indicator_start_value(indic7, 20)
     meter3.set_indicator_end_value(indic7, 40)
 
-    indic8 = meter3.add_arc(scale, 10, lv.palette_main(lv.PALETTE.GREEN), 0)
+    indic8 = meter3.add_arc(10, lv.palette_main(lv.PALETTE.GREEN), 0)
     meter3.set_indicator_start_value(indic8, 40)
     meter3.set_indicator_end_value(indic8, 60)
 
-    indic9 = meter3.add_scale_lines(scale, lv.palette_darken(lv.PALETTE.GREEN, 3), lv.palette_darken(lv.PALETTE.GREEN, 3), True, 0)
+    indic9 = meter3.add_scale_lines(lv.palette_darken(lv.PALETTE.GREEN, 3), lv.palette_darken(lv.PALETTE.GREEN, 3), True, 0)
     meter3.set_indicator_start_value(indic9, 40)
     meter3.set_indicator_end_value(indic9, 60)
 
-    indic10 = meter3.add_needle_line(scale, 4, lv.palette_darken(lv.PALETTE.GREY, 4), -25)
+    indic10 = meter3.add_needle_line(4, lv.palette_darken(lv.PALETTE.GREY, 4), -25)
 
     mbps_label = lv.label(meter3)
     mbps_label.set_text("-- Mbps")
