@@ -53,6 +53,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_
 static void invalidate_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
 static void clean_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
 static void zeroAlpha(const lv_color_t * buf, uint32_t length);
+static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const lv_area_t * area3, const lv_area_t * area4);
 
 /**********************
  *  STATIC VARIABLES
@@ -118,19 +119,25 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 {
     lv_area_t dest_area;
     if(!_lv_area_intersect(&dest_area, dsc->blend_area, draw_ctx->clip_area)) return;
+    //trace4Areas(draw_ctx->buf_area, draw_ctx->clip_area, dsc->blend_area, &dest_area);
+    // + draw_ctx->buf_area has the entire draw buffer location
+    // + draw_ctx->clip_area has the current draw buffer location
+    // + dsc->blend_area has the location of the area intended to be painted - image etc.
+    // + dest_area has the area actually being painted
+    // All coordinates are relative to the screen.
 
     bool done = false;
     invalidateCache = false;
 
     if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&dest_area) > 100) {
         lv_coord_t dest_w = lv_area_get_width(draw_ctx->buf_area);
-        lv_area_move(&dest_area, 0, -draw_ctx->buf_area->y1); // draw area on the destination buffer
+        lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1); // translate the draw area to the origin of the buffer area
 
         if(dsc->src_buf != NULL) {
             lv_coord_t src_w = lv_area_get_width(dsc->blend_area);
-            lv_point_t src_pos;
-            src_pos.x = 0;
-            src_pos.y = 0;
+            lv_point_t src_pos; // position of the destination in relation to the source area
+            src_pos.x = dest_area.x1 - dsc->blend_area->x1;
+            src_pos.y = dest_area.y1 - dsc->blend_area->y1;
             //zeroAlpha(src_buf, lv_area_get_size(dsc->blend_area));
             lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
             done = true;
@@ -151,6 +158,40 @@ static void zeroAlpha(const lv_color_t * buf, uint32_t length) {
         //*buf32 &= 0x00ffffff; // zero MSB
         *buf32 |= 0xff000000; // set MSB
         buf32++;
+    }
+}
+
+static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const lv_area_t * area3, const lv_area_t * area4) {
+    static uint32_t counter = 0;
+
+    lv_coord_t x = area1->x1;
+    lv_coord_t y = area1->y1;
+    lv_coord_t w = lv_area_get_width(area1);
+    lv_coord_t h = lv_area_get_height(area1);
+    printf("%i %i %i %i", x, y, w, h);
+
+    x = area2->x1;
+    y = area2->y1;
+    w = lv_area_get_width(area2);
+    h = lv_area_get_height(area2);
+    printf(" %i %i %i %i", x, y, w, h);
+
+    x = area3->x1;
+    y = area3->y1;
+    w = lv_area_get_width(area3);
+    h = lv_area_get_height(area3);
+    printf(" %i %i %i %i", x, y, w, h);
+
+    x = area4->x1;
+    y = area4->y1;
+    w = lv_area_get_width(area4);
+    h = lv_area_get_height(area4);
+    printf(" %i %i %i %i\n", x, y, w, h);
+
+    counter++;
+    if (counter == 900) {
+        counter = 0;
+        printf("\n");
     }
 }
 
@@ -226,6 +267,8 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
         src_buf2 += src_width;
         dst_buf2 += dst_width;
     }
+    
+    invalidateCache = false;
 }
 
 static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
@@ -238,7 +281,7 @@ static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_
     //clean_cache((uint32_t)dest_buf, dest_stride - area_w, area_w, area_h);
     //clean_cache((uint32_t)src_buf, src_width - area_w, area_w, area_h);
     SCB_CleanDCache(); // TODO: change
-    
+
     DMA2D->CR = 0;
     DMA2D->FGMAR   = (uint32_t)(src_buf + (src_width * src_pos->y) + src_pos->x);
     DMA2D->OMAR    = (uint32_t)(dst_buf + (dst_width * dst_area->y1) + dst_area->x1);
