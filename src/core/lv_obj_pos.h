@@ -355,7 +355,7 @@ void lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coord
  * @param recursive     consider the transformation properties of the parents too
  * @param inv           do the inverse of the transformation (-angle and 1/zoom)
  */
-void lv_obj_transform_point(const struct _lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv);
+void lv_obj_transform_point(const struct _lv_obj_t * obj, lv_point_t * p, lv_point_t * p1, bool recursive, bool inv);
 
 /**
  * Transform an area using the angle and zoom style properties of an object
