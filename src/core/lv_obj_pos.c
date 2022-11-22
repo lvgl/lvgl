@@ -1164,14 +1164,15 @@ static void transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * p
 
     if(p1)
     {
-		pivot.x = obj->coords.x1 + (p->x - p1->x) + lv_obj_get_style_transform_pivot_x(obj, 0);
-		pivot.y = obj->coords.y1 + (p->y - p1->y) + lv_obj_get_style_transform_pivot_y(obj, 0);
+        pivot.x = obj->coords.x1 + (p->x - p1->x) + lv_obj_get_style_transform_pivot_x(obj, 0);
+        pivot.y = obj->coords.y1 + (p->y - p1->y) + lv_obj_get_style_transform_pivot_y(obj, 0);
     }
     else
     {
-	    pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
-	    pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0);
+        pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
+        pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0);
     }
+
     if(inv) {
         angle = -angle;
         zoom = (256 * 256) / zoom;
