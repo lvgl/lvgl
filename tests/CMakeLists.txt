@@ -145,13 +145,6 @@ add_library(test_common
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
 target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
-# Some examples `#include "lvgl/lvgl.h"` - which is a path which is not
-# in this source repository. If this repo is in a directory names 'lvgl'
-# then we can add our parent directory to the include path.
-# TODO: This is not good practice and should be fixed.
-get_filename_component(LVGL_PARENT_DIR ${LVGL_DIR} DIRECTORY)
-target_include_directories(lvgl_examples PUBLIC $<BUILD_INTERFACE:${LVGL_PARENT_DIR}>)
-
 # Generate one test executable for each source file pair.
 # The sources in ${CMAKE_CURRENT_BINARY_DIR} is auto-generated, the
 # sources in src/test_cases is the actual test case.
