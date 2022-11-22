@@ -135,7 +135,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
         if(dsc->src_buf != NULL) {
             lv_coord_t src_w = lv_area_get_width(dsc->blend_area);
-            lv_point_t src_pos; // position of the destination in relation to the source area
+            lv_point_t src_pos; // position of the destination area in relation to the source area
             src_pos.x = dest_area.x1 - dsc->blend_area->x1;
             src_pos.y = dest_area.y1 - dsc->blend_area->y1;
             //zeroAlpha(src_buf, lv_area_get_size(dsc->blend_area));
@@ -195,12 +195,14 @@ static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const 
     }
 }
 
+// Does dest_stride == draw_ctx->buf_area width ?
+// Is dest_area an intersection of draw_ctx->clip_area & src_area ?
 void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
     LV_UNUSED(draw_ctx);
     lv_point_t src_pos;
-    src_pos.x = 0;
-    src_pos.y = 0;
+    src_pos.x = dest_area->x1 - src_area->x1;
+    src_pos.y = dest_area->y1 - src_area->y1;
     lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_pos, LV_OPA_MAX);
 }
 
@@ -216,7 +218,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
 		if(dsc->header.cf == LV_IMG_CF_RGBA8888) {
 			/*TODO Blend here. Perform a fill as example*/
 			lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-            lv_area_move(&dest_area, 0, -draw_ctx->buf_area->y1);
+            lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 			lv_draw_stm32_dma2d_blend_fill(draw_ctx->buf, dest_width, &dest_area, lv_color_hex3(lv_rand(0x000, 0xfff)));
 			return LV_RES_OK;
 		}
@@ -263,7 +265,7 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
 
     while (area_h > 0) {
         area_h--;
-        memcpy((uint32_t *)dst_buf2, src_buf2, area_w * sizeof(lv_color_t));
+        memcpy(dst_buf2, src_buf2, area_w * sizeof(lv_color_t));
         src_buf2 += src_width;
         dst_buf2 += dst_width;
     }
@@ -289,7 +291,8 @@ static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_
     DMA2D->OOR     = dst_width - draw_width;
     DMA2D->FGPFCCR = LV_DMA2D_COLOR_FORMAT;
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->NLR     = (uint32_t)(draw_width << 16) | (uint16_t)draw_height;
+    // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
+    DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) & DMA2D_NLR_NL_Msk);
 
     invalidateCache = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
