@@ -129,7 +129,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
         if(dsc->src_buf != NULL) {
             lv_coord_t src_w = lv_area_get_width(dsc->blend_area);
-            lv_point_t src_pos; // position of the clip area in relation to the source bitmap area
+            lv_point_t src_pos; // position of the clip area origin within source image area
             src_pos.x = dest_area.x1 - dsc->blend_area->x1;
             src_pos.y = dest_area.y1 - dsc->blend_area->y1;
             //zeroAlpha(src_buf, lv_area_get_size(dsc->blend_area));
@@ -167,14 +167,14 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
 	    lv_area_t dest_area;
 	    /*Return if fully clipped*/
 	    if(!_lv_area_intersect(&dest_area, src_area, draw_ctx->clip_area)) return LV_RES_OK;
-
+        //return LV_RES_INV; // temp
 		const lv_img_dsc_t * img = src;
 
 		//if(img->header.cf == LV_IMG_CF_RGBA8888 && dsc->angle == 0 && dsc->zoom == 256) {
         if(img->header.cf == LV_IMG_CF_RGBA8888) {
-			/*TODO Blend here. Perform a fill as example*/
+            // note: this code never runs
 			lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-            lv_point_t src_pos; // position of the clip area in relation to the source image area
+            lv_point_t src_pos; // position of the clip area origin within source image area
             src_pos.x = dest_area.x1 - src_area->x1;
             src_pos.y = dest_area.y1 - src_area->y1;
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
@@ -210,7 +210,7 @@ static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
     DMA2D->CR |= DMA2D_CR_START;
 }
 
-static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa) {
+static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa) {
     assert_param((DMA2D->CR & DMA2D_CR_START) == 0U);
     lv_coord_t area_w = lv_area_get_width(dst_area);
     lv_coord_t area_h = lv_area_get_height(dst_area);
@@ -227,7 +227,7 @@ static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_
     invalidateCache = false;
 }
 
-static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
+static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
 {
     assert_param((uint32_t)dst_buf % LV_IMG_PX_SIZE_ALPHA_BYTE == 0);
     assert_param((uint32_t)src_buf % LV_IMG_PX_SIZE_ALPHA_BYTE == 0);
@@ -255,7 +255,6 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
         clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
     }
 
-    //SCB_CleanDCache(); // TODO: change
     clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height);
     invalidateCache = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
@@ -285,7 +284,6 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
 
     if (invalidateCache) {
-        //clean_cache((uint32_t)(draw_ctx->buf), dest_w * dest_h * LV_IMG_PX_SIZE_ALPHA_BYTE);
          // invalidate cache ONLY after DMA2D transfer
         invalidate_cache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos, (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos);
         invalidateCache = false;
@@ -309,7 +307,6 @@ static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t wid
     // DCCIMVAC((uint32_t*)address, op_size);
     // return;
 
-//#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
     uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset); // in bytes
     uint16_t lcrc = (width / PIXELS_PER_CACHE_ROW); // line cache row count
     __DSB();
@@ -330,18 +327,10 @@ static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t wid
 
     __DSB();
     __ISB();
-//#endif
 }
 
 static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height)
 {
-    // int32_t dsize = 4*((height * width) + (height - 1 * offset));
-    // int32_t op_size = dsize + (address & (32U - 1U));
-    // //SCB_CleanDCache();
-    // SCB_CleanDCache_by_Addr((uint32_t*)address, op_size);
-    // return;
-
-//#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
     uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset);
     uint16_t lcrc = (width / PIXELS_PER_CACHE_ROW); // line cache row count
 
@@ -359,7 +348,6 @@ static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, l
 
     __DSB();
     __ISB();
-//#endif
 }
 
 static void zeroAlpha(const lv_color_t * buf, uint32_t length) {
