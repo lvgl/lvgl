@@ -15,7 +15,6 @@ build_only_options = {
     'OPTIONS_MINIMAL_MONOCHROME': 'Minimal config monochrome',
     'OPTIONS_NORMAL_8BIT': 'Normal config, 8 bit color depth',
     'OPTIONS_16BIT': 'Minimal config, 16 bit color depth',
-    'OPTIONS_16BIT_SWAP': 'Normal config, 16 bit color depth swapped',
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
 }
 
