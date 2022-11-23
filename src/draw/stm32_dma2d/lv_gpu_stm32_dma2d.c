@@ -46,13 +46,17 @@
  **********************/
 
 static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color);
+static void lv_draw_stm32_dma2d_blend_fill2(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color);
+
 static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa);
+static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa);
 static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src);
 
 static void invalidate_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
 static void clean_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
 static void zeroAlpha(const lv_color_t * buf, uint32_t length);
 static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const lv_area_t * area3, const lv_area_t * area4);
+static void compareBuffers(const lv_color_t* b1, const lv_color_t* b2, const lv_area_t * area, lv_coord_t stride);
 
 /**********************
  *  STATIC VARIABLES
@@ -112,6 +116,7 @@ void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ct
 
 void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
+    ALIGN_32BYTES(static lv_color_t test_buf[800*48]); // test
     lv_area_t dest_area;
     if(!_lv_area_intersect(&dest_area, dsc->blend_area, draw_ctx->clip_area)) return;
     //trace4Areas(draw_ctx->buf_area, draw_ctx->clip_area, dsc->blend_area, &dest_area);
@@ -134,19 +139,22 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             src_pos.y = dest_area.y1 - dsc->blend_area->y1;
             //zeroAlpha(src_buf, lv_area_get_size(dsc->blend_area));
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
-            lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
+            lv_draw_stm32_dma2d_blend_map2(draw_ctx->buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
+            // test
+            lv_draw_stm32_dma2d_blend_map(test_buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
+            compareBuffers(draw_ctx->buf, test_buf, &dest_area, 800);
+            // end test
             done = true;
         }
         else if(dsc->opa >= LV_OPA_MAX) {
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
-            lv_draw_stm32_dma2d_blend_fill(draw_ctx->buf, dest_w, &dest_area, dsc->color);
+            lv_draw_stm32_dma2d_blend_fill2(draw_ctx->buf, dest_w, &dest_area, dsc->color);
             done = true;
         }
     }
 
     if(!done) lv_draw_sw_blend_basic(draw_ctx, dsc);
 }
-
 
 // Does dest_stride = width(draw_ctx->buf_area) ?
 // Does dest_area = intersect(draw_ctx->clip_area, src_area) ?
@@ -156,7 +164,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     lv_point_t src_pos;
     src_pos.x = dest_area->x1 - src_area->x1;
     src_pos.y = dest_area->y1 - src_area->y1;
-    lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_pos, LV_OPA_MAX);
+    lv_draw_stm32_dma2d_blend_map2(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_pos, LV_OPA_MAX);
 }
 
 static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * src_area, const void * src)
@@ -178,7 +186,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
             src_pos.x = dest_area.x1 - src_area->x1;
             src_pos.y = dest_area.y1 - src_area->y1;
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-            lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_width, &dest_area, (lv_color_t *)img->data, img->header.w, &src_pos, dsc->opa);
+            lv_draw_stm32_dma2d_blend_map2(draw_ctx->buf, dest_width, &dest_area, (lv_color_t *)img->data, img->header.w, &src_pos, dsc->opa);
             //lv_draw_stm32_dma2d_blend_fill(draw_ctx->buf, dest_width, &dest_area, lv_color_hex3(lv_rand(0x000, 0xfff)));
 			return LV_RES_OK;
 		}
@@ -208,9 +216,10 @@ static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
     invalidateCache = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     DMA2D->CR |= DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START) != 0U);
 }
 
-static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa) {
+static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa) {
     assert_param((DMA2D->CR & DMA2D_CR_START) == 0U);
     lv_coord_t area_w = lv_area_get_width(dst_area);
     lv_coord_t area_h = lv_area_get_height(dst_area);
@@ -227,7 +236,24 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
     invalidateCache = false;
 }
 
-static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
+static void lv_draw_stm32_dma2d_blend_fill2(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color)
+{
+    lv_coord_t dest_w = lv_area_get_width(fill_area);
+    lv_coord_t dest_h = lv_area_get_height(fill_area);
+    lv_color_t * buf = (lv_color_t *)dest_buf;
+
+    while(dest_h > 0) {
+        dest_h--;
+        for (lv_coord_t x = 0; x < dest_w; x++) {
+            *buf = color;
+            buf++;
+        }
+        buf += dest_stride - dest_w;
+    }
+    invalidateCache = false;
+}
+
+static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
 {
     assert_param((uint32_t)dst_buf % LV_IMG_PX_SIZE_ALPHA_BYTE == 0);
     assert_param((uint32_t)src_buf % LV_IMG_PX_SIZE_ALPHA_BYTE == 0);
@@ -259,6 +285,7 @@ static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_
     invalidateCache = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     DMA2D->CR |= DMA2D_CR_START;
+    while((DMA2D->CR & DMA2D_CR_START) != 0U);
 }
 
 void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
@@ -391,6 +418,27 @@ static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const 
     if (counter == 900) {
         counter = 0;
         printf("\n");
+    }
+}
+
+static void compareBuffers(const lv_color_t* b1, const lv_color_t* b2, const lv_area_t * area, lv_coord_t stride) {
+    lv_coord_t area_w = lv_area_get_width(area);
+    lv_coord_t area_h = lv_area_get_height(area);
+    lv_color_t * buf1 = (lv_color_t *)b1 + (stride * area->y1) + area->x1;
+    lv_color_t * buf2 = (lv_color_t *)b2 + (stride * area->y1) + area->x1;
+
+    while (area_h > 0) {
+        area_h--;
+        //memcpy(dst_buf2, src_buf2, area_w * sizeof(lv_color_t));
+        for (lv_coord_t x = 0; x < area_w; x++) {
+            if ((*buf1).full != (*buf2).full) {
+                printf("mismatch\n");
+            }
+            buf1++;
+            buf2++;
+        }
+        buf1 += stride - area_w;
+        buf2 += stride - area_w;
     }
 }
 
