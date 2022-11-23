@@ -8,7 +8,7 @@ def scroll_begin_event(e):
 
 # Create a Tab view object
 tabview = lv.tabview(lv.scr_act(), lv.DIR.LEFT, 80)
-tabview.get_content().add_event_cb(scroll_begin_event, lv.EVENT.SCROLL_BEGIN, None)
+tabview.get_content().add_event(scroll_begin_event, lv.EVENT.SCROLL_BEGIN, None)
 
 tabview.set_style_bg_color(lv.palette_lighten(lv.PALETTE.RED, 2), 0)
 

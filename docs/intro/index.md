@@ -144,7 +144,7 @@ See the [Porting](/porting/display) section to learn more.
 
 ### LVGL doesn't start, randomly crashes or nothing is drawn on the display. What can be the problem?
 - Try increasing `LV_MEM_SIZE`.
-- Be sure `lv_disp_drv_t`, `lv_indev_drv_t` and `lv_fs_drv_t` are global or `static`.
+- Be sure `lv_disp_t`, `lv_indev_t` and `lv_fs_drv_t` are global or `static`.
 - Be sure your display works without LVGL. E.g. paint it to red on start up.
 - Enable [Logging](porting/log)
 - Enable asserts in `lv_conf.h` (`LV_USE_ASSERT_...`)

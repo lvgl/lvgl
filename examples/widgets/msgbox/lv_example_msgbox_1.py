@@ -5,6 +5,6 @@ def event_cb(e):
 btns = ["Apply", "Close", ""]
 
 mbox1 = lv.msgbox(lv.scr_act(), "Hello", "This is a message box with two buttons.", btns, True)
-mbox1.add_event_cb(event_cb, lv.EVENT.VALUE_CHANGED, None)
+mbox1.add_event(event_cb, lv.EVENT.VALUE_CHANGED, None)
 mbox1.center()
 

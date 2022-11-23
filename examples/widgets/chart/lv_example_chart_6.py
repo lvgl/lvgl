@@ -13,7 +13,7 @@ class ExampleChart_6():
         chart.set_axis_tick(lv.chart.AXIS.PRIMARY_Y, 10, 5, 6, 5, True, 40)
         chart.set_axis_tick(lv.chart.AXIS.PRIMARY_X, 10, 5, 10, 1, True, 30)
 
-        chart.add_event_cb(self.event_cb, lv.EVENT.ALL, None)
+        chart.add_event(self.event_cb, lv.EVENT.ALL, None)
         chart.refresh_ext_draw_size()
 
         self.cursor = chart.add_cursor(lv.palette_main(lv.PALETTE.BLUE), lv.DIR.LEFT | lv.DIR.BOTTOM)
