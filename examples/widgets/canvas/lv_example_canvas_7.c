@@ -9,10 +9,6 @@
  */
 void lv_example_canvas_7(void)
 {
-
-    /*Create a button to better see the transparency*/
-    lv_btn_create(lv_scr_act());
-
     /*Create a buffer for the canvas*/
     static uint8_t cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT)];
 
