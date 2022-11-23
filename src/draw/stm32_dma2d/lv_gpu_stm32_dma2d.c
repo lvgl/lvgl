@@ -141,8 +141,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
             lv_draw_stm32_dma2d_blend_map2(draw_ctx->buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
             // test
-            lv_draw_stm32_dma2d_blend_map(test_buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
-            compareBuffers(draw_ctx->buf, test_buf, &dest_area, 800);
+            //lv_draw_stm32_dma2d_blend_map(test_buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa); // THIS LINE CAUSES THE PROBLEM!
+            //compareBuffers(draw_ctx->buf, test_buf, &dest_area, 800);
             // end test
             done = true;
         }
