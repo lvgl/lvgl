@@ -68,7 +68,7 @@ static void invalidate_cache(void);
 void lv_draw_stm32_dma2d_init(void)
 {
     /*Enable DMA2D clock*/
-#if defined(STM32F4) || defined(STM32F7)
+#if defined(STM32F4) || defined(STM32F7) || defined(STM32U5)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
 #elif defined(STM32H7)
     RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
@@ -250,7 +250,7 @@ static void invalidate_cache(void)
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     if(disp->driver->clean_dcache_cb) disp->driver->clean_dcache_cb(disp->driver);
     else {
-#if __CORTEX_M >= 0x07
+#if __CORTEX_M == 0x07
         if((SCB->CCR) & (uint32_t)SCB_CCR_DC_Msk)
             SCB_CleanInvalidateDCache();
 #endif
