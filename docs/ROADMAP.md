@@ -39,7 +39,8 @@
 ### Styles
 - [ ] Make `style_bg_img` support `9patch` images
 - [ ] non-uniform scale of images: scale width and height differently
-
+- [ ] Scroll anim settings should come from styles to allow customization
+- [ ] 
 ### Widgets
 - [ ] `lv_img`: Reconsider image sizing models (when the image size is not content): center, top-left, zoom, tile, other?
 - [ ] `lv_tabview` Replace button matrix with real buttons for more flexibility
