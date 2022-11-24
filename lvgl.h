@@ -42,6 +42,7 @@ extern "C" {
 #include "src/font/lv_font_loader.h"
 #include "src/font/lv_font_fmt_txt.h"
 
+#if LV_USE_EXTRA_WIDGETS
 #include "src/widgets/animimg/lv_animimg.h"
 #include "src/widgets/arc/lv_arc.h"
 #include "src/widgets/bar/lv_bar.h"
@@ -74,28 +75,84 @@ extern "C" {
 #include "src/widgets/textarea/lv_textarea.h"
 #include "src/widgets/tileview/lv_tileview.h"
 #include "src/widgets/win/lv_win.h"
+#endif /* LV_USE_EXTRA_WIDGETS */
 
+#if LV_USE_SNAPSHOT
 #include "src/others/snapshot/lv_snapshot.h"
-#include "src/others/monkey/lv_monkey.h"
-#include "src/others/gridnav/lv_gridnav.h"
-#include "src/others/fragment/lv_fragment.h"
-#include "src/others/imgfont/lv_imgfont.h"
-#include "src/others/msg/lv_msg.h"
-#include "src/others/ime/lv_ime_pinyin.h"
-#include "src/others/file_explorer/lv_file_explorer.h"
+#endif /* LV_USE_SNAPSHOT */
 
+#if LV_USE_MONKEY
+#include "src/others/monkey/lv_monkey.h"
+#endif /* LV_USE_MONKEY */
+
+#if LV_USE_GRIDNAV
+#include "src/others/gridnav/lv_gridnav.h"
+#endif /* LV_USE_GRIDNAV */
+
+#if LV_USE_FRAGMENT
+#include "src/others/fragment/lv_fragment.h"
+#endif /* LV_USE_FRAGMENT */
+
+#if LV_USE_IMGFONT
+#include "src/others/imgfont/lv_imgfont.h"
+#endif /* LV_USE_IMGFONT */
+
+#if LV_USE_MSG
+#include "src/others/msg/lv_msg.h"
+#endif /* LV_USE_MSG */
+
+#if LV_USE_IME_PINYIN
+#include "src/others/ime/lv_ime_pinyin.h"
+#endif /* LV_USE_IME_PINYIN */
+
+#if LV_USE_FILE_EXPLORER
+#include "src/others/file_explorer/lv_file_explorer.h"
+#endif /* LV_USE_FILE_EXPLORER */
+
+#if LV_USE_BMP
 #include "src/libs/bmp/lv_bmp.h"
+#endif /* LV_USE_BMP */
+
 #include "src/libs/fsdrv/lv_fsdrv.h"
+
+#if LV_USE_PNG
 #include "src/libs/png/lv_png.h"
+#endif /* LV_USE_PNG */
+
+#if LV_USE_GIF
 #include "src/libs/gif/lv_gif.h"
+#endif /* LV_USE_GIF */
+
+#if LV_USE_QRCODE
 #include "src/libs/qrcode/lv_qrcode.h"
+#endif /* LV_USE_QRCODE */
+
+#if LV_USE_SJPG
 #include "src/libs/sjpg/lv_sjpg.h"
+#endif /* LV_USE_SJPG */
+
+#if LV_USE_FREETYPE
 #include "src/libs/freetype/lv_freetype.h"
+#endif /* LV_USE_FREETYPE */
+
+#if LV_USE_RLOTTIE
 #include "src/libs/rlottie/lv_rlottie.h"
+#endif /* LV_USE_RLOTTIE */
+
+#if LV_USE_FFMPEG
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
+#endif /* LV_USE_FFMPEG */
+
+#if LV_USE_TINY_TTF
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
+#endif /* LV_USE_TINY_TTF */
+
+#if LV_USE_FLEX
 #include "src/layouts/flex/lv_flex.h"
+#endif /* LV_USE_FLEX */
+#if LV_USE_GRID
 #include "src/layouts/grid/lv_grid.h"
+#endif /* LV_USE_GRID */
 
 #include "src/draw/lv_draw.h"
 
