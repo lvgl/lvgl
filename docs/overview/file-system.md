@@ -5,8 +5,8 @@ A file system is identified by an assigned drive letter.
 For example, if an SD card is associated with the letter `'S'`, a file can be reached using `"S:path/to/file.txt"`.
 
 ## Ready to use drivers
-The [lv_fs_if](https://github.com/lvgl/lv_fs_if) repository contains prepared drivers using POSIX, standard C and the [FATFS](http://elm-chan.org/fsw/ff/00index_e.html) API.
-See its [README](https://github.com/lvgl/lv_fs_if#readme) for the details.
+
+LVGL contains prepared drivers for the API of POSIX, standard C, Windows, and [FATFS](http://elm-chan.org/fsw/ff/00index_e.html). Learn more [here](/libs/fsdrv). 
 
 ## Adding a driver
 
