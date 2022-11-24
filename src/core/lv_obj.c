@@ -22,15 +22,43 @@
 #include "../misc/lv_gc.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
-#include "../libs/bmp/lv_bmp.h"
-#include "../libs/ffmpeg/lv_ffmpeg.h"
-#include "../libs/freetype/lv_freetype.h"
 #include "../libs/fsdrv/lv_fsdrv.h"
-#include "../libs/gif/lv_gif.h"
-#include "../libs/png/lv_png.h"
-#include "../libs/sjpg/lv_sjpg.h"
-#include "../layouts/flex/lv_flex.h"
-#include "../layouts/grid/lv_grid.h"
+
+#if LV_USE_BMP
+    #include "../libs/bmp/lv_bmp.h"
+#endif
+
+#if LV_USE_FFMPEG
+    #include "../libs/ffmpeg/lv_ffmpeg.h"
+#endif
+
+#if LV_USE_FREETYPE
+    #include "../libs/freetype/lv_freetype.h"
+#endif
+
+#if LV_USE_GIF
+    #include "../libs/gif/lv_gif.h"
+#endif
+
+#if LV_USE_PNG
+    #include "../libs/png/lv_png.h"
+#endif
+
+#if LV_USE_SJPG
+    #include "../libs/sjpg/lv_sjpg.h"
+#endif
+
+#if LV_USE_FLEX
+    #include "../layouts/flex/lv_flex.h"
+#endif
+
+#if LV_USE_GRID
+    #include "../layouts/grid/lv_grid.h"
+#endif
+
+#if LV_USE_MSG
+    #include "../others/msg/lv_msg.h"
+#endif
 
 #if LV_USE_BUILTIN_MALLOC
     #include "../misc/lv_malloc_builtin.h"

@@ -17,9 +17,15 @@
 #include "../core/lv_obj.h"
 #include "../core/lv_refr.h"
 #include "../core/lv_theme.h"
-#include "../draw/sdl/lv_draw_sdl.h"
-#include "../draw/sw/lv_draw_sw.h"
-#include "../draw/sdl/lv_draw_sdl.h"
+
+#if LV_USE_DRAW_SDL
+    #include "../draw/sdl/lv_draw_sdl.h"
+#endif
+
+#if LV_USE_DRAW_SW
+    #include "../draw/sw/lv_draw_sw.h"
+#endif
+
 #if LV_USE_GPU_STM32_DMA2D
     #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
 #endif
