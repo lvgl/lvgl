@@ -1402,7 +1402,19 @@
 /*==================
  * WIDGETS
  *================*/
-
+#ifndef LV_USE_EXTRA_WIDGETS
+    #ifndef LV_USE_EXTRA_WIDGETS
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_EXTRA_WIDGETS
+                #define LV_USE_EXTRA_WIDGETS CONFIG_LV_USE_EXTRA_WIDGETS
+            #else
+                #define LV_USE_EXTRA_WIDGETS 0
+            #endif
+        #else
+            #define LV_USE_EXTRA_WIDGETS      1
+        #endif
+    #endif
+#endif /* LV_USE_EXTRA_WIDGETS */
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
 #ifndef LV_USE_ANIMIMG
@@ -1891,7 +1903,6 @@
 /*==================
  * THEMES
  *==================*/
-
 /*A simple, impressive and very complete theme*/
 #ifndef LV_USE_THEME_DEFAULT
     #ifdef _LV_KCONFIG_PRESENT
@@ -1999,7 +2010,6 @@
  *====================*/
 
 /*File system interfaces for common APIs */
-
 /*API for fopen, fread, etc*/
 #ifndef LV_USE_FS_STDIO
     #ifdef CONFIG_LV_USE_FS_STDIO
