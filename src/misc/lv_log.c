@@ -108,7 +108,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
             lv_vsnprintf(msg, sizeof(msg), format, args);
             lv_snprintf(buf, sizeof(buf), "[%s]" LOG_TIMESTAMP_FMT " %s: %s \t(in %s line #%d)\n",
                         lvl_prefix[level], LOG_TIMESTAMP_EXPR func, msg, &file[p], line);
-            custom_print_cb(buf);
+            custom_print_cb(level, buf);
         }
 #endif
 
@@ -132,7 +132,7 @@ void lv_log(const char * format, ...)
     if(custom_print_cb) {
         char buf[512];
         lv_vsnprintf(buf, sizeof(buf), format, args);
-        custom_print_cb(buf);
+        custom_print_cb(LV_LOG_LEVEL_USER, buf);
     }
 #endif
 
