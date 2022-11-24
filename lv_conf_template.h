@@ -460,7 +460,9 @@
 /*==================
  * WIDGETS
  *================*/
-
+#ifndef LV_USE_EXTRA_WIDGETS
+    #define LV_USE_EXTRA_WIDGETS      1
+#endif /* LV_USE_EXTRA_WIDGETS */
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
 #define LV_USE_ANIMIMG    1
@@ -553,7 +555,6 @@
 /*==================
  * THEMES
  *==================*/
-
 /*A simple, impressive and very complete theme*/
 #define LV_USE_THEME_DEFAULT 1
 #if LV_USE_THEME_DEFAULT
@@ -589,7 +590,6 @@
  *====================*/
 
 /*File system interfaces for common APIs */
-
 /*API for fopen, fread, etc*/
 #define LV_USE_FS_STDIO 0
 #if LV_USE_FS_STDIO
