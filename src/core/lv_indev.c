@@ -818,7 +818,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_proc_press(_lv_indev_proc_t * proc)
 {
-    uint8_t indev_flag = false;
+    bool no_move = false;
 
     LV_LOG_INFO("pressed at x:%d y:%d", proc->types.pointer.act_point.x, proc->types.pointer.act_point.y);
     indev_obj_act = proc->types.pointer.act_obj;
@@ -858,11 +858,11 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
 
     if((proc->types.pointer.act_point.x == proc->types.pointer.indev_point.x) &&
        (proc->types.pointer.act_point.y == proc->types.pointer.indev_point.y))
-        indev_flag = true;
+        no_move = true;
 
     lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, &proc->types.pointer.indev_point, true, true);
 
-    if(indev_flag) {
+    if(no_move) {
         proc->types.pointer.last_point.x = proc->types.pointer.act_point.x;
         proc->types.pointer.last_point.y = proc->types.pointer.act_point.y;
     }
