@@ -26,7 +26,7 @@
 static lv_coord_t calc_content_width(lv_obj_t * obj);
 static lv_coord_t calc_content_height(lv_obj_t * obj);
 static void layout_update_core(lv_obj_t * obj);
-static void transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * p1, bool inv);
+static void transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * prev_p, bool inv);
 
 /**********************
  *  STATIC VARIABLES
@@ -795,18 +795,18 @@ void lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_dif
     }
 }
 
-void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * p1, bool recursive, bool inv)
+void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * prev_p, bool recursive, bool inv)
 {
     if(obj) {
         lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
         bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
         if(inv) {
-            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, p1, recursive, inv);
-            if(do_tranf) transform_point(obj, p, p1, inv);
+            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, prev_p, recursive, inv);
+            if(do_tranf) transform_point(obj, p, prev_p, inv);
         }
         else {
-            if(do_tranf) transform_point(obj, p, p1, inv);
-            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, p1, recursive, inv);
+            if(do_tranf) transform_point(obj, p, prev_p, inv);
+            if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, prev_p, recursive, inv);
         }
     }
 }
@@ -1153,7 +1153,7 @@ static void layout_update_core(lv_obj_t * obj)
     }
 }
 
-static void transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * p1, bool inv)
+static void transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * prev_p, bool inv)
 {
     int16_t angle = lv_obj_get_style_transform_angle(obj, 0);
     int16_t zoom = lv_obj_get_style_transform_zoom(obj, 0);
@@ -1162,9 +1162,9 @@ static void transform_point(const lv_obj_t * obj, lv_point_t * p, lv_point_t * p
 
     lv_point_t pivot;
 
-    if(p1) {
-        pivot.x = obj->coords.x1 + (p->x - p1->x) + lv_obj_get_style_transform_pivot_x(obj, 0);
-        pivot.y = obj->coords.y1 + (p->y - p1->y) + lv_obj_get_style_transform_pivot_y(obj, 0);
+    if(prev_p) {
+        pivot.x = obj->coords.x1 + (p->x - prev_p->x) + lv_obj_get_style_transform_pivot_x(obj, 0);
+        pivot.y = obj->coords.y1 + (p->y - prev_p->y) + lv_obj_get_style_transform_pivot_y(obj, 0);
     }
     else {
         pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0);
