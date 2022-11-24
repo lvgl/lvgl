@@ -782,73 +782,80 @@ menu "LVGL configuration"
 			default y if !LV_CONF_MINIMAL
 	endmenu
 
-	menu "Extra Widgets"
-		config LV_USE_ANIMIMG
-			bool "Anim image."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_CALENDAR
-			bool "Calendar."
-			default y if !LV_CONF_MINIMAL
-		config LV_CALENDAR_WEEK_STARTS_MONDAY
-			bool "Calendar week starts monday."
-			depends on LV_USE_CALENDAR
-		config LV_USE_CALENDAR_HEADER_ARROW
-			bool "Use calendar header arrow"
-			depends on LV_USE_CALENDAR
-			default y
-		config LV_USE_CALENDAR_HEADER_DROPDOWN
-			bool "Use calendar header dropdown"
-			depends on LV_USE_CALENDAR
-			default y
-		config LV_USE_CHART
-			bool "Chart."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_COLORWHEEL
-			bool "Colorwheel."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_IMGBTN
-			bool "Imgbtn."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_KEYBOARD
-			bool "Keyboard."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_LED
-			bool "LED."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_LIST
-			bool "List."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_MENU
-			bool "Menu."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_METER
-			bool "Meter."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_MSGBOX
-			bool "Msgbox."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_SPAN
-			bool "span"
-			default y if !LV_CONF_MINIMAL
-		config LV_SPAN_SNIPPET_STACK_SIZE
-			int "Maximum number of span descriptor"
-			default 64
-			depends on LV_USE_SPAN
-		config LV_USE_SPINBOX
-			bool "Spinbox."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_SPINNER
-			bool "Spinner."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_TABVIEW
-			bool "Tabview."
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_TILEVIEW
-			bool "Tileview"
-			default y if !LV_CONF_MINIMAL
-		config LV_USE_WIN
-			bool "Win"
-			default y if !LV_CONF_MINIMAL
+	menu "Enable Extra Widgets"
+		config LV_USE_EXTRA_WIDGETS
+		bool "Enable Extra Widgets."
+		default y if !LV_CONF_MINIMAL
+	if LV_USE_EXTRA_WIDGETS
+		menu "Extra Widgets"
+			config LV_USE_ANIMIMG
+				bool "Anim image."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_CALENDAR
+				bool "Calendar."
+				default y if !LV_CONF_MINIMAL
+			config LV_CALENDAR_WEEK_STARTS_MONDAY
+				bool "Calendar week starts monday."
+				depends on LV_USE_CALENDAR
+			config LV_USE_CALENDAR_HEADER_ARROW
+				bool "Use calendar header arrow"
+				depends on LV_USE_CALENDAR
+				default y
+			config LV_USE_CALENDAR_HEADER_DROPDOWN
+				bool "Use calendar header dropdown"
+				depends on LV_USE_CALENDAR
+				default y
+			config LV_USE_CHART
+				bool "Chart."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_COLORWHEEL
+				bool "Colorwheel."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_IMGBTN
+				bool "Imgbtn."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_KEYBOARD
+				bool "Keyboard."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_LED
+				bool "LED."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_LIST
+				bool "List."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_MENU
+				bool "Menu."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_METER
+				bool "Meter."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_MSGBOX
+				bool "Msgbox."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_SPAN
+				bool "span"
+				default y if !LV_CONF_MINIMAL
+			config LV_SPAN_SNIPPET_STACK_SIZE
+				int "Maximum number of span descriptor"
+				default 64
+				depends on LV_USE_SPAN
+			config LV_USE_SPINBOX
+				bool "Spinbox."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_SPINNER
+				bool "Spinner."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_TABVIEW
+				bool "Tabview."
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_TILEVIEW
+				bool "Tileview"
+				default y if !LV_CONF_MINIMAL
+			config LV_USE_WIN
+				bool "Win"
+				default y if !LV_CONF_MINIMAL
+		endmenu
+	endif
 	endmenu
 
 	menu "Themes"
