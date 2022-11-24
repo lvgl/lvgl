@@ -2162,40 +2162,49 @@
     #endif
 #endif
 #if LV_USE_FREETYPE
-    /*Memory used by FreeType to cache characters [bytes] (-1: no caching)*/
+    /*Memory used by FreeType to cache characters [bytes]*/
     #ifndef LV_FREETYPE_CACHE_SIZE
         #ifdef CONFIG_LV_FREETYPE_CACHE_SIZE
             #define LV_FREETYPE_CACHE_SIZE CONFIG_LV_FREETYPE_CACHE_SIZE
         #else
-            #define LV_FREETYPE_CACHE_SIZE (16 * 1024)
+            #define LV_FREETYPE_CACHE_SIZE (64 * 1024)
         #endif
     #endif
-    #if LV_FREETYPE_CACHE_SIZE >= 0
-        /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
-        /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
-        /* if font size >= 256, must be configured as image cache */
-        #ifndef LV_FREETYPE_SBIT_CACHE
-            #ifdef CONFIG_LV_FREETYPE_SBIT_CACHE
-                #define LV_FREETYPE_SBIT_CACHE CONFIG_LV_FREETYPE_SBIT_CACHE
-            #else
-                #define LV_FREETYPE_SBIT_CACHE 0
-            #endif
+
+    /*Let FreeType to use LVGL memory and file porting*/
+    #ifndef LV_FREETYPE_USE_LVGL_PORT
+        #ifdef CONFIG_LV_FREETYPE_USE_LVGL_PORT
+            #define LV_FREETYPE_USE_LVGL_PORT CONFIG_LV_FREETYPE_USE_LVGL_PORT
+        #else
+            #define LV_FREETYPE_USE_LVGL_PORT 0
         #endif
-        /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
-        /* (0:use system defaults) */
-        #ifndef LV_FREETYPE_CACHE_FT_FACES
-            #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
-                #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
-            #else
-                #define LV_FREETYPE_CACHE_FT_FACES 0
-            #endif
+    #endif
+
+    /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
+    /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
+    /* if font size >= 256, must be configured as image cache */
+    #ifndef LV_FREETYPE_SBIT_CACHE
+        #ifdef CONFIG_LV_FREETYPE_SBIT_CACHE
+            #define LV_FREETYPE_SBIT_CACHE CONFIG_LV_FREETYPE_SBIT_CACHE
+        #else
+            #define LV_FREETYPE_SBIT_CACHE 0
         #endif
-        #ifndef LV_FREETYPE_CACHE_FT_SIZES
-            #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-                #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
-            #else
-                #define LV_FREETYPE_CACHE_FT_SIZES 0
-            #endif
+    #endif
+
+    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
+    /* (0:use system defaults) */
+    #ifndef LV_FREETYPE_CACHE_FT_FACES
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_FACES
+            #define LV_FREETYPE_CACHE_FT_FACES CONFIG_LV_FREETYPE_CACHE_FT_FACES
+        #else
+            #define LV_FREETYPE_CACHE_FT_FACES 4
+        #endif
+    #endif
+    #ifndef LV_FREETYPE_CACHE_FT_SIZES
+        #ifdef CONFIG_LV_FREETYPE_CACHE_FT_SIZES
+            #define LV_FREETYPE_CACHE_FT_SIZES CONFIG_LV_FREETYPE_CACHE_FT_SIZES
+        #else
+            #define LV_FREETYPE_CACHE_FT_SIZES 4
         #endif
     #endif
 #endif
