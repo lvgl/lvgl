@@ -147,12 +147,7 @@ extern "C" {
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
 #endif /* LV_USE_TINY_TTF */
 
-#if LV_USE_FLEX
-#include "src/layouts/flex/lv_flex.h"
-#endif /* LV_USE_FLEX */
-#if LV_USE_GRID
-#include "src/layouts/grid/lv_grid.h"
-#endif /* LV_USE_GRID */
+#include "src/layouts/lv_layouts.h"
 
 #include "src/draw/lv_draw.h"
 
