@@ -61,9 +61,15 @@ extern "C" {
 #endif
 
 #include "../lv_conf_internal.h"
+#include LV_STDIO_INCLUDE
+
+#define lv_snprintf LV_SNPRINTF
+#define lv_vsnprintf LV_VSNPRINTF
+
+#if LV_USE_BUILTIN_SNPRINTF
+
 #include <stdarg.h>
 #include <stddef.h>
-
 #include "lv_types.h"
 
 typedef struct {
@@ -74,9 +80,7 @@ typedef struct {
 int lv_snprintf_builtin(char * buffer, size_t count, const char * format, ...);
 int lv_vsnprintf_builtin(char * buffer, size_t count, const char * format, va_list va);
 
-#define lv_snprintf LV_SNPRINTF
-#define lv_vsnprintf LV_VSNPRINTF
-
+#endif /*LV_USE_BUILTIN_SNPRINTF*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -10,7 +10,7 @@
 #include "../misc/lv_math.h"
 #include "../core/lv_refr.h"
 #include "../core/lv_disp.h"
-#include "../core/lv_disp_priv.h"
+#include "../core/lv_disp_private.h"
 #include "../misc/lv_gc.h"
 
 #if LV_USE_DRAW_SW
@@ -688,35 +688,33 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
  * OTHERS
  *--------------------*/
 
-void lv_disp_add_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+void lv_disp_add_event(lv_disp_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
     LV_ASSERT_NULL(disp);
 
-    lv_event_add_callback(&disp->event_list, event_cb, filter, user_data);
+    lv_event_add(&disp->event_list, event_cb, filter, user_data);
 }
 
-bool lv_disp_remove_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb)
+uint32_t lv_disp_get_event_count(lv_disp_t * disp)
+{
+    LV_ASSERT_NULL(disp);
+    return lv_event_get_count(&disp->event_list);
+}
+
+
+lv_event_dsc_t * lv_disp_get_event_dsc(lv_disp_t * disp, uint32_t index)
+{
+    LV_ASSERT_NULL(disp);
+    return lv_event_get_dsc(&disp->event_list, index);
+
+}
+
+bool lv_disp_remove_event(lv_disp_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
 
-    return lv_event_remove_callback(&disp->event_list, event_cb);
+    return lv_event_remove(&disp->event_list, index);
 }
-
-bool lv_disp_remove_event_cb_with_user_data(lv_disp_t * disp, lv_event_cb_t event_cb, const void * user_data)
-{
-    LV_ASSERT_NULL(disp);
-
-    return lv_event_remove_callback_with_user_data(&disp->event_list, event_cb, user_data);
-}
-
-
-void * lv_disp_get_event_user_data_of_cb(lv_disp_t * disp, lv_event_cb_t event_cb)
-{
-    LV_ASSERT_NULL(disp);
-
-    return lv_event_get_user_data_of_callback(&disp->event_list, event_cb);
-}
-
 
 lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_data)
 {

@@ -7,9 +7,9 @@
  *      INCLUDES
  ********************/
 #include "lv_indev.h"
-#include "lv_indev_priv.h"
+#include "lv_indev_private.h"
 #include "lv_disp.h"
-#include "lv_disp_priv.h"
+#include "lv_disp_private.h"
 #include "lv_obj.h"
 #include "lv_indev_scroll.h"
 #include "lv_group.h"

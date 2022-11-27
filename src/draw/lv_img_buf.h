@@ -87,51 +87,6 @@ typedef struct {
  **********************/
 
 /**
- * Allocate an image buffer in RAM
- * @param w width of image
- * @param h height of image
- * @param cf a color format (`LV_COLOR_FORMAT_...`)
- * @return an allocated image, or NULL on failure
- */
-lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_color_format_t cf);
-
-/**
- * Get the color of an image's pixel
- * @param dsc an image descriptor
- * @param x x coordinate of the point to get
- * @param y x coordinate of the point to get
- * @return color of the point
- */
-lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x);
-
-/**
- * Get the alpha value of an image's pixel
- * @param dsc pointer to an image descriptor
- * @param x x coordinate of the point to set
- * @param y x coordinate of the point to set
- * @return alpha value of the point
- */
-lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
-
-/**
- * Set the color of a pixel of an image. The alpha channel won't be affected.
- * @param dsc pointer to an image descriptor
- * @param x x coordinate of the point to set
- * @param y x coordinate of the point to set
- * @param c color of the point
- */
-void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c);
-
-/**
- * Set the alpha value of a pixel of an image. The color won't be affected
- * @param dsc pointer to an image descriptor
- * @param x x coordinate of the point to set
- * @param y x coordinate of the point to set
- * @param opa the desired opacity
- */
-void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa);
-
-/**
  * Set the palette color of an indexed image. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
  * @param dsc pointer to an image descriptor
  * @param id the palette color to set:
@@ -148,15 +103,6 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color32_t c);
  * @param dsc image buffer to free
  */
 void lv_img_buf_free(lv_img_dsc_t * dsc);
-
-/**
- * Get the memory consumption of a raw bitmap, given color format and dimensions.
- * @param w width
- * @param h height
- * @param cf color format
- * @return size in bytes
- */
-uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_color_format_t cf);
 
 /**
  * Get the area of a rectangle if its rotated and scaled

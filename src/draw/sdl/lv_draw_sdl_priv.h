@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_sdl_priv.h
+ * @file lv_draw_sdl_private.h
  *
  */
 

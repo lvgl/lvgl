@@ -1,10 +1,10 @@
 
 #include "../../lv_examples.h"
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 
 #if LV_USE_TABLE && LV_USE_FILE_EXPLORER && (LV_USE_FS_STDIO || LV_USE_FS_POSIX || LV_USE_FS_WIN32 || LV_USE_FS_FATFS) && LV_BUILD_EXAMPLES
+
+#include <stdlib.h>
+#include <string.h>
 
 static void file_explorer_event_handler(lv_event_t * e)
 {
@@ -108,7 +108,7 @@ void lv_example_file_explorer_2(void)
 #endif
 #endif
 
-    lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(file_explorer, file_explorer_event_handler, LV_OBJ_EVENT_ALL, NULL);
 
     /*Quick access status control button*/
     lv_obj_t * fe_quick_access_obj = lv_file_explorer_get_quick_access_area(file_explorer);
@@ -123,7 +123,7 @@ void lv_example_file_explorer_2(void)
     lv_label_set_text(label, LV_SYMBOL_LIST);
     lv_obj_center(label);
 
-    lv_obj_add_event_cb(btn, btn_event_handler, LV_OBJ_EVENT_VALUE_CHANGED, fe_quick_access_obj);
+    lv_obj_add_event(btn, btn_event_handler, LV_OBJ_EVENT_VALUE_CHANGED, fe_quick_access_obj);
 
     /*Sort control*/
     static const char * opts = "NONE\n"
@@ -137,7 +137,7 @@ void lv_example_file_explorer_2(void)
     lv_obj_align(dd, LV_ALIGN_RIGHT_MID, 0, 0);
     //lv_obj_align_to(dd, btn, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
-    lv_obj_add_event_cb(dd, dd_event_handler, LV_OBJ_EVENT_VALUE_CHANGED, file_explorer);
+    lv_obj_add_event(dd, dd_event_handler, LV_OBJ_EVENT_VALUE_CHANGED, file_explorer);
 }
 
 #endif

@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include "lv_refr.h"
 #include "lv_disp.h"
-#include "lv_disp_priv.h"
+#include "lv_disp_private.h"
 #include "../hal/lv_hal_tick.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_mem.h"

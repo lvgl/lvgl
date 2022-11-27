@@ -1,10 +1,10 @@
 /**
- * @file lv_disp_priv.h
+ * @file lv_disp_private.h
  *
  */
 
-#ifndef LV_DISP_PRIV_H
-#define LV_DISP_PRIV_H
+#ifndef LV_DISP_PRIVATE_H
+#define LV_DISP_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,4 +169,4 @@ typedef struct _lv_disp_t {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DISP_PRIV_H*/
+#endif /*LV_DISP_PRIVATE_H*/

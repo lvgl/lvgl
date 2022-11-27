@@ -196,24 +196,23 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
 
         return;
     }
-    else {
-        size_t buf_size_px = lv_area_get_size(draw_ctx->buf_area);
-        bool has_alpha = lv_color_format_has_alpha(draw_ctx->color_format);
-        uint8_t px_size_in = lv_color_format_get_size(has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
-        uint8_t px_size_out = lv_color_format_get_size(draw_ctx->color_format);
-
-        /*In-plpace conversation can happen only when converting to a smaller pixel size*/
-        if(px_size_in >= px_size_out) {
-            if(has_alpha) lv_color_from_native_alpha(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
-            else lv_color_from_native(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
-        }
-        else {
-            /*TODO What to to do when can't perform in-place conversion?*/
-            LV_LOG_WARN("Can't convert to the desired color format (%d)", draw_ctx->color_format);
-        }
-        return;
-    }
 #endif
+
+    size_t buf_size_px = lv_area_get_size(draw_ctx->buf_area);
+    bool has_alpha = lv_color_format_has_alpha(draw_ctx->color_format);
+    uint8_t px_size_in = lv_color_format_get_size(has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
+    uint8_t px_size_out = lv_color_format_get_size(draw_ctx->color_format);
+
+    /*In-plpace conversation can happen only when converting to a smaller pixel size*/
+    if(px_size_in >= px_size_out) {
+        if(has_alpha) lv_color_from_native_alpha(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
+        else lv_color_from_native(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
+    }
+    else {
+        /*TODO What to to do when can't perform in-place conversion?*/
+        LV_LOG_WARN("Can't convert to the desired color format (%d)", draw_ctx->color_format);
+    }
+    return;
 
     LV_LOG_WARN("Couldn't convert the image to the desired format");
 }

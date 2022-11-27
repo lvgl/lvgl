@@ -364,7 +364,8 @@ static inline uint8_t lv_color8_to_int(lv_color8_t c)
 
 static inline uint16_t lv_color16_to_int(lv_color16_t c)
 {
-    return *((uint16_t *) &c);
+    uint16_t * p = (uint16_t *)&c;
+    return *p;
 }
 
 static inline uint32_t lv_color24_to_int(lv_color24_t c)
@@ -390,8 +391,12 @@ static inline lv_color8_t lv_color8_from_buf(const uint8_t * buf)
 
 static inline lv_color16_t lv_color16_from_buf(const uint8_t * buf)
 {
-    uint16_t tmp = buf[0] + (buf[1] << 8);
-    return *((lv_color16_t *)&tmp);
+    /*buf might be not aligned so craft the color byte-by-byte*/
+    lv_color16_t c16;
+    uint8_t * c16p = (uint8_t *) &c16;
+    c16p[0] = buf[0];
+    c16p[1] = buf[1];
+    return c16;
 }
 
 static inline lv_color24_t lv_color24_from_buf(const uint8_t * buf)

@@ -1,10 +1,10 @@
 /**
- * @file lv_indev_priv.h
+ * @file lv_indev_private.h
  *
  */
 
-#ifndef LV_INDEV_PRIV_H
-#define LV_INDEV_PRIV_H
+#ifndef LV_INDEV_PRIVATE_H
+#define LV_INDEV_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,4 +118,4 @@ typedef struct _lv_indev_t {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_INDEV_PRIV_H*/
+#endif /*LV_INDEV_PRIVATE_H*/

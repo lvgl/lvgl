@@ -27,7 +27,6 @@ typedef struct _lv_event_dsc_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void remove_dsc(lv_event_list_t * list, uint32_t idx);
 
 /**********************
  *  STATIC VARIABLES
@@ -85,8 +84,8 @@ lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess)
     return LV_RES_OK;
 }
 
-void lv_event_add_callback(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter,
-                           void * user_data)
+void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter,
+                  void * user_data)
 {
     list->cnt++;
     list->dsc = lv_realloc(list->dsc, list->cnt * sizeof(lv_event_dsc_t));
@@ -98,39 +97,48 @@ void lv_event_add_callback(lv_event_list_t * list, lv_event_cb_t cb, lv_event_co
     list->dsc[list->cnt - 1].user_data = user_data;
 }
 
-bool lv_event_remove_callback(lv_event_list_t * list, lv_event_cb_t cb)
-{
-    uint32_t i = 0;
-    for(i = 0; i < list->cnt; i++) {
-        if(cb == NULL || list->dsc[i].cb == cb) {
-            remove_dsc(list, i);
-        }
-    }
 
-    /*No event handler found*/
-    return false;
+uint32_t lv_event_get_count(lv_event_list_t * list)
+{
+    LV_ASSERT_NULL(list);
+    return list->cnt;
 }
 
-bool lv_event_remove_callback_with_user_data(lv_event_list_t * list, lv_event_cb_t cb, const void * user_data)
+
+lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index)
 {
-    uint32_t i = 0;
-    for(i = 0; i < list->cnt; i++) {
-        if((cb == NULL || list->dsc[i].cb == cb) && list->dsc[i].user_data == user_data) {
-            remove_dsc(list, i);
-            return true;
-        }
-    }
-    /*No event handler found*/
-    return false;
+    LV_ASSERT_NULL(list);
+    if(index >= list->cnt) return NULL;
+    else return &list->dsc[index];
 }
 
-void * lv_event_get_user_data_of_callback(lv_event_list_t * list, lv_event_cb_t event_cb)
+lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc)
 {
-    uint32_t i = 0;
-    for(i = 0; i < list->cnt; i++) {
-        if(event_cb == list->dsc[i].cb) return list->dsc[i].user_data;
+    LV_ASSERT_NULL(dsc);
+    return dsc->cb;
+}
+
+void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc)
+{
+    LV_ASSERT_NULL(dsc);
+    return dsc->user_data;
+
+}
+
+bool lv_event_remove(lv_event_list_t * list, uint32_t index)
+{
+    LV_ASSERT_NULL(list);
+    if(index >= list->cnt) return false;
+
+    /*Shift the remaining event handlers forward*/
+    uint32_t i;
+    for(i = index; i < list->cnt - 1; i++) {
+        list->dsc[i] = list->dsc[i + 1];
     }
-    return NULL;
+    list->cnt--;
+    list->dsc = lv_realloc(list->dsc, list->cnt * sizeof(lv_event_dsc_t));
+    LV_ASSERT_MALLOC(list->dsc);
+    return true;
 }
 
 void * lv_event_get_target(lv_event_t * e)
@@ -189,14 +197,3 @@ void _lv_event_mark_deleted(void * target)
  *   STATIC FUNCTIONS
  **********************/
 
-static void remove_dsc(lv_event_list_t * list, uint32_t idx)
-{
-    /*Shift the remaining event handlers forward*/
-    uint32_t i;
-    for(i = idx; i < list->cnt - 1; i++) {
-        list->dsc[i] = list->dsc[i + 1];
-    }
-    list->cnt--;
-    list->dsc = lv_realloc(list->dsc, list->cnt * sizeof(lv_event_dsc_t));
-    LV_ASSERT_MALLOC(list->dsc);
-}

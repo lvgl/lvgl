@@ -10,7 +10,7 @@
 #if LV_USE_TABVIEW
 
 #include "../../misc/lv_assert.h"
-#include "../../core/lv_indev_priv.h"
+#include "../../core/lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -227,10 +227,10 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     tabview->map = lv_malloc(sizeof(const char *));
     tabview->map[0] = (char *)"";
     lv_btnmatrix_set_map(btnm, (const char **)tabview->map);
-    lv_obj_add_event_cb(btnm, btns_value_changed_event_cb, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(btnm, btns_value_changed_event_cb, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(cont, cont_scroll_end_event_cb, LV_OBJ_EVENT_ALL, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
     switch(tabview->tab_pos) {

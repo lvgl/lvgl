@@ -81,12 +81,12 @@ void eventLicener_registEvent(PikaObj* self,
     strsDeinit(&buffs);
 }
 
-void pika_lvgl_lv_obj_add_event_cb(PikaObj* self,
+void pika_lvgl_lv_obj_add_event(PikaObj* self,
                                    Arg* event_cb,
                                    int filter,
                                    void* user_data) {
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    lv_obj_add_event_cb(lv_obj, __pika_event_cb, filter, NULL);
+    lv_obj_add_event(lv_obj, __pika_event_cb, filter, NULL);
     obj_setArg(self, "_event_cb", event_cb);
     obj_setPtr(self, "_event_user_data", user_data);
     obj_newDirectObj(self, "_event_evt", New_pika_lvgl_lv_event);

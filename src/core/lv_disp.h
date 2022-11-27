@@ -428,32 +428,13 @@ static inline void lv_scr_load(lv_obj_t * scr)
  * @param filter        event code to react or `LV_EVENT_ALL`
  * @param user_data     optional user_data
  */
-void lv_disp_add_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
+void lv_disp_add_event(lv_disp_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data);
 
-/**
- * Remove an event callback. If added multiple times the oldest will be removed.
- * @param disp          pointer to a display
- * @param event_cb      an event callback
- * @return              true: the event callback was found and removed
- */
-bool lv_disp_remove_event_cb(lv_disp_t * disp, lv_event_cb_t event_cb);
+uint32_t lv_disp_get_event_count(lv_disp_t * disp);
 
-/**
- * Remove an event callback with matching user_data. If added multiple times the oldest will be removed.
-  * @param disp         pointer to a display
- * @param event_cb      an event callback
- * @param user_data     a user_data
- * @return              true: the event callback was found and removed
- */
-bool lv_disp_remove_event_cb_with_user_data(lv_disp_t * disp, lv_event_cb_t event_cb, const void * user_data);
+lv_event_dsc_t * lv_disp_get_event_dsc(lv_disp_t * disp, uint32_t index);
 
-/**
- * Get the user data of a given event callback
- * @param disp      pointer to a display
- * @param event_cb  the event callback
- * @return          the user_data of the event callback or NULL is not found
- */
-void * lv_disp_get_event_user_data_of_cb(lv_disp_t * disp, lv_event_cb_t event_cb);
+bool lv_disp_remove_event(lv_disp_t * disp, uint32_t index);
 
 /**
  * Send amn event to a display

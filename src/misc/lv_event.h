@@ -26,6 +26,7 @@ extern "C" {
  **********************/
 
 struct _lv_event_dsc_t;
+typedef struct _lv_event_dsc_t lv_event_dsc_t;
 
 /**
  * Type of event being sent to the object.
@@ -105,7 +106,7 @@ typedef enum {
 
 
 typedef struct {
-    struct _lv_event_dsc_t * dsc;
+    lv_event_dsc_t * dsc;
     uint32_t cnt;
 } lv_event_list_t;
 
@@ -138,14 +139,18 @@ void _lv_event_pop(lv_event_t * e);
 
 lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess);
 
-void lv_event_add_callback(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
 
-bool lv_event_remove_callback(lv_event_list_t * list, lv_event_cb_t cb);
+void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
 
-bool lv_event_remove_callback_with_user_data(lv_event_list_t * list, lv_event_cb_t cb, const void * user_data);
+uint32_t lv_event_get_count(lv_event_list_t * list);
 
-void * lv_event_get_user_data_of_callback(lv_event_list_t * list, lv_event_cb_t event_cb);
+lv_event_dsc_t * lv_event_get_dsc(lv_event_list_t * list, uint32_t index);
 
+lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc);
+
+void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc);
+
+bool lv_event_remove(lv_event_list_t * list, uint32_t index);
 
 /**
  * Get the object originally targeted by the event. It's the same even if the event is bubbled.
