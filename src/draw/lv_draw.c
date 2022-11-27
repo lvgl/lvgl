@@ -48,6 +48,33 @@ void lv_draw_wait_for_finish(lv_draw_ctx_t * draw_ctx)
     //    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
 }
 
+lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords)
+{
+    lv_draw_task_t * new_task = lv_malloc(sizeof(lv_draw_task_t));
+    lv_memzero(new_task, sizeof(*new_task));
+
+#if DRAW_LOG
+    printf("Add  (%p, %p): %d, %d, %d, %d\n", new_task, new_task->draw_dsc, coords->x1, coords->y1,
+           lv_area_get_width(coords), lv_area_get_height(coords));
+#endif
+
+    new_task->area = *coords;
+    new_task->clip_area = *draw_ctx->clip_area;
+
+    /*Find the tail*/
+    if(draw_ctx->draw_task_head == NULL) {
+        draw_ctx->draw_task_head = new_task;
+    }
+    else {
+        lv_draw_task_t * tail = draw_ctx->draw_task_head;
+        while(tail->next) tail = tail->next;
+
+        tail->next = new_task;
+    }
+
+    return new_task;
+}
+
 void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx)
 {
     draw_ctx->dispatch_req = 0;

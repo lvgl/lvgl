@@ -104,7 +104,7 @@ void lv_draw_sw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_l
 }
 
 void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
-                            const lv_draw_img_dsc_t * draw_dsc)
+                            lv_draw_img_dsc_t * draw_dsc)
 {
     lv_img_dsc_t img;
     img.data = draw_ctx->buf;
@@ -119,8 +119,9 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     draw_ctx->clip_area = layer_ctx->original.clip_area;
     draw_ctx->color_format = layer_ctx->original.color_format;
 
+    draw_dsc->src = &img;
     /*Blend the layer*/
-    lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, &img);
+    lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act);
     lv_draw_wait_for_finish(draw_ctx);
     lv_img_cache_invalidate_src(&img);
 }

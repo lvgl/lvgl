@@ -46,7 +46,6 @@ void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
     LV_UNUSED(disp);
 
-
     draw_ctx->buffer_copy = lv_draw_sw_buffer_copy;
     draw_ctx->buffer_convert = lv_draw_sw_buffer_convert;
     draw_ctx->buffer_clear = lv_draw_sw_buffer_clear;
@@ -55,7 +54,6 @@ void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
     draw_ctx->layer_blend = lv_draw_sw_layer_blend;
     draw_ctx->layer_destroy = lv_draw_sw_layer_destroy;
     draw_ctx->layer_instance_size = sizeof(lv_draw_sw_layer_ctx_t);
-
 
     for(int i = 0; i < 3; i++) {
         lv_draw_sw_unit_t * draw_sw_unit = lv_malloc(sizeof(*draw_sw_unit));
@@ -264,6 +262,9 @@ static int thread(void * ptr)
                 break;
             case LV_DRAW_TASK_TYPE_LABEL:
                 lv_draw_sw_label((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+                break;
+            case LV_DRAW_TASK_TYPE_IMAGE:
+                lv_draw_sw_img((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
                 break;
         }
 #if DRAW_LOG

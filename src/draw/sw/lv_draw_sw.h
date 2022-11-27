@@ -79,7 +79,7 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx);
 
 void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx);
 
-void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
+void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
                           lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
                           lv_opa_t * abuf);
@@ -91,7 +91,7 @@ void lv_draw_sw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_l
                              lv_draw_layer_flags_t flags);
 
 void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
-                            const lv_draw_img_dsc_t * draw_dsc);
+                            lv_draw_img_dsc_t * draw_dsc);
 
 void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx);
 

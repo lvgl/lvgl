@@ -35,6 +35,7 @@ struct _lv_draw_img_dsc_t;
 typedef enum {
     LV_DRAW_TASK_TYPE_RECTANGLE,
     LV_DRAW_TASK_TYPE_LABEL,
+    LV_DRAW_TASK_TYPE_IMAGE,
     LV_DRAW_TASK_TYPE_LINE,
     LV_DRAW_TASK_TYPE_ARC,
 } lv_draw_task_type_t;
@@ -197,6 +198,8 @@ typedef struct _lv_draw_ctx_t  {
 void lv_draw_init(void);
 
 void lv_draw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
+
+lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords);
 
 void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx);
 

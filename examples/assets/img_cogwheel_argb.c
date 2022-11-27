@@ -1,6 +1,6 @@
 #include "../../lvgl.h"
 
-#if LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES || 1
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
     #define LV_ATTRIBUTE_MEM_ALIGN

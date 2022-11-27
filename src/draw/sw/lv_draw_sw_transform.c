@@ -85,12 +85,12 @@ static void a8_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_co
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
+void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
                           lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
                           lv_opa_t * abuf)
 {
-    LV_UNUSED(draw_ctx);
+    LV_UNUSED(draw_unit);
 
     point_transform_dsc_t tr_dsc;
     tr_dsc.angle = -draw_dsc->angle;

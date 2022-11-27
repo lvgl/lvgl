@@ -75,30 +75,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
         return;
     }
 
-    lv_draw_task_t * new_task = lv_malloc(sizeof(lv_draw_task_t));
-    lv_memzero(new_task, sizeof(*new_task));
+    lv_draw_task_t * t = lv_draw_add_task(draw_ctx, coords);
 
-    new_task->draw_dsc = lv_malloc(sizeof(lv_draw_label_dsc_t));
-    lv_memcpy(new_task->draw_dsc, dsc, sizeof(*dsc));
-#if DRAW_LOG
-    printf("Add  (%p, %p): %d, %d, %d, %d\n", new_task, new_task->draw_dsc, coords->x1, coords->y1,
-           lv_area_get_width(coords), lv_area_get_height(coords));
-#endif
-    new_task->type = LV_DRAW_TASK_TYPE_LABEL;
-
-    new_task->area = *coords;
-    new_task->clip_area = *draw_ctx->clip_area;
-
-    /*Find the tail*/
-    if(draw_ctx->draw_task_head == NULL) {
-        draw_ctx->draw_task_head = new_task;
-    }
-    else {
-        lv_draw_task_t * tail = draw_ctx->draw_task_head;
-        while(tail->next) tail = tail->next;
-
-        tail->next = new_task;
-    }
+    t->draw_dsc = lv_malloc(sizeof(*dsc));
+    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
+    t->type = LV_DRAW_TASK_TYPE_LABEL;
 
     lv_draw_dispatch(draw_ctx);
 }

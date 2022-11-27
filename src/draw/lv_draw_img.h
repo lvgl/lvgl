@@ -38,6 +38,7 @@ typedef struct {
 } lv_draw_img_sup_t;
 
 typedef struct _lv_draw_img_dsc_t {
+    const void * src;
 
     int16_t angle;
     uint16_t zoom;
@@ -70,8 +71,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                 const void * src);
+void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords);
 
 
 void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
