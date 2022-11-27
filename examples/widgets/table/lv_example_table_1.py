@@ -49,5 +49,5 @@ table.set_height(200)
 table.center()
 
 # Add an event callback to apply some custom drawing
-table.add_event_cb(draw_part_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
+table.add_event(draw_part_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
 

@@ -116,7 +116,7 @@ It's very important that draw buffer(s) should be large enough for both the nati
 With `lv_disp_set_user_data(disp, p)` a pointer to a custom data can be stored in display object.
 
 ## Events
-`lv_disp_add_event_cb(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds an event handler to a display.
+`lv_disp_add_event(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds an event handler to a display.
 The following events are sent:
 - `LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw). `lv_event_get_param(e)` returns a pointer to an `lv_area_t` varaible with the coordinates of the area to be invalidated. The ara can be freely modified is needed to adopt it the specialrequirement of the display. Usually needed with monoschrome displays to invalidate Nx8 lines at once.
 - `LV_DISP_EVENT_RENDER_START` Called when rendering starts.

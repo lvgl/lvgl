@@ -98,7 +98,7 @@ list1.set_style_pad_row( 5, 0)
 for i in range(15):
     btn = lv.btn(list1)
     btn.set_width(lv.pct(100))
-    btn.add_event_cb( event_handler, lv.EVENT.CLICKED, None)
+    btn.add_event( event_handler, lv.EVENT.CLICKED, None)
     lab = lv.label(btn)
     lab.set_text("Item " + str(i))
 
@@ -113,25 +113,25 @@ list2.align(lv.ALIGN.TOP_RIGHT, 0, 0)
 list2.set_flex_flow(lv.FLEX_FLOW.COLUMN)
 
 btn = list2.add_btn(None, "Top")
-btn.add_event_cb(event_handler_top, lv.EVENT.ALL, None)
+btn.add_event(event_handler_top, lv.EVENT.ALL, None)
 lv.group_remove_obj(btn)
 
 btn = list2.add_btn(lv.SYMBOL.UP, "Up")
-btn.add_event_cb(event_handler_up, lv.EVENT.ALL, None)
+btn.add_event(event_handler_up, lv.EVENT.ALL, None)
 lv.group_remove_obj(btn)
 
 btn = list2.add_btn(lv.SYMBOL.LEFT, "Center")
-btn.add_event_cb(event_handler_center, lv.EVENT.ALL, None)
+btn.add_event(event_handler_center, lv.EVENT.ALL, None)
 lv.group_remove_obj(btn)
 
 btn = list2.add_btn(lv.SYMBOL.DOWN, "Down")
-btn.add_event_cb(event_handler_dn, lv.EVENT.ALL, None)
+btn.add_event(event_handler_dn, lv.EVENT.ALL, None)
 lv.group_remove_obj(btn)
 
 btn = list2.add_btn(None, "Bottom")
-btn.add_event_cb(event_handler_bottom, lv.EVENT.ALL, None)
+btn.add_event(event_handler_bottom, lv.EVENT.ALL, None)
 lv.group_remove_obj(btn)
 
 btn = list2.add_btn(lv.SYMBOL.SHUFFLE, "Shuffle")
-btn.add_event_cb(event_handler_swap, lv.EVENT.ALL, None)
+btn.add_event(event_handler_swap, lv.EVENT.ALL, None)
 lv.group_remove_obj(btn)

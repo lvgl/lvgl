@@ -69,6 +69,6 @@ def event_cb(e):
 # Add custom drawer to the button matrix to c
 #
 btnm = lv.btnmatrix(lv.scr_act())
-btnm.add_event_cb(event_cb, lv.EVENT.ALL, None)
+btnm.add_event(event_cb, lv.EVENT.ALL, None)
 btnm.center()
 

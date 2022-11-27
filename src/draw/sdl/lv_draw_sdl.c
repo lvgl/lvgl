@@ -59,7 +59,7 @@ void lv_draw_sdl_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * ds
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_sdl_init_ctx(lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
     _lv_draw_sdl_utils_init();
     lv_memzero(draw_ctx, sizeof(lv_draw_sdl_ctx_t));
@@ -81,7 +81,7 @@ void lv_draw_sdl_init_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
     lv_draw_sdl_texture_cache_init(draw_ctx_sdl);
 }
 
-void lv_draw_sdl_deinit_ctx(lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_sdl_deinit_ctx(lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx)
 {
     lv_draw_sdl_ctx_t * draw_ctx_sdl = (lv_draw_sdl_ctx_t *) draw_ctx;
     lv_draw_sdl_texture_cache_deinit(draw_ctx_sdl);

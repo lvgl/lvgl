@@ -46,6 +46,12 @@ label = lv.label(btn)                       # Add a label to the button
 label.set_text("Button")                    # Set the labels text
 label.center()
 
+# Create a slider in the center of the display
+slider = lv.slider(lv.scr_act())
+slider.set_width(200)                                              # Set the width
+slider.center()                                                    # Align to the center of the parent (screen)
+slider.add_event(slider_event_cb, lv.EVENT.VALUE_CHANGED, None) # Assign an event function
+
 # Create another button and use the red style too
 btn2 = lv.btn(lv.scr_act())
 btn2.remove_style_all()                     # Remove the styles coming from the theme

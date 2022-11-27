@@ -34,7 +34,7 @@ LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
 LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
 
 ta = lv.textarea(lv.scr_act())
-ta.add_event_cb(ta_event_cb, lv.EVENT.VALUE_CHANGED, None)
+ta.add_event(ta_event_cb, lv.EVENT.VALUE_CHANGED, None)
 ta.set_accepted_chars("0123456789:")
 ta.set_max_length(5)
 ta.set_one_line(True)
