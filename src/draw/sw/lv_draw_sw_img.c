@@ -61,6 +61,8 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_sw_img(draw_unit, &new_draw_dsc, coords);
+
+    printf("Layer drawn\n");
 }
 
 
@@ -68,6 +70,9 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
                                           const lv_area_t * coords)
 {
+
+
+    printf("sw_img start: %d, %d\n", coords->x1, coords->y1);
     _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(draw_dsc->src, draw_dsc->recolor, draw_dsc->frame_id);
     if(cdsc == NULL)  {
         LV_LOG_WARN("Couldn't open the image");
@@ -249,6 +254,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         lv_free(rgb_buf);
     }
     draw_unit->clip_area = clip_area_ori;
+    printf("sw_img finish: %d, %d\n", coords->x1, coords->y1);
 
 }
 

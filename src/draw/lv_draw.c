@@ -107,6 +107,7 @@ void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx)
                 }
 
                 lv_free(draw_ctx_drawn);
+                printf("Layer freed\n");
             }
 
             lv_free(t->draw_dsc);

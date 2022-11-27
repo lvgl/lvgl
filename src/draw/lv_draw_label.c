@@ -325,6 +325,10 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_letter_dsc_t * dsc, 
 
     dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter);
     dsc->letter_coords = &letter_coords;
+
+    if(letter == 'A') {
+        printf("A\n");
+    }
     cb(draw_unit, dsc);
 }
 

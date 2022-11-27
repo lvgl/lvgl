@@ -53,7 +53,7 @@ typedef struct _lv_draw_task_t {
     lv_draw_task_type_t type;
     lv_area_t area;
     lv_area_t clip_area;
-    lv_draw_task_state_t state;
+    int state;              /*int instead of lv_draw_task_state_t to be sure its atomic*/
     void * draw_dsc;
 } lv_draw_task_t;
 

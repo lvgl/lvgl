@@ -419,6 +419,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_argb(lv_color_t * dest_buf, const lv_area
                 }
                 dest_buf8_row += dest_stride * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
                 dest_buf8 = dest_buf8_row;
+                mask += (mask_stride - w);
             }
         }
         /*With opacity*/
