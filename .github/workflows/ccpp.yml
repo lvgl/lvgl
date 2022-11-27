@@ -17,7 +17,6 @@ jobs:
         build_option: ['OPTIONS_MINIMAL_MONOCHROME',
                        'OPTIONS_NORMAL_8BIT',
                        'OPTIONS_16BIT',
-                       'OPTIONS_16BIT_SWAP',
                        'OPTIONS_FULL_32BIT']
     name: Build ${{ matrix.build_option }}
     steps:
@@ -77,7 +76,7 @@ jobs:
 
           # The shell to run commands with in the container
           shell: /bin/bash
-          
+
           # Create cached/volume directories on host
           setup: |
             mkdir -p ~/.ccache

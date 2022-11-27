@@ -28,7 +28,7 @@ void my_print(const char * buf)
 #endif
 
 /* Display flushing */
-void my_disp_flush( lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p )
+void my_disp_flush( lv_disp_t *disp, const lv_area_t *area, lv_color_t *color_p )
 {
     uint32_t w = ( area->x2 - area->x1 + 1 );
     uint32_t h = ( area->y2 - area->y1 + 1 );
@@ -42,7 +42,7 @@ void my_disp_flush( lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *colo
 }
 
 /*Read the touchpad*/
-void my_touchpad_read( lv_indev_drv_t * indev_driver, lv_indev_data_t * data )
+void my_touchpad_read( lv_indev_t * indev_driver, lv_indev_data_t * data )
 {
     uint16_t touchX, touchY;
 
@@ -96,7 +96,7 @@ void setup()
     lv_disp_draw_buf_init( &draw_buf, buf, NULL, screenWidth * 10 );
 
     /*Initialize the display*/
-    static lv_disp_drv_t disp_drv;
+    static lv_disp_t disp_drv;
     lv_disp_drv_init( &disp_drv );
     /*Change the following line to your display resolution*/
     disp_drv.hor_res = screenWidth;
@@ -106,7 +106,7 @@ void setup()
     lv_disp_drv_register( &disp_drv );
 
     /*Initialize the (dummy) input device driver*/
-    static lv_indev_drv_t indev_drv;
+    static lv_indev_t indev_drv;
     lv_indev_drv_init( &indev_drv );
     indev_drv.type = LV_INDEV_TYPE_POINTER;
     indev_drv.read_cb = my_touchpad_read;

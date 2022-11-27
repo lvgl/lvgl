@@ -30,7 +30,7 @@ class LV_Example_Msg_2:
         # Up button
         btn = lv.btn(panel)
         btn.set_flex_grow(1)
-        btn.add_event_cb(self.btn_event_cb, lv.EVENT.ALL, None)
+        btn.add_event(self.btn_event_cb, lv.EVENT.ALL, None)
         label = lv.label(btn)
         label.set_text(lv.SYMBOL.LEFT)
         label.center()
@@ -41,12 +41,12 @@ class LV_Example_Msg_2:
         label.set_style_text_align(lv.TEXT_ALIGN.CENTER, 0)
         label.set_text("?")
         lv.msg_subscribe_obj(MSG_UPDATE, label, None)
-        label.add_event_cb(self.label_event_cb, lv.EVENT.MSG_RECEIVED, None)
+        label.add_event(self.label_event_cb, lv.EVENT.MSG_RECEIVED, None)
         
         # Down button
         btn = lv.btn(panel)
         btn.set_flex_grow(1)
-        btn.add_event_cb(self.btn_event_cb, lv.EVENT.ALL, None)
+        btn.add_event(self.btn_event_cb, lv.EVENT.ALL, None)
         label = lv.label(btn)
         label.set_text(lv.SYMBOL.RIGHT)
         label.center()
@@ -55,7 +55,7 @@ class LV_Example_Msg_2:
         slider = lv.slider(panel)
         slider.set_flex_grow(1)
         slider.add_flag(lv.OBJ_FLAG_FLEX_IN_NEW_TRACK)
-        slider.add_event_cb(self.slider_event_cb, lv.EVENT.ALL, None)
+        slider.add_event(self.slider_event_cb, lv.EVENT.ALL, None)
         lv.msg_subscribe_obj(MSG_UPDATE, slider, None)
         
         

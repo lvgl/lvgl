@@ -470,7 +470,7 @@ static void fill_blended(lv_color_t * dest_buf, const lv_area_t * dest_area,
             blend_fp = color_blend_true_color_multiply;
             break;
         default:
-            LV_LOG_WARN("fill_blended: unsupported blend mode");
+            LV_LOG_WARN("unsupported blend mode");
             return;
     }
 
@@ -772,7 +772,7 @@ static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_c
             blend_fp = color_blend_true_color_multiply;
             break;
         default:
-            LV_LOG_WARN("fill_blended: unsupported blend mode");
+            LV_LOG_WARN("unsupported blend mode");
             return;
     }
 

@@ -41,6 +41,11 @@ typedef enum {
     LV_OBJ_CLASS_GROUP_DEF_FALSE,
 } lv_obj_class_group_def_t;
 
+typedef enum {
+    LV_OBJ_CLASS_THEME_INHERITABLE_FALSE,    /**< Do not inherit theme from base class. */
+    LV_OBJ_CLASS_THEME_INHERITABLE_TRUE,
+} lv_obj_class_theme_inheritable_t;
+
 typedef void (*lv_obj_class_event_cb_t)(struct _lv_obj_class_t * class_p, struct _lv_event_t * e);
 /**
  * Describe the common methods of every object.
@@ -60,6 +65,7 @@ typedef struct _lv_obj_class_t {
     uint32_t editable : 2;             /**< Value from ::lv_obj_class_editable_t*/
     uint32_t group_def : 2;            /**< Value from ::lv_obj_class_group_def_t*/
     uint32_t instance_size : 16;
+    uint32_t theme_inheritable : 1;    /**< Value from ::lv_obj_class_theme_inheritable_t*/
 } lv_obj_class_t;
 
 /**********************

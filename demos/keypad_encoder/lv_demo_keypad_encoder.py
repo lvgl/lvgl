@@ -97,15 +97,15 @@ class KeyboardEncoder:
         self.kb = lv.keyboard(lv.scr_act())
         self.kb.add_flag(lv.obj.FLAG.HIDDEN)
         
-        ta1.add_event_cb(self.ta_event_cb, lv.EVENT.ALL, None)
-        ta2.add_event_cb(self.ta_event_cb, lv.EVENT.ALL, None)
+        ta1.add_event(self.ta_event_cb, lv.EVENT.ALL, None)
+        ta2.add_event(self.ta_event_cb, lv.EVENT.ALL, None)
 
 
     def msgbox_create(self):
 
         btns = ["Ok", "Cancel", ""]
         mbox = lv.msgbox(None, "Hi", "Welcome to the keyboard and encoder demo", btns, False)
-        mbox.add_event_cb(self.msgbox_event_cb, lv.EVENT.ALL, None)
+        mbox.add_event(self.msgbox_event_cb, lv.EVENT.ALL, None)
         lv.group_focus_obj(mbox.get_btns())
         mbox.get_btns().add_state(lv.STATE.FOCUS_KEY)
         self.g.focus_freeze(True)

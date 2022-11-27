@@ -91,7 +91,7 @@ else :
 
 
 menu.set_mode_root_back_btn(lv.menu.ROOT_BACK_BTN.ENABLED)
-menu.add_event_cb(lambda evt: back_event_handler(evt,menu), lv.EVENT.CLICKED, None)
+menu.add_event(lambda evt: back_event_handler(evt,menu), lv.EVENT.CLICKED, None)
 menu.set_size(LV_HOR_RES, LV_VER_RES )
 menu.center()
 
@@ -146,7 +146,7 @@ sub_menu_mode_page.set_style_pad_hor(menu.get_main_header().get_style_pad_left(0
 lv.menu_separator(sub_menu_mode_page)
 section = lv.menu_section(sub_menu_mode_page)
 cont = create_switch(section, lv.SYMBOL.AUDIO, "Sidebar enable",True)
-cont.get_child(2).add_event_cb(lambda evt: switch_handler(evt,menu), lv.EVENT.VALUE_CHANGED, None)
+cont.get_child(2).add_event(lambda evt: switch_handler(evt,menu), lv.EVENT.VALUE_CHANGED, None)
 
 # Create a root page
 root_page = lv.menu_page(menu, "Settings")

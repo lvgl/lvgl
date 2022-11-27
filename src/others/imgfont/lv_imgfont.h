@@ -26,9 +26,9 @@ extern "C" {
  **********************/
 
 /* gets the image path name of this character */
-typedef bool (*lv_get_imgfont_path_cb_t)(const lv_font_t * font, void * img_src,
+typedef bool (*lv_imgfont_get_path_cb_t)(const lv_font_t * font, void * img_src,
                                          uint16_t len, uint32_t unicode, uint32_t unicode_next,
-                                         void * user_data);
+                                         lv_coord_t * offset_y, void * user_data);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -40,7 +40,7 @@ typedef bool (*lv_get_imgfont_path_cb_t)(const lv_font_t * font, void * img_src,
  * @param path_cb a function to get the image path name of character.
  * @return pointer to the new imgfont or NULL if create error.
  */
-lv_font_t * lv_imgfont_create(uint16_t height, lv_get_imgfont_path_cb_t path_cb, void * user_data);
+lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb, void * user_data);
 
 /**
  * Destroy a image font that has been created.

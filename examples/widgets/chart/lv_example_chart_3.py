@@ -17,7 +17,7 @@ chart.set_type(lv.chart.TYPE.BAR)
 chart.set_range(lv.chart.AXIS.PRIMARY_Y, 0, 100)
 chart.set_range(lv.chart.AXIS.SECONDARY_Y, 0, 400)
 chart.set_point_count(12)
-chart.add_event_cb(draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
+chart.add_event(draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
 
 # Add ticks and label to every axis
 chart.set_axis_tick(lv.chart.AXIS.PRIMARY_X, 10, 5, 12, 3, True, 40)

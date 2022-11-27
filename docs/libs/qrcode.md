@@ -3,21 +3,13 @@
 
 QR code generation with LVGL. Uses [QR-Code-generator](https://github.com/nayuki/QR-Code-generator) by [nayuki](https://github.com/nayuki).
 
-## Get started
-- Download or clone this repository
-  - [Download](https://github.com/lvgl/lv_lib_qrcode.git) from GitHub
-  - Clone: git clone https://github.com/lvgl/lv_lib_qrcode.git
-- Include the library: `#include "lv_lib_qrcode/lv_qrcode.h"`
-- Test with the following code:
-```c
-const char * data = "Hello world";
+## Usage
 
-/*Create a 100x100 QR code*/
-lv_obj_t * qr = lv_qrcode_create(lv_scr_act(), 100, lv_color_hex3(0x33f), lv_color_hex3(0xeef));
+Enable `LV_USE_QRCODE` in `lv_conf.h`.
 
-/*Set data*/
-lv_qrcode_update(qr, data, strlen(data));
-```
+Use `lv_qrcode_create()` to create a qrcode object, and use `lv_qrcode_update()` to generate a QR code.
+
+If you need to re-modify the size and color, use `lv_qrcode_set_size()` and `lv_qrcode_set_dark/light_color()`, and call `lv_qrcode_update()` again to regenerate the QR code.
 
 ## Notes
 - QR codes with less data are smaller, but they scaled by an integer number to best fit to the given size.

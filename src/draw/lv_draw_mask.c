@@ -87,7 +87,7 @@ int16_t lv_draw_mask_add(void * param, void * custom_id)
     }
 
     if(i >= _LV_MASK_MAX_NUM) {
-        LV_LOG_WARN("lv_mask_add: no place to add the mask");
+        LV_LOG_WARN("no place to add the mask");
         return LV_MASK_ID_INV;
     }
 

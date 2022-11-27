@@ -16,13 +16,13 @@ kb = lv.keyboard(lv.scr_act())
 ta = lv.textarea(lv.scr_act())
 ta.set_width(200)
 ta.align(lv.ALIGN.TOP_LEFT, 10, 10)
-ta.add_event_cb(lambda e: ta_event_cb(e,kb), lv.EVENT.ALL, None)
+ta.add_event(lambda e: ta_event_cb(e,kb), lv.EVENT.ALL, None)
 ta.set_placeholder_text("Hello")
 
 ta = lv.textarea(lv.scr_act())
 ta.set_width(200)
 ta.align(lv.ALIGN.TOP_RIGHT, -10, 10)
-ta.add_event_cb(lambda e: ta_event_cb(e,kb), lv.EVENT.ALL, None)
+ta.add_event(lambda e: ta_event_cb(e,kb), lv.EVENT.ALL, None)
 
 kb.set_textarea(ta)
 

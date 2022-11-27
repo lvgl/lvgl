@@ -144,7 +144,7 @@ See the [Porting](/porting/display) section to learn more.
 
 ### LVGL doesn't start, randomly crashes or nothing is drawn on the display. What can be the problem?
 - Try increasing `LV_MEM_SIZE`.
-- Be sure `lv_disp_drv_t`, `lv_indev_drv_t` and `lv_fs_drv_t` are global or `static`.
+- Be sure `lv_disp_t`, `lv_indev_t` and `lv_fs_drv_t` are global or `static`.
 - Be sure your display works without LVGL. E.g. paint it to red on start up.
 - Enable [Logging](porting/log)
 - Enable asserts in `lv_conf.h` (`LV_USE_ASSERT_...`)
@@ -170,9 +170,9 @@ Probably there a bug in your display driver. Try the following code without usin
 lv_color_t buf[BUF_W * BUF_H];
 lv_color_t * buf_p = buf;
 uint16_t x, y;
-for(y = 0; y &lt; BUF_H; y++) {
+for(y = 0; y < BUF_H; y++) {
     lv_color_t c = lv_color_mix(LV_COLOR_BLUE, LV_COLOR_RED, (y * 255) / BUF_H);
-    for(x = 0; x &lt; BUF_W; x++){
+    for(x = 0; x < BUF_W; x++){
         (*buf_p) =  c;
         buf_p++;
     }
@@ -200,7 +200,7 @@ Probably LVGL's color format is not compatible with your display's color format.
 ### How to reduce flash/ROM usage?
 You can disable all the unused features (such as animations, file system, GPU etc.) and object types in *lv_conf.h*.
 
-If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG. 
+If you are using GCC/CLANG you can add `-fdata-sections -ffunction-sections` compiler flags and `--gc-sections` linker flag to remove unused functions and variables from the final binary. If possible, add the `-flto` compiler flag to enable link-time-optimisation together with `-Os` for GCC or `-Oz` for CLANG.
 
 ### How to reduce the RAM usage
 - Lower the size of the *Display buffer*

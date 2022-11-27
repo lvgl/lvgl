@@ -108,7 +108,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
         new_line_start += _lv_txt_get_next_line(&text[line_start], font, letter_space, max_width, NULL, flag);
 
         if((unsigned long)size_res->y + (unsigned long)letter_height + (unsigned long)line_space > LV_MAX_OF(lv_coord_t)) {
-            LV_LOG_WARN("lv_txt_get_size: integer overflow while calculating text height");
+            LV_LOG_WARN("integer overflow while calculating text height");
             return;
         }
         else {

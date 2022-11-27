@@ -132,8 +132,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
             ys_step_256 = (256 * ys_diff) / (dest_w - 1);
         }
 
-        int32_t xs_ups = xs1_ups;
-        int32_t ys_ups = ys1_ups;
+        int32_t xs_ups = xs1_ups + 0x80;
+        int32_t ys_ups = ys1_ups + 0x80;
 
         if(draw_dsc->antialias == 0) {
             switch(cf) {

@@ -52,7 +52,7 @@ PACK_DIRS="
 
 # Specify file names to be added to pack base directory
 PACK_BASE_FILES="
-  ../../docs/LICENCE.txt
+  ../../LICENCE.txt
   ../../README.md
   ../../lvgl.h
   lv_conf_cmsis.h
