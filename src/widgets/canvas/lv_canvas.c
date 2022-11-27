@@ -150,7 +150,7 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, lv_coord_t x, lv_c
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
 
     if(x + w - 1 >= (lv_coord_t)canvas->dsc.header.w || y + h - 1 >= (lv_coord_t)canvas->dsc.header.h) {
-        LV_LOG_WARN("lv_canvas_copy_buf: x or y out of the canvas");
+        LV_LOG_WARN("x or y out of the canvas");
         return;
     }
 
@@ -539,7 +539,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_img_header_t header;
     lv_res_t res = lv_img_decoder_get_info(src, &header);
     if(res != LV_RES_OK) {
-        LV_LOG_WARN("lv_canvas_draw_img: Couldn't get the image data.");
+        LV_LOG_WARN("couldn't get the image data.");
         return;
     }
     /*Create a dummy display to fool the lv_draw function.

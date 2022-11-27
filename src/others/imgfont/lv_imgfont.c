@@ -19,7 +19,7 @@
  **********************/
 typedef struct {
     lv_font_t * font;
-    lv_get_imgfont_path_cb_t path_cb;
+    lv_imgfont_get_path_cb_t path_cb;
     void * user_data;
     char path[LV_IMGFONT_PATH_MAX_LEN];
 } imgfont_dsc_t;
@@ -46,7 +46,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-lv_font_t * lv_imgfont_create(uint16_t height, lv_get_imgfont_path_cb_t path_cb, void * user_data)
+lv_font_t * lv_imgfont_create(uint16_t height, lv_imgfont_get_path_cb_t path_cb, void * user_data)
 {
     LV_ASSERT_MSG(LV_IMGFONT_PATH_MAX_LEN > sizeof(lv_img_dsc_t),
                   "LV_IMGFONT_PATH_MAX_LEN must be greater than sizeof(lv_img_dsc_t)");
@@ -75,9 +75,7 @@ lv_font_t * lv_imgfont_create(uint16_t height, lv_get_imgfont_path_cb_t path_cb,
 
 void lv_imgfont_destroy(lv_font_t * font)
 {
-    if(font == NULL) {
-        return;
-    }
+    LV_ASSERT_NULL(font);
 
     imgfont_dsc_t * dsc = (imgfont_dsc_t *)font->dsc;
     lv_free(dsc);
@@ -104,7 +102,9 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     LV_ASSERT_NULL(dsc);
     if(dsc->path_cb == NULL) return false;
 
-    if(!dsc->path_cb(dsc->font, dsc->path, LV_IMGFONT_PATH_MAX_LEN, unicode, unicode_next, dsc->user_data)) {
+    lv_coord_t offset_y = 0;
+
+    if(!dsc->path_cb(dsc->font, dsc->path, LV_IMGFONT_PATH_MAX_LEN, unicode, unicode_next, &offset_y, dsc->user_data)) {
         return false;
     }
 
@@ -134,7 +134,7 @@ static bool imgfont_get_glyph_dsc(const lv_font_t * font, lv_font_glyph_dsc_t * 
     dsc_out->box_h = img_header->h;
     dsc_out->bpp = LV_IMGFONT_BPP;   /* is image identifier */
     dsc_out->ofs_x = 0;
-    dsc_out->ofs_y = 0;
+    dsc_out->ofs_y = offset_y;
 
     return true;
 }

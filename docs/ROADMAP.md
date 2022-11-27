@@ -13,6 +13,7 @@
 - [ ] Replace `disp_drv->direct_mode/full_refresh` with enum.
 - [x] Consider flat directory structure. E.g. `extra/widgets` to `widgets`
 - [ ] Rename `disp_drv->monitor_cb` to `render_completed/finished/ready`
+- [ ] Use `uint32_t` and `int32_t` in APIs where possible
 
 ### Architecture
 - [ ] Consider merging `lv_disp_t`, `lv_disp_drv_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
@@ -38,6 +39,7 @@
 ### Styles
 - [ ] Make `style_bg_img` support `9patch` images
 - [ ] non-uniform scale of images: scale width and height differently
+- [ ] Scroll anim settings should come from styles to allow customization
 
 ### Widgets
 - [ ] `lv_img`: Reconsider image sizing models (when the image size is not content): center, top-left, zoom, tile, other?
@@ -51,6 +53,7 @@
  ### Animations
 - [ ] Consider `anim` events to replace many callbacks with one
 - [ ] `lv_anim_time_to_speed` should work differently to remove `style_anim_speed`. E.g. on large values of anim time store the speed.   Besides all widgets should use the `style_anim` property. `anim` should clamp the time if it's calculated from speed, e.g `lv_clamp(200, t, 2000)`. (maybe `a->min_time/max_time`).
+- [ ] Use dedicated `lv_anim_custom_exec_cb_t`. See [here](https://forum.lvgl.io/t/custom-exec-cb-prevents-lv-anim-del-obj-null/10266).
 
 ## Planned in general
 
@@ -67,6 +70,7 @@
 
 ### Styles
 - [ ] Hover
+- [ ] Global states in selectors. E.g. `LV_STATE_PRESSED | SMALL_SCREEN` like media quarry in CSS 
 
 ### Drawing and rendering
 - [ ] Different radius on each corner #2800
@@ -81,6 +85,7 @@
 
 ### Others
 - [ ] More grid features. E.g. repeat(auto-fill, minmax( <value> px, 1fr))
+- [ ] Named grid cells to allow updating layouts without touching the children (like CSS `grid-template-areas`)
 - [ ] Scene support. See [this comment](https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911)
 - [ ] Circle layout. #2871
 - [ ] Variable binding. I.e create properties which can be bound to objects and those obejcts are notified on value change. Maybe based on `lv_msg`?

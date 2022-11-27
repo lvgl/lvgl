@@ -37,9 +37,27 @@ typedef struct {
     int32_t life;
 } _lv_img_cache_entry_t;
 
+typedef struct {
+    _lv_img_cache_entry_t * (*open_cb)(const void * src, lv_color_t color, int32_t frame_id);
+    void (*set_size_cb)(uint16_t new_entry_cnt);
+    void (*invalidate_src_cb)(const void * src);
+} lv_img_cache_manager_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the img cache manager
+ * @param manager Pointer to the img cache manager
+ */
+void lv_img_cache_manager_init(lv_img_cache_manager_t * manager);
+
+/**
+ * Apply the img cache manager
+ * @param manager Pointer to the img cache manager
+ */
+void lv_img_cache_manager_apply(const lv_img_cache_manager_t * manager);
 
 /**
  * Open an image using the image decoder interface and cache it.
@@ -58,7 +76,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color, i
  * E.g. if 20 PNG or JPG images are open in the RAM they consume memory while opened in the cache.
  * @param new_entry_cnt number of image to cache
  */
-void lv_img_cache_set_size(uint16_t new_slot_num);
+void lv_img_cache_set_size(uint16_t new_entry_cnt);
 
 /**
  * Invalidate an image source in the cache.

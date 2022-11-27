@@ -385,9 +385,11 @@ static unsigned lodepng_buffer_file(unsigned char * out, size_t size, const char
 
     uint32_t br;
     res = lv_fs_read(&f, out, size, &br);
+    lv_fs_close(&f);
+
     if(res != LV_FS_RES_OK) return 78;
     if(br != size) return 78;
-    lv_fs_close(&f);
+
     return 0;
 }
 

@@ -31,7 +31,7 @@ set(LV_CONF_PATH
     CACHE STRING "" FORCE)
 
 # Fetch LVGL from GitHub
-FetchContent_Declare(lvgl URL https://github.com/lvgl/lvgl.git)
+FetchContent_Declare(lvgl GIT_REPOSITORY https://github.com/lvgl/lvgl.git)
 FetchContent_MakeAvailable(lvgl)
 
 # The target "MyFirmware" depends on LVGL
@@ -48,13 +48,13 @@ Besides `LV_CONF_PATH` there are few additional CMake options available.
 - `LV_LVGL_H_INCLUDE_SIMPLE`: which specifies whether to `#include "lvgl.h"` absolut or relative
 
     | ON (default) | OFF            |
-    | ------------ | -------------- |
+    |--------------|----------------|
     | "lvgl.h"     | "../../lvgl.h" |
 
 - `LV_CONF_INCLUDE_SIMPLE`: which specifies whether to `#include "lv_conf.h"` and `"lv_drv_conf.h"` absolut or relative
 
     | ON (default)    | OFF                   |
-    | --------------- | --------------------- |
+    |-----------------|-----------------------|
     | "lv_conf.h"     | "../../lv_conf.h"     |
     | "lv_drv_conf.h" | "../../lv_drv_conf.h" |
 

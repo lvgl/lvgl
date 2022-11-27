@@ -29,7 +29,9 @@ void lv_test_init(void)
 
 void lv_test_deinit(void)
 {
+#if LV_USE_BUILTIN_MALLOC
     lv_mem_deinit_builtin();
+#endif
 }
 
 static void hal_init(void)

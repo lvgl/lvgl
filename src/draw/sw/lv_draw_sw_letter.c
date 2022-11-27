@@ -105,7 +105,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_INFO("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
+            LV_LOG_INFO("glyph dsc not found for U+%" LV_PRIX32, letter);
 
 #if LV_USE_FONT_PLACEHOLDER
             /* draw placeholder */
@@ -130,9 +130,21 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
     /*Don't draw anything if the character is empty. E.g. space*/
     if((g.box_h == 0) || (g.box_w == 0)) return;
 
+    lv_coord_t real_h;
+#if LV_USE_IMGFONT
+    if(g.bpp == LV_IMGFONT_BPP) {
+        /*Center imgfont's drawing position*/
+        real_h = (dsc->font->line_height - g.box_h) / 2;
+    }
+    else
+#endif
+    {
+        real_h = (dsc->font->line_height - dsc->font->base_line) - g.box_h;
+    }
+
     lv_point_t gpos;
     gpos.x = pos_p->x + g.ofs_x;
-    gpos.y = pos_p->y + (dsc->font->line_height - dsc->font->base_line) - g.box_h - g.ofs_y;
+    gpos.y = pos_p->y + real_h - g.ofs_y;
 
     /*If the letter is completely out of mask don't draw it*/
     if(gpos.x + g.box_w < draw_ctx->clip_area->x1 ||
@@ -144,7 +156,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
 
     const uint8_t * map_p = lv_font_get_glyph_bitmap(g.resolved_font, letter);
     if(map_p == NULL) {
-        LV_LOG_WARN("lv_draw_letter: character's bitmap not found");
+        LV_LOG_WARN("character's bitmap not found");
         return;
     }
 
@@ -216,7 +228,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
             shades = 256;
             break;       /*No opa table, pixel value will be used directly*/
         default:
-            LV_LOG_WARN("lv_draw_letter: invalid bpp");
+            LV_LOG_WARN("invalid bpp");
             return; /*Invalid bpp. Can't render the letter*/
     }
 
@@ -382,7 +394,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             bitmask_init  = 0xFF;
             break;       /*No opa table, pixel value will be used directly*/
         default:
-            LV_LOG_WARN("lv_draw_letter: invalid bpp not found");
+            LV_LOG_WARN("invalid bpp not found");
             return; /*Invalid bpp. Can't render the letter*/
     }
 
@@ -480,8 +492,8 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
                 uint8_t bg_rgb[3] = {dest_buf_tmp->ch.red, dest_buf_tmp->ch.green, dest_buf_tmp->ch.blue};
 
 #if LV_DRAW_SW_FONT_SUBPX_BGR
-                res_color.ch.blue = (uint32_t)((uint32_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.red = (uint32_t)((uint32_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8;
 #else
                 res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
                 res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;

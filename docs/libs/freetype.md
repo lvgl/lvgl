@@ -2,36 +2,71 @@
 # FreeType support
 Interface to [FreeType](https://www.freetype.org/) to generate font bitmaps run time.
 
-## Install FreeType
-- Download Freetype from [here](https://sourceforge.net/projects/freetype/files/)
+## Add FreeType to your project
+
+First, Download FreeType from [here](https://sourceforge.net/projects/freetype/files/).
+
+There are two ways to use FreeType:
+### For UNIX
+For UNIX systems, it is recommended to use the way of compiling and installing libraries.
+- Enter the FreeType source code directory.
 - `make`
 - `sudo make install`
-
-## Add FreeType to your project
 - Add include path: `/usr/include/freetype2` (for GCC: `-I/usr/include/freetype2 -L/usr/local/lib`)
-- Add library: `freetype` (for GCC: `-L/usr/local/lib -lfreetype`)
+- Link library: `freetype` (for GCC: `-L/usr/local/lib -lfreetype`)
+
+### For Embedded Devices
+For embedded devices, it is more recommended to use the FreeType configuration file provided by LVGL, which only includes the most commonly used functions, which is very meaningful for saving limited FLASH space.
+
+- Copy the FreeType source code to your project directory.
+- Refer to the following `Makefile` for configuration:
+
+```make
+# FreeType custom configuration header file
+CFLAGS += -DFT2_BUILD_LIBRARY
+CFLAGS += -DFT_CONFIG_MODULES_H=<lvgl/src/libs/freetype/ftmodule.h>
+CFLAGS += -DFT_CONFIG_OPTIONS_H=<lvgl/src/libs/freetype/ftoption.h>
+
+# FreeType include path
+CFLAGS += -Ifreetype/include
+
+# FreeType C source file
+FT_CSRCS += freetype/src/base/ftbase.c
+FT_CSRCS += freetype/src/base/ftbitmap.c
+FT_CSRCS += freetype/src/base/ftdebug.c
+FT_CSRCS += freetype/src/base/ftglyph.c
+FT_CSRCS += freetype/src/base/ftinit.c
+FT_CSRCS += freetype/src/cache/ftcache.c
+FT_CSRCS += freetype/src/gzip/ftgzip.c
+FT_CSRCS += freetype/src/sfnt/sfnt.c
+FT_CSRCS += freetype/src/smooth/smooth.c
+FT_CSRCS += freetype/src/truetype/truetype.c
+CSRCS += $(FT_CSRCS)
+```
 
 ## Usage
 Enable `LV_USE_FREETYPE` in `lv_conf.h`.
 
-To cache the glyphs from the opened fonts, set  `LV_FREETYPE_CACHE_SIZE >= 0` and then use the following macros for detailed configuration:
-1. `LV_FREETYPE_CACHE_SIZE`:maximum memory(bytes) used to cache font bitmap, outline, character maps, etc. 0 means use the system default value, less than 0 means disable cache. Note: that this value does not account for managed FT_Face and FT_Size objects.
-1. `LV_FREETYPE_CACHE_FT_FACES`:maximum number of opened FT_Face objects managed by this cache instance.0 means use the system default value. Only useful when LV_FREETYPE_CACHE_SIZE >= 0.
-1. `LV_FREETYPE_CACHE_FT_SIZES`:maximum number of opened FT_Size objects managed by this cache instance. 0 means use the system default value. Only useful when LV_FREETYPE_CACHE_SIZE >= 0.
+Cache configuration:
+- `LV_FREETYPE_CACHE_SIZE` - Maximum memory(Bytes) used to cache font bitmap, outline, character maps, etc. **Note:** This value does not include the memory used by 'FT_Face' and 'FT_Size' objects
+- `LV_FREETYPE_CACHE_FT_FACES` - Maximum open number of `FT_Face` objects.
+- `LV_FREETYPE_CACHE_FT_SIZES` - Maximum open number of `FT_Size` objects.
 
 When you are sure that all the used font sizes will not be greater than 256, you can enable `LV_FREETYPE_SBIT_CACHE`, which is much more memory efficient for small bitmaps.
 
-You can use `lv_ft_font_init()` to create FreeType fonts. It returns `true` to indicate success, at the same time, the `font` member of `lv_ft_info_t` will be filled with a pointer to an LVGL font, and you can use it like any LVGL font.
-
-Font style supports bold and italic, you can use the following macros to set:
-1. `FT_FONT_STYLE_NORMAL`:default style.
-1. `FT_FONT_STYLE_ITALIC`:Italic style
-1. `FT_FONT_STYLE_BOLD`:bold style
-
-They can be combined.eg:`FT_FONT_STYLE_BOLD | FT_FONT_STYLE_ITALIC`.
-
-Note that, the FreeType extension doesn't use LVGL's file system.
+By default, the FreeType extension doesn't use LVGL's file system.
 You can simply pass the path to the font as usual on your operating system or platform.
+
+If you want FreeType to use lvgl's memory allocation and file system interface, you can enable `LV_FREETYPE_USE_LVGL_PORT` in `lv_conf.h`, convenient for unified management.
+
+The font style supports *Italic* and **Bold** fonts processed by software, and can be set with reference to the following values:
+- `LV_FREETYPE_FONT_STYLE_NORMAL` - Default style.
+- `LV_FREETYPE_FONT_STYLE_ITALIC` - Italic style.
+- `LV_FREETYPE_FONT_STYLE_BOLD` - Bold style.
+
+They can be combined.eg: `LV_FREETYPE_FONT_STYLE_BOLD | LV_FREETYPE_FONT_STYLE_ITALIC`.
+
+Use the `lv_freetype_font_create()` function to create a font. To delete a font, use `lv_freetype_font_del()`. For more detailed usage, please refer to example code.
 
 ## Example
 ```eval_rst
