@@ -113,16 +113,6 @@ lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t *
                             lv_text_flag_t flag);
 
 /**
- * Check next character in a string and decide if the character is part of the command or not
- * @param state pointer to a txt_cmd_state_t variable which stores the current state of command
- * processing
- * @param c the current character
- * @return true: the character is part of a command and should not be written,
- *         false: the character should be written
- */
-bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
-
-/**
  * Insert a string into an other
  * @param txt_buf the original text (must be big enough for the result text and NULL terminated)
  * @param pos position to insert (0: before the original text, 1: after the first char etc.)

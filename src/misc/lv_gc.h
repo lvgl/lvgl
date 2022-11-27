@@ -58,7 +58,7 @@ extern "C" {
     LV_DISPATCH_COND(f, _lv_draw_mask_saved_arr_t , _lv_draw_mask_list, LV_USE_DRAW_MASKS, 1)            \
     LV_DISPATCH(f, void * , _lv_theme_default_styles)                                                  \
     LV_DISPATCH(f, void * , _lv_theme_basic_styles)                                                    \
-    LV_DISPATCH_COND(f, uint8_t *, _lv_font_decompr_buf, LV_USE_FONT_COMPRESSED, 1)                    \
+    LV_DISPATCH_COND(f, uint8_t *, _lv_font_fmt_txt_bitmap_buf, LV_USE_FONT_COMPRESSED, 1)                    \
     LV_DISPATCH(f, uint8_t * , _lv_grad_cache_mem)                                                     \
     LV_DISPATCH(f, uint8_t * , _lv_style_custom_prop_flag_lookup_table)                                \
     LV_DISPATCH(f, lv_ll_t, _subs_ll)

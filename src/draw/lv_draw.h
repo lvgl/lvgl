@@ -20,14 +20,6 @@ extern "C" {
 #include "lv_img_decoder.h"
 #include "lv_img_cache.h"
 
-#include "lv_draw_rect.h"
-#include "lv_draw_label.h"
-#include "lv_draw_img.h"
-#include "lv_draw_line.h"
-#include "lv_draw_triangle.h"
-#include "lv_draw_arc.h"
-#include "lv_draw_mask.h"
-#include "lv_draw_transform.h"
 #include "lv_draw_layer.h"
 
 /*********************
@@ -37,6 +29,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _lv_draw_img_dsc_t;
 
 typedef enum {
     LV_DRAW_TASK_TYPE_RECTANGLE,
@@ -171,7 +165,7 @@ typedef struct _lv_draw_ctx_t  {
      * @param draw_dsc      pointer to an image draw descriptor
      */
     void (*layer_blend)(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
-                        const lv_draw_img_dsc_t * draw_dsc);
+                        const struct _lv_draw_img_dsc_t * draw_dsc);
 
     /**
      * Destroy a layer context. The original buffer and area data of the `draw_ctx` will be restored
@@ -224,6 +218,11 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_dr
 /**********************
  *   POST INCLUDES
  *********************/
+#include "lv_draw_rect.h"
+#include "lv_draw_label.h"
+#include "lv_draw_img.h"
+#include "lv_draw_arc.h"
+#include "lv_draw_line.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

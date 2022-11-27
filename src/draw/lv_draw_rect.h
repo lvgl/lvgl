@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "lv_draw.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
@@ -67,8 +67,6 @@ typedef struct {
     lv_coord_t shadow_spread;
     lv_opa_t shadow_opa;
 } lv_draw_rect_dsc_t;
-
-struct _lv_draw_ctx_t;
 
 /**********************
  * GLOBAL PROTOTYPES

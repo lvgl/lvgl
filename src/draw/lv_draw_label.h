@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw.h"
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_txt.h"
 #include "../misc/lv_color.h"
@@ -27,25 +28,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    const lv_font_t * font;
-    uint32_t sel_start;
-    uint32_t sel_end;
-    lv_color_t color;
-    lv_color_t sel_color;
-    lv_color_t sel_bg_color;
-    lv_coord_t line_space;
-    lv_coord_t letter_space;
-    lv_coord_t ofs_x;
-    lv_coord_t ofs_y;
-    lv_opa_t opa;
-    lv_base_dir_t bidi_dir;
-    lv_text_align_t align;
-    lv_text_flag_t flag;
-    lv_text_decor_t decor : 3;
-    lv_blend_mode_t blend_mode: 3;
-} lv_draw_label_dsc_t;
-
+struct _lv_draw_ctx_t;
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
  * all the previous characters needs to be checked to calculate the positions.
@@ -63,7 +46,61 @@ typedef struct _lv_draw_label_hint_t {
     int32_t coord_y;
 } lv_draw_label_hint_t;
 
-struct _lv_draw_ctx_t;
+
+typedef struct {
+    const char * text;
+    const lv_font_t * font;
+    uint32_t sel_start;
+    uint32_t sel_end;
+    lv_color_t color;
+    lv_color_t sel_color;
+    lv_color_t sel_bg_color;
+    lv_coord_t line_space;
+    lv_coord_t letter_space;
+    lv_coord_t ofs_x;
+    lv_coord_t ofs_y;
+    lv_opa_t opa;
+    lv_base_dir_t bidi_dir;
+    lv_text_align_t align;
+    lv_text_flag_t flag;
+    lv_text_decor_t decor : 3;
+    lv_blend_mode_t blend_mode: 3;
+    lv_draw_label_hint_t * hint;
+} lv_draw_label_dsc_t;
+
+typedef enum {
+    LV_DRAW_LETTER_BITMAP_FORMAT_A8,
+    LV_DRAW_LETTER_BITMAP_FORMAT_SUBPX,
+    LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE,
+} lv_draw_letter_bitmap_format_t;
+
+typedef struct {
+    const uint8_t * bitmap;
+    lv_draw_letter_bitmap_format_t format;
+
+    const lv_area_t * bg_coords;
+    const lv_area_t * letter_coords;
+    lv_coord_t line1_y_ofs;
+    lv_coord_t line2_y_ofs;
+    lv_coord_t line_width;
+    lv_text_decor_t decor;
+    lv_blend_mode_t blend_mode;
+
+    lv_color_t bg_color;
+    lv_color_t letter_color;
+    lv_color_t line_color;
+
+    lv_opa_t letter_opa;
+    lv_opa_t bg_opa;
+    lv_opa_t line_opa;
+} lv_draw_letter_dsc_t;
+
+
+typedef void(*lv_draw_letter_cb_t)(lv_draw_unit_t * draw_unit, lv_draw_letter_dsc_t * dsc);
+
+void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_dsc_t * dsc, const lv_area_t * coords,
+                                    lv_draw_letter_cb_t cb);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -79,11 +116,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
-                                         const lv_area_t * coords, const char * txt, lv_draw_label_hint_t * hint);
-
-void lv_draw_letter(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
-                    uint32_t letter);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+                                         const lv_area_t * coords);
 
 /***********************
  * GLOBAL VARIABLES

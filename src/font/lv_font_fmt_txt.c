@@ -58,6 +58,13 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
     static rle_state_t rle_state;
 #endif /*LV_USE_FONT_COMPRESSED*/
 
+static const uint8_t opa4_table[16] = {0,  17, 34,  51,
+                                       68, 85, 102, 119,
+                                       136, 153, 170, 187,
+                                       204, 221, 238, 255
+                                      };
+
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -70,12 +77,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Used as `get_glyph_bitmap` callback in lvgl's native font format if the font is uncompressed.
- * @param font pointer to font
- * @param unicode_letter a unicode letter which bitmap should be get
- * @return pointer to the bitmap or NULL if not found
- */
+
 const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter)
 {
     if(unicode_letter == '\t') unicode_letter = ' ';
@@ -86,47 +88,43 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
+    static size_t last_buf_size = 0;
+    if(LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf) == NULL) last_buf_size = 0;
+
+    uint32_t gsize = gdsc->box_w * gdsc->box_h;
+    if(gsize == 0) return NULL;
+
+    if(last_buf_size < gsize) {
+        uint8_t * tmp = lv_realloc(LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf), gsize);
+        LV_ASSERT_MALLOC(tmp);
+        if(tmp == NULL) return NULL;
+        LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf) = tmp;
+        last_buf_size = gsize;
+    }
+
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        const uint8_t * bitmap = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        uint32_t i;
+        for(i = 0; i < gsize - 1; i += 2) {
+            _lv_font_fmt_txt_bitmap_buf[i] = opa4_table[(*bitmap) >> 4];
+            _lv_font_fmt_txt_bitmap_buf[i + 1] = opa4_table[(*bitmap) & 0xF];
+            bitmap++;
+        }
+        /*If gsize was even*/
+        if(i == gsize - 1) {
+            _lv_font_fmt_txt_bitmap_buf[i - 1] = opa4_table[(*bitmap) & 0xF];
+        }
+        return _lv_font_fmt_txt_bitmap_buf;
     }
     /*Handle compressed bitmap*/
     else {
 #if LV_USE_FONT_COMPRESSED
-        static size_t last_buf_size = 0;
-        if(LV_GC_ROOT(_lv_font_decompr_buf) == NULL) last_buf_size = 0;
 
-        uint32_t gsize = gdsc->box_w * gdsc->box_h;
-        if(gsize == 0) return NULL;
-
-        uint32_t buf_size = gsize;
-        /*Compute memory size needed to hold decompressed glyph, rounding up*/
-        switch(fdsc->bpp) {
-            case 1:
-                buf_size = (gsize + 7) >> 3;
-                break;
-            case 2:
-                buf_size = (gsize + 3) >> 2;
-                break;
-            case 3:
-                buf_size = (gsize + 1) >> 1;
-                break;
-            case 4:
-                buf_size = (gsize + 1) >> 1;
-                break;
-        }
-
-        if(last_buf_size < buf_size) {
-            uint8_t * tmp = lv_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
-            LV_ASSERT_MALLOC(tmp);
-            if(tmp == NULL) return NULL;
-            LV_GC_ROOT(_lv_font_decompr_buf) = tmp;
-            last_buf_size = buf_size;
-        }
 
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_decompr_buf), gdsc->box_w, gdsc->box_h,
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf), gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
-        return LV_GC_ROOT(_lv_font_decompr_buf);
+        return LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf);
 #else /*!LV_USE_FONT_COMPRESSED*/
         LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
         return NULL;
@@ -196,9 +194,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
 void _lv_font_clean_up_fmt_txt(void)
 {
 #if LV_USE_FONT_COMPRESSED
-    if(LV_GC_ROOT(_lv_font_decompr_buf)) {
-        lv_free(LV_GC_ROOT(_lv_font_decompr_buf));
-        LV_GC_ROOT(_lv_font_decompr_buf) = NULL;
+    if(LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf)) {
+        lv_free(LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf));
+        LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf) = NULL;
     }
 #endif
 }

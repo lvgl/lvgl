@@ -37,7 +37,7 @@ typedef struct {
     uint32_t chroma_keyed   : 1;
 } lv_draw_img_sup_t;
 
-typedef struct {
+typedef struct _lv_draw_img_dsc_t {
 
     int16_t angle;
     uint16_t zoom;
