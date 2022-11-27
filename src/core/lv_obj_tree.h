@@ -15,6 +15,8 @@ extern "C" {
  *********************/
 #include <stddef.h>
 #include <stdbool.h>
+#include "../misc/lv_anim.h"
+#include "../hal/lv_hal_disp.h"
 
 /*********************
  *      DEFINES

@@ -14,6 +14,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stdbool.h>
+#include "../misc/lv_area.h"
+#include "lv_obj_draw.h"
+#include "lv_obj_class.h"
+#include "../hal/lv_hal_indev.h"
 
 /*********************
  *      DEFINES
