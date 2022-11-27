@@ -11,7 +11,7 @@
 
 #include "../lv_img_cache.h"
 #include "../../core/lv_disp.h"
-#include "../../core/lv_disp_priv.h"
+#include "../../core/lv_disp_private.h"
 #include "../../misc/lv_log.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_mem.h"

@@ -10,7 +10,7 @@
 #if LV_USE_DRAW_SW
 
 #include "lv_draw_sw.h"
-#include "../../core/lv_disp_priv.h"
+#include "../../core/lv_disp_private.h"
 #include <errno.h>
 
 /*********************
@@ -198,7 +198,7 @@ void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
     }
 #endif
 
-    size_t buf_size_px = lv_area_get_size(draw_ctx->buf_area);
+    size_t buf_size_px = lv_area_get_size(&draw_ctx->buf_area);
     bool has_alpha = lv_color_format_has_alpha(draw_ctx->color_format);
     uint8_t px_size_in = lv_color_format_get_size(has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
     uint8_t px_size_out = lv_color_format_get_size(draw_ctx->color_format);
