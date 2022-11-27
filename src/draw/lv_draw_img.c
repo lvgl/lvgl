@@ -52,16 +52,20 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
-/**
- * Draw an image
- * @param coords the coordinates of the image
- * @param mask the image will be drawn only in this area
- * @param src pointer to a lv_color_t array which contains the pixels of the image
- * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
- */
+
+void lv_draw_layer(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
+{
+    lv_draw_task_t * t = lv_draw_add_task(draw_ctx, coords);
+
+    t->draw_dsc = lv_malloc(sizeof(*dsc));
+    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
+    t->type = LV_DRAW_TASK_TYPE_LAYER;
+    t->state = LV_DRAW_TASK_STATE_WAITING;
+}
+
+
 void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
 {
-
     if(dsc->src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         return;
@@ -73,20 +77,6 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_IMAGE;
-
-    //    lv_res_t res;
-    //    if(draw_ctx->draw_img) {
-    //        res = draw_ctx->draw_img(draw_ctx, dsc, coords, src);
-    //    }
-    //    else {
-    //        res = decode_and_draw(draw_ctx, dsc, coords, src);
-    //    }
-    //
-    //    if(res == LV_RES_INV) {
-    //        LV_LOG_WARN("Image draw error");
-    //        show_error(draw_ctx, coords, "No\ndata");
-    //        return;
-    //    }
 }
 
 /**

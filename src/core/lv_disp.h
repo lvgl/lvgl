@@ -306,7 +306,7 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp);
  * @param draw_ctx_deinit   deinit callback
  */
 void lv_disp_set_draw_ctx(lv_disp_t * disp,
-                          void (*draw_ctx_init)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx),
+                          void (*draw_ctx_init)(lv_disp_t * disp),
                           void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx));
 
 /*---------------------

@@ -128,7 +128,7 @@ void lv_refr_now(lv_disp_t * disp)
 
 void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 {
-    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    lv_area_t clip_area_ori = draw_ctx->clip_area;
     lv_area_t clip_coords_for_obj;
 
     /*Truncate the clip area to `obj size + ext size` area*/
@@ -136,12 +136,11 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
-    bool com_clip_res = _lv_area_intersect(&clip_coords_for_obj, clip_area_ori, &obj_coords_ext);
-    /*If the object is visible on the current clip area OR has overflow visible draw it.
-     *With overflow visible drawing should happen to apply the masks which might affect children */
-    bool should_draw = com_clip_res || lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
+    bool com_clip_res = _lv_area_intersect(&clip_coords_for_obj, &clip_area_ori, &obj_coords_ext);
+    /*If the object is visible on the current clip area*/
+    bool should_draw = com_clip_res;
     if(should_draw) {
-        draw_ctx->clip_area = &clip_coords_for_obj;
+        draw_ctx->clip_area = clip_coords_for_obj;
 
         lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
         lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN, draw_ctx);
@@ -163,17 +162,12 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
      *With not overflow visible limit the clip are to the object's coordinates to clip the children*/
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-        clip_coords_for_children  = *clip_area_ori;
-    }
-    else {
-        if(!_lv_area_intersect(&clip_coords_for_children, clip_area_ori, &obj->coords)) {
-            refr_children = false;
-        }
+    if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, &obj->coords)) {
+        refr_children = false;
     }
 
     if(refr_children) {
-        draw_ctx->clip_area = &clip_coords_for_children;
+        draw_ctx->clip_area = clip_coords_for_children;
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
         for(i = 0; i < child_cnt; i++) {
@@ -184,7 +178,7 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
     /*If the object was visible on the clip area call the post draw events too*/
     if(should_draw) {
-        draw_ctx->clip_area = &clip_coords_for_obj;
+        draw_ctx->clip_area = clip_coords_for_obj;
 
         /*If all the children are redrawn make 'post draw' draw*/
         lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_POST_BEGIN, draw_ctx);
@@ -414,7 +408,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 
     if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT &&
-       disp_refr->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
+       disp_refr->color_format != LV_COLOR_FORMAT_NATIVE) {
         LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
         return;
     }
@@ -444,9 +438,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
             uint32_t i;
             for(i = 0; i < disp_refr->inv_p; i++) {
                 if(disp_refr->inv_area_joined[i]) continue;
-                disp_refr->draw_ctx->buffer_copy(disp_refr->draw_ctx,
-                                                 buf_off_screen, stride, &disp_refr->inv_areas[i],
-                                                 buf_on_screen, stride, &disp_refr->inv_areas[i]);
+                disp_refr->draw_ctx_head->buffer_copy(disp_refr->draw_ctx_head,
+                                                      buf_off_screen, stride, &disp_refr->inv_areas[i],
+                                                      buf_on_screen, stride, &disp_refr->inv_areas[i]);
             }
         }
 
@@ -571,7 +565,7 @@ static void refr_invalid_areas(void)
  */
 static void refr_area(const lv_area_t * area_p)
 {
-    lv_draw_ctx_t * draw_ctx = disp_refr->draw_ctx;
+    lv_draw_ctx_t * draw_ctx = disp_refr->draw_ctx_head;
     draw_ctx->buf = disp_refr->draw_buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
@@ -580,16 +574,16 @@ static void refr_area(const lv_area_t * area_p)
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1,
                     lv_disp_get_ver_res(disp_refr) - 1);
-        draw_ctx->buf_area = &disp_area;
+        draw_ctx->buf_area = disp_area;
 
         if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL) {
             disp_refr->last_part = 1;
-            draw_ctx->clip_area = &disp_area;
+            draw_ctx->clip_area = disp_area;
             refr_area_part(draw_ctx);
         }
         else if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
             disp_refr->last_part = disp_refr->last_area;
-            draw_ctx->clip_area = area_p;
+            draw_ctx->clip_area = *area_p;
             refr_area_part(draw_ctx);
         }
         return;
@@ -613,8 +607,8 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
-        draw_ctx->buf_area = &sub_area;
-        draw_ctx->clip_area = &sub_area;
+        draw_ctx->buf_area = sub_area;
+        draw_ctx->clip_area = sub_area;
         draw_ctx->buf = disp_refr->draw_buf_act;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
@@ -629,8 +623,8 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
-        draw_ctx->buf_area = &sub_area;
-        draw_ctx->clip_area = &sub_area;
+        draw_ctx->buf_area = sub_area;
+        draw_ctx->clip_area = sub_area;
         draw_ctx->buf = disp_refr->draw_buf_act;
         disp_refr->last_part = 1;
         refr_area_part(draw_ctx);
@@ -656,9 +650,9 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(draw_ctx->buf_area, lv_disp_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&draw_ctx->buf_area, lv_disp_get_scr_act(disp_refr));
     if(disp_refr->prev_scr) {
-        top_prev_scr = lv_refr_get_top_obj(draw_ctx->buf_area, disp_refr->prev_scr);
+        top_prev_scr = lv_refr_get_top_obj(&draw_ctx->buf_area, disp_refr->prev_scr);
     }
 
     /*Draw a bottom layer background if there is no top object*/
@@ -794,6 +788,9 @@ static lv_res_t layer_get_area(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj, lv_laye
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
+    //    *layer_area_out = obj_coords_ext;
+    //    return LV_RES_OK;
+
 
     if(layer_type == LV_LAYER_TYPE_TRANSFORM) {
         /*Get the transformed area and clip it to the current clip area.
@@ -801,7 +798,7 @@ static lv_res_t layer_get_area(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj, lv_laye
         lv_area_t clip_coords_for_obj;
         lv_area_t tranf_coords = obj_coords_ext;
         lv_obj_get_transformed_area(obj, &tranf_coords, false, false);
-        if(!_lv_area_intersect(&clip_coords_for_obj, draw_ctx->clip_area, &tranf_coords)) {
+        if(!_lv_area_intersect(&clip_coords_for_obj, &draw_ctx->clip_area, &tranf_coords)) {
             return LV_RES_INV;
         }
 
@@ -818,7 +815,7 @@ static lv_res_t layer_get_area(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj, lv_laye
     }
     else if(layer_type == LV_LAYER_TYPE_SIMPLE) {
         lv_area_t clip_coords_for_obj;
-        if(!_lv_area_intersect(&clip_coords_for_obj, draw_ctx->clip_area, &obj_coords_ext)) {
+        if(!_lv_area_intersect(&clip_coords_for_obj, &draw_ctx->clip_area, &obj_coords_ext)) {
             return LV_RES_INV;
         }
         *layer_area_out = clip_coords_for_obj;
@@ -831,40 +828,39 @@ static lv_res_t layer_get_area(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj, lv_laye
     return LV_RES_OK;
 }
 
-static void layer_alpha_test(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx,
-                             lv_draw_layer_flags_t flags)
-{
-    bool has_alpha;
-    /*If globally the layer has alpha maybe this smaller section has not (e.g. not on a rounded corner)
-     *If turns out that this section has no alpha renderer can choose faster algorithms*/
-    if(flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA) {
-        /*Test for alpha by assuming there is no alpha. If it fails, fall back to rendering with alpha*/
-        has_alpha = true;
-        if(_lv_area_is_in(&layer_ctx->area_act, &obj->coords, 0)) {
-            lv_cover_check_info_t info;
-            info.res = LV_COVER_RES_COVER;
-            info.area = &layer_ctx->area_act;
-            lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
-            if(info.res == LV_COVER_RES_COVER) has_alpha = false;
-        }
-
-        if(has_alpha) {
-            layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_alpha - 1;
-        }
-    }
-    else {
-        has_alpha = false;
-    }
-
-    if(layer_ctx->area_act.y2 > layer_ctx->area_full.y2) layer_ctx->area_act.y2 = layer_ctx->area_full.y2;
-    lv_draw_layer_adjust(draw_ctx, layer_ctx, has_alpha ? LV_DRAW_LAYER_FLAG_HAS_ALPHA : LV_DRAW_LAYER_FLAG_NONE);
-}
+//static void layer_alpha_test(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
+//{
+//    bool has_alpha;
+//    /*If globally the layer has alpha maybe this smaller section has not (e.g. not on a rounded corner)
+//     *If turns out that this section has no alpha renderer can choose faster algorithms*/
+//    if(flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA) {
+//        /*Test for alpha by assuming there is no alpha. If it fails, fall back to rendering with alpha*/
+//        has_alpha = true;
+//        if(_lv_area_is_in(&layer_ctx->area_act, &obj->coords, 0)) {
+//            lv_cover_check_info_t info;
+//            info.res = LV_COVER_RES_COVER;
+//            info.area = &layer_ctx->area_act;
+//            lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
+//            if(info.res == LV_COVER_RES_COVER) has_alpha = false;
+//        }
+//
+//        if(has_alpha) {
+//            layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_alpha - 1;
+//        }
+//    }
+//    else {
+//        has_alpha = false;
+//    }
+//
+//    if(layer_ctx->area_act.y2 > layer_ctx->area_full.y2) layer_ctx->area_act.y2 = layer_ctx->area_full.y2;
+//    lv_draw_layer_adjust(draw_ctx, layer_ctx, has_alpha ? LV_DRAW_LAYER_FLAG_HAS_ALPHA : LV_DRAW_LAYER_FLAG_NONE);
+//}
 
 
 void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 {
-    /*Do not refresh hidden objects*/
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
+
     lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
     if(layer_type == LV_LAYER_TYPE_NONE) {
         lv_obj_redraw(draw_ctx, obj);
@@ -877,64 +873,37 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         lv_res_t res = layer_get_area(draw_ctx, obj, layer_type, &layer_area_full);
         if(res != LV_RES_OK) return;
 
-        lv_draw_layer_flags_t flags = LV_DRAW_LAYER_FLAG_HAS_ALPHA;
+        lv_draw_ctx_t * new_draw_ctx = disp_refr->draw_ctx_init(disp_refr);
+        LV_ASSERT_MALLOC(new_draw_ctx);
 
-        if(_lv_area_is_in(&layer_area_full, &obj->coords, 0)) {
-            lv_cover_check_info_t info;
-            info.res = LV_COVER_RES_COVER;
-            info.area = &layer_area_full;
-            lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
-            if(info.res == LV_COVER_RES_COVER) flags &= ~LV_DRAW_LAYER_FLAG_HAS_ALPHA;
-        }
+        new_draw_ctx->color_format = LV_COLOR_FORMAT_NATIVE_ALPHA;
 
-        if(layer_type == LV_LAYER_TYPE_SIMPLE) flags |= LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE;
+        uint8_t * buf = lv_malloc(lv_area_get_size(&layer_area_full) * lv_color_format_get_size(new_draw_ctx->color_format));
+        LV_ASSERT_MALLOC(buf);
+        new_draw_ctx->buf = buf;
+        new_draw_ctx->buf_area = layer_area_full;
+        new_draw_ctx->clip_area = layer_area_full;
+        new_draw_ctx->buffer_clear(new_draw_ctx);
+        new_draw_ctx->parent = draw_ctx;
 
-        lv_draw_layer_ctx_t * layer_ctx = lv_draw_layer_create(draw_ctx, &layer_area_full, flags);
-        if(layer_ctx == NULL) {
-            LV_LOG_WARN("Couldn't create a new layer context");
-            return;
-        }
-        lv_point_t pivot = {
-            .x = lv_obj_get_style_transform_pivot_x(obj, 0),
-            .y = lv_obj_get_style_transform_pivot_y(obj, 0)
-        };
+        lv_obj_redraw(new_draw_ctx, obj);
+        new_draw_ctx->all_tasks_added = true;
 
-        lv_draw_img_dsc_t draw_dsc;
-        lv_draw_img_dsc_init(&draw_dsc);
-        draw_dsc.opa = opa;
-        draw_dsc.angle = lv_obj_get_style_transform_angle(obj, 0);
-        if(draw_dsc.angle > 3600) draw_dsc.angle -= 3600;
-        else if(draw_dsc.angle < 0) draw_dsc.angle += 3600;
+        lv_draw_img_dsc_t layer_draw_dsc;
+        lv_draw_img_dsc_init(&layer_draw_dsc);
+        layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_draw_ctx->buf_area.x1;
+        layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_draw_ctx->buf_area.y1;
 
-        draw_dsc.zoom = lv_obj_get_style_transform_zoom(obj, 0);
-        draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
-        draw_dsc.antialias = disp_refr->antialiasing;
+        layer_draw_dsc.opa = opa;
+        layer_draw_dsc.angle = lv_obj_get_style_transform_angle(obj, 0);
+        while(layer_draw_dsc.angle > 3600) layer_draw_dsc.angle -= 3600;
+        while(layer_draw_dsc.angle < 0) layer_draw_dsc.angle += 3600;
+        layer_draw_dsc.zoom = lv_obj_get_style_transform_zoom(obj, 0);
+        layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
+        layer_draw_dsc.antialias = disp_refr->antialiasing;
+        layer_draw_dsc.src = new_draw_ctx;
 
-        if(flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
-            layer_ctx->area_act = layer_ctx->area_full;
-            layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_no_alpha - 1;
-            if(layer_ctx->area_act.y2 > layer_ctx->area_full.y2) layer_ctx->area_act.y2 = layer_ctx->area_full.y2;
-        }
-        while(layer_ctx->area_act.y1 <= layer_area_full.y2) {
-            if(flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
-                layer_alpha_test(obj, draw_ctx, layer_ctx, flags);
-            }
-
-            lv_obj_redraw(draw_ctx, obj);
-
-            draw_dsc.pivot.x = obj->coords.x1 + pivot.x - draw_ctx->buf_area->x1;
-            draw_dsc.pivot.y = obj->coords.y1 + pivot.y - draw_ctx->buf_area->y1;
-
-            /*With LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE it should also go the next chunk*/
-            lv_draw_layer_blend(draw_ctx, layer_ctx, &draw_dsc);
-
-            if((flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) == 0) break;
-
-            layer_ctx->area_act.y1 = layer_ctx->area_act.y2 + 1;
-            layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_no_alpha - 1;
-        }
-
-        lv_draw_layer_destroy(draw_ctx, layer_ctx);
+        lv_draw_layer(draw_ctx, &layer_draw_dsc, &new_draw_ctx->buf_area);
     }
 }
 
@@ -1159,10 +1128,10 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
 static void draw_buf_flush(lv_disp_t * disp)
 {
     /*Flush the rendered content to the display*/
-    lv_draw_ctx_t * draw_ctx = disp->draw_ctx;
+    lv_draw_ctx_t * draw_ctx = disp->draw_ctx_head;
     //    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
     while(draw_ctx->draw_task_head) {
-        lv_draw_dispatch_if_requested(draw_ctx);
+        lv_draw_dispatch_if_requested();
     }
 
     printf("------------------------------------------------------------------------------------------------------------\n\n");
@@ -1187,10 +1156,10 @@ static void draw_buf_flush(lv_disp_t * disp)
     if(disp->flush_cb) {
         /*Rotate the buffer to the display's native orientation if necessary*/
         if(disp->rotation != LV_DISP_ROTATION_0 && disp->sw_rotate) {
-            draw_buf_rotate(draw_ctx->buf_area, draw_ctx->buf);
+            draw_buf_rotate(&draw_ctx->buf_area, draw_ctx->buf);
         }
         else {
-            call_flush_cb(disp, draw_ctx->buf_area, draw_ctx->buf);
+            call_flush_cb(disp, &draw_ctx->buf_area, draw_ctx->buf);
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
@@ -1216,7 +1185,7 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t *
         .y2 = area->y2 + disp->offset_y
     };
 
-    if(disp->draw_ctx->buffer_convert) disp->draw_ctx->buffer_convert(disp->draw_ctx);
+    if(disp->draw_ctx_head->buffer_convert) disp->draw_ctx_head->buffer_convert(disp->draw_ctx_head);
 
     disp->flush_cb(disp, &offset_area, color_p);
 }

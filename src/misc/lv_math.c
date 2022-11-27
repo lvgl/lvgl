@@ -45,12 +45,11 @@ static const int16_t sin0_90_table[] = {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle)
+LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_sin(int16_t angle)
 {
-    int16_t ret = 0;
-    angle       = angle % 360;
-
-    if(angle < 0) angle = 360 + angle;
+    int32_t ret = 0;
+    while(angle < 0) angle += 360;
+    while(angle >= 360) angle -= 360;
 
     if(angle < 90) {
         ret = sin0_90_table[angle];
@@ -68,7 +67,9 @@ LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle)
         ret   = -sin0_90_table[angle];
     }
 
-    return ret;
+    if(ret == 32767) return 32768;
+    else if(ret == -32767) return -32768;
+    else return ret;
 }
 
 /**

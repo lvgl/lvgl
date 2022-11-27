@@ -92,7 +92,7 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_ds
 
     lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
     lv_area_t clipped_area;
-    bool clip_ok = _lv_area_intersect(&clipped_area, coords, draw_ctx->clip_area);
+    bool clip_ok = _lv_area_intersect(&clipped_area, coords, draw_unit->clip_area);
     if(!clip_ok) return;
 
     lv_text_align_t align = dsc->align;
@@ -149,7 +149,7 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_ds
                                                            dsc->flag);
 
     /*Go the first visible line*/
-    while(pos.y + line_height_font < draw_ctx->clip_area->y1) {
+    while(pos.y + line_height_font < draw_ctx->clip_area.y1) {
         /*Go to next line*/
         line_start = line_end;
         line_end += _lv_txt_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
@@ -282,7 +282,7 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_ds
         /*Go the next line position*/
         pos.y += line_height;
 
-        if(pos.y > draw_ctx->clip_area->y2) return;
+        if(pos.y > draw_ctx->clip_area.y2) return;
     }
 
     LV_ASSERT_MEM_INTEGRITY();
@@ -321,7 +321,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_letter_dsc_t * dsc, 
     letter_coords.y2 = letter_coords.y1 + g.box_h - 1;
 
     /*If the letter is completely out of mask don't draw it*/
-    if(_lv_area_is_out(&letter_coords, draw_ctx->clip_area, 0)) return;
+    if(_lv_area_is_out(&letter_coords, &draw_ctx->clip_area, 0)) return;
 
     dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter);
     dsc->letter_coords = &letter_coords;

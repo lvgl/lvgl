@@ -11,6 +11,7 @@
 
 #include "../lv_img_cache.h"
 #include "../../core/lv_disp.h"
+#include "../../core/lv_disp_priv.h"
 #include "../../misc/lv_log.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_mem.h"
@@ -42,6 +43,26 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+
+void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords)
+{
+    lv_draw_ctx_t * draw_ctx_to_draw = (lv_draw_ctx_t *)draw_dsc->src;
+    lv_img_dsc_t img_dsc;
+    img_dsc.header.w = lv_area_get_width(&draw_ctx_to_draw->buf_area);
+    img_dsc.header.h = lv_area_get_height(&draw_ctx_to_draw->buf_area);
+    img_dsc.header.cf = draw_ctx_to_draw->color_format;
+    img_dsc.header.always_zero = 0;
+    img_dsc.header.chroma_keyed = 0;
+    img_dsc.data = draw_ctx_to_draw->buf;
+
+    lv_draw_img_dsc_t new_draw_dsc;
+    lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_img_dsc_t));
+    new_draw_dsc.src = &img_dsc;
+
+    lv_draw_sw_img(draw_unit, &new_draw_dsc, coords);
+}
+
 
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,

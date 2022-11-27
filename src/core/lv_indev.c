@@ -489,8 +489,8 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 
     bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
-    /*If the point is on this object or has overflow visible check its children too*/
-    if(_lv_area_is_point_on(&obj->coords, &p_trans, 0) || lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+    /*If the point is on this object*/
+    if(_lv_area_is_point_on(&obj->coords, &p_trans, 0)) {
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
 

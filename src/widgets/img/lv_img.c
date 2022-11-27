@@ -654,10 +654,10 @@ static void draw_img(lv_event_t * e)
                 img_clip_area.y1 = bg_coords.y1 + ptop;
                 img_clip_area.x2 = bg_coords.x2 - pright;
                 img_clip_area.y2 = bg_coords.y2 - pbottom;
-                const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+                const lv_area_t clip_area_ori = draw_ctx->clip_area;
 
-                if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) return;
-                draw_ctx->clip_area = &img_clip_area;
+                if(!_lv_area_intersect(&img_clip_area, &draw_ctx->clip_area, &img_clip_area)) return;
+                draw_ctx->clip_area = img_clip_area;
 
                 lv_area_t coords_tmp;
                 coords_tmp.y1 = img_max_area.y1 + img->offset.y;

@@ -105,7 +105,8 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     lv_disp_set_draw_ctx(disp, lv_draw_sw_init_ctx, lv_draw_sw_deinit_ctx);
 #endif
 
-    disp->draw_ctx->color_format = LV_COLOR_FORMAT_NATIVE;
+    disp->draw_ctx_head->color_format = LV_COLOR_FORMAT_NATIVE;
+    disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
     disp->inv_en_cnt = 1;
 
@@ -417,7 +418,7 @@ void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format)
     if(disp == NULL) return;
 
     disp->color_format = color_format;
-    disp->draw_ctx->color_format = color_format;
+    disp->draw_ctx_head->color_format = color_format;
 }
 
 lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp)
@@ -466,24 +467,13 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp)
  *--------------------*/
 
 void lv_disp_set_draw_ctx(lv_disp_t * disp,
-                          void (*draw_ctx_init)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx),
+                          void (*draw_ctx_init)(lv_disp_t * disp),
                           void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx))
 {
-    if(disp->draw_ctx) {
-        if(disp->draw_ctx_deinit) disp->draw_ctx_deinit(disp, disp->draw_ctx);
-        lv_free(disp->draw_ctx);
-        disp->draw_ctx = NULL;
-    }
-
     disp->draw_ctx_init = draw_ctx_init;
     disp->draw_ctx_deinit = draw_ctx_deinit;
 
-    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_ctx_t));
-    LV_ASSERT_MALLOC(draw_ctx);
-    if(draw_ctx == NULL) return;
-    lv_memzero(draw_ctx, sizeof(*draw_ctx));
-    disp->draw_ctx_init(disp, draw_ctx);
-    disp->draw_ctx = draw_ctx;
+    disp->draw_ctx_init(disp);
 }
 
 /*---------------------

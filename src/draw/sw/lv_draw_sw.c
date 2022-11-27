@@ -10,6 +10,7 @@
 #if LV_USE_DRAW_SW
 
 #include "lv_draw_sw.h"
+#include "../../core/lv_disp_priv.h"
 #include <errno.h>
 
 /*********************
@@ -42,29 +43,43 @@ static int thread(void * ptr);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
+lv_draw_ctx_t * lv_draw_sw_init_ctx(lv_disp_t * disp)
 {
-    LV_UNUSED(disp);
-
+    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_ctx_t));
+    LV_ASSERT_MALLOC(draw_ctx);
+    lv_memzero(draw_ctx, sizeof(lv_draw_ctx_t));
     draw_ctx->buffer_copy = lv_draw_sw_buffer_copy;
     draw_ctx->buffer_convert = lv_draw_sw_buffer_convert;
     draw_ctx->buffer_clear = lv_draw_sw_buffer_clear;
-    draw_ctx->layer_init = lv_draw_sw_layer_create;
-    draw_ctx->layer_adjust = lv_draw_sw_layer_adjust;
-    draw_ctx->layer_blend = lv_draw_sw_layer_blend;
-    draw_ctx->layer_destroy = lv_draw_sw_layer_destroy;
-    draw_ctx->layer_instance_size = sizeof(lv_draw_sw_layer_ctx_t);
+    //    draw_ctx->layer_create = lv_draw_sw_layer_create;
+    //    draw_ctx->layer_adjust = lv_draw_sw_layer_adjust;
+    //    draw_ctx->layer_blend = lv_draw_sw_layer_blend;
+    //    draw_ctx->layer_destroy = lv_draw_sw_layer_destroy;
+    //    draw_ctx->layer_instance_size = sizeof(lv_draw_sw_layer_ctx_t);
 
-    for(int i = 0; i < 3; i++) {
+    if(disp->draw_ctx_head) {
+        lv_draw_ctx_t * tail = disp->draw_ctx_head;
+        while(tail->next) tail = tail->next;
+        tail->next = draw_ctx;
+    }
+    else {
+        disp->draw_ctx_head = draw_ctx;
+    }
+
+    return draw_ctx;
+}
+
+void draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt)
+{
+    uint32_t i;
+    for(i = 0; i < cnt; i++) {
         lv_draw_sw_unit_t * draw_sw_unit = lv_malloc(sizeof(*draw_sw_unit));
         lv_memzero(draw_sw_unit, sizeof(lv_draw_sw_unit_t));
-        draw_sw_unit->base_unit.draw_ctx = draw_ctx;
-        draw_sw_unit->base_unit.wait_for_finish = lv_draw_sw_wait_for_finish;
         draw_sw_unit->base_unit.dispatch = lv_draw_sw_dispatch;
         draw_sw_unit->idx = i;
 
-        draw_sw_unit->base_unit.next = draw_ctx->draw_unit_head;
-        draw_ctx->draw_unit_head = (lv_draw_unit_t *) draw_sw_unit;
+        draw_sw_unit->base_unit.next = disp->draw_unit_head;
+        disp->draw_unit_head = (lv_draw_unit_t *) draw_sw_unit;
 
         pthread_mutex_init(&draw_sw_unit->lock, NULL);
         pthread_cond_init(&draw_sw_unit->cond, NULL);
@@ -77,15 +92,7 @@ void lv_draw_sw_init_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 void lv_draw_sw_deinit_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
     LV_UNUSED(disp);
-
-    lv_draw_sw_unit_t * draw_sw_ctx = (lv_draw_sw_unit_t *) draw_ctx;
-    lv_memzero(draw_sw_ctx, sizeof(lv_draw_sw_unit_t));
-}
-
-void lv_draw_sw_wait_for_finish(lv_draw_ctx_t * draw_ctx)
-{
-    LV_UNUSED(draw_ctx);
-    /*Nothing to wait for*/
+    lv_memzero(draw_ctx, sizeof(lv_draw_ctx_t));
 }
 
 
@@ -99,22 +106,19 @@ int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx
 
     lv_draw_task_t * t = lv_draw_get_next_available_task(draw_ctx, NULL);
     while(t) {
-        //        if(t->type == LV_DRAW_TASK_TYPE_RECTANGLE)
-        {
+        pthread_mutex_lock(&draw_sw_unit->lock);
 
-            pthread_mutex_lock(&draw_sw_unit->lock);
-
-            t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
-            draw_sw_unit->task_act = t;
+        t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
+        draw_sw_unit->task_act = t;
+        draw_sw_unit->base_unit.draw_ctx = draw_ctx;
+        draw_sw_unit->base_unit.clip_area = &t->clip_area;
 #if DRAW_LOG
-            printf("%d Taken: %d, %d, %d, %d\n", draw_sw_unit->idx, t->area.x1, t->area.y1,
-                   lv_area_get_width(&t->area), lv_area_get_height(&t->area));
+        printf("%d Taken: %d, %d, %d, %d\n", draw_sw_unit->idx, t->area.x1, t->area.y1,
+               lv_area_get_width(&t->area), lv_area_get_height(&t->area));
 #endif
-            pthread_cond_signal(&draw_sw_unit->cond);
-            pthread_mutex_unlock(&draw_sw_unit->lock);
-            return 1;
-        }
-        t = lv_draw_get_next_available_task(draw_ctx, t);
+        pthread_cond_signal(&draw_sw_unit->cond);
+        pthread_mutex_unlock(&draw_sw_unit->lock);
+        return 1;
     }
 
     return -1;
@@ -219,8 +223,8 @@ void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx)
     uint8_t px_size = lv_color_format_get_size(draw_ctx->color_format);
     uint8_t * buf8 = draw_ctx->buf;
     lv_area_t a;
-    lv_area_copy(&a, draw_ctx->clip_area);
-    lv_area_move(&a, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_copy(&a, &draw_ctx->clip_area);
+    lv_area_move(&a, -draw_ctx->buf_area.x1, -draw_ctx->buf_area.y1);
     lv_coord_t w = lv_area_get_width(&a);
     buf8 += a.y1 * w * px_size;
     buf8 += a.x1 * px_size;
@@ -253,8 +257,6 @@ static int thread(void * ptr)
         printf("%d Draw : %d, %d, %d, %d\n", u->idx, coords->x1, coords->y1,
                lv_area_get_width(coords), lv_area_get_height(coords));
 #endif
-        u->base_unit.clip_area = &u->task_act->clip_area;
-
 
         switch(u->task_act->type) {
             case LV_DRAW_TASK_TYPE_RECTANGLE:
@@ -265,6 +267,9 @@ static int thread(void * ptr)
                 break;
             case LV_DRAW_TASK_TYPE_IMAGE:
                 lv_draw_sw_img((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+                break;
+            case LV_DRAW_TASK_TYPE_LAYER:
+                lv_draw_sw_layer((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
                 break;
         }
 #if DRAW_LOG

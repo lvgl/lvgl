@@ -811,7 +811,7 @@ void lv_obj_get_transformed_area(const lv_obj_t * obj, lv_area_t * area, bool re
     area->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
     area->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
     area->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
-    lv_area_increase(area, 5, 5);
+    //    lv_area_increase(area, 10, 10);
 }
 
 
@@ -862,18 +862,16 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     }
 
     /*Truncate the area to the object*/
-    if(!lv_obj_has_flag_any(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-        lv_area_t obj_coords;
-        lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
-        lv_area_copy(&obj_coords, &obj->coords);
-        obj_coords.x1 -= ext_size;
-        obj_coords.y1 -= ext_size;
-        obj_coords.x2 += ext_size;
-        obj_coords.y2 += ext_size;
+    lv_area_t obj_coords;
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
+    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords.x1 -= ext_size;
+    obj_coords.y1 -= ext_size;
+    obj_coords.x2 += ext_size;
+    obj_coords.y2 += ext_size;
 
-        /*The area is not on the object*/
-        if(!_lv_area_intersect(area, area, &obj_coords)) return false;
-    }
+    /*The area is not on the object*/
+    if(!_lv_area_intersect(area, area, &obj_coords)) return false;
 
     lv_obj_get_transformed_area(obj, area, true, false);
 
@@ -885,11 +883,9 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
         if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false;
 
         /*Truncate to the parent and if no common parts break*/
-        if(!lv_obj_has_flag_any(par, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
-            lv_area_t par_area = par->coords;
-            lv_obj_get_transformed_area(par, &par_area, true, false);
-            if(!_lv_area_intersect(area, area, &par_area)) return false;
-        }
+        lv_area_t par_area = par->coords;
+        lv_obj_get_transformed_area(par, &par_area, true, false);
+        if(!_lv_area_intersect(area, area, &par_area)) return false;
 
         par = lv_obj_get_parent(par);
     }
