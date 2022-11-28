@@ -61,6 +61,8 @@ void lv_draw_layer(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, cons
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_LAYER;
     t->state = LV_DRAW_TASK_STATE_WAITING;
+
+    lv_draw_dispatch();
 }
 
 
@@ -77,6 +79,8 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_IMAGE;
+
+    lv_draw_dispatch();
 }
 
 /**

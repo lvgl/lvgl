@@ -67,7 +67,7 @@ void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, cons
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_RECTANGLE;
 
-    lv_draw_dispatch(draw_ctx);
+    lv_draw_dispatch();
 }
 
 /**********************

@@ -61,8 +61,6 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_sw_img(draw_unit, &new_draw_dsc, coords);
-
-    printf("Layer drawn\n");
 }
 
 
@@ -72,29 +70,30 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
 {
 
 
-    printf("sw_img start: %d, %d\n", coords->x1, coords->y1);
-    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(draw_dsc->src, draw_dsc->recolor, draw_dsc->frame_id);
-    if(cdsc == NULL)  {
-        LV_LOG_WARN("Couldn't open the image");
-        return;
-    }
+    //    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(draw_dsc->src, draw_dsc->recolor, draw_dsc->frame_id);
+    //    if(cdsc == NULL)  {
+    //        LV_LOG_WARN("Couldn't open the image");
+    //        return;
+    //    }
+    //
+    //    if(cdsc->dec_dsc.error_msg != NULL) {
+    //        LV_LOG_WARN("Couldn't open the image: %s", cdsc->dec_dsc.error_msg);
+    //        lv_img_decoder_close(&cdsc->dec_dsc);
+    //        return;
+    //    }
 
-    if(cdsc->dec_dsc.error_msg != NULL) {
-        LV_LOG_WARN("Couldn't open the image: %s", cdsc->dec_dsc.error_msg);
-        lv_img_decoder_close(&cdsc->dec_dsc);
-        return;
-    }
+    lv_img_dsc_t * img_dsc = draw_dsc->src;
+    const uint8_t * src_buf = img_dsc->data;
 
-    const uint8_t * src_buf = cdsc->dec_dsc.img_data;
-
-    lv_color_format_t cf = cdsc->dec_dsc.header.cf;
+    lv_color_format_t cf = img_dsc->header.cf;
+    //    lv_color_format_t cf = cdsc->dec_dsc.header.cf;
     lv_draw_img_sup_t sup;
-    sup.palette = cdsc->dec_dsc.palette;
-    sup.palette_size = cdsc->dec_dsc.palette_size;
-    sup.alpha_color = cdsc->dec_dsc.color;
-    sup.chroma_key_color = lv_color_hex(0x00ff00);
-    sup.chroma_keyed = cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED ? 1 : 0;
-
+    //    sup.palette = cdsc->dec_dsc.palette;
+    //    sup.palette_size = cdsc->dec_dsc.palette_size;
+    //    sup.alpha_color = cdsc->dec_dsc.color;
+    //    sup.chroma_key_color = lv_color_hex(0x00ff00);
+    //    sup.chroma_keyed = cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED ? 1 : 0;
+    //
     lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
 
     lv_area_t map_area_rot;
@@ -116,7 +115,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
     union_ok = _lv_area_intersect(&clip_com, draw_unit->clip_area, &map_area_rot);
     /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
     if(union_ok == false) {
-        lv_img_decoder_close(&cdsc->dec_dsc);
+        //        lv_img_decoder_close(&cdsc->dec_dsc);
         return;
     }
 
@@ -254,8 +253,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         lv_free(rgb_buf);
     }
     draw_unit->clip_area = clip_area_ori;
-    printf("sw_img finish: %d, %d\n", coords->x1, coords->y1);
-
 }
 
 /**********************

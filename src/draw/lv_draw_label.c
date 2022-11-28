@@ -81,7 +81,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_LABEL;
 
-    lv_draw_dispatch(draw_ctx);
+    lv_draw_dispatch();
 }
 
 void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_dsc_t * dsc, const lv_area_t * coords,
@@ -326,9 +326,6 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_letter_dsc_t * dsc, 
     dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter);
     dsc->letter_coords = &letter_coords;
 
-    if(letter == 'A') {
-        printf("A\n");
-    }
     cb(draw_unit, dsc);
 }
 

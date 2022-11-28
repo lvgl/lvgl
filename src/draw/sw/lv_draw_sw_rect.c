@@ -74,7 +74,6 @@ void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
     draw_shadow(draw_unit->draw_ctx, dsc);
 #endif
 
-    uint32_t t = lv_tick_get();
     for(int i = 0; i < 10; i++) {
         draw_bg(draw_unit, dsc, coords);
         draw_bg_img(draw_unit, dsc, coords);
@@ -83,8 +82,6 @@ void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
 
         draw_outline(draw_unit, dsc, coords);
     }
-
-    printf("%d\n", lv_tick_elaps(t));
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -96,8 +93,6 @@ void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
 static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->bg_opa <= LV_OPA_MIN) return;
-
-    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
 
     lv_area_t bg_coords;
     lv_area_copy(&bg_coords, coords);

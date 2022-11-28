@@ -90,6 +90,7 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
                           lv_opa_t * abuf)
 {
+
     LV_UNUSED(draw_unit);
 
     point_transform_dsc_t tr_dsc;

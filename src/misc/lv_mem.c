@@ -11,6 +11,7 @@
 #include "lv_tlsf.h"
 #include "lv_assert.h"
 #include "lv_log.h"
+#include <pthread.h>
 #include LV_STDLIB_INCLUDE
 #include LV_STRING_INCLUDE
 
@@ -44,6 +45,7 @@
  *  STATIC VARIABLES
  **********************/
 static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variable if 0 byte should be allocated*/
+static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
 /**********************
  *      MACROS
@@ -57,6 +59,7 @@ static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variabl
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
 /**
  * Allocate a memory dynamically
  * @param size size of the memory to allocate in bytes
@@ -70,7 +73,9 @@ void * lv_malloc(size_t size)
         return &zero_mem;
     }
 
+    //    pthread_mutex_lock(&lock);
     void * alloc = LV_MALLOC(size);
+    //    pthread_mutex_unlock(&lock);
 
     if(alloc == NULL) {
         LV_LOG_INFO("couldn't allocate memory (%lu bytes)", (unsigned long)size);
@@ -103,7 +108,10 @@ void lv_free(void * data)
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
+    //    pthread_mutex_lock(&lock);
     LV_FREE(data);
+    //    pthread_mutex_unlock(&lock);
+
 }
 
 /**
@@ -124,7 +132,10 @@ void * lv_realloc(void * data_p, size_t new_size)
 
     if(data_p == &zero_mem) return lv_malloc(new_size);
 
+    //    pthread_mutex_lock(&lock);
     void * new_p = LV_REALLOC(data_p, new_size);
+    //    pthread_mutex_unlock(&lock);
+
     if(new_p == NULL) {
         LV_LOG_ERROR("couldn't reallocate memory");
         return NULL;

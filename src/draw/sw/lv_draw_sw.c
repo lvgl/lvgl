@@ -277,7 +277,7 @@ static int thread(void * ptr)
 #endif
         u->task_act->state = LV_DRAW_TASK_STATE_READY;
         u->task_act = NULL;
-        lv_draw_dispatch_request(u->base_unit.draw_ctx);
+        lv_draw_dispatch_request();
 
         pthread_mutex_unlock(&u->lock);
     }

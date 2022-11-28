@@ -92,8 +92,6 @@ typedef struct _lv_draw_ctx_t  {
      */
     lv_color_format_t color_format;
 
-    int dispatch_req;       /*`int` type to be sure it's atomic write/read*/
-
     /**
      * Copy an area from buffer to an other
      * @param draw_ctx      pointer to a draw context
@@ -144,11 +142,11 @@ void lv_draw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
 
 lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords);
 
-void lv_draw_dispatch(lv_draw_ctx_t * draw_ctx);
+void lv_draw_dispatch(void);
 
 void lv_draw_dispatch_if_requested(void);
 
-void lv_draw_dispatch_request(lv_draw_ctx_t * draw_ctx);
+void lv_draw_dispatch_request(void);
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_prev);
 

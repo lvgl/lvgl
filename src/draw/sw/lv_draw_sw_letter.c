@@ -55,6 +55,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
 void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
+    printf("draw_label to %p\n", draw_unit->draw_ctx);
     lv_draw_label_interate_letters(draw_unit, dsc, coords, draw_letter);
 }
 
