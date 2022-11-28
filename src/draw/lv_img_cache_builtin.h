@@ -1,10 +1,10 @@
 /**
- * @file lv_example_get_started.h
+ * @file lv_img_cache_builtin.h
  *
  */
 
-#ifndef LV_EX_GET_STARTED_H
-#define LV_EX_GET_STARTED_H
+#ifndef LV_IMG_CACHE_BUILTIN_H
+#define LV_IMG_CACHE_BUILTIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,10 +25,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_get_started_1(void);
-void lv_example_get_started_2(void);
-void lv_example_get_started_3(void);
-void lv_example_get_started_4(void);
+
+void _lv_img_cache_builtin_init(void);
 
 /**********************
  *      MACROS
@@ -38,4 +36,4 @@ void lv_example_get_started_4(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EX_GET_STARTED_H*/
+#endif /*LV_IMG_CACHE_BUILTIN_H*/

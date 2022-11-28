@@ -2,26 +2,31 @@
 #if LV_BUILD_EXAMPLES
 #if LV_USE_FREETYPE
 
+#if LV_FREETYPE_USE_LVGL_PORT
+    #define PATH_PREFIX "A:"
+#else
+    #define PATH_PREFIX "./"
+#endif
+
 /**
  * Load a font with FreeType
  */
 void lv_example_freetype_1(void)
 {
     /*Create a font*/
-    static lv_ft_info_t info;
-    /*FreeType uses C standard file system, so no driver letter is required.*/
-    info.name = "./lvgl/examples/libs/freetype/Lato-Regular.ttf";
-    info.weight = 24;
-    info.style = FT_FONT_STYLE_NORMAL;
-    info.mem = NULL;
-    if(!lv_ft_font_init(&info)) {
-        LV_LOG_ERROR("create failed.");
+    lv_font_t * font = lv_freetype_font_create(PATH_PREFIX "lvgl/examples/libs/freetype/Lato-Regular.ttf",
+                                               24,
+                                               LV_FREETYPE_FONT_STYLE_NORMAL);
+
+    if(!font) {
+        LV_LOG_ERROR("freetype font create failed.");
+        return;
     }
 
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_style_set_text_font(&style, info.font);
+    lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
     /*Create a label with the new style*/

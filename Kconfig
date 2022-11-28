@@ -956,19 +956,20 @@ menu "LVGL configuration"
 		if LV_USE_FREETYPE
 			menu "FreeType cache config"
 				config LV_FREETYPE_CACHE_SIZE
-				int "Memory used by FreeType to cache characters [bytes] (-1: no caching)"
-				default 16384
-				if LV_FREETYPE_CACHE_SIZE >= 0
-					config LV_FREETYPE_SBIT_CACHE
-						bool "enable sbit cache"
-						default n
-					config LV_FREETYPE_CACHE_FT_FACES
-						int "The maximum number of FT_Face(0: use defaults)"
-						default 0
-					config LV_FREETYPE_CACHE_FT_SIZES
-						int "The maximum number of FT_Size(0: use defaults)"
-						default 0
-				endif
+					int "Memory used by FreeType to cache characters [bytes]"
+					default 65535
+				config LV_FREETYPE_USE_LVGL_PORT
+					bool "Let FreeType to use LVGL memory and file porting"
+					default n
+				config LV_FREETYPE_SBIT_CACHE
+					bool "enable sbit cache"
+					default n
+				config LV_FREETYPE_CACHE_FT_FACES
+					int "The maximum number of FT_Face(0: use defaults)"
+					default 4
+				config LV_FREETYPE_CACHE_FT_SIZES
+					int "The maximum number of FT_Size(0: use defaults)"
+					default 4
 			endmenu
 		endif
 

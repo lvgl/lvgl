@@ -119,9 +119,62 @@ See some examples of creating widgets, using layouts and applying styles. You wi
 
 For more examples check out the [Examples](https://github.com/lvgl/lvgl/tree/master/examples) folder.
 
+
+### Hello world label
+
+![Simple Hello world label example in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_1.png)
+
+<details>
+  <summary>C code</summary>
+
+```c
+/*Change the active screen's background color*/
+lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x003a57), LV_PART_MAIN);
+
+/*Create a white label, set its text and align it to the center*/
+lv_obj_t * label = lv_label_create(lv_scr_act());
+lv_label_set_text(label, "Hello world");
+lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
+lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+```
+</details>
+
+<details>
+  <summary>MicroPython code | <a href="https://sim.lvgl.io/v8.3/micropython/ports/javascript/index.html?script_direct=4ab7c40c35b0dc349aa2f0c3b00938d7d8e8ac9f" target="_blank">Online Simulator</a></summary>
+
+```python
+# Change the active screen's background color
+scr = lv.scr_act()
+scr.set_style_bg_color(lv.color_hex(0x003a57), lv.PART.MAIN)
+
+# Create a white label, set its text and align it to the center
+label = lv.label(lv.scr_act()) 
+label.set_text("Hello world")
+label.set_style_text_color(lv.color_hex(0xffffff), lv.PART.MAIN)
+label.align(lv.ALIGN.CENTER, 0, 0)
+```
+</details>
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Button with Click Event
 
-![LVGL button with label example](https://github.com/kisvegabor/test/raw/master/readme_example_1.gif)
+![LVGL button with label example](https://github.com/kisvegabor/test/raw/master/readme_example_2.gif)
 
 <details>
   <summary>C code</summary>
@@ -165,7 +218,7 @@ label.center()
 <br>
 
 ### Checkboxes with Layout
-![Checkboxes with layout in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_2.gif)
+![Checkboxes with layout in LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_3.gif)
 
 <details>
   <summary>C code</summary>
@@ -241,7 +294,7 @@ cb.add_event_cb(event_handler, lv.EVENT.ALL, None)
 <br>
 
 ### Styling a Slider
-![Styling a slider with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_3.gif)
+![Styling a slider with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.gif)
 
 
 <details>
@@ -269,7 +322,7 @@ lv_style_set_bg_grad_dir(&style_indicator, LV_GRAD_DIR_HOR);
 lv_style_set_shadow_color(&style_indicator, lv_color_hex(0x37B9F5));
 lv_style_set_shadow_width(&style_indicator, 15);
 lv_style_set_shadow_spread(&style_indicator, 5);
-
+4
 /*Add the style sheet to the slider's INDICATOR part*/
 lv_obj_add_style(slider, &style_indicator, LV_PART_INDICATOR);
 
@@ -329,7 +382,7 @@ slider.set_style_shadow_spread(2, lv.PART.KNOB)
 
 ### English, Hebrew (mixed LTR-RTL) and Chinese texts
 
-![English, Hebrew and Chinese texts with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_4.png)
+![English, Hebrew and Chinese texts with LVGL](https://github.com/kisvegabor/test/raw/master/readme_example_5.png)
 
 <details>
   <summary>C code</summary>

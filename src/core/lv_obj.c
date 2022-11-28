@@ -14,6 +14,7 @@
 #include "lv_theme.h"
 #include "../misc/lv_assert.h"
 #include "../draw/lv_draw.h"
+#include "../draw/lv_img_cache_builtin.h"
 #include "../misc/lv_anim.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_async.h"
@@ -158,9 +159,9 @@ void lv_init(void)
     _lv_refr_init();
 
     _lv_img_decoder_init();
-#if LV_IMG_CACHE_DEF_SIZE
-    lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
-#endif
+
+    _lv_img_cache_builtin_init();
+
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";
 
