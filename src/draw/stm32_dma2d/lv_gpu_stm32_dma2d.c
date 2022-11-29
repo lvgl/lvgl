@@ -9,11 +9,10 @@
 #include "lv_gpu_stm32_dma2d.h"
 #include "../../core/lv_refr.h"
 
-#include "main.h" // test only
-#include "stdio.h"
-
 #if LV_USE_GPU_STM32_DMA2D
 
+#include "stdio.h"
+#include "main.h"
 #include LV_GPU_DMA2D_CMSIS_INCLUDE
 
 /*********************
@@ -37,6 +36,8 @@
     /*Can't use GPU with other formats*/
 #endif
 
+#define CACHE_ROW_SIZE 32U // cache row size in Bytes
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -44,19 +45,18 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color);
-static void lv_draw_stm32_dma2d_blend_fill2(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color);
-
-static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa);
-static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa);
+static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride, const lv_area_t * fill_area, lv_color_t color);
+static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_stride, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_pos, lv_opa_t opa);
 static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src);
-
 static void invalidate_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
 static void clean_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
+static void waitForDmaFransferToFinish(void);
+static void startDmaFransfer(void);
+/*
 static void zeroAlpha(const lv_color_t * buf, uint32_t length);
 static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const lv_area_t * area3, const lv_area_t * area4);
 static void compareBuffers(const lv_color_t* b1, const lv_color_t* b2, const lv_area_t * area, lv_coord_t stride);
+*/
 
 /**********************
  *  STATIC VARIABLES
@@ -116,7 +116,6 @@ void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ct
 
 void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    ALIGN_32BYTES(static lv_color_t test_buf[800*48]); // test
     lv_area_t dest_area;
     if(!_lv_area_intersect(&dest_area, dsc->blend_area, draw_ctx->clip_area)) return;
     //trace4Areas(draw_ctx->buf_area, draw_ctx->clip_area, dsc->blend_area, &dest_area);
@@ -137,18 +136,13 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             lv_point_t src_pos; // position of the clip area origin within source image area
             src_pos.x = dest_area.x1 - dsc->blend_area->x1;
             src_pos.y = dest_area.y1 - dsc->blend_area->y1;
-            //zeroAlpha(src_buf, lv_area_get_size(dsc->blend_area));
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
-            lv_draw_stm32_dma2d_blend_map2(draw_ctx->buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
-            // test
-            //lv_draw_stm32_dma2d_blend_map(test_buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa); // THIS LINE CAUSES THE PROBLEM!
-            //compareBuffers(draw_ctx->buf, test_buf, &dest_area, 800);
-            // end test
+            lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_w, &dest_area, dsc->src_buf, src_w, &src_pos, dsc->opa);
             done = true;
         }
         else if(dsc->opa >= LV_OPA_MAX) {
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
-            lv_draw_stm32_dma2d_blend_fill2(draw_ctx->buf, dest_w, &dest_area, dsc->color);
+            lv_draw_stm32_dma2d_blend_fill(draw_ctx->buf, dest_w, &dest_area, dsc->color);
             done = true;
         }
     }
@@ -164,7 +158,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     lv_point_t src_pos;
     src_pos.x = dest_area->x1 - src_area->x1;
     src_pos.y = dest_area->y1 - src_area->y1;
-    lv_draw_stm32_dma2d_blend_map2(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_pos, LV_OPA_MAX);
+    lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_pos, LV_OPA_MAX);
 }
 
 static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * src_area, const void * src)
@@ -186,8 +180,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
             src_pos.x = dest_area.x1 - src_area->x1;
             src_pos.y = dest_area.y1 - src_area->y1;
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-            lv_draw_stm32_dma2d_blend_map2(draw_ctx->buf, dest_width, &dest_area, (lv_color_t *)img->data, img->header.w, &src_pos, dsc->opa);
-            //lv_draw_stm32_dma2d_blend_fill(draw_ctx->buf, dest_width, &dest_area, lv_color_hex3(lv_rand(0x000, 0xfff)));
+            lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_width, &dest_area, (lv_color_t *)img->data, img->header.w, &src_pos, dsc->opa);
 			return LV_RES_OK;
 		}
 	}
@@ -195,79 +188,45 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
 	return LV_RES_INV;
 }
 
-static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, lv_color_t color)
+static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride, const lv_area_t * dst_area, lv_color_t color)
 {
-    assert_param((uint32_t)dst_buf % 4 == 0);
-    assert_param((DMA2D->CR & DMA2D_CR_START) == 0U);
-    /*Simply fill an area*/
+    assert_param((uint32_t)dst_buf % CACHE_ROW_SIZE == 0);
     lv_coord_t draw_width = lv_area_get_width(dst_area);
     lv_coord_t draw_height = lv_area_get_height(dst_area);
+    
+    waitForDmaFransferToFinish();
     
     DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos; // Register-to-memory (no FG nor BG, only output stage active)
     
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->OMAR = (uint32_t)(dst_buf + (dst_width * dst_area->y1) + dst_area->x1);
+    DMA2D->OMAR = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
     DMA2D->OCOLR = color.full;
-    DMA2D->OOR = dst_width - draw_width; // out offset
+    DMA2D->OOR = dst_stride - draw_width; // out offset
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) & DMA2D_NLR_NL_Msk);
-
-    /* start transfer */
-    invalidateCache = true;
-    DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
-    DMA2D->CR |= DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START) != 0U);
-}
-
-static void lv_draw_stm32_dma2d_blend_map2(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa) {
-    assert_param((DMA2D->CR & DMA2D_CR_START) == 0U);
-    lv_coord_t area_w = lv_area_get_width(dst_area);
-    lv_coord_t area_h = lv_area_get_height(dst_area);
-    lv_color_t * dst_buf2 = (lv_color_t *)dst_buf + (dst_width * dst_area->y1) + dst_area->x1;
-    lv_color_t * src_buf2 = (lv_color_t *)src_buf + (src_width * src_pos->y) + src_pos->x;
-
-    while (area_h > 0) {
-        area_h--;
-        memcpy(dst_buf2, src_buf2, area_w * sizeof(lv_color_t));
-        src_buf2 += src_width;
-        dst_buf2 += dst_width;
-    }
     
-    invalidateCache = false;
+    startDmaFransfer();
 }
 
-static void lv_draw_stm32_dma2d_blend_fill2(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color)
+static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_stride, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_pos, lv_opa_t opa)
 {
-    lv_coord_t dest_w = lv_area_get_width(fill_area);
-    lv_coord_t dest_h = lv_area_get_height(fill_area);
-    lv_color_t * buf = (lv_color_t *)dest_buf;
-
-    while(dest_h > 0) {
-        dest_h--;
-        for (lv_coord_t x = 0; x < dest_w; x++) {
-            *buf = color;
-            buf++;
-        }
-        buf += dest_stride - dest_w;
-    }
-    invalidateCache = false;
-}
-
-static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
-{
-    assert_param((uint32_t)dst_buf % LV_IMG_PX_SIZE_ALPHA_BYTE == 0);
-    assert_param((uint32_t)src_buf % LV_IMG_PX_SIZE_ALPHA_BYTE == 0);
-    assert_param((DMA2D->CR & DMA2D_CR_START) == 0U);
+    assert_param((uint32_t)dst_buf % CACHE_ROW_SIZE == 0);
+    assert_param((uint32_t)src_buf % CACHE_ROW_SIZE == 0);
     lv_coord_t draw_width = lv_area_get_width(dst_area);
     lv_coord_t draw_height = lv_area_get_height(dst_area);
 
+    waitForDmaFransferToFinish();
+
     DMA2D->FGPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->FGMAR   = (uint32_t)(src_buf + (src_width * src_pos->y) + src_pos->x);
-    DMA2D->FGOR    = src_width - draw_width;
-    
+    DMA2D->FGMAR   = (uint32_t)(src_buf + (src_stride * src_pos->y) + src_pos->x);
+    DMA2D->FGOR    = src_stride - draw_width;
+    DMA2D->FGCOLR = 0;
+    clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height);
+
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->OMAR    = (uint32_t)(dst_buf + (dst_width * dst_area->y1) + dst_area->x1);
-    DMA2D->OOR     = dst_width - draw_width;
+    DMA2D->OMAR    = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
+    DMA2D->OOR     = dst_stride - draw_width;
+    DMA2D->OCOLR = 0;
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) & DMA2D_NLR_NL_Msk);
 
@@ -278,33 +237,44 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
         DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
         DMA2D->BGMAR = DMA2D->OMAR;
         DMA2D->BGOR = DMA2D->OOR;
+        DMA2D->BGCOLR = 0;
         clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
     }
 
-    clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height);
+    startDmaFransfer();
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+static void startDmaFransfer(void) {
     invalidateCache = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     DMA2D->CR |= DMA2D_CR_START;
-    while((DMA2D->CR & DMA2D_CR_START) != 0U);
+}
+
+static void waitForDmaFransferToFinish(void) {
+    while ((DMA2D->CR & DMA2D_CR_START) != 0U);
 }
 
 void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+
     if(disp->driver && disp->driver->wait_cb) {
         while((DMA2D->CR & DMA2D_CR_START) != 0U) {
             disp->driver->wait_cb(disp->driver);
         }
     }
     else {
-        while((DMA2D->CR & DMA2D_CR_START) != 0U);
+        waitForDmaFransferToFinish();
     }
     
     __IO uint32_t isrFlags = DMA2D->ISR;
 
-    if (isrFlags & DMA2D_FLAG_CE) {
+    if (isrFlags & DMA2D_ISR_CEIF) {
         printf("dma2d config error\n");
-    } else if (isrFlags & DMA2D_FLAG_TE) {
+    } else if (isrFlags & DMA2D_ISR_TEIF) {
         printf("dma2d transfer error\n");
     }
     
@@ -319,37 +289,29 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-#define CACHE_ROW_SIZE 32U // cache row size in Bytes
-#define PIXELS_PER_CACHE_ROW (CACHE_ROW_SIZE / LV_IMG_PX_SIZE_ALPHA_BYTE)
-
-// TODO: use if((SCB->CCR) & (uint32_t)SCB_CCR_DC_Msk)
 static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height)
 {
-    // int32_t dsize = 4*((height * width) + (height - 1 * offset));
-    // int32_t op_size = dsize + (address & (32U - 1U));
-    // DCCIMVAC((uint32_t*)address, op_size);
-    // return;
-
+    if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset); // in bytes
-    uint16_t lcrc = (width / PIXELS_PER_CACHE_ROW); // line cache row count
+    uint16_t ll = LV_IMG_PX_SIZE_ALPHA_BYTE * width; // line length in bytes
+    uint32_t n = 0; // address of the next cache row after the last invalidated
+    lv_coord_t h = 0;
+ 
     __DSB();
+    
+    while (h < height) {
+        uint32_t a = address + (h * stride);
+        uint32_t e = a + ll; // end address, address of the first byte after the current line
+        a &= ~(CACHE_ROW_SIZE - 1U);
+        if (a < n) a = n; // prevent the previous last cache row from being processed again
 
-    while (height > 0) {
-        height--;
-        uint32_t a = address + (height * stride);
-        //SCB->DCCMVAC = a; // clean the first line cache row first
-
-        for (uint16_t r = 0; r < lcrc; r++) {
+        while (a < e) {
             SCB->DCIMVAC = a;
             a += CACHE_ROW_SIZE;
         }
         
-        //SCB->DCCMVAC = a; // clean the last line cache row first
-        //SCB->DCIMVAC = a;
+        n = a;
+        h++;
     };
 
     __DSB();
@@ -358,25 +320,33 @@ static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t wid
 
 static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height)
 {
-    uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset);
-    uint16_t lcrc = (width / PIXELS_PER_CACHE_ROW); // line cache row count
-
+    if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
+    uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset); // in bytes
+    uint16_t ll = LV_IMG_PX_SIZE_ALPHA_BYTE * width; // line length in bytes
+    uint32_t n = 0; // address of the next cache row after the last one processed
+    lv_coord_t h = 0;
     __DSB();
-    
-    while (height > 0) {
-        height--;
-        uint32_t a = address + (height * stride);
-        
-        for (uint16_t r = 0; r < lcrc; r++) {
+
+    while (h < height) {
+        uint32_t a = address + (h * stride);
+        uint32_t e = a + ll; // end address, address of the first byte after the current line
+        a &= ~(CACHE_ROW_SIZE - 1U);
+        if (a < n) a = n; // prevent the previous last cache row from being processed again
+
+        while (a < e) {
             SCB->DCCMVAC = a;
             a += CACHE_ROW_SIZE;
         }
+        
+        n = a;
+        h++;
     };
 
     __DSB();
     __ISB();
 }
 
+/* test code
 static void zeroAlpha(const lv_color_t * buf, uint32_t length) {
     uint32_t * buf32 = (uint32_t *)buf;
     while (length > 0) {
@@ -441,5 +411,68 @@ static void compareBuffers(const lv_color_t* b1, const lv_color_t* b2, const lv_
         buf2 += stride - area_w;
     }
 }
+
+static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_width, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
+{
+    lv_coord_t area_w = lv_area_get_width(dst_area);
+    lv_coord_t area_h = lv_area_get_height(dst_area);
+    lv_color_t * dst_buf2 = (lv_color_t *)dst_buf + (dst_width * dst_area->y1) + dst_area->x1;
+    lv_color_t * src_buf2 = (lv_color_t *)src_buf + (src_width * src_pos->y) + src_pos->x;
+
+    while (area_h > 0) {
+        area_h--;
+        memcpy(dst_buf2, src_buf2, area_w * sizeof(lv_color_t));
+        src_buf2 += src_width;
+        dst_buf2 += dst_width;
+    }
+    
+    invalidateCache = false;
+}
+
+static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_stride, const lv_area_t * dst_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_pos, lv_opa_t opa)
+{
+    lv_coord_t area_w = lv_area_get_width(dst_area);
+    lv_coord_t area_h = lv_area_get_height(dst_area);
+    lv_color_t * dst_buf2 = (lv_color_t *)dst_buf + (dst_stride * dst_area->y1) + dst_area->x1;
+    lv_color_t * src_buf2 = (lv_color_t *)src_buf + (src_stride * src_pos->y) + src_pos->x;
+
+    while(area_h > 0) {
+        area_h--;
+        for (lv_coord_t x = 0; x < area_w; x++) {
+            lv_color_t fg_color = *src_buf2;
+            lv_color_t bg_color = *dst_buf2;
+            lv_color_t out;
+            // See: RM0410, 9.3.6 DMA2D blender (p. 286)
+            uint8_t a_multi = (fg_color.ch.alpha * bg_color.ch.alpha) / 255;
+            out.ch.alpha = fg_color.ch.alpha + bg_color.ch.alpha - a_multi;
+            out.ch.red = (fg_color.ch.red * fg_color.ch.alpha + bg_color.ch.red * bg_color.ch.alpha - bg_color.ch.red * a_multi) / out.ch.alpha;
+            out.ch.green = (fg_color.ch.green * fg_color.ch.alpha + bg_color.ch.green * bg_color.ch.alpha - bg_color.ch.green * a_multi) / out.ch.alpha;
+            out.ch.blue = (fg_color.ch.blue * fg_color.ch.alpha + bg_color.ch.blue * bg_color.ch.alpha - bg_color.ch.blue * a_multi) / out.ch.alpha;
+            *dst_buf2 = out;
+            dst_buf2++;
+            src_buf2++;
+        }
+        dst_buf2 += dst_stride - area_w;
+        src_buf += src_stride - area_w;
+    }
+}
+
+static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color)
+{
+    lv_coord_t dest_w = lv_area_get_width(fill_area);
+    lv_coord_t dest_h = lv_area_get_height(fill_area);
+    lv_color_t * buf = (lv_color_t *)dest_buf;
+
+    while(dest_h > 0) {
+        dest_h--;
+        for (lv_coord_t x = 0; x < dest_w; x++) {
+            *buf = color;
+            buf++;
+        }
+        buf += dest_stride - dest_w;
+    }
+    invalidateCache = false;
+}
+*/
 
 #endif
