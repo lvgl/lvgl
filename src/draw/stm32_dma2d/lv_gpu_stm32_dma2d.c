@@ -132,6 +132,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     invalidateCache = false;
 
     if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&dest_area) > 100) {
+        // note: draw_ctx->buf does NOT contain alpha channel bytes,
+        // alpha channel bytes are carried in dsc->mask_buf
         lv_coord_t dest_w = lv_area_get_width(draw_ctx->buf_area);
 
         if(dsc->src_buf != NULL) {
@@ -174,14 +176,12 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
 
     if(lv_img_src_get_type(src) == LV_IMG_SRC_VARIABLE) {
         lv_area_t dest_area;
-        /*Return if fully clipped*/
         if(!_lv_area_intersect(&dest_area, src_area, draw_ctx->clip_area)) return LV_RES_OK;
-        //return LV_RES_INV; // temp
         const lv_img_dsc_t * img = src;
 
         //if(img->header.cf == LV_IMG_CF_RGBA8888 && dsc->angle == 0 && dsc->zoom == 256) {
         if(img->header.cf == LV_IMG_CF_RGBA8888) {
-            // note: this code never runs
+            // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
             lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
             lv_point_t src_pos; // position of the clip area origin within source image area
             src_pos.x = dest_area.x1 - src_area->x1;
