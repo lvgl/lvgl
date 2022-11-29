@@ -53,7 +53,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_
                                         const void * src);
 static void invalidate_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
 static void clean_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
-static void waitForDmaTransferToFinish(void);
+static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv);
 static void startDmaTransfer(void);
 /*
 static void zeroAlpha(const lv_color_t * buf, uint32_t length);
@@ -203,14 +203,14 @@ static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
     lv_coord_t draw_width = lv_area_get_width(dst_area);
     lv_coord_t draw_height = lv_area_get_height(dst_area);
 
-    waitForDmaTransferToFinish();
+    waitForDmaTransferToFinish(NULL);
 
     DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos; // Register-to-memory (no FG nor BG, only output stage active)
 
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->OMAR = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
-    DMA2D->OOR = dst_stride - draw_width; // out offset
-    DMA2D->OCOLR = color.full;
+    DMA2D->OMAR   = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
+    DMA2D->OOR    = dst_stride - draw_width; // out offset
+    DMA2D->OCOLR  = color.full;
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) &
                                                                                     DMA2D_NLR_NL_Msk);
@@ -226,18 +226,18 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
     lv_coord_t draw_width = lv_area_get_width(dst_area);
     lv_coord_t draw_height = lv_area_get_height(dst_area);
 
-    waitForDmaTransferToFinish();
+    waitForDmaTransferToFinish(NULL);
 
     DMA2D->FGPFCCR = LV_DMA2D_COLOR_FORMAT;
     DMA2D->FGMAR   = (uint32_t)(src_buf + (src_stride * src_pos->y) + src_pos->x);
     DMA2D->FGOR    = src_stride - draw_width;
-    DMA2D->FGCOLR = 0;
+    DMA2D->FGCOLR  = 0;
     clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height);
 
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->OMAR    = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
-    DMA2D->OOR     = dst_stride - draw_width;
-    DMA2D->OCOLR = 0;
+    DMA2D->OMAR   = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
+    DMA2D->OOR    = dst_stride - draw_width;
+    DMA2D->OCOLR  = 0;
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) &
                                                                                     DMA2D_NLR_NL_Msk);
@@ -248,9 +248,9 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
     else {
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;
         DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
-        DMA2D->BGMAR = DMA2D->OMAR;
-        DMA2D->BGOR = DMA2D->OOR;
-        DMA2D->BGCOLR = 0;
+        DMA2D->BGMAR   = DMA2D->OMAR;
+        DMA2D->BGOR    = DMA2D->OOR;
+        DMA2D->BGCOLR  = 0;
         clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
     }
 
@@ -267,23 +267,21 @@ static void startDmaTransfer(void)
     DMA2D->CR |= DMA2D_CR_START;
 }
 
-static void waitForDmaTransferToFinish(void)
+static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
 {
-    while((DMA2D->CR & DMA2D_CR_START) != 0U);
+    if (disp_drv && disp_drv->wait_cb) {
+        while((DMA2D->CR & DMA2D_CR_START) != 0U) {
+            disp_drv->wait_cb(disp_drv);
+        }
+    } else {
+        while((DMA2D->CR & DMA2D_CR_START) != 0U);
+    }
 }
 
 void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-
-    if(disp->driver && disp->driver->wait_cb) {
-        while((DMA2D->CR & DMA2D_CR_START) != 0U) {
-            disp->driver->wait_cb(disp->driver);
-        }
-    }
-    else {
-        waitForDmaTransferToFinish();
-    }
+    waitForDmaTransferToFinish(disp->driver);
 
     __IO uint32_t isrFlags = DMA2D->ISR;
 
