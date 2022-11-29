@@ -31,6 +31,7 @@ typedef struct {
     void * user_data;       /*Set the the user_data set in `lv_msg_subscribe`*/
     void * _priv_data;      /*Used internally*/
     const void * payload;   /*Pointer to the data of the message*/
+	uint8_t _checked : 1;	/*Used internally to prevent multiple notifications*/
 } lv_msg_t;
 
 

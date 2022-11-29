@@ -39,6 +39,8 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool sub_dsc_deleted;
+static bool sub_dsc_created;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -47,6 +49,11 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_MSG
+#define MSG_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#else
+#define MSG_TRACE(...)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -68,6 +75,8 @@ void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * use
     s->msg_id = msg_id;
     s->callback = cb;
     s->user_data = user_data;
+    s->_checked = 1; // if subsribed during `notify`, it won't be notified immediately
+	sub_dsc_created = true;
     return s;
 }
 
@@ -89,6 +98,7 @@ void lv_msg_unsubscribe(void * s)
 {
     LV_ASSERT_NULL(s);
     _lv_ll_remove(&LV_GC_ROOT(_subs_ll), s);
+	sub_dsc_deleted = true;
     lv_free(s);
 }
 
@@ -136,16 +146,43 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e)
  *   STATIC FUNCTIONS
  **********************/
 
-static void notify(lv_msg_t * m)
-{
-    sub_dsc_t * s;
+static void notify(lv_msg_t * m) {
+    // First clear all sub_dsc_t checked flags
+    sub_dsc_t* s;
     _LV_LL_READ(&LV_GC_ROOT(_subs_ll), s) {
-        if(s->msg_id == m->id && s->callback) {
-            m->user_data = s->user_data;
-            m->_priv_data = s->_priv_data;
-            s->callback(m);
-        }
+        s->_checked = 0;
     }
+    
+    //Run all sub_dsc_t from the list
+    do {
+        sub_dsc_deleted = false;
+        sub_dsc_created = false;
+        s = _lv_ll_get_head(&LV_GC_ROOT(_subs_ll));
+        while (s) {
+            // get next element while current is surely valid
+            sub_dsc_t* next = _lv_ll_get_next(&LV_GC_ROOT(_subs_ll), s);
+
+            // Notify only once
+            if (!s->_checked) {
+                s->_checked = 1;
+
+                // Check if this sub_dsc_t is about this msg_id
+                if (s->msg_id == m->id && s->callback) {
+                    // Notify
+                    m->user_data    = s->user_data;
+                    m->_priv_data   = s->_priv_data;
+                    s->callback(s, m);
+                }
+            }
+
+            // Load next or restart
+            if (sub_dsc_created || sub_dsc_deleted) {
+                MSG_TRACE("At least one sub_dsc_t was created or deleted during notify");
+                break;
+            }
+            s = next;
+        }
+    } while (s);
 }
 
 static void obj_notify_cb(lv_msg_t * m)
