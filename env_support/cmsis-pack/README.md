@@ -123,9 +123,23 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
 
    
 
-10. Thoroughly remove the `3rd party libraries` section.
+10. Remove following macro definitions in the `3rd party libraries` section:
 
-11. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+    - \#define LV_USE_FS_STDIO 0
+    - \#define LV_USE_FS_POSIX 0
+    - \#define LV_USE_FS_WIN32 0
+    - \#define LV_USE_FS_FATFS 0
+    - \#define LV_USE_PNG 0
+    - \#define LV_USE_BMP 0
+    - \#define LV_USE_SJPG 0
+    - \#define LV_USE_GIF 0
+    - \#define LV_USE_QRCODE 0
+    - \#define LV_USE_FREETYPE 0
+    - \#define LV_USE_TINY_TTF 0
+    - \#define LV_USE_RLOTTIE 0
+    - \#define LV_USE_FFMPEG 0
+
+9. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 

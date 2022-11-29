@@ -36,7 +36,7 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-11-16" version="1.0.11-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.11-alpha.pack">
+    <release date="2022-11-28" version="1.0.11" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.11.pack">
       - LVGL 9.0.0-dev
       - Montyly update for November
     </release>
@@ -263,6 +263,7 @@
                 <file category="sourceC"            name="src/draw/sw/lv_draw_sw_dither.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_img.c" />
                 <file category="sourceC"            name="src/draw/lv_img_cache.c" />
+                <file category="sourceC"            name="src/draw/lv_img_cache_builtin.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_line.c" />
                 <file category="sourceC"            name="src/draw/lv_draw_triangle.c" />
                 <file category="sourceC"            name="src/draw/lv_draw.c" />
@@ -400,7 +401,7 @@
                 <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.4" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.5" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
@@ -454,7 +455,7 @@
             <component Cgroup="lvgl" Csub="GPU STM32-DMA2D"  condition="LVGL-Essential">
               <description>An hardware acceleration from STM32-DMA2D</description>
               <files>
-              <file category="sourceC"            name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c" />
+              <file category="sourceC"      name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c" />
               </files>
 
               <RTE_Components_h>
@@ -468,7 +469,7 @@
             <component Cgroup="lvgl" Csub="GPU SWM341-DMA2D"  condition="LVGL-Essential">
               <description>An hardware acceleration from SWM341-DMA2D</description>
               <files>
-              <file category="sourceC"            name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c" />
+              <file category="sourceC"      name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c" />
               </files>
 
               <RTE_Components_h>
@@ -482,10 +483,10 @@
             <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-Essential">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
-              <file category="sourceC"            name="src/draw/nxp/lv_gpu_nxp.c" />
-              <file category="sourceC"            name="src/draw/nxp/pxp/lv_draw_pxp_blend.c" />
-              <file category="sourceC"            name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c" />
-              <file category="sourceC"            name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c" />
+              <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
+              <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_blend.c" />
+              <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c" />
+              <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c" />
               </files>
 
               <RTE_Components_h>
@@ -499,11 +500,11 @@
             <component Cgroup="lvgl" Csub="GPU NXP-VGLite"  condition="LVGL-Essential">
               <description>An hardware acceleration from NXP-VGLite</description>
               <files>
-              <file category="sourceC"            name="src/draw/nxp/lv_gpu_nxp.c" />
-              <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
-              <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_blend.c" />
-              <file category="sourceC"            name="src/draw/nxp/vglite/lv_draw_vglite_rect.c" />
-              <file category="sourceC"            name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c" />
+              <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
+              <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
+              <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_blend.c" />
+              <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_rect.c" />
+              <file category="sourceC"      name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c" />
               </files>
 
               <RTE_Components_h>
@@ -517,7 +518,7 @@
             <component Cgroup="lvgl" Csub="GPU GD32-IPA"  condition="LVGL-Essential">
               <description>An hardware acceleration from GD32-IPA</description>
               <files>
-              <file category="sourceC"            name="src/draw/gd32_ipa/lv_gpu_gd32_ipa.c" />
+              <file category="sourceC"      name="src/draw/gd32_ipa/lv_gpu_gd32_ipa.c" />
               </files>
 
               <RTE_Components_h>
@@ -533,34 +534,34 @@
               <files>
 
                 <!-- src/themes -->
-                <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
-                <file category="sourceC"            name="src/themes/basic/lv_theme_basic.c" />
-                <file category="sourceC"            name="src/themes/mono/lv_theme_mono.c" />
+                <file category="sourceC"    name="src/themes/default/lv_theme_default.c" />
+                <file category="sourceC"    name="src/themes/basic/lv_theme_basic.c" />
+                <file category="sourceC"    name="src/themes/mono/lv_theme_mono.c" />
 
                 <!-- src/widgets -->
-                <file category="sourceC"            name="src/widgets/animimg/lv_animimg.c" />
-                <file category="sourceC"            name="src/widgets/calendar/lv_calendar.c" />
-                <file category="sourceC"            name="src/widgets/calendar/lv_calendar_header_arrow.c" />
-                <file category="sourceC"            name="src/widgets/calendar/lv_calendar_header_dropdown.c" />
-                <file category="sourceC"            name="src/widgets/chart/lv_chart.c" />
-                <file category="sourceC"            name="src/widgets/colorwheel/lv_colorwheel.c" />
-                <file category="sourceC"            name="src/widgets/imgbtn/lv_imgbtn.c" />
-                <file category="sourceC"            name="src/widgets/keyboard/lv_keyboard.c" />
-                <file category="sourceC"            name="src/widgets/led/lv_led.c" />
-                <file category="sourceC"            name="src/widgets/list/lv_list.c" />
-                <file category="sourceC"            name="src/widgets/menu/lv_menu.c" />
-                <file category="sourceC"            name="src/widgets/meter/lv_meter.c" />
-                <file category="sourceC"            name="src/widgets/msgbox/lv_msgbox.c" />
-                <file category="sourceC"            name="src/widgets/span/lv_span.c" />
-                <file category="sourceC"            name="src/widgets/spinbox/lv_spinbox.c" />
-                <file category="sourceC"            name="src/widgets/spinner/lv_spinner.c" />
-                <file category="sourceC"            name="src/widgets/tabview/lv_tabview.c" />
-                <file category="sourceC"            name="src/widgets/tileview/lv_tileview.c" />
-                <file category="sourceC"            name="src/widgets/win/lv_win.c" />
+                <file category="sourceC"    name="src/widgets/animimg/lv_animimg.c" />
+                <file category="sourceC"    name="src/widgets/calendar/lv_calendar.c" />
+                <file category="sourceC"    name="src/widgets/calendar/lv_calendar_header_arrow.c" />
+                <file category="sourceC"    name="src/widgets/calendar/lv_calendar_header_dropdown.c" />
+                <file category="sourceC"    name="src/widgets/chart/lv_chart.c" />
+                <file category="sourceC"    name="src/widgets/colorwheel/lv_colorwheel.c" />
+                <file category="sourceC"    name="src/widgets/imgbtn/lv_imgbtn.c" />
+                <file category="sourceC"    name="src/widgets/keyboard/lv_keyboard.c" />
+                <file category="sourceC"    name="src/widgets/led/lv_led.c" />
+                <file category="sourceC"    name="src/widgets/list/lv_list.c" />
+                <file category="sourceC"    name="src/widgets/menu/lv_menu.c" />
+                <file category="sourceC"    name="src/widgets/meter/lv_meter.c" />
+                <file category="sourceC"    name="src/widgets/msgbox/lv_msgbox.c" />
+                <file category="sourceC"    name="src/widgets/span/lv_span.c" />
+                <file category="sourceC"    name="src/widgets/spinbox/lv_spinbox.c" />
+                <file category="sourceC"    name="src/widgets/spinner/lv_spinner.c" />
+                <file category="sourceC"    name="src/widgets/tabview/lv_tabview.c" />
+                <file category="sourceC"    name="src/widgets/tileview/lv_tileview.c" />
+                <file category="sourceC"    name="src/widgets/win/lv_win.c" />
 
                 <!-- src/layouts -->
-                <file category="sourceC"            name="src/layouts/flex/lv_flex.c" />
-                <file category="sourceC"            name="src/layouts/grid/lv_grid.c" />
+                <file category="sourceC"    name="src/layouts/flex/lv_flex.c" />
+                <file category="sourceC"    name="src/layouts/grid/lv_grid.c" />
               </files>
 
               <RTE_Components_h>
@@ -574,15 +575,15 @@
             <component Cgroup="lvgl" Csub="PikaScript Binding" Cversion="0.2.0" condition="LVGL-Essential">
               <description>Add the binding for PikaScript, an ultra-light-weight python VM.</description>
               <files>
-                <file category="doc"      name="pikascript/README.md"/>
-                <file category="sourceC"  name="pikascript/pika_lvgl.c" />
-                <file category="sourceC"  name="pikascript/pika_lvgl_indev_t.c" />
-                <file category="sourceC"  name="pikascript/pika_lvgl_lv_event.c" />
-                <file category="sourceC"  name="pikascript/pika_lvgl_lv_obj.c" />
-                <file category="sourceC"  name="pikascript/pika_lvgl_lv_style_t.c" />
-                <file category="sourceC"  name="pikascript/pika_lv_point_t.c" />
-                <file category="sourceC"  name="pikascript/pika_lv_timer_t.c" />
-                <file category="sourceC"  name="pikascript/pika_lv_wegit.c" />
+                <file category="doc"        name="pikascript/README.md"/>
+                <file category="sourceC"    name="pikascript/pika_lvgl.c" />
+                <file category="sourceC"    name="pikascript/pika_lvgl_indev_t.c" />
+                <file category="sourceC"    name="pikascript/pika_lvgl_lv_event.c" />
+                <file category="sourceC"    name="pikascript/pika_lvgl_lv_obj.c" />
+                <file category="sourceC"    name="pikascript/pika_lvgl_lv_style_t.c" />
+                <file category="sourceC"    name="pikascript/pika_lv_point_t.c" />
+                <file category="sourceC"    name="pikascript/pika_lv_timer_t.c" />
+                <file category="sourceC"    name="pikascript/pika_lv_wegit.c" />
               </files>
               <Pre_Include_Local_Component_h>
 
@@ -601,8 +602,8 @@
               <description>Add PNG support</description>
               <files>
                 <!-- src/libs/png -->
-                <file category="sourceC"            name="src/libs/png/lodepng.c" />
-                <file category="sourceC"            name="src/libs/png/lv_png.c" />
+                <file category="sourceC"    name="src/libs/png/lodepng.c" />
+                <file category="sourceC"    name="src/libs/png/lv_png.c" />
               </files>
 
               <RTE_Components_h>
@@ -617,7 +618,7 @@
               <description>Add BMP support</description>
               <files>
                 <!-- src/libs/bmp -->
-                <file category="sourceC"            name="src/libs/bmp/lv_bmp.c" />
+                <file category="sourceC"    name="src/libs/bmp/lv_bmp.c" />
               </files>
 
               <RTE_Components_h>
@@ -632,7 +633,11 @@
               <description>Add freetype support, an extra librbary is required.</description>
               <files>
                 <!-- src/libs/freetype -->
-                <file category="sourceC"            name="src/libs/freetype/lv_freetype.c" />
+                <file category="sourceC"    name="src/libs/freetype/lv_freetype.c" />
+                <file category="header"     name="src/libs/freetype/lv_freetype.h" />
+                <file category="sourceC"    name="src/libs/freetype/lv_ftsystem.c" />
+                <file category="header"     name="src/libs/freetype/ftmodule.h" />
+                <file category="header"     name="src/libs/freetype/ftoption.h" />
               </files>
 
               <RTE_Components_h>
@@ -647,8 +652,8 @@
               <description>Add GIF support</description>
               <files>
                 <!-- src/libs/gif -->
-                <file category="sourceC"            name="src/libs/gif/lv_gif.c" />
-                <file category="sourceC"            name="src/libs/gif/gifdec.c" />
+                <file category="sourceC"    name="src/libs/gif/lv_gif.c" />
+                <file category="sourceC"    name="src/libs/gif/gifdec.c" />
               </files>
 
               <RTE_Components_h>
@@ -663,8 +668,8 @@
               <description>Add sJPG support</description>
               <files>
                 <!-- src/libs/sjpg -->
-                <file category="sourceC"            name="src/libs/sjpg/lv_sjpg.c" />
-                <file category="sourceC"            name="src/libs/sjpg/tjpgd.c" />
+                <file category="sourceC"    name="src/libs/sjpg/lv_sjpg.c" />
+                <file category="sourceC"    name="src/libs/sjpg/tjpgd.c" />
               </files>
 
               <RTE_Components_h>
@@ -679,8 +684,8 @@
               <description>Add QRCode support</description>
               <files>
                 <!-- src/libs/qrcode -->
-                <file category="sourceC"            name="src/libs/qrcode/lv_qrcode.c" />
-                <file category="sourceC"            name="src/libs/qrcode/qrcodegen.c" />
+                <file category="sourceC"    name="src/libs/qrcode/lv_qrcode.c" />
+                <file category="sourceC"    name="src/libs/qrcode/qrcodegen.c" />
               </files>
 
               <RTE_Components_h>
@@ -695,9 +700,9 @@
               <description>Add FileSystem support</description>
               <files>
                 <!-- src/libs/fsdrv -->
-                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_fatfs.c" />
-                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_posix.c" />
-                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_stdio.c" />
+                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_fatfs.c" />
+                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_posix.c" />
+                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_stdio.c" />
               </files>
 
             </component>
@@ -706,7 +711,7 @@
               <description>Add RLOTTIE support, an extra librbary is required.</description>
               <files>
                 <!-- src/libs/rlottie -->
-                <file category="sourceC"            name="src/libs/rlottie/lv_rlottie.c" />
+                <file category="sourceC"    name="src/libs/rlottie/lv_rlottie.c" />
               </files>
 
               <RTE_Components_h>
@@ -721,7 +726,7 @@
               <description>Add ffmpeg support, an extra librbary is required.</description>
               <files>
                 <!-- src/libs/ffmpeg -->
-                <file category="sourceC"            name="src/libs/ffmpeg/lv_ffmpeg.c" />
+                <file category="sourceC"    name="src/libs/ffmpeg/lv_ffmpeg.c" />
               </files>
 
               <RTE_Components_h>
@@ -736,7 +741,7 @@
               <description>Add Pinyin input method</description>
               <files>
                 <!-- src/others/ime -->
-                <file category="sourceC"            name="src/others/ime/lv_ime_pinyin.c" />
+                <file category="sourceC"    name="src/others/ime/lv_ime_pinyin.c" />
               </files>
 
               <RTE_Components_h>
@@ -751,8 +756,8 @@
               <description>Add Pinyin input method</description>
               <files>
                 <!-- src/others/file_explorer -->
-                <file category="sourceC"            name="src/others/file_explorer/lv_file_explorer.c" />
-                <file category="header"             name="src/others/file_explorer/lv_file_explorer.h" />
+                <file category="sourceC"    name="src/others/file_explorer/lv_file_explorer.c" />
+                <file category="header"     name="src/others/file_explorer/lv_file_explorer.h" />
               </files>
 
               <RTE_Components_h>
@@ -767,10 +772,10 @@
               <description>Add tiny ttf support</description>
               <files>
                 <!-- src/libs/tiny_ttf -->
-                <file category="sourceC"            name="src/libs/tiny_ttf/lv_tiny_ttf.c" />
-                <file category="header"             name="src/libs/tiny_ttf/lv_tiny_ttf.h" />
+                <file category="sourceC"    name="src/libs/tiny_ttf/lv_tiny_ttf.c" />
+                <file category="header"     name="src/libs/tiny_ttf/lv_tiny_ttf.h" />
                 <!-- src/libs/fsdrv -->
-                <file category="sourceC"            name="src/libs/fsdrv/lv_fs_cbfs.c" />
+                <file category="sourceC"    name="src/libs/fsdrv/lv_fs_cbfs.c" />
               </files>
 
               <RTE_Components_h>
@@ -785,21 +790,21 @@
               <description>Add the official benchmark.</description>
               <files>
                 <!-- demos/benchmark -->
-                <file category="sourceC"            name="demos/benchmark/lv_demo_benchmark.c" />
-                <file category="header"            name="demos/benchmark/lv_demo_benchmark.h" />
+                <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
+                <file category="header"     name="demos/benchmark/lv_demo_benchmark.h" />
 
-                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_alpha16.c" />
-                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
-                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_chroma_keyed.c" />
-                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
-                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
-                <file category="sourceC"            name="demos/benchmark/assets/img_benchmark_cogwheel_rgb565a8.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_alpha16.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_chroma_keyed.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_rgb565a8.c" />
 
-                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c" />
-                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c" />
-                <file category="sourceC"            name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c" />
 
-                <file category="doc"            name="demos/benchmark/README.md" />
+                <file category="doc"        name="demos/benchmark/README.md" />
               </files>
 
               <RTE_Components_h>
@@ -814,12 +819,12 @@
               <description>Add the demo:widgets</description>
               <files>
                 <!-- demos/widgets -->
-                <file category="sourceC"            name="demos/widgets/lv_demo_widgets.c" />
-                <file category="header"             name="demos/widgets/lv_demo_widgets.h" />
+                <file category="sourceC"    name="demos/widgets/lv_demo_widgets.c" />
+                <file category="header"     name="demos/widgets/lv_demo_widgets.h" />
 
-                <file category="sourceC"            name="demos/widgets/assets/img_clothes.c" />
-                <file category="sourceC"            name="demos/widgets/assets/img_demo_widgets_avatar.c" />
-                <file category="sourceC"            name="demos/widgets/assets/img_lvgl_logo.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_clothes.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_demo_widgets_avatar.c" />
+                <file category="sourceC"    name="demos/widgets/assets/img_lvgl_logo.c" />
               </files>
 
               <RTE_Components_h>
