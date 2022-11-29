@@ -338,6 +338,11 @@ menu "LVGL configuration"
 				bool "Enable/Disable LV_LOG_TRACE in anim module"
 				default y
 				depends on LV_USE_LOG
+			
+			config LV_LOG_TRACE_MSG
+				bool "Enable/Disable LV_LOG_TRACE in msg module"
+				default y
+				depends on LV_USE_LOG
 		endmenu
 
 		menu "Asserts"
