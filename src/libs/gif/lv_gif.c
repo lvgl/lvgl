@@ -99,6 +99,8 @@ void lv_gif_restart(lv_obj_t * obj)
 {
     lv_gif_t * gifobj = (lv_gif_t *) obj;
     gd_rewind(gifobj->gif);
+    lv_timer_resume(gifobj->timer);
+    lv_timer_reset(gifobj->timer);
 }
 
 /**********************
@@ -138,6 +140,7 @@ static void next_frame_task_cb(lv_timer_t * t)
         /*It was the last repeat*/
         if(gifobj->gif->loop_count <= 1) {
             lv_res_t res = lv_event_send(obj, LV_EVENT_READY, NULL);
+            lv_timer_pause(t);
             if(res != LV_FS_RES_OK) return;
         }
         else {
