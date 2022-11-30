@@ -179,11 +179,10 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
         if(!_lv_area_intersect(&dest_area, src_area, draw_ctx->clip_area)) return LV_RES_OK;
         const lv_img_dsc_t * img = src;
 
-        //if(img->header.cf == LV_IMG_CF_RGBA8888 && dsc->angle == 0 && dsc->zoom == 256) {
-        if(img->header.cf == LV_IMG_CF_RGBA8888) {
+        if(img->header.cf == LV_IMG_CF_RGBA8888 && dsc->angle == 0 && dsc->zoom == 256) {
             // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
             lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-            lv_point_t src_pos; // position of the clip area origin within source image area
+            lv_point_t src_pos; // position of the clip area origin within the source image area
             src_pos.x = dest_area.x1 - src_area->x1;
             src_pos.y = dest_area.y1 - src_area->y1;
             lv_area_move(&dest_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
@@ -273,7 +272,8 @@ static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
         while((DMA2D->CR & DMA2D_CR_START) != 0U) {
             disp_drv->wait_cb(disp_drv);
         }
-    } else {
+    }
+    else {
         while((DMA2D->CR & DMA2D_CR_START) != 0U);
     }
 }
@@ -286,10 +286,11 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     __IO uint32_t isrFlags = DMA2D->ISR;
 
     if(isrFlags & DMA2D_ISR_CEIF) {
-        printf("dma2d config error\n");
+        printf("DMA2D config error\n");
     }
-    else if(isrFlags & DMA2D_ISR_TEIF) {
-        printf("dma2d transfer error\n");
+    
+    if(isrFlags & DMA2D_ISR_TEIF) {
+        printf("DMA2D transfer error\n");
     }
 
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
