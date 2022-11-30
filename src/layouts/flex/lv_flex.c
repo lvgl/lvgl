@@ -61,6 +61,8 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 static void place_content(lv_flex_align_t place, lv_coord_t max_size, lv_coord_t content_size, lv_coord_t item_cnt,
                           lv_coord_t * start_pos, lv_coord_t * gap);
 static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
+static lv_coord_t lv_obj_get_width_with_margin(const lv_obj_t * obj);
+static lv_coord_t lv_obj_get_height_with_margin(const lv_obj_t * obj);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -327,8 +329,9 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
     if(f->wrap && ((f->row && w_set == LV_SIZE_CONTENT) || (!f->row && h_set == LV_SIZE_CONTENT))) {
         f->wrap = false;
     }
-    lv_coord_t(*get_main_size)(const lv_obj_t *) = (f->row ? lv_obj_get_width : lv_obj_get_height);
-    lv_coord_t(*get_cross_size)(const lv_obj_t *) = (!f->row ? lv_obj_get_width : lv_obj_get_height);
+    lv_coord_t(*get_main_size)(const lv_obj_t *) = (f->row ? lv_obj_get_width_with_margin : lv_obj_get_height_with_margin);
+    lv_coord_t(*get_cross_size)(const lv_obj_t *) = (!f->row ? lv_obj_get_width_with_margin :
+                                                     lv_obj_get_height_with_margin);
 
     t->track_main_size = 0;
     t->track_fix_main_size = 0;
@@ -407,6 +410,12 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     void (*area_set_main_size)(lv_area_t *, lv_coord_t) = (f->row ? lv_area_set_width : lv_area_set_height);
     lv_coord_t (*area_get_main_size)(const lv_area_t *) = (f->row ? lv_area_get_width : lv_area_get_height);
     lv_coord_t (*area_get_cross_size)(const lv_area_t *) = (!f->row ? lv_area_get_width : lv_area_get_height);
+
+    typedef lv_coord_t (*margin_func_t)(const struct _lv_obj_t *, uint32_t);
+    margin_func_t get_margin_main_start = (f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
+    margin_func_t get_margin_main_end = (f->row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
+    margin_func_t get_margin_cross_start = (!f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
+    margin_func_t get_margin_cross_end = (!f->row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
 
     /*Calculate the size of grow items first*/
     uint32_t i;
@@ -500,11 +509,14 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                 /*Round up the cross size to avoid rounding error when dividing by 2
                  *The issue comes up e,g, with column direction with center cross direction if an element's width changes*/
                 cross_pos = (((t->track_cross_size + 1) & (~1)) - area_get_cross_size(&item->coords)) / 2;
+                cross_pos += (get_margin_cross_start(item, LV_PART_MAIN) - get_margin_cross_end(item, LV_PART_MAIN)) / 2;
                 break;
             case LV_FLEX_ALIGN_END:
                 cross_pos = t->track_cross_size - area_get_cross_size(&item->coords);
+                cross_pos -= get_margin_cross_end(item, LV_PART_MAIN);
                 break;
             default:
+                cross_pos += get_margin_cross_start(item, LV_PART_MAIN);
                 break;
         }
 
@@ -521,8 +533,8 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
         lv_coord_t diff_x = abs_x - item->coords.x1 + tr_x;
         lv_coord_t diff_y = abs_y - item->coords.y1 + tr_y;
-        diff_x += f->row ? main_pos : cross_pos;
-        diff_y += f->row ? cross_pos : main_pos;
+        diff_x += f->row ? main_pos + get_margin_main_start(item, LV_PART_MAIN) : cross_pos;
+        diff_y += f->row ? cross_pos : main_pos + get_margin_main_start(item, LV_PART_MAIN);
 
         if(diff_x || diff_y) {
             lv_obj_invalidate(item);
@@ -534,7 +546,9 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
             lv_obj_move_children_by(item, diff_x, diff_y, false);
         }
 
-        if(!(f->row && rtl)) main_pos += area_get_main_size(&item->coords) + item_gap + place_gap;
+        if(!(f->row && rtl)) main_pos += area_get_main_size(&item->coords) + item_gap + place_gap
+                                             + get_margin_main_start(item, LV_PART_MAIN)
+                                             + get_margin_main_end(item, LV_PART_MAIN);
         else main_pos -= item_gap + place_gap;
 
         item = get_next_item(cont, f->rev, &item_first_id);
@@ -596,6 +610,20 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id)
         if((*item_id) < (int32_t)cont->spec_attr->child_cnt) return cont->spec_attr->children[*item_id];
         else return NULL;
     }
+}
+
+static lv_coord_t lv_obj_get_width_with_margin(const lv_obj_t * obj)
+{
+    return lv_obj_get_style_margin_left(obj, LV_PART_MAIN)
+           + lv_obj_get_width(obj)
+           + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+}
+
+static lv_coord_t lv_obj_get_height_with_margin(const lv_obj_t * obj)
+{
+    return lv_obj_get_style_margin_top(obj, LV_PART_MAIN)
+           + lv_obj_get_height(obj)
+           + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 }
 
 #endif /*LV_USE_FLEX*/
