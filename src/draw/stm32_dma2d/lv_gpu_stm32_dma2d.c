@@ -232,6 +232,7 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
     if(opa >= LV_OPA_MAX) {
         //DMA2D->CR = 0; // Memory-to-memory (FG fetch only)
         DMA2D->CR = 0x1UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with PFC (FG fetch only with FG PFC active)
+        DMA2D->FGPFCCR |= (0xFF << DMA2D_FGPFCCR_ALPHA_Pos); // not needed
     } else {
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
