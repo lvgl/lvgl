@@ -73,6 +73,11 @@ lv_style_prop_t LV_STYLE_FLEX_MAIN_PLACE;
 lv_style_prop_t LV_STYLE_FLEX_CROSS_PLACE;
 lv_style_prop_t LV_STYLE_FLEX_TRACK_PLACE;
 lv_style_prop_t LV_STYLE_FLEX_GROW;
+lv_style_prop_t LV_STYLE_FLEX_MARGIN_LEFT;
+lv_style_prop_t LV_STYLE_FLEX_MARGIN_TOP;
+lv_style_prop_t LV_STYLE_FLEX_MARGIN_RIGHT;
+lv_style_prop_t LV_STYLE_FLEX_MARGIN_BOTTOM;
+
 
 /**********************
  *  STATIC VARIABLES
@@ -103,6 +108,11 @@ void lv_flex_init(void)
     LV_STYLE_FLEX_MAIN_PLACE = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
     LV_STYLE_FLEX_CROSS_PLACE = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
     LV_STYLE_FLEX_TRACK_PLACE = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
+
+    LV_STYLE_FLEX_MARGIN_LEFT = lv_style_register_prop(LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
+    LV_STYLE_FLEX_MARGIN_TOP = lv_style_register_prop(LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
+    LV_STYLE_FLEX_MARGIN_RIGHT = lv_style_register_prop(LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
+    LV_STYLE_FLEX_MARGIN_BOTTOM = lv_style_register_prop(LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
 }
 
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)
@@ -167,6 +177,37 @@ void lv_style_set_flex_grow(lv_style_t * style, uint8_t value)
     lv_style_set_prop(style, LV_STYLE_FLEX_GROW, v);
 }
 
+void lv_style_set_flex_margin_top(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_MARGIN_TOP, v);
+}
+
+void lv_style_set_flex_margin_bottom(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_MARGIN_BOTTOM, v);
+}
+
+void lv_style_set_flex_margin_left(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_MARGIN_LEFT, v);
+}
+
+void lv_style_set_flex_margin_right(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_FLEX_MARGIN_RIGHT, v);
+}
 
 void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector)
 {
@@ -207,6 +248,39 @@ void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_GROW, v, selector);
 }
+
+void lv_obj_set_style_flex_margin_top(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_MARGIN_TOP, v, selector);
+}
+
+void lv_obj_set_style_flex_margin_bottom(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_MARGIN_BOTTOM, v, selector);
+}
+
+void lv_obj_set_style_flex_margin_left(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_MARGIN_LEFT, v, selector);
+}
+
+void lv_obj_set_style_flex_margin_right(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_MARGIN_RIGHT, v, selector);
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -412,10 +486,10 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     lv_coord_t (*area_get_cross_size)(const lv_area_t *) = (!f->row ? lv_area_get_width : lv_area_get_height);
 
     typedef lv_coord_t (*margin_func_t)(const struct _lv_obj_t *, uint32_t);
-    margin_func_t get_margin_main_start = (f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
-    margin_func_t get_margin_main_end = (f->row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
-    margin_func_t get_margin_cross_start = (!f->row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
-    margin_func_t get_margin_cross_end = (!f->row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
+    margin_func_t get_margin_main_start = (f->row ? lv_obj_get_style_flex_margin_left : lv_obj_get_style_flex_margin_top);
+    margin_func_t get_margin_main_end = (f->row ? lv_obj_get_style_flex_margin_right : lv_obj_get_style_flex_margin_bottom);
+    margin_func_t get_margin_cross_start = (!f->row ? lv_obj_get_style_flex_margin_left : lv_obj_get_style_flex_margin_top);
+    margin_func_t get_margin_cross_end = (!f->row ? lv_obj_get_style_flex_margin_right : lv_obj_get_style_flex_margin_bottom);
 
     /*Calculate the size of grow items first*/
     uint32_t i;
@@ -614,16 +688,16 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id)
 
 static lv_coord_t lv_obj_get_width_with_margin(const lv_obj_t * obj)
 {
-    return lv_obj_get_style_margin_left(obj, LV_PART_MAIN)
+    return lv_obj_get_style_flex_margin_left(obj, LV_PART_MAIN)
            + lv_obj_get_width(obj)
-           + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+           + lv_obj_get_style_flex_margin_right(obj, LV_PART_MAIN);
 }
 
 static lv_coord_t lv_obj_get_height_with_margin(const lv_obj_t * obj)
 {
-    return lv_obj_get_style_margin_top(obj, LV_PART_MAIN)
+    return lv_obj_get_style_flex_margin_top(obj, LV_PART_MAIN)
            + lv_obj_get_height(obj)
-           + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
+           + lv_obj_get_style_flex_margin_bottom(obj, LV_PART_MAIN);
 }
 
 #endif /*LV_USE_FLEX*/

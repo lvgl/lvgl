@@ -63,6 +63,10 @@ extern lv_style_prop_t LV_STYLE_FLEX_MAIN_PLACE;
 extern lv_style_prop_t LV_STYLE_FLEX_CROSS_PLACE;
 extern lv_style_prop_t LV_STYLE_FLEX_TRACK_PLACE;
 extern lv_style_prop_t LV_STYLE_FLEX_GROW;
+extern lv_style_prop_t LV_STYLE_FLEX_MARGIN_LEFT;
+extern lv_style_prop_t LV_STYLE_FLEX_MARGIN_TOP;
+extern lv_style_prop_t LV_STYLE_FLEX_MARGIN_RIGHT;
+extern lv_style_prop_t LV_STYLE_FLEX_MARGIN_BOTTOM;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -103,11 +107,19 @@ void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value);
 void lv_style_set_flex_cross_place(lv_style_t * style, lv_flex_align_t value);
 void lv_style_set_flex_track_place(lv_style_t * style, lv_flex_align_t value);
 void lv_style_set_flex_grow(lv_style_t * style, uint8_t value);
+void lv_style_set_flex_margin_left(lv_style_t * style, lv_coord_t value);
+void lv_style_set_flex_margin_top(lv_style_t * style, lv_coord_t value);
+void lv_style_set_flex_margin_right(lv_style_t * style, lv_coord_t value);
+void lv_style_set_flex_margin_bottom(lv_style_t * style, lv_coord_t value);
 void lv_obj_set_style_flex_flow(lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector);
 void lv_obj_set_style_flex_main_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
 void lv_obj_set_style_flex_cross_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
 void lv_obj_set_style_flex_track_place(lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
 void lv_obj_set_style_flex_grow(lv_obj_t * obj, uint8_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_margin_left(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_margin_top(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_margin_right(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_margin_bottom(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 
 static inline lv_flex_flow_t lv_obj_get_style_flex_flow(const lv_obj_t * obj, uint32_t part)
 {
@@ -139,6 +151,30 @@ static inline uint8_t lv_obj_get_style_flex_grow(const lv_obj_t * obj, uint32_t 
     return (uint8_t)v.num;
 }
 
+static inline lv_coord_t lv_obj_get_style_flex_margin_top(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_MARGIN_TOP);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_flex_margin_bottom(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_MARGIN_BOTTOM);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_flex_margin_left(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_MARGIN_LEFT);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_flex_margin_right(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_MARGIN_RIGHT);
+    return (lv_coord_t)v.num;
+}
+
 /**********************
  *      MACROS
  **********************/
@@ -161,6 +197,26 @@ static inline uint8_t lv_obj_get_style_flex_grow(const lv_obj_t * obj, uint32_t 
 #define LV_STYLE_CONST_FLEX_CROSS_PLACE(val) \
     { \
         .prop_ptr = &LV_STYLE_FLEX_CROSS_PLACE, .value = { .num = (lv_flex_flow_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_MARGIN_TOP(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_MARGIN_TOP, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_MARGIN_BOTTOM(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_MARGIN_BOTTOM, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_MARGIN_LEFT(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_MARGIN_LEFT, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_MARGIN_RIGHT(val) \
+    { \
+        .prop_ptr = &LV_STYLE_FLEX_MARGIN_RIGHT, .value = { .num = (int32_t)val } \
     }
 
 
