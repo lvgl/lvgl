@@ -120,7 +120,7 @@ static void ctrl_pad_spinbox_event_handler(lv_event_t * e)
 {
     view_t * ui = lv_event_get_user_data(e);
     lv_obj_t * spinbox = lv_event_get_target(e);
-    lv_style_prop_t prop = (lv_uintptr_t)lv_obj_get_user_data(spinbox);
+    lv_style_prop_t prop = (lv_style_prop_t)(lv_uintptr_t)lv_obj_get_user_data(spinbox);
 
     lv_style_value_t v = {
         .num = (int32_t)lv_spinbox_get_value(spinbox)
