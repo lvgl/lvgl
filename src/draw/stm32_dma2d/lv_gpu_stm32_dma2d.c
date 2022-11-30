@@ -228,6 +228,15 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
     waitForDmaTransferToFinish(NULL);
 
     DMA2D->FGPFCCR = LV_DMA2D_COLOR_FORMAT;
+    
+    if(opa >= LV_OPA_MAX) {
+        //DMA2D->CR = 0; // Memory-to-memory (FG fetch only)
+        DMA2D->CR = 0x1UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with PFC (FG fetch only with FG PFC active)
+    } else {
+        DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
+        DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
+    }
+
     DMA2D->FGMAR   = (uint32_t)(src_buf + (src_stride * src_pos->y) + src_pos->x);
     DMA2D->FGOR    = src_stride - draw_width;
     DMA2D->FGCOLR  = 0;
@@ -240,18 +249,12 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) &
                                                                                     DMA2D_NLR_NL_Msk);
-
-    if(opa >= LV_OPA_MAX) {
-        DMA2D->CR = 0;
-    }
-    else {
-        DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;
-        DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
-        DMA2D->BGMAR   = DMA2D->OMAR;
-        DMA2D->BGOR    = DMA2D->OOR;
-        DMA2D->BGCOLR  = 0;
-        clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
-    }
+    
+    DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
+    DMA2D->BGMAR   = DMA2D->OMAR;
+    DMA2D->BGOR    = DMA2D->OOR;
+    DMA2D->BGCOLR  = 0;
+    clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
 
     startDmaTransfer();
 }
@@ -310,7 +313,7 @@ static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t wid
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset); // in bytes
     uint16_t ll = LV_IMG_PX_SIZE_ALPHA_BYTE * width; // line length in bytes
-    uint32_t n = 0; // address of the next cache row after the last invalidated
+    uint32_t n = 0; // address of the next cache row after the last invalidated row
     lv_coord_t h = 0;
 
     __DSB();
@@ -319,7 +322,7 @@ static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t wid
         uint32_t a = address + (h * stride);
         uint32_t e = a + ll; // end address, address of the first byte after the current line
         a &= ~(CACHE_ROW_SIZE - 1U);
-        if(a < n) a = n;  // prevent the previous last cache row from being processed again
+        if(a < n) a = n;  // prevent the previous last cache row from being invalidated again
 
         while(a < e) {
             SCB->DCIMVAC = a;
@@ -339,7 +342,7 @@ static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, l
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset); // in bytes
     uint16_t ll = LV_IMG_PX_SIZE_ALPHA_BYTE * width; // line length in bytes
-    uint32_t n = 0; // address of the next cache row after the last one processed
+    uint32_t n = 0; // address of the next cache row after the last cleaned row
     lv_coord_t h = 0;
     __DSB();
 
@@ -347,7 +350,7 @@ static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, l
         uint32_t a = address + (h * stride);
         uint32_t e = a + ll; // end address, address of the first byte after the current line
         a &= ~(CACHE_ROW_SIZE - 1U);
-        if(a < n) a = n;  // prevent the previous last cache row from being processed again
+        if(a < n) a = n;  // prevent the previous last cache row from being cleaned again
 
         while(a < e) {
             SCB->DCCMVAC = a;
