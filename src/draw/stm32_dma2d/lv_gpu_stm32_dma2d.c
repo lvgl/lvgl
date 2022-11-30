@@ -243,20 +243,21 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t
     DMA2D->FGCOLR  = 0;
     clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height);
 
+    DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
+    DMA2D->BGMAR   = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
+    DMA2D->BGOR    = dst_stride - draw_width;
+    DMA2D->BGCOLR  = 0;
+    clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
+
     DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->OMAR   = (uint32_t)(dst_buf + (dst_stride * dst_area->y1) + dst_area->x1);
-    DMA2D->OOR    = dst_stride - draw_width;
+    DMA2D->OMAR   = DMA2D->BGMAR;
+    DMA2D->OOR    = DMA2D->BGOR;
     DMA2D->OCOLR  = 0;
+    
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) &
                                                                                     DMA2D_NLR_NL_Msk);
     
-    DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
-    DMA2D->BGMAR   = DMA2D->OMAR;
-    DMA2D->BGOR    = DMA2D->OOR;
-    DMA2D->BGCOLR  = 0;
-    clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
-
     startDmaTransfer();
 }
 
