@@ -67,22 +67,22 @@ void _lv_indev_scroll_handler(_lv_indev_proc_t * proc)
         lv_point_t pivot = { 0, 0 };
         int16_t angle;
         int16_t zoom;
-        lv_obj_t * parent; 
+        lv_obj_t * parent;
 
         parent = scroll_obj;
         angle = lv_obj_get_style_transform_angle(scroll_obj, 0);
         zoom = lv_obj_get_style_transform_zoom(scroll_obj, 0);
 
         while(parent) {
-          parent = lv_obj_get_parent(parent);
-          angle += lv_obj_get_style_transform_angle(parent, 0);
-          zoom *= (lv_obj_get_style_transform_zoom(parent, 0)/256);
+            parent = lv_obj_get_parent(parent);
+            angle += lv_obj_get_style_transform_angle(parent, 0);
+            zoom *= (lv_obj_get_style_transform_zoom(parent, 0)/256);
         }
 
-        if (angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
-          angle = -angle;
-          zoom = (256 * 256) / zoom;
-          lv_point_transform(&proc->types.pointer.vect, angle, zoom, &pivot);
+        if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+            angle = -angle;
+            zoom = (256 * 256) / zoom;
+            lv_point_transform(&proc->types.pointer.vect, angle, zoom, &pivot);
         }
 
         if(proc->types.pointer.scroll_dir == LV_DIR_HOR) {
@@ -293,10 +293,10 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
     angle = lv_obj_get_style_transform_angle(obj_act, 0);
     zoom = lv_obj_get_style_transform_zoom(obj_act, 0);
 
-    if (angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
-      angle = -angle;
-      zoom = (256 * 256) / zoom;
-      lv_point_transform(&vect, angle, zoom, &pivot);
+    if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+        angle = -angle;
+        zoom = (256 * 256) / zoom;
+        lv_point_transform(&vect, angle, zoom, &pivot);
     }
 
     cur_scroll_sum.x += vect.x;
@@ -325,10 +325,10 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
         while(parent) {
             parent = lv_obj_get_parent(parent);
             angle += lv_obj_get_style_transform_angle(parent, 0);
-            zoom *= (lv_obj_get_style_transform_zoom(parent, 0)/256);
+            zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
         }
 
-        if (angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+        if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
             cur_scroll_sum.x = proc->types.pointer.scroll_sum.x;
             cur_scroll_sum.y = proc->types.pointer.scroll_sum.y;
             vect.x = proc->types.pointer.vect.x;
@@ -339,16 +339,15 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
             cur_scroll_sum.x += vect.x;
             cur_scroll_sum.y += vect.y;
         }
-        else
-        {
+        else {
             cur_scroll_sum.x = proc->types.pointer.vect.x + proc->types.pointer.scroll_sum.x;
             cur_scroll_sum.y = proc->types.pointer.vect.y + proc->types.pointer.scroll_sum.y;
         }
         if(LV_ABS(cur_scroll_sum.x) > LV_ABS(cur_scroll_sum.y)) {
-          hor_en = true;
+            hor_en = true;
         }
         else {
-          ver_en = true;
+            ver_en = true;
         }
 
         /*Consider both up-down or left/right scrollable according to the current direction*/
