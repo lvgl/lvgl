@@ -26,6 +26,7 @@ typedef struct {
     lv_msg_subscribe_cb_t callback;
     void * user_data;
     void * _priv_data;      /*Internal: used only store 'obj' in lv_obj_subscribe*/
+    uint8_t _checked : 1;   /*Internal: used to prevent multiple notifications*/
 } sub_dsc_t;
 
 /**********************
@@ -39,6 +40,7 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static bool restart_notify;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -47,6 +49,11 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *      MACROS
  **********************/
+#if LV_LOG_TRACE_MSG
+    #define MSG_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#else
+    #define MSG_TRACE(...)
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -68,6 +75,8 @@ void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * use
     s->msg_id = msg_id;
     s->callback = cb;
     s->user_data = user_data;
+    s->_checked = 1; // if subsribed during `notify`, it won't be notified immediately
+    restart_notify = true;
     return s;
 }
 
@@ -89,6 +98,7 @@ void lv_msg_unsubscribe(void * s)
 {
     LV_ASSERT_NULL(s);
     _lv_ll_remove(&LV_GC_ROOT(_subs_ll), s);
+    restart_notify = true;
     lv_free(s);
 }
 
@@ -138,14 +148,48 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e)
 
 static void notify(lv_msg_t * m)
 {
+    static unsigned int _recursion_counter = 0;
+    _recursion_counter++;
+
+    /*First clear all _checked flags*/
     sub_dsc_t * s;
-    _LV_LL_READ(&LV_GC_ROOT(_subs_ll), s) {
-        if(s->msg_id == m->id && s->callback) {
-            m->user_data = s->user_data;
-            m->_priv_data = s->_priv_data;
-            s->callback(m);
+    if(_recursion_counter == 1) {
+        _LV_LL_READ(&LV_GC_ROOT(_subs_ll), s) {
+            s->_checked = 0;
         }
     }
+
+    /*Run all sub_dsc_t from the list*/
+    do {
+        restart_notify = false;
+        s = _lv_ll_get_head(&LV_GC_ROOT(_subs_ll));
+        while(s) {
+            /*get next element while current is surely valid*/
+            sub_dsc_t * next = _lv_ll_get_next(&LV_GC_ROOT(_subs_ll), s);
+
+            /*Notify only once*/
+            if(!s->_checked) {
+                /*Check if this sub_dsc_t is about this msg_id*/
+                if(s->msg_id == m->id && s->callback) {
+                    // Set this flag and notify
+                    s->_checked = 1;
+                    m->user_data = s->user_data;
+                    m->_priv_data = s->_priv_data;
+                    s->callback(m);
+                }
+            }
+
+            /*restart or load next*/
+            if(restart_notify) {
+                MSG_TRACE("Start from the first sub_dsc_t again because _subs_ll may have changed");
+                break;
+            }
+            s = next;
+        }
+    } while(s);
+
+    _recursion_counter--;
+    restart_notify = (_recursion_counter > 0);
 }
 
 static void obj_notify_cb(lv_msg_t * m)
