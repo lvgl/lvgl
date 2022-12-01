@@ -76,7 +76,7 @@ void _lv_indev_scroll_handler(_lv_indev_proc_t * proc)
         while(parent) {
             parent = lv_obj_get_parent(parent);
             angle += lv_obj_get_style_transform_angle(parent, 0);
-            zoom *= (lv_obj_get_style_transform_zoom(parent, 0)/256);
+            zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
         }
 
         if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
