@@ -105,6 +105,17 @@ void * lv_msg_get_user_data(lv_msg_t * m);
  */
 lv_msg_t * lv_event_get_msg(lv_event_t * e);
 
+/*Fix typo*/
+static inline void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
+{
+    return lv_msg_subsribe(msg_id, cb, user_data);
+}
+
+static inline void * lv_msg_subscribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data)
+{
+    return lv_msg_subsribe_obj(msg_id, obj, user_data);
+}
+
 /**********************
  * GLOBAL VARIABLES
  **********************/
