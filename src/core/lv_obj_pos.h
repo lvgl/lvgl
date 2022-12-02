@@ -350,18 +350,12 @@ void lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coord
 
 /**
  * Transform a point using the angle and zoom style properties of an object
- * p a current untransformed point, so (p - prev_p) can calculate the current moving distance,
- * and pivot + (p - prev_p) ensures taht the distance between the current pressing point
- * and the starting point of the object is consistent with the previous one.
  * @param obj           pointer to an object whose style properties should be used
  * @param p             a point to transform, the result will be written back here too
- * @param prev_p        a previous untransformed point. If the object was moving and it was transformed the a previous point
- *                      helps to fix incorrect calculations due to the transformed coordinate system.
  * @param recursive     consider the transformation properties of the parents too
  * @param inv           do the inverse of the transformation (-angle and 1/zoom)
  */
-void lv_obj_transform_point(const struct _lv_obj_t * obj, lv_point_t * p, lv_point_t * prev_p, bool recursive,
-                            bool inv);
+void lv_obj_transform_point(const struct _lv_obj_t * obj, lv_point_t * p, bool recursive, bool inv);
 
 /**
  * Transform an area using the angle and zoom style properties of an object
