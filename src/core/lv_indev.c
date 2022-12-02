@@ -852,7 +852,7 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
     }
 
-    lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, true, true);
+    /*lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, true, true);*/
 
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != proc->types.pointer.act_obj) {
