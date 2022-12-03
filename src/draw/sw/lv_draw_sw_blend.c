@@ -103,7 +103,7 @@ void lv_draw_sw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * d
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    const lv_opa_t * mask;
+    lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
     if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
@@ -129,7 +129,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
         }
     }
 
-
     const lv_color_t * src_buf = dsc->src_buf;
     lv_coord_t src_stride;
     if(src_buf) {
@@ -142,8 +141,18 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
 
     lv_coord_t mask_stride;
     if(mask) {
+        /*Round the values in the mask if anti-aliasing is disabled*/
+        if(disp->driver->antialiasing == 0) {
+            int32_t mask_size = lv_area_get_size(dsc->mask_area);
+            int32_t i;
+            for(i = 0; i < mask_size; i++) {
+                mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
+            }
+        }
+
         mask_stride = lv_area_get_width(dsc->mask_area);
         mask += mask_stride * (blend_area.y1 - dsc->mask_area->y1) + (blend_area.x1 - dsc->mask_area->x1);
+
     }
     else {
         mask_stride = 0;
