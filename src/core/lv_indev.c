@@ -852,8 +852,6 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
     }
 
-    lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, true, true);
-
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != proc->types.pointer.act_obj) {
         proc->types.pointer.last_point.x = proc->types.pointer.act_point.x;
@@ -986,6 +984,27 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
         proc->types.pointer.act_obj = NULL;
         proc->pr_timestamp          = 0;
         proc->longpr_rep_timestamp  = 0;
+
+
+        /*Get the transformed vector with this object*/
+        if(scroll_obj) {
+            int16_t angle = 0;
+            int16_t zoom = 256;
+            lv_point_t pivot = { 0, 0 };
+            lv_obj_t * parent = scroll_obj;
+            while(parent) {
+                angle += lv_obj_get_style_transform_angle(parent, 0);
+                zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
+                parent = lv_obj_get_parent(parent);
+            }
+
+            if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+                angle = -angle;
+                zoom = (256 * 256) / zoom;
+                lv_point_transform(&proc->types.pointer.scroll_throw_vect, angle, zoom, &pivot);
+                lv_point_transform(&proc->types.pointer.scroll_throw_vect_ori, angle, zoom, &pivot);
+            }
+        }
 
     }
 
