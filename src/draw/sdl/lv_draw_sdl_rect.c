@@ -39,6 +39,12 @@ typedef struct {
 
 typedef struct {
     lv_sdl_cache_key_magic_t magic;
+    lv_gradient_stop_t stops[LV_GRADIENT_MAX_STOPS];
+    uint8_t stops_count;
+} lv_draw_rect_grad_key_t;
+
+typedef struct {
+    lv_sdl_cache_key_magic_t magic;
     lv_coord_t radius;
     lv_coord_t size;
     lv_coord_t blur;
@@ -56,6 +62,9 @@ typedef struct {
 
 static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                           const lv_draw_rect_dsc_t * dsc);
+
+static void draw_bg_grad(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                         const lv_draw_rect_dsc_t * dsc);
 
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
@@ -80,6 +89,8 @@ static void frag_render_center(SDL_Renderer * renderer, SDL_Texture * frag, lv_c
                                const lv_area_t * coords, const lv_area_t * clipped, bool full);
 
 static lv_draw_rect_bg_key_t rect_bg_key_create(lv_coord_t radius, lv_coord_t size);
+
+static lv_draw_rect_grad_key_t rect_grad_key_create(const lv_grad_dsc_t * grad);
 
 static lv_draw_rect_shadow_key_t rect_shadow_key_create(lv_coord_t radius, lv_coord_t size, lv_coord_t blur);
 
@@ -157,6 +168,43 @@ SDL_Texture * lv_draw_sdl_rect_bg_frag_obtain(lv_draw_sdl_ctx_t * ctx, lv_coord_
         int16_t mask_id = lv_draw_mask_add(&mask_rout_param, NULL);
         texture = lv_draw_sdl_mask_dump_texture(ctx->renderer, &coords_frag, &mask_id, 1);
         lv_draw_mask_remove_id(mask_id);
+        SDL_assert(texture);
+        lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), texture);
+    }
+    return texture;
+}
+
+SDL_Texture * lv_draw_sdl_rect_grad_frag_obtain(lv_draw_sdl_ctx_t * ctx, const lv_grad_dsc_t * grad)
+{
+    lv_draw_rect_grad_key_t key = rect_grad_key_create(grad);
+    SDL_Texture * texture = lv_draw_sdl_texture_cache_get(ctx, &key, sizeof(key), NULL);
+    if(texture == NULL) {
+        Uint32 amask = 0xFF000000;
+        Uint32 rmask = 0x00FF0000;
+        Uint32 gmask = 0x0000FF00;
+        Uint32 bmask = 0x000000FF;
+        lv_color_t pixels[256];
+        for(int i = 0; i < grad->stops_count - 1; i++) {
+            uint8_t frac_start = grad->stops[i].frac;
+            uint8_t frac_end = grad->stops[i + 1].frac;
+            lv_color_t from = grad->stops[i].color;
+            lv_color_t to = grad->stops[i + 1].color;
+            if(i == 0) {
+                for(int px = 0; px < frac_start; px++) {
+                    pixels[px] = from;
+                }
+            }
+            for(int frac = frac_start; frac < frac_end; frac++) {
+                pixels[frac] = lv_color_mix(to, from, (frac - frac_start) * 255 / (frac_end - frac_start));
+            }
+        }
+        for(int px = grad->stops[grad->stops_count - 1].frac + 1; px < 256; px++) {
+            pixels[px] = grad->stops[grad->stops_count - 1].color;
+        }
+        SDL_Surface * surface = SDL_CreateRGBSurfaceFrom(pixels, 256, 1, LV_COLOR_DEPTH, 256 * LV_COLOR_DEPTH / 8,
+                                                         rmask, gmask, bmask, amask);
+        texture = SDL_CreateTextureFromSurface(ctx->renderer, surface);
+        SDL_FreeSurface(surface);
         SDL_assert(texture);
         lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), texture);
     }
@@ -253,7 +301,16 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
         return;
     }
     SDL_Color bg_color;
-    lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
+    if(dsc->bg_grad.dir == LV_GRAD_DIR_NONE) {
+        lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
+    }
+    else if(dsc->bg_grad.stops_count == 1) {
+        lv_color_to_sdl_color(&dsc->bg_grad.stops[0].color, &bg_color);
+    }
+    else {
+        draw_bg_grad(ctx, coords, draw_area, dsc);
+        return;
+    }
     lv_coord_t radius = dsc->radius;
     if(radius <= 0) {
         SDL_Rect rect;
@@ -275,6 +332,32 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
     lv_draw_sdl_rect_bg_frag_draw_corners(ctx, texture, real_radius, coords, draw_area, false);
     frag_render_borders(ctx->renderer, texture, real_radius, coords, draw_area, false);
     frag_render_center(ctx->renderer, texture, real_radius, coords, draw_area, false);
+}
+
+static void draw_bg_grad(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                         const lv_draw_rect_dsc_t * dsc)
+{
+    SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
+    SDL_Texture * texture = lv_draw_sdl_rect_grad_frag_obtain(ctx, &dsc->bg_grad);
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+    SDL_Rect clip_rect;
+    lv_area_to_sdl_rect(draw_area, &clip_rect);
+    SDL_RenderSetClipRect(ctx->renderer, &clip_rect);
+    if(dsc->bg_grad.dir == LV_GRAD_DIR_VER) {
+        int coords_w = lv_area_get_width(coords), coords_h = lv_area_get_height(coords);
+        SDL_Point coords_center = {.x = coords->x1 + coords_w / 2, .y = coords->y1 + coords_h / 2};
+        SDL_Rect rotated_rect = {
+            .w = coords_h, .h = coords_w,
+            .x = coords_center.x - coords_h / 2, .y = coords_center.y - coords_w / 2
+        };
+        SDL_RenderCopyEx(ctx->renderer, texture, NULL, &rotated_rect, 90, NULL, SDL_FLIP_NONE);
+    }
+    else {
+        SDL_Rect rect;
+        lv_area_to_sdl_rect(coords, &rect);
+        SDL_RenderCopy(ctx->renderer, texture, NULL, &rect);
+    }
+    SDL_RenderSetClipRect(ctx->renderer, NULL);
 }
 
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
@@ -679,6 +762,19 @@ static lv_draw_rect_bg_key_t rect_bg_key_create(lv_coord_t radius, lv_coord_t si
     key.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_BG;
     key.radius = radius;
     key.size = size;
+    return key;
+}
+
+static lv_draw_rect_grad_key_t rect_grad_key_create(const lv_grad_dsc_t * grad)
+{
+    lv_draw_rect_grad_key_t key;
+    SDL_memset(&key, 0, sizeof(key));
+    key.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_GRAD;
+    key.stops_count = grad->stops_count;
+    for(uint8_t i = 0; i < grad->stops_count; i++) {
+        key.stops[i].frac = grad->stops[i].frac;
+        key.stops[i].color = grad->stops[i].color;
+    }
     return key;
 }
 
