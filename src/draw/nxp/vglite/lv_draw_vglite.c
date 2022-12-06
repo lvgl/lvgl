@@ -184,13 +184,13 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
             blit.src = src_buf;
             blit.src_width = src_width;
             blit.src_height = src_height;
-            blit.src_stride = src_stride * (int32_t)sizeof(lv_color_t);
+            blit.src_stride = src_stride;
             blit.src_area = src_area;
 
             blit.dst = dest_buf;
             blit.dst_width = dest_width;
             blit.dst_height = dest_height;
-            blit.dst_stride = dest_stride * (int32_t)sizeof(lv_color_t);
+            blit.dst_stride = dest_stride;
             blit.dst_area.x1 = blend_area.x1;
             blit.dst_area.y1 = blend_area.y1;
             blit.dst_area.x2 = blend_area.x2;
@@ -264,13 +264,13 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
         blit.src = src_buf;
         blit.src_width = src_width;
         blit.src_height = src_height;
-        blit.src_stride = src_stride * (int32_t)sizeof(lv_color_t);
+        blit.src_stride = src_stride;
         blit.src_area = src_area;
 
         blit.dst = dest_buf;
         blit.dst_width = lv_area_get_width(draw_ctx->buf_area);
         blit.dst_height = lv_area_get_height(draw_ctx->buf_area);
-        blit.dst_stride = dest_stride * (int32_t)sizeof(lv_color_t);
+        blit.dst_stride = dest_stride;
         blit.dst_area.x1 = blend_area.x1;
         blit.dst_area.y1 = blend_area.y1;
         blit.dst_area.x2 = blend_area.x2;

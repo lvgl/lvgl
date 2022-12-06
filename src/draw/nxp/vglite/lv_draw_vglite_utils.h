@@ -97,7 +97,7 @@ extern "C" {
  * @param[in/out] vgbuf Buffer structure to be filled
  * @param[in] width Width of buffer in pixels
  * @param[in] height Height of buffer in pixels
- * @param[in] stride Stride of the buffer in bytes
+ * @param[in] stride Stride of the buffer in pixels
  * @param[in] ptr Pointer to the buffer (must be aligned according VG-Lite requirements)
  * @param[in] source Boolean to check if this is a source buffer
  */

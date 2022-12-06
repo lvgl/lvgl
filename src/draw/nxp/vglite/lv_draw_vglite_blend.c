@@ -90,9 +90,9 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     *
     * @param[in,out] area Area to be updated
     * @param[in,out] buf Pointer to be updated
-    * @param[in] stridePx Buffer stride in pixels
+    * @param[in] stride Buffer stride in pixels
     */
-    static void _align_y(lv_area_t * area, lv_color_t ** buf, uint32_t stridePx);
+    static void _align_y(lv_area_t * area, lv_color_t ** buf, lv_coord_t stride);
 
     /**
     * Software BLIT as a fall-back scenario.
@@ -144,7 +144,7 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
     lv_color32_t col32 = {.full = lv_color_to32(color)}; /*Convert color to RGBA8888*/
     vg_lite_color_t vgcol; /* vglite takes ABGR */
 
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width * sizeof(lv_color_t),
+    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
                           (const lv_color_t *)dest_buf, false) != LV_RES_OK)
         VG_LITE_RETURN_INV("Init buffer failed.");
 
@@ -243,9 +243,9 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_split(lv_gpu_nxp_vglite_blit_info_t * bl
 
     /* Stage 1: Move starting pointers as close as possible to [x1, y1], so coordinates are as small as possible.  */
     _align_x(&blit->src_area, (lv_color_t **)&blit->src);
-    _align_y(&blit->src_area, (lv_color_t **)&blit->src,  blit->src_stride / sizeof(lv_color_t));
+    _align_y(&blit->src_area, (lv_color_t **)&blit->src,  blit->src_stride);
     _align_x(&blit->dst_area, (lv_color_t **)&blit->dst);
-    _align_y(&blit->dst_area, (lv_color_t **)&blit->dst,  blit->dst_stride / sizeof(lv_color_t));
+    _align_y(&blit->dst_area, (lv_color_t **)&blit->dst,  blit->dst_stride);
 
     /* Stage 2: If we're in limit, do a single BLIT */
     if((blit->src_area.x2 < LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR) &&
@@ -298,14 +298,12 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_split(lv_gpu_nxp_vglite_blit_info_t * bl
         if(tileBlit.src_area.y2 >= LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR) {
             tileBlit.src_area.y2 = LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR - 1; /* Should never happen */
         }
-        tileBlit.src = blit->src + tileY * LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR * blit->src_stride / sizeof(
-                           lv_color_t); /* stride in px! */
+        tileBlit.src = blit->src + tileY * LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR * blit->src_stride;
 
         tileBlit.dst_area.y1 = tileBlit.src_area.y1; /* y has no alignment, always in sync with src */
         tileBlit.dst_area.y2 = tileBlit.src_area.y2;
 
-        tileBlit.dst = blit->dst + tileY * LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR * blit->dst_stride / sizeof(
-                           lv_color_t); /* stride in px! */
+        tileBlit.dst = blit->dst + tileY * LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR * blit->dst_stride;
 
         for(int tileX = 0; tileX < totalTilesX; tileX++) {
 
@@ -480,18 +478,15 @@ static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
     lv_coord_t w = lv_area_get_width(&blit->src_area);
     lv_coord_t h = lv_area_get_height(&blit->src_area);
 
-    int32_t srcStridePx = blit->src_stride / (int32_t)sizeof(lv_color_t);
-    int32_t dstStridePx = blit->dst_stride / (int32_t)sizeof(lv_color_t);
-
-    lv_color_t * src = (lv_color_t *)blit->src + blit->src_area.y1 * srcStridePx + blit->src_area.x1;
-    lv_color_t * dst = (lv_color_t *)blit->dst + blit->dst_area.y1 * dstStridePx + blit->dst_area.x1;
+    lv_color_t * src = (lv_color_t *)blit->src + blit->src_area.y1 * blit->src_stride + blit->src_area.x1;
+    lv_color_t * dst = (lv_color_t *)blit->dst + blit->dst_area.y1 * blit->dst_stride + blit->dst_area.x1;
 
     if(blit->opa >= (lv_opa_t)LV_OPA_MAX) {
         /* simple copy */
         for(y = 0; y < h; y++) {
             lv_memcpy(dst, src, (uint32_t)w * sizeof(lv_color_t));
-            src += srcStridePx;
-            dst += dstStridePx;
+            src += blit->src_stride;
+            dst += blit->dst_stride;
         }
     }
     else if(blit->opa >= (lv_opa_t)LV_OPA_MIN) {
@@ -500,8 +495,8 @@ static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
             for(x = 0; x < w; x++) {
                 dst[x] = lv_color_mix(src[x], dst[x], blit->opa);
             }
-            src += srcStridePx;
-            dst += dstStridePx;
+            src += blit->src_stride;
+            dst += blit->dst_stride;
         }
     }
 }
@@ -511,29 +506,30 @@ static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * bl
 
     /* Test for minimal width */
     if(lv_area_get_width(&blit->src_area) < (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX)
-        VG_LITE_RETURN_INV("Src area width (%d) is smaller than required (%d).", lv_area_get_width(&blit->src_area),
-                           LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+        VG_LITE_RETURN_INV("Src area width (%d px) is smaller than required (%d).",
+        		lv_area_get_width(&blit->src_area), LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
 
     /* Test for minimal width */
     if(lv_area_get_width(&blit->dst_area) < (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX)
-        VG_LITE_RETURN_INV("Dest area width (%d) is smaller than required (%d).", lv_area_get_width(&blit->dst_area),
-                           LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+        VG_LITE_RETURN_INV("Dest area width (%d px) is smaller than required (%d).",
+        		lv_area_get_width(&blit->dst_area), LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
 
     /* Test for pointer alignment */
-    if((((uintptr_t) blit->src) % LV_ATTRIBUTE_MEM_ALIGN_SIZE) != 0x0)
-        VG_LITE_RETURN_INV("Src buffer ptr (0x%X) not aligned to %d.", (size_t) blit->src, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
+    if((((uintptr_t)blit->src) % (uintptr_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) != 0x0U)
+        VG_LITE_RETURN_INV("Src buffer ptr (0x%x) not aligned to 0x%x bytes.",
+        		(size_t)blit->src, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
 
     /* No alignment requirement for destination pixel buffer when using mode VG_LITE_LINEAR */
 
     /* Test for stride alignment */
-    if((blit->src_stride % (LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX * LV_COLOR_DEPTH / 8)) !=  0x0)
-        VG_LITE_RETURN_INV("Src buffer stride (%d px) not aligned to %d px.", blit->src_stride,
-                           LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+    if((blit->src_stride % (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) !=  0x0U)
+        VG_LITE_RETURN_INV("Src buffer stride (%d px) not aligned to %d px.",
+        		blit->src_stride, LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
 
     /* Test for stride alignment */
-    if((blit->dst_stride % (LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX * LV_COLOR_DEPTH / 8)) !=  0x0)
-        VG_LITE_RETURN_INV("Dest buffer stride (%d px) not aligned to %d px.", blit->dst_stride,
-                           LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+    if((blit->dst_stride % (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) !=  0x0U)
+        VG_LITE_RETURN_INV("Dest buffer stride (%d px) not aligned to %d px.",
+        		blit->dst_stride, LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
 
     if((lv_area_get_width(&blit->src_area) != lv_area_get_width(&blit->dst_area)) ||
        (lv_area_get_height(&blit->src_area) != lv_area_get_height(&blit->dst_area)))
@@ -545,7 +541,7 @@ static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * bl
 static void _align_x(lv_area_t * area, lv_color_t ** buf)
 {
 
-    int alignedAreaStartPx = area->x1 - (area->x1 % (LV_ATTRIBUTE_MEM_ALIGN_SIZE * 8 / LV_COLOR_DEPTH));
+    int alignedAreaStartPx = area->x1 - (area->x1 % (LV_ATTRIBUTE_MEM_ALIGN_SIZE / sizeof(lv_color_t)));
     VG_LITE_COND_STOP(alignedAreaStartPx < 0, "Negative X alignment.");
 
     area->x1 -= alignedAreaStartPx;
@@ -553,17 +549,17 @@ static void _align_x(lv_area_t * area, lv_color_t ** buf)
     *buf += alignedAreaStartPx;
 }
 
-static void _align_y(lv_area_t * area, lv_color_t ** buf, uint32_t stridePx)
+static void _align_y(lv_area_t * area, lv_color_t ** buf, lv_coord_t stride)
 {
     int LineToAlignMem;
     int alignedAreaStartPy;
     /* find how many lines of pixels will respect memory alignment requirement */
-    if(stridePx % (uint32_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE == 0U) {
+    if((stride % (lv_coord_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) == 0x0U) {
         alignedAreaStartPy = area->y1;
     }
     else {
-        LineToAlignMem = LV_ATTRIBUTE_MEM_ALIGN_SIZE / (sizeof(lv_color_t) * LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
-        VG_LITE_COND_STOP(LV_ATTRIBUTE_MEM_ALIGN_SIZE % (sizeof(lv_color_t) * LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX),
+        LineToAlignMem = LV_ATTRIBUTE_MEM_ALIGN_SIZE / (LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX * sizeof(lv_color_t));
+        VG_LITE_COND_STOP(LV_ATTRIBUTE_MEM_ALIGN_SIZE % (LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX * sizeof(lv_color_t)),
                           "Complex case: need gcd function.");
         alignedAreaStartPy = area->y1 - (area->y1 % LineToAlignMem);
         VG_LITE_COND_STOP(alignedAreaStartPy < 0, "Negative Y alignment.");
@@ -571,7 +567,7 @@ static void _align_y(lv_area_t * area, lv_color_t ** buf, uint32_t stridePx)
 
     area->y1 -= alignedAreaStartPy;
     area->y2 -= alignedAreaStartPy;
-    *buf += (uint32_t)alignedAreaStartPy * stridePx;
+    *buf += (uint32_t)(alignedAreaStartPy * stride);
 }
 #endif /*VG_LITE_BLIT_SPLIT_ENABLED*/
 

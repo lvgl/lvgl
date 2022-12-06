@@ -100,7 +100,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
     vg_lite_blend_t vglite_blend_mode = lv_vglite_get_blend_mode(blend_mode);
 
     /*** Init destination buffer ***/
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width * sizeof(lv_color_t),
+    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
                           (const lv_color_t *)draw_ctx->buf, false)
        != LV_RES_OK)
         VG_LITE_RETURN_INV("Init buffer failed.");
