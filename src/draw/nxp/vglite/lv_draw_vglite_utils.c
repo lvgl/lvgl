@@ -80,14 +80,14 @@ lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t h
                             const lv_color_t * ptr, bool source)
 {
     /*Test for memory alignment*/
-    if((((uintptr_t)ptr) % (uintptr_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) != (uintptr_t)0x0U)
-        VG_LITE_RETURN_INV("%s buffer (0x%x) not aligned to %d.", source ? "Src" : "Dest",
-                           (size_t) ptr, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
+    if((((uintptr_t)ptr) % (uintptr_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) != 0x0U)
+        VG_LITE_RETURN_INV("%s buffer ptr (0x%x) not aligned to %d.", source ? "Src" : "Dest",
+                           (size_t)ptr, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
 
     /*Test for stride alignment*/
-    if(source && (stride % (LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX * sizeof(lv_color_t))) != 0x0U)
-        VG_LITE_RETURN_INV("Src buffer stride (%d bytes) not aligned to %d bytes.", stride,
-                           LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX * sizeof(lv_color_t));
+    if(source && (stride % LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) != 0x0U)
+        VG_LITE_RETURN_INV("Src buffer stride (%d px) not aligned to %d px.", stride,
+                           LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
 
     vgbuf->format = VG_LITE_PX_FMT;
     vgbuf->tiled = VG_LITE_LINEAR;
@@ -96,7 +96,7 @@ lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t h
 
     vgbuf->width = (int32_t)width;
     vgbuf->height = (int32_t)height;
-    vgbuf->stride = (int32_t)stride;
+    vgbuf->stride = (int32_t)(stride) * sizeof(lv_color_t);
 
     lv_memset_00(&vgbuf->yuv, sizeof(vgbuf->yuv));
 

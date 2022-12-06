@@ -123,7 +123,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
     lv_memset_00(arc_path, sizeof(arc_path));
 
     /*** Init destination buffer ***/
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width * sizeof(lv_color_t),
+    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
                           (const lv_color_t *)draw_ctx->buf, false) != LV_RES_OK)
         VG_LITE_RETURN_INV("Init buffer failed.");
 
