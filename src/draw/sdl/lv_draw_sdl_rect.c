@@ -184,22 +184,8 @@ SDL_Texture * lv_draw_sdl_rect_grad_frag_obtain(lv_draw_sdl_ctx_t * ctx, const l
         Uint32 gmask = 0x0000FF00;
         Uint32 bmask = 0x000000FF;
         lv_color_t pixels[256];
-        for(int i = 0; i < grad->stops_count - 1; i++) {
-            uint8_t frac_start = grad->stops[i].frac;
-            uint8_t frac_end = grad->stops[i + 1].frac;
-            lv_color_t from = grad->stops[i].color;
-            lv_color_t to = grad->stops[i + 1].color;
-            if(i == 0) {
-                for(int px = 0; px < frac_start; px++) {
-                    pixels[px] = from;
-                }
-            }
-            for(int frac = frac_start; frac < frac_end; frac++) {
-                pixels[frac] = lv_color_mix(to, from, (frac - frac_start) * 255 / (frac_end - frac_start));
-            }
-        }
-        for(int px = grad->stops[grad->stops_count - 1].frac + 1; px < 256; px++) {
-            pixels[px] = grad->stops[grad->stops_count - 1].color;
+        for(int i = 0; i < 256; i++) {
+            pixels[i] = lv_gradient_calculate(grad, 256, i);
         }
         SDL_Surface * surface = SDL_CreateRGBSurfaceFrom(pixels, 256, 1, LV_COLOR_DEPTH, 256 * LV_COLOR_DEPTH / 8,
                                                          rmask, gmask, bmask, amask);
