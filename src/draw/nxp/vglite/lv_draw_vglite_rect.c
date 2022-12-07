@@ -90,10 +90,7 @@ static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path
 
 lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    vg_lite_buffer_t vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
-    lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-    lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
     vg_lite_matrix_t matrix;
     lv_coord_t width = lv_area_get_width(coords);
     lv_coord_t height = lv_area_get_height(coords);
@@ -101,6 +98,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     vg_lite_matrix_t * grad_matrix;
     vg_lite_color_t vgcol;
     lv_coord_t radius = dsc->radius;
+    vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
 
     if(dsc->radius < 0)
         return LV_RES_INV;
@@ -113,11 +111,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     lv_area_t rel_clip;
     lv_area_copy(&rel_clip, draw_ctx->clip_area);
     lv_area_move(&rel_clip, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
-    /*** Init destination buffer ***/
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
-                          (const lv_color_t *)draw_ctx->buf, false) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
 
     /*** Init path ***/
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
@@ -181,10 +174,10 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
 
     /*** Draw rectangle ***/
     if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
-        err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
+        err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
     }
     else {
-        err = vg_lite_draw_gradient(&vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient, VG_LITE_BLEND_SRC_OVER);
+        err = vg_lite_draw_gradient(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, &gradient, VG_LITE_BLEND_SRC_OVER);
     }
     VG_LITE_ERR_RETURN_INV(err, "Draw gradient failed.");
 
@@ -205,13 +198,13 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
 lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                                const lv_area_t * coords, bool border)
 {
-    vg_lite_buffer_t vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
     lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
     lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
     vg_lite_color_t vgcol; /* vglite takes ABGR */
     vg_lite_matrix_t matrix;
     lv_coord_t radius = dsc->radius;
+    vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
 
     if(radius < 0)
         return LV_RES_INV;
@@ -244,11 +237,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
     /* Choose vglite blend mode based on given lvgl blend mode */
     lv_blend_mode_t blend_mode = dsc->blend_mode;
     vg_lite_blend_t vglite_blend_mode = lv_vglite_get_blend_mode(blend_mode);
-
-    /*** Init destination buffer ***/
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
-                          (const lv_color_t *)draw_ctx->buf, false) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
 
     /*** Init path ***/
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
@@ -293,7 +281,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
     err = vg_lite_update_stroke(&path);
     VG_LITE_ERR_RETURN_INV(err, "Update stroke failed.");
 
-    err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
+    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw border failed.");
 
     if(lv_vglite_run() != LV_RES_OK)

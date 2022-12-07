@@ -143,6 +143,9 @@ static void lv_draw_vglite_wait_for_finish(lv_draw_ctx_t * draw_ctx)
 
 static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+        return;
+
     if(need_argb8565_support()) {
         lv_draw_sw_blend_basic(draw_ctx, dsc);
         return;
@@ -163,7 +166,6 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
-
         const lv_color_t * src_buf = dsc->src_buf;
 
         if(src_buf == NULL) {
@@ -217,6 +219,9 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
 static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                        const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf)
 {
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+        return;
+
     if(need_argb8565_support()) {
         lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
         return;
@@ -297,17 +302,17 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
 static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
                                 const lv_point_t * point2)
 {
-    if(need_argb8565_support()) {
-        lv_draw_sw_line(draw_ctx, dsc, point1, point2);
-        return;
-    }
-
     if(dsc->width == 0)
         return;
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
     if(point1->x == point2->x && point1->y == point2->y)
         return;
+
+    if(need_argb8565_support()) {
+        lv_draw_sw_line(draw_ctx, dsc, point1, point2);
+        return;
+    }
 
     lv_area_t clip_line;
     clip_line.x1 = LV_MIN(point1->x, point2->x) - dsc->width / 2;
@@ -477,11 +482,6 @@ static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_r
 static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                                uint16_t radius, uint16_t start_angle, uint16_t end_angle)
 {
-    if(need_argb8565_support()) {
-        lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
-        return;
-    }
-
     bool done = false;
 
 #if LV_DRAW_COMPLEX
@@ -491,6 +491,11 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
         return;
     if(start_angle == end_angle)
         return;
+
+    if(need_argb8565_support()) {
+        lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
+        return;
+    }
 
     done = (lv_gpu_nxp_vglite_draw_arc(draw_ctx, dsc, center, (int32_t)radius,
                                        (int32_t)start_angle, (int32_t)end_angle) == LV_RES_OK);

@@ -68,6 +68,8 @@ static inline void invalidate_cache(void);
  *  STATIC VARIABLES
  **********************/
 
+static vg_lite_buffer_t dest_vgbuf;
+
 /**********************
  *      MACROS
  **********************/
@@ -76,35 +78,14 @@ static inline void invalidate_cache(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t height, uint32_t stride,
-                            const lv_color_t * ptr, bool source)
+vg_lite_buffer_t * lv_vglite_get_dest_buf(void)
 {
-    /*Test for memory alignment*/
-    if((((uintptr_t)ptr) % (uintptr_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) != 0x0U)
-        VG_LITE_RETURN_INV("%s buffer ptr (0x%x) not aligned to %d.", source ? "Src" : "Dest",
-                           (size_t)ptr, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
+    return &dest_vgbuf;
+}
 
-    /*Test for stride alignment*/
-    if(source && (stride % LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) != 0x0U)
-        VG_LITE_RETURN_INV("Src buffer stride (%d px) not aligned to %d px.", stride,
-                           LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
-
-    vgbuf->format = VG_LITE_PX_FMT;
-    vgbuf->tiled = VG_LITE_LINEAR;
-    vgbuf->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
-    vgbuf->transparency_mode = VG_LITE_IMAGE_OPAQUE;
-
-    vgbuf->width = (int32_t)width;
-    vgbuf->height = (int32_t)height;
-    vgbuf->stride = (int32_t)(stride) * sizeof(lv_color_t);
-
-    lv_memset_00(&vgbuf->yuv, sizeof(vgbuf->yuv));
-
-    vgbuf->memory = (void *)ptr;
-    vgbuf->address = (uint32_t)vgbuf->memory;
-    vgbuf->handle = NULL;
-
-    return LV_RES_OK;
+void lv_vglite_init_dest_buf(const lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride)
+{
+    lv_vglite_init_buf(&dest_vgbuf, dest_buf, dest_area, dest_stride);
 }
 
 #if BLIT_DBG_AREAS
@@ -225,4 +206,22 @@ static inline void invalidate_cache(void)
         disp->driver->clean_dcache_cb(disp->driver);
 }
 
+void lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf, const lv_area_t * area,
+                        lv_coord_t stride)
+{
+    vgbuf->format = VG_LITE_PX_FMT;
+    vgbuf->tiled = VG_LITE_LINEAR;
+    vgbuf->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
+    vgbuf->transparency_mode = VG_LITE_IMAGE_OPAQUE;
+
+    vgbuf->width = (int32_t)lv_area_get_width(area);
+    vgbuf->height = (int32_t)lv_area_get_height(area);
+    vgbuf->stride = (int32_t)(stride) * sizeof(lv_color_t);
+
+    lv_memset_00(&vgbuf->yuv, sizeof(vgbuf->yuv));
+
+    vgbuf->memory = (void *)buf;
+    vgbuf->address = (uint32_t)vgbuf->memory;
+    vgbuf->handle = NULL;
+}
 #endif /*LV_USE_GPU_NXP_VG_LITE*/

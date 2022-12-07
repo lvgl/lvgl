@@ -105,27 +105,19 @@ static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
 lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                                     int32_t radius, int32_t start_angle, int32_t end_angle)
 {
-
-    vg_lite_buffer_t vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
     lv_color32_t col32 = {.full = lv_color_to32(dsc->color)}; /*Convert color to RGBA8888*/
-    lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-    lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
     vg_lite_path_t path;
     vg_lite_color_t vgcol; /* vglite takes ABGR */
     vg_lite_matrix_t matrix;
     lv_opa_t opa = dsc->opa;
     bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
     lv_point_t clip_center = {center->x - draw_ctx->buf_area->x1, center->y - draw_ctx->buf_area->y1};
+    vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
 
     /* path: max size = 16 cubic bezier (7 words each) */
     int32_t arc_path[16 * 7];
     lv_memset_00(arc_path, sizeof(arc_path));
-
-    /*** Init destination buffer ***/
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
-                          (const lv_color_t *)draw_ctx->buf, false) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
 
     /*** Init path ***/
     lv_coord_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
@@ -227,7 +219,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
         VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
 
     /*** Draw arc ***/
-    err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
+    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw arc failed.");
 
     if(lv_vglite_run() != LV_RES_OK)

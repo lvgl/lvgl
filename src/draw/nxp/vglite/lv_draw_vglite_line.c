@@ -62,14 +62,11 @@
 lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
                                      const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip_line)
 {
-    vg_lite_buffer_t vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
-
-    int32_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-    int32_t dest_height = lv_area_get_height(draw_ctx->buf_area);
     vg_lite_path_t path;
     vg_lite_color_t vgcol; /* vglite takes ABGR */
     vg_lite_matrix_t matrix;
+    vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
     lv_opa_t opa = dsc->opa;
 
     vg_lite_cap_style_t cap_style = (dsc->round_start || dsc->round_end) ? VG_LITE_CAP_ROUND : VG_LITE_CAP_BUTT;
@@ -98,13 +95,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
     /* Choose vglite blend mode based on given lvgl blend mode */
     lv_blend_mode_t blend_mode = dsc->blend_mode;
     vg_lite_blend_t vglite_blend_mode = lv_vglite_get_blend_mode(blend_mode);
-
-    /*** Init destination buffer ***/
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
-                          (const lv_color_t *)draw_ctx->buf, false)
-       != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
-
 
     /*** Init path ***/
     lv_coord_t width = dsc->width;
@@ -139,7 +129,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
     err = vg_lite_update_stroke(&path);
     VG_LITE_ERR_RETURN_INV(err, "Update stroke failed.");
 
-    err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
+    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw line failed.");
 
     if(lv_vglite_run() != LV_RES_OK)

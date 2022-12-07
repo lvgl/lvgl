@@ -58,7 +58,7 @@ extern "C" {
 #endif
 
 #ifndef LV_GPU_NXP_VG_LITE_LOG_TRACES
-/** Enable logging of VG-Lite errors (\see LV_LOG_ERROR)*/
+/** Enable logging of VG-Lite traces (\see LV_LOG_ERROR)*/
 #define LV_GPU_NXP_VG_LITE_LOG_TRACES 0
 #endif
 
@@ -92,17 +92,30 @@ extern "C" {
  **********************/
 
 /**
- * Fills vg_lite_buffer_t structure according given parameters.
+ * Init vglite buffer.
  *
- * @param[in/out] vgbuf Buffer structure to be filled
- * @param[in] width Width of buffer in pixels
- * @param[in] height Height of buffer in pixels
- * @param[in] stride Stride of the buffer in pixels
- * @param[in] ptr Pointer to the buffer (must be aligned according VG-Lite requirements)
- * @param[in] source Boolean to check if this is a source buffer
+ * @param[in/out] vgbuf The vglite buffer it has to be updated
+ * @param[in] buf Buffer pointer (does not require alignment for VG_LITE_LINEAR mode)
+ * @param[in] area Buffer area (for width and height)
+ * @param[in] stride Buffer stride in pixels
  */
-lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t height, uint32_t stride,
-                            const lv_color_t * ptr, bool source);
+void lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
+
+/**
+ * Get vglite destination buffer pointer.
+ *
+ * @retval The vglite destination buffer
+ */
+vg_lite_buffer_t * lv_vglite_get_dest_buf(void);
+
+/**
+ * Init vglite destination buffer. It will be set once per frame.
+ *
+ * @param[in] dest_buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
+ * @param[in] dest_area Destination buffer area (for width and height)
+ * @param[in] dest_stride Stride of destination buffer
+ */
+void lv_vglite_init_dest_buf(const lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride);
 
 #if BLIT_DBG_AREAS
 /**
@@ -125,19 +138,27 @@ void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, 
  * @param[in] lv_col32 The initial LVGL 32bit color
  * @param[in] opa The opacity to premultiply with
  * @param[in] vg_col_format The format of the resulting vglite color
-
+ *
+ * @retval LV_RES_OK Operation completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
 lv_res_t lv_vglite_premult_and_swizzle(vg_lite_color_t * vg_col32, lv_color32_t lv_col32, lv_opa_t opa,
                                        vg_lite_buffer_format_t vg_col_format);
 
 /**
- * Generates corresponding vglite blend mode based on given LVGL blend mode
- * @param lv_blend_mode The LVGL blend mode to be converted into vglite blend mode
+ * Get vglite blend mode.
+ *
+ * @param[in] lv_blend_mode The LVGL blend mode
+ *
+ * @retval The vglite blend mode
  */
 vg_lite_blend_t lv_vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
 
 /**
  * Clear cache and flush command to VG-Lite.
+ *
+ * @retval LV_RES_OK Run completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
 lv_res_t lv_vglite_run(void);
 
