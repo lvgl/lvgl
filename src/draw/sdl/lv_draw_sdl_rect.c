@@ -41,7 +41,8 @@ typedef struct {
     lv_sdl_cache_key_magic_t magic;
     lv_gradient_stop_t stops[LV_GRADIENT_MAX_STOPS];
     uint8_t stops_count;
-} lv_draw_rect_grad_key_t;
+    lv_grad_dir_t dir;
+} lv_draw_rect_grad_strip_key_t;
 
 typedef struct {
     lv_sdl_cache_key_magic_t magic;
@@ -63,8 +64,11 @@ typedef struct {
 static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                           const lv_draw_rect_dsc_t * dsc);
 
-static void draw_bg_grad(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
-                         const lv_draw_rect_dsc_t * dsc);
+static void draw_bg_grad_simple(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                                const lv_draw_rect_dsc_t * dsc);
+
+static void draw_bg_grad_radius(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                                const lv_draw_rect_dsc_t * dsc);
 
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc);
@@ -90,7 +94,7 @@ static void frag_render_center(SDL_Renderer * renderer, SDL_Texture * frag, lv_c
 
 static lv_draw_rect_bg_key_t rect_bg_key_create(lv_coord_t radius, lv_coord_t size);
 
-static lv_draw_rect_grad_key_t rect_grad_key_create(const lv_grad_dsc_t * grad);
+static lv_draw_rect_grad_strip_key_t rect_grad_strip_key_create(const lv_grad_dsc_t * grad);
 
 static lv_draw_rect_shadow_key_t rect_shadow_key_create(lv_coord_t radius, lv_coord_t size, lv_coord_t blur);
 
@@ -174,9 +178,9 @@ SDL_Texture * lv_draw_sdl_rect_bg_frag_obtain(lv_draw_sdl_ctx_t * ctx, lv_coord_
     return texture;
 }
 
-SDL_Texture * lv_draw_sdl_rect_grad_frag_obtain(lv_draw_sdl_ctx_t * ctx, const lv_grad_dsc_t * grad)
+SDL_Texture * lv_draw_sdl_rect_grad_strip_obtain(lv_draw_sdl_ctx_t * ctx, const lv_grad_dsc_t * grad)
 {
-    lv_draw_rect_grad_key_t key = rect_grad_key_create(grad);
+    lv_draw_rect_grad_strip_key_t key = rect_grad_strip_key_create(grad);
     SDL_Texture * texture = lv_draw_sdl_texture_cache_get(ctx, &key, sizeof(key), NULL);
     if(texture == NULL) {
         Uint32 amask = 0xFF000000;
@@ -187,7 +191,9 @@ SDL_Texture * lv_draw_sdl_rect_grad_frag_obtain(lv_draw_sdl_ctx_t * ctx, const l
         for(int i = 0; i < 256; i++) {
             pixels[i] = lv_gradient_calculate(grad, 256, i);
         }
-        SDL_Surface * surface = SDL_CreateRGBSurfaceFrom(pixels, 256, 1, LV_COLOR_DEPTH, 256 * LV_COLOR_DEPTH / 8,
+        int width = grad->dir == LV_GRAD_DIR_VER ? 1 : 256;
+        int height = grad->dir == LV_GRAD_DIR_VER ? 256 : 1;
+        SDL_Surface * surface = SDL_CreateRGBSurfaceFrom(pixels, width, height, LV_COLOR_DEPTH, width * LV_COLOR_DEPTH / 8,
                                                          rmask, gmask, bmask, amask);
         texture = SDL_CreateTextureFromSurface(ctx->renderer, surface);
         SDL_FreeSurface(surface);
@@ -254,7 +260,7 @@ void lv_draw_sdl_rect_bg_frag_draw_corners(lv_draw_sdl_ctx_t * ctx, SDL_Texture 
             SDL_RenderCopyEx(ctx->renderer, frag, &src_rect, &dst_rect, 0, NULL, SDL_FLIP_HORIZONTAL | SDL_FLIP_VERTICAL);
         }
     }
-    /* Lower left, right edge should not be clip */
+    /* Lower left, right edge should not be clipped */
     corner_area.x1 = coords->x1;
     corner_area.x2 = coords->x1 + frag_size - 1;
     if(_lv_area_intersect(&dst_area, &corner_area, clip)) {
@@ -286,6 +292,7 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
     if(dsc->bg_opa == 0) {
         return;
     }
+    lv_coord_t radius = dsc->radius;
     SDL_Color bg_color;
     if(dsc->bg_grad.dir == LV_GRAD_DIR_NONE) {
         lv_color_to_sdl_color(&dsc->bg_color, &bg_color);
@@ -294,10 +301,14 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
         lv_color_to_sdl_color(&dsc->bg_grad.stops[0].color, &bg_color);
     }
     else {
-        draw_bg_grad(ctx, coords, draw_area, dsc);
+        if(radius <= 0) {
+            draw_bg_grad_simple(ctx, coords, draw_area, dsc);
+        }
+        else {
+            draw_bg_grad_radius(ctx, coords, draw_area, dsc);
+        }
         return;
     }
-    lv_coord_t radius = dsc->radius;
     if(radius <= 0) {
         SDL_Rect rect;
         lv_area_to_sdl_rect(draw_area, &rect);
@@ -320,35 +331,43 @@ static void draw_bg_color(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, con
     frag_render_center(ctx->renderer, texture, real_radius, coords, draw_area, false);
 }
 
-static void draw_bg_grad(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
-                         const lv_draw_rect_dsc_t * dsc)
+static void draw_bg_grad_simple(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                                const lv_draw_rect_dsc_t * dsc)
 {
     SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
-    SDL_Texture * texture = lv_draw_sdl_rect_grad_frag_obtain(ctx, &dsc->bg_grad);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_Rect clip_rect;
-    lv_area_to_sdl_rect(draw_area, &clip_rect);
-    SDL_RenderSetClipRect(ctx->renderer, &clip_rect);
+    SDL_Texture * grad_texture = lv_draw_sdl_rect_grad_strip_obtain(ctx, &dsc->bg_grad);
+    SDL_SetTextureBlendMode(grad_texture, SDL_BLENDMODE_BLEND);
+
+    SDL_Rect dstrect;
+    lv_area_to_sdl_rect(draw_area, &dstrect);
+    SDL_Rect srcrect;
     if(dsc->bg_grad.dir == LV_GRAD_DIR_VER) {
-        int coords_w = lv_area_get_width(coords), coords_h = lv_area_get_height(coords);
-        SDL_Point coords_center = {.x = coords->x1 + coords_w / 2, .y = coords->y1 + coords_h / 2};
-        SDL_Rect rotated_rect = {
-            .w = coords_h, .h = coords_w,
-            .x = coords_center.x - coords_h / 2, .y = coords_center.y - coords_w / 2
-        };
-        SDL_RenderCopyEx(ctx->renderer, texture, NULL, &rotated_rect, 90, NULL, SDL_FLIP_NONE);
+        lv_coord_t coords_h = lv_area_get_height(coords);
+        srcrect.x = 0;
+        srcrect.y = dstrect.y * 255 / coords_h;
+        srcrect.w = 1;
+        srcrect.h = dstrect.h * 256 / coords_h;
     }
     else {
-        SDL_Rect rect;
-        lv_area_to_sdl_rect(coords, &rect);
-        SDL_RenderCopy(ctx->renderer, texture, NULL, &rect);
+        lv_coord_t coords_w = lv_area_get_width(coords);
+        srcrect.x = dstrect.x * 255 / coords_w;
+        srcrect.y = 0;
+        srcrect.w = dstrect.w * 256 / coords_w;
+        srcrect.h = 1;
     }
-    SDL_RenderSetClipRect(ctx->renderer, NULL);
+    SDL_RenderCopy(ctx->renderer, grad_texture, &srcrect, &dstrect);
+}
+
+static void draw_bg_grad_radius(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
+                                const lv_draw_rect_dsc_t * dsc)
+{
+
 }
 
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
                         const lv_draw_rect_dsc_t * dsc)
 {
+    LV_UNUSED(draw_area);
     if(SKIP_IMAGE(dsc)) return;
 
     lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
@@ -751,12 +770,13 @@ static lv_draw_rect_bg_key_t rect_bg_key_create(lv_coord_t radius, lv_coord_t si
     return key;
 }
 
-static lv_draw_rect_grad_key_t rect_grad_key_create(const lv_grad_dsc_t * grad)
+static lv_draw_rect_grad_strip_key_t rect_grad_strip_key_create(const lv_grad_dsc_t * grad)
 {
-    lv_draw_rect_grad_key_t key;
+    lv_draw_rect_grad_strip_key_t key;
     SDL_memset(&key, 0, sizeof(key));
     key.magic = LV_GPU_CACHE_KEY_MAGIC_RECT_GRAD;
     key.stops_count = grad->stops_count;
+    key.dir = grad->dir;
     for(uint8_t i = 0; i < grad->stops_count; i++) {
         key.stops[i].frac = grad->stops[i].frac;
         key.stops[i].color = grad->stops[i].color;
