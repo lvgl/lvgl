@@ -75,6 +75,15 @@
  */
 static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * blit);
 
+/**
+* Verify BLIT structure - widths, stride, pointer alignment
+*
+* @param[in] blit BLIT configuration
+* @retval LV_RES_OK
+* @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+*/
+static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
+
 #if VG_LITE_BLIT_SPLIT_ENABLED
 
     /**
@@ -100,15 +109,6 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     * @param[in] blit BLIT configuration
     */
     static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
-
-    /**
-    * Verify BLIT structure - widths, stride, pointer alignment
-    *
-    * @param[in] blit BLIT configuration
-    * @retval LV_RES_OK
-    * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
-    */
-    static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
 
     /**
     * BLock Image Transfer - split BLIT.
@@ -138,16 +138,11 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
     lv_coord_t area_w = lv_area_get_width(fill_area);
     lv_coord_t area_h = lv_area_get_height(fill_area);
 
-    vg_lite_buffer_t vgbuf;
     vg_lite_rectangle_t rect;
     vg_lite_error_t err = VG_LITE_SUCCESS;
     lv_color32_t col32 = {.full = lv_color_to32(color)}; /*Convert color to RGBA8888*/
     vg_lite_color_t vgcol; /* vglite takes ABGR */
-
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width,
-                          (const lv_color_t *)dest_buf, false) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
-
+    vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
 
     vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_BGRA8888 : VG_LITE_ABGR8888;
     if(lv_vglite_premult_and_swizzle(&vgcol, col32, opa, color_format) != LV_RES_OK)
@@ -159,7 +154,7 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         rect.width = area_w;
         rect.height = area_h;
 
-        err = vg_lite_clear(&vgbuf, &rect, vgcol);
+        err = vg_lite_clear(vgbuf, &rect, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Clear failed.");
 
         if(lv_vglite_run() != LV_RES_OK)
@@ -186,7 +181,7 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
         vg_lite_identity(&matrix);
 
         /*Draw rectangle*/
-        err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
+        err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
         VG_LITE_ERR_RETURN_INV(err, "Draw rectangle failed.");
 
         if(lv_vglite_run() != LV_RES_OK)
@@ -221,11 +216,6 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_gpu_nxp_vglite_blit_info_t * blit)
 static lv_res_t _lv_gpu_nxp_vglite_blit_split(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
     lv_res_t rv = LV_RES_INV;
-
-    if(_lv_gpu_nxp_vglite_check_blit(blit) != LV_RES_OK) {
-        PRINT_BLT("Blit check failed\n");
-        return LV_RES_INV;
-    }
 
     PRINT_BLT("BLIT from: "
               "Area: %03d,%03d - %03d,%03d "
@@ -381,28 +371,19 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_split(lv_gpu_nxp_vglite_blit_info_t * bl
 
 static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
-    vg_lite_buffer_t src_vgbuf, dst_vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
     uint32_t rect[4];
     vg_lite_float_t scale = 1.0;
+    vg_lite_buffer_t src_vgbuf;
+    vg_lite_buffer_t * dst_vgbuf = lv_vglite_get_dest_buf();
 
-    if(blit == NULL) {
-        /*Wrong parameter*/
+    if(_lv_gpu_nxp_vglite_check_blit(blit) != LV_RES_OK) {
+        PRINT_BLT("Blit check failed\n");
         return LV_RES_INV;
     }
 
-    if(blit->opa < (lv_opa_t) LV_OPA_MIN) {
-        return LV_RES_OK; /*Nothing to BLIT*/
-    }
-
-    /*Wrap src/dst buffer into VG-Lite buffer*/
-    if(lv_vglite_init_buf(&src_vgbuf, (uint32_t)blit->src_width, (uint32_t)blit->src_height, (uint32_t)blit->src_stride,
-                          blit->src, true) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
-
-    if(lv_vglite_init_buf(&dst_vgbuf, (uint32_t)blit->dst_width, (uint32_t)blit->dst_height, (uint32_t)blit->dst_stride,
-                          blit->dst, false) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
+    /*Wrap src buffer into VG-Lite buffer*/
+    lv_vglite_init_buf(&src_vgbuf, blit->src, &blit->src_area, blit->src_stride);
 
     rect[0] = (uint32_t)blit->src_area.x1; /* start x */
     rect[1] = (uint32_t)blit->src_area.y1; /* start y */
@@ -450,7 +431,7 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
                             (int32_t)lv_area_get_height(&blit->dst_area));
     }
 
-    err = vg_lite_blit_rect(&dst_vgbuf, &src_vgbuf, rect, &matrix, blend, color, VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, &src_vgbuf, rect, &matrix, blend, color, VG_LITE_FILTER_POINT);
     if(err != VG_LITE_SUCCESS) {
         if(scissoring)
             vg_lite_disable_scissor();
@@ -465,6 +446,43 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
 
     if(scissoring)
         vg_lite_disable_scissor();
+
+    return LV_RES_OK;
+}
+
+static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
+{
+
+    /* Test for minimal width */
+    if(lv_area_get_width(&blit->src_area) < (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX)
+        VG_LITE_RETURN_INV("Src area width (%d px) is smaller than required (%d).",
+                           lv_area_get_width(&blit->src_area), LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+
+    /* Test for minimal width */
+    if(lv_area_get_width(&blit->dst_area) < (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX)
+        VG_LITE_RETURN_INV("Dest area width (%d px) is smaller than required (%d).",
+                           lv_area_get_width(&blit->dst_area), LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+
+    /* Test for pointer alignment */
+    if((((uintptr_t)blit->src) % (uintptr_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) != 0x0U)
+        VG_LITE_RETURN_INV("Src buffer ptr (0x%x) not aligned to 0x%x bytes.",
+                           (size_t)blit->src, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
+
+    /* No alignment requirement for destination pixel buffer when using mode VG_LITE_LINEAR */
+
+    /* Test for stride alignment */
+    if((blit->src_stride % (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) !=  0x0U)
+        VG_LITE_RETURN_INV("Src buffer stride (%d px) not aligned to %d px.",
+                           blit->src_stride, LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+
+    /* Test for stride alignment */
+    if((blit->dst_stride % (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) !=  0x0U)
+        VG_LITE_RETURN_INV("Dest buffer stride (%d px) not aligned to %d px.",
+                           blit->dst_stride, LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
+
+    if((lv_area_get_width(&blit->src_area) != lv_area_get_width(&blit->dst_area)) ||
+       (lv_area_get_height(&blit->src_area) != lv_area_get_height(&blit->dst_area)))
+        VG_LITE_RETURN_INV("Src and dest buffer areas are not equal.");
 
     return LV_RES_OK;
 }
@@ -489,7 +507,7 @@ static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
             dst += blit->dst_stride;
         }
     }
-    else if(blit->opa >= (lv_opa_t)LV_OPA_MIN) {
+    else {
         /* alpha blending */
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {
@@ -499,43 +517,6 @@ static void _sw_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
             dst += blit->dst_stride;
         }
     }
-}
-
-static lv_res_t _lv_gpu_nxp_vglite_check_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
-{
-
-    /* Test for minimal width */
-    if(lv_area_get_width(&blit->src_area) < (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX)
-        VG_LITE_RETURN_INV("Src area width (%d px) is smaller than required (%d).",
-        		lv_area_get_width(&blit->src_area), LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
-
-    /* Test for minimal width */
-    if(lv_area_get_width(&blit->dst_area) < (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX)
-        VG_LITE_RETURN_INV("Dest area width (%d px) is smaller than required (%d).",
-        		lv_area_get_width(&blit->dst_area), LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
-
-    /* Test for pointer alignment */
-    if((((uintptr_t)blit->src) % (uintptr_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) != 0x0U)
-        VG_LITE_RETURN_INV("Src buffer ptr (0x%x) not aligned to 0x%x bytes.",
-        		(size_t)blit->src, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
-
-    /* No alignment requirement for destination pixel buffer when using mode VG_LITE_LINEAR */
-
-    /* Test for stride alignment */
-    if((blit->src_stride % (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) !=  0x0U)
-        VG_LITE_RETURN_INV("Src buffer stride (%d px) not aligned to %d px.",
-        		blit->src_stride, LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
-
-    /* Test for stride alignment */
-    if((blit->dst_stride % (lv_coord_t)LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX) !=  0x0U)
-        VG_LITE_RETURN_INV("Dest buffer stride (%d px) not aligned to %d px.",
-        		blit->dst_stride, LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX);
-
-    if((lv_area_get_width(&blit->src_area) != lv_area_get_width(&blit->dst_area)) ||
-       (lv_area_get_height(&blit->src_area) != lv_area_get_height(&blit->dst_area)))
-        VG_LITE_RETURN_INV("Src and dest buffer areas are not equal.");
-
-    return LV_RES_OK;
 }
 
 static void _align_x(lv_area_t * area, lv_color_t ** buf)

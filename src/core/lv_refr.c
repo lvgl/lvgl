@@ -23,6 +23,10 @@
     #include "../widgets/label/lv_label.h"
 #endif
 
+#if LV_USE_GPU_NXP_VG_LITE
+    #include "../draw/nxp/vglite/lv_draw_vglite_utils.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -623,6 +627,10 @@ static void refr_area(const lv_area_t * area_p)
 static void refr_area_part(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
+
+#if LV_USE_GPU_NXP_VG_LITE
+    lv_vglite_init_dest_buf(draw_ctx->buf, draw_ctx->buf_area, lv_area_get_width(draw_ctx->buf_area));
+#endif
 
     /* Below the `area_p` area will be redrawn into the draw buffer.
      * In single buffered mode wait here until the buffer is freed.*/
