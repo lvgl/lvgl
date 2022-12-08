@@ -34,10 +34,13 @@
 #include "lv_draw_pxp_blend.h"
 
 #if LV_USE_GPU_NXP_PXP
+#include "lvgl_support.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#define PXP_TEMP_BUF_SIZE LCD_WIDTH * LCD_HEIGHT * LCD_FB_BYTE_PER_PIXEL
 
 #if LV_COLOR_16_SWAP
     #error Color swap not implemented. Disable LV_COLOR_16_SWAP feature.
@@ -62,6 +65,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static LV_ATTRIBUTE_MEM_ALIGN uint8_t temp_buf[PXP_TEMP_BUF_SIZE];
 
 /**
  * BLock Image Transfer - copy rectangular image from src buffer to dst buffer
@@ -368,13 +373,8 @@ static lv_res_t lv_gpu_nxp_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t *
     lv_coord_t dest_w = lv_area_get_width(dest_area);
     lv_coord_t dest_h = lv_area_get_height(dest_area);
     lv_res_t res;
-    uint32_t size = dest_w * dest_h * sizeof(lv_color_t);
 
-    lv_color_t * tmp_buf = (lv_color_t *)lv_mem_buf_get(size);
-    if(!tmp_buf)
-        PXP_RETURN_INV("Allocating temporary buffer failed.");
-
-    const lv_area_t tmp_area = {
+    const lv_area_t temp_area = {
         .x1 = 0,
         .y1 = 0,
         .x2 = dest_w - 1,
@@ -382,19 +382,14 @@ static lv_res_t lv_gpu_nxp_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t *
     };
 
     /*Step 1: Transform with full opacity to temporary buffer*/
-    res = lv_gpu_nxp_pxp_blit_cover(tmp_buf, &tmp_area, dest_w, src_buf, src_area, dsc, cf);
+    res = lv_gpu_nxp_pxp_blit_cover((lv_color_t *)temp_buf, &temp_area, dest_w, src_buf, src_area, dsc, cf);
     if(res != LV_RES_OK) {
         PXP_LOG_TRACE("Blit cover with full opacity failed.");
-        lv_mem_buf_release(tmp_buf);
-
         return res;
     }
 
     /*Step 2: Blit temporary results with required opacity to output*/
-    res = lv_gpu_nxp_pxp_blit_cf(dest_buf, dest_area, dest_stride, tmp_buf, &tmp_area, dsc, cf);
-
-    /*Clean-up memory*/
-    lv_mem_buf_release(tmp_buf);
+    res = lv_gpu_nxp_pxp_blit_cf(dest_buf, dest_area, dest_stride, (lv_color_t *)temp_buf, &temp_area, dsc, cf);
 
     return res;
 }
