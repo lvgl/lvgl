@@ -448,7 +448,54 @@ static void draw_bg_grad_radius(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coord
     SDL_Texture * grad_texture = lv_draw_sdl_rect_grad_frag_obtain(ctx, &dsc->bg_grad, bg_w, bg_h, radius);
 
     lv_draw_sdl_rect_bg_frag_draw_corners(ctx, grad_texture, real_radius, coords, draw_area, true);
-    //    draw_bg_grad_simple(ctx, coords, draw_area, dsc);
+    lv_area_t part_coords;
+    lv_area_t part_area;
+    if(bg_w > radius * 2) {
+        /*Draw left, middle, right*/
+        part_coords.x1 = 0;
+        part_coords.x2 = radius - 1;
+        part_coords.y1 = radius;
+        part_coords.y2 = bg_h - radius - 1;
+
+        lv_area_align(coords, &part_coords, LV_ALIGN_LEFT_MID, 0, 0);
+        _lv_area_intersect(&part_area, &part_coords, draw_area);
+        draw_bg_grad_simple(ctx, coords, &part_area, &dsc->bg_grad, false);
+
+        lv_area_align(coords, &part_coords, LV_ALIGN_RIGHT_MID, 0, 0);
+        _lv_area_intersect(&part_area, &part_coords, draw_area);
+        draw_bg_grad_simple(ctx, coords, &part_area, &dsc->bg_grad, false);
+
+        part_coords.x1 = radius;
+        part_coords.x2 = bg_w - radius - 1;
+        part_coords.y1 = 0;
+        part_coords.y2 = bg_h - 1;
+        lv_area_align(coords, &part_coords, LV_ALIGN_CENTER, 0, 0);
+        _lv_area_intersect(&part_area, &part_coords, draw_area);
+        draw_bg_grad_simple(ctx, coords, &part_area, &dsc->bg_grad, false);
+    }
+    else if(bg_h > radius * 2) {
+        /*Draw top, middle, bottom*/
+        part_coords.x1 = radius;
+        part_coords.x2 = bg_w - radius - 1;
+        part_coords.y1 = 0;
+        part_coords.y2 = radius - 1;
+
+        lv_area_align(coords, &part_coords, LV_ALIGN_TOP_MID, 0, 0);
+        _lv_area_intersect(&part_area, &part_coords, draw_area);
+        draw_bg_grad_simple(ctx, coords, &part_area, &dsc->bg_grad, false);
+
+        lv_area_align(coords, &part_coords, LV_ALIGN_BOTTOM_MID, 0, 0);
+        _lv_area_intersect(&part_area, &part_coords, draw_area);
+        draw_bg_grad_simple(ctx, coords, &part_area, &dsc->bg_grad, false);
+
+        part_coords.x1 = 0;
+        part_coords.x2 = bg_w - 1;
+        part_coords.y1 = radius;
+        part_coords.y2 = bg_h - radius - 1;
+        lv_area_align(coords, &part_coords, LV_ALIGN_CENTER, 0, 0);
+        _lv_area_intersect(&part_area, &part_coords, draw_area);
+        draw_bg_grad_simple(ctx, coords, &part_area, &dsc->bg_grad, false);
+    }
 }
 
 static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const lv_area_t * draw_area,
