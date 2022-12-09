@@ -158,25 +158,19 @@ static void btn_dec_event_handler(lv_event_t * e)
     }
 }
 
-static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, const char * txt, lv_style_prop_t prop)
+static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, const char * txt, lv_style_prop_t prop, lv_obj_t** cont_)
 {
-    lv_obj_t * cont_main = lv_obj_create(par);
-
-    lv_obj_set_width(cont_main, lv_pct(100));
-    lv_obj_set_flex_flow(cont_main, LV_FLEX_FLOW_COLUMN);
-
-    lv_obj_clear_flag(cont_main, LV_OBJ_FLAG_SCROLLABLE);
-
-    lv_obj_t * label = lv_label_create(cont_main);
-    lv_label_set_text(label, txt);
+    lv_obj_t * cont_main = par;
+    lv_obj_t * label;
 
     lv_obj_t * cont_spinbox = lv_obj_create(cont_main);
+    if (cont_) *cont_ = cont_spinbox;
     lv_obj_remove_style_all(cont_spinbox);
     lv_obj_set_height(cont_spinbox, LV_SIZE_CONTENT);
-    lv_obj_set_width(cont_spinbox, lv_pct(100));
+    lv_obj_set_flex_grow(cont_spinbox, 1);
     lv_obj_set_style_radius(cont_spinbox, 5, LV_PART_MAIN);
     lv_obj_set_style_clip_corner(cont_spinbox, true, LV_PART_MAIN);
-    lv_obj_set_style_outline_width(cont_spinbox, 3, LV_PART_MAIN);
+    lv_obj_set_style_outline_width(cont_spinbox, 2, LV_PART_MAIN);
     lv_obj_set_style_outline_color(cont_spinbox, lv_color_hex3(0xddd), LV_PART_MAIN);
 
     lv_obj_set_flex_flow(cont_spinbox, LV_FLEX_FLOW_ROW);
@@ -230,6 +224,7 @@ static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, const char * txt, lv_style
 static void tab_layout_create(lv_obj_t * tab, view_t * ui)
 {
     lv_obj_set_flex_flow(tab, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_style_pad_gap(tab, 5, LV_PART_MAIN);
     lv_obj_set_flex_align(
         tab,
         LV_FLEX_ALIGN_START,
@@ -237,14 +232,79 @@ static void tab_layout_create(lv_obj_t * tab, view_t * ui)
         LV_FLEX_ALIGN_CENTER
     );
 
+    static lv_style_t group_style;
+    lv_style_init(&group_style);
+    lv_style_set_pad_all(&group_style, 2);
+    lv_style_set_border_width(&group_style, 0);
+    lv_style_set_width(&group_style, LV_PCT(100));
+    lv_style_set_height(&group_style, LV_SIZE_CONTENT);
 
-    ui->ctrl_pad.tab.layout.spinbox_width = spinbox_ctrl_create(tab, "width", LV_STYLE_WIDTH);
-    ui->ctrl_pad.tab.layout.spinbox_height = spinbox_ctrl_create(tab, "height", LV_STYLE_HEIGHT);
-    ui->ctrl_pad.tab.layout.spinbox_pad_top = spinbox_ctrl_create(tab, "pad-top", LV_STYLE_PAD_TOP);
-    ui->ctrl_pad.tab.layout.spinbox_pad_bottom = spinbox_ctrl_create(tab, "pad-bottom", LV_STYLE_PAD_BOTTOM);
-    ui->ctrl_pad.tab.layout.spinbox_pad_left = spinbox_ctrl_create(tab, "pad-left", LV_STYLE_PAD_LEFT);
-    ui->ctrl_pad.tab.layout.spinbox_pad_right = spinbox_ctrl_create(tab, "pad-right", LV_STYLE_PAD_RIGHT);
-    ui->ctrl_pad.tab.layout.spinbox_pad_column = spinbox_ctrl_create(tab, "pad-column", LV_STYLE_PAD_COLUMN);
-    ui->ctrl_pad.tab.layout.spinbox_pad_row = spinbox_ctrl_create(tab, "pad-row", LV_STYLE_PAD_ROW);
-    ui->ctrl_pad.tab.layout.spinbox_flex_grow = spinbox_ctrl_create(tab, "flex-grow", LV_STYLE_FLEX_GROW);
+    lv_obj_t * label = lv_label_create(tab);
+    lv_obj_set_style_pad_top(label, 10, LV_PART_MAIN);
+    lv_checkbox_set_text(label, "WIDTH x HEIGHT");
+
+    lv_obj_t * temp_group = lv_obj_create(tab);
+    ui->ctrl_pad.tab.layout.group_width_and_height = temp_group;
+    lv_obj_add_style(temp_group, &group_style, LV_PART_MAIN);
+    lv_obj_set_flex_flow(temp_group, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(temp_group, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    ui->ctrl_pad.tab.layout.spinbox_width = spinbox_ctrl_create(temp_group, "width", LV_STYLE_WIDTH, NULL);
+    ui->ctrl_pad.tab.layout.spinbox_height = spinbox_ctrl_create(temp_group, "height", LV_STYLE_HEIGHT, NULL);
+
+    label = lv_label_create(tab);
+    lv_obj_set_style_pad_top(label, 10, LV_PART_MAIN);
+    lv_checkbox_set_text(label, "MIN-WIDTH x MIN-HEIGHT");
+
+    temp_group = lv_obj_create(tab);
+    ui->ctrl_pad.tab.layout.group_width_and_height_min = temp_group;
+    lv_obj_add_style(temp_group, &group_style, LV_PART_MAIN);
+    lv_obj_set_flex_flow(temp_group, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(temp_group, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    ui->ctrl_pad.tab.layout.spinbox_min_width = spinbox_ctrl_create(temp_group, "min-width", LV_STYLE_MIN_WIDTH, NULL);
+    ui->ctrl_pad.tab.layout.spinbox_min_height = spinbox_ctrl_create(temp_group, "min-height", LV_STYLE_MIN_HEIGHT, NULL);
+
+    label = lv_label_create(tab);
+    lv_obj_set_style_pad_top(label, 10, LV_PART_MAIN);
+    lv_checkbox_set_text(label, "MAX-WIDTH x MAX-HEIGHT");
+
+    temp_group = lv_obj_create(tab);
+    ui->ctrl_pad.tab.layout.group_width_and_height_max = temp_group;
+    lv_obj_add_style(temp_group, &group_style, LV_PART_MAIN);
+    lv_obj_set_flex_flow(temp_group, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(temp_group, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    ui->ctrl_pad.tab.layout.spinbox_max_width = spinbox_ctrl_create(temp_group, "max-width", LV_STYLE_MAX_WIDTH, NULL);
+    ui->ctrl_pad.tab.layout.spinbox_max_height = spinbox_ctrl_create(temp_group, "max-height", LV_STYLE_MAX_HEIGHT, NULL);
+
+
+    temp_group = lv_obj_create(tab);
+    ui->ctrl_pad.tab.layout.group_width_and_height_max = temp_group;
+    lv_obj_add_style(temp_group, &group_style, LV_PART_MAIN);
+    lv_obj_set_style_pad_top(temp_group, 20, LV_PART_MAIN);
+    lv_obj_set_flex_flow(temp_group, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(temp_group, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_obj_t * temp_cont;
+    ui->ctrl_pad.tab.layout.spinbox_pad_top = spinbox_ctrl_create(temp_group, "pad-top", LV_STYLE_PAD_TOP, &temp_cont);
+    lv_obj_set_style_width(ui->ctrl_pad.tab.layout.spinbox_pad_top, 30, LV_PART_MAIN);
+    ui->ctrl_pad.tab.layout.spinbox_pad_left = spinbox_ctrl_create(temp_group, "pad-left", LV_STYLE_PAD_LEFT, &temp_cont);
+    lv_obj_add_flag(temp_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    label = lv_label_create(temp_group);
+    lv_checkbox_set_text(label, "PADDING");
+    ui->ctrl_pad.tab.layout.spinbox_pad_right = spinbox_ctrl_create(temp_group, "pad-right", LV_STYLE_PAD_RIGHT, NULL);
+    ui->ctrl_pad.tab.layout.spinbox_pad_bottom = spinbox_ctrl_create(temp_group, "pad-bottom", LV_STYLE_PAD_BOTTOM, &temp_cont);
+    lv_obj_add_flag(temp_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+
+
+    label = lv_label_create(tab);
+    lv_obj_set_style_pad_top(label, 20, LV_PART_MAIN);
+    lv_checkbox_set_text(label, "PAD: COL x ROW x GROW");
+
+    temp_group = lv_obj_create(tab);
+    ui->ctrl_pad.tab.layout.group_width_and_height_max = temp_group;
+    lv_obj_add_style(temp_group, &group_style, LV_PART_MAIN);
+    lv_obj_set_flex_flow(temp_group, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(temp_group, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    ui->ctrl_pad.tab.layout.spinbox_pad_column = spinbox_ctrl_create(temp_group, "pad-column", LV_STYLE_PAD_COLUMN, NULL);
+    ui->ctrl_pad.tab.layout.spinbox_pad_row = spinbox_ctrl_create(temp_group, "pad-row", LV_STYLE_PAD_ROW, NULL);
+    ui->ctrl_pad.tab.layout.spinbox_flex_grow = spinbox_ctrl_create(temp_group, "flex-grow", LV_STYLE_FLEX_GROW, NULL);
 }

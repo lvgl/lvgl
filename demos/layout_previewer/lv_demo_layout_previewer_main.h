@@ -52,8 +52,15 @@ typedef struct {
 
             struct {
                 lv_obj_t * tab;
+                lv_obj_t * group_width_and_height;
                 lv_obj_t * spinbox_width;
                 lv_obj_t * spinbox_height;
+                lv_obj_t * group_width_and_height_min;
+                lv_obj_t * spinbox_min_width;
+                lv_obj_t * spinbox_min_height;
+                lv_obj_t * group_width_and_height_max;
+                lv_obj_t * spinbox_max_width;
+                lv_obj_t * spinbox_max_height;
                 lv_obj_t * spinbox_pad_top;
                 lv_obj_t * spinbox_pad_bottom;
                 lv_obj_t * spinbox_pad_left;
