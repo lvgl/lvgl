@@ -50,8 +50,8 @@ static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
 static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_stride, const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset, lv_opa_t opa);
 static void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dst_buf, lv_coord_t dst_stride, const lv_area_t* draw_area, const lv_opa_t* mask_buf, lv_coord_t mask_stride, const lv_point_t* mask_offset, lv_color32_t color, lv_opa_t opa);
 static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords, const void * src);
-static void invalidate_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
-static void clean_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height);
+static void invalidate_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize);
+static void clean_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize);
 static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv);
 static void startDmaTransfer(void);
 /*
@@ -150,19 +150,21 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
+
     if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
     else mask = dsc->mask_buf;
 
     if (dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
-        c1++; // never happens
+        c1++; // 0 - never happens
     } else if (lv_area_get_size(&draw_area) < 100) {
         c2++; // 223
     } else if (mask != NULL && dsc->src_buf != NULL) {
         c3++; // 1.6
+        // note: draw_ctx->buf (xRGB) does NOT carry alpha channel bytes,
+        // alpha channel bytes are carried in dsc->mask_buf
     } else if (mask != NULL && dsc->src_buf == NULL) {
         c4++; // 200
-        if(!_lv_area_intersect(&draw_area, &draw_area, dsc->mask_area)) return; // further limit draw_area to mask_area
         lv_coord_t dest_w = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t mask_stride = lv_area_get_width(dsc->mask_area);
         lv_point_t mask_offset; // mask offset in relation to draw_area
@@ -170,16 +172,11 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         mask_offset.y = draw_area.y1 - dsc->mask_area->y1;
         lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
         lv_color_t color = dsc->color;
-        if (color.ch.alpha != 0xff) {
-            //printf("a: %i\n", color.ch.alpha);
-            // note: dsc->color.ch.alpha can be 0xff !
-        }
-        lv_draw_stm32_dma2d_blend_paint(draw_ctx->buf, dest_w, &draw_area, mask, mask_stride, &mask_offset, dsc->color, dsc->opa);
+        lv_opa_t opa = dsc->opa;
+        lv_draw_stm32_dma2d_blend_paint(draw_ctx->buf, dest_w, &draw_area, mask, mask_stride, &mask_offset, color, opa);
         done = true;
     } else if (mask == NULL && dsc->src_buf != NULL) {
         c5++; // 1
-        // note: draw_ctx->buf (xRGB) does NOT carry alpha channel bytes,
-        // alpha channel bytes are carried in dsc->mask_buf
         lv_coord_t dest_w = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t src_w = lv_area_get_width(dsc->blend_area);
         lv_point_t src_offset; // source image offset in relation to draw_area
@@ -192,6 +189,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     } else if (mask == NULL && dsc->src_buf == NULL) {
         if (dsc->opa < LV_OPA_MAX) {
             // DMA2D is unable to fill solid color with transparency :/
+            // TODO: Probably it is possible using: CR = 0x2UL << DMA2D_CR_MODE_Pos, FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos) and dummy A8 mask
             c6++; // 2.5
         } else {
             c7++; // 8.7
@@ -202,7 +200,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             done = true;
         }
     } else {
-        c8++; // 0
+        c8++; // 0 - never happens
     }
     
     if(!done) {
@@ -251,7 +249,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
 
 /**
  * @brief Fills draw_area with specified color.
- * @param color color to painted, note: alpha is ignored
+ * @param color color to be painted, note: alpha is ignored
  */
 static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
                                            const lv_area_t * draw_area, lv_color_t color)
@@ -299,21 +297,21 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dst_buf, lv_coord_t 
 		DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
 		// Note: select mode 1 or 2 depending on whether src_buf has xRGB or ARGB data respectively
         //DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos);  // Replace original foreground image alpha channel value by ALPHA[7:0]
-        DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+        DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
 	}
 
 	DMA2D->FGMAR = (uint32_t)(src_buf + (src_stride * src_offset->y) + src_offset->x);
 	DMA2D->FGOR = src_stride - draw_width;
 	DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
-	clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height);
+	clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_color_t));
 
 	DMA2D->BGPFCCR = DMA2D_INPUT_ARGB8888;
 	DMA2D->BGMAR = (uint32_t)(dst_buf + (dst_stride * draw_area->y1) + draw_area->x1);
 	DMA2D->BGOR = dst_stride - draw_width;
 	DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
-	clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
+	clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-	DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;;
+	DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;
 	DMA2D->OMAR = DMA2D->BGMAR;
 	DMA2D->OOR = DMA2D->BGOR;
 	DMA2D->OCOLR = 0;
@@ -328,7 +326,7 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dst_buf, lv_coord_t 
  * @brief Paints solid color with alpha mask with additional constant opacity. Useful e.g. for painting anti-aliased fonts.
  * @param src_offset src offset in relation to dst, useful when src (alpha mask) is larger than draw_area
  * @param color color to paint, note: alpha is ignored
- * @param opa extra opacity to be applied
+ * @param opa constant opacity to be applied
  */
 static void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dst_buf, lv_coord_t dst_stride, const lv_area_t* draw_area, const lv_opa_t* mask_buf, lv_coord_t mask_stride, const lv_point_t* mask_offset, lv_color32_t color, lv_opa_t opa) {
 	assert_param((uint32_t)dst_buf % CACHE_ROW_SIZE == 0);
@@ -344,18 +342,18 @@ static void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dst_buf, lv_coord_
 	DMA2D->FGPFCCR = DMA2D_INPUT_A8;
     if (opa < LV_OPA_MAX) {
 	    DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
-	    DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+	    DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
     }
 	DMA2D->FGMAR = (uint32_t)(mask_buf + (mask_stride * mask_offset->y) + mask_offset->x);
 	DMA2D->FGOR = mask_stride - draw_width;
-	DMA2D->FGCOLR = color.full; //| (0xff << 24);  // used in A4 and A8 modes only
-	clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height); // adjust for 8bit mask
+	DMA2D->FGCOLR = color.full | (0xff << 24);  // used in A4 and A8 modes only
+	clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_opa_t)); // adjust for 8bit mask
 
 	DMA2D->BGPFCCR = DMA2D_INPUT_ARGB8888;
 	DMA2D->BGMAR = (uint32_t)(dst_buf + (dst_stride * draw_area->y1) + draw_area->x1);
 	DMA2D->BGOR = dst_stride - draw_width;
 	DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
-	clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height);
+	clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
 	DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;;
 	DMA2D->OMAR = DMA2D->BGMAR;
@@ -410,18 +408,18 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     if(invalidateCache) {
         // invalidate cache ONLY after DMA2D transfer
         invalidate_cache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
-                         (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos);
+                         (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, LV_IMG_PX_SIZE_ALPHA_BYTE);
         invalidateCache = false;
     }
 
     lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
-static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height)
+static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
-    uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset); // in bytes
-    uint16_t ll = LV_IMG_PX_SIZE_ALPHA_BYTE * width; // line length in bytes
+    uint32_t stride = pixelSize * (width + offset); // in bytes
+    uint16_t ll = pixelSize * width; // line length in bytes
     uint32_t n = 0; // address of the next cache row after the last invalidated row
     lv_coord_t h = 0;
 
@@ -446,11 +444,11 @@ static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t wid
     __ISB();
 }
 
-static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height)
+static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
-    uint32_t stride = LV_IMG_PX_SIZE_ALPHA_BYTE * (width + offset); // in bytes
-    uint16_t ll = LV_IMG_PX_SIZE_ALPHA_BYTE * width; // line length in bytes
+    uint32_t stride = pixelSize * (width + offset); // in bytes
+    uint16_t ll = pixelSize * width; // line length in bytes
     uint32_t n = 0; // address of the next cache row after the last cleaned row
     lv_coord_t h = 0;
     __DSB();
