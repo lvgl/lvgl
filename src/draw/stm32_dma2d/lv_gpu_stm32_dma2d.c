@@ -157,7 +157,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
     if (dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
         c1++; // 0 - never happens
-    } else if (lv_area_get_size(&draw_area) < 100) {
+    } else if (lv_area_get_size(&draw_area) < 80) {
         c2++; // 223
     } else if (mask != NULL && dsc->src_buf != NULL) {
         c3++; // 1.6
@@ -173,6 +173,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
         lv_color_t color = dsc->color;
         lv_opa_t opa = dsc->opa;
+        // TODO: some bug here, map has wrong bytes
         lv_draw_stm32_dma2d_blend_paint(draw_ctx->buf, dest_w, &draw_area, mask, mask_stride, &mask_offset, color, opa);
         done = true;
     } else if (mask == NULL && dsc->src_buf != NULL) {
@@ -269,7 +270,7 @@ static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0]
         
-        // note: in Alpha Mode 1 this address is not used as to supply foreground A8 bytes
+        // note: in Alpha Mode 1 this address is not used as to supply foreground A8 bytes, those bytes are replaced by ALPHA const
         DMA2D->FGMAR = (uint32_t)(dst_buf + (dst_stride * draw_area->y1) + draw_area->x1);
         DMA2D->FGOR = dst_stride - draw_width;
         DMA2D->FGCOLR = color.full;  // used in A4 and A8 modes only, alpha is ignored
