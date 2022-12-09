@@ -1,10 +1,10 @@
 ﻿/**
- * @file lv_demo_layout_previewer_main.h
+ * @file lv_demo_flex_layout_main.h
  *
  */
 
-#ifndef LV_DEMO_LAYOUT_PREVIEWER_MAIN_H
-#define LV_DEMO_LAYOUT_PREVIEWER_MAIN_H
+#ifndef LV_DEMO_FLEX_LAYOUT_MAIN_H
+#define LV_DEMO_FLEX_LAYOUT_MAIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,4 +101,4 @@ void flex_loader_attach(view_t * ui);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DEMO_LAYOUT_PREVIEWER_MAIN_H*/
+#endif /*LV_DEMO_FLEX_LAYOUT_MAIN_H*/

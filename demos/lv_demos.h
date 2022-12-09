@@ -35,8 +35,8 @@ extern "C" {
 #include "widgets/lv_demo_widgets.h"
 #endif
 
-#if LV_USE_DEMO_LAYOUT_PREVIEWER
-#include "layout_previewer/lv_demo_layout_previewer.h"
+#if LV_USE_DEMO_FLEX_LAYOUT
+#include "flex_layout/lv_demo_flex_layout.h"
 #endif
 
 /*********************

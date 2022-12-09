@@ -1,10 +1,10 @@
 ﻿/**
- * @file lv_demo_layout_previewer.h
+ * @file lv_demo_flex_layout.h
  *
  */
 
-#ifndef LV_DEMO_LAYOUT_PREVIEWER_H
-#define LV_DEMO_LAYOUT_PREVIEWER_H
+#ifndef LV_DEMO_FLEX_LAYOUT_H
+#define LV_DEMO_FLEX_LAYOUT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +25,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_demo_layout_previewer(void);
+void lv_demo_flex_layout(void);
 
 /**********************
  *      MACROS
@@ -35,4 +35,4 @@ void lv_demo_layout_previewer(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DEMO_LAYOUT_PREVIEWER_H*/
+#endif /*LV_DEMO_FLEX_LAYOUT_H*/

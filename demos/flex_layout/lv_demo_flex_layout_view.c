@@ -1,5 +1,5 @@
 ﻿/**
- * @file lv_demo_layout_previewer_view.c
+ * @file lv_demo_flex_layout_view.c
  *
  */
 
@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_demo_layout_previewer_main.h"
+#include "lv_demo_flex_layout_main.h"
 
 /*********************
  *      DEFINES

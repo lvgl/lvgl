@@ -1,5 +1,5 @@
 ﻿/**
- * @file lv_demo_layout_previewer_ctrl_pad.h
+ * @file lv_demo_flex_layout_ctrl_pad.h
  *
  */
 
@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_demo_layout_previewer_main.h"
+#include "lv_demo_flex_layout_main.h"
 
 /*********************
  *      DEFINES

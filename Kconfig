@@ -1111,7 +1111,7 @@ menu "LVGL configuration"
 			depends on LV_USE_DEMO_MUSIC
 			default n
 
-		config LV_USE_DEMO_LAYOUT_PREVIEWER
+		config LV_USE_DEMO_FLEX_LAYOUT
 			bool "Flex layout previewer"
 			default n
 	endmenu
