@@ -352,17 +352,21 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dest_buf, lv_coord_t
 	DMA2D->FGPFCCR = DMA2D_INPUT_ARGB8888;
 
 	if (isSrcArgb) {
+        // src is ARGB
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
-        DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+        DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 2: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
     } else {
+        // src is xRGB
         if (opa == 0xff) {
+            // no need to blend
             DMA2D->CR = 0x1UL << DMA2D_CR_MODE_Pos;            // Memory-to-memory with PFC (FG fetch only with FG PFC active)
+            // Alpha Mode 0: No modification of the foreground image alpha channel value
         } else {
+            // blend with constant ALPHA only
             DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
             DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
-            // Note: select Alpha Mode 1 or 2 depending on whether src_buf has xRGB or ARGB data respectively
-            DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+            DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
         }
     }
 
