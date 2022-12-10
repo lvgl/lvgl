@@ -237,7 +237,7 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
             c10++;
             // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
             lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-            lv_point_t src_offset; // position of the clip area origin within the source image area
+            lv_point_t src_offset; // source image offset in relation to draw_area
             src_offset.x = draw_area.x1 - src_area->x1;
             src_offset.y = draw_area.y1 - src_area->y1;
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
@@ -429,7 +429,7 @@ STATIC void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
 
     if(invalidateCache) {
-        // invalidate cache ONLY after DMA2D transfer
+        // invalidate output buffer cached memory ONLY after DMA2D transfer
         invalidate_cache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
                          (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, LV_IMG_PX_SIZE_ALPHA_BYTE);
         invalidateCache = false;
