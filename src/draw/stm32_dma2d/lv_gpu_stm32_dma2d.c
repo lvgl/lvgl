@@ -176,10 +176,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         mask_offset.x = draw_area.x1 - dsc->mask_area->x1;
         mask_offset.y = draw_area.y1 - dsc->mask_area->y1;
         lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-        lv_color_t color = dsc->color;
-        lv_opa_t opa = dsc->opa;
         // TODO: some bug here, map has wrong bytes
-        lv_draw_stm32_dma2d_blend_paint(draw_ctx->buf, dest_w, &draw_area, mask, mask_stride, &mask_offset, color, opa);
+        lv_draw_stm32_dma2d_blend_paint(draw_ctx->buf, dest_w, &draw_area, mask, mask_stride, &mask_offset, dsc->color, dsc->opa);
         done = true;
     } else if (mask == NULL && dsc->src_buf != NULL) {
         c5++; // 1
