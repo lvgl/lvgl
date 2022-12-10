@@ -45,6 +45,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+/*
 static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
                                            const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa);
 static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dst_buf, lv_coord_t dst_stride, const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset, lv_opa_t opa);
@@ -54,6 +55,7 @@ static void invalidate_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord
 static void clean_cache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize);
 static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv);
 static void startDmaTransfer(void);
+*/
 /*
 static void zeroAlpha(const lv_color_t * buf, uint32_t length);
 static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const lv_area_t * area3, const lv_area_t * area4);
@@ -216,7 +218,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_pos, LV_OPA_MAX);
 }
 
-static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                         const lv_area_t * src_area, const void * src)
 {
     //lv_draw_sw_img_decoded(draw_ctx, dsc, src_area, src, color_format);
@@ -246,7 +248,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
  * @brief Fills draw_area with specified color.
  * @param color color to be painted, note: alpha is ignored
  */
-static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
+STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
                                            const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa)
 {
     assert_param((uint32_t)dst_buf % CACHE_ROW_SIZE == 0);
@@ -270,9 +272,10 @@ static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0]
         
-        // note: in Alpha Mode 1 this address is not used as to supply foreground A8 bytes, those bytes are replaced by ALPHA const
-        DMA2D->FGMAR = (uint32_t)(dst_buf + (dst_stride * draw_area->y1) + draw_area->x1);
-        DMA2D->FGOR = dst_stride - draw_width;
+        // note: in Alpha Mode 1 FGMAR and FGOR are not used as to supply foreground A8 bytes,
+        // those bytes are replaced by ALPHA const defined in FGPFCCR
+        DMA2D->FGMAR = (uint32_t)dst_buf;
+        DMA2D->FGOR = dst_stride;
         DMA2D->FGCOLR = color.full;  // used in A4 and A8 modes only, alpha is ignored
 
         DMA2D->BGPFCCR = DMA2D_INPUT_ARGB8888;
@@ -297,7 +300,7 @@ static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
  * @param src_offset src offset in relation to dst, useful when src is larger than draw_area
  * @param opa constant opacity to be applied
  */
-static void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dst_buf, lv_coord_t dst_stride, const lv_area_t* draw_area, const lv_color_t* src_buf, lv_coord_t src_stride, const lv_point_t* src_offset, lv_opa_t opa) {
+STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dst_buf, lv_coord_t dst_stride, const lv_area_t* draw_area, const lv_color_t* src_buf, lv_coord_t src_stride, const lv_point_t* src_offset, lv_opa_t opa) {
 	
     assert_param((uint32_t)dst_buf % CACHE_ROW_SIZE == 0);
     assert_param((uint32_t)src_buf % CACHE_ROW_SIZE == 0);
@@ -347,7 +350,7 @@ static void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dst_buf, lv_coord_t 
  * @param color color to paint, note: alpha is ignored
  * @param opa constant opacity to be applied
  */
-static void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dst_buf, lv_coord_t dst_stride, const lv_area_t* draw_area, const lv_opa_t* mask_buf, lv_coord_t mask_stride, const lv_point_t* mask_offset, lv_color32_t color, lv_opa_t opa) {
+STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dst_buf, lv_coord_t dst_stride, const lv_area_t* draw_area, const lv_opa_t* mask_buf, lv_coord_t mask_stride, const lv_point_t* mask_offset, lv_color32_t color, lv_opa_t opa) {
 	assert_param((uint32_t)dst_buf % CACHE_ROW_SIZE == 0);
     assert_param((uint32_t)mask_buf % CACHE_ROW_SIZE == 0);
 
@@ -395,7 +398,7 @@ static void startDmaTransfer(void)
     DMA2D->CR |= DMA2D_CR_START;
 }
 
-static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
+STATIC void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
 {
     if (disp_drv && disp_drv->wait_cb) {
         while((DMA2D->CR & DMA2D_CR_START) != 0U) {
@@ -405,13 +408,7 @@ static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
     else {
         while((DMA2D->CR & DMA2D_CR_START) != 0U);
     }
-}
-
-void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    waitForDmaTransferToFinish(disp->driver);
-
+    
     __IO uint32_t isrFlags = DMA2D->ISR;
 
     if(isrFlags & DMA2D_ISR_CEIF) {
@@ -430,7 +427,12 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
                          (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, LV_IMG_PX_SIZE_ALPHA_BYTE);
         invalidateCache = false;
     }
+}
 
+void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
+{
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    waitForDmaTransferToFinish(disp->driver);
     lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
