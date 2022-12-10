@@ -117,6 +117,18 @@ void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ct
     LV_UNUSED(drv);
     LV_UNUSED(draw_ctx);
 }
+    
+static uint32_t c1 = 0;
+static uint32_t c2 = 0;
+static uint32_t c3 = 0;
+static uint32_t c4 = 0;
+static uint32_t c5 = 0;
+static uint32_t c6 = 0;
+static uint32_t c7 = 0;
+static uint32_t c8 = 0;
+static uint32_t c9 = 0;
+static uint32_t c10 = 0;
+static uint32_t c11 = 0;
 
 void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
@@ -133,21 +145,12 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     invalidateCache = false;
     
     static uint32_t c = 0;
-    static uint32_t c1 = 0;
-    static uint32_t c2 = 0;
-    static uint32_t c3 = 0;
-    static uint32_t c4 = 0;
-    static uint32_t c5 = 0;
-    static uint32_t c6 = 0;
-    static uint32_t c7 = 0;
-    static uint32_t c8 = 0;
-    static uint32_t c9 = 0;
 
     c++;
     
     if (c == 100) {
         c = 0;
-        printf("%li %li %li %li %li %li %li %li %li\n", c1, c2, c3, c4, c5, c6, c7, c8, c9);
+        printf("%li %li %li %li %li %li %li %li %li %li %li\n", c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11);
     }
     
     const lv_opa_t * mask;
@@ -211,11 +214,13 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
                                      const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
+    c9++;
     LV_UNUSED(draw_ctx);
-    lv_point_t src_pos;
-    src_pos.x = dest_area->x1 - src_area->x1;
-    src_pos.y = dest_area->y1 - src_area->y1;
-    lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_pos, LV_OPA_MAX);
+    lv_point_t src_offset;
+    src_offset.x = dest_area->x1 - src_area->x1;
+    src_offset.y = dest_area->y1 - src_area->y1;
+    // FIXME: use lv_area_move() here ?
+    lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_offset, 0xff);
 }
 
 STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
@@ -229,6 +234,7 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
         const lv_img_dsc_t * img = src;
 
         if(img->header.cf == LV_IMG_CF_RGBA8888 && dsc->angle == 0 && dsc->zoom == 256) {
+            c10++;
             // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
             lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
             lv_point_t src_offset; // position of the clip area origin within the source image area
@@ -240,7 +246,8 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
             return LV_RES_OK;
         }
     }
-
+    
+    c11++;
     return LV_RES_INV;
 }
 
@@ -439,7 +446,7 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
-    uint32_t stride = pixelSize * (width + offset); // in bytes
+    uint16_t stride = pixelSize * (width + offset); // in bytes
     uint16_t ll = pixelSize * width; // line length in bytes
     uint32_t n = 0; // address of the next cache row after the last invalidated row
     lv_coord_t h = 0;
@@ -468,7 +475,7 @@ static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t wid
 static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize)
 {
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
-    uint32_t stride = pixelSize * (width + offset); // in bytes
+    uint16_t stride = pixelSize * (width + offset); // in bytes
     uint16_t ll = pixelSize * width; // line length in bytes
     uint32_t n = 0; // address of the next cache row after the last cleaned row
     lv_coord_t h = 0;
