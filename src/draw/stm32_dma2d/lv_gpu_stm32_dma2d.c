@@ -134,7 +134,6 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 {
     lv_area_t draw_area;
     if(!_lv_area_intersect(&draw_area, dsc->blend_area, draw_ctx->clip_area)) return;
-    //trace4Areas(draw_ctx->buf_area, draw_ctx->clip_area, dsc->blend_area, &draw_area);
     // + draw_ctx->buf_area has the entire draw buffer location
     // + draw_ctx->clip_area has the current draw buffer location
     // + dsc->blend_area has the location of the area intended to be painted - image etc.
@@ -166,7 +165,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         c2++; // 223
     } else if (mask != NULL && dsc->src_buf != NULL) {
         c3++; // 1.6
-        // note: draw_ctx->buf (xRGB) does NOT carry alpha channel bytes,
+        // note: dsc->src_buf (xRGB) does NOT carry alpha channel bytes,
         // alpha channel bytes are carried in dsc->mask_buf
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t mask_stride = lv_area_get_width(dsc->mask_area);
