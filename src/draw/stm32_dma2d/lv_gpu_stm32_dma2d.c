@@ -272,8 +272,8 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0]
         
-        // note: in Alpha Mode 1 FGMAR and FGOR are not used as to supply foreground A8 bytes,
-        // those bytes are replaced by ALPHA const defined in FGPFCCR
+        // note: in Alpha Mode 1 FGMAR and FGOR are not used to supply foreground A8 bytes,
+        // those bytes are replaced by constant ALPHA defined in FGPFCCR
         DMA2D->FGMAR = (uint32_t)dst_buf;
         DMA2D->FGOR = dst_stride;
         DMA2D->FGCOLR = color.full;  // used in A4 and A8 modes only, alpha is ignored
@@ -318,7 +318,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dst_buf, lv_coord_t 
 		DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
 		DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
 		// Note: select mode 1 or 2 depending on whether src_buf has xRGB or ARGB data respectively
-        //DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos);  // Replace original foreground image alpha channel value by ALPHA[7:0]
+        //DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos);  // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0]
         DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
 	}
 
