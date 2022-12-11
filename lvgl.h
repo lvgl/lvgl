@@ -84,6 +84,7 @@ extern "C" {
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
 
+#include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bmp/lv_bmp.h"
 #include "src/libs/fsdrv/lv_fsdrv.h"
 #include "src/libs/png/lv_png.h"

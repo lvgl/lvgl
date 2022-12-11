@@ -633,6 +633,9 @@
 /*QR code library*/
 #define LV_USE_QRCODE 0
 
+/*Barcode code library*/
+#define LV_USE_BARCODE 0
+
 /*FreeType library*/
 #define LV_USE_FREETYPE 0
 #if LV_USE_FREETYPE
