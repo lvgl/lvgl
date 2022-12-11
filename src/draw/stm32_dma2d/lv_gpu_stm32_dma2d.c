@@ -112,6 +112,65 @@ void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     dma2d_draw_ctx->base_draw.buffer_copy = lv_draw_stm32_dma2d_buffer_copy;
 }
 
+#include "stm32f7xx_hal.h"
+static uint32_t DWT_Delay_Init(void);
+static uint32_t DWT_Get_us(void);
+static void DWT_Delay_us(volatile uint32_t microseconds);
+
+__STATIC_INLINE uint32_t DWT_Get_us() {
+	/* Go to number of cycles for system */
+	uint32_t us = DWT->CYCCNT * 1000000 / HAL_RCC_GetHCLKFreq();
+    return us;
+}
+
+/**
+ * @brief  This function provides a delay (in microseconds)
+ * @param  microseconds: delay in microseconds
+ */
+__STATIC_INLINE void DWT_Delay_us(volatile uint32_t microseconds) {
+	uint32_t clk_cycle_start = DWT->CYCCNT;
+
+	/* Go to number of cycles for system */
+	microseconds *= (HAL_RCC_GetHCLKFreq() / 1000000);
+
+	/* Delay till end */
+	while ((DWT->CYCCNT - clk_cycle_start) < microseconds)
+		;
+}
+
+/**
+ * @brief  Initializes DWT_Clock_Cycle_Count for DWT_Delay_us function
+ * @return Error DWT counter
+ *         false: clock cycle counter not started
+ *         true: clock cycle counter works
+ */
+bool DWT_Init(void) {
+	/* Disable TRC */
+	CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk;  // ~0x01000000;
+	/* Enable TRC */
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;  // 0x01000000;
+
+	/* Disable clock cycle counter */
+	DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;  //~0x00000001;
+	/* Enable  clock cycle counter */
+	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;  //0x00000001;
+
+	/* Reset the clock cycle counter value */
+	DWT->CYCCNT = 0;
+
+	/* 3 NO OPERATION instructions */
+	__ASM volatile("NOP");
+	__ASM volatile("NOP");
+	__ASM volatile("NOP");
+
+	/* Check if clock cycle counter has started */
+	if (DWT->CYCCNT) {
+		return true; /*clock cycle counter started*/
+	} else {
+		return false; /*clock cycle counter not started*/
+	}
+}
+
 void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 {
     LV_UNUSED(drv);
@@ -306,7 +365,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         
         DMA2D->FGPFCCR = DMA2D_INPUT_A8;
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
-        DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0]
+        DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
         
         // note: in Alpha Mode 1 FGMAR and FGOR are not used to supply foreground A8 bytes,
         // those bytes are replaced by constant ALPHA defined in FGPFCCR
@@ -411,7 +470,9 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dest_buf, lv_coord
 	DMA2D->FGPFCCR = DMA2D_INPUT_A8;
     if (opa < LV_OPA_MAX) {
 	    DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
-	    DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+	    DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 2: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+    } else {
+        // Alpha Mode 0: No modification of the foreground image alpha channel value
     }
 	DMA2D->FGMAR = (uint32_t)(mask_buf + (mask_stride * mask_offset->y) + mask_offset->x);
 	DMA2D->FGOR = mask_stride - draw_width;
