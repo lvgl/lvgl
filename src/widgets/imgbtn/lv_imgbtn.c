@@ -29,7 +29,7 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void refr_img(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 static lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
-static void update_src_pair(lv_imgbtn_src_pair_t * pair, const void * src);
+static void update_src_info(lv_imgbtn_src_info_t * info, const void * src);
 
 /**********************
  *  STATIC VARIABLES
@@ -84,9 +84,9 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
 
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    update_src_pair(&imgbtn->src_left[state], src_left);
-    update_src_pair(&imgbtn->src_mid[state], src_mid);
-    update_src_pair(&imgbtn->src_right[state], src_right);
+    update_src_info(&imgbtn->src_left[state], src_left);
+    update_src_info(&imgbtn->src_mid[state], src_mid);
+    update_src_info(&imgbtn->src_right[state], src_right);
 
     refr_img(obj);
 }
@@ -214,7 +214,7 @@ static void draw_main(lv_event_t * e)
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
 
     /*Simply draw the middle src if no tiled*/
-    lv_imgbtn_src_pair_t * src_pair = &imgbtn->src_left[state];
+    lv_imgbtn_src_info_t * src_info = &imgbtn->src_left[state];
 
     lv_coord_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
     lv_coord_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
@@ -233,27 +233,27 @@ static void draw_main(lv_event_t * e)
     lv_coord_t left_w = 0;
     lv_coord_t right_w = 0;
 
-    if(src_pair->img_src) {
-        left_w = src_pair->header.w;
+    if(src_info->img_src) {
+        left_w = src_info->header.w;
         coords_part.x1 = coords.x1;
         coords_part.y1 = coords.y1;
-        coords_part.x2 = coords.x1 + src_pair->header.w - 1;
-        coords_part.y2 = coords.y1 + src_pair->header.h - 1;
-        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_pair->img_src);
+        coords_part.x2 = coords.x1 + src_info->header.w - 1;
+        coords_part.y2 = coords.y1 + src_info->header.h - 1;
+        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_info->img_src);
     }
 
-    src_pair = &imgbtn->src_right[state];
-    if(src_pair->img_src) {
-        right_w = src_pair->header.w;
-        coords_part.x1 = coords.x2 - src_pair->header.w + 1;
+    src_info = &imgbtn->src_right[state];
+    if(src_info->img_src) {
+        right_w = src_info->header.w;
+        coords_part.x1 = coords.x2 - src_info->header.w + 1;
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x2;
-        coords_part.y2 = coords.y1 + src_pair->header.h - 1;
-        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_pair->img_src);
+        coords_part.y2 = coords.y1 + src_info->header.h - 1;
+        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_info->img_src);
     }
 
-    src_pair = &imgbtn->src_mid[state];
-    if(src_pair->img_src) {
+    src_info = &imgbtn->src_mid[state];
+    if(src_info->img_src) {
         lv_area_t clip_area_center;
         clip_area_center.x1 = coords.x1 + left_w;
         clip_area_center.x2 = coords.x2 - right_w;
@@ -271,13 +271,13 @@ static void draw_main(lv_event_t * e)
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
-            coords_part.x2 = coords_part.x1 + src_pair->header.w - 1;
-            coords_part.y2 = coords_part.y1 + src_pair->header.h - 1;
+            coords_part.x2 = coords_part.x1 + src_info->header.w - 1;
+            coords_part.y2 = coords_part.y1 + src_info->header.h - 1;
 
-            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + src_pair->header.w - 1); i += src_pair->header.w) {
-                lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_pair->img_src);
+            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + src_info->header.w - 1); i += src_info->header.w) {
+                lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_info->img_src);
                 coords_part.x1 = coords_part.x2 + 1;
-                coords_part.x2 += src_pair->header.w;
+                coords_part.x2 += src_info->header.w;
             }
             draw_ctx->clip_area = clip_area_ori;
         }
@@ -357,20 +357,20 @@ static lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn)
     }
 }
 
-static void update_src_pair(lv_imgbtn_src_pair_t * pair, const void * src)
+static void update_src_info(lv_imgbtn_src_info_t * info, const void * src)
 {
     if(!src) {
-        lv_memzero(pair, sizeof(lv_imgbtn_src_pair_t));
+        lv_memzero(info, sizeof(lv_imgbtn_src_info_t));
         return;
     }
 
-    lv_res_t res = lv_img_decoder_get_info(src, &pair->header);
+    lv_res_t res = lv_img_decoder_get_info(src, &info->header);
     if(res != LV_RES_OK) {
         LV_LOG_WARN("can't get info");
         return;
     }
 
-    pair->img_src = src;
+    info->img_src = src;
 }
 
 #endif

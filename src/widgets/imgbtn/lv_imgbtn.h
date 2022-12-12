@@ -33,7 +33,7 @@ typedef enum {
 typedef struct {
     const void * img_src;
     lv_img_header_t header;
-} lv_imgbtn_src_pair_t;
+} lv_imgbtn_src_info_t;
 
 /**********************
  *      TYPEDEFS
@@ -41,9 +41,9 @@ typedef struct {
 /*Data of image button*/
 typedef struct {
     lv_obj_t obj;
-    lv_imgbtn_src_pair_t src_mid[_LV_IMGBTN_STATE_NUM];   /*Store center images to each state*/
-    lv_imgbtn_src_pair_t src_left[_LV_IMGBTN_STATE_NUM];  /*Store left side images to each state*/
-    lv_imgbtn_src_pair_t src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
+    lv_imgbtn_src_info_t src_mid[_LV_IMGBTN_STATE_NUM];   /*Store center images to each state*/
+    lv_imgbtn_src_info_t src_left[_LV_IMGBTN_STATE_NUM];  /*Store left side images to each state*/
+    lv_imgbtn_src_info_t src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
 } lv_imgbtn_t;
 
 extern const lv_obj_class_t lv_imgbtn_class;
