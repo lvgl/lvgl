@@ -1,3 +1,4 @@
+CSRCS += lv_draw_vglite.c
 CSRCS += lv_draw_vglite_arc.c
 CSRCS += lv_draw_vglite_blend.c
 CSRCS += lv_draw_vglite_line.c
