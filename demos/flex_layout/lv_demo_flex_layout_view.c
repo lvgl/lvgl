@@ -9,6 +9,8 @@
 
 #include "lv_demo_flex_layout_main.h"
 
+#if LV_USE_DEMO_FLEX_LAYOUT && LV_USE_USER_DATA
+
 /*********************
  *      DEFINES
  *********************/
@@ -151,3 +153,5 @@ static void obj_child_node_checked_style_init(lv_style_t * style)
     lv_style_transition_dsc_init(&tran, prop, lv_anim_path_ease_out, 300, 0, NULL);
     lv_style_set_transition(style, &tran);
 }
+
+#endif

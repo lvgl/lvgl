@@ -39,15 +39,15 @@ typedef struct {
 
             struct {
                 lv_obj_t * tab;
-                lv_obj_t * roller_flow;
+                lv_obj_t * ddlist_flow;
                 lv_obj_t * checkbox_scrl;
             } flex;
 
             struct {
                 lv_obj_t * tab;
-                lv_obj_t * roller_align_main;
-                lv_obj_t * roller_align_cross;
-                lv_obj_t * roller_align_track;
+                lv_obj_t * ddlist_align_main;
+                lv_obj_t * ddlist_align_cross;
+                lv_obj_t * ddlist_align_track;
             } align;
 
             struct {

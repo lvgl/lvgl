@@ -9,6 +9,8 @@
 
 #include "lv_demo_flex_layout_main.h"
 
+#if LV_USE_DEMO_FLEX_LAYOUT && LV_USE_USER_DATA
+
 /*********************
  *      DEFINES
  *********************/
@@ -76,3 +78,5 @@ static void obj_child_node_event_handler(lv_event_t * e)
     flex_loader_obj_update(obj, ui);
     ctrl_pad_obj_update(obj, ui);
 }
+
+#endif

@@ -9,6 +9,8 @@
 
 #include "lv_demo_flex_layout_main.h"
 
+#if LV_USE_DEMO_FLEX_LAYOUT && LV_USE_USER_DATA
+
 /*********************
  *      DEFINES
  *********************/
@@ -162,3 +164,5 @@ static void ctrl_pad_btn_event_attach(view_t * ui)
         ui
     );
 }
+
+#endif

@@ -9,22 +9,23 @@
 
 #include "lv_demo_flex_layout_main.h"
 
+#if LV_USE_DEMO_FLEX_LAYOUT && LV_USE_USER_DATA
+
 /*********************
  *      DEFINES
  *********************/
 
-#define ROLLER_ALIGN_CREATE_DEF(item)   \
+#define DDLIST_ALIGN_CREATE_DEF(item)   \
     do {                                \
-        ui->ctrl_pad.tab.align.roller_align_##item = \
-                                                     roller_create(tab,                            \
-                                                                   "Align "#item" place",          \
-                                                                   "FLEX_ALIGN_START\n"            \
-                                                                   "FLEX_ALIGN_END\n"              \
-                                                                   "FLEX_ALIGN_CENTER\n"           \
-                                                                   "FLEX_ALIGN_SPACE_EVENLY\n"     \
-                                                                   "FLEX_ALIGN_SPACE_AROUND\n"     \
-                                                                   "FLEX_ALIGN_SPACE_BETWEEN"      \
-                                                                  );                               \
+        ui->ctrl_pad.tab.align.ddlist_align_##item = \
+                                                     ddlist_create(tab,                     \
+                                                                   "Align "#item" place",   \
+                                                                   "start\n"                \
+                                                                   "end\n"                  \
+                                                                   "center\n"               \
+                                                                   "space evenly\n"         \
+                                                                   "space around\n"         \
+                                                                   "space between");        \
     } while(0)
 
 /**********************
@@ -80,21 +81,20 @@ void view_ctrl_pad_create(lv_obj_t * par, view_t * ui)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_obj_t * roller_create(lv_obj_t * par, const char * name, const char * options)
+static lv_obj_t * ddlist_create(lv_obj_t * par, const char * name, const char * options)
 {
     lv_obj_t * cont = lv_obj_create(par);
     lv_obj_remove_style_all(cont);
-    lv_obj_set_width(cont, lv_pct(80));
+    lv_obj_set_size(cont, lv_pct(80), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
 
     lv_obj_t * label = lv_label_create(cont);
     lv_label_set_text(label, name);
 
-    lv_obj_t * roller = lv_roller_create(cont);
-    lv_obj_set_width(roller, lv_pct(100));
-    lv_roller_set_options(roller, options, LV_ROLLER_MODE_NORMAL);
-    lv_roller_set_visible_row_count(roller, 3);
-    return roller;
+    lv_obj_t * ddlist = lv_dropdown_create(cont);
+    lv_obj_set_width(ddlist, lv_pct(100));
+    lv_dropdown_set_options_static(ddlist, options);
+    return ddlist;
 }
 
 static void tab_flex_create(lv_obj_t * tab, view_t * ui)
@@ -102,26 +102,26 @@ static void tab_flex_create(lv_obj_t * tab, view_t * ui)
     lv_obj_set_flex_flow(tab, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(
         tab,
+        LV_FLEX_ALIGN_START,
         LV_FLEX_ALIGN_CENTER,
-        LV_FLEX_ALIGN_CENTER,
-        LV_FLEX_ALIGN_SPACE_AROUND
+        LV_FLEX_ALIGN_CENTER
     );
 
-    ui->ctrl_pad.tab.flex.roller_flow = roller_create(
+    ui->ctrl_pad.tab.flex.ddlist_flow = ddlist_create(
                                             tab,
                                             "Flow",
-                                            "FLEX_FLOW_ROW\n"
-                                            "FLEX_FLOW_COLUMN\n"
-                                            "FLEX_FLOW_ROW_WRAP\n"
-                                            "FLEX_FLOW_ROW_REVERSE\n"
-                                            "FLEX_FLOW_ROW_WRAP_REVERSE\n"
-                                            "FLEX_FLOW_COLUMN_WRAP\n"
-                                            "FLEX_FLOW_COLUMN_REVERSE\n"
-                                            "FLEX_FLOW_COLUMN_WRAP_REVERSE"
+                                            "row\n"
+                                            "column\n"
+                                            "row wrap\n"
+                                            "row reverse\n"
+                                            "row wrap reverse\n"
+                                            "column wrap\n"
+                                            "column reverse\n"
+                                            "column wrap reverse"
                                         );
 
     lv_obj_t * cb = lv_checkbox_create(tab);
-    lv_checkbox_set_text(cb, "SCROLLABLE");
+    lv_checkbox_set_text(cb, "Scrollable");
     ui->ctrl_pad.tab.flex.checkbox_scrl = cb;
 }
 
@@ -135,9 +135,9 @@ static void tab_align_create(lv_obj_t * tab, view_t * ui)
         LV_FLEX_ALIGN_CENTER
     );
 
-    ROLLER_ALIGN_CREATE_DEF(main);
-    ROLLER_ALIGN_CREATE_DEF(cross);
-    ROLLER_ALIGN_CREATE_DEF(track);
+    DDLIST_ALIGN_CREATE_DEF(main);
+    DDLIST_ALIGN_CREATE_DEF(cross);
+    DDLIST_ALIGN_CREATE_DEF(track);
 }
 
 static void btn_inc_event_handler(lv_event_t * e)
@@ -310,3 +310,5 @@ static void tab_layout_create(lv_obj_t * tab, view_t * ui)
     ui->ctrl_pad.tab.layout.spinbox_pad_row = spinbox_ctrl_create(temp_group, LV_STYLE_PAD_ROW, NULL);
     ui->ctrl_pad.tab.layout.spinbox_flex_grow = spinbox_ctrl_create(temp_group, LV_STYLE_FLEX_GROW, NULL);
 }
+
+#endif
