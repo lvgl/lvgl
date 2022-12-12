@@ -120,75 +120,110 @@ static void lv_draw_pxp_wait_for_finish(lv_draw_ctx_t * draw_ctx)
 
 static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+        return;
+
     if(need_argb8565_support()) {
         lv_draw_sw_blend_basic(draw_ctx, dsc);
         return;
     }
 
     lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
+    /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*Make the blend area relative to the buffer*/
     lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
-    bool done = false;
-    /*Fill/Blend only non masked, normal blended*/
-    if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
-        lv_color_t * dest_buf = draw_ctx->buf;
-        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-        const lv_color_t * src_buf = dsc->src_buf;
-
-        if(src_buf == NULL) {
-            done = (lv_gpu_nxp_pxp_fill(dest_buf, dest_stride, &blend_area,
-                                        dsc->color, dsc->opa) == LV_RES_OK);
-            if(!done)
-                PXP_LOG_TRACE("PXP fill failed. Fallback.");
-
-        }
-        else {
-            lv_area_t src_area;
-            src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1);
-            src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1);
-            src_area.x2 = src_area.x1 + lv_area_get_width(dsc->blend_area) - 1;
-            src_area.y2 = src_area.y1 + lv_area_get_height(dsc->blend_area) - 1;
-
-            done = (lv_gpu_nxp_pxp_blit(dest_buf, &blend_area, dest_stride, src_buf, &src_area,
-                                        dsc->opa, LV_DISP_ROT_NONE) == LV_RES_OK);
-            if(!done)
-                PXP_LOG_TRACE("PXP blit failed. Fallback.");
-        }
+    if(dsc->mask_buf != NULL || dsc->blend_mode != LV_BLEND_MODE_NORMAL ||
+       lv_area_get_size(&blend_area) < LV_GPU_NXP_PXP_SIZE_LIMIT) {
+        lv_draw_sw_blend_basic(draw_ctx, dsc);
+        return;
     }
 
-    if(!done)
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
+    /*Fill/Blend only non masked, normal blended*/
+    lv_color_t * dest_buf = draw_ctx->buf;
+    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+    const lv_color_t * src_buf = dsc->src_buf;
+
+    if(src_buf == NULL) {
+        lv_gpu_nxp_pxp_fill(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa);
+    }
+    else {
+        lv_area_t src_area;
+        src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1);
+        src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1);
+        src_area.x2 = src_area.x1 + lv_area_get_width(dsc->blend_area) - 1;
+        src_area.y2 = src_area.y1 + lv_area_get_height(dsc->blend_area) - 1;
+        lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
+
+        lv_gpu_nxp_pxp_blit(dest_buf, &blend_area, dest_stride, src_buf, &src_area, src_stride,
+                            dsc->opa, LV_DISP_ROT_NONE);
+    }
 }
 
 static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf)
 {
+    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
+        return;
+
     if(need_argb8565_support()) {
         lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
         return;
     }
 
-    /*Use the clip area as draw area*/
-    lv_area_t draw_area;
-    lv_area_copy(&draw_area, draw_ctx->clip_area);
-    bool mask_any = lv_draw_mask_is_any(&draw_area);
-    bool scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
+    const lv_color_t * src_buf = (const lv_color_t *)map_p;
+    if(!src_buf) {
+        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+        return;
+    }
 
     lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
+    /*Let's get the blend area which is the intersection of the area to draw and the clip area.*/
     if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*Make the blend area relative to the buffer*/
     lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    const lv_color_t * src_buf = (const lv_color_t *)map_p;
-    if(!src_buf) {
+    lv_coord_t src_width = lv_area_get_width(coords);
+    lv_coord_t src_height = lv_area_get_height(coords);
+
+    bool has_mask = lv_draw_mask_is_any(&blend_area);
+    bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
+    bool has_rotation = (dsc->angle != 0);
+    bool unsup_rotation = false;
+
+    if(has_rotation) {
+        /*
+         * PXP can only rotate at 90x angles.
+         */
+        if(dsc->angle % 900) {
+            PXP_LOG_TRACE("Rotation angle %d is not supported. PXP can rotate only 90x angle.", dsc->angle);
+            unsup_rotation = true;
+        }
+
+        /*
+         * PXP is set to process 16x16 blocks to optimize the system for memory
+         * bandwidth and image processing time.
+         * The output engine essentially truncates any output pixels after the
+         * desired number of pixels has been written.
+         * When rotating a source image and the output is not divisible by the block
+         * size, the incorrect pixels could be truncated and the final output image
+         * can look shifted.
+         */
+        if(src_width % 16 || src_height % 16) {
+            PXP_LOG_TRACE("Rotation is not supported for image w/o alignment to block size 16x16.");
+            unsup_rotation = true;
+        }
+    }
+
+    if(has_mask || has_scale || unsup_rotation || lv_area_get_size(&blend_area) < LV_GPU_NXP_PXP_SIZE_LIMIT
+#if LV_COLOR_DEPTH != 32
+       || lv_img_cf_has_alpha(cf)
+#endif
+      ) {
         lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
         return;
     }
@@ -199,24 +234,12 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     lv_area_t src_area;
     src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
     src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
-    src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
-    src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
+    src_area.x2 = src_area.x1 + src_width - 1;
+    src_area.y2 = src_area.y1 + src_height - 1;
+    lv_coord_t src_stride = lv_area_get_width(coords);
 
-    bool done = false;
-
-    if(!mask_any && !scale
-#if LV_COLOR_DEPTH!=32
-       && !lv_img_cf_has_alpha(cf)
-#endif
-      ) {
-        done = (lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, &src_area,
-                                              dsc, cf) == LV_RES_OK);
-        if(!done)
-            PXP_LOG_TRACE("PXP blit transform failed. Fallback.");
-    }
-
-    if(!done)
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+    lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, &src_area, src_stride,
+                                  dsc, cf);
 }
 
 #endif /*LV_USE_GPU_NXP_PXP*/
