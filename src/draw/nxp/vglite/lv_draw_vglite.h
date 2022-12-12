@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_nxp.h
+ * @file lv_draw_vglite.h
  *
  */
 
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_GPU_NXP_H
-#define LV_GPU_NXP_H
+#ifndef LV_DRAW_VGLITE_H
+#define LV_DRAW_VGLITE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,9 +38,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
-#if LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE
-#include "../sw/lv_draw_sw.h"
+#include "../../../lv_conf_internal.h"
+#if LV_USE_GPU_NXP_VG_LITE
+#include "../../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
@@ -49,23 +49,23 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef lv_draw_sw_ctx_t lv_draw_nxp_ctx_t;
+typedef lv_draw_sw_ctx_t lv_draw_vglite_ctx_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_nxp_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_vglite_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 
-void lv_draw_nxp_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_vglite_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 
 /**********************
  *      MACROS
  **********************/
-#endif /*LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE*/
+#endif /*LV_USE_GPU_NXP_VG_LITE*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_NXP_H*/
+#endif /*LV_DRAW_VGLITE_H*/
