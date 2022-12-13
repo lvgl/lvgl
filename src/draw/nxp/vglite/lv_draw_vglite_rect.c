@@ -215,16 +215,15 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
 
     if(border) {
         /* Draw border - only has radius if object has radius*/
-        float border_half = floor(dsc->border_width / 2.0f);
+        lv_coord_t border_half = (lv_coord_t)floor(dsc->border_width / 2.0f);
         if(radius > border_half)
             radius = radius - border_half;
     }
     else {
-        /* Draw outline - always has radius */
-        radius = radius + ceil(dsc->outline_width / 2.0f);
-
-        if(radius > (lv_coord_t)LV_RADIUS_CIRCLE)
-            radius = (lv_coord_t)LV_RADIUS_CIRCLE;
+        /* Draw outline - always has radius, leave the same radius in the circle case */
+        lv_coord_t outline_half = (lv_coord_t)ceil(dsc->outline_width / 2.0f);
+        if(radius < (lv_coord_t)LV_RADIUS_CIRCLE - outline_half)
+            radius = radius + outline_half;
     }
 
     vg_lite_cap_style_t cap_style = (radius) ? VG_LITE_CAP_ROUND : VG_LITE_CAP_BUTT;
