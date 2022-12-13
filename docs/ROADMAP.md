@@ -46,6 +46,7 @@
 - [ ] `lv_tabview` Replace button matrix with real buttons for more flexibility
 - [ ] `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
 - [ ] Improve `lv_label_align_t` #1656
+- [ ] Disabled widgets should absorb indev actions without sending events. [#3860](https://github.com/lvgl/lvgl/issues/3860)
 
 ### Drawing and rendering
 - [ ] Allow selecting between the layered (new) and not layered (old) rendering.
