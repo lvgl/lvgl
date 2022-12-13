@@ -71,7 +71,11 @@
 #  define LV_BIG_ENDIAN_SYSTEM 0
 #endif
 
-#define LV_ATTRIBUTE_MEM_ALIGN ALIGN(4)
+#ifdef rt_align /* >= RT-Thread v5.0.0 */
+#  define LV_ATTRIBUTE_MEM_ALIGN rt_align(RT_ALIGN_SIZE)
+#else
+#  define LV_ATTRIBUTE_MEM_ALIGN ALIGN(RT_ALIGN_SIZE)
+#endif
 
 /*==================
 * EXAMPLES
