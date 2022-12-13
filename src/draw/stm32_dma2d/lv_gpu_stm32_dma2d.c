@@ -61,10 +61,7 @@ static void zeroAlpha(const lv_color_t * buf, uint32_t length);
 static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const lv_area_t * area3, const lv_area_t * area4);
 static void compareBuffers(const lv_color_t* b1, const lv_color_t* b2, const lv_area_t * area, lv_coord_t stride);
 */
-//#include "stm32f7xx_hal.h"
-static bool DWT_Init(void);
-static uint32_t DWT_Get_us(void);
-static void DWT_Delay_us(volatile uint32_t microseconds);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -113,63 +110,6 @@ void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     dma2d_draw_ctx->base_draw.draw_img = lv_draw_stm32_dma2d_img;
     dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_stm32_dma2d_wait_cb;
     dma2d_draw_ctx->base_draw.buffer_copy = lv_draw_stm32_dma2d_buffer_copy;
-    bool result = DWT_Init();
-}
-
-__STATIC_INLINE uint32_t DWT_Get_us() {
-	/* Go to number of cycles for system */
-	uint32_t us = (DWT->CYCCNT * 1000000) / HAL_RCC_GetHCLKFreq();
-    return us;
-}
-
-/**
- * @brief  This function provides a delay (in microseconds)
- * @param  microseconds: delay in microseconds
- */
-__STATIC_INLINE void DWT_Delay_us(volatile uint32_t microseconds) {
-	uint32_t clk_cycle_start = DWT->CYCCNT;
-
-	/* Go to number of cycles for system */
-	microseconds *= (HAL_RCC_GetHCLKFreq() / 1000000);
-
-	/* Delay till end */
-	while ((DWT->CYCCNT - clk_cycle_start) < microseconds)
-		;
-}
-
-/**
- * @brief  Initializes DWT_Clock_Cycle_Count for DWT_Delay_us function
- * @return Error DWT counter
- *         false: clock cycle counter not started
- *         true: clock cycle counter works
- */
-static bool DWT_Init(void) {
-	/* Disable TRC */
-	CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk;  // ~0x01000000;
-	/* Enable TRC */
-	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;  // 0x01000000;
-    
-    DWT->LAR = 0xC5ACCE55;
-
-    /* Disable clock cycle counter */
-	DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;  //~0x00000001;
-	/* Enable  clock cycle counter */
-	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;  //0x00000001;
-    
-    /* Reset the clock cycle counter value */
-	DWT->CYCCNT = 0;
-
-	/* 3 NO OPERATION instructions */
-	__ASM volatile("NOP");
-	__ASM volatile("NOP");
-	__ASM volatile("NOP");
-
-	/* Check if clock cycle counter has started */
-	if (DWT->CYCCNT) {
-		return true; /*clock cycle counter started*/
-	} else {
-		return false; /*clock cycle counter not started*/
-	}
 }
 
 void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
@@ -177,31 +117,13 @@ void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ct
     LV_UNUSED(drv);
     LV_UNUSED(draw_ctx);
 }
-    
-static uint32_t c1 = 0;
-static uint32_t c2 = 0;
-static uint32_t c3 = 0;
-static uint32_t c4 = 0;
-static uint32_t c5 = 0;
-static uint32_t c6 = 0;
-static uint32_t c7 = 0;
-static uint32_t c8 = 0;
-static uint32_t c9 = 0;
-static uint32_t c10 = 0;
-static uint32_t c11 = 0;
-
-static uint32_t t1a = 0;
-static uint32_t t1b = 0;
-static uint32_t t2a = 0;
-static uint32_t t2b = 0;
-static uint32_t t3a = 0;
-static uint32_t t3b = 0;
-static uint32_t t4a = 0;
-static uint32_t t4b = 0;
-static uint32_t t5 = 0;
 
 void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
+    uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
+    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0);
+
     lv_area_t draw_area;
     if(!_lv_area_intersect(&draw_area, dsc->blend_area, draw_ctx->clip_area)) return;
     // + draw_ctx->buf_area has the entire draw buffer location
@@ -210,19 +132,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     // + draw_area has the area actually being painted
     // All coordinates are relative to the screen.
 
-    bool done = false;
-    invalidateCache = false;
-    
-    static uint32_t c = 0;
-
-    c++;
-    
-    if (c == 100) {
-        c = 0;
-        //printf("%li %li %li %li %li %li %li %li %li %li %li\n", c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11);
-        printf("%li %li %li %li %li %li %li %li %li\n", t1a, t1b, t2a, t2b, t3a, t3b, t4a, t4b, t5);
-    }
-    
+    invalidateCache = false;    
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
 
@@ -230,16 +140,9 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
     else mask = dsc->mask_buf;
 
-    uint32_t size = lv_area_get_size(&draw_area);
-
     if (dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
-        c1++; // 0 - never happens
-    } else if (mask != NULL && dsc->src_buf != NULL) {
-        c3++; // 0.2%
-        DWT->CYCCNT = 0;
         lv_draw_sw_blend_basic(draw_ctx, dsc);
-        t1b += DWT_Get_us();
-        DWT->CYCCNT = 0;
+    } else if (mask != NULL && dsc->src_buf != NULL) { // 0.2%
         // note: dsc->src_buf (xRGB) does NOT carry alpha channel bytes,
         // alpha channel bytes are carried in dsc->mask_buf
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
@@ -273,14 +176,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
         lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
         lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, dsc->src_buf, src_stride, &src_offset, dsc->opa, true);
-        t1a += DWT_Get_us();
-        // done = true;
-    } else if (mask != NULL && dsc->src_buf == NULL) {
-        c4++; // 93.5%
-        DWT->CYCCNT = 0;
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
-        t2b += DWT_Get_us();
-        DWT->CYCCNT = 0;
+    } else if (mask != NULL && dsc->src_buf == NULL) { // 93.5%
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t mask_stride = lv_area_get_width(dsc->mask_area);
         lv_point_t mask_offset; // mask offset in relation to draw_area
@@ -289,14 +185,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
         // TODO: some bug here, map occasionally has wrong bytes
         lv_draw_stm32_dma2d_blend_paint(draw_ctx->buf, dest_stride, &draw_area, mask, mask_stride, &mask_offset, dsc->color, dsc->opa);
-        t2a += DWT_Get_us();
-        // done = true;
-    } else if (mask == NULL && dsc->src_buf != NULL) {
-        c5++; // 0.2%
-        DWT->CYCCNT = 0;
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
-        t3b += DWT_Get_us();
-        DWT->CYCCNT = 0;
+    } else if (mask == NULL && dsc->src_buf != NULL) { // 0.2%
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
         lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
         lv_point_t src_offset; // source image offset in relation to draw_area
@@ -305,21 +194,14 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         lv_area_move(&draw_area, -draw_ctx->buf_area->x1,
                         -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
         lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, dsc->src_buf, src_stride, &src_offset, dsc->opa, false);
-        t3a += DWT_Get_us();
-        // done = true;
-    } else if (mask == NULL && dsc->src_buf == NULL) {
-        c6++; // 6.1%
-        DWT->CYCCNT = 0;
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
-        t4b += DWT_Get_us();
-        DWT->CYCCNT = 0;
+    } else if (mask == NULL && dsc->src_buf == NULL) { // 6.1%
         lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
         lv_area_move(&draw_area, -draw_ctx->buf_area->x1,
                         -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
         lv_draw_stm32_dma2d_blend_fill(draw_ctx->buf, dest_stride, &draw_area, dsc->color, dsc->opa);
-        t4a += DWT_Get_us();
-        // done = true;
     }
+    
+    //SCB_InvalidateDCache_by_Addr(draw_ctx->buf, drawBufferLength);
 }
 
 // Does dest_stride = width(draw_ctx->buf_area) ?
@@ -327,7 +209,6 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
                                      const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
-    c9++;
     LV_UNUSED(draw_ctx);
     lv_point_t src_offset;
     src_offset.x = dest_area->x1 - src_area->x1;
@@ -347,7 +228,6 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
         const lv_img_dsc_t * img = src;
 
         if(img->header.cf == LV_IMG_CF_RGBA8888 && dsc->angle == 0 && dsc->zoom == 256) {
-            c10++;
             // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
             lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
             lv_point_t src_offset; // source image offset in relation to draw_area
@@ -360,7 +240,6 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
         }
     }
     
-    c11++;
     return LV_RES_INV;
 }
 
@@ -390,7 +269,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         
         DMA2D->FGPFCCR = DMA2D_INPUT_A8;
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
-        DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
+        DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0]
         
         // note: in Alpha Mode 1 FGMAR and FGOR are not used to supply foreground A8 bytes,
         // those bytes are replaced by constant ALPHA defined in FGPFCCR
@@ -495,9 +374,7 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dest_buf, lv_coord
 	DMA2D->FGPFCCR = DMA2D_INPUT_A8;
     if (opa < LV_OPA_MAX) {
 	    DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
-	    DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 2: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
-    } else {
-        // Alpha Mode 0: No modification of the foreground image alpha channel value
+	    DMA2D->FGPFCCR |= (0x2UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
     }
 	DMA2D->FGMAR = (uint32_t)(mask_buf + (mask_stride * mask_offset->y) + mask_offset->x);
 	DMA2D->FGOR = mask_stride - draw_width;
