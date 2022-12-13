@@ -136,6 +136,7 @@ static void flex_flow_event_handler(lv_event_t * e)
 
     if(ui->obj_cur) {
         lv_obj_set_flex_flow(ui->obj_cur, flex_flow_map[selected]);
+        lv_obj_scroll_to(ui->obj_cur, 0, 0, LV_ANIM_ON);
     }
 }
 

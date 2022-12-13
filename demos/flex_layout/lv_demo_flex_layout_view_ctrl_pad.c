@@ -110,14 +110,14 @@ static void tab_flex_create(lv_obj_t * tab, view_t * ui)
     ui->ctrl_pad.tab.flex.ddlist_flow = ddlist_create(
                                             tab,
                                             "Flow",
-                                            "row\n"
-                                            "column\n"
-                                            "row wrap\n"
-                                            "row reverse\n"
-                                            "row wrap reverse\n"
-                                            "column wrap\n"
-                                            "column reverse\n"
-                                            "column wrap reverse"
+                                            "Row\n"
+                                            "Column\n"
+                                            "Row wrap\n"
+                                            "Row reverse\n"
+                                            "Row wrap reverse\n"
+                                            "Column wrap\n"
+                                            "Column reverse\n"
+                                            "Column wrap reverse"
                                         );
 
     lv_obj_t * cb = lv_checkbox_create(tab);
@@ -188,11 +188,11 @@ static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, lv_style_prop_t prop, lv_o
         lv_style_set_text_color(&btn_style, lv_theme_get_color_primary(par));
     }
 
-    lv_obj_t * btn_inc = lv_btn_create(cont_spinbox);
-    lv_obj_set_width(btn_inc, 30);
-    lv_obj_add_style(btn_inc, &btn_style, LV_PART_MAIN);
-    label = lv_label_create(btn_inc);
-    lv_label_set_text(label, "+");
+    lv_obj_t * btn_dec = lv_btn_create(cont_spinbox);
+    lv_obj_set_width(btn_dec, 30);
+    lv_obj_add_style(btn_dec, &btn_style, LV_PART_MAIN);
+    label = lv_label_create(btn_dec);
+    lv_label_set_text(label, "-");
     lv_obj_center(label);
 
     lv_obj_t * spinbox = lv_spinbox_create(cont_spinbox);
@@ -205,14 +205,14 @@ static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, lv_style_prop_t prop, lv_o
     lv_obj_set_style_radius(spinbox, 0, LV_PART_MAIN);
     lv_obj_set_user_data(spinbox, (void *)(lv_uintptr_t)prop);
     lv_spinbox_set_range(spinbox, LV_COORD_MIN, LV_COORD_MAX);
-    lv_spinbox_set_digit_format(spinbox, 4, 0);
+    lv_spinbox_set_digit_format(spinbox, 3, 0);
     lv_spinbox_step_prev(spinbox);
 
-    lv_obj_t * btn_dec = lv_btn_create(cont_spinbox);
-    lv_obj_set_width(btn_dec, 30);
-    lv_obj_add_style(btn_dec, &btn_style, LV_PART_MAIN);
-    label = lv_label_create(btn_dec);
-    lv_label_set_text(label, "-");
+    lv_obj_t * btn_inc = lv_btn_create(cont_spinbox);
+    lv_obj_set_width(btn_inc, 30);
+    lv_obj_add_style(btn_inc, &btn_style, LV_PART_MAIN);
+    label = lv_label_create(btn_inc);
+    lv_label_set_text(label, "+");
     lv_obj_center(label);
 
     lv_obj_add_event_cb(btn_inc, btn_inc_event_handler, LV_EVENT_ALL, spinbox);
@@ -275,7 +275,6 @@ static void tab_layout_create(lv_obj_t * tab, view_t * ui)
     ui->ctrl_pad.tab.layout.spinbox_max_width = spinbox_ctrl_create(temp_group, LV_STYLE_MAX_WIDTH, NULL);
     ui->ctrl_pad.tab.layout.spinbox_max_height = spinbox_ctrl_create(temp_group, LV_STYLE_MAX_HEIGHT, NULL);
 
-
     temp_group = lv_obj_create(tab);
     ui->ctrl_pad.tab.layout.group_width_and_height_max = temp_group;
     lv_obj_add_style(temp_group, &group_style, LV_PART_MAIN);
@@ -295,7 +294,6 @@ static void tab_layout_create(lv_obj_t * tab, view_t * ui)
     ui->ctrl_pad.tab.layout.spinbox_pad_bottom = spinbox_ctrl_create(temp_group, LV_STYLE_PAD_BOTTOM, &temp_cont);
     lv_obj_set_flex_grow(temp_cont, 0);
     lv_obj_add_flag(temp_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-
 
     label = lv_label_create(tab);
     lv_obj_set_style_pad_top(label, 20, LV_PART_MAIN);
