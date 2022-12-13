@@ -112,6 +112,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
             }
             else {
                 w = (LV_COORD_GET_PCT(w) * parent_w) / 100;
+                w -= lv_obj_get_style_margin_left(obj, LV_PART_MAIN) + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
             }
         }
 
@@ -144,6 +145,7 @@ bool lv_obj_refr_size(lv_obj_t * obj)
             }
             else {
                 h = (LV_COORD_GET_PCT(h) * parent_h) / 100;
+                h -= lv_obj_get_style_margin_top(obj, LV_PART_MAIN) + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
             }
         }
 
