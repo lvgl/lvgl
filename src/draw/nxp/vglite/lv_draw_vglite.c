@@ -68,11 +68,13 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
 
 static void lv_draw_vglite_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-static lv_res_t draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-static lv_res_t draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+                                      const lv_area_t * coords);
 
-static lv_res_t draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+                                       const lv_area_t * coords);
 
 static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                                uint16_t radius, uint16_t start_angle, uint16_t end_angle);
@@ -350,7 +352,7 @@ static void lv_draw_vglite_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc
 
     /* Draw the background */
     vglite_dsc.bg_opa = dsc->bg_opa;
-    if(draw_vglite_bg(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
+    if(lv_draw_vglite_bg(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
         lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
     vglite_dsc.bg_opa = 0;
 
@@ -364,17 +366,17 @@ static void lv_draw_vglite_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc
 
     /* Draw the border */
     vglite_dsc.border_opa = dsc->border_opa;
-    if(draw_vglite_border(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
+    if(lv_draw_vglite_border(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
         lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
     vglite_dsc.border_opa = 0;
 
     /* Draw the outline */
     vglite_dsc.outline_opa = dsc->outline_opa;
-    if(draw_vglite_outline(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
+    if(lv_draw_vglite_outline(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
         lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
 }
 
-static lv_res_t draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->bg_opa <= (lv_opa_t)LV_OPA_MIN)
         return LV_RES_INV;
@@ -418,7 +420,8 @@ static lv_res_t draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_
     return LV_RES_INV;
 }
 
-static lv_res_t draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+                                      const lv_area_t * coords)
 {
     if(dsc->border_opa <= (lv_opa_t)LV_OPA_MIN)
         return LV_RES_INV;
@@ -445,7 +448,8 @@ static lv_res_t draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     return res;
 }
 
-static lv_res_t draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+                                       const lv_area_t * coords)
 {
     if(dsc->outline_opa <= (lv_opa_t)LV_OPA_MIN)
         return LV_RES_INV;
