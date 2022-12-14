@@ -34,7 +34,7 @@
 #include "lv_draw_vglite_arc.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
-#include "math.h"
+#include <math.h>
 
 /*********************
  *      DEFINES

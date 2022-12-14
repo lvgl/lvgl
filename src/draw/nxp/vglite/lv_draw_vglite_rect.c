@@ -34,14 +34,15 @@
 #include "lv_draw_vglite_rect.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
-
 #include <math.h>
+
 /*********************
  *      DEFINES
  *********************/
 /*********************
  *      DEFINES
  *********************/
+
 /* Path data sizes for different elements */
 #define CUBIC_PATH_DATA_SIZE 7 /* 1 opcode, 6 arguments */
 #define LINE_PATH_DATA_SIZE 3  /* 1 opcode, 2 arguments */
@@ -62,6 +63,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
 /**
  * Generates path data for rectangle drawing.
  *
@@ -73,6 +75,7 @@
 static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
                                             lv_coord_t radius,
                                             const lv_area_t * coords);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
