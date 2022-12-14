@@ -32,8 +32,9 @@
  *********************/
 
 #include "lv_draw_vglite_line.h"
-#include "math.h"
+
 #if LV_USE_GPU_NXP_VG_LITE
+#include <math.h>
 
 /*********************
  *      DEFINES
