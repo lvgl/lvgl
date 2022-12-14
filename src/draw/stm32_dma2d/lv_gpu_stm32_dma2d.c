@@ -120,14 +120,21 @@ void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ct
 
 void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
-    // both draw buffer start and its size have to be 32-byte aligned
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
-    uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
-    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0);
-
     if (dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
         lv_draw_sw_blend_basic(draw_ctx, dsc);
         return;
+    }
+    
+    // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
+    uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
+    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0);
+    
+    if (dsc->src_buf) {
+        // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
+        uint32_t srcBufferLength = lv_area_get_size(dsc->blend_area) * sizeof(lv_color_t);
+        assert_param((uint32_t)dsc->src_buf % CACHE_ROW_SIZE == 0);
+        assert_param(srcBufferLength % CACHE_ROW_SIZE == 0);
     }
 
     lv_area_t draw_area;
@@ -139,16 +146,19 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     // All coordinates are relative to the screen.
 
     invalidateCache = false;
-    const lv_opa_t * mask;
-    if(dsc->mask_buf == NULL) mask = NULL;
+    const lv_opa_t * mask = dsc->mask_buf;
 
     if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
-    else mask = dsc->mask_buf;
-
+    
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
 
     if (mask != NULL) {
+        // For performance reasons, both mask buffer start address and buffer size *should* be 32-byte aligned since mask buffer cache is being cleaned.
+        uint32_t srcBufferLength = lv_area_get_size(dsc->mask_area) * sizeof(lv_opa_t);
+        assert_param((uint32_t)mask % CACHE_ROW_SIZE == 0);
+        assert_param(srcBufferLength % CACHE_ROW_SIZE == 0);
+
         lv_coord_t mask_stride = lv_area_get_width(dsc->mask_area);
         lv_point_t mask_offset; // mask offset in relation to draw_area
         mask_offset.x = draw_area.x1 - dsc->mask_area->x1;
@@ -158,7 +168,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
             lv_draw_stm32_dma2d_blend_paint(draw_ctx->buf, dest_stride, &draw_area, mask, mask_stride, &mask_offset, dsc->color, dsc->opa);
         } else { // 0.2%
-            // note: dsc->src_buf (xRGB) does NOT carry alpha channel bytes,
+            // note: dsc->src_buf (xRGB) does not carry alpha channel bytes,
             // alpha channel bytes are carried in dsc->mask_buf
             
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
@@ -214,19 +224,33 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
                                      const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
+    // FIXME:
+    // 1. Both src_buf and dest_buf pixel size *must* be known to use DMA2D.
+    // 2. Verify both buffers start addresses and lengths are 32-byte (cache row size) aligned.
     LV_UNUSED(draw_ctx);
     lv_point_t src_offset;
     src_offset.x = dest_area->x1 - src_area->x1;
     src_offset.y = dest_area->y1 - src_area->y1;
-    // FIXME: use lv_area_move() here ?
+    // FIXME: use lv_area_move(dest_area, -dest_area->x1, -dest_area->y1) here ?
+    // TODO: It is assumed that dest_buf and src_buf buffers are of lv_color_t type. Verify it.
     lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_offset, 0xff, false);
 }
 
 STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                         const lv_area_t * src_area, const void * src)
 {
-    //lv_draw_sw_img_decoded(draw_ctx, dsc, src_area, src, color_format);
+    // FIXME: src pixel size *must* be known to use DMA2D
 
+    // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
+    uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
+    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0);
+    
+    // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
+    uint32_t srcBufferLength = lv_area_get_size(src_area) * sizeof(lv_color_t); // TODO: verify src pixel size = sizeof(lv_color_t)
+    assert_param((uint32_t)src % CACHE_ROW_SIZE == 0);
+    assert_param(srcBufferLength % CACHE_ROW_SIZE == 0);
+    
     if(lv_img_src_get_type(src) == LV_IMG_SRC_VARIABLE) {
         lv_area_t draw_area;
         if(!_lv_area_intersect(&draw_area, src_area, draw_ctx->clip_area)) return LV_RES_OK;
@@ -254,9 +278,7 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
  */
 STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                            const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa)
-{
-    assert_param((uint32_t)dest_buf % CACHE_ROW_SIZE == 0);
-	
+{	
     lv_coord_t draw_width = lv_area_get_width(draw_area);
 	lv_coord_t draw_height = lv_area_get_height(draw_area);
 
@@ -271,7 +293,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->OCOLR = color.full | (0xff << 24);
     } else {
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
-        
+
         DMA2D->FGPFCCR = DMA2D_INPUT_A8;
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
@@ -306,10 +328,6 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
  * @param isSrcArgb if TRUE, source buffer is ARGB, otherwise source buffer is xRGB
  */
 STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dest_buf, lv_coord_t dest_stride, const lv_area_t* draw_area, const lv_color_t* src_buf, lv_coord_t src_stride, const lv_point_t* src_offset, lv_opa_t opa, bool isSrcArgb) {
-	
-    assert_param((uint32_t)dest_buf % CACHE_ROW_SIZE == 0);
-    assert_param((uint32_t)src_buf % CACHE_ROW_SIZE == 0);
-    
     lv_coord_t draw_width = lv_area_get_width(draw_area);
 	lv_coord_t draw_height = lv_area_get_height(draw_area);
 
@@ -366,9 +384,6 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t* dest_buf, lv_coord_t
  * @param opa constant opacity to be applied
  */
 STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dest_buf, lv_coord_t dest_stride, const lv_area_t* draw_area, const lv_opa_t* mask_buf, lv_coord_t mask_stride, const lv_point_t* mask_offset, lv_color32_t color, lv_opa_t opa) {
-	assert_param((uint32_t)dest_buf % CACHE_ROW_SIZE == 0);
-    assert_param((uint32_t)mask_buf % CACHE_ROW_SIZE == 0);
-
     lv_coord_t draw_width = lv_area_get_width(draw_area);
 	lv_coord_t draw_height = lv_area_get_height(draw_area);
 
@@ -507,134 +522,5 @@ static void clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, l
     __DSB();
     __ISB();
 }
-
-/* test code
-static void zeroAlpha(const lv_color_t * buf, uint32_t length) {
-    uint32_t * buf32 = (uint32_t *)buf;
-    while (length > 0) {
-        length--;
-        //*buf32 &= 0x00ffffff; // zero MSB
-        *buf32 |= 0xff000000; // set MSB
-        buf32++;
-    }
-}
-
-static void trace4Areas(const lv_area_t * area1, const lv_area_t * area2, const lv_area_t * area3, const lv_area_t * area4) {
-    static uint32_t counter = 0;
-
-    lv_coord_t x = area1->x1;
-    lv_coord_t y = area1->y1;
-    lv_coord_t w = lv_area_get_width(area1);
-    lv_coord_t h = lv_area_get_height(area1);
-    printf("%i %i %i %i", x, y, w, h);
-
-    x = area2->x1;
-    y = area2->y1;
-    w = lv_area_get_width(area2);
-    h = lv_area_get_height(area2);
-    printf(" %i %i %i %i", x, y, w, h);
-
-    x = area3->x1;
-    y = area3->y1;
-    w = lv_area_get_width(area3);
-    h = lv_area_get_height(area3);
-    printf(" %i %i %i %i", x, y, w, h);
-
-    x = area4->x1;
-    y = area4->y1;
-    w = lv_area_get_width(area4);
-    h = lv_area_get_height(area4);
-    printf(" %i %i %i %i\n", x, y, w, h);
-
-    counter++;
-    if (counter == 900) {
-        counter = 0;
-        printf("\n");
-    }
-}
-
-static void compareBuffers(const lv_color_t* b1, const lv_color_t* b2, const lv_area_t * area, lv_coord_t stride) {
-    lv_coord_t area_w = lv_area_get_width(area);
-    lv_coord_t area_h = lv_area_get_height(area);
-    lv_color_t * buf1 = (lv_color_t *)b1 + (stride * area->y1) + area->x1;
-    lv_color_t * buf2 = (lv_color_t *)b2 + (stride * area->y1) + area->x1;
-
-    while (area_h > 0) {
-        area_h--;
-        //memcpy(dest_buf2, src_buf2, area_w * sizeof(lv_color_t));
-        for (lv_coord_t x = 0; x < area_w; x++) {
-            if ((*buf1).full != (*buf2).full) {
-                printf("mismatch\n");
-            }
-            buf1++;
-            buf2++;
-        }
-        buf1 += stride - area_w;
-        buf2 += stride - area_w;
-    }
-}
-
-static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_width, const lv_area_t * dest_area, const lv_color_t * src_buf, lv_coord_t src_width, const lv_point_t * src_pos, lv_opa_t opa)
-{
-    lv_coord_t area_w = lv_area_get_width(dest_area);
-    lv_coord_t area_h = lv_area_get_height(dest_area);
-    lv_color_t * dest_buf2 = (lv_color_t *)dest_buf + (dest_width * dest_area->y1) + dest_area->x1;
-    lv_color_t * src_buf2 = (lv_color_t *)src_buf + (src_width * src_pos->y) + src_pos->x;
-
-    while (area_h > 0) {
-        area_h--;
-        memcpy(dest_buf2, src_buf2, area_w * sizeof(lv_color_t));
-        src_buf2 += src_width;
-        dest_buf2 += dest_width;
-    }
-
-    invalidateCache = false;
-}
-
-static void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_pos, lv_opa_t opa)
-{
-    lv_coord_t area_w = lv_area_get_width(dest_area);
-    lv_coord_t area_h = lv_area_get_height(dest_area);
-    lv_color_t * dest_buf2 = (lv_color_t *)dest_buf + (dest_stride * dest_area->y1) + dest_area->x1;
-    lv_color_t * src_buf2 = (lv_color_t *)src_buf + (src_stride * src_pos->y) + src_pos->x;
-
-    while(area_h > 0) {
-        area_h--;
-        for (lv_coord_t x = 0; x < area_w; x++) {
-            lv_color_t fg_color = *src_buf2;
-            lv_color_t bg_color = *dst_buf2;
-            lv_color_t out;
-            // See: RM0410, 9.3.6 DMA2D blender (p. 286)
-            uint8_t a_multi = (fg_color.ch.alpha * bg_color.ch.alpha) / 255;
-            out.ch.alpha = fg_color.ch.alpha + bg_color.ch.alpha - a_multi;
-            out.ch.red = (fg_color.ch.red * fg_color.ch.alpha + bg_color.ch.red * bg_color.ch.alpha - bg_color.ch.red * a_multi) / out.ch.alpha;
-            out.ch.green = (fg_color.ch.green * fg_color.ch.alpha + bg_color.ch.green * bg_color.ch.alpha - bg_color.ch.green * a_multi) / out.ch.alpha;
-            out.ch.blue = (fg_color.ch.blue * fg_color.ch.alpha + bg_color.ch.blue * bg_color.ch.alpha - bg_color.ch.blue * a_multi) / out.ch.alpha;
-            *dst_buf2 = out;
-            dest_buf2++;
-            src_buf2++;
-        }
-        dest_buf2 += dest_stride - area_w;
-        src_buf += src_stride - area_w;
-    }
-}
-
-static void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area, lv_color_t color)
-{
-    lv_coord_t dest_stride = lv_area_get_width(fill_area);
-    lv_coord_t dest_h = lv_area_get_height(fill_area);
-    lv_color_t * buf = (lv_color_t *)dest_buf;
-
-    while(dest_h > 0) {
-        dest_h--;
-        for (lv_coord_t x = 0; x < dest_stride; x++) {
-            *buf = color;
-            buf++;
-        }
-        buf += dest_stride - dest_stride;
-    }
-    invalidateCache = false;
-}
-*/
 
 #endif
