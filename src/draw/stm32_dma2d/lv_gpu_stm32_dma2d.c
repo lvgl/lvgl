@@ -133,8 +133,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     if (dsc->src_buf) {
         // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
         uint32_t srcBufferLength = lv_area_get_size(dsc->blend_area) * sizeof(lv_color_t);
-        assert_param((uint32_t)dsc->src_buf % CACHE_ROW_SIZE == 0);
         assert_param(srcBufferLength % CACHE_ROW_SIZE == 0);
+        assert_param((uint32_t)dsc->src_buf % CACHE_ROW_SIZE == 0);
     }
 
     lv_area_t draw_area;
