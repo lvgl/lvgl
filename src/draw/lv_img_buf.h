@@ -29,21 +29,21 @@ extern "C" {
 #define LV_IMG_PX_SIZE_ALPHA_BYTE 4
 #endif
 
-#define LV_IMG_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_SIZE / 8) * w * h)
-#define LV_IMG_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_SIZE / 8) * w * h)
-#define LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
+#define LV_IMG_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_SIZE / 8) * (w) * (h))
+#define LV_IMG_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_SIZE / 8) * (w) * (h))
+#define LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * (w) * (h))
 
 /*+ 1: to be sure no fractional row*/
-#define LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h) ((((w + 7) / 8) * h))
-#define LV_IMG_BUF_SIZE_ALPHA_2BIT(w, h) ((((w + 3) / 4) * h))
-#define LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h) ((((w + 1 ) / 2) * h))
-#define LV_IMG_BUF_SIZE_ALPHA_8BIT(w, h) ((w * h))
+#define LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h) (((((w) + 7) / 8) * (h)))
+#define LV_IMG_BUF_SIZE_ALPHA_2BIT(w, h) (((((w) + 3) / 4) * (h)))
+#define LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h) (((((w) + 1 ) / 2) * (h)))
+#define LV_IMG_BUF_SIZE_ALPHA_8BIT(w, h) (((w) * (h)))
 
 /*4 * X: for palette*/
-#define LV_IMG_BUF_SIZE_INDEXED_1BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h) + 4 * 2)
-#define LV_IMG_BUF_SIZE_INDEXED_2BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_2BIT(w, h) + 4 * 4)
-#define LV_IMG_BUF_SIZE_INDEXED_4BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h) + 4 * 16)
-#define LV_IMG_BUF_SIZE_INDEXED_8BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_8BIT(w, h) + 4 * 256)
+#define LV_IMG_BUF_SIZE_INDEXED_1BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_1BIT((w), (h)) + 4 * 2)
+#define LV_IMG_BUF_SIZE_INDEXED_2BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_2BIT((w), (h)) + 4 * 4)
+#define LV_IMG_BUF_SIZE_INDEXED_4BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_4BIT((w), (h)) + 4 * 16)
+#define LV_IMG_BUF_SIZE_INDEXED_8BIT(w, h) (LV_IMG_BUF_SIZE_ALPHA_8BIT((w), (h)) + 4 * 256)
 
 #define _LV_ZOOM_INV_UPSCALE 5
 
