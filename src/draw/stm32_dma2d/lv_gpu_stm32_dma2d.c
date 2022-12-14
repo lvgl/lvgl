@@ -126,9 +126,9 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     }
     
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
     uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     assert_param(drawBufferLength % CACHE_ROW_SIZE == 0);
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
     
     if (dsc->src_buf) {
         // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
@@ -156,8 +156,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     if (mask != NULL) {
         // For performance reasons, both mask buffer start address and buffer size *should* be 32-byte aligned since mask buffer cache is being cleaned.
         uint32_t srcBufferLength = lv_area_get_size(dsc->mask_area) * sizeof(lv_opa_t);
-        assert_param((uint32_t)mask % CACHE_ROW_SIZE == 0);
         assert_param(srcBufferLength % CACHE_ROW_SIZE == 0);
+        assert_param((uint32_t)mask % CACHE_ROW_SIZE == 0);
 
         lv_coord_t mask_stride = lv_area_get_width(dsc->mask_area);
         lv_point_t mask_offset; // mask offset in relation to draw_area
@@ -232,7 +232,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     src_offset.x = dest_area->x1 - src_area->x1;
     src_offset.y = dest_area->y1 - src_area->y1;
     // FIXME: use lv_area_move(dest_area, -dest_area->x1, -dest_area->y1) here ?
-    // TODO: It is assumed that dest_buf and src_buf buffers are of lv_color_t type. Verify it.
+    // TODO: It is assumed that dest_buf and src_buf buffers are of lv_color_t type. Verify it, this assumption may be incorrect.
     lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_offset, 0xff, false);
 }
 
@@ -242,14 +242,14 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
     // FIXME: src pixel size *must* be known to use DMA2D
 
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
     uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     assert_param(drawBufferLength % CACHE_ROW_SIZE == 0);
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
     
     // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
     uint32_t srcBufferLength = lv_area_get_size(src_area) * sizeof(lv_color_t); // TODO: verify src pixel size = sizeof(lv_color_t)
-    assert_param((uint32_t)src % CACHE_ROW_SIZE == 0);
     assert_param(srcBufferLength % CACHE_ROW_SIZE == 0);
+    assert_param((uint32_t)src % CACHE_ROW_SIZE == 0);
     
     if(lv_img_src_get_type(src) == LV_IMG_SRC_VARIABLE) {
         lv_area_t draw_area;
@@ -263,6 +263,7 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
             src_offset.x = draw_area.x1 - src_area->x1;
             src_offset.y = draw_area.y1 - src_area->y1;
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+            // TODO: It is assumed that img->data buffer is of lv_color_t type. Verify it, this assumption may be incorrect.
             lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, (lv_color_t *)img->data, img->header.w, &src_offset,
                                           dsc->opa, true);
             return LV_RES_OK;
@@ -421,6 +422,14 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t* dest_buf, lv_coord
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
+{
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    waitForDmaTransferToFinish(disp->driver);
+    lv_draw_sw_wait_for_finish(draw_ctx);
+}
+
 static void startDmaTransfer(void)
 {
     invalidateCache = true;
@@ -457,13 +466,6 @@ STATIC void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
                          (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, LV_IMG_PX_SIZE_ALPHA_BYTE);
         invalidateCache = false;
     }
-}
-
-void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
-{
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    waitForDmaTransferToFinish(disp->driver);
-    lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
 static void invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv_coord_t height, uint8_t pixelSize)
