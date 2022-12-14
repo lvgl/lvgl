@@ -1,5 +1,5 @@
 /**
- * @file lv_gpu_nxp_vglite.h
+ * @file lv_draw_vglite_utils.h
  *
  */
 
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_GPU_NXP_VGLITE_H
-#define LV_GPU_NXP_VGLITE_H
+#ifndef LV_DRAW_VGLITE_UTILS_H
+#define LV_DRAW_VGLITE_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -201,4 +201,4 @@ lv_res_t lv_vglite_run(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_NXP_VGLITE_H*/
+#endif /*LV_DRAW_VGLITE_UTILS_H*/
