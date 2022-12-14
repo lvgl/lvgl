@@ -7,8 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_sdl_window.h"
-#include <stdbool.h>
 #if LV_USE_SDL
+#include <stdbool.h>
+#include "../../core/lv_refr.h"
 
 #include LV_SDL_INCLUDE_PATH
 

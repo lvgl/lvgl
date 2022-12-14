@@ -103,6 +103,12 @@ extern "C" {
 
 #include "src/lv_api_map.h"
 
+#include "lvgl/src/dev/sdl/lv_sdl_window.h"
+#include "lvgl/src/dev/sdl/lv_sdl_mouse.h"
+#include "lvgl/src/dev/sdl/lv_sdl_mousewheel.h"
+#include "lvgl/src/dev/sdl/lv_sdl_keyboard.h"
+
+#include "src/lvgl_private.h"
 
 /*********************
  *      DEFINES
