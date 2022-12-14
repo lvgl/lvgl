@@ -47,29 +47,9 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#ifndef LV_GPU_NXP_VG_LITE_FILL_SIZE_LIMIT
-/** Minimum area (in pixels) to be filled by VG-Lite with 100% opacity*/
-#define LV_GPU_NXP_VG_LITE_FILL_SIZE_LIMIT 5000
-#endif
-
-#ifndef LV_GPU_NXP_VG_LITE_FILL_OPA_SIZE_LIMIT
-/** Minimum area (in pixels) to be filled by VG-Lite with transparency*/
-#define LV_GPU_NXP_VG_LITE_FILL_OPA_SIZE_LIMIT 5000
-#endif
-
-#ifndef LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT
-/** Minimum area (in pixels) for image copy with 100% opacity to be handled by VG-Lite*/
-#define LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT 5000
-#endif
-
-#ifndef LV_GPU_NXP_VG_LITE_BUFF_SYNC_BLIT_SIZE_LIMIT
-/** Minimum invalidated area (in pixels) to be synchronized by VG-Lite during buffer sync */
-#define LV_GPU_NXP_VG_LITE_BUFF_SYNC_BLIT_SIZE_LIMIT 5000
-#endif
-
-#ifndef LV_GPU_NXP_VG_LITE_BLIT_OPA_SIZE_LIMIT
-/** Minimum area (in pixels) for image copy with transparency to be handled by VG-Lite*/
-#define LV_GPU_NXP_VG_LITE_BLIT_OPA_SIZE_LIMIT 5000
+/* Minimum area (in pixels) for VG-Lite processing. */
+#ifndef LV_GPU_NXP_VG_LITE_SIZE_LIMIT
+#define LV_GPU_NXP_VG_LITE_SIZE_LIMIT 5000
 #endif
 
 /**********************

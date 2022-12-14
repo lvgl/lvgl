@@ -49,10 +49,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/** Use this symbol as limit to disable feature (value has to be larger than supported resolution) */
-#define LV_GPU_NXP_VG_LITE_FEATURE_DISABLED (1920*1080+1)
-
-/** Stride in px required by VG-Lite HW. Don't change this. */
+/** Stride in px required by VG-Lite HW*/
 #define LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX 16U
 
 #ifndef LV_GPU_NXP_VG_LITE_LOG_ERRORS

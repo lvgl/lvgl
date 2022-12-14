@@ -135,18 +135,8 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
 lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
                                 const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa)
 {
-    uint32_t area_size = lv_area_get_size(fill_area);
     lv_coord_t area_w = lv_area_get_width(fill_area);
     lv_coord_t area_h = lv_area_get_height(fill_area);
-
-    if(opa >= (lv_opa_t)LV_OPA_MAX) {
-        if(area_size < LV_GPU_NXP_VG_LITE_FILL_SIZE_LIMIT)
-            VG_LITE_RETURN_INV("Area size %d smaller than limit %d.", area_size, LV_GPU_NXP_VG_LITE_FILL_SIZE_LIMIT);
-    }
-    else {
-        if(area_size < LV_GPU_NXP_VG_LITE_FILL_OPA_SIZE_LIMIT)
-            VG_LITE_RETURN_INV("Area size %d smaller than limit %d.", area_size, LV_GPU_NXP_VG_LITE_FILL_OPA_SIZE_LIMIT);
-    }
 
     vg_lite_buffer_t vgbuf;
     vg_lite_rectangle_t rect;
@@ -211,38 +201,15 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
 
 lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
-    uint32_t dest_size = lv_area_get_size(&blit->dst_area);
-
-    if(blit->opa >= (lv_opa_t)LV_OPA_MAX) {
-        if(dest_size < LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT)
-            VG_LITE_RETURN_INV("Area size %d smaller than limit %d.", dest_size, LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT);
-    }
-    else {
-        if(dest_size < LV_GPU_NXP_VG_LITE_BLIT_OPA_SIZE_LIMIT)
-            VG_LITE_RETURN_INV("Area size %d smaller than limit %d.", dest_size, LV_GPU_NXP_VG_LITE_BLIT_OPA_SIZE_LIMIT);
-    }
-
 #if VG_LITE_BLIT_SPLIT_ENABLED
     return _lv_gpu_nxp_vglite_blit_split(blit);
 #endif /* non RT595 */
 
-    /* Just pass down */
     return _lv_gpu_nxp_vglite_blit_single(blit);
 }
 
 lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_gpu_nxp_vglite_blit_info_t * blit)
 {
-    uint32_t dest_size = lv_area_get_size(&blit->dst_area);
-
-    if(blit->opa >= (lv_opa_t)LV_OPA_MAX) {
-        if(dest_size < LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT)
-            VG_LITE_RETURN_INV("Area size %d smaller than limit %d.", dest_size, LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT);
-    }
-    else {
-        if(dest_size < LV_GPU_NXP_VG_LITE_BLIT_OPA_SIZE_LIMIT)
-            VG_LITE_RETURN_INV("Area size %d smaller than limit %d.", dest_size, LV_GPU_NXP_VG_LITE_BLIT_OPA_SIZE_LIMIT);
-    }
-
     return _lv_gpu_nxp_vglite_blit_single(blit);
 }
 
