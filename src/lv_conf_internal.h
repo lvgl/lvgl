@@ -2565,6 +2565,15 @@
     #endif
 #endif
 
+/*Flex layout demo*/
+#ifndef LV_USE_DEMO_FLEX_LAYOUT
+    #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
+        #define LV_USE_DEMO_FLEX_LAYOUT CONFIG_LV_USE_DEMO_FLEX_LAYOUT
+    #else
+        #define LV_USE_DEMO_FLEX_LAYOUT 0
+    #endif
+#endif
+
 
 
 /*----------------------------------

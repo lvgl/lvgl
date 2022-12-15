@@ -1119,6 +1119,10 @@ menu "LVGL configuration"
 			bool "Enable Auto play"
 			depends on LV_USE_DEMO_MUSIC
 			default n
+
+		config LV_USE_DEMO_FLEX_LAYOUT
+			bool "Flex layout previewer"
+			default n
 	endmenu
 
 endmenu
