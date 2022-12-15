@@ -114,8 +114,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
-    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // if fails, critical
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // if fails, critical
+    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical
 
     if(dsc->src_buf) {
         // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
@@ -280,14 +280,14 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
 STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                            const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa)
 {
-    assert_param(!isDma2dInProgess); // if fails, critical
+    assert_param(!isDma2dInProgess); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
     waitForDmaTransferToFinish(NULL);
 
     if(opa >= LV_OPA_MAX) {
-        DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos;  // Register-to-memory (no FG nor BG, only output stage active)
+        DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos; // Register-to-memory (no FG nor BG, only output stage active)
 
         DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
@@ -295,7 +295,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->OCOLR = color.full | (0xff << 24);
     }
     else {
-        DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
+        DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
 
         DMA2D->FGPFCCR = DMA2D_INPUT_A8;
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
@@ -336,7 +336,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
                                           const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset,
                                           lv_opa_t opa, bool isSrcArgb)
 {
-    assert_param(!isDma2dInProgess); // if fails, critical
+    assert_param(!isDma2dInProgess); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
@@ -348,7 +348,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
 
     if(isSrcArgb) {
         // src is ARGB
-        DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
+        DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x2UL <<
                            DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 2: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
@@ -357,12 +357,12 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
         // src is xRGB
         if(opa == 0xff) {
             // no need to blend
-            DMA2D->CR = 0x1UL << DMA2D_CR_MODE_Pos;            // Memory-to-memory with PFC (FG fetch only with FG PFC active)
+            DMA2D->CR = 0x1UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with PFC (FG fetch only with FG PFC active)
             // Alpha Mode 0: No modification of the foreground image alpha channel value
         }
         else {
             // blend with constant ALPHA only
-            DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
+            DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
             DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
             DMA2D->FGPFCCR |= (0x1UL <<
                                DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
@@ -402,7 +402,7 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dest_buf, lv_coor
                                             const lv_area_t * draw_area, const lv_opa_t * mask_buf, lv_coord_t mask_stride, const lv_point_t * mask_offset,
                                             lv_color32_t color, lv_opa_t opa)
 {
-    assert_param(!isDma2dInProgess); // if fails, critical
+    assert_param(!isDma2dInProgess); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
