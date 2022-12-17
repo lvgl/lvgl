@@ -20,7 +20,7 @@
  *********************/
 
 #if LV_COLOR_16_SWAP
-    // Note: DMA2D red/blue swap (RBS) works for (A)RGB 24/32 color as well
+    // Note: DMA2D red/blue swap (RBS) works for all color modes
     #define RBS_BIT 1U
 #else
     #define RBS_BIT 0U
@@ -298,7 +298,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
-        DMA2D->OCOLR = color.full | (0xff << 24);
+        DMA2D->OCOLR = (lv_color_to32(color) | (0xff << 24));
     }
     else {
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
@@ -313,7 +313,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         // those bytes are replaced by constant ALPHA defined in FGPFCCR
         DMA2D->FGMAR = (uint32_t)dest_buf;
         DMA2D->FGOR = dest_stride;
-        DMA2D->FGCOLR = color.full;  // used in A4 and A8 modes only, alpha is ignored
+        DMA2D->FGCOLR = (lv_color_to32(color) | (0xff << 24));
 
         DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
         DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
