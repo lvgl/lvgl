@@ -23,13 +23,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_DMA2D_ARGB8888 0
-#define LV_DMA2D_RGB888 1
-#define LV_DMA2D_RGB565 2
-#define LV_DMA2D_ARGB1555 3
-#define LV_DMA2D_ARGB4444 4
-
-#define STATIC static // allows to remove "static"
+#define STATIC static // allows to remove "static" for tests
 
 /**********************
  *      TYPEDEFS
@@ -69,7 +63,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
                                           lv_opa_t opa, bool isSrcArgb);
 STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dst_buf, lv_coord_t dst_stride,
                                             const lv_area_t * draw_area, const lv_opa_t * mask_buf, lv_coord_t mask_stride, const lv_point_t * mask_offset,
-                                            lv_color32_t color, lv_opa_t opa);
+                                            lv_color_t color, lv_opa_t opa);
 STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
                                         const void * src);
 

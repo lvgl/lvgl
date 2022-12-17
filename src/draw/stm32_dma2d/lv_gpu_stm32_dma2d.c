@@ -20,20 +20,20 @@
  *********************/
 
 #if LV_COLOR_16_SWAP
-    // TODO: F7 has red blue swap bit in control register for all layers and output
-    #error "Can't use DMA2D with LV_COLOR_16_SWAP 1"
-#endif
-
-#if LV_COLOR_DEPTH == 8
-    #error "Can't use DMA2D with LV_COLOR_DEPTH == 8"
+    // Note: DMA2D red/blue swap (RBS) works for (A)RGB 24/32 color as well
+    #define RBS_BIT 1U
+#else
+    #define RBS_BIT 0U
 #endif
 
 #if LV_COLOR_DEPTH == 16
-    #define LV_DMA2D_COLOR_FORMAT LV_DMA2D_RGB565
+    #define DMA2D_INPUT_COLOR DMA2D_INPUT_RGB565
+    #define DMA2D_OUTPUT_COLOR DMA2D_OUTPUT_RGB565
 #elif LV_COLOR_DEPTH == 32
-    #define LV_DMA2D_COLOR_FORMAT LV_DMA2D_ARGB8888
+    #define DMA2D_INPUT_COLOR DMA2D_INPUT_ARGB8888
+    #define DMA2D_OUTPUT_COLOR DMA2D_OUTPUT_ARGB8888
 #else
-    /*Can't use GPU with other formats*/
+    #error "Cannot use DMA2D with LV_COLOR_DEPTH other than 16 or 32"
 #endif
 
 #define CACHE_ROW_SIZE 32U // cache row size in Bytes
@@ -156,9 +156,9 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
                                             dsc->opa);
         }
         else {   // 0.2%
-            // note: dsc->src_buf (xRGB) does not carry alpha channel bytes,
+            // note: (x)RGB dsc->src_buf does not carry alpha channel bytes,
             // alpha channel bytes are carried in dsc->mask_buf
-
+#if LV_COLOR_DEPTH == 32
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
             lv_point_t src_offset; // source image offset in relation to draw_area
             src_offset.x = draw_area.x1 - dsc->blend_area->x1;
@@ -188,6 +188,11 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
                          -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
             lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, dsc->src_buf, src_stride, &src_offset, dsc->opa,
                                           true);
+#else
+            // Note: 16-bit bitmap hardware blending with mask and background is possible, but requires a temp 24 or 32-bit buffer to combine bitmap with mask first.
+            // In case of 32-bit bitmap existing buffer is used
+            lv_draw_sw_blend_basic(draw_ctx, dsc);
+#endif
         }
     }
     else {
@@ -241,8 +246,8 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
 
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
-    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0);
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0);
+    assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical
 
     // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
     uint32_t srcBufferLength = lv_area_get_size(src_area) * sizeof(
@@ -289,9 +294,10 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
     if(opa >= LV_OPA_MAX) {
         DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos; // Register-to-memory (no FG nor BG, only output stage active)
 
-        DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;
+        DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+        DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
-        DMA2D->OOR = dest_stride - draw_width;  // out offset
+        DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
         DMA2D->OCOLR = color.full | (0xff << 24);
     }
     else {
@@ -301,20 +307,23 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x1UL <<
                            DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
+        DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
 
-        // note: in Alpha Mode 1 FGMAR and FGOR are not used to supply foreground A8 bytes,
+        // Note: in Alpha Mode 1 FGMAR and FGOR are not used to supply foreground A8 bytes,
         // those bytes are replaced by constant ALPHA defined in FGPFCCR
         DMA2D->FGMAR = (uint32_t)dest_buf;
         DMA2D->FGOR = dest_stride;
         DMA2D->FGCOLR = color.full;  // used in A4 and A8 modes only, alpha is ignored
 
-        DMA2D->BGPFCCR = DMA2D_INPUT_ARGB8888;
+        DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
+        DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
         DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->BGOR = dest_stride - draw_width;
         DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
         cleanCache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-        DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;;
+        DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+        DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
         DMA2D->OMAR = DMA2D->BGMAR;
         DMA2D->OOR = DMA2D->BGOR;
         DMA2D->OCOLR = 0;
@@ -344,7 +353,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
 
     if(opa >= LV_OPA_MAX) opa = 0xff;
 
-    DMA2D->FGPFCCR = DMA2D_INPUT_ARGB8888;
+    DMA2D->FGPFCCR = DMA2D_INPUT_COLOR;
 
     if(isSrcArgb) {
         // src is ARGB
@@ -369,18 +378,21 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
         }
     }
 
+    DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
     DMA2D->FGMAR = (uint32_t)(src_buf + (src_stride * src_offset->y) + src_offset->x);
     DMA2D->FGOR = src_stride - draw_width;
     DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
     cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-    DMA2D->BGPFCCR = DMA2D_INPUT_ARGB8888;
+    DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
+    DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
     DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->BGOR = dest_stride - draw_width;
     DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
     cleanCache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-    DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;
+    DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+    DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
     DMA2D->OMAR = DMA2D->BGMAR;
     DMA2D->OOR = DMA2D->BGOR;
     DMA2D->OCOLR = 0;
@@ -400,7 +412,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
  */
 STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                             const lv_area_t * draw_area, const lv_opa_t * mask_buf, lv_coord_t mask_stride, const lv_point_t * mask_offset,
-                                            lv_color32_t color, lv_opa_t opa)
+                                            lv_color_t color, lv_opa_t opa)
 {
     assert_param(!isDma2dInProgess); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
@@ -418,20 +430,21 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dest_buf, lv_coor
     }
     DMA2D->FGMAR = (uint32_t)(mask_buf + (mask_stride * mask_offset->y) + mask_offset->x);
     DMA2D->FGOR = mask_stride - draw_width;
-    DMA2D->FGCOLR = color.full | (0xff << 24);  // used in A4 and A8 modes only
+    DMA2D->FGCOLR = (lv_color_to32(color) | (0xff << 24));  // used in A4 and A8 modes only
     cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_opa_t)); // adjust for 8bit mask
 
-    DMA2D->BGPFCCR = DMA2D_INPUT_ARGB8888;
+    DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
+    DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
     DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->BGOR = dest_stride - draw_width;
     DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
     cleanCache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-    DMA2D->OPFCCR = DMA2D_OUTPUT_ARGB8888;;
+    DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+    DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
     DMA2D->OMAR = DMA2D->BGMAR;
     DMA2D->OOR = DMA2D->BGOR;
     DMA2D->OCOLR = 0;
-
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (uint32_t)((draw_width << DMA2D_NLR_PL_Pos) & DMA2D_NLR_PL_Msk) | ((draw_height << DMA2D_NLR_NL_Pos) &
                                                                                     DMA2D_NLR_NL_Msk);
