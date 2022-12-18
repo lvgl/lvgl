@@ -7,7 +7,7 @@ LV_FILE_EXPLORER_PATH_MAX_LEN = 128
 
 def file_explorer_event_handler(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED:
         cur_path =  obj.explorer_get_current_path()
@@ -17,7 +17,7 @@ def file_explorer_event_handler(e):
 def btn_event_handler(e,fe_quick_access_obj):
 
     code = e.get_code()
-    btn = e.get_target()
+    btn = e.get_target_obj()
     # lv_obj_t * file_explorer = lv_event_get_user_data(e);
 
     if code == lv.EVENT.VALUE_CHANGED :
@@ -29,7 +29,7 @@ def btn_event_handler(e,fe_quick_access_obj):
 def dd_event_handler(e, file_explorer):
 
     code = e.get_code()
-    dd = e.get_target()
+    dd = e.get_target_obj()
     # fe_quick_access_obj = lv_event_get_user_data(e);
 
     if code == lv.EVENT.VALUE_CHANGED :
@@ -55,7 +55,7 @@ if LV_USE_FS_WIN32 :
         file_explorer.explorer_set_quick_access_path(lv.EXPLORER_DOCS_DIR, "C:/Users/Public/Documents");
         file_explorer.explorer_set_quick_access_path(lv.EXPLORER_FS_DIR, "D:");
 
-# linux 
+# linux
 file_explorer.explorer_open_dir("A:/")
 
 if LV_FILE_EXPLORER_QUICK_ACCESS :

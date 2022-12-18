@@ -1,6 +1,6 @@
 def drag_event_handler(e):
 
-    obj = e.get_target()
+    obj = e.get_target_obj()
 
     indev = lv.indev_get_act()
 

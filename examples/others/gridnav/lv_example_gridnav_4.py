@@ -1,5 +1,5 @@
 def event_handler(e):
-    obj = e.get_target()
+    obj = e.get_target_obj()
     list = obj.get_parent()
     print("Clicked: " + list.get_btn_text(obj))
 

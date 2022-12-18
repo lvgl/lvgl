@@ -1,6 +1,6 @@
 def scroll_event_cb(e):
 
-    cont = e.get_target()
+    cont = e.get_target_obj()
 
     cont_a = lv.area_t()
     cont.get_coords(cont_a)

@@ -89,7 +89,7 @@ class LvExampleAnim_3():
             self.chart.refresh()
 
     def slider_event_cb(self,e):
-        slider = e.get_target()
+        slider = e.get_target_obj()
 
         if slider == self.p1_slider:
             label = self.p1_label

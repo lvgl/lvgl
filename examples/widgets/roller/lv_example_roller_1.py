@@ -1,6 +1,6 @@
 def event_handler(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     if code == lv.EVENT.VALUE_CHANGED:
         option = " "*10
         obj.get_selected_str(option, len(option))

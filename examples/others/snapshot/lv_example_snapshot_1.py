@@ -24,7 +24,7 @@ img_star = lv.img_dsc_t({
 })
 
 def event_cb(e, snapshot_obj):
-    img = e.get_target()
+    img = e.get_target_obj()
 
     if snapshot_obj:
         # no need to free the old source for snapshot_obj, gc will free it for us.

@@ -116,7 +116,7 @@ class LV_ExampleAnimTimeline_1(object):
         lv.anim_timeline_add(self.anim_timeline, 400, self.a6)
 
     def slider_prg_event_handler(self,e):
-        slider = e.get_target()
+        slider = e.get_target_obj()
 
         if  not self.anim_timeline:
             self.anim_timeline_create()
@@ -126,7 +126,7 @@ class LV_ExampleAnimTimeline_1(object):
 
 
     def btn_run_event_handler(self,e):
-        btn = e.get_target()
+        btn = e.get_target_obj()
         if not self.anim_timeline:
             self.anim_timeline_create()
 

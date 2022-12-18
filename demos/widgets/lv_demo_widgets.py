@@ -1258,7 +1258,7 @@ def meter3_anim_cb(meter,indic, label, val) :
 def ta_event_cb(e,kb,tv) :
 
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
     # lv_obj_t * kb = lv_event_get_user_data(e);
 
     indev = lv.indev_get_act()
@@ -1288,7 +1288,7 @@ def ta_event_cb(e,kb,tv) :
 def birthday_event_cb(e):
     global calendar
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
 
     if code == lv.EVENT.FOCUSED :
         indev = lv.indev_get_act()
@@ -1347,7 +1347,7 @@ def _lv_area_intersect(a1_p, a2_p) :
 def chart_event_cb(e):
 
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
 
     if code == lv.EVENT.PRESSED or code == lv.EVENT.RELEASED :

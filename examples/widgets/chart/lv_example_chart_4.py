@@ -5,7 +5,7 @@ import display_driver
 def event_cb(e):
 
     code = e.get_code()
-    chart = e.get_target()
+    chart = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED:
         chart.invalidate()

@@ -1,6 +1,6 @@
 def ta_event_cb(e,kb):
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
     if code == lv.EVENT.FOCUSED:
         kb.set_textarea(ta)
         kb.clear_flag(lv.obj.FLAG.HIDDEN)

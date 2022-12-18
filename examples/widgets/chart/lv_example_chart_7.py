@@ -6,7 +6,7 @@ import display_driver
 def draw_event_cb(e):
     dsc = e.get_draw_part_dsc()
     if dsc.part == lv.PART.ITEMS:
-        obj = e.get_target()
+        obj = e.get_target_obj()
         ser = obj.get_series_next(None)
         cnt = obj.get_point_count()
         # print("cnt: ",cnt)

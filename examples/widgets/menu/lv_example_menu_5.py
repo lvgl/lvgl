@@ -53,7 +53,7 @@ def create_switch(parent, icon, txt, chk) :
 
 def back_event_handler(e,menu):
 
-    obj = e.get_target()
+    obj = e.get_target_obj()
     # menu = lv_event_get_user_data(e);
 
     if menu.back_btn_is_root(obj) :
@@ -63,7 +63,7 @@ def back_event_handler(e,menu):
 def switch_handler(e,menu):
 
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     if code == lv.EVENT.VALUE_CHANGED :
         if obj.has_state(lv.STATE.CHECKED) :
             menu.set_page(None)
@@ -72,7 +72,7 @@ def switch_handler(e,menu):
             lv.event_send(menu.get_cur_sidebar_page().get_child(0).get_child(0),lv.EVENT.CLICKED,None)
         else :
             menu.set_sidebar_page(None)
-            menu.clear_history()      #  Clear history because we will be showing the root page later 
+            menu.clear_history()      #  Clear history because we will be showing the root page later
             menu.set_page(root_page)
 
 LV_MENU_ITEM_BUILDER_VARIANT_1 = const(0)

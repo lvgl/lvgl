@@ -12,7 +12,7 @@ class Message:
         self.value = value
     def message(self):
         return self.value
-        
+
 def auth_manager(m,passwd):
     payload = m.get_payload()
     pin_act = payload.__cast__().message()
@@ -25,7 +25,7 @@ def auth_manager(m,passwd):
         lv.msg_send(MSG_LOGIN_ERROR, Message("Incorrect PIN"))
 
 def textarea_event_cb(e):
-    ta = e.get_target()
+    ta = e.get_target_obj()
     code = e.get_code()
     if code == lv.EVENT.READY:
         passwd = Message(ta.get_text())
@@ -51,7 +51,7 @@ def log_out_event_cb(e):
         lv.msg_send(MSG_LOG_OUT, None)
     elif code == lv.EVENT.MSG_RECEIVED:
         m = e.get_msg()
-        btn = e.get_target()
+        btn = e.get_target_obj()
         id = m.get_id()
         if id == MSG_LOGIN_OK:
             btn.clear_state(lv.STATE.DISABLED)
@@ -61,7 +61,7 @@ def log_out_event_cb(e):
 def start_engine_msg_event_cb(e):
 
     m = e.get_msg()
-    btn = e.get_target()
+    btn = e.get_target_obj()
     id = m.get_id()
     if id == MSG_LOGIN_OK:
         btn.clear_state(lv.STATE.DISABLED)
@@ -70,7 +70,7 @@ def start_engine_msg_event_cb(e):
 
 
 def info_label_msg_event_cb(e):
-    label = e.get_target()
+    label = e.get_target_obj()
     m = e.get_msg()
     id = m.get_id()
     if id ==  MSG_LOGIN_ERROR:

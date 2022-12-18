@@ -1,5 +1,5 @@
 def ta_event_cb(e):
-    ta = e.get_target()
+    ta = e.get_target_obj()
     txt = ta.get_text()
     # print(txt)
     pos = ta.get_cursor_pos()
