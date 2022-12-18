@@ -1,5 +1,6 @@
 #!/opt/bin/lv_micropython -i
 import lvgl as lv
+import display_driver_utils
 import fs_driver
 import time,os,sys
 
@@ -907,13 +908,7 @@ try:
 except NameError:
     script_path = ''
 
-# Initialize the display driver
-default_group = lv.group_create()
-default_group.set_default()
-
-lv.sdl_window_create(800, 480)
-sdl_indev = lv.sdl_mouse_create()
-sdl_indev.set_group(default_group)
+driver = display_driver_utils.driver(width=SCREEN_SIZE[0],height=SCREEN_SIZE[1],orientation=display_driver_utils.ORIENT_LANDSCAPE)
 
 # Create a screen and load it
 scr=lv.obj()
