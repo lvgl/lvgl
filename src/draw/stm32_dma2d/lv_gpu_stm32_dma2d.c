@@ -214,7 +214,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         }
     }
 
-    //waitForDmaTransferToFinish(NULL); // FIXME: this line should not be needed here, but it is
+    
 }
 
 // Does dest_stride = width(draw_ctx->buf_area) ?
@@ -298,7 +298,9 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
-        DMA2D->OCOLR = (lv_color_to32(color) | (0xff << 24));
+        // FIXME: swap OCOLR R/B bits if RBS_BIT is set
+        //DMA2D->OCOLR = (lv_color_to32(color) | (0xff << 24)); // TODO: Does OCOLR type must match DMA2D_OUTPUT_COLOR?
+        DMA2D->OCOLR = color.full;
     }
     else {
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
@@ -313,7 +315,9 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         // those bytes are replaced by constant ALPHA defined in FGPFCCR
         DMA2D->FGMAR = (uint32_t)dest_buf;
         DMA2D->FGOR = dest_stride;
-        DMA2D->FGCOLR = (lv_color_to32(color) | (0xff << 24));
+        // FIXME: swap FGCOLR R/B bits if RBS_BIT is set
+        //DMA2D->FGCOLR = (lv_color_to32(color) | (0xff << 24));
+        DMA2D->FGCOLR = color.full;
 
         DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
         DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
@@ -430,7 +434,9 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dest_buf, lv_coor
     }
     DMA2D->FGMAR = (uint32_t)(mask_buf + (mask_stride * mask_offset->y) + mask_offset->x);
     DMA2D->FGOR = mask_stride - draw_width;
-    DMA2D->FGCOLR = (lv_color_to32(color) | (0xff << 24));  // used in A4 and A8 modes only
+    // FIXME: swap FGCOLR R/B bits if RBS_BIT is set
+    //DMA2D->FGCOLR = (lv_color_to32(color) | (0xff << 24));  // used in A4 and A8 modes only
+    DMA2D->FGCOLR = color.full;
     cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_opa_t)); // adjust for 8bit mask
 
     DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
@@ -465,6 +471,7 @@ static void startDmaTransfer(void)
     isDma2dInProgess = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     DMA2D->CR |= DMA2D_CR_START;
+    waitForDmaTransferToFinish(NULL); // FIXME: this line should not be needed here, but it is
 }
 
 static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
