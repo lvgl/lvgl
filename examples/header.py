@@ -2,4 +2,4 @@
 
 import lvgl as lv
 
-import display_driver
+lv.sdl_window_create(800, 480)
