@@ -9,11 +9,11 @@ static void mask_event_cb(lv_event_t * e)
     static int16_t mask_top_id = -1;
     static int16_t mask_bottom_id = -1;
 
-    if(code == LV_OBJ_EVENT_COVER_CHECK) {
+    if(code == LV_EVENT_COVER_CHECK) {
         lv_event_set_cover_res(e, LV_COVER_RES_MASKED);
 
     }
-    else if(code == LV_OBJ_EVENT_DRAW_MAIN_BEGIN) {
+    else if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
         /* add mask */
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
@@ -40,7 +40,7 @@ static void mask_event_cb(lv_event_t * e)
         mask_bottom_id = lv_draw_mask_add(fade_mask_bottom, NULL);
 
     }
-    else if(code == LV_OBJ_EVENT_DRAW_POST_END) {
+    else if(code == LV_EVENT_DRAW_POST_END) {
         lv_draw_mask_fade_param_t * fade_mask_top = lv_draw_mask_remove_id(mask_top_id);
         lv_draw_mask_fade_param_t * fade_mask_bottom = lv_draw_mask_remove_id(mask_bottom_id);
         lv_draw_mask_free_param(fade_mask_top);
@@ -90,7 +90,7 @@ void lv_example_roller_3(void)
 
     lv_obj_center(roller1);
     lv_roller_set_visible_row_count(roller1, 3);
-    lv_obj_add_event(roller1, mask_event_cb, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(roller1, mask_event_cb, LV_EVENT_ALL, NULL);
 }
 
 #endif

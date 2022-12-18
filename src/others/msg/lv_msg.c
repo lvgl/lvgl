@@ -90,7 +90,7 @@ void * lv_msg_subscribe_obj(lv_msg_id_t msg_id, lv_obj_t * obj, void * user_data
     }
 
     if(s_first == NULL) {
-        lv_obj_add_event(obj, obj_delete_event_cb, LV_OBJ_EVENT_DELETE, s);
+        lv_obj_add_event(obj, obj_delete_event_cb, LV_EVENT_DELETE, s);
     }
 
     return s;
@@ -134,7 +134,7 @@ void * lv_msg_get_user_data(lv_msg_t * m)
 
 lv_msg_t * lv_event_get_msg(lv_event_t * e)
 {
-    if(e->code == LV_OBJ_EVENT_MSG_RECEIVED) {
+    if(e->code == LV_EVENT_MSG_RECEIVED) {
         return lv_event_get_param(e);
     }
     else {
@@ -161,7 +161,7 @@ static void notify(lv_msg_t * m)
 
 static void obj_notify_cb(lv_msg_t * m)
 {
-    lv_obj_send_event(m->_priv_data, LV_OBJ_EVENT_MSG_RECEIVED, m);
+    lv_obj_send_event(m->_priv_data, LV_EVENT_MSG_RECEIVED, m);
 }
 
 static void obj_delete_event_cb(lv_event_t * e)

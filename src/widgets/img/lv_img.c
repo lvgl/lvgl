@@ -444,7 +444,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
 
     /*Ancestor events will be called during drawing*/
-    if(code != LV_OBJ_EVENT_DRAW_MAIN && code != LV_OBJ_EVENT_DRAW_POST) {
+    if(code != LV_EVENT_DRAW_MAIN && code != LV_EVENT_DRAW_POST) {
         /*Call the ancestor's event handler*/
         lv_res_t res = lv_obj_event_base(MY_CLASS, e);
         if(res != LV_RES_OK) return;
@@ -453,7 +453,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_img_t * img = (lv_img_t *)obj;
 
-    if(code == LV_OBJ_EVENT_STYLE_CHANGED) {
+    if(code == LV_EVENT_STYLE_CHANGED) {
         /*Refresh the file name to refresh the symbol text size*/
         if(img->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(obj, img->src);
@@ -463,7 +463,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_obj_refresh_ext_draw_size(obj);
         }
     }
-    else if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
+    else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
 
         lv_coord_t * s = lv_event_get_param(e);
 
@@ -479,7 +479,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
             *s = LV_MAX(*s, a.y2 - h);
         }
     }
-    else if(code == LV_OBJ_EVENT_HIT_TEST) {
+    else if(code == LV_EVENT_HIT_TEST) {
         lv_hit_test_info_t * info = lv_event_get_param(e);
 
         /*If the object is exactly image sized (not cropped, not mosaic) and transformed
@@ -504,7 +504,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
             info->res = _lv_area_is_point_on(&a, info->point, 0);
         }
     }
-    else if(code == LV_OBJ_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
             *p = lv_img_get_transformed_size(obj);
@@ -514,7 +514,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
             p->y = img->h;
         }
     }
-    else if(code == LV_OBJ_EVENT_DRAW_MAIN || code == LV_OBJ_EVENT_DRAW_POST || code == LV_OBJ_EVENT_COVER_CHECK) {
+    else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {
         draw_img(e);
     }
 }
@@ -524,7 +524,7 @@ static void draw_img(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     lv_img_t * img = (lv_img_t *)obj;
-    if(code == LV_OBJ_EVENT_COVER_CHECK) {
+    if(code == LV_EVENT_COVER_CHECK) {
         lv_cover_check_info_t * info = lv_event_get_param(e);
         if(info->res == LV_COVER_RES_MASKED) return;
         if(img->src_type == LV_IMG_SRC_UNKNOWN || img->src_type == LV_IMG_SRC_SYMBOL) {
@@ -570,7 +570,7 @@ static void draw_img(lv_event_t * e)
             }
         }
     }
-    else if(code == LV_OBJ_EVENT_DRAW_MAIN || code == LV_OBJ_EVENT_DRAW_POST) {
+    else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST) {
 
         lv_coord_t obj_w = lv_obj_get_width(obj);
         lv_coord_t obj_h = lv_obj_get_height(obj);
@@ -610,7 +610,7 @@ static void draw_img(lv_event_t * e)
 
         lv_area_copy(&obj->coords, &ori_coords);
 
-        if(code == LV_OBJ_EVENT_DRAW_MAIN) {
+        if(code == LV_EVENT_DRAW_MAIN) {
             if(img->h == 0 || img->w == 0) return;
             if(img->zoom == 0) return;
 

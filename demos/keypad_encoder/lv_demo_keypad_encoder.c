@@ -156,15 +156,15 @@ static void text_input_create(lv_obj_t * parent)
     lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_add_event(ta1, ta_event_cb, LV_OBJ_EVENT_ALL, kb);
-    lv_obj_add_event(ta2, ta_event_cb, LV_OBJ_EVENT_ALL, kb);
+    lv_obj_add_event(ta1, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event(ta2, ta_event_cb, LV_EVENT_ALL, kb);
 }
 
 static void msgbox_create(void)
 {
     static const char * btns[] = {"Ok", "Cancel", ""};
     lv_obj_t * mbox = lv_msgbox_create(NULL, "Hi", "Welcome to the keyboard and encoder demo", btns, false);
-    lv_obj_add_event(mbox, msgbox_event_cb, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
     lv_group_focus_obj(lv_msgbox_get_btns(mbox));
     lv_obj_add_state(lv_msgbox_get_btns(mbox), LV_STATE_FOCUS_KEY);
     lv_group_focus_freeze(g, true);
@@ -181,7 +181,7 @@ static void msgbox_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * msgbox = lv_event_get_current_target(e);
 
-    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
+    if(code == LV_EVENT_VALUE_CHANGED) {
         const char * txt = lv_msgbox_get_active_btn_text(msgbox);
         if(txt) {
             lv_msgbox_close(msgbox);
@@ -203,7 +203,7 @@ static void ta_event_cb(lv_event_t * e)
     lv_obj_t * ta = lv_event_get_target(e);
     lv_obj_t * kb = lv_event_get_user_data(e);
 
-    if(code == LV_OBJ_EVENT_CLICKED && indev_type == LV_INDEV_TYPE_ENCODER) {
+    if(code == LV_EVENT_CLICKED && indev_type == LV_INDEV_TYPE_ENCODER) {
         lv_keyboard_set_textarea(kb, ta);
         lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_group_focus_obj(kb);
@@ -212,7 +212,7 @@ static void ta_event_cb(lv_event_t * e)
         lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
     }
 
-    if(code == LV_OBJ_EVENT_READY || code == LV_OBJ_EVENT_CANCEL) {
+    if(code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
         lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_obj_set_height(tv, LV_VER_RES);
     }

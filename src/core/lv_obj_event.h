@@ -28,7 +28,7 @@ extern "C" {
 struct _lv_obj_t;
 
 /**
- * Used as the event parameter of ::LV_OBJ_EVENT_HIT_TEST to check if an `point` can click the object or not.
+ * Used as the event parameter of ::LV_EVENT_HIT_TEST to check if an `point` can click the object or not.
  * `res` should be set like this:
  *   - If already set to `false` an other event wants that point non clickable. If you want to respect it leave it as `false` or set `true` to overwrite it.
  *   - If already set `true` and `point` shouldn't be clickable set to `false`
@@ -40,7 +40,7 @@ typedef struct {
 } lv_hit_test_info_t;
 
 /**
- * Used as the event parameter of ::LV_OBJ_EVENT_COVER_CHECK to check if an area is covered by the object or not.
+ * Used as the event parameter of ::LV_EVENT_COVER_CHECK to check if an area is covered by the object or not.
  * In the event use `const lv_area_t * area = lv_event_get_cover_area(e)` to get the area to check
  * and `lv_event_set_cover_res(e, res)` to set the result.
  */
@@ -90,7 +90,7 @@ struct _lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e);
  * Used by the user to react on event which happens with the object.
  * An object can have multiple event handler. They will be called in the same order as they were added.
  * @param obj       pointer to an object
- * @param filter    and event code (e.g. `LV_OBJ_EVENT_CLICKED`) on which the event should be called. `LV_OBJ_EVENT_ALL` can be sued the receive all the events.
+ * @param filter    and event code (e.g. `LV_EVENT_CLICKED`) on which the event should be called. `LV_EVENT_ALL` can be sued the receive all the events.
  * @param event_cb  the new event function
  * @param           user_data custom data data will be available in `event_cb`
  */
@@ -111,7 +111,7 @@ bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
 lv_indev_t * lv_event_get_indev(lv_event_t * e);
 
 /**
- * Get the part draw descriptor passed as parameter to `LV_OBJ_EVENT_DRAW_PART_BEGIN/END`.
+ * Get the part draw descriptor passed as parameter to `LV_EVENT_DRAW_PART_BEGIN/END`.
  * @param e     pointer to an event
  * @return      the part draw descriptor to hook the drawing or NULL if called on an unrelated event
  */
@@ -119,35 +119,35 @@ lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e);
 
 /**
  * Get the draw context which should be the first parameter of the draw functions.
- * Namely: `LV_OBJ_EVENT_DRAW_MAIN/POST`, `LV_OBJ_EVENT_DRAW_MAIN/POST_BEGIN`, `LV_OBJ_EVENT_DRAW_MAIN/POST_END`
+ * Namely: `LV_EVENT_DRAW_MAIN/POST`, `LV_EVENT_DRAW_MAIN/POST_BEGIN`, `LV_EVENT_DRAW_MAIN/POST_END`
  * @param e     pointer to an event
  * @return      pointer to a draw context or NULL if called on an unrelated event
  */
 lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e);
 
 /**
- * Get the old area of the object before its size was changed. Can be used in `LV_OBJ_EVENT_SIZE_CHANGED`
+ * Get the old area of the object before its size was changed. Can be used in `LV_EVENT_SIZE_CHANGED`
  * @param e     pointer to an event
  * @return      the old absolute area of the object or NULL if called on an unrelated event
  */
 const lv_area_t * lv_event_get_old_size(lv_event_t * e);
 
 /**
- * Get the key passed as parameter to an event. Can be used in `LV_OBJ_EVENT_KEY`
+ * Get the key passed as parameter to an event. Can be used in `LV_EVENT_KEY`
  * @param e     pointer to an event
  * @return      the triggering key or NULL if called on an unrelated event
  */
 uint32_t lv_event_get_key(lv_event_t * e);
 
 /**
- * Get the animation descriptor of a scrolling. Can be used in `LV_OBJ_EVENT_SCROLL_BEGIN`
+ * Get the animation descriptor of a scrolling. Can be used in `LV_EVENT_SCROLL_BEGIN`
  * @param e     pointer to an event
  * @return      the animation that will scroll the object. (can be modified as required)
  */
 lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e);
 
 /**
- * Set the new extra draw size. Can be used in `LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE`
+ * Set the new extra draw size. Can be used in `LV_EVENT_REFR_EXT_DRAW_SIZE`
  * @param e     pointer to an event
  * @param size  The new extra draw size
  */
@@ -155,14 +155,14 @@ void lv_event_set_ext_draw_size(lv_event_t * e, lv_coord_t size);
 
 /**
  * Get a pointer to an `lv_point_t` variable in which the self size should be saved (width in `point->x` and height `point->y`).
- * Can be used in `LV_OBJ_EVENT_GET_SELF_SIZE`
+ * Can be used in `LV_EVENT_GET_SELF_SIZE`
  * @param e     pointer to an event
  * @return      pointer to `lv_point_t` or NULL if called on an unrelated event
  */
 lv_point_t * lv_event_get_self_size_info(lv_event_t * e);
 
 /**
- * Get a pointer to an `lv_hit_test_info_t` variable in which the hit test result should be saved. Can be used in `LV_OBJ_EVENT_HIT_TEST`
+ * Get a pointer to an `lv_hit_test_info_t` variable in which the hit test result should be saved. Can be used in `LV_EVENT_HIT_TEST`
  * @param e     pointer to an event
  * @return      pointer to `lv_hit_test_info_t` or NULL if called on an unrelated event
  */
@@ -170,14 +170,14 @@ lv_hit_test_info_t * lv_event_get_hit_test_info(lv_event_t * e);
 
 /**
  * Get a pointer to an area which should be examined whether the object fully covers it or not.
- * Can be used in `LV_OBJ_EVENT_HIT_TEST`
+ * Can be used in `LV_EVENT_HIT_TEST`
  * @param e     pointer to an event
  * @return      an area with absolute coordinates to check
  */
 const lv_area_t * lv_event_get_cover_area(lv_event_t * e);
 
 /**
- * Set the result of cover checking. Can be used in `LV_OBJ_EVENT_COVER_CHECK`
+ * Set the result of cover checking. Can be used in `LV_EVENT_COVER_CHECK`
  * @param e     pointer to an event
  * @param res   an element of ::lv_cover_check_info_t
  */

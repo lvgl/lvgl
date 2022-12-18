@@ -117,7 +117,7 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp);
  *--------------------*/
 
 /**
- * Sets the resolution of a display. `LV_DISP_EVENT_RESOLUTION_CHANGED` event will be sent.
+ * Sets the resolution of a display. `LV_EVENT_RESOLUTION_CHANGED` event will be sent.
  * Here the native resolution of the device should be set. If the display will be rotated later with
  * `lv_disp_set_rotation` LVGL will swap the hor. and ver. resolution automatically.
  * @param disp      pointer to a display
@@ -441,7 +441,7 @@ bool lv_disp_remove_event(lv_disp_t * disp, uint32_t index);
 /**
  * Send amn event to a display
  * @param disp          pointer to a display
- * @param code          an event code. LV_DISP_EVENT_...
+ * @param code          an event code. LV_EVENT_...
  * @param user_data     optional user_data
  * @return              LV_RES_OK: disp wasn't deleted in the event.
  */

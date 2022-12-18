@@ -183,7 +183,7 @@ label.align(lv.ALIGN.CENTER, 0, 0)
 lv_obj_t * btn = lv_btn_create(lv_scr_act());                   /*Add a button to the current screen*/
 lv_obj_center(btn);                                             /*Set its position*/
 lv_obj_set_size(btn, 100, 50);                                  /*Set its size*/
-lv_obj_add_event(btn, btn_event_cb, LV_OBJ_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+lv_obj_add_event(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
 
 lv_obj_t * label = lv_label_create(btn);                        /*Add a label to the button*/
 lv_label_set_text(label, "Button");                             /*Set the labels text*/
@@ -231,22 +231,22 @@ lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, L
 lv_obj_t * cb;
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Apple");
-lv_obj_add_event(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
+lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Banana");
 lv_obj_add_state(cb, LV_STATE_CHECKED);
-lv_obj_add_event(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
+lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_checkbox_set_text(cb, "Lemon");
 lv_obj_add_state(cb, LV_STATE_DISABLED);
-lv_obj_add_event(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
+lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 
 cb = lv_checkbox_create(lv_scr_act());
 lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED);
 lv_checkbox_set_text(cb, "Melon\nand a new line");
-lv_obj_add_event(cb, event_handler, LV_OBJ_EVENT_ALL, NULL);
+lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 ```
 
 </details>

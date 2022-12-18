@@ -11,7 +11,7 @@ static void file_explorer_event_handler(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if(code == LV_OBJ_EVENT_VALUE_CHANGED) {
+    if(code == LV_EVENT_VALUE_CHANGED) {
         const char * cur_path =  lv_file_explorer_get_current_path(obj);
         const char * sel_fn = lv_file_explorer_get_selected_file_name(obj);
         uint16_t path_len = strlen(cur_path);
@@ -78,7 +78,7 @@ void lv_example_file_explorer_1(void)
 #endif
 #endif
 
-    lv_obj_add_event(file_explorer, file_explorer_event_handler, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 }
 
 #endif

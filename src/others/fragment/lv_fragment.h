@@ -104,7 +104,7 @@ struct _lv_fragment_class_t {
     void (*obj_will_delete_cb)(lv_fragment_t * self, lv_obj_t * obj);
 
     /**
-     * Called when the object created by fragment received `LV_OBJ_EVENT_DELETE` event
+     * Called when the object created by fragment received `LV_EVENT_DELETE` event
      * @param self Fragment instance
      * @param obj object with this fragment
      */

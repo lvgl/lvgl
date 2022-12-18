@@ -22,7 +22,7 @@ Call `lv_obj_add_state(switch, LV_STATE_CHECKED)` to turn it on, or `lv_obj_clea
 
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when the switch changes state.
+- `LV_EVENT_VALUE_CHANGED` Sent when the switch changes state.
 
 See the events of the [Base object](/widgets/obj) too.
 

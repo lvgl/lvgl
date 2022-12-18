@@ -56,7 +56,7 @@ void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * use
 
 /**
  * Subscribe an `lv_obj` to a message.
- * `LV_OBJ_EVENT_MSG_RECEIVED` will be triggered if a message with matching ID was sent
+ * `LV_EVENT_MSG_RECEIVED` will be triggered if a message with matching ID was sent
  * @param msg_id        the message ID to listen to
  * @param obj           pointer to an `lv_obj`
  * @param user_data     arbitrary data which will be available in `cb` too
@@ -110,7 +110,7 @@ const void * lv_msg_get_payload(lv_msg_t * m);
 void * lv_msg_get_user_data(lv_msg_t * m);
 
 /**
- * Get the message object from an event object. Can be used in `LV_OBJ_EVENT_MSG_RECEIVED` events.
+ * Get the message object from an event object. Can be used in `LV_EVENT_MSG_RECEIVED` events.
  * @param e     pointer to an event object
  * @return      the message object or NULL if called with unrelated event code.
  */

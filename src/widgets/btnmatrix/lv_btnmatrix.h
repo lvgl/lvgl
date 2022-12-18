@@ -38,7 +38,7 @@ enum {
     LV_BTNMATRIX_CTRL_DISABLED   = 0x0020, /**< Disable this button.*/
     LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< The button can be toggled.*/
     LV_BTNMATRIX_CTRL_CHECKED    = 0x0080, /**< Button is currently toggled (e.g. checked).*/
-    LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_OBJ_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_OBJ_EVENT_VALUE_CHANGE on PRESS*/
+    LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
     LV_BTNMATRIX_CTRL_POPOVER    = 0x0200, /**< Show a popover when pressing this key*/
     LV_BTNMATRIX_CTRL_RECOLOR    = 0x1000, /**< Enable text recoloring with `#color`*/
     _LV_BTNMATRIX_CTRL_RESERVED  = 0x2000, /**< Reserved for later use*/
@@ -67,7 +67,7 @@ extern const lv_obj_class_t lv_btnmatrix_class;
 
 /**
  * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_btnmatrix_class`
- * Used in `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END`
+ * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
  */
 typedef enum {
     LV_BTNMATRIX_DRAW_PART_BTN,    /**< The rectangle and label of buttons*/

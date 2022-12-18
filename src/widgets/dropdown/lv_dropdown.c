@@ -455,7 +455,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     /*To allow styling the list*/
-    lv_obj_send_event(dropdown_obj, LV_OBJ_EVENT_READY, NULL);
+    lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
 
     lv_obj_t * label = get_label(dropdown_obj);
     lv_label_set_text_static(label, dropdown->options);
@@ -551,7 +551,7 @@ void lv_dropdown_close(lv_obj_t * obj)
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
     lv_obj_add_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_send_event(obj, LV_OBJ_EVENT_CANCEL, NULL);
+    lv_obj_send_event(obj, LV_EVENT_CANCEL, NULL);
 }
 
 bool lv_dropdown_is_open(lv_obj_t * obj)
@@ -658,7 +658,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
-    if(code == LV_OBJ_EVENT_FOCUSED) {
+    if(code == LV_EVENT_FOCUSED) {
         lv_group_t * g             = lv_obj_get_group(obj);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -676,25 +676,25 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
     }
-    else if(code == LV_OBJ_EVENT_DEFOCUSED || code == LV_OBJ_EVENT_LEAVE) {
+    else if(code == LV_EVENT_DEFOCUSED || code == LV_EVENT_LEAVE) {
         lv_dropdown_close(obj);
     }
-    else if(code == LV_OBJ_EVENT_RELEASED) {
+    else if(code == LV_EVENT_RELEASED) {
         res = btn_release_handler(obj);
         if(res != LV_RES_OK) return;
     }
-    else if(code == LV_OBJ_EVENT_STYLE_CHANGED) {
+    else if(code == LV_EVENT_STYLE_CHANGED) {
         lv_obj_refresh_self_size(obj);
     }
-    else if(code == LV_OBJ_EVENT_SIZE_CHANGED) {
+    else if(code == LV_EVENT_SIZE_CHANGED) {
         lv_obj_refresh_self_size(obj);
     }
-    else if(code == LV_OBJ_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_point_t * p = lv_event_get_param(e);
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
         p->y = lv_font_get_line_height(font);
     }
-    else if(code == LV_OBJ_EVENT_KEY) {
+    else if(code == LV_EVENT_KEY) {
         char c = *((char *)lv_event_get_param(e));
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(!lv_dropdown_is_open(obj)) {
@@ -721,7 +721,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
         else if(c == LV_KEY_ENTER) {
             /* Handle the ENTER key only if it was send by an other object.
-             * Do no process it if ENTER is sent by the dropdown because it's handled in LV_OBJ_EVENT_RELEASED */
+             * Do no process it if ENTER is sent by the dropdown because it's handled in LV_EVENT_RELEASED */
             lv_obj_t * indev_obj = lv_indev_get_obj_act();
             if(indev_obj != obj) {
                 res = btn_release_handler(obj);
@@ -729,7 +729,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
     }
-    else if(code == LV_OBJ_EVENT_DRAW_MAIN) {
+    else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
     }
 }
@@ -742,7 +742,7 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
 
     /*Call the ancestor's event handler*/
     lv_event_code_t code = lv_event_get_code(e);
-    if(code != LV_OBJ_EVENT_DRAW_POST) {
+    if(code != LV_EVENT_DRAW_POST) {
         res = lv_obj_event_base(MY_CLASS_LIST, e);
         if(res != LV_RES_OK) return;
     }
@@ -750,19 +750,19 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
     lv_obj_t * dropdown_obj = ((lv_dropdown_list_t *)list)->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
 
-    if(code == LV_OBJ_EVENT_RELEASED) {
+    if(code == LV_EVENT_RELEASED) {
         if(lv_indev_get_scroll_obj(lv_indev_get_act()) == NULL) {
             list_release_handler(list);
         }
     }
-    else if(code == LV_OBJ_EVENT_PRESSED) {
+    else if(code == LV_EVENT_PRESSED) {
         list_press_handler(list);
     }
-    else if(code == LV_OBJ_EVENT_SCROLL_BEGIN) {
+    else if(code == LV_EVENT_SCROLL_BEGIN) {
         dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
         lv_obj_invalidate(list);
     }
-    else if(code == LV_OBJ_EVENT_DRAW_POST) {
+    else if(code == LV_EVENT_DRAW_POST) {
         draw_list(e);
         res = lv_obj_event_base(MY_CLASS_LIST, e);
         if(res != LV_RES_OK) return;
@@ -1016,7 +1016,7 @@ static lv_res_t btn_release_handler(lv_obj_t * obj)
                 dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
                 lv_res_t res;
                 uint32_t id  = dropdown->sel_opt_id; /*Just to use uint32_t in event data*/
-                res = lv_obj_send_event(obj, LV_OBJ_EVENT_VALUE_CHANGED, &id);
+                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
                 if(res != LV_RES_OK) return res;
                 lv_obj_invalidate(obj);
             }
@@ -1071,7 +1071,7 @@ static lv_res_t list_release_handler(lv_obj_t * list_obj)
     if(dropdown->text == NULL) lv_obj_invalidate(dropdown_obj);
 
     uint32_t id  = dropdown->sel_opt_id; /*Just to use uint32_t in event data*/
-    lv_res_t res = lv_obj_send_event(dropdown_obj, LV_OBJ_EVENT_VALUE_CHANGED, &id);
+    lv_res_t res = lv_obj_send_event(dropdown_obj, LV_EVENT_VALUE_CHANGED, &id);
     if(res != LV_RES_OK) return res;
 
     return LV_RES_OK;

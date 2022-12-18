@@ -57,11 +57,11 @@ From `lv_msg_t` the followings can be used to get some data:
 ## Subscribe with an lv_obj
 It's quite typical that an LVGL widget is interested in some messages.
 To make it simpler `lv_msg_subsribe_obj(msg_id, obj, user_data)` can be used.
-If a new message is published with `msg_id` an `LV_OBJ_EVENT_MSG_RECEIVED` event will be sent to the object.
+If a new message is published with `msg_id` an `LV_EVENT_MSG_RECEIVED` event will be sent to the object.
 
 For example:
 ```c
-lv_obj_add_event(user_name_label, user_name_label_event_cb, LV_OBJ_EVENT_MSG_RECEIVED, NULL);
+lv_obj_add_event(user_name_label, user_name_label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
 lv_msg_subsribe_obj(MSG_USER_NAME_CHANGED, user_name_label, NULL);
 
 ...

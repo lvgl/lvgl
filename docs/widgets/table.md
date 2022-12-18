@@ -46,8 +46,8 @@ E.g. `lv_obj_set_size(table, LV_SIZE_CONTENT, LV_SIZE_CONTENT)` automatically se
 If the width or height is set to a smaller number than the "intrinsic" size then the table becomes scrollable.
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when a new cell is selected with keys.
-- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` are sent for the following types:
+- `LV_EVENT_VALUE_CHANGED` Sent when a new cell is selected with keys.
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following types:
     - `LV_TABLE_DRAW_PART_CELL` The individual cells of the table
         - `part`: `LV_PART_ITEMS`
         - `draw_area`: area of the indicator
@@ -64,7 +64,7 @@ Learn more about [Events](/overview/event).
 The following *Keys* are processed by the Tables:
 - `LV_KEY_RIGHT/LEFT/UP/DOWN/` Select a cell.
 
-Note that, as usual, the state of `LV_KEY_ENTER` is translated to `LV_OBJ_EVENT_PRESSED/PRESSING/RELEASED` etc.
+Note that, as usual, the state of `LV_KEY_ENTER` is translated to `LV_EVENT_PRESSED/PRESSING/RELEASED` etc.
 
 `lv_table_get_selected_cell(table, &row, &col)` can be used to get the currently selected cell. Row and column will be set to `LV_TABLE_CELL_NONE` no cell is selected.
 

@@ -40,8 +40,8 @@ The popovers currently are merely a visual effect and don't allow selecting addi
 You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_..., kb_map, kb_ctrl);`. See the [Button matrix](/widgets/btnmatrix) for more information about creating new maps a ctrls.
 
 Keep in mind that using following keywords will have the same effect as with the original map:
-- `LV_SYMBOL_OK` Send `LV_OBJ_EVENT_RADY` to the assigend Text area.
-- `LV_SYMBOL_CLOSE` or `LV_SYMBOL_KEYBOARD` Send `LV_OBJ_EVENT_CANCEL` to the assigend Text area.
+- `LV_SYMBOL_OK` Send `LV_EVENT_RADY` to the assigend Text area.
+- `LV_SYMBOL_CLOSE` or `LV_SYMBOL_KEYBOARD` Send `LV_EVENT_CANCEL` to the assigend Text area.
 - `LV_SYMBOL_BACKSPACE` Delete on the left.
 - `LV_SYMBOL_LEFT` Move the cursor left.
 - `LV_SYMBOL_RIGHT` Move the cursor right.
@@ -51,9 +51,9 @@ Keep in mind that using following keywords will have the same effect as with the
 - *"1#"* Load the lower case map.
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when the button is pressed/released or repeated after long press. The event data is set to the ID of the pressed/released button.
-- `LV_OBJ_EVENT_READY` - The *Ok* button is clicked.
-- `LV_OBJ_EVENT_CANCEL` - The *Close* button is clicked.
+- `LV_EVENT_VALUE_CHANGED` Sent when the button is pressed/released or repeated after long press. The event data is set to the ID of the pressed/released button.
+- `LV_EVENT_READY` - The *Ok* button is clicked.
+- `LV_EVENT_CANCEL` - The *Close* button is clicked.
 
 The keyboard has a **default event handler** callback called `lv_keyboard_def_event_cb`, which handles the button pressing, map changing, the assigned text area, etc. You can remove it and replace it with a custom event handler if you wish.
 
