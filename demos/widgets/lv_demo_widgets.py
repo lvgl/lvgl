@@ -1,6 +1,5 @@
 #!/opt/bin/lv_micropython -i
 import lvgl as lv
-import display_driver_utils
 import fs_driver
 import time,os,sys
 
@@ -909,7 +908,12 @@ except NameError:
     script_path = ''
 
 # Initialize the display driver
-driver = display_driver_utils.driver(width=SCREEN_SIZE[0],height=SCREEN_SIZE[1],orientation=display_driver_utils.ORIENT_LANDSCAPE)
+default_group = lv.group_create()
+default_group.set_default()
+
+lv.sdl_window_create(800, 480)
+sdl_indev = lv.sdl_mouse_create()
+sdl_indev.set_group(default_group)
 
 # Create a screen and load it
 scr=lv.obj()
@@ -919,9 +923,8 @@ lv.scr_load(scr)
 fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
 
-# get the display size
-LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
-LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
+LV_HOR_RES = lv.scr_act().get_disp().get_hor_res()
+LV_VER_RES = lv.scr_act().get_disp().get_ver_res()
 
 print("Screen resolution: {:d}x{:d}".format(LV_HOR_RES,LV_VER_RES))
 

@@ -1,4 +1,3 @@
-import display_driver
 import lvgl as lv
 
 # A class is used to keep track of the series list because later we

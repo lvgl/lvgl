@@ -1,7 +1,5 @@
 class KeyboardEncoder:
     def __init__(self):
-        self.LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
-        print("vertial size: ",self.LV_VER_RES)
         self.g = lv.group_create()
         self.g.set_default()
 
@@ -11,10 +9,10 @@ class KeyboardEncoder:
 
             if not cur_drv :
                 break
-            if cur_drv.driver.type == lv.INDEV_TYPE.KEYPAD:
+            if cur_drv.get_type() == lv.INDEV_TYPE.KEYPAD:
                 print("Found keypad")
                 cur_drv.set_group(self.g)
-            if cur_drv.driver.type == lv.INDEV_TYPE.ENCODER:
+            if cur_drv.get_type() == lv.INDEV_TYPE.ENCODER:
                 print("Found encoder")
                 cur_drv.set_group(self.g)
 
@@ -145,12 +143,12 @@ class KeyboardEncoder:
             self.kb.clear_flag(lv.obj.FLAG.HIDDEN)
             self.kb.group_focus_obj()
             self.kb.get_group().set_editing()
-            self.tv.set_height(LV_VER_RES // 2)
+            self.tv.set_height(lv.pct(50))
             lv_obj_align(kb, LV_ALIGN_BOTTOM_MID, 0, 0);
 
         if code == lv.EVENT.READY or code == lv.EVENT.CANCEL:
             self.kb.add_flag(lv.obj.FLAG.HIDDEN)
-            self.tv.set_height(self.LV_VER_RES)
+            self.tv.set_height(lv.pct(100))
 
 
 keyboard_encoder = KeyboardEncoder()

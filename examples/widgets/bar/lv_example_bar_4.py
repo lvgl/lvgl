@@ -13,7 +13,7 @@ def get_icon(filename,xres,yres):
 
     icon_dsc = lv.img_dsc_t(
         {
-            "header": {"always_zero": 0, "w": xres, "h": yres, "cf": lv.img.CF.TRUE_COLOR_ALPHA},
+            "header": {"always_zero": 0, "w": xres, "h": yres, "cf": lv.COLOR_FORMAT.NATIVE_ALPHA},
             "data": icon_data,
             "data_size": len(icon_data),
         }

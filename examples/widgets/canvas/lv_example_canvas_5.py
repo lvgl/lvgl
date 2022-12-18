@@ -1,10 +1,3 @@
-#!/opt/bin/lv_micropython -i
-# Initialize 
-
-import lvgl as lv
-import display_driver
-import fs_driver
-
 CANVAS_WIDTH  = 50
 CANVAS_HEIGHT = 50
 
@@ -19,7 +12,7 @@ cbuf = bytearray((LV_COLOR_SIZE // 8) * CANVAS_WIDTH * CANVAS_HEIGHT)
 
 # Create a canvas and initialize its palette
 canvas = lv.canvas(lv.scr_act())
-canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.img.CF.TRUE_COLOR)
+canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 canvas.fill_bg(lv.color_hex3(0xccc), lv.OPA.COVER)
 canvas.center()
 

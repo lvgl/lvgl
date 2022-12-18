@@ -56,7 +56,7 @@ img1 = lv.img(lv.scr_act())
 img1.set_src(img_cogwheel_argb)
 img1.align(lv.ALIGN.RIGHT_MID, -20, 0)
 
-lv.event_send(intense_slider, lv.EVENT.VALUE_CHANGED, None)
+intense_slider.send_event(lv.EVENT.VALUE_CHANGED, None)
 
 
 

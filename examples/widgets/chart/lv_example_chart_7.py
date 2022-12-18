@@ -1,7 +1,6 @@
 #!/opt/bin/lv_micropython -i
 import utime as time
 import lvgl as lv
-import display_driver
 
 def draw_event_cb(e):
     dsc = e.get_draw_part_dsc()

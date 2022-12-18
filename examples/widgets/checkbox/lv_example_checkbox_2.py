@@ -49,7 +49,7 @@ class LV_Example_Checkbox_2:
 
 
     def radio_event_handler(self,e):
-        cont = e.get_current_target()
+        cont = e.get_current_target_obj()
         act_cb = e.get_target_obj()
         if cont == self.cont1:
             active_id = self.active_index_1

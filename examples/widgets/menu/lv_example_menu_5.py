@@ -68,8 +68,7 @@ def switch_handler(e,menu):
         if obj.has_state(lv.STATE.CHECKED) :
             menu.set_page(None)
             menu.set_sidebar_page(root_page)
-            # lv_event_send(lv_obj_get_child(lv_obj_get_child(lv_menu_get_cur_sidebar_page(menu), 0), 0), LV_EVENT_CLICKED, NULL);
-            lv.event_send(menu.get_cur_sidebar_page().get_child(0).get_child(0),lv.EVENT.CLICKED,None)
+            menu.get_cur_sidebar_page().get_child(0).get_child(0).send_event(lv.EVENT.CLICKED,None)
         else :
             menu.set_sidebar_page(None)
             menu.clear_history()      #  Clear history because we will be showing the root page later
@@ -77,9 +76,6 @@ def switch_handler(e,menu):
 
 LV_MENU_ITEM_BUILDER_VARIANT_1 = const(0)
 LV_MENU_ITEM_BUILDER_VARIANT_2 = const(1)
-
-LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
-LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
 
 menu = lv.menu(lv.scr_act())
 
@@ -92,7 +88,7 @@ else :
 
 menu.set_mode_root_back_btn(lv.menu.ROOT_BACK_BTN.ENABLED)
 menu.add_event(lambda evt: back_event_handler(evt,menu), lv.EVENT.CLICKED, None)
-menu.set_size(LV_HOR_RES, LV_VER_RES )
+menu.set_size(lv.pct(100), lv.pct(100))
 menu.center()
 
 # Create sub pages
@@ -168,7 +164,8 @@ menu.set_load_page_event(cont, sub_menu_mode_page)
 
 menu.set_sidebar_page(root_page)
 
-lv.event_send(menu.get_cur_sidebar_page().get_child(0).get_child(0),lv.EVENT.CLICKED,None)
+
+menu.get_cur_sidebar_page().get_child(0).get_child(0).send_event(lv.EVENT.CLICKED,None)
 
 
 
