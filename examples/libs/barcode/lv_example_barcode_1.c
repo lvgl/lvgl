@@ -14,8 +14,8 @@ void lv_example_barcode_1(void)
     lv_obj_center(barcode);
 
     /*Set color*/
-    lv_barcode_set_dark_color(barcode, fg_color);
-    lv_barcode_set_light_color(barcode, bg_color);
+    lv_barcode_set_dark_color(barcode, lv_color_to32(fg_color));
+    lv_barcode_set_light_color(barcode, lv_color_to32(bg_color));
 
     /*Add a border with bg_color*/
     lv_obj_set_style_border_color(barcode, bg_color, 0);

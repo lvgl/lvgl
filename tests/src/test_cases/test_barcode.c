@@ -25,16 +25,16 @@ void test_barcode_normal(void)
     lv_obj_set_height(barcode, 50);
     lv_obj_center(barcode);
 
-    lv_color_t dark_color = lv_color_black();
-    lv_color_t light_color = lv_color_white();
+    lv_color32_t dark_color = lv_color_to32(lv_color_black());
+    lv_color32_t light_color = lv_color_to32(lv_color_white());
     uint16_t scale = 2;
 
-    lv_barcode_set_dark_color(barcode, lv_color_black());
-    lv_barcode_set_light_color(barcode, lv_color_white());
+    lv_barcode_set_dark_color(barcode, dark_color);
+    lv_barcode_set_light_color(barcode, light_color);
     lv_barcode_set_scale(barcode, scale);
 
-    TEST_ASSERT_EQUAL_COLOR(lv_barcode_get_dark_color(barcode), dark_color);
-    TEST_ASSERT_EQUAL_COLOR(lv_barcode_get_light_color(barcode), light_color);
+    TEST_ASSERT_EQUAL_COLOR32(lv_barcode_get_dark_color(barcode), dark_color);
+    TEST_ASSERT_EQUAL_COLOR32(lv_barcode_get_light_color(barcode), light_color);
     TEST_ASSERT_EQUAL(lv_barcode_get_scale(barcode), scale);
 
     lv_res_t res = lv_barcode_update(barcode, "https://lvgl.io");
