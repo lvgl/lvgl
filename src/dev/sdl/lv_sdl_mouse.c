@@ -90,7 +90,9 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
         case SDL_FINGERUP:
         case SDL_FINGERDOWN:
         case SDL_FINGERMOTION:
+#if SDL_VERSION_ATLEAST(2,0,12)
             win_id = event->tfinger.windowID;
+#endif
             break;
         default:
             return;

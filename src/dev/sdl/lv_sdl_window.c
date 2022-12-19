@@ -110,6 +110,8 @@ uint8_t lv_sdl_window_get_zoom(lv_disp_t * disp)
 lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
+    if(win_id == UINT32_MAX) return disp;
+
     while(disp) {
         lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
         if(SDL_GetWindowID(dsc->window) == win_id) {
