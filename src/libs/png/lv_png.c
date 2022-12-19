@@ -157,11 +157,14 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         if(strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
 
             /*Load the PNG file into buffer. It's still compressed (not decoded)*/
-            unsigned char * png_data;      /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
-            size_t png_data_size;          /*Size of `png_data` in bytes*/
+            unsigned char * png_data = NULL;    /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
+            size_t png_data_size;               /*Size of `png_data` in bytes*/
 
             error = lodepng_load_file(&png_data, &png_data_size, fn);   /*Load the file*/
             if(error) {
+                if(png_data != NULL) {
+                    lv_free(png_data);
+                }
                 LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
             }

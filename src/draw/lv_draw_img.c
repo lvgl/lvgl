@@ -181,7 +181,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
-        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, &sup, cf);
+        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, &sup, cdsc->dec_dsc.header.cf);
         draw_ctx->clip_area = clip_area_ori;
     }
     /*The whole uncompressed image is not available. Try to read it line-by-line*/
@@ -222,7 +222,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
             }
 
             draw_ctx->clip_area = &mask_line;
-            lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, &sup, cf);
+            lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, &sup, cdsc->dec_dsc.header.cf);
             line.y1++;
             line.y2++;
             y++;

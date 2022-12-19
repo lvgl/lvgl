@@ -338,6 +338,11 @@ menu "LVGL configuration"
 				bool "Enable/Disable LV_LOG_TRACE in anim module"
 				default y
 				depends on LV_USE_LOG
+			
+			config LV_LOG_TRACE_MSG
+				bool "Enable/Disable LV_LOG_TRACE in msg module"
+				default y
+				depends on LV_USE_LOG
 		endmenu
 
 		menu "Asserts"
@@ -951,6 +956,9 @@ menu "LVGL configuration"
 		config LV_USE_QRCODE
 			bool "QR code library"
 
+		config LV_USE_BARCODE
+			bool "Barcode library"
+
 		config LV_USE_FREETYPE
 			bool "FreeType library"
 		if LV_USE_FREETYPE
@@ -1110,6 +1118,10 @@ menu "LVGL configuration"
 		config LV_DEMO_MUSIC_AUTO_PLAY
 			bool "Enable Auto play"
 			depends on LV_USE_DEMO_MUSIC
+			default n
+
+		config LV_USE_DEMO_FLEX_LAYOUT
+			bool "Flex layout previewer"
 			default n
 	endmenu
 

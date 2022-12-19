@@ -186,7 +186,8 @@ void lv_img_set_offset_y(lv_obj_t * obj, lv_coord_t y)
 
 void lv_img_set_angle(lv_obj_t * obj, int16_t angle)
 {
-    if(angle < 0 || angle >= 3600) angle = angle % 3600;
+    while(angle >= 3600) angle -= 3600;
+    while(angle < 0) angle += 3600;
 
     lv_img_t * img = (lv_img_t *)obj;
     if(angle == img->angle) return;
