@@ -75,7 +75,7 @@ void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * use
     s->msg_id = msg_id;
     s->callback = cb;
     s->user_data = user_data;
-    s->_checked = 1; // if subsribed during `notify`, it won't be notified immediately
+    s->_checked = 0; /*if subsribed during `notify`, it should be notified immediately*/
     restart_notify = true;
     return s;
 }
