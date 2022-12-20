@@ -42,7 +42,7 @@ typedef struct {
     lv_res_t (*query_cb)(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps, 
                          lv_img_dec_ctx_t * dec_ctx);
     void (*set_size_cb)(uint16_t new_entry_cnt);
-    void (*invalidate_src_cb)(const void * src);
+    void (*invalidate_src_cb)(const lv_img_src_t * src);
     void (*cleanup_cb)(_lv_img_cache_entry_t * entry);
 } lv_img_cache_manager_t;
 

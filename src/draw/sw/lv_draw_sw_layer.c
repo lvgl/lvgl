@@ -47,7 +47,7 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
 {
     lv_draw_sw_layer_ctx_t * layer_sw_ctx = (lv_draw_sw_layer_ctx_t *) layer_ctx;
     uint32_t px_size = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
-    layer_ctx->img_src = lv_img_src_create(LV_IMG_SRC_FLAG_PERMANENT);
+    layer_ctx->img_src = lv_img_src_create();
     if(layer_ctx->img_src == NULL) {
         LV_ASSERT_MALLOC(layer_ctx->img_src);
         return NULL;
@@ -119,7 +119,6 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     img.header.h = lv_area_get_height(draw_ctx->buf_area);
     img.header.cf = draw_ctx->render_with_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
     lv_img_src_set_raw(layer_ctx->img_src, &img);
-    lv_img_cache_invalidate_src(layer_ctx->img_src);
 
     /*Restore the original draw_ctx*/
     draw_ctx->buf = layer_ctx->original.buf;
@@ -130,7 +129,7 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     /*Blend the layer*/
     lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, layer_ctx->img_src);
     lv_draw_wait_for_finish(draw_ctx);
-    lv_img_cache_invalidate_src(&img);
+    lv_img_cache_invalidate_src(layer_ctx->img_src);
 }
 
 void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx)

@@ -44,39 +44,12 @@ enum {
 
 typedef uint8_t lv_img_src_type_t;
 
-
-
-/**
- * Image source flags.*/
-enum {
-    /**
-     * 0: can be attached to a single object which frees it if required
-     * 1: can be attached to any number of object and none of them will try to free it
-     */
-    LV_IMG_SRC_FLAG_PERMANENT = 0x01,
-
-    /**
-     * only if loose == 1
-     * 0: not attached to any objects yet
-     * 1: attached to an object, can't be attached again
-     */
-    _LV_IMG_SRC_FLAG_CAPTURED = 0x02,
-
-    /**
-     * 1: The image source was created by lv_img_src_create() so it should be freed in lv_img_src_free
-     */
-    _LV_IMG_SRC_FLAG_MALLOCED = 0x04,
-};
-
-typedef uint8_t lv_img_src_flag_t;
-
 /**
  * A generic image source descriptor.
  * You can build an image source via `lv_img_src_from_xxx` or `lv_img_src_set_src` functions.
  */
 typedef struct {
-    uint8_t         type: 5;          /**< See `lv_img_src_type_t` above */
-    uint8_t         flag: 3;          /**< See `lv_img_src_flag_t` above */
+    uint8_t         type;           /**< See `lv_img_src_type_t` above */
     size_t          data_len;       /**< The data's length in bytes */
     const void   *  data;           /**< A pointer on the given unique resource identifier */
     const char   *  ext;            /**< If the data points to a file, this will point to the extension */
@@ -100,8 +73,12 @@ typedef struct {
  */
 lv_img_src_type_t lv_img_src_get_type(const void * src);
 
+/** Get an image source to an empty object (no image)
+ *  @return a pointer to a lv_img_src_t object instance that should be freed unless it's captured by a LVGL function
+ */
+lv_img_src_t * lv_img_src_create(void);
+
 /** Free a source descriptor.
- *  Only to be called if allocated via lv_img_src_parse
  *  @param src  The src format to free
  */
 void lv_img_src_free(lv_img_src_t * src);
@@ -131,52 +108,52 @@ void lv_img_src_set_file(lv_img_src_t * src, const char * file_path);
  */
 void lv_img_src_set_raw(lv_img_src_t * src, const lv_img_dsc_t * raw);
 
-/** Get an image source to a text with any symbol in it
+/** Get an image source from a text with any symbol in it
  *  @param symbol An textual strings with symbols
- *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
- *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+ *  @return a pointer to a lv_img_src_t object instance that should be freed unless it's captured by a LVGL function
 */
-lv_img_src_t * lv_img_src_from_symbol(const char * symbol, lv_img_src_flag_t flags);
+lv_img_src_t * lv_img_src_from_symbol(const char * symbol);
 
-/** Get an image source to a byte array containing the image encoded data
+/** Get an image source from a byte array containing the image encoded data
  *  @param data A pointer to the image's data
  *  @param len  The length pointed by data in bytes
- *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
- *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+ *  @return a pointer to a lv_img_src_t object instance that should be freed unless it's captured by a LVGL function
 */
-lv_img_src_t * lv_img_src_from_data(const uint8_t * data, const size_t len, lv_img_src_flag_t flags);
+lv_img_src_t * lv_img_src_from_data(const uint8_t * data, const size_t len);
 
-/**Get an image source to a file
+/**Get an image source from a file path
  *  @param path Path to the file containing the image
- *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
- *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+ *  @return a pointer to a lv_img_src_t object instance that should be freed unless it's captured by a LVGL function
  */
-lv_img_src_t * lv_img_src_from_file(const char * file_path, lv_img_src_flag_t flags);
+lv_img_src_t * lv_img_src_from_file(const char * file_path);
 
-/** Get an image source to an image descriptor
+/** Get an image source from an image descriptor
  *  @param raw  Pointer to a lv_img_dsc_t instance
- *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
- *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+ *  @return a pointer to a lv_img_src_t object instance that should be freed unless it's captured by a LVGL function
  */
-lv_img_src_t * lv_img_src_from_raw(const lv_img_dsc_t * raw, lv_img_src_flag_t flags);
+lv_img_src_t * lv_img_src_from_raw(const lv_img_dsc_t * raw);
 
-/** Get an image source to an empty object (no image)
- *  @param flags    an element of @lv_img_src_flag_t. 0: to create an image source which can be simply attached to one image.
- *  @return a lv_img_src_move_t object instance that doesn't need to be free is used as argument to a LVGL function
+/** Get an image source from a void *.
+ *  @deprecated Don't use this since there are multiple bugs with type erasing and type guessing the image format.
+ *  @param raw  Pointer to a void *
+ *  @return a pointer to a lv_img_src_t object instance that should be freed unless it's captured by a LVGL function
  */
-lv_img_src_t * lv_img_src_create(lv_img_src_flag_t flags);
+lv_img_src_t * lv_img_src_parse(const void * raw);
 
-/** Copy the source of the descriptor to another descriptor
+
+
+
+/** Copy the image source to another image source. The destination object is freed if required.
  *  @param dest The dest object to fill
  *  @param src  The source object to read from
  */
 void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src);
 
-/** Capture  the source of the descriptor and move to another descriptor
- *  @param dest The dest object to fill
- *  @param src  The source object to move from
+/** Handful helper function to capture a given image source.
+ *  @param dest If it exists, it's freed and then it's set to the source pointer
+ *  @param src  The pointer to capture. The pointer shouldn't be freed after calling this method.
  */
-void lv_img_src_capture(lv_img_src_t ** dest, lv_img_src_t * src);
+void lv_img_src_capture(lv_img_src_t ** dest, const lv_img_src_t * src);
 
 #ifdef __cplusplus
 } /*extern "C"*/

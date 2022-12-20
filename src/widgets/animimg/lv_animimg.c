@@ -160,7 +160,7 @@ static void index_change(lv_obj_t * obj, int32_t index)
 
     idx = index % animimg->pic_count;
 
-    lv_img_set_src(obj, lv_img_src_from_raw(animimg->dsc[idx], 0));
+    lv_img_set_src(obj, lv_img_src_from_raw(animimg->dsc[idx]));
 }
 
 #endif

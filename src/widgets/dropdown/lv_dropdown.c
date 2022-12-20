@@ -593,7 +593,7 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     dropdown->option_cnt      = 0;
     dropdown->dir = LV_DIR_BOTTOM;
 
-    lv_dropdown_set_symbol(obj, lv_img_src_from_symbol(LV_SYMBOL_DOWN, 0));
+    lv_dropdown_set_symbol(obj, lv_img_src_from_symbol(LV_SYMBOL_DOWN));
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
 
@@ -620,9 +620,7 @@ static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 
     if(dropdown->symbol) {
-        if(LV_BT(dropdown->symbol->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
-            lv_img_src_free(dropdown->symbol);
-        }
+        lv_img_src_free(dropdown->symbol);
     }
 }
 

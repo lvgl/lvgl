@@ -230,6 +230,11 @@ void lv_init(void)
     lv_fs_win32_init();
 #endif
 
+    /*Make FFMPEG first because decoder are checked in reverse insertion order and this one captures all other */
+#if LV_USE_FFMPEG
+    lv_ffmpeg_init();
+#endif
+
 #if LV_USE_PNG
     lv_png_init();
 #endif
@@ -250,11 +255,6 @@ void lv_init(void)
     lv_gif_init();
 #endif
 
-    /*Make FFMPEG last because the last converter will be checked first and
-     *it's superior to any other */
-#if LV_USE_FFMPEG
-    lv_ffmpeg_init();
-#endif
 
 #if LV_USE_FREETYPE
     /*Init freetype library*/

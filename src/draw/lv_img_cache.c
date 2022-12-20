@@ -36,6 +36,18 @@ static lv_img_cache_manager_t img_cache_manager = { 0 };
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_img_cache_manager_init(lv_img_cache_manager_t * manager)
+{
+    LV_ASSERT_NULL(manager);
+    lv_memzero(manager, sizeof(lv_img_cache_manager_t));
+}
+
+void lv_img_cache_manager_apply(const lv_img_cache_manager_t * manager)
+{
+    LV_ASSERT_NULL(manager);
+    lv_memcpy(&img_cache_manager, manager, sizeof(lv_img_cache_manager_t));
+}
+
 /**
  * Open an image using the image decoder interface and cache it.
  * The image will be left open meaning if the image decoder open callback allocated memory then it will remain.
@@ -53,15 +65,15 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_i
 lv_res_t _lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
                             lv_img_dec_ctx_t * dec_ctx)
 {
-    if(img_cache_manager.query_cb);
+    if(img_cache_manager.query_cb)
         return img_cache_manager.query_cb(dsc, header, caps, dec_ctx);
     return LV_RES_INV;
 }
 
 void _lv_img_cache_cleanup(_lv_img_cache_entry_t * entry)
 {
-    if(img_cache_manager.cleanup_cb);
-        return img_cache_manager.cleanup_cb(entry);
+    if(img_cache_manager.cleanup_cb)
+        img_cache_manager.cleanup_cb(entry);
 }
 
 void lv_img_cache_set_size(uint16_t new_entry_cnt)
@@ -70,7 +82,7 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     img_cache_manager.set_size_cb(new_entry_cnt);
 }
 
-void lv_img_cache_invalidate_src(const void * src)
+void lv_img_cache_invalidate_src(const lv_img_src_t * src)
 {
     LV_ASSERT_NULL(img_cache_manager.invalidate_src_cb);
     img_cache_manager.invalidate_src_cb(src);

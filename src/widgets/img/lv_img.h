@@ -135,7 +135,8 @@ lv_res_t lv_img_set_stop_at_frame(lv_obj_t * obj, const lv_frame_index_t index, 
  * Set the image source to display on the the object
  *
  * @param obj       pointer to an image object
- * @param src       an image source instance that can be created from:
+ * @param src       a pointer to an image source instance that's captured (no need to free it).
+ *                  It can be created from:
  *                  1. from a file: lv_img_src_from_file("S:/path/to/file")
  *                  2. from encoded image data: lv_img_src_from_data(&some_data, data_length)
  *                  3. from symbol: lv_img_src_from_symbol("Ok " LV_SYMBOL_OK)

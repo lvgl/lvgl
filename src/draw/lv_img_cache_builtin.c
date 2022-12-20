@@ -39,7 +39,8 @@ static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const lv_img_dec_dsc_i
 static lv_res_t _lv_img_cache_query_builtin(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
                             lv_img_dec_ctx_t * dec_ctx);
 static void lv_img_cache_set_size_builtin(uint16_t new_entry_cnt);
-static void lv_img_cache_invalidate_src_builtin(const void * src);
+static void lv_img_cache_invalidate_src_builtin(const lv_img_src_t * src);
+static void lv_img_cache_cleanup_builtin(_lv_img_cache_entry_t * cache);
 
 static bool lv_img_cache_match(const lv_img_src_t * src1, const lv_img_src_t * src2);
 static bool find_entry(const lv_img_src_t * src, const lv_color32_t * color, lv_img_dec_ctx_t * dec_ctx,
@@ -72,7 +73,7 @@ void _lv_img_cache_builtin_init(void)
     manager.query_cb = _lv_img_cache_query_builtin;
     manager.set_size_cb = lv_img_cache_set_size_builtin;
     manager.invalidate_src_cb = lv_img_cache_invalidate_src_builtin;
-    manager.cleanup_cb = _lv_img_cache_cleanup;
+    manager.cleanup_cb = lv_img_cache_cleanup_builtin;
     lv_img_cache_manager_apply(&manager);
 }
 
@@ -203,7 +204,7 @@ static void lv_img_cache_set_size_builtin(uint16_t new_entry_cnt)
  * Useful if the image source is updated therefore it needs to be cached again.
  * @param src an image source path to a file or pointer to an `lv_img_dsc_t` variable.
  */
-static void lv_img_cache_invalidate_src_builtin(const void * src)
+static void lv_img_cache_invalidate_src_builtin(const lv_img_src_t * src)
 {
     LV_UNUSED(src);
 #if LV_IMG_CACHE_DEF_SIZE
@@ -305,7 +306,7 @@ static bool lv_img_cache_match(const lv_img_src_t * src1, const lv_img_src_t * s
     return false;
 }
 
-void _lv_img_cache_cleanup(_lv_img_cache_entry_t * cache)
+static void lv_img_cache_cleanup_builtin(_lv_img_cache_entry_t * cache)
 {
     /*Automatically close images with no caching*/
 #if LV_IMG_CACHE_DEF_SIZE == 0

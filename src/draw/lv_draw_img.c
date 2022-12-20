@@ -30,7 +30,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
                                                       const lv_area_t * coords, const lv_img_src_t * src);
 
 LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
-                                                             const lv_area_t * coords, lv_img_cache_entry_t * entry);
+                                                             const lv_area_t * coords, _lv_img_cache_entry_t * entry);
 
 static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg);
 
@@ -89,7 +89,7 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_are
 }
 
 void lv_draw_img_cached(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                        lv_img_cache_entry_t * entry)
+                        _lv_img_cache_entry_t * entry)
 {
     if(entry == NULL) {
         LV_LOG_WARN("Image draw: entry is NULL");
@@ -213,39 +213,6 @@ bool lv_img_cf_has_alpha(lv_img_cf_t cf)
     return has_alpha;
 }
 
-/**
- * Get the type of an image source
- * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
- *  - a path to a file (e.g. "S:/folder/image.bin")
- *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
- */
-lv_img_src_t lv_img_src_get_type(const void * src)
-{
-    lv_img_src_t img_src_type = LV_IMG_SRC_UNKNOWN;
-
-    if(src == NULL) return img_src_type;
-    const uint8_t * u8_p = src;
-
-    /*The first byte shows the type of the image source*/
-    if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        img_src_type = LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
-    }
-    else if(u8_p[0] >= 0x80) {
-        img_src_type = LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
-    }
-    else {
-        img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is draw to the first byte < 0x20*/
-    }
-
-    if(LV_IMG_SRC_UNKNOWN == img_src_type) {
-        LV_LOG_WARN("unknown image type");
-    }
-
-    return img_src_type;
-}
-
 void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
 {
@@ -270,19 +237,19 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     lv_color32_t recolor = { .full = lv_color_to32(draw_dsc->recolor) };
     LV_COLOR_SET_A32(recolor, draw_dsc->recolor_opa);
     lv_img_dec_dsc_in_init(&dsc, src, &recolor, &size_hint);
-    lv_img_cache_entry_t * cdsc = lv_img_cache_open(&dsc, draw_dsc->dec_ctx);
+    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(&dsc, draw_dsc->dec_ctx);
     if(!cdsc) {
         LV_LOG_WARN("Image type detection error");
 
         return LV_RES_INV;
     }
     lv_res_t res = decode_and_draw_cached(draw_ctx, draw_dsc, coords, cdsc);
-    lv_img_cache_cleanup(cdsc);
+    _lv_img_cache_cleanup(cdsc);
     return res;
 }
 
 LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * draw_dsc,
-                                                             const lv_area_t * coords, lv_img_cache_entry_t * cdsc)
+                                                             const lv_area_t * coords, _lv_img_cache_entry_t * cdsc)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
     if(cdsc == NULL) return LV_RES_INV;

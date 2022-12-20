@@ -72,7 +72,7 @@ void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, cons
  * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
 void lv_draw_img_cached(struct _lv_draw_ctx_t * draw_ctx, lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                        lv_img_cache_entry_t * entry);
+                        _lv_img_cache_entry_t * entry);
 
 
 void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,

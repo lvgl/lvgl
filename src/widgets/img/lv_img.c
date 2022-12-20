@@ -429,9 +429,9 @@ static void extract_metadata(lv_img_t * img, lv_point_t * size_hint)
     dsc.color.full = lv_color_to32(lv_obj_get_style_img_recolor_filtered(obj, LV_PART_MAIN));
     dsc.size_hint = *size_hint;
 
-    if(lv_img_cache_query(&dsc, &header, &img->caps, img->dec_ctx) == LV_RES_INV) {
+    if(_lv_img_cache_query(&dsc, &header, &img->caps, img->dec_ctx) == LV_RES_INV) {
         /* Couldn't decode the picture, let's return anyway */
-        LV_LOG_WARN("extract_metadata: image failed decoding");
+        LV_LOG_WARN("image failed decoding");
         return;
     }
 
@@ -475,10 +475,8 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         lv_img_decoder_close(&dsc);
         img->dec_ctx = NULL;
     }
-
-    if(img->src && LV_BT(img->src->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
-        lv_img_src_free(img->src);
-    }
+    
+    lv_img_src_free(img->src);
 
     if(img->anim_timer) {
         lv_timer_del(img->anim_timer);
@@ -673,7 +671,7 @@ static void draw_img(lv_event_t * e)
             .color = {.full = 0},
             .size_hint = {.x = lv_obj_get_width(obj), .y = lv_obj_get_height(obj)}
         };
-        lv_img_cache_entry_t * entry = lv_img_cache_open(&dsc, NULL);
+        _lv_img_cache_entry_t * entry = _lv_img_cache_open(&dsc, NULL);
         if(entry != NULL) {
             img->caps = entry->dec_dsc.caps;
             if(LV_BT(img->caps, LV_IMG_DEC_ANIMATED)) {
@@ -687,7 +685,7 @@ static void draw_img(lv_event_t * e)
             img->h = entry->dec_dsc.header.h;
             img->cf = entry->dec_dsc.header.cf;
 
-            lv_img_cache_cleanup(entry);
+            _lv_img_cache_cleanup(entry);
         }
     }
     if(img->dec_ctx && LV_BT(img->caps, LV_IMG_DEC_ANIMATED) && img->anim_timer == NULL) {

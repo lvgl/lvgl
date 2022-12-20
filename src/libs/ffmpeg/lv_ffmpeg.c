@@ -155,6 +155,9 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     }
     /* Extract metadata */
     dsc->dec_ctx->total_frames = ffmpeg_ctx->video_stream->nb_frames;
+    if(!dsc->dec_ctx->total_frames) {
+        goto error_out;
+    }
     dsc->dec_ctx->frame_rate = ffmpeg_ctx->video_stream->avg_frame_rate.num / ffmpeg_ctx->video_stream->avg_frame_rate.den;
     dsc->dec_ctx->frame_delay = (1000 * ffmpeg_ctx->video_stream->avg_frame_rate.den) /
                                 ffmpeg_ctx->video_stream->avg_frame_rate.num;

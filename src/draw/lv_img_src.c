@@ -59,13 +59,7 @@ lv_img_src_type_t lv_img_src_get_type(const void * src)
 
 void lv_img_src_free(lv_img_src_t * src)
 {
-    if(src == NULL) return;
-
     img_src_clear(src);
-
-    if(LV_BT(src->flag, _LV_IMG_SRC_FLAG_MALLOCED)) {
-        lv_free(src);
-    }
 }
 
 
@@ -107,35 +101,46 @@ void lv_img_src_set_symbol(lv_img_src_t * src, const char * symbol)
         return;
 }
 
-lv_img_src_t * lv_img_src_from_symbol(const char * symbol, lv_img_src_flag_t flags)
+lv_img_src_t * lv_img_src_from_symbol(const char * symbol)
 {
-    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_t * img_src = lv_img_src_create();
     lv_img_src_set_symbol((lv_img_src_t *)img_src, symbol);
     return img_src;
 }
 
-lv_img_src_t * lv_img_src_from_data(const uint8_t * data, const size_t len, lv_img_src_flag_t flags)
+lv_img_src_t * lv_img_src_from_data(const uint8_t * data, const size_t len)
 {
-    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_t * img_src = lv_img_src_create();
     lv_img_src_set_data((lv_img_src_t *)img_src, data, len);
     return img_src;
 }
 
-lv_img_src_t * lv_img_src_from_file(const char * file_path, lv_img_src_flag_t flags)
+lv_img_src_t * lv_img_src_from_file(const char * file_path)
 {
-    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_t * img_src = lv_img_src_create();
     lv_img_src_set_file((lv_img_src_t *)img_src, file_path);
     return img_src;
 }
 
-lv_img_src_t * lv_img_src_from_raw(const lv_img_dsc_t * raw, lv_img_src_flag_t flags)
+lv_img_src_t * lv_img_src_from_raw(const lv_img_dsc_t * raw)
 {
-    lv_img_src_t * img_src = lv_img_src_create(flags);
+    lv_img_src_t * img_src = lv_img_src_create();
     lv_img_src_set_raw((lv_img_src_t *)img_src, raw);
     return img_src;
 }
 
-lv_img_src_t * lv_img_src_create(lv_img_src_flag_t flags)
+lv_img_src_t * lv_img_src_parse(const void * raw)
+{
+    switch(lv_img_src_get_type(raw))
+    {
+    case LV_IMG_SRC_FILE: return lv_img_src_from_file((const char*)raw); 
+    case LV_IMG_SRC_SYMBOL: return lv_img_src_from_symbol((const char*)raw);
+    case LV_IMG_SRC_VARIABLE: return lv_img_src_from_raw((const lv_img_dsc_t*)raw);
+    default: return NULL;    
+    }
+}
+
+lv_img_src_t * lv_img_src_create()
 {
     lv_img_src_t * img_src = lv_malloc(sizeof(lv_img_src_t));
     if(img_src == NULL) {
@@ -144,7 +149,6 @@ lv_img_src_t * lv_img_src_create(lv_img_src_flag_t flags)
     }
     lv_memset(img_src, 0, sizeof(img_src));
     img_src->type = LV_IMG_SRC_UNKNOWN;
-    img_src->flag = flags | _LV_IMG_SRC_FLAG_MALLOCED;
     return img_src;
 }
 
@@ -164,25 +168,10 @@ void lv_img_src_copy(lv_img_src_t * dest, const lv_img_src_t * src)
     }
 }
 
-void lv_img_src_capture(lv_img_src_t ** dest, lv_img_src_t * src)
+void lv_img_src_capture(lv_img_src_t ** dest, const lv_img_src_t * src)
 {
-
-    if(src && LV_BF(src->flag, LV_IMG_SRC_FLAG_PERMANENT) && LV_BT(src->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
-        LV_LOG_WARN("src (%p) is already captured.", (void *)src);
-        return;
-    }
-
-    /*Free the current img_src is required*/
-    if(*dest && LV_BF((*dest)->flag, LV_IMG_SRC_FLAG_PERMANENT) && LV_BT((*dest)->flag, _LV_IMG_SRC_FLAG_CAPTURED)) {
-        lv_img_src_free(*dest);
-        *dest = NULL;
-    }
-
-    *dest = src;
-
-    if((*dest) && LV_BF((*dest)->flag, LV_IMG_SRC_FLAG_PERMANENT)) {
-        (*dest)->flag |= _LV_IMG_SRC_FLAG_CAPTURED;
-    }
+    if(*dest != NULL) lv_img_src_free(*dest);
+    *dest = src; 
 }
 
 
