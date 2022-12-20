@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "barcode/lv_example_barcode.h"
 #include "bmp/lv_example_bmp.h"
 #include "ffmpeg/lv_example_ffmpeg.h"
 #include "freetype/lv_example_freetype.h"
@@ -21,6 +22,7 @@ extern "C" {
 #include "qrcode/lv_example_qrcode.h"
 #include "rlottie/lv_example_rlottie.h"
 #include "sjpg/lv_example_sjpg.h"
+#include "tiny_ttf/lv_example_tiny_ttf.h"
 
 /*********************
  *      DEFINES

@@ -35,11 +35,32 @@ typedef struct {
      * Decrement all lifes by one every in every ::lv_img_cache_open.
      * If life == 0 the entry can be reused*/
     int32_t life;
-} lv_img_cache_entry_t;
+} _lv_img_cache_entry_t;
+
+typedef struct {
+    _lv_img_cache_entry_t * (*open_cb)(const lv_img_dec_dsc_in_t * dsc, lv_img_dec_ctx_t * dec_ctx);
+    lv_res_t (*query_cb)(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps, 
+                         lv_img_dec_ctx_t * dec_ctx);
+    void (*set_size_cb)(uint16_t new_entry_cnt);
+    void (*invalidate_src_cb)(const void * src);
+    void (*cleanup_cb)(_lv_img_cache_entry_t * entry);
+} lv_img_cache_manager_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Initialize the img cache manager
+ * @param manager Pointer to the img cache manager
+ */
+void lv_img_cache_manager_init(lv_img_cache_manager_t * manager);
+
+/**
+ * Apply the img cache manager
+ * @param manager Pointer to the img cache manager
+ */
+void lv_img_cache_manager_apply(const lv_img_cache_manager_t * manager);
 
 /**
  * Open an image using the image decoder interface and cache it.
@@ -49,7 +70,7 @@ typedef struct {
  * @param dec_ctx   Optional decoder initialization context. Can be NULL
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img_dec_ctx_t * dec_ctx);
+_lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Query the image decoder interface to find a decoder that's able to open the given source and extract the
@@ -60,7 +81,7 @@ lv_img_cache_entry_t * lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_img
  * @param dec_ctx   Optional decoder initialization context. Can be NULL
  * @return LV_RES_OK if a decoder was able to open the image
  */
-lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
+lv_res_t _lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
                             lv_img_dec_ctx_t * dec_ctx);
 
 /**
@@ -69,7 +90,7 @@ lv_res_t lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * h
  * E.g. if 20 PNG or JPG images are open in the RAM they consume memory while opened in the cache.
  * @param new_entry_cnt number of image to cache
  */
-void lv_img_cache_set_size(uint16_t new_slot_num);
+void lv_img_cache_set_size(uint16_t new_entry_cnt);
 
 /**
  * Invalidate an image source in the cache.
@@ -82,7 +103,7 @@ void lv_img_cache_invalidate_src(const lv_img_src_t * src);
  * Cleanup a cache entry returned by lv_img_cache_open.
  * This only happens if the image cache is disabled to avoid leaking an entry
  */
-void lv_img_cache_cleanup(lv_img_cache_entry_t * entry);
+void _lv_img_cache_cleanup(_lv_img_cache_entry_t * entry);
 
 /**********************
  *      MACROS

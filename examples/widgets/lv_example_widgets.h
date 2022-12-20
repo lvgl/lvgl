@@ -49,6 +49,11 @@ void lv_example_calendar_1(void);
 
 void lv_example_canvas_1(void);
 void lv_example_canvas_2(void);
+void lv_example_canvas_3(void);
+void lv_example_canvas_4(void);
+void lv_example_canvas_5(void);
+void lv_example_canvas_6(void);
+void lv_example_canvas_7(void);
 
 void lv_example_chart_1(void);
 void lv_example_chart_2(void);

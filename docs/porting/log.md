@@ -25,7 +25,7 @@ If you can't use `printf` or want to use a custom function to log, you can regis
 For example:
 
 ```c
-void my_log_cb(const char * buf)
+void my_log_cb(lv_log_level_t level, const char * buf)
 {
   serial_send(buf, strlen(buf));
 }

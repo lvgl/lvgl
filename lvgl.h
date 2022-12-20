@@ -21,7 +21,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
 #include "src/misc/lv_log.h"
 #include "src/misc/lv_timer.h"
 #include "src/misc/lv_math.h"
@@ -83,7 +82,9 @@ extern "C" {
 #include "src/others/imgfont/lv_imgfont.h"
 #include "src/others/msg/lv_msg.h"
 #include "src/others/ime/lv_ime_pinyin.h"
+#include "src/others/file_explorer/lv_file_explorer.h"
 
+#include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bmp/lv_bmp.h"
 #include "src/libs/fsdrv/lv_fsdrv.h"
 #include "src/libs/png/lv_png.h"
@@ -93,7 +94,7 @@ extern "C" {
 #include "src/libs/freetype/lv_freetype.h"
 #include "src/libs/rlottie/lv_rlottie.h"
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
-
+#include "src/libs/tiny_ttf/lv_tiny_ttf.h"
 #include "src/layouts/flex/lv_flex.h"
 #include "src/layouts/grid/lv_grid.h"
 

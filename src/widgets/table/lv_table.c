@@ -42,6 +42,7 @@ static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 static size_t get_cell_txt_len(const char * txt);
 static void copy_cell_txt(char * dst, const char * txt);
 static void get_cell_area(lv_obj_t * obj, uint16_t row, uint16_t col, lv_area_t * area);
+static void scroll_to_selected_cell(lv_obj_t * obj);
 
 static inline bool is_cell_empty(void * cell)
 {
@@ -381,7 +382,7 @@ lv_coord_t lv_table_get_col_width(lv_obj_t * obj, uint16_t col)
     lv_table_t * table = (lv_table_t *)obj;
 
     if(col >= table->col_cnt) {
-        LV_LOG_WARN("lv_table_set_col_width: too big 'col_id'. Must be < LV_TABLE_COL_MAX.");
+        LV_LOG_WARN("too big 'col_id'. Must be < LV_TABLE_COL_MAX.");
         return 0;
     }
 
@@ -394,7 +395,7 @@ bool lv_table_has_cell_ctrl(lv_obj_t * obj, uint16_t row, uint16_t col, lv_table
 
     lv_table_t * table = (lv_table_t *)obj;
     if(row >= table->row_cnt || col >= table->col_cnt) {
-        LV_LOG_WARN("lv_table_get_cell_crop: invalid row or column");
+        LV_LOG_WARN("invalid row or column");
         return false;
     }
     uint32_t cell = row * table->col_cnt + col;
@@ -516,6 +517,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(col == LV_TABLE_CELL_NONE || row == LV_TABLE_CELL_NONE) {
             table->col_act = 0;
             table->row_act = 0;
+            scroll_to_selected_cell(obj);
             lv_obj_invalidate(obj);
             return;
         }
@@ -559,6 +561,8 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
             table->col_act = col;
             table->row_act = row;
             lv_obj_invalidate(obj);
+
+            scroll_to_selected_cell(obj);
 
             res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
@@ -1006,4 +1010,26 @@ static void get_cell_area(lv_obj_t * obj, uint16_t row, uint16_t col, lv_area_t 
 
 }
 
+
+static void scroll_to_selected_cell(lv_obj_t * obj)
+{
+    lv_table_t * table = (lv_table_t *)obj;
+
+    lv_area_t a;
+    get_cell_area(obj, table->row_act, table->col_act, &a);
+    if(a.x1 < 0) {
+        lv_obj_scroll_by_bounded(obj, -a.x1, 0, LV_ANIM_ON);
+    }
+    else if(a.x2 > lv_obj_get_width(obj)) {
+        lv_obj_scroll_by_bounded(obj, lv_obj_get_width(obj) - a.x2, 0, LV_ANIM_ON);
+    }
+
+    if(a.y1 < 0) {
+        lv_obj_scroll_by_bounded(obj, 0, -a.y1, LV_ANIM_ON);
+    }
+    else if(a.y2 > lv_obj_get_height(obj)) {
+        lv_obj_scroll_by_bounded(obj, 0, lv_obj_get_height(obj) - a.y2, LV_ANIM_ON);
+    }
+
+}
 #endif

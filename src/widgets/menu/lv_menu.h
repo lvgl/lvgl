@@ -73,7 +73,8 @@ typedef struct {
 
 typedef struct {
     lv_obj_t obj;
-    char * title;
+    char  *  title;
+    bool     static_title;
 } lv_menu_page_t;
 
 extern const lv_obj_class_t lv_menu_class;
@@ -102,7 +103,7 @@ lv_obj_t * lv_menu_create(lv_obj_t * parent);
  * @param title pointer to text for title in header (NULL to not display title)
  * @return pointer to the created menu page
  */
-lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char * title);
+lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char const * const title);
 
 /**
  * Create a menu cont object
@@ -133,6 +134,21 @@ lv_obj_t * lv_menu_separator_create(lv_obj_t * parent);
  * @param page pointer to the menu page to set (NULL to clear main and clear menu history)
  */
 void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page);
+
+/**
+ * Set menu page title
+ * @param page pointer to the menu page
+ * @param title pointer to text for title in header (NULL to not display title)
+ */
+void lv_menu_set_page_title(lv_obj_t * page, char const * const title);
+
+/**
+ * Set menu page title with a static text. It will not be saved by the label so the 'text' variable
+ * has to be 'alive' while the page exists.
+ * @param page pointer to the menu page
+ * @param title pointer to text for title in header (NULL to not display title)
+ */
+void lv_menu_set_page_title_static(lv_obj_t * page, char const * const title);
 
 /**
  * Set menu page to display in sidebar

@@ -91,7 +91,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/dropdown/index.rst
+.. include:: ../../examples/widgets/dropdown/index.rst
 
 ```
 

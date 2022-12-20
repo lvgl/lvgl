@@ -1,5 +1,76 @@
 # Changelog
 
+
+## [v8.3.4](https://github.com/lvgl/lvgl/compare/v8.3.4...v8.3.3) 15 December 2022
+
+### New Features
+
+- feat(keyboard): ported arabic keyboard from release 7.10.0 [`3728`](https://github.com/lvgl/lvgl/pull/3728)
+- feat(table): scroll to the selected cell with key navigation [`39d03a8`](https://github.com/lvgl/lvgl/commit/39d03a80f45847a1977cfe9cc6a509b1613d0aca)
+
+### Fixes
+
+- fix(rt-thread): sync rt-thread v5.0.0 rt_align [`3864`](https://github.com/lvgl/lvgl/pull/3864)
+- fix(draw): SDL2 gradient support  #3848 [`3856`](https://github.com/lvgl/lvgl/pull/3856)
+- fix(esp.cmake): add demos and examples [`3784`](https://github.com/lvgl/lvgl/pull/3784)
+- fix(indev): fix scrolling on transformed obejcts [`84cf05d`](https://github.com/lvgl/lvgl/commit/84cf05d8b23b31e000db757a278545e58fcbcbe8)
+- fix(style): add the missing support for pct pivot in tranasform style properties [`c8e584f`](https://github.com/lvgl/lvgl/commit/c8e584f879a1e1427e7a8f5ff496af39f17df41d)
+- fix(flex): be sure obj-&gt;w_layout and h_layout can't be set at the same time [`c4c4007`](https://github.com/lvgl/lvgl/commit/c4c400716e80a279e7b3d43b8992915fe94441eb)
+- fix(chart): fix very dense bar charts [`bb2c2ac`](https://github.com/lvgl/lvgl/commit/bb2c2ac34ac943978513c7ed51885078979b1c10)
+- fix(draw): handle LV_COLOR_DEPTH == 1 too in lv_draw_sw_transform [`bd11ad8`](https://github.com/lvgl/lvgl/commit/bd11ad8542eac9ff51420e5afb80f7e6fcf36a5c)
+- fix(example): fix warnings [`1e3ca25`](https://github.com/lvgl/lvgl/commit/1e3ca25fed13bbf85c32a60d4b7041cf8bd525ab)
+- fix(benchmark): fix warnings [`1ed026c`](https://github.com/lvgl/lvgl/commit/1ed026ca7307957568fe419f1ff39a15b2535b3e)
+- fix(draw): fix text color with sub pixel rendering and BGR order [`e050f5c`](https://github.com/lvgl/lvgl/commit/e050f5ca156f79d752894f38f0a437c946205cb4)
+- fix(meter): fix setting part_draw_dsc.id in needle img drawing [`716e5e2`](https://github.com/lvgl/lvgl/commit/716e5e2c8bd2a22e7d56e8d7ca33054a11a1f4ed)
+- fix(gridnav): fix stucking in pressed state with encoder [`ad56dfa`](https://github.com/lvgl/lvgl/commit/ad56dfaf7046a9bb8c05e877a8c8852cd14a59af)
+- fix(darw): add back the disappeared antialising=0 support [`2c17b28`](https://github.com/lvgl/lvgl/commit/2c17b28ac476c95a4153ab6cabb77b1c7208bb74)
+- fix(msg): fix typos in API by adding wrappers [`41fa416`](https://github.com/lvgl/lvgl/commit/41fa41613455260ccdeb87ecb890ce026ff0a435)
+- fix(draw): fix transformation accuracy [`e06f03d`](https://github.com/lvgl/lvgl/commit/e06f03db72f98439078118518158f52439dd7bf8)
+- fix(style): remove the reduntant define of LV_GRADIENT_MAX_STOPS [`903e94b`](https://github.com/lvgl/lvgl/commit/903e94b716ca1b32cdb51de11df679953699e53b)
+- demo(benchmark): fix lv_label_set_text_fmt format strings [`ae38258`](https://github.com/lvgl/lvgl/commit/ae3825871e31cd42cad2f310bdfc605150670511)
+- demo(benchmark): fix warning [`1173dcb`](https://github.com/lvgl/lvgl/commit/1173dcba96621e20c9a7240c8572bd6573bce6a0)
+
+## [v8.3.3](https://github.com/lvgl/lvgl/compare/v8.3.2...v8.3.3) 06 October 2022
+
+v8.3.3 is the same as v8.3.2. It was released only because the version number was set incorrectly in lvgl.h.
+
+
+## [v8.3.2](https://github.com/lvgl/lvgl/compare/v8.3.1...v8.3.2) 27 September 2022
+
+### Fixes
+
+- fix(fragment): fixed child fragment event dispatch [`3683`](https://github.com/lvgl/lvgl/pull/3683)
+- fix(sdl): clear streaming/target texture with FillRect [`3682`](https://github.com/lvgl/lvgl/pull/3682)
+- fix(sdl): transformation with alpha (#3576) [`3678`](https://github.com/lvgl/lvgl/pull/3678)
+- fix(draw_sw): fix image cache to access the freed stack space [`3584`](https://github.com/lvgl/lvgl/pull/3584)
+- fix(style): use compile time prop_cnt for const styles [`3609`](https://github.com/lvgl/lvgl/pull/3609)
+- fix(demo): can not found lvgl.h file [`3477`](https://github.com/lvgl/lvgl/pull/3477)
+- fix(ci) checkout lv_micropython release/v8 branch [`3524`](https://github.com/lvgl/lvgl/pull/3524)
+- fix(canvas): fix clipéping on transformation [`b884aba`](https://github.com/lvgl/lvgl/commit/b884abae26f3824b27783a85d18ed51e550347c1)
+- fix(draw): allow drawing outline with LV_DRAW_COMPLEX == 0 too [`ece3495`](https://github.com/lvgl/lvgl/commit/ece34950040e218fc73605a4e88f1060c2a274f8)
+- fix(colorwheel): fix updating color when using lv_colorwheel_set_hsv [`d59bba1`](https://github.com/lvgl/lvgl/commit/d59bba12db115afb4b6aa53eed2625221dfff2fd)
+- fix(slider): find the nearest value on click instead of floor [`dfd14fa`](https://github.com/lvgl/lvgl/commit/dfd14fa778aef25d0db61748a58aa9989ce5e2c8)
+- fix(draw): fix border drawing with thick borders [`d5b2a9b`](https://github.com/lvgl/lvgl/commit/d5b2a9b2562cbfa327bf0ec03c11d28576037a14)
+- fix(refr): fix true double double buffering logic with transparent screens [`8b605cc`](https://github.com/lvgl/lvgl/commit/8b605cc48224d0497cdd936fa77229e0c3d606d2)
+- fix(group): be sure obj is removed from its current group in lv_group_add_obj [`5156ee0`](https://github.com/lvgl/lvgl/commit/5156ee058d5de674a00ffd84d15d460de7f0e53b)
+- fix(style): add missing invalidation in lv_obj_remove_local_style_prop [`a0515ba`](https://github.com/lvgl/lvgl/commit/a0515ba30dd74b8b22a6709d334eb03782ee1a4d)
+
+### Docs
+
+- docs(draw) remove reference to old lv_fs_add_drv function [`3564`](https://github.com/lvgl/lvgl/pull/3564)
+- docs(disp): LV_COLOR_SCREEN_TRANSP remove dependency on LV_COLOR_DEPTH_32 as transparency is supported across all color depths [`3556`](https://github.com/lvgl/lvgl/pull/3556)
+
+### CI and tests
+
+- ci: protect test.c with #if LV_BUILD_TEST [`be485d7`](https://github.com/lvgl/lvgl/commit/be485d7605136d2a5d6a633c7cb5b7c525cae7ee)
+
+### Others
+
+- chore(rt-thread) backport fixes from v9 [`3604`](https://github.com/lvgl/lvgl/pull/3604)
+
+- chore: fix warnings [`7640950`](https://github.com/lvgl/lvgl/commit/76409502163ffe67cfbab9c7f24f2226cc8a5941)
+- remove accidentally added code [`5022476`](https://github.com/lvgl/lvgl/commit/5022476edc8676f2a6ef7b919d3578159edeef7c)
+
 ## [v8.3.1](https://github.com/lvgl/lvgl/compare/v8.3.0...v8.3.1) 25 July 2022
 
 ### Fixes
@@ -1682,7 +1753,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 ## v7.0.0 (18.05.2020)
 
 ### Documentation
-The docs for v7 is available at https://docs.littlevgl.com/v7/en/html/index.html
+The docs for v7 is available at https://docs.lvgl.io/7.11/index.html
 
 ### Legal changes
 
@@ -1721,7 +1792,7 @@ As part of these updates, a lot of objects were reworked and the APIs have been 
 - *value* display a text which is stored in the style. It can be used e.g. as a light-weighted text on buttons too.
 - *margin*: similar to *padding* but used to keep space outside the object
 
-Read the [Style](https://docs.littlevgl.com/v7/en/html/overview/style.html) section of the documentation to learn how the new styles system works.
+Read the [Style](https://docs.lvgl.io/7.11/overview/style.html) section of the documentation to learn how the new styles system works.
 
 ### GPU integration
 To better utilize GPUs, from this version GPU usage can be integrated into LVGL. In `lv_conf.h` any supported GPUs can be enabled with a single configuration option.

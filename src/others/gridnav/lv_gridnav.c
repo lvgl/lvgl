@@ -95,7 +95,10 @@ void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable
         return;
     }
 
-    lv_obj_clear_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+    if(dsc->focused_obj) {
+        lv_obj_clear_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+    }
+
     lv_obj_add_state(to_focus, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
     lv_obj_scroll_to_view(to_focus, anim_en);
     dsc->focused_obj = to_focus;
@@ -217,6 +220,7 @@ static void gridnav_event_cb(lv_event_t * e)
         if(dsc->focused_obj == NULL)  dsc->focused_obj = find_first_focusable(obj);
         if(dsc->focused_obj) {
             lv_obj_add_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_clear_state(dsc->focused_obj, LV_STATE_PRESSED); /*Be sure the focuses obj is not stuck in pressed state*/
             lv_obj_scroll_to_view(dsc->focused_obj, LV_ANIM_OFF);
         }
     }

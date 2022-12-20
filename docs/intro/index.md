@@ -170,9 +170,9 @@ Probably there a bug in your display driver. Try the following code without usin
 lv_color_t buf[BUF_W * BUF_H];
 lv_color_t * buf_p = buf;
 uint16_t x, y;
-for(y = 0; y &lt; BUF_H; y++) {
+for(y = 0; y < BUF_H; y++) {
     lv_color_t c = lv_color_mix(LV_COLOR_BLUE, LV_COLOR_RED, (y * 255) / BUF_H);
-    for(x = 0; x &lt; BUF_W; x++){
+    for(x = 0; x < BUF_W; x++){
         (*buf_p) =  c;
         buf_p++;
     }

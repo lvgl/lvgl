@@ -389,7 +389,7 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     uint32_t c;
     for(c = 0; i < txt_len && dropdown->options[i] != '\n'; c++, i++) {
         if(buf_size && c >= buf_size - 1) {
-            LV_LOG_WARN("lv_dropdown_get_selected_str: the buffer was too small");
+            LV_LOG_WARN("the buffer was too small");
             break;
         }
         buf[c] = dropdown->options[i];
@@ -405,7 +405,7 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
     uint32_t opt_i = 0;
     const char * start = opts;
 
-    while(start[char_i] != '\0') {
+    while(start[0] != '\0') {
         for(char_i = 0; (start[char_i] != '\n') && (start[char_i] != '\0'); char_i++);
 
         if(memcmp(start, option, LV_MIN(strlen(option), char_i)) == 0) return opt_i;

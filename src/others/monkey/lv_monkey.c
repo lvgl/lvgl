@@ -19,7 +19,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_monkey {
+struct _lv_monkey {
     lv_monkey_config_t config;
     lv_indev_drv_t indev_drv;
     lv_indev_data_t indev_data;
@@ -28,7 +28,7 @@ typedef struct _lv_monkey {
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
-} lv_monkey_t;
+};
 
 static const lv_key_t lv_key_map[] = {
     LV_KEY_UP,

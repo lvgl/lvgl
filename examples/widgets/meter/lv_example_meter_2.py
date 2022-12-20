@@ -17,16 +17,15 @@ meter.set_size(200, 200)
 # Remove the circle from the middle
 meter.remove_style(None, lv.PART.INDICATOR)
 
-# Add a scale first
-scale = meter.add_scale()
-meter.set_scale_ticks(scale, 11, 2, 10, lv.palette_main(lv.PALETTE.GREY))
-meter.set_scale_major_ticks(scale, 1, 2, 30, lv.color_hex3(0xeee), 10)
-meter.set_scale_range(scale, 0, 100, 270, 90)
+# Scale settings
+meter.set_scale_ticks(11, 2, 10, lv.palette_main(lv.PALETTE.GREY))
+meter.set_scale_major_ticks(1, 2, 30, lv.color_hex3(0xeee), 10)
+meter.set_scale_range(0, 100, 270, 90)
 
 # Add a three arc indicator
-indic1 = meter.add_arc(scale, 10, lv.palette_main(lv.PALETTE.RED), 0)
-indic2 = meter.add_arc(scale, 10, lv.palette_main(lv.PALETTE.GREEN), -10)
-indic3 = meter.add_arc(scale, 10, lv.palette_main(lv.PALETTE.BLUE), -20)
+indic1 = meter.add_arc(10, lv.palette_main(lv.PALETTE.RED), 0)
+indic2 = meter.add_arc(10, lv.palette_main(lv.PALETTE.GREEN), -10)
+indic3 = meter.add_arc(10, lv.palette_main(lv.PALETTE.BLUE), -20)
 
 # Create an animation to set the value
 a1 = lv.anim_t()

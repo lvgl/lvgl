@@ -31,6 +31,9 @@
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
     #define LV_MEM_SIZE (128U * 1024U)          /*[bytes]*/
 
+    /*Size of the memory expand for `lv_malloc()` in bytes*/
+    #define LV_MEM_POOL_EXPAND_SIZE 0
+
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
     /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
@@ -50,6 +53,8 @@
 #endif  /*LV_USE_BUILTIN_SNPRINTF*/
 
 #define LV_STDLIB_INCLUDE <stdint.h>
+#define LV_STDIO_INCLUDE  <stdio.h>
+#define LV_STRING_INCLUDE <string.h>
 #define LV_MALLOC       lv_malloc_builtin
 #define LV_REALLOC      lv_realloc_builtin
 #define LV_FREE         lv_free_builtin
@@ -70,13 +75,9 @@
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE             "perf_counter.h"
+        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
 
-        #if __PER_COUNTER_VER__ < 10902ul
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
-        #else
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
-        #endif
+        #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
     #endif   /*LV_TICK_CUSTOM*/
 #else
     #define LV_TICK_CUSTOM 0
@@ -189,6 +190,13 @@
     #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
 #endif
 
+/*Use GD32 IPA GPU
+ * This adds support for Image Processing Accelerator on GD32F450 and GD32F470 series MCUs
+ *
+ * NOTE: IPA on GD32F450 has a bug where the fill operation overwrites data beyond the
+ * framebuffer. This driver works around it by saving and restoring affected memory, but
+ * this makes it not thread-safe. GD32F470 is not affected. */
+
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -208,11 +216,15 @@
     *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
     *LV_LOG_LEVEL_USER        Only logs added by the user
     *LV_LOG_LEVEL_NONE        Do not log anything*/
-    #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
+    #define LV_LOG_LEVEL      LV_LOG_LEVEL_USER
 
     /*1: Print the log with 'printf';
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
     #define LV_LOG_PRINTF 0
+
+    /*1: Enable print timestamp;
+     *0: Disable print timestamp*/
+    #define LV_LOG_USE_TIMESTAMP 1
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #define LV_LOG_TRACE_MEM        1
@@ -223,6 +235,7 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
+    #define LV_LOG_TRACE_MSG        1
 
 #endif  /*LV_USE_LOG*/
 
@@ -339,9 +352,9 @@
  *https://fonts.google.com/specimen/Montserrat*/
 #define LV_FONT_MONTSERRAT_8  0
 #define LV_FONT_MONTSERRAT_10 0
-#define LV_FONT_MONTSERRAT_12 0
+#define LV_FONT_MONTSERRAT_12 1
 #define LV_FONT_MONTSERRAT_14 1
-#define LV_FONT_MONTSERRAT_16 0
+#define LV_FONT_MONTSERRAT_16 1
 #define LV_FONT_MONTSERRAT_18 0
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
@@ -401,7 +414,7 @@
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
 /*Can break (wrap) texts on these chars*/
-#define LV_TXT_BREAK_CHARS " ,.;:-_"
+#define LV_TXT_BREAK_CHARS " ,.;:-_)]}"
 
 /*If a word is at least this long, will break wherever "prettiest"
  *To disable, set to a value <= 0*/
@@ -499,9 +512,6 @@
 #define LV_USE_MSGBOX     1
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
-#if LV_USE_ROLLER
-    #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
-#endif
 
 #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
 
@@ -570,6 +580,68 @@
 /*A layout similar to Grid in CSS.*/
 #define LV_USE_GRID 1
 
+/*====================
+ * 3RD PARTS LIBRARIES
+ *====================*/
+
+/*API for fopen, fread, etc*/
+#if LV_USE_FS_STDIO
+    #define LV_FS_STDIO_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_STDIO_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_STDIO_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for open, read, etc*/
+#if LV_USE_FS_POSIX
+    #define LV_FS_POSIX_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_POSIX_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_POSIX_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for CreateFile, ReadFile, etc*/
+#if LV_USE_FS_WIN32
+    #define LV_FS_WIN32_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_WIN32_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
+    #define LV_FS_WIN32_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for FATFS (needs to be added separately). Uses f_open, f_read, etc*/
+#if LV_USE_FS_FATFS
+    #define LV_FS_FATFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+    #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+#if LV_USE_FREETYPE
+    /*Memory used by FreeType to cache characters [bytes]*/
+    #define LV_FREETYPE_CACHE_SIZE (64 * 1024)
+
+    /*Let FreeType to use LVGL memory and file porting*/
+    #define LV_FREETYPE_USE_LVGL_PORT 0
+
+    /* 1: bitmap cache use the sbit cache, 0:bitmap cache use the image cache. */
+    /* sbit cache:it is much more memory efficient for small bitmaps(font size < 256) */
+    /* if font size >= 256, must be configured as image cache */
+    #define LV_FREETYPE_SBIT_CACHE 0
+
+    /* Maximum number of opened FT_Face/FT_Size objects managed by this cache instance. */
+    /* (0:use system defaults) */
+    #define LV_FREETYPE_CACHE_FT_FACES 4
+    #define LV_FREETYPE_CACHE_FT_SIZES 4
+#endif
+
+#if LV_USE_TINY_TTF
+    /* Enable loading TTF data from files */
+    #define LV_TINY_TTF_FILE_SUPPORT 0
+#endif
+
+
+/*FFmpeg library for image decoding and playing videos
+ *Supports all major image formats so do not enable other image decoder with it*/
+#if LV_USE_FFMPEG
+    /*Dump input information to stderr*/
+    #define LV_FFMPEG_DUMP_FORMAT 0
+#endif
+
 /*==================
  * OTHERS
  *==================*/
@@ -616,6 +688,16 @@
     #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
 
+/*1: Enable file explorer*/
+/*Requires: lv_table*/
+#if LV_USE_FILE_EXPLORER
+    /*Maximum length of path*/
+    #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
+    /*Quick access bar, 1:use, 0:not use*/
+    /*Requires: lv_list*/
+    #define LV_FILE_EXPLORER_QUICK_ACCESS        1
+#endif 
+
 /*==================
 * EXAMPLES
 *==================*/
@@ -635,7 +717,7 @@
 /*Benchmark your system*/
 #if LV_USE_DEMO_BENCHMARK
     /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-    #define LV_DEMO_BENCHMARK_RGB565A8 0
+    #define LV_DEMO_BENCHMARK_RGB565A8 1
 #endif
 
 /*--END OF LV_CONF_H--*/

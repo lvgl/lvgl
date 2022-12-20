@@ -40,14 +40,20 @@
         /* platform-specific printf format for int32_t, usually "d" or "ld" */
         #define LV_PRId32 PRId32
         #define LV_PRIu32 PRIu32
+        #define LV_PRIx32 PRIx32
+        #define LV_PRIX32 PRIX32
     #else
         #define LV_PRId32 "d"
         #define LV_PRIu32 "u"
+        #define LV_PRIx32 "x"
+        #define LV_PRIX32 "X"
     #endif
 #else
     /* hope this is correct for ports without __has_include or without inttypes.h */
     #define LV_PRId32 "d"
     #define LV_PRIu32 "u"
+    #define LV_PRIx32 "x"
+    #define LV_PRIX32 "X"
 #endif
 
 #ifdef __cplusplus
@@ -55,9 +61,15 @@ extern "C" {
 #endif
 
 #include "../lv_conf_internal.h"
+#include LV_STDIO_INCLUDE
+
+#define lv_snprintf LV_SNPRINTF
+#define lv_vsnprintf LV_VSNPRINTF
+
+#if LV_USE_BUILTIN_SNPRINTF
+
 #include <stdarg.h>
 #include <stddef.h>
-
 #include "lv_types.h"
 
 typedef struct {
@@ -68,9 +80,7 @@ typedef struct {
 int lv_snprintf_builtin(char * buffer, size_t count, const char * format, ...);
 int lv_vsnprintf_builtin(char * buffer, size_t count, const char * format, va_list va);
 
-#define lv_snprintf LV_SNPRINTF
-#define lv_vsnprintf LV_VSNPRINTF
-
+#endif /*LV_USE_BUILTIN_SNPRINTF*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

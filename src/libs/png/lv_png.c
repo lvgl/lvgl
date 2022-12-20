@@ -89,7 +89,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     uint32_t size[2];
     uint32_t error;
 
-    unsigned char * png_data;      /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
+    unsigned char * png_data = NULL;    /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
     size_t png_data_size;          /*Size of `png_data` in bytes*/
     bool   free_data = false;
     if(dsc->input.src->type == LV_IMG_SRC_FILE) {
@@ -113,7 +113,10 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
             /*Load the PNG file into buffer. It's still compressed (not decoded)*/
             error = lodepng_load_file(&png_data, &png_data_size, dsc->input.src->data);   /*Load the file*/
             if(error) {
-                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+                if(png_data != NULL) {
+                    lv_free(png_data);
+                }
+                LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
             }
             free_data = true;
@@ -148,7 +151,7 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
     if(free_data) lv_free(png_data); /*Free the loaded file*/
     if(error) {
-        LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+        LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
         return LV_RES_INV;
     }
 

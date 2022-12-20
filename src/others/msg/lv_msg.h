@@ -24,8 +24,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef lv_uintptr_t lv_msg_id_t;
+
 typedef struct {
-    uint32_t id;            /*Identifier of the message*/
+    lv_msg_id_t id;            /*Identifier of the message*/
     void * user_data;       /*Set the the user_data set in `lv_msg_subscribe`*/
     void * _priv_data;      /*Used internally*/
     const void * payload;   /*Pointer to the data of the message*/
@@ -50,7 +52,7 @@ void lv_msg_init(void);
  * @param user_data     arbitrary data which will be available in `cb` too
  * @return              pointer to a "subscribe object". It can be used the unsubscribe.
  */
-void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data);
+void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data);
 
 /**
  * Subscribe an `lv_obj` to a message.
@@ -60,7 +62,7 @@ void * lv_msg_subscribe(uint32_t msg_id, lv_msg_subscribe_cb_t cb, void * user_d
  * @param user_data     arbitrary data which will be available in `cb` too
  * @return              pointer to a "subscribe object". It can be used the unsubscribe.
  */
-void * lv_msg_subscribe_obj(uint32_t msg_id, lv_obj_t * obj, void * user_data);
+void * lv_msg_subscribe_obj(lv_msg_id_t msg_id, lv_obj_t * obj, void * user_data);
 
 /**
  * Cancel a previous subscription
@@ -74,14 +76,24 @@ void lv_msg_unsubscribe(void * s);
  * @param msg_id        ID of the message to send
  * @param data          pointer to the data to send
  */
-void lv_msg_send(uint32_t msg_id, const void * payload);
+void lv_msg_send(lv_msg_id_t msg_id, const void * payload);
+
+/**
+ * Send a message where the message ID is `v` (the value of the pointer)
+ * and the payload is `v`.
+ * It can be used to send unique messages when a variable changed.
+ * @param v     pointer to a variable.
+ * @note        to subscribe to a variable use `lv_msg_subscribe((lv_msg_id_t)v, msg_cb, user_data)`
+ *              or `lv_msg_subscribe_obj((lv_msg_id_t)v, obj, user_data)`
+ */
+void lv_msg_update_value(void * v);
 
 /**
  * Get the ID of a message object. Typically used in the subscriber callback.
  * @param m             pointer to a message object
  * @return              the ID of the message
  */
-uint32_t lv_msg_get_id(lv_msg_t * m);
+lv_msg_id_t lv_msg_get_id(lv_msg_t * m);
 
 /**
  * Get the payload of a message object. Typically used in the subscriber callback.

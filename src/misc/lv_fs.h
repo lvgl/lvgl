@@ -117,7 +117,7 @@ void _lv_fs_init(void);
 
 /**
  * Initialize a file system driver with default values.
- * It is used to surly have known values in the fields ant not memory junk.
+ * It is used to ensure all fields have known values and not memory junk.
  * After it you can set the fields.
  * @param drv     pointer to driver variable to initialize
  */

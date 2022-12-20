@@ -286,14 +286,14 @@ lv_obj_t * lv_indev_get_obj_act(void)
     return indev_obj_act;
 }
 
-lv_timer_t * lv_indev_get_read_timer(lv_disp_t * indev)
+lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev)
 {
     if(!indev) {
         LV_LOG_WARN("lv_indev_get_read_timer: indev was NULL");
         return NULL;
     }
 
-    return indev->refr_timer;
+    return indev->driver->read_timer;
 }
 
 
@@ -356,16 +356,16 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 
     /*Simple sanity check*/
     if(data->point.x < 0) {
-        LV_LOG_WARN("X is %d which is smaller than zero", data->point.x);
+        LV_LOG_WARN("X is %d which is smaller than zero", (int)data->point.x);
     }
     if(data->point.x >= lv_disp_get_hor_res(i->driver->disp)) {
-        LV_LOG_WARN("X is %d which is greater than hor. res", data->point.x);
+        LV_LOG_WARN("X is %d which is greater than hor. res", (int)data->point.x);
     }
     if(data->point.y < 0) {
-        LV_LOG_WARN("Y is %d which is smaller than zero", data->point.y);
+        LV_LOG_WARN("Y is %d which is smaller than zero", (int)data->point.y);
     }
     if(data->point.y >= lv_disp_get_ver_res(i->driver->disp)) {
-        LV_LOG_WARN("Y is %d which is greater than ver. res", data->point.y);
+        LV_LOG_WARN("Y is %d which is greater than ver. res", (int)data->point.y);
     }
 
     /*Move the cursor if set and moved*/
@@ -779,10 +779,10 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     static lv_indev_state_t prev_state = LV_INDEV_STATE_RELEASED;
     if(prev_state != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {
-            LV_LOG_INFO("button %" LV_PRIu32 " is pressed (x:%d y:%d)", data->btn_id, x, y);
+            LV_LOG_INFO("button %" LV_PRIu32 " is pressed (x:%d y:%d)", data->btn_id, (int)x, (int)y);
         }
         else {
-            LV_LOG_INFO("button %" LV_PRIu32 " is released (x:%d y:%d)", data->btn_id, x, y);
+            LV_LOG_INFO("button %" LV_PRIu32 " is released (x:%d y:%d)", data->btn_id, (int)x, (int)y);
         }
     }
 
@@ -816,7 +816,8 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_proc_press(_lv_indev_proc_t * proc)
 {
-    LV_LOG_INFO("pressed at x:%d y:%d", proc->types.pointer.act_point.x, proc->types.pointer.act_point.y);
+    LV_LOG_INFO("pressed at x:%d y:%d", (int)proc->types.pointer.act_point.x,
+                (int)proc->types.pointer.act_point.y);
     indev_obj_act = proc->types.pointer.act_obj;
 
     if(proc->wait_until_release != 0) return;
@@ -851,8 +852,6 @@ static void indev_proc_press(_lv_indev_proc_t * proc)
         _lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;
     }
-
-    lv_obj_transform_point(indev_obj_act, &proc->types.pointer.act_point, true, true);
 
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != proc->types.pointer.act_obj) {
@@ -982,15 +981,38 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
             lv_event_send(indev_obj_act, LV_EVENT_CLICKED, indev_act);
             if(indev_reset_check(proc)) return;
         }
+        else {
+            lv_event_send(scroll_obj, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
+            if(indev_reset_check(proc)) return;
+        }
 
         proc->types.pointer.act_obj = NULL;
         proc->pr_timestamp          = 0;
         proc->longpr_rep_timestamp  = 0;
 
+
+        /*Get the transformed vector with this object*/
+        if(scroll_obj) {
+            int16_t angle = 0;
+            int16_t zoom = 256;
+            lv_point_t pivot = { 0, 0 };
+            lv_obj_t * parent = scroll_obj;
+            while(parent) {
+                angle += lv_obj_get_style_transform_angle(parent, 0);
+                zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
+                parent = lv_obj_get_parent(parent);
+            }
+
+            if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+                angle = -angle;
+                zoom = (256 * 256) / zoom;
+                lv_point_transform(&proc->types.pointer.scroll_throw_vect, angle, zoom, &pivot);
+                lv_point_transform(&proc->types.pointer.scroll_throw_vect_ori, angle, zoom, &pivot);
+            }
+        }
+
     }
 
-    /*The reset can be set in the Call the ancestor's event handler function.
-     * In case of reset query ignore the remaining parts.*/
     if(scroll_obj) {
         _lv_indev_scroll_throw_handler(proc);
         if(indev_reset_check(proc)) return;

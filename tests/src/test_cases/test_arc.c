@@ -26,6 +26,11 @@ void setUp(void)
     active_screen = lv_scr_act();
 }
 
+void tearDown(void)
+{
+    lv_obj_clean(lv_scr_act());
+}
+
 void test_arc_creation_successfull(void)
 {
     arc = lv_arc_create(active_screen);
@@ -156,6 +161,14 @@ void test_arc_click_area_with_adv_hittest(void)
     event_cnt = 0;
     lv_test_mouse_click_at(106, 50);
     TEST_ASSERT_EQUAL_UINT32(0, event_cnt);
+}
+
+void test_arc_basic_render(void)
+{
+    arc = lv_arc_create(lv_scr_act());
+    lv_obj_set_size(arc, 100, 100);
+    lv_obj_center(arc);
+    TEST_ASSERT_EQUAL_SCREENSHOT("arc_1.png");
 }
 
 static void dummy_event_cb(lv_event_t * e)

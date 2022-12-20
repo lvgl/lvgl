@@ -30,7 +30,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/spinner/index.rst
+.. include:: ../../examples/widgets/spinner/index.rst
 
 ```
 

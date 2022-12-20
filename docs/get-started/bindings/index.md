@@ -8,5 +8,7 @@
 
    micropython
    cpp
+   pikascript
+   javascript
 ```
 

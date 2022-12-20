@@ -86,7 +86,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
 Use 4 spaces indentation instead of tab.
 
-You can use **astyle** to format the code. Run `code-formatter.sh` from the `scrips` folder.
+You can use **astyle** to format the code. Run `code-format.py` from the `scripts` folder.
 
 #### pre-commit
 

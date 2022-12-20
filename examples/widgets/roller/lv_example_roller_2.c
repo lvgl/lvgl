@@ -21,6 +21,9 @@ void lv_example_roller_2(void)
     static lv_style_t style_sel;
     lv_style_init(&style_sel);
     lv_style_set_text_font(&style_sel, &lv_font_montserrat_22);
+    lv_style_set_bg_color(&style_sel, lv_color_hex3(0xf88));
+    lv_style_set_border_width(&style_sel, 2);
+    lv_style_set_border_color(&style_sel, lv_color_hex3(0xf00));
 
     const char * opts = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
     lv_obj_t * roller;
@@ -32,6 +35,9 @@ void lv_example_roller_2(void)
     lv_obj_set_width(roller, 100);
     lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
     lv_obj_set_style_text_align(roller, LV_TEXT_ALIGN_LEFT, 0);
+    lv_obj_set_style_bg_color(roller, lv_color_hex3(0x0f0), 0);
+    lv_obj_set_style_bg_grad_color(roller, lv_color_hex3(0xafa), 0);
+    lv_obj_set_style_bg_grad_dir(roller, LV_GRAD_DIR_VER, 0);
     lv_obj_align(roller, LV_ALIGN_LEFT_MID, 10, 0);
     lv_obj_add_event_cb(roller, event_handler, LV_EVENT_ALL, NULL);
     lv_roller_set_selected(roller, 2, LV_ANIM_OFF);

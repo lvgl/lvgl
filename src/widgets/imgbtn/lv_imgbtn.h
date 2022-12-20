@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_imgbtn.h
  *
  */
@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
 #include "../../core/lv_obj.h"
+
 #if LV_USE_IMGBTN != 0
 
 /*********************
@@ -30,16 +30,20 @@ typedef enum {
     _LV_IMGBTN_STATE_NUM,
 } lv_imgbtn_state_t;
 
+typedef struct {
+    const void * img_src;
+    lv_img_header_t header;
+} lv_imgbtn_src_info_t;
+
 /**********************
  *      TYPEDEFS
  **********************/
 /*Data of image button*/
 typedef struct {
     lv_obj_t obj;
-    const void * img_src_mid[_LV_IMGBTN_STATE_NUM];   /*Store center images to each state*/
-    const void * img_src_left[_LV_IMGBTN_STATE_NUM];  /*Store left side images to each state*/
-    const void * img_src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
-    lv_img_cf_t act_cf; /*Color format of the currently active image*/
+    lv_imgbtn_src_info_t src_mid[_LV_IMGBTN_STATE_NUM];   /*Store center images to each state*/
+    lv_imgbtn_src_info_t src_left[_LV_IMGBTN_STATE_NUM];  /*Store left side images to each state*/
+    lv_imgbtn_src_info_t src_right[_LV_IMGBTN_STATE_NUM]; /*Store right side images to each state*/
 } lv_imgbtn_t;
 
 extern const lv_obj_class_t lv_imgbtn_class;

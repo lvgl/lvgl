@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_imgbtn.c
  *
  */
@@ -28,7 +28,8 @@ static void draw_main(lv_event_t * e);
 static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void refr_img(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
-lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
+static lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
+static void update_src_info(lv_imgbtn_src_info_t * info, const void * src);
 
 /**********************
  *  STATIC VARIABLES
@@ -83,9 +84,9 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
 
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    imgbtn->img_src_left[state] = src_left;
-    imgbtn->img_src_mid[state] = src_mid;
-    imgbtn->img_src_right[state] = src_right;
+    update_src_info(&imgbtn->src_left[state], src_left);
+    update_src_info(&imgbtn->src_mid[state], src_mid);
+    update_src_info(&imgbtn->src_right[state], src_right);
 
     refr_img(obj);
 }
@@ -125,7 +126,7 @@ const void * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
 
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    return imgbtn->img_src_left[state];
+    return imgbtn->src_left[state].img_src;
 }
 
 /**
@@ -139,7 +140,7 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    return imgbtn->img_src_mid[state];
+    return imgbtn->src_mid[state].img_src;
 }
 
 /**
@@ -153,7 +154,7 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
 
-    return imgbtn->img_src_right[state];
+    return imgbtn->src_right[state].img_src;
 }
 
 
@@ -166,11 +167,9 @@ static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     LV_UNUSED(class_p);
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
     /*Initialize the allocated 'ext'*/
-    lv_memzero((void *)imgbtn->img_src_mid, sizeof(imgbtn->img_src_mid));
-    lv_memzero(imgbtn->img_src_left, sizeof(imgbtn->img_src_left));
-    lv_memzero(imgbtn->img_src_right, sizeof(imgbtn->img_src_right));
-
-    imgbtn->act_cf = LV_IMG_CF_UNKNOWN;
+    lv_memzero(&imgbtn->src_mid, sizeof(imgbtn->src_mid));
+    lv_memzero(&imgbtn->src_left, sizeof(imgbtn->src_left));
+    lv_memzero(&imgbtn->src_right, sizeof(imgbtn->src_right));
 }
 
 
@@ -197,12 +196,10 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_point_t * p = lv_event_get_self_size_info(e);
         lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
         lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
-        if(imgbtn->img_src_left[state] == NULL &&
-           imgbtn->img_src_mid[state] != NULL &&
-           imgbtn->img_src_right[state] == NULL) {
-            lv_img_header_t header;
-            lv_img_decoder_get_info(imgbtn->img_src_mid[state], &header);
-            p->x = LV_MAX(p->x, header.w);
+        if(imgbtn->src_left[state].img_src == NULL &&
+           imgbtn->src_mid[state].img_src != NULL &&
+           imgbtn->src_right[state].img_src == NULL) {
+            p->x = LV_MAX(p->x, imgbtn->src_mid[state].header.w);
         }
     }
 }
@@ -217,7 +214,7 @@ static void draw_main(lv_event_t * e)
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
 
     /*Simply draw the middle src if no tiled*/
-    const void * src = imgbtn->img_src_left[state];
+    lv_imgbtn_src_info_t * src_info = &imgbtn->src_left[state];
 
     lv_coord_t tw = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
     lv_coord_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
@@ -232,34 +229,31 @@ static void draw_main(lv_event_t * e)
     lv_draw_img_dsc_init(&img_dsc);
     lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
 
-    lv_img_header_t header;
     lv_area_t coords_part;
     lv_coord_t left_w = 0;
     lv_coord_t right_w = 0;
 
-    if(src) {
-        lv_img_decoder_get_info(src, &header);
-        left_w = header.w;
+    if(src_info->img_src) {
+        left_w = src_info->header.w;
         coords_part.x1 = coords.x1;
         coords_part.y1 = coords.y1;
-        coords_part.x2 = coords.x1 + header.w - 1;
-        coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
+        coords_part.x2 = coords.x1 + src_info->header.w - 1;
+        coords_part.y2 = coords.y1 + src_info->header.h - 1;
+        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_info->img_src);
     }
 
-    src = imgbtn->img_src_right[state];
-    if(src) {
-        lv_img_decoder_get_info(src, &header);
-        right_w = header.w;
-        coords_part.x1 = coords.x2 - header.w + 1;
+    src_info = &imgbtn->src_right[state];
+    if(src_info->img_src) {
+        right_w = src_info->header.w;
+        coords_part.x1 = coords.x2 - src_info->header.w + 1;
         coords_part.y1 = coords.y1;
         coords_part.x2 = coords.x2;
-        coords_part.y2 = coords.y1 + header.h - 1;
-        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
+        coords_part.y2 = coords.y1 + src_info->header.h - 1;
+        lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_info->img_src);
     }
 
-    src = imgbtn->img_src_mid[state];
-    if(src) {
+    src_info = &imgbtn->src_mid[state];
+    if(src_info->img_src) {
         lv_area_t clip_area_center;
         clip_area_center.x1 = coords.x1 + left_w;
         clip_area_center.x2 = coords.x2 - right_w;
@@ -271,20 +265,19 @@ static void draw_main(lv_event_t * e)
         comm_res = _lv_area_intersect(&clip_area_center, &clip_area_center, draw_ctx->clip_area);
         if(comm_res) {
             lv_coord_t i;
-            lv_img_decoder_get_info(src, &header);
 
             const lv_area_t * clip_area_ori = draw_ctx->clip_area;
             draw_ctx->clip_area = &clip_area_center;
 
             coords_part.x1 = coords.x1 + left_w;
             coords_part.y1 = coords.y1;
-            coords_part.x2 = coords_part.x1 + header.w - 1;
-            coords_part.y2 = coords_part.y1 + header.h - 1;
+            coords_part.x2 = coords_part.x1 + src_info->header.w - 1;
+            coords_part.y2 = coords_part.y1 + src_info->header.h - 1;
 
-            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + header.w - 1); i += header.w) {
-                lv_draw_img(draw_ctx, &img_dsc, &coords_part, src);
+            for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + src_info->header.w - 1); i += src_info->header.w) {
+                lv_draw_img(draw_ctx, &img_dsc, &coords_part, src_info->img_src);
                 coords_part.x1 = coords_part.x2 + 1;
-                coords_part.x2 += header.w;
+                coords_part.x2 += src_info->header.w;
             }
             draw_ctx->clip_area = clip_area_ori;
         }
@@ -295,22 +288,12 @@ static void refr_img(lv_obj_t * obj)
 {
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
-    lv_img_header_t header;
 
-    const void * src = imgbtn->img_src_mid[state];
+    const void * src = imgbtn->src_mid[state].img_src;
     if(src == NULL) return;
 
-    lv_res_t info_res = LV_RES_OK;
-    info_res = lv_img_decoder_get_info(src, &header);
-
-    if(info_res == LV_RES_OK) {
-        imgbtn->act_cf = header.cf;
-        lv_obj_refresh_self_size(obj);
-        lv_obj_set_height(obj, header.h); /*Keep the user defined width*/
-    }
-    else {
-        imgbtn->act_cf = LV_IMG_CF_UNKNOWN;
-    }
+    lv_obj_refresh_self_size(obj);
+    lv_obj_set_height(obj, imgbtn->src_mid[state].header.h); /*Keep the user defined width*/
 
     lv_obj_invalidate(obj);
 }
@@ -325,25 +308,25 @@ static void refr_img(lv_obj_t * obj)
 static lv_imgbtn_state_t suggest_state(lv_obj_t * obj, lv_imgbtn_state_t state)
 {
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
-    if(imgbtn->img_src_mid[state] == NULL) {
+    if(imgbtn->src_mid[state].img_src == NULL) {
         switch(state) {
             case LV_IMGBTN_STATE_PRESSED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_RELEASED].img_src) return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_CHECKED_RELEASED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_RELEASED].img_src) return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_CHECKED_PRESSED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED]) return LV_IMGBTN_STATE_CHECKED_RELEASED;
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_PRESSED]) return LV_IMGBTN_STATE_PRESSED;
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED].img_src) return LV_IMGBTN_STATE_CHECKED_RELEASED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_PRESSED].img_src) return LV_IMGBTN_STATE_PRESSED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_RELEASED].img_src) return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_DISABLED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_RELEASED].img_src) return LV_IMGBTN_STATE_RELEASED;
                 break;
             case LV_IMGBTN_STATE_CHECKED_DISABLED:
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED]) return LV_IMGBTN_STATE_CHECKED_RELEASED;
-                if(imgbtn->img_src_mid[LV_IMGBTN_STATE_RELEASED]) return LV_IMGBTN_STATE_RELEASED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_CHECKED_RELEASED].img_src) return LV_IMGBTN_STATE_CHECKED_RELEASED;
+                if(imgbtn->src_mid[LV_IMGBTN_STATE_RELEASED].img_src) return LV_IMGBTN_STATE_RELEASED;
                 break;
             default:
                 break;
@@ -353,7 +336,7 @@ static lv_imgbtn_state_t suggest_state(lv_obj_t * obj, lv_imgbtn_state_t state)
     return state;
 }
 
-lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn)
+static lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn)
 {
     LV_ASSERT_OBJ(imgbtn, MY_CLASS);
 
@@ -372,6 +355,22 @@ lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn)
         if(obj_state & LV_STATE_PRESSED) return LV_IMGBTN_STATE_PRESSED;
         else return LV_IMGBTN_STATE_RELEASED;
     }
+}
+
+static void update_src_info(lv_imgbtn_src_info_t * info, const void * src)
+{
+    if(!src) {
+        lv_memzero(info, sizeof(lv_imgbtn_src_info_t));
+        return;
+    }
+
+    lv_res_t res = lv_img_decoder_get_info(src, &info->header);
+    if(res != LV_RES_OK) {
+        LV_LOG_WARN("can't get info");
+        return;
+    }
+
+    info->img_src = src;
 }
 
 #endif

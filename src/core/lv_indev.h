@@ -155,7 +155,7 @@ lv_obj_t * lv_indev_get_obj_act(void);
  * @param indev pointer to an input device
  * @return pointer to the indev read refresher timer. (NULL on error)
  */
-lv_timer_t * lv_indev_get_read_timer(lv_disp_t * indev);
+lv_timer_t * lv_indev_get_read_timer(lv_indev_t * indev);
 
 /**
  * Search the most top, clickable object by a point

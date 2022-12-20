@@ -53,8 +53,8 @@
 
 #define LV_SPRINTF_CUSTOM 1
 #define LV_SPRINTF_INCLUDE LV_RTTHREAD_INCLUDE
-#define lv_snprintf  rt_snprintf
-#define lv_vsnprintf rt_vsnprintf
+#define LV_SNPRINTF  rt_snprintf
+#define LV_VSNPRINTF rt_vsnprintf
 #define LV_SPRINTF_USE_FLOAT 0
 
 /*=====================
@@ -67,7 +67,11 @@
 #  define LV_BIG_ENDIAN_SYSTEM 0
 #endif
 
-#define LV_ATTRIBUTE_MEM_ALIGN ALIGN(4)
+#ifdef rt_align /* >= RT-Thread v5.0.0 */
+#  define LV_ATTRIBUTE_MEM_ALIGN rt_align(RT_ALIGN_SIZE)
+#else
+#  define LV_ATTRIBUTE_MEM_ALIGN ALIGN(RT_ALIGN_SIZE)
+#endif
 
 /*==================
 * EXAMPLES

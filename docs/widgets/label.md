@@ -77,7 +77,7 @@ Learn more about [Keys](/overview/indev).
 
 ```eval_rst
 
-.. include:: ../../../examples/widgets/label/index.rst
+.. include:: ../../examples/widgets/label/index.rst
 
 ```
 

@@ -20,9 +20,22 @@
 #include "../draw/sdl/lv_draw_sdl.h"
 #include "../draw/sw/lv_draw_sw.h"
 #include "../draw/sdl/lv_draw_sdl.h"
-#include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
-#include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
-#include "../draw/arm2d/lv_gpu_arm2d.h"
+#if LV_USE_GPU_STM32_DMA2D
+    #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
+#endif
+
+#if LV_USE_GPU_GD32_IPA
+    #include "../draw/gd32_ipa/lv_gpu_gd32_ipa.h"
+#endif
+
+#if LV_USE_GPU_SWM341_DMA2D
+    #include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
+#endif
+
+#if LV_USE_GPU_ARM2D
+    #include "../draw/arm2d/lv_gpu_arm2d.h"
+#endif
+
 #if LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE
     #include "../draw/nxp/lv_gpu_nxp.h"
 #endif
@@ -59,7 +72,7 @@ static lv_disp_t * disp_def;
 
 /**
  * Initialize a display driver with default values.
- * It is used to surly have known values in the fields ant not memory junk.
+ * It is used to ensure all fields have known values and not memory junk.
  * After it you can set the fields.
  * @param driver pointer to driver variable to initialize
  */
@@ -90,6 +103,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_stm32_dma2d_ctx_init;
     driver->draw_ctx_deinit = lv_draw_stm32_dma2d_ctx_deinit;
     driver->draw_ctx_size = sizeof(lv_draw_stm32_dma2d_ctx_t);
+#elif LV_USE_GPU_GD32_IPA
+    driver->draw_ctx_init = lv_draw_gd32_ipa_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_gd32_ipa_ctx_deinit;
+    driver->draw_ctx_size = sizeof(lv_draw_gd32_ipa_ctx_t);
 #elif LV_USE_GPU_SWM341_DMA2D
     driver->draw_ctx_init = lv_draw_swm341_dma2d_ctx_init;
     driver->draw_ctx_deinit = lv_draw_swm341_dma2d_ctx_deinit;

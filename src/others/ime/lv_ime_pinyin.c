@@ -434,6 +434,8 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     pinyin_ime->kb = kb;
+    lv_obj_set_parent(obj, lv_obj_get_parent(kb));
+    lv_obj_set_parent(pinyin_ime->cand_panel, lv_obj_get_parent(kb));
     lv_obj_add_event_cb(pinyin_ime->kb, lv_ime_pinyin_kb_event, LV_EVENT_VALUE_CHANGED, obj);
     lv_obj_align_to(pinyin_ime->cand_panel, pinyin_ime->kb, LV_ALIGN_OUT_TOP_MID, 0, 0);
 }
@@ -569,7 +571,7 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
 #endif
 
     /* Init pinyin_ime->cand_panel */
-    pinyin_ime->cand_panel = lv_btnmatrix_create(lv_scr_act());
+    pinyin_ime->cand_panel = lv_btnmatrix_create(lv_obj_get_parent(obj));
     lv_btnmatrix_set_map(pinyin_ime->cand_panel, (const char **)lv_btnm_def_pinyin_sel_map);
     lv_obj_set_size(pinyin_ime->cand_panel, LV_PCT(100), LV_PCT(5));
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
@@ -974,6 +976,8 @@ static void pinyin_ime_clear_data(lv_obj_t * obj)
 #if LV_IME_PINYIN_USE_K9_MODE
 static void pinyin_k9_init_data(lv_obj_t * obj)
 {
+    LV_UNUSED(obj);
+
     uint16_t py_str_i = 0;
     uint16_t btnm_i = 0;
     for(btnm_i = 19; btnm_i < (LV_IME_PINYIN_K9_CAND_TEXT_NUM + 21); btnm_i++) {
@@ -1015,7 +1019,7 @@ static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char *
     int mark[LV_IME_PINYIN_K9_MAX_INPUT] = {0};
     int index = 0;
     int flag = 0;
-    int count = 0;
+    uint16_t count = 0;
 
     uint32_t ll_len = 0;
     ime_pinyin_k9_py_str_t * ll_index = NULL;
@@ -1040,7 +1044,7 @@ static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char *
         }
         else {
             flag = mark[index];
-            if(flag < strlen(py9_map[k9_input[index] - '2'])) {
+            if((size_t)flag < strlen(py9_map[k9_input[index] - '2'])) {
                 py_comp[index] = py9_map[k9_input[index] - '2'][flag];
                 mark[index] = mark[index] + 1;
                 index++;

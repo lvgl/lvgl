@@ -87,7 +87,7 @@ int16_t lv_draw_mask_add(void * param, void * custom_id)
     }
 
     if(i >= _LV_MASK_MAX_NUM) {
-        LV_LOG_WARN("lv_mask_add: no place to add the mask");
+        LV_LOG_WARN("no place to add the mask");
         return LV_MASK_ID_INV;
     }
 
@@ -1384,8 +1384,9 @@ static void circ_calc_aa4(_lv_draw_mask_radius_circle_dsc_t * c, lv_coord_t radi
         return;
     }
 
-    lv_coord_t * cir_x = lv_malloc((radius + 1) * 2 * 2 * sizeof(lv_coord_t));
-    lv_memset(cir_x, 0, (radius + 1) * 2 * 2 * sizeof(lv_coord_t));
+    const size_t cir_xy_size = (radius + 1) * 2 * 2 * sizeof(lv_coord_t);
+    lv_coord_t * cir_x = lv_malloc(cir_xy_size);
+    lv_memset(cir_x, 0, cir_xy_size);
     lv_coord_t * cir_y = &cir_x[(radius + 1) * 2];
 
     uint32_t y_8th_cnt = 0;

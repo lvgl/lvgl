@@ -94,6 +94,16 @@ void lv_mem_deinit_builtin(void)
     lv_mem_init_builtin();
 }
 
+lv_mem_builtin_pool_t * lv_mem_builtin_add_pool(void * mem, size_t bytes)
+{
+    return lv_tlsf_add_pool(tlsf, mem, bytes);
+}
+
+void lv_mem_builtin_remove_pool(lv_mem_builtin_pool_t * pool)
+{
+    lv_tlsf_remove_pool(tlsf, pool);
+}
+
 void lv_mem_monitor_builtin(lv_mem_monitor_t * mon_p)
 {
     /*Init the data*/

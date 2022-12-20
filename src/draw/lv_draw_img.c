@@ -213,6 +213,38 @@ bool lv_img_cf_has_alpha(lv_img_cf_t cf)
     return has_alpha;
 }
 
+/**
+ * Get the type of an image source
+ * @param src pointer to an image source:
+ *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
+ *  - a path to a file (e.g. "S:/folder/image.bin")
+ *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
+ * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
+ */
+lv_img_src_t lv_img_src_get_type(const void * src)
+{
+    lv_img_src_t img_src_type = LV_IMG_SRC_UNKNOWN;
+
+    if(src == NULL) return img_src_type;
+    const uint8_t * u8_p = src;
+
+    /*The first byte shows the type of the image source*/
+    if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
+        img_src_type = LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
+    }
+    else if(u8_p[0] >= 0x80) {
+        img_src_type = LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
+    }
+    else {
+        img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is draw to the first byte < 0x20*/
+    }
+
+    if(LV_IMG_SRC_UNKNOWN == img_src_type) {
+        LV_LOG_WARN("unknown image type");
+    }
+
+    return img_src_type;
+}
 
 void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
@@ -258,13 +290,6 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * dra
     /*Save the decoder context as it might contains useful information for the img object*/
     draw_dsc->dec_ctx = cdsc->dec_dsc.dec_ctx;
 
-    lv_img_cf_t cf;
-    if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-    else if(LV_IMG_CF_ALPHA_8BIT == cdsc->dec_dsc.header.cf) cf = LV_IMG_CF_ALPHA_8BIT;
-    else if(LV_IMG_CF_RGB565A8 == cdsc->dec_dsc.header.cf) cf = LV_IMG_CF_RGB565A8;
-    else if(lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-    else cf = LV_IMG_CF_TRUE_COLOR;
-
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
 
@@ -297,7 +322,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * dra
 
         const lv_area_t * clip_area_ori = draw_ctx->clip_area;
         draw_ctx->clip_area = &clip_com;
-        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cf);
+        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, cdsc->dec_dsc.header.cf);
         draw_ctx->clip_area = clip_area_ori;
     }
     /*The whole uncompressed image is not available. Try to read it line-by-line*/
@@ -336,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw_cached(lv_draw_ctx_t * dra
             }
 
             draw_ctx->clip_area = &mask_line;
-            lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, cf);
+            lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, cdsc->dec_dsc.header.cf);
             line.y1++;
             line.y2++;
             y++;

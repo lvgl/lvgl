@@ -2,11 +2,11 @@
 
 import argparse
 import errno
-import glob
 import shutil
 import subprocess
 import sys
 import os
+from itertools import chain
 
 lvgl_test_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -15,7 +15,6 @@ build_only_options = {
     'OPTIONS_MINIMAL_MONOCHROME': 'Minimal config monochrome',
     'OPTIONS_NORMAL_8BIT': 'Normal config, 8 bit color depth',
     'OPTIONS_16BIT': 'Minimal config, 16 bit color depth',
-    'OPTIONS_16BIT_SWAP': 'Normal config, 16 bit color depth swapped',
     'OPTIONS_FULL_32BIT': 'Full config, 32 bit color depth',
 }
 
@@ -23,10 +22,6 @@ test_options = {
     'OPTIONS_TEST_SYSHEAP': 'Test config, system heap, 32 bit color depth',
     'OPTIONS_TEST_DEFHEAP': 'Test config, LVGL heap, 32 bit color depth',
 }
-
-
-def is_valid_option_name(option_name):
-    return option_name in build_only_options or option_name in test_options
 
 
 def get_option_description(option_name):
@@ -41,22 +36,6 @@ def delete_dir_ignore_missing(dir_path):
         shutil.rmtree(dir_path)
     except FileNotFoundError:
         pass
-
-
-def generate_test_runners():
-    '''Generate the test runner source code.'''
-    global lvgl_test_dir
-    os.chdir(lvgl_test_dir)
-    delete_dir_ignore_missing('src/test_runners')
-    os.mkdir('src/test_runners')
-
-    # TODO: Intermediate files should be in the build folders, not alongside
-    #       the other repo source.
-    for f in glob.glob("./src/test_cases/test_*.c"):
-        r = f[:-2] + "_Runner.c"
-        r = r.replace("/test_cases/", "/test_runners/")
-        subprocess.check_call(['ruby', 'unity/generate_test_runner.rb',
-                               f, r, 'config.yml'])
 
 
 def options_abbrev(options_name):
@@ -146,9 +125,7 @@ def generate_code_coverage_report():
     cmd = ['gcovr', '--root', root_dir, '--html-details', '--output',
            html_report_file, '--xml', 'report/coverage.xml',
            '-j', str(os.cpu_count()), '--print-summary',
-           '--html-title', 'LVGL Test Coverage']
-    for d in ('.*\\bexamples/.*', '\\bsrc/test_.*', '\\bsrc/lv_test.*', '\\bunity\\b'):
-        cmd.extend(['--exclude', d])
+           '--html-title', 'LVGL Test Coverage', '--filter', '../src/.*/lv_.*\.c']
 
     subprocess.check_call(cmd)
     print("Done: See %s" % html_report_file, flush=True)
@@ -164,6 +141,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Build and/or run LVGL tests.', epilog=epilog)
     parser.add_argument('--build-options', nargs=1,
+                        choices=list(chain(build_only_options, test_options)),
                         help='''the build option name to build or run. When
                         omitted all build configurations are used.
                         ''')
@@ -186,13 +164,6 @@ if __name__ == "__main__":
                 options_to_build = build_only_options
         else:
             options_to_build = test_options
-
-    for opt in options_to_build:
-        if not is_valid_option_name(opt):
-            print('Invalid build option "%s"' % opt, file=sys.stderr)
-            sys.exit(errno.EINVAL)
-
-    generate_test_runners()
 
     for options_name in options_to_build:
         is_test = options_name in test_options

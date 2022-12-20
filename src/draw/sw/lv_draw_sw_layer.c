@@ -130,6 +130,7 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     /*Blend the layer*/
     lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, layer_ctx->img_src);
     lv_draw_wait_for_finish(draw_ctx);
+    lv_img_cache_invalidate_src(&img);
 }
 
 void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx)

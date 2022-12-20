@@ -62,6 +62,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
     blend_dsc.blend_mode = draw_dsc->blend_mode;
     blend_dsc.blend_area = &blend_area;
 
+    if(lv_img_cf_is_chroma_keyed(cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+    else if(cf == LV_IMG_CF_ALPHA_8BIT) {}
+    else if(cf == LV_IMG_CF_RGB565A8) {}
+    else if(lv_img_cf_has_alpha(cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    else cf = LV_IMG_CF_TRUE_COLOR;
+
     /*The simplest case just copy the pixels into the draw_buf*/
     if(!mask_any && !transform && cf == LV_IMG_CF_TRUE_COLOR && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
