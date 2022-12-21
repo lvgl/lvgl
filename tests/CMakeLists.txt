@@ -58,13 +58,19 @@ elseif (OPTIONS_FULL_32BIT)
 elseif (OPTIONS_TEST_SYSHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP} -fsanitize=address --coverage)
     set (TEST_LIBS --coverage -fsanitize=address)
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_DEFHEAP)
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_DEFHEAP})
     set (TEST_LIBS --coverage -fsanitize=address)
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (ENABLE_TESTS ON)
 elseif (OPTIONS_TEST_MEMORYCHECK)
     # sanitizer is disabled because valgrind uses LD_PRELOAD and the
     # sanitizer lib needs to load first
     set (BUILD_OPTIONS ${LVGL_TEST_OPTIONS_TEST_SYSHEAP})
+    set (LV_CONF_BUILD_DISABLE_EXAMPLES ON)
+    set (ENABLE_TESTS ON)
 else()
     message(FATAL_ERROR "Must provide a known options value (check main.py?).")
 endif()
@@ -110,7 +116,9 @@ get_filename_component(LVGL_DIR ${LVGL_TEST_DIR} DIRECTORY)
 # Include lvgl project file.
 include(${LVGL_DIR}/CMakeLists.txt)
 target_compile_options(lvgl PUBLIC ${COMPILE_OPTIONS})
-target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})
+if (TARGET lvgl_examples)
+  target_compile_options(lvgl_examples PUBLIC ${COMPILE_OPTIONS})
+endif()
 
 
 set(TEST_INCLUDE_DIRS
@@ -123,22 +131,19 @@ add_library(test_common
     STATIC
         src/lv_test_indev.c
         src/lv_test_init.c
+        src/test_assets/animimg001.c
+        src/test_assets/animimg002.c
+        src/test_assets/animimg003.c
         src/test_assets/font_1.c
         src/test_assets/font_2.c
         src/test_assets/font_3.c
+        src/test_assets/img_caret_down.c
         src/test_assets/ubuntu_font.c
         unity/unity_support.c
         unity/unity.c
 )
 target_include_directories(test_common PUBLIC ${TEST_INCLUDE_DIRS})
 target_compile_options(test_common PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
-
-# Some examples `#include "lvgl/lvgl.h"` - which is a path which is not
-# in this source repository. If this repo is in a directory names 'lvgl'
-# then we can add our parent directory to the include path.
-# TODO: This is not good practice and should be fixed.
-get_filename_component(LVGL_PARENT_DIR ${LVGL_DIR} DIRECTORY)
-target_include_directories(lvgl_examples PUBLIC $<BUILD_INTERFACE:${LVGL_PARENT_DIR}>)
 
 # Generate one test executable for each source file pair.
 # The sources in ${CMAKE_CURRENT_BINARY_DIR} is auto-generated, the
@@ -147,7 +152,14 @@ find_package(Ruby REQUIRED)
 set(generate_test_runner_rb
     ${CMAKE_CURRENT_SOURCE_DIR}/unity/generate_test_runner.rb)
 set(generate_test_runner_config ${CMAKE_CURRENT_SOURCE_DIR}/config.yml)
-file( GLOB TEST_CASE_FILES src/test_cases/*.c )
+
+# disable test targets for build only tests
+if (ENABLE_TESTS)
+    file( GLOB TEST_CASE_FILES src/test_cases/*.c )
+else()
+    set(TEST_CASE_FILES)
+endif()
+
 foreach( test_case_fname ${TEST_CASE_FILES} )
     # If test file is foo/bar/baz.c then test_name is "baz".
     get_filename_component(test_name ${test_case_fname} NAME_WLE)
@@ -169,7 +181,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} test_common lvgl_examples lvgl_demos lvgl png m ${TEST_LIBS})
+    target_link_libraries(${test_name} test_common lvgl_demos lvgl png m ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
