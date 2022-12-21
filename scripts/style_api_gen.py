@@ -481,6 +481,9 @@ def docs(p):
 base_dir = os.path.abspath(os.path.dirname(__file__))
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
 
+print("#include \"../misc/lv_area.h\"")
+print("#include \"../misc/lv_style.h\"")
+print("#include \"../core/lv_obj_style.h\"")
 for p in props:
   obj_style_get(p)
 
