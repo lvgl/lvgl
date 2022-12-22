@@ -141,7 +141,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(!slider->dragging) {
             lv_coord_t x_ofs = p.x - slider->pressed_point.x;
             lv_coord_t y_ofs = p.y - slider->pressed_point.y;
-            lv_coord_t drag_range = indev->driver->scroll_limit * 2;
+            lv_coord_t drag_range = indev->driver->scroll_limit;
 
             /*When drag is not out of range, it is not processed*/
             if(LV_ABS(x_ofs) < drag_range && LV_ABS(y_ofs) < drag_range) {
