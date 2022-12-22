@@ -37,6 +37,7 @@ static void position_knob(lv_obj_t * obj, lv_area_t * knob_area, const lv_coord_
 static void draw_knob(lv_event_t * e);
 static bool is_slider_horizontal(lv_obj_t * obj);
 static void drag_start(lv_obj_t * obj);
+static void update_knob_pos(lv_obj_t * obj, bool check_drag);
 
 /**********************
  *  STATIC VARIABLES
@@ -131,85 +132,10 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_indev_get_point(lv_indev_get_act(), &slider->pressed_point);
     }
     else if(code == LV_EVENT_PRESSING) {
-        lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_get_type(indev) != LV_INDEV_TYPE_POINTER) return;
-        if(lv_indev_get_scroll_obj(indev) != NULL) return;
-
-        lv_point_t p;
-        lv_indev_get_point(indev, &p);
-
-        if(!slider->dragging) {
-            lv_coord_t x_ofs = p.x - slider->pressed_point.x;
-            lv_coord_t y_ofs = p.y - slider->pressed_point.y;
-            lv_coord_t drag_range = indev->driver->scroll_limit;
-
-            /*When drag is not out of range, it is not processed*/
-            if(LV_ABS(x_ofs) < drag_range && LV_ABS(y_ofs) < drag_range) {
-                return;
-            }
-        }
-
-        if(!slider->value_to_set) {
-            /*Ready to start drag*/
-            drag_start(obj);
-        }
-
-        int32_t new_value = 0;
-        bool is_hor = is_slider_horizontal(obj);
-        const int32_t range = slider->bar.max_value - slider->bar.min_value;
-        if(is_hor) {
-            const lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-            const lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-            const lv_coord_t w = lv_obj_get_width(obj);
-            const lv_coord_t indic_w = w - bg_left - bg_right;
-
-            if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
-                /*Make the point relative to the indicator*/
-                new_value = (obj->coords.x2 - bg_right) - p.x;
-            }
-            else {
-                /*Make the point relative to the indicator*/
-                new_value = p.x - (obj->coords.x1 + bg_left);
-            }
-            if(indic_w) {
-                new_value = (new_value * range + indic_w / 2) / indic_w;
-                new_value += slider->bar.min_value;
-            }
-        }
-        else {
-            const lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-            const lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-            const lv_coord_t h = lv_obj_get_height(obj);
-            const lv_coord_t indic_h = h - bg_bottom - bg_top;
-
-            /*Make the point relative to the indicator*/
-            new_value = p.y - (obj->coords.y2 + bg_bottom);
-            new_value = (-new_value * range + indic_h / 2) / indic_h;
-            new_value += slider->bar.min_value;
-        }
-
-        int32_t real_max_value = slider->bar.max_value;
-        int32_t real_min_value = slider->bar.min_value;
-        /*Figure out the min. and max. for this mode*/
-        if(slider->value_to_set == &slider->bar.start_value) {
-            real_max_value = slider->bar.cur_value;
-        }
-        else {
-            real_min_value = slider->bar.start_value;
-        }
-
-        new_value = LV_CLAMP(real_min_value, new_value, real_max_value);
-        if(*slider->value_to_set != new_value) {
-            *slider->value_to_set = new_value;
-            if(is_hor) lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
-            else  lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
-
-            lv_obj_invalidate(obj);
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return;
-        }
+        update_knob_pos(obj, true);
     }
     else if(code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
+        update_knob_pos(obj, false);
         slider->dragging = false;
         slider->value_to_set = NULL;
 
@@ -477,6 +403,91 @@ static void drag_start(lv_obj_t * obj)
                 }
             }
         }
+    }
+}
+
+static void update_knob_pos(lv_obj_t * obj, bool check_drag)
+{
+    lv_slider_t * slider = (lv_slider_t *)obj;
+    lv_indev_t * indev = lv_indev_get_act();
+    if(lv_indev_get_type(indev) != LV_INDEV_TYPE_POINTER)
+        return;
+    if(lv_indev_get_scroll_obj(indev) != NULL)
+        return;
+
+    lv_point_t p;
+    lv_indev_get_point(indev, &p);
+    bool is_hor = is_slider_horizontal(obj);
+
+    if(check_drag && !slider->dragging) {
+        lv_coord_t ofs = is_hor ? (p.x - slider->pressed_point.x) : (p.y - slider->pressed_point.y);
+
+        /*Stop processing when offset is below scroll_limit*/
+        if(LV_ABS(ofs) < indev->driver->scroll_limit) {
+            return;
+        }
+    }
+
+    if(!slider->value_to_set) {
+        /*Ready to start drag*/
+        drag_start(obj);
+    }
+
+    int32_t new_value = 0;
+    const int32_t range = slider->bar.max_value - slider->bar.min_value;
+    if(is_hor) {
+        const lv_coord_t bg_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+        const lv_coord_t bg_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+        const lv_coord_t w = lv_obj_get_width(obj);
+        const lv_coord_t indic_w = w - bg_left - bg_right;
+
+        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) {
+            /*Make the point relative to the indicator*/
+            new_value = (obj->coords.x2 - bg_right) - p.x;
+        }
+        else {
+            /*Make the point relative to the indicator*/
+            new_value = p.x - (obj->coords.x1 + bg_left);
+        }
+        if(indic_w) {
+            new_value = (new_value * range + indic_w / 2) / indic_w;
+            new_value += slider->bar.min_value;
+        }
+    }
+    else {
+        const lv_coord_t bg_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+        const lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+        const lv_coord_t h = lv_obj_get_height(obj);
+        const lv_coord_t indic_h = h - bg_bottom - bg_top;
+
+        /*Make the point relative to the indicator*/
+        new_value = p.y - (obj->coords.y2 + bg_bottom);
+        new_value = (-new_value * range + indic_h / 2) / indic_h;
+        new_value += slider->bar.min_value;
+    }
+
+    int32_t real_max_value = slider->bar.max_value;
+    int32_t real_min_value = slider->bar.min_value;
+    /*Figure out the min. and max. for this mode*/
+    if(slider->value_to_set == &slider->bar.start_value) {
+        real_max_value = slider->bar.cur_value;
+    }
+    else {
+        real_min_value = slider->bar.start_value;
+    }
+
+    new_value = LV_CLAMP(real_min_value, new_value, real_max_value);
+    if(*slider->value_to_set != new_value) {
+        *slider->value_to_set = new_value;
+        if(is_hor)
+            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+        else
+            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+
+        lv_obj_invalidate(obj);
+        lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        if(res != LV_RES_OK)
+            return;
     }
 }
 
