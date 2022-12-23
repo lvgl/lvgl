@@ -21,7 +21,7 @@ void lv_example_gridnav_2(void)
     uint32_t i;
     for(i = 0; i < 15; i++) {
         lv_snprintf(buf, sizeof(buf), "File %d", i + 1);
-        lv_obj_t * item = lv_list_add_btn(list1,  lv_img_src_from_symbol(LV_SYMBOL_FILE, 0), buf);
+        lv_obj_t * item = lv_list_add_btn(list1,  lv_img_src_from_symbol(LV_SYMBOL_FILE), buf);
         lv_obj_set_style_bg_opa(item, 0, 0);
         lv_group_remove_obj(item);   /*Not needed, we use the gridnav instead*/
     }
@@ -35,7 +35,7 @@ void lv_example_gridnav_2(void)
 
     for(i = 0; i < 15; i++) {
         lv_snprintf(buf, sizeof(buf), "Folder %d", i + 1);
-        lv_obj_t * item = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_DIRECTORY, 0), buf);
+        lv_obj_t * item = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_DIRECTORY), buf);
         lv_obj_set_style_bg_opa(item, 0, 0);
         lv_group_remove_obj(item);
     }

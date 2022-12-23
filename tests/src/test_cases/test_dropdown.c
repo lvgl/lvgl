@@ -351,7 +351,7 @@ void test_dropdown_render_1(void)
 
     lv_img_src_t * symbol = lv_dropdown_get_symbol(dd3);
     TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_DOWN, symbol->data);
-    lv_dropdown_set_symbol(dd3, lv_img_src_from_symbol(LV_SYMBOL_LEFT, 0));
+    lv_dropdown_set_symbol(dd3, lv_img_src_from_symbol(LV_SYMBOL_LEFT));
     symbol = lv_dropdown_get_symbol(dd3);
     TEST_ASSERT_EQUAL_STRING(LV_SYMBOL_LEFT, symbol->data);
 
@@ -373,7 +373,7 @@ void test_dropdown_render_2(void)
     lv_obj_t * dd1 = lv_dropdown_create(lv_scr_act());
     lv_dropdown_set_text(dd1, "Short");
     lv_dropdown_set_options(dd1, "1\n2");
-    lv_dropdown_set_symbol(dd1, lv_img_src_from_raw(&img_caret_down, 0));
+    lv_dropdown_set_symbol(dd1, lv_img_src_from_raw(&img_caret_down));
     lv_dropdown_open(dd1);
 
     lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
@@ -394,14 +394,14 @@ void test_dropdown_render_2(void)
     lv_dropdown_set_options(dd4, "1aaaaaaaaaaaaaaaa\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_obj_align(dd4, LV_ALIGN_LEFT_MID, 450, 10);
     lv_dropdown_set_dir(dd4, LV_DIR_TOP);
-    lv_dropdown_set_symbol(dd4, lv_img_src_from_symbol(LV_SYMBOL_UP, 0));
+    lv_dropdown_set_symbol(dd4, lv_img_src_from_symbol(LV_SYMBOL_UP));
     lv_dropdown_open(dd4);
 
     lv_obj_t * dd5 = lv_dropdown_create(lv_scr_act());
     lv_dropdown_set_text(dd5, "Go Down");
     lv_dropdown_set_options(dd5, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15");
     lv_dropdown_set_dir(dd5, LV_DIR_TOP);
-    lv_dropdown_set_symbol(dd5, lv_img_src_from_symbol(LV_SYMBOL_UP, 0));
+    lv_dropdown_set_symbol(dd5, lv_img_src_from_symbol(LV_SYMBOL_UP));
     lv_obj_align(dd5, LV_ALIGN_LEFT_MID, 650, -200);
     lv_dropdown_open(dd5);
 
@@ -409,7 +409,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_set_text(dd6, "Right");
     lv_dropdown_set_options(dd6, "1aaa\n2aa\n3aa");
     lv_dropdown_set_dir(dd6, LV_DIR_RIGHT);
-    lv_dropdown_set_symbol(dd6, lv_img_src_from_symbol(LV_SYMBOL_RIGHT, 0));
+    lv_dropdown_set_symbol(dd6, lv_img_src_from_symbol(LV_SYMBOL_RIGHT));
     lv_obj_align(dd6, LV_ALIGN_BOTTOM_LEFT, 20, -20);
     lv_dropdown_open(dd6);
     lv_obj_set_style_text_align(lv_dropdown_get_list(dd6), LV_TEXT_ALIGN_RIGHT, 0);
@@ -418,7 +418,7 @@ void test_dropdown_render_2(void)
     lv_dropdown_set_text(dd7, "Left");
     lv_dropdown_set_options(dd7, "1aaa\n2\n3");
     lv_dropdown_set_dir(dd7, LV_DIR_LEFT);
-    lv_dropdown_set_symbol(dd7, lv_img_src_from_symbol(LV_SYMBOL_LEFT, 0));
+    lv_dropdown_set_symbol(dd7, lv_img_src_from_symbol(LV_SYMBOL_LEFT));
     lv_obj_align(dd7, LV_ALIGN_BOTTOM_RIGHT, -20, -20);
     lv_dropdown_open(dd7);
 

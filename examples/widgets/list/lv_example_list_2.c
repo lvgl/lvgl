@@ -145,15 +145,15 @@ void lv_example_list_2(void)
     lv_obj_add_event_cb(btn, event_handler_top, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_UP, 0), "Up");
+    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_UP), "Up");
     lv_obj_add_event_cb(btn, event_handler_up, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_LEFT, 0), "Center");
+    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_LEFT), "Center");
     lv_obj_add_event_cb(btn, event_handler_center, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_DOWN, 0), "Down");
+    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_DOWN), "Down");
     lv_obj_add_event_cb(btn, event_handler_dn, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
@@ -161,7 +161,7 @@ void lv_example_list_2(void)
     lv_obj_add_event_cb(btn, event_handler_bottom, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_SHUFFLE, 0), "Shuffle");
+    btn = lv_list_add_btn(list2, lv_img_src_from_symbol(LV_SYMBOL_SHUFFLE), "Shuffle");
     lv_obj_add_event_cb(btn, event_handler_swap, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 }

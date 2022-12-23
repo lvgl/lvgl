@@ -39,7 +39,7 @@ typedef struct {
 
 typedef struct {
     _lv_img_cache_entry_t * (*open_cb)(const lv_img_dec_dsc_in_t * dsc, lv_img_dec_ctx_t * dec_ctx);
-    lv_res_t (*query_cb)(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps, 
+    lv_res_t (*query_cb)(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
                          lv_img_dec_ctx_t * dec_ctx);
     void (*set_size_cb)(uint16_t new_entry_cnt);
     void (*invalidate_src_cb)(const lv_img_src_t * src);
@@ -82,7 +82,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_i
  * @return LV_RES_OK if a decoder was able to open the image
  */
 lv_res_t _lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
-                            lv_img_dec_ctx_t * dec_ctx);
+                             lv_img_dec_ctx_t * dec_ctx);
 
 /**
  * Set the number of images to be cached.

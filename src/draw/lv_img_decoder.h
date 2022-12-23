@@ -137,37 +137,37 @@ typedef struct _lv_img_dec_dsc_in_t {
 /**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_img_dec_dsc_t {
     /**The decoder which was able to open the image source*/
-    lv_img_decoder_t * decoder;
+    lv_img_decoder_t  * decoder;
 
     /** How much time did it take to open the image. [ms]
      *  If not set `lv_img_cache` will measure and set the time to open*/
-    uint32_t time_to_open;
+    uint32_t            time_to_open;
 
     /** The input data to set*/
-    lv_img_dec_dsc_in_t  input;
+    lv_img_dec_dsc_in_t input;
 
     /** The output data to retrieve from the decoder.
      * Anything below is filled by the decoder
      *******************************************************/
 
     /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
-    lv_img_header_t header;
+    lv_img_header_t     header;
 
     /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
      *  Can be NULL if the decoded context does not have the LV_IMG_DEC_CACHED capability.
      *  In that case, you'll need to call `read_line` to read line by line.
      *  MUST be set in `open` function*/
-    const uint8_t * img_data;
+    const uint8_t   *   img_data;
 
     /**Initialization context for decoder*/
-    lv_img_dec_ctx_t * dec_ctx;
+    lv_img_dec_ctx_t  * dec_ctx;
 
     /**The decoder capabilities (used when the decoder context is NULL) */
     uint8_t             caps;
 
     /**A text to display instead of the image when the image can't be opened.
      * Can be set in `open` function or set NULL.*/
-    const char * error_msg;
+    const char     *    error_msg;
 
 } lv_img_dec_dsc_t;
 

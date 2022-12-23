@@ -63,7 +63,7 @@ _lv_img_cache_entry_t * _lv_img_cache_open(const lv_img_dec_dsc_in_t * dsc, lv_i
 }
 
 lv_res_t _lv_img_cache_query(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
-                            lv_img_dec_ctx_t * dec_ctx)
+                             lv_img_dec_ctx_t * dec_ctx)
 {
     if(img_cache_manager.query_cb)
         return img_cache_manager.query_cb(dsc, header, caps, dec_ctx);

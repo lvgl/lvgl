@@ -143,8 +143,8 @@ static lv_res_t decoder_open(lv_img_dec_dsc_t * dsc, const lv_img_dec_flags_t fl
     }
 
     /*Decode the PNG image*/
-    uint32_t png_width;             /*Will be the width of the decoded image*/
-    uint32_t png_height;            /*Will be the height of the decoded image*/
+    unsigned png_width;             /*Will be the width of the decoded image*/
+    unsigned png_height;            /*Will be the height of the decoded image*/
 
     /*Decode the loaded image in ARGB8888 */
     uint8_t * img_data = (uint8_t *)dsc->img_data;

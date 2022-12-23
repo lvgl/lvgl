@@ -172,7 +172,7 @@ void lv_demo_widgets(void)
         lv_obj_set_style_pad_left(tab_btns, LV_HOR_RES / 2, 0);
         lv_obj_t * logo = lv_img_create(tab_btns);
         LV_IMG_DECLARE(img_lvgl_logo);
-        lv_img_set_src(logo, lv_img_src_from_raw(&img_lvgl_logo, 0));
+        lv_img_set_src(logo, lv_img_src_from_raw(&img_lvgl_logo));
         lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
         lv_obj_t * label = lv_label_create(tab_btns);
@@ -207,7 +207,7 @@ static void profile_create(lv_obj_t * parent)
 
     LV_IMG_DECLARE(img_demo_widgets_avatar);
     lv_obj_t * avatar = lv_img_create(panel1);
-    lv_img_set_src(avatar, lv_img_src_from_raw(&img_demo_widgets_avatar, 0));
+    lv_img_set_src(avatar, lv_img_src_from_raw(&img_demo_widgets_avatar));
 
     lv_obj_t * name = lv_label_create(panel1);
     lv_label_set_text(name, "Elena Smith");
@@ -907,12 +907,13 @@ void shop_create(lv_obj_t * parent)
     lv_obj_add_style(title, &style_title, 0);
 
     LV_IMG_DECLARE(img_clothes);
-    lv_img_src_t  * img_src = lv_img_src_from_raw(&img_clothes, LV_IMG_SRC_FLAG_PERMANENT);
-    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$722");
-    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$411");
-    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$917");
-    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$64");
-    create_shop_item(list, img_src, "Blue jeans", "Clothes", "$805");
+    lv_img_src_t  * img_src = lv_img_src_from_raw(&img_clothes);
+    create_shop_item(list, lv_img_src_dup(img_src), "Blue jeans", "Clothes", "$722");
+    create_shop_item(list, lv_img_src_dup(img_src), "Blue jeans", "Clothes", "$411");
+    create_shop_item(list, lv_img_src_dup(img_src), "Blue jeans", "Clothes", "$917");
+    create_shop_item(list, lv_img_src_dup(img_src), "Blue jeans", "Clothes", "$64");
+    create_shop_item(list, lv_img_src_dup(img_src), "Blue jeans", "Clothes", "$805");
+    lv_img_src_free(img_src);
 
     lv_obj_t * notifications = lv_obj_create(parent);
     if(disp_size == DISP_SMALL) {

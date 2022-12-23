@@ -105,7 +105,7 @@ void test_win_add_btn(void)
     lv_obj_update_layout(win);
 
     // Add a button to the window header
-    lv_win_add_btn(win, LV_SYMBOL_OK, win_btn_width);
+    lv_win_add_btn(win, lv_img_src_from_symbol(LV_SYMBOL_OK), win_btn_width);
     lv_obj_update_layout(win);
 
     // Check that no additional children have been created under win
@@ -134,10 +134,10 @@ void test_win_add_multiple_elements(void)
 
     // Create the win object, get the header and update layout
     win = lv_win_create(active_screen, win_header_height);
-    lv_win_add_btn(win, LV_SYMBOL_LEFT, win_btn_width);
+    lv_win_add_btn(win, lv_img_src_from_symbol(LV_SYMBOL_LEFT), win_btn_width);
     lv_win_add_title(win, dummy_text);
-    lv_win_add_btn(win, LV_SYMBOL_RIGHT, win_btn_width);
-    lv_win_add_btn(win, LV_SYMBOL_CLOSE, win_btn_close_width);
+    lv_win_add_btn(win, lv_img_src_from_symbol(LV_SYMBOL_RIGHT), win_btn_width);
+    lv_win_add_btn(win, lv_img_src_from_symbol(LV_SYMBOL_CLOSE), win_btn_close_width);
 
     header = lv_win_get_header(win);
     lv_obj_update_layout(win);

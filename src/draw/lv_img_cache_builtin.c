@@ -37,7 +37,7 @@
 
 static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const lv_img_dec_dsc_in_t * dsc, lv_img_dec_ctx_t * dec_ctx);
 static lv_res_t _lv_img_cache_query_builtin(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
-                            lv_img_dec_ctx_t * dec_ctx);
+                                            lv_img_dec_ctx_t * dec_ctx);
 static void lv_img_cache_set_size_builtin(uint16_t new_entry_cnt);
 static void lv_img_cache_invalidate_src_builtin(const lv_img_src_t * src);
 static void lv_img_cache_cleanup_builtin(_lv_img_cache_entry_t * cache);
@@ -82,7 +82,7 @@ void _lv_img_cache_builtin_init(void)
  **********************/
 
 lv_res_t _lv_img_cache_query_builtin(const lv_img_dec_dsc_in_t * dsc, lv_img_header_t * header, uint8_t * caps,
-                            lv_img_dec_ctx_t * dec_ctx)
+                                     lv_img_dec_ctx_t * dec_ctx)
 {
     _lv_img_cache_entry_t * cached_src = NULL;
     if(find_entry(dsc->src, NULL, dec_ctx, &cached_src)) {
@@ -212,11 +212,8 @@ static void lv_img_cache_invalidate_src_builtin(const lv_img_src_t * src)
 
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {
-        if(src == NULL || lv_img_cache_match(src, cache[i].dec_dsc.src)) {
-            if(cache[i].dec_dsc.src != NULL) {
-                lv_img_decoder_close(&cache[i].dec_dsc);
-            }
-
+        if(src == NULL || lv_img_cache_match(src, cache[i].dec_dsc.input.src)) {
+            lv_img_decoder_close(&cache[i].dec_dsc);
             lv_memzero(&cache[i], sizeof(_lv_img_cache_entry_t));
         }
     }

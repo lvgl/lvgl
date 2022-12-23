@@ -36,9 +36,6 @@ extern const lv_obj_class_t lv_animimg_class;
 typedef struct {
     lv_img_t img;
     lv_anim_t anim;
-    /*picture sequence */
-    lv_img_dsc_t ** dsc;
-    int8_t  pic_count;
 } lv_animimg_t;
 
 
@@ -65,11 +62,10 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent);
 
 /**
  * Set the image animation images source.
- * @param img pointer to an animation image object
- * @param dsc pointer to a series images
- * @param num images' number
+ * @param img  pointer to an animation image object
+ * @param srcs pointer to a series images, captured (use lv_img_src_from_arr likely)
  */
-void lv_animimg_set_src(lv_obj_t * img,  lv_img_dsc_t * dsc[], uint8_t num);
+void lv_animimg_set_src(lv_obj_t * img,  lv_img_src_t * srcs);
 
 /**
  * Startup the image animation.
@@ -97,9 +93,9 @@ void lv_animimg_set_repeat_count(lv_obj_t * img, uint16_t count);
 /**
  * Get the image animation images source.
  * @param img pointer to an animation image object
- * @return a pointer that will point to a series images
+ * @return a pointer that will point to an image source array that shouldn't be cleared.
  */
-lv_img_dsc_t ** lv_animimg_get_src(lv_obj_t * img);
+lv_img_src_t * lv_animimg_get_src(lv_obj_t * img);
 
 /**
  * Get the image animation images source.

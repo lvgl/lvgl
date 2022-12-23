@@ -176,8 +176,9 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 {
     LV_UNUSED(class_p);
 
+    lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_img_dsc_t * img = lv_canvas_get_img(obj);
-    lv_img_cache_invalidate_src(img);
+    lv_img_cache_invalidate_src(canvas->img.src);
 
     if(!img->data) {
         LV_LOG_INFO("canvas buffer is NULL");

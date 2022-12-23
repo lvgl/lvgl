@@ -8,12 +8,6 @@ LV_IMG_DECLARE(animimg001)
 LV_IMG_DECLARE(animimg002)
 LV_IMG_DECLARE(animimg003)
 
-static const lv_img_dsc_t * anim_imgs[3] = {
-    &animimg001,
-    &animimg002,
-    &animimg003,
-};
-
 static lv_obj_t * active_screen = NULL;
 static lv_obj_t * animimg = NULL;
 
@@ -42,33 +36,40 @@ void test_animimg_successful_create(void)
     TEST_ASSERT_NOT_NULL(animimg);
 }
 
+static lv_img_src_t * animimg_set_src()
+{
+    lv_img_src_t * anim_imgs[3] = {
+        lv_img_src_from_raw(&animimg001),
+        lv_img_src_from_raw(&animimg002),
+        lv_img_src_from_raw(&animimg003),
+    };
+    lv_img_src_t * srcs = lv_img_src_from_srcs(anim_imgs, 3);
+    lv_animimg_set_src(animimg, srcs);
+    return srcs;
+}
+
 void test_animimg_set_src(void)
 {
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, 3);
-
+    (void)animimg_set_src();
     TEST_ASSERT_NOT_NULL(animimg);
 }
 
 void test_animimg_get_src(void)
 {
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, 3);
+    lv_img_src_t * srcs = animimg_set_src();
+    lv_img_src_t * actual_srcs = lv_animimg_get_src(animimg);
 
-    lv_img_dsc_t ** actual_dsc = lv_animimg_get_src(animimg);
-
-    TEST_ASSERT_NOT_NULL(actual_dsc);
-    TEST_ASSERT_EQUAL_PTR(actual_dsc, anim_imgs);
+    TEST_ASSERT_NOT_NULL(actual_srcs);
+    TEST_ASSERT_EQUAL_PTR(actual_srcs, srcs);
 }
 
 
 void test_animimg_get_src_count(void)
 {
-    uint8_t expected_count = 3;
-
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, expected_count);
-
+    (void)animimg_set_src();
     uint8_t actual_count = lv_animimg_get_src_count(animimg);
 
-    TEST_ASSERT_EQUAL_UINT8(actual_count, expected_count);
+    TEST_ASSERT_EQUAL_UINT8(actual_count, 3);
 }
 
 void test_animimg_set_duration(void)
@@ -95,7 +96,7 @@ void test_animimg_start(void)
 {
     // for lv_animimg_start() to actually work,
     // we need to properly setup the widget beforehand
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, 3);
+    (void)animimg_set_src();
     lv_animimg_set_duration(animimg, 1000);
     lv_animimg_set_repeat_count(animimg, LV_ANIM_REPEAT_INFINITE);
 

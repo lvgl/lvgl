@@ -8,7 +8,7 @@ try:
     # Open an image from a file
     #
     img = lv.img(lv.scr_act())
-    img.set_src("ffmpeg.png")
+    img.set_src(lv.img_src_from_file("ffmpeg.png"))
     img.center()
 except Exception as e:
     print(e)

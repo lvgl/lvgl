@@ -64,13 +64,13 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t * dsc[], uint8_t num)
+void lv_animimg_set_src(lv_obj_t * obj,  lv_img_src_t * srcs)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
-    animimg->dsc = dsc;
-    animimg->pic_count = num;
-    lv_anim_set_values(&animimg->anim, 0, num - 1);
+    lv_img_set_src((lv_obj_t *)&animimg->img, srcs->type == LV_IMG_SRC_ARRAY ? srcs : lv_img_src_from_srcs(&srcs, 1));
+    lv_anim_set_values(&animimg->anim, 0, animimg->img.src->data_len - 1);
 }
 
 void lv_animimg_start(lv_obj_t * obj)
@@ -103,18 +103,18 @@ void lv_animimg_set_repeat_count(lv_obj_t * obj, uint16_t count)
  * Getter functions
  *====================*/
 
-lv_img_dsc_t ** lv_animimg_get_src(lv_obj_t * obj)
+lv_img_src_t * lv_animimg_get_src(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
-    return animimg->dsc;
+    return animimg->img.src;
 }
 
 uint8_t lv_animimg_get_src_count(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
-    return animimg->pic_count;
+    return animimg->img.src != NULL ? animimg->img.src->data_len : 0;
 }
 
 uint32_t lv_animimg_get_duration(lv_obj_t * obj)
@@ -142,8 +142,6 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_UNUSED(class_p);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
 
-    animimg->dsc = NULL;
-    animimg->pic_count = -1;
     //initial animation
     lv_anim_init(&animimg->anim);
     lv_anim_set_var(&animimg->anim, obj);
@@ -155,12 +153,10 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
 static void index_change(lv_obj_t * obj, int32_t index)
 {
-    lv_coord_t idx;
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
-
-    idx = index % animimg->pic_count;
-
-    lv_img_set_src(obj, lv_img_src_from_raw(animimg->dsc[idx]));
+    lv_img_src_t * src = animimg->img.src;
+    if(!src) return;
+    src->valid_index = index % src->data_len;
 }
 
 #endif

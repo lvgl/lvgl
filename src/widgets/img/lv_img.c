@@ -475,7 +475,7 @@ static void lv_img_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         lv_img_decoder_close(&dsc);
         img->dec_ctx = NULL;
     }
-    
+
     lv_img_src_free(img->src);
 
     if(img->anim_timer) {
