@@ -26,8 +26,8 @@ Alternatively, configure `LV_TICK_CUSTOM` (see `lv_conf.h`) so that LVGL can ret
 The buffer size can be set freely but 1/10 screen size is a good starting point.
 ```c
 static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
-lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_SER / 10);  /*Initialize the display buffer.*/
+static lv_color_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
+lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_RES / 10);  /*Initialize the display buffer.*/
 ```
 - Implement and register a function which can copy the rendered image to an area of your display:
 ```c
