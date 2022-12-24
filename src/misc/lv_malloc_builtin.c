@@ -124,6 +124,7 @@ void lv_mem_builtin_remove_pool(lv_mem_builtin_pool_t pool)
     _LV_LL_READ(&pool_ll, pool_p) {
         if(*pool_p == pool) {
             _lv_ll_remove(&pool_ll, pool_p);
+            lv_free(pool_p);
             lv_tlsf_remove_pool(tlsf, pool);
             return;
         }
