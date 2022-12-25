@@ -116,7 +116,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     //assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical 
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical
 
     if(dsc->src_buf) {
         // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
@@ -215,7 +215,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         }
     }
 
-    
+
 }
 
 // Does dest_stride = width(draw_ctx->buf_area) ?
@@ -228,7 +228,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical 
+    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical
     // FIXME:
     // 1. Both src_buf and dest_buf pixel size *must* be known to use DMA2D.
     // 2. Verify both buffers start addresses and lengths are 32-byte (cache row size) aligned.
@@ -306,11 +306,11 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
         // Note: unlike FGCOLR nad BGCOLR, OCOLR bits must match DMA2D_OUTPUT_COLOR, alpha can be specified
-    #if LV_COLOR_16_SWAP
+#if LV_COLOR_16_SWAP
         DMA2D->OCOLR = (color.ch.blue << 11) | (color.ch.green_l << 5 | color.ch.green_h << 8) | (color.ch.red);
-    #else
+#else
         DMA2D->OCOLR = color.full;
-    #endif
+#endif
     }
     else {
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
@@ -367,7 +367,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
 
     if(isSrcArgb32) {
         // src is ARGB32
-        DMA2D->FGPFCCR =DMA2D_INPUT_ARGB8888;
+        DMA2D->FGPFCCR = DMA2D_INPUT_ARGB8888;
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x2UL <<
@@ -391,9 +391,10 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
     }
 
     DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
-    if (isSrcArgb32) {
-        DMA2D->FGMAR = (uint32_t)(((lv_color32_t*)src_buf) + (src_stride * src_offset->y) + src_offset->x);
-    } else {
+    if(isSrcArgb32) {
+        DMA2D->FGMAR = (uint32_t)(((lv_color32_t *)src_buf) + (src_stride * src_offset->y) + src_offset->x);
+    }
+    else {
         DMA2D->FGMAR = (uint32_t)(((lv_color_t *)src_buf) + (src_stride * src_offset->y) + src_offset->x);
     }
     DMA2D->FGOR = src_stride - draw_width;
@@ -481,7 +482,7 @@ static void startDmaTransfer(void)
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     // Note: cleaning output buffer cache is needed only because buffer may be misaligned or adjacent area may be drawn in sw-fashion
     cleanCache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
-                        (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
+               (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
     DMA2D->CR |= DMA2D_CR_START;
     waitForDmaTransferToFinish(NULL); // FIXME: this line should not be needed here, but it is
 }
