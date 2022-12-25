@@ -348,11 +348,11 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
  * @brief Draws src (foreground) map on dst (background) map.
  * @param src_offset src offset in relation to dst, useful when src is larger than draw_area
  * @param opa constant opacity to be applied
- * @param isSrcArgb if TRUE, source buffer is ARGB, otherwise source buffer is xRGB
+ * @param isSrcArgb32 if TRUE, source buffer is ARGB32(8888), otherwise source buffer is xRGB/RGB
  */
 STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                          const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset,
-                                          lv_opa_t opa, bool isSrcArgb)
+                                          const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset,
+                                          lv_opa_t opa, bool isSrcArgb32)
 {
     assert_param(!isDma2dInProgess); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
@@ -362,17 +362,17 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
 
     if(opa >= LV_OPA_MAX) opa = 0xff;
 
-    DMA2D->FGPFCCR = DMA2D_INPUT_COLOR;
-
-    if(isSrcArgb) {
-        // src is ARGB
+    if(isSrcArgb32) {
+        // src is ARGB32
+        DMA2D->FGPFCCR =DMA2D_INPUT_ARGB8888;
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x2UL <<
                            DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 2: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
     }
     else {
-        // src is xRGB
+        DMA2D->FGPFCCR = DMA2D_INPUT_COLOR;
+        // src is RGB or xRGB
         if(opa == 0xff) {
             // no need to blend
             DMA2D->CR = 0x1UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with PFC (FG fetch only with FG PFC active)
@@ -388,10 +388,14 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
     }
 
     DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
-    DMA2D->FGMAR = (uint32_t)(src_buf + (src_stride * src_offset->y) + src_offset->x);
+    if (isSrcArgb32) {
+        DMA2D->FGMAR = (uint32_t)(((lv_color32_t*)src_buf) + (src_stride * src_offset->y) + src_offset->x);
+    } else {
+        DMA2D->FGMAR = (uint32_t)(((lv_color_t *)src_buf) + (src_stride * src_offset->y) + src_offset->x);
+    }
     DMA2D->FGOR = src_stride - draw_width;
     DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
-    cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_color_t));
+    cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, (isSrcArgb32 ? 4 : sizeof(lv_color_t)));
 
     DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
     DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
@@ -472,7 +476,7 @@ static void startDmaTransfer(void)
     assert_param(!isDma2dInProgess);
     isDma2dInProgess = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
-    // Note: cleaning output buffer cache is needed only because buffer may be misaligned
+    // Note: cleaning output buffer cache is needed only because buffer may be misaligned or adjacent area may be drawn in sw-fashion
     cleanCache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
                         (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
     DMA2D->CR |= DMA2D_CR_START;
