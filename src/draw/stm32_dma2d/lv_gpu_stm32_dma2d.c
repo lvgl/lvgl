@@ -476,19 +476,11 @@ static void startDmaTransfer(void)
     isDma2dInProgess = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     // Note: cleaning output buffer cache is needed only because buffer may be misaligned or adjacent area may be drawn in sw-fashion
-    static uint32_t callCount = 0;
-    static uint32_t timeCount = 0;
     cleanCache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
                (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
     DMA2D->CR |= DMA2D_CR_START;
-    dwt_reset();
     // Note: for some reason mask buffer gets damaged during transfer if waiting is postponed
     waitForDmaTransferToFinish(NULL); // FIXME: this line should not be needed here, but it is
-    callCount++;
-    timeCount += dwt_get_us();
-    if (callCount %100 == 0) {
-        printf("t: %.1f\n", (float)timeCount / callCount);
-    }
 }
 
 static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
