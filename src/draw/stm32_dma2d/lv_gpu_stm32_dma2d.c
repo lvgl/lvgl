@@ -59,7 +59,6 @@ static bool isDma2dInProgess = false; // indicates whether DMA2D transfer *initi
  *   GLOBAL FUNCTIONS
  **********************/
 
-
 // astyle --options=lvgl/scripts/code-format.cfg --ignore-exclude-errors lvgl/src/draw/stm32_dma2d/*.c lvgl/src/draw/stm32_dma2d/*.h
 
 /**
@@ -85,6 +84,7 @@ void lv_draw_stm32_dma2d_init(void)
 
     // AHB master timer configuration
     DMA2D->AMTCR = 0; // AHB bus guaranteed dead time disabled
+    //dwt_init(); // init µs timer
 }
 
 void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
@@ -218,6 +218,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
 // Does dest_stride = width(draw_ctx->buf_area) ?
 // Does dest_area = intersect(draw_ctx->clip_area, src_area) ?
+// See: https://github.com/lvgl/lvgl/issues/3714#issuecomment-1331710788
 void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
                                      const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
@@ -570,6 +571,51 @@ static void cleanCache(uint32_t address, lv_coord_t offset, lv_coord_t width, lv
 
     __DSB();
     __ISB();
+}
+
+// initialize µs timer
+static bool dwt_init(void)
+{
+    // disable TRC
+    CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk;
+    // enable TRC
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+    DWT->LAR = 0xC5ACCE55;
+
+    // disable clock cycle counter
+    DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;
+    // enable  clock cycle counter
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
+    // reset the clock cycle counter value
+    DWT->CYCCNT = 0;
+
+    // 3 NO OPERATION instructions
+    __ASM volatile("NOP");
+    __ASM volatile("NOP");
+    __ASM volatile("NOP");
+
+    // check if clock cycle counter has started
+    if(DWT->CYCCNT) {
+        return true; // clock cycle counter started
+    }
+    else {
+        return false; // clock cycle counter not started
+    }
+}
+
+// get elapsed µs since reset
+__STATIC_INLINE uint32_t dwt_get_us()
+{
+    uint32_t us = (DWT->CYCCNT * 1000000) / HAL_RCC_GetHCLKFreq();
+    return us;
+}
+
+// reset µs timer
+__STATIC_INLINE void dwt_reset()
+{
+    DWT->CYCCNT = 0;
 }
 
 #endif

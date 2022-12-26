@@ -74,6 +74,10 @@ static void invalidateCache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_
 static void cleanCache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height,
                        uint8_t pixelSize);
 
+static bool dwt_init(void);
+static void dwt_reset(void);
+static uint32_t dwt_get_us(void);
+
 /**********************
  *      MACROS
  **********************/
