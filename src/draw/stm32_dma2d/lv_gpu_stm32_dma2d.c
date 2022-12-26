@@ -315,7 +315,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->FGPFCCR = DMA2D_INPUT_A8;
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x1UL <<
-                           DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
+                           DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by FGPFCCR.ALPHA
         //DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
 
         // Note: in Alpha Mode 1 FGMAR and FGOR are not used to supply foreground A8 bytes,
@@ -367,7 +367,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x2UL <<
-                           DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 2: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+                           DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 2: Replace original foreground image alpha channel value by FGPFCCR.ALPHA multiplied with original alpha channel value
     }
     else {
         DMA2D->FGPFCCR = DMA2D_INPUT_COLOR;
@@ -382,7 +382,7 @@ STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_
             DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
             DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
             DMA2D->FGPFCCR |= (0x1UL <<
-                               DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by ALPHA[7:0]
+                               DMA2D_FGPFCCR_AM_Pos); // Alpha Mode 1: Replace original foreground image alpha channel value by FGPFCCR.ALPHA
         }
     }
 
@@ -438,7 +438,7 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dest_buf, lv_coor
     if(opa < LV_OPA_MAX) {
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x2UL <<
-                           DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
+                           DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by FGPFCCR.ALPHA multiplied with original alpha channel value
     }
     //DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
     DMA2D->FGMAR = (uint32_t)(mask_buf + (mask_stride * mask_offset->y) + mask_offset->x);
