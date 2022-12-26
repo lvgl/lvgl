@@ -216,14 +216,11 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     }
 }
 
-// Does dest_stride = width(draw_ctx->buf_area) ?
 // Does dest_area = intersect(draw_ctx->clip_area, src_area) ?
 // See: https://github.com/lvgl/lvgl/issues/3714#issuecomment-1331710788
 void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
                                      const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
-    // Note: x1 must be zero. Otherwise, there is no way to correctly calculate dest_stride and drawBufferLength.
-    assert_param(draw_ctx->buf_area->x1 == 0); // critical
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical
@@ -478,11 +475,19 @@ static void startDmaTransfer(void)
     isDma2dInProgess = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     // Note: cleaning output buffer cache is needed only because buffer may be misaligned or adjacent area may be drawn in sw-fashion
+    static uint32_t callCount = 0;
+    static uint32_t timeCount = 0;
     cleanCache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
                (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
     DMA2D->CR |= DMA2D_CR_START;
+    dwt_reset();
     // Note: for some reason mask buffer gets damaged during transfer if waiting is postponed
     waitForDmaTransferToFinish(NULL); // FIXME: this line should not be needed here, but it is
+    callCount++;
+    timeCount += dwt_get_us();
+    if (callCount %100 == 0) {
+        printf("t: %.1f\n", (float)timeCount / callCount);
+    }
 }
 
 static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv)
