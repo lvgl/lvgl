@@ -192,7 +192,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 #else
             // Note: 16-bit bitmap hardware blending with mask and background is possible, but requires a temp 24 or 32-bit buffer to combine bitmap with mask first.
             // In case of 32-bit bitmap existing buffer is used
-            lv_draw_sw_blend_basic(draw_ctx, dsc);
+            lv_draw_sw_blend_basic(draw_ctx, dsc); // (e.g. Shop Items)
 #endif
         }
     }
@@ -214,8 +214,6 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
                                           false);
         }
     }
-
-
 }
 
 // Does dest_stride = width(draw_ctx->buf_area) ?
@@ -274,10 +272,9 @@ STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
             src_offset.x = draw_area.x1 - src_area->x1;
             src_offset.y = draw_area.y1 - src_area->y1;
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-            // TODO: It is assumed that img->data buffer is of lv_color_t type. Verify it, this assumption may be incorrect.
+            // TODO: It is assumed that img->data buffer is of lv_color_t type. This assumption may be incorrect.
             lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, (lv_color_t *)img->data, img->header.w,
-                                          &src_offset,
-                                          dsc->opa, true);
+                                          &src_offset, dsc->opa, true);
             return LV_RES_OK;
         }
     }
@@ -306,7 +303,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
         // Note: unlike FGCOLR nad BGCOLR, OCOLR bits must match DMA2D_OUTPUT_COLOR, alpha can be specified
-#if LV_COLOR_16_SWAP
+#if RBS_BIT
         DMA2D->OCOLR = (color.ch.blue << 11) | (color.ch.green_l << 5 | color.ch.green_h << 8) | (color.ch.red);
 #else
         DMA2D->OCOLR = color.full;
@@ -325,8 +322,7 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
         // those bytes are replaced by constant ALPHA defined in FGPFCCR
         DMA2D->FGMAR = (uint32_t)dest_buf;
         DMA2D->FGOR = dest_stride;
-        // FIXME: swap FGCOLR R/B bits if RBS_BIT is set
-        DMA2D->FGCOLR = lv_color_to32(color) & 0x00ffffff; // swap FGCOLR R/B bits if FGPFCCR.RBS bit is set
+        DMA2D->FGCOLR = lv_color_to32(color) & 0x00ffffff; // swap FGCOLR R/B bits if FGPFCCR.RBS (RBS_BIT) bit is set
 
         DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
         DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
@@ -444,10 +440,10 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dest_buf, lv_coor
         DMA2D->FGPFCCR |= (0x2UL <<
                            DMA2D_FGPFCCR_AM_Pos); // Alpha Mode: Replace original foreground image alpha channel value by ALPHA[7:0] multiplied with original alpha channel value
     }
+    //DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
     DMA2D->FGMAR = (uint32_t)(mask_buf + (mask_stride * mask_offset->y) + mask_offset->x);
     DMA2D->FGOR = mask_stride - draw_width;
-    // FIXME: swap FGCOLR R/B bits if RBS_BIT is set
-    DMA2D->FGCOLR = lv_color_to32(color) & 0x00ffffff;  // swap FGCOLR R/B bits if FGPFCCR.RBS bit is set
+    DMA2D->FGCOLR = lv_color_to32(color) & 0x00ffffff;  // swap FGCOLR R/B bits if FGPFCCR.RBS (RBS_BIT) bit is set
     cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_opa_t));
 
     DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
@@ -484,6 +480,7 @@ static void startDmaTransfer(void)
     cleanCache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
                (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
     DMA2D->CR |= DMA2D_CR_START;
+    // Note: for some reason mask buffer gets damaged during transfer if waiting is postponed
     waitForDmaTransferToFinish(NULL); // FIXME: this line should not be needed here, but it is
 }
 
