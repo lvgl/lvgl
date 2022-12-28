@@ -63,7 +63,7 @@ indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*
 indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+void my_touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
     /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
     if(touchpad_is_pressed()) {
