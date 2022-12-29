@@ -267,8 +267,11 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
     do {
         entry = readdir(handle->dir_p);
         if(entry) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
             if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
             else strcpy(fn, entry->d_name);
+#pragma GCC diagnostic pop
         }
         else {
             strcpy(fn, "");
