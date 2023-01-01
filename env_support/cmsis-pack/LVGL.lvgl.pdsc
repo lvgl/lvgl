@@ -36,11 +36,9 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-12-18" version="1.0.12-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.12-alpha.pack">
+    <release date="2022-12-31" version="1.0.12" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.12.pack">
       - LVGL 9.0.0-dev
-      - Montyly update for December
-      - Fix ARM2D Transform Support
-      - Add Barcode
+      - The final update for 2022, Happy New Year
     </release>
     <release date="2022-11-28" version="1.0.11" url="https://github.com/lvgl/lvgl/raw/f433ed62248cafd915848ff4d0720f97fb0fc7fd/env_support/cmsis-pack/LVGL.lvgl.1.0.11.pack">
       - LVGL 9.0.0-dev
@@ -189,6 +187,72 @@
         <condition id="Arm-2D">
             <description>Require Arm-2D Support</description>
             <require Cclass="Acceleration" Cgroup="Arm-2D"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-Arm-2D">
+            <description>Enable LVGL Arm-2D GPU Support</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>-->
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-STM32-DMA2D">
+            <description>Enable LVGL Arm-2D GPU Support</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>-->
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-SWM341-DMA2D">
+            <description>Enable LVGL Arm-2D GPU Support</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>-->
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-NXP-PXP">
+            <description>Enable LVGL Arm-2D GPU Support</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>-->
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-NXP-VGLite">
+            <description>Enable LVGL Arm-2D GPU Support</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>-->
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+        </condition>
+        
+        <condition id="LVGL-GPU-GD32-IPA">
+            <description>Enable LVGL Arm-2D GPU Support</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>-->
         </condition>
 
     </conditions>
@@ -443,10 +507,10 @@
               </files>
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-Essential" Cversion="1.2.0">
+            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-GPU-Arm-2D" Cversion="1.2.0">
               <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
               <files>
-              <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
+                <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
               </files>
 
               <RTE_Components_h>
@@ -458,10 +522,10 @@
 
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU STM32-DMA2D"  condition="LVGL-Essential">
+            <component Cgroup="lvgl" Csub="GPU STM32-DMA2D"  condition="LVGL-GPU-STM32-DMA2D">
               <description>An hardware acceleration from STM32-DMA2D</description>
               <files>
-              <file category="sourceC"      name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c" />
+                <file category="sourceC"      name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c" />
               </files>
 
               <RTE_Components_h>
@@ -472,10 +536,10 @@
 
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU SWM341-DMA2D"  condition="LVGL-Essential">
+            <component Cgroup="lvgl" Csub="GPU SWM341-DMA2D"  condition="LVGL-GPU-SWM341-DMA2D">
               <description>An hardware acceleration from SWM341-DMA2D</description>
               <files>
-              <file category="sourceC"      name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c" />
+                <file category="sourceC"      name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c" />
               </files>
 
               <RTE_Components_h>
@@ -486,13 +550,13 @@
 
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-Essential">
+            <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-GPU-NXP-PXP">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
-              <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
-              <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_blend.c" />
-              <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c" />
-              <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c" />
+                <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
+                <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_blend.c" />
+                <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c" />
+                <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c" />
               </files>
 
               <RTE_Components_h>
@@ -503,14 +567,14 @@
 
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU NXP-VGLite"  condition="LVGL-Essential">
+            <component Cgroup="lvgl" Csub="GPU NXP-VGLite"  condition="LVGL-GPU-NXP-VGLite">
               <description>An hardware acceleration from NXP-VGLite</description>
               <files>
-              <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
-              <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
-              <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_blend.c" />
-              <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_rect.c" />
-              <file category="sourceC"      name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c" />
+                <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_blend.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_rect.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c" />
               </files>
 
               <RTE_Components_h>
@@ -521,10 +585,10 @@
 
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU GD32-IPA"  condition="LVGL-Essential">
+            <component Cgroup="lvgl" Csub="GPU GD32-IPA"  condition="LVGL-GPU-GD32-IPA">
               <description>An hardware acceleration from GD32-IPA</description>
               <files>
-              <file category="sourceC"      name="src/draw/gd32_ipa/lv_gpu_gd32_ipa.c" />
+                <file category="sourceC"      name="src/draw/gd32_ipa/lv_gpu_gd32_ipa.c" />
               </files>
 
               <RTE_Components_h>
