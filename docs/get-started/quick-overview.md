@@ -26,8 +26,8 @@ Alternatively, configure `LV_TICK_CUSTOM` (see `lv_conf.h`) so that LVGL can ret
 The buffer size can be set freely but 1/10 screen size is a good starting point.
 ```c
 static lv_disp_draw_buf_t draw_buf;
-static lv_color_t buf1[DISP_HOR_RES * DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
-lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_SER / 10);  /*Initialize the display buffer.*/
+static lv_color_t buf1[MY_DISP_HOR_RES * MY_DISP_VER_RES / 10];                        /*Declare a buffer for 1/10 screen size*/
+lv_disp_draw_buf_init(&draw_buf, buf1, NULL, MY_DISP_HOR_RES * MY_DISP_VER_RES / 10);  /*Initialize the display buffer.*/
 ```
 - Implement and register a function which can copy the rendered image to an area of your display:
 ```c
@@ -63,7 +63,7 @@ indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*
 indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-void my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+void my_touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
     /*`touchpad_is_pressed` and `touchpad_get_xy` needs to be implemented by you*/
     if(touchpad_is_pressed()) {
