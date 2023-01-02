@@ -234,8 +234,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     src_offset.y = dest_area->y1 - src_area->y1;
     // FIXME: use lv_area_move(dest_area, -dest_area->x1, -dest_area->y1) here ?
     // TODO: It is assumed that dest_buf and src_buf buffers are of lv_color_t type. Verify it, this assumption may be incorrect.
-    // TODO: Consider using a separate method using DMA2D.CR=0 (no blending, no PFC)
-    lv_draw_stm32_dma2d_blend_map(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_offset, 0xff, false);
+    lv_draw_stm32_dma2d_copy_buffer(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_offset);
     waitForDmaTransferToFinish(NULL); // TODO: is this line needed here?
 }
 
@@ -346,7 +345,8 @@ STATIC void lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord
  * @brief Draws src (foreground) map on dst (background) map.
  * @param src_offset src offset in relation to dst, useful when src is larger than draw_area
  * @param opa constant opacity to be applied
- * @param isSrcArgb32 if TRUE, source buffer is ARGB32(8888), otherwise source buffer is xRGB/RGB
+ * @param isSrcArgb32 If TRUE, source buffer is ARGB32(8888), regardless of LV_COLOR_DEPTH.
+ * If FALSE, source buffer is described by LV_COLOR_DEPTH.
  */
 STATIC void lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                           const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset,
@@ -457,6 +457,48 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dest_buf, lv_coor
     DMA2D->OMAR = DMA2D->BGMAR;
     DMA2D->OOR = DMA2D->BGOR;
     DMA2D->OCOLR = 0;
+    // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
+    DMA2D->NLR = (draw_width << DMA2D_NLR_PL_Pos) | (draw_height << DMA2D_NLR_NL_Pos);
+
+    startDmaTransfer();
+}
+
+/**
+ * @brief Copies src (foreground) map to the dst (background) map.
+ * @param src_offset src offset in relation to dst, useful when src is larger than draw_area
+ */
+STATIC void lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
+                                          const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset)
+{
+    assert_param(!isDma2dInProgess); // critical
+    lv_coord_t draw_width = lv_area_get_width(draw_area);
+    lv_coord_t draw_height = lv_area_get_height(draw_area);
+
+    waitForDmaTransferToFinish(NULL);
+
+    DMA2D->CR = 0x0UL; // Memory-to-memory (FG fetch only)
+
+    DMA2D->FGPFCCR = DMA2D_INPUT_COLOR;
+    DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
+    DMA2D->FGMAR = (uint32_t)(((lv_color_t *)src_buf) + (src_stride * src_offset->y) + src_offset->x);
+
+    DMA2D->FGOR = src_stride - draw_width;
+    DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
+    cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_color_t));
+
+    DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
+    DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
+    DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
+    DMA2D->BGOR = dest_stride - draw_width;
+    DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
+    cleanCache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
+
+    DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+    DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
+    DMA2D->OMAR = DMA2D->BGMAR;
+    DMA2D->OOR = DMA2D->BGOR;
+    DMA2D->OCOLR = 0;
+
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
     DMA2D->NLR = (draw_width << DMA2D_NLR_PL_Pos) | (draw_height << DMA2D_NLR_NL_Pos);
 

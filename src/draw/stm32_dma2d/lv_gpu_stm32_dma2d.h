@@ -66,7 +66,8 @@ STATIC void lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dst_buf, lv_coord
                                             lv_color_t color, lv_opa_t opa);
 STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
                                         const void * src);
-
+STATIC void lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
+                                          const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset);
 static void waitForDmaTransferToFinish(lv_disp_drv_t * disp_drv);
 static void startDmaTransfer(void);
 static void invalidateCache(uint32_t sourceAddress, lv_coord_t offset, lv_coord_t width, lv_coord_t height,
