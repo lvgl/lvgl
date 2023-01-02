@@ -46,13 +46,13 @@ void lv_mem_deinit_builtin(void);
  * @param bytes memory block size
  * @return pointer to lv_mem_builtin_pool handle
  */
-lv_mem_builtin_pool_t * lv_mem_builtin_add_pool(void * mem, size_t bytes);
+lv_mem_builtin_pool_t lv_mem_builtin_add_pool(void * mem, size_t bytes);
 
 /**
  * Remove the memory pool.
  * @param lv_mem_builtin_pool_t pointer to lv_mem_builtin_pool handle
  */
-void lv_mem_builtin_remove_pool(lv_mem_builtin_pool_t * pool);
+void lv_mem_builtin_remove_pool(lv_mem_builtin_pool_t pool);
 
 void * lv_malloc_builtin(size_t size);
 void * lv_realloc_builtin(void * p, size_t new_size);
