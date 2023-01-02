@@ -481,7 +481,6 @@ STATIC void lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coor
     DMA2D->FGPFCCR = DMA2D_INPUT_COLOR;
     DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
     DMA2D->FGMAR = (uint32_t)(((lv_color_t *)src_buf) + (src_stride * src_offset->y) + src_offset->x);
-
     DMA2D->FGOR = src_stride - draw_width;
     DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
     cleanCache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_color_t));
