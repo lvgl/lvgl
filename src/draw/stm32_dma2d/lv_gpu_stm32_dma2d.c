@@ -38,28 +38,10 @@
 
 #define CACHE_ROW_SIZE 32U // cache row size in Bytes
 
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-static bool isDma2dInProgess = false; // indicates whether DMA2D transfer *initiated here* is in progress
-
-/**********************
- *      MACROS
- **********************/
-
-/**********************
- *   GLOBAL FUNCTIONS
- **********************/
-
+// For code/implementation discussion refer to https://github.com/lvgl/lvgl/issues/3714#issuecomment-1365187036
 // astyle --options=lvgl/scripts/code-format.cfg --ignore-exclude-errors lvgl/src/draw/stm32_dma2d/*.c lvgl/src/draw/stm32_dma2d/*.h
+
+static bool isDma2dInProgess = false; // indicates whether DMA2D transfer *initiated here* is in progress
 
 /**
  * Turn on the peripheral and set output color mode, this only needs to be done once
