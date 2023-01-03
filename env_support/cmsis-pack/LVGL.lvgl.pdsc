@@ -27,18 +27,17 @@
   <url>https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/</url>
   <supportContact>https://github.com/lvgl/lvgl/issues/new/choose</supportContact>
   <license>LICENCE.txt</license>
-  <!-- optional license file -->
-  <!--
-  <license>
-  </license>
-  -->
 
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-01-15" version="1.1.0-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
+    <release date="2023-01-25" version="1.1.0-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
       - LVGL 9.0.0-dev
-      - Monthly update for January
+      - Update for the CMSIS pack
+        * Rework components to get more granulated sub-groups
+        * Implement conditions for better dependencies check
+        * Add the missing hearder files included by lvgl.h
+        * Add more widgets and demos
     </release>
     <release date="2022-12-31" version="1.0.12" url="https://github.com/lvgl/lvgl/raw/7d0de1aabeabd4c71231895df7a503a3313b4619/env_support/cmsis-pack/LVGL.lvgl.1.0.12.pack">
       - LVGL 9.0.0-dev
@@ -61,7 +60,7 @@
     </release>
     <release date="2022-08-30" version="1.0.8" url="https://github.com/lvgl/lvgl/raw/eb2e296d23b009aca7daf0e9be062d05b4b0048a/env_support/cmsis-pack/LVGL.lvgl.1.0.8.pack">
       - LVGL 9.0.0-dev
-      - Add the binding for pikascript (an ultra-light-weight python VM) 
+      - Add the binding for pikascript (an ultra-light-weight python VM)
       - Montyly update for August
     </release>
     <release date="2022-07-29" version="1.0.7" url="https://github.com/lvgl/lvgl/raw/b454a66e0be85976385c81cf9c9025f272a66f5d/env_support/cmsis-pack/LVGL.lvgl.1.0.7.pack">
@@ -114,6 +113,12 @@
     </release>
   </releases>
 
+  <!-- optional taxonomy section for defining new component Class and Group names -->
+  <!--
+  <taxonomy>
+  </taxonomy>
+  -->
+
   <keywords>
     <!-- keywords for indexing -->
     <keyword>Cortex-M</keyword>
@@ -121,176 +126,330 @@
     <keyword>Performance Analaysis</keyword>
   </keywords>
 
-    <conditions>
-        <!--
-        <condition id="Arm Compiler">
-            <description>Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang).</description>
-            <accept Tcompiler="ARMCC" Toptions="AC6"/>
-            <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
-            <accept Tcompiler="ARMCC" Toptions="AC5"/>
-        </condition>
-        <condition id="Arm GCC">
-            <description>GNU Tools for Arm Embedded Processors.</description>
-            <accept Tcompiler="GCC"/>
-        </condition>
-        <condition id="Cortex-M Processors">
-            <description>Support All Cortex-M based processors</description>
-            <accept  Dcore="Cortex-M0"/>
-            <accept  Dcore="Cortex-M0+"/>
-            <accept  Dcore="Cortex-M1"/>
-            <accept  Dcore="Cortex-M3"/>
-            <accept  Dcore="Cortex-M4"/>
-            <accept  Dcore="Cortex-M7"/>
-            <accept  Dcore="Cortex-M23"/>
-            <accept  Dcore="Cortex-M33"/>
-            <accept  Dcore="Cortex-M35P"/>
-            <accept  Dcore="Cortex-M55"/>
-            <accept  Dcore="SC000"/>
-            <accept  Dcore="SC300"/>
-            <accept  Dcore="ARMV8MBL"/>
-            <accept  Dcore="ARMV8MML"/>
-        </condition>
-
-        <condition id="CMSIS-CORE">
-            <description>Require CMSIS-CORE Support</description>
-            <require Cclass="CMSIS" Cgroup="CORE"/>
-        </condition>
-
-
-
-        <condition id="Cortex-M Arm GCC">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm GCC"/>
-            <require condition="Cortex-M Processors"/>
-        </condition>
-        <condition id="Cortex-M Arm Compiler">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm Compiler"/>
-            <require condition="Cortex-M Processors"/>
-        </condition>
-
-        <condition id="Cortex-M Arm GCC CMSIS-CORE">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm GCC"/>
-            <require condition="Cortex-M Processors"/>
-            <require condition="CMSIS-CORE"/>
-        </condition>
-        <condition id="Cortex-M Arm Compiler CMSIS-CORE">
-            <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
-            <require condition="Arm Compiler"/>
-            <require condition="Cortex-M Processors"/>
-            <require condition="CMSIS-CORE"/>
-        </condition>
-        -->
-
-        <condition id="LVGL-Essential">
-            <description>Require LVGL Essential Service</description>
-            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
-        </condition>
-
-        <condition id="Arm-2D">
-            <description>Require Arm-2D Support</description>
-            <require Cclass="Acceleration" Cgroup="Arm-2D"/>
-        </condition>
-        
-        <condition id="LVGL-GPU-Arm-2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
-            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>-->
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
-        </condition>
-        
-        <condition id="LVGL-GPU-STM32-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
-            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>-->
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
-        </condition>
-        
-        <condition id="LVGL-GPU-SWM341-DMA2D">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
-            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>-->
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
-        </condition>
-        
-        <condition id="LVGL-GPU-NXP-PXP">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
-            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>-->
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
-        </condition>
-        
-        <condition id="LVGL-GPU-NXP-VGLite">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
-            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>-->
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
-        </condition>
-        
-        <condition id="LVGL-GPU-GD32-IPA">
-            <description>Enable LVGL Arm-2D GPU Support</description>
-            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
-            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
-            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>-->
-        </condition>
-
-    </conditions>
-  <!-- apis section (optional - for Application Programming Interface descriptions) -->
-  <!--
-  <apis>
-  </apis>
-  -->
-
-  <!-- boards section (mandatory for Board Support Packs) -->
-  <!--
-  <boards>
-  </boards>
-  -->
-
   <!-- devices section (mandatory for Device Family Packs) -->
   <!--
   <devices>
   </devices>
   -->
 
-  <!-- examples section (optional for all Software Packs)-->
+  <!-- apis section (optional - for Application Programming Interface descriptions) -->
   <!--
-  <examples>
-  </examples>
+  <apis>
+  </apis>
   -->
 
   <!-- conditions section (optional for all Software Packs)-->
-  <!--
   <conditions>
-  </conditions>
-  -->
+    <!--
+    <condition id="Arm Compiler">
+        <description>Arm Compiler 5 (armcc) or Arm Compiler 6 (armclang).</description>
+        <accept Tcompiler="ARMCC" Toptions="AC6"/>
+        <accept Tcompiler="ARMCC" Toptions="AC6LTO"/>
+        <accept Tcompiler="ARMCC" Toptions="AC5"/>
+    </condition>
+    <condition id="Arm GCC">
+        <description>GNU Tools for Arm Embedded Processors.</description>
+        <accept Tcompiler="GCC"/>
+    </condition>
+    <condition id="Cortex-M Processors">
+        <description>Support All Cortex-M based processors</description>
+        <accept  Dcore="Cortex-M0"/>
+        <accept  Dcore="Cortex-M0+"/>
+        <accept  Dcore="Cortex-M1"/>
+        <accept  Dcore="Cortex-M3"/>
+        <accept  Dcore="Cortex-M4"/>
+        <accept  Dcore="Cortex-M7"/>
+        <accept  Dcore="Cortex-M23"/>
+        <accept  Dcore="Cortex-M33"/>
+        <accept  Dcore="Cortex-M35P"/>
+        <accept  Dcore="Cortex-M55"/>
+        <accept  Dcore="SC000"/>
+        <accept  Dcore="SC300"/>
+        <accept  Dcore="ARMV8MBL"/>
+        <accept  Dcore="ARMV8MML"/>
+    </condition>
 
-    <components>
+    <condition id="CMSIS-CORE">
+        <description>Require CMSIS-CORE Support</description>
+        <require Cclass="CMSIS" Cgroup="CORE"/>
+    </condition>
+
+    <condition id="Cortex-M Arm GCC">
+        <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+        <require condition="Arm GCC"/>
+        <require condition="Cortex-M Processors"/>
+    </condition>
+    <condition id="Cortex-M Arm Compiler">
+        <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+        <require condition="Arm Compiler"/>
+        <require condition="Cortex-M Processors"/>
+    </condition>
+
+    <condition id="Cortex-M Arm GCC CMSIS-CORE">
+        <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+        <require condition="Arm GCC"/>
+        <require condition="Cortex-M Processors"/>
+        <require condition="CMSIS-CORE"/>
+    </condition>
+    <condition id="Cortex-M Arm Compiler CMSIS-CORE">
+        <description>Compile Cortex-M Processors with GNU Tools for Arm Embedded Processors.</description>
+        <require condition="Arm Compiler"/>
+        <require condition="Cortex-M Processors"/>
+        <require condition="CMSIS-CORE"/>
+    </condition>
+    -->
+
+    <condition id="Arm-2D">
+        <description>Require Arm-2D Support</description>
+        <require Cclass="Acceleration" Cgroup="Arm-2D"/>
+    </condition>
+
+    <!-- LVGL Conditions -->
+    <condition id="LVGL-Essential">
+        <description>Require LVGL Essential Service</description>
+        <require Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+    </condition>
+
+    <condition id="LVGL-GPU-Arm-2D">
+        <description>Enable LVGL Arm-2D GPU Support</description>
+        <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>-->
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+    </condition>
+
+    <condition id="LVGL-GPU-STM32-DMA2D">
+        <description>Enable LVGL Arm-2D GPU Support</description>
+        <require Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+        <!--<deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>-->
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+    </condition>
+
+    <condition id="LVGL-GPU-SWM341-DMA2D">
+        <description>Enable LVGL Arm-2D GPU Support</description>
+        <require Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+        <!--<deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>-->
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+    </condition>
+
+    <condition id="LVGL-GPU-NXP-PXP">
+        <description>Enable LVGL Arm-2D GPU Support</description>
+        <require Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+        <!--<deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>-->
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+    </condition>
+
+    <condition id="LVGL-GPU-NXP-VGLite">
+        <description>Enable LVGL Arm-2D GPU Support</description>
+        <require Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+        <!--<deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>-->
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+    </condition>
+
+    <condition id="LVGL-GPU-GD32-IPA">
+        <description>Enable LVGL Arm-2D GPU Support</description>
+        <require Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+        <deny Cbundle="LVGL" Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+        <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>-->
+    </condition>
+
+    <!-- LVGL9 Conditions -->
+    <condition id="LVGL9-Essential">
+      <description>Require LVGL Essential</description>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Essential"/>
+    </condition>
+
+    <condition id="STM32-DMA2D HAL">
+        <description>STM32-DMA2D HAL Dependencies</description>
+        <require condition="LVGL9-Essential"/>
+        <require Dvendor="STMicroelectronics:13"/>
+        <deny Cbundle="STMicro_Driver" Cclass="Device" Cgroup="DMA2D" Csub="HAL"/> <!-- STM32CubeMX: DMA2D HAL -->
+        <require Cclass="Device" Cgroup="STM32Cube HAL" Csub="DMA2D"/> <!-- Keil: DMA2D HAL -->
+    </condition>
+
+    <condition id="STM32-DMA2D HAL - STM32CubeMX">
+        <description>STM32-DMA2D HAL Dependencies as defined in STM32CubeMX</description>
+        <require condition="LVGL9-Essential"/>
+        <require Dvendor="STMicroelectronics:13"/>
+        <deny Cclass="Device" Cgroup="STM32Cube HAL" Csub="DMA2D"/> <!-- Keil: DMA2D HAL -->
+        <!-- <require Cbundle="STMicro_Driver" Cclass="Device" Cgroup="DMA2D" Csub="HAL"/> --> <!-- STM32CubeMX: DMA2D HAL (NOT YET IMPLEMENTED) -->
+    </condition>
+
+    <condition id="Arm-2D HAL">
+        <description>Arm-2D HAL Dependencies</description>
+        <require condition="LVGL9-Essential"/>
+        <deny Dvendor="STMicroelectronics:13"/>
+    </condition>
+
+    <condition id="SWM341-DMA2D HAL">
+        <description>SWM341-DMA2D HAL Dependencies</description>
+        <require condition="LVGL9-Essential"/>
+        <deny Dvendor="STMicroelectronics:13"/>
+    </condition>
+
+    <condition id="NXP-PXP HAL">
+        <description>NXP-PXP HAL Dependencies</description>
+        <require condition="LVGL9-Essential"/>
+        <deny Dvendor="STMicroelectronics:13"/>
+    </condition>
+
+    <condition id="NXP-VGLite HAL">
+        <description>NXP-VGLite HAL Dependencies</description>
+        <require condition="LVGL9-Essential"/>
+        <deny Dvendor="STMicroelectronics:13"/>
+    </condition>
+
+    <condition id="GD32-IPA HAL">
+        <description>GD32-IPA HAL Dependencies</description>
+        <require condition="LVGL9-Essential"/>
+        <deny Dvendor="STMicroelectronics:13"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Animing">
+      <description>Required modules for the Animing widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Image"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Dropdown">
+      <description>Required modules for the Dropdown widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Label"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Image">
+      <description>Required modules for the Image widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Label"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Keyboard">
+      <description>Required modules for the Keyboard widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Buttons Matrix"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Text Area"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Message Box">
+      <description>Required modules for the Message Box widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Buttons Matrix"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Label"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Roller">
+      <description>Required modules for the Roller widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Label"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Slider">
+      <description>Required modules for the Slider widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Bar"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Spin Box">
+      <description>Required modules for the Spin Box widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Text Area"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Spinner">
+      <description>Required modules for the Spinner widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Arc"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Table">
+      <description>Required modules for the Table widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Label"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets Text Area">
+      <description>Required modules for the Text Area widget</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Label"/>
+    </condition>
+
+    <condition id="LVGL-Extra Widgets">
+      <description>Require Extra Widgets</description>
+      <require condition="LVGL9-Essential"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Animing"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Arc"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Bar"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Buttons"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Buttons Matrix"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Calendar"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Canvas"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Chart"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Checkbox"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Color Wheel"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Dropdown"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Image"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Image Button"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Keyboard"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Label"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="LED"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Line"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="List"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Menu"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Meter"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Message Box"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Roller"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Slider"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Span"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Spin Box"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Spinner"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Switch"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Table"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Tab View"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Text Area"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Title View"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Extra Widgets" Csub="Window"/>
+    </condition>
+
+    <condition id="LVGL-Extras">
+      <description>Require Extras</description>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Themes" Csub="Basic"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Layouts" Csub="Flex"/>
+      <require Cbundle="LVGL9" Cclass="LVGL" Cgroup="Layouts" Csub="Grid"/>
+      <require condition="LVGL-Extra Widgets"/>
+    </condition>
+
+    <condition id="LVGL-ThemeDefault">
+      <description>Require Theme Default</description>
+      <accept Cbundle="LVGL9" Cclass="LVGL" Cgroup="Themes" Csub="Default Dark"/>
+      <accept Cbundle="LVGL9" Cclass="LVGL" Cgroup="Themes" Csub="Default Light"/>
+    </condition>
+  </conditions>
+
+  <components>
+    <!-- LVGL -->
         <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="9.0.0-dev">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
@@ -925,12 +1084,1314 @@
 
             </component>
         </bundle>
-    </components>
 
-  <!-- optional taxonomy section for defining new component Class and Group names -->
+    <!-- LVGL9 -->
+    <bundle Cbundle="LVGL9" Cclass="LVGL" Cversion="9.0.0-dev">
+      <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
+      <doc></doc>
+      <!-- LVGL Core -->
+      <component Cgroup="Essential" Cversion="9.0.0-dev">
+        <description>The Essential services of LVGL (without extra content)</description>
+        <files>
+          <!-- src/core -->
+          <file category="include"      name="src/"/>
+          <file category="sourceC"      name="src/core/lv_theme.c"/>
+          <file category="sourceC"      name="src/core/lv_indev_scroll.c"/>
+          <file category="sourceC"      name="src/core/lv_obj.c"/>
+          <file category="sourceC"      name="src/core/lv_refr.c"/>
+          <file category="sourceC"      name="src/core/lv_obj_pos.c"/>
+          <file category="sourceC"      name="src/core/lv_obj_style_gen.c"/>
+          <file category="sourceC"      name="src/core/lv_obj_class.c"/>
+          <file category="sourceC"      name="src/core/lv_obj_tree.c"/>
+          <file category="sourceC"      name="src/core/lv_indev.c"/>
+          <file category="sourceC"      name="src/core/lv_disp.c"/>
+          <file category="sourceC"      name="src/core/lv_obj_scroll.c"/>
+          <file category="sourceC"      name="src/core/lv_event.c"/>
+          <file category="sourceC"      name="src/core/lv_obj_draw.c"/>
+          <file category="sourceC"      name="src/core/lv_group.c"/>
+          <file category="sourceC"      name="src/core/lv_obj_style.c"/>
+          <file category="header"       name="src/core/lv_disp.h"/>
+          <file category="header"       name="src/core/lv_event.h"/>
+          <file category="header"       name="src/core/lv_group.h"/>
+          <file category="header"       name="src/core/lv_indev.h"/>
+          <file category="header"       name="src/core/lv_indev_scroll.h"/>
+          <file category="header"       name="src/core/lv_obj.h"/>
+          <file category="header"       name="src/core/lv_obj_class.h"/>
+          <file category="header"       name="src/core/lv_obj_draw.h"/>
+          <file category="header"       name="src/core/lv_obj_pos.h"/>
+          <file category="header"       name="src/core/lv_obj_scroll.h"/>
+          <file category="header"       name="src/core/lv_obj_style.h"/>
+          <file category="header"       name="src/core/lv_obj_style_gen.h"/>
+          <file category="header"       name="src/core/lv_obj_tree.h"/>
+          <file category="header"       name="src/core/lv_refr.h"/>
+          <file category="header"       name="src/core/lv_theme.h"/>
+          <!-- src/draw -->
+          <file category="sourceC"      name="src/draw/lv_draw_label.c"/>
+          <file category="sourceC"      name="src/draw/lv_img_decoder.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_rect.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_transform.c"/>
+          <file category="sourceC"      name="src/draw/lv_img_buf.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_mask.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_img.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_polygon.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_line.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_letter.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_arc.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_transform.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_blend.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_gradient.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_layer.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_rect.c"/>
+          <file category="sourceC"      name="src/draw/sw/lv_draw_sw_dither.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_img.c"/>
+          <file category="sourceC"      name="src/draw/lv_img_cache.c"/>
+          <file category="sourceC"      name="src/draw/lv_img_cache_builtin.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_line.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_triangle.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_layer.c"/>
+          <file category="sourceC"      name="src/draw/lv_draw_arc.c"/>
+          <file category="header"       name="src/draw/lv_draw.h"/>
+          <file category="header"       name="src/draw/lv_draw_arc.h"/>
+          <file category="header"       name="src/draw/lv_draw_img.h"/>
+          <file category="header"       name="src/draw/lv_draw_label.h"/>
+          <file category="header"       name="src/draw/lv_draw_layer.h"/>
+          <file category="header"       name="src/draw/lv_draw_line.h"/>
+          <file category="header"       name="src/draw/lv_draw_mask.h"/>
+          <file category="header"       name="src/draw/lv_draw_rect.h"/>
+          <file category="header"       name="src/draw/lv_draw_transform.h"/>
+          <file category="header"       name="src/draw/lv_draw_triangle.h"/>
+          <file category="header"       name="src/draw/lv_img_buf.h"/>
+          <file category="header"       name="src/draw/lv_img_cache.h"/>
+          <file category="header"       name="src/draw/lv_img_cache_builtin.h"/>
+          <file category="header"       name="src/draw/lv_img_decoder.h"/>
+          <file category="header"       name="src/draw/sw/lv_draw_sw.h"/>
+          <file category="header"       name="src/draw/sw/lv_draw_sw_blend.h"/>
+          <file category="header"       name="src/draw/sw/lv_draw_sw_dither.h"/>
+          <file category="header"       name="src/draw/sw/lv_draw_sw_gradient.h"/>
+          <!-- src/font -->
+          <file category="sourceC"      name="src/font/lv_font.c"/>
+          <file category="sourceC"      name="src/font/lv_font_dejavu_16_persian_hebrew.c"/>
+          <file category="sourceC"      name="src/font/lv_font_fmt_txt.c"/>
+          <file category="sourceC"      name="src/font/lv_font_loader.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_8.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_10.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_12.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_12_subpx.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_14.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_16.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_18.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_20.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_22.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_24.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_26.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_28.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_28_compressed.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_30.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_32.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_34.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_36.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_38.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_40.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_42.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_44.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_46.c"/>
+          <file category="sourceC"      name="src/font/lv_font_montserrat_48.c"/>
+          <file category="sourceC"      name="src/font/lv_font_simsun_16_cjk.c"/>
+          <file category="sourceC"      name="src/font/lv_font_unscii_8.c"/>
+          <file category="sourceC"      name="src/font/lv_font_unscii_16.c"/>
+          <file category="header"       name="src/font/lv_font.h"/>
+          <file category="header"       name="src/font/lv_font_fmt_txt.h"/>
+          <file category="header"       name="src/font/lv_font_loader.h"/>
+          <file category="header"       name="src/font/lv_symbol_def.h"/>
+          <!-- src/hal -->
+          <file category="sourceC"      name="src/hal/lv_hal_disp.c"/>
+          <file category="sourceC"      name="src/hal/lv_hal_indev.c"/>
+          <file category="sourceC"      name="src/hal/lv_hal_tick.c"/>
+          <file category="header"       name="src/hal/lv_hal.h"/>
+          <file category="header"       name="src/hal/lv_hal_disp.h"/>
+          <file category="header"       name="src/hal/lv_hal_indev.h"/>
+          <file category="header"       name="src/hal/lv_hal_tick.h"/>
+          <!-- src/misc-->
+          <file category="sourceC"      name="src/misc/lv_style_gen.c"/>
+          <file category="sourceC"      name="src/misc/lv_fs.c"/>
+          <file category="sourceC"      name="src/misc/lv_malloc_builtin.c"/>
+          <file category="sourceC"      name="src/misc/lv_memcpy_builtin.c"/>
+          <file category="sourceC"      name="src/misc/lv_async.c"/>
+          <file category="sourceC"      name="src/misc/lv_txt_ap.c"/>
+          <file category="sourceC"      name="src/misc/lv_gc.c"/>
+          <file category="sourceC"      name="src/misc/lv_tlsf.c"/>
+          <file category="sourceC"      name="src/misc/lv_log.c"/>
+          <file category="sourceC"      name="src/misc/lv_lru.c"/>
+          <file category="sourceC"      name="src/misc/lv_area.c"/>
+          <file category="sourceC"      name="src/misc/lv_bidi.c"/>
+          <file category="sourceC"      name="src/misc/lv_ll.c"/>
+          <file category="sourceC"      name="src/misc/lv_anim_timeline.c"/>
+          <file category="sourceC"      name="src/misc/lv_math.c"/>
+          <file category="sourceC"      name="src/misc/lv_anim.c"/>
+          <file category="sourceC"      name="src/misc/lv_txt.c"/>
+          <file category="sourceC"      name="src/misc/lv_mem.c"/>
+          <file category="sourceC"      name="src/misc/lv_utils.c"/>
+          <file category="sourceC"      name="src/misc/lv_timer.c"/>
+          <file category="sourceC"      name="src/misc/lv_style.c"/>
+          <file category="sourceC"      name="src/misc/lv_templ.c"/>
+          <file category="sourceC"      name="src/misc/lv_color.c"/>
+          <file category="sourceC"      name="src/misc/lv_printf.c"/>
+          <file category="header"       name="src/misc/lv_anim.h"/>
+          <file category="header"       name="src/misc/lv_anim_timeline.h"/>
+          <file category="header"       name="src/misc/lv_area.h"/>
+          <file category="header"       name="src/misc/lv_assert.h"/>
+          <file category="header"       name="src/misc/lv_async.h"/>
+          <file category="header"       name="src/misc/lv_bidi.h"/>
+          <file category="header"       name="src/misc/lv_color.h"/>
+          <file category="header"       name="src/misc/lv_fs.h"/>
+          <file category="header"       name="src/misc/lv_gc.h"/>
+          <file category="header"       name="src/misc/lv_ll.h"/>
+          <file category="header"       name="src/misc/lv_log.h"/>
+          <file category="header"       name="src/misc/lv_lru.h"/>
+          <file category="header"       name="src/misc/lv_malloc_builtin.h"/>
+          <file category="header"       name="src/misc/lv_math.h"/>
+          <file category="header"       name="src/misc/lv_mem.h"/>
+          <file category="header"       name="src/misc/lv_memcpy_builtin.h"/>
+          <file category="header"       name="src/misc/lv_printf.h"/>
+          <file category="header"       name="src/misc/lv_style.h"/>
+          <file category="header"       name="src/misc/lv_style_gen.h"/>
+          <file category="header"       name="src/misc/lv_templ.h"/>
+          <file category="header"       name="src/misc/lv_timer.h"/>
+          <file category="header"       name="src/misc/lv_tlsf.h"/>
+          <file category="header"       name="src/misc/lv_txt.h"/>
+          <file category="header"       name="src/misc/lv_txt_ap.h"/>
+          <file category="header"       name="src/misc/lv_types.h"/>
+          <file category="header"       name="src/misc/lv_utils.h"/>
+          <!-- src header files -->
+          <file category="header"       name="src/lv_conf_internal.h"/>
+          <file category="header"       name="src/lv_conf_kconfig.h"/>
+          <file category="header"       name="src/lv_api_map.h"/>
+          <file category="header"       name="src/lvgl.h"/>
+          <!-- general -->
+          <!-- <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.6"/> -->
+          <file category="header"       name="lv_conf.h" attr="template" select="lv_conf template" version="1.1.6"/>
+          <file category="sourceC"      name="lv_cmsis_pack.c"/>
+          <file category="header"       name="lvgl.h"/>
+          <!-- Documentation -->
+          <file category="doc"          name="README.md"/>
+          <!-- BEGIN: Remaining header files included by lvgl.h -->
+          <!-- src/libs header files -->
+          <file category="header"       name="src/libs/png/lv_png.h"/>
+          <file category="header"       name="src/libs/png/lodepng.h"/>
+          <file category="header"       name="src/libs/bmp/lv_bmp.h"/>
+          <file category="header"       name="src/libs/gif/lv_gif.h"/>
+          <file category="header"       name="src/libs/gif/gifdec.h"/>
+          <file category="header"       name="src/libs/sjpg/lv_sjpg.h"/>
+          <file category="header"       name="src/libs/sjpg/tjpgd.h"/>
+          <file category="header"       name="src/libs/sjpg/tjpgdcnf.h"/>
+          <file category="header"       name="src/libs/freetype/lv_freetype.h"/>
+          <file category="header"       name="src/libs/freetype/ftmodule.h"/>
+          <file category="header"       name="src/libs/freetype/ftoption.h"/>
+          <file category="header"       name="src/libs/barcode/code128.h"/>
+          <file category="header"       name="src/libs/barcode/lv_barcode.h"/>
+          <file category="header"       name="src/libs/qrcode/lv_qrcode.h"/>
+          <file category="header"       name="src/libs/qrcode/qrcodegen.h"/>
+          <file category="header"       name="src/libs/fsdrv/lv_fsdrv.h"/>
+          <file category="header"       name="src/libs/fsdrv/lv_fsdrv.h"/>
+          <file category="header"       name="src/libs/fsdrv/lv_fsdrv.h"/>
+          <file category="header"       name="src/libs/rlottie/lv_rlottie.h"/>
+          <file category="header"       name="src/libs/ffmpeg/lv_ffmpeg.h"/>
+          <file category="header"       name="src/libs/tiny_ttf/lv_tiny_ttf.h"/>
+          <file category="header"       name="src/libs/tiny_ttf/stb_rect_pack.h"/>
+          <file category="header"       name="src/libs/tiny_ttf/stb_truetype_htcw.h"/>
+          <!-- src/themes header file -->
+          <file category="header"       name="src/themes/lv_themes.h"/>
+          <file category="header"       name="src/themes/default/lv_theme_default.h"/>
+          <file category="header"       name="src/themes/basic/lv_theme_basic.h"/>
+          <file category="header"       name="src/themes/mono/lv_theme_mono.h"/>
+          <!-- src/widgets header file -->
+          <file category="header"       name="src/widgets/objx_templ/lv_objx_templ.h"/>
+          <file category="header"       name="src/widgets/animimg/lv_animimg.h"/>
+          <file category="header"       name="src/widgets/arc/lv_arc.h"/>
+          <file category="header"       name="src/widgets/bar/lv_bar.h"/>
+          <file category="header"       name="src/widgets/btn/lv_btn.h"/>
+          <file category="header"       name="src/widgets/btnmatrix/lv_btnmatrix.h"/>
+          <file category="header"       name="src/widgets/calendar/lv_calendar.h"/>
+          <file category="header"       name="src/widgets/calendar/lv_calendar_header_arrow.h"/>
+          <file category="header"       name="src/widgets/calendar/lv_calendar_header_dropdown.h"/>
+          <file category="header"       name="src/widgets/canvas/lv_canvas.h"/>
+          <file category="header"       name="src/widgets/chart/lv_chart.h"/>
+          <file category="header"       name="src/widgets/checkbox/lv_checkbox.h"/>
+          <file category="header"       name="src/widgets/colorwheel/lv_colorwheel.h"/>
+          <file category="header"       name="src/widgets/dropdown/lv_dropdown.h"/>
+          <file category="header"       name="src/widgets/img/lv_img.h"/>
+          <file category="header"       name="src/widgets/imgbtn/lv_imgbtn.h"/>
+          <file category="header"       name="src/widgets/keyboard/lv_keyboard.h"/>
+          <file category="header"       name="src/widgets/label/lv_label.h"/>
+          <file category="header"       name="src/widgets/led/lv_led.h"/>
+          <file category="header"       name="src/widgets/line/lv_line.h"/>
+          <file category="header"       name="src/widgets/list/lv_list.h"/>
+          <file category="header"       name="src/widgets/menu/lv_menu.h"/>
+          <file category="header"       name="src/widgets/meter/lv_meter.h"/>
+          <file category="header"       name="src/widgets/msgbox/lv_msgbox.h"/>
+          <file category="header"       name="src/widgets/roller/lv_roller.h"/>
+          <file category="header"       name="src/widgets/slider/lv_slider.h"/>
+          <file category="header"       name="src/widgets/span/lv_span.h"/>
+          <file category="header"       name="src/widgets/spinbox/lv_spinbox.h"/>
+          <file category="header"       name="src/widgets/spinner/lv_spinner.h"/>
+          <file category="header"       name="src/widgets/switch/lv_switch.h"/>
+          <file category="header"       name="src/widgets/table/lv_table.h"/>
+          <file category="header"       name="src/widgets/tabview/lv_tabview.h"/>
+          <file category="header"       name="src/widgets/textarea/lv_textarea.h"/>
+          <file category="header"       name="src/widgets/tileview/lv_tileview.h"/>
+          <file category="header"       name="src/widgets/win/lv_win.h"/>
+          <!-- src/layouts header file -->
+          <file category="header"       name="src/layouts/lv_layouts.h"/>
+          <file category="header"       name="src/layouts/flex/lv_flex.h"/>
+          <file category="header"       name="src/layouts/grid/lv_grid.h"/>
+          <!-- src/others header file -->
+          <file category="header"       name="src/others/file_explorer/lv_file_explorer.h"/>
+          <file category="header"       name="src/others/monkey/lv_monkey.h"/>
+          <file category="header"       name="src/others/msg/lv_msg.h"/>
+          <file category="header"       name="src/others/ime/lv_ime_pinyin.h"/>
+          <file category="header"       name="src/others/fragment/lv_fragment.h"/>
+          <file category="header"       name="src/others/snapshot/lv_snapshot.h"/>
+          <file category="header"       name="src/others/imgfont/lv_imgfont.h"/>
+          <file category="header"       name="src/others/gridnav/lv_gridnav.h"/>
+          <!-- END: Remaining header files included by lvgl.h -->
+        </files>
+        <Pre_Include_Global_h>
+/*! \brief use lv_config_cmsis.h which will be pre-included */
+#define LV_CONF_SKIP                  1
+#define LV_LVGL_H_INCLUDE_SIMPLE
+        </Pre_Include_Global_h>
+         <RTE_Components_h>
+/*! \brief Enable LVGL */
+#define RTE_GRAPHICS_LVGL
+         </RTE_Components_h>
+      </component>
+
+      <!-- Porting -->
+      <component Cgroup="Porting" Csub="Display" Cvariant="Template" condition="LVGL9-Essential" Cversion="9.0.0-dev">
+        <description>Porting Template for Display</description>
+        <files>
+          <file category="header"       name="examples/porting/lv_port_disp_template.h" attr="template" select="Display port template" version="1.0.1"/>
+          <file category="sourceC"      name="examples/porting/lv_port_disp_template.c" attr="template" select="Display port template" version="1.0.1"/>
+        </files>
+      </component>
+      <component Cgroup="Porting" Csub="Input Devices" Cvariant="Template" condition="LVGL9-Essential" Cversion="9.0.0-dev">
+        <description>Porting Template for Input Devices</description>
+        <files>
+          <file category="header"       name="examples/porting/lv_port_indev_template.h" attr="template" select="Input devices port template" version="1.0.1"/>
+          <file category="sourceC"      name="examples/porting/lv_port_indev_template.c" attr="template" select="Input devices port template" version="1.0.1"/>
+        </files>
+      </component>
+      <component Cgroup="Porting" Csub="File Systems" Cvariant="Template" condition="LVGL9-Essential" Cversion="9.0.0-dev">
+        <description>Porting Template for File Systems</description>
+        <files>
+          <file category="header"       name="examples/porting/lv_port_fs_template.h" attr="template" select="File system port template" version="1.0.1"/>
+          <file category="sourceC"      name="examples/porting/lv_port_fs_template.c" attr="template" select="File system port template" version="1.0.1"/>
+        </files>
+      </component>
+
+      <!-- GPU -->
+      <component Cgroup="GPU" Cvariant="Arm-2D" condition="Arm-2D HAL" Cversion="1.2.0">
+        <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
+        <files>
+          <file category="header"       name="src/draw/arm2d/lv_gpu_arm2d.h" condition="Arm-2D"/>
+          <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable Arm-2D support*/
+#define LV_USE_GPU_ARM2D              1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="GPU" Cvariant="STM32-DMA2D" condition="STM32-DMA2D HAL" Cversion="1.1.0">
+        <description>An hardware acceleration from STM32-DMA2D</description>
+        <files>
+          <file category="header"       name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"/>
+          <file category="sourceC"      name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable STM32 DMA2D */
+#define LV_USE_GPU_STM32_DMA2D        1
+#define LV_GPU_DMA2D_CMSIS_INCLUDE    CMSIS_device_header
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="GPU" Cvariant="STM32 DMA2D" condition="STM32-DMA2D HAL - STM32CubeMX" Cversion="1.1.0">
+        <description>An hardware acceleration from STM32-DMA2D</description>
+        <files>
+          <file category="header"       name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"/>
+          <file category="sourceC"      name="src/draw/stm32_dma2d/lv_gpu_stm32_dma2d.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable STM32 DMA2D */
+#define LV_USE_GPU_STM32_DMA2D        1
+#define LV_GPU_DMA2D_CMSIS_INCLUDE    "main.h"
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="GPU" Cvariant="SWM341-DMA2D" condition="SWM341-DMA2D HAL" Cversion="1.0.0">
+        <description>An hardware acceleration from SWM341-DMA2D</description>
+        <files>
+          <file category="header"       name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"/>
+          <file category="sourceC"      name="src/draw/swm341_dma2d/lv_gpu_swm341_dma2d.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable SWM341 DMA2D */
+#define LV_USE_GPU_SWM341_DMA2D       1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="GPU" Cvariant="NXP-PXP" condition="NXP-PXP HAL" Cversion="1.0.0">
+        <description>An hardware acceleration from NXP-PXP</description>
+        <files>
+          <file category="header"       name="src/draw/nxp/lv_gpu_nxp.h"/>
+          <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c"/>
+          <file category="header"       name="src/draw/nxp/pxp/lv_draw_pxp_blend.h"/>
+          <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_blend.c"/>
+          <file category="header"       name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.h"/>
+          <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c"/>
+          <file category="header"       name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.h"/>
+          <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable NXP PXP */
+#define LV_USE_GPU_NXP_PXP            1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="GPU" Cvariant="NXP-VGLite" condition="NXP-VGLite HAL" Cversion="1.0.0">
+        <description>An hardware acceleration from NXP-VGLite</description>
+        <files>
+          <file category="header"       name="src/draw/nxp/lv_gpu_nxp.h"/>
+          <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c"/>
+          <file category="header"       name="src/draw/nxp/vglite/lv_draw_vglite_arc.h"/>
+          <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c"/>
+          <file category="header"       name="src/draw/nxp/vglite/lv_draw_vglite_blend.h"/>
+          <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_blend.c"/>
+          <file category="header"       name="src/draw/nxp/vglite/lv_draw_vglite_rect.h"/>
+          <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_rect.c"/>
+          <file category="header"       name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.h"/>
+          <file category="sourceC"      name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable NXP VGLite */
+#define LV_USE_GPU_NXP_VG_LITE        1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="GPU" Cvariant="GD32-IPA" condition="GD32-IPA HAL" Cversion="1.0.0">
+        <description>An hardware acceleration from GD32-IPA</description>
+        <files>
+          <file category="header"       name="src/draw/gd32_ipa/lv_gpu_gd32_ipa.h"/>
+          <file category="sourceC"      name="src/draw/gd32_ipa/lv_gpu_gd32_ipa.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable GD32 IPA */
+#define LV_USE_GPU_GD32_IPA           1
+        </RTE_Components_h>
+      </component>
+
+      <!-- Third Party Libs -->
+      <component Cgroup="3rd Party Libraries" Csub="PNG decoder library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add PNG decoder library</description>
+        <files>
+          <file category="header"       name="src/libs/png/lv_png.h"/>
+          <file category="sourceC"      name="src/libs/png/lv_png.c"/>
+          <file category="header"       name="src/libs/png/lodepng.h"/>
+          <file category="sourceC"      name="src/libs/png/lodepng.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable PNG decoder library */
+#define LV_USE_PNG                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="BMP decoder library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add BMP support</description>
+        <files>
+          <file category="header"       name="src/libs/bmp/lv_bmp.h"/>
+          <file category="sourceC"      name="src/libs/bmp/lv_bmp.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable BMP decoder library */
+#define LV_USE_BMP                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="GIF decoder library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add GIF decoder library</description>
+        <files>
+          <file category="header"       name="src/libs/gif/lv_gif.h"/>
+          <file category="sourceC"      name="src/libs/gif/lv_gif.c"/>
+          <file category="header"       name="src/libs/gif/gifdec.h"/>
+          <file category="sourceC"      name="src/libs/gif/gifdec.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable GIF decoder library */
+#define LV_USE_GIF                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="JPG + split JPG decoder library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add sJPG + split JPG decoder library</description>
+        <files>
+          <file category="header"       name="src/libs/sjpg/lv_sjpg.h"/>
+          <file category="sourceC"      name="src/libs/sjpg/lv_sjpg.c"/>
+          <file category="header"       name="src/libs/sjpg/tjpgd.h"/>
+          <file category="sourceC"      name="src/libs/sjpg/tjpgd.c"/>
+          <file category="header"       name="src/libs/sjpg/tjpgdcnf.h"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable JPG + split JPG decoder library */
+#define LV_USE_SJPG                   1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="FreeType library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add FreeType library</description>
+        <files>
+          <file category="header"       name="src/libs/freetype/lv_freetype.h"/>
+          <file category="sourceC"      name="src/libs/freetype/lv_freetype.c"/>
+          <file category="header"       name="src/libs/freetype/ftmodule.h"/>
+          <file category="header"       name="src/libs/freetype/ftoption.h"/>
+          <file category="sourceC"      name="src/libs/freetype/lv_ftsystem.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable FreeType library */
+#define LV_USE_FREETYPE               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="Barcode library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add Barcode library</description>
+        <files>
+          <file category="header"       name="src/libs/barcode/code128.h"/>
+          <file category="sourceC"      name="src/libs/barcode/code128.c"/>
+          <file category="header"       name="src/libs/barcode/lv_barcode.h"/>
+          <file category="sourceC"      name="src/libs/barcode/lv_barcode.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable Barcode library */
+#define LV_USE_BARCODE                1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="QR code library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add QR code library</description>
+        <files>
+          <file category="header"       name="src/libs/qrcode/lv_qrcode.h"/>
+          <file category="sourceC"      name="src/libs/qrcode/lv_qrcode.c"/>
+          <file category="header"       name="src/libs/qrcode/qrcodegen.h"/>
+          <file category="sourceC"      name="src/libs/qrcode/qrcodegen.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable QR code library */
+#define LV_USE_QRCODE                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="File system on top of stdio API" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add File system on top of stdio API</description>
+        <files>
+          <file category="header"       name="src/libs/fsdrv/lv_fsdrv.h"/>
+          <file category="sourceC"      name="src/libs/fsdrv/lv_fs_stdio.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable File system on top of stdio API */
+#define LV_USE_FS_STDIO               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="File system on top of posix API" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add File system on top of posix API</description>
+        <files>
+          <file category="header"       name="src/libs/fsdrv/lv_fsdrv.h"/>
+          <file category="sourceC"      name="src/libs/fsdrv/lv_fs_fatfs.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable File system on top of posix API */
+#define LV_USE_FS_POSIX               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="File system on top of Win32 API" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add File system on top of Win32 API</description>
+        <files>
+          <file category="header"       name="src/libs/fsdrv/lv_fsdrv.h"/>
+          <file category="sourceC"      name="src/libs/fsdrv/lv_fs_posix.c"/>
+          <file category="sourceC"      name="src/libs/fsdrv/lv_fs_cbfs.c"/>
+
+        </files>
+        <RTE_Components_h>
+/*! \brief enable File system on top of Win32 API */
+#define LV_USE_FS_WIN32               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="Lottie library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add Lottie library</description>
+        <files>
+          <file category="header"       name="src/libs/rlottie/lv_rlottie.h"/>
+          <file category="sourceC"      name="src/libs/rlottie/lv_rlottie.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable Lottie library */
+#define LV_USE_RLOTTIE                1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="FFmpeg library" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add FFmpeg library</description>
+        <files>
+          <file category="header"       name="src/libs/ffmpeg/lv_ffmpeg.h"/>
+          <file category="sourceC"      name="src/libs/ffmpeg/lv_ffmpeg.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Add FFmpeg library */
+#define LV_USE_FFMPEG                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="3rd Party Libraries" Csub="Tiny TTF" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add tiny ttf library</description>
+        <files>
+          <file category="header"       name="src/libs/tiny_ttf/lv_tiny_ttf.h"/>
+          <file category="sourceC"      name="src/libs/tiny_ttf/lv_tiny_ttf.c"/>
+          <file category="header"       name="src/libs/tiny_ttf/stb_rect_pack.h"/>
+          <file category="header"       name="src/libs/tiny_ttf/stb_truetype_htcw.h"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Add tiny ttf library */
+#define LV_USE_TINY_TTF               1
+        </RTE_Components_h>
+      </component>
+
+      <!-- Others -->
+      <component Cgroup="Others" Csub="File Explorer" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Enable file explorer</description>
+        <files>
+          <file category="header"       name="src/others/file_explorer/lv_file_explorer.h"/>
+          <file category="sourceC"      name="src/others/file_explorer/lv_file_explorer.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Enable file explorer*/
+#define LV_USE_FILE_EXPLORER          1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Others" Csub="Monkey" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description></description>
+        <files>
+          <file category="header"       name="src/others/monkey/lv_monkey.h"/>
+          <file category="sourceC"      name="src/others/monkey/lv_monkey.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable Monkey support */
+#define LV_USE_MONKEY                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Others" Csub="Msg" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description></description>
+        <files>
+          <file category="header"       name="src/others/msg/lv_msg.h"/>
+          <file category="sourceC"      name="src/others/msg/lv_msg.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable msg support */
+#define LV_USE_MSG                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Others" Csub="Pinyin" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Add Pinyin input method</description>
+        <files>
+          <file category="header"       name="src/others/ime/lv_ime_pinyin.h"/>
+          <file category="sourceC"      name="src/others/ime/lv_ime_pinyin.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable Pinyin support */
+#define LV_USE_IME_PINYIN             1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Others" Csub="Fragment" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description></description>
+        <files>
+          <file category="doc"          name="src/others/fragment/README.md"/>
+          <file category="header"       name="src/others/fragment/lv_fragment.h"/>
+          <file category="sourceC"      name="src/others/fragment/lv_fragment.c"/>
+          <file category="sourceC"      name="src/others/fragment/lv_fragment_manager.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable fragment support */
+#define LV_USE_FRAGMENT               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Others" Csub="Snapshot" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description></description>
+        <files>
+          <file category="header"       name="src/others/snapshot/lv_snapshot.h"/>
+          <file category="sourceC"      name="src/others/snapshot/lv_snapshot.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable snapshot support */
+#define LV_USE_SNAPSHOT               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Others" Csub="Imgfont" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description></description>
+        <files>
+          <file category="header"       name="src/others/imgfont/lv_imgfont.h"/>
+          <file category="sourceC"      name="src/others/imgfont/lv_imgfont.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable imgfont support */
+#define LV_USE_IMGFONT                1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Others" Csub="GridNav" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description></description>
+        <files>
+          <file category="header"       name="src/others/gridnav/lv_gridnav.h"/>
+          <file category="sourceC"      name="src/others/gridnav/lv_gridnav.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable GridNav support */
+#define LV_USE_GRIDNAV                1
+        </RTE_Components_h>
+      </component>
+
+      <!-- Themes -->
+      <component Cgroup="Themes" Csub="Default Dark" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Use Default Dark Theme</description>
+        <files>
+          <file category="header"       name="src/themes/lv_themes.h"/>
+          <file category="header"       name="src/themes/default/lv_theme_default.h"/>
+          <file category="sourceC"      name="src/themes/default/lv_theme_default.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Default Dark Theme */
+#define LV_USE_THEME_DEFAULT          1
+#define LV_THEME_DEFAULT_DARK         1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Themes" Csub="Default Light" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Use Default Light Theme</description>
+        <files>
+          <file category="header"       name="src/themes/lv_themes.h"/>
+          <file category="header"       name="src/themes/default/lv_theme_default.h"/>
+          <file category="sourceC"      name="src/themes/default/lv_theme_default.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Default Light Theme */
+#define LV_USE_THEME_DEFAULT          1
+#define LV_THEME_DEFAULT_DARK         0
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Themes" Csub="Enable grow on press" condition="LVGL-ThemeDefault" Cversion="1.0.0">
+        <description>Enable grow on press</description>
+        <files>
+          <file category="header"       name="src/themes/lv_themes.h"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Enable grow on press */
+#define LV_THEME_DEFAULT_GROW         1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Themes" Csub="Basic" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Themes</description>
+        <files>
+          <file category="header"       name="src/themes/lv_themes.h"/>
+          <file category="header"       name="src/themes/basic/lv_theme_basic.h"/>
+          <file category="sourceC"      name="src/themes/basic/lv_theme_basic.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Basic Theme */
+#define LV_USE_THEME_BASIC            1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Themes" Csub="Mono" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Themes</description>
+        <files>
+          <file category="header"       name="src/themes/lv_themes.h"/>
+          <file category="header"       name="src/themes/mono/lv_theme_mono.h"/>
+          <file category="sourceC"      name="src/themes/mono/lv_theme_mono.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Mono Theme */
+#define LV_USE_THEME_MONO             1
+        </RTE_Components_h>
+      </component>
+
+      <!-- Extra Widgets -->
+      <component Cgroup="Extra Widgets" Csub="Object Template" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Object Template</description>
+        <files>
+          <file category="header"       name="src/widgets/objx_templ/lv_objx_templ.h"/>
+          <file category="sourceC"      name="src/widgets/objx_templ/lv_objx_templ.c"/>
+        </files>
+        <RTE_Components_h>
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Animing" condition="LVGL-Extra Widgets Animing" Cversion="1.0.0">
+        <description>Extra Widgets: Animing</description>
+        <files>
+          <file category="header"       name="src/widgets/animimg/lv_animimg.h"/>
+          <file category="sourceC"      name="src/widgets/animimg/lv_animimg.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Animing */
+#define LV_USE_ANIMIMG                1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Arc" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Arc</description>
+        <files>
+          <file category="header"       name="src/widgets/arc/lv_arc.h"/>
+          <file category="sourceC"      name="src/widgets/arc/lv_arc.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Arc */
+#define LV_USE_ARC                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Bar" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Bar</description>
+        <files>
+          <file category="header"       name="src/widgets/bar/lv_bar.h"/>
+          <file category="sourceC"      name="src/widgets/bar/lv_bar.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Bar */
+#define LV_USE_BAR                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Buttons" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Buttons</description>
+        <files>
+          <file category="header"       name="src/widgets/btn/lv_btn.h"/>
+          <file category="sourceC"      name="src/widgets/btn/lv_btn.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Buttons */
+#define LV_USE_BTN                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Buttons Matrix" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Buttons Matrix</description>
+        <files>
+          <file category="header"       name="src/widgets/btnmatrix/lv_btnmatrix.h"/>
+          <file category="sourceC"      name="src/widgets/btnmatrix/lv_btnmatrix.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Buttons Matrix */
+#define LV_USE_BTNMATRIX              1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Calendar" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Calendar</description>
+        <files>
+          <file category="header"       name="src/widgets/calendar/lv_calendar.h"/>
+          <file category="sourceC"      name="src/widgets/calendar/lv_calendar.c"/>
+          <file category="header"       name="src/widgets/calendar/lv_calendar_header_arrow.h"/>
+          <file category="sourceC"      name="src/widgets/calendar/lv_calendar_header_arrow.c"/>
+          <file category="header"       name="src/widgets/calendar/lv_calendar_header_dropdown.h"/>
+          <file category="sourceC"      name="src/widgets/calendar/lv_calendar_header_dropdown.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Calendar */
+#define LV_USE_CALENDAR               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Canvas" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Canvas</description>
+        <files>
+          <file category="header"       name="src/widgets/canvas/lv_canvas.h"/>
+          <file category="sourceC"      name="src/widgets/canvas/lv_canvas.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Canvas */
+#define LV_USE_CANVAS                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Chart" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Chart</description>
+        <files>
+          <file category="header"       name="src/widgets/chart/lv_chart.h"/>
+          <file category="sourceC"      name="src/widgets/chart/lv_chart.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Chart */
+#define LV_USE_CHART                  1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Checkbox" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Checkbox</description>
+        <files>
+          <file category="header"       name="src/widgets/checkbox/lv_checkbox.h"/>
+          <file category="sourceC"      name="src/widgets/checkbox/lv_checkbox.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Checkbox */
+#define LV_USE_CHECKBOX               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Color Wheel" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Color Wheel</description>
+        <files>
+          <file category="header"       name="src/widgets/colorwheel/lv_colorwheel.h"/>
+          <file category="sourceC"      name="src/widgets/colorwheel/lv_colorwheel.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Color Wheel */
+#define LV_USE_COLORWHEEL             1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Dropdown" condition="LVGL-Extra Widgets Dropdown" Cversion="1.0.0">
+        <description>Extra Widgets: Dropdown</description>
+        <files>
+          <file category="header"       name="src/widgets/dropdown/lv_dropdown.h"/>
+          <file category="sourceC"      name="src/widgets/dropdown/lv_dropdown.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Dropdown */
+#define LV_USE_DROPDOWN               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Image" condition="LVGL-Extra Widgets Image" Cversion="1.0.0">
+        <description>Extra Widgets: Image</description>
+        <files>
+          <file category="header"       name="src/widgets/img/lv_img.h"/>
+          <file category="sourceC"      name="src/widgets/img/lv_img.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Image */
+#define LV_USE_IMG                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Image Button" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Image Button</description>
+        <files>
+          <file category="header"       name="src/widgets/imgbtn/lv_imgbtn.h"/>
+          <file category="sourceC"      name="src/widgets/imgbtn/lv_imgbtn.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Image Button */
+#define LV_USE_IMGBTN                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Keyboard" condition="LVGL-Extra Widgets Keyboard" Cversion="1.0.0">
+        <description>Extra Widgets: Keyboard</description>
+        <files>
+          <file category="header"       name="src/widgets/keyboard/lv_keyboard.h"/>
+          <file category="sourceC"      name="src/widgets/keyboard/lv_keyboard.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Keyboard */
+#define LV_USE_KEYBOARD               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Label" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Label</description>
+        <files>
+          <file category="header"       name="src/widgets/label/lv_label.h"/>
+          <file category="sourceC"      name="src/widgets/label/lv_label.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Label */
+#define LV_USE_LABEL                  1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="LED" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: LED</description>
+        <files>
+          <file category="header"       name="src/widgets/led/lv_led.h"/>
+          <file category="sourceC"      name="src/widgets/led/lv_led.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets LED */
+#define LV_USE_LED                    1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Line" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Line</description>
+        <files>
+          <file category="header"       name="src/widgets/line/lv_line.h"/>
+          <file category="sourceC"      name="src/widgets/line/lv_line.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Line */
+#define LV_USE_LINE                   1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="List" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: List</description>
+        <files>
+          <file category="header"       name="src/widgets/list/lv_list.h"/>
+          <file category="sourceC"      name="src/widgets/list/lv_list.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets List */
+#define LV_USE_LIST                   1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Menu" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Menu</description>
+        <files>
+          <file category="header"       name="src/widgets/menu/lv_menu.h"/>
+          <file category="sourceC"      name="src/widgets/menu/lv_menu.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Menu */
+#define LV_USE_MENU                   1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Meter" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Meter</description>
+        <files>
+          <file category="header"       name="src/widgets/meter/lv_meter.h"/>
+          <file category="sourceC"      name="src/widgets/meter/lv_meter.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Meter */
+#define LV_USE_METER                  1
+/*! \brief Enable Complex drawing */
+#define LV_USE_DRAW_MASKS             1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Message Box" condition="LVGL-Extra Widgets Message Box" Cversion="1.0.0">
+        <description>Extra Widgets: Message Box</description>
+        <files>
+          <file category="header"       name="src/widgets/msgbox/lv_msgbox.h"/>
+          <file category="sourceC"      name="src/widgets/msgbox/lv_msgbox.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Message Box */
+#define LV_USE_MSGBOX                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Roller" condition="LVGL-Extra Widgets Roller" Cversion="1.0.0">
+        <description>Extra Widgets: Roller</description>
+        <files>
+          <file category="header"       name="src/widgets/roller/lv_roller.h"/>
+          <file category="sourceC"      name="src/widgets/roller/lv_roller.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Roller */
+#define LV_USE_ROLLER                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Slider" condition="LVGL-Extra Widgets Slider" Cversion="1.0.0">
+        <description>Extra Widgets: Slider</description>
+        <files>
+          <file category="header"       name="src/widgets/slider/lv_slider.h"/>
+          <file category="sourceC"      name="src/widgets/slider/lv_slider.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Slider */
+#define LV_USE_SLIDER                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Span" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Span</description>
+        <files>
+          <file category="header"       name="src/widgets/span/lv_span.h"/>
+          <file category="sourceC"      name="src/widgets/span/lv_span.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Span */
+#define LV_USE_SPAN                   1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Spin Box" condition="LVGL-Extra Widgets Spin Box" Cversion="1.0.0">
+        <description>Extra Widgets: Spin Box</description>
+        <files>
+          <file category="header"       name="src/widgets/spinbox/lv_spinbox.h"/>
+          <file category="sourceC"      name="src/widgets/spinbox/lv_spinbox.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Spin Box */
+#define LV_USE_SPINBOX                1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Spinner" condition="LVGL-Extra Widgets Spinner" Cversion="1.0.0">
+        <description>Extra Widgets: Spinner</description>
+        <files>
+          <file category="header"       name="src/widgets/spinner/lv_spinner.h"/>
+          <file category="sourceC"      name="src/widgets/spinner/lv_spinner.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Spinner */
+#define LV_USE_SPINNER                1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Switch" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Switch</description>
+        <files>
+          <file category="header"       name="src/widgets/switch/lv_switch.h"/>
+          <file category="sourceC"      name="src/widgets/switch/lv_switch.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Switch */
+#define LV_USE_SWITCH                 1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Table" condition="LVGL-Extra Widgets Table" Cversion="1.0.0">
+        <description>Extra Widgets: Table</description>
+        <files>
+          <file category="header"       name="src/widgets/table/lv_table.h"/>
+          <file category="sourceC"      name="src/widgets/table/lv_table.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Table */
+#define LV_USE_TABLE                  1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Tab View" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Tab View</description>
+        <files>
+          <file category="header"       name="src/widgets/tabview/lv_tabview.h"/>
+          <file category="sourceC"      name="src/widgets/tabview/lv_tabview.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Tab View */
+#define LV_USE_TABVIEW                1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Text Area" condition="LVGL-Extra Widgets Text Area" Cversion="1.0.0">
+        <description>Extra Widgets: Text Area</description>
+        <files>
+          <file category="header"       name="src/widgets/textarea/lv_textarea.h"/>
+          <file category="sourceC"      name="src/widgets/textarea/lv_textarea.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Text Area */
+#define LV_USE_TEXTAREA               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Title View" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Title View</description>
+        <files>
+          <file category="header"       name="src/widgets/tileview/lv_tileview.h"/>
+          <file category="sourceC"      name="src/widgets/tileview/lv_tileview.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Title View */
+#define LV_USE_TILEVIEW               1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Extra Widgets" Csub="Window" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Extra Widgets: Window</description>
+        <files>
+          <file category="header"       name="src/widgets/win/lv_win.h"/>
+          <file category="sourceC"      name="src/widgets/win/lv_win.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Extra Widgets Window */
+#define LV_USE_WIN                    1
+        </RTE_Components_h>
+      </component>
+
+      <!-- Layouts -->
+      <component Cgroup="Layouts" Csub="Flex" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Use Flex Layouts</description>
+        <files>
+          <file category="header"       name="src/layouts/lv_layouts.h"/>
+          <file category="header"       name="src/layouts/flex/lv_flex.h"/>
+          <file category="sourceC"      name="src/layouts/flex/lv_flex.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Flex Layouts */
+#define LV_USE_FLEX                   1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Layouts" Csub="Grid" condition="LVGL9-Essential" Cversion="1.0.0">
+        <description>Use Grid Layouts</description>
+        <files>
+          <file category="header"       name="src/layouts/lv_layouts.h"/>
+          <file category="header"       name="src/layouts/grid/lv_grid.h"/>
+          <file category="sourceC"      name="src/layouts/grid/lv_grid.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief Use Grid Layouts */
+#define LV_USE_GRID                   1
+        </RTE_Components_h>
+      </component>
+
+      <!-- Tools -->
+      <component Cgroup="Tools" Csub="PikaScript Binding" condition="LVGL9-Essential" Cversion="0.2.0">
+        <description>Add the binding for PikaScript, an ultra-light-weight python VM.</description>
+        <files>
+          <file category="sourceC"      name="pikascript/pika_lvgl.c"/>
+          <file category="sourceC"      name="pikascript/pika_lvgl_indev_t.c"/>
+          <file category="sourceC"      name="pikascript/pika_lvgl_lv_event.c"/>
+          <file category="sourceC"      name="pikascript/pika_lvgl_lv_obj.c"/>
+          <file category="sourceC"      name="pikascript/pika_lvgl_lv_style_t.c"/>
+          <file category="sourceC"      name="pikascript/pika_lv_point_t.c"/>
+          <file category="sourceC"      name="pikascript/pika_lv_timer_t.c"/>
+          <file category="sourceC"      name="pikascript/pika_lv_wegit.c"/>
+          <file category="doc"          name="pikascript/README.md"/>
+        </files>
+        <Pre_Include_Local_Component_h>
+  /* enabling PikaScript Binding */
+#define PIKASCRIPT                    1
+        </Pre_Include_Local_Component_h>
+        <RTE_Components_h>
+/*! \brief enable PikaScrit Binding */
+#define LV_USE_PIKASCRIPT_BINDING     1
+        </RTE_Components_h>
+      </component>
+
+      <!-- LVGL Demos -->
+      <component Cgroup="Demos" Cvariant="Benchmark" condition="LVGL-Extras" isDefaultVariant="true" Cversion="1.0.0">
+        <description>Add the demo official benchmark.</description>
+        <files>
+          <file category="header"       name="demos/lv_demos.h"/>
+          <file category="header"       name="demos/benchmark/lv_demo_benchmark.h"/>
+          <file category="sourceC"      name="demos/benchmark/lv_demo_benchmark.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/img_benchmark_cogwheel_alpha16.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/img_benchmark_cogwheel_chroma_keyed.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/img_benchmark_cogwheel_rgb.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/img_benchmark_cogwheel_rgb565a8.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/lv_font_bechmark_montserrat_12_compr_az.c.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/lv_font_bechmark_montserrat_16_compr_az.c.c"/>
+          <file category="sourceC"      name="demos/benchmark/assets/lv_font_bechmark_montserrat_28_compr_az.c.c"/>
+          <file category="doc"          name="demos/benchmark/README.md"/>
+          <file category="doc"          name="demos/benchmark/screenshot1.png"/>
+          <file category="doc"          name="demos/benchmark/screenshot2.png"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable the demo official bencharmk */
+#define LV_USE_DEMO_BENCHMARK         1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Demos" Cvariant="Stress" condition="LVGL-Extras" Cversion="1.0.0">
+        <description>Add the demo stress.</description>
+        <files>
+          <file category="header"       name="demos/lv_demos.h"/>
+          <file category="header"       name="demos/stress/lv_demo_stress.h"/>
+          <file category="sourceC"      name="demos/stress/lv_demo_stress.c"/>
+          <file category="doc"          name="demos/stress/README.md"/>
+          <file category="doc"          name="demos/stress/screenshot1.png"/>
+          <file category="doc"          name="demos/stress/screenshot1.gif"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable the demo stress */
+#define LV_USE_DEMO_STRESS            1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Demos" Cvariant="Widgets" condition="LVGL-Extras" Cversion="1.0.0">
+        <description>Add the demo widgets.</description>
+        <files>
+          <file category="header"       name="demos/lv_demos.h"/>
+          <file category="header"       name="demos/widgets/lv_demo_widgets.h"/>
+          <file category="sourceC"      name="demos/widgets/lv_demo_widgets.c"/>
+          <file category="sourceC"      name="demos/widgets/assets/img_clothes.c"/>
+          <file category="sourceC"      name="demos/widgets/assets/img_demo_widgets_avatar.c"/>
+          <file category="sourceC"      name="demos/widgets/assets/img_lvgl_logo.c"/>
+          <!-- <file category="doc"          name="demos/widgets/README.md"/> -->
+          <!-- <file category="doc"          name="demos/widgets/screenshot1.png"/> -->
+          <!-- <file category="doc"          name="demos/widgets/screenshot1.gif"/> -->
+        </files>
+        <RTE_Components_h>
+/*! \brief enable the demo widgets */
+#define LV_USE_DEMO_WIDGETS           1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Demos" Cvariant="Keypad and Encoder" condition="LVGL-Extras" Cversion="1.0.0">
+        <description>Add the demo keypad_encoder.</description>
+        <files>
+          <file category="header"       name="demos/lv_demos.h"/>
+          <file category="header"       name="demos/keypad_encoder/lv_demo_keypad_encoder.h"/>
+          <file category="sourceC"      name="demos/keypad_encoder/lv_demo_keypad_encoder.c"/>
+          <file category="doc"          name="demos/keypad_encoder/README.md"/>
+          <file category="doc"          name="demos/keypad_encoder/screenshot1.png"/>
+          <file category="doc"          name="demos/keypad_encoder/screenshot1.gif"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable the demo keypad_encoder support */
+#define LV_USE_DEMO_KEYPAD_AND_ENCODER  1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Demos" Cvariant="Music Player" condition="LVGL-Extras" Cversion="1.0.0">
+        <description>Add the demo music.</description>
+        <files>
+          <file category="header"       name="demos/lv_demos.h"/>
+          <file category="header"       name="demos/music/lv_demo_music.h"/>
+          <file category="sourceC"      name="demos/music/lv_demo_music.c"/>
+          <file category="header"       name="demos/music/lv_demo_music_list.h"/>
+          <file category="sourceC"      name="demos/music/lv_demo_music_list.c"/>
+          <file category="header"       name="demos/music/lv_demo_music_main.h"/>
+          <file category="sourceC"      name="demos/music/lv_demo_music_main.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_corner_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_list_pause.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_list_pause_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_list_play.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_list_play_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_loop.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_loop_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_next.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_next_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_pause.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_pause_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_play.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_play_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_prev.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_prev_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_rnd.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_btn_rnd_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_corner_left.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_corner_left_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_corner_right.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_corner_right_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_cover_1.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_cover_1_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_cover_2.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_cover_2_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_cover_3.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_cover_3_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_1.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_1_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_2.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_2_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_3.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_3_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_4.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_icon_4_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_list_border.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_list_border_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_logo.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_slider_knob.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_slider_knob_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_wave_bottom.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_wave_bottom_large.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_wave_top.c"/>
+          <file category="sourceC"      name="demos/music/assets/img_lv_demo_music_wave_top_large.c"/>
+          <file category="header"       name="demos/music/assets/spectrum_1.h"/>
+          <file category="header"       name="demos/music/assets/spectrum_2.h"/>
+          <file category="header"       name="demos/music/assets/spectrum_3.h"/>
+          <file category="doc"          name="demos/music/README.md"/>
+          <file category="doc"          name="demos/music/screenshot1.gif"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable the demo music */
+#define LV_USE_DEMO_MUSIC             1
+        </RTE_Components_h>
+      </component>
+      <component Cgroup="Demos" Cvariant="Flex layout" condition="LVGL-Extras" Cversion="1.0.0">
+        <description>Add the demo flex_layout.</description>
+        <files>
+          <file category="header"       name="demos/flex_layout/lv_demo_flex_layout.h"/>
+          <file category="sourceC"      name="demos/flex_layout/lv_demo_flex_layout_ctrl_pad.c"/>
+          <file category="sourceC"      name="demos/flex_layout/lv_demo_flex_layout_flex_loader.c"/>
+          <file category="sourceC"      name="demos/flex_layout/lv_demo_flex_layout_main.c"/>
+          <file category="header"       name="demos/flex_layout/lv_demo_flex_layout_main.h"/>
+          <file category="sourceC"      name="demos/flex_layout/lv_demo_flex_layout_view.c"/>
+          <file category="sourceC"      name="demos/flex_layout/lv_demo_flex_layout_view_child_node.c"/>
+          <file category="sourceC"      name="demos/flex_layout/lv_demo_flex_layout_view_ctrl_pad.c"/>
+        </files>
+        <RTE_Components_h>
+/*! \brief enable the demo keypad_encoder */
+#define LV_USE_DEMO_FLEX_LAYOUT       1
+/*! \brief enable User Data needed by the demo flex_layout */
+#define LV_USE_USER_DATA              1
+        </RTE_Components_h>
+      </component>
+    </bundle>
+  </components>
+
+  <!-- boards section (mandatory for Board Support Packs) -->
   <!--
-  <taxonomy>
-  </taxonomy>
+  <boards>
+  </boards>
+  -->
+
+  <!-- examples section (optional for all Software Packs)-->
+  <!--
+  <examples>
+  </examples>
   -->
 
 </package>

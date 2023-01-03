@@ -171,7 +171,9 @@
 #if LV_USE_GPU_STM32_DMA2D
     /*Must be defined to include path of CMSIS header of target processor
     e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
-    #define LV_GPU_DMA2D_CMSIS_INCLUDE
+    #ifndef LV_GPU_DMA2D_CMSIS_INCLUDE
+        #define LV_GPU_DMA2D_CMSIS_INCLUDE
+    #endif
 #endif
 
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
@@ -208,7 +210,7 @@
     *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
     *LV_LOG_LEVEL_USER        Only logs added by the user
     *LV_LOG_LEVEL_NONE        Do not log anything*/
-    #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
+    #define LV_LOG_LEVEL      LV_LOG_LEVEL_WARN
 
     /*1: Print the log with 'printf';
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
@@ -227,7 +229,7 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-	#define LV_LOG_TRACE_MSG		1
+    #define LV_LOG_TRACE_MSG        1
 
 #endif  /*LV_USE_LOG*/
 
@@ -252,14 +254,14 @@
  *-----------*/
 
 /*1: Show CPU usage and FPS count*/
-#define LV_USE_PERF_MONITOR 0
+#define LV_USE_PERF_MONITOR 1
 #if LV_USE_PERF_MONITOR
     #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 #endif
 
 /*1: Show the used memory and the memory fragmentation
  * Requires `LV_USE_BUILTIN_MALLOC = 1`*/
-#define LV_USE_MEM_MONITOR 0
+#define LV_USE_MEM_MONITOR 1
 #if LV_USE_MEM_MONITOR
     #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
 #endif
@@ -286,7 +288,6 @@
  *However the opened images consume additional RAM.
  *0: to disable caching*/
 #define LV_IMG_CACHE_DEF_SIZE 0
-
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
@@ -327,7 +328,6 @@
 
 /*Place performance critical functions into a faster memory (e.g RAM)*/
 #define LV_ATTRIBUTE_FAST_MEM
-
 
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
  *should also appear on LVGL binding API such as Micropython.*/
@@ -442,20 +442,25 @@
 /*==================
  * WIDGETS
  *================*/
-
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
-
-#define LV_USE_ANIMIMG    1
-
-#define LV_USE_ARC        1
-
-#define LV_USE_BAR        1
-
-#define LV_USE_BTN        1
-
-#define LV_USE_BTNMATRIX  1
-
-#define LV_USE_CALENDAR   1
+#ifndef LV_USE_ANIMIMG
+    #define LV_USE_ANIMIMG    0
+#endif
+#ifndef LV_USE_ARC
+    #define LV_USE_ARC        0
+#endif
+#ifndef LV_USE_BAR
+    #define LV_USE_BAR        0
+#endif
+#ifndef LV_USE_BTN
+    #define LV_USE_BTN        0
+#endif
+#ifndef LV_USE_BTNMATRIX
+    #define LV_USE_BTNMATRIX  0
+#endif
+#ifndef LV_USE_CALENDAR
+    #define LV_USE_CALENDAR   0
+#endif
 #if LV_USE_CALENDAR
     #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
     #if LV_CALENDAR_WEEK_STARTS_MONDAY
@@ -468,98 +473,126 @@
     #define LV_USE_CALENDAR_HEADER_ARROW 1
     #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
 #endif  /*LV_USE_CALENDAR*/
-
-#define LV_USE_CANVAS     1
-
-#define LV_USE_CHART      1
-
-#define LV_USE_CHECKBOX   1
-
-#define LV_USE_COLORWHEEL 1
-
-#define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
-
-#define LV_USE_IMG        1   /*Requires: lv_label*/
-
-#define LV_USE_IMGBTN     1
-
-#define LV_USE_KEYBOARD   1
-
-#define LV_USE_LABEL      1
+#ifndef LV_USE_CANVAS
+    #define LV_USE_CANVAS     0
+#endif
+#ifndef LV_USE_CHART
+    #define LV_USE_CHART      0
+#endif
+#ifndef LV_USE_CHECKBOX
+    #define LV_USE_CHECKBOX   0
+#endif
+#ifndef LV_USE_COLORWHEEL
+    #define LV_USE_COLORWHEEL 0
+#endif
+#ifndef LV_USE_DROPDOWN
+    #define LV_USE_DROPDOWN   0   /*Requires: lv_label*/
+#endif
+#ifndef LV_USE_IMG
+    #define LV_USE_IMG        0   /*Requires: lv_label*/
+#endif
+#ifndef LV_USE_IMGBTN
+    #define LV_USE_IMGBTN     0
+#endif
+#ifndef LV_USE_KEYBOARD
+    #define LV_USE_KEYBOARD   0
+#endif
+#ifndef LV_USE_LABEL
+    #define LV_USE_LABEL      0
+#endif
 #if LV_USE_LABEL
     #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
-    #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
+    #define LV_LABEL_LONG_TXT_HINT  1 /*Store some extra info in labels to speed up drawing of very long texts*/
 #endif
-
-#define LV_USE_LED        1
-
-#define LV_USE_LINE       1
-
-#define LV_USE_LIST       1
-
-#define LV_USE_MENU       1
-
-#define LV_USE_METER      1
-
-#define LV_USE_MSGBOX     1
-
-#define LV_USE_ROLLER     1   /*Requires: lv_label*/
-
-#define LV_USE_SLIDER     1   /*Requires: lv_bar*/
-
-#define LV_USE_SPAN       1
+#ifndef LV_USE_LED
+    #define LV_USE_LED        0
+#endif
+#ifndef LV_USE_LINE
+    #define LV_USE_LINE       0
+#endif
+#ifndef LV_USE_LIST
+    #define LV_USE_LIST       0
+#endif
+#ifndef LV_USE_MENU
+    #define LV_USE_MENU       0
+#endif
+#ifndef LV_USE_METER
+    #define LV_USE_METER      0
+#endif
+#ifndef LV_USE_MSGBOX
+    #define LV_USE_MSGBOX     0
+#endif
+#ifndef LV_USE_ROLLER
+    #define LV_USE_ROLLER     0   /*Requires: lv_label*/
+#endif
+#ifndef LV_USE_SLIDER
+    #define LV_USE_SLIDER     0   /*Requires: lv_bar*/
+#endif
+#ifndef LV_USE_SPAN
+    #define LV_USE_SPAN       0
+#endif
 #if LV_USE_SPAN
     /*A line text can contain maximum num of span descriptor */
     #define LV_SPAN_SNIPPET_STACK_SIZE 64
 #endif
-
-#define LV_USE_SPINBOX    1
-
-#define LV_USE_SPINNER    1
-
-#define LV_USE_SWITCH     1
-
-#define LV_USE_TEXTAREA   1   /*Requires: lv_label*/
+#ifndef LV_USE_SPINBOX
+    #define LV_USE_SPINBOX    0
+#endif
+#ifndef LV_USE_SPINNER
+    #define LV_USE_SPINNER    0
+#endif
+#ifndef LV_USE_SWITCH
+    #define LV_USE_SWITCH     0
+#endif
+#ifndef LV_USE_TEXTAREA
+    #define LV_USE_TEXTAREA   0   /*Requires: lv_label*/
+#endif
 #if LV_USE_TEXTAREA != 0
     #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
 #endif
-
-#define LV_USE_TABLE      1
-
-#define LV_USE_TABVIEW    1
-
-#define LV_USE_TILEVIEW   1
-
-#define LV_USE_WIN        1
+#ifndef LV_USE_TABLE
+    #define LV_USE_TABLE      0
+#endif
+#ifndef LV_USE_TABVIEW
+    #define LV_USE_TABVIEW    0
+#endif
+#ifndef LV_USE_TILEVIEW
+    #define LV_USE_TILEVIEW   0
+#endif
+#ifndef LV_USE_WIN
+    #define LV_USE_WIN        0
+#endif
 
 /*==================
  * THEMES
  *==================*/
+#ifndef LV_USE_THEME_DEFAULT
+    #define LV_USE_THEME_DEFAULT      0
+#endif
 
-#ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
-    /*A simple, impressive and very complete theme*/
-    #define LV_USE_THEME_DEFAULT 1
-    #if LV_USE_THEME_DEFAULT
-
-        /*0: Light mode; 1: Dark mode*/
+#if LV_USE_THEME_DEFAULT
+    /*0: Light mode; 1: Dark mode*/
+    #ifndef LV_THEME_DEFAULT_DARK
         #define LV_THEME_DEFAULT_DARK 0
+    #endif
 
-        /*1: Enable grow on press*/
-        #define LV_THEME_DEFAULT_GROW 1
+    /*1: Enable grow on press*/
+    #ifndef LV_THEME_DEFAULT_GROW
+        #define LV_THEME_DEFAULT_GROW 0
+    #endif
 
-        /*Default transition time in [ms]*/
+    /*Default transition time in [ms]*/
+    #ifndef LV_THEME_DEFAULT_TRANSITION_TIME
         #define LV_THEME_DEFAULT_TRANSITION_TIME 80
-    #endif /*LV_USE_THEME_DEFAULT*/
+    #endif
+#endif /* LV_USE_THEME_DEFAULT */
 
-    /*A very simple theme that is a good starting point for a custom theme*/
-    #define LV_USE_THEME_BASIC 1
+#ifndef LV_USE_THEME_BASIC
+    #define LV_USE_THEME_BASIC        0
+#endif
 
-    /*A theme designed for monochrome displays*/
-    #define LV_USE_THEME_MONO 1
-#else
-    #define LV_USE_THEME_DEFAULT    0
-    #define LV_USE_THEME_BASIC      0
-    #define LV_USE_THEME_MONO       0
+#ifndef LV_USE_THEME_MONO
+    #define LV_USE_THEME_MONO         0
 #endif
 
 /*==================
@@ -567,10 +600,14 @@
  *==================*/
 
 /*A layout similar to Flexbox in CSS.*/
-#define LV_USE_FLEX 1
+#ifndef LV_USE_FLEX
+    #define LV_USE_FLEX               0
+#endif
 
 /*A layout similar to Grid in CSS.*/
-#define LV_USE_GRID 1
+#ifndef LV_USE_GRID
+    #define LV_USE_GRID               0
+#endif
 
 /*====================
  * 3RD PARTS LIBRARIES
@@ -628,7 +665,6 @@
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
 #endif
-
 
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/

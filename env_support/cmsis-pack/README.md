@@ -181,8 +181,6 @@ echo " "
 
 ### A. For Windows users
 
-Update the '**CMSIS_PACK_PATH**' accordingly (Usually just replace the name gabriel with your own windows account name is sufficient.).
-
 Update the '**PATH_TO_ADD**' to point to the installation folders of **7Zip** and **xmllint**.
 
 Launch the git-bash and go to the cmsis-pack folder.
