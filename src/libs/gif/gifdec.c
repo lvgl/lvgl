@@ -257,7 +257,7 @@ read_application_ext(gd_GIF * gif)
             if(loop_count == 0) {
                 gif->loop_count = 0;
             }
-            else{
+            else {
                 gif->loop_count = loop_count + 1;
             }
         }
@@ -586,8 +586,8 @@ gd_get_frame(gd_GIF * gif)
 
     dispose(gif);
     f_gif_read(gif, &sep, 1);
-    while (sep != ',') {
-        if (sep == ';') {
+    while(sep != ',') {
+        if(sep == ';') {
             f_gif_seek(gif, gif->anim_start, LV_FS_SEEK_SET);
             if(gif->loop_count == 1 || gif->loop_count < 0) {
                 return 0;
@@ -596,7 +596,7 @@ gd_get_frame(gd_GIF * gif)
                 gif->loop_count--;
             }
         }
-        else if (sep == '!')
+        else if(sep == '!')
             read_ext(gif);
         else return -1;
         f_gif_read(gif, &sep, 1);

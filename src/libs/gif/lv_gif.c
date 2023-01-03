@@ -123,7 +123,7 @@ static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
     lv_img_cache_invalidate_src(&gifobj->imgdsc);
-    if(gifobj->gif )
+    if(gifobj->gif)
         gd_close_gif(gifobj->gif);
     lv_timer_del(gifobj->timer);
 }
