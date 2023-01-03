@@ -160,6 +160,7 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
 #endif
     }
     gif->anim_start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
+    gif->loop_count = -1;
     goto ok;
 fail:
     f_gif_close(gif_base);
@@ -240,6 +241,7 @@ read_application_ext(gd_GIF * gif)
 {
     char app_id[8];
     char app_auth_code[3];
+    uint16_t loop_count;
 
     /* Discard block size (always 0x0B). */
     f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
@@ -250,7 +252,15 @@ read_application_ext(gd_GIF * gif)
     if(!strncmp(app_id, "NETSCAPE", sizeof(app_id))) {
         /* Discard block size (0x03) and constant byte (0x01). */
         f_gif_seek(gif, 2, LV_FS_SEEK_CUR);
-        gif->loop_count = read_num(gif);
+        loop_count = read_num(gif);
+        if(gif->loop_count < 0) {
+            if(loop_count == 0) {
+                gif->loop_count = 0;
+            }
+            else{
+                gif->loop_count = loop_count + 1;
+            }
+        }
         /* Skip block terminator. */
         f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
     }
@@ -576,10 +586,17 @@ gd_get_frame(gd_GIF * gif)
 
     dispose(gif);
     f_gif_read(gif, &sep, 1);
-    while(sep != ',') {
-        if(sep == ';')
-            return 0;
-        if(sep == '!')
+    while (sep != ',') {
+        if (sep == ';') {
+            f_gif_seek(gif, gif->anim_start, LV_FS_SEEK_SET);
+            if(gif->loop_count == 1 || gif->loop_count < 0) {
+                return 0;
+            }
+            else if(gif->loop_count > 1) {
+                gif->loop_count--;
+            }
+        }
+        else if (sep == '!')
             read_ext(gif);
         else return -1;
         f_gif_read(gif, &sep, 1);
@@ -607,6 +624,7 @@ gd_render_frame(gd_GIF * gif, uint8_t * buffer)
 void
 gd_rewind(gd_GIF * gif)
 {
+    gif->loop_count = -1;
     f_gif_seek(gif, gif->anim_start, LV_FS_SEEK_SET);
 }
 
