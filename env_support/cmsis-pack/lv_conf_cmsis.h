@@ -172,7 +172,9 @@
 #if LV_USE_GPU_STM32_DMA2D
     /*Must be defined to include path of CMSIS header of target processor
     e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
-    #define LV_GPU_DMA2D_CMSIS_INCLUDE
+    #ifndef LV_GPU_DMA2D_CMSIS_INCLUDE
+        #define LV_GPU_DMA2D_CMSIS_INCLUDE
+    #endif
 #endif
 
 /*Use NXP's PXP GPU iMX RTxxx platforms*/
@@ -189,13 +191,6 @@
 #if LV_USE_GPU_SWM341_DMA2D
     #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
 #endif
-
-/*Use GD32 IPA GPU
- * This adds support for Image Processing Accelerator on GD32F450 and GD32F470 series MCUs
- *
- * NOTE: IPA on GD32F450 has a bug where the fill operation overwrites data beyond the
- * framebuffer. This driver works around it by saving and restoring affected memory, but
- * this makes it not thread-safe. GD32F470 is not affected. */
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -295,7 +290,6 @@
  *0: to disable caching*/
 #define LV_IMG_CACHE_DEF_SIZE 0
 
-
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
 #define LV_GRADIENT_MAX_STOPS 2
@@ -336,7 +330,6 @@
 /*Place performance critical functions into a faster memory (e.g RAM)*/
 #define LV_ATTRIBUTE_FAST_MEM
 
-
 /*Export integer constant to binding. This macro is used with constants in the form of LV_<CONST> that
  *should also appear on LVGL binding API such as Micropython.*/
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning /*The default value just prevents GCC warning*/
@@ -352,9 +345,9 @@
  *https://fonts.google.com/specimen/Montserrat*/
 #define LV_FONT_MONTSERRAT_8  0
 #define LV_FONT_MONTSERRAT_10 0
-#define LV_FONT_MONTSERRAT_12 1
+#define LV_FONT_MONTSERRAT_12 0
 #define LV_FONT_MONTSERRAT_14 1
-#define LV_FONT_MONTSERRAT_16 1
+#define LV_FONT_MONTSERRAT_16 0
 #define LV_FONT_MONTSERRAT_18 0
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
@@ -450,124 +443,130 @@
 /*==================
  * WIDGETS
  *================*/
-
+#ifndef LV_USE_EXTRA_WIDGETS
+    #define LV_USE_EXTRA_WIDGETS      0
+#endif /* LV_USE_EXTRA_WIDGETS */
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
-#define LV_USE_ANIMIMG    1
+#if LV_USE_EXTRA_WIDGETS
+    #define LV_USE_ANIMIMG    1
 
-#define LV_USE_ARC        1
+    #define LV_USE_ARC        1
 
-#define LV_USE_BAR        1
+    #define LV_USE_BAR        1
 
-#define LV_USE_BTN        1
+    #define LV_USE_BTN        1
 
-#define LV_USE_BTNMATRIX  1
+    #define LV_USE_BTNMATRIX  1
 
-#define LV_USE_CALENDAR   1
-#if LV_USE_CALENDAR
-    #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
-    #if LV_CALENDAR_WEEK_STARTS_MONDAY
-        #define LV_CALENDAR_DEFAULT_DAY_NAMES {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
-    #else
-        #define LV_CALENDAR_DEFAULT_DAY_NAMES {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
+    #define LV_USE_CALENDAR   1
+    #if LV_USE_CALENDAR
+        #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
+        #if LV_CALENDAR_WEEK_STARTS_MONDAY
+            #define LV_CALENDAR_DEFAULT_DAY_NAMES {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
+        #else
+            #define LV_CALENDAR_DEFAULT_DAY_NAMES {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
+        #endif
+
+        #define LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May",  "June", "July", "August", "September", "October", "November", "December"}
+        #define LV_USE_CALENDAR_HEADER_ARROW 1
+        #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
+    #endif  /*LV_USE_CALENDAR*/
+
+    #define LV_USE_CANVAS     1
+
+    #define LV_USE_CHART      1
+
+    #define LV_USE_CHECKBOX   1
+
+    #define LV_USE_COLORWHEEL 1
+
+    #define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
+
+    #define LV_USE_IMG        1   /*Requires: lv_label*/
+
+    #define LV_USE_IMGBTN     1
+
+    #define LV_USE_KEYBOARD   1
+
+    #define LV_USE_LABEL      1
+    #if LV_USE_LABEL
+        #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
+        #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
     #endif
 
-    #define LV_CALENDAR_DEFAULT_MONTH_NAMES {"January", "February", "March",  "April", "May",  "June", "July", "August", "September", "October", "November", "December"}
-    #define LV_USE_CALENDAR_HEADER_ARROW 1
-    #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
-#endif  /*LV_USE_CALENDAR*/
+    #define LV_USE_LED        1
 
-#define LV_USE_CANVAS     1
+    #define LV_USE_LINE       1
 
-#define LV_USE_CHART      1
+    #define LV_USE_LIST       1
 
-#define LV_USE_CHECKBOX   1
+    #define LV_USE_MENU       1
 
-#define LV_USE_COLORWHEEL 1
+    #define LV_USE_METER      1
 
-#define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
+    #define LV_USE_MSGBOX     1
 
-#define LV_USE_IMG        1   /*Requires: lv_label*/
+    #define LV_USE_ROLLER     1   /*Requires: lv_label*/
 
-#define LV_USE_IMGBTN     1
+    #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
 
-#define LV_USE_KEYBOARD   1
+    #define LV_USE_SPAN       1
+    #if LV_USE_SPAN
+        /*A line text can contain maximum num of span descriptor */
+        #define LV_SPAN_SNIPPET_STACK_SIZE 64
+    #endif
 
-#define LV_USE_LABEL      1
-#if LV_USE_LABEL
-    #define LV_LABEL_TEXT_SELECTION 1 /*Enable selecting text of the label*/
-    #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
-#endif
+    #define LV_USE_SPINBOX    1
 
-#define LV_USE_LED        1
+    #define LV_USE_SPINNER    1
 
-#define LV_USE_LINE       1
+    #define LV_USE_SWITCH     1
 
-#define LV_USE_LIST       1
+    #define LV_USE_TEXTAREA   1   /*Requires: lv_label*/
+    #if LV_USE_TEXTAREA != 0
+        #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
+    #endif
 
-#define LV_USE_MENU       1
+    #define LV_USE_TABLE      1
 
-#define LV_USE_METER      1
+    #define LV_USE_TABVIEW    1
 
-#define LV_USE_MSGBOX     1
+    #define LV_USE_TILEVIEW   1
 
-#define LV_USE_ROLLER     1   /*Requires: lv_label*/
-
-#define LV_USE_SLIDER     1   /*Requires: lv_bar*/
-
-#define LV_USE_SPAN       1
-#if LV_USE_SPAN
-    /*A line text can contain maximum num of span descriptor */
-    #define LV_SPAN_SNIPPET_STACK_SIZE 64
-#endif
-
-#define LV_USE_SPINBOX    1
-
-#define LV_USE_SPINNER    1
-
-#define LV_USE_SWITCH     1
-
-#define LV_USE_TEXTAREA   1   /*Requires: lv_label*/
-#if LV_USE_TEXTAREA != 0
-    #define LV_TEXTAREA_DEF_PWD_SHOW_TIME 1500    /*ms*/
-#endif
-
-#define LV_USE_TABLE      1
-
-#define LV_USE_TABVIEW    1
-
-#define LV_USE_TILEVIEW   1
-
-#define LV_USE_WIN        1
+    #define LV_USE_WIN        1
+#endif /* LV_USE_EXTRA_WIDGETS */
 
 /*==================
  * THEMES
  *==================*/
+#ifndef LV_USE_THEME_DEFAULT
+    #define LV_USE_THEME_DEFAULT      0
+#endif
 
-#ifdef RTE_GRAPHICS_LVGL_USE_EXTRA_THEMES
-    /*A simple, impressive and very complete theme*/
-    #define LV_USE_THEME_DEFAULT 1
-    #if LV_USE_THEME_DEFAULT
-
-        /*0: Light mode; 1: Dark mode*/
+#if LV_USE_THEME_DEFAULT
+    /*0: Light mode; 1: Dark mode*/
+    #ifndef LV_THEME_DEFAULT_DARK
         #define LV_THEME_DEFAULT_DARK 0
+    #endif
 
-        /*1: Enable grow on press*/
-        #define LV_THEME_DEFAULT_GROW 1
+    /*1: Enable grow on press*/
+    #ifndef LV_THEME_DEFAULT_GROW
+        #define LV_THEME_DEFAULT_GROW 0
+    #endif
 
-        /*Default transition time in [ms]*/
+    /*Default transition time in [ms]*/
+    #ifndef LV_THEME_DEFAULT_TRANSITION_TIME
         #define LV_THEME_DEFAULT_TRANSITION_TIME 80
-    #endif /*LV_USE_THEME_DEFAULT*/
+    #endif
+#endif /* LV_USE_THEME_DEFAULT */
 
-    /*A very simple theme that is a good starting point for a custom theme*/
-    #define LV_USE_THEME_BASIC 1
+#ifndef LV_USE_THEME_BASIC
+    #define LV_USE_THEME_BASIC        0
+#endif
 
-    /*A theme designed for monochrome displays*/
-    #define LV_USE_THEME_MONO 1
-#else
-    #define LV_USE_THEME_DEFAULT    0
-    #define LV_USE_THEME_BASIC      0
-    #define LV_USE_THEME_MONO       0
+#ifndef LV_USE_THEME_MONO
+    #define LV_USE_THEME_MONO         0
 #endif
 
 /*==================
@@ -575,10 +574,14 @@
  *==================*/
 
 /*A layout similar to Flexbox in CSS.*/
-#define LV_USE_FLEX 1
+#ifndef LV_USE_FLEX
+    #define LV_USE_FLEX               0
+#endif
 
 /*A layout similar to Grid in CSS.*/
-#define LV_USE_GRID 1
+#ifndef LV_USE_GRID
+    #define LV_USE_GRID               0
+#endif
 
 /*====================
  * 3RD PARTS LIBRARIES
@@ -633,7 +636,6 @@
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
 #endif
-
 
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
@@ -696,7 +698,7 @@
     /*Quick access bar, 1:use, 0:not use*/
     /*Requires: lv_list*/
     #define LV_FILE_EXPLORER_QUICK_ACCESS        1
-#endif 
+#endif
 
 /*==================
 * EXAMPLES

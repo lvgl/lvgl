@@ -130,19 +130,15 @@ echo Generating Pack Version: for $PACK_VENDOR.$PACK_NAME
 echo " "
 IFS=$SAVEIFS
 
-#if $PACK_BUILD directory does not exist, create it.
-if [ ! -d $PACK_BUILD ]; then
-  mkdir -p $PACK_BUILD
-fi
-
-mkdir -p ${PACK_BUILD}/examples
+#if $PACK_BUILD directory exist, delete it.
+[ -d $PACK_BUILD ] && rm -rf $PACK_BUILD
+# create the $PACK_BUILD directory.
 mkdir -p ${PACK_BUILD}/examples/porting
 
 # Copy files into build base directory: $PACK_BUILD
 # pdsc file is mandatory in base directory:
 cp -f  ./$PACK_VENDOR.$PACK_NAME.pdsc ${PACK_BUILD}
 cp -f ../../examples/porting/* ${PACK_BUILD}/examples/porting
-
 
 # directories
 echo Adding directories to pack:
@@ -162,6 +158,7 @@ do
   cp -f  "$f" $PACK_BUILD/
 done
 
+mv "${PACK_BUILD}/lv_conf_cmsis.h" "${PACK_BUILD}/lv_conf.h"
 mv "${PACK_BUILD}/lv_cmsis_pack.txt" "${PACK_BUILD}/lv_cmsis_pack.c"
 
 # Run Schema Check (for Linux only):
@@ -177,7 +174,7 @@ if [ $errorlevel -ne 0 ]; then
 fi
 
 # Run Pack Check and generate PackName file with version
-$PACKCHK $PACK_BUILD/$PACK_VENDOR.$PACK_NAME.pdsc -n PackName.txt -x M362
+$PACKCHK $PACK_BUILD/$PACK_VENDOR.$PACK_NAME.pdsc -n PackName.txt -x M362 M364 M393
 errorlevel=$?
 if [ $errorlevel -ne 0 ]; then
   echo "build aborted: pack check failed"
@@ -187,12 +184,14 @@ fi
 
 PACKNAME=`cat PackName.txt`
 rm -rf PackName.txt
+#if $PACKNAME file exist, delete it.
+[ -f $PACKNAME ] && rm -f $PACKNAME
 
-echo remove unrequired files and folders...
-rm -rf $PACK_BUILD/demos/keypad_encoder
-rm -rf $PACK_BUILD/demos/music
-rm -rf $PACK_BUILD/demos/stress
-rm -rf $PACK_BUILD/demos/widgets/screenshot1.gif
+# echo remove unrequired files and folders...
+# rm -rf $PACK_BUILD/demos/keypad_encoder
+# rm -rf $PACK_BUILD/demos/music
+# rm -rf $PACK_BUILD/demos/stress
+# rm -rf $PACK_BUILD/demos/widgets/screenshot1.gif
 
 # echo apply patches...
 # rm -rf $PACK_BUILD/demos/lv_demos.h
@@ -219,8 +218,15 @@ fi
 
 # cp -f ./$PACK_VENDOR.$PACK_NAME.pdsc ${PACK_WAREHOUSE}
 
-
 echo "build of pack succeeded"
+
+PACK_TIMESTAMP=`date -u '+%Y-%m-%dT%H:%M:%S%:z' --date="$(stat -c '@%Y' $PACKNAME)"`
+_PACKNAME="${PACKNAME%.*}"
+PACK_VERSION="${_PACKNAME#$PACK_VENDOR.$PACK_NAME.}"
+echo "Updating $PACK_NAME.pidx for the new pack version $PACK_VERSION"
+sed -i "s/<timestamp>.*<\/timestamp>/<timestamp>${PACK_TIMESTAMP}<\/timestamp>/g" $PACK_NAME.pidx
+sed -i "s/version=\".*\"/version=\"${PACK_VERSION}\"/g" $PACK_NAME.pidx
+
 # Clean up
 echo "cleaning up ..."
 
