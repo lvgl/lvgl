@@ -29,6 +29,7 @@
 </p>
 <br>
 
+[中文宣传单](./flyers/LVGL-Chinese-Flyer.pdf)
 
 #### 目录
 - [概况与总览](#概况与总览)
