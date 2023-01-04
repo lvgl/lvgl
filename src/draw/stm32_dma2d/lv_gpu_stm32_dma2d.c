@@ -66,7 +66,7 @@ void lv_draw_stm32_dma2d_init(void)
     // AHB master timer configuration
     DMA2D->AMTCR = 0; // AHB bus guaranteed dead time disabled
 #if defined(LV_STM32_DMA2D_TEST)
-    _lv_gpu_stm32_dma2d_dwt_init(); // init µs timer
+    _lv_gpu_stm32_dwt_init(); // init µs timer
 #endif
 }
 
@@ -221,8 +221,8 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(NULL); // TODO: is this line needed here?
 }
 
-lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                                 const lv_area_t * src_area, const void * src)
+lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * src_area,
+                                 const void * src)
 {
     // FIXME: src pixel size *must* be known to use DMA2D
 
@@ -339,8 +339,8 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
  * If FALSE, source buffer is described by LV_COLOR_DEPTH.
  */
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                                          const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset,
-                                                          lv_opa_t opa, bool isSrcArgb32)
+                                                          const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset, lv_opa_t opa,
+                                                          bool isSrcArgb32)
 {
     assert_param(!isDma2dInProgess); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
@@ -599,7 +599,7 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_
 }
 
 // initialize µs timer
-static bool _lv_gpu_stm32_dma2d_dwt_init(void)
+LV_STM32_DMA2D_STATIC bool _lv_gpu_stm32_dwt_init(void)
 {
     // disable TRC
     CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk;
@@ -631,14 +631,14 @@ static bool _lv_gpu_stm32_dma2d_dwt_init(void)
 }
 
 // get elapsed µs since reset
-__STATIC_INLINE uint32_t _lv_gpu_stm32_dma2d_dwt_get_us(void)
+LV_STM32_DMA2D_STATIC uint32_t _lv_gpu_stm32_dwt_get_us(void)
 {
     uint32_t us = (DWT->CYCCNT * 1000000) / HAL_RCC_GetHCLKFreq();
     return us;
 }
 
 // reset µs timer
-__STATIC_INLINE void _lv_gpu_stm32_dma2d_dwt_reset(void)
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dwt_reset(void)
 {
     DWT->CYCCNT = 0;
 }
