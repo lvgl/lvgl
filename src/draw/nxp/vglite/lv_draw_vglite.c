@@ -152,7 +152,7 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
     }
 
     lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
+    /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area))
         return; /*Fully clipped, nothing to do*/
 
@@ -161,51 +161,28 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
 
     bool done = false;
     /*Fill/Blend only non masked, normal blended*/
-    if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL) {
-        lv_color_t * dest_buf = draw_ctx->buf;
-        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-        lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-        lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
+    if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL &&
+       lv_area_get_size(&blend_area) >= LV_GPU_NXP_VG_LITE_SIZE_LIMIT) {
         const lv_color_t * src_buf = dsc->src_buf;
 
         if(src_buf == NULL) {
-            done = (lv_gpu_nxp_vglite_fill(dest_buf, dest_width, dest_height, &blend_area,
-                                           dsc->color, dsc->opa) == LV_RES_OK);
+            done = (lv_gpu_nxp_vglite_fill(&blend_area, dsc->color, dsc->opa) == LV_RES_OK);
             if(!done)
                 VG_LITE_LOG_TRACE("VG-Lite fill failed. Fallback.");
         }
         else {
+            lv_color_t * dest_buf = draw_ctx->buf;
+            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
             lv_area_t src_area;
-            lv_coord_t src_width = lv_area_get_width(dsc->blend_area);
-            lv_coord_t src_height = lv_area_get_height(dsc->blend_area);
             src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1);
             src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1);
-            src_area.x2 = src_area.x1 + src_width - 1;
-            src_area.y2 = src_area.y1 + src_height - 1;
-
-            lv_gpu_nxp_vglite_blit_info_t blit;
+            src_area.x2 = src_area.x1 + lv_area_get_width(dsc->blend_area) - 1;
+            src_area.y2 = src_area.y1 + lv_area_get_height(dsc->blend_area) - 1;
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
 
-            blit.src = src_buf;
-            blit.src_width = src_width;
-            blit.src_height = src_height;
-            blit.src_stride = src_stride;
-            blit.src_area = src_area;
-
-            blit.dst = dest_buf;
-            blit.dst_width = dest_width;
-            blit.dst_height = dest_height;
-            blit.dst_stride = dest_stride;
-            blit.dst_area.x1 = blend_area.x1;
-            blit.dst_area.y1 = blend_area.y1;
-            blit.dst_area.x2 = blend_area.x2;
-            blit.dst_area.y2 = blend_area.y2;
-
-            blit.opa = dsc->opa;
-            blit.zoom = LV_IMG_ZOOM_NONE;
-            blit.angle = 0;
-
-            done = (lv_gpu_nxp_vglite_blit(&blit) == LV_RES_OK);
+            done = (lv_gpu_nxp_vglite_blit(dest_buf, &blend_area, dest_stride,
+                                           src_buf, &src_area, src_stride, dsc) == LV_RES_OK); //TODO: remove dsc
 
             if(!done)
                 VG_LITE_LOG_TRACE("VG-Lite blit failed. Fallback.");
@@ -227,69 +204,42 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
         return;
     }
 
-    /*Use the clip area as draw area*/
-    lv_area_t draw_area;
-    lv_area_copy(&draw_area, draw_ctx->clip_area);
-    bool mask_any = lv_draw_mask_is_any(&draw_area);
-    bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
-
-    lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to fill and the clip area.*/
-    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
-        return; /*Fully clipped, nothing to do*/
-
-    /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
     const lv_color_t * src_buf = (const lv_color_t *)map_p;
     if(!src_buf) {
         lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
         return;
     }
 
-    lv_color_t * dest_buf = draw_ctx->buf;
-    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+    lv_area_t blend_area;
+    /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
+    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
+        return; /*Fully clipped, nothing to do*/
 
-    lv_area_t src_area;
-    lv_coord_t src_width = lv_area_get_width(coords);
-    lv_coord_t src_height = lv_area_get_height(coords);
-    src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
-    src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
-    src_area.x2 = src_area.x1 + src_width - 1;
-    src_area.y2 = src_area.y1 + src_height - 1;
+    /*Make the blend area relative to the buffer*/
+    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    bool has_mask = lv_draw_mask_is_any(&blend_area);
+    bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
 
     bool done = false;
-
-    if(!mask_any &&
-       !lv_img_cf_is_chroma_keyed(cf) && !recolor
-#if LV_COLOR_DEPTH!=32
+    if(!has_mask && !has_recolor && !lv_img_cf_is_chroma_keyed(cf) &&
+       lv_area_get_size(&blend_area) >= LV_GPU_NXP_VG_LITE_SIZE_LIMIT
+#if LV_COLOR_DEPTH != 32
        && !lv_img_cf_has_alpha(cf)
 #endif
       ) {
-        lv_gpu_nxp_vglite_blit_info_t blit;
+        lv_color_t * dest_buf = draw_ctx->buf;
+        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
+        lv_area_t src_area;
+        src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
+        src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
+        src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
+        src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
         lv_coord_t src_stride = lv_area_get_width(coords);
 
-        blit.src = src_buf;
-        blit.src_width = src_width;
-        blit.src_height = src_height;
-        blit.src_stride = src_stride;
-        blit.src_area = src_area;
-
-        blit.dst = dest_buf;
-        blit.dst_width = lv_area_get_width(draw_ctx->buf_area);
-        blit.dst_height = lv_area_get_height(draw_ctx->buf_area);
-        blit.dst_stride = dest_stride;
-        blit.dst_area.x1 = blend_area.x1;
-        blit.dst_area.y1 = blend_area.y1;
-        blit.dst_area.x2 = blend_area.x2;
-        blit.dst_area.y2 = blend_area.y2;
-
-        blit.opa = dsc->opa;
-        blit.angle = dsc->angle;
-        blit.pivot = dsc->pivot;
-        blit.zoom = dsc->zoom;
-
-        done = (lv_gpu_nxp_vglite_blit_transform(&blit) == LV_RES_OK);
+        done = (lv_gpu_nxp_vglite_blit_transform(dest_buf, &blend_area, dest_stride,
+                                                 src_buf, &src_area, src_stride, dsc) == LV_RES_OK);
 
         if(!done)
             VG_LITE_LOG_TRACE("VG-Lite blit transform failed. Fallback.");

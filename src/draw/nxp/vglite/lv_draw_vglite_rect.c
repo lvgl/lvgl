@@ -199,8 +199,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
                                                const lv_area_t * coords, bool border)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
-    lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-    lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
     vg_lite_color_t vgcol; /* vglite takes ABGR */
     vg_lite_matrix_t matrix;
     lv_coord_t radius = dsc->radius;

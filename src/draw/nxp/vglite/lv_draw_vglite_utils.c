@@ -35,17 +35,14 @@
 
 #if LV_USE_GPU_NXP_VG_LITE
 #include "../../../core/lv_refr.h"
-#if BLIT_DBG_AREAS
-    #include "lv_draw_vglite_blend.h"
-#endif
 
 /*********************
  *      DEFINES
  *********************/
 
-#if LV_COLOR_DEPTH==16
+#if LV_COLOR_DEPTH == 16
     #define VG_LITE_PX_FMT VG_LITE_RGB565
-#elif LV_COLOR_DEPTH==32
+#elif LV_COLOR_DEPTH == 32
     #define VG_LITE_PX_FMT VG_LITE_BGRA8888
 #else
     #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
@@ -87,43 +84,6 @@ void lv_vglite_init_dest_buf(const lv_color_t * dest_buf, const lv_area_t * dest
 {
     lv_vglite_init_buf(&dest_vgbuf, dest_buf, dest_area, dest_stride);
 }
-
-#if BLIT_DBG_AREAS
-void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
-                                  lv_area_t * fill_area, lv_color_t color)
-{
-    lv_area_t a;
-
-    /* top line */
-    a.x1 = fill_area->x1;
-    a.x2 = fill_area->x2;
-    a.y1 = fill_area->y1;
-    a.y2 = fill_area->y1;
-    lv_gpu_nxp_vglite_fill(dest_buf, dest_width, dest_height, &a, color, LV_OPA_COVER);
-
-
-    /* bottom line */
-    a.x1 = fill_area->x1;
-    a.x2 = fill_area->x2;
-    a.y1 = fill_area->y2;
-    a.y2 = fill_area->y2;
-    lv_gpu_nxp_vglite_fill(dest_buf, dest_width, dest_height, &a, color, LV_OPA_COVER);
-
-    /* left line */
-    a.x1 = fill_area->x1;
-    a.x2 = fill_area->x1;
-    a.y1 = fill_area->y1;
-    a.y2 = fill_area->y2;
-    lv_gpu_nxp_vglite_fill(dest_buf, dest_width, dest_height, &a, color, LV_OPA_COVER);
-
-    /* right line */
-    a.x1 = fill_area->x2;
-    a.x2 = fill_area->x2;
-    a.y1 = fill_area->y1;
-    a.y2 = fill_area->y2;
-    lv_gpu_nxp_vglite_fill(dest_buf, dest_width, dest_height, &a, color, LV_OPA_COVER);
-}
-#endif /* BLIT_DBG_AREAS */
 
 lv_res_t lv_vglite_run(void)
 {
