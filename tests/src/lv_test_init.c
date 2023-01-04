@@ -72,7 +72,12 @@ static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_
     LV_UNUSED(area);
     LV_UNUSED(color_p);
 
-    memcpy(test_fb, color_p, lv_area_get_size(area) * sizeof(lv_color_t));
+    for(int y = area->y1; y <= area->y2; y++) {
+        for(int x = area->x1; x <= area->x2; x++) {
+            test_fb[y * HOR_RES + x] = *color_p;
+            color_p++;
+        }
+    }
 
     lv_disp_flush_ready(disp_drv);
 }
