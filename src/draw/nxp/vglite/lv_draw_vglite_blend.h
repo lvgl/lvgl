@@ -56,29 +56,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/**
- * BLock Image Transfer descriptor structure
- */
-typedef struct {
-
-    const lv_color_t * src;  /**< Source buffer pointer (must be aligned on 16px in bytes)*/
-    lv_area_t src_area;      /**< Area to be copied from source*/
-    lv_coord_t src_width;    /**< Source buffer width*/
-    lv_coord_t src_height;   /**< Source buffer height*/
-    lv_coord_t src_stride;   /**< Source buffer stride in px (must be aligned on 16px)*/
-
-    const lv_color_t * dst;  /**< Destination buffer pointer (must be aligned on 16px in bytes)*/
-    lv_area_t dst_area;      /**< Target area in destination buffer (must be the same as src_area)*/
-    lv_coord_t dst_width;    /**< Destination buffer width*/
-    lv_coord_t dst_height;   /**< Destination buffer height*/
-    lv_coord_t dst_stride;   /**< Destination buffer stride in px (must be aligned on 16px)*/
-
-    lv_opa_t opa;            /**< Opacity - alpha mix (0 = source not copied, 255 = 100% opaque)*/
-    uint32_t angle;          /**< Rotation angle (1/10 of degree)*/
-    uint32_t zoom;           /**< 256 = no zoom (1:1 scale ratio)*/
-    lv_point_t pivot;        /**< The coordinates of rotation pivot in source image buffer*/
-} lv_gpu_nxp_vglite_blit_info_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -86,35 +63,52 @@ typedef struct {
 /**
  * Fill area, with optional opacity.
  *
- * @param[in/out] dest_buf Destination buffer pointer (must be aligned on 16px in bytes)
- * @param[in] dest_width Destination buffer width in pixels (must be aligned on 16px)
- * @param[in] dest_height Destination buffer height in pixels
- * @param[in] fill_area Area to be filled
- * @param[in] color Fill color
+ * @param[in] dest_area Area with relative coordinates of destination buffer
+ * @param[in] color Color
  * @param[in] opa Opacity (255 = full, 128 = 50% background/50% color, 0 = no fill)
+ *
  * @retval LV_RES_OK Fill completed
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
-                                const lv_area_t * fill_area, lv_color_t color, lv_opa_t opa);
+lv_res_t lv_gpu_nxp_vglite_fill(const lv_area_t * dest_area, lv_color_t color, lv_opa_t opa);
 
 /**
- * BLock Image Transfer.
+ * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
+ * By default, image is copied directly, with optional opacity.
  *
- * @param[in] blit Description of the transfer
+ * @param[in/out] dest_buf Destination buffer
+ * @param[in] dest_area Area with relative coordinates of destination buffer
+ * @param[in] dest_stride Stride of destination buffer in pixels
+ * @param[in] src_buf Source buffer
+ * @param[in] src_area Source area with relative coordinates of source buffer
+ * @param[in] src_stride Stride of source buffer in pixels
+ * @param[in] dsc Image descriptor
+ *
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit);
+lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
+                                const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
+                                const lv_draw_img_dsc_t * dsc);
 
 /**
- * BLock Image Transfer with transformation.
+ * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
+ * By default, image is copied directly, with optional opacity.
  *
- * @param[in] blit Description of the transfer
+ * @param[in/out] dest_buf Destination buffer
+ * @param[in] dest_area Area with relative coordinates of destination buffer
+ * @param[in] dest_stride Stride of destination buffer in pixels
+ * @param[in] src_buf Source buffer
+ * @param[in] src_area Source area with relative coordinates of source buffer
+ * @param[in] src_stride Stride of source buffer in pixels
+ * @param[in] dsc Image descriptor
+ *
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_gpu_nxp_vglite_blit_info_t * blit);
+lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
+                                          const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
+                                          const lv_draw_img_dsc_t * dsc);
 
 /**********************
  *      MACROS

@@ -62,18 +62,6 @@ extern "C" {
 #define LV_GPU_NXP_VG_LITE_LOG_TRACES 0
 #endif
 
-/* Draw rectangles around BLIT tiles */
-#define BLIT_DBG_AREAS   0
-
-/* Print detailed info to SDK console (NOT to LVGL log system) */
-#define BLIT_DBG_VERBOSE 0
-
-/* Verbose debug print */
-#if BLIT_DBG_VERBOSE
-#define PRINT_BLT PRINTF
-#else
-#define PRINT_BLT(...)
-#endif
 
 /* The optimal Bezier control point offset for radial unit
  * see: https://spencermortensen.com/articles/bezier-circle/
@@ -116,20 +104,6 @@ vg_lite_buffer_t * lv_vglite_get_dest_buf(void);
  * @param[in] dest_stride Stride of destination buffer
  */
 void lv_vglite_init_dest_buf(const lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride);
-
-#if BLIT_DBG_AREAS
-/**
- * Draw a simple rectangle, 1 px line width.
- *
- * @param dest_buf Destination buffer
- * @param dest_width Destination buffer width (must be aligned on 16px)
- * @param dest_height Destination buffer height
- * @param fill_area Rectangle coordinates
- * @param color Rectangle color
- */
-void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
-                                  lv_area_t * fill_area, lv_color_t color);
-#endif
 
 /**
  * Premultiplies and swizzles given LVGL 32bit color to obtain vglite color.
@@ -195,7 +169,7 @@ lv_res_t lv_vglite_run(void);
 #if LV_GPU_NXP_VG_LITE_LOG_TRACES
 #define VG_LITE_LOG_TRACE(fmt, ...)           \
     do {                                      \
-        LV_LOG_ERROR(fmt, ##__VA_ARGS__);     \
+        LV_LOG(fmt, ##__VA_ARGS__);     \
     } while (0)
 
 #define VG_LITE_RETURN_INV(fmt, ...)          \
