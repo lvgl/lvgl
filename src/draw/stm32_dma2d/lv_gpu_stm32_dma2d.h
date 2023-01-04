@@ -70,7 +70,7 @@ LV_STM32_DMA2D_STATIC lv_res_t _lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw, co
                                                         const lv_area_t * coords, const void * src);
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                                             const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset);
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(lv_disp_drv_t * disp_drv);
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp_drv_t * disp_drv);
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_start_dma_transfer(void);
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t sourceAddress, lv_coord_t offset,
                                                                 lv_coord_t width, lv_coord_t height, uint8_t pixelSize);

@@ -218,7 +218,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     // FIXME: use lv_area_move(dest_area, -dest_area->x1, -dest_area->y1) here ?
     // TODO: It is assumed that dest_buf and src_buf buffers are of lv_color_t type. Verify it, this assumption may be incorrect.
     _lv_draw_stm32_dma2d_copy_buffer(dest_buf, dest_stride, dest_area, src_buf, src_stride, &src_offset);
-    _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(NULL); // TODO: is this line needed here?
+    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL); // TODO: is this line needed here?
 }
 
 lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * src_area,
@@ -262,7 +262,7 @@ lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
 void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(disp->driver);
+    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(disp->driver);
     lv_draw_sw_wait_for_finish(draw_ctx);
 }
 
@@ -281,7 +281,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
-    _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(NULL);
+    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL);
 
     if(opa >= LV_OPA_MAX) {
         DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos; // Register-to-memory (no FG nor BG, only output stage active)
@@ -346,7 +346,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
-    _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(NULL);
+    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL);
 
     if(opa >= LV_OPA_MAX) opa = 0xff;
 
@@ -420,7 +420,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
-    _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(NULL);
+    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL);
 
     DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
 
@@ -465,7 +465,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * d
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
-    _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(NULL);
+    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL);
 
     DMA2D->CR = 0x0UL; // Memory-to-memory (FG fetch only)
 
@@ -476,17 +476,12 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * d
     DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-    DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
-    DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
-    DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
-    DMA2D->BGOR = dest_stride - draw_width;
-    DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
-    _lv_gpu_stm32_dma2d_clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
+    // Note BG* registers do not need to be set up since BG is not used
 
     DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
-    DMA2D->OMAR = DMA2D->BGMAR;
-    DMA2D->OOR = DMA2D->BGOR;
+    DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
+    DMA2D->OOR = dest_stride - draw_width;
     DMA2D->OCOLR = 0;
 
     // PL - pixel per lines (14 bit), NL - number of lines (16 bit)
@@ -505,10 +500,10 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_start_dma_transfer(void)
                                     (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
     DMA2D->CR |= DMA2D_CR_START;
     // Note: for some reason mask buffer gets damaged during transfer if waiting is postponed
-    _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(NULL); // FIXME: this line should not be needed here, but it is
+    _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL); // FIXME: this line should not be needed here, but it is
 }
 
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_wait_for_dma_transfer_to_finish(lv_disp_drv_t * disp_drv)
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp_drv_t * disp_drv)
 {
     if(disp_drv && disp_drv->wait_cb) {
         while((DMA2D->CR & DMA2D_CR_START) != 0U) {
