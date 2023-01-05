@@ -182,7 +182,7 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
 
             done = (lv_gpu_nxp_vglite_blit(dest_buf, &blend_area, dest_stride,
-                                           src_buf, &src_area, src_stride, dsc) == LV_RES_OK); //TODO: remove dsc
+                                           src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
 
             if(!done)
                 VG_LITE_LOG_TRACE("VG-Lite blit failed. Fallback.");
