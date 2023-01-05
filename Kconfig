@@ -911,7 +911,8 @@ menu "LVGL configuration"
             string "Set the working directory"
             depends on LV_USE_FS_STDIO
         config LV_FS_STDIO_CACHE_SIZE
-            string ">0 to cache this number of bytes in lv_fs_read()"
+            int ">0 to cache this number of bytes in lv_fs_read()"
+            default 0
             depends on LV_USE_FS_STDIO
 
         config LV_USE_FS_POSIX
