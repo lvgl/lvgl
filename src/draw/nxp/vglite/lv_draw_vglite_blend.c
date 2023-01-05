@@ -81,7 +81,7 @@
  */
 static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
                                    const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
-                                   const lv_draw_img_dsc_t * dsc);
+                                   lv_opa_t opa);
 
 /**
  * Check source memory and stride alignment.
@@ -129,12 +129,14 @@ static void align_y(lv_area_t * area, lv_color_t ** buf, lv_coord_t stride);
  */
 static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
                                   const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
-                                  const lv_draw_img_dsc_t * dsc);
+                                  lv_opa_t opa);
 #endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static vg_lite_matrix_t vgmatrix;
 
 /**********************
  *      MACROS
@@ -205,15 +207,18 @@ lv_res_t lv_gpu_nxp_vglite_fill(const lv_area_t * dest_area, lv_color_t color, l
 
 lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
                                 const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
-                                const lv_draw_img_dsc_t * dsc)
+                                lv_opa_t opa)
 {
+    vg_lite_identity(&vgmatrix);
+    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
+
 #if VG_LITE_BLIT_SPLIT_ENABLED
-    return vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc);
+    return vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
 #else
     LV_UNUSED(dest_buf);
     LV_UNUSED(dest_stride);
 
-    return vglite_blit_single(dest_area, src_buf, src_area, src_stride, dsc);
+    return vglite_blit_single(dest_area, src_buf, src_area, src_stride, opa);
 #endif
 }
 
@@ -221,19 +226,28 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
                                           const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
                                           const lv_draw_img_dsc_t * dsc)
 {
-#if VG_LITE_BLIT_SPLIT_ENABLED
+    vg_lite_identity(&vgmatrix);
+    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
+
     bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
     bool has_rotation = (dsc->angle != 0);
 
-    if(!has_scale && !has_rotation)
-        return vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc);
+    if(has_scale || has_rotation) {
+        vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
 
-    return LV_RES_INV;
+        vg_lite_translate(dsc->pivot.x, dsc->pivot.y, &vgmatrix);
+        vg_lite_rotate(dsc->angle / 10.0f, &vgmatrix);   /* angle is 1/10 degree */
+        vg_lite_scale(scale, scale, &vgmatrix);
+        vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &vgmatrix);
+    }
+
+#if VG_LITE_BLIT_SPLIT_ENABLED
+    return vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
 #else
     LV_UNUSED(dest_buf);
     LV_UNUSED(dest_stride);
 
-    return vglite_blit_single(dest_area, src_buf, src_area, src_stride, dsc);
+    return vglite_blit_single(dest_area, src_buf, src_area, src_stride, dsc->opa);
 #endif
 }
 
@@ -244,7 +258,7 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
 #if VG_LITE_BLIT_SPLIT_ENABLED
 static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
                                   const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
-                                  const lv_draw_img_dsc_t * dsc)
+                                  lv_opa_t opa)
 {
     lv_res_t rv = LV_RES_INV;
 
@@ -272,7 +286,10 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
         /* Init the vglite buffer adjusted at stage 1. */
         lv_vglite_init_dest_buf(dest_buf, dest_area, dest_stride);
 
-        rv = vglite_blit_single(dest_area, src_buf, src_area, src_stride, dsc);
+        vg_lite_identity(&vgmatrix);
+        vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
+
+        rv = vglite_blit_single(dest_area, src_buf, src_area, src_stride, opa);
 
         VG_LITE_LOG_TRACE("Single "
                           "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -377,7 +394,11 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
 
             /* Init the vglite tile buffer. */
             lv_vglite_init_dest_buf(tile_dest_buf, &tile_dest_area, dest_stride);
-            rv = vglite_blit_single(&tile_dest_area, tile_src_buf, &tile_src_area, src_stride, dsc);
+
+            vg_lite_identity(&vgmatrix);
+            vg_lite_translate((vg_lite_float_t)tile_dest_area.x1, (vg_lite_float_t)tile_dest_area.y1, &vgmatrix);
+
+            rv = vglite_blit_single(&tile_dest_area, tile_src_buf, &tile_src_area, src_stride, opa);
 
             VG_LITE_LOG_TRACE("Tile [%d, %d] "
                               "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -409,7 +430,7 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
 
 static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
                                    const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
-                                   const lv_draw_img_dsc_t * dsc)
+                                   lv_opa_t opa)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t src_vgbuf;
@@ -430,28 +451,14 @@ static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
         (uint32_t)lv_area_get_height(src_area) /* height */
     };
 
-    vg_lite_matrix_t matrix;
-    vg_lite_identity(&matrix);
-    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &matrix);
-
-    if((dsc->angle != 0) || (dsc->zoom != LV_IMG_ZOOM_NONE)) {
-        vg_lite_translate(dsc->pivot.x, dsc->pivot.y, &matrix);
-        vg_lite_rotate(dsc->angle / 10.0f, &matrix);   /* angle is 1/10 degree */
-
-        vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
-        vg_lite_scale(scale, scale, &matrix);
-        vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &matrix);
-    }
-
     uint32_t color;
     vg_lite_blend_t blend;
-    if(dsc->opa >= (lv_opa_t)LV_OPA_MAX) {
+    if(opa >= (lv_opa_t)LV_OPA_MAX) {
         color = 0xFFFFFFFFU;
         blend = VG_LITE_BLEND_SRC_OVER;
         src_vgbuf.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
     else {
-        uint32_t opa = (uint32_t)dsc->opa;
         if(vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
             color = (opa << 24) | 0x00FFFFFFU;
         }
@@ -472,7 +479,7 @@ static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
                             (int32_t)lv_area_get_height(dest_area));
     }
 
-    err = vg_lite_blit_rect(dst_vgbuf, &src_vgbuf, rect, &matrix, blend, color, VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, &src_vgbuf, rect, &vgmatrix, blend, color, VG_LITE_FILTER_POINT);
     if(err != VG_LITE_SUCCESS) {
         if(scissoring)
             vg_lite_disable_scissor();

@@ -91,11 +91,8 @@ static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path
 lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
-    vg_lite_matrix_t matrix;
     lv_coord_t width = lv_area_get_width(coords);
     lv_coord_t height = lv_area_get_height(coords);
-    vg_lite_linear_gradient_t gradient;
-    vg_lite_matrix_t * grad_matrix;
     vg_lite_color_t vgcol;
     lv_coord_t radius = dsc->radius;
     vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
@@ -122,9 +119,13 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     err = vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
                             (vg_lite_float_t) rel_clip.x1, (vg_lite_float_t) rel_clip.y1,
                             ((vg_lite_float_t) rel_clip.x2) + 1.0f, ((vg_lite_float_t) rel_clip.y2) + 1.0f);
-
     VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
+
+    vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
+
+    vg_lite_matrix_t * grad_matrix;
+    vg_lite_linear_gradient_t gradient;
 
     /*** Init Color/Gradient ***/
     if(dsc->bg_grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
@@ -200,7 +201,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_color_t vgcol; /* vglite takes ABGR */
-    vg_lite_matrix_t matrix;
     lv_coord_t radius = dsc->radius;
     vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
 
@@ -246,8 +246,9 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
     err = vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
                             (vg_lite_float_t) rel_clip.x1, (vg_lite_float_t) rel_clip.y1,
                             ((vg_lite_float_t) rel_clip.x2) + 1.0f, ((vg_lite_float_t) rel_clip.y2) + 1.0f);
-
     VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
+
+    vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
     lv_opa_t opa;

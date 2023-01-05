@@ -109,7 +109,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
     lv_color32_t col32 = {.full = lv_color_to32(dsc->color)}; /*Convert color to RGBA8888*/
     vg_lite_path_t path;
     vg_lite_color_t vgcol; /* vglite takes ABGR */
-    vg_lite_matrix_t matrix;
     lv_opa_t opa = dsc->opa;
     bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
     lv_point_t clip_center = {center->x - draw_ctx->buf_area->x1, center->y - draw_ctx->buf_area->y1};
@@ -211,12 +210,12 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
                             ((vg_lite_float_t) draw_ctx->clip_area->x2) + 1.0f, ((vg_lite_float_t) draw_ctx->clip_area->y2) + 1.0f);
     VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
 
-    /* set rotation angle */
-    vg_lite_identity(&matrix);
-
     vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_BGRA8888 : VG_LITE_ABGR8888;
     if(lv_vglite_premult_and_swizzle(&vgcol, col32, opa, color_format) != LV_RES_OK)
         VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
+
+    vg_lite_matrix_t matrix;
+    vg_lite_identity(&matrix);
 
     /*** Draw arc ***/
     err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);

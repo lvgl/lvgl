@@ -82,14 +82,14 @@ lv_res_t lv_gpu_nxp_vglite_fill(const lv_area_t * dest_area, lv_color_t color, l
  * @param[in] src_buf Source buffer
  * @param[in] src_area Source area with relative coordinates of source buffer
  * @param[in] src_stride Stride of source buffer in pixels
- * @param[in] dsc Image descriptor
+ * @param[in] opa Opacity
  *
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
 lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
                                 const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
-                                const lv_draw_img_dsc_t * dsc);
+                                lv_opa_t opa);
 
 /**
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.

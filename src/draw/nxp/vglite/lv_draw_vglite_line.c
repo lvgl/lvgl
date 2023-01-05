@@ -65,7 +65,6 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_path_t path;
     vg_lite_color_t vgcol; /* vglite takes ABGR */
-    vg_lite_matrix_t matrix;
     vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
     lv_opa_t opa = dsc->opa;
 
@@ -110,7 +109,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_lin
                             ((vg_lite_float_t)rel_clip.x2) + 1.0f, ((vg_lite_float_t)rel_clip.y2) + 1.0f);
     VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
 
-    /* Set rotation angle */
+    vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
     lv_color32_t col32 = { .full = lv_color_to32(dsc->color) }; /*Convert color to RGBA8888*/
