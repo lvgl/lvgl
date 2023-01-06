@@ -264,22 +264,28 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
         return;
     }
 
-    lv_area_t clip_line;
-    clip_line.x1 = LV_MIN(point1->x, point2->x) - dsc->width / 2;
-    clip_line.x2 = LV_MAX(point1->x, point2->x) + dsc->width / 2;
-    clip_line.y1 = LV_MIN(point1->y, point2->y) - dsc->width / 2;
-    clip_line.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
+    lv_area_t rel_clip_area;
+    rel_clip_area.x1 = LV_MIN(point1->x, point2->x) - dsc->width / 2;
+    rel_clip_area.x2 = LV_MAX(point1->x, point2->x) + dsc->width / 2;
+    rel_clip_area.y1 = LV_MIN(point1->y, point2->y) - dsc->width / 2;
+    rel_clip_area.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 
     bool is_common;
-    is_common = _lv_area_intersect(&clip_line, &clip_line, draw_ctx->clip_area);
+    is_common = _lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_ctx->clip_area);
     if(!is_common)
         return;
 
+    /* Make coordinates relative to the draw buffer */
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_point_t rel_point1 = { point1->x - draw_ctx->buf_area->x1, point1->y - draw_ctx->buf_area->y1 };
+    lv_point_t rel_point2 = { point2->x - draw_ctx->buf_area->x1, point2->y - draw_ctx->buf_area->y1 };
+
     bool done = false;
-    bool mask_any = lv_draw_mask_is_any(&clip_line);
+    bool mask_any = lv_draw_mask_is_any(&rel_clip_area);
 
     if(!mask_any) {
-        done = (lv_gpu_nxp_vglite_draw_line(draw_ctx, dsc, point1, point2, &clip_line) == LV_RES_OK);
+        done = (lv_gpu_nxp_vglite_draw_line(&rel_point1, &rel_point2, &rel_clip_area, dsc) == LV_RES_OK);
         if(!done)
             VG_LITE_LOG_TRACE("VG-Lite draw line failed. Fallback.");
     }

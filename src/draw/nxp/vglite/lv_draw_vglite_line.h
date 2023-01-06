@@ -56,15 +56,19 @@ extern "C"
  * GLOBAL PROTOTYPES
  **********************/
 
-/***
+/**
  * Draw line shape with effects
- * @param draw_ctx drawing context
- * @param dsc the line description structure (width, rounded ending, opacity, ...)
- * @param point1 the coordinates of the beginning point of the line
- * @param point2 the coordinates of the ending point of the line
+ *
+ * @param[in] point1 Starting point with relative coordinates
+ * @param[in] point2 Ending point with relative coordinates
+ * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] dsc Line description structure (width, rounded ending, opacity, ...)
+ *
+ * @retval LV_RES_OK Draw completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-lv_res_t lv_gpu_nxp_vglite_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
-                                     const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip_line);
+lv_res_t lv_gpu_nxp_vglite_draw_line(const lv_point_t * point1, const lv_point_t * point2,
+                                     const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc);
 
 /**********************
  *      MACROS
