@@ -37,7 +37,6 @@ static void anim_ready_handler(lv_anim_t * a);
  *  STATIC VARIABLES
  **********************/
 static bool anim_list_changed;
-static bool anim_run_round;
 static lv_timer_t * _lv_anim_tmr;
 
 /**********************
@@ -89,8 +88,8 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     /*Initialize the animation descriptor*/
     lv_memcpy(new_anim, a, sizeof(lv_anim_t));
     if(a->var == a) new_anim->var = new_anim;
-    new_anim->run_round = anim_run_round;
     new_anim->last_timer_run = lv_tick_get();
+    new_anim->pending_hifi_run = 0;
 
     /*Set the start value*/
     if(new_anim->early_apply) {
@@ -346,9 +345,6 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
  */
 static void anim_timer(lv_timer_t * timer)
 {
-    /*Flip the run round*/
-    anim_run_round = anim_run_round ? false : true;
-
     lv_anim_t * a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
 
     while(a != NULL) {
@@ -360,8 +356,27 @@ static void anim_timer(lv_timer_t * timer)
          */
         anim_list_changed = false;
 
-        if(a->run_round != anim_run_round) {
-            a->run_round = anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
+        if(elaps >= timer->period || a->pending_hifi_run) {
+            if(a->pending_hifi_run) {
+                a->pending_hifi_run = 0;
+
+                /*If this is running before the refresh period completed
+                 *This needs to be checked because the user might not have had time to
+                 *poll the timer handler by the time it needed to be polled, in which case
+                 *there's nothing to compensate since the timing is already bad anyway */
+                if(elaps < timer->period) {
+                    /*Move the last run timestamp back in time to force an update in the period
+                     *in which other animations would have been run if we hadn't forced the timer
+                     *to change to execute this high fidelity run.
+                     *
+                     *e.g. if the period is 30 ms and we forced the timer to run 10 ms after,
+                     *we need to pretend we last ran the animation timer 10 ms ago so that
+                     *the animation timer runs again in 20 ms, as initially expected */
+                    if(timer->last_run > elaps) {
+                        timer->last_run -= elaps;
+                    }
+                }
+            }
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;
@@ -387,13 +402,14 @@ static void anim_timer(lv_timer_t * timer)
                     if(a->exec_cb) a->exec_cb(a->var, new_value);
                 }
                 else if(a->high_fidelity) {
+                    int32_t backup_act_time = a->act_time;
+
                     /*The animated value didn't change in this frame,
                      *but we should check if the value is changing some time
-                     *before the next frame*/
-                    int32_t backup_act_time = a->act_time;
+                     *before the next refresh period*/
                     uint8_t time_to_next_value_change = 0;
                     for(uint32_t i = 1; i < timer->period; i++) {
-                        /*Calculate the values from now until the next frame*/
+                        /*Calculate the values from now until the next refresh period*/
                         a->act_time++;
                         new_value = a->path_cb(a);
                         if(new_value != a->current_value) {
@@ -401,18 +417,20 @@ static void anim_timer(lv_timer_t * timer)
                             break;
                         }
                     }
+
                     /*Restore the current animation time*/
                     a->act_time = backup_act_time;
 
                     /*The value is changing before the next timer period*/
                     if(time_to_next_value_change > 0) {
                         /*Move the last run timestamp back in time to force an update
-                         *e.g. if the period is 30 ms and the value is changing in 10 ms,
-                         *we need to pretend we last ran the animation 20 ms ago, so that
-                         *the animation timer runs again in 10 ms*/
+                         *e.g. if the refresh period is 30 ms and the value is changing in 10 ms,
+                         *we need to pretend we last ran the animation timer 20 ms ago,
+                         *so that the animation timer runs again in 10 ms*/
                         uint32_t time_offset = timer->period - time_to_next_value_change;
                         if(timer->last_run > time_offset) {
                             timer->last_run -= time_offset;
+                            a->pending_hifi_run = 1;
                         }
                     }
                 }

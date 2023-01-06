@@ -96,8 +96,8 @@ typedef struct _lv_anim_t {
     /*Animation system use these - user shouldn't set*/
     uint32_t last_timer_run;
     uint8_t playback_now : 1; /**< Play back is in progress*/
-    uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
     uint8_t start_cb_called : 1;    /**< Indicates that the `start_cb` was already called*/
+    uint8_t pending_hifi_run : 1;   /**< Indicates that the animation has a pending high fidelity run*/
 } lv_anim_t;
 
 /**********************
