@@ -450,8 +450,15 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
         return;
     }
 
-    done = (lv_gpu_nxp_vglite_draw_arc(draw_ctx, dsc, center, (int32_t)radius,
-                                       (int32_t)start_angle, (int32_t)end_angle) == LV_RES_OK);
+    /* Make coordinates relative to the draw buffer */
+    lv_point_t rel_center = {center->x - draw_ctx->buf_area->x1, center->y - draw_ctx->buf_area->y1};
+
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    done = (lv_gpu_nxp_vglite_draw_arc(&rel_center, (int32_t)radius, (int32_t)start_angle, (int32_t)end_angle,
+                                       &rel_clip_area, dsc) == LV_RES_OK);
     if(!done)
         VG_LITE_LOG_TRACE("VG-Lite draw arc failed. Fallback.");
 #endif/*LV_USE_DRAW_MASKS*/
