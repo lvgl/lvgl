@@ -29,7 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_timer(lv_timer_t * param);
+static void anim_timer(lv_timer_t * timer);
 static void anim_mark_list_change(void);
 static void anim_ready_handler(lv_anim_t * a);
 
@@ -71,6 +71,7 @@ void lv_anim_init(lv_anim_t * a)
     a->repeat_cnt = 1;
     a->path_cb = lv_anim_path_linear;
     a->early_apply = 1;
+    a->high_fidelity = 0;
 }
 
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
@@ -341,13 +342,10 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
 
 /**
  * Periodically handle the animations.
- * @param param unused
+ * @param timer pointer to the animation timer
  */
-static void anim_timer(lv_timer_t * param)
+static void anim_timer(lv_timer_t * timer)
 {
-    LV_UNUSED(param);
-
-
     /*Flip the run round*/
     anim_run_round = anim_run_round ? false : true;
 
@@ -387,6 +385,36 @@ static void anim_timer(lv_timer_t * param)
                     a->current_value = new_value;
                     /*Apply the calculated value*/
                     if(a->exec_cb) a->exec_cb(a->var, new_value);
+                }
+                else if(a->high_fidelity) {
+                    /*The animated value didn't change in this frame,
+                     *but we should check if the value is changing some time
+                     *before the next frame*/
+                    int32_t backup_act_time = a->act_time;
+                    uint8_t time_to_next_value_change = 0;
+                    for(uint32_t i = 1; i < timer->period; i++) {
+                        /*Calculate the values from now until the next frame*/
+                        a->act_time++;
+                        new_value = a->path_cb(a);
+                        if(new_value != a->current_value) {
+                            time_to_next_value_change = i;
+                            break;
+                        }
+                    }
+                    /*Restore the current animation time*/
+                    a->act_time = backup_act_time;
+
+                    /*The value is changing before the next timer period*/
+                    if(time_to_next_value_change > 0) {
+                        /*Move the last run timestamp back in time to force an update
+                         *e.g. if the period is 30 ms and the value is changing in 10 ms,
+                         *we need to pretend we last ran the animation 20 ms ago, so that
+                         *the animation timer runs again in 10 ms*/
+                        uint32_t time_offset = timer->period - time_to_next_value_change;
+                        if(timer->last_run > time_offset) {
+                            timer->last_run -= time_offset;
+                        }
+                    }
                 }
 
                 /*If the time is elapsed the animation is ready*/

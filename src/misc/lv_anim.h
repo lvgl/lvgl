@@ -91,6 +91,7 @@ typedef struct _lv_anim_t {
     uint32_t repeat_delay;       /**< Wait before repeat*/
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
     uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay`*/
+    uint8_t high_fidelity : 1;   /**< 1: Enables high fidelity execution*/
 
     /*Animation system use these - user shouldn't set*/
     uint32_t last_timer_run;
@@ -289,6 +290,19 @@ static inline void lv_anim_set_repeat_delay(lv_anim_t * a, uint32_t delay)
 static inline void lv_anim_set_early_apply(lv_anim_t * a, bool en)
 {
     a->early_apply = en;
+}
+
+/**
+ * Set whether the animation should be ran as soon as its value changes, not pegged to the refresh period.
+ * This is useful in cases where the animated value would normally change shortly after the refresh period,
+ * but the animation system waits until the next refresh period to update it. This prevents jittery animations.
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param en        true: update the animated value as
+ *                  false: update the animated value only on the refresh period
+ */
+static inline void lv_anim_set_high_fidelity(lv_anim_t * a, bool en)
+{
+    a->high_fidelity = en;
 }
 
 /**

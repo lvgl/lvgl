@@ -857,6 +857,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
             dest->repeat_delay = src->repeat_delay;
             dest->ready_cb = src->ready_cb;
             dest->playback_delay = src->playback_delay;
+            dest->high_fidelity = src->high_fidelity;
             break;
         case LV_LABEL_LONG_SCROLL_CIRCULAR:
             /** If the dest animation is already running, overwrite is not allowed */
@@ -865,6 +866,7 @@ static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_
             dest->repeat_cnt = src->repeat_cnt;
             dest->repeat_delay = src->repeat_delay;
             dest->ready_cb = src->ready_cb;
+            dest->high_fidelity = src->high_fidelity;
             break;
         default:
             break;
