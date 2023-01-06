@@ -202,7 +202,7 @@ uint32_t lv_anim_speed_to_time(uint32_t speed, int32_t start, int32_t end)
 
 void lv_anim_refr_now(void)
 {
-    anim_timer(NULL);
+    anim_timer(_lv_anim_tmr);
 }
 
 int32_t lv_anim_path_linear(const lv_anim_t * a)
