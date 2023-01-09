@@ -973,7 +973,7 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
 
         /*Send CLICK if no scrolling and no previous gesture detected*/
         if(scroll_obj == NULL && proc->types.pointer.gesture_sent == 0) {
-            if(proc->long_pr_sent == 0) {
+            if(proc->long_pr_sent == 0  && proc->types.pointer.gesture_sent == 0) {
                 lv_event_send(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(proc)) return;
             }
