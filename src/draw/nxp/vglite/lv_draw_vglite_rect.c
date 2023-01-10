@@ -88,7 +88,8 @@ static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+lv_res_t lv_gpu_nxp_vglite_draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
+                                   const lv_draw_rect_dsc_t * dsc)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     lv_coord_t width = lv_area_get_width(coords);
@@ -100,25 +101,16 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     if(dsc->radius < 0)
         return LV_RES_INV;
 
-    /* Make areas relative to draw buffer */
-    lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
-    lv_area_t rel_clip;
-    lv_area_copy(&rel_clip, draw_ctx->clip_area);
-    lv_area_move(&rel_clip, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
     /*** Init path ***/
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
     uint32_t path_data_size;
-    lv_vglite_create_rect_path_data(path_data, &path_data_size, radius, &rel_coords);
+    lv_vglite_create_rect_path_data(path_data, &path_data_size, radius, coords);
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_LOW;
 
     vg_lite_path_t path;
     err = vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
-                            (vg_lite_float_t) rel_clip.x1, (vg_lite_float_t) rel_clip.y1,
-                            ((vg_lite_float_t) rel_clip.x2) + 1.0f, ((vg_lite_float_t) rel_clip.y2) + 1.0f);
+                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
     VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
 
     vg_lite_matrix_t matrix;
@@ -157,7 +149,7 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
 
         grad_matrix = vg_lite_get_grad_matrix(&gradient);
         vg_lite_identity(grad_matrix);
-        vg_lite_translate((float)rel_coords.x1, (float)rel_coords.y1, grad_matrix);
+        vg_lite_translate((float)coords->x1, (float)coords->y1, grad_matrix);
 
         if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_VER) {
             vg_lite_scale(1.0f, (float)height / 256.0f, grad_matrix);
@@ -196,8 +188,8 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_
     return LV_RES_OK;
 }
 
-lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
-                                               const lv_area_t * coords, bool border)
+lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const lv_area_t * clip_area,
+                                               const lv_draw_rect_dsc_t * dsc, bool border)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_color_t vgcol; /* vglite takes ABGR */
@@ -223,29 +215,19 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const l
     vg_lite_cap_style_t cap_style = (radius) ? VG_LITE_CAP_ROUND : VG_LITE_CAP_BUTT;
     vg_lite_join_style_t join_style = (radius) ? VG_LITE_JOIN_ROUND : VG_LITE_JOIN_MITER;
 
-    /* Make areas relative to draw buffer */
-    lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
-    lv_area_t rel_clip;
-    lv_area_copy(&rel_clip, draw_ctx->clip_area);
-    lv_area_move(&rel_clip, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
     /* Choose vglite blend mode based on given lvgl blend mode */
-    lv_blend_mode_t blend_mode = dsc->blend_mode;
-    vg_lite_blend_t vglite_blend_mode = lv_vglite_get_blend_mode(blend_mode);
+    vg_lite_blend_t vglite_blend_mode = lv_vglite_get_blend_mode(dsc->blend_mode);
 
     /*** Init path ***/
     int32_t path_data[RECT_PATH_DATA_MAX_SIZE];
     uint32_t path_data_size;
-    lv_vglite_create_rect_path_data(path_data, &path_data_size, radius, &rel_coords);
+    lv_vglite_create_rect_path_data(path_data, &path_data_size, radius, coords);
     vg_lite_quality_t path_quality = dsc->radius > 0 ? VG_LITE_HIGH : VG_LITE_LOW;
 
     vg_lite_path_t path;
     err = vg_lite_init_path(&path, VG_LITE_S32, path_quality, path_data_size, path_data,
-                            (vg_lite_float_t) rel_clip.x1, (vg_lite_float_t) rel_clip.y1,
-                            ((vg_lite_float_t) rel_clip.x2) + 1.0f, ((vg_lite_float_t) rel_clip.y2) + 1.0f);
+                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
     VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
 
     vg_lite_matrix_t matrix;

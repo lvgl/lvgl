@@ -58,22 +58,31 @@ extern "C" {
 /**
  * Draw rectangle background with effects (rounded corners, gradient)
  *
- * @param draw_ctx drawing context
- * @param dsc description of the rectangle background
- * @param coords the area where rectangle background is clipped
+ * @param[in] coords Coordinates of the rectangle background (relative to dest buff)
+ * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] dsc Description of the rectangle background
+ *
+ * @retval LV_RES_OK Draw completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ *
  */
-lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+lv_res_t lv_gpu_nxp_vglite_draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
+                                   const lv_draw_rect_dsc_t * dsc);
 
 /**
  * Draw rectangle border/outline shape with effects (rounded corners, opacity)
  *
- * @param draw_ctx drawing context
- * @param dsc description of the rectangle border/outline
- * @param coords the area where the rectangle border/outline is clipped
- * @param border true for border, false for outline
+ * @param[in] coords Coordinates of the rectangle border/outline (relative to dest buff)
+ * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] dsc Description of the rectangle border/outline
+ * @param[in] border True for border, False for outline
+ *
+ * @retval LV_RES_OK Draw completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ *
  */
-lv_res_t lv_gpu_nxp_vglite_draw_border_generic(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
-                                               const lv_area_t * coords, bool border);
+lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const lv_area_t * clip_area,
+                                               const lv_draw_rect_dsc_t * dsc, bool border);
 
 /**********************
  *      MACROS
