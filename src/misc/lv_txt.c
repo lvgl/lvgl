@@ -496,6 +496,31 @@ void _lv_txt_encoded_letter_next_2(const char * txt, uint32_t * letter, uint32_t
     *letter_next = *letter != '\0' ? _lv_txt_encoded_next(&txt[*ofs], NULL) : 0;
 }
 
+bool _lv_txt_is_break_char(uint32_t letter)
+{
+    uint32_t i = 0;
+    bool ret = false;
+
+    /* each chinese character can be break */
+    if(letter >= 0x4E00 && letter <= 0x9FA5) {
+        return true;
+    }
+
+    /*Compare the letter to TXT_BREAK_CHARS*/
+    while(LV_TXT_BREAK_CHARS[i] != '\0') {
+        uint32_t break_char = _lv_txt_encoded_next(LV_TXT_BREAK_CHARS, &i);
+        if(break_char == 0) {
+            break;
+        }
+        else if(letter == break_char) {
+            ret = true; /*If match then it is break char*/
+            break;
+        }
+    }
+
+    return ret;
+}
+
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
 /*******************************
  *   UTF-8 ENCODER/DECODER
