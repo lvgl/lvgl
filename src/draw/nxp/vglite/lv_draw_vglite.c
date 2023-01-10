@@ -342,22 +342,29 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
     if(dsc->bg_opa <= (lv_opa_t)LV_OPA_MIN)
         return LV_RES_INV;
 
-    lv_area_t bg_coords;
-    lv_area_copy(&bg_coords, coords);
+    lv_area_t rel_coords;
+    lv_area_copy(&rel_coords, coords);
 
     /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
     if(dsc->border_width > 1 && dsc->border_opa >= (lv_opa_t)LV_OPA_MAX && dsc->radius != 0) {
-        bg_coords.x1 += (dsc->border_side & LV_BORDER_SIDE_LEFT) ? 1 : 0;
-        bg_coords.y1 += (dsc->border_side & LV_BORDER_SIDE_TOP) ? 1 : 0;
-        bg_coords.x2 -= (dsc->border_side & LV_BORDER_SIDE_RIGHT) ? 1 : 0;
-        bg_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
+        rel_coords.x1 += (dsc->border_side & LV_BORDER_SIDE_LEFT) ? 1 : 0;
+        rel_coords.y1 += (dsc->border_side & LV_BORDER_SIDE_TOP) ? 1 : 0;
+        rel_coords.x2 -= (dsc->border_side & LV_BORDER_SIDE_RIGHT) ? 1 : 0;
+        rel_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
     }
 
+    /* Make coordinates relative to draw buffer */
+    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
     lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &bg_coords, draw_ctx->clip_area))
+    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
         return LV_RES_INV;
 
-    bool mask_any = lv_draw_mask_is_any(&bg_coords);
+    bool mask_any = lv_draw_mask_is_any(&rel_coords);
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
     lv_color_t bg_color = (grad_dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) ?
                           dsc->bg_color : dsc->bg_grad.stops[0].color;
@@ -371,7 +378,7 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
      * Complex case: gradient or radius but no mask.
      */
     if(!mask_any && ((dsc->radius != 0) || (grad_dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))) {
-        lv_res_t res = lv_gpu_nxp_vglite_draw_bg(draw_ctx, dsc, &bg_coords);
+        lv_res_t res = lv_gpu_nxp_vglite_draw_bg(&rel_coords, &rel_clip_area, dsc);
         if(res != LV_RES_OK)
             VG_LITE_LOG_TRACE("VG-Lite draw bg failed. Fallback.");
 
@@ -393,16 +400,23 @@ static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_re
     if(dsc->border_side != (lv_border_side_t)LV_BORDER_SIDE_FULL)
         return LV_RES_INV;
 
-    lv_area_t border_coords;
+    lv_area_t rel_coords;
     lv_coord_t border_width = dsc->border_width;
 
     /* Move border inwards to align with software rendered border */
-    border_coords.x1 = coords->x1 + ceil(border_width / 2.0f);
-    border_coords.x2 = coords->x2 - floor(border_width / 2.0f);
-    border_coords.y1 = coords->y1 + ceil(border_width / 2.0f);
-    border_coords.y2 = coords->y2 - floor(border_width / 2.0f);
+    rel_coords.x1 = coords->x1 + ceil(border_width / 2.0f);
+    rel_coords.x2 = coords->x2 - floor(border_width / 2.0f);
+    rel_coords.y1 = coords->y1 + ceil(border_width / 2.0f);
+    rel_coords.y2 = coords->y2 - floor(border_width / 2.0f);
 
-    lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(draw_ctx, dsc, &border_coords, true);
+    /* Make coordinates relative to the draw buffer */
+    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(&rel_coords, &rel_clip_area, dsc, true);
     if(res != LV_RES_OK)
         VG_LITE_LOG_TRACE("VG-Lite draw border failed. Fallback.");
 
@@ -419,13 +433,20 @@ static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_r
 
     /* Move outline outwards to align with software rendered outline */
     lv_coord_t outline_pad = dsc->outline_pad - 1;
-    lv_area_t outline_coords;
-    outline_coords.x1 = coords->x1 - outline_pad - floor(dsc->outline_width / 2.0f);
-    outline_coords.x2 = coords->x2 + outline_pad + ceil(dsc->outline_width / 2.0f);
-    outline_coords.y1 = coords->y1 - outline_pad - floor(dsc->outline_width / 2.0f);
-    outline_coords.y2 = coords->y2 + outline_pad + ceil(dsc->outline_width / 2.0f);
+    lv_area_t rel_coords;
+    rel_coords.x1 = coords->x1 - outline_pad - floor(dsc->outline_width / 2.0f);
+    rel_coords.x2 = coords->x2 + outline_pad + ceil(dsc->outline_width / 2.0f);
+    rel_coords.y1 = coords->y1 - outline_pad - floor(dsc->outline_width / 2.0f);
+    rel_coords.y2 = coords->y2 + outline_pad + ceil(dsc->outline_width / 2.0f);
 
-    lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(draw_ctx, dsc, &outline_coords, false);
+    /* Make coordinates relative to the draw buffer */
+    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(&rel_coords, &rel_clip_area, dsc, false);
     if(res != LV_RES_OK)
         VG_LITE_LOG_TRACE("VG-Lite draw outline failed. Fallback.");
 
