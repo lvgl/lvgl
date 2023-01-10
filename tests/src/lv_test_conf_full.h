@@ -62,6 +62,7 @@
 #define LV_USE_SJPG     1
 #define LV_USE_GIF      1
 #define LV_USE_QRCODE   1
+#define LV_USE_BARCODE  1
 #define LV_USE_FRAGMENT 1
 #define LV_USE_IMGFONT  1
 #define LV_USE_IME_PINYIN   1
