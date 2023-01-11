@@ -173,11 +173,11 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             // Note: 16-bit bitmap hardware blending with mask and background is possible, but requires a temp 24 or 32-bit buffer to combine bitmap with mask first.
 
             lv_draw_sw_blend_basic(draw_ctx, dsc); // (e.g. Shop Items)
-            lv_coord_t draw_width = lv_area_get_width(&draw_area);
-            lv_coord_t draw_height = lv_area_get_height(&draw_area);
-            uint32_t dest_address = (uint32_t)(draw_ctx->buf + (dest_stride * draw_area.y1) + draw_area.x1);
-            // clean cache after software drawing
-            _lv_gpu_stm32_dma2d_clean_cache(dest_address, dest_stride - draw_width, draw_width, draw_height, sizeof(lv_color_t));
+            // clean cache after software drawing - this does not help since this is not the only place where buffer is written without dma2d
+            // lv_coord_t draw_width = lv_area_get_width(&draw_area);
+            // lv_coord_t draw_height = lv_area_get_height(&draw_area);
+            // uint32_t dest_address = (uint32_t)(draw_ctx->buf + (dest_stride * draw_area.y1) + draw_area.x1);
+            // _lv_gpu_stm32_dma2d_clean_cache(dest_address, dest_stride - draw_width, draw_width, draw_height, sizeof(lv_color_t));
 #endif
         }
     }
@@ -251,6 +251,10 @@ lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
             if(DMA2D_INPUT_COLOR == DMA2D_INPUT_ARGB8888) {
                 bitmapColorCode = ARGB8888;
                 break;
+            }
+            else if(DMA2D_INPUT_COLOR == DMA2D_INPUT_RGB565) {
+                // bitmap color is 24b ARGB8565 - dma2d unsupported
+                return LV_RES_INV;
             }
             else {
                 return LV_RES_INV;
@@ -332,7 +336,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
         DMA2D->FGPFCCR = DMA2D_INPUT_A8;
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         // Alpha Mode 1: Replace original foreground image alpha channel value by FGPFCCR.ALPHA
-        DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos); 
+        DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos);
         //DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
 
         // Note: in Alpha Mode 1 FGMAR and FGOR are not used to supply foreground A8 bytes,
@@ -546,7 +550,8 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_start_dma_transfer(void)
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     // Note: cleaning output buffer cache is needed only when buffer may be misaligned or adjacent area may have been drawn in sw-fashion, e.g. using lv_draw_sw_blend_basic()
 #if LV_COLOR_DEPTH == 16
-    _lv_gpu_stm32_dma2d_clean_cache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos, (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
+    _lv_gpu_stm32_dma2d_clean_cache(DMA2D->OMAR, DMA2D->OOR, (DMA2D->NLR & DMA2D_NLR_PL_Msk) >> DMA2D_NLR_PL_Pos,
+                                    (DMA2D->NLR & DMA2D_NLR_NL_Msk) >> DMA2D_NLR_NL_Pos, sizeof(lv_color_t));
 #endif
     DMA2D->CR |= DMA2D_CR_START;
     // Note: for some reason mask buffer gets damaged during transfer if waiting is postponed
