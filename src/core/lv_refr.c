@@ -24,7 +24,7 @@
 #endif
 
 #if LV_USE_GPU_NXP_VG_LITE
-    #include "../draw/nxp/vglite/lv_draw_vglite_buf.h"
+    #include "../draw/nxp/vglite/lv_vglite_buf.h"
 #endif
 
 /*********************

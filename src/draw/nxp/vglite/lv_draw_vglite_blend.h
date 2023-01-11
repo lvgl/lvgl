@@ -41,7 +41,7 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
-#include "lv_draw_vglite_utils.h"
+#include "lv_vglite_utils.h"
 
 /*********************
  *      DEFINES

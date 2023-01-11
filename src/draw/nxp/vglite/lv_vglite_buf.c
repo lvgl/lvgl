@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_utils.c
+ * @file lv_vglite_buf.c
  *
  */
 
@@ -31,7 +31,7 @@
  *      INCLUDES
  *********************/
 
-#include "lv_draw_vglite_buf.h"
+#include "lv_vglite_buf.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
 

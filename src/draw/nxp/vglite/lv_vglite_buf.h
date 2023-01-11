@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_buf.h
+ * @file lv_vglite_buf.h
  *
  */
 
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_DRAW_VGLITE_BUF_H
-#define LV_DRAW_VGLITE_BUF_H
+#ifndef LV_VGLITE_BUF_H
+#define LV_VGLITE_BUF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -111,4 +111,4 @@ void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_co
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_VGLITE_BUF_H*/
+#endif /*LV_VGLITE_BUF_H*/
