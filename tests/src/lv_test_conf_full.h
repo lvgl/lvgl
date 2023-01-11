@@ -52,6 +52,9 @@
 #define LV_USE_MEM_MONITOR          1
 #define LV_LABEL_TEXT_SELECTION     1
 
+#define LV_USE_FLEX 1
+#define LV_USE_GRID 1
+
 #define LV_USE_FS_STDIO     1
 #define LV_FS_STDIO_LETTER  'A'
 #define LV_USE_FS_POSIX     1
