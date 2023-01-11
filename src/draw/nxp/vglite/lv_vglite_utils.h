@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_vglite_utils.h
+ * @file lv_vglite_utils.h
  *
  */
 
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_DRAW_VGLITE_UTILS_H
-#define LV_DRAW_VGLITE_UTILS_H
+#ifndef LV_VGLITE_UTILS_H
+#define LV_VGLITE_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -166,4 +166,4 @@ lv_res_t lv_vglite_run(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DRAW_VGLITE_UTILS_H*/
+#endif /*LV_VGLITE_UTILS_H*/
