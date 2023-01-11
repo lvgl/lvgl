@@ -40,14 +40,6 @@
  *      DEFINES
  *********************/
 
-#if LV_COLOR_DEPTH == 16
-    #define VG_LITE_PX_FMT VG_LITE_RGB565
-#elif LV_COLOR_DEPTH == 32
-    #define VG_LITE_PX_FMT VG_LITE_BGRA8888
-#else
-    #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
-#endif
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -65,8 +57,6 @@ static inline void invalidate_cache(void);
  *  STATIC VARIABLES
  **********************/
 
-static vg_lite_buffer_t dest_vgbuf;
-
 /**********************
  *      MACROS
  **********************/
@@ -74,16 +64,6 @@ static vg_lite_buffer_t dest_vgbuf;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-vg_lite_buffer_t * lv_vglite_get_dest_buf(void)
-{
-    return &dest_vgbuf;
-}
-
-void lv_vglite_init_dest_buf(const lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride)
-{
-    lv_vglite_init_buf(&dest_vgbuf, dest_buf, dest_area, dest_stride);
-}
 
 lv_res_t lv_vglite_run(void)
 {
@@ -166,22 +146,4 @@ static inline void invalidate_cache(void)
         disp->driver->clean_dcache_cb(disp->driver);
 }
 
-void lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf, const lv_area_t * area,
-                        lv_coord_t stride)
-{
-    vgbuf->format = VG_LITE_PX_FMT;
-    vgbuf->tiled = VG_LITE_LINEAR;
-    vgbuf->image_mode = VG_LITE_NORMAL_IMAGE_MODE;
-    vgbuf->transparency_mode = VG_LITE_IMAGE_OPAQUE;
-
-    vgbuf->width = (int32_t)lv_area_get_width(area);
-    vgbuf->height = (int32_t)lv_area_get_height(area);
-    vgbuf->stride = (int32_t)(stride) * sizeof(lv_color_t);
-
-    lv_memset_00(&vgbuf->yuv, sizeof(vgbuf->yuv));
-
-    vgbuf->memory = (void *)buf;
-    vgbuf->address = (uint32_t)vgbuf->memory;
-    vgbuf->handle = NULL;
-}
 #endif /*LV_USE_GPU_NXP_VG_LITE*/

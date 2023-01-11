@@ -34,12 +34,16 @@
 #include "lv_draw_vglite_blend.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
+#include "lv_draw_vglite_buf.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-/* Enable BLIT quality degradation workaround for RT595, recommended for screen's dimension > 352 pixels */
+/**
+ * Enable BLIT quality degradation workaround for RT595,
+ * recommended for screen's dimension > 352 pixels.
+ */
 #define RT595_BLIT_WRKRND_ENABLED 1
 
 /* Internal compound symbol */
@@ -71,17 +75,13 @@
  * Blit single image, with optional opacity.
  *
  * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] src_buf Source buffer
  * @param[in] src_area Source area with relative coordinates of source buffer
- * @param[in] src_stride Stride of source buffer in pixels
  * @param[in] opa Opacity
  *
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
-                                   const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
-                                   lv_opa_t opa);
+static lv_res_t vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa);
 
 /**
  * Check source memory and stride alignment.
@@ -212,13 +212,26 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
     vg_lite_identity(&vgmatrix);
     vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
 
+    /* Wrap src buffer into VG-Lite buffer */
+    lv_vglite_set_src_buf(src_buf, src_area, src_stride);
+
 #if VG_LITE_BLIT_SPLIT_ENABLED
-    return vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
+    lv_color_t * orig_dest_buf = dest_buf;
+
+    lv_res_t rv = vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
+
+    /* Restore the original vglite buf address. */
+    lv_vglite_set_dest_buf_ptr(orig_dest_buf);
+
+    return rv;
 #else
     LV_UNUSED(dest_buf);
     LV_UNUSED(dest_stride);
 
-    return vglite_blit_single(dest_area, src_buf, src_area, src_stride, opa);
+    if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
+        VG_LITE_RETURN_INV("Check src alignment failed.");
+
+    return vglite_blit_single(dest_area, src_area, opa);
 #endif
 }
 
@@ -226,11 +239,11 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
                                           const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
                                           const lv_draw_img_dsc_t * dsc)
 {
-    vg_lite_identity(&vgmatrix);
-    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
-
     bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
     bool has_rotation = (dsc->angle != 0);
+
+    vg_lite_identity(&vgmatrix);
+    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
 
     if(has_scale || has_rotation) {
         vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
@@ -241,13 +254,26 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
         vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &vgmatrix);
     }
 
+    /* Wrap src buffer into VG-Lite buffer */
+    lv_vglite_set_src_buf(src_buf, src_area, src_stride);
+
 #if VG_LITE_BLIT_SPLIT_ENABLED
-    return vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
+    lv_color_t * orig_dest_buf = dest_buf;
+
+    lv_res_t rv = vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
+
+    /* Restore the original vglite buf address. */
+    lv_vglite_set_dest_buf_ptr(orig_dest_buf);
+
+    return rv;
 #else
     LV_UNUSED(dest_buf);
     LV_UNUSED(dest_stride);
 
-    return vglite_blit_single(dest_area, src_buf, src_area, src_stride, dsc->opa);
+    if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
+        VG_LITE_RETURN_INV("Check src alignment failed.");
+
+    return vglite_blit_single(dest_area, src_area, dsc->opa);
 #endif
 }
 
@@ -272,9 +298,7 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
                       lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                       (uintptr_t)src_buf, (uintptr_t)dest_buf);
 
-    lv_color_t * dest_buf_orig = dest_buf;
-
-    /* Stage 1: Move starting pointers as close as possible to [x1, y1], so coordinates are as small as possible.  */
+    /* Stage 1: Move starting pointers as close as possible to [x1, y1], so coordinates are as small as possible. */
     align_x(src_area, (lv_color_t **)&src_buf);
     align_y(src_area, (lv_color_t **)&src_buf, src_stride);
     align_x(dest_area, (lv_color_t **)&dest_buf);
@@ -283,13 +307,19 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
     /* Stage 2: If we're in limit, do a single BLIT */
     if((src_area->x2 < LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR) &&
        (src_area->y2 < LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR)) {
-        /* Init the vglite buffer adjusted at stage 1. */
-        lv_vglite_init_dest_buf(dest_buf, dest_area, dest_stride);
+        /* Check alignment. */
+        if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
+            VG_LITE_RETURN_INV("Check src alignment failed.");
 
+        /* Set new vglite buf addresses. */
+        lv_vglite_set_dest_buf_ptr(dest_buf);
+        lv_vglite_set_src_buf_ptr(src_buf);
+
+        /* Set matrix. */
         vg_lite_identity(&vgmatrix);
         vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
 
-        rv = vglite_blit_single(dest_area, src_buf, src_area, src_stride, opa);
+        rv = vglite_blit_single(dest_area, src_area, opa);
 
         VG_LITE_LOG_TRACE("Single "
                           "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -301,9 +331,6 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
                           lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                           (uintptr_t)src_buf, (uintptr_t)dest_buf,
                           rv == LV_RES_OK ? "OK!" : "FAILED!");
-
-        /* Restore the original vglite buf. */
-        lv_vglite_init_dest_buf(dest_buf_orig, dest_buf_area, dest_stride);
 
         return rv;
     };
@@ -392,13 +419,19 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
                 tile_dest_area.x2 += shift_dest_x;
             }
 
-            /* Init the vglite tile buffer. */
-            lv_vglite_init_dest_buf(tile_dest_buf, &tile_dest_area, dest_stride);
+            /* Check alignment. */
+            if(check_src_alignment(tile_src_buf, src_stride) != LV_RES_OK)
+                VG_LITE_RETURN_INV("Check src alignment failed.");
 
+            /* Set new vglite buf addresses. */
+            lv_vglite_set_dest_buf_ptr(tile_dest_buf);
+            lv_vglite_set_src_buf_ptr(tile_src_buf);
+
+            /* Set matrix.*/
             vg_lite_identity(&vgmatrix);
             vg_lite_translate((vg_lite_float_t)tile_dest_area.x1, (vg_lite_float_t)tile_dest_area.y1, &vgmatrix);
 
-            rv = vglite_blit_single(&tile_dest_area, tile_src_buf, &tile_src_area, src_stride, opa);
+            rv = vglite_blit_single(&tile_dest_area, &tile_src_area, opa);
 
             VG_LITE_LOG_TRACE("Tile [%d, %d] "
                               "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -413,36 +446,20 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
                               rv == LV_RES_OK ? "OK!" : "FAILED!");
 
             if(rv != LV_RES_OK) {
-                break;
+                return rv;
             }
         }
-        /* Propagate the blit error. */
-        if(rv != LV_RES_OK)
-            break;
     }
-
-    /* Restore the original vglite buf. */
-    lv_vglite_init_dest_buf(dest_buf_orig, dest_buf_area, dest_stride);
 
     return rv;
 }
 #endif /* VG_LITE_BLIT_SPLIT_ENABLED */
 
-static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
-                                   const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
-                                   lv_opa_t opa)
+static lv_res_t vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
-    vg_lite_buffer_t src_vgbuf;
     vg_lite_buffer_t * dst_vgbuf = lv_vglite_get_dest_buf();
-
-    if(check_src_alignment(src_buf, src_stride) != LV_RES_OK) {
-        VG_LITE_RETURN_INV("Check src alignment failed.");
-        return LV_RES_INV;
-    }
-
-    /*Wrap src buffer into VG-Lite buffer*/
-    lv_vglite_init_buf(&src_vgbuf, src_buf, src_area, src_stride);
+    vg_lite_buffer_t * src_vgbuf = lv_vglite_get_src_buf();
 
     uint32_t rect[] = {
         (uint32_t)src_area->x1, /* start x */
@@ -456,7 +473,7 @@ static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
     if(opa >= (lv_opa_t)LV_OPA_MAX) {
         color = 0xFFFFFFFFU;
         blend = VG_LITE_BLEND_SRC_OVER;
-        src_vgbuf.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+        src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
     else {
         if(vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
@@ -466,8 +483,8 @@ static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
             color = (opa << 24) | (opa << 16) | (opa << 8) | opa;
         }
         blend = VG_LITE_BLEND_SRC_OVER;
-        src_vgbuf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-        src_vgbuf.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+        src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+        src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
 
     bool scissoring = lv_area_get_width(dest_area) < lv_area_get_width(src_area) ||
@@ -479,7 +496,7 @@ static lv_res_t vglite_blit_single(const lv_area_t * dest_area,
                             (int32_t)lv_area_get_height(dest_area));
     }
 
-    err = vg_lite_blit_rect(dst_vgbuf, &src_vgbuf, rect, &vgmatrix, blend, color, VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, rect, &vgmatrix, blend, color, VG_LITE_FILTER_POINT);
     if(err != VG_LITE_SUCCESS) {
         if(scissoring)
             vg_lite_disable_scissor();
