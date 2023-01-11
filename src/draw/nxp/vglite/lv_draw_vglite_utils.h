@@ -43,7 +43,6 @@ extern "C" {
 #include "vg_lite.h"
 #include "../../sw/lv_draw_sw.h"
 #include "../../../misc/lv_log.h"
-#include "fsl_debug_console.h"
 
 /*********************
  *      DEFINES
@@ -78,32 +77,6 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/**
- * Init vglite buffer.
- *
- * @param[in/out] vgbuf The vglite buffer it has to be updated
- * @param[in] buf Buffer pointer (does not require alignment for VG_LITE_LINEAR mode)
- * @param[in] area Buffer area (for width and height)
- * @param[in] stride Buffer stride in pixels
- */
-void lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
-
-/**
- * Get vglite destination buffer pointer.
- *
- * @retval The vglite destination buffer
- */
-vg_lite_buffer_t * lv_vglite_get_dest_buf(void);
-
-/**
- * Init vglite destination buffer. It will be set once per frame.
- *
- * @param[in] dest_buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
- * @param[in] dest_area Destination buffer area (for width and height)
- * @param[in] dest_stride Stride of destination buffer
- */
-void lv_vglite_init_dest_buf(const lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride);
 
 /**
  * Premultiplies and swizzles given LVGL 32bit color to obtain vglite color.
