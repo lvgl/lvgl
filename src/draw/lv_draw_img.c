@@ -73,8 +73,8 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
     if(draw_ctx->draw_img) {
         res = draw_ctx->draw_img(draw_ctx, dsc, coords, src);
     }
-    
-    if (res != LV_RES_OK) {
+
+    if(res != LV_RES_OK) {
         res = decode_and_draw(draw_ctx, dsc, coords, src);
     }
 
