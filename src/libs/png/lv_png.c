@@ -27,7 +27,7 @@
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
-static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
+static void convert_color_depth(uint8_t ** img_p, uint32_t px_cnt);
 
 /**********************
  *  STATIC VARIABLES
@@ -185,7 +185,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
             }
 
             /*Convert the image to the system's color depth*/
-            convert_color_depth(img_data,  png_width * png_height);
+            convert_color_depth(&img_data,  png_width * png_height);
             dsc->img_data = img_data;
             return LV_RES_OK;     /*The image is fully decoded. Return with its pointer*/
         }
@@ -207,7 +207,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         }
 
         /*Convert the image to the system's color depth*/
-        convert_color_depth(img_data,  png_width * png_height);
+        convert_color_depth(&img_data,  png_width * png_height);
 
         dsc->img_data = img_data;
         return LV_RES_OK;     /*Return with its pointer*/
@@ -233,12 +233,14 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
  * @param img the ARGB888 image
  * @param px_cnt number of pixels in `img`
  */
-static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
+static void convert_color_depth(uint8_t ** img_p, uint32_t px_cnt)
 {
+    uint8_t * img = *img_p;
+
 #if LV_COLOR_DEPTH == 32
     lv_color32_t * img_argb = (lv_color32_t *)img;
     lv_color_t c;
-    lv_color_t * img_c = (lv_color_t *) img;
+    lv_color_t * img_c = (lv_color_t *)img;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
         c = lv_color_make(img_argb[i].ch.red, img_argb[i].ch.green, img_argb[i].ch.blue);
@@ -273,6 +275,11 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
         img[i * 2 + 1] = img_argb[i].ch.alpha;
         img[i * 2 + 0] = b > 128 ? 1 : 0;
     }
+#endif
+
+#if LV_COLOR_DEPTH != 32
+    /*Reallocate memory to reduce memory usage*/
+    *img_p = lv_realloc(img, LV_IMG_PX_SIZE_ALPHA_BYTE * px_cnt);
 #endif
 }
 
