@@ -94,23 +94,38 @@ static lv_res_t vglite_blit_single(const lv_area_t * dest_area, const lv_area_t 
  */
 static lv_res_t check_src_alignment(const lv_color_t * src_buf, lv_coord_t src_stride);
 
+/**
+ * Translates the matrix to destination coordinates.
+ *
+ * @param[in] dest_area Area with relative coordinates of destination buffer
+ */
+static inline void lv_vglite_translate_matrix(const lv_area_t * dest_area);
+
+/**
+ * Translates the matrix to destination coordinates with transformation (scale or rotate).
+ *
+ * @param[in] dest_area Area with relative coordinates of destination buffer
+ * @param[in] dsc Image descriptor
+ */
+static inline void lv_vglite_transform_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc);
+
 #if VG_LITE_BLIT_SPLIT_ENABLED
 
 /**
-* Move buffer pointer as close as possible to area, but with respect to alignment requirements. X-axis only.
-*
-* @param[in/out] area Area to be updated
-* @param[in/out] buf Pointer to be updated
-*/
+ * Move buffer pointer as close as possible to area, but with respect to alignment requirements. X-axis only.
+ *
+ * @param[in/out] area Area to be updated
+ * @param[in/out] buf Pointer to be updated
+ */
 static void align_x(lv_area_t * area, lv_color_t ** buf);
 
 /**
-* Move buffer pointer to the area start and update variables, Y-axis only.
-*
-* @param[in/out] area Area to be updated
-* @param[in/out] buf Pointer to be updated
-* @param[in] stride Buffer stride in pixels
-*/
+ * Move buffer pointer to the area start and update variables, Y-axis only.
+ *
+ * @param[in/out] area Area to be updated
+ * @param[in/out] buf Pointer to be updated
+ * @param[in] stride Buffer stride in pixels
+ */
 static void align_y(lv_area_t * area, lv_color_t ** buf, lv_coord_t stride);
 
 /**
@@ -209,10 +224,10 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
                                 const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
                                 lv_opa_t opa)
 {
-    vg_lite_identity(&vgmatrix);
-    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
+    /* Set vgmatrix. */
+    lv_vglite_translate_matrix(dest_area);
 
-    /* Wrap src buffer into VG-Lite buffer */
+    /* Set src_vgbuf structure. */
     lv_vglite_set_src_buf(src_buf, src_area, src_stride);
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
@@ -220,7 +235,7 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
 
     lv_res_t rv = vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
 
-    /* Restore the original vglite buf address. */
+    /* Restore the original dest_vgbuf memory address. */
     lv_vglite_set_dest_buf_ptr(orig_dest_buf);
 
     return rv;
@@ -239,22 +254,10 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
                                           const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
                                           const lv_draw_img_dsc_t * dsc)
 {
-    bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
-    bool has_rotation = (dsc->angle != 0);
+    /* Set vgmatrix. */
+    lv_vglite_transform_matrix(dest_area, dsc);
 
-    vg_lite_identity(&vgmatrix);
-    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
-
-    if(has_scale || has_rotation) {
-        vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
-
-        vg_lite_translate(dsc->pivot.x, dsc->pivot.y, &vgmatrix);
-        vg_lite_rotate(dsc->angle / 10.0f, &vgmatrix);   /* angle is 1/10 degree */
-        vg_lite_scale(scale, scale, &vgmatrix);
-        vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &vgmatrix);
-    }
-
-    /* Wrap src buffer into VG-Lite buffer */
+    /* Set src_vgbuf structure. */
     lv_vglite_set_src_buf(src_buf, src_area, src_stride);
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
@@ -262,7 +265,7 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
 
     lv_res_t rv = vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
 
-    /* Restore the original vglite buf address. */
+    /* Restore the original dest_vgbuf memory address. */
     lv_vglite_set_dest_buf_ptr(orig_dest_buf);
 
     return rv;
@@ -307,17 +310,15 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
     /* Stage 2: If we're in limit, do a single BLIT */
     if((src_area->x2 < LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR) &&
        (src_area->y2 < LV_GPU_NXP_VG_LITE_BLIT_SPLIT_THR)) {
-        /* Check alignment. */
         if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
             VG_LITE_RETURN_INV("Check src alignment failed.");
 
-        /* Set new vglite buf addresses. */
+        /* Set new dest_vgbuf and src_vgbuf memory addresses. */
         lv_vglite_set_dest_buf_ptr(dest_buf);
         lv_vglite_set_src_buf_ptr(src_buf);
 
-        /* Set matrix. */
-        vg_lite_identity(&vgmatrix);
-        vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
+        /* Set vgmatrix. */
+        lv_vglite_translate_matrix(dest_area);
 
         rv = vglite_blit_single(dest_area, src_area, opa);
 
@@ -419,17 +420,15 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
                 tile_dest_area.x2 += shift_dest_x;
             }
 
-            /* Check alignment. */
             if(check_src_alignment(tile_src_buf, src_stride) != LV_RES_OK)
                 VG_LITE_RETURN_INV("Check src alignment failed.");
 
-            /* Set new vglite buf addresses. */
+            /* Set vgmatrix. */
+            lv_vglite_translate_matrix(&tile_dest_area);
+
+            /* Set new dest_vgbuf and src_vgbuf memory addresses. */
             lv_vglite_set_dest_buf_ptr(tile_dest_buf);
             lv_vglite_set_src_buf_ptr(tile_src_buf);
-
-            /* Set matrix.*/
-            vg_lite_identity(&vgmatrix);
-            vg_lite_translate((vg_lite_float_t)tile_dest_area.x1, (vg_lite_float_t)tile_dest_area.y1, &vgmatrix);
 
             rv = vglite_blit_single(&tile_dest_area, &tile_src_area, opa);
 
@@ -531,10 +530,32 @@ static lv_res_t check_src_alignment(const lv_color_t * src_buf, lv_coord_t src_s
     return LV_RES_OK;
 }
 
+static inline void lv_vglite_translate_matrix(const lv_area_t * dest_area)
+{
+    vg_lite_identity(&vgmatrix);
+    vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
+}
+
+static inline void lv_vglite_transform_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc)
+{
+    lv_vglite_translate_matrix(dest_area);
+
+    bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
+    bool has_rotation = (dsc->angle != 0);
+
+    if(has_scale || has_rotation) {
+        vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
+
+        vg_lite_translate(dsc->pivot.x, dsc->pivot.y, &vgmatrix);
+        vg_lite_rotate(dsc->angle / 10.0f, &vgmatrix);   /* angle is 1/10 degree */
+        vg_lite_scale(scale, scale, &vgmatrix);
+        vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &vgmatrix);
+    }
+}
+
 #if VG_LITE_BLIT_SPLIT_ENABLED
 static void align_x(lv_area_t * area, lv_color_t ** buf)
 {
-
     int alignedAreaStartPx = area->x1 - (area->x1 % (LV_ATTRIBUTE_MEM_ALIGN_SIZE / sizeof(lv_color_t)));
     VG_LITE_COND_STOP(alignedAreaStartPx < 0, "Negative X alignment.");
 
