@@ -54,6 +54,14 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/**
+ * Init vglite destination buffer. It will be done once per frame.
+ *
+ * @param[in] buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
+ * @param[in] area Destination buffer area (for width and height)
+ * @param[in] stride Stride of destination buffer
+ */
+void lv_gpu_nxp_vglite_init_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 
 /**
  * Get vglite destination buffer pointer.
@@ -82,15 +90,6 @@ void lv_vglite_set_dest_buf_ptr(const lv_color_t * buf);
  * @param[in] buf Source buffer address
  */
 void lv_vglite_set_src_buf_ptr(const lv_color_t * buf);
-
-/**
- * Set vglite destination buffer. It will be done once per frame.
- *
- * @param[in] buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
- * @param[in] area Destination buffer area (for width and height)
- * @param[in] stride Stride of destination buffer
- */
-void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 
 /**
  * Set vglite source buffer. It will be done only if buffer addreess is different.
