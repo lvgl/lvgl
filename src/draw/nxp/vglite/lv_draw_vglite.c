@@ -39,6 +39,7 @@
 #include "lv_draw_vglite_line.h"
 #include "lv_draw_vglite_rect.h"
 #include "lv_draw_vglite_arc.h"
+#include "lv_vglite_buf.h"
 
 #if LV_COLOR_DEPTH != 32
     #include "../../../core/lv_refr.h"
@@ -55,6 +56,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static void lv_draw_vglite_init_buf(lv_draw_ctx_t * draw_ctx);
 
 static void lv_draw_vglite_wait_for_finish(lv_draw_ctx_t * draw_ctx);
 
@@ -96,6 +99,7 @@ void lv_draw_vglite_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     lv_draw_sw_init_ctx(drv, draw_ctx);
 
     lv_draw_vglite_ctx_t * vglite_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
+    vglite_draw_ctx->base_draw.init_buf = lv_draw_vglite_init_buf;
     vglite_draw_ctx->base_draw.draw_line = lv_draw_vglite_line;
     vglite_draw_ctx->base_draw.draw_arc = lv_draw_vglite_arc;
     vglite_draw_ctx->base_draw.draw_rect = lv_draw_vglite_rect;
@@ -132,6 +136,11 @@ static inline bool need_argb8565_support()
 #endif
 
     return false;
+}
+
+static void lv_draw_vglite_init_buf(lv_draw_ctx_t * draw_ctx)
+{
+    lv_gpu_nxp_vglite_init_buf(draw_ctx->buf, draw_ctx->buf_area, lv_area_get_width(draw_ctx->buf_area));
 }
 
 static void lv_draw_vglite_wait_for_finish(lv_draw_ctx_t * draw_ctx)

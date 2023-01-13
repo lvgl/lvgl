@@ -55,6 +55,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
+static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 static inline void vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf);
 static inline void vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
                                   const lv_area_t * area, lv_coord_t stride);
@@ -73,6 +74,11 @@ static vg_lite_buffer_t src_vgbuf;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+void lv_gpu_nxp_vglite_init_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
+{
+    lv_vglite_set_dest_buf(buf, area, stride);
+}
 
 vg_lite_buffer_t * lv_vglite_get_dest_buf(void)
 {
@@ -94,11 +100,6 @@ void lv_vglite_set_src_buf_ptr(const lv_color_t * buf)
     vglite_set_buf_ptr(&src_vgbuf, buf);
 }
 
-void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
-{
-    vglite_set_buf(&dest_vgbuf, buf, area, stride);
-}
-
 void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
 {
     if(src_vgbuf.memory != (void *)buf)
@@ -108,6 +109,11 @@ void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_co
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
+{
+    vglite_set_buf(&dest_vgbuf, buf, area, stride);
+}
 
 static inline void vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf)
 {
