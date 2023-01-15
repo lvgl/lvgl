@@ -76,7 +76,6 @@
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
         #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
-
         #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
     #endif   /*LV_TICK_CUSTOM*/
 #else
@@ -190,13 +189,6 @@
     #define LV_GPU_SWM341_DMA2D_INCLUDE "SWM341.h"
 #endif
 
-/*Use GD32 IPA GPU
- * This adds support for Image Processing Accelerator on GD32F450 and GD32F470 series MCUs
- *
- * NOTE: IPA on GD32F450 has a bug where the fill operation overwrites data beyond the
- * framebuffer. This driver works around it by saving and restoring affected memory, but
- * this makes it not thread-safe. GD32F470 is not affected. */
-
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -216,11 +208,11 @@
     *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
     *LV_LOG_LEVEL_USER        Only logs added by the user
     *LV_LOG_LEVEL_NONE        Do not log anything*/
-    #define LV_LOG_LEVEL      LV_LOG_LEVEL_USER
+    #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
 
     /*1: Print the log with 'printf';
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
-    #define LV_LOG_PRINTF 0
+    #define LV_LOG_PRINTF 1
 
     /*1: Enable print timestamp;
      *0: Disable print timestamp*/
@@ -235,7 +227,7 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-    #define LV_LOG_TRACE_MSG        1
+	#define LV_LOG_TRACE_MSG		1
 
 #endif  /*LV_USE_LOG*/
 
@@ -325,7 +317,7 @@
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN      __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN __attribute__((aligned(4)))
 
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
@@ -584,6 +576,8 @@
  * 3RD PARTS LIBRARIES
  *====================*/
 
+/*File system interfaces for common APIs */
+
 /*API for fopen, fread, etc*/
 #if LV_USE_FS_STDIO
     #define LV_FS_STDIO_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
@@ -629,6 +623,7 @@
     #define LV_FREETYPE_CACHE_FT_SIZES 4
 #endif
 
+/* Built-in TTF decoder */
 #if LV_USE_TINY_TTF
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
@@ -673,6 +668,7 @@
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
+//#define LV_USE_IME_PINYIN 0
 #if LV_USE_IME_PINYIN
     /*1: Use default thesaurus*/
     /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
@@ -690,13 +686,14 @@
 
 /*1: Enable file explorer*/
 /*Requires: lv_table*/
+//#define LV_USE_FILE_EXPLORER                     0
 #if LV_USE_FILE_EXPLORER
     /*Maximum length of path*/
     #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
     /*Quick access bar, 1:use, 0:not use*/
     /*Requires: lv_list*/
     #define LV_FILE_EXPLORER_QUICK_ACCESS        1
-#endif 
+#endif
 
 /*==================
 * EXAMPLES
@@ -717,7 +714,7 @@
 /*Benchmark your system*/
 #if LV_USE_DEMO_BENCHMARK
     /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-    #define LV_DEMO_BENCHMARK_RGB565A8 1
+    #define LV_DEMO_BENCHMARK_RGB565A8 0
 #endif
 
 /*--END OF LV_CONF_H--*/
