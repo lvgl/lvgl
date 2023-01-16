@@ -21,20 +21,18 @@
     #define RBS_BIT 0U
 #endif
 
-#if LV_COLOR_DEPTH == 16
-    #define DMA2D_INPUT_COLOR DMA2D_INPUT_RGB565
-    #define DMA2D_OUTPUT_COLOR DMA2D_OUTPUT_RGB565
-#elif LV_COLOR_DEPTH == 32
-    #define DMA2D_INPUT_COLOR DMA2D_INPUT_ARGB8888
-    #define DMA2D_OUTPUT_COLOR DMA2D_OUTPUT_ARGB8888
-#else
-    #error "Cannot use DMA2D with LV_COLOR_DEPTH other than 16 or 32"
-#endif
-
 #define CACHE_ROW_SIZE 32U // cache row size in Bytes
 
 // For code/implementation discussion refer to https://github.com/lvgl/lvgl/issues/3714#issuecomment-1365187036
 // astyle --options=lvgl/scripts/code-format.cfg --ignore-exclude-errors lvgl/src/draw/stm32_dma2d/*.c lvgl/src/draw/stm32_dma2d/*.h
+
+#if LV_COLOR_DEPTH == 16
+    const dma2d_color_format_t LvglColorFormat = RGB565;
+#elif LV_COLOR_DEPTH == 32
+    const dma2d_color_format_t LvglColorFormat = ARGB8888;
+#else
+    #error "Cannot use DMA2D with LV_COLOR_DEPTH other than 16 or 32"
+#endif
 
 static bool isDma2dInProgess = false; // indicates whether DMA2D transfer *initiated here* is in progress
 
@@ -196,7 +194,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1,
                          -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
             _lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, dsc->src_buf, src_stride, &src_offset, dsc->opa,
-                                           DMA2D_INPUT_COLOR, true);
+                                           LvglColorFormat, true);
         }
     }
 }
@@ -220,7 +218,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     // FIXME: use lv_area_move(dest_area, -dest_area->x1, -dest_area->y1) here ?
     // TODO: It is assumed that dest_buf and src_buf buffers are of lv_color_t type. Verify it, this assumption may be incorrect.
     _lv_draw_stm32_dma2d_blend_map((const lv_color_t *)dest_buf, dest_stride, dest_area, (const lv_color_t *)src_buf,
-                                   src_stride, &src_offset, 0xff, DMA2D_INPUT_COLOR, true);
+                                   src_stride, &src_offset, 0xff, LvglColorFormat, true);
     // TODO: Investigate if output buffer cache needs to be invalidated. It depends on what the destination buffer is and how it is used next - by dma2d or not.
     _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL); // TODO: is this line needed here?
 }
@@ -230,29 +228,29 @@ lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
 {
     //if(lv_img_src_get_type(src) != LV_IMG_SRC_VARIABLE) return LV_RES_INV;
     const lv_img_dsc_t * img = src;
-    bitmap_color_code_t bitmapColorCode;
+    dma2d_color_format_t bitmapColorFormat;
     bool ignoreBitmapAlpha = false;
 
     switch(img->header.cf) {
         case LV_IMG_CF_RGBA8888:
-            bitmapColorCode = ARGB8888;
+            bitmapColorFormat = ARGB8888;
             break; // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
         case LV_IMG_CF_RGBX8888:
-            bitmapColorCode = ARGB8888;
+            bitmapColorFormat = ARGB8888;
             ignoreBitmapAlpha = true;
             break;
         case LV_IMG_CF_RGB565:
-            bitmapColorCode = RGB565;
+            bitmapColorFormat = RGB565;
             break;
         case LV_IMG_CF_TRUE_COLOR:
-            bitmapColorCode = DMA2D_INPUT_COLOR;
+            bitmapColorFormat = LvglColorFormat;
             break;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
 #if LV_COLOR_DEPTH == 16
             // bitmap color format is 24b ARGB8565 - dma2d unsupported
             return LV_RES_INV;
 #elif LV_COLOR_DEPTH == 32
-            bitmapColorCode = ARGB8888;
+            bitmapColorFormat = ARGB8888;
             break;
 #else
             // unknown bitmap color format
@@ -287,7 +285,7 @@ lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
     src_offset.y = draw_area.y1 - src_area->y1;
     lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
     _lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, img->data, img->header.w,
-                                   &src_offset, dsc->opa, bitmapColorCode, ignoreBitmapAlpha);
+                                   &src_offset, dsc->opa, bitmapColorFormat, ignoreBitmapAlpha);
     return LV_RES_OK;
 }
 
@@ -318,7 +316,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
     if(opa >= LV_OPA_MAX) {
         DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos; // Register-to-memory (no FG nor BG, only output stage active)
 
-        DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+        DMA2D->OPFCCR = LvglColorFormat;
         DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
@@ -344,14 +342,14 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
         DMA2D->FGOR = dest_stride;
         DMA2D->FGCOLR = lv_color_to32(color) & 0x00ffffff; // swap FGCOLR R/B bits if FGPFCCR.RBS (RBS_BIT) bit is set
 
-        DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
+        DMA2D->BGPFCCR = LvglColorFormat;
         DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
         DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->BGOR = dest_stride - draw_width;
         DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
         _lv_gpu_stm32_dma2d_clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-        DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+        DMA2D->OPFCCR = LvglColorFormat;
         DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
         DMA2D->OMAR = DMA2D->BGMAR;
         DMA2D->OOR = DMA2D->BGOR;
@@ -372,19 +370,19 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
  */
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                                           const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset, lv_opa_t opa,
-                                                          bitmap_color_code_t src_color_code, bool ignore_src_alpha)
+                                                          dma2d_color_format_t src_color_format, bool ignore_src_alpha)
 {
     assert_param(!isDma2dInProgess); // critical
     if(opa <= LV_OPA_MIN) return;
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
-    bool bitmapHasOpacity = !ignore_src_alpha && (src_color_code == ARGB8888 || src_color_code == ARGB1555 ||
-                                                  src_color_code == ARGB4444);
+    bool bitmapHasOpacity = !ignore_src_alpha && (src_color_format == ARGB8888 || src_color_format == ARGB1555 ||
+                                                  src_color_format == ARGB4444);
 
     if(opa >= LV_OPA_MAX) opa = 0xff;
 
     uint8_t srcBpp; // source bytes per pixel
-    switch(src_color_code) {
+    switch(src_color_format) {
         case ARGB8888:
             srcBpp = 4;
             break;
@@ -397,17 +395,17 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
             srcBpp = 2;
             break;
         default:
-            LV_LOG_ERROR("unsupported color code");
+            LV_LOG_ERROR("unsupported color format");
             return;
     }
 
     _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL);
 
-    DMA2D->FGPFCCR = src_color_code;
+    DMA2D->FGPFCCR = src_color_format;
 
     if(opa == 0xff && !bitmapHasOpacity) {
         // no need to blend
-        if(src_color_code == DMA2D_OUTPUT_COLOR) {
+        if(src_color_format == LvglColorFormat) {
             // no need to convert pixel format (PFC) either
             DMA2D->CR = 0x0UL;
         }
@@ -436,7 +434,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
     DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, srcBpp);
 
-    DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+    DMA2D->OPFCCR = LvglColorFormat;
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
     DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->OOR = dest_stride - draw_width;
@@ -444,7 +442,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
 
     if(opa != 0xff || bitmapHasOpacity) {
         // use background (BG*) registers
-        DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
+        DMA2D->BGPFCCR = LvglColorFormat;
         DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
         DMA2D->BGMAR = DMA2D->OMAR;
         DMA2D->BGOR = DMA2D->OOR;
@@ -488,14 +486,14 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
     DMA2D->FGCOLR = lv_color_to32(color) & 0x00ffffff;  // swap FGCOLR R/B bits if FGPFCCR.RBS (RBS_BIT) bit is set
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_opa_t));
 
-    DMA2D->BGPFCCR = DMA2D_INPUT_COLOR;
+    DMA2D->BGPFCCR = LvglColorFormat;
     DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
     DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->BGOR = dest_stride - draw_width;
     DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
-    DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+    DMA2D->OPFCCR = LvglColorFormat;
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
     DMA2D->OMAR = DMA2D->BGMAR;
     DMA2D->OOR = DMA2D->BGOR;
@@ -521,7 +519,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * d
 
     DMA2D->CR = 0x0UL; // Memory-to-memory (FG fetch only)
 
-    DMA2D->FGPFCCR = DMA2D_INPUT_COLOR;
+    DMA2D->FGPFCCR = LvglColorFormat;
     DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
     DMA2D->FGMAR = (uint32_t)(src_buf + (src_stride * src_offset->y) + src_offset->x);
     DMA2D->FGOR = src_stride - draw_width;
@@ -530,7 +528,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * d
 
     // Note BG* registers do not need to be set up since BG is not used
 
-    DMA2D->OPFCCR = DMA2D_OUTPUT_COLOR;
+    DMA2D->OPFCCR = LvglColorFormat;
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
     DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->OOR = dest_stride - draw_width;
