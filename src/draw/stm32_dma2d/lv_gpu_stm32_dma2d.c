@@ -248,17 +248,16 @@ lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
             bitmapColorCode = DMA2D_INPUT_COLOR;
             break;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
-            if(DMA2D_INPUT_COLOR == DMA2D_INPUT_ARGB8888) {
-                bitmapColorCode = ARGB8888;
-                break;
-            }
-            else if(DMA2D_INPUT_COLOR == DMA2D_INPUT_RGB565) {
-                // bitmap color is 24b ARGB8565 - dma2d unsupported
-                return LV_RES_INV;
-            }
-            else {
-                return LV_RES_INV;
-            }
+#if LV_COLOR_DEPTH == 16
+            // bitmap color format is 24b ARGB8565 - dma2d unsupported
+            return LV_RES_INV;
+#elif LV_COLOR_DEPTH == 32
+            bitmapColorCode = ARGB8888;
+            break;
+#else
+            // unknown bitmap color format
+            return LV_RES_INV;
+#endif
         default:
             return LV_RES_INV;
     }
