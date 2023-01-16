@@ -56,9 +56,9 @@
  **********************/
 
 static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
-static inline void vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf);
-static inline void vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
-                                  const lv_area_t * area, lv_coord_t stride);
+static inline void lv_vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf);
+static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
+                                     const lv_area_t * area, lv_coord_t stride);
 
 /**********************
  *  STATIC VARIABLES
@@ -92,18 +92,18 @@ vg_lite_buffer_t * lv_vglite_get_src_buf(void)
 
 void lv_vglite_set_dest_buf_ptr(const lv_color_t * buf)
 {
-    vglite_set_buf_ptr(&dest_vgbuf, buf);
+    lv_vglite_set_buf_ptr(&dest_vgbuf, buf);
 }
 
 void lv_vglite_set_src_buf_ptr(const lv_color_t * buf)
 {
-    vglite_set_buf_ptr(&src_vgbuf, buf);
+    lv_vglite_set_buf_ptr(&src_vgbuf, buf);
 }
 
 void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
 {
     if(src_vgbuf.memory != (void *)buf)
-        vglite_set_buf(&src_vgbuf, buf, area, stride);
+        lv_vglite_set_buf(&src_vgbuf, buf, area, stride);
 }
 
 /**********************
@@ -112,17 +112,17 @@ void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_co
 
 static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
 {
-    vglite_set_buf(&dest_vgbuf, buf, area, stride);
+    lv_vglite_set_buf(&dest_vgbuf, buf, area, stride);
 }
 
-static inline void vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf)
+static inline void lv_vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf)
 {
     vgbuf->memory = (void *)buf;
     vgbuf->address = (uint32_t)vgbuf->memory;
 }
 
-static inline void vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
-                                  const lv_area_t * area, lv_coord_t stride)
+static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
+                                     const lv_area_t * area, lv_coord_t stride)
 {
     vgbuf->format = VG_LITE_PX_FMT;
     vgbuf->tiled = VG_LITE_LINEAR;

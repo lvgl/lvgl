@@ -81,7 +81,7 @@
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-static lv_res_t vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa);
+static lv_res_t lv_vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa);
 
 /**
  * Check source memory and stride alignment.
@@ -142,9 +142,9 @@ static void align_y(lv_area_t * area, lv_color_t ** buf, lv_coord_t stride);
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
-                                  const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
-                                  lv_opa_t opa);
+static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
+                                     const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
+                                     lv_opa_t opa);
 #endif
 
 /**********************
@@ -233,7 +233,7 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
 #if VG_LITE_BLIT_SPLIT_ENABLED
     lv_color_t * orig_dest_buf = dest_buf;
 
-    lv_res_t rv = vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
+    lv_res_t rv = lv_vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
 
     /* Restore the original dest_vgbuf memory address. */
     lv_vglite_set_dest_buf_ptr(orig_dest_buf);
@@ -246,7 +246,7 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
     if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
         VG_LITE_RETURN_INV("Check src alignment failed.");
 
-    return vglite_blit_single(dest_area, src_area, opa);
+    return lv_vglite_blit_single(dest_area, src_area, opa);
 #endif
 }
 
@@ -263,7 +263,7 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
 #if VG_LITE_BLIT_SPLIT_ENABLED
     lv_color_t * orig_dest_buf = dest_buf;
 
-    lv_res_t rv = vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
+    lv_res_t rv = lv_vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
 
     /* Restore the original dest_vgbuf memory address. */
     lv_vglite_set_dest_buf_ptr(orig_dest_buf);
@@ -276,7 +276,7 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
     if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
         VG_LITE_RETURN_INV("Check src alignment failed.");
 
-    return vglite_blit_single(dest_area, src_area, dsc->opa);
+    return lv_vglite_blit_single(dest_area, src_area, dsc->opa);
 #endif
 }
 
@@ -285,9 +285,9 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
  **********************/
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
-static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
-                                  const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
-                                  lv_opa_t opa)
+static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
+                                     const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
+                                     lv_opa_t opa)
 {
     lv_res_t rv = LV_RES_INV;
 
@@ -320,7 +320,7 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
         /* Set vgmatrix. */
         lv_vglite_translate_matrix(dest_area);
 
-        rv = vglite_blit_single(dest_area, src_area, opa);
+        rv = lv_vglite_blit_single(dest_area, src_area, opa);
 
         VG_LITE_LOG_TRACE("Single "
                           "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -430,7 +430,7 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
             lv_vglite_set_dest_buf_ptr(tile_dest_buf);
             lv_vglite_set_src_buf_ptr(tile_src_buf);
 
-            rv = vglite_blit_single(&tile_dest_area, &tile_src_area, opa);
+            rv = lv_vglite_blit_single(&tile_dest_area, &tile_src_area, opa);
 
             VG_LITE_LOG_TRACE("Tile [%d, %d] "
                               "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -454,7 +454,7 @@ static lv_res_t vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_area, 
 }
 #endif /* VG_LITE_BLIT_SPLIT_ENABLED */
 
-static lv_res_t vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa)
+static lv_res_t lv_vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = lv_vglite_get_dest_buf();
