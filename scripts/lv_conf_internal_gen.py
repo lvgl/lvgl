@@ -17,7 +17,7 @@ if sys.version_info < (3,6,0):
   exit(1)
 
 fin = open(LV_CONF_TEMPLATE)
-fout = open(LV_CONF_INTERNAL, "w")
+fout = open(LV_CONF_INTERNAL, "w", newline='')
 
 fout.write(
 '''/**
