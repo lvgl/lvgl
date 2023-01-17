@@ -20,7 +20,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include LV_GPU_DMA2D_CMSIS_INCLUDE
-//#include "stm32f7xx_hal.h"
+//#include "stm32f7xx.h"
 
 /*********************
  *      DEFINES
@@ -36,11 +36,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 enum dma2d_color_format {
-    ARGB8888 = DMA2D_INPUT_ARGB8888,
-    RGB888 = DMA2D_INPUT_RGB888,
-    RGB565 = DMA2D_INPUT_RGB565,
-    ARGB1555 = DMA2D_INPUT_ARGB1555,
-    ARGB4444 = DMA2D_INPUT_ARGB4444
+    ARGB8888 = 0x00000000U,
+    RGB888 = 0x00000001U,
+    RGB565 = 0x00000002U,
+    ARGB1555 = 0x00000003U,
+    ARGB4444 = 0x00000004U,
+    A8 = 0x00000009U
 };
 typedef enum dma2d_color_format dma2d_color_format_t;
 typedef lv_draw_sw_ctx_t lv_draw_stm32_dma2d_ctx_t;

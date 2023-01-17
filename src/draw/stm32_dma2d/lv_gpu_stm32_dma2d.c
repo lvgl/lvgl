@@ -330,7 +330,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
     else {
         DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos; // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
 
-        DMA2D->FGPFCCR = DMA2D_INPUT_A8;
+        DMA2D->FGPFCCR = A8;
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         // Alpha Mode 1: Replace original foreground image alpha channel value by FGPFCCR.ALPHA
         DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos);
@@ -474,7 +474,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
 
     DMA2D->CR = 0x2UL << DMA2D_CR_MODE_Pos;  // Memory-to-memory with blending (FG and BG fetch with PFC and blending)
 
-    DMA2D->FGPFCCR = DMA2D_INPUT_A8;
+    DMA2D->FGPFCCR = A8;
     if(opa < LV_OPA_MAX) {
         DMA2D->FGPFCCR |= (opa << DMA2D_FGPFCCR_ALPHA_Pos);
         DMA2D->FGPFCCR |= (0x2UL <<
