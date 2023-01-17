@@ -48,9 +48,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/** Stride in px required by VG-Lite HW*/
-#define LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX 16U
-
 #ifndef LV_GPU_NXP_VG_LITE_LOG_ERRORS
 /** Enable logging of VG-Lite errors (\see LV_LOG_ERROR)*/
 #define LV_GPU_NXP_VG_LITE_LOG_ERRORS 1

@@ -40,6 +40,9 @@
  *      DEFINES
  *********************/
 
+/** Stride in px required by VG-Lite HW*/
+#define LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX 16U
+
 /**
  * Enable BLIT quality degradation workaround for RT595,
  * recommended for screen's dimension > 352 pixels.
