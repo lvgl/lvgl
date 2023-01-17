@@ -44,6 +44,11 @@
  *      DEFINES
  *********************/
 
+/* Minimum area (in pixels) for PXP blit/fill processing. */
+#ifndef LV_GPU_NXP_PXP_SIZE_LIMIT
+    #define LV_GPU_NXP_PXP_SIZE_LIMIT 5000
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
