@@ -39,17 +39,35 @@ remove the misleading guide above this code segment.
 ...
 ```
 
-4. Remove macro definitions for
+4. Update `LV_STDIO_INCLUDE` and `LV_STRING_INCLUDE`
+
+   ```c
+   #define LV_STDIO_INCLUDE  <stdio.h>
+   #define LV_STRING_INCLUDE <string.h>
+   ```
+
+   
+
+5. Remove macro definitions for
+
    - LV_USE_GPU_STM32_DMA2D
    - LV_USE_GPU_NXP_PXP
    - LV_USE_GPU_NXP_VG_LITE
    - LV_USE_GPU_SWM341_DMA2D
    - LV_USE_GPU_GD32_IPA
    - LV_USE_GPU_ARM2D
+   - LV_USE_DEMO_WIDGETS
+   - LV_USE_DEMO_BENCHMARK
    - LV_USE_IME_PINYIN
    - LV_USE_FILE_EXPLORER
-   - LV_USE_TINY_TTF
-5. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
+
+6. Update `LV_LOG_PRINTF` to `1`
+
+7. Update `LV_DEMO_BENCHMARK_RGB565A8` to `1`
+
+8. Set `LV_FONT_MONTSERRAT_12` and `LV_FONT_MONTSERRAT_16` to `1` (So Widgets and Benchmark can be compiled correctly, this is for improving the out of box experience.)
+
+9. Update macro `LV_ATTRIBUTE_MEM_ALIGN` and `LV_ATTRIBUTE_MEM_ALIGN_SIZE`  to force a WORD alignment.
 ```c
 #define LV_ATTRIBUTE_MEM_ALIGN_SIZE     4
 #define LV_ATTRIBUTE_MEM_ALIGN          __attribute__((aligned(4)))
@@ -151,7 +169,7 @@ if [ `uname -s` = "Linux" ]
   CMSIS_PACK_PATH="/home/$USER/.arm/Packs/ARM/CMSIS/5.7.0/"
   PATH_TO_ADD="$CMSIS_PACK_PATH/CMSIS/Utilities/Linux64/"
 else
-  CMSIS_PACK_PATH="/C/Users/gabriel/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0"
+  CMSIS_PACK_PATH="/C/Users/$USER/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0"
   PATH_TO_ADD="/C/Program Files (x86)/7-Zip/:$CMSIS_PACK_PATH/CMSIS/Utilities/Win32/:/C/xmllint/"
 fi
 [[ ":$PATH:" != *":$PATH_TO_ADD}:"* ]] && PATH="${PATH}:${PATH_TO_ADD}"

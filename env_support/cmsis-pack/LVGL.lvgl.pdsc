@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2022-12-31" version="1.0.12" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.0.12.pack">
+    <release date="2023-01-15" version="1.1.0-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
+      - LVGL 9.0.0-dev
+      - Monthly update for January
+    </release>
+    <release date="2022-12-31" version="1.0.12" url="https://github.com/lvgl/lvgl/raw/7d0de1aabeabd4c71231895df7a503a3313b4619/env_support/cmsis-pack/LVGL.lvgl.1.0.12.pack">
       - LVGL 9.0.0-dev
       - The final update for 2022, Happy New Year
     </release>
@@ -471,7 +475,7 @@
                 <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.6" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.7" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
