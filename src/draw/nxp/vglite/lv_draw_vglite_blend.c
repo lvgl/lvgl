@@ -547,11 +547,13 @@ static inline void lv_vglite_transform_matrix(const lv_area_t * dest_area, const
     bool has_rotation = (dsc->angle != 0);
 
     if(has_scale || has_rotation) {
-        vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
-
         vg_lite_translate(dsc->pivot.x, dsc->pivot.y, &vgmatrix);
-        vg_lite_rotate(dsc->angle / 10.0f, &vgmatrix);   /* angle is 1/10 degree */
-        vg_lite_scale(scale, scale, &vgmatrix);
+        if(has_rotation)
+            vg_lite_rotate(dsc->angle / 10.0f, &vgmatrix);   /* angle is 1/10 degree */
+        if(has_scale) {
+            vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
+            vg_lite_scale(scale, scale, &vgmatrix);
+        }
         vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &vgmatrix);
     }
 }
