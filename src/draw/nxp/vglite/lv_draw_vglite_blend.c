@@ -98,19 +98,19 @@ static lv_res_t lv_vglite_blit_single(const lv_area_t * dest_area, const lv_area
 static lv_res_t check_src_alignment(const lv_color_t * src_buf, lv_coord_t src_stride);
 
 /**
- * Translates the matrix to destination coordinates.
+ * Creates matrix that translates to origin of given destination area.
  *
  * @param[in] dest_area Area with relative coordinates of destination buffer
  */
-static inline void lv_vglite_translate_matrix(const lv_area_t * dest_area);
+static inline void lv_vglite_set_translation_matrix(const lv_area_t * dest_area);
 
 /**
- * Translates the matrix to destination coordinates with transformation (scale or rotate).
+ * Creates matrix that translates to origin of given destination area with transformation (scale or rotate).
  *
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] dsc Image descriptor
  */
-static inline void lv_vglite_transform_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc);
+static inline void lv_vglite_set_transformation_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc);
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
 
@@ -228,7 +228,7 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
                                 lv_opa_t opa)
 {
     /* Set vgmatrix. */
-    lv_vglite_translate_matrix(dest_area);
+    lv_vglite_set_translation_matrix(dest_area);
 
     /* Set src_vgbuf structure. */
     lv_vglite_set_src_buf(src_buf, src_area, src_stride);
@@ -258,7 +258,7 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
                                           const lv_draw_img_dsc_t * dsc)
 {
     /* Set vgmatrix. */
-    lv_vglite_transform_matrix(dest_area, dsc);
+    lv_vglite_set_transformation_matrix(dest_area, dsc);
 
     /* Set src_vgbuf structure. */
     lv_vglite_set_src_buf(src_buf, src_area, src_stride);
@@ -321,7 +321,7 @@ static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_are
         lv_vglite_set_src_buf_ptr(src_buf);
 
         /* Set vgmatrix. */
-        lv_vglite_translate_matrix(dest_area);
+        lv_vglite_set_translation_matrix(dest_area);
 
         rv = lv_vglite_blit_single(dest_area, src_area, opa);
 
@@ -427,7 +427,7 @@ static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_are
                 VG_LITE_RETURN_INV("Check src alignment failed.");
 
             /* Set vgmatrix. */
-            lv_vglite_translate_matrix(&tile_dest_area);
+            lv_vglite_set_translation_matrix(&tile_dest_area);
 
             /* Set new dest_vgbuf and src_vgbuf memory addresses. */
             lv_vglite_set_dest_buf_ptr(tile_dest_buf);
@@ -533,15 +533,15 @@ static lv_res_t check_src_alignment(const lv_color_t * src_buf, lv_coord_t src_s
     return LV_RES_OK;
 }
 
-static inline void lv_vglite_translate_matrix(const lv_area_t * dest_area)
+static inline void lv_vglite_set_translation_matrix(const lv_area_t * dest_area)
 {
     vg_lite_identity(&vgmatrix);
     vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &vgmatrix);
 }
 
-static inline void lv_vglite_transform_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc)
+static inline void lv_vglite_set_transformation_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc)
 {
-    lv_vglite_translate_matrix(dest_area);
+    lv_vglite_set_translation_matrix(dest_area);
 
     bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
     bool has_rotation = (dsc->angle != 0);
