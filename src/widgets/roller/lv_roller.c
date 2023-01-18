@@ -124,7 +124,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         lv_coord_t normal_h = roller->option_cnt * (lv_font_get_line_height(font) + lv_obj_get_style_text_letter_space(obj, 0));
         roller->inf_page_cnt = LV_CLAMP(3, EXTRA_INF_SIZE / normal_h, 15);
         if(!(roller->inf_page_cnt & 1)) roller->inf_page_cnt++;   /*Make it odd*/
-        LV_LOG_INFO("Using %" LV_PRId32 " pages to make the roller look infinite", roller->inf_page_cnt);
+        LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
 
         size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
         char * opt_extra = lv_malloc(opt_len * roller->inf_page_cnt);
