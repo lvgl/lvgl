@@ -4,14 +4,14 @@
 #include "unity/unity.h"
 #include "lv_test_indev.h"
 
-LV_IMG_DECLARE(animimg001)
-LV_IMG_DECLARE(animimg002)
-LV_IMG_DECLARE(animimg003)
+LV_IMG_DECLARE(test_animimg001)
+LV_IMG_DECLARE(test_animimg002)
+LV_IMG_DECLARE(test_animimg003)
 
 static const lv_img_dsc_t * anim_imgs[3] = {
-    &animimg001,
-    &animimg002,
-    &animimg003,
+    &test_animimg001,
+    &test_animimg002,
+    &test_animimg003,
 };
 
 static lv_obj_t * active_screen = NULL;

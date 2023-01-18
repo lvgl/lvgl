@@ -131,13 +131,13 @@ add_library(test_common
     STATIC
         src/lv_test_indev.c
         src/lv_test_init.c
-        src/test_assets/animimg001.c
-        src/test_assets/animimg002.c
-        src/test_assets/animimg003.c
+        src/test_assets/test_animimg001.c
+        src/test_assets/test_animimg002.c
+        src/test_assets/test_animimg003.c
         src/test_assets/font_1.c
         src/test_assets/font_2.c
         src/test_assets/font_3.c
-        src/test_assets/img_caret_down.c
+        src/test_assets/test_img_caret_down.c
         src/test_assets/ubuntu_font.c
         unity/unity_support.c
         unity/unity.c
