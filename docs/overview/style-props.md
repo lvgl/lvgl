@@ -213,6 +213,45 @@ Sets the padding between the columns. Used by the layouts.
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
+## Margin
+Properties to describe spacing around an object. Very similar to the margin properties in HTML.
+
+### margin_top
+Sets the margin on the top. It makes the object area bigger in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### margin_bottom
+Sets the margin on the bottom. It makes the object area bigger in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### margin_left
+Sets the margin on the left. It makes the object area bigger in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### margin_right
+Sets the margin on the right. It makes the object area bigger in this direction.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
 ## Background
 Properties to describe the background color and image of the objects.
 

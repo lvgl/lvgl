@@ -44,6 +44,14 @@ void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_PAD_ROW;
 void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_PAD_COLUMN;
+void lv_style_set_margin_top(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_MARGIN_TOP;
+void lv_style_set_margin_bottom(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_MARGIN_BOTTOM;
+void lv_style_set_margin_left(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_MARGIN_LEFT;
+void lv_style_set_margin_right(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_MARGIN_RIGHT;
 void lv_style_set_bg_color(lv_style_t * style, lv_color_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_BG_COLOR;
 void lv_style_set_bg_opa(lv_style_t * style, lv_opa_t value);
@@ -280,6 +288,26 @@ extern const lv_style_prop_t _lv_style_const_prop_id_BASE_DIR;
 #define LV_STYLE_CONST_PAD_COLUMN(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_PAD_COLUMN, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_MARGIN_TOP(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_MARGIN_TOP, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_MARGIN_BOTTOM(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_MARGIN_BOTTOM, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_MARGIN_LEFT(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_MARGIN_LEFT, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_MARGIN_RIGHT(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_MARGIN_RIGHT, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_BG_COLOR(val) \

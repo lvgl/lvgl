@@ -97,6 +97,16 @@ static inline uint8_t get_grid_row_align(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_row_align(obj, 0);
 }
+static inline lv_coord_t get_margin_hor(lv_obj_t * obj)
+{
+    return lv_obj_get_style_margin_left(obj, LV_PART_MAIN)
+           + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+}
+static inline lv_coord_t get_margin_ver(lv_obj_t * obj)
+{
+    return lv_obj_get_style_margin_top(obj, LV_PART_MAIN)
+           + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
+}
 
 /**********************
  *  GLOBAL VARIABLES
@@ -618,20 +628,21 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     switch(col_align) {
         default:
         case LV_GRID_ALIGN_START:
-            x = c->x[col_pos];
+            x = c->x[col_pos] + lv_obj_get_style_margin_left(item, LV_PART_MAIN);
             item->w_layout = 0;
             break;
         case LV_GRID_ALIGN_STRETCH:
-            x = c->x[col_pos];
-            item_w = col_w;
+            x = c->x[col_pos] + lv_obj_get_style_margin_left(item, LV_PART_MAIN);
+            item_w = col_w - get_margin_hor(item);
             item->w_layout = 1;
             break;
         case LV_GRID_ALIGN_CENTER:
-            x = c->x[col_pos] + (col_w - item_w) / 2;
+            x = c->x[col_pos] + (col_w - item_w) / 2 + (lv_obj_get_style_margin_left(item, LV_PART_MAIN) -
+                                                        lv_obj_get_style_margin_right(item, LV_PART_MAIN)) / 2;
             item->w_layout = 0;
             break;
         case LV_GRID_ALIGN_END:
-            x = c->x[col_pos] + col_w - lv_obj_get_width(item);
+            x = c->x[col_pos] + col_w - lv_obj_get_width(item) - lv_obj_get_style_margin_right(item, LV_PART_MAIN);
             item->w_layout = 0;
             break;
     }
@@ -639,20 +650,21 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     switch(row_align) {
         default:
         case LV_GRID_ALIGN_START:
-            y = c->y[row_pos];
+            y = c->y[row_pos] + lv_obj_get_style_margin_top(item, LV_PART_MAIN);
             item->h_layout = 0;
             break;
         case LV_GRID_ALIGN_STRETCH:
-            y = c->y[row_pos];
-            item_h = row_h;
+            y = c->y[row_pos] + lv_obj_get_style_margin_top(item, LV_PART_MAIN);
+            item_h = row_h - get_margin_ver(item);
             item->h_layout = 1;
             break;
         case LV_GRID_ALIGN_CENTER:
-            y = c->y[row_pos] + (row_h - item_h) / 2;
+            y = c->y[row_pos] + (row_h - item_h) / 2 + (lv_obj_get_style_margin_top(item, LV_PART_MAIN) -
+                                                        lv_obj_get_style_margin_bottom(item, LV_PART_MAIN)) / 2;
             item->h_layout = 0;
             break;
         case LV_GRID_ALIGN_END:
-            y = c->y[row_pos] + row_h - lv_obj_get_height(item);
+            y = c->y[row_pos] + row_h - lv_obj_get_height(item) - lv_obj_get_style_margin_bottom(item, LV_PART_MAIN);
             item->h_layout = 0;
             break;
     }

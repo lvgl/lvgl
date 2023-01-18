@@ -230,6 +230,46 @@ void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_PAD_COLUMN = LV_STYLE_PAD_COLUMN;
 
+void lv_style_set_margin_top(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MARGIN_TOP, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_MARGIN_TOP = LV_STYLE_MARGIN_TOP;
+
+void lv_style_set_margin_bottom(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MARGIN_BOTTOM, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_MARGIN_BOTTOM = LV_STYLE_MARGIN_BOTTOM;
+
+void lv_style_set_margin_left(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MARGIN_LEFT, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_MARGIN_LEFT = LV_STYLE_MARGIN_LEFT;
+
+void lv_style_set_margin_right(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_MARGIN_RIGHT, v);
+}
+
+const lv_style_prop_t _lv_style_const_prop_id_MARGIN_RIGHT = LV_STYLE_MARGIN_RIGHT;
+
 void lv_style_set_bg_color(lv_style_t * style, lv_color_t value)
 {
     lv_style_value_t v = {

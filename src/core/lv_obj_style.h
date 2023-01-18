@@ -222,6 +222,26 @@ static inline void lv_obj_set_style_pad_ver(struct _lv_obj_t * obj, lv_coord_t v
     lv_obj_set_style_pad_bottom(obj, value, selector);
 }
 
+static inline void lv_obj_set_style_margin_all(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_obj_set_style_margin_left(obj, value, selector);
+    lv_obj_set_style_margin_right(obj, value, selector);
+    lv_obj_set_style_margin_top(obj, value, selector);
+    lv_obj_set_style_margin_bottom(obj, value, selector);
+}
+
+static inline void lv_obj_set_style_margin_hor(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_obj_set_style_margin_left(obj, value, selector);
+    lv_obj_set_style_margin_right(obj, value, selector);
+}
+
+static inline void lv_obj_set_style_margin_ver(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_obj_set_style_margin_top(obj, value, selector);
+    lv_obj_set_style_margin_bottom(obj, value, selector);
+}
+
 static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
 {
     lv_obj_set_style_pad_row(obj, value, selector);

@@ -141,7 +141,9 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-        child_res = LV_MAX(child_res, child->coords.y2);
+
+        lv_coord_t tmp_y = child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN);
+        child_res = LV_MAX(child_res, tmp_y);
     }
 
     lv_coord_t space_top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
@@ -180,8 +182,9 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-        x1 = LV_MIN(x1, child->coords.x1);
 
+        lv_coord_t tmp_x = child->coords.x1 - lv_obj_get_style_margin_left(child, LV_PART_MAIN);
+        x1 = LV_MIN(x1, tmp_x);
     }
 
     if(x1 != LV_COORD_MAX) {
@@ -217,7 +220,9 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = obj->spec_attr->children[i];
         if(lv_obj_has_flag_any(child,  LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_FLOATING)) continue;
-        child_res = LV_MAX(child_res, child->coords.x2);
+
+        lv_coord_t tmp_x = child->coords.x2 + lv_obj_get_style_margin_right(child, LV_PART_MAIN);
+        child_res = LV_MAX(child_res, tmp_x);
     }
 
     lv_coord_t space_right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
