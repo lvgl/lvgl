@@ -106,15 +106,15 @@ props = [
 
 {'name': 'MARGIN_BOTTOM',
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the bottom. It makes the object area bigger in this direction."},
+ 'dsc': "Sets the margin on the bottom. The object will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_LEFT',
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the left. It makes the object area bigger in this direction."},
+ 'dsc': "Sets the margin on the left. The object will keep this space from its siblings in layouts."},
 
 {'name': 'MARGIN_RIGHT',
   'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the right. It makes the object area bigger in this direction."},
+ 'dsc': "Sets the margin on the right. The object will keep this space from its siblings in layouts."},
 
 {'section': 'Background', 'dsc':'Properties to describe the background color and image of the objects.' },
 {'name': 'BG_COLOR',
