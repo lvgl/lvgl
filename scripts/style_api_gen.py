@@ -102,7 +102,7 @@ props = [
 {'section': 'Margin', 'dsc' : "Properties to describe spacing around an object. Very similar to the margin properties in HTML."},
 {'name': 'MARGIN_TOP',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Sets the margin on the top. It makes the object area bigger in this direction."},
+ 'dsc': "Sets the margin on the top. The object will keep this space from its siblings in layouts. "},
 
 {'name': 'MARGIN_BOTTOM',
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
