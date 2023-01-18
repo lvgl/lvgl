@@ -90,17 +90,17 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         return;
     }
     // Note: x1 must be zero. Otherwise, there is no way to correctly calculate dest_stride.
-    //assert_param(draw_ctx->buf_area->x1 == 0); // critical
+    //LV_ASSERT_MSG(draw_ctx->buf_area->x1 == 0); // critical
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     //uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
-    //assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical
+    //LV_ASSERT_MSG(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
+    LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical
 
     if(dsc->src_buf) {
         // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
         //uint32_t srcBufferLength = lv_area_get_size(dsc->blend_area) * sizeof(lv_color_t);
-        //assert_param(srcBufferLength % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
-        //assert_param((uint32_t)dsc->src_buf % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
+        //LV_ASSERT_MSG(srcBufferLength % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
+        //LV_ASSERT_MSG((uint32_t)dsc->src_buf % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
     }
 
     lv_area_t draw_area;
@@ -121,8 +121,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     if(mask != NULL) {
         // For performance reasons, both mask buffer start address and buffer size *should* be 32-byte aligned since mask buffer cache is being cleaned.
         //uint32_t srcBufferLength = lv_area_get_size(dsc->mask_area) * sizeof(lv_opa_t);
-        //assert_param(srcBufferLength % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
-        //assert_param((uint32_t)mask % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
+        //LV_ASSERT_MSG(srcBufferLength % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
+        //LV_ASSERT_MSG((uint32_t)mask % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
 
         lv_coord_t mask_stride = lv_area_get_width(dsc->mask_area);
         lv_point_t mask_offset; // mask offset in relation to draw_area
@@ -206,8 +206,8 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
 {
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     //uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
-    //assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical
+    //LV_ASSERT_MSG(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
+    LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical
     // FIXME:
     // 1. Both src_buf and dest_buf pixel size *must* be known to use DMA2D.
     // 2. Verify both buffers start addresses and lengths are 32-byte (cache row size) aligned.
@@ -268,13 +268,13 @@ lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
     // FIXME: If image is drawn by SW, then output cache needs to be cleaned next. Currently it is not possible.
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     //uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
-    //assert_param(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
-    assert_param((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0); // critical
+    //LV_ASSERT_MSG(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
+    LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical
 
     // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
     //uint32_t srcBufferLength = lv_area_get_size(src_area) * sizeof(lv_color_t); // TODO: verify src pixel size = sizeof(lv_color_t)
-    //assert_param(srcBufferLength % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
-    //assert_param((uint32_t)src % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
+    //LV_ASSERT_MSG(srcBufferLength % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
+    //LV_ASSERT_MSG((uint32_t)src % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
 
     lv_area_t draw_area;
     if(!_lv_area_intersect(&draw_area, src_area, draw_ctx->clip_area)) return LV_RES_OK;
@@ -307,7 +307,7 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                                            const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa)
 {
-    assert_param(!isDma2dInProgess); // critical
+    LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished"); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
@@ -372,7 +372,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
                                                           const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset, lv_opa_t opa,
                                                           dma2d_color_format_t src_color_format, bool ignore_src_alpha)
 {
-    assert_param(!isDma2dInProgess); // critical
+    LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished"); // critical
     if(opa <= LV_OPA_MIN) return;
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
@@ -466,7 +466,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
                                                             const lv_area_t * draw_area, const lv_opa_t * mask_buf, lv_coord_t mask_stride, const lv_point_t * mask_offset,
                                                             lv_color_t color, lv_opa_t opa)
 {
-    assert_param(!isDma2dInProgess); // critical
+    LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished"); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
@@ -511,7 +511,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
 LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
                                                             const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset)
 {
-    assert_param(!isDma2dInProgess); // critical
+    LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished"); // critical
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
 
@@ -542,7 +542,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * d
 
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_start_dma_transfer(void)
 {
-    assert_param(!isDma2dInProgess);
+    LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished");
     isDma2dInProgess = true;
     DMA2D->IFCR = 0x3FU; // trigger ISR flags reset
     // Note: cleaning output buffer cache is needed only when buffer may be misaligned or adjacent area may have been drawn in sw-fashion, e.g. using lv_draw_sw_blend_basic()
