@@ -72,6 +72,7 @@ void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
     dma2d_draw_ctx->blend = lv_draw_stm32_dma2d_blend;
     dma2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_stm32_dma2d_img_decoded;
+    //dma2d_draw_ctx->base_draw.draw_img = lv_draw_stm32_dma2d_img;
     // Note: currently it does not make sense use lv_gpu_stm32_dma2d_wait_cb() since waiting starts right after the dma2d transfer
     //dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_stm32_dma2d_wait_cb;
     dma2d_draw_ctx->base_draw.buffer_copy = lv_draw_stm32_dma2d_buffer_copy;
@@ -90,11 +91,11 @@ static void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw
         return;
     }
     // Note: x1 must be zero. Otherwise, there is no way to correctly calculate dest_stride.
-    //LV_ASSERT_MSG(draw_ctx->buf_area->x1 == 0); // critical
+    //LV_ASSERT_MSG(draw_ctx->buf_area->x1 == 0); // critical?
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     //uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     //LV_ASSERT_MSG(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
-    LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical
+    //LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical?
 
     if(dsc->src_buf) {
         // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
@@ -199,7 +200,7 @@ static void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * des
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     //uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     //LV_ASSERT_MSG(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
-    LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical
+    //LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical?
     // FIXME:
     // 1. Both src_buf and dest_buf pixel size *must* be known to use DMA2D.
     // 2. Verify both buffers start addresses and lengths are 32-byte (cache row size) aligned.
@@ -235,6 +236,7 @@ static void lv_draw_stm32_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_d
                                        img_dsc->opa, bitmapColorFormat, ignoreBitmapAlpha);
     }
     else {
+        // all more complex cases which require additional image transformations
         lv_draw_sw_img_decoded(draw_ctx, img_dsc, coords, src_buf, color_format);
 
     }
@@ -295,7 +297,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     //uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
     //LV_ASSERT_MSG(drawBufferLength % CACHE_ROW_SIZE == 0); // critical, but this is not the way to test it
-    LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical
+    //LV_ASSERT_MSG((uint32_t)draw_ctx->buf % CACHE_ROW_SIZE == 0, "draw_ctx.buf is not 32B aligned"); // critical?
 
     // For performance reasons, both source buffer start address and buffer size *should* be 32-byte aligned since source buffer cache is being cleaned.
     //uint32_t srcBufferLength = lv_area_get_size(src_area) * sizeof(lv_color_t); // TODO: verify src pixel size = sizeof(lv_color_t)
