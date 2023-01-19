@@ -71,7 +71,7 @@ void lv_draw_stm32_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     lv_draw_stm32_dma2d_ctx_t * dma2d_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
 
     dma2d_draw_ctx->blend = lv_draw_stm32_dma2d_blend;
-    dma2d_draw_ctx->base_draw.draw_img = lv_draw_stm32_dma2d_img;
+    dma2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_stm32_dma2d_img_decoded;
     // Note: currently it does not make sense use lv_gpu_stm32_dma2d_wait_cb() since waiting starts right after the dma2d transfer
     //dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_stm32_dma2d_wait_cb;
     dma2d_draw_ctx->base_draw.buffer_copy = lv_draw_stm32_dma2d_buffer_copy;
@@ -83,7 +83,7 @@ void lv_draw_stm32_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ct
     LV_UNUSED(draw_ctx);
 }
 
-void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+static void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
 {
     if(dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
         lv_draw_sw_blend_basic(draw_ctx, dsc);
@@ -116,7 +116,6 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
 
-
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
     if(mask != NULL) {
         // For performance reasons, both mask buffer start address and buffer size *should* be 32-byte aligned since mask buffer cache is being cleaned.
@@ -125,9 +124,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
         //LV_ASSERT_MSG((uint32_t)mask % CACHE_ROW_SIZE == 0); // FIXME: assert fails (performance, non-critical)
 
         lv_coord_t mask_stride = lv_area_get_width(dsc->mask_area);
-        lv_point_t mask_offset; // mask offset in relation to draw_area
-        mask_offset.x = draw_area.x1 - dsc->mask_area->x1;
-        mask_offset.y = draw_area.y1 - dsc->mask_area->y1;
+        lv_point_t mask_offset = lv_area_get_offset(dsc->mask_area, &draw_area); // mask offset in relation to draw_area
 
         if(dsc->src_buf == NULL) {  // 93.5%
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
@@ -139,9 +136,7 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
             // alpha channel bytes are carried in dsc->mask_buf
 #if LV_COLOR_DEPTH == 32
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
-            lv_point_t src_offset; // source image offset in relation to draw_area
-            src_offset.x = draw_area.x1 - dsc->blend_area->x1;
-            src_offset.y = draw_area.y1 - dsc->blend_area->y1;
+            lv_point_t src_offset = lv_area_get_offset(dsc->blend_area, &draw_area); // source image offset in relation to draw_area
             lv_coord_t draw_width = lv_area_get_width(&draw_area);
             lv_coord_t draw_height = lv_area_get_height(&draw_area);
 
@@ -181,16 +176,13 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
     }
     else {
         if(dsc->src_buf == NULL) {  // 6.1%
-            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1,
                          -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
             _lv_draw_stm32_dma2d_blend_fill(draw_ctx->buf, dest_stride, &draw_area, dsc->color, dsc->opa);
         }
         else {   // 0.2%
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
-            lv_point_t src_offset; // source image offset in relation to draw_area
-            src_offset.x = draw_area.x1 - dsc->blend_area->x1;
-            src_offset.y = draw_area.y1 - dsc->blend_area->y1;
+            lv_point_t src_offset = lv_area_get_offset(dsc->blend_area, &draw_area); // source image offset in relation to draw_area
             lv_area_move(&draw_area, -draw_ctx->buf_area->x1,
                          -draw_ctx->buf_area->y1); // translate the screen draw area to the origin of the buffer area
             _lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, dsc->src_buf, src_stride, &src_offset, dsc->opa,
@@ -201,8 +193,8 @@ void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_
 
 // Does dest_area = intersect(draw_ctx->clip_area, src_area) ?
 // See: https://github.com/lvgl/lvgl/issues/3714#issuecomment-1331710788
-void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
-                                     const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
+static void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
+                                            const lv_area_t * dest_area, void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
     //uint32_t drawBufferLength = lv_area_get_size(draw_ctx->buf_area) * sizeof(lv_color_t);
@@ -212,9 +204,7 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     // 1. Both src_buf and dest_buf pixel size *must* be known to use DMA2D.
     // 2. Verify both buffers start addresses and lengths are 32-byte (cache row size) aligned.
     LV_UNUSED(draw_ctx);
-    lv_point_t src_offset;
-    src_offset.x = dest_area->x1 - src_area->x1;
-    src_offset.y = dest_area->y1 - src_area->y1;
+    lv_point_t src_offset = lv_area_get_offset(src_area, dest_area);
     // FIXME: use lv_area_move(dest_area, -dest_area->x1, -dest_area->y1) here ?
     // TODO: It is assumed that dest_buf and src_buf buffers are of lv_color_t type. Verify it, this assumption may be incorrect.
     _lv_draw_stm32_dma2d_blend_map((const lv_color_t *)dest_buf, dest_stride, dest_area, (const lv_color_t *)src_buf,
@@ -223,47 +213,83 @@ void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx, void * dest_buf, 
     _lv_gpu_stm32_dma2d_await_dma_transfer_finish(NULL); // TODO: is this line needed here?
 }
 
-lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * src_area,
-                                 const void * src)
+static void lv_draw_stm32_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
+                                            const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t color_format)
 {
-    //if(lv_img_src_get_type(src) != LV_IMG_SRC_VARIABLE) return LV_RES_INV;
-    const lv_img_dsc_t * img = src;
-    dma2d_color_format_t bitmapColorFormat;
-    bool ignoreBitmapAlpha = false;
+    if(draw_ctx->draw_img_decoded == NULL) return;
+    lv_area_t draw_area;
+    lv_area_copy(&draw_area, draw_ctx->clip_area);
 
-    switch(img->header.cf) {
+    bool mask_any = lv_draw_mask_is_any(&draw_area);
+    bool transform = img_dsc->angle != 0 || img_dsc->zoom != LV_IMG_ZOOM_NONE;
+    const dma2d_color_format_t bitmapColorFormat = lv_color_format_to_dma2d_color_format(color_format);
+    const bool ignoreBitmapAlpha = (color_format == LV_IMG_CF_RGBX8888);
+
+    if(!mask_any && !transform && bitmapColorFormat != UNSUPPORTED && img_dsc->recolor_opa == LV_OPA_TRANSP) {
+        // simple bitmap blending, optionally with supported color format conversion - handle directly by dma2d
+        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+        lv_coord_t src_stride = lv_area_get_width(coords);
+        lv_point_t src_offset = lv_area_get_offset(coords, &draw_area); // source image offset in relation to draw_area
+        lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+        _lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, src_buf, src_stride, &src_offset,
+                                       img_dsc->opa, bitmapColorFormat, ignoreBitmapAlpha);
+    }
+    else {
+        lv_draw_sw_img_decoded(draw_ctx, img_dsc, coords, src_buf, color_format);
+
+    }
+}
+
+static lv_point_t lv_area_get_offset(const lv_area_t * area1, const lv_area_t * area2)
+{
+    lv_point_t offset = {x: area2->x1 - area1->x1, y: area2->y1 - area1->y1};
+    return offset;
+}
+
+static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t color_format)
+{
+    switch(color_format) {
         case LV_IMG_CF_RGBA8888:
-            bitmapColorFormat = ARGB8888;
-            break; // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
+            // note: LV_IMG_CF_RGBA8888 is actually ARGB8888
+            return ARGB8888;
         case LV_IMG_CF_RGBX8888:
-            bitmapColorFormat = ARGB8888;
-            ignoreBitmapAlpha = true;
-            break;
+            // note: LV_IMG_CF_RGBX8888 is actually XRGB8888
+            return ARGB8888;
         case LV_IMG_CF_RGB565:
-            bitmapColorFormat = RGB565;
-            break;
+            return RGB565;
         case LV_IMG_CF_TRUE_COLOR:
-            bitmapColorFormat = LvglColorFormat;
-            break;
+            return LvglColorFormat;
         case LV_IMG_CF_TRUE_COLOR_ALPHA:
 #if LV_COLOR_DEPTH == 16
             // bitmap color format is 24b ARGB8565 - dma2d unsupported
-            return LV_RES_INV;
+            return UNSUPPORTED;
 #elif LV_COLOR_DEPTH == 32
-            bitmapColorFormat = ARGB8888;
-            break;
+            return ARGB8888;
 #else
             // unknown bitmap color format
-            return LV_RES_INV;
+            return UNSUPPORTED;
 #endif
         default:
-            return LV_RES_INV;
+            return UNSUPPORTED;
+    }
+}
+
+static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
+                                        const lv_area_t * src_area,
+                                        const void * src)
+{
+    //if(lv_img_src_get_type(src) != LV_IMG_SRC_VARIABLE) return LV_RES_INV;
+    return LV_RES_INV;
+    if(img_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
+    const lv_img_dsc_t * img = src;
+    const dma2d_color_format_t bitmapColorFormat = lv_color_format_to_dma2d_color_format(img->header.cf);
+    const bool ignoreBitmapAlpha = (img->header.cf == LV_IMG_CF_RGBX8888);
+
+    if(bitmapColorFormat == UNSUPPORTED || img_dsc->angle != 0 || img_dsc->zoom != LV_IMG_ZOOM_NONE) {
+        return LV_RES_INV; // sorry, dma2d can handle this
     }
 
-    if(dsc->angle != 0 || dsc->zoom != 256) {
-        return LV_RES_INV; // sorry, dma2d can handle that
-    }
-
+    // FIXME: handle dsc.pivot, dsc.recolor, dsc.blend_mode
     // FIXME: src pixel size *must* be known to use DMA2D
     // FIXME: If image is drawn by SW, then output cache needs to be cleaned next. Currently it is not possible.
     // Both draw buffer start address and buffer size *must* be 32-byte aligned since draw buffer cache is being invalidated.
@@ -280,16 +306,14 @@ lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc
     if(!_lv_area_intersect(&draw_area, src_area, draw_ctx->clip_area)) return LV_RES_OK;
 
     lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-    lv_point_t src_offset; // source image offset in relation to draw_area
-    src_offset.x = draw_area.x1 - src_area->x1;
-    src_offset.y = draw_area.y1 - src_area->y1;
+    lv_point_t src_offset = lv_area_get_offset(src_area, &draw_area); // source image offset in relation to draw_area
     lv_area_move(&draw_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
     _lv_draw_stm32_dma2d_blend_map(draw_ctx->buf, dest_stride, &draw_area, img->data, img->header.w,
-                                   &src_offset, dsc->opa, bitmapColorFormat, ignoreBitmapAlpha);
+                                   &src_offset, img_dsc->opa, bitmapColorFormat, ignoreBitmapAlpha);
     return LV_RES_OK;
 }
 
-void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
+static void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     _lv_gpu_stm32_dma2d_await_dma_transfer_finish(disp->driver);
@@ -322,6 +346,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
         DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
         // Note: unlike FGCOLR and BGCOLR, OCOLR bits must match DMA2D_OUTPUT_COLOR, alpha can be specified
 #if RBS_BIT
+        // swap red/blue bits
         DMA2D->OCOLR = (color.ch.blue << 11) | (color.ch.green_l << 5 | color.ch.green_h << 8) | (color.ch.red);
 #else
         DMA2D->OCOLR = color.full;
@@ -373,7 +398,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
                                                           dma2d_color_format_t src_color_format, bool ignore_src_alpha)
 {
     LV_ASSERT_MSG(!isDma2dInProgess, "dma2d transfer has not finished"); // critical
-    if(opa <= LV_OPA_MIN) return;
+    if(opa <= LV_OPA_MIN || src_color_format == UNSUPPORTED) return;
     lv_coord_t draw_width = lv_area_get_width(draw_area);
     lv_coord_t draw_height = lv_area_get_height(draw_area);
     bool bitmapHasOpacity = !ignore_src_alpha && (src_color_format == ARGB8888 || src_color_format == ARGB1555 ||
