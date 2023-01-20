@@ -41,4 +41,10 @@
 #define lv_snprintf snprintf
 #define lv_vsnprintf vsnprintf
 
+/*
+ * Needed because of a workaround for a GCC bug,
+ * see https://github.com/lvgl/lvgl/issues/3078
+ */
+#define LV_CONF_SUPPRESS_DEFINE_CHECK 1
+
 #endif /* ZEPHYR_LIB_GUI_LVGL_LV_CONF_H_ */
