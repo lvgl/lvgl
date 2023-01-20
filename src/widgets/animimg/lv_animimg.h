@@ -99,7 +99,7 @@ void lv_animimg_set_repeat_count(lv_obj_t * img, uint16_t count);
  * @param img pointer to an animation image object
  * @return a pointer that will point to a series images
  */
-lv_img_dsc_t ** lv_animimg_get_src(lv_obj_t * img);
+const void ** lv_animimg_get_src(lv_obj_t * img);
 
 /**
  * Get the image animation images source.
