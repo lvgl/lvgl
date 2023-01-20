@@ -133,7 +133,7 @@ static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t 
     vgbuf->height = (int32_t)lv_area_get_height(area);
     vgbuf->stride = (int32_t)(stride) * sizeof(lv_color_t);
 
-    lv_memset_00(&vgbuf->yuv, sizeof(vgbuf->yuv));
+    lv_memset(&vgbuf->yuv, 0, sizeof(vgbuf->yuv));
 
     vgbuf->memory = (void *)buf;
     vgbuf->address = (uint32_t)vgbuf->memory;
