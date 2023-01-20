@@ -41,10 +41,6 @@
 #include "lv_draw_vglite_arc.h"
 #include "lv_vglite_buf.h"
 
-#if LV_COLOR_DEPTH != 32
-    #include "../../../core/lv_refr.h"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -134,7 +130,8 @@ void lv_draw_vglite_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 static inline bool need_argb8565_support(lv_draw_ctx_t * draw_ctx)
 {
 #if LV_COLOR_DEPTH != 32
-    if(draw_ctx->render_with_alpha) return true;
+    if(draw_ctx->render_with_alpha)
+        return true;
 #endif
 
     return false;
@@ -157,7 +154,7 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    if(need_argb8565_support()) {
+    if(need_argb8565_support(draw_ctx)) {
         lv_draw_sw_blend_basic(draw_ctx, dsc);
         return;
     }
@@ -210,7 +207,7 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    if(need_argb8565_support()) {
+    if(need_argb8565_support(draw_ctx)) {
         lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
         return;
     }
@@ -270,7 +267,7 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
     if(point1->x == point2->x && point1->y == point2->y)
         return;
 
-    if(need_argb8565_support()) {
+    if(need_argb8565_support(draw_ctx)) {
         lv_draw_sw_line(draw_ctx, dsc, point1, point2);
         return;
     }
@@ -307,7 +304,7 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
 
 static void lv_draw_vglite_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(need_argb8565_support()) {
+    if(need_argb8565_support(draw_ctx)) {
         lv_draw_sw_rect(draw_ctx, dsc, coords);
         return;
     }
@@ -480,7 +477,7 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
     if(start_angle == end_angle)
         return;
 
-    if(need_argb8565_support()) {
+    if(need_argb8565_support(draw_ctx)) {
         lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
         return;
     }
