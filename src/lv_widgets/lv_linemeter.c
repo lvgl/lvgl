@@ -447,7 +447,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         p1.y = y_out_extra;
 
         /* Set the color of the lines */
-        if(ext->cur_value == ext->min_value || (!ext->mirrored && i > level + ext->lvl_ofs) || (ext->mirrored && i <= level + ext->lvl_ofs)) {
+        if(ext->cur_value == ext->min_value || (!ext->mirrored && i > level + ext->lvl_ofs) || (ext->mirrored &&
+                                                                                                i <= level + ext->lvl_ofs)) {
             line_dsc.color = end_color;
             line_dsc.width = end_line_width;
         }

@@ -900,7 +900,8 @@ static void lv_refr_vdb_rotate(lv_area_t * area, lv_color_t * color_p)
              * Set the original last_part flag on the last part of rotation. */
             if(row + height >= area_h && vdb->last_area && vdb->last_part) {
                 vdb->flushing_last = 1;
-            } else {
+            }
+            else {
                 vdb->flushing_last = 0;
             }
 

@@ -246,8 +246,8 @@ static void basic_init(void)
     lv_style_set_bg_color(&styles->bg_click, LV_STATE_DISABLED, COLOR_BG_DIS);
     lv_style_set_border_width(&styles->bg_click, LV_STATE_CHECKED, 0);
     if((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) == 0) {
-    lv_style_set_border_color(&styles->bg_click, LV_STATE_FOCUSED | LV_STATE_PRESSED,
-            lv_color_darken(theme.color_primary, LV_OPA_20));
+        lv_style_set_border_color(&styles->bg_click, LV_STATE_FOCUSED | LV_STATE_PRESSED,
+                                  lv_color_darken(theme.color_primary, LV_OPA_20));
     }
 
     lv_style_set_border_color(&styles->bg_click, LV_STATE_PRESSED, COLOR_BG_BORDER_PR);
