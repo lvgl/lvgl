@@ -352,7 +352,6 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_TILEVIEW:
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_BG);
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_SCROLLBAR);
-            lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
             break;
 #endif
 

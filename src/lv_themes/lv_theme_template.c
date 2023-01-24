@@ -636,8 +636,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_SCROLLBAR);
             _lv_style_list_add_style(list, &styles->bg);
 
+#if LV_USE_ANIMATION
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
             _lv_style_list_add_style(list, &styles->bg);
+#endif
             break;
 #endif
 
