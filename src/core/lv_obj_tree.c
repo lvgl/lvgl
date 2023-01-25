@@ -390,6 +390,12 @@ static void obj_del_core(lv_obj_t * obj)
         indev = lv_indev_get_next(indev);
     }
 
+    /*Delete all pending async del-s*/
+    lv_res_t async_cancel_res = LV_RES_OK;
+    while(async_cancel_res == LV_RES_OK) {
+        async_cancel_res = lv_async_call_cancel(lv_obj_del_async_cb, obj);
+    }
+
     /*All children deleted. Now clean up the object specific data*/
     _lv_obj_destruct(obj);
 
