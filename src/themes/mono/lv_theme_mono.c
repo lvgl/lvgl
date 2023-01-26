@@ -50,6 +50,9 @@ typedef struct {
 #if LV_USE_TEXTAREA
     lv_style_t ta_cursor;
 #endif
+#if LV_USE_CHART
+    lv_style_t chart_indic;
+#endif
 } my_theme_styles_t;
 
 
@@ -156,6 +159,14 @@ static void style_init(bool dark_bg, const lv_font_t * font)
     lv_style_set_border_width(&styles->ta_cursor, 2);
     lv_style_set_bg_opa(&styles->ta_cursor, LV_OPA_TRANSP);
     lv_style_set_anim_time(&styles->ta_cursor, 500);
+#endif
+
+#if LV_USE_CHART
+    style_init_reset(&styles->chart_indic);
+    lv_style_set_radius(&styles->chart_indic, LV_RADIUS_CIRCLE);
+    lv_style_set_size(&styles->chart_indic, lv_disp_dpx(theme.disp, 8), lv_disp_dpx(theme.disp, 8));
+    lv_style_set_bg_color(&styles->chart_indic, COLOR_FG);
+    lv_style_set_bg_opa(&styles->chart_indic, LV_OPA_COVER);
 #endif
 }
 
@@ -353,6 +364,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_chart_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
+        lv_obj_add_style(obj, &styles->chart_indic, LV_PART_INDICATOR);
         lv_obj_add_style(obj, &styles->card, LV_PART_ITEMS);
         lv_obj_add_style(obj, &styles->card, LV_PART_TICKS);
         lv_obj_add_style(obj, &styles->card, LV_PART_CURSOR);
