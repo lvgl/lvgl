@@ -5,6 +5,5 @@
   <timestamp>2023-01-15T23:33:00</timestamp>
   <pindex>
     <pdsc url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" name="lvgl" version="1.1.0-alpha"/>
-    <pdsc url="https://raw.githubusercontent.com/lvgl/lvgl/v8.3/env_support/cmsis-pack/" vendor="LVGL" name="lvgl8" version="1.0.6-p1"/>
   </pindex>
 </index>
