@@ -169,8 +169,8 @@ static void _lv_gpu_nxp_pxp_wait(void)
     if(s_pxpIdle == true)
         return;
 
-    xSemaphoreTake(s_pxpIdleSem, portMAX_DELAY);
-    s_pxpIdle = true;
+    if(xSemaphoreTake(s_pxpIdleSem, portMAX_DELAY) == pdTRUE)
+        s_pxpIdle = true;
 #else
     while(s_pxpIdle == false) {
     }
