@@ -16,6 +16,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include "../misc/lv_bidi.h"
+#include "../misc/lv_style.h"
 
 /*********************
  *      DEFINES
@@ -26,6 +27,8 @@ extern "C" {
  **********************/
 /*Can't include lv_obj.h because it includes this header file*/
 struct _lv_obj_t;
+typedef uint32_t lv_part_t;
+typedef uint16_t lv_state_t;
 
 typedef enum {
     _LV_STYLE_STATE_CMP_SAME,           /*The style properties in the 2 states are identical*/
@@ -217,6 +220,26 @@ static inline void lv_obj_set_style_pad_ver(struct _lv_obj_t * obj, lv_coord_t v
 {
     lv_obj_set_style_pad_top(obj, value, selector);
     lv_obj_set_style_pad_bottom(obj, value, selector);
+}
+
+static inline void lv_obj_set_style_margin_all(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_obj_set_style_margin_left(obj, value, selector);
+    lv_obj_set_style_margin_right(obj, value, selector);
+    lv_obj_set_style_margin_top(obj, value, selector);
+    lv_obj_set_style_margin_bottom(obj, value, selector);
+}
+
+static inline void lv_obj_set_style_margin_hor(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_obj_set_style_margin_left(obj, value, selector);
+    lv_obj_set_style_margin_right(obj, value, selector);
+}
+
+static inline void lv_obj_set_style_margin_ver(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_obj_set_style_margin_top(obj, value, selector);
+    lv_obj_set_style_margin_bottom(obj, value, selector);
 }
 
 static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)

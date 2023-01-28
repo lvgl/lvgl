@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "../misc/lv_area.h"
+#include "lv_draw_img.h"
 
 /*********************
  *      DEFINES

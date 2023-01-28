@@ -184,6 +184,38 @@ void lv_obj_set_style_pad_column(struct _lv_obj_t * obj, lv_coord_t value, lv_st
     lv_obj_set_local_style_prop(obj, LV_STYLE_PAD_COLUMN, v, selector);
 }
 
+void lv_obj_set_style_margin_top(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_MARGIN_TOP, v, selector);
+}
+
+void lv_obj_set_style_margin_bottom(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_MARGIN_BOTTOM, v, selector);
+}
+
+void lv_obj_set_style_margin_left(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_MARGIN_LEFT, v, selector);
+}
+
+void lv_obj_set_style_margin_right(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_MARGIN_RIGHT, v, selector);
+}
+
 void lv_obj_set_style_bg_color(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {

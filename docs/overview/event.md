@@ -172,3 +172,13 @@ The *target* parameter of the event is always the current target object, not the
 .. include:: ../../examples/event/index.rst
 
 ```
+
+## API
+
+
+```eval_rst
+
+.. doxygenfile:: lv_event.h
+  :project: lvgl
+
+```

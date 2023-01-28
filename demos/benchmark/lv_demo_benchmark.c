@@ -804,15 +804,15 @@ static void show_scene_report(void)
     if(scene_act < 0) return;
 
     if(scene_with_opa) {
-        lv_label_set_text_fmt(subtitle, "Result: %"LV_PRId32" FPS",
+        lv_label_set_text_fmt(subtitle, "Result: %" LV_PRIu32 " FPS",
                               scenes[scene_act].fps_opa);
-        LV_LOG("Result of \"%s + opa\": %"LV_PRId32" FPS\n", scenes[scene_act].name,
+        LV_LOG("Result of \"%s + opa\": %" LV_PRIu32 " FPS\n", scenes[scene_act].name,
                scenes[scene_act].fps_opa);
     }
     else {
-        lv_label_set_text_fmt(subtitle, "Result: %"LV_PRId32" FPS",
+        lv_label_set_text_fmt(subtitle, "Result: %" LV_PRIu32 " FPS",
                               scenes[scene_act].fps_normal);
-        LV_LOG("Result of \"%s\": %"LV_PRId32" FPS\n", scenes[scene_act].name,
+        LV_LOG("Result of \"%s\": %" LV_PRIu32 " FPS\n", scenes[scene_act].name,
                scenes[scene_act].fps_normal);
     }
 }

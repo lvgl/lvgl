@@ -241,6 +241,8 @@ static signed char code128_switch_code(char from_mode, char to_mode)
                     return 101;
             }
             break;
+        default:
+            break;
     }
 
     CODE128_ASSERT(0); // Invalid mode switch
@@ -250,32 +252,32 @@ static signed char code128_switch_code(char from_mode, char to_mode)
 static signed char code128a_ascii_to_code(signed char value)
 {
     if(value >= ' ' && value <= '_')
-        return value - ' ';
+        return (signed char)(value - ' ');
     else if(value >= 0 && value < ' ')
-        return value + 64;
-    else if(value == CODE128_FNC1)
+        return (signed char)(value + 64);
+    else if(value == (signed char)CODE128_FNC1)
         return 102;
-    else if(value == CODE128_FNC2)
+    else if(value == (signed char)CODE128_FNC2)
         return 97;
-    else if(value == CODE128_FNC3)
+    else if(value == (signed char)CODE128_FNC3)
         return 96;
-    else if(value == CODE128_FNC4)
+    else if(value == (signed char)CODE128_FNC4)
         return 101;
     else
         return -1;
 }
 
-static signed char code128b_ascii_to_code(char value)
+static signed char code128b_ascii_to_code(signed char value)
 {
-    if(value >= 32)  // value <= 127 is implied
-        return value - 32;
-    else if(value == CODE128_FNC1)
+    if(value >= ' ')  // value <= 127 is implied
+        return (signed char)(value - ' ');
+    else if(value == (signed char)CODE128_FNC1)
         return 102;
-    else if(value == CODE128_FNC2)
+    else if(value == (signed char)CODE128_FNC2)
         return 97;
-    else if(value == CODE128_FNC3)
+    else if(value == (signed char)CODE128_FNC3)
         return 96;
-    else if(value == CODE128_FNC4)
+    else if(value == (signed char)CODE128_FNC4)
         return 100;
     else
         return -1;

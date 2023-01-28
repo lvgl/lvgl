@@ -98,8 +98,11 @@ lv_res_t lv_async_call_cancel(lv_async_cb_t async_xcb, void * user_data)
 
 static void lv_async_timer_cb(lv_timer_t * timer)
 {
+    /*Save the info because an lv_async_call_cancel might delete it in the callback*/
     lv_async_info_t * info = (lv_async_info_t *)timer->user_data;
-
-    info->cb(info->user_data);
+    lv_async_info_t info_save = *info;
+    lv_timer_del(timer);
     lv_free(info);
+
+    info_save.cb(info_save.user_data);
 }

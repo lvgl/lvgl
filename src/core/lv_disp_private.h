@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "lv_theme.h"
+#include "../draw/lv_draw.h"
 
 /*********************
  *      DEFINES

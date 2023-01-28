@@ -121,6 +121,16 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("finished");
 }
 
+static inline lv_coord_t resolve_point_coord(lv_coord_t coord, lv_coord_t max)
+{
+    if(LV_COORD_IS_PCT(coord)) {
+        return LV_CLAMP(0, max * LV_COORD_GET_PCT(coord) / 100, max);
+    }
+    else {
+        return coord;
+    }
+}
+
 static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
@@ -151,8 +161,13 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         uint16_t i;
         for(i = 0; i < line->point_num; i++) {
-            w = LV_MAX(line->point_array[i].x, w);
-            h = LV_MAX(line->point_array[i].y, h);
+            if(!LV_COORD_IS_PCT(line->point_array[i].x)) {
+                w = LV_MAX(line->point_array[i].x, w);
+            }
+
+            if(!LV_COORD_IS_PCT(line->point_array[i].y)) {
+                h = LV_MAX(line->point_array[i].y, h);
+            }
         }
 
         lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
@@ -171,7 +186,6 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_get_coords(obj, &area);
         lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(obj);
         lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(obj);
-        lv_coord_t h = lv_obj_get_height(obj);
 
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
@@ -182,17 +196,25 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         for(i = 0; i < line->point_num - 1; i++) {
             lv_point_t p1;
             lv_point_t p2;
-            p1.x = line->point_array[i].x + x_ofs;
-            p2.x = line->point_array[i + 1].x + x_ofs;
+
+            lv_coord_t w = lv_obj_get_width(obj);
+            lv_coord_t h = lv_obj_get_height(obj);
+
+            p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
+            p1.y = resolve_point_coord(line->point_array[i].y, h);
+
+            p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
+            p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
 
             if(line->y_inv == 0) {
-                p1.y = line->point_array[i].y + y_ofs;
-                p2.y = line->point_array[i + 1].y + y_ofs;
+                p1.y = p1.y + y_ofs;
+                p2.y = p2.y + y_ofs;
             }
             else {
-                p1.y = h - line->point_array[i].y + y_ofs;
-                p2.y = h - line->point_array[i + 1].y + y_ofs;
+                p1.y = h - p1.y + y_ofs;
+                p2.y = h - p2.y + y_ofs;
             }
+
             lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }

@@ -95,8 +95,8 @@ extern "C" {
 #include "src/libs/rlottie/lv_rlottie.h"
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
-#include "src/layouts/flex/lv_flex.h"
-#include "src/layouts/grid/lv_grid.h"
+
+#include "src/layouts/lv_layouts.h"
 
 #include "src/draw/lv_draw.h"
 
