@@ -84,6 +84,8 @@ typedef struct _lv_draw_ctx_t  {
      */
     lv_color_format_t color_format;
 
+    void (*init_buf)(struct _lv_draw_ctx_t * draw_ctx);
+
     void (*draw_rect)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
     void (*draw_arc)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,

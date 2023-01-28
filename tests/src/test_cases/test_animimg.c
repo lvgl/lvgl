@@ -44,16 +44,16 @@ void test_animimg_successful_create(void)
 
 void test_animimg_set_src(void)
 {
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, 3);
+    lv_animimg_set_src(animimg, (const void **) anim_imgs, 3);
 
     TEST_ASSERT_NOT_NULL(animimg);
 }
 
 void test_animimg_get_src(void)
 {
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, 3);
+    lv_animimg_set_src(animimg, (const void **) anim_imgs, 3);
 
-    lv_img_dsc_t ** actual_dsc = lv_animimg_get_src(animimg);
+    const void ** actual_dsc = lv_animimg_get_src(animimg);
 
     TEST_ASSERT_NOT_NULL(actual_dsc);
     TEST_ASSERT_EQUAL_PTR(actual_dsc, anim_imgs);
@@ -64,7 +64,7 @@ void test_animimg_get_src_count(void)
 {
     uint8_t expected_count = 3;
 
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, expected_count);
+    lv_animimg_set_src(animimg, (const void **) anim_imgs, expected_count);
 
     uint8_t actual_count = lv_animimg_get_src_count(animimg);
 
@@ -95,7 +95,7 @@ void test_animimg_start(void)
 {
     // for lv_animimg_start() to actually work,
     // we need to properly setup the widget beforehand
-    lv_animimg_set_src(animimg, (lv_img_dsc_t **) anim_imgs, 3);
+    lv_animimg_set_src(animimg, (const void **) anim_imgs, 3);
     lv_animimg_set_duration(animimg, 1000);
     lv_animimg_set_repeat_count(animimg, LV_ANIM_REPEAT_INFINITE);
 
