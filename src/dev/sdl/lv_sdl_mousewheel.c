@@ -10,6 +10,7 @@
 #if LV_USE_SDL
 
 #include "../../core/lv_group.h"
+#include "../../core/lv_indev_private.h"
 #include LV_SDL_INCLUDE_PATH
 
 /*********************

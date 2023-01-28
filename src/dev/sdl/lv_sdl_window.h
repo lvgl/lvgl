@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "../../core/lv_disp.h"
+#include "../../core/lv_indev.h"
 
 #if LV_USE_SDL
 

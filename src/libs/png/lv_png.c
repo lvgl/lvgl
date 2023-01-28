@@ -270,7 +270,7 @@ static void convert_color_depth(uint8_t ** img_p, uint32_t px_cnt)
 
 #if LV_COLOR_DEPTH != 32
     /*Reallocate memory to reduce memory usage*/
-    *img_p = lv_realloc(img, LV_IMG_PX_SIZE_ALPHA_BYTE * px_cnt);
+    *img_p = lv_realloc(img, LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE * px_cnt);
 #endif
 }
 

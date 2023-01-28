@@ -536,8 +536,8 @@ const lv_img_dsc_t test_animimg002 = {
     .header.always_zero = 0,
     .header.w = 130,
     .header.h = 170,
-    .data_size = 22100 * LV_IMG_PX_SIZE_ALPHA_BYTE,
-    .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
+    .data_size = 22100 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
     .data = test_animimg002_map,
 };
 

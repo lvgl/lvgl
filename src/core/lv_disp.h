@@ -13,10 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_theme.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_event.h"
-#include "lv_disp_private.h"
+#include "../misc/lv_area.h"
+#include "../misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -32,7 +32,7 @@ extern "C" {
 
 struct _lv_obj_t;
 struct _lv_theme_t;
-struct _lv_draw_crx_t;
+struct _lv_draw_ctx_t;
 struct _lv_disp_t;
 typedef struct _lv_disp_t lv_disp_t;
 
@@ -456,14 +456,14 @@ lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_
  * @param disp      pointer to a display
  * @param th        pointer to a theme
  */
-void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th);
+void lv_disp_set_theme(lv_disp_t * disp, struct _lv_theme_t * th);
 
 /**
  * Get the theme of a display
  * @param disp      pointer to a display
  * @return          the display's theme (can be NULL)
  */
-lv_theme_t * lv_disp_get_theme(lv_disp_t * disp);
+struct _lv_theme_t * lv_disp_get_theme(lv_disp_t * disp);
 
 /**
  * Get elapsed time since last user activity on a display (e.g. click)

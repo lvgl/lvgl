@@ -12,9 +12,10 @@
 #include "../../misc/lv_assert.h"
 #include "../../core/lv_group.h"
 #include "../../core/lv_indev.h"
+#include "../../core/lv_indev_private.h"
+#include "../../core/lv_disp.h"
 #include "../../draw/lv_draw.h"
 #include "../../misc/lv_math.h"
-#include "../../core/lv_disp.h"
 #include "../img/lv_img.h"
 
 /*********************
@@ -485,7 +486,7 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
             lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
 
         lv_obj_invalidate(obj);
-        lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+        lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK)
             return;
     }
