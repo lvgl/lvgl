@@ -261,13 +261,15 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
 
     /*Be sure there is no other animation on the screens*/
     lv_anim_del(new_scr, NULL);
-    lv_anim_del(lv_scr_act(), NULL);
+    lv_anim_del(act_scr, NULL);
 
     /*Be sure both screens are in a normal position*/
     lv_obj_set_pos(new_scr, 0, 0);
-    lv_obj_set_pos(lv_scr_act(), 0, 0);
     lv_obj_remove_local_style_prop(new_scr, LV_STYLE_OPA, 0);
-    lv_obj_remove_local_style_prop(lv_scr_act(), LV_STYLE_OPA, 0);
+    if(act_scr) {
+        lv_obj_set_pos(act_scr, 0, 0);
+        lv_obj_remove_local_style_prop(act_scr, LV_STYLE_OPA, 0);
+    }
 
 
     /*Shortcut for immediate load*/
