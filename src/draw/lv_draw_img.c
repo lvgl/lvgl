@@ -48,7 +48,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     lv_memzero(dsc, sizeof(lv_draw_img_dsc_t));
     dsc->recolor = lv_color_black();
     dsc->opa = LV_OPA_COVER;
-    dsc->zoom = LV_IMG_ZOOM_NONE;
+    dsc->zoom = LV_ZOOM_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
@@ -246,7 +246,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     else if(cdsc->dec_dsc.img_data) {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
-        if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
+        if(draw_dsc->angle || draw_dsc->zoom != LV_ZOOM_NONE) {
             int32_t w = lv_area_get_width(coords);
             int32_t h = lv_area_get_height(coords);
 

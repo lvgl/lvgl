@@ -558,7 +558,7 @@ static void a8_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_co
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)
 {
-    if(t->angle == 0 && t->zoom == LV_IMG_ZOOM_NONE) {
+    if(t->angle == 0 && t->zoom == LV_ZOOM_NONE) {
         *xout = xin * 256;
         *yout = yin * 256;
         return;
@@ -571,7 +571,7 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
         *xout = ((int32_t)(xin * t->zoom)) + (t->pivot_x_256);
         *yout = ((int32_t)(yin * t->zoom)) + (t->pivot_y_256);
     }
-    else if(t->zoom == LV_IMG_ZOOM_NONE) {
+    else if(t->zoom == LV_ZOOM_NONE) {
         *xout = ((t->cosma * xin - t->sinma * yin) >> 2) + (t->pivot_x_256);
         *yout = ((t->sinma * xin + t->cosma * yin) >> 2) + (t->pivot_y_256);
     }

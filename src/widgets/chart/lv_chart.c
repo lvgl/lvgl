@@ -666,8 +666,8 @@ static void lv_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     chart->pressed_point_id  = LV_CHART_POINT_NONE;
     chart->type        = LV_CHART_TYPE_LINE;
     chart->update_mode = LV_CHART_UPDATE_MODE_SHIFT;
-    chart->zoom_x      = LV_IMG_ZOOM_NONE;
-    chart->zoom_y      = LV_IMG_ZOOM_NONE;
+    chart->zoom_x      = LV_ZOOM_NONE;
+    chart->zoom_y      = LV_ZOOM_NONE;
 
     LV_TRACE_OBJ_CREATE("finished");
 }

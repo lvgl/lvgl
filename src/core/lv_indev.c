@@ -1003,7 +1003,7 @@ static void indev_proc_release(_lv_indev_proc_t * proc)
                 parent = lv_obj_get_parent(parent);
             }
 
-            if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+            if(angle != 0 || zoom != LV_ZOOM_NONE) {
                 angle = -angle;
                 zoom = (256 * 256) / zoom;
                 lv_point_transform(&proc->types.pointer.scroll_throw_vect, angle, zoom, &pivot);

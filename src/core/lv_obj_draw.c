@@ -240,7 +240,7 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t *
     }
 
     draw_dsc->angle = 0;
-    draw_dsc->zoom = LV_IMG_ZOOM_NONE;
+    draw_dsc->zoom = LV_ZOOM_NONE;
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 

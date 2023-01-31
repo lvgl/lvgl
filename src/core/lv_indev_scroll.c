@@ -71,7 +71,7 @@ void _lv_indev_scroll_handler(_lv_indev_proc_t * proc)
         parent = lv_obj_get_parent(parent);
     }
 
-    if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+    if(angle != 0 || zoom != LV_ZOOM_NONE) {
         angle = -angle;
         zoom = (256 * 256) / zoom;
         lv_point_t pivot = { 0, 0 };
@@ -299,7 +299,7 @@ static lv_obj_t * find_scroll_obj(_lv_indev_proc_t * proc)
         }
 
         lv_point_t obj_scroll_sum = proc->types.pointer.scroll_sum;
-        if(angle != 0 || zoom != LV_IMG_ZOOM_NONE) {
+        if(angle != 0 || zoom != LV_ZOOM_NONE) {
             angle = -angle;
             zoom = (256 * 256) / zoom;
             lv_point_transform(&obj_scroll_sum, angle, zoom, &pivot);
