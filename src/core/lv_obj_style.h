@@ -27,8 +27,11 @@ extern "C" {
  **********************/
 /*Can't include lv_obj.h because it includes this header file*/
 struct _lv_obj_t;
+
+#ifndef LV_OBJ_H
 typedef uint32_t lv_part_t;
 typedef uint16_t lv_state_t;
+#endif
 
 typedef enum {
     _LV_STYLE_STATE_CMP_SAME,           /*The style properties in the 2 states are identical*/
