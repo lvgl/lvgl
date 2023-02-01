@@ -1,12 +1,12 @@
 /**
- * @file lv_gpu_nxp_vglite.h
+ * @file lv_vglite_utils.h
  *
  */
 
 /**
  * MIT License
  *
- * Copyright 2020-2022 NXP
+ * Copyright 2022, 2023 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_GPU_NXP_VGLITE_H
-#define LV_GPU_NXP_VGLITE_H
+#ifndef LV_VGLITE_UTILS_H
+#define LV_VGLITE_UTILS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,17 +43,10 @@ extern "C" {
 #include "vg_lite.h"
 #include "../../sw/lv_draw_sw.h"
 #include "../../../misc/lv_log.h"
-#include "fsl_debug_console.h"
 
 /*********************
  *      DEFINES
  *********************/
-
-/** Use this symbol as limit to disable feature (value has to be larger than supported resolution) */
-#define LV_GPU_NXP_VG_LITE_FEATURE_DISABLED (1920*1080+1)
-
-/** Stride in px required by VG-Lite HW. Don't change this. */
-#define LV_GPU_NXP_VG_LITE_STRIDE_ALIGN_PX 16U
 
 #ifndef LV_GPU_NXP_VG_LITE_LOG_ERRORS
 /** Enable logging of VG-Lite errors (\see LV_LOG_ERROR)*/
@@ -61,22 +54,10 @@ extern "C" {
 #endif
 
 #ifndef LV_GPU_NXP_VG_LITE_LOG_TRACES
-/** Enable logging of VG-Lite errors (\see LV_LOG_ERROR)*/
+/** Enable logging of VG-Lite traces (\see LV_LOG_ERROR)*/
 #define LV_GPU_NXP_VG_LITE_LOG_TRACES 0
 #endif
 
-/* Draw rectangles around BLIT tiles */
-#define BLIT_DBG_AREAS   0
-
-/* Print detailed info to SDK console (NOT to LVGL log system) */
-#define BLIT_DBG_VERBOSE 0
-
-/* Verbose debug print */
-#if BLIT_DBG_VERBOSE
-#define PRINT_BLT PRINTF
-#else
-#define PRINT_BLT(...)
-#endif
 
 /* The optimal Bezier control point offset for radial unit
  * see: https://spencermortensen.com/articles/bezier-circle/
@@ -95,36 +76,35 @@ extern "C" {
  **********************/
 
 /**
- * Fills vg_lite_buffer_t structure according given parameters.
+ * Premultiplies and swizzles given LVGL 32bit color to obtain vglite color.
  *
- * @param[in/out] vgbuf Buffer structure to be filled
- * @param[in] width Width of buffer in pixels
- * @param[in] height Height of buffer in pixels
- * @param[in] stride Stride of the buffer in bytes
- * @param[in] ptr Pointer to the buffer (must be aligned according VG-Lite requirements)
- * @param[in] source Boolean to check if this is a source buffer
- */
-lv_res_t lv_vglite_init_buf(vg_lite_buffer_t * vgbuf, uint32_t width, uint32_t height, uint32_t stride,
-                            const lv_color_t * ptr, bool source);
-
-#if BLIT_DBG_AREAS
-/**
- * Draw a simple rectangle, 1 px line width.
+ * @param[in/out] vg_col32 The obtained vglite color
+ * @param[in] lv_col32 The initial LVGL 32bit color
+ * @param[in] opa The opacity to premultiply with
+ * @param[in] vg_col_format The format of the resulting vglite color
  *
- * @param dest_buf Destination buffer
- * @param dest_width Destination buffer width (must be aligned on 16px)
- * @param dest_height Destination buffer height
- * @param fill_area Rectangle coordinates
- * @param color Rectangle color
+ * @retval LV_RES_OK Operation completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-void lv_vglite_dbg_draw_rectangle(lv_color_t * dest_buf, lv_coord_t dest_width, lv_coord_t dest_height,
-                                  lv_area_t * fill_area, lv_color_t color);
-#endif
+lv_res_t lv_vglite_premult_and_swizzle(vg_lite_color_t * vg_col32, lv_color32_t lv_col32, lv_opa_t opa,
+                                       vg_lite_buffer_format_t vg_col_format);
 
 /**
- * Clean & invalidate cache.
+ * Get vglite blend mode.
+ *
+ * @param[in] lv_blend_mode The LVGL blend mode
+ *
+ * @retval The vglite blend mode
  */
-void lv_vglite_invalidate_cache(void);
+vg_lite_blend_t lv_vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
+
+/**
+ * Clear cache and flush command to VG-Lite.
+ *
+ * @retval LV_RES_OK Run completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ */
+lv_res_t lv_vglite_run(void);
 
 /**********************
  *      MACROS
@@ -142,7 +122,8 @@ void lv_vglite_invalidate_cache(void);
 #define VG_LITE_ERR_RETURN_INV(err, fmt, ...) \
     do {                                      \
         if(err != VG_LITE_SUCCESS) {          \
-            LV_LOG_ERROR(fmt, ##__VA_ARGS__); \
+            LV_LOG_ERROR(fmt" (err = %d)",    \
+                         err, ##__VA_ARGS__); \
             return LV_RES_INV;                \
         }                                     \
     } while (0)
@@ -158,7 +139,7 @@ void lv_vglite_invalidate_cache(void);
 #if LV_GPU_NXP_VG_LITE_LOG_TRACES
 #define VG_LITE_LOG_TRACE(fmt, ...)           \
     do {                                      \
-        LV_LOG_ERROR(fmt, ##__VA_ARGS__);     \
+        LV_LOG(fmt, ##__VA_ARGS__);     \
     } while (0)
 
 #define VG_LITE_RETURN_INV(fmt, ...)          \
@@ -182,4 +163,4 @@ void lv_vglite_invalidate_cache(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_NXP_VGLITE_H*/
+#endif /*LV_VGLITE_UTILS_H*/

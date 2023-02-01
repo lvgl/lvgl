@@ -613,6 +613,9 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
 
+    if(draw_ctx->init_buf)
+        draw_ctx->init_buf(draw_ctx);
+
     /* Below the `area_p` area will be redrawn into the draw buffer.
      * In single buffered mode wait here until the buffer is freed.
      * In full double buffered mode wait here while the buffers are swapped and a buffer becomes available*/
