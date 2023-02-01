@@ -6,7 +6,7 @@
 /**
  * MIT License
  *
- * Copyright 2021, 2022 NXP
+ * Copyright 2021-2023 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ extern "C" {
 #include "../../../lv_conf_internal.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
-#include "lv_gpu_nxp_vglite.h"
+#include "lv_vglite_utils.h"
 #include "../../lv_draw_rect.h"
 
 /*********************
@@ -56,13 +56,33 @@ extern "C" {
  **********************/
 
 /**
- * Draw rectangle shape with effects (rounded corners, gradient)
+ * Draw rectangle background with effects (rounded corners, gradient)
  *
- * @param draw_ctx drawing context
- * @param dsc description of the rectangle
- * @param coords the area where rectangle is clipped
+ * @param[in] coords Coordinates of the rectangle background (relative to dest buff)
+ * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] dsc Description of the rectangle background
+ *
+ * @retval LV_RES_OK Draw completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ *
  */
-lv_res_t lv_gpu_nxp_vglite_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+lv_res_t lv_gpu_nxp_vglite_draw_bg(const lv_area_t * coords, const lv_area_t * clip_area,
+                                   const lv_draw_rect_dsc_t * dsc);
+
+/**
+ * Draw rectangle border/outline shape with effects (rounded corners, opacity)
+ *
+ * @param[in] coords Coordinates of the rectangle border/outline (relative to dest buff)
+ * @param[in] clip_area Clipping area with relative coordinates to dest buff
+ * @param[in] dsc Description of the rectangle border/outline
+ * @param[in] border True for border, False for outline
+ *
+ * @retval LV_RES_OK Draw completed
+ * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
+ *
+ */
+lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const lv_area_t * clip_area,
+                                               const lv_draw_rect_dsc_t * dsc, bool border);
 
 /**********************
  *      MACROS

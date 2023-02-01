@@ -6,7 +6,7 @@
 /**
  * MIT License
  *
- * Copyright 2020-2022 NXP
+ * Copyright 2020-2023 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -81,8 +81,11 @@ typedef struct {
     /** Callback for PXP interrupt de-initialization*/
     void (*pxp_interrupt_deinit)(void);
 
-    /** Callback that should start PXP and wait for operation complete*/
+    /** Callback for PXP start*/
     void (*pxp_run)(void);
+
+    /** Callback for waiting of PXP completion*/
+    void (*pxp_wait)(void);
 } lv_nxp_pxp_cfg_t;
 
 /**********************
@@ -104,9 +107,19 @@ lv_res_t lv_gpu_nxp_pxp_init(void);
 void lv_gpu_nxp_pxp_deinit(void);
 
 /**
- * Start PXP job and wait for completion.
+ * Reset PXP device.
+ */
+void lv_gpu_nxp_pxp_reset(void);
+
+/**
+ * Clear cache and start PXP.
  */
 void lv_gpu_nxp_pxp_run(void);
+
+/**
+ * Wait for PXP completion.
+ */
+void lv_gpu_nxp_pxp_wait(void);
 
 /**********************
  *      MACROS

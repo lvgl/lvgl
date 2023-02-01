@@ -6,7 +6,7 @@
 /**
  * MIT License
  *
- * Copyright 2021, 2022 NXP
+ * Copyright 2021-2023 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,8 @@
 #include "lv_draw_vglite_arc.h"
 
 #if LV_USE_GPU_NXP_VG_LITE
-#include "math.h"
+#include "lv_vglite_buf.h"
+#include <math.h>
 
 /*********************
  *      DEFINES
@@ -88,7 +89,7 @@ typedef struct _cubic_cont_pt {
 
 static void rotate_point(int32_t angle, int32_t * x, int32_t * y);
 static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
-                         int32_t start_angle, int32_t end_angle, lv_point_t center, bool cw);
+                         int32_t start_angle, int32_t end_angle, const lv_point_t * center, bool cw);
 
 /**********************
  *  STATIC VARIABLES
@@ -102,30 +103,19 @@ static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
-                                    int32_t radius, int32_t start_angle, int32_t end_angle)
+lv_res_t lv_gpu_nxp_vglite_draw_arc(const lv_point_t * center, int32_t radius, int32_t start_angle, int32_t end_angle,
+                                    const lv_area_t * clip_area, const lv_draw_arc_dsc_t * dsc)
 {
-
-    vg_lite_buffer_t vgbuf;
     vg_lite_error_t err = VG_LITE_SUCCESS;
     lv_color32_t col32 = {.full = lv_color_to32(dsc->color)}; /*Convert color to RGBA8888*/
-    lv_coord_t dest_width = lv_area_get_width(draw_ctx->buf_area);
-    lv_coord_t dest_height = lv_area_get_height(draw_ctx->buf_area);
     vg_lite_path_t path;
     vg_lite_color_t vgcol; /* vglite takes ABGR */
-    vg_lite_matrix_t matrix;
-    lv_opa_t opa = dsc->opa;
     bool donut = ((end_angle - start_angle) % 360 == 0) ? true : false;
-    lv_point_t clip_center = {center->x - draw_ctx->buf_area->x1, center->y - draw_ctx->buf_area->y1};
+    vg_lite_buffer_t * vgbuf = lv_vglite_get_dest_buf();
 
     /* path: max size = 16 cubic bezier (7 words each) */
     int32_t arc_path[16 * 7];
     lv_memset_00(arc_path, sizeof(arc_path));
-
-    /*** Init destination buffer ***/
-    if(lv_vglite_init_buf(&vgbuf, (uint32_t)dest_width, (uint32_t)dest_height, (uint32_t)dest_width * sizeof(lv_color_t),
-                          (const lv_color_t *)draw_ctx->buf, false) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Init buffer failed.");
 
     /*** Init path ***/
     lv_coord_t width = dsc->width;  /* inner arc radius = outer arc radius - width */
@@ -140,11 +130,11 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
     cp_y = 0;
     rotate_point(start_angle, &cp_x, &cp_y);
     arc_path[pidx++] = VLC_OP_MOVE;
-    arc_path[pidx++] = clip_center.x + cp_x;
-    arc_path[pidx++] = clip_center.y + cp_y;
+    arc_path[pidx++] = center->x + cp_x;
+    arc_path[pidx++] = center->y + cp_y;
 
     /* draw 1-5 outer quarters */
-    add_arc_path(arc_path, &pidx, radius, start_angle, end_angle, clip_center, true);
+    add_arc_path(arc_path, &pidx, radius, start_angle, end_angle, center, true);
 
     if(donut) {
         /* close outer circle */
@@ -152,24 +142,24 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
         cp_y = 0;
         rotate_point(start_angle, &cp_x, &cp_y);
         arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = clip_center.x + cp_x;
-        arc_path[pidx++] = clip_center.y + cp_y;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
         /* start inner circle */
         cp_x = radius - width;
         cp_y = 0;
         rotate_point(start_angle, &cp_x, &cp_y);
         arc_path[pidx++] = VLC_OP_MOVE;
-        arc_path[pidx++] = clip_center.x + cp_x;
-        arc_path[pidx++] = clip_center.y + cp_y;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
 
     }
     else if(dsc->rounded != 0U) {    /* 1st rounded arc ending */
         cp_x = radius - width / 2;
         cp_y = 0;
         rotate_point(end_angle, &cp_x, &cp_y);
-        lv_point_t round_center = {clip_center.x + cp_x, clip_center.y + cp_y};
+        lv_point_t round_center = {center->x + cp_x, center->y + cp_y};
         add_arc_path(arc_path, &pidx, width / 2, end_angle, (end_angle + 180),
-                     round_center, true);
+                     &round_center, true);
 
     }
     else {   /* 1st flat ending */
@@ -177,12 +167,12 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
         cp_y = 0;
         rotate_point(end_angle, &cp_x, &cp_y);
         arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = clip_center.x + cp_x;
-        arc_path[pidx++] = clip_center.y + cp_y;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
     }
 
     /* draw 1-5 inner quarters */
-    add_arc_path(arc_path, &pidx, radius - width, start_angle, end_angle, clip_center, false);
+    add_arc_path(arc_path, &pidx, radius - width, start_angle, end_angle, center, false);
 
     /* last control point of curve */
     if(donut) {     /* close the loop */
@@ -190,17 +180,17 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
         cp_y = 0;
         rotate_point(start_angle, &cp_x, &cp_y);
         arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = clip_center.x + cp_x;
-        arc_path[pidx++] = clip_center.y + cp_y;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
 
     }
     else if(dsc->rounded != 0U) {    /* 2nd rounded arc ending */
         cp_x = radius - width / 2;
         cp_y = 0;
         rotate_point(start_angle, &cp_x, &cp_y);
-        lv_point_t round_center = {clip_center.x + cp_x, clip_center.y + cp_y};
+        lv_point_t round_center = {center->x + cp_x, center->y + cp_y};
         add_arc_path(arc_path, &pidx, width / 2, (start_angle + 180), (start_angle + 360),
-                     round_center, true);
+                     &round_center, true);
 
     }
     else {   /* 2nd flat ending */
@@ -208,46 +198,30 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_
         cp_y = 0;
         rotate_point(start_angle, &cp_x, &cp_y);
         arc_path[pidx++] = VLC_OP_LINE;
-        arc_path[pidx++] = clip_center.x + cp_x;
-        arc_path[pidx++] = clip_center.y + cp_y;
+        arc_path[pidx++] = center->x + cp_x;
+        arc_path[pidx++] = center->y + cp_y;
     }
 
     arc_path[pidx++] = VLC_OP_END;
 
     err = vg_lite_init_path(&path, VG_LITE_S32, VG_LITE_HIGH, (uint32_t)pidx * sizeof(int32_t), arc_path,
-                            (vg_lite_float_t) draw_ctx->clip_area->x1, (vg_lite_float_t) draw_ctx->clip_area->y1,
-                            ((vg_lite_float_t) draw_ctx->clip_area->x2) + 1.0f, ((vg_lite_float_t) draw_ctx->clip_area->y2) + 1.0f);
+                            (vg_lite_float_t)clip_area->x1, (vg_lite_float_t)clip_area->y1,
+                            ((vg_lite_float_t)clip_area->x2) + 1.0f, ((vg_lite_float_t)clip_area->y2) + 1.0f);
     VG_LITE_ERR_RETURN_INV(err, "Init path failed.");
 
-    /* set rotation angle */
+    vg_lite_buffer_format_t color_format = LV_COLOR_DEPTH == 16 ? VG_LITE_BGRA8888 : VG_LITE_ABGR8888;
+    if(lv_vglite_premult_and_swizzle(&vgcol, col32, dsc->opa, color_format) != LV_RES_OK)
+        VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
+
+    vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
-    if(opa <= (lv_opa_t)LV_OPA_MAX) {
-        /* Only pre-multiply color if hardware pre-multiplication is not present */
-        if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-            col32.ch.red = (uint8_t)(((uint16_t)col32.ch.red * opa) >> 8);
-            col32.ch.green = (uint8_t)(((uint16_t)col32.ch.green * opa) >> 8);
-            col32.ch.blue = (uint8_t)(((uint16_t)col32.ch.blue * opa) >> 8);
-        }
-        col32.ch.alpha = opa;
-    }
-
-#if LV_COLOR_DEPTH==16
-    vgcol = col32.full;
-#else /*LV_COLOR_DEPTH==32*/
-    vgcol = ((uint32_t)col32.ch.alpha << 24) | ((uint32_t)col32.ch.blue << 16) | ((uint32_t)col32.ch.green << 8) |
-            (uint32_t)col32.ch.red;
-#endif
-
-    /*Clean & invalidate cache*/
-    lv_vglite_invalidate_cache();
-
     /*** Draw arc ***/
-    err = vg_lite_draw(&vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
+    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw arc failed.");
 
-    err = vg_lite_finish();
-    VG_LITE_ERR_RETURN_INV(err, "Finish failed.");
+    if(lv_vglite_run() != LV_RES_OK)
+        VG_LITE_RETURN_INV("Run failed.");
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
@@ -564,50 +538,50 @@ static void get_arc_control_points(vg_arc * arc, bool start)
  * center: (in) the center of the circle in draw coordinates
  * cw: (in) true if arc is clockwise
  */
-static void add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, lv_point_t center, bool cw)
+static void add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, const lv_point_t * center, bool cw)
 {
     /* assumes first control point already in array arc_path[] */
     int idx = *pidx;
     if(cw) {
 #if BEZIER_DBG_CONTROL_POINTS
         arc_path[idx++] = VLC_OP_LINE;
-        arc_path[idx++] = q_arc->p1x + center.x;
-        arc_path[idx++] = q_arc->p1y + center.y;
+        arc_path[idx++] = q_arc->p1x + center->x;
+        arc_path[idx++] = q_arc->p1y + center->y;
         arc_path[idx++] = VLC_OP_LINE;
-        arc_path[idx++] = q_arc->p2x + center.x;
-        arc_path[idx++] = q_arc->p2y + center.y;
+        arc_path[idx++] = q_arc->p2x + center->x;
+        arc_path[idx++] = q_arc->p2y + center->y;
         arc_path[idx++] = VLC_OP_LINE;
-        arc_path[idx++] = q_arc->p3x + center.x;
-        arc_path[idx++] = q_arc->p3y + center.y;
+        arc_path[idx++] = q_arc->p3x + center->x;
+        arc_path[idx++] = q_arc->p3y + center->y;
 #else
         arc_path[idx++] = VLC_OP_CUBIC;
-        arc_path[idx++] = q_arc->p1x + center.x;
-        arc_path[idx++] = q_arc->p1y + center.y;
-        arc_path[idx++] = q_arc->p2x + center.x;
-        arc_path[idx++] = q_arc->p2y + center.y;
-        arc_path[idx++] = q_arc->p3x + center.x;
-        arc_path[idx++] = q_arc->p3y + center.y;
+        arc_path[idx++] = q_arc->p1x + center->x;
+        arc_path[idx++] = q_arc->p1y + center->y;
+        arc_path[idx++] = q_arc->p2x + center->x;
+        arc_path[idx++] = q_arc->p2y + center->y;
+        arc_path[idx++] = q_arc->p3x + center->x;
+        arc_path[idx++] = q_arc->p3y + center->y;
 #endif
     }
     else {      /* reverse points order when counter-clockwise */
 #if BEZIER_DBG_CONTROL_POINTS
         arc_path[idx++] = VLC_OP_LINE;
-        arc_path[idx++] = q_arc->p2x + center.x;
-        arc_path[idx++] = q_arc->p2y + center.y;
+        arc_path[idx++] = q_arc->p2x + center->x;
+        arc_path[idx++] = q_arc->p2y + center->y;
         arc_path[idx++] = VLC_OP_LINE;
-        arc_path[idx++] = q_arc->p1x + center.x;
-        arc_path[idx++] = q_arc->p1y + center.y;
+        arc_path[idx++] = q_arc->p1x + center->x;
+        arc_path[idx++] = q_arc->p1y + center->y;
         arc_path[idx++] = VLC_OP_LINE;
-        arc_path[idx++] = q_arc->p0x + center.x;
-        arc_path[idx++] = q_arc->p0y + center.y;
+        arc_path[idx++] = q_arc->p0x + center->x;
+        arc_path[idx++] = q_arc->p0y + center->y;
 #else
         arc_path[idx++] = VLC_OP_CUBIC;
-        arc_path[idx++] = q_arc->p2x + center.x;
-        arc_path[idx++] = q_arc->p2y + center.y;
-        arc_path[idx++] = q_arc->p1x + center.x;
-        arc_path[idx++] = q_arc->p1y + center.y;
-        arc_path[idx++] = q_arc->p0x + center.x;
-        arc_path[idx++] = q_arc->p0y + center.y;
+        arc_path[idx++] = q_arc->p2x + center->x;
+        arc_path[idx++] = q_arc->p2y + center->y;
+        arc_path[idx++] = q_arc->p1x + center->x;
+        arc_path[idx++] = q_arc->p1y + center->y;
+        arc_path[idx++] = q_arc->p0x + center->x;
+        arc_path[idx++] = q_arc->p0y + center->y;
 #endif
     }
     /* update index i n path array*/
@@ -615,7 +589,7 @@ static void add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, l
 }
 
 static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
-                         int32_t start_angle, int32_t end_angle, lv_point_t center, bool cw)
+                         int32_t start_angle, int32_t end_angle, const lv_point_t * center, bool cw)
 {
     /* set number of arcs to draw */
     vg_arc q_arc;

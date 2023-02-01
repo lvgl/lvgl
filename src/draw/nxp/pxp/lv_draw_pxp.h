@@ -1,12 +1,12 @@
 /**
- * @file lv_gpu_nxp.h
+ * @file lv_draw_pxp.h
  *
  */
 
 /**
  * MIT License
  *
- * Copyright 2022 NXP
+ * Copyright 2022, 2023 NXP
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@
  *
  */
 
-#ifndef LV_GPU_NXP_H
-#define LV_GPU_NXP_H
+#ifndef LV_DRAW_PXP_H
+#define LV_DRAW_PXP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,9 +38,10 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
-#if LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE
-#include "../sw/lv_draw_sw.h"
+#include "../../../lv_conf_internal.h"
+
+#if LV_USE_GPU_NXP_PXP
+#include "../../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
@@ -49,23 +50,23 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef lv_draw_sw_ctx_t lv_draw_nxp_ctx_t;
+typedef lv_draw_sw_ctx_t lv_draw_pxp_ctx_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_nxp_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_pxp_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 
-void lv_draw_nxp_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_pxp_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 
 /**********************
  *      MACROS
  **********************/
-#endif /*LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE*/
+#endif /*LV_USE_GPU_NXP_PXP*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_GPU_NXP_H*/
+#endif /*LV_DRAW_PXP_H*/
