@@ -1,6 +1,6 @@
 _CANVAS_WIDTH = 200
 _CANVAS_HEIGHT = 150
-LV_IMG_ZOOM_NONE = 256
+LV_ZOOM_NONE = 256
 
 rect_dsc = lv.draw_rect_dsc_t()
 rect_dsc.init()
@@ -40,4 +40,4 @@ img.header.w = _CANVAS_WIDTH
 img.header.h = _CANVAS_HEIGHT
 
 canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
-canvas.transform(img, 30, LV_IMG_ZOOM_NONE, 0, 0, _CANVAS_WIDTH // 2, _CANVAS_HEIGHT // 2, True)
+canvas.transform(img, 30, LV_ZOOM_NONE, 0, 0, _CANVAS_WIDTH // 2, _CANVAS_HEIGHT // 2, True)
