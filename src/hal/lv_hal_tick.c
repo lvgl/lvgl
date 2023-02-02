@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_hal_tick.h"
+#include "../misc/lv_types.h"
 #include <stddef.h>
 
 #if LV_TICK_CUSTOM == 1
@@ -29,8 +30,13 @@
  *  STATIC VARIABLES
  **********************/
 #if !LV_TICK_CUSTOM
-    static uint32_t sys_time = 0;
-    static volatile uint8_t tick_irq_flag;
+    #if LV_USE_ATOMICS == 1
+        static _Atomic(uint32_t) sys_time = 0;
+        static _Atomic(uint8_t) tick_irq_flag;
+    #else
+        static uint32_t sys_time = 0;
+        static volatile uint8_t tick_irq_flag;
+    #endif
 #endif
 
 /**********************
