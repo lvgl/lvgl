@@ -210,8 +210,6 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
 
     lv_coord_t w = lv_area_get_width(area);
     long int location = 0;
-    long int byte_location = 0;
-    unsigned char bit_location = 0;
 
     /*32 bit per pixel*/
     if(dsc->vinfo.bits_per_pixel == 32 && LV_COLOR_DEPTH == 32) {
@@ -261,10 +259,8 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
         }
     }
     else {
-        char buf[256];
-        lv_snprintf(buf, "Not supported color format. LV_COLOR_DEPTH == %d but FB color depth is %d\n", LV_COLOR_DEPTH,
-                    dsc->vinfo.bits_per_pixel);
-        perror(buf);
+        LV_LOG_ERROR("Not supported color format. LV_COLOR_DEPTH == %d but FB color depth is %d\n", LV_COLOR_DEPTH,
+                     dsc->vinfo.bits_per_pixel);
     }
 
     //May be some direct update command is required

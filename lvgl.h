@@ -109,6 +109,8 @@ extern "C" {
 #include "src/dev/sdl/lv_sdl_mousewheel.h"
 #include "src/dev/sdl/lv_sdl_keyboard.h"
 
+#include "src/dev/disp/fb/lv_linux_fbdev.h"
+
 #include "src/lvgl_private.h"
 
 /*********************
