@@ -166,11 +166,9 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
     }
 
     lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    /*Make the blend area relative to the buffer*/
     lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
     bool done = false;
@@ -224,13 +222,21 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
         return;
     }
 
-    lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
-    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
-        return; /*Fully clipped, nothing to do*/
+    lv_area_t rel_coords;
+    lv_area_copy(&rel_coords, coords);
+    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_area_t blend_area;
+    bool has_transform = dsc->angle != 0 || dsc->zoom != LV_IMG_ZOOM_NONE;
+
+    if(has_transform)
+        lv_area_copy(&blend_area, &rel_coords);
+    else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
+        return; /*Fully clipped, nothing to do*/
 
     bool has_mask = lv_draw_mask_is_any(&blend_area);
     bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
@@ -252,11 +258,15 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
         src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
         lv_coord_t src_stride = lv_area_get_width(coords);
 
-        done = (lv_gpu_nxp_vglite_blit_transform(dest_buf, &blend_area, dest_stride,
-                                                 src_buf, &src_area, src_stride, dsc) == LV_RES_OK);
+        if(has_transform)
+            done = (lv_gpu_nxp_vglite_blit_transform(dest_buf, &blend_area, dest_stride, &rel_clip_area,
+                                                     src_buf, &src_area, src_stride, dsc) == LV_RES_OK);
+        else
+            done = (lv_gpu_nxp_vglite_blit(dest_buf, &blend_area, dest_stride,
+                                           src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
 
         if(!done)
-            VG_LITE_LOG_TRACE("VG-Lite blit transform failed. Fallback.");
+            VG_LITE_LOG_TRACE("VG-Lite blit %sfailed. Fallback.", has_transform ? "transform " : "");
     }
 
     if(!done)
@@ -284,12 +294,9 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
     rel_clip_area.y1 = LV_MIN(point1->y, point2->y) - dsc->width / 2;
     rel_clip_area.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 
-    bool is_common;
-    is_common = _lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_ctx->clip_area);
-    if(!is_common)
-        return;
+    if(!_lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_ctx->clip_area))
+        return; /*Fully clipped, nothing to do*/
 
-    /* Make coordinates relative to the draw buffer */
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
     lv_point_t rel_point1 = { point1->x - draw_ctx->buf_area->x1, point1->y - draw_ctx->buf_area->y1 };
@@ -369,17 +376,14 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
         rel_coords.x2 -= (dsc->border_side & LV_BORDER_SIDE_RIGHT) ? 1 : 0;
         rel_coords.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
     }
-
-    /* Make coordinates relative to draw buffer */
     lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    lv_area_t clipped_coords;
-    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
-        return LV_RES_INV;
+    if(!_lv_area_intersect(&rel_coords, &rel_coords, &rel_clip_area))
+        return LV_RES_OK; /*Fully clipped, nothing to do*/
 
     bool mask_any = lv_draw_mask_is_any(&rel_coords);
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
@@ -426,7 +430,6 @@ static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_re
     rel_coords.y1 = coords->y1 + ceil(border_width / 2.0f);
     rel_coords.y2 = coords->y2 - floor(border_width / 2.0f);
 
-    /* Make coordinates relative to the draw buffer */
     lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
     lv_area_t rel_clip_area;
@@ -456,7 +459,6 @@ static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_r
     rel_coords.y1 = coords->y1 - outline_pad - floor(dsc->outline_width / 2.0f);
     rel_coords.y2 = coords->y2 + outline_pad + ceil(dsc->outline_width / 2.0f);
 
-    /* Make coordinates relative to the draw buffer */
     lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
     lv_area_t rel_clip_area;
@@ -488,7 +490,6 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
         return;
     }
 
-    /* Make coordinates relative to the draw buffer */
     lv_point_t rel_center = {center->x - draw_ctx->buf_area->x1, center->y - draw_ctx->buf_area->y1};
 
     lv_area_t rel_clip_area;

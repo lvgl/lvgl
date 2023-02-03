@@ -93,6 +93,7 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
  * @param[in/out] dest_buf Destination buffer
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] dest_stride Stride of destination buffer in pixels
+ * @param[in] clip_area Clip area with relative coordinates of destination buffer
  * @param[in] src_buf Source buffer
  * @param[in] src_area Source area with relative coordinates of source buffer
  * @param[in] src_stride Stride of source buffer in pixels
@@ -102,6 +103,7 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
 lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
+                                          lv_area_t * clip_area,
                                           const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
                                           const lv_draw_img_dsc_t * dsc);
 

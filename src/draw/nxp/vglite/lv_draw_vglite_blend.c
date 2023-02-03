@@ -75,16 +75,15 @@
  **********************/
 
 /**
- * Blit single image, with optional opacity.
+ * Blit image, with optional opacity.
  *
- * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] src_area Source area with relative coordinates of source buffer
  * @param[in] opa Opacity
  *
  * @retval LV_RES_OK Transfer complete
  * @retval LV_RES_INV Error occurred (\see LV_GPU_NXP_VG_LITE_LOG_ERRORS)
  */
-static lv_res_t lv_vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa);
+static lv_res_t lv_vglite_blit(const lv_area_t * src_area, lv_opa_t opa);
 
 /**
  * Check source memory and stride alignment.
@@ -111,6 +110,18 @@ static inline void lv_vglite_set_translation_matrix(const lv_area_t * dest_area)
  * @param[in] dsc Image descriptor
  */
 static inline void lv_vglite_set_transformation_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc);
+
+/**
+ * Enable scissor and set the clipping box.
+ *
+ * @param[in] clip_area Clip area with relative coordinates of destination buffer
+ */
+static inline void lv_vglite_set_scissor(const lv_area_t * clip_area);
+
+/**
+ * Disable scissor.
+ */
+static inline void lv_vglite_disable_scissor(void);
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
 
@@ -227,51 +238,60 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
                                 const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
                                 lv_opa_t opa)
 {
+    lv_res_t rv = LV_RES_INV;
+
+    /* Set src_vgbuf structure. */
+    lv_vglite_set_src_buf(src_buf, src_area, src_stride);
+
+#if VG_LITE_BLIT_SPLIT_ENABLED
+    lv_color_t * orig_dest_buf = dest_buf;
+
+    rv = lv_vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
+
+    /* Restore the original dest_vgbuf memory address. */
+    lv_vglite_set_dest_buf_ptr(orig_dest_buf);
+#else
+    LV_UNUSED(dest_buf);
+    LV_UNUSED(dest_stride);
+
+    if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
+        VG_LITE_RETURN_INV("Check src alignment failed.");
+
+    /* Set scissor. */
+    lv_vglite_set_scissor(dest_area);
+
     /* Set vgmatrix. */
     lv_vglite_set_translation_matrix(dest_area);
 
-    /* Set src_vgbuf structure. */
-    lv_vglite_set_src_buf(src_buf, src_area, src_stride);
+    /* Start blit. */
+    rv = lv_vglite_blit(src_area, opa);
 
-#if VG_LITE_BLIT_SPLIT_ENABLED
-    lv_color_t * orig_dest_buf = dest_buf;
-
-    lv_res_t rv = lv_vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, opa);
-
-    /* Restore the original dest_vgbuf memory address. */
-    lv_vglite_set_dest_buf_ptr(orig_dest_buf);
+    /* Disable scissor. */
+    lv_vglite_disable_scissor();
+#endif
 
     return rv;
-#else
-    LV_UNUSED(dest_buf);
-    LV_UNUSED(dest_stride);
-
-    if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
-        VG_LITE_RETURN_INV("Check src alignment failed.");
-
-    return lv_vglite_blit_single(dest_area, src_area, opa);
-#endif
 }
 
 lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
+                                          lv_area_t * clip_area,
                                           const lv_color_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
                                           const lv_draw_img_dsc_t * dsc)
 {
-    /* Set vgmatrix. */
-    lv_vglite_set_transformation_matrix(dest_area, dsc);
+    lv_res_t rv = LV_RES_INV;
 
     /* Set src_vgbuf structure. */
     lv_vglite_set_src_buf(src_buf, src_area, src_stride);
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
+    LV_UNUSED(clip_area);
+
     lv_color_t * orig_dest_buf = dest_buf;
 
-    lv_res_t rv = lv_vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
+    rv = lv_vglite_blit_split(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc->opa);
 
     /* Restore the original dest_vgbuf memory address. */
     lv_vglite_set_dest_buf_ptr(orig_dest_buf);
-
-    return rv;
 #else
     LV_UNUSED(dest_buf);
     LV_UNUSED(dest_stride);
@@ -279,8 +299,20 @@ lv_res_t lv_gpu_nxp_vglite_blit_transform(lv_color_t * dest_buf, lv_area_t * des
     if(check_src_alignment(src_buf, src_stride) != LV_RES_OK)
         VG_LITE_RETURN_INV("Check src alignment failed.");
 
-    return lv_vglite_blit_single(dest_area, src_area, dsc->opa);
+    /* Set scissor */
+    lv_vglite_set_scissor(clip_area);
+
+    /* Set vgmatrix. */
+    lv_vglite_set_transformation_matrix(dest_area, dsc);
+
+    /* Start blit. */
+    rv = lv_vglite_blit(src_area, dsc->opa);
+
+    /* Disable scissor. */
+    lv_vglite_disable_scissor();
 #endif
+
+    return rv;
 }
 
 /**********************
@@ -320,10 +352,17 @@ static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_are
         lv_vglite_set_dest_buf_ptr(dest_buf);
         lv_vglite_set_src_buf_ptr(src_buf);
 
+        /* Set scissor */
+        lv_vglite_set_scissor(dest_area);
+
         /* Set vgmatrix. */
         lv_vglite_set_translation_matrix(dest_area);
 
-        rv = lv_vglite_blit_single(dest_area, src_area, opa);
+        /* Start blit. */
+        rv = lv_vglite_blit(src_area, opa);
+
+        /* Disable scissor. */
+        lv_vglite_disable_scissor();
 
         VG_LITE_LOG_TRACE("Single "
                           "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -426,14 +465,21 @@ static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_are
             if(check_src_alignment(tile_src_buf, src_stride) != LV_RES_OK)
                 VG_LITE_RETURN_INV("Check src alignment failed.");
 
-            /* Set vgmatrix. */
-            lv_vglite_set_translation_matrix(&tile_dest_area);
-
             /* Set new dest_vgbuf and src_vgbuf memory addresses. */
             lv_vglite_set_dest_buf_ptr(tile_dest_buf);
             lv_vglite_set_src_buf_ptr(tile_src_buf);
 
-            rv = lv_vglite_blit_single(&tile_dest_area, &tile_src_area, opa);
+            /* Set scissor */
+            lv_vglite_set_scissor(&tile_dest_area);
+
+            /* Set vgmatrix. */
+            lv_vglite_set_translation_matrix(&tile_dest_area);
+
+            /* Start blit. */
+            rv = lv_vglite_blit(&tile_src_area, opa);
+
+            /* Disable scissor. */
+            lv_vglite_disable_scissor();
 
             VG_LITE_LOG_TRACE("Tile [%d, %d] "
                               "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -457,7 +503,7 @@ static lv_res_t lv_vglite_blit_split(lv_color_t * dest_buf, lv_area_t * dest_are
 }
 #endif /* VG_LITE_BLIT_SPLIT_ENABLED */
 
-static lv_res_t lv_vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa)
+static lv_res_t lv_vglite_blit(const lv_area_t * src_area, lv_opa_t opa)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = lv_vglite_get_dest_buf();
@@ -489,30 +535,11 @@ static lv_res_t lv_vglite_blit_single(const lv_area_t * dest_area, const lv_area
         src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
 
-    bool scissoring = lv_area_get_width(dest_area) < lv_area_get_width(src_area) ||
-                      lv_area_get_height(dest_area) < lv_area_get_height(src_area);
-    if(scissoring) {
-        vg_lite_enable_scissor();
-        vg_lite_set_scissor((int32_t)dest_area->x1, (int32_t)dest_area->y1,
-                            (int32_t)lv_area_get_width(dest_area),
-                            (int32_t)lv_area_get_height(dest_area));
-    }
-
     err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, rect, &vgmatrix, blend, color, VG_LITE_FILTER_POINT);
-    if(err != VG_LITE_SUCCESS) {
-        if(scissoring)
-            vg_lite_disable_scissor();
-        VG_LITE_RETURN_INV("Blit rectangle failed.");
-    }
+    VG_LITE_ERR_RETURN_INV(err, "Blit rectangle failed.");
 
-    if(lv_vglite_run() != LV_RES_OK) {
-        if(scissoring)
-            vg_lite_disable_scissor();
+    if(lv_vglite_run() != LV_RES_OK)
         VG_LITE_RETURN_INV("Run failed.");
-    }
-
-    if(scissoring)
-        vg_lite_disable_scissor();
 
     return LV_RES_OK;
 }
@@ -546,16 +573,27 @@ static inline void lv_vglite_set_transformation_matrix(const lv_area_t * dest_ar
     bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
     bool has_rotation = (dsc->angle != 0);
 
-    if(has_scale || has_rotation) {
-        vg_lite_translate(dsc->pivot.x, dsc->pivot.y, &vgmatrix);
-        if(has_rotation)
-            vg_lite_rotate(dsc->angle / 10.0f, &vgmatrix);   /* angle is 1/10 degree */
-        if(has_scale) {
-            vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
-            vg_lite_scale(scale, scale, &vgmatrix);
-        }
-        vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &vgmatrix);
+    vg_lite_translate(dsc->pivot.x, dsc->pivot.y, &vgmatrix);
+    if(has_rotation)
+        vg_lite_rotate(dsc->angle / 10.0f, &vgmatrix);   /* angle is 1/10 degree */
+    if(has_scale) {
+        vg_lite_float_t scale = 1.0f * dsc->zoom / LV_IMG_ZOOM_NONE;
+        vg_lite_scale(scale, scale, &vgmatrix);
     }
+    vg_lite_translate(0.0f - dsc->pivot.x, 0.0f - dsc->pivot.y, &vgmatrix);
+}
+
+static inline void lv_vglite_set_scissor(const lv_area_t * clip_area)
+{
+    vg_lite_enable_scissor();
+    vg_lite_set_scissor((int32_t)clip_area->x1, (int32_t)clip_area->y1,
+                        (int32_t)lv_area_get_width(clip_area),
+                        (int32_t)lv_area_get_height(clip_area));
+}
+
+static inline void lv_vglite_disable_scissor(void)
+{
+    vg_lite_disable_scissor();
 }
 
 #if VG_LITE_BLIT_SPLIT_ENABLED
