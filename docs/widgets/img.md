@@ -71,7 +71,7 @@ Using the offset parameter a [Texture atlas](https://en.wikipedia.org/wiki/Textu
 
 ## Transformations
 
-Using the `lv_img_set_zoom(img, factor)` the images will be zoomed. Set `factor` to `256` or `LV_IMG_ZOOM_NONE` to disable zooming.
+Using the `lv_img_set_zoom(img, factor)` the images will be zoomed. Set `factor` to `256` or `LV_ZOOM_NONE` to disable zooming.
 A larger value enlarges the images (e.g. `512` double size), a smaller value shrinks it (e.g. `128` half size).
 Fractional scale works as well. E.g. `281` for 10% enlargement.
 

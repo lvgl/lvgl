@@ -23,6 +23,7 @@ extern "C" {
 #define LV_INDEV_STATE_REL      LV_INDEV_STATE_RELEASED
 #define LV_INDEV_STATE_PR       LV_INDEV_STATE_PRESSED
 #define LV_OBJ_FLAG_SNAPABLE    LV_OBJ_FLAG_SNAPPABLE   /*Fixed typo*/
+#define LV_IMG_ZOOM_NONE        LV_ZOOM_NONE
 
 /**********************
  *      TYPEDEFS

@@ -190,7 +190,7 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     lv_coord_t src_height = lv_area_get_height(coords);
 
     bool has_mask = lv_draw_mask_is_any(&blend_area);
-    bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
+    bool has_scale = (dsc->zoom != LV_ZOOM_NONE);
     bool has_rotation = (dsc->angle != 0);
     bool unsup_rotation = false;
 

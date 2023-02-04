@@ -60,7 +60,7 @@ props = [
 
 {'name': 'TRANSFORM_ZOOM',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom an objects. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom an objects. The value 256 (or `LV_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_ANGLE',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,

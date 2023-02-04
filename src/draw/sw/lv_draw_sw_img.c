@@ -52,7 +52,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
     lv_area_copy(&draw_area, draw_ctx->clip_area);
 
     bool mask_any = lv_draw_mask_is_any(&draw_area);
-    bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
+    bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
 
     lv_area_t blend_area;
     lv_draw_sw_blend_dsc_t blend_dsc;
@@ -138,7 +138,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
         blend_area.y2 = blend_area.y1 + buf_h - 1;
 
         lv_draw_mask_res_t mask_res_def = (cf != LV_IMG_CF_TRUE_COLOR || draw_dsc->angle ||
-                                           draw_dsc->zoom != LV_IMG_ZOOM_NONE) ?
+                                           draw_dsc->zoom != LV_ZOOM_NONE) ?
                                           LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 
