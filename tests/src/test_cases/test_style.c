@@ -122,4 +122,32 @@ void test_const_style(void)
     TEST_ASSERT_EQUAL(50, lv_obj_get_style_height(obj, LV_PART_MAIN));
 }
 
+void test_style_replacement(void)
+{
+    /*Define styles*/
+    lv_style_t style_red;
+    lv_style_t style_blue;
+
+    lv_style_init(&style_red);
+    lv_style_set_bg_color(&style_red, lv_color_hex(0xff0000));
+
+    lv_style_init(&style_blue);
+    lv_style_set_bg_color(&style_blue, lv_color_hex(0x0000ff));
+
+    /*Create object with style*/
+    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_add_style(obj, &style_red, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(lv_color_hex(0xff0000).full, lv_obj_get_style_bg_color(obj, LV_PART_MAIN).full);
+
+    /*Replace style successfully*/
+    bool replaced = lv_obj_replace_style(obj, &style_red, &style_blue, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(true, replaced);
+    TEST_ASSERT_EQUAL(lv_color_hex(0x0000ff).full, lv_obj_get_style_bg_color(obj, LV_PART_MAIN).full);
+
+    /*Failed replacement (already replaced)*/
+    replaced = lv_obj_replace_style(obj, &style_red, &style_blue, LV_PART_MAIN);
+    TEST_ASSERT_EQUAL(false, replaced);
+    TEST_ASSERT_EQUAL(lv_color_hex(0x0000ff).full, lv_obj_get_style_bg_color(obj, LV_PART_MAIN).full);
+}
+
 #endif
