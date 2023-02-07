@@ -1,5 +1,38 @@
 # Changelog
 
+## [v8.3.5](https://github.com/lvgl/lvgl/compare/v8.3.4...v8.3.5) 7 February 2023
+
+### Performance
+
+- perf(gpu): improve NXP's PXP and VGLite accelerators [`3952`](https://github.com/lvgl/lvgl/pull/3952)
+- perf(dam2d): rework stm32 dma2d  [`3904`](https://github.com/lvgl/lvgl/pull/3904)
+
+### Fixes
+
+- fix(monkey): remove executable permissions from source files [`3971`](https://github.com/lvgl/lvgl/pull/3971)
+- fix(ci): set Ubuntu version for MicroPython test [`3865`](https://github.com/lvgl/lvgl/pull/3865)
+- fix(Kconfig): fix wrong type of LV_FS_STDIO_CACHE_SIZE (v8.3) [`3906`](https://github.com/lvgl/lvgl/pull/3906)
+- docs(indev): fix the name of long_press_repeat_time (was long_press_rep_time) [`34c545e`](https://github.com/lvgl/lvgl/commit/34c545ef19dc97c8952a412e533a4cd3924b9fbc)
+- fix(roller): consider the recolor setting of the label [`39f4247`](https://github.com/lvgl/lvgl/commit/39f424767fa57376c4cb08cf22951fd56d854fd6)
+
+### Examples
+
+### Docs
+
+- docs(indev): fix the name of long_press_repeat_time (was long_press_rep_time) [`34c545e`](https://github.com/lvgl/lvgl/commit/34c545ef19dc97c8952a412e533a4cd3924b9fbc)
+
+### CI and tests
+
+- ci(esp): fix push to the component registry on tag [`e529230`](https://github.com/lvgl/lvgl/commit/e529230f4bb97b4506c430aac96d5ddaef685dc4)
+
+### Others
+
+- chore(cmsis-pack): update cmsis-pack for v8.3.5 [`3972`](https://github.com/lvgl/lvgl/pull/3972)
+- chore: add an option to "LV_TICK_CUSTOM" [`3879`](https://github.com/lvgl/lvgl/pull/3879)
+
+- bump version numbers to v8.3.5-dev [`47c8f8f`](https://github.com/lvgl/lvgl/commit/47c8f8f9822f4c0c0ffbe2f12b380bddefcec475)
+- Update layer.md [`9faca8a`](https://github.com/lvgl/lvgl/commit/9faca8a8d4125e21dedbf6e46aa1586a6b57e5b8)
+
 
 ## [v8.3.4](https://github.com/lvgl/lvgl/compare/v8.3.4...v8.3.3) 15 December 2022
 
