@@ -17,6 +17,13 @@
 /*********************
  *      DEFINES
  *********************/
+
+/** Count the cache entries's life. Add `time_to_open` to `life` when the entry is used.
+ * Decrement all lifes by one every in every ::lv_img_cache_open.
+ * If life == 0 the entry can be reused*/
+#define CACHE_GET_LIFE(entry) ((lv_intptr_t)((entry)->user_data))
+#define CACHE_SET_LIFE(entry, v) ((entry)->user_data = (void*)((lv_intptr_t)(v)))
+
 /*Decrement life with this value on every open*/
 #define LV_IMG_CACHE_AGING 1
 
@@ -100,8 +107,9 @@ static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const void * src, lv_c
     /*Decrement all lifes. Make the entries older*/
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {
-        if(cache[i].life > INT32_MIN + LV_IMG_CACHE_AGING) {
-            cache[i].life -= LV_IMG_CACHE_AGING;
+        int32_t life = CACHE_GET_LIFE(&cache[i]);
+        if(life > INT32_MIN + LV_IMG_CACHE_AGING) {
+            CACHE_SET_LIFE(&cache[i], life - LV_IMG_CACHE_AGING);
         }
     }
 
@@ -113,8 +121,9 @@ static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const void * src, lv_c
              *Image difficult to open should live longer to keep avoid frequent their recaching.
              *Therefore increase `life` with `time_to_open`*/
             cached_src = &cache[i];
-            cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN;
-            if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIMIT;
+            int32_t life = CACHE_GET_LIFE(cached_src);
+            CACHE_SET_LIFE(cached_src, life + cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN);
+            if(CACHE_GET_LIFE(cached_src) > LV_IMG_CACHE_LIFE_LIMIT) CACHE_SET_LIFE(cached_src, LV_IMG_CACHE_LIFE_LIMIT);
             LV_LOG_TRACE("image source found in the cache");
             break;
         }
@@ -126,7 +135,7 @@ static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const void * src, lv_c
     /*Find an entry to reuse. Select the entry with the least life*/
     cached_src = &cache[0];
     for(i = 1; i < entry_cnt; i++) {
-        if(cache[i].life < cached_src->life) {
+        if(CACHE_GET_LIFE(&cache[i]) < CACHE_GET_LIFE(cached_src)) {
             cached_src = &cache[i];
         }
     }
@@ -148,11 +157,11 @@ static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const void * src, lv_c
     if(open_res == LV_RES_INV) {
         LV_LOG_WARN("Image draw cannot open the image resource");
         lv_memzero(cached_src, sizeof(_lv_img_cache_entry_t));
-        cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its us*/
+        CACHE_SET_LIFE(cached_src, INT32_MIN); /*Make the empty entry very "weak" to force its us*/
         return NULL;
     }
 
-    cached_src->life = 0;
+    CACHE_SET_LIFE(cached_src, 0);
 
     /*If `time_to_open` was not set in the open function set it here*/
     if(cached_src->dec_dsc.time_to_open == 0) {
