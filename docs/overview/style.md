@@ -203,6 +203,19 @@ lv_obj_add_style(btn, &style_btn, 0);      				  /*Default button style*/
 lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);  /*Overwrite only some colors to red when pressed*/
 ```
 
+### Replace styles
+To replace a specific style of an object use `lv_obj_replace_style(obj, old_style, new_style, selector)`. This function
+will only replace `old_style` with `new_style` if the `selector` matches the `selector` used in `lv_obj_add_style`.
+Both styles, i.e. `old_style` and `new_style`, must not be `NULL` (for adding and removing separate functions exist).
+If the combination of `old_style` and `selector` exists multiple times in `obj`'s styles, all occurrences will be
+replaced. The return value of the function indicates whether at least one successful replacement took place.
+
+Using `lv_obj_replace_style`:
+```c
+lv_obj_add_style(btn, &style_btn, 0);                      /*Add a button style*/
+lv_obj_replace_style(btn, &style_btn, &new_style_btn, 0);  /*Replace the button style with a different one*/
+```
+
 ### Remove styles
 To remove all styles from an object use `lv_obj_remove_style_all(obj)`.
 

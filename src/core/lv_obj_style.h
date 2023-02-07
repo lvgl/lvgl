@@ -81,6 +81,18 @@ void _lv_obj_style_init(void);
 void lv_obj_add_style(struct _lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector);
 
 /**
+ * Replaces a style of an object, preserving the order of the style stack (local styles and transitions are ignored).
+ * @param obj           pointer to an object
+ * @param old_style     pointer to a style to replace.
+ * @param new_style     pointer to a style to replace the old style with.
+ * @param selector      OR-ed values of states and a part to replace only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
+ * @example lv_obj_replace_style(obj, &yellow_style, &blue_style, LV_PART_ANY | LV_STATE_ANY); //Replace a specific style
+ * @example lv_obj_replace_style(obj, &yellow_style, &blue_style, LV_PART_MAIN | LV_STATE_PRESSED); //Replace a specific style assigned to the main part when it is pressed
+ */
+bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,
+                          lv_style_selector_t selector);
+
+/**
  * Add a style to an object.
  * @param obj       pointer to an object
  * @param style     pointer to a style to remove. Can be NULL to check only the selector
