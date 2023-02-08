@@ -36,6 +36,13 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
+     <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/release/v8.3/env_support/cmsis-pack/LVGL.lvgl.8.3.5.pack">
+      - LVGL 8.3.5 release
+      - Use LVGL version as the cmsis-pack version
+      - Fix GPU support for NXP PXP and NXP VGLite
+      - Rework stm32 DMA2D support
+      - Various fixes
+    </release>
     <release date="2023-01-15" version="1.1.0-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
       - LVGL 9.0.0-dev
       - Monthly update for January
