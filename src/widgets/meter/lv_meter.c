@@ -453,7 +453,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
             }
         }
 
-        int32_t angle_upscale = ((i * meter->scale.angle_range) * 10) / (meter->scale.tick_cnt - 1) +  + meter->scale.rotation *
+        int32_t angle_upscale = ((i * meter->scale.angle_range) * 10) / (meter->scale.tick_cnt - 1) + meter->scale.rotation *
                                 10;
 
         line_dsc.color = line_color;
