@@ -1576,7 +1576,14 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
     }
 
     p1.y = y_ofs;
-    uint32_t total_tick_num = (t->major_cnt - 1) * t->minor_cnt;
+    uint32_t total_tick_num;
+    if (chart->type == LV_CHART_TYPE_LINE && (((t->major_cnt - 1) * t->minor_cnt) == chart->point_cnt)) {
+        total_tick_num = chart->point_cnt - 1;
+    }
+    else {
+        total_tick_num = (t->major_cnt - 1) * t->minor_cnt;
+    }
+    if (!total_tick_num) return; /*Ensure total_tick_num is not equal to zero*/
     for(i = 0; i <= total_tick_num; i++) { /*one extra loop - it may not exist in the list, empty label*/
         bool major = false;
         if(i % t->minor_cnt == 0) major = true;
