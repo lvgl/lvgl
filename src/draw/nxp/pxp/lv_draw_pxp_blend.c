@@ -343,26 +343,40 @@ static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area
     bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
     bool has_rotation = (dsc->angle != 0);
 
+    lv_point_t pivot = dsc->pivot;
+    lv_coord_t piv_offset_x = 0;
+    lv_coord_t piv_offset_y = 0;
+
     lv_gpu_nxp_pxp_reset();
 
     if(has_rotation) {
-        /*Convert rotation angle*/
+        /*Convert rotation angle and calculate offsets caused by pivot*/
         pxp_rotate_degree_t pxp_angle;
         switch(dsc->angle) {
             case 0:
                 pxp_angle = kPXP_Rotate0;
+                piv_offset_x = 0;
+                piv_offset_y = 0;
                 break;
             case 900:
                 pxp_angle = kPXP_Rotate90;
+                piv_offset_x = pivot.x + pivot.y - src_h;
+                piv_offset_y = pivot.y - pivot.x;
                 break;
             case 1800:
                 pxp_angle = kPXP_Rotate180;
+                piv_offset_x = 2 * pivot.x - src_w;
+                piv_offset_y = 2 * pivot.y - src_h;
                 break;
             case 2700:
                 pxp_angle = kPXP_Rotate270;
+                piv_offset_x = pivot.x - pivot.y;
+                piv_offset_y = pivot.x + pivot.y - src_w;
                 break;
             default:
                 pxp_angle = kPXP_Rotate0;
+                piv_offset_x = 0;
+                piv_offset_y = 0;
         }
         PXP_SetRotateConfig(LV_GPU_NXP_PXP_ID, kPXP_RotateOutputBuffer, pxp_angle, kPXP_FlipDisable);
     }
@@ -386,7 +400,7 @@ static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area
     pxp_output_buffer_config_t outputBufferConfig = {
         .pixelFormat = (pxp_output_pixel_format_t)PXP_OUT_PIXEL_FORMAT,
         .interlacedMode = kPXP_OutputProgressive,
-        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_area->x1),
+        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * (dest_area->y1 + piv_offset_y) + (dest_area->x1 + piv_offset_x)),
         .buffer1Addr = (uint32_t)0U,
         .pitchBytes = dest_stride * sizeof(lv_color_t),
         .width = dest_w,
