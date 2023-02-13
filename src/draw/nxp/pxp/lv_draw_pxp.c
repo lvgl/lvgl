@@ -192,21 +192,19 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    lv_area_t blend_area;
-    bool has_transform = dsc->angle != 0 || dsc->zoom != LV_IMG_ZOOM_NONE;
+    bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
+    bool has_rotation = (dsc->angle != 0);
+    bool unsup_rotation = false;
 
-    if(has_transform)
+    lv_area_t blend_area;
+    if(has_rotation)
         lv_area_copy(&blend_area, &rel_coords);
     else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
+    bool has_mask = lv_draw_mask_is_any(&blend_area);
     lv_coord_t src_width = lv_area_get_width(coords);
     lv_coord_t src_height = lv_area_get_height(coords);
-
-    bool has_mask = lv_draw_mask_is_any(&blend_area);
-    bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
-    bool has_rotation = (dsc->angle != 0);
-    bool unsup_rotation = false;
 
     if(has_rotation) {
         /*

@@ -100,7 +100,7 @@ static void lv_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t * dest_area, 
  * @param[in] dsc Image descriptor
  * @param[in] cf Color format
  */
-static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void lv_pxp_blit_cover(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
                               const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
                               const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf);
 
@@ -286,7 +286,7 @@ void lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_
     lv_gpu_nxp_pxp_run();
 }
 
-void lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+void lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
                                    const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
                                    const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf)
 {
@@ -316,22 +316,25 @@ static void lv_pxp_blit_opa(lv_color_t * dest_buf, const lv_area_t * dest_area, 
                             const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
                             const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf)
 {
-    lv_coord_t temp_area_w = lv_area_get_width(dest_area);
-    lv_coord_t temp_area_h = lv_area_get_height(dest_area);
-    const lv_area_t temp_area = {
-        .x1 = 0,
-        .y1 = 0,
-        .x2 = temp_area_w - 1,
-        .y2 = temp_area_h - 1
-    };
+    lv_area_t temp_area;
+    lv_area_copy(&temp_area, dest_area);
+    lv_coord_t temp_stride = dest_stride;
+    lv_coord_t temp_w = lv_area_get_width(&temp_area);
+    lv_coord_t temp_h = lv_area_get_height(&temp_area);
 
     /*Step 1: Transform with full opacity to temporary buffer*/
-    lv_pxp_blit_cover((lv_color_t *)temp_buf, &temp_area, temp_area_w, src_buf, src_area, src_stride, dsc, cf);
+    lv_pxp_blit_cover((lv_color_t *)temp_buf, &temp_area, temp_stride, src_buf, src_area, src_stride, dsc, cf);
+
+    /*Switch width and height if angle requires it*/
+    if(dsc->angle == 900 || dsc->angle == 2700) {
+        temp_area.x2 = temp_area.x1 + temp_h - 1;
+        temp_area.y2 = temp_area.y1 + temp_w - 1;
+    }
 
     /*Step 2: Blit temporary result with required opacity to output*/
-    lv_pxp_blit_cf(dest_buf, dest_area, dest_stride, (lv_color_t *)temp_buf, &temp_area, temp_area_w, dsc, cf);
+    lv_pxp_blit_cf(dest_buf, &temp_area, dest_stride, (lv_color_t *)temp_buf, &temp_area, temp_stride, dsc, cf);
 }
-static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+static void lv_pxp_blit_cover(lv_color_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
                               const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
                               const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf)
 {
@@ -344,8 +347,8 @@ static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area
     bool has_rotation = (dsc->angle != 0);
 
     lv_point_t pivot = dsc->pivot;
-    lv_coord_t piv_offset_x = 0;
-    lv_coord_t piv_offset_y = 0;
+    lv_coord_t piv_offset_x;
+    lv_coord_t piv_offset_y;
 
     lv_gpu_nxp_pxp_reset();
 
@@ -359,26 +362,27 @@ static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area
                 piv_offset_y = 0;
                 break;
             case 900:
-                pxp_angle = kPXP_Rotate90;
-                piv_offset_x = pivot.x + pivot.y - src_h;
+                piv_offset_x = pivot.x + pivot.y - dest_h;
                 piv_offset_y = pivot.y - pivot.x;
+                pxp_angle = kPXP_Rotate90;
                 break;
             case 1800:
+                piv_offset_x = 2 * pivot.x - dest_w;
+                piv_offset_y = 2 * pivot.y - dest_h;
                 pxp_angle = kPXP_Rotate180;
-                piv_offset_x = 2 * pivot.x - src_w;
-                piv_offset_y = 2 * pivot.y - src_h;
                 break;
             case 2700:
-                pxp_angle = kPXP_Rotate270;
                 piv_offset_x = pivot.x - pivot.y;
-                piv_offset_y = pivot.x + pivot.y - src_w;
+                piv_offset_y = pivot.x + pivot.y - dest_w;
+                pxp_angle = kPXP_Rotate270;
                 break;
             default:
-                pxp_angle = kPXP_Rotate0;
                 piv_offset_x = 0;
                 piv_offset_y = 0;
+                pxp_angle = kPXP_Rotate0;
         }
         PXP_SetRotateConfig(LV_GPU_NXP_PXP_ID, kPXP_RotateOutputBuffer, pxp_angle, kPXP_FlipDisable);
+        lv_area_move(dest_area, piv_offset_x, piv_offset_y);
     }
 
     /*AS buffer - source image*/
@@ -400,7 +404,7 @@ static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area
     pxp_output_buffer_config_t outputBufferConfig = {
         .pixelFormat = (pxp_output_pixel_format_t)PXP_OUT_PIXEL_FORMAT,
         .interlacedMode = kPXP_OutputProgressive,
-        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * (dest_area->y1 + piv_offset_y) + (dest_area->x1 + piv_offset_x)),
+        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_area->x1),
         .buffer1Addr = (uint32_t)0U,
         .pitchBytes = dest_stride * sizeof(lv_color_t),
         .width = dest_w,
