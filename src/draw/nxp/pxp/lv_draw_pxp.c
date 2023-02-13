@@ -184,13 +184,21 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
         return;
     }
 
-    lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to draw and the clip area.*/
-    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
-        return; /*Fully clipped, nothing to do*/
+    lv_area_t rel_coords;
+    lv_area_copy(&rel_coords, coords);
+    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_area_t blend_area;
+    bool has_transform = dsc->angle != 0 || dsc->zoom != LV_IMG_ZOOM_NONE;
+
+    if(has_transform)
+        lv_area_copy(&blend_area, &rel_coords);
+    else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
+        return; /*Fully clipped, nothing to do*/
 
     lv_coord_t src_width = lv_area_get_width(coords);
     lv_coord_t src_height = lv_area_get_height(coords);
