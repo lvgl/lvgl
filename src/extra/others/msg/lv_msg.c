@@ -94,6 +94,25 @@ void lv_msg_unsubscribe(void * s)
     lv_mem_free(s);
 }
 
+uint32_t lv_msg_unsubscribe_obj(uint32_t msg_id, lv_obj_t * obj)
+{
+    uint32_t cnt = 0;
+    sub_dsc_t * s = _lv_ll_get_head(&subs_ll);
+    while(s) {
+        sub_dsc_t * s_next = _lv_ll_get_next(&subs_ll, s);
+        if(s->callback == obj_notify_cb &&
+           (s->msg_id == LV_MSG_ID_ANY || s->msg_id == msg_id) &&
+           (obj == NULL || s->_priv_data == obj)) {
+            lv_msg_unsubscribe(s);
+            cnt++;
+        }
+
+        s = s_next;
+    }
+
+    return cnt;
+}
+
 void lv_msg_send(uint32_t msg_id, const void * payload)
 {
     lv_msg_t m;
@@ -128,8 +147,6 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e)
         return NULL;
     }
 }
-
-
 
 /**********************
  *   STATIC FUNCTIONS
