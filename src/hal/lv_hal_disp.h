@@ -23,6 +23,11 @@ extern "C" {
 #include "../misc/lv_area.h"
 #include "../misc/lv_ll.h"
 #include "../misc/lv_timer.h"
+#include "../misc/lv_types.h"
+
+#if LV_USE_ATOMICS == 1
+#include <stdatomic.h>
+#endif
 
 /*********************
  *      DEFINES
@@ -47,6 +52,11 @@ struct _lv_disp_t;
 struct _lv_disp_drv_t;
 struct _lv_theme_t;
 
+#if LV_USE_ATOMICS == 1
+#define FLUSHING_TYPE atomic_int
+#else
+#define FLUSHING_TYPE volatile int
+#endif
 /**
  * Structure for holding display buffer information.
  */
@@ -57,13 +67,13 @@ typedef struct _lv_disp_draw_buf_t {
     /*Internal, used by the library*/
     void * buf_act;
     uint32_t size; /*In pixel count*/
-    /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
-    volatile int flushing;
-    /*1: It was the last chunk to flush. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
-    volatile int flushing_last;
-    volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
-    volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
+    FLUSHING_TYPE flushing;
+    /*It was the last chunk to flush. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    FLUSHING_TYPE flushing_last;
+    uint32_t last_area         : 1; /*1: the last area is being rendered*/
+    uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
 } lv_disp_draw_buf_t;
+#undef FLUSHING_TYPE
 
 typedef enum {
     LV_DISP_ROT_NONE = 0,
