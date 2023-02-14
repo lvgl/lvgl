@@ -12,7 +12,7 @@ Now that the source files are included in your project, follow the instructions 
 
 ## Bare Metal Example
 A minimal example using STM32CubeIDE, and HAL.
-* When setting up **Pinout and Configuration** using the **Device Configuration Tool**, select **System Core** - **SYS** - **Timebase Source** and set to **TIM1** or any timer of your choice (anything other than SysTick).
+* When setting up **Pinout and Configuration** using the **Device Configuration Tool**, select **System Core** - **SYS** and ensure that **Timebase Source** is set to **SysTick**.
 * Configure any other peripherals (including the LCD panel), and initialise them in *main.c*.
 * ```#include "lvgl.h"``` in the *main.c* file.
 * Create some frame buffer(s) as global variables:
@@ -61,20 +61,23 @@ while (1)
   HAL_Delay(5);
 }
 ```
-* Add a call to ```lv_tick_inc()``` inside the ```HAL_TIM_PeriodElapsedCallback()``` function, near the bottom of *main.c*, which should have been generated after saving your *Device Configuration* in the first step.
+* Add a call to ```lv_tick_inc()``` inside the ```SysTick_Handler()``` function. Open the *stm32xxxx_it.c* file (the name will depend on your specific MCU), and update the ```SysTick_Handler()``` function:
 ```
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+void SysTick_Handler(void)
 {
-  /* USER CODE BEGIN Callback 0 */
+  /* USER CODE BEGIN SysTick_IRQn 0 */
+  
+    HAL_SYSTICK_IRQHandler();
+    lv_tick_inc(1);
+    #ifdef USE_RTOS_SYSTICK
+      osSystickHandler();
+    #endif
 
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM16) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-  lv_tick_inc(1);
+  /* USER CODE END SysTick_IRQn 0 */
+  HAL_IncTick();
+  /* USER CODE BEGIN SysTick_IRQn 1 */
 
-  /* USER CODE END Callback 1 */
+  /* USER CODE END SysTick_IRQn 1 */
 }
 ```
 * Finally, write the callback function, ```my_flush_cb()```, which will send the display buffer to your LCD panel. Below is one example, but it will vary depending on your setup.
