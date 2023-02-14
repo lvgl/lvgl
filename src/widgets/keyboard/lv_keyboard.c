@@ -104,7 +104,7 @@ static const lv_btnmatrix_ctrl_t default_kb_ctrl_ar_map[] = {
 #endif
 
 static const char * const default_kb_map_spec[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", LV_SYMBOL_BACKSPACE, "\n",
-                                                   "abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+                                                   "abc", "+", "&", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
                                                    "\\",  "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
                                                    LV_SYMBOL_KEYBOARD,
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
