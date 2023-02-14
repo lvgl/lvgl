@@ -57,6 +57,7 @@
 
 #define LV_USE_FS_STDIO     1
 #define LV_FS_STDIO_LETTER  'A'
+#define LV_FS_STDIO_CACHE_SIZE 512
 #define LV_USE_FS_POSIX     1
 #define LV_FS_POSIX_LETTER  'B'
 
