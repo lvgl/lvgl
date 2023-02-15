@@ -261,8 +261,6 @@ void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x)
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    x = x % ext->w;
-
     ext->offset.x = x;
     lv_obj_invalidate(img);
 }
@@ -278,8 +276,6 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
     LV_ASSERT_OBJ(img, LV_OBJX_NAME);
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-
-    y = y % ext->h;
 
     ext->offset.y = y;
     lv_obj_invalidate(img);
@@ -683,8 +679,10 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_area_t zoomed_coords;
             lv_obj_get_coords(img, &zoomed_coords);
 
-            zoomed_coords.x1 += (int32_t)((int32_t)ext->offset.x * zoom_final) >> 8;
-            zoomed_coords.y1 += (int32_t)((int32_t)ext->offset.y * zoom_final) >> 8;
+            int32_t offset_x = (int32_t)ext->offset.x % ext->w;
+            int32_t offset_y = (int32_t)ext->offset.y % ext->h;
+            zoomed_coords.x1 += (int32_t)(offset_x * zoom_final) >> 8;
+            zoomed_coords.y1 += (int32_t)(offset_y * zoom_final) >> 8;
             zoomed_coords.x2 = zoomed_coords.x1 + ((int32_t)((int32_t)(obj_w - 1) * zoom_final) >> 8);
             zoomed_coords.y2 = zoomed_coords.y1 + ((int32_t)((int32_t)(obj_h - 1) * zoom_final) >> 8);
 
