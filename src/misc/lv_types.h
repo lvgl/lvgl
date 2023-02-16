@@ -34,11 +34,13 @@ extern "C" {
 
 /*Use atomics instead of volatile variables for state which is potentially shared between threads, as long as
  *the compiler supports it.*/
+#ifndef LV_USE_ATOMICS
 #if (defined(__cplusplus) && __cplusplus >= 201103L)\
     || (__STDC_VERSION__ >= 201112L && !defined(__STDC_NO_ATOMICS__))
 #define LV_USE_ATOMICS 1
 #else
 #define LV_USE_ATOMICS 0
+#endif
 #endif
 
 /**********************
