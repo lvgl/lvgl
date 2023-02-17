@@ -23,6 +23,7 @@
 #include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_rect.h"
 #include "lv_draw_sdl_layer.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -366,7 +367,7 @@ static void apply_recolor_opa(SDL_Texture * texture, const lv_draw_img_dsc_t * d
 {
     if(draw_dsc->recolor_opa > LV_OPA_TRANSP) {
         /* Draw with mixed recolor */
-        lv_color_t recolor = lv_color_mix(draw_dsc->recolor, lv_color_white(), draw_dsc->recolor_opa);
+        lv_color_t recolor = LV_COLOR_MIX(draw_dsc->recolor, lv_color_white(), draw_dsc->recolor_opa);
         SDL_SetTextureColorMod(texture, recolor.ch.red, recolor.ch.green, recolor.ch.blue);
     }
     else {

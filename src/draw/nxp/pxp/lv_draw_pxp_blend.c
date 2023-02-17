@@ -35,6 +35,7 @@
 
 #if LV_USE_GPU_NXP_PXP
 #include "lvgl_support.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -478,7 +479,7 @@ static void lv_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * dest_area, l
 
         if(has_recolor) {
             /* New color key after recoloring */
-            lv_color_t colorKey =  lv_color_mix(dsc->recolor, LV_COLOR_CHROMA_KEY, dsc->recolor_opa);
+            lv_color_t colorKey =  LV_COLOR_MIX(dsc->recolor, LV_COLOR_CHROMA_KEY, dsc->recolor_opa);
 
             LV_COLOR_SET_R(colorKeyLow, colorKey.ch.red != 0 ? colorKey.ch.red - 1 : 0);
             LV_COLOR_SET_G(colorKeyLow, colorKey.ch.green != 0 ? colorKey.ch.green - 1 : 0);

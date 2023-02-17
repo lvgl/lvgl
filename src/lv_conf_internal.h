@@ -260,6 +260,35 @@
     #endif
 #endif
 
+#ifndef LV_COLOR_EXTERN_INCLUDE
+    #ifdef CONFIG_LV_COLOR_EXTERN_INCLUDE
+        #define LV_COLOR_EXTERN_INCLUDE CONFIG_LV_COLOR_EXTERN_INCLUDE
+    #else
+        #define LV_COLOR_EXTERN_INCLUDE <stdint.h>
+    #endif
+#endif
+#ifndef LV_COLOR_MIX
+    #ifdef CONFIG_LV_COLOR_MIX
+        #define LV_COLOR_MIX CONFIG_LV_COLOR_MIX
+    #else
+        #define LV_COLOR_MIX      lv_color_mix
+    #endif
+#endif
+#ifndef LV_COLOR_PREMULT
+    #ifdef CONFIG_LV_COLOR_PREMULT
+        #define LV_COLOR_PREMULT CONFIG_LV_COLOR_PREMULT
+    #else
+        #define LV_COLOR_PREMULT      lv_color_premult
+    #endif
+#endif
+#ifndef LV_COLOR_MIX_PREMULT
+    #ifdef CONFIG_LV_COLOR_MIX_PREMULT
+        #define LV_COLOR_MIX_PREMULT CONFIG_LV_COLOR_MIX_PREMULT
+    #else
+        #define LV_COLOR_MIX_PREMULT      lv_color_mix_premult
+    #endif
+#endif
+
 /*====================
    HAL SETTINGS
  *====================*/
