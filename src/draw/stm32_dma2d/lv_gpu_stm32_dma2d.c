@@ -634,6 +634,7 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
                                                                 lv_coord_t height, uint8_t pixel_size)
 {
+#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes
     uint16_t ll = pixel_size * width; // line length in bytes
@@ -659,11 +660,13 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address
 
     __DSB();
     __ISB();
+#endif
 }
 
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
                                                            lv_coord_t height, uint8_t pixel_size)
 {
+#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes
     uint16_t ll = pixel_size * width; // line length in bytes
@@ -688,6 +691,7 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_
 
     __DSB();
     __ISB();
+#endif
 }
 
 // initialize µs timer
