@@ -698,8 +698,9 @@ LV_STM32_DMA2D_STATIC bool _lv_gpu_stm32_dwt_init(void)
     // enable TRC
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
+#if defined(__CORTEX_M) && (__CORTEX_M == 7U)
     DWT->LAR = 0xC5ACCE55;
-
+#endif
     // disable clock cycle counter
     DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;
     // enable  clock cycle counter
