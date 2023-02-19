@@ -188,6 +188,7 @@ void lv_chart_set_zoom_x(lv_obj_t * obj, uint16_t zoom_x)
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->zoom_x == zoom_x) return;
+    if(LV_ZOOM_NONE > zoom_x) zoom_x = LV_ZOOM_NONE;
 
     chart->zoom_x = zoom_x;
     lv_obj_refresh_self_size(obj);
@@ -202,6 +203,7 @@ void lv_chart_set_zoom_y(lv_obj_t * obj, uint16_t zoom_y)
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->zoom_y == zoom_y) return;
+    if(LV_ZOOM_NONE > zoom_y) zoom_y = LV_ZOOM_NONE;
 
     chart->zoom_y = zoom_y;
     lv_obj_refresh_self_size(obj);
@@ -345,26 +347,38 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
+
+    /* Allocate space for a new series and add it to the chart series linked list */
     lv_chart_series_t * ser = _lv_ll_ins_head(&chart->series_ll);
     LV_ASSERT_MALLOC(ser);
     if(ser == NULL) return NULL;
 
-    lv_coord_t def = LV_CHART_POINT_NONE;
-
-    ser->color  = color;
+    /* Allocate memory for point_cnt points, handle failure below */
     ser->y_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
     LV_ASSERT_MALLOC(ser->y_points);
 
     if(chart->type == LV_CHART_TYPE_SCATTER) {
         ser->x_points = lv_malloc(sizeof(lv_coord_t) * chart->point_cnt);
         LV_ASSERT_MALLOC(ser->x_points);
+        if(NULL == ser->x_points) {
+            lv_free(ser->y_points);
+            _lv_ll_remove(&chart->series_ll, ser);
+            lv_free(ser);
+            return NULL;
+        }
     }
+    else {
+        ser->x_points = NULL;
+    }
+
     if(ser->y_points == NULL) {
         _lv_ll_remove(&chart->series_ll, ser);
         lv_free(ser);
         return NULL;
     }
 
+    /* Set series properties on successful allocation */
+    ser->color = color;
     ser->start_point = 0;
     ser->y_ext_buf_assigned = false;
     ser->hidden = 0;
@@ -372,6 +386,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     ser->y_axis_sec = axis & LV_CHART_AXIS_SECONDARY_Y ? 1 : 0;
 
     uint16_t i;
+    const lv_coord_t def = LV_CHART_POINT_NONE;
     lv_coord_t * p_tmp = ser->y_points;
     for(i = 0; i < chart->point_cnt; i++) {
         *p_tmp = def;
