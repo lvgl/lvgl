@@ -469,7 +469,7 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, srcBpp);
 
     DMA2D->OPFCCR = LvglColorFormat;
-#if defined(DMA2D_OPFCCR_RBS_Pos)    
+#if defined(DMA2D_OPFCCR_RBS_Pos)
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
 #endif
     DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
