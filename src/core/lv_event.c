@@ -117,7 +117,7 @@ lv_obj_t * lv_event_get_current_target(lv_event_t * e)
 
 lv_event_code_t lv_event_get_code(lv_event_t * e)
 {
-    return e->code & ~LV_EVENT_PREPROCESS;
+    return (lv_event_code_t)(e->code & ~LV_EVENT_PREPROCESS);
 }
 
 void * lv_event_get_param(lv_event_t * e)
