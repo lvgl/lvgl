@@ -87,9 +87,11 @@ LV_IMG_DECLARE(img_benchmark_cogwheel_chroma_keyed);
 LV_IMG_DECLARE(img_benchmark_cogwheel_indexed16);
 LV_IMG_DECLARE(img_benchmark_cogwheel_alpha16);
 
-LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);
-LV_FONT_DECLARE(lv_font_benchmark_montserrat_16_compr_az);
-LV_FONT_DECLARE(lv_font_benchmark_montserrat_28_compr_az);
+#if LV_USE_FONT_COMPRESSED
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_16_compr_az);
+    LV_FONT_DECLARE(lv_font_benchmark_montserrat_28_compr_az);
+#endif
 
 static void benchmark_init(void);
 static void show_scene_report(void);
@@ -446,13 +448,13 @@ static void txt_large_cb(void)
 
 }
 
+#if LV_USE_FONT_COMPRESSED
 static void txt_small_compr_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_text_font(&style_common, &lv_font_benchmark_montserrat_12_compr_az);
     lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     txt_create(&style_common);
-
 }
 
 static void txt_medium_compr_cb(void)
@@ -461,7 +463,6 @@ static void txt_medium_compr_cb(void)
     lv_style_set_text_font(&style_common, &lv_font_benchmark_montserrat_16_compr_az);
     lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     txt_create(&style_common);
-
 }
 
 static void txt_large_compr_cb(void)
@@ -470,9 +471,8 @@ static void txt_large_compr_cb(void)
     lv_style_set_text_font(&style_common, &lv_font_benchmark_montserrat_28_compr_az);
     lv_style_set_text_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     txt_create(&style_common);
-
 }
-
+#endif
 
 static void line_cb(void)
 {
@@ -480,7 +480,6 @@ static void line_cb(void)
     lv_style_set_line_width(&style_common, LINE_WIDTH);
     lv_style_set_line_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
     line_create(&style_common);
-
 }
 
 static void arc_think_cb(void)
@@ -622,9 +621,11 @@ static scene_dsc_t scenes[] = {
     {.name = "Text medium",                  .weight = 30, .create_cb = txt_medium_cb},
     {.name = "Text large",                   .weight = 20, .create_cb = txt_large_cb},
 
+#if LV_USE_FONT_COMPRESSED
     {.name = "Text small compressed",        .weight = 3, .create_cb = txt_small_compr_cb},
     {.name = "Text medium compressed",       .weight = 5, .create_cb = txt_medium_compr_cb},
     {.name = "Text large compressed",        .weight = 10, .create_cb = txt_large_compr_cb},
+#endif
 
     {.name = "Line",                         .weight = 10, .create_cb = line_cb},
 
