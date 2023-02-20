@@ -958,6 +958,10 @@ static void generate_report(void)
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
         lv_disp_t * disp = lv_disp_get_default();
         disp->driver->flush_cb = flush_cb_ori;
+        if(disp->refr_timer) {
+            lv_timer_set_period(disp->refr_timer, disp_ori_timer_period);
+        }
+        lv_timer_set_period(lv_anim_get_timer(), anim_ori_timer_period);
     }
 
 
