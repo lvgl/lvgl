@@ -215,8 +215,8 @@ static lv_obj_t * spinbox_ctrl_create(lv_obj_t * par, lv_style_prop_t prop, lv_o
     lv_label_set_text(label, "+");
     lv_obj_center(label);
 
-    lv_obj_add_event_cb(btn_inc, btn_inc_event_handler, LV_EVENT_ALL, spinbox);
-    lv_obj_add_event_cb(btn_dec, btn_dec_event_handler, LV_EVENT_ALL, spinbox);
+    lv_obj_add_event(btn_inc, btn_inc_event_handler, LV_EVENT_ALL, spinbox);
+    lv_obj_add_event(btn_dec, btn_dec_event_handler, LV_EVENT_ALL, spinbox);
 
     return spinbox;
 }

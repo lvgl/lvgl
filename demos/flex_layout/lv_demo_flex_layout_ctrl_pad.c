@@ -23,7 +23,7 @@
     } while(0)
 
 #define SPINBOX_EVENT_ATTACH(item)  \
-    lv_obj_add_event_cb(ui->ctrl_pad.tab.layout.spinbox_##item, ctrl_pad_spinbox_event_handler, LV_EVENT_VALUE_CHANGED, ui);
+    lv_obj_add_event(ui->ctrl_pad.tab.layout.spinbox_##item, ctrl_pad_spinbox_event_handler, LV_EVENT_VALUE_CHANGED, ui);
 
 
 /**********************
@@ -65,7 +65,7 @@ void ctrl_pad_attach(view_t * ui)
     SPINBOX_EVENT_ATTACH(pad_row);
     SPINBOX_EVENT_ATTACH(flex_grow);
 
-    lv_obj_add_event_cb(
+    lv_obj_add_event(
         ui->ctrl_pad.tab.flex.checkbox_scrl,
         ctrl_pad_checkbox_event_handler,
         LV_EVENT_VALUE_CHANGED,
@@ -150,14 +150,14 @@ static void ctrl_pad_checkbox_event_handler(lv_event_t * e)
 
 static void ctrl_pad_btn_event_attach(view_t * ui)
 {
-    lv_obj_add_event_cb(
+    lv_obj_add_event(
         ui->ctrl_pad.btn.add,
         ctrl_pad_btn_add_event_handler,
         LV_EVENT_CLICKED,
         ui
     );
 
-    lv_obj_add_event_cb(
+    lv_obj_add_event(
         ui->ctrl_pad.btn.remove,
         ctrl_pad_btn_remove_event_handler,
         LV_EVENT_CLICKED,
