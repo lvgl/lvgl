@@ -14,6 +14,7 @@
 - [x] Consider flat directory structure. E.g. `extra/widgets` to `widgets`
 - [ ] Rename `disp_drv->monitor_cb` to `render_completed/finished/ready`
 - [ ] Use `uint32_t` and `int32_t` in APIs where possible
+- [ ] To define a new stdlib API use defines `LV_USE_CUSTO_...` and let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
 
 ### Architecture
 - [ ] Consider merging `lv_disp_t`, `lv_disp_drv_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
