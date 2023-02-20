@@ -297,7 +297,7 @@ lv_group_t * lv_indev_get_group(const lv_indev_t * indev)
 
 lv_disp_t * lv_indev_get_disp(const lv_indev_t * indev)
 {
-    if(indev == NULL) return LV_INDEV_TYPE_NONE;
+    if(indev == NULL) return NULL;
 
     return indev->disp;
 }

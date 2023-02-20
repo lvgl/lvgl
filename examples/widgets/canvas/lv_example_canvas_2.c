@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CANVAS && LV_BUILD_EXAMPLES && 0
+#if LV_USE_CANVAS && LV_BUILD_EXAMPLES
 
 #define CANVAS_WIDTH  50
 #define CANVAS_HEIGHT  50
@@ -17,7 +17,7 @@ void lv_example_canvas_2(void)
 
     /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_IMG_CF_INDEXED_1BIT);
+    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_I1);
     lv_canvas_set_palette(canvas, 0, LV_COLOR_CHROMA_KEY);
     lv_canvas_set_palette(canvas, 1, lv_palette_main(LV_PALETTE_RED));
 
