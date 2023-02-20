@@ -18,8 +18,8 @@ void lv_example_canvas_2(void)
     /*Create a canvas and initialize its palette*/
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
     lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_I1);
-    lv_canvas_set_palette(canvas, 0, LV_COLOR_CHROMA_KEY);
-    lv_canvas_set_palette(canvas, 1, lv_palette_main(LV_PALETTE_RED));
+    lv_canvas_set_palette(canvas, 0, lv_color_to32(LV_COLOR_CHROMA_KEY));
+    lv_canvas_set_palette(canvas, 1, lv_color_to32(lv_palette_main(LV_PALETTE_RED)));
 
     /*Create colors with the indices of the palette*/
     lv_color_t c0;

@@ -85,7 +85,7 @@ static uint32_t anim_ori_timer_period;
 LV_IMG_DECLARE(img_benchmark_cogwheel_rgb);
 LV_IMG_DECLARE(img_benchmark_cogwheel_chroma_keyed);
 LV_IMG_DECLARE(img_benchmark_cogwheel_indexed16);
-LV_IMG_DECLARE(img_benchmark_cogwheel_alpha16);
+LV_IMG_DECLARE(img_benchmark_cogwheel_alpha256);
 
 #if LV_USE_FONT_COMPRESSED
     LV_FONT_DECLARE(lv_font_benchmark_montserrat_12_compr_az);
@@ -303,7 +303,7 @@ static void img_alpha_cb(void)
 {
     lv_style_reset(&style_common);
     lv_style_set_img_opa(&style_common, scene_with_opa ? LV_OPA_50 : LV_OPA_COVER);
-    img_create(&style_common, &img_benchmark_cogwheel_alpha16, false, false, false);
+    img_create(&style_common, &img_benchmark_cogwheel_alpha256, false, false, false);
 }
 
 
