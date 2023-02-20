@@ -9,6 +9,7 @@
 #include "lv_obj.h"
 #include "lv_disp.h"
 #include "../misc/lv_gc.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -815,7 +816,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
             case LV_STYLE_IMG_RECOLOR:
                 if(v <= 0) value_final.color = tr->start_value.color;
                 else if(v >= 255) value_final.color = tr->end_value.color;
-                else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
+                else value_final.color = LV_COLOR_MIX(tr->end_value.color, tr->start_value.color, v);
                 break;
 
             default:

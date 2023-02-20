@@ -11,6 +11,7 @@
 
 #include "../../misc/lv_assert.h"
 #include "../../themes/lv_themes.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -179,22 +180,22 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &rect_dsc);
 
         /*Use the original colors brightness to modify color->led*/
-        rect_dsc.bg_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_color));
-        rect_dsc.bg_grad.stops[0].color = lv_color_mix(led->color, lv_color_black(),
+        rect_dsc.bg_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_color));
+        rect_dsc.bg_grad.stops[0].color = LV_COLOR_MIX(led->color, lv_color_black(),
                                                        lv_color_brightness(rect_dsc.bg_grad.stops[0].color));
-        rect_dsc.bg_grad.stops[1].color = lv_color_mix(led->color, lv_color_black(),
+        rect_dsc.bg_grad.stops[1].color = LV_COLOR_MIX(led->color, lv_color_black(),
                                                        lv_color_brightness(rect_dsc.bg_grad.stops[1].color));
-        rect_dsc.shadow_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.shadow_color));
-        rect_dsc.border_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.border_color));
-        rect_dsc.outline_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.outline_color));
+        rect_dsc.shadow_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.shadow_color));
+        rect_dsc.border_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.border_color));
+        rect_dsc.outline_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.outline_color));
 
         /*Mix. the color with black proportionally with brightness*/
-        rect_dsc.bg_color = lv_color_mix(rect_dsc.bg_color, lv_color_black(), led->bright);
-        rect_dsc.bg_grad.stops[0].color   = lv_color_mix(rect_dsc.bg_grad.stops[0].color, lv_color_black(), led->bright);
-        rect_dsc.bg_grad.stops[1].color   = lv_color_mix(rect_dsc.bg_grad.stops[1].color, lv_color_black(), led->bright);
-        rect_dsc.border_color = lv_color_mix(rect_dsc.border_color, lv_color_black(), led->bright);
-        rect_dsc.shadow_color = lv_color_mix(rect_dsc.shadow_color, lv_color_black(), led->bright);
-        rect_dsc.outline_color = lv_color_mix(rect_dsc.outline_color, lv_color_black(), led->bright);
+        rect_dsc.bg_color = LV_COLOR_MIX(rect_dsc.bg_color, lv_color_black(), led->bright);
+        rect_dsc.bg_grad.stops[0].color   = LV_COLOR_MIX(rect_dsc.bg_grad.stops[0].color, lv_color_black(), led->bright);
+        rect_dsc.bg_grad.stops[1].color   = LV_COLOR_MIX(rect_dsc.bg_grad.stops[1].color, lv_color_black(), led->bright);
+        rect_dsc.border_color = LV_COLOR_MIX(rect_dsc.border_color, lv_color_black(), led->bright);
+        rect_dsc.shadow_color = LV_COLOR_MIX(rect_dsc.shadow_color, lv_color_black(), led->bright);
+        rect_dsc.outline_color = LV_COLOR_MIX(rect_dsc.outline_color, lv_color_black(), led->bright);
 
         /*Set the current shadow width according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/

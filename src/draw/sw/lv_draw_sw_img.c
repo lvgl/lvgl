@@ -15,6 +15,7 @@
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_mem.h"
 #include "../../misc/lv_math.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -164,11 +165,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
                 uint16_t premult_v[3];
                 lv_opa_t recolor_opa = draw_dsc->recolor_opa;
                 lv_color_t recolor = draw_dsc->recolor;
-                lv_color_premult(recolor, recolor_opa, premult_v);
+                LV_COLOR_PREMULT(recolor, recolor_opa, premult_v);
                 recolor_opa = 255 - recolor_opa;
                 uint32_t i;
                 for(i = 0; i < buf_size; i++) {
-                    rgb_buf[i] = lv_color_mix_premult(premult_v, rgb_buf[i], recolor_opa);
+                    rgb_buf[i] = LV_COLOR_MIX_PREMULT(premult_v, rgb_buf[i], recolor_opa);
                 }
             }
 #if LV_USE_DRAW_MASKS

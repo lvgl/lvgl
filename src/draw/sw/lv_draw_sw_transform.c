@@ -12,6 +12,7 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_area.h"
 #include "../../core/lv_refr.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -434,9 +435,9 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                 cbuf[x] = c_base;
             }
             else {
-                c_ver = lv_color_mix(c_ver, c_base, ys_fract);
-                c_hor = lv_color_mix(c_hor, c_base, xs_fract);
-                cbuf[x] = lv_color_mix(c_hor, c_ver, LV_OPA_50);
+                c_ver = LV_COLOR_MIX(c_ver, c_base, ys_fract);
+                c_hor = LV_COLOR_MIX(c_hor, c_base, xs_fract);
+                cbuf[x] = LV_COLOR_MIX(c_hor, c_ver, LV_OPA_50);
             }
         }
         /*Partially out of the image*/

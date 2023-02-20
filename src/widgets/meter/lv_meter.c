@@ -10,6 +10,7 @@
 #if LV_USE_METER != 0
 
 #include "../../misc/lv_assert.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -448,7 +449,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
                     else {
                         ratio = lv_map(value_of_line, meter->scale.min, meter->scale.max, LV_OPA_TRANSP, LV_OPA_COVER);
                     }
-                    line_color = lv_color_mix(indic->type_data.scale_lines.color_end, indic->type_data.scale_lines.color_start, ratio);
+                    line_color = LV_COLOR_MIX(indic->type_data.scale_lines.color_end, indic->type_data.scale_lines.color_start, ratio);
                 }
             }
         }

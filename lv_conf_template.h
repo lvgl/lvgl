@@ -72,6 +72,11 @@
 #define LV_STRLEN       lv_strlen_builtin
 #define LV_STRNCPY      lv_strncpy_builtin
 
+#define LV_COLOR_EXTERN_INCLUDE <stdint.h>
+#define LV_COLOR_MIX      lv_color_mix
+#define LV_COLOR_PREMULT      lv_color_premult
+#define LV_COLOR_MIX_PREMULT      lv_color_mix_premult
+
 /*====================
    HAL SETTINGS
  *====================*/
