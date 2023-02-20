@@ -137,17 +137,17 @@ void test_style_replacement(void)
     /*Create object with style*/
     lv_obj_t * obj = lv_obj_create(lv_scr_act());
     lv_obj_add_style(obj, &style_red, LV_PART_MAIN);
-    TEST_ASSERT_EQUAL(lv_color_hex(0xff0000).full, lv_obj_get_style_bg_color(obj, LV_PART_MAIN).full);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0xff0000), lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
 
     /*Replace style successfully*/
     bool replaced = lv_obj_replace_style(obj, &style_red, &style_blue, LV_PART_MAIN);
     TEST_ASSERT_EQUAL(true, replaced);
-    TEST_ASSERT_EQUAL(lv_color_hex(0x0000ff).full, lv_obj_get_style_bg_color(obj, LV_PART_MAIN).full);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0x0000ff), lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
 
     /*Failed replacement (already replaced)*/
     replaced = lv_obj_replace_style(obj, &style_red, &style_blue, LV_PART_MAIN);
     TEST_ASSERT_EQUAL(false, replaced);
-    TEST_ASSERT_EQUAL(lv_color_hex(0x0000ff).full, lv_obj_get_style_bg_color(obj, LV_PART_MAIN).full);
+    TEST_ASSERT_EQUAL_COLOR(lv_color_hex(0x0000ff), lv_obj_get_style_bg_color(obj, LV_PART_MAIN));
 }
 
 #endif
