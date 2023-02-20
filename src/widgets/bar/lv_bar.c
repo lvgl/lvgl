@@ -496,18 +496,23 @@ static void draw_indic(lv_event_t * e)
     int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
 #endif
 
-    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-    draw_ctx->clip_area = &bar->indic_area;
+    lv_area_t indic_clip_area;
+    if(_lv_area_intersect(&indic_clip_area, &indic_area, draw_ctx->clip_area)) {
+        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+        draw_ctx->clip_area = &indic_clip_area;
 
-    lv_draw_rect(draw_ctx, &draw_rect_dsc, &mask_indic_max_area);
-    draw_rect_dsc.border_opa = border_opa;
-    draw_rect_dsc.shadow_opa = shadow_opa;
+        lv_draw_rect(draw_ctx, &draw_rect_dsc, &mask_indic_max_area);
+        draw_rect_dsc.border_opa = border_opa;
+        draw_rect_dsc.shadow_opa = shadow_opa;
 
-    /*Draw the border*/
-    draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
-    draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
-    draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
-    lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
+        /*Draw the border*/
+        draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
+        draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
+        draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
+        lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
+
+        draw_ctx->clip_area = clip_area_ori;
+    }
 
 #if LV_USE_DRAW_MASKS
     lv_draw_mask_free_param(&mask_indic_param);
@@ -516,7 +521,6 @@ static void draw_indic(lv_event_t * e)
     lv_draw_mask_remove_id(mask_bg_id);
 #endif
 
-    draw_ctx->clip_area = clip_area_ori;
 
     lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 }
