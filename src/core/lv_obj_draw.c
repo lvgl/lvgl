@@ -389,7 +389,7 @@ lv_coord_t _lv_obj_get_ext_draw_size(const lv_obj_t * obj)
 lv_layer_type_t _lv_obj_get_layer_type(const lv_obj_t * obj)
 {
 
-    if(obj->spec_attr) return obj->spec_attr->layer_type;
+    if(obj->spec_attr) return (lv_layer_type_t)obj->spec_attr->layer_type;
     else return LV_LAYER_TYPE_NONE;
 }
 
