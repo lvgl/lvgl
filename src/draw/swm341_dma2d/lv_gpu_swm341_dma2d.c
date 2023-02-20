@@ -200,7 +200,7 @@ static void lv_draw_swm341_dma2d_blend_map(lv_color_t * dest_buf, const lv_area_
         DMA2D->L[DMA2D_LAYER_FG].OR = src_stride - dest_w;
         DMA2D->L[DMA2D_LAYER_FG].PFCCR = (LV_DMA2D_COLOR_FORMAT << DMA2D_PFCCR_CFMT_Pos)
                                          /*alpha mode 2, replace with foreground * alpha value*/
-                                         | (2 << DAM2D_PFCCR_AMODE_Pos)
+                                         | (2 << DMA2D_PFCCR_AMODE_Pos)
                                          /*alpha value*/
                                          | (opa << DMA2D_PFCCR_ALPHA_Pos);
 
