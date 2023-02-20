@@ -36,7 +36,7 @@ void lv_example_label_4(void)
 
     /*Create a "8 bit alpha" canvas and clear it*/
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, mask_map, MASK_WIDTH, MASK_HEIGHT, LV_IMG_CF_ALPHA_8BIT);
+    lv_canvas_set_buffer(canvas, mask_map, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_L8);
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_TRANSP);
 
     /*Draw a label to the canvas. The result "image" will be used as mask*/
@@ -57,7 +57,7 @@ void lv_example_label_4(void)
     lv_obj_set_style_bg_color(grad, lv_color_hex(0xff0000), 0);
     lv_obj_set_style_bg_grad_color(grad, lv_color_hex(0x0000ff), 0);
     lv_obj_set_style_bg_grad_dir(grad, LV_GRAD_DIR_HOR, 0);
-    lv_obj_add_event_cb(grad, add_mask_event_cb, LV_EVENT_ALL, mask_map);
+    lv_obj_add_event(grad, add_mask_event_cb, LV_EVENT_ALL, mask_map);
 }
 
 #endif

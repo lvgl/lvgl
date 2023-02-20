@@ -340,7 +340,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_STYLE_CHANGED) {
         lv_obj_t * label = get_label(obj);
         /*Be sure the label's style is updated before processing the roller*/
-        if(label) lv_event_send(label, LV_EVENT_STYLE_CHANGED, NULL);
+        if(label) lv_obj_send_event(label, LV_EVENT_STYLE_CHANGED, NULL);
         lv_obj_refresh_self_size(obj);
         refr_position(obj, LV_ANIM_OFF);
     }
@@ -731,7 +731,7 @@ static lv_res_t release_handler(lv_obj_t * obj)
     }
 
     uint32_t id  = roller->sel_opt_id; /*Just to use uint32_t in event data*/
-    lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &id);
+    lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
     return res;
 }
 

@@ -76,7 +76,7 @@ void lv_draw_swm341_dma2d_init(void)
     DMA2D->L[DMA2D_LAYER_OUT].PFCCR = (LV_DMA2D_COLOR_FORMAT << DMA2D_PFCCR_CFMT_Pos);
 }
 
-void lv_draw_swm341_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_swm341_dma2d_ctx_init(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
 
     lv_draw_sw_init_ctx(drv, draw_ctx);
@@ -88,9 +88,9 @@ void lv_draw_swm341_dma2d_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx
     dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_swm341_dma2d_wait_cb;
 }
 
-void lv_draw_swm341_dma2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_swm341_dma2d_ctx_deinit(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 {
-    LV_UNUSED(drv);
+    LV_UNUSED(disp);
     LV_UNUSED(draw_ctx);
 }
 

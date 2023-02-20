@@ -1,9 +1,9 @@
 
-def event_handler(evt):
-    code = evt.get_code()
+def event_handler(e):
+    code = e.get_code()
 
     if code == lv.EVENT.VALUE_CHANGED:
-        source = evt.get_current_target()
+        source = e.get_current_target_obj()
         date = lv.calendar_date_t()
         if source.get_pressed_date(date) == lv.RES.OK:
             calendar.set_today_date(date.year, date.month, date.day)
@@ -13,7 +13,7 @@ def event_handler(evt):
 calendar = lv.calendar(lv.scr_act())
 calendar.set_size(200, 200)
 calendar.align(lv.ALIGN.CENTER, 0, 20)
-calendar.add_event_cb(event_handler, lv.EVENT.ALL, None)
+calendar.add_event(event_handler, lv.EVENT.ALL, None)
 
 calendar.set_today_date(2021, 02, 23)
 calendar.set_showed_date(2021, 02)

@@ -9,7 +9,7 @@ class LV_Example_Checkbox_2:
         #`LV.EVENT.CLICKED` on the container.
         # Since user_data cannot be used to pass parameters in MicroPython I use an instance variable to
         # keep the index of the active button
-        
+
         self.active_index_1 = 0
         self.active_index_2 = 0
         self.style_radio = lv.style_t()
@@ -20,12 +20,12 @@ class LV_Example_Checkbox_2:
         self.style_radio_chk.init()
         self.style_radio_chk.init()
         self.style_radio_chk.set_bg_img_src(None)
-        
+
         self.cont1 = lv.obj(lv.scr_act())
         self.cont1.set_flex_flow(lv.FLEX_FLOW.COLUMN)
         self.cont1.set_size(lv.pct(40), lv.pct(80))
-        self.cont1.add_event_cb(self.radio_event_handler, lv.EVENT.CLICKED, None)
-        
+        self.cont1.add_event(self.radio_event_handler, lv.EVENT.CLICKED, None)
+
         for i in range(5):
             txt = "A {:d}".format(i+1)
             self.radiobutton_create(self.cont1,txt)
@@ -38,8 +38,8 @@ class LV_Example_Checkbox_2:
         self.cont2.set_flex_flow(lv.FLEX_FLOW.COLUMN)
         self.cont2.set_size(lv.pct(40), lv.pct(80))
         self.cont2.set_x(lv.pct(50))
-        self.cont2.add_event_cb(self.radio_event_handler, lv.EVENT.CLICKED, None)
-        
+        self.cont2.add_event(self.radio_event_handler, lv.EVENT.CLICKED, None)
+
         for i in range(3):
             txt = "B {:d}".format(i+1)
             self.radiobutton_create(self.cont2,txt)
@@ -47,10 +47,10 @@ class LV_Example_Checkbox_2:
         # Make the first checkbox checked*/
         self.cont2.get_child(0).add_state(lv.STATE.CHECKED)
 
-        
+
     def radio_event_handler(self,e):
-        cont = e.get_current_target()
-        act_cb = e.get_target()
+        cont = e.get_current_target_obj()
+        act_cb = e.get_target_obj()
         if cont == self.cont1:
             active_id = self.active_index_1
         else:

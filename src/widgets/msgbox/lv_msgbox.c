@@ -101,7 +101,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     if(add_close_btn) {
         mbox->close_btn = lv_btn_create(obj);
         lv_obj_set_ext_click_area(mbox->close_btn, LV_DPX(10));
-        lv_obj_add_event_cb(mbox->close_btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_event(mbox->close_btn, msgbox_close_click_event_cb, LV_EVENT_CLICKED, NULL);
         lv_obj_t * label = lv_label_create(mbox->close_btn);
         lv_label_set_text(label, LV_SYMBOL_CLOSE);
         const lv_font_t * font = lv_obj_get_style_text_font(mbox->close_btn, LV_PART_MAIN);

@@ -31,7 +31,7 @@ void lv_example_fragment_1(void)
     lv_obj_set_size(root, LV_PCT(100), LV_PCT(100));
     lv_fragment_manager_t * manager = lv_fragment_manager_create(NULL);
     /* Clean up the fragment manager before objects in containers got deleted */
-    lv_obj_add_event_cb(root, sample_container_del, LV_EVENT_DELETE, manager);
+    lv_obj_add_event(root, sample_container_del, LV_EVENT_DELETE, manager);
 
     lv_fragment_t * fragment = lv_fragment_create(&sample_cls, "Fragment");
     lv_fragment_manager_replace(manager, fragment, &root);

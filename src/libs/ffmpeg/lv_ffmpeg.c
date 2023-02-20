@@ -19,7 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8
     #define AV_PIX_FMT_TRUE_COLOR AV_PIX_FMT_RGB8
 #elif LV_COLOR_DEPTH == 16
     #define AV_PIX_FMT_TRUE_COLOR AV_PIX_FMT_RGB565LE
@@ -172,7 +172,7 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     uint32_t data_size = 0;
 
     if(has_alpha) {
-        data_size = width * height * LV_IMG_PX_SIZE_ALPHA_BYTE;
+        data_size = width * height * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
     }
     else {
         data_size = width * height * LV_COLOR_SIZE / 8;
@@ -182,7 +182,7 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     player->imgdsc.header.w = width;
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
-    player->imgdsc.header.cf = has_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+    player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
     player->imgdsc.data = ffmpeg_get_img_data(player->ffmpeg_ctx);
 
     lv_img_set_src(&player->img.obj, &(player->imgdsc));
@@ -600,7 +600,7 @@ static int ffmpeg_get_img_header(const char * filepath,
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
         header->always_zero = 0;
-        header->cf = (has_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR);
+        header->cf = (has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
 
         ret = 0;
     }

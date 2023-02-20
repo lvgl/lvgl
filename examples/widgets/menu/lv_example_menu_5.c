@@ -29,7 +29,7 @@ void lv_example_menu_5(void)
         lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, 0), 50), 0);
     }
     lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
-    lv_obj_add_event_cb(menu, back_event_handler, LV_EVENT_CLICKED, menu);
+    lv_obj_add_event(menu, back_event_handler, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);
 
@@ -85,7 +85,7 @@ void lv_example_menu_5(void)
     lv_menu_separator_create(sub_menu_mode_page);
     section = lv_menu_section_create(sub_menu_mode_page);
     cont = create_switch(section, LV_SYMBOL_AUDIO, "Sidebar enable", true);
-    lv_obj_add_event_cb(lv_obj_get_child(cont, 2), switch_handler, LV_EVENT_VALUE_CHANGED, menu);
+    lv_obj_add_event(lv_obj_get_child(cont, 2), switch_handler, LV_EVENT_VALUE_CHANGED, menu);
 
     /*Create a root page*/
     root_page = lv_menu_page_create(menu, "Settings");
@@ -107,7 +107,8 @@ void lv_example_menu_5(void)
 
     lv_menu_set_sidebar_page(menu, root_page);
 
-    lv_event_send(lv_obj_get_child(lv_obj_get_child(lv_menu_get_cur_sidebar_page(menu), 0), 0), LV_EVENT_CLICKED, NULL);
+    lv_obj_send_event(lv_obj_get_child(lv_obj_get_child(lv_menu_get_cur_sidebar_page(menu), 0), 0), LV_EVENT_CLICKED,
+                      NULL);
 }
 
 static void back_event_handler(lv_event_t * e)
@@ -130,7 +131,8 @@ static void switch_handler(lv_event_t * e)
         if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
             lv_menu_set_page(menu, NULL);
             lv_menu_set_sidebar_page(menu, root_page);
-            lv_event_send(lv_obj_get_child(lv_obj_get_child(lv_menu_get_cur_sidebar_page(menu), 0), 0), LV_EVENT_CLICKED, NULL);
+            lv_obj_send_event(lv_obj_get_child(lv_obj_get_child(lv_menu_get_cur_sidebar_page(menu), 0), 0), LV_EVENT_CLICKED,
+                              NULL);
         }
         else {
             lv_menu_set_sidebar_page(menu, NULL);

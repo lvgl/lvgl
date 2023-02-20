@@ -81,7 +81,7 @@ To get an object's screen use the `lv_obj_get_screen(obj)` function.
 
 ### Events
 
-To set an event callback for an object, use `lv_obj_add_event_cb(obj, event_cb, LV_EVENT_..., user_data)`,
+To set an event callback for an object, use `lv_obj_add_event(obj, event_cb, LV_EVENT_..., user_data)`,
 
 To manually send an event to an object, use `lv_event_send(obj, LV_EVENT_..., param)`
 

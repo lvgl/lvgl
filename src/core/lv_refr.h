@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "lv_disp.h"
 #include <stdbool.h>
 
 /*********************
@@ -76,14 +77,6 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
  * @return the display being refreshed
  */
 lv_disp_t * _lv_refr_get_disp_refreshing(void);
-
-/**
- * Set the display which is being refreshed.
- * It shouldn't be used directly by the user.
- * It can be used to trick the drawing functions about there is an active display.
- * @param the display being refreshed
- */
-void _lv_refr_set_disp_refreshing(lv_disp_t * disp);
 
 #if LV_USE_PERF_MONITOR
 /**

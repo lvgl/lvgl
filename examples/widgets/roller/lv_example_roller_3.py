@@ -51,12 +51,12 @@ class Lv_Roller_3():
 
         roller1.center()
         roller1.set_visible_row_count(3)
-        roller1.add_event_cb(self.mask_event_cb, lv.EVENT.ALL, None)
+        roller1.add_event(self.mask_event_cb, lv.EVENT.ALL, None)
 
     def mask_event_cb(self,e):
 
         code = e.get_code()
-        obj = e.get_target()
+        obj = e.get_target_obj()
 
         if code == lv.EVENT.COVER_CHECK:
             e.set_cover_res(lv.COVER_RES.MASKED)

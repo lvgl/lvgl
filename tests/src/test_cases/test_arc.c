@@ -134,7 +134,7 @@ void test_arc_click_area_with_adv_hittest(void)
     lv_obj_set_size(arc, 100, 100);
     lv_obj_set_style_arc_width(arc, 10, 0);
     lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_add_event_cb(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event(arc, dummy_event_cb, LV_EVENT_PRESSED, NULL);
     lv_obj_set_ext_click_area(arc, 5);
 
     /*No click detected at the middle*/

@@ -1,7 +1,7 @@
 def event_cb(e):
 
     # The original target of the event. Can be the buttons or the container
-    target = e.get_target()
+    target = e.get_target_obj()
     # print(type(target))
 
     # If container was clicked do nothing
@@ -29,4 +29,4 @@ for i in range(30):
     label.set_text(str(i))
     label.center()
 
-cont.add_event_cb(event_cb, lv.EVENT.CLICKED, None)
+cont.add_event(event_cb, lv.EVENT.CLICKED, None)

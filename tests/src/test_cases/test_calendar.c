@@ -185,7 +185,7 @@ void test_calendar_event_key_down_gui(void)
 
     lv_calendar_set_showed_date(calendar, 2022, 9);
 
-    lv_event_send(calendar, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(calendar, LV_EVENT_KEY, (void *) &key);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("calendar_07.png");
 }

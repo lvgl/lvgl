@@ -1,5 +1,5 @@
-def slider_event_cb(evt):
-    slider = evt.get_target()
+def slider_event_cb(e):
+    slider = e.get_target_obj()
 
     # Refresh the text
     label.set_text(str(slider.get_value()))
@@ -12,7 +12,7 @@ def slider_event_cb(evt):
 slider = lv.slider(lv.scr_act())
 slider.set_width(200)                                              # Set the width
 slider.center()                                                    # Align to the center of the parent (screen)
-slider.add_event_cb(slider_event_cb, lv.EVENT.VALUE_CHANGED, None) # Assign an event function
+slider.add_event(slider_event_cb, lv.EVENT.VALUE_CHANGED, None) # Assign an event function
 
 # Create a label above the slider
 label = lv.label(lv.scr_act())

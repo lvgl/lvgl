@@ -1,4 +1,3 @@
-import display_driver
 import lvgl as lv
 
 # A class is used to keep track of the series list because later we
@@ -15,7 +14,7 @@ stacked_area_chart = StackedAreaChart()
 #
 def draw_event_cb(e):
 
-    obj = e.get_target()
+    obj = e.get_target_obj()
     cont_a = lv.area_t()
     obj.get_coords(cont_a)
 
@@ -79,7 +78,7 @@ def lv_example_chart_8():
     stacked_area_chart.obj.center()
     stacked_area_chart.obj.set_type( lv.chart.TYPE.LINE)
     stacked_area_chart.obj.set_div_line_count(5, 7)
-    stacked_area_chart.obj.add_event_cb( draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
+    stacked_area_chart.obj.add_event( draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
 
     # Set range to 0 to 100 for percentages. Draw ticks
     stacked_area_chart.obj.set_range(lv.chart.AXIS.PRIMARY_Y,0,100)

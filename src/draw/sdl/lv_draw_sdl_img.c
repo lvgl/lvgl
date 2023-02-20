@@ -232,7 +232,7 @@ static SDL_Texture * upload_img_texture(SDL_Renderer * renderer, lv_img_decoder_
     if(!dsc->img_data) {
         return upload_img_texture_fallback(renderer, dsc);
     }
-    bool chroma_keyed = dsc->header.cf == (uint32_t) LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+    bool chroma_keyed = dsc->header.cf == (uint32_t) LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED;
     int h = (int) dsc->header.h;
     int w = (int) dsc->header.w;
     void * data = (void *) dsc->img_data;

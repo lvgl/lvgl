@@ -98,9 +98,9 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
 #if LV_COLOR_DEPTH == 32
             uint16_t bpp;
             memcpy(&bpp, headers + 28, 2);
-            header->cf = bpp == 32 ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+            header->cf = bpp == 32 ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
 #else
-            header->cf = LV_IMG_CF_TRUE_COLOR;
+            header->cf = LV_COLOR_FORMAT_NATIVE;
 #endif
             return LV_RES_OK;
         }
@@ -213,10 +213,10 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
             uint8_t b2 = buf[i * 4 + 2];
             uint8_t b3 = buf[i * 4 + 3];
             lv_color32_t * c = (lv_color32_t *)&buf[i * 4];
-            c->ch.red = b2;
-            c->ch.green = b1;
-            c->ch.blue = b0;
-            c->ch.alpha = b3;
+            c->red = b2;
+            c->green = b1;
+            c->blue = b0;
+            c->alpha = b3;
         }
     }
     if(b->bpp == 24) {
@@ -225,10 +225,10 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
         for(i = len - 1; i >= 0; i--) {
             uint8_t * t = &buf[i * 3];
             lv_color32_t * c = (lv_color32_t *)&buf[i * 4];
-            c->ch.red = t[2];
-            c->ch.green = t[1];
-            c->ch.blue = t[0];
-            c->ch.alpha = 0xff;
+            c->red = t[2];
+            c->green = t[1];
+            c->blue = t[0];
+            c->alpha = 0xff;
         }
     }
 #endif

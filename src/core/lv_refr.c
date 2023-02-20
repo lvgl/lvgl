@@ -9,8 +9,8 @@
 #include <stddef.h>
 #include "lv_refr.h"
 #include "lv_disp.h"
+#include "lv_disp_private.h"
 #include "../hal/lv_hal_tick.h"
-#include "../hal/lv_hal_disp.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
@@ -60,7 +60,7 @@ static void refr_obj_and_children(lv_draw_ctx_t * draw_ctx, lv_obj_t * top_obj);
 static void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj);
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h);
 static void draw_buf_flush(lv_disp_t * disp);
-static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p);
+static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
 
 #if LV_USE_PERF_MONITOR
     static void perf_monitor_init(perf_monitor_t * perf_monitor);
@@ -143,9 +143,9 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     if(should_draw) {
         draw_ctx->clip_area = &clip_coords_for_obj;
 
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
-        lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
 #if LV_USE_REFR_DEBUG
         lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
         lv_draw_rect_dsc_t draw_dsc;
@@ -187,9 +187,9 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         draw_ctx->clip_area = &clip_coords_for_obj;
 
         /*If all the children are redrawn make 'post draw' draw*/
-        lv_event_send(obj, LV_EVENT_DRAW_POST_BEGIN, draw_ctx);
-        lv_event_send(obj, LV_EVENT_DRAW_POST, draw_ctx);
-        lv_event_send(obj, LV_EVENT_DRAW_POST_END, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, draw_ctx);
     }
 
     draw_ctx->clip_area = clip_area_ori;
@@ -232,14 +232,15 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     if(suc == false)  return; /*Out of the screen*/
 
     /*If there were at least 1 invalid area in full refresh mode, redraw the whole screen*/
-    if(disp->driver->full_refresh) {
+    if(disp->render_mode == LV_DISP_RENDER_MODE_FULL) {
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
         if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
         return;
     }
 
-    if(disp->driver->rounder_cb) disp->driver->rounder_cb(disp->driver, &com_area);
+    lv_res_t res = lv_disp_send_event(disp, LV_EVENT_INVALIDATE_AREA, &com_area);
+    if(res != LV_RES_OK) return;
 
     /*Save only if this area is not in one of the saved areas*/
     uint16_t i;
@@ -269,17 +270,6 @@ lv_disp_t * _lv_refr_get_disp_refreshing(void)
 }
 
 /**
- * Set the display which is being refreshed.
- * It shouldn't be used directly by the user.
- * It can be used to trick the drawing functions about there is an active display.
- * @param the display being refreshed
- */
-void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
-{
-    disp_refr = disp;
-}
-
-/**
  * Called periodically to handle the refreshing
  * @param tmr pointer to the timer itself
  */
@@ -288,6 +278,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     REFR_TRACE("begin");
 
     uint32_t start = lv_tick_get();
+
 
     if(tmr) {
         disp_refr = tmr->user_data;
@@ -303,7 +294,19 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         disp_refr = lv_disp_get_default();
     }
 
-    uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
+    if(disp_refr->draw_buf_size == 0) {
+        LV_LOG_WARN("draw_buf_size == 0");
+        return;
+    }
+
+    if(disp_refr->draw_buf_1 == NULL) {
+        LV_LOG_WARN("No draw buffer");
+        return;
+    }
+
+#if LV_USE_PERF_MONITOR && LV_USE_LABEL
+    volatile uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
+#endif
     disp_refr->last_render_start_time = start;
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
@@ -398,6 +401,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     lv_obj_update_layout(disp_refr->act_scr);
     if(disp_refr->prev_scr) lv_obj_update_layout(disp_refr->prev_scr);
 
+    lv_obj_update_layout(disp_refr->bottom_layer);
     lv_obj_update_layout(disp_refr->top_layer);
     lv_obj_update_layout(disp_refr->sys_layer);
 
@@ -409,7 +413,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
-    if(disp_refr->driver->direct_mode && disp_refr->driver->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
+    if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT &&
+       disp_refr->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
         LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
         return;
     }
@@ -418,14 +423,30 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     refr_invalid_areas();
 
-
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
-        if(disp_refr->driver->full_refresh) {
-            lv_area_t disp_area;
-            lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
-            disp_refr->driver->draw_ctx->buf_area = &disp_area;
-            draw_buf_flush(disp_refr);
+        /*Call monitor cb if present*/
+        lv_disp_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
+
+        /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
+        if(lv_disp_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
+            /*We need to wait for ready here to not mess up the active screen*/
+            while(disp_refr->flushing) {
+                if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
+            }
+            /*The buffers are already swapped.
+             *So the active buffer is the off screen buffer where LVGL will render*/
+            void * buf_off_screen = disp_refr->draw_buf_act;
+            void * buf_on_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
+
+            lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+            uint32_t i;
+            for(i = 0; i < disp_refr->inv_p; i++) {
+                if(disp_refr->inv_area_joined[i]) continue;
+                disp_refr->draw_ctx->buffer_copy(disp_refr->draw_ctx,
+                                                 buf_off_screen, stride, &disp_refr->inv_areas[i],
+                                                 buf_on_screen, stride, &disp_refr->inv_areas[i]);
+            }
         }
 
         /*Clean up*/
@@ -433,10 +454,6 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
 
-        /*Call monitor cb if present*/
-        if(disp_refr->driver->monitor_cb) {
-            disp_refr->driver->monitor_cb(disp_refr->driver, elaps, px_num);
-        }
     }
 
     _lv_font_clean_up_fmt_txt();
@@ -526,20 +543,18 @@ static void refr_invalid_areas(void)
     }
 
     /*Notify the display driven rendering has started*/
-    if(disp_refr->driver->render_start_cb) {
-        disp_refr->driver->render_start_cb(disp_refr->driver);
-    }
+    lv_disp_send_event(disp_refr, LV_EVENT_RENDER_START, NULL);
 
-    disp_refr->driver->draw_buf->last_area = 0;
-    disp_refr->driver->draw_buf->last_part = 0;
+    disp_refr->last_area = 0;
+    disp_refr->last_part = 0;
     disp_refr->rendering_in_progress = true;
 
     for(i = 0; i < disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
         if(disp_refr->inv_area_joined[i] == 0) {
 
-            if(i == last_i) disp_refr->driver->draw_buf->last_area = 1;
-            disp_refr->driver->draw_buf->last_part = 0;
+            if(i == last_i) disp_refr->last_area = 1;
+            disp_refr->last_part = 0;
             refr_area(&disp_refr->inv_areas[i]);
 
             px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
@@ -555,23 +570,24 @@ static void refr_invalid_areas(void)
  */
 static void refr_area(const lv_area_t * area_p)
 {
-    lv_draw_ctx_t * draw_ctx = disp_refr->driver->draw_ctx;
-    draw_ctx->buf = disp_refr->driver->draw_buf->buf_act;
+    lv_draw_ctx_t * draw_ctx = disp_refr->draw_ctx;
+    draw_ctx->buf = disp_refr->draw_buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
-    if(disp_refr->driver->full_refresh || disp_refr->driver->direct_mode) {
+    if(disp_refr->render_mode != LV_DISP_RENDER_MODE_PARTIAL) {
         lv_area_t disp_area;
-        lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
+        lv_area_set(&disp_area, 0, 0, lv_disp_get_hor_res(disp_refr) - 1,
+                    lv_disp_get_ver_res(disp_refr) - 1);
         draw_ctx->buf_area = &disp_area;
 
-        if(disp_refr->driver->full_refresh) {
-            disp_refr->driver->draw_buf->last_part = 1;
+        if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL) {
+            disp_refr->last_part = 1;
             draw_ctx->clip_area = &disp_area;
             refr_area_part(draw_ctx);
         }
-        else {
-            disp_refr->driver->draw_buf->last_part = disp_refr->driver->draw_buf->last_area;
+        else if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
+            disp_refr->last_part = disp_refr->last_area;
             draw_ctx->clip_area = area_p;
             refr_area_part(draw_ctx);
         }
@@ -598,10 +614,10 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.y2 = row + max_row - 1;
         draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
-        draw_ctx->buf = disp_refr->driver->draw_buf->buf_act;
+        draw_ctx->buf = disp_refr->draw_buf_act;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
-        if(y2 == row_last) disp_refr->driver->draw_buf->last_part = 1;
+        if(y2 == row_last) disp_refr->last_part = 1;
         refr_area_part(draw_ctx);
     }
 
@@ -614,35 +630,27 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.y2 = y2;
         draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
-        draw_ctx->buf = disp_refr->driver->draw_buf->buf_act;
-        disp_refr->driver->draw_buf->last_part = 1;
+        draw_ctx->buf = disp_refr->draw_buf_act;
+        disp_refr->last_part = 1;
         refr_area_part(draw_ctx);
     }
 }
 
 static void refr_area_part(lv_draw_ctx_t * draw_ctx)
 {
-    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
-
-    if(draw_ctx->init_buf)
-        draw_ctx->init_buf(draw_ctx);
-
-    /* Below the `area_p` area will be redrawn into the draw buffer.
-     * In single buffered mode wait here until the buffer is freed.*/
-    if(draw_buf->buf1 && !draw_buf->buf2) {
-        while(draw_buf->flushing) {
-            if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
+    /* In single buffered mode wait here until the buffer is freed.
+     * Else we would draw into the buffer while it's still being transferred to the display*/
+    if(!lv_disp_is_double_buffered(disp_refr)) {
+        while(disp_refr->flushing) {
+            if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
         }
+    }
 
-        /*If the screen is transparent initialize it when the flushing is ready*/
-        if(disp_refr->driver->screen_transp) {
-            if(disp_refr->driver->clear_cb) {
-                disp_refr->driver->clear_cb(disp_refr->driver, disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size);
-            }
-            else {
-                lv_memzero(disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size * LV_IMG_PX_SIZE_ALPHA_BYTE);
-            }
-        }
+    if(draw_ctx->init_buf) draw_ctx->init_buf(draw_ctx);
+
+    /*If the screen is transparent initialize it when the flushing is ready*/
+    if(lv_color_format_has_alpha(disp_refr->color_format)) {
+        if(draw_ctx->buffer_clear) draw_ctx->buffer_clear(draw_ctx);
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -654,40 +662,9 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
         top_prev_scr = lv_refr_get_top_obj(draw_ctx->buf_area, disp_refr->prev_scr);
     }
 
-    /*Draw a display background if there is no top object*/
+    /*Draw a bottom layer background if there is no top object*/
     if(top_act_scr == NULL && top_prev_scr == NULL) {
-        lv_area_t a;
-        lv_area_set(&a, 0, 0,
-                    lv_disp_get_hor_res(disp_refr) - 1, lv_disp_get_ver_res(disp_refr) - 1);
-        if(draw_ctx->draw_bg) {
-            lv_draw_rect_dsc_t dsc;
-            lv_draw_rect_dsc_init(&dsc);
-            dsc.bg_img_src = disp_refr->bg_img;
-            dsc.bg_img_opa = disp_refr->bg_opa;
-            dsc.bg_color = disp_refr->bg_color;
-            dsc.bg_opa = disp_refr->bg_opa;
-            draw_ctx->draw_bg(draw_ctx, &dsc, &a);
-        }
-        else if(disp_refr->bg_img) {
-            lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
-            if(res == LV_RES_OK) {
-                lv_draw_img_dsc_t dsc;
-                lv_draw_img_dsc_init(&dsc);
-                dsc.opa = disp_refr->bg_opa;
-                lv_draw_img(draw_ctx, &dsc, &a, disp_refr->bg_img);
-            }
-            else {
-                LV_LOG_WARN("Can't draw the background image");
-            }
-        }
-        else {
-            lv_draw_rect_dsc_t dsc;
-            lv_draw_rect_dsc_init(&dsc);
-            dsc.bg_color = disp_refr->bg_color;
-            dsc.bg_opa = disp_refr->bg_opa;
-            lv_draw_rect(draw_ctx, &dsc, draw_ctx->buf_area);
-        }
+        refr_obj_and_children(draw_ctx, lv_disp_get_layer_bottom(disp_refr));
     }
 
     if(disp_refr->draw_prev_over_act) {
@@ -715,11 +692,7 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
     refr_obj_and_children(draw_ctx, lv_disp_get_layer_top(disp_refr));
     refr_obj_and_children(draw_ctx, lv_disp_get_layer_sys(disp_refr));
 
-    /*In true double buffered mode flush only once when all areas were rendered.
-     *In normal mode flush after every area*/
-    if(disp_refr->driver->full_refresh == false) {
-        draw_buf_flush(disp_refr);
-    }
+    draw_buf_flush(disp_refr);
 }
 
 /**
@@ -740,7 +713,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_cover_check_info_t info;
     info.res = LV_COVER_RES_COVER;
     info.area = area_p;
-    lv_event_send(obj, LV_EVENT_COVER_CHECK, &info);
+    lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
     if(info.res == LV_COVER_RES_MASKED) return NULL;
 
     int32_t i;
@@ -802,9 +775,9 @@ static void refr_obj_and_children(lv_draw_ctx_t * draw_ctx, lv_obj_t * top_obj)
         }
 
         /*Call the post draw draw function of the parents of the to object*/
-        lv_event_send(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)draw_ctx);
-        lv_event_send(parent, LV_EVENT_DRAW_POST, (void *)draw_ctx);
-        lv_event_send(parent, LV_EVENT_DRAW_POST_END, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)draw_ctx);
 
         /*The new border will be the last parents,
          *so the 'younger' brothers of parent will be refreshed*/
@@ -872,7 +845,7 @@ static void layer_alpha_test(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_draw_l
             lv_cover_check_info_t info;
             info.res = LV_COVER_RES_COVER;
             info.area = &layer_ctx->area_act;
-            lv_event_send(obj, LV_EVENT_COVER_CHECK, &info);
+            lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
             if(info.res == LV_COVER_RES_COVER) has_alpha = false;
         }
 
@@ -911,7 +884,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
             lv_cover_check_info_t info;
             info.res = LV_COVER_RES_COVER;
             info.area = &layer_area_full;
-            lv_event_send(obj, LV_EVENT_COVER_CHECK, &info);
+            lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
             if(info.res == LV_COVER_RES_COVER) flags &= ~LV_DRAW_LAYER_FLAG_HAS_ALPHA;
         }
 
@@ -943,14 +916,13 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
         draw_dsc.zoom = lv_obj_get_style_transform_zoom(obj, 0);
         draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
-        draw_dsc.antialias = disp_refr->driver->antialiasing;
+        draw_dsc.antialias = disp_refr->antialiasing;
 
         if(flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
             layer_ctx->area_act = layer_ctx->area_full;
             layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_no_alpha - 1;
             if(layer_ctx->area_act.y2 > layer_ctx->area_full.y2) layer_ctx->area_act.y2 = layer_ctx->area_full.y2;
         }
-
         while(layer_ctx->area_act.y1 <= layer_area_full.y2) {
             if(flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
                 layer_alpha_test(obj, draw_ctx, layer_ctx, flags);
@@ -977,43 +949,44 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h)
 {
-    int32_t max_row = (uint32_t)disp->driver->draw_buf->size / area_w;
+    bool has_alpha = lv_color_format_has_alpha(disp->color_format);
+    uint8_t px_size_render = has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE : sizeof(lv_color_t);
+    uint32_t px_size_disp =  lv_color_format_get_size(disp->color_format);
+    int32_t max_row = (uint32_t)disp->draw_buf_size / LV_MAX(px_size_render, px_size_disp) / area_w;
 
     if(max_row > area_h) max_row = area_h;
 
     /*Round down the lines of draw_buf if rounding is added*/
-    if(disp_refr->driver->rounder_cb) {
-        lv_area_t tmp;
-        tmp.x1 = 0;
-        tmp.x2 = 0;
-        tmp.y1 = 0;
+    lv_area_t tmp;
+    tmp.x1 = 0;
+    tmp.x2 = 0;
+    tmp.y1 = 0;
 
-        lv_coord_t h_tmp = max_row;
-        do {
-            tmp.y2 = h_tmp - 1;
-            disp_refr->driver->rounder_cb(disp_refr->driver, &tmp);
+    lv_coord_t h_tmp = max_row;
+    do {
+        tmp.y2 = h_tmp - 1;
+        lv_disp_send_event(disp_refr, LV_EVENT_INVALIDATE_AREA, &tmp);
 
-            /*If this height fits into `max_row` then fine*/
-            if(lv_area_get_height(&tmp) <= max_row) break;
+        /*If this height fits into `max_row` then fine*/
+        if(lv_area_get_height(&tmp) <= max_row) break;
 
-            /*Decrement the height of the area until it fits into `max_row` after rounding*/
-            h_tmp--;
-        } while(h_tmp > 0);
+        /*Decrement the height of the area until it fits into `max_row` after rounding*/
+        h_tmp--;
+    } while(h_tmp > 0);
 
-        if(h_tmp <= 0) {
-            LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or to "
-                        "small draw_buf)");
-            return 0;
-        }
-        else {
-            max_row = tmp.y2 + 1;
-        }
+    if(h_tmp <= 0) {
+        LV_LOG_WARN("Can't set draw_buf height using the round function. (Wrong round_cb or too "
+                    "small draw_buf)");
+        return 0;
+    }
+    else {
+        max_row = tmp.y2 + 1;
     }
 
     return max_row;
 }
 
-static void draw_buf_rotate_180(lv_disp_drv_t * drv, lv_area_t * area, lv_color_t * color_p)
+static void draw_buf_rotate_180(lv_disp_t * disp, lv_area_t * area, lv_color_t * color_p)
 {
     lv_coord_t area_w = lv_area_get_width(area);
     lv_coord_t area_h = lv_area_get_height(area);
@@ -1030,11 +1003,11 @@ static void draw_buf_rotate_180(lv_disp_drv_t * drv, lv_area_t * area, lv_color_
     }
     lv_coord_t tmp_coord;
     tmp_coord = area->y2;
-    area->y2 = drv->ver_res - area->y1 - 1;
-    area->y1 = drv->ver_res - tmp_coord - 1;
+    area->y2 = disp->ver_res - area->y1 - 1;
+    area->y1 = disp->ver_res - tmp_coord - 1;
     tmp_coord = area->x2;
-    area->x2 = drv->hor_res - area->x1 - 1;
-    area->x1 = drv->hor_res - tmp_coord - 1;
+    area->x2 = disp->hor_res - area->x1 - 1;
+    area->x1 = disp->hor_res - tmp_coord - 1;
 }
 
 static LV_ATTRIBUTE_FAST_MEM void draw_buf_rotate_90(bool invert_i, lv_coord_t area_w, lv_coord_t area_h,
@@ -1106,27 +1079,25 @@ static void draw_buf_rotate_90_sqr(bool is_270, lv_coord_t w, lv_color_t * color
  */
 static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
 {
-    lv_disp_drv_t * drv = disp_refr->driver;
-    if(disp_refr->driver->full_refresh && drv->sw_rotate) {
+    if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL && disp_refr->sw_rotate) {
         LV_LOG_ERROR("cannot rotate a full refreshed display!");
         return;
     }
-    if(drv->rotated == LV_DISP_ROT_180) {
-        draw_buf_rotate_180(drv, area, color_p);
-        call_flush_cb(drv, area, color_p);
+    if(disp_refr->rotation == LV_DISP_ROTATION_180) {
+        draw_buf_rotate_180(disp_refr, area, color_p);
+        call_flush_cb(disp_refr, area, color_p);
     }
-    else if(drv->rotated == LV_DISP_ROT_90 || drv->rotated == LV_DISP_ROT_270) {
+    else if(disp_refr->rotation == LV_DISP_ROTATION_90 || disp_refr->rotation == LV_DISP_ROTATION_270) {
         /*Allocate a temporary buffer to store rotated image*/
         lv_color_t * rot_buf = NULL;
-        lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
         lv_coord_t area_w = lv_area_get_width(area);
         lv_coord_t area_h = lv_area_get_height(area);
         /*Determine the maximum number of rows that can be rotated at a time*/
         lv_coord_t max_row = LV_MIN((lv_coord_t)((LV_DISP_ROT_MAX_BUF / sizeof(lv_color_t)) / area_w), area_h);
         lv_coord_t init_y_off;
         init_y_off = area->y1;
-        if(drv->rotated == LV_DISP_ROT_90) {
-            area->y2 = drv->ver_res - area->x1 - 1;
+        if(disp_refr->rotation == LV_DISP_ROTATION_90) {
+            area->y2 = disp_refr->ver_res - area->x1 - 1;
             area->y1 = area->y2 - area_w + 1;
         }
         else {
@@ -1138,49 +1109,49 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
         lv_coord_t row = 0;
         while(row < area_h) {
             lv_coord_t height = LV_MIN(max_row, area_h - row);
-            draw_buf->flushing = 1;
+            disp_refr->flushing = 1;
             if((row == 0) && (area_h >= area_w)) {
                 /*Rotate the initial area as a square*/
                 height = area_w;
-                draw_buf_rotate_90_sqr(drv->rotated == LV_DISP_ROT_270, area_w, color_p);
-                if(drv->rotated == LV_DISP_ROT_90) {
+                draw_buf_rotate_90_sqr(disp_refr->rotation == LV_DISP_ROTATION_270, area_w, color_p);
+                if(disp_refr->rotation == LV_DISP_ROTATION_90) {
                     area->x1 = init_y_off;
                     area->x2 = init_y_off + area_w - 1;
                 }
                 else {
-                    area->x2 = drv->hor_res - 1 - init_y_off;
+                    area->x2 = disp_refr->hor_res - 1 - init_y_off;
                     area->x1 = area->x2 - area_w + 1;
                 }
             }
             else {
                 /*Rotate other areas using a maximum buffer size*/
                 if(rot_buf == NULL) rot_buf = lv_malloc(LV_DISP_ROT_MAX_BUF);
-                draw_buf_rotate_90(drv->rotated == LV_DISP_ROT_270, area_w, height, color_p, rot_buf);
+                draw_buf_rotate_90(disp_refr->rotation == LV_DISP_ROTATION_270, area_w, height, color_p, rot_buf);
 
-                if(drv->rotated == LV_DISP_ROT_90) {
+                if(disp_refr->rotation == LV_DISP_ROTATION_90) {
                     area->x1 = init_y_off + row;
                     area->x2 = init_y_off + row + height - 1;
                 }
                 else {
-                    area->x2 = drv->hor_res - 1 - init_y_off - row;
+                    area->x2 = disp_refr->hor_res - 1 - init_y_off - row;
                     area->x1 = area->x2 - height + 1;
                 }
             }
 
             /* The original part (chunk of the current area) were split into more parts here.
              * Set the original last_part flag on the last part of rotation. */
-            if(row + height >= area_h && draw_buf->last_area && draw_buf->last_part) {
-                draw_buf->flushing_last = 1;
+            if(row + height >= area_h && disp_refr->last_area && disp_refr->last_part) {
+                disp_refr->flushing_last = 1;
             }
             else {
-                draw_buf->flushing_last = 0;
+                disp_refr->flushing_last = 0;
             }
 
             /*Flush the completed area to the display*/
-            call_flush_cb(drv, area, rot_buf == NULL ? color_p : rot_buf);
+            call_flush_cb(disp_refr, area, rot_buf == NULL ? color_p : rot_buf);
             /*FIXME: Rotation forces legacy behavior where rendering and flushing are done serially*/
-            while(draw_buf->flushing) {
-                if(drv->wait_cb) drv->wait_cb(drv);
+            while(disp_refr->flushing) {
+                if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
             }
             color_p += area_w * height;
             row += height;
@@ -1195,71 +1166,63 @@ static void draw_buf_rotate(lv_area_t * area, lv_color_t * color_p)
  */
 static void draw_buf_flush(lv_disp_t * disp)
 {
-    lv_disp_draw_buf_t * draw_buf = lv_disp_get_draw_buf(disp_refr);
-
     /*Flush the rendered content to the display*/
-    lv_draw_ctx_t * draw_ctx = disp->driver->draw_ctx;
+    lv_draw_ctx_t * draw_ctx = disp->draw_ctx;
     if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
 
     /* In double buffered mode wait until the other buffer is freed
-     * and driver is ready to receive the new buffer */
-    if(draw_buf->buf1 && draw_buf->buf2) {
-        while(draw_buf->flushing) {
-            if(disp_refr->driver->wait_cb) disp_refr->driver->wait_cb(disp_refr->driver);
-        }
-
-        /*If the screen is transparent initialize it when the flushing is ready*/
-        if(disp_refr->driver->screen_transp) {
-            if(disp_refr->driver->clear_cb) {
-                disp_refr->driver->clear_cb(disp_refr->driver, disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size);
-            }
-            else {
-                lv_memzero(disp_refr->driver->draw_buf->buf_act, disp_refr->driver->draw_buf->size * LV_IMG_PX_SIZE_ALPHA_BYTE);
-            }
+     * and driver is ready to receive the new buffer.
+     * If we need to wait here it means that the content of one buffer is being sent to display
+     * and other buffer already contains the new rendered image. */
+    if(lv_disp_is_double_buffered(disp)) {
+        while(disp->flushing) {
+            if(disp->wait_cb) disp_refr->wait_cb(disp);
         }
     }
 
-    draw_buf->flushing = 1;
+    disp->flushing = 1;
 
-    if(disp_refr->driver->draw_buf->last_area && disp_refr->driver->draw_buf->last_part) draw_buf->flushing_last = 1;
-    else draw_buf->flushing_last = 0;
+    if(disp->last_area && disp->last_part) disp->flushing_last = 1;
+    else disp->flushing_last = 0;
 
-    bool flushing_last = draw_buf->flushing_last;
+    bool flushing_last = disp->flushing_last;
 
-    if(disp->driver->flush_cb) {
+    if(disp->flush_cb) {
         /*Rotate the buffer to the display's native orientation if necessary*/
-        if(disp->driver->rotated != LV_DISP_ROT_NONE && disp->driver->sw_rotate) {
+        if(disp->rotation != LV_DISP_ROTATION_0 && disp->sw_rotate) {
             draw_buf_rotate(draw_ctx->buf_area, draw_ctx->buf);
         }
         else {
-            call_flush_cb(disp->driver, draw_ctx->buf_area, draw_ctx->buf);
+            call_flush_cb(disp, draw_ctx->buf_area, draw_ctx->buf);
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
-    if(draw_buf->buf1 && draw_buf->buf2 && (!disp->driver->direct_mode || flushing_last)) {
-        if(draw_buf->buf_act == draw_buf->buf1)
-            draw_buf->buf_act = draw_buf->buf2;
-        else
-            draw_buf->buf_act = draw_buf->buf1;
+    if(lv_disp_is_double_buffered(disp) && (disp->render_mode != LV_DISP_RENDER_MODE_DIRECT || flushing_last)) {
+        if(disp->draw_buf_act == disp->draw_buf_1) {
+            disp->draw_buf_act = disp->draw_buf_2;
+        }
+        else {
+            disp->draw_buf_act = disp->draw_buf_1;
+        }
     }
 }
 
-static void call_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_p)
+static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
 {
     REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
                (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2,
                (void *)color_p);
 
     lv_area_t offset_area = {
-        .x1 = area->x1 + drv->offset_x,
-        .y1 = area->y1 + drv->offset_y,
-        .x2 = area->x2 + drv->offset_x,
-        .y2 = area->y2 + drv->offset_y
+        .x1 = area->x1 + disp->offset_x,
+        .y1 = area->y1 + disp->offset_y,
+        .x2 = area->x2 + disp->offset_x,
+        .y2 = area->y2 + disp->offset_y
     };
 
-    if(drv->draw_ctx->buffer_convert) drv->draw_ctx->buffer_convert(drv->draw_ctx);
+    if(disp->draw_ctx->buffer_convert) disp->draw_ctx->buffer_convert(disp->draw_ctx);
 
-    drv->flush_cb(drv, &offset_area, color_p);
+    disp->flush_cb(disp, &offset_area, color_p);
 }
 
 #if LV_USE_PERF_MONITOR

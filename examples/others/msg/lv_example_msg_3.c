@@ -29,7 +29,7 @@ void lv_example_msg_3(void)
     /*Up button*/
     btn = lv_btn_create(panel);
     lv_obj_set_flex_grow(btn, 1);
-    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(btn, btn_event_cb, LV_EVENT_ALL, NULL);
     label = lv_label_create(btn);
     lv_label_set_text(label, LV_SYMBOL_LEFT);
     lv_obj_center(label);
@@ -40,12 +40,12 @@ void lv_example_msg_3(void)
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
     lv_label_set_text(label, "?");
     lv_msg_subscribe_obj((lv_msg_id_t)&power_value, label, NULL);
-    lv_obj_add_event_cb(label, label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
+    lv_obj_add_event(label, label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
 
     /*Down button*/
     btn = lv_btn_create(panel);
     lv_obj_set_flex_grow(btn, 1);
-    lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(btn, btn_event_cb, LV_EVENT_ALL, NULL);
     label = lv_label_create(btn);
     lv_label_set_text(label, LV_SYMBOL_RIGHT);
     lv_obj_center(label);
@@ -55,7 +55,7 @@ void lv_example_msg_3(void)
     lv_obj_set_flex_grow(slider, 1);
     lv_obj_add_flag(slider, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
     lv_msg_subscribe_obj((lv_msg_id_t)&power_value, slider, NULL);
-    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(slider, slider_event_cb, LV_EVENT_ALL, NULL);
 
     power_value = 30;
     lv_msg_update_value(&power_value);

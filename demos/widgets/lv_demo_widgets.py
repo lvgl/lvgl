@@ -113,7 +113,7 @@ def profile_create(parent):
     user_name = lv.textarea(panel2)
     user_name.set_one_line(True)
     user_name.set_placeholder_text("Your name")
-    user_name.add_event_cb(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
+    user_name.add_event(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
 
     password_label = lv.label(panel2)
     password_label.set_text("Password")
@@ -123,7 +123,7 @@ def profile_create(parent):
     password.set_one_line(True)
     password.set_password_mode(True)
     password.set_placeholder_text("Min. 8 chars.")
-    password.add_event_cb(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
+    password.add_event(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
 
     gender_label = lv.label(panel2)
     gender_label.set_text("Gender")
@@ -138,7 +138,7 @@ def profile_create(parent):
 
     birthdate = lv.textarea(panel2)
     birthdate.set_one_line(True)
-    birthdate.add_event_cb(birthday_event_cb, lv.EVENT.ALL, None)
+    birthdate.add_event(birthday_event_cb, lv.EVENT.ALL, None)
 
     # Create the third panel
     panel3 = lv.obj(parent)
@@ -152,7 +152,7 @@ def profile_create(parent):
 
     slider1 = lv.slider(panel3)
     slider1.set_width(lv.pct(95))
-    # slider1.add_event_cb(slider_event_cb, lv.event.ALL, None)
+    # slider1.add_event(slider_event_cb, lv.event.ALL, None)
     slider1.refresh_ext_draw_size()
 
     team_player_label = lv.label(panel3)
@@ -391,7 +391,7 @@ def analytics_create(parent):
     chart1.set_axis_tick(lv.chart.AXIS.PRIMARY_X, 0, 0, 12, 1, True, 50)
     chart1.set_div_line_count(0, 12)
     chart1.set_point_count(12)
-    chart1.add_event_cb(chart_event_cb, lv.EVENT.ALL, None)
+    chart1.add_event(chart_event_cb, lv.EVENT.ALL, None)
     if disp_size == DISP_SMALL:
         chart1.set_zoom_x(256 * 3)
     elif disp_size == DISP_MEDIUM:
@@ -440,7 +440,7 @@ def analytics_create(parent):
     chart2.set_type(lv.chart.TYPE.BAR)
     chart2.set_div_line_count(6, 0)
     chart2.set_point_count(12)
-    chart2.add_event_cb(chart_event_cb, lv.EVENT.ALL, None)
+    chart2.add_event(chart_event_cb, lv.EVENT.ALL, None)
     chart2.set_zoom_x(256 * 2)
     chart2.set_style_border_side(lv.BORDER_SIDE.LEFT | lv.BORDER_SIDE.BOTTOM, 0)
     chart2.set_style_radius(0, 0)
@@ -714,7 +714,7 @@ def shop_create(parent):
     chart3.set_type(lv.chart.TYPE.BAR)
     chart3.set_div_line_count(6, 0)
     chart3.set_point_count(7)
-    chart3.add_event_cb(shop_chart_event_cb, lv.EVENT.ALL, None)
+    chart3.add_event(shop_chart_event_cb, lv.EVENT.ALL, None)
 
     ser4 = chart3.add_series(lv.theme_get_color_primary(chart3), lv.chart.AXIS.PRIMARY_Y)
     chart3.set_next_value(ser4, lv.rand(60, 90))
@@ -908,7 +908,6 @@ try:
 except NameError:
     script_path = ''
 
-# Initialize the display driver
 driver = display_driver_utils.driver(width=SCREEN_SIZE[0],height=SCREEN_SIZE[1],orientation=display_driver_utils.ORIENT_LANDSCAPE)
 
 # Create a screen and load it
@@ -919,9 +918,8 @@ lv.scr_load(scr)
 fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
 
-# get the display size
-LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
-LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
+LV_HOR_RES = lv.scr_act().get_disp().get_hor_res()
+LV_VER_RES = lv.scr_act().get_disp().get_ver_res()
 
 print("Screen resolution: {:d}x{:d}".format(LV_HOR_RES,LV_VER_RES))
 
@@ -1094,7 +1092,7 @@ def color_changer_create(parent):
         c.set_style_radius(lv.RADIUS_CIRCLE, 0)
         c.set_style_opa(lv.OPA.TRANSP, 0)
         c.set_size(20, 20)
-        # c.add_event_cb(c, color_event_cb, LV_EVENT_ALL, &palette[i])
+        # c.add_event(c, color_event_cb, LV_EVENT_ALL, &palette[i])
         c.clear_flag(lv.obj.FLAG.SCROLL_ON_FOCUS)
 
     btn = lv.btn(parent)
@@ -1102,7 +1100,7 @@ def color_changer_create(parent):
     btn.set_style_bg_color(lv.color_white(), lv.STATE.CHECKED)
     btn.set_style_pad_all(10, 0)
     btn.set_style_radius(lv.RADIUS_CIRCLE, 0)
-    # btn.add_event_cb(color_changer_event_cb, lv.EVENT-ALL, color_cont)
+    # btn.add_event(color_changer_event_cb, lv.EVENT-ALL, color_cont)
     btn.set_style_shadow_width(0, 0)
     btn.set_style_bg_img_src(lv.SYMBOL.NEW_LINE, 0)
 
@@ -1258,7 +1256,7 @@ def meter3_anim_cb(meter,indic, label, val) :
 def ta_event_cb(e,kb,tv) :
 
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
     # lv_obj_t * kb = lv_event_get_user_data(e);
 
     indev = lv.indev_get_act()
@@ -1288,7 +1286,7 @@ def ta_event_cb(e,kb,tv) :
 def birthday_event_cb(e):
     global calendar
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
 
     if code == lv.EVENT.FOCUSED :
         indev = lv.indev_get_act()
@@ -1307,9 +1305,9 @@ def birthday_event_cb(e):
                     calendar.set_size(300, 330)
                 calendar.set_showed_date(1990, 01)
                 calendar.align(lv.ALIGN.CENTER, 0, 30)
-                # password.add_event_cb(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
+                # password.add_event(lambda e: ta_event_cb(e,kb,tv),lv.EVENT.ALL,None)
 
-                calendar.add_event_cb(lambda e: calendar_event_cb(e,ta), lv.EVENT.ALL, None)
+                calendar.add_event(lambda e: calendar_event_cb(e,ta), lv.EVENT.ALL, None)
 
                 header = lv.calendar_header_dropdown(calendar)
 
@@ -1347,7 +1345,7 @@ def _lv_area_intersect(a1_p, a2_p) :
 def chart_event_cb(e):
 
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
 
     if code == lv.EVENT.PRESSED or code == lv.EVENT.RELEASED :

@@ -169,7 +169,7 @@ void test_dropdown_keypad(void)
     lv_obj_set_pos(dd1, 20, 20);
     lv_dropdown_set_options(dd1, "1\n2\n3\n4\n5\n6\n7\n8");
     lv_group_add_obj(g, dd1);
-    lv_obj_add_event_cb(dd1, dd_event, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(dd1, dd_event, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
     lv_obj_set_pos(dd2, 300, 20);
@@ -272,7 +272,7 @@ void test_dropdown_encoder(void)
     lv_obj_set_pos(dd1, 20, 20);
     lv_dropdown_set_options(dd1, "1\n2\n3\n4\n5\n6\n7\n8");
     lv_group_add_obj(g, dd1);
-    lv_obj_add_event_cb(dd1, dd_event, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(dd1, dd_event, LV_EVENT_VALUE_CHANGED, NULL);
 
     lv_obj_t * dd2 = lv_dropdown_create(lv_scr_act());
     lv_obj_set_pos(dd2, 300, 20);

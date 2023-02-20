@@ -11,6 +11,7 @@
 #include "../../core/lv_obj.h"
 #include "../../misc/lv_assert.h"
 #include "../../core/lv_group.h"
+#include "../../core/lv_disp.h"
 #include "../../draw/lv_draw.h"
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_math.h"

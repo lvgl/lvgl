@@ -391,7 +391,7 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     img->src       = NULL;
     img->src_type  = LV_IMG_SRC_UNKNOWN;
-    img->cf        = LV_IMG_CF_UNKNOWN;
+    img->cf        = LV_COLOR_FORMAT_UNKNOWN;
     img->w         = lv_obj_get_width(obj);
     img->h         = lv_obj_get_height(obj);
     img->angle = 0;
@@ -530,7 +530,7 @@ static void draw_img(lv_event_t * e)
         }
 
         /*Non true color format might have "holes"*/
-        if(img->cf != LV_IMG_CF_TRUE_COLOR && img->cf != LV_IMG_CF_RAW) {
+        if(lv_color_format_has_alpha(img->cf)) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }

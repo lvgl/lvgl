@@ -59,13 +59,13 @@ class LvExampleAnim_3():
         self.p2_slider.set_range(0, 1024)
         self.p1_slider.set_style_pad_all(2, lv.PART.KNOB)
         self.p2_slider.set_style_pad_all(2, lv.PART.KNOB)
-        self.p1_slider.add_event_cb(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
-        self.p2_slider.add_event_cb(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
+        self.p1_slider.add_event(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
+        self.p2_slider.add_event(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
         self.p1_slider.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1,lv.GRID_ALIGN.START, 1, 1)
         self.p2_slider.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1,lv.GRID_ALIGN.START, 2, 1)
 
         self.run_btn = lv.btn(par)
-        self.run_btn.add_event_cb(self.run_btn_event_handler, lv.EVENT.CLICKED, None)
+        self.run_btn.add_event(self.run_btn_event_handler, lv.EVENT.CLICKED, None)
         btn_label = lv.label(self.run_btn)
         btn_label.set_text(lv.SYMBOL.PLAY)
         btn_label.center()
@@ -89,7 +89,7 @@ class LvExampleAnim_3():
             self.chart.refresh()
 
     def slider_event_cb(self,e):
-        slider = e.get_target()
+        slider = e.get_target_obj()
 
         if slider == self.p1_slider:
             label = self.p1_label

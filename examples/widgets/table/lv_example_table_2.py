@@ -4,7 +4,7 @@ import gc
 ITEM_CNT = 200
 
 def draw_event_cb(e):
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     # If the cells are drawn...
     if dsc.part == lv.PART.ITEMS:
@@ -40,7 +40,7 @@ def draw_event_cb(e):
         dsc.draw_ctx.rect(rect_dsc, sw_area)
 
 def change_event_cb(e):
-    obj = e.get_target()
+    obj = e.get_target_obj()
     row = lv.C_Pointer()
     col = lv.C_Pointer()
     table.get_selected_cell(row, col)
@@ -81,8 +81,8 @@ for i in range(ITEM_CNT):
 table.align(lv.ALIGN.CENTER, 0, -20)
 
 # Add an event callback to apply some custom drawing
-table.add_event_cb(draw_event_cb, lv.EVENT.DRAW_PART_END, None)
-table.add_event_cb(change_event_cb, lv.EVENT.VALUE_CHANGED, None)
+table.add_event(draw_event_cb, lv.EVENT.DRAW_PART_END, None)
+table.add_event(change_event_cb, lv.EVENT.VALUE_CHANGED, None)
 
 gc.collect()
 mem_used = mem_free - gc.mem_free()

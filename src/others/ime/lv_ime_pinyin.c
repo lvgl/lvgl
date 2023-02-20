@@ -436,7 +436,7 @@ void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb)
     pinyin_ime->kb = kb;
     lv_obj_set_parent(obj, lv_obj_get_parent(kb));
     lv_obj_set_parent(pinyin_ime->cand_panel, lv_obj_get_parent(kb));
-    lv_obj_add_event_cb(pinyin_ime->kb, lv_ime_pinyin_kb_event, LV_EVENT_VALUE_CHANGED, obj);
+    lv_obj_add_event(pinyin_ime->kb, lv_ime_pinyin_kb_event, LV_EVENT_VALUE_CHANGED, obj);
     lv_obj_align_to(pinyin_ime->cand_panel, pinyin_ime->kb, LV_ALIGN_OUT_TOP_MID, 0, 0);
 }
 
@@ -599,8 +599,8 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_obj_set_style_bg_color(pinyin_ime->cand_panel, lv_color_white(), LV_PART_ITEMS | LV_STATE_PRESSED);
 
     /* event handler */
-    lv_obj_add_event_cb(pinyin_ime->cand_panel, lv_ime_pinyin_cand_panel_event, LV_EVENT_VALUE_CHANGED, obj);
-    lv_obj_add_event_cb(obj, lv_ime_pinyin_style_change_event, LV_EVENT_STYLE_CHANGED, NULL);
+    lv_obj_add_event(pinyin_ime->cand_panel, lv_ime_pinyin_cand_panel_event, LV_EVENT_VALUE_CHANGED, obj);
+    lv_obj_add_event(obj, lv_ime_pinyin_style_change_event, LV_EVENT_STYLE_CHANGED, NULL);
 
 #if LV_IME_PINYIN_USE_K9_MODE
     pinyin_ime->k9_input_str_len = 0;

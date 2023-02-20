@@ -17,7 +17,7 @@
 - [ ] To define a new stdlib API use defines `LV_USE_CUSTO_...` and let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
 
 ### Architecture
-- [ ] Consider merging `lv_disp_t`, `lv_disp_drv_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
+- [ ] Consider merging `lv_disp_t`, `lv_disp_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
 - [ ] Better way to reset global variables in `lv_deinit()` #3385
 - [ ] New driver architecture #2720
 - [x] `draw_ctx->buffer_convert`? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1147954592).  Also remove 16 SWAPPED color format? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1140886258).
@@ -72,7 +72,7 @@
 
 ### Styles
 - [ ] Hover
-- [ ] Global states in selectors. E.g. `LV_STATE_PRESSED | SMALL_SCREEN` like media quarry in CSS 
+- [ ] Global states in selectors. E.g. `LV_STATE_PRESSED | SMALL_SCREEN` like media quarry in CSS
 
 ### Drawing and rendering
 - [ ] Different radius on each corner #2800

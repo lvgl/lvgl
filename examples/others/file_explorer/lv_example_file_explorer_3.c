@@ -122,7 +122,7 @@ void lv_example_file_explorer_3(void)
 #endif
 #endif
 
-    lv_obj_add_event_cb(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(file_explorer, file_explorer_event_handler, LV_EVENT_ALL, NULL);
 }
 
 #endif

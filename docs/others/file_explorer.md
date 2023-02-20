@@ -138,7 +138,7 @@ static void file_explorer_event_handler(lv_event_t * e)
 }
 ```
 
-您还可以将获取到的 **路径** 和 **文件名称** 通过例如 strcpy 和 strcat 函数保存到一个数组中，方便后续使用。 
+您还可以将获取到的 **路径** 和 **文件名称** 通过例如 strcpy 和 strcat 函数保存到一个数组中，方便后续使用。
 
 </p>
 </details>

@@ -1,6 +1,6 @@
 def draw_event_cb(e):
 
-    obj = e.get_target()
+    obj = e.get_target_obj()
 
     # Add the faded area before the lines are drawn
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
@@ -62,7 +62,7 @@ chart1.set_size(200, 150)
 chart1.center()
 chart1.set_type(lv.chart.TYPE.LINE)    # Show lines and points too
 
-chart1.add_event_cb(draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
+chart1.add_event(draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
 chart1.set_update_mode(lv.chart.UPDATE_MODE.CIRCULAR)
 
 # Add two data series

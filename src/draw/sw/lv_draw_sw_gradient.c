@@ -318,8 +318,8 @@ LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_gradient_calculate(const lv_grad_dsc_t 
     for(uint8_t i = 1; i < dsc->stops_count; i++) {
         int32_t cur = (dsc->stops[i].frac * range) >> 8;
         if(frac <= cur) {
-            one.full = lv_color_to32(dsc->stops[i - 1].color);
-            two.full = lv_color_to32(dsc->stops[i].color);
+            one = lv_color_to32(dsc->stops[i - 1].color);
+            two = lv_color_to32(dsc->stops[i].color);
             min = (dsc->stops[i - 1].frac * range) >> 8;
             max = (dsc->stops[i].frac * range) >> 8;
             d = max - min;
@@ -334,9 +334,9 @@ LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_gradient_calculate(const lv_grad_dsc_t 
     lv_opa_t mix = (frac * 255) / d;
     lv_opa_t imix = 255 - mix;
 
-    lv_grad_color_t r = GRAD_CM(LV_UDIV255(two.ch.red * mix   + one.ch.red * imix),
-                                LV_UDIV255(two.ch.green * mix + one.ch.green * imix),
-                                LV_UDIV255(two.ch.blue * mix  + one.ch.blue * imix));
+    lv_grad_color_t r = GRAD_CM(LV_UDIV255(two.red * mix   + one.red * imix),
+                                LV_UDIV255(two.green * mix + one.green * imix),
+                                LV_UDIV255(two.blue * mix  + one.blue * imix));
     return r;
 }
 

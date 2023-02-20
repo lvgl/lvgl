@@ -38,7 +38,7 @@ void lv_example_event_3(void)
         lv_obj_center(label);
     }
 
-    lv_obj_add_event_cb(cont, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event(cont, event_cb, LV_EVENT_CLICKED, NULL);
 }
 
 #endif

@@ -54,7 +54,7 @@ void lv_example_scroll_6(void)
     lv_obj_set_size(cont, 200, 200);
     lv_obj_center(cont);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
-    lv_obj_add_event_cb(cont, scroll_event_cb, LV_EVENT_SCROLL, NULL);
+    lv_obj_add_event(cont, scroll_event_cb, LV_EVENT_SCROLL, NULL);
     lv_obj_set_style_radius(cont, LV_RADIUS_CIRCLE, 0);
     lv_obj_set_style_clip_corner(cont, true, 0);
     lv_obj_set_scroll_dir(cont, LV_DIR_VER);
@@ -71,7 +71,7 @@ void lv_example_scroll_6(void)
     }
 
     /*Update the buttons position manually for first*/
-    lv_event_send(cont, LV_EVENT_SCROLL, NULL);
+    lv_obj_send_event(cont, LV_EVENT_SCROLL, NULL);
 
     /*Be sure the fist button is in the middle*/
     lv_obj_scroll_to_view(lv_obj_get_child(cont, 0), LV_ANIM_OFF);

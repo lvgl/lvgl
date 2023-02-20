@@ -12,7 +12,7 @@ class Message:
         self.value = value
     def message(self):
         return self.value
-        
+
 def auth_manager(m,passwd):
     payload = m.get_payload()
     pin_act = payload.__cast__().message()
@@ -25,7 +25,7 @@ def auth_manager(m,passwd):
         lv.msg_send(MSG_LOGIN_ERROR, Message("Incorrect PIN"))
 
 def textarea_event_cb(e):
-    ta = e.get_target()
+    ta = e.get_target_obj()
     code = e.get_code()
     if code == lv.EVENT.READY:
         passwd = Message(ta.get_text())
@@ -51,7 +51,7 @@ def log_out_event_cb(e):
         lv.msg_send(MSG_LOG_OUT, None)
     elif code == lv.EVENT.MSG_RECEIVED:
         m = e.get_msg()
-        btn = e.get_target()
+        btn = e.get_target_obj()
         id = m.get_id()
         if id == MSG_LOGIN_OK:
             btn.clear_state(lv.STATE.DISABLED)
@@ -61,7 +61,7 @@ def log_out_event_cb(e):
 def start_engine_msg_event_cb(e):
 
     m = e.get_msg()
-    btn = e.get_target()
+    btn = e.get_target_obj()
     id = m.get_id()
     if id == MSG_LOGIN_OK:
         btn.clear_state(lv.STATE.DISABLED)
@@ -70,7 +70,7 @@ def start_engine_msg_event_cb(e):
 
 
 def info_label_msg_event_cb(e):
-    label = e.get_target()
+    label = e.get_target_obj()
     m = e.get_msg()
     id = m.get_id()
     if id ==  MSG_LOGIN_ERROR:
@@ -100,7 +100,7 @@ ta.set_width(200)
 ta.set_one_line(True)
 ta.set_password_mode(True)
 ta.set_placeholder_text("The password is: hello")
-ta.add_event_cb(textarea_event_cb, lv.EVENT.ALL, None)
+ta.add_event(textarea_event_cb, lv.EVENT.ALL, None)
 lv.msg_subscribe_obj(MSG_LOGIN_ERROR, ta, None)
 lv.msg_subscribe_obj(MSG_LOGIN_OK, ta, None)
 lv.msg_subscribe_obj(MSG_LOG_OUT, ta, None)
@@ -111,7 +111,7 @@ kb.set_textarea(ta)
 # Create a log out button which will be active only when logged in
 btn = lv.btn(lv.scr_act())
 btn.set_pos(240, 10)
-btn.add_event_cb(log_out_event_cb, lv.EVENT.ALL, None)
+btn.add_event(log_out_event_cb, lv.EVENT.ALL, None)
 lv.msg_subscribe_obj(MSG_LOGIN_OK, btn, None)
 lv.msg_subscribe_obj(MSG_LOG_OUT, btn, None)
 
@@ -121,7 +121,7 @@ label.set_text("LOG OUT")
 # Create a label to show info
 label = lv.label(lv.scr_act());
 label.set_text("")
-label.add_event_cb(info_label_msg_event_cb, lv.EVENT.MSG_RECEIVED, None)
+label.add_event(info_label_msg_event_cb, lv.EVENT.MSG_RECEIVED, None)
 label.set_pos(10, 60)
 lv.msg_subscribe_obj(MSG_LOGIN_ERROR, label, None)
 lv.msg_subscribe_obj(MSG_LOGIN_OK, label, None)
@@ -130,7 +130,7 @@ lv.msg_subscribe_obj(MSG_LOG_OUT, label, None)
 #Create button which will be active only when logged in
 btn = lv.btn(lv.scr_act())
 btn.set_pos(10, 80)
-btn.add_event_cb(start_engine_msg_event_cb, lv.EVENT.MSG_RECEIVED, None)
+btn.add_event(start_engine_msg_event_cb, lv.EVENT.MSG_RECEIVED, None)
 btn.add_flag(lv.obj.FLAG.CHECKABLE)
 lv.msg_subscribe_obj(MSG_LOGIN_OK, btn, None)
 lv.msg_subscribe_obj(MSG_LOG_OUT, btn, None)

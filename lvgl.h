@@ -104,13 +104,21 @@ extern "C" {
 
 #include "src/lv_api_map.h"
 
-/*-----------------
- * EXTRAS
- *----------------*/
+#include "src/dev/sdl/lv_sdl_window.h"
+#include "src/dev/sdl/lv_sdl_mouse.h"
+#include "src/dev/sdl/lv_sdl_mousewheel.h"
+#include "src/dev/sdl/lv_sdl_keyboard.h"
+
+#include "src/dev/disp/fb/lv_linux_fbdev.h"
+
+#include "src/lvgl_private.h"
 
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_USE_DEV_VERSION
+#warning "You are using the development version of LVGL which is not stable at this moment. For production use the release/v8.3 branch. To silence this warning add #define LV_USE_DEV_VERSION to lv_conf.h"
+#endif
 
 /**********************
  *      TYPEDEFS

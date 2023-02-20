@@ -27,12 +27,12 @@ E.g. `lv_disp_trig_activity(NULL)` will trigger a user activity on the default d
 
 ### Mirror display
 
-To mirror the image of a display to another display, you don't need to use multi-display support. Just transfer the buffer received in `drv.flush_cb` to the other display too.
+To mirror the image of a display to another display, you don't need to use multi-display support. Just transfer the buffer received in `flush_cb` to the other display too.
 
 ### Split image
 You can create a larger virtual display from an array of smaller ones. You can create it as below:
 1. Set the resolution of the displays to the large display's resolution.
-2. In `drv.flush_cb`, truncate and modify the `area` parameter for each display.
+2. In `flush_cb`, truncate and modify the `area` parameter for each display.
 3. Send the buffer's content to each real display with the truncated area.
 
 ## Screens
@@ -57,17 +57,18 @@ Screens can be deleted with `lv_obj_del(scr)`, but ensure that you do not delete
 
 ### Transparent screens
 
-Usually, the opacity of the screen is `LV_OPA_COVER` to provide a solid background for its children. If this is not the case (opacity &lt; 100%) the display's background color or image will be visible.
-See the [Display background](#display-background) section for more details. If the display's background opacity is also not `LV_OPA_COVER` LVGL has no solid background to draw.
+Usually, the opacity of the screen is `LV_OPA_COVER` to provide a solid background for its children. If this is not the case (opacity &lt; 100%) the display's `bottom_layer` be visible.
+If the bottom layer's opacity is also not `LV_OPA_COVER` LVGL has no solid background to draw.
 
-This configuration (transparent screen and display) could be used to create for example OSD menus where a video is played on a lower layer, and a menu is overlayed on an upper layer.
+This configuration (transparent screen and display) could be used to create for example OSD menus where a video is played on a lower layer, and a menu is overlaid on an upper layer.
 
-As this mode operates on the Alpha channel of the pixels `LV_COLOR_DEPTH = 32` is also required. The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 where there are solid objects.
+To properly render the screen the display's color format needs to be set to one with alpha channel.
 
 In summary, to enable transparent screens and displays for OSD menu-like UIs:
-- Be sure to use `LV_COLOR_DEPTH 32`
-- Set the screen's opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP)`
-- Set the display opacity to `LV_OPA_TRANSP` with `lv_disp_set_bg_opa(NULL, LV_OPA_TRANSP);`
+- Set the screen's `bg_opa` to transparent: `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
+- Set the bottom layer's `bg_opa` to transparent: `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
+- Set the screen's bg_opa to 0: `lv_obj_set_style_local_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
+- Set a color format with alpha channel. E.g. `lv_disp_set_color_format(disp, LV_COLOR_FORMAT_NATIVE_ALPHA)`
 
 ## Features of displays
 

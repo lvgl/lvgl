@@ -59,7 +59,7 @@ void lv_example_table_1(void)
     lv_obj_center(table);
 
     /*Add an event callback to to apply some custom drawing*/
-    lv_obj_add_event_cb(table, draw_part_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event(table, draw_part_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
 }
 
 #endif

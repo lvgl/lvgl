@@ -20,7 +20,7 @@ void lv_example_event_1(void)
     lv_obj_t * btn = lv_btn_create(lv_scr_act());
     lv_obj_set_size(btn, 100, 50);
     lv_obj_center(btn);
-    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event(btn, event_cb, LV_EVENT_CLICKED, NULL);
 
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, "Click me!");

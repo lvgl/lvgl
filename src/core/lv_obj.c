@@ -8,9 +8,11 @@
  *********************/
 #include "lv_obj.h"
 #include "lv_indev.h"
+#include "lv_indev_private.h"
 #include "lv_refr.h"
 #include "lv_group.h"
 #include "lv_disp.h"
+#include "lv_disp_private.h"
 #include "lv_theme.h"
 #include "../misc/lv_assert.h"
 #include "../draw/lv_draw.h"
@@ -536,9 +538,10 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
             lv_free(obj->spec_attr->children);
             obj->spec_attr->children = NULL;
         }
-        if(obj->spec_attr->event_dsc) {
-            lv_free(obj->spec_attr->event_dsc);
-            obj->spec_attr->event_dsc = NULL;
+        if(obj->spec_attr->event_list.dsc) {
+            lv_free(obj->spec_attr->event_list.dsc);
+            obj->spec_attr->event_list.dsc = NULL;
+            obj->spec_attr->event_list.cnt = 0;
         }
 
         lv_free(obj->spec_attr);
@@ -608,7 +611,7 @@ static void lv_obj_draw(lv_event_t * e)
         part_dsc.rect_dsc = &draw_dsc;
         part_dsc.draw_area = &coords;
         part_dsc.part = LV_PART_MAIN;
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
 #if LV_USE_DRAW_MASKS
         /*With clip corner enabled draw the bg img separately to make it clipped*/
@@ -640,7 +643,7 @@ static void lv_obj_draw(lv_event_t * e)
 
         }
 #endif
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
@@ -682,10 +685,10 @@ static void lv_obj_draw(lv_event_t * e)
             part_dsc.rect_dsc = &draw_dsc;
             part_dsc.draw_area = &coords;
             part_dsc.part = LV_PART_MAIN;
-            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
             lv_draw_rect(draw_ctx, &draw_dsc, &coords);
-            lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
         }
     }
 }
@@ -712,16 +715,16 @@ static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
     if(lv_area_get_size(&hor_area) > 0) {
         part_dsc.draw_area = &hor_area;
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
         lv_draw_rect(draw_ctx, &draw_dsc, &hor_area);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     if(lv_area_get_size(&ver_area) > 0) {
         part_dsc.draw_area = &ver_area;
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
         part_dsc.draw_area = &ver_area;
         lv_draw_rect(draw_ctx, &draw_dsc, &ver_area);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
 }
 
@@ -800,7 +803,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
             else lv_obj_clear_state(obj, LV_STATE_CHECKED);
 
-            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
     }
@@ -826,7 +829,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
             /*With Enter LV_EVENT_RELEASED will send VALUE_CHANGE event*/
             if(c != LV_KEY_ENTER) {
-                lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return;
             }
         }

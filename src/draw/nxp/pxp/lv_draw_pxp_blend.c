@@ -391,130 +391,133 @@ static void lv_pxp_blit_cover(lv_color_t * dest_buf, const lv_area_t * dest_area
     };
     PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
 
-    if(has_recolor || lv_img_cf_has_alpha(cf)) {
-        /**
-         * Configure Porter-Duff blending.
-         *
-         * Note: srcFactorMode and dstFactorMode are inverted in fsl_pxp.h:
-         * srcFactorMode is actually applied on PS alpha value
-         * dstFactorMode is actually applied on AS alpha value
-         */
-        pxp_porter_duff_config_t pdConfig = {
-            .enable = 1,
-            .dstColorMode = kPXP_PorterDuffColorWithAlpha,
-            .srcColorMode = kPXP_PorterDuffColorNoAlpha,
-            .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
-            .srcGlobalAlphaMode = lv_img_cf_has_alpha(cf) ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
-            .dstFactorMode = kPXP_PorterDuffFactorStraight,
-            .srcFactorMode = kPXP_PorterDuffFactorInversed,
-            .dstGlobalAlpha = has_recolor ? dsc->recolor_opa : 0x00,
-            .srcGlobalAlpha = 0xff,
-            .dstAlphaMode = kPXP_PorterDuffAlphaStraight, /*don't care*/
-            .srcAlphaMode = kPXP_PorterDuffAlphaStraight
-        };
-        PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
+    <<< <<< < HEAD
+    if(recolor || lv_color_format_has_alpha(cf)) {
+        == == == =
+        if(has_recolor || lv_img_cf_has_alpha(cf)) {
+            >>> >>> > master
+            /**
+             * Configure Porter-Duff blending.
+             *
+             * Note: srcFactorMode and dstFactorMode are inverted in fsl_pxp.h:
+             * srcFactorMode is actually applied on PS alpha value
+             * dstFactorMode is actually applied on AS alpha value
+             */
+            pxp_porter_duff_config_t pdConfig = {
+                .enable = 1,
+                .dstColorMode = kPXP_PorterDuffColorWithAlpha,
+                .srcColorMode = kPXP_PorterDuffColorNoAlpha,
+                .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
+                .srcGlobalAlphaMode = lv_color_format_has_alpha(cf) ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
+                .dstFactorMode = kPXP_PorterDuffFactorStraight,
+                .srcFactorMode = kPXP_PorterDuffFactorInversed,
+                .dstGlobalAlpha = has_recolor ? dsc->recolor_opa : 0x00,
+                .srcGlobalAlpha = 0xff,
+                .dstAlphaMode = kPXP_PorterDuffAlphaStraight, /*don't care*/
+                .srcAlphaMode = kPXP_PorterDuffAlphaStraight
+            };
+            PXP_SetPorterDuffConfig(LV_GPU_NXP_PXP_ID, &pdConfig);
+        }
+
+        lv_gpu_nxp_pxp_run();
     }
 
-    lv_gpu_nxp_pxp_run();
-}
+    static void lv_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+                               const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
+                               const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf) {
+        lv_coord_t dest_w = lv_area_get_width(dest_area);
+        lv_coord_t dest_h = lv_area_get_height(dest_area);
+        lv_coord_t src_w = lv_area_get_width(src_area);
+        lv_coord_t src_h = lv_area_get_height(src_area);
 
-static void lv_pxp_blit_cf(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
-                           const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride,
-                           const lv_draw_img_dsc_t * dsc, lv_img_cf_t cf)
-{
-    lv_coord_t dest_w = lv_area_get_width(dest_area);
-    lv_coord_t dest_h = lv_area_get_height(dest_area);
-    lv_coord_t src_w = lv_area_get_width(src_area);
-    lv_coord_t src_h = lv_area_get_height(src_area);
+        lv_gpu_nxp_pxp_reset();
 
-    lv_gpu_nxp_pxp_reset();
-
-    pxp_as_blend_config_t asBlendConfig = {
-        .alpha = dsc->opa,
-        .invertAlpha = false,
-        .alphaMode = kPXP_AlphaRop,
-        .ropMode = kPXP_RopMergeAs
-    };
-
-    if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_is_chroma_keyed(cf) && !lv_img_cf_has_alpha(cf)) {
-        /*Simple blit, no effect - Disable PS buffer*/
-        PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
-    }
-    else {
-        /*PS must be enabled to fetch background pixels.
-          PS and OUT buffers are the same, blend will be done in-place*/
-        pxp_ps_buffer_config_t psBufferConfig = {
-            .pixelFormat = PXP_PS_PIXEL_FORMAT,
-            .swapByte = false,
-            .bufferAddr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_area->x1),
-            .bufferAddrU = 0U,
-            .bufferAddrV = 0U,
-            .pitchBytes = dest_stride * sizeof(lv_color_t)
+        pxp_as_blend_config_t asBlendConfig = {
+            .alpha = dsc->opa,
+            .invertAlpha = false,
+            .alphaMode = kPXP_AlphaRop,
+            .ropMode = kPXP_RopMergeAs
         };
-        if(dsc->opa >= (lv_opa_t)LV_OPA_MAX) {
-            asBlendConfig.alphaMode = lv_img_cf_has_alpha(cf) ? kPXP_AlphaEmbedded : kPXP_AlphaOverride;
+
+        if(dsc->opa >= (lv_opa_t)LV_OPA_MAX && !lv_img_cf_is_chroma_keyed(cf) && !lv_color_format_has_alpha(cf)) {
+            /*Simple blit, no effect - Disable PS buffer*/
+            PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
         }
         else {
-            asBlendConfig.alphaMode = lv_img_cf_has_alpha(cf) ? kPXP_AlphaMultiply : kPXP_AlphaOverride;
+            /*PS must be enabled to fetch background pixels.
+              PS and OUT buffers are the same, blend will be done in-place*/
+            pxp_ps_buffer_config_t psBufferConfig = {
+                .pixelFormat = PXP_PS_PIXEL_FORMAT,
+                .swapByte = false,
+                .bufferAddr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_area->x1),
+                .bufferAddrU = 0U,
+                .bufferAddrV = 0U,
+                .pitchBytes = dest_stride * sizeof(lv_color_t)
+            };
+            if(dsc->opa >= (lv_opa_t)LV_OPA_MAX) {
+                asBlendConfig.alphaMode = lv_color_format_has_alpha(cf) ? kPXP_AlphaEmbedded : kPXP_AlphaOverride;
+            }
+            else {
+                asBlendConfig.alphaMode = lv_color_format_has_alpha(cf) ? kPXP_AlphaMultiply : kPXP_AlphaOverride;
+            }
+            PXP_SetProcessSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &psBufferConfig);
+            PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, dest_w - 1U, dest_h - 1U);
         }
-        PXP_SetProcessSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &psBufferConfig);
-        PXP_SetProcessSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, dest_w - 1U, dest_h - 1U);
-    }
 
-    /*AS buffer - source image*/
-    pxp_as_buffer_config_t asBufferConfig = {
-        .pixelFormat = PXP_AS_PIXEL_FORMAT,
-        .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_area->x1),
-        .pitchBytes = src_stride * sizeof(lv_color_t)
-    };
-    PXP_SetAlphaSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &asBufferConfig);
-    PXP_SetAlphaSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, src_w - 1U, src_h - 1U);
-    PXP_SetAlphaSurfaceBlendConfig(LV_GPU_NXP_PXP_ID, &asBlendConfig);
+        /*AS buffer - source image*/
+        pxp_as_buffer_config_t asBufferConfig = {
+            .pixelFormat = PXP_AS_PIXEL_FORMAT,
+            .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_area->x1),
+            .pitchBytes = src_stride * sizeof(lv_color_t)
+        };
+        PXP_SetAlphaSurfaceBufferConfig(LV_GPU_NXP_PXP_ID, &asBufferConfig);
+        PXP_SetAlphaSurfacePosition(LV_GPU_NXP_PXP_ID, 0U, 0U, src_w - 1U, src_h - 1U);
+        PXP_SetAlphaSurfaceBlendConfig(LV_GPU_NXP_PXP_ID, &asBlendConfig);
 
-    if(lv_img_cf_is_chroma_keyed(cf)) {
-        lv_color_t colorKeyLow = LV_COLOR_CHROMA_KEY;
-        lv_color_t colorKeyHigh = LV_COLOR_CHROMA_KEY;
+        if(lv_img_cf_is_chroma_keyed(cf)) {
+            lv_color_t colorKeyLow = LV_COLOR_CHROMA_KEY;
+            lv_color_t colorKeyHigh = LV_COLOR_CHROMA_KEY;
 
-        bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+            bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
 
-        if(has_recolor) {
-            /* New color key after recoloring */
-            lv_color_t colorKey =  LV_COLOR_MIX(dsc->recolor, LV_COLOR_CHROMA_KEY, dsc->recolor_opa);
+            if(has_recolor) {
+                /* New color key after recoloring */
+                lv_color_t colorKey =  LV_COLOR_MIX(dsc->recolor, LV_COLOR_CHROMA_KEY, dsc->recolor_opa);
 
-            LV_COLOR_SET_R(colorKeyLow, colorKey.ch.red != 0 ? colorKey.ch.red - 1 : 0);
-            LV_COLOR_SET_G(colorKeyLow, colorKey.ch.green != 0 ? colorKey.ch.green - 1 : 0);
-            LV_COLOR_SET_B(colorKeyLow, colorKey.ch.blue != 0 ? colorKey.ch.blue - 1 : 0);
+                LV_COLOR_SET_R(colorKeyLow, colorKey.ch.red != 0 ? colorKey.ch.red - 1 : 0);
+                LV_COLOR_SET_G(colorKeyLow, colorKey.ch.green != 0 ? colorKey.ch.green - 1 : 0);
+                LV_COLOR_SET_B(colorKeyLow, colorKey.ch.blue != 0 ? colorKey.ch.blue - 1 : 0);
 
 #if LV_COLOR_DEPTH == 16
-            LV_COLOR_SET_R(colorKeyHigh, colorKey.ch.red != 0x1f ? colorKey.ch.red + 1 : 0x1f);
-            LV_COLOR_SET_G(colorKeyHigh, colorKey.ch.green != 0x3f ? colorKey.ch.green + 1 : 0x3f);
-            LV_COLOR_SET_B(colorKeyHigh, colorKey.ch.blue != 0x1f ? colorKey.ch.blue + 1 : 0x1f);
+                LV_COLOR_SET_R(colorKeyHigh, colorKey.ch.red != 0x1f ? colorKey.ch.red + 1 : 0x1f);
+                LV_COLOR_SET_G(colorKeyHigh, colorKey.ch.green != 0x3f ? colorKey.ch.green + 1 : 0x3f);
+                LV_COLOR_SET_B(colorKeyHigh, colorKey.ch.blue != 0x1f ? colorKey.ch.blue + 1 : 0x1f);
 #else /*LV_COLOR_DEPTH == 32*/
-            LV_COLOR_SET_R(colorKeyHigh, colorKey.ch.red != 0xff ? colorKey.ch.red + 1 : 0xff);
-            LV_COLOR_SET_G(colorKeyHigh, colorKey.ch.green != 0xff ? colorKey.ch.green + 1 : 0xff);
-            LV_COLOR_SET_B(colorKeyHigh, colorKey.ch.blue != 0xff ? colorKey.ch.blue + 1 : 0xff);
+                LV_COLOR_SET_R(colorKeyHigh, colorKey.ch.red != 0xff ? colorKey.ch.red + 1 : 0xff);
+                LV_COLOR_SET_G(colorKeyHigh, colorKey.ch.green != 0xff ? colorKey.ch.green + 1 : 0xff);
+                LV_COLOR_SET_B(colorKeyHigh, colorKey.ch.blue != 0xff ? colorKey.ch.blue + 1 : 0xff);
 #endif
+            }
+
+            PXP_SetAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_color_to32(colorKeyLow),
+                                               lv_color_to32(colorKeyHigh));
         }
 
-        PXP_SetAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_color_to32(colorKeyLow),
-                                           lv_color_to32(colorKeyHigh));
+        PXP_EnableAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_img_cf_is_chroma_keyed(cf));
+
+        /*Output buffer.*/
+        pxp_output_buffer_config_t outputBufferConfig = {
+            .pixelFormat = (pxp_output_pixel_format_t)PXP_OUT_PIXEL_FORMAT,
+            .interlacedMode = kPXP_OutputProgressive,
+            .buffer0Addr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_area->x1),
+            .buffer1Addr = (uint32_t)0U,
+            .pitchBytes = dest_stride * sizeof(lv_color_t),
+            .width = dest_w,
+            .height = dest_h
+        };
+        PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
+
+        lv_gpu_nxp_pxp_run();
     }
-
-    PXP_EnableAlphaSurfaceOverlayColorKey(LV_GPU_NXP_PXP_ID, lv_img_cf_is_chroma_keyed(cf));
-
-    /*Output buffer.*/
-    pxp_output_buffer_config_t outputBufferConfig = {
-        .pixelFormat = (pxp_output_pixel_format_t)PXP_OUT_PIXEL_FORMAT,
-        .interlacedMode = kPXP_OutputProgressive,
-        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_area->x1),
-        .buffer1Addr = (uint32_t)0U,
-        .pitchBytes = dest_stride * sizeof(lv_color_t),
-        .width = dest_w,
-        .height = dest_h
-    };
-    PXP_SetOutputBufferConfig(LV_GPU_NXP_PXP_ID, &outputBufferConfig);
-
-    lv_gpu_nxp_pxp_run();
-}
 
 #endif /*LV_USE_GPU_NXP_PXP*/

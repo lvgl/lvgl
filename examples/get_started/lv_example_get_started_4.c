@@ -21,7 +21,7 @@ void lv_example_get_started_4(void)
     lv_obj_t * slider = lv_slider_create(lv_scr_act());
     lv_obj_set_width(slider, 200);                          /*Set the width*/
     lv_obj_center(slider);                                  /*Align to the center of the parent (screen)*/
-    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);     /*Assign an event function*/
+    lv_obj_add_event(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);     /*Assign an event function*/
 
     /*Create a label above the slider*/
     label = lv_label_create(lv_scr_act());

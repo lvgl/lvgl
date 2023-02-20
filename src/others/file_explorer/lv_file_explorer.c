@@ -273,8 +273,8 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     explorer->quick_access_area = lv_obj_create(explorer->cont);
     lv_obj_set_size(explorer->quick_access_area, LV_PCT(FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH), LV_PCT(100));
     lv_obj_set_flex_flow(explorer->quick_access_area, LV_FLEX_FLOW_COLUMN);
-    lv_obj_add_event_cb(explorer->quick_access_area, quick_access_area_event_handler, LV_EVENT_ALL,
-                        explorer);
+    lv_obj_add_event(explorer->quick_access_area, quick_access_area_event_handler, LV_EVENT_ALL,
+                     explorer);
 #endif
 
     /*File table area on the right*/
@@ -300,7 +300,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_device, "DEVICE"), lv_palette_main(LV_PALETTE_ORANGE), 0);
 
     btn = lv_list_add_btn(explorer->list_device, NULL, LV_SYMBOL_DRIVE " File System");
-    lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
+    lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
 
     /*list 2*/
     explorer->list_places = lv_list_create(explorer->quick_access_area);
@@ -308,15 +308,15 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_set_style_bg_color(lv_list_add_text(explorer->list_places, "PLACES"), lv_palette_main(LV_PALETTE_LIME), 0);
 
     btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_HOME " HOME");
-    lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
+    lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
     btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_VIDEO " Video");
-    lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
+    lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
     btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_IMAGE " Pictures");
-    lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
+    lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
     btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_AUDIO " Music");
-    lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
+    lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
     btn = lv_list_add_btn(explorer->list_places, NULL, LV_SYMBOL_FILE "  Documents");
-    lv_obj_add_event_cb(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
+    lv_obj_add_event(btn, quick_access_event_handler, LV_EVENT_CLICKED, obj);
 #endif
 
     /*Show current path*/
@@ -329,7 +329,7 @@ static void lv_file_explorer_constructor(const lv_obj_class_t * class_p, lv_obj_
     lv_obj_set_size(explorer->file_table, LV_PCT(100), LV_PCT(86));
     lv_table_set_col_width(explorer->file_table, 0, LV_PCT(100));
     lv_table_set_col_cnt(explorer->file_table, 1);
-    lv_obj_add_event_cb(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
+    lv_obj_add_event(explorer->file_table, browser_file_event_handler, LV_EVENT_ALL, obj);
 
     /*only scroll up and down*/
     lv_obj_set_scroll_dir(explorer->file_table, LV_DIR_TOP | LV_DIR_BOTTOM);
@@ -518,7 +518,7 @@ static void browser_file_event_handler(lv_event_t * e)
         else {
             if(strcmp(str_fn, "..") != 0) {
                 explorer->sel_fn = str_fn;
-                lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             }
         }
     }
@@ -526,7 +526,7 @@ static void browser_file_event_handler(lv_event_t * e)
         lv_table_set_col_width(explorer->file_table, 0, lv_obj_get_width(explorer->file_table));
     }
     else if((code == LV_EVENT_CLICKED) || (code == LV_EVENT_RELEASED)) {
-        lv_event_send(obj, LV_EVENT_CLICKED, NULL);
+        lv_obj_send_event(obj, LV_EVENT_CLICKED, NULL);
     }
 }
 
@@ -599,7 +599,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
 
     lv_table_set_row_cnt(explorer->file_table, index);
     file_explorer_sort(obj);
-    lv_event_send(obj, LV_EVENT_READY, NULL);
+    lv_obj_send_event(obj, LV_EVENT_READY, NULL);
 
     /*Move the table to the top*/
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);

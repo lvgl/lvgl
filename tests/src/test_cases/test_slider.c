@@ -49,13 +49,13 @@ void test_slider_event_keys_right_and_up_increment_value_by_one(void)
     lv_slider_set_value(slider, 10, LV_ANIM_OFF);
     int32_t value = lv_slider_get_value(slider);
 
-    lv_event_send(slider, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(slider, LV_EVENT_KEY, (void *) &key);
 
     int32_t new_value = lv_slider_get_value(slider);
     TEST_ASSERT_EQUAL_INT32(value + 1, new_value);
 
     key = LV_KEY_UP;
-    lv_event_send(slider, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(slider, LV_EVENT_KEY, (void *) &key);
     TEST_ASSERT_EQUAL_INT32(new_value + 1, lv_slider_get_value(slider));
 }
 
@@ -65,13 +65,13 @@ void test_slider_event_keys_left_and_down_decrement_value_by_one(void)
     lv_slider_set_value(slider, 10, LV_ANIM_OFF);
     int32_t value = lv_slider_get_value(slider);
 
-    lv_event_send(slider, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(slider, LV_EVENT_KEY, (void *) &key);
 
     int32_t new_value = lv_slider_get_value(slider);
     TEST_ASSERT_EQUAL_INT32(value - 1, new_value);
 
     key = LV_KEY_DOWN;
-    lv_event_send(slider, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(slider, LV_EVENT_KEY, (void *) &key);
     TEST_ASSERT_EQUAL_INT32(new_value - 1, lv_slider_get_value(slider));
 }
 
@@ -81,7 +81,7 @@ void test_slider_event_invalid_key_should_not_change_values(void)
     lv_slider_set_value(slider, 10, LV_ANIM_OFF);
     int32_t value = lv_slider_get_value(slider);
 
-    lv_event_send(slider, LV_EVENT_KEY, (void *) &key);
+    lv_obj_send_event(slider, LV_EVENT_KEY, (void *) &key);
 
     TEST_ASSERT_EQUAL_INT32(value, lv_slider_get_value(slider));
 }
@@ -187,7 +187,7 @@ void test_normal_mode_slider_hit_test(void)
     };
 
     lv_slider_set_value(sliderNormalMode, 100, LV_ANIM_OFF);
-    lv_event_send(sliderNormalMode, LV_EVENT_HIT_TEST, (void *) &info);
+    lv_obj_send_event(sliderNormalMode, LV_EVENT_HIT_TEST, (void *) &info);
 
     /* point can click slider */
     TEST_ASSERT(info.res);
@@ -205,7 +205,7 @@ void test_slider_range_event_hit_test(void)
         .res = false,
         .point = &point
     };
-    lv_event_send(sliderRangeMode, LV_EVENT_HIT_TEST, (void *) &info);
+    lv_obj_send_event(sliderRangeMode, LV_EVENT_HIT_TEST, (void *) &info);
 
     /* point can click slider in the left knob */
     TEST_ASSERT(info.res);

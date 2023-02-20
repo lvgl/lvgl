@@ -134,7 +134,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     }
 
     rlottie->imgdsc.header.always_zero = 0;
-    rlottie->imgdsc.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    rlottie->imgdsc.header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA;
     rlottie->imgdsc.header.h = create_height;
     rlottie->imgdsc.header.w = create_width;
     rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
@@ -212,7 +212,7 @@ static void convert_to_rgba5658(uint32_t * pix, const size_t width, const size_t
             dest[0] = (uint8_t)(r & 0xFF);
             dest[1] = (uint8_t)((r >> 8) & 0xFF);
             dest[sizeof(r)] = (uint8_t)(in >> 24);
-            dest += LV_IMG_PX_SIZE_ALPHA_BYTE;
+            dest += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
         }
         src += width;
     }
@@ -240,7 +240,7 @@ static void next_frame_task_cb(lv_timer_t * t)
                 if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
                     rlottie->current_frame = rlottie->total_frames - 1;
                 else {
-                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    lv_obj_send_event(obj, LV_EVENT_READY, NULL);
                     lv_timer_pause(t);
                     return;
                 }
@@ -253,7 +253,7 @@ static void next_frame_task_cb(lv_timer_t * t)
                 if((rlottie->play_ctrl & LV_RLOTTIE_CTRL_LOOP) == LV_RLOTTIE_CTRL_LOOP)
                     rlottie->current_frame = 0;
                 else {
-                    lv_event_send(obj, LV_EVENT_READY, NULL);
+                    lv_obj_send_event(obj, LV_EVENT_READY, NULL);
                     lv_timer_pause(t);
                     return;
                 }

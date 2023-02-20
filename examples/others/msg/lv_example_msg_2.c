@@ -28,7 +28,7 @@ void lv_example_msg_2(void)
     lv_textarea_set_one_line(ta, true);
     lv_textarea_set_password_mode(ta, true);
     lv_textarea_set_placeholder_text(ta, "The password is: hello");
-    lv_obj_add_event_cb(ta, textarea_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(ta, textarea_event_cb, LV_EVENT_ALL, NULL);
     lv_msg_subscribe_obj(MSG_LOGIN_ERROR, ta, NULL);
     lv_msg_subscribe_obj(MSG_LOGIN_OK, ta, NULL);
     lv_msg_subscribe_obj(MSG_LOG_OUT, ta, NULL);
@@ -42,7 +42,7 @@ void lv_example_msg_2(void)
     /*Create a log out button which will be active only when logged in*/
     btn = lv_btn_create(lv_scr_act());
     lv_obj_set_pos(btn, 240, 10);
-    lv_obj_add_event_cb(btn, log_out_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(btn, log_out_event_cb, LV_EVENT_ALL, NULL);
     lv_msg_subscribe_obj(MSG_LOGIN_OK, btn, NULL);
     lv_msg_subscribe_obj(MSG_LOG_OUT, btn, NULL);
 
@@ -52,7 +52,7 @@ void lv_example_msg_2(void)
     /*Create a label to show info*/
     label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "");
-    lv_obj_add_event_cb(label, info_label_msg_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
+    lv_obj_add_event(label, info_label_msg_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
     lv_obj_set_pos(label, 10, 60);
     lv_msg_subscribe_obj(MSG_LOGIN_ERROR, label, NULL);
     lv_msg_subscribe_obj(MSG_LOGIN_OK, label, NULL);
@@ -61,7 +61,7 @@ void lv_example_msg_2(void)
     /*Create button which will be active only when logged in*/
     btn = lv_btn_create(lv_scr_act());
     lv_obj_set_pos(btn, 10, 80);
-    lv_obj_add_event_cb(btn, start_engine_msg_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
+    lv_obj_add_event(btn, start_engine_msg_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
     lv_msg_subscribe_obj(MSG_LOGIN_OK, btn, NULL);
     lv_msg_subscribe_obj(MSG_LOG_OUT, btn, NULL);

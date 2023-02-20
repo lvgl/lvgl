@@ -73,7 +73,7 @@ void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size)
         return;
     }
 
-    lv_canvas_set_buffer(obj, buf, size, size, LV_IMG_CF_INDEXED_1BIT);
+    lv_canvas_set_buffer(obj, buf, size, size, LV_COLOR_FORMAT_I1);
 
     /*Clear canvas buffer*/
     lv_canvas_fill_bg(obj, lv_color_white(), LV_OPA_COVER);
@@ -104,10 +104,10 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
         return LV_RES_INV;
     }
 
-    lv_canvas_set_palette(obj, 0, qrcode->dark_color);
-    lv_canvas_set_palette(obj, 1, qrcode->light_color);
+    lv_canvas_set_palette(obj, 0, lv_color_to32(qrcode->dark_color));
+    lv_canvas_set_palette(obj, 1, lv_color_to32(qrcode->light_color));
     lv_color_t c;
-    c.full = 1;
+    lv_color_set_int(&c, 1);
     lv_canvas_fill_bg(obj, c, LV_OPA_COVER);
 
     if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RES_INV;
@@ -167,8 +167,8 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
             if(aligned == false && (x & 0x7) == 0) aligned = true;
 
             if(aligned == false) {
-                c.full = a ? 0 : 1;
-                lv_canvas_set_px_color(obj, x, y, c);
+                lv_color_set_int(&c, a ? 0 : 1);
+                lv_canvas_set_px(obj, x, y, c, LV_OPA_COVER);
             }
             else {
                 if(!a) b |= (1 << (7 - p));

@@ -13,11 +13,12 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_color.h"
-#include "../../hal/lv_hal_disp.h"
-#include "../sw/lv_draw_sw.h"
+#include "../../lv_conf_internal.h"
 
 #if LV_USE_GPU_SWM341_DMA2D
+#include "../../misc/lv_color.h"
+#include "../../core/lv_disp.h"
+#include "../sw/lv_draw_sw.h"
 
 /*********************
  *      DEFINES
@@ -32,7 +33,7 @@ extern "C" {
  **********************/
 typedef lv_draw_sw_ctx_t lv_draw_swm341_dma2d_ctx_t;
 
-struct _lv_disp_drv_t;
+struct _lv_disp_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -43,9 +44,9 @@ struct _lv_disp_drv_t;
  */
 void lv_draw_swm341_dma2d_init(void);
 
-void lv_draw_swm341_dma2d_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_swm341_dma2d_ctx_init(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
 
-void lv_draw_swm341_dma2d_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_swm341_dma2d_ctx_deinit(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
 
 void lv_draw_swm341_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
 

@@ -196,7 +196,7 @@ void test_msgbox_close_click_event(void)
     // Msgbox close button is a lv_btn widget
     close_btn = lv_msgbox_get_close_btn(msgbox);
 
-    lv_event_send(close_btn, LV_EVENT_CLICKED, NULL);
+    lv_obj_send_event(close_btn, LV_EVENT_CLICKED, NULL);
 }
 
 #endif

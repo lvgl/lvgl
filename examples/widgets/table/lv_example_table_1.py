@@ -1,5 +1,5 @@
 def draw_part_event_cb(e):
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     # If the cells are drawn../
     if dsc.part == lv.PART.ITEMS:
@@ -49,5 +49,5 @@ table.set_height(200)
 table.center()
 
 # Add an event callback to apply some custom drawing
-table.add_event_cb(draw_part_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
+table.add_event(draw_part_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
 

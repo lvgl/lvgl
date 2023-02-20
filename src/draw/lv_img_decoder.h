@@ -103,7 +103,7 @@ typedef struct _lv_img_decoder_dsc_t {
     /**The image source. A file path like "S:my_img.png" or pointer to an `lv_img_dsc_t` variable*/
     const void * src;
 
-    /**Color to draw the image. USed when the image has alpha channel only*/
+    /**Color to draw the image. Used when the image has alpha channel only*/
     lv_color_t color;
 
     /**Frame of the image, using with animated images*/
@@ -118,6 +118,9 @@ typedef struct _lv_img_decoder_dsc_t {
     /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
      *  MUST be set in `open` function*/
     const uint8_t * img_data;
+
+    const lv_color32_t * palette;
+    uint32_t palette_size;
 
     /** How much time did it take to open the image. [ms]
      *  If not set `lv_img_cache` will measure and set the time to open*/
@@ -241,20 +244,6 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
 lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
-
-/**
- * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
- * Required only if the "open" function can't return with the whole decoded pixel array.
- * @param decoder pointer to the decoder the function associated with
- * @param dsc pointer to decoder descriptor
- * @param x start x coordinate
- * @param y start y coordinate
- * @param len number of pixels to decode
- * @param buf a buffer to store the decoded pixels
- * @return LV_RES_OK: ok; LV_RES_INV: failed
- */
-lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
-                                           lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
 /**
  * Close the pending decoding. Free resources etc.

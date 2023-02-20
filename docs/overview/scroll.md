@@ -149,7 +149,7 @@ static void store_scroll_value_event_cb(lv_event_t* e) {
 }
 
 lv_obj_t* container = lv_obj_create(NULL);
-lv_obj_add_event_cb(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
+lv_obj_add_event(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
 ```
 
 Scrool coordinates can be retrieve from differents axes with these functions:

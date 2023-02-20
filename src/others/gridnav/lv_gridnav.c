@@ -67,24 +67,45 @@ void lv_gridnav_add(lv_obj_t * obj, lv_gridnav_ctrl_t ctrl)
     LV_ASSERT_MALLOC(dsc);
     dsc->ctrl = ctrl;
     dsc->focused_obj = NULL;
-    lv_obj_add_event_cb(obj, gridnav_event_cb, LV_EVENT_ALL, dsc);
+    lv_obj_add_event(obj, gridnav_event_cb, LV_EVENT_ALL, dsc);
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
 }
 
 void lv_gridnav_remove(lv_obj_t * obj)
 {
-    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(obj, gridnav_event_cb);
-    if(dsc == NULL) return; /* no gridnav on this object */
+    lv_event_dsc_t * event_dsc = NULL;
+    uint32_t event_cnt = lv_obj_get_event_count(obj);
+    uint32_t i;
+    for(i = 0; i < event_cnt; i++) {
+        event_dsc = lv_obj_get_event_dsc(obj, i);
+        if(lv_event_dsc_get_cb(event_dsc) == gridnav_event_cb) {
+            break;
+        }
+    }
 
-    lv_free(dsc);
-    lv_obj_remove_event_cb(obj, gridnav_event_cb);
+    if(event_dsc) {
+        lv_free(lv_event_dsc_get_user_data(event_dsc));
+        lv_obj_remove_event(obj, i);
+
+    }
 }
 
 void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_NULL(to_focus);
-    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(cont, gridnav_event_cb);
+
+    uint32_t i;
+    uint32_t event_cnt = lv_obj_get_event_count(cont);
+    lv_gridnav_dsc_t * dsc = NULL;
+    for(i = 0; i < event_cnt; i++) {
+        lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(cont, i);
+        if(lv_event_dsc_get_cb(event_dsc) == gridnav_event_cb) {
+            dsc = lv_event_dsc_get_user_data(event_dsc);
+            break;
+        }
+    }
+
     if(dsc == NULL) {
         LV_LOG_WARN("`cont` is not a gridnav container");
         return;
@@ -205,7 +226,7 @@ static void gridnav_event_cb(lv_event_t * e)
         }
         else {
             if(lv_group_get_focused(lv_obj_get_group(obj)) == obj) {
-                lv_event_send(dsc->focused_obj, LV_EVENT_KEY, &key);
+                lv_obj_send_event(dsc->focused_obj, LV_EVENT_KEY, &key);
             }
         }
 
@@ -260,7 +281,7 @@ static void gridnav_event_cb(lv_event_t * e)
             /*Forward press/release related event too*/
             lv_indev_type_t t = lv_indev_get_type(lv_indev_get_act());
             if(t == LV_INDEV_TYPE_ENCODER || t == LV_INDEV_TYPE_KEYPAD) {
-                lv_event_send(dsc->focused_obj, code, lv_indev_get_act());
+                lv_obj_send_event(dsc->focused_obj, code, lv_indev_get_act());
             }
         }
     }

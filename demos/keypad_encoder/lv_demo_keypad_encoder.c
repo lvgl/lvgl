@@ -49,19 +49,20 @@ void lv_demo_keypad_encoder(void)
     g = lv_group_create();
     lv_group_set_default(g);
 
-    lv_indev_t * cur_drv = NULL;
+    lv_indev_t * indev = NULL;
     for(;;) {
-        cur_drv = lv_indev_get_next(cur_drv);
-        if(!cur_drv) {
+        indev = lv_indev_get_next(indev);
+        if(!indev) {
             break;
         }
 
-        if(cur_drv->driver->type == LV_INDEV_TYPE_KEYPAD) {
-            lv_indev_set_group(cur_drv, g);
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type == LV_INDEV_TYPE_KEYPAD) {
+            lv_indev_set_group(indev, g);
         }
 
-        if(cur_drv->driver->type == LV_INDEV_TYPE_ENCODER) {
-            lv_indev_set_group(cur_drv, g);
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            lv_indev_set_group(indev, g);
         }
     }
 
@@ -155,15 +156,15 @@ static void text_input_create(lv_obj_t * parent)
     lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
-    lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
-    lv_obj_add_event_cb(ta2, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event(ta1, ta_event_cb, LV_EVENT_ALL, kb);
+    lv_obj_add_event(ta2, ta_event_cb, LV_EVENT_ALL, kb);
 }
 
 static void msgbox_create(void)
 {
     static const char * btns[] = {"Ok", "Cancel", ""};
     lv_obj_t * mbox = lv_msgbox_create(NULL, "Hi", "Welcome to the keyboard and encoder demo", btns, false);
-    lv_obj_add_event_cb(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
     lv_group_focus_obj(lv_msgbox_get_btns(mbox));
     lv_obj_add_state(lv_msgbox_get_btns(mbox), LV_STATE_FOCUS_KEY);
     lv_group_focus_freeze(g, true);

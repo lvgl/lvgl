@@ -71,8 +71,8 @@ btn1 = lv.btn(lv.scr_act())
 btn1.align(lv.ALIGN.TOP_MID, 0, 10)
 btn2 = lv.btn(lv.scr_act())
 btn2.align(lv.ALIGN.TOP_MID, 0, 50)
-btn1.add_event_cb(event_cb_1, lv.EVENT.CLICKED, 0)
-btn2.add_event_cb(event_cb_2, lv.EVENT.CLICKED, 0)
+btn1.add_event(event_cb_1, lv.EVENT.CLICKED, 0)
+btn2.add_event(event_cb_2, lv.EVENT.CLICKED, 0)
 print('mem used max: %0.2f kB' % (mem.getMax()))
 print('mem used now: %0.2f kB' % (mem.getNow()))
 ```
@@ -139,7 +139,7 @@ void pika_lvgl_arc_set_angles(PikaObj *self, int start, int end){
 To use the module, just `import pika_lvgl` and the precompiler will automatically scan main.py and bind the `pika_lvgl` module
 
 ```
-$ ./rust-msc-latest-win10.exe 
+$ ./rust-msc-latest-win10.exe
 (pikascript) packages installed:
     pikascript-core==v1.10.0
     PikaStdLib==v1.10.0

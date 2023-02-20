@@ -155,7 +155,7 @@ void lv_textarea_add_char(lv_obj_t * obj, uint32_t c)
     /*Move the cursor after the new character*/
     lv_textarea_set_cursor_pos(obj, lv_textarea_get_cursor_pos(obj) + 1);
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
@@ -205,7 +205,7 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
     /*Move the cursor after the new text*/
     lv_textarea_set_cursor_pos(obj, lv_textarea_get_cursor_pos(obj) + _lv_txt_get_encoded_length(txt));
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 void lv_textarea_del_char(lv_obj_t * obj)
@@ -248,7 +248,7 @@ void lv_textarea_del_char(lv_obj_t * obj)
     /*Move the cursor to the place of the deleted character*/
     lv_textarea_set_cursor_pos(obj, ta->cursor.pos - 1);
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 
 }
 
@@ -309,7 +309,7 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
         auto_hide_characters(obj);
     }
 
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 void lv_textarea_set_placeholder_text(lv_obj_t * obj, const char * txt)
@@ -843,7 +843,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     ta->label = lv_label_create(obj);
     lv_obj_set_width(ta->label, lv_pct(100));
     lv_label_set_text(ta->label, "");
-    lv_obj_add_event_cb(ta->label, label_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(ta->label, label_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_textarea_set_cursor_pos(obj, 0);
 
@@ -905,7 +905,7 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(c == LV_KEY_END)
             lv_textarea_set_cursor_pos(obj, LV_TEXTAREA_CURSOR_LAST);
         else if(c == LV_KEY_ENTER && lv_textarea_get_one_line(obj))
-            lv_event_send(obj, LV_EVENT_READY, NULL);
+            lv_obj_send_event(obj, LV_EVENT_READY, NULL);
         else {
             lv_textarea_add_char(obj, c);
         }
@@ -1263,7 +1263,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
 static lv_res_t insert_handler(lv_obj_t * obj, const char * txt)
 {
     ta_insert_replace = NULL;
-    lv_event_send(obj, LV_EVENT_INSERT, (char *)txt);
+    lv_obj_send_event(obj, LV_EVENT_INSERT, (char *)txt);
 
     /* Drop txt if insert replace is set to '\0' */
     if(ta_insert_replace && ta_insert_replace[0] == '\0')
@@ -1346,7 +1346,7 @@ static void draw_cursor(lv_event_t * e)
     lv_draw_label_dsc_t cur_label_dsc;
     lv_draw_label_dsc_init(&cur_label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
-    if(cur_dsc.bg_opa > LV_OPA_MIN || cur_label_dsc.color.full != label_color.full) {
+    if(cur_dsc.bg_opa > LV_OPA_MIN || !lv_color_eq(cur_label_dsc.color, label_color)) {
         lv_draw_label(draw_ctx, &cur_label_dsc, &cur_area, letter_buf, NULL);
     }
 }

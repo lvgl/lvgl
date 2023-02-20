@@ -1,12 +1,11 @@
 #!/opt/bin/lv_micropython -i
 import utime as time
 import lvgl as lv
-import display_driver
 
 def draw_event_cb(e):
     dsc = e.get_draw_part_dsc()
     if dsc.part == lv.PART.ITEMS:
-        obj = e.get_target()
+        obj = e.get_target_obj()
         ser = obj.get_series_next(None)
         cnt = obj.get_point_count()
         # print("cnt: ",cnt)
@@ -46,7 +45,7 @@ def add_data(timer,chart):
 chart = lv.chart(lv.scr_act())
 chart.set_size(200, 150)
 chart.align(lv.ALIGN.CENTER, 0, 0)
-chart.add_event_cb(draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
+chart.add_event(draw_event_cb, lv.EVENT.DRAW_PART_BEGIN, None)
 chart.set_style_line_width(0, lv.PART.ITEMS)   # Remove the lines
 
 chart.set_type(lv.chart.TYPE.SCATTER)

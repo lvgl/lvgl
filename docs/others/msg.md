@@ -61,7 +61,7 @@ If a new message is published with `msg_id` an `LV_EVENT_MSG_RECEIVED` event wil
 
 For example:
 ```c
-lv_obj_add_event_cb(user_name_label, user_name_label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
+lv_obj_add_event(user_name_label, user_name_label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
 lv_msg_subsribe_obj(MSG_USER_NAME_CHANGED, user_name_label, NULL);
 
 ...

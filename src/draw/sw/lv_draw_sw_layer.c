@@ -9,7 +9,7 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../hal/lv_hal_disp.h"
+#include "../../core/lv_disp.h"
 #include "../../misc/lv_area.h"
 #include "../../core/lv_refr.h"
 
@@ -46,7 +46,7 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
                                                       lv_draw_layer_flags_t flags)
 {
     lv_draw_sw_layer_ctx_t * layer_sw_ctx = (lv_draw_sw_layer_ctx_t *) layer_ctx;
-    uint32_t px_size = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
+    uint32_t px_size = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE : sizeof(lv_color_t);
     if(flags & LV_DRAW_LAYER_FLAG_CAN_SUBDIVIDE) {
         layer_sw_ctx->buf_size_bytes = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE;
         uint32_t full_size = lv_area_get_size(&layer_sw_ctx->base_draw.area_full) * px_size;
@@ -64,7 +64,7 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
         layer_sw_ctx->base_draw.area_act = layer_sw_ctx->base_draw.area_full;
         layer_sw_ctx->base_draw.area_act.y2 = layer_sw_ctx->base_draw.area_full.y1;
         lv_coord_t w = lv_area_get_width(&layer_sw_ctx->base_draw.area_act);
-        layer_sw_ctx->base_draw.max_row_with_alpha = layer_sw_ctx->buf_size_bytes / w / LV_IMG_PX_SIZE_ALPHA_BYTE;
+        layer_sw_ctx->base_draw.max_row_with_alpha = layer_sw_ctx->buf_size_bytes / w / LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
         layer_sw_ctx->base_draw.max_row_with_no_alpha = layer_sw_ctx->buf_size_bytes / w / sizeof(lv_color_t);
     }
     else {
@@ -79,7 +79,7 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
         draw_ctx->buf = layer_sw_ctx->base_draw.buf;
         draw_ctx->buf_area = &layer_sw_ctx->base_draw.area_act;
         draw_ctx->clip_area = &layer_sw_ctx->base_draw.area_act;
-        draw_ctx->render_with_alpha = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? 1 : 0;
+        draw_ctx->color_format = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? LV_COLOR_FORMAT_NATIVE : LV_COLOR_FORMAT_NATIVE_ALPHA;
     }
 
     return layer_ctx;
@@ -92,10 +92,10 @@ void lv_draw_sw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_l
     lv_draw_sw_layer_ctx_t * layer_sw_ctx = (lv_draw_sw_layer_ctx_t *) layer_ctx;
     if(flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA) {
         lv_memzero(layer_ctx->buf, layer_sw_ctx->buf_size_bytes);
-        draw_ctx->render_with_alpha = 1;
+        draw_ctx->color_format = LV_COLOR_FORMAT_NATIVE_ALPHA;
     }
     else {
-        draw_ctx->render_with_alpha = 0;
+        draw_ctx->color_format = LV_COLOR_FORMAT_NATIVE;
     }
 
     draw_ctx->buf = layer_ctx->buf;
@@ -111,13 +111,13 @@ void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_la
     img.header.always_zero = 0;
     img.header.w = lv_area_get_width(draw_ctx->buf_area);
     img.header.h = lv_area_get_height(draw_ctx->buf_area);
-    img.header.cf = draw_ctx->render_with_alpha ? LV_IMG_CF_TRUE_COLOR_ALPHA : LV_IMG_CF_TRUE_COLOR;
+    img.header.cf = draw_ctx->color_format;
 
     /*Restore the original draw_ctx*/
     draw_ctx->buf = layer_ctx->original.buf;
     draw_ctx->buf_area = layer_ctx->original.buf_area;
     draw_ctx->clip_area = layer_ctx->original.clip_area;
-    draw_ctx->render_with_alpha = layer_ctx->original.render_with_alpha;
+    draw_ctx->color_format = layer_ctx->original.color_format;
 
     /*Blend the layer*/
     lv_draw_img(draw_ctx, draw_dsc, &layer_ctx->area_act, &img);

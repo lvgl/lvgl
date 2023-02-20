@@ -26,7 +26,7 @@ void lv_example_chart_3(void)
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 100);
     lv_chart_set_range(chart, LV_CHART_AXIS_SECONDARY_Y, 0, 400);
     lv_chart_set_point_count(chart, 12);
-    lv_obj_add_event_cb(chart, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event(chart, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
 
     /*Add ticks and label to every axis*/
     lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 10, 5, 12, 3, true, 40);

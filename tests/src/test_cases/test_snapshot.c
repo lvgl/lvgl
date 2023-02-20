@@ -21,7 +21,7 @@ void test_snapshot_should_not_leak_memory(void)
     initial_available_memory = monitor.free_size;
 
     for(idx = 0; idx < NUM_SNAPSHOTS; idx++) {
-        snapshots[idx] = lv_snapshot_take(lv_scr_act(), LV_IMG_CF_TRUE_COLOR_ALPHA);
+        snapshots[idx] = lv_snapshot_take(lv_scr_act(), LV_COLOR_FORMAT_NATIVE_ALPHA);
         TEST_ASSERT_NOT_NULL(snapshots[idx]);
     }
 

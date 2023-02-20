@@ -5,7 +5,7 @@ from img_wink_png import img_wink_png_map
 
 img_wink_png = lv.img_dsc_t(
     {
-        "header": {"always_zero": 0, "w": 50, "h": 50,  "cf": lv.img.CF.RAW_ALPHA},
+        "header": {"always_zero": 0, "w": 50, "h": 50,  "cf": lv.COLOR_FORMAT.RAW_ALPHA},
         "data_size": 5158,
         "data": img_wink_png_map,
     }

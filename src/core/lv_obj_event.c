@@ -1,5 +1,5 @@
 /**
- * @file lv_event.c
+ * @file lv_obj_event.c
  *
  */
 
@@ -8,6 +8,7 @@
  *********************/
 #include "lv_obj.h"
 #include "lv_indev.h"
+#include "lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -26,15 +27,12 @@ typedef struct _lv_event_dsc_t {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id);
 static lv_res_t event_send_core(lv_event_t * e);
 static bool event_is_bubbled(lv_event_t * e);
-
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_event_t * event_head;
 
 /**********************
  *      MACROS
@@ -49,7 +47,7 @@ static lv_event_t * event_head;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event_code, void * param)
+lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 {
     if(obj == NULL) return LV_RES_OK;
 
@@ -65,17 +63,13 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event_code, void * param)
     e.stop_bubbling = 0;
     e.stop_processing = 0;
 
-    /*Build a simple linked list from the objects used in the events
-     *It's important to know if this object was deleted by a nested event
-     *called from this `event_cb`.*/
-    e.prev = event_head;
-    event_head = &e;
+    _lv_event_push(&e);
 
     /*Send the event*/
     lv_res_t res = event_send_core(&e);
 
     /*Remove this element from the list*/
-    event_head = e.prev;
+    _lv_event_pop(&e);
 
     return res;
 }
@@ -84,7 +78,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     const lv_obj_class_t * base;
-    if(class_p == NULL) base = e->current_target->class_p;
+    if(class_p == NULL) base = ((lv_obj_t *)e->current_target)->class_p;
     else base = class_p->base_class;
 
     /*Find a base in which call the ancestor's event handler_cb if set*/
@@ -104,164 +98,47 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     return res;
 }
 
-
-lv_obj_t * lv_event_get_target(lv_event_t * e)
-{
-    return e->target;
-}
-
-lv_obj_t * lv_event_get_current_target(lv_event_t * e)
-{
-    return e->current_target;
-}
-
-lv_event_code_t lv_event_get_code(lv_event_t * e)
-{
-    return (lv_event_code_t)(e->code & ~LV_EVENT_PREPROCESS);
-}
-
-void * lv_event_get_param(lv_event_t * e)
-{
-    return e->param;
-}
-
-void * lv_event_get_user_data(lv_event_t * e)
-{
-    return e->user_data;
-}
-
-void lv_event_stop_bubbling(lv_event_t * e)
-{
-    e->stop_bubbling = 1;
-}
-
-void lv_event_stop_processing(lv_event_t * e)
-{
-    e->stop_processing = 1;
-}
-
-
-uint32_t lv_event_register_id(void)
-{
-    static uint32_t last_id = _LV_EVENT_LAST;
-    last_id ++;
-    return last_id;
-}
-
-void _lv_event_mark_deleted(lv_obj_t * obj)
-{
-    lv_event_t * e = event_head;
-
-    while(e) {
-        if(e->current_target == obj || e->target == obj) e->deleted = 1;
-        e = e->prev;
-    }
-}
-
-
-struct _lv_event_dsc_t * lv_obj_add_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
-                                             void * user_data)
+void lv_obj_add_event(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
+                      void * user_data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_allocate_spec_attr(obj);
 
-    obj->spec_attr->event_dsc_cnt++;
-    obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
-                                           obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
-    LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
-
-    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].cb = event_cb;
-    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].filter = filter;
-    obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1].user_data = user_data;
-
-    return &obj->spec_attr->event_dsc[obj->spec_attr->event_dsc_cnt - 1];
+    lv_event_add(&obj->spec_attr->event_list, event_cb, filter, user_data);
 }
 
-bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
+uint32_t lv_obj_get_event_count(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->spec_attr == NULL) return false;
-
-    int32_t i = 0;
-    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
-        if(event_cb == NULL || obj->spec_attr->event_dsc[i].cb == event_cb) {
-            /*Shift the remaining event handlers forward*/
-            for(; i < (obj->spec_attr->event_dsc_cnt - 1); i++) {
-                obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i + 1];
-            }
-            obj->spec_attr->event_dsc_cnt--;
-            obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
-                                                   obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
-            LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
-            return true;
-        }
-    }
-
-    /*No event handler found*/
-    return false;
-}
-
-bool lv_obj_remove_event_cb_with_user_data(lv_obj_t * obj, lv_event_cb_t event_cb, const void * user_data)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->spec_attr == NULL) return false;
-
-    int32_t i = 0;
-    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
-        if((event_cb == NULL || obj->spec_attr->event_dsc[i].cb == event_cb) &&
-           obj->spec_attr->event_dsc[i].user_data == user_data) {
-            /*Shift the remaining event handlers forward*/
-            for(; i < (obj->spec_attr->event_dsc_cnt - 1); i++) {
-                obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i + 1];
-            }
-            obj->spec_attr->event_dsc_cnt--;
-            obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
-                                                   obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
-            LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
-            return true;
-        }
-    }
-
-    /*No event handler found*/
-    return false;
+    LV_ASSERT_NULL(obj);
+    if(obj->spec_attr == NULL) return 0;
+    return lv_event_get_count(&obj->spec_attr->event_list);
 }
 
 
-bool lv_obj_remove_event_dsc(lv_obj_t * obj, struct _lv_event_dsc_t * event_dsc)
+lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index)
 {
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    if(obj->spec_attr == NULL) return false;
-
-    int32_t i = 0;
-    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
-        if(&obj->spec_attr->event_dsc[i] == event_dsc) {
-            /*Shift the remaining event handlers forward*/
-            for(; i < (obj->spec_attr->event_dsc_cnt - 1); i++) {
-                obj->spec_attr->event_dsc[i] = obj->spec_attr->event_dsc[i + 1];
-            }
-            obj->spec_attr->event_dsc_cnt--;
-            obj->spec_attr->event_dsc = lv_realloc(obj->spec_attr->event_dsc,
-                                                   obj->spec_attr->event_dsc_cnt * sizeof(lv_event_dsc_t));
-            LV_ASSERT_MALLOC(obj->spec_attr->event_dsc);
-            return true;
-        }
-    }
-
-    /*No event handler found*/
-    return false;
-}
-
-void * lv_obj_get_event_user_data(struct _lv_obj_t * obj, lv_event_cb_t event_cb)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
+    LV_ASSERT_NULL(obj);
     if(obj->spec_attr == NULL) return NULL;
-
-    int32_t i = 0;
-    for(i = 0; i < obj->spec_attr->event_dsc_cnt; i++) {
-        if(event_cb == obj->spec_attr->event_dsc[i].cb) return obj->spec_attr->event_dsc[i].user_data;
-    }
-    return NULL;
+    return lv_event_get_dsc(&obj->spec_attr->event_list, index);
 }
+
+bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
+{
+    LV_ASSERT_NULL(obj);
+    if(obj->spec_attr == NULL) return false;
+    return lv_event_remove(&obj->spec_attr->event_list, index);
+}
+
+lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
+{
+    return lv_event_get_target(e);
+}
+
+lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
+{
+    return lv_event_get_current_target(e);
+}
+
 
 lv_indev_t * lv_event_get_indev(lv_event_t * e)
 {
@@ -349,7 +226,7 @@ lv_anim_t * lv_event_get_scroll_anim(lv_event_t * e)
     }
     else {
         LV_LOG_WARN("Not interpreted with this event code");
-        return 0;
+        return NULL;
     }
 }
 
@@ -413,16 +290,6 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_event_dsc_t * lv_obj_get_event_dsc(const lv_obj_t * obj, uint32_t id)
-{
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-
-    if(!obj->spec_attr) return NULL;
-    if(id >= obj->spec_attr->event_dsc_cnt) return NULL;
-
-    return &obj->spec_attr->event_dsc[id];
-}
-
 static lv_res_t event_send_core(lv_event_t * e)
 {
     EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->current_target, e->param);
@@ -430,59 +297,34 @@ static lv_res_t event_send_core(lv_event_t * e)
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
     if(indev_act) {
-        if(indev_act->driver->feedback_cb) indev_act->driver->feedback_cb(indev_act->driver, e->code);
+        if(indev_act->feedback_cb) indev_act->feedback_cb(indev_act, e->code);
         if(e->stop_processing) return LV_RES_OK;
         if(e->deleted) return LV_RES_INV;
     }
 
+    lv_obj_t * target = e->target;
     lv_res_t res = LV_RES_OK;
-    lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(e->current_target, 0);
+    lv_event_list_t * list = target->spec_attr ?  &target->spec_attr->event_list : NULL;
 
-    uint32_t i = 0;
-    while(event_dsc && res == LV_RES_OK) {
-        if(event_dsc->cb  && ((event_dsc->filter & LV_EVENT_PREPROCESS) == LV_EVENT_PREPROCESS)
-           && (event_dsc->filter == (LV_EVENT_ALL | LV_EVENT_PREPROCESS) ||
-               (event_dsc->filter & ~LV_EVENT_PREPROCESS) == e->code)) {
-            e->user_data = event_dsc->user_data;
-            event_dsc->cb(e);
-
-            if(e->stop_processing) return LV_RES_OK;
-            /*Stop if the object is deleted*/
-            if(e->deleted) return LV_RES_INV;
-        }
-
-        i++;
-        event_dsc = lv_obj_get_event_dsc(e->current_target, i);
-    }
+    res = lv_event_send(list, e, true);
+    if(res != LV_RES_OK) return res;
 
     res = lv_obj_event_base(NULL, e);
+    if(res != LV_RES_OK) return res;
 
-    event_dsc = res == LV_RES_INV ? NULL : lv_obj_get_event_dsc(e->current_target, 0);
+    res = lv_event_send(list, e, false);
+    if(res != LV_RES_OK) return res;
 
-    i = 0;
-    while(event_dsc && res == LV_RES_OK) {
-        if(event_dsc->cb && ((event_dsc->filter & LV_EVENT_PREPROCESS) == 0)
-           && (event_dsc->filter == LV_EVENT_ALL || event_dsc->filter == e->code)) {
-            e->user_data = event_dsc->user_data;
-            event_dsc->cb(e);
-
-            if(e->stop_processing) return LV_RES_OK;
-            /*Stop if the object is deleted*/
-            if(e->deleted) return LV_RES_INV;
-        }
-
-        i++;
-        event_dsc = lv_obj_get_event_dsc(e->current_target, i);
-    }
-
-    if(res == LV_RES_OK && e->current_target->parent && event_is_bubbled(e)) {
-        e->current_target = e->current_target->parent;
+    lv_obj_t * parent = lv_obj_get_parent(e->current_target);
+    if(parent && event_is_bubbled(e)) {
+        e->current_target = parent;
         res = event_send_core(e);
-        if(res != LV_RES_OK) return LV_RES_INV;
+        if(res != LV_RES_OK) return res;
     }
 
     return res;
 }
+
 
 static bool event_is_bubbled(lv_event_t * e)
 {

@@ -28,7 +28,7 @@ void lv_example_canvas_1(void)
     static uint8_t cbuf[LV_CANVAS_BUF_SIZE_TRUE_COLOR(CANVAS_WIDTH, CANVAS_HEIGHT)];
 
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_IMG_CF_TRUE_COLOR);
+    lv_canvas_set_buffer(canvas, cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_NATIVE);
     lv_obj_center(canvas);
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_GREY, 3), LV_OPA_COVER);
 
@@ -42,7 +42,7 @@ void lv_example_canvas_1(void)
     memcpy(cbuf_tmp, cbuf, sizeof(cbuf_tmp));
     lv_img_dsc_t img;
     img.data = (void *)cbuf_tmp;
-    img.header.cf = LV_IMG_CF_TRUE_COLOR;
+    img.header.cf = LV_COLOR_FORMAT_NATIVE;
     img.header.w = CANVAS_WIDTH;
     img.header.h = CANVAS_HEIGHT;
 

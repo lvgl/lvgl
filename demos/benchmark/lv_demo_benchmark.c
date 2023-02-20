@@ -73,7 +73,7 @@ static lv_style_t style_common;
 static bool scene_with_opa = true;
 static uint32_t last_flush_cb_call;
 static uint32_t render_start_time;
-static void (*flush_cb_ori)(lv_disp_drv_t *, const lv_area_t *, lv_color_t *);
+static void (*flush_cb_ori)(lv_disp_t *, const lv_area_t *, lv_color_t *);
 static uint32_t disp_ori_timer_period;
 static uint32_t anim_ori_timer_period;
 
@@ -99,9 +99,9 @@ static void calc_scene_statistics(void);
 static lv_res_t load_next_scene(void);
 static void next_scene_timer_cb(lv_timer_t * timer);
 static void single_scene_finsih_timer_cb(lv_timer_t * timer);
-static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px);
-static void render_start_cb(lv_disp_drv_t * drv);
-static void dummy_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * colors);
+static void monitor_cb(lv_disp_t * drv, uint32_t time, uint32_t px);
+static void render_start_cb(lv_disp_t * drv);
+static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t * colors);
 static void generate_report(void);
 
 static void rect_create(lv_style_t * style);
@@ -884,7 +884,7 @@ static void single_scene_finsih_timer_cb(lv_timer_t * timer)
     lv_obj_invalidate(lv_scr_act());
 }
 
-static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px)
+static void monitor_cb(lv_disp_t * drv, uint32_t time, uint32_t px)
 {
     LV_UNUSED(drv);
     LV_UNUSED(px);
@@ -902,13 +902,13 @@ static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px)
 }
 
 
-static void render_start_cb(lv_disp_drv_t * drv)
+static void render_start_cb(lv_disp_t * drv)
 {
     LV_UNUSED(drv);
     render_start_time = lv_tick_get();
 }
 
-static void dummy_flush_cb(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * colors)
+static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t * colors)
 {
     LV_UNUSED(area);
     LV_UNUSED(colors);

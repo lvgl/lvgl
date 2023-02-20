@@ -161,7 +161,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     for(i = 0; i < child_cnt; i++) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(child == calendar->btnm) continue;
-        lv_event_send(child, LV_EVENT_VALUE_CHANGED, obj);
+        lv_obj_send_event(child, LV_EVENT_VALUE_CHANGED, obj);
     }
 }
 
@@ -276,7 +276,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->btnm = lv_btnmatrix_create(obj);
     lv_btnmatrix_set_map(calendar->btnm, calendar->map);
     lv_btnmatrix_set_btn_ctrl_all(calendar->btnm, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);
-    lv_obj_add_event_cb(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);

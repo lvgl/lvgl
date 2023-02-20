@@ -3,12 +3,12 @@ import os
 
 LV_FILE_EXPLORER_QUICK_ACCESS = True
 LV_USE_FS_WIN32 = False
-LV_FILE_EXPLORER_PATH_MAX_LEN = 128 
+LV_FILE_EXPLORER_PATH_MAX_LEN = 128
 
 def file_explorer_event_handler(e) :
 
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED:
         cur_path =  obj.explorer_get_current_path()
@@ -30,7 +30,7 @@ if LV_USE_FS_WIN32 :
         file_explorer.explorer_set_quick_access_path(lv.EXPLORER_DOCS_DIR, "C:/Users/Public/Documents");
         file_explorer.explorer_set_quick_access_path(lv.EXPLORER_FS_DIR, "D:");
 
-# linux 
+# linux
 file_explorer.explorer_open_dir("A:/")
 
 if LV_FILE_EXPLORER_QUICK_ACCESS :
@@ -43,5 +43,5 @@ if LV_FILE_EXPLORER_QUICK_ACCESS :
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.DOCS_DIR, home_dir + "/Documents")
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.FS_DIR, "A:/")
 
-file_explorer.add_event_cb(file_explorer_event_handler, lv.EVENT.ALL, None)
+file_explorer.add_event(file_explorer_event_handler, lv.EVENT.ALL, None)
 

@@ -53,7 +53,7 @@ def create_switch(parent, icon, txt, chk) :
 
 def back_event_handler(e,menu):
 
-    obj = e.get_target()
+    obj = e.get_target_obj()
     # menu = lv_event_get_user_data(e);
 
     if menu.back_btn_is_root(obj) :
@@ -63,23 +63,19 @@ def back_event_handler(e,menu):
 def switch_handler(e,menu):
 
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     if code == lv.EVENT.VALUE_CHANGED :
         if obj.has_state(lv.STATE.CHECKED) :
             menu.set_page(None)
             menu.set_sidebar_page(root_page)
-            # lv_event_send(lv_obj_get_child(lv_obj_get_child(lv_menu_get_cur_sidebar_page(menu), 0), 0), LV_EVENT_CLICKED, NULL);
-            lv.event_send(menu.get_cur_sidebar_page().get_child(0).get_child(0),lv.EVENT.CLICKED,None)
+            menu.get_cur_sidebar_page().get_child(0).get_child(0).send_event(lv.EVENT.CLICKED,None)
         else :
             menu.set_sidebar_page(None)
-            menu.clear_history()      #  Clear history because we will be showing the root page later 
+            menu.clear_history()      #  Clear history because we will be showing the root page later
             menu.set_page(root_page)
 
 LV_MENU_ITEM_BUILDER_VARIANT_1 = const(0)
 LV_MENU_ITEM_BUILDER_VARIANT_2 = const(1)
-
-LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
-LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
 
 menu = lv.menu(lv.scr_act())
 
@@ -91,8 +87,8 @@ else :
 
 
 menu.set_mode_root_back_btn(lv.menu.ROOT_BACK_BTN.ENABLED)
-menu.add_event_cb(lambda evt: back_event_handler(evt,menu), lv.EVENT.CLICKED, None)
-menu.set_size(LV_HOR_RES, LV_VER_RES )
+menu.add_event(lambda evt: back_event_handler(evt,menu), lv.EVENT.CLICKED, None)
+menu.set_size(lv.pct(100), lv.pct(100))
 menu.center()
 
 # Create sub pages
@@ -146,7 +142,7 @@ sub_menu_mode_page.set_style_pad_hor(menu.get_main_header().get_style_pad_left(0
 lv.menu_separator(sub_menu_mode_page)
 section = lv.menu_section(sub_menu_mode_page)
 cont = create_switch(section, lv.SYMBOL.AUDIO, "Sidebar enable",True)
-cont.get_child(2).add_event_cb(lambda evt: switch_handler(evt,menu), lv.EVENT.VALUE_CHANGED, None)
+cont.get_child(2).add_event(lambda evt: switch_handler(evt,menu), lv.EVENT.VALUE_CHANGED, None)
 
 # Create a root page
 root_page = lv.menu_page(menu, "Settings")
@@ -168,7 +164,8 @@ menu.set_load_page_event(cont, sub_menu_mode_page)
 
 menu.set_sidebar_page(root_page)
 
-lv.event_send(menu.get_cur_sidebar_page().get_child(0).get_child(0),lv.EVENT.CLICKED,None)
+
+menu.get_cur_sidebar_page().get_child(0).get_child(0).send_event(lv.EVENT.CLICKED,None)
 
 
 

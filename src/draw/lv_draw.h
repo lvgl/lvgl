@@ -52,7 +52,7 @@ typedef struct _lv_draw_layer_ctx_t {
         const lv_area_t * clip_area;
         lv_area_t * buf_area;
         void * buf;
-        bool render_with_alpha;
+        lv_color_format_t color_format;
     } original;
 } lv_draw_layer_ctx_t;
 
@@ -73,12 +73,6 @@ typedef struct _lv_draw_ctx_t  {
     const lv_area_t * clip_area;
 
     /**
-     * If true and Alpha byte will be appended to the colors.
-     * It might make rendering slower.
-     */
-    bool render_with_alpha;
-
-    /**
      * The rendered image in draw_ctx->buf will be converted to this format
      * using draw_ctx->buffer_convert.
      */
@@ -91,8 +85,8 @@ typedef struct _lv_draw_ctx_t  {
     void (*draw_arc)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                      uint16_t radius,  uint16_t start_angle, uint16_t end_angle);
 
-    void (*draw_img_decoded)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                             const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
+    void (*draw_img_decoded)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
+                             const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format);
 
     lv_res_t (*draw_img)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
                          const lv_area_t * coords, const void * src);
@@ -124,12 +118,8 @@ typedef struct _lv_draw_ctx_t  {
      */
     void (*draw_transform)(struct _lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
                            lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                           const lv_draw_img_dsc_t * draw_dsc, lv_img_cf_t cf, lv_color_t * cbuf, lv_opa_t * abuf);
-
-    /**
-     * Replace the buffer with a rect without decoration like radius or borders
-     */
-    void (*draw_bg)(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_area_t * coords);
+                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
+                           lv_opa_t * abuf);
 
     /**
      * Wait until all background operations are finished. (E.g. GPU operations)
@@ -155,10 +145,12 @@ typedef struct _lv_draw_ctx_t  {
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
     /**
-     * Convert the content of `draw_ctx->buf` to `draw_ctx->output_color_format`
+     * Convert the content of `draw_ctx->buf` to `draw_ctx->color_format`
      * @param draw_ctx
      */
     void (*buffer_convert)(struct _lv_draw_ctx_t * draw_ctx);
+
+    void (*buffer_clear)(struct _lv_draw_ctx_t * draw_ctx);
 
     /**
      * Initialize a new layer context.

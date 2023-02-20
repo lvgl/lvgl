@@ -236,9 +236,9 @@ static void lv_checkbox_draw(lv_event_t * e)
     part_draw_dsc.draw_area = &marker_area_transf;
     part_draw_dsc.part = LV_PART_INDICATOR;
 
-    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
     lv_draw_rect(draw_ctx, &indic_dsc, &marker_area_transf);
-    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);

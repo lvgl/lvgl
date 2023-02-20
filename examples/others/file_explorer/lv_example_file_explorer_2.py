@@ -7,7 +7,7 @@ LV_FILE_EXPLORER_PATH_MAX_LEN = 128
 
 def file_explorer_event_handler(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED:
         cur_path =  obj.explorer_get_current_path()
@@ -17,7 +17,7 @@ def file_explorer_event_handler(e):
 def btn_event_handler(e,fe_quick_access_obj):
 
     code = e.get_code()
-    btn = e.get_target()
+    btn = e.get_target_obj()
     # lv_obj_t * file_explorer = lv_event_get_user_data(e);
 
     if code == lv.EVENT.VALUE_CHANGED :
@@ -29,7 +29,7 @@ def btn_event_handler(e,fe_quick_access_obj):
 def dd_event_handler(e, file_explorer):
 
     code = e.get_code()
-    dd = e.get_target()
+    dd = e.get_target_obj()
     # fe_quick_access_obj = lv_event_get_user_data(e);
 
     if code == lv.EVENT.VALUE_CHANGED :
@@ -55,7 +55,7 @@ if LV_USE_FS_WIN32 :
         file_explorer.explorer_set_quick_access_path(lv.EXPLORER_DOCS_DIR, "C:/Users/Public/Documents");
         file_explorer.explorer_set_quick_access_path(lv.EXPLORER_FS_DIR, "D:");
 
-# linux 
+# linux
 file_explorer.explorer_open_dir("A:/")
 
 if LV_FILE_EXPLORER_QUICK_ACCESS :
@@ -68,7 +68,7 @@ if LV_FILE_EXPLORER_QUICK_ACCESS :
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.DOCS_DIR, home_dir + "/Documents")
     file_explorer.explorer_set_quick_access_path(lv.EXPLORER.FS_DIR, "A:/")
 
-file_explorer.add_event_cb(file_explorer_event_handler, lv.EVENT.ALL, None)
+file_explorer.add_event(file_explorer_event_handler, lv.EVENT.ALL, None)
 
 # Quick access status control button
 fe_quick_access_obj = file_explorer.explorer_get_quick_access_area()
@@ -83,8 +83,8 @@ label = lv.label(btn)
 label.set_text(lv.SYMBOL.LIST)
 label.center()
 
-btn.add_event_cb(lambda evt: btn_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
-#btn.add_event_cb(lambda evt: btn_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
+btn.add_event(lambda evt: btn_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
+#btn.add_event(lambda evt: btn_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
 
 # Sort control
 opts = "NONE\nKIND"
@@ -97,6 +97,6 @@ dd.set_options_static(opts)
 dd.align(lv.ALIGN.RIGHT_MID, 0, 0)
 # lv_obj_align_to(dd, btn, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
-dd.add_event_cb(lambda evt: dd_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
-#dd.add_event_cb(lambda evt: dd_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
+dd.add_event(lambda evt: dd_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
+#dd.add_event(lambda evt: dd_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
 

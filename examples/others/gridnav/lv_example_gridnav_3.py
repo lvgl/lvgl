@@ -43,8 +43,8 @@ label = lv.label(cont_sub1)
 cont_sub1.set_style_bg_color(lv.palette_lighten(lv.PALETTE.RED, 5), lv.STATE.FOCUSED)
 label.set_width(lv.pct(100));
 label.set_text(
-    """I'm a very long text which makes my container scrollable. 
-    As LV_GRIDNAV_FLAG_SCROLL_FIRST is enabled arrows will scroll me first 
+    """I'm a very long text which makes my container scrollable.
+    As LV_GRIDNAV_FLAG_SCROLL_FIRST is enabled arrows will scroll me first
     and a new objects will be focused only when an edge is reached with the scrolling.\n
     This is only some placeholder text to be sure the parent will be scrollable. \n
     Hello world!
@@ -61,7 +61,7 @@ lv.gridnav_add(cont_sub2, lv.GRIDNAV_CTRL.ROLLOVER)
 #Only the container needs to be in a group
 lv.group_get_default().add_obj(cont_sub2)
 
-cont_sub2.add_event_cb(cont_sub_event_cb, lv.EVENT.KEY, None)
+cont_sub2.add_event(cont_sub_event_cb, lv.EVENT.KEY, None)
 
 # Use flex here, but works with grid or manually placed objects as well
 cont_sub2.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)

@@ -15,10 +15,10 @@ void lv_example_arc_1(void)
     lv_arc_set_bg_angles(arc, 0, 270);
     lv_arc_set_value(arc, 10);
     lv_obj_center(arc);
-    lv_obj_add_event_cb(arc, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, label);
+    lv_obj_add_event(arc, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, label);
 
     /*Manually update the label for the first time*/
-    lv_event_send(arc, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(arc, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 static void value_changed_event_cb(lv_event_t * e)

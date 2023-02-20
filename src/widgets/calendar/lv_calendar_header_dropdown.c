@@ -82,17 +82,17 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_obj_t * year_dd = lv_dropdown_create(obj);
     lv_dropdown_set_options(year_dd, year_list);
-    lv_obj_add_event_cb(year_dd, year_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
+    lv_obj_add_event(year_dd, year_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
     lv_obj_set_flex_grow(year_dd, 1);
 
     lv_obj_t * month_dd = lv_dropdown_create(obj);
     lv_dropdown_set_options(month_dd, month_list);
-    lv_obj_add_event_cb(month_dd, month_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
+    lv_obj_add_event(month_dd, month_event_cb, LV_EVENT_VALUE_CHANGED, calendar);
     lv_obj_set_flex_grow(month_dd, 1);
 
-    lv_obj_add_event_cb(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     /*Refresh the drop downs*/
-    lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 static void month_event_cb(lv_event_t * e)

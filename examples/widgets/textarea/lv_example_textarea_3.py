@@ -1,5 +1,5 @@
 def ta_event_cb(e):
-    ta = e.get_target()
+    ta = e.get_target_obj()
     txt = ta.get_text()
     # print(txt)
     pos = ta.get_cursor_pos()
@@ -30,11 +30,8 @@ def ta_event_cb(e):
 #
 # Create the text area
 
-LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
-LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
-
 ta = lv.textarea(lv.scr_act())
-ta.add_event_cb(ta_event_cb, lv.EVENT.VALUE_CHANGED, None)
+ta.add_event(ta_event_cb, lv.EVENT.VALUE_CHANGED, None)
 ta.set_accepted_chars("0123456789:")
 ta.set_max_length(5)
 ta.set_one_line(True)
@@ -43,7 +40,7 @@ ta.add_state(lv.STATE.FOCUSED)
 
 # Create a keyboard
 kb = lv.keyboard(lv.scr_act())
-kb.set_size(LV_HOR_RES, LV_VER_RES // 2)
+kb.set_size(lv.pct(100), lv.pct(50))
 kb.set_mode(lv.keyboard.MODE.NUMBER)
 kb.set_textarea(ta)
 

@@ -10,7 +10,7 @@ def event_handler(evt):
 btn1 = lv.btn(lv.scr_act())
 
 # attach the callback
-btn1.add_event_cb(event_handler,lv.EVENT.ALL, None)
+btn1.add_event(event_handler,lv.EVENT.ALL, None)
 
 btn1.align(lv.ALIGN.CENTER,0,-40)
 label=lv.label(btn1)
@@ -20,8 +20,8 @@ label.set_text("Button")
 btn2 = lv.btn(lv.scr_act())
 
 # attach the callback
-#btn2.add_event_cb(event_handler,lv.EVENT.VALUE_CHANGED,None)
-btn2.add_event_cb(event_handler,lv.EVENT.ALL, None)
+#btn2.add_event(event_handler,lv.EVENT.VALUE_CHANGED,None)
+btn2.add_event(event_handler,lv.EVENT.ALL, None)
 
 btn2.align(lv.ALIGN.CENTER,0,40)
 btn2.add_flag(lv.obj.FLAG.CHECKABLE)

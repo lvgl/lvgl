@@ -40,7 +40,7 @@ void lv_example_event_2(void)
     lv_obj_t * info_label = lv_label_create(lv_scr_act());
     lv_label_set_text(info_label, "The last button event:\nNone");
 
-    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_ALL, info_label);
+    lv_obj_add_event(btn, event_cb, LV_EVENT_ALL, info_label);
 }
 
 #endif

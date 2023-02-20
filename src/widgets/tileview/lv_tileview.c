@@ -8,6 +8,7 @@
  *********************/
 #include "lv_tileview.h"
 #include "../../core/lv_indev.h"
+#include "../../core/lv_indev_private.h"
 #if LV_USE_TILEVIEW
 
 /*********************
@@ -126,7 +127,7 @@ static void lv_tileview_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 {
     LV_UNUSED(class_p);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
-    lv_obj_add_event_cb(obj, tileview_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(obj, tileview_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_set_scroll_snap_x(obj, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_scroll_snap_y(obj, LV_SCROLL_SNAP_CENTER);
@@ -159,7 +160,7 @@ static void tileview_event_cb(lv_event_t * e)
 
     if(code == LV_EVENT_SCROLL_END) {
         lv_indev_t * indev = lv_indev_get_act();
-        if(indev && indev->proc.state == LV_INDEV_STATE_PRESSED) {
+        if(indev && indev->state == LV_INDEV_STATE_PRESSED) {
             return;
         }
 
@@ -184,7 +185,7 @@ static void tileview_event_cb(lv_event_t * e)
                 lv_tileview_tile_t * tile = (lv_tileview_tile_t *)tile_obj;
                 tv->tile_act = (lv_obj_t *)tile;
                 dir = tile->dir;
-                lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 break;
             }
         }

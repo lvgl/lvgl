@@ -1,6 +1,6 @@
 def event_handler(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     if code == lv.EVENT.VALUE_CHANGED:
         option = " "*10
         obj.get_selected_str(option, len(option))
@@ -27,5 +27,5 @@ roller1.set_options("\n".join([
 
 roller1.set_visible_row_count(4)
 roller1.center()
-roller1.add_event_cb(event_handler, lv.EVENT.ALL, None)
+roller1.add_event(event_handler, lv.EVENT.ALL, None)
 

@@ -10,6 +10,7 @@
 #if LV_USE_TABVIEW
 
 #include "../../misc/lv_assert.h"
+#include "../../core/lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -226,10 +227,10 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     tabview->map = lv_malloc(sizeof(const char *));
     tabview->map[0] = (char *)"";
     lv_btnmatrix_set_map(btnm, (const char **)tabview->map);
-    lv_obj_add_event_cb(btnm, btns_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(btnm, btns_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    lv_obj_add_event_cb(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_set_scrollbar_mode(cont, LV_SCROLLBAR_MODE_OFF);
 
     switch(tabview->tab_pos) {
@@ -322,7 +323,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
     }
     else if(code == LV_EVENT_SCROLL_END) {
         lv_indev_t * indev = lv_indev_get_act();
-        if(indev && indev->proc.state == LV_INDEV_STATE_PRESSED) {
+        if(indev && indev->state == LV_INDEV_STATE_PRESSED) {
             return;
         }
 
@@ -345,7 +346,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         if(t != lv_tabview_get_tab_act(tv)) new_tab = true;
         lv_tabview_set_act(tv, t, LV_ANIM_ON);
 
-        if(new_tab) lv_event_send(tv, LV_EVENT_VALUE_CHANGED, NULL);
+        if(new_tab) lv_obj_send_event(tv, LV_EVENT_VALUE_CHANGED, NULL);
     }
 }
 #endif /*LV_USE_TABVIEW*/

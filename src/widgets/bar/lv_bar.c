@@ -406,8 +406,8 @@ static void draw_indic(lv_event_t * e)
         part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
         part_draw_dsc.draw_area = &bar->indic_area;
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         return;
     }
 
@@ -426,7 +426,7 @@ static void draw_indic(lv_event_t * e)
     part_draw_dsc.rect_dsc = &draw_rect_dsc;
     part_draw_dsc.draw_area = &bar->indic_area;
 
-    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
     lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     lv_coord_t short_side = LV_MIN(barw, barh);
@@ -522,7 +522,7 @@ static void draw_indic(lv_event_t * e)
 #endif
 
 
-    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 }
 
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)

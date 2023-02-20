@@ -73,10 +73,15 @@ typedef void * lv_user_data_t;
  * TEST CONFIGS
  ***********************/
 
-#if !(defined(LV_TEST_OPTION)) || LV_TEST_OPTION == 4
+#define LV_USE_DEV_VERSION
+
+#if !(defined(LV_TEST_OPTION)) || LV_TEST_OPTION == 5
 #define  LV_COLOR_DEPTH     32
 #define  LV_DPI_DEF         160
 #include "lv_test_conf_full.h"
+#elif LV_TEST_OPTION == 4
+#define  LV_COLOR_DEPTH     24
+#define  LV_DPI_DEF         120
 #elif LV_TEST_OPTION == 3
 #define  LV_COLOR_DEPTH     16
 #define  LV_DPI_DEF         90

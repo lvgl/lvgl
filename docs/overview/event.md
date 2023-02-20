@@ -11,7 +11,7 @@ Events are triggered in LVGL when something happens which might be interesting t
 The user can assign callback functions to an object to see its events. In practice, it looks like this:
 ```c
 lv_obj_t * btn = lv_btn_create(lv_scr_act());
-lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
+lv_obj_add_event(btn, my_event_cb, LV_EVENT_CLICKED, NULL);   /*Assign an event callback*/
 
 ...
 
@@ -23,19 +23,19 @@ static void my_event_cb(lv_event_t * event)
 In the example `LV_EVENT_CLICKED` means that only the click event will call `my_event_cb`. See the [list of event codes](#event-codes) for all the options.
 `LV_EVENT_ALL` can be used to receive all events.
 
-The last parameter of `lv_obj_add_event_cb` is a pointer to any custom data that will be available in the event. It will be described later in more detail.
+The last parameter of `lv_obj_add_event` is a pointer to any custom data that will be available in the event. It will be described later in more detail.
 
 More events can be added to an object, like this:
 ```c
-lv_obj_add_event_cb(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
-lv_obj_add_event_cb(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
-lv_obj_add_event_cb(obj, my_event_cb_3, LV_EVENT_ALL, NULL);		/*No filtering, receive all events*/
+lv_obj_add_event(obj, my_event_cb_1, LV_EVENT_CLICKED, NULL);
+lv_obj_add_event(obj, my_event_cb_2, LV_EVENT_PRESSED, NULL);
+lv_obj_add_event(obj, my_event_cb_3, LV_EVENT_ALL, NULL);		/*No filtering, receive all events*/
 ```
 
 Even the same event callback can be used on an object with different `user_data`. For example:
 ```c
-lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
-lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
+lv_obj_add_event(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
+lv_obj_add_event(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
 ```
 
 The events will be called in the order as they were added.
@@ -46,7 +46,7 @@ Other objects can use the same *event callback*.
 
 ## Remove event(s) from an object
 
-Events can be removed from an object with the `lv_obj_remove_event_cb(obj, event_cb)` function or `lv_obj_remove_event_dsc(obj, event_dsc)`. `event_dsc` is a pointer returned by `lv_obj_add_event_cb`.
+Events can be removed from an object with the `lv_obj_remove_event_cb(obj, event_cb)` function or `lv_obj_remove_event_dsc(obj, event_dsc)`. `event_dsc` is a pointer returned by `lv_obj_add_event`.
 
 ## Event codes
 
@@ -153,7 +153,7 @@ lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 - `lv_event_get_code(e)` get the event code
 - `lv_event_get_current_target(e)` get the object to which an event was sent. I.e. the object whose event handler is being called.
 - `lv_event_get_target(e)` get the object that originally triggered the event (different from `lv_event_get_target` if [event bubbling](#event-bubbling) is enabled)
-- `lv_event_get_user_data(e)` get the pointer passed as the last parameter of `lv_obj_add_event_cb`.
+- `lv_event_get_user_data(e)` get the pointer passed as the last parameter of `lv_obj_add_event`.
 - `lv_event_get_param(e)` get the parameter passed as the last parameter of `lv_event_send`
 
 

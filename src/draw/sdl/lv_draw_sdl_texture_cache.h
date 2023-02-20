@@ -20,7 +20,7 @@ extern "C" {
 
 #include LV_DRAW_SDL_INCLUDE_PATH
 #include "lv_draw_sdl.h"
-#include "lv_draw_sdl_priv.h"
+#include "lv_draw_sdl_private.h"
 #include "../../draw/lv_img_decoder.h"
 #include "../../misc/lv_area.h"
 

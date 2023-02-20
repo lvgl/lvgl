@@ -116,7 +116,7 @@ void test_colorwheel_event_keys_right_and_up_increment_value_by_one(void)
 
     lv_color_hsv_t hsv_cur = lv_colorwheel_get_hsv(colorwheel);
 
-    lv_event_send(colorwheel, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(colorwheel, LV_EVENT_KEY, &keyCode);
 
     lv_color_hsv_t hsv_new = lv_colorwheel_get_hsv(colorwheel);
 
@@ -127,7 +127,7 @@ void test_colorwheel_event_keys_right_and_up_increment_value_by_one(void)
     hsv_cur = hsv_new;
 
     keyCode = LV_KEY_UP;
-    lv_event_send(colorwheel, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(colorwheel, LV_EVENT_KEY, &keyCode);
 
     hsv_new = lv_colorwheel_get_hsv(colorwheel);
 
@@ -138,7 +138,7 @@ void test_colorwheel_event_keys_right_and_up_increment_value_by_one(void)
     hsv_cur = hsv_new;
 
     keyCode = LV_KEY_UP;
-    lv_event_send(colorwheel, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(colorwheel, LV_EVENT_KEY, &keyCode);
 
     hsv_new = lv_colorwheel_get_hsv(colorwheel);
 
@@ -154,7 +154,7 @@ void test_colorwheel_event_keys_left_and_down_decrement_value_by_one(void)
 
     lv_color_hsv_t hsv_cur = lv_colorwheel_get_hsv(colorwheel);
 
-    lv_event_send(colorwheel, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(colorwheel, LV_EVENT_KEY, &keyCode);
 
     lv_color_hsv_t hsv_new = lv_colorwheel_get_hsv(colorwheel);
 
@@ -165,7 +165,7 @@ void test_colorwheel_event_keys_left_and_down_decrement_value_by_one(void)
     hsv_cur = hsv_new;
 
     keyCode = LV_KEY_DOWN;
-    lv_event_send(colorwheel, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(colorwheel, LV_EVENT_KEY, &keyCode);
 
     hsv_new = lv_colorwheel_get_hsv(colorwheel);
 
@@ -176,7 +176,7 @@ void test_colorwheel_event_keys_left_and_down_decrement_value_by_one(void)
     hsv_cur = hsv_new;
 
     keyCode = LV_KEY_DOWN;
-    lv_event_send(colorwheel, LV_EVENT_KEY, &keyCode);
+    lv_obj_send_event(colorwheel, LV_EVENT_KEY, &keyCode);
 
     hsv_new = lv_colorwheel_get_hsv(colorwheel);
 

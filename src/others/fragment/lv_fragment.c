@@ -89,7 +89,7 @@ lv_obj_t * lv_fragment_create_obj(lv_fragment_t * fragment, lv_obj_t * container
     lv_fragment_manager_create_obj(fragment->child_manager);
     if(states) {
         states->obj_created = true;
-        lv_obj_add_event_cb(obj, cb_delete_assertion, LV_EVENT_DELETE, NULL);
+        lv_obj_add_event(obj, cb_delete_assertion, LV_EVENT_DELETE, NULL);
     }
     if(cls->obj_created_cb) {
         cls->obj_created_cb(fragment, obj);
@@ -105,7 +105,18 @@ void lv_fragment_del_obj(lv_fragment_t * fragment)
     if(states) {
         if(!states->obj_created) return;
         states->destroying_obj = true;
-        bool cb_removed = lv_obj_remove_event_cb(fragment->obj, cb_delete_assertion);
+
+        uint32_t i;
+        uint32_t event_cnt = lv_obj_get_event_count(fragment->obj);
+        bool cb_removed = false;
+        for(i = 0; i < event_cnt; i++) {
+            lv_event_dsc_t * event_dsc = lv_obj_get_event_dsc(fragment->obj, i);
+            if(lv_event_dsc_get_cb(event_dsc) == cb_delete_assertion) {
+                cb_removed = lv_obj_remove_event(fragment->obj, i);
+                break;
+            }
+        }
+
         LV_ASSERT(cb_removed);
     }
     LV_ASSERT_NULL(fragment->obj);

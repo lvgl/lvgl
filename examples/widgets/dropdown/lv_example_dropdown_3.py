@@ -12,7 +12,7 @@ img_caret_down_argb = lv.img_dsc_t({
 })
 
 def event_cb(e):
-    dropdown = e.get_target()
+    dropdown = e.get_target_obj()
     option = " "*64 # should be large enough to store the option
     dropdown.get_selected_str(option, len(option))
     print(option.strip() +" is selected")
@@ -42,5 +42,5 @@ dropdown.set_style_transform_angle(1800, lv.PART.INDICATOR | lv.STATE.CHECKED)
 # In a menu we don't need to show the last clicked item
 dropdown.set_selected_highlight(False)
 
-dropdown.add_event_cb(event_cb, lv.EVENT.VALUE_CHANGED, None)
+dropdown.add_event(event_cb, lv.EVENT.VALUE_CHANGED, None)
 

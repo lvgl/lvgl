@@ -21,7 +21,7 @@
  **********************/
 struct _lv_monkey {
     lv_monkey_config_t config;
-    lv_indev_drv_t indev_drv;
+    lv_indev_t indev_drv;
     lv_indev_data_t indev_data;
     lv_indev_t * indev;
     lv_timer_t * timer;
@@ -49,7 +49,7 @@ static const lv_key_t lv_key_map[] = {
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_monkey_read_cb(lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
+static void lv_monkey_read_cb(lv_indev_t * indev_drv, lv_indev_data_t * data);
 static int32_t lv_monkey_random(int32_t howsmall, int32_t howbig);
 static void lv_monkey_timer_cb(lv_timer_t * timer);
 
@@ -74,7 +74,7 @@ lv_monkey_t * lv_monkey_create(const lv_monkey_config_t * config)
 
     monkey->config = *config;
 
-    lv_indev_drv_t * drv = &monkey->indev_drv;
+    lv_indev_t * drv = &monkey->indev_drv;
     lv_indev_drv_init(drv);
     drv->type = config->type;
     drv->read_cb = lv_monkey_read_cb;
@@ -135,7 +135,7 @@ void lv_monkey_del(lv_monkey_t * monkey)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_monkey_read_cb(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+static void lv_monkey_read_cb(lv_indev_t * indev_drv, lv_indev_data_t * data)
 {
     lv_monkey_t * monkey = indev_drv->user_data;
 

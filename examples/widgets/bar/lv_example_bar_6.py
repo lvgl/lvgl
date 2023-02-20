@@ -6,7 +6,7 @@ def event_cb(e):
     if dsc.part != lv.PART.INDICATOR:
         return
 
-    obj= e.get_target()
+    obj= e.get_target_obj()
 
     label_dsc = lv.draw_label_dsc_t()
     label_dsc.init()
@@ -38,7 +38,7 @@ def event_cb(e):
 #
 
 bar = lv.bar(lv.scr_act())
-bar.add_event_cb(event_cb, lv.EVENT.DRAW_PART_END, None)
+bar.add_event(event_cb, lv.EVENT.DRAW_PART_END, None)
 bar.set_size(200, 20)
 bar.center()
 

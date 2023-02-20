@@ -127,23 +127,23 @@ void pika_lvgl_bar_set_value(PikaObj* self, int value, int anim) {
 
 int pika_lvgl_bar_get_max_value(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_bar_get_max_value(lv_obj);    
+    return lv_bar_get_max_value(lv_obj);
 }
 int pika_lvgl_bar_get_min_value(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_bar_get_min_value(lv_obj);    
+    return lv_bar_get_min_value(lv_obj);
 }
 int pika_lvgl_bar_get_mode(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_bar_get_mode(lv_obj);    
+    return lv_bar_get_mode(lv_obj);
 }
 int pika_lvgl_bar_get_start_value(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_bar_get_start_value(lv_obj);    
+    return lv_bar_get_start_value(lv_obj);
 }
 int pika_lvgl_bar_get_value(PikaObj *self){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");
-    return lv_bar_get_value(lv_obj);    
+    return lv_bar_get_value(lv_obj);
 }
 void pika_lvgl_bar_set_mode(PikaObj *self, int mode){
     lv_obj_t* lv_obj = obj_getPtr(self, "lv_obj");

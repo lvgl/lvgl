@@ -35,7 +35,7 @@ void lv_example_img_2(void)
     lv_img_set_src(img1, &img_cogwheel_argb);
     lv_obj_align(img1, LV_ALIGN_RIGHT_MID, -20, 0);
 
-    lv_event_send(intense_slider, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_send_event(intense_slider, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
 static void slider_event_cb(lv_event_t * e)
@@ -57,7 +57,7 @@ static lv_obj_t * create_slider(lv_color_t color)
     lv_obj_set_size(slider, 10, 200);
     lv_obj_set_style_bg_color(slider, color, LV_PART_KNOB);
     lv_obj_set_style_bg_color(slider, lv_color_darken(color, LV_OPA_40), LV_PART_INDICATOR);
-    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     return slider;
 }
 

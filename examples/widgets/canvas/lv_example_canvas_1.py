@@ -23,7 +23,7 @@ label_dsc.color = lv.palette_main(lv.PALETTE.YELLOW)
 cbuf = bytearray(_CANVAS_WIDTH * _CANVAS_HEIGHT * 4)
 
 canvas = lv.canvas(lv.scr_act())
-canvas.set_buffer(cbuf, _CANVAS_WIDTH, _CANVAS_HEIGHT, lv.img.CF.TRUE_COLOR)
+canvas.set_buffer(cbuf, _CANVAS_WIDTH, _CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 canvas.center()
 canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
 
@@ -35,7 +35,7 @@ canvas.draw_text(40, 20, 100, label_dsc, "Some text on text canvas")
 
 img = lv.img_dsc_t()
 img.data = cbuf[:]
-img.header.cf = lv.img.CF.TRUE_COLOR
+img.header.cf = lv.COLOR_FORMAT.NATIVE
 img.header.w = _CANVAS_WIDTH
 img.header.h = _CANVAS_HEIGHT
 

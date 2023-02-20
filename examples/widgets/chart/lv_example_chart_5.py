@@ -44,13 +44,13 @@ ecg_sample = [
 
 def slider_x_event_cb(e):
 
-    slider = e.get_target()
+    slider = e.get_target_obj()
     v = slider.get_value()
     chart.set_zoom_x(v)
 
 def slider_y_event_cb(e):
 
-    slider = e.get_target()
+    slider = e.get_target_obj()
     v = slider.get_value()
     chart.set_zoom_y(v)
 
@@ -77,13 +77,13 @@ chart.set_ext_y_array(ser, ecg_sample)
 
 slider = lv.slider(lv.scr_act())
 slider.set_range(lv.ZOOM_NONE, lv.ZOOM_NONE * 10)
-slider.add_event_cb(slider_x_event_cb, lv.EVENT.VALUE_CHANGED, None)
+slider.add_event(slider_x_event_cb, lv.EVENT.VALUE_CHANGED, None)
 slider.set_size(200,10)
 slider.align_to(chart, lv.ALIGN.OUT_BOTTOM_MID, 0, 20)
 
 slider = lv.slider(lv.scr_act())
 slider.set_range(lv.ZOOM_NONE, lv.ZOOM_NONE * 10)
-slider.add_event_cb(slider_y_event_cb, lv.EVENT.VALUE_CHANGED, None)
+slider.add_event(slider_y_event_cb, lv.EVENT.VALUE_CHANGED, None)
 slider.set_size(10, 150)
 slider.align_to(chart, lv.ALIGN.OUT_RIGHT_MID, 20, 0)
 

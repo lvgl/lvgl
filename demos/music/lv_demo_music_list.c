@@ -189,7 +189,7 @@ static lv_obj_t * add_list_btn(lv_obj_t * parent, uint32_t track_id)
     lv_obj_add_style(btn, &style_btn_pr, LV_STATE_PRESSED);
     lv_obj_add_style(btn, &style_btn_chk, LV_STATE_CHECKED);
     lv_obj_add_style(btn, &style_btn_dis, LV_STATE_DISABLED);
-    lv_obj_add_event_cb(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event(btn, btn_click_event_cb, LV_EVENT_CLICKED, NULL);
 
     if(track_id >= 3) {
         lv_obj_add_state(btn, LV_STATE_DISABLED);

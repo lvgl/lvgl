@@ -50,7 +50,7 @@ static void event_cb(lv_event_t * e)
 void lv_example_bar_6(void)
 {
     lv_obj_t * bar = lv_bar_create(lv_scr_act());
-    lv_obj_add_event_cb(bar, event_cb, LV_EVENT_DRAW_PART_END, NULL);
+    lv_obj_add_event(bar, event_cb, LV_EVENT_DRAW_PART_END, NULL);
     lv_obj_set_size(bar, 200, 20);
     lv_obj_center(bar);
 

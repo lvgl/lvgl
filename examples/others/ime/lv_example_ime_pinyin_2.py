@@ -2,7 +2,7 @@ import fs_driver
 
 def ta_event_cb(e,kb):
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
 
     if code == lv.EVENT.FOCUSED:
         if lv.indev_get_act() != None and lv.indev_get_act().get_type() != lv.INDEV_TYPE.KEYPAD :
@@ -18,12 +18,12 @@ fs_driver.fs_register(fs_drv, 'S')
 font_simsun_16_cjk = lv.font_load("S:../../assets/font/lv_font_simsun_16_cjk.fnt")
 if font_simsun_16_cjk == None:
     print("Error when loading chinese font")
-    
+
 pinyin_ime = lv.ime_pinyin(lv.scr_act())
 pinyin_ime.set_style_text_font(font_simsun_16_cjk, 0)
 # pinyin_ime.pinyin_set_dict(your_dict)  # Use a custom dictionary. If it is not set, the built-in dictionary will be used.
 
-# ta1 
+# ta1
 ta1 = lv.textarea(lv.scr_act())
 ta1.set_one_line(True)
 ta1.set_style_text_font(font_simsun_16_cjk, 0)
@@ -36,7 +36,7 @@ kb.set_textarea(ta1)
 pinyin_ime.pinyin_set_keyboard(kb)
 pinyin_ime.pinyin_set_mode(lv.ime_pinyin.PINYIN_MODE.K9)    #  Set to 9-key input mode. Default: 26-key input(k26) mode.
 
-ta1.add_event_cb(lambda evt: ta_event_cb(evt,kb), lv.EVENT.ALL, None)
+ta1.add_event(lambda evt: ta_event_cb(evt,kb), lv.EVENT.ALL, None)
 
 # Get the cand_panel, and adjust its size and position
 cand_panel = pinyin_ime.pinyin_get_cand_panel()

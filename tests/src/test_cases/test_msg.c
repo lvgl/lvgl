@@ -44,7 +44,7 @@ void test_add_entry_and_send_msg(void)
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_msg_subscribe_obj((lv_msg_id_t)&value, label, NULL);
-    lv_obj_add_event_cb(label, event_cb, LV_EVENT_MSG_RECEIVED, NULL);
+    lv_obj_add_event(label, event_cb, LV_EVENT_MSG_RECEIVED, NULL);
 
     value = 300;
     lv_msg_update_value(&value);

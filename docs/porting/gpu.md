@@ -30,10 +30,10 @@ for `lv_draw_line` it's called [lv_draw_line_dsc_t](https://github.com/lvgl/lvgl
 To correctly render according to a `draw_dsc` you need to be familiar with the [Boxing model](https://docs.lvgl.io/master/overview/coords.html#boxing-model) of LVGL and the meanings of the fields. The name and meaning of the fields are identical to name and meaning of the [Style properties](https://docs.lvgl.io/master/overview/style-props.html).
 
 ### Initialization
-The `lv_disp_drv_t` has 4 fields related to the draw context:
+The `lv_disp_t` has 4 fields related to the draw context:
 - `lv_draw_ctx_t * draw_ctx` Pointer to the `draw_ctx` of this display
-- `void (*draw_ctx_init)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)` Callback to initialize a `draw_ctx`
-- `void (*draw_ctx_deinit)(struct _lv_disp_drv_t * disp_drv, lv_draw_ctx_t * draw_ctx)` Callback to de-initialize a `draw_ctx`
+- `void (*draw_ctx_init)(struct _lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx)` Callback to initialize a `draw_ctx`
+- `void (*draw_ctx_deinit)(struct _lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx)` Callback to de-initialize a `draw_ctx`
 - `size_t draw_ctx_size` Size of the draw context structure. E.g. `sizeof(lv_draw_sw_ctx_t)`
 
 When you ignore these fields, LVGL will set default values for callbacks and size in `lv_disp_drv_init()` based on the configuration in `lv_conf.h`.
@@ -91,7 +91,7 @@ First extend `lv_draw_sw_ctx_t`:
 /*We don't add new fields, so just for clarity add new type*/
 typedef lv_draw_sw_ctx_t my_draw_ctx_t;
 
-void my_draw_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void my_draw_ctx_init(lv_disp_t * drv, lv_draw_ctx_t * draw_ctx)
 {
     /*Initialize the parent type first */
     lv_draw_sw_init_ctx(drv, draw_ctx);
@@ -106,7 +106,7 @@ void my_draw_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 
 After calling `lv_disp_draw_init(&drv)` you can assign the new `draw_ctx_init` callback and set `draw_ctx_size` to overwrite the defaults:
 ```c
-static lv_disp_drv_t drv;
+static lv_disp_t drv;
 lv_disp_draw_init(&drv);
 drv->hor_res = my_hor_res;
 drv->ver_res = my_ver_res;

@@ -11,6 +11,7 @@
 #if LV_USE_COLORWHEEL
 
 #include "../../misc/lv_assert.h"
+#include "../../core/lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -122,10 +123,9 @@ bool lv_colorwheel_set_hsv(lv_obj_t * obj, lv_color_hsv_t hsv)
  */
 bool lv_colorwheel_set_rgb(lv_obj_t * obj, lv_color_t color)
 {
-    lv_color32_t c32;
-    c32.full = lv_color_to32(color);
+    lv_color32_t c32 = lv_color_to32(color);
 
-    return lv_colorwheel_set_hsv(obj,  lv_color_rgb_to_hsv(c32.ch.red, c32.ch.green, c32.ch.blue));
+    return lv_colorwheel_set_hsv(obj,  lv_color_rgb_to_hsv(c32.red, c32.green, c32.blue));
 }
 
 /**
@@ -408,7 +408,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-                res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -429,7 +429,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
 
             if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-                res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return;
             }
         }
@@ -454,7 +454,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_indev_get_point(indev, &p);
         }
 
-        lv_coord_t drag_limit = indev->driver->scroll_limit;
+        lv_coord_t drag_limit = indev->scroll_limit;
         if((LV_ABS(p.x - colorwheel->last_press_point.x) > drag_limit) ||
            (LV_ABS(p.y - colorwheel->last_press_point.y) > drag_limit)) {
             colorwheel->last_change_time = lv_tick_get();
@@ -489,7 +489,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         /*If the inner area is being pressed, go to the next color mode on long press*/
         uint32_t diff = lv_tick_elaps(colorwheel->last_change_time);
-        if(!on_ring && diff > indev->driver->long_press_time && !colorwheel->mode_fixed) {
+        if(!on_ring && diff > indev->long_press_time && !colorwheel->mode_fixed) {
             next_color_mode(obj);
             lv_indev_wait_release(lv_indev_get_act());
             return;
@@ -516,7 +516,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return;
         }
     }
@@ -569,7 +569,7 @@ static lv_res_t double_click_reset(lv_obj_t * obj)
     lv_colorwheel_t * colorwheel = (lv_colorwheel_t *)obj;
     lv_indev_t * indev = lv_indev_get_act();
     /*Double clicked? Use long press time as double click time out*/
-    if(lv_tick_elaps(colorwheel->last_click_time) < indev->driver->long_press_time) {
+    if(lv_tick_elaps(colorwheel->last_click_time) < indev->long_press_time) {
         lv_color_hsv_t hsv_cur;
         hsv_cur = colorwheel->hsv;
 
@@ -588,7 +588,7 @@ static lv_res_t double_click_reset(lv_obj_t * obj)
         lv_indev_wait_release(indev);
 
         if(lv_colorwheel_set_hsv(obj, hsv_cur)) {
-            lv_res_t res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
     }

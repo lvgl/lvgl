@@ -122,7 +122,7 @@ void test_switch_should_update_extra_draw_size_after_editing_padding(void)
 /* See #2330 for context */
 void test_switch_should_trigger_value_changed_event_only_once(void)
 {
-    lv_obj_add_event_cb(sw, event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event(sw, event_handler, LV_EVENT_ALL, NULL);
     mouse_click_on_switch();
 
     TEST_ASSERT_EQUAL(1, value_changed_event_cnt);

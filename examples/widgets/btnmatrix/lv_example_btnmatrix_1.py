@@ -1,6 +1,6 @@
-def event_handler(evt):
-    code = evt.get_code()
-    obj  = evt.get_target()
+def event_handler(e):
+    code = e.get_code()
+    obj  = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED :
         id = obj.get_selected_btn()
@@ -18,7 +18,7 @@ btnm1.set_btn_width(10, 2)        # Make "Action1" twice as wide as "Action2"
 btnm1.set_btn_ctrl(10, lv.btnmatrix.CTRL.CHECKABLE)
 btnm1.set_btn_ctrl(11, lv.btnmatrix.CTRL.CHECKED)
 btnm1.align(lv.ALIGN.CENTER, 0, 0)
-btnm1.add_event_cb(event_handler, lv.EVENT.ALL, None)
+btnm1.add_event(event_handler, lv.EVENT.ALL, None)
 
 
 #endif

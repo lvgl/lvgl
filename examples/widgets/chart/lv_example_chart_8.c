@@ -79,7 +79,7 @@ void lv_example_chart_8(void)
     lv_obj_center(stacked_area_chart.obj);
     lv_chart_set_type(stacked_area_chart.obj, LV_CHART_TYPE_LINE);
     lv_chart_set_div_line_count(stacked_area_chart.obj, 5, 7);
-    lv_obj_add_event_cb(stacked_area_chart.obj, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event(stacked_area_chart.obj, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
 
     /* Set range to 0 to 100 for percentages. Draw ticks */
     lv_chart_set_range(stacked_area_chart.obj, LV_CHART_AXIS_PRIMARY_Y, 0, 100);

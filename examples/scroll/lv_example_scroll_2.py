@@ -1,7 +1,7 @@
 def sw_event_cb(e,panel):
 
     code = e.get_code()
-    sw = e.get_target()
+    sw = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED:
 
@@ -39,7 +39,7 @@ panel.update_snap(lv.ANIM.ON)
 # Switch between "One scroll" and "Normal scroll" mode
 sw = lv.switch(lv.scr_act())
 sw.align(lv.ALIGN.TOP_RIGHT, -20, 10)
-sw.add_event_cb(lambda evt:  sw_event_cb(evt,panel), lv.EVENT.ALL, None)
+sw.add_event(lambda evt:  sw_event_cb(evt,panel), lv.EVENT.ALL, None)
 label = lv.label(lv.scr_act())
 label.set_text("One scroll")
 label.align_to(sw, lv.ALIGN.OUT_BOTTOM_MID, 0, 5)

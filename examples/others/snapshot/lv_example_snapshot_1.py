@@ -24,7 +24,7 @@ img_star = lv.img_dsc_t({
 })
 
 def event_cb(e, snapshot_obj):
-    img = e.get_target()
+    img = e.get_target_obj()
 
     if snapshot_obj:
         # no need to free the old source for snapshot_obj, gc will free it for us.
@@ -61,5 +61,5 @@ for i in range(4):
     img.set_style_bg_opa(lv.OPA.COVER, 0)
     img.set_style_transform_zoom(400, lv.STATE.PRESSED)
     img.add_flag(img.FLAG.CLICKABLE)
-    img.add_event_cb(lambda e: event_cb(e, snapshot_obj), lv.EVENT.PRESSED, None)
-    img.add_event_cb(lambda e: event_cb(e, snapshot_obj), lv.EVENT.RELEASED, None)
+    img.add_event(lambda e: event_cb(e, snapshot_obj), lv.EVENT.PRESSED, None)
+    img.add_event(lambda e: event_cb(e, snapshot_obj), lv.EVENT.RELEASED, None)

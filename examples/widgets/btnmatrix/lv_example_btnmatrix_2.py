@@ -13,7 +13,7 @@ img_star_argb = lv.img_dsc_t({
 
 def event_cb(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     if code == lv.EVENT.DRAW_PART_BEGIN:
         # Change the draw descriptor the 2nd button
@@ -69,6 +69,6 @@ def event_cb(e):
 # Add custom drawer to the button matrix to c
 #
 btnm = lv.btnmatrix(lv.scr_act())
-btnm.add_event_cb(event_cb, lv.EVENT.ALL, None)
+btnm.add_event(event_cb, lv.EVENT.ALL, None)
 btnm.center()
 

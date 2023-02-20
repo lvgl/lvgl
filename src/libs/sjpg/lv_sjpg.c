@@ -165,7 +165,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
 
             raw_sjpeg_data += 14; //seek to res info ... refer sjpeg format
             header->always_zero = 0;
-            header->cf = LV_IMG_CF_RAW;
+            header->cf = LV_COLOR_FORMAT_RAW;
 
             header->w = *raw_sjpeg_data++;
             header->w |= *raw_sjpeg_data++ << 8;
@@ -178,7 +178,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
         }
         else if(is_jpg(raw_sjpeg_data, raw_sjpeg_data_size) == true) {
             header->always_zero = 0;
-            header->cf = LV_IMG_CF_RAW;
+            header->cf = LV_COLOR_FORMAT_RAW;
 
             uint8_t * workb_temp = lv_malloc(TJPGD_WORKBUFF_SIZE);
             if(!workb_temp) return LV_RES_INV;
@@ -235,7 +235,7 @@ end:
                     return LV_RES_INV;
                 }
                 header->always_zero = 0;
-                header->cf = LV_IMG_CF_RAW;
+                header->cf = LV_COLOR_FORMAT_RAW;
                 uint8_t * raw_sjpeg_data = buff;
                 header->w = *raw_sjpeg_data++;
                 header->w |= *raw_sjpeg_data++ << 8;
@@ -270,7 +270,7 @@ end:
 
             if(rc == JDR_OK) {
                 header->always_zero = 0;
-                header->cf = LV_IMG_CF_RAW;
+                header->cf = LV_COLOR_FORMAT_RAW;
                 header->w = jd_tmp.width;
                 header->h = jd_tmp.height;
                 return LV_RES_OK;
@@ -760,9 +760,14 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
             buf[offset + 0] = *cache++;
             offset += 4;
         }
-
+#elif  LV_COLOR_DEPTH == 24
+        for(int i = 0; i < len; i++) {
+            buf[offset + 2] = *cache++;
+            buf[offset + 1] = *cache++;
+            buf[offset + 0] = *cache++;
+            offset += 3;
+        }
 #elif  LV_COLOR_DEPTH == 16
-
         for(int i = 0; i < len; i++) {
             uint16_t col_16bit = (*cache++ & 0xf8) << 8;
             col_16bit |= (*cache++ & 0xFC) << 3;
@@ -775,9 +780,7 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
             buf[offset++] = col_16bit >> 8;
 #endif // LV_BIG_ENDIAN_SYSTEM
         }
-
 #elif  LV_COLOR_DEPTH == 8
-
         for(int i = 0; i < len; i++) {
             uint8_t col_8bit = (*cache++ & 0xC0);
             col_8bit |= (*cache++ & 0xe0) >> 2;
@@ -786,8 +789,6 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
         }
 #else
 #error Unsupported LV_COLOR_DEPTH
-
-
 #endif // LV_COLOR_DEPTH
         return LV_RES_OK;
     }
@@ -824,6 +825,13 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
             buf[offset + 1] = *cache++;
             buf[offset + 0] = *cache++;
             offset += 4;
+        }
+#elif LV_COLOR_DEPTH == 24
+        for(int i = 0; i < len; i++) {
+            buf[offset + 2] = *cache++;
+            buf[offset + 1] = *cache++;
+            buf[offset + 0] = *cache++;
+            offset += 3;
         }
 #elif  LV_COLOR_DEPTH == 16
 

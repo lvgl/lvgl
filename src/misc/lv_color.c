@@ -44,7 +44,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
         px_num--;
     }
 
-    uint32_t c32 = (uint32_t)color.full + ((uint32_t)color.full << 16);
+    uint32_t cint = lv_color_to_int(color);
+    uint32_t c32 = (uint32_t)cint + ((uint32_t)cint << 16);
     uint32_t * buf32 = (uint32_t *)buf;
 
     while(px_num > 16) {
@@ -123,6 +124,408 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
     }
 #endif
 }
+
+uint8_t lv_color_format_get_size(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_NATIVE_REVERSED:
+            return LV_COLOR_DEPTH / 8;
+        case LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED:
+            return LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_ARGB2222:
+            return 1;
+        case LV_COLOR_FORMAT_A8L8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB4444:
+            return 2;
+
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB8565:
+            return 3;
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            return 4;
+
+        case LV_COLOR_FORMAT_UNKNOWN:
+        default:
+            return 0;
+    }
+}
+
+bool lv_color_format_has_alpha(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_NATIVE_ALPHA_REVERSED:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_ARGB2222:
+        case LV_COLOR_FORMAT_ARGB4444:
+        case LV_COLOR_FORMAT_A8L8:
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB1555:
+        case LV_COLOR_FORMAT_ARGB8888:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static uint8_t bit_2_to_8[4] = {0, 85, 170, 255};
+static uint8_t bit_4_to_8[16] = {0,   17,  34,  51,  68,  85,  102, 119,
+                                 136, 153, 170, 187, 204, 221, 238, 255
+                                };
+#if LV_COLOR_DEPTH != 16
+static uint8_t bit_6_to_8[64] = {0,   4,   8,   12,  16,  20,  24,  28,
+                                 32,  36,  40,  45,  49,  53,  57,  61,
+                                 65,  69,  73,  77,  81,  85,  89,  93,
+                                 97,  101, 105, 109, 113, 117, 121, 125,
+                                 130, 134, 138, 142, 146, 150, 154, 158,
+                                 162, 166, 170, 174, 178, 182, 186, 190,
+                                 194, 198, 202, 206, 210, 215, 219, 223,
+                                 227, 231, 235, 239, 243, 247, 251, 255
+                                };
+#endif
+
+static uint8_t bit_5_to_8[32] = {0,   8,   16,  25,  33,  41,  49,  58,
+                                 66,  74,  82,  90,  99,  107, 115, 123,
+                                 132, 140, 148, 156, 165, 173, 181, 189,
+                                 197, 206, 214, 222, 230, 239, 247, 255
+                                };
+
+void lv_color_to_native(const uint8_t * src_buf, lv_color_format_t src_cf, lv_color_t * c_out, lv_opa_t * a_out,
+                        lv_color_t alpha_color, uint32_t px_cnt)
+{
+    uint32_t i;
+    uint32_t tmp;
+    lv_color_t c;
+    switch(src_cf) {
+        case LV_COLOR_FORMAT_L8:
+#if LV_COLOR_DEPTH == 8
+            lv_memcpy(c_out, src_buf, px_cnt);
+            lv_memset(a_out, 0xff, px_cnt);
+#else
+            lv_memset(a_out, 0xff, px_cnt);
+            c = lv_color_black();
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_mix(alpha_color, c, src_buf[i]);
+            }
+#endif
+            break;
+        case LV_COLOR_FORMAT_A8:
+            lv_color_fill(c_out, alpha_color, px_cnt);
+            lv_memcpy(a_out, src_buf, px_cnt);
+            break;
+        case LV_COLOR_FORMAT_A8L8:
+            c = lv_color_black();
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_mix(c, alpha_color, src_buf[0]);
+                a_out[i] = src_buf[1];
+                src_buf += 2;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB2222:
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_make(bit_2_to_8[(src_buf[i]) & 0x30], bit_2_to_8[(src_buf[i]) & 0x0C],
+                                         bit_2_to_8[(src_buf[i]) & 0x03]);
+                a_out[i] = bit_2_to_8[(src_buf[i]) & 0xC0];
+            }
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+#if LV_COLOR_DEPTH == 16
+            lv_memcpy(c_out, src_buf, px_cnt * 2);
+            lv_memset(a_out, 0xff, px_cnt);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                *c_out = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+                src_buf += 2;
+            }
+#endif
+            break;
+        case LV_COLOR_FORMAT_ARGB1555:
+            for(i = 0; i < px_cnt; i++) {
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                c_out[i] = lv_color_make(bit_5_to_8[(tmp & 0x7C00) >> 10], bit_5_to_8[(tmp & 0x03E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+                a_out[i] = tmp & 0x8000 ? 0xFF : 0x00;
+                src_buf += 2;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB4444:
+            for(i = 0; i < px_cnt; i++) {
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                c_out[i] = lv_color_make(bit_4_to_8[(tmp & 0x0F00) >> 8], bit_4_to_8[(tmp & 0x00F0) >> 4], bit_4_to_8[tmp & 0x000F]);
+                a_out[i] = bit_4_to_8[(tmp & 0xF000) >> 12];
+                src_buf += 2;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB8565:
+            for(i = 0; i < px_cnt; i++) {
+#if LV_COLOR_DEPTH == 16
+                lv_color_set_int(&c_out[i], src_buf[0] + (src_buf[1] << 8));
+#else
+                tmp = src_buf[0] + (src_buf[1] << 8);
+                c_out[i] = lv_color_make(bit_5_to_8[tmp >> 11], bit_6_to_8[(tmp & 0x07E0) >> 5], bit_5_to_8[tmp & 0x001F]);
+#endif
+                a_out[i] = src_buf[2];
+                src_buf += 3;
+            }
+            break;
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_RGB888:
+            lv_memset(a_out, 0xFF, px_cnt);
+            tmp = LV_COLOR_FORMAT_RGB888 ? 3 : 4;
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+                src_buf += tmp;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+            for(i = 0; i < px_cnt; i++) {
+                c_out[i] = lv_color_make(src_buf[2], src_buf[1], src_buf[0]);
+                a_out[i] = src_buf[3];
+                src_buf += 4;
+            }
+            break;
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_RGB565A8:
+        default:
+            LV_LOG_WARN("Can't convert to %d format", src_cf);
+            lv_color_fill(c_out, lv_color_hex(0x000000), px_cnt);
+            lv_memset(a_out, 0xFF, px_cnt);
+            break;
+    }
+}
+
+
+void lv_color_from_native(const lv_color_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf, uint32_t px_cnt)
+{
+    uint32_t i;
+    switch(dest_cf) {
+        case LV_COLOR_FORMAT_L8:
+            for(i = 0; i < px_cnt; i++) {
+                dest_buf[i] = lv_color_brightness(src_buf[i]);
+            }
+            break;
+        case LV_COLOR_FORMAT_A8:
+            lv_memset(dest_buf, 0xff, px_cnt);
+            break;
+        case LV_COLOR_FORMAT_A8L8:
+            for(i = 0; i < px_cnt; i++) {
+                dest_buf[0] = lv_color_brightness(src_buf[i]);
+                dest_buf[1] = 0xff;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB2222:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color16_t c16 = lv_color_to16(src_buf[i]);
+                dest_buf[i] = 0xC0 + ((c16.red >> 3) << 4) + ((c16.green >> 4) << 2) + (c16.blue >> 3);
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB4444:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color16_t c16 = lv_color_to16(src_buf[i]);
+                dest_buf[0] = ((c16.green >> 2) << 4) + (c16.blue >> 1);
+                dest_buf[1] = 0xF0 + (c16.red >> 1);
+                dest_buf += 2;
+            }
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+#if LV_COLOR_DEPTH == 16
+            lv_memcpy(dest_buf, src_buf, px_cnt * 2);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                *((lv_color16_t *)dest_buf) = lv_color_to16(src_buf[i]);
+                dest_buf += 2;
+            }
+#endif
+            break;
+        case LV_COLOR_FORMAT_ARGB1555:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color16_t c16 = lv_color_to16(src_buf[i]);
+                dest_buf[0] = (((c16.green >> 1) & 0x07) << 5) + c16.blue;
+                dest_buf[1] = 0x80 + (c16.red << 2) + (c16.green >> 4);
+                dest_buf += 2;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB8565:
+            for(i = 0; i < px_cnt; i++) {
+                uint16_t tmp = lv_color16_to_int(lv_color_to16(src_buf[i]));
+                dest_buf[0] = tmp & 0xff;
+                dest_buf[1] = tmp >> 8;
+                dest_buf[2] = 0xff;
+                dest_buf += 3;
+            }
+            break;
+        case LV_COLOR_FORMAT_RGB888:
+#if LV_COLOR_DEPTH == 24
+            lv_memcpy(dest_buf, src_buf, px_cnt * 3);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color24_t c24 = lv_color_to24(src_buf[i]);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf += 3;
+            }
+#endif
+            break;
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888:
+#if LV_COLOR_DEPTH == 32
+            lv_memcpy(dest_buf, src_buf, px_cnt * 4);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color24_t c24 = lv_color_to24(src_buf[i]);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf[3] = 0xff;
+                dest_buf += 4;
+            }
+
+#endif
+            break;
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_RGB565A8:
+        default:
+            LV_LOG_WARN("Can't convert from %d format", dest_cf);
+            return;
+    }
+}
+
+void lv_color_from_native_alpha(const uint8_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf, uint32_t px_cnt)
+{
+    uint32_t i;
+    switch(dest_cf) {
+        case LV_COLOR_FORMAT_L8:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                dest_buf[0] = lv_color_brightness(color);
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_A8:
+            for(i = 0; i < px_cnt; i++) {
+                dest_buf[i] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_A8L8:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                dest_buf[0] = lv_color_brightness(color);
+                dest_buf[1] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB2222:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                lv_opa_t opa = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf[i] = (opa & 0xC0) + ((c16.red >> 3) << 4) + ((c16.green >> 4) << 2) + (c16.blue >> 3);
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB4444:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                lv_opa_t opa = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf[0] = ((c16.green >> 2) << 4) + (c16.blue >> 1);
+                dest_buf[1] = (opa & 0xF0) + (c16.red >> 1);
+                dest_buf += 2;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                *((uint16_t *) dest_buf) = lv_color16_to_int(c16);
+                dest_buf += 2;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB1555:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                lv_opa_t opa = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf[0] = (((c16.green >> 1) & 0x07) << 5) + c16.blue;
+                dest_buf[1] = (opa & 0x80) + (c16.red << 2) + (c16.green >> 4);
+                dest_buf += 2;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB8565:
+#if LV_COLOR_DEPTH == 16
+            lv_memcpy(dest_buf, src_buf, px_cnt * 3);
+
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color16_t c16 = lv_color_to16(color);
+                *((uint16_t *) dest_buf) = lv_color16_to_int(c16);
+                dest_buf[2] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];;
+                dest_buf += 3;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+#endif
+            break;
+        case LV_COLOR_FORMAT_RGB888:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color24_t c24 = lv_color_to24(color);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf += 3;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_XRGB8888:
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color24_t c24 = lv_color_to24(color);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf[3] = 0xff;
+                dest_buf += 4;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+#if LV_COLOR_DEPTH == 24 || LV_COLOR_DEPTH == 32
+            lv_memcpy(dest_buf, src_buf, px_cnt * 4);
+#else
+            for(i = 0; i < px_cnt; i++) {
+                lv_color_t color = lv_color_from_buf(src_buf);
+                lv_color24_t c24 = lv_color_to24(color);
+                dest_buf[0] = c24.blue;
+                dest_buf[1] = c24.green;
+                dest_buf[2] = c24.red;
+                dest_buf[3] = src_buf[LV_COLOR_FORMAT_NATIVE_ALPHA_OFS];
+                dest_buf += 4;
+                src_buf += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            }
+#endif
+            break;
+
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_RGB565A8:
+        default:
+            LV_LOG_WARN("Can't convert from %d format", dest_cf);
+            return;
+    }
+}
+
+
 
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl)
 {
@@ -268,9 +671,10 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 lv_color_hsv_t lv_color_to_hsv(lv_color_t color)
 {
     lv_color32_t color32;
-    color32.full = lv_color_to32(color);
-    return lv_color_rgb_to_hsv(color32.ch.red, color32.ch.green, color32.ch.blue);
+    color32 = lv_color_to32(color);
+    return lv_color_rgb_to_hsv(color32.red, color32.green, color32.blue);
 }
+
 
 lv_color_t lv_palette_main(lv_palette_t p)
 {

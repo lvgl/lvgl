@@ -111,7 +111,7 @@ void lv_example_chart_2(void)
 
     lv_chart_set_div_line_count(chart1, 5, 7);
 
-    lv_obj_add_event_cb(chart1, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event(chart1, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
     lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
 
     /*Add two data series*/
