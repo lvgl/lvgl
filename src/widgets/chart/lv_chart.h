@@ -271,7 +271,7 @@ void lv_chart_refresh(lv_obj_t * obj);
  * @param obj       pointer to a chart object
  * @param color     color of the data series
  * @param axis      the y axis to which the series should be attached (::LV_CHART_AXIS_PRIMARY_Y or ::LV_CHART_AXIS_SECONDARY_Y)
- * @return          pointer to the allocated data series
+ * @return          pointer to the allocated data series or NULL on failure
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_chart_axis_t axis);
 
