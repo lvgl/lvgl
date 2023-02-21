@@ -92,7 +92,8 @@
 - [ ] Circle layout. #2871
 - [ ] Variable binding. I.e create properties which can be bound to objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
 - [ ] Consider [stagger animations](https://greensock.com/docs/v3/Staggers).
-
+- [ ] Universal scale widget/support (see [here](https://forum.lvgl.io/t/linear-meter-bar-with-ticks/10986))
+ 
 ## Ideas
 - Consider direct binary font format support
 - Improve groups. [Discussion](https://forum.lvgl.io/t/lv-group-tabindex/2927/3). Reconsider focusing logic. Allow having no widget selected (on web it's possible). Keep editing state in `lv_obj_t` (See [here](https://github.com/lvgl/lvgl/issues/3646)). Support slider left knob focusing (see [here](https://github.com/lvgl/lvgl/issues/3246))
