@@ -718,7 +718,7 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
  * @param pos_array write the positions of the tracks here
  * @return the total size of the grid
  */
-static lv_coord_t grid_align(lv_coord_t cont_size, bool auto_size, lv_grid_align_t align, lv_coord_t gap, uint32_t track_num,
+static lv_coord_t grid_align(lv_coord_t cont_size,  bool auto_size, lv_grid_align_t align, lv_coord_t gap, uint32_t track_num,
                              lv_coord_t * size_array, lv_coord_t * pos_array, bool reverse)
 {
     lv_coord_t grid_size = 0;
