@@ -79,7 +79,7 @@ struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * dr
         draw_ctx->buf = layer_sw_ctx->base_draw.buf;
         draw_ctx->buf_area = &layer_sw_ctx->base_draw.area_act;
         draw_ctx->clip_area = &layer_sw_ctx->base_draw.area_act;
-        draw_ctx->color_format = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? LV_COLOR_FORMAT_NATIVE : LV_COLOR_FORMAT_NATIVE_ALPHA;
+        draw_ctx->color_format = flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
     }
 
     return layer_ctx;
