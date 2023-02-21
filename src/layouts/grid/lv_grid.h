@@ -169,13 +169,13 @@ static inline lv_coord_t lv_obj_get_style_grid_cell_row_span(const lv_obj_t * ob
 static inline lv_grid_align_t lv_obj_get_style_grid_cell_x_align(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_X_ALIGN);
-    return (lv_coord_t)v.num;
+    return (lv_grid_align_t)v.num;
 }
 
 static inline lv_grid_align_t lv_obj_get_style_grid_cell_y_align(const lv_obj_t * obj, uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_Y_ALIGN);
-    return (lv_coord_t)v.num;
+    return (lv_grid_align_t)v.num;
 }
 
 /**********************
