@@ -763,7 +763,8 @@ static lv_coord_t grid_align(lv_coord_t cont_size,  bool auto_size, lv_grid_alig
                 gap = (lv_coord_t)(cont_size - grid_size) / (lv_coord_t)(track_num + 1);
                 pos_array[0] = gap;
                 break;
-
+            default:
+                break;
         }
     }
 
