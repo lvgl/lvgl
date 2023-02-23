@@ -97,6 +97,8 @@ typedef enum {
     LV_EVENT_RENDER_START,
     LV_EVENT_RENDER_READY,
     LV_EVENT_RESOLUTION_CHANGED,
+    LV_EVENT_REFR_START,
+    LV_EVENT_REFR_FINISH,
 
     _LV_EVENT_LAST,               /** Number of default events*/
 

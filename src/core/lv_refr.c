@@ -304,6 +304,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
+    lv_disp_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
+
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
     volatile uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
 #endif
@@ -409,14 +411,13 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
         LV_LOG_WARN("there is no active screen");
-        REFR_TRACE("finished");
-        return;
+        goto refr_finish;
     }
 
     if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT &&
        disp_refr->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
         LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
-        return;
+        goto refr_finish;
     }
 
     lv_refr_join_area();
@@ -461,6 +462,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 #if LV_USE_DRAW_MASKS
     _lv_draw_mask_cleanup();
 #endif
+
+refr_finish:
+    lv_disp_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
 
     REFR_TRACE("finished");
 }
