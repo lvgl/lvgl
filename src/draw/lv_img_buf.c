@@ -61,7 +61,7 @@ void lv_img_buf_free(lv_img_dsc_t * dsc)
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
                                       const lv_point_t * pivot)
 {
-    if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) {
+    if(angle == 0 && zoom == LV_ZOOM_NONE) {
         res->x1 = 0;
         res->y1 = 0;
         res->x2 = w - 1;

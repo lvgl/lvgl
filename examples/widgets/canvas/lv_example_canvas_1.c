@@ -47,7 +47,7 @@ void lv_example_canvas_1(void)
     img.header.h = CANVAS_HEIGHT;
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_GREY, 3), LV_OPA_COVER);
-    lv_canvas_transform(canvas, &img, 120, LV_IMG_ZOOM_NONE, 0, 0, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, true);
+    lv_canvas_transform(canvas, &img, 120, LV_ZOOM_NONE, 0, 0, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, true);
 }
 
 #endif

@@ -471,10 +471,10 @@ static lv_res_t _lv_gpu_nxp_vglite_blit_single(lv_gpu_nxp_vglite_blit_info_t * b
     vg_lite_identity(&matrix);
     vg_lite_translate((vg_lite_float_t)blit->dst_area.x1, (vg_lite_float_t)blit->dst_area.y1, &matrix);
 
-    if((blit->angle != 0) || (blit->zoom != LV_IMG_ZOOM_NONE)) {
+    if((blit->angle != 0) || (blit->zoom != LV_ZOOM_NONE)) {
         vg_lite_translate(blit->pivot.x, blit->pivot.y, &matrix);
         vg_lite_rotate(blit->angle / 10.0f, &matrix);   /* angle is 1/10 degree */
-        scale = 1.0f * blit->zoom / LV_IMG_ZOOM_NONE;
+        scale = 1.0f * blit->zoom / LV_ZOOM_NONE;
         vg_lite_scale(scale, scale, &matrix);
         vg_lite_translate(0.0f - blit->pivot.x, 0.0f - blit->pivot.y, &matrix);
     }

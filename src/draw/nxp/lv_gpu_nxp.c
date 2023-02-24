@@ -203,7 +203,7 @@ static void lv_draw_nxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
                 blit.dst_area.y2 = blend_area.y2;
 
                 blit.opa = dsc->opa;
-                blit.zoom = LV_IMG_ZOOM_NONE;
+                blit.zoom = LV_ZOOM_NONE;
                 blit.angle = 0;
 
                 done = (lv_gpu_nxp_vglite_blit(&blit) == LV_RES_OK);
@@ -230,7 +230,7 @@ static void lv_draw_nxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
     bool recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
 #endif
 #if LV_USE_GPU_NXP_PXP
-    bool scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
+    bool scale = (dsc->zoom != LV_ZOOM_NONE);
 #endif
     bool done = false;
 

@@ -98,7 +98,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
 
     lv_area_t map_area_rot;
     lv_area_copy(&map_area_rot, coords);
-    if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
+    if(draw_dsc->angle || draw_dsc->zoom != LV_ZOOM_NONE) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
@@ -126,7 +126,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
     lv_area_t draw_area;
     lv_area_copy(&draw_area, draw_unit->clip_area);
 
-    bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
+    bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
 
     lv_area_t blend_area;
     lv_draw_sw_blend_dsc_t blend_dsc;
@@ -206,7 +206,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_area.y2 = blend_area.y1 + buf_h - 1;
 
         lv_draw_mask_res_t mask_res_def = (cf != LV_COLOR_FORMAT_NATIVE || draw_dsc->angle ||
-                                           draw_dsc->zoom != LV_IMG_ZOOM_NONE) ?
+                                           draw_dsc->zoom != LV_ZOOM_NONE) ?
                                           LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 

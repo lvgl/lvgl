@@ -671,7 +671,7 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
         scale_center.x -= indic->type_data.needle_img.pivot.x;
         scale_center.y -= indic->type_data.needle_img.pivot.y;
         lv_area_t a;
-        _lv_img_buf_get_transformed_area(&a, info.w, info.h, angle, LV_IMG_ZOOM_NONE, &indic->type_data.needle_img.pivot);
+        _lv_img_buf_get_transformed_area(&a, info.w, info.h, angle, LV_ZOOM_NONE, &indic->type_data.needle_img.pivot);
         a.x1 += scale_center.x - 2;
         a.y1 += scale_center.y - 2;
         a.x2 += scale_center.x + 2;
