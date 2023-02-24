@@ -52,9 +52,15 @@ typedef enum {
 
     /**
      * The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer.
-     * This way the buffer always contain the whole image.
+     * This way the buffer always contain the whole image. Only the changed ares will be updated.
+     * With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
      */
     LV_DISP_RENDER_MODE_DIRECT,
+
+    /**
+     * Always redraw the whole screen even if only one pixel has been changed.
+     * With 2 buffers in flush_cb only and address change is required.
+     */
     LV_DISP_RENDER_MODE_FULL,
 } lv_disp_render_mode_t;
 
