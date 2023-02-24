@@ -99,6 +99,23 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Sets the padding between the columns. Used by the layouts."},
 
+{'section': 'Margin', 'dsc' : "Properties to describe spacing around an object. Very similar to the margin properties in HTML."},
+{'name': 'MARGIN_TOP',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Sets the margin on the top. The object will keep this space from its siblings in layouts. "},
+
+{'name': 'MARGIN_BOTTOM',
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Sets the margin on the bottom. The object will keep this space from its siblings in layouts."},
+
+{'name': 'MARGIN_LEFT',
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Sets the margin on the left. The object will keep this space from its siblings in layouts."},
+
+{'name': 'MARGIN_RIGHT',
+  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Sets the margin on the right. The object will keep this space from its siblings in layouts."},
+
 {'section': 'Background', 'dsc':'Properties to describe the background color and image of the objects.' },
 {'name': 'BG_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t', 'default':'`0xffffff`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
@@ -481,6 +498,9 @@ def docs(p):
 base_dir = os.path.abspath(os.path.dirname(__file__))
 sys.stdout = open(base_dir + '/../src/core/lv_obj_style_gen.h', 'w')
 
+print("#include \"../misc/lv_area.h\"")
+print("#include \"../misc/lv_style.h\"")
+print("#include \"../core/lv_obj_style.h\"")
 for p in props:
   obj_style_get(p)
 

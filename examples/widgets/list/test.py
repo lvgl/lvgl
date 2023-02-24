@@ -3,7 +3,7 @@ import lvgl as lv
 import display_driver
 def event_handler(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED:
             print("Clicked: list1." + list1.get_btn_text(obj))
 

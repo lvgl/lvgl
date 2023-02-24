@@ -10,13 +10,13 @@ class Temperature:
         return f"{self.value} °C"
 
 def slider_event_cb(e):
-    slider = e.get_target()
+    slider = e.get_target_obj()
     v = slider.get_value()
     # Notify all subscribers (only the label now) that the slider value has been changed
     lv.msg_send(MSG_NEW_TEMPERATURE, Temperature(v))
 
 def label_event_cb(e):
-    label = e.get_target()
+    label = e.get_target_obj()
     msg = e.get_msg()
     # Respond only to MSG_NEW_TEMPERATURE message
     if msg.get_id() == MSG_NEW_TEMPERATURE:

@@ -1,6 +1,6 @@
-def event_handler(evt):
-    code = evt.get_code()
-    obj  = evt.get_target()
+def event_handler(e):
+    code = e.get_code()
+    obj  = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED :
         id = obj.get_selected_btn()

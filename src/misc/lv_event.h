@@ -93,10 +93,12 @@ typedef enum {
     LV_EVENT_MSG_RECEIVED,
 #endif
 
-    LV_DISP_EVENT_INVALIDATE_AREA,
-    LV_DISP_EVENT_RENDER_START,
-    LV_DISP_EVENT_RENDER_READY,
-    LV_DISP_EVENT_RESOLUTION_CHANGED,
+    LV_EVENT_INVALIDATE_AREA,
+    LV_EVENT_RENDER_START,
+    LV_EVENT_RENDER_READY,
+    LV_EVENT_RESOLUTION_CHANGED,
+    LV_EVENT_REFR_START,
+    LV_EVENT_REFR_FINISH,
 
     _LV_EVENT_LAST,               /** Number of default events*/
 
@@ -139,7 +141,6 @@ void _lv_event_push(lv_event_t * e);
 void _lv_event_pop(lv_event_t * e);
 
 lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess);
-
 
 void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
 

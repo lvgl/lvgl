@@ -12,6 +12,7 @@
 
 #include "lv_theme_default.h"
 #include "../../misc/lv_gc.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -198,8 +199,8 @@ static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color
 static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t color, lv_opa_t opa)
 {
     LV_UNUSED(f);
-    if(theme.flags & MODE_DARK) return lv_color_mix(lv_palette_darken(LV_PALETTE_GREY, 2), color, opa);
-    else return lv_color_mix(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
+    if(theme.flags & MODE_DARK) return LV_COLOR_MIX(lv_palette_darken(LV_PALETTE_GREY, 2), color, opa);
+    else return LV_COLOR_MIX(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
 }
 
 static void style_init(void)

@@ -188,7 +188,6 @@ typedef struct _lv_obj_t {
     uint16_t w_layout   : 1;
 } lv_obj_t;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

@@ -34,6 +34,9 @@ bool lv_test_assert_img_eq(const char * fn_ref);
 #  define TEST_ASSERT_EQUAL_COLOR(c1, c2)                   TEST_ASSERT_EQUAL_UINT32(lv_color_to_int(c1), lv_color_to_int(c2))
 #  define TEST_ASSERT_EQUAL_COLOR_MESSAGE(c1, c2, msg)      TEST_ASSERT_EQUAL_UINT32_MESSAGE(c1.full, c2.full, msg)
 
+#  define TEST_ASSERT_EQUAL_COLOR32(c1, c2)                   TEST_ASSERT_EQUAL_UINT32(lv_color32_to_int(c1), lv_color32_to_int(c2))
+#  define TEST_ASSERT_EQUAL_COLOR32_MESSAGE(c1, c2, msg)      TEST_ASSERT_EQUAL_UINT32_MESSAGE(c1.full, c2.full, msg)
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

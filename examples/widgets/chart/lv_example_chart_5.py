@@ -44,13 +44,13 @@ ecg_sample = [
 
 def slider_x_event_cb(e):
 
-    slider = e.get_target()
+    slider = e.get_target_obj()
     v = slider.get_value()
     chart.set_zoom_x(v)
 
 def slider_y_event_cb(e):
 
-    slider = e.get_target()
+    slider = e.get_target_obj()
     v = slider.get_value()
     chart.set_zoom_y(v)
 

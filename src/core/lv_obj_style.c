@@ -10,6 +10,7 @@
 #include "lv_disp.h"
 #include "lv_disp_private.h"
 #include "../misc/lv_gc.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -106,6 +107,51 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     obj->styles[i].selector = selector;
 
     lv_obj_refresh_style(obj, selector, LV_STYLE_PROP_ANY);
+}
+
+bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, const lv_style_t * new_style,
+                          lv_style_selector_t selector)
+{
+    lv_state_t state = lv_obj_style_get_selector_state(selector);
+    lv_part_t part = lv_obj_style_get_selector_part(selector);
+
+    /*All objects must exist*/
+    if(!obj || !old_style || !new_style || (old_style == new_style)) {
+        return false;
+    }
+
+    /*Similar to lv_obj_add_style, delete transition*/
+    trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
+
+    bool replaced = false;
+    uint32_t i;
+    for(i = 0; i < obj->style_cnt; i++) {
+        lv_state_t state_act = lv_obj_style_get_selector_state(obj->styles[i].selector);
+        lv_part_t part_act = lv_obj_style_get_selector_part(obj->styles[i].selector);
+
+        /*Skip local styles and transitions*/
+        if(obj->styles[i].is_local || obj->styles[i].is_trans) {
+            continue;
+        }
+
+        /*Skip non-matching styles*/
+        if((state != LV_STATE_ANY && state_act != state) ||
+           (part != LV_PART_ANY && part_act != part) ||
+           (old_style != obj->styles[i].style)) {
+            continue;
+        }
+
+        lv_memzero(&obj->styles[i], sizeof(_lv_obj_style_t));
+        obj->styles[i].style = new_style;
+        obj->styles[i].selector = selector;
+
+        replaced = true;
+        /*Don't break and continue replacing other occurrences*/
+    }
+    if(replaced) {
+        lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ANY);
+    }
+    return replaced;
 }
 
 void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
@@ -771,7 +817,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
             case LV_STYLE_IMG_RECOLOR:
                 if(v <= 0) value_final.color = tr->start_value.color;
                 else if(v >= 255) value_final.color = tr->end_value.color;
-                else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
+                else value_final.color = LV_COLOR_MIX(tr->end_value.color, tr->start_value.color, v);
                 break;
 
             default:

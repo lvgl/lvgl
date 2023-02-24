@@ -23,7 +23,7 @@ class ScrollExample_3():
 
     def float_btn_event_cb(self,e,list):
         code = e.get_code()
-        float_btn = e.get_target()
+        float_btn = e.get_target_obj()
 
         if code == lv.EVENT.CLICKED:
             list_btn = list.add_btn(lv.SYMBOL.AUDIO, "Track {:d}".format(self.btn_cnt))

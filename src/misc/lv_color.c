@@ -8,6 +8,7 @@
  *********************/
 #include "lv_color.h"
 #include "lv_log.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -528,12 +529,12 @@ void lv_color_from_native_alpha(const uint8_t * src_buf, uint8_t * dest_buf, lv_
 
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl)
 {
-    return lv_color_mix(lv_color_white(), c, lvl);
+    return LV_COLOR_MIX(lv_color_white(), c, lvl);
 }
 
 lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl)
 {
-    return lv_color_mix(lv_color_black(), c, lvl);
+    return LV_COLOR_MIX(lv_color_black(), c, lvl);
 }
 
 lv_color_t lv_color_change_lightness(lv_color_t c, lv_opa_t lvl)

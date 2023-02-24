@@ -12,6 +12,7 @@
 #include "../../misc/lv_math.h"
 #include "../../core/lv_disp.h"
 #include "../../core/lv_refr.h"
+#include LV_COLOR_EXTERN_INCLUDE
 
 /*********************
  *      DEFINES
@@ -59,14 +60,14 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
  **********************/
 #define FILL_NORMAL_MASK_PX(color)                                                          \
     if(*mask == LV_OPA_COVER) *dest_buf = color;                                 \
-    else *dest_buf = lv_color_mix(color, *dest_buf, *mask);            \
+    else *dest_buf = LV_COLOR_MIX(color, *dest_buf, *mask);            \
     mask++;                                                         \
     dest_buf++;
 
 #define MAP_NORMAL_MASK_PX(x)                                                          \
     if(*mask_tmp_x) {          \
         if(*mask_tmp_x == LV_OPA_COVER) dest_buf[x] = src_buf[x];                                 \
-        else dest_buf[x] = lv_color_mix(src_buf[x], dest_buf[x], *mask_tmp_x);            \
+        else dest_buf[x] = LV_COLOR_MIX(src_buf[x], dest_buf[x], *mask_tmp_x);            \
     }                                                                                               \
     mask_tmp_x++;
 
@@ -179,7 +180,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
         /*Has opacity*/
         else {
             lv_color_t last_dest_color = lv_color_black();
-            lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
+            lv_color_t last_res_color = LV_COLOR_MIX(color, last_dest_color, opa);
 
 #if LV_COLOR_MIX_ROUND_OFS == 0 && LV_COLOR_DEPTH == 16
             /*lv_color_mix work with an optimized algorithm with 16 bit color depth.
@@ -190,14 +191,14 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
 #endif
 
             uint16_t color_premult[3];
-            lv_color_premult(color, opa, color_premult);
+            LV_COLOR_PREMULT(color, opa, color_premult);
             lv_opa_t opa_inv = 255 - opa;
 
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     if(!lv_color_eq(last_dest_color, dest_buf[x])) {
                         last_dest_color = dest_buf[x];
-                        last_res_color = lv_color_mix_premult(color_premult, dest_buf[x], opa_inv);
+                        last_res_color = LV_COLOR_MIX_PREMULT(color_premult, dest_buf[x], opa_inv);
                     }
                     dest_buf[x] = last_res_color;
                 }
@@ -279,7 +280,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(lv_color_t * dest_buf, const lv_ar
                                                              (uint32_t)((uint32_t)(*mask) * opa) >> 8;
                         if(*mask != last_mask || !lv_color_eq(last_dest_color, dest_buf[x])) {
                             if(opa_tmp == LV_OPA_COVER) last_res_color = color;
-                            else last_res_color = lv_color_mix(color, dest_buf[x], opa_tmp);
+                            else last_res_color = LV_COLOR_MIX(color, dest_buf[x], opa_tmp);
                             last_mask = *mask;
                             last_dest_color = dest_buf[x];
                         }
@@ -541,7 +542,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
         else {
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
-                    dest_buf[x] = lv_color_mix(src_buf[x], dest_buf[x], opa);
+                    dest_buf[x] = LV_COLOR_MIX(src_buf[x], dest_buf[x], opa);
                 }
                 dest_buf += dest_stride;
                 src_buf += src_stride;
@@ -601,7 +602,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(lv_color_t * dest_buf, const lv_are
                 for(x = 0; x < w; x++) {
                     if(mask[x]) {
                         lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : ((opa * mask[x]) >> 8);
-                        dest_buf[x] = lv_color_mix(src_buf[x], dest_buf[x], opa_tmp);
+                        dest_buf[x] = LV_COLOR_MIX(src_buf[x], dest_buf[x], opa_tmp);
                     }
                 }
                 dest_buf += dest_stride;
@@ -840,7 +841,7 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
 #endif
 
     if(opa == LV_OPA_COVER) return fg;
-    else return lv_color_mix(fg, bg, opa);
+    else return LV_COLOR_MIX(fg, bg, opa);
 }
 
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
@@ -859,7 +860,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 
     if(opa == LV_OPA_COVER) return fg;
 
-    return lv_color_mix(fg, bg, opa);
+    return LV_COLOR_MIX(fg, bg, opa);
 }
 
 static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
@@ -882,5 +883,5 @@ static inline lv_color_t color_blend_true_color_multiply(lv_color_t fg, lv_color
 
     if(opa == LV_OPA_COVER) return fg;
 
-    return lv_color_mix(fg, bg, opa);
+    return LV_COLOR_MIX(fg, bg, opa);
 }

@@ -66,7 +66,7 @@ indic_min = meter.add_needle_img(img_hand_min_dsc, 5, 5)
 indic_hour = meter.add_needle_img(img_hand_hour_dsc, 5, 5)
 
 #Add an event to set the numbers of hours
-meter.add_event_cb(tick_label_event, lv.EVENT.DRAW_PART_BEGIN, None)
+meter.add_event(tick_label_event, lv.EVENT.DRAW_PART_BEGIN, None)
 
 # Create an animation to set the value
 a1 = lv.anim_t()

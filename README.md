@@ -47,7 +47,6 @@ SquareLine Studio is a professional yet affordable drag and drop UI editor for L
 **Services**<br>
 Our team is ready to help you with graphics design, UI implementation and consulting services. Contact us if you need some support during the development of your next GUI project.
 
-
 ## :rocket: Features
 
 **Free and Portable**
@@ -257,7 +256,7 @@ lv_obj_add_event(cb, event_handler, LV_EVENT_ALL, NULL);
 ```python
 def event_handler(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     if code == lv.EVENT.VALUE_CHANGED:
         txt = obj.get_text()
         if obj.get_state() & lv.STATE.CHECKED:

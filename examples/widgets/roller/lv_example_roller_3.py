@@ -56,7 +56,7 @@ class Lv_Roller_3():
     def mask_event_cb(self,e):
 
         code = e.get_code()
-        obj = e.get_target()
+        obj = e.get_target_obj()
 
         if code == lv.EVENT.COVER_CHECK:
             e.set_cover_res(lv.COVER_RES.MASKED)

@@ -260,6 +260,35 @@
     #endif
 #endif
 
+#ifndef LV_COLOR_EXTERN_INCLUDE
+    #ifdef CONFIG_LV_COLOR_EXTERN_INCLUDE
+        #define LV_COLOR_EXTERN_INCLUDE CONFIG_LV_COLOR_EXTERN_INCLUDE
+    #else
+        #define LV_COLOR_EXTERN_INCLUDE <stdint.h>
+    #endif
+#endif
+#ifndef LV_COLOR_MIX
+    #ifdef CONFIG_LV_COLOR_MIX
+        #define LV_COLOR_MIX CONFIG_LV_COLOR_MIX
+    #else
+        #define LV_COLOR_MIX      lv_color_mix
+    #endif
+#endif
+#ifndef LV_COLOR_PREMULT
+    #ifdef CONFIG_LV_COLOR_PREMULT
+        #define LV_COLOR_PREMULT CONFIG_LV_COLOR_PREMULT
+    #else
+        #define LV_COLOR_PREMULT      lv_color_premult
+    #endif
+#endif
+#ifndef LV_COLOR_MIX_PREMULT
+    #ifdef CONFIG_LV_COLOR_MIX_PREMULT
+        #define LV_COLOR_MIX_PREMULT CONFIG_LV_COLOR_MIX_PREMULT
+    #else
+        #define LV_COLOR_MIX_PREMULT      lv_color_mix_premult
+    #endif
+#endif
+
 /*====================
    HAL SETTINGS
  *====================*/
@@ -297,6 +326,9 @@
             #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
         #endif
     #endif
+    /*If using lvgl as ESP32 component*/
+    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
 #endif   /*LV_TICK_CUSTOM*/
 
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
@@ -733,6 +765,17 @@
             #define LV_LOG_TRACE_ANIM       1
         #endif
     #endif
+	#ifndef LV_LOG_TRACE_MSG
+	    #ifdef _LV_KCONFIG_PRESENT
+	        #ifdef CONFIG_LV_LOG_TRACE_MSG
+	            #define LV_LOG_TRACE_MSG CONFIG_LV_LOG_TRACE_MSG
+	        #else
+	            #define LV_LOG_TRACE_MSG 0
+	        #endif
+	    #else
+	        #define LV_LOG_TRACE_MSG		1
+	    #endif
+	#endif
 
 #endif  /*LV_USE_LOG*/
 
@@ -2162,6 +2205,15 @@
     #endif
 #endif
 
+/*Barcode code library*/
+#ifndef LV_USE_BARCODE
+    #ifdef CONFIG_LV_USE_BARCODE
+        #define LV_USE_BARCODE CONFIG_LV_USE_BARCODE
+    #else
+        #define LV_USE_BARCODE 0
+    #endif
+#endif
+
 /*FreeType library*/
 #ifndef LV_USE_FREETYPE
     #ifdef CONFIG_LV_USE_FREETYPE
@@ -2600,6 +2652,15 @@
         #else
             #define LV_DEMO_MUSIC_AUTO_PLAY 0
         #endif
+    #endif
+#endif
+
+/*Flex layout demo*/
+#ifndef LV_USE_DEMO_FLEX_LAYOUT
+    #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
+        #define LV_USE_DEMO_FLEX_LAYOUT CONFIG_LV_USE_DEMO_FLEX_LAYOUT
+    #else
+        #define LV_USE_DEMO_FLEX_LAYOUT 0
     #endif
 #endif
 

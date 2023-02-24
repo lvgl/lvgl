@@ -11,6 +11,9 @@ The Line object is capable of drawing straight lines between a set of points.
 ### Set points
 The points have to be stored in an `lv_point_t` array and passed to the object by the `lv_line_set_points(lines, point_array, point_cnt)` function.
 
+Their coordinates can either be specified as raw pixel coordinates (e.g. `{5, 10}`), or as a percentage of the line's bounding box using `LV_PCT(x)`. In the latter case, the line's width/height may need to be set explicitly using
+`lv_obj_set_width/height`, as percentage values do not automatically expand the bounding box.
+
 ### Auto-size
 By default, the Line's width and height are set to `LV_SIZE_CONTENT`. This means it will automatically set its size to fit all the points. If the size is set explicitly, parts on the line may not be visible.
 

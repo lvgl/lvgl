@@ -12,7 +12,7 @@ cbuf = bytearray((LV_COLOR_SIZE // 8) * CANVAS_WIDTH * CANVAS_HEIGHT)
 
 # Create a canvas and initialize its palette
 canvas = lv.canvas(lv.scr_act())
-canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.img.CF.TRUE_COLOR)
+canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 canvas.fill_bg(lv.color_hex3(0xccc), lv.OPA.COVER)
 canvas.center()
 
@@ -27,7 +27,7 @@ dsc.round_start = 1
 p = [ {"x":15,"y":15},
       {"x":35,"y":10},
       {"x":10,"y":40} ]
-      
+
 canvas.draw_line(p, 3, dsc)
 
 

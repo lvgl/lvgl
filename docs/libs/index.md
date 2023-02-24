@@ -14,6 +14,7 @@
    freetype
    tiny_ttf
    qrcode
+   barcode
    rlottie
    ffmpeg
 ```

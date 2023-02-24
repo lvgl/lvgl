@@ -72,6 +72,11 @@
 #define LV_STRLEN       lv_strlen_builtin
 #define LV_STRNCPY      lv_strncpy_builtin
 
+#define LV_COLOR_EXTERN_INCLUDE <stdint.h>
+#define LV_COLOR_MIX      lv_color_mix
+#define LV_COLOR_PREMULT      lv_color_premult
+#define LV_COLOR_MIX_PREMULT      lv_color_mix_premult
+
 /*====================
    HAL SETTINGS
  *====================*/
@@ -85,6 +90,9 @@
 #if LV_TICK_CUSTOM
     #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
     #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+    /*If using lvgl as ESP32 component*/
+    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
 #endif   /*LV_TICK_CUSTOM*/
 
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
@@ -245,6 +253,7 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
+	#define LV_LOG_TRACE_MSG		1
 
 #endif  /*LV_USE_LOG*/
 
@@ -636,6 +645,9 @@
 /*QR code library*/
 #define LV_USE_QRCODE 0
 
+/*Barcode code library*/
+#define LV_USE_BARCODE 0
+
 /*FreeType library*/
 #define LV_USE_FREETYPE 0
 #if LV_USE_FREETYPE
@@ -791,6 +803,8 @@
     #define LV_DEMO_MUSIC_AUTO_PLAY 0
 #endif
 
+/*Flex layout demo*/
+#define LV_USE_DEMO_FLEX_LAYOUT 0
 
 /*--END OF LV_CONF_H--*/
 

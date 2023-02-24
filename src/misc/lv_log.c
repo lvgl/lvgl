@@ -23,7 +23,7 @@
  *********************/
 
 #if LV_LOG_USE_TIMESTAMP
-    #define LOG_TIMESTAMP_FMT  "\t(%" LV_PRId32 ".%03" LV_PRId32 ", +%" LV_PRId32 ")\t"
+    #define LOG_TIMESTAMP_FMT  "\t(%" LV_PRIu32 ".%03" LV_PRIu32 ", +%" LV_PRIu32 ")\t"
     #define LOG_TIMESTAMP_EXPR t / 1000, t % 1000, t - last_log_time,
 #else
     #define LOG_TIMESTAMP_FMT

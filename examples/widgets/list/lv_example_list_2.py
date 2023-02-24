@@ -3,10 +3,10 @@ import urandom
 currentButton = None
 list1 = None
 
-def event_handler(evt):
+def event_handler(e):
     global currentButton
-    code = evt.get_code()
-    obj = evt.get_target()
+    code = e.get_code()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED:
         if currentButton == obj:
             currentButton = None
@@ -20,20 +20,20 @@ def event_handler(evt):
             else:
                 child.clear_state(lv.STATE.CHECKED)
 
-def event_handler_top(evt):
+def event_handler_top(e):
     global currentButton
-    code = evt.get_code()
-    obj = evt.get_target()
+    code = e.get_code()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED:
         if currentButton == None:
             return
         currentButton.move_background()
         currentButton.scroll_to_view( lv.ANIM.ON)
 
-def event_handler_up(evt):
+def event_handler_up(e):
     global currentButton
-    code = evt.get_code()
-    obj = evt.get_target()
+    code = e.get_code()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED or code == lv.EVENT.LONG_PRESSED_REPEAT:
         if currentButton == None:
             return
@@ -43,10 +43,10 @@ def event_handler_up(evt):
         currentButton.move_to_index(index - 1)
         currentButton.scroll_to_view(lv.ANIM.ON)
 
-def event_handler_center(evt):
+def event_handler_center(e):
     global currentButton
-    code = evt.get_code()
-    obj = evt.get_target()
+    code = e.get_code()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED or code == lv.EVENT.LONG_PRESSED_REPEAT:
         if currentButton == None:
             return
@@ -55,10 +55,10 @@ def event_handler_center(evt):
         currentButton.move_to_index(pos)
         currentButton.scroll_to_view(lv.ANIM.ON)
 
-def event_handler_dn(evt):
+def event_handler_dn(e):
     global currentButton
-    code = evt.get_code()
-    obj = evt.get_target()
+    code = e.get_code()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED or code == lv.EVENT.LONG_PRESSED_REPEAT:
         if currentButton == None:
             return
@@ -66,21 +66,21 @@ def event_handler_dn(evt):
         currentButton.move_to_index(index + 1)
         currentButton.scroll_to_view(lv.ANIM.ON)
 
-def event_handler_bottom(evt):
+def event_handler_bottom(e):
     global currentButton
-    code = evt.get_code()
-    obj = evt.get_target()
+    code = e.get_code()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED or code == lv.EVENT.LONG_PRESSED_REPEAT:
         if currentButton == None:
             return
         currentButton.move_foreground()
         currentButton.scroll_to_view(lv.ANIM.ON)
 
-def event_handler_swap(evt):
+def event_handler_swap(e):
     global currentButton
     global list1
-    code = evt.get_code()
-    obj = evt.get_target()
+    code = e.get_code()
+    obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED:
         cnt = list1.get_child_cnt()
         for i in range(100):

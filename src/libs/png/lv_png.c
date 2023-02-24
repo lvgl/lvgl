@@ -27,7 +27,7 @@
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
-static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
+static void convert_color_depth(uint8_t ** img_p, uint32_t px_cnt);
 
 /**********************
  *  STATIC VARIABLES
@@ -157,11 +157,14 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         if(strcmp(lv_fs_get_ext(fn), "png") == 0) {              /*Check the extension*/
 
             /*Load the PNG file into buffer. It's still compressed (not decoded)*/
-            unsigned char * png_data;      /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
-            size_t png_data_size;          /*Size of `png_data` in bytes*/
+            unsigned char * png_data = NULL;    /*Pointer to the loaded data. Same as the original file just loaded into the RAM*/
+            size_t png_data_size;               /*Size of `png_data` in bytes*/
 
             error = lodepng_load_file(&png_data, &png_data_size, fn);   /*Load the file*/
             if(error) {
+                if(png_data != NULL) {
+                    lv_free(png_data);
+                }
                 LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
             }
@@ -182,7 +185,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
             }
 
             /*Convert the image to the system's color depth*/
-            convert_color_depth(img_data,  png_width * png_height);
+            convert_color_depth(&img_data,  png_width * png_height);
             dsc->img_data = img_data;
             return LV_RES_OK;     /*The image is fully decoded. Return with its pointer*/
         }
@@ -204,7 +207,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         }
 
         /*Convert the image to the system's color depth*/
-        convert_color_depth(img_data,  png_width * png_height);
+        convert_color_depth(&img_data,  png_width * png_height);
 
         dsc->img_data = img_data;
         return LV_RES_OK;     /*Return with its pointer*/
@@ -230,12 +233,14 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
  * @param img the ARGB888 image
  * @param px_cnt number of pixels in `img`
  */
-static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
+static void convert_color_depth(uint8_t ** img_p, uint32_t px_cnt)
 {
+    uint8_t * img = *img_p;
+
 #if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     lv_color32_t * img_argb = (lv_color32_t *)img;
     lv_color_t c;
-    lv_color_t * img_c = (lv_color_t *) img;
+    lv_color_t * img_c = (lv_color_t *)img;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
         c = lv_color_make(img_argb[i].red, img_argb[i].green, img_argb[i].blue);
@@ -261,6 +266,11 @@ static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
         img[i * 2 + 1] = img_argb[i].alpha;
         img[i * 2 + 0] = lv_color_to_int(c);
     }
+#endif
+
+#if LV_COLOR_DEPTH != 32
+    /*Reallocate memory to reduce memory usage*/
+    *img_p = lv_realloc(img, LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE * px_cnt);
 #endif
 }
 

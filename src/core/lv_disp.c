@@ -926,7 +926,7 @@ static void update_resolution(lv_disp_t * disp)
 
     lv_obj_tree_walk(NULL, invalidate_layout_cb, NULL);
 
-    lv_disp_send_event(disp, LV_DISP_EVENT_RESOLUTION_CHANGED, NULL);
+    lv_disp_send_event(disp, LV_EVENT_RESOLUTION_CHANGED, NULL);
 }
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)

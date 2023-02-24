@@ -1,7 +1,7 @@
 def sw_event_cb(e,panel):
 
     code = e.get_code()
-    sw = e.get_target()
+    sw = e.get_target_obj()
 
     if code == lv.EVENT.VALUE_CHANGED:
 

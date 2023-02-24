@@ -20,8 +20,6 @@ extern "C" {
 #include "lv_img_decoder.h"
 #include "lv_img_cache.h"
 
-#include "lv_draw_layer.h"
-
 /*********************
  *      DEFINES
  *********************/

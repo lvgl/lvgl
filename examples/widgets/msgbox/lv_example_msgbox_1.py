@@ -1,5 +1,5 @@
 def event_cb(e):
-    mbox = e.get_current_target()
+    mbox = e.get_target_obj()
     print("Button %s clicked" % mbox.get_active_btn_text())
 
 btns = ["Apply", "Close", ""]

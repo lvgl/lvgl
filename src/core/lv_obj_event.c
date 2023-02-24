@@ -1,5 +1,5 @@
 /**
- * @file lv_event.c
+ * @file lv_obj_event.c
  *
  */
 

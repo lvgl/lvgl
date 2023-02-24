@@ -13,7 +13,7 @@ img_star_argb = lv.img_dsc_t({
 
 def event_cb(e):
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     if code == lv.EVENT.DRAW_PART_BEGIN:
         # Change the draw descriptor the 2nd button

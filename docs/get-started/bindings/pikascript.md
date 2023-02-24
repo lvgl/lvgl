@@ -139,7 +139,7 @@ void pika_lvgl_arc_set_angles(PikaObj *self, int start, int end){
 To use the module, just `import pika_lvgl` and the precompiler will automatically scan main.py and bind the `pika_lvgl` module
 
 ```
-$ ./rust-msc-latest-win10.exe 
+$ ./rust-msc-latest-win10.exe
 (pikascript) packages installed:
     pikascript-core==v1.10.0
     PikaStdLib==v1.10.0

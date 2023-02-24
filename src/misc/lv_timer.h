@@ -172,6 +172,16 @@ uint8_t lv_timer_get_idle(void);
  */
 lv_timer_t * lv_timer_get_next(lv_timer_t * timer);
 
+/**
+ * Get the user_data passed when the timer was created
+ * @param timer pointer to the lv_timer
+ * @return pointer to the user_data
+ */
+static inline void * lv_timer_get_user_data(lv_timer_t * timer)
+{
+    return timer->user_data;
+}
+
 /**********************
  *      MACROS
  **********************/

@@ -12,7 +12,7 @@ img_caret_down_argb = lv.img_dsc_t({
 })
 
 def event_cb(e):
-    dropdown = e.get_target()
+    dropdown = e.get_target_obj()
     option = " "*64 # should be large enough to store the option
     dropdown.get_selected_str(option, len(option))
     print(option.strip() +" is selected")

@@ -166,8 +166,6 @@ void lv_img_set_offset_x(lv_obj_t * obj, lv_coord_t x)
 
     lv_img_t * img = (lv_img_t *)obj;
 
-    x = x % img->w;
-
     img->offset.x = x;
     lv_obj_invalidate(obj);
 }
@@ -178,15 +176,14 @@ void lv_img_set_offset_y(lv_obj_t * obj, lv_coord_t y)
 
     lv_img_t * img = (lv_img_t *)obj;
 
-    y = y % img->h;
-
     img->offset.y = y;
     lv_obj_invalidate(obj);
 }
 
 void lv_img_set_angle(lv_obj_t * obj, int16_t angle)
 {
-    if(angle < 0 || angle >= 3600) angle = angle % 3600;
+    while(angle >= 3600) angle -= 3600;
+    while(angle < 0) angle += 3600;
 
     lv_img_t * img = (lv_img_t *)obj;
     if(angle == img->angle) return;
@@ -660,12 +657,14 @@ static void draw_img(lv_event_t * e)
                 draw_ctx->clip_area = img_clip_area;
 
                 lv_area_t coords_tmp;
-                coords_tmp.y1 = img_max_area.y1 + img->offset.y;
+                lv_coord_t offset_x = img->offset.x % img->w;
+                lv_coord_t offset_y = img->offset.y % img->h;
+                coords_tmp.y1 = img_max_area.y1 + offset_y;
                 if(coords_tmp.y1 > img_max_area.y1) coords_tmp.y1 -= img->h;
                 coords_tmp.y2 = coords_tmp.y1 + img->h - 1;
 
                 for(; coords_tmp.y1 < img_max_area.y2; coords_tmp.y1 += img_size_final.y, coords_tmp.y2 += img_size_final.y) {
-                    coords_tmp.x1 = img_max_area.x1 + img->offset.x;
+                    coords_tmp.x1 = img_max_area.x1 + offset_x;
                     if(coords_tmp.x1 > img_max_area.x1) coords_tmp.x1 -= img->w;
                     coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 

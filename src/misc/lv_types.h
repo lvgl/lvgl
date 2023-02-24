@@ -49,14 +49,17 @@ typedef uint8_t lv_res_t;
 #if defined(__cplusplus) || __STDC_VERSION__ >= 199901L
 // If c99 or newer,  use the definition of uintptr_t directly from <stdint.h>
 typedef uintptr_t lv_uintptr_t;
+typedef intptr_t lv_intptr_t;
 
 #else
 
 // Otherwise, use the arch size determination
 #ifdef LV_ARCH_64
 typedef uint64_t lv_uintptr_t;
+typedef int64_t lv_intptr_t;
 #else
 typedef uint32_t lv_uintptr_t;
+typedef int32_t lv_intptr_t;
 #endif
 
 #endif

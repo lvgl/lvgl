@@ -1,5 +1,5 @@
 def event_cb(e):
-    obj = e.get_target()
+    obj = e.get_target_obj()
     id = obj.get_selected_btn()
     if id == 0:
         prev = True

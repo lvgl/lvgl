@@ -202,6 +202,10 @@ enum {
     LV_STYLE_PAD_COLUMN             = 21,
     LV_STYLE_BASE_DIR               = 22,
     LV_STYLE_CLIP_CORNER            = 23,
+    LV_STYLE_MARGIN_TOP             = 24,
+    LV_STYLE_MARGIN_BOTTOM          = 25,
+    LV_STYLE_MARGIN_LEFT            = 26,
+    LV_STYLE_MARGIN_RIGHT           = 27,
 
     /*Group 2*/
     LV_STYLE_BG_COLOR               = 32,

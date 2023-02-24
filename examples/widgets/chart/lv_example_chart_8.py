@@ -1,4 +1,3 @@
-import display_driver
 import lvgl as lv
 
 # A class is used to keep track of the series list because later we
@@ -15,7 +14,7 @@ stacked_area_chart = StackedAreaChart()
 #
 def draw_event_cb(e):
 
-    obj = e.get_target()
+    obj = e.get_target_obj()
     cont_a = lv.area_t()
     obj.get_coords(cont_a)
 

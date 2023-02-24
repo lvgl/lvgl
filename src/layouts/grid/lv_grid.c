@@ -53,7 +53,8 @@ static void calc_free(_lv_grid_calc_t * calc);
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c);
 static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c);
 static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t * hint);
-static lv_coord_t grid_align(lv_coord_t cont_size,  bool auto_size, uint8_t align, lv_coord_t gap, uint32_t track_num,
+static lv_coord_t grid_align(lv_coord_t cont_size, bool auto_size, lv_grid_align_t align, lv_coord_t gap,
+                             uint32_t track_num,
                              lv_coord_t * size_array, lv_coord_t * pos_array, bool reverse);
 static uint32_t count_tracks(const lv_coord_t * templ);
 
@@ -65,37 +66,47 @@ static inline const lv_coord_t * get_row_dsc(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_row_dsc_array(obj, 0);
 }
-static inline uint8_t get_col_pos(lv_obj_t * obj)
+static inline lv_coord_t get_col_pos(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_column_pos(obj, 0);
 }
-static inline uint8_t get_row_pos(lv_obj_t * obj)
+static inline lv_coord_t get_row_pos(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_row_pos(obj, 0);
 }
-static inline uint8_t get_col_span(lv_obj_t * obj)
+static inline lv_coord_t get_col_span(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_column_span(obj, 0);
 }
-static inline uint8_t get_row_span(lv_obj_t * obj)
+static inline lv_coord_t get_row_span(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_row_span(obj, 0);
 }
-static inline uint8_t get_cell_col_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_cell_col_align(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_x_align(obj, 0);
 }
-static inline uint8_t get_cell_row_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_cell_row_align(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_cell_y_align(obj, 0);
 }
-static inline uint8_t get_grid_col_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_grid_col_align(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_column_align(obj, 0);
 }
-static inline uint8_t get_grid_row_align(lv_obj_t * obj)
+static inline lv_grid_align_t get_grid_row_align(lv_obj_t * obj)
 {
     return lv_obj_get_style_grid_row_align(obj, 0);
+}
+static inline lv_coord_t get_margin_hor(lv_obj_t * obj)
+{
+    return lv_obj_get_style_margin_left(obj, LV_PART_MAIN)
+           + lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+}
+static inline lv_coord_t get_margin_ver(lv_obj_t * obj)
+{
+    return lv_obj_get_style_margin_top(obj, LV_PART_MAIN)
+           + lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 }
 
 /**********************
@@ -162,8 +173,8 @@ void lv_obj_set_grid_align(lv_obj_t * obj, lv_grid_align_t column_align, lv_grid
 
 }
 
-void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t x_align, uint8_t col_pos, uint8_t col_span,
-                          lv_grid_align_t y_align, uint8_t row_pos, uint8_t row_span)
+void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t x_align, lv_coord_t col_pos, lv_coord_t col_span,
+                          lv_grid_align_t y_align, lv_coord_t row_pos, lv_coord_t row_span)
 
 {
     lv_obj_set_style_grid_cell_column_pos(obj, col_pos, 0);
@@ -242,7 +253,7 @@ void lv_style_set_grid_cell_row_span(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_GRID_CELL_ROW_SPAN, v);
 }
 
-void lv_style_set_grid_cell_x_align(lv_style_t * style, lv_coord_t value)
+void lv_style_set_grid_cell_x_align(lv_style_t * style, lv_grid_align_t value)
 {
     lv_style_value_t v = {
         .num = value
@@ -250,7 +261,7 @@ void lv_style_set_grid_cell_x_align(lv_style_t * style, lv_coord_t value)
     lv_style_set_prop(style, LV_STYLE_GRID_CELL_X_ALIGN, v);
 }
 
-void lv_style_set_grid_cell_y_align(lv_style_t * style, lv_coord_t value)
+void lv_style_set_grid_cell_y_align(lv_style_t * style, lv_grid_align_t value)
 {
     lv_style_value_t v = {
         .num = value
@@ -324,7 +335,7 @@ void lv_obj_set_style_grid_cell_row_span(lv_obj_t * obj, lv_coord_t value, lv_st
     lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_ROW_SPAN, v, selector);
 }
 
-void lv_obj_set_style_grid_cell_x_align(lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+void lv_obj_set_style_grid_cell_x_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = value
@@ -332,7 +343,7 @@ void lv_obj_set_style_grid_cell_x_align(lv_obj_t * obj, lv_coord_t value, lv_sty
     lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_X_ALIGN, v, selector);
 }
 
-void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = value
@@ -362,9 +373,8 @@ static void grid_update(lv_obj_t * cont, void * user_data)
 
     /*Calculate the grids absolute x and y coordinates.
      *It will be used as helper during item repositioning to avoid calculating this value for every children*/
-    lv_coord_t border_widt = lv_obj_get_style_border_width(cont, LV_PART_MAIN);
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_PART_MAIN) + border_widt;
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_PART_MAIN) + border_widt;
+    lv_coord_t pad_left = lv_obj_get_style_space_left(cont, LV_PART_MAIN);
+    lv_coord_t pad_top = lv_obj_get_style_space_top(cont, LV_PART_MAIN);
     hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);
     hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_y(cont);
 
@@ -619,20 +629,21 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     switch(col_align) {
         default:
         case LV_GRID_ALIGN_START:
-            x = c->x[col_pos];
+            x = c->x[col_pos] + lv_obj_get_style_margin_left(item, LV_PART_MAIN);
             item->w_layout = 0;
             break;
         case LV_GRID_ALIGN_STRETCH:
-            x = c->x[col_pos];
-            item_w = col_w;
+            x = c->x[col_pos] + lv_obj_get_style_margin_left(item, LV_PART_MAIN);
+            item_w = col_w - get_margin_hor(item);
             item->w_layout = 1;
             break;
         case LV_GRID_ALIGN_CENTER:
-            x = c->x[col_pos] + (col_w - item_w) / 2;
+            x = c->x[col_pos] + (col_w - item_w) / 2 + (lv_obj_get_style_margin_left(item, LV_PART_MAIN) -
+                                                        lv_obj_get_style_margin_right(item, LV_PART_MAIN)) / 2;
             item->w_layout = 0;
             break;
         case LV_GRID_ALIGN_END:
-            x = c->x[col_pos] + col_w - lv_obj_get_width(item);
+            x = c->x[col_pos] + col_w - lv_obj_get_width(item) - lv_obj_get_style_margin_right(item, LV_PART_MAIN);
             item->w_layout = 0;
             break;
     }
@@ -640,20 +651,21 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
     switch(row_align) {
         default:
         case LV_GRID_ALIGN_START:
-            y = c->y[row_pos];
+            y = c->y[row_pos] + lv_obj_get_style_margin_top(item, LV_PART_MAIN);
             item->h_layout = 0;
             break;
         case LV_GRID_ALIGN_STRETCH:
-            y = c->y[row_pos];
-            item_h = row_h;
+            y = c->y[row_pos] + lv_obj_get_style_margin_top(item, LV_PART_MAIN);
+            item_h = row_h - get_margin_ver(item);
             item->h_layout = 1;
             break;
         case LV_GRID_ALIGN_CENTER:
-            y = c->y[row_pos] + (row_h - item_h) / 2;
+            y = c->y[row_pos] + (row_h - item_h) / 2 + (lv_obj_get_style_margin_top(item, LV_PART_MAIN) -
+                                                        lv_obj_get_style_margin_bottom(item, LV_PART_MAIN)) / 2;
             item->h_layout = 0;
             break;
         case LV_GRID_ALIGN_END:
-            y = c->y[row_pos] + row_h - lv_obj_get_height(item);
+            y = c->y[row_pos] + row_h - lv_obj_get_height(item) - lv_obj_get_style_margin_bottom(item, LV_PART_MAIN);
             item->h_layout = 0;
             break;
     }
@@ -707,7 +719,8 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * c, item_repos_hint_t *
  * @param pos_array write the positions of the tracks here
  * @return the total size of the grid
  */
-static lv_coord_t grid_align(lv_coord_t cont_size,  bool auto_size, uint8_t align, lv_coord_t gap, uint32_t track_num,
+static lv_coord_t grid_align(lv_coord_t cont_size,  bool auto_size, lv_grid_align_t align, lv_coord_t gap,
+                             uint32_t track_num,
                              lv_coord_t * size_array, lv_coord_t * pos_array, bool reverse)
 {
     lv_coord_t grid_size = 0;
@@ -752,7 +765,8 @@ static lv_coord_t grid_align(lv_coord_t cont_size,  bool auto_size, uint8_t alig
                 gap = (lv_coord_t)(cont_size - grid_size) / (lv_coord_t)(track_num + 1);
                 pos_array[0] = gap;
                 break;
-
+            default:
+                break;
         }
     }
 

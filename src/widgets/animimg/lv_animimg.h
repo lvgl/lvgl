@@ -37,7 +37,7 @@ typedef struct {
     lv_img_t img;
     lv_anim_t anim;
     /*picture sequence */
-    lv_img_dsc_t ** dsc;
+    const void ** dsc;
     int8_t  pic_count;
 } lv_animimg_t;
 
@@ -69,7 +69,7 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent);
  * @param dsc pointer to a series images
  * @param num images' number
  */
-void lv_animimg_set_src(lv_obj_t * img,  lv_img_dsc_t * dsc[], uint8_t num);
+void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], uint8_t num);
 
 /**
  * Startup the image animation.
@@ -99,7 +99,7 @@ void lv_animimg_set_repeat_count(lv_obj_t * img, uint16_t count);
  * @param img pointer to an animation image object
  * @return a pointer that will point to a series images
  */
-lv_img_dsc_t ** lv_animimg_get_src(lv_obj_t * img);
+const void ** lv_animimg_get_src(lv_obj_t * img);
 
 /**
  * Get the image animation images source.

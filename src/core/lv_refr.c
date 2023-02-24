@@ -233,7 +233,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
         return;
     }
 
-    lv_res_t res = lv_disp_send_event(disp, LV_DISP_EVENT_INVALIDATE_AREA, &com_area);
+    lv_res_t res = lv_disp_send_event(disp, LV_EVENT_INVALIDATE_AREA, &com_area);
     if(res != LV_RES_OK) return;
 
     /*Save only if this area is not in one of the saved areas*/
@@ -297,6 +297,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         LV_LOG_WARN("No draw buffer");
         return;
     }
+
+    lv_disp_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
     volatile uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
@@ -403,14 +405,13 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
         LV_LOG_WARN("there is no active screen");
-        REFR_TRACE("finished");
-        return;
+        goto refr_finish;
     }
 
     if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT &&
        disp_refr->color_format != LV_COLOR_FORMAT_NATIVE) {
         LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
-        return;
+        goto refr_finish;
     }
 
     lv_refr_join_area();
@@ -420,8 +421,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
         /*Call monitor cb if present*/
-        lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_READY, NULL);
-        printf("Rendered in %dms\n", lv_tick_elaps(start));
+        lv_disp_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
 
         /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
         if(lv_disp_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
@@ -456,6 +456,9 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 #if LV_USE_DRAW_MASKS
     _lv_draw_mask_cleanup();
 #endif
+
+refr_finish:
+    lv_disp_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
 
     REFR_TRACE("finished");
 }
@@ -538,7 +541,7 @@ static void refr_invalid_areas(void)
     }
 
     /*Notify the display driven rendering has started*/
-    lv_disp_send_event(disp_refr, LV_DISP_EVENT_RENDER_START, NULL);
+    lv_disp_send_event(disp_refr, LV_EVENT_RENDER_START, NULL);
 
     disp_refr->last_area = 0;
     disp_refr->last_part = 0;
@@ -640,6 +643,8 @@ static void refr_area_part(lv_draw_ctx_t * draw_ctx)
             if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
         }
     }
+
+    //    if(draw_ctx->init_buf) draw_ctx->init_buf(draw_ctx);
 
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
@@ -828,7 +833,9 @@ static lv_res_t layer_get_area(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj, lv_laye
     return LV_RES_OK;
 }
 
-//static void layer_alpha_test(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
+
+//static void layer_alpha_test(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx,
+//                             lv_draw_layer_flags_t flags)
 //{
 //    bool has_alpha;
 //    /*If globally the layer has alpha maybe this smaller section has not (e.g. not on a rounded corner)
@@ -926,7 +933,7 @@ static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area
     lv_coord_t h_tmp = max_row;
     do {
         tmp.y2 = h_tmp - 1;
-        lv_disp_send_event(disp_refr, LV_DISP_EVENT_INVALIDATE_AREA, &tmp);
+        lv_disp_send_event(disp_refr, LV_EVENT_INVALIDATE_AREA, &tmp);
 
         /*If this height fits into `max_row` then fine*/
         if(lv_area_get_height(&tmp) <= max_row) break;
@@ -1175,7 +1182,8 @@ static void draw_buf_flush(lv_disp_t * disp)
 
 static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
 {
-    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer", area->x1, area->y1, area->x2, area->y2,
+    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
+               (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2,
                (void *)color_p);
 
     lv_area_t offset_area = {

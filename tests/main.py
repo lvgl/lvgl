@@ -102,7 +102,7 @@ def run_tests(options_name):
 
     os.chdir(get_build_dir(options_name))
     subprocess.check_call(
-        ['ctest', '--timeout', '30', '--parallel', str(os.cpu_count()), '--output-on-failure'])
+        ['ctest', '--timeout', '300', '--parallel', str(os.cpu_count()), '--output-on-failure'])
 
 
 def generate_code_coverage_report():

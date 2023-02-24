@@ -106,7 +106,8 @@ You need to have 3 buttons available:
 - `LV_KEY_RIGHT` will simulate turning encoder right
 - other keys will be passed to the focused widget
 
-If you hold the keys it will simulate an encoder advance with period specified in `indev->long_press_rep_time`.
+
+If you hold the keys it will simulate an encoder advance with period specified in `indev_drv.long_press_repeat_time`.
 
 ```c
 
@@ -164,7 +165,7 @@ The default value of the following parameters can be changed in `lv_indev_t`:
 - `scroll_limit` Number of pixels to slide before actually scrolling the object.
 - `scroll_throw`  Scroll throw (momentum) slow-down in [%]. Greater value means faster slow-down.
 - `long_press_time` Press time to send `LV_EVENT_LONG_PRESSED` (in milliseconds)
-- `long_press_rep_time` Interval of sending `LV_EVENT_LONG_PRESSED_REPEAT` (in milliseconds)
+- `long_press_repeat_time` Interval of sending `LV_EVENT_LONG_PRESSED_REPEAT` (in milliseconds)
 - `read_timer` pointer to the `lv_timer` which reads the input device. Its parameters can be changed by `lv_timer_...()` functions. `LV_DEF_REFR_PERIOD` in `lv_hal_disp.h` sets the default read period.
 
 ### Feedback

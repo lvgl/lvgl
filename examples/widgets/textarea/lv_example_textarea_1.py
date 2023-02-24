@@ -3,7 +3,7 @@ def textarea_event_handler(e, ta):
 
 
 def btnm_event_handler(e, ta):
-    obj = e.get_target()
+    obj = e.get_target_obj()
     txt = obj.get_btn_text(obj.get_selected_btn())
     if txt == lv.SYMBOL.BACKSPACE:
         ta.del_char()

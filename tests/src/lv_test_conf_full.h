@@ -52,8 +52,12 @@
 #define LV_USE_MEM_MONITOR          1
 #define LV_LABEL_TEXT_SELECTION     1
 
+#define LV_USE_FLEX 1
+#define LV_USE_GRID 1
+
 #define LV_USE_FS_STDIO     1
 #define LV_FS_STDIO_LETTER  'A'
+#define LV_FS_STDIO_CACHE_SIZE 512
 #define LV_USE_FS_POSIX     1
 #define LV_FS_POSIX_LETTER  'B'
 
@@ -62,6 +66,7 @@
 #define LV_USE_SJPG     1
 #define LV_USE_GIF      1
 #define LV_USE_QRCODE   1
+#define LV_USE_BARCODE  1
 #define LV_USE_FRAGMENT 1
 #define LV_USE_IMGFONT  1
 #define LV_USE_IME_PINYIN   1

@@ -908,7 +908,6 @@ try:
 except NameError:
     script_path = ''
 
-# Initialize the display driver
 driver = display_driver_utils.driver(width=SCREEN_SIZE[0],height=SCREEN_SIZE[1],orientation=display_driver_utils.ORIENT_LANDSCAPE)
 
 # Create a screen and load it
@@ -919,9 +918,8 @@ lv.scr_load(scr)
 fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
 
-# get the display size
-LV_HOR_RES = lv.scr_act().get_disp().driver.hor_res
-LV_VER_RES = lv.scr_act().get_disp().driver.ver_res
+LV_HOR_RES = lv.scr_act().get_disp().get_hor_res()
+LV_VER_RES = lv.scr_act().get_disp().get_ver_res()
 
 print("Screen resolution: {:d}x{:d}".format(LV_HOR_RES,LV_VER_RES))
 
@@ -1258,7 +1256,7 @@ def meter3_anim_cb(meter,indic, label, val) :
 def ta_event_cb(e,kb,tv) :
 
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
     # lv_obj_t * kb = lv_event_get_user_data(e);
 
     indev = lv.indev_get_act()
@@ -1288,7 +1286,7 @@ def ta_event_cb(e,kb,tv) :
 def birthday_event_cb(e):
     global calendar
     code = e.get_code()
-    ta = e.get_target()
+    ta = e.get_target_obj()
 
     if code == lv.EVENT.FOCUSED :
         indev = lv.indev_get_act()
@@ -1347,7 +1345,7 @@ def _lv_area_intersect(a1_p, a2_p) :
 def chart_event_cb(e):
 
     code = e.get_code()
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
 
     if code == lv.EVENT.PRESSED or code == lv.EVENT.RELEASED :

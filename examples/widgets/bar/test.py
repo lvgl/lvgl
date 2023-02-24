@@ -1,6 +1,13 @@
 #!/opt/bin/lv_micropython -i
 import lvgl as lv
-import display_driver
+
+default_group = lv.group_create()
+default_group.set_default()
+
+lv.sdl_window_create(480, 320)
+sdl_indev = lv.sdl_mouse_create()
+sdl_indev.set_group(default_group)
+
 def set_value(bar, v):
     bar.set_value(v, lv.ANIM.OFF)
 
@@ -9,7 +16,7 @@ def event_cb(e):
     if dsc.part != lv.PART.INDICATOR:
         return
 
-    obj= e.get_target()
+    obj= e.get_target_obj()
 
     label_dsc = lv.draw_label_dsc_t()
     label_dsc.init()

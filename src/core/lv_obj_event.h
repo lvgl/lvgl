@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_EVENT_H
-#define LV_EVENT_H
+#ifndef LV_OBJ_EVENT_H
+#define LV_OBJ_EVENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -191,4 +191,4 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_EVENT_H*/
+#endif /*LV_OBJ_EVENT_H*/

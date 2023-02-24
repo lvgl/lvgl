@@ -64,7 +64,7 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_animimg_set_src(lv_obj_t * obj,  lv_img_dsc_t * dsc[], uint8_t num)
+void lv_animimg_set_src(lv_obj_t * obj, const void * dsc[], uint8_t num)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;
@@ -103,7 +103,7 @@ void lv_animimg_set_repeat_count(lv_obj_t * obj, uint16_t count)
  * Getter functions
  *====================*/
 
-lv_img_dsc_t ** lv_animimg_get_src(lv_obj_t * obj)
+const void ** lv_animimg_get_src(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_animimg_t * animimg = (lv_animimg_t *)obj;

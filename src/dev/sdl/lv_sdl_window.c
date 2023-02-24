@@ -7,8 +7,9 @@
  *      INCLUDES
  *********************/
 #include "lv_sdl_window.h"
-#include <stdbool.h>
 #if LV_USE_SDL
+#include <stdbool.h>
+#include "../../core/lv_refr.h"
 
 #include LV_SDL_INCLUDE_PATH
 
@@ -85,7 +86,7 @@ lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
     lv_disp_set_flush_cb(disp, flush_cb);
     lv_disp_set_draw_buffers(disp, dsc->fb, NULL,
                              lv_disp_get_hor_res(disp) * lv_disp_get_hor_res(disp), LV_DISP_RENDER_MODE_DIRECT);
-    lv_disp_add_event(disp, res_chg_event_cb, LV_DISP_EVENT_RESOLUTION_CHANGED, NULL);
+    lv_disp_add_event(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
     return disp;
 }
@@ -109,6 +110,8 @@ uint8_t lv_sdl_window_get_zoom(lv_disp_t * disp)
 lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
+    if(win_id == UINT32_MAX) return disp;
+
     while(disp) {
         lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
         if(SDL_GetWindowID(dsc->window) == win_id) {
@@ -211,7 +214,7 @@ static void window_create(lv_disp_t * disp)
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
     texture_resize(disp);
-    lv_color_fill(dsc->fb, lv_color_hex3(0x8ff), hor_res * ver_res);
+    lv_memset(dsc->fb, 0xff, hor_res * ver_res * sizeof(lv_color_t));
 }
 
 static void window_update(lv_disp_t * disp)

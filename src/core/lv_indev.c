@@ -297,7 +297,7 @@ lv_group_t * lv_indev_get_group(const lv_indev_t * indev)
 
 lv_disp_t * lv_indev_get_disp(const lv_indev_t * indev)
 {
-    if(indev == NULL) return LV_INDEV_TYPE_NONE;
+    if(indev == NULL) return NULL;
 
     return indev->disp;
 }
@@ -489,7 +489,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 
     bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
-    /*If the point is on this object*/
+    /*If the point is on this object check its children too*/
     if(_lv_area_is_point_on(&obj->coords, &p_trans, 0)) {
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
@@ -1038,8 +1038,6 @@ static void indev_proc_press(lv_indev_t * indev)
         if(indev_reset_check(indev)) return;
     }
 
-    lv_obj_transform_point(indev_obj_act, &indev->pointer.act_point, true, true);
-
     /*If a new object was found reset some variables and send a pressed event handler*/
     if(indev_obj_act != indev->pointer.act_obj) {
         indev->pointer.last_point.x = indev->pointer.act_point.x;
@@ -1176,6 +1174,27 @@ static void indev_proc_release(lv_indev_t * indev)
         indev->pointer.act_obj = NULL;
         indev->pr_timestamp          = 0;
         indev->longpr_rep_timestamp  = 0;
+
+
+        /*Get the transformed vector with this object*/
+        if(scroll_obj) {
+            int16_t angle = 0;
+            int16_t zoom = 256;
+            lv_point_t pivot = { 0, 0 };
+            lv_obj_t * parent = scroll_obj;
+            while(parent) {
+                angle += lv_obj_get_style_transform_angle(parent, 0);
+                zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
+                parent = lv_obj_get_parent(parent);
+            }
+
+            if(angle != 0 || zoom != LV_ZOOM_NONE) {
+                angle = -angle;
+                zoom = (256 * 256) / zoom;
+                lv_point_transform(&indev->pointer.scroll_throw_vect, angle, zoom, &pivot);
+                lv_point_transform(&indev->pointer.scroll_throw_vect_ori, angle, zoom, &pivot);
+            }
+        }
 
     }
 

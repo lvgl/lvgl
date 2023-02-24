@@ -1,4 +1,3 @@
-import display_driver
 import lvgl as lv
 
 def add_data(t):

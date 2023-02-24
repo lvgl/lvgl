@@ -1,5 +1,5 @@
 def draw_part_event_cb(e):
-    obj = e.get_target()
+    obj = e.get_target_obj()
     dsc = lv.obj_draw_part_dsc_t.__cast__(e.get_param())
     # If the cells are drawn../
     if dsc.part == lv.PART.ITEMS:

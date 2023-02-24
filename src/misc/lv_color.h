@@ -661,7 +661,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_c
     }
     /*Opaque background: use simple mix*/
     else if(bg_opa >= LV_OPA_MAX) {
-        *res_color = lv_color_mix(fg_color, bg_color, fg_opa);
+        *res_color = LV_COLOR_MIX(fg_color, bg_color, fg_opa);
         *res_opa = LV_OPA_COVER;
     }
     /*Both colors have alpha. Expensive calculation need to be applied*/
@@ -685,7 +685,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_c
             res_opa_saved = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
             LV_ASSERT(res_opa_saved != 0);
             lv_opa_t ratio = (uint16_t)((uint16_t)fg_opa * 255) / res_opa_saved;
-            res_color_saved = lv_color_mix(fg_color, bg_color, ratio);
+            res_color_saved = LV_COLOR_MIX(fg_color, bg_color, ratio);
 
         }
 
