@@ -91,7 +91,7 @@ static void anim_x_cb(void * var, int32_t v)
 static void run_btn_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    if(code == LV_OBJ_EVENT_CLICKED) {
+    if(code == LV_EVENT_CLICKED) {
         lv_anim_start(&ginfo.a);
     }
 }
@@ -139,13 +139,13 @@ static void page_obj_init(lv_obj_t * par)
     lv_slider_set_range(ginfo.p2_slider, 0, 1024);
     lv_obj_set_style_pad_all(ginfo.p1_slider, 2, LV_PART_KNOB);
     lv_obj_set_style_pad_all(ginfo.p2_slider, 2, LV_PART_KNOB);
-    lv_obj_add_event(ginfo.p1_slider, slider_event_cb, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_add_event(ginfo.p2_slider, slider_event_cb, LV_OBJ_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(ginfo.p1_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(ginfo.p2_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_grid_cell(ginfo.p1_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 1, 1);
     lv_obj_set_grid_cell(ginfo.p2_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 2, 1);
 
     ginfo.run_btn = lv_btn_create(par);
-    lv_obj_add_event(ginfo.run_btn, run_btn_event_handler, LV_OBJ_EVENT_CLICKED, NULL);
+    lv_obj_add_event(ginfo.run_btn, run_btn_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_t * btn_label = lv_label_create(ginfo.run_btn);
     lv_label_set_text(btn_label, LV_SYMBOL_PLAY);
     lv_obj_center(btn_label);

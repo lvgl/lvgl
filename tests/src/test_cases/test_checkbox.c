@@ -21,7 +21,7 @@ static void event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
 
-    if(LV_OBJ_EVENT_VALUE_CHANGED == code) {
+    if(LV_EVENT_VALUE_CHANGED == code) {
         event_called = true;
     }
 }
@@ -40,7 +40,7 @@ void test_checkbox_should_call_event_handler_on_click_when_enabled(void)
     checkbox = lv_checkbox_create(active_screen);
 
     lv_obj_add_state(checkbox, LV_STATE_CHECKED);
-    lv_obj_add_event(checkbox, event_handler, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(checkbox, event_handler, LV_EVENT_ALL, NULL);
 
     lv_test_mouse_click_at(checkbox->coords.x1, checkbox->coords.y1);
 

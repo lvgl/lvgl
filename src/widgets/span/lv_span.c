@@ -539,16 +539,16 @@ static void lv_spangroup_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
 
-    if(code == LV_OBJ_EVENT_DRAW_MAIN) {
+    if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
     }
-    else if(code == LV_OBJ_EVENT_STYLE_CHANGED) {
+    else if(code == LV_EVENT_STYLE_CHANGED) {
         refresh_self_size(obj);
     }
-    else if(code == LV_OBJ_EVENT_SIZE_CHANGED) {
+    else if(code == LV_EVENT_SIZE_CHANGED) {
         refresh_self_size(obj);
     }
-    else if(code == LV_OBJ_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_coord_t width = 0;
         lv_coord_t height = 0;
         lv_point_t * self_size = lv_event_get_param(e);

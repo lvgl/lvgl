@@ -57,7 +57,7 @@ void _lv_indev_scroll_handler(lv_indev_t * indev)
 
         init_scroll_limits(indev);
 
-        lv_obj_send_event(scroll_obj, LV_OBJ_EVENT_SCROLL_BEGIN, NULL);
+        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_BEGIN, NULL);
         if(indev->reset_query) return;
     }
 
@@ -199,7 +199,7 @@ void _lv_indev_scroll_throw_handler(lv_indev_t * indev)
             }
         }
 
-        lv_obj_send_event(scroll_obj, LV_OBJ_EVENT_SCROLL_END, indev_act);
+        lv_obj_send_event(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
         if(indev->reset_query) return;
 
         indev->pointer.scroll_dir = LV_DIR_NONE;

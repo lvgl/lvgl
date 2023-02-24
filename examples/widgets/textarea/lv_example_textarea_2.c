@@ -14,7 +14,7 @@ void lv_example_textarea_2(void)
     lv_textarea_set_one_line(pwd_ta, true);
     lv_obj_set_width(pwd_ta, lv_pct(40));
     lv_obj_set_pos(pwd_ta, 5, 20);
-    lv_obj_add_event(pwd_ta, ta_event_cb, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(pwd_ta, ta_event_cb, LV_EVENT_ALL, NULL);
 
     /*Create a label and position it above the text box*/
     lv_obj_t * pwd_label = lv_label_create(lv_scr_act());
@@ -26,7 +26,7 @@ void lv_example_textarea_2(void)
     lv_textarea_set_one_line(text_ta, true);
     lv_textarea_set_password_mode(text_ta, false);
     lv_obj_set_width(text_ta, lv_pct(40));
-    lv_obj_add_event(text_ta, ta_event_cb, LV_OBJ_EVENT_ALL, NULL);
+    lv_obj_add_event(text_ta, ta_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_align(text_ta, LV_ALIGN_TOP_RIGHT, -5, 20);
 
 
@@ -46,12 +46,12 @@ static void ta_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * ta = lv_event_get_target(e);
-    if(code == LV_OBJ_EVENT_CLICKED || code == LV_OBJ_EVENT_FOCUSED) {
+    if(code == LV_EVENT_CLICKED || code == LV_EVENT_FOCUSED) {
         /*Focus on the clicked text area*/
         if(kb != NULL) lv_keyboard_set_textarea(kb, ta);
     }
 
-    else if(code == LV_OBJ_EVENT_READY) {
+    else if(code == LV_EVENT_READY) {
         LV_LOG_USER("Ready, current text: %s", lv_textarea_get_text(ta));
     }
 }

@@ -57,7 +57,7 @@ extern const lv_obj_class_t lv_arc_class;
 
 /**
  * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_arc_class`
- * Used in `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END`
+ * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
  */
 typedef enum {
     LV_ARC_DRAW_PART_BACKGROUND,    /**< The background arc*/

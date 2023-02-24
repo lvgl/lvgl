@@ -189,10 +189,10 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
 
     /*Call the ancestor's event handler to the object with its new coordinates*/
-    lv_obj_send_event(obj, LV_OBJ_EVENT_SIZE_CHANGED, &ori);
+    lv_obj_send_event(obj, LV_EVENT_SIZE_CHANGED, &ori);
 
     /*Call the ancestor's event handler to the parent too*/
-    lv_obj_send_event(parent, LV_OBJ_EVENT_CHILD_CHANGED, obj);
+    lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -590,14 +590,14 @@ void lv_obj_get_content_coords(const lv_obj_t * obj, lv_area_t * area)
 lv_coord_t lv_obj_get_self_width(const lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
-    lv_obj_send_event((lv_obj_t *)obj, LV_OBJ_EVENT_GET_SELF_SIZE, &p);
+    lv_obj_send_event((lv_obj_t *)obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.x;
 }
 
 lv_coord_t lv_obj_get_self_height(const lv_obj_t * obj)
 {
     lv_point_t p = {LV_COORD_MIN, 0};
-    lv_obj_send_event((lv_obj_t *)obj, LV_OBJ_EVENT_GET_SELF_SIZE, &p);
+    lv_obj_send_event((lv_obj_t *)obj, LV_EVENT_GET_SELF_SIZE, &p);
     return p.y;
 }
 
@@ -747,7 +747,7 @@ void lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     lv_obj_move_children_by(obj, diff.x, diff.y, false);
 
     /*Call the ancestor's event handler to the parent too*/
-    if(parent) lv_obj_send_event(parent, LV_OBJ_EVENT_CHILD_CHANGED, obj);
+    if(parent) lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -942,7 +942,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
         hit_info.res = true;
-        lv_obj_send_event(obj, LV_OBJ_EVENT_HIT_TEST, &hit_info);
+        lv_obj_send_event(obj, LV_EVENT_HIT_TEST, &hit_info);
         return hit_info.res;
     }
 

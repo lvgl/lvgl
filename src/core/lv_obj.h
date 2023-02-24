@@ -125,7 +125,7 @@ typedef uint32_t lv_obj_flag_t;
 
 /**
  * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_obj_class`
- * Used in `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END`
+ * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
  */
 typedef enum {
     LV_OBJ_DRAW_PART_RECTANGLE,  /**< The main rectangle*/

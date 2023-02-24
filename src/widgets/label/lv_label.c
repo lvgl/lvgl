@@ -688,12 +688,12 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
     const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
 
-    if((code == LV_OBJ_EVENT_STYLE_CHANGED) || (code == LV_OBJ_EVENT_SIZE_CHANGED)) {
+    if((code == LV_EVENT_STYLE_CHANGED) || (code == LV_EVENT_SIZE_CHANGED)) {
         /*Revert dots for proper refresh*/
         lv_label_revert_dots(obj);
         lv_label_refr_text(obj);
     }
-    else if(code == LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE) {
+    else if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /* Italic or other non-typical letters can be drawn of out of the object.
          * It happens if box_w + ofs_x > adw_w in the glyph.
          * To avoid this add some extra draw area.
@@ -702,7 +702,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         const lv_coord_t font_h = lv_font_get_line_height(font);
         lv_event_set_ext_draw_size(e, font_h / 4);
     }
-    else if(code == LV_OBJ_EVENT_GET_SELF_SIZE) {
+    else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_label_t * label = (lv_label_t *)obj;
         if(label->invalid_size_cache) {
             const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
@@ -724,7 +724,7 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
         self_size->x = LV_MAX(self_size->x, label->size_cache.x);
         self_size->y = LV_MAX(self_size->y, label->size_cache.y);
     }
-    else if(code == LV_OBJ_EVENT_DRAW_MAIN) {
+    else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
     }
 }

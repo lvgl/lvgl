@@ -142,9 +142,9 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
     if(should_draw) {
         draw_ctx->clip_area = clip_coords_for_obj;
 
-        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
-        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN, draw_ctx);
-        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_MAIN_END, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_BEGIN, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_MAIN_END, draw_ctx);
 #if LV_USE_REFR_DEBUG
         lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
         lv_draw_rect_dsc_t draw_dsc;
@@ -181,9 +181,9 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         draw_ctx->clip_area = clip_coords_for_obj;
 
         /*If all the children are redrawn make 'post draw' draw*/
-        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_POST_BEGIN, draw_ctx);
-        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_POST, draw_ctx);
-        lv_obj_send_event(obj, LV_OBJ_EVENT_DRAW_POST_END, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST, draw_ctx);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, draw_ctx);
     }
 
     draw_ctx->clip_area = clip_area_ori;
@@ -706,7 +706,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_cover_check_info_t info;
     info.res = LV_COVER_RES_COVER;
     info.area = area_p;
-    lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
+    lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
     if(info.res == LV_COVER_RES_MASKED) return NULL;
 
     int32_t i;
@@ -768,9 +768,9 @@ static void refr_obj_and_children(lv_draw_ctx_t * draw_ctx, lv_obj_t * top_obj)
         }
 
         /*Call the post draw draw function of the parents of the to object*/
-        lv_obj_send_event(parent, LV_OBJ_EVENT_DRAW_POST_BEGIN, (void *)draw_ctx);
-        lv_obj_send_event(parent, LV_OBJ_EVENT_DRAW_POST, (void *)draw_ctx);
-        lv_obj_send_event(parent, LV_OBJ_EVENT_DRAW_POST_END, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_EVENT_DRAW_POST_BEGIN, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_EVENT_DRAW_POST, (void *)draw_ctx);
+        lv_obj_send_event(parent, LV_EVENT_DRAW_POST_END, (void *)draw_ctx);
 
         /*The new border will be the last parents,
          *so the 'younger' brothers of parent will be refreshed*/
@@ -840,7 +840,7 @@ static lv_res_t layer_get_area(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj, lv_laye
 //            lv_cover_check_info_t info;
 //            info.res = LV_COVER_RES_COVER;
 //            info.area = &layer_ctx->area_act;
-//            lv_obj_send_event(obj, LV_OBJ_EVENT_COVER_CHECK, &info);
+//            lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
 //            if(info.res == LV_COVER_RES_COVER) has_alpha = false;
 //        }
 //
