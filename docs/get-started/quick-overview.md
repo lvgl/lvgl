@@ -126,7 +126,7 @@ You can assign one or more callbacks to an object which will be called if the ob
 A callback is assigned like this:
 
 ```c
-lv_obj_add_event(btn, btn_event_cb, LV_OBJ_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
+lv_obj_add_event(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /*Assign a callback to the button*/
 
 ...
 
@@ -136,7 +136,7 @@ void btn_event_cb(lv_event_t * e)
 }
 ```
 
-`LV_OBJ_EVENT_ALL` can be used instead of `LV_OBJ_EVENT_CLICKED` to invoke the callback for any event.
+`LV_EVENT_ALL` can be used instead of `LV_EVENT_CLICKED` to invoke the callback for any event.
 
 From `lv_event_t * e` the current event code can be retrieved with:
 ```c

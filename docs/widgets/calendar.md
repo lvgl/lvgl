@@ -41,7 +41,7 @@ The name of the days can be adjusted with `lv_calendar_set_day_names(calendar, d
 Only the pointer of the day names is saved so the elements should be static, global or constant variables.
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` Sent if a date is clicked. `lv_calendar_get_pressed_date(calendar, &date)` set `date` to the date currently being pressed. Returns `LV_RES_OK` if there is a valid pressed date, else `LV_RES_INV`.
+- `LV_EVENT_VALUE_CHANGED` Sent if a date is clicked. `lv_calendar_get_pressed_date(calendar, &date)` set `date` to the date currently being pressed. Returns `LV_RES_OK` if there is a valid pressed date, else `LV_RES_INV`.
 
 Learn more about [Events](/overview/event).
 

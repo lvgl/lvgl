@@ -29,7 +29,7 @@ The number of visible rows can be adjusted with `lv_roller_set_visible_row_count
 This function calculates the height with the current style. If the font, line space, border width, etc. of the roller changes this function needs to be called again.
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when a new option is selected.
+- `LV_EVENT_VALUE_CHANGED` Sent when a new option is selected.
 
 See the events of the [Base object](/widgets/obj) too.
 
@@ -38,7 +38,7 @@ Learn more about [Events](/overview/event).
 ## Keys
 - `LV_KEY_RIGHT/DOWN` Select the next option
 - `LV_KEY_LEFT/UP` Select the previous option
-- `LY_KEY_ENTER` Apply the selected option (Send `LV_OBJ_EVENT_VALUE_CHANGED` event)
+- `LY_KEY_ENTER` Apply the selected option (Send `LV_EVENT_VALUE_CHANGED` event)
 
 ## Example
 

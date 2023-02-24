@@ -73,8 +73,8 @@ Similarly `lv_arc_rotate_obj_to_angle(arc, obj_to_rotate, radius_offset)` can be
 It's a typical use case to call these functions in the `VALUE_CHANGED` event of the arc.
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to set a new value.
-- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` are sent with the following types:
+- `LV_EVENT_VALUE_CHANGED` sent when the arc is pressed/dragged to set a new value.
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent with the following types:
     - `LV_ARC_DRAW_PART_BACKGROUND` The background arc.
         - `part`: `LV_PART_MAIN`
         - `p1`: center of the arc

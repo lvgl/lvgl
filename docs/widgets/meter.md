@@ -56,7 +56,7 @@ If `local` is `false` `color_start` and `color_end` will be mapped to the start 
 `lv_meter_set_indicator_start_value(meter, inidicator, value)` and `lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the value of the indicator.
 
 ## Events
-- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` is sent for the following types:
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` is sent for the following types:
     - `LV_METER_DRAW_PART_ARC` The arc indicator
        - `part`: `LV_PART_ITEMS`
        - `sub_part_ptr`: pointer to the indicator

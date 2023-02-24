@@ -44,7 +44,7 @@ To select a new tab you can:
 `lv_tabview_get_content(tabview)` returns the container for the tabs, `lv_tabview_get_tab_btns(tabview)` returns the Tab buttons object which is a [Button matrix](/widgets/btnmatrix).
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` Sent when a new tab is selected by sliding or clicking the tab button. `lv_tabview_get_tab_act(tabview)` returns the zero based index of the current tab.
+- `LV_EVENT_VALUE_CHANGED` Sent when a new tab is selected by sliding or clicking the tab button. `lv_tabview_get_tab_act(tabview)` returns the zero based index of the current tab.
 
 Learn more about [Events](/overview/event).
 

@@ -32,9 +32,9 @@ In the latter case the knob moves to the point clicked and slider value changes 
 The extended click area (set by `lv_obj_set_ext_click_area(slider, value)`) increases to knob's click area.
 
 ## Events
-- `LV_OBJ_EVENT_VALUE_CHANGED` Sent while the slider is being dragged or changed with keys. The event is sent continuously while the slider is being dragged.
-- `LV_OBJ_EVENT_RELEASED` Sent when the slider has just been released.
-- `LV_OBJ_EVENT_DRAW_PART_BEGIN` and `LV_OBJ_EVENT_DRAW_PART_END` are sent for the following parts.
+- `LV_EVENT_VALUE_CHANGED` Sent while the slider is being dragged or changed with keys. The event is sent continuously while the slider is being dragged.
+- `LV_EVENT_RELEASED` Sent when the slider has just been released.
+- `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` are sent for the following parts.
     - `LV_SLIDER_DRAW_PART_KNOB` The main (right) knob of the slider
         - `part`: `LV_PART_KNOB`
         - `draw_area`: area of the indicator

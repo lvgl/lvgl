@@ -112,18 +112,18 @@ These events are related to the actual drawing of an object. E.g. the drawing of
 
 `lv_event_get_clip_area(event)` can be used to get the current clip area. The clip area is required in draw functions to make them draw only on a limited area.
 
-#### LV_OBJ_EVENT_DRAW_MAIN_BEGIN
+#### LV_EVENT_DRAW_MAIN_BEGIN
 
 Sent before starting to draw an object. This is a good place to add masks manually. E.g. add a line mask that "removes" the right side of an object.
 
-#### LV_OBJ_EVENT_DRAW_MAIN
+#### LV_EVENT_DRAW_MAIN
 
 The actual drawing of an object happens in this event. E.g. a rectangle for a button is drawn here. First, the widgets' internal events are called to perform drawing and after that you can draw anything on top of them.
 For example you can add a custom text or an image.
 
-#### LV_OBJ_EVENT_DRAW_MAIN_END
+#### LV_EVENT_DRAW_MAIN_END
 
-Called when the main drawing is finished. You can draw anything here as well and it's also a good place to remove any masks created in `LV_OBJ_EVENT_DRAW_MAIN_BEGIN`.
+Called when the main drawing is finished. You can draw anything here as well and it's also a good place to remove any masks created in `LV_EVENT_DRAW_MAIN_BEGIN`.
 
 ### Post drawing
 
@@ -131,17 +131,17 @@ Post drawing events are called when all the children of an object are drawn. For
 
 `lv_event_get_clip_area(event)` can be used to get the current clip area.
 
-#### LV_OBJ_EVENT_DRAW_POST_BEGIN
+#### LV_EVENT_DRAW_POST_BEGIN
 
 Sent before starting the post draw phase. Masks can be added here too to mask out the post drawn content.
 
-#### LV_OBJ_EVENT_DRAW_POST
+#### LV_EVENT_DRAW_POST
 
 The actual drawing should happen here.
 
-#### LV_OBJ_EVENT_DRAW_POST_END
+#### LV_EVENT_DRAW_POST_END
 
-Called when post drawing has finished. If masks were not removed in `LV_OBJ_EVENT_DRAW_MAIN_END` they should be removed here.
+Called when post drawing has finished. If masks were not removed in `LV_EVENT_DRAW_MAIN_END` they should be removed here.
 
 ### Part drawing
 
@@ -178,17 +178,17 @@ const void * sub_part_ptr;          // A pointer the identifies something in the
 
 `lv_event_get_draw_part_dsc(event)` can be used to get a pointer to `lv_obj_draw_part_t`.
 
-#### LV_OBJ_EVENT_DRAW_PART_BEGIN
+#### LV_EVENT_DRAW_PART_BEGIN
 
 Start the drawing of a part. This is a good place to modify the draw descriptors (e.g. `rect_dsc`), or add masks.
 
-#### LV_OBJ_EVENT_DRAW_PART_END
+#### LV_EVENT_DRAW_PART_END
 
-Finish the drawing of a part. This is a good place to draw extra content on the part or remove masks added in `LV_OBJ_EVENT_DRAW_PART_BEGIN`.
+Finish the drawing of a part. This is a good place to draw extra content on the part or remove masks added in `LV_EVENT_DRAW_PART_BEGIN`.
 
 ### Others
 
-#### LV_OBJ_EVENT_COVER_CHECK
+#### LV_EVENT_COVER_CHECK
 
 This event is used to check whether an object fully covers an area or not.
 
@@ -212,7 +212,7 @@ Before sending this event LVGL checks if at least the widget's coordinates fully
 You need to check only the drawing you have added. The existing properties known by a widget are handled in its internal events.
 E.g. if a widget has &gt; 0 radius it might not cover an area, but you need to handle `radius` only if you will modify it and the widget won't know about it.
 
-#### LV_OBJ_EVENT_REFR_EXT_DRAW_SIZE
+#### LV_EVENT_REFR_EXT_DRAW_SIZE
 
 If you need to draw outside a widget, LVGL needs to know about it to provide extra space for drawing.
 Let's say you create an event which writes the current value of a slider above its knob. In this case LVGL needs to know that the slider's draw area should be larger with the size required for the text.
