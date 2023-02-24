@@ -25,9 +25,9 @@ By default, the last created (and only) display is used.
 If you pass `NULL` as `disp` parameter to display related functions the default display will usually be used.
 E.g. `lv_disp_trig_activity(NULL)` will trigger a user activity on the default display. (See below in [Inactivity](#Inactivity)).
 
-### Mirror display
+### Duplicate display
 
-To mirror the image of a display to another display, you don't need to use multi-display support. Just transfer the buffer received in `flush_cb` to the other display too.
+To duplicate the image of a display to another display, you don't need to the use multi-display support. Just transfer the buffer received in `flush_cb` to the other display too.
 
 ### Split image
 You can create a larger virtual display from an array of smaller ones. You can create it as below:
@@ -57,7 +57,7 @@ Screens can be deleted with `lv_obj_del(scr)`, but ensure that you do not delete
 
 ### Transparent screens
 
-Usually, the opacity of the screen is `LV_OPA_COVER` to provide a solid background for its children. If this is not the case (opacity &lt; 100%) the display's `bottom_layer` be visible.
+Usually, the opacity of the screen is `LV_OPA_COVER` to provide a solid background for its children. If this is not the case (opacity &lt; 100%) the display's `bottom_layer` will be visible.
 If the bottom layer's opacity is also not `LV_OPA_COVER` LVGL has no solid background to draw.
 
 This configuration (transparent screen and display) could be used to create for example OSD menus where a video is played on a lower layer, and a menu is overlaid on an upper layer.
@@ -66,8 +66,7 @@ To properly render the screen the display's color format needs to be set to one 
 
 In summary, to enable transparent screens and displays for OSD menu-like UIs:
 - Set the screen's `bg_opa` to transparent: `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
-- Set the bottom layer's `bg_opa` to transparent: `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
-- Set the screen's bg_opa to 0: `lv_obj_set_style_local_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
+- Set the bottom layer's `bg_opa` to transparent: `lv_obj_set_style_local_bg_opa(lv_bottom_layer(), LV_OPA_TRANSP, 0)`
 - Set a color format with alpha channel. E.g. `lv_disp_set_color_format(disp, LV_COLOR_FORMAT_NATIVE_ALPHA)`
 
 ## Features of displays
