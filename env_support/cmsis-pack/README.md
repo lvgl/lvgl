@@ -158,7 +158,15 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
     - \#define LV_USE_RLOTTIE 0
     - \#define LV_USE_FFMPEG 0
 
-9. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
+11. Remove unsupported devices from the `DEVICES` section
+
+    - LV_SE_SDL
+
+    - LV_USE_LINUX_FBDEV
+
+    - LV_USE_TFT_ESPI
+
+12. rename '**lv_conf_template.h**' to '**lv_conf_cmsis.h**'.
 
 
 
