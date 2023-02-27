@@ -33,6 +33,7 @@
 - [x] More color formats: 24 bit, ARGB1555, ARGB4444 etc
 - [ ] Unified caching #3116 #3415
 - [ ] Make layouts with an `lv_layout_dsc_t` instead of registering an ID+callback. See [here](https://github.com/lvgl/lvgl/issues/3481#issuecomment-1206434501)
+- [ ] Condider using `lv_color32_t` on APIs to support e.g. alpha gradient.
 
 ### Styles
 - [ ] Make `style_bg_img` support `9patch` images
