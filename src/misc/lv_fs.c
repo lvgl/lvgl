@@ -152,8 +152,11 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
             /*First part of data is in cache buffer, but we need to read rest of data from FS*/
             lv_memcpy(buf, buffer + buffer_offset, buffer_remaining_length);
 
+            file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position + buffer_remaining_length,
+                                 LV_FS_SEEK_SET);
+
             uint32_t bytes_read_to_buffer = 0;
-            if(btr > buffer_size) {
+            if(btr - buffer_remaining_length > buffer_size) {
                 /*If remaining data chuck is bigger than buffer size, then do not use cache, instead read it directly from FS*/
                 res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)(buf + buffer_remaining_length),
                                            btr - buffer_remaining_length, &bytes_read_to_buffer);
@@ -259,7 +262,7 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
                     file_p->cache->file_position = pos;
 
                     /*FS seek if new position is outside cache buffer*/
-                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position > file_p->cache->end) {
+                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position >= file_p->cache->end) {
                         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
                     }
 
@@ -269,14 +272,14 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
                     file_p->cache->file_position += pos;
 
                     /*FS seek if new position is outside cache buffer*/
-                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position > file_p->cache->end) {
+                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position >= file_p->cache->end) {
                         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
                     }
 
                     break;
                 }
             case LV_FS_SEEK_END: {
-                    /*Because we don't know the file size, we do a little trick: do a FS seek, then get new file position from FS*/
+                    /*Because we don't know the file size, we do a little trick: do a FS seek, then get the new file position from FS*/
                     res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos, whence);
                     if(res == LV_FS_RES_OK) {
                         uint32_t tmp_position;
