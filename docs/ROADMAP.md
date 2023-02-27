@@ -10,7 +10,7 @@
 - [ ] Reconsider the use of `has`, `is`, `enable` "action" keywords
 - [x] Update canvas API (https://github.com/lvgl/lvgl/issues/3393)
 - [x] `LV_STYLE_PROP_INHERIT` -> `LV_STYLE_PROP_FLAG_INHERITABLE` [LINK](https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769)
-- [ ] Replace `disp_drv->direct_mode/full_refresh` with enum.
+- [x] Replace `disp_drv->direct_mode/full_refresh` with enum.
 - [x] Consider flat directory structure. E.g. `extra/widgets` to `widgets`
 - [ ] Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `lv_coord_t` as `int32_t`.
 - [ ] To define a new stdlib API use defines `LV_USE_CUSTO_...` and let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
