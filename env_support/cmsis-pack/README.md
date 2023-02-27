@@ -160,7 +160,7 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
 
 11. Remove unsupported devices from the `DEVICES` section
 
-    - LV_SE_SDL
+    - LV_USE_SDL
 
     - LV_USE_LINUX_FBDEV
 
