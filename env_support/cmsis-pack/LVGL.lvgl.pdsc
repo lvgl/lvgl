@@ -36,6 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
+     <release date="2023-02-26" version="9.0.0-dev" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev.pack">
+      - LVGL 9.0.0-dev
+      - New Driver Architecture
+      - Other fixes
+     </release>
      <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/release/v8.3/env_support/cmsis-pack/LVGL.lvgl.8.3.5.pack">
       - LVGL 8.3.5 release
       - Use LVGL version as the cmsis-pack version
@@ -43,7 +48,7 @@
       - Rework stm32 DMA2D support
       - Various fixes
     </release>
-    <release date="2023-01-15" version="1.1.0-alpha" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
+    <release date="2023-01-15" version="1.1.0-alpha" url="https://github.com/lvgl/lvgl/raw/4e3f341b882e0453d3da5cce6bb1b6357e52e3e7/env_support/cmsis-pack/LVGL.lvgl.1.1.0-alpha.pack">
       - LVGL 9.0.0-dev
       - Monthly update for January
     </release>
@@ -316,7 +321,7 @@
                 <file category="sourceC"            name="src/core/lv_indev.c" />
                 <file category="sourceC"            name="src/core/lv_disp.c" />
                 <file category="sourceC"            name="src/core/lv_obj_scroll.c" />
-                <file category="sourceC"            name="src/core/lv_event.c" />
+                <file category="sourceC"            name="src/core/lv_obj_event.c" />
                 <file category="sourceC"            name="src/core/lv_obj_draw.c" />
                 <file category="sourceC"            name="src/core/lv_group.c" />
                 <file category="sourceC"            name="src/core/lv_obj_style.c" />
@@ -384,8 +389,6 @@
                 <file category="sourceC"            name="src/font/lv_font_unscii_16.c" />
 
                 <!-- src/hal -->
-                <file category="sourceC"            name="src/hal/lv_hal_disp.c" />
-                <file category="sourceC"            name="src/hal/lv_hal_indev.c" />
                 <file category="sourceC"            name="src/hal/lv_hal_tick.c" />
 
                 <!-- src/others -->
@@ -422,6 +425,7 @@
                 <file category="sourceC"            name="src/misc/lv_style.c" />
                 <file category="sourceC"            name="src/misc/lv_color.c" />
                 <file category="sourceC"            name="src/misc/lv_printf.c" />
+                <file category="sourceC"            name="src/misc/lv_event.c" />
 
                 <!-- src/widgets -->
                 <file category="sourceC"            name="src/widgets/spinner/lv_spinner.c" />
@@ -482,11 +486,18 @@
                 <file category="sourceC"            name="src/themes/default/lv_theme_default.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.1.7" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.2.0" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
-
+                
+                <!-- code template -->
+                <file category="header"       name="examples/porting/lv_port_disp_template.h" attr="template" select="Display port template" version="2.0.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_disp_template.c" attr="template" select="Display port template" version="2.0.0"/>
+                <file category="header"       name="examples/porting/lv_port_indev_template.h" attr="template" select="Input devices port template" version="2.0.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_indev_template.c" attr="template" select="Input devices port template" version="2.0.0"/>
+                <file category="header"       name="examples/porting/lv_port_fs_template.h" attr="template" select="File system port template" version="2.0.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_fs_template.c" attr="template" select="File system port template" version="2.0.0"/>
               </files>
 
               <Pre_Include_Global_h>
@@ -564,7 +575,7 @@
             <component Cgroup="lvgl" Csub="GPU NXP-PXP"  condition="LVGL-GPU-NXP-PXP">
               <description>An hardware acceleration from NXP-PXP</description>
               <files>
-                <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
+                <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_draw_pxp_blend.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp.c" />
                 <file category="sourceC"      name="src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c" />
@@ -581,11 +592,13 @@
             <component Cgroup="lvgl" Csub="GPU NXP-VGLite"  condition="LVGL-GPU-NXP-VGLite">
               <description>An hardware acceleration from NXP-VGLite</description>
               <files>
-                <file category="sourceC"      name="src/draw/nxp/lv_gpu_nxp.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_line.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_arc.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_blend.c" />
                 <file category="sourceC"      name="src/draw/nxp/vglite/lv_draw_vglite_rect.c" />
-                <file category="sourceC"      name="src/draw/nxp/vglite/lv_gpu_nxp_vglite.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_buf.c" />
+                <file category="sourceC"      name="src/draw/nxp/vglite/lv_vglite_utils.c" />
               </files>
 
               <RTE_Components_h>
@@ -776,7 +789,7 @@
               </RTE_Components_h>
 
             </component>
-
+      
             <component Cgroup="lvgl" Csub="Libs QRCode"  condition="LVGL-Essential">
               <description>Add QRCode support</description>
               <files>
@@ -890,7 +903,7 @@
                 <file category="sourceC"    name="demos/benchmark/lv_demo_benchmark.c" />
                 <file category="header"     name="demos/benchmark/lv_demo_benchmark.h" />
 
-                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_alpha16.c" />
+                <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_alpha256.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_argb.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_chroma_keyed.c" />
                 <file category="sourceC"    name="demos/benchmark/assets/img_benchmark_cogwheel_indexed16.c" />
