@@ -179,15 +179,15 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
     LV_UNUSED(drv);
     int w;
     switch(whence) {
-    case LV_FS_SEEK_SET:
-        w = SEEK_SET;
-        break;
-    case LV_FS_SEEK_CUR:
-        w = SEEK_CUR;
-        break;
-    case LV_FS_SEEK_END:
-        w = SEEK_END;
-        break;
+        case LV_FS_SEEK_SET:
+            w = SEEK_SET;
+            break;
+        case LV_FS_SEEK_CUR:
+            w = SEEK_CUR;
+            break;
+        case LV_FS_SEEK_END:
+            w = SEEK_END;
+            break;
     }
 
     off_t offset = lseek((lv_uintptr_t)file_p, pos, w);
