@@ -26,3 +26,9 @@ Pie chart
 .. lv_example:: widgets/meter/lv_example_meter_4
   :language: c
 
+
+Linear meter
+"""""""""""""""""""""""
+
+.. lv_example:: widgets/meter/lv_example_meter_5
+  :language: c

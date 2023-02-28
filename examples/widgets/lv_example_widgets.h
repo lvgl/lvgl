@@ -101,6 +101,7 @@ void lv_example_meter_1(void);
 void lv_example_meter_2(void);
 void lv_example_meter_3(void);
 void lv_example_meter_4(void);
+void lv_example_meter_5(void);
 
 void lv_example_msgbox_1(void);
 

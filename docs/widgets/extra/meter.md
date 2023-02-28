@@ -11,6 +11,26 @@ The Meter widget can visualize data in very flexible ways. In can show arcs, nee
 
 ## Usage
 
+### Meter mode
+
+Meter widget can have a linear (vertical/horizontal) or round mode.
+By default, the mode is round, but changing is simple: `lv_meter_set_indicator_mode(meter, LV_METER_INDICATOR_MODE_LINEAR)`.
+If the mode is `LV_METER_INDICATOR_MODE_LINEAR`, the widget's orientation depends on it's size:
+if width >= height - horizontal, otherwise - vertical.
+
+Linear mode has additional options:
+- `lv_obj_set_style_base_dir(meter, LV_BASE_DIR_RTL, 0)` - for changing scale direction. By default horizontal meter has scale direction from
+  left to right, vertical meter - from up to down.
+- `lv_meter_set_needle_side(scale, toggle_side)` - for toggle labels with needle. By default horizontal meter has labels under
+  the scale and needle below the scale, vertical meter has labels on the left and needle on the right.
+
+According to the styles widget has borders and custom background. It can be disabled for showing only widget
+itself, useful for linear meter:
+```c
+lv_obj_set_style_bg_opa(meter, LV_OPA_TRANSP, 0);
+lv_obj_set_style_border_width(meter, 0, 0);
+```
+
 ### Add a scale
 
 First a *Scale* needs to be added to the Meter with `lv_meter_scale_t * scale = lv_meter_add_scale(meter)`.
