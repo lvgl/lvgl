@@ -59,10 +59,14 @@
 
 static void lv_draw_pxp_wait_for_finish(lv_draw_ctx_t * draw_ctx);
 
+static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+
 static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
 
-static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+static void lv_draw_pxp_buffer_copy(lv_draw_ctx_t * draw_ctx,
+                                    void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
+                                    void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -84,6 +88,7 @@ void lv_draw_pxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     pxp_draw_ctx->base_draw.draw_img_decoded = lv_draw_pxp_img_decoded;
     pxp_draw_ctx->blend = lv_draw_pxp_blend;
     pxp_draw_ctx->base_draw.wait_for_finish = lv_draw_pxp_wait_for_finish;
+    pxp_draw_ctx->base_draw.buffer_copy = lv_draw_pxp_buffer_copy;
 }
 
 void lv_draw_pxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
@@ -251,6 +256,20 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 
     lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, &src_area, src_stride,
                                   dsc, cf);
+}
+
+static void lv_draw_pxp_buffer_copy(lv_draw_ctx_t * draw_ctx,
+                                    void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
+                                    void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
+{
+    LV_UNUSED(draw_ctx);
+
+    if(lv_area_get_size(dest_area) < LV_GPU_NXP_PXP_SIZE_LIMIT) {
+        lv_draw_sw_buffer_copy(draw_ctx, dest_buf, dest_stride, dest_area, src_buf, src_stride, src_area);
+        return;
+    }
+
+    lv_gpu_nxp_pxp_buffer_copy(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride);
 }
 
 #endif /*LV_USE_GPU_NXP_PXP*/

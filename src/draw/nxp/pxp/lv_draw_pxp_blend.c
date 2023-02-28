@@ -308,6 +308,33 @@ void lv_gpu_nxp_pxp_blit_transform(lv_color_t * dest_buf, lv_area_t * dest_area,
     lv_pxp_blit_cf(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride, dsc, cf);
 }
 
+void lv_gpu_nxp_pxp_buffer_copy(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+                                const lv_color_t * src_buf, const lv_area_t * src_area, lv_coord_t src_stride)
+{
+    lv_coord_t src_width = lv_area_get_width(src_area);
+    lv_coord_t src_height = lv_area_get_height(src_area);
+
+    lv_gpu_nxp_pxp_reset();
+
+    const pxp_pic_copy_config_t picCopyConfig = {
+        .srcPicBaseAddr = (uint32_t)src_buf,
+        .srcPitchBytes = src_stride * sizeof(lv_color_t),
+        .srcOffsetX = src_area->x1,
+        .srcOffsetY = src_area->y1,
+        .destPicBaseAddr = (uint32_t)dest_buf,
+        .destPitchBytes = dest_stride * sizeof(lv_color_t),
+        .destOffsetX = dest_area->x1,
+        .destOffsetY = dest_area->y1,
+        .width = src_width,
+        .height = src_height,
+        .pixelFormat = PXP_AS_PIXEL_FORMAT
+    };
+
+    PXP_StartPictureCopy(LV_GPU_NXP_PXP_ID, &picCopyConfig);
+
+    lv_gpu_nxp_pxp_wait();
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
