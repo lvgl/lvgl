@@ -64,9 +64,9 @@ DMA or other hardware should be used to transfer data to the display so the MCU 
 This way, the rendering and refreshing of the display become parallel operations.
 
 
-## Advnaced options
+## Advanced options
 
-### Resoltion
+### Resolution
 To set the resolution of the display after creation use `lv_disp_set_res(disp, hor_res, ver_res);`
 
 It's not mandatory to use the whole display for LVGL, however in some cases the physical resolution is important. For example the touchpad still sees the whole resolution and the values needs to be converted
