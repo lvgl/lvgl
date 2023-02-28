@@ -188,6 +188,8 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
         case LV_FS_SEEK_END:
             w = SEEK_END;
             break;
+        default:
+            return LV_FS_RES_INV_PARAM;
     }
 
     off_t offset = lseek((lv_uintptr_t)file_p, pos, w);
