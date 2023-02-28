@@ -183,9 +183,6 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
                 VG_LITE_LOG_TRACE("VG-Lite fill failed. Fallback.");
         }
         else {
-            lv_color_t * dest_buf = draw_ctx->buf;
-            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
             lv_area_t src_area;
             src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1);
             src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1);
@@ -193,8 +190,15 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
             src_area.y2 = src_area.y1 + lv_area_get_height(dsc->blend_area) - 1;
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
 
-            done = (lv_gpu_nxp_vglite_blit(dest_buf, &blend_area, dest_stride,
-                                           src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
+#if VG_LITE_BLIT_SPLIT_ENABLED
+            lv_color_t * dest_buf = draw_ctx->buf;
+            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
+            done = (lv_gpu_nxp_vglite_blit_split(dest_buf, &blend_area, dest_stride,
+                                                 src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
+#else
+            done = (lv_gpu_nxp_vglite_blit(&blend_area, src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
+#endif
 
             if(!done)
                 VG_LITE_LOG_TRACE("VG-Lite blit failed. Fallback.");
@@ -248,9 +252,6 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
        && !lv_img_cf_has_alpha(cf)
 #endif
       ) {
-        lv_color_t * dest_buf = draw_ctx->buf;
-        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
         lv_area_t src_area;
         src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
         src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
@@ -258,12 +259,23 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
         src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
         lv_coord_t src_stride = lv_area_get_width(coords);
 
+#if VG_LITE_BLIT_SPLIT_ENABLED
+        lv_color_t * dest_buf = draw_ctx->buf;
+        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+
         if(has_transform)
-            done = (lv_gpu_nxp_vglite_blit_transform(dest_buf, &blend_area, dest_stride, &rel_clip_area,
+            /* VG-Lite blit split with transformation is not supported! */
+            done = false;
+        else
+            done = (lv_gpu_nxp_vglite_blit_split(dest_buf, &blend_area, dest_stride,
+                                                 src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
+#else
+        if(has_transform)
+            done = (lv_gpu_nxp_vglite_blit_transform(&blend_area, &rel_clip_area,
                                                      src_buf, &src_area, src_stride, dsc) == LV_RES_OK);
         else
-            done = (lv_gpu_nxp_vglite_blit(dest_buf, &blend_area, dest_stride,
-                                           src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
+            done = (lv_gpu_nxp_vglite_blit(&blend_area, src_buf, &src_area, src_stride, dsc->opa) == LV_RES_OK);
+#endif
 
         if(!done)
             VG_LITE_LOG_TRACE("VG-Lite blit %sfailed. Fallback.", has_transform ? "transform " : "");
