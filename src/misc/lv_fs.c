@@ -138,10 +138,10 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
     char * buffer = file_p->cache->buffer;
     uint16_t buffer_size = file_p->drv->cache_size;
 
-    if(start <= file_position && file_position < end) {
+    if(start <= file_position && file_position <= end) {
         /* Data can be read from cache buffer */
-        uint16_t buffer_offset = file_position - start;
-        uint32_t buffer_remaining_length = LV_MIN((uint32_t)buffer_size - buffer_offset, (uint32_t)end - file_position);
+        uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
+        uint16_t buffer_offset = (end - start) - buffer_remaining_length + 1;
 
         if(btr <= buffer_remaining_length) {
             /*Data is in cache buffer, and buffer end not reached, no need to read from FS*/
@@ -152,7 +152,7 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
             /*First part of data is in cache buffer, but we need to read rest of data from FS*/
             lv_memcpy(buf, buffer + buffer_offset, buffer_remaining_length);
 
-            file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position + buffer_remaining_length,
+            file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->end + 1,
                                  LV_FS_SEEK_SET);
 
             uint32_t bytes_read_to_buffer = 0;
@@ -164,8 +164,8 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
             else {
                 /*If remaining data chunk is smaller than buffer size, then read into cache buffer*/
                 res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buffer, buffer_size, &bytes_read_to_buffer);
-                file_p->cache->start = file_p->cache->end;
-                file_p->cache->end = file_p->cache->start + bytes_read_to_buffer;
+                file_p->cache->start = file_p->cache->end + 1;
+                file_p->cache->end = file_p->cache->start + bytes_read_to_buffer - 1;
 
                 uint16_t data_chunk_remaining = LV_MIN(btr - buffer_remaining_length, bytes_read_to_buffer);
                 lv_memcpy(buf + buffer_remaining_length, buffer, data_chunk_remaining);
@@ -174,6 +174,9 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
         }
     }
     else {
+        file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position,
+                             LV_FS_SEEK_SET);
+
         /*Data is not in cache buffer*/
         if(btr > buffer_size) {
             /*If bigger data is requested, then do not use cache, instead read it directly*/
@@ -187,10 +190,12 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
                 buffer = file_p->cache->buffer;
             }
 
+
+
             uint32_t bytes_read_to_buffer = 0;
             res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buffer, buffer_size, &bytes_read_to_buffer);
             file_p->cache->start = file_position;
-            file_p->cache->end = file_p->cache->start + bytes_read_to_buffer;
+            file_p->cache->end = file_p->cache->start + bytes_read_to_buffer - 1;
 
             *br = LV_MIN(btr, bytes_read_to_buffer);
             lv_memcpy(buf, buffer, *br);
@@ -262,7 +267,7 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
                     file_p->cache->file_position = pos;
 
                     /*FS seek if new position is outside cache buffer*/
-                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position >= file_p->cache->end) {
+                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position > file_p->cache->end) {
                         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
                     }
 
@@ -272,7 +277,7 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
                     file_p->cache->file_position += pos;
 
                     /*FS seek if new position is outside cache buffer*/
-                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position >= file_p->cache->end) {
+                    if(file_p->cache->file_position < file_p->cache->start || file_p->cache->file_position > file_p->cache->end) {
                         res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, file_p->cache->file_position, LV_FS_SEEK_SET);
                     }
 
