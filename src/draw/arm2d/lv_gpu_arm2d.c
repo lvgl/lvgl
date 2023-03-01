@@ -653,11 +653,11 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
         }
         else {
             __arm_2d_impl_tile_copy_opacity((color_int *)src_buf,
-                                         src_stride,
-                                         (color_int *)dest_buf,
-                                         dest_stride,
-                                         &copy_size,
-                                         opa);
+                                            src_stride,
+                                            (color_int *)dest_buf,
+                                            dest_stride,
+                                            &copy_size,
+                                            opa);
         }
     }
     /*Masked*/
@@ -676,11 +676,11 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
         /*Handle opa and mask values too*/
         else {
             __arm_2d_impl_gray8_tile_copy_opacity((uint8_t *)mask,
-                                               mask_stride,
-                                               (uint8_t *)mask,
-                                               mask_stride,
-                                               &copy_size,
-                                               opa);
+                                                  mask_stride,
+                                                  (uint8_t *)mask,
+                                                  mask_stride,
+                                                  &copy_size,
+                                                  opa);
 
             __arm_2d_impl_src_msk_copy((color_int *)src_buf,
                                        src_stride,
