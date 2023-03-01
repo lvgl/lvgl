@@ -68,10 +68,10 @@
 #define MAX_BUF_SIZE (uint32_t) lv_disp_get_hor_res(_lv_refr_get_disp_refreshing())
 
 #if LV_COLOR_DEPTH == 16
-#define arm_2d_fill_colour              arm_2d_rgb16_fill_colour
-#define arm_2d_fill_colour_with_alpha   arm_2d_rgb565_fill_colour_with_alpha
-#define arm_2d_fill_colour_with_mask    arm_2d_rgb565_fill_colour_with_mask
-#define arm_2d_fill_colour_with_mask_and_opacity                                \
+#define arm_2d_fill_color              arm_2d_rgb16_fill_colour
+#define arm_2d_fill_color_with_alpha   arm_2d_rgb565_fill_colour_with_alpha
+#define arm_2d_fill_color_with_mask    arm_2d_rgb565_fill_colour_with_mask
+#define arm_2d_fill_color_with_mask_and_opacity                                 \
     arm_2d_rgb565_fill_colour_with_mask_and_opacity
 #define arm_2d_tile_copy                arm_2d_rgb16_tile_copy
 #define arm_2d_tile_copy_opacity           arm_2d_rgb565_tile_copy_opacity
@@ -79,19 +79,19 @@
 #define arm_2d_color_t                  arm_2d_color_rgb565_t
 
 /* arm-2d direct mode apis */
-#define __arm_2d_impl_colour_filling    __arm_2d_impl_rgb16_colour_filling
-#define __arm_2d_impl_colour_filling_with_opacity                               \
+#define __arm_2d_impl_color_filling    __arm_2d_impl_rgb16_colour_filling
+#define __arm_2d_impl_color_filling_with_opacity                                \
     __arm_2d_impl_rgb565_colour_filling_with_opacity
-#define __arm_2d_impl_colour_filling_mask                                       \
+#define __arm_2d_impl_color_filling_mask                                        \
     __arm_2d_impl_rgb565_colour_filling_mask
-#define __arm_2d_impl_colour_filling_mask_opacity                               \
+#define __arm_2d_impl_color_filling_mask_opacity                                \
     __arm_2d_impl_rgb565_colour_filling_mask_opacity
 #define __arm_2d_impl_copy              __arm_2d_impl_rgb16_copy
 #define __arm_2d_impl_tile_copy_opacity    __arm_2d_impl_rgb565_tile_copy_opacity
 #define __arm_2d_impl_src_msk_copy      __arm_2d_impl_rgb565_src_msk_copy
 #define __arm_2d_impl_src_chn_msk_copy  __arm_2d_impl_rgb565_src_chn_msk_copy
 #define __arm_2d_impl_cl_key_copy       __arm_2d_impl_rgb16_cl_key_copy
-#define __arm_2d_impl_tile_copy_colour_keying_opacity                           \
+#define __arm_2d_impl_tile_copy_color_keying_opacity                            \
     __arm_2d_impl_rgb565_tile_copy_colour_keying_opacity
 #define arm_2d_tile_transform_with_src_mask_and_opacity_prepare                 \
     arm_2dp_rgb565_tile_transform_with_src_mask_and_opacity_prepare
@@ -105,10 +105,10 @@
 #define color_int                       uint16_t
 
 #elif LV_COLOR_DEPTH == 32
-#define arm_2d_fill_colour              arm_2d_rgb32_fill_colour
-#define arm_2d_fill_colour_with_alpha   arm_2d_cccn888_fill_colour_with_alpha
-#define arm_2d_fill_colour_with_mask    arm_2d_cccn888_fill_colour_with_mask
-#define arm_2d_fill_colour_with_mask_and_opacity                                \
+#define arm_2d_fill_color              arm_2d_rgb32_fill_colour
+#define arm_2d_fill_color_with_alpha   arm_2d_cccn888_fill_colour_with_alpha
+#define arm_2d_fill_color_with_mask    arm_2d_cccn888_fill_colour_with_mask
+#define arm_2d_fill_color_with_mask_and_opacity                                 \
     arm_2d_cccn888_fill_colour_with_mask_and_opacity
 #define arm_2d_tile_copy                arm_2d_rgb32_tile_copy
 #define arm_2d_tile_copy_opacity           arm_2d_cccn888_tile_copy_opacity
@@ -116,19 +116,19 @@
 #define arm_2d_color_t                  arm_2d_color_cccn888_t
 
 /* arm-2d direct mode apis */
-#define __arm_2d_impl_colour_filling    __arm_2d_impl_rgb32_colour_filling
-#define __arm_2d_impl_colour_filling_with_opacity                               \
+#define __arm_2d_impl_color_filling    __arm_2d_impl_rgb32_colour_filling
+#define __arm_2d_impl_color_filling_with_opacity                                \
     __arm_2d_impl_cccn888_colour_filling_with_opacity
-#define __arm_2d_impl_colour_filling_mask                                       \
+#define __arm_2d_impl_color_filling_mask                                        \
     __arm_2d_impl_cccn888_colour_filling_mask
-#define __arm_2d_impl_colour_filling_mask_opacity                               \
+#define __arm_2d_impl_color_filling_mask_opacity                                \
     __arm_2d_impl_cccn888_colour_filling_mask_opacity
 #define __arm_2d_impl_copy              __arm_2d_impl_rgb32_copy
 #define __arm_2d_impl_tile_copy_opacity    __arm_2d_impl_cccn888_tile_copy_opacity
 #define __arm_2d_impl_src_msk_copy      __arm_2d_impl_cccn888_src_msk_copy
 #define __arm_2d_impl_src_chn_msk_copy  __arm_2d_impl_cccn888_src_chn_msk_copy
 #define __arm_2d_impl_cl_key_copy       __arm_2d_impl_rgb32_cl_key_copy
-#define __arm_2d_impl_tile_copy_colour_keying_opacity                           \
+#define __arm_2d_impl_tile_copy_color_keying_opacity                            \
     __arm_2d_impl_cccn888_tile_copy_colour_keying_opacity
 #define arm_2d_tile_transform_with_src_mask_and_opacity_prepare                 \
     arm_2dp_cccn888_tile_transform_with_src_mask_and_opacity_prepare
@@ -286,7 +286,7 @@
                 = lv_malloc(src_w * src_h * sizeof(lv_color_t));                \
             if (NULL == rgb_tmp_buf) {                                          \
                 LV_LOG_WARN(                                                    \
-                    "Failed to allocate memory for accelerating recolour, "     \
+                    "Failed to allocate memory for accelerating recolor, "      \
                     "use normal route instead.");                               \
                 break;                                                          \
             }                                                                   \
@@ -295,8 +295,8 @@
                 .iWidth = src_w,                                                \
                 .iHeight = src_h,                                               \
             };                                                                  \
-            /* apply re-colour */                                               \
-            __arm_2d_impl_colour_filling_with_opacity(                          \
+            /* apply re-color */                                                \
+            __arm_2d_impl_color_filling_with_opacity(                           \
                 (color_int *)rgb_tmp_buf,                                       \
                 src_w,                                                          \
                 &copy_size,                                                     \
@@ -323,7 +323,7 @@
                 = lv_malloc(src_w * src_h * sizeof(lv_color_t));                \
             if (NULL == rgb_tmp_buf) {                                          \
                 LV_LOG_WARN(                                                    \
-                    "Failed to allocate memory for accelerating recolour, "     \
+                    "Failed to allocate memory for accelerating recolor, "      \
                     "use normal route instead.");                               \
                 break;                                                          \
             }                                                                   \
@@ -332,8 +332,8 @@
                 .iWidth = src_w,                                                \
                 .iHeight = src_h,                                               \
             };                                                                  \
-            /* apply re-colour */                                               \
-            __arm_2d_impl_colour_filling_with_opacity(                          \
+            /* apply re-color */                                                \
+            __arm_2d_impl_color_filling_with_opacity(                           \
                 (color_int *)rgb_tmp_buf,                                       \
                 src_w,                                                          \
                 &copy_size,                                                     \
@@ -582,14 +582,14 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
     /*No mask*/
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
-            __arm_2d_impl_colour_filling((color_int *)dest_buf,
+            __arm_2d_impl_color_filling((color_int *)dest_buf,
                                          dest_stride,
                                          &target_size,
                                          lv_color_to_int(color));
         }
         /*Has opacity*/
         else {
-            __arm_2d_impl_colour_filling_with_opacity((color_int *)dest_buf,
+            __arm_2d_impl_color_filling_with_opacity((color_int *)dest_buf,
                                                       dest_stride,
                                                       &target_size,
                                                       lv_color_to_int(color),
@@ -600,7 +600,7 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
     else {
         /*Only the mask matters*/
         if(opa >= LV_OPA_MAX) {
-            __arm_2d_impl_colour_filling_mask((color_int *)dest_buf,
+            __arm_2d_impl_color_filling_mask((color_int *)dest_buf,
                                               dest_stride,
                                               (uint8_t *)mask,
                                               mask_stride,
@@ -609,7 +609,7 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
         }
         /*With opacity*/
         else {
-            __arm_2d_impl_colour_filling_mask_opacity((color_int *)dest_buf,
+            __arm_2d_impl_color_filling_mask_opacity((color_int *)dest_buf,
                                                       dest_stride,
                                                       (uint8_t *)mask,
                                                       mask_stride,
@@ -804,8 +804,8 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 .iHeight = buf_h,
             };
 
-            /* apply re-colour */
-            __arm_2d_impl_colour_filling(
+            /* apply re-color */
+            __arm_2d_impl_color_filling(
                 (color_int *)rgb_buf,
                 buf_w,
                 &copy_size,
@@ -816,17 +816,17 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
 
         if(!transform) {
             if(LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED == cf)  {
-                /* copy with colour keying */
+                /* copy with color keying */
 
                 /* *INDENT-OFF* */
                 __RECOLOUR_WRAPPER(
                     color_int chrome_key_int = lv_color_to_int(LV_COLOR_CHROMA_KEY);
-                    /* calculate new chrome-key colour */
+                    /* calculate new chrome-key color */
                     if(draw_dsc->recolor_opa > LV_OPA_MIN) {
-                    color_int recolour_int = lv_color_to_int(draw_dsc->recolor);
+                    color_int recolor_int = lv_color_to_int(draw_dsc->recolor);
 
                     __ARM_2D_PIXEL_BLENDING_OPA(
-                        (color_int *) & recolour_int,
+                        (color_int *) & recolor_int,
                         (color_int *) & chrome_key_int,
                         draw_dsc->recolor_opa
                     );
@@ -844,7 +844,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                         chrome_key_int);
                     }
                     else {
-                        __arm_2d_impl_tile_copy_colour_keying_opacity(
+                        __arm_2d_impl_tile_copy_color_keying_opacity(
                             (color_int *)src_buf_tmp,
                             src_stride,
                             (color_int *)dest_buf,
@@ -1175,8 +1175,8 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                     .iHeight = buf_h,
                 };
 
-                /* apply re-colour */
-                __arm_2d_impl_colour_filling_with_opacity(
+                /* apply re-color */
+                __arm_2d_impl_color_filling_with_opacity(
                     (color_int *)rgb_buf,
                     buf_w,
                     &copy_size,
