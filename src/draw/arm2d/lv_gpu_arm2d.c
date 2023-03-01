@@ -36,8 +36,7 @@
 
 
 #include "lv_gpu_arm2d.h"
-//#include "../../core/lv_refr.h"
-#include "lvgl.h"
+#include "../../core/lv_refr.h"
 
 #if LV_USE_GPU_ARM2D
 #define __ARM_2D_IMPL__
