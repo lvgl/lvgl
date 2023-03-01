@@ -583,17 +583,17 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
             __arm_2d_impl_color_filling((color_int *)dest_buf,
-                                         dest_stride,
-                                         &target_size,
-                                         lv_color_to_int(color));
+                                        dest_stride,
+                                        &target_size,
+                                        lv_color_to_int(color));
         }
         /*Has opacity*/
         else {
             __arm_2d_impl_color_filling_with_opacity((color_int *)dest_buf,
-                                                      dest_stride,
-                                                      &target_size,
-                                                      lv_color_to_int(color),
-                                                      opa);
+                                                     dest_stride,
+                                                     &target_size,
+                                                     lv_color_to_int(color),
+                                                     opa);
         }
     }
     /*Masked*/
@@ -601,21 +601,21 @@ static bool arm_2d_fill_normal(lv_color_t * dest_buf,
         /*Only the mask matters*/
         if(opa >= LV_OPA_MAX) {
             __arm_2d_impl_color_filling_mask((color_int *)dest_buf,
-                                              dest_stride,
-                                              (uint8_t *)mask,
-                                              mask_stride,
-                                              &target_size,
-                                              lv_color_to_int(color));
+                                             dest_stride,
+                                             (uint8_t *)mask,
+                                             mask_stride,
+                                             &target_size,
+                                             lv_color_to_int(color));
         }
         /*With opacity*/
         else {
             __arm_2d_impl_color_filling_mask_opacity((color_int *)dest_buf,
-                                                      dest_stride,
-                                                      (uint8_t *)mask,
-                                                      mask_stride,
-                                                      &target_size,
-                                                      lv_color_to_int(color),
-                                                      opa);
+                                                     dest_stride,
+                                                     (uint8_t *)mask,
+                                                     mask_stride,
+                                                     &target_size,
+                                                     lv_color_to_int(color),
+                                                     opa);
         }
     }
 
