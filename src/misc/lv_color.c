@@ -166,6 +166,7 @@ bool lv_color_format_has_alpha(lv_color_format_t cf)
         case LV_COLOR_FORMAT_ARGB4444:
         case LV_COLOR_FORMAT_A8L8:
         case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_ARGB8565:
         case LV_COLOR_FORMAT_ARGB1555:
         case LV_COLOR_FORMAT_ARGB8888:
             return true;
