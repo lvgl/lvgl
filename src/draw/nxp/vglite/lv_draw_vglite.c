@@ -306,7 +306,8 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
     rel_clip_area.y1 = LV_MIN(point1->y, point2->y) - dsc->width / 2;
     rel_clip_area.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 
-    if(!_lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_ctx->clip_area))
+    lv_area_t clipped_coords;
+    if(!_lv_area_intersect(&clipped_coords, &rel_clip_area, draw_ctx->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
@@ -394,7 +395,8 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
     lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    if(!_lv_area_intersect(&rel_coords, &rel_coords, &rel_clip_area))
+    lv_area_t clipped_coords;
+    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
         return LV_RES_OK; /*Fully clipped, nothing to do*/
 
     bool mask_any = lv_draw_mask_is_any(&rel_coords);
@@ -448,6 +450,10 @@ static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_re
     lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
+    lv_area_t clipped_coords;
+    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
+        return LV_RES_OK; /*Fully clipped, nothing to do*/
+
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(&rel_coords, &rel_clip_area, dsc, true);
     if(res != LV_RES_OK)
         VG_LITE_LOG_TRACE("VG-Lite draw border failed. Fallback.");
@@ -476,6 +482,10 @@ static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_r
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+
+    lv_area_t clipped_coords;
+    if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
+        return LV_RES_OK; /*Fully clipped, nothing to do*/
 
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(&rel_coords, &rel_clip_area, dsc, false);
     if(res != LV_RES_OK)
