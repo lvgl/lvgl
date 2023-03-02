@@ -1,7 +1,4 @@
-#!//opt/bin/lv_micropython -i
 import utime as time
-import lvgl as lv
-import display_driver
 
 def set_value(indic,v):
     meter.set_indicator_end_value(indic, v)

@@ -73,8 +73,7 @@ class ExampleChart_6():
                 draw_rect_dsc.init()
                 draw_rect_dsc.bg_color = lv.palette_main(lv.PALETTE.BLUE)
                 draw_rect_dsc.radius = 3
-
-                lv.draw_rect(a, dsc.clip_area, draw_rect_dsc)
+                dsc.draw_ctx.rect(draw_rect_dsc,a)
 
                 draw_label_dsc = lv.draw_label_dsc_t()
                 draw_label_dsc.init()
@@ -83,6 +82,6 @@ class ExampleChart_6():
                 a.x2 -= 5
                 a.y1 += 5
                 a.y2 -= 5
-                lv.draw_label(a, dsc.clip_area, draw_label_dsc, value_txt, None)
+                dsc.draw_ctx.label(draw_label_dsc,a,value_txt,None)
 
 example_chart_6 = ExampleChart_6()

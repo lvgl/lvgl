@@ -1,7 +1,4 @@
-#!//opt/bin/lv_micropython -i
 import utime as time
-import lvgl as lv
-import display_driver
 
 # Create an image from the png file
 try:
@@ -45,7 +42,7 @@ def tick_label_event(e):
     if draw_part_dsc.id % 5:  return
 
     # The order of numbers on the clock is tricky: 12, 1, 2, 3...*/
-    txt = ["12", "1", "2as", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
+    txt = ["12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
     # dsc.text is defined char text[16], I must therefore convert the Python string to a byte_array
 
     idx = int(draw_part_dsc.id / 5)
