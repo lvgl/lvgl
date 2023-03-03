@@ -47,4 +47,18 @@ void test_list_get_text_from_label(void)
     TEST_ASSERT_EQUAL_STRING(message, lv_label_get_text(label));
 }
 
+void test_list_snapshot(void)
+{
+    lv_obj_t * snapshot_list = lv_list_create(lv_scr_act());
+
+    lv_list_add_text(snapshot_list, "File");
+    lv_list_add_btn(snapshot_list, LV_SYMBOL_FILE, "New");
+    lv_list_add_btn(snapshot_list, LV_SYMBOL_DIRECTORY, "Open");
+    lv_list_add_btn(snapshot_list, LV_SYMBOL_SAVE, "Save");
+
+    lv_obj_center(snapshot_list);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("list_1.png");
+}
+
 #endif
