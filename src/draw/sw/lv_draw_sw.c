@@ -27,8 +27,7 @@
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-static void thread_cb(void * ptr);
-
+static void render_thread_cb(void * ptr);
 
 /**********************
  *  STATIC VARIABLES
@@ -75,10 +74,10 @@ void draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt)
         draw_sw_unit->base_unit.next = disp->draw_unit_head;
         disp->draw_unit_head = (lv_draw_unit_t *) draw_sw_unit;
 
-        lv_mutex_init(&draw_sw_unit->lock);
-        lv_thread_sync_init(&draw_sw_unit->cond);
-
-        lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_MID, thread_cb, 8 * 1024, draw_sw_unit);
+        lv_mutex_init(&draw_sw_unit->render_block);
+        lv_mutex_lock(
+            &draw_sw_unit->render_block); /*The render thread should sleep by default, waiting for the mutex to be unlocked*/
+        lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_MID, render_thread_cb, 8 * 1024, draw_sw_unit);
     }
 }
 
@@ -90,30 +89,29 @@ void lv_draw_sw_deinit_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
 
 int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx)
 {
-
     lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
-    if(draw_sw_unit->task_act) {
-        return 0;
-    }
 
+    /*Return immediately if it's busy with draw task*/
+    if(draw_sw_unit->task_act) return 0;
+
+    /*Try to get an ready to draw*/
     lv_draw_task_t * t = lv_draw_get_next_available_task(draw_ctx, NULL);
-    while(t) {
-        lv_mutex_lock(&draw_sw_unit->lock);
+    if(t == NULL) return -1;
 
-        t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
-        draw_sw_unit->task_act = t;
-        draw_sw_unit->base_unit.draw_ctx = draw_ctx;
-        draw_sw_unit->base_unit.clip_area = &t->clip_area;
+    t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
+    draw_sw_unit->base_unit.draw_ctx = draw_ctx;
+    draw_sw_unit->base_unit.clip_area = &t->clip_area;
+    draw_sw_unit->task_act = t;
 #if DRAW_LOG
-        printf("%d Taken: %d, %d, %d, %d\n", draw_sw_unit->idx, t->area.x1, t->area.y1,
-               lv_area_get_width(&t->area), lv_area_get_height(&t->area));
+    printf("%d Taken: %d, %d, %d, %d\n", draw_sw_unit->idx, t->area.x1, t->area.y1,
+           lv_area_get_width(&t->area), lv_area_get_height(&t->area));
 #endif
-        lv_thread_sync_signal(&draw_sw_unit->cond);
-        lv_mutex_unlock(&draw_sw_unit->lock);
-        return 1;
-    }
 
-    return -1;
+    /*Let the render thread work*/
+    lv_mutex_unlock(&draw_sw_unit->render_block);
+
+    return 1;
+
 }
 
 void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
@@ -232,46 +230,50 @@ void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx)
  *   STATIC FUNCTIONS
  **********************/
 
-static void thread_cb(void * ptr)
+static void render_thread_cb(void * ptr)
 {
     lv_draw_sw_unit_t * u = ptr;
 
     while(1) {
-        lv_mutex_lock(&u->lock);
-
-        while(u->task_act == NULL) {
-            lv_thread_sync_wait(&u->cond, &u->lock);
-        }
-
-        const lv_area_t * coords = &u->task_act->area;
+        /*Wait here until a mutex is unlocked due to a draw task to render*/
+        lv_mutex_lock(&u->render_block);
+        /*The mutex was only to wait for and event, so we can unlock it immediately*/
+        lv_mutex_unlock(&u->render_block);
+        if(u->task_act) {
 #if DRAW_LOG
-        printf("%d Draw : %d, %d, %d, %d\n", u->idx, coords->x1, coords->y1,
-               lv_area_get_width(coords), lv_area_get_height(coords));
+            const lv_area_t * coords = &u->task_act->area;
+            printf("%d Draw : %d, %d, %d, %d\n", u->idx, coords->x1, coords->y1,
+                   lv_area_get_width(coords), lv_area_get_height(coords));
 #endif
 
-        switch(u->task_act->type) {
-            case LV_DRAW_TASK_TYPE_RECTANGLE:
-                lv_draw_sw_rect((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
-                break;
-            case LV_DRAW_TASK_TYPE_LABEL:
-                lv_draw_sw_label((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
-                break;
-            case LV_DRAW_TASK_TYPE_IMAGE:
-                lv_draw_sw_img((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
-                break;
-            case LV_DRAW_TASK_TYPE_LAYER:
-                lv_draw_sw_layer((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
-                break;
-        }
+            /*Render the draw task*/
+            switch(u->task_act->type) {
+                case LV_DRAW_TASK_TYPE_RECTANGLE:
+                    lv_draw_sw_rect((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+                    break;
+                case LV_DRAW_TASK_TYPE_LABEL:
+                    lv_draw_sw_label((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+                    break;
+                case LV_DRAW_TASK_TYPE_IMAGE:
+                    lv_draw_sw_img((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+                    break;
+                case LV_DRAW_TASK_TYPE_LAYER:
+                    lv_draw_sw_layer((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+                    break;
+                default:
+                    break;
+            }
 #if DRAW_LOG
-        printf("%d Ready: %d, %d, %d, %d\n", u->idx, coords->x1, coords->y1,
-               lv_area_get_width(coords), lv_area_get_height(coords));
+            printf("%d Ready: %d, %d, %d, %d\n", u->idx, coords->x1, coords->y1,
+                   lv_area_get_width(coords), lv_area_get_height(coords));
 #endif
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
-        u->task_act = NULL;
-        lv_draw_dispatch_request();
+            /*Cleaup*/
+            u->task_act->state = LV_DRAW_TASK_STATE_READY;
+            u->task_act = NULL;
 
-        lv_mutex_unlock(&u->lock);
+            /*The draw unit is free now. Request a new dispatching as it can get a new task*/
+            lv_draw_dispatch_request();
+        }
     }
 }
 

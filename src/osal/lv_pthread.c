@@ -111,7 +111,41 @@ lv_res_t lv_mutex_delete(lv_mutex_t * mutex)
 
 lv_res_t lv_thread_sync_init(lv_thread_sync_t * sync)
 {
-    int ret = pthread_cond_init(sync, NULL);
+    int ret = pthread_cond_init(&sync->cond, NULL);
+    if(ret) {
+        LV_LOG_WARN("Error cond: %d", ret);
+        return LV_RES_INV;
+    }
+
+
+    ret = pthread_mutex_init(&sync->mutex, NULL);
+    if(ret) {
+        LV_LOG_WARN("Error mutex: %d", ret);
+        return LV_RES_INV;
+    }
+    else {
+        return LV_RES_OK;
+    }
+
+    return LV_RES_OK;
+}
+
+lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync, lv_mutex_t * mutex)
+{
+    int ret = pthread_mutex_lock(&sync->mutex);
+    if(ret) {
+        LV_LOG_WARN("Error: %d", ret);
+        return LV_RES_INV;
+    }
+
+    ret = pthread_cond_wait(&sync->cond, &sync->mutex);
+    if(ret) {
+        LV_LOG_WARN("Error cond wait: %d", ret);
+        return LV_RES_INV;
+    }
+
+
+    ret = pthread_mutex_unlock(&sync->mutex);
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
         return LV_RES_INV;
@@ -120,20 +154,21 @@ lv_res_t lv_thread_sync_init(lv_thread_sync_t * sync)
     return LV_RES_OK;
 }
 
-lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync, lv_mutex_t * mutex)
+lv_res_t lv_thread_sync_signal(lv_thread_sync_t * sync)
 {
-    int ret = pthread_cond_wait(sync, mutex);
+    int ret = pthread_mutex_lock(&sync->mutex);
     if(ret) {
-        LV_LOG_WARN("Error cond wait: %d", ret);
+        LV_LOG_WARN("Error: %d", ret);
         return LV_RES_INV;
     }
 
-    return LV_RES_OK;
-}
+    ret = pthread_cond_signal(&sync->cond);
+    if(ret) {
+        LV_LOG_WARN("Error: %d", ret);
+        return LV_RES_INV;
+    }
 
-lv_res_t lv_thread_sync_signal(lv_thread_sync_t * sync)
-{
-    int ret = pthread_cond_signal(sync);
+    ret = pthread_mutex_unlock(&sync->mutex);
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
         return LV_RES_INV;
@@ -144,7 +179,8 @@ lv_res_t lv_thread_sync_signal(lv_thread_sync_t * sync)
 
 lv_res_t lv_thread_sync_delete(lv_thread_sync_t * sync)
 {
-    pthread_cond_destroy(sync);
+    pthread_cond_destroy(&sync->cond);
+    pthread_mutex_destroy(&sync->mutex);
     return LV_RES_OK;
 }
 

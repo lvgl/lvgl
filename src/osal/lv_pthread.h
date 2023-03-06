@@ -32,7 +32,10 @@ typedef struct {
 
 typedef pthread_mutex_t lv_mutex_t;
 
-typedef pthread_cond_t lv_thread_sync_t;
+typedef struct {
+    pthread_cond_t cond;
+    pthread_mutex_t mutex;
+} lv_thread_sync_t;
 
 /**********************
  * GLOBAL PROTOTYPES
