@@ -233,13 +233,13 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp);
 
 /**
  * Set the buffers for a display
- * @param disp          pointer to a display
- * @param buf1          first buffer
- * @param buf2          second buffer (can be `NULL`)
- * @param buf_size_px   size of the buffer in pixels
- * @param render_mode   LV_DISP_RENDER_MODE_PARTIAL/DIRECT/FULL
+ * @param disp              pointer to a display
+ * @param buf1              first buffer
+ * @param buf2              second buffer (can be `NULL`)
+ * @param buf_size_byte     size of the buffer in bytes
+ * @param render_mode       LV_DISP_RENDER_MODE_PARTIAL/DIRECT/FULL
  */
-void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_px,
+void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_byte,
                               lv_disp_render_mode_t render_mode);
 
 /**

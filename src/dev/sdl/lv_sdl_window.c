@@ -86,7 +86,7 @@ lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
 
     lv_disp_set_flush_cb(disp, flush_cb);
     lv_disp_set_draw_buffers(disp, dsc->fb, NULL,
-                             lv_disp_get_hor_res(disp) * lv_disp_get_hor_res(disp), LV_DISP_RENDER_MODE_DIRECT);
+                             lv_disp_get_hor_res(disp) * lv_disp_get_hor_res(disp) * sizeof(lv_color_t), LV_DISP_RENDER_MODE_DIRECT);
     lv_disp_add_event(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
     return disp;
