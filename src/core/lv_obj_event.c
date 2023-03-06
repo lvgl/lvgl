@@ -302,7 +302,7 @@ static lv_res_t event_send_core(lv_event_t * e)
         if(e->deleted) return LV_RES_INV;
     }
 
-    lv_obj_t * target = e->target;
+    lv_obj_t * target = e->current_target;
     lv_res_t res = LV_RES_OK;
     lv_event_list_t * list = target->spec_attr ?  &target->spec_attr->event_list : NULL;
 
