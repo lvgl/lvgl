@@ -1208,6 +1208,7 @@ static void ta_event_cb(lv_event_t * e)
             lv_obj_set_height(tv, LV_VER_RES - lv_obj_get_height(kb));
             lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
             lv_obj_scroll_to_view_recursive(ta, LV_ANIM_OFF);
+            lv_indev_wait_release(lv_event_get_param(e));
         }
     }
     else if(code == LV_EVENT_DEFOCUSED) {
