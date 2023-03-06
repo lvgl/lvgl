@@ -17,9 +17,6 @@
  *      DEFINES
  *********************/
 
-/*Recommended only to emulate a setup with a display controller*/
-#define LV_SDL_PARTIAL_MODE    0
-
 /**********************
  *      TYPEDEFS
  **********************/
