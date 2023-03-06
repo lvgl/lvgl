@@ -132,7 +132,7 @@ void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable
 
 static void gridnav_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_current_target(e);
+    lv_obj_t * obj = lv_event_get_original_target(e);
     lv_gridnav_dsc_t * dsc = lv_event_get_user_data(e);
     lv_event_code_t code = lv_event_get_code(e);
 

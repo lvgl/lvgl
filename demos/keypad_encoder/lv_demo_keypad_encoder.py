@@ -118,7 +118,7 @@ class KeyboardEncoder:
     def msgbox_event_cb(self,e):
 
         code = e.get_code();
-        msgbox = e.get_current_target()
+        msgbox = e.get_target()
 
         if code == lv.EVENT.VALUE_CHANGED:
             txt = msgbox.get_active_btn_text()

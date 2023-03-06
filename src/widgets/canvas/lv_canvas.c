@@ -169,7 +169,7 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
                          lv_coord_t offset_y,
                          int32_t pivot_x, int32_t pivot_y, bool antialias)
 {
-#if LV_USE_DRAW_MASKS && 0
+#if LV_USE_DRAW_MASKS
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(src_img);
 
@@ -193,16 +193,24 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
     dest_area.y1 = -offset_y;
     dest_area.y2 = -offset_y;
 
+    lv_draw_img_sup_t sup;
+    lv_memzero(&sup, sizeof(sup));
+
+    /*Create a dummy display to fool the lv_draw function.
+     *It will think it draws to real screen.*/
+    lv_area_t clip_area;
+    lv_draw_ctx_t * draw_ctx = init_fake_disp(obj, &clip_area);
+
     lv_color_t * cbuf = lv_malloc(dest_img->header.w * sizeof(lv_color_t));
     lv_opa_t * abuf = lv_malloc(dest_img->header.w * sizeof(lv_opa_t));
     for(y = 0; y < dest_img->header.h; y++) {
         if(y + offset_y >= 0) {
-            lv_draw_sw_transform(NULL, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
-                                 &draw_dsc, canvas->dsc.header.cf, cbuf, abuf);
+            lv_draw_sw_transform(draw_ctx, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
+                                 &draw_dsc, &sup, canvas->dsc.header.cf, cbuf, abuf);
 
             for(x = 0; x < dest_img->header.w; x++) {
                 if(abuf[x]) {
-                    lv_canvas_set_px(dest_img, x, y, cbuf[x], abuf[x]);
+                    lv_canvas_set_px(obj, x, y, cbuf[x], abuf[x]);
                 }
             }
 

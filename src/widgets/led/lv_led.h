@@ -95,7 +95,7 @@ void lv_led_off(lv_obj_t * led);
 void lv_led_toggle(lv_obj_t * led);
 
 /**
- * Get the brightness of a LEd object
+ * Get the brightness of a LED object
  * @param led pointer to LED object
  * @return bright 0 (max. dark) ... 255 (max. light)
  */

@@ -226,7 +226,6 @@ void lv_disp_set_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
 
     if(disp->hor_res == hor_res && disp->ver_res == ver_res) return;
 
-
     disp->hor_res = hor_res;
     disp->ver_res = ver_res;
 
@@ -723,7 +722,7 @@ lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_
     lv_memzero(&e, sizeof(e));
     e.code = code;
     e.target = disp;
-    e.current_target = disp;
+    e.original_target = disp;
     e.param = user_data;
     lv_res_t res;
     res = lv_event_send(&disp->event_list, &e, true);

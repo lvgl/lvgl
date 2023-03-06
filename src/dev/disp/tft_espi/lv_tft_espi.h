@@ -28,7 +28,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_px);
+lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes);
 
 /**********************
  *      MACROS

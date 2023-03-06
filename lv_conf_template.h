@@ -752,6 +752,7 @@
 #define LV_USE_SDL              0
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+    #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
 #endif
 
 /*Driver for /dev/fb*/

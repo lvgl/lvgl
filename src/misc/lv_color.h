@@ -586,10 +586,13 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_MIX_ROUND_OFS == 0
     /*Source: https://stackoverflow.com/a/50012418/1999969*/
+    uint16_t c1_16 = *(uint16_t *)&c1;
+    uint16_t c2_16 = *(uint16_t *)&c2;
     mix = (uint32_t)((uint32_t)mix + 4) >> 3;
-    uint32_t bg = (uint32_t)((uint32_t)(*(uint16_t *)&c2) | ((uint32_t)(*(uint16_t *)&c2) << 16)) &
-                  0x7E0F81F; /*0b00000111111000001111100000011111*/
-    uint32_t fg = (uint32_t)((uint32_t)(*(uint16_t *)&c1) | ((uint32_t)(*(uint16_t *)&c1) << 16)) & 0x7E0F81F;
+
+    /*0x7E0F81F = 0b00000111111000001111100000011111*/
+    uint32_t bg = (uint32_t)(c2_16 | ((uint32_t)c2_16 << 16)) & 0x7E0F81F;
+    uint32_t fg = (uint32_t)(c1_16 | ((uint32_t)c1_16 << 16)) & 0x7E0F81F;
     uint32_t result = ((((fg - bg) * mix) >> 5) + bg) & 0x7E0F81F;
     lv_color_set_int(&ret, (uint16_t)((result >> 16) | result));
 #elif LV_COLOR_DEPTH == 8

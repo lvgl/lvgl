@@ -71,19 +71,19 @@ lv_res_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, v
 lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
 
 /**
- * Get the object originally targeted by the event. It's the same even if the event is bubbled.
+ * Get the current target of the event. It's the object which event handler being called.
+ * If the event is not bubbled it's the same as "orignal" target.
  * @param e     pointer to the event descriptor
  * @return      the target of the event_code
  */
 struct _lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
 
 /**
- * Get the current target of the event. It's the object which event handler being called.
- * If the event is not bubbled it's the same as "normal" target.
+ * Get the object originally targeted by the event. It's the same even if the event is bubbled.
  * @param e     pointer to the event descriptor
- * @return      pointer to the current target of the event_code
+ * @return      pointer to the original target of the event_code
  */
-struct _lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e);
+struct _lv_obj_t * lv_event_get_original_target_obj(lv_event_t * e);
 
 /**
  * Add an event handler function for an object.

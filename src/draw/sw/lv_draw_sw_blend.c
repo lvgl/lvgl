@@ -95,7 +95,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv
     lv_coord_t dest_stride = lv_area_get_width(&draw_ctx->buf_area);
 
     lv_color_t * dest_buf = draw_ctx->buf;
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE) {
+    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE || draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSED) {
         dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area.y1) + (blend_area.x1 - draw_ctx->buf_area.x1);
     }
     else {

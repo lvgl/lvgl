@@ -20,6 +20,7 @@ void lv_example_switch_1(void)
 
     sw = lv_switch_create(lv_scr_act());
     lv_obj_add_event(sw, event_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_flag(sw, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     sw = lv_switch_create(lv_scr_act());
     lv_obj_add_state(sw, LV_STATE_CHECKED);

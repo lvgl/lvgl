@@ -907,10 +907,10 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t *
     LV_UNUSED(colors);
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
-        flush_cb_ori(drv, area, colors);
-
         /*Measure the time since render start after flushing*/
         bool last = lv_disp_flush_is_last(drv);
+        flush_cb_ori(drv, area, colors);
+
         if(last) {
             uint32_t t = lv_tick_elaps(render_start_time);
             if(scene_with_opa) {
@@ -945,10 +945,11 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, lv_color_t *
         }
     }
     else if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
+        bool last = lv_disp_flush_is_last(drv);
+
         /*Just bypass the driver and measure the pure rendering time*/
         lv_disp_flush_ready(drv);
 
-        bool last = lv_disp_flush_is_last(drv);
         if(last) {
             uint32_t t = lv_tick_elaps(render_start_time);
             if(scene_with_opa) {

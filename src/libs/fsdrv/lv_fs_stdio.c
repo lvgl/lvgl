@@ -178,7 +178,22 @@ static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, 
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
     LV_UNUSED(drv);
-    fseek(file_p, pos, whence);
+    int w;
+    switch(whence) {
+        case LV_FS_SEEK_SET:
+            w = SEEK_SET;
+            break;
+        case LV_FS_SEEK_CUR:
+            w = SEEK_CUR;
+            break;
+        case LV_FS_SEEK_END:
+            w = SEEK_END;
+            break;
+        default:
+            return LV_FS_RES_INV_PARAM;
+    }
+
+    fseek(file_p, pos, w);
     return LV_FS_RES_OK;
 }
 

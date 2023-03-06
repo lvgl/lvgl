@@ -1239,8 +1239,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 static void indev_click_focus(lv_indev_t * indev)
 {
     /*Handle click focus*/
-    if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) == false ||
-       indev->pointer.last_pressed == indev_obj_act) {
+    if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) == false) {
         return;
     }
 
