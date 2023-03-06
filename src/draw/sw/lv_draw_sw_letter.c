@@ -55,7 +55,6 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 
 void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords)
 {
-    printf("draw_label to %p\n", draw_unit->draw_ctx);
     lv_draw_label_interate_letters(draw_unit, dsc, coords, draw_letter);
 }
 
@@ -81,7 +80,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter(lv_draw_unit_t * draw_unit, lv_dra
         return;
     }
 
-
     if(draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_A8) {
         lv_draw_sw_blend_dsc_t blend_dsc;
         lv_memzero(&blend_dsc, sizeof(blend_dsc));
@@ -99,6 +97,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter(lv_draw_unit_t * draw_unit, lv_dra
 
     }
 #endif
+
 #if LV_USE_IMGFONT
     if(draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {
         lv_area_t fill_area;

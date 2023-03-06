@@ -78,7 +78,7 @@ static const uint8_t opa4_table[16] = {0,  17, 34,  51,
  **********************/
 
 
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter)
+const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out)
 {
     if(unicode_letter == '\t') unicode_letter = ' ';
 
@@ -88,39 +88,26 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    static size_t last_buf_size = 0;
-    if(LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf) == NULL) last_buf_size = 0;
-
     uint32_t gsize = gdsc->box_w * gdsc->box_h;
     if(gsize == 0) return NULL;
 
-    if(last_buf_size < gsize) {
-        uint8_t * tmp = lv_realloc(LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf), gsize);
-        LV_ASSERT_MALLOC(tmp);
-        if(tmp == NULL) return NULL;
-        LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf) = tmp;
-        last_buf_size = gsize;
-    }
-
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        const uint8_t * bitmap = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
         uint32_t i;
         for(i = 0; i < gsize - 1; i += 2) {
-            _lv_font_fmt_txt_bitmap_buf[i] = opa4_table[(*bitmap) >> 4];
-            _lv_font_fmt_txt_bitmap_buf[i + 1] = opa4_table[(*bitmap) & 0xF];
-            bitmap++;
+            bitmap_out[i] = opa4_table[(*bitmap_in) >> 4];
+            bitmap_out[i + 1] = opa4_table[(*bitmap_in) & 0xF];
+            bitmap_in++;
         }
         /*If gsize was even*/
         if(i == gsize - 1) {
-            _lv_font_fmt_txt_bitmap_buf[i - 1] = opa4_table[(*bitmap) & 0xF];
+            bitmap_out[i - 1] = opa4_table[(*bitmap_in) & 0xF];
         }
-        return _lv_font_fmt_txt_bitmap_buf;
+        return bitmap_out;
     }
     /*Handle compressed bitmap*/
     else {
 #if LV_USE_FONT_COMPRESSED
-
-
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
         decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_fmt_txt_bitmap_buf), gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);

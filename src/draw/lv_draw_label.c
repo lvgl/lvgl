@@ -323,7 +323,8 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_letter_dsc_t * dsc, 
     /*If the letter is completely out of mask don't draw it*/
     if(_lv_area_is_out(&letter_coords, &draw_ctx->clip_area, 0)) return;
 
-    dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter);
+    uint8_t buf_out[100 * 100];
+    dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter, buf_out);
     dsc->letter_coords = &letter_coords;
 
     cb(draw_unit, dsc);
