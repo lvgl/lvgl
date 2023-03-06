@@ -1,4 +1,4 @@
-/**nit
+/**
  * @file lv_draw_sw.c
  *
  */
@@ -11,7 +11,6 @@
 
 #include "lv_draw_sw.h"
 #include "../../core/lv_disp_private.h"
-#include <errno.h>
 
 /*********************
  *      DEFINES
@@ -28,7 +27,7 @@
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
-static int thread(void * ptr);
+static void thread_cb(void * ptr);
 
 
 /**********************
@@ -51,11 +50,6 @@ lv_draw_ctx_t * lv_draw_sw_init_ctx(lv_disp_t * disp)
     draw_ctx->buffer_copy = lv_draw_sw_buffer_copy;
     draw_ctx->buffer_convert = lv_draw_sw_buffer_convert;
     draw_ctx->buffer_clear = lv_draw_sw_buffer_clear;
-    //    draw_ctx->layer_create = lv_draw_sw_layer_create;
-    //    draw_ctx->layer_adjust = lv_draw_sw_layer_adjust;
-    //    draw_ctx->layer_blend = lv_draw_sw_layer_blend;
-    //    draw_ctx->layer_destroy = lv_draw_sw_layer_destroy;
-    //    draw_ctx->layer_instance_size = sizeof(lv_draw_sw_layer_ctx_t);
 
     if(disp->draw_ctx_head) {
         lv_draw_ctx_t * tail = disp->draw_ctx_head;
@@ -81,11 +75,10 @@ void draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt)
         draw_sw_unit->base_unit.next = disp->draw_unit_head;
         disp->draw_unit_head = (lv_draw_unit_t *) draw_sw_unit;
 
-        pthread_mutex_init(&draw_sw_unit->lock, NULL);
-        pthread_cond_init(&draw_sw_unit->cond, NULL);
+        lv_mutex_init(&draw_sw_unit->lock);
+        lv_thread_sync_init(&draw_sw_unit->cond);
 
-        pthread_t thread_id;
-        pthread_create(&thread_id, NULL, thread, draw_sw_unit);
+        lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_MID, thread_cb, 8 * 1024, draw_sw_unit);
     }
 }
 
@@ -94,7 +87,6 @@ void lv_draw_sw_deinit_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
     LV_UNUSED(disp);
     lv_memzero(draw_ctx, sizeof(lv_draw_ctx_t));
 }
-
 
 int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx)
 {
@@ -106,7 +98,7 @@ int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx
 
     lv_draw_task_t * t = lv_draw_get_next_available_task(draw_ctx, NULL);
     while(t) {
-        pthread_mutex_lock(&draw_sw_unit->lock);
+        lv_mutex_lock(&draw_sw_unit->lock);
 
         t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
         draw_sw_unit->task_act = t;
@@ -116,8 +108,8 @@ int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx
         printf("%d Taken: %d, %d, %d, %d\n", draw_sw_unit->idx, t->area.x1, t->area.y1,
                lv_area_get_width(&t->area), lv_area_get_height(&t->area));
 #endif
-        pthread_cond_signal(&draw_sw_unit->cond);
-        pthread_mutex_unlock(&draw_sw_unit->lock);
+        lv_thread_sync_signal(&draw_sw_unit->cond);
+        lv_mutex_unlock(&draw_sw_unit->lock);
         return 1;
     }
 
@@ -240,16 +232,15 @@ void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx)
  *   STATIC FUNCTIONS
  **********************/
 
-/* Very simple thread - counts 0 to 9 delaying 50ms between increments */
-static int thread(void * ptr)
+static void thread_cb(void * ptr)
 {
     lv_draw_sw_unit_t * u = ptr;
 
     while(1) {
-        pthread_mutex_lock(&u->lock);
+        lv_mutex_lock(&u->lock);
 
         while(u->task_act == NULL) {
-            pthread_cond_wait(&u->cond, &u->lock);
+            lv_thread_sync_wait(&u->cond, &u->lock);
         }
 
         const lv_area_t * coords = &u->task_act->area;
@@ -280,10 +271,8 @@ static int thread(void * ptr)
         u->task_act = NULL;
         lv_draw_dispatch_request();
 
-        pthread_mutex_unlock(&u->lock);
+        lv_mutex_unlock(&u->lock);
     }
-
-    return 0;
 }
 
 #endif /*LV_USE_DRAW_SW*/

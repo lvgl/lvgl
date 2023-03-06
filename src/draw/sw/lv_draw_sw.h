@@ -20,7 +20,7 @@ extern "C" {
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
 #include "../../core/lv_disp.h"
-#include <pthread.h>
+#include "../../osal/lv_os.h"
 
 /*********************
  *      DEFINES
@@ -33,8 +33,9 @@ extern "C" {
 typedef struct {
     lv_draw_unit_t base_unit;
     struct _lv_draw_task_t * task_act;
-    pthread_mutex_t lock;
-    pthread_cond_t  cond;
+    lv_thread_sync_t cond;
+    lv_mutex_t lock;
+    lv_thread_t thread;
     uint32_t idx;
 } lv_draw_sw_unit_t;
 
