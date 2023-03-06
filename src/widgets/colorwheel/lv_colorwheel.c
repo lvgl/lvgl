@@ -358,7 +358,7 @@ static void lv_colorwheel_event(const lv_obj_class_t * class_p, lv_event_t * e)
     LV_UNUSED(class_p);
 
     /*Call the ancestor's event handler*/
-    lv_res_t res = lv_event_base(MY_CLASS, e);
+    lv_res_t res = lv_obj_event_base(MY_CLASS, e);
 
     if(res != LV_RES_OK) return;
 

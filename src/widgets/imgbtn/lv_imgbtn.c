@@ -178,7 +178,7 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res = lv_event_base(&lv_imgbtn_class, e);
+    lv_res_t res = lv_obj_event_base(&lv_imgbtn_class, e);
     if(res != LV_RES_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);

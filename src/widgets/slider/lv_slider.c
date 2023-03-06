@@ -102,7 +102,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_event_base(MY_CLASS, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);

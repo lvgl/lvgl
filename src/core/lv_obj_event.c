@@ -75,7 +75,7 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
 }
 
 
-lv_res_t lv_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     const lv_obj_class_t * base;
     if(class_p == NULL) base = ((lv_obj_t *)e->target)->class_p;
@@ -309,7 +309,7 @@ static lv_res_t event_send_core(lv_event_t * e)
     res = lv_event_send(list, e, true);
     if(res != LV_RES_OK) return res;
 
-    res = lv_event_base(NULL, e);
+    res = lv_obj_event_base(NULL, e);
     if(res != LV_RES_OK) return res;
 
     res = lv_event_send(list, e, false);

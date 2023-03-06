@@ -651,7 +651,7 @@ static void lv_dropdown_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_res_t res;
 
     /*Call the ancestor's event handler*/
-    res = lv_event_base(MY_CLASS, e);
+    res = lv_obj_event_base(MY_CLASS, e);
     if(res != LV_RES_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
@@ -743,7 +743,7 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
     /*Call the ancestor's event handler*/
     lv_event_code_t code = lv_event_get_code(e);
     if(code != LV_EVENT_DRAW_POST) {
-        res = lv_event_base(MY_CLASS_LIST, e);
+        res = lv_obj_event_base(MY_CLASS_LIST, e);
         if(res != LV_RES_OK) return;
     }
     lv_obj_t * list = lv_event_get_target(e);
@@ -764,7 +764,7 @@ static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * 
     }
     else if(code == LV_EVENT_DRAW_POST) {
         draw_list(e);
-        res = lv_event_base(MY_CLASS_LIST, e);
+        res = lv_obj_event_base(MY_CLASS_LIST, e);
         if(res != LV_RES_OK) return;
     }
 }
