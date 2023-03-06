@@ -735,7 +735,7 @@ lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_
     lv_memzero(&e, sizeof(e));
     e.code = code;
     e.target = disp;
-    e.current_target = disp;
+    e.original_target = disp;
     e.param = user_data;
     lv_res_t res;
     res = lv_event_send(&disp->event_list, &e, true);

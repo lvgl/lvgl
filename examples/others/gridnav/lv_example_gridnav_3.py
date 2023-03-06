@@ -1,6 +1,6 @@
 def cont_sub_event_cb(e):
     k = e.get_key()
-    obj = e.get_current_target()
+    obj = e.get_target_obj()
     if k == lv.KEY.ENTER:
         lv.group_focus_obj(obj)
 

@@ -4,7 +4,7 @@
 static void cont_sub_event_cb(lv_event_t * e)
 {
     uint32_t k = lv_event_get_key(e);
-    lv_obj_t * obj = lv_event_get_current_target(e);
+    lv_obj_t * obj = lv_event_get_target(e);
     if(k == LV_KEY_ENTER) {
         lv_group_focus_obj(obj);
     }

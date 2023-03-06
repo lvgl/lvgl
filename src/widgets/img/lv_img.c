@@ -443,7 +443,7 @@ static void lv_img_event(const lv_obj_class_t * class_p, lv_event_t * e)
     /*Ancestor events will be called during drawing*/
     if(code != LV_EVENT_DRAW_MAIN && code != LV_EVENT_DRAW_POST) {
         /*Call the ancestor's event handler*/
-        lv_res_t res = lv_obj_event_base(MY_CLASS, e);
+        lv_res_t res = lv_event_base(MY_CLASS, e);
         if(res != LV_RES_OK) return;
     }
 
@@ -602,7 +602,7 @@ static void draw_img(lv_event_t * e)
         lv_area_copy(&ori_coords, &obj->coords);
         lv_area_copy(&obj->coords, &bg_coords);
 
-        lv_res_t res = lv_obj_event_base(MY_CLASS, e);
+        lv_res_t res = lv_event_base(MY_CLASS, e);
         if(res != LV_RES_OK) return;
 
         lv_area_copy(&obj->coords, &ori_coords);

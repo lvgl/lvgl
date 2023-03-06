@@ -55,7 +55,7 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
 
     lv_event_t e;
     e.target = obj;
-    e.current_target = obj;
+    e.original_target = obj;
     e.code = event_code;
     e.user_data = NULL;
     e.param = param;
@@ -75,10 +75,10 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
 }
 
 
-lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
+lv_res_t lv_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     const lv_obj_class_t * base;
-    if(class_p == NULL) base = ((lv_obj_t *)e->current_target)->class_p;
+    if(class_p == NULL) base = ((lv_obj_t *)e->target)->class_p;
     else base = class_p->base_class;
 
     /*Find a base in which call the ancestor's event handler_cb if set*/
@@ -134,9 +134,9 @@ lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
     return lv_event_get_target(e);
 }
 
-lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
+lv_obj_t * lv_event_get_original_target_obj(lv_event_t * e)
 {
-    return lv_event_get_current_target(e);
+    return lv_event_get_original_target(e);
 }
 
 
@@ -292,7 +292,7 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
 
 static lv_res_t event_send_core(lv_event_t * e)
 {
-    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->current_target, e->param);
+    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
@@ -302,22 +302,22 @@ static lv_res_t event_send_core(lv_event_t * e)
         if(e->deleted) return LV_RES_INV;
     }
 
-    lv_obj_t * target = e->current_target;
+    lv_obj_t * target = e->target;
     lv_res_t res = LV_RES_OK;
     lv_event_list_t * list = target->spec_attr ?  &target->spec_attr->event_list : NULL;
 
     res = lv_event_send(list, e, true);
     if(res != LV_RES_OK) return res;
 
-    res = lv_obj_event_base(NULL, e);
+    res = lv_event_base(NULL, e);
     if(res != LV_RES_OK) return res;
 
     res = lv_event_send(list, e, false);
     if(res != LV_RES_OK) return res;
 
-    lv_obj_t * parent = lv_obj_get_parent(e->current_target);
+    lv_obj_t * parent = lv_obj_get_parent(e->target);
     if(parent && event_is_bubbled(e)) {
-        e->current_target = parent;
+        e->target = parent;
         res = event_send_core(e);
         if(res != LV_RES_OK) return res;
     }
@@ -340,7 +340,7 @@ static bool event_is_bubbled(lv_event_t * e)
     }
 
     /*Check other codes only if bubbling is enabled*/
-    if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_BUBBLE) == false) return false;
+    if(lv_obj_has_flag(e->target, LV_OBJ_FLAG_EVENT_BUBBLE) == false) return false;
 
     switch(e->code) {
         case LV_EVENT_HIT_TEST:

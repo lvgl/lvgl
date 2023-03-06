@@ -146,9 +146,9 @@ void * lv_event_get_target(lv_event_t * e)
     return e->target;
 }
 
-void * lv_event_get_current_target(lv_event_t * e)
+void * lv_event_get_original_target(lv_event_t * e)
 {
-    return e->current_target;
+    return e->original_target;
 }
 
 lv_event_code_t lv_event_get_code(lv_event_t * e)
@@ -188,7 +188,7 @@ void _lv_event_mark_deleted(void * target)
     lv_event_t * e = event_head;
 
     while(e) {
-        if(e->current_target == target || e->target == target) e->deleted = 1;
+        if(e->original_target == target || e->target == target) e->deleted = 1;
         e = e->prev;
     }
 }
