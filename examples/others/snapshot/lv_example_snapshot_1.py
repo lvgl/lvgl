@@ -30,7 +30,7 @@ def event_cb(e, snapshot_obj):
         # no need to free the old source for snapshot_obj, gc will free it for us.
 
         # take a new snapshot, overwrite the old one
-        dsc = lv.snapshot_take(img.get_parent(), lv.img.CF.TRUE_COLOR_ALPHA)
+        dsc = lv.snapshot_take(img.get_parent(), lv.COLOR_FORMAT.NATIVE_ALPHA)
         snapshot_obj.set_src(dsc)
 
     gc.collect()
