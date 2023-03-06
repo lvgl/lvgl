@@ -225,7 +225,6 @@ void lv_disp_set_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
 
     if(disp->hor_res == hor_res && disp->ver_res == ver_res) return;
 
-
     disp->hor_res = hor_res;
     disp->ver_res = ver_res;
 

@@ -26,6 +26,7 @@ typedef struct {
     SDL_Texture * texture;
     lv_color_t * fb;
     uint8_t zoom;
+    uint8_t ignore_size_chg;
 } lv_sdl_window_t;
 
 /**********************
@@ -105,8 +106,6 @@ uint8_t lv_sdl_window_get_zoom(lv_disp_t * disp)
     return dsc->zoom;
 }
 
-
-
 lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
@@ -169,8 +168,10 @@ static void sdl_event_handler(lv_timer_t * t)
                 case SDL_WINDOWEVENT_EXPOSED:
                     window_update(disp);
                     break;
-                case SDL_WINDOWEVENT_SIZE_CHANGED:
+                case SDL_WINDOWEVENT_RESIZED:
+                    dsc->ignore_size_chg = 1;
                     lv_disp_set_res(disp, event.window.data1 / dsc->zoom, event.window.data2 / dsc->zoom);
+                    dsc->ignore_size_chg = 0;
                     lv_refr_now(disp);
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
@@ -239,7 +240,6 @@ static void texture_resize(lv_disp_t * disp)
     dsc->fb = (lv_color_t *)realloc(dsc->fb, sizeof(lv_color_t) * hor_res * ver_res);
     lv_disp_set_draw_buffers(disp, dsc->fb, NULL, hor_res * ver_res * sizeof(lv_color_t), LV_DISP_RENDER_MODE_DIRECT);
 
-    SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 
 #if LV_COLOR_DEPTH == 32
@@ -260,6 +260,14 @@ static void texture_resize(lv_disp_t * disp)
 static void res_chg_event_cb(lv_event_t * e)
 {
     lv_disp_t * disp = lv_event_get_target(e);
+
+    int32_t hor_res = lv_disp_get_hor_res(disp);
+    int32_t ver_res = lv_disp_get_ver_res(disp);
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    if(dsc->ignore_size_chg == false) {
+        SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
+    }
+
     texture_resize(disp);
 }
 
