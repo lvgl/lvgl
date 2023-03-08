@@ -92,6 +92,7 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_ext_click_area(obj, LV_DPX(8));
 }
 
