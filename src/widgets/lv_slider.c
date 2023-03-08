@@ -239,13 +239,14 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         new_value = LV_CLAMP(real_min_value, new_value, real_max_value);
         if(*slider->value_to_set != new_value) {
-        	if(slider->value_to_set == &slider->bar.start_value) {
-        		lv_bar_set_start_value(obj, new_value, LV_ANIM_ON);
-        	} else {
-        		lv_bar_set_value(obj, new_value, LV_ANIM_ON);
-        	}
-        	res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
-        	if(res != LV_RES_OK) return;
+            if(slider->value_to_set == &slider->bar.start_value) {
+                lv_bar_set_start_value(obj, new_value, LV_ANIM_ON);
+            }
+            else {
+                lv_bar_set_value(obj, new_value, LV_ANIM_ON);
+            }
+            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RES_OK) return;
         }
 
     }
