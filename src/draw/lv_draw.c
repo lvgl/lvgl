@@ -22,7 +22,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_end);
+static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_check);
 
 /**********************
  *  STATIC VARIABLES
@@ -180,21 +180,24 @@ void lv_draw_dispatch_request(void)
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_prev)
 {
+    /*If the first task is screen sized, there cannot be independent areas*/
     if(draw_ctx->draw_task_head) {
+        lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
+        lv_coord_t ver_res = lv_disp_get_ver_res(_lv_refr_get_disp_refreshing());
         lv_draw_task_t * t = draw_ctx->draw_task_head;
-        if(t->state != LV_DRAW_TASK_STATE_QUEUED && t->area.x1 <= 0 && t->area.x2 >= 799 && t->area.y1 <= 0 &&
-           t->area.y2 >= 479) {
+        if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
+           t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
+           t->area.y1 <= 0 && t->area.y2 >= ver_res - 1) {
             return NULL;
         }
     }
 
     lv_draw_task_t * t = t_prev ? t_prev->next : draw_ctx->draw_task_head;
-    int c = 0;
     while(t) {
+        /*Find a queued and independent task*/
         if(t->state == LV_DRAW_TASK_STATE_QUEUED && is_independent(draw_ctx, t)) {
             return t;
         }
-        c++;
         t = t->next;
     }
 
@@ -205,16 +208,20 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_dr
  *   STATIC FUNCTIONS
  **********************/
 
-static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_end)
+/**
+ * Check if there are older draw task overlapping the area of `t_check`
+ * @param draw_ctx      the draw ctx to search in
+ * @param t_check       check this task if it overlaps with the older ones
+ * @return              true: `t_check` is not overlapping with older tasks so it's independent
+ */
+static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_check)
 {
     lv_draw_task_t * t = draw_ctx->draw_task_head;
 
-    int c = 0;
-    /*If t_end is outside of the older tasks then it's independent*/
-    while(t && t != t_end) {
-        c++;
+    /*If t_check is outside of the older tasks then it's independent*/
+    while(t && t != t_check) {
         if(t->state != LV_DRAW_TASK_STATE_READY) {
-            if(_lv_area_is_on(&t_end->area, &t->area)) {
+            if(_lv_area_is_on(&t_check->area, &t->area)) {
                 return false;
             }
         }

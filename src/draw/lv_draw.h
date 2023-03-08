@@ -146,6 +146,12 @@ void lv_draw_dispatch_if_requested(void);
 
 void lv_draw_dispatch_request(void);
 
+/**
+ * Find and available draw task
+ * @param draw_ctx      the draw ctx to search in
+ * @param t_prev        continue searching from this task
+ * @return              tan available draw task or NULL if there is no any
+ */
 lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_prev);
 
 
