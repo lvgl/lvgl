@@ -27,7 +27,11 @@ static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_check);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_thread_sync_t sync;
+#if LV_USE_OS
+    static lv_thread_sync_t sync;
+#else
+    static int dispatch_req = 0;
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -43,7 +47,9 @@ static lv_thread_sync_t sync;
 
 void lv_draw_init(void)
 {
+#if LV_USE_OS
     lv_thread_sync_init(&sync);
+#endif
 }
 
 lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords)
