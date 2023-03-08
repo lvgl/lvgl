@@ -344,7 +344,15 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         if(t < 0) t = 0;
         bool new_tab = false;
         if(t != lv_tabview_get_tab_act(tv)) new_tab = true;
-        lv_tabview_set_act(tv, t, LV_ANIM_ON);
+
+
+        /*If not scrolled by an indev set the tab immediately*/
+        if(lv_indev_get_act()) {
+            lv_tabview_set_act(tv, t, LV_ANIM_ON);
+        }
+        else {
+            lv_tabview_set_act(tv, t, LV_ANIM_OFF);
+        }
 
         if(new_tab) lv_obj_send_event(tv, LV_EVENT_VALUE_CHANGED, NULL);
     }
