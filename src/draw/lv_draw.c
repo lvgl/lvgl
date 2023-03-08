@@ -27,8 +27,6 @@ static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_check);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static int dispatch_req = 0;
-static lv_mutex_t mutex;
 static lv_thread_sync_t sync;
 
 /**********************
@@ -45,7 +43,6 @@ static lv_thread_sync_t sync;
 
 void lv_draw_init(void)
 {
-    lv_mutex_init(&mutex);
     lv_thread_sync_init(&sync);
 }
 
@@ -74,7 +71,6 @@ lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * co
 
 void lv_draw_dispatch(void)
 {
-    dispatch_req = 0;
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_draw_ctx_t * draw_ctx = disp->draw_ctx_head;
     while(draw_ctx) {
@@ -147,32 +143,20 @@ void lv_draw_dispatch(void)
     }
 }
 
-void lv_draw_dispatch_if_requested(void)
+void lv_draw_dispatch_wait_for_request(void)
 {
 #if LV_USE_OS
-    lv_mutex_lock(&mutex);
-
-    while(!dispatch_req) {
-        lv_thread_sync_wait(&sync, &mutex);
-    }
-
-    lv_mutex_unlock(&mutex);
-
-    lv_draw_dispatch();
+    lv_thread_sync_wait(&sync);
 #else
-    if(!dispatch_req)  return;
-
-    lv_draw_dispatch();
+    while(!dispatch_req);
+    dispatch_req = 0;
 #endif
 }
 
 void lv_draw_dispatch_request(void)
 {
 #if LV_USE_OS
-    lv_mutex_lock(&mutex);
-    dispatch_req = 1;
     lv_thread_sync_signal(&sync);
-    lv_mutex_unlock(&mutex);
 #else
     dispatch_req = 1;
 #endif

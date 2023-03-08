@@ -1138,7 +1138,8 @@ static void draw_buf_flush(lv_disp_t * disp)
     lv_draw_ctx_t * draw_ctx = disp->draw_ctx_head;
     //    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
     while(draw_ctx->draw_task_head) {
-        lv_draw_dispatch_if_requested();
+        lv_draw_dispatch_wait_for_request();
+        lv_draw_dispatch();
     }
 
     /* In double buffered mode wait until the other buffer is freed

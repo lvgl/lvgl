@@ -9,7 +9,6 @@
 #include "lv_os.h"
 #if LV_USE_PTHREAD
 
-#include <pthread.h>
 #include <errno.h>
 #include "../misc/lv_log.h"
 
@@ -111,7 +110,7 @@ lv_res_t lv_mutex_delete(lv_mutex_t * mutex)
 
 lv_res_t lv_thread_sync_init(lv_thread_sync_t * sync)
 {
-    int ret = pthread_cond_init(sync, NULL);
+    int ret = sem_init(sync, 0, 0);
     if(ret) {
         LV_LOG_WARN("Error init: %d", ret);
         return LV_RES_INV;
@@ -119,12 +118,11 @@ lv_res_t lv_thread_sync_init(lv_thread_sync_t * sync)
     else {
         return LV_RES_OK;
     }
-
 }
 
-lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync, lv_mutex_t * mutex)
+lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync)
 {
-    int ret = pthread_cond_wait(sync, mutex);
+    int ret = sem_wait(sync);
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
         return LV_RES_INV;
@@ -135,8 +133,7 @@ lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync, lv_mutex_t * mutex)
 
 lv_res_t lv_thread_sync_signal(lv_thread_sync_t * sync)
 {
-    /*Now the caller thread of lv_thread_sync_wait acn run again*/
-    int ret = pthread_cond_signal(sync);
+    int ret = sem_post(sync);
     if(ret) {
         LV_LOG_WARN("Error: %d", ret);
         return LV_RES_INV;
@@ -147,7 +144,7 @@ lv_res_t lv_thread_sync_signal(lv_thread_sync_t * sync)
 
 lv_res_t lv_thread_sync_delete(lv_thread_sync_t * sync)
 {
-    //    pthread_mutex_destroy(sync);
+    sem_destroy(sync);
     return LV_RES_OK;
 }
 

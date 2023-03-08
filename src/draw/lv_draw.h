@@ -142,7 +142,11 @@ lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * co
 
 void lv_draw_dispatch(void);
 
-void lv_draw_dispatch_if_requested(void);
+/**
+ * Wait for a new dispatch request.
+ * It's blocking if `LV_USE_OS == 0` else it yields
+ */
+void lv_draw_dispatch_wait_for_request(void);
 
 void lv_draw_dispatch_request(void);
 

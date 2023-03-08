@@ -17,6 +17,8 @@ extern "C" {
 #if LV_USE_PTHREAD
 
 #include <pthread.h>
+#include <semaphore.h>
+
 /*********************
  *      DEFINES
  *********************/
@@ -32,7 +34,7 @@ typedef struct {
 
 typedef pthread_mutex_t lv_mutex_t;
 
-typedef pthread_cond_t lv_thread_sync_t;
+typedef sem_t lv_thread_sync_t;
 
 /**********************
  * GLOBAL PROTOTYPES

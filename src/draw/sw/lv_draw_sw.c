@@ -104,7 +104,7 @@ void lv_draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt)
 
 #if LV_USE_OS
         lv_thread_sync_init(&draw_sw_unit->sync);
-        lv_mutex_init(&draw_sw_unit->mutex);
+        //        lv_mutex_init(&draw_sw_unit->mutex);
         lv_thread_init(&draw_sw_unit->thread, LV_THREAD_PRIO_MID, render_thread_cb, 8 * 1024, draw_sw_unit);
 #endif
     }
@@ -126,7 +126,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * d
     if(t == NULL) return -1;
 
 #if LV_USE_OS
-    lv_mutex_lock(&draw_sw_unit->mutex);
+    //    lv_mutex_lock(&draw_sw_unit->mutex);
 
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
     draw_sw_unit->base_unit.draw_ctx = draw_ctx;
@@ -135,7 +135,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * d
 
     /*Let the render thread work*/
     lv_thread_sync_signal(&draw_sw_unit->sync);
-    lv_mutex_unlock(&draw_sw_unit->mutex);
+    //    lv_mutex_unlock(&draw_sw_unit->mutex);
 #else
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
     draw_sw_unit->base_unit.draw_ctx = draw_ctx;
@@ -272,11 +272,8 @@ static void render_thread_cb(void * ptr)
     lv_draw_sw_unit_t * u = ptr;
 
     while(1) {
-
-        lv_mutex_lock(&u->mutex);
-
         while(u->task_act == NULL) {
-            lv_thread_sync_wait(&u->sync, &u->mutex);
+            lv_thread_sync_wait(&u->sync);
         }
 
         exectue_drawing(u);
@@ -287,8 +284,6 @@ static void render_thread_cb(void * ptr)
 
         /*The draw unit is free now. Request a new dispatching as it can get a new task*/
         lv_draw_dispatch_request();
-
-        lv_mutex_unlock(&u->mutex);
     }
 }
 #endif

@@ -111,10 +111,9 @@ lv_res_t lv_thread_sync_init(lv_thread_sync_t * sync);
 /**
  * Wait for a "signal" on a sync object
  * @param sync      a sync object
- * @param mutex     a mutex which will be unlocked while waiting
  * @return          LV_RES_OK: success; LV_RES_INV: failure
  */
-lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync, lv_mutex_t * mutex);
+lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync);
 
 /**
  * Send a wake-up signal to a sync object
