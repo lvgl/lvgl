@@ -14,6 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+#if LV_USE_OS
+
 #include "../misc/lv_types.h"
 #include LV_OS_CUSTOM_INCLUDE
 
@@ -131,6 +133,8 @@ lv_res_t lv_thread_sync_delete(lv_thread_sync_t * sync);
 /**********************
  *      MACROS
  **********************/
+
+#endif /*LV_USE_OS*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

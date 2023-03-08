@@ -1141,8 +1141,6 @@ static void draw_buf_flush(lv_disp_t * disp)
         lv_draw_dispatch_if_requested();
     }
 
-    printf("--------------------\n\n");
-
     /* In double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer.
      * If we need to wait here it means that the content of one buffer is being sent to display

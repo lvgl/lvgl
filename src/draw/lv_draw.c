@@ -27,6 +27,9 @@ static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_end);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static int dispatch_req = 0;
+static lv_mutex_t mutex;
+static lv_thread_sync_t sync;
 
 /**********************
  *  STATIC VARIABLES
@@ -42,18 +45,14 @@ static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_end);
 
 void lv_draw_init(void)
 {
-    /*Nothing to init now*/
+    lv_mutex_init(&mutex);
+    lv_thread_sync_init(&sync);
 }
 
 lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords)
 {
     lv_draw_task_t * new_task = lv_malloc(sizeof(lv_draw_task_t));
     lv_memzero(new_task, sizeof(*new_task));
-
-#if DRAW_LOG
-    printf("Add  (%p, %p): %d, %d, %d, %d\n", new_task, new_task->draw_dsc, coords->x1, coords->y1,
-           lv_area_get_width(coords), lv_area_get_height(coords));
-#endif
 
     new_task->area = *coords;
     new_task->clip_area = draw_ctx->clip_area;
@@ -73,8 +72,6 @@ lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * co
     return new_task;
 }
 
-static int dispatch_req = 0;
-
 void lv_draw_dispatch(void)
 {
     dispatch_req = 0;
@@ -87,9 +84,6 @@ void lv_draw_dispatch(void)
         while(t) {
             lv_draw_task_t * t_next = t->next;
             if(t->state == LV_DRAW_TASK_STATE_READY) {
-#if DRAW_LOG
-                printf("Remov(%p)\n", t);
-#endif
                 if(t_prev) t_prev->next = t->next;
                 else draw_ctx->draw_task_head = t_next;
 
@@ -155,13 +149,33 @@ void lv_draw_dispatch(void)
 
 void lv_draw_dispatch_if_requested(void)
 {
-    if(!dispatch_req)  return;
+#if LV_USE_OS
+    lv_mutex_lock(&mutex);
+
+    while(!dispatch_req) {
+        lv_thread_sync_wait(&sync, &mutex);
+    }
+
+    lv_mutex_unlock(&mutex);
+
     lv_draw_dispatch();
+#else
+    if(!dispatch_req)  return;
+
+    lv_draw_dispatch();
+#endif
 }
 
 void lv_draw_dispatch_request(void)
 {
+#if LV_USE_OS
+    lv_mutex_lock(&mutex);
     dispatch_req = 1;
+    lv_thread_sync_signal(&sync);
+    lv_mutex_unlock(&mutex);
+#else
+    dispatch_req = 1;
+#endif
 }
 
 lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_prev)
@@ -184,9 +198,6 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_dr
         t = t->next;
     }
 
-    if(c > 20) {
-        //        return NULL;
-    }
     return NULL;
 }
 
