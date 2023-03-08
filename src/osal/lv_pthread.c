@@ -110,41 +110,37 @@ lv_res_t lv_mutex_delete(lv_mutex_t * mutex)
 
 lv_res_t lv_thread_sync_init(lv_thread_sync_t * sync)
 {
-    int ret = sem_init(sync, 0, 0);
-    if(ret) {
-        LV_LOG_WARN("Error init: %d", ret);
-        return LV_RES_INV;
-    }
-    else {
-        return LV_RES_OK;
-    }
+    pthread_mutex_init(&sync->mutex, 0);
+    pthread_cond_init(&sync->cond, 0);
+    sync->v = false;
+    return LV_RES_OK;
 }
 
 lv_res_t lv_thread_sync_wait(lv_thread_sync_t * sync)
 {
-    int ret = sem_wait(sync);
-    if(ret) {
-        LV_LOG_WARN("Error: %d", ret);
-        return LV_RES_INV;
+    pthread_mutex_lock(&sync->mutex);
+    while(!sync->v) {
+        pthread_cond_wait(&sync->cond, &sync->mutex);
     }
-
+    sync->v = false;
+    pthread_mutex_unlock(&sync->mutex);
     return LV_RES_OK;
 }
 
 lv_res_t lv_thread_sync_signal(lv_thread_sync_t * sync)
 {
-    int ret = sem_post(sync);
-    if(ret) {
-        LV_LOG_WARN("Error: %d", ret);
-        return LV_RES_INV;
-    }
+    pthread_mutex_lock(&sync->mutex);
+    sync->v = true;
+    pthread_cond_signal(&sync->cond);
+    pthread_mutex_unlock(&sync->mutex);
 
     return LV_RES_OK;
 }
 
 lv_res_t lv_thread_sync_delete(lv_thread_sync_t * sync)
 {
-    sem_destroy(sync);
+    pthread_mutex_destroy(&sync->mutex);
+    pthread_cond_destroy(&sync->cond);
     return LV_RES_OK;
 }
 

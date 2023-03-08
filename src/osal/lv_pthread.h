@@ -18,6 +18,7 @@ extern "C" {
 
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdbool.h>
 
 /*********************
  *      DEFINES
@@ -34,7 +35,11 @@ typedef struct {
 
 typedef pthread_mutex_t lv_mutex_t;
 
-typedef sem_t lv_thread_sync_t;
+typedef struct {
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    bool v;
+} lv_thread_sync_t;
 
 /**********************
  * GLOBAL PROTOTYPES
