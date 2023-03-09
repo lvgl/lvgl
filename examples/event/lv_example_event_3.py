@@ -18,13 +18,13 @@ def event_cb(e):
 #
 
 cont = lv.obj(lv.scr_act())
-cont.set_size(300, 200)
+cont.set_size(290, 200)
 cont.center()
 cont.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)
 
 for i in range(30):
     btn = lv.btn(cont)
-    btn.set_size(80, 50)
+    btn.set_size(70, 50)
     btn.add_flag(lv.obj.FLAG.EVENT_BUBBLE)
 
     label = lv.label(btn)
