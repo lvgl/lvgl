@@ -11,10 +11,24 @@ fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
 
 try:
-    ltr_label.set_style_text_font(ltr_label, lv.font_montserrat_16, 0)
+    ltr_label.set_style_text_font(ltr_label, lv.font_montserrat_16,0)
 except:
-    font_montserrat_16 = lv.font_load("S:../../assets/font/montserrat-16.fnt")
-    ltr_label.set_style_text_font(font_montserrat_16, 0)
+    fs_drv = lv.fs_drv_t()
+    fs_driver.fs_register(fs_drv, 'S')
+    print("montserrat-16 not enabled in lv_conf.h, dynamically loading the font")
+    
+    # get the directory in which the script is running
+    try:
+        script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
+    except NameError:
+        print("Could not find script path")
+        script_path = ''
+    if script_path != '':
+        try:
+            font_montserrat_16 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-16.fnt")
+            ltr_label.set_style_text_font(font_montserrat_16,0)            
+        except:
+            print("Cannot load font file montserrat-16.fnt")
 
 ltr_label.set_width(310)
 ltr_label.align(lv.ALIGN.TOP_LEFT, 5, 5)

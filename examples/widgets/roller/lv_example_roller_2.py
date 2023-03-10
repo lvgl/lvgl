@@ -1,6 +1,5 @@
 import fs_driver
 
-
 def event_handler(e):
     code = e.get_code()
     obj = e.get_target_obj()
@@ -16,15 +15,30 @@ def event_handler(e):
 # A style to make the selected option larger
 style_sel = lv.style_t()
 style_sel.init()
-
+ 
 try:
     style_sel.set_text_font(lv.font_montserrat_22)
 except:
     fs_drv = lv.fs_drv_t()
     fs_driver.fs_register(fs_drv, 'S')
     print("montserrat-22 not enabled in lv_conf.h, dynamically loading the font")
-    font_montserrat_22 = lv.font_load("S:" + "../../assets/font/montserrat-22.fnt")
-    style_sel.set_text_font(font_montserrat_22)
+    
+    # get the directory in which the script is running
+    try:
+        script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
+    except NameError:
+        print("Could not find script path")
+        script_path = ''
+    if script_path != '':
+        try:        
+            font_montserrat_22 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-22.fnt")
+            style_sel.set_text_font(font_montserrat_22)
+        except:
+            print("Cannot load font file montserrat-22.fnt")
+        
+style_sel.set_bg_color(lv.color_hex3(0xf88))
+style_sel.set_border_width(2)
+style_sel.set_border_color(lv.color_hex3(0xf00))
 
 opts = "\n".join(["1","2","3","4","5","6","7","8","9","10"])
 
@@ -35,6 +49,8 @@ roller.set_visible_row_count(2)
 roller.set_width(100)
 roller.add_style(style_sel, lv.PART.SELECTED)
 roller.set_style_text_align(lv.TEXT_ALIGN.LEFT, 0)
+roller.set_style_bg_color(lv.color_hex3(0x0f0), 0)
+roller.set_style_bg_grad_color(lv.color_hex3(0xafa), 0);
 roller.align(lv.ALIGN.LEFT_MID, 10, 0)
 roller.add_event(event_handler, lv.EVENT.ALL, None)
 roller.set_selected(2, lv.ANIM.OFF)

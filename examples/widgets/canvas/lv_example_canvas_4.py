@@ -23,19 +23,27 @@ dsc.init()
 
 dsc.color = lv.palette_main(lv.PALETTE.RED)
 
+# get the directory in which the script is running
 try:
-    dsc.font = lv_font_montserrat_18
-except:
-    # needed for dynamic font loading
-    fs_drv = lv.fs_drv_t()
-    fs_driver.fs_register(fs_drv, 'S')
+    script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
+except NameError:
+    print("Could not find script path")
+    script_path = ''
 
-    print("Loading font montserrat_18")
-    font_montserrat_18 = lv.font_load("S:../../assets/font/montserrat-18.fnt")
-    if not font_montserrat_18:
-        print("Font loading failed")
-    else:
-        dsc.font = font_montserrat_18
+if script_path != '':
+    try:
+        dsc.font = lv.font_montserrat_18
+    except:
+        # needed for dynamic font loading
+        fs_drv = lv.fs_drv_t()
+        fs_driver.fs_register(fs_drv, 'S')
+        
+        print("Loading font montserrat_18")
+        font_montserrat_18 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-18.fnt")
+        if not font_montserrat_18:
+            print("Font loading failed")
+        else:
+            dsc.font = font_montserrat_18
 
 dsc.decor = lv.TEXT_DECOR.UNDERLINE
 print('Printing "Hello"')
