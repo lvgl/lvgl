@@ -45,6 +45,7 @@
 - [ ] `lv_tabview` Replace button matrix with real buttons for more flexibility
 - [ ] `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
 - [ ] `lv_roller` make it more flexible #4009
+- [ ] Universal scale widget/support (see [here](https://forum.lvgl.io/t/linear-meter-bar-with-ticks/10986) and #4043)
 - [ ] Improve `lv_label_align_t` #1656
 - [ ] Disabled widgets should absorb indev actions without sending events. [#3860](https://github.com/lvgl/lvgl/issues/3860)
 
@@ -94,7 +95,6 @@
 - [ ] Circle layout. #2871
 - [ ] Variable binding. I.e create properties which can be bound to objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
 - [ ] Consider [stagger animations](https://greensock.com/docs/v3/Staggers).
-- [ ] Universal scale widget/support (see [here](https://forum.lvgl.io/t/linear-meter-bar-with-ticks/10986))
  
 ## Ideas
 - Consider direct binary font format support
