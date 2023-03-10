@@ -44,6 +44,7 @@
 - [ ] `lv_img`: Reconsider image sizing models (when the image size is not content): center, top-left, zoom, tile, other?
 - [ ] `lv_tabview` Replace button matrix with real buttons for more flexibility
 - [ ] `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
+- [ ] `lv_roller` make it more flexible #4009
 - [ ] Improve `lv_label_align_t` #1656
 - [ ] Disabled widgets should absorb indev actions without sending events. [#3860](https://github.com/lvgl/lvgl/issues/3860)
 
@@ -82,6 +83,9 @@
 - [ ] ARGB image stroke/grow on the alpha map
 - [ ] real time blur
 - [ ] gradient with alpha
+
+### Widgets
+- [ ] `lv_bar`, `lv_arc`: handle max < min for fill direction swapping #4039 
 
 ### Others
 - [ ] More grid features. E.g. repeat(auto-fill, minmax( <value> px, 1fr))
