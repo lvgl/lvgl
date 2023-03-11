@@ -120,7 +120,7 @@ void lv_draw_dispatch(void)
 
         /*This draw_ctx is ready, enable blending its buffer*/
         if(draw_ctx->parent && draw_ctx->all_tasks_added && draw_ctx->draw_task_head == NULL) {
-            /*Find a draw task with LAYER in the draw_ctx where the is the src is this draw_ctx*/
+            /*Find a draw task with TYPE_LAYER in the draw_ctx where the is the src is this draw_ctx*/
             lv_draw_task_t * t = draw_ctx->parent->draw_task_head;
             while(t) {
                 if(t->type == LV_DRAW_TASK_TYPE_LAYER && t->state == LV_DRAW_TASK_STATE_WAITING) {
@@ -211,7 +211,8 @@ static bool is_independent(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_check)
     /*If t_check is outside of the older tasks then it's independent*/
     while(t && t != t_check) {
         if(t->state != LV_DRAW_TASK_STATE_READY) {
-            if(_lv_area_is_on(&t_check->area, &t->area)) {
+            lv_area_t a;
+            if(_lv_area_intersect(&a, &t->area, &t_check->area)) {
                 return false;
             }
         }

@@ -74,7 +74,7 @@ void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
     draw_shadow(draw_unit->draw_ctx, dsc);
 #endif
 
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 1; i++) {
         draw_bg(draw_unit, dsc, coords);
         draw_bg_img(draw_unit, dsc, coords);
 
