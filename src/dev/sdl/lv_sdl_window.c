@@ -229,7 +229,7 @@ static void window_create(lv_disp_t * disp)
     dsc->zoom = 1;
 
     int flag = SDL_WINDOW_RESIZABLE;
-#if SDL_FULLSCREEN
+#if LV_SDL_FULLSCREEN
     flag |= SDL_WINDOW_FULLSCREEN;
 #endif
 

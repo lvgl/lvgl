@@ -2511,6 +2511,13 @@
             #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
         #endif
     #endif
+    #ifndef LV_SDL_FULLSCREEN
+        #ifdef CONFIG_LV_SDL_FULLSCREEN
+            #define LV_SDL_FULLSCREEN CONFIG_LV_SDL_FULLSCREEN
+        #else
+            #define LV_SDL_FULLSCREEN      0
+        #endif
+    #endif
 #endif
 
 /*Driver for /dev/fb*/
