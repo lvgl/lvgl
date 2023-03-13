@@ -450,7 +450,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     uint8_t font_rgb[3];
 
     lv_color_t color = dsc->color;
-    uint8_t txt_rgb[3] = {color.ch.red, color.ch.green, color.ch.blue};
+    uint8_t txt_rgb[3] = {color.red, color.green, color.blue};
 
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(blend_dsc));
@@ -489,20 +489,20 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
                 subpx_cnt = 0;
 
                 lv_color_t res_color;
-                uint8_t bg_rgb[3] = {dest_buf_tmp->ch.red, dest_buf_tmp->ch.green, dest_buf_tmp->ch.blue};
+                uint8_t bg_rgb[3] = {dest_buf_tmp->red, dest_buf_tmp->green, dest_buf_tmp->blue};
 
 #if LV_DRAW_SW_FONT_SUBPX_BGR
-                res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8;
-                res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8;
+                res_color.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8;
+                res_color.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8;
 #else
-                res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+                res_color.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
+                res_color.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
 #endif
 
-                res_color.ch.green = (uint32_t)((uint32_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
+                res_color.green = (uint32_t)((uint32_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
 
 #if LV_COLOR_DEPTH == 32
-                res_color.ch.alpha = 0xff;
+                res_color.alpha = 0xff;
 #endif
 
                 if(font_rgb[0] == 0 && font_rgb[1] == 0 && font_rgb[2] == 0) mask_buf[mask_p] = LV_OPA_TRANSP;
