@@ -53,12 +53,12 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_draw_pxp_wait_for_finish(lv_draw_ctx_t * draw_ctx);
+static void lv_draw_pxp_wait_for_finish(lv_layer_t * layer);
 
-static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_pxp_img_decoded(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc,
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
 
-static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+static void lv_draw_pxp_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -72,19 +72,19 @@ static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_pxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_pxp_ctx_init(lv_disp_drv_t * drv, lv_layer_t * layer)
 {
-    lv_draw_sw_init_ctx(drv, draw_ctx);
+    lv_draw_sw_init_ctx(drv, layer);
 
-    lv_draw_pxp_ctx_t * pxp_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
-    pxp_draw_ctx->base_draw.draw_img_decoded = lv_draw_pxp_img_decoded;
-    pxp_draw_ctx->blend = lv_draw_pxp_blend;
-    pxp_draw_ctx->base_draw.wait_for_finish = lv_draw_pxp_wait_for_finish;
+    lv_draw_pxp_ctx_t * pxp_layer = (lv_draw_sw_ctx_t *)layer;
+    pxp_layer->base_draw.draw_img_decoded = lv_draw_pxp_img_decoded;
+    pxp_layer->blend = lv_draw_pxp_blend;
+    pxp_layer->base_draw.wait_for_finish = lv_draw_pxp_wait_for_finish;
 }
 
-void lv_draw_pxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_pxp_ctx_deinit(lv_disp_drv_t * drv, lv_layer_t * layer)
 {
-    lv_draw_sw_deinit_ctx(drv, draw_ctx);
+    lv_draw_sw_deinit_ctx(drv, layer);
 }
 
 /**********************
@@ -92,7 +92,7 @@ void lv_draw_pxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
  **********************/
 
 /**
- * During rendering, LVGL might initializes new draw_ctxs and start drawing into
+ * During rendering, LVGL might initializes new layers and start drawing into
  * a separate buffer (called layer). If the content to be rendered has "holes",
  * e.g. rounded corner, LVGL temporarily sets the disp_drv.screen_transp flag.
  * It means the renderers should draw into an ARGB buffer.
@@ -100,49 +100,49 @@ void lv_draw_pxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
  * the target pixel format is ARGB8565 which is not supported by the GPU.
  * In this case, the PXP callbacks should fallback to SW rendering.
  */
-static inline bool need_argb8565_support(lv_draw_ctx_t * draw_ctx)
+static inline bool need_argb8565_support(lv_layer_t * layer)
 {
 #if LV_COLOR_DEPTH != 32
-    if(draw_ctx->render_with_alpha)
+    if(layer->render_with_alpha)
         return true;
 #endif
 
     return false;
 }
 
-static void lv_draw_pxp_wait_for_finish(lv_draw_ctx_t * draw_ctx)
+static void lv_draw_pxp_wait_for_finish(lv_layer_t * layer)
 {
     lv_gpu_nxp_pxp_wait();
 
-    lv_draw_sw_wait_for_finish(draw_ctx);
+    lv_draw_sw_wait_for_finish(layer);
 }
 
-static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+static void lv_draw_pxp_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    if(need_argb8565_support(draw_ctx)) {
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
+    if(need_argb8565_support(layer)) {
+        lv_draw_sw_blend_basic(layer, dsc);
         return;
     }
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area))
+    if(!_lv_area_intersect(&blend_area, dsc->blend_area, layer->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
     if(dsc->mask_buf != NULL || dsc->blend_mode != LV_BLEND_MODE_NORMAL ||
        lv_area_get_size(&blend_area) < LV_GPU_NXP_PXP_SIZE_LIMIT) {
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
+        lv_draw_sw_blend_basic(layer, dsc);
         return;
     }
 
     /*Fill/Blend only non masked, normal blended*/
-    lv_color_t * dest_buf = draw_ctx->buf;
-    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+    lv_color_t * dest_buf = layer->buf;
+    lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);
     const lv_color_t * src_buf = dsc->src_buf;
 
     if(src_buf == NULL) {
@@ -150,8 +150,8 @@ static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
     }
     else {
         lv_area_t src_area;
-        src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1);
-        src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1);
+        src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - layer->buf_area->x1);
+        src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - layer->buf_area->y1);
         src_area.x2 = src_area.x1 + lv_area_get_width(dsc->blend_area) - 1;
         src_area.y2 = src_area.y1 + lv_area_get_height(dsc->blend_area) - 1;
         lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
@@ -161,30 +161,30 @@ static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
     }
 }
 
-static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_pxp_img_decoded(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc,
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    if(need_argb8565_support(draw_ctx)) {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+    if(need_argb8565_support(layer)) {
+        lv_draw_sw_img_decoded(layer, dsc, coords, map_p, cf);
         return;
     }
 
     const lv_color_t * src_buf = (const lv_color_t *)map_p;
     if(!src_buf) {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+        lv_draw_sw_img_decoded(layer, dsc, coords, map_p, cf);
         return;
     }
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to draw and the clip area.*/
-    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
+    if(!_lv_area_intersect(&blend_area, coords, layer->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
     lv_coord_t src_width = lv_area_get_width(coords);
     lv_coord_t src_height = lv_area_get_height(coords);
@@ -223,16 +223,16 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
        || lv_img_cf_has_alpha(cf)
 #endif
       ) {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+        lv_draw_sw_img_decoded(layer, dsc, coords, map_p, cf);
         return;
     }
 
-    lv_color_t * dest_buf = draw_ctx->buf;
-    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+    lv_color_t * dest_buf = layer->buf;
+    lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);
 
     lv_area_t src_area;
-    src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
-    src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
+    src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area->x1);
+    src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area->y1);
     src_area.x2 = src_area.x1 + src_width - 1;
     src_area.y2 = src_area.y1 + src_height - 1;
     lv_coord_t src_stride = lv_area_get_width(coords);

@@ -40,7 +40,7 @@ static void dump_masks(SDL_Texture * texture, const lv_area_t * coords);
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_sdl_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[],
+void lv_draw_sdl_polygon(lv_layer_t * layer, const lv_draw_rect_dsc_t * draw_dsc, const lv_point_t points[],
                          uint16_t point_cnt)
 {
     if(point_cnt < 3) return;
@@ -66,13 +66,13 @@ void lv_draw_sdl_polygon(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dr
 
     bool is_common;
     lv_area_t draw_area;
-    is_common = _lv_area_intersect(&draw_area, &poly_coords, draw_ctx->clip_area);
+    is_common = _lv_area_intersect(&draw_area, &poly_coords, layer->clip_area);
     if(!is_common) {
         lv_draw_mask_free_param(&polygon_param);
         return;
     }
 
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
 
     int16_t mask_id = lv_draw_mask_add(&polygon_param, NULL);
 

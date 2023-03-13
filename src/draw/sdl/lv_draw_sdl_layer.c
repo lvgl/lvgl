@@ -42,10 +42,10 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx,
+lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_layer_t * layer, lv_draw_layer_ctx_t * layer_ctx,
                                              lv_draw_layer_flags_t flags)
 {
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_draw_sdl_layer_ctx_t * transform_ctx = (lv_draw_sdl_layer_ctx_t *) layer_ctx;
@@ -78,16 +78,16 @@ lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_draw_ctx_t * draw_ctx, lv_draw_l
 
     /* Set proper drawing context for transform layer */
     ctx->internals->transform_count += 1;
-    draw_ctx->buf_area = &layer_ctx->area_full;
-    draw_ctx->clip_area = &layer_ctx->area_full;
+    layer->buf_area = &layer_ctx->area_full;
+    layer->clip_area = &layer_ctx->area_full;
 
     return layer_ctx;
 }
 
-void lv_draw_sdl_layer_blend(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx,
+void lv_draw_sdl_layer_blend(lv_layer_t * layer, lv_draw_layer_ctx_t * layer_ctx,
                              const lv_draw_img_dsc_t * draw_dsc)
 {
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
     lv_draw_sdl_layer_ctx_t * transform_ctx = (lv_draw_sdl_layer_ctx_t *) layer_ctx;
 
     SDL_Renderer * renderer = ctx->renderer;
@@ -114,9 +114,9 @@ void lv_draw_sdl_layer_blend(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * lay
     SDL_RenderSetClipRect(renderer, NULL);
 }
 
-void lv_draw_sdl_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx)
+void lv_draw_sdl_layer_destroy(lv_layer_t * layer, lv_draw_layer_ctx_t * layer_ctx)
 {
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
     ctx->internals->transform_count -= 1;
 }
 

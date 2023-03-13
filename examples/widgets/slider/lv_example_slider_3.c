@@ -48,7 +48,7 @@ static void slider_event_cb(lv_event_t * e)
             lv_draw_label_dsc_t label_draw_dsc;
             lv_draw_label_dsc_init(&label_draw_dsc);
             label_draw_dsc.color = lv_color_hex3(0x888);
-            lv_draw_label(dsc->draw_ctx, &label_draw_dsc, &label_area, buf, NULL);
+            lv_draw_label(dsc->layer, &label_draw_dsc, &label_area, buf, NULL);
         }
     }
 }

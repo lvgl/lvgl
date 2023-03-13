@@ -46,17 +46,17 @@ struct _lv_disp_t;
  */
 void lv_draw_stm32_dma2d_init(void);
 
-void lv_draw_stm32_dma2d_ctx_init(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_stm32_dma2d_ctx_init(struct _lv_disp_t * disp, lv_layer_t * layer);
 
-void lv_draw_stm32_dma2d_ctx_deinit(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_stm32_dma2d_ctx_deinit(struct _lv_disp_t * disp, lv_layer_t * layer);
 
-void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+void lv_draw_stm32_dma2d_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc);
 
-void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx,
+void lv_draw_stm32_dma2d_buffer_copy(lv_layer_t * layer,
                                      void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
                                      void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
-void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx);
+void lv_gpu_stm32_dma2d_wait_cb(lv_layer_t * layer);
 
 /**********************
  *      MACROS

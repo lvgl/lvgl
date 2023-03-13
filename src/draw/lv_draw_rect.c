@@ -59,7 +59,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
  * @param mask the rectangle will be drawn only in this mask
  * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->bg_opa <= LV_OPA_MIN &&
        (dsc->border_opa <= LV_OPA_MIN || dsc->border_width == 0) &&
@@ -68,7 +68,7 @@ void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, cons
         return;
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(draw_ctx, coords);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));

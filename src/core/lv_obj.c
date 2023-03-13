@@ -76,7 +76,7 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_draw(lv_event_t * e);
 static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx);
+static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
@@ -586,7 +586,7 @@ static void lv_obj_draw(lv_event_t * e)
 
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
@@ -605,7 +605,7 @@ static void lv_obj_draw(lv_event_t * e)
         coords.y2 += h;
 
         lv_obj_draw_part_dsc_t part_dsc;
-        lv_obj_draw_dsc_init(&part_dsc, draw_ctx);
+        lv_obj_draw_dsc_init(&part_dsc, layer);
         part_dsc.class_p = MY_CLASS;
         part_dsc.type = LV_OBJ_DRAW_PART_RECTANGLE;
         part_dsc.rect_dsc = &draw_dsc;
@@ -622,7 +622,7 @@ static void lv_obj_draw(lv_event_t * e)
         }
 #endif
 
-        lv_draw_rect(draw_ctx, &draw_dsc, &coords);
+        lv_draw_rect(layer, &draw_dsc, &coords);
 
 
 #if LV_USE_DRAW_MASKS
@@ -638,7 +638,7 @@ static void lv_obj_draw(lv_event_t * e)
                 draw_dsc.outline_opa = LV_OPA_TRANSP;
                 draw_dsc.shadow_opa = LV_OPA_TRANSP;
                 draw_dsc.bg_img_src = bg_img_src;
-                lv_draw_rect(draw_ctx, &draw_dsc, &coords);
+                lv_draw_rect(layer, &draw_dsc, &coords);
             }
 
         }
@@ -646,8 +646,8 @@ static void lv_obj_draw(lv_event_t * e)
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     else if(code == LV_EVENT_DRAW_POST) {
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
-        draw_scrollbar(obj, draw_ctx);
+        lv_layer_t * layer = lv_event_get_layer(e);
+        draw_scrollbar(obj, layer);
 
 #if LV_USE_DRAW_MASKS
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
@@ -679,7 +679,7 @@ static void lv_obj_draw(lv_event_t * e)
             coords.y2 += h;
 
             lv_obj_draw_part_dsc_t part_dsc;
-            lv_obj_draw_dsc_init(&part_dsc, draw_ctx);
+            lv_obj_draw_dsc_init(&part_dsc, layer);
             part_dsc.class_p = MY_CLASS;
             part_dsc.type = LV_OBJ_DRAW_PART_BORDER_POST;
             part_dsc.rect_dsc = &draw_dsc;
@@ -687,13 +687,13 @@ static void lv_obj_draw(lv_event_t * e)
             part_dsc.part = LV_PART_MAIN;
             lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
 
-            lv_draw_rect(draw_ctx, &draw_dsc, &coords);
+            lv_draw_rect(layer, &draw_dsc, &coords);
             lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
         }
     }
 }
 
-static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
+static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
 {
 
     lv_area_t hor_area;
@@ -707,7 +707,7 @@ static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     if(sb_res != LV_RES_OK) return;
 
     lv_obj_draw_part_dsc_t part_dsc;
-    lv_obj_draw_dsc_init(&part_dsc, draw_ctx);
+    lv_obj_draw_dsc_init(&part_dsc, layer);
     part_dsc.class_p = MY_CLASS;
     part_dsc.type = LV_OBJ_DRAW_PART_SCROLLBAR;
     part_dsc.rect_dsc = &draw_dsc;
@@ -716,14 +716,14 @@ static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     if(lv_area_get_size(&hor_area) > 0) {
         part_dsc.draw_area = &hor_area;
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-        lv_draw_rect(draw_ctx, &draw_dsc, &hor_area);
+        lv_draw_rect(layer, &draw_dsc, &hor_area);
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     if(lv_area_get_size(&ver_area) > 0) {
         part_dsc.draw_area = &ver_area;
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
         part_dsc.draw_area = &ver_area;
-        lv_draw_rect(draw_ctx, &draw_dsc, &ver_area);
+        lv_draw_rect(layer, &draw_dsc, &ver_area);
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
 }

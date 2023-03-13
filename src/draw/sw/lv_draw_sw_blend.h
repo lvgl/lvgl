@@ -29,8 +29,8 @@ extern "C" {
  **********************/
 
 typedef struct {
-    const lv_area_t * blend_area;   /**< The area with absolute coordinates to draw on `draw_ctx->buf`
-                                     *   will be clipped to `draw_ctx->clip_area` */
+    const lv_area_t * blend_area;   /**< The area with absolute coordinates to draw on `layer->buf`
+                                     *   will be clipped to `layer->clip_area` */
     const lv_color_t * src_buf;     /**< Pointer to an image to blend. If set `fill_color` is ignored */
     lv_color_t color;               /**< Fill color*/
     const lv_opa_t * mask_buf;            /**< NULL if ignored, or an alpha mask to apply on `blend_area`*/
@@ -47,8 +47,8 @@ struct _lv_draw_unit_t;
  **********************/
 
 /**
- * Call the blend function of the `draw_ctx`.
- * @param draw_ctx      pointer to a draw context
+ * Call the blend function of the `layer`.
+ * @param layer      pointer to a draw context
  * @param dsc           pointer to an initialized blend descriptor
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(struct _lv_draw_unit_t * draw_unit, const lv_draw_sw_blend_dsc_t * dsc);

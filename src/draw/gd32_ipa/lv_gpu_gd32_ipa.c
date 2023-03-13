@@ -65,11 +65,11 @@ static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_s
 static void lv_draw_gd32_ipa_blend_map(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                        const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa);
 
-static void lv_draw_gd32_ipa_img_decoded(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_gd32_ipa_img_decoded(lv_layer_t * draw, const lv_draw_img_dsc_t * dsc,
                                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
 
-static void lv_gpu_gd32_ipa_wait_cb(lv_draw_ctx_t * draw_ctx);
+static void lv_gpu_gd32_ipa_wait_cb(lv_layer_t * layer);
 static void invalidate_cache(void);
 
 /**********************
@@ -101,74 +101,74 @@ void lv_draw_gd32_ipa_init(void)
 }
 
 
-void lv_draw_gd32_ipa_ctx_init(lv_disp_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_gd32_ipa_ctx_init(lv_disp_t * drv, lv_layer_t * layer)
 {
 
-    lv_draw_sw_init_ctx(drv, draw_ctx);
+    lv_draw_sw_init_ctx(drv, layer);
 
-    lv_draw_gd32_ipa_ctx_t * ipa_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
+    lv_draw_gd32_ipa_ctx_t * ipa_layer = (lv_draw_sw_ctx_t *)layer;
 
-    ipa_draw_ctx->blend = lv_draw_gd32_ipa_blend;
-    ipa_draw_ctx->base_draw.wait_for_finish = lv_gpu_gd32_ipa_wait_cb;
-    ipa_draw_ctx->base_draw.buffer_copy = lv_draw_gd32_ipa_buffer_copy;
+    ipa_layer->blend = lv_draw_gd32_ipa_blend;
+    ipa_layer->base_draw.wait_for_finish = lv_gpu_gd32_ipa_wait_cb;
+    ipa_layer->base_draw.buffer_copy = lv_draw_gd32_ipa_buffer_copy;
 
 }
 
-void lv_draw_gd32_ipa_ctx_deinit(lv_disp_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_gd32_ipa_ctx_deinit(lv_disp_t * drv, lv_layer_t * layer)
 {
     LV_UNUSED(drv);
-    LV_UNUSED(draw_ctx);
+    LV_UNUSED(layer);
 }
 
 
-void lv_draw_gd32_ipa_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+void lv_draw_gd32_ipa_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc)
 {
     lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
+    if(!_lv_area_intersect(&blend_area, dsc->blend_area, layer->clip_area)) return;
 
     bool done = false;
 
     if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&blend_area) > 100) {
-        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+        lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);
 
-        lv_color_t * dest_buf = draw_ctx->buf;
-        dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
+        lv_color_t * dest_buf = layer->buf;
+        dest_buf += dest_stride * (blend_area.y1 - layer->buf_area->y1) + (blend_area.x1 - layer->buf_area->x1);
 
         const lv_color_t * src_buf = dsc->src_buf;
         if(src_buf) {
-            lv_draw_sw_blend_basic(draw_ctx, dsc);
+            lv_draw_sw_blend_basic(layer, dsc);
             lv_coord_t src_stride;
             src_stride = lv_area_get_width(dsc->blend_area);
             src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 -  dsc->blend_area->x1);
-            lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+            lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
             lv_draw_gd32_ipa_blend_map(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa);
             done = true;
         }
         else if(dsc->opa >= LV_OPA_MAX) {
-            lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+            lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
             lv_draw_gd32_ipa_blend_fill(dest_buf, dest_stride, &blend_area, dsc->color);
             done = true;
         }
     }
 
-    if(!done) lv_draw_sw_blend_basic(draw_ctx, dsc);
+    if(!done) lv_draw_sw_blend_basic(layer, dsc);
 }
 
-void lv_draw_gd32_ipa_buffer_copy(lv_draw_ctx_t * draw_ctx,
+void lv_draw_gd32_ipa_buffer_copy(lv_layer_t * layer,
                                   void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
                                   void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
-    LV_UNUSED(draw_ctx);
+    LV_UNUSED(layer);
     lv_draw_gd32_ipa_blend_map(dest_buf, dest_area, dest_stride, src_buf, src_stride, LV_OPA_MAX);
 }
 
 
-static void lv_draw_gd32_ipa_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_gd32_ipa_img_decoded(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc,
                                          const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
 {
     /*TODO basic ARGB8888 image can be handles here*/
 
-    lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
+    lv_draw_sw_img_decoded(layer, dsc, coords, map_p, color_format);
 }
 
 static void lv_draw_gd32_ipa_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
@@ -262,7 +262,7 @@ static void lv_draw_gd32_ipa_blend_map(lv_color_t * dest_buf, const lv_area_t * 
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_gpu_gd32_ipa_wait_cb(lv_draw_ctx_t * draw_ctx)
+static void lv_gpu_gd32_ipa_wait_cb(lv_layer_t * layer)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     if(disp->driver && disp->driver->wait_cb) {
@@ -273,7 +273,7 @@ static void lv_gpu_gd32_ipa_wait_cb(lv_draw_ctx_t * draw_ctx)
     else {
         while(IPA_CTL & IPA_CTL_TEN);
     }
-    lv_draw_sw_wait_for_finish(draw_ctx);
+    lv_draw_sw_wait_for_finish(layer);
 }
 
 

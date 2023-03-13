@@ -48,7 +48,7 @@ typedef struct {
 } lv_draw_sdl_drv_param_t;
 
 typedef struct {
-    lv_draw_ctx_t base_draw;
+    lv_layer_t base_draw;
     SDL_Renderer * renderer;
     struct lv_draw_sdl_context_internals_t * internals;
 } lv_draw_sdl_ctx_t;
@@ -57,13 +57,13 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_sdl_init_ctx(lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_sdl_init_ctx(lv_disp_t * disp_drv, lv_layer_t * layer);
 
 /**
  * @brief Free caches
  *
  */
-void lv_draw_sdl_deinit_ctx(lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_sdl_deinit_ctx(lv_disp_t * disp_drv, lv_layer_t * layer);
 
 SDL_Texture * lv_draw_sdl_create_screen_texture(SDL_Renderer * renderer, lv_coord_t hor, lv_coord_t ver);
 

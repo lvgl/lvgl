@@ -81,7 +81,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv
     /*Do not draw transparent things*/
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
+    lv_layer_t * layer = draw_unit->layer;
 
     lv_area_t blend_area;
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_unit->clip_area)) return;
@@ -92,17 +92,17 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
     else mask = dsc->mask_buf;
 
-    lv_coord_t dest_stride = lv_area_get_width(&draw_ctx->buf_area);
+    lv_coord_t dest_stride = lv_area_get_width(&layer->buf_area);
 
-    lv_color_t * dest_buf = draw_ctx->buf;
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE || draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSED) {
-        dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area.y1) + (blend_area.x1 - draw_ctx->buf_area.x1);
+    lv_color_t * dest_buf = layer->buf;
+    if(layer->color_format == LV_COLOR_FORMAT_NATIVE || layer->color_format == LV_COLOR_FORMAT_NATIVE_REVERSED) {
+        dest_buf += dest_stride * (blend_area.y1 - layer->buf_area.y1) + (blend_area.x1 - layer->buf_area.x1);
     }
     else {
         /*With LV_COLOR_DEPTH 16 it means ARGB8565 (3 bytes format)*/
         uint8_t * dest_buf8 = (uint8_t *) dest_buf;
-        dest_buf8 += dest_stride * (blend_area.y1 - draw_ctx->buf_area.y1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-        dest_buf8 += (blend_area.x1 - draw_ctx->buf_area.x1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+        dest_buf8 += dest_stride * (blend_area.y1 - layer->buf_area.y1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+        dest_buf8 += (blend_area.x1 - layer->buf_area.x1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
         dest_buf = (lv_color_t *)dest_buf8;
     }
 
@@ -126,10 +126,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv
         mask_stride = 0;
     }
 
-    lv_area_move(&blend_area, -draw_ctx->buf_area.x1, -draw_ctx->buf_area.y1);
+    lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
 
-    if(lv_color_format_has_alpha(draw_ctx->color_format)) {
+    if(lv_color_format_has_alpha(layer->color_format)) {
         if(dsc->src_buf == NULL) {
             fill_argb(dest_buf, &blend_area, dest_stride, dsc->color, dsc->opa, mask, mask_stride);
         }

@@ -162,16 +162,16 @@
             lv_area_t blend_area2;                                              \
             if(!_lv_area_intersect(&blend_area2,                                \
                                    &draw_area,                                  \
-                                   draw_ctx->clip_area)) return;                \
+                                   layer->clip_area)) return;                \
                                                                                 \
             int32_t w = lv_area_get_width(&blend_area2);                        \
             int32_t h = lv_area_get_height(&blend_area2);                       \
                                                                                 \
-            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);     \
+            lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);     \
                                                                                 \
-            lv_color_t * dest_buf = draw_ctx->buf;                              \
-            dest_buf += dest_stride * (blend_area2.y1 - draw_ctx->buf_area->y1) \
-                        + (blend_area2.x1 - draw_ctx->buf_area->x1);            \
+            lv_color_t * dest_buf = layer->buf;                              \
+            dest_buf += dest_stride * (blend_area2.y1 - layer->buf_area->y1) \
+                        + (blend_area2.x1 - layer->buf_area->x1);            \
                                                                                 \
             arm_2d_size_t copy_size = {                                         \
                 .iWidth = lv_area_get_width(&blend_area2),                      \
@@ -182,23 +182,23 @@
         static arm_2d_tile_t target_tile;                                       \
         static arm_2d_region_t target_region;                                   \
                                                                                 \
-        lv_color_t * dest_buf = draw_ctx->buf;                                  \
+        lv_color_t * dest_buf = layer->buf;                                  \
                                                                                 \
         target_tile = (arm_2d_tile_t) {                                         \
             .tRegion = {                                                        \
                 .tSize = {                                                      \
-                    .iWidth = lv_area_get_width(draw_ctx->buf_area),            \
-                    .iHeight = lv_area_get_height(draw_ctx->buf_area),          \
+                    .iWidth = lv_area_get_width(layer->buf_area),            \
+                    .iHeight = lv_area_get_height(layer->buf_area),          \
                 },                                                              \
             },                                                                  \
             .tInfo.bIsRoot = true,                                              \
-            .phwBuffer = (uint16_t *)draw_ctx->buf,                             \
+            .phwBuffer = (uint16_t *)layer->buf,                             \
         };                                                                      \
                                                                                 \
         target_region = (arm_2d_region_t) {                                     \
             .tLocation = {                                                      \
-                .iX = (__blend_area).x1 - draw_ctx->buf_area->x1,               \
-                .iY = (__blend_area).y1 - draw_ctx->buf_area->y1,               \
+                .iX = (__blend_area).x1 - layer->buf_area->x1,               \
+                .iY = (__blend_area).y1 - layer->buf_area->y1,               \
             },                                                                  \
             .tSize = {                                                          \
                 .iWidth = lv_area_get_width(&(__blend_area)),                   \
@@ -361,8 +361,8 @@
                                                                                 \
             target_region = (arm_2d_region_t) {                                 \
                 .tLocation = {                                                  \
-                    .iX = coords->x1 - draw_ctx->clip_area->x1,                 \
-                    .iY = coords->y1 - draw_ctx->clip_area->y1,                 \
+                    .iX = coords->x1 - layer->clip_area->x1,                 \
+                    .iY = coords->y1 - layer->clip_area->y1,                 \
                 },                                                              \
                 .tSize = {                                                      \
                     .iWidth = lv_area_get_width(coords),                        \
@@ -428,11 +428,11 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
                                lv_coord_t mask_stride);
 
 LV_ATTRIBUTE_FAST_MEM
-static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+static void lv_draw_arm2d_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM
-static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx);
+static void lv_gpu_arm2d_wait_cb(lv_layer_t * layer);
 LV_ATTRIBUTE_FAST_MEM
-static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
+static void lv_draw_arm2d_img_decoded(struct _lv_layer_t * layer,
                                       const lv_draw_img_dsc_t * draw_dsc,
                                       const lv_area_t * coords,
                                       const uint8_t * src_buf,
@@ -451,34 +451,34 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_arm2d_ctx_init(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
+void lv_draw_arm2d_ctx_init(lv_disp_t * disp, lv_layer_t * layer)
 {
     arm_2d_init();
 
-    lv_draw_sw_init_ctx(disp, draw_ctx);
+    lv_draw_sw_init_ctx(disp, layer);
 
-    lv_draw_arm2d_ctx_t * arm2d_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
+    lv_draw_arm2d_ctx_t * arm2d_layer = (lv_draw_sw_ctx_t *)layer;
 
-    arm2d_draw_ctx->blend = lv_draw_arm2d_blend;
-    arm2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_arm2d_wait_cb;
+    arm2d_layer->blend = lv_draw_arm2d_blend;
+    arm2d_layer->base_draw.wait_for_finish = lv_gpu_arm2d_wait_cb;
 
 #if !__ARM_2D_HAS_HW_ACC__
-    arm2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_arm2d_img_decoded;
+    arm2d_layer->base_draw.draw_img_decoded = lv_draw_arm2d_img_decoded;
 #endif
 
 }
 
-void lv_draw_arm2d_ctx_deinit(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
+void lv_draw_arm2d_ctx_deinit(lv_disp_t * disp, lv_layer_t * layer)
 {
     LV_UNUSED(disp);
-    LV_UNUSED(draw_ctx);
+    LV_UNUSED(layer);
 }
 
 extern void test_flush(lv_color_t * color_p);
 
 
 LV_ATTRIBUTE_FAST_MEM
-static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+static void lv_draw_arm2d_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc)
 {
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
@@ -486,10 +486,10 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
     else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
     else mask = dsc->mask_buf;
 
-    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+    lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);
 
     lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
+    if(!_lv_area_intersect(&blend_area, dsc->blend_area, layer->clip_area)) return;
 
     //lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 
@@ -497,15 +497,15 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
     do {
 
         /* target buffer */
-        lv_color_t * dest_buf = draw_ctx->buf;
-        if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE) {
-            dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
+        lv_color_t * dest_buf = layer->buf;
+        if(layer->color_format == LV_COLOR_FORMAT_NATIVE) {
+            dest_buf += dest_stride * (blend_area.y1 - layer->buf_area->y1) + (blend_area.x1 - layer->buf_area->x1);
         }
         else if(LV_COLOR_DEPTH == 24 || LV_COLOR_DEPTH == 32) {
             /*With LV_COLOR_DEPTH 16 it means ARGB8565 (3 bytes format), it is not support here*/
             uint8_t * dest_buf8 = (uint8_t *) dest_buf;
-            dest_buf8 += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-            dest_buf8 += (blend_area.x1 - draw_ctx->buf_area->x1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            dest_buf8 += dest_stride * (blend_area.y1 - layer->buf_area->y1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            dest_buf8 += (blend_area.x1 - layer->buf_area->x1) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
             dest_buf = (lv_color_t *)dest_buf8;
         }
         else {
@@ -532,9 +532,9 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
             mask_stride = 0;
         }
 
-        lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+        lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
-        if(lv_color_format_has_alpha(draw_ctx->color_format)) {
+        if(lv_color_format_has_alpha(layer->color_format)) {
             break;
         }
         if(dsc->src_buf == NULL) {
@@ -562,7 +562,7 @@ static void lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend
         }
     } while(0);
 
-    if(!is_accelerated) lv_draw_sw_blend_basic(draw_ctx, dsc);
+    if(!is_accelerated) lv_draw_sw_blend_basic(layer, dsc);
 }
 
 LV_ATTRIBUTE_FAST_MEM
@@ -697,7 +697,7 @@ static bool arm_2d_copy_normal(lv_color_t * dest_buf,
 }
 
 LV_ATTRIBUTE_FAST_MEM
-static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
+static void lv_draw_arm2d_img_decoded(struct _lv_layer_t * layer,
                                       const lv_draw_img_dsc_t * draw_dsc,
                                       const lv_area_t * coords,
                                       const uint8_t * src_buf,
@@ -708,7 +708,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
 
     /*Use the clip area as draw area*/
     lv_area_t draw_area;
-    lv_area_copy(&draw_area, draw_ctx->clip_area);
+    lv_area_copy(&draw_area, layer->clip_area);
 
     bool mask_any = lv_draw_mask_is_any(&draw_area);
     bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
@@ -726,11 +726,11 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
 
         blend_dsc.blend_area = coords;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
     else if(!mask_any && !transform && cf == LV_COLOR_FORMAT_A8) {
         lv_area_t clipped_coords;
-        if(!_lv_area_intersect(&clipped_coords, coords, draw_ctx->clip_area)) return;
+        if(!_lv_area_intersect(&clipped_coords, coords, layer->clip_area)) return;
 
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
         blend_dsc.mask_area = coords;
@@ -739,7 +739,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
 
         blend_dsc.blend_area = coords;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
 #if LV_COLOR_DEPTH == 16
     else if(!mask_any && !transform && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
@@ -751,15 +751,15 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
         blend_dsc.blend_area = coords;
         blend_dsc.mask_area = coords;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
 #endif
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
-        blend_area.x1 = draw_ctx->clip_area->x1;
-        blend_area.x2 = draw_ctx->clip_area->x2;
-        blend_area.y1 = draw_ctx->clip_area->y1;
-        blend_area.y2 = draw_ctx->clip_area->y2;
+        blend_area.x1 = layer->clip_area->x1;
+        blend_area.x2 = layer->clip_area->x2;
+        blend_area.y1 = layer->clip_area->y1;
+        blend_area.y2 = layer->clip_area->y2;
 
         lv_coord_t src_w = lv_area_get_width(coords);
         lv_coord_t src_h = lv_area_get_height(coords);
@@ -1029,27 +1029,27 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 arm_2d_region_t clip_region;
                 static arm_2d_region_t target_region;
 
-                lv_color_t * dest_buf = draw_ctx->buf;
+                lv_color_t * dest_buf = layer->buf;
 
                 target_tile_origin = (arm_2d_tile_t) {
                     .tRegion = {
                         .tSize = {
-                            .iWidth = lv_area_get_width(draw_ctx->buf_area),
-                            .iHeight = lv_area_get_height(draw_ctx->buf_area),
+                            .iWidth = lv_area_get_width(layer->buf_area),
+                            .iHeight = lv_area_get_height(layer->buf_area),
                         },
                     },
                     .tInfo.bIsRoot = true,
-                    .phwBuffer = (uint16_t *)draw_ctx->buf,
+                    .phwBuffer = (uint16_t *)layer->buf,
                 };
 
                 clip_region = (arm_2d_region_t) {
                     .tLocation = {
-                        .iX = draw_ctx->clip_area->x1 - draw_ctx->buf_area->x1,
-                        .iY = draw_ctx->clip_area->y1 - draw_ctx->buf_area->y1,
+                        .iX = layer->clip_area->x1 - layer->buf_area->x1,
+                        .iY = layer->clip_area->y1 - layer->buf_area->y1,
                     },
                     .tSize = {
-                        .iWidth = lv_area_get_width(draw_ctx->clip_area),
-                        .iHeight = lv_area_get_height(draw_ctx->clip_area),
+                        .iWidth = lv_area_get_width(layer->clip_area),
+                        .iHeight = lv_area_get_height(layer->clip_area),
                     },
                 };
 
@@ -1161,7 +1161,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
             lv_area_copy(&transform_area, &blend_area);
             lv_area_move(&transform_area, -coords->x1, -coords->y1);
             if(transform) {
-                lv_draw_transform(draw_ctx, &transform_area, src_buf, src_w, src_h, src_w,
+                lv_draw_transform(layer, &transform_area, src_buf, src_w, src_h, src_w,
                                   draw_dsc, sup, cf, rgb_buf, mask_buf);
             }
             else {
@@ -1205,7 +1205,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
 #endif /*LV_USE_DRAW_MASKS*/
 
             /*Blend*/
-            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            lv_draw_sw_blend(layer, &blend_dsc);
 
             /*Go the the next lines*/
             blend_area.y1 = blend_area.y2 + 1;
@@ -1218,7 +1218,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
     }
 }
 
-static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx)
+static void lv_gpu_arm2d_wait_cb(lv_layer_t * layer)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 
@@ -1226,7 +1226,7 @@ static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     if(disp->wait_cb) {
         disp->wait_cb(disp);
     }
-    lv_draw_sw_wait_for_finish(draw_ctx);
+    lv_draw_sw_wait_for_finish(layer);
 }
 
 

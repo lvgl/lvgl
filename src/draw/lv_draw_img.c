@@ -25,10 +25,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_layer_t * layer, const lv_draw_img_dsc_t * draw_dsc,
                                                       const lv_area_t * coords, const void * src);
 
-static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg);
+static void show_error(lv_layer_t * layer, const lv_area_t * coords, const char * msg);
 static void draw_cleanup(_lv_img_cache_entry_t * cache);
 
 /**********************
@@ -53,9 +53,9 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
 }
 
 
-void lv_draw_layer(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_layer(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
 {
-    lv_draw_task_t * t = lv_draw_add_task(draw_ctx, coords);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
@@ -66,7 +66,7 @@ void lv_draw_layer(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, cons
 }
 
 
-void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_img(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -74,7 +74,7 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
     }
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_draw_task_t * t = lv_draw_add_task(draw_ctx, coords);
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
@@ -120,7 +120,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_layer_t * layer, const lv_draw_img_dsc_t * draw_dsc,
                                                       const lv_area_t * coords, const void * src)
 {
     //    if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
@@ -131,7 +131,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     //
     //    if(cdsc->dec_dsc.error_msg != NULL) {
     //        LV_LOG_WARN("Image draw error");
-    //        show_error(draw_ctx, coords, cdsc->dec_dsc.error_msg);
+    //        show_error(layer, coords, cdsc->dec_dsc.error_msg);
     //        draw_cleanup(cdsc);
     //        return LV_RES_INV;
     //    }
@@ -163,23 +163,23 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     //
     //        lv_area_t clip_com; /*Common area of mask and coords*/
     //        bool union_ok;
-    //        union_ok = _lv_area_intersect(&clip_com, draw_ctx->clip_area, &map_area_rot);
+    //        union_ok = _lv_area_intersect(&clip_com, layer->clip_area, &map_area_rot);
     //        /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
     //        if(union_ok == false) {
     //            draw_cleanup(cdsc);
     //            return LV_RES_OK;
     //        }
     //
-    //        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-    //        draw_ctx->clip_area = &clip_com;
-    //        lv_draw_img_decoded(draw_ctx, draw_dsc, coords, cdsc->dec_dsc.img_data, &sup, cf);
-    //        draw_ctx->clip_area = clip_area_ori;
+    //        const lv_area_t * clip_area_ori = layer->clip_area;
+    //        layer->clip_area = &clip_com;
+    //        lv_draw_img_decoded(layer, draw_dsc, coords, cdsc->dec_dsc.img_data, &sup, cf);
+    //        layer->clip_area = clip_area_ori;
     //    }
     //    /*The whole uncompressed image is not available. Try to read it line-by-line*/
     //    else {
     //        lv_area_t mask_com; /*Common area of mask and coords*/
     //        bool union_ok;
-    //        union_ok = _lv_area_intersect(&mask_com, draw_ctx->clip_area, coords);
+    //        union_ok = _lv_area_intersect(&mask_com, layer->clip_area, coords);
     //        /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
     //        if(union_ok == false) {
     //            draw_cleanup(cdsc);
@@ -189,7 +189,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     //        int32_t width = lv_area_get_width(&mask_com);
     //
     //        uint8_t  * buf = lv_malloc(lv_area_get_width(&mask_com) * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE);
-    //        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+    //        const lv_area_t * clip_area_ori = layer->clip_area;
     //        lv_area_t line;
     //        lv_area_copy(&line, &mask_com);
     //        lv_area_set_height(&line, 1);
@@ -208,17 +208,17 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
     //                LV_LOG_WARN("Image draw can't read the line");
     //                lv_free(buf);
     //                draw_cleanup(cdsc);
-    //                draw_ctx->clip_area = clip_area_ori;
+    //                layer->clip_area = clip_area_ori;
     //                return LV_RES_INV;
     //            }
     //
-    //            draw_ctx->clip_area = &mask_line;
-    //            lv_draw_img_decoded(draw_ctx, draw_dsc, &line, buf, &sup, cf);
+    //            layer->clip_area = &mask_line;
+    //            lv_draw_img_decoded(layer, draw_dsc, &line, buf, &sup, cf);
     //            line.y1++;
     //            line.y2++;
     //            y++;
     //        }
-    //        draw_ctx->clip_area = clip_area_ori;
+    //        layer->clip_area = clip_area_ori;
     //        lv_free(buf);
     //    }
     //
@@ -227,16 +227,16 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 }
 
 
-static void show_error(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords, const char * msg)
+static void show_error(lv_layer_t * layer, const lv_area_t * coords, const char * msg)
 {
     //    lv_draw_rect_dsc_t rect_dsc;
     //    lv_draw_rect_dsc_init(&rect_dsc);
     //    rect_dsc.bg_color = lv_color_white();
-    //    lv_draw_rect(draw_ctx, &rect_dsc, coords);
+    //    lv_draw_rect(layer, &rect_dsc, coords);
     //
     //    lv_draw_label_dsc_t label_dsc;
     //    lv_draw_label_dsc_init(&label_dsc);
-    //    lv_draw_label(draw_ctx, &label_dsc, coords, msg, NULL);
+    //    lv_draw_label(layer, &label_dsc, coords, msg, NULL);
 }
 
 static void draw_cleanup(_lv_img_cache_entry_t * cache)

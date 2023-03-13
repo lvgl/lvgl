@@ -28,7 +28,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_ctx_t;
+struct _lv_layer_t;
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
  * all the previous characters needs to be checked to calculate the positions.
@@ -116,7 +116,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
                                          const lv_area_t * coords);
 
 /***********************

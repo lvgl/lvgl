@@ -45,9 +45,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_draw_ctx_t * lv_draw_sw_init_ctx(lv_disp_t * disp);
+lv_layer_t * lv_draw_sw_init_ctx(lv_disp_t * disp);
 
-void lv_draw_sw_deinit_ctx(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_sw_deinit_ctx(struct _lv_disp_t * disp, lv_layer_t * layer);
 
 /***********************
  * GLOBAL VARIABLES

@@ -54,10 +54,10 @@ static lv_font_glyph_key_t font_key_glyph_create(const lv_font_t * font_p, uint3
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
+void lv_draw_sdl_draw_letter(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                              uint32_t letter)
 {
-    const lv_area_t * clip_area = draw_ctx->clip_area;
+    const lv_area_t * clip_area = layer->clip_area;
     const lv_font_t * font_p = dsc->font;
     lv_opa_t opa = dsc->opa;
     lv_color_t color = dsc->color;
@@ -92,7 +92,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
             glyph_dsc.bg_img_opa = LV_OPA_MIN;
             glyph_dsc.border_color = dsc->color;
             glyph_dsc.border_width = 1;
-            draw_ctx->draw_rect(draw_ctx, &glyph_dsc, &glyph_coords);
+            layer->draw_rect(layer, &glyph_dsc, &glyph_coords);
         }
         return;
     }
@@ -111,7 +111,7 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
         return;
     }
 
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
     SDL_Renderer * renderer = ctx->renderer;
 
     lv_font_glyph_key_t glyph_key = font_key_glyph_create(font_p, letter);

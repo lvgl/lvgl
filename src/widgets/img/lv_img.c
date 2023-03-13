@@ -611,7 +611,7 @@ static void draw_img(lv_event_t * e)
             if(img->h == 0 || img->w == 0) return;
             if(img->zoom == 0) return;
 
-            lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+            lv_layer_t * layer = lv_event_get_layer(e);
 
             lv_area_t img_max_area;
             lv_area_copy(&img_max_area, &obj->coords);
@@ -651,10 +651,10 @@ static void draw_img(lv_event_t * e)
                 img_clip_area.y1 = bg_coords.y1 + ptop;
                 img_clip_area.x2 = bg_coords.x2 - pright;
                 img_clip_area.y2 = bg_coords.y2 - pbottom;
-                const lv_area_t clip_area_ori = draw_ctx->clip_area;
+                const lv_area_t clip_area_ori = layer->clip_area;
 
-                if(!_lv_area_intersect(&img_clip_area, &draw_ctx->clip_area, &img_clip_area)) return;
-                draw_ctx->clip_area = img_clip_area;
+                if(!_lv_area_intersect(&img_clip_area, &layer->clip_area, &img_clip_area)) return;
+                layer->clip_area = img_clip_area;
 
                 lv_area_t coords_tmp;
                 lv_coord_t offset_x = img->offset.x % img->w;
@@ -669,17 +669,17 @@ static void draw_img(lv_event_t * e)
                     coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
                     for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
-                        lv_draw_img(draw_ctx, &img_dsc, &coords_tmp);
+                        lv_draw_img(layer, &img_dsc, &coords_tmp);
                     }
                 }
-                draw_ctx->clip_area = clip_area_ori;
+                layer->clip_area = clip_area_ori;
             }
             else if(img->src_type == LV_IMG_SRC_SYMBOL) {
                 lv_draw_label_dsc_t label_dsc;
                 lv_draw_label_dsc_init(&label_dsc);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
                 label_dsc.text = img->src;
-                lv_draw_label(draw_ctx, &label_dsc, &obj->coords);
+                lv_draw_label(layer, &label_dsc, &obj->coords);
             }
             else if(img->src == NULL) {
                 /*Do not need to draw image when src is NULL*/

@@ -90,22 +90,22 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp->color_chroma_key = LV_COLOR_CHROMA_KEY;
 
 #if LV_USE_GPU_STM32_DMA2D
-    lv_disp_set_draw_ctx(disp, lv_draw_stm32_dma2d_ctx_init, lv_draw_stm32_dma2d_ctx_deinit,
-                         sizeof(lv_draw_stm32_dma2d_ctx_t));
+    lv_disp_set_layer(disp, lv_draw_stm32_dma2d_ctx_init, lv_draw_stm32_dma2d_ctx_deinit,
+                      sizeof(lv_draw_stm32_dma2d_ctx_t));
 #elif LV_USE_GPU_SWM341_DMA2D
-    lv_disp_set_draw_ctx(disp, lv_draw_swm341_dma2d_ctx_init, lv_draw_swm341_dma2d_ctx_deinit,
-                         sizeof(lv_draw_swm341_dma2d_ctx_t));
+    lv_disp_set_layer(disp, lv_draw_swm341_dma2d_ctx_init, lv_draw_swm341_dma2d_ctx_deinit,
+                      sizeof(lv_draw_swm341_dma2d_ctx_t));
 #elif LV_USE_GPU_NXP_PXP || LV_USE_GPU_NXP_VG_LITE
-    lv_disp_set_draw_ctx(disp, lv_draw_nxp_ctx_init, lv_draw_nxp_ctx_deinit, sizeof(lv_draw_nxp_ctx_t));
+    lv_disp_set_layer(disp, lv_draw_nxp_ctx_init, lv_draw_nxp_ctx_deinit, sizeof(lv_draw_nxp_ctx_t));
 #elif LV_USE_DRAW_SDL
-    lv_disp_set_draw_ctx(disp, lv_draw_sdl_init_ctx, lv_draw_sdl_deinit_ctx, sizeof(lv_draw_sdl_ctx_t));
+    lv_disp_set_layer(disp, lv_draw_sdl_init_ctx, lv_draw_sdl_deinit_ctx, sizeof(lv_draw_sdl_ctx_t));
 #elif LV_USE_GPU_ARM2D
-    lv_disp_set_draw_ctx(disp, lv_draw_arm2d_ctx_init, lv_draw_arm2d_ctx_deinit, sizeof(lv_draw_arm2d_ctx_t));
+    lv_disp_set_layer(disp, lv_draw_arm2d_ctx_init, lv_draw_arm2d_ctx_deinit, sizeof(lv_draw_arm2d_ctx_t));
 #else
-    lv_disp_set_draw_ctx(disp, lv_draw_sw_init_ctx, lv_draw_sw_deinit_ctx);
+    lv_disp_set_layer(disp, lv_draw_sw_init_ctx, lv_draw_sw_deinit_ctx);
 #endif
 
-    disp->draw_ctx_head->color_format = LV_COLOR_FORMAT_NATIVE;
+    disp->layer_head->color_format = LV_COLOR_FORMAT_NATIVE;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
     disp->inv_en_cnt = 1;
@@ -417,7 +417,7 @@ void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format)
     if(disp == NULL) return;
 
     disp->color_format = color_format;
-    disp->draw_ctx_head->color_format = color_format;
+    disp->layer_head->color_format = color_format;
 }
 
 lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp)
@@ -465,14 +465,14 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp)
  * DRAW CONTEXT
  *--------------------*/
 
-void lv_disp_set_draw_ctx(lv_disp_t * disp,
-                          void (*draw_ctx_init)(lv_disp_t * disp),
-                          void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx))
+void lv_disp_set_layer(lv_disp_t * disp,
+                       void (*layer_init)(lv_disp_t * disp),
+                       void (*layer_deinit)(lv_disp_t * disp, lv_layer_t * layer))
 {
-    disp->draw_ctx_init = draw_ctx_init;
-    disp->draw_ctx_deinit = draw_ctx_deinit;
+    disp->layer_init = layer_init;
+    disp->layer_deinit = layer_deinit;
 
-    disp->draw_ctx_init(disp);
+    disp->layer_init(disp);
 }
 
 /*---------------------

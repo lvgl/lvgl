@@ -779,7 +779,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_obj_t * obj = lv_event_get_target(e);
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
 
         lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
         if(opa < LV_OPA_MIN) return;
@@ -877,13 +877,13 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             poly[3].x = center.x + x2_out;
             poly[3].y = center.y + get_sin(di, v);
 
-            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
+            lv_draw_polygon(layer, &draw_dsc, poly, 4);
 
             poly[0].x = center.x - x1_out;
             poly[1].x = center.x - x1_in;
             poly[2].x = center.x - x2_in;
             poly[3].x = center.x - x2_out;
-            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
+            lv_draw_polygon(layer, &draw_dsc, poly, 4);
         }
     }
 }

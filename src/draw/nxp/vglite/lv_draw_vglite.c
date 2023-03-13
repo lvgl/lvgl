@@ -58,29 +58,29 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void lv_draw_vglite_init_buf(lv_draw_ctx_t * draw_ctx);
+static void lv_draw_vglite_init_buf(lv_layer_t * layer);
 
-static void lv_draw_vglite_wait_for_finish(lv_draw_ctx_t * draw_ctx);
+static void lv_draw_vglite_wait_for_finish(lv_layer_t * layer);
 
-static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_vglite_img_decoded(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc,
                                        const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
 
-static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+static void lv_draw_vglite_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc);
 
-static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
+static void lv_draw_vglite_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
                                 const lv_point_t * point2);
 
-static void lv_draw_vglite_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static void lv_draw_vglite_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+static lv_res_t lv_draw_vglite_bg(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
-static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+static lv_res_t lv_draw_vglite_border(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc,
                                       const lv_area_t * coords);
 
-static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+static lv_res_t lv_draw_vglite_outline(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc,
                                        const lv_area_t * coords);
 
-static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+static void lv_draw_vglite_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                                uint16_t radius, uint16_t start_angle, uint16_t end_angle);
 
 /**********************
@@ -95,23 +95,23 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_vglite_ctx_init(lv_disp_drv_t * drv, lv_layer_t * layer)
 {
-    lv_draw_sw_init_ctx(drv, draw_ctx);
+    lv_draw_sw_init_ctx(drv, layer);
 
-    lv_draw_vglite_ctx_t * vglite_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
-    vglite_draw_ctx->base_draw.init_buf = lv_draw_vglite_init_buf;
-    vglite_draw_ctx->base_draw.draw_line = lv_draw_vglite_line;
-    vglite_draw_ctx->base_draw.draw_arc = lv_draw_vglite_arc;
-    vglite_draw_ctx->base_draw.draw_rect = lv_draw_vglite_rect;
-    vglite_draw_ctx->base_draw.draw_img_decoded = lv_draw_vglite_img_decoded;
-    vglite_draw_ctx->blend = lv_draw_vglite_blend;
-    vglite_draw_ctx->base_draw.wait_for_finish = lv_draw_vglite_wait_for_finish;
+    lv_draw_vglite_ctx_t * vglite_layer = (lv_draw_sw_ctx_t *)layer;
+    vglite_layer->base_draw.init_buf = lv_draw_vglite_init_buf;
+    vglite_layer->base_draw.draw_line = lv_draw_vglite_line;
+    vglite_layer->base_draw.draw_arc = lv_draw_vglite_arc;
+    vglite_layer->base_draw.draw_rect = lv_draw_vglite_rect;
+    vglite_layer->base_draw.draw_img_decoded = lv_draw_vglite_img_decoded;
+    vglite_layer->blend = lv_draw_vglite_blend;
+    vglite_layer->base_draw.wait_for_finish = lv_draw_vglite_wait_for_finish;
 }
 
-void lv_draw_vglite_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
+void lv_draw_vglite_ctx_deinit(lv_disp_drv_t * drv, lv_layer_t * layer)
 {
-    lv_draw_sw_deinit_ctx(drv, draw_ctx);
+    lv_draw_sw_deinit_ctx(drv, layer);
 }
 
 /**********************
@@ -119,7 +119,7 @@ void lv_draw_vglite_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
  **********************/
 
 /**
- * During rendering, LVGL might initializes new draw_ctxs and start drawing into
+ * During rendering, LVGL might initializes new layers and start drawing into
  * a separate buffer (called layer). If the content to be rendered has "holes",
  * e.g. rounded corner, LVGL temporarily sets the disp_drv.screen_transp flag.
  * It means the renderers should draw into an ARGB buffer.
@@ -127,45 +127,45 @@ void lv_draw_vglite_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
  * the target pixel format is ARGB8565 which is not supported by the GPU.
  * In this case, the VG-Lite callbacks should fallback to SW rendering.
  */
-static inline bool need_argb8565_support(lv_draw_ctx_t * draw_ctx)
+static inline bool need_argb8565_support(lv_layer_t * layer)
 {
 #if LV_COLOR_DEPTH != 32
-    if(draw_ctx->render_with_alpha)
+    if(layer->render_with_alpha)
         return true;
 #endif
 
     return false;
 }
 
-static void lv_draw_vglite_init_buf(lv_draw_ctx_t * draw_ctx)
+static void lv_draw_vglite_init_buf(lv_layer_t * layer)
 {
-    lv_gpu_nxp_vglite_init_buf(draw_ctx->buf, draw_ctx->buf_area, lv_area_get_width(draw_ctx->buf_area));
+    lv_gpu_nxp_vglite_init_buf(layer->buf, layer->buf_area, lv_area_get_width(layer->buf_area));
 }
 
-static void lv_draw_vglite_wait_for_finish(lv_draw_ctx_t * draw_ctx)
+static void lv_draw_vglite_wait_for_finish(lv_layer_t * layer)
 {
     vg_lite_finish();
 
-    lv_draw_sw_wait_for_finish(draw_ctx);
+    lv_draw_sw_wait_for_finish(layer);
 }
 
-static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+static void lv_draw_vglite_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    if(need_argb8565_support(draw_ctx)) {
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
+    if(need_argb8565_support(layer)) {
+        lv_draw_sw_blend_basic(layer, dsc);
         return;
     }
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area))
+    if(!_lv_area_intersect(&blend_area, dsc->blend_area, layer->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
     bool done = false;
     /*Fill/Blend only non masked, normal blended*/
@@ -179,12 +179,12 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
                 VG_LITE_LOG_TRACE("VG-Lite fill failed. Fallback.");
         }
         else {
-            lv_color_t * dest_buf = draw_ctx->buf;
-            lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+            lv_color_t * dest_buf = layer->buf;
+            lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);
 
             lv_area_t src_area;
-            src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - draw_ctx->buf_area->x1);
-            src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - draw_ctx->buf_area->y1);
+            src_area.x1 = blend_area.x1 - (dsc->blend_area->x1 - layer->buf_area->x1);
+            src_area.y1 = blend_area.y1 - (dsc->blend_area->y1 - layer->buf_area->y1);
             src_area.x2 = src_area.x1 + lv_area_get_width(dsc->blend_area) - 1;
             src_area.y2 = src_area.y1 + lv_area_get_height(dsc->blend_area) - 1;
             lv_coord_t src_stride = lv_area_get_width(dsc->blend_area);
@@ -198,33 +198,33 @@ static void lv_draw_vglite_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blen
     }
 
     if(!done)
-        lv_draw_sw_blend_basic(draw_ctx, dsc);
+        lv_draw_sw_blend_basic(layer, dsc);
 }
 
-static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_vglite_img_decoded(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc,
                                        const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
-    if(need_argb8565_support(draw_ctx)) {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+    if(need_argb8565_support(layer)) {
+        lv_draw_sw_img_decoded(layer, dsc, coords, map_p, cf);
         return;
     }
 
     const lv_color_t * src_buf = (const lv_color_t *)map_p;
     if(!src_buf) {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+        lv_draw_sw_img_decoded(layer, dsc, coords, map_p, cf);
         return;
     }
 
     lv_area_t blend_area;
     /*Let's get the blend area which is the intersection of the area to draw and the clip area*/
-    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
+    if(!_lv_area_intersect(&blend_area, coords, layer->clip_area))
         return; /*Fully clipped, nothing to do*/
 
     /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
     bool has_mask = lv_draw_mask_is_any(&blend_area);
     bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
@@ -236,12 +236,12 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
        && !lv_img_cf_has_alpha(cf)
 #endif
       ) {
-        lv_color_t * dest_buf = draw_ctx->buf;
-        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+        lv_color_t * dest_buf = layer->buf;
+        lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);
 
         lv_area_t src_area;
-        src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
-        src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
+        src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area->x1);
+        src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area->y1);
         src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
         src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
         lv_coord_t src_stride = lv_area_get_width(coords);
@@ -254,10 +254,10 @@ static void lv_draw_vglite_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_i
     }
 
     if(!done)
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
+        lv_draw_sw_img_decoded(layer, dsc, coords, map_p, cf);
 }
 
-static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
+static void lv_draw_vglite_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
                                 const lv_point_t * point2)
 {
     if(dsc->width == 0)
@@ -267,8 +267,8 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
     if(point1->x == point2->x && point1->y == point2->y)
         return;
 
-    if(need_argb8565_support(draw_ctx)) {
-        lv_draw_sw_line(draw_ctx, dsc, point1, point2);
+    if(need_argb8565_support(layer)) {
+        lv_draw_sw_line(layer, dsc, point1, point2);
         return;
     }
 
@@ -279,15 +279,15 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
     rel_clip_area.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 
     bool is_common;
-    is_common = _lv_area_intersect(&rel_clip_area, &rel_clip_area, draw_ctx->clip_area);
+    is_common = _lv_area_intersect(&rel_clip_area, &rel_clip_area, layer->clip_area);
     if(!is_common)
         return;
 
     /* Make coordinates relative to the draw buffer */
-    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&rel_clip_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
-    lv_point_t rel_point1 = { point1->x - draw_ctx->buf_area->x1, point1->y - draw_ctx->buf_area->y1 };
-    lv_point_t rel_point2 = { point2->x - draw_ctx->buf_area->x1, point2->y - draw_ctx->buf_area->y1 };
+    lv_point_t rel_point1 = { point1->x - layer->buf_area->x1, point1->y - layer->buf_area->y1 };
+    lv_point_t rel_point2 = { point2->x - layer->buf_area->x1, point2->y - layer->buf_area->y1 };
 
     bool done = false;
     bool mask_any = lv_draw_mask_is_any(&rel_clip_area);
@@ -299,13 +299,13 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
     }
 
     if(!done)
-        lv_draw_sw_line(draw_ctx, dsc, point1, point2);
+        lv_draw_sw_line(layer, dsc, point1, point2);
 }
 
-static void lv_draw_vglite_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static void lv_draw_vglite_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    if(need_argb8565_support(draw_ctx)) {
-        lv_draw_sw_rect(draw_ctx, dsc, coords);
+    if(need_argb8565_support(layer)) {
+        lv_draw_sw_rect(layer, dsc, coords);
         return;
     }
 
@@ -318,37 +318,37 @@ static void lv_draw_vglite_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc
     vglite_dsc.outline_opa = 0;
 #if LV_USE_DRAW_MASKS
     /* Draw the shadow with CPU */
-    lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
+    lv_draw_sw_rect(layer, &vglite_dsc, coords);
     vglite_dsc.shadow_opa = 0;
 #endif /*LV_USE_DRAW_MASKS*/
 
     /* Draw the background */
     vglite_dsc.bg_opa = dsc->bg_opa;
-    if(lv_draw_vglite_bg(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
-        lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
+    if(lv_draw_vglite_bg(layer, &vglite_dsc, coords) != LV_RES_OK)
+        lv_draw_sw_rect(layer, &vglite_dsc, coords);
     vglite_dsc.bg_opa = 0;
 
     /* Draw the background image
-     * It will be done once draw_ctx->draw_img_decoded()
+     * It will be done once layer->draw_img_decoded()
      * callback gets called from lv_draw_sw_rect().
      */
     vglite_dsc.bg_img_opa = dsc->bg_img_opa;
-    lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
+    lv_draw_sw_rect(layer, &vglite_dsc, coords);
     vglite_dsc.bg_img_opa = 0;
 
     /* Draw the border */
     vglite_dsc.border_opa = dsc->border_opa;
-    if(lv_draw_vglite_border(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
-        lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
+    if(lv_draw_vglite_border(layer, &vglite_dsc, coords) != LV_RES_OK)
+        lv_draw_sw_rect(layer, &vglite_dsc, coords);
     vglite_dsc.border_opa = 0;
 
     /* Draw the outline */
     vglite_dsc.outline_opa = dsc->outline_opa;
-    if(lv_draw_vglite_outline(draw_ctx, &vglite_dsc, coords) != LV_RES_OK)
-        lv_draw_sw_rect(draw_ctx, &vglite_dsc, coords);
+    if(lv_draw_vglite_outline(layer, &vglite_dsc, coords) != LV_RES_OK)
+        lv_draw_sw_rect(layer, &vglite_dsc, coords);
 }
 
-static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+static lv_res_t lv_draw_vglite_bg(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->bg_opa <= (lv_opa_t)LV_OPA_MIN)
         return LV_RES_INV;
@@ -365,11 +365,11 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
     }
 
     /* Make coordinates relative to draw buffer */
-    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&rel_coords, -layer->buf_area->x1, -layer->buf_area->y1);
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
-    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_copy(&rel_clip_area, layer->clip_area);
+    lv_area_move(&rel_clip_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
     lv_area_t clipped_coords;
     if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
@@ -384,7 +384,7 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
 
     /*
      * Most simple case: just a plain rectangle (no mask, no radius, no gradient)
-     * shall be handled by draw_ctx->blend().
+     * shall be handled by layer->blend().
      *
      * Complex case: gradient or radius but no mask.
      */
@@ -399,7 +399,7 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
     return LV_RES_INV;
 }
 
-static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+static lv_res_t lv_draw_vglite_border(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc,
                                       const lv_area_t * coords)
 {
     if(dsc->border_opa <= (lv_opa_t)LV_OPA_MIN)
@@ -421,11 +421,11 @@ static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_re
     rel_coords.y2 = coords->y2 - floor(border_width / 2.0f);
 
     /* Make coordinates relative to the draw buffer */
-    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&rel_coords, -layer->buf_area->x1, -layer->buf_area->y1);
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
-    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_copy(&rel_clip_area, layer->clip_area);
+    lv_area_move(&rel_clip_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(&rel_coords, &rel_clip_area, dsc, true);
     if(res != LV_RES_OK)
@@ -434,7 +434,7 @@ static lv_res_t lv_draw_vglite_border(lv_draw_ctx_t * draw_ctx, const lv_draw_re
     return res;
 }
 
-static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+static lv_res_t lv_draw_vglite_outline(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc,
                                        const lv_area_t * coords)
 {
     if(dsc->outline_opa <= (lv_opa_t)LV_OPA_MIN)
@@ -451,11 +451,11 @@ static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_r
     rel_coords.y2 = coords->y2 + outline_pad + ceil(dsc->outline_width / 2.0f);
 
     /* Make coordinates relative to the draw buffer */
-    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_move(&rel_coords, -layer->buf_area->x1, -layer->buf_area->y1);
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
-    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_copy(&rel_clip_area, layer->clip_area);
+    lv_area_move(&rel_clip_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
     lv_res_t res = lv_gpu_nxp_vglite_draw_border_generic(&rel_coords, &rel_clip_area, dsc, false);
     if(res != LV_RES_OK)
@@ -464,7 +464,7 @@ static lv_res_t lv_draw_vglite_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_r
     return res;
 }
 
-static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+static void lv_draw_vglite_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                                uint16_t radius, uint16_t start_angle, uint16_t end_angle)
 {
     bool done = false;
@@ -477,17 +477,17 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
     if(start_angle == end_angle)
         return;
 
-    if(need_argb8565_support(draw_ctx)) {
-        lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
+    if(need_argb8565_support(layer)) {
+        lv_draw_sw_arc(layer, dsc, center, radius, start_angle, end_angle);
         return;
     }
 
     /* Make coordinates relative to the draw buffer */
-    lv_point_t rel_center = {center->x - draw_ctx->buf_area->x1, center->y - draw_ctx->buf_area->y1};
+    lv_point_t rel_center = {center->x - layer->buf_area->x1, center->y - layer->buf_area->y1};
 
     lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
-    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_copy(&rel_clip_area, layer->clip_area);
+    lv_area_move(&rel_clip_area, -layer->buf_area->x1, -layer->buf_area->y1);
 
     done = (lv_gpu_nxp_vglite_draw_arc(&rel_center, (int32_t)radius, (int32_t)start_angle, (int32_t)end_angle,
                                        &rel_clip_area, dsc) == LV_RES_OK);
@@ -496,7 +496,7 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
 #endif/*LV_USE_DRAW_MASKS*/
 
     if(!done)
-        lv_draw_sw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
+        lv_draw_sw_arc(layer, dsc, center, radius, start_angle, end_angle);
 }
 
 #endif /*LV_USE_GPU_NXP_VG_LITE*/

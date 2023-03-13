@@ -250,7 +250,7 @@ static void draw_indic(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
 
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
@@ -400,7 +400,7 @@ static void draw_indic(lv_event_t * e)
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
 
         lv_obj_draw_part_dsc_t part_draw_dsc;
-        lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
+        lv_obj_draw_dsc_init(&part_draw_dsc, layer);
         part_draw_dsc.part = LV_PART_INDICATOR;
         part_draw_dsc.class_p = MY_CLASS;
         part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
@@ -419,7 +419,7 @@ static void draw_indic(lv_event_t * e)
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
+    lv_obj_draw_dsc_init(&part_draw_dsc, layer);
     part_draw_dsc.part = LV_PART_INDICATOR;
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
@@ -448,7 +448,7 @@ static void draw_indic(lv_event_t * e)
         draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
         draw_rect_dsc.border_opa = LV_OPA_TRANSP;
 
-        lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
+        lv_draw_rect(layer, &draw_rect_dsc, &bar->indic_area);
 
         draw_rect_dsc.bg_opa = bg_opa;
         draw_rect_dsc.bg_img_opa = bg_img_opa;
@@ -497,11 +497,11 @@ static void draw_indic(lv_event_t * e)
 #endif
 
     lv_area_t indic_clip_area;
-    if(_lv_area_intersect(&indic_clip_area, &indic_area, draw_ctx->clip_area)) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-        draw_ctx->clip_area = &indic_clip_area;
+    if(_lv_area_intersect(&indic_clip_area, &indic_area, layer->clip_area)) {
+        const lv_area_t * clip_area_ori = layer->clip_area;
+        layer->clip_area = &indic_clip_area;
 
-        lv_draw_rect(draw_ctx, &draw_rect_dsc, &mask_indic_max_area);
+        lv_draw_rect(layer, &draw_rect_dsc, &mask_indic_max_area);
         draw_rect_dsc.border_opa = border_opa;
         draw_rect_dsc.shadow_opa = shadow_opa;
 
@@ -509,9 +509,9 @@ static void draw_indic(lv_event_t * e)
         draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
         draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
         draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
-        lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
+        lv_draw_rect(layer, &draw_rect_dsc, &bar->indic_area);
 
-        draw_ctx->clip_area = clip_area_ori;
+        layer->clip_area = clip_area_ori;
     }
 
 #if LV_USE_DRAW_MASKS

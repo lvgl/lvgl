@@ -58,13 +58,13 @@ typedef lv_draw_sw_ctx_t lv_draw_pxp_ctx_t;
 
 <<< <<< < HEAD:
 src / draw / nxp / lv_gpu_nxp.h
-void lv_draw_nxp_ctx_init(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_nxp_ctx_init(struct _lv_disp_t * disp, lv_layer_t * layer);
 
-void lv_draw_nxp_ctx_deinit(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_nxp_ctx_deinit(struct _lv_disp_t * disp, lv_layer_t * layer);
 == == == =
-    void lv_draw_pxp_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+    void lv_draw_pxp_ctx_init(struct _lv_disp_drv_t * drv, lv_layer_t * layer);
 
-void lv_draw_pxp_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
+void lv_draw_pxp_ctx_deinit(struct _lv_disp_drv_t * drv, lv_layer_t * layer);
 >>> >>> > master:
 src / draw / nxp / pxp / lv_draw_pxp.h
 

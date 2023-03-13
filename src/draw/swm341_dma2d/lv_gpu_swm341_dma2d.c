@@ -43,7 +43,7 @@ static void lv_draw_swm341_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t de
 static void lv_draw_swm341_dma2d_blend_map(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                            const lv_color_t * src_buf, lv_coord_t src_stride, lv_opa_t opa);
 
-static void lv_draw_swm341_dma2d_img_decoded(lv_draw_ctx_t * draw, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_swm341_dma2d_img_decoded(lv_layer_t * draw, const lv_draw_img_dsc_t * dsc,
                                              const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format);
 
 /**********************
@@ -76,64 +76,64 @@ void lv_draw_swm341_dma2d_init(void)
     DMA2D->L[DMA2D_LAYER_OUT].PFCCR = (LV_DMA2D_COLOR_FORMAT << DMA2D_PFCCR_CFMT_Pos);
 }
 
-void lv_draw_swm341_dma2d_ctx_init(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
+void lv_draw_swm341_dma2d_ctx_init(lv_disp_t * disp, lv_layer_t * layer)
 {
 
-    lv_draw_sw_init_ctx(drv, draw_ctx);
+    lv_draw_sw_init_ctx(drv, layer);
 
-    lv_draw_swm341_dma2d_ctx_t * dma2d_draw_ctx = (lv_draw_sw_ctx_t *)draw_ctx;
+    lv_draw_swm341_dma2d_ctx_t * dma2d_layer = (lv_draw_sw_ctx_t *)layer;
 
-    dma2d_draw_ctx->blend = lv_draw_swm341_dma2d_blend;
-    //    dma2d_draw_ctx->base_draw.draw_img_decoded = lv_draw_swm341_dma2d_img_decoded;
-    dma2d_draw_ctx->base_draw.wait_for_finish = lv_gpu_swm341_dma2d_wait_cb;
+    dma2d_layer->blend = lv_draw_swm341_dma2d_blend;
+    //    dma2d_layer->base_draw.draw_img_decoded = lv_draw_swm341_dma2d_img_decoded;
+    dma2d_layer->base_draw.wait_for_finish = lv_gpu_swm341_dma2d_wait_cb;
 }
 
-void lv_draw_swm341_dma2d_ctx_deinit(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
+void lv_draw_swm341_dma2d_ctx_deinit(lv_disp_t * disp, lv_layer_t * layer)
 {
     LV_UNUSED(disp);
-    LV_UNUSED(draw_ctx);
+    LV_UNUSED(layer);
 }
 
-void lv_draw_swm341_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+void lv_draw_swm341_dma2d_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc)
 {
     lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area))
+    if(!_lv_area_intersect(&blend_area, dsc->blend_area, layer->clip_area))
         return;
 
     bool done = false;
 
     if(dsc->mask_buf == NULL && dsc->blend_mode == LV_BLEND_MODE_NORMAL && lv_area_get_size(&blend_area) > 100) {
-        lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
+        lv_coord_t dest_stride = lv_area_get_width(layer->buf_area);
 
-        lv_color_t * dest_buf = draw_ctx->buf;
-        dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
+        lv_color_t * dest_buf = layer->buf;
+        dest_buf += dest_stride * (blend_area.y1 - layer->buf_area->y1) + (blend_area.x1 - layer->buf_area->x1);
 
         const lv_color_t * src_buf = dsc->src_buf;
         if(src_buf) {
-            lv_draw_sw_blend_basic(draw_ctx, dsc);
+            lv_draw_sw_blend_basic(layer, dsc);
             lv_coord_t src_stride;
             src_stride = lv_area_get_width(dsc->blend_area);
             src_buf += src_stride * (blend_area.y1 - dsc->blend_area->y1) + (blend_area.x1 - dsc->blend_area->x1);
-            lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+            lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
             lv_draw_swm341_dma2d_blend_map(dest_buf, &blend_area, dest_stride, src_buf, src_stride, dsc->opa);
             done = true;
         }
         else if(dsc->opa >= LV_OPA_MAX) {
-            lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+            lv_area_move(&blend_area, -layer->buf_area->x1, -layer->buf_area->y1);
             lv_draw_swm341_dma2d_blend_fill(dest_buf, dest_stride, &blend_area, dsc->color);
             done = true;
         }
     }
 
-    if(!done) lv_draw_sw_blend_basic(draw_ctx, dsc);
+    if(!done) lv_draw_sw_blend_basic(layer, dsc);
 }
 
-static void lv_draw_swm341_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
+static void lv_draw_swm341_dma2d_img_decoded(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc,
                                              const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t color_format)
 {
     /*TODO basic ARGB8888 image can be handles here*/
 
-    lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, color_format);
+    lv_draw_sw_img_decoded(layer, dsc, coords, map_p, color_format);
 }
 
 static void lv_draw_swm341_dma2d_blend_fill(lv_color_t * dest_buf, lv_coord_t dest_stride, const lv_area_t * fill_area,
@@ -220,7 +220,7 @@ static void lv_draw_swm341_dma2d_blend_map(lv_color_t * dest_buf, const lv_area_
     }
 }
 
-void lv_gpu_swm341_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
+void lv_gpu_swm341_dma2d_wait_cb(lv_layer_t * layer)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     if(disp->driver && disp->driver->wait_cb) {
@@ -231,7 +231,7 @@ void lv_gpu_swm341_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
     else {
         while(DMA2D->CR & DMA2D_CR_START_Msk);
     }
-    lv_draw_sw_wait_for_finish(draw_ctx);
+    lv_draw_sw_wait_for_finish(layer);
 }
 
 #endif

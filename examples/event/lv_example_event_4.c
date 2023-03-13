@@ -37,7 +37,7 @@ static void event_cb(lv_event_t * e)
         a.y2 = size;
         lv_area_align(&obj->coords, &a, LV_ALIGN_CENTER, 0, 0);
 
-        lv_draw_rect(dsc->draw_ctx, &draw_dsc, &a);
+        lv_draw_rect(dsc->layer, &draw_dsc, &a);
     }
 }
 

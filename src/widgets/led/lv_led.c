@@ -204,10 +204,10 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         rect_dsc.shadow_spread = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_spread) /
                                  (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
 
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
 
         lv_obj_draw_part_dsc_t  part_draw_dsc;
-        lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
+        lv_obj_draw_dsc_init(&part_draw_dsc, layer);
         part_draw_dsc.draw_area = &obj->coords;
         part_draw_dsc.class_p = MY_CLASS;
         part_draw_dsc.type = LV_LED_DRAW_PART_RECTANGLE;
@@ -215,7 +215,7 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         part_draw_dsc.part = LV_PART_MAIN;
 
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw_ctx, &rect_dsc, &obj->coords);
+        lv_draw_rect(layer, &rect_dsc, &obj->coords);
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }

@@ -50,10 +50,10 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_draw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sdl_draw_bg(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    const lv_area_t * clip = draw_ctx->clip_area;
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    const lv_area_t * clip = layer->clip_area;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_area;
     bool has_content = _lv_area_intersect(&t_area, coords, clip);
@@ -100,7 +100,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
     SDL_RenderFillRect(ctx->renderer, &rect);
 
     SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
-    lv_draw_rect((lv_draw_ctx_t *) ctx, dsc, coords);
+    lv_draw_rect((lv_layer_t *) ctx, dsc, coords);
 }
 
 #endif /*LV_USE_DRAW_SDL*/

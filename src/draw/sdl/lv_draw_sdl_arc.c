@@ -44,10 +44,10 @@ static void get_cap_area(int16_t angle, lv_coord_t thickness, uint16_t radius, c
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
+void lv_draw_sdl_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center,
                           uint16_t radius, uint16_t start_angle, uint16_t end_angle)
 {
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
 
     lv_area_t area_out;
     area_out.x1 = center->x - radius;
@@ -56,7 +56,7 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     area_out.y2 = center->y + radius - 1;
 
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &area_out, draw_ctx->clip_area)) {
+    if(!_lv_area_intersect(&draw_area, &area_out, layer->clip_area)) {
         return;
     }
 

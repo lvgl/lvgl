@@ -34,13 +34,13 @@ typedef struct _lv_draw_sdl_layer_ctx_t {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx,
+lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_layer_t * layer, lv_draw_layer_ctx_t * layer_ctx,
                                              lv_draw_layer_flags_t flags);
 
-void lv_draw_sdl_layer_blend(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * transform_ctx,
+void lv_draw_sdl_layer_blend(lv_layer_t * layer, lv_draw_layer_ctx_t * transform_ctx,
                              const lv_draw_img_dsc_t * draw_dsc);
 
-void lv_draw_sdl_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx);
+void lv_draw_sdl_layer_destroy(lv_layer_t * layer, lv_draw_layer_ctx_t * layer_ctx);
 
 void lv_draw_sdl_transform_areas_offset(lv_draw_sdl_ctx_t * ctx, bool has_composite, lv_area_t * apply_area,
                                         lv_area_t * coords, lv_area_t * clip);

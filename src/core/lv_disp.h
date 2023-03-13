@@ -250,7 +250,7 @@ void lv_disp_set_flush_cb(lv_disp_t * disp, void (*flush_cb)(struct _lv_disp_t *
                                                              lv_color_t * color_p));
 /**
  * Set the color format of the display.
- * If set to other than `LV_COLOR_FORMAT_NATIVE` the draw_ctx's `buffer_convert` function will be used
+ * If set to other than `LV_COLOR_FORMAT_NATIVE` the layer's `buffer_convert` function will be used
  * to convert the rendered content to the desired color format.
  * @param disp              pointer to a display
  * @param color_format      By default `LV_COLOR_FORMAT_NATIVE` to render with L8, RGB565, RGB888 or ARGB8888.
@@ -310,12 +310,12 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp);
 /**
  * Initialize a new draw context for the display
  * @param disp              pointer to a display
- * @param draw_ctx_init     init callback
- * @param draw_ctx_deinit   deinit callback
+ * @param layer_init     init callback
+ * @param layer_deinit   deinit callback
  */
-void lv_disp_set_draw_ctx(lv_disp_t * disp,
-                          void (*draw_ctx_init)(lv_disp_t * disp),
-                          void (*draw_ctx_deinit)(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx));
+void lv_disp_set_layer(lv_disp_t * disp,
+                       void (*layer_init)(lv_disp_t * disp),
+                       void (*layer_deinit)(lv_disp_t * disp, lv_layer_t * layer));
 
 /*---------------------
  * SCREENS

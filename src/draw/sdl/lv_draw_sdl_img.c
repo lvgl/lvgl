@@ -95,11 +95,11 @@ static void apply_recolor_opa(SDL_Texture * texture, const lv_draw_img_dsc_t * d
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
+lv_res_t lv_draw_sdl_img_core(lv_layer_t * layer, const lv_draw_img_dsc_t * draw_dsc,
                               const lv_area_t * coords, const void * src)
 {
-    const lv_area_t * clip = draw_ctx->clip_area;
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    const lv_area_t * clip = layer->clip_area;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
 
     size_t key_size;
     lv_draw_sdl_cache_key_head_img_t * key = lv_draw_sdl_texture_img_key_create(src, draw_dsc->frame_id, &key_size);

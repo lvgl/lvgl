@@ -37,7 +37,7 @@ static void draw_border(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
 static void draw_outline(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 
 #if LV_USE_DRAW_MASKS
-LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords);
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t s,
                                                          lv_coord_t r);
@@ -71,7 +71,7 @@ static void draw_border_simple(lv_draw_unit_t * draw_unit, const lv_area_t * out
 void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 #if LV_USE_DRAW_MASKS
-    draw_shadow(draw_unit->draw_ctx, dsc);
+    draw_shadow(draw_unit->layer, dsc);
 #endif
 
     for(int i = 0; i < 1; i++) {
@@ -226,7 +226,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
             if(dither_func) dither_func(grad, blend_area.x1,  h - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[h - bg_coords.y1];
-            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            lv_draw_sw_blend(layer, &blend_dsc);
         }
         goto bg_clean_up;
     }
@@ -252,7 +252,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
             if(dither_func) dither_func(grad, blend_area.x1,  top_y - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[top_y - bg_coords.y1];
-            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            lv_draw_sw_blend(layer, &blend_dsc);
         }
 
         if(bottom_y <= clipped_coords.y2) {
@@ -263,7 +263,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
             if(dither_func) dither_func(grad, blend_area.x1,  bottom_y - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[bottom_y - bg_coords.y1];
-            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            lv_draw_sw_blend(layer, &blend_dsc);
         }
     }
 
@@ -281,7 +281,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
         blend_area.y2 = bg_coords.y2 - rout;
         blend_dsc.opa = opa;
         blend_dsc.mask_buf = NULL;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
     /*With gradient and/or mask draw line by line*/
     else {
@@ -302,7 +302,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
             if(dither_func) dither_func(grad, blend_area.x1,  h - bg_coords.y1, grad_size);
 #endif
             if(grad_dir == LV_GRAD_DIR_VER) blend_dsc.color = grad->map[h - bg_coords.y1];
-            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            lv_draw_sw_blend(layer, &blend_dsc);
         }
     }
 
@@ -325,15 +325,15 @@ static void draw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
     //    if(dsc->bg_img_src == NULL) return;
     //    if(dsc->bg_img_opa <= LV_OPA_MIN) return;
     //
-    //    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
+    //    lv_layer_t * layer = draw_unit->layer;
     //
     //    lv_area_t clip_area;
-    //    if(!_lv_area_intersect(&clip_area, coords, draw_ctx->clip_area)) {
+    //    if(!_lv_area_intersect(&clip_area, coords, layer->clip_area)) {
     //        return;
     //    }
     //
-    //    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-    //    draw_ctx->clip_area = &clip_area;
+    //    const lv_area_t * clip_area_ori = layer->clip_area;
+    //    layer->clip_area = &clip_area;
     //
     //    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
     //    if(src_type == LV_IMG_SRC_SYMBOL) {
@@ -350,7 +350,7 @@ static void draw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
     //        label_draw_dsc.font = dsc->bg_img_symbol_font;
     //        label_draw_dsc.color = dsc->bg_img_recolor;
     //        label_draw_dsc.opa = dsc->bg_img_opa;
-    //        lv_draw_label(draw_ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
+    //        lv_draw_label(layer, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
     //    }
     //    else {
     //        lv_img_header_t header;
@@ -371,7 +371,7 @@ static void draw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
     //                area.x2 = area.x1 + header.w - 1;
     //                area.y2 = area.y1 + header.h - 1;
     //
-    //                lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+    //                lv_draw_img(layer, &img_dsc, &area, dsc->bg_img_src);
     //            }
     //            else {
     //                lv_area_t area;
@@ -383,7 +383,7 @@ static void draw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
     //                    area.x1 = coords->x1;
     //                    area.x2 = area.x1 + header.w - 1;
     //                    for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-    //                        lv_draw_img(draw_ctx, &img_dsc, &area, dsc->bg_img_src);
+    //                        lv_draw_img(layer, &img_dsc, &area, dsc->bg_img_src);
     //                    }
     //                }
     //            }
@@ -393,7 +393,7 @@ static void draw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
     //        }
     //    }
     //
-    //    draw_ctx->clip_area = clip_area_ori;
+    //    layer->clip_area = clip_area_ori;
 }
 
 static void draw_border(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
@@ -403,7 +403,7 @@ static void draw_border(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
     if(dsc->border_side == LV_BORDER_SIDE_NONE) return;
     if(dsc->border_post) return;
 
-    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
+    lv_layer_t * layer = draw_unit->layer;
 
     int32_t coords_w = lv_area_get_width(coords);
     int32_t coords_h = lv_area_get_height(coords);
@@ -427,7 +427,7 @@ static void draw_border(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
 }
 
 #if LV_USE_DRAW_MASKS
-LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
+LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords)
 {
     /*Check whether the shadow is visible*/
@@ -459,7 +459,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `shadow_area`*/
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, &shadow_area, draw_ctx->clip_area)) return;
+    if(!_lv_area_intersect(&draw_area, &shadow_area, layer->clip_area)) return;
 
     /*Consider 1 px smaller bg to be sure the edge will be covered by the shadow*/
     lv_area_t bg_area;
@@ -548,7 +548,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.x1 = LV_MAX(blend_area.x1, w_half);
     blend_area.y2 = LV_MIN(blend_area.y2, h_half);
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -575,7 +575,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -591,7 +591,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.x1 = LV_MAX(blend_area.x1, w_half);
     blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -618,7 +618,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -631,7 +631,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.y2 = shadow_area.y1 + corner_size - 1;
     blend_area.y2 = LV_MIN(blend_area.y2, h_half);
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -659,11 +659,11 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
                     blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
                 }
                 else {
                     blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
                 }
                 sh_buf_tmp += corner_size;
             }
@@ -679,7 +679,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
 
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -710,11 +710,11 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
                     blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
                 }
                 else {
                     blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
 
                 }
                 sh_buf_tmp += corner_size;
@@ -734,7 +734,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.y2 = LV_MAX(blend_area.y2, h_half);
     blend_area.x1 = LV_MAX(blend_area.x1, w_half);
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -759,7 +759,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                     blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
                     if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
             }
         }
     }
@@ -791,7 +791,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.y2 = LV_MAX(blend_area.y2, h_half);
     blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -816,7 +816,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                     if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
 
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
             }
         }
     }
@@ -830,7 +830,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
     blend_area.y2 = LV_MIN(blend_area.y2, h_half);
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -859,7 +859,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
 
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -875,7 +875,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
     blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         sh_buf_tmp = sh_buf;
@@ -902,7 +902,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
                 }
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
                 sh_buf_tmp += corner_size;
             }
         }
@@ -915,7 +915,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
     blend_area.y2 = shadow_area.y2 - corner_size;
     blend_dsc.mask_buf = mask_buf;
 
-    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_ctx->clip_area) &&
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, layer->clip_area) &&
        !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
         lv_coord_t w = lv_area_get_width(&clip_area_sub);
         if(w > 0) {
@@ -927,7 +927,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
 
                 lv_memset(mask_buf, 0xff, w);
                 blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
             }
         }
     }
@@ -1113,7 +1113,7 @@ static void draw_outline(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * 
     if(dsc->outline_opa <= LV_OPA_MIN) return;
     if(dsc->outline_width == 0) return;
 
-    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
+    lv_layer_t * layer = draw_unit->layer;
 
     lv_opa_t opa = dsc->outline_opa;
 
@@ -1167,7 +1167,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
     /*Get clipped draw area which is the real draw area.
      *It is always the same or inside `coords`*/
     lv_area_t draw_area;
-    if(!_lv_area_intersect(&draw_area, outer_area, draw_ctx->clip_area)) return;
+    if(!_lv_area_intersect(&draw_area, outer_area, layer->clip_area)) return;
     int32_t draw_area_w = lv_area_get_width(&draw_area);
 
     lv_draw_sw_blend_dsc_t blend_dsc;
@@ -1220,7 +1220,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
 
             lv_memset(blend_dsc.mask_buf, 0xff, draw_area_w);
             blend_dsc.mask_res = lv_draw_mask_apply(blend_dsc.mask_buf, draw_area.x1, h, draw_area_w);
-            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+            lv_draw_sw_blend(layer, &blend_dsc);
         }
 
         lv_draw_mask_free_param(&mask_rin_param);
@@ -1250,7 +1250,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
         blend_area.x2 = core_area.x2;
         blend_area.y1 = outer_area->y1;
         blend_area.y2 = inner_area->y1 - 1;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
 
     if(bottom_side && split_hor) {
@@ -1258,7 +1258,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
         blend_area.x2 = core_area.x2;
         blend_area.y1 = inner_area->y2 + 1;
         blend_area.y2 = outer_area->y2;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
 
     if(left_side) {
@@ -1266,7 +1266,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
         blend_area.x2 = inner_area->x1 - 1;
         blend_area.y1 = core_area.y1;
         blend_area.y2 = core_area.y2;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
 
     if(right_side) {
@@ -1274,7 +1274,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
         blend_area.x2 = outer_area->x2;
         blend_area.y1 = core_area.y1;
         blend_area.y2 = core_area.y2;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
 
     /*Draw the corners*/
@@ -1297,13 +1297,13 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
             if(top_y >= draw_area.y1) {
                 blend_area.y1 = top_y;
                 blend_area.y2 = top_y;
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
             }
 
             if(bottom_y <= draw_area.y2) {
                 blend_area.y1 = bottom_y;
                 blend_area.y2 = bottom_y;
-                lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                lv_draw_sw_blend(layer, &blend_dsc);
             }
         }
     }
@@ -1320,7 +1320,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_mask_apply(blend_dsc.mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
                 }
             }
 
@@ -1331,7 +1331,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_mask_apply(blend_dsc.mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
                 }
             }
         }
@@ -1349,7 +1349,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_mask_apply(blend_dsc.mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
                 }
             }
 
@@ -1360,7 +1360,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
                     blend_dsc.mask_res = lv_draw_mask_apply(blend_dsc.mask_buf, blend_area.x1, h, blend_w);
-                    lv_draw_sw_blend(draw_ctx, &blend_dsc);
+                    lv_draw_sw_blend(layer, &blend_dsc);
                 }
             }
         }

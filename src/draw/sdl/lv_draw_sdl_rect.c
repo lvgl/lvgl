@@ -102,10 +102,10 @@ static lv_draw_rect_border_key_t rect_border_key_create(lv_coord_t rout, lv_coor
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sdl_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_sdl_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
-    const lv_area_t * clip = draw_ctx->clip_area;
-    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    const lv_area_t * clip = layer->clip_area;
+    lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) layer;
 
     lv_area_t extension = {0, 0, 0, 0};
     if(!SKIP_SHADOW(dsc)) {
@@ -301,7 +301,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
         /* Reset transform state temporarilly, so the label will be drawn in desinated position */
         uint8_t transform_count = ctx->internals->transform_count;
         ctx->internals->transform_count = 0;
-        lv_draw_label((lv_draw_ctx_t *) ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
+        lv_draw_label((lv_layer_t *) ctx, &label_draw_dsc, &a, dsc->bg_img_src, NULL);
         ctx->internals->transform_count = transform_count;
     }
     else {
@@ -349,7 +349,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
             /* Reset transform state temporarilly, so the image will be drawn in desinated position */
             uint8_t transform_count = ctx->internals->transform_count;
             ctx->internals->transform_count = 0;
-            lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
+            lv_draw_img((lv_layer_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
             ctx->internals->transform_count = transform_count;
         }
         else {
@@ -366,7 +366,7 @@ static void draw_bg_img(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, const
                 uint8_t transform_count = ctx->internals->transform_count;
                 ctx->internals->transform_count = 0;
                 for(; area.x1 <= coords->x2; area.x1 += header.w, area.x2 += header.w) {
-                    lv_draw_img((lv_draw_ctx_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
+                    lv_draw_img((lv_layer_t *) ctx, &img_dsc, &area, dsc->bg_img_src);
                 }
                 ctx->internals->transform_count = transform_count;
             }

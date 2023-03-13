@@ -97,9 +97,9 @@ typedef struct _lv_disp_t {
     /*---------------------
      * Draw context
      *--------------------*/
-    lv_draw_ctx_t * draw_ctx_head;
-    lv_draw_ctx_t * (*draw_ctx_init)(struct _lv_disp_t * disp);
-    void (*draw_ctx_deinit)(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+    lv_layer_t * layer_head;
+    lv_layer_t * (*layer_init)(struct _lv_disp_t * disp);
+    void (*layer_deinit)(struct _lv_disp_t * disp, lv_layer_t * layer);
 
     lv_draw_unit_t * draw_unit_head;
 

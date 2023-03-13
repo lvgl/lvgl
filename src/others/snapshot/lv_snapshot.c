@@ -122,19 +122,19 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_img_ds
 
     lv_disp_t * obj_disp = lv_obj_get_disp(obj);
 
-    lv_draw_ctx_t * draw_ctx = lv_malloc(obj_disp->draw_ctx_size);
-    LV_ASSERT_MALLOC(draw_ctx);
-    if(draw_ctx == NULL) return LV_RES_INV;
-    obj_disp->draw_ctx_init(NULL, draw_ctx);
-    draw_ctx->clip_area = &snapshot_area;
-    draw_ctx->buf_area = &snapshot_area;
-    draw_ctx->buf = (void *)buf;
-    draw_ctx->color_format = dsc->header.cf;
+    lv_layer_t * layer = lv_malloc(obj_disp->layer_size);
+    LV_ASSERT_MALLOC(layer);
+    if(layer == NULL) return LV_RES_INV;
+    obj_disp->layer_init(NULL, layer);
+    layer->clip_area = &snapshot_area;
+    layer->buf_area = &snapshot_area;
+    layer->buf = (void *)buf;
+    layer->color_format = dsc->header.cf;
 
-    lv_obj_redraw(draw_ctx, obj);
+    lv_obj_redraw(layer, obj);
 
-    if(draw_ctx->buffer_convert) draw_ctx->buffer_convert(draw_ctx);
-    lv_free(draw_ctx);
+    if(layer->buffer_convert) layer->buffer_convert(layer);
+    lv_free(layer);
 
     return LV_RES_OK;
 }

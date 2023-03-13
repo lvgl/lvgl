@@ -29,8 +29,8 @@
  **********************/
 static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static lv_draw_ctx_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area);
-static void deinit_fake_disp(lv_obj_t * canvas, lv_draw_ctx_t * draw_ctx);
+static lv_layer_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area);
+static void deinit_fake_disp(lv_obj_t * canvas, lv_layer_t * layer);
 
 /**********************
  *  STATIC VARIABLES
@@ -199,13 +199,13 @@ void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, 
     /*Create a dummy display to fool the lv_draw function.
      *It will think it draws to real screen.*/
     lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(obj, &clip_area);
+    lv_layer_t * layer = init_fake_disp(obj, &clip_area);
 
     lv_color_t * cbuf = lv_malloc(dest_img->header.w * sizeof(lv_color_t));
     lv_opa_t * abuf = lv_malloc(dest_img->header.w * sizeof(lv_opa_t));
     for(y = 0; y < dest_img->header.h; y++) {
         if(y + offset_y >= 0) {
-            lv_draw_sw_transform(draw_ctx, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
+            lv_draw_sw_transform(layer, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
                                  &draw_dsc, &sup, canvas->dsc.header.cf, cbuf, abuf);
 
             for(x = 0; x < dest_img->header.w; x++) {
@@ -488,7 +488,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     /*Create a dummy display to fool the lv_draw function.
      *It will think it draws to real screen.*/
     lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
+    lv_layer_t * layer = init_fake_disp(canvas, &clip_area);
 
     lv_area_t coords;
     coords.x1 = x;
@@ -496,9 +496,9 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     coords.x2 = x + w - 1;
     coords.y2 = y + h - 1;
 
-    lv_draw_rect(draw_ctx, draw_dsc, &coords);
+    lv_draw_rect(layer, draw_dsc, &coords);
 
-    deinit_fake_disp(canvas, draw_ctx);
+    deinit_fake_disp(canvas, layer);
 
     lv_obj_invalidate(canvas);
 }
@@ -518,16 +518,16 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     /*Create a dummy display to fool the lv_draw function.
      *It will think it draws to real screen.*/
     lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
+    lv_layer_t * layer = init_fake_disp(canvas, &clip_area);
 
     lv_area_t coords;
     coords.x1 = x;
     coords.y1 = y;
     coords.x2 = x + max_w - 1;
     coords.y2 = dsc->header.h - 1;
-    lv_draw_label(draw_ctx, draw_dsc, &coords, txt, NULL);
+    lv_draw_label(layer, draw_dsc, &coords, txt, NULL);
 
-    deinit_fake_disp(canvas, draw_ctx);
+    deinit_fake_disp(canvas, layer);
 
     lv_obj_invalidate(canvas);
 }
@@ -553,7 +553,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     /*Create a dummy display to fool the lv_draw function.
      *It will think it draws to real screen.*/
     lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
+    lv_layer_t * layer = init_fake_disp(canvas, &clip_area);
 
     lv_area_t coords;
     coords.x1 = x;
@@ -561,9 +561,9 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     coords.x2 = x + header.w - 1;
     coords.y2 = y + header.h - 1;
 
-    lv_draw_img(draw_ctx, draw_dsc, &coords, src);
+    lv_draw_img(layer, draw_dsc, &coords, src);
 
-    deinit_fake_disp(canvas, draw_ctx);
+    deinit_fake_disp(canvas, layer);
 
     lv_obj_invalidate(canvas);
 }
@@ -583,14 +583,14 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     /*Create a dummy display to fool the lv_draw function.
      *It will think it draws to real screen.*/
     lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
+    lv_layer_t * layer = init_fake_disp(canvas, &clip_area);
 
     uint32_t i;
     for(i = 0; i < point_cnt - 1; i++) {
-        lv_draw_line(draw_ctx, draw_dsc, &points[i], &points[i + 1]);
+        lv_draw_line(layer, draw_dsc, &points[i], &points[i + 1]);
     }
 
-    deinit_fake_disp(canvas, draw_ctx);
+    deinit_fake_disp(canvas, layer);
 
     lv_obj_invalidate(canvas);
 }
@@ -610,11 +610,11 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     /*Create a dummy display to fool the lv_draw function.
      *It will think it draws to real screen.*/
     lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
+    lv_layer_t * layer = init_fake_disp(canvas, &clip_area);
 
-    lv_draw_polygon(draw_ctx, draw_dsc, points, point_cnt);
+    lv_draw_polygon(layer, draw_dsc, points, point_cnt);
 
-    deinit_fake_disp(canvas, draw_ctx);
+    deinit_fake_disp(canvas, layer);
 
     lv_obj_invalidate(canvas);
 }
@@ -635,12 +635,12 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     /*Create a dummy display to fool the lv_draw function.
      *It will think it draws to real screen.*/
     lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
+    lv_layer_t * layer = init_fake_disp(canvas, &clip_area);
 
     lv_point_t p = {x, y};
-    lv_draw_arc(draw_ctx, draw_dsc, &p, r,  start_angle, end_angle);
+    lv_draw_arc(layer, draw_dsc, &p, r,  start_angle, end_angle);
 
-    deinit_fake_disp(canvas, draw_ctx);
+    deinit_fake_disp(canvas, layer);
 
     lv_obj_invalidate(canvas);
 #else
@@ -688,7 +688,7 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 }
 
 
-static lv_draw_ctx_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area)
+static lv_layer_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area)
 {
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -697,23 +697,23 @@ static lv_draw_ctx_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area)
     clip_area->y1 = 0;
     clip_area->y2 = dsc->header.h - 1;
 
-    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_sw_ctx_t));
-    LV_ASSERT_MALLOC(draw_ctx);
-    if(draw_ctx == NULL)  return NULL;
-    lv_draw_sw_init_ctx(NULL, draw_ctx);
-    draw_ctx->clip_area = clip_area;
-    draw_ctx->buf_area = clip_area;
-    draw_ctx->buf = (void *)dsc->data;
-    draw_ctx->color_format = dsc->header.cf;
+    lv_layer_t * layer = lv_malloc(sizeof(lv_draw_sw_ctx_t));
+    LV_ASSERT_MALLOC(layer);
+    if(layer == NULL)  return NULL;
+    lv_draw_sw_init_ctx(NULL, layer);
+    layer->clip_area = clip_area;
+    layer->buf_area = clip_area;
+    layer->buf = (void *)dsc->data;
+    layer->color_format = dsc->header.cf;
 
-    return draw_ctx;
+    return layer;
 }
 
-static void deinit_fake_disp(lv_obj_t * canvas, lv_draw_ctx_t * draw_ctx)
+static void deinit_fake_disp(lv_obj_t * canvas, lv_layer_t * layer)
 {
     LV_UNUSED(canvas);
-    lv_draw_sw_deinit_ctx(NULL, draw_ctx);
-    lv_free(draw_ctx);
+    lv_draw_sw_deinit_ctx(NULL, layer);
+    lv_free(layer);
 }
 
 

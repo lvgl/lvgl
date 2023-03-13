@@ -25,11 +25,11 @@
 // *  STATIC PROTOTYPES
 // **********************/
 //
-//LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+//LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
 //                                                 const lv_point_t * point1, const lv_point_t * point2);
-//LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+//LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
 //                                                const lv_point_t * point1, const lv_point_t * point2);
-//LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+//LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
 //                                                const lv_point_t * point1, const lv_point_t * point2);
 //
 ///**********************
@@ -51,7 +51,7 @@
 // * @param clip the line will be drawn only in this area
 // * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
 // */
-//LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+//LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
 //                                           const lv_point_t * point1, const lv_point_t * point2)
 //{
 //    if(dsc->width == 0) return;
@@ -66,14 +66,14 @@
 //    clip_line.y2 = LV_MAX(point1->y, point2->y) + dsc->width / 2;
 //
 //    bool is_common;
-//    is_common = _lv_area_intersect(&clip_line, &clip_line, draw_ctx->clip_area);
+//    is_common = _lv_area_intersect(&clip_line, &clip_line, layer->clip_area);
 //    if(!is_common) return;
-//    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-//    draw_ctx->clip_area = &clip_line;
+//    const lv_area_t * clip_area_ori = layer->clip_area;
+//    layer->clip_area = &clip_line;
 //
-//    if(point1->y == point2->y) draw_line_hor(draw_ctx, dsc, point1, point2);
-//    else if(point1->x == point2->x) draw_line_ver(draw_ctx, dsc, point1, point2);
-//    else draw_line_skew(draw_ctx, dsc, point1, point2);
+//    if(point1->y == point2->y) draw_line_hor(layer, dsc, point1, point2);
+//    else if(point1->x == point2->x) draw_line_ver(layer, dsc, point1, point2);
+//    else draw_line_skew(layer, dsc, point1, point2);
 //
 //    if(dsc->round_end || dsc->round_start) {
 //        lv_draw_rect_dsc_t cir_dsc;
@@ -91,7 +91,7 @@
 //            cir_area.y1 = point1->y - r;
 //            cir_area.x2 = point1->x + r - r_corr;
 //            cir_area.y2 = point1->y + r - r_corr ;
-//            lv_draw_rect(draw_ctx, &cir_dsc, &cir_area);
+//            lv_draw_rect(layer, &cir_dsc, &cir_area);
 //        }
 //
 //        if(dsc->round_end) {
@@ -99,11 +99,11 @@
 //            cir_area.y1 = point2->y - r;
 //            cir_area.x2 = point2->x + r - r_corr;
 //            cir_area.y2 = point2->y + r - r_corr ;
-//            lv_draw_rect(draw_ctx, &cir_dsc, &cir_area);
+//            lv_draw_rect(layer, &cir_dsc, &cir_area);
 //        }
 //    }
 //
-//    draw_ctx->clip_area = clip_area_ori;
+//    layer->clip_area = clip_area_ori;
 //}
 //
 ///**********************
@@ -111,7 +111,7 @@
 // **********************/
 //
 //
-//LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+//LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
 //                                                const lv_point_t * point1, const lv_point_t * point2)
 //{
 //    int32_t w = dsc->width - 1;
@@ -125,7 +125,7 @@
 //    blend_area.y2 = point1->y + w_half0;
 //
 //    bool is_common;
-//    is_common = _lv_area_intersect(&blend_area, &blend_area, draw_ctx->clip_area);
+//    is_common = _lv_area_intersect(&blend_area, &blend_area, layer->clip_area);
 //    if(!is_common) return;
 //
 //    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
@@ -141,7 +141,7 @@
 //
 //    /*If there is no mask then simply draw a rectangle*/
 //    if(simple_mode) {
-//        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+//        lv_draw_sw_blend(layer, &blend_dsc);
 //    }
 //#if LV_USE_DRAW_MASKS
 //    /*If there other mask apply it*/
@@ -187,7 +187,7 @@
 //                }
 //            }
 //
-//            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+//            lv_draw_sw_blend(layer, &blend_dsc);
 //
 //            blend_area.y1++;
 //            blend_area.y2++;
@@ -197,7 +197,7 @@
 //#endif /*LV_USE_DRAW_MASKS*/
 //}
 //
-//LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+//LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
 //                                                const lv_point_t * point1, const lv_point_t * point2)
 //{
 //    int32_t w = dsc->width - 1;
@@ -211,7 +211,7 @@
 //    blend_area.y2 = LV_MAX(point1->y, point2->y) - 1;
 //
 //    bool is_common;
-//    is_common = _lv_area_intersect(&blend_area, &blend_area, draw_ctx->clip_area);
+//    is_common = _lv_area_intersect(&blend_area, &blend_area, layer->clip_area);
 //    if(!is_common) return;
 //
 //    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
@@ -227,7 +227,7 @@
 //
 //    /*If there is no mask then simply draw a rectangle*/
 //    if(simple_mode) {
-//        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+//        lv_draw_sw_blend(layer, &blend_dsc);
 //    }
 //
 //#if LV_USE_DRAW_MASKS
@@ -267,7 +267,7 @@
 //                dash_cnt ++;
 //            }
 //
-//            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+//            lv_draw_sw_blend(layer, &blend_dsc);
 //
 //            blend_area.y1++;
 //            blend_area.y2++;
@@ -277,7 +277,7 @@
 //#endif /*LV_USE_DRAW_MASKS*/
 //}
 //
-//LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+//LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
 //                                                 const lv_point_t * point1, const lv_point_t * point2)
 //{
 //#if LV_USE_DRAW_MASKS
@@ -327,7 +327,7 @@
 //    /*Get the union of `coords` and `clip`*/
 //    /*`clip` is already truncated to the `draw_buf` size
 //     *in 'lv_refr_area' function*/
-//    bool is_common = _lv_area_intersect(&blend_area, &blend_area, draw_ctx->clip_area);
+//    bool is_common = _lv_area_intersect(&blend_area, &blend_area, layer->clip_area);
 //    if(is_common == false) return;
 //
 //    lv_draw_mask_line_param_t mask_left_param;
@@ -408,7 +408,7 @@
 //        }
 //        else {
 //            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-//            lv_draw_sw_blend(draw_ctx, &blend_dsc);
+//            lv_draw_sw_blend(layer, &blend_dsc);
 //
 //            blend_area.y1 = blend_area.y2 + 1;
 //            blend_area.y2 = blend_area.y1;
@@ -421,7 +421,7 @@
 //    if(blend_area.y1 != blend_area.y2) {
 //        blend_area.y2--;
 //        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-//        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+//        lv_draw_sw_blend(layer, &blend_dsc);
 //    }
 //
 //    lv_free(mask_buf);
@@ -437,7 +437,7 @@
 //#else
 //    LV_UNUSED(point1);
 //    LV_UNUSED(point2);
-//    LV_UNUSED(draw_ctx);
+//    LV_UNUSED(layer);
 //    LV_UNUSED(dsc);
 //    LV_LOG_WARN("Can't draw skewed line with LV_USE_DRAW_MASKS == 0");
 //#endif /*LV_USE_DRAW_MASKS*/

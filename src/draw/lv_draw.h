@@ -48,10 +48,23 @@ typedef enum {
 
 typedef struct _lv_draw_task_t {
     struct _lv_draw_task_t * next;
+
     lv_draw_task_type_t type;
+
+    /**
+     * The bounding box of the thing to draw
+     */
     lv_area_t area;
+
+    /**
+     * The clip area of the layer is saved here when the draw task is created.
+     * As the clip area of the layer can be changed as new draw tasks are added its current value needs to be saved.
+     * Therefore during drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
+     */
     lv_area_t clip_area;
-    int state;              /*int instead of lv_draw_task_state_t to be sure its atomic*/
+
+    volatile int state;              /*int instead of lv_draw_task_state_t to be sure its atomic*/
+
     void * draw_dsc;
 } lv_draw_task_t;
 
@@ -61,14 +74,15 @@ typedef struct {
 
 typedef struct _lv_draw_unit_t {
     struct _lv_draw_unit_t * next;
-    struct _lv_draw_ctx_t * draw_ctx;
+    struct _lv_layer_t * layer;
+
     const lv_area_t * clip_area;
 
-    int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_draw_ctx_t * draw_ctx);
+    int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
 } lv_draw_unit_t;
 
 
-typedef struct _lv_draw_ctx_t  {
+typedef struct _lv_layer_t  {
     /**
      *  Pointer to a buffer to draw into
      */
@@ -81,18 +95,22 @@ typedef struct _lv_draw_ctx_t  {
 
     /**
      * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
+     * Can be set before new draw tasks are added to indicate the clip area of the draw tasks.
+     * Therefore `lv_draw_add_task()` always saves it in the new draw task to know the clip area when the draw task was added.
+     * During drawing the draw units also sees the saved clip_area and should use it during drawing.
+     * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
      */
     lv_area_t clip_area;
 
     /**
-     * The rendered image in draw_ctx->buf will be converted to this format
-     * using draw_ctx->buffer_convert.
+     * The rendered image in layer->buf will be converted to this format
+     * using layer->buffer_convert.
      */
     lv_color_format_t color_format;
 
     /**
      * Copy an area from buffer to an other
-     * @param draw_ctx      pointer to a draw context
+     * @param layer      pointer to a draw context
      * @param dest_buf      copy the buffer into this buffer
      * @param dest_stride   the width of the dest_buf in pixels
      * @param dest_area     the destination area
@@ -104,31 +122,31 @@ typedef struct _lv_draw_ctx_t  {
      *       but can have different x and y position.
      * @note dest_area and src_area must be clipped to the real dimensions of the buffers
      */
-    void (*buffer_copy)(struct _lv_draw_ctx_t * draw_ctx, void * dest_buf, lv_coord_t dest_stride,
+    void (*buffer_copy)(struct _lv_layer_t * layer, void * dest_buf, lv_coord_t dest_stride,
                         const lv_area_t * dest_area,
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
     /**
-     * Convert the content of `draw_ctx->buf` to `draw_ctx->color_format`
-     * @param draw_ctx
+     * Convert the content of `layer->buf` to `layer->color_format`
+     * @param layer
      */
-    void (*buffer_convert)(struct _lv_draw_ctx_t * draw_ctx);
+    void (*buffer_convert)(struct _lv_layer_t * layer);
 
-    void (*buffer_clear)(struct _lv_draw_ctx_t * draw_ctx);
+    void (*buffer_clear)(struct _lv_layer_t * layer);
 
     /**
      * Linked list of draw tasks
      */
     lv_draw_task_t * draw_task_head;
 
-    struct _lv_draw_ctx_t * parent;
-    struct _lv_draw_ctx_t * next;
+    struct _lv_layer_t * parent;
+    struct _lv_layer_t * next;
     bool all_tasks_added;
 
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
-} lv_draw_ctx_t;
+} lv_layer_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -136,9 +154,9 @@ typedef struct _lv_draw_ctx_t  {
 
 void lv_draw_init(void);
 
-void lv_draw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
+void lv_draw_wait_for_finish(lv_layer_t * layer);
 
-lv_draw_task_t * lv_draw_add_task(lv_draw_ctx_t * draw_ctx, const lv_area_t * coords);
+lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords);
 
 void lv_draw_dispatch(void);
 
@@ -152,11 +170,11 @@ void lv_draw_dispatch_request(void);
 
 /**
  * Find and available draw task
- * @param draw_ctx      the draw ctx to search in
+ * @param layer      the draw ctx to search in
  * @param t_prev        continue searching from this task
  * @return              tan available draw task or NULL if there is no any
  */
-lv_draw_task_t * lv_draw_get_next_available_task(lv_draw_ctx_t * draw_ctx, lv_draw_task_t * t_prev);
+lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev);
 
 
 /**********************

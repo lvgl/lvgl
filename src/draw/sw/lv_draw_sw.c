@@ -29,15 +29,15 @@
 
 static void exectue_drawing(lv_draw_sw_unit_t * u);
 
-static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx);
+static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
-static void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
+static void lv_draw_sw_buffer_copy(lv_layer_t * layer,
                                    void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
                                    void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
-static void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx);
+static void lv_draw_sw_buffer_convert(lv_layer_t * layer);
 
-static void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx);
+static void lv_draw_sw_buffer_clear(lv_layer_t * layer);
 
 /**********************
  *  GLOBAL PROTOTYPES
@@ -63,31 +63,31 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_draw_ctx_t * lv_draw_sw_init_ctx(lv_disp_t * disp)
+lv_layer_t * lv_draw_sw_init_ctx(lv_disp_t * disp)
 {
-    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_ctx_t));
-    LV_ASSERT_MALLOC(draw_ctx);
-    lv_memzero(draw_ctx, sizeof(lv_draw_ctx_t));
-    draw_ctx->buffer_copy = lv_draw_sw_buffer_copy;
-    draw_ctx->buffer_convert = lv_draw_sw_buffer_convert;
-    draw_ctx->buffer_clear = lv_draw_sw_buffer_clear;
+    lv_layer_t * layer = lv_malloc(sizeof(lv_layer_t));
+    LV_ASSERT_MALLOC(layer);
+    lv_memzero(layer, sizeof(lv_layer_t));
+    layer->buffer_copy = lv_draw_sw_buffer_copy;
+    layer->buffer_convert = lv_draw_sw_buffer_convert;
+    layer->buffer_clear = lv_draw_sw_buffer_clear;
 
-    if(disp->draw_ctx_head) {
-        lv_draw_ctx_t * tail = disp->draw_ctx_head;
+    if(disp->layer_head) {
+        lv_layer_t * tail = disp->layer_head;
         while(tail->next) tail = tail->next;
-        tail->next = draw_ctx;
+        tail->next = layer;
     }
     else {
-        disp->draw_ctx_head = draw_ctx;
+        disp->layer_head = layer;
     }
 
-    return draw_ctx;
+    return layer;
 }
 
-void lv_draw_sw_deinit_ctx(lv_disp_t * disp, lv_draw_ctx_t * draw_ctx)
+void lv_draw_sw_deinit_ctx(lv_disp_t * disp, lv_layer_t * layer)
 {
     LV_UNUSED(disp);
-    lv_memzero(draw_ctx, sizeof(lv_draw_ctx_t));
+    lv_memzero(layer, sizeof(lv_layer_t));
 }
 
 void lv_draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt)
@@ -113,7 +113,7 @@ void lv_draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt)
  *   STATIC FUNCTIONS
  **********************/
 
-static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * draw_ctx)
+static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_sw_unit_t * draw_sw_unit = (lv_draw_sw_unit_t *) draw_unit;
 
@@ -121,14 +121,14 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * d
     if(draw_sw_unit->task_act) return 0;
 
     /*Try to get an ready to draw*/
-    lv_draw_task_t * t = lv_draw_get_next_available_task(draw_ctx, NULL);
+    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL);
     if(t == NULL) return -1;
 
 #if LV_USE_OS
     //    lv_mutex_lock(&draw_sw_unit->mutex);
 
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
-    draw_sw_unit->base_unit.draw_ctx = draw_ctx;
+    draw_sw_unit->base_unit.layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
 
@@ -137,7 +137,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * d
     //    lv_mutex_unlock(&draw_sw_unit->mutex);
 #else
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
-    draw_sw_unit->base_unit.draw_ctx = draw_ctx;
+    draw_sw_unit->base_unit.layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
 
@@ -153,13 +153,13 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_draw_ctx_t * d
     return 1;
 }
 
-static void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
+static void lv_draw_sw_buffer_copy(lv_layer_t * layer,
                                    void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
                                    void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
 {
-    LV_UNUSED(draw_ctx);
+    LV_UNUSED(layer);
 
-    uint8_t px_size = lv_color_format_get_size(draw_ctx->color_format);
+    uint8_t px_size = lv_color_format_get_size(layer->color_format);
     uint8_t * dest_bufc =  dest_buf;
     uint8_t * src_bufc =  src_buf;
 
@@ -179,23 +179,23 @@ static void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
     }
 }
 
-static void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
+static void lv_draw_sw_buffer_convert(lv_layer_t * layer)
 {
     /*Keep the rendered image as it is*/
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE) return;
+    if(layer->color_format == LV_COLOR_FORMAT_NATIVE) return;
 
 #if LV_COLOR_DEPTH == 8
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_L8) return;
+    if(layer->color_format == LV_COLOR_FORMAT_L8) return;
 #endif
 
 #if LV_COLOR_DEPTH == 16
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_RGB565) return;
+    if(layer->color_format == LV_COLOR_FORMAT_RGB565) return;
 
     /*Make both the clip and buf area relative to the buf area*/
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSED) {
-        uint32_t px_cnt = lv_area_get_size(draw_ctx->buf_area);
+    if(layer->color_format == LV_COLOR_FORMAT_NATIVE_REVERSED) {
+        uint32_t px_cnt = lv_area_get_size(layer->buf_area);
         uint32_t u32_cnt = px_cnt / 2;
-        uint16_t * buf16 = draw_ctx->buf;
+        uint16_t * buf16 = layer->buf;
         uint32_t * buf32 = (uint32_t *) buf16 ;
 
         /*Swap all byte pairs*/
@@ -227,33 +227,33 @@ static void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx)
     }
 #endif
 
-    size_t buf_size_px = lv_area_get_size(&draw_ctx->buf_area);
+    size_t buf_size_px = lv_area_get_size(&layer->buf_area);
 
-    bool has_alpha = lv_color_format_has_alpha(draw_ctx->color_format);
+    bool has_alpha = lv_color_format_has_alpha(layer->color_format);
     uint8_t px_size_in = lv_color_format_get_size(has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
-    uint8_t px_size_out = lv_color_format_get_size(draw_ctx->color_format);
+    uint8_t px_size_out = lv_color_format_get_size(layer->color_format);
 
     /*In-plpace conversation can happen only when converting to a smaller pixel size*/
     if(px_size_in >= px_size_out) {
-        if(has_alpha) lv_color_from_native_alpha(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
-        else lv_color_from_native(draw_ctx->buf, draw_ctx->buf, draw_ctx->color_format, buf_size_px);
+        if(has_alpha) lv_color_from_native_alpha(layer->buf, layer->buf, layer->color_format, buf_size_px);
+        else lv_color_from_native(layer->buf, layer->buf, layer->color_format, buf_size_px);
     }
     else {
         /*TODO What to to do when can't perform in-place conversion?*/
-        LV_LOG_WARN("Can't convert to the desired color format (%d)", draw_ctx->color_format);
+        LV_LOG_WARN("Can't convert to the desired color format (%d)", layer->color_format);
     }
     return;
 
     LV_LOG_WARN("Couldn't convert the image to the desired format");
 }
 
-static void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx)
+static void lv_draw_sw_buffer_clear(lv_layer_t * layer)
 {
-    uint8_t px_size = lv_color_format_get_size(draw_ctx->color_format);
-    uint8_t * buf8 = draw_ctx->buf;
+    uint8_t px_size = lv_color_format_get_size(layer->color_format);
+    uint8_t * buf8 = layer->buf;
     lv_area_t a;
-    lv_area_copy(&a, &draw_ctx->clip_area);
-    lv_area_move(&a, -draw_ctx->buf_area.x1, -draw_ctx->buf_area.y1);
+    lv_area_copy(&a, &layer->clip_area);
+    lv_area_move(&a, -layer->buf_area.x1, -layer->buf_area.y1);
     lv_coord_t w = lv_area_get_width(&a);
     buf8 += a.y1 * w * px_size;
     buf8 += a.x1 * px_size;

@@ -48,14 +48,14 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
 
 void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords)
 {
-    lv_draw_ctx_t * draw_ctx_to_draw = (lv_draw_ctx_t *)draw_dsc->src;
+    lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
     lv_img_dsc_t img_dsc;
-    img_dsc.header.w = lv_area_get_width(&draw_ctx_to_draw->buf_area);
-    img_dsc.header.h = lv_area_get_height(&draw_ctx_to_draw->buf_area);
-    img_dsc.header.cf = draw_ctx_to_draw->color_format;
+    img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
+    img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
+    img_dsc.header.cf = layer_to_draw->color_format;
     img_dsc.header.always_zero = 0;
     img_dsc.header.chroma_keyed = 0;
-    img_dsc.data = draw_ctx_to_draw->buf;
+    img_dsc.data = layer_to_draw->buf;
 
     lv_draw_img_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_img_dsc_t));
@@ -95,7 +95,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
     //    sup.chroma_key_color = lv_color_hex(0x00ff00);
     //    sup.chroma_keyed = cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED ? 1 : 0;
     //
-    lv_draw_ctx_t * draw_ctx = draw_unit->draw_ctx;
+    lv_layer_t * layer = draw_unit->layer;
 
     lv_area_t map_area_rot;
     lv_area_copy(&map_area_rot, coords);
@@ -167,7 +167,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_dsc.blend_area = coords;
         blend_dsc.mask_area = coords;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-        lv_draw_sw_blend(draw_ctx, &blend_dsc);
+        lv_draw_sw_blend(layer, &blend_dsc);
     }
 #endif
     /*In the other cases every pixel need to be checked one-by-one*/

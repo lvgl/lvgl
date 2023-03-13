@@ -52,10 +52,10 @@ static SDL_Texture * line_texture_create(lv_draw_sdl_ctx_t * sdl_ctx, const lv_d
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
+void lv_draw_sdl_draw_line(lv_layer_t * layer, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
                            const lv_point_t * point2)
 {
-    lv_draw_sdl_ctx_t * sdl_ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_ctx_t * sdl_ctx = (lv_draw_sdl_ctx_t *) layer;
     SDL_Renderer * renderer = sdl_ctx->renderer;
     lv_coord_t x1 = point1->x, x2 = point2->x, y1 = point1->y, y2 = point2->y;
     double length = SDL_sqrt(SDL_pow(x2 - x1, 2) + SDL_pow(y2 - y1, 2));
@@ -72,7 +72,7 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
     }
 
     lv_area_t coords = {x1, y1, x2, y2};
-    const lv_area_t * clip = draw_ctx->clip_area;
+    const lv_area_t * clip = layer->clip_area;
 
     SDL_Rect coords_r, clip_r;
     lv_area_to_sdl_rect(&coords, &coords_r);

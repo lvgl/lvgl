@@ -47,8 +47,8 @@ static void lv_dropdownlist_destructor(const lv_obj_class_t * class_p, lv_obj_t 
 static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_list(lv_event_t * e);
 
-static void draw_box(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, uint16_t id, lv_state_t state);
-static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, uint16_t id, lv_state_t state);
+static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state);
+static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state);
 static lv_res_t btn_release_handler(lv_obj_t * obj);
 static lv_res_t list_release_handler(lv_obj_t * list_obj);
 static void list_press_handler(lv_obj_t * page);
@@ -774,7 +774,7 @@ static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
 
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
@@ -835,7 +835,7 @@ static void draw_main(lv_event_t * e)
         if(symbol_type == LV_IMG_SRC_SYMBOL) {
             symbol_area.y1 = obj->coords.y1 + top;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
-            lv_draw_label(draw_ctx, &symbol_dsc, &symbol_area, dropdown->symbol, NULL);
+            lv_draw_label(layer, &symbol_dsc, &symbol_area, dropdown->symbol, NULL);
         }
         else {
             symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
@@ -846,7 +846,7 @@ static void draw_main(lv_event_t * e)
             img_dsc.pivot.x = symbol_w / 2;
             img_dsc.pivot.y = symbol_h / 2;
             img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_INDICATOR);
-            lv_draw_img(draw_ctx, &img_dsc, &symbol_area, dropdown->symbol);
+            lv_draw_img(layer, &img_dsc, &symbol_area, dropdown->symbol);
         }
     }
 
@@ -877,7 +877,7 @@ static void draw_main(lv_event_t * e)
             txt_area.x2 = txt_area.x1 + size.x;
         }
     }
-    lv_draw_label(draw_ctx, &label_dsc, &txt_area, opt_txt, NULL);
+    lv_draw_label(layer, &label_dsc, &txt_area, opt_txt, NULL);
 
     if(dropdown->text == NULL) {
         lv_free((char *)opt_txt);
@@ -890,37 +890,37 @@ static void draw_list(lv_event_t * e)
     lv_dropdown_list_t * list = (lv_dropdown_list_t *)list_obj;
     lv_obj_t * dropdown_obj = list->dropdown;
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
 
     /* Clip area might be too large too to shadow but
      * the selected option can be drawn on only the background*/
     lv_area_t clip_area_core;
     bool has_common;
-    has_common = _lv_area_intersect(&clip_area_core, draw_ctx->clip_area, &dropdown->list->coords);
+    has_common = _lv_area_intersect(&clip_area_core, layer->clip_area, &dropdown->list->coords);
     if(has_common) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-        draw_ctx->clip_area = &clip_area_core;
+        const lv_area_t * clip_area_ori = layer->clip_area;
+        layer->clip_area = &clip_area_core;
         if(dropdown->selected_highlight) {
             if(dropdown->pr_opt_id == dropdown->sel_opt_id) {
-                draw_box(dropdown_obj, draw_ctx, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
-                draw_box_label(dropdown_obj, draw_ctx, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
+                draw_box(dropdown_obj, layer, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
+                draw_box_label(dropdown_obj, layer, dropdown->pr_opt_id, LV_STATE_CHECKED | LV_STATE_PRESSED);
             }
             else {
-                draw_box(dropdown_obj, draw_ctx, dropdown->pr_opt_id, LV_STATE_PRESSED);
-                draw_box_label(dropdown_obj, draw_ctx, dropdown->pr_opt_id, LV_STATE_PRESSED);
-                draw_box(dropdown_obj, draw_ctx, dropdown->sel_opt_id, LV_STATE_CHECKED);
-                draw_box_label(dropdown_obj, draw_ctx, dropdown->sel_opt_id, LV_STATE_CHECKED);
+                draw_box(dropdown_obj, layer, dropdown->pr_opt_id, LV_STATE_PRESSED);
+                draw_box_label(dropdown_obj, layer, dropdown->pr_opt_id, LV_STATE_PRESSED);
+                draw_box(dropdown_obj, layer, dropdown->sel_opt_id, LV_STATE_CHECKED);
+                draw_box_label(dropdown_obj, layer, dropdown->sel_opt_id, LV_STATE_CHECKED);
             }
         }
         else {
-            draw_box(dropdown_obj, draw_ctx, dropdown->pr_opt_id, LV_STATE_PRESSED);
-            draw_box_label(dropdown_obj, draw_ctx, dropdown->pr_opt_id, LV_STATE_PRESSED);
+            draw_box(dropdown_obj, layer, dropdown->pr_opt_id, LV_STATE_PRESSED);
+            draw_box_label(dropdown_obj, layer, dropdown->pr_opt_id, LV_STATE_PRESSED);
         }
-        draw_ctx->clip_area = clip_area_ori;
+        layer->clip_area = clip_area_ori;
     }
 }
 
-static void draw_box(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, uint16_t id, lv_state_t state)
+static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state)
 {
     if(id == LV_DROPDOWN_PR_NONE) return;
 
@@ -952,13 +952,13 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, uint16_t
     lv_draw_rect_dsc_t sel_rect;
     lv_draw_rect_dsc_init(&sel_rect);
     lv_obj_init_draw_rect_dsc(list_obj,  LV_PART_SELECTED, &sel_rect);
-    lv_draw_rect(draw_ctx, &sel_rect, &rect_area);
+    lv_draw_rect(layer, &sel_rect, &rect_area);
 
     list_obj->state = state_ori;
     list_obj->skip_trans = 0;
 }
 
-static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, uint16_t id, lv_state_t state)
+static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state)
 {
     if(id == LV_DROPDOWN_PR_NONE) return;
 
@@ -993,12 +993,12 @@ static void draw_box_label(lv_obj_t * dropdown_obj, lv_draw_ctx_t * draw_ctx, ui
     area_sel.x2 = list_obj->coords.x2;
     lv_area_t mask_sel;
     bool area_ok;
-    area_ok = _lv_area_intersect(&mask_sel, draw_ctx->clip_area, &area_sel);
+    area_ok = _lv_area_intersect(&mask_sel, layer->clip_area, &area_sel);
     if(area_ok) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-        draw_ctx->clip_area = &mask_sel;
-        lv_draw_label(draw_ctx, &label_dsc, &label->coords, lv_label_get_text(label), NULL);
-        draw_ctx->clip_area = clip_area_ori;
+        const lv_area_t * clip_area_ori = layer->clip_area;
+        layer->clip_area = &mask_sel;
+        lv_draw_label(layer, &label_dsc, &label->coords, lv_label_get_text(label), NULL);
+        layer->clip_area = clip_area_ori;
     }
     list_obj->state = state_orig;
     list_obj->skip_trans = 0;

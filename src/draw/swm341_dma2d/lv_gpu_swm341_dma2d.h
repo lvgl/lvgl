@@ -44,13 +44,13 @@ struct _lv_disp_t;
  */
 void lv_draw_swm341_dma2d_init(void);
 
-void lv_draw_swm341_dma2d_ctx_init(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_swm341_dma2d_ctx_init(struct _lv_disp_t * disp, lv_layer_t * layer);
 
-void lv_draw_swm341_dma2d_ctx_deinit(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_swm341_dma2d_ctx_deinit(struct _lv_disp_t * disp, lv_layer_t * layer);
 
-void lv_draw_swm341_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+void lv_draw_swm341_dma2d_blend(lv_layer_t * layer, const lv_draw_sw_blend_dsc_t * dsc);
 
-void lv_gpu_swm341_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx);
+void lv_gpu_swm341_dma2d_wait_cb(lv_layer_t * layer);
 
 /**********************
  *      MACROS
