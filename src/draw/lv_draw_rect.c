@@ -61,6 +61,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
  */
 void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
+    if(dsc->bg_opa <= LV_OPA_MIN &&
+       (dsc->border_opa <= LV_OPA_MIN || dsc->border_width == 0) &&
+       (dsc->outline_opa <= LV_OPA_MIN || dsc->outline_width == 0) &&
+       (dsc->shadow_opa <= LV_OPA_MIN || dsc->shadow_width == 0)) {
+        return;
+    }
+
     lv_draw_task_t * t = lv_draw_add_task(draw_ctx, coords);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));

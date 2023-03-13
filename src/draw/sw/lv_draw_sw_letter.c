@@ -90,6 +90,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter(lv_draw_unit_t * draw_unit, lv_dra
         blend_dsc.mask_area = draw_dsc->letter_coords;
         blend_dsc.blend_area = draw_dsc->letter_coords;
         blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
 #if LV_USE_FONT_SUBPX && 0
