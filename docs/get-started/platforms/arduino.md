@@ -52,8 +52,13 @@ In the INO file you can see how to register a display and a touchpad for LVGL an
 
 Note that, there is no dedicated INO file for every example. Instead, you can load an example by calling an `lv_example_...` function. For example `lv_example_btn_1()`.
 
-**IMPORTANT**
+**IMPORTANT NOTE 1**
 Due to some the limitations of Arduino's build system you need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`.
+
+
+**IMPORTANT NOTE 2**
+Note that the `lv_examples` library is for LVGL v7 and you shouldn't install it for this version (since LVGL v8)
+as the examples and demos are now part of the main LVGL library.
 
 ## Debugging and logging
 
