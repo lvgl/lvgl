@@ -13,7 +13,6 @@
 #define LV_USE_ASSERT_MEM_INTEGRITY     1
 #define LV_USE_ASSERT_OBJ               1
 #define LV_USE_ASSERT_STYLE             1
-#define LV_USE_USER_DATA                1
 #define LV_USE_LARGE_COORD      1
 
 #define LV_FONT_MONTSERRAT_8    1

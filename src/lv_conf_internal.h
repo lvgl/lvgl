@@ -905,18 +905,6 @@
     #endif
 #endif
 
-#ifndef LV_USE_USER_DATA
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_USER_DATA
-            #define LV_USE_USER_DATA CONFIG_LV_USE_USER_DATA
-        #else
-            #define LV_USE_USER_DATA 0
-        #endif
-    #else
-        #define LV_USE_USER_DATA 1
-    #endif
-#endif
-
 /*Garbage Collector settings
  *Used if lvgl is bound to higher level language and the memory is managed by that language*/
 #ifndef LV_ENABLE_GC

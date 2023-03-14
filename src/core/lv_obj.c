@@ -994,9 +994,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
                 ts[tsi].delay = tr->delay;
                 ts[tsi].path_cb = tr->path_xcb;
                 ts[tsi].prop = tr->props[j];
-#if LV_USE_USER_DATA
                 ts[tsi].user_data = tr->user_data;
-#endif
                 ts[tsi].selector = obj_style->selector;
                 tsi++;
             }

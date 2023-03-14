@@ -308,11 +308,7 @@ void lv_style_transition_dsc_init(lv_style_transition_dsc_t * tr, const lv_style
     tr->path_xcb = path_cb == NULL ? lv_anim_path_linear : path_cb;
     tr->time = time;
     tr->delay = delay;
-#if LV_USE_USER_DATA
     tr->user_data = user_data;
-#else
-    LV_UNUSED(user_data);
-#endif
 }
 
 lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)

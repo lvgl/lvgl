@@ -88,10 +88,7 @@ typedef struct _lv_img_decoder_t {
     lv_img_decoder_open_f_t open_cb;
     lv_img_decoder_read_line_f_t read_line_cb;
     lv_img_decoder_close_f_t close_cb;
-
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
 } lv_img_decoder_t;
 
 

@@ -24,9 +24,7 @@ struct _lv_monkey {
     lv_indev_data_t indev_data;
     lv_indev_t * indev;
     lv_timer_t * timer;
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
 };
 
 static const lv_key_t lv_key_map[] = {
@@ -100,8 +98,6 @@ bool lv_monkey_get_enable(lv_monkey_t * monkey)
     return !monkey->timer->paused;
 }
 
-#if LV_USE_USER_DATA
-
 void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data)
 {
     LV_ASSERT_NULL(monkey);
@@ -113,8 +109,6 @@ void * lv_monkey_get_user_data(lv_monkey_t * monkey)
     LV_ASSERT_NULL(monkey);
     return monkey->user_data;
 }
-
-#endif
 
 void lv_monkey_del(lv_monkey_t * monkey)
 {

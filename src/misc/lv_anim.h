@@ -77,9 +77,7 @@ typedef struct _lv_anim_t {
     lv_anim_ready_cb_t ready_cb;         /**< Call it when the animation is ready*/
     lv_anim_deleted_cb_t deleted_cb;     /**< Call it when the animation is deleted*/
     lv_anim_get_value_cb_t get_value_cb; /**< Get the current value in relative mode*/
-#if LV_USE_USER_DATA
-    void * user_data; /**< Custom user data*/
-#endif
+    void * user_data;                    /**< Custom user data*/
     lv_anim_path_cb_t path_cb;         /**< Describe the path (curve) of animations*/
     int32_t start_value;               /**< Start value*/
     int32_t current_value;             /**< Current value*/
@@ -296,12 +294,10 @@ static inline void lv_anim_set_early_apply(lv_anim_t * a, bool en)
  * @param a           pointer to an initialized `lv_anim_t` variable
  * @param user_data   pointer to the new user_data.
  */
-#if LV_USE_USER_DATA
 static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
 {
     a->user_data = user_data;
 }
-#endif
 
 /**
  * Create an animation
@@ -352,12 +348,10 @@ static inline uint16_t lv_anim_get_repeat_count(lv_anim_t * a)
  * @param   a pointer to an initialized `lv_anim_t` variable
  * @return  the pointer to the custom user_data of the animation
  */
-#if LV_USE_USER_DATA
 static inline void * lv_anim_get_user_data(lv_anim_t * a)
 {
     return a->user_data;
 }
-#endif
 
 /**
  * Delete an animation of a variable with a given animator function
