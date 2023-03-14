@@ -48,7 +48,10 @@ void _lv_sdl_mouse_handler(SDL_Event * event);
 void _lv_sdl_mousewheel_handler(SDL_Event * event);
 void _lv_sdl_keyboard_handler(SDL_Event * event);
 static void res_chg_event_cb(lv_event_t * e);
-static int tick_thread(void * ptr);
+
+#if !LV_TICK_CUSTOM
+    static int tick_thread(void * ptr);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -70,8 +73,9 @@ lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
         SDL_Init(SDL_INIT_VIDEO);
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
-
+#if !LV_TICK_CUSTOM
         SDL_CreateThread(tick_thread, "LVGL thread", NULL);
+#endif
         inited = true;
     }
 
@@ -299,6 +303,7 @@ static void res_chg_event_cb(lv_event_t * e)
     texture_resize(disp);
 }
 
+#if !LV_TICK_CUSTOM
 static int tick_thread(void * ptr)
 {
     LV_UNUSED(ptr);
@@ -313,5 +318,6 @@ static int tick_thread(void * ptr)
 
     return 0;
 }
+#endif
 
 #endif /*LV_USE_SDL*/
