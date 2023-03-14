@@ -65,9 +65,7 @@ typedef struct _lv_group_t {
                                                     targets are available in this direction (to allow edge feedback
                                                     like a sound or a scroll bounce) */
 
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
 
     uint8_t frozen : 1;         /**< 1: can't focus to new object*/
     uint8_t editing : 1;        /**< 1: Edit mode, 0: Navigate mode*/

@@ -55,9 +55,7 @@ typedef struct {
     lv_style_selector_t selector;
     lv_style_prop_t prop;
     lv_anim_path_cb_t path_cb;
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
 } _lv_obj_style_transition_dsc_t;
 
 /**********************

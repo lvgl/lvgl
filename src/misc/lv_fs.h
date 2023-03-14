@@ -83,9 +83,7 @@ typedef struct _lv_fs_drv_t {
     lv_fs_res_t (*dir_read_cb)(struct _lv_fs_drv_t * drv, void * rddir_p, char * fn);
     lv_fs_res_t (*dir_close_cb)(struct _lv_fs_drv_t * drv, void * rddir_p);
 
-#if LV_USE_USER_DATA
     void * user_data; /**< Custom file user data*/
-#endif
 } lv_fs_drv_t;
 
 typedef struct {

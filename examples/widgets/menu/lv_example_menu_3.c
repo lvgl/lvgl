@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_MENU && LV_USE_USER_DATA && LV_BUILD_EXAMPLES
+#if LV_USE_MENU && LV_BUILD_EXAMPLES
 
 void lv_example_menu_3(void)
 {

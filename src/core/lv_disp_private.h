@@ -125,9 +125,7 @@ typedef struct _lv_disp_t {
 
     void * driver_data; /**< Custom user data*/
 
-#if LV_USE_USER_DATA
     void * user_data; /**< Custom user data*/
-#endif
 
     lv_event_list_t event_list;
 

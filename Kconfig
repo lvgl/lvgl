@@ -441,10 +441,6 @@ menu "LVGL configuration"
 				bool "Enable float in built-in (v)snprintf functions"
 				depends on !LV_SPRINTF_CUSTOM
 
-			config LV_USE_USER_DATA
-				bool "Add a 'user_data' to drivers and objects."
-				default y
-
 			config LV_ENABLE_GC
 				bool "Enable garbage collector"
 

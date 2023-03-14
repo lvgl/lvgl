@@ -195,10 +195,7 @@ typedef struct _lv_draw_ctx_t  {
      */
     size_t layer_instance_size;
 
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
-
 } lv_draw_ctx_t;
 
 /**********************

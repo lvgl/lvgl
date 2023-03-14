@@ -61,10 +61,7 @@ lv_group_t * lv_group_create(void)
     group->editing        = 0;
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap           = 1;
-
-#if LV_USE_USER_DATA
-    group->user_data = NULL;
-#endif
+    group->user_data      = NULL;
 
     return group;
 }
