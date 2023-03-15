@@ -99,7 +99,7 @@ void lv_flex_init(void)
 {
     LV_LAYOUT_FLEX = lv_layout_register(flex_update, NULL);
 
-    LV_STYLE_FLEX_FLOW = lv_style_register_prop(LV_STYLE_PROP_FLAG_NONE);
+    LV_STYLE_FLEX_FLOW = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
     LV_STYLE_FLEX_MAIN_PLACE = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
     LV_STYLE_FLEX_CROSS_PLACE = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
     LV_STYLE_FLEX_TRACK_PLACE = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
