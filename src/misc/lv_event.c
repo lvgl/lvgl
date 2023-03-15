@@ -61,7 +61,7 @@ void _lv_event_pop(lv_event_t * e)
     event_head = e->prev;
 }
 
-lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess)
+lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess)
 {
     if(list == NULL) return LV_RES_OK;
 
@@ -69,7 +69,7 @@ lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess)
     for(i = 0; i < list->cnt; i++) {
         if(list->dsc[i].cb == NULL) continue;
         bool is_preprocessed = (list->dsc[i].filter & LV_EVENT_PREPROCESS) != 0;
-        if(is_preprocessed != prerpocess) continue;
+        if(is_preprocessed != preprocess) continue;
         lv_event_code_t filter = list->dsc[i].filter & ~LV_EVENT_PREPROCESS;
         if(filter == LV_EVENT_ALL || filter == e->code) {
             e->user_data = list->dsc[i].user_data;
