@@ -18,11 +18,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_event_dsc_t {
+struct _lv_event_dsc_t {
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
-} lv_event_dsc_t;
+};
 
 /**********************
  *  STATIC PROTOTYPES
