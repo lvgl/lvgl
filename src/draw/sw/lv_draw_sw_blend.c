@@ -317,8 +317,9 @@ static inline void set_px_argb(uint8_t * buf, lv_color_t color, lv_opa_t opa)
     lv_color_set_int(&bg_color, buf[0] + (buf[1] << 8));
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf[2]);
     if(buf[2] <= LV_OPA_MIN) return;
-    buf[0] = (*((uint16_t *) &res_color)) & 0xff;
-    buf[1] = (*((uint16_t *) &res_color)) >> 8;
+    uint16_t res_color16 = lv_color_to_int(res_color);
+    buf[0] = res_color16 & 0xff;
+    buf[1] = res_color16 >> 8;
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     bg_color = *((lv_color_t *)buf);
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf[3]);
@@ -363,8 +364,9 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
 #if LV_COLOR_DEPTH == 8
     buf[0] = lv_color_to_int(last_res_color);
 #elif LV_COLOR_DEPTH == 16
-    buf[0] = (*((uint16_t *) &last_res_color)) & 0xff;
-    buf[1] = (*((uint16_t *) &last_res_color)) >> 8;
+    uint16_t last_res_color16 = lv_color_to_int(last_res_color);
+    buf[0] = last_res_color16 & 0xff;
+    buf[1] = last_res_color16 >> 8;
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     buf[0] = last_res_color.blue;
     buf[1] = last_res_color.green;
