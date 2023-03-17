@@ -40,8 +40,6 @@
  *      DEFINES
  *********************/
 
-#define PXP_TEMP_BUF_SIZE LCD_WIDTH * LCD_HEIGHT * LCD_FB_BYTE_PER_PIXEL
-
 #if LV_COLOR_16_SWAP
     #error Color swap not implemented. Disable LV_COLOR_16_SWAP feature.
 #endif
@@ -50,10 +48,12 @@
     #define PXP_OUT_PIXEL_FORMAT kPXP_OutputPixelFormatRGB565
     #define PXP_AS_PIXEL_FORMAT kPXP_AsPixelFormatRGB565
     #define PXP_PS_PIXEL_FORMAT kPXP_PsPixelFormatRGB565
+    #define PXP_TEMP_BUF_SIZE LCD_WIDTH * LCD_HEIGHT * 2U
 #elif LV_COLOR_DEPTH == 32
     #define PXP_OUT_PIXEL_FORMAT kPXP_OutputPixelFormatARGB8888
     #define PXP_AS_PIXEL_FORMAT kPXP_AsPixelFormatARGB8888
     #define PXP_PS_PIXEL_FORMAT kPXP_PsPixelFormatRGB888
+    #define PXP_TEMP_BUF_SIZE LCD_WIDTH * LCD_HEIGHT * 4U
 #elif
     #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
 #endif
