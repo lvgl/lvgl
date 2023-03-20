@@ -9,8 +9,8 @@ static uint32_t active_index_2 = 0;
 static void radio_event_handler(lv_event_t * e)
 {
     uint32_t * active_id = lv_event_get_user_data(e);
-    lv_obj_t * cont = lv_event_get_target(e);
-    lv_obj_t * act_cb = lv_event_get_original_target(e);
+    lv_obj_t * cont = lv_event_get_current_target(e);
+    lv_obj_t * act_cb = lv_event_get_target(e);
     lv_obj_t * old_cb = lv_obj_get_child(cont, *active_id);
 
     /*Do nothing if the container was clicked*/

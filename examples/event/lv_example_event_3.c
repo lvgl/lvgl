@@ -4,10 +4,10 @@
 static void event_cb(lv_event_t * e)
 {
     /*The original target of the event. Can be the buttons or the container*/
-    lv_obj_t * target = lv_event_get_original_target(e);
+    lv_obj_t * target = lv_event_get_target(e);
 
     /*The current target is always the container as the event is added to it*/
-    lv_obj_t * cont = lv_event_get_target(e);
+    lv_obj_t * cont = lv_event_get_current_target(e);
 
     /*If container was clicked do nothing*/
     if(target == cont) return;

@@ -141,12 +141,12 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
     return true;
 }
 
-void * lv_event_get_target(lv_event_t * e)
+void * lv_event_get_current_target(lv_event_t * e)
 {
-    return e->target;
+    return e->current_target;
 }
 
-void * lv_event_get_original_target(lv_event_t * e)
+void * lv_event_get_target(lv_event_t * e)
 {
     return e->original_target;
 }
@@ -188,7 +188,7 @@ void _lv_event_mark_deleted(void * target)
     lv_event_t * e = event_head;
 
     while(e) {
-        if(e->original_target == target || e->target == target) e->deleted = 1;
+        if(e->original_target == target || e->current_target == target) e->deleted = 1;
         e = e->prev;
     }
 }

@@ -114,7 +114,7 @@ typedef struct {
 } lv_event_list_t;
 
 typedef struct _lv_event_t {
-    void * target;
+    void * current_target;
     void * original_target;
     lv_event_code_t code;
     void * user_data;
@@ -167,7 +167,7 @@ void * lv_event_get_target(lv_event_t * e);
  * @param e     pointer to the event descriptor
  * @return      pointer to the current target of the event_code
  */
-void * lv_event_get_original_target(lv_event_t * e);
+void * lv_event_get_current_target(lv_event_t * e);
 
 /**
  * Get the event code of an event

@@ -49,7 +49,7 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_event_t e;
-    e.target = obj;
+    e.current_target = obj;
     e.original_target = obj;
     e.code = event_code;
     e.user_data = NULL;
@@ -73,7 +73,7 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
 lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     const lv_obj_class_t * base;
-    if(class_p == NULL) base = ((lv_obj_t *)e->target)->class_p;
+    if(class_p == NULL) base = ((lv_obj_t *)e->current_target)->class_p;
     else base = class_p->base_class;
 
     /*Find a base in which call the ancestor's event handler_cb if set*/
@@ -124,14 +124,14 @@ bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
     return lv_event_remove(&obj->spec_attr->event_list, index);
 }
 
+lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
+{
+    return lv_event_get_current_target(e);
+}
+
 lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
 {
     return lv_event_get_target(e);
-}
-
-lv_obj_t * lv_event_get_original_target_obj(lv_event_t * e)
-{
-    return lv_event_get_original_target(e);
 }
 
 
@@ -297,7 +297,7 @@ static lv_res_t event_send_core(lv_event_t * e)
         if(e->deleted) return LV_RES_INV;
     }
 
-    lv_obj_t * target = e->target;
+    lv_obj_t * target = e->current_target;
     lv_res_t res = LV_RES_OK;
     lv_event_list_t * list = target->spec_attr ?  &target->spec_attr->event_list : NULL;
 
@@ -310,9 +310,9 @@ static lv_res_t event_send_core(lv_event_t * e)
     res = lv_event_send(list, e, false);
     if(res != LV_RES_OK) return res;
 
-    lv_obj_t * parent = lv_obj_get_parent(e->target);
+    lv_obj_t * parent = lv_obj_get_parent(e->current_target);
     if(parent && event_is_bubbled(e)) {
-        e->target = parent;
+        e->current_target = parent;
         res = event_send_core(e);
         if(res != LV_RES_OK) return res;
     }
@@ -335,7 +335,7 @@ static bool event_is_bubbled(lv_event_t * e)
     }
 
     /*Check other codes only if bubbling is enabled*/
-    if(lv_obj_has_flag(e->target, LV_OBJ_FLAG_EVENT_BUBBLE) == false) return false;
+    if(lv_obj_has_flag(e->current_target, LV_OBJ_FLAG_EVENT_BUBBLE) == false) return false;
 
     switch(e->code) {
         case LV_EVENT_HIT_TEST:

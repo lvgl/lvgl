@@ -34,7 +34,7 @@
  **********************/
 static void disp_init(void);
 
-static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
+static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_buf);
 
 /**********************
  *  STATIC VARIABLES
@@ -111,7 +111,7 @@ void disp_disable_update(void)
 /*Flush the content of the internal buffer the specific area on the display
  *You can use DMA or any hardware acceleration to do this operation in the background but
  *'lv_disp_flush_ready()' has to be called when finished.*/
-static void disp_flush(lv_disp_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+static void disp_flush(lv_disp_t * disp_drv, const lv_area_t * area, lv_color_t * color_buf)
 {
     if(disp_flush_enabled) {
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
@@ -122,7 +122,7 @@ static void disp_flush(lv_disp_t * disp_drv, const lv_area_t * area, lv_color_t 
             for(x = area->x1; x <= area->x2; x++) {
                 /*Put a pixel to the display. For example:*/
                 /*put_px(x, y, *color_p)*/
-                color_p++;
+                color_buf++;
             }
         }
     }

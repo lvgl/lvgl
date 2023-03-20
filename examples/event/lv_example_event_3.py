@@ -1,11 +1,11 @@
 def event_cb(e):
 
     # The original target of the event. Can be the buttons or the container
-    target = e.get_original_target_obj()
-    
+    target = e.get_target_obj()
+
     # The current target is always the container as the event is added to it
-    cont = e.get_target_obj()
-    
+    cont = e.get_current_target_obj()
+
     # If container was clicked do nothing
     if target == cont:
         return
