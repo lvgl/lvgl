@@ -88,6 +88,7 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
     disp->dpi              = LV_DPI_DEF;
     disp->color_chroma_key = LV_COLOR_CHROMA_KEY;
+    disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
 #if LV_USE_GPU_STM32_DMA2D
     lv_disp_set_layer(disp, lv_draw_stm32_dma2d_ctx_init, lv_draw_stm32_dma2d_ctx_deinit,
@@ -105,8 +106,6 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     lv_disp_set_layer(disp, lv_draw_sw_init_ctx, lv_draw_sw_deinit_ctx);
 #endif
 
-    disp->layer_head->color_format = LV_COLOR_FORMAT_NATIVE;
-    disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
     disp->inv_en_cnt = 1;
 

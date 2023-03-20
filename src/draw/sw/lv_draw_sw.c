@@ -68,6 +68,7 @@ lv_layer_t * lv_draw_sw_init_ctx(lv_disp_t * disp)
     lv_layer_t * layer = lv_malloc(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(layer);
     lv_memzero(layer, sizeof(lv_layer_t));
+    layer->color_format = disp->color_format;
     layer->buffer_copy = lv_draw_sw_buffer_copy;
     layer->buffer_convert = lv_draw_sw_buffer_convert;
     layer->buffer_clear = lv_draw_sw_buffer_clear;
