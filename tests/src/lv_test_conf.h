@@ -15,13 +15,14 @@ extern "C" {
 /***********************
  * PLATFORM CONFIGS
  ***********************/
+#include "lv_test_malloc.h"
 
 #ifdef LVGL_CI_USING_SYS_HEAP
 #define LV_USE_BUILTIN_MALLOC   0
 #define LV_USE_BUILTIN_MEMCPY   1
 #define LV_USE_BUILTIN_SNPRINTF 1
 #define LV_STDLIB_INCLUDE <stdlib.h>
-#define LV_MALLOC       malloc
+#define LV_MALLOC       lv_malloc_test_wrapper
 #define LV_REALLOC      realloc
 #define LV_FREE         free
 #define LV_MEMSET       memset
@@ -32,7 +33,7 @@ extern "C" {
 #define LV_USE_BUILTIN_MALLOC   1
 #define LV_USE_BUILTIN_MEMCPY   1
 #define LV_USE_BUILTIN_SNPRINTF 1
-#define LV_MALLOC       lv_malloc_builtin
+#define LV_MALLOC       lv_malloc_test_wrapper
 #define LV_REALLOC      lv_realloc_builtin
 #define LV_FREE         lv_free_builtin
 #define LV_MEMSET       lv_memset_builtin
