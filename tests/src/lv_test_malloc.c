@@ -1,6 +1,6 @@
 #include "lv_test_malloc.h"
 
-#ifdef LVGL_CI_USING_DEF_HEAP
+#ifndef LVGL_CI_USING_SYS_HEAP
     #include "../../src/misc/lv_malloc_builtin.h"
 #endif
 
