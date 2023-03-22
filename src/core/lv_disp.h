@@ -245,10 +245,10 @@ void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32
 /**
  * Set the flush callback whcih will be called to copy the rendered image to the display.
  * @param disp      pointer to a display
- * @param flush_cb  the flush callback
+ * @param flush_cb  the flush callback (`px_map` contains the rendered image as raw pixel map and it should be copied to `area` on the display)
  */
 void lv_disp_set_flush_cb(lv_disp_t * disp, void (*flush_cb)(struct _lv_disp_t * disp, const lv_area_t * area,
-                                                             lv_color_t * color_p));
+                                                             lv_color_t * px_map));
 /**
  * Set the color format of the display.
  * If set to other than `LV_COLOR_FORMAT_NATIVE` the draw_ctx's `buffer_convert` function will be used

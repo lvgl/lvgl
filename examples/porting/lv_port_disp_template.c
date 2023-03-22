@@ -34,7 +34,7 @@
  **********************/
 static void disp_init(void);
 
-static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_buf);
+static void disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * px_map);
 
 /**********************
  *  STATIC VARIABLES
@@ -108,10 +108,11 @@ void disp_disable_update(void)
     disp_flush_enabled = false;
 }
 
-/*Flush the content of the internal buffer the specific area on the display
+/*Flush the content of the internal buffer the specific area on the display.
+ *`px_map` contains the rendered image as raw pixel map and it should be copied to `area` on the display.
  *You can use DMA or any hardware acceleration to do this operation in the background but
- *'lv_disp_flush_ready()' has to be called when finished.*/
-static void disp_flush(lv_disp_t * disp_drv, const lv_area_t * area, lv_color_t * color_buf)
+ *'lv_disp_flush_ready()' has to be called when it's finished.*/
+static void disp_flush(lv_disp_t * disp_drv, const lv_area_t * area, lv_color_t * px_map)
 {
     if(disp_flush_enabled) {
         /*The most simple case (but also the slowest) to put all pixels to the screen one-by-one*/
@@ -121,8 +122,8 @@ static void disp_flush(lv_disp_t * disp_drv, const lv_area_t * area, lv_color_t 
         for(y = area->y1; y <= area->y2; y++) {
             for(x = area->x1; x <= area->x2; x++) {
                 /*Put a pixel to the display. For example:*/
-                /*put_px(x, y, *color_p)*/
-                color_buf++;
+                /*put_px(x, y, *px_map)*/
+                px_map++;
             }
         }
     }
