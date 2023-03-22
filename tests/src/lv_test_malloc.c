@@ -22,8 +22,7 @@ void * lv_malloc_test_wrapper(size_t size)
     else {
 #ifdef LVGL_CI_USING_SYS_HEAP
         return malloc(size);
-#endif
-#ifdef LVGL_CI_USING_DEF_HEAP
+#else // LVGL_CI_USING_DEF_HEAP and others
         return lv_malloc_builtin(size);
 #endif
     }
