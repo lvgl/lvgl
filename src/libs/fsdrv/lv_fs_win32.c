@@ -12,6 +12,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <limits.h>
 
 /*********************
  *      DEFINES

@@ -1,8 +1,4 @@
-#!//opt/bin/lv_micropython -i
 import utime as time
-import lvgl as lv
-import display_driver
-
 def set_value(indic, v):
     meter.set_indicator_value(indic, v)
 
@@ -12,6 +8,10 @@ def set_value(indic, v):
 meter = lv.meter(lv.scr_act())
 meter.center()
 meter.set_size(200, 200)
+
+#Add a scale first
+meter.set_scale_ticks(41, 2, 10, lv.palette_main(lv.PALETTE.GREY))
+meter.set_scale_major_ticks(8, 4, 15, lv.color_black(), 10)
 
 indic = lv.meter_indicator_t()
 

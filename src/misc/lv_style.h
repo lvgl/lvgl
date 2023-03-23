@@ -304,9 +304,7 @@ typedef uint8_t lv_style_res_t;
  */
 typedef struct {
     const lv_style_prop_t * props; /**< An array with the properties to animate.*/
-#if LV_USE_USER_DATA
     void * user_data;              /**< A custom user data that will be passed to the animation's user_data */
-#endif
     lv_anim_path_cb_t path_xcb;     /**< A path for the animation.*/
     uint32_t time;                 /**< Duration of the transition in [ms]*/
     uint32_t delay;                /**< Delay before the transition in [ms]*/

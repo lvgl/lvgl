@@ -3,7 +3,7 @@ def event_handler(e):
     code = e.get_code()
 
     if code == lv.EVENT.VALUE_CHANGED:
-        source = e.get_target_obj()
+        source = e.get_current_target_obj()
         date = lv.calendar_date_t()
         if source.get_pressed_date(date) == lv.RES.OK:
             calendar.set_today_date(date.year, date.month, date.day)

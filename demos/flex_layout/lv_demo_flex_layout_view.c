@@ -9,7 +9,7 @@
 
 #include "lv_demo_flex_layout_main.h"
 
-#if LV_USE_DEMO_FLEX_LAYOUT && LV_USE_USER_DATA
+#if LV_USE_DEMO_FLEX_LAYOUT
 
 /*********************
  *      DEFINES
@@ -101,7 +101,7 @@ void view_create(lv_obj_t * par, view_t * ui)
     ui->ctrl_pad.btn.add = btn_create(obj, "Add", lv_palette_main(LV_PALETTE_BLUE_GREY));
     ui->ctrl_pad.btn.remove = btn_create(obj, "Remove", lv_palette_main(LV_PALETTE_RED));
 
-    lv_event_send(ui->root, LV_EVENT_CLICKED, NULL); /*Make it active by default*/
+    lv_obj_send_event(ui->root, LV_EVENT_CLICKED, NULL); /*Make it active by default*/
 
     /* fade effect */
     lv_obj_fade_in(ui->root, 600, 0);

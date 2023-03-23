@@ -720,7 +720,7 @@ lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_
     lv_event_t e;
     lv_memzero(&e, sizeof(e));
     e.code = code;
-    e.target = disp;
+    e.current_target = disp;
     e.original_target = disp;
     e.param = user_data;
     lv_res_t res;
@@ -849,13 +849,7 @@ void lv_disp_set_user_data(lv_disp_t * disp, void * user_data)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) return;
-
-#if LV_USE_USER_DATA
     disp->user_data = user_data;
-#else
-    LV_UNUSED(user_data);
-    LV_LOG_WARN("LV_USE_USER_DATA is not enabled");
-#endif
 }
 
 void lv_disp_set_driver_data(lv_disp_t * disp, void * driver_data)
@@ -870,13 +864,7 @@ void * lv_disp_get_user_data(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) return NULL;
-
-#if LV_USE_USER_DATA
     return disp->user_data;
-#else
-    LV_LOG_WARN("LV_USE_USER_DATA is no enabled");
-    return NULL;
-#endif
 }
 
 void * lv_disp_get_driver_data(lv_disp_t * disp)

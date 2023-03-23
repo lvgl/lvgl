@@ -26,7 +26,7 @@ style.set_border_color(lv.palette_main(lv.PALETTE.BLUE))
 
 style.set_img_recolor(lv.palette_main(lv.PALETTE.BLUE))
 style.set_img_recolor_opa(lv.OPA._50)
-# style.set_transform_angle(300)
+style.set_transform_angle(300)
 
 # Create an object with the new style
 obj = lv.img(lv.scr_act())

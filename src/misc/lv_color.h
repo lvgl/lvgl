@@ -586,8 +586,8 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_MIX_ROUND_OFS == 0
     /*Source: https://stackoverflow.com/a/50012418/1999969*/
-    uint16_t c1_16 = *(uint16_t *)&c1;
-    uint16_t c2_16 = *(uint16_t *)&c2;
+    uint16_t c1_16 = lv_color_to_int(c1);
+    uint16_t c2_16 = lv_color_to_int(c2);
     mix = (uint32_t)((uint32_t)mix + 4) >> 3;
 
     /*0x7E0F81F = 0b00000111111000001111100000011111*/

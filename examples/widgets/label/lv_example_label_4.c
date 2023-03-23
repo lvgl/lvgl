@@ -32,11 +32,11 @@ static void add_mask_event_cb(lv_event_t * e)
 void lv_example_label_4(void)
 {
     /* Create the mask of a text by drawing it to a canvas*/
-    static lv_opa_t mask_map[MASK_WIDTH * MASK_HEIGHT];
+    static lv_color_t mask_map[MASK_WIDTH * MASK_HEIGHT];
 
     /*Create a "8 bit alpha" canvas and clear it*/
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, mask_map, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_L8);
+    lv_canvas_set_buffer(canvas, mask_map, MASK_WIDTH, MASK_HEIGHT, LV_COLOR_FORMAT_NATIVE);
     lv_canvas_fill_bg(canvas, lv_color_black(), LV_OPA_TRANSP);
 
     /*Draw a label to the canvas. The result "image" will be used as mask*/
@@ -48,6 +48,14 @@ void lv_example_label_4(void)
 
     /*The mask is reads the canvas is not required anymore*/
     lv_obj_del(canvas);
+
+    /*Convert the mask to A8*/
+    uint32_t i;
+    uint8_t * mask8 = (uint8_t *) mask_map;
+    lv_color_t * mask_c = mask_map;
+    for(i = 0; i < MASK_WIDTH * MASK_HEIGHT; i++) {
+        mask8[i] = lv_color_brightness(mask_c[i]);
+    }
 
     /* Create an object from where the text will be masked out.
      * Now it's a rectangle with a gradient but it could be an image too*/

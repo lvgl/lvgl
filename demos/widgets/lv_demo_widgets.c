@@ -1254,7 +1254,7 @@ static void calendar_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * ta = lv_event_get_user_data(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     if(code == LV_EVENT_VALUE_CHANGED) {
         lv_calendar_date_t d;
         lv_calendar_get_pressed_date(obj, &d);

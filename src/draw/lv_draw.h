@@ -143,9 +143,7 @@ typedef struct _lv_layer_t  {
     struct _lv_layer_t * next;
     bool all_tasks_added;
 
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
 } lv_layer_t;
 
 /**********************

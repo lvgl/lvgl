@@ -259,12 +259,7 @@ void lv_indev_set_read_cb(lv_indev_t * indev,  void (*read_cb)(struct _lv_indev_
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data)
 {
     if(indev == NULL) return;
-#if LV_USE_USER_DATA
     indev->user_data = user_data;
-#else
-    LV_UNUSED(user_data);
-    LV_LOG_WARN("LV_USE_USER_DATA is no enabled");
-#endif
 }
 
 void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data)
@@ -312,13 +307,7 @@ void lv_indev_set_disp(lv_indev_t * indev, lv_disp_t * disp)
 void * lv_indev_get_user_data(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
-
-#if LV_USE_USER_DATA
     return indev->user_data;
-#else
-    LV_LOG_WARN("LV_USE_USER_DATA is no enabled");
-    return NULL;
-#endif
 }
 
 void * lv_indev_get_driver_data(const lv_indev_t * indev)

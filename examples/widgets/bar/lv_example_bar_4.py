@@ -1,30 +1,20 @@
-#
-# get an icon
-#
-def get_icon(filename,xres,yres):
-    try:
-        sdl_filename = "../../assets/" + filename + "_" + str(xres) + "x" + str(yres) + "_argb8888.fnt"
-        print("file name: ", sdl_filename)
-        with open(sdl_filename,'rb') as f:
-            icon_data = f.read()
-    except:
-        print("Could not find image file: " + filename)
-        return None
+# Create an image from the png file
+try:
+    with open('../../assets/img_strip.png','rb') as f:
+        png_data = f.read()
+except:
+    print("Could not find img_strip.png")
+    sys.exit()
 
-    icon_dsc = lv.img_dsc_t(
-        {
-            "header": {"always_zero": 0, "w": xres, "h": yres, "cf": lv.COLOR_FORMAT.NATIVE_ALPHA},
-            "data": icon_data,
-            "data_size": len(icon_data),
-        }
-    )
-    return icon_dsc
+img_skew_strip_dsc = lv.img_dsc_t({
+  'data_size': len(png_data),
+  'data': png_data
+})
 
 #
 # Bar with stripe pattern and ranged value
 #
 
-img_skew_strip_dsc = get_icon("img_skew_strip",80,20)
 style_indic = lv.style_t()
 
 style_indic.init()

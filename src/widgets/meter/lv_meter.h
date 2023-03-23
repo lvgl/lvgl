@@ -163,7 +163,7 @@ void lv_meter_set_scale_range(lv_obj_t * obj, int32_t min, int32_t max, uint32_t
  * @param width         width of the line
  * @param color         color of the line
  * @param r_mod         the radius modifier (added to the scale's radius) to get the lines length
- * @return              the new indicator
+ * @return              the new indicator or NULL on allocation failure.
  */
 lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, uint16_t width,
                                                 lv_color_t color, int16_t r_mod);
@@ -174,7 +174,7 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, uint16_t width,
  * @param src           the image source of the indicator. path or pointer to ::lv_img_dsc_t
  * @param pivot_x       the X pivot point of the needle
  * @param pivot_y       the Y pivot point of the needle
- * @return              the new indicator
+ * @return              the new indicator or NULL on allocation failure.
  * @note                the needle image should point to the right, like -O----->
  */
 lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, const void * src,
@@ -186,7 +186,7 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, const void * src,
  * @param width         width of the arc
  * @param color         color of the arc
  * @param r_mod         the radius modifier (added to the scale's radius) to get the outer radius of the arc
- * @return              the new indicator
+ * @return              the new indicator or NULL on allocation failure.
  */
 lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, uint16_t width, lv_color_t color,
                                         int16_t r_mod);
@@ -199,7 +199,7 @@ lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, uint16_t width, lv_color
  * @param color_end     the end color
  * @param local         tell how to map start and end color. true: the indicator's start and end_value; false: the scale's min max value
  * @param width_mod     add this the affected tick's width
- * @return              the new indicator
+ * @return              the new indicator or NULL on allocation failure.
  */
 lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_color_t color_start,
                                                 lv_color_t color_end, bool local, int16_t width_mod);

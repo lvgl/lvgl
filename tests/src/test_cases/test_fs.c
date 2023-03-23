@@ -32,7 +32,7 @@ void test_read(void)
     char cur[512];
     getcwd(cur, 512);
     errno = 0;
-    void * a = fopen("src/test_files/readtest.txt", "rd");
+    void * a = fopen("src/test_files/readtest.txt", "r");
     printf("%s, %d, %p\n", cur, errno, a);
     fclose(a);
 
