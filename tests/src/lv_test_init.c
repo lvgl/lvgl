@@ -25,7 +25,7 @@ void lv_test_init(void)
 {
     lv_init();
     hal_init();
-    lv_malloc_test_init();
+    lv_test_malloc_init();
 }
 
 void lv_test_deinit(void)
