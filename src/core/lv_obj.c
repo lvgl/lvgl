@@ -438,7 +438,6 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
 
         obj->spec_attr->scroll_dir = LV_DIR_ALL;
         obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
-        obj->spec_attr->child_cnt = 0;
     }
 }
 
