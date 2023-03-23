@@ -4,9 +4,13 @@
 #include <stdlib.h>
 
 typedef void * (* lv_malloc_stub_cb)(size_t);
+typedef void * (* lv_realloc_stub_cb)(void * p, size_t new_size);
 
 void lv_test_malloc_init(void);
 void lv_test_malloc_set_cb(lv_malloc_stub_cb stub_malloc);
 void * lv_test_malloc(size_t s);
+
+void lv_test_realloc_set_cb(lv_realloc_stub_cb stub_realloc);
+void * lv_test_realloc(void * p, size_t new_size);
 
 #endif

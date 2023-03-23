@@ -23,7 +23,7 @@ extern "C" {
 #define LV_USE_BUILTIN_SNPRINTF 1
 #define LV_STDLIB_INCLUDE <stdlib.h>
 #define LV_MALLOC       lv_test_malloc
-#define LV_REALLOC      realloc
+#define LV_REALLOC      lv_test_realloc
 #define LV_FREE         free
 #define LV_MEMSET       memset
 #define LV_MEMCPY       memcpy
@@ -34,7 +34,7 @@ extern "C" {
 #define LV_USE_BUILTIN_MEMCPY   1
 #define LV_USE_BUILTIN_SNPRINTF 1
 #define LV_MALLOC       lv_test_malloc
-#define LV_REALLOC      lv_realloc_builtin
+#define LV_REALLOC      lv_test_realloc
 #define LV_FREE         lv_free_builtin
 #define LV_MEMSET       lv_memset_builtin
 #define LV_MEMCPY       lv_memcpy_builtin
