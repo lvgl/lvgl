@@ -179,7 +179,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
 
 /**
  * Join two areas into a third which involves the other two
- * @param res_p pointer to an area, the result will be stored here
+ * @param a_res_p pointer to an area, the result will be stored here
  * @param a1_p pointer to the first area
  * @param a2_p pointer to the second area
  */
@@ -233,6 +233,8 @@ bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b);
  * @param base an area where the other will be aligned
  * @param to_align the area to align
  * @param align `LV_ALIGN_...`
+ * @param ofs_x X offset
+ * @param ofs_y Y offset
  */
 void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, lv_coord_t ofs_x, lv_coord_t ofs_y);
 

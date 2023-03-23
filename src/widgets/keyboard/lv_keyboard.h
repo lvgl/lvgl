@@ -103,6 +103,8 @@ void lv_keyboard_set_popovers(lv_obj_t * kb, bool en);
  * @param mode keyboard map to alter 'lv_keyboard_mode_t'
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnmatrix_set_map()' for more info.
+ * @param ctrl_map
+
  */
 void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[],
                          const lv_btnmatrix_ctrl_t ctrl_map[]);
@@ -127,7 +129,7 @@ lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * kb);
 
 /**
  * Tell whether "popovers" mode is enabled or not.
- * @param kb pointer to a Keyboard object
+ * @param obj pointer to a Keyboard object
  * @return true: "popovers" mode is enabled; false: disabled
  */
 bool lv_btnmatrix_get_popovers(const lv_obj_t * obj);
@@ -172,8 +174,7 @@ static inline const char * lv_keyboard_get_btn_text(const lv_obj_t * obj, uint16
  * Default keyboard event to add characters to the Text area and change the map.
  * If a custom `event_cb` is added to the keyboard this function can be called from it to handle the
  * button clicks
- * @param kb pointer to a keyboard
- * @param event the triggering event
+ * @param e the triggering event
  */
 void lv_keyboard_def_event_cb(lv_event_t * e);
 

@@ -30,7 +30,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum lv_draw_sdl_composite_texture_id_t {
+typedef enum _lv_draw_sdl_composite_texture_id_t {
     LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0,
     LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1,
     LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0,
@@ -45,9 +45,11 @@ typedef enum lv_draw_sdl_composite_texture_id_t {
 /**
  * Begin drawing with mask. Render target will be switched to a temporary texture,
  * and drawing coordinates may get clipped or translated
+ * @param ctx      pointer to the current draw context
  * @param coords_in Original coordinates
  * @param clip_in Original clip area
  * @param extension Useful for shadows or outlines, can be NULL
+ * @param blend_mode blend mode
  * @param coords_out Translated coords
  * @param clip_out Translated clip area
  * @param apply_area Area of actual composited texture will be drawn

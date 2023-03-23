@@ -91,7 +91,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 /**
  * Calculate the integer exponents.
  * @param base
- * @param power
+ * @param exp
  * @return base raised to the power exponent
  */
 int64_t lv_pow(int64_t base, int8_t exp);

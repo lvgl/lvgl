@@ -89,7 +89,7 @@ lv_obj_t * lv_img_create(lv_obj_t * parent);
 /**
  * Set the image data to display on the object
  * @param obj       pointer to an image object
- * @param src_img   1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
+ * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
  *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
  */
@@ -171,7 +171,7 @@ const void * lv_img_get_src(lv_obj_t * obj);
 
 /**
  * Get the offset's x attribute of the image object.
- * @param img       pointer to an image
+ * @param obj       pointer to an image
  * @return          offset X value.
  */
 lv_coord_t lv_img_get_offset_x(lv_obj_t * obj);
@@ -192,7 +192,7 @@ uint16_t lv_img_get_angle(lv_obj_t * obj);
 
 /**
  * Get the pivot (rotation center) of the image.
- * @param img       pointer to an image object
+ * @param obj       pointer to an image object
  * @param pivot     store the rotation center here
  */
 void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot);

@@ -170,7 +170,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj);
 
 /**
  * Get the mode of the slider.
- * @param obj       pointer to a bar object
+ * @param slider       pointer to a bar object
  * @return          see ::lv_slider_mode_t
  */
 static inline lv_slider_mode_t lv_slider_get_mode(lv_obj_t * slider)

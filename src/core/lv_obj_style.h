@@ -29,8 +29,14 @@ extern "C" {
 struct _lv_obj_t;
 
 #ifndef LV_OBJ_H
+/// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
 typedef uint32_t lv_part_t;
 typedef uint16_t lv_state_t;
+/// @endcond
+
 #endif
 
 typedef enum {

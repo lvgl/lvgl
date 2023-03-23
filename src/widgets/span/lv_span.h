@@ -218,6 +218,8 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width);
 /**
  * get the text content height with width fixed.
  * @param obj pointer to a spangroup object.
+ * @param width the width of the span group.
+
  */
 lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width);
 

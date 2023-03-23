@@ -38,10 +38,16 @@ enum {
 };
 typedef uint8_t lv_menu_mode_root_back_btn_t;
 
-typedef struct lv_menu_load_page_event_data_t {
+typedef struct /// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
+lv_menu_load_page_event_data_t
+/// @endcond
+{
     lv_obj_t * menu;
     lv_obj_t * page;
-} lv_menu_load_page_event_data_t;
+} lv_menu_load_page_event_data_t ;
 
 typedef struct {
     lv_obj_t * page;
@@ -227,6 +233,7 @@ lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj);
 /**
  * Check if an obj is a root back btn
  * @param menu pointer to the menu
+ * @param obj pointer to the back button
  * @return true if it is a root back btn
  */
 bool lv_menu_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);

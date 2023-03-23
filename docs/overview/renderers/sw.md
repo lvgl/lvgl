@@ -1,4 +1,0 @@
-# Software renderer
-
-TODO
-

@@ -50,7 +50,7 @@ lv_mem_builtin_pool_t lv_mem_builtin_add_pool(void * mem, size_t bytes);
 
 /**
  * Remove the memory pool.
- * @param lv_mem_builtin_pool_t pointer to lv_mem_builtin_pool handle
+ * @param pool pointer to lv_mem_builtin_pool handle
  */
 void lv_mem_builtin_remove_pool(lv_mem_builtin_pool_t pool);
 

@@ -1,3 +1,0 @@
-# FreeRTOS
-
-TODO

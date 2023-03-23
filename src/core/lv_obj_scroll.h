@@ -186,8 +186,8 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end);
 /**
  * Scroll by a given amount of pixels
  * @param obj       pointer to an object to scroll
- * @param dx         pixels to scroll horizontally
- * @param dy         pixels to scroll vertically
+ * @param x         pixels to scroll horizontally
+ * @param y         pixels to scroll vertically
  * @param anim_en   LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  * @note            > 0 value means scroll right/bottom (show the more content on the right/bottom)
  * @note            e.g. dy = -20 means scroll down 20 px

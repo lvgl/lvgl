@@ -72,11 +72,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
 
 /**
  * Write a text
- * @param coords coordinates of the label
- * @param mask the label will be drawn only in this area
- * @param dsc pointer to draw descriptor
- * @param txt `\0` terminated text to write
- * @param hint pointer to a `lv_draw_label_hint_t` variable.
+ * @param draw_ctx      pointer to the current draw context
+ * @param dsc           pointer to draw descriptor
+ * @param coords        coordinates of the label
+ * @param txt           `\0` terminated text to write
+ * @param hint          pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the draw to speed up the drawing of very long texts (thousands of lines).
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,

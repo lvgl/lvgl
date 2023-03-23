@@ -80,6 +80,7 @@ void lv_animimg_start(lv_obj_t * obj);
 /**
  * Set the image animation duration time. unit:ms
  * @param img pointer to an animation image object
+ * @param duration the duration
  */
 void lv_animimg_set_duration(lv_obj_t * img, uint32_t duration);
 
