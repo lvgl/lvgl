@@ -844,7 +844,7 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     fg.green = LV_MIN(bg.green + fg.green, 63);
     fg.blue = LV_MIN(bg.blue + fg.blue, 31);
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
-    fg.red = LV_MIN(bg.red + fg.red, 32551);
+    fg.red = LV_MIN(bg.red + fg.red, 255);
     fg.green = LV_MIN(bg.green + fg.green, 255);
     fg.blue = LV_MIN(bg.blue + fg.blue, 255);
 #endif
