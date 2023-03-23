@@ -4,7 +4,7 @@ Fonts
 
 In LVGL fonts are collections of bitmaps and other information required
 to render images of individual letters (glyph). A font is stored in a
-:c:struct:`lv_font_t` variable and can be set in a style's *text_font* field.
+:cpp:type:`lv_font_t` variable and can be set in a style's *text_font* field.
 For example:
 
 .. code:: c
@@ -77,7 +77,7 @@ Special fonts
 -  :c:macro:`LV_FONT_UNSCII_16`: 16 px pixel perfect font with only ASCII characters
 
 The built-in fonts are **global variables** with names like
-:c:var:`lv_font_montserrat_16` for a 16 px height font. To use them in a
+:cpp:var:`lv_font_montserrat_16` for a 16 px height font. To use them in a
 style, just add a pointer to a font variable like shown above.
 
 The built-in fonts with *bpp = 4* contain the ASCII characters and use
@@ -135,13 +135,13 @@ The default base direction for screens can be set by
 :c:macro:`LV_BIDI_BASE_DIR_DEF` in *lv_conf.h* and other objects inherit the
 base direction from their parent.
 
-To set an object's base direction use :c:expr:`lv_obj_set_base_dir(obj, base_dir)`. 
+To set an object's base direction use :cpp:expr:`lv_obj_set_base_dir(obj, base_dir)`.
 The possible base directions are: 
 
-- :c:enumerator:`LV_BIDI_DIR_LTR`: Left to Right base direction 
-- :c:enumerator:`LV_BIDI_DIR_RTL`: Right to Left base direction 
-- :c:enumerator:`LV_BIDI_DIR_AUTO`: Auto detect base direction 
-- :c:enumerator:`LV_BIDI_DIR_INHERIT`: Inherit base direction from the parent (or a default value for non-screen objects)
+- :cpp:enumerator:`LV_BIDI_DIR_LTR`: Left to Right base direction
+- :cpp:enumerator:`LV_BIDI_DIR_RTL`: Right to Left base direction
+- :cpp:enumerator:`LV_BIDI_DIR_AUTO`: Auto detect base direction
+- :cpp:enumerator:`LV_BIDI_DIR_INHERIT`: Inherit base direction from the parent (or a default value for non-screen objects)
 
 This list summarizes the effect of RTL base direction on objects: 
 
@@ -167,8 +167,8 @@ LVGL supports these rules if :c:macro:`LV_USE_ARABIC_PERSIAN_CHARS` is enabled.
 However, there are some limitations: 
 
 - Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature. 
-- Static text (i.e. const) is not processed. E.g. texts set by :c:func:`lv_label_set_text()` will be "Arabic processed" but :c:func:`lv_lable_set_text_static()` won't. 
-- Text get functions (e.g. :c:func:`lv_label_get_text()`) will return the processed text.
+- Static text (i.e. const) is not processed. E.g. texts set by :cpp:func:`lv_label_set_text()` will be "Arabic processed" but :cpp:func:`lv_lable_set_text_static()` won't.
+- Text get functions (e.g. :cpp:func:`lv_label_get_text()`) will return the processed text.
 
 Subpixel rendering
 ------------------
@@ -227,7 +227,7 @@ There are several ways to add a new font to your project:
    ``lvgl/scripts/built_in_font`` folder. (This requires Python and
    ``lv_font_conv`` to be installed)
 
-To declare a font in a file, use :c:expr:`LV_FONT_DECLARE(my_font_name)`.
+To declare a font in a file, use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 
 To make fonts globally available (like the built-in fonts), add them to
 :c:macro:`LV_FONT_CUSTOM_DECLARE` in *lv_conf.h*.
@@ -249,7 +249,7 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 5. Convert the font and copy the generated source code to your project.
    Make sure to compile the .c file of your font.
 6. Declare the font using ``extern lv_font_t my_font_name;`` or simply
-   use :c:expr:`LV_FONT_DECLARE(my_font_name)`.
+   use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 
 **Using the symbol** 
 
@@ -257,16 +257,16 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
    `this site <http://www.ltg.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex>`__.
    For ``0xf287`` the *Hex UTF-8 bytes* are ``EF 8A 87``.
 2. Create a ``define`` string from the UTF8 values: ``#define MY_USB_SYMBOL "\xEF\x8A\x87"``
-3. Create a label and set the text. Eg. :c:expr:`lv_label_set_text(label, MY_USB_SYMBOL)`
+3. Create a label and set the text. Eg. :cpp:expr:`lv_label_set_text(label, MY_USB_SYMBOL)`
 
-:note: :c:expr:`lv_label_set_text(label, MY_USB_SYMBOL)` searches for this
+:note: :cpp:expr:`lv_label_set_text(label, MY_USB_SYMBOL)` searches for this
        symbol in the font defined in ``style.text.font`` properties. To use the
        symbol you may need to change it. Eg ``style.text.font = my_font_name``
 
 Load a font at run-time
 ***********************
 
-:c:func:`lv_font_load` can be used to load a font from a file. The font needs
+:cpp:func:`lv_font_load` can be used to load a font from a file. The font needs
 to have a special binary format. (Not TTF or WOFF). Use
 `lv_font_conv <https://github.com/lvgl/lv_font_conv/>`__ with the
 ``--format bin`` option to generate an LVGL compatible font file.
@@ -298,7 +298,7 @@ the font's bitmap and read them when the library needs them.
 A ready to use FreeType can be found in
 `lv_freetype <https://github.com/lvgl/lv_lib_freetype>`__ repository.
 
-To do this, a custom :c:struct:`lv_font_t` variable needs to be created:
+To do this, a custom :cpp:type:`lv_font_t` variable needs to be created:
 
 .. code:: c
 
@@ -349,7 +349,7 @@ To do this, a custom :c:struct:`lv_font_t` variable needs to be created:
 Use font fallback
 *****************
 
-You can specify ``fallback`` in :c:struct:`lv_font_t` to provide fallback to the
+You can specify ``fallback`` in :cpp:type:`lv_font_t` to provide fallback to the
 font. When the font fails to find glyph to a letter, it will try to let
 font from ``fallback`` to handle.
 
@@ -371,17 +371,8 @@ API
 
 .. raw:: html
 
-    <div include-html="font\lv_font.html"></div>
     <div include-html="font\lv_font_fmt_txt.html"></div>
-    <div include-html="font\lv_font_loader.html"></div>
-    <script>includeHTML();</script>
-
-.. Autogenerated
-
-.. raw:: html
-
-    <div include-html="font\lv_font_fmt_txt.html"></div>
-    <div include-html="font\lv_font_loader.html"></div>
     <div include-html="font\lv_font.html"></div>
+    <div include-html="font\lv_font_loader.html"></div>
     <script>includeHTML();</script>
 

@@ -43,16 +43,16 @@ Change order
 
 There are four explicit ways to bring an object to the foreground:
 
-- Use :c:expr:`lv_obj_move_foreground(obj)` to bring an object to the foreground.
-  Similarly, use :c:expr:`lv_obj_move_background(obj)` to move it to the background.
-- Use :c:expr:`lv_obj_move_to_index(obj, idx)` to move an object to a given index in the order of children.
+- Use :cpp:expr:`lv_obj_move_foreground(obj)` to bring an object to the foreground.
+  Similarly, use :cpp:expr:`lv_obj_move_background(obj)` to move it to the background.
+- Use :cpp:expr:`lv_obj_move_to_index(obj, idx)` to move an object to a given index in the order of children.
 
   - ``0``: background
   - ``child_num - 1``: foreground
-  - ``< 0``: count from the top, to move forward (up): :c:expr:`lv_obj_move_to_index(obj, lv_obj_get_index(obj) - 1)`
+  - ``< 0``: count from the top, to move forward (up): :cpp:expr:`lv_obj_move_to_index(obj, lv_obj_get_index(obj) - 1)`
 
-- Use :c:expr:`lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
-- When :c:expr:`lv_obj_set_parent(obj, new_parent)` is used, ``obj`` will be on the foreground of the ``new_parent``.
+- Use :cpp:expr:`lv_obj_swap(obj1, obj2)` to swap the relative layer position of two objects.
+- When :cpp:expr:`lv_obj_set_parent(obj, new_parent)` is used, ``obj`` will be on the foreground of the ``new_parent``.
 
 Top and sys layers
 ******************
@@ -60,7 +60,7 @@ Top and sys layers
 LVGL uses two special layers named ``layer_top`` and ``layer_sys``. Both
 are visible and common on all screens of a display. **They are not,
 however, shared among multiple physical displays.** The ``layer_top`` is
-always on top of the default screen (:c:func:`lv_scr_act()`), and
+always on top of the default screen (:cpp:func:`lv_scr_act()`), and
 ``layer_sys`` is on top of ``layer_top``.
 
 The ``layer_top`` can be used by the user to create some content visible

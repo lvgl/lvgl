@@ -15,7 +15,7 @@ correct format in the drivers ``flush_cb``.
 
 Creating more displays is easy: just initialize more display buffers and
 register another driver for every display. When you create the UI, use
-:c:expr:`lv_disp_set_default(disp)` to tell the library on which display to
+:cpp:expr:`lv_disp_set_default(disp)` to tell the library on which display to
 create objects.
 
 Why would you want multi-display support? Here are some examples:
@@ -34,11 +34,11 @@ Therefore, the whole concept of multi-display handling is completely
 hidden if you register only one display. By default, the last created
 (and only) display is used.
 
-:c:expr:`lv_scr_act()`, :c:expr:`lv_scr_load(scr)`, :c:expr:`lv_layer_top()`,
-:c:expr:`lv_layer_sys()`, :c:macro:`LV_HOR_RES` and :c:macro:`LV_VER_RES` are always applied
+:cpp:func:`lv_scr_act`, :cpp:func:`lv_scr_load`, :cpp:func:`lv_layer_top`,
+:cpp:func:`lv_layer_sys`, :c:macro:`LV_HOR_RES` and :c:macro:`LV_VER_RES` are always applied
 on the most recently created (default) display. If you pass ``NULL`` as
 ``disp`` parameter to display related functions the default display will
-usually be used. E.g. :c:expr:`lv_disp_trig_activity(NULL)` will trigger a
+usually be used. E.g. :cpp:expr:`lv_disp_trig_activity(NULL)` will trigger a
 user activity on the default display. (See below in `Inactivity <#Inactivity>`__).
 
 Mirror display
@@ -73,7 +73,7 @@ Be sure not to confuse displays and screens:
 Screens can be considered the highest level containers which have no
 parent. A screen’s size is always equal to its display and their origin
 is (0;0). Therefore, a screen’s coordinates can’t be changed,
-i.e. :c:expr:`lv_obj_set_pos()`, :c:expr:`lv_obj_set_size()` or similar functions
+i.e. :cpp:expr:`lv_obj_set_pos()`, :cpp:expr:`lv_obj_set_size()` or similar functions
 can’t be used on screens.
 
 A screen can be created from any object type but the two most typical
@@ -81,26 +81,26 @@ types are `Base object </widgets/obj>`__ and `Image </widgets/img>`__
 (to create a wallpaper).
 
 To create a screen, use
-:c:expr:`lv_obj_t * scr = lv_<type>_create(NULL, copy)`. ``copy`` can be an
+``lv_obj_t * scr = lv_<type>_create(NULL, copy)``. ``copy`` can be an
 existing screen copied into the new screen.
 
-To load a screen, use :c:expr:`lv_scr_load(scr)`. To get the active screen,
-use :c:expr:`lv_scr_act()`. These functions work on the default display. If
+To load a screen, use :cpp:expr:`lv_scr_load(scr)`. To get the active screen,
+use :cpp:expr:`lv_scr_act()`. These functions work on the default display. If
 you want to specify which display to work on, use
-:c:expr:`lv_disp_get_scr_act(disp)` and :c:expr:`lv_disp_load_scr(disp, scr)`. A
+:cpp:expr:`lv_disp_get_scr_act(disp)` and :cpp:expr:`lv_disp_load_scr(disp, scr)`. A
 screen can be loaded with animations too. Read more
 `here <object.html#load-screens>`__.
 
-Screens can be deleted with :c:expr:`lv_obj_del(scr)`, but ensure that you do
+Screens can be deleted with :cpp:expr:`lv_obj_del(scr)`, but ensure that you do
 not delete the currently loaded screen.
 
 Transparent screens
 -------------------
 
-Usually, the opacity of the screen is :c:macro:`LV_OPA_COVER` to provide a
+Usually, the opacity of the screen is :cpp:enumerator:`LV_OPA_COVER` to provide a
 solid background for its children. If this is not the case (opacity <
 100%) the display’s ``bottom_layer`` be visible. If the bottom layer’s
-opacity is also not :c:macro:`LV_OPA_COVER` LVGL has no solid background to
+opacity is also not :cpp:enumerator:`LV_OPA_COVER` LVGL has no solid background to
 draw.
 
 This configuration (transparent screen and display) could be used to
@@ -114,13 +114,13 @@ In summary, to enable transparent screens and displays for OSD menu-like
 UIs:
 
 - Set the screen’s ``bg_opa`` to transparent:
-  :c:expr:`lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
 - Set the bottom layer’s ``bg_opa`` to transparent:
-  :c:expr:`lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
 - Set the screen’s bg_opa to 0:
-  :c:expr:`lv_obj_set_style_local_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
 - Set a color format with alpha channel. E.g.
-  :c:expr:`lv_disp_set_color_format(disp, LV_COLOR_FORMAT_NATIVE_ALPHA)`
+  :cpp:expr:`lv_disp_set_color_format(disp, LV_COLOR_FORMAT_NATIVE_ALPHA)`
 
 Features of displays
 ********************
@@ -131,12 +131,12 @@ Inactivity
 A user’s inactivity time is measured on each display. Every use of an
 `Input device </overview/indev>`__ (if `associated with the display </porting/indev#other-features>`__) counts as an activity. To
 get time elapsed since the last activity, use
-:c:expr:`lv_disp_get_inactive_time(disp)`. If ``NULL`` is passed, the lowest
+:cpp:expr:`lv_disp_get_inactive_time(disp)`. If ``NULL`` is passed, the lowest
 inactivity time among all displays will be returned (**NULL isn’t just
 the default display**).
 
 You can manually trigger an activity using
-:c:expr:`lv_disp_trig_activity(disp)`. If ``disp`` is ``NULL``, the default
+:cpp:expr:`lv_disp_trig_activity(disp)`. If ``disp`` is ``NULL``, the default
 screen will be used (**and not all displays**).
 
 Background
@@ -147,16 +147,16 @@ opacity properties. They become visible when the current screen is
 transparent or not positioned to cover the whole display.
 
 The background color is a simple color to fill the display. It can be
-adjusted with :c:expr:`lv_disp_set_bg_color(disp, color)`;
+adjusted with :cpp:expr:`lv_obj_set_style_bg_color(obj, color)`;
 
 The display background image is a path to a file or a pointer to an
-:c:struct:`lv_img_dsc_t` variable (converted image data) to be used as
-wallpaper. It can be set with :c:expr:`lv_disp_set_bg_image(disp, &my_img)`;
+:cpp:struct:`lv_img_dsc_t` variable (converted image data) to be used as
+wallpaper. It can be set with :cpp:expr:`lv_obj_set_style_bg_img_src(obj, &my_img)`;
 If a background image is configured the background won’t be filled with
 ``bg_color``.
 
 The opacity of the background color or image can be adjusted with
-:c:expr:`lv_disp_set_bg_opa(disp, opa)`.
+:cpp:expr:`lv_obj_set_style_bg_opa(obj, opa)`.
 
 The ``disp`` parameter of these functions can be ``NULL`` to select the
 default display.
@@ -168,17 +168,8 @@ API
 
 .. raw:: html
 
-    <div include-html="core\lv_refr.html"></div>
     <div include-html="misc\lv_gc.html"></div>
     <div include-html="core\lv_disp.html"></div>
-    <script>includeHTML();</script>
-
-.. Autogenerated
-
-.. raw:: html
-
     <div include-html="core\lv_refr.html"></div>
-    <div include-html="misc\lv_gc.html"></div>
-    <div include-html="core\lv_disp.html"></div>
     <script>includeHTML();</script>
 

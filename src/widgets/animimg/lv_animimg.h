@@ -45,8 +45,15 @@ typedef struct {
 /*Image parts*/
 enum {
     LV_ANIM_IMG_PART_MAIN,
-};
+} _lv_animimg_part_t;
+
+
+#ifdef DOXYGEN
+typedef _lv_animimg_part_t lv_animimg_part_t;
+#else
 typedef uint8_t lv_animimg_part_t;
+#endif
+
 
 /**********************
  * GLOBAL PROTOTYPES

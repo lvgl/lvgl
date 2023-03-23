@@ -13,13 +13,13 @@ The *animator* functions have the following prototype:
    void func(void * var, lv_anim_var_t value);
 
 This prototype is compatible with the majority of the property *set*
-functions in LVGL. For example :c:expr:`lv_obj_set_x(obj, value)` or
-:c:expr:`lv_obj_set_width(obj, value)`
+functions in LVGL. For example :cpp:expr:`lv_obj_set_x(obj, value)` or
+:cpp:expr:`lv_obj_set_width(obj, value)`
 
 Create an animation
 *******************
 
-To create an animation an :c:struct:`lv_anim_t` variable has to be initialized
+To create an animation an :cpp:type:`lv_anim_t` variable has to be initialized
 and configured with ``lv_anim_set_...()`` functions.
 
 .. code:: c
@@ -85,8 +85,8 @@ and configured with ``lv_anim_set_...()`` functions.
 
 You can apply multiple different animations on the same variable at the
 same time. For example, animate the x and y coordinates with
-:c:func:`lv_obj_set_x` and :c:func:`lv_obj_set_y`. However, only one animation can
-exist with a given variable and function pair and :c:expr:`lv_anim_start()`
+:cpp:func:`lv_obj_set_x` and :cpp:func:`lv_obj_set_y`. However, only one animation can
+exist with a given variable and function pair and :cpp:func:`lv_anim_start`
 will remove any existing animations for such a pair.
 
 Animation path
@@ -98,13 +98,13 @@ with fixed steps. A *path* is a function which calculates the next value
 to set based on the current state of the animation. Currently, there are
 the following built-in path functions:
 
--  :c:func:`lv_anim_path_linear`: linear animation
--  :c:func:`lv_anim_path_step`: change in one step at the end
--  :c:func:`lv_anim_path_ease_in`: slow at the beginning
--  :c:func:`lv_anim_path_ease_out`: slow at the end
--  :c:func:`lv_anim_path_ease_in_out`: slow at the beginning and end
--  :c:func:`lv_anim_path_overshoot`: overshoot the end value
--  :c:func:`lv_anim_path_bounce`: bounce back a little from the end value (like
+-  :cpp:func:`lv_anim_path_linear`: linear animation
+-  :cpp:func:`lv_anim_path_step`: change in one step at the end
+-  :cpp:func:`lv_anim_path_ease_in`: slow at the beginning
+-  :cpp:func:`lv_anim_path_ease_out`: slow at the end
+-  :cpp:func:`lv_anim_path_ease_in_out`: slow at the beginning and end
+-  :cpp:func:`lv_anim_path_overshoot`: overshoot the end value
+-  :cpp:func:`lv_anim_path_bounce`: bounce back a little from the end value (like
    hitting a wall)
 
 Speed vs time
@@ -113,17 +113,17 @@ Speed vs time
 By default, you set the animation time directly. But in some cases,
 setting the animation speed is more practical.
 
-The :c:expr:`lv_anim_speed_to_time(speed, start, end)` function calculates the
+The :cpp:expr:`lv_anim_speed_to_time(speed, start, end)` function calculates the
 required time in milliseconds to reach the end value from a start value
 with the given speed. The speed is interpreted in *unit/sec* dimension.
-For example, :c:expr:`lv_anim_speed_to_time(20,0,100)` will yield 5000
-milliseconds. For example, in the case of :c:func:`lv_obj_set_x` *unit* is
+For example, :cpp:expr:`lv_anim_speed_to_time(20, 0, 100)` will yield 5000
+milliseconds. For example, in the case of :cpp:func:`lv_obj_set_x` *unit* is
 pixels so *20* means *20 px/sec* speed.
 
 Delete animations
 *****************
 
-You can delete an animation with :c:expr:`lv_anim_del(var, func)` if you
+You can delete an animation with :cpp:expr:`lv_anim_del(var, func)` if you
 provide the animated variable and its animator function.
 
 Timeline
@@ -132,34 +132,34 @@ Timeline
 A timeline is a collection of multiple animations which makes it easy to
 create complex composite animations.
 
-Firstly, create an animation element but don’t call :c:expr:`lv_anim_start()`.
+Firstly, create an animation element but don’t call :cpp:func:`lv_anim_start`.
 
 Secondly, create an animation timeline object by calling
-:c:expr:`lv_anim_timeline_create()`.
+:cpp:func:`lv_anim_timeline_create`.
 
 Thirdly, add animation elements to the animation timeline by calling
-:c:expr:`lv_anim_timeline_add(at, start_time, &a)`. ``start_time`` is the
+:cpp:expr:`lv_anim_timeline_add(at, start_time, &a)`. ``start_time`` is the
 start time of the animation on the timeline. Note that ``start_time``
 will override the value of ``delay``.
 
-Finally, call :c:expr:`lv_anim_timeline_start(at)` to start the animation
+Finally, call :cpp:expr:`lv_anim_timeline_start(at)` to start the animation
 timeline.
 
 It supports forward and backward playback of the entire animation group,
-using :c:expr:`lv_anim_timeline_set_reverse(at, reverse)`.
+using :cpp:expr:`lv_anim_timeline_set_reverse(at, reverse)`.
 
-Call :c:expr:`lv_anim_timeline_stop(at)` to stop the animation timeline.
+Call :cpp:expr:`lv_anim_timeline_stop(at)` to stop the animation timeline.
 
-Call :c:expr:`lv_anim_timeline_set_progress(at, progress)` function to set the
+Call :cpp:expr:`lv_anim_timeline_set_progress(at, progress)` function to set the
 state of the object corresponding to the progress of the timeline.
 
-Call :c:expr:`lv_anim_timeline_get_playtime(at)` function to get the total
+Call :cpp:expr:`lv_anim_timeline_get_playtime(at)` function to get the total
 duration of the entire animation timeline.
 
-Call :c:expr:`lv_anim_timeline_get_reverse(at)` function to get whether to
+Call :cpp:expr:`lv_anim_timeline_get_reverse(at)` function to get whether to
 reverse the animation timeline.
 
-Call :c:expr:`lv_anim_timeline_del(at)` function to delete the animation
+Call :cpp:expr:`lv_anim_timeline_del(at)` function to delete the animation
 timeline.
 
 .. image:: /misc/anim-timeline.png
@@ -177,16 +177,7 @@ API
 .. raw:: html
 
     <div include-html="misc\lv_gc.html"></div>
-    <div include-html="misc\lv_anim.html"></div>
     <div include-html="misc\lv_anim_timeline.html"></div>
-    <script>includeHTML();</script>
-
-.. Autogenerated
-
-.. raw:: html
-
-    <div include-html="misc\lv_anim_timeline.html"></div>
-    <div include-html="misc\lv_gc.html"></div>
     <div include-html="misc\lv_anim.html"></div>
     <script>includeHTML();</script>
 

@@ -41,8 +41,13 @@ enum {
     LV_CHART_TYPE_LINE,     /**< Connect the points with lines*/
     LV_CHART_TYPE_BAR,      /**< Draw columns*/
     LV_CHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
-};
+} _lv_chart_type_t;
+
+#ifdef DOXYGEN
+typedef _lv_chart_type_t lv_chart_type_t;
+#else
 typedef uint8_t lv_chart_type_t;
+#endif
 
 /**
  * Chart update mode for `lv_chart_set_next`
@@ -50,8 +55,13 @@ typedef uint8_t lv_chart_type_t;
 enum {
     LV_CHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one the right*/
     LV_CHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
-};
+} _lv_chart_update_mode_t;
+
+#ifdef DOXYGEN
+typedef _lv_chart_update_mode_t lv_chart_update_mode_t;
+#else
 typedef uint8_t lv_chart_update_mode_t;
+#endif
 
 /**
  * Enumeration of the axis'
@@ -62,8 +72,14 @@ enum {
     LV_CHART_AXIS_PRIMARY_X     = 0x02,
     LV_CHART_AXIS_SECONDARY_X   = 0x04,
     _LV_CHART_AXIS_LAST
-};
+} _lv_chart_axis_t;
+
+#ifdef DOXYGEN
+typedef _lv_chart_axis_t lv_chart_axis_t;
+#else
 typedef uint8_t lv_chart_axis_t;
+#endif
+
 
 /**
  * Descriptor a chart series

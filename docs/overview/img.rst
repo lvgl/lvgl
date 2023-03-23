@@ -17,7 +17,7 @@ Variables
 ---------
 
 Images stored internally in a variable are composed mainly of an
-:c:struct:`lv_img_dsc_t` structure with the following fields: 
+:cpp:struct:`lv_img_dsc_t` structure with the following fields:
 
 - **header**:
 
@@ -53,19 +53,19 @@ Color formats
 
 Various built-in color formats are supported: 
 
-- :c:enumerator:`LV_IMG_CF_TRUE_COLOR`: Simply stores the RGB colors (in whatever color depth LVGL is configured for). 
-- :c:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`: Like :c:enumerator:`LV_IMG_CF_TRUE_COLOR` but it also adds an alpha (transparency) byte for every pixel. 
-- :c:enumerator:`LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED`: Like :c:enumerator:`LV_IMG_CF_TRUE_COLOR` but if a pixel has the 
-  :c:macro:`LV_COLOR_TRANSP` color (set in *lv_conf.h*) it will be transparent. 
-- :c:enumerator:`LV_IMG_CF_INDEXED_1BIT`, :c:enumerator:`LV_IMG_CF_INDEXED_2BIT`, :c:enumerator:`LV_IMG_CF_INDEXED_4BIT`, :c:enumerator:`LV_IMG_CF_INDEXED_8BIT`:
+- :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR`: Simply stores the RGB colors (in whatever color depth LVGL is configured for).
+- :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`: Like :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR` but it also adds an alpha (transparency) byte for every pixel.
+- :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED`: Like :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR` but if a pixel has the
+  :c:macro:`LV_COLOR_TRANSP` color (set in *lv_conf.h*) it will be transparent.
+- :cpp:enumerator:`LV_IMG_CF_INDEXED_1BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_2BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_4BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_8BIT`:
   Uses a palette with 2, 4, 16 or 256 colors and stores each pixel in 1, 2, 4 or 8 bits.
-- :c:enumerator:`LV_IMG_CF_ALPHA_1BIT`, :c:enumerator:`LV_IMG_CF_ALPHA_2BIT`, :c:enumerator:`LV_IMG_CF_ALPHA_4BIT`, :c:enumerator:`LV_IMG_CF_ALPHA_8BIT`:
+- :cpp:enumerator:`LV_IMG_CF_ALPHA_1BIT`, :cpp:enumerator:`LV_IMG_CF_ALPHA_2BIT`, :cpp:enumerator:`LV_IMG_CF_ALPHA_4BIT`, :cpp:enumerator:`LV_IMG_CF_ALPHA_8BIT`:
   **Only stores the Alpha value with 1, 2, 4 or 8 bits.** The pixels take the color of ``style.img_recolor`` and
   the set opacity. The source image has to be an alpha channel. This is
   ideal for bitmaps similar to fonts where the whole image is one color
   that can be altered.
 
-The bytes of :c:enumerator:`LV_IMG_CF_TRUE_COLOR` images are stored in the following order.
+The bytes of :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR` images are stored in the following order.
 
 - 32-bit color depth:
     - **Byte 0**: Blue
@@ -75,18 +75,18 @@ The bytes of :c:enumerator:`LV_IMG_CF_TRUE_COLOR` images are stored in the follo
 - 16-bit color depth:
     - **Byte 0**: Green 3 lower bit, Blue 5 bit
     - **Byte 1**: Red 5 bit, Green 3 higher bit
-    - **Byte 2**: Alpha byte (only with :c:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`)
+    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`)
 - 8-bit color depth:
     - **Byte 0**: Red 3 bit, Green 3 bit, Blue 2 bit
-    - **Byte 2**: Alpha byte (only with :c:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`)
+    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
 with one of the built-in color formats and an external `Image decoder <#image-decoder>`__ 
 needs to be used to decode the image. 
 
-- :c:enumerator:`LV_IMG_CF_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
-- :c:enumerator:`LV_IMG_CF_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel. 
-- :c:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED`: Indicates that an image is chroma-keyed as described in :c:enumerator:`LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED` above.
+- :cpp:enumerator:`LV_IMG_CF_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
+- :cpp:enumerator:`LV_IMG_CF_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel.
+- :cpp:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED`: Indicates that an image is chroma-keyed as described in :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED` above.
 
 Add and use images
 ******************
@@ -146,8 +146,8 @@ variable to display it using LVGL. For example:
        .data = my_img_data,
    };
 
-If the color format is :c:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA` you can set
-``data_size`` like ``80 * 60 *`` :c:enumerator:`LV_IMG_PX_SIZE_ALPHA_BYTE`.
+If the color format is :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA` you can set
+``data_size`` like ``80 * 60 *`` :cpp:enumerator:`LV_IMG_PX_SIZE_ALPHA_BYTE`.
 
 Another (possibly simpler) option to create and display an image at
 run-time is to use the `Canvas </widgets/canvas>`__ object.
@@ -169,7 +169,7 @@ The simplest way to use an image in LVGL is to display it with an
    lv_img_set_src(icon, "S:my_icon.bin");
 
 If the image was converted with the online converter, you should use
-:c:expr:`LV_IMG_DECLARE(my_icon_dsc)` to declare the image in the file where
+:cpp:expr:`LV_IMG_DECLARE(my_icon_dsc)` to declare the image in the file where
 you want to use it.
 
 Image decoder
@@ -210,8 +210,8 @@ binary file you uploaded and write it as an image "bitmap". You then
 need to attach an image decoder that will parse that bitmap and generate
 the real, renderable bitmap.
 
-``header.cf`` will be :c:enumerator:`LV_IMG_CF_RAW`, :c:enumerator:`LV_IMG_CF_RAW_ALPHA` or
-:c:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED` accordingly. You should choose the
+``header.cf`` will be :cpp:enumerator:`LV_IMG_CF_RAW`, :cpp:enumerator:`LV_IMG_CF_RAW_ALPHA` or
+:cpp:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED` accordingly. You should choose the
 correct format according to your needs: a fully opaque image, using an
 alpha channel or using a chroma key.
 
@@ -226,7 +226,7 @@ be in *True color* format). The ``LV_IMG_CF_USER_ENCODED_...`` formats
 are not known by the library and therefore they should be decoded to one
 of the known formats from the `Color formats <#color-formats>`__
 section. It's possible to decode an image to a non-true color format
-first (for example: :c:enumerator:`LV_IMG_INDEXED_4BITS`) and then call the built-in
+first (for example: :cpp:enumerator:`LV_IMG_INDEXED_4BITS`) and then call the built-in
 decoder functions to convert it to *True color*.
 
 With *User encoded* formats, the color format in the open function
@@ -332,7 +332,7 @@ So in summary:
 - In ``decoder_info``, you should collect some basic information about the image and store it in ``header``.
 - In ``decoder_open``, you should try to open the image source pointed by
   ``dsc->src``. Its type is already in ``dsc->src_type == LV_IMG_SRC_FILE/VARIABLE``.
-  If this format/type is not supported by the decoder, return :c:enumerator:`LV_RES_INV`.
+  If this format/type is not supported by the decoder, return :cpp:enumerator:`LV_RES_INV`.
   However, if you can open the image, a pointer to the decoded *True color* image should be
   set in ``dsc->img_data``. If the format is known, but you don't want to
   decode the entire image (e.g. no memory for it), set ``dsc->img_data = NULL`` and
@@ -349,8 +349,8 @@ Manually use an image decoder
 
 LVGL will use registered image decoders automatically if you try and
 draw a raw image (i.e. using the ``lv_img`` object) but you can use them
-manually too. Create an :c:struct:`lv_img_decoder_dsc_t` variable to describe
-the decoding session and call :c:func:`lv_img_decoder_open()`.
+manually too. Create an :cpp:type:`lv_img_decoder_dsc_t` variable to describe
+the decoding session and call :cpp:func:`lv_img_decoder_open`.
 
 The ``color`` parameter is used only with ``LV_IMG_CF_ALPHA_1/2/4/8BIT``
 images to tell color of the image. ``frame_id`` can be used if the image
@@ -394,7 +394,7 @@ The number of cache entries can be defined with
 the most recently used image will be left open.
 
 The size of the cache can be changed at run-time with
-:c:expr:`lv_img_cache_set_size(entry_num)`.
+:cpp:expr:`lv_img_cache_set_size(entry_num)`.
 
 Value of images
 ---------------
@@ -434,14 +434,14 @@ to cache even the largest images at the same time.
 Clean the cache
 ---------------
 
-Let's say you have loaded a PNG image into a :c:struct:`lv_img_dsc_t` ``my_png``
+Let's say you have loaded a PNG image into a :cpp:struct:`lv_img_dsc_t` ``my_png``
 variable and use it in an ``lv_img`` object. If the image is already
 cached and you then change the underlying PNG file, you need to notify
 LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file changed and LVGL will still draw the
 old image from cache.
 
-To do this, use :c:func:`lv_img_cache_invalidate_src` ``(&my_png)``. If ``NULL`` is
+To do this, use :cpp:func:`lv_img_cache_invalidate_src` ``(&my_png)``. If ``NULL`` is
 passed as a parameter, the whole cache will be cleaned.
 
 Custom cache algorithm
@@ -504,12 +504,12 @@ API
 
 .. raw:: html
 
-    <div include-html="widgets\img\lv_img.html"></div>
-    <div include-html="draw\lv_draw_img.html"></div>
-    <div include-html="draw\lv_img_cache_builtin.html"></div>
-    <div include-html="draw\lv_img_cache.html"></div>
-    <div include-html="misc\lv_gc.html"></div>
-    <div include-html="draw\lv_img_buf.html"></div>
     <div include-html="draw\lv_img_decoder.html"></div>
+    <div include-html="misc\lv_gc.html"></div>
+    <div include-html="widgets\img\lv_img.html"></div>
+    <div include-html="draw\lv_img_cache_builtin.html"></div>
+    <div include-html="draw\lv_img_buf.html"></div>
+    <div include-html="draw\lv_draw_img.html"></div>
+    <div include-html="draw\lv_img_cache.html"></div>
     <script>includeHTML();</script>
 

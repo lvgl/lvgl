@@ -20,8 +20,8 @@ Adding a driver
 Registering a driver
 --------------------
 
-To add a driver, a :c:struct:`lv_fs_drv_t` needs to be initialized like below.
-The :c:struct:`lv_fs_drv_t` needs to be static, global or dynamically allocated
+To add a driver, a :cpp:type:`lv_fs_drv_t` needs to be initialized like below.
+The :cpp:type:`lv_fs_drv_t` needs to be static, global or dynamically allocated
 and not a local variable.
 
 .. code:: c
@@ -64,7 +64,7 @@ The prototype of ``open_cb`` looks like this:
    void * (*open_cb)(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 
 ``path`` is the path after the drive letter (e.g. "S:path/to/file.txt" -> "path/to/file.txt").
-``mode`` can be :c:enumerator:`LV_FS_MODE_WR` or :c:enumerator:`LV_FS_MODE_RD` to open for writes or reads.
+``mode`` can be :cpp:enumerator:`LV_FS_MODE_WR` or :cpp:enumerator:`LV_FS_MODE_RD` to open for writes or reads.
 
 The return value is a pointer to a *file object* that describes the
 opened file or ``NULL`` if there were any issues (e.g. the file wasn't
@@ -107,8 +107,8 @@ The example below shows how to read from a file:
 
    lv_fs_close(&f);
 
-*The mode in :c:func:`lv_fs_open` can be :c:enumerator:`LV_FS_MODE_WR` to open for writes
-only or :c:enumerator:`LV_FS_MODE_RD` ``|`` :c:enumerator:`LV_FS_MODE_WR` for both*
+*The mode in :cpp:func:`lv_fs_open` can be :cpp:enumerator:`LV_FS_MODE_WR` to open for writes
+only or :cpp:enumerator:`LV_FS_MODE_RD` ``|`` :cpp:enumerator:`LV_FS_MODE_WR` for both*
 
 This example shows how to read a directory's content. It's up to the
 driver how to mark directories in the result but it can be a good

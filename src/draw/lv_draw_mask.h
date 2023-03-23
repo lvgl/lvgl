@@ -38,9 +38,13 @@ enum {
     LV_DRAW_MASK_RES_FULL_COVER,
     LV_DRAW_MASK_RES_CHANGED,
     LV_DRAW_MASK_RES_UNKNOWN
-};
+} _lv_draw_mask_res_t;
 
+#ifdef DOXYGEN
+typedef _lv_draw_mask_res_t lv_draw_mask_res_t;
+#else
 typedef uint8_t lv_draw_mask_res_t;
+#endif
 
 typedef struct {
     void * param;
@@ -74,16 +78,21 @@ enum {
     LV_DRAW_MASK_TYPE_FADE,
     LV_DRAW_MASK_TYPE_MAP,
     LV_DRAW_MASK_TYPE_POLYGON,
-};
+} _lv_draw_mask_type_t;
 
+#ifdef DOXYGEN
+typedef _lv_draw_mask_type_t lv_draw_mask_type_t;
+#else
 typedef uint8_t lv_draw_mask_type_t;
+#endif
+
 
 enum {
     LV_DRAW_MASK_LINE_SIDE_LEFT = 0,
     LV_DRAW_MASK_LINE_SIDE_RIGHT,
     LV_DRAW_MASK_LINE_SIDE_TOP,
     LV_DRAW_MASK_LINE_SIDE_BOTTOM,
-};
+} _lv_draw_mask_line_side_t;
 
 /**
  * A common callback type for every mask type.
@@ -93,7 +102,11 @@ typedef lv_draw_mask_res_t (*lv_draw_mask_xcb_t)(lv_opa_t * mask_buf, lv_coord_t
                                                  lv_coord_t len,
                                                  void * p);
 
+#ifdef DOXYGEN
+typedef _lv_draw_mask_line_side_t lv_draw_mask_line_side_t;
+#else
 typedef uint8_t lv_draw_mask_line_side_t;
+#endif
 
 typedef struct {
     lv_draw_mask_xcb_t cb;

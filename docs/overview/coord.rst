@@ -23,13 +23,13 @@ Units
 -----
 
 -  pixel: Simply a position in pixels. An integer always means pixels.
-   E.g. :c:expr:`lv_obj_set_x(btn, 10)`
+   E.g. :cpp:expr:`lv_obj_set_x(btn, 10)`
 -  percentage: The percentage of the size of the object or its parent
-   (depending on the property). :c:expr:`lv_pct(value)` converts a value to
-   percentage. E.g. :c:expr:`lv_obj_set_width(btn, lv_pct(50))`
--  :c:enumerator:`LV_SIZE_CONTENT`: Special value to set the width/height of an
+   (depending on the property). :cpp:expr:`lv_pct(value)` converts a value to
+   percentage. E.g. :cpp:expr:`lv_obj_set_width(btn, lv_pct(50))`
+-  :c:macro:`LV_SIZE_CONTENT`: Special value to set the width/height of an
    object to involve all the children. It's similar to ``auto`` in CSS.
-   E.g. :c:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
+   E.g. :cpp:expr:`lv_obj_set_width(btn, LV_SIZE_CONTENT)`.
 
 Boxing model
 ------------
@@ -66,10 +66,10 @@ objects. If so it refreshes their position, size and layout.
 
 In other words, if you need to get the coordinate of an object and the
 coordinates were just changed, LVGL needs to be forced to recalculate
-the coordinates. To do this call :c:expr:`lv_obj_update_layout(obj)`.
+the coordinates. To do this call :cpp:func:`lv_obj_update_layout`.
 
 The size and position might depend on the parent or layout. Therefore
-:c:func:`lv_obj_update_layout` recalculates the coordinates of all objects on
+:cpp:func:`lv_obj_update_layout` recalculates the coordinates of all objects on
 the screen of ``obj``.
 
 Removing styles
@@ -78,7 +78,7 @@ Removing styles
 As it's described in the `Using styles <#using-styles>`__ section,
 coordinates can also be set via style properties. To be more precise,
 under the hood every style coordinate related property is stored as a
-style property. If you use :c:expr:`lv_obj_set_x(obj, 20)` LVGL saves ``x=20``
+style property. If you use :cpp:expr:`lv_obj_set_x(obj, 20)` LVGL saves ``x=20``
 in the local style of the object.
 
 This is an internal mechanism and doesn't matter much as you use LVGL.
@@ -155,15 +155,15 @@ To change the alignment and set new coordinates:
 
 The following alignment options can be used:
 
-- :c:enumerator:`LV_ALIGN_TOP_LEFT`
-- :c:enumerator:`LV_ALIGN_TOP_MID`
-- :c:enumerator:`LV_ALIGN_TOP_RIGHT`
-- :c:enumerator:`LV_ALIGN_BOTTOM_LEFT`
-- :c:enumerator:`LV_ALIGN_BOTTOM_MID`
-- :c:enumerator:`LV_ALIGN_BOTTOM_RIGHT`
-- :c:enumerator:`LV_ALIGN_LEFT_MID`
-- :c:enumerator:`LV_ALIGN_RIGHT_MID`
-- :c:enumerator:`LV_ALIGN_CENTER`
+- :cpp:enumerator:`LV_ALIGN_TOP_LEFT`
+- :cpp:enumerator:`LV_ALIGN_TOP_MID`
+- :cpp:enumerator:`LV_ALIGN_TOP_RIGHT`
+- :cpp:enumerator:`LV_ALIGN_BOTTOM_LEFT`
+- :cpp:enumerator:`LV_ALIGN_BOTTOM_MID`
+- :cpp:enumerator:`LV_ALIGN_BOTTOM_RIGHT`
+- :cpp:enumerator:`LV_ALIGN_LEFT_MID`
+- :cpp:enumerator:`LV_ALIGN_RIGHT_MID`
+- :cpp:enumerator:`LV_ALIGN_CENTER`
 
 It's quite common to align a child to the center of its parent,
 therefore a dedicated function exists:
@@ -188,18 +188,18 @@ it's also possible to align an object to an arbitrary reference object.
 Besides the alignments options above, the following can be used to align
 an object outside the reference object:
 
--  :c:enumerator:`LV_ALIGN_OUT_TOP_LEFT`
--  :c:enumerator:`LV_ALIGN_OUT_TOP_MID`
--  :c:enumerator:`LV_ALIGN_OUT_TOP_RIGHT`
--  :c:enumerator:`LV_ALIGN_OUT_BOTTOM_LEFT`
--  :c:enumerator:`LV_ALIGN_OUT_BOTTOM_MID`
--  :c:enumerator:`LV_ALIGN_OUT_BOTTOM_RIGHT`
--  :c:enumerator:`LV_ALIGN_OUT_LEFT_TOP`
--  :c:enumerator:`LV_ALIGN_OUT_LEFT_MID`
--  :c:enumerator:`LV_ALIGN_OUT_LEFT_BOTTOM`
--  :c:enumerator:`LV_ALIGN_OUT_RIGHT_TOP`
--  :c:enumerator:`LV_ALIGN_OUT_RIGHT_MID`
--  :c:enumerator:`LV_ALIGN_OUT_RIGHT_BOTTOM`
+-  :cpp:enumerator:`LV_ALIGN_OUT_TOP_LEFT`
+-  :cpp:enumerator:`LV_ALIGN_OUT_TOP_MID`
+-  :cpp:enumerator:`LV_ALIGN_OUT_TOP_RIGHT`
+-  :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_LEFT`
+-  :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_MID`
+-  :cpp:enumerator:`LV_ALIGN_OUT_BOTTOM_RIGHT`
+-  :cpp:enumerator:`LV_ALIGN_OUT_LEFT_TOP`
+-  :cpp:enumerator:`LV_ALIGN_OUT_LEFT_MID`
+-  :cpp:enumerator:`LV_ALIGN_OUT_LEFT_BOTTOM`
+-  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_TOP`
+-  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_MID`
+-  :cpp:enumerator:`LV_ALIGN_OUT_RIGHT_BOTTOM`
 
 For example to align a label above a button and center the label
 horizontally:
@@ -208,7 +208,7 @@ horizontally:
 
    lv_obj_align_to(label, btn, LV_ALIGN_OUT_TOP_MID, 0, -10);
 
-Note that, unlike with :c:expr:`lv_obj_align()`, :c:expr:`lv_obj_align_to()` can not
+Note that, unlike with :cpp:func:`lv_obj_align`, :cpp:func:`lv_obj_align_to` can not
 realign the object if its coordinates or the reference object's
 coordinates change.
 
@@ -233,14 +233,14 @@ size. For example to set the object's height to the screen height:
 
    lv_obj_set_height(obj, lv_pct(100));
 
-The size settings support a special value: :c:enumerator:`LV_SIZE_CONTENT`. It means
+The size settings support a special value: :c:macro:`LV_SIZE_CONTENT`. It means
 the object's size in the respective direction will be set to the size of
 its children. Note that only children on the right and bottom sides will
 be considered and children on the top and left remain cropped. This
 limitation makes the behavior more predictable.
 
-Objects with :c:enumerator:`LV_OBJ_FLAG_HIDDEN` or :c:enumerator:`LV_OBJ_FLAG_FLOATING` will be
-ignored by the :c:enumerator:`LV_SIZE_CONTENT` calculation.
+Objects with :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` or :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` will be
+ignored by the :c:macro:`LV_SIZE_CONTENT` calculation.
 
 The above functions set the size of an object's bounding box but the
 size of the content area can be set as well. This means an object's
@@ -278,8 +278,8 @@ However, using styles to set the coordinates has some great advantages:
   ``style_btn`` makes the object ``100x50`` by default but adding
   ``style_full_width`` overwrites only the width of the object.
 - The object can have different position or size depending on state.
-  E.g. 100 px wide in :c:enumerator:`LV_STATE_DEFAULT` but 120 px
-  in :c:enumerator:`LV_STATE_PRESSED`.
+  E.g. 100 px wide in :cpp:enumerator:`LV_STATE_DEFAULT` but 120 px
+  in :cpp:enumerator:`LV_STATE_PRESSED`.
 - Style transitions can be used to make the coordinate changes smooth.
 
 Here are some examples to set an object's size using a style:
@@ -354,14 +354,14 @@ Translation is applied from the current position of the object.
 
 Percentage values can be used in translations as well. The percentage is
 relative to the size of the object (and not to the size of the parent).
-For example :c:expr:`lv_pct(50)` will move the object with half of its
+For example :cpp:expr:`lv_pct(50)` will move the object with half of its
 width/height.
 
 The translation is applied after the layouts are calculated. Therefore,
 even laid out objects' position can be translated.
 
 The translation actually moves the object. That means it makes the
-scrollbars and :c:enumerator:`LV_SIZE_CONTENT` sized objects react to the position
+scrollbars and :c:macro:`LV_SIZE_CONTENT` sized objects react to the position
 change.
 
 Transformation
@@ -374,7 +374,7 @@ object 2x10 pixels wider.
 
 Unlike position translation, the size transformation doesn't make the
 object "really" larger. In other words scrollbars, layouts, and
-:c:enumerator:`LV_SIZE_CONTENT` will not react to the transformed size. Hence, size
+:c:macro:`LV_SIZE_CONTENT` will not react to the transformed size. Hence, size
 transformation is "only" a visual effect.
 
 This code enlarges a button when it's pressed:
@@ -395,7 +395,7 @@ Similarly to CSS, LVGL also supports ``min-width``, ``max-width``,
 ``min-height`` and ``max-height``. These are limits preventing an
 object's size from becoming smaller/larger than these values. They are
 especially useful if the size is set by percentage or
-:c:enumerator:`LV_SIZE_CONTENT`.
+:c:macro:`LV_SIZE_CONTENT`.
 
 .. code:: c
 
@@ -432,7 +432,7 @@ The position and size set by the layout overwrites the "normal" x, y,
 width, and height settings.
 
 There is only one function that is the same for every layout:
-``lv_obj_set_layout(obj, <LAYOUT_NAME>)`` sets the layout on an object.
+:cpp:func:`lv_obj_set_layout` ``(obj, <LAYOUT_NAME>)`` sets the layout on an object.
 For further settings of the parent and children see the documentation of
 the given layout.
 
@@ -449,11 +449,11 @@ Flags
 There are some flags that can be used on objects to affect how they
 behave with layouts:
 
-- :c:enumerator:`LV_OBJ_FLAG_HIDDEN` Hidden objects are ignored in layout calculations.
-- :c:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` The object is simply ignored by the layouts. Its coordinates can be set as usual.
-- :c:enumerator:`LV_OBJ_FLAG_FLOATING` Same as :c:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` but the object with :c:enumerator:`LV_OBJ_FLAG_FLOATING` will be ignored in :c:enumerator:`LV_SIZE_CONTENT` calculations.
+- :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` Hidden objects are ignored in layout calculations.
+- :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` The object is simply ignored by the layouts. Its coordinates can be set as usual.
+- :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Same as :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` but the object with :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` will be ignored in :c:macro:`LV_SIZE_CONTENT` calculations.
 
-These flags can be added/removed with :c:expr:`lv_obj_add_flag(obj, FLAG)` and :c:expr:`lv_obj_clear_flag(obj, FLAG)`
+These flags can be added/removed with :cpp:expr:`lv_obj_add_flag(obj, FLAG)` and :cpp:expr:`lv_obj_clear_flag(obj, FLAG)`
 
 Adding new layouts
 ------------------
@@ -500,7 +500,6 @@ Examples
 API
 ***
 
-.. Autogenerated
 .. Autogenerated
 
 .. raw:: html

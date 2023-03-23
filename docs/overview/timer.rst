@@ -131,7 +131,7 @@ API
 
 .. raw:: html
 
-    <div include-html="misc\lv_timer.html"></div>
     <div include-html="misc\lv_gc.html"></div>
+    <div include-html="misc\lv_timer.html"></div>
     <script>includeHTML();</script>
 

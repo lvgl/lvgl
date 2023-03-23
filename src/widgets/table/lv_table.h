@@ -40,9 +40,13 @@ enum {
     LV_TABLE_CELL_CTRL_CUSTOM_2    = 1 << 5,
     LV_TABLE_CELL_CTRL_CUSTOM_3    = 1 << 6,
     LV_TABLE_CELL_CTRL_CUSTOM_4    = 1 << 7,
-};
+} _lv_table_cell_ctrl_t;
 
-typedef uint8_t  lv_table_cell_ctrl_t;
+#ifdef DOXYGEN
+typedef _lv_table_cell_ctrl_t lv_table_cell_ctrl_t;
+#else
+typedef uint8_t lv_table_cell_ctrl_t;
+#endif
 
 /*Data of table*/
 typedef struct {

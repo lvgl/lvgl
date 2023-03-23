@@ -48,8 +48,13 @@ enum {
     LV_LABEL_LONG_SCROLL,           /**< Keep the size and roll the text back and forth*/
     LV_LABEL_LONG_SCROLL_CIRCULAR,  /**< Keep the size and roll the text circularly*/
     LV_LABEL_LONG_CLIP,             /**< Keep the size and clip the text out of it*/
-};
+} _lv_label_long_mode_t;
+
+#ifdef DOXYGEN
+typedef _lv_label_long_mode_t lv_label_long_mode_t;
+#else
 typedef uint8_t lv_label_long_mode_t;
+#endif
 
 typedef struct {
     lv_obj_t obj;

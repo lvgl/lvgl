@@ -46,7 +46,12 @@ typedef enum {
     _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
 } _lv_style_state_cmp_t;
 
+#ifdef DOXYGEN
+typedef _lv_style_selector_t lv_style_selector_t;
+#else
 typedef uint32_t lv_style_selector_t;
+#endif
+
 
 typedef struct {
     const lv_style_t * style;

@@ -10,7 +10,7 @@ objects, also called *Widgets*. For example a
 
 You can see all the `Object types </widgets/index>`__ here.
 
-All objects are referenced using an :c:struct:`lv_obj_t` pointer as a handle.
+All objects are referenced using an :cpp:type:`lv_obj_t` pointer as a handle.
 This pointer can later be used to set or get the attributes of the
 object.
 
@@ -113,7 +113,7 @@ outside will not be visible.
    lv_obj_set_x(obj1, -30);    /*Move the child a little bit off the parent*/
 
 This behavior can be overwritten with
-:c:expr:`lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)` which allow the
+:cpp:expr:`lv_obj_add_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)` which allow the
 children to be drawn out of the parent.
 
 Create and delete objects
@@ -138,7 +138,7 @@ Every widget has its own **create** function with a prototype like this:
 Typically, the create functions only have a *parent* parameter telling
 them on which object to create the new widget.
 
-The return value is a pointer to the created object with :c:struct:`lv_obj_t` ``*``
+The return value is a pointer to the created object with :cpp:type:`lv_obj_t` ``*``
 type.
 
 There is a common **delete** function for all object types. It deletes
@@ -148,17 +148,17 @@ the object and all of its children.
 
    void lv_obj_del(lv_obj_t * obj);
 
-:c:func:`lv_obj_del` will delete the object immediately. If for any reason you
+:cpp:func:`lv_obj_del` will delete the object immediately. If for any reason you
 can't delete the object immediately you can use
-:c:expr:`lv_obj_del_async(obj)` which will perform the deletion on the next
-call of :c:func:`lv_timer_handler()`. This is useful e.g. if you want to
-delete the parent of an object in the child's :c:enumerator:`LV_EVENT_DELETE`
+:cpp:expr:`lv_obj_del_async(obj)` which will perform the deletion on the next
+call of :cpp:func:`lv_timer_handler`. This is useful e.g. if you want to
+delete the parent of an object in the child's :cpp:enumerator:`LV_EVENT_DELETE`
 handler.
 
 You can remove all the children of an object (but not the object itself)
-using :c:expr:`lv_obj_clean(obj)`.
+using :cpp:expr:`lv_obj_clean(obj)`.
 
-You can use :c:expr:`lv_obj_del_delayed(obj, 1000)` to delete an object after
+You can use :cpp:expr:`lv_obj_del_delayed(obj, 1000)` to delete an object after
 some time. The delay is expressed in milliseconds.
 
 Screens
@@ -183,12 +183,12 @@ Get the active screen
 There is always an active screen on each display. By default, the
 library creates and loads a "Base object" as a screen for each display.
 
-To get the currently active screen use the :c:func:`lv_scr_act()` function.
+To get the currently active screen use the :cpp:func:`lv_scr_act` function.
 
 Load screens
 ------------
 
-To load a new screen, use :c:expr:`lv_scr_load(scr1)`.
+To load a new screen, use :cpp:expr:`lv_scr_load(scr1)`.
 
 Layers
 ------
@@ -203,9 +203,9 @@ screen. The *top layer* is above every object on the screen and the
 *system layer* is above the *top layer*. You can add any pop-up windows
 to the *top layer* freely. But, the *system layer* is restricted to
 system-level things (e.g. mouse cursor will be placed there with
-:c:func:`lv_indev_set_cursor()`).
+:cpp:func:`lv_indev_set_cursor`).
 
-The :c:func:`lv_layer_top()` and :c:func:`lv_layer_sys()` functions return pointers
+The :cpp:func:`lv_layer_top` and :cpp:func:`lv_layer_sys` functions return pointers
 to the top and system layers respectively.
 
 Read the `Layer overview </overview/layer>`__ section to learn more
@@ -215,19 +215,19 @@ Load screen with animation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A new screen can be loaded with animation by using
-:c:expr:`lv_scr_load_anim(scr, transition_type, time, delay, auto_del)`. The
+:cpp:expr:`lv_scr_load_anim(scr, transition_type, time, delay, auto_del)`. The
 following transition types exist: 
 
-- :c:enumerator:`LV_SCR_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds 
-- :c:enumerator:`LV_SCR_LOAD_ANIM_OVER_LEFT`, :c:enumerator:`LV_SCR_LOAD_ANIM_OVER_RIGHT`, :c:enumerator:`LV_SCR_LOAD_ANIM_OVER_TOP` and :c:enumerator:`LV_SCR_LOAD_ANIM_OVER_BOTTOM`: Move the new screen over the current towards the given direction 
-- :c:enumerator:`LV_SCR_LOAD_ANIM_OUT_LEFT`, :c:enumerator:`LV_SCR_LOAD_ANIM_OUT_RIGHT`, :c:enumerator:`LV_SCR_LOAD_ANIM_OUT_TOP` and :c:enumerator:`LV_SCR_LOAD_ANIM_OUT_BOTTOM`: Move out the old screen over the current towards the given direction 
-- :c:enumerator:`LV_SCR_LOAD_ANIM_MOVE_LEFT`, :c:enumerator:`LV_SCR_LOAD_ANIM_MOVE_RIGHT`, :c:enumerator:`LV_SCR_LOAD_ANIM_MOVE_TOP` and :c:enumerator:`LV_SCR_LOAD_ANIM_MOVE_BOTTOM`: Move both the current and new screens towards the given direction 
-- :c:enumerator:`LV_SCR_LOAD_ANIM_FADE_IN` and :c:enumerator:`LV_SCR_LOAD_ANIM_FADE_OUT`: Fade the new screen over the old screen, or vice versa
+- :cpp:enumerator:`LV_SCR_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds
+- :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_BOTTOM`: Move the new screen over the current towards the given direction
+- :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_OUT_BOTTOM`: Move out the old screen over the current towards the given direction
+- :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_MOVE_BOTTOM`: Move both the current and new screens towards the given direction
+- :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_IN` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_FADE_OUT`: Fade the new screen over the old screen, or vice versa
 
 Setting ``auto_del`` to ``true`` will automatically delete the old
 screen when the animation is finished.
 
-The new screen will become active (returned by :c:func:`lv_scr_act()`) when
+The new screen will become active (returned by :cpp:func:`lv_scr_act`) when
 the animation starts after ``delay`` time. All inputs are disabled
 during the screen animation.
 
@@ -236,10 +236,10 @@ Handling multiple displays
 
 Screens are created on the currently selected *default display*. The
 *default display* is the last registered display with
-:c:func:`lv_disp_drv_register`. You can also explicitly select a new default
-display using :c:expr:`lv_disp_set_default(disp)`.
+:cpp:func:`lv_disp_drv_register`. You can also explicitly select a new default
+display using :cpp:expr:`lv_disp_set_default(disp)`.
 
-:c:func:`lv_scr_act()`, :c:func:`lv_scr_load()` and :c:func:`lv_scr_load_anim()` operate
+:cpp:func:`lv_scr_act`, :cpp:func:`lv_scr_load` and :cpp:func:`lv_scr_load_anim` operate
 on the default screen.
 
 Visit `Multi-display support </overview/display>`__ to learn more.
@@ -254,15 +254,15 @@ Parts are similar to *pseudo-elements* in CSS.
 
 The following predefined parts exist in LVGL: 
 
-- :c:enumerator:`LV_PART_MAIN`: A background like rectangle 
-- :c:enumerator:`LV_PART_SCROLLBAR`: The scrollbar(s) 
-- :c:enumerator:`LV_PART_INDICATOR`: Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox 
-- :c:enumerator:`LV_PART_KNOB`: Like a handle to grab to adjust the value 
-- :c:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section 
-- :c:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells) 
-- :c:enumerator:`LV_PART_TICKS`: Ticks on scales e.g. for a chart or meter 
-- :c:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor 
-- :c:enumerator:`LV_PART_CUSTOM_FIRST`: Custom parts can be added from here.
+- :cpp:enumerator:`LV_PART_MAIN`: A background like rectangle
+- :cpp:enumerator:`LV_PART_SCROLLBAR`: The scrollbar(s)
+- :cpp:enumerator:`LV_PART_INDICATOR`: Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox
+- :cpp:enumerator:`LV_PART_KNOB`: Like a handle to grab to adjust the value
+- :cpp:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section
+- :cpp:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells)
+- :cpp:enumerator:`LV_PART_TICKS`: Ticks on scales e.g. for a chart or meter
+- :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor
+- :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom parts can be added from here.
 
 The main purpose of parts is to allow styling the "components" of the
 widgets. They are described in more detail in the 
@@ -273,19 +273,19 @@ States
 
 The object can be in a combination of the following states:
 
-- :c:enumerator:`LV_STATE_DEFAULT`: Normal, released state
-- :c:enumerator:`LV_STATE_CHECKED`: Toggled or checked state
-- :c:enumerator:`LV_STATE_FOCUSED`: Focused via keypad or encoder or clicked via touchpad/mouse
-- :c:enumerator:`LV_STATE_FOCUS_KEY`: Focused via keypad or encoder but not via touchpad/mouse
-- :c:enumerator:`LV_STATE_EDITED`: Edit by an encoder
-- :c:enumerator:`LV_STATE_HOVERED`: Hovered by mouse (not supported now)
-- :c:enumerator:`LV_STATE_PRESSED`: Being pressed
-- :c:enumerator:`LV_STATE_SCROLLED`: Being scrolled
-- :c:enumerator:`LV_STATE_DISABLED`: Disabled state
-- :c:enumerator:`LV_STATE_USER_1`: Custom state
-- :c:enumerator:`LV_STATE_USER_2`: Custom state
-- :c:enumerator:`LV_STATE_USER_3`: Custom state
-- :c:enumerator:`LV_STATE_USER_4`: Custom state
+- :cpp:enumerator:`LV_STATE_DEFAULT`: Normal, released state
+- :cpp:enumerator:`LV_STATE_CHECKED`: Toggled or checked state
+- :cpp:enumerator:`LV_STATE_FOCUSED`: Focused via keypad or encoder or clicked via touchpad/mouse
+- :cpp:enumerator:`LV_STATE_FOCUS_KEY`: Focused via keypad or encoder but not via touchpad/mouse
+- :cpp:enumerator:`LV_STATE_EDITED`: Edit by an encoder
+- :cpp:enumerator:`LV_STATE_HOVERED`: Hovered by mouse (not supported now)
+- :cpp:enumerator:`LV_STATE_PRESSED`: Being pressed
+- :cpp:enumerator:`LV_STATE_SCROLLED`: Being scrolled
+- :cpp:enumerator:`LV_STATE_DISABLED`: Disabled state
+- :cpp:enumerator:`LV_STATE_USER_1`: Custom state
+- :cpp:enumerator:`LV_STATE_USER_2`: Custom state
+- :cpp:enumerator:`LV_STATE_USER_3`: Custom state
+- :cpp:enumerator:`LV_STATE_USER_4`: Custom state
 
 The states are usually automatically changed by the library as the user
 interacts with an object (presses, releases, focuses, etc.). However,
@@ -293,7 +293,7 @@ the states can be changed manually too. To set or clear given state (but
 leave the other states untouched) use
 ``lv_obj_add/clear_state(obj, LV_STATE_...)`` In both cases OR-ed state
 values can be used as well. E.g.
-``lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)``.
+:cpp:expr:`lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 
 To learn more about the states read the related section of the
 `Style overview </overview/style>`__.
@@ -307,44 +307,24 @@ children. Check details in `Snapshot </others/snapshot>`__.
 API
 ***
 
-
-.. raw:: html
-
-    <div include-html="layouts\grid\lv_grid.html"></div>
-    <div include-html="misc\lv_gc.html"></div>
-    <div include-html="core\lv_obj_pos.html"></div>
-    <div include-html="core\lv_obj_class.html"></div>
-    <div include-html="core\lv_obj_style.html"></div>
-    <div include-html="core\lv_obj_event.html"></div>
-    <div include-html="core\lv_obj_style_gen.html"></div>
-    <div include-html="core\lv_obj.html"></div>
-    <div include-html="core\lv_obj_tree.html"></div>
-    <div include-html="layouts\flex\lv_flex.html"></div>
-    <div include-html="lv_api_map.html"></div>
-    <div include-html="core\lv_obj_draw.html"></div>
-    <div include-html="core\lv_refr.html"></div>
-    <div include-html="widgets\tileview\lv_tileview.html"></div>
-    <div include-html="core\lv_obj_scroll.html"></div>
-    <script>includeHTML();</script>
-
 .. Autogenerated
 
 .. raw:: html
 
-    <div include-html="core\lv_obj_style.html"></div>
-    <div include-html="layouts\flex\lv_flex.html"></div>
     <div include-html="core\lv_obj_tree.html"></div>
-    <div include-html="core\lv_obj_draw.html"></div>
     <div include-html="misc\lv_gc.html"></div>
-    <div include-html="core\lv_obj.html"></div>
-    <div include-html="core\lv_obj_event.html"></div>
-    <div include-html="core\lv_obj_class.html"></div>
-    <div include-html="core\lv_obj_scroll.html"></div>
     <div include-html="core\lv_obj_style_gen.html"></div>
-    <div include-html="lv_api_map.html"></div>
     <div include-html="widgets\tileview\lv_tileview.html"></div>
+    <div include-html="core\lv_obj_class.html"></div>
     <div include-html="core\lv_refr.html"></div>
-    <div include-html="core\lv_obj_pos.html"></div>
+    <div include-html="layouts\flex\lv_flex.html"></div>
     <div include-html="layouts\grid\lv_grid.html"></div>
+    <div include-html="core\lv_obj_draw.html"></div>
+    <div include-html="lv_api_map.html"></div>
+    <div include-html="core\lv_obj.html"></div>
+    <div include-html="core\lv_obj_style.html"></div>
+    <div include-html="core\lv_obj_event.html"></div>
+    <div include-html="core\lv_obj_scroll.html"></div>
+    <div include-html="core\lv_obj_pos.html"></div>
     <script>includeHTML();</script>
 

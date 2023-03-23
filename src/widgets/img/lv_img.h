@@ -67,9 +67,13 @@ enum {
      *  It causes layout recalculation.
      *  If the object size is set explicitly, the image will be cropped when zoomed in.*/
     LV_IMG_SIZE_MODE_REAL,
-};
+} _lv_img_size_mode_t;
 
+#ifdef DOXYGEN
+typedef _lv_img_size_mode_t lv_img_size_mode_t;
+#else
 typedef uint8_t lv_img_size_mode_t;
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

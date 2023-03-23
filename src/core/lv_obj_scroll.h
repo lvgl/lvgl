@@ -34,8 +34,15 @@ enum {
     LV_SCROLLBAR_MODE_ON,       /**< Always show scrollbars*/
     LV_SCROLLBAR_MODE_ACTIVE,   /**< Show scroll bars when object is being scrolled*/
     LV_SCROLLBAR_MODE_AUTO,     /**< Show scroll bars when the content is large enough to be scrolled*/
-};
+} _lv_scrollbar_mode_t;
+
+
+#ifdef DOXYGEN
+typedef _lv_scrollbar_mode_t lv_scrollbar_mode_t;
+#else
 typedef uint8_t lv_scrollbar_mode_t;
+#endif
+
 
 
 /** Scroll span align options. Tells where to align the snappable children when scroll stops.*/
@@ -44,8 +51,13 @@ enum {
     LV_SCROLL_SNAP_START,   /**< Align to the left/top*/
     LV_SCROLL_SNAP_END,     /**< Align to the right/bottom*/
     LV_SCROLL_SNAP_CENTER   /**< Align to the center*/
-};
+} _lv_scroll_snap_t;
+
+#ifdef DOXYGEN
+typedef _lv_scroll_snap_t lv_scroll_snap_t;
+#else
 typedef uint8_t lv_scroll_snap_t;
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

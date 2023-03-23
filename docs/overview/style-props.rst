@@ -11,7 +11,7 @@ objects.
 width
 ~~~~~
 
-Sets the width of object. Pixel, percentage and ``LV_SIZE_CONTENT``
+Sets the width of object. Pixel, percentage and :c:macro:`LV_SIZE_CONTENT`
 values can be used. Percentage values are relative to the width of the
 parent’s content area.
 

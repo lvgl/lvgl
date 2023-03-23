@@ -48,8 +48,13 @@ enum {
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
     LV_KEYBOARD_MODE_TEXT_ARABIC
 #endif
-};
+} _lv_keyboard_mode_t;
+
+#ifdef DOXYGEN
+typedef _lv_keyboard_mode_t lv_keyboard_mode_t;
+#else
 typedef uint8_t lv_keyboard_mode_t;
+#endif
 
 /*Data of keyboard*/
 typedef struct {

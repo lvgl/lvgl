@@ -55,9 +55,13 @@ enum {
     LV_STATE_USER_4      =  0x8000,
 
     LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
-};
+} _lv_state_t;
 
+#ifdef DOXYGEN
+typedef _lv_state_t lv_state_t;
+#else
 typedef uint16_t lv_state_t;
+#endif
 
 /**
  * The possible parts of widgets.
@@ -78,15 +82,20 @@ enum {
     LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
 
     LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
-};
+} _lv_part_t;
 
+
+#ifdef DOXYGEN
+typedef _lv_part_t lv_part_t;
+#else
 typedef uint32_t lv_part_t;
+#endif
 
 /**
  * On/Off features controlling the object's behavior.
  * OR-ed values are possible
  */
-enum {
+typedef enum {
     LV_OBJ_FLAG_HIDDEN          = (1L << 0),  /**< Make the object hidden. (Like it wasn't there at all)*/
     LV_OBJ_FLAG_CLICKABLE       = (1L << 1),  /**< Make the object clickable by the input devices*/
     LV_OBJ_FLAG_CLICK_FOCUSABLE = (1L << 2),  /**< Add focused state to the object when clicked*/
@@ -118,11 +127,15 @@ enum {
     LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
+} _lv_obj_flag_t;
 
-};
 
-
+#ifdef DOXYGEN
+typedef _lv_obj_flag_t lv_obj_flag_t;
+#else
 typedef uint32_t lv_obj_flag_t;
+#endif
+
 
 /**
  * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_obj_class`

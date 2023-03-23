@@ -56,9 +56,13 @@ enum {
     LV_FONT_SUBPX_HOR,
     LV_FONT_SUBPX_VER,
     LV_FONT_SUBPX_BOTH,
-};
+} _lv_font_subpx_t;
 
+#ifdef DOXYGEN
+typedef _lv_font_subpx_t lv_font_subpx_t;
+#else
 typedef uint8_t lv_font_subpx_t;
+#endif
 
 /** Describe the properties of a font*/
 typedef struct _lv_font_t {
