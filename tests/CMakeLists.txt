@@ -136,6 +136,7 @@ add_library(test_common
     STATIC
         src/lv_test_indev.c
         src/lv_test_init.c
+        src/lv_test_malloc.c
         src/test_assets/test_animimg001.c
         src/test_assets/test_animimg002.c
         src/test_assets/test_animimg003.c
