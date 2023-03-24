@@ -28,6 +28,10 @@ LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
 /**
  * Opacity percentages.
  */
+
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_OPA_TRANSP = 0,
     LV_OPA_0      = 0,
@@ -42,7 +46,14 @@ enum {
     LV_OPA_90     = 229,
     LV_OPA_100    = 255,
     LV_OPA_COVER  = 255,
+#ifdef DOXYGEN
+} lv_opa_t;
+#else
 };
+
+typedef uint8_t lv_opa_t;
+#endif /*DOXYGEN*/
+
 
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
@@ -215,11 +226,6 @@ typedef struct {
     uint8_t s;
     uint8_t v;
 } lv_color_hsv_t;
-
-//! @cond Doxygen_Suppress
-/*No idea where the guard is required but else throws warnings in the docs*/
-typedef uint8_t lv_opa_t;
-//! @endcond
 
 struct _lv_color_filter_dsc_t;
 

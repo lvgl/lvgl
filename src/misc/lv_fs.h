@@ -31,6 +31,9 @@ extern "C" {
 /**
  * Errors in the file system module.
  */
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_FS_RES_OK = 0,
     LV_FS_RES_HW_ERR,     /*Low level hardware error*/
@@ -45,17 +48,32 @@ enum {
     LV_FS_RES_OUT_OF_MEM, /*Not enough memory for an internal operation*/
     LV_FS_RES_INV_PARAM,  /*Invalid parameter among arguments*/
     LV_FS_RES_UNKNOWN,    /*Other unknown error*/
+
+#ifdef DOXYGEN
+} lv_fs_res_t;
+#else
 };
+
 typedef uint8_t lv_fs_res_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * File open mode.
  */
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
+#ifdef DOXYGEN
+} lv_fs_mode_t;
+#else
 };
+
 typedef uint8_t lv_fs_mode_t;
+#endif /*DOXYGEN*/
 
 
 /**

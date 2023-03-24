@@ -51,18 +51,21 @@ typedef struct {
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_FONT_SUBPX_NONE,
     LV_FONT_SUBPX_HOR,
     LV_FONT_SUBPX_VER,
     LV_FONT_SUBPX_BOTH,
-} _lv_font_subpx_t;
-
 #ifdef DOXYGEN
-typedef _lv_font_subpx_t lv_font_subpx_t;
+} lv_font_subpx_t;
 #else
+};
+
 typedef uint8_t lv_font_subpx_t;
-#endif
+#endif /*DOXYGEN*/
 
 /** Describe the properties of a font*/
 typedef struct _lv_font_t {

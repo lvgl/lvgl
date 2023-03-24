@@ -39,7 +39,8 @@ typedef enum {
     LV_LRU_VALUE_TOO_LARGE
 } lv_lru_res_t;
 
-typedef void (lv_lru_free_t)(void * v);
+typedef void lv_lru_free_t(void * v);
+
 typedef struct _lv_lru_item_t lv_lru_item_t;
 
 typedef struct /// @cond

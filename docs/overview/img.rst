@@ -53,9 +53,9 @@ Color formats
 
 Various built-in color formats are supported: 
 
-- :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR`: Simply stores the RGB colors (in whatever color depth LVGL is configured for).
-- :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`: Like :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR` but it also adds an alpha (transparency) byte for every pixel.
-- :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED`: Like :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR` but if a pixel has the
+- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE`: Simply stores the RGB colors (in whatever color depth LVGL is configured for).
+- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`: Like :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` but it also adds an alpha (transparency) byte for every pixel.
+- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED`: Like :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` but if a pixel has the
   :c:macro:`LV_COLOR_TRANSP` color (set in *lv_conf.h*) it will be transparent.
 - :cpp:enumerator:`LV_IMG_CF_INDEXED_1BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_2BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_4BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_8BIT`:
   Uses a palette with 2, 4, 16 or 256 colors and stores each pixel in 1, 2, 4 or 8 bits.
@@ -65,28 +65,28 @@ Various built-in color formats are supported:
   ideal for bitmaps similar to fonts where the whole image is one color
   that can be altered.
 
-The bytes of :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR` images are stored in the following order.
+The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the following order.
 
 - 32-bit color depth:
     - **Byte 0**: Blue
     - **Byte 1**: Green
     - **Byte 2**: Red
-    - **Byte 3**: Alpha
+    - **Byte 3**: Alpha (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`)
 - 16-bit color depth:
     - **Byte 0**: Green 3 lower bit, Blue 5 bit
     - **Byte 1**: Red 5 bit, Green 3 higher bit
-    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`)
+    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`)
 - 8-bit color depth:
     - **Byte 0**: Red 3 bit, Green 3 bit, Blue 2 bit
-    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA`)
+    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
 with one of the built-in color formats and an external `Image decoder <#image-decoder>`__ 
 needs to be used to decode the image. 
 
-- :cpp:enumerator:`LV_IMG_CF_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
-- :cpp:enumerator:`LV_IMG_CF_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel.
-- :cpp:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED`: Indicates that an image is chroma-keyed as described in :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED` above.
+- :cpp:enumerator:`LV_COLOR_FORMAT_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
+- :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel.
+- :cpp:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED`: Indicates that an image is chroma-keyed as described in :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED` above.
 
 Add and use images
 ******************
@@ -108,9 +108,8 @@ Adding an image to LVGL via the online converter is easy.
 2. Give the image a name that will be used within LVGL.
 3. Select the `Color format <#color-formats>`__.
 4. Select the type of image you want. Choosing a binary will generate a
-   ``.bin`` file that must be stored separately and read using the `file
-   support <#files>`__. Choosing a variable will generate a standard C
-   file that can be linked into your project.
+   ``.bin`` file that must be stored separately and read using the `file support <#files>`__.
+   Choosing a variable will generate a standard C file that can be linked into your project.
 5. Hit the *Convert* button. Once the conversion is finished, your
    browser will automatically download the resulting file.
 
@@ -146,7 +145,7 @@ variable to display it using LVGL. For example:
        .data = my_img_data,
    };
 
-If the color format is :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA` you can set
+If the color format is :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA` you can set
 ``data_size`` like ``80 * 60 *`` :cpp:enumerator:`LV_IMG_PX_SIZE_ALPHA_BYTE`.
 
 Another (possibly simpler) option to create and display an image at
@@ -441,7 +440,7 @@ LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file changed and LVGL will still draw the
 old image from cache.
 
-To do this, use :cpp:func:`lv_img_cache_invalidate_src` ``(&my_png)``. If ``NULL`` is
+To do this, use :cpp:expr:`lv_img_cache_invalidate_src(&my_png)`. If ``NULL`` is
 passed as a parameter, the whole cache will be cleaned.
 
 Custom cache algorithm
@@ -488,28 +487,16 @@ following code to replace the LVGL built-in image cache manager:
 API
 ***
 
-
-.. raw:: html
-
-    <div include-html="misc\lv_gc.html"></div>
-    <div include-html="draw\lv_draw_img.html"></div>
-    <div include-html="draw\lv_img_cache_builtin.html"></div>
-    <div include-html="draw\lv_img_cache.html"></div>
-    <div include-html="draw\lv_img_decoder.html"></div>
-    <div include-html="draw\lv_img_buf.html"></div>
-    <div include-html="widgets\img\lv_img.html"></div>
-    <script>includeHTML();</script>
-
 .. Autogenerated
 
 .. raw:: html
 
-    <div include-html="draw\lv_img_decoder.html"></div>
     <div include-html="misc\lv_gc.html"></div>
+    <div include-html="draw\lv_img_buf.html"></div>
+    <div include-html="draw\lv_img_cache.html"></div>
+    <div include-html="draw\lv_img_decoder.html"></div>
     <div include-html="widgets\img\lv_img.html"></div>
     <div include-html="draw\lv_img_cache_builtin.html"></div>
-    <div include-html="draw\lv_img_buf.html"></div>
     <div include-html="draw\lv_draw_img.html"></div>
-    <div include-html="draw\lv_img_cache.html"></div>
     <script>includeHTML();</script>
 

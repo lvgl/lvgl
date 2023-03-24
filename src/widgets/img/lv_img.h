@@ -47,7 +47,7 @@ typedef struct {
     lv_point_t pivot;     /*rotation center of the image*/
     uint16_t zoom;         /*256 means no zoom, 512 double size, 128 half size*/
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
-    uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
+    uint8_t cf : 5;        /*Color format from `lv_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
     uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
 } lv_img_t;
@@ -57,6 +57,9 @@ extern const lv_obj_class_t lv_img_class;
 /**
  * Image size mode, when image size and object size is different
  */
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     /** Zoom doesn't affect the coordinates of the object,
      *  however if zoomed in the image is drawn out of the its coordinates.
@@ -67,13 +70,14 @@ enum {
      *  It causes layout recalculation.
      *  If the object size is set explicitly, the image will be cropped when zoomed in.*/
     LV_IMG_SIZE_MODE_REAL,
-} _lv_img_size_mode_t;
 
-#ifdef DOXYGEN
-typedef _lv_img_size_mode_t lv_img_size_mode_t;
+ #ifdef DOXYGEN
+} lv_img_size_mode_t;
 #else
+};
+
 typedef uint8_t lv_img_size_mode_t;
-#endif
+#endif /*DOXYGEN*/
 
 /**********************
  * GLOBAL PROTOTYPES

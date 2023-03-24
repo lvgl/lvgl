@@ -31,18 +31,21 @@ extern "C" {
 
 /**
  * Source of image.*/
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_IMG_SRC_VARIABLE, /** Binary/C variable*/
     LV_IMG_SRC_FILE, /** File in filesystem*/
     LV_IMG_SRC_SYMBOL, /** Symbol (@ref lv_symbol_def.h)*/
     LV_IMG_SRC_UNKNOWN, /** Unknown source*/
-} _lv_img_src_t;
-
 #ifdef DOXYGEN
-typedef _lv_img_src_t lv_img_src_t;
+} lv_img_src_t;
 #else
+};
+
 typedef uint8_t lv_img_src_t;
-#endif
+#endif /*DOXYGEN*/
 
 /*Decoder function definitions*/
 struct _lv_img_decoder_dsc_t;

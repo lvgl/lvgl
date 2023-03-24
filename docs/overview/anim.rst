@@ -176,8 +176,8 @@ API
 
 .. raw:: html
 
+    <div include-html="misc\lv_anim.html"></div>
     <div include-html="misc\lv_gc.html"></div>
     <div include-html="misc\lv_anim_timeline.html"></div>
-    <div include-html="misc\lv_anim.html"></div>
     <script>includeHTML();</script>
 

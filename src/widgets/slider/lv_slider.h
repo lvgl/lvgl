@@ -30,18 +30,21 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_SLIDER_MODE_NORMAL = LV_BAR_MODE_NORMAL,
     LV_SLIDER_MODE_SYMMETRICAL = LV_BAR_MODE_SYMMETRICAL,
     LV_SLIDER_MODE_RANGE = LV_BAR_MODE_RANGE
-} _lv_slider_mode_t;
-
 #ifdef DOXYGEN
-typedef _lv_slider_mode_t lv_slider_mode_t;
+} lv_slider_mode_t;
 #else
+};
+
 typedef uint8_t lv_slider_mode_t;
-#endif
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     lv_bar_t bar;       /*Add the ancestor's type first*/

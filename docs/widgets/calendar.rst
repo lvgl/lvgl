@@ -126,7 +126,7 @@ API
 .. raw:: html
 
     <div include-html="widgets\calendar\lv_calendar.html"></div>
-    <div include-html="widgets\calendar\lv_calendar_header_dropdown.html"></div>
     <div include-html="widgets\calendar\lv_calendar_header_arrow.html"></div>
+    <div include-html="widgets\calendar\lv_calendar_header_dropdown.html"></div>
     <script>includeHTML();</script>
 

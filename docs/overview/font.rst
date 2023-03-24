@@ -138,10 +138,9 @@ base direction from their parent.
 To set an object's base direction use :cpp:expr:`lv_obj_set_base_dir(obj, base_dir)`.
 The possible base directions are: 
 
-- :cpp:enumerator:`LV_BIDI_DIR_LTR`: Left to Right base direction
-- :cpp:enumerator:`LV_BIDI_DIR_RTL`: Right to Left base direction
-- :cpp:enumerator:`LV_BIDI_DIR_AUTO`: Auto detect base direction
-- :cpp:enumerator:`LV_BIDI_DIR_INHERIT`: Inherit base direction from the parent (or a default value for non-screen objects)
+- :cpp:enumerator:`LV_BASE_DIR_LTR`: Left to Right base direction
+- :cpp:enumerator:`LV_BASE_DIR_RTL`: Right to Left base direction
+- :cpp:enumerator:`LV_BASE_DIR_AUTO`: Auto detect base direction
 
 This list summarizes the effect of RTL base direction on objects: 
 
@@ -167,8 +166,8 @@ LVGL supports these rules if :c:macro:`LV_USE_ARABIC_PERSIAN_CHARS` is enabled.
 However, there are some limitations: 
 
 - Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature. 
-- Static text (i.e. const) is not processed. E.g. texts set by :cpp:func:`lv_label_set_text()` will be "Arabic processed" but :cpp:func:`lv_lable_set_text_static()` won't.
-- Text get functions (e.g. :cpp:func:`lv_label_get_text()`) will return the processed text.
+- Static text (i.e. const) is not processed. E.g. texts set by :cpp:func:`lv_label_set_text` will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` won't.
+- Text get functions (e.g. :cpp:func:`lv_label_get_text`) will return the processed text.
 
 Subpixel rendering
 ------------------
@@ -372,7 +371,7 @@ API
 .. raw:: html
 
     <div include-html="font\lv_font_fmt_txt.html"></div>
-    <div include-html="font\lv_font.html"></div>
     <div include-html="font\lv_font_loader.html"></div>
+    <div include-html="font\lv_font.html"></div>
     <script>includeHTML();</script>
 

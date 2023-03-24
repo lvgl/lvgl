@@ -26,18 +26,20 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_ARC_MODE_NORMAL,
     LV_ARC_MODE_SYMMETRICAL,
     LV_ARC_MODE_REVERSE
-} _lv_arc_mode_t;
-
 #ifdef DOXYGEN
-typedef _lv_arc_mode_t lv_arc_mode_t;
+} lv_arc_mode_t;
 #else
+};
+
 typedef uint8_t lv_arc_mode_t;
-#endif
+#endif /*DOXYGEN*/
 
 
 typedef struct {

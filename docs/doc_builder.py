@@ -15,16 +15,16 @@ def load_xml(fle):
     # a typedef and it causes an error to occur building the docs. The Error
     # doesn't stop the documentation from being generated, I just don't want
     # to see the ugly red output.
-
-    if 'typedef void() lv_lru_free_t(void *v)' in d:
-        d = d.replace(
-            '<type>void()</type>\n        '
-            '<definition>typedef void() lv_lru_free_t(void *v)</definition>',
-            '<type>void</type>\n        '
-            '<definition>typedef void(lv_lru_free_t)(void *v)</definition>'
-        )
-        with open(fle, 'wb') as f:
-            f.write(d.encode('utf-8'))
+    #
+    # if 'typedef void() lv_lru_free_t(void *v)' in d:
+    #     d = d.replace(
+    #         '<type>void()</type>\n        '
+    #         '<definition>typedef void() lv_lru_free_t(void *v)</definition>',
+    #         '<type>void</type>\n        '
+    #         '<definition>typedef void(lv_lru_free_t)(void *v)</definition>'
+    #     )
+    #     with open(fle, 'wb') as f:
+    #         f.write(d.encode('utf-8'))
 
     return ET.fromstring(d)
 

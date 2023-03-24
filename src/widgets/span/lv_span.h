@@ -27,30 +27,35 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_SPAN_OVERFLOW_CLIP,
     LV_SPAN_OVERFLOW_ELLIPSIS,
-} _lv_span_overflow_t;
+#ifdef DOXYGEN
+} lv_span_overflow_t;
+#else
+};
+
+typedef uint8_t lv_span_overflow_t;
+#endif /*DOXYGEN*/
 
 #ifdef DOXYGEN
-typedef _lv_span_overflow_t lv_span_overflow_t;
-#else
-typedef uint8_t lv_span_overflow_t;
-#endif
-
-
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_SPAN_MODE_FIXED,     /**< fixed the obj size*/
     LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size*/
     LV_SPAN_MODE_BREAK,     /**< Keep width, break the too long lines and expand height*/
-} _lv_span_mode_t;
-
-
 #ifdef DOXYGEN
-typedef _lv_span_mode_t lv_span_mode_t;
+} lv_span_mode_t;
 #else
+};
+
 typedef uint8_t lv_span_mode_t;
-#endif
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     char * txt;             /* a pointer to display text */

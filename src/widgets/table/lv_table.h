@@ -33,6 +33,9 @@ LV_EXPORT_CONST_INT(LV_TABLE_CELL_NONE);
  *      TYPEDEFS
  **********************/
 
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_TABLE_CELL_CTRL_MERGE_RIGHT = 1 << 0,
     LV_TABLE_CELL_CTRL_TEXT_CROP   = 1 << 1,
@@ -40,13 +43,14 @@ enum {
     LV_TABLE_CELL_CTRL_CUSTOM_2    = 1 << 5,
     LV_TABLE_CELL_CTRL_CUSTOM_3    = 1 << 6,
     LV_TABLE_CELL_CTRL_CUSTOM_4    = 1 << 7,
-} _lv_table_cell_ctrl_t;
-
 #ifdef DOXYGEN
-typedef _lv_table_cell_ctrl_t lv_table_cell_ctrl_t;
+} lv_table_cell_ctrl_t;
 #else
+};
+
 typedef uint8_t lv_table_cell_ctrl_t;
-#endif
+#endif /*DOXYGEN*/
+
 
 /*Data of table*/
 typedef struct {

@@ -24,29 +24,35 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_MENU_HEADER_TOP_FIXED, /* Header is positioned at the top */
     LV_MENU_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
     LV_MENU_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
-} _lv_menu_mode_header_t;
+#ifdef DOXYGEN
+} lv_menu_mode_header_t;
+#else
+};
+
+typedef uint8_t lv_menu_mode_header_t;
+#endif /*DOXYGEN*/
+
 
 #ifdef DOXYGEN
-typedef _lv_menu_mode_header_t lv_menu_mode_header_t;
-#else
-typedef uint8_t lv_menu_mode_header_t;
-#endif
-
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_MENU_ROOT_BACK_BTN_DISABLED,
     LV_MENU_ROOT_BACK_BTN_ENABLED
-} _lv_menu_mode_root_back_btn_t;
-
 #ifdef DOXYGEN
-typedef _lv_menu_mode_root_back_btn_t lv_menu_mode_root_back_btn_t;
+} lv_menu_mode_root_back_btn_t;
 #else
+};
+
 typedef uint8_t lv_menu_mode_root_back_btn_t;
-#endif
+#endif /*DOXYGEN*/
 
 typedef struct /// @cond
 /**

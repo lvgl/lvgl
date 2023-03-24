@@ -162,7 +162,7 @@ Convert color
 
 You can convert a color from the current color depth to another. The
 converter functions return with a number, so you have to use the
-:cpp:member:``full` field to map a converted color back into a structure:
+:cpp:member:`full` field to map a converted color back into a structure:
 
 .. code:: c
 

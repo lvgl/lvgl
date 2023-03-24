@@ -22,20 +22,20 @@ Mode
 ^^^^
 
 Scrollbars are displayed according to a configured ``mode``. The
-following ``mode``\ s exist: - ``LV_SCROLLBAR_MODE_OFF`` Never show the
-scrollbars - ``LV_SCROLLBAR_MODE_ON`` Always show the scrollbars -
-``LV_SCROLLBAR_MODE_ACTIVE`` Show scroll bars while an object is being
-scrolled - ``LV_SCROLLBAR_MODE_AUTO`` Show scroll bars when the content
-is large enough to be scrolled
+following ``mode``\ (s) exist:
 
-``lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_...)`` sets the
-scrollbar mode on an object.
+- :cpp:enumerator:`LV_SCROLLBAR_MODE_OFF`: Never show the scrollbars
+- :cpp:enumerator:`LV_SCROLLBAR_MODE_ON`: Always show the scrollbars
+- :cpp:enumerator:`LV_SCROLLBAR_MODE_ACTIVE`: Show scroll bars while an object is being scrolled
+- :cpp:enumerator:`LV_SCROLLBAR_MODE_AUTO`: Show scroll bars when the content is large enough to be scrolled
+
+``lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_...)`` sets the scrollbar mode on an object.
 
 Styling
 ^^^^^^^
 
 The scrollbars have their own dedicated part, called
-``LV_PART_SCROLLBAR``. For example a scrollbar can turn to red like
+:cpp:enumerator:`LV_PART_SCROLLBAR`. For example a scrollbar can turn to red like
 this:
 
 .. code:: c
@@ -48,7 +48,7 @@ this:
 
    lv_obj_add_style(obj, &style_red, LV_PART_SCROLLBAR);
 
-An object goes to the ``LV_STATE_SCROLLED`` state while it's being
+An object goes to the :cpp:enumerator:`LV_STATE_SCROLLED` state while it's being
 scrolled. This allows adding different styles to the scrollbar or the
 object itself when scrolled. This code makes the scrollbar blue when the
 object is scrolled:
@@ -63,10 +63,10 @@ object is scrolled:
 
    lv_obj_add_style(obj, &style_blue, LV_STATE_SCROLLED | LV_PART_SCROLLBAR);
 
-If the base direction of the ``LV_PART_SCROLLBAR`` is RTL
-(``LV_BASE_DIR_RTL``) the vertical scrollbar will be placed on the left.
+If the base direction of the :cpp:enumerator:`LV_PART_SCROLLBAR` is RTL
+(:c:macro:`LV_BASE_DIR_RTL`) the vertical scrollbar will be placed on the left.
 Note that, the ``base_dir`` style property is inherited. Therefore, it
-can be set directly on the ``LV_PART_SCROLLBAR`` part of an object or on
+can be set directly on the :cpp:enumerator:`LV_PART_SCROLLBAR` part of an object or on
 the object's or any parent's main part to make a scrollbar inherit the
 base direction.
 
@@ -76,12 +76,12 @@ base direction.
 Events
 ------
 
-The following events are related to scrolling: -
-``LV_EVENT_SCROLL_BEGIN`` Scrolling begins. The event parameter is
-``NULL`` or an ``lv_anim_t *`` with a scroll animation descriptor that
-can be modified if required. - ``LV_EVENT_SCROLL_END`` Scrolling ends. -
-``LV_EVENT_SCROLL`` Scroll happened. Triggered on every position change.
-Scroll events
+The following events are related to scrolling:
+- :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`: Scrolling begins. The event parameter is
+  ``NULL`` or an ``lv_anim_t *`` with a scroll animation descriptor that
+  can be modified if required.
+- :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends.
+- :cpp:enumerator:`LV_EVENT_SCROLL`: Scroll happened. Triggered on every position change. Scroll events
 
 Basic example
 *************
@@ -98,20 +98,23 @@ Scrollable
 ----------
 
 It's possible to make an object non-scrollable with
-``lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE)``.
+:cpp:expr:`lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE)`.
 
 Non-scrollable objects can still propagate the scrolling (chain) to
 their parents.
 
 The direction in which scrolling happens can be controlled by
 ``lv_obj_set_scroll_dir(obj, LV_DIR_...)``. The following values are
-possible for the direction: - ``LV_DIR_TOP`` only scroll up -
-``LV_DIR_LEFT`` only scroll left - ``LV_DIR_BOTTOM`` only scroll down -
-``LV_DIR_RIGHT`` only scroll right - ``LV_DIR_HOR`` only scroll
-horizontally - ``LV_DIR_VER`` only scroll vertically - ``LV_DIR_ALL``
-scroll any directions
+possible for the direction:
+- :cpp:enumerator:`LV_DIR_TOP`: only scroll up
+- :cpp:enumerator:`LV_DIR_LEFT`: only scroll left
+- :cpp:enumerator:`LV_DIR_BOTTOM`: only scroll down
+- :cpp:enumerator:`LV_DIR_RIGHT`: only scroll right
+- :cpp:enumerator:`LV_DIR_HOR`: only scroll horizontally
+- :cpp:enumerator:`LV_DIR_VER`: only scroll vertically
+- :cpp:enumerator:`LV_DIR_ALL`: scroll any directions
 
-OR-ed values are also possible. E.g. ``LV_DIR_TOP | LV_DIR_LEFT``.
+OR-ed values are also possible. E.g. :cpp:expr:`LV_DIR_TOP | LV_DIR_LEFT`.
 
 Scroll chain
 ------------
@@ -135,7 +138,7 @@ inertial momentum for the scrolling. It's like the object was thrown and
 scrolling slows down smoothly.
 
 The scroll momentum can be enabled/disabled with the
-``LV_OBJ_FLAG_SCROLL_MOMENTUM`` flag.
+:cpp:enumerator:`LV_OBJ_FLAG_SCROLL_MOMENTUM` flag.
 
 Elastic scroll
 --------------
@@ -144,7 +147,7 @@ Normally an object can't be scrolled past the extremeties of its
 content. That is the top side of the content can't be below the top side
 of the object.
 
-However, with ``LV_OBJ_FLAG_SCROLL_ELASTIC`` a fancy effect is added
+However, with :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ELASTIC` a fancy effect is added
 when the user "over-scrolls" the content. The scrolling slows down, and
 the content can be scrolled inside the object. When the object is
 released the content scrolled in it will be animated back to the valid
@@ -155,22 +158,24 @@ Snapping
 
 The children of an object can be snapped according to specific rules
 when scrolling ends. Children can be made snappable individually with
-the ``LV_OBJ_FLAG_SNAPPABLE`` flag.
+the :cpp:enumerator:`LV_OBJ_FLAG_SNAPPABLE` flag.
 
-An object can align snapped children in four ways: -
-``LV_SCROLL_SNAP_NONE`` Snapping is disabled. (default) -
-``LV_SCROLL_SNAP_START`` Align the children to the left/top side of a
-scrolled object - ``LV_SCROLL_SNAP_END`` Align the children to the
-right/bottom side of a scrolled object - ``LV_SCROLL_SNAP_CENTER`` Align
-the children to the center of a scrolled object
+An object can align snapped children in four ways:
+
+- :cpp:enumerator:`LV_SCROLL_SNAP_NONE`: Snapping is disabled. (default)
+- :cpp:enumerator:`LV_SCROLL_SNAP_START`: Align the children to the left/top side of a scrolled object
+- :cpp:enumerator:`LV_SCROLL_SNAP_END`: Align the children to the right/bottom side of a scrolled object
+- :cpp:enumerator:`LV_SCROLL_SNAP_CENTER`: Align the children to the center of a scrolled object
 
 Snap alignment is set with
 ``lv_obj_set_scroll_snap_x/y(obj, LV_SCROLL_SNAP_...)``:
 
-Under the hood the following happens: 1. User scrolls an object and
-releases the screen 2. LVGL calculates where the scroll would end
-considering scroll momentum 3. LVGL finds the nearest scroll point 4.
-LVGL scrolls to the snap point with an animation
+Under the hood the following happens:
+
+1. User scrolls an object and releases the screen
+2. LVGL calculates where the scroll would end considering scroll momentum
+3. LVGL finds the nearest scroll point
+4. LVGL scrolls to the snap point with an animation
 
 Scroll one
 ----------
@@ -178,9 +183,9 @@ Scroll one
 The "scroll one" feature tells LVGL to allow scrolling only one
 snappable child at a time. This requires making the children snappable
 and setting a scroll snap alignment different from
-``LV_SCROLL_SNAP_NONE``.
+:cpp:enumerator:`LV_SCROLL_SNAP_NONE`.
 
-This feature can be enabled by the ``LV_OBJ_FLAG_SCROLL_ONE`` flag.
+This feature can be enabled by the :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ONE` flag.
 
 Scroll on focus
 ---------------
@@ -197,14 +202,12 @@ tabview.
 Scroll manually
 ***************
 
-The following API functions allow manual scrolling of objects: -
-``lv_obj_scroll_by(obj, x, y, LV_ANIM_ON/OFF)`` scroll by ``x`` and
-``y`` values - ``lv_obj_scroll_to(obj, x, y, LV_ANIM_ON/OFF)`` scroll to
-bring the given coordinate to the top left corner -
-``lv_obj_scroll_to_x(obj, x, LV_ANIM_ON/OFF)`` scroll to bring the given
-coordinate to the left side -
-``lv_obj_scroll_to_y(obj, y, LV_ANIM_ON/OFF)`` scroll to bring the given
-coordinate to the top side
+The following API functions allow manual scrolling of objects:
+
+- ``lv_obj_scroll_by(obj, x, y, LV_ANIM_ON/OFF)`` scroll by ``x`` and ``y`` values
+- ``lv_obj_scroll_to(obj, x, y, LV_ANIM_ON/OFF)`` scroll to bring the given coordinate to the top left corner
+- ``lv_obj_scroll_to_x(obj, x, LV_ANIM_ON/OFF)`` scroll to bring the given coordinate to the left side
+- ``lv_obj_scroll_to_y(obj, y, LV_ANIM_ON/OFF)`` scroll to bring the given coordinate to the top side
 
 From time to time you may need to retrieve the scroll position of an
 element, either to restore it later, or to display dynamically some
@@ -225,13 +228,14 @@ to combine scroll event and store the scroll top position.
    lv_obj_add_event(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
 
 Scrool coordinates can be retrieve from differents axes with these
-functions: - ``lv_obj_get_scroll_x(obj)`` Get the ``x`` coordinate of
-object - ``lv_obj_get_scroll_y(obj)`` Get the ``y`` coordinate of object
+functions:
+
+- ``lv_obj_get_scroll_x(obj)`` Get the ``x`` coordinate of object
+- ``lv_obj_get_scroll_y(obj)`` Get the ``y`` coordinate of object
 - ``lv_obj_get_scroll_top(obj)`` Get the scroll coordinate from the top
-- ``lv_obj_get_scroll_bottom(obj)`` Get the scroll coordinate from the
-bottom - ``lv_obj_get_scroll_left(obj)`` Get the scroll coordinate from
-the left - ``lv_obj_get_scroll_right(obj)`` Get the scroll coordinate
-from the right
+- ``lv_obj_get_scroll_bottom(obj)`` Get the scroll coordinate from the bottom
+- ``lv_obj_get_scroll_left(obj)`` Get the scroll coordinate from the left
+- ``lv_obj_get_scroll_right(obj)`` Get the scroll coordinate from the right
 
 Self size
 *********
@@ -249,7 +253,7 @@ and make the table scrollable.
 This means not only the children can make an object scrollable but a
 larger self size will too.
 
-LVGL uses the ``LV_EVENT_GET_SELF_SIZE`` event to get the self size of
+LVGL uses the :cpp:enumerator:`LV_EVENT_GET_SELF_SIZE` event to get the self size of
 an object. Here is an example to see how to handle the event:
 
 .. code:: c
@@ -274,12 +278,6 @@ Examples
 
 API
 ***
-
-
-.. raw:: html
-
-    <div include-html="core\lv_obj_scroll.html"></div>
-    <script>includeHTML();</script>
 
 .. Autogenerated
 

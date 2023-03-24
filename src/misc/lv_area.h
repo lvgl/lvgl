@@ -48,6 +48,10 @@ typedef struct {
 } lv_area_t;
 
 /** Alignments*/
+
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_ALIGN_DEFAULT = 0,
     LV_ALIGN_TOP_LEFT,
@@ -72,9 +76,18 @@ enum {
     LV_ALIGN_OUT_RIGHT_TOP,
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
+#ifdef DOXYGEN
+} lv_align_t;
+#else
 };
-typedef uint8_t lv_align_t;
 
+typedef uint8_t lv_align_t;
+#endif /*DOXYGEN*/
+
+
+#ifdef DOXYGEN
+typedef
+#endif /*DOXYGEN*/
 enum {
     LV_DIR_NONE     = 0x00,
     LV_DIR_LEFT     = (1 << 0),
@@ -84,9 +97,14 @@ enum {
     LV_DIR_HOR      = LV_DIR_LEFT | LV_DIR_RIGHT,
     LV_DIR_VER      = LV_DIR_TOP | LV_DIR_BOTTOM,
     LV_DIR_ALL      = LV_DIR_HOR | LV_DIR_VER,
+#ifdef DOXYGEN
+} lv_dir_t;
+#else
 };
 
 typedef uint8_t lv_dir_t;
+#endif /*DOXYGEN*/
+
 
 /**********************
  * GLOBAL PROTOTYPES
