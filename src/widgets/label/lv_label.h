@@ -42,9 +42,6 @@ LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SELECTION_OFF);
  **********************/
 
 /** Long mode behaviors. Used in 'lv_label_ext_t'*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_LABEL_LONG_WRAP,             /**< Keep the object width, wrap lines longer than object width and expand the object height*/
     LV_LABEL_LONG_DOT,              /**< Keep the size and write dots at the end if the text is too long*/

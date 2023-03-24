@@ -10,13 +10,13 @@ and provide the call period in milliseconds. For example,
 ``lv_tick_inc(1)`` when calling every millisecond.
 
 ``lv_tick_inc`` should be called in a higher priority routine than
-``lv_task_handler()`` (e.g. in an interrupt) to precisely know the
+``lv_task_handler()`` (e.g. in an interrupt) to precisely know the
 elapsed milliseconds even if the execution of ``lv_task_handler`` takes
 more time.
 
 With FreeRTOS ``lv_tick_inc`` can be called in ``vApplicationTickHook``.
 
-On Linux based operating systems (e.g. on Raspberry Pi) ``lv_tick_inc``
+On Linux based operating systems (e.g. on Raspberry Pi) ``lv_tick_inc``
 can be called in a thread like below:
 
 .. code:: c

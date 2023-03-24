@@ -4505,7 +4505,7 @@ anim
 ~~~~
 
 The animation template for the object’s animation. Should be a pointer
-to :cpp:struct:`lv_anim_t`. The animation parameters are widget specific,
+to :cpp:type:`lv_anim_t`. The animation parameters are widget specific,
 e.g. animation time could be the E.g. blink time of the cursor on the
 text area or scroll time of a roller. See the widgets’ documentation to
 learn more.

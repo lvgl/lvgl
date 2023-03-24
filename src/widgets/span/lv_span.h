@@ -27,9 +27,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_SPAN_OVERFLOW_CLIP,
     LV_SPAN_OVERFLOW_ELLIPSIS,
@@ -41,9 +38,6 @@ enum {
 typedef uint8_t lv_span_overflow_t;
 #endif /*DOXYGEN*/
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_SPAN_MODE_FIXED,     /**< fixed the obj size*/
     LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size*/

@@ -15,11 +15,11 @@ Create a timer
 
 To create a new timer, use
 :cpp:expr:`lv_timer_create(timer_cb, period_ms, user_data)`. It will create an
-:cpp:struct:`lv_timer_t` ``*`` variable, which can be used later to modify the
+:cpp:type:`lv_timer_t` ``*`` variable, which can be used later to modify the
 parameters of the timer. :cpp:func:`lv_timer_create_basic` can also be used.
 This allows you to create a new timer without specifying any parameters.
 
-A timer callback should have a :cpp:expr:`void (*lv_timer_cb_t)(lv_timer_t *)`
+A timer callback should have a ``void (*lv_timer_cb_t)(lv_timer_t *)``
 prototype.
 
 For example:
@@ -73,7 +73,7 @@ Measure idle time
 *****************
 
 You can get the idle percentage time of :cpp:func:`lv_timer_handler` with
-:cpp:func:`lv_timer_get_idle(`. Note that, it doesn’t measure the idle time of
+:cpp:func:`lv_timer_get_idle`. Note that, it doesn’t measure the idle time of
 the overall system, only :cpp:func:`lv_timer_handler`. It can be misleading if
 you use an operating system and call :cpp:func:`lv_timer_handler` in a timer, as
 it won’t actually measure the time the OS spends in an idle thread.
@@ -125,7 +125,7 @@ API
 
 .. raw:: html
 
-    <div include-html="misc\lv_gc.html"></div>
     <div include-html="misc\lv_timer.html"></div>
+    <div include-html="misc\lv_gc.html"></div>
     <script>includeHTML();</script>
 

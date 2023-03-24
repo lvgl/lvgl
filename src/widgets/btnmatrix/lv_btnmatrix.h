@@ -31,9 +31,6 @@ LV_EXPORT_CONST_INT(LV_BTNMATRIX_BTN_NONE);
 
 /** Type to store button control bits (disabled, hidden etc.)
  * The first 3 bits are used to store the width*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     _LV_BTNMATRIX_WIDTH     = 0x0007,      /**< Reserved to stire the size units*/
     LV_BTNMATRIX_CTRL_HIDDEN     = 0x0008, /**< Button hidden*/

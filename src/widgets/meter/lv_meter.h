@@ -30,9 +30,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_METER_INDICATOR_TYPE_NEEDLE_IMG,
     LV_METER_INDICATOR_TYPE_NEEDLE_LINE,

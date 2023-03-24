@@ -46,9 +46,6 @@ typedef struct {
 } lv_font_fmt_txt_glyph_dsc_t;
 
 /** Format of font character map.*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
     LV_FONT_FMT_TXT_CMAP_SPARSE_FULL,

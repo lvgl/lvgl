@@ -51,9 +51,6 @@ typedef struct {
 } lv_font_glyph_dsc_t;
 
 /** The bitmaps might be upscaled by 3 to achieve subpixel rendering.*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_FONT_SUBPX_NONE,
     LV_FONT_SUBPX_HOR,

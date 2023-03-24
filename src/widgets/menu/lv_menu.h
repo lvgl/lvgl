@@ -24,9 +24,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_MENU_HEADER_TOP_FIXED, /* Header is positioned at the top */
     LV_MENU_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
@@ -40,9 +37,6 @@ typedef uint8_t lv_menu_mode_header_t;
 #endif /*DOXYGEN*/
 
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_MENU_ROOT_BACK_BTN_DISABLED,
     LV_MENU_ROOT_BACK_BTN_ENABLED

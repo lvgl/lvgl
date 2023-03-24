@@ -24,9 +24,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_COLORWHEEL_MODE_HUE,
     LV_COLORWHEEL_MODE_SATURATION,

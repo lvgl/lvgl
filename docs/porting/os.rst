@@ -12,7 +12,7 @@ Tasks and threads
 -----------------
 
 If you need to use real tasks or threads, you need a mutex which should
-be invoked before the call of ``lv_timer_handler`` and released after
+be invoked before the call of :cpp:func:`lv_timer_handler` and released after
 it. Also, you have to use the same mutex in other tasks and threads
 around every LVGL (``lv_...``) related function call and code. This way
 you can use LVGL in a real multitasking environment. Just make use of a
@@ -54,10 +54,10 @@ Interrupts
 ----------
 
 Try to avoid calling LVGL functions from interrupt handlers (except
-``lv_tick_inc()`` and ``lv_disp_flush_ready()``). But if you need to do
+:cpp:func:`lv_tick_inc` and :cpp:func:`lv_disp_flush_ready`). But if you need to do
 this you have to disable the interrupt which uses LVGL functions while
-``lv_timer_handler`` is running.
+:cpp:func:`lv_timer_handler` is running.
 
 It’s a better approach to simply set a flag or some value in the
 interrupt, and periodically check it in an LVGL timer (which is run by
-``lv_timer_handler``).
+:cpp:func:`lv_timer_handler`).

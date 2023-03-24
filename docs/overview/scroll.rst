@@ -77,9 +77,9 @@ Events
 ------
 
 The following events are related to scrolling:
+
 - :cpp:enumerator:`LV_EVENT_SCROLL_BEGIN`: Scrolling begins. The event parameter is
-  ``NULL`` or an ``lv_anim_t *`` with a scroll animation descriptor that
-  can be modified if required.
+  ``NULL`` or an ``lv_anim_t *`` with a scroll animation descriptor that can be modified if required.
 - :cpp:enumerator:`LV_EVENT_SCROLL_END`: Scrolling ends.
 - :cpp:enumerator:`LV_EVENT_SCROLL`: Scroll happened. Triggered on every position change. Scroll events
 
@@ -236,6 +236,7 @@ functions:
 - ``lv_obj_get_scroll_bottom(obj)`` Get the scroll coordinate from the bottom
 - ``lv_obj_get_scroll_left(obj)`` Get the scroll coordinate from the left
 - ``lv_obj_get_scroll_right(obj)`` Get the scroll coordinate from the right
+
 
 Self size
 *********

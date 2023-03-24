@@ -30,9 +30,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_BASE_DIR_LTR      = 0x00,
     LV_BASE_DIR_RTL      = 0x01,

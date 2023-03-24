@@ -237,11 +237,11 @@ To get a property’s value from a style:
        do_something(v.color);
    }
 
-:cpp:struct:`lv_style_value_t`:cpp:struct: has 3 fields:
+:cpp:struct:`lv_style_value_t` has 3 fields:
 
-- :cpp:member:`lv_style_value_t.num`: for integer, boolean and opacity properties
-- :cpp:member:`lv_style_value_t.color`: for color properties
-- :cpp:member:`lv_style_value_t.ptr`: for pointer properties
+- :cpp:member:`num`: for integer, boolean and opacity properties
+- :cpp:member:`color`: for color properties
+- :cpp:member:`ptr`: for pointer properties
 
 To reset a style (free all its data) use:
 
@@ -339,7 +339,7 @@ notified. There are 3 options to do this:
    object(s) are affected by that style call :cpp:expr:`lv_obj_refresh_style(obj, part, property)`.
    To refresh all parts and properties use :cpp:expr:`lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY)`.
 3. To make LVGL check all objects to see if they use a style and refresh them
-   when needed, call :cpp:expr:`lv_obj_report_style_change(&style)``. If ``style``
+   when needed, call :cpp:expr:`lv_obj_report_style_change(&style)`. If ``style``
    is ``NULL`` all objects will be notified about a style change.
 
 Get a property’s value on an object
@@ -535,11 +535,11 @@ API
 
 .. raw:: html
 
-    <div include-html="misc\lv_gc.html"></div>
     <div include-html="layouts\flex\lv_flex.html"></div>
+    <div include-html="layouts\grid\lv_grid.html"></div>
     <div include-html="core\lv_obj_style.html"></div>
     <div include-html="misc\lv_style.html"></div>
+    <div include-html="misc\lv_gc.html"></div>
     <div include-html="misc\lv_style_gen.html"></div>
-    <div include-html="layouts\grid\lv_grid.html"></div>
     <script>includeHTML();</script>
 

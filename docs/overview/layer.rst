@@ -83,6 +83,7 @@ API
 
 .. raw:: html
 
-    <div include-html="core\lv_disp.html"></div>
     <div include-html="core\lv_obj_draw.html"></div>
+    <div include-html="core\lv_disp.html"></div>
     <script>includeHTML();</script>
+

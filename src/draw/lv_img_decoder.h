@@ -31,9 +31,6 @@ extern "C" {
 
 /**
  * Source of image.*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_IMG_SRC_VARIABLE, /** Binary/C variable*/
     LV_IMG_SRC_FILE, /** File in filesystem*/

@@ -26,9 +26,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_ARC_MODE_NORMAL,
     LV_ARC_MODE_SYMMETRICAL,

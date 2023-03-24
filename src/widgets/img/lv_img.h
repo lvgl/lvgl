@@ -57,9 +57,6 @@ extern const lv_obj_class_t lv_img_class;
 /**
  * Image size mode, when image size and object size is different
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     /** Zoom doesn't affect the coordinates of the object,
      *  however if zoomed in the image is drawn out of the its coordinates.

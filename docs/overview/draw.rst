@@ -364,21 +364,21 @@ API
 
 .. raw:: html
 
-    <div include-html="draw\lv_draw_layer.html"></div>
-    <div include-html="misc\lv_gc.html"></div>
-    <div include-html="draw\lv_draw_label.html"></div>
-    <div include-html="draw\lv_draw_rect.html"></div>
-    <div include-html="draw\lv_draw_mask.html"></div>
-    <div include-html="draw\lv_draw_transform.html"></div>
-    <div include-html="draw\sdl\lv_draw_sdl_layer.html"></div>
-    <div include-html="draw\sw\lv_draw_sw.html"></div>
-    <div include-html="draw\sw\lv_draw_sw_blend.html"></div>
     <div include-html="draw\lv_draw_img.html"></div>
+    <div include-html="draw\sw\lv_draw_sw_blend.html"></div>
+    <div include-html="draw\lv_draw_triangle.html"></div>
+    <div include-html="draw\lv_draw_layer.html"></div>
+    <div include-html="draw\sdl\lv_draw_sdl_layer.html"></div>
+    <div include-html="draw\lv_draw_mask.html"></div>
+    <div include-html="draw\lv_draw_label.html"></div>
+    <div include-html="draw\sdl\lv_draw_sdl_mask.html"></div>
+    <div include-html="draw\lv_draw_line.html"></div>
+    <div include-html="draw\lv_draw_rect.html"></div>
+    <div include-html="draw\sw\lv_draw_sw.html"></div>
     <div include-html="draw\sdl\lv_draw_sdl_composite.html"></div>
     <div include-html="draw\lv_draw_arc.html"></div>
-    <div include-html="draw\lv_draw_triangle.html"></div>
-    <div include-html="draw\lv_draw_line.html"></div>
+    <div include-html="misc\lv_gc.html"></div>
+    <div include-html="draw\lv_draw_transform.html"></div>
     <div include-html="draw\lv_draw.html"></div>
-    <div include-html="draw\sdl\lv_draw_sdl_mask.html"></div>
     <script>includeHTML();</script>
 

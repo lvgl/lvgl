@@ -36,9 +36,6 @@ LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 /**
  * Chart types
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_CHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_CHART_TYPE_LINE,     /**< Connect the points with lines*/
@@ -56,9 +53,6 @@ typedef uint8_t lv_chart_type_t;
 /**
  * Chart update mode for `lv_chart_set_next`
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_CHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one the right*/
     LV_CHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
@@ -74,9 +68,6 @@ typedef uint8_t lv_chart_update_mode_t;
 /**
  * Enumeration of the axis'
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_CHART_AXIS_PRIMARY_Y     = 0x00,
     LV_CHART_AXIS_SECONDARY_Y   = 0x01,

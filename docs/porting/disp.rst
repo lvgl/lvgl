@@ -52,7 +52,7 @@ Draw buffers
 ------------
 
 The draw buffers can be set with
-:cpp:expr:`lv_disp_set_draw_buffers(disp, buf1, buf2, buf_size_px, render_mode);`
+:cpp:expr:`lv_disp_set_draw_buffers(disp, buf1, buf2, buf_size_px, render_mode)`
 
 -  ``buf1`` a bufer where LVGL can render
 -  ``buf2`` a second optional buffer (see more details below)
@@ -117,7 +117,7 @@ still sees the whole resolution and the values needs to be converted to
 the active LVGL display area. So the physical resoltution and the offset
 of the active area can be set with
 :cpp:expr:`lv_disp_set_physical_res(disp, hor_res, ver_res)` and
-:cpp:expr:`lv_disp_set_offset(disp, x, y)``
+:cpp:expr:`lv_disp_set_offset(disp, x, y)`
 
 Rotation
 --------
@@ -139,10 +139,10 @@ Set the color format of the display. The default is
 :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` which means LVGL render with the follow
 formats dpeneding on :c:macro:`LV_COLOR_DEPTH`:
 
-- :cpp:enumerator:`LV_COLOR_DEPTH 32`: XRGB8888 (4 bytes/pixel)
-- :cpp:enumerator:`LV_COLOR_DEPTH 24`: RGB888 (3 bytes/pixel)
-- :cpp:enumerator:`LV_COLOR_DEPTH 16`: RGB565 (2 bytes/pixel)
-- :cpp:enumerator:`LV_COLOR_DEPTH 8`: L8 (1 bytes/pixel)
+- :c:macro:`LV_COLOR_DEPTH` ``32``: XRGB8888 (4 bytes/pixel)
+- :c:macro:`LV_COLOR_DEPTH` ``24``: RGB888 (3 bytes/pixel)
+- :c:macro:`LV_COLOR_DEPTH` ``16``: RGB565 (2 bytes/pixel)
+- :c:macro:`LV_COLOR_DEPTH` ``8``: L8 (1 bytes/pixel)
 
 The ``color_format`` can be changed with
 :cpp:expr:`lv_disp_set_color_depth(disp, LV_COLOR_FORMAT_...)` to the following
@@ -263,8 +263,8 @@ API
 
 .. raw:: html
 
-    <div include-html="core\lv_disp.html"></div>
     <div include-html="misc\lv_gc.html"></div>
+    <div include-html="core\lv_disp.html"></div>
     <div include-html="core\lv_refr.html"></div>
     <script>includeHTML();</script>
 

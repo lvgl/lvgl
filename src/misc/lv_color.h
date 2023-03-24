@@ -29,9 +29,6 @@ LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
  * Opacity percentages.
  */
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_OPA_TRANSP = 0,
     LV_OPA_0      = 0,

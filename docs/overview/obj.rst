@@ -311,20 +311,20 @@ API
 
 .. raw:: html
 
+    <div include-html="core\lv_obj_draw.html"></div>
+    <div include-html="core\lv_obj_scroll.html"></div>
+    <div include-html="core\lv_obj_event.html"></div>
+    <div include-html="layouts\flex\lv_flex.html"></div>
+    <div include-html="widgets\tileview\lv_tileview.html"></div>
+    <div include-html="core\lv_obj_style_gen.html"></div>
+    <div include-html="core\lv_refr.html"></div>
+    <div include-html="layouts\grid\lv_grid.html"></div>
+    <div include-html="core\lv_obj_pos.html"></div>
+    <div include-html="core\lv_obj.html"></div>
+    <div include-html="core\lv_obj_style.html"></div>
+    <div include-html="core\lv_obj_tree.html"></div>
     <div include-html="core\lv_obj_class.html"></div>
     <div include-html="misc\lv_gc.html"></div>
-    <div include-html="core\lv_obj_scroll.html"></div>
-    <div include-html="core\lv_obj_style_gen.html"></div>
-    <div include-html="layouts\flex\lv_flex.html"></div>
-    <div include-html="core\lv_obj_pos.html"></div>
-    <div include-html="core\lv_obj_style.html"></div>
-    <div include-html="widgets\tileview\lv_tileview.html"></div>
-    <div include-html="core\lv_obj_tree.html"></div>
     <div include-html="lv_api_map.html"></div>
-    <div include-html="core\lv_obj_draw.html"></div>
-    <div include-html="core\lv_obj_event.html"></div>
-    <div include-html="layouts\grid\lv_grid.html"></div>
-    <div include-html="core\lv_obj.html"></div>
-    <div include-html="core\lv_refr.html"></div>
     <script>includeHTML();</script>
 

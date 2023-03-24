@@ -38,9 +38,6 @@ struct _lv_obj_t;
  * Possible states of a widget.
  * OR-ed values are possible
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_STATE_DEFAULT     =  0x0000,
     LV_STATE_CHECKED     =  0x0001,
@@ -73,9 +70,6 @@ typedef uint16_t lv_state_t;
  * Not all parts are used by every widget
  */
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
     LV_PART_SCROLLBAR    = 0x010000,   /**< The scrollbar(s)*/
@@ -89,7 +83,6 @@ enum {
     LV_PART_CUSTOM_FIRST = 0x080000,    /**< Extension point for custom widgets*/
 
     LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
-
 #ifdef DOXYGEN
 } lv_part_t;
 #else
@@ -134,14 +127,12 @@ typedef enum {
     LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
-} _lv_obj_flag_t;
-
-
 #ifdef DOXYGEN
-typedef _lv_obj_flag_t lv_obj_flag_t;
+} lv_obj_flag_t;
 #else
+};
 typedef uint32_t lv_obj_flag_t;
-#endif
+#endif /*DOXYGEN*/
 
 
 /**

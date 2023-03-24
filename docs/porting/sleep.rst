@@ -29,5 +29,5 @@ function to signal a wake-up (press, touch or click etc.) has happened:
    timer_start();                   /*Restart the timer where lv_tick_inc() is called*/
    lv_task_handler();               /*Call `lv_task_handler()` manually to process the wake-up event*/
 
-In addition to ``lv_disp_get_inactive_time()`` you can check
-``lv_anim_count_running()`` to see if all animations have finished.
+In addition to :cpp:func:`lv_disp_get_inactive_time` you can check
+:cpp:func:`lv_anim_count_running` to see if all animations have finished.

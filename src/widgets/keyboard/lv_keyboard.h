@@ -36,9 +36,6 @@ extern "C" {
  **********************/
 
 /** Current keyboard mode.*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_KEYBOARD_MODE_TEXT_LOWER,
     LV_KEYBOARD_MODE_TEXT_UPPER,

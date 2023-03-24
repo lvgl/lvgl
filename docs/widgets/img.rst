@@ -227,12 +227,12 @@ API
 
 .. raw:: html
 
+    <div include-html="draw\lv_draw_img.html"></div>
+    <div include-html="draw\lv_img_cache_builtin.html"></div>
+    <div include-html="draw\lv_img_decoder.html"></div>
     <div include-html="misc\lv_gc.html"></div>
     <div include-html="draw\lv_img_buf.html"></div>
-    <div include-html="draw\lv_img_cache.html"></div>
-    <div include-html="draw\lv_img_decoder.html"></div>
     <div include-html="widgets\img\lv_img.html"></div>
-    <div include-html="draw\lv_img_cache_builtin.html"></div>
-    <div include-html="draw\lv_draw_img.html"></div>
+    <div include-html="draw\lv_img_cache.html"></div>
     <script>includeHTML();</script>
 

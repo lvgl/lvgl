@@ -40,9 +40,6 @@ extern "C" {
  * Options for text rendering.
  */
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_TEXT_FLAG_NONE    = 0x00,
     LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
@@ -59,9 +56,6 @@ typedef uint8_t lv_text_flag_t;
 
 /**
  * State machine for text renderer.*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
     LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
@@ -76,9 +70,6 @@ typedef uint8_t lv_text_cmd_state_t;
 
 
 /** Label align policy*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_TEXT_ALIGN_AUTO, /**< Align text auto*/
     LV_TEXT_ALIGN_LEFT, /**< Align text to left*/

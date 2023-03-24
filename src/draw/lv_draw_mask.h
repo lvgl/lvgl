@@ -32,9 +32,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_DRAW_MASK_RES_TRANSP,
     LV_DRAW_MASK_RES_FULL_COVER,
@@ -74,9 +71,6 @@ static inline bool lv_draw_mask_is_any(const lv_area_t * a)
 
 #if LV_USE_DRAW_MASKS
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_DRAW_MASK_TYPE_LINE,
     LV_DRAW_MASK_TYPE_ANGLE,
@@ -92,9 +86,6 @@ enum {
 typedef uint8_t lv_draw_mask_type_t;
 #endif /*DOXYGEN*/
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_DRAW_MASK_LINE_SIDE_LEFT = 0,
     LV_DRAW_MASK_LINE_SIDE_RIGHT,

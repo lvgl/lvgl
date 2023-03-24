@@ -33,9 +33,6 @@ LV_EXPORT_CONST_INT(LV_TABLE_CELL_NONE);
  *      TYPEDEFS
  **********************/
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_TABLE_CELL_CTRL_MERGE_RIGHT = 1 << 0,
     LV_TABLE_CELL_CTRL_TEXT_CROP   = 1 << 1,

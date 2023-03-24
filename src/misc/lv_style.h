@@ -85,9 +85,6 @@ LV_EXPORT_CONST_INT(LV_ZOOM_NONE);
 /**
  * Possible options how to blend opaque drawings
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_BLEND_MODE_NORMAL,     /**< Simply mix according to the opacity value*/
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
@@ -106,9 +103,6 @@ typedef uint8_t lv_blend_mode_t;
  * Some options to apply decorations on texts.
  * 'OR'ed values can be used.
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_TEXT_DECOR_NONE          = 0x00,
     LV_TEXT_DECOR_UNDERLINE     = 0x01,
@@ -126,9 +120,6 @@ typedef uint8_t lv_text_decor_t;
  * Selects on which sides border should be drawn
  * 'OR'ed values can be used.
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_BORDER_SIDE_NONE     = 0x00,
     LV_BORDER_SIDE_BOTTOM   = 0x01,
@@ -149,9 +140,6 @@ typedef uint8_t lv_border_side_t;
 /**
  * The direction of the gradient.
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_GRAD_DIR_NONE, /**< No gradient (the `grad_color` property is ignored)*/
     LV_GRAD_DIR_VER,  /**< Vertical (top to bottom) gradient*/
@@ -169,9 +157,6 @@ typedef uint8_t lv_grad_dir_t;
  * The dithering algorithm for the gradient
  * Depends on LV_DRAW_SW_GRADIENT_DITHER
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/
     LV_DITHER_ORDERED,  /**< Ordered dithering. Faster to compute and use less memory but lower quality*/
@@ -217,9 +202,6 @@ typedef union {
  *
  * Props are split into groups of 16. When adding a new prop to a group, ensure it does not overflow into the next one.
  */
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_STYLE_PROP_INV               = 0,
 
@@ -338,9 +320,6 @@ enum {
 typedef uint16_t lv_style_prop_t;
 #endif /*DOXYGEN*/
 
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_STYLE_RES_NOT_FOUND,
     LV_STYLE_RES_FOUND,

@@ -29,9 +29,6 @@ extern "C" {
 struct _lv_obj_t;
 
 /** Scrollbar modes: shows when should the scrollbars be visible*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_SCROLLBAR_MODE_OFF,      /**< Never show scrollbars*/
     LV_SCROLLBAR_MODE_ON,       /**< Always show scrollbars*/
@@ -46,9 +43,6 @@ typedef uint8_t lv_scrollbar_mode_t;
 #endif /*DOXYGEN*/
 
 /** Scroll span align options. Tells where to align the snappable children when scroll stops.*/
-#ifdef DOXYGEN
-typedef
-#endif /*DOXYGEN*/
 enum {
     LV_SCROLL_SNAP_NONE,    /**< Do not align, leave where it is*/
     LV_SCROLL_SNAP_START,   /**< Align to the left/top*/
