@@ -30,7 +30,7 @@ Limitations
    flash it's better to convert them to C array with `LVGL's image converter <https://lvgl.io/tools/imageconverter>`__.
 -  The BMP files color format needs to match with :c:macro:`LV_COLOR_DEPTH`.
    Use GIMP to save the image in the required format. Both RGB888 and
-   ARGB888 works with :c:expr:`LV_COLOR_DEPTH` ``32``
+   ARGB888 works with :c:macro:`LV_COLOR_DEPTH` ``32``
 -  Palette is not supported.
 -  Because not the whole image is read in can not be zoomed or rotated.
 

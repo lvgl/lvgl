@@ -176,7 +176,7 @@ Ext. draw No
 height
 ~~~~~~
 
-Sets the height of object. Pixel, percentage and ``LV_SIZE_CONTENT`` can
+Sets the height of object. Pixel, percentage and :c:macro:`LV_SIZE_CONTENT` can
 be used. Percentage values are relative to the height of the parent’s
 content area.
 
@@ -453,10 +453,21 @@ align
 
 Set the alignment which tells from which point of the parent the X and Y
 coordinates should be interpreted. The possible values are:
-``LV_ALIGN_DEFAULT``, ``LV_ALIGN_TOP_LEFT/MID/RIGHT``,
-``LV_ALIGN_BOTTOM_LEFT/MID/RIGHT``, ``LV_ALIGN_LEFT/RIGHT_MID``,
-``LV_ALIGN_CENTER``. ``LV_ALIGN_DEFAULT`` means ``LV_ALIGN_TOP_LEFT``
-with LTR base direction and ``LV_ALIGN_TOP_RIGHT`` with RTL base
+
+- :cpp:enumerator:`LV_ALIGN_DEFAULT`, 
+- :cpp:enumerator:`LV_ALIGN_TOP_LEFT`
+- :cpp:enumerator:`LV_ALIGN_TOP_MID`
+- :cpp:enumerator:`LV_ALIGN_TOP_RIGHT`,
+- :cpp:enumerator:`LV_ALIGN_BOTTOM_LEFT`
+- :cpp:enumerator:`LV_ALIGN_BOTTOM_MID`
+- :cpp:enumerator:`LV_ALIGN_BOTTOM_RIGHT`, 
+- :cpp:enumerator:`LV_ALIGN_LEFT_MID`
+- :cpp:enumerator:`LV_ALIGN_RIGHT_MID`,
+- :cpp:enumerator:`LV_ALIGN_CENTER`. 
+- :cpp:enumerator:`LV_ALIGN_DEFAULT`
+
+:cpp:enumerator:`LV_ALIGN_DEFAULT` means :cpp:enumerator:`LV_ALIGN_TOP_LEFT`
+with LTR base direction and :cpp:enumerator:`LV_ALIGN_TOP_RIGHT` with RTL base
 direction.
 
 .. raw:: html
@@ -467,7 +478,7 @@ direction.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_ALIGN_DEFAULT``
+Default :cpp:enumerator:`LV_ALIGN_DEFAULT`
 
 .. raw:: html
 
@@ -511,7 +522,7 @@ transform_width
 ~~~~~~~~~~~~~~~
 
 Make the object wider on both sides with this value. Pixel and
-percentage (with ``lv_pct(x)``) values can be used. Percentage values
+percentage (with :cpp:expr:`lv_pct(x)`) values can be used. Percentage values
 are relative to the object’s width.
 
 .. raw:: html
@@ -566,7 +577,7 @@ transform_height
 ~~~~~~~~~~~~~~~~
 
 Make the object higher on both sides with this value. Pixel and
-percentage (with ``lv_pct(x)``) values can be used. Percentage values
+percentage (with :cpp:expr:`lv_pct(x)`) values can be used. Percentage values
 are relative to the object’s height.
 
 .. raw:: html
@@ -621,7 +632,7 @@ translate_x
 ~~~~~~~~~~~
 
 Move the object with this value in X direction. Applied after layouts,
-aligns and other positioning. Pixel and percentage (with ``lv_pct(x)``)
+aligns and other positioning. Pixel and percentage (with :cpp:expr:`lv_pct(x)`)
 values can be used. Percentage values are relative to the object’s
 width.
 
@@ -677,7 +688,7 @@ translate_y
 ~~~~~~~~~~~
 
 Move the object with this value in Y direction. Applied after layouts,
-aligns and other positioning. Pixel and percentage (with ``lv_pct(x)``)
+aligns and other positioning. Pixel and percentage (with :cpp:expr:`lv_pct(x)`)
 values can be used. Percentage values are relative to the object’s
 height.
 
@@ -732,7 +743,7 @@ Ext. draw No
 transform_zoom
 ~~~~~~~~~~~~~~
 
-Zoom an objects. The value 256 (or ``LV_ZOOM_NONE``) means normal size,
+Zoom an objects. The value 256 (or :cpp:enumerator:`LV_ZOOM_NONE`) means normal size,
 128 half size, 512 double size, and so on
 
 .. raw:: html
@@ -1557,10 +1568,10 @@ Ext. draw No
 bg_opa
 ~~~~~~
 
-Set the opacity of the background. Value 0, ``LV_OPA_0`` or
-``LV_OPA_TRANSP`` means fully transparent, 255, ``LV_OPA_100`` or
-``LV_OPA_COVER`` means fully covering, other values or LV_OPA_10,
-LV_OPA_20, etc means semi transparency.
+Set the opacity of the background. Value 0, :cpp:enumerator:`LV_OPA_0` or
+:cpp:enumerator:`LV_OPA_TRANSP` means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or
+:cpp:enumerator:`LV_OPA_COVER` means fully covering, other values or :cpp:enumerator:`LV_OPA_10`,
+:cpp:enumerator:`LV_OPA_20`, etc means semi transparency.
 
 .. raw:: html
 
@@ -1570,7 +1581,7 @@ LV_OPA_20, etc means semi transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_TRANSP``
+Default :cpp:enumerator:`LV_OPA_TRANSP`
 
 .. raw:: html
 
@@ -1614,7 +1625,7 @@ bg_grad_color
 ~~~~~~~~~~~~~
 
 Set the gradient color of the background. Used only if ``grad_dir`` is
-not ``LV_GRAD_DIR_NONE``
+not :cpp:enumerator:`LV_GRAD_DIR_NONE`
 
 .. raw:: html
 
@@ -1668,7 +1679,11 @@ bg_grad_dir
 ~~~~~~~~~~~
 
 Set the direction of the gradient of the background. The possible values
-are ``LV_GRAD_DIR_NONE/HOR/VER``.
+are:
+
+- :cpp:enumerator:`LV_GRAD_DIR_NONE`
+- :cpp:enumerator:`LV_GRAD_DIR_HOR`
+- :cpp:enumerator:`LV_GRAD_DIR_VER`
 
 .. raw:: html
 
@@ -1678,7 +1693,7 @@ are ``LV_GRAD_DIR_NONE/HOR/VER``.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_GRAD_DIR_NONE``
+Default :cpp:enumerator:`LV_GRAD_DIR_NONE`
 
 .. raw:: html
 
@@ -1832,8 +1847,8 @@ bg_grad
 ~~~~~~~
 
 Set the gradient definition. The pointed instance must exist while the
-object is alive. NULL to disable. It wraps ``BG_GRAD_COLOR``,
-``BG_GRAD_DIR``, ``BG_MAIN_STOP`` and ``BG_GRAD_STOP`` into one
+object is alive. NULL to disable. It wraps :cpp:enumerator:`BG_GRAD_COLOR`,
+:cpp:enumerator:`BG_GRAD_DIR`, :cpp:enumerator:`BG_MAIN_STOP` and :cpp:enumerator:`BG_GRAD_STOP` into one
 descriptor and allows creating gradients with more colors too.
 
 .. raw:: html
@@ -1888,7 +1903,11 @@ bg_dither_mode
 ~~~~~~~~~~~~~~
 
 Set the dithering mode of the gradient of the background. The possible
-values are ``LV_DITHER_NONE/ORDERED/ERR_DIFF``.
+values are:
+
+- :cpp:enumerator:`LV_DITHER_NONE`
+- :cpp:enumerator:`LV_DITHER_ORDERED`
+- :cpp:enumerator:`LV_DITHER_ERR_DIFF`
 
 .. raw:: html
 
@@ -1898,7 +1917,7 @@ values are ``LV_DITHER_NONE/ORDERED/ERR_DIFF``.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_DITHER_NONE``
+Default :cpp:enumerator:`LV_DITHER_NONE`
 
 .. raw:: html
 
@@ -1941,7 +1960,7 @@ Ext. draw No
 bg_img_src
 ~~~~~~~~~~
 
-Set a background image. Can be a pointer to ``lv_img_dsc_t``, a path to
+Set a background image. Can be a pointer to :cpp:struct:`lv_img_dsc_t`, a path to
 a file or an ``LV_SYMBOL_...``
 
 .. raw:: html
@@ -1995,9 +2014,9 @@ Ext. draw Yes
 bg_img_opa
 ~~~~~~~~~~
 
-Set the opacity of the background image. Value 0, ``LV_OPA_0`` or
-``LV_OPA_TRANSP`` means fully transparent, 255, ``LV_OPA_100`` or
-``LV_OPA_COVER`` means fully covering, other values or LV_OPA_10,
+Set the opacity of the background image. Value 0, :cpp:enumerator:`LV_OPA_0` or
+:cpp:enumerator:`LV_OPA_TRANSP` means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or
+:cpp:enumerator:`LV_OPA_COVER` means fully covering, other values or LV_OPA_10,
 LV_OPA_20, etc means semi transparency.
 
 .. raw:: html
@@ -2008,7 +2027,7 @@ LV_OPA_20, etc means semi transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -2104,9 +2123,9 @@ Ext. draw No
 bg_img_recolor_opa
 ~~~~~~~~~~~~~~~~~~
 
-Set the intensity of background image recoloring. Value 0, ``LV_OPA_0``
-or ``LV_OPA_TRANSP`` means no mixing, 255, ``LV_OPA_100`` or
-``LV_OPA_COVER`` means full recoloring, other values or LV_OPA_10,
+Set the intensity of background image recoloring. Value 0, :cpp:enumerator:`LV_OPA_0`
+or :cpp:enumerator:`LV_OPA_TRANSP` means no mixing, 255, :cpp:enumerator:`LV_OPA_100` or
+:cpp:enumerator:`LV_OPA_COVER` means full recoloring, other values or LV_OPA_10,
 LV_OPA_20, etc are interpreted proportionally.
 
 .. raw:: html
@@ -2117,7 +2136,7 @@ LV_OPA_20, etc are interpreted proportionally.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_TRANSP``
+Default :cpp:enumerator:`LV_OPA_TRANSP`
 
 .. raw:: html
 
@@ -2272,9 +2291,9 @@ Ext. draw No
 border_opa
 ~~~~~~~~~~
 
-Set the opacity of the border. Value 0, ``LV_OPA_0`` or
-``LV_OPA_TRANSP`` means fully transparent, 255, ``LV_OPA_100`` or
-``LV_OPA_COVER`` means fully covering, other values or LV_OPA_10,
+Set the opacity of the border. Value 0, :cpp:enumerator:`LV_OPA_0` or
+:cpp:enumerator:`LV_OPA_TRANSP` means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or
+:cpp:enumerator:`LV_OPA_COVER` means fully covering, other values or LV_OPA_10,
 LV_OPA_20, etc means semi transparency.
 
 .. raw:: html
@@ -2285,7 +2304,7 @@ LV_OPA_20, etc means semi transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -2382,8 +2401,16 @@ border_side
 ~~~~~~~~~~~
 
 Set only which side(s) the border should be drawn. The possible values
-are ``LV_BORDER_SIDE_NONE/TOP/BOTTOM/LEFT/RIGHT/INTERNAL``. OR-ed values
-can be used as well, e.g. ``LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT``.
+are:
+
+- :cpp:enumerator:`LV_BORDER_SIDE_NONE`
+- :cpp:enumerator:`LV_BORDER_SIDE_TOP`
+- :cpp:enumerator:`LV_BORDER_SIDE_BOTTOM`
+- :cpp:enumerator:`LV_BORDER_SIDE_LEFT`
+- :cpp:enumerator:`LV_BORDER_SIDE_RIGHT`
+- :cpp:enumerator:`LV_BORDER_SIDE_INTERNAL`
+
+OR-ed values can be used as well, e.g. :cpp:expr:`LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT`.
 
 .. raw:: html
 
@@ -2393,7 +2420,7 @@ can be used as well, e.g. ``LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_LEFT``.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_BORDER_SIDE_NONE``
+Default :cpp:enumerator:`LV_BORDER_SIDE_NONE`
 
 .. raw:: html
 
@@ -2602,9 +2629,9 @@ Ext. draw No
 outline_opa
 ~~~~~~~~~~~
 
-Set the opacity of the outline. Value 0, ``LV_OPA_0`` or
-``LV_OPA_TRANSP`` means fully transparent, 255, ``LV_OPA_100`` or
-``LV_OPA_COVER`` means fully covering, other values or LV_OPA_10,
+Set the opacity of the outline. Value 0, :cpp:enumerator:`LV_OPA_0` or
+:cpp:enumerator:`LV_OPA_TRANSP` means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or
+:cpp:enumerator:`LV_OPA_COVER` means fully covering, other values or LV_OPA_10,
 LV_OPA_20, etc means semi transparency.
 
 .. raw:: html
@@ -2615,7 +2642,7 @@ LV_OPA_20, etc means semi transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -2658,7 +2685,7 @@ Ext. draw Yes
 outline_pad
 ~~~~~~~~~~~
 
-Set the padding of the outline, i.e. the gap between object and the
+Set the padding of the outline, i.e. the gap between object and the
 outline.
 
 .. raw:: html
@@ -2983,9 +3010,9 @@ Ext. draw No
 shadow_opa
 ~~~~~~~~~~
 
-Set the opacity of the shadow. Value 0, ``LV_OPA_0`` or
-``LV_OPA_TRANSP`` means fully transparent, 255, ``LV_OPA_100`` or
-``LV_OPA_COVER`` means fully covering, other values or LV_OPA_10,
+Set the opacity of the shadow. Value 0, :cpp:enumerator:`LV_OPA_0` or
+:cpp:enumerator:`LV_OPA_TRANSP` means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or
+:cpp:enumerator:`LV_OPA_COVER` means fully covering, other values or LV_OPA_10,
 LV_OPA_20, etc means semi transparency.
 
 .. raw:: html
@@ -2996,7 +3023,7 @@ LV_OPA_20, etc means semi transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -3044,8 +3071,8 @@ Properties to describe the images
 img_opa
 ~~~~~~~
 
-Set the opacity of an image. Value 0, ``LV_OPA_0`` or ``LV_OPA_TRANSP``
-means fully transparent, 255, ``LV_OPA_100`` or ``LV_OPA_COVER`` means
+Set the opacity of an image. Value 0, :cpp:enumerator:`LV_OPA_0` or :cpp:enumerator:`LV_OPA_TRANSP`
+means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or :cpp:enumerator:`LV_OPA_COVER` means
 fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi
 transparency.
 
@@ -3057,7 +3084,7 @@ transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -3153,9 +3180,9 @@ Ext. draw No
 img_recolor_opa
 ~~~~~~~~~~~~~~~
 
-Set the intensity of the color mixing. Value 0, ``LV_OPA_0`` or
-``LV_OPA_TRANSP`` means fully transparent, 255, ``LV_OPA_100`` or
-``LV_OPA_COVER`` means fully covering, other values or LV_OPA_10,
+Set the intensity of the color mixing. Value 0, :cpp:enumerator:`LV_OPA_0` or
+:cpp:enumerator:`LV_OPA_TRANSP` means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or
+:cpp:enumerator:`LV_OPA_COVER` means fully covering, other values or LV_OPA_10,
 LV_OPA_20, etc means semi transparency.
 
 .. raw:: html
@@ -3492,7 +3519,7 @@ Set the opacity of the lines.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -3710,7 +3737,7 @@ Set the opacity of the arcs.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -3755,7 +3782,7 @@ arc_img_src
 
 Set an image from which the arc will be masked out. It’s useful to
 display complex effects on the arcs. Can be a pointer to
-``lv_img_dsc_t`` or a path to a file
+:cpp:struct:`lv_img_dsc_t` or a path to a file
 
 .. raw:: html
 
@@ -3867,8 +3894,8 @@ Ext. draw No
 text_opa
 ~~~~~~~~
 
-Set the opacity of the text. Value 0, ``LV_OPA_0`` or ``LV_OPA_TRANSP``
-means fully transparent, 255, ``LV_OPA_100`` or ``LV_OPA_COVER`` means
+Set the opacity of the text. Value 0, :cpp:enumerator:`LV_OPA_0` or :cpp:enumerator:`LV_OPA_TRANSP`
+means fully transparent, 255, :cpp:enumerator:`LV_OPA_100` or :cpp:enumerator:`LV_OPA_COVER` means
 fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi
 transparency.
 
@@ -3880,7 +3907,7 @@ transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -3923,7 +3950,7 @@ Ext. draw No
 text_font
 ~~~~~~~~~
 
-Set the font of the text (a pointer ``lv_font_t *``).
+Set the font of the text (a pointer :cpp:type:`lv_font_t` ``*``).
 
 .. raw:: html
 
@@ -3933,7 +3960,7 @@ Set the font of the text (a pointer ``lv_font_t *``).
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_FONT_DEFAULT``
+Default :cpp:enumerator:`LV_FONT_DEFAULT`
 
 .. raw:: html
 
@@ -4082,9 +4109,13 @@ Ext. draw No
 text_decor
 ~~~~~~~~~~
 
-Set decoration for the text. The possible values are
-``LV_TEXT_DECOR_NONE/UNDERLINE/STRIKETHROUGH``. OR-ed values can be used
-as well.
+Set decoration for the text. The possible values are:
+
+- :cpp:enumerator:`LV_TEXT_DECOR_NONE`
+- :cpp:enumerator:`LV_TEXT_DECOR_UNDERLINE`
+- :cpp:enumerator:`LV_TEXT_DECOR_STRIKETHROUGH`
+
+OR-ed values can be used as well.
 
 .. raw:: html
 
@@ -4094,7 +4125,7 @@ as well.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_TEXT_DECOR_NONE``
+Default :cpp:enumerator:`LV_TEXT_DECOR_NONE`
 
 .. raw:: html
 
@@ -4138,9 +4169,14 @@ text_align
 ~~~~~~~~~~
 
 Set how to align the lines of the text. Note that it doesn’t align the
-object itself, only the lines inside the object. The possible values are
-``LV_TEXT_ALIGN_LEFT/CENTER/RIGHT/AUTO``. ``LV_TEXT_ALIGN_AUTO`` detect
-the text base direction and uses left or right alignment accordingly
+object itself, only the lines inside the object. The possible values are:
+
+- :cpp:enumerator:`LV_TEXT_ALIGN_LEFT`
+- :cpp:enumerator:`LV_TEXT_ALIGN_CENTER`
+- :cpp:enumerator:`LV_TEXT_ALIGN_RIGHT`
+- :cpp:enumerator:`LV_TEXT_ALIGN_AUTO` `
+
+:cpp:enumerator:`LV_TEXT_ALIGN_AUTO` detect the text base direction and uses left or right alignment accordingly
 
 .. raw:: html
 
@@ -4150,7 +4186,7 @@ the text base direction and uses left or right alignment accordingly
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_TEXT_ALIGN_AUTO``
+Default :cpp:enumerator:`LV_TEXT_ALIGN_AUTO`
 
 .. raw:: html
 
@@ -4199,7 +4235,7 @@ radius
 ~~~~~~
 
 Set the radius on every corner. The value is interpreted in pixel (>= 0)
-or ``LV_RADIUS_CIRCLE`` for max. radius
+or :c:macro:`LV_RADIUS_CIRCLE` for max. radius
 
 .. raw:: html
 
@@ -4307,8 +4343,8 @@ opa
 ~~~
 
 Scale down all opacity values of the object by this factor. Value 0,
-``LV_OPA_0`` or ``LV_OPA_TRANSP`` means fully transparent, 255,
-``LV_OPA_100`` or ``LV_OPA_COVER`` means fully covering, other values or
+:cpp:enumerator:`LV_OPA_0` or :cpp:enumerator:`LV_OPA_TRANSP` means fully transparent, 255,
+:cpp:enumerator:`LV_OPA_100` or :cpp:enumerator:`LV_OPA_COVER` means fully covering, other values or
 LV_OPA_10, LV_OPA_20, etc means semi transparency.
 
 .. raw:: html
@@ -4319,7 +4355,7 @@ LV_OPA_10, LV_OPA_20, etc means semi transparency.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_COVER``
+Default :cpp:enumerator:`LV_OPA_COVER`
 
 .. raw:: html
 
@@ -4425,7 +4461,7 @@ The intensity of mixing of color filter.
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_OPA_TRANSP``
+Default :cpp:enumerator:`LV_OPA_TRANSP`
 
 .. raw:: html
 
@@ -4469,8 +4505,8 @@ anim
 ~~~~
 
 The animation template for the object’s animation. Should be a pointer
-to ``lv_anim_t``. The animation parameters are widget specific,
-e.g. animation time could be the E.g. blink time of the cursor on the
+to :cpp:struct:`lv_anim_t`. The animation parameters are widget specific,
+e.g. animation time could be the E.g. blink time of the cursor on the
 text area or scroll time of a roller. See the widgets’ documentation to
 learn more.
 
@@ -4580,7 +4616,7 @@ Ext. draw No
 anim_speed
 ~~~~~~~~~~
 
-The animation speed in pixel/sec. Its meaning is widget specific. E.g.
+The animation speed in pixel/sec. Its meaning is widget specific. E.g.
 scroll speed of label. See the widgets’ documentation to learn more.
 
 .. raw:: html
@@ -4634,7 +4670,7 @@ Ext. draw No
 transition
 ~~~~~~~~~~
 
-An initialized ``lv_style_transition_dsc_t`` to describe a transition.
+An initialized :cpp:struct:`lv_style_transition_dsc_t` to describe a transition.
 
 .. raw:: html
 
@@ -4688,7 +4724,12 @@ blend_mode
 ~~~~~~~~~~
 
 Describes how to blend the colors to the background. The possible values
-are ``LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY``
+are:
+
+- :cpp:enumerator:`LV_BLEND_MODE_NORMAL`
+- :cpp:enumerator:`LV_BLEND_MODE_ADDITIVE`
+- :cpp:enumerator:`LV_BLEND_MODE_SUBTRACTIVE`
+- :cpp:enumerator:`LV_BLEND_MODE_MULTIPLY`
 
 .. raw:: html
 
@@ -4698,7 +4739,7 @@ are ``LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE/MULTIPLY``
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_BLEND_MODE_NORMAL``
+Default :cpp:enumerator:`LV_BLEND_MODE_NORMAL`
 
 .. raw:: html
 
@@ -4796,8 +4837,11 @@ Ext. draw No
 base_dir
 ~~~~~~~~
 
-Set the base direction of the object. The possible values are
-``LV_BIDI_DIR_LTR/RTL/AUTO``.
+Set the base direction of the object. The possible values are:
+
+- :cpp:enumerator:`LV_BASE_DIR_LTR`
+- :cpp:enumerator:`LV_BASE_DIR_RTL`
+- :cpp:enumerator:`LV_BASE_DIR_AUTO`.
 
 .. raw:: html
 
@@ -4807,7 +4851,7 @@ Set the base direction of the object. The possible values are
 
    <li style="display:inline; margin-right: 20px; margin-left: 0px">
 
-Default ``LV_BASE_DIR_AUTO``
+Default :cpp:enumerator:`LV_BASE_DIR_AUTO`
 
 .. raw:: html
 
