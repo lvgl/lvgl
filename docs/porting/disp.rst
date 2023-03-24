@@ -263,8 +263,8 @@ API
 
 .. raw:: html
 
+    <div include-html="core\lv_refr.html"></div>
     <div include-html="misc\lv_gc.html"></div>
     <div include-html="core\lv_disp.html"></div>
-    <div include-html="core\lv_refr.html"></div>
     <script>includeHTML();</script>
 

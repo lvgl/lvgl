@@ -525,6 +525,94 @@ include_html_template = '''\
 
 include_template = '    <div include-html="{path}"></div>'
 
+convert_output_path = r'C:\Users\drsch\Desktop\New folder (74)'
+
+
+def convert_express(express):
+    for name in structures:
+        if name == express[2:-2]:
+            return ':cpp:struct:' + express[1:-1]
+
+    for name in unions:
+        if name == express[2:-2]:
+            return ':cpp:union:' + express[1:-1]
+
+    for name in variables:
+        if name == express[2:-2]:
+            return ':cpp:var:' + express[1:-1]
+
+    for name in typedefs:
+        if name == express[2:-2]:
+            return ':cpp:type:' + express[1:-1]
+
+    for name in defines:
+        if name == express[2:-2]:
+            return ':c:macro:' + express[1:-1]
+
+    for name in functions:
+        if name == express[2:-2]:
+            return ':cpp:func:' + express[1:-1]
+        elif name + '()' == express[2:-2]:
+            return ':cpp:func:' + express[1:-4] + '`'
+        elif '=' not in express and '(' in express:
+            if express[2:-2].split('(', 1)[0] == name:
+                return ':cpp:expr:' + express[1:-1].replace(';', '')
+
+    for enum in enums.values():
+        for member in enum.members:
+            if member.name == express[2:-2]:
+                return ':cpp:enumerator:' + express[1:-1]
+    return express
+
+
+def convert_doc(src):
+    with open(src, 'rb') as f:
+        data = f.read().decode('utf-8')
+
+    last_char = ''
+    express = ''
+    output = ''
+
+    open_express = False
+
+    for char in data:
+        if char == '`':
+            if last_char == '`':
+                if open_express:
+                    express += '``'
+                    open_express = False
+                    express = ' '.join(item.strip() for item in express.split('\n'))
+                    output += convert_express(express)
+                    express = ''
+                    last_char = ''
+                else:
+                    open_express = True
+                    express = '``'
+
+                    last_char = ''
+            else:
+                last_char = '`'
+
+        elif open_express:
+            express += char
+            last_char = char
+
+        elif last_char == '`':
+            output += '`'
+            output += char
+            last_char = char
+        else:
+            output += char
+
+        dst = src.split('docs')[1][1:]
+        dst = os.path.join(convert_output_path, dst)
+        dst_path = os.path.split(dst)[0]
+        if not os.path.exists(dst_path):
+            os.makedirs(dst_path)
+
+        with open(dst, 'wb') as f:
+            f.write(output.encode('utf-8'))
+
 
 def run(*doc_paths):
     api_path = os.path.join(base_path, 'API')
@@ -682,6 +770,9 @@ def run(*doc_paths):
             html_includes.add(html_files[header_file])
 
         for name, path in items:
+            if 'widgets' in path:
+                convert_doc(path)
+
             html_includes = set()
 
             for container in (

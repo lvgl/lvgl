@@ -10,15 +10,15 @@ arcs, needles, ticks lines and labels.
 Parts and Styles
 ****************
 
--  ``LV_PART_MAIN`` The background of the Meter. Uses the typical
+-  :cpp:enumerator:`LV_PART_MAIN` The background of the Meter. Uses the typical
    background properties.
--  ``LV_PART_TICK`` The tick lines a labels using the *line* and *text*
+-  :cpp:enumerator:`LV_PART_TICK` The tick lines a labels using the *line* and *text*
    style properties.
--  ``LV_PART_INDICATOR`` The needle line or image using the *line* and
+-  :cpp:enumerator:`LV_PART_INDICATOR` The needle line or image using the *line* and
    *img* style properties, as well as the background properties to draw
    a square (or circle) on the pivot of the needles. Padding makes the
    square larger.
--  ``LV_PART_ITEMS`` The arcs using the *arc* properties.
+-  :cpp:enumerator:`LV_PART_ITEMS` The arcs using the *arc* properties.
 
 Usage
 *****
@@ -29,10 +29,10 @@ Scale
 The Scale has minor and major ticks, and labels on the major ticks.
 
 The minor tick lines can be configured with:
-``lv_meter_set_scale_ticks(meter, tick_count, line_width, tick_length, ctick_olor)``.
+:cpp:expr:`lv_meter_set_scale_ticks(meter, tick_count, line_width, tick_length, ctick_olor)`.
 
 To show major tick lines use
-``lv_meter_set_scale_major_ticks(meter, nth_major, tick_width, tick_length, tick_color, label_gap)``.
+:cpp:expr:`lv_meter_set_scale_major_ticks(meter, nth_major, tick_width, tick_length, tick_color, label_gap)`.
 ``nth_major`` to specify how many minor ticks to skip to draw a major
 tick.
 
@@ -40,7 +40,7 @@ Labels are added automatically on major ticks with ``label_gap``
 distance from the ticks with text proportionally to the values of the
 tick line.
 
-``lv_meter_set_scale_range(meter, min, max, angle_range, rotation)``
+:cpp:expr:`lv_meter_set_scale_range(meter, min, max, angle_range, rotation)`
 sets the value and angle range of the scale.
 
 Add indicators
@@ -58,7 +58,7 @@ Needle line
 adds a needle line to a Scale. By default, the length of the line is the
 same as the scale’s radius but ``r_mod`` changes the length.
 
-``lv_meter_set_indicator_value(meter, indic, value)`` sets the value of
+:cpp:expr:`lv_meter_set_indicator_value(meter, indic, value)` sets the value of
 the indicator.
 
 Needle image
@@ -70,7 +70,7 @@ needle pointing to the right like this ``-O--->``. ``pivot_x`` and
 ``pivot_y`` sets the pivot point of the rotation relative to the top
 left corner of the image.
 
-``lv_meter_set_indicator_value(meter, inidicator, value)`` sets the
+:cpp:expr:`lv_meter_set_indicator_value(meter, inidicator, value)` sets the
 value of the indicator.
 
 Arc
@@ -80,8 +80,8 @@ Arc
 and arc indicator. . By default, the radius of the arc is the same as
 the scale’s radius but ``r_mod`` changes the radius.
 
-``lv_meter_set_indicator_start_value(meter, indic, value)`` and
-``lv_meter_set_indicator_end_value(meter, inidicator, value)`` sets the
+:cpp:expr:`lv_meter_set_indicator_start_value(meter, indic, value)` and
+:cpp:expr:`lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the
 value of the indicator.
 
 Scale lines (ticks)
@@ -96,41 +96,41 @@ start and end value of the scale and only a “slice” of that color
 gradient will be visible in the indicator’s start and end value range.
 ``width_mod`` modifies the width of the tick lines.
 
-``lv_meter_set_indicator_start_value(meter, inidicator, value)`` and
-``lv_meter_set_indicator_end_value(meter, inidicator, value)`` sets the
+:cpp:expr:`lv_meter_set_indicator_start_value(meter, inidicator, value)` and
+:cpp:expr:`lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the
 value of the indicator.
 
 Events
 ******
 
--  ``LV_EVENT_DRAW_PART_BEGIN`` and ``LV_EVENT_DRAW_PART_END`` is sent
+-  :cpp:enumerator:`LV_EVENT_DRAW_PART_BEGIN` and :cpp:enumerator:`LV_EVENT_DRAW_PART_END` is sent
    for the following types:
 
-   -  ``LV_METER_DRAW_PART_ARC`` The arc indicator
+   -  :cpp:enumerator:`LV_METER_DRAW_PART_ARC` The arc indicator
 
-      -  ``part``: ``LV_PART_ITEMS``
+      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
       -  ``sub_part_ptr``: pointer to the indicator
       -  ``arc_dsc``
       -  ``radius``: radius of the arc
       -  ``p1`` center of the arc
 
-   -  ``LV_METER_DRAW_PART_NEEDLE_LINE`` The needle lines
+   -  :cpp:enumerator:`LV_METER_DRAW_PART_NEEDLE_LINE` The needle lines
 
-      -  ``part``: ``LV_PART_ITEMS``
+      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
       -  ``p1``, ``p2`` points of the line
       -  ``line_dsc``
       -  ``sub_part_ptr``: pointer to the indicator
 
-   -  ``LV_METER_DRAW_PART_NEEDLE_IMG`` The needle images
+   -  :cpp:enumerator:`LV_METER_DRAW_PART_NEEDLE_IMG` The needle images
 
-      -  ``part``: ``LV_PART_ITEMS``
+      -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
       -  ``p1``, ``p2`` points of the line
       -  ``img_dsc``
       -  ``sub_part_ptr``: pointer to the indicator
 
-   -  ``LV_METER_DRAW_PART_TICK`` The tick lines and labels
+   -  :cpp:enumerator:`LV_METER_DRAW_PART_TICK` The tick lines and labels
 
-      -  ``part``: ``LV_PART_TICKS``
+      -  ``part``: :cpp:enumerator:`LV_PART_TICKS`
       -  ``value``: the value of the line
       -  ``text``: ``value`` converted to decimal or ``NULL`` on minor
          lines
@@ -156,12 +156,6 @@ Example
 
 API
 ***
-
-
-.. raw:: html
-
-    <div include-html="widgets\meter\lv_meter.html"></div>
-    <script>includeHTML();</script>
 
 .. Autogenerated
 

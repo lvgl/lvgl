@@ -215,7 +215,7 @@ API
 
 .. raw:: html
 
-    <div include-html="misc\lv_event.html"></div>
     <div include-html="core\lv_obj_event.html"></div>
+    <div include-html="misc\lv_event.html"></div>
     <script>includeHTML();</script>
 

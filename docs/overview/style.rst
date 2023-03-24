@@ -535,11 +535,11 @@ API
 
 .. raw:: html
 
-    <div include-html="layouts\flex\lv_flex.html"></div>
     <div include-html="layouts\grid\lv_grid.html"></div>
-    <div include-html="core\lv_obj_style.html"></div>
-    <div include-html="misc\lv_style.html"></div>
-    <div include-html="misc\lv_gc.html"></div>
     <div include-html="misc\lv_style_gen.html"></div>
+    <div include-html="misc\lv_gc.html"></div>
+    <div include-html="layouts\flex\lv_flex.html"></div>
+    <div include-html="misc\lv_style.html"></div>
+    <div include-html="core\lv_obj_style.html"></div>
     <script>includeHTML();</script>
 

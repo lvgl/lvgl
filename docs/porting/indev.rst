@@ -242,8 +242,8 @@ API
 
 .. raw:: html
 
+    <div include-html="core\lv_indev_scroll.html"></div>
     <div include-html="core\lv_indev.html"></div>
     <div include-html="misc\lv_gc.html"></div>
-    <div include-html="core\lv_indev_scroll.html"></div>
     <script>includeHTML();</script>
 
