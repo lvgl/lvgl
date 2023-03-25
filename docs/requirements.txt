@@ -10,4 +10,5 @@ sphinxcontrib-htmlhelp
 sphinxcontrib-jsmath
 sphinxcontrib-qthelp
 sphinxcontrib-serializinghtml
+sphinx-rtd-dark-mode
 typing-extensions
