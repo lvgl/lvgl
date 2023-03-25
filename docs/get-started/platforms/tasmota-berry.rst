@@ -31,23 +31,16 @@ Highlights of Berry
 
 Berry has the following advantages:
 
--  Lightweight: A well-optimized interpreter with very little resources.
-   Ideal for use in microprocessors.
--  Fast: optimized one-pass bytecode compiler and register-based virtual
-   machine.
--  Powerful: supports imperative programming, object-oriented
-   programming, functional programming.
--  Flexible: Berry is a dynamic type script, and it’s intended for
-   embedding in applications. It can provide good dynamic scalability
-   for the host system.
--  Simple: simple and natural syntax, support garbage collection, and
-   easy to use FFI (foreign function interface).
--  RAM saving: With compile-time object construction, most of the
-   constant objects are stored in read-only code data segments, so the
-   RAM usage of the interpreter is very low when it starts.
+- Lightweight: A well-optimized interpreter with very little resources. Ideal for use in microprocessors.
+- Fast: optimized one-pass bytecode compiler and register-based virtual machine.
+- Powerful: supports imperative programming, object-oriented programming, functional programming.
+- Flexible: Berry is a dynamic type script, and it’s intended for embedding in applications.
+  It can provide good dynamic scalability for the host system.
+- Simple: simple and natural syntax, support garbage collection, and easy to use FFI (foreign function interface).
+- RAM saving: With compile-time object construction, most of the constant objects are stored
+  in read-only code data segments, so the RAM usage of the interpreter is very low when it starts.
 
-All features are detailed in the `Berry Reference
-Manual <https://github.com/berry-lang/berry/wiki/Reference>`__
+All features are detailed in the `Berry Reference Manual <https://github.com/berry-lang/berry/wiki/Reference>`__
 
 --------------
 
@@ -67,25 +60,22 @@ Versions supported: LVGL v8.0.2, LodePNG v20201017, Freetype 2.10.4
 Tasmota + Berry + LVGL could be used for:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  Fast prototyping GUI.
--  Shortening the cycle of changing and fine-tuning the GUI.
--  Modelling the GUI in a more abstract way by defining reusable
-   composite objects, taking advantage of Berry’s language features such
-   as Inheritance, Closures, Exception Handling…
--  Make LVGL accessible to a larger audience. No need to know C to
-   create a nice GUI on an embedded system.
+- Fast prototyping GUI.
+- Shortening the cycle of changing and fine-tuning the GUI.
+- Modelling the GUI in a more abstract way by defining reusable composite objects, taking
+  advantage of Berry’s language features such as Inheritance, Closures, Exception Handling…
+- Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.
 
 A higher level interface compatible with
-`OpenHASP <https://github.com/HASwitchPlate/openHASP>`__ is also under
-development.
+`OpenHASP <https://github.com/HASwitchPlate/openHASP>`__
+is also under development.
 
 --------------
 
 So what does it look like?
 --------------------------
 
-   TL;DR: Similar to MicroPython, it’s very much like the C API, but
-   Object-Oriented for LVGL components.
+TL;DR: Similar to MicroPython, it’s very much like the C API, but Object-Oriented for LVGL components.
 
 Let’s dive right into an example!
 
@@ -110,6 +100,6 @@ in less than 10 minutes in this `short tutorial <https://tasmota.github.io/docs/
 Where can I find more information?
 ----------------------------------
 
--  `Tasmota Documentation <https://tasmota.github.io/docs/>`__
--  `Berry Documentation <https://github.com/berry-lang/berry/wiki/Reference>`__
--  `Tasmota LVGL Berry documentation <https://tasmota.github.io/docs/LVGL/>`__
+- `Tasmota Documentation <https://tasmota.github.io/docs/>`__
+- `Berry Documentation <https://github.com/berry-lang/berry/wiki/Reference>`__
+- `Tasmota LVGL Berry documentation <https://tasmota.github.io/docs/LVGL/>`__

@@ -64,15 +64,13 @@ to point to our own copy of it.
 Additional CMake options
 ========================
 
-Besides :c:macro:`LV_CONF_PATH` there are few additional CMake options
-available.
+Besides :c:macro:`LV_CONF_PATH` there are few additional CMake options available.
 
 
 Include paths options
 ---------------------
 
--  :c:macro:`LV_LVGL_H_INCLUDE_SIMPLE`: which specifies whether to
-   ``#include "lvgl.h"`` absolut or relative
+-  :c:macro:`LV_LVGL_H_INCLUDE_SIMPLE`: which specifies whether to ``#include "lvgl.h"`` absolut or relative
 
    ============ ==============
    ON (default) OFF
@@ -80,8 +78,7 @@ Include paths options
    “lvgl.h”     “../../lvgl.h”
    ============ ==============
 
--  :c:macro:`LV_CONF_INCLUDE_SIMPLE`: which specifies whether to
-   ``#include "lv_conf.h"`` and ``"lv_drv_conf.h"`` absolut or relative
+-  :c:macro:`LV_CONF_INCLUDE_SIMPLE`: which specifies whether to ``#include "lv_conf.h"`` and ``"lv_drv_conf.h"`` absolut or relative
 
    =============== =====================
    ON (default)    OFF
@@ -104,17 +101,14 @@ Examples/demos options
   the main CMake file.
 | To disable their built, use:
 
--  :c:macro:`LV_CONF_BUILD_DISABLE_EXAMPLES`: Set to ``1`` to disable
-   *examples* build
--  :c:macro:`LV_CONF_BUILD_DISABLE_DEMOS`: Set to ``1`` to disable *demos*
-   build
+-  :c:macro:`LV_CONF_BUILD_DISABLE_EXAMPLES`: Set to ``1`` to disable *examples* build
+-  :c:macro:`LV_CONF_BUILD_DISABLE_DEMOS`: Set to ``1`` to disable *demos* build
 
 
 Building LVGL drivers
 *********************
 
-To build `LVGL drivers <https://github.com/lvgl/lv_drivers>`__, you can
-use:
+To build `LVGL drivers <https://github.com/lvgl/lv_drivers>`__, you can use:
 
 .. code:: cmake
 

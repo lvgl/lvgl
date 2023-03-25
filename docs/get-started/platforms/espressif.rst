@@ -50,10 +50,8 @@ that sets some configuration options so you can use LVGL right away.
 
 **Option 2:** IDF Component Manager
 
-LVGL is also distributed through `IDF Component
-Manager <https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html>`__.
-It allows users to seamlessly integrate `LVGL
-component <https://components.espressif.com/component/lvgl/lvgl>`__ into
+LVGL is also distributed through `IDF Component Manager <https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html>`__.
+It allows users to seamlessly integrate `LVGL component <https://components.espressif.com/component/lvgl/lvgl>`__ into
 their project with following command:
 
 .. code:: sh

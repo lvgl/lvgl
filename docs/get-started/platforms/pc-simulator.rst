@@ -1,3 +1,5 @@
+.. _simulator:
+
 ===============
 Simulator on PC
 ===============
@@ -6,39 +8,33 @@ You can try out LVGL **using only your PC** (i.e. without any
 development boards). LVGL will run on a simulator environment on the PC
 where anyone can write and experiment with real LVGL applications.
 
-Using the simulator on a PC has the following advantages: - Hardware
-independent - Write code, run it on the PC and see the result on a
-monitor. - Cross-platform - Any Windows, Linux or macOS system can run
-the PC simulator. - Portability - The written code is portable, which
-means you can simply copy it when migrating to embedded hardware. - Easy
-Validation - The simulator is also very useful to report bugs because it
-provides a common platform for every user. So it's a good idea to
-reproduce a bug in the simulator and use that code snippet in the
-`Forum <https://forum.lvgl.io>`__.
+Using the simulator on a PC has the following advantages:
+
+- Hardware independent: Write code, run it on the PC and see the result on a monitor.
+- Cross-platform: Any Windows, Linux or macOS system can run the PC simulator.
+- Portability: The written code is portable, which means you can simply copy it when migrating to embedded hardware.
+- Easy Validation: The simulator is also very useful to report bugs because it
+  provides a common platform for every user. So it's a good idea to
+  reproduce a bug in the simulator and use that code snippet in the
+  `Forum <https://forum.lvgl.io>`__.
 
 
 Select an IDE
 -------------
 
-The simulator is ported to various IDEs (Integrated Development
-Environments). Choose your favorite IDE, read its README on GitHub,
-download the project, and load it to the IDE.
+The simulator is ported to various IDEs (Integrated Development Environments).
+Choose your favorite IDE, read its README on GitHub, download the project, and load it to the IDE.
 
--  `Eclipse with SDLdriver <https://github.com/lvgl/lv_sim_eclipse_sdl>`__: 
-   Recommended on Linux and Mac
--  `CodeBlocks <https://github.com/lvgl/lv_sim_codeblocks_win>`__:
-   Recommended on Windows
--  `VisualStudio with SDL driver <https://github.com/lvgl/lv_sim_visual_studio_sdl>`__: 
-   For Windows
--  `VSCode with SDL driver <https://github.com/lvgl/lv_sim_vscode_sdl>`__: 
-   Recommended on Linux and Mac
--  `PlatformIO with SDL driver <https://github.com/lvgl/lv_platformio>`__: 
-   Recommended on Linux and Mac
--  `MDK with FastModel <https://github.com/lvgl/lv_port_an547_cm55_sim>`__: 
-   For Windows
+- `Eclipse with SDLdriver <https://github.com/lvgl/lv_sim_eclipse_sdl>`__: Recommended on Linux and Mac
+- `CodeBlocks <https://github.com/lvgl/lv_sim_codeblocks_win>`__: Recommended on Windows
+- `VisualStudio with SDL driver <https://github.com/lvgl/lv_sim_visual_studio_sdl>`__: For Windows
+- `VSCode with SDL driver <https://github.com/lvgl/lv_sim_vscode_sdl>`__: Recommended on Linux and Mac
+- `PlatformIO with SDL driver <https://github.com/lvgl/lv_platformio>`__: Recommended on Linux and Mac
+- `MDK with FastModel <https://github.com/lvgl/lv_port_an547_cm55_sim>`__: For Windows
 
-External project not maintained by the LVGL organization: - `QT
-Creator <https://github.com/Varanda-Labs/lvgl-qt-sim>`__: Cross platform
+External project not maintained by the LVGL organization:
+
+- `QT Creator <https://github.com/Varanda-Labs/lvgl-qt-sim>`__: Cross platform
 
 You can use any IDE for development but, for simplicity, the
 configuration for Eclipse CDT is what we'll focus on in this tutorial.
@@ -57,17 +53,15 @@ Install Eclipse CDT
 
 `Eclipse CDT <https://eclipse.org/cdt/>`__ is a C/C++ IDE.
 
-Eclipse is a Java-based tool so be sure **Java Runtime Environment** is
-installed on your system.
+Eclipse is a Java-based tool so be sure **Java Runtime Environment** is installed on your system.
 
-On Debian-based distros (e.g. Ubuntu):
-``sudo apt-get install default-jre``
+On Debian-based distros (e.g. Ubuntu): ``sudo apt-get install default-jre``
 
-Note: If you are using other distros, then please install a ‘Java
-Runtime Environment' suitable to your distro. Note: If you are using
-macOS and get a “Failed to create the Java Virtual Machine” error,
-uninstall any other Java JDK installs and install Java JDK 8u. This
-should fix the problem.
+:note: If you are using other distros, then please install a ‘Java
+       Runtime Environment' suitable to your distro. Note: If you are using
+       macOS and get a “Failed to create the Java Virtual Machine” error,
+       uninstall any other Java JDK installs and install Java JDK 8u. This
+       should fix the problem.
 
 You can download Eclipse's CDT from:
 https://www.eclipse.org/cdt/downloads.php. Start the installer and
@@ -76,8 +70,7 @@ choose *Eclipse CDT* from the list.
 Install SDL 2
 ~~~~~~~~~~~~~
 
-The PC simulator uses the `SDL
-2 <https://www.libsdl.org/download-2.0.php>`__ cross-platform library to
+The PC simulator uses the `SDL2 <https://www.libsdl.org/download-2.0.php>`__ cross-platform library to
 simulate a TFT display and a touchpad.
 
 Linux
@@ -85,31 +78,24 @@ Linux
 
 On **Linux** you can easily install SDL2 using a terminal:
 
-1. Find the current version of SDL2:
-   ``apt-cache search libsdl2 (e.g. libsdl2-2.0-0)``
-2. Install SDL2: ``sudo apt-get install libsdl2-2.0-0`` (replace with
-   the found version)
-3. Install SDL2 development package:
-   ``sudo apt-get install libsdl2-dev``
-4. If build essentials are not installed yet:
-   ``sudo apt-get install build-essential``
+1. Find the current version of SDL2: ``apt-cache search libsdl2 (e.g. libsdl2-2.0-0)``
+2. Install SDL2: ``sudo apt-get install libsdl2-2.0-0`` (replace with the found version)
+3. Install SDL2 development package: ``sudo apt-get install libsdl2-dev``
+4. If build essentials are not installed yet: ``sudo apt-get install build-essential``
 
 Windows
 ^^^^^^^
 
-If you are using **Windows** firstly you need to install MinGW (`64 bit
-version <https://www.mingw-w64.org/downloads/#msys2>`__). After
+If you are using **Windows** firstly you need to install
+MinGW (`64 bit version <https://www.mingw-w64.org/downloads/#msys2>`__). After
 installing MinGW, do the following steps to add SDL2:
 
 1. Download the development libraries of SDL. Go to
-   https://www.libsdl.org/download-2.0.php and download *Development
-   Libraries: SDL2-devel-2.0.5-mingw.tar.gz*
-2. Decompress the file and go to *x86_64-w64-mingw32* directory (for 64
-   bit MinGW) or to *i686-w64-mingw32* (for 32 bit MinGW)
+   https://www.libsdl.org/download-2.0.php and download *Development Libraries: SDL2-devel-2.0.5-mingw.tar.gz*
+2. Decompress the file and go to *x86_64-w64-mingw32* directory (for 64 bit MinGW) or to *i686-w64-mingw32* (for 32 bit MinGW)
 3. Copy *mingw32/include/SDL2* folder to *C:/MinGW/…/x86_64-w64-mingw32/include*
 4. Copy *mingw32/lib/* content to *C:/MinGW/…/x86_64-w64-mingw32/lib*
-5. Copy *mingw32/bin/SDL2.dll* to *{eclipse_workspace}/pc_simulator/Debug/\_*.
-   Do it later when Eclipse is installed.
+5. Copy *mingw32/bin/SDL2.dll* to *{eclipse_workspace}/pc_simulator/Debug/\_*. Do it later when Eclipse is installed.
 
 :Note: If you are using **Microsoft Visual Studio** instead of Eclipse
        then you don't have to install MinGW.
@@ -119,8 +105,7 @@ OSX
 
 On **OSX** you can easily install SDL2 with brew: ``brew install sdl2``
 
-If something is not working, then please refer `this
-tutorial <http://lazyfoo.net/tutorials/SDL/01_hello_SDL/index.php>`__ to
+If something is not working, then please refer `this tutorial <http://lazyfoo.net/tutorials/SDL/01_hello_SDL/index.php>`__ to
 get started with SDL.
 
 Pre-configured project
@@ -128,8 +113,8 @@ Pre-configured project
 
 A pre-configured graphics library project (based on the latest release)
 is always available to get started easily. You can find the latest one
-on `GitHub <https://github.com/lvgl/lv_sim_eclipse_sdl>`__. (Please note
-that, the project is configured for Eclipse CDT).
+on `GitHub <https://github.com/lvgl/lv_sim_eclipse_sdl>`__.
+(Please note that, the project is configured for Eclipse CDT).
 
 Add the pre-configured project to Eclipse CDT
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

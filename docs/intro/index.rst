@@ -25,6 +25,7 @@ Key features
 - Documentation is available online and as PDF
 - Free and open-source under MIT license
 
+.. _requirements:
 
 Requirements
 ------------
@@ -61,8 +62,8 @@ It's not mandatory, but we highly appreciate it if you write a few words about y
 
 Although you can get LVGL for free there is a massive amount of work behind it. It's created by a group of volunteers who made it available for you in their free time.
 
-To make the LVGL project sustainable, please consider `CONTRIBUTING </intro/CONTRIBUTING>`__ to the project.
-You can choose from many different ways of contributing See `CONTRIBUTING </intro/CONTRIBUTING>`__ such as simply writing a tweet about you using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
+To make the LVGL project sustainable, please consider :ref:`contributing` to the project.
+You can choose from many different ways of contributing See :ref:`contributing` such as simply writing a tweet about you using LVGL, fixing bugs, translating the documentation, or even becoming a maintainer.
 
 Repository layout
 -----------------
@@ -111,7 +112,7 @@ The core repositories have at least the following branches:
 Changelog
 ^^^^^^^^^
 
-The changes are recorded in `CHANGELOG </CHANGELOG>`__.
+The changes are recorded in :ref:`changelog`.
 
 Version support
 ^^^^^^^^^^^^^^^
@@ -158,7 +159,7 @@ Before posting a question, please ready this FAQ section as you might find answe
 Is my MCU/hardware supported?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Every MCU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the `Requirements </Requirements>`__ is supported by LVGL.
+Every MCU which is capable of driving a display via parallel port, SPI, RGB interface or anything else and fulfills the :ref:`requirements` is supported by LVGL.
 
 This includes:
 
@@ -183,34 +184,34 @@ Some examples of the supported display types:
 * even LED matrices
 * or any other display where you can control the color/state of the pixels
 
-See the `Display interface <porting/disp>`__ section to learn more.
+See the :ref:`display_interface` section to learn more.
 
 
 LVGL doesn't start, randomly crashes or nothing is drawn on the display. What can be the problem?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Try increasing :c:macro:`LV_MEM_SIZE`.
-* Be sure :c:struct:`lv_disp_t`, :c:struct:`lv_indev_t` and :c:struct:`lv_fs_drv_t` are global or `static`.
+* Be sure :cpp:type:`lv_disp_t`, :cpp:type:`lv_indev_t` and :cpp:type:`lv_fs_drv_t` are global or `static`.
 * Be sure your display works without LVGL. E.g. paint it to red on start up.
-* Enable `Logging <porting/log>`__
+* Enable :ref:`logging`
 * Enable asserts in `lv_conf.h` (`LV_USE_ASSERT_...`)
 * If you use an RTOS
-   * increase the stack size of the task which calls :c:expr:`lv_timer_handler()`
-   * Be sure you used a mutex as described here: `Operating system and interrupts <porting/os>`__
+   * increase the stack size of the task which calls :cpp:func:`lv_timer_handler`
+   * Be sure you used a mutex as described here: :ref:`os_interrupt`
 
 
 My display driver is not called. What have I missed?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Be sure you are calling :c:expr:`lv_tick_inc(x)` in an interrupt and :c:expr:`lv_timer_handler()` in your main `while(1)`.
+Be sure you are calling :cpp:expr:`lv_tick_inc(x)` in an interrupt and :cpp:func:`lv_timer_handler` in your main ``while(1)``.
 
-Learn more in the `Tick <porting/hal_tick>`__ and `Timer <porting/timer_handler>`__ handler sections.
+Learn more in the :ref:`tick` and :ref:`timer` sections.
 
 
 Why is the display driver called only once? Only the upper part of the display is refreshed.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Be sure you are calling :c:expr:`lv_disp_flush_ready(drv)` at the end of your "*display flush callback*".
+Be sure you are calling :cpp:expr:`lv_disp_flush_ready(drv)` at the end of your "*display flush callback*".
 
 
 Why do I see only garbage on the screen?

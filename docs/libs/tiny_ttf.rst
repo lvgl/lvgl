@@ -38,3 +38,9 @@ Example
 
 API
 ---
+
+:ref:`lv_tiny_ttf`
+
+:ref:`stb_rect_pack`
+
+:ref:`stb_truetype_htcw`

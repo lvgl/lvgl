@@ -35,13 +35,13 @@ Configure LVGL
 --------------
 
 LVGL has its own configuration file called ``lv_conf.h``. When LVGL is
-installed, follow these configuration steps: 1. Go to the directory of
-the installed Arduino libraries 2. Go to ``lvgl`` and copy
-``lv_conf_template.h`` as ``lv_conf.h`` into the Arduino Libraries
-directory next to the ``lvgl`` library folder. 3. Open ``lv_conf.h`` and
-change the first ``#if 0`` to ``#if 1`` to enable the content of the
-file 4. Set the color depth of you display in :c:macro:`LV_COLOR_DEPTH` 5. Set
-:c:expr:`LV_TICK_CUSTOM` ``1``
+installed, follow these configuration steps:
+
+1. Go to the directory of the installed Arduino libraries
+2. Go to ``lvgl`` and copy ``lv_conf_template.h`` as ``lv_conf.h`` into the Arduino Libraries directory next to the ``lvgl`` library folder.
+3. Open ``lv_conf.h`` and change the first ``#if 0`` to ``#if 1`` to enable the content of the file
+4. Set the color depth of you display in :c:macro:`LV_COLOR_DEPTH`
+5. Set :c:macro:`LV_TICK_CUSTOM`
 
 Finally the layout with ``lv_conf.h`` should look like this:
 
@@ -70,11 +70,11 @@ Use the examples and demos
 
 Note that, there is no dedicated INO file for every example. Instead,
 you can load an example by calling an ``lv_example_...`` function. For
-example :c:expr:`lv_example_btn_1()`.
+example :cpp:func:`lv_example_btn_1`.
 
-**IMPORTANT** Due to some the limitations of Arduino's build system you
-need to copy ``lvgl/examples`` to ``lvgl/src/examples``. Similarly for
-the demos ``lvgl/demos`` to ``lvgl/src/demos``.
+:important: Due to some the limitations of Arduino's build system you
+            need to copy ``lvgl/examples`` to ``lvgl/src/examples``. Similarly for
+            the demos ``lvgl/demos`` to ``lvgl/src/demos``.
 
 
 Debugging and logging

@@ -115,7 +115,7 @@ components. The order of the initialization is:
 3. Register the display and input devices drivers in LVGL. Learn more
    about `Display </porting/display>`__ and `Input
    device </porting/indev>`__ registration.
-4. Call :cpp:func:`lv_tick_inc(x)` every ``x`` milliseconds in an interrupt to
+4. Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in an interrupt to
    report the elapsed time to LVGL. `Learn more </porting/tick>`__.
-5. Call :cpp:func:`lv_timer_handler()` every few milliseconds to handle LVGL
+5. Call :cpp:func:`lv_timer_handler` every few milliseconds to handle LVGL
    related tasks. `Learn more </porting/timer-handler>`__.

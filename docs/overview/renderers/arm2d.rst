@@ -47,3 +47,5 @@ Examples
 
 API
 ***
+
+:ref:`lv_gpu_arm2d`

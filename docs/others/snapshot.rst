@@ -62,3 +62,5 @@ Example
 
 API
 ---
+
+:ref:`lv_snapshot`

@@ -310,3 +310,5 @@ Example
 
 API
 ---
+
+:ref:`lv_ime_pinyin`

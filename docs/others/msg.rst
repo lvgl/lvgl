@@ -149,3 +149,5 @@ Example
 
 API
 ---
+
+:ref:`lv_msg`

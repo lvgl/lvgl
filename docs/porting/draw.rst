@@ -9,71 +9,65 @@ software renderer.
 Draw context
 ************
 
-The core structure of drawing is ``lv_draw_ctx_t``. It contains a
+The core structure of drawing is :cpp:type:`lv_draw_ctx_t`. It contains a
 pointer to a buffer where drawing should happen and a couple of
 callbacks to draw rectangles, texts, and other primitives.
 
 Fields
 ------
 
-``lv_draw_ctx_t`` has the following fields: - ``void * buf`` Pointer to
-a buffer to draw into - ``lv_area_t * buf_area`` The position and size
-of ``buf`` (absolute coordinates) - ``const lv_area_t * clip_area`` The
-current clip area with absolute coordinates, always the same or smaller
-than ``buf_area``. All drawings should be clipped to this area. -
-``void (*draw_rect)()`` Draw a rectangle with shadow, gradient, border,
-etc. - ``void (*draw_arc)()`` Draw an arc -
-``void (*draw_img_decoded)()`` Draw an (A)RGB image that is already
-decoded by LVGL. - ``lv_res_t (*draw_img)()`` Draw an image before
-decoding it (it bypasses LVGL’s internal image decoders) -
-``void (*draw_letter)()`` Draw a letter - ``void (*draw_line)()`` Draw a
-line - ``void (*draw_polygon)()`` Draw a polygon - ``void (*draw_bg)()``
-Replace the buffer with a rect without decoration like radius or
-borders. - ``void (*wait_for_finish)()`` Wait until all background
-operation are finished. (E.g. GPU operations) - ``void * user_data``
-Custom user data for arbitrary purpose
+:cpp:type:`lv_draw_ctx_t` has the following fields:
 
-(For the sake of simplicity the parameters of the callbacks are not
-shown here.)
+- ``void * buf`` Pointer to a buffer to draw into
+- ``lv_area_t * buf_area`` The position and size of ``buf`` (absolute coordinates)
+- ``const lv_area_t * clip_area`` The current clip area with absolute coordinates, always the same or smaller than ``buf_area``. All drawings should be clipped to this area.
+- ``void (*draw_rect)()`` Draw a rectangle with shadow, gradient, border, etc.
+- ``void (*draw_arc)()`` Draw an arc
+- ``void (*draw_img_decoded)()`` Draw an (A)RGB image that is already decoded by LVGL.
+- ``lv_res_t (*draw_img)()`` Draw an image before decoding it (it bypasses LVGL’s internal image decoders)
+- ``void (*draw_letter)()`` Draw a letter
+- ``void (*draw_line)()`` Draw a line - ``void (*draw_polygon)()`` Draw a polygon
+- ``void (*draw_bg)()`` Replace the buffer with a rect without decoration like radius or borders.
+- ``void (*wait_for_finish)()`` Wait until all background operation are finished. (E.g. GPU operations)
+- ``void * user_data`` Custom user data for arbitrary purpose
+
+(For the sake of simplicity the parameters of the callbacks are not shown here.)
 
 All ``draw_*`` callbacks receive a pointer to the current ``draw_ctx``
 as their first parameter. Among the other parameters there is a
-descriptor that tells what to draw, e.g. for ``draw_rect`` it’s called
-`lv_draw_rect_dsc_t <https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_rect.h>`__,
-for ``lv_draw_line`` it’s called
-`lv_draw_line_dsc_t <https://github.com/lvgl/lvgl/blob/master/src/draw/lv_draw_line.h>`__,
+descriptor that tells what to draw, e.g. for ``draw_rect`` it’s called
+:cpp:struct:`lv_draw_rect_dsc_t`,
+for :cpp:func:`lv_draw_line` it’s called :cpp:struct:`lv_draw_line_dsc_t`,
 etc.
 
 To correctly render according to a ``draw_dsc`` you need to be familiar
-with the `Boxing
-model <https://docs.lvgl.io/master/overview/coords.html#boxing-model>`__
+with the `Boxing model </overview/coords.html#boxing-model>`__
 of LVGL and the meanings of the fields. The name and meaning of the
-fields are identical to name and meaning of the `Style
-properties <https://docs.lvgl.io/master/overview/style-props.html>`__.
+fields are identical to name and meaning of the `Style properties </overview/style-props.html>`__.
 
 Initialization
 --------------
 
-The ``lv_disp_t`` has 4 fields related to the draw context:
+The :cpp:type:`lv_disp_t` has 4 fields related to the draw context:
 
 - ``lv_draw_ctx_t * draw_ctx`` Pointer to the ``draw_ctx`` of this display
 - ``void (*draw_ctx_init)(struct _lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx)`` Callback to initialize a ``draw_ctx``
 - ``void (*draw_ctx_deinit)(struct _lv_disp_t * disp_drv, lv_draw_ctx_t * draw_ctx)`` Callback to de-initialize a ``draw_ctx``
-- ``size_t draw_ctx_size`` Size of the draw context structure. E.g. ``sizeof(lv_draw_sw_ctx_t)``
+- ``size_t draw_ctx_size`` Size of the draw context structure. E.g. :cpp:expr:`sizeof(lv_draw_sw_ctx_t)`
 
 When you ignore these fields, LVGL will set default values for callbacks
-and size in ``lv_disp_drv_init()`` based on the configuration in
-``lv_conf.h``. ``lv_disp_drv_register()`` will allocate a ``draw_ctx``
-based on ``draw_ctx_size`` and call ``draw_ctx_init()`` on it.
+and size in :cpp:func:`lv_disp_drv_init` based on the configuration in
+``lv_conf.h``. :cpp:func:`lv_disp_drv_register` will allocate a ``draw_ctx``
+based on ``draw_ctx_size`` and call :cpp:func:`draw_ctx_init` on it.
 
 However, you can overwrite the callbacks and the size values before
-calling ``lv_disp_drv_register()``. It makes it possible to use your own
+calling :cpp:func:`lv_disp_drv_register`. It makes it possible to use your own
 ``draw_ctx`` with your own callbacks.
 
 Software renderer
 *****************
 
-LVGL’s built in software renderer extends the basic ``lv_draw_ctx_t``
+LVGL’s built in software renderer extends the basic :cpp:type:`lv_draw_ctx_t`
 structure and sets the draw callbacks. It looks like this:
 
 .. code:: c
@@ -86,7 +80,7 @@ structure and sets the draw callbacks. It looks like this:
        void (*blend)(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
    } lv_draw_sw_ctx_t;
 
-Set the draw callbacks in ``draw_ctx_init()`` like:
+Set the draw callbacks in :cpp:func:`draw_ctx_init` like:
 
 .. code:: c
 
@@ -100,10 +94,9 @@ Blend callback
 As you saw above the software renderer adds the ``blend`` callback
 field. It’s a special callback related to how the software renderer
 works. All draw operations end up in the ``blend`` callback which can
-either fill an area or copy an image to an area by considering an
-optional mask.
+either fill an area or copy an image to an area by considering an optional mask.
 
-The ``lv_draw_sw_blend_dsc_t`` parameter describes what and how to
+The :cpp:struct:`lv_draw_sw_blend_dsc_t` parameter describes what and how to
 blend. It has the following fields:
 
 - ``const lv_area_t * blend_area`` The area with absolute coordinates to draw
@@ -115,7 +108,7 @@ blend. It has the following fields:
 - ``lv_draw_mask_res_t mask_res`` The result of the previous mask operation. (``LV_DRAW_MASK_RES_...``)
 - ``const lv_area_t * mask_area`` The area of ``mask_buf`` with absolute coordinates
 - ``lv_opa_t opa`` The overall opacity
-- ``lv_blend_mode_t blend_mode`` E.g. ``LV_BLEND_MODE_ADDITIVE``
+- ``lv_blend_mode_t blend_mode`` E.g. :cpp:enumerator:`LV_BLEND_MODE_ADDITIVE`
 
 Extend the software renderer
 ****************************
@@ -129,7 +122,7 @@ color fill operations only.
 As all draw callbacks call ``blend`` callback to fill an area in the end
 only the ``blend`` callback needs to be overwritten.
 
-First extend ``lv_draw_sw_ctx_t``:
+First extend :cpp:struct:`lv_draw_sw_ctx_t`:
 
 .. code:: c
 
@@ -149,8 +142,8 @@ First extend ``lv_draw_sw_ctx_t``:
            my_draw_ctx->base_draw.wait_for_finish = my_gpu_wait;
    }
 
-After calling ``lv_disp_draw_init(&drv)`` you can assign the new
-``draw_ctx_init`` callback and set ``draw_ctx_size`` to overwrite the
+After calling :cpp:expr:`lv_disp_draw_init(&drv)` you can assign the new
+:cpp:func:`draw_ctx_init` callback and set ``draw_ctx_size`` to overwrite the
 defaults:
 
 .. code:: c
@@ -252,16 +245,43 @@ Fully custom draw engine
 
 For example if your MCU/MPU supports a powerful vector graphics engine
 you might use only that instead of LVGL’s SW renderer. In this case, you
-need to base the renderer on the basic ``lv_draw_ctx_t`` (instead of
-``lv_draw_sw_ctx_t``) and extend/initialize it as you wish.
+need to base the renderer on the basic :cpp:type:`lv_draw_ctx_t` (instead of
+:cpp:struct:`lv_draw_sw_ctx_t`) and extend/initialize it as you wish.
 
 API
 ***
 
 .. Autogenerated
 
-.. raw:: html
+:ref:`lv_draw_sdl_composite`
 
-    <div include-html="draw\lv_draw.html"></div>
-    <script>includeHTML();</script>
+:ref:`lv_draw_arc`
+
+:ref:`lv_draw_sdl_mask`
+
+:ref:`lv_draw_line`
+
+:ref:`lv_draw_transform`
+
+:ref:`lv_draw_triangle`
+
+:ref:`lv_draw_label`
+
+:ref:`lv_draw_layer`
+
+:ref:`lv_gc`
+
+:ref:`lv_draw_sw`
+
+:ref:`lv_draw_rect`
+
+:ref:`lv_draw`
+
+:ref:`lv_draw_mask`
+
+:ref:`lv_draw_img`
+
+:ref:`lv_draw_sdl_layer`
+
+:ref:`lv_draw_sw_blend`
 

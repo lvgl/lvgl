@@ -4,7 +4,7 @@ Quick overview
 
 Here you can learn the most important things about LVGL. You should read
 this first to get a general impression and read the detailed
-`Porting </porting/index>`__ and `Overview </overview/index>`__ sections
+:ref:`porting` and :ref:`overview` sections
 after that.
 
 Get started in a simulator
@@ -14,10 +14,9 @@ Instead of porting LVGL to embedded hardware straight away, it’s highly
 recommended to get started in a simulator first.
 
 LVGL is ported to many IDEs to be sure you will find your favorite one.
-Go to the `Simulators </get-started/platforms/pc-simulator>`__ section
-to get ready-to-use projects that can be run on your PC. This way you
-can save the time of porting for now and get some experience with LVGL
-immediately.
+Go to the :ref:`simulator` section to get ready-to-use projects that can be run 
+on your PC. This way you can save the time of porting for now and get some 
+experience with LVGL immediately.
 
 Add LVGL into your project
 --------------------------
@@ -31,11 +30,11 @@ If you would rather try LVGL on your own project follow these steps:
    ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
    file’s content and set the :c:macro:`LV_COLOR_DEPTH` defines.
 -  Include ``lvgl/lvgl.h`` in files where you need to use LVGL related functions.
--  Call :c:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
+-  Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
    (``x`` should be between 1 and 10). It is required for the internal
    timing of LVGL. Alternatively, configure :c:macro:`LV_TICK_CUSTOM` (see
    ``lv_conf.h``) so that LVGL can retrieve the current time directly.
--  Call :c:expr:`lv_init()`
+-  Call :cpp:func:`lv_init`
 -  Create a draw buffer: LVGL will render the graphics here first, and
    send the rendered image to the display. The buffer size can be set
    freely but 1/10 screen size is a good starting point.
@@ -97,11 +96,11 @@ If you would rather try LVGL on your own project follow these steps:
 
    }
 
--  Call :c:expr:`lv_timer_handler()` periodically every few milliseconds in
+-  Call :cpp:func:`lv_timer_handler` periodically every few milliseconds in
    the main ``while(1)`` loop or in an operating system task. It will
    redraw the screen if required, handle input devices, animation etc.
 
-For a more detailed guide go to the `Porting </porting/index>`__
+For a more detailed guide go to the :ref:`porting`
 section.
 
 Learn the basics
@@ -111,7 +110,7 @@ Widgets
 ~~~~~~~
 
 The graphical elements like Buttons, Labels, Sliders, Charts etc. are
-called objects or widgets. Go to `Widgets </widgets/index>`__ to see the
+called objects or widgets. Go to :ref:`widgets` to see the
 full list of available widgets.
 
 Every object has a parent object where it is created. For example, if a
@@ -125,11 +124,11 @@ other words, the parts of the children outside the parent are clipped.
 
 A Screen is the “root” parent. You can have any number of screens.
 
-To get the current screen call :c:expr:`lv_scr_act()`, and to load a screen
-use :c:expr:`lv_scr_load(scr1)`.
+To get the current screen call :cpp:func:`lv_scr_act`, and to load a screen
+use :cpp:expr:`lv_scr_load(scr1)`.
 
 You can create a new object with ``lv_<type>_create(parent)``. It will
-return an :c:expr:`lv_obj_t *` variable that can be used as a reference to the
+return an :cpp:type:`lv_obj_t` ``*`` variable that can be used as a reference to the
 object to set its parameters.
 
 For example:
@@ -179,10 +178,10 @@ A callback is assigned like this:
        printf("Clicked\n");
    }
 
-:c:enumerator:`LV_EVENT_ALL` can be used instead of :c:enumerator:`LV_EVENT_CLICKED` to invoke
+:cpp:enumerator:`LV_EVENT_ALL` can be used instead of :cpp:enumerator:`LV_EVENT_CLICKED` to invoke
 the callback for any event.
 
-From :c:expr:`lv_event_t * e` the current event code can be retrieved with:
+From :cpp:expr:`lv_event_t * e` the current event code can be retrieved with:
 
 .. code:: c
 
@@ -194,15 +193,15 @@ The object that triggered the event can be retrieved with:
 
    lv_obj_t * obj = lv_event_get_target(e);
 
-To learn all features of the events go to the `Event overview </overview/event>`__ section.
+To learn all features of the events go to the :ref:`events` section.
 
 Parts
 ~~~~~
 
 Widgets might be built from one or more *parts*. For example, a button
-has only one part called :c:enumerator:`LV_PART_MAIN`. However, a
-`Slider </widgets/slider>`__ has :c:enumerator:`LV_PART_MAIN`, :c:enumerator:`LV_PART_INDICATOR`
-and :c:enumerator:`LV_PART_KNOB`.
+has only one part called :cpp:enumerator:`LV_PART_MAIN`. However, a
+:ref:`slider` has :cpp:enumerator:`LV_PART_MAIN`, :cpp:enumerator:`LV_PART_INDICATOR`
+and :cpp:enumerator:`LV_PART_KNOB`.
 
 By using parts you can apply different styles to sub-elements of a
 widget. (See below)
@@ -214,19 +213,19 @@ States
 
 LVGL objects can be in a combination of the following states:
 
-- :c:enumerator:`LV_STATE_DEFAULT`: Normal, released state
-- :c:enumerator:`LV_STATE_CHECKED`: Toggled or checked state
-- :c:enumerator:`LV_STATE_FOCUSED`: Focused via keypad or encoder or clicked via touchpad/mouse
-- :c:enumerator:`LV_STATE_FOCUS_KEY`: Focused via keypad or encoder but not via touchpad/mouse
-- :c:enumerator:`LV_STATE_EDITED`: Edit by an encoder
-- :c:enumerator:`LV_STATE_HOVERED`: Hovered by mouse (not supported now)
-- :c:enumerator:`LV_STATE_PRESSED`: Being pressed
-- :c:enumerator:`LV_STATE_SCROLLED`: Being scrolled
-- :c:enumerator:`LV_STATE_DISABLED`: Disabled
+- :cpp:enumerator:`LV_STATE_DEFAULT`: Normal, released state
+- :cpp:enumerator:`LV_STATE_CHECKED`: Toggled or checked state
+- :cpp:enumerator:`LV_STATE_FOCUSED`: Focused via keypad or encoder or clicked via touchpad/mouse
+- :cpp:enumerator:`LV_STATE_FOCUS_KEY`: Focused via keypad or encoder but not via touchpad/mouse
+- :cpp:enumerator:`LV_STATE_EDITED`: Edit by an encoder
+- :cpp:enumerator:`LV_STATE_HOVERED`: Hovered by mouse (not supported now)
+- :cpp:enumerator:`LV_STATE_PRESSED`: Being pressed
+- :cpp:enumerator:`LV_STATE_SCROLLED`: Being scrolled
+- :cpp:enumerator:`LV_STATE_DISABLED`: Disabled
 
 For example, if you press an object it will automatically go to the
-:c:enumerator:`LV_STATE_FOCUSED` and :c:enumerator:`LV_STATE_PRESSED` states and when you
-release it the :c:enumerator:`LV_STATE_PRESSED` state will be removed while focus
+:cpp:enumerator:`LV_STATE_FOCUSED` and :cpp:enumerator:`LV_STATE_PRESSED` states and when you
+release it the :cpp:enumerator:`LV_STATE_PRESSED` state will be removed while focus
 remains active.
 
 To check if an object is in a given state use
@@ -246,10 +245,10 @@ Styles
 A style instance contains properties such as background color, border
 width, font, etc. that describe the appearance of objects.
 
-Styles are represented with :c:struct:`lv_style_t` variables. Only their pointer
+Styles are represented with :cpp:struct:`lv_style_t` variables. Only their pointer
 is saved in the objects so they need to be defined as static or global.
 Before using a style it needs to be initialized with
-:c:expr:`lv_style_init(&style1)`. After that, properties can be added to
+:cpp:expr:`lv_style_init(&style1)`. After that, properties can be added to
 configure the style. For example:
 
 .. code:: c
@@ -259,7 +258,7 @@ configure the style. For example:
    lv_style_set_bg_color(&style1, lv_color_hex(0xa03080))
    lv_style_set_border_width(&style1, 2))
 
-See the full list of properties `here </overview/style.html#properties>`__.
+See the full list of properties here :ref:`style_properties`.
 
 Styles are assigned using the ORed combination of an object’s part and
 state. For example to use this style on the slider’s indicator when the
@@ -269,19 +268,19 @@ slider is pressed:
 
    lv_obj_add_style(slider1, &style1, LV_PART_INDICATOR | LV_STATE_PRESSED);
 
-If the *part* is :c:enumerator:`LV_PART_MAIN` it can be omitted:
+If the *part* is :cpp:enumerator:`LV_PART_MAIN` it can be omitted:
 
 .. code:: c
 
    lv_obj_add_style(btn1, &style1, LV_STATE_PRESSED); /*Equal to LV_PART_MAIN | LV_STATE_PRESSED*/
 
-Similarly, :c:enumerator:`LV_STATE_DEFAULT` can be omitted too:
+Similarly, :cpp:enumerator:`LV_STATE_DEFAULT` can be omitted too:
 
 .. code:: c
 
    lv_obj_add_style(slider1, &style1, LV_PART_INDICATOR); /*Equal to LV_PART_INDICATOR | LV_STATE_DEFAULT*/
 
-For :c:enumerator:`LV_STATE_DEFAULT` and :c:enumerator:`LV_PART_MAIN` simply write ``0``:
+For :cpp:enumerator:`LV_STATE_DEFAULT` and :cpp:enumerator:`LV_PART_MAIN` simply write ``0``:
 
 .. code:: c
 
@@ -298,7 +297,7 @@ background color to make the button red:
    lv_obj_add_style(btn1, &style1_btn_red, 0);
 
 If a property is not set on for the current state, the style with
-:c:enumerator:`LV_STATE_DEFAULT` will be used. A default value is used if the
+:cpp:enumerator:`LV_STATE_DEFAULT` will be used. A default value is used if the
 property is not defined in the default state.
 
 Some properties (typically the text-related ones) can be inherited. This
@@ -313,7 +312,7 @@ style which resides inside the object and is used only by the object:
 
    lv_obj_set_style_bg_color(slider1, lv_color_hex(0x2080bb), LV_PART_INDICATOR | LV_STATE_PRESSED);
 
-To learn all the features of styles see the `Style overview </overview/style>`__ section.
+To learn all the features of styles see the :ref:`styles` section.
 
 Themes
 ~~~~~~
@@ -332,7 +331,7 @@ Examples
 Micropython
 -----------
 
-Learn more about `Micropython </get-started/bindings/micropython>`__.
+Learn more about :ref:`micropython`.
 
 .. code:: python
 

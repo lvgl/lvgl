@@ -49,7 +49,7 @@ category.
      }
    }
 
-To set a mouse cursor use ``lv_indev_set_cursor(indev, &img_cursor)``.
+To set a mouse cursor use :cpp:expr:`lv_indev_set_cursor(indev, &img_cursor)`.
 
 Keypad or keyboard
 ------------------
@@ -59,10 +59,10 @@ navigation buttons belong here.
 
 To use a keyboard/keypad:
 
-- Register a ``read_cb`` function and use ``LV_INDEV_TYPE_KEYPAD`` type.
+- Register a ``read_cb`` function and use :cpp:enumerator:`LV_INDEV_TYPE_KEYPAD` type.
 - An object group has to be created: ``lv_group_t * g = lv_group_create()`` and objects have to be added to
-  it with ``lv_group_add_obj(g, obj)``
-- The created group has to be assigned to an input device: ``lv_indev_set_group(indev, g)``
+  it with :cpp:expr:`lv_group_add_obj(g, obj)`
+- The created group has to be assigned to an input device: :cpp:expr:`lv_indev_set_group(indev, g)`
 - Use ``LV_KEY_...`` to navigate among the objects in the group. See
   ``lv_core/lv_group.h`` for the available keys.
 
@@ -83,16 +83,21 @@ To use a keyboard/keypad:
 Encoder
 -------
 
-With an encoder you can do the following: 1. Press its button 2.
-Long-press its button 3. Turn left 4. Turn right
+With an encoder you can do the following:
 
-In short, the Encoder input devices work like this: - By turning the
-encoder you can focus on the next/previous object. - When you press the
-encoder on a simple object (like a button), it will be clicked. - If you
-press the encoder on a complex object (like a list, message box, etc.)
-the object will go to edit mode whereby you can navigate inside the
-object by turning the encoder. - To leave edit mode, long press the
-button.
+1. Press its button
+2. Long-press its button
+3. Turn left
+4. Turn right
+
+In short, the Encoder input devices work like this:
+
+- By turning the encoder you can focus on the next/previous object.
+- When you press the encoder on a simple object (like a button), it will be clicked.
+- If you press the encoder on a complex object (like a list, message box, etc.)
+  the object will go to edit mode whereby you can navigate inside the
+  object by turning the encoder.
+- To leave edit mode, long press the button.
 
 To use an *Encoder* (similarly to the *Keypads*) the objects should be
 added to groups.
@@ -120,9 +125,9 @@ buttons in addition to encoder wheel.
 
 You need to have 3 buttons available:
 
-- ``LV_KEY_ENTER`` will simulate press or pushing of the encoder button
-- ``LV_KEY_LEFT`` will simulate turning encoder left
-- ``LV_KEY_RIGHT`` will simulate turning encoder right
+- :cpp:enumerator:`LV_KEY_ENTER`: will simulate press or pushing of the encoder button
+- :cpp:enumerator:`LV_KEY_LEFT`: will simulate turning encoder left
+- :cpp:enumerator:`LV_KEY_RIGHT`: will simulate turning encoder right
 - other keys will be passed to the focused widget
 
 If you hold the keys it will simulate an encoder advance with period
@@ -151,15 +156,13 @@ Button
 
 *Buttons* mean external “hardware” buttons next to the screen which are
 assigned to specific coordinates of the screen. If a button is pressed
-it will simulate the pressing on the assigned coordinate. (Similarly to
-a touchpad)
+it will simulate the pressing on the assigned coordinate. (Similarly to a touchpad)
 
-To assign buttons to coordinates use
-``lv_indev_set_button_points(my_indev, points_array)``. ``points_array``
-should look like
-``const lv_point_t points_array[] = { {12,30},{60,90}, ...}``
+To assign buttons to coordinates use ``lv_indev_set_button_points(my_indev, points_array)``. ``points_array``
+should look like ``const lv_point_t points_array[] = { {12,30},{60,90}, ...}``
 
-``important::  The points_array can't go out of scope. Either declare it as a global variable or as a static variable inside a function.``
+:important: The points_array can't go out of scope. Either declare it as a global variable
+            or as a static variable inside a function.`
 
 .. code:: c
 
@@ -187,31 +190,30 @@ Other features
 Parameters
 ----------
 
-The default value of the following parameters can be changed in
-``lv_indev_t``:
+The default value of the following parameters can be changed in :cpp:type:`lv_indev_t`:
 
 - ``scroll_limit`` Number of pixels to slide before actually scrolling the object.
 - ``scroll_throw`` Scroll throw (momentum) slow-down in [%]. Greater value means faster slow-down.
-- ``long_press_time`` Press time to send ``LV_EVENT_LONG_PRESSED`` (in milliseconds)
-- ``long_press_repeat_time`` Interval of sending ``LV_EVENT_LONG_PRESSED_REPEAT`` (in milliseconds)
+- ``long_press_time`` Press time to send :cpp:enumerator:`LV_EVENT_LONG_PRESSED` (in milliseconds)
+- ``long_press_repeat_time`` Interval of sending :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT` (in milliseconds)
 - ``read_timer`` pointer to the ``lv_timer`` which reads the input device. Its parameters
-  can be changed by ``lv_timer_...()`` functions. ``LV_DEF_REFR_PERIOD``
+  can be changed by ``lv_timer_...()`` functions. :c:macro:`LV_DEF_REFR_PERIOD`
   in ``lv_hal_disp.h`` sets the default read period.
 
 Feedback
 --------
 
 Besides ``read_cb`` a ``feedback_cb`` callback can be also specified in
-``lv_indev_t``. ``feedback_cb`` is called when any type of event is sent
+:cpp:type:`lv_indev_t`. ``feedback_cb`` is called when any type of event is sent
 by the input devices (independently of its type). This allows generating
-feedback for the user, e.g. to play a sound on ``LV_EVENT_CLICKED``.
+feedback for the user, e.g. to play a sound on :cpp:enumerator:`LV_EVENT_CLICKED`.
 
 Associating with a display
 --------------------------
 
 Every input device is associated with a display. By default, a new input
 device is added to the last display created or explicitly selected
-(using ``lv_disp_set_default()``). The associated display is stored and
+(using :cpp:func:`lv_disp_set_default`). The associated display is stored and
 can be changed in ``disp`` field of the driver.
 
 Buffered reading
@@ -230,20 +232,17 @@ read and it should call ``read_cb`` again.
 Further reading
 ***************
 
--  `lv_port_indev_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c>`__
-   for a template for your own driver.
--  `INdev features </overview/display>`__ to learn more about higher
-   level input device features.
+- `lv_port_indev_template.c <https://github.com/lvgl/lvgl/blob/master/examples/porting/lv_port_indev_template.c>`__ for a template for your own driver.
+- `INdev features </overview/display>`__ to learn more about higher level input device features.
 
 API
 ***
 
 .. Autogenerated
 
-.. raw:: html
+:ref:`lv_indev_scroll`
 
-    <div include-html="core\lv_indev_scroll.html"></div>
-    <div include-html="core\lv_indev.html"></div>
-    <div include-html="misc\lv_gc.html"></div>
-    <script>includeHTML();</script>
+:ref:`lv_indev`
+
+:ref:`lv_gc`
 

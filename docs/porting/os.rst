@@ -1,3 +1,5 @@
+.. _os_interrupt:
+
 ===============================
 Operating system and interrupts
 ===============================

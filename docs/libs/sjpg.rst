@@ -88,3 +88,9 @@ Example
 
 API
 ---
+
+:ref:`lv_sjpg`
+
+:ref:`tjpgd`
+
+:ref:`tjpgdcnf`

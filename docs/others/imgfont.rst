@@ -26,3 +26,5 @@ Example
 
 API
 ---
+
+:ref:`lv_imgfont`

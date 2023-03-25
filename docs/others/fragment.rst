@@ -76,3 +76,5 @@ Example
 
 API
 ---
+
+:ref:`lv_fragment`

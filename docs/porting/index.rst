@@ -1,3 +1,5 @@
+.. _porting:
+
 =======
 Porting
 =======
@@ -9,9 +11,9 @@ Porting
     project
     disp
     indev
-    hal_tick
+    tick
     timer_handler
     sleep
     os
     log
-    draw_ctx
+    draw
