@@ -306,7 +306,7 @@ lv_ime_pinyin 有以下模式：
 Example
 -------
 
-.. include:: ../../examples/others/ime/index.rst
+.. include:: ../examples/others/ime/index.rst
 
 API
 ---

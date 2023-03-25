@@ -39,7 +39,7 @@ as image sources. For example:
    lv_img_set_src(my_img, "S:path/to/picture.jpg");
 
 Note that, a file system driver needs to registered to open images from
-files. Read more about it `here <https://docs.lvgl.io/master/overview/file-system.html>`__ or just
+files. Read more about it :ref:`file-system` or just
 enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 
 Converter
@@ -83,7 +83,7 @@ The expected result is:
 Example
 -------
 
-.. include:: ../../examples/libs/sjpg/index.rst
+.. include:: ../examples/libs/sjpg/index.rst
 
 
 API

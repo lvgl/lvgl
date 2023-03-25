@@ -19,7 +19,10 @@ class LvExample(Directive):
     }
 
     def get_example_code_path(self, example_path, language):
-        return os.path.abspath("../examples/" + example_path + "." + language)
+        base_path = os.path.dirname(__file__)
+        examples_path = os.path.abspath(os.path.join(base_path, '..', 'examples'))
+        example_path = os.path.join(examples_path, example_path + '.' + language)
+        return example_path
 
     def human_language_name(self, language):
         if language == 'py':
@@ -69,15 +72,15 @@ class LvExample(Directive):
 
         if os.path.exists(c_path):
             c_code = self.embed_code(c_path, example_path, 'c', buttons={
-                '<i class="fa fa-github"></i>&nbsp;GitHub': self.github_path(example_path, 'c')
+                '<i class="fa fa-github"></i>&nbsp;View on GitHub': self.github_path(example_path, 'c')
             })
         else:
             c_code = None
 
         if os.path.exists(py_path):
             py_code = self.embed_code(py_path, example_path, 'py', buttons={
-                '<i class="fa fa-github"></i>&nbsp;GitHub': self.github_path(example_path, 'py'),
-                '<i class="fa fa-play"></i>&nbsp;Simulator': f"https://sim.lvgl.io/v{env.config.version}/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/{example_path}.py"
+                '<i class="fa fa-github"></i>&nbsp;View on GitHub': self.github_path(example_path, 'py'),
+                '<i class="fa fa-play"></i>&nbsp;MicroPython Simulator': f"https://sim.lvgl.io/v{env.config.version}/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/{example_path}.py"
             })
         else:
             py_code = None

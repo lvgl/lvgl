@@ -72,7 +72,7 @@ Fragment Based Navigation
 Example
 -------
 
-.. include:: ../../examples/others/fragment/index.rst
+.. include:: ../examples/others/fragment/index.rst
 
 API
 ---

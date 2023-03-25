@@ -58,7 +58,7 @@ firstly and resize the buffer accordingly.
 Example
 -------
 
-.. include:: ../../examples/others/snapshot/index.rst
+.. include:: ../examples/others/snapshot/index.rst
 
 API
 ---

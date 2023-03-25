@@ -1,3 +1,5 @@
+.. _quick-overview:
+
 ==============
 Quick overview
 ==============
@@ -326,7 +328,7 @@ The theme for your application is a compile time configuration set in
 Examples
 --------
 
-.. include:: ../../examples/get_started/index.rst
+.. include:: ../examples/get_started/index.rst
 
 Micropython
 -----------

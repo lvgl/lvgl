@@ -94,13 +94,13 @@ please refer to example code.
 Example
 -------
 
-.. include:: ../../examples/libs/freetype/index.rst
+.. include:: ../examples/libs/freetype/index.rst
 
 Learn more
 ----------
 
 -  FreeType`tutorial <https://www.freetype.org/freetype2/docs/tutorial/step1.html>`__
--  LVGL's `font interface <https://docs.lvgl.io/master/overview/font.html#add-a-new-font-engine>`__
+-  LVGL's :ref:`add_font`
 
 API
 ---

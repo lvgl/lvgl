@@ -95,6 +95,8 @@ Animation
 Style
 -----
 
+.. include::https://github.com/lvgl/lv_binding_js/blob/master/doc/style/position-size-layout.md
+
 -  `position-size-layout <https://github.com/lvgl/lv_binding_js/blob/master/doc/style/position-size-layout.md>`__
 -  `boxing-model <https://github.com/lvgl/lv_binding_js/blob/master/doc/style/boxing-model.md>`__
 -  `color <https://github.com/lvgl/lv_binding_js/blob/master/doc/style/color.md>`__

@@ -1,8 +1,8 @@
 import os
 from xml.etree import ElementTree as ET
 
-base_path = os.path.dirname(__file__)
-xml_path = os.path.join(base_path, 'xml')
+base_path = ''
+xml_path = ''
 
 
 def load_xml(fle):
@@ -504,155 +504,77 @@ class CLASS(object):
                 cls(self, **member.attrib)
 
 
-rst_template = '''
-### {section}
-
-```eval_rst
-
-{directives}
-
-```
-'''
-
-include_html_template = '''\
-
-.. raw:: html
-
-{includes}
-    <script>includeHTML();</script>
-
-'''
-
-include_template = '    <div include-html="{path}"></div>'
-
-convert_output_path = r'C:\Users\drsch\Desktop\New folder (74)'
+lvgl_src_path = ''
+api_path = ''
+html_files = {}
 
 
-def convert_express(express):
-    for name in structures:
-        if name == express[2:-2]:
-            return ':cpp:struct:' + express[1:-1]
+def iter_src(n, p):
+    if p:
+        out_path = os.path.join(api_path, p)
+    else:
+        out_path = api_path
 
-    for name in unions:
-        if name == express[2:-2]:
-            return ':cpp:union:' + express[1:-1]
+    index_file = None
 
-    for name in variables:
-        if name == express[2:-2]:
-            return ':cpp:var:' + express[1:-1]
+    if p:
+        src_path = os.path.join(lvgl_src_path, p)
+    else:
+        src_path = lvgl_src_path
 
-    for name in typedefs:
-        if name == express[2:-2]:
-            return ':cpp:type:' + express[1:-1]
+    folders = []
 
-    for name in defines:
-        if name == express[2:-2]:
-            return ':c:macro:' + express[1:-1]
+    for file in os.listdir(src_path):
+        if 'private' in file:
+            continue
 
-    for name in functions:
-        if name == express[2:-2]:
-            return ':cpp:func:' + express[1:-1]
-        elif name + '()' == express[2:-2]:
-            return ':cpp:func:' + express[1:-4] + '`'
-        elif '=' not in express and '(' in express:
-            if express[2:-2].split('(', 1)[0] == name:
-                return ':cpp:expr:' + express[1:-1].replace(';', '')
+        if os.path.isdir(os.path.join(src_path, file)):
+            folders.append((file, os.path.join(p, file)))
+            continue
 
-    for enum in enums.values():
-        for member in enum.members:
-            if member.name == express[2:-2]:
-                return ':cpp:enumerator:' + express[1:-1]
-    return express
+        if not file.endswith('.h'):
+            continue
 
+        if not os.path.exists(out_path):
+            os.makedirs(out_path)
 
-def convert_doc(src):
-    with open(src, 'rb') as f:
-        data = f.read().decode('utf-8')
+        if index_file is None:
+            index_file = open(os.path.join(out_path, 'index.rst'), 'w')
+            if n:
+                index_file.write('=' * len(n))
+                index_file.write('\n' + n + '\n')
+                index_file.write('=' * len(n))
+                index_file.write('\n\n\n')
 
-    last_char = ''
-    express = ''
-    output = ''
+            index_file.write('.. toctree::\n    :maxdepth: 2\n\n')
 
-    open_express = False
+        name = os.path.splitext(file)[0]
+        index_file.write('    ' + name + '\n')
 
-    for char in data:
-        if char == '`':
-            if last_char == '`':
-                if open_express:
-                    express += '``'
-                    open_express = False
-                    express = ' '.join(item.strip() for item in express.split('\n'))
-                    output += convert_express(express)
-                    express = ''
-                    last_char = ''
-                else:
-                    open_express = True
-                    express = '``'
+        rst_file = os.path.join(out_path, name + '.rst')
+        html_file = os.path.join(p, name + '.html')
+        html_files[name] = html_file
 
-                    last_char = ''
-            else:
-                last_char = '`'
+        with open(rst_file, 'w') as f:
+            f.write('.. _{0}:'.format(name))
+            f.write('\n\n')
+            f.write('=' * len(file))
+            f.write('\n')
+            f.write(file)
+            f.write('\n')
+            f.write('=' * len(file))
+            f.write('\n\n\n')
 
-        elif open_express:
-            express += char
-            last_char = char
+            f.write('.. doxygenfile:: ' + file)
+            f.write('\n')
+            f.write('    :project: lvgl')
+            f.write('\n\n')
 
-        elif last_char == '`':
-            output += '`'
-            output += char
-            last_char = char
-        else:
-            output += char
-
-        dst = src.split('docs')[1][1:]
-        dst = os.path.join(convert_output_path, dst)
-        dst_path = os.path.split(dst)[0]
-        if not os.path.exists(dst_path):
-            os.makedirs(dst_path)
-
-        with open(dst, 'wb') as f:
-            f.write(output.encode('utf-8'))
-
-
-def run(*doc_paths):
-    api_path = os.path.join(base_path, 'API')
-
-    if not os.path.exists(api_path):
-        os.makedirs(api_path)
-
-    html_files = {}
-
-    def iter_src(n, p):
-        if p:
-            out_path = os.path.join(api_path, p)
-        else:
-            out_path = api_path
-
-        index_file = None
-
-        if p:
-            src_path = os.path.join(base_path, '..', 'src', p)
-        else:
-            src_path = os.path.join(base_path, '..', 'src')
-
-        folders = []
-
-        for file in os.listdir(src_path):
-            if 'private' in file:
-                continue
-
-            if os.path.isdir(os.path.join(src_path, file)):
-                folders.append((file, os.path.join(p, file)))
-                continue
-
-            if not file.endswith('.h'):
-                continue
-
-            if not os.path.exists(out_path):
-                os.makedirs(out_path)
-
+    for name, folder in folders:
+        if iter_src(name, folder):
             if index_file is None:
                 index_file = open(os.path.join(out_path, 'index.rst'), 'w')
+
                 if n:
                     index_file.write('=' * len(n))
                     index_file.write('\n' + n + '\n')
@@ -661,52 +583,76 @@ def run(*doc_paths):
 
                 index_file.write('.. toctree::\n    :maxdepth: 2\n\n')
 
-            name = os.path.splitext(file)[0]
-            index_file.write('    ' + name + '\n')
+            index_file.write('    ' + os.path.split(folder)[-1] + '/index\n')
 
-            rst_file = os.path.join(out_path, name + '.rst')
-            html_file = os.path.join(p, name + '.html')
-            html_files[name] = html_file
+    if index_file is not None:
+        index_file.write('\n')
+        index_file.close()
+        return True
 
-            with open(rst_file, 'w') as f:
-                f.write('.. _{0}:'.format(name))
-                f.write('\n\n')
-                f.write('=' * len(file))
-                f.write('\n')
-                f.write(file)
-                f.write('\n')
-                f.write('=' * len(file))
-                f.write('\n\n\n')
+    return False
 
-                f.write('.. doxygenfile:: ' + file)
-                f.write('\n')
-                f.write('    :project: lvgl')
-                f.write('\n\n')
 
-        for name, folder in folders:
-            if iter_src(name, folder):
-                if index_file is None:
-                    index_file = open(os.path.join(out_path, 'index.rst'), 'w')
+def clean_name(nme):
+    if nme.startswith('_lv_'):
+        nme = nme[4:]
+    elif nme.startswith('lv_'):
+        nme = nme[3:]
 
-                    if n:
-                        index_file.write('=' * len(n))
-                        index_file.write('\n' + n + '\n')
-                        index_file.write('=' * len(n))
-                        index_file.write('\n\n\n')
+    if nme.endswith('_t'):
+        nme = nme[:-2]
 
-                    index_file.write('.. toctree::\n    :maxdepth: 2\n\n')
+    return nme
 
-                index_file.write('    ' + os.path.split(folder)[-1] + '/index\n')
 
-        if index_file is not None:
-            index_file.write('\n')
-            index_file.close()
-            return True
+def is_name_match(item_name, obj_name):
+    u_num = item_name.count('_') + 1
 
+    obj_name = obj_name.split('_')
+    if len(obj_name) < u_num:
         return False
+    obj_name = '_'.join(obj_name[:u_num])
 
+    return item_name == obj_name
+
+
+def get_includes(name1, name2, obj, includes):
+    name2 = clean_name(name2)
+
+    if not is_name_match(name1, name2):
+        return
+
+    if obj.parent is not None:
+        header_file = obj.parent.header_file
+    elif hasattr(obj, 'header_file'):
+        header_file = obj.header_file
+    else:
+        return
+
+    if not header_file:
+        return
+
+    if header_file not in html_files:
+        return
+
+    includes.add((header_file, html_files[header_file]))
+
+
+def run(project_path, temp_directory, *doc_paths):
+    global base_path
+    global xml_path
+    global lvgl_src_path
+    global api_path
+    
+    base_path = temp_directory
+    xml_path = os.path.join(base_path, 'xml')
+    api_path = os.path.join(base_path, 'API')
+    lvgl_src_path = os.path.join(project_path, 'src')
+
+    if not os.path.exists(api_path):
+        os.makedirs(api_path)
+    
     iter_src('API', '')
-
     index = load_xml('index')
 
     for compound in index:
@@ -714,67 +660,20 @@ def run(*doc_paths):
         if compound.attrib['kind'] in ('example', 'page', 'dir'):
             continue
 
-        # print(compound.attrib['name'])
         globals()[compound.attrib['kind'].upper()](
             None,
             node=compound,
             **compound.attrib
         )
 
-    def clean_name(nme):
-        if nme.startswith('_lv_'):
-            nme = nme[4:]
-        elif nme.startswith('lv_'):
-            nme = nme[3:]
-
-        if nme.endswith('_t'):
-            nme = nme[:-2]
-
-        return nme
-
-    def is_name_match(item_name, obj_name):
-        u_num = item_name.count('_') + 1
-
-        obj_name = obj_name.split('_')
-        if len(obj_name) < u_num:
-            return False
-        obj_name = '_'.join(obj_name[:u_num])
-
-        return item_name == obj_name
-
     for folder in doc_paths:
-
         items = list(
             (os.path.splitext(item)[0], os.path.join(folder, item))
             for item in os.listdir(folder)
             if item.endswith('rst') and 'index' not in item
         )
 
-        def _do(name1, name2, obj):
-            name2 = clean_name(name2)
-
-            if not is_name_match(name1, name2):
-                return
-
-            if obj.parent is not None:
-                header_file = obj.parent.header_file
-            elif hasattr(obj, 'header_file'):
-                header_file = obj.header_file
-            else:
-                return
-
-            if not header_file:
-                return
-
-            if header_file not in html_files:
-                return
-
-            html_includes.add((header_file, html_files[header_file]))
-
         for name, path in items:
-            # if 'widgets' in path:
-            # convert_doc(path)
-
             html_includes = set()
 
             for container in (
@@ -788,19 +687,12 @@ def run(*doc_paths):
                 functions
             ):
                 for n, o in container.items():
-                    _do(name, n, o)
+                    get_includes(name, n, o, html_includes)
 
             if html_includes:
-                # html_includes = list(
-                #     include_template.format(path=inc)
-                #     for inc in html_includes
-                # )
-                # output = include_html_template.format(
-                #     includes='\n'.join(html_includes)
-                # )
-
                 html_includes = list(
-                    ':ref:`{0}`\n'.format(inc) for inc, _ in html_includes
+                    ':ref:`{0}`\n'.format(inc)
+                    for inc, _ in html_includes
                 )
 
                 output = ('\n'.join(html_includes)) + '\n'

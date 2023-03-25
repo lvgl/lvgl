@@ -291,7 +291,7 @@ through functions such as *strcpy* and *strcat* for later use.
 Example
 -------
 
-.. include:: ../../examples/others/file_explorer/index.rst
+.. include:: ../examples/others/file_explorer/index.rst
 
 API
 ---

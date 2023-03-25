@@ -33,7 +33,7 @@ available). The cache size is indicated in bytes.
 Example
 -------
 
-.. include:: ../../examples/libs/tiny_ttf/index.rst
+.. include:: ../examples/libs/tiny_ttf/index.rst
 
 
 API

@@ -13,4 +13,3 @@ Platforms
     tasmota-berry
     cmake
     mdk
-

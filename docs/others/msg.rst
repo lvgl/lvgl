@@ -145,7 +145,7 @@ when it’s notified about the new temperature.
 Example
 -------
 
-.. include:: ../../examples/others/msg/index.rst
+.. include:: ../examples/others/msg/index.rst
 
 API
 ---

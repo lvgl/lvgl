@@ -22,7 +22,7 @@ longer used.
 Example
 -------
 
-.. include:: ../../examples/others/imgfont/index.rst
+.. include:: ../examples/others/imgfont/index.rst
 
 API
 ---

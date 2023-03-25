@@ -117,9 +117,11 @@ def print_item(path, lvl, d, fout):
             fout.write("\n")
 
 
-def exec():
+def exec(temp_directory):
+    output_path = os.path.join(temp_directory, 'examples.rst')
+
     paths = ["../examples/", "../demos/"]
-    fout = open("examples.rst", "w")
+    fout = open(output_path, "w")
     filelist = []
 
     for path in paths:
@@ -139,6 +141,8 @@ def exec():
     # fout.write(":github_url: |github_link_base|/examples.md\n")
     # fout.write("```\n")
     # fout.write("\n")
+
+    fout.write('.. _examples:\n\n')
     write_header(0, 'Examples', fout)
 
     for h in h1:

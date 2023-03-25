@@ -1,3 +1,5 @@
+.. _introduction:
+
 ============
 Introduction
 ============
@@ -280,4 +282,4 @@ How to work with an operating system?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To work with an operating system where tasks can interrupt each other (preemptively) you should protect LVGL related function calls with a mutex.
-See the `Operating system and interrupts <porting/os>`__ section to learn more.
+See the :ref:`os_interrupt` section to learn more.

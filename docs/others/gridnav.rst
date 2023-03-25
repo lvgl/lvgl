@@ -59,10 +59,9 @@ hidden (:c:enumerator:`LV_OBJ_FLAG_HIDDEN`) to be focusable by gridnav.
 Example
 -------
 
-.. include:: ../../examples/others/gridnav/index.rst
+.. include:: ../examples/others/gridnav/index.rst
 
 API
 ---
 
 :ref:`lv_gridnav`
-

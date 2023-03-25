@@ -30,4 +30,3 @@ Welcome to the documentation of LVGL!
     CODING_STYLE
     CHANGELOG
     ROADMAP
-

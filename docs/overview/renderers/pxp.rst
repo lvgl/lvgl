@@ -12,4 +12,3 @@ API
 :ref:`lv_gpu_nxp_pxp`
 
 :ref:`lv_gpu_nxp_pxp_osa`
-
