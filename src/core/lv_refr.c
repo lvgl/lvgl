@@ -643,9 +643,6 @@ static void refr_area_part(lv_layer_t * layer)
             if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
         }
     }
-
-    //    if(layer->init_buf) layer->init_buf(layer);
-
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
         if(layer->buffer_clear) layer->buffer_clear(layer);

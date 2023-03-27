@@ -13,6 +13,9 @@
 #include "lv_log.h"
 #include "lv_ll.h"
 #include "lv_math.h"
+#if LV_USE_OS
+    #include "../osal/lv_os.h"
+#endif
 
 #ifdef LV_MEM_POOL_INCLUDE
     #include LV_MEM_POOL_INCLUDE
@@ -32,6 +35,10 @@
 #else
     #define MEM_UNIT         uint32_t
     #define ALIGN_MASK       0x3
+#endif
+
+#if LV_USE_OS
+    lv_mutex_t mutex;
 #endif
 
 /**********************
@@ -90,6 +97,8 @@ void lv_mem_init_builtin(void)
     lv_pool_t * pool_p = _lv_ll_ins_tail(&pool_ll);
     LV_ASSERT_MALLOC(pool_p);
     *pool_p = lv_tlsf_get_pool(tlsf);
+
+    lv_mutex_init(&mutex);
 
 #if LV_MEM_ADD_JUNK
     LV_LOG_WARN("LV_MEM_ADD_JUNK is enabled which makes LVGL much slower");
@@ -159,24 +168,34 @@ void lv_mem_monitor_builtin(lv_mem_monitor_t * mon_p)
 
 void * lv_malloc_builtin(size_t size)
 {
+    lv_mutex_lock(&mutex);
     cur_used += size;
     max_used = LV_MAX(cur_used, max_used);
-    return lv_tlsf_malloc(tlsf, size);
+    void * p = lv_tlsf_malloc(tlsf, size);
+
+    lv_mutex_unlock(&mutex);
+    return p;
 }
 
 void * lv_realloc_builtin(void * p, size_t new_size)
 {
-    return lv_tlsf_realloc(tlsf, p, new_size);
+    lv_mutex_lock(&mutex);
+    void * p_new = lv_tlsf_realloc(tlsf, p, new_size);
+    lv_mutex_unlock(&mutex);
+
+    return p_new;
 }
 
 void lv_free_builtin(void * p)
 {
+    lv_mutex_lock(&mutex);
 #if LV_MEM_ADD_JUNK
     lv_memset(p, 0xbb, lv_tlsf_block_size(data));
 #endif
     size_t size = lv_tlsf_free(tlsf, p);
     if(cur_used > size) cur_used -= size;
     else cur_used = 0;
+    lv_mutex_unlock(&mutex);
 }
 
 lv_res_t lv_mem_test_builtin(void)
