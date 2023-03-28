@@ -865,7 +865,7 @@ static lv_coord_t knob_get_extra_size(lv_obj_t * obj)
     knob_outline_size += lv_obj_get_style_outline_width(obj, LV_PART_KNOB);
     knob_outline_size += lv_obj_get_style_outline_pad(obj, LV_PART_KNOB);
 
-   return LV_MAX(knob_shadow_size, knob_outline_size);
+    return LV_MAX(knob_shadow_size, knob_outline_size);
 }
 
 #endif
