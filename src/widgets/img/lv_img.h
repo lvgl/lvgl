@@ -39,18 +39,19 @@ extern "C" {
  */
 typedef struct {
     lv_obj_t obj;
-    const void * src; /*Image source: Pointer to an array or a file or a symbol*/
+    const void * src;         /*Image source: Pointer to an array or a file or a symbol*/
     lv_point_t offset;
-    lv_coord_t w;          /*Width of the image (Handled by the library)*/
-    lv_coord_t h;          /*Height of the image (Handled by the library)*/
-    uint16_t angle;    /*rotation angle of the image*/
-    lv_point_t pivot;     /*rotation center of the image*/
-    uint16_t zoom;         /*256 means no zoom, 512 double size, 128 half size*/
-    uint8_t src_type : 2;  /*See: lv_img_src_t*/
-    uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
-    uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
+    lv_coord_t w;             /*Width of the image (Handled by the library)*/
+    lv_coord_t h;             /*Height of the image (Handled by the library)*/
+    uint16_t angle;           /*rotation angle of the image*/
+    lv_point_t pivot;         /*rotation center of the image*/
+    uint16_t zoom;            /*256 means no zoom, 512 double size, 128 half size*/
+    uint8_t src_type : 2;     /*See: lv_img_src_t*/
+    uint8_t cf : 5;           /*Color format from `lv_img_color_format_t`*/
+    uint8_t antialias : 1;    /*Apply anti-aliasing in transformations (rotate, zoom)*/
     uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
     uint8_t repeat: 2; /*Image repeat mode when image size and object size is different.*/
+    uint8_t obj_fit: 3;   /*How the lv_img, should be resized to fit its container*/
 } lv_img_t;
 
 extern const lv_obj_class_t lv_img_class;
@@ -90,6 +91,47 @@ enum {
 };
 
 typedef uint8_t lv_img_repeat_t;
+
+/**
+ * Image size mode, when image size and object size is different
+ */
+enum {
+    /**
+     * The replaced content is not resized.
+     */
+    LV_IMG_OBJ_FIT_NONE = 0,
+
+    /**
+     * The replaced content is sized to fill the element's content box.
+     * The entire object will completely fill the box.
+     * If the object's aspect ratio does not match the aspect ratio of its box,
+     * then the object will be stretched to fit.
+    */
+    LV_IMG_OBJ_FIT_FILL,
+
+    /**
+     * The replaced content is scaled to maintain its aspect ratio while fitting
+     * within the element's content box. The entire object is made to fill the box,
+     * while preserving its aspect ratio, so the object will be
+     * "letterboxed" if its aspect ratio does not match the aspect ratio of the box.
+     */
+    LV_IMG_OBJ_FIT_CONTAIN,
+
+    /**
+     * The replaced content is sized to maintain its aspect ratio while filling
+     * the element's entire content box. If the object's aspect ratio does not
+     * match the aspect ratio of its box, then the object will be clipped to fit.
+     */
+    LV_IMG_OBJ_FIT_COVER,
+
+    /**
+     * The content is sized as if none or contain were specified,
+     * whichever would result in a smaller concrete object size.
+     */
+    LV_IMG_OBJ_FIT_SCALE_DOWN,
+};
+
+typedef uint8_t lv_img_obj_fit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
