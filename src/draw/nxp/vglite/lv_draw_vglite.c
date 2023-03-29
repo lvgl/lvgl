@@ -316,9 +316,9 @@ static void lv_draw_vglite_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc
     lv_point_t rel_point2 = { point2->x - draw_ctx->buf_area->x1, point2->y - draw_ctx->buf_area->y1 };
 
     bool done = false;
-    bool mask_any = lv_draw_mask_is_any(&rel_clip_area);
+    bool has_mask = lv_draw_mask_is_any(&rel_clip_area);
 
-    if(!mask_any) {
+    if(!has_mask) {
         done = (lv_gpu_nxp_vglite_draw_line(&rel_point1, &rel_point2, &rel_clip_area, dsc) == LV_RES_OK);
         if(!done)
             VG_LITE_LOG_TRACE("VG-Lite draw line failed. Fallback.");
@@ -399,7 +399,7 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
     if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))
         return LV_RES_OK; /*Fully clipped, nothing to do*/
 
-    bool mask_any = lv_draw_mask_is_any(&rel_coords);
+    bool has_mask = lv_draw_mask_is_any(&rel_coords);
     lv_grad_dir_t grad_dir = dsc->bg_grad.dir;
     lv_color_t bg_color = (grad_dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) ?
                           dsc->bg_color : dsc->bg_grad.stops[0].color;
@@ -412,7 +412,7 @@ static lv_res_t lv_draw_vglite_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_d
      *
      * Complex case: gradient or radius but no mask.
      */
-    if(!mask_any && ((dsc->radius != 0) || (grad_dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))) {
+    if(!has_mask && ((dsc->radius != 0) || (grad_dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))) {
         lv_res_t res = lv_gpu_nxp_vglite_draw_bg(&rel_coords, &rel_clip_area, dsc);
         if(res != LV_RES_OK)
             VG_LITE_LOG_TRACE("VG-Lite draw bg failed. Fallback.");
@@ -518,9 +518,9 @@ static void lv_draw_vglite_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t
     lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
     lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    bool mask_any = lv_draw_mask_is_any(&rel_clip_area);
+    bool has_mask = lv_draw_mask_is_any(&rel_clip_area);
 
-    if(!mask_any) {
+    if(!has_mask) {
         done = (lv_gpu_nxp_vglite_draw_arc(&rel_center, (int32_t)radius, (int32_t)start_angle, (int32_t)end_angle,
                                            &rel_clip_area, dsc) == LV_RES_OK);
         if(!done)
