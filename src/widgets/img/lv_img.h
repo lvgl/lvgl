@@ -228,6 +228,14 @@ void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode);
  * @param mode      the new repeat mode.
  */
 void lv_img_set_repeat(lv_obj_t * obj, lv_img_repeat_t mode);
+
+/**
+ * Set the image object fit mode.
+ *
+ * @param obj       pointer to an image object
+ * @param mode      the new obj fit mode.
+ */
+void lv_img_set_obj_fit(lv_obj_t * obj, lv_img_obj_fit_t mode);
 /*=====================
  * Getter functions
  *====================*/
@@ -294,6 +302,13 @@ lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj);
  * @return          element of @ref lv_img_repeat_t
  */
 lv_img_repeat_t lv_img_get_repeat(lv_obj_t * obj);
+/**
+ * Get the size mode of the image
+ * @param obj       pointer to an image object
+ * @return          element of @ref lv_img_obj_fit_t
+ */
+lv_img_obj_fit_t lv_img_get_obj_fit(lv_obj_t * obj);
+
 /**********************
  *      MACROS
  **********************/

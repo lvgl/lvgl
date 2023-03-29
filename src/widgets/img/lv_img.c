@@ -305,6 +305,16 @@ void lv_img_set_repeat(lv_obj_t * obj, lv_img_repeat_t mode)
     img->repeat = mode;
     lv_obj_invalidate(obj);
 }
+void lv_img_set_obj_fit(lv_obj_t* obj, lv_img_obj_fit_t mode)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_img_t * img = (lv_img_t *)obj;
+    if(mode == img->obj_fit) return;
+
+    img->obj_fit = mode;
+    lv_obj_invalidate(obj);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -384,6 +394,13 @@ lv_img_repeat_t lv_img_get_repeat(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
     return img->repeat;
+}
+
+lv_img_obj_fit_t lv_img_get_obj_fit(lv_obj_t* obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_img_t * img = (lv_img_t *)obj;
+    return img->obj_fit;
 }
 
 /**********************
