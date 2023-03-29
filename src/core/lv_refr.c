@@ -249,14 +249,14 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     }
 
     /*Save the area*/
-    if(disp->inv_p < LV_INV_BUF_SIZE) {
-        lv_area_copy(&disp->inv_areas[disp->inv_p], &com_area);
-    }
-    else {   /*If no place for the area add the screen*/
+    lv_area_t * tmp_area_p = &com_area;
+    if(disp->inv_p >= LV_INV_BUF_SIZE) { /*If no place for the area add the screen*/
         disp->inv_p = 0;
-        lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
+        tmp_area_p = &scr_area;
     }
+    lv_area_copy(&disp->inv_areas[disp->inv_p], tmp_area_p);
     disp->inv_p++;
+
     if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
 }
 
