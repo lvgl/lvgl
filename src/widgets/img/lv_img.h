@@ -80,10 +80,10 @@ enum {
     LV_IMG_REPEAT_NONE = 0,
 
     /** Repeat the image in X direction */
-    LV_IMG_REPEAT_X = 0b01,
+    LV_IMG_REPEAT_X = 1,
 
     /** Repeat the image in Y direction */
-    LV_IMG_REPEAT_Y = 0b10,
+    LV_IMG_REPEAT_Y = 2,
 
     /** Repeat the image in both directions */
     LV_IMG_REPEAT_XY = LV_IMG_REPEAT_X | LV_IMG_REPEAT_Y,
