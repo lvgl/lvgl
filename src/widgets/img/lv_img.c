@@ -396,7 +396,7 @@ lv_img_repeat_t lv_img_get_repeat(lv_obj_t * obj)
     return img->repeat;
 }
 
-lv_img_obj_fit_t lv_img_get_obj_fit(lv_obj_t* obj)
+lv_img_obj_fit_t lv_img_get_obj_fit(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;

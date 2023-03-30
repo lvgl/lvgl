@@ -93,7 +93,7 @@ enum {
 typedef uint8_t lv_img_repeat_t;
 
 /**
- * Image size mode, when image size and object size is different
+ * Image object fit mode, when image size and object size is different
  */
 enum {
     /**
