@@ -663,30 +663,32 @@ static void draw_img(lv_event_t * e)
                 if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) return;
                 draw_ctx->clip_area = &img_clip_area;
 
-                lv_area_t coords_start;
-                lv_area_t coords_tmp;
+                // according to img->repeat, draw the image multiple times
+                int y_repeat_cnt = 1;
+                int x_repeat_cnt = 1;
                 lv_coord_t offset_x = img->offset.x;
                 lv_coord_t offset_y = img->offset.y;
+                lv_area_t coords_start = {
+                    .x1 = offset_x,
+                    .y1 = offset_y,
+                };
 
-                coords_start.y1 = img->repeat & LV_IMG_REPEAT_Y
-                                  ? img_max_area.y1 - (img_size_final.y - offset_y) % img_size_final.y
-                                  : offset_y;
+                if(img->repeat & LV_IMG_REPEAT_Y) {
+                    coords_start.y1 = img_max_area.y1 - (img_size_final.y - offset_y) % img_size_final.y;
+                    y_repeat_cnt = (img_max_area.y2 - img_max_area.y1 + 1) / img_size_final.y + 1 + (offset_y != 0);
+                }
+                if(img->repeat & LV_IMG_REPEAT_X) {
+                    coords_start.x1 = img_max_area.x1 - (img_size_final.x - offset_x) % img_size_final.x;
+                    x_repeat_cnt = (img_max_area.x2 - img_max_area.x1 + 1) / img_size_final.x + 1 + (offset_x != 0);
+                }
+
                 coords_start.y2 = coords_start.y1 + img->h - 1;
-                coords_start.x1 = img->repeat & LV_IMG_REPEAT_X
-                                  ? img_max_area.x1 - (img_size_final.x - offset_x) % img_size_final.x
-                                  : offset_x;
                 coords_start.x2 = coords_start.x1 + img->w - 1;
 
-                // according to img->repeat, draw the image
-                int y_repeat_cnt = img->repeat & LV_IMG_REPEAT_Y
-                                   ? (img_max_area.y2 - img_max_area.y1 + 1) / img_size_final.y + 1 + (offset_y != 0)
-                                   : 1;
-                int x_repeat_cnt = img->repeat & LV_IMG_REPEAT_X
-                                   ? (img_max_area.x2 - img_max_area.x1 + 1) / img_size_final.x + 1 + (offset_x != 0)
-                                   : 1;
-
-                coords_tmp.y1 = coords_start.y1;
-                coords_tmp.y2 = coords_start.y2;
+                lv_area_t coords_tmp = {
+                    .y1 = coords_start.y1,
+                    .y2 = coords_start.y2,
+                };
                 while(y_repeat_cnt--) {
                     coords_tmp.x1 = coords_start.x1;
                     coords_tmp.x2 = coords_start.x2;
