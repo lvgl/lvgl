@@ -284,6 +284,10 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const l
 
 }
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
 static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
                                             lv_coord_t radius,
                                             const lv_area_t * coords)
@@ -451,9 +455,5 @@ static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path
     /* Resulting path size */
     *path_data_size = pidx * sizeof(int32_t);
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #endif /*LV_USE_GPU_NXP_VG_LITE*/
