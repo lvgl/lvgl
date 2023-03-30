@@ -52,7 +52,12 @@
 #elif LV_COLOR_DEPTH == 32
     #define PXP_OUT_PIXEL_FORMAT kPXP_OutputPixelFormatARGB8888
     #define PXP_AS_PIXEL_FORMAT kPXP_AsPixelFormatARGB8888
-    #define PXP_PS_PIXEL_FORMAT kPXP_PsPixelFormatRGB888
+    #if (!(defined(FSL_FEATURE_PXP_HAS_NO_EXTEND_PIXEL_FORMAT) && FSL_FEATURE_PXP_HAS_NO_EXTEND_PIXEL_FORMAT)) && \
+        (!(defined(FSL_FEATURE_PXP_V3) && FSL_FEATURE_PXP_V3))
+        #define PXP_PS_PIXEL_FORMAT kPXP_PsPixelFormatARGB8888
+    #else
+        #define PXP_PS_PIXEL_FORMAT kPXP_PsPixelFormatRGB888
+    #endif
     #define PXP_TEMP_BUF_SIZE LCD_WIDTH * LCD_HEIGHT * 4U
 #elif
     #error Only 16bit and 32bit color depth are supported. Set LV_COLOR_DEPTH to 16 or 32.
