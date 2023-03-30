@@ -296,6 +296,15 @@ void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode)
     lv_obj_invalidate(obj);
 }
 
+void lv_img_set_repeat(lv_obj_t * obj, lv_img_repeat_t mode)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_img_t * img = (lv_img_t *)obj;
+    if(mode == img->repeat) return;
+
+    img->repeat = mode;
+    lv_obj_invalidate(obj);
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -368,6 +377,13 @@ lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
     return img->obj_size_mode;
+}
+
+lv_img_repeat_t lv_img_get_repeat(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_img_t * img = (lv_img_t *)obj;
+    return img->repeat;
 }
 
 /**********************
@@ -647,21 +663,37 @@ static void draw_img(lv_event_t * e)
                 if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) return;
                 draw_ctx->clip_area = &img_clip_area;
 
+                lv_area_t coords_start;
                 lv_area_t coords_tmp;
-                lv_coord_t offset_x = img->offset.x % img->w;
-                lv_coord_t offset_y = img->offset.y % img->h;
-                coords_tmp.y1 = img_max_area.y1 + offset_y;
-                if(coords_tmp.y1 > img_max_area.y1) coords_tmp.y1 -= img->h;
-                coords_tmp.y2 = coords_tmp.y1 + img->h - 1;
+                lv_coord_t offset_x = img->offset.x;
+                lv_coord_t offset_y = img->offset.y;
 
-                for(; coords_tmp.y1 < img_max_area.y2; coords_tmp.y1 += img_size_final.y, coords_tmp.y2 += img_size_final.y) {
-                    coords_tmp.x1 = img_max_area.x1 + offset_x;
-                    if(coords_tmp.x1 > img_max_area.x1) coords_tmp.x1 -= img->w;
-                    coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
+                coords_start.y1 = img_max_area.y1 - (img_size_final.y - offset_y) % img_size_final.y;
+                coords_start.y2 = coords_start.y1 + img->h - 1;
+                coords_start.x1 = img_max_area.x1 - (img_size_final.x - offset_x) % img_size_final.x;
+                coords_start.x2 = coords_start.x1 + img->w - 1;
 
-                    for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
+                // according to img->repeat, draw the image
+                int y_repeat_cnt = img->repeat & LV_IMG_REPEAT_Y
+                                   ? (img_max_area.y2 - img_max_area.y1 + 1) / img_size_final.y + 1 + (offset_y != 0)
+                                   : 1;
+                int x_repeat_cnt = img->repeat & LV_IMG_REPEAT_X
+                                   ? (img_max_area.x2 - img_max_area.x1 + 1) / img_size_final.x + 1 + (offset_x != 0)
+                                   : 1;
+
+                coords_tmp.y1 = coords_start.y1;
+                coords_tmp.y2 = coords_start.y2;
+                for(int y = 0; y < y_repeat_cnt; y++) {
+                    coords_tmp.x1 = coords_start.x1;
+                    coords_tmp.x2 = coords_start.x2;
+
+                    for(int x = 0; x < x_repeat_cnt; x++) {
                         lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src);
+                        coords_tmp.x1 += img_size_final.x;
+                        coords_tmp.x2 += img_size_final.x;
                     }
+                    coords_tmp.y1 += img_size_final.y;
+                    coords_tmp.y2 += img_size_final.y;
                 }
                 draw_ctx->clip_area = clip_area_ori;
             }

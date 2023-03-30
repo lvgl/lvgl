@@ -50,6 +50,7 @@ typedef struct {
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
     uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
+    uint8_t repeat: 2; /*Image repeat mode when image size and object size is different.*/
 } lv_img_t;
 
 extern const lv_obj_class_t lv_img_class;
@@ -70,6 +71,25 @@ enum {
 };
 
 typedef uint8_t lv_img_size_mode_t;
+
+/**
+ * Image repeat mode, when image size and object size is different and need repeat
+ */
+enum {
+    /** Repeat the image in both directions */
+    LV_IMG_REPEAT_NONE = 0,
+
+    /** Repeat the image in X direction */
+    LV_IMG_REPEAT_X = 0b01,
+
+    /** Repeat the image in Y direction */
+    LV_IMG_REPEAT_Y = 0b10,
+
+    /** Repeat the image in both directions */
+    LV_IMG_REPEAT_XY = LV_IMG_REPEAT_X | LV_IMG_REPEAT_Y,
+};
+
+typedef uint8_t lv_img_repeat_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -158,6 +178,14 @@ void lv_img_set_antialias(lv_obj_t * obj, bool antialias);
  * @param mode      the new size mode.
  */
 void lv_img_set_size_mode(lv_obj_t * obj, lv_img_size_mode_t mode);
+
+/**
+ * Set the image object repeat mode.
+ *
+ * @param obj       pointer to an image object
+ * @param mode      the new repeat mode.
+ */
+void lv_img_set_repeat(lv_obj_t * obj, lv_img_repeat_t mode);
 /*=====================
  * Getter functions
  *====================*/
@@ -218,6 +246,12 @@ bool lv_img_get_antialias(lv_obj_t * obj);
  */
 lv_img_size_mode_t lv_img_get_size_mode(lv_obj_t * obj);
 
+/**
+ * Get the repeat mode of the image
+ * @param obj       pointer to an image object
+ * @return          element of @ref lv_img_repeat_t
+ */
+lv_img_repeat_t lv_img_get_repeat(lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
