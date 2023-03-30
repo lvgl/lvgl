@@ -410,6 +410,7 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->pivot.x = 0;
     img->pivot.y = 0;
     img->obj_size_mode = LV_IMG_SIZE_MODE_VIRTUAL;
+    img->repeat = LV_IMG_REPEAT_XY;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
