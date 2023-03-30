@@ -683,11 +683,11 @@ static void draw_img(lv_event_t * e)
 
                 coords_tmp.y1 = coords_start.y1;
                 coords_tmp.y2 = coords_start.y2;
-                for(int y = 0; y < y_repeat_cnt; y++) {
+                while(y_repeat_cnt--) {
                     coords_tmp.x1 = coords_start.x1;
                     coords_tmp.x2 = coords_start.x2;
 
-                    for(int x = 0; x < x_repeat_cnt; x++) {
+                    while(x_repeat_cnt--) {
                         lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src);
                         coords_tmp.x1 += img_size_final.x;
                         coords_tmp.x2 += img_size_final.x;
