@@ -668,9 +668,13 @@ static void draw_img(lv_event_t * e)
                 lv_coord_t offset_x = img->offset.x;
                 lv_coord_t offset_y = img->offset.y;
 
-                coords_start.y1 = img_max_area.y1 - (img_size_final.y - offset_y) % img_size_final.y;
+                coords_start.y1 = img->repeat & LV_IMG_REPEAT_Y
+                                  ? img_max_area.y1 - (img_size_final.y - offset_y) % img_size_final.y
+                                  : offset_y;
                 coords_start.y2 = coords_start.y1 + img->h - 1;
-                coords_start.x1 = img_max_area.x1 - (img_size_final.x - offset_x) % img_size_final.x;
+                coords_start.x1 = img->repeat & LV_IMG_REPEAT_X
+                                  ? img_max_area.x1 - (img_size_final.x - offset_x) % img_size_final.x
+                                  : offset_x;
                 coords_start.x2 = coords_start.x1 + img->w - 1;
 
                 // according to img->repeat, draw the image
