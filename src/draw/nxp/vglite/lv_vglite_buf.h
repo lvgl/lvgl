@@ -100,6 +100,17 @@ void lv_vglite_set_src_buf_ptr(const lv_color_t * buf);
  */
 void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 
+/**
+ * Set vglite buffer.
+ *
+ * @param[in] vgbuf Address of the VGLite buffer object
+ * @param[in] buf Address of the memory for the VGLite buffer
+ * @param[in] area buffer area (for width and height)
+ * @param[in] stride buffer stride
+ */
+void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
+                       const lv_area_t * area, lv_coord_t stride);
+
 /**********************
  *      MACROS
  **********************/
