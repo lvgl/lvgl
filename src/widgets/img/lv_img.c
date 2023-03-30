@@ -665,24 +665,26 @@ static void draw_img(lv_event_t * e)
                 // according to img->repeat, draw the image multiple times
                 int y_repeat_cnt = 1;
                 int x_repeat_cnt = 1;
-                lv_coord_t offset_x = (img_size_final.x - img->offset.x % img_size_final.x) % img_size_final.x;
-                lv_coord_t offset_y = (img_size_final.y - img->offset.y % img_size_final.x) % img_size_final.y;
-                lv_point_t img_max_area_size = {
-                    .x = lv_area_get_width(&img_max_area) + offset_x,
-                    .y = lv_area_get_height(&img_max_area) + offset_y,
-                };
                 lv_area_t coords_start = {
                     .x1 = img->offset.x,
                     .y1 = img->offset.y,
                 };
 
-                if(img->repeat & LV_IMG_REPEAT_X) {
-                    coords_start.x1 = img_max_area.x1 - offset_x;
-                    x_repeat_cnt = img_max_area_size.x / img_size_final.x + (img_max_area_size.x % img_size_final.x != 0);
-                }
-                if(img->repeat & LV_IMG_REPEAT_Y) {
-                    coords_start.y1 = img_max_area.y1 - offset_y;
-                    y_repeat_cnt = img_max_area_size.y / img_size_final.y + (img_max_area_size.y % img_size_final.y != 0);
+                if(img->repeat != LV_IMG_REPEAT_NONE) {
+                    lv_coord_t offset_x = (img_size_final.x - img->offset.x % img_size_final.x) % img_size_final.x;
+                    lv_coord_t offset_y = (img_size_final.y - img->offset.y % img_size_final.x) % img_size_final.y;
+                    lv_point_t img_max_area_size = {
+                        .x = lv_area_get_width(&img_max_area) + offset_x,
+                        .y = lv_area_get_height(&img_max_area) + offset_y,
+                    };
+                    if(img->repeat & LV_IMG_REPEAT_X) {
+                        coords_start.x1 = img_max_area.x1 - offset_x;
+                        x_repeat_cnt = img_max_area_size.x / img_size_final.x + (img_max_area_size.x % img_size_final.x != 0);
+                    }
+                    if(img->repeat & LV_IMG_REPEAT_Y) {
+                        coords_start.y1 = img_max_area.y1 - offset_y;
+                        y_repeat_cnt = img_max_area_size.y / img_size_final.y + (img_max_area_size.y % img_size_final.y != 0);
+                    }
                 }
                 coords_start.y2 = coords_start.y1 + img->h - 1;
                 coords_start.x2 = coords_start.x1 + img->w - 1;
@@ -691,16 +693,12 @@ static void draw_img(lv_event_t * e)
                     .y1 = coords_start.y1,
                     .y2 = coords_start.y2,
                 };
-                for (int i = 0; i < y_repeat_cnt; i++) {
+                for(int i = 0; i < y_repeat_cnt; i++, coords_tmp.y1 += img_size_final.y, coords_tmp.y2 += img_size_final.y) {
                     coords_tmp.x1 = coords_start.x1;
                     coords_tmp.x2 = coords_start.x2;
-                    for (int j = 0; j < x_repeat_cnt; j++) {
+                    for(int j = 0; j < x_repeat_cnt; j++, coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
                         lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src);
-                        coords_tmp.x1 += img_size_final.x;
-                        coords_tmp.x2 += img_size_final.x;
                     }
-                    coords_tmp.y1 += img_size_final.y;
-                    coords_tmp.y2 += img_size_final.y;
                 }
                 draw_ctx->clip_area = clip_area_ori;
             }
