@@ -49,9 +49,9 @@ typedef struct {
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout);
 
-static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                       int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                       int32_t x_end, lv_color_t * cbuf, uint8_t * abuf);
+static void argb8888_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                           int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                           int32_t x_end, lv_color_t * cbuf, uint8_t * abuf);
 
 static void rgb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                       int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
@@ -67,13 +67,20 @@ static void rgb565a8_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src
                            int32_t x_end, lv_color_t * cbuf, uint8_t * abuf);
 #endif
 
-static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                            int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                            int32_t x_end, lv_color_t * cbuf, uint8_t * abuf, lv_color_format_t cf);
+static void rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                   int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                   int32_t x_end, lv_color_t * cbuf, uint8_t * abuf);
+
+
+static void argb8888_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                        int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                        int32_t x_end, lv_color_t * cbuf, uint8_t * abuf);
 
 static void a8_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                   int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                   int32_t x_end, uint8_t * abuf);
+
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -139,9 +146,6 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
         if(draw_dsc->antialias == 0) {
             switch(cf) {
-                case LV_COLOR_FORMAT_NATIVE_ALPHA:
-                    argb_no_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf);
-                    break;
                 case LV_COLOR_FORMAT_NATIVE:
                     if(sup->chroma_keyed) {
                         rgb_no_aa_chroma_key(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf,
@@ -150,6 +154,9 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                     else {
                         rgb_no_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf);
                     }
+                    break;
+                case LV_COLOR_FORMAT_ARGB8888:
+                    argb8888_no_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf);
                     break;
 
 #if LV_COLOR_DEPTH == 16
@@ -163,11 +170,16 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
         }
         else {
             switch(cf) {
+                case LV_COLOR_FORMAT_NATIVE:
+                    //                    rgb_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf, cf);
+                    break;
                 case LV_COLOR_FORMAT_A8:
                     a8_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, abuf);
                     break;
+                case LV_COLOR_FORMAT_ARGB8888:
+                    argb8888_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf);
+                    break;
                 default:
-                    argb_and_rgb_aa(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, cbuf, abuf, cf);
                     break;
             }
         }
@@ -270,9 +282,9 @@ static void rgb_no_aa_chroma_key(const uint8_t * src, lv_coord_t src_w, lv_coord
     }
 }
 
-static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                       int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
-                       int32_t x_end, lv_color_t * cbuf, uint8_t * abuf)
+static void argb8888_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                           int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                           int32_t x_end, lv_color_t * cbuf, uint8_t * abuf)
 {
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
@@ -288,21 +300,11 @@ static void argb_no_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, 
             abuf[x] = 0;
         }
         else {
-            const uint8_t * src_tmp = src;
-            src_tmp += (ys_int * src_stride * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE) + xs_int * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
+            const lv_color32_t * src32 = (const lv_color32_t *)src;
+            src32 += (ys_int * src_stride) + xs_int;
 
-#if LV_COLOR_DEPTH == 8
-            lv_color_set_int(&cbuf[x], src_tmp[0]);
-#elif LV_COLOR_DEPTH == 16
-            lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8));
-#elif LV_COLOR_DEPTH == 24
-            cbuf[x].blue = *(src_tmp + 0);
-            cbuf[x].green = *(src_tmp + 1);
-            cbuf[x].red = *(src_tmp + 2);
-#elif LV_COLOR_DEPTH == 32
-            cbuf[x] = *((lv_color_t *)src_tmp);
-#endif
-            abuf[x] = src_tmp[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
+            cbuf[x] = lv_color_from_xrgb8888(*src32);
+            abuf[x] = src32->alpha;
         }
     }
 }
@@ -343,28 +345,185 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
                             int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                             int32_t x_end, lv_color_t * cbuf, uint8_t * abuf, lv_color_format_t cf)
 {
+    //    int32_t xs_ups_start = xs_ups;
+    //    int32_t ys_ups_start = ys_ups;
+    //    bool has_alpha;
+    //    int32_t px_size;
+    //    switch(cf) {
+    //        case LV_COLOR_FORMAT_NATIVE:
+    //            has_alpha = false;
+    //            px_size = sizeof(lv_color_t);
+    //            break;
+    //        case LV_COLOR_FORMAT_RGB565A8:
+    //            has_alpha = true;
+    //            px_size = sizeof(lv_color_t);
+    //            break;
+    //        default:
+    //            return;
+    //    }
+    //
+    //    lv_coord_t x;
+    //    for(x = 0; x < x_end; x++) {
+    //        xs_ups = xs_ups_start + ((xs_step * x) >> 8);
+    //        ys_ups = ys_ups_start + ((ys_step * x) >> 8);
+    //
+    //        int32_t xs_int = xs_ups >> 8;
+    //        int32_t ys_int = ys_ups >> 8;
+    //
+    //        /*Fully out of the image*/
+    //        if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
+    //            abuf[x] = 0x00;
+    //            continue;
+    //        }
+    //
+    //        /*Get the direction the hor and ver neighbor
+    //         *`fract` will be in range of 0x00..0xFF and `next` (+/-1) indicates the direction*/
+    //        int32_t xs_fract = xs_ups & 0xFF;
+    //        int32_t ys_fract = ys_ups & 0xFF;
+    //
+    //        int32_t x_next;
+    //        int32_t y_next;
+    //        if(xs_fract < 0x80) {
+    //            x_next = -1;
+    //            xs_fract = (0x7F - xs_fract) * 2;
+    //        }
+    //        else {
+    //            x_next = 1;
+    //            xs_fract = (xs_fract - 0x80) * 2;
+    //        }
+    //        if(ys_fract < 0x80) {
+    //            y_next = -1;
+    //            ys_fract = (0x7F - ys_fract) * 2;
+    //        }
+    //        else {
+    //            y_next = 1;
+    //            ys_fract = (ys_fract - 0x80) * 2;
+    //        }
+    //
+    //        const uint8_t * src_tmp = src;
+    //        src_tmp += (ys_int * src_stride * px_size) + xs_int * px_size;
+    //
+    //
+    //        if(xs_int + x_next >= 0 &&
+    //           xs_int + x_next <= src_w - 1 &&
+    //           ys_int + y_next >= 0 &&
+    //           ys_int + y_next <= src_h - 1) {
+    //
+    //            const uint8_t * px_base = src_tmp;
+    //            const uint8_t * px_hor = src_tmp + x_next * px_size;
+    //            const uint8_t * px_ver = src_tmp + y_next * src_stride * px_size;
+    //            lv_color_t c_base;
+    //            lv_color_t c_ver;
+    //            lv_color_t c_hor;
+    //
+    //            if(has_alpha) {
+    //                lv_opa_t a_base;
+    //                lv_opa_t a_ver;
+    //                lv_opa_t a_hor;
+    //                if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) {
+    //                    a_base = px_base[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
+    //                    a_ver = px_ver[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
+    //                    a_hor = px_hor[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
+    //                }
+    //#if LV_COLOR_DEPTH == 16
+    //                else if(cf == LV_COLOR_FORMAT_RGB565A8) {
+    //                    const lv_opa_t * a_tmp = src + src_stride * src_h * sizeof(lv_color_t);
+    //                    a_base = *(a_tmp + (ys_int * src_stride) + xs_int);
+    //                    a_hor = *(a_tmp + (ys_int * src_stride) + xs_int + x_next);
+    //                    a_ver = *(a_tmp + ((ys_int + y_next) * src_stride) + xs_int);
+    //                }
+    //#endif
+    //                else {
+    //                    a_base = 0xff;
+    //                    a_ver = 0xff;
+    //                    a_hor = 0xff;
+    //                }
+    //
+    //                if(a_ver != a_base) a_ver = ((a_ver * ys_fract) + (a_base * (0x100 - ys_fract))) >> 8;
+    //                if(a_hor != a_base) a_hor = ((a_hor * xs_fract) + (a_base * (0x100 - xs_fract))) >> 8;
+    //                abuf[x] = (a_ver + a_hor) >> 1;
+    //
+    //                if(abuf[x] == 0x00) continue;
+    //
+    //#if LV_COLOR_DEPTH == 8
+    //                lv_color_set_int(&c_base, px_base[0]);
+    //                lv_color_set_int(&c_ver, px_ver[0]);
+    //                lv_color_set_int(&c_hor, px_hor[0]);
+    //#elif LV_COLOR_DEPTH == 16
+    //                lv_color_set_int(&c_base, px_base[0] + (px_base[1] << 8));
+    //                lv_color_set_int(&c_ver, px_ver[0] + (px_ver[1] << 8));
+    //                lv_color_set_int(&c_hor, px_hor[0] + (px_hor[1] << 8));
+    //#elif LV_COLOR_DEPTH == 24
+    //                lv_color_set_int(&c_base, px_base[0] + (px_base[1] << 8) +  + (px_base[2] << 8));
+    //                lv_color_set_int(&c_ver, px_ver[0] + (px_ver[1] << 8) + (px_ver[2] << 8));
+    //                lv_color_set_int(&c_hor, px_hor[0] + (px_hor[1] << 8) + (px_hor[2] << 8));
+    //#elif LV_COLOR_DEPTH == 32
+    //                c_base = *((lv_color_t *)px_base);
+    //                c_ver = *((lv_color_t *)px_ver);
+    //                c_hor = *((lv_color_t *)px_hor);
+    //#endif
+    //            }
+    //            /*No alpha channel -> RGB*/
+    //            else {
+    //                c_base = *((const lv_color_t *) px_base);
+    //                c_hor = *((const lv_color_t *) px_hor);
+    //                c_ver = *((const lv_color_t *) px_ver);
+    //                abuf[x] = 0xff;
+    //            }
+    //
+    //            if(lv_color_eq(c_base, c_ver) && lv_color_eq(c_base, c_hor)) {
+    //                cbuf[x] = c_base;
+    //            }
+    //            else {
+    //                c_ver = LV_COLOR_MIX(c_ver, c_base, ys_fract);
+    //                c_hor = LV_COLOR_MIX(c_hor, c_base, xs_fract);
+    //                cbuf[x] = LV_COLOR_MIX(c_hor, c_ver, LV_OPA_50);
+    //            }
+    //        }
+    //        /*Partially out of the image*/
+    //        else {
+    //#if LV_COLOR_DEPTH == 8
+    //            lv_color_set_int(&cbuf[x], src_tmp[0]);
+    //#elif LV_COLOR_DEPTH == 16
+    //            lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8));
+    //#elif LV_COLOR_DEPTH == 24
+    //            lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8) + (src_tmp[2] << 8));
+    //#elif LV_COLOR_DEPTH == 32
+    //            cbuf[x] = *((lv_color_t *)src_tmp);
+    //#endif
+    //            lv_opa_t a;
+    //            switch(cf) {
+    //                case LV_COLOR_FORMAT_NATIVE_ALPHA:
+    //                    a = src_tmp[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
+    //                    break;
+    //#if LV_COLOR_DEPTH == 16
+    //                case LV_COLOR_FORMAT_RGB565A8:
+    //                    a = *(src + src_stride * src_h * sizeof(lv_color_t) + (ys_int * src_stride) + xs_int);
+    //                    break;
+    //#endif
+    //                default:
+    //                    a = 0xff;
+    //            }
+    //
+    //            if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
+    //                abuf[x] = (a * (0xFF - xs_fract)) >> 8;
+    //            }
+    //            else if((ys_int == 0 && y_next < 0) || (ys_int == src_h - 1 && y_next > 0))  {
+    //                abuf[x] = (a * (0xFF - ys_fract)) >> 8;
+    //            }
+    //            else {
+    //                abuf[x] = 0x00;
+    //            }
+    //        }
+    //    }
+}
+
+static void argb8888_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                        int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
+                        int32_t x_end, lv_color_t * cbuf, uint8_t * abuf)
+{
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
-    bool has_alpha;
-    int32_t px_size;
-    switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE:
-            has_alpha = false;
-            px_size = sizeof(lv_color_t);
-            break;
-        case LV_COLOR_FORMAT_NATIVE_ALPHA:
-            has_alpha = true;
-            px_size = LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-            break;
-#if LV_COLOR_DEPTH == 16
-        case LV_COLOR_FORMAT_RGB565A8:
-            has_alpha = true;
-            px_size = sizeof(lv_color_t);
-            break;
-#endif
-        default:
-            return;
-    }
 
     lv_coord_t x;
     for(x = 0; x < x_end; x++) {
@@ -404,8 +563,8 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
             ys_fract = (ys_fract - 0x80) * 2;
         }
 
-        const uint8_t * src_tmp = src;
-        src_tmp += (ys_int * src_stride * px_size) + xs_int * px_size;
+        const lv_color32_t * src_tmp = (const lv_color32_t *)src;
+        src_tmp += (ys_int * src_stride) + xs_int;
 
 
         if(xs_int + x_next >= 0 &&
@@ -413,101 +572,36 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
            ys_int + y_next >= 0 &&
            ys_int + y_next <= src_h - 1) {
 
-            const uint8_t * px_base = src_tmp;
-            const uint8_t * px_hor = src_tmp + x_next * px_size;
-            const uint8_t * px_ver = src_tmp + y_next * src_stride * px_size;
-            lv_color_t c_base;
-            lv_color_t c_ver;
-            lv_color_t c_hor;
+            lv_color32_t px_base = src_tmp[0];
+            lv_color32_t px_hor = src_tmp[x_next];
+            lv_color32_t px_ver = src_tmp[y_next * src_stride];
 
-            if(has_alpha) {
-                lv_opa_t a_base;
-                lv_opa_t a_ver;
-                lv_opa_t a_hor;
-                if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) {
-                    a_base = px_base[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
-                    a_ver = px_ver[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
-                    a_hor = px_hor[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
-                }
-#if LV_COLOR_DEPTH == 16
-                else if(cf == LV_COLOR_FORMAT_RGB565A8) {
-                    const lv_opa_t * a_tmp = src + src_stride * src_h * sizeof(lv_color_t);
-                    a_base = *(a_tmp + (ys_int * src_stride) + xs_int);
-                    a_hor = *(a_tmp + (ys_int * src_stride) + xs_int + x_next);
-                    a_ver = *(a_tmp + ((ys_int + y_next) * src_stride) + xs_int);
-                }
-#endif
-                else {
-                    a_base = 0xff;
-                    a_ver = 0xff;
-                    a_hor = 0xff;
-                }
+            if(px_ver.alpha != px_base.alpha) px_ver.alpha = ((px_ver.alpha * ys_fract) + (px_base.alpha *
+                                                                                               (0x100 - ys_fract))) >> 8;
+            if(px_hor.alpha != px_base.alpha) px_hor.alpha = ((px_hor.alpha * xs_fract) + (px_base.alpha *
+                                                                                               (0x100 - xs_fract))) >> 8;
+            abuf[x] = (px_ver.alpha + px_hor.alpha) >> 1;
 
-                if(a_ver != a_base) a_ver = ((a_ver * ys_fract) + (a_base * (0x100 - ys_fract))) >> 8;
-                if(a_hor != a_base) a_hor = ((a_hor * xs_fract) + (a_base * (0x100 - xs_fract))) >> 8;
-                abuf[x] = (a_ver + a_hor) >> 1;
+            if(abuf[x] == 0x00) continue;
 
-                if(abuf[x] == 0x00) continue;
 
-#if LV_COLOR_DEPTH == 8
-                lv_color_set_int(&c_base, px_base[0]);
-                lv_color_set_int(&c_ver, px_ver[0]);
-                lv_color_set_int(&c_hor, px_hor[0]);
-#elif LV_COLOR_DEPTH == 16
-                lv_color_set_int(&c_base, px_base[0] + (px_base[1] << 8));
-                lv_color_set_int(&c_ver, px_ver[0] + (px_ver[1] << 8));
-                lv_color_set_int(&c_hor, px_hor[0] + (px_hor[1] << 8));
-#elif LV_COLOR_DEPTH == 24
-                lv_color_set_int(&c_base, px_base[0] + (px_base[1] << 8) +  + (px_base[2] << 8));
-                lv_color_set_int(&c_ver, px_ver[0] + (px_ver[1] << 8) + (px_ver[2] << 8));
-                lv_color_set_int(&c_hor, px_hor[0] + (px_hor[1] << 8) + (px_hor[2] << 8));
-#elif LV_COLOR_DEPTH == 32
-                c_base = *((lv_color_t *)px_base);
-                c_ver = *((lv_color_t *)px_ver);
-                c_hor = *((lv_color_t *)px_hor);
-#endif
-            }
-            /*No alpha channel -> RGB*/
-            else {
-                c_base = *((const lv_color_t *) px_base);
-                c_hor = *((const lv_color_t *) px_hor);
-                c_ver = *((const lv_color_t *) px_ver);
-                abuf[x] = 0xff;
-            }
 
-            if(lv_color_eq(c_base, c_ver) && lv_color_eq(c_base, c_hor)) {
-                cbuf[x] = c_base;
+            if(lv_color32_eq(px_base, px_ver) && lv_color32_eq(px_base, px_hor)) {
+                cbuf[x] = lv_color_from_xrgb8888(px_base);
             }
             else {
-                c_ver = LV_COLOR_MIX(c_ver, c_base, ys_fract);
-                c_hor = LV_COLOR_MIX(c_hor, c_base, xs_fract);
-                cbuf[x] = LV_COLOR_MIX(c_hor, c_ver, LV_OPA_50);
+                lv_color_t v = lv_color_from_xrgb8888(px_ver);
+                lv_color_t h = lv_color_from_xrgb8888(px_hor);
+                lv_color_t b = lv_color_from_xrgb8888(px_base);
+                v = LV_COLOR_MIX(v, b, ys_fract);
+                h = LV_COLOR_MIX(h, b, xs_fract);
+                cbuf[x] = LV_COLOR_MIX(h, v, LV_OPA_50);
             }
         }
         /*Partially out of the image*/
         else {
-#if LV_COLOR_DEPTH == 8
-            lv_color_set_int(&cbuf[x], src_tmp[0]);
-#elif LV_COLOR_DEPTH == 16
-            lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8));
-#elif LV_COLOR_DEPTH == 24
-            lv_color_set_int(&cbuf[x], src_tmp[0] + (src_tmp[1] << 8) + (src_tmp[2] << 8));
-#elif LV_COLOR_DEPTH == 32
-            cbuf[x] = *((lv_color_t *)src_tmp);
-#endif
-            lv_opa_t a;
-            switch(cf) {
-                case LV_COLOR_FORMAT_NATIVE_ALPHA:
-                    a = src_tmp[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
-                    break;
-#if LV_COLOR_DEPTH == 16
-                case LV_COLOR_FORMAT_RGB565A8:
-                    a = *(src + src_stride * src_h * sizeof(lv_color_t) + (ys_int * src_stride) + xs_int);
-                    break;
-#endif
-                default:
-                    a = 0xff;
-            }
+            cbuf[x] = lv_color_from_xrgb8888(*src_tmp);
+            lv_opa_t a = src_tmp->alpha;
 
             if((xs_int == 0 && x_next < 0) || (xs_int == src_w - 1 && x_next > 0))  {
                 abuf[x] = (a * (0xFF - xs_fract)) >> 8;

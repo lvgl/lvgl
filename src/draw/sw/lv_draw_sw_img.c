@@ -129,6 +129,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
 
     bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
 
+    bool mask_any = false;
+
     lv_area_t blend_area;
     lv_draw_sw_blend_dsc_t blend_dsc;
 
@@ -212,7 +214,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_dsc.mask_res = mask_res_def;
 
         if(cf == LV_COLOR_FORMAT_A8) {
-            lv_color_fill(rgb_buf, draw_dsc->recolor, buf_size);
+            lv_color_buf_fill(rgb_buf, draw_dsc->recolor, buf_size);
         }
 
         while(blend_area.y1 <= y_last) {
@@ -291,38 +293,6 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
             cbuf_tmp += dest_w;
         }
     }
-    else if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) {
-        src_tmp8 += (src_stride * dest_area->y1 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE) + dest_area->x1 *
-                    LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-
-        lv_coord_t src_new_line_step_px = (src_stride - lv_area_get_width(dest_area));
-        lv_coord_t src_new_line_step_byte = src_new_line_step_px * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-
-        lv_coord_t dest_h = lv_area_get_height(dest_area);
-        lv_coord_t dest_w = lv_area_get_width(dest_area);
-        for(y = 0; y < dest_h; y++) {
-            for(x = 0; x < dest_w; x++) {
-                abuf[x] = src_tmp8[LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE - 1];
-#if LV_COLOR_DEPTH == 8
-                lv_color_set_int(&cbuf[x], *src_tmp8);
-#elif LV_COLOR_DEPTH == 16
-                lv_color_set_int(&cbuf[x], *src_tmp8 + ((*(src_tmp8 + 1)) << 8));
-#elif LV_COLOR_DEPTH == 24
-                cbuf[x].blue = *src_tmp8;
-                cbuf[x].green = *(src_tmp8 + 1);
-                cbuf[x].red = *(src_tmp8 + 2);
-#elif LV_COLOR_DEPTH == 32
-                cbuf[x] = *((lv_color_t *) src_tmp8);
-                cbuf[x].alpha = 0xff;
-#endif
-                src_tmp8 += LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-
-            }
-            cbuf += dest_w;
-            abuf += dest_w;
-            src_tmp8 += src_new_line_step_byte;
-        }
-    }
 #if LV_COLOR_DEPTH == 16
     else if(cf == LV_COLOR_FORMAT_RGB565A8) {
         src_tmp8 += (src_stride * dest_area->y1 * sizeof(lv_color_t)) + dest_area->x1 * sizeof(lv_color_t);
@@ -396,7 +366,7 @@ static void convert_cb(const lv_area_t * dest_area, const void * src_buf, lv_coo
         lv_coord_t dest_h = lv_area_get_height(dest_area);
         lv_coord_t dest_w = lv_area_get_width(dest_area);
         for(y = 0; y < dest_h; y++) {
-            lv_color_to_native(src_tmp8, cf, cbuf, abuf, sup->alpha_color, dest_w);
+            lv_color_buf_to_native(src_tmp8, cf, cbuf, abuf, sup->alpha_color, dest_w);
             cbuf += dest_w;
             abuf += dest_w;
             src_tmp8 += src_stride * px_size;

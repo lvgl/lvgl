@@ -880,7 +880,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         lv_layer_t * new_layer = disp_refr->layer_init(disp_refr);
         LV_ASSERT_MALLOC(new_layer);
 
-        new_layer->color_format = LV_COLOR_FORMAT_NATIVE_ALPHA;
+        new_layer->color_format = LV_COLOR_FORMAT_ARGB8888;
 
         uint8_t * buf = lv_malloc(lv_area_get_size(&layer_area_full) * lv_color_format_get_size(new_layer->color_format));
         LV_ASSERT_MALLOC(buf);
@@ -915,7 +915,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h)
 {
     bool has_alpha = lv_color_format_has_alpha(disp->color_format);
-    uint8_t px_size_render = has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE : sizeof(lv_color_t);
+    uint8_t px_size_render = has_alpha ? sizeof(lv_color32_t) : sizeof(lv_color_t);
     uint32_t px_size_disp =  lv_color_format_get_size(disp->color_format);
     int32_t max_row = (uint32_t)disp->draw_buf_size / LV_MAX(px_size_render, px_size_disp) / area_w;
 
