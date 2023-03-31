@@ -667,8 +667,8 @@ static void draw_img(lv_event_t * e)
                 int y_repeat_cnt = 1;
                 int x_repeat_cnt = 1;
                 lv_area_t coords_start = {
-                    .x1 = img->offset.x,
-                    .y1 = img->offset.y,
+                    .x1 = img_max_area.x1 - img->offset.x,
+                    .y1 = img_max_area.y1 - img->offset.y,
                 };
 
                 if(img->repeat != LV_IMG_REPEAT_NONE) {
@@ -687,8 +687,8 @@ static void draw_img(lv_event_t * e)
                         y_repeat_cnt = img_max_area_size.y / img_size_final.y + (img_max_area_size.y % img_size_final.y != 0);
                     }
                 }
-                coords_start.y2 = coords_start.y1 + img->h - 1;
                 coords_start.x2 = coords_start.x1 + img->w - 1;
+                coords_start.y2 = coords_start.y1 + img->h - 1;
 
                 lv_area_t coords_tmp = {
                     .y1 = coords_start.y1,
