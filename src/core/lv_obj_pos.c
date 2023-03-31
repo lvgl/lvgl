@@ -844,7 +844,6 @@ void lv_obj_invalidate(const lv_obj_t * obj)
     obj_coords.y2 += ext_size;
 
     lv_obj_invalidate_area(obj, &obj_coords);
-
 }
 
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
@@ -911,7 +910,6 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
     obj_coords.y2 += ext_size;
 
     return lv_obj_area_is_visible(obj, &obj_coords);
-
 }
 
 void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t size)
