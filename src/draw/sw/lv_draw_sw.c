@@ -125,6 +125,15 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL);
     if(t == NULL) return -1;
 
+
+    /*If the buffer of the layer is not allocated yet, allocate it now*/
+    if(layer->buf == NULL) {
+        uint8_t * buf = lv_malloc(lv_area_get_size(&layer->buf_area) * lv_color_format_get_size(layer->color_format));
+        LV_ASSERT_MALLOC(buf);
+        layer->buf = buf;
+        layer->buffer_clear(layer);
+    }
+
 #if LV_USE_OS
     //    lv_mutex_lock(&draw_sw_unit->mutex);
 
@@ -132,6 +141,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     draw_sw_unit->base_unit.layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
+
 
     /*Let the render thread work*/
     lv_thread_sync_signal(&draw_sw_unit->sync);

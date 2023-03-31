@@ -882,12 +882,9 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
         new_layer->color_format = LV_COLOR_FORMAT_ARGB8888;
 
-        uint8_t * buf = lv_malloc(lv_area_get_size(&layer_area_full) * lv_color_format_get_size(new_layer->color_format));
-        LV_ASSERT_MALLOC(buf);
-        new_layer->buf = buf;
+        new_layer->buf = NULL;
         new_layer->buf_area = layer_area_full;
         new_layer->clip_area = layer_area_full;
-        new_layer->buffer_clear(new_layer);
         new_layer->parent = layer;
 
         lv_obj_redraw(new_layer, obj);
