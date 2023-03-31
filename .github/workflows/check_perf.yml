@@ -2,13 +2,13 @@ name: SO3-LVGL Performance
 on: [push, pull_request, workflow_dispatch]
 jobs:
   so3_lvgl:
-    runs-on: alpine:latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
-          apk update
-          apk add make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount dtc dosfstools u-boot-tools net-tools \
+          apt-get update
+          apt-get add make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount dtc dosfstools u-boot-tools net-tools \
             bridge-utils iptables dnsmasq util-linux qemu-system-arm
       - name: SO3-LVGL build
         run: |
