@@ -1,4 +1,4 @@
-name: Docs
+name: SO3-LVGL Performance
 on: [push, pull_request, workflow_dispatch]
 jobs:
   docs:
