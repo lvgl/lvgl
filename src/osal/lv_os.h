@@ -21,6 +21,8 @@ extern "C" {
 
 #if LV_USE_PTHREAD
 #include "lv_pthread.h"
+#elif LV_USE_FREERTOS
+#include "lv_freertos.h"
 #endif
 
 /*********************
