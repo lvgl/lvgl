@@ -198,8 +198,8 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
 /**
  * Invalidate an area on display to redraw it
- * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
  * @param disp pointer to display where the area should be invalidated (NULL can be used if there is
+ * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
  * only one display)
  */
 void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
