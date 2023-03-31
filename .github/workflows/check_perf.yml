@@ -8,7 +8,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount dtc dosfstools u-boot-tools net-tools \
+          sudo apt-get install -f make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount device-tree-compiler \
+          dosfstools u-boot-tools net-tools \
             bridge-utils iptables dnsmasq util-linux qemu-system-arm
       - name: SO3-LVGL build
         run: |
