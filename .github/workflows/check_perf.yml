@@ -1,7 +1,7 @@
 name: SO3-LVGL Performance
 on: [push, pull_request, workflow_dispatch]
 jobs:
-  docs:
+  so3_lvgl:
     runs-on: alpine:latest
     steps:
       - uses: actions/checkout@v2
