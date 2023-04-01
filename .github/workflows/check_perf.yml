@@ -8,9 +8,9 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -f make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount device-tree-compiler \
+          sudo apt-get install -y make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount device-tree-compiler \
           dosfstools u-boot-tools net-tools \
-            bridge-utils iptables dnsmasq util-linux qemu-system-arm
+          bridge-utils iptables util-linux qemu-system-arm flex
       - name: SO3-LVGL build
         run: |
           wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
