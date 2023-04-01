@@ -305,7 +305,7 @@ void lv_img_set_repeat(lv_obj_t * obj, lv_img_repeat_t mode)
     img->repeat = mode;
     lv_obj_invalidate(obj);
 }
-void lv_img_set_obj_fit(lv_obj_t* obj, lv_img_obj_fit_t mode)
+void lv_img_set_obj_fit(lv_obj_t * obj, lv_img_obj_fit_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_img_t * img = (lv_img_t *)obj;
@@ -702,6 +702,34 @@ static void draw_img(lv_event_t * e)
                     if(img->repeat & LV_IMG_REPEAT_Y) {
                         coords_start.y1 = img_max_area.y1 - offset_y;
                         y_repeat_cnt = img_max_area_size.y / img_size_final.y + (img_max_area_size.y % img_size_final.y != 0);
+                    }
+                }
+                else {
+                    coords_start.x1 += (lv_area_get_width(&img_max_area) - img_size_final.x) / 2;
+                    coords_start.y1 += (lv_area_get_height(&img_max_area) - img_size_final.y) / 2;
+
+                    switch(img->obj_fit) {
+                        case LV_IMG_OBJ_FIT_NONE:
+                            break;
+                        case LV_IMG_OBJ_FIT_CONTAIN:
+                            img_dsc.zoom = LV_MIN((lv_coord_t)(obj_w * LV_ZOOM_NONE / (lv_coord_t)img_size_final.x),
+                                                  (lv_coord_t)(obj_h * LV_ZOOM_NONE / (lv_coord_t)img_size_final.y));
+                            break ;
+                        case LV_IMG_OBJ_FIT_COVER:
+                            img_dsc.zoom = LV_MAX((lv_coord_t)(obj_w * LV_ZOOM_NONE / (lv_coord_t)img_size_final.x),
+                                                  (lv_coord_t)(obj_h * LV_ZOOM_NONE / (lv_coord_t)img_size_final.y));
+                            break;
+                        case LV_IMG_OBJ_FIT_FILL:
+                            img_dsc.zoom = LV_ZOOM_NONE;
+                            break;
+                        case LV_IMG_OBJ_FIT_SCALE_DOWN:
+                            if(obj_w > img_size_final.x || obj_h > img_size_final.y) {
+                                img_dsc.zoom = LV_MIN((lv_coord_t)((lv_coord_t)img_size_final.x * LV_ZOOM_NONE / obj_w),
+                                                      (lv_coord_t)((lv_coord_t)img_size_final.y * LV_ZOOM_NONE / obj_h));
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
                 coords_start.x2 = coords_start.x1 + img->w - 1;
