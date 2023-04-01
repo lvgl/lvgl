@@ -704,7 +704,7 @@ static void draw_img(lv_event_t * e)
                         y_repeat_cnt = img_max_area_size.y / img_size_final.y + (img_max_area_size.y % img_size_final.y != 0);
                     }
                 }
-                else {
+                else if(img->obj_fit != LV_IMG_OBJ_FIT_NONE) {
                     coords_start.x1 += (lv_area_get_width(&img_max_area) - img_size_final.x) / 2;
                     coords_start.y1 += (lv_area_get_height(&img_max_area) - img_size_final.y) / 2;
 
