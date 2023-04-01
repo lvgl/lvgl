@@ -10,7 +10,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount device-tree-compiler \
           dosfstools u-boot-tools net-tools \
-          bridge-utils iptables util-linux qemu-system-arm flex
+          bridge-utils iptables util-linux qemu-system-arm libyaml-dev
       - name: SO3-LVGL build
         run: |
           wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
