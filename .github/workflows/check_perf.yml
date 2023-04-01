@@ -9,7 +9,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y make cmake gcc-arm-none-eabi libc-dev bison flex bash patch mount device-tree-compiler \
-          dosfstools u-boot-tools net-tools \
+          dosfstools u-boot-tools net-tools pkg-config \
           bridge-utils iptables util-linux qemu-system-arm libyaml-dev
       - name: SO3-LVGL build
         run: |
