@@ -22,6 +22,8 @@ jobs:
           cd usr; ./build.sh; cd ..
           cd filesystem
           ./create_img.sh vexpress
+          cd ../rootfs
+          ./create_ramfs.sh vexpress
           cd ..
           ./deploy.sh -bu
           ./st
