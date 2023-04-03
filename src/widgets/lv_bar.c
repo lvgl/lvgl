@@ -571,6 +571,8 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
                                        _lv_bar_anim_t * anim_info, lv_anim_enable_t en)
 {
     if(en == LV_ANIM_OFF) {
+        lv_anim_del(anim_info, NULL);
+        anim_info->anim_state = LV_BAR_ANIM_STATE_INV;
         *value_ptr = new_value;
         lv_obj_invalidate((lv_obj_t *)obj);
     }
