@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-02-06" version="8.3.5" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.5.pack">
+    <release date="2023-04-02" version="8.3.6" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
+      - LVGL 8.3.6 release
+      - Various fixes, See CHANGELOG.md
+    </release>
+    <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/e7e8cf846dce96f7542e27b5c9655bab680c31a1/env_support/cmsis-pack/LVGL.lvgl.8.3.5.pack">
       - LVGL 8.3.5 release
       - Use LVGL version as the cmsis-pack version
       - Fix GPU support for NXP PXP and NXP VGLite
@@ -262,7 +266,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.5">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.6">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
@@ -395,10 +399,18 @@
                 <file category="sourceC"            name="src/widgets/lv_textarea.c" />
 
                 <!-- general -->
-                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.2" />
+                <file category="preIncludeGlobal"   name="lv_conf_cmsis.h" attr="config" version="1.0.3" />
                 <file category="sourceC"            name="lv_cmsis_pack.c" attr="config" version="1.0.0" />
                 <file category="header"             name="lvgl.h" />
                 <file category="doc"                name="README.md"/>
+                
+                <!-- code template -->
+                <file category="header"       name="examples/porting/lv_port_disp_template.h"   attr="template" select="Display port template"          version="2.0.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_disp_template.c"   attr="template" select="Display port template"          version="2.0.0"/>
+                <file category="header"       name="examples/porting/lv_port_indev_template.h"  attr="template" select="Input devices port template"    version="2.0.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_indev_template.c"  attr="template" select="Input devices port template"    version="2.0.0"/>
+                <file category="header"       name="examples/porting/lv_port_fs_template.h"     attr="template" select="File system port template"      version="2.0.0"/>
+                <file category="sourceC"      name="examples/porting/lv_port_fs_template.c"     attr="template" select="File system port template"      version="2.0.0"/>
 
               </files>
 

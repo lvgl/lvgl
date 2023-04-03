@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.3.4
+ * Configuration file for v8.3.6
  */
 
 /* clang-format off */
@@ -181,7 +181,7 @@
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #if LV_USE_GPU_STM32_DMA2D
     /*Must be defined to include path of CMSIS header of target processor
-    e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
+    e.g. "stm32f7xx.h" or "stm32f4xx.h"*/
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
