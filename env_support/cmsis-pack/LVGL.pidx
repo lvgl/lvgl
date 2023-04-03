@@ -4,6 +4,6 @@
   <url>https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/</url>
   <timestamp>2023-02-06T12:22:00</timestamp>
   <pindex>
-    <pdsc url="https://raw.githubusercontent.com/lvgl/lvgl/release/v8.3/env_support/cmsis-pack/" vendor="LVGL" name="lvgl" version="8.3.5"/>
+    <pdsc url="https://raw.githubusercontent.com/lvgl/lvgl/release/v8.3/env_support/cmsis-pack/" vendor="LVGL" name="lvgl" version="8.3.6"/>
   </pindex>
 </index>
