@@ -131,21 +131,27 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
         uint8_t * buf = lv_malloc(lv_area_get_size(&layer->buf_area) * lv_color_format_get_size(layer->color_format));
         LV_ASSERT_MALLOC(buf);
         layer->buf = buf;
-        layer->buffer_clear(layer);
+
+        if(lv_color_format_has_alpha(layer->color_format)) {
+            layer->buffer_clear(layer);
+            uint32_t i;
+            uint8_t * buf8 = layer->buf;
+            for(i = 0; i < lv_area_get_size(&layer->buf_area) * 4; i++) {
+                if(buf8[3]) {
+                    printf("asd\n");
+                }
+            }
+        }
     }
 
 #if LV_USE_OS
-    //    lv_mutex_lock(&draw_sw_unit->mutex);
-
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
     draw_sw_unit->base_unit.layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
 
-
     /*Let the render thread work*/
     lv_thread_sync_signal(&draw_sw_unit->sync);
-    //    lv_mutex_unlock(&draw_sw_unit->mutex);
 #else
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
     draw_sw_unit->base_unit.layer = layer;
@@ -258,22 +264,13 @@ static void lv_draw_sw_buffer_convert(lv_layer_t * layer)
     //    LV_LOG_WARN("Couldn't convert the image to the desired format");
 }
 
+uint8_t * buf_tmp;
+
 static void lv_draw_sw_buffer_clear(lv_layer_t * layer)
 {
     uint8_t px_size = lv_color_format_get_size(layer->color_format);
-    uint8_t * buf8 = layer->buf;
-    lv_area_t a;
-    lv_area_copy(&a, &layer->clip_area);
-    lv_area_move(&a, -layer->buf_area.x1, -layer->buf_area.y1);
-    lv_coord_t w = lv_area_get_width(&a);
-    buf8 += a.y1 * w * px_size;
-    buf8 += a.x1 * px_size;
-
-    lv_coord_t y;
-    for(y = a.y1; y <= a.y2; y++) {
-        lv_memzero(buf8, w * px_size);
-        buf8 += w * px_size;
-    }
+    lv_memset(layer->buf, 0x00, lv_area_get_size(&layer->buf_area) * px_size);
+    buf_tmp = layer->buf;
 }
 
 #if LV_USE_OS
@@ -301,6 +298,7 @@ static void render_thread_cb(void * ptr)
 static void exectue_drawing(lv_draw_sw_unit_t * u)
 {
     /*Render the draw task*/
+    lv_draw_task_t * t = u->task_act;
     switch(u->task_act->type) {
         case LV_DRAW_TASK_TYPE_RECTANGLE:
             lv_draw_sw_rect((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);

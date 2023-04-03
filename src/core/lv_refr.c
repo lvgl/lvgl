@@ -790,9 +790,6 @@ static lv_res_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type
     lv_area_t obj_coords_ext;
     lv_obj_get_coords(obj, &obj_coords_ext);
     lv_area_increase(&obj_coords_ext, ext_draw_size, ext_draw_size);
-    //    *layer_area_out = obj_coords_ext;
-    //    return LV_RES_OK;
-
 
     if(layer_type == LV_LAYER_TYPE_TRANSFORM) {
         /*Get the transformed area and clip it to the current clip area.
@@ -823,7 +820,7 @@ static lv_res_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type
         *layer_area_out = clip_coords_for_obj;
     }
     else {
-        LV_LOG_WARN("Unhandled intermediate layer type");
+        LV_LOG_WARN("Unhandled layer type");
         return LV_RES_INV;
     }
 
@@ -831,34 +828,18 @@ static lv_res_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type
 }
 
 
-//static void layer_alpha_test(lv_obj_t * obj, lv_layer_t * layer, lv_draw_layer_ctx_t * layer_ctx,
-//                             lv_draw_layer_flags_t flags)
-//{
-//    bool has_alpha;
-//    /*If globally the layer has alpha maybe this smaller section has not (e.g. not on a rounded corner)
-//     *If turns out that this section has no alpha renderer can choose faster algorithms*/
-//    if(flags & LV_DRAW_LAYER_FLAG_HAS_ALPHA) {
-//        /*Test for alpha by assuming there is no alpha. If it fails, fall back to rendering with alpha*/
-//        has_alpha = true;
-//        if(_lv_area_is_in(&layer_ctx->area_act, &obj->coords, 0)) {
-//            lv_cover_check_info_t info;
-//            info.res = LV_COVER_RES_COVER;
-//            info.area = &layer_ctx->area_act;
-//            lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
-//            if(info.res == LV_COVER_RES_COVER) has_alpha = false;
-//        }
-//
-//        if(has_alpha) {
-//            layer_ctx->area_act.y2 = layer_ctx->area_act.y1 + layer_ctx->max_row_with_alpha - 1;
-//        }
-//    }
-//    else {
-//        has_alpha = false;
-//    }
-//
-//    if(layer_ctx->area_act.y2 > layer_ctx->area_full.y2) layer_ctx->area_act.y2 = layer_ctx->area_full.y2;
-//    lv_draw_layer_adjust(layer, layer_ctx, has_alpha ? LV_DRAW_LAYER_FLAG_HAS_ALPHA : LV_DRAW_LAYER_FLAG_NONE);
-//}
+static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area)
+{
+    /*Test for alpha by assuming there is no alpha. If it fails, fall back to rendering with alpha*/
+    if(!_lv_area_is_in(area, &obj->coords, 0)) return false;
+
+    lv_cover_check_info_t info;
+    info.res = LV_COVER_RES_COVER;
+    info.area = area;
+    lv_obj_send_event(obj, LV_EVENT_COVER_CHECK, &info);
+    if(info.res == LV_COVER_RES_COVER) return false;
+    else return true;
+}
 
 
 void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
@@ -877,34 +858,63 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         lv_res_t res = layer_get_area(layer, obj, layer_type, &layer_area_full);
         if(res != LV_RES_OK) return;
 
-        lv_layer_t * new_layer = disp_refr->layer_init(disp_refr);
-        LV_ASSERT_MALLOC(new_layer);
+        /*Simple layer can be subdivied into smaller layers*/
+        uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
+        uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
+        if(layer_type == LV_LAYER_TYPE_SIMPLE) {
+            lv_coord_t w = lv_area_get_width(&layer_area_full);
+            max_rgb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color_t);
+            max_argb_row_height = LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE / w / sizeof(lv_color32_t);
+        }
 
-        new_layer->color_format = LV_COLOR_FORMAT_ARGB8888;
+        lv_area_t layer_area_act;
+        layer_area_act.x1 = layer_area_full.x1;
+        layer_area_act.x2 = layer_area_full.x2;
+        layer_area_act.y1 = layer_area_full.y1;
+        layer_area_act.y2 = layer_area_full.y1;
 
-        new_layer->buf = NULL;
-        new_layer->buf_area = layer_area_full;
-        new_layer->clip_area = layer_area_full;
-        new_layer->parent = layer;
+        while(layer_area_act.y2 < layer_area_full.y2) {
+            /* Test with an RGB layer size (which is larger than the ARGB layer size)
+             * If it really doesn't need alpha use it. Else switch to the ARGB size*/
+            layer_area_act.y2 = layer_area_act.y1 + max_rgb_row_height - 1;
+            if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
+            bool area_need_alpha = alpha_test_area_on_obj(obj, &layer_area_act);
+            if(area_need_alpha) {
+                layer_area_act.y2 = layer_area_act.y1 + max_argb_row_height - 1;
+                if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
+            }
 
-        lv_obj_redraw(new_layer, obj);
-        new_layer->all_tasks_added = true;
+            lv_layer_t * new_layer = disp_refr->layer_init(disp_refr);
+            LV_ASSERT_MALLOC(new_layer);
+            new_layer->buf = NULL;
+            new_layer->parent = layer;
 
-        lv_draw_img_dsc_t layer_draw_dsc;
-        lv_draw_img_dsc_init(&layer_draw_dsc);
-        layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
-        layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
+            new_layer->color_format = area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
 
-        layer_draw_dsc.opa = opa;
-        layer_draw_dsc.angle = lv_obj_get_style_transform_angle(obj, 0);
-        while(layer_draw_dsc.angle > 3600) layer_draw_dsc.angle -= 3600;
-        while(layer_draw_dsc.angle < 0) layer_draw_dsc.angle += 3600;
-        layer_draw_dsc.zoom = lv_obj_get_style_transform_zoom(obj, 0);
-        layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
-        layer_draw_dsc.antialias = disp_refr->antialiasing;
-        layer_draw_dsc.src = new_layer;
+            new_layer->buf_area = layer_area_act;
+            new_layer->clip_area = layer_area_act;
 
-        lv_draw_layer(layer, &layer_draw_dsc, &new_layer->buf_area);
+            lv_obj_redraw(new_layer, obj);
+            new_layer->all_tasks_added = true;
+
+            lv_draw_img_dsc_t layer_draw_dsc;
+            lv_draw_img_dsc_init(&layer_draw_dsc);
+            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
+            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
+
+            layer_draw_dsc.opa = opa;
+            layer_draw_dsc.angle = lv_obj_get_style_transform_angle(obj, 0);
+            while(layer_draw_dsc.angle > 3600) layer_draw_dsc.angle -= 3600;
+            while(layer_draw_dsc.angle < 0) layer_draw_dsc.angle += 3600;
+            layer_draw_dsc.zoom = lv_obj_get_style_transform_zoom(obj, 0);
+            layer_draw_dsc.blend_mode = lv_obj_get_style_blend_mode(obj, 0);
+            layer_draw_dsc.antialias = disp_refr->antialiasing;
+            layer_draw_dsc.src = new_layer;
+
+            lv_draw_layer(layer, &layer_draw_dsc, &new_layer->buf_area);
+
+            layer_area_act.y1 = layer_area_act.y2 + 1;
+        }
     }
 }
 

@@ -50,6 +50,11 @@ void lv_draw_init(void)
 #if LV_USE_OS
     lv_thread_sync_init(&sync);
 #endif
+
+#if LV_USE_DRAW_MASKS
+    lv_draw_mask_init();
+#endif
+
 }
 
 lv_draw_task_t * lv_draw_add_task(lv_layer_t * layer, const lv_area_t * coords)

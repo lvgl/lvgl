@@ -42,15 +42,6 @@ enum {
 
 typedef uint8_t lv_draw_mask_res_t;
 
-typedef struct {
-    void * param;
-    void * custom_id;
-} _lv_draw_mask_saved_t;
-
-typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
-
-
-
 #if LV_USE_DRAW_MASKS == 0
 static inline  uint8_t lv_draw_mask_get_cnt(void)
 {
@@ -220,13 +211,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-/**
- * Add a draw mask. Everything drawn after it (until removing the mask) will be affected by the mask.
- * @param param an initialized mask parameter. Only the pointer is saved.
- * @param custom_id a custom pointer to identify the mask. Used in `lv_draw_mask_remove_custom`.
- * @return the an integer, the ID of the mask. Can be used in `lv_draw_mask_remove_id`.
- */
-int16_t lv_draw_mask_add(void * param, void * custom_id);
+void lv_draw_mask_init(void);
 
 //! @cond Doxygen_Suppress
 
@@ -241,42 +226,11 @@ int16_t lv_draw_mask_add(void * param, void * custom_id);
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(void * list[], lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                            lv_coord_t abs_y,
                                                             lv_coord_t len);
 
-/**
- * Apply the specified buffers on a line. Used internally by the library's drawing routines.
- * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
- * @param abs_x absolute X coordinate where the line to calculate start
- * @param abs_y absolute Y coordinate where the line to calculate start
- * @param len length of the line to calculate (in pixel count)
- * @param ids ID array of added buffers
- * @param ids_count number of ID array
- * @return One of these values:
- * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
- * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
- * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
- */
-LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                                lv_coord_t len, const int16_t * ids, int16_t ids_count);
-
 //! @endcond
-
-/**
- * Remove a mask with a given ID
- * @param id the ID of the mask.  Returned by `lv_draw_mask_add`
- * @return the parameter of the removed mask.
- * If more masks have `custom_id` ID then the last mask's parameter will be returned
- */
-void * lv_draw_mask_remove_id(int16_t id);
-
-/**
- * Remove all mask with a given custom ID
- * @param custom_id a pointer used in `lv_draw_mask_add`
- * @return return the parameter of the removed mask.
- * If more masks have `custom_id` ID then the last mask's parameter will be returned
- */
-void * lv_draw_mask_remove_custom(void * custom_id);
 
 /**
  * Free the data from the parameter.
@@ -292,24 +246,6 @@ void lv_draw_mask_free_param(void * p);
  * the temporal (cache) data of the masks
  */
 void _lv_draw_mask_cleanup(void);
-
-//! @cond Doxygen_Suppress
-
-/**
- * Count the currently added masks
- * @return number of active masks
- */
-LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void);
-
-
-/**
- * Check if there is any added draw mask
- * @param a     an area to test for affecting masks.
- * @return true: there is t least 1 draw mask; false: there are no draw masks
- */
-bool lv_draw_mask_is_any(const lv_area_t * a);
-
-//! @endcond
 
 /**
  *Initialize a line mask from two points.

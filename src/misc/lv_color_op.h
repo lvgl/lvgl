@@ -246,6 +246,17 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_buf_fill(lv_color_t * buf, lv_color_t color,
 
 //! @endcond
 
+
+void lv_color_buf_to_native(const uint8_t * src_buf, lv_color_format_t src_cf, lv_color_t * c_out, lv_opa_t * a_out,
+                            lv_color_t alpha_color, uint32_t px_cnt);
+
+void lv_color_buf_from_native(const lv_color_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf,
+                              uint32_t px_cnt);
+
+
+void lv_color_buf_from_argb8888(const lv_color32_t * src_buf, uint8_t * dest_buf, lv_color_format_t dest_cf,
+                                uint32_t px_cnt);
+
 /**********************
  *  PREDEFINED COLORS
  **********************/

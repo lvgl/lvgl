@@ -627,19 +627,19 @@ static void lv_obj_draw(lv_event_t * e)
 
 #if LV_USE_DRAW_MASKS
         if(clip_corner) {
-            lv_draw_mask_radius_param_t * mp = lv_malloc(sizeof(lv_draw_mask_radius_param_t));
-            lv_draw_mask_radius_init(mp, &obj->coords, draw_dsc.radius, false);
-            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
-            lv_draw_mask_add(mp, obj + 8);
-
-            if(bg_img_src) {
-                draw_dsc.bg_opa = LV_OPA_TRANSP;
-                draw_dsc.border_opa = LV_OPA_TRANSP;
-                draw_dsc.outline_opa = LV_OPA_TRANSP;
-                draw_dsc.shadow_opa = LV_OPA_TRANSP;
-                draw_dsc.bg_img_src = bg_img_src;
-                lv_draw_rect(layer, &draw_dsc, &coords);
-            }
+            //            lv_draw_mask_radius_param_t * mp = lv_malloc(sizeof(lv_draw_mask_radius_param_t));
+            //            lv_draw_mask_radius_init(mp, &obj->coords, draw_dsc.radius, false);
+            //            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
+            //            lv_draw_mask_add(mp, obj + 8);
+            //
+            //            if(bg_img_src) {
+            //                draw_dsc.bg_opa = LV_OPA_TRANSP;
+            //                draw_dsc.border_opa = LV_OPA_TRANSP;
+            //                draw_dsc.outline_opa = LV_OPA_TRANSP;
+            //                draw_dsc.shadow_opa = LV_OPA_TRANSP;
+            //                draw_dsc.bg_img_src = bg_img_src;
+            //                lv_draw_rect(layer, &draw_dsc, &coords);
+            //            }
 
         }
 #endif
@@ -651,11 +651,11 @@ static void lv_obj_draw(lv_event_t * e)
 
 #if LV_USE_DRAW_MASKS
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
-            lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
-            if(param) {
-                lv_draw_mask_free_param(param);
-                lv_free(param);
-            }
+            //            lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
+            //            if(param) {
+            //                lv_draw_mask_free_param(param);
+            //                lv_free(param);
+            //            }
         }
 #endif
 

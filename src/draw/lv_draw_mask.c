@@ -12,6 +12,7 @@
 #include "../misc/lv_log.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_gc.h"
+#include "../osal/lv_os.h"
 
 /*********************
  *      DEFINES
@@ -63,6 +64,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_USE_OS
+    static lv_mutex_t circle_cache_mutex;
+#endif
 
 /**********************
  *      MACROS
@@ -72,132 +76,31 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Add a draw mask. Everything drawn after it (until removing the mask) will be affected by the mask.
- * @param param an initialized mask parameter. Only the pointer is saved.
- * @param custom_id a custom pointer to identify the mask. Used in `lv_draw_mask_remove_custom`.
- * @return the an integer, the ID of the mask. Can be used in `lv_draw_mask_remove_id`.
- */
-int16_t lv_draw_mask_add(void * param, void * custom_id)
+void lv_draw_mask_init(void)
 {
-    /*Look for a free entry*/
-    uint8_t i;
-    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_draw_mask_list[i]).param == NULL) break;
-    }
-
-    if(i >= _LV_MASK_MAX_NUM) {
-        LV_LOG_WARN("no place to add the mask");
-        return LV_MASK_ID_INV;
-    }
-
-    LV_GC_ROOT(_lv_draw_mask_list[i]).param = param;
-    LV_GC_ROOT(_lv_draw_mask_list[i]).custom_id = custom_id;
-
-    return i;
+#if LV_USE_OS
+    lv_mutex_init(&circle_cache_mutex);
+#endif
 }
 
-/**
- * Apply the added buffers on a line. Used internally by the library's drawing routines.
- * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
- * @param abs_x absolute X coordinate where the line to calculate start
- * @param abs_y absolute Y coordinate where the line to calculate start
- * @param len length of the line to calculate (in pixel count)
- * @return One of these values:
- * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
- * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
- * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
- */
-LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+
+LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(void * list[], lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                            lv_coord_t abs_y,
                                                             lv_coord_t len)
 {
     bool changed = false;
     _lv_draw_mask_common_dsc_t * dsc;
 
-    _lv_draw_mask_saved_t * m = LV_GC_ROOT(_lv_draw_mask_list);
-
-    while(m->param) {
-        dsc = m->param;
+    uint32_t i;
+    for(i = 0; list[i]; i++) {
+        dsc = list[i];
         lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
-        res = dsc->cb(mask_buf, abs_x, abs_y, len, (void *)m->param);
-        if(res == LV_DRAW_MASK_RES_TRANSP) return LV_DRAW_MASK_RES_TRANSP;
-        else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
-
-        m++;
-    }
-
-    return changed ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
-}
-
-/**
- * Apply the specified buffers on a line. Used internally by the library's drawing routines.
- * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
- * @param abs_x absolute X coordinate where the line to calculate start
- * @param abs_y absolute Y coordinate where the line to calculate start
- * @param len length of the line to calculate (in pixel count)
- * @param ids ID array of added buffers
- * @param ids_count number of ID array
- * @return One of these values:
- * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
- * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
- * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
- */
-LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                                lv_coord_t len, const int16_t * ids, int16_t ids_count)
-{
-    bool changed = false;
-    _lv_draw_mask_common_dsc_t * dsc;
-
-    for(int i = 0; i < ids_count; i++) {
-        int16_t id = ids[i];
-        if(id == LV_MASK_ID_INV) continue;
-        dsc = LV_GC_ROOT(_lv_draw_mask_list[id]).param;
-        if(!dsc) continue;
-        lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
-        res = dsc->cb(mask_buf, abs_x, abs_y, len, dsc);
+        res = dsc->cb(mask_buf, abs_x, abs_y, len, list[i]);
         if(res == LV_DRAW_MASK_RES_TRANSP) return LV_DRAW_MASK_RES_TRANSP;
         else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
     }
 
     return changed ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
-}
-
-/**
- * Remove a mask with a given ID
- * @param id the ID of the mask.  Returned by `lv_draw_mask_add`
- * @return the parameter of the removed mask.
- * If more masks have `custom_id` ID then the last mask's parameter will be returned
- */
-void * lv_draw_mask_remove_id(int16_t id)
-{
-    _lv_draw_mask_common_dsc_t * p = NULL;
-
-    if(id != LV_MASK_ID_INV) {
-        p = LV_GC_ROOT(_lv_draw_mask_list[id]).param;
-        LV_GC_ROOT(_lv_draw_mask_list[id]).param = NULL;
-        LV_GC_ROOT(_lv_draw_mask_list[id]).custom_id = NULL;
-    }
-
-    return p;
-}
-
-/**
- * Remove all mask with a given custom ID
- * @param custom_id a pointer used in `lv_draw_mask_add`
- * @return return the parameter of the removed mask.
- * If more masks have `custom_id` ID then the last mask's parameter will be returned
- */
-void * lv_draw_mask_remove_custom(void * custom_id)
-{
-    _lv_draw_mask_common_dsc_t * p = NULL;
-    uint8_t i;
-    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_draw_mask_list[i]).custom_id == custom_id) {
-            p = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
-            lv_draw_mask_remove_id(i);
-        }
-    }
-    return p;
 }
 
 /**
@@ -237,46 +140,6 @@ void _lv_draw_mask_cleanup(void)
         }
         lv_memzero(&LV_GC_ROOT(_lv_circle_cache[i]), sizeof(LV_GC_ROOT(_lv_circle_cache[i])));
     }
-}
-
-/**
- * Count the currently added masks
- * @return number of active masks
- */
-LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void)
-{
-    uint8_t cnt = 0;
-    uint8_t i;
-    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_draw_mask_list[i]).param) cnt++;
-    }
-    return cnt;
-}
-
-bool lv_draw_mask_is_any(const lv_area_t * a)
-{
-    if(a == NULL) return LV_GC_ROOT(_lv_draw_mask_list[0]).param ? true : false;
-
-    uint8_t i;
-    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
-        _lv_draw_mask_common_dsc_t * comm_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
-        if(comm_param == NULL) continue;
-        if(comm_param->type == LV_DRAW_MASK_TYPE_RADIUS) {
-            lv_draw_mask_radius_param_t * radius_param = LV_GC_ROOT(_lv_draw_mask_list[i]).param;
-            if(radius_param->cfg.outer) {
-                if(!_lv_area_is_out(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
-            }
-            else {
-                if(!_lv_area_is_in(a, &radius_param->cfg.rect, radius_param->cfg.radius)) return true;
-            }
-        }
-        else {
-            return true;
-        }
-    }
-
-    return false;
-
 }
 
 /**
@@ -490,6 +353,10 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
         return;
     }
 
+#if LV_USE_OS
+    lv_mutex_lock(&circle_cache_mutex);
+#endif
+
     uint32_t i;
 
     /*Try to reuse a circle cache entry*/
@@ -498,6 +365,9 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
             LV_GC_ROOT(_lv_circle_cache[i]).used_cnt++;
             CIRCLE_CACHE_AGING(LV_GC_ROOT(_lv_circle_cache[i]).life, radius);
             param->circle = &LV_GC_ROOT(_lv_circle_cache[i]);
+#if LV_USE_OS
+            lv_mutex_unlock(&circle_cache_mutex);
+#endif
             return;
         }
     }
@@ -526,6 +396,10 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
     param->circle = entry;
 
     circ_calc_aa4(param->circle, radius);
+#if LV_USE_OS
+    lv_mutex_unlock(&circle_cache_mutex);
+#endif
+
 }
 
 /**

@@ -95,7 +95,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
     //    sup.chroma_key_color = lv_color_hex(0x00ff00);
     //    sup.chroma_keyed = cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED ? 1 : 0;
     //
-    lv_layer_t * layer = draw_unit->layer;
+
 
     lv_area_t map_area_rot;
     lv_area_copy(&map_area_rot, coords);
