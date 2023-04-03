@@ -1,5 +1,42 @@
 # Changelog
 
+## [v8.3.6](https://github.com/lvgl/lvgl/compare/v8.3.6...v8.3.5) 3 April 2023
+
+### New Features
+
+- feat(msg): add lv_msg_unsubcribe_obj [`6af0179`](https://github.com/lvgl/lvgl/commit/6af01798d82f90f0c2ba6a9da39c4f10fb427df7)
+
+### Performance
+
+### Fixes
+
+- fix(group): fix default_group becomes wild pointer when deleted [`4076`](https://github.com/lvgl/lvgl/pull/4076)
+- fix(fs_posix): allow creating new file and set permission. [`3976`](https://github.com/lvgl/lvgl/pull/3976)
+- fix(img): support negative angles [`3846`](https://github.com/lvgl/lvgl/pull/3846)
+- fix(gif): synchronize with master [`4003`](https://github.com/lvgl/lvgl/pull/4003)
+- fix(gpu): fix STM GPU drivers for some variants [`4004`](https://github.com/lvgl/lvgl/pull/4004)
+- fix(img): possible divide by 0 exception (lvgl#3988) [`3990`](https://github.com/lvgl/lvgl/pull/3990)
+- fix(arc): fix knob area invalidation [`d0e19eb`](https://github.com/lvgl/lvgl/commit/d0e19eb2d38ba8a500399b0496d7a8363be4003e)
+- fix(slider): consider animations on pressing [`0b7777f`](https://github.com/lvgl/lvgl/commit/0b7777f27a7932efe3d594be426e1beb59d80ae3)
+- fix(bar): delete running animations when a new value is set without animation [`aa31380`](https://github.com/lvgl/lvgl/commit/aa313806d0ebde475fc2bc360a15172cc1b658a7)
+- docs: use a fixed commit of lv_web_emscripten [`501230e`](https://github.com/lvgl/lvgl/commit/501230e0fc95936199b3187d350873c3bb4a94e4)
+
+### Examples
+
+### Docs
+
+- docs(arduino): add note to not use lv_examles library [`2f294aa`](https://github.com/lvgl/lvgl/commit/2f294aa76c8fece98a4fa72304bc6f267ed2a228)
+- docs: use a fixed commit of lv_web_emscripten [`501230e`](https://github.com/lvgl/lvgl/commit/501230e0fc95936199b3187d350873c3bb4a94e4)
+
+### CI and tests
+
+### Others
+
+- chore(cmsis-pack): update cmsis-pack for v8.3.6 [`4108`](https://github.com/lvgl/lvgl/pull/4108)
+- chore: update the version numbers to v8.3.5-dev [`77670fb`](https://github.com/lvgl/lvgl/commit/77670fb1a55e0f2012ff7a057e535830e7253e22)
+- Update build_html_examples.sh [`399069b`](https://github.com/lvgl/lvgl/commit/399069b4a2423c11823581668fe71ce9a7c88e7d)
+
+
 ## [v8.3.5](https://github.com/lvgl/lvgl/compare/v8.3.4...v8.3.5) 7 February 2023
 
 ### Performance
