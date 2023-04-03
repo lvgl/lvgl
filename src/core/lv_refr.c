@@ -830,6 +830,7 @@ static lv_res_t layer_get_area(lv_layer_t * layer, lv_obj_t * obj, lv_layer_type
 
 static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area)
 {
+
     /*Test for alpha by assuming there is no alpha. If it fails, fall back to rendering with alpha*/
     if(!_lv_area_is_in(area, &obj->coords, 0)) return false;
 
@@ -858,7 +859,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         lv_res_t res = layer_get_area(layer, obj, layer_type, &layer_area_full);
         if(res != LV_RES_OK) return;
 
-        /*Simple layer can be subdivied into smaller layers*/
+        /*Simple layers can be subdivied into smaller layers*/
         uint32_t max_rgb_row_height = lv_area_get_height(&layer_area_full);
         uint32_t max_argb_row_height = lv_area_get_height(&layer_area_full);
         if(layer_type == LV_LAYER_TYPE_SIMPLE) {

@@ -62,6 +62,33 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_sw_img(draw_unit, &new_draw_dsc, coords);
+#if LV_USE_LAYER_DEBUG == 0
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_rect_dsc_init(&rect_dsc);
+    rect_dsc.bg_color = lv_color_hex(layer_to_draw->color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
+    rect_dsc.border_color = rect_dsc.bg_color;
+    rect_dsc.bg_opa = LV_OPA_20;
+    rect_dsc.border_opa = LV_OPA_60;
+    rect_dsc.border_width = 2;
+
+
+    lv_area_t area_rot;
+    lv_area_copy(&area_rot, coords);
+    if(draw_dsc->angle || draw_dsc->zoom != LV_ZOOM_NONE) {
+        int32_t w = lv_area_get_width(coords);
+        int32_t h = lv_area_get_height(coords);
+
+        _lv_img_buf_get_transformed_area(&area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
+
+        area_rot.x1 += coords->x1;
+        area_rot.y1 += coords->y1;
+        area_rot.x2 += coords->x1;
+        area_rot.y2 += coords->y1;
+    }
+
+
+    lv_draw_sw_rect(draw_unit, &rect_dsc, &area_rot);
+#endif
 }
 
 

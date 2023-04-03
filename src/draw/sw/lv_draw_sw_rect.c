@@ -72,20 +72,6 @@ static void draw_border_simple(lv_draw_unit_t * draw_unit, const lv_area_t * out
 void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords)
 {
 
-    //    if(coords->x2 < 600)  {
-    //        printf("layer_address draw_rect: %p\n", draw_unit->layer->buf);
-    //        uint32_t i;
-    //        uint8_t * buf8 = draw_unit->layer->buf;
-    //        for(i = 0; i < lv_area_get_size(&draw_unit->layer->buf_area) * 4; i++) {
-    //            if(buf8[3]) {
-    //                printf("ggg\n");
-    //                return;
-    //            }
-    //        }
-    //
-    //        return;
-    //    }
-
 #if LV_USE_DRAW_MASKS
     draw_shadow(draw_unit, dsc, coords);
 #endif
