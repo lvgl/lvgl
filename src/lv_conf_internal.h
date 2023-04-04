@@ -2506,6 +2506,13 @@
             #define LV_SDL_FULLSCREEN      0
         #endif
     #endif
+    #ifndef LV_SDL_WINDOW_TITLE
+        #ifdef CONFIG_LV_SDL_WINDOW_TITLE
+            #define LV_SDL_WINDOW_TITLE CONFIG_LV_SDL_WINDOW_TITLE
+        #else
+            #define LV_SDL_WINDOW_TITLE    "LVGL Simulator"
+        #endif
+    #endif
 #endif
 
 /*Driver for /dev/fb*/
