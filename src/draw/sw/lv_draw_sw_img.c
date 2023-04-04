@@ -62,16 +62,8 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_sw_img(draw_unit, &new_draw_dsc, coords);
-#if LV_USE_LAYER_DEBUG == 0
-    lv_draw_rect_dsc_t rect_dsc;
-    lv_draw_rect_dsc_init(&rect_dsc);
-    rect_dsc.bg_color = lv_color_hex(layer_to_draw->color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
-    rect_dsc.border_color = rect_dsc.bg_color;
-    rect_dsc.bg_opa = LV_OPA_20;
-    rect_dsc.border_opa = LV_OPA_60;
-    rect_dsc.border_width = 2;
 
-
+#if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     lv_area_t area_rot;
     lv_area_copy(&area_rot, coords);
     if(draw_dsc->angle || draw_dsc->zoom != LV_ZOOM_NONE) {
@@ -85,9 +77,61 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
         area_rot.x2 += coords->x1;
         area_rot.y2 += coords->y1;
     }
+    lv_area_t draw_area;
+    if(!_lv_area_intersect(&draw_area, &area_rot, draw_unit->clip_area)) return;
+#endif
 
-
+#if LV_USE_LAYER_DEBUG
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_rect_dsc_init(&rect_dsc);
+    rect_dsc.bg_color = lv_color_hex(layer_to_draw->color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
+    rect_dsc.border_color = rect_dsc.bg_color;
+    rect_dsc.bg_opa = LV_OPA_20;
+    rect_dsc.border_opa = LV_OPA_60;
+    rect_dsc.border_width = 2;
     lv_draw_sw_rect(draw_unit, &rect_dsc, &area_rot);
+#endif
+
+#if LV_USE_PARALLEL_DRAW_DEBUG
+    uint32_t idx = 0;
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    lv_draw_unit_t * draw_unit_tmp = disp->draw_unit_head;
+    while(draw_unit_tmp != draw_unit) {
+        draw_unit_tmp = draw_unit_tmp->next;
+        idx++;
+    }
+
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_rect_dsc_init(&rect_dsc);
+    rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+    rect_dsc.border_color = rect_dsc.bg_color;
+    rect_dsc.bg_opa = LV_OPA_10;
+    rect_dsc.border_opa = LV_OPA_100;
+    rect_dsc.border_width = 2;
+    lv_draw_sw_rect(draw_unit, &rect_dsc, &area_rot);
+
+
+    lv_point_t txt_size;
+    lv_txt_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+
+    lv_area_t txt_area;
+    txt_area.x1 = draw_area.x1;
+    txt_area.x2 = draw_area.x1 + txt_size.x - 1;
+    txt_area.y2 = draw_area.y2;
+    txt_area.y1 = draw_area.y2 - txt_size.y + 1;
+
+    lv_draw_rect_dsc_init(&rect_dsc);
+    rect_dsc.bg_color = lv_color_black();
+    lv_draw_sw_rect(draw_unit, &rect_dsc, &txt_area);
+
+    char buf[8];
+    lv_snprintf(buf, sizeof(buf), "%d", idx);
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.color = lv_color_white();
+    label_dsc.text = buf;
+    lv_draw_sw_label(draw_unit, &label_dsc, &txt_area);
+
 #endif
 }
 

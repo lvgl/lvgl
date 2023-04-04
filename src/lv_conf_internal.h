@@ -895,6 +895,26 @@
     #endif
 #endif
 
+/*1: Draw a red overlay for ARGB layers and a green overlay for RGB layers*/
+#ifndef LV_USE_LAYER_DEBUG
+    #ifdef CONFIG_LV_USE_LAYER_DEBUG
+        #define LV_USE_LAYER_DEBUG CONFIG_LV_USE_LAYER_DEBUG
+    #else
+        #define LV_USE_LAYER_DEBUG 0
+    #endif
+#endif
+
+/*1: Draw overlays with different colors for each draw_unit's tasks.
+ *Also add the index number of the draw unit on white background.
+ *For layers add the index number of the draw unit on black background.*/
+#ifndef LV_USE_PARALLEL_DRAW_DEBUG
+    #ifdef CONFIG_LV_USE_PARALLEL_DRAW_DEBUG
+        #define LV_USE_PARALLEL_DRAW_DEBUG CONFIG_LV_USE_PARALLEL_DRAW_DEBUG
+    #else
+        #define LV_USE_PARALLEL_DRAW_DEBUG 0
+    #endif
+#endif
+
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
 #ifndef LV_DISP_ROT_MAX_BUF

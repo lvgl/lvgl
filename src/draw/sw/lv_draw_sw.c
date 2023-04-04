@@ -9,6 +9,7 @@
 #include "../lv_draw.h"
 #if LV_USE_DRAW_SW
 
+#include "../../core/lv_refr.h"
 #include "lv_draw_sw.h"
 #include "../../core/lv_disp_private.h"
 
@@ -298,22 +299,68 @@ static void exectue_drawing(lv_draw_sw_unit_t * u)
 {
     /*Render the draw task*/
     lv_draw_task_t * t = u->task_act;
-    switch(u->task_act->type) {
+    switch(t->type) {
         case LV_DRAW_TASK_TYPE_RECTANGLE:
-            lv_draw_sw_rect((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+            lv_draw_sw_rect((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
-            lv_draw_sw_label((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+            lv_draw_sw_label((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_sw_img((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+            lv_draw_sw_img((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            lv_draw_sw_layer((lv_draw_unit_t *)u, u->task_act->draw_dsc, &u->task_act->area);
+            lv_draw_sw_layer((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         default:
             break;
     }
+
+#if LV_USE_PARALLEL_DRAW_DEBUG
+    /*Layers manage it for themselves*/
+    if(t->type != LV_DRAW_TASK_TYPE_LAYER) {
+        lv_area_t draw_area;
+        if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
+
+        int32_t idx = 0;
+        lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+        lv_draw_unit_t * draw_unit_tmp = disp->draw_unit_head;
+        while(draw_unit_tmp != (lv_draw_unit_t *)u) {
+            draw_unit_tmp = draw_unit_tmp->next;
+            idx++;
+        }
+        lv_draw_rect_dsc_t rect_dsc;
+        lv_draw_rect_dsc_init(&rect_dsc);
+        rect_dsc.bg_color = lv_palette_main(idx % _LV_PALETTE_LAST);
+        rect_dsc.border_color = rect_dsc.bg_color;
+        rect_dsc.bg_opa = LV_OPA_10;
+        rect_dsc.border_opa = LV_OPA_80;
+        rect_dsc.border_width = 1;
+        lv_draw_sw_rect((lv_draw_unit_t *)u, &rect_dsc, &draw_area);
+
+        lv_point_t txt_size;
+        lv_txt_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+
+        lv_area_t txt_area;
+        txt_area.x1 = draw_area.x1;
+        txt_area.y1 = draw_area.y1;
+        txt_area.x2 = draw_area.x1 + txt_size.x - 1;
+        txt_area.y2 = draw_area.y1 + txt_size.y - 1;
+
+        lv_draw_rect_dsc_init(&rect_dsc);
+        rect_dsc.bg_color = lv_color_white();
+        lv_draw_sw_rect((lv_draw_unit_t *)u, &rect_dsc, &txt_area);
+
+        char buf[8];
+        lv_snprintf(buf, sizeof(buf), "%d", idx);
+        lv_draw_label_dsc_t label_dsc;
+        lv_draw_label_dsc_init(&label_dsc);
+        label_dsc.color = lv_color_black();
+        label_dsc.text = buf;
+        lv_draw_sw_label((lv_draw_unit_t *)u, &label_dsc, &txt_area);
+    }
+#endif
+
 }
 
 #endif /*LV_USE_DRAW_SW*/

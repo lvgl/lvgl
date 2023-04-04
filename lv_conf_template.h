@@ -293,6 +293,14 @@
 /*1: Draw random colored rectangles over the redrawn areas*/
 #define LV_USE_REFR_DEBUG 0
 
+/*1: Draw a red overlay for ARGB layers and a green overlay for RGB layers*/
+#define LV_USE_LAYER_DEBUG 0
+
+/*1: Draw overlays with different colors for each draw_unit's tasks.
+ *Also add the index number of the draw unit on white background.
+ *For layers add the index number of the draw unit on black background.*/
+#define LV_USE_PARALLEL_DRAW_DEBUG 0
+
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
