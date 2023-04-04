@@ -9,14 +9,6 @@
 #include "lv_img.h"
 #if LV_USE_IMG != 0
 
-#include "../../core/lv_disp.h"
-#include "../../misc/lv_assert.h"
-#include "../../draw/lv_img_decoder.h"
-#include "../../misc/lv_fs.h"
-#include "../../misc/lv_txt.h"
-#include "../../misc/lv_math.h"
-#include "../../misc/lv_log.h"
-
 /*********************
  *      DEFINES
  *********************/

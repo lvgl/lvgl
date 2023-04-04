@@ -1,0 +1,28 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/ebaskoro/devcontainer-features/emscripten:1": {}
+  },
+  "postCreateCommand": "chmod +x /workspace/lvgl_app/lvgl/.devcontainer/setup.sh; /workspace/lvgl_app/lvgl/.devcontainer/setup.sh",
+  "postStartCommand": ". /usr/local/emsdk/emsdk_env.sh;",
+   
+  // Configure tool-specific properties.
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        //"searking.preview-vscode"
+        "analytic-signal.preview-html"
+      ]
+    }
+  },
+  
+  "hostRequirements": {
+   "cpus": 4
+  },
+    
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace/lvgl_app/lvgl,type=bind",
+  "workspaceFolder": "/workspace/lvgl_app"
+  
+}

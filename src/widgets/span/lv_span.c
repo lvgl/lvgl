@@ -128,9 +128,11 @@ void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span)
             _lv_ll_remove(&spans->child_ll, cur_span);
             if(cur_span->txt && cur_span->static_flag == 0) {
                 lv_free(cur_span->txt);
+                cur_span->txt = NULL;
             }
             lv_style_reset(&cur_span->style);
             lv_free(cur_span);
+            cur_span = NULL;
             break;
         }
     }
@@ -150,10 +152,15 @@ void lv_span_set_text(lv_span_t * span, const char * text)
 
     if(span->txt == NULL || span->static_flag == 1) {
         span->txt = lv_malloc(strlen(text) + 1);
+        LV_ASSERT_MALLOC(span->txt);
     }
     else {
         span->txt = lv_realloc(span->txt, strlen(text) + 1);
+        LV_ASSERT_MALLOC(span->txt);
     }
+
+    if(span->txt == NULL) return;
+
     span->static_flag = 0;
     strcpy(span->txt, text);
 
@@ -168,6 +175,7 @@ void lv_span_set_text_static(lv_span_t * span, const char * text)
 
     if(span->txt && span->static_flag == 0) {
         lv_free(span->txt);
+        span->txt = NULL;
     }
     span->static_flag = 1;
     span->txt = (char *)text;
@@ -521,6 +529,7 @@ static void lv_spangroup_destructor(const lv_obj_class_t * class_p, lv_obj_t * o
         _lv_ll_remove(&spans->child_ll, cur_span);
         if(cur_span->txt && cur_span->static_flag == 0) {
             lv_free(cur_span->txt);
+            cur_span->txt = NULL;
         }
         lv_style_reset(&cur_span->style);
         lv_free(cur_span);

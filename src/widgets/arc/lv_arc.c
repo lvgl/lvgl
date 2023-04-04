@@ -39,6 +39,7 @@ static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * a
 static lv_coord_t get_angle(const lv_obj_t * obj);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
 static void value_update(lv_obj_t * arc);
+static lv_coord_t knob_get_extra_size(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -620,8 +621,11 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
         lv_coord_t knob_pad = LV_MAX4(knob_left, knob_right, knob_top, knob_bottom) + 2;
 
+        lv_coord_t knob_extra_size = knob_pad - bg_pad;
+        knob_extra_size += knob_get_extra_size(obj);
+
         lv_coord_t * s = lv_event_get_param(e);
-        *s = LV_MAX(*s, knob_pad - bg_pad);
+        *s = LV_MAX(*s, knob_extra_size);
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_arc_draw(e);
@@ -736,6 +740,7 @@ static void inv_arc_area(lv_obj_t * obj, uint16_t start_angle, uint16_t end_angl
 
     lv_area_t inv_area;
     lv_draw_arc_get_area(c.x, c.y, r, start_angle, end_angle, w, rounded, &inv_area);
+
     lv_obj_invalidate_area(obj, &inv_area);
 }
 
@@ -747,6 +752,13 @@ static void inv_knob_area(lv_obj_t * obj)
 
     lv_area_t a;
     get_knob_area(obj, &c, r, &a);
+
+    lv_coord_t knob_extra_size = knob_get_extra_size(obj);
+
+    if(knob_extra_size > 0) {
+        lv_area_increase(&a, knob_extra_size, knob_extra_size);
+    }
+
     lv_obj_invalidate_area(obj, &a);
 }
 
@@ -860,6 +872,21 @@ static void value_update(lv_obj_t * obj)
             return;
     }
     arc->last_angle = angle; /*Cache angle for slew rate limiting*/
+}
+
+static lv_coord_t knob_get_extra_size(lv_obj_t * obj)
+{
+    lv_coord_t knob_shadow_size = 0;
+    knob_shadow_size += lv_obj_get_style_shadow_width(obj, LV_PART_KNOB);
+    knob_shadow_size += lv_obj_get_style_shadow_spread(obj, LV_PART_KNOB);
+    knob_shadow_size += LV_ABS(lv_obj_get_style_shadow_ofs_x(obj, LV_PART_KNOB));
+    knob_shadow_size += LV_ABS(lv_obj_get_style_shadow_ofs_y(obj, LV_PART_KNOB));
+
+    lv_coord_t knob_outline_size = 0;
+    knob_outline_size += lv_obj_get_style_outline_width(obj, LV_PART_KNOB);
+    knob_outline_size += lv_obj_get_style_outline_pad(obj, LV_PART_KNOB);
+
+    return LV_MAX(knob_shadow_size, knob_outline_size);
 }
 
 #endif
