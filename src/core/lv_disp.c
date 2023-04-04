@@ -11,6 +11,7 @@
 #include "../core/lv_refr.h"
 #include "../core/lv_disp.h"
 #include "../core/lv_disp_private.h"
+#include "../core/lv_theme.h"
 #include "../misc/lv_gc.h"
 
 #if LV_USE_DRAW_SW
