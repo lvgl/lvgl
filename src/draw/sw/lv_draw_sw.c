@@ -50,6 +50,8 @@ void lv_draw_sw_rect(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
 
 void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 
+void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
+
 void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords);
 
 /**********************
@@ -308,6 +310,9 @@ static void exectue_drawing(lv_draw_sw_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_sw_img((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_ARC:
+            lv_draw_sw_arc((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
             lv_draw_sw_layer((lv_draw_unit_t *)u, t->draw_dsc, &t->area);

@@ -651,6 +651,10 @@ static void lv_arc_draw(lv_event_t * e)
     if(arc_r > 0) {
         lv_draw_arc_dsc_init(&arc_dsc);
         lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
+        arc_dsc.center = center;
+        arc_dsc.start_angle = arc->bg_angle_start + arc->rotation;
+        arc_dsc.end_angle = arc->bg_angle_end + arc->rotation;
+
 
         part_draw_dsc.part = LV_PART_MAIN;
         part_draw_dsc.class_p = MY_CLASS;
@@ -660,8 +664,8 @@ static void lv_arc_draw(lv_event_t * e)
         part_draw_dsc.arc_dsc = &arc_dsc;
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
-        lv_draw_arc(layer, &arc_dsc, &center, part_draw_dsc.radius, arc->bg_angle_start + arc->rotation,
-                    arc->bg_angle_end + arc->rotation);
+        arc_dsc.radius = part_draw_dsc.radius;
+        lv_draw_arc(layer, &arc_dsc);
 
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
@@ -676,6 +680,9 @@ static void lv_arc_draw(lv_event_t * e)
     if(indic_r > 0) {
         lv_draw_arc_dsc_init(&arc_dsc);
         lv_obj_init_draw_arc_dsc(obj, LV_PART_INDICATOR, &arc_dsc);
+        arc_dsc.center = center;
+        arc_dsc.start_angle = arc->indic_angle_start + arc->rotation;
+        arc_dsc.end_angle = arc->indic_angle_end + arc->rotation;
 
         part_draw_dsc.part = LV_PART_INDICATOR;
         part_draw_dsc.class_p = MY_CLASS;
@@ -683,11 +690,12 @@ static void lv_arc_draw(lv_event_t * e)
         part_draw_dsc.p1 = &center;
         part_draw_dsc.radius = indic_r;
         part_draw_dsc.arc_dsc = &arc_dsc;
+        arc_dsc.radius = part_draw_dsc.radius;
+
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
         if(arc_dsc.width > part_draw_dsc.radius) arc_dsc.width = part_draw_dsc.radius;
-        lv_draw_arc(layer, &arc_dsc, &center, part_draw_dsc.radius, arc->indic_angle_start + arc->rotation,
-                    arc->indic_angle_end + arc->rotation);
+        lv_draw_arc(layer, &arc_dsc);
 
         lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
