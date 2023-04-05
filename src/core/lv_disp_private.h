@@ -146,7 +146,7 @@ struct _lv_disp_t {
     /** OPTIONAL: Called periodically while lvgl waits for operation to be completed.
      * For example flushing or GPU
      * User can execute very simple tasks here or yield the task*/
-    void (*wait_cb)(struct _lv_disp_t * disp_drv);
+    void (*wait_cb)(struct _lv_disp_t * disp);
 
     /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h) */
