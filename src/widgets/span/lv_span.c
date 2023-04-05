@@ -150,19 +150,21 @@ void lv_span_set_text(lv_span_t * span, const char * text)
         return;
     }
 
+    size_t text_alloc_len = lv_strlen(text) + 1;
+
     if(span->txt == NULL || span->static_flag == 1) {
-        span->txt = lv_malloc(lv_strlen(text) + 1);
+        span->txt = lv_malloc(text_alloc_len);
         LV_ASSERT_MALLOC(span->txt);
     }
     else {
-        span->txt = lv_realloc(span->txt, lv_strlen(text) + 1);
+        span->txt = lv_realloc(span->txt, text_alloc_len);
         LV_ASSERT_MALLOC(span->txt);
     }
 
     if(span->txt == NULL) return;
 
     span->static_flag = 0;
-    strcpy(span->txt, text);
+    lv_strncpy(span->txt, text, text_alloc_len);
 
     refresh_self_size(span->spangroup);
 }

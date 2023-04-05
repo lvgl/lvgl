@@ -1281,7 +1281,8 @@ static void copy_text_to_label(lv_label_t * label, const char * text)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(text, label->text);
 #else
-    (void) strcpy(label->text, text);
+    size_t len = lv_strlen(text);
+    (void) lv_strncpy(label->text, text, len);
 #endif
 }
 

@@ -146,7 +146,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     if(dropdown->options == NULL) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    strcpy(dropdown->options, options);
+    lv_strncpy(dropdown->options, options, len);
 #else
     _lv_txt_ap_proc(options, dropdown->options);
 #endif
@@ -203,7 +203,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
         LV_ASSERT_MALLOC(dropdown->options);
         if(dropdown->options == NULL) return;
 
-        strcpy(dropdown->options, static_options);
+        lv_strncpy(dropdown->options, static_options, len);
         dropdown->static_txt = 0;
     }
 
@@ -243,7 +243,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     LV_ASSERT_MALLOC(ins_buf);
     if(ins_buf == NULL) return;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    strcpy(ins_buf, option);
+    lv_strncpy(ins_buf, option, new_len + 1);
 #else
     _lv_txt_ap_proc(option, ins_buf);
 #endif
