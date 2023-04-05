@@ -752,7 +752,6 @@
     #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
     #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
     #define LV_SDL_FULLSCREEN      0
-    #define LV_SDL_WINDOW_TITLE    "LVGL Simulator"
 #endif
 
 /*Driver for /dev/fb*/
