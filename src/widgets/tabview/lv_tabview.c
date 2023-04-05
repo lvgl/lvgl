@@ -84,7 +84,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     if(tabview->tab_pos & LV_DIR_VER) {
         new_map = lv_malloc((tab_id + 1) * sizeof(const char *));
         lv_memcpy(new_map, old_map, sizeof(const char *) * (tab_id - 1));
-        new_map[tab_id - 1] = lv_malloc(strlen(name) + 1);
+        new_map[tab_id - 1] = lv_malloc(lv_strlen(name) + 1);
         strcpy((char *)new_map[tab_id - 1], name);
         new_map[tab_id] = (char *)"";
     }
@@ -93,13 +93,13 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
         new_map = lv_malloc((tab_id * 2) * sizeof(const char *));
         lv_memcpy(new_map, old_map, sizeof(const char *) * (tab_id - 1) * 2);
         if(tabview->tab_cnt == 0) {
-            new_map[0] = lv_malloc(strlen(name) + 1);
+            new_map[0] = lv_malloc(lv_strlen(name) + 1);
             strcpy((char *)new_map[0], name);
             new_map[1] = (char *)"";
         }
         else {
             new_map[tab_id * 2 - 3] = (char *)"\n";
-            new_map[tab_id * 2 - 2] = lv_malloc(strlen(name) + 1);
+            new_map[tab_id * 2 - 2] = lv_malloc(lv_strlen(name) + 1);
             new_map[tab_id * 2 - 1] = (char *)"";
             strcpy((char *)new_map[(tab_id * 2) - 2], name);
         }
@@ -130,7 +130,7 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t id, const char * new_name)
     if(tabview->tab_pos & LV_DIR_HOR) id *= 2;
 
     lv_free(tabview->map[id]);
-    tabview->map[id] = lv_malloc(strlen(new_name) + 1);
+    tabview->map[id] = lv_malloc(lv_strlen(new_name) + 1);
     strcpy(tabview->map[id], new_name);
     lv_obj_invalidate(obj);
 }

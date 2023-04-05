@@ -392,7 +392,7 @@ void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
     }
 
     if(title) {
-        page->title        = lv_malloc(strlen(title) + 1);
+        page->title        = lv_malloc(lv_strlen(title) + 1);
         page->static_title = false;
 
         LV_ASSERT_MALLOC(page->title);

@@ -959,7 +959,7 @@ static size_t get_cell_txt_len(const char * txt)
 #else
     /* cell_data layout: [ctrl][txt][trailing '\0' terminator]
      * +2 because of the trailing '\0' and the ctrl */
-    retval = strlen(txt) + 2;
+    retval = lv_strlen(txt) + 2;
 #endif
 
     return retval;
