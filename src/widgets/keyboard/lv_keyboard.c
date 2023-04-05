@@ -309,6 +309,40 @@ bool lv_btnmatrix_get_popovers(const lv_obj_t * obj)
  *====================*/
 
 /**
+ * Add the default keyboard event if it wasn't added previously.
+ * @param obj pointer to a keyboard object
+ */
+void lv_keyboard_add_default_event(lv_obj_t * obj)
+{
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
+    if(keyboard->def_event_dsc) {
+        return;
+    }
+    lv_obj_add_event(obj, lv_keyboard_def_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    keyboard->def_event_dsc = lv_obj_get_event_dsc(obj, lv_obj_get_event_count(obj) - 1);
+}
+
+/**
+ * Remove the default keyboard event if it was added previously.
+ * @param obj pointer to a keyboard object
+ */
+void lv_keyboard_remove_default_event(lv_obj_t * obj)
+{
+    lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
+    if(!keyboard->def_event_dsc) {
+        return;
+    }
+    uint32_t num_events = lv_obj_get_event_count(obj);
+    for(uint32_t i = 0; i < num_events; ++i) {
+        if(lv_obj_get_event_dsc(obj, i) == keyboard->def_event_dsc) {
+            lv_obj_remove_event(obj, i);
+            break;
+        }
+    }
+    keyboard->def_event_dsc = NULL;
+}
+
+/**
  * Default keyboard event to add characters to the Text area and change the map.
  * If a custom `event_cb` is added to the keyboard this function can be called from it to handle the
  * button clicks
@@ -429,14 +463,15 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
-    keyboard->ta         = NULL;
-    keyboard->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
-    keyboard->popovers   = 0;
+    keyboard->ta            = NULL;
+    keyboard->mode          = LV_KEYBOARD_MODE_TEXT_LOWER;
+    keyboard->popovers      = 0;
+    keyboard->def_event_dsc = NULL;
 
     lv_obj_align(obj, LV_ALIGN_BOTTOM_MID, 0, 0);
-    lv_obj_add_event(obj, lv_keyboard_def_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_style_base_dir(obj, LV_BASE_DIR_LTR, 0);
 
+    lv_keyboard_add_default_event(obj);
     lv_keyboard_update_map(obj);
 }
 

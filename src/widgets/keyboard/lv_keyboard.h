@@ -57,6 +57,7 @@ typedef struct {
     lv_obj_t * ta;              /*Pointer to the assigned text area*/
     lv_keyboard_mode_t mode;    /*Key map type*/
     uint8_t popovers : 1;       /*Show button titles in popovers on press*/
+    lv_event_dsc_t * def_event_dsc; /*Descriptor for the default event or NULL if it was removed*/
 } lv_keyboard_t;
 
 extern const lv_obj_class_t lv_keyboard_class;
@@ -167,6 +168,18 @@ static inline const char * lv_keyboard_get_btn_text(const lv_obj_t * obj, uint16
 /*=====================
  * Other functions
  *====================*/
+
+/**
+ * Add the default keyboard event if it wasn't added previously.
+ * @param obj pointer to a keyboard object
+ */
+void lv_keyboard_add_default_event(lv_obj_t * obj);
+
+/**
+ * Remove the default keyboard event if it was added previously.
+ * @param obj pointer to a keyboard object
+ */
+void lv_keyboard_remove_default_event(lv_obj_t * obj);
 
 /**
  * Default keyboard event to add characters to the Text area and change the map.
