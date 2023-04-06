@@ -51,7 +51,7 @@ void lvgl_free(void *ptr)
 	k_spin_unlock(&lvgl_heap_lock, key);
 }
 
-static int lvgl_heap_init(const struct device *unused)
+static int lvgl_heap_init(void)
 {
 	sys_heap_init(&lvgl_heap, &lvgl_heap_mem[0], HEAP_BYTES);
 	return 0;
