@@ -150,19 +150,21 @@ void lv_span_set_text(lv_span_t * span, const char * text)
         return;
     }
 
+    size_t text_alloc_len = lv_strlen(text) + 1;
+
     if(span->txt == NULL || span->static_flag == 1) {
-        span->txt = lv_malloc(strlen(text) + 1);
+        span->txt = lv_malloc(text_alloc_len);
         LV_ASSERT_MALLOC(span->txt);
     }
     else {
-        span->txt = lv_realloc(span->txt, strlen(text) + 1);
+        span->txt = lv_realloc(span->txt, text_alloc_len);
         LV_ASSERT_MALLOC(span->txt);
     }
 
     if(span->txt == NULL) return;
 
     span->static_flag = 0;
-    strcpy(span->txt, text);
+    lv_strncpy(span->txt, text, text_alloc_len);
 
     refresh_self_size(span->spangroup);
 }
@@ -903,7 +905,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
             }
             if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
                 if(last_snippet->txt[last_snippet->bytes] != '\0') {
-                    last_snippet->bytes = strlen(last_snippet->txt);
+                    last_snippet->bytes = lv_strlen(last_snippet->txt);
                     last_snippet->txt_w = lv_txt_get_width(last_snippet->txt, last_snippet->bytes, last_snippet->font,
                                                            last_snippet->letter_space, txt_flag);
                 }

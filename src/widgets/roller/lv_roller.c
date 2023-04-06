@@ -126,11 +126,11 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         if(!(roller->inf_page_cnt & 1)) roller->inf_page_cnt++;   /*Make it odd*/
         LV_LOG_INFO("Using %" LV_PRIu32 " pages to make the roller look infinite", roller->inf_page_cnt);
 
-        size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
+        size_t opt_len = lv_strlen(options) + 1; /*+1 to add '\n' after option lists*/
         char * opt_extra = lv_malloc(opt_len * roller->inf_page_cnt);
         uint8_t i;
         for(i = 0; i < roller->inf_page_cnt; i++) {
-            strcpy(&opt_extra[opt_len * i], options);
+            lv_strncpy(&opt_extra[opt_len * i], options, opt_len);
             opt_extra[opt_len * (i + 1) - 1] = '\n';
         }
         opt_extra[opt_len * roller->inf_page_cnt - 1] = '\0';
@@ -243,7 +243,7 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     uint32_t i;
     uint16_t line        = 0;
     const char * opt_txt = lv_label_get_text(label);
-    size_t txt_len     = strlen(opt_txt);
+    size_t txt_len     = lv_strlen(opt_txt);
 
     for(i = 0; i < txt_len && line != roller->sel_opt_id; i++) {
         if(opt_txt[i] == '\n') line++;

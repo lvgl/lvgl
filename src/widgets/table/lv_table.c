@@ -959,7 +959,7 @@ static size_t get_cell_txt_len(const char * txt)
 #else
     /* cell_data layout: [ctrl][txt][trailing '\0' terminator]
      * +2 because of the trailing '\0' and the ctrl */
-    retval = strlen(txt) + 2;
+    retval = lv_strlen(txt) + 2;
 #endif
 
     return retval;
@@ -971,7 +971,8 @@ static void copy_cell_txt(char * dst, const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(txt, &dst[1]);
 #else
-    strcpy(&dst[1], txt);
+    size_t len = lv_strlen(txt);
+    lv_strncpy(&dst[1], txt, len);
 #endif
 }
 
