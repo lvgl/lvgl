@@ -1,4 +1,4 @@
-name: SO3-LVGL Performance
+name: SO3-LVGL Performance check
 on: [push, pull_request, workflow_dispatch]
 jobs:
   so3_lvgl:
@@ -11,7 +11,7 @@ jobs:
           sudo apt-get install -y cmake gcc-arm-none-eabi  device-tree-compiler \
           u-boot-tools pkg-config bridge-utils qemu-system-arm
           sudo apt-get remove -y libyaml-dev
-      - name: SO3-LVGL performance check
+      - name: SO3-LVGL building components
         run: |
           wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
           unzip master.zip
@@ -27,6 +27,16 @@ jobs:
           ./create_ramfs.sh vexpress
           cd ..
           ./deploy.sh -bu
-          ./st
+
+        - name: SO3-LVGL performance check
+        run: |
+          ./st > out.log
+
+        - name: Download_artifact
+          uses: actions/upload-artifact@v3
+          with:
+            name: test_performance
+            path: out.log
+
 
 
