@@ -29,6 +29,7 @@ jobs:
           ./deploy.sh -bu
       - name: SO3-LVGL performance check
         run: |
+          cd so3
           ./st > out.log
       - name: Download_artifact
         uses: actions/upload-artifact@v3
