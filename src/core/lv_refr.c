@@ -1176,6 +1176,7 @@ static void mem_monitor_init(void)
 
 static void refr_async_cb(void * user_data)
 {
+    LV_UNUSED(user_data);
 #if LV_USE_PERF_MONITOR
     perf_monitor_init();
 #endif

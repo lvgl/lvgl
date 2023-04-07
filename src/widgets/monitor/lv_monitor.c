@@ -90,5 +90,6 @@ static void lv_monitor_timer_cb(lv_timer_t * timer)
 
 static void lv_monitor_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
+    LV_UNUSED(class_p);
     lv_obj_event_base(MY_CLASS, e);
 }
