@@ -6,17 +6,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - uses: actions/cache@v3
-        id: cache  
+      - name: Install texlive Apt dependencies
+        using: Eeems-Org/apt-cache-action
         with:
-          path: so3/ci/cache/
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/lockfiles') }}
+        packages: cmake gcc-arm-none-eabi  device-tree-compileru-boot-tools pkg-config bridge-utils qemu-system-arm
       
-      - name: Install dependencies
+      - name: Remove useless dependency
         run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake gcc-arm-none-eabi  device-tree-compiler \
-          u-boot-tools pkg-config bridge-utils qemu-system-arm
           sudo apt-get remove -y libyaml-dev
           
       - name: SO3-LVGL building components
