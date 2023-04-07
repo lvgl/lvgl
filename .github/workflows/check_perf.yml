@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test_performance
-          path: out.log
+          path: so3/out.log
 
 
 
