@@ -9,7 +9,7 @@ jobs:
       - name: Install required APT packages
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: cmake gcc-arm-none-eabi device-tree-compileru-boot-tools pkg-config bridge-utils qemu-system-arm
+          packages: cmake gcc-arm-none-eabi device-tree-compiler u-boot-tools pkg-config bridge-utils qemu-system-arm
           version: 1.0
           
       - name: Remove useless dependency
