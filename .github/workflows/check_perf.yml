@@ -11,7 +11,6 @@ jobs:
           sudo apt-get install -y cmake gcc-arm-none-eabi  device-tree-compiler \
           u-boot-tools pkg-config bridge-utils qemu-system-arm
           sudo apt-get remove -y libyaml-dev
-
       - name: SO3-LVGL building components
         run: |
           wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
@@ -28,11 +27,9 @@ jobs:
           ./create_ramfs.sh vexpress
           cd ..
           ./deploy.sh -bu
-
         - name: SO3-LVGL performance check
         run: |
           ./st > out.log
-
         - name: Download_artifact
           uses: actions/upload-artifact@v3
           with:
