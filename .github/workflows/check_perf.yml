@@ -5,12 +5,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      
+      - uses: actions/cache@v3
+        id: cache  
+        with:
+          path: packages/
+          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/lockfiles') }}
+      
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake gcc-arm-none-eabi  device-tree-compiler \
           u-boot-tools pkg-config bridge-utils qemu-system-arm
           sudo apt-get remove -y libyaml-dev
+          
       - name: SO3-LVGL building components
         run: |
           wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
@@ -27,10 +35,12 @@ jobs:
           ./create_ramfs.sh vexpress
           cd ..
           ./deploy.sh -bu
+          
       - name: SO3-LVGL performance check
         run: |
           cd so3
           ./st
+          
       - name: Download_artifact
         uses: actions/upload-artifact@v3
         with:
