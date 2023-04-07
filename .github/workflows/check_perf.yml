@@ -30,12 +30,10 @@ jobs:
       - name: SO3-LVGL performance check
         run: |
           cd so3
-          ./st > out.log
+          ./st
       - name: Download_artifact
         uses: actions/upload-artifact@v3
         with:
           name: test_performance
-          path: so3/out.log
-
-
+          path: so3/perf_check*.log
 
