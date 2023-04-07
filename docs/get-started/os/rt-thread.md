@@ -17,29 +17,25 @@
 - Supports all mainstream compiling tools such as GCC, Keil and IAR.
 - Supports a wide range of <a href="https://www.rt-thread.io/board.html">architectures and chips</a>.
 
-
 ## How to run LVGL on RT-Thread?
 
 [中文文档](https://www.rt-thread.org/document/site/#/rt-thread-version/rt-thread-standard/packages-manual/lvgl-docs/introduction)
 
 LVGL has registered as a [software package](https://packages.rt-thread.org/en/detail.html?package=LVGL) of RT-Thread. By using [Env tool](https://www.rt-thread.io/download.html?download=Env) or [RT-Thread Studio IDE](https://www.rt-thread.io/download.html?download=Studio), RT-Thread users can easily download LVGL source code and combine with RT-Thread project. RT-Thread community has port LVGL to several BSPs:
 
-| BSP                                                          | Note |
-| ------------------------------------------------------------ | ---- |
-| [QEMU simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/qemu-vexpress-a9/applications/lvgl) |      |
-| [Visual Studio simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/simulator/applications/lvgl) |      |
-| [Nuvoton numaker-iot-m487](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m487/applications/lvgl) |      |
-| [Nuvoton numaker-pfm-m487](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-pfm-m487/applications/lvgl) |      |
-| [Nuvoton nk-980iot](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-980iot/applications/lvgl) |      |
-| [Nuvoton numaker-m2354](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m2354/applications/lvgl) |      |
-| [Nuvoton nk-n9h30](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-n9h30/applications/lvgl) |      |
-| [Nuvoton numaker-m032ki](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m032ki/applications/lvgl) |      |
-| [NXP imxrt1060-evk](https://github.com/RT-Thread/rt-thread/tree/master/bsp/imxrt/imxrt1060-nxp-evk/applications/lvgl) |      |
-| [STM32L475 pandora](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora/applications/lvgl) |      |
-| [STM32F407 explorer](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-atk-explorer/applications/lvgl) |      |
-| [STM32F469 Discovery](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f469-st-disco/applications/lvgl) |      |
-| [Raspberry PICO](https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/applications/lvgl) |      |
-
+| BSP                                                                                                                               | Note                                                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [QEMU simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/qemu-vexpress-a9/applications/lvgl)                       | [Infineon psoc6-evaluationkit-062S2](https://github.com/RT-Thread/rt-thread/tree/master/bsp/Infineon/psoc6-evaluationkit-062S2/applications/lvgl) |
+| [Visual Studio simulator](https://github.com/RT-Thread/rt-thread/tree/master/bsp/simulator/applications/lvgl)                     | [Renesas ra6m3-ek](https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m3-ek/board/lvgl)                                            |
+| [Nuvoton numaker-iot-m487](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m487/applications/lvgl)     | [Renesas ra6m4-cpk](https://github.com/RT-Thread/rt-thread/tree/master/bsp/renesas/ra6m4-cpk/board/lvgl)                                          |
+| [Nuvoton numaker-pfm-m487](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-pfm-m487/applications/lvgl)     | [synwit swm341](https://github.com/RT-Thread/rt-thread/tree/master/bsp/synwit/swm341/applications/lvgl)                                           |
+| [Nuvoton nk-980iot](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-980iot/applications/lvgl)                   | [STM32H750 ART-Pi](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32h750-artpi/applications/lvgl)                                |
+| [Nuvoton numaker-m2354](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m2354/applications/lvgl)           | [STM32F469 Discovery](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f469-st-disco/applications/lvgl)                          |
+| [Nuvoton nk-n9h30](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/nk-n9h30/applications/lvgl)                     | [STM32F407 explorer](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32f407-atk-explorer/applications/lvgl)                       |
+| [Nuvoton numaker-m032ki](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m032ki/applications/lvgl)         | [STM32L475 pandora](https://github.com/RT-Thread/rt-thread/tree/master/bsp/stm32/stm32l475-atk-pandora/applications/lvgl)                         |
+| [Nuvoton numaker-hmi-ma35d1](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-hmi-ma35d1/applications/lvgl) | [NXP imxrt1060-evk](https://github.com/RT-Thread/rt-thread/tree/master/bsp/imxrt/imxrt1060-nxp-evk/applications/lvgl)                             |
+| [Nuvoton numaker-iot-m467](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-iot-m467/applications/lvgl)     | [Raspberry PICO](https://github.com/RT-Thread/rt-thread/tree/master/bsp/raspberry-pico/applications/lvgl)                                         |
+| [Nuvoton numaker-m467hj](https://github.com/RT-Thread/rt-thread/tree/master/bsp/nuvoton/numaker-m467hj/applications/lvgl)         |                                                                                                                                                   |
 
 ### Tutorials
 
