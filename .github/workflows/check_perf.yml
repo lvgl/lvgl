@@ -9,7 +9,7 @@ jobs:
       - uses: actions/cache@v3
         id: cache  
         with:
-          path: packages/
+          path: so3/ci/cache/
           key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('**/lockfiles') }}
       
       - name: Install dependencies
