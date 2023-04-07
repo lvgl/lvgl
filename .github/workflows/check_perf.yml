@@ -17,7 +17,7 @@ jobs:
           unzip master.zip
           mv so3-master so3
           cd so3
-          patch -s -p0 < ci/so3_ci.patch; \
+          patch -s -p0 < ci/so3_ci.patch
           cd u-boot; make vexpress_defconfig; make -j8; cd ..
           cd so3; make vexpress_fb_defconfig; make -j8; cd ..
           cd usr; ./build.sh; cd ..
