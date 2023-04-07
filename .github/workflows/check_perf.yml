@@ -6,10 +6,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Install texlive Apt dependencies
+      - name: Install required APT packages
         using: Eeems-Org/apt-cache-action
         with:
-        packages: cmake gcc-arm-none-eabi  device-tree-compileru-boot-tools pkg-config bridge-utils qemu-system-arm
+          packages: cmake gcc-arm-none-eabi  device-tree-compileru-boot-tools pkg-config bridge-utils qemu-system-arm
       
       - name: Remove useless dependency
         run: |
