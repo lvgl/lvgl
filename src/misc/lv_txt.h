@@ -167,8 +167,13 @@ static inline bool _lv_txt_is_break_char(uint32_t letter)
     uint8_t i;
     bool ret = false;
 
-    /* each chinese character can be break */
+    /*Each chinese character can be break*/
     if(letter >= 0x4E00 && letter <= 0x9FA5) {
+        return true;
+    }
+
+    /*Each fullwidth ASCII variants can be break*/
+    if(letter >= 0xFF01 && letter <= 0xFF5E) {
         return true;
     }
 
