@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_calendar_header_arrow.h"
-#if LV_USE_CALENDAR_HEADER_ARROW
+#if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_ARROW
 
 #include "lv_calendar.h"
 #include "../btn/lv_btn.h"
