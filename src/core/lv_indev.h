@@ -114,6 +114,8 @@ void lv_indev_set_type(lv_indev_t * indev, lv_indev_type_t indev_type);
 
 void lv_indev_set_read_cb(lv_indev_t * indev,  void (*read_cb)(struct _lv_indev_t * indev, lv_indev_data_t * data));
 
+void lv_indev_set_feedback_cb(lv_indev_t * indev,  void (*feedback_cb)(struct _lv_indev_t * indev, uint8_t event_code));
+
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data);
 
 void lv_indev_set_driver_data(lv_indev_t * indev, void * driver_data);

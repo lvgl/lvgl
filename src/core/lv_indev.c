@@ -256,6 +256,13 @@ void lv_indev_set_read_cb(lv_indev_t * indev,  void (*read_cb)(struct _lv_indev_
     indev->read_cb = read_cb;
 }
 
+void lv_indev_set_feedback_cb(lv_indev_t * indev,  void (*feedback_cb)(struct _lv_indev_t * indev, uint8_t event_code))
+{
+    if(indev == NULL) return;
+
+    indev->feedback_cb = feedback_cb;
+}
+
 void lv_indev_set_user_data(lv_indev_t * indev, void * user_data)
 {
     if(indev == NULL) return;
