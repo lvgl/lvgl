@@ -170,9 +170,12 @@ The default value of the following parameters can be changed in `lv_indev_t`:
 
 ### Feedback
 
-Besides `read_cb` a `feedback_cb` callback can be also specified in `lv_indev_t`.
-`feedback_cb` is called when any type of event is sent by the input devices (independently of its type). This allows generating feedback for the user, e.g. to play a sound on `LV_EVENT_CLICKED`.
+Besides `read_cb` a `feedback_cb` callback can be also specified.
 
+`feedback_cb` is called when any type of event is sent by the input devices (independently of its type). This allows generating feedback for the user, e.g. to play a sound on `LV_EVENT_CLICKED`.
+```c
+lv_indev_set_feedback_cb(indev, feedback_cb);
+```
 
 ### Associating with a display
 Every input device is associated with a display. By default, a new input device is added to the last display created or explicitly selected (using `lv_disp_set_default()`).
