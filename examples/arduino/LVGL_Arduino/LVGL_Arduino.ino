@@ -20,9 +20,10 @@ TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight); /* TFT instance */
 
 #if LV_USE_LOG != 0
 /* Serial debugging */
-void my_print(const char * buf)
+void my_print( lv_log_level_t level, const char * buf )
 {
-    Serial.printf(buf);
+    LV_UNUSED(level);
+    Serial.print(buf);
     Serial.flush();
 }
 #endif
