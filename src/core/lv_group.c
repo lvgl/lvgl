@@ -466,7 +466,7 @@ static bool focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
 }
 
 /**
- * Find an indev preferably with KEYPAD or ENCOEDR type that uses the given group.
+ * Find an indev preferably with POINTER type (because it's the most generic) that uses the given group.
  * In other words, find an indev, that is related to the given group.
  * In the worst case simply return the latest indev
  * @param g     a group the find in the indevs
@@ -474,22 +474,15 @@ static bool focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
  */
 static lv_indev_t * get_indev(const lv_group_t * g)
 {
-    lv_indev_t * indev_encoder = NULL;
-    lv_indev_t * indev_group = NULL;
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(lv_indev_get_group(indev) == g) {
-            /*Prefer KEYPAD*/
-            if(indev_type == LV_INDEV_TYPE_KEYPAD) return indev;
-            if(indev_type == LV_INDEV_TYPE_ENCODER) indev_encoder = indev;
-            indev_group = indev;
+            /*Prefer POINTER*/
+            if(indev_type == LV_INDEV_TYPE_POINTER) return indev;
         }
         indev = lv_indev_get_next(indev);
     }
-
-    if(indev_encoder) return indev_encoder;
-    if(indev_group) return indev_group;
 
     /*In lack of a better option use the first input device. (It can be NULL if there is no input device)*/
     return lv_indev_get_next(NULL);
