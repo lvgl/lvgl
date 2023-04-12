@@ -106,8 +106,8 @@ display become parallel operations.
 Advnaced options
 ****************
 
-Resoltion
----------
+Resolution
+----------
 
 To set the resolution of the display after creation use
 :cpp:expr:`lv_disp_set_res(disp, hor_res, ver_res)`
@@ -199,14 +199,14 @@ Events
 ******
 
 :cpp:expr:`lv_disp_add_event(disp, event_cb, LV_DISP_EVENT_..., user_data)` adds
-an event handler to a display. The following events are sent: -
-:cpp:enumerator:`LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for
-redraw). :cpp:expr:`lv_event_get_param(e)` returns a pointer to an :cpp:struct:`lv_area_t`
-varaible with the coordinates of the area to be invalidated. The ara can
-be freely modified is needed to adopt it the specialrequirement of the
-display. Usually needed with monoschrome displays to invalidate Nx8
-lines at once.
+an event handler to a display. The following events are sent:
 
+- :cpp:enumerator:`LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
+  :cpp:expr:`lv_event_get_param(e)` returns a pointer to an :cpp:struct:`lv_area_t`
+  varaible with the coordinates of the area to be invalidated. The ara can
+  be freely modified is needed to adopt it the specialrequirement of the
+  display. Usually needed with monoschrome displays to invalidate Nx8
+  lines at once.
 - :cpp:enumerator:`LV_DISP_EVENT_RENDER_START`: Called when rendering starts.
 - :cpp:enumerator:`LV_DISP_EVENT_RENDER_READY`: Called when rendering is ready
 - :cpp:enumerator:`LV_DISP_EVENT_RESOLUTION_CHANGED`: Called when the resolution changes due
@@ -239,7 +239,7 @@ You can do this in the following way:
 If you have multiple displays call :cpp:expr:`lv_disp_set_deafult(disp1)` to
 select the display to refresh before :cpp:expr:`_lv_disp_refr_timer(NULL)`.
 
-Note that :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_disp_refr_timer` can not
+.. note:: that :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_disp_refr_timer` can not
 run at the same time.
 
 If the performance monitor is enabled, the value of

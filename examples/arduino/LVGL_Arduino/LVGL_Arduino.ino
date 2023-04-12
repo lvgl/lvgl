@@ -1,13 +1,13 @@
 /*Using LVGL with Arduino requires some extra steps:
- * Be sure to read the docs here: https://docs.lvgl.io/master/get-started/platforms/arduino.html  */
+ *Be sure to read the docs here: https://docs.lvgl.io/master/get-started/platforms/arduino.html  */
 
 #include <lvgl.h>
 #include <TFT_eSPI.h>
 
 /*To use the built-in examples and demos of LVGL uncomment the includes below respectively.
- *You also need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`.*/
-//#include <demos/lv_demos.h>
-//#include <examples/lv_examples.h>
+ *You also need to copy `lvgl/examples` to `lvgl/src/examples`. Similarly for the demos `lvgl/demos` to `lvgl/src/demos`.
+ Note that the `lv_examples` library is for LVGL v7 and you shouldn't install it for this version (since LVGL v8)
+ as the examples and demos are now part of the main LVGL library. */
 
 /*Change to your screen resolution*/
 static const uint16_t screenWidth  = 480;
@@ -20,9 +20,10 @@ TFT_eSPI tft = TFT_eSPI(screenWidth, screenHeight); /* TFT instance */
 
 #if LV_USE_LOG != 0
 /* Serial debugging */
-void my_print(const char * buf)
+void my_print( lv_log_level_t level, const char * buf )
 {
-    Serial.printf(buf);
+    LV_UNUSED(level);
+    Serial.print(buf);
     Serial.flush();
 }
 #endif

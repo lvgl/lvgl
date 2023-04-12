@@ -10,7 +10,7 @@
 #include "lv_demo_flex_layout_main.h"
 #include "lv_demo_flex_layout.h"
 
-#if LV_USE_DEMO_FLEX_LAYOUT && LV_USE_USER_DATA
+#if LV_USE_DEMO_FLEX_LAYOUT
 
 /*********************
  *      DEFINES

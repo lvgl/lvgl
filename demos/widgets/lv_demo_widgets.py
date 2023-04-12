@@ -1314,7 +1314,7 @@ def birthday_event_cb(e):
 def calendar_event_cb(e,ta) :
     global calendar
     code = e.get_code()
-    obj = lv.calendar.__cast__(e.get_current_target())
+    obj = lv.calendar.__cast__(e.get_target())
     if code == lv.EVENT.VALUE_CHANGED:
         d = lv.calendar_date_t()
         obj.get_pressed_date(d)

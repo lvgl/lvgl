@@ -226,6 +226,12 @@ static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
             word_len--;
             break;
         }
+        else if(_lv_txt_is_a_word(letter_next) || _lv_txt_is_a_word(letter)) {
+            /*Found a word for single letter, usually true for CJK*/
+            *word_w_ptr = cur_w;
+            i = i_next;
+            break;
+        }
 
         /*Update the output width*/
         if(word_w_ptr != NULL && break_index == NO_BREAK_FOUND) *word_w_ptr = cur_w;

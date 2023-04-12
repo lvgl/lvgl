@@ -39,7 +39,7 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_px)
+lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes)
 {
     lv_tft_espi_t * dsc = (lv_tft_espi_t *)lv_malloc(sizeof(lv_tft_espi_t));
     LV_ASSERT_MALLOC(dsc);
@@ -57,7 +57,7 @@ lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, u
     dsc->tft->setRotation( 3 ); /* Landscape orientation, flipped */
     lv_disp_set_driver_data(disp, (void *)dsc);
     lv_disp_set_flush_cb(disp, flush_cb);
-    lv_disp_set_draw_buffers(disp, (void*)buf, NULL, buf_size_px, LV_DISP_RENDER_MODE_PARTIAL);
+    lv_disp_set_draw_buffers(disp, (void*)buf, NULL, buf_size_bytes, LV_DISP_RENDER_MODE_PARTIAL);
     return disp;
 }
 

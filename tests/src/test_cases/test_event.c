@@ -7,7 +7,7 @@ static void event_object_deletion_cb(const lv_obj_class_t * cls, lv_event_t * e)
 {
     LV_UNUSED(cls);
     if(lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
-        lv_obj_del(lv_event_get_current_target(e));
+        lv_obj_del(lv_event_get_target(e));
     }
 }
 

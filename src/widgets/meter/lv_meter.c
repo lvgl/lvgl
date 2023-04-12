@@ -109,6 +109,10 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, uint16_t width,
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
+    if(NULL == indic) {
+        return NULL;
+    }
+
     lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 
@@ -128,6 +132,10 @@ lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, const void * src,
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
+    if(NULL == indic) {
+        return NULL;
+    }
+
     lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 
@@ -147,6 +155,10 @@ lv_meter_indicator_t * lv_meter_add_arc(lv_obj_t * obj, uint16_t width, lv_color
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
+    if(NULL == indic) {
+        return NULL;
+    }
+
     lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 
@@ -166,6 +178,10 @@ lv_meter_indicator_t * lv_meter_add_scale_lines(lv_obj_t * obj, lv_color_t color
     lv_meter_t * meter = (lv_meter_t *)obj;
     lv_meter_indicator_t * indic = _lv_ll_ins_head(&meter->indicator_ll);
     LV_ASSERT_MALLOC(indic);
+    if(NULL == indic) {
+        return NULL;
+    }
+
     lv_memzero(indic, sizeof(lv_meter_indicator_t));
     indic->opa = LV_OPA_COVER;
 

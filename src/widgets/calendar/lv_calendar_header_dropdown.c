@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_calendar_header_dropdown.h"
-#if LV_USE_CALENDAR_HEADER_DROPDOWN
+#if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_DROPDOWN
 
 #include "lv_calendar.h"
 #include "../dropdown/lv_dropdown.h"

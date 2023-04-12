@@ -92,6 +92,7 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_ext_click_area(obj, LV_DPX(8));
 }
 
@@ -131,6 +132,7 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_PRESSED) {
         /*Save the pressed coordinates*/
         lv_indev_get_point(lv_indev_get_act(), &slider->pressed_point);
+        lv_obj_transform_point(obj, &slider->pressed_point, true, true);
     }
     else if(code == LV_EVENT_PRESSING) {
         update_knob_pos(obj, true);
@@ -352,6 +354,7 @@ static void drag_start(lv_obj_t * obj)
     }
     else if(mode == LV_SLIDER_MODE_RANGE) {
         lv_indev_get_point(lv_indev_get_act(), &p);
+        lv_obj_transform_point(obj, &p, true, true);
         bool hor = is_slider_horizontal(obj);
         lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
 
@@ -418,6 +421,8 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
 
     lv_point_t p;
     lv_indev_get_point(indev, &p);
+    lv_obj_transform_point(obj, &p, true, true);
+
     bool is_hor = is_slider_horizontal(obj);
 
     if(check_drag && !slider->dragging) {

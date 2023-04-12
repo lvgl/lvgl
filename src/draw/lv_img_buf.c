@@ -80,10 +80,10 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     lv_point_transform(&p[1], angle, zoom, pivot);
     lv_point_transform(&p[2], angle, zoom, pivot);
     lv_point_transform(&p[3], angle, zoom, pivot);
-    res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x) - 2;
-    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x) + 2;
-    res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y) - 2;
-    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y) + 2;
+    res->x1 = LV_MIN4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->x2 = LV_MAX4(p[0].x, p[1].x, p[2].x, p[3].x);
+    res->y1 = LV_MIN4(p[0].y, p[1].y, p[2].y, p[3].y);
+    res->y2 = LV_MAX4(p[0].y, p[1].y, p[2].y, p[3].y);
 
 #else
     LV_UNUSED(angle);

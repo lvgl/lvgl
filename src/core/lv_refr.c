@@ -150,7 +150,7 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         lv_color_t debug_color = lv_color_make(lv_rand(0, 0xFF), lv_rand(0, 0xFF), lv_rand(0, 0xFF));
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
-        draw_dsc.bg_color.full = debug_color.full;
+        draw_dsc.bg_color = debug_color;
         draw_dsc.bg_opa = LV_OPA_20;
         draw_dsc.border_width = 1;
         draw_dsc.border_opa = LV_OPA_30;
@@ -198,8 +198,8 @@ void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
 
 /**
  * Invalidate an area on display to redraw it
- * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
  * @param disp pointer to display where the area should be invalidated (NULL can be used if there is
+ * @param area_p pointer to area which should be invalidated (NULL: delete the invalidated areas)
  * only one display)
  */
 void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
@@ -249,14 +249,14 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     }
 
     /*Save the area*/
-    if(disp->inv_p < LV_INV_BUF_SIZE) {
-        lv_area_copy(&disp->inv_areas[disp->inv_p], &com_area);
-    }
-    else {   /*If no place for the area add the screen*/
+    lv_area_t * tmp_area_p = &com_area;
+    if(disp->inv_p >= LV_INV_BUF_SIZE) { /*If no place for the area add the screen*/
         disp->inv_p = 0;
-        lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
+        tmp_area_p = &scr_area;
     }
+    lv_area_copy(&disp->inv_areas[disp->inv_p], tmp_area_p);
     disp->inv_p++;
+
     if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
 }
 
@@ -303,6 +303,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         LV_LOG_WARN("No draw buffer");
         return;
     }
+
+    lv_disp_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
     volatile uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
@@ -409,58 +411,64 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
         LV_LOG_WARN("there is no active screen");
-        REFR_TRACE("finished");
-        return;
+        goto refr_finish;
     }
 
     if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT &&
        disp_refr->draw_ctx->color_format != LV_COLOR_FORMAT_NATIVE) {
         LV_LOG_WARN("In direct_mode only LV_COLOR_FORMAT_NATIVE color format is supported");
-        return;
+        goto refr_finish;
     }
 
     lv_refr_join_area();
 
     refr_invalid_areas();
 
+    if(disp_refr->inv_p == 0) goto refr_cache_clean_up;
+
     /*If refresh happened ...*/
-    if(disp_refr->inv_p != 0) {
-        /*Call monitor cb if present*/
-        lv_disp_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
+    /*Call monitor cb if present*/
+    lv_disp_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
 
-        /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-        if(lv_disp_is_double_buffered(disp_refr) && disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
-            /*We need to wait for ready here to not mess up the active screen*/
-            while(disp_refr->flushing) {
-                if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
-            }
-            /*The buffers are already swapped.
-             *So the active buffer is the off screen buffer where LVGL will render*/
-            void * buf_off_screen = disp_refr->draw_buf_act;
-            void * buf_on_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
+    if(!lv_disp_is_double_buffered(disp_refr) || disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) goto refr_clean_up;
 
-            lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
-            uint32_t i;
-            for(i = 0; i < disp_refr->inv_p; i++) {
-                if(disp_refr->inv_area_joined[i]) continue;
-                disp_refr->draw_ctx->buffer_copy(disp_refr->draw_ctx,
-                                                 buf_off_screen, stride, &disp_refr->inv_areas[i],
-                                                 buf_on_screen, stride, &disp_refr->inv_areas[i]);
-            }
-        }
+    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
+    /*We need to wait for ready here to not mess up the active screen*/
+    while(disp_refr->flushing) {
+        if(disp_refr->wait_cb) disp_refr->wait_cb(disp_refr);
+    }
+    /*The buffers are already swapped.
+     *So the active buffer is the off screen buffer where LVGL will render*/
+    void * buf_off_screen = disp_refr->draw_buf_act;
+    void * buf_on_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1
+                           ? disp_refr->draw_buf_2
+                           : disp_refr->draw_buf_1;
 
-        /*Clean up*/
-        lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
-        lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
-        disp_refr->inv_p = 0;
-
+    lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+    uint32_t i;
+    for(i = 0; i < disp_refr->inv_p; i++) {
+        if(disp_refr->inv_area_joined[i]) continue;
+        disp_refr->draw_ctx->buffer_copy(
+            disp_refr->draw_ctx,
+            buf_off_screen, stride, &disp_refr->inv_areas[i],
+            buf_on_screen, stride, &disp_refr->inv_areas[i]
+        );
     }
 
+refr_clean_up:
+    lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
+    lv_memzero(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
+    disp_refr->inv_p = 0;
+
+refr_cache_clean_up:
     _lv_font_clean_up_fmt_txt();
 
 #if LV_USE_DRAW_MASKS
     _lv_draw_mask_cleanup();
 #endif
+
+refr_finish:
+    lv_disp_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
 
     REFR_TRACE("finished");
 }

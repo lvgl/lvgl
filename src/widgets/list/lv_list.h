@@ -32,12 +32,36 @@ extern const lv_obj_class_t lv_list_btn_class;
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create a list object
+ * @param parent    pointer to an object, it will be the parent of the new list
+ * @return          pointer to the created list
+ */
 lv_obj_t * lv_list_create(lv_obj_t * parent);
 
+/**
+ * Add text to a list
+ * @param list      pointer to a list, it will be the parent of the new label
+ * @param txt       Text of the new label
+ * @return          pointer to the created label
+ */
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt);
 
+/**
+ * Add button to a list
+ * @param list      pointer to a list, it will be the parent of the new button
+ * @param icon      icon for the button, when NULL it will have no icon
+ * @param txt       Text of the new button, when NULL no text will be added
+ * @return          pointer to the created button
+ */
 lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt);
 
+/**
+ * Get text of a given list button
+ * @param list      pointer to a list
+ * @param btn       pointer to the button
+ * @return          Text of btn, if btn doesn't have text "" will be returned
+ */
 const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn);
 
 /**********************

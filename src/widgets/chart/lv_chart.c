@@ -299,17 +299,17 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
         int32_t block_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
                                                                   LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the column on ~adjacent X*/
         lv_coord_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
-        lv_coord_t col_w = block_w / ser_cnt;
+        lv_coord_t col_w = (block_w - (ser_cnt - 1) * ser_gap) / ser_cnt;
+        //        p_out->x = (int32_t)((int32_t)w * id) / chart->point_cnt;
 
-        p_out->x = (int32_t)((int32_t)w * id) / chart->point_cnt;
-
+        p_out->x = (int32_t)((int32_t)(w - block_w) * id) / (chart->point_cnt - 1);
         lv_chart_series_t * ser_i = NULL;
         _LV_LL_READ_BACK(&chart->series_ll, ser_i) {
             if(ser_i == ser) break;
-            p_out->x += col_w;
+            p_out->x += col_w + ser_gap;
         }
 
-        p_out->x += (col_w - ser_gap) / 2;
+        p_out->x += col_w / 2;
     }
     else {
         p_out->x = 0;
@@ -1591,7 +1591,14 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
     }
 
     p1.y = y_ofs;
-    uint32_t total_tick_num = (t->major_cnt - 1) * t->minor_cnt;
+    uint32_t total_tick_num;
+    if(chart->type == LV_CHART_TYPE_LINE && (((t->major_cnt - 1) * t->minor_cnt) == chart->point_cnt)) {
+        total_tick_num = chart->point_cnt - 1;
+    }
+    else {
+        total_tick_num = (t->major_cnt - 1) * t->minor_cnt;
+    }
+    if(!total_tick_num) return; /*Ensure total_tick_num is not equal to zero*/
     for(i = 0; i <= total_tick_num; i++) { /*one extra loop - it may not exist in the list, empty label*/
         bool major = false;
         if(i % t->minor_cnt == 0) major = true;

@@ -18,11 +18,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_event_dsc_t {
-    lv_event_cb_t cb;
-    void * user_data;
-    lv_event_code_t filter : 8;
-} lv_event_dsc_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -54,8 +49,8 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_event_t e;
-    e.target = obj;
     e.current_target = obj;
+    e.original_target = obj;
     e.code = event_code;
     e.user_data = NULL;
     e.param = param;
@@ -129,14 +124,14 @@ bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
     return lv_event_remove(&obj->spec_attr->event_list, index);
 }
 
-lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
-{
-    return lv_event_get_target(e);
-}
-
 lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
 {
     return lv_event_get_current_target(e);
+}
+
+lv_obj_t * lv_event_get_target_obj(lv_event_t * e)
+{
+    return lv_event_get_target(e);
 }
 
 
@@ -292,7 +287,7 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
 
 static lv_res_t event_send_core(lv_event_t * e)
 {
-    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->current_target, e->param);
+    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
@@ -302,7 +297,7 @@ static lv_res_t event_send_core(lv_event_t * e)
         if(e->deleted) return LV_RES_INV;
     }
 
-    lv_obj_t * target = e->target;
+    lv_obj_t * target = e->current_target;
     lv_res_t res = LV_RES_OK;
     lv_event_list_t * list = target->spec_attr ?  &target->spec_attr->event_list : NULL;
 

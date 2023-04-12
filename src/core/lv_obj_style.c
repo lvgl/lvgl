@@ -428,9 +428,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
     lv_anim_set_delay(&a, tr_dsc->delay);
     lv_anim_set_path_cb(&a, tr_dsc->path_cb);
     lv_anim_set_early_apply(&a, false);
-#if LV_USE_USER_DATA
-    a.user_data = tr_dsc->user_data;
-#endif
+    lv_anim_set_user_data(&a, tr_dsc->user_data);
     lv_anim_start(&a);
 }
 

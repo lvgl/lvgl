@@ -1,0 +1,85 @@
+<html>
+	<head>
+		<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no'/>
+		<style type="text/css">
+			html, body {
+			  margin: 0;
+
+			  width: 100%;
+			  height: 100%;
+			  min-width: 100%;
+			  min-height: 100%;
+			}
+
+			body {
+			  display: flex;
+			  flex-direction: column;
+			  align-items: center;
+			  justify-content: center;
+			}
+
+			.git-commit-info {
+				font-family: Consolas, 'Courier New', Courier, monospace;
+				background-color: #f1f1f1;
+				padding: 2px;
+				text-align: left;
+			}
+			#git-hash {
+				text-align: center;
+			}
+			#output {
+				margin: 0;
+				padding: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="git-hash"></div>
+		<p id="output">
+			<canvas id="canvas"></canvas>
+		</p>
+        <script src="gitrev.js"></script>
+		<script>
+			var siteURL = new URL(window.location.href);
+			var w = siteURL.searchParams.get("w") || "800";
+			var h = siteURL.searchParams.get("h") || "480";
+			var canvas = document.getElementById('canvas');
+			canvas.setAttribute("width", w);
+			canvas.setAttribute("height", h);
+			console.log("Requested " + w + "x" + h + " px");
+			var Module = {
+				print: function(text) {
+					console.log(text);
+				},
+				printErr: function(text) {
+					console.error(text);
+				},
+				canvas: (function() {
+					return canvas;
+				})(),
+				arguments: [ siteURL.searchParams.get("w") || "800", siteURL.searchParams.get("h") || "480", siteURL.searchParams.get("example") ?? "default" ]
+			};
+			if(typeof window.git_hash != 'undefined') {
+				var gitHashDiv = document.querySelector("#git-hash");
+				var gitLink = document.createElement("div");
+				var gitHashComponents = window.git_hash.split(" ").filter(component => component.trim().length > 0);
+				for(var i = 0; i < gitHashComponents.length; i++) {
+					console.log(gitHashComponents[i], gitHashComponents[i].length);
+					/* This is an extremely lazy way of checking for a Git hash, but it works */
+					if(gitHashComponents[i].length == 40) {
+						gitHashComponents[i] = `<a href="https://github.com/lvgl/${gitHashComponents[i+1]}/commit/${gitHashComponents[i]}">${gitHashComponents[i]}</a>`;
+					} else {
+						/* Repository name */
+						gitHashComponents[i] += "<br/>";
+					}
+				}
+				gitLink.classList.add("git-commit-info");
+				gitLink.innerHTML = gitHashComponents.join(" ");
+				gitHashDiv.textContent = "LVGL compiled to Emscripten. Git commit information:";
+				gitHashDiv.appendChild(gitLink);	
+			}
+                        window.addEventListener("click", () => window.focus());
+		</script>
+		{{{ SCRIPT }}}
+	</body>
+</html>

@@ -61,7 +61,7 @@
    COLOR SETTINGS
  *====================*/
 
-/*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
+/*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 24 (RGB888), 32 (ARGB8888)*/
 #ifndef LV_COLOR_DEPTH
     #ifdef CONFIG_LV_COLOR_DEPTH
         #define LV_COLOR_DEPTH CONFIG_LV_COLOR_DEPTH
@@ -100,7 +100,7 @@
         #ifdef CONFIG_LV_MEM_SIZE
             #define LV_MEM_SIZE CONFIG_LV_MEM_SIZE
         #else
-            #define LV_MEM_SIZE (128U * 1024U)          /*[bytes]*/
+            #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
         #endif
     #endif
 
@@ -902,18 +902,6 @@
         #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
     #else
         #define LV_DISP_ROT_MAX_BUF (10*1024)
-    #endif
-#endif
-
-#ifndef LV_USE_USER_DATA
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_USER_DATA
-            #define LV_USE_USER_DATA CONFIG_LV_USE_USER_DATA
-        #else
-            #define LV_USE_USER_DATA 0
-        #endif
-    #else
-        #define LV_USE_USER_DATA 1
     #endif
 #endif
 
@@ -2502,6 +2490,20 @@
             #define LV_SDL_INCLUDE_PATH CONFIG_LV_SDL_INCLUDE_PATH
         #else
             #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+        #endif
+    #endif
+    #ifndef LV_SDL_PARTIAL_MODE
+        #ifdef CONFIG_LV_SDL_PARTIAL_MODE
+            #define LV_SDL_PARTIAL_MODE CONFIG_LV_SDL_PARTIAL_MODE
+        #else
+            #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
+        #endif
+    #endif
+    #ifndef LV_SDL_FULLSCREEN
+        #ifdef CONFIG_LV_SDL_FULLSCREEN
+            #define LV_SDL_FULLSCREEN CONFIG_LV_SDL_FULLSCREEN
+        #else
+            #define LV_SDL_FULLSCREEN      0
         #endif
     #endif
 #endif

@@ -1,3 +1,5 @@
+import utime as time
+
 #
 # Create a pie chart
 #

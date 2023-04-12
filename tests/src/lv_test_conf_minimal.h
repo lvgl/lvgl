@@ -7,12 +7,14 @@
 #define  LV_USE_ASSERT_MEM_INTEGRITY    0
 #define  LV_USE_ASSERT_OBJ              0
 #define  LV_USE_ASSERT_STYLE            0
-#define  LV_USE_USER_DATA               0
 
 #define  LV_USE_BIDI                    0
 #define  LV_USE_ARABIC_PERSIAN_CHARS    0
 
 #define  LV_BUILD_EXAMPLES              1
+
+#define LV_USE_THEME_BASIC              1
+#define LV_USE_THEME_DEFAULT            0
 
 #define  LV_USE_PNG                     1
 #define  LV_USE_BMP                     1

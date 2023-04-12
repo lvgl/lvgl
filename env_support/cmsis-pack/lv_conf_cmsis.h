@@ -65,9 +65,17 @@
 #define LV_STRLEN       lv_strlen_builtin
 #define LV_STRNCPY      lv_strncpy_builtin
 
+#define LV_COLOR_EXTERN_INCLUDE <stdint.h>
+#define LV_COLOR_MIX      lv_color_mix
+#define LV_COLOR_PREMULT      lv_color_premult
+#define LV_COLOR_MIX_PREMULT      lv_color_mix_premult
+
 /*====================
    HAL SETTINGS
  *====================*/
+
+/*Default display refresh, input device read and animation step period.*/
+#define LV_DEF_REFR_PERIOD  33      /*[ms]*/
 
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
@@ -208,7 +216,7 @@
     *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
     *LV_LOG_LEVEL_USER        Only logs added by the user
     *LV_LOG_LEVEL_NONE        Do not log anything*/
-    #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
+    #define LV_LOG_LEVEL LV_LOG_LEVEL_USER
 
     /*1: Print the log with 'printf';
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
@@ -271,8 +279,6 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
-#define LV_USE_USER_DATA 1
-
 /*Garbage Collector settings
  *Used if lvgl is bound to higher level language and the memory is managed by that language*/
 #define LV_ENABLE_GC 0
@@ -317,7 +323,7 @@
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN  __attribute__((aligned(4)))
 
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
@@ -605,6 +611,7 @@
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
+/*FreeType library*/
 #if LV_USE_FREETYPE
     /*Memory used by FreeType to cache characters [bytes]*/
     #define LV_FREETYPE_CACHE_SIZE (64 * 1024)
@@ -628,7 +635,6 @@
     /* Enable loading TTF data from files */
     #define LV_TINY_TTF_FILE_SUPPORT 0
 #endif
-
 
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
@@ -668,7 +674,6 @@
 
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
-//#define LV_USE_IME_PINYIN 0
 #if LV_USE_IME_PINYIN
     /*1: Use default thesaurus*/
     /*If you do not use the default thesaurus, be sure to use `lv_ime_pinyin` after setting the thesauruss*/
@@ -686,7 +691,6 @@
 
 /*1: Enable file explorer*/
 /*Requires: lv_table*/
-//#define LV_USE_FILE_EXPLORER                     0
 #if LV_USE_FILE_EXPLORER
     /*Maximum length of path*/
     #define LV_FILE_EXPLORER_PATH_MAX_LEN        (128)
@@ -714,7 +718,7 @@
 /*Benchmark your system*/
 #if LV_USE_DEMO_BENCHMARK
     /*Use RGB565A8 images with 16 bit color depth instead of ARGB8565*/
-    #define LV_DEMO_BENCHMARK_RGB565A8 0
+    #define LV_DEMO_BENCHMARK_RGB565A8 1
 #endif
 
 /*--END OF LV_CONF_H--*/

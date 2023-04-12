@@ -1017,7 +1017,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->pad_zero, 0);
     }
-#endif
 
 #if LV_USE_CALENDAR_HEADER_ARROW
     else if(lv_obj_check_type(obj, &lv_calendar_header_arrow_class)) {
@@ -1029,6 +1028,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_calendar_header_dropdown_class)) {
         lv_obj_add_style(obj, &styles->calendar_header, 0);
     }
+#endif
 #endif
 
 #if LV_USE_KEYBOARD

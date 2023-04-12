@@ -401,7 +401,7 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
          * Set `step` accordingly*/
         else {
             const char * txt = lv_textarea_get_text(obj);
-            const size_t txt_len = strlen(txt);
+            const size_t txt_len = lv_strlen(txt);
 
             /* Check cursor position */
             /* Cursor is in '.' digit */
@@ -484,7 +484,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
 
     /*Add leading zeros*/
     int32_t i;
-    const int digits_len = (int)strlen(digits);
+    const int digits_len = (int) lv_strlen(digits);
 
     const int leading_zeros_cnt = spinbox->digit_count - digits_len;
     if(leading_zeros_cnt) {

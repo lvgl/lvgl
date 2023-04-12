@@ -18,11 +18,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct _lv_event_dsc_t {
+struct _lv_event_dsc_t {
     lv_event_cb_t cb;
     void * user_data;
     uint32_t filter;
-} lv_event_dsc_t;
+};
 
 /**********************
  *  STATIC PROTOTYPES
@@ -61,7 +61,7 @@ void _lv_event_pop(lv_event_t * e)
     event_head = e->prev;
 }
 
-lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess)
+lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess)
 {
     if(list == NULL) return LV_RES_OK;
 
@@ -69,7 +69,7 @@ lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool prerpocess)
     for(i = 0; i < list->cnt; i++) {
         if(list->dsc[i].cb == NULL) continue;
         bool is_preprocessed = (list->dsc[i].filter & LV_EVENT_PREPROCESS) != 0;
-        if(is_preprocessed != prerpocess) continue;
+        if(is_preprocessed != preprocess) continue;
         lv_event_code_t filter = list->dsc[i].filter & ~LV_EVENT_PREPROCESS;
         if(filter == LV_EVENT_ALL || filter == e->code) {
             e->user_data = list->dsc[i].user_data;
@@ -141,14 +141,14 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
     return true;
 }
 
-void * lv_event_get_target(lv_event_t * e)
-{
-    return e->target;
-}
-
 void * lv_event_get_current_target(lv_event_t * e)
 {
     return e->current_target;
+}
+
+void * lv_event_get_target(lv_event_t * e)
+{
+    return e->original_target;
 }
 
 lv_event_code_t lv_event_get_code(lv_event_t * e)
@@ -188,7 +188,7 @@ void _lv_event_mark_deleted(void * target)
     lv_event_t * e = event_head;
 
     while(e) {
-        if(e->current_target == target || e->target == target) e->deleted = 1;
+        if(e->original_target == target || e->current_target == target) e->deleted = 1;
         e = e->prev;
     }
 }

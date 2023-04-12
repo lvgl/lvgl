@@ -103,7 +103,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(lv_draw_ctx_t * draw_ctx, cons
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
 
     lv_color_t * dest_buf = draw_ctx->buf;
-    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE) {
+    if(draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE || draw_ctx->color_format == LV_COLOR_FORMAT_NATIVE_REVERSED) {
         dest_buf += dest_stride * (blend_area.y1 - draw_ctx->buf_area->y1) + (blend_area.x1 - draw_ctx->buf_area->x1);
     }
     else {
@@ -317,8 +317,9 @@ static inline void set_px_argb(uint8_t * buf, lv_color_t color, lv_opa_t opa)
     lv_color_set_int(&bg_color, buf[0] + (buf[1] << 8));
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf[2]);
     if(buf[2] <= LV_OPA_MIN) return;
-    buf[0] = (*((uint16_t *) &res_color)) & 0xff;
-    buf[1] = (*((uint16_t *) &res_color)) >> 8;
+    uint16_t res_color16 = lv_color_to_int(res_color);
+    buf[0] = res_color16 & 0xff;
+    buf[1] = res_color16 >> 8;
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     bg_color = *((lv_color_t *)buf);
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf[3]);
@@ -363,8 +364,9 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
 #if LV_COLOR_DEPTH == 8
     buf[0] = lv_color_to_int(last_res_color);
 #elif LV_COLOR_DEPTH == 16
-    buf[0] = (*((uint16_t *) &last_res_color)) & 0xff;
-    buf[1] = (*((uint16_t *) &last_res_color)) >> 8;
+    uint16_t last_res_color16 = lv_color_to_int(last_res_color);
+    buf[0] = last_res_color16 & 0xff;
+    buf[1] = last_res_color16 >> 8;
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
     buf[0] = last_res_color.blue;
     buf[1] = last_res_color.green;
@@ -842,7 +844,7 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     fg.green = LV_MIN(bg.green + fg.green, 63);
     fg.blue = LV_MIN(bg.blue + fg.blue, 31);
 #elif LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
-    fg.red = LV_MIN(bg.red + fg.red, 32551);
+    fg.red = LV_MIN(bg.red + fg.red, 255);
     fg.green = LV_MIN(bg.green + fg.green, 255);
     fg.blue = LV_MIN(bg.blue + fg.blue, 255);
 #endif

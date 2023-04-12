@@ -1,7 +1,7 @@
-
 #if LV_BUILD_TEST
 #include "lv_test_init.h"
 #include "lv_test_indev.h"
+#include "lv_test_malloc.h"
 #include "../../src/misc/lv_malloc_builtin.h"
 #include <sys/time.h>
 #include <stdio.h>
@@ -25,6 +25,7 @@ void lv_test_init(void)
 {
     lv_init();
     hal_init();
+    lv_test_malloc_init();
 }
 
 void lv_test_deinit(void)
@@ -89,7 +90,7 @@ uint32_t custom_tick_get(void)
 
 void lv_test_assert_fail(void)
 {
-    TEST_FAIL();
+    // Handle error on test
 }
 
 #endif

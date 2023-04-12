@@ -22,7 +22,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct _lv_indev_t {
+struct _lv_indev_t {
     /**< Input device type*/
     lv_indev_type_t type;
 
@@ -45,10 +45,7 @@ typedef struct _lv_indev_t {
     uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
 
     void * driver_data;
-
-#if LV_USE_USER_DATA
     void * user_data;
-#endif
 
     /**< Pointer to the assigned display*/
     struct _lv_disp_t * disp;
@@ -105,7 +102,7 @@ typedef struct _lv_indev_t {
     struct _lv_group_t * group;    /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
-} lv_indev_t;
+};
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

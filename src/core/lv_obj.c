@@ -994,9 +994,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
                 ts[tsi].delay = tr->delay;
                 ts[tsi].path_cb = tr->path_xcb;
                 ts[tsi].prop = tr->props[j];
-#if LV_USE_USER_DATA
                 ts[tsi].user_data = tr->user_data;
-#endif
                 ts[tsi].selector = obj_style->selector;
                 tsi++;
             }
@@ -1011,7 +1009,9 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     lv_free(ts);
 
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) {
-        lv_obj_invalidate(obj);
+        //        lv_obj_invalidate(obj);
+        /*Invalidation is not enough, e.g. layer type needs to be updated too*/
+        lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
     }
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
         lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);

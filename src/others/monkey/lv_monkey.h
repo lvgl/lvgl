@@ -81,8 +81,6 @@ void lv_monkey_set_enable(lv_monkey_t * monkey, bool en);
  */
 bool lv_monkey_get_enable(lv_monkey_t * monkey);
 
-#if LV_USE_USER_DATA
-
 /**
  * Set the user_data field of the monkey
  * @param monkey   pointer to a monkey
@@ -96,8 +94,6 @@ void lv_monkey_set_user_data(lv_monkey_t * monkey, void * user_data);
  * @return the pointer to the user_data of the monkey
  */
 void * lv_monkey_get_user_data(lv_monkey_t * monkey);
-
-#endif/*LV_USE_USER_DATA*/
 
 /**
  * Delete monkey
