@@ -167,11 +167,6 @@ static inline bool _lv_txt_is_break_char(uint32_t letter)
     uint8_t i;
     bool ret = false;
 
-    /* each chinese character can be break */
-    if(letter >= 0x4E00 && letter <= 0x9FA5) {
-        return true;
-    }
-
     /*Compare the letter to TXT_BREAK_CHARS*/
     for(i = 0; LV_TXT_BREAK_CHARS[i] != '\0'; i++) {
         if(letter == (uint32_t)LV_TXT_BREAK_CHARS[i]) {
@@ -181,6 +176,35 @@ static inline bool _lv_txt_is_break_char(uint32_t letter)
     }
 
     return ret;
+}
+
+
+/**
+ * Test if char is break char or not (a text can broken here or not)
+ * @param letter a letter
+ * @return false: 'letter' is not break char
+ */
+static inline bool _lv_txt_is_a_word(uint32_t letter)
+{
+    /*Cheap check on invalid letter*/
+    if(letter == 0) return false;
+
+    /*Chinese characters*/
+    if(letter >= 0x4E00 && letter <= 0x9FA5) {
+        return true;
+    }
+
+    /*Fullwidth ASCII variants*/
+    if(letter >= 0xFF01 && letter <= 0xFF5E) {
+        return true;
+    }
+
+    /*CJK symbols and punctuation*/
+    if(letter >= 0x3000 && letter <= 0x303F) {
+        return true;
+    }
+
+    return false;
 }
 
 /***************************************************************
