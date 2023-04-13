@@ -1119,7 +1119,7 @@ static void perf_monitor_event_cb(lv_event_t * e)
     lv_obj_t * monitor = lv_event_get_current_target_obj(e);
     perf_info_t * info = lv_obj_get_user_data(monitor);
     uint32_t cpu = 100 - lv_timer_get_idle();
-    uint32_t avg_time = info->elaps_sum / info->frame_cnt;
+    uint32_t avg_time = info->frame_cnt ? info->elaps_sum / info->frame_cnt : 0;
     lv_label_set_text_fmt(
         monitor,
         "%" LV_PRIu32" FPS / %" LV_PRIu32" ms\n%" LV_PRIu32 "%% CPU",
