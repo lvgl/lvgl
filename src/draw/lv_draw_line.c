@@ -42,15 +42,27 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     dsc->color = lv_color_black();
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc,
-                                        const lv_point_t * point1, const lv_point_t * point2)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc)
 {
-    //    if(dsc->width == 0) return;
-    //    if(dsc->opa <= LV_OPA_MIN) return;
-    //
-    //    layer->draw_line(layer, dsc, point1, point2);
+    lv_area_t a;
+    a.x1 = LV_MIN(dsc->p1.x, dsc->p2.x) - dsc->width;
+    a.x2 = LV_MAX(dsc->p1.x, dsc->p2.x) + dsc->width;
+    a.y1 = LV_MIN(dsc->p1.y, dsc->p2.y) - dsc->width;
+    a.y2 = LV_MAX(dsc->p1.y, dsc->p2.y) + dsc->width;
+
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a);
+
+    t->draw_dsc = lv_malloc(sizeof(*dsc));
+    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
+    t->type = LV_DRAW_TASK_TYPE_LINE;
+
+    if(dsc->obj) {
+        lv_obj_send_event(dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
+    }
+
+    lv_draw_dispatch();
 }
-//
-///**********************
-// *   STATIC FUNCTIONS
-// **********************/
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/

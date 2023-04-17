@@ -26,6 +26,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
+    lv_point_t p1;
+    lv_point_t p2;
     lv_color_t color;
     lv_coord_t width;
     lv_coord_t dash_width;
@@ -57,8 +59,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
  * @param clip the line will be drawn only in this area
  * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
  */
-void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
-                  const lv_point_t * point2);
+void lv_draw_line(struct _lv_layer_t * layer, const lv_draw_line_dsc_t * dsc);
 
 
 /**********************

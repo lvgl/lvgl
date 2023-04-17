@@ -136,13 +136,6 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
 
         if(lv_color_format_has_alpha(layer->color_format)) {
             layer->buffer_clear(layer);
-            uint32_t i;
-            uint8_t * buf8 = layer->buf;
-            for(i = 0; i < lv_area_get_size(&layer->buf_area) * 4; i++) {
-                if(buf8[3]) {
-                    printf("asd\n");
-                }
-            }
         }
     }
 
@@ -313,6 +306,9 @@ static void exectue_drawing(lv_draw_sw_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_ARC:
             lv_draw_sw_arc((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_LINE:
+            lv_draw_sw_line((lv_draw_unit_t *)u, t->draw_dsc);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
             lv_draw_sw_layer((lv_draw_unit_t *)u, t->draw_dsc, &t->area);

@@ -48,7 +48,6 @@ void lv_draw_arc(lv_layer_t * layer, const lv_draw_arc_dsc_t * dsc)
     if(dsc->width == 0) return;
     if(dsc->start_angle == dsc->end_angle) return;
 
-
     lv_area_t a;
     a.x1 = dsc->center.x - dsc->radius;
     a.y1 = dsc->center.y - dsc->radius;
