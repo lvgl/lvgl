@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../../core/lv_obj.h"
-#if LV_USE_CALENDAR_HEADER_DROPDOWN
+#if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_DROPDOWN
 
 /*********************
  *      DEFINES

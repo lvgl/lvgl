@@ -33,9 +33,7 @@
     #include "../draw/nxp/lv_gpu_nxp.h"
 #endif
 
-#if LV_USE_THEME_DEFAULT
-    #include "../themes/default/lv_theme_default.h"
-#endif
+#include "../themes/lv_themes.h"
 
 /*********************
  *      DEFINES

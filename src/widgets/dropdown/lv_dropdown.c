@@ -130,7 +130,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 
     /*Allocate space for the new text*/
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    size_t len = strlen(options) + 1;
+    size_t len = lv_strlen(options) + 1;
 #else
     size_t len = _lv_txt_ap_calc_bytes_cnt(options) + 1;
 #endif
@@ -146,7 +146,7 @@ void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
     if(dropdown->options == NULL) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    strcpy(dropdown->options, options);
+    lv_strncpy(dropdown->options, options, len);
 #else
     _lv_txt_ap_proc(options, dropdown->options);
 #endif
@@ -197,20 +197,20 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     /*Convert static options to dynamic*/
     if(dropdown->static_txt != 0) {
         char * static_options = dropdown->options;
-        size_t len = strlen(static_options) + 1;
+        size_t len = lv_strlen(static_options) + 1;
 
         dropdown->options = lv_malloc(len);
         LV_ASSERT_MALLOC(dropdown->options);
         if(dropdown->options == NULL) return;
 
-        strcpy(dropdown->options, static_options);
+        lv_strncpy(dropdown->options, static_options, len);
         dropdown->static_txt = 0;
     }
 
     /*Allocate space for the new option*/
-    size_t old_len = (dropdown->options == NULL) ? 0 : strlen(dropdown->options);
+    size_t old_len = (dropdown->options == NULL) ? 0 : lv_strlen(dropdown->options);
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    size_t ins_len = strlen(option) + 1;
+    size_t ins_len = lv_strlen(option) + 1;
 #else
     size_t ins_len = _lv_txt_ap_calc_bytes_cnt(option) + 1;
 #endif
@@ -243,7 +243,7 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     LV_ASSERT_MALLOC(ins_buf);
     if(ins_buf == NULL) return;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    strcpy(ins_buf, option);
+    lv_strncpy(ins_buf, option, new_len + 1);
 #else
     _lv_txt_ap_proc(option, ins_buf);
 #endif
@@ -375,7 +375,7 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     size_t txt_len;
 
     if(dropdown->options)  {
-        txt_len     = strlen(dropdown->options);
+        txt_len     = lv_strlen(dropdown->options);
     }
     else {
         buf[0] = '\0';
@@ -408,7 +408,7 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
     while(start[0] != '\0') {
         for(char_i = 0; (start[char_i] != '\n') && (start[char_i] != '\0'); char_i++);
 
-        if(memcmp(start, option, LV_MIN(strlen(option), char_i)) == 0) return opt_i;
+        if(memcmp(start, option, LV_MIN(lv_strlen(option), char_i)) == 0) return opt_i;
         start = &start[char_i];
         if(start[0] == '\n') start++;
         opt_i++;
