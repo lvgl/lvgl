@@ -162,18 +162,6 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
     }
 }
 
-lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e)
-{
-    if(e->code == LV_EVENT_DRAW_PART_BEGIN ||
-       e->code == LV_EVENT_DRAW_PART_END) {
-        return lv_event_get_param(e);
-    }
-    else {
-        LV_LOG_WARN("Not interpreted with this event code");
-        return NULL;
-    }
-}
-
 lv_layer_t * lv_event_get_layer(lv_event_t * e)
 {
     if(e->code == LV_EVENT_DRAW_MAIN ||
@@ -347,8 +335,7 @@ static bool event_is_bubbled(lv_event_t * e)
         case LV_EVENT_DRAW_POST_BEGIN:
         case LV_EVENT_DRAW_POST:
         case LV_EVENT_DRAW_POST_END:
-        case LV_EVENT_DRAW_PART_BEGIN:
-        case LV_EVENT_DRAW_PART_END:
+        case LV_EVENT_DRAW_TASK_ADDED:
         case LV_EVENT_REFRESH:
         case LV_EVENT_DELETE:
         case LV_EVENT_CHILD_CREATED:

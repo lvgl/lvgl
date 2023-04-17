@@ -684,16 +684,8 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     const size_t txt_ap_size = 256 ;
-    char * txt_ap = lv_malloc(txt_ap_size);
+    char txt_ap[txt_ap_size];
 #endif
-
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, layer);
-    part_draw_dsc.part = LV_PART_ITEMS;
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_BTNMATRIX_DRAW_PART_BTN;
-    part_draw_dsc.rect_dsc = &draw_rect_dsc_act;
-    part_draw_dsc.label_dsc = &draw_label_dsc_act;
 
     for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
         /*Search the next valid text in the map*/
@@ -744,11 +736,6 @@ static void draw_main(lv_event_t * e)
         if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
         else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
 
-
-        part_draw_dsc.draw_area = &btn_area;
-        part_draw_dsc.id = btn_i;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
             draw_rect_dsc_act.border_side = LV_BORDER_SIDE_FULL;
@@ -798,15 +785,12 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Draw the text*/
-        lv_draw_label(layer, &draw_label_dsc_act, &btn_area, txt, NULL);
-
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        draw_label_dsc_act.text = txt;
+        draw_label_dsc_act.text_local = true;
+        lv_draw_label(layer, &draw_label_dsc_act, &btn_area);
     }
 
     obj->skip_trans = 0;
-#if LV_USE_ARABIC_PERSIAN_CHARS
-    lv_free(txt_ap);
-#endif
 }
 /**
  * Create the required number of buttons and control bytes according to a map

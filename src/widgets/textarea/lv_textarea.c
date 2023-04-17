@@ -1301,7 +1301,8 @@ static void draw_placeholder(lv_event_t * e)
         lv_area_t ph_coords;
         lv_area_copy(&ph_coords, &obj->coords);
         lv_area_move(&ph_coords, left + border_width, top + border_width);
-        lv_draw_label(layer, &ph_dsc, &ph_coords, ta->placeholder_txt, NULL);
+        ph_dsc.text = ta->placeholder_txt;
+        lv_draw_label(layer, &ph_dsc, &ph_coords);
     }
 }
 
@@ -1347,7 +1348,9 @@ static void draw_cursor(lv_event_t * e)
     lv_draw_label_dsc_init(&cur_label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
     if(cur_dsc.bg_opa > LV_OPA_MIN || !lv_color_eq(cur_label_dsc.color, label_color)) {
-        lv_draw_label(layer, &cur_label_dsc, &cur_area, letter_buf, NULL);
+        cur_label_dsc.text = letter_buf;
+        cur_label_dsc.text_local = true;
+        lv_draw_label(layer, &cur_label_dsc, &cur_area);
     }
 }
 

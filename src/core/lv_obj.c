@@ -604,15 +604,6 @@ static void lv_obj_draw(lv_event_t * e)
         coords.y1 -= h;
         coords.y2 += h;
 
-        lv_obj_draw_part_dsc_t part_dsc;
-        lv_obj_draw_dsc_init(&part_dsc, layer);
-        part_dsc.class_p = MY_CLASS;
-        part_dsc.type = LV_OBJ_DRAW_PART_RECTANGLE;
-        part_dsc.rect_dsc = &draw_dsc;
-        part_dsc.draw_area = &coords;
-        part_dsc.part = LV_PART_MAIN;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-
 #if LV_USE_DRAW_MASKS
         /*With clip corner enabled draw the bg img separately to make it clipped*/
         bool clip_corner = (lv_obj_get_style_clip_corner(obj, LV_PART_MAIN) && draw_dsc.radius != 0) ? true : false;
@@ -622,6 +613,7 @@ static void lv_obj_draw(lv_event_t * e)
         }
 #endif
 
+        draw_dsc.part = LV_OBJ_DRAW_PART_RECTANGLE;
         lv_draw_rect(layer, &draw_dsc, &coords);
 
 
@@ -643,7 +635,6 @@ static void lv_obj_draw(lv_event_t * e)
 
         }
 #endif
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_layer_t * layer = lv_event_get_layer(e);
@@ -678,17 +669,8 @@ static void lv_obj_draw(lv_event_t * e)
             coords.y1 -= h;
             coords.y2 += h;
 
-            lv_obj_draw_part_dsc_t part_dsc;
-            lv_obj_draw_dsc_init(&part_dsc, layer);
-            part_dsc.class_p = MY_CLASS;
-            part_dsc.type = LV_OBJ_DRAW_PART_BORDER_POST;
-            part_dsc.rect_dsc = &draw_dsc;
-            part_dsc.draw_area = &coords;
-            part_dsc.part = LV_PART_MAIN;
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-
+            draw_dsc.part = LV_OBJ_DRAW_PART_BORDER_POST;
             lv_draw_rect(layer, &draw_dsc, &coords);
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
         }
     }
 }
@@ -706,25 +688,15 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
     lv_res_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
     if(sb_res != LV_RES_OK) return;
 
-    lv_obj_draw_part_dsc_t part_dsc;
-    lv_obj_draw_dsc_init(&part_dsc, layer);
-    part_dsc.class_p = MY_CLASS;
-    part_dsc.type = LV_OBJ_DRAW_PART_SCROLLBAR;
-    part_dsc.rect_dsc = &draw_dsc;
-    part_dsc.part = LV_PART_SCROLLBAR;
-
     if(lv_area_get_size(&hor_area) > 0) {
-        part_dsc.draw_area = &hor_area;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
+        draw_dsc.part = LV_OBJ_DRAW_PART_SCROLLBAR;
+        draw_dsc.id1 = 0;
         lv_draw_rect(layer, &draw_dsc, &hor_area);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
     if(lv_area_get_size(&ver_area) > 0) {
-        part_dsc.draw_area = &ver_area;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-        part_dsc.draw_area = &ver_area;
+        draw_dsc.part = LV_OBJ_DRAW_PART_SCROLLBAR;
+        draw_dsc.id1 = 1;
         lv_draw_rect(layer, &draw_dsc, &ver_area);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
     }
 }
 

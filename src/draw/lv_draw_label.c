@@ -81,6 +81,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_LABEL;
 
+    /*The text is stored in a local variable so malloc memory for it*/
+    if(dsc->text_local) {
+        lv_draw_label_dsc_t * new_dsc = t->draw_dsc;
+        new_dsc->text = lv_malloc(lv_strlen(new_dsc->text) + 1);
+        strcpy(new_dsc->text, dsc->text);
+    }
+
+
     lv_draw_dispatch();
 }
 

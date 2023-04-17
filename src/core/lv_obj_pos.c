@@ -155,11 +155,6 @@ bool lv_obj_refr_size(lv_obj_t * obj)
         h = lv_clamp_height(h, minh, maxh, parent_h);
     }
 
-    /*calc_auto_size set the scroll x/y to 0 so revert the original value*/
-    if(w_is_content || h_is_content) {
-        lv_obj_scroll_to(obj, sl_ori, st_ori, LV_ANIM_OFF);
-    }
-
     /*Do nothing if the size is not changed*/
     /*It is very important else recursive resizing can occur without size change*/
     if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) return false;
@@ -970,7 +965,8 @@ lv_coord_t lv_clamp_height(lv_coord_t height, lv_coord_t min_height, lv_coord_t 
 
 static lv_coord_t calc_content_width(lv_obj_t * obj)
 {
-    lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+    lv_coord_t scroll_x_tmp = lv_obj_get_scroll_x(obj);
+    if(obj->spec_attr) obj->spec_attr->scroll.x = 0;
 
     lv_coord_t space_right = lv_obj_get_style_space_right(obj, LV_PART_MAIN);
     lv_coord_t space_left = lv_obj_get_style_space_left(obj, LV_PART_MAIN);
@@ -1056,13 +1052,16 @@ static lv_coord_t calc_content_width(lv_obj_t * obj)
         }
     }
 
+    if(obj->spec_attr) obj->spec_attr->scroll.x = scroll_x_tmp;
+
     if(child_res == LV_COORD_MIN) return self_w;
     return LV_MAX(child_res, self_w);
 }
 
 static lv_coord_t calc_content_height(lv_obj_t * obj)
 {
-    lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+    lv_coord_t scroll_y_tmp = lv_obj_get_scroll_y(obj);
+    if(obj->spec_attr) obj->spec_attr->scroll.y = 0;
 
     lv_coord_t space_top = lv_obj_get_style_space_top(obj, LV_PART_MAIN);
     lv_coord_t space_bottom = lv_obj_get_style_space_bottom(obj, LV_PART_MAIN);
@@ -1104,6 +1103,8 @@ static lv_coord_t calc_content_height(lv_obj_t * obj)
 
         child_res = LV_MAX(child_res, child_res_tmp + lv_obj_get_style_margin_bottom(child, LV_PART_MAIN));
     }
+
+    if(obj->spec_attr) obj->spec_attr->scroll.y = scroll_y_tmp;
 
     if(child_res == LV_COORD_MIN) return self_h;
     return LV_MAX(self_h, child_res + space_bottom);

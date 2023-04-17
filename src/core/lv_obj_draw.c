@@ -343,18 +343,6 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
     return s;
 }
 
-void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_layer_t * layer)
-{
-    lv_memzero(dsc, sizeof(lv_obj_draw_part_dsc_t));
-    dsc->layer = layer;
-}
-
-bool lv_obj_draw_part_check_type(lv_obj_draw_part_dsc_t * dsc, const lv_obj_class_t * class_p, uint32_t type)
-{
-    if(dsc->class_p == class_p && dsc->type == type) return true;
-    else return false;
-}
-
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

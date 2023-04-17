@@ -237,17 +237,8 @@ static void lv_checkbox_draw(lv_event_t * e)
     marker_area_transf.y1 -= transf_h;
     marker_area_transf.y2 += transf_h;
 
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, layer);
-    part_draw_dsc.rect_dsc = &indic_dsc;
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_CHECKBOX_DRAW_PART_BOX;
-    part_draw_dsc.draw_area = &marker_area_transf;
-    part_draw_dsc.part = LV_PART_INDICATOR;
-
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+    indic_dsc.part = LV_CHECKBOX_DRAW_PART_BOX;
     lv_draw_rect(layer, &indic_dsc, &marker_area_transf);
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
@@ -258,6 +249,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_draw_label_dsc_t txt_dsc;
     lv_draw_label_dsc_init(&txt_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &txt_dsc);
+    txt_dsc.text = cb->txt;
 
     lv_coord_t y_ofs = (lv_area_get_height(&marker_area) - font_h) / 2;
     lv_area_t txt_area;
@@ -266,6 +258,6 @@ static void lv_checkbox_draw(lv_event_t * e)
     txt_area.y1 = obj->coords.y1 + bg_topp + y_ofs;
     txt_area.y2 = txt_area.y1 + txt_size.y;
 
-    lv_draw_label(layer, &txt_dsc, &txt_area, cb->txt, NULL);
+    lv_draw_label(layer, &txt_dsc, &txt_area);
 }
 #endif

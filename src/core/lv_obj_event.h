@@ -111,13 +111,6 @@ bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
 lv_indev_t * lv_event_get_indev(lv_event_t * e);
 
 /**
- * Get the part draw descriptor passed as parameter to `LV_EVENT_DRAW_PART_BEGIN/END`.
- * @param e     pointer to an event
- * @return      the part draw descriptor to hook the drawing or NULL if called on an unrelated event
- */
-lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e);
-
-/**
  * Get the draw context which should be the first parameter of the draw functions.
  * Namely: `LV_EVENT_DRAW_MAIN/POST`, `LV_EVENT_DRAW_MAIN/POST_BEGIN`, `LV_EVENT_DRAW_MAIN/POST_END`
  * @param e     pointer to an event

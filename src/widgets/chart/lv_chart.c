@@ -779,11 +779,11 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
     lv_chart_t * chart  = (lv_chart_t *)obj;
 
     lv_area_t series_clip_area;
-    bool mask_ret = _lv_area_intersect(&series_clip_area, &obj->coords, layer->clip_area);
+    bool mask_ret = _lv_area_intersect(&series_clip_area, &obj->coords, &layer->clip_area);
     if(mask_ret == false) return;
 
-    const lv_area_t * clip_area_ori = layer->clip_area;
-    layer->clip_area = &series_clip_area;
+    const lv_area_t clip_area_ori = layer->clip_area;
+    layer->clip_area = series_clip_area;
 
     int16_t i;
     int16_t i_start;
@@ -799,17 +799,6 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
-
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, layer);
-    part_draw_dsc.part = LV_PART_MAIN;
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_CHART_DRAW_PART_DIV_LINE_INIT;
-    part_draw_dsc.line_dsc = &line_dsc;
-    part_draw_dsc.id = 0xFFFFFFFF;
-    part_draw_dsc.p1 = NULL;
-    part_draw_dsc.p2 = NULL;
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
     lv_opa_t border_opa = lv_obj_get_style_border_opa(obj, LV_PART_MAIN);
     lv_coord_t border_w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
@@ -829,20 +818,14 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
             if((border_side & LV_BORDER_SIDE_BOTTOM) && (lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) == 0)) i_end--;
         }
 
+        line_dsc.part = LV_CHART_DRAW_PART_DIV_LINE_HOR;
+
         for(i = i_start; i < i_end; i++) {
             p1.y = (int32_t)((int32_t)h * i) / (chart->hdiv_cnt - 1);
             p1.y += y_ofs;
             p2.y = p1.y;
 
-            part_draw_dsc.class_p = MY_CLASS;
-            part_draw_dsc.type = LV_CHART_DRAW_PART_DIV_LINE_HOR;
-            part_draw_dsc.p1 = &p1;
-            part_draw_dsc.p2 = &p2;
-            part_draw_dsc.id = i;
-
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(layer, &line_dsc, &p1, &p2);
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
     }
 
@@ -857,27 +840,16 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
             if((border_side & LV_BORDER_SIDE_RIGHT) && (lv_obj_get_style_pad_right(obj, LV_PART_MAIN) == 0)) i_end--;
         }
 
+        line_dsc.part = LV_CHART_DRAW_PART_DIV_LINE_VER;
+
         for(i = i_start; i < i_end; i++) {
             p1.x = (int32_t)((int32_t)w * i) / (chart->vdiv_cnt - 1);
             p1.x += x_ofs;
             p2.x = p1.x;
 
-            part_draw_dsc.class_p = MY_CLASS;
-            part_draw_dsc.type = LV_CHART_DRAW_PART_DIV_LINE_VER;
-            part_draw_dsc.p1 = &p1;
-            part_draw_dsc.p2 = &p2;
-            part_draw_dsc.id = i;
-
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_line(layer, &line_dsc, &p1, &p2);
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
     }
-
-    part_draw_dsc.id = 0xFFFFFFFF;
-    part_draw_dsc.p1 = NULL;
-    part_draw_dsc.p2 = NULL;
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
     layer->clip_area = clip_area_ori;
 }

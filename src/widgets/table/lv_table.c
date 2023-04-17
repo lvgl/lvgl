@@ -580,10 +580,10 @@ static void draw_main(lv_event_t * e)
     lv_table_t * table = (lv_table_t *)obj;
     lv_layer_t * layer = lv_event_get_layer(e);
     lv_area_t clip_area;
-    if(!_lv_area_intersect(&clip_area, &obj->coords, layer->clip_area)) return;
+    if(!_lv_area_intersect(&clip_area, &obj->coords, &layer->clip_area)) return;
 
-    const lv_area_t * clip_area_ori = layer->clip_area;
-    layer->clip_area = &clip_area;
+    const lv_area_t clip_area_ori = layer->clip_area;
+    layer->clip_area = clip_area;
 
     lv_point_t txt_size;
     lv_area_t cell_area;
@@ -620,14 +620,6 @@ static void draw_main(lv_event_t * e)
     bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     /*Handle custom drawer*/
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, layer);
-    part_draw_dsc.part = LV_PART_ITEMS;
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_TABLE_DRAW_PART_CELL;
-    part_draw_dsc.rect_dsc = &rect_dsc_act;
-    part_draw_dsc.label_dsc = &label_dsc_act;
-
     for(row = 0; row < table->row_cnt; row++) {
         lv_coord_t h_row = table->row_h[row];
 
@@ -718,9 +710,13 @@ static void draw_main(lv_event_t * e)
                 obj->skip_trans = 0;
             }
 
-            part_draw_dsc.draw_area = &cell_area_border;
-            part_draw_dsc.id = row * table->col_cnt + col;
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+
+            rect_dsc_act.id2 = row;
+            rect_dsc_act.id1 = col;
+            rect_dsc_def.part = LV_TABLE_DRAW_PART_CELL;
+            label_dsc_act.id1 = row;
+            label_dsc_act.id2 = col;
+            label_dsc_def.part = LV_TABLE_DRAW_PART_CELL;
 
             lv_draw_rect(layer, &rect_dsc_act, &cell_area_border);
 
@@ -755,13 +751,12 @@ static void draw_main(lv_event_t * e)
                 bool label_mask_ok;
                 label_mask_ok = _lv_area_intersect(&label_clip_area, &clip_area, &cell_area);
                 if(label_mask_ok) {
-                    layer->clip_area = &label_clip_area;
-                    lv_draw_label(layer, &label_dsc_act, &txt_area, table->cell_data[cell] + 1, NULL);
-                    layer->clip_area = &clip_area;
+                    layer->clip_area = label_clip_area;
+                    label_dsc_act.text = table->cell_data[cell] + 1;
+                    lv_draw_label(layer, &label_dsc_act, &txt_area);
+                    layer->clip_area = clip_area;
                 }
             }
-
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 
             cell += col_merge + 1;
             col += col_merge;

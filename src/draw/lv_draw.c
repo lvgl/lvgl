@@ -113,6 +113,13 @@ void lv_draw_dispatch(void)
                     disp->layer_deinit(disp, layer_drawn);
                     lv_free(layer_drawn);
                 }
+                if(t->type == LV_DRAW_TASK_TYPE_LABEL) {
+                    lv_draw_label_dsc_t * draw_label_dsc = t->draw_dsc;
+                    if(draw_label_dsc->text_local) {
+                        lv_free(draw_label_dsc->text);
+                        draw_label_dsc->text = NULL;
+                    }
+                }
 
                 lv_free(t->draw_dsc);
                 lv_free(t);

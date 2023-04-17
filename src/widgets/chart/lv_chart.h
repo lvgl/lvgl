@@ -125,7 +125,6 @@ extern const lv_obj_class_t lv_chart_class;
  * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
  */
 typedef enum {
-    LV_CHART_DRAW_PART_DIV_LINE_INIT,    /**< Used before/after drawn the div lines*/
     LV_CHART_DRAW_PART_DIV_LINE_HOR,     /**< Used for each horizontal division lines*/
     LV_CHART_DRAW_PART_DIV_LINE_VER,     /**< Used for each vertical division lines*/
     LV_CHART_DRAW_PART_LINE_AND_POINT,   /**< Used on line and scatter charts for lines and points*/

@@ -36,6 +36,10 @@ typedef struct {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode  : 2;
     uint8_t rounded : 1;
+    void * class_p;
+    uint32_t part;
+    uint32_t id1;
+    uint32_t id2;
 } lv_draw_arc_dsc_t;
 
 struct _lv_layer_t;

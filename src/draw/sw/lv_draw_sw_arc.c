@@ -63,18 +63,13 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         cir_dsc.bg_img_opa = dsc->opa;
     }
     else {
-        cir_dsc.bg_opa = dsc->opa;
-        cir_dsc.bg_color = dsc->color;
+        cir_dsc.bg_opa = LV_OPA_TRANSP;
+        cir_dsc.border_opa = dsc->opa;
+        cir_dsc.border_color = dsc->color;
+        cir_dsc.border_width = dsc->width;
     }
 
     lv_area_t area_out = *coords;
-
-    lv_area_t area_in;
-    lv_area_copy(&area_in, &area_out);
-    area_in.x1 += dsc->width;
-    area_in.y1 += dsc->width;
-    area_in.x2 -= dsc->width;
-    area_in.y2 -= dsc->width;
 
     /*Draw a full ring*/
     if(dsc->start_angle + 360 == dsc->end_angle || dsc->start_angle == dsc->end_angle + 360) {
@@ -83,6 +78,12 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         return;
     }
 
+    lv_area_t area_in;
+    lv_area_copy(&area_in, &area_out);
+    area_in.x1 += dsc->width;
+    area_in.y1 += dsc->width;
+    area_in.x2 -= dsc->width;
+    area_in.y2 -= dsc->width;
 
     int32_t start_angle = dsc->start_angle;
     int32_t end_angle = dsc->end_angle;

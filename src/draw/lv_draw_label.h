@@ -65,7 +65,12 @@ typedef struct {
     lv_text_flag_t flag;
     lv_text_decor_t decor : 3;
     lv_blend_mode_t blend_mode: 3;
+    uint8_t text_local  : 1;
     lv_draw_label_hint_t * hint;
+
+    uint32_t part;
+    uint32_t id1;
+    uint32_t id2;
 } lv_draw_label_dsc_t;
 
 typedef enum {
