@@ -651,7 +651,6 @@ static void lv_arc_draw(lv_event_t * e)
         arc_dsc.center = center;
         arc_dsc.start_angle = arc->bg_angle_start + arc->rotation;
         arc_dsc.end_angle = arc->bg_angle_end + arc->rotation;
-        arc_dsc.part = LV_ARC_DRAW_PART_BACKGROUND;
         arc_dsc.radius = arc_r;
         lv_draw_arc(layer, &arc_dsc);
     }
@@ -671,7 +670,6 @@ static void lv_arc_draw(lv_event_t * e)
         arc_dsc.end_angle = arc->indic_angle_end + arc->rotation;
 
         arc_dsc.radius = indic_r;
-        arc_dsc.part = LV_ARC_DRAW_PART_FOREGROUND;
 
         lv_draw_arc(layer, &arc_dsc);
     }
@@ -682,7 +680,6 @@ static void lv_arc_draw(lv_event_t * e)
     lv_draw_rect_dsc_t knob_rect_dsc;
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
-    knob_rect_dsc.part = LV_ARC_DRAW_PART_KNOB;
     lv_draw_rect(layer, &knob_rect_dsc, &knob_area);
 }
 

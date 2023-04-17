@@ -237,7 +237,6 @@ static void lv_checkbox_draw(lv_event_t * e)
     marker_area_transf.y1 -= transf_h;
     marker_area_transf.y2 += transf_h;
 
-    indic_dsc.part = LV_CHECKBOX_DRAW_PART_BOX;
     lv_draw_rect(layer, &indic_dsc, &marker_area_transf);
 
     lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);

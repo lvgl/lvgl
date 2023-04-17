@@ -613,7 +613,6 @@ static void lv_obj_draw(lv_event_t * e)
         }
 #endif
 
-        draw_dsc.part = LV_OBJ_DRAW_PART_RECTANGLE;
         lv_draw_rect(layer, &draw_dsc, &coords);
 
 
@@ -669,7 +668,6 @@ static void lv_obj_draw(lv_event_t * e)
             coords.y1 -= h;
             coords.y2 += h;
 
-            draw_dsc.part = LV_OBJ_DRAW_PART_BORDER_POST;
             lv_draw_rect(layer, &draw_dsc, &coords);
         }
     }
@@ -689,12 +687,10 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
     if(sb_res != LV_RES_OK) return;
 
     if(lv_area_get_size(&hor_area) > 0) {
-        draw_dsc.part = LV_OBJ_DRAW_PART_SCROLLBAR;
         draw_dsc.id1 = 0;
         lv_draw_rect(layer, &draw_dsc, &hor_area);
     }
     if(lv_area_get_size(&ver_area) > 0) {
-        draw_dsc.part = LV_OBJ_DRAW_PART_SCROLLBAR;
         draw_dsc.id1 = 1;
         lv_draw_rect(layer, &draw_dsc, &ver_area);
     }

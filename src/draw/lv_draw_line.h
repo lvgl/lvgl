@@ -35,6 +35,11 @@ typedef struct {
     uint8_t round_start : 1;
     uint8_t round_end   : 1;
     uint8_t raw_end     : 1;    /*Do not bother with perpendicular line ending if it's not visible for any reason*/
+
+    struct _lv_obj_t * obj;
+    uint32_t part;
+    uint32_t id1;
+    uint32_t id2;
 } lv_draw_line_dsc_t;
 
 struct _lv_layer_t;

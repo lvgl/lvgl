@@ -713,10 +713,8 @@ static void draw_main(lv_event_t * e)
 
             rect_dsc_act.id2 = row;
             rect_dsc_act.id1 = col;
-            rect_dsc_def.part = LV_TABLE_DRAW_PART_CELL;
             label_dsc_act.id1 = row;
             label_dsc_act.id2 = col;
-            label_dsc_def.part = LV_TABLE_DRAW_PART_CELL;
 
             lv_draw_rect(layer, &rect_dsc_act, &cell_area_border);
 

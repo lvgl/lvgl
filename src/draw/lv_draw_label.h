@@ -68,6 +68,7 @@ typedef struct {
     uint8_t text_local  : 1;
     lv_draw_label_hint_t * hint;
 
+    struct _lv_obj_t * obj;
     uint32_t part;
     uint32_t id1;
     uint32_t id2;
@@ -123,6 +124,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label_dsc_t * dsc,
                                          const lv_area_t * coords);
+
+LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
+                                          const lv_point_t * point, uint32_t unicode_letter);
 
 /***********************
  * GLOBAL VARIABLES

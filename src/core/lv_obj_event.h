@@ -26,6 +26,7 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
+struct _lv_obj_class_t;
 
 /**
  * Used as the event parameter of ::LV_EVENT_HIT_TEST to check if an `point` can click the object or not.
@@ -38,6 +39,14 @@ typedef struct {
     const lv_point_t * point;   /**< A point relative to screen to check if it can click the object or not*/
     bool res;                   /**< true: `point` can click the object; false: it cannot*/
 } lv_hit_test_info_t;
+
+
+/** Cover check results.*/
+typedef enum {
+    LV_COVER_RES_COVER      = 0,
+    LV_COVER_RES_NOT_COVER  = 1,
+    LV_COVER_RES_MASKED     = 2,
+} lv_cover_res_t;
 
 /**
  * Used as the event parameter of ::LV_EVENT_COVER_CHECK to check if an area is covered by the object or not.
@@ -68,7 +77,7 @@ lv_res_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, v
  * @param e         pointer to the event descriptor
  * @return          LV_RES_OK: the target object was not deleted in the event; LV_RES_INV: it was deleted in the event_code
  */
-lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
+lv_res_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * e);
 
 /**
  * Get the current target of the event. It's the object which event handler being called.

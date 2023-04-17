@@ -9,6 +9,7 @@
 #include "lv_draw.h"
 #include "lv_draw_rect.h"
 #include "../misc/lv_assert.h"
+#include "../core/lv_obj_event.h"
 
 /*********************
  *      DEFINES
@@ -73,6 +74,10 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_RECTANGLE;
+
+    if(dsc->obj) {
+        lv_obj_send_event(dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
+    }
 
     lv_draw_dispatch();
 }

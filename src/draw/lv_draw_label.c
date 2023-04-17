@@ -9,8 +9,7 @@
 #include "lv_draw.h"
 #include "lv_draw_label.h"
 #include "../misc/lv_math.h"
-#include "../core/lv_disp.h"
-#include "../core/lv_refr.h"
+#include "../core/lv_obj_event.h"
 #include "../misc/lv_bidi.h"
 #include "../misc/lv_assert.h"
 
@@ -88,9 +87,46 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
         strcpy(new_dsc->text, dsc->text);
     }
 
+    if(dsc->obj) {
+        lv_obj_send_event(dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
+    }
 
     lv_draw_dispatch();
 }
+
+
+
+LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_t * dsc,
+                                          const lv_point_t * point, uint32_t unicode_letter)
+{
+    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->font == NULL) {
+        LV_LOG_WARN("dsc->font == NULL");
+        return;
+    }
+
+
+    lv_font_glyph_dsc_t g;
+    lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
+
+    lv_area_t a;
+    a.x1 = point->x;
+    a.y1 = point->y;
+    a.x2 = a.x1 + g.adv_w;
+    a.y2 = a.y1 + lv_font_get_line_height(g.resolved_font);
+
+    const char * letter_buf = (char *)&unicode_letter;
+
+#if LV_BIG_ENDIAN_SYSTEM
+    if(c != 0) while(*letter_buf == 0) ++letter_buf;
+#endif
+
+    dsc->text = letter_buf;
+    dsc->text_local = 1;
+
+    lv_draw_label(layer, dsc, &a);
+}
+
 
 void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_dsc_t * dsc, const lv_area_t * coords,
                                     lv_draw_letter_cb_t cb)

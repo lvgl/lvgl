@@ -178,7 +178,6 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &rect_dsc);
-        rect_dsc.part = LV_LED_DRAW_PART_RECTANGLE;
 
         /*Use the original colors brightness to modify color->led*/
         rect_dsc.bg_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_color));

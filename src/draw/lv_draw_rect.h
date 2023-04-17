@@ -67,7 +67,7 @@ typedef struct {
     lv_coord_t shadow_spread;
     lv_opa_t shadow_opa;
 
-
+    struct _lv_obj_t * obj;
     uint32_t part;
     uint32_t id1;
     uint32_t id2;

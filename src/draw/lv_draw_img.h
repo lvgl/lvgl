@@ -54,6 +54,11 @@ typedef struct _lv_draw_img_dsc_t {
     int32_t frame_id;
     uint16_t antialias      : 1;
     lv_draw_img_sup_t * sup;
+
+    struct _lv_obj_t * obj;
+    uint32_t part;
+    uint32_t id1;
+    uint32_t id2;
 } lv_draw_img_dsc_t;
 
 struct _lv_layer_t;
