@@ -15,6 +15,7 @@ if(LV_MICROPYTHON)
 else()
   if(CONFIG_LV_BUILD_EXAMPLES)
     file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
+    set_source_files_properties(${EXAMPLE_SOURCES} COMPILE_FLAGS "-Wno-unused-variable -Wno-format")
   endif()
 
   if(CONFIG_LV_USE_DEMO_WIDGETS)
@@ -36,6 +37,7 @@ else()
   if(CONFIG_LV_USE_DEMO_MUSIC)
     file(GLOB_RECURSE DEMO_MUSIC_SOURCES ${LVGL_ROOT_DIR}/demos/music/*.c)
     list(APPEND DEMO_SOURCES ${DEMO_MUSIC_SOURCES})
+    set_source_files_properties(${DEMO_MUSIC_SOURCES} COMPILE_FLAGS "-Wno-format")
   endif()
 
   idf_component_register(SRCS ${SOURCES} ${EXAMPLE_SOURCES} ${DEMO_SOURCES}
