@@ -195,6 +195,11 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page)
 
     lv_menu_t * menu = (lv_menu_t *)obj;
 
+    /* Guard against setting the same page again */
+    if(menu->main_page == page) {
+        return;
+    }
+
     /* Hide previous page */
     if(menu->main_page != NULL) {
         lv_obj_set_parent(menu->main_page, menu->storage);
