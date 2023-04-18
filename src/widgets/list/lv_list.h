@@ -71,7 +71,7 @@ const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn);
  * @param txt       pointer to the text
  * @return          Text of btn, if btn doesn't have text "" will be returned
  */
-static void lv_list_set_btn_text(lv_obj_t * list, lv_obj_t * btn, const char* txt);
+void lv_list_set_btn_text(lv_obj_t * list, lv_obj_t * btn, const char * txt);
 
 /**********************
  *      MACROS
