@@ -971,8 +971,8 @@ static void copy_cell_txt(char * dst, const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
     _lv_txt_ap_proc(txt, &dst[1]);
 #else
-    size_t len = lv_strlen(txt);
-    lv_strncpy(&dst[1], txt, len);
+    size_t len = lv_strlen(txt) + 1;
+    lv_memcpy(&dst[1], txt, len);
 #endif
 }
 
