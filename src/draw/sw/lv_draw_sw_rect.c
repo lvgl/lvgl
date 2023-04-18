@@ -397,514 +397,513 @@ static void draw_border(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * d
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc,
                                               const lv_area_t * coords)
 {
-    //    /*Check whether the shadow is visible*/
-    //    if(dsc->shadow_width == 0) return;
-    //    if(dsc->shadow_opa <= LV_OPA_MIN) return;
-    //
-    //    if(dsc->shadow_width == 1 && dsc->shadow_spread <= 0 &&
-    //       dsc->shadow_ofs_x == 0 && dsc->shadow_ofs_y == 0) {
-    //        return;
-    //    }
-    //
-    //    /*Calculate the rectangle which is blurred to get the shadow in `shadow_area`*/
-    //    lv_area_t core_area;
-    //    core_area.x1 = coords->x1  + dsc->shadow_ofs_x - dsc->shadow_spread;
-    //    core_area.x2 = coords->x2  + dsc->shadow_ofs_x + dsc->shadow_spread;
-    //    core_area.y1 = coords->y1  + dsc->shadow_ofs_y - dsc->shadow_spread;
-    //    core_area.y2 = coords->y2  + dsc->shadow_ofs_y + dsc->shadow_spread;
-    //
-    //    /*Calculate the bounding box of the shadow*/
-    //    lv_area_t shadow_area;
-    //    shadow_area.x1 = core_area.x1 - dsc->shadow_width / 2 - 1;
-    //    shadow_area.x2 = core_area.x2 + dsc->shadow_width / 2 + 1;
-    //    shadow_area.y1 = core_area.y1 - dsc->shadow_width / 2 - 1;
-    //    shadow_area.y2 = core_area.y2 + dsc->shadow_width / 2 + 1;
-    //
-    //    lv_opa_t opa = dsc->shadow_opa;
-    //    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
-    //
-    //    /*Get clipped draw area which is the real draw area.
-    //     *It is always the same or inside `shadow_area`*/
-    //    lv_area_t draw_area;
-    //    if(!_lv_area_intersect(&draw_area, &shadow_area, draw_unit->clip_area)) return;
-    //
-    //    /*Consider 1 px smaller bg to be sure the edge will be covered by the shadow*/
-    //    lv_area_t bg_area;
-    //    lv_area_copy(&bg_area, coords);
-    //    lv_area_increase(&bg_area, -1, -1);
-    //
-    //    /*Get the clamped radius*/
-    //    int32_t r_bg = dsc->radius;
-    //    lv_coord_t short_side = LV_MIN(lv_area_get_width(&bg_area), lv_area_get_height(&bg_area));
-    //    if(r_bg > short_side >> 1) r_bg = short_side >> 1;
-    //
-    //    /*Get the clamped radius*/
-    //    int32_t r_sh = dsc->radius;
-    //    short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
-    //    if(r_sh > short_side >> 1) r_sh = short_side >> 1;
-    //
-    //
-    //    /*Get how many pixels are affected by the blur on the corners*/
-    //    int32_t corner_size = dsc->shadow_width  + r_sh;
-    //
-    //    lv_opa_t * sh_buf;
-    //
-    //#if LV_DRAW_SW_SHADOW_CACHE_SIZE
-    //    if(sh_cache_size == corner_size && sh_cache_r == r_sh) {
-    //        /*Use the cache if available*/
-    //        sh_buf = lv_malloc(corner_size * corner_size);
-    //        lv_memcpy(sh_buf, sh_cache, corner_size * corner_size);
-    //    }
-    //    else {
-    //        /*A larger buffer is required for calculation*/
-    //        sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
-    //        shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
-    //
-    //        /*Cache the corner if it fits into the cache size*/
-    //        if((uint32_t)corner_size * corner_size < sizeof(sh_cache)) {
-    //            lv_memcpy(sh_cache, sh_buf, corner_size * corner_size);
-    //            sh_cache_size = corner_size;
-    //            sh_cache_r = r_sh;
-    //        }
-    //    }
-    //#else
-    //    sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
-    //    shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
-    //#endif
-    //
-    //    /*Skip a lot of masking if the background will cover the shadow that would be masked out*/
-    //    bool mask_any = lv_draw_mask_is_any(&shadow_area);
-    //    bool simple = true;
-    //    if(mask_any || dsc->bg_opa < LV_OPA_COVER || dsc->blend_mode != LV_BLEND_MODE_NORMAL) simple = false;
-    //
-    //    /*Create a radius mask to clip remove shadow on the bg area*/
-    //
-    //    lv_draw_mask_radius_param_t mask_rout_param;
-    //    int16_t mask_rout_id = LV_MASK_ID_INV;
-    //    if(!simple) {
-    //        lv_draw_mask_radius_init(&mask_rout_param, &bg_area, r_bg, true);
-    //        mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-    //    }
-    //    lv_opa_t * mask_buf = lv_malloc(lv_area_get_width(&shadow_area));
-    //    lv_area_t blend_area;
-    //    lv_area_t clip_area_sub;
-    //    lv_opa_t * sh_buf_tmp;
-    //    lv_coord_t y;
-    //    bool simple_sub;
-    //
-    //    lv_draw_sw_blend_dsc_t blend_dsc;
-    //    lv_memzero(&blend_dsc, sizeof(blend_dsc));
-    //    blend_dsc.blend_area = &blend_area;
-    //    blend_dsc.mask_area = &blend_area;
-    //    blend_dsc.mask_buf = mask_buf;
-    //    blend_dsc.color = dsc->shadow_color;
-    //    blend_dsc.opa = dsc->shadow_opa;
-    //    blend_dsc.blend_mode = dsc->blend_mode;
-    //
-    //    lv_coord_t w_half = shadow_area.x1 + lv_area_get_width(&shadow_area) / 2;
-    //    lv_coord_t h_half = shadow_area.y1 + lv_area_get_height(&shadow_area) / 2;
-    //
-    //    /*Draw the corners if they are on the current clip area and not fully covered by the bg*/
-    //
-    //    /*Top right corner*/
-    //    blend_area.x2 = shadow_area.x2;
-    //    blend_area.x1 = shadow_area.x2 - corner_size + 1;
-    //    blend_area.y1 = shadow_area.y1;
-    //    blend_area.y2 = shadow_area.y1 + corner_size - 1;
-    //    /*Do not overdraw the other top corners*/
-    //    blend_area.x1 = LV_MAX(blend_area.x1, w_half);
-    //    blend_area.y2 = LV_MIN(blend_area.y2, h_half);
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (clip_area_sub.y1 - shadow_area.y1) * corner_size;
-    //        sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
-    //
-    //        /*Do not mask if out of the bg*/
-    //        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //        else simple_sub = simple;
-    //        if(w > 0) {
-    //            blend_dsc.mask_buf = mask_buf;
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
-    //            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                }
-    //                else {
-    //                    blend_dsc.mask_buf = sh_buf_tmp;
-    //                }
-    //                lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //                sh_buf_tmp += corner_size;
-    //            }
-    //        }
-    //    }
-    //
-    //    /*Bottom right corner.
-    //     *Almost the same as top right just read the lines of `sh_buf` from then end*/
-    //    blend_area.x2 = shadow_area.x2;
-    //    blend_area.x1 = shadow_area.x2 - corner_size + 1;
-    //    blend_area.y1 = shadow_area.y2 - corner_size + 1;
-    //    blend_area.y2 = shadow_area.y2;
-    //    /*Do not overdraw the other corners*/
-    //    blend_area.x1 = LV_MAX(blend_area.x1, w_half);
-    //    blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
-    //        sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
-    //        /*Do not mask if out of the bg*/
-    //        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //        else simple_sub = simple;
-    //
-    //        if(w > 0) {
-    //            blend_dsc.mask_buf = mask_buf;
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
-    //            for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                }
-    //                else {
-    //                    blend_dsc.mask_buf = sh_buf_tmp;
-    //                }
-    //                lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //                sh_buf_tmp += corner_size;
-    //            }
-    //        }
-    //    }
-    //
-    //    /*Top side*/
-    //    blend_area.x1 = shadow_area.x1 + corner_size;
-    //    blend_area.x2 = shadow_area.x2 - corner_size;
-    //    blend_area.y1 = shadow_area.y1;
-    //    blend_area.y2 = shadow_area.y1 + corner_size - 1;
-    //    blend_area.y2 = LV_MIN(blend_area.y2, h_half);
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (clip_area_sub.y1 - blend_area.y1) * corner_size;
-    //
-    //        /*Do not mask if out of the bg*/
-    //        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //        else simple_sub = simple;
-    //
-    //        if(w > 0) {
-    //            if(!simple_sub) {
-    //                blend_dsc.mask_buf = mask_buf;
-    //            }
-    //            else {
-    //                blend_dsc.mask_buf = NULL;
-    //            }
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //
-    //            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memset(mask_buf, sh_buf_tmp[0], w);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                    lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //                }
-    //                else {
-    //                    blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
-    //                    lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //                }
-    //                sh_buf_tmp += corner_size;
-    //            }
-    //        }
-    //    }
-    //    blend_dsc.opa = dsc->shadow_opa;    /*Restore*/
-    //
-    //    /*Bottom side*/
-    //    blend_area.x1 = shadow_area.x1 + corner_size;
-    //    blend_area.x2 = shadow_area.x2 - corner_size;
-    //    blend_area.y1 = shadow_area.y2 - corner_size + 1;
-    //    blend_area.y2 = shadow_area.y2;
-    //    blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
-    //
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
-    //        if(w > 0) {
-    //            /*Do not mask if out of the bg*/
-    //            if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //            else simple_sub = simple;
-    //
-    //            if(!simple_sub) {
-    //                blend_dsc.mask_buf = mask_buf;
-    //            }
-    //            else {
-    //                blend_dsc.mask_buf = NULL;
-    //            }
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //
-    //            for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                /*Do not mask if out of the bg*/
-    //                if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //                else simple_sub = simple;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memset(mask_buf, sh_buf_tmp[0], w);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                    lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //                }
-    //                else {
-    //                    blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
-    //                    lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //
-    //                }
-    //                sh_buf_tmp += corner_size;
-    //            }
-    //        }
-    //    }
-    //
-    //    blend_dsc.opa = dsc->shadow_opa;    /*Restore*/
-    //
-    //    /*Right side*/
-    //    blend_area.x1 = shadow_area.x2 - corner_size + 1;
-    //    blend_area.x2 = shadow_area.x2;
-    //    blend_area.y1 = shadow_area.y1 + corner_size;
-    //    blend_area.y2 = shadow_area.y2 - corner_size;
-    //    /*Do not overdraw the other corners*/
-    //    blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
-    //    blend_area.y2 = LV_MAX(blend_area.y2, h_half);
-    //    blend_area.x1 = LV_MAX(blend_area.x1, w_half);
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (corner_size - 1) * corner_size;
-    //        sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
-    //
-    //        /*Do not mask if out of the bg*/
-    //        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //        else simple_sub = simple;
-    //        blend_dsc.mask_buf = simple_sub ? sh_buf_tmp : mask_buf;
-    //
-    //        if(w > 0) {
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
-    //            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memcpy(mask_buf, sh_buf_tmp, w);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                }
-    //                lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //            }
-    //        }
-    //    }
-    //
-    //    /*Mirror the shadow corner buffer horizontally*/
-    //    sh_buf_tmp = sh_buf ;
-    //    for(y = 0; y < corner_size; y++) {
-    //        int32_t x;
-    //        lv_opa_t * start = sh_buf_tmp;
-    //        lv_opa_t * end = sh_buf_tmp + corner_size - 1;
-    //        for(x = 0; x < corner_size / 2; x++) {
-    //            lv_opa_t tmp = *start;
-    //            *start = *end;
-    //            *end = tmp;
-    //
-    //            start++;
-    //            end--;
-    //        }
-    //        sh_buf_tmp += corner_size;
-    //    }
-    //
-    //    /*Left side*/
-    //    blend_area.x1 = shadow_area.x1;
-    //    blend_area.x2 = shadow_area.x1 + corner_size - 1;
-    //    blend_area.y1 = shadow_area.y1 + corner_size;
-    //    blend_area.y2 = shadow_area.y2 - corner_size;
-    //    /*Do not overdraw the other corners*/
-    //    blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
-    //    blend_area.y2 = LV_MAX(blend_area.y2, h_half);
-    //    blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (corner_size - 1) * corner_size;
-    //        sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
-    //
-    //        /*Do not mask if out of the bg*/
-    //        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //        else simple_sub = simple;
-    //        blend_dsc.mask_buf = simple_sub ? sh_buf_tmp : mask_buf;
-    //        if(w > 0) {
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
-    //            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memcpy(mask_buf, sh_buf_tmp, w);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                }
-    //
-    //                lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //            }
-    //        }
-    //    }
-    //
-    //    /*Top left corner*/
-    //    blend_area.x1 = shadow_area.x1;
-    //    blend_area.x2 = shadow_area.x1 + corner_size - 1;
-    //    blend_area.y1 = shadow_area.y1;
-    //    blend_area.y2 = shadow_area.y1 + corner_size - 1;
-    //    /*Do not overdraw the other corners*/
-    //    blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
-    //    blend_area.y2 = LV_MIN(blend_area.y2, h_half);
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (clip_area_sub.y1 - blend_area.y1) * corner_size;
-    //        sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
-    //
-    //        /*Do not mask if out of the bg*/
-    //        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //        else simple_sub = simple;
-    //        blend_dsc.mask_buf = mask_buf;
-    //
-    //        if(w > 0) {
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
-    //            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                }
-    //                else {
-    //                    blend_dsc.mask_buf = sh_buf_tmp;
-    //                }
-    //
-    //                lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //                sh_buf_tmp += corner_size;
-    //            }
-    //        }
-    //    }
-    //
-    //    /*Bottom left corner.
-    //     *Almost the same as bottom right just read the lines of `sh_buf` from then end*/
-    //    blend_area.x1 = shadow_area.x1 ;
-    //    blend_area.x2 = shadow_area.x1 + corner_size - 1;
-    //    blend_area.y1 = shadow_area.y2 - corner_size + 1;
-    //    blend_area.y2 = shadow_area.y2;
-    //    /*Do not overdraw the other corners*/
-    //    blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
-    //    blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        sh_buf_tmp = sh_buf;
-    //        sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
-    //        sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
-    //
-    //        /*Do not mask if out of the bg*/
-    //        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
-    //        else simple_sub = simple;
-    //        blend_dsc.mask_buf = mask_buf;
-    //        if(w > 0) {
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
-    //            for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                if(!simple_sub) {
-    //                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-    //                    blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-    //                }
-    //                else {
-    //                    blend_dsc.mask_buf = sh_buf_tmp;
-    //                }
-    //                lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //                sh_buf_tmp += corner_size;
-    //            }
-    //        }
-    //    }
-    //
-    //    /*Draw the center rectangle.*/
-    //    blend_area.x1 = shadow_area.x1 + corner_size ;
-    //    blend_area.x2 = shadow_area.x2 - corner_size;
-    //    blend_area.y1 = shadow_area.y1 + corner_size;
-    //    blend_area.y2 = shadow_area.y2 - corner_size;
-    //    blend_dsc.mask_buf = mask_buf;
-    //
-    //    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
-    //       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
-    //        lv_coord_t w = lv_area_get_width(&clip_area_sub);
-    //        if(w > 0) {
-    //            blend_area.x1 = clip_area_sub.x1;
-    //            blend_area.x2 = clip_area_sub.x2;
-    //            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
-    //                blend_area.y1 = y;
-    //                blend_area.y2 = y;
-    //
-    //                lv_memset(mask_buf, 0xff, w);
-    //                blend_dsc.mask_res = lv_draw_mask_apply(mask_buf, clip_area_sub.x1, y, w);
-    //                lv_draw_sw_blend(draw_unit, &blend_dsc);
-    //            }
-    //        }
-    //    }
-    //
-    //    if(!simple) {
-    //        lv_draw_mask_free_param(&mask_rout_param);
-    //        lv_draw_mask_remove_id(mask_rout_id);
-    //    }
-    //    lv_free(sh_buf);
-    //    lv_free(mask_buf);
+    /*Check whether the shadow is visible*/
+    if(dsc->shadow_width == 0) return;
+    if(dsc->shadow_opa <= LV_OPA_MIN) return;
+
+    if(dsc->shadow_width == 1 && dsc->shadow_spread <= 0 &&
+       dsc->shadow_ofs_x == 0 && dsc->shadow_ofs_y == 0) {
+        return;
+    }
+
+    /*Calculate the rectangle which is blurred to get the shadow in `shadow_area`*/
+    lv_area_t core_area;
+    core_area.x1 = coords->x1  + dsc->shadow_ofs_x - dsc->shadow_spread;
+    core_area.x2 = coords->x2  + dsc->shadow_ofs_x + dsc->shadow_spread;
+    core_area.y1 = coords->y1  + dsc->shadow_ofs_y - dsc->shadow_spread;
+    core_area.y2 = coords->y2  + dsc->shadow_ofs_y + dsc->shadow_spread;
+
+    /*Calculate the bounding box of the shadow*/
+    lv_area_t shadow_area;
+    shadow_area.x1 = core_area.x1 - dsc->shadow_width / 2 - 1;
+    shadow_area.x2 = core_area.x2 + dsc->shadow_width / 2 + 1;
+    shadow_area.y1 = core_area.y1 - dsc->shadow_width / 2 - 1;
+    shadow_area.y2 = core_area.y2 + dsc->shadow_width / 2 + 1;
+
+    lv_opa_t opa = dsc->shadow_opa;
+    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+
+    /*Get clipped draw area which is the real draw area.
+     *It is always the same or inside `shadow_area`*/
+    lv_area_t draw_area;
+    if(!_lv_area_intersect(&draw_area, &shadow_area, draw_unit->clip_area)) return;
+
+    /*Consider 1 px smaller bg to be sure the edge will be covered by the shadow*/
+    lv_area_t bg_area;
+    lv_area_copy(&bg_area, coords);
+    lv_area_increase(&bg_area, -1, -1);
+
+    /*Get the clamped radius*/
+    int32_t r_bg = dsc->radius;
+    lv_coord_t short_side = LV_MIN(lv_area_get_width(&bg_area), lv_area_get_height(&bg_area));
+    if(r_bg > short_side >> 1) r_bg = short_side >> 1;
+
+    /*Get the clamped radius*/
+    int32_t r_sh = dsc->radius;
+    short_side = LV_MIN(lv_area_get_width(&core_area), lv_area_get_height(&core_area));
+    if(r_sh > short_side >> 1) r_sh = short_side >> 1;
+
+
+    /*Get how many pixels are affected by the blur on the corners*/
+    int32_t corner_size = dsc->shadow_width  + r_sh;
+
+    lv_opa_t * sh_buf;
+
+#if LV_DRAW_SW_SHADOW_CACHE_SIZE
+    if(sh_cache_size == corner_size && sh_cache_r == r_sh) {
+        /*Use the cache if available*/
+        sh_buf = lv_malloc(corner_size * corner_size);
+        lv_memcpy(sh_buf, sh_cache, corner_size * corner_size);
+    }
+    else {
+        /*A larger buffer is required for calculation*/
+        sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
+        shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
+
+        /*Cache the corner if it fits into the cache size*/
+        if((uint32_t)corner_size * corner_size < sizeof(sh_cache)) {
+            lv_memcpy(sh_cache, sh_buf, corner_size * corner_size);
+            sh_cache_size = corner_size;
+            sh_cache_r = r_sh;
+        }
+    }
+#else
+    sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
+    shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
+#endif
+
+    /*Skip a lot of masking if the background will cover the shadow that would be masked out*/
+    bool simple = true;
+    if(dsc->bg_opa < LV_OPA_COVER || dsc->blend_mode != LV_BLEND_MODE_NORMAL) simple = false;
+
+    /*Create a radius mask to clip remove shadow on the bg area*/
+
+    lv_draw_mask_radius_param_t mask_rout_param;
+    void * masks[2] = {0};
+    if(!simple) {
+        lv_draw_mask_radius_init(&mask_rout_param, &bg_area, r_bg, true);
+        masks[0] = &mask_rout_param;
+    }
+
+    lv_opa_t * mask_buf = lv_malloc(lv_area_get_width(&shadow_area));
+    lv_area_t blend_area;
+    lv_area_t clip_area_sub;
+    lv_opa_t * sh_buf_tmp;
+    lv_coord_t y;
+    bool simple_sub;
+
+    lv_draw_sw_blend_dsc_t blend_dsc;
+    lv_memzero(&blend_dsc, sizeof(blend_dsc));
+    blend_dsc.blend_area = &blend_area;
+    blend_dsc.mask_area = &blend_area;
+    blend_dsc.mask_buf = mask_buf;
+    blend_dsc.color = dsc->shadow_color;
+    blend_dsc.opa = dsc->shadow_opa;
+    blend_dsc.blend_mode = dsc->blend_mode;
+
+    lv_coord_t w_half = shadow_area.x1 + lv_area_get_width(&shadow_area) / 2;
+    lv_coord_t h_half = shadow_area.y1 + lv_area_get_height(&shadow_area) / 2;
+
+    /*Draw the corners if they are on the current clip area and not fully covered by the bg*/
+
+    /*Top right corner*/
+    blend_area.x2 = shadow_area.x2;
+    blend_area.x1 = shadow_area.x2 - corner_size + 1;
+    blend_area.y1 = shadow_area.y1;
+    blend_area.y2 = shadow_area.y1 + corner_size - 1;
+    /*Do not overdraw the other top corners*/
+    blend_area.x1 = LV_MAX(blend_area.x1, w_half);
+    blend_area.y2 = LV_MIN(blend_area.y2, h_half);
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (clip_area_sub.y1 - shadow_area.y1) * corner_size;
+        sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
+
+        /*Do not mask if out of the bg*/
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        else simple_sub = simple;
+        if(w > 0) {
+            blend_dsc.mask_buf = mask_buf;
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                if(!simple_sub) {
+                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                }
+                else {
+                    blend_dsc.mask_buf = sh_buf_tmp;
+                }
+                lv_draw_sw_blend(draw_unit, &blend_dsc);
+                sh_buf_tmp += corner_size;
+            }
+        }
+    }
+
+    /*Bottom right corner.
+     *Almost the same as top right just read the lines of `sh_buf` from then end*/
+    blend_area.x2 = shadow_area.x2;
+    blend_area.x1 = shadow_area.x2 - corner_size + 1;
+    blend_area.y1 = shadow_area.y2 - corner_size + 1;
+    blend_area.y2 = shadow_area.y2;
+    /*Do not overdraw the other corners*/
+    blend_area.x1 = LV_MAX(blend_area.x1, w_half);
+    blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
+        sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
+        /*Do not mask if out of the bg*/
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        else simple_sub = simple;
+
+        if(w > 0) {
+            blend_dsc.mask_buf = mask_buf;
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                if(!simple_sub) {
+                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                }
+                else {
+                    blend_dsc.mask_buf = sh_buf_tmp;
+                }
+                lv_draw_sw_blend(draw_unit, &blend_dsc);
+                sh_buf_tmp += corner_size;
+            }
+        }
+    }
+
+    /*Top side*/
+    blend_area.x1 = shadow_area.x1 + corner_size;
+    blend_area.x2 = shadow_area.x2 - corner_size;
+    blend_area.y1 = shadow_area.y1;
+    blend_area.y2 = shadow_area.y1 + corner_size - 1;
+    blend_area.y2 = LV_MIN(blend_area.y2, h_half);
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (clip_area_sub.y1 - blend_area.y1) * corner_size;
+
+        /*Do not mask if out of the bg*/
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        else simple_sub = simple;
+
+        if(w > 0) {
+            if(!simple_sub) {
+                blend_dsc.mask_buf = mask_buf;
+            }
+            else {
+                blend_dsc.mask_buf = NULL;
+            }
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+
+            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                if(!simple_sub) {
+                    lv_memset(mask_buf, sh_buf_tmp[0], w);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    lv_draw_sw_blend(draw_unit, &blend_dsc);
+                }
+                else {
+                    blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
+                    lv_draw_sw_blend(draw_unit, &blend_dsc);
+                }
+                sh_buf_tmp += corner_size;
+            }
+        }
+    }
+    blend_dsc.opa = dsc->shadow_opa;    /*Restore*/
+
+    /*Bottom side*/
+    blend_area.x1 = shadow_area.x1 + corner_size;
+    blend_area.x2 = shadow_area.x2 - corner_size;
+    blend_area.y1 = shadow_area.y2 - corner_size + 1;
+    blend_area.y2 = shadow_area.y2;
+    blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
+
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
+        if(w > 0) {
+            /*Do not mask if out of the bg*/
+            if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+            else simple_sub = simple;
+
+            if(!simple_sub) {
+                blend_dsc.mask_buf = mask_buf;
+            }
+            else {
+                blend_dsc.mask_buf = NULL;
+            }
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+
+            for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                /*Do not mask if out of the bg*/
+                if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+                else simple_sub = simple;
+
+                if(!simple_sub) {
+                    lv_memset(mask_buf, sh_buf_tmp[0], w);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    lv_draw_sw_blend(draw_unit, &blend_dsc);
+                }
+                else {
+                    blend_dsc.opa = opa == LV_OPA_COVER ? sh_buf_tmp[0] : (sh_buf_tmp[0] * dsc->shadow_opa) >> 8;
+                    lv_draw_sw_blend(draw_unit, &blend_dsc);
+
+                }
+                sh_buf_tmp += corner_size;
+            }
+        }
+    }
+
+    blend_dsc.opa = dsc->shadow_opa;    /*Restore*/
+
+    /*Right side*/
+    blend_area.x1 = shadow_area.x2 - corner_size + 1;
+    blend_area.x2 = shadow_area.x2;
+    blend_area.y1 = shadow_area.y1 + corner_size;
+    blend_area.y2 = shadow_area.y2 - corner_size;
+    /*Do not overdraw the other corners*/
+    blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
+    blend_area.y2 = LV_MAX(blend_area.y2, h_half);
+    blend_area.x1 = LV_MAX(blend_area.x1, w_half);
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (corner_size - 1) * corner_size;
+        sh_buf_tmp += clip_area_sub.x1 - (shadow_area.x2 - corner_size + 1);
+
+        /*Do not mask if out of the bg*/
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        else simple_sub = simple;
+        blend_dsc.mask_buf = simple_sub ? sh_buf_tmp : mask_buf;
+
+        if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                if(!simple_sub) {
+                    lv_memcpy(mask_buf, sh_buf_tmp, w);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                }
+                lv_draw_sw_blend(draw_unit, &blend_dsc);
+            }
+        }
+    }
+
+    /*Mirror the shadow corner buffer horizontally*/
+    sh_buf_tmp = sh_buf ;
+    for(y = 0; y < corner_size; y++) {
+        int32_t x;
+        lv_opa_t * start = sh_buf_tmp;
+        lv_opa_t * end = sh_buf_tmp + corner_size - 1;
+        for(x = 0; x < corner_size / 2; x++) {
+            lv_opa_t tmp = *start;
+            *start = *end;
+            *end = tmp;
+
+            start++;
+            end--;
+        }
+        sh_buf_tmp += corner_size;
+    }
+
+    /*Left side*/
+    blend_area.x1 = shadow_area.x1;
+    blend_area.x2 = shadow_area.x1 + corner_size - 1;
+    blend_area.y1 = shadow_area.y1 + corner_size;
+    blend_area.y2 = shadow_area.y2 - corner_size;
+    /*Do not overdraw the other corners*/
+    blend_area.y1 = LV_MIN(blend_area.y1, h_half + 1);
+    blend_area.y2 = LV_MAX(blend_area.y2, h_half);
+    blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (corner_size - 1) * corner_size;
+        sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
+
+        /*Do not mask if out of the bg*/
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        else simple_sub = simple;
+        blend_dsc.mask_buf = simple_sub ? sh_buf_tmp : mask_buf;
+        if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                if(!simple_sub) {
+                    lv_memcpy(mask_buf, sh_buf_tmp, w);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                }
+
+                lv_draw_sw_blend(draw_unit, &blend_dsc);
+            }
+        }
+    }
+
+    /*Top left corner*/
+    blend_area.x1 = shadow_area.x1;
+    blend_area.x2 = shadow_area.x1 + corner_size - 1;
+    blend_area.y1 = shadow_area.y1;
+    blend_area.y2 = shadow_area.y1 + corner_size - 1;
+    /*Do not overdraw the other corners*/
+    blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
+    blend_area.y2 = LV_MIN(blend_area.y2, h_half);
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (clip_area_sub.y1 - blend_area.y1) * corner_size;
+        sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
+
+        /*Do not mask if out of the bg*/
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        else simple_sub = simple;
+        blend_dsc.mask_buf = mask_buf;
+
+        if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                if(!simple_sub) {
+                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                }
+                else {
+                    blend_dsc.mask_buf = sh_buf_tmp;
+                }
+
+                lv_draw_sw_blend(draw_unit, &blend_dsc);
+                sh_buf_tmp += corner_size;
+            }
+        }
+    }
+
+    /*Bottom left corner.
+     *Almost the same as bottom right just read the lines of `sh_buf` from then end*/
+    blend_area.x1 = shadow_area.x1 ;
+    blend_area.x2 = shadow_area.x1 + corner_size - 1;
+    blend_area.y1 = shadow_area.y2 - corner_size + 1;
+    blend_area.y2 = shadow_area.y2;
+    /*Do not overdraw the other corners*/
+    blend_area.y1 = LV_MAX(blend_area.y1, h_half + 1);
+    blend_area.x2 = LV_MIN(blend_area.x2, w_half - 1);
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        sh_buf_tmp = sh_buf;
+        sh_buf_tmp += (blend_area.y2 - clip_area_sub.y2) * corner_size;
+        sh_buf_tmp += clip_area_sub.x1 - blend_area.x1;
+
+        /*Do not mask if out of the bg*/
+        if(simple && _lv_area_is_out(&clip_area_sub, &bg_area, r_bg)) simple_sub = true;
+        else simple_sub = simple;
+        blend_dsc.mask_buf = mask_buf;
+        if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                if(!simple_sub) {
+                    lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
+                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                }
+                else {
+                    blend_dsc.mask_buf = sh_buf_tmp;
+                }
+                lv_draw_sw_blend(draw_unit, &blend_dsc);
+                sh_buf_tmp += corner_size;
+            }
+        }
+    }
+
+    /*Draw the center rectangle.*/
+    blend_area.x1 = shadow_area.x1 + corner_size ;
+    blend_area.x2 = shadow_area.x2 - corner_size;
+    blend_area.y1 = shadow_area.y1 + corner_size;
+    blend_area.y2 = shadow_area.y2 - corner_size;
+    blend_dsc.mask_buf = mask_buf;
+
+    if(_lv_area_intersect(&clip_area_sub, &blend_area, draw_unit->clip_area) &&
+       !_lv_area_is_in(&clip_area_sub, &bg_area, r_bg)) {
+        lv_coord_t w = lv_area_get_width(&clip_area_sub);
+        if(w > 0) {
+            blend_area.x1 = clip_area_sub.x1;
+            blend_area.x2 = clip_area_sub.x2;
+            for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
+                blend_area.y1 = y;
+                blend_area.y2 = y;
+
+                lv_memset(mask_buf, 0xff, w);
+                blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                lv_draw_sw_blend(draw_unit, &blend_dsc);
+            }
+        }
+    }
+
+    if(!simple) {
+        lv_draw_mask_free_param(&mask_rout_param);
+    }
+    lv_free(sh_buf);
+    lv_free(mask_buf);
 }
 
 /**
