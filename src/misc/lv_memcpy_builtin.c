@@ -169,6 +169,13 @@ char * lv_strncpy_builtin(char * dst, const char * src, size_t dest_size)
     return dst;
 }
 
+char * lv_strcpy_builtin(char * dst, const char * src)
+{
+    char * tmp = dst;
+    while((*dst++ = *src++) != '\0');
+    return tmp;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

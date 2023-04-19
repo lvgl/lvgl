@@ -140,7 +140,7 @@
     #endif
 #endif  /*LV_USE_BUILTIN_MALLOC*/
 
-/*Enable lv_memcpy_builtin, lv_memset_builtin, lv_strlen_builtin, lv_strncpy_builtin*/
+/*Enable lv_memcpy_builtin, lv_memset_builtin, lv_strlen_builtin, lv_strncpy_builtin, lv_strcpy_builtin*/
 #ifndef LV_USE_BUILTIN_MEMCPY
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_BUILTIN_MEMCPY
@@ -257,6 +257,13 @@
         #define LV_STRNCPY CONFIG_LV_STRNCPY
     #else
         #define LV_STRNCPY      lv_strncpy_builtin
+    #endif
+#endif
+#ifndef LV_STRCPY
+    #ifdef CONFIG_LV_STRCPY
+        #define LV_STRCPY CONFIG_LV_STRCPY
+    #else
+        #define LV_STRCPY       lv_strcpy_builtin
     #endif
 #endif
 
