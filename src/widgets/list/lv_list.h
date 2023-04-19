@@ -64,6 +64,15 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
  */
 const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn);
 
+/**
+ * Set text of a given list button
+ * @param list      pointer to a list
+ * @param btn       pointer to the button
+ * @param txt       pointer to the text
+ * @return          Text of btn, if btn doesn't have text "" will be returned
+ */
+void lv_list_set_btn_text(lv_obj_t * list, lv_obj_t * btn, const char * txt);
+
 /**********************
  *      MACROS
  **********************/

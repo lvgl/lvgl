@@ -114,6 +114,19 @@ const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn)
     return "";
 }
 
+void lv_list_set_btn_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
+{
+    LV_UNUSED(list);
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(btn); i++) {
+        lv_obj_t * child = lv_obj_get_child(btn, i);
+        if(lv_obj_check_type(child, &lv_label_class)) {
+            lv_label_set_text(child, txt);
+            return;
+        }
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
