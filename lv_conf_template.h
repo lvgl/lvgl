@@ -274,6 +274,15 @@
 #define LV_ASSERT_HANDLER while(1);   /*Halt by default*/
 
 /*-------------
+ * OSAL
+ *-----------*/
+#define LV_USE_OS   1
+#if LV_USE_OS
+    #define LV_USE_PTHREAD  1
+    #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+#endif
+
+/*-------------
  * Others
  *-----------*/
 

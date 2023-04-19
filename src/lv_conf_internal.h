@@ -846,6 +846,41 @@
 #endif
 
 /*-------------
+ * OSAL
+ *-----------*/
+#ifndef LV_USE_OS
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_OS
+            #define LV_USE_OS CONFIG_LV_USE_OS
+        #else
+            #define LV_USE_OS 0
+        #endif
+    #else
+        #define LV_USE_OS   1
+    #endif
+#endif
+#if LV_USE_OS
+    #ifndef LV_USE_PTHREAD
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_PTHREAD
+                #define LV_USE_PTHREAD CONFIG_LV_USE_PTHREAD
+            #else
+                #define LV_USE_PTHREAD 0
+            #endif
+        #else
+            #define LV_USE_PTHREAD  1
+        #endif
+    #endif
+    #ifndef LV_OS_CUSTOM_INCLUDE
+        #ifdef CONFIG_LV_OS_CUSTOM_INCLUDE
+            #define LV_OS_CUSTOM_INCLUDE CONFIG_LV_OS_CUSTOM_INCLUDE
+        #else
+            #define LV_OS_CUSTOM_INCLUDE <stdint.h>
+        #endif
+    #endif
+#endif
+
+/*-------------
  * Others
  *-----------*/
 
