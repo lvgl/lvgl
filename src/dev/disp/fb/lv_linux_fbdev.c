@@ -103,7 +103,7 @@ lv_disp_t * lv_linux_fbdev_create(void)
 
 void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
 {
-    char * devname = lv_malloc(strlen(file));
+    char * devname = lv_malloc(strlen(file) + 1);
     LV_ASSERT_MALLOC(devname);
     if(devname == NULL) return;
     strcpy(devname, file);
