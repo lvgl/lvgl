@@ -848,29 +848,20 @@
 /*-------------
  * OSAL
  *-----------*/
+
+/*Select an operating system to use. Possible values:
+ *- LV_OS_NONE
+ *- LV_OS_PTHREAD
+ *- LV_OS_FREETYPE
+ *- LV_OS_CUSTOM*/
 #ifndef LV_USE_OS
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_OS
-            #define LV_USE_OS CONFIG_LV_USE_OS
-        #else
-            #define LV_USE_OS 0
-        #endif
+    #ifdef CONFIG_LV_USE_OS
+        #define LV_USE_OS CONFIG_LV_USE_OS
     #else
-        #define LV_USE_OS   1
+        #define LV_USE_OS   LV_OS_PTHREAD
     #endif
 #endif
-#if LV_USE_OS
-    #ifndef LV_USE_PTHREAD
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_USE_PTHREAD
-                #define LV_USE_PTHREAD CONFIG_LV_USE_PTHREAD
-            #else
-                #define LV_USE_PTHREAD 0
-            #endif
-        #else
-            #define LV_USE_PTHREAD  1
-        #endif
-    #endif
+#if LV_USE_OS == LV_OS_CUSTOM
     #ifndef LV_OS_CUSTOM_INCLUDE
         #ifdef CONFIG_LV_OS_CUSTOM_INCLUDE
             #define LV_OS_CUSTOM_INCLUDE CONFIG_LV_OS_CUSTOM_INCLUDE
