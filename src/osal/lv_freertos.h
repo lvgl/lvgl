@@ -38,8 +38,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../lv_conf_internal.h"
-#if LV_USE_FREERTOS
+#include "lv_os.h"
+#if LV_USE_OS == LV_OS_FREERTOS
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"

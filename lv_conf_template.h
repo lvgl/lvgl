@@ -276,9 +276,14 @@
 /*-------------
  * OSAL
  *-----------*/
-#define LV_USE_OS   1
-#if LV_USE_OS
-    #define LV_USE_PTHREAD  1
+
+/*Select an operating system to use. Possible values:
+ *- LV_OS_NONE
+ *- LV_OS_PTHREAD
+ *- LV_OS_FREETYPE
+ *- LV_OS_CUSTOM*/
+#define LV_USE_OS   LV_OS_PTHREAD
+#if LV_USE_OS == LV_OS_CUSTOM
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
 

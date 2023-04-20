@@ -11,18 +11,28 @@ extern "C" {
 #endif
 
 /*********************
+ *    OS OPTIONS
+ *********************/
+#define LV_OS_NONE      0
+#define LV_OS_PTHREAD   1
+#define LV_OS_FREEROTS  2
+#define LV_OS_CUSTOM    255
+
+/*********************
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+
 #if LV_USE_OS
 
 #include "../misc/lv_types.h"
-#include LV_OS_CUSTOM_INCLUDE
 
-#if LV_USE_PTHREAD
+#if LV_USE_OS == LV_OS_PTHREAD
 #include "lv_pthread.h"
-#elif LV_USE_FREERTOS
+#elif LV_USE_OS == LV_OS_FREEROTS
 #include "lv_freertos.h"
+#elif LV_USE_OS == LV_OS_CUSTOM
+#include LV_OS_CUSTOM_INCLUDE
 #endif
 
 /*********************

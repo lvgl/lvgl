@@ -13,8 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
-#if LV_USE_PTHREAD
+#include "lv_os.h"
+
+#if LV_USE_OS == LV_OS_PTHREAD
 
 #include <pthread.h>
 #include <semaphore.h>
@@ -55,4 +56,4 @@ typedef struct {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_PTHREAD_H*/
+#endif /*LV_USE_OS == LV_OS_PTHREAD*/

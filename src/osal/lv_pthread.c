@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_os.h"
-#if LV_USE_PTHREAD
+#if LV_USE_OS == LV_OS_PTHREAD
 
 #include <errno.h>
 #include "../misc/lv_log.h"
@@ -155,4 +155,4 @@ static int generic_callback(void * user_data)
     return 0;
 }
 
-#endif /*LV_USE_PTHREAD*/
+#endif /*LV_USE_OS == LV_OS_PTHREAD*/

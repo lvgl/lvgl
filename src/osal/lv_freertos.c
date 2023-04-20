@@ -31,8 +31,9 @@
  *      INCLUDES
  *********************/
 
-#include "lv_os.h"
-#if LV_USE_FREERTOS
+#include "lv_freertos.h"
+#if LV_USE_OS == LV_OS_FREERTOS
+
 #include "atomic.h"
 #include "../misc/lv_log.h"
 
@@ -398,4 +399,4 @@ static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
     }
 }
 
-#endif /*LV_USE_PTHREAD*/
+#endif /*LV_USE_OS == LV_OS_FREERTOS*/
