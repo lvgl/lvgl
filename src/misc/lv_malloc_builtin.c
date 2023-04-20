@@ -13,9 +13,7 @@
 #include "lv_log.h"
 #include "lv_ll.h"
 #include "lv_math.h"
-#if LV_USE_OS
-    #include "../osal/lv_os.h"
-#endif
+#include "../osal/lv_os.h"
 
 #ifdef LV_MEM_POOL_INCLUDE
     #include LV_MEM_POOL_INCLUDE
