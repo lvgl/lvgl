@@ -154,6 +154,11 @@ char * lv_strncpy(char * dst, const char * src, size_t dest_size)
     return LV_STRNCPY(dst, src, dest_size);
 }
 
+char * lv_strcpy(char * dst, const char * src)
+{
+    return LV_STRCPY(dst, src);
+}
+
 lv_res_t lv_mem_test(void)
 {
     if(zero_mem != ZERO_MEM_SENTINEL) {
