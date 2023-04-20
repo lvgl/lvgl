@@ -245,7 +245,10 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     lv_obj_send_event(parent, LV_EVENT_CHILD_DELETED, obj1);
 
     parent->spec_attr->children[index1] = obj2;
+    obj2->parent = parent;
+
     parent2->spec_attr->children[index2] = obj1;
+    obj1->parent = parent2;
 
     lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj2);
     lv_obj_send_event(parent, LV_EVENT_CHILD_CREATED, obj2);
