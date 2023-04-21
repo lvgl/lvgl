@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #define LV_OS_NONE      0
 #define LV_OS_PTHREAD   1
-#define LV_OS_FREEROTS  2
+#define LV_OS_FREERTOS  2
 #define LV_OS_CUSTOM    255
 
 /*********************
@@ -29,7 +29,7 @@ extern "C" {
 
 #if LV_USE_OS == LV_OS_PTHREAD
 #include "lv_pthread.h"
-#elif LV_USE_OS == LV_OS_FREEROTS
+#elif LV_USE_OS == LV_OS_FREERTOS
 #include "lv_freertos.h"
 #elif LV_USE_OS == LV_OS_CUSTOM
 #include LV_OS_CUSTOM_INCLUDE

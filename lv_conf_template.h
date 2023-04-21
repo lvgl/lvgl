@@ -280,7 +280,7 @@
 /*Select an operating system to use. Possible values:
  *- LV_OS_NONE
  *- LV_OS_PTHREAD
- *- LV_OS_FREETYPE
+ *- LV_OS_FREERTOS
  *- LV_OS_CUSTOM*/
 #define LV_USE_OS   LV_OS_PTHREAD
 #if LV_USE_OS == LV_OS_CUSTOM

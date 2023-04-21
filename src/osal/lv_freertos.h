@@ -37,8 +37,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#include "lv_os.h"
 #if LV_USE_OS == LV_OS_FREERTOS
 
 #include "FreeRTOS.h"
@@ -82,7 +80,7 @@ typedef struct {
  *      MACROS
  **********************/
 
-#endif /*LV_USE_FREERTOS*/
+#endif /*LV_USE_OS == LV_OS_FREERTOS*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

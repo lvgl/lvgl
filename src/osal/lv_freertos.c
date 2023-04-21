@@ -30,8 +30,8 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_os.h"
 
-#include "lv_freertos.h"
 #if LV_USE_OS == LV_OS_FREERTOS
 
 #include "atomic.h"

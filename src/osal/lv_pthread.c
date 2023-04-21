@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_os.h"
+
 #if LV_USE_OS == LV_OS_PTHREAD
 
 #include <errno.h>

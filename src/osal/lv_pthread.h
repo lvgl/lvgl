@@ -13,8 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_os.h"
-
 #if LV_USE_OS == LV_OS_PTHREAD
 
 #include <pthread.h>
@@ -50,10 +48,10 @@ typedef struct {
  *      MACROS
  **********************/
 
-#endif /*LV_USE_PTHREAD*/
+#endif /*LV_USE_OS == LV_OS_PTHREAD*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_USE_OS == LV_OS_PTHREAD*/
+#endif /*LV_PTHREAD_H*/
