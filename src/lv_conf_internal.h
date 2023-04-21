@@ -852,7 +852,7 @@
 /*Select an operating system to use. Possible values:
  *- LV_OS_NONE
  *- LV_OS_PTHREAD
- *- LV_OS_FREETYPE
+ *- LV_OS_FREERTOS
  *- LV_OS_CUSTOM*/
 #ifndef LV_USE_OS
     #ifdef CONFIG_LV_USE_OS
