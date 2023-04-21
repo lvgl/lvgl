@@ -696,6 +696,7 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_chart_series_t * ser;
     while(chart->series_ll.head) {
         ser = _lv_ll_get_head(&chart->series_ll);
+        if(!ser) continue;
 
         if(!ser->y_ext_buf_assigned) lv_free(ser->y_points);
 
