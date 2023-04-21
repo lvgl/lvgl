@@ -339,7 +339,7 @@ uint32_t lv_obj_get_index(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    if(parent == NULL) return 0;
+    if(parent == NULL) return 0xFFFFFFFF;
 
     uint32_t i = 0;
     for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
