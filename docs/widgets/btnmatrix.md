@@ -25,7 +25,7 @@ So in the example the first row will have 2 buttons each with 50% width and a se
 The buttons' width can be set relative to the other button in the same row with `lv_btnmatrix_set_btn_width(btnm, btn_id, width)`
 E.g. in a line with two buttons: *btnA, width = 1* and *btnB, width = 2*, *btnA* will have 33 % width and *btnB* will have 66 % width.
 It's similar to how the [`flex-grow`](https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow) property works in CSS.
-The width must be in the \[1..7\] range and the default width is 1.
+The width must be in the \[1..15\] range and the default width is 1.
 
 In addition to the width, each button can be customized with the following parameters:
 - `LV_BTNMATRIX_CTRL_HIDDEN` Makes a button hidden (hidden buttons still take up space in the layout, they are just not visible or clickable)
