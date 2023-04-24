@@ -32,18 +32,19 @@ LV_EXPORT_CONST_INT(LV_BTNMATRIX_BTN_NONE);
 /** Type to store button control bits (disabled, hidden etc.)
  * The first 3 bits are used to store the width*/
 enum {
-    _LV_BTNMATRIX_WIDTH     = 0x0007,      /**< Reserved to stire the size units*/
-    LV_BTNMATRIX_CTRL_HIDDEN     = 0x0008, /**< Button hidden*/
-    LV_BTNMATRIX_CTRL_NO_REPEAT  = 0x0010, /**< Do not repeat press this button.*/
-    LV_BTNMATRIX_CTRL_DISABLED   = 0x0020, /**< Disable this button.*/
-    LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< The button can be toggled.*/
-    LV_BTNMATRIX_CTRL_CHECKED    = 0x0080, /**< Button is currently toggled (e.g. checked).*/
-    LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
-    LV_BTNMATRIX_CTRL_POPOVER    = 0x0200, /**< Show a popover when pressing this key*/
-    LV_BTNMATRIX_CTRL_RECOLOR    = 0x1000, /**< Enable text recoloring with `#color`*/
-    _LV_BTNMATRIX_CTRL_RESERVED  = 0x2000, /**< Reserved for later use*/
-    LV_BTNMATRIX_CTRL_CUSTOM_1   = 0x4000, /**< Custom free to use flag*/
-    LV_BTNMATRIX_CTRL_CUSTOM_2   = 0x8000, /**< Custom free to use flag*/
+    _LV_BTNMATRIX_WIDTH            = 0x000F, /**< Reserved to store the size units*/
+    LV_BTNMATRIX_CTRL_HIDDEN       = 0x0010, /**< Button hidden*/
+    LV_BTNMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not repeat press this button.*/
+    LV_BTNMATRIX_CTRL_DISABLED     = 0x0040, /**< Disable this button.*/
+    LV_BTNMATRIX_CTRL_CHECKABLE    = 0x0080, /**< The button can be toggled.*/
+    LV_BTNMATRIX_CTRL_CHECKED      = 0x0100, /**< Button is currently toggled (e.g. checked).*/
+    LV_BTNMATRIX_CTRL_CLICK_TRIG   = 0x0200, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
+    LV_BTNMATRIX_CTRL_POPOVER      = 0x0400, /**< Show a popover when pressing this key*/
+    LV_BTNMATRIX_CTRL_RECOLOR      = 0x0800, /**< Enable text recoloring with `#color`*/
+    _LV_BTNMATRIX_CTRL_RESERVED_1  = 0x1000, /**< Reserved for later use*/
+    _LV_BTNMATRIX_CTRL_RESERVED_2  = 0x2000, /**< Reserved for later use*/
+    LV_BTNMATRIX_CTRL_CUSTOM_1     = 0x4000, /**< Custom free to use flag*/
+    LV_BTNMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free to use flag*/
 };
 
 typedef uint16_t lv_btnmatrix_ctrl_t;
