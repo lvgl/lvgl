@@ -252,6 +252,9 @@ static void window_create(lv_disp_t * disp)
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
     texture_resize(disp);
     lv_memset(dsc->fb, 0xff, hor_res * ver_res * sizeof(lv_color_t));
+    /*Some platforms (e.g. Emscripten) seem to require setting the size again */
+    SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
+    texture_resize(disp);
 }
 
 static void window_update(lv_disp_t * disp)
