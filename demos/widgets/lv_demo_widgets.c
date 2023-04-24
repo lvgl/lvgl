@@ -1271,227 +1271,227 @@ static void calendar_event_cb(lv_event_t * e)
 
 static void slider_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
-
-    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * s = lv_event_get_param(e);
-        *s = LV_MAX(*s, 60);
-    }
-    else if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        if(dsc->part == LV_PART_KNOB && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
-            char buf[8];
-            lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_slider_get_value(obj));
-
-            lv_point_t text_size;
-            lv_txt_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-
-            lv_area_t txt_area;
-            txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2 - text_size.x / 2;
-            txt_area.x2 = txt_area.x1 + text_size.x;
-            txt_area.y2 = dsc->draw_area->y1 - 10;
-            txt_area.y1 = txt_area.y2 - text_size.y;
-
-            lv_area_t bg_area;
-            bg_area.x1 = txt_area.x1 - LV_DPX(8);
-            bg_area.x2 = txt_area.x2 + LV_DPX(8);
-            bg_area.y1 = txt_area.y1 - LV_DPX(8);
-            bg_area.y2 = txt_area.y2 + LV_DPX(8);
-
-            lv_draw_rect_dsc_t rect_dsc;
-            lv_draw_rect_dsc_init(&rect_dsc);
-            rect_dsc.bg_color = lv_palette_darken(LV_PALETTE_GREY, 3);
-            rect_dsc.radius = LV_DPX(5);
-            lv_draw_rect(dsc->layer, &rect_dsc, &bg_area);
-
-            lv_draw_label_dsc_t label_dsc;
-            lv_draw_label_dsc_init(&label_dsc);
-            label_dsc.color = lv_color_white();
-            label_dsc.font = font_normal;
-            lv_draw_label(dsc->layer, &label_dsc, &txt_area, buf, NULL);
-        }
-    }
+    //    lv_event_code_t code = lv_event_get_code(e);
+    //    lv_obj_t * obj = lv_event_get_target(e);
+    //
+    //    if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
+    //        lv_coord_t * s = lv_event_get_param(e);
+    //        *s = LV_MAX(*s, 60);
+    //    }
+    //    else if(code == LV_EVENT_DRAW_PART_END) {
+    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
+    //        if(dsc->part == LV_PART_KNOB && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
+    //            char buf[8];
+    //            lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_slider_get_value(obj));
+    //
+    //            lv_point_t text_size;
+    //            lv_txt_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    //
+    //            lv_area_t txt_area;
+    //            txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2 - text_size.x / 2;
+    //            txt_area.x2 = txt_area.x1 + text_size.x;
+    //            txt_area.y2 = dsc->draw_area->y1 - 10;
+    //            txt_area.y1 = txt_area.y2 - text_size.y;
+    //
+    //            lv_area_t bg_area;
+    //            bg_area.x1 = txt_area.x1 - LV_DPX(8);
+    //            bg_area.x2 = txt_area.x2 + LV_DPX(8);
+    //            bg_area.y1 = txt_area.y1 - LV_DPX(8);
+    //            bg_area.y2 = txt_area.y2 + LV_DPX(8);
+    //
+    //            lv_draw_rect_dsc_t rect_dsc;
+    //            lv_draw_rect_dsc_init(&rect_dsc);
+    //            rect_dsc.bg_color = lv_palette_darken(LV_PALETTE_GREY, 3);
+    //            rect_dsc.radius = LV_DPX(5);
+    //            lv_draw_rect(dsc->layer, &rect_dsc, &bg_area);
+    //
+    //            lv_draw_label_dsc_t label_dsc;
+    //            lv_draw_label_dsc_init(&label_dsc);
+    //            label_dsc.color = lv_color_white();
+    //            label_dsc.font = font_normal;
+    //            lv_draw_label(dsc->layer, &label_dsc, &txt_area, buf, NULL);
+    //        }
+    //    }
 }
 
 static void chart_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
-
-    if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
-        lv_obj_invalidate(obj); /*To make the value boxes visible*/
-    }
-    else if(code == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        /*Set the markers' text*/
-        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
-            if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
-                const char * month[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
-                lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
-            }
-            else {
-                const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-                lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
-            }
-        }
-
-        /*Add the faded area before the lines are drawn */
-        else if(dsc->part == LV_PART_ITEMS) {
-#if LV_USE_DRAW_MASKS
-            /*Add  a line mask that keeps the area below the line*/
-            if(dsc->p1 && dsc->p2) {
-                lv_draw_mask_line_param_t line_mask_param;
-                lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y,
-                                              LV_DRAW_MASK_LINE_SIDE_BOTTOM);
-                int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
-
-                /*Add a fade effect: transparent bottom covering top*/
-                lv_coord_t h = lv_obj_get_height(obj);
-                lv_draw_mask_fade_param_t fade_mask_param;
-                lv_draw_mask_fade_init(&fade_mask_param, &obj->coords, LV_OPA_COVER, obj->coords.y1 + h / 8, LV_OPA_TRANSP,
-                                       obj->coords.y2);
-                int16_t fade_mask_id = lv_draw_mask_add(&fade_mask_param, NULL);
-
-                /*Draw a rectangle that will be affected by the mask*/
-                lv_draw_rect_dsc_t draw_rect_dsc;
-                lv_draw_rect_dsc_init(&draw_rect_dsc);
-                draw_rect_dsc.bg_opa = LV_OPA_50;
-                draw_rect_dsc.bg_color = dsc->line_dsc->color;
-
-                lv_area_t obj_clip_area;
-                _lv_area_intersect(&obj_clip_area, dsc->layer->clip_area, &obj->coords);
-                const lv_area_t * clip_area_ori = dsc->layer->clip_area;
-                dsc->layer->clip_area = &obj_clip_area;
-                lv_area_t a;
-                a.x1 = dsc->p1->x;
-                a.x2 = dsc->p2->x - 1;
-                a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
-                a.y2 = obj->coords.y2;
-                lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-                dsc->layer->clip_area = clip_area_ori;
-                /*Remove the masks*/
-                lv_draw_mask_remove_id(line_mask_id);
-                lv_draw_mask_remove_id(fade_mask_id);
-            }
-#endif
-
-
-            const lv_chart_series_t * ser = dsc->sub_part_ptr;
-
-            if(lv_chart_get_pressed_point(obj) == dsc->id) {
-                if(lv_chart_get_type(obj) == LV_CHART_TYPE_LINE) {
-                    dsc->rect_dsc->outline_color = lv_color_white();
-                    dsc->rect_dsc->outline_width = 2;
-                }
-                else {
-                    dsc->rect_dsc->shadow_color = ser->color;
-                    dsc->rect_dsc->shadow_width = 15;
-                    dsc->rect_dsc->shadow_spread = 0;
-                }
-
-                char buf[8];
-                lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, dsc->value);
-
-                lv_point_t text_size;
-                lv_txt_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-
-                lv_area_t txt_area;
-                if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
-                    txt_area.y2 = dsc->draw_area->y1 - LV_DPX(15);
-                    txt_area.y1 = txt_area.y2 - text_size.y;
-                    if(ser == lv_chart_get_series_next(obj, NULL)) {
-                        txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2;
-                        txt_area.x2 = txt_area.x1 + text_size.x;
-                    }
-                    else {
-                        txt_area.x2 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2;
-                        txt_area.x1 = txt_area.x2 - text_size.x;
-                    }
-                }
-                else {
-                    txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2 - text_size.x / 2;
-                    txt_area.x2 = txt_area.x1 + text_size.x;
-                    txt_area.y2 = dsc->draw_area->y1 - LV_DPX(15);
-                    txt_area.y1 = txt_area.y2 - text_size.y;
-                }
-
-                lv_area_t bg_area;
-                bg_area.x1 = txt_area.x1 - LV_DPX(8);
-                bg_area.x2 = txt_area.x2 + LV_DPX(8);
-                bg_area.y1 = txt_area.y1 - LV_DPX(8);
-                bg_area.y2 = txt_area.y2 + LV_DPX(8);
-
-                lv_draw_rect_dsc_t rect_dsc;
-                lv_draw_rect_dsc_init(&rect_dsc);
-                rect_dsc.bg_color = ser->color;
-                rect_dsc.radius = LV_DPX(5);
-                lv_draw_rect(dsc->layer, &rect_dsc, &bg_area);
-
-                lv_draw_label_dsc_t label_dsc;
-                lv_draw_label_dsc_init(&label_dsc);
-                label_dsc.color = lv_color_white();
-                label_dsc.font = font_normal;
-                lv_draw_label(dsc->layer, &label_dsc, &txt_area,  buf, NULL);
-            }
-            else {
-                dsc->rect_dsc->outline_width = 0;
-                dsc->rect_dsc->shadow_width = 0;
-            }
-        }
-    }
+    //    lv_event_code_t code = lv_event_get_code(e);
+    //    lv_obj_t * obj = lv_event_get_target(e);
+    //
+    //    if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
+    //        lv_obj_invalidate(obj); /*To make the value boxes visible*/
+    //    }
+    //    else if(code == LV_EVENT_DRAW_PART_BEGIN) {
+    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
+    //        /*Set the markers' text*/
+    //        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
+    //            if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
+    //                const char * month[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
+    //                lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
+    //            }
+    //            else {
+    //                const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
+    //                lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
+    //            }
+    //        }
+    //
+    //        /*Add the faded area before the lines are drawn */
+    //        else if(dsc->part == LV_PART_ITEMS) {
+    //#if LV_USE_DRAW_MASKS
+    //            /*Add  a line mask that keeps the area below the line*/
+    //            if(dsc->p1 && dsc->p2) {
+    //                lv_draw_mask_line_param_t line_mask_param;
+    //                lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y,
+    //                                              LV_DRAW_MASK_LINE_SIDE_BOTTOM);
+    //                int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
+    //
+    //                /*Add a fade effect: transparent bottom covering top*/
+    //                lv_coord_t h = lv_obj_get_height(obj);
+    //                lv_draw_mask_fade_param_t fade_mask_param;
+    //                lv_draw_mask_fade_init(&fade_mask_param, &obj->coords, LV_OPA_COVER, obj->coords.y1 + h / 8, LV_OPA_TRANSP,
+    //                                       obj->coords.y2);
+    //                int16_t fade_mask_id = lv_draw_mask_add(&fade_mask_param, NULL);
+    //
+    //                /*Draw a rectangle that will be affected by the mask*/
+    //                lv_draw_rect_dsc_t draw_rect_dsc;
+    //                lv_draw_rect_dsc_init(&draw_rect_dsc);
+    //                draw_rect_dsc.bg_opa = LV_OPA_50;
+    //                draw_rect_dsc.bg_color = dsc->line_dsc->color;
+    //
+    //                lv_area_t obj_clip_area;
+    //                _lv_area_intersect(&obj_clip_area, dsc->layer->clip_area, &obj->coords);
+    //                const lv_area_t * clip_area_ori = dsc->layer->clip_area;
+    //                dsc->layer->clip_area = &obj_clip_area;
+    //                lv_area_t a;
+    //                a.x1 = dsc->p1->x;
+    //                a.x2 = dsc->p2->x - 1;
+    //                a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
+    //                a.y2 = obj->coords.y2;
+    //                lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
+    //                dsc->layer->clip_area = clip_area_ori;
+    //                /*Remove the masks*/
+    //                lv_draw_mask_remove_id(line_mask_id);
+    //                lv_draw_mask_remove_id(fade_mask_id);
+    //            }
+    //#endif
+    //
+    //
+    //            const lv_chart_series_t * ser = dsc->sub_part_ptr;
+    //
+    //            if(lv_chart_get_pressed_point(obj) == dsc->id) {
+    //                if(lv_chart_get_type(obj) == LV_CHART_TYPE_LINE) {
+    //                    dsc->rect_dsc->outline_color = lv_color_white();
+    //                    dsc->rect_dsc->outline_width = 2;
+    //                }
+    //                else {
+    //                    dsc->rect_dsc->shadow_color = ser->color;
+    //                    dsc->rect_dsc->shadow_width = 15;
+    //                    dsc->rect_dsc->shadow_spread = 0;
+    //                }
+    //
+    //                char buf[8];
+    //                lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, dsc->value);
+    //
+    //                lv_point_t text_size;
+    //                lv_txt_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    //
+    //                lv_area_t txt_area;
+    //                if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
+    //                    txt_area.y2 = dsc->draw_area->y1 - LV_DPX(15);
+    //                    txt_area.y1 = txt_area.y2 - text_size.y;
+    //                    if(ser == lv_chart_get_series_next(obj, NULL)) {
+    //                        txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2;
+    //                        txt_area.x2 = txt_area.x1 + text_size.x;
+    //                    }
+    //                    else {
+    //                        txt_area.x2 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2;
+    //                        txt_area.x1 = txt_area.x2 - text_size.x;
+    //                    }
+    //                }
+    //                else {
+    //                    txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2 - text_size.x / 2;
+    //                    txt_area.x2 = txt_area.x1 + text_size.x;
+    //                    txt_area.y2 = dsc->draw_area->y1 - LV_DPX(15);
+    //                    txt_area.y1 = txt_area.y2 - text_size.y;
+    //                }
+    //
+    //                lv_area_t bg_area;
+    //                bg_area.x1 = txt_area.x1 - LV_DPX(8);
+    //                bg_area.x2 = txt_area.x2 + LV_DPX(8);
+    //                bg_area.y1 = txt_area.y1 - LV_DPX(8);
+    //                bg_area.y2 = txt_area.y2 + LV_DPX(8);
+    //
+    //                lv_draw_rect_dsc_t rect_dsc;
+    //                lv_draw_rect_dsc_init(&rect_dsc);
+    //                rect_dsc.bg_color = ser->color;
+    //                rect_dsc.radius = LV_DPX(5);
+    //                lv_draw_rect(dsc->layer, &rect_dsc, &bg_area);
+    //
+    //                lv_draw_label_dsc_t label_dsc;
+    //                lv_draw_label_dsc_init(&label_dsc);
+    //                label_dsc.color = lv_color_white();
+    //                label_dsc.font = font_normal;
+    //                lv_draw_label(dsc->layer, &label_dsc, &txt_area,  buf, NULL);
+    //            }
+    //            else {
+    //                dsc->rect_dsc->outline_width = 0;
+    //                dsc->rect_dsc->shadow_width = 0;
+    //            }
+    //        }
+    //    }
 }
 
 
 static void shop_chart_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    if(code == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        /*Set the markers' text*/
-        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
-            const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-            lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
-        }
-        if(dsc->part == LV_PART_ITEMS) {
-            dsc->rect_dsc->bg_opa = LV_OPA_TRANSP; /*We will draw it later*/
-        }
-    }
-    if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        /*Add the faded area before the lines are drawn */
-        if(dsc->part == LV_PART_ITEMS) {
-            static const uint32_t devices[10] = {32, 43, 21, 56, 29, 36, 19, 25, 62, 35};
-            static const uint32_t clothes[10] = {12, 19, 23, 31, 27, 32, 32, 11, 21, 32};
-            static const uint32_t services[10] = {56, 38, 56, 13, 44, 32, 49, 64, 17, 33};
-
-            lv_draw_rect_dsc_t draw_rect_dsc;
-            lv_draw_rect_dsc_init(&draw_rect_dsc);
-
-            lv_coord_t h = lv_area_get_height(dsc->draw_area);
-
-            lv_area_t a;
-            a.x1 = dsc->draw_area->x1;
-            a.x2 = dsc->draw_area->x2;
-
-            a.y1 = dsc->draw_area->y1;
-            a.y2 = a.y1 + 4 + (devices[dsc->id] * h) / 100; /*+4 to overlap the radius*/
-            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
-            draw_rect_dsc.radius = 4;
-            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-
-            a.y1 = a.y2 - 4;                                    /*-4 to overlap the radius*/
-            a.y2 = a.y1 + (clothes[dsc->id] * h) / 100;
-            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
-            draw_rect_dsc.radius = 0;
-            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-
-            a.y1 = a.y2;
-            a.y2 = a.y1 + (services[dsc->id] * h) / 100;
-            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_GREEN);
-            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-        }
-    }
+    //    lv_event_code_t code = lv_event_get_code(e);
+    //    if(code == LV_EVENT_DRAW_PART_BEGIN) {
+    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
+    //        /*Set the markers' text*/
+    //        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
+    //            const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
+    //            lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
+    //        }
+    //        if(dsc->part == LV_PART_ITEMS) {
+    //            dsc->rect_dsc->bg_opa = LV_OPA_TRANSP; /*We will draw it later*/
+    //        }
+    //    }
+    //    if(code == LV_EVENT_DRAW_PART_END) {
+    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
+    //        /*Add the faded area before the lines are drawn */
+    //        if(dsc->part == LV_PART_ITEMS) {
+    //            static const uint32_t devices[10] = {32, 43, 21, 56, 29, 36, 19, 25, 62, 35};
+    //            static const uint32_t clothes[10] = {12, 19, 23, 31, 27, 32, 32, 11, 21, 32};
+    //            static const uint32_t services[10] = {56, 38, 56, 13, 44, 32, 49, 64, 17, 33};
+    //
+    //            lv_draw_rect_dsc_t draw_rect_dsc;
+    //            lv_draw_rect_dsc_init(&draw_rect_dsc);
+    //
+    //            lv_coord_t h = lv_area_get_height(dsc->draw_area);
+    //
+    //            lv_area_t a;
+    //            a.x1 = dsc->draw_area->x1;
+    //            a.x2 = dsc->draw_area->x2;
+    //
+    //            a.y1 = dsc->draw_area->y1;
+    //            a.y2 = a.y1 + 4 + (devices[dsc->id] * h) / 100; /*+4 to overlap the radius*/
+    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
+    //            draw_rect_dsc.radius = 4;
+    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
+    //
+    //            a.y1 = a.y2 - 4;                                    /*-4 to overlap the radius*/
+    //            a.y2 = a.y1 + (clothes[dsc->id] * h) / 100;
+    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
+    //            draw_rect_dsc.radius = 0;
+    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
+    //
+    //            a.y1 = a.y2;
+    //            a.y2 = a.y1 + (services[dsc->id] * h) / 100;
+    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_GREEN);
+    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
+    //        }
+    //    }
 }
 
 

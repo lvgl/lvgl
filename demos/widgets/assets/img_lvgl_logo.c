@@ -155,8 +155,8 @@ const lv_img_dsc_t img_lvgl_logo = {
     .header.always_zero = 0,
     .header.w = 42,
     .header.h = 43,
-    .data_size = 1806 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
-    .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
+    //    .data_size = 1806 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_lvgl_logo_map,
 };
 
