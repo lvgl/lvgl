@@ -143,7 +143,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
         lv_opa_t * mask_buf = lv_malloc(blend_area_w);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         int32_t h;
         for(h = blend_area.y1; h <= y2; h++) {
             lv_memset(mask_buf, 0xff, blend_area_w);
@@ -163,7 +163,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
                     mask_buf[i] = 0x00;
                 }
 
-                blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             }
 
             lv_draw_sw_blend(draw_unit, &blend_dsc);
@@ -216,7 +216,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
         lv_opa_t * mask_buf = lv_malloc(draw_area_w);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         lv_coord_t dash_start = (blend_area.y1) % (dsc->dash_gap + dsc->dash_width);
 
         lv_coord_t dash_cnt = dash_start;
@@ -226,7 +226,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
             lv_memset(mask_buf, 0xff, draw_area_w);
 
             if(dash_cnt > dsc->dash_width) {
-                blend_dsc.mask_res = LV_DRAW_MASK_RES_TRANSP;
+                blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_TRANSP;
             }
 
             if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
@@ -296,41 +296,43 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
     bool is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
     if(is_common == false) return;
 
-    lv_draw_mask_line_param_t mask_left_param;
-    lv_draw_mask_line_param_t mask_right_param;
-    lv_draw_mask_line_param_t mask_top_param;
-    lv_draw_mask_line_param_t mask_bottom_param;
+    lv_draw_sw_mask_line_param_t mask_left_param;
+    lv_draw_sw_mask_line_param_t mask_right_param;
+    lv_draw_sw_mask_line_param_t mask_top_param;
+    lv_draw_sw_mask_line_param_t mask_bottom_param;
 
     void * masks[5] = {&mask_left_param, &mask_right_param, NULL, NULL, NULL};
 
 
     if(flat) {
         if(xdiff > 0) {
-            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0,
-                                          LV_DRAW_MASK_LINE_SIDE_LEFT);
-            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1,
-                                          LV_DRAW_MASK_LINE_SIDE_RIGHT);
+            lv_draw_sw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0,
+                                             LV_DRAW_SW_MASK_LINE_SIDE_LEFT);
+            lv_draw_sw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1,
+                                             LV_DRAW_SW_MASK_LINE_SIDE_RIGHT);
         }
         else {
-            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1,
-                                          LV_DRAW_MASK_LINE_SIDE_LEFT);
-            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0,
-                                          LV_DRAW_MASK_LINE_SIDE_RIGHT);
+            lv_draw_sw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1,
+                                             LV_DRAW_SW_MASK_LINE_SIDE_LEFT);
+            lv_draw_sw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0,
+                                             LV_DRAW_SW_MASK_LINE_SIDE_RIGHT);
         }
     }
     else {
-        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half1, p1.y, p2.x + w_half1, p2.y,
-                                      LV_DRAW_MASK_LINE_SIDE_LEFT);
-        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half0, p1.y, p2.x - w_half0, p2.y,
-                                      LV_DRAW_MASK_LINE_SIDE_RIGHT);
+        lv_draw_sw_mask_line_points_init(&mask_left_param, p1.x + w_half1, p1.y, p2.x + w_half1, p2.y,
+                                         LV_DRAW_SW_MASK_LINE_SIDE_LEFT);
+        lv_draw_sw_mask_line_points_init(&mask_right_param, p1.x - w_half0, p1.y, p2.x - w_half0, p2.y,
+                                         LV_DRAW_SW_MASK_LINE_SIDE_RIGHT);
 
     }
 
     /*Use the normal vector for the endings*/
 
     if(!dsc->raw_end) {
-        lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
-        lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y, p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);
+        lv_draw_sw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff,
+                                         LV_DRAW_SW_MASK_LINE_SIDE_BOTTOM);
+        lv_draw_sw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y, p2.x - ydiff, p2.y + xdiff,
+                                         LV_DRAW_SW_MASK_LINE_SIDE_TOP);
         masks[3] = &mask_top_param;
         masks[4] = &mask_bottom_param;
     }
@@ -362,8 +364,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
 
     /*Fill the first row with 'color'*/
     for(h = blend_area.y1; h <= y2; h++) {
-        blend_dsc.mask_res = lv_draw_mask_apply(masks, &mask_buf[mask_p], blend_area.x1, h, draw_area_w);
-        if(blend_dsc.mask_res == LV_DRAW_MASK_RES_TRANSP) {
+        blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, &mask_buf[mask_p], blend_area.x1, h, draw_area_w);
+        if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
             lv_memzero(&mask_buf[mask_p], draw_area_w);
         }
 
@@ -372,7 +374,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
             blend_area.y2 ++;
         }
         else {
-            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             lv_draw_sw_blend(draw_unit, &blend_dsc);
 
             blend_area.y1 = blend_area.y2 + 1;
@@ -385,16 +387,16 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
     /*Flush the last part*/
     if(blend_area.y1 != blend_area.y2) {
         blend_area.y2--;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
 
     lv_free(mask_buf);
 
-    lv_draw_mask_free_param(&mask_left_param);
-    lv_draw_mask_free_param(&mask_right_param);
-    lv_draw_mask_free_param(&mask_top_param);
-    lv_draw_mask_free_param(&mask_bottom_param);
+    lv_draw_sw_mask_free_param(&mask_left_param);
+    lv_draw_sw_mask_free_param(&mask_right_param);
+    lv_draw_sw_mask_free_param(&mask_top_param);
+    lv_draw_sw_mask_free_param(&mask_bottom_param);
 #else
     LV_UNUSED(draw_unit);
     LV_UNUSED(dsc);

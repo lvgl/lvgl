@@ -134,7 +134,7 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_ds
     const lv_font_t * font = dsc->font;
     int32_t w;
 
-    lv_layer_t * layer = draw_unit->layer;
+    lv_layer_t * layer = draw_unit->target_layer;
     lv_area_t clipped_area;
     bool clip_ok = _lv_area_intersect(&clipped_area, coords, draw_unit->clip_area);
     if(!clip_ok) return;
@@ -340,7 +340,7 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, lv_draw_label_ds
 static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_letter_dsc_t * dsc,  const lv_point_t * pos,
                         const lv_font_t * font, uint32_t letter, lv_draw_letter_cb_t cb)
 {
-    lv_layer_t * layer = draw_unit->layer;
+    lv_layer_t * layer = draw_unit->target_layer;
     lv_font_glyph_dsc_t g;
 
     bool g_ret = lv_font_get_glyph_dsc(font, &g, letter, '\0');

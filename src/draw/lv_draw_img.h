@@ -51,6 +51,12 @@ typedef struct _lv_draw_img_dsc_t {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode : 4;
 
+    lv_opa_t * bitmap_mask;     /*A8 mask or NULL is not used*/
+    lv_area_t bitmap_mask_area;
+
+    lv_area_t rectangle_mask_area;
+    lv_coord_t rectangle_mask_radius;
+
     int32_t frame_id;
     uint16_t antialias      : 1;
     lv_draw_img_sup_t * sup;

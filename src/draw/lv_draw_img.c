@@ -50,6 +50,11 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_ZOOM_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
+
+    dsc->rectangle_mask_area.x1 = LV_COORD_MIN;
+    dsc->rectangle_mask_area.y1 = LV_COORD_MIN;
+    dsc->rectangle_mask_area.x2 = LV_COORD_MAX;
+    dsc->rectangle_mask_area.y2 = LV_COORD_MAX;
 }
 
 
@@ -61,6 +66,9 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_a
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_LAYER;
     t->state = LV_DRAW_TASK_STATE_WAITING;
+
+    lv_layer_t * layer_to_draw = (lv_layer_t *)dsc->src;
+    layer_to_draw->all_tasks_added = true;
 
     lv_draw_dispatch();
 }

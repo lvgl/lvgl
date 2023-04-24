@@ -110,7 +110,6 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     rect_dsc.border_width = 2;
     lv_draw_sw_rect(draw_unit, &rect_dsc, &area_rot);
 
-
     lv_point_t txt_size;
     lv_txt_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
@@ -131,7 +130,6 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     label_dsc.color = lv_color_white();
     label_dsc.text = buf;
     lv_draw_sw_label(draw_unit, &label_dsc, &txt_area);
-
 #endif
 }
 
@@ -140,84 +138,53 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
                                           const lv_area_t * coords)
 {
-
-
-    //    _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(draw_dsc->src, draw_dsc->recolor, draw_dsc->frame_id);
-    //    if(cdsc == NULL)  {
-    //        LV_LOG_WARN("Couldn't open the image");
-    //        return;
-    //    }
-    //
-    //    if(cdsc->dec_dsc.error_msg != NULL) {
-    //        LV_LOG_WARN("Couldn't open the image: %s", cdsc->dec_dsc.error_msg);
-    //        lv_img_decoder_close(&cdsc->dec_dsc);
-    //        return;
-    //    }
-
     lv_img_dsc_t * img_dsc = draw_dsc->src;
     const uint8_t * src_buf = img_dsc->data;
 
     lv_color_format_t cf = img_dsc->header.cf;
-    //    lv_color_format_t cf = cdsc->dec_dsc.header.cf;
     lv_draw_img_sup_t sup;
-    //    sup.palette = cdsc->dec_dsc.palette;
-    //    sup.palette_size = cdsc->dec_dsc.palette_size;
-    //    sup.alpha_color = cdsc->dec_dsc.color;
-    //    sup.chroma_key_color = lv_color_hex(0x00ff00);
-    //    sup.chroma_keyed = cf == LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED ? 1 : 0;
-    //
 
-
-    lv_area_t map_area_rot;
-    lv_area_copy(&map_area_rot, coords);
+    lv_area_t transformed_area;
+    lv_area_copy(&transformed_area, coords);
     if(draw_dsc->angle || draw_dsc->zoom != LV_ZOOM_NONE) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
-        _lv_img_buf_get_transformed_area(&map_area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
+        _lv_img_buf_get_transformed_area(&transformed_area, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
 
-        map_area_rot.x1 += coords->x1;
-        map_area_rot.y1 += coords->y1;
-        map_area_rot.x2 += coords->x1;
-        map_area_rot.y2 += coords->y1;
+        transformed_area.x1 += coords->x1;
+        transformed_area.y1 += coords->y1;
+        transformed_area.x2 += coords->x1;
+        transformed_area.y2 += coords->y1;
     }
 
-    lv_area_t clip_com; /*Common area of mask and coords*/
-    bool union_ok;
-    union_ok = _lv_area_intersect(&clip_com, draw_unit->clip_area, &map_area_rot);
+    lv_area_t draw_area; /*Common area of cilp_area and coords. The image is visible only here*/
     /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
-    if(union_ok == false) {
-        //        lv_img_decoder_close(&cdsc->dec_dsc);
+    if(!_lv_area_intersect(&draw_area, draw_unit->clip_area, &transformed_area)) {
         return;
     }
 
     const lv_area_t * clip_area_ori = draw_unit->clip_area;
-    draw_unit->clip_area = &clip_com;
+    draw_unit->clip_area = &draw_area;
 
-    /*Use the clip area as draw area*/
-    lv_area_t draw_area;
-    lv_area_copy(&draw_area, draw_unit->clip_area);
+    bool transformed = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
+    bool masked = (draw_dsc->bitmap_mask && _lv_area_is_on(&draw_dsc->bitmap_mask_area, &transformed_area)) ||
+                  _lv_area_is_on(&draw_dsc->rectangle_mask_area, &transformed_area);
 
-    bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
 
-    bool mask_any = false;
-
-    lv_area_t blend_area;
     lv_draw_sw_blend_dsc_t blend_dsc;
 
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;
     blend_dsc.blend_mode = draw_dsc->blend_mode;
-    blend_dsc.blend_area = &blend_area;
 
     /*The simplest case just copy the pixels into the draw_buf*/
-    if(!transform && cf == LV_COLOR_FORMAT_NATIVE && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
+    if(!masked && !transformed && cf == LV_COLOR_FORMAT_NATIVE && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
-
         blend_dsc.blend_area = coords;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
-    else if(!transform && cf == LV_COLOR_FORMAT_A8) {
+    else if(!transformed && cf == LV_COLOR_FORMAT_A8) {
         lv_area_t clipped_coords;
         if(!_lv_area_intersect(&clipped_coords, coords, draw_unit->clip_area)) return;
 
@@ -225,13 +192,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_dsc.mask_area = coords;
         blend_dsc.src_buf = NULL;
         blend_dsc.color = sup.alpha_color;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
 
         blend_dsc.blend_area = coords;
         lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
-#if LV_COLOR_DEPTH == 16
-    else if(!mask_any && !transform && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
+    else if(!masked && !transformed && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         lv_coord_t src_w = lv_area_get_width(coords);
         lv_coord_t src_h = lv_area_get_height(coords);
         blend_dsc.src_buf = (const lv_color_t *)src_buf;
@@ -239,12 +205,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_dsc.mask_buf += sizeof(lv_color_t) * src_w * src_h;
         blend_dsc.blend_area = coords;
         blend_dsc.mask_area = coords;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
-        lv_draw_sw_blend(layer, &blend_dsc);
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+        lv_draw_sw_blend(draw_unit, &blend_dsc);
     }
-#endif
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
+        lv_area_t blend_area;
+        blend_dsc.blend_area = &blend_area;
         blend_area.x1 = draw_unit->clip_area->x1;
         blend_area.x2 = draw_unit->clip_area->x2;
         blend_area.y1 = draw_unit->clip_area->y1;
@@ -274,14 +241,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         lv_opa_t * mask_buf = lv_malloc(buf_size);
         blend_dsc.mask_buf = mask_buf;
         blend_dsc.mask_area = &blend_area;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
         blend_dsc.src_buf = rgb_buf;
         lv_coord_t y_last = blend_area.y2;
         blend_area.y2 = blend_area.y1 + buf_h - 1;
 
-        lv_draw_mask_res_t mask_res_def = (cf != LV_COLOR_FORMAT_NATIVE || draw_dsc->angle ||
-                                           draw_dsc->zoom != LV_ZOOM_NONE) ?
-                                          LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+        lv_draw_sw_mask_res_t mask_res_def = (cf != LV_COLOR_FORMAT_NATIVE || draw_dsc->angle ||
+                                              draw_dsc->zoom != LV_ZOOM_NONE) ?
+                                             LV_DRAW_SW_MASK_RES_CHANGED : LV_DRAW_SW_MASK_RES_FULL_COVER;
         blend_dsc.mask_res = mask_res_def;
 
         if(cf == LV_COLOR_FORMAT_A8) {
@@ -293,7 +260,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
             lv_area_t transform_area;
             lv_area_copy(&transform_area, &blend_area);
             lv_area_move(&transform_area, -coords->x1, -coords->y1);
-            if(transform) {
+            if(transformed) {
                 lv_draw_sw_transform(draw_unit, &transform_area, src_buf, src_w, src_h, src_w,
                                      draw_dsc, &sup, cf, rgb_buf, mask_buf);
             }

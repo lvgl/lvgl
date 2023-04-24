@@ -141,7 +141,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
 
 #if LV_USE_OS
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
-    draw_sw_unit->base_unit.layer = layer;
+    draw_sw_unit->base_unit.target_layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
 
@@ -149,7 +149,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     lv_thread_sync_signal(&draw_sw_unit->sync);
 #else
     t->state = LV_DRAW_TASK_STATE_IN_PRGRESS;
-    draw_sw_unit->base_unit.layer = layer;
+    draw_sw_unit->base_unit.target_layer = target_layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
 
@@ -312,6 +312,9 @@ static void exectue_drawing(lv_draw_sw_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
             lv_draw_sw_layer((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+            lv_draw_sw_mask_rect((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         default:
             break;

@@ -52,7 +52,7 @@ void lv_draw_init(void)
 #endif
 
 #if LV_USE_DRAW_MASKS
-    lv_draw_mask_init();
+    lv_draw_sw_mask_init();
 #endif
 
 }
@@ -221,14 +221,6 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 
     return new_layer;
 }
-
-
-void lv_draw_layer_close(lv_layer_t * layer)
-{
-    layer->all_tasks_added = true;
-}
-
-
 
 /**********************
  *   STATIC FUNCTIONS

@@ -84,15 +84,15 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend(lv_draw_unit_t * draw_unit, const lv
     /*Do not draw transparent things*/
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_layer_t * layer = draw_unit->layer;
+    lv_layer_t * layer = draw_unit->target_layer;
 
     lv_area_t blend_area;
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_unit->clip_area)) return;
 
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
-    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_MASK_RES_TRANSP) return;
-    else if(dsc->mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask = NULL;
+    if(dsc->mask_buf && dsc->mask_res == LV_DRAW_SW_MASK_RES_TRANSP) return;
+    else if(dsc->mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) mask = NULL;
     else mask = dsc->mask_buf;
 
     lv_coord_t dest_stride = lv_area_get_width(&layer->buf_area);

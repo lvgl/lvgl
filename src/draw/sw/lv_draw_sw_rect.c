@@ -141,11 +141,11 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
     /*Add a radius mask if there is a radius*/
     int32_t clipped_w = lv_area_get_width(&clipped_coords);
     lv_opa_t * mask_buf = NULL;
-    lv_draw_mask_radius_param_t mask_rout_param;
+    lv_draw_sw_mask_radius_param_t mask_rout_param;
     void * mask_list[2] = {NULL, NULL};
     if(rout > 0) {
         mask_buf = lv_malloc(clipped_w);
-        lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
+        lv_draw_sw_mask_radius_init(&mask_rout_param, &bg_coords, rout, false);
         mask_list[0] = &mask_rout_param;
     }
 
@@ -220,8 +220,8 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
         /* Initialize the mask to opa instead of 0xFF and blend with LV_OPA_COVER.
          * It saves calculating the final opa in lv_draw_sw_blend*/
         lv_memset(mask_buf, opa, clipped_w);
-        blend_dsc.mask_res = lv_draw_mask_apply(mask_list, mask_buf, blend_area.x1, top_y, clipped_w);
-        if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+        blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, top_y, clipped_w);
+        if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
 
         if(top_y >= clipped_coords.y1) {
             blend_area.y1 = top_y;
@@ -264,7 +264,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
     /*With gradient draw line by line*/
     else {
         blend_dsc.opa = opa;
-        blend_dsc.mask_res = LV_DRAW_MASK_RES_FULL_COVER;
+        blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_FULL_COVER;
         int32_t h_end = bg_coords.y2 - rout;
         for(h = bg_coords.y1 + rout; h <= h_end; h++) {
             blend_area.y1 = h;
@@ -282,7 +282,7 @@ static void draw_bg(lv_draw_unit_t * draw_unit, const lv_draw_rect_dsc_t * dsc, 
 bg_clean_up:
     if(mask_buf) {
         lv_free(mask_buf);
-        lv_draw_mask_free_param(&mask_rout_param);
+        lv_draw_sw_mask_free_param(&mask_rout_param);
     }
     if(grad) {
         lv_gradient_cleanup(grad);
@@ -480,10 +480,10 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
 
     /*Create a radius mask to clip remove shadow on the bg area*/
 
-    lv_draw_mask_radius_param_t mask_rout_param;
+    lv_draw_sw_mask_radius_param_t mask_rout_param;
     void * masks[2] = {0};
     if(!simple) {
-        lv_draw_mask_radius_init(&mask_rout_param, &bg_area, r_bg, true);
+        lv_draw_sw_mask_radius_init(&mask_rout_param, &bg_area, r_bg, true);
         masks[0] = &mask_rout_param;
     }
 
@@ -531,15 +531,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
             blend_dsc.mask_buf = mask_buf;
             blend_area.x1 = clip_area_sub.x1;
             blend_area.x2 = clip_area_sub.x2;
-            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
                 blend_area.y2 = y;
 
                 if(!simple_sub) {
                     lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
@@ -574,15 +574,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
             blend_dsc.mask_buf = mask_buf;
             blend_area.x1 = clip_area_sub.x1;
             blend_area.x2 = clip_area_sub.x2;
-            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
                 blend_area.y1 = y;
                 blend_area.y2 = y;
 
                 if(!simple_sub) {
                     lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
@@ -626,8 +626,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
 
                 if(!simple_sub) {
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                     lv_draw_sw_blend(draw_unit, &blend_dsc);
                 }
                 else {
@@ -677,8 +677,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
 
                 if(!simple_sub) {
                     lv_memset(mask_buf, sh_buf_tmp[0], w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                     lv_draw_sw_blend(draw_unit, &blend_dsc);
                 }
                 else {
@@ -718,15 +718,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
         if(w > 0) {
             blend_area.x1 = clip_area_sub.x1;
             blend_area.x2 = clip_area_sub.x2;
-            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
                 blend_area.y2 = y;
 
                 if(!simple_sub) {
                     lv_memcpy(mask_buf, sh_buf_tmp, w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 lv_draw_sw_blend(draw_unit, &blend_dsc);
             }
@@ -774,15 +774,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
         if(w > 0) {
             blend_area.x1 = clip_area_sub.x1;
             blend_area.x2 = clip_area_sub.x2;
-            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
                 blend_area.y2 = y;
 
                 if(!simple_sub) {
                     lv_memcpy(mask_buf, sh_buf_tmp, w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
 
                 lv_draw_sw_blend(draw_unit, &blend_dsc);
@@ -814,15 +814,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
         if(w > 0) {
             blend_area.x1 = clip_area_sub.x1;
             blend_area.x2 = clip_area_sub.x2;
-            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y1; y <= clip_area_sub.y2; y++) {
                 blend_area.y1 = y;
                 blend_area.y2 = y;
 
                 if(!simple_sub) {
                     lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
@@ -858,15 +858,15 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
         if(w > 0) {
             blend_area.x1 = clip_area_sub.x1;
             blend_area.x2 = clip_area_sub.x2;
-            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
+            blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;    /*In simple mode it won't be overwritten*/
             for(y = clip_area_sub.y2; y >= clip_area_sub.y1; y--) {
                 blend_area.y1 = y;
                 blend_area.y2 = y;
 
                 if(!simple_sub) {
                     lv_memcpy(mask_buf, sh_buf_tmp, corner_size);
-                    blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
-                    if(blend_dsc.mask_res == LV_DRAW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                    if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
                 }
                 else {
                     blend_dsc.mask_buf = sh_buf_tmp;
@@ -895,14 +895,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(lv_draw_unit_t * draw_unit, const 
                 blend_area.y2 = y;
 
                 lv_memset(mask_buf, 0xff, w);
-                blend_dsc.mask_res = lv_draw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
+                blend_dsc.mask_res = lv_draw_sw_mask_apply(masks, mask_buf, clip_area_sub.x1, y, w);
                 lv_draw_sw_blend(draw_unit, &blend_dsc);
             }
         }
     }
 
     if(!simple) {
-        lv_draw_mask_free_param(&mask_rout_param);
+        lv_draw_sw_mask_free_param(&mask_rout_param);
     }
     lv_free(sh_buf);
     lv_free(mask_buf);
@@ -929,8 +929,8 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
     sh_area.x1 = sh_area.x2 - lv_area_get_width(coords);
     sh_area.y2 = sh_area.y1 + lv_area_get_height(coords);
 
-    lv_draw_mask_radius_param_t mask_param;
-    lv_draw_mask_radius_init(&mask_param, &sh_area, r, false);
+    lv_draw_sw_mask_radius_param_t mask_param;
+    lv_draw_sw_mask_radius_init(&mask_param, &sh_area, r, false);
 
 #if SHADOW_ENHANCE
     /*Set half shadow width width because blur will be repeated*/
@@ -943,8 +943,8 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
     uint16_t * sh_ups_tmp_buf = (uint16_t *)sh_buf;
     for(y = 0; y < size; y++) {
         lv_memset(mask_line, 0xff, size);
-        lv_draw_mask_res_t mask_res = mask_param.dsc.cb(mask_line, 0, y, size, &mask_param);
-        if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
+        lv_draw_sw_mask_res_t mask_res = mask_param.dsc.cb(mask_line, 0, y, size, &mask_param);
+        if(mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
             lv_memzero(sh_ups_tmp_buf, size * sizeof(sh_ups_tmp_buf[0]));
         }
         else {
@@ -960,7 +960,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
     }
     lv_free(mask_line);
 
-    lv_draw_mask_free_param(&mask_param);
+    lv_draw_sw_mask_free_param(&mask_param);
 
     if(sw == 1) {
         int32_t i;
@@ -1142,15 +1142,15 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
     void * mask_list[3] = {0};
 
     /*Create mask for the inner mask*/
-    lv_draw_mask_radius_param_t mask_rin_param;
-    lv_draw_mask_radius_init(&mask_rin_param, inner_area, rin, true);
+    lv_draw_sw_mask_radius_param_t mask_rin_param;
+    lv_draw_sw_mask_radius_init(&mask_rin_param, inner_area, rin, true);
     mask_list[0] = &mask_rin_param;
 
 
     /*Create mask for the outer area*/
-    lv_draw_mask_radius_param_t mask_rout_param;
+    lv_draw_sw_mask_radius_param_t mask_rout_param;
     if(rout > 0) {
-        lv_draw_mask_radius_init(&mask_rout_param, outer_area, rout, false);
+        lv_draw_sw_mask_radius_init(&mask_rout_param, outer_area, rout, false);
         mask_list[1] = &mask_rout_param;
     }
 
@@ -1183,7 +1183,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
         split_hor = false;
     }
 
-    blend_dsc.mask_res = LV_DRAW_MASK_RES_FULL_COVER;
+    blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_FULL_COVER;
     /*Draw the straight lines first if they are long enough*/
     if(top_side && split_hor) {
         blend_area.x1 = core_area.x1;
@@ -1232,7 +1232,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
             if(top_y < draw_area.y1 && bottom_y > draw_area.y2) continue;   /*This line is clipped now*/
 
             lv_memset(blend_dsc.mask_buf, 0xff, draw_area_w);
-            blend_dsc.mask_res = lv_draw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, top_y, draw_area_w);
+            blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, top_y, draw_area_w);
 
             if(top_y >= draw_area.y1) {
                 blend_area.y1 = top_y;
@@ -1259,7 +1259,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
                     blend_area.y2 = h;
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
                     lv_draw_sw_blend(draw_unit, &blend_dsc);
                 }
             }
@@ -1270,7 +1270,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
                     blend_area.y2 = h;
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
                     lv_draw_sw_blend(draw_unit, &blend_dsc);
                 }
             }
@@ -1288,7 +1288,7 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
                     blend_area.y2 = h;
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
                     lv_draw_sw_blend(draw_unit, &blend_dsc);
                 }
             }
@@ -1299,15 +1299,15 @@ void draw_border_generic(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
                     blend_area.y2 = h;
 
                     lv_memset(blend_dsc.mask_buf, 0xff, blend_w);
-                    blend_dsc.mask_res = lv_draw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
+                    blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, blend_dsc.mask_buf, blend_area.x1, h, blend_w);
                     lv_draw_sw_blend(draw_unit, &blend_dsc);
                 }
             }
         }
     }
 
-    lv_draw_mask_free_param(&mask_rin_param);
-    if(rout > 0) lv_draw_mask_free_param(&mask_rout_param);
+    lv_draw_sw_mask_free_param(&mask_rin_param);
+    if(rout > 0) lv_draw_sw_mask_free_param(&mask_rout_param);
     lv_free(blend_dsc.mask_buf);
 
 #else /*LV_USE_DRAW_MASKS*/

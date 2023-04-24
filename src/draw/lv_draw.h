@@ -37,6 +37,8 @@ typedef enum {
     LV_DRAW_TASK_TYPE_LAYER,
     LV_DRAW_TASK_TYPE_LINE,
     LV_DRAW_TASK_TYPE_ARC,
+    LV_DRAW_TASK_TYPE_MASK_RECTANGLE,
+    LV_DRAW_TASK_TYPE_MASK_BITMAP,
 } lv_draw_task_type_t;
 
 typedef enum {
@@ -74,7 +76,11 @@ typedef struct {
 
 typedef struct _lv_draw_unit_t {
     struct _lv_draw_unit_t * next;
-    struct _lv_layer_t * layer;
+
+    /**
+     * The target_layer on which drawing should happen
+     */
+    struct _lv_layer_t * target_layer;
 
     const lv_area_t * clip_area;
 
@@ -104,7 +110,7 @@ typedef struct _lv_layer_t  {
 
     /**
      * The rendered image in layer->buf will be converted to this format
-     * using layer->buffer_convert.
+     * using target_layer->buffer_convert.
      */
     lv_color_format_t color_format;
 
@@ -122,17 +128,17 @@ typedef struct _lv_layer_t  {
      *       but can have different x and y position.
      * @note dest_area and src_area must be clipped to the real dimensions of the buffers
      */
-    void (*buffer_copy)(struct _lv_layer_t * layer, void * dest_buf, lv_coord_t dest_stride,
+    void (*buffer_copy)(struct _lv_layer_t * target_layer, void * dest_buf, lv_coord_t dest_stride,
                         const lv_area_t * dest_area,
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
     /**
-     * Convert the content of `layer->buf` to `layer->color_format`
-     * @param layer
+     * Convert the content of `target_layer->buf` to `target_layer->color_format`
+     * @param target_layer
      */
     void (*buffer_convert)(struct _lv_layer_t * layer);
 
-    void (*buffer_clear)(struct _lv_layer_t * layer);
+    void (*buffer_clear)(struct _lv_layer_t * target_layer);
 
     /**
      * Linked list of draw tasks
@@ -179,15 +185,9 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
  * @param parent_layer      the parent layer to which the layer will be merged when it's rendered
  * @param color_format      the color format of the layer
  * @param area              the areas of the layer (absolute coordinates)
- * @return                  the new layer or NULL on error
+ * @return                  the new target_layer or NULL on error
  */
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area);
-
-/**
- * Close the layer when all draw tasks are added to it.
- * @param layer     the layer to close
- */
-void lv_draw_layer_close(lv_layer_t * layer);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -205,6 +205,7 @@ void lv_draw_layer_close(lv_layer_t * layer);
 #include "lv_draw_img.h"
 #include "lv_draw_arc.h"
 #include "lv_draw_line.h"
+#include "lv_draw_mask.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

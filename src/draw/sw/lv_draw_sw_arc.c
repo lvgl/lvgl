@@ -93,20 +93,20 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     void * mask_list[4] = {0};
 
     /*Create an angle mask*/
-    lv_draw_mask_angle_param_t mask_angle_param;
-    lv_draw_mask_angle_init(&mask_angle_param, dsc->center.x, dsc->center.y, start_angle, end_angle);
+    lv_draw_sw_mask_angle_param_t mask_angle_param;
+    lv_draw_sw_mask_angle_init(&mask_angle_param, dsc->center.x, dsc->center.y, start_angle, end_angle);
     mask_list[0] = &mask_angle_param;
 
     /*Create an outer mask*/
-    lv_draw_mask_radius_param_t mask_out_param;
-    lv_draw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
+    lv_draw_sw_mask_radius_param_t mask_out_param;
+    lv_draw_sw_mask_radius_init(&mask_out_param, &area_out, LV_RADIUS_CIRCLE, false);
     mask_list[1] = &mask_out_param;
 
     /*Create inner the mask*/
-    lv_draw_mask_radius_param_t mask_in_param;
+    lv_draw_sw_mask_radius_param_t mask_in_param;
     bool mask_in_param_valid = false;
     if(lv_area_get_width(&area_in) > 0 && lv_area_get_height(&area_in) > 0) {
-        lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        lv_draw_sw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
         mask_list[2] = &mask_in_param;
         mask_in_param_valid = true;
     }
@@ -130,7 +130,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     blend_area.y2 = blend_area.y1;
     for(h = 0; h < blend_h; h++) {
         lv_memset(mask_buf, 0xff, blend_w);
-        blend_dsc.mask_res = lv_draw_mask_apply(mask_list, mask_buf, blend_area.x1, blend_area.y1, blend_w);
+        blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, blend_area.y1, blend_w);
 
         lv_draw_sw_blend(draw_unit, &blend_dsc);
 
@@ -138,10 +138,10 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_area.y2 ++;
     }
 
-    lv_draw_mask_free_param(&mask_angle_param);
-    lv_draw_mask_free_param(&mask_out_param);
+    lv_draw_sw_mask_free_param(&mask_angle_param);
+    lv_draw_sw_mask_free_param(&mask_out_param);
     if(mask_in_param_valid) {
-        lv_draw_mask_free_param(&mask_in_param);
+        lv_draw_sw_mask_free_param(&mask_in_param);
     }
     lv_free(mask_buf);
 

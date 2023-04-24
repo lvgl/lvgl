@@ -458,7 +458,7 @@ refr_cache_clean_up:
     _lv_font_clean_up_fmt_txt();
 
 #if LV_USE_DRAW_MASKS
-    _lv_draw_mask_cleanup();
+    _lv_draw_sw_mask_cleanup();
 #endif
 
 refr_finish:
@@ -836,7 +836,7 @@ static bool alpha_test_area_on_obj(lv_obj_t * obj, const lv_area_t * area)
 {
 
     /*Test for alpha by assuming there is no alpha. If it fails, fall back to rendering with alpha*/
-    if(!_lv_area_is_in(area, &obj->coords, 0)) return false;
+    if(!_lv_area_is_on(area, &obj->coords)) return false;
 
     lv_cover_check_info_t info;
     info.res = LV_COVER_RES_COVER;
@@ -892,7 +892,6 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
             lv_layer_t * new_layer = lv_draw_layer_create(layer,
                                                           area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
             lv_obj_redraw(new_layer, obj);
-            lv_draw_layer_close(new_layer);
 
             lv_draw_img_dsc_t layer_draw_dsc;
             lv_draw_img_dsc_init(&layer_draw_dsc);
