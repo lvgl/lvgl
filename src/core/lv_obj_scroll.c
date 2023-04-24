@@ -260,7 +260,7 @@ void lv_obj_scroll_by_bounded(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_a
     /*We need to know the final sizes for bound check*/
     lv_obj_update_layout(obj);
 
-    /*Don't let scroll more then naturally possible by the size of the content*/
+    /*Don't let scroll more than naturally possible by the size of the content*/
     lv_coord_t x_current = -lv_obj_get_scroll_x(obj);
     lv_coord_t x_bounded = x_current + dx;
 
@@ -283,7 +283,7 @@ void lv_obj_scroll_by_bounded(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_a
         }
     }
 
-    /*Don't let scroll more then naturally possible by the size of the content*/
+    /*Don't let scroll more than naturally possible by the size of the content*/
     lv_coord_t y_current = -lv_obj_get_scroll_y(obj);
     lv_coord_t y_bounded = y_current + dy;
 
