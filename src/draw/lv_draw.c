@@ -206,6 +206,30 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     return NULL;
 }
 
+lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
+{
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    lv_layer_t * new_layer = disp->layer_init(disp);
+    LV_ASSERT_MALLOC(new_layer);
+    if(new_layer == NULL) return NULL;
+
+    new_layer->buf = NULL;
+    new_layer->parent = parent_layer;
+    new_layer->color_format = color_format;
+    new_layer->buf_area = *area;
+    new_layer->clip_area = *area;
+
+    return new_layer;
+}
+
+
+void lv_draw_layer_close(lv_layer_t * layer)
+{
+    layer->all_tasks_added = true;
+}
+
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

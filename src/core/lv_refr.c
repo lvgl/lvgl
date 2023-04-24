@@ -889,18 +889,10 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
                 if(layer_area_act.y2 > layer_area_full.y2) layer_area_act.y2 = layer_area_full.y2;
             }
 
-            lv_layer_t * new_layer = disp_refr->layer_init(disp_refr);
-            LV_ASSERT_MALLOC(new_layer);
-            new_layer->buf = NULL;
-            new_layer->parent = layer;
-
-            new_layer->color_format = area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
-
-            new_layer->buf_area = layer_area_act;
-            new_layer->clip_area = layer_area_act;
-
+            lv_layer_t * new_layer = lv_draw_layer_create(layer,
+                                                          area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
             lv_obj_redraw(new_layer, obj);
-            new_layer->all_tasks_added = true;
+            lv_draw_layer_close(new_layer);
 
             lv_draw_img_dsc_t layer_draw_dsc;
             lv_draw_img_dsc_init(&layer_draw_dsc);

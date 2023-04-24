@@ -174,6 +174,20 @@ void lv_draw_dispatch_request(void);
  */
 lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev);
 
+/**
+ * Create a new layer on a parent layer
+ * @param parent_layer      the parent layer to which the layer will be merged when it's rendered
+ * @param color_format      the color format of the layer
+ * @param area              the areas of the layer (absolute coordinates)
+ * @return                  the new layer or NULL on error
+ */
+lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area);
+
+/**
+ * Close the layer when all draw tasks are added to it.
+ * @param layer     the layer to close
+ */
+void lv_draw_layer_close(lv_layer_t * layer);
 
 /**********************
  *  GLOBAL VARIABLES
