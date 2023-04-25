@@ -70,6 +70,17 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_a
     lv_layer_t * layer_to_draw = (lv_layer_t *)dsc->src;
     layer_to_draw->all_tasks_added = true;
 
+    lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
+    base_dsc->layer = layer;
+
+    if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
+        /*Disable sending LV_EVENT_DRAW_TASK_ADDED first to avoid triggering recursive
+         *event calls due draw task adds in the event*/
+        lv_obj_clear_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+        lv_obj_send_event(dsc->base.obj, LV_EVENT_DRAW_TASK_ADDED, t);
+        lv_obj_add_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    }
+
     lv_draw_dispatch();
 }
 
@@ -88,9 +99,13 @@ void lv_draw_img(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_are
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
     t->type = LV_DRAW_TASK_TYPE_IMAGE;
 
-    if(dsc->obj) {
-        lv_obj_send_event(dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
+    lv_draw_dsc_base_t * base_dsc = t->draw_dsc;
+    base_dsc->layer = layer;
+
+    if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
+        lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
     }
+
 
     lv_draw_dispatch();
 }

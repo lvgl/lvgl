@@ -26,6 +26,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
+    lv_draw_dsc_base_t base;
+
     lv_point_t p1;
     lv_point_t p2;
     lv_color_t color;
@@ -37,11 +39,6 @@ typedef struct {
     uint8_t round_start : 1;
     uint8_t round_end   : 1;
     uint8_t raw_end     : 1;    /*Do not bother with perpendicular line ending if it's not visible for any reason*/
-
-    struct _lv_obj_t * obj;
-    uint32_t part;
-    uint32_t id1;
-    uint32_t id2;
 } lv_draw_line_dsc_t;
 
 struct _lv_layer_t;

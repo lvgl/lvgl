@@ -297,26 +297,26 @@ static void draw_part_begin_event_cb(lv_event_t * e)
     lv_draw_rect_dsc_t * rect_draw_dsc;
     rect_draw_dsc = draw_task->draw_dsc;
 
-    if(rect_draw_dsc->part == LV_PART_ITEMS) {
+    if(rect_draw_dsc->base.part == LV_PART_ITEMS) {
         /*Day name styles*/
-        if(rect_draw_dsc->id1 < 7) {
+        if(rect_draw_dsc->base.id1 < 7) {
             rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
             rect_draw_dsc->border_opa = LV_OPA_TRANSP;
         }
-        else if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->id1, LV_BTNMATRIX_CTRL_DISABLED)) {
+        else if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->base.id1, LV_BTNMATRIX_CTRL_DISABLED)) {
             rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
             rect_draw_dsc->border_opa = LV_OPA_TRANSP;
         }
 
-        if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->id1, LV_CALENDAR_CTRL_HIGHLIGHT)) {
+        if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_HIGHLIGHT)) {
             rect_draw_dsc->bg_opa = LV_OPA_40;
             rect_draw_dsc->bg_color = lv_theme_get_color_primary(obj);
-            if(lv_btnmatrix_get_selected_btn(obj) == rect_draw_dsc->id1) {
+            if(lv_btnmatrix_get_selected_btn(obj) == rect_draw_dsc->base.id1) {
                 rect_draw_dsc->bg_opa = LV_OPA_70;
             }
         }
 
-        if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->id1, LV_CALENDAR_CTRL_TODAY)) {
+        if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_TODAY)) {
             rect_draw_dsc->border_opa = LV_OPA_COVER;
             rect_draw_dsc->border_color = lv_theme_get_color_primary(obj);
             rect_draw_dsc->border_width += 1;

@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw.h"
 #include "lv_img_decoder.h"
 #include "lv_img_buf.h"
 #include "../misc/lv_style.h"
@@ -38,6 +39,8 @@ typedef struct {
 } lv_draw_img_sup_t;
 
 typedef struct _lv_draw_img_dsc_t {
+    lv_draw_dsc_base_t base;
+
     const void * src;
 
     int16_t angle;
@@ -60,11 +63,6 @@ typedef struct _lv_draw_img_dsc_t {
     int32_t frame_id;
     uint16_t antialias      : 1;
     lv_draw_img_sup_t * sup;
-
-    struct _lv_obj_t * obj;
-    uint32_t part;
-    uint32_t id1;
-    uint32_t id2;
 } lv_draw_img_dsc_t;
 
 struct _lv_layer_t;

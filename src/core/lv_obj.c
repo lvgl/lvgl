@@ -604,50 +604,11 @@ static void lv_obj_draw(lv_event_t * e)
         coords.y1 -= h;
         coords.y2 += h;
 
-#if LV_USE_DRAW_MASKS
-        /*With clip corner enabled draw the bg img separately to make it clipped*/
-        bool clip_corner = (lv_obj_get_style_clip_corner(obj, LV_PART_MAIN) && draw_dsc.radius != 0) ? true : false;
-        const void * bg_img_src = draw_dsc.bg_img_src;
-        if(clip_corner) {
-            draw_dsc.bg_img_src = NULL;
-        }
-#endif
-
         lv_draw_rect(layer, &draw_dsc, &coords);
-
-
-#if LV_USE_DRAW_MASKS
-        if(clip_corner) {
-            //            lv_draw_mask_radius_param_t * mp = lv_malloc(sizeof(lv_draw_mask_radius_param_t));
-            //            lv_draw_mask_radius_init(mp, &obj->coords, draw_dsc.radius, false);
-            //            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
-            //            lv_draw_mask_add(mp, obj + 8);
-            //
-            //            if(bg_img_src) {
-            //                draw_dsc.bg_opa = LV_OPA_TRANSP;
-            //                draw_dsc.border_opa = LV_OPA_TRANSP;
-            //                draw_dsc.outline_opa = LV_OPA_TRANSP;
-            //                draw_dsc.shadow_opa = LV_OPA_TRANSP;
-            //                draw_dsc.bg_img_src = bg_img_src;
-            //                lv_draw_rect(layer, &draw_dsc, &coords);
-            //            }
-
-        }
-#endif
     }
     else if(code == LV_EVENT_DRAW_POST) {
         lv_layer_t * layer = lv_event_get_layer(e);
         draw_scrollbar(obj, layer);
-
-#if LV_USE_DRAW_MASKS
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
-            //            lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
-            //            if(param) {
-            //                lv_draw_mask_free_param(param);
-            //                lv_free(param);
-            //            }
-        }
-#endif
 
         /*If the border is drawn later disable loading other properties*/
         if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
@@ -687,11 +648,11 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
     if(sb_res != LV_RES_OK) return;
 
     if(lv_area_get_size(&hor_area) > 0) {
-        draw_dsc.id1 = 0;
+        draw_dsc.base.id1 = 0;
         lv_draw_rect(layer, &draw_dsc, &hor_area);
     }
     if(lv_area_get_size(&ver_area) > 0) {
-        draw_dsc.id1 = 1;
+        draw_dsc.base.id1 = 1;
         lv_draw_rect(layer, &draw_dsc, &ver_area);
     }
 }

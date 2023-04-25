@@ -26,6 +26,8 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
+    lv_draw_dsc_base_t base;
+
     lv_color_t color;
     lv_coord_t width;
     uint16_t start_angle;
@@ -36,11 +38,6 @@ typedef struct {
     lv_opa_t opa;
     lv_blend_mode_t blend_mode  : 2;
     uint8_t rounded : 1;
-
-    struct _lv_obj_t * obj;
-    uint32_t part;
-    uint32_t id1;
-    uint32_t id2;
 } lv_draw_arc_dsc_t;
 
 struct _lv_layer_t;

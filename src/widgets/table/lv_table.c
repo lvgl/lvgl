@@ -710,11 +710,10 @@ static void draw_main(lv_event_t * e)
                 obj->skip_trans = 0;
             }
 
-
-            rect_dsc_act.id2 = row;
-            rect_dsc_act.id1 = col;
-            label_dsc_act.id1 = row;
-            label_dsc_act.id2 = col;
+            rect_dsc_act.base.id2 = row;
+            rect_dsc_act.base.id1 = col;
+            label_dsc_act.base.id1 = row;
+            label_dsc_act.base.id2 = col;
 
             lv_draw_rect(layer, &rect_dsc_act, &cell_area_border);
 

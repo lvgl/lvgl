@@ -48,6 +48,8 @@ typedef struct _lv_draw_label_hint_t {
 
 
 typedef struct {
+    lv_draw_dsc_base_t base;
+
     const char * text;
     const lv_font_t * font;
     uint32_t sel_start;
@@ -67,11 +69,6 @@ typedef struct {
     lv_blend_mode_t blend_mode: 3;
     uint8_t text_local  : 1;
     lv_draw_label_hint_t * hint;
-
-    struct _lv_obj_t * obj;
-    uint32_t part;
-    uint32_t id1;
-    uint32_t id2;
 } lv_draw_label_dsc_t;
 
 typedef enum {

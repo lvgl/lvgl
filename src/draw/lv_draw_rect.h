@@ -30,6 +30,8 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
  **********************/
 
 typedef struct {
+    lv_draw_dsc_base_t base;
+
     lv_coord_t radius;
     lv_blend_mode_t blend_mode;
 
@@ -66,11 +68,6 @@ typedef struct {
     lv_coord_t shadow_ofs_y;
     lv_coord_t shadow_spread;
     lv_opa_t shadow_opa;
-
-    struct _lv_obj_t * obj;
-    uint32_t part;
-    uint32_t id1;
-    uint32_t id2;
 } lv_draw_rect_dsc_t;
 
 /**********************

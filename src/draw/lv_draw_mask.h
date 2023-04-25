@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_conf_internal.h"
+#include "lv_draw.h"
 #include "../misc/lv_color.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
@@ -26,13 +26,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
+    lv_draw_dsc_base_t base;
+
     lv_area_t area;
     lv_coord_t radius;
-
-    struct _lv_obj_t * obj;
-    uint32_t part;
-    uint32_t id1;
-    uint32_t id2;
 } lv_draw_mask_rect_dsc_t;
 
 struct _lv_layer_t;

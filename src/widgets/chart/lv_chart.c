@@ -816,8 +816,6 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
             if((border_side & LV_BORDER_SIDE_BOTTOM) && (lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) == 0)) i_end--;
         }
 
-        line_dsc.part = LV_CHART_DRAW_PART_DIV_LINE_HOR;
-
         for(i = i_start; i < i_end; i++) {
             line_dsc.p1.y = (int32_t)((int32_t)h * i) / (chart->hdiv_cnt - 1);
             line_dsc.p1.y += y_ofs;
@@ -837,8 +835,6 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
             if((border_side & LV_BORDER_SIDE_LEFT) && (lv_obj_get_style_pad_left(obj, LV_PART_MAIN) == 0)) i_start++;
             if((border_side & LV_BORDER_SIDE_RIGHT) && (lv_obj_get_style_pad_right(obj, LV_PART_MAIN) == 0)) i_end--;
         }
-
-        line_dsc.part = LV_CHART_DRAW_PART_DIV_LINE_VER;
 
         for(i = i_start; i < i_end; i++) {
             line_dsc.p1.x = (int32_t)((int32_t)w * i) / (chart->vdiv_cnt - 1);
@@ -900,8 +896,8 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         if(ser->hidden) continue;
         line_dsc.color = ser->color;
         point_dsc_default.bg_color = ser->color;
-        line_dsc.id2 = 0;
-        point_dsc_default.id2 = 0;
+        line_dsc.base.id2 = 0;
+        point_dsc_default.base.id2 = 0;
 
         lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
@@ -964,12 +960,12 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                     point_area.y2 = line_dsc.p1.y + point_h;
 
                     if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                        line_dsc.id2 = i;
+                        line_dsc.base.id2 = i;
                         lv_draw_line(layer, &line_dsc);
                     }
 
                     if(point_w && point_h && ser->y_points[p_prev] != LV_CHART_POINT_NONE) {
-                        point_dsc_default.id2 = i;
+                        point_dsc_default.base.id2 = i;
                         lv_draw_rect(layer, &point_dsc_default, &point_area);
                     }
                 }
@@ -987,12 +983,12 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                 point_area.x2 = line_dsc.p2.x + point_w;
                 point_area.y1 = line_dsc.p2.y - point_h;
                 point_area.y2 = line_dsc.p2.y + point_h;
-                point_dsc_default.id2 = i;
+                point_dsc_default.base.id2 = i;
                 lv_draw_rect(layer, &point_dsc_default, &point_area);
             }
 
-            point_dsc_default.id1++;
-            line_dsc.id1++;
+            point_dsc_default.base.id1++;
+            line_dsc.base.id1++;
         }
     }
 
@@ -1088,10 +1084,10 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
                 point_area.y2 = line_dsc.p1.y + point_h;
 
                 if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                    line_dsc.id2 = i;
+                    line_dsc.base.id2 = i;
                     lv_draw_line(layer, &line_dsc);
                     if(point_w && point_h) {
-                        point_dsc_default.id2 = i;
+                        point_dsc_default.base.id2 = i;
                         lv_draw_rect(layer, &point_dsc_default, &point_area);
                     }
                 }
@@ -1109,13 +1105,13 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
                     point_area.y1 = line_dsc.p2.y - point_h;
                     point_area.y2 = line_dsc.p2.y + point_h;
 
-                    point_dsc_default.id2 = i;
+                    point_dsc_default.base.id2 = i;
                     lv_draw_rect(layer, &point_dsc_default, &point_area);
                 }
             }
         }
-        line_dsc.id1++;
-        point_dsc_default.id1++;
+        line_dsc.base.id1++;
+        point_dsc_default.base.id1++;
         layer->clip_area = clip_area_ori;
     }
 }
@@ -1163,8 +1159,8 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
     /*Go through all points*/
     for(i = 0; i < chart->point_cnt; i++) {
         lv_coord_t x_act = (int32_t)((int32_t)(w - block_w) * i) / (chart->point_cnt - 1) + obj->coords.x1 + x_ofs;
-        col_dsc.id2 = i;
-        col_dsc.id1 = 0;
+        col_dsc.base.id2 = i;
+        col_dsc.base.id1 = 0;
 
         /*Draw the current point of all data line*/
         _LV_LL_READ_BACK(&chart->series_ll, ser) {
@@ -1188,7 +1184,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
             if(ser->y_points[p_act] != LV_CHART_POINT_NONE) {
                 lv_draw_rect(layer, &col_dsc, &col_a);
             }
-            col_dsc.id1++;
+            col_dsc.base.id1++;
         }
     }
     layer->clip_area = clip_area_ori;
@@ -1260,8 +1256,8 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
             line_dsc.p2.x = cursor->dir & LV_DIR_RIGHT ? obj->coords.x2 : cx;
             line_dsc.p2.y = line_dsc.p1.y;
 
-            line_dsc.id2 = 0;
-            point_dsc_tmp.id2 = 0;
+            line_dsc.base.id2 = 0;
+            point_dsc_tmp.base.id2 = 0;
 
             lv_draw_line(layer, &line_dsc);
 
@@ -1276,8 +1272,8 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
             line_dsc.p2.x = line_dsc.p1.x;
             line_dsc.p2.y = cursor->dir & LV_DIR_BOTTOM ? obj->coords.y2 : cy;
 
-            line_dsc.id2 = 1;
-            point_dsc_tmp.id2 = 1;
+            line_dsc.base.id2 = 1;
+            point_dsc_tmp.base.id2 = 1;
 
             lv_draw_line(layer, &line_dsc);
 
@@ -1285,8 +1281,8 @@ static void draw_cursors(lv_obj_t * obj, lv_layer_t * layer)
                 lv_draw_rect(layer, &point_dsc_tmp, &point_area);
             }
         }
-        line_dsc_ori.id1++;
-        point_dsc_ori.id1++;
+        line_dsc_ori.base.id1++;
+        point_dsc_ori.base.id1++;
     }
 
     layer->clip_area = clip_area_ori;

@@ -152,6 +152,14 @@ typedef struct _lv_layer_t  {
     void * user_data;
 } lv_layer_t;
 
+typedef struct {
+    struct _lv_obj_t * obj;
+    uint32_t part;
+    uint32_t id1;
+    uint32_t id2;
+    lv_layer_t * layer;
+} lv_draw_dsc_base_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

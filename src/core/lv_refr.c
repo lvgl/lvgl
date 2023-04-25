@@ -198,8 +198,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 img_draw_dsc.src = layer_children;
                 lv_draw_layer(layer, &img_draw_dsc, &layer_children->buf_area);
             }
-
-
         }
     }
 

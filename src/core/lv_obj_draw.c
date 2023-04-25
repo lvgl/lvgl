@@ -38,8 +38,8 @@
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
-    draw_dsc->obj = obj;
-    draw_dsc->part = part;
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
 
     lv_opa_t opa = LV_OPA_COVER;
     if(part != LV_PART_MAIN) {
@@ -199,8 +199,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc_t * draw_dsc)
 {
-    draw_dsc->obj = obj;
-    draw_dsc->part = part;
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
 
     draw_dsc->opa = lv_obj_get_style_text_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
@@ -233,8 +233,8 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
 
 void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc)
 {
-    draw_dsc->obj = obj;
-    draw_dsc->part = part;
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
 
     draw_dsc->opa = lv_obj_get_style_img_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
@@ -263,8 +263,8 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t *
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t * draw_dsc)
 {
-    draw_dsc->obj = obj;
-    draw_dsc->part = part;
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
 
     draw_dsc->opa = lv_obj_get_style_line_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
@@ -298,8 +298,8 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t
 
 void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
-    draw_dsc->obj = obj;
-    draw_dsc->part = part;
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
 
     draw_dsc->width = lv_obj_get_style_arc_width(obj, part);
     if(draw_dsc->width == 0) return;
