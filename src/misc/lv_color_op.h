@@ -36,6 +36,14 @@ typedef struct _lv_color_filter_dsc_t {
 } lv_color_filter_dsc_t;
 
 
+typedef struct {
+    lv_color32_t fg_saved;
+    lv_color32_t bg_saved;
+    lv_color32_t res_saved;
+    lv_opa_t res_alpha_saved;
+    lv_opa_t ratio_saved;
+} lv_color_mix_alpha_cache_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -125,6 +133,9 @@ static inline lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
     return bg;
 }
 
+
+void lv_color_mix_with_alpha_cache_init(lv_color_mix_alpha_cache_t * cache);
+
 /**
  * Mix two colors. Both color can have alpha value.
  * @param bg_color background color
@@ -134,7 +145,8 @@ static inline lv_color32_t lv_color_mix32(lv_color32_t fg, lv_color32_t bg)
  * @param res_color the result color
  * @param res_opa the result opacity
  */
-LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t lv_color_mix_with_alpha(lv_color32_t bg, lv_color32_t fg)
+LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t lv_color_mix_with_alpha(lv_color32_t bg, lv_color32_t fg,
+                                                                         lv_color_mix_alpha_cache_t * cache)
 {
     /*Pick the foreground if it's fully opaque or the Background is fully transparent*/
     if(fg.alpha == 255 || bg.alpha <= LV_OPA_MIN) {
@@ -150,31 +162,29 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t lv_color_mix_with_alpha(lv_colo
     }
     /*Both colors have alpha. Expensive calculation need to be applied*/
     else {
+        return fg;
+        return lv_color_mix32(fg, bg);
+
         /*Save the parameters and the result. If they will be asked again don't compute again*/
-        static lv_color32_t fg_saved = {0, 0, 0, 0};
-        static lv_color32_t bg_saved = {0, 0, 0, 0};
-        static lv_color32_t res_saved = {0, 0, 0, 0};
-        static lv_opa_t res_alpha_saved = 255;
-        static lv_opa_t ratio_saved = 255;
 
         /*Update the ratio and the result alpha value if the input alpha values change*/
-        if(bg.alpha != bg_saved.alpha || fg.alpha != fg_saved.alpha) {
+        if(bg.alpha != cache->bg_saved.alpha || fg.alpha != cache->fg_saved.alpha) {
             /*Info:
              * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
-            res_alpha_saved  = 255 - ((uint32_t)((uint32_t)(255 - fg.alpha) * (255 - bg.alpha)) >> 8);
-            LV_ASSERT(ratio_saved != 0);
-            ratio_saved = (uint32_t)((uint32_t)fg.alpha * 255) / res_alpha_saved;
+            cache->res_alpha_saved  = 255 - ((uint32_t)((uint32_t)(255 - fg.alpha) * (255 - bg.alpha)) >> 8);
+            LV_ASSERT(cache->ratio_saved != 0);
+            cache->ratio_saved = (uint32_t)((uint32_t)fg.alpha * 255) / cache->res_alpha_saved;
         }
 
-        if(!lv_color32_eq(bg, bg_saved) || !lv_color32_eq(fg, fg_saved)) {
-            fg_saved = fg;
-            bg_saved = bg;
-            fg.alpha = ratio_saved;
-            res_saved = lv_color_mix32(fg, bg);
-            res_saved.alpha = res_alpha_saved;
+        if(!lv_color32_eq(bg, cache->bg_saved) || !lv_color32_eq(fg, cache->fg_saved)) {
+            cache->fg_saved = fg;
+            cache->bg_saved = bg;
+            fg.alpha = cache->ratio_saved;
+            cache->res_saved = lv_color_mix32(fg, bg);
+            cache->res_saved.alpha = cache->res_alpha_saved;
         }
 
-        return res_saved;
+        return cache->res_saved;
     }
 }
 

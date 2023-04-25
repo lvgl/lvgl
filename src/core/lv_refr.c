@@ -170,9 +170,36 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
         layer->clip_area = clip_coords_for_children;
         uint32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
-        for(i = 0; i < child_cnt; i++) {
-            lv_obj_t * child = obj->spec_attr->children[i];
-            refr_obj(layer, child);
+        if(child_cnt) {
+            lv_layer_t * layer_children = layer;
+            bool clip_corner = lv_obj_get_style_clip_corner(obj, LV_PART_MAIN);
+
+            lv_coord_t radius = 0;
+            if(clip_corner) {
+                radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
+                if(radius == 0) clip_corner = false;
+            }
+            if(clip_corner) {
+                layer_children = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &obj->coords);
+            }
+            for(i = 0; i < child_cnt; i++) {
+                lv_obj_t * child = obj->spec_attr->children[i];
+                refr_obj(layer_children, child);
+            }
+            if(clip_corner) {
+                lv_draw_mask_rect_dsc_t mask_draw_dsc;
+                lv_draw_mask_rect_dsc_init(&mask_draw_dsc);
+                mask_draw_dsc.area = layer_children->buf_area;
+                mask_draw_dsc.radius = radius;
+                lv_draw_mask_rect(layer_children, &mask_draw_dsc);
+
+                lv_draw_img_dsc_t img_draw_dsc;
+                lv_draw_img_dsc_init(&img_draw_dsc);
+                img_draw_dsc.src = layer_children;
+                lv_draw_layer(layer, &img_draw_dsc, &layer_children->buf_area);
+            }
+
+
         }
     }
 

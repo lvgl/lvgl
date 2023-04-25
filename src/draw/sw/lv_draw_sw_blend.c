@@ -48,7 +48,7 @@ static void map_blended(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_c
 
 
 static inline lv_color32_t lv_color_mix_with_alpha_blend_mode(lv_color32_t fg, lv_color32_t bg,
-                                                              lv_blend_mode_t blend_mode);
+                                                              lv_blend_mode_t blend_mode, lv_color_mix_alpha_cache_t * cache);
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
@@ -344,6 +344,9 @@ LV_ATTRIBUTE_FAST_MEM static void fill_argb8888(lv_color32_t * dest_buf, const l
     int32_t x;
     int32_t y;
 
+    lv_color_mix_alpha_cache_t cache;
+    lv_color_mix_with_alpha_cache_init(&cache);
+
     /*No mask*/
     if(mask == NULL) {
         /*No matter what the background is, overwrite it with fully covering color*/
@@ -362,7 +365,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_argb8888(lv_color32_t * dest_buf, const l
         else {
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
-                    dest_buf[x] = lv_color_mix_with_alpha(dest_buf[x], color32);
+                    dest_buf[x] = lv_color_mix_with_alpha(dest_buf[x], color32, &cache);
                 }
                 dest_buf += dest_stride;
             }
@@ -375,7 +378,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_argb8888(lv_color32_t * dest_buf, const l
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     color32.alpha = mask[x];
-                    dest_buf[x] = lv_color_mix_with_alpha(dest_buf[x], color32);
+                    dest_buf[x] = lv_color_mix_with_alpha(dest_buf[x], color32, &cache);
                 }
                 dest_buf += dest_stride;
                 mask += mask_stride;
@@ -395,7 +398,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_argb8888(lv_color32_t * dest_buf, const l
                                             opa_original : (uint32_t)((uint32_t)(mask[x]) * opa_original) >> 8;
                         }
 
-                        dest_buf[x] = lv_color_mix_with_alpha(dest_buf[x], color32);
+                        dest_buf[x] = lv_color_mix_with_alpha(dest_buf[x], color32, &cache);
                     }
                 }
                 dest_buf += dest_stride;
@@ -541,6 +544,9 @@ LV_ATTRIBUTE_FAST_MEM static void map_to_argb8888(lv_color32_t * dest_buf, const
     int32_t y;
     lv_color32_t d;
 
+    lv_color_mix_alpha_cache_t cache;
+    lv_color_mix_with_alpha_cache_init(&cache);
+
     if(mask == NULL) {
         if(opa >= LV_OPA_MAX) {
             /*Simple image copy*/
@@ -557,7 +563,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_to_argb8888(lv_color32_t * dest_buf, const
                 for(y = 0; y < h; y++) {
                     for(x = 0; x < w; x++) {
                         d = lv_color_to_xrgb8888(src_buf[x]);
-                        dest_buf[x] = lv_color_mix_with_alpha_blend_mode(d, dest_buf[x], blend_mode);
+                        dest_buf[x] = lv_color_mix_with_alpha_blend_mode(d, dest_buf[x], blend_mode, &cache);
                     }
                     dest_buf += dest_stride;
                     src_buf += src_stride;
@@ -571,7 +577,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_to_argb8888(lv_color32_t * dest_buf, const
                 for(x = 0; x < w; x++) {
                     d = lv_color_to_xrgb8888(src_buf[x]);
                     d.alpha = opa;
-                    dest_buf[x] = lv_color_mix_with_alpha_blend_mode(d, dest_buf[x], blend_mode);
+                    dest_buf[x] = lv_color_mix_with_alpha_blend_mode(d, dest_buf[x], blend_mode, &cache);
                 }
                 dest_buf += dest_stride;
                 src_buf += src_stride;
@@ -585,7 +591,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_to_argb8888(lv_color32_t * dest_buf, const
                 for(x = 0; x < w; x++) {
                     d = lv_color_to_xrgb8888(src_buf[x]);
                     d.alpha = mask[x];
-                    dest_buf[x] = lv_color_mix_with_alpha_blend_mode(d, dest_buf[x], blend_mode);
+                    dest_buf[x] = lv_color_mix_with_alpha_blend_mode(d, dest_buf[x], blend_mode, &cache);
                 }
                 mask += mask_stride;
                 dest_buf += dest_stride;
@@ -599,7 +605,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_to_argb8888(lv_color32_t * dest_buf, const
                     lv_opa_t opa_tmp = mask[x] >= LV_OPA_MAX ? opa : ((opa * mask[x]) >> 8);
                     d = lv_color_to_xrgb8888(src_buf[x]);
                     d.alpha = opa_tmp;
-                    dest_buf[x] = lv_color_mix_with_alpha(d, dest_buf[x]);
+                    dest_buf[x] = lv_color_mix_with_alpha(d, dest_buf[x], &cache);
                 }
                 mask += mask_stride;
                 dest_buf += dest_stride;
@@ -611,49 +617,45 @@ LV_ATTRIBUTE_FAST_MEM static void map_to_argb8888(lv_color32_t * dest_buf, const
 }
 
 static inline lv_color32_t lv_color_mix_with_alpha_blend_mode(lv_color32_t fg, lv_color32_t bg,
-                                                              lv_blend_mode_t blend_mode)
+                                                              lv_blend_mode_t blend_mode, lv_color_mix_alpha_cache_t * cache)
 {
-    static lv_color32_t bg_saved;
-    static lv_color32_t fg_saved;
-    static lv_color32_t res_saved;
-
     /*Get the result color*/
-    if(!lv_color32_eq(bg, bg_saved) || !lv_color32_eq(fg, fg_saved)) {
-        bg_saved = bg;
-        fg_saved = fg;
+    if(!lv_color32_eq(bg, cache->bg_saved) || !lv_color32_eq(fg, cache->fg_saved)) {
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL:
-                res_saved = lv_color_mix_with_alpha(bg, fg);
-                return res_saved;
+                return lv_color_mix_with_alpha(bg, fg, cache);
 
             case LV_BLEND_MODE_ADDITIVE:
-                res_saved.red = LV_MIN(bg.red + fg.red, 255);
-                res_saved.green = LV_MIN(bg.green + fg.green, 255);
-                res_saved.blue = LV_MIN(bg.blue + fg.blue, 255);
+                cache->res_saved.red = LV_MIN(bg.red + fg.red, 255);
+                cache->res_saved.green = LV_MIN(bg.green + fg.green, 255);
+                cache->res_saved.blue = LV_MIN(bg.blue + fg.blue, 255);
                 break;
             case LV_BLEND_MODE_MULTIPLY:
-                res_saved.red = (fg.red * bg.red) >> 8;
-                res_saved.green = (fg.green * bg.green) >> 8;
-                res_saved.blue = (fg.blue * bg.blue) >> 8;
+                cache->res_saved.red = (fg.red * bg.red) >> 8;
+                cache->res_saved.green = (fg.green * bg.green) >> 8;
+                cache->res_saved.blue = (fg.blue * bg.blue) >> 8;
                 break;
             case LV_BLEND_MODE_SUBTRACTIVE:
-                res_saved.red = LV_MAX((int32_t)bg.red - fg.red, 0);
-                res_saved.green = LV_MAX((int32_t)bg.green - fg.green, 0);
-                res_saved.blue = LV_MAX((int32_t)bg.blue - fg.blue, 0);
+                cache->res_saved.red = LV_MAX((int32_t)bg.red - fg.red, 0);
+                cache->res_saved.green = LV_MAX((int32_t)bg.green - fg.green, 0);
+                cache->res_saved.blue = LV_MAX((int32_t)bg.blue - fg.blue, 0);
                 break;
         }
 
-        /*Always keep the original bg.alpha*/
+        cache->bg_saved = bg;
+        cache->fg_saved = fg;
+
         if(fg.alpha >= LV_OPA_MAX) {
-            res_saved = fg;
-            res_saved.alpha = bg.alpha;
+            cache->res_saved.alpha = bg.alpha;
         }
         else {
-            res_saved = lv_color_mix32(fg, bg);
+            cache->res_saved = lv_color_mix32(fg, bg);
         }
+        /*Always keep the original bg.alpha*/
+        cache->res_saved.alpha = cache->bg_saved.alpha;
     }
 
-    return res_saved;
+    return cache->res_saved;
 }
 
 
