@@ -73,6 +73,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.header.w  = w;
     canvas->dsc.header.h  = h;
     canvas->dsc.data      = buf;
+    canvas->dsc.data_size = w * h * lv_color_format_get_size(cf);
 
     lv_img_set_src(obj, &canvas->dsc);
     lv_img_cache_invalidate_src(&canvas->dsc);
