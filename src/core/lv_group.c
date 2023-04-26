@@ -474,17 +474,19 @@ static bool focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
  */
 static lv_indev_t * get_indev(const lv_group_t * g)
 {
+    lv_indev_t * indev_guess = NULL;
     lv_indev_t * indev = lv_indev_get_next(NULL);
+
     while(indev) {
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        /*Prefer POINTER*/
+        if(indev_type == LV_INDEV_TYPE_POINTER) return indev;
         if(lv_indev_get_group(indev) == g) {
-            /*Prefer POINTER*/
-            if(indev_type == LV_INDEV_TYPE_POINTER) return indev;
+            indev_guess = indev;
         }
         indev = lv_indev_get_next(indev);
     }
 
-    /*In lack of a better option use the first input device. (It can be NULL if there is no input device)*/
-    return lv_indev_get_next(NULL);
+    return indev_guess;
 }
 
