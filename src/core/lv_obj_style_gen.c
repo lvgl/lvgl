@@ -98,6 +98,7 @@ void lv_obj_set_style_translate_x(struct _lv_obj_t * obj, lv_coord_t value, lv_s
 
 void lv_obj_set_style_translate_y(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
 {
+    if (value == 0) value = 1;
     lv_style_value_t v = {
         .num = (int32_t)value
     };
