@@ -43,9 +43,9 @@ typedef struct {
 
 
 /*Image parts*/
-enum {
+enum _lv_animimg_part_t {
     LV_ANIM_IMG_PART_MAIN,
-} _lv_animimg_part_t;
+};
 
 
 #ifdef DOXYGEN
