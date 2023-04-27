@@ -107,7 +107,7 @@ Events
 
       -  ``part``: :cpp:enumerator:`LV_PART_ITEMS`
       -  ``id``:index of the button being drawn
-      -  ``draw_area``: the area of teh button
+      -  ``draw_area``: the area of the button
       -  ``rect_dsc``
 
 See the events of the `Base object </widgets/obj>`__ too.

@@ -21,7 +21,7 @@
 - [x] New driver architecture #2720
 - [x] `draw_ctx->buffer_convert`? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1147954592).  Also remove 16 SWAPPED color format? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1140886258).
 - [ ] `lv_img_set_src()` use "type-aware" parameter and rework image decoders. See [here](https://github.com/lvgl/lvgl/tree/arch/img-decode-rework)
-- [ ] Reconsider masks. There should be a generic high level mask API whic is independent of the drawing engine. [#4059](https://github.com/lvgl/lvgl/issues/4059)
+- [ ] Reconsider masks. There should be a generic high level mask API which is independent of the drawing engine. [#4059](https://github.com/lvgl/lvgl/issues/4059)
 - [x] `get_glyph_bitmap` should return an a8 bitmap that can be blended immediately.
 - [ ] Reconsider how themes should work. See [here](https://github.com/lvgl/lvgl/pull/3390#pullrequestreview-990710921).
 - [ ] Make LVGL render independent areas in parallel. [#4016](https://github.com/lvgl/lvgl/issues/4016)
@@ -45,7 +45,7 @@
 - [ ] Disabled widgets should absorb indev actions without sending events. [#3860](https://github.com/lvgl/lvgl/issues/3860)
 
 ### Drawing and rendering
-- [ ] Automatically recalculate the layout if a coordinte is get with `lv_obj_get_width/height/x/y/etc`
+- [ ] Automatically recalculate the layout if a coordinate is get with `lv_obj_get_width/height/x/y/etc`
 
  ### Animations
 - [ ] Use `anim` events to replace many callbacks with one
@@ -55,7 +55,7 @@
 ## Planned in general
 
 ### CI
-- [ ] Plaform independent bechmarking #3443
+- [ ] Platform independent benchmarking #3443
 - [ ] Run static analyzer
 - [ ] Release script
 - [ ] Unit test for all widgets #2337
@@ -91,7 +91,7 @@
 - [ ] Named grid cells to allow updating layouts without touching the children (like CSS `grid-template-areas`)
 - [ ] Scene support. See [this comment](https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911)
 - [ ] Circle layout. #2871
-- [ ] Variable binding. I.e create properties which can be bound to objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
+- [ ] Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
 - [ ] Consider [stagger animations](https://greensock.com/docs/v3/Staggers).
  
 ## Ideas

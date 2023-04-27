@@ -10,7 +10,7 @@ providing a familiar React-like experience to users.
 
 **Code**
 
-**Code Runing on Real Device**
+**Code Running on Real Device**
 
 Table of Contents
 -----------------
@@ -29,7 +29,7 @@ Features
 --------
 
 -  Support all lvgl built-in components
--  Fully suport lvgl flex and grid style
+-  Fully support lvgl flex and grid style
 -  support most lvgl style，just write like html5 css
 -  support dynamic load image
 -  Fully support lvgl animation

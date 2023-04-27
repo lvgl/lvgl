@@ -227,7 +227,7 @@ to combine scroll event and store the scroll top position.
    lv_obj_t* container = lv_obj_create(NULL);
    lv_obj_add_event(container, store_scroll_value_event_cb, LV_EVENT_SCROLL, NULL);
 
-Scrool coordinates can be retrieve from differents axes with these
+Scroll coordinates can be retrieved from different axes with these
 functions:
 
 - ``lv_obj_get_scroll_x(obj)`` Get the ``x`` coordinate of object
@@ -262,7 +262,7 @@ an object. Here is an example to see how to handle the event:
    if(event_code == LV_EVENT_GET_SELF_SIZE) {
        lv_point_t * p = lv_event_get_param(e);
 
-     //If x or y < 0 then it doesn't neesd to be calculated now
+     //If x or y < 0 then it doesn't need to be calculated now
      if(p->x >= 0) {
        p->x = 200; //Set or calculate the self width
      }

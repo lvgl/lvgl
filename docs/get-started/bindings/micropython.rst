@@ -194,7 +194,7 @@ follow some coding conventions:
 - Argument must be named in H files too.
 - Do not ``malloc`` into a static or global variables. Instead declare the variable in :c:macro:`LV_ITERATE_ROOTS`
   list in ``lv_gc.h`` and mark the variable with :cpp:expr:`GC_ROOT(variable)` when it's used. **See** :ref:`memory_management`
-- To register and use callbacks one of the followings needs to be followed. **See** :ref:`callbacks`
+- To register and use callbacks one of the following needs to be followed.  **See** :ref:`callbacks`
 
    - Pass a pointer to a ``struct`` as the first argument of both the registration function and the callback. That
      ``struct`` must contain ``void * user_data`` field.
@@ -262,7 +262,7 @@ next to the function pointer when registering a callback, and access that object
 - The basic idea is that we have ``void * user_data`` field that is used automatically by the Micropython Binding
   to save the *Micropython callable object* for a callback. This field must be provided when registering the function
   pointer, and provided to the callback function itself.
-- Although called "user_data", the user is not expectd to read/write that field. Instead, the Micropython glue code uses
+- Although called "user_data", the user is not expected to read/write that field. Instead, the Micropython glue code uses
   ``user_data`` to automatically keep track of the Micropython callable object. The glue code updates it when the callback
   is registered, and uses it when the callback is called in order to invoke a call to the original callable object.
 
@@ -279,7 +279,7 @@ There are a few options for defining a callback in LVGL C API:
 
   - A parameter called ``void * user_data`` is provided to the registration function as the **last** argument
 
-    - The callback itself recieves ``void *`` as the **last** argument
+    - The callback itself receives ``void *`` as the **last** argument
 
 - Option 3: both callback and ``user_data`` are struct fields
 
@@ -296,12 +296,12 @@ Examples
 
 - :cpp:type:`lv_anim_t` contains ``user_data`` field. :cpp:func:`lv_anim_set_path_cb`
   registers `path_cb` callback. Both ``lv_anim_set_path_cb`` and :cpp:type:`lv_anim_path_cb_t`
-  recieve :cpp:type:`lv_anim_t` as their first argument
+  receive :cpp:type:`lv_anim_t` as their first argument
 - ``path_cb`` field can also be assigned directly in the Python code because it's a member
   of :cpp:type:`lv_anim_t` which contains ``user_data`` field, and :cpp:type:`lv_anim_path_cb_t`
-  recieve :cpp:type:`lv_anim_t` as its first argument.
-- :cpp:func:`lv_imgfont_create` registers ``path_cb`` and recieves ``user_data`` as the last
-  argument. The callback :cpp:func:`lv_imgfont_get_path_cb_t` also receieves the ``user_data`` as the last argument.
+  receive :cpp:type:`lv_anim_t` as its first argument.
+- :cpp:func:`lv_imgfont_create` registers ``path_cb`` and receives ``user_data`` as the last
+  argument. The callback :cpp:func:`lv_imgfont_get_path_cb_t` also receives the ``user_data`` as the last argument.
 
 .. _more-information-1:
 

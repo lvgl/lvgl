@@ -169,7 +169,7 @@ lottie size is as intended - Limit total number of frames, the longer
 the lottie animation is, the more memory it will consume for rendering
 (rlottie consumes IRAM for rendering) - Build the lottie animation for
 the intended frame rate - default lottie is 60fps, embedded LCDs likely
-wont go above 30fps
+won't go above 30fps
 
 IDF Setup
 ~~~~~~~~~
@@ -194,7 +194,7 @@ Rlottie patch file
 Rlottie relies on a dynamic linking for an image loader lib. This needs
 to be disabled as the IDF doesn't play nice with dynamic linking.
 
-A patch file is available in lvgl uner:
+A patch file is available in lvgl under:
 ``/env_support/esp/rlottie/0001-changes-to-compile-with-esp-idf.patch``
 
 Apply the patch file to your rlottie submodule.
@@ -223,7 +223,7 @@ guarantee that every animation will work.
 Additional Rlottie considerations in ESP-IDF
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While unecessary, removing the ``rlottie/rlottie/example`` folder can remove
+While unnecessary, removing the ``rlottie/rlottie/example`` folder can remove
 many un-needed files for this embedded LVGL application
 
 From here, you can use the relevant LVGL lv_rlottie functions to create

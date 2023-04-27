@@ -373,7 +373,7 @@ Other features which are (still) not on the road map are listed in the
 `Feature request <https://forum.lvgl.io/c/feature-request/9>`__ category
 of the Forum.
 
-When adding a new features the followings also needs to be updated:
+When adding a new features the following also needs to be updated:
 
 - Update `lv_conf_template.h <https://github.com/lvgl/lvgl/blob/master/lv_conf_template.h>`__
 - Add description in the `docs <https://github.com/lvgl/lvgl/tree/master/docs>`__

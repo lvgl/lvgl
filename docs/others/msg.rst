@@ -65,7 +65,7 @@ The callback should look like this:
        ...do something...
    }
 
-From :c:struct:`lv_msg_t` the followings can be used to get some data:
+From :c:struct:`lv_msg_t` the following can be used to get some data:
 
 - :c:expr:`lv_msg_get_id(m)`
 - :c:expr:`lv_msg_get_payload(m)`

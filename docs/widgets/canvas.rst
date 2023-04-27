@@ -66,7 +66,7 @@ color format of the buffer and the canvas need to match.
 
 To draw something to the canvas use:
 
-- :cpp:expr:`lv_canvas_draw_rect(canvas, x, y, width, heigth, &draw_dsc)`
+- :cpp:expr:`lv_canvas_draw_rect(canvas, x, y, width, height, &draw_dsc)`
 - :cpp:expr:`lv_canvas_draw_text(canvas, x, y, max_width, &draw_dsc, txt)`
 - :cpp:expr:`lv_canvas_draw_img(canvas, x, y, &img_src, &draw_dsc)`
 - :cpp:expr:`lv_canvas_draw_line(canvas, point_array, point_cnt, &draw_dsc)`
