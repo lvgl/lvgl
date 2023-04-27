@@ -39,19 +39,15 @@ typedef uint16_t lv_state_t;
 
 #endif
 
-typedef enum _lv_style_state_cmp_t {
+typedef enum {
     _LV_STYLE_STATE_CMP_SAME,           /*The style properties in the 2 states are identical*/
     _LV_STYLE_STATE_CMP_DIFF_REDRAW,    /*The differences can be shown with a simple redraw*/
     _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /*The differences can be shown with a simple redraw*/
     _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
-};
+} _lv_style_state_cmp_t;
 
-#ifdef DOXYGEN
-typedef _lv_style_state_cmp_t lv_style_selector_t;
-#else
+
 typedef uint32_t lv_style_selector_t;
-#endif /*DOXYGEN*/
-
 
 typedef struct {
     const lv_style_t * style;
