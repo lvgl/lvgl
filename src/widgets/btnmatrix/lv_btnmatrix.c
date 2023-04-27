@@ -536,11 +536,19 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER && editing)) {
                 uint32_t b = 0;
                 if(btnm->one_check) {
-                    while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b]) ||
-                          button_is_checked(btnm->ctrl_bits[b]) == false) b++;
+                    while(b < btnm->btn_cnt &&
+                          (button_is_hidden(btnm->ctrl_bits[b]) ||
+                           button_is_inactive(btnm->ctrl_bits[b]) ||
+                           button_is_checked(btnm->ctrl_bits[b]) == false)) {
+                        b++;
+                    }
                 }
                 else {
-                    while(button_is_hidden(btnm->ctrl_bits[b]) || button_is_inactive(btnm->ctrl_bits[b])) b++;
+                    while(b < btnm->btn_cnt &&
+                          (button_is_hidden(btnm->ctrl_bits[b]) ||
+                           button_is_inactive(btnm->ctrl_bits[b]))) {
+                        b++;
+                    }
                 }
 
                 btnm->btn_id_sel = b;
