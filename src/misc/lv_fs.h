@@ -60,7 +60,7 @@ typedef uint8_t lv_fs_res_t;
 enum _lv_fs_mode_t {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
- };
+};
 
 #ifdef DOXYGEN
 typedef _lv_fs_mode_t lv_fs_mode_t;
