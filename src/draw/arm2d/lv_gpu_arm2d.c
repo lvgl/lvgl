@@ -1075,8 +1075,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                 source_center.iX = draw_dsc->pivot.x;
                 source_center.iY = draw_dsc->pivot.y;
 
-                if((LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED == cf) ||
-                   (LV_COLOR_FORMAT_NATIVE == cf)) {
+                if(LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED == cf) {
 
                     __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
                         arm_2d_tile_transform_with_opacity_prepare,
@@ -1094,7 +1093,7 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                     );
                     is_accelerated = true;
                 }
-                else if (LV_COLOR_FORMAT_RGB565A8 == cf) {
+                else if(LV_COLOR_FORMAT_RGB565A8 == cf) {
                     static arm_2d_tile_t mask_tile;
                     mask_tile = source_tile;
 
