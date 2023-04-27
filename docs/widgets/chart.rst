@@ -20,7 +20,7 @@ Parts and Styles
    charts ``pad_column`` sets the space between the columns of the
    adjacent indices.
 -  :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar used if the chart is zoomed. See
-   the `Base object </widgets/obj>`__\ ’s documentation for details.
+   the `Base object </widgets/obj>`__\ 's documentation for details.
 -  :cpp:enumerator:`LV_PART_ITEMS` Refers to the line or bar series.
 
    -  Line chart: The *line* properties are used by the lines.
@@ -49,7 +49,7 @@ The following data display types exist:
 - :cpp:enumerator:`LV_CHART_TYPE_NONE`:  Do not display any data. Can be used to hide the series.
 - :cpp:enumerator:`LV_CHART_TYPE_LINE`:  Draw lines between the data points and/or points (rectangles or circles) on the data points.
 - :cpp:enumerator:`LV_CHART_TYPE_BAR`: Draw bars.
-- :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point’s and lines between the points. .
+- :cpp:enumerator:`LV_CHART_TYPE_SCATTER`: X/Y chart drawing point's and lines between the points. .
 
 You can specify the display type with
 :cpp:expr:`lv_chart_set_type(chart, LV_CHART_TYPE_...)`.
@@ -67,13 +67,13 @@ an array for the data points. ``axis`` can have the following values:
 - :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X` Bottom axis
 - :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X` Top axis
 
-``axis`` tells which axis’s range should be used te scale the values.
+``axis`` tells which axis's range should be used te scale the values.
 
 :cpp:expr:`lv_chart_set_ext_y_array(chart, ser, value_array)` makes the chart
 use an external array for the given series. ``value_array`` should look
 like this: ``lv_coord_t * value_array[num_points]``. The array size
 needs to be large enough to hold all the points of that series. The
-array’s pointer will be saved in the chart so it needs to be global,
+array's pointer will be saved in the chart so it needs to be global,
 static or dynamically allocated. Note: you should call
 :cpp:expr:`lv_chart_refresh(chart)` after the external data source has been
 updated to update the chart.
@@ -130,7 +130,7 @@ Handling large number of points
 
 On line charts, if the number of points is greater than the pixels
 horizontally, the Chart will draw only vertical lines to make the
-drawing of large amount of data effective. If there are, let’s say, 10
+drawing of large amount of data effective. If there are, let's say, 10
 points to a pixel, LVGL searches the smallest and the largest value and
 draws a vertical lines between them to ensure no peaks are missed.
 
@@ -152,7 +152,7 @@ The number of horizontal and vertical division lines can be modified by
 :cpp:expr:`lv_chart_set_div_line_count(chart, hdiv_num, vdiv_num)`. The default
 settings are 3 horizontal and 5 vertical division lines. If there is a
 visible border on a side and no padding on that side, the division line
-would be drawn on top of the border and therefore it won’t be drawn.
+would be drawn on top of the border and therefore it won't be drawn.
 
 Override default start point for series
 ---------------------------------------
@@ -200,11 +200,11 @@ the cursor. ``pos`` is a pointer to an :cpp:struct:`lv_point_t` variable. E.g.
 will remain in the same place.
 
 :cpp:expr:`lv_chart_get_point_pos_by_id(chart, series, id, &point_out)` gets the
-coordinate of a given point. It’s useful to place the cursor at a given
+coordinate of a given point. It's useful to place the cursor at a given
 point.
 
 :cpp:expr:`lv_chart_set_cursor_point(chart, cursor, series, point_id)` sticks
-the cursor at a point. If the point’s position changes (new value or
+the cursor at a point. If the point's position changes (new value or
 scrolling) the cursor will move with the point.
 
 Events

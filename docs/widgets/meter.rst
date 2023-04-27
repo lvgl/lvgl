@@ -56,7 +56,7 @@ Needle line
 
 ``indic = lv_meter_add_needle_line(meter, line_width, line_color, r_mod)``
 adds a needle line to a Scale. By default, the length of the line is the
-same as the scale’s radius but ``r_mod`` changes the length.
+same as the scale's radius but ``r_mod`` changes the length.
 
 :cpp:expr:`lv_meter_set_indicator_value(meter, indic, value)` sets the value of
 the indicator.
@@ -78,7 +78,7 @@ Arc
 
 ``indic = lv_meter_add_arc(meter, arc_width, arc_color, r_mod)`` adds
 and arc indicator. . By default, the radius of the arc is the same as
-the scale’s radius but ``r_mod`` changes the radius.
+the scale's radius but ``r_mod`` changes the radius.
 
 :cpp:expr:`lv_meter_set_indicator_start_value(meter, indic, value)` and
 :cpp:expr:`lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the
@@ -89,11 +89,11 @@ Scale lines (ticks)
 
 ``indic = lv_meter_add_scale_lines(meter, color_start, color_end, local, width_mod)``
 adds an indicator that modifies the ticks lines. If ``local`` is
-``true`` the ticks’ color will be faded from ``color_start`` to
-``color_end`` in the indicator’s start and end value range. If ``local``
+``true`` the ticks' color will be faded from ``color_start`` to
+``color_end`` in the indicator's start and end value range. If ``local``
 is ``false`` ``color_start`` and ``color_end`` will be mapped to the
-start and end value of the scale and only a “slice” of that color
-gradient will be visible in the indicator’s start and end value range.
+start and end value of the scale and only a "slice" of that color
+gradient will be visible in the indicator's start and end value range.
 ``width_mod`` modifies the width of the tick lines.
 
 :cpp:expr:`lv_meter_set_indicator_start_value(meter, inidicator, value)` and

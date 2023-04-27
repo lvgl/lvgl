@@ -172,10 +172,10 @@ ou corrigir um problema rotulado como
 pessoa receberá um pagamento por esse trabalho. Estimamos o tempo
 necessário, a complexidade e a importância da questão e definimos um
 preço de acordo. Para entrar, apenas comente sobre um problema
-patrocinado dizendo “Olá, gostaria de lidar com isso. É assim que estou
-planejando corrigi-lo/implementá-lo…”. Um trabalho é considerado pronto
+patrocinado dizendo "Olá, gostaria de lidar com isso. É assim que estou
+planejando corrigi-lo/implementá-lo…". Um trabalho é considerado pronto
 quando é aprovado e mesclado por um mantenedor. Depois disso, você pode
-enviar uma “despesa” (expense) pela plataforma
+enviar uma "despesa" (expense) pela plataforma
 `opencollective.com <https://opencollective.com/lvgl>`__ e então
 receberá o pagamento em alguns dias.
 
@@ -241,19 +241,19 @@ Código C
 
 .. code:: c
 
-   lv_obj_t * btn = lv_btn_create(lv_scr_act());                   /* Adiciona o botão a tela atual */
-   lv_obj_center(btn);                                             /* Define a posição do botão */
-   lv_obj_set_size(btn, 100, 50);                                  /* Define o tamanho do botão */
+   lv_obj_t * btn = lv_btn_create(lv_scr_act());                   /* Adiciona o botão a tela atual */
+   lv_obj_center(btn);                                             /* Define a posição do botão */
+   lv_obj_set_size(btn, 100, 50);                                  /* Define o tamanho do botão */
    lv_obj_add_event(btn, btn_event_cb, LV_EVENT_CLICKED, NULL); /* Atribui um retorno de chamada (callback) ao botão */
 
-   lv_obj_t * label = lv_label_create(btn);                        /* Adiciona um rótulo (label) */
-   lv_label_set_text(label, "Botão");                              /* Define um texto para o rótulo (label) */
-   lv_obj_center(label);                                           /* Alinha o texto no centro do botão */
+   lv_obj_t * label = lv_label_create(btn);                        /* Adiciona um rótulo (label) */
+   lv_label_set_text(label, "Botão");                              /* Define um texto para o rótulo (label) */
+   lv_obj_center(label);                                           /* Alinha o texto no centro do botão */
    ...
 
    void btn_event_cb(lv_event_t * e)
    {
-     printf("Clicado\n");
+     printf("Clicado\n");
    }
 
 .. raw:: html
@@ -277,7 +277,7 @@ Código MicroPython \| Simulador online
 .. code:: python
 
    def btn_event_cb(e):
-     print("Clicado")
+     print("Clicado")
 
    # Cria um botão e um rótulo (label)
    btn = lv.btn(lv.scr_act())

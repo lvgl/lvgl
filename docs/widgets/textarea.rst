@@ -25,11 +25,11 @@ Parts and Styles
    ``bg_color`` style properties can be used. ``bg_color`` should be set
    directly on the label of the text area.
 -  :cpp:enumerator:`LV_PART_CURSOR` Marks the position where the characters are
-   inserted. The cursor’s area is always the bounding box of the current
+   inserted. The cursor's area is always the bounding box of the current
    character. A block cursor can be created by adding a background color
-   and background opacity to :cpp:enumerator:`LV_PART_CURSOR`\ ’s style. The create
+   and background opacity to :cpp:enumerator:`LV_PART_CURSOR`\ 's style. The create
    line cursor leave the cursor transparent and set a left border. The
-   ``anim_time`` style property sets the cursor’s blink time.
+   ``anim_time`` style property sets the cursor's blink time.
 -  :cpp:enumerator:`LV_PART_TEXTAREA_PLACEHOLDER` Unique to Text Area, allows styling
    the placeholder text.
 
@@ -39,7 +39,7 @@ Usage
 Add text
 --------
 
-You can insert text or characters to the current cursor’s position with:
+You can insert text or characters to the current cursor's position with:
 
 -  :cpp:expr:`lv_textarea_add_char(textarea, 'c')`
 -  :cpp:expr:`lv_textarea_add_text(textarea, "insert this text")`
@@ -69,8 +69,8 @@ Move the cursor
 
 The cursor position can be modified directly like
 :cpp:expr:`lv_textarea_set_cursor_pos(textarea, 10)`. The ``0`` position means
-“before the first characters”, :cpp:enumerator:`LV_TA_CURSOR_LAST` means “after the
-last character”
+"before the first characters", :cpp:enumerator:`LV_TA_CURSOR_LAST` means "after the
+last character"
 
 You can step the cursor with
 
@@ -135,7 +135,7 @@ scrolling and drawing might be slow. However, by enabling
 :c:macro:`LV_LABEL_LONG_TXT_HINT` in ``lv_conf.h`` the performance can be
 hugely improved. This will save some additional information about the
 label to speed up its drawing. Using :c:macro:`LV_LABEL_LONG_TXT_HINT` the
-scrolling and drawing will as fast as with “normal” short texts.
+scrolling and drawing will as fast as with "normal" short texts.
 
 Select text
 -----------

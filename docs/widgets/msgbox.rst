@@ -18,7 +18,7 @@ Parts and Styles
 ****************
 
 The message box is built from other widgets, so you can check these
-widgets’ documentation for details.
+widgets' documentation for details.
 
 - Background: `lv_obj </widgets/obj>`__
 - Close button: `lv_btn </widgets/btn>`__
@@ -36,9 +36,9 @@ creates a message box.
 
 If ``parent`` is ``NULL`` the message box will be modal. ``title`` and
 ``txt`` are strings for the title and the text. ``btn_txts[]`` is an
-array with the buttons’ text. E.g.
+array with the buttons' text. E.g.
 ``const char * btn_txts[] = {"Ok", "Cancel", NULL}``. ``add_close_btn``
-can be ``true`` or ``false`` to add/don’t add a close button.
+can be ``true`` or ``false`` to add/don't add a close button.
 
 Get the parts
 -------------

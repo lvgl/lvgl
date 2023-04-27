@@ -56,7 +56,7 @@ To create a Lottie animation from file use:
      lv_obj_t * lottie = lv_rlottie_create_from_file(parent, width, height, "path/to/lottie.json");
 
 Note that, Rlottie uses the standard STDIO C file API, so you can use
-the path “normally” and no LVGL specific driver letter is required.
+the path "normally" and no LVGL specific driver letter is required.
 
 Use Rlottie from raw string data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -206,7 +206,7 @@ An example CMakeLists file has been provided at
 ``/env_support/esp/rlottie/CMakeLists.txt``
 
 Copy this CMakeLists file to
-``‘your-project-directory'/components/rlottie/``
+``'your-project-directory'/components/rlottie/``
 
 In addition to the component CMakeLists file, you'll also need to tell
 your project level CMakeLists in your IDF project to require rlottie:

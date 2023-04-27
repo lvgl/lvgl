@@ -4,7 +4,7 @@ Checkbox (lv_checkbox)
 Overview
 ********
 
-The Checkbox object is created from a “tick box” and a label. When the
+The Checkbox object is created from a "tick box" and a label. When the
 Checkbox is clicked the tick box is toggled.
 
 Parts and Styles
@@ -13,9 +13,9 @@ Parts and Styles
 -  :cpp:enumerator:`LV_PART_MAIN` The is the background of the Checkbox and it uses
    the text and all the typical background style properties.
    ``pad_column`` adjusts the spacing between the tickbox and the label
--  :cpp:enumerator:`LV_PART_INDICATOR` The “tick box” is a square that uses all the
+-  :cpp:enumerator:`LV_PART_INDICATOR` The "tick box" is a square that uses all the
    typical background style properties. By default, its size is equal to
-   the height of the main part’s font. Padding properties make the tick
+   the height of the main part's font. Padding properties make the tick
    box larger in the respective directions.
 
 The Checkbox is added to the default group (if it is set).
@@ -31,7 +31,7 @@ The text can be modified with the
 dynamically allocated.
 
 To set a static text, use :cpp:expr:`lv_checkbox_set_static_text(cb, txt)`. This
-way, only a pointer to ``txt`` will be stored. The text then shouldn’t
+way, only a pointer to ``txt`` will be stored. The text then shouldn't
 be deallocated while the checkbox exists.
 
 Check, uncheck, disable
@@ -69,7 +69,7 @@ Learn more about :ref:`events`.
 Keys
 ****
 
-The following *Keys* are processed by the ‘Buttons’: -
+The following *Keys* are processed by the 'Buttons': -
 ``LV_KEY_RIGHT/UP`` Go to toggled state if toggling is enabled -
 ``LV_KEY_LEFT/DOWN`` Go to non-toggled state if toggling is enabled -
 :cpp:enumerator:`LV_KEY_ENTER` Clicks the checkbox and toggles it

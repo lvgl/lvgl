@@ -154,7 +154,7 @@ specified in ``indev_drv.long_press_repeat_time``.
 Button
 ------
 
-*Buttons* mean external “hardware” buttons next to the screen which are
+*Buttons* mean external "hardware" buttons next to the screen which are
 assigned to specific coordinates of the screen. If a button is pressed
 it will simulate the pressing on the assigned coordinate. (Similarly to a touchpad)
 

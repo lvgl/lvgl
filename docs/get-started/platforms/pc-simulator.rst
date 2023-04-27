@@ -57,9 +57,9 @@ Eclipse is a Java-based tool so be sure **Java Runtime Environment** is installe
 
 On Debian-based distros (e.g. Ubuntu): ``sudo apt-get install default-jre``
 
-:note: If you are using other distros, then please install a ‘Java
+:note: If you are using other distros, then please install a 'Java
        Runtime Environment' suitable to your distro. Note: If you are using
-       macOS and get a “Failed to create the Java Virtual Machine” error,
+       macOS and get a "Failed to create the Java Virtual Machine" error,
        uninstall any other Java JDK installs and install Java JDK 8u. This
        should fix the problem.
 
@@ -142,7 +142,7 @@ Compile and Run
 Now you are ready to run LVGL on your PC. Click on the Hammer Icon on
 the top menu bar to Build the project. If you have done everything
 right, then you will not get any errors. Note that on some systems
-additional steps might be required to “see” SDL 2 from Eclipse but in
+additional steps might be required to "see" SDL 2 from Eclipse but in
 most cases the configuration in the downloaded project is enough.
 
 After a successful build, click on the Play button on the top menu bar

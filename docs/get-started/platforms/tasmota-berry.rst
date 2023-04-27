@@ -34,7 +34,7 @@ Berry has the following advantages:
 - Lightweight: A well-optimized interpreter with very little resources. Ideal for use in microprocessors.
 - Fast: optimized one-pass bytecode compiler and register-based virtual machine.
 - Powerful: supports imperative programming, object-oriented programming, functional programming.
-- Flexible: Berry is a dynamic type script, and it’s intended for embedding in applications.
+- Flexible: Berry is a dynamic type script, and it's intended for embedding in applications.
   It can provide good dynamic scalability for the host system.
 - Simple: simple and natural syntax, support garbage collection, and easy to use FFI (foreign function interface).
 - RAM saving: With compile-time object construction, most of the constant objects are stored
@@ -63,7 +63,7 @@ Tasmota + Berry + LVGL could be used for:
 - Fast prototyping GUI.
 - Shortening the cycle of changing and fine-tuning the GUI.
 - Modelling the GUI in a more abstract way by defining reusable composite objects, taking
-  advantage of Berry’s language features such as Inheritance, Closures, Exception Handling…
+  advantage of Berry's language features such as Inheritance, Closures, Exception Handling…
 - Make LVGL accessible to a larger audience. No need to know C to create a nice GUI on an embedded system.
 
 A higher level interface compatible with
@@ -75,9 +75,9 @@ is also under development.
 So what does it look like?
 --------------------------
 
-TL;DR: Similar to MicroPython, it’s very much like the C API, but Object-Oriented for LVGL components.
+TL;DR: Similar to MicroPython, it's very much like the C API, but Object-Oriented for LVGL components.
 
-Let’s dive right into an example!
+Let's dive right into an example!
 
 A simple example
 ~~~~~~~~~~~~~~~~

@@ -10,7 +10,7 @@ More information about ESP-IDF build system can be found `here <https://docs.esp
 LVGL demo project for ESP32
 ---------------------------
 
-We’ve created `lv_port_esp32 <https://github.com/lvgl/lv_port_esp32>`__,
+We've created `lv_port_esp32 <https://github.com/lvgl/lv_port_esp32>`__,
 a project using ESP-IDF and LVGL to show one of the demos from
 `demos <https://github.com/lvgl/lvgl/demos>`__. You can configure the
 project to use one of the many supported display controllers and targets
@@ -44,7 +44,7 @@ git repository you can include LVGL as a git submodule:
 
    git submodule add https://github.com/lvgl/lvgl.git components/lvgl
 
-The above command will clone LVGL’s main repository into the
+The above command will clone LVGL's main repository into the
 ``components/lvgl`` directory. LVGL includes a ``CMakeLists.txt`` file
 that sets some configuration options so you can use LVGL right away.
 
@@ -73,8 +73,8 @@ When you are ready to configure LVGL, launch the configuration menu with
 Using lvgl_esp32_drivers in ESP-IDF project
 -------------------------------------------
 
-You can also add ``lvgl_esp32_drivers`` as a “component”. This component
-should be located inside a directory named “components” in your project
+You can also add ``lvgl_esp32_drivers`` as a "component". This component
+should be located inside a directory named "components" in your project
 root directory.
 
 When your project is a git repository you can include

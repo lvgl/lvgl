@@ -6,7 +6,7 @@ Overview
 
 A Canvas inherits from `Image </widgets/img>`__ where the user can draw
 anything. Rectangles, texts, images, lines, arcs can be drawn here using
-lvgl’s drawing engine. Additionally “effects” can be applied, such as
+lvgl's drawing engine. Additionally "effects" can be applied, such as
 rotation, zoom and blur.
 
 Parts and Styles
@@ -45,18 +45,18 @@ sets pixels with *index=3* to red.
 Drawing
 -------
 
-To set a pixel’s color on the canvas, use
+To set a pixel's color on the canvas, use
 :cpp:expr:`lv_canvas_set_px_color(canvas, x, y, LV_COLOR_RED)`. With
 ``LV_IMG_CF_INDEXED_...`` the index of the color needs to be passed as
 color. E.g. ``lv_color_t c; c.full = 3;``
 
-To set a pixel’s opacity with :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA` or
+To set a pixel's opacity with :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR_ALPHA` or
 ``LV_IMG_CF_ALPHA_...`` format on the canvas, use
 :cpp:expr:`lv_canvas_set_px_opa(canvas, x, y, opa)`.
 
 :cpp:expr:`lv_canvas_fill_bg(canvas, LV_COLOR_BLUE, LV_OPA_50)` fills the whole
 canvas to blue with 50% opacity. Note that if the current color format
-doesn’t support colors (e.g. :cpp:enumerator:`LV_IMG_CF_ALPHA_2BIT`) the color will be
+doesn't support colors (e.g. :cpp:enumerator:`LV_IMG_CF_ALPHA_2BIT`) the color will be
 ignored. Similarly, if opacity is not supported
 (e.g. :cpp:enumerator:`LV_IMG_CF_TRUE_COLOR`) it will be ignored.
 
@@ -78,7 +78,7 @@ which should be first initialized with one of
 ``lv_draw_rect/label/img/line/arc_dsc_init()`` and then modified with
 the desired colors and other values.
 
-The draw function can draw to any color format. For example, it’s
+The draw function can draw to any color format. For example, it's
 possible to draw a text to an :cpp:enumerator:`LV_IMG_VF_ALPHA_8BIT` canvas and use
 the result image as a `draw mask </overview/drawing>`__ later.
 
@@ -99,7 +99,7 @@ following parameters:
 - ``pivot_y`` pivot Y of rotation. Relative to the source canvas. Set to ``source height / 2`` to rotate around the center
 - ``antialias`` true: apply anti-aliasing during the transformation. Looks better but slower.
 
-Note that a canvas can’t be rotated on itself. You need a source and
+Note that a canvas can't be rotated on itself. You need a source and
 destination canvas or image.
 
 Blur

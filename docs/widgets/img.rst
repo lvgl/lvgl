@@ -38,7 +38,7 @@ To make the variable visible in the C file, you need to declare it with
 
 To use external files, you also need to convert the image files using
 the online converter tool but now you should select the binary output
-format. You also need to use LVGL’s file system module and register a
+format. You also need to use LVGL's file system module and register a
 driver with some functions for the basic file operation. Go to the
 `File system </overview/file-system>`__ to learn more. To set an image sourced
 from a file, use :cpp:expr:`lv_img_set_src(img, "S:folder1/my_img.bin")`.
@@ -46,7 +46,7 @@ from a file, use :cpp:expr:`lv_img_set_src(img, "S:folder1/my_img.bin")`.
 You can also set a symbol similarly to `Labels </widgets/label>`__. In
 this case, the image will be rendered as text according to the *font*
 specified in the style. It enables to use of light-weight monochrome
-“letters” instead of real images. You can set symbol like
+"letters" instead of real images. You can set symbol like
 :cpp:expr:`lv_img_set_src(img1, LV_SYMBOL_OK)`.
 
 Label as an image
@@ -67,7 +67,7 @@ handling methods:
 -  **Chroma-keying** - Pixels with :c:macro:`LV_COLOR_CHROMA_KEY` (*lv_conf.h*)
    color will be transparent.
 -  **Alpha byte** - An alpha byte is added to every pixel that contains
-   the pixel’s opacity
+   the pixel's opacity
 
 Palette and Alpha index
 -----------------------
@@ -98,13 +98,13 @@ Auto-size
 ---------
 
 If the width or height of the image object is set to :c:macro:`LV_SIZE_CONTENT`
-the object’s size will be set according to the size of the image source
+the object's size will be set according to the size of the image source
 in the respective direction.
 
 Mosaic
 ------
 
-If the object’s size is greater than the image size in any directions,
+If the object's size is greater than the image size in any directions,
 then the image will be repeated like a mosaic. This allows creation a
 large image from only a very narrow source. For example, you can have a
 *300 x 5* image with a special gradient and set it as a wallpaper using
@@ -117,7 +117,7 @@ With :cpp:expr:`lv_img_set_offset_x(img, x_ofs)` and
 :cpp:expr:`lv_img_set_offset_y(img, y_ofs)`, you can add some offset to the
 displayed image. Useful if the object size is smaller than the image
 source size. Using the offset parameter a `Texture atlas <https://en.wikipedia.org/wiki/Texture_atlas>`__
-or a “running image” effect can be created by `Animating </overview/animation>`__ the x or y offset.
+or a "running image" effect can be created by `Animating </overview/animation>`__ the x or y offset.
 
 Transformations
 ***************
@@ -149,7 +149,7 @@ In other words transformations work only on true color images stored as
 C array, or if a custom `Image decoder </overview/images#image-edecoder>`__
 returns the whole image.
 
-Note that the real coordinates of image objects won’t change during
+Note that the real coordinates of image objects won't change during
 transformation. That is ``lv_obj_get_width/height/x/y()`` will return
 the original, non-zoomed coordinates.
 
@@ -158,7 +158,7 @@ transformation properties coming from styles. (See
 `here </overview/style#opacity-and-transformations>`__). The main
 differences are that pure image widget transformation
 
-- doesn’t transform the children of the image widget
+- doesn't transform the children of the image widget
 - image is transformed directly without creating an intermediate layer (buffer) to snapshot the widget
 
 Size mode
@@ -166,14 +166,14 @@ Size mode
 
 By default, when the image is zoomed or rotated the real coordinates of
 the image object are not changed. The larger content simply overflows
-the object’s boundaries. It also means the layouts are not affected the
+the object's boundaries. It also means the layouts are not affected the
 by the transformations.
 
 If you need the object size to be updated to the transformed size set
 :cpp:expr:`lv_img_set_size_mode(img, LV_IMG_SIZE_MODE_REAL)`. (The previous mode
 is the default and called :cpp:enumerator:`LV_IMG_SIZE_MODE_VIRTUAL`). In this case if
 the width/height of the object is set to :c:macro:`LV_SIZE_CONTENT` the
-object’s size will be set to the zoomed and rotated size. If an explicit
+object's size will be set to the zoomed and rotated size. If an explicit
 size is set then the overflowing content will be cropped.
 
 Rounded image

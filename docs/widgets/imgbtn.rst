@@ -4,7 +4,7 @@ Image button (lv_imgbtn)
 Overview
 ********
 
-The Image button is very similar to the simple ‘Button’ object. The only
+The Image button is very similar to the simple 'Button' object. The only
 difference is that it displays user-defined images in each state instead
 of drawing a rectangle.
 
@@ -28,7 +28,7 @@ To set the image in a state, use the
 :cpp:expr:`lv_imgbtn_set_src(imgbtn, LV_IMGBTN_STATE_..., src_left, src_center, src_right)`.
 
 The image sources work the same as described in the `Image object </widgets/img>`__
-except that “Symbols” are not supported by the Image button. Any of the sources can ``NULL``.
+except that "Symbols" are not supported by the Image button. Any of the sources can ``NULL``.
 
 The possible states are:
 

@@ -24,7 +24,7 @@ Fields
 - ``void (*draw_rect)()`` Draw a rectangle with shadow, gradient, border, etc.
 - ``void (*draw_arc)()`` Draw an arc
 - ``void (*draw_img_decoded)()`` Draw an (A)RGB image that is already decoded by LVGL.
-- ``lv_res_t (*draw_img)()`` Draw an image before decoding it (it bypasses LVGL’s internal image decoders)
+- ``lv_res_t (*draw_img)()`` Draw an image before decoding it (it bypasses LVGL's internal image decoders)
 - ``void (*draw_letter)()`` Draw a letter
 - ``void (*draw_line)()`` Draw a line - ``void (*draw_polygon)()`` Draw a polygon
 - ``void (*draw_bg)()`` Replace the buffer with a rect without decoration like radius or borders.
@@ -35,9 +35,9 @@ Fields
 
 All ``draw_*`` callbacks receive a pointer to the current ``draw_ctx``
 as their first parameter. Among the other parameters there is a
-descriptor that tells what to draw, e.g. for ``draw_rect`` it’s called
+descriptor that tells what to draw, e.g. for ``draw_rect`` it's called
 :cpp:struct:`lv_draw_rect_dsc_t`,
-for :cpp:func:`lv_draw_line` it’s called :cpp:struct:`lv_draw_line_dsc_t`,
+for :cpp:func:`lv_draw_line` it's called :cpp:struct:`lv_draw_line_dsc_t`,
 etc.
 
 To correctly render according to a ``draw_dsc`` you need to be familiar
@@ -67,7 +67,7 @@ calling :cpp:func:`lv_disp_drv_register`. It makes it possible to use your own
 Software renderer
 *****************
 
-LVGL’s built in software renderer extends the basic :cpp:type:`lv_draw_ctx_t`
+LVGL's built in software renderer extends the basic :cpp:type:`lv_draw_ctx_t`
 structure and sets the draw callbacks. It looks like this:
 
 .. code:: c
@@ -92,7 +92,7 @@ Blend callback
 --------------
 
 As you saw above the software renderer adds the ``blend`` callback
-field. It’s a special callback related to how the software renderer
+field. It's a special callback related to how the software renderer
 works. All draw operations end up in the ``blend`` callback which can
 either fill an area or copy an image to an area by considering an optional mask.
 
@@ -100,7 +100,7 @@ The :cpp:struct:`lv_draw_sw_blend_dsc_t` parameter describes what and how to
 blend. It has the following fields:
 
 - ``const lv_area_t * blend_area`` The area with absolute coordinates to draw
-  on ``draw_ctx->buf``. If ``src_buf`` is set, it’s the coordinates of the image to blend.
+  on ``draw_ctx->buf``. If ``src_buf`` is set, it's the coordinates of the image to blend.
 - ``const lv_color_t * src_buf`` Pointer to an image to blend. If set,
   ``color`` is ignored. If not set fill ``blend_area`` with ``color``
 - ``lv_color_t color`` Fill color. Used only if ``src_buf == NULL``
@@ -116,7 +116,7 @@ Extend the software renderer
 New blend callback
 ------------------
 
-Let’s take a practical example: you would like to use your MCUs GPU for
+Let's take a practical example: you would like to use your MCUs GPU for
 color fill operations only.
 
 As all draw callbacks call ``blend`` callback to fill an area in the end
@@ -244,7 +244,7 @@ Fully custom draw engine
 ************************
 
 For example if your MCU/MPU supports a powerful vector graphics engine
-you might use only that instead of LVGL’s SW renderer. In this case, you
+you might use only that instead of LVGL's SW renderer. In this case, you
 need to base the renderer on the basic :cpp:type:`lv_draw_ctx_t` (instead of
 :cpp:struct:`lv_draw_sw_ctx_t`) and extend/initialize it as you wish.
 

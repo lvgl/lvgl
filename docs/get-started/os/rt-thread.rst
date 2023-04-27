@@ -14,7 +14,7 @@ Flash and 1.2 KB RAM memory resources can be tailored with easy-to-use
 tools. For resource-rich IoT devices, RT-Thread can use the **online
 software package** management tool, together with system configuration
 tools, to achieve intuitive and rapid modular cutting, seamlessly import
-rich software packages; thus, achieving complex functions like Android’s
+rich software packages; thus, achieving complex functions like Android's
 graphical interface and touch sliding effects, smart voice interaction
 effects, and so on.
 
