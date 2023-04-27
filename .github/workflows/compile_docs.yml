@@ -19,9 +19,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Setup Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: '3.10'
       - name: Cache Python packages
         uses: actions/cache@v2
         with:
