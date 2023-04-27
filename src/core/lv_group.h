@@ -25,7 +25,7 @@ extern "C" {
  *      DEFINES
  *********************/
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
-enum _lv_key_t{
+enum _lv_key_t {
     LV_KEY_UP        = 17,  /*0x11*/
     LV_KEY_DOWN      = 18,  /*0x12*/
     LV_KEY_RIGHT     = 19,  /*0x13*/

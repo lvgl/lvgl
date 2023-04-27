@@ -47,7 +47,7 @@ typedef struct /// @cond
 /**
  *  Tells Doxygen to ignore a duplicate declaration
  */
-lv_lru_t
+    lv_lru_t
 /// @endcond
 {
     lv_lru_item_t ** items;

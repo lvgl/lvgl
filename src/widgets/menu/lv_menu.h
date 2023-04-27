@@ -52,7 +52,7 @@ typedef struct /// @cond
 /**
  *  Tells Doxygen to ignore a duplicate declaration
  */
-lv_menu_load_page_event_data_t
+    lv_menu_load_page_event_data_t
 /// @endcond
 {
     lv_obj_t * menu;
