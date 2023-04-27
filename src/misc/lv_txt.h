@@ -39,31 +39,50 @@ extern "C" {
 /**
  * Options for text rendering.
  */
-enum {
+
+enum _lv_text_flag_t {
     LV_TEXT_FLAG_NONE    = 0x00,
     LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
     LV_TEXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
     LV_TEXT_FLAG_FIT     = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_text_flag_t lv_text_flag_t;
+#else
 typedef uint8_t lv_text_flag_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * State machine for text renderer.*/
-enum {
+enum _lv_text_cmd_state_t {
     LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
     LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
     LV_TEXT_CMD_STATE_IN,   /**< Processing the command*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_text_cmd_state_t lv_text_cmd_state_t;
+#else
 typedef uint8_t lv_text_cmd_state_t;
+#endif /*DOXYGEN*/
+
 
 /** Label align policy*/
-enum {
+enum _lv_text_align_t {
     LV_TEXT_ALIGN_AUTO, /**< Align text auto*/
     LV_TEXT_ALIGN_LEFT, /**< Align text to left*/
     LV_TEXT_ALIGN_CENTER, /**< Align text to center*/
     LV_TEXT_ALIGN_RIGHT, /**< Align text to right*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_text_align_t lv_text_align_t;
+#else
 typedef uint8_t lv_text_align_t;
+#endif /*DOXYGEN*/
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -76,8 +95,9 @@ typedef uint8_t lv_text_align_t;
  * @param font pointer to font of the text
  * @param letter_space letter space of the text
  * @param line_space line space of the text
- * @param flags settings for the text from ::lv_text_flag_t
  * @param max_width max width of the text (break the lines to fit this size). Set COORD_MAX to avoid
+ * @param flag settings for the text from ::lv_text_flag_t
+
  * line breaks
  */
 void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
@@ -92,7 +112,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * line breaks
  * @param used_width When used_width != NULL, save the width of this line if
  * flag == LV_TEXT_FLAG_NONE, otherwise save -1.
- * @param flags settings for the text from 'txt_flag_type' enum
+ * @param flag settings for the text from 'txt_flag_type' enum
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
  * they are different)
  */
@@ -106,7 +126,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coor
  * UTF-8)
  * @param font pointer to a font
  * @param letter_space letter space
- * @param flags settings for the text from 'txt_flag_t' enum
+ * @param flag settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
 lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
@@ -142,6 +162,8 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
 /**
  * return a new formatted text. Memory will be allocated to store the text.
  * @param fmt `printf`-like format
+ * @param ap items to print
+
  * @return pointer to the allocated text string.
  */
 char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap) LV_FORMAT_ATTRIBUTE(1, 0);

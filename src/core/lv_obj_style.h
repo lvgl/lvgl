@@ -29,8 +29,14 @@ extern "C" {
 struct _lv_obj_t;
 
 #ifndef LV_OBJ_H
+/// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
 typedef uint32_t lv_part_t;
 typedef uint16_t lv_state_t;
+/// @endcond
+
 #endif
 
 typedef enum {
@@ -39,6 +45,7 @@ typedef enum {
     _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /*The differences can be shown with a simple redraw*/
     _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
 } _lv_style_state_cmp_t;
+
 
 typedef uint32_t lv_style_selector_t;
 

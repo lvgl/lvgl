@@ -60,7 +60,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * parent);
 /**
  * Set the text of a check box. `txt` will be copied and may be deallocated
  * after this function returns.
- * @param cb    pointer to a check box
+ * @param obj    pointer to a check box
  * @param txt   the text of the check box. NULL to refresh with the current text.
  */
 void lv_checkbox_set_text(lv_obj_t * obj, const char * txt);
@@ -68,7 +68,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt);
 /**
  * Set the text of a check box. `txt` must not be deallocated during the life
  * of this checkbox.
- * @param cb    pointer to a check box
+ * @param obj    pointer to a check box
  * @param txt   the text of the check box.
  */
 void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt);
@@ -79,7 +79,7 @@ void lv_checkbox_set_text_static(lv_obj_t * obj, const char * txt);
 
 /**
  * Get the text of a check box
- * @param cb    pointer to check box object
+ * @param obj    pointer to check box object
  * @return      pointer to the text of the check box
  */
 const char * lv_checkbox_get_text(const lv_obj_t * obj);

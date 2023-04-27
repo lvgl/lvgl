@@ -33,12 +33,17 @@ extern "C" {
  **********************/
 
 /** Roller mode.*/
-enum {
+enum _lv_roller_mode_t {
     LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options).*/
     LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever).*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_roller_mode_t lv_roller_mode_t;
+#else
 typedef uint8_t lv_roller_mode_t;
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     lv_obj_t obj;
@@ -80,7 +85,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
  * Set the selected option
  * @param obj       pointer to a roller object
  * @param sel_opt   index of the selected option (0 ... number of option - 1);
- * @param anim_en   LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
+ * @param anim   LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
  */
 void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t anim);
 

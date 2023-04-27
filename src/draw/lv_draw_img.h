@@ -65,14 +65,24 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
 
 /**
  * Draw an image
- * @param coords the coordinates of the image
- * @param mask the image will be drawn only in this area
- * @param src pointer to a lv_color_t array which contains the pixels of the image
- * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
+ * @param draw_ctx      pointer to the current draw context
+ * @param dsc           pointer to an initialized `lv_draw_img_dsc_t` variable
+ * @param coords        the coordinates of the image
+ * @param src           pointer to a lv_color_t array which contains the pixels of the image
  */
 void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
                  const void * src);
 
+
+/**
+ * Draw a decoded image
+ * @param draw_ctx      pointer to the current draw context
+ * @param dsc           pointer to an initialized `lv_draw_img_dsc_t` variable
+ * @param coords        the coordinates of the image
+ * @param map_p
+ * @param sup
+ * @param color_format
+ */
 
 void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
                          const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format);

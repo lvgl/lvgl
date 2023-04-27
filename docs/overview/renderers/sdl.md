@@ -1,4 +1,0 @@
-# SDL renderer
-
-TODO
-

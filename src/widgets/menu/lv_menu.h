@@ -24,24 +24,40 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-enum {
+enum _lv_menu_mode_header_t {
     LV_MENU_HEADER_TOP_FIXED, /* Header is positioned at the top */
     LV_MENU_HEADER_TOP_UNFIXED, /* Header is positioned at the top and can be scrolled out of view*/
     LV_MENU_HEADER_BOTTOM_FIXED /* Header is positioned at the bottom */
 };
-typedef uint8_t lv_menu_mode_header_t;
 
-enum {
+#ifdef DOXYGEN
+typedef _lv_menu_mode_header_t lv_menu_mode_header_t;
+#else
+typedef uint8_t lv_menu_mode_header_t;
+#endif /*DOXYGEN*/
+
+
+enum _lv_menu_mode_root_back_btn_t {
     LV_MENU_ROOT_BACK_BTN_DISABLED,
     LV_MENU_ROOT_BACK_BTN_ENABLED
 };
-typedef uint8_t lv_menu_mode_root_back_btn_t;
 
-typedef struct lv_menu_load_page_event_data_t {
+#ifdef DOXYGEN
+typedef _lv_menu_mode_root_back_btn_t lv_menu_mode_root_back_btn_t;
+#else
+typedef uint8_t lv_menu_mode_root_back_btn_t;
+#endif /*DOXYGEN*/
+
+typedef struct /// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
+    lv_menu_load_page_event_data_t
+/// @endcond
+{
     lv_obj_t * menu;
     lv_obj_t * page;
-} lv_menu_load_page_event_data_t;
+} lv_menu_load_page_event_data_t ;
 
 typedef struct {
     lv_obj_t * page;
@@ -227,6 +243,7 @@ lv_obj_t * lv_menu_get_sidebar_header_back_btn(lv_obj_t * obj);
 /**
  * Check if an obj is a root back btn
  * @param menu pointer to the menu
+ * @param obj pointer to the back button
  * @return true if it is a root back btn
  */
 bool lv_menu_back_btn_is_root(lv_obj_t * menu, lv_obj_t * obj);

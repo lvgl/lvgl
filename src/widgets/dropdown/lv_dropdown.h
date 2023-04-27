@@ -224,7 +224,7 @@ lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj);
 
 /**
  * Open the drop.down list
- * @param obj       pointer to drop-down list object
+ * @param dropdown_obj       pointer to drop-down list object
  */
 void lv_dropdown_open(lv_obj_t * dropdown_obj);
 

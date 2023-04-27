@@ -39,12 +39,18 @@ extern "C" {
 /**
  * LVGL error codes.
  */
-enum {
+enum _lv_res_t {
     LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
                       function or an operation was failed*/
     LV_RES_OK,      /*The object is valid (no deleted) after the action*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_res_t lv_res_t;
+#else
 typedef uint8_t lv_res_t;
+#endif /*DOXYGEN*/
+
 
 #if defined(__cplusplus) || __STDC_VERSION__ >= 199901L
 // If c99 or newer,  use the definition of uintptr_t directly from <stdint.h>

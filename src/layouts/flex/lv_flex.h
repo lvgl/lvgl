@@ -75,18 +75,18 @@ extern lv_style_prop_t LV_STYLE_FLEX_GROW;
 void lv_flex_init(void);
 
 /**
- * Set hot the item should flow
- * @param flex pointer to a flex layout descriptor
+ * Set how the item should flow
+ * @param obj pointer to an object. The parent must have flex layout else nothing will happen.
  * @param flow an element of `lv_flex_flow_t`.
  */
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow);
 
 /**
  * Set how to place (where to align) the items and tracks
- * @param flex pointer: to a flex layout descriptor
+ * @param obj pointer to an object. The parent must have flex layout else nothing will happen.
  * @param main_place where to place the items on main axis (in their track). Any value of `lv_flex_align_t`.
  * @param cross_place where to place the item in their track on the cross axis. `LV_FLEX_ALIGN_START/END/CENTER`
- * @param track_place where to place the tracks in the cross direction. Any value of `lv_flex_align_t`.
+ * @param track_cross_place where to place the tracks in the cross direction. Any value of `lv_flex_align_t`.
  */
 void lv_obj_set_flex_align(lv_obj_t * obj, lv_flex_align_t main_place, lv_flex_align_t cross_place,
                            lv_flex_align_t track_cross_place);

@@ -564,7 +564,7 @@ static inline lv_coord_t lv_dpx(lv_coord_t n)
  * considering the DPI of the given display.
  * It ensures that e.g. `lv_dpx(100)` will have the same physical size regardless to the
  * DPI of the display.
- * @param obj   a display whose dpi should be considered
+ * @param disp   a display whose dpi should be considered
  * @param n     the number of pixels to scale
  * @return      `n x current_dpi/160`
  */

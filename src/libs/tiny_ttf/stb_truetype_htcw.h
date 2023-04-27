@@ -604,10 +604,22 @@ typedef struct {
     float xoff2, yoff2;
 } stbtt_packedchar;
 
+/// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
 typedef struct stbtt_pack_context stbtt_pack_context;
 typedef struct stbtt_fontinfo stbtt_fontinfo;
+/// @endcond
+
 #ifndef STB_RECT_PACK_VERSION
+/// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
 typedef struct stbrp_rect stbrp_rect;
+/// @endcond
+
 #endif
 STBTT_DEF int  stbtt_PackBegin(stbtt_pack_context * spc, unsigned char * pixels, int width, int height,
                                int stride_in_bytes, int padding, void * alloc_context);
@@ -824,7 +836,7 @@ STBTT_DEF int  stbtt_GetGlyphKernAdvance(const stbtt_fontinfo * info, int glyph1
 STBTT_DEF int  stbtt_GetGlyphBox(const stbtt_fontinfo * info, int glyph_index, int * x0, int * y0, int * x1, int * y1);
 // as above, but takes one or more glyph indices for greater efficiency
 
-typedef struct stbtt_kerningentry {
+typedef struct _stbtt_kerningentry {
     int glyph1; // use stbtt_FindGlyphIndex
     int glyph2;
     int advance;

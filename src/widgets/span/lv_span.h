@@ -27,18 +27,29 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_span_overflow_t {
     LV_SPAN_OVERFLOW_CLIP,
     LV_SPAN_OVERFLOW_ELLIPSIS,
 };
-typedef uint8_t lv_span_overflow_t;
 
-enum {
+#ifdef DOXYGEN
+typedef _lv_span_overflow_t lv_span_overflow_t;
+#else
+typedef uint8_t lv_span_overflow_t;
+#endif /*DOXYGEN*/
+
+enum _lv_span_mode_t {
     LV_SPAN_MODE_FIXED,     /**< fixed the obj size*/
     LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size*/
     LV_SPAN_MODE_BREAK,     /**< Keep width, break the too long lines and expand height*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_span_mode_t lv_span_mode_t;
+#else
 typedef uint8_t lv_span_mode_t;
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     char * txt;             /* a pointer to display text */
@@ -218,6 +229,8 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width);
 /**
  * get the text content height with width fixed.
  * @param obj pointer to a spangroup object.
+ * @param width the width of the span group.
+
  */
 lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width);
 

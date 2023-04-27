@@ -32,8 +32,8 @@ extern "C" {
 
 /**
  * Initialize the theme
- * @param color_primary the primary color of the theme
- * @param color_secondary the secondary color for the theme
+ * @param disp pointer to display
+ * @param dark_bg
  * @param font pointer to a font to use.
  * @return a pointer to reference this theme later
  */

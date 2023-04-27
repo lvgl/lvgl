@@ -31,7 +31,7 @@ LV_EXPORT_CONST_INT(LV_BTNMATRIX_BTN_NONE);
 
 /** Type to store button control bits (disabled, hidden etc.)
  * The first 3 bits are used to store the width*/
-enum {
+enum _lv_btnmatrix_ctrl_t {
     _LV_BTNMATRIX_WIDTH            = 0x000F, /**< Reserved to store the size units*/
     LV_BTNMATRIX_CTRL_HIDDEN       = 0x0010, /**< Button hidden*/
     LV_BTNMATRIX_CTRL_NO_REPEAT    = 0x0020, /**< Do not repeat press this button.*/
@@ -47,7 +47,12 @@ enum {
     LV_BTNMATRIX_CTRL_CUSTOM_2     = 0x8000, /**< Custom free to use flag*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_btnmatrix_ctrl_t lv_btnmatrix_ctrl_t;
+#else
 typedef uint16_t lv_btnmatrix_ctrl_t;
+#endif /*DOXYGEN*/
+
 
 typedef bool (*lv_btnmatrix_btn_draw_cb_t)(lv_obj_t * btnm, uint32_t btn_id, const lv_area_t * draw_area,
                                            const lv_area_t * clip_area);

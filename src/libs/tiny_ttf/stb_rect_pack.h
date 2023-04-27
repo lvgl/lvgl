@@ -78,9 +78,14 @@
 extern "C" {
 #endif
 
+/// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
 typedef struct stbrp_context stbrp_context;
 typedef struct stbrp_node    stbrp_node;
 typedef struct stbrp_rect    stbrp_rect;
+/// @endcond
 
 typedef int            stbrp_coord;
 

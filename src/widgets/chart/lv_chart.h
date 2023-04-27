@@ -36,34 +36,52 @@ LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 /**
  * Chart types
  */
-enum {
+enum _lv_chart_type_t {
     LV_CHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_CHART_TYPE_LINE,     /**< Connect the points with lines*/
     LV_CHART_TYPE_BAR,      /**< Draw columns*/
     LV_CHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_chart_type_t lv_chart_type_t;
+#else
 typedef uint8_t lv_chart_type_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * Chart update mode for `lv_chart_set_next`
  */
-enum {
+enum _lv_chart_update_mode_t {
     LV_CHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one the right*/
     LV_CHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_chart_update_mode_t lv_chart_update_mode_t;
+#else
 typedef uint8_t lv_chart_update_mode_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * Enumeration of the axis'
  */
-enum {
+enum _lv_chart_axis_t {
     LV_CHART_AXIS_PRIMARY_Y     = 0x00,
     LV_CHART_AXIS_SECONDARY_Y   = 0x01,
     LV_CHART_AXIS_PRIMARY_X     = 0x02,
     LV_CHART_AXIS_SECONDARY_X   = 0x04,
     _LV_CHART_AXIS_LAST
 };
+
+#ifdef DOXYGEN
+typedef _lv_chart_axis_t lv_chart_axis_t;
+#else
 typedef uint8_t lv_chart_axis_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * Descriptor a chart series
@@ -169,8 +187,8 @@ void lv_chart_set_range(lv_obj_t * obj, lv_chart_axis_t axis, lv_coord_t min, lv
 
 /**
  * Set update mode of the chart object. Affects
- * @param obj       pointer to a chart object
- * @param mode      the update mode
+ * @param obj              pointer to a chart object
+ * @param update_mode      the update mode
  */
 void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode);
 
@@ -234,14 +252,14 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * obj);
 
 /**
  * Get the data point number per data line on chart
- * @param chart     pointer to chart object
+ * @param obj       pointer to chart object
  * @return          point number on each data line
  */
 uint16_t lv_chart_get_point_count(const lv_obj_t * obj);
 
 /**
  * Get the current index of the x-axis start point in the data array
- * @param chart     pointer to a chart object
+ * @param obj       pointer to a chart object
  * @param ser       pointer to a data series on 'chart'
  * @return          the index of the current x start point in the data array
  */
@@ -249,7 +267,7 @@ uint16_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * se
 
 /**
  * Get the position of a point to the chart.
- * @param chart     pointer to a chart object
+ * @param obj       pointer to a chart object
  * @param ser       pointer to series
  * @param id        the index.
  * @param p_out     store the result position here
@@ -258,7 +276,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
 
 /**
  * Refresh a chart if its data line has changed
- * @param   chart pointer to chart object
+ * @param   obj   pointer to chart object
  */
 void lv_chart_refresh(lv_obj_t * obj);
 
@@ -277,14 +295,14 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
 
 /**
  * Deallocate and remove a data series from a chart
- * @param chart     pointer to a chart object
+ * @param obj       pointer to a chart object
  * @param series    pointer to a data series on 'chart'
  */
 void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series);
 
 /**
  * Hide/Unhide a single series of a chart.
- * @param obj       pointer to a chart object.
+ * @param chart     pointer to a chart object.
  * @param series    pointer to a series object
  * @param hide      true: hide the series
  */
@@ -292,7 +310,7 @@ void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hid
 
 /**
  * Change the color of a series
- * @param obj       pointer to a chart object.
+ * @param chart     pointer to a chart object.
  * @param series    pointer to a series object
  * @param color     the new color of the series
  */
@@ -332,7 +350,7 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * obj, lv_color_t color, lv_di
 
 /**
  * Set the coordinate of the cursor with respect to the paddings
- * @param obj       pointer to a chart object
+ * @param chart     pointer to a chart object
  * @param cursor    pointer to the cursor
  * @param pos       the new coordinate of cursor relative to the chart
  */
@@ -340,7 +358,7 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
 
 /**
  * Stick the cursor to a point
- * @param obj       pointer to a chart object
+ * @param chart     pointer to a chart object
  * @param cursor    pointer to the cursor
  * @param ser       pointer to a series
  * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
@@ -350,7 +368,7 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
 
 /**
  * Get the coordinate of the cursor with respect to the paddings
- * @param obj       pointer to a chart object
+ * @param chart     pointer to a chart object
  * @param cursor    pointer to cursor
  * @return          coordinate of the cursor as lv_point_t
  */

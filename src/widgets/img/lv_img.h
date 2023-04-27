@@ -47,7 +47,7 @@ typedef struct {
     lv_point_t pivot;     /*rotation center of the image*/
     uint16_t zoom;         /*256 means no zoom, 512 double size, 128 half size*/
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
-    uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
+    uint8_t cf : 5;        /*Color format from `lv_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
     uint8_t obj_size_mode: 2; /*Image size mode when image size and object size is different.*/
 } lv_img_t;
@@ -57,7 +57,7 @@ extern const lv_obj_class_t lv_img_class;
 /**
  * Image size mode, when image size and object size is different
  */
-enum {
+enum _lv_img_size_mode_t {
     /** Zoom doesn't affect the coordinates of the object,
      *  however if zoomed in the image is drawn out of the its coordinates.
      *  The layout's won't change on zoom */
@@ -69,7 +69,11 @@ enum {
     LV_IMG_SIZE_MODE_REAL,
 };
 
+#ifdef DOXYGEN
+typedef _lv_img_size_mode_t lv_img_size_mode_t;
+#else
 typedef uint8_t lv_img_size_mode_t;
+#endif /*DOXYGEN*/
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -89,7 +93,7 @@ lv_obj_t * lv_img_create(lv_obj_t * parent);
 /**
  * Set the image data to display on the object
  * @param obj       pointer to an image object
- * @param src_img   1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
+ * @param src       1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &my_img) or
  *                  2) path to an image file (e.g. "S:/dir/img.bin")or
  *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)
  */
@@ -171,7 +175,7 @@ const void * lv_img_get_src(lv_obj_t * obj);
 
 /**
  * Get the offset's x attribute of the image object.
- * @param img       pointer to an image
+ * @param obj       pointer to an image
  * @return          offset X value.
  */
 lv_coord_t lv_img_get_offset_x(lv_obj_t * obj);
@@ -192,7 +196,7 @@ uint16_t lv_img_get_angle(lv_obj_t * obj);
 
 /**
  * Get the pivot (rotation center) of the image.
- * @param img       pointer to an image object
+ * @param obj       pointer to an image object
  * @param pivot     store the rotation center here
  */
 void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot);

@@ -39,10 +39,17 @@ typedef enum {
     LV_LRU_VALUE_TOO_LARGE
 } lv_lru_res_t;
 
-typedef void (lv_lru_free_t)(void * v);
+typedef void lv_lru_free_t(void * v);
+
 typedef struct _lv_lru_item_t lv_lru_item_t;
 
-typedef struct lv_lru_t {
+typedef struct /// @cond
+/**
+ *  Tells Doxygen to ignore a duplicate declaration
+ */
+    lv_lru_t
+/// @endcond
+{
     lv_lru_item_t ** items;
     uint64_t access_count;
     size_t free_memory;

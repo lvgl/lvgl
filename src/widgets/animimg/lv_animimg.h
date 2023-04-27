@@ -43,10 +43,17 @@ typedef struct {
 
 
 /*Image parts*/
-enum {
+enum _lv_animimg_part_t {
     LV_ANIM_IMG_PART_MAIN,
 };
+
+
+#ifdef DOXYGEN
+typedef _lv_animimg_part_t lv_animimg_part_t;
+#else
 typedef uint8_t lv_animimg_part_t;
+#endif
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -80,6 +87,7 @@ void lv_animimg_start(lv_obj_t * obj);
 /**
  * Set the image animation duration time. unit:ms
  * @param img pointer to an animation image object
+ * @param duration the duration
  */
 void lv_animimg_set_duration(lv_obj_t * img, uint32_t duration);
 

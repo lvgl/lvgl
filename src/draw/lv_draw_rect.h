@@ -79,9 +79,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
 /**
  * Draw a rectangle
- * @param coords the coordinates of the rectangle
- * @param clip the rectangle will be drawn only in this area
- * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
+ * @param draw_ctx      pointer to the current draw context
+ * @param dsc           pointer to an initialized `lv_draw_rect_dsc_t` variable
+ * @param coords        the coordinates of the rectangle
  */
 void lv_draw_rect(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
 

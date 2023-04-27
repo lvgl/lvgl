@@ -30,13 +30,19 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-enum {
+enum _lv_meter_indicator_type_t {
     LV_METER_INDICATOR_TYPE_NEEDLE_IMG,
     LV_METER_INDICATOR_TYPE_NEEDLE_LINE,
     LV_METER_INDICATOR_TYPE_SCALE_LINES,
     LV_METER_INDICATOR_TYPE_ARC,
 };
+
+#ifdef DOXYGEN
+typedef _lv_meter_indicator_type_t lv_meter_indicator_type_t;
+#else
 typedef uint8_t lv_meter_indicator_type_t;
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     lv_meter_indicator_type_t type;

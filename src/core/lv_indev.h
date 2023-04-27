@@ -160,7 +160,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, struct _lv_obj_t * cur_obj);
 /**
  * Set a destination group for a keypad input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device
- * @param group point to a group
+ * @param group pointer to a group
  */
 void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group);
 
@@ -168,7 +168,7 @@ void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group);
  * Set the an array of points for LV_INDEV_TYPE_BUTTON.
  * These points will be assigned to the buttons to press a specific point on the screen
  * @param indev pointer to an input device
- * @param group point to a group
+ * @param points array of points
  */
 void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t points[]);
 

@@ -28,13 +28,18 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-enum {
+enum _lv_bar_mode_t {
     LV_BAR_MODE_NORMAL,
     LV_BAR_MODE_SYMMETRICAL,
     LV_BAR_MODE_RANGE
 };
+
+#ifdef DOXYGEN
+typedef _lv_bar_mode_t lv_bar_mode_t;
+#else
 typedef uint8_t lv_bar_mode_t;
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     lv_obj_t * bar;
@@ -82,7 +87,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent);
 
 /**
  * Set a new value on the bar
- * @param bar       pointer to a bar object
+ * @param obj       pointer to a bar object
  * @param value     new value
  * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
@@ -90,9 +95,9 @@ void lv_bar_set_value(lv_obj_t * obj, int32_t value, lv_anim_enable_t anim);
 
 /**
  * Set a new start value on the bar
- * @param obj       pointer to a bar object
- * @param value     new start value
- * @param anim      LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @param obj             pointer to a bar object
+ * @param start_value     new start value
+ * @param anim            LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_t anim);
 

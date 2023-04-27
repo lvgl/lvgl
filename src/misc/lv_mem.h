@@ -62,7 +62,7 @@ void lv_free(void * data);
 
 /**
  * Reallocate a memory with a new size. The old content will be kept.
- * @param data pointer to an allocated memory.
+ * @param data_p pointer to an allocated memory.
  * Its content will be copied to the new memory block and freed
  * @param new_size the desired new size in byte
  * @return pointer to the new memory, NULL on failure

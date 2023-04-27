@@ -28,7 +28,8 @@ LV_EXPORT_CONST_INT(LV_COLOR_DEPTH);
 /**
  * Opacity percentages.
  */
-enum {
+
+enum _lv_opa_t {
     LV_OPA_TRANSP = 0,
     LV_OPA_0      = 0,
     LV_OPA_10     = 25,
@@ -43,6 +44,13 @@ enum {
     LV_OPA_100    = 255,
     LV_OPA_COVER  = 255,
 };
+
+#ifdef DOXYGEN
+typedef _lv_opa_t lv_opa_t;
+#else
+typedef uint8_t lv_opa_t;
+#endif /*DOXYGEN*/
+
 
 #define LV_OPA_MIN 2    /*Opacities below this will be transparent*/
 #define LV_OPA_MAX 253  /*Opacities above this will fully cover*/
@@ -216,11 +224,6 @@ typedef struct {
     uint8_t v;
 } lv_color_hsv_t;
 
-//! @cond Doxygen_Suppress
-/*No idea where the guard is required but else throws warnings in the docs*/
-typedef uint8_t lv_opa_t;
-//! @endcond
-
 struct _lv_color_filter_dsc_t;
 
 typedef lv_color_t (*lv_color_filter_cb_t)(const struct _lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
@@ -292,14 +295,14 @@ void lv_color_from_native_alpha(const uint8_t * src_buf, uint8_t * dest_buf, lv_
                                 uint32_t px_cnt);
 /**
  * Get the pixel size of a color format in bits
- * @param cf a color format (`LV_IMG_CF_...`)
+ * @param src_cf a color format (`LV_IMG_CF_...`)
  * @return the pixel size in bits
  */
 uint8_t lv_color_format_get_size(lv_color_format_t src_cf);
 
 /**
  * Check if a color format has alpha channel or not
- * @param cf a color format (`LV_IMG_CF_...`)
+ * @param src_cf a color format (`LV_IMG_CF_...`)
  * @return true: has alpha channel; false: doesn't have alpha channel
  */
 bool lv_color_format_has_alpha(lv_color_format_t src_cf);

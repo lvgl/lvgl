@@ -30,7 +30,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_base_dir_t {
     LV_BASE_DIR_LTR      = 0x00,
     LV_BASE_DIR_RTL      = 0x01,
     LV_BASE_DIR_AUTO     = 0x02,
@@ -39,7 +39,12 @@ enum {
     LV_BASE_DIR_WEAK     = 0x21,
 };
 
+#ifdef DOXYGEN
+typedef _lv_base_dir_t lv_base_dir_t;
+#else
 typedef uint8_t lv_base_dir_t;
+#endif /*DOXYGEN*/
+
 
 /**********************
  * GLOBAL PROTOTYPES

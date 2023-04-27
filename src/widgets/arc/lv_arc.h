@@ -26,13 +26,18 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-enum {
+enum _lv_arc_mode_t {
     LV_ARC_MODE_NORMAL,
     LV_ARC_MODE_SYMMETRICAL,
     LV_ARC_MODE_REVERSE
 };
+
+#ifdef DOXYGEN
+typedef _lv_arc_mode_t lv_arc_mode_t;
+#else
 typedef uint8_t lv_arc_mode_t;
+#endif /*DOXYGEN*/
+
 
 typedef struct {
     lv_obj_t obj;
@@ -138,7 +143,7 @@ void lv_arc_set_rotation(lv_obj_t * obj, uint16_t rotation);
 /**
  * Set the type of arc.
  * @param obj   pointer to arc object
- * @param mode  arc's mode
+ * @param type  arc's mode
  */
 void lv_arc_set_mode(lv_obj_t * obj, lv_arc_mode_t type);
 
@@ -233,14 +238,14 @@ lv_arc_mode_t lv_arc_get_mode(const lv_obj_t * obj);
 
 /**
  * Get the rotation for the whole arc
- * @param arc       pointer to an arc object
+ * @param obj       pointer to an arc object
  * @return          arc's current rotation
  */
 int16_t lv_arc_get_rotation(const lv_obj_t * obj);
 
 /**
  * Get the current knob offset
- * @param arc       pointer to an arc object
+ * @param obj       pointer to an arc object
  * @return          arc's current knob offset
  */
 int16_t lv_arc_get_knob_offset(const lv_obj_t * obj);
@@ -259,9 +264,9 @@ void lv_arc_align_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_align, lv
 
 /**
  * Rotate an object to the current position of the arc (knob)
- * @param obj           pointer to an arc object
- * @param obj_to_align  pointer to an object to rotate
- * @param r_offset      consider the radius larger with this value (< 0: for smaller radius)
+ * @param obj            pointer to an arc object
+ * @param obj_to_rotate  pointer to an object to rotate
+ * @param r_offset       consider the radius larger with this value (< 0: for smaller radius)
  */
 void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, lv_coord_t r_offset);
 

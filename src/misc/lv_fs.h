@@ -31,7 +31,7 @@ extern "C" {
 /**
  * Errors in the file system module.
  */
-enum {
+enum _lv_fs_res_t {
     LV_FS_RES_OK = 0,
     LV_FS_RES_HW_ERR,     /*Low level hardware error*/
     LV_FS_RES_FS_ERR,     /*Error in the file system structure*/
@@ -46,16 +46,27 @@ enum {
     LV_FS_RES_INV_PARAM,  /*Invalid parameter among arguments*/
     LV_FS_RES_UNKNOWN,    /*Other unknown error*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_fs_res_t lv_fs_res_t;
+#else
 typedef uint8_t lv_fs_res_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * File open mode.
  */
-enum {
+enum _lv_fs_mode_t {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
 };
+
+#ifdef DOXYGEN
+typedef _lv_fs_mode_t lv_fs_mode_t;
+#else
 typedef uint8_t lv_fs_mode_t;
+#endif /*DOXYGEN*/
 
 
 /**
@@ -192,7 +203,7 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whenc
 /**
  * Give the position of the read write pointer
  * @param file_p    pointer to a lv_fs_file_t variable
- * @param pos_p     pointer to store the position of the read write pointer
+ * @param pos       pointer to store the position of the read write pointer
  * @return          LV_FS_RES_OK or any error from 'fs_res_t'
  */
 lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos);

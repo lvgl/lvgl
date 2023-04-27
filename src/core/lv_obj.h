@@ -38,7 +38,7 @@ struct _lv_obj_t;
  * Possible states of a widget.
  * OR-ed values are possible
  */
-enum {
+enum _lv_state_t {
     LV_STATE_DEFAULT     =  0x0000,
     LV_STATE_CHECKED     =  0x0001,
     LV_STATE_FOCUSED     =  0x0002,
@@ -57,7 +57,11 @@ enum {
     LV_STATE_ANY = 0xFFFF,    /**< Special value can be used in some functions to target all states*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_state_t lv_state_t;
+#else
 typedef uint16_t lv_state_t;
+#endif /*DOXYGEN*/
 
 /**
  * The possible parts of widgets.
@@ -65,7 +69,8 @@ typedef uint16_t lv_state_t;
  * E.g. slider = background + indicator + knob
  * Not all parts are used by every widget
  */
-enum {
+
+enum _lv_part_t {
     LV_PART_MAIN         = 0x000000,   /**< A background like rectangle*/
     LV_PART_SCROLLBAR    = 0x010000,   /**< The scrollbar(s)*/
     LV_PART_INDICATOR    = 0x020000,   /**< Indicator, e.g. for slider, bar, switch, or the tick box of the checkbox*/
@@ -80,13 +85,17 @@ enum {
     LV_PART_ANY          = 0x0F0000,    /**< Special value can be used in some functions to target all parts*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_part_t lv_part_t;
+#else
 typedef uint32_t lv_part_t;
+#endif /*DOXYGEN*/
 
 /**
  * On/Off features controlling the object's behavior.
  * OR-ed values are possible
  */
-enum {
+typedef enum {
     LV_OBJ_FLAG_HIDDEN          = (1L << 0),  /**< Make the object hidden. (Like it wasn't there at all)*/
     LV_OBJ_FLAG_CLICKABLE       = (1L << 1),  /**< Make the object clickable by the input devices*/
     LV_OBJ_FLAG_CLICK_FOCUSABLE = (1L << 2),  /**< Add focused state to the object when clicked*/
@@ -118,11 +127,14 @@ enum {
     LV_OBJ_FLAG_USER_2          = (1L << 28), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_3          = (1L << 29), /**< Custom flag, free to use by user*/
     LV_OBJ_FLAG_USER_4          = (1L << 30), /**< Custom flag, free to use by user*/
+} _lv_obj_flag_t;
 
-};
-
-
+#ifdef DOXYGEN
+typedef _lv_obj_flag_t lv_obj_flag_t;
+#else
 typedef uint32_t lv_obj_flag_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_obj_class`

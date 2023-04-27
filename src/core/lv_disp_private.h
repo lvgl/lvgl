@@ -107,6 +107,7 @@ struct _lv_disp_t {
      * Screens
      *--------------------*/
 
+
     /** Screens of the display*/
     struct _lv_obj_t ** screens;    /**< Array of screen objects.*/
     struct _lv_obj_t * act_scr;     /**< Currently active screen on this display*/

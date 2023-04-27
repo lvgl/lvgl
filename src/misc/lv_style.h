@@ -85,7 +85,7 @@ LV_EXPORT_CONST_INT(LV_ZOOM_NONE);
 /**
  * Possible options how to blend opaque drawings
  */
-enum {
+enum _lv_blend_mode_t {
     LV_BLEND_MODE_NORMAL,     /**< Simply mix according to the opacity value*/
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
@@ -93,25 +93,34 @@ enum {
     LV_BLEND_MODE_REPLACE,    /**< Replace background with foreground in the area*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_blend_mode_t lv_blend_mode_t;
+#else
 typedef uint8_t lv_blend_mode_t;
+#endif /*DOXYGEN*/
 
 /**
  * Some options to apply decorations on texts.
  * 'OR'ed values can be used.
  */
-enum {
+enum _lv_text_decor_t {
     LV_TEXT_DECOR_NONE          = 0x00,
     LV_TEXT_DECOR_UNDERLINE     = 0x01,
     LV_TEXT_DECOR_STRIKETHROUGH = 0x02,
 };
 
+#ifdef DOXYGEN
+typedef _lv_text_decor_t lv_text_decor_t;
+#else
 typedef uint8_t lv_text_decor_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * Selects on which sides border should be drawn
  * 'OR'ed values can be used.
  */
-enum {
+enum _lv_border_side_t {
     LV_BORDER_SIDE_NONE     = 0x00,
     LV_BORDER_SIDE_BOTTOM   = 0x01,
     LV_BORDER_SIDE_TOP      = 0x02,
@@ -120,30 +129,46 @@ enum {
     LV_BORDER_SIDE_FULL     = 0x0F,
     LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 };
+
+#ifdef DOXYGEN
+typedef _lv_border_side_t lv_border_side_t;
+#else
 typedef uint8_t lv_border_side_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * The direction of the gradient.
  */
-enum {
+enum _lv_grad_dir_t {
     LV_GRAD_DIR_NONE, /**< No gradient (the `grad_color` property is ignored)*/
     LV_GRAD_DIR_VER,  /**< Vertical (top to bottom) gradient*/
     LV_GRAD_DIR_HOR,  /**< Horizontal (left to right) gradient*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_grad_dir_t lv_grad_dir_t;
+#else
 typedef uint8_t lv_grad_dir_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * The dithering algorithm for the gradient
  * Depends on LV_DRAW_SW_GRADIENT_DITHER
  */
-enum {
+enum _lv_dither_mode_t {
     LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/
     LV_DITHER_ORDERED,  /**< Ordered dithering. Faster to compute and use less memory but lower quality*/
     LV_DITHER_ERR_DIFF, /**< Error diffusion mode. Slower to compute and use more memory but give highest dither quality*/
 };
 
+#ifdef DOXYGEN
+typedef _lv_dither_mode_t lv_dither_mode_t;
+#else
 typedef uint8_t lv_dither_mode_t;
+#endif /*DOXYGEN*/
+
 
 /** A gradient stop definition.
  *  This matches a color and a position in a virtual 0-255 scale.
@@ -177,7 +202,7 @@ typedef union {
  *
  * Props are split into groups of 16. When adding a new prop to a group, ensure it does not overflow into the next one.
  */
-enum {
+enum _lv_style_prop_t {
     LV_STYLE_PROP_INV               = 0,
 
     /*Group 0*/
@@ -289,15 +314,24 @@ enum {
     _LV_STYLE_PROP_CONST             = 0xFFFF /* magic value for const styles */
 };
 
+#ifdef DOXYGEN
+typedef _lv_style_prop_t lv_style_prop_t;
+#else
 typedef uint16_t lv_style_prop_t;
+#endif /*DOXYGEN*/
 
-enum {
+enum _lv_style_res_t {
     LV_STYLE_RES_NOT_FOUND,
     LV_STYLE_RES_FOUND,
     LV_STYLE_RES_INHERIT
 };
 
+#ifdef DOXYGEN
+typedef _lv_style_res_t lv_style_res_t;
+#else
 typedef uint8_t lv_style_res_t;
+#endif /*DOXYGEN*/
+
 
 /**
  * Descriptor for style transitions

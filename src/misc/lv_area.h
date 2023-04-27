@@ -48,7 +48,8 @@ typedef struct {
 } lv_area_t;
 
 /** Alignments*/
-enum {
+
+enum _lv_align_t {
     LV_ALIGN_DEFAULT = 0,
     LV_ALIGN_TOP_LEFT,
     LV_ALIGN_TOP_MID,
@@ -73,9 +74,15 @@ enum {
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
 };
-typedef uint8_t lv_align_t;
 
-enum {
+#ifdef DOXYGEN
+typedef _lv_align_t lv_align_t;
+#else
+typedef uint8_t lv_align_t;
+#endif /*DOXYGEN*/
+
+
+enum _lv_dir_t {
     LV_DIR_NONE     = 0x00,
     LV_DIR_LEFT     = (1 << 0),
     LV_DIR_RIGHT    = (1 << 1),
@@ -86,7 +93,12 @@ enum {
     LV_DIR_ALL      = LV_DIR_HOR | LV_DIR_VER,
 };
 
+#ifdef DOXYGEN
+typedef _lv_dir_t lv_dir_t;
+#else
 typedef uint8_t lv_dir_t;
+#endif /*DOXYGEN*/
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -179,7 +191,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
 
 /**
  * Join two areas into a third which involves the other two
- * @param res_p pointer to an area, the result will be stored here
+ * @param a_res_p pointer to an area, the result will be stored here
  * @param a1_p pointer to the first area
  * @param a2_p pointer to the second area
  */
@@ -233,6 +245,8 @@ bool _lv_area_is_equal(const lv_area_t * a, const lv_area_t * b);
  * @param base an area where the other will be aligned
  * @param to_align the area to align
  * @param align `LV_ALIGN_...`
+ * @param ofs_x X offset
+ * @param ofs_y Y offset
  */
 void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t align, lv_coord_t ofs_x, lv_coord_t ofs_y);
 
