@@ -88,6 +88,8 @@ size_t lv_strlen(const char * str);
 
 char * lv_strncpy(char * dst, const char * src, size_t dest_size);
 
+char * lv_strcpy(char * dst, const char * src);
+
 /**
  *
  * @return

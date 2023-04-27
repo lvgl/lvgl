@@ -36,6 +36,10 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
+     <release date="2023-03-03" version="8.3.6" url="https://github.com/lvgl/lvgl/raw/release/v8.3/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
+      - LVGL 8.3.6 release
+      - Various fixes
+    </release>
      <release date="2023-02-26" version="9.0.0-dev" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.9.0.0-dev.pack">
       - LVGL 9.0.0-dev
       - New Driver Architecture

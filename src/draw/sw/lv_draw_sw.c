@@ -96,6 +96,9 @@ void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
     src_bufc += src_stride * px_size * src_area->y1;
     src_bufc += src_area->x1 * px_size;
 
+    src_stride *= px_size;
+    dest_stride *= px_size;
+
     uint32_t line_length = lv_area_get_width(dest_area) * px_size;
     lv_coord_t y;
     for(y = dest_area->y1; y <= dest_area->y2; y++) {

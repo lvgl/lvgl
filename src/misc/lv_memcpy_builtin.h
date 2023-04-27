@@ -48,6 +48,8 @@ size_t lv_strlen_builtin(const char * str);
 
 char * lv_strncpy_builtin(char * dst, const char * src, size_t dest_size);
 
+char * lv_strcpy_builtin(char * dst, const char * src);
+
 /**********************
  *      MACROS
  **********************/

@@ -294,6 +294,11 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         disp_refr = lv_disp_get_default();
     }
 
+    if(disp_refr == NULL) {
+        LV_LOG_WARN("No display registered");
+        return;
+    }
+
     if(disp_refr->draw_buf_size == 0) {
         LV_LOG_WARN("draw_buf_size == 0");
         return;

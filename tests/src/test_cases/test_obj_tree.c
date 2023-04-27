@@ -36,4 +36,48 @@ void test_obj_tree_2(void)
     //TEST_ASSERT_EQUAL_SCREENSHOT("scr1.png")
 }
 
+void test_obj_tree_3(void)
+{
+    /* tests lv_obj_swap */
+    lv_obj_t * parent1 = lv_obj_create(lv_scr_act());
+    lv_obj_t * parent2 = lv_obj_create(lv_scr_act());
+    lv_obj_t * child1 = lv_obj_create(parent1);
+    lv_obj_t * child2 = lv_obj_create(parent2);
+
+    /* were the parents set correctly for the children? */
+    lv_obj_t * child1_parent_before = lv_obj_get_parent(child1);
+    lv_obj_t * child2_parent_before = lv_obj_get_parent(child2);
+
+    TEST_ASSERT_EQUAL(child1_parent_before, parent1);
+    TEST_ASSERT_EQUAL(child2_parent_before, parent2);
+
+    /* were the children set correctly for the parents? */
+    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent1), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_index(child1), 0);
+    TEST_ASSERT_EQUAL(lv_obj_get_child(parent1, 0), child1);
+
+    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent2), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_index(child2), 0);
+    TEST_ASSERT_EQUAL(lv_obj_get_child(parent2, 0), child2);
+
+    /* swap the children */
+    lv_obj_swap(child1, child2);
+
+    /* test for properly swapped parents */
+    lv_obj_t * child1_parent_after = lv_obj_get_parent(child1);
+    lv_obj_t * child2_parent_after = lv_obj_get_parent(child2);
+
+    TEST_ASSERT_EQUAL(child1_parent_after, parent2);
+    TEST_ASSERT_EQUAL(child2_parent_after, parent1);
+
+    /* test for correctly set children */
+    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent1), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_index(child2), 0);
+    TEST_ASSERT_EQUAL(lv_obj_get_child(parent1, 0), child2);
+
+    TEST_ASSERT_EQUAL(lv_obj_get_child_cnt(parent2), 1);
+    TEST_ASSERT_EQUAL(lv_obj_get_index(child1), 0);
+    TEST_ASSERT_EQUAL(lv_obj_get_child(parent2, 0), child1);
+}
+
 #endif

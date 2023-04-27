@@ -245,7 +245,10 @@ void lv_obj_swap(lv_obj_t * obj1, lv_obj_t * obj2)
     lv_obj_send_event(parent, LV_EVENT_CHILD_DELETED, obj1);
 
     parent->spec_attr->children[index1] = obj2;
+    obj2->parent = parent;
+
     parent2->spec_attr->children[index2] = obj1;
+    obj1->parent = parent2;
 
     lv_obj_send_event(parent, LV_EVENT_CHILD_CHANGED, obj2);
     lv_obj_send_event(parent, LV_EVENT_CHILD_CREATED, obj2);
@@ -336,7 +339,7 @@ uint32_t lv_obj_get_index(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    if(parent == NULL) return 0;
+    if(parent == NULL) return 0xFFFFFFFF;
 
     uint32_t i = 0;
     for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {

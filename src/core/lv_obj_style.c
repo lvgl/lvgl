@@ -81,6 +81,9 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
     trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
+    /*Try removing the style first to be sure it won't be added twice*/
+    lv_obj_remove_style(obj, style, selector);
+
     uint32_t i;
     /*Go after the transition and local styles*/
     for(i = 0; i < obj->style_cnt; i++) {
