@@ -46,16 +46,16 @@ typedef struct {
 } lv_font_fmt_txt_glyph_dsc_t;
 
 /** Format of font character map.*/
-enum {
+enum _lv_font_fmt_txt_cmap_type_t {
     LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
     LV_FONT_FMT_TXT_CMAP_SPARSE_FULL,
     LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
     LV_FONT_FMT_TXT_CMAP_SPARSE_TINY,
-#ifdef DOXYGEN
-} lv_font_fmt_txt_cmap_type_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_font_fmt_txt_cmap_type_t lv_font_fmt_txt_cmap_type_t;
+#else
 typedef uint8_t lv_font_fmt_txt_cmap_type_t;
 #endif /*DOXYGEN*/
 

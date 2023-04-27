@@ -36,7 +36,7 @@ extern "C" {
  **********************/
 
 /** Current keyboard mode.*/
-enum {
+enum _lv_keyboard_mode_t {
     LV_KEYBOARD_MODE_TEXT_LOWER,
     LV_KEYBOARD_MODE_TEXT_UPPER,
     LV_KEYBOARD_MODE_SPECIAL,
@@ -48,11 +48,11 @@ enum {
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
     LV_KEYBOARD_MODE_TEXT_ARABIC
 #endif
-#ifdef DOXYGEN
-} lv_keyboard_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_keyboard_mode_t lv_keyboard_mode_t;
+#else
 typedef uint8_t lv_keyboard_mode_t;
 #endif /*DOXYGEN*/
 

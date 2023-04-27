@@ -40,46 +40,46 @@ extern "C" {
  * Options for text rendering.
  */
 
-enum {
+enum _lv_text_flag_t {
     LV_TEXT_FLAG_NONE    = 0x00,
     LV_TEXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
     LV_TEXT_FLAG_EXPAND  = 0x02, /**< Ignore max-width to avoid automatic word wrapping*/
     LV_TEXT_FLAG_FIT     = 0x04, /**< Max-width is already equal to the longest line. (Used to skip some calculation)*/
-#ifdef DOXYGEN
-} lv_text_flag_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_text_flag_t lv_text_flag_t;
+#else
 typedef uint8_t lv_text_flag_t;
 #endif /*DOXYGEN*/
 
 
 /**
  * State machine for text renderer.*/
-enum {
+enum _lv_text_cmd_state_t {
     LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
     LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
     LV_TEXT_CMD_STATE_IN,   /**< Processing the command*/
-#ifdef DOXYGEN
-} lv_text_cmd_state_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_text_cmd_state_t lv_text_cmd_state_t;
+#else
 typedef uint8_t lv_text_cmd_state_t;
 #endif /*DOXYGEN*/
 
 
 /** Label align policy*/
-enum {
+enum _lv_text_align_t {
     LV_TEXT_ALIGN_AUTO, /**< Align text auto*/
     LV_TEXT_ALIGN_LEFT, /**< Align text to left*/
     LV_TEXT_ALIGN_CENTER, /**< Align text to center*/
     LV_TEXT_ALIGN_RIGHT, /**< Align text to right*/
-#ifdef DOXYGEN
-} lv_text_align_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_text_align_t lv_text_align_t;
+#else
 typedef uint8_t lv_text_align_t;
 #endif /*DOXYGEN*/
 

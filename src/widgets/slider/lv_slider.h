@@ -30,15 +30,15 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_slider_mode_t {
     LV_SLIDER_MODE_NORMAL = LV_BAR_MODE_NORMAL,
     LV_SLIDER_MODE_SYMMETRICAL = LV_BAR_MODE_SYMMETRICAL,
     LV_SLIDER_MODE_RANGE = LV_BAR_MODE_RANGE
-#ifdef DOXYGEN
-} lv_slider_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_slider_mode_t lv_slider_mode_t;
+#else
 typedef uint8_t lv_slider_mode_t;
 #endif /*DOXYGEN*/
 

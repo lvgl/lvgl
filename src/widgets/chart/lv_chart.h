@@ -36,16 +36,16 @@ LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 /**
  * Chart types
  */
-enum {
+enum _lv_chart_type_t {
     LV_CHART_TYPE_NONE,     /**< Don't draw the series*/
     LV_CHART_TYPE_LINE,     /**< Connect the points with lines*/
     LV_CHART_TYPE_BAR,      /**< Draw columns*/
     LV_CHART_TYPE_SCATTER,  /**< Draw points and lines in 2D (x,y coordinates)*/
-#ifdef DOXYGEN
-} lv_chart_type_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_chart_type_t lv_chart_type_t;
+#else
 typedef uint8_t lv_chart_type_t;
 #endif /*DOXYGEN*/
 
@@ -53,14 +53,14 @@ typedef uint8_t lv_chart_type_t;
 /**
  * Chart update mode for `lv_chart_set_next`
  */
-enum {
+enum _lv_chart_update_mode_t {
     LV_CHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one the right*/
     LV_CHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
-#ifdef DOXYGEN
-} lv_chart_update_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_chart_update_mode_t lv_chart_update_mode_t;
+#else
 typedef uint8_t lv_chart_update_mode_t;
 #endif /*DOXYGEN*/
 
@@ -68,17 +68,17 @@ typedef uint8_t lv_chart_update_mode_t;
 /**
  * Enumeration of the axis'
  */
-enum {
+enum _lv_chart_axis_t {
     LV_CHART_AXIS_PRIMARY_Y     = 0x00,
     LV_CHART_AXIS_SECONDARY_Y   = 0x01,
     LV_CHART_AXIS_PRIMARY_X     = 0x02,
     LV_CHART_AXIS_SECONDARY_X   = 0x04,
     _LV_CHART_AXIS_LAST
-#ifdef DOXYGEN
-} lv_chart_axis_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_chart_axis_t lv_chart_axis_t;
+#else
 typedef uint8_t lv_chart_axis_t;
 #endif /*DOXYGEN*/
 

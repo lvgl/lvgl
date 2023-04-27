@@ -26,15 +26,15 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_arc_mode_t {
     LV_ARC_MODE_NORMAL,
     LV_ARC_MODE_SYMMETRICAL,
     LV_ARC_MODE_REVERSE
-#ifdef DOXYGEN
-} lv_arc_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_arc_mode_t lv_arc_mode_t;
+#else
 typedef uint8_t lv_arc_mode_t;
 #endif /*DOXYGEN*/
 

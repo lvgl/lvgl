@@ -49,7 +49,7 @@ typedef struct {
 
 /** Alignments*/
 
-enum {
+enum _lv_align_t {
     LV_ALIGN_DEFAULT = 0,
     LV_ALIGN_TOP_LEFT,
     LV_ALIGN_TOP_MID,
@@ -73,16 +73,16 @@ enum {
     LV_ALIGN_OUT_RIGHT_TOP,
     LV_ALIGN_OUT_RIGHT_MID,
     LV_ALIGN_OUT_RIGHT_BOTTOM,
-#ifdef DOXYGEN
-} lv_align_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_align_t lv_align_t;
+#else
 typedef uint8_t lv_align_t;
 #endif /*DOXYGEN*/
 
 
-enum {
+enum _lv_dir_t {
     LV_DIR_NONE     = 0x00,
     LV_DIR_LEFT     = (1 << 0),
     LV_DIR_RIGHT    = (1 << 1),
@@ -91,11 +91,11 @@ enum {
     LV_DIR_HOR      = LV_DIR_LEFT | LV_DIR_RIGHT,
     LV_DIR_VER      = LV_DIR_TOP | LV_DIR_BOTTOM,
     LV_DIR_ALL      = LV_DIR_HOR | LV_DIR_VER,
-#ifdef DOXYGEN
-} lv_dir_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_dir_t lv_dir_t;
+#else
 typedef uint8_t lv_dir_t;
 #endif /*DOXYGEN*/
 

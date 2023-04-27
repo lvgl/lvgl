@@ -57,7 +57,7 @@ extern const lv_obj_class_t lv_img_class;
 /**
  * Image size mode, when image size and object size is different
  */
-enum {
+enum _lv_img_size_mode_t {
     /** Zoom doesn't affect the coordinates of the object,
      *  however if zoomed in the image is drawn out of the its coordinates.
      *  The layout's won't change on zoom */
@@ -67,12 +67,11 @@ enum {
      *  It causes layout recalculation.
      *  If the object size is set explicitly, the image will be cropped when zoomed in.*/
     LV_IMG_SIZE_MODE_REAL,
-
- #ifdef DOXYGEN
-} lv_img_size_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_img_size_mode_t lv_img_size_mode_t;
+#else
 typedef uint8_t lv_img_size_mode_t;
 #endif /*DOXYGEN*/
 

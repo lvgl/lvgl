@@ -27,26 +27,26 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_span_overflow_t {
     LV_SPAN_OVERFLOW_CLIP,
     LV_SPAN_OVERFLOW_ELLIPSIS,
-#ifdef DOXYGEN
-} lv_span_overflow_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_span_overflow_t lv_span_overflow_t;
+#else
 typedef uint8_t lv_span_overflow_t;
 #endif /*DOXYGEN*/
 
-enum {
+enum _lv_span_mode_t {
     LV_SPAN_MODE_FIXED,     /**< fixed the obj size*/
     LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size*/
     LV_SPAN_MODE_BREAK,     /**< Keep width, break the too long lines and expand height*/
-#ifdef DOXYGEN
-} lv_span_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_span_mode_t lv_span_mode_t;
+#else
 typedef uint8_t lv_span_mode_t;
 #endif /*DOXYGEN*/
 

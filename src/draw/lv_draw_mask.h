@@ -32,16 +32,16 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_draw_mask_res_t {
     LV_DRAW_MASK_RES_TRANSP,
     LV_DRAW_MASK_RES_FULL_COVER,
     LV_DRAW_MASK_RES_CHANGED,
     LV_DRAW_MASK_RES_UNKNOWN
-#ifdef DOXYGEN
-} lv_draw_mask_res_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_draw_mask_res_t lv_draw_mask_res_t;
+#else
 typedef uint8_t lv_draw_mask_res_t;
 #endif /*DOXYGEN*/
 
@@ -71,31 +71,31 @@ static inline bool lv_draw_mask_is_any(const lv_area_t * a)
 
 #if LV_USE_DRAW_MASKS
 
-enum {
+enum _lv_draw_mask_type_t {
     LV_DRAW_MASK_TYPE_LINE,
     LV_DRAW_MASK_TYPE_ANGLE,
     LV_DRAW_MASK_TYPE_RADIUS,
     LV_DRAW_MASK_TYPE_FADE,
     LV_DRAW_MASK_TYPE_MAP,
     LV_DRAW_MASK_TYPE_POLYGON,
-#ifdef DOXYGEN
-} lv_draw_mask_type_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_draw_mask_type_t lv_draw_mask_type_t;
+#else
 typedef uint8_t lv_draw_mask_type_t;
 #endif /*DOXYGEN*/
 
-enum {
+enum _lv_draw_mask_line_side_t {
     LV_DRAW_MASK_LINE_SIDE_LEFT = 0,
     LV_DRAW_MASK_LINE_SIDE_RIGHT,
     LV_DRAW_MASK_LINE_SIDE_TOP,
     LV_DRAW_MASK_LINE_SIDE_BOTTOM,
-#ifdef DOXYGEN
-} lv_draw_mask_line_side_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_draw_mask_line_side_t lv_draw_mask_line_side_t;
+#else
 typedef uint8_t lv_draw_mask_line_side_t;
 #endif /*DOXYGEN*/
 

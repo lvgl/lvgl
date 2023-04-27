@@ -33,14 +33,14 @@ extern "C" {
  **********************/
 
 /** Roller mode.*/
-enum {
+enum _lv_roller_mode_t {
     LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options).*/
     LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever).*/
-#ifdef DOXYGEN
-} lv_roller_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_roller_mode_t lv_roller_mode_t;
+#else
 typedef uint8_t lv_roller_mode_t;
 #endif /*DOXYGEN*/
 

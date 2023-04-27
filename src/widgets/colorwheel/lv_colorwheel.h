@@ -24,15 +24,15 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-enum {
+enum _lv_colorwheel_mode_t {
     LV_COLORWHEEL_MODE_HUE,
     LV_COLORWHEEL_MODE_SATURATION,
     LV_COLORWHEEL_MODE_VALUE
-#ifdef DOXYGEN
-} lv_colorwheel_mode_t;
-#else
 };
 
+#ifdef DOXYGEN
+typedef _lv_colorwheel_mode_t lv_colorwheel_mode_t;
+#else
 typedef uint8_t lv_colorwheel_mode_t;
 #endif /*DOXYGEN*/
 
