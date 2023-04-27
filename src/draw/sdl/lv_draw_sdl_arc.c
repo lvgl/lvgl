@@ -104,7 +104,9 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     }
 
     lv_coord_t w = lv_area_get_width(&draw_area), h = lv_area_get_height(&draw_area);
-    SDL_Texture * texture = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1, w, h);
+    bool texture_cached = false;
+    SDL_Texture * texture = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM1, w, h,
+                                                                 &texture_cached);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
     dump_masks(texture, &draw_area, mask_ids, mask_ids_count, cap_ids[0] != LV_MASK_ID_INV ? cap_ids : NULL);
 
@@ -135,6 +137,11 @@ void lv_draw_sdl_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * ds
     SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
     SDL_SetTextureAlphaMod(texture, dsc->opa);
     SDL_RenderCopy(ctx->renderer, texture, &srcrect, &dstrect);
+
+    if(!texture_cached) {
+        LV_LOG_WARN("Texture is not cached, this will impact performance.");
+        SDL_DestroyTexture(texture);
+    }
 }
 
 /**********************
