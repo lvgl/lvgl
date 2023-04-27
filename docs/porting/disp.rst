@@ -11,7 +11,7 @@ a multiple displays and a different driver for each (see below),
 Basic setup
 ***********
 
-Draw buffer(s) are simple array(s) that LVGL uses to render the screen’s
+Draw buffer(s) are simple array(s) that LVGL uses to render the screen's
 content. Once rendering is ready the content of the draw buffer is sent
 to the display using the ``flush_cb`` function.
 
@@ -75,7 +75,7 @@ The draw buffers can be set with
    -  :cpp:enumerator:`LV_DISP_RENDER_MODE_FULL` The buffer can smaller or screen
       sized but LVGL will always redraw the whole screen even is only 1
       pixel has been changed. If two screen sized draw buffers are
-      provided, LVGL’s display handling works like “traditional” double
+      provided, LVGL's display handling works like "traditional" double
       buffering. This means the ``flush_cb`` callback only has to update
       the address of the framebuffer (``color_p`` parameter).
 
@@ -112,7 +112,7 @@ Resolution
 To set the resolution of the display after creation use
 :cpp:expr:`lv_disp_set_res(disp, hor_res, ver_res)`
 
-It’s not mandatory to use the whole display for LVGL, however in some
+It's not mandatory to use the whole display for LVGL, however in some
 cases the physical resolution is important. For example the touchpad
 still sees the whole resolution and the values needs to be converted to
 the active LVGL display area. So the physical resoltution and the offset
@@ -124,13 +124,13 @@ Rotation
 --------
 
 LVGL supports rotation of the display in 90 degree increments. You can
-select whether you’d like software rotation or hardware rotation.
+select whether you'd like software rotation or hardware rotation.
 
 The orientation of the display can be changed with
 ``lv_disp_set_rotation(disp, LV_DISP_ROTATION_0/90/180/270, true/false)``.
 LVGL will swap the horizontal and vertical resolutions internally
 according to the set degree. IF the last paramter is ``true`` LVGL will
-rotate the rendered image. If it’s ``false`` the display driver should
+rotate the rendered image. If it's ``false`` the display driver should
 rotate the rendered image.
 
 Color format
@@ -173,7 +173,7 @@ native color format to the desired, therfore rendering in non-native
 formats has a negative effect on peroformance. Learn more about
 ``draw_ctx`` `here </porting/gpu>`__.
 
-It’s very important that draw buffer(s) should be large enough for both
+It's very important that draw buffer(s) should be large enough for both
 the native format and the target color format. For example if
 ``LV_COLOR_DEPTH == 16`` and :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888` is selected
 LVGL will choosoe the larger to figure out how many pixel can be

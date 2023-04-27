@@ -26,7 +26,7 @@ no payload but :c:enumerator:`MSG_USER_NAME_CHANGED` can have a :c:expr:`const c
 payload containing the user name, and :c:enumerator:`MSG_USER_AVATAR_CHANGED` a
 :c:expr:`const void *` image source with the new avatar image.
 
-To be more precise the message ID’s type is declared like this:
+To be more precise the message ID's type is declared like this:
 
 .. code:: c
 
@@ -43,7 +43,7 @@ Subscribe to a message
 :c:expr:`lv_msg_subscribe(msg_id, callback, user_data)` can be used to
 subscribe to message.
 
-Don’t forget that ``msg_id`` can be a constant or a variable address
+Don't forget that ``msg_id`` can be a constant or a variable address
 too:
 
 .. code:: c
@@ -74,7 +74,7 @@ From :c:struct:`lv_msg_t` the followings can be used to get some data:
 Subscribe with an lv_obj
 ------------------------
 
-It’s quite typical that an LVGL widget is interested in some messages.
+It's quite typical that an LVGL widget is interested in some messages.
 To make it simpler :c:expr:`lv_msg_subsribe_obj(msg_id, obj, user_data)` can
 be used. If a new message is published with ``msg_id`` an
 :c:enumerator:`LV_EVENT_MSG_RECEIVED` event will be sent to the object.
@@ -95,7 +95,7 @@ For example:
        lv_label_set_text(label, lv_msg_get_payload(m));
    }
 
-Here ``msg_id`` also can be a variable’s address:
+Here ``msg_id`` also can be a variable's address:
 
 .. code:: c
 
@@ -128,19 +128,19 @@ Messages can be sent with :c:expr:`lv_msg_send(msg_id, payload)`. E.g.
 
 If have subscribed to a variable with
 :c:expr:`lv_msg_subscribe((lv_msg_id_t)&v, callback, NULL)` and changed the
-variable’s value the subscribers can be notified like this:
+variable's value the subscribers can be notified like this:
 
 .. code:: c
 
    v = 10;
    lv_msg_update_value(&v); //Notify all the subscribers of `(lv_msg_id_t)&v`
 
-It’s handy way of creating API for the UI too. If the UI provides some
+It's handy way of creating API for the UI too. If the UI provides some
 global variables (e.g. ``int current_tempereature``) and anyone can
 read and write this variable. After writing they can notify all the
 elements who are interested in that value. E.g. an ``lv_label`` can
 subscribe to :c:expr:`(lv_msg_id_t)&current_tempereature` and update its text
-when it’s notified about the new temperature.
+when it's notified about the new temperature.
 
 Example
 -------

@@ -9,7 +9,7 @@ with preconfigured targets for:
 - `MicroPython <https://docs.micropython.org/en/v1.15/develop/cmodules.html>`__
 - `Zephyr <https://docs.zephyrproject.org/latest/guides/zephyr_cmake_package.html>`__
 
-On top of the preconfigured targets you can also use “plain” CMake to
+On top of the preconfigured targets you can also use "plain" CMake to
 integrate LVGL into any custom C/C++ project.
 
 
@@ -75,7 +75,7 @@ Include paths options
    ============ ==============
    ON (default) OFF
    ============ ==============
-   “lvgl.h”     “../../lvgl.h”
+   "lvgl.h"     "../../lvgl.h"
    ============ ==============
 
 -  :c:macro:`LV_CONF_INCLUDE_SIMPLE`: which specifies whether to ``#include "lv_conf.h"`` and ``"lv_drv_conf.h"`` absolut or relative
@@ -83,8 +83,8 @@ Include paths options
    =============== =====================
    ON (default)    OFF
    =============== =====================
-   “lv_conf.h”     “../../lv_conf.h”
-   “lv_drv_conf.h” “../../lv_drv_conf.h”
+   "lv_conf.h"     "../../lv_conf.h"
+   "lv_drv_conf.h" "../../lv_drv_conf.h"
    =============== =====================
 
 ..

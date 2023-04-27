@@ -12,7 +12,7 @@ Parts and Styles
 -  :cpp:enumerator:`LV_PART_MAIN` The background of the roller uses all the typical
    background properties and text style properties.
    ``style_text_line_space`` adjusts the space between the options. When
-   the Roller is scrolled and doesn’t stop exactly on an option it will
+   the Roller is scrolled and doesn't stop exactly on an option it will
    scroll to the nearest valid option automatically in ``anim_time``
    milliseconds as specified in the style.
 -  :cpp:enumerator:`LV_PART_SELECTED` The selected option in the middle. Besides the

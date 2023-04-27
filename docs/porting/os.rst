@@ -6,7 +6,7 @@ Operating system and interrupts
 
 LVGL is **not thread-safe** by default.
 
-However, in the following conditions it’s valid to call LVGL related
+However, in the following conditions it's valid to call LVGL related
 functions: - In *events*. Learn more in :ref:`events`. -
 In *lv_timer*. Learn more in `Timers </overview/timer>`__.
 
@@ -60,6 +60,6 @@ Try to avoid calling LVGL functions from interrupt handlers (except
 this you have to disable the interrupt which uses LVGL functions while
 :cpp:func:`lv_timer_handler` is running.
 
-It’s a better approach to simply set a flag or some value in the
+It's a better approach to simply set a flag or some value in the
 interrupt, and periodically check it in an LVGL timer (which is run by
 :cpp:func:`lv_timer_handler`).

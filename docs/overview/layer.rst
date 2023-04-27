@@ -73,7 +73,7 @@ acts as a modal.
    lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
 
 The ``layer_sys`` is also used for similar purposes in LVGL. For
-example, it places the mouse cursor above all layers to be sure it’s
+example, it places the mouse cursor above all layers to be sure it's
 always visible.
 
 API

@@ -9,7 +9,7 @@ If the children are arranged into a grid-like layout then the up, down,
 left and right arrows move focus to the nearest sibling in the
 respective direction.
 
-It doesn’t matter how the children are positioned, as only the current x
+It doesn't matter how the children are positioned, as only the current x
 and y coordinates are considered. This means that gridnav works with
 manually positioned children, as well as `Flex </layouts/flex>`__ and
 `Grid </layouts/grid>`__ layouts.

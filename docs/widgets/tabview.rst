@@ -41,7 +41,7 @@ Add tabs
 
 New tabs can be added with :cpp:expr:`lv_tabview_add_tab(tabview, "Tab name")`.
 This will return a pointer to an `lv_obj </widgets/obj>`__ object where
-the tab’s content can be created.
+the tab's content can be created.
 
 Rename tabs
 -----------

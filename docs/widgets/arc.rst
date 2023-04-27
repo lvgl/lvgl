@@ -11,14 +11,14 @@ Parts and Styles
 ****************
 
 -  :cpp:enumerator:`LV_PART_MAIN` Draws a background using the typical background
-   style properties and an arc using the arc style properties. The arc’s
+   style properties and an arc using the arc style properties. The arc's
    size and position will respect the *padding* style properties.
 -  :cpp:enumerator:`LV_PART_INDICATOR` Draws another arc using the *arc* style
    properties. Its padding values are interpreted relative to the
    background arc.
 -  :cpp:enumerator:`LV_PART_KNOB` Draws a handle on the end of the indicator using all
    background properties and padding values. With zero padding the knob
-   size is the same as the indicator’s width. Larger padding makes it
+   size is the same as the indicator's width. Larger padding makes it
    larger, smaller padding makes it smaller.
 
 Usage
@@ -32,13 +32,13 @@ value is interpreted in a range (minimum and maximum values) which can
 be modified with :cpp:expr:`lv_arc_set_range(arc, min, max)`. The default range
 is 0..100.
 
-The indicator arc is drawn on the main part’s arc. This if the value is
-set to maximum the indicator arc will cover the entire “background” arc.
+The indicator arc is drawn on the main part's arc. This if the value is
+set to maximum the indicator arc will cover the entire "background" arc.
 To set the start and end angle of the background arc use the
 :cpp:expr:`lv_arc_set_bg_angles(arc, start_angle, end_angle)` functions or
 ``lv_arc_set_bg_start/end_angle(arc, angle)``.
 
-Zero degrees is at the middle right (3 o’clock) of the object and the
+Zero degrees is at the middle right (3 o'clock) of the object and the
 degrees are increasing in clockwise direction. The angles should be in
 the [0;360] range.
 
@@ -81,10 +81,10 @@ relative to the end of the arc The knob offset can be set by
 Setting the indicator manually
 ------------------------------
 
-It’s also possible to set the angles of the indicator arc directly with
+It's also possible to set the angles of the indicator arc directly with
 :cpp:expr:`lv_arc_set_angles(arc, start_angle, end_angle)` function or
 ``lv_arc_set_start/end_angle(arc, start_angle)``. In this case the set
-“value” and “mode” are ignored.
+"value" and "mode" are ignored.
 
 In other words, the angle and value settings are independent. You should
 exclusively use one or the other. Mixing the two might result in
@@ -110,14 +110,14 @@ Place another object to the knob
 --------------------------------
 
 Another object can be positioned according to the current position of
-the arc in order to follow the arc’s current value (angle). To do this
+the arc in order to follow the arc's current value (angle). To do this
 use :cpp:expr:`lv_arc_align_obj_to_angle(arc, obj_to_align, radius_offset)`.
 
 Similarly
 :cpp:expr:`lv_arc_rotate_obj_to_angle(arc, obj_to_rotate, radius_offset)` can be
 used to rotate the object to the current value of the arc.
 
-It’s a typical use case to call these functions in the ``VALUE_CHANGED``
+It's a typical use case to call these functions in the ``VALUE_CHANGED``
 event of the arc.
 
 Events

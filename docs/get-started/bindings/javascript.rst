@@ -5,7 +5,7 @@ JavaScript
 With `lv_binding_js <https://github.com/lvgl/lv_binding_js>`__ you can
 write lvgl with JavaScript.
 
-It uses React’s virtual DOM concept to manipulate lvgl UI components,
+It uses React's virtual DOM concept to manipulate lvgl UI components,
 providing a familiar React-like experience to users.
 
 **Code**

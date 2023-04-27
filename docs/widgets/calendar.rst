@@ -12,8 +12,8 @@ The Calendar is added to the default group (if it is set). Calendar is
 an editable object which allow selecting and clicking the dates with
 encoder navigation too.
 
-To make the Calendar flexible, by default it doesn’t show the current
-year or month. Instead, there are optional “headers” that can be
+To make the Calendar flexible, by default it doesn't show the current
+year or month. Instead, there are optional "headers" that can be
 attached to the calendar.
 
 Parts and Styles
@@ -28,7 +28,7 @@ object under the hood to arrange the days into a matrix.
 
   - day names have no border, no background and drawn with a gray color
   - days of the previous and next month have :cpp:enumerator:`LV_BTNMATRIX_CTRL_DISABLED` flag
-  - today has a thicker border with the theme’s primary color - highlighted days have some opacity with the theme’s primary color.
+  - today has a thicker border with the theme's primary color - highlighted days have some opacity with the theme's primary color.
 
 Usage
 *****
@@ -55,7 +55,7 @@ Highlighted days
 The list of highlighted dates should be stored in a
 :cpp:struct:`lv_calendar_date_t` array loaded by
 :cpp:expr:`lv_calendar_set_highlighted_dates(calendar, highlighted_dates, date_num)`.
-Only the array’s pointer will be saved so the array should be a static
+Only the array's pointer will be saved so the array should be a static
 or global variable.
 
 Name of the days

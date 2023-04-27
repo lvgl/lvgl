@@ -110,7 +110,7 @@ Many `LVGL examples <https://docs.lvgl.io/master/examples.html>`__ are available
 PC Simulator
 ~~~~~~~~~~~~
 
-Micropython is ported to many platforms. One notable port is “unix”, which allows you to build and run Micropython
+Micropython is ported to many platforms. One notable port is "unix", which allows you to build and run Micropython
 (+LVGL) on a Linux machine. (On a Windows machine you might need Virtual Box or WSL or MinGW or Cygwin etc.)
 
 `Click here to know more information about building and running the unix port <https://github.com/lvgl/lv_micropython>`__
@@ -190,7 +190,7 @@ follow some coding conventions:
 - ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
   first argument, and the prefix of the ``struct`` name should be used as the prefix of the
   function name too (e.g. :cpp:expr:`lv_disp_set_default(lv_disp_t * disp)`)
-- Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as “private”.
+- Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as "private".
 - Argument must be named in H files too.
 - Do not ``malloc`` into a static or global variables. Instead declare the variable in :c:macro:`LV_ITERATE_ROOTS`
   list in ``lv_gc.h`` and mark the variable with :cpp:expr:`GC_ROOT(variable)` when it's used. **See** :ref:`memory_management`

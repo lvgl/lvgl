@@ -13,7 +13,7 @@ width
 
 Sets the width of object. Pixel, percentage and :c:macro:`LV_SIZE_CONTENT`
 values can be used. Percentage values are relative to the width of the
-parent’s content area.
+parent's content area.
 
 .. raw:: html
 
@@ -67,7 +67,7 @@ min_width
 ~~~~~~~~~
 
 Sets a minimal width. Pixel and percentage values can be used.
-Percentage values are relative to the width of the parent’s content
+Percentage values are relative to the width of the parent's content
 area.
 
 .. raw:: html
@@ -122,7 +122,7 @@ max_width
 ~~~~~~~~~
 
 Sets a maximal width. Pixel and percentage values can be used.
-Percentage values are relative to the width of the parent’s content
+Percentage values are relative to the width of the parent's content
 area.
 
 .. raw:: html
@@ -177,7 +177,7 @@ height
 ~~~~~~
 
 Sets the height of object. Pixel, percentage and :c:macro:`LV_SIZE_CONTENT` can
-be used. Percentage values are relative to the height of the parent’s
+be used. Percentage values are relative to the height of the parent's
 content area.
 
 .. raw:: html
@@ -232,7 +232,7 @@ min_height
 ~~~~~~~~~~
 
 Sets a minimal height. Pixel and percentage values can be used.
-Percentage values are relative to the width of the parent’s content
+Percentage values are relative to the width of the parent's content
 area.
 
 .. raw:: html
@@ -287,7 +287,7 @@ max_height
 ~~~~~~~~~~
 
 Sets a maximal height. Pixel and percentage values can be used.
-Percentage values are relative to the height of the parent’s content
+Percentage values are relative to the height of the parent's content
 area.
 
 .. raw:: html
@@ -343,7 +343,7 @@ x
 
 Set the X coordinate of the object considering the set ``align``. Pixel
 and percentage values can be used. Percentage values are relative to the
-width of the parent’s content area.
+width of the parent's content area.
 
 .. raw:: html
 
@@ -398,7 +398,7 @@ y
 
 Set the Y coordinate of the object considering the set ``align``. Pixel
 and percentage values can be used. Percentage values are relative to the
-height of the parent’s content area.
+height of the parent's content area.
 
 .. raw:: html
 
@@ -523,7 +523,7 @@ transform_width
 
 Make the object wider on both sides with this value. Pixel and
 percentage (with :cpp:expr:`lv_pct(x)`) values can be used. Percentage values
-are relative to the object’s width.
+are relative to the object's width.
 
 .. raw:: html
 
@@ -578,7 +578,7 @@ transform_height
 
 Make the object higher on both sides with this value. Pixel and
 percentage (with :cpp:expr:`lv_pct(x)`) values can be used. Percentage values
-are relative to the object’s height.
+are relative to the object's height.
 
 .. raw:: html
 
@@ -633,7 +633,7 @@ translate_x
 
 Move the object with this value in X direction. Applied after layouts,
 aligns and other positioning. Pixel and percentage (with :cpp:expr:`lv_pct(x)`)
-values can be used. Percentage values are relative to the object’s
+values can be used. Percentage values are relative to the object's
 width.
 
 .. raw:: html
@@ -689,7 +689,7 @@ translate_y
 
 Move the object with this value in Y direction. Applied after layouts,
 aligns and other positioning. Pixel and percentage (with :cpp:expr:`lv_pct(x)`)
-values can be used. Percentage values are relative to the object’s
+values can be used. Percentage values are relative to the object's
 height.
 
 .. raw:: html
@@ -851,8 +851,8 @@ Ext. draw Yes
 transform_pivot_x
 ~~~~~~~~~~~~~~~~~
 
-Set the pivot point’s X coordinate for transformations. Relative to the
-object’s top left corner’
+Set the pivot point's X coordinate for transformations. Relative to the
+object's top left corner'
 
 .. raw:: html
 
@@ -905,8 +905,8 @@ Ext. draw No
 transform_pivot_y
 ~~~~~~~~~~~~~~~~~
 
-Set the pivot point’s Y coordinate for transformations. Relative to the
-object’s top left corner’
+Set the pivot point's Y coordinate for transformations. Relative to the
+object's top left corner'
 
 .. raw:: html
 
@@ -959,7 +959,7 @@ Ext. draw No
 Padding
 -------
 
-Properties to describe spacing between the parent’s sides and the
+Properties to describe spacing between the parent's sides and the
 children and among the children. Very similar to the padding properties
 in HTML.
 
@@ -1791,7 +1791,7 @@ Ext. draw No
 bg_grad_stop
 ~~~~~~~~~~~~
 
-Set the point from which the background’s gradient color should start. 0
+Set the point from which the background's gradient color should start. 0
 means to top/left side, 255 the bottom/right side, 128 the center, and
 so on
 
@@ -2517,7 +2517,7 @@ Ext. draw No
 Outline
 -------
 
-Properties to describe the outline. It’s like a border but drawn outside
+Properties to describe the outline. It's like a border but drawn outside
 of the rectangles.
 
 outline_width
@@ -3780,7 +3780,7 @@ Ext. draw No
 arc_img_src
 ~~~~~~~~~~~
 
-Set an image from which the arc will be masked out. It’s useful to
+Set an image from which the arc will be masked out. It's useful to
 display complex effects on the arcs. Can be a pointer to
 :cpp:struct:`lv_img_dsc_t` or a path to a file
 
@@ -4168,7 +4168,7 @@ Ext. draw No
 text_align
 ~~~~~~~~~~
 
-Set how to align the lines of the text. Note that it doesn’t align the
+Set how to align the lines of the text. Note that it doesn't align the
 object itself, only the lines inside the object. The possible values are:
 
 - :cpp:enumerator:`LV_TEXT_ALIGN_LEFT`
@@ -4504,10 +4504,10 @@ Ext. draw No
 anim
 ~~~~
 
-The animation template for the object’s animation. Should be a pointer
+The animation template for the object's animation. Should be a pointer
 to :cpp:type:`lv_anim_t`. The animation parameters are widget specific,
 e.g. animation time could be the E.g. blink time of the cursor on the
-text area or scroll time of a roller. See the widgets’ documentation to
+text area or scroll time of a roller. See the widgets' documentation to
 learn more.
 
 .. raw:: html
@@ -4563,7 +4563,7 @@ anim_time
 
 The animation time in milliseconds. Its meaning is widget specific. E.g.
 blink time of the cursor on the text area or scroll time of a roller.
-See the widgets’ documentation to learn more.
+See the widgets' documentation to learn more.
 
 .. raw:: html
 
@@ -4617,7 +4617,7 @@ anim_speed
 ~~~~~~~~~~
 
 The animation speed in pixel/sec. Its meaning is widget specific. E.g.
-scroll speed of label. See the widgets’ documentation to learn more.
+scroll speed of label. See the widgets' documentation to learn more.
 
 .. raw:: html
 

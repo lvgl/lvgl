@@ -66,7 +66,7 @@ NuttX + LVGL could be used for
 -  Fast prototyping GUI for MVP (Minimum Viable Product) presentation.
 -  visualize sensor data directly and easily on the board without using
    a computer.
--  Final products with a GUI without a touchscreen (i.e. 3D Printer
+-  Final products with a GUI without a touchscreen (i.e. 3D Printer
    Interface using Rotary Encoder to Input data).
 -  Final products with a touchscreen (and all sorts of bells and
    whistles).
@@ -78,21 +78,21 @@ How to get started with NuttX and LVGL?
 
 There are many boards in the `NuttX
 mainline <https://github.com/apache/incubator-nuttx>`__ with support for
-LVGL. Let’s use the
+LVGL. Let's use the
 `STM32F429IDISCOVERY <https://www.st.com/en/evaluation-tools/32f429idiscovery.html>`__
 as an example because it is a very popular board.
 
 First you need to install the pre-requisites on your system
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let’s use the `Windows Subsystem for
+Let's use the `Windows Subsystem for
 Linux <https://acassis.wordpress.com/2018/01/10/how-to-build-nuttx-on-windows-10/>`__
 
 .. code:: shell
 
    $ sudo apt-get install automake bison build-essential flex gcc-arm-none-eabi gperf git libncurses5-dev libtool libusb-dev libusb-1.0.0-dev pkg-config kconfig-frontends openocd
 
-Now let’s create a workspace to save our files
+Now let's create a workspace to save our files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: shell
@@ -131,7 +131,7 @@ Flashing the firmware in the board using OpenOCD:
 
    $ sudo openocd -f interface/stlink-v2.cfg -f target/stm32f4x.cfg -c init -c "reset halt" -c "flash write_image erase nuttx.bin 0x08000000"
 
-Reset the board and using the ‘NSH>’ terminal start the LVGL demo:
+Reset the board and using the 'NSH>' terminal start the LVGL demo:
 
 .. code:: shell
 

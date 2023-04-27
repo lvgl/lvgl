@@ -5,7 +5,7 @@ File Explorer
 ``lv_file_explorer`` provides an API to browse the contents of the file
 system. ``lv_file_explorer`` only provides the file browsing function,
 but does not provide the actual file operation function. In other words,
-you can’t click a picture file to open and view the picture like a PC.
+you can't click a picture file to open and view the picture like a PC.
 ``lv_file_explorer`` will tell you the full path and name of the
 currently clicked file. The file operation function needs to be
 implemented by the user.

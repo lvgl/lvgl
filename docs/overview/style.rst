@@ -7,24 +7,24 @@ Styles
 *Styles* are used to set the appearance of objects. Styles in lvgl are
 heavily inspired by CSS. The concept in a nutshell is as follows: - A
 style is an :cpp:type:`lv_style_t` variable which can hold properties like
-border width, text color and so on. It’s similar to a ``class`` in CSS.
+border width, text color and so on. It's similar to a ``class`` in CSS.
 
 - Styles can be assigned to objects to change their appearance. Upon
   assignment, the target part (*pseudo-element* in CSS) and target state
   (*pseudo class*) can be specified. For example one can add
-  ``style_blue`` to the knob of a slider when it’s in pressed state.
+  ``style_blue`` to the knob of a slider when it's in pressed state.
 - The same style can be used by any number of objects.
 - Styles can be cascaded which means multiple styles may be assigned to an object and
   each style can have different properties. Therefore, not all properties
   have to be specified in a style. LVGL will search for a property until a
-  style defines it or use a default if it’s not specified by any of the
+  style defines it or use a default if it's not specified by any of the
   styles. For example ``style_btn`` can result in a default gray button
   and ``style_btn_red`` can add only a ``background-color=red`` to
   overwrite the background color.
 - The most recently added style has higher precedence. This means if a property
   is specified in two styles the newest style in the object will be used.
-- Some properties (e.g. text color) can be inherited from a parent(s) if it’s not specified in an object.
-- Objects can also have local styles with higher precedence than “normal” styles.
+- Some properties (e.g. text color) can be inherited from a parent(s) if it's not specified in an object.
+- Objects can also have local styles with higher precedence than "normal" styles.
 - Unlike CSS (where pseudo-classes describe different states, e.g. ``:focus``),
   in LVGL a property is assigned to a given state.
 - Transitions can be applied when the object changes state.
@@ -53,51 +53,51 @@ pressed at the same time. This is represented as :cpp:expr:`LV_STATE_FOCUSED | L
 
 A style can be added to any state or state combination. For example,
 setting a different background color for the default and pressed states.
-If a property is not defined in a state the best matching state’s
+If a property is not defined in a state the best matching state's
 property will be used. Typically this means the property with
 :cpp:enumerator:`LV_STATE_DEFAULT` is used.˛ If the property is not set even for the
 default state the default value will be used. (See later)
 
-But what does the “best matching state’s property” really mean? States
+But what does the "best matching state's property" really mean? States
 have a precedence which is shown by their value (see in the above list).
-A higher value means higher precedence. To determine which state’s
-property to use let’s take an example. Imagine the background color is
+A higher value means higher precedence. To determine which state's
+property to use let's take an example. Imagine the background color is
 defined like this:
 
 - :cpp:enumerator:`LV_STATE_DEFAULT`: white
 - :cpp:enumerator:`LV_STATE_PRESSED`: gray
 - :cpp:enumerator:`LV_STATE_FOCUSED`: red
 
-1. Initially the object is in the default state, so it’s a simple case:
-   the property is perfectly defined in the object’s current state as
+1. Initially the object is in the default state, so it's a simple case:
+   the property is perfectly defined in the object's current state as
    white.
 2. When the object is pressed there are 2 related properties: default
    with white (default is related to every state) and pressed with gray.
    The pressed state has 0x0020 precedence which is higher than the
-   default state’s 0x0000 precedence, so gray color will be used.
+   default state's 0x0000 precedence, so gray color will be used.
 3. When the object is focused the same thing happens as in pressed state
    and red color will be used. (Focused state has higher precedence than
    default state).
 4. When the object is focused and pressed both gray and red would work,
    but the pressed state has higher precedence than focused so gray
    color will be used.
-5. It’s possible to set e.g. rose color for :cpp:expr:`LV_STATE_PRESSED | LV_STATE_FOCUSED`.
+5. It's possible to set e.g. rose color for :cpp:expr:`LV_STATE_PRESSED | LV_STATE_FOCUSED`.
    In this case, this combined state has 0x0020 + 0x0002 = 0x0022 precedence, which is higher than
-   the pressed state’s precedence so rose color would be used.
+   the pressed state's precedence so rose color would be used.
 6. When the object is in the checked state there is no property to set
    the background color for this state. So for lack of a better option,
-   the object remains white from the default state’s property.
+   the object remains white from the default state's property.
 
 Some practical notes:
 
-- The precedence (value) of states is quite intuitive, and it’s something the
+- The precedence (value) of states is quite intuitive, and it's something the
   user would expect naturally. E.g. if an object is focused the user will still
-  want to see if it’s pressed, therefore the pressed state has a higher
+  want to see if it's pressed, therefore the pressed state has a higher
   precedence. If the focused state had a higher precedence it would overwrite
   the pressed color.
 - If you want to set a property for all states (e.g. red background color)
-  just set it for the default state. If the object can’t find a property
-  for its current state it will fall back to the default state’s property.
+  just set it for the default state. If the object can't find a property
+  for its current state it will fall back to the default state's property.
 - Use ORed states to describe the properties for complex cases. (E.g.
   pressed + checked + focused)
 - It might be a good idea to use different
@@ -110,7 +110,7 @@ Some practical notes:
 Cascading styles
 ****************
 
-It’s not required to set all the properties in one style. It’s possible
+It's not required to set all the properties in one style. It's possible
 to add more styles to an object and have the latter added style modify
 or extend appearance. For example, create a general gray button style
 and create a new one for red buttons where only the new background color
@@ -122,13 +122,13 @@ This is much like in CSS when used classes are listed like
 Styles added later have precedence over ones set earlier. So in the
 gray/red button example above, the normal button style should be added
 first and the red style second. However, the precedence of the states
-are still taken into account. So let’s examine the following case:
+are still taken into account. So let's examine the following case:
 
 - the basic button style defines dark-gray color for the default state and
   light-gray color for the pressed state
 - the red button style defines the background color as red only in the default state
 
-In this case, when the button is released (it’s in default state) it
+In this case, when the button is released (it's in default state) it
 will be red because a perfect match is found in the most recently added
 style (red). When the button is pressed the light-gray color is a better
 match because it describes the current state perfectly, so the button
@@ -138,9 +138,9 @@ Inheritance
 ***********
 
 Some properties (typically those related to text) can be inherited from
-the parent object’s styles. Inheritance is applied only if the given
-property is not set in the object’s styles (even in default state). In
-this case, if the property is inheritable, the property’s value will be
+the parent object's styles. Inheritance is applied only if the given
+property is not set in the object's styles (even in default state). In
+this case, if the property is inheritable, the property's value will be
 searched in the parents until an object specifies a value for the
 property. The parents will use their own state to determine the value.
 So if a button is pressed, and the text color comes from here, the
@@ -149,9 +149,9 @@ pressed text color will be used.
 Forced value inheritance/default value
 **************************************
 
-Sometimes you may want to force a child object to use the parent’s value
+Sometimes you may want to force a child object to use the parent's value
 for a given style property. To do this you can use one of the following
-(depending on what type of style you’re using):
+(depending on what type of style you're using):
 
 .. code:: c
 
@@ -184,7 +184,7 @@ The following predefined parts exist in LVGL:
 - :cpp:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section
 - :cpp:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells)
 - :cpp:enumerator:`LV_PART_TICKS`: Ticks on scales e.g. for a chart or meter
-- :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area’s or chart’s cursor
+- :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor
 - :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom part identifiers can be added starting from here.
 
 For example a `Slider </widgets/slider.html>`__ has three parts:
@@ -229,7 +229,7 @@ To remove a property use:
 
    lv_style_remove_prop(&style, LV_STYLE_BG_COLOR);
 
-To get a property’s value from a style:
+To get a property's value from a style:
 
 .. code:: c
 
@@ -302,7 +302,7 @@ function will only replace ``old_style`` with ``new_style`` if the
 ``selector`` matches the ``selector`` used in ``lv_obj_add_style``. Both
 styles, i.e. ``old_style`` and ``new_style``, must not be ``NULL`` (for
 adding and removing separate functions exist). If the combination of
-``old_style`` and ``selector`` exists multiple times in ``obj``\ ’s
+``old_style`` and ``selector`` exists multiple times in ``obj``\ 's
 styles, all occurrences will be replaced. The return value of the
 function indicates whether at least one successful replacement took
 place.
@@ -344,14 +344,14 @@ notified. There are 3 options to do this:
    when needed, call :cpp:expr:`lv_obj_report_style_change(&style)`. If ``style``
    is ``NULL`` all objects will be notified about a style change.
 
-Get a property’s value on an object
+Get a property's value on an object
 -----------------------------------
 
 To get a final value of property
 
 - considering cascading, inheritance, local styles and transitions (see below)
 - property get functions like this can be used: ``lv_obj_get_style_<property_name>(obj, <part>)``.
-  These functions use the object’s current state and if no better candidate exists they return a default value.
+  These functions use the object's current state and if no better candidate exists they return a default value.
   For example:
 
 .. code:: c
@@ -361,11 +361,11 @@ To get a final value of property
 Local styles
 ************
 
-In addition to “normal” styles, objects can also store local styles.
+In addition to "normal" styles, objects can also store local styles.
 This concept is similar to inline styles in CSS
 (e.g. ``<div style="color:red">``) with some modification.
 
-Local styles are like normal styles, but they can’t be shared among
+Local styles are like normal styles, but they can't be shared among
 other objects. If used, local styles are allocated automatically, and
 freed when the object is deleted. They are useful to add local
 customization to an object.
@@ -391,9 +391,9 @@ For the full list of style properties click
 Typical background properties
 -----------------------------
 
-In the documentation of the widgets you will see sentences like “The
-widget uses the typical background properties”. These “typical
-background properties” are the ones related to:
+In the documentation of the widgets you will see sentences like "The
+widget uses the typical background properties". These "typical
+background properties" are the ones related to:
 
 - Background
 - Border
@@ -406,13 +406,13 @@ background properties” are the ones related to:
 Transitions
 ***********
 
-By default, when an object changes state (e.g. it’s pressed) the new
+By default, when an object changes state (e.g. it's pressed) the new
 properties from the new state are set immediately. However, with
-transitions it’s possible to play an animation on state change. For
+transitions it's possible to play an animation on state change. For
 example, on pressing a button its background color can be animated to
 the pressed color over 300 ms.
 
-The parameters of the transitions are stored in the styles. It’s
+The parameters of the transitions are stored in the styles. It's
 possible to set
 
 - the time of the transition
@@ -456,18 +456,18 @@ transformation properties.
 These properties have this effect only on the ``MAIN`` part of the
 widget.
 
-The created snapshot is called “intermediate layer” or simply “layer”.
+The created snapshot is called "intermediate layer" or simply "layer".
 If only ``opa`` and/or ``blend_mode`` is set to a non-default value LVGL
 can build the layer from smaller chunks. The size of these chunks can be
 configured by the following properties in ``lv_conf.h``:
 
 - :cpp:enumerator:`LV_LAYER_SIMPLE_BUF_SIZE`: [bytes] the optimal target buffer size. LVGL will try to allocate this size of memory.
-- :cpp:enumerator:`LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE`: [bytes] used if :cpp:enumerator:`LV_LAYER_SIMPLE_BUF_SIZE` couldn’t be allocated.
+- :cpp:enumerator:`LV_LAYER_SIMPLE_FALLBACK_BUF_SIZE`: [bytes] used if :cpp:enumerator:`LV_LAYER_SIMPLE_BUF_SIZE` couldn't be allocated.
 
 If transformation properties were also used the layer can not be
 rendered in chunks, but one larger memory needs to be allocated. The
 required memory depends on the angle, zoom and pivot parameters, and the
-size of the area to redraw, but it’s never larger than the size of the
+size of the area to redraw, but it's never larger than the size of the
 widget (including the extra draw size used for shadow, outline, etc).
 
 If the widget can fully cover the area to redraw, LVGL creates an RGB
@@ -499,7 +499,7 @@ To set a theme for a display, two steps are required:
 2. Assign the initialized theme to a display.
 
 Theme initialization functions can have different prototypes. This
-example shows how to set the “default” theme:
+example shows how to set the "default" theme:
 
 .. code:: c
 
@@ -518,8 +518,8 @@ Extending themes
 ----------------
 
 Built-in themes can be extended. If a custom theme is created, a parent
-theme can be selected. The parent theme’s styles will be added before
-the custom theme’s styles. Any number of themes can be chained this way.
+theme can be selected. The parent theme's styles will be added before
+the custom theme's styles. Any number of themes can be chained this way.
 E.g. default theme -> custom theme -> dark theme.
 
 :cpp:expr:`lv_theme_set_parent(new_theme, base_theme)` extends the

@@ -33,7 +33,7 @@ Retrieving a span child
 -----------------------
 
 Spangroups store their children differently from normal objects, so
-normal functions for getting children won’t work.
+normal functions for getting children won't work.
 
 :cpp:expr:`lv_spangroup_get_child(spangroup, id)` will return a pointer to the
 child span at index ``id``. In addition, ``id`` can be negative to index

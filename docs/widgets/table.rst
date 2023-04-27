@@ -66,12 +66,12 @@ To merge more adjacent cells call this function for each cell.
 Scroll
 ------
 
-If the label’s width or height is set to :c:macro:`LV_SIZE_CONTENT` that size
+If the label's width or height is set to :c:macro:`LV_SIZE_CONTENT` that size
 will be used to show the whole table in the respective direction. E.g.
 :cpp:expr:`lv_obj_set_size(table, LV_SIZE_CONTENT, LV_SIZE_CONTENT)`
 automatically sets the table size to show all the columns and rows.
 
-If the width or height is set to a smaller number than the “intrinsic”
+If the width or height is set to a smaller number than the "intrinsic"
 size then the table becomes scrollable.
 
 Events

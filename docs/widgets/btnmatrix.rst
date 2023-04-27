@@ -27,7 +27,7 @@ Parts and Styles
 Usage
 *****
 
-Button’s text
+Button's text
 -------------
 
 There is a text on each button. To specify them a descriptor string
@@ -38,7 +38,7 @@ that the last element has to be either ``NULL`` or an empty string
 (``""``)!
 
 Use ``"\n"`` in the map to insert a **line break**. E.g.
-``{"btn1", "btn2", "\n", "btn3", ""}``. Each line’s buttons have their
+``{"btn1", "btn2", "\n", "btn3", ""}``. Each line's buttons have their
 width calculated automatically. So in the example the first row will
 have 2 buttons each with 50% width and a second row with 1 button having
 100% width.
@@ -46,10 +46,10 @@ have 2 buttons each with 50% width and a second row with 1 button having
 Control buttons
 ---------------
 
-The buttons’ width can be set relative to the other button in the same
+The buttons' width can be set relative to the other button in the same
 row with :cpp:expr:`lv_btnmatrix_set_btn_width(btnm, btn_id, width)` E.g. in a
 line with two buttons: *btnA, width = 1* and *btnB, width = 2*, *btnA*
-will have 33 % width and *btnB* will have 66 % width. It’s similar to
+will have 33 % width and *btnB* will have 66 % width. It's similar to
 how the
 ```flex-grow`` <https://developer.mozilla.org/en-US/docs/Web/CSS/flex-grow>`__
 property works in CSS. The width must be in the [1..15] range and the
@@ -71,7 +71,7 @@ following parameters:
 
 By default, all flags are disabled.
 
-To set or clear a button’s control attribute, use
+To set or clear a button's control attribute, use
 ``lv_btnmatrix_set_btn_ctrl(btnm, btn_id, LV_BTNM_CTRL_...)`` and
 ``lv_btnmatrix_clear_btn_ctrl(btnm, btn_id, LV_BTNMATRIX_CTRL_...)``
 respectively. More ``LV_BTNM_CTRL_...`` values can be OR-ed
@@ -90,7 +90,7 @@ The number of elements should be equal to the number of buttons
 One check
 ---------
 
-The “One check” feature can be enabled with
+The "One check" feature can be enabled with
 :cpp:expr:`lv_btnmatrix_set_one_checked(btnm, true)` to allow only one button to
 be checked at a time.
 
@@ -130,11 +130,11 @@ Keys
 
 Note that long pressing the button matrix with an encoder can mean to
 enter/leave edit mode and simply long pressing a button to make it
-repeat as well. To avoid this contradiction it’s suggested to add
+repeat as well. To avoid this contradiction it's suggested to add
 :cpp:expr:`lv_btnmatrix_set_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT)`
 to the button matrix if used with encoder. This way, the pressed button
 repeat feature is disabled and on leaving edit mode the selected button
-won’t be activated.
+won't be activated.
 
 Learn more about :ref:`indev_keys`.
 

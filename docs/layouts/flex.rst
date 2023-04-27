@@ -59,12 +59,12 @@ To manage the placement of the children use
 :c:expr:`lv_obj_set_flex_align(obj,  main_place, cross_place, track_cross_place)`
 
 -  ``main_place`` determines how to distribute the items in their track
-   on the main axis. E.g. flush the items to the right on :c:enumerator:`LV_FLEX_FLOW_ROW_WRAP`. (It’s called
+   on the main axis. E.g. flush the items to the right on :c:enumerator:`LV_FLEX_FLOW_ROW_WRAP`. (It's called
    ``justify-content`` in CSS)
 -  ``cross_place`` determines how to distribute the items in their track
    on the cross axis. E.g. if the items have different height place them
-   to the bottom of the track. (It’s called ``align-items`` in CSS)
--  ``track_cross_place`` determines how to distribute the tracks (It’s
+   to the bottom of the track. (It's called ``align-items`` in CSS)
+-  ``track_cross_place`` determines how to distribute the tracks (It's
    called ``align-content`` in CSS)
 
 The possible values are:
@@ -77,7 +77,7 @@ The possible values are:
   equal. Does not apply to ``track_cross_place``.
 - :c:enumerator:`LV_FLEX_ALIGN_SPACE_AROUND`: items are evenly
   distributed in the track with equal space around them. Note that
-  visually the spaces aren’t equal, since all the items have equal space
+  visually the spaces aren't equal, since all the items have equal space
   on both sides. The first item will have one unit of space against the
   container edge, but two units of space between the next item because
   that next item has its own spacing that applies. Not applies to
@@ -123,7 +123,7 @@ following properties can be set on the flex container style:
 
 -  ``pad_column`` Sets the padding between the columns.
 
-These can for example be used if you don’t want any padding between your
+These can for example be used if you don't want any padding between your
 objects: :c:expr:`lv_style_set_pad_column(&row_container_style,0)`
 
 Other features
