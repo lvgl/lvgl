@@ -11,7 +11,6 @@
 #include "lv_disp.h"
 #include "lv_disp_private.h"
 #include "../hal/lv_hal_tick.h"
-#include "../misc/lv_async.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
@@ -19,10 +18,7 @@
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
 #include "../others/snapshot/lv_snapshot.h"
-
-#if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
-    #include "../widgets/monitor/lv_monitor.h"
-#endif
+#include "../others/monitor/lv_monitor.h"
 
 /*********************
  *      DEFINES
@@ -31,17 +27,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    uint32_t    elaps_sum;
-    uint32_t    frame_cnt;
-    lv_disp_t * disp;
-} perf_info_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static void lv_refr_join_area(void);
-static void refr_async_cb(void * user_data);
 static void refr_invalid_areas(void);
 static void refr_area(const lv_area_t * area_p);
 static void refr_area_part(lv_draw_ctx_t * draw_ctx);
@@ -51,13 +41,6 @@ static void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj);
 static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area_h);
 static void draw_buf_flush(lv_disp_t * disp);
 static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
-
-#if LV_USE_PERF_MONITOR
-    static void perf_monitor_init(void);
-#endif
-#if LV_USE_MEM_MONITOR
-    static void mem_monitor_init(void);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -83,10 +66,8 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
  */
 void _lv_refr_init(void)
 {
-#if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
-    lv_async_call(refr_async_cb, NULL);
-#else
-    LV_UNUSED(refr_async_cb);
+#if LV_USE_MONITOR
+    lv_monitor_builtin_init();
 #endif
 }
 
@@ -1102,85 +1083,4 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t *
     if(disp->draw_ctx->buffer_convert) disp->draw_ctx->buffer_convert(disp->draw_ctx);
 
     disp->flush_cb(disp, &offset_area, color_p);
-}
-
-#if LV_USE_PERF_MONITOR
-
-static void perf_monitor_refr_finish_cb(lv_event_t * e)
-{
-    lv_obj_t * monitor = lv_event_get_user_data(e);
-    perf_info_t * info = lv_obj_get_user_data(monitor);
-    info->elaps_sum += lv_tick_elaps(info->disp->last_render_start_time);
-    info->frame_cnt++;
-}
-
-static void perf_monitor_event_cb(lv_event_t * e)
-{
-    lv_obj_t * monitor = lv_event_get_current_target_obj(e);
-    perf_info_t * info = lv_obj_get_user_data(monitor);
-    uint32_t cpu = 100 - lv_timer_get_idle();
-    uint32_t avg_time = info->frame_cnt ? info->elaps_sum / info->frame_cnt : 0;
-    lv_label_set_text_fmt(
-        monitor,
-        "%" LV_PRIu32" FPS / %" LV_PRIu32" ms\n%" LV_PRIu32 "%% CPU",
-        info->frame_cnt,
-        avg_time,
-        cpu
-    );
-    info->elaps_sum = 0;
-    info->frame_cnt = 0;
-}
-
-static void perf_monitor_init(void)
-{
-    perf_info_t * info = lv_malloc(sizeof(perf_info_t));
-    LV_ASSERT_MALLOC(info);
-
-    lv_memzero(info, sizeof(perf_info_t));
-    info->disp = lv_disp_get_default();
-
-    lv_obj_t * monitor = lv_monitor_create();
-    lv_monitor_set_refr_time(monitor, 1000);
-    lv_obj_align(monitor, LV_USE_PERF_MONITOR_POS, 0, 0);
-    lv_obj_set_style_text_align(monitor, LV_TEXT_ALIGN_RIGHT, 0);
-    lv_obj_set_user_data(monitor, info);
-    lv_obj_add_event(monitor, perf_monitor_event_cb, LV_EVENT_REFRESH, NULL);
-    lv_disp_add_event(info->disp, perf_monitor_refr_finish_cb, LV_EVENT_REFR_FINISH, monitor);
-}
-#endif
-
-#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC
-static void mem_monitor_event_cb(lv_event_t * e)
-{
-    lv_obj_t * monitor = lv_event_get_current_target_obj(e);
-    lv_mem_monitor_t mon;
-    lv_mem_monitor(&mon);
-    uint32_t used_size = mon.total_size - mon.free_size;;
-    uint32_t used_kb = used_size / 1024;
-    uint32_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
-    lv_label_set_text_fmt(monitor,
-                          "%"LV_PRIu32 ".%"LV_PRIu32 " kB used (%d %%)\n"
-                          "%d%% frag.",
-                          used_kb, used_kb_tenth, mon.used_pct,
-                          mon.frag_pct);
-}
-
-static void mem_monitor_init(void)
-{
-    lv_obj_t * monitor = lv_monitor_create();
-    lv_obj_add_event(monitor, mem_monitor_event_cb, LV_EVENT_REFRESH, NULL);
-    lv_obj_align(monitor, LV_USE_MEM_MONITOR_POS, 0, 0);
-    lv_monitor_set_refr_time(monitor, 300);
-}
-#endif
-
-static void refr_async_cb(void * user_data)
-{
-    LV_UNUSED(user_data);
-#if LV_USE_PERF_MONITOR
-    perf_monitor_init();
-#endif
-#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC
-    mem_monitor_init();
-#endif
 }

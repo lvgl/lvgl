@@ -14,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../label/lv_label.h"
+#include "../../../lvgl.h"
 
-#if 1
+#if LV_USE_MONITOR
 
 #if LV_USE_LABEL == 0
 #error "lv_monitor: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
@@ -44,9 +44,17 @@ lv_obj_t * lv_monitor_create(void);
 
 void lv_monitor_set_refr_time(lv_obj_t * obj, uint32_t time);
 
+void lv_monitor_builtin_init(void);
+
 /**********************
  *      MACROS
  **********************/
+
+#else
+
+#if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
+#warning "lv_monitor: lv_monitor is required. Enable it in lv_conf.h (LV_USE_MONITOR  1)"
+#endif
 
 #endif /*LV_USE_MONITOR*/
 
