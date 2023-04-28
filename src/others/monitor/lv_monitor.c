@@ -35,8 +35,14 @@ static void lv_monitor_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 static void lv_monitor_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void lv_monitor_timer_cb(lv_timer_t * timer);
 static void monitor_async_cb(void * user_data);
-static void perf_monitor_init(void);
-static void mem_monitor_init(void);
+
+#if LV_USE_PERF_MONITOR
+    static void perf_monitor_init(void);
+#endif
+
+#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC
+    static void mem_monitor_init(void);
+#endif
 
 /**********************
  *  STATIC VARIABLES
