@@ -850,7 +850,7 @@
  *-----------*/
 
 /*1: Show CPU usage and FPS count
- * Requires `LV_USE_MONITOR = 1*/
+ * Requires `LV_USE_MONITOR = 1`*/
 #ifndef LV_USE_PERF_MONITOR
     #ifdef CONFIG_LV_USE_PERF_MONITOR
         #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
