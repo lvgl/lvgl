@@ -284,16 +284,16 @@ static void texture_resize(lv_disp_t * disp)
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 
 #if LV_COLOR_DEPTH == 32
-    SDL_PixelFormat px_format = {.format = SDL_PIXELFORMAT_ARGB8888};
+    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_ARGB8888;
 #elif LV_COLOR_DEPTH == 24
-    SDL_PixelFormat px_format = {.format = SDL_PIXELFORMAT_BGR24};
+    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_BGR24;
 #elif LV_COLOR_DEPTH == 16
-    SDL_PixelFormat px_format = {.format = SDL_PIXELFORMAT_RGB565};
+    SDL_PixelFormatEnum px_format = SDL_PIXELFORMAT_RGB565;
 #else
 #error("Unsupported color format")
 #endif
 
-    dsc->texture = SDL_CreateTexture(dsc->renderer, px_format.format,
+    dsc->texture = SDL_CreateTexture(dsc->renderer, px_format,
                                      SDL_TEXTUREACCESS_STATIC, hor_res, ver_res);
     SDL_SetTextureBlendMode(dsc->texture, SDL_BLENDMODE_BLEND);
 }
