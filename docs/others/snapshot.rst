@@ -45,13 +45,13 @@ Use Existing Buffer
 
 If the snapshot needs update now and then, or simply caller provides memory, use API
 ``lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_img_cf_t cf, lv_img_dsc_t * dsc, void * buf, uint32_t buff_size)``
-for this case. It’s caller’s responsibility to alloc/free the memory.
+for this case. It's caller's responsibility to alloc/free the memory.
 
 If snapshot is generated successfully, the image descriptor is updated
 and image data will be stored to provided ``buf``.
 
 Note that snapshot may fail if provided buffer is not enough, which may
-happen when object size changes. It’s recommended to use API
+happen when object size changes. It's recommended to use API
 :c:func:`lv_snapshot_buf_size_needed` to check the needed buffer size in byte
 firstly and resize the buffer accordingly.
 

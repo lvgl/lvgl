@@ -15,7 +15,7 @@ Parts and Styles
 - :cpp:enumerator:`LV_PART_MAIN` The main part of the list that uses all the typical background properties
 - :cpp:enumerator:`LV_PART_SCROLLBAR` The scrollbar. See the `Base objects </widgets/obj>`__ documentation for details.
 
-**Buttons and Texts** See the `Button </widgets/btn>`__\ ’s and `Label </widgets/label>`__\ ’s documentation.
+**Buttons and Texts** See the `Button </widgets/btn>`__\ 's and `Label </widgets/label>`__\ 's documentation.
 
 Usage
 *****
@@ -28,7 +28,7 @@ Buttons
 - that can be an image or symbol
 - and a text.
 
-The text starts to scroll horizontally if it’s too long.
+The text starts to scroll horizontally if it's too long.
 
 Texts
 -----

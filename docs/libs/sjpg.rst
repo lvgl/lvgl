@@ -12,9 +12,9 @@ Overview
 -  Supports both normal JPG and the custom SJPG formats.
 -  Decoding normal JPG consumes RAM with the size of the whole
    uncompressed image (recommended only for devices with more RAM)
--  SJPG is a custom format based on “normal” JPG and specially made for
+-  SJPG is a custom format based on "normal" JPG and specially made for
    LVGL.
--  SJPG is ‘split-jpeg’ which is a bundle of small jpeg fragments with
+-  SJPG is 'split-jpeg' which is a bundle of small jpeg fragments with
    an sjpg header.
 -  SJPG size will be almost comparable to the jpg file or might be a
    slightly larger.

@@ -32,7 +32,7 @@ Value and range
 ---------------
 
 To set an initial value use :cpp:expr:`lv_slider_set_value(slider, new_value, LV_ANIM_ON/OFF)`. The
-animation time is set by the styles’ ``anim_time`` property.
+animation time is set by the styles' ``anim_time`` property.
 
 To specify the range (min, max values), :cpp:expr:`lv_slider_set_range(slider, min , max)` can be used.
 
@@ -60,7 +60,7 @@ desirable to set the slider to react on dragging the knob only. This
 feature is enabled by adding the :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST`:
 :cpp:expr:`lv_obj_add_flag(slider, LV_OBJ_FLAG_ADV_HITTEST)`.
 
-The extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`) increases to knob’s click area.
+The extended click area (set by :cpp:expr:`lv_obj_set_ext_click_area(slider, value)`) increases to knob's click area.
 
 Events
 ******
@@ -93,8 +93,8 @@ Learn more about :ref:`events`.
 Keys
 ****
 
--  ``LV_KEY_UP/RIGHT`` Increment the slider’s value by 1
--  ``LV_KEY_DOWN/LEFT`` Decrement the slider’s value by 1
+-  ``LV_KEY_UP/RIGHT`` Increment the slider's value by 1
+-  ``LV_KEY_DOWN/LEFT`` Decrement the slider's value by 1
 
 Learn more about :ref:`indev_keys`.
 

@@ -10,7 +10,7 @@ and `misc/lv_templ.h <https://github.com/lvgl/lvgl/blob/master/src/misc/lv_templ
 Naming conventions
 ------------------
 
--  Words are separated by ’\_’
+-  Words are separated by '\_'
 -  In variable and function names use only lower case letters
    (e.g. *height_tmp*)
 -  In enums and defines use only upper case letters
@@ -77,7 +77,7 @@ doing.
 You should write **why** have you done this:
 ``x++; /*Because of closing '\0' of the string*/``
 
-Short “code summaries” of a few lines are accepted. E.g.
+Short "code summaries" of a few lines are accepted. E.g.
 ``/*Calculate the new coordinates*/``
 
 In comments use \` \` when referring to a variable. E.g.
@@ -160,7 +160,7 @@ If you want to skip any particular hook you can do so with:
 Testing hooks
 -------------
 
-It’s no necessary to do a commit to test the hooks, you can test hooks
+It's no necessary to do a commit to test the hooks, you can test hooks
 by adding the files into the staging area and run:
 
 .. code:: console

@@ -27,7 +27,7 @@ Create a color wheel
 --------------------
 
 :cpp:expr:`lv_colorwheel_create(parent, knob_recolor)` creates a new color
-wheel. With ``knob_recolor=true`` the knob’s background color will be
+wheel. With ``knob_recolor=true`` the knob's background color will be
 set to the current color.
 
 Set color
@@ -57,9 +57,9 @@ Learn more about :ref:`events`.
 Keys
 ****
 
--  :cpp:enumerator:`LV_KEY_UP`, :cpp:enumerator:`LV_KEY_RIGHT` Increment the current parameter’s
+-  :cpp:enumerator:`LV_KEY_UP`, :cpp:enumerator:`LV_KEY_RIGHT` Increment the current parameter's
    value by 1
--  :cpp:enumerator:`LV_KEY_DOWN`, :cpp:enumerator:`LV_KEY_LEFT` Decrement the current parameter’s
+-  :cpp:enumerator:`LV_KEY_DOWN`, :cpp:enumerator:`LV_KEY_LEFT` Decrement the current parameter's
    value by 1
 -  :cpp:enumerator:`LV_KEY_ENTER` A long press will show the next mode. Double click
    to reset the current parameter.

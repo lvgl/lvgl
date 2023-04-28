@@ -53,7 +53,7 @@ input method plug-in, then use
 :c:expr:`lv_ime_pinyin_set_keyboard(pinyin_ime, kb)` to add the ``keyboard``
 you created to the Pinyin input method plug-in. You can use
 :c:expr:`lv_ime_pinyin_set_dict(pinyin_ime, your_dict)` to use a custom
-dictionary (if you don’t want to use the built-in dictionary at first,
+dictionary (if you don't want to use the built-in dictionary at first,
 you can disable :c:macro:`LV_IME_PINYIN_USE_DEFAULT_DICT` in ``lv_conf.h``,
 which can save a lot of memory space).
 
@@ -110,7 +110,7 @@ the keyboard and dictionary at any time.
 Custom dictionary
 -----------------
 
-If you don’t want to use the built-in Pinyin dictionary, you can use the
+If you don't want to use the built-in Pinyin dictionary, you can use the
 custom dictionary. Or if you think that the built-in phonetic dictionary
 consumes a lot of memory, you can also use a custom dictionary.
 
@@ -260,7 +260,7 @@ The lv_ime_pinyin have the following modes:
 -  :c:enumerator:`LV_IME_PINYIN_MODE_K9`: Pinyin 9 key input mode
 -  :c:enumerator:`LV_IME_PINYIN_MODE_K9_NUMBER`: Numeric keypad mode
 
-The ``TEXT`` modes’ layout contains buttons to change mode.
+The ``TEXT`` modes' layout contains buttons to change mode.
 
 To set the mode manually, use
 :c:expr:`lv_ime_pinyin_set_mode(pinyin_ime, mode)` . The default mode is

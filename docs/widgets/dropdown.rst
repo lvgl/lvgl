@@ -18,7 +18,7 @@ with encoder navigation too.
 Parts and Styles
 ****************
 
-The Dropdown widget is built from the elements: “button” and “list”
+The Dropdown widget is built from the elements: "button" and "list"
 (both not related to the button and list widgets)
 
 Button
@@ -29,7 +29,7 @@ Button
 -  :cpp:enumerator:`LV_PART_INDICATOR` Typically an arrow symbol that can be an image
    or a text (:cpp:enumerator:`LV_SYMBOL`).
 
-The button goes to :cpp:enumerator:`LV_STATE_CHECKED` when it’s opened.
+The button goes to :cpp:enumerator:`LV_STATE_CHECKED` when it's opened.
 
 List
 ----
@@ -74,7 +74,7 @@ inserts a new option to ``pos`` index.
 To save memory the options can set from a static(constant) string too
 with :cpp:expr:`lv_dropdown_set_static_options(dropdown, options)`. In this case
 the options string should be alive while the drop-down list exists and
-:cpp:func:`lv_dropdown_add_option` can’t be used
+:cpp:func:`lv_dropdown_add_option` can't be used
 
 You can select an option manually with
 :cpp:expr:`lv_dropdown_set_selected(dropdown, id)`, where ``id`` is the index of

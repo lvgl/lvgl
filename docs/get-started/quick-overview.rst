@@ -12,7 +12,7 @@ after that.
 Get started in a simulator
 --------------------------
 
-Instead of porting LVGL to embedded hardware straight away, it’s highly
+Instead of porting LVGL to embedded hardware straight away, it's highly
 recommended to get started in a simulator first.
 
 LVGL is ported to many IDEs to be sure you will find your favorite one.
@@ -30,7 +30,7 @@ If you would rather try LVGL on your own project follow these steps:
 -  Copy the ``lvgl`` folder into your project.
 -  Copy ``lvgl/lv_conf_template.h`` as ``lv_conf.h`` next to the
    ``lvgl`` folder, change the first ``#if 0`` to ``1`` to enable the
-   file’s content and set the :c:macro:`LV_COLOR_DEPTH` defines.
+   file's content and set the :c:macro:`LV_COLOR_DEPTH` defines.
 -  Include ``lvgl/lvgl.h`` in files where you need to use LVGL related functions.
 -  Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
    (``x`` should be between 1 and 10). It is required for the internal
@@ -121,10 +121,10 @@ label is created on a button, the button is the parent of label.
 The child object moves with the parent and if the parent is deleted the
 children will be deleted too.
 
-Children can be visible only within their parent’s bounding area. In
+Children can be visible only within their parent's bounding area. In
 other words, the parts of the children outside the parent are clipped.
 
-A Screen is the “root” parent. You can have any number of screens.
+A Screen is the "root" parent. You can have any number of screens.
 
 To get the current screen call :cpp:func:`lv_scr_act`, and to load a screen
 use :cpp:expr:`lv_scr_load(scr1)`.
@@ -208,7 +208,7 @@ and :cpp:enumerator:`LV_PART_KNOB`.
 By using parts you can apply different styles to sub-elements of a
 widget. (See below)
 
-Read the widgets’ documentation to learn which parts each uses.
+Read the widgets' documentation to learn which parts each uses.
 
 States
 ~~~~~~
@@ -262,8 +262,8 @@ configure the style. For example:
 
 See the full list of properties here :ref:`style_properties`.
 
-Styles are assigned using the ORed combination of an object’s part and
-state. For example to use this style on the slider’s indicator when the
+Styles are assigned using the ORed combination of an object's part and
+state. For example to use this style on the slider's indicator when the
 slider is pressed:
 
 .. code:: c
@@ -304,7 +304,7 @@ property is not defined in the default state.
 
 Some properties (typically the text-related ones) can be inherited. This
 means if a property is not set in an object it will be searched for in
-its parents too. For example, you can set the font once in the screen’s
+its parents too. For example, you can set the font once in the screen's
 style and all text on that screen will inherit it by default.
 
 Local style properties also can be added to objects. This creates a

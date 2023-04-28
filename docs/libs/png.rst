@@ -16,7 +16,7 @@ enable one in ``lv_conf.h`` with ``LV_USE_FS_...``
 The whole PNG image is decoded so during decoding RAM equals to
 ``image width x image height x 4`` bytes are required.
 
-As it might take significant time to decode PNG images LVGL’s :ref:`image-caching` feature can be useful.
+As it might take significant time to decode PNG images LVGL's :ref:`image-caching` feature can be useful.
 
 Example
 -------

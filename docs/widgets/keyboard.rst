@@ -30,7 +30,7 @@ The Keyboards have the following modes:
 - :cpp:enumerator:`LV_KEYBOARD_MODE_NUMBER` Display numbers, +/- sign, and decimal dot
 - :cpp:enumerator:`LV_KEYBOARD_MODE_USER_1` through :cpp:enumerator:`LV_KEYBOARD_MODE_USER_4` User-defined modes.
 
-The ``TEXT`` modes’ layout contains buttons to change mode.
+The ``TEXT`` modes' layout contains buttons to change mode.
 
 To set the mode manually, use :cpp:expr:`lv_keyboard_set_mode(kb, mode)`. The
 default mode is :cpp:enumerator:`LV_KEYBOARD_MODE_TEXT_UPPER`.
@@ -57,7 +57,7 @@ boundaries. To account for this, reserve extra free space on top of the
 keyboard or ensure that the keyboard is added *after* any widgets
 adjacent to its top boundary so that the popovers can draw over those.
 
-The popovers currently are merely a visual effect and don’t allow
+The popovers currently are merely a visual effect and don't allow
 selecting additional characters such as accents yet.
 
 New Keymap
@@ -77,9 +77,9 @@ with the original map:
 - :c:macro:`LV_SYMBOL_LEFT` Move the cursor left.
 - :c:macro:`LV_SYMBOL_RIGHT` Move the cursor right.
 - :c:macro:`LV_SYMBOL_NEW_LINE` New line.
-- *“ABC”* Load the uppercase map.
-- *“abc”* Load the lower case map.
-- *“1#”* Load the lower case map.
+- *"ABC"* Load the uppercase map.
+- *"abc"* Load the lower case map.
+- *"1#"* Load the lower case map.
 
 Events
 ******

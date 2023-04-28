@@ -9,7 +9,7 @@ The Grid layout is a subset of `CSS Flexbox <https://css-tricks.com/snippets/css
 
 It can arrange items into a 2D "table" that has rows or columns
 (tracks). The item can span through multiple columns or rows. The
-track’s size can be set in pixel, to the largest item
+track's size can be set in pixel, to the largest item
 (:c:macro:`LV_GRID_CONTENT`) or in "Free unit" (FR) to distribute the free
 space proportionally.
 
@@ -22,7 +22,7 @@ Terms
 *****
 
 -  tracks: the rows or columns
--  free unit (FR): if set on track’s size is set in ``FR`` it will grow
+-  free unit (FR): if set on track's size is set in ``FR`` it will grow
    to fill the remaining space on the parent.
 -  gap: the space between the rows and columns or the items on a track
 
@@ -88,7 +88,7 @@ If there are some empty space the track can be aligned several ways:
   between any two items (and the space to the edges) is equal. Not applies to ``track_cross_place``.
 - :c:enumerator:`LV_GRID_ALIGN_SPACE_AROUND`: items are
   evenly distributed in the track with equal space around them. Note that
-  visually the spaces aren’t equal, since all the items have equal space
+  visually the spaces aren't equal, since all the items have equal space
   on both sides. The first item will have one unit of space against the
   container edge, but two units of space between the next item because
   that next item has its own spacing that applies. Not applies to ``track_cross_place``.
@@ -96,7 +96,7 @@ If there are some empty space the track can be aligned several ways:
   evenly distributed in the track: first item is on the start line, last
   item on the end line. Not applies to ``track_cross_place``.
 
-To set the track’s alignment use
+To set the track's alignment use
 :c:expr:`lv_obj_set_grid_align(obj, column_align, row_align)`.
 
 Style interface

@@ -29,7 +29,7 @@ Why would you want multi-display support? Here are some examples:
 Using only one display
 ----------------------
 
-Using more displays can be useful but in most cases it’s not required.
+Using more displays can be useful but in most cases it's not required.
 Therefore, the whole concept of multi-display handling is completely
 hidden if you register only one display. By default, the last created
 (and only) display is used.
@@ -44,7 +44,7 @@ user activity on the default display. (See below in `Inactivity <#Inactivity>`__
 Mirror display
 --------------
 
-To mirror the image of a display to another display, you don’t need to
+To mirror the image of a display to another display, you don't need to
 use multi-display support. Just transfer the buffer received in
 ``flush_cb`` to the other display too.
 
@@ -53,8 +53,8 @@ Split image
 
 You can create a larger virtual display from an array of smaller ones.
 You can create it as below: 1. Set the resolution of the displays to the
-large display’s resolution. 2. In ``flush_cb``, truncate and modify the
-``area`` parameter for each display. 3. Send the buffer’s content to
+large display's resolution. 2. In ``flush_cb``, truncate and modify the
+``area`` parameter for each display. 3. Send the buffer's content to
 each real display with the truncated area.
 
 Screens
@@ -71,10 +71,10 @@ Be sure not to confuse displays and screens:
    with it, but not vice versa.
 
 Screens can be considered the highest level containers which have no
-parent. A screen’s size is always equal to its display and their origin
-is (0;0). Therefore, a screen’s coordinates can’t be changed,
+parent. A screen's size is always equal to its display and their origin
+is (0;0). Therefore, a screen's coordinates can't be changed,
 i.e. :cpp:expr:`lv_obj_set_pos()`, :cpp:expr:`lv_obj_set_size()` or similar functions
-can’t be used on screens.
+can't be used on screens.
 
 A screen can be created from any object type but the two most typical
 types are `Base object </widgets/obj>`__ and `Image </widgets/img>`__
@@ -99,7 +99,7 @@ Transparent screens
 
 Usually, the opacity of the screen is :cpp:enumerator:`LV_OPA_COVER` to provide a
 solid background for its children. If this is not the case (opacity <
-100%) the display’s ``bottom_layer`` be visible. If the bottom layer’s
+100%) the display's ``bottom_layer`` be visible. If the bottom layer's
 opacity is also not :cpp:enumerator:`LV_OPA_COVER` LVGL has no solid background to
 draw.
 
@@ -107,17 +107,17 @@ This configuration (transparent screen and display) could be used to
 create for example OSD menus where a video is played on a lower layer,
 and a menu is overlaid on an upper layer.
 
-To properly render the screen the display’s color format needs to be set
+To properly render the screen the display's color format needs to be set
 to one with alpha channel.
 
 In summary, to enable transparent screens and displays for OSD menu-like
 UIs:
 
-- Set the screen’s ``bg_opa`` to transparent:
+- Set the screen's ``bg_opa`` to transparent:
   :cpp:expr:`lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
-- Set the bottom layer’s ``bg_opa`` to transparent:
+- Set the bottom layer's ``bg_opa`` to transparent:
   :cpp:expr:`lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
-- Set the screen’s bg_opa to 0:
+- Set the screen's bg_opa to 0:
   :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
 - Set a color format with alpha channel. E.g.
   :cpp:expr:`lv_disp_set_color_format(disp, LV_COLOR_FORMAT_NATIVE_ALPHA)`
@@ -128,11 +128,11 @@ Features of displays
 Inactivity
 ----------
 
-A user’s inactivity time is measured on each display. Every use of an
+A user's inactivity time is measured on each display. Every use of an
 `Input device </overview/indev>`__ (if `associated with the display </porting/indev#other-features>`__) counts as an activity. To
 get time elapsed since the last activity, use
 :cpp:expr:`lv_disp_get_inactive_time(disp)`. If ``NULL`` is passed, the lowest
-inactivity time among all displays will be returned (**NULL isn’t just
+inactivity time among all displays will be returned (**NULL isn't just
 the default display**).
 
 You can manually trigger an activity using
@@ -152,7 +152,7 @@ adjusted with :cpp:expr:`lv_obj_set_style_bg_color(obj, color)`;
 The display background image is a path to a file or a pointer to an
 :cpp:struct:`lv_img_dsc_t` variable (converted image data) to be used as
 wallpaper. It can be set with :cpp:expr:`lv_obj_set_style_bg_img_src(obj, &my_img)`;
-If a background image is configured the background won’t be filled with
+If a background image is configured the background won't be filled with
 ``bg_color``.
 
 The opacity of the background color or image can be adjusted with

@@ -17,7 +17,7 @@ In general, you can set the macro :c:macro:`LV_USE_GPU_ARM2D` to ``1`` in
 
 If you are using
 `CMSIS-Pack <https://github.com/lvgl/lvgl/tree/master/env_support/cmsis-pack>`__
-to deploy the LVGL. You don’t have to define the macro
+to deploy the LVGL. You don't have to define the macro
 :c:macro:`LV_USE_GPU_ARM2D` manually, instead, please select the component
 ``GPU Arm-2D`` in the **RTE** dialog. This step will define the macro for us.
 

@@ -4,7 +4,7 @@ Base object (lv_obj)
 Overview
 ********
 
-The ‘Base Object’ implements the basic properties of widgets on a
+The 'Base Object' implements the basic properties of widgets on a
 screen, such as:
 
 - coordinates
@@ -19,7 +19,7 @@ objects in LVGL are inherited.
 The functions and functionalities of the Base object can be used with
 other widgets too. For example :cpp:expr:`lv_obj_set_width(slider, 100)`
 
-The Base object can be directly used as a simple widget: it’s nothing
+The Base object can be directly used as a simple widget: it's nothing
 more than a rectangle. In HTML terms, think of it as a ``<div>``.
 
 Coordinates
@@ -118,11 +118,11 @@ When you have created a screen like
 :cpp:expr:`lv_scr_load(screen)`. The :cpp:func:`lv_scr_act` function gives you a
 pointer to the active screen.
 
-If you have multiple displays, it’s important to know that the screen
+If you have multiple displays, it's important to know that the screen
 functions operate on the most recently created display or the one
 explicitly selected with :cpp:func:`lv_disp_set_default`.
 
-To get an object’s screen use the :cpp:expr:`lv_obj_get_screen(obj)` function.
+To get an object's screen use the :cpp:expr:`lv_obj_get_screen(obj)` function.
 
 Events
 ------
@@ -156,13 +156,13 @@ Flags
 There are some attributes which can be enabled/disabled by
 ``lv_obj_add/clear_flag(obj, LV_OBJ_FLAG_...)``:
 
--  :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` Make the object hidden. (Like it wasn’t there at all)
+-  :cpp:enumerator:`LV_OBJ_FLAG_HIDDEN` Make the object hidden. (Like it wasn't there at all)
 -  :cpp:enumerator:`LV_OBJ_FLAG_CLICKABLE` Make the object clickable by input devices
 -  :cpp:enumerator:`LV_OBJ_FLAG_CLICK_FOCUSABLE` Add focused state to the object when clicked
 -  :cpp:enumerator:`LV_OBJ_FLAG_CHECKABLE` Toggle checked state when the object is clicked
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLLABLE` Make the object scrollable
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ELASTIC` Allow scrolling inside but with slower speed
--  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_MOMENTUM` Make the object scroll further when “thrown”
+-  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_MOMENTUM` Make the object scroll further when "thrown"
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_ONE` Allow scrolling only one snappable children
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_CHAIN_HOR` Allow propagating the horizontal scroll to a parent
 -  :cpp:enumerator:`LV_OBJ_FLAG_SCROLL_CHAIN_VER` Allow propagating the vertical scroll to a parent
@@ -176,7 +176,7 @@ There are some attributes which can be enabled/disabled by
 -  :cpp:enumerator:`LV_OBJ_FLAG_ADV_HITTEST` Allow performing more accurate hit (click) test. E.g. accounting for rounded corners
 -  :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` Make the object positionable by the layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Do not scroll the object when the parent scrolls and ignore layout
--  :cpp:enumerator:`LV_OBJ_FLAG_OVERFLOW_VISIBLE` Do not clip the children’s content to the parent’s boundary
+-  :cpp:enumerator:`LV_OBJ_FLAG_OVERFLOW_VISIBLE` Do not clip the children's content to the parent's boundary
 -  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_1` Custom flag, free to use by layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_LAYOUT_2` Custom flag, free to use by layouts
 -  :cpp:enumerator:`LV_OBJ_FLAG_WIDGET_1` Custom flag, free to use by widget

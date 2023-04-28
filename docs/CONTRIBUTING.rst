@@ -6,7 +6,7 @@ Contributing
 Introduction
 ------------
 
-Join LVGL’s community and leave your footprint in the library!
+Join LVGL's community and leave your footprint in the library!
 
 There are a lot of ways to contribute to LVGL even if you are new to the
 library or even new to programming.
@@ -15,7 +15,7 @@ It might be scary to make the first step but you have nothing to be
 afraid of. A friendly and helpful community is waiting for you. Get to
 know like-minded people and make something great together.
 
-So let’s find which contribution option fits you the best and help you
+So let's find which contribution option fits you the best and help you
 join the development of LVGL!
 
 Before getting started here are some guidelines to make contribution smoother:
@@ -33,7 +33,7 @@ Before getting started here are some guidelines to make contribution smoother:
 - Speak about one thing in one issue or topic. It makes your post easier to find later for
   someone with the same question.
 - Give feedback and close the issue or mark the topic as solved if your question is answered.
-- For non-trivial fixes and features, it’s better to open an issue first to discuss the
+- For non-trivial fixes and features, it's better to open an issue first to discuss the
   details instead of sending a pull request directly.
 - Please read and follow the Coding style guide.
 
@@ -42,8 +42,8 @@ Pull request
 
 Merging new code into the lvgl, documentation, blog, examples, and other
 repositories happen via *Pull requests* (PR for short). A PR is a
-notification like “Hey, I made some updates to your project. Here are
-the changes, you can add them if you want.” To do this you need a copy
+notification like "Hey, I made some updates to your project. Here are
+the changes, you can add them if you want." To do this you need a copy
 (called fork) of the original project under your account, make some
 changes there, and notify the original repository about your updates.
 You can see what it looks like on GitHub for LVGL here:
@@ -70,13 +70,13 @@ The instructions describe the main ``lvgl`` repository but it works the
 same way for the other repositories.
 
 1. Fork the `lvgl repository <https://github.com/lvgl/lvgl>`__. To do this click the
-   “Fork” button in the top right corner. It will “copy” the ``lvgl``
+   "Fork" button in the top right corner. It will "copy" the ``lvgl``
    repository to your GitHub account (``https://github.com/<YOUR_NAME>?tab=repositories``)
 2. Clone your forked repository.
 3. Add your changes. You can create a *feature branch* from *master* for the updates: ``git checkout -b the-new-feature``
 4. Commit and push your changes to the forked ``lvgl`` repository.
 5. Create a PR on GitHub from the page of your ``lvgl`` repository (``https://github.com/<YOUR_NAME>/lvgl``) by
-   clicking the *“New pull request”* button. Don’t forget to select the branch where you added your changes.
+   clicking the *"New pull request"* button. Don't forget to select the branch where you added your changes.
 6. Set the base branch. It means where you want to merge your update. In the ``lvgl`` repo both the fixes
    and new features go to ``master`` branch.
 7. Describe what is in the update. An example code is welcome if applicable.
@@ -111,13 +111,13 @@ Possible ``<type>``\ s:
 - ``chore`` any minor formatting or style changes that would make the changelog noisy
 
 ``<scope>`` is the module, file, or sub-system that is affected by the
-commit. It’s usually one word and can be chosen freely. For example
+commit. It's usually one word and can be chosen freely. For example
 ``img``, ``layout``, ``txt``, ``anim``. The scope can be omitted.
 
 ``<subject>`` contains a short description of the change:
 
-- use the imperative, present tense: “change” not “changed” nor “changes”
-- don’t capitalize the first letter
+- use the imperative, present tense: "change" not "changed" nor "changes"
+- don't capitalize the first letter
 - no dot (.) at the end
 - max 90 characters
 
@@ -126,7 +126,7 @@ change.
 
 ``<footer>`` shall contain
 
-- the words “BREAKING CHANGE” if the changes break the API
+- the words "BREAKING CHANGE" if the changes break the API
 - reference to the GitHub issue or Pull Request if applicable.
 
 Some examples:
@@ -149,7 +149,7 @@ Overview
 ~~~~~~~~
 
 To ensure all licensing criteria are met for every repository of the
-LVGL project, we apply a process called DCO (Developer’s Certificate of
+LVGL project, we apply a process called DCO (Developer's Certificate of
 Origin).
 
 The text of DCO can be read here: https://developercertificate.org/.
@@ -199,7 +199,7 @@ Use MIT licensed code
 As LVGL is MIT licensed, other MIT licensed code can be integrated
 without issues. The MIT license requires a copyright notice be added to
 the derived work. Any derivative work based on MIT licensed code must
-copy the original work’s license file or text.
+copy the original work's license file or text.
 
 Use GPL licensed code
 ^^^^^^^^^^^^^^^^^^^^^
@@ -210,8 +210,8 @@ can not accept GPL licensed code.
 Ways to contribute
 ------------------
 
-Even if you’re just getting started with LVGL there are plenty of ways
-to get your feet wet. Most of these options don’t even require knowing a
+Even if you're just getting started with LVGL there are plenty of ways
+to get your feet wet. Most of these options don't even require knowing a
 single line of LVGL code.
 
 Below we have collected some opportunities about the ways you can
@@ -242,11 +242,11 @@ Have you already started using LVGL in a
 `Simulator </get-started/platforms/pc-simulator>`__, a development
 board, or on your custom hardware? Was it easy or were there some
 obstacles? Are you happy with the result? Showing your project to others
-is a win-win situation because it increases your and LVGL’s reputation
+is a win-win situation because it increases your and LVGL's reputation
 at the same time.
 
 You can post about your project on Twitter, Facebook, LinkedIn, create a
-YouTube video, and so on. Only one thing: On social media don’t forget
+YouTube video, and so on. Only one thing: On social media don't forget
 to add a link to ``https://lvgl.io`` or ``https://github.com/lvgl`` and
 use the hashtag ``#lvgl``. Thank you! :)
 
@@ -255,7 +255,7 @@ projects <https://forum.lvgl.io/c/my-projects/10>`__ category of the
 Forum.
 
 The `LVGL Blog <https://blog.lvgl.io>`__ welcomes posts from anyone.
-It’s a good place to talk about a project you created with LVGL, write a
+It's a good place to talk about a project you created with LVGL, write a
 tutorial, or share some nice tricks. The latest blog posts are shown on
 the `homepage of LVGL <https://lvgl.io>`__ to make your work more
 visible.
@@ -268,7 +268,7 @@ add your post.
 Any of these help to spread the word and familiarize new developers with
 LVGL.
 
-If you don’t want to speak about your project publicly, feel free to use
+If you don't want to speak about your project publicly, feel free to use
 `Contact form <https://lvgl.io/#contact>`__ on lvgl.io to private
 message to us.
 
@@ -278,7 +278,7 @@ Write examples
 As you learn LVGL you will probably play with the features of widgets.
 Why not publish your experiments?
 
-Each widgets’ documentation contains examples. For instance, here are
+Each widgets' documentation contains examples. For instance, here are
 the examples of the `Drop-down list </widgets/dropdown#examples>`__
 widget. The examples are directly loaded from the
 `lvgl/examples <https://github.com/lvgl/lvgl/tree/master/examples>`__
@@ -292,7 +292,7 @@ conventions:
 - Make the example as short and simple as possible.
 - Add comments to explain what the example does.
 - Use 320x240 resolution.
-- Update ``index.rst`` in the example’s folder with your new example. To see how other examples are added, look in the
+- Update ``index.rst`` in the example's folder with your new example. To see how other examples are added, look in the
   `lvgl/examples/widgets <https://github.com/lvgl/lvgl/tree/master/examples/widgets>`__
   folder.
 
@@ -327,7 +327,7 @@ Send fixes
 The beauty of open-source software is you can easily dig in to it to
 understand how it works. You can also fix or adjust it as you wish.
 
-If you found and fixed a bug don’t hesitate to send a `Pull
+If you found and fixed a bug don't hesitate to send a `Pull
 request <#pull-request>`__ with the fix.
 
 In your Pull request please also add a line to
@@ -337,7 +337,7 @@ Join the conversations in the Forum
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It feels great to know you are not alone if something is not working.
-It’s even better to help others when they struggle with something.
+It's even better to help others when they struggle with something.
 
 While you were learning LVGL you might have had questions and used the
 Forum to get answers. As a result, you probably have more knowledge
@@ -346,7 +346,7 @@ about how LVGL works.
 One of the best ways to give back is to use the Forum and answer the
 questions of newcomers - like you were once.
 
-Just read the titles and if you are familiar with the topic don’t
+Just read the titles and if you are familiar with the topic don't
 hesitate to share your thoughts and suggestions.
 
 Participating in the discussions is one of the best ways to become part
@@ -402,8 +402,8 @@ maintainer
 If you are interested, just send a message (e.g. from the Forum) to the
 current maintainers of the repository. They will check if the
 prerequisites are met. Note that meeting the prerequisites is not a
-guarantee of acceptance, i.e. if the conditions are met you won’t
-automatically become a maintainer. It’s up to the current maintainers to
+guarantee of acceptance, i.e. if the conditions are met you won't
+automatically become a maintainer. It's up to the current maintainers to
 make the decision.
 
 Move your project repository under LVGL organization

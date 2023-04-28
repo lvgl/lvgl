@@ -8,7 +8,7 @@ What is PikaScript ?
 interpreter designed specifically for microcontrollers, and it supports
 a subset of the common Python3 syntax.
 
-It’s lighter, requiring only 32k of code space and 4k of RAM, which
+It's lighter, requiring only 32k of code space and 4k of RAM, which
 means it can run on stm32f103c8 (blue-pill) or even stm32g030c8, on the
 other hand, you can leave valuable space for more material or larger
 buffer areas.
@@ -18,9 +18,9 @@ all, does not depend on OS or file system, has good support for popular
 IDEs for Windows platforms like Keil, IAR, RT-Thread-Studio, and of
 course, supports linux-gcc development platforms.
 
-It’s smarter, with a unique C module mechanism that allows you to
+It's smarter, with a unique C module mechanism that allows you to
 generate bindings automatically by simply writing the API for the C
-module in Python, and you don’t need to deal with the headache of
+module in Python, and you don't need to deal with the headache of
 writing any macros or global tables manually. On the other hand, all C
 modules have sophisticated smart hints, even hinting at the types of
 your arguments .
@@ -152,7 +152,7 @@ interface file)
        def set_bg_angles(self, start: int, end: int): ...
        def set_angles(self, start: int, end: int): ...
 
-Then PikaScript’s pre-compiler can automatically bind the following C
+Then PikaScript's pre-compiler can automatically bind the following C
 functions, simply by naming the functions in the module_class_method
 format, without any additional work, and all binding and registration is
 done automatically.

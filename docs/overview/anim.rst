@@ -132,7 +132,7 @@ Timeline
 A timeline is a collection of multiple animations which makes it easy to
 create complex composite animations.
 
-Firstly, create an animation element but don’t call :cpp:func:`lv_anim_start`.
+Firstly, create an animation element but don't call :cpp:func:`lv_anim_start`.
 
 Secondly, create an animation timeline object by calling
 :cpp:func:`lv_anim_timeline_create`.

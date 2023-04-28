@@ -61,7 +61,7 @@ Configuration file
 ------------------
 
 There is a configuration header file for LVGL called **lv_conf.h**. You
-modify this header to set the library’s basic behavior, disable unused
+modify this header to set the library's basic behavior, disable unused
 modules and features, adjust the size of memory buffers in compile-time,
 etc.
 
@@ -77,7 +77,7 @@ content. So the layout of the files should look like this:
    |-other files and folders
 
 Comments in the config file explain the meaning of the options. Be sure
-to set at least :c:macro:`LV_COLOR_DEPTH` according to your display’s color
+to set at least :c:macro:`LV_COLOR_DEPTH` according to your display's color
 depth. Note that, the examples and demos explicitly need to be enabled
 in ``lv_conf.h``.
 

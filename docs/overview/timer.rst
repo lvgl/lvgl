@@ -66,29 +66,29 @@ Repeat count
 
 You can make a timer repeat only a given number of times with
 :cpp:expr:`lv_timer_set_repeat_count(timer, count)`. The timer will
-automatically be deleted after it’s called the defined number of times.
+automatically be deleted after it's called the defined number of times.
 Set the count to ``-1`` to repeat indefinitely.
 
 Measure idle time
 *****************
 
 You can get the idle percentage time of :cpp:func:`lv_timer_handler` with
-:cpp:func:`lv_timer_get_idle`. Note that, it doesn’t measure the idle time of
+:cpp:func:`lv_timer_get_idle`. Note that, it doesn't measure the idle time of
 the overall system, only :cpp:func:`lv_timer_handler`. It can be misleading if
 you use an operating system and call :cpp:func:`lv_timer_handler` in a timer, as
-it won’t actually measure the time the OS spends in an idle thread.
+it won't actually measure the time the OS spends in an idle thread.
 
 Asynchronous calls
 ******************
 
-In some cases, you can’t perform an action immediately. For example, you
-can’t delete an object because something else is still using it, or you
-don’t want to block the execution now. For these cases,
+In some cases, you can't perform an action immediately. For example, you
+can't delete an object because something else is still using it, or you
+don't want to block the execution now. For these cases,
 :cpp:expr:`lv_async_call(my_function, data_p)` can be used to call
 ``my_function`` on the next invocation of :cpp:func:`lv_timer_handler`.
-``data_p`` will be passed to the function when it’s called. Note that
+``data_p`` will be passed to the function when it's called. Note that
 only the data pointer is saved, so you need to ensure that the variable
-will be “alive” while the function is called. It can be *static*, global
+will be "alive" while the function is called. It can be *static*, global
 or dynamically allocated data. If you want to cancel an asynchronous
 call, call :cpp:expr:`lv_async_call_cancel(my_function, data_p)`, which will
 clear all asynchronous calls matching ``my_function`` and ``data_p``.
@@ -114,7 +114,7 @@ For example:
 
    /*The screen is still valid so you can do other things with it*/
 
-If you just want to delete an object and don’t need to clean anything up
+If you just want to delete an object and don't need to clean anything up
 in ``my_screen_cleanup`` you could just use :cpp:func:`lv_obj_del_async` which
 will delete the object on the next call to :cpp:func:`lv_timer_handler`.
 

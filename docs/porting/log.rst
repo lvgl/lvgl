@@ -15,7 +15,7 @@ To enable logging, set :c:macro:`LV_USE_LOG` in ``lv_conf.h`` and set
 
 - :c:macro:`LV_LOG_LEVEL_TRACE`: A lot of logs to give detailed information
 - :c:macro:`LV_LOG_LEVEL_INFO`: Log important events
-- :c:macro:`LV_LOG_LEVEL_WARN`: Log if something unwanted happened but didn’t cause a problem
+- :c:macro:`LV_LOG_LEVEL_WARN`: Log if something unwanted happened but didn't cause a problem
 - :c:macro:`LV_LOG_LEVEL_ERROR`: Only critical issues, where the system may fail
 - :c:macro:`LV_LOG_LEVEL_USER`: Only user messages
 - :c:macro:`LV_LOG_LEVEL_NONE`: Do not log anything
@@ -36,8 +36,8 @@ If your system supports ``printf``, you just need to enable
 Custom log function
 -------------------
 
-If you can’t use ``printf`` or want to use a custom function to log, you
-can register a “logger” callback with :cpp:func:`lv_log_register_print_cb`.
+If you can't use ``printf`` or want to use a custom function to log, you
+can register a "logger" callback with :cpp:func:`lv_log_register_print_cb`.
 
 For example:
 

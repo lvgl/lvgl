@@ -30,7 +30,7 @@ value is changed by :cpp:func:`lv_spinbox_set_value`, by
 increment/decrement. Only multiples of ten can be set, and not for example 3.
 
 :cpp:expr:`lv_spinbox_set_cursor_pos(spinbox, 1)` sets the cursor to a specific
-digit to change on increment/decrement. For example position ‘0’ sets the cursor to the least significant digit.
+digit to change on increment/decrement. For example position '0' sets the cursor to the least significant digit.
 
 If an encoder is used as input device, the selected digit is shifted to
 the right by default whenever the encoder button is clicked. To change this behaviour to shifting

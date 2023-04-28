@@ -34,7 +34,7 @@ Title and buttons
 Any number of texts (but typically only one) can be added to the header
 with :cpp:expr:`lv_win_add_title(win, "The title")`.
 
-Control buttons can be added to the window’s header with
+Control buttons can be added to the window's header with
 :cpp:expr:`lv_win_add_btn(win, icon, btn_width)`. ``icon`` can be any image
 source, and ``btn_width`` is the width of the button.
 
