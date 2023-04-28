@@ -253,7 +253,7 @@ void lv_img_set_zoom(lv_obj_t * obj, uint16_t zoom)
     lv_coord_t w = lv_obj_get_width(obj);
     lv_coord_t h = lv_obj_get_height(obj);
     lv_area_t a;
-    _lv_img_buf_get_transformed_area(&a, w, h, img->angle, img->zoom >> 8, &img->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, img->angle, img->zoom, &img->pivot);
     a.x1 += obj->coords.x1 - 1;
     a.y1 += obj->coords.y1 - 1;
     a.x2 += obj->coords.x1 + 1;
