@@ -67,7 +67,7 @@ an array for the data points. ``axis`` can have the following values:
 - :cpp:enumerator:`LV_CHART_AXIS_PRIMARY_X` Bottom axis
 - :cpp:enumerator:`LV_CHART_AXIS_SECONDARY_X` Top axis
 
-``axis`` tells which axis's range should be used te scale the values.
+``axis`` tells which axis's range should be used to scale the values.
 
 :cpp:expr:`lv_chart_set_ext_y_array(chart, ser, value_array)` makes the chart
 use an external array for the given series. ``value_array`` should look

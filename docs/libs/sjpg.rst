@@ -10,7 +10,7 @@ Overview
 --------
 
 -  Supports both normal JPG and the custom SJPG formats.
--  Decoding normal JPG consumes RAM with the size fo the whole
+-  Decoding normal JPG consumes RAM with the size of the whole
    uncompressed image (recommended only for devices with more RAM)
 -  SJPG is a custom format based on "normal" JPG and specially made for
    LVGL.
@@ -24,7 +24,7 @@ Overview
 -  By default the sjpg image cache will be image width \* 2 \* 16 bytes
    (can be modified)
 -  Currently only 16 bit image format is supported (TODO)
--  Only the required partion of the JPG and SJPG images are decoded,
+-  Only the required portion of the JPG and SJPG images are decoded,
    therefore they can't be zoomed or rotated.
 
 Usage

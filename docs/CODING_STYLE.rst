@@ -122,7 +122,7 @@ pre-commit
 ----------
 
 `pre-commit <https://pre-commit.com/>`__ is a multi-language package
-manager for pre-commit hooks. See the `instalation
+manager for pre-commit hooks. See the `installation
 guide <https://pre-commit.com/#installation>`__ to get pre-commit python
 package installed into your development machine.
 

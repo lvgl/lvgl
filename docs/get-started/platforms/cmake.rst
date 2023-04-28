@@ -70,7 +70,7 @@ Besides :c:macro:`LV_CONF_PATH` there are few additional CMake options available
 Include paths options
 ---------------------
 
--  :c:macro:`LV_LVGL_H_INCLUDE_SIMPLE`: which specifies whether to ``#include "lvgl.h"`` absolut or relative
+-  :c:macro:`LV_LVGL_H_INCLUDE_SIMPLE`: which specifies whether to ``#include "lvgl.h"`` absolute or relative
 
    ============ ==============
    ON (default) OFF
@@ -78,7 +78,7 @@ Include paths options
    "lvgl.h"     "../../lvgl.h"
    ============ ==============
 
--  :c:macro:`LV_CONF_INCLUDE_SIMPLE`: which specifies whether to ``#include "lv_conf.h"`` and ``"lv_drv_conf.h"`` absolut or relative
+-  :c:macro:`LV_CONF_INCLUDE_SIMPLE`: which specifies whether to ``#include "lv_conf.h"`` and ``"lv_drv_conf.h"`` absolute or relative
 
    =============== =====================
    ON (default)    OFF

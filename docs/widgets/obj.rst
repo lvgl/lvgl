@@ -81,7 +81,7 @@ To get a specific child of a parent use :cpp:expr:`lv_obj_get_child(parent, idx)
 - ``1`` get the child created second
 - ``-1`` get the child created last
 
-The children can be iterated lke this:
+The children can be iterated like this:
 
 .. code:: c
 

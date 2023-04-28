@@ -2347,7 +2347,7 @@ Ext. draw No
 border_width
 ~~~~~~~~~~~~
 
-Set hte width of the border. Only pixel values can be used.
+Set the width of the border. Only pixel values can be used.
 
 .. raw:: html
 
@@ -3456,7 +3456,7 @@ Ext. draw No
 line_color
 ~~~~~~~~~~
 
-Set the color fo the lines.
+Set the color of the lines.
 
 .. raw:: html
 

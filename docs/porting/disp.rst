@@ -55,14 +55,14 @@ Draw buffers
 The draw buffers can be set with
 :cpp:expr:`lv_disp_set_draw_buffers(disp, buf1, buf2, buf_size_px, render_mode)`
 
--  ``buf1`` a bufer where LVGL can render
+-  ``buf1`` a buffer where LVGL can render
 -  ``buf2`` a second optional buffer (see more details below)
 -  ``buf_size_byte`` size of the buffer(s) in bytes
 -  ``render_mode``
 
    -  :cpp:enumerator:`LV_DISP_RENDER_MODE_PARTIAL` Use the buffer(s) to render the
       screen is smaller parts. This way the buffers can be smaller then
-      the display to save RAM. At least 1/10 sceen size buffer(s) are
+      the display to save RAM. At least 1/10 screen size buffer(s) are
       recommended. In ``flush_cb`` the rendered images needs to be
       copied to the given area of the display.
    -  :cpp:enumerator:`LV_DISP_RENDER_MODE_DIRECT` The buffer(s) has to be screen
@@ -115,7 +115,7 @@ To set the resolution of the display after creation use
 It's not mandatory to use the whole display for LVGL, however in some
 cases the physical resolution is important. For example the touchpad
 still sees the whole resolution and the values needs to be converted to
-the active LVGL display area. So the physical resoltution and the offset
+the active LVGL display area. So the physical resolution and the offset
 of the active area can be set with
 :cpp:expr:`lv_disp_set_physical_res(disp, hor_res, ver_res)` and
 :cpp:expr:`lv_disp_set_offset(disp, x, y)`
@@ -129,7 +129,7 @@ select whether you'd like software rotation or hardware rotation.
 The orientation of the display can be changed with
 ``lv_disp_set_rotation(disp, LV_DISP_ROTATION_0/90/180/270, true/false)``.
 LVGL will swap the horizontal and vertical resolutions internally
-according to the set degree. IF the last paramter is ``true`` LVGL will
+according to the set degree. If the last parameter is ``true`` LVGL will
 rotate the rendered image. If it's ``false`` the display driver should
 rotate the rendered image.
 
@@ -138,7 +138,7 @@ Color format
 
 Set the color format of the display. The default is
 :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` which means LVGL render with the follow
-formats dpeneding on :c:macro:`LV_COLOR_DEPTH`:
+formats depending on :c:macro:`LV_COLOR_DEPTH`:
 
 - :c:macro:`LV_COLOR_DEPTH` ``32``: XRGB8888 (4 bytes/pixel)
 - :c:macro:`LV_COLOR_DEPTH` ``24``: RGB888 (3 bytes/pixel)
@@ -152,7 +152,7 @@ values:
 - :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`: Append an alpha byte to the native format resulting
   in A8L8, ARGB8565, ARGB8888 formats.
 - :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_REVERSE`: Reverse the byte order of the native format. Useful if the
-  rendered image is sent to the disply via SPI and
+  rendered image is sent to the display via SPI and
   the display needs the bytes in the opposite order.
 - :cpp:enumerator:`LV_COLOR_FORMAT_L8`: Lightness only on 8 bit
 - :cpp:enumerator:`LV_COLOR_FORMAT_A8`: Alpha only on 8 bit
@@ -165,20 +165,20 @@ values:
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB4444`: 4 bit for each channel
 - :cpp:enumerator:`LV_COLOR_FORMAT_RGB888`: 8 bit for each color channel with out alpha channel
 - :cpp:enumerator:`LV_COLOR_FORMAT_ARGB8888`: 8 bit for each channel
-- :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`: 8 bit for each color channel and 8 bit placholder for the alpha cannel
+- :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888`: 8 bit for each color channel and 8 bit placeholder for the alpha channel
 
-If the color fotmat is set to non-native ``draw_ctx->buffer_convert``
+If the color format is set to non-native ``draw_ctx->buffer_convert``
 function will be called before calling ``flush_cb`` to convert the
-native color format to the desired, therfore rendering in non-native
-formats has a negative effect on peroformance. Learn more about
+native color format to the desired, therefore rendering in non-native
+formats has a negative effect on performance. Learn more about
 ``draw_ctx`` `here </porting/gpu>`__.
 
 It's very important that draw buffer(s) should be large enough for both
 the native format and the target color format. For example if
 ``LV_COLOR_DEPTH == 16`` and :cpp:enumerator:`LV_COLOR_FORMAT_XRGB8888` is selected
-LVGL will choosoe the larger to figure out how many pixel can be
+LVGL will choose the larger to figure out how many pixel can be
 rendered at once. Therefore with :cpp:enumerator:`LV_DISP_RENDER_MODE_FULL` and the
-larger pixel size needs to choosen.
+larger pixel size needs to be chosen.
 
 :cpp:enumerator:`LV_DISP_RENDER_MODE_DIRECT` supports only the
 :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` format.
@@ -203,9 +203,9 @@ an event handler to a display. The following events are sent:
 
 - :cpp:enumerator:`LV_DISP_EVENT_INVALIDATE_AREA` An area is invalidated (marked for redraw).
   :cpp:expr:`lv_event_get_param(e)` returns a pointer to an :cpp:struct:`lv_area_t`
-  varaible with the coordinates of the area to be invalidated. The ara can
-  be freely modified is needed to adopt it the specialrequirement of the
-  display. Usually needed with monoschrome displays to invalidate Nx8
+  variable with the coordinates of the area to be invalidated. The area can
+  be freely modified is needed to adopt it the special requirement of the
+  display. Usually needed with monochrome displays to invalidate Nx8
   lines at once.
 - :cpp:enumerator:`LV_DISP_EVENT_RENDER_START`: Called when rendering starts.
 - :cpp:enumerator:`LV_DISP_EVENT_RENDER_READY`: Called when rendering is ready
