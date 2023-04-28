@@ -371,6 +371,7 @@ menu "LVGL configuration"
 		menu "Others"
 			config LV_USE_PERF_MONITOR
 				bool "Show CPU usage and FPS count."
+				depends on LV_USE_MONITOR
 
 			choice
 				prompt "Performance monitor position."
@@ -400,6 +401,7 @@ menu "LVGL configuration"
 			config LV_USE_MEM_MONITOR
 				bool "Show the used memory and the memory fragmentation."
 				depends on !LV_MEM_CUSTOM
+				depends on LV_USE_MONITOR
 
 			choice
 				prompt "Memory monitor position."
@@ -993,6 +995,10 @@ menu "LVGL configuration"
 		config LV_USE_SNAPSHOT
 			bool "Enable API to take snapshot"
 			default y if !LV_CONF_MINIMAL
+
+		config LV_USE_MONITOR
+			bool "Enable Monitor component"
+			default n
 
 		config LV_USE_MONKEY
 			bool "Enable Monkey test"
