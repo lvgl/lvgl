@@ -40,11 +40,23 @@ extern const lv_obj_class_t lv_monitor_class;
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Create a monitor object (on lv_layer_sys).
+ * @return  pointer to the new monitor object
+ */
 lv_obj_t * lv_monitor_create(void);
 
+/**
+ * Check if a given flag or any of the flags are set on an object.
+ * @param obj   pointer to a monitor object
+ * @param time  monitor refresh interval
+ */
 void lv_monitor_set_refr_time(lv_obj_t * obj, uint32_t time);
 
-void lv_monitor_builtin_init(void);
+/**
+ * Initialize built-in monitors, such as performance and memory monitors.
+ */
+void _lv_monitor_builtin_init(void);
 
 /**********************
  *      MACROS

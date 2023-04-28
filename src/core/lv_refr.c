@@ -67,7 +67,7 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
 void _lv_refr_init(void)
 {
 #if LV_USE_MONITOR
-    lv_monitor_builtin_init();
+    _lv_monitor_builtin_init();
 #endif
 }
 

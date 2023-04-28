@@ -73,7 +73,7 @@ void lv_monitor_set_refr_time(lv_obj_t * obj, uint32_t time)
     lv_timer_set_period(monitor->timer, time);
 }
 
-void lv_monitor_builtin_init(void)
+void _lv_monitor_builtin_init(void)
 {
     lv_async_call(monitor_async_cb, NULL);
 }
