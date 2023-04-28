@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.abspath('./_ext'))
 # from subprocess import PIPE, Popen
 
 # import recommonmark
-from recommonmark.transform import AutoStructify
+# from recommonmark.transform import AutoStructify
 from sphinx.builders.html import StandaloneHTMLBuilder
 
 # -- General configuration ------------------------------------------------
@@ -272,10 +272,10 @@ _, repo_commit_hash = subprocess.getstatusoutput("git rev-parse HEAD")
 # Example configuration for intersphinx: refer to the Python standard library.
 
 def setup(app):
-    app.add_config_value('recommonmark_config', {
-            'enable_eval_rst': True,
-            'enable_auto_toc_tree': 'True',
-            }, True)
-    app.add_transform(AutoStructify)
+    # app.add_config_value('recommonmark_config', {
+    #         'enable_eval_rst': True,
+    #         'enable_auto_toc_tree': 'True',
+    #         }, True)
+    # app.add_transform(AutoStructify)
     app.add_css_file('css/custom.css')
     app.add_css_file('css/fontawesome.min.css')
