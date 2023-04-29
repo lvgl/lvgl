@@ -57,7 +57,7 @@ jobs:
       - name: Build examples (with cache)
         run: scripts/build_html_examples.sh
       - name: Build docs
-        run: docs/build.py
+        run: docs/build.py skip_latex
       - name: Remove .doctrees
         run: rm -rf out_html/.doctrees
       - name: Retrieve version
