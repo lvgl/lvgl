@@ -207,16 +207,18 @@ def get_version():
     major, d = d.split('\n', 1)
     d = d.split('#define LVGL_VERSION_MINOR', 1)[-1]
     minor, d = d.split('\n', 1)
-    d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
-    patch, d = d.split('\n', 1)
+    # d = d.split('#define LVGL_VERSION_PATCH', 1)[-1]
+    # patch, d = d.split('\n', 1)
 
-    ver = '{0}.{1}.{2}'.format(major.strip(), minor.strip(), patch.strip())
+    ver = '{0}.{1}'.format(major.strip(), minor.strip())
 
-    if '#define LVGL_VERSION_INFO' in d:
-        d = d.split('#define LVGL_VERSION_INFO', 1)[-1]
-        info, d = d.split('\n', 1)
-        info = info.strip().replace('"', '')
-        ver += '-' + info
+    # ver = '{0}.{1}.{2}'.format(major.strip(), minor.strip(), patch.strip())
+
+    # if '#define LVGL_VERSION_INFO' in d:
+    #     d = d.split('#define LVGL_VERSION_INFO', 1)[-1]
+    #     info, d = d.split('\n', 1)
+    #     info = info.strip().replace('"', '')
+    #     ver += '-' + info
 
     return ver
 
