@@ -74,7 +74,7 @@ void lv_msg_unsubscribe(void * s);
 /**
  * Send a message with a given ID and payload
  * @param msg_id        ID of the message to send
- * @param data          pointer to the data to send
+ * @param payload          pointer to the data to send
  */
 void lv_msg_send(lv_msg_id_t msg_id, const void * payload);
 

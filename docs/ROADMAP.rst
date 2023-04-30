@@ -22,7 +22,7 @@ Naming and API
 Architecture
 ~~~~~~~~~~~~
 
-- [x] Consider merging `lv_disp_drv_t`, `lv_disp_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`s from the new driver API (or only some of them)
+- [x] Consider merging `lv_disp_drv_t`, `lv_disp_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t`, and `struct`'s from the new driver API (or only some of them)
 - [x] New driver architecture #2720
 - [x] `draw_ctx->buffer_convert`? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1147954592).  Also remove 16 SWAPPED color format? See [here](https://github.com/lvgl/lvgl/issues/3379#issuecomment-1140886258).
 - [ ] `lv_img_set_src()` use "type-aware" parameter and rework image decoders. See [here](https://github.com/lvgl/lvgl/tree/arch/img-decode-rework)

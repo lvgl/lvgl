@@ -59,7 +59,7 @@ extern "C" {
 /**
  * Fill area, with optional opacity.
  *
- * @param[in/out] dest_buf Destination buffer
+ * @param dest_buf Destination buffer
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] dest_stride Stride of destination buffer in pixels
  * @param[in] color Color
@@ -73,7 +73,7 @@ void lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_
  * By default, image is copied directly, with optional opacity. This function can also
  * rotate the display output buffer to a specified angle (90x step).
  *
- * @param[in/out] dest_buf Destination buffer
+ * @param dest_buf Destination buffer
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] dest_stride Stride of destination buffer in pixels
  * @param[in] src_buf Source buffer
@@ -89,8 +89,7 @@ void lv_gpu_nxp_pxp_blit(lv_color_t * dest_buf, const lv_area_t * dest_area, lv_
 /**
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
  *
- *
- * @param[in/out] dest_buf Destination buffer
+ * @param dest_buf Destination buffer
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] dest_stride Stride of destination buffer in pixels
  * @param[in] src_buf Source buffer

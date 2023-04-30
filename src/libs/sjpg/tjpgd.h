@@ -44,8 +44,8 @@ typedef struct {
 } JRECT;
 
 /* Decompressor object structure */
-typedef struct JDEC JDEC;
-struct JDEC {
+typedef struct _JDEC JDEC;
+struct _JDEC {
     size_t dctr;                /* Number of bytes available in the input buffer */
     uint8_t * dptr;             /* Current data read ptr */
     uint8_t * inbuf;            /* Bit stream input buffer */
