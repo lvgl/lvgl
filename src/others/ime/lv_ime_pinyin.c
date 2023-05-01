@@ -778,11 +778,14 @@ static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
         if(ta == NULL) return;
 
         uint32_t id = lv_btnmatrix_get_selected_btn(cand_panel);
-        if(id == 0) {
+        if(id == LV_BTNMATRIX_BTN_NONE) {
+            return;
+        }
+        else if(id == 0) {
             pinyin_page_proc(obj, 0);
             return;
         }
-        if(id == (LV_IME_PINYIN_CAND_TEXT_NUM + 1)) {
+        else if(id == (LV_IME_PINYIN_CAND_TEXT_NUM + 1)) {
             pinyin_page_proc(obj, 1);
             return;
         }
