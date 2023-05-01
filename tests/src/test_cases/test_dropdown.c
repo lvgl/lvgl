@@ -441,5 +441,17 @@ void test_dropdown_should_list_on_top(void)
     TEST_ASSERT_EQUAL_INT(2, lv_obj_get_index(list));
 }
 
+/* See #4191 */
+void test_dropdown_get_options_should_check_lengths(void)
+{
+    lv_obj_t * dd = lv_dropdown_create(lv_scr_act());
+    lv_dropdown_set_options(dd, "abc\nab");
+    TEST_ASSERT_EQUAL_INT(1, lv_dropdown_get_option_index(dd, "ab"));
+
+    lv_dropdown_set_options(dd, "Option 1\nOption 2\nOption 3\nOption");
+    TEST_ASSERT_EQUAL_INT(3, lv_dropdown_get_option_index(dd, "Option"));
+    TEST_ASSERT_EQUAL_INT(-1, lv_dropdown_get_option_index(dd, "Option "));
+}
+
 
 #endif
