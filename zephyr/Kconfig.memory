@@ -83,6 +83,14 @@ config LV_Z_VDB_ALIGN
 	  buffer may be accessed as a uint8_t *, uint16_t *, or uint32_t *,
 	  so buffer must be aligned to prevent unaligned memory access
 
+config LV_Z_VBD_CUSTOM_SECTION
+	bool "Link rendering buffers to custom section"
+	depends on LV_Z_BUFFER_ALLOC_STATIC
+	help
+	  Place LVGL rendering buffers in custom section, with tag ".lvgl_buf".
+	  This can be used by custom linker scripts to relocate the LVGL
+	  rendering buffers to a custom location, such as tightly coupled or
+	  external memory.
 choice
 	prompt "Rendering Buffer Allocation"
 	default LV_Z_BUFFER_ALLOC_STATIC
