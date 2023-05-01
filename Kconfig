@@ -398,6 +398,11 @@ menu "LVGL configuration"
 					bool "Center"
 			endchoice
 
+			config LV_USE_PERF_MONITOR_LOG_MODE
+				bool "Prints performance data using log"
+				depends on LV_USE_PERF_MONITOR
+				default n
+
 			config LV_USE_MEM_MONITOR
 				bool "Show the used memory and the memory fragmentation."
 				depends on !LV_MEM_CUSTOM

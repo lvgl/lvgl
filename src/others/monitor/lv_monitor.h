@@ -41,17 +41,18 @@ extern const lv_obj_class_t lv_monitor_class;
  **********************/
 
 /**
- * Create a monitor object (on lv_layer_sys).
- * @return  pointer to the new monitor object
+ * Create a monitor object.
+ * @param parent pointer to an object, it will be the parent of the new monitor
+ * @return       pointer to the new monitor object
  */
-lv_obj_t * lv_monitor_create(void);
+lv_obj_t * lv_monitor_create(lv_obj_t * parent);
 
 /**
  * Check if a given flag or any of the flags are set on an object.
- * @param obj   pointer to a monitor object
- * @param time  monitor refresh interval
+ * @param obj     pointer to a monitor object
+ * @param period  monitor refresh period
  */
-void lv_monitor_set_refr_time(lv_obj_t * obj, uint32_t time);
+void lv_monitor_set_refr_period(lv_obj_t * obj, uint32_t period);
 
 /**
  * Initialize built-in monitors, such as performance and memory monitors.

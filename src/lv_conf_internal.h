@@ -873,11 +873,13 @@
             #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
         #endif
     #endif
-    #ifndef LV_USE_PERF_MONITOR_LOG_MDOE
-        #ifdef CONFIG_LV_USE_PERF_MONITOR_LOG_MDOE
-            #define LV_USE_PERF_MONITOR_LOG_MDOE CONFIG_LV_USE_PERF_MONITOR_LOG_MDOE
+
+    /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
+    #ifndef LV_USE_PERF_MONITOR_LOG_MODE
+        #ifdef CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
+            #define LV_USE_PERF_MONITOR_LOG_MODE CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
         #else
-            #define LV_USE_PERF_MONITOR_LOG_MDOE 0
+            #define LV_USE_PERF_MONITOR_LOG_MODE 0
         #endif
     #endif
 #endif

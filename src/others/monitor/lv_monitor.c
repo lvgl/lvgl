@@ -11,9 +11,6 @@
 
 #if LV_USE_MONITOR
 
-#include "../../misc/lv_assert.h"
-#include LV_COLOR_EXTERN_INCLUDE
-
 /*********************
  *      DEFINES
  *********************/
@@ -64,19 +61,19 @@ const lv_obj_class_t lv_monitor_class = {
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * lv_monitor_create(void)
+lv_obj_t * lv_monitor_create(lv_obj_t * parent)
 {
     LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, lv_layer_sys());
+    lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
     return obj;
 }
 
-void lv_monitor_set_refr_time(lv_obj_t * obj, uint32_t time)
+void lv_monitor_set_refr_period(lv_obj_t * obj, uint32_t period)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_monitor_t * monitor = (lv_monitor_t *)obj;
-    lv_timer_set_period(monitor->timer, time);
+    lv_timer_set_period(monitor->timer, period);
 }
 
 void _lv_monitor_builtin_init(void)
@@ -132,7 +129,7 @@ static void perf_monitor_event_cb(lv_event_t * e)
     uint32_t cpu = 100 - lv_timer_get_idle();
     uint32_t avg_time = info->frame_cnt ? info->elaps_sum / info->frame_cnt : 0;
 
-#if LV_USE_PERF_MONITOR_LOG_MDOE
+#if LV_USE_PERF_MONITOR_LOG_MODE
     LV_LOG("Performance: %" LV_PRIu32" FPS / %" LV_PRIu32" ms / %" LV_PRIu32 "%% CPU\n",
            info->frame_cnt,
            avg_time,
@@ -145,28 +142,25 @@ static void perf_monitor_event_cb(lv_event_t * e)
         avg_time,
         cpu
     );
-#endif /*LV_USE_PERF_MONITOR_LOG_MDOE*/
+#endif /*LV_USE_PERF_MONITOR_LOG_MODE*/
     info->elaps_sum = 0;
     info->frame_cnt = 0;
 }
 
 static void perf_monitor_init(void)
 {
-    perf_info_t * info = lv_malloc(sizeof(perf_info_t));
-    LV_ASSERT_MALLOC(info);
+    static perf_info_t info = { 0 };
+    info.disp = lv_disp_get_default();
 
-    lv_memzero(info, sizeof(perf_info_t));
-    info->disp = lv_disp_get_default();
-
-    lv_obj_t * monitor = lv_monitor_create();
-    lv_monitor_set_refr_time(monitor, 1000);
+    lv_obj_t * monitor = lv_monitor_create(lv_layer_sys());
+    lv_monitor_set_refr_period(monitor, 1000);
     lv_obj_align(monitor, LV_USE_PERF_MONITOR_POS, 0, 0);
     lv_obj_set_style_text_align(monitor, LV_TEXT_ALIGN_RIGHT, 0);
-    lv_obj_set_user_data(monitor, info);
+    lv_obj_set_user_data(monitor, &info);
     lv_obj_add_event(monitor, perf_monitor_event_cb, LV_EVENT_REFRESH, NULL);
-    lv_disp_add_event(info->disp, perf_monitor_refr_finish_cb, LV_EVENT_REFR_FINISH, monitor);
+    lv_disp_add_event(info.disp, perf_monitor_refr_finish_cb, LV_EVENT_REFR_FINISH, monitor);
 
-#if LV_USE_PERF_MONITOR_LOG_MDOE
+#if LV_USE_PERF_MONITOR_LOG_MODE
     /*Reduce rendering performance consumption*/
     lv_obj_add_flag(monitor, LV_OBJ_FLAG_HIDDEN);
 #endif
@@ -191,10 +185,10 @@ static void mem_monitor_event_cb(lv_event_t * e)
 
 static void mem_monitor_init(void)
 {
-    lv_obj_t * monitor = lv_monitor_create();
+    lv_obj_t * monitor = lv_monitor_create(lv_layer_sys());
     lv_obj_add_event(monitor, mem_monitor_event_cb, LV_EVENT_REFRESH, NULL);
     lv_obj_align(monitor, LV_USE_MEM_MONITOR_POS, 0, 0);
-    lv_monitor_set_refr_time(monitor, 300);
+    lv_monitor_set_refr_period(monitor, 300);
 }
 #endif
 
