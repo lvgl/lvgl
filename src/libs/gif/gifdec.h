@@ -6,12 +6,12 @@
 
 #if LV_USE_GIF
 
-typedef struct gd_Palette {
+typedef struct _gd_Palette {
     int size;
     uint8_t colors[0x100 * 3];
 } gd_Palette;
 
-typedef struct gd_GCE {
+typedef struct _gd_GCE {
     uint16_t delay;
     uint8_t tindex;
     uint8_t disposal;
@@ -21,7 +21,7 @@ typedef struct gd_GCE {
 
 
 
-typedef struct gd_GIF {
+typedef struct _gd_GIF {
     lv_fs_file_t fd;
     const char * data;
     uint8_t is_file;
@@ -34,12 +34,12 @@ typedef struct gd_GIF {
     gd_Palette * palette;
     gd_Palette lct, gct;
     void (*plain_text)(
-        struct gd_GIF * gif, uint16_t tx, uint16_t ty,
+        struct _gd_GIF * gif, uint16_t tx, uint16_t ty,
         uint16_t tw, uint16_t th, uint8_t cw, uint8_t ch,
         uint8_t fg, uint8_t bg
     );
-    void (*comment)(struct gd_GIF * gif);
-    void (*application)(struct gd_GIF * gif, char id[8], char auth[3]);
+    void (*comment)(struct _gd_GIF * gif);
+    void (*application)(struct _gd_GIF * gif, char id[8], char auth[3]);
     uint16_t fx, fy, fw, fh;
     uint8_t bgindex;
     uint8_t * canvas, *frame;

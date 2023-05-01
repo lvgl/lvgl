@@ -112,7 +112,7 @@ Built-in colors
 Opacity
 *******
 
-To describe opacity the :cpp:var:`lv_opa_t` type is created from ``uint8_t``.
+To describe opacity the :cpp:type:`lv_opa_t` type is created from ``uint8_t``.
 Some special purpose defines are also introduced:
 
 -  :cpp:enumerator:`LV_OPA_TRANSP` Value: 0, means no opacity making the color
@@ -144,7 +144,7 @@ The following variable types are defined by the color module:
 -  :cpp:type:`lv_color_int_t` ``uint8_t``, ``uint16_t`` or ``uint32_t``
    depending on the color depth setting. Used to build color arrays from
    plain numbers.
--  :cpp:var:`lv_opa_t` A simple ``uint8_t`` type to describe opacity.
+-  :cpp:type:`lv_opa_t` A simple ``uint8_t`` type to describe opacity.
 
 The :cpp:type:`lv_color_t`, :cpp:union:`lv_color1_t`, :cpp:union:`lv_color8_t`, :cpp:class:`lv_color16_t`
 and :cpp:class:`lv_color32_t` types have four fields:

@@ -37,7 +37,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct lv_draw_sdl_context_internals_t;
+struct _lv_draw_sdl_context_internals_t;
 
 typedef struct {
     /**
@@ -50,7 +50,7 @@ typedef struct {
 typedef struct {
     lv_draw_ctx_t base_draw;
     SDL_Renderer * renderer;
-    struct lv_draw_sdl_context_internals_t * internals;
+    struct _lv_draw_sdl_context_internals_t * internals;
 } lv_draw_sdl_ctx_t;
 
 /**********************

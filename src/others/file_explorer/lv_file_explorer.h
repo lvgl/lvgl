@@ -85,6 +85,8 @@ lv_obj_t * lv_file_explorer_create(lv_obj_t * parent);
  * Set file_explorer
  * @param obj   pointer to a label object
  * @param dir   the dir from 'lv_file_explorer_dir_t' enum.
+ * @param path   path
+
  */
 void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir_t dir, const char * path);
 #endif

@@ -83,7 +83,7 @@ lv_obj_t * lv_ime_pinyin_create(lv_obj_t * parent);
 /**
  * Set the keyboard of Pinyin input method.
  * @param obj  pointer to a Pinyin input method object
- * @param dict pointer to a Pinyin input method keyboard
+ * @param kb pointer to a Pinyin input method keyboard
  */
 void lv_ime_pinyin_set_keyboard(lv_obj_t * obj, lv_obj_t * kb);
 

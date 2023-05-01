@@ -32,7 +32,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct lv_draw_sdl_rect_header_t {
+typedef struct _lv_draw_sdl_rect_header_t {
     lv_img_header_t base;
     SDL_Rect rect;
 } lv_draw_sdl_rect_header_t;

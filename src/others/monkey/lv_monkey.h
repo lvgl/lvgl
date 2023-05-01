@@ -32,8 +32,10 @@ typedef struct {
 
     /**< Monkey execution period*/
     struct {
+        //! @cond Doxygen_Suppress
         uint32_t min;
         uint32_t max;
+        //! @endcond
     } period_range;
 
     /**< The range of input value*/

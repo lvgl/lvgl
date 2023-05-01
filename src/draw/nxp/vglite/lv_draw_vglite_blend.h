@@ -71,7 +71,7 @@ lv_res_t lv_gpu_nxp_vglite_fill(const lv_area_t * dest_area, lv_color_t color, l
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
  * By default, image is copied directly, with optional opacity.
  *
- * @param[in/out] dest_buf Destination buffer
+ * @param dest_buf Destination buffer
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] dest_stride Stride of destination buffer in pixels
  * @param[in] src_buf Source buffer
@@ -90,7 +90,7 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_color_t * dest_buf, lv_area_t * dest_area, lv
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
  * By default, image is copied directly, with optional opacity.
  *
- * @param[in/out] dest_buf Destination buffer
+ * @param dest_buf Destination buffer
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] dest_stride Stride of destination buffer in pixels
  * @param[in] src_buf Source buffer

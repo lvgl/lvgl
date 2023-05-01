@@ -122,6 +122,7 @@ shutil.copytree(examples_path, os.path.join(temp_directory, 'examples'))
 with open(os.path.join(temp_directory, 'Doxyfile'), 'rb') as f:
     data = f.read().decode('utf-8')
 
+data = data.replace('#*#*LV_CONF_PATH*#*#', os.path.join(base_path, 'lv_conf.h'))
 data = data.replace('*#*#SRC#*#*', '"{0}"'.format(lvgl_src_path))
 
 with open(os.path.join(temp_directory, 'Doxyfile'), 'wb') as f:

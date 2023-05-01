@@ -301,7 +301,7 @@ Examples
   of :cpp:type:`lv_anim_t` which contains ``user_data`` field, and :cpp:type:`lv_anim_path_cb_t`
   receive :cpp:type:`lv_anim_t` as its first argument.
 - :cpp:func:`lv_imgfont_create` registers ``path_cb`` and receives ``user_data`` as the last
-  argument. The callback :cpp:func:`lv_imgfont_get_path_cb_t` also receives the ``user_data`` as the last argument.
+  argument. The callback :cpp:type:`lv_imgfont_get_path_cb_t` also receives the ``user_data`` as the last argument.
 
 .. _more-information-1:
 

@@ -78,7 +78,7 @@ extern "C" {
 /**
  * Premultiplies and swizzles given LVGL 32bit color to obtain vglite color.
  *
- * @param[in/out] vg_col32 The obtained vglite color
+ * @param vg_col32 The obtained vglite color
  * @param[in] lv_col32 The initial LVGL 32bit color
  * @param[in] opa The opacity to premultiply with
  * @param[in] vg_col_format The format of the resulting vglite color
