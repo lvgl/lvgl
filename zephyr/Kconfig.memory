@@ -66,6 +66,14 @@ config LV_Z_DOUBLE_VDB
 	help
 	  Use two buffers to render and flush data in parallel
 
+config LV_Z_FULL_REFRESH
+	bool "Force full refresh mode"
+	help
+	  Force full refresh of display on update. When combined with
+	  LV_Z_VDB_SIZE, this setting can improve performance for display
+	  controllers that require a framebuffer to be present in system memory,
+	  since the controller can render the LVGL framebuffer directly
+
 choice
 	prompt "Rendering Buffer Allocation"
 	default LV_Z_BUFFER_ALLOC_STATIC

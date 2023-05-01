@@ -353,6 +353,10 @@ static int lvgl_init(void)
 	lv_disp_drv_init(&disp_drv);
 	disp_drv.user_data = (void *)&disp_data;
 
+#ifdef CONFIG_LV_Z_FULL_REFRESH
+	disp_drv.full_refresh = 1;
+#endif
+
 	err = lvgl_allocate_rendering_buffers(&disp_drv);
 	if (err != 0) {
 		return err;
