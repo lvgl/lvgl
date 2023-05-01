@@ -13,10 +13,11 @@ extern "C" {
 /*********************
  *    OS OPTIONS
  *********************/
-#define LV_OS_NONE      0
-#define LV_OS_PTHREAD   1
-#define LV_OS_FREERTOS  2
-#define LV_OS_CUSTOM    255
+#define LV_OS_NONE          0
+#define LV_OS_PTHREAD       1
+#define LV_OS_FREERTOS      2
+#define LV_OS_CMSIS_RTOS2   3
+#define LV_OS_CUSTOM        255
 
 /*********************
  *      INCLUDES
@@ -31,6 +32,8 @@ extern "C" {
 #include "lv_pthread.h"
 #elif LV_USE_OS == LV_OS_FREERTOS
 #include "lv_freertos.h"
+#elif LV_USE_OS == LV_OS_CMSIS_RTOS2
+#include "lv_cmsis_rtos2.h"
 #elif LV_USE_OS == LV_OS_CUSTOM
 #include LV_OS_CUSTOM_INCLUDE
 #endif
