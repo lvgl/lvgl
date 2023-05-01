@@ -78,19 +78,6 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p);
  */
 lv_disp_t * _lv_refr_get_disp_refreshing(void);
 
-#if LV_USE_PERF_MONITOR
-/**
- * Reset FPS counter
- */
-void lv_refr_reset_fps_counter(void);
-
-/**
- * Get the average FPS
- * @return the average FPS
- */
-uint32_t lv_refr_get_fps_avg(void);
-#endif
-
 /**
  * Called periodically to handle the refreshing
  * @param timer pointer to the timer itself

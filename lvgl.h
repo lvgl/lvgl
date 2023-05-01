@@ -80,6 +80,7 @@ extern "C" {
 #include "src/others/gridnav/lv_gridnav.h"
 #include "src/others/fragment/lv_fragment.h"
 #include "src/others/imgfont/lv_imgfont.h"
+#include "src/others/monitor/lv_monitor.h"
 #include "src/others/msg/lv_msg.h"
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"

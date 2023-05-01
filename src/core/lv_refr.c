@@ -18,10 +18,7 @@
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
 #include "../others/snapshot/lv_snapshot.h"
-
-#if LV_USE_PERF_MONITOR || LV_USE_MEM_MONITOR
-    #include "../widgets/label/lv_label.h"
-#endif
+#include "../others/monitor/lv_monitor.h"
 
 /*********************
  *      DEFINES
@@ -30,23 +27,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    uint32_t    perf_last_time;
-    uint32_t    elaps_sum;
-    uint32_t    frame_cnt;
-    uint32_t    fps_sum_cnt;
-    uint32_t    fps_sum_all;
-#if LV_USE_LABEL
-    lv_obj_t  * perf_label;
-#endif
-} perf_monitor_t;
-
-typedef struct {
-    uint32_t     mem_last_time;
-#if LV_USE_LABEL
-    lv_obj_t  *  mem_label;
-#endif
-} mem_monitor_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -62,26 +42,11 @@ static uint32_t get_max_row(lv_disp_t * disp, lv_coord_t area_w, lv_coord_t area
 static void draw_buf_flush(lv_disp_t * disp);
 static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
 
-#if LV_USE_PERF_MONITOR
-    static void perf_monitor_init(perf_monitor_t * perf_monitor);
-#endif
-#if LV_USE_MEM_MONITOR
-    static void mem_monitor_init(mem_monitor_t * mem_monitor);
-#endif
-
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint32_t px_num;
+
 static lv_disp_t * disp_refr; /*Display being refreshed*/
-
-#if LV_USE_PERF_MONITOR
-    static perf_monitor_t   perf_monitor;
-#endif
-
-#if LV_USE_MEM_MONITOR
-    static mem_monitor_t    mem_monitor;
-#endif
 
 /**********************
  *      MACROS
@@ -101,11 +66,8 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
  */
 void _lv_refr_init(void)
 {
-#if LV_USE_PERF_MONITOR
-    perf_monitor_init(&perf_monitor);
-#endif
-#if LV_USE_MEM_MONITOR
-    mem_monitor_init(&mem_monitor);
+#if LV_USE_MONITOR
+    _lv_monitor_builtin_init();
 #endif
 }
 
@@ -311,98 +273,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     lv_disp_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
-#if LV_USE_PERF_MONITOR && LV_USE_LABEL
-    volatile uint32_t elaps = lv_tick_elaps(disp_refr->last_render_start_time);
-#endif
     disp_refr->last_render_start_time = start;
-
-#if LV_USE_PERF_MONITOR && LV_USE_LABEL
-    lv_obj_t * perf_label = perf_monitor.perf_label;
-    if(perf_label == NULL) {
-        perf_label = lv_label_create(lv_layer_sys());
-        lv_obj_set_style_bg_opa(perf_label, LV_OPA_50, 0);
-        lv_obj_set_style_bg_color(perf_label, lv_color_black(), 0);
-        lv_obj_set_style_text_color(perf_label, lv_color_white(), 0);
-        lv_obj_set_style_pad_top(perf_label, 3, 0);
-        lv_obj_set_style_pad_bottom(perf_label, 3, 0);
-        lv_obj_set_style_pad_left(perf_label, 3, 0);
-        lv_obj_set_style_pad_right(perf_label, 3, 0);
-        lv_obj_set_style_text_align(perf_label, LV_TEXT_ALIGN_RIGHT, 0);
-        lv_label_set_text(perf_label, "?");
-        lv_obj_align(perf_label, LV_USE_PERF_MONITOR_POS, 0, 0);
-        perf_monitor.perf_label = perf_label;
-    }
-
-    if(lv_tick_elaps(perf_monitor.perf_last_time) < 300) {
-        if(px_num > 5000) {
-            perf_monitor.elaps_sum += elaps;
-            perf_monitor.frame_cnt ++;
-        }
-    }
-    else {
-        perf_monitor.perf_last_time = lv_tick_get();
-        uint32_t fps_limit;
-        uint32_t fps;
-
-        if(disp_refr->refr_timer) {
-            fps_limit = 1000 / disp_refr->refr_timer->period;
-        }
-        else {
-            fps_limit = 1000 / 33;
-        }
-
-        if(perf_monitor.elaps_sum == 0) {
-            perf_monitor.elaps_sum = 1;
-        }
-        if(perf_monitor.frame_cnt == 0) {
-            fps = fps_limit;
-        }
-        else {
-            fps = (1000 * perf_monitor.frame_cnt) / perf_monitor.elaps_sum;
-        }
-        perf_monitor.elaps_sum = 0;
-        perf_monitor.frame_cnt = 0;
-        if(fps > fps_limit) {
-            fps = fps_limit;
-        }
-
-        perf_monitor.fps_sum_all += fps;
-        perf_monitor.fps_sum_cnt ++;
-        uint32_t cpu = 100 - lv_timer_get_idle();
-        lv_label_set_text_fmt(perf_label, "%"LV_PRIu32" FPS\n%"LV_PRIu32"%% CPU", fps, cpu);
-    }
-#endif
-
-#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC && LV_USE_LABEL
-    lv_obj_t * mem_label = mem_monitor.mem_label;
-    if(mem_label == NULL) {
-        mem_label = lv_label_create(lv_layer_sys());
-        lv_obj_set_style_bg_opa(mem_label, LV_OPA_50, 0);
-        lv_obj_set_style_bg_color(mem_label, lv_color_black(), 0);
-        lv_obj_set_style_text_color(mem_label, lv_color_white(), 0);
-        lv_obj_set_style_pad_top(mem_label, 3, 0);
-        lv_obj_set_style_pad_bottom(mem_label, 3, 0);
-        lv_obj_set_style_pad_left(mem_label, 3, 0);
-        lv_obj_set_style_pad_right(mem_label, 3, 0);
-        lv_label_set_text(mem_label, "?");
-        lv_obj_align(mem_label, LV_USE_MEM_MONITOR_POS, 0, 0);
-        mem_monitor.mem_label = mem_label;
-    }
-
-    if(lv_tick_elaps(mem_monitor.mem_last_time) > 300) {
-        mem_monitor.mem_last_time = lv_tick_get();
-        lv_mem_monitor_t mon;
-        lv_mem_monitor(&mon);
-        uint32_t used_size = mon.total_size - mon.free_size;;
-        uint32_t used_kb = used_size / 1024;
-        uint32_t used_kb_tenth = (used_size - (used_kb * 1024)) / 102;
-        lv_label_set_text_fmt(mem_label,
-                              "%"LV_PRIu32 ".%"LV_PRIu32 " kB used (%d %%)\n"
-                              "%d%% frag.",
-                              used_kb, used_kb_tenth, mon.used_pct,
-                              mon.frag_pct);
-    }
-#endif
 
     /*Refresh the screen's layout if required*/
     lv_obj_update_layout(disp_refr->act_scr);
@@ -478,23 +349,6 @@ refr_finish:
     REFR_TRACE("finished");
 }
 
-#if LV_USE_PERF_MONITOR
-void lv_refr_reset_fps_counter(void)
-{
-    perf_monitor.fps_sum_all = 0;
-    perf_monitor.fps_sum_cnt = 0;
-}
-
-uint32_t lv_refr_get_fps_avg(void)
-{
-    if(perf_monitor.fps_sum_cnt == 0) {
-        return 0;
-    }
-    return perf_monitor.fps_sum_all / perf_monitor.fps_sum_cnt;
-}
-#endif
-
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -541,8 +395,6 @@ static void lv_refr_join_area(void)
  */
 static void refr_invalid_areas(void)
 {
-    px_num = 0;
-
     if(disp_refr->inv_p == 0) return;
 
     /*Find the last area which will be drawn*/
@@ -570,7 +422,7 @@ static void refr_invalid_areas(void)
             disp_refr->last_part = 0;
             refr_area(&disp_refr->inv_areas[i]);
 
-            px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
+            lv_area_get_size(&disp_refr->inv_areas[i]);
         }
     }
 
@@ -1237,25 +1089,3 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t *
 
     disp->flush_cb(disp, &offset_area, color_p);
 }
-
-#if LV_USE_PERF_MONITOR
-static void perf_monitor_init(perf_monitor_t * _perf_monitor)
-{
-    LV_ASSERT_NULL(_perf_monitor);
-    _perf_monitor->elaps_sum = 0;
-    _perf_monitor->fps_sum_all = 0;
-    _perf_monitor->fps_sum_cnt = 0;
-    _perf_monitor->frame_cnt = 0;
-    _perf_monitor->perf_last_time = 0;
-    _perf_monitor->perf_label = NULL;
-}
-#endif
-
-#if LV_USE_MEM_MONITOR
-static void mem_monitor_init(mem_monitor_t * _mem_monitor)
-{
-    LV_ASSERT_NULL(_mem_monitor);
-    _mem_monitor->mem_last_time = 0;
-    _mem_monitor->mem_label = NULL;
-}
-#endif
