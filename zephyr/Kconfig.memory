@@ -74,6 +74,15 @@ config LV_Z_FULL_REFRESH
 	  controllers that require a framebuffer to be present in system memory,
 	  since the controller can render the LVGL framebuffer directly
 
+config LV_Z_VDB_ALIGN
+	int "Rending buffer alignment"
+	default 4
+	depends on LV_Z_BUFFER_ALLOC_STATIC
+	help
+	  Rendering buffer alignment. Depending on chosen color depth,
+	  buffer may be accessed as a uint8_t *, uint16_t *, or uint32_t *,
+	  so buffer must be aligned to prevent unaligned memory access
+
 choice
 	prompt "Rendering Buffer Allocation"
 	default LV_Z_BUFFER_ALLOC_STATIC
