@@ -774,6 +774,9 @@ static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     if(code == LV_EVENT_VALUE_CHANGED) {
+        lv_obj_t * ta = lv_keyboard_get_textarea(pinyin_ime->kb);
+        if(ta == NULL) return;
+
         uint32_t id = lv_btnmatrix_get_selected_btn(cand_panel);
         if(id == 0) {
             pinyin_page_proc(obj, 0);
@@ -785,7 +788,6 @@ static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
         }
 
         const char * txt = lv_btnmatrix_get_btn_text(cand_panel, id);
-        lv_obj_t * ta = lv_keyboard_get_textarea(pinyin_ime->kb);
         uint16_t index = 0;
         for(index = 0; index < pinyin_ime->ta_count; index++)
             lv_textarea_del_char(ta);
