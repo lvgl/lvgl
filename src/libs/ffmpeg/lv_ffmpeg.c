@@ -666,7 +666,7 @@ static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx)
 
 struct ffmpeg_context_s * ffmpeg_open_file(const char * path)
 {
-    if(path == NULL || strlen(path) == 0) {
+    if(path == NULL || lv_strlen(path) == 0) {
         LV_LOG_ERROR("file path is empty");
         return NULL;
     }

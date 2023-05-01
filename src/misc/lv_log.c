@@ -12,6 +12,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include "lv_printf.h"
+#include "lv_mem.h"
 #include "../hal/lv_hal_tick.h"
 
 #if LV_LOG_PRINTF
@@ -85,7 +86,7 @@ void _lv_log_add(lv_log_level_t level, const char * file, int line, const char *
 
         /*Use only the file name not the path*/
         size_t p;
-        for(p = strlen(file); p > 0; p--) {
+        for(p = lv_strlen(file); p > 0; p--) {
             if(file[p] == '/' || file[p] == '\\') {
                 p++;    /*Skip the slash*/
                 break;

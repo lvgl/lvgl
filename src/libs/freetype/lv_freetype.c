@@ -174,7 +174,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16
         lv_free(dsc);
         return NULL;
     }
-    strcpy(dsc->pathname, pathname);
+    lv_strcpy(dsc->pathname, pathname);
 
     dsc->size = size;
     dsc->style = style;

@@ -130,7 +130,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
         char * opt_extra = lv_malloc(opt_len * roller->inf_page_cnt);
         uint8_t i;
         for(i = 0; i < roller->inf_page_cnt; i++) {
-            lv_strncpy(&opt_extra[opt_len * i], options, opt_len);
+            lv_strcpy(&opt_extra[opt_len * i], options);
             opt_extra[opt_len * (i + 1) - 1] = '\n';
         }
         opt_extra[opt_len * roller->inf_page_cnt - 1] = '\0';
