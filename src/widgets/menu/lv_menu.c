@@ -400,7 +400,7 @@ void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
         if(page->title == NULL) {
             return;
         }
-        lv_strncpy(page->title, title, len);
+        lv_strcpy(page->title, title);
     }
     else {
         page->title        = NULL;

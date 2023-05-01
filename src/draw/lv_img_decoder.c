@@ -111,14 +111,14 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     dsc->frame_id = frame_id;
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
-        size_t fnlen = strlen(src);
+        size_t fnlen = lv_strlen(src);
         dsc->src = lv_malloc(fnlen + 1);
         LV_ASSERT_MALLOC(dsc->src);
         if(dsc->src == NULL) {
             LV_LOG_WARN("out of memory");
             return LV_RES_INV;
         }
-        strcpy((char *)dsc->src, src);
+        lv_strcpy((char *)dsc->src, src);
     }
     else {
         dsc->src = src;

@@ -87,7 +87,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
 #if LV_USE_ARABIC_PERSIAN_CHARS
         _lv_txt_ap_proc(txt, cb->txt);
 #else
-        lv_strncpy(cb->txt, txt, len);
+        lv_strcpy(cb->txt, txt);
 #endif
 
         cb->static_txt = 0;

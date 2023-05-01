@@ -164,7 +164,7 @@ void lv_span_set_text(lv_span_t * span, const char * text)
     if(span->txt == NULL) return;
 
     span->static_flag = 0;
-    lv_strncpy(span->txt, text, text_alloc_len);
+    lv_strcpy(span->txt, text);
 
     refresh_self_size(span->spangroup);
 }

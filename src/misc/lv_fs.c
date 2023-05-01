@@ -445,7 +445,7 @@ char * lv_fs_get_letters(char * buf)
 const char * lv_fs_get_ext(const char * fn)
 {
     size_t i;
-    for(i = strlen(fn); i > 0; i--) {
+    for(i = lv_strlen(fn); i > 0; i--) {
         if(fn[i] == '.') {
             return &fn[i + 1];
         }
@@ -459,7 +459,7 @@ const char * lv_fs_get_ext(const char * fn)
 
 char * lv_fs_up(char * path)
 {
-    size_t len = strlen(path);
+    size_t len = lv_strlen(path);
     if(len == 0) return path;
 
     len--; /*Go before the trailing '\0'*/
@@ -485,7 +485,7 @@ char * lv_fs_up(char * path)
 
 const char * lv_fs_get_last(const char * path)
 {
-    size_t len = strlen(path);
+    size_t len = lv_strlen(path);
     if(len == 0) return path;
 
     len--; /*Go before the trailing '\0'*/

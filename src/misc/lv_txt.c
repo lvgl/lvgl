@@ -420,8 +420,8 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 {
     if(txt_buf == NULL || ins_txt == NULL) return;
 
-    size_t old_len = strlen(txt_buf);
-    size_t ins_len = strlen(ins_txt);
+    size_t old_len = lv_strlen(txt_buf);
+    size_t ins_len = lv_strlen(ins_txt);
     if(ins_len == 0) return;
 
     size_t new_len = ins_len + old_len;
@@ -441,7 +441,7 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 {
     if(txt == NULL) return;
 
-    size_t old_len = strlen(txt);
+    size_t old_len = lv_strlen(txt);
 
     pos = _lv_txt_encoded_get_byte_id(txt, pos); /*Convert to byte index instead of letter index*/
     len = _lv_txt_encoded_get_byte_id(&txt[pos], len);
@@ -861,7 +861,7 @@ static uint32_t lv_txt_iso8859_1_get_char_id(const char * txt, uint32_t byte_id)
  */
 static uint32_t lv_txt_iso8859_1_get_length(const char * txt)
 {
-    return strlen(txt);
+    return lv_strlen(txt);
 }
 #else
 

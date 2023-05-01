@@ -81,7 +81,7 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
     lv_file_explorer_t * explorer = (lv_file_explorer_t *)obj;
 
     /*If path is unavailable */
-    if((path == NULL) || (strlen(path) <= 0)) return;
+    if((path == NULL) || (lv_strlen(path) <= 0)) return;
 
     char ** dir_str = NULL;
     switch(dir) {
@@ -116,14 +116,14 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
     }
 
     /*Get the size of the text*/
-    size_t len = strlen(path) + 1;
+    size_t len = lv_strlen(path) + 1;
 
     /*Allocate space for the new text*/
     *dir_str = lv_malloc(len);
     LV_ASSERT_MALLOC(*dir_str);
     if(*dir_str == NULL) return;
 
-    strcpy(*dir_str, path);
+    lv_strcpy(*dir_str, path);
 }
 
 #endif
@@ -498,7 +498,7 @@ static void browser_file_event_handler(lv_event_t * e)
         str_fn = str_fn + 5;
         if((strcmp(str_fn, ".") == 0))  return;
 
-        if((strcmp(str_fn, "..") == 0) && (strlen(explorer->current_path) > 3)) {
+        if((strcmp(str_fn, "..") == 0) && (lv_strlen(explorer->current_path) > 3)) {
             strip_ext(explorer->current_path);
             /*Remove the last '/' character*/
             strip_ext(explorer->current_path);
@@ -559,7 +559,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
         }
 
         /*fn is empty, if not more files to read*/
-        if(strlen(fn) == 0) {
+        if(lv_strlen(fn) == 0) {
             LV_LOG_USER("Not more files to read!");
             break;
         }
@@ -605,10 +605,10 @@ static void show_dir(lv_obj_t * obj, const char * path)
     lv_obj_scroll_to_y(explorer->file_table, 0, LV_ANIM_OFF);
 
     lv_memzero(explorer->current_path, sizeof(explorer->current_path));
-    strcpy(explorer->current_path, path);
+    lv_strncpy(explorer->current_path, path, sizeof(explorer->current_path) - 1);
     lv_label_set_text_fmt(explorer->path_label, LV_SYMBOL_EYE_OPEN" %s", path);
 
-    size_t current_path_len = strlen(explorer->current_path);
+    size_t current_path_len = lv_strlen(explorer->current_path);
     if((*((explorer->current_path) + current_path_len) != '/') && (current_path_len < LV_FILE_EXPLORER_PATH_MAX_LEN)) {
         *((explorer->current_path) + current_path_len) = '/';
     }
@@ -618,7 +618,7 @@ static void show_dir(lv_obj_t * obj, const char * path)
 /*Remove the specified suffix*/
 static void strip_ext(char * dir)
 {
-    char * end = dir + strlen(dir);
+    char * end = dir + lv_strlen(dir);
 
     while(end >= dir && *end != '/') {
         --end;
@@ -698,8 +698,8 @@ static bool is_end_with(const char * str1, const char * str2)
     if(str1 == NULL || str2 == NULL)
         return false;
 
-    uint16_t len1 = strlen(str1);
-    uint16_t len2 = strlen(str2);
+    uint16_t len1 = lv_strlen(str1);
+    uint16_t len2 = lv_strlen(str2);
     if((len1 < len2) || (len1 == 0 || len2 == 0))
         return false;
 

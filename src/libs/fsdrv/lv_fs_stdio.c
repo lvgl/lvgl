@@ -240,7 +240,7 @@ static void * fs_dir_open(lv_fs_drv_t * drv, const char * path)
     char buf[MAX_PATH_LEN];
     lv_snprintf(buf, sizeof(buf), LV_FS_STDIO_PATH "%s\\*", path);
 
-    strcpy(handle->next_fn, "");
+    lv_strcpy(handle->next_fn, "");
     handle->dir_p = FindFirstFileA(buf, &fdata);
     do {
         if(strcmp(fdata.cFileName, ".") == 0 || strcmp(fdata.cFileName, "..") == 0) {
@@ -283,16 +283,16 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
         entry = readdir(handle->dir_p);
         if(entry) {
             if(entry->d_type == DT_DIR) sprintf(fn, "/%s", entry->d_name);
-            else strcpy(fn, entry->d_name);
+            else lv_strcpy(fn, entry->d_name);
         }
         else {
-            strcpy(fn, "");
+            lv_strcpy(fn, "");
         }
     } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
 #else
-    strcpy(fn, handle->next_fn);
+    lv_strcpy(fn, handle->next_fn);
 
-    strcpy(handle->next_fn, "");
+    lv_strcpy(handle->next_fn, "");
     WIN32_FIND_DATAA fdata;
 
     if(FindNextFileA(handle->dir_p, &fdata) == false) return LV_FS_RES_OK;

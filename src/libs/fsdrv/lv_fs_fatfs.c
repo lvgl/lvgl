@@ -257,9 +257,9 @@ static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn)
 
         if(fno.fattrib & AM_DIR) {
             fn[0] = '/';
-            strcpy(&fn[1], fno.fname);
+            lv_strcpy(&fn[1], fno.fname);
         }
-        else strcpy(fn, fno.fname);
+        else lv_strcpy(fn, fno.fname);
 
     } while(strcmp(fn, "/.") == 0 || strcmp(fn, "/..") == 0);
 

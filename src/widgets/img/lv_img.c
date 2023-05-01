@@ -116,10 +116,10 @@ void lv_img_set_src(lv_obj_t * obj, const void * src)
             if(img->src_type == LV_IMG_SRC_FILE || img->src_type == LV_IMG_SRC_SYMBOL) {
                 old_src = img->src;
             }
-            char * new_str = lv_malloc(strlen(src) + 1);
+            char * new_str = lv_malloc(lv_strlen(src) + 1);
             LV_ASSERT_MALLOC(new_str);
             if(new_str == NULL) return;
-            strcpy(new_str, src);
+            lv_strcpy(new_str, src);
             img->src = new_str;
 
             if(old_src) lv_free((void *)old_src);

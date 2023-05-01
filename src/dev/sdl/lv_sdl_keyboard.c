@@ -68,7 +68,7 @@ static void sdl_keyboard_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     lv_sdl_keyboard_t * dev = lv_indev_get_driver_data(indev);
 
-    const size_t len = strlen(dev->buf);
+    const size_t len = lv_strlen(dev->buf);
 
     /*Send a release manually*/
     if(dev->dummy_read) {
@@ -121,7 +121,7 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
                 const uint32_t ctrl_key = keycode_to_ctrl_key(event->key.keysym.sym);
                 if(ctrl_key == '\0')
                     return;
-                const size_t len = strlen(dsc->buf);
+                const size_t len = lv_strlen(dsc->buf);
                 if(len < KEYBOARD_BUFFER_SIZE - 1) {
                     dsc->buf[len] = ctrl_key;
                     dsc->buf[len + 1] = '\0';
@@ -129,7 +129,7 @@ void _lv_sdl_keyboard_handler(SDL_Event * event)
                 break;
             }
         case SDL_TEXTINPUT: {                   /*Text input*/
-                const size_t len = strlen(dsc->buf) + strlen(event->text.text);
+                const size_t len = lv_strlen(dsc->buf) + lv_strlen(event->text.text);
                 if(len < KEYBOARD_BUFFER_SIZE - 1)
                     strcat(dsc->buf, event->text.text);
             }
