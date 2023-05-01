@@ -434,9 +434,6 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(c == LV_KEY_DOWN) {
             lv_spinbox_decrement(obj);
         }
-        else {
-            lv_textarea_add_char(obj, c);
-        }
     }
 }
 
