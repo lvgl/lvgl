@@ -7,7 +7,6 @@
 #define LV_LOG_PRINTF           1
 #define LV_USE_FONT_SUBPX       1
 #define LV_FONT_SUBPX_BGR       1
-#define LV_USE_PERF_MONITOR     1
 #define LV_USE_ASSERT_NULL      1
 #define LV_USE_ASSERT_MALLOC    1
 #define LV_USE_ASSERT_MEM_INTEGRITY     1
@@ -72,7 +71,7 @@
 #define LV_USE_MSG          1
 #define LV_USE_FILE_EXPLORER    1
 #define LV_USE_TINY_TTF 1
-
+#define LV_USE_SYSMON   1
 
 #define LV_BUILD_EXAMPLES       1
 #define LV_USE_DEMO_WIDGETS     1

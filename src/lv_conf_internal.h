@@ -857,7 +857,7 @@
  *-----------*/
 
 /*1: Show CPU usage and FPS count
- * Requires `LV_USE_MONITOR = 1`*/
+ * Requires `LV_USE_SYSMON = 1`*/
 #ifndef LV_USE_PERF_MONITOR
     #ifdef CONFIG_LV_USE_PERF_MONITOR
         #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
@@ -873,18 +873,20 @@
             #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
         #endif
     #endif
-    #ifndef LV_USE_PERF_MONITOR_LOG_MDOE
-        #ifdef CONFIG_LV_USE_PERF_MONITOR_LOG_MDOE
-            #define LV_USE_PERF_MONITOR_LOG_MDOE CONFIG_LV_USE_PERF_MONITOR_LOG_MDOE
+
+    /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
+    #ifndef LV_USE_PERF_MONITOR_LOG_MODE
+        #ifdef CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
+            #define LV_USE_PERF_MONITOR_LOG_MODE CONFIG_LV_USE_PERF_MONITOR_LOG_MODE
         #else
-            #define LV_USE_PERF_MONITOR_LOG_MDOE 0
+            #define LV_USE_PERF_MONITOR_LOG_MODE 0
         #endif
     #endif
 #endif
 
 /*1: Show the used memory and the memory fragmentation
  * Requires `LV_USE_BUILTIN_MALLOC = 1`
- * Requires `LV_USE_MONITOR = 1`*/
+ * Requires `LV_USE_SYSMON = 1`*/
 #ifndef LV_USE_MEM_MONITOR
     #ifdef CONFIG_LV_USE_MEM_MONITOR
         #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
@@ -2335,16 +2337,12 @@
     #endif
 #endif
 
-/*1: Enable Monitor component*/
-#ifndef LV_USE_MONITOR
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_MONITOR
-            #define LV_USE_MONITOR CONFIG_LV_USE_MONITOR
-        #else
-            #define LV_USE_MONITOR 0
-        #endif
+/*1: Enable system monitor component*/
+#ifndef LV_USE_SYSMON
+    #ifdef CONFIG_LV_USE_SYSMON
+        #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
     #else
-        #define LV_USE_MONITOR 1
+        #define LV_USE_SYSMON 0
     #endif
 #endif
 

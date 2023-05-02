@@ -12,13 +12,10 @@
 #include "lv_disp_private.h"
 #include "../hal/lv_hal_tick.h"
 #include "../misc/lv_timer.h"
-#include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_gc.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
-#include "../others/snapshot/lv_snapshot.h"
-#include "../others/monitor/lv_monitor.h"
 
 /*********************
  *      DEFINES
@@ -66,9 +63,6 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
  */
 void _lv_refr_init(void)
 {
-#if LV_USE_MONITOR
-    _lv_monitor_builtin_init();
-#endif
 }
 
 void lv_refr_now(lv_disp_t * disp)
@@ -421,8 +415,6 @@ static void refr_invalid_areas(void)
             if(i == last_i) disp_refr->last_area = 1;
             disp_refr->last_part = 0;
             refr_area(&disp_refr->inv_areas[i]);
-
-            lv_area_get_size(&disp_refr->inv_areas[i]);
         }
     }
 
