@@ -698,7 +698,7 @@
 #define LV_USE_SNAPSHOT 0
 
 /*1: Enable system monitor component*/
-#define LV_USE_SYSMON 1
+#define LV_USE_SYSMON 0
 
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0

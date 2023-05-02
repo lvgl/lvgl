@@ -2339,14 +2339,10 @@
 
 /*1: Enable system monitor component*/
 #ifndef LV_USE_SYSMON
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_SYSMON
-            #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
-        #else
-            #define LV_USE_SYSMON 0
-        #endif
+    #ifdef CONFIG_LV_USE_SYSMON
+        #define LV_USE_SYSMON CONFIG_LV_USE_SYSMON
     #else
-        #define LV_USE_SYSMON 1
+        #define LV_USE_SYSMON 0
     #endif
 #endif
 
