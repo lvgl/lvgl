@@ -129,6 +129,10 @@ static void perf_stat_event_cb(lv_event_t * e)
     uint32_t cpu = 100 - lv_timer_get_idle();
     uint32_t avg_time = info->frame_cnt ? info->elaps_sum / info->frame_cnt : 0;
 
+    /*Avoid warning*/
+    LV_UNUSED(cpu);
+    LV_UNUSED(avg_time);
+
 #if LV_USE_PERF_MONITOR_LOG_MODE
     LV_LOG("Performance: %" LV_PRIu32" FPS / %" LV_PRIu32" ms / %" LV_PRIu32 "%% CPU\n",
            info->frame_cnt,
