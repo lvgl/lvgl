@@ -857,7 +857,7 @@
  *-----------*/
 
 /*1: Show CPU usage and FPS count
- * Requires `LV_USE_MONITOR = 1`*/
+ * Requires `LV_USE_STAT = 1`*/
 #ifndef LV_USE_PERF_MONITOR
     #ifdef CONFIG_LV_USE_PERF_MONITOR
         #define LV_USE_PERF_MONITOR CONFIG_LV_USE_PERF_MONITOR
@@ -886,7 +886,7 @@
 
 /*1: Show the used memory and the memory fragmentation
  * Requires `LV_USE_BUILTIN_MALLOC = 1`
- * Requires `LV_USE_MONITOR = 1`*/
+ * Requires `LV_USE_STAT = 1`*/
 #ifndef LV_USE_MEM_MONITOR
     #ifdef CONFIG_LV_USE_MEM_MONITOR
         #define LV_USE_MEM_MONITOR CONFIG_LV_USE_MEM_MONITOR
@@ -2337,16 +2337,16 @@
     #endif
 #endif
 
-/*1: Enable Monitor component*/
-#ifndef LV_USE_MONITOR
+/*1: Enable status monitor component*/
+#ifndef LV_USE_STAT
     #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_USE_MONITOR
-            #define LV_USE_MONITOR CONFIG_LV_USE_MONITOR
+        #ifdef CONFIG_LV_USE_STAT
+            #define LV_USE_STAT CONFIG_LV_USE_STAT
         #else
-            #define LV_USE_MONITOR 0
+            #define LV_USE_STAT 0
         #endif
     #else
-        #define LV_USE_MONITOR 1
+        #define LV_USE_STAT 1
     #endif
 #endif
 

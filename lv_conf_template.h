@@ -279,7 +279,7 @@
  *-----------*/
 
 /*1: Show CPU usage and FPS count
- * Requires `LV_USE_MONITOR = 1`*/
+ * Requires `LV_USE_STAT = 1`*/
 #define LV_USE_PERF_MONITOR 0
 #if LV_USE_PERF_MONITOR
     #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
@@ -290,7 +290,7 @@
 
 /*1: Show the used memory and the memory fragmentation
  * Requires `LV_USE_BUILTIN_MALLOC = 1`
- * Requires `LV_USE_MONITOR = 1`*/
+ * Requires `LV_USE_STAT = 1`*/
 #define LV_USE_MEM_MONITOR 0
 #if LV_USE_MEM_MONITOR
     #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
@@ -697,8 +697,8 @@
 /*1: Enable API to take snapshot for object*/
 #define LV_USE_SNAPSHOT 0
 
-/*1: Enable Monitor component*/
-#define LV_USE_MONITOR 1
+/*1: Enable status monitor component*/
+#define LV_USE_STAT 1
 
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0
