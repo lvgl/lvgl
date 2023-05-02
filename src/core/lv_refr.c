@@ -415,8 +415,6 @@ static void refr_invalid_areas(void)
             if(i == last_i) disp_refr->last_area = 1;
             disp_refr->last_part = 0;
             refr_area(&disp_refr->inv_areas[i]);
-
-            lv_area_get_size(&disp_refr->inv_areas[i]);
         }
     }
 
