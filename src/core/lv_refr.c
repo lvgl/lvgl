@@ -18,7 +18,7 @@
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
 #include "../others/snapshot/lv_snapshot.h"
-#include "../others/stat/lv_stat.h"
+#include "../others/metrics/lv_metrics.h"
 
 /*********************
  *      DEFINES
@@ -66,8 +66,8 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
  */
 void _lv_refr_init(void)
 {
-#if LV_USE_STAT
-    _lv_stat_builtin_init();
+#if LV_USE_METRICS
+    _lv_metrics_builtin_init();
 #endif
 }
 

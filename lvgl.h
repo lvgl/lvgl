@@ -76,6 +76,7 @@ extern "C" {
 #include "src/widgets/win/lv_win.h"
 
 #include "src/others/snapshot/lv_snapshot.h"
+#include "src/others/metrics/lv_metrics.h"
 #include "src/others/monkey/lv_monkey.h"
 #include "src/others/gridnav/lv_gridnav.h"
 #include "src/others/fragment/lv_fragment.h"
@@ -83,7 +84,6 @@ extern "C" {
 #include "src/others/msg/lv_msg.h"
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
-#include "src/others/stat/lv_stat.h"
 
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bmp/lv_bmp.h"
