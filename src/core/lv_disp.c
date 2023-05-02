@@ -399,8 +399,7 @@ void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32
     disp->render_mode = render_mode;
 }
 
-void lv_disp_set_flush_cb(lv_disp_t * disp, void (*flush_cb)(struct _lv_disp_t * disp, const lv_area_t * area,
-                                                             lv_color_t * color_p))
+void lv_disp_set_flush_cb(lv_disp_t * disp, lv_disp_flush_cb_t flush_cb)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return;
