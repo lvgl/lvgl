@@ -160,6 +160,10 @@ void lv_init(void)
     /*Initialize the screen refresh system*/
     _lv_refr_init();
 
+#if LV_USE_SYSMON
+    _lv_sysmon_builtin_init();
+#endif
+
     _lv_img_decoder_init();
 
     _lv_img_cache_builtin_init();

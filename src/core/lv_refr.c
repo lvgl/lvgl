@@ -12,13 +12,10 @@
 #include "lv_disp_private.h"
 #include "../hal/lv_hal_tick.h"
 #include "../misc/lv_timer.h"
-#include "../misc/lv_mem.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_gc.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
-#include "../others/snapshot/lv_snapshot.h"
-#include "../others/metrics/lv_metrics.h"
 
 /*********************
  *      DEFINES
@@ -66,9 +63,6 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
  */
 void _lv_refr_init(void)
 {
-#if LV_USE_METRICS
-    _lv_metrics_builtin_init();
-#endif
 }
 
 void lv_refr_now(lv_disp_t * disp)

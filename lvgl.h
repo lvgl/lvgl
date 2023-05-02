@@ -76,7 +76,7 @@ extern "C" {
 #include "src/widgets/win/lv_win.h"
 
 #include "src/others/snapshot/lv_snapshot.h"
-#include "src/others/metrics/lv_metrics.h"
+#include "src/others/sysmon/lv_sysmon.h"
 #include "src/others/monkey/lv_monkey.h"
 #include "src/others/gridnav/lv_gridnav.h"
 #include "src/others/fragment/lv_fragment.h"
