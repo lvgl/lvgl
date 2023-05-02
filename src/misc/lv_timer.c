@@ -311,9 +311,15 @@ static bool lv_timer_exec(lv_timer_t * timer)
         if(timer->repeat_count > 0) timer->repeat_count--;
         timer->last_run = lv_tick_get();
         TIMER_TRACE("calling timer callback: %p", *((void **)&timer->timer_cb));
+
         if(timer->timer_cb && original_repeat_count != 0) timer->timer_cb(timer);
-        if(!timer_deleted) TIMER_TRACE("timer callback %p finished", *((void **)&timer->timer_cb));
-        else TIMER_TRACE("timer callback finished");
+
+        if(!timer_deleted) {
+            TIMER_TRACE("timer callback %p finished", *((void **)&timer->timer_cb));
+        }
+        else {
+            TIMER_TRACE("timer callback finished");
+        }
 
         LV_ASSERT_MEM_INTEGRITY();
         exec = true;
