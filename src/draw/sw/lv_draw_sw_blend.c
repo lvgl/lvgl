@@ -430,7 +430,7 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
 
     /*Set the result color*/
 #if LV_COLOR_DEPTH == 8
-    buf[0] = res_color.full;
+    buf[0] = last_res_color.full;
 #elif LV_COLOR_DEPTH == 16
     buf[0] = last_res_color.full & 0xff;
     buf[1] = last_res_color.full >> 8;
