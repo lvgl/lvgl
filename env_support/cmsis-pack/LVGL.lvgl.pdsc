@@ -36,8 +36,9 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-04-28" version="8.3.7-dev1" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.7-dev1.pack">
-      - LVGL 8.3.7 dev
+    <release date="2023-04-28" version="8.3.7" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.7.pack">
+      - LVGL 8.3.7
+      - Minor updates
     </release>
     <release date="2023-04-02" version="8.3.6" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
       - LVGL 8.3.6 release
@@ -269,7 +270,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.7-dev">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.7">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
@@ -446,7 +447,7 @@
               </files>
             </component>
 
-            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-GPU-Arm-2D" Cversion="1.2.1">
+            <component Cgroup="lvgl" Csub="GPU Arm-2D"  condition="LVGL-GPU-Arm-2D" Cversion="1.2.2">
               <description>A 2D image processing library from Arm (i.e. Arm-2D) for All Cortex-M processors including Cortex-M0</description>
               <files>
               <file category="sourceC"      name="src/draw/arm2d/lv_gpu_arm2d.c" condition="Arm-2D"/>
