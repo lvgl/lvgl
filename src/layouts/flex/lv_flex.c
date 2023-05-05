@@ -372,8 +372,12 @@ static int32_t find_track_end(lv_obj_t * cont, flex_t * f, int32_t item_start_id
                 t->track_fix_main_size += item_size + item_gap;
             }
 
-
-            t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
+            if(f->wrap) {
+                t->track_cross_size = LV_MAX(get_cross_size(item), t->track_cross_size);
+            }
+            else {
+                t->track_cross_size = f->row ? lv_obj_get_height(item->parent) : lv_obj_get_width(item->parent);
+            }
             t->item_cnt++;
         }
 
