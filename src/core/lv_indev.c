@@ -1173,7 +1173,8 @@ static void indev_proc_release(lv_indev_t * indev)
             lv_obj_t * parent = scroll_obj;
             while(parent) {
                 angle += lv_obj_get_style_transform_angle(parent, 0);
-                zoom *= (lv_obj_get_style_transform_zoom(parent, 0) / 256);
+                int32_t zoom_act = lv_obj_get_style_transform_zoom_safe(parent, 0);
+                zoom = (zoom * zoom_act) >> 8;
                 parent = lv_obj_get_parent(parent);
             }
 
