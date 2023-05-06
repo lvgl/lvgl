@@ -700,6 +700,12 @@
 /*1: Enable system monitor component*/
 #define LV_USE_SYSMON 0
 
+/*1: Enable custom trace system*/
+#define LV_USE_TRACE 0
+#if LV_USE_TRACE
+#define LV_TRACE_INCLUDE <stdint.h>
+#endif
+
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0
 

@@ -2346,6 +2346,24 @@
     #endif
 #endif
 
+/*1: Enable custom trace system*/
+#ifndef LV_USE_TRACE
+    #ifdef CONFIG_LV_USE_TRACE
+        #define LV_USE_TRACE CONFIG_LV_USE_TRACE
+    #else
+        #define LV_USE_TRACE 0
+    #endif
+#endif
+#if LV_USE_TRACE
+#ifndef LV_TRACE_INCLUDE
+    #ifdef CONFIG_LV_TRACE_INCLUDE
+        #define LV_TRACE_INCLUDE CONFIG_LV_TRACE_INCLUDE
+    #else
+        #define LV_TRACE_INCLUDE <stdint.h>
+    #endif
+#endif
+#endif
+
 /*1: Enable Monkey test*/
 #ifndef LV_USE_MONKEY
     #ifdef CONFIG_LV_USE_MONKEY

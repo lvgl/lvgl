@@ -16,6 +16,7 @@
 #include "../misc/lv_gc.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
+#include "../others/trace/lv_trace.h"
 
 /*********************
  *      DEFINES
@@ -231,6 +232,7 @@ lv_disp_t * _lv_refr_get_disp_refreshing(void)
  */
 void _lv_disp_refr_timer(lv_timer_t * tmr)
 {
+    LV_TRACE_BEGIN;
     REFR_TRACE("begin");
 
     uint32_t start = lv_tick_get();
@@ -341,6 +343,7 @@ refr_finish:
     lv_disp_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
 
     REFR_TRACE("finished");
+    LV_TRACE_END;
 }
 
 /**********************
