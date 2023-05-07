@@ -37,4 +37,3 @@ Example
 API
 ---
 
-:ref:`lv_monkey`

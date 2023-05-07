@@ -105,8 +105,7 @@ Learn more
 API
 ---
 
-:ref:`lv_freetype`
-
 :ref:`ftoption`
 
 :ref:`ftmodule`
+

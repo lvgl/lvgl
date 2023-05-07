@@ -12,4 +12,4 @@
 #    changelog-gen v5.7.0
 #    changelog-gen v6.0.0
 
-auto-changelog -t changelog-template.hbs -l false --latest-version $1 --unreleased-only  --tag-pattern ^v[0-9]+.[0-9]+.[0-9]+$ -o CHANGELOG_LAST.md
+auto-changelog -t changelog-template.hbs -l false --latest-version $1 --unreleased-only  --tag-pattern ^v[0-9]+.[0-9]+.[0-9]+$ -o CHANGELOG_LAST.rst

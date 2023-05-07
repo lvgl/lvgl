@@ -22,6 +22,6 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            See the [CHANGELOG](https://github.com/lvgl/lvgl/blob/master/docs/CHANGELOG.md)
+            See the `CHANGELOG <https://github.com/lvgl/lvgl/blob/master/docs/CHANGELOG.rst>`__
           draft: false
           prerelease: false

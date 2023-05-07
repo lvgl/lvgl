@@ -50,6 +50,5 @@ Example
 API
 ---
 
-:ref:`lv_gif`
-
 :ref:`gifdec`
+

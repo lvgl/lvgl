@@ -296,4 +296,3 @@ Example
 API
 ---
 
-:ref:`lv_file_explorer`

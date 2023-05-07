@@ -42,4 +42,3 @@ Example
 API
 ---
 
-:ref:`lv_bmp`

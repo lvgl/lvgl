@@ -26,6 +26,5 @@ Example
 API
 ---
 
-:ref:`lv_png`
-
 :ref:`lodepng`
+
