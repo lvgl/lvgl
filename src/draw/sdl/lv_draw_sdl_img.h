@@ -35,6 +35,7 @@ extern "C" {
 typedef struct lv_draw_sdl_img_header_t {
     lv_img_header_t base;
     SDL_Rect rect;
+    bool managed;
 } lv_draw_sdl_img_header_t;
 
 /**********************
@@ -56,9 +57,22 @@ typedef struct lv_draw_sdl_img_header_t {
 /*=====================
  * Other functions
  *====================*/
+/**
+ *
+ * @param ctx Drawing context
+ * @param key Texture cache key
+ * @param key_size Size of texture cache key
+ * @param src Image source pointer
+ * @param frame_id Frame ID for animated image
+ * @param texture Texture for render
+ * @param header Header also holds sdl image info
+ * @param texture_in_cache Whether the texture has been put in the cache. Please note for managed texture,
+ * this will be false too. So you'll need to check header.managed too.
+ * @return Whether the image has been loaded successfully
+ */
 bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key_head_img_t * key, size_t key_size,
                                   const void * src, int32_t frame_id, SDL_Texture ** texture,
-                                  lv_draw_sdl_img_header_t ** header);
+                                  lv_draw_sdl_img_header_t ** header, bool * texture_in_cache);
 /**********************
  *      MACROS
  **********************/
