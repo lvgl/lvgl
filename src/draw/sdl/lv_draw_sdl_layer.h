@@ -28,6 +28,7 @@ typedef struct _lv_draw_sdl_layer_ctx_t {
     SDL_Texture * orig_target;
     SDL_Texture * target;
     SDL_Rect target_rect;
+    bool target_in_cache;
     lv_draw_layer_flags_t flags;
 } lv_draw_sdl_layer_ctx_t;
 /**********************

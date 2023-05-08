@@ -72,7 +72,8 @@ static void draw_img_rounded(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, con
                              lv_coord_t radius);
 
 static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture,
-                                             const lv_draw_sdl_img_header_t * header, int w, int h, lv_coord_t radius);
+                                             const lv_draw_sdl_img_header_t * header, int w, int h, lv_coord_t radius,
+                                             bool * in_cache);
 
 static lv_draw_img_rounded_key_t rounded_key_create(const SDL_Texture * texture, lv_coord_t w, lv_coord_t h,
                                                     lv_coord_t radius);
@@ -106,11 +107,16 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     lv_draw_sdl_img_header_t * header = NULL;
     SDL_Texture * texture = lv_draw_sdl_texture_cache_get_with_userdata(ctx, key, key_size, &texture_found,
                                                                         (void **) &header);
+    bool texture_in_cache = false;
     if(!texture_found) {
-        lv_draw_sdl_img_load_texture(ctx, key, key_size, src, draw_dsc->frame_id, &texture, &header);
+        lv_draw_sdl_img_load_texture(ctx, key, key_size, src, draw_dsc->frame_id, &texture, &header,
+                                     &texture_in_cache);
+    }
+    else {
+        texture_in_cache = true;
     }
     SDL_free(key);
-    if(!texture) {
+    if(!texture || !header) {
         return LV_RES_INV;
     }
 
@@ -147,6 +153,14 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     }
 
     lv_draw_sdl_composite_end(ctx, &apply_area, draw_dsc->blend_mode);
+
+    if(!texture_in_cache) {
+        LV_LOG_WARN("Texture is not cached, this will impact performance.");
+        if(!header->managed) {
+            SDL_DestroyTexture(texture);
+        }
+        lv_mem_free(header);
+    }
 
     return LV_RES_OK;
 }
@@ -185,7 +199,7 @@ static void calc_draw_part(SDL_Texture * texture, const lv_draw_sdl_img_header_t
 
 bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key_head_img_t * key, size_t key_size,
                                   const void * src, int32_t frame_id, SDL_Texture ** texture,
-                                  lv_draw_sdl_img_header_t ** header)
+                                  lv_draw_sdl_img_header_t ** header, bool * texture_in_cache)
 {
     _lv_img_cache_entry_t * cdsc = _lv_img_cache_open(src, lv_color_white(), frame_id);
     lv_draw_sdl_cache_flag_t tex_flags = 0;
@@ -210,16 +224,18 @@ bool lv_draw_sdl_img_load_texture(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_cache_key
 #endif
     }
     if(texture && cdsc) {
-        *header = SDL_malloc(sizeof(lv_draw_sdl_img_header_t));
+        *header = lv_mem_alloc(sizeof(lv_draw_sdl_img_header_t));
         SDL_memcpy(&(*header)->base, &cdsc->dec_dsc.header, sizeof(lv_img_header_t));
         (*header)->rect = rect;
-        lv_draw_sdl_texture_cache_put_advanced(ctx, key, key_size, *texture, *header, SDL_free, tex_flags);
+        (*header)->managed = (tex_flags & LV_DRAW_SDL_CACHE_FLAG_MANAGED) != 0;
+        *texture_in_cache = lv_draw_sdl_texture_cache_put_advanced(ctx, key, key_size, *texture, *header, SDL_free,
+                                                                   tex_flags);
+        return true;
     }
     else {
-        lv_draw_sdl_texture_cache_put(ctx, key, key_size, NULL);
+        *texture_in_cache = lv_draw_sdl_texture_cache_put(ctx, key, key_size, NULL);
         return false;
     }
-    return true;
 }
 
 /**********************
@@ -320,7 +336,8 @@ static void draw_img_rounded(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, con
 {
     const int w = lv_area_get_width(coords), h = lv_area_get_height(coords);
     lv_coord_t real_radius = LV_MIN3(radius, w, h);
-    SDL_Texture * frag = img_rounded_frag_obtain(ctx, texture, header, w, h, real_radius);
+    bool frag_in_cache = false;
+    SDL_Texture * frag = img_rounded_frag_obtain(ctx, texture, header, w, h, real_radius, &frag_in_cache);
     apply_recolor_opa(frag, draw_dsc);
     lv_draw_sdl_rect_bg_frag_draw_corners(ctx, frag, real_radius, coords, clip, true);
 
@@ -360,6 +377,11 @@ static void draw_img_rounded(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture, con
         SDL_RenderCopy(ctx->renderer, texture, &src_rect, &dst_rect);
     }
     SDL_RenderSetClipRect(ctx->renderer, NULL);
+
+    if(!frag_in_cache) {
+        LV_LOG_WARN("Texture is not cached, this will impact performance.");
+        SDL_DestroyTexture(frag);
+    }
 }
 
 static void apply_recolor_opa(SDL_Texture * texture, const lv_draw_img_dsc_t * draw_dsc)
@@ -377,15 +399,18 @@ static void apply_recolor_opa(SDL_Texture * texture, const lv_draw_img_dsc_t * d
 }
 
 static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Texture * texture,
-                                             const lv_draw_sdl_img_header_t * header, int w, int h, lv_coord_t radius)
+                                             const lv_draw_sdl_img_header_t * header, int w, int h, lv_coord_t radius,
+                                             bool * in_cache)
 {
     lv_draw_img_rounded_key_t key = rounded_key_create(texture, w, h, radius);
-    SDL_Texture * mask_frag = lv_draw_sdl_rect_bg_frag_obtain(ctx, radius);
+    bool mask_frag_in_cache = false;
+    SDL_Texture * mask_frag = lv_draw_sdl_rect_bg_frag_obtain(ctx, radius, &mask_frag_in_cache);
     SDL_Texture * img_frag = lv_draw_sdl_texture_cache_get(ctx, &key, sizeof(key), NULL);
     if(img_frag == NULL) {
         const lv_coord_t full_frag_size = radius * 2 + 3;
         img_frag = SDL_CreateTexture(ctx->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, SDL_TEXTUREACCESS_TARGET,
                                      full_frag_size, full_frag_size);
+        SDL_assert(img_frag);
         SDL_SetTextureBlendMode(img_frag, SDL_BLENDMODE_BLEND);
         SDL_Texture * old_target = SDL_GetRenderTarget(ctx->renderer);
         SDL_SetRenderTarget(ctx->renderer, img_frag);
@@ -395,7 +420,7 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
         SDL_RenderFillRect(ctx->renderer, NULL);
         SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
 
-        lv_area_t coords = {0, 0, w - 1, h - 1}, clip;
+        lv_area_t coords = {0, 0, w - 1, h - 1};
         lv_area_t frag_coords = {0, 0, full_frag_size - 1, full_frag_size - 1};
         lv_draw_sdl_rect_bg_frag_draw_corners(ctx, mask_frag, radius, &frag_coords, NULL, false);
 
@@ -446,7 +471,14 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
         SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
         SDL_SetRenderTarget(ctx->renderer, old_target);
-        lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), img_frag);
+        *in_cache = lv_draw_sdl_texture_cache_put(ctx, &key, sizeof(key), img_frag);
+    }
+    else {
+        *in_cache = true;
+    }
+    if(!mask_frag_in_cache) {
+        LV_LOG_WARN("Texture is not cached, this will impact performance.");
+        SDL_DestroyTexture(mask_frag);
     }
     return img_frag;
 }

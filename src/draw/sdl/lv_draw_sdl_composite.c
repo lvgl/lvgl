@@ -86,7 +86,8 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
         LV_ASSERT(internals->mask == NULL && internals->composition == NULL && internals->target_backup == NULL);
 
         lv_coord_t w = lv_area_get_width(apply_area), h = lv_area_get_height(apply_area);
-        internals->composition = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0, w, h);
+        internals->composition = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0, w, h,
+                                                                      &internals->composition_cached);
         /* Don't need to worry about integral overflow */
         lv_coord_t ofs_x = (lv_coord_t) - apply_area->x1, ofs_y = (lv_coord_t) - apply_area->y1;
         /* Offset draw area to start with (0,0) of coords */
@@ -174,19 +175,23 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
                 break;
         }
         SDL_RenderCopy(ctx->renderer, internals->composition, &src_rect, &dst_rect);
+        if(!internals->composition_cached) {
+            LV_LOG_WARN("Texture is not cached, this will impact performance.");
+            SDL_DestroyTexture(internals->composition);
+        }
     }
 
     internals->mask = internals->composition = internals->target_backup = NULL;
 }
 
 SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_texture_id_t id,
-                                                   lv_coord_t w, lv_coord_t h)
+                                                   lv_coord_t w, lv_coord_t h, bool * texture_in_cache)
 {
     lv_point_t * tex_size = NULL;
     composite_key_t mask_key = mask_key_create(id);
     SDL_Texture * result = lv_draw_sdl_texture_cache_get_with_userdata(ctx, &mask_key, sizeof(composite_key_t), NULL,
                                                                        (void **) &tex_size);
-    if(!result || tex_size->x < w || tex_size->y < h) {
+    if(result == NULL || tex_size->x < w || tex_size->y < h) {
         lv_coord_t size = next_pow_of_2(LV_MAX(w, h));
         int access = SDL_TEXTUREACCESS_STREAMING;
         if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TRANSFORM0) {
@@ -198,8 +203,19 @@ SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_d
         result = SDL_CreateTexture(ctx->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, access, size, size);
         tex_size = lv_mem_alloc(sizeof(lv_point_t));
         tex_size->x = tex_size->y = size;
-        lv_draw_sdl_texture_cache_put_advanced(ctx, &mask_key, sizeof(composite_key_t), result, tex_size, lv_mem_free, 0);
+        bool in_cache = lv_draw_sdl_texture_cache_put_advanced(ctx, &mask_key, sizeof(composite_key_t), result,
+                                                               tex_size, lv_mem_free, 0);
+        if(!in_cache) {
+            lv_mem_free(tex_size);
+        }
+        if(texture_in_cache != NULL) {
+            *texture_in_cache = in_cache;
+        }
     }
+    else if(texture_in_cache != NULL) {
+        *texture_in_cache = true;
+    }
+
     return result;
 }
 

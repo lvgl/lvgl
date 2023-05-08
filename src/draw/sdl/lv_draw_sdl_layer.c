@@ -58,7 +58,8 @@ lv_draw_layer_ctx_t * lv_draw_sdl_layer_init(lv_draw_ctx_t * draw_ctx, lv_draw_l
 
     enum lv_draw_sdl_composite_texture_id_t texture_id = LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TRANSFORM0 +
                                                          ctx->internals->transform_count;
-    transform_ctx->target = lv_draw_sdl_composite_texture_obtain(ctx, texture_id, target_w, target_h);
+    transform_ctx->target = lv_draw_sdl_composite_texture_obtain(ctx, texture_id, target_w, target_h,
+                                                                 &transform_ctx->target_in_cache);
     transform_ctx->target_rect.x = 0;
     transform_ctx->target_rect.y = 0;
     transform_ctx->target_rect.w = target_w;
@@ -117,6 +118,11 @@ void lv_draw_sdl_layer_blend(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * lay
 void lv_draw_sdl_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx)
 {
     lv_draw_sdl_ctx_t * ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
+    lv_draw_sdl_layer_ctx_t * transform_ctx = (lv_draw_sdl_layer_ctx_t *) layer_ctx;
+    if(!transform_ctx->target_in_cache && transform_ctx->target != NULL) {
+        LV_LOG_WARN("Texture is not cached, this will impact performance.");
+        SDL_DestroyTexture(transform_ctx->target);
+    }
     ctx->internals->transform_count -= 1;
 }
 

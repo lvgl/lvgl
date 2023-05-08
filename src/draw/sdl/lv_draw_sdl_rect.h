@@ -57,12 +57,36 @@ typedef struct lv_draw_sdl_rect_header_t {
  * Other functions
  *====================*/
 
-SDL_Texture * lv_draw_sdl_rect_bg_frag_obtain(lv_draw_sdl_ctx_t * ctx, lv_coord_t radius);
+/**
+ *
+ * @param ctx Drawing context
+ * @param radius Corner radius of the rectangle
+ * @param in_cache Whether the texture has been put in the cache
+ * @return Background fragment texture
+ */
+SDL_Texture * lv_draw_sdl_rect_bg_frag_obtain(lv_draw_sdl_ctx_t * ctx, lv_coord_t radius, bool * in_cache);
 
+/**
+ *
+ * @param ctx Drawing context
+ * @param grad Gradient info
+ * @param w Width of the rectangle
+ * @param h Height of the rectangle
+ * @param radius Corner radius of the rectangle
+ * @param in_cache Whether the texture has been put in the cache
+ * @return Gradient fragment texture
+ */
 SDL_Texture * lv_draw_sdl_rect_grad_frag_obtain(lv_draw_sdl_ctx_t * ctx, const lv_grad_dsc_t * grad, lv_coord_t w,
-                                                lv_coord_t h, lv_coord_t radius);
+                                                lv_coord_t h, lv_coord_t radius, bool * in_cache);
 
-SDL_Texture * lv_draw_sdl_rect_grad_strip_obtain(lv_draw_sdl_ctx_t * ctx, const lv_grad_dsc_t * grad);
+/**
+ *
+ * @param ctx Drawing context
+ * @param grad Gradient info
+ * @param in_cache Whether the texture has been put in the cache
+ * @return Gradient strip texture
+ */
+SDL_Texture * lv_draw_sdl_rect_grad_strip_obtain(lv_draw_sdl_ctx_t * ctx, const lv_grad_dsc_t * grad, bool * in_cache);
 
 void lv_draw_sdl_rect_bg_frag_draw_corners(lv_draw_sdl_ctx_t * ctx, SDL_Texture * frag, lv_coord_t frag_size,
                                            const lv_area_t * coords, const lv_area_t * clip, bool full);
