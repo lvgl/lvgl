@@ -167,3 +167,5 @@ Example
 
 API
 ***
+
+:ref:`lv_arc`

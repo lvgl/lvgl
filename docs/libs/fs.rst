@@ -32,4 +32,3 @@ number of actual reads from the storage.
 API
 ***
 
-:ref:`lv_fsdrv`

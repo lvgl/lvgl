@@ -32,6 +32,5 @@ Example
 API
 ---
 
-:ref:`lv_qrcode`
-
 :ref:`qrcodegen`
+

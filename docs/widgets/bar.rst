@@ -80,3 +80,5 @@ Example
 
 API
 ***
+
+:ref:`lv_bar`

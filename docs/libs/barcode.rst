@@ -35,6 +35,5 @@ Example
 API
 ---
 
-:ref:`lv_barcode`
-
 :ref:`code128`
+

@@ -273,5 +273,3 @@ Example
 
 API
 ---
-
-:ref:`lv_rlottie`

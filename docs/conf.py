@@ -18,15 +18,10 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import subprocess
 import sys
 
 sys.path.insert(0, os.path.abspath('./_ext'))
 
-# from subprocess import PIPE, Popen
-
-# import recommonmark
-# from recommonmark.transform import AutoStructify
 from sphinx.builders.html import StandaloneHTMLBuilder
 
 # -- General configuration ------------------------------------------------
@@ -43,8 +38,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    # 'recommonmark',
-    # 'sphinx_markdown_tables',
     'breathe',
     'sphinx_sitemap',
     'lv_example',
@@ -65,7 +58,7 @@ highlight_language = 'c'
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst']# , '.md']
+source_suffix = ['.rst']
 
 
 # The master toctree document.
@@ -266,7 +259,7 @@ StandaloneHTMLBuilder.supported_image_types = [
 
 smartquotes = False
 
-_, repo_commit_hash = subprocess.getstatusoutput("git rev-parse HEAD")
+repo_commit_hash = os.environ['LVGL_GITCOMMIT']
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
