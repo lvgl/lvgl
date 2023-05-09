@@ -52,6 +52,10 @@ typedef uint8_t lv_scale_mode_t;
 
 typedef struct {
     lv_obj_t obj;
+    lv_coord_t major_len;
+    lv_coord_t minor_len;
+    lv_coord_t range_min;
+    lv_coord_t range_max;
     uint32_t total_tick_count   : 15;
     uint32_t major_tick_every   : 15;
     lv_scale_mode_t mode;
@@ -107,6 +111,16 @@ void lv_scale_set_total_tick_count(lv_obj_t * obj, lv_coord_t total_tick_count);
  * @param   major_tick_every    New count for major tick drawing
  */
 void lv_scale_set_major_tick_every(lv_obj_t * obj, lv_coord_t major_tick_every);
+
+void lv_scale_set_axis_tick(lv_obj_t * obj, lv_coord_t major_len, lv_coord_t minor_len, bool label_en);
+
+/**
+ * Set the minimal and maximal values on a scale
+ * @param obj       pointer to a scale object
+ * @param min       minimum value of the scale
+ * @param max       maximum value of the scale
+ */
+void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max);
 
 /*=====================
  * Getter functions
