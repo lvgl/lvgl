@@ -423,6 +423,7 @@ static void lv_style_set_prop_internal(lv_style_t * style, lv_style_prop_t prop_
     }
 
     lv_style_prop_t prop_id = LV_STYLE_PROP_ID_MASK(prop_and_meta);
+    LV_ASSERT(prop_id != LV_STYLE_PROP_INV);
 
     if(style->prop_cnt > 1) {
         uint8_t * tmp = style->v_p.values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
