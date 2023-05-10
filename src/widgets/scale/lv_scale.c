@@ -322,7 +322,18 @@ static void scale_draw_horizontal(lv_obj_t *obj, lv_event_t * event)
     /* Get style properties so they can be used in the tick and label drawing */
     lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t label_gap = scale->label_enabled ? lv_obj_get_style_pad_bottom(obj, LV_PART_TICKS) : 0U;
+    lv_coord_t label_gap = 0U;
+    lv_coord_t y_ofs = 0U;
+    
+    if (scale->label_enabled && (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode)) {
+        label_gap = lv_obj_get_style_pad_bottom(obj, LV_PART_TICKS);
+        y_ofs = obj->coords.y2;
+    }
+    else if (scale->label_enabled && (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+        label_gap = lv_obj_get_style_pad_top(obj, LV_PART_TICKS);
+        y_ofs = obj->coords.y1;
+    }
+    else { /* Nothing to do */ }
 
     /* Configure both line and label draw descriptors for the tick and label drawings */
     lv_draw_line_dsc_t line_dsc;
@@ -338,19 +349,27 @@ static void scale_draw_horizontal(lv_obj_t *obj, lv_event_t * event)
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_SCALE_DRAW_PART_TICK_LABEL;
-    part_draw_dsc.id = LV_SCALE_MODE_HORIZONTAL;
+    part_draw_dsc.id = scale->mode;
     part_draw_dsc.part = LV_PART_TICKS;
     part_draw_dsc.label_dsc = &label_dsc;
     part_draw_dsc.line_dsc = &line_dsc;
+
+    lv_coord_t major_len = scale->major_len;
+    lv_coord_t minor_len = scale->minor_len;
+
+    /* Draw tick lines to the top */
+    if (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+        major_len *= -1;
+        minor_len *= -1;
+    }
 
     uint16_t total_tick_count = scale->total_tick_count;
 
     /* Get offset on both axis so the widget can be drawn from there */
     lv_coord_t x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-    lv_coord_t y_ofs = obj->coords.y1;
 
     uint8_t tick_idx = 0;
-    for (tick_idx = 0; tick_idx < total_tick_count; tick_idx++)
+    for (tick_idx = 0; tick_idx <= total_tick_count; tick_idx++)
     {
         /* The tick is represented by a vertical line. We need two points to draw it */
         lv_point_t tick_point_a;
@@ -361,7 +380,7 @@ static void scale_draw_horizontal(lv_obj_t *obj, lv_event_t * event)
 
         /* Setup the tick points */
         lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
-        lv_coord_t tick_length = is_major_tick ? scale->major_len : scale->minor_len;
+        lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
 
         tick_point_a.x = horizontal_position;
         tick_point_a.y = y_ofs;
@@ -388,8 +407,15 @@ static void scale_draw_horizontal(lv_obj_t *obj, lv_event_t * event)
             lv_area_t label_coords;
             label_coords.x1 = (tick_point_b.x - size.x / 2);
             label_coords.x2 = (tick_point_b.x + size.x / 2);
-            label_coords.y1 = tick_point_b.y + label_gap;
-            label_coords.y2 = label_coords.y1 + size.y;
+            
+            if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
+                label_coords.y1 = tick_point_b.y + label_gap;
+                label_coords.y2 = label_coords.y1 + size.y;
+            }
+            else { /* LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode */
+                label_coords.y2 = tick_point_b.y - label_gap;
+                label_coords.y1 = label_coords.y2 - size.y;
+            }
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
