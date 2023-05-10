@@ -69,6 +69,7 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
+    LV_PROFILER_BEGIN;
     lv_res_t res;
     if(draw_ctx->draw_img) {
         res = draw_ctx->draw_img(draw_ctx, dsc, coords, src);
@@ -76,6 +77,7 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
     else {
         res = decode_and_draw(draw_ctx, dsc, coords, src);
     }
+    LV_PROFILER_END;
 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");
@@ -121,8 +123,9 @@ void lv_draw_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc
                          const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format)
 {
     if(draw_ctx->draw_img_decoded == NULL) return;
-
+    LV_PROFILER_BEGIN;
     draw_ctx->draw_img_decoded(draw_ctx, dsc, coords, map_p, sup, color_format);
+    LV_PROFILER_END;
 }
 
 /**********************

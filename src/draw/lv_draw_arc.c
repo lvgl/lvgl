@@ -48,10 +48,12 @@ void lv_draw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const 
     if(dsc->width == 0) return;
     if(start_angle == end_angle) return;
 
+    LV_PROFILER_BEGIN;
     draw_ctx->draw_arc(draw_ctx, dsc, center, radius, start_angle, end_angle);
 
     //    const lv_draw_backend_t * backend = lv_draw_backend_get();
     //    backend->draw_arc(center_x, center_y, radius, start_angle, end_angle, clip_area, dsc);
+    LV_PROFILER_END;
 }
 
 void lv_draw_arc_get_area(lv_coord_t x, lv_coord_t y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,

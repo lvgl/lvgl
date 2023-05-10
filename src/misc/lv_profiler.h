@@ -1,10 +1,10 @@
 /**
- * @file lv_trace.h
+ * @file lv_profiler.h
  *
  */
 
-#ifndef LV_TRACE_H
-#define LV_TRACE_H
+#ifndef LV_PROFILER_H
+#define LV_PROFILER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,25 +14,15 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../lv_conf_internal.h"
+#include "../lv_conf_internal.h"
 
-#if LV_USE_TRACE
+#if LV_USE_PROFILER
 
-#include LV_TRACE_INCLUDE
+#include LV_PROFILER_INCLUDE
 
 /*********************
  *      DEFINES
  *********************/
-
-#ifndef LV_TRACE_BEGIN
-#warning "LV_TRACE_BEGIN is not defined"
-#define LV_TRACE_BEGIN
-#endif
-
-#ifndef LV_TRACE_END
-#warning "LV_TRACE_END is not defined"
-#define LV_TRACE_END
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -46,15 +36,10 @@ extern "C" {
  *      MACROS
  **********************/
 
-#else
-
-#define LV_TRACE_BEGIN
-#define LV_TRACE_END
-
-#endif /*LV_USE_TRACE*/
+#endif /*LV_USE_PROFILER*/
 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
 
-#endif /*LV_TRACE_H*/
+#endif /*LV_PROFILER_H*/

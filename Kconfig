@@ -1009,6 +1009,13 @@ menu "LVGL configuration"
 			bool "Enable Monkey test"
 			default n
 
+		config LV_USE_PROFILER
+			bool "Run-time performance profiler."
+		config LV_PROFILER_INCLUDE
+			string "Header to include for the profiler"
+			depends on LV_USE_PROFILER
+			default "profiler.h"
+
 		config LV_USE_GRIDNAV
 			bool "Enable grid navigation"
 			default n

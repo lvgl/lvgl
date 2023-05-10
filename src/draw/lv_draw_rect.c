@@ -63,8 +63,9 @@ void lv_draw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, cons
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 
+    LV_PROFILER_BEGIN;
     draw_ctx->draw_rect(draw_ctx, dsc, coords);
-
+    LV_PROFILER_END;
     LV_ASSERT_MEM_INTEGRITY();
 }
 
