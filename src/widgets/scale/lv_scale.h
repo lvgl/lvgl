@@ -114,7 +114,26 @@ void lv_scale_set_total_tick_count(lv_obj_t * obj, lv_coord_t total_tick_count);
  */
 void lv_scale_set_major_tick_every(lv_obj_t * obj, lv_coord_t major_tick_every);
 
-void lv_scale_set_axis_tick(lv_obj_t * obj, lv_coord_t major_len, lv_coord_t minor_len, bool label_en);
+/**
+ * Sets label visibility
+ * @param   obj       pointer the scale object
+ * @param   show_label  Show axis label
+ */
+void lv_scale_set_label_show(lv_obj_t * obj, bool show_label);
+
+/**
+ * Sets major tick length
+ * @param   obj       pointer the scale object
+ * @param   major_len   Major tick length
+ */
+void lv_scale_set_major_tick_length(lv_obj_t * obj, lv_coord_t major_len);
+
+/**
+ * Sets major tick length
+ * @param   obj       pointer the scale object
+ * @param   minor_len   Minor tick length
+ */
+void lv_scale_set_minor_tick_length(lv_obj_t * obj, lv_coord_t minor_len);
 
 /**
  * Set the minimal and maximal values on a scale
