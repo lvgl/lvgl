@@ -103,14 +103,32 @@ void lv_scale_set_major_tick_every(lv_obj_t * obj, lv_coord_t major_tick_every)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_axis_tick(lv_obj_t * obj, lv_coord_t major_len, lv_coord_t minor_len, bool label_en)
+void lv_scale_set_major_tick_length(lv_obj_t * obj, lv_coord_t major_len)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->major_len = major_len;
+
+    lv_obj_invalidate(obj);
+}
+
+void lv_scale_set_minor_tick_length(lv_obj_t * obj, lv_coord_t minor_len)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
     scale->minor_len = minor_len;
-    scale->label_enabled = label_en;
+
+    lv_obj_invalidate(obj);
+}
+
+void lv_scale_set_label_show(lv_obj_t * obj, bool show_label)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
+    scale->label_enabled = show_label;
 
     lv_obj_invalidate(obj);
 }
@@ -147,7 +165,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
-    scale->mode = LV_SCALE_MODE_VERTICAL;
+    scale->mode = LV_SCALE_MODE_HORIZONTAL_TOP;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
 
     LV_TRACE_OBJ_CREATE("finished");
