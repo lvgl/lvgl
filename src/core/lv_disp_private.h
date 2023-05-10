@@ -26,6 +26,11 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _lv_disp_t;
+
+typedef void (*lv_disp_flush_cb_t)(struct _lv_disp_t * disp, const lv_area_t * area, lv_color_t * px_map);
+
 struct _lv_disp_t {
 
     /*---------------------
@@ -70,7 +75,7 @@ struct _lv_disp_t {
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished*/
-    void (*flush_cb)(struct _lv_disp_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
+    lv_disp_flush_cb_t flush_cb;
 
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
