@@ -421,15 +421,12 @@ static void scale_draw_horizontal(lv_obj_t *obj, lv_event_t * event)
     /* Get style properties so they can be used in the tick and label drawing */
     lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t label_gap = 0U;
     lv_coord_t y_ofs = 0U;
     
-    if (scale->label_enabled && (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode)) {
-        label_gap = lv_obj_get_style_pad_bottom(obj, LV_PART_TICKS);
+    if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
         y_ofs = obj->coords.y2;
     }
-    else if (scale->label_enabled && (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-        label_gap = lv_obj_get_style_pad_top(obj, LV_PART_TICKS);
+    else if (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
         y_ofs = obj->coords.y1;
     }
     else { /* Nothing to do */ }
@@ -485,9 +482,10 @@ static void scale_draw_horizontal(lv_obj_t *obj, lv_event_t * event)
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
-        if(tick_point_a.y + line_dsc.width / 2  >= obj->coords.y1 && tick_point_b.y - line_dsc.width / 2  <= obj->coords.y2) {
+        /* NOTE: Commented out so HORIZONTAL_BOTTOM ticks can be drawn */
+        //if(tick_point_a.y + line_dsc.width / 2  >= obj->coords.y1 && tick_point_b.y - line_dsc.width / 2  <= obj->coords.y2) {
             lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
-        }
+        //}
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
