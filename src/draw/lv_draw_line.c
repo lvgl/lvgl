@@ -48,7 +48,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(struct _lv_draw_ctx_t * draw_ctx, const 
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
 
+    LV_PROFILER_BEGIN;
     draw_ctx->draw_line(draw_ctx, dsc, point1, point2);
+    LV_PROFILER_END;
 }
 
 /**********************

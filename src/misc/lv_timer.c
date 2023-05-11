@@ -12,6 +12,7 @@
 #include "lv_ll.h"
 #include "lv_gc.h"
 #include "lv_printf.h"
+#include "lv_profiler.h"
 
 /*********************
  *      DEFINES
@@ -82,6 +83,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         return 1;
     }
 
+    LV_PROFILER_BEGIN;
     static uint32_t idle_period_start = 0;
     static uint32_t busy_time         = 0;
 
@@ -143,6 +145,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     already_running = false; /*Release the mutex*/
 
     TIMER_TRACE("finished (%" LV_PRIu32 " ms until the next timer call)", time_till_next);
+    LV_PROFILER_END;
     return time_till_next;
 }
 

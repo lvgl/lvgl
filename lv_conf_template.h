@@ -700,6 +700,12 @@
 /*1: Enable system monitor component*/
 #define LV_USE_SYSMON 0
 
+/*1: Enable the run-time performance profiler*/
+#define LV_USE_PROFILER 0
+#define LV_PROFILER_INCLUDE <stdint.h>
+#define LV_PROFILER_BEGIN
+#define LV_PROFILER_END
+
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0
 

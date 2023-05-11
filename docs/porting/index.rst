@@ -16,4 +16,5 @@ Porting
     sleep
     os
     log
+    profiler
     draw

@@ -364,7 +364,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_draw_ctx_t * draw_ctx, const lv_draw
 void lv_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,  const lv_point_t * pos_p,
                     uint32_t letter)
 {
+    LV_PROFILER_BEGIN;
     draw_ctx->draw_letter(draw_ctx, dsc, pos_p, letter);
+    LV_PROFILER_END;
 }
 
 

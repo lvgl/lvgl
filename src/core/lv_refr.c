@@ -14,6 +14,7 @@
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_gc.h"
+#include "../misc/lv_profiler.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
 
@@ -231,6 +232,7 @@ lv_disp_t * _lv_refr_get_disp_refreshing(void)
  */
 void _lv_disp_refr_timer(lv_timer_t * tmr)
 {
+    LV_PROFILER_BEGIN;
     REFR_TRACE("begin");
 
     uint32_t start = lv_tick_get();
@@ -341,6 +343,7 @@ refr_finish:
     lv_disp_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
 
     REFR_TRACE("finished");
+    LV_PROFILER_END;
 }
 
 /**********************
@@ -390,6 +393,7 @@ static void lv_refr_join_area(void)
 static void refr_invalid_areas(void)
 {
     if(disp_refr->inv_p == 0) return;
+    LV_PROFILER_BEGIN;
 
     /*Find the last area which will be drawn*/
     int32_t i;
@@ -419,6 +423,7 @@ static void refr_invalid_areas(void)
     }
 
     disp_refr->rendering_in_progress = false;
+    LV_PROFILER_END;
 }
 
 /**
