@@ -193,6 +193,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
         }
         else if (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode || LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
             scale_draw_vertical(obj, event);
+            scale_draw_indicator(obj, event);
         }
         else if (LV_SCALE_MODE_ROUND == scale->mode) {
             
@@ -235,19 +236,38 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
 
     /* Get style properties so they can be used in the tick and label drawing */
     lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t label_gap = 0U;
+    /* Get offset on both axis so the widget can be drawn from there */
+    lv_coord_t x_ofs = 0U;
     lv_coord_t y_ofs = 0U;
     
     if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
         label_gap = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+        x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
         y_ofs = obj->coords.y2;
     }
     else if (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
         label_gap = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+        x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
         y_ofs = obj->coords.y1;
     }
-    else { /* Nothing to do */ }
+    else if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
+        label_gap = lv_obj_get_style_pad_left(obj, LV_PART_TICKS);
+        x_ofs = obj->coords.x1;
+        y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
+    }
+    else if (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+        label_gap = lv_obj_get_style_pad_right(obj, LV_PART_TICKS);
+        x_ofs = obj->coords.x2;
+        y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
+    }
+    else {
+        /* Mode not handled */
+        return;
+    }
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
@@ -265,17 +285,18 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
     lv_coord_t major_len = scale->major_len;
     lv_coord_t minor_len = scale->minor_len;
 
-    /* Draw tick lines to the top */
+    /* Handle tick length being drawn backwards */
     if (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
         major_len *= -1;
         minor_len *= -1;
     }
+    else if (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+        major_len *= -1;
+        minor_len *= -1;
+    }
+    else { /* Nothing to do */ }
 
     uint16_t total_tick_count = scale->total_tick_count;
-
-    /* Get offset on both axis so the widget can be drawn from there */
-    lv_coord_t x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-
     uint8_t tick_idx = 0;
     for (tick_idx = 0; tick_idx <= total_tick_count; tick_idx++)
     {
@@ -285,15 +306,26 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
         /* A major tick is the one which has a label in it */
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
-
-        /* Setup the tick points */
-        lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - 2U) * tick_idx) / total_tick_count;
         lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
 
-        tick_point_a.x = horizontal_position;
-        tick_point_a.y = y_ofs;
-        tick_point_b.x = horizontal_position;
-        tick_point_b.y = tick_point_a.y + tick_length;
+        /* Setup the tick points
+         * TODO: Replace magic number 2U with line_descriptor.width */
+        if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - 2U) * tick_idx) / total_tick_count;
+            lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
+
+            tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
+            tick_point_a.y = vertical_position;
+            tick_point_b.x = tick_point_a.x - tick_length;
+            tick_point_b.y = vertical_position;
+        } else {
+            lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - 2U) * tick_idx) / total_tick_count;
+
+            tick_point_a.x = horizontal_position;
+            tick_point_a.y = y_ofs;
+            tick_point_b.x = horizontal_position;
+            tick_point_b.y = tick_point_a.y + tick_length;
+        }
 
         // LV_LOG_USER("Tick %d at P1 {%d, %d} P2 {%d, %d}", tick_idx, tick_point_a.x, tick_point_a.y, tick_point_b.x, tick_point_b.y);
 
@@ -312,17 +344,31 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
 
             /* Set the label draw area at some distance of the major tick */
             lv_area_t label_coords;
-            label_coords.x1 = (tick_point_b.x - size.x / 2);
-            label_coords.x2 = (tick_point_b.x + size.x / 2);
             
             if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
+                label_coords.x1 = (tick_point_b.x - size.x / 2);
+                label_coords.x2 = (tick_point_b.x + size.x / 2);
                 label_coords.y1 = tick_point_b.y + label_gap;
                 label_coords.y2 = label_coords.y1 + size.y;
             }
-            else { /* LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode */
+            else if (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+                label_coords.x1 = (tick_point_b.x - size.x / 2);
+                label_coords.x2 = (tick_point_b.x + size.x / 2);
                 label_coords.y2 = tick_point_b.y - label_gap;
                 label_coords.y1 = label_coords.y2 - size.y;
             }
+            else if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
+                label_coords.x1 = tick_point_b.x - size.x - label_gap;
+                label_coords.x2 = tick_point_b.x - label_gap;
+                label_coords.y1 = (tick_point_b.y - size.y / 2);
+                label_coords.y2 = (tick_point_b.y + size.y / 2);
+            } else if (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+                label_coords.x1 = tick_point_b.x + label_gap;
+                label_coords.x2 = tick_point_b.x + size.x + label_gap;
+                label_coords.y1 = (tick_point_b.y - size.y / 2);
+                label_coords.y2 = (tick_point_b.y + size.y / 2);
+            }
+            else { /* Nothing to do */ }
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
             lv_draw_label(draw_ctx, &label_dsc, &label_coords, part_draw_dsc.text, NULL);
