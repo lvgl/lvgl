@@ -331,8 +331,21 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
 
         if (is_major_tick)
         {
+            int32_t min_out = 0;
+            int32_t max_out = 0;
             char text_buffer[20] = {0};
-            int32_t tick_value = lv_map(total_tick_count - tick_idx, 0, total_tick_count, scale->range_max, scale->range_min);
+
+            if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+                min_out = scale->range_min;
+                max_out = scale->range_max;
+            }
+            else {
+                min_out = scale->range_max;
+                max_out = scale->range_min;
+            }
+
+            int32_t tick_value = lv_map(total_tick_count - tick_idx, 0, total_tick_count, min_out, max_out);
+            
             lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
             part_draw_dsc.text = text_buffer;
             part_draw_dsc.text_length = sizeof(text_buffer);
