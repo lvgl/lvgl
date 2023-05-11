@@ -310,7 +310,6 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
          * TODO: Replace magic number 2U with line_descriptor.width */
         if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - 2U) * tick_idx) / total_tick_count;
-            lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
 
             tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
             tick_point_a.y = vertical_position;
