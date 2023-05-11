@@ -221,8 +221,7 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
-    // part_draw_dsc.type = LV_SCALE_DRAW_PART_TICK_LABEL;
-    // part_draw_dsc.id = scale->mode;
+    part_draw_dsc.id = scale->mode;
     part_draw_dsc.part = LV_PART_ITEMS;
 }
 
@@ -277,7 +276,6 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_SCALE_DRAW_PART_TICK_LABEL;
     part_draw_dsc.id = scale->mode;
     part_draw_dsc.part = LV_PART_INDICATOR;
     part_draw_dsc.label_dsc = &label_dsc;
@@ -420,7 +418,6 @@ static void scale_draw_vertical(lv_obj_t *obj, lv_event_t * event)
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_SCALE_DRAW_PART_TICK_LABEL;
     part_draw_dsc.id = scale->mode;
     part_draw_dsc.part = LV_PART_TICKS;
     part_draw_dsc.line_dsc = &line_dsc;
@@ -499,7 +496,6 @@ static void scale_draw_horizontal(lv_obj_t *obj, lv_event_t * event)
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_SCALE_DRAW_PART_TICK_LABEL;
     part_draw_dsc.id = scale->mode;
     part_draw_dsc.part = LV_PART_TICKS;
     part_draw_dsc.line_dsc = &line_dsc;
