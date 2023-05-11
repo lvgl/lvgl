@@ -342,15 +342,12 @@ static void scale_draw_vertical(lv_obj_t *obj, lv_event_t * event)
     lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t label_gap = 0U;
     lv_coord_t x_ofs = 0U;
     
-    if (scale->label_enabled && (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode)) {
-        label_gap = lv_obj_get_style_pad_left(obj, LV_PART_TICKS);
+    if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
         x_ofs = obj->coords.x1;
     }
-    else if (scale->label_enabled && (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-        label_gap = lv_obj_get_style_pad_right(obj, LV_PART_TICKS);
+    else if (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
         x_ofs = obj->coords.x2;
     }
     else { /* Nothing to do */ }
@@ -361,17 +358,12 @@ static void scale_draw_vertical(lv_obj_t *obj, lv_event_t * event)
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
     line_dsc.width = 2U; /* NOTE: Had to set up manually, otherwise the ticks were not visible */
 
-    lv_draw_label_dsc_t label_dsc;
-    lv_draw_label_dsc_init(&label_dsc);
-    lv_obj_init_draw_label_dsc(obj, LV_PART_TICKS, &label_dsc);
-
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.type = LV_SCALE_DRAW_PART_TICK_LABEL;
     part_draw_dsc.id = scale->mode;
     part_draw_dsc.part = LV_PART_TICKS;
-    part_draw_dsc.label_dsc = &label_dsc;
     part_draw_dsc.line_dsc = &line_dsc;
 
     uint16_t total_tick_count = scale->total_tick_count;
@@ -409,43 +401,7 @@ static void scale_draw_vertical(lv_obj_t *obj, lv_event_t * event)
 
         // LV_LOG_USER("Tick %d at P1 {%d, %d} P2 {%d, %d}", tick_idx, tick_point_a.x, tick_point_a.y, tick_point_b.x, tick_point_b.y);
 
-        /* Draw label when they're enabled and the current tick is a major tick */
-        if (scale->label_enabled && is_major_tick)
-        {
-            char text_buffer[20] = {0};
-            int32_t tick_value = lv_map(total_tick_count - tick_idx, 0, total_tick_count, scale->range_min, scale->range_max);
-            lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-            part_draw_dsc.text = text_buffer;
-            part_draw_dsc.text_length = sizeof(text_buffer);
-
-            /* Reserve appropiate size for the tick label */
-            lv_point_t size;
-            lv_txt_get_size(&size, part_draw_dsc.text,
-                label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-
-            /* Set the label draw area at some distance of the major tick */
-            lv_area_t label_coords;
-            label_coords.y1 = (tick_point_b.y - size.y / 2);
-            label_coords.y2 = (tick_point_b.y + size.y / 2);
-
-            if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-                label_coords.x1 = tick_point_b.x - size.x - label_gap;
-                label_coords.x2 = tick_point_b.x - label_gap;
-            } else { /* LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode */
-                label_coords.x1 = tick_point_b.x + label_gap;
-                label_coords.x2 = tick_point_b.x + size.x + label_gap;
-            }
-
-            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-
-            lv_draw_label(draw_ctx, &label_dsc, &label_coords, part_draw_dsc.text, NULL);
-        }
-        else {
-            part_draw_dsc.label_dsc = NULL;
-            part_draw_dsc.text = NULL;
-            part_draw_dsc.text_length = 0;
-            lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        }
+        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
         if(tick_point_a.y + line_dsc.width / 2  >= obj->coords.y1 && tick_point_b.y - line_dsc.width / 2  <= obj->coords.y2) {
             lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
