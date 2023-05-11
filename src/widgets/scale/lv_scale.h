@@ -66,14 +66,6 @@ typedef struct {
 
 extern const lv_obj_class_t lv_scale_class;
 
-/**
- * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_scale_class`
- * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
- */
-typedef enum {
-    LV_SCALE_DRAW_PART_TICK_LABEL,       /**< Used on tick lines and labels*/
-} lv_scale_draw_part_type_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
