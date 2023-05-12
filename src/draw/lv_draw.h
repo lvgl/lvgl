@@ -73,6 +73,9 @@ typedef struct _lv_draw_ctx_t  {
      */
     const lv_area_t * clip_area;
 
+    /** The original area which is updated*/
+    lv_area_t clip_area_original;
+
     /**
      * The rendered image in draw_ctx->buf will be converted to this format
      * using draw_ctx->buffer_convert.

@@ -446,11 +446,13 @@ static void refr_area(const lv_area_t * area_p)
         if(disp_refr->render_mode == LV_DISP_RENDER_MODE_FULL) {
             disp_refr->last_part = 1;
             draw_ctx->clip_area = &disp_area;
+            draw_ctx->clip_area_original = disp_area;
             refr_area_part(draw_ctx);
         }
         else if(disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
             disp_refr->last_part = disp_refr->last_area;
             draw_ctx->clip_area = area_p;
+            draw_ctx->clip_area_original = *area_p;
             refr_area_part(draw_ctx);
         }
         return;
@@ -490,6 +492,7 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
+        draw_ctx->clip_area_original = sub_area;
         draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
         draw_ctx->buf = disp_refr->draw_buf_act;
@@ -1055,7 +1058,7 @@ static void draw_buf_flush(lv_disp_t * disp)
             draw_buf_rotate(draw_ctx->buf_area, draw_ctx->buf);
         }
         else {
-            call_flush_cb(disp, draw_ctx->buf_area, draw_ctx->buf);
+            call_flush_cb(disp, &draw_ctx->clip_area_original, draw_ctx->buf);
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
