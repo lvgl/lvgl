@@ -168,7 +168,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
-    scale->mode = LV_SCALE_MODE_HORIZONTAL_TOP;
+    scale->mode = LV_SCALE_MODE_VERTICAL_RIGHT;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -219,14 +219,10 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
 
     if (scale->total_tick_count <= 1) return;
 
-    LV_LOG_USER("Drawing items");
-
     /* Configure line draw descriptor for the minor tick drawing */
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
-    line_dsc.width = 2U; /* NOTE: Had to set up manually, otherwise the ticks were not visible */
-    line_dsc.color = lv_obj_get_style_line_color(scale, LV_PART_ITEMS);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
@@ -365,6 +361,11 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
     }
     else { /* Nothing to do */ }
 
+    /* Configure line draw descriptor for the minor tick drawing */
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
+
     uint16_t total_tick_count = scale->total_tick_count;
     uint8_t tick_idx = 0;
     for (tick_idx = 0; tick_idx <= total_tick_count; tick_idx++)
@@ -377,10 +378,9 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
         lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
 
-        /* Setup the tick points
-         * TODO: Replace magic number 2U with line_descriptor.width */
+        /* Setup the tick points */
         if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - 2U) * tick_idx) / total_tick_count;
+            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
 
             tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
             tick_point_a.y = vertical_position;
