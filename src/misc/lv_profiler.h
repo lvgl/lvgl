@@ -36,6 +36,11 @@ extern "C" {
  *      MACROS
  **********************/
 
+#else
+
+#define LV_PROFILER_BEGIN
+#define LV_PROFILER_END
+
 #endif /*LV_USE_PROFILER*/
 
 #ifdef __cplusplus

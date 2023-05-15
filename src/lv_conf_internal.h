@@ -2346,7 +2346,7 @@
     #endif
 #endif
 
-/*1: Enable the run-time performance profiler*/
+/*1: Enable the runtime performance profiler*/
 #ifndef LV_USE_PROFILER
     #ifdef CONFIG_LV_USE_PROFILER
         #define LV_USE_PROFILER CONFIG_LV_USE_PROFILER
@@ -2354,25 +2354,32 @@
         #define LV_USE_PROFILER 0
     #endif
 #endif
-#ifndef LV_PROFILER_INCLUDE
-    #ifdef CONFIG_LV_PROFILER_INCLUDE
-        #define LV_PROFILER_INCLUDE CONFIG_LV_PROFILER_INCLUDE
-    #else
-        #define LV_PROFILER_INCLUDE <stdint.h>
+#if LV_USE_PROFILER
+    /*Header to include for the profiler*/
+    #ifndef LV_PROFILER_INCLUDE
+        #ifdef CONFIG_LV_PROFILER_INCLUDE
+            #define LV_PROFILER_INCLUDE CONFIG_LV_PROFILER_INCLUDE
+        #else
+            #define LV_PROFILER_INCLUDE <stdint.h>
+        #endif
     #endif
-#endif
-#ifndef LV_PROFILER_BEGIN
-    #ifdef CONFIG_LV_PROFILER_BEGIN
-        #define LV_PROFILER_BEGIN CONFIG_LV_PROFILER_BEGIN
-    #else
-        #define LV_PROFILER_BEGIN
+
+    /*Profiler start point function*/
+    #ifndef LV_PROFILER_BEGIN
+        #ifdef CONFIG_LV_PROFILER_BEGIN
+            #define LV_PROFILER_BEGIN CONFIG_LV_PROFILER_BEGIN
+        #else
+            #define LV_PROFILER_BEGIN
+        #endif
     #endif
-#endif
-#ifndef LV_PROFILER_END
-    #ifdef CONFIG_LV_PROFILER_END
-        #define LV_PROFILER_END CONFIG_LV_PROFILER_END
-    #else
-        #define LV_PROFILER_END
+
+    /*Profiler end point function*/
+    #ifndef LV_PROFILER_END
+        #ifdef CONFIG_LV_PROFILER_END
+            #define LV_PROFILER_END CONFIG_LV_PROFILER_END
+        #else
+            #define LV_PROFILER_END
+        #endif
     #endif
 #endif
 

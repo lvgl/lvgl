@@ -19,6 +19,7 @@
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_gc.h"
+#include "../misc/lv_profiler.h"
 
 /*********************
  *      DEFINES
@@ -135,6 +136,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
 
 void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
+    LV_PROFILER_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
 
     /* For touchpad sometimes users don't set the last pressed coordinate on release.
@@ -159,6 +161,7 @@ void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     else {
         LV_LOG_WARN("indev_read_cb is not registered");
     }
+    LV_PROFILER_END;
 }
 
 void lv_indev_read_timer_cb(lv_timer_t * timer)
@@ -177,6 +180,9 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
 
     if(indev_act->disabled ||
        indev_act->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
+
+    LV_PROFILER_BEGIN;
+
     bool continue_reading;
     do {
         /*Read the data*/
@@ -218,6 +224,7 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     indev_obj_act = NULL;
 
     INDEV_TRACE("finished");
+    LV_PROFILER_END;
 }
 
 void lv_indev_enable(lv_indev_t * indev, bool en)

@@ -1010,7 +1010,7 @@ menu "LVGL configuration"
 			default n
 
 		config LV_USE_PROFILER
-			bool "Run-time performance profiler."
+			bool "Runtime performance profiler."
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			depends on LV_USE_PROFILER
