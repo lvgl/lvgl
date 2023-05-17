@@ -230,20 +230,29 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
     lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t x_ofs = 0U;
+    lv_coord_t y_ofs = 0U;
     
     if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
         x_ofs = obj->coords.x1;
+        y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
     }
     else if (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
         x_ofs = obj->coords.x2;
+        y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
     }
-    else { /* Nothing to do */ }    
+    else if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
+        x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
+        y_ofs = obj->coords.y2;
+    }
+    else if (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+        x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
+        y_ofs = obj->coords.y1;
+    }
+    else { /* Nothing to do */ }
 
     uint16_t total_tick_count = scale->total_tick_count;
-
-    /* Get offset on both axis so the widget can be drawn from there */
-    lv_coord_t y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
 
     lv_coord_t major_len = scale->major_len;
     lv_coord_t minor_len = lv_obj_get_style_width(scale, LV_PART_ITEMS);
@@ -253,6 +262,12 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
         major_len *= -1;
         minor_len *= -1;
     }
+    /* Draw tick lines to the top */
+    else if (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+        major_len *= -1;
+        minor_len *= -1;
+    }
+    else { /* Nothing to do */ }
 
     uint8_t tick_idx = 0;
     for (tick_idx = 0; tick_idx <= total_tick_count; tick_idx++)
@@ -263,25 +278,34 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
         /* A major tick is the one which has a label in it */
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
+        lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
 
         if (is_major_tick) continue;
 
         /* Setup the tick points */
-        lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
-        lv_coord_t tick_length = minor_len;
+        if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
 
-        tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
-        tick_point_a.y = vertical_position;
-        tick_point_b.x = tick_point_a.x - tick_length;
-        tick_point_b.y = vertical_position;
+            tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
+            tick_point_a.y = vertical_position;
+            tick_point_b.x = tick_point_a.x - tick_length;
+            tick_point_b.y = vertical_position;
+        } else {
+            lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
+
+            tick_point_a.x = horizontal_position;
+            tick_point_a.y = y_ofs;
+            tick_point_b.x = horizontal_position;
+            tick_point_b.y = tick_point_a.y + tick_length;
+        }
 
         // LV_LOG_USER("Tick %d at P1 {%d, %d} P2 {%d, %d}", tick_idx, tick_point_a.x, tick_point_a.y, tick_point_b.x, tick_point_b.y);
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
-        if(tick_point_a.y + line_dsc.width / 2  >= obj->coords.y1 && tick_point_b.y - line_dsc.width / 2  <= obj->coords.y2) {
+        // if(tick_point_a.y + line_dsc.width / 2  >= obj->coords.y1 && tick_point_b.y - line_dsc.width / 2  <= obj->coords.y2) {
             lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
-        }
+        // }
 
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
