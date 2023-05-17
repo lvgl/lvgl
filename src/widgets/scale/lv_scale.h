@@ -54,6 +54,7 @@ typedef uint8_t lv_scale_mode_t;
 
 typedef struct {
     lv_obj_t obj;
+    char ** txt_src;
     lv_coord_t major_len;
     lv_coord_t minor_len;
     lv_coord_t range_min;
@@ -134,6 +135,13 @@ void lv_scale_set_minor_tick_length(lv_obj_t * obj, lv_coord_t minor_len);
  * @param max       maximum value of the scale
  */
 void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max);
+
+/**
+ * Set custom text source for major ticks labels
+ * @param obj       pointer to a scale object
+ * @param txt_src   pointer to an array of strings which will be display at major ticks
+ */
+void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src);
 
 /*=====================
  * Getter functions
