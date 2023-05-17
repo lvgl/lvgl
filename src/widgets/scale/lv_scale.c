@@ -145,6 +145,16 @@ void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max)
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
+    scale->txt_src = txt_src;
+
+    lv_obj_invalidate(obj);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -382,6 +392,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
 
     uint16_t total_tick_count = scale->total_tick_count;
     uint8_t tick_idx = 0;
+    uint16_t major_tick_idx = 0;
     for (tick_idx = 0; tick_idx <= total_tick_count; tick_idx++)
     {
         /* The tick is represented by a vertical line. We need two points to draw it */
@@ -424,11 +435,19 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                 max_out = scale->range_min;
             }
 
-            int32_t tick_value = lv_map(total_tick_count - tick_idx, 0, total_tick_count, min_out, max_out);
-            
-            lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-            part_draw_dsc.text = text_buffer;
-            part_draw_dsc.text_length = sizeof(text_buffer);
+            /* Check if the custom text array has element for this major tick index */
+            if (scale->txt_src[major_tick_idx])
+            {
+                part_draw_dsc.text = scale->txt_src[major_tick_idx];
+                part_draw_dsc.text_length = strlen(scale->txt_src[major_tick_idx]);
+            }
+            else /* Add label with mapped values */
+            {
+                int32_t tick_value = lv_map(total_tick_count - tick_idx, 0, total_tick_count, min_out, max_out);    
+                lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+                part_draw_dsc.text = text_buffer;
+                part_draw_dsc.text_length = sizeof(text_buffer);
+            }
 
             /* Reserve appropiate size for the tick label */
             lv_point_t size;
@@ -467,6 +486,8 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
             lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
             lv_draw_label(draw_ctx, &label_dsc, &label_coords, part_draw_dsc.text, NULL);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+
+            major_tick_idx++;
         }
     }
 }
