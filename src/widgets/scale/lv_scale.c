@@ -311,7 +311,6 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
     }
 }
 
-/* Currently this only supports horizontal labels */
 static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -359,12 +358,19 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
     /* Formatting the labels with the configured style for LV_PART_INDICATOR */
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
 
+    /* Major tick style */
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
+    line_dsc.width = 2U; /* NOTE: Had to set up manually, otherwise the ticks were not visible */
+
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.id = scale->mode;
     part_draw_dsc.part = LV_PART_INDICATOR;
     part_draw_dsc.label_dsc = &label_dsc;
+    part_draw_dsc.line_dsc = &line_dsc;
 
     lv_coord_t major_len = scale->major_len;
     lv_coord_t minor_len = scale->minor_len;
@@ -379,11 +385,6 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
         minor_len *= -1;
     }
     else { /* Nothing to do */ }
-
-    /* Configure line draw descriptor for the minor tick drawing */
-    lv_draw_line_dsc_t line_dsc;
-    lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
 
     uint16_t total_tick_count = scale->total_tick_count;
     uint8_t tick_idx = 0;
@@ -406,15 +407,13 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
             tick_point_b.x = tick_point_a.x - tick_length;
             tick_point_b.y = vertical_position;
         } else {
-            lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - 2U) * tick_idx) / total_tick_count;
+            lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
 
             tick_point_a.x = horizontal_position;
             tick_point_a.y = y_ofs;
             tick_point_b.x = horizontal_position;
             tick_point_b.y = tick_point_a.y + tick_length;
         }
-
-        // LV_LOG_USER("Tick %d at P1 {%d, %d} P2 {%d, %d}", tick_idx, tick_point_a.x, tick_point_a.y, tick_point_b.x, tick_point_b.y);
 
         if (is_major_tick)
         {
@@ -471,6 +470,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
             else { /* Nothing to do */ }
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+            lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
             lv_draw_label(draw_ctx, &label_dsc, &label_coords, part_draw_dsc.text, NULL);
             lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
