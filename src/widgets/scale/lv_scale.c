@@ -299,14 +299,8 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
             tick_point_b.y = tick_point_a.y + tick_length;
         }
 
-        // LV_LOG_USER("Tick %d at P1 {%d, %d} P2 {%d, %d}", tick_idx, tick_point_a.x, tick_point_a.y, tick_point_b.x, tick_point_b.y);
-
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-
-        // if(tick_point_a.y + line_dsc.width / 2  >= obj->coords.y1 && tick_point_b.y - line_dsc.width / 2  <= obj->coords.y2) {
-            lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
-        // }
-
+        lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
     }
 }
