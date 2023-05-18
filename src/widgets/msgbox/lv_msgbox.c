@@ -111,6 +111,9 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * parent, const char * title, const char * 
     }
 
     mbox->content = lv_obj_class_create_obj(&lv_msgbox_content_class, obj);
+    LV_ASSERT_MALLOC(obj);
+    if(obj == NULL) return NULL;
+    lv_obj_class_init_obj(obj);
 
     bool has_txt = txt && lv_strlen(txt) > 0;
     if(has_txt) {
