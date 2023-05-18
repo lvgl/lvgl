@@ -72,6 +72,23 @@ extern "C" {
  **********************/
 
 /**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+/**
+ * Enable scissor and set the clipping box.
+ *
+ * @param[in] clip_area Clip area with relative coordinates of destination buffer
+ */
+static inline void lv_vglite_set_scissor(const lv_area_t * clip_area);
+
+/**
+ * Disable scissor.
+ */
+static inline void lv_vglite_disable_scissor(void);
+
+
+/**********************
  * GLOBAL PROTOTYPES
  **********************/
 
@@ -156,6 +173,23 @@ lv_res_t lv_vglite_run(void);
         return LV_RES_INV;                    \
     }while(0)
 #endif /*LV_GPU_NXP_VG_LITE_LOG_TRACES*/
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static inline void lv_vglite_set_scissor(const lv_area_t * clip_area)
+{
+    vg_lite_enable_scissor();
+    vg_lite_set_scissor((int32_t)clip_area->x1, (int32_t)clip_area->y1,
+                        (int32_t)lv_area_get_width(clip_area),
+                        (int32_t)lv_area_get_height(clip_area));
+}
+
+static inline void lv_vglite_disable_scissor(void)
+{
+    vg_lite_disable_scissor();
+}
 
 #endif /*LV_USE_GPU_NXP_VG_LITE*/
 

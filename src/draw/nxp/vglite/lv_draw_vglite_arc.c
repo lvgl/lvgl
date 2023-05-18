@@ -216,12 +216,16 @@ lv_res_t lv_gpu_nxp_vglite_draw_arc(const lv_point_t * center, int32_t radius, i
     vg_lite_matrix_t matrix;
     vg_lite_identity(&matrix);
 
+    lv_vglite_set_scissor(clip_area);
+
     /*** Draw arc ***/
     err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw arc failed.");
 
     if(lv_vglite_run() != LV_RES_OK)
         VG_LITE_RETURN_INV("Run failed.");
+
+    lv_vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");

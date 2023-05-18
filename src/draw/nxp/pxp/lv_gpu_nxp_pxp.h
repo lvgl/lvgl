@@ -149,7 +149,7 @@ void lv_gpu_nxp_pxp_wait(void);
 #if LV_GPU_NXP_PXP_LOG_TRACES
 #define PXP_LOG_TRACE(fmt, ...)               \
     do {                                      \
-        LV_LOG_ERROR(fmt, ##__VA_ARGS__);     \
+        LV_LOG(fmt, ##__VA_ARGS__);     \
     } while (0)
 #else
 #define PXP_LOG_TRACE(fmt, ...)               \

@@ -57,8 +57,6 @@
 
 static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride);
 static inline void lv_vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf);
-static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
-                                     const lv_area_t * area, lv_coord_t stride);
 
 /**********************
  *  STATIC VARIABLES
@@ -106,23 +104,8 @@ void lv_vglite_set_src_buf(const lv_color_t * buf, const lv_area_t * area, lv_co
         lv_vglite_set_buf(&src_vgbuf, buf, area, stride);
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
-{
-    lv_vglite_set_buf(&dest_vgbuf, buf, area, stride);
-}
-
-static inline void lv_vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf)
-{
-    vgbuf->memory = (void *)buf;
-    vgbuf->address = (uint32_t)vgbuf->memory;
-}
-
-static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
-                                     const lv_area_t * area, lv_coord_t stride)
+void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t * buf,
+                       const lv_area_t * area, lv_coord_t stride)
 {
     vgbuf->format = VG_LITE_PX_FMT;
     vgbuf->tiled = VG_LITE_LINEAR;
@@ -138,6 +121,21 @@ static inline void lv_vglite_set_buf(vg_lite_buffer_t * vgbuf, const lv_color_t 
     vgbuf->memory = (void *)buf;
     vgbuf->address = (uint32_t)vgbuf->memory;
     vgbuf->handle = NULL;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static inline void lv_vglite_set_dest_buf(const lv_color_t * buf, const lv_area_t * area, lv_coord_t stride)
+{
+    lv_vglite_set_buf(&dest_vgbuf, buf, area, stride);
+}
+
+static inline void lv_vglite_set_buf_ptr(vg_lite_buffer_t * vgbuf, const lv_color_t * buf)
+{
+    vgbuf->memory = (void *)buf;
+    vgbuf->address = (uint32_t)vgbuf->memory;
 }
 
 #endif /*LV_USE_GPU_NXP_VG_LITE*/
