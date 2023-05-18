@@ -37,7 +37,7 @@ static void pinyin_ime_clear_data(lv_obj_t * obj);
 
 #if LV_IME_PINYIN_USE_K9_MODE
     static void pinyin_k9_init_data(lv_obj_t * obj);
-    static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char * py9_map[]);
+    static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char * py9_map[],bool updateflag);
     static bool pinyin_k9_is_valid_py(lv_obj_t * obj, char * py_str);
     static void pinyin_k9_fill_cand(lv_obj_t * obj);
     static void pinyin_k9_cand_page_proc(lv_obj_t * obj, uint16_t dir);
@@ -468,7 +468,7 @@ void lv_ime_pinyin_set_mode(lv_obj_t * obj, lv_ime_pinyin_mode_t mode)
     if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K9) {
         pinyin_k9_init_data(obj);
         lv_keyboard_set_map(pinyin_ime->kb, LV_KEYBOARD_MODE_USER_1, (const char *)lv_btnm_def_pinyin_k9_map,
-                            (const)default_kb_ctrl_k9_map);
+                            (const lv_btnmatrix_ctrl_t*)default_kb_ctrl_k9_map);
         lv_keyboard_set_mode(pinyin_ime->kb, LV_KEYBOARD_MODE_USER_1);
     }
 #endif
@@ -699,7 +699,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 #if LV_IME_PINYIN_USE_K9_MODE
                 else if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K9) {
                     pinyin_ime->k9_input_str_len = strlen(pinyin_ime->input_char) - 1;
-                    pinyin_k9_get_legal_py(obj, pinyin_ime->k9_input_str, k9_py_map);
+                    pinyin_k9_get_legal_py(obj, pinyin_ime->k9_input_str, k9_py_map,false);
                     pinyin_k9_fill_cand(obj);
                     pinyin_input_proc(obj);
                 }
@@ -741,7 +741,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
                     break;
                 }
             }
-            pinyin_k9_get_legal_py(obj, pinyin_ime->k9_input_str, k9_py_map);
+            pinyin_k9_get_legal_py(obj, pinyin_ime->k9_input_str, k9_py_map,true);
             pinyin_k9_fill_cand(obj);
             pinyin_input_proc(obj);
         }
@@ -997,7 +997,7 @@ static void pinyin_k9_init_data(lv_obj_t * obj)
     default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 16] = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
 }
 
-static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char * py9_map[])
+static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char * py9_map[],bool updateflag)
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -1048,7 +1048,7 @@ static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char *
         }
     }
 
-    if(count > 0) {
+    if(updateflag&&count > 0) {
         pinyin_ime->ta_count++;
         pinyin_ime->k9_legal_py_count = count;
     }
