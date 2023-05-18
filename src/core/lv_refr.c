@@ -1074,6 +1074,7 @@ static void draw_buf_flush(lv_disp_t * disp)
 
 static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
 {
+    LV_PROFILER_BEGIN;
     REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
                (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2,
                (void *)color_p);
@@ -1088,4 +1089,5 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t *
     if(disp->draw_ctx->buffer_convert) disp->draw_ctx->buffer_convert(disp->draw_ctx);
 
     disp->flush_cb(disp, &offset_area, color_p);
+    LV_PROFILER_END;
 }

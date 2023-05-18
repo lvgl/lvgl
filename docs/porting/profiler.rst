@@ -14,9 +14,9 @@ Porting
 
 To enable profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and configure the following options:
 
-- :c:macro:`LV_PROFILER_INCLUDE`: Provides a header file for the performance measurement function.
-- :c:macro:`LV_PROFILER_BEGIN`: Performance measurement start point function.
-- :c:macro:`LV_PROFILER_END`: Performance measurement end point function.
+- :c:macro:`LV_PROFILER_INCLUDE`: Provides a header file for the profiler function.
+- :c:macro:`LV_PROFILER_BEGIN`: Profiler start point function.
+- :c:macro:`LV_PROFILER_END`: Profiler end point function.
 
 Example
 *******
@@ -30,7 +30,7 @@ Configure ``lv_conf.h``:
    #define LV_USE_PROFILER 1
    #define LV_PROFILER_INCLUDE "lvgl/src/hal/lv_hal_tick.h"
    #define LV_PROFILER_BEGIN   uint32_t profiler_start = lv_tick_get()
-   #define LV_PROFILER_END     LV_LOG_USER("cost %" LV_PRIu32 "ms", lv_tick_elaps(profiler_start))
+   #define LV_PROFILER_END     LV_LOG_USER("cost %dms", (int)lv_tick_elaps(profiler_start))
 
 
 Users can add the measured functions themselves:
