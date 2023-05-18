@@ -119,11 +119,15 @@ lv_res_t lv_gpu_nxp_vglite_draw_line(const lv_point_t * point1, const lv_point_t
     err = vg_lite_update_stroke(&path);
     VG_LITE_ERR_RETURN_INV(err, "Update stroke failed.");
 
+    lv_vglite_set_scissor(clip_area);
+
     err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw line failed.");
 
     if(lv_vglite_run() != LV_RES_OK)
         VG_LITE_RETURN_INV("Run failed.");
+
+    lv_vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");

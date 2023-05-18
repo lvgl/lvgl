@@ -59,10 +59,14 @@
 
 static void lv_draw_pxp_wait_for_finish(lv_draw_ctx_t * draw_ctx);
 
+static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+
 static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
                                     const lv_area_t * coords, const uint8_t * map_p, lv_img_cf_t cf);
 
-static void lv_draw_pxp_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+static void lv_draw_pxp_buffer_copy(lv_draw_ctx_t * draw_ctx,
+                                    void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
+                                    void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -84,6 +88,7 @@ void lv_draw_pxp_ctx_init(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
     pxp_draw_ctx->base_draw.draw_img_decoded = lv_draw_pxp_img_decoded;
     pxp_draw_ctx->blend = lv_draw_pxp_blend;
     pxp_draw_ctx->base_draw.wait_for_finish = lv_draw_pxp_wait_for_finish;
+    pxp_draw_ctx->base_draw.buffer_copy = lv_draw_pxp_buffer_copy;
 }
 
 void lv_draw_pxp_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
@@ -184,21 +189,27 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
         return;
     }
 
-    lv_area_t blend_area;
-    /*Let's get the blend area which is the intersection of the area to draw and the clip area.*/
-    if(!_lv_area_intersect(&blend_area, coords, draw_ctx->clip_area))
-        return; /*Fully clipped, nothing to do*/
+    lv_area_t rel_coords;
+    lv_area_copy(&rel_coords, coords);
+    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    /*Make the blend area relative to the buffer*/
-    lv_area_move(&blend_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
+    lv_area_t rel_clip_area;
+    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
+    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
 
-    lv_coord_t src_width = lv_area_get_width(coords);
-    lv_coord_t src_height = lv_area_get_height(coords);
-
-    bool has_mask = lv_draw_mask_is_any(&blend_area);
     bool has_scale = (dsc->zoom != LV_IMG_ZOOM_NONE);
     bool has_rotation = (dsc->angle != 0);
     bool unsup_rotation = false;
+
+    lv_area_t blend_area;
+    if(has_rotation)
+        lv_area_copy(&blend_area, &rel_coords);
+    else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
+        return; /*Fully clipped, nothing to do*/
+
+    bool has_mask = lv_draw_mask_is_any(&blend_area);
+    lv_coord_t src_width = lv_area_get_width(coords);
+    lv_coord_t src_height = lv_area_get_height(coords);
 
     if(has_rotation) {
         /*
@@ -245,6 +256,20 @@ static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_
 
     lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, &src_area, src_stride,
                                   dsc, cf);
+}
+
+static void lv_draw_pxp_buffer_copy(lv_draw_ctx_t * draw_ctx,
+                                    void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
+                                    void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
+{
+    LV_UNUSED(draw_ctx);
+
+    if(lv_area_get_size(dest_area) < LV_GPU_NXP_PXP_SIZE_LIMIT) {
+        lv_draw_sw_buffer_copy(draw_ctx, dest_buf, dest_stride, dest_area, src_buf, src_stride, src_area);
+        return;
+    }
+
+    lv_gpu_nxp_pxp_buffer_copy(dest_buf, dest_area, dest_stride, src_buf, src_area, src_stride);
 }
 
 #endif /*LV_USE_GPU_NXP_PXP*/

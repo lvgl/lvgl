@@ -166,6 +166,8 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(const lv_area_t * coords, const lv_area_t * c
     if(lv_vglite_premult_and_swizzle(&vgcol, bg_col32, dsc->bg_opa, color_format) != LV_RES_OK)
         VG_LITE_RETURN_INV("Premultiplication and swizzle failed.");
 
+    lv_vglite_set_scissor(clip_area);
+
     /*** Draw rectangle ***/
     if(dsc->bg_grad.dir == (lv_grad_dir_t)LV_GRAD_DIR_NONE) {
         err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_EVEN_ODD, &matrix, VG_LITE_BLEND_SRC_OVER, vgcol);
@@ -177,6 +179,8 @@ lv_res_t lv_gpu_nxp_vglite_draw_bg(const lv_area_t * coords, const lv_area_t * c
 
     if(lv_vglite_run() != LV_RES_OK)
         VG_LITE_RETURN_INV("Run failed.");
+
+    lv_vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
@@ -263,11 +267,15 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const l
     err = vg_lite_update_stroke(&path);
     VG_LITE_ERR_RETURN_INV(err, "Update stroke failed.");
 
+    lv_vglite_set_scissor(clip_area);
+
     err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
     VG_LITE_ERR_RETURN_INV(err, "Draw border failed.");
 
     if(lv_vglite_run() != LV_RES_OK)
         VG_LITE_RETURN_INV("Run failed.");
+
+    lv_vglite_disable_scissor();
 
     err = vg_lite_clear_path(&path);
     VG_LITE_ERR_RETURN_INV(err, "Clear path failed.");
@@ -275,6 +283,10 @@ lv_res_t lv_gpu_nxp_vglite_draw_border_generic(const lv_area_t * coords, const l
     return LV_RES_OK;
 
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path_data_size,
                                             lv_coord_t radius,
@@ -443,9 +455,5 @@ static void lv_vglite_create_rect_path_data(int32_t * path_data, uint32_t * path
     /* Resulting path size */
     *path_data_size = pidx * sizeof(int32_t);
 }
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
 #endif /*LV_USE_GPU_NXP_VG_LITE*/
