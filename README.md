@@ -65,7 +65,7 @@ Our team is ready to help you with graphics design, UI implementation and consul
   - Word wrapping, kerning, text scrolling, sub-pixel rendering, Pinyin-IME Chinese input, Emojis in texts.
   - Rendering engine supporting animations, anti-aliasing, opacity, smooth scrolling, shadows, image transformation, etc  
   - Supports Mouse, Touchpad, Keypad, Keyboard, External buttons, Encoder [Input devices](https://docs.lvgl.io/master/porting/indev.html).
-  - [Multiple display](https://docs.lvgl.io/master/overview/display.html) support.
+  - [Multiple display](https://docs.lvgl.io/master/overview/disp.html#multiple-display-support) support.
 
 **Binding and Build Support**
   - [Micropython Binding](https://blog.lvgl.io/2019-02-20/micropython-bindings) exposes LVGL API
