@@ -424,7 +424,7 @@ lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp)
     return disp->color_format;
 }
 
-void lv_disp_set_antialaising(lv_disp_t * disp, bool en)
+void lv_disp_set_antialiasing(lv_disp_t * disp, bool en)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return;
@@ -552,7 +552,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     lv_disp_t * d = lv_obj_get_disp(new_scr);
     lv_obj_t * act_scr = lv_scr_act();
 
-    /*If an other screen load animation is in progress
+    /*If another screen load animation is in progress
      *make target screen loaded immediately. */
     if(d->scr_to_load && act_scr != d->scr_to_load) {
         scr_load_internal(d->scr_to_load);

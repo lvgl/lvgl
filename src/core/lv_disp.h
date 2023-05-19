@@ -46,7 +46,7 @@ typedef enum {
 typedef enum {
     /**
      * Use the buffer(s) to render the screen is smaller parts.
-     * This way the buffers can be smaller then the display to save RAM. At least 1/10 sceen size buffer(s) are recommended.
+     * This way the buffers can be smaller then the display to save RAM. At least 1/10 screen size buffer(s) are recommended.
      */
     LV_DISP_RENDER_MODE_PARTIAL,
 
@@ -274,7 +274,7 @@ lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp);
  * @param disp      pointer to a display
  * @param en        true/false
  */
-void lv_disp_set_antialaising(lv_disp_t * disp, bool en);
+void lv_disp_set_antialiasing(lv_disp_t * disp, bool en);
 
 /**
  * Get if anti-aliasing is enabled for a display or not
