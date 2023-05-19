@@ -746,6 +746,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
                     if(strcmp(txt, "abc ") == 0)    pinyin_ime->k9_input_str_len += lv_strlen(k9_py_map[i]) + 1;
                     else                            pinyin_ime->k9_input_str_len += lv_strlen(k9_py_map[i]);
                     pinyin_ime->k9_input_str[pinyin_ime->ta_count] = 50 + i;
+                    pinyin_ime->k9_input_str[pinyin_ime->ta_count + 1] = '\0';
 
                     break;
                 }
