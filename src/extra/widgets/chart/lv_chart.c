@@ -1382,8 +1382,10 @@ static void draw_y_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
 
     lv_chart_tick_dsc_t * t = get_tick_gsc(obj, axis);
 
-    if(t->major_cnt <= 1) return;
     if(!t->label_en && !t->major_len && !t->minor_len) return;
+    if(t->major_cnt <= 1) return;
+    uint32_t total_tick_num = (t->major_cnt - 1) * (t->minor_cnt);
+    if(total_tick_num == 0) return;
 
     uint8_t sec_axis = axis == LV_CHART_AXIS_PRIMARY_Y ? 0 : 1;
 
@@ -1433,7 +1435,6 @@ static void draw_y_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
     part_draw_dsc.line_dsc = &line_dsc;
     part_draw_dsc.label_dsc = &label_dsc;
 
-    uint32_t total_tick_num = (t->major_cnt - 1) * (t->minor_cnt);
     for(i = 0; i <= total_tick_num; i++) {
         /*draw a line at moving y position*/
         p2.y = p1.y = y_ofs + (int32_t)((int32_t)(h - line_dsc.width) * i) / total_tick_num;
@@ -1514,6 +1515,8 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
     lv_chart_tick_dsc_t * t = get_tick_gsc(obj, axis);
     if(t->major_cnt <= 1) return;
     if(!t->label_en && !t->major_len && !t->minor_len) return;
+    uint32_t total_tick_num = (t->major_cnt - 1) * (t->minor_cnt);
+    if(total_tick_num == 0) return;
 
     uint32_t i;
     lv_point_t p1;
@@ -1571,7 +1574,6 @@ static void draw_x_ticks(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, lv_chart_axis
     }
 
     p1.y = y_ofs;
-    uint32_t total_tick_num = (t->major_cnt - 1) * t->minor_cnt;
     for(i = 0; i <= total_tick_num; i++) { /*one extra loop - it may not exist in the list, empty label*/
         bool major = false;
         if(i % t->minor_cnt == 0) major = true;
