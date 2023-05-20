@@ -476,6 +476,7 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
+        draw_ctx->clip_area_original = sub_area;
         draw_ctx->buf_area = &sub_area;
         draw_ctx->clip_area = &sub_area;
         draw_ctx->buf = disp_refr->draw_buf_act;
