@@ -29,10 +29,11 @@ Here is some pseudocode to illustrate the concept:
    void lvgl_thread(void)
    {
        while(1) {
+           uint32_t time_till_next;
            mutex_lock(&lvgl_mutex);
-           lv_task_handler();
+           time_till_next = lv_task_handler();
            mutex_unlock(&lvgl_mutex);
-           thread_sleep(10); /* sleep for 10 ms */
+           thread_sleep(time_till_next); /* sleep for a while */
        }
    }
 
