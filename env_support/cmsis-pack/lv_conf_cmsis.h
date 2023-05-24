@@ -56,6 +56,7 @@
 #define LV_STDIO_INCLUDE  <stdio.h>
 #define LV_STRING_INCLUDE <string.h>
 #define LV_MALLOC       lv_malloc_builtin
+#define LV_MEMALIGN     lv_memalign_builtin
 #define LV_REALLOC      lv_realloc_builtin
 #define LV_FREE         lv_free_builtin
 #define LV_MEMSET       lv_memset_builtin

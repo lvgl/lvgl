@@ -5,12 +5,14 @@
 #endif
 
 static lv_malloc_stub_cb malloc_stub_cb;
+static lv_memalign_stub_cb memalign_stub_cb;
 static lv_realloc_stub_cb realloc_stub_cb;
 static lv_free_stub_cb free_stub_cb;
 
 void lv_test_malloc_init(void)
 {
     malloc_stub_cb = NULL;
+    memalign_stub_cb = NULL;
     realloc_stub_cb = NULL;
     free_stub_cb = NULL;
 }
@@ -29,6 +31,15 @@ void * lv_test_malloc_normal(size_t size)
 #endif
 }
 
+void * lv_test_memalign_normal(size_t align, size_t size)
+{
+#ifdef LVGL_CI_USING_SYS_HEAP
+    return memalign(align, size);
+#else // LVGL_CI_USING_DEF_HEAP and others
+    return lv_memalign_builtin(align, size);
+#endif
+}
+
 void * lv_test_realloc_normal(void * p, size_t new_size)
 {
 #ifdef LVGL_CI_USING_SYS_HEAP
@@ -42,6 +53,17 @@ void * lv_test_malloc(size_t s)
 {
     if(malloc_stub_cb) return malloc_stub_cb(s);
     else return lv_test_malloc_normal(s);
+}
+
+void lv_test_memalign_set_cb(lv_memalign_stub_cb stub_memalign)
+{
+    memalign_stub_cb = stub_memalign;
+}
+
+void * lv_test_memalign(size_t align, size_t size)
+{
+    if(memalign_stub_cb) return memalign_stub_cb(align, size);
+    else return lv_test_memalign_normal(align, size);
 }
 
 void lv_test_realloc_set_cb(lv_realloc_stub_cb stub_realloc)
