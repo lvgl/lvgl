@@ -34,6 +34,7 @@ Architecture
 - [x] More color formats: 24 bit, ARGB1555, ARGB4444 etc
 - [ ] Unified caching #3116 #3415
 - [ ] Condider using `lv_color32_t` on APIs to support e.g. alpha gradient.
+- [ ] Add more feature to key presses (long press, release, etc). See [here](https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263).
 
 Styles
 ~~~~~~
