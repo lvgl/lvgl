@@ -55,6 +55,7 @@ lv_mem_builtin_pool_t lv_mem_builtin_add_pool(void * mem, size_t bytes);
 void lv_mem_builtin_remove_pool(lv_mem_builtin_pool_t pool);
 
 void * lv_malloc_builtin(size_t size);
+void * lv_memalign_builtin(size_t align, size_t size);
 void * lv_realloc_builtin(void * p, size_t new_size);
 void lv_free_builtin(void * p);
 

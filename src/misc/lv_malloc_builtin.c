@@ -164,6 +164,13 @@ void * lv_malloc_builtin(size_t size)
     return lv_tlsf_malloc(tlsf, size);
 }
 
+void * lv_memalign_builtin(size_t align, size_t size)
+{
+    cur_used += size;
+    max_used = LV_MAX(cur_used, max_used);
+    return lv_tlsf_memalign(tlsf, align, size);
+}
+
 void * lv_realloc_builtin(void * p, size_t new_size)
 {
     return lv_tlsf_realloc(tlsf, p, new_size);

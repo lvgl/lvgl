@@ -203,6 +203,13 @@
         #define LV_MALLOC       lv_malloc_builtin
     #endif
 #endif
+#ifndef LV_MEMALIGN
+    #ifdef CONFIG_LV_MEMALIGN
+        #define LV_MEMALIGN CONFIG_LV_MEMALIGN
+    #else
+        #define LV_MEMALIGN     lv_memalign_builtin
+    #endif
+#endif
 #ifndef LV_REALLOC
     #ifdef CONFIG_LV_REALLOC
         #define LV_REALLOC CONFIG_LV_REALLOC

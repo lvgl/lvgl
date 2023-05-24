@@ -55,6 +55,14 @@ typedef struct {
 void * lv_malloc(size_t size);
 
 /**
+ * Allocate a block of memory with a specified alignment.
+ * @param align The desired alignment of the memory block.
+ * @param size The size of the memory block to allocate.
+ * @return A pointer to the allocated memory block, or NULL if the allocation failed.
+ */
+void * lv_memalign(size_t align, size_t size);
+
+/**
  * Free an allocated data
  * @param data pointer to an allocated memory
  */
