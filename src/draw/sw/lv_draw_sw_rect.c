@@ -1124,12 +1124,7 @@ static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * ds
 
     lv_area_t area_outer;
     lv_area_copy(&area_outer, &area_inner);
-
-    area_outer.x1 -= dsc->outline_width;
-    area_outer.x2 += dsc->outline_width;
-    area_outer.y1 -= dsc->outline_width;
-    area_outer.y2 += dsc->outline_width;
-
+    lv_area_increase(&area_outer, dsc->outline_width, dsc->outline_width);
 
     int32_t inner_w = lv_area_get_width(&area_inner);
     int32_t inner_h = lv_area_get_height(&area_inner);

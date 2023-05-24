@@ -504,11 +504,7 @@ static void draw_outline(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coords, cons
 
     lv_area_t area_outer;
     lv_area_copy(&area_outer, &area_inner);
-
-    area_outer.x1 -= dsc->outline_width;
-    area_outer.x2 += dsc->outline_width;
-    area_outer.y1 -= dsc->outline_width;
-    area_outer.y2 += dsc->outline_width;
+    lv_area_increase(&area_outer, dsc->outline_width, dsc->outline_width);
 
     lv_area_t draw_area;
     if(!_lv_area_intersect(&draw_area, &area_outer, clip)) return;

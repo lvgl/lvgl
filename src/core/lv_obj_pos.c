@@ -924,10 +924,7 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 {
     lv_area_copy(area, &obj->coords);
     if(obj->spec_attr) {
-        area->x1 -= obj->spec_attr->ext_click_pad;
-        area->x2 += obj->spec_attr->ext_click_pad;
-        area->y1 -= obj->spec_attr->ext_click_pad;
-        area->y2 += obj->spec_attr->ext_click_pad;
+        lv_area_increase(area, obj->spec_attr->ext_click_pad, obj->spec_attr->ext_click_pad);
     }
 }
 
