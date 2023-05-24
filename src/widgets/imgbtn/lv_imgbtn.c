@@ -221,10 +221,7 @@ static void draw_main(lv_event_t * e)
     lv_coord_t th = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
     lv_area_t coords;
     lv_area_copy(&coords, &obj->coords);
-    coords.x1 -= tw;
-    coords.x2 += tw;
-    coords.y1 -= th;
-    coords.y2 += th;
+    lv_area_increase(&coords, tw, th);
 
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);

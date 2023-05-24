@@ -232,10 +232,7 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_area_t marker_area_transf;
     lv_area_copy(&marker_area_transf, &marker_area);
-    marker_area_transf.x1 -= transf_w;
-    marker_area_transf.x2 += transf_w;
-    marker_area_transf.y1 -= transf_h;
-    marker_area_transf.y2 += transf_h;
+    lv_area_increase(&marker_area_transf, transf_w, transf_h);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
