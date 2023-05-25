@@ -303,10 +303,9 @@ void lv_obj_update_layout(const lv_obj_t * obj)
     mutex = true;
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
-
-    /*Repeat until there where layout invalidations*/
+    /*Repeat until there are no more layout invalidations*/
     while(scr->scr_layout_inv) {
-        LV_LOG_INFO("Layout update begin");
+        LV_LOG_TRACE("Layout update begin");
         scr->scr_layout_inv = 0;
         layout_update_core(scr);
         LV_LOG_TRACE("Layout update end");
