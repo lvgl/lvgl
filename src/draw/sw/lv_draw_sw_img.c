@@ -191,7 +191,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_c
             /*Blend*/
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
-            /*Go the the next lines*/
+            /*Go to the next lines*/
             blend_area.y1 = blend_area.y2 + 1;
             blend_area.y2 = blend_area.y1 + buf_h - 1;
             if(blend_area.y2 > y_last) blend_area.y2 = y_last;

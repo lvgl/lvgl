@@ -43,9 +43,9 @@ typedef struct {
     lv_point_t offset;
     lv_coord_t w;          /*Width of the image (Handled by the library)*/
     lv_coord_t h;          /*Height of the image (Handled by the library)*/
-    uint16_t angle;    /*rotation angle of the image*/
+    lv_coord_t angle;    /*rotation angle of the image*/
     lv_point_t pivot;     /*rotation center of the image*/
-    uint16_t zoom;         /*256 means no zoom, 512 double size, 128 half size*/
+    lv_coord_t zoom;         /*256 means no zoom, 512 double size, 128 half size*/
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
     uint8_t cf : 5;        /*Color format from `lv_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
@@ -192,7 +192,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * obj);
  * @param obj       pointer to an image object
  * @return      rotation angle in 0.1 degrees (0..3600)
  */
-uint16_t lv_img_get_angle(lv_obj_t * obj);
+lv_coord_t lv_img_get_angle(lv_obj_t * obj);
 
 /**
  * Get the pivot (rotation center) of the image.
@@ -206,7 +206,7 @@ void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot);
  * @param obj       pointer to an image object
  * @return          zoom factor (256: no zoom)
  */
-uint16_t lv_img_get_zoom(lv_obj_t * obj);
+lv_coord_t lv_img_get_zoom(lv_obj_t * obj);
 
 /**
  * Get whether the transformations (rotate, zoom) are anti-aliased or not
