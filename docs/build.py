@@ -14,6 +14,7 @@ import example_list as ex
 import doc_builder
 import shutil
 import tempfile
+import config_builder
 
 # due to the modifications that take place to the documentation files
 # when the documentaation builds it is better to copy the source files to a
@@ -115,6 +116,8 @@ if clean:
 
     # os.mkdir(api_path)
     # os.mkdir(lang)
+
+config_builder.run()
 
 shutil.copytree('.', temp_directory, dirs_exist_ok=True)
 shutil.copytree(examples_path, os.path.join(temp_directory, 'examples'))
@@ -259,6 +262,8 @@ else:
         return remove_folder
 
     iter_temp(temp_directory)
+
+config_builder.cleanup()
 
 print('output path:', html_dst_path)
 print('\nFINISHED!!')
