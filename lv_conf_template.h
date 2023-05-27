@@ -783,6 +783,9 @@
     #define LV_LINUX_FBDEV_BSD  0
 #endif
 
+/*Driver for /dev/dri/card*/
+#define LV_USE_LINUX_DRM        0
+
 /*Interface for TFT_eSPI*/
 #define LV_USE_TFT_ESPI         0
 
