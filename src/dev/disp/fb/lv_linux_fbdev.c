@@ -78,6 +78,10 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
     #define FBIOBLANK FBIO_BLANK
 #endif /* LV_LINUX_FBDEV_BSD */
 
+#ifndef DIV_ROUND_UP
+    #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
+#endif
+
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -184,13 +188,18 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
 
     lv_coord_t hor_res = dsc->vinfo.xres;
     lv_coord_t ver_res = dsc->vinfo.yres;
+    lv_coord_t width = dsc->vinfo.width;
+
     uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
     lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
     lv_disp_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISP_RENDER_MODE_PARTIAL);
     lv_disp_set_res(disp, hor_res, ver_res);
 
-    LV_LOG_INFO("Resolution is set to %dx%d", hor_res, ver_res);
+    if(width) {
+        lv_disp_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
+    }
 
+    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_disp_get_dpi(disp));
 }
 
 /**********************
