@@ -16,6 +16,13 @@
  *      TYPEDEFS
  **********************/
 
+#define NEWTON_ITERATIONS       8
+#define CUBIC_PRECISION_BITS    20 /* 10 or 20 bits recommended, int64_t calculation is used for 20bit precision */
+
+#if CUBIC_PRECISION_BITS < 10 || CUBIC_PRECISION_BITS > 20
+    #error "cubic precision bits should be in range of [10, 20] for 32bit/64bit calculations."
+#endif
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -94,6 +101,212 @@ uint32_t lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
     uint32_t v4 = (t3 * u3) >> 10;
 
     return v1 + v2 + v3 + v4;
+}
+
+static float do_cubic_bezier_f(float t, float a, float b, float c)
+{
+    /*a*t^3 + b*t^2 + c*t*/
+    return ((a * t + b) * t + c) * t;
+}
+
+/**
+ * cubic-bezier Reference:
+ *
+ * https://github.com/gre/bezier-easing
+ * https://opensource.apple.com/source/WebCore/WebCore-955.66/platform/graphics/UnitBezier.h
+ *
+ * Copyright (c) 2014 Gaëtan Renaudeau
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/**
+ * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
+ * @param x time in range of [0..1]
+ * @param x1 x of control point 1 in range of [0..1]
+ * @param y1 y of control point 1 in range of [0..1]
+ * @param x2 x of control point 2 in range of [0..1]
+ * @param y2 y of control point 2 in range of [0..1]
+ * @return the value calculated
+ */
+float lv_cubic_bezier_f(float x, float x1, float y1, float x2, float y2)
+{
+    float ax, bx, cx, ay, by, cy;
+    float tl, tr, t;  /*t in cubic-bezier function, used for bisection */
+    float xs;  /*x sampled on curve */
+    float d; /*slope value at specified t*/
+
+    if(x == 0 || x == 1) return x;
+
+    cx = 3.f * x1;
+    bx = 3.f * (x2 - x1) - cx;
+    ax = 1.f - cx - bx;
+
+    cy = 3.f * y1;
+    by = 3.f * (y2 - y1) - cy;
+    ay = 1.f - cy - by;
+
+    /*Try Newton's method firstly */
+    t = x; /*Make a guess*/
+    for(int i = 0; i < NEWTON_ITERATIONS; i++) {
+        xs = do_cubic_bezier_f(t, ax, bx, cx);
+        xs -= x;
+        if(LV_ABS(xs) < 1e-6f) goto found;
+
+        d = (3.f * ax * t + 2.f * bx) * t + cx;
+        if(LV_ABS(d) < 1e-6f) break;
+        t -= xs / d;
+    }
+
+    /*Fallback to bisection method for reliability*/
+    tl = 0.f, tr = 1.f, t = x;
+
+    if(t < tl) {
+        t = tl;
+        goto found;
+    }
+
+    if(t > tr) {
+        t = tr;
+        goto found;
+    }
+
+    while(tl < tr) {
+        xs = do_cubic_bezier_f(t, ax, bx, cx);
+        if(LV_ABS(xs - x) < 1e-6f) goto found;
+        x > xs ? (tl = t) : (tr = t);
+        t = (tr - tl) * .5f + tl;
+    }
+
+found:
+    return do_cubic_bezier_f(t, ay, by, cy);
+}
+
+static int32_t do_cubic_bezier(int32_t t, int32_t a, int32_t b, int32_t c)
+{
+    /*a * t^3 + b * t^2 + c * t*/
+#if CUBIC_PRECISION_BITS > 10
+    int64_t ret;
+#else
+    int32_t ret;
+#endif
+
+    ret = a;
+    ret = (ret * t) >> CUBIC_PRECISION_BITS;
+    ret = ((ret + b) * t) >> CUBIC_PRECISION_BITS;
+    ret = ((ret + c) * t) >> CUBIC_PRECISION_BITS;
+    return ret;
+}
+
+/**
+ * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
+ * @param x time in range of [0..1024]
+ * @param x1 x of control point 1 in range of [0..1024]
+ * @param y1 y of control point 1 in range of [0..1024]
+ * @param x2 x of control point 2 in range of [0..1024]
+ * @param y2 y of control point 2 in range of [0..1024]
+ * @return the value calculated
+ */
+int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    int32_t ax, bx, cx, ay, by, cy;
+    int32_t tl, tr, t;  /*t in cubic-bezier function, used for bisection */
+    int32_t xs;  /*x sampled on curve */
+#if CUBIC_PRECISION_BITS > 10
+    int64_t d; /*slope value at specified t*/
+#else
+    int32_t d;
+#endif
+
+    if(x == 0 || x == 1024) return x;
+
+    /* input is always 10bit precision */
+
+#if CUBIC_PRECISION_BITS != 10
+    x <<= CUBIC_PRECISION_BITS - 10;
+    x1 <<= CUBIC_PRECISION_BITS - 10;
+    x2 <<= CUBIC_PRECISION_BITS - 10;
+    y1 <<= CUBIC_PRECISION_BITS - 10;
+    y2 <<= CUBIC_PRECISION_BITS - 10;
+#endif
+
+    cx = 3 * x1;
+    bx = 3 * (x2 - x1) - cx;
+    ax = (1L << CUBIC_PRECISION_BITS) - cx - bx;
+
+    cy = 3 * y1;
+    by = 3 * (y2 - y1) - cy;
+    ay = (1L << CUBIC_PRECISION_BITS)  - cy - by;
+
+    /*Try Newton's method firstly */
+    t = x; /*Make a guess*/
+    for(int i = 0; i < NEWTON_ITERATIONS; i++) {
+        /*Check if x on curve at t matches input x*/
+        xs = do_cubic_bezier(t, ax, bx, cx) - x;
+        if(LV_ABS(xs) <= 1) goto found;
+
+        /* get slop at t, d = 3 * ax * t^2 + 2 * bx + t + cx */
+        d = ax; /* use 64bit operation if needed. */
+        d = (3 * d * t) >> CUBIC_PRECISION_BITS;
+        d = ((d + 2 * bx) * t) >> CUBIC_PRECISION_BITS;
+        d += cx;
+
+        if(LV_ABS(d) <= 1) break;
+
+        d = ((int64_t)xs * (1L << CUBIC_PRECISION_BITS)) / d;
+        if(d == 0) break;  /*Reached precision limits*/
+        t -= d;
+    }
+
+    /*Fallback to bisection method for reliability*/
+    tl = 0, tr = 1L << CUBIC_PRECISION_BITS, t = x;
+
+    if(t < tl) {
+        t = tl;
+        goto found;
+    }
+
+    if(t > tr) {
+        t = tr;
+        goto found;
+    }
+
+    while(tl < tr) {
+        xs = do_cubic_bezier(t, ax, bx, cx);
+        if(LV_ABS(xs - x) <= 1) goto found;
+        x > xs ? (tl = t) : (tr = t);
+        t = (tr - tl) / 2 + tl;
+        if(t == tl) break;
+    }
+
+    /*Failed to find suitable t for given x, return a value anyway.*/
+found:
+    /*Return y at t*/
+#if CUBIC_PRECISION_BITS != 10
+    return do_cubic_bezier(t, ay, by, cy) >> (CUBIC_PRECISION_BITS - 10);
+#else
+    return do_cubic_bezier(t, ay, by, cy);
+#endif
 }
 
 /**
