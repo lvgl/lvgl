@@ -294,7 +294,7 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
 
         /* Setup the tick points */
         if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
+            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * (total_tick_count - tick_idx)) / total_tick_count;
 
             tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
             tick_point_a.y = vertical_position;
@@ -404,19 +404,22 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
 
         /* Setup the tick points */
         if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
+            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * (total_tick_count - tick_idx)) / total_tick_count;
 
             tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
             tick_point_a.y = vertical_position;
             tick_point_b.x = tick_point_a.x - tick_length;
             tick_point_b.y = vertical_position;
-        } else {
+        } else if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) / total_tick_count;
 
             tick_point_a.x = horizontal_position;
             tick_point_a.y = y_ofs;
             tick_point_b.x = horizontal_position;
             tick_point_b.y = tick_point_a.y + tick_length;
+        }
+        else {
+            /* Circular mode */
         }
 
         /* Label text setup */
@@ -440,27 +443,13 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
             int32_t min_out = 0U;
             int32_t max_out = 0U;
 
-            if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+            if ((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
+                || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
                 min_out = scale->range_min;
                 max_out = scale->range_max;
             }
             else {
-                min_out = scale->range_max;
-                max_out = scale->range_min;
-            }
-
-            /* Check if the custom text array has element for this major tick index */
-            if (scale->txt_src[major_tick_idx])
-            {
-                part_draw_dsc.text = scale->txt_src[major_tick_idx];
-                part_draw_dsc.text_length = strlen(scale->txt_src[major_tick_idx]);
-            }
-            else /* Add label with mapped values */
-            {
-                int32_t tick_value = lv_map(total_tick_count - tick_idx, 0, total_tick_count, min_out, max_out);    
-                lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-                part_draw_dsc.text = text_buffer;
-                part_draw_dsc.text_length = sizeof(text_buffer);
+                /* Circular mode */
             }
 
             tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
