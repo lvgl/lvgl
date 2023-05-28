@@ -2383,6 +2383,25 @@
     #endif
 #endif
 
+/*1: Enable the built-in run-time performance profiler*/
+#ifndef LV_USE_PROFILER_BUILTIN
+    #ifdef CONFIG_LV_USE_PROFILER_BUILTIN
+        #define LV_USE_PROFILER_BUILTIN CONFIG_LV_USE_PROFILER_BUILTIN
+    #else
+        #define LV_USE_PROFILER_BUILTIN 0
+    #endif
+#endif
+#if LV_USE_PROFILER_BUILTIN
+    /*Default profiler trace buffer size*/
+    #ifndef LV_PROFILER_BUILTIN_BUF_SIZE
+        #ifdef CONFIG_LV_PROFILER_BUILTIN_BUF_SIZE
+            #define LV_PROFILER_BUILTIN_BUF_SIZE CONFIG_LV_PROFILER_BUILTIN_BUF_SIZE
+        #else
+            #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /*[bytes]*/
+        #endif
+    #endif
+#endif
+
 /*1: Enable Monkey test*/
 #ifndef LV_USE_MONKEY
     #ifdef CONFIG_LV_USE_MONKEY

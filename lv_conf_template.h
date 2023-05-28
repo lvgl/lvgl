@@ -713,6 +713,13 @@
     #define LV_PROFILER_END
 #endif
 
+/*1: Enable the built-in run-time performance profiler*/
+#define LV_USE_PROFILER_BUILTIN 0
+#if LV_USE_PROFILER_BUILTIN
+    /*Default profiler trace buffer size*/
+    #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /*[bytes]*/
+#endif
+
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0
 
