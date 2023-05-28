@@ -8,7 +8,7 @@
  *********************/
 
 #include "lv_profiler_builtin.h"
-#include "lvgl/lvgl.h"
+#include "../lvgl.h"
 
 /*********************
  *      DEFINES
