@@ -40,7 +40,7 @@ typedef struct {
     size_t buf_size;                    /**< The size of the buffer used for profiling data */
     uint32_t tick_per_sec;              /**< The number of ticks per second */
     uint32_t (*tick_get_cb)(void);      /**< Callback function to get the current tick count */
-    void (*dump_cb)(const char * buf);  /**< Callback function to dump the profiling data */
+    void (*flush_cb)(const char * buf); /**< Callback function to flush the profiling data */
 } lv_profiler_builtin_config_t;
 
 /**********************
@@ -65,13 +65,12 @@ void lv_profiler_builtin_init(const lv_profiler_builtin_config_t * config);
 void lv_profiler_builtin_uninit(void);
 
 /**
- * @brief Dump the profiling data to the console
+ * @brief Flush the profiling data to the console
  */
-void lv_profiler_builtin_dump(void);
+void lv_profiler_builtin_flush(void);
 
 /**
  * @brief Write the profiling data for a function with the given tag
- *
  * @param func Name of the function being profiled
  * @param tag Tag to associate with the profiling data for the function
  */

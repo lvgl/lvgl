@@ -43,7 +43,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void default_dump_cb(const char * buf);
+static void default_flush_cb(const char * buf);
 
 /**********************
  *  STATIC VARIABLES
@@ -66,7 +66,7 @@ void lv_profiler_builtin_config_init(lv_profiler_builtin_config_t * config)
     config->buf_size = LV_PROFILER_BUILTIN_BUF_SIZE;
     config->tick_per_sec = 1000;
     config->tick_get_cb = lv_tick_get;
-    config->dump_cb = default_dump_cb;
+    config->flush_cb = default_flush_cb;
 }
 
 void lv_profiler_builtin_init(const lv_profiler_builtin_config_t * config)
@@ -105,11 +105,11 @@ void lv_profiler_builtin_uninit(void)
     lv_memzero(&profiler_ctx, sizeof(profiler_ctx));
 }
 
-void lv_profiler_builtin_dump(void)
+void lv_profiler_builtin_flush(void)
 {
     LV_ASSERT_NULL(profiler_ctx.item_arr);
-    if(!profiler_ctx.config.dump_cb) {
-        LV_LOG_WARN("dump_cb is not registered");
+    if(!profiler_ctx.config.flush_cb) {
+        LV_LOG_WARN("flush_cb is not registered");
         return;
     }
 
@@ -123,7 +123,7 @@ void lv_profiler_builtin_dump(void)
                     item->tick / tick_per_sec,
                     item->tag,
                     item->func);
-        profiler_ctx.config.dump_cb(buf);
+        profiler_ctx.config.flush_cb(buf);
     }
 }
 
@@ -132,7 +132,7 @@ void lv_profiler_builtin_write(const char * func, char tag)
     LV_ASSERT_NULL(profiler_ctx.item_arr);
     LV_ASSERT_NULL(func);
     if(profiler_ctx.cur_index >= profiler_ctx.item_num) {
-        lv_profiler_builtin_dump();
+        lv_profiler_builtin_flush();
         profiler_ctx.cur_index = 0;
     }
 
@@ -147,7 +147,7 @@ void lv_profiler_builtin_write(const char * func, char tag)
  *   STATIC FUNCTIONS
  **********************/
 
-static void default_dump_cb(const char * buf)
+static void default_flush_cb(const char * buf)
 {
     LV_LOG("%s", buf);
 }
