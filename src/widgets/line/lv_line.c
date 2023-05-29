@@ -170,9 +170,6 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
 
-        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        w += line_width;
-        h += line_width;
         p->x = w;
         p->y = h;
     }
