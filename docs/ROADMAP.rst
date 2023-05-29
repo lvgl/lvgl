@@ -1,7 +1,7 @@
 
 .. |check| replace:: ✅
 
-.. |uncheck| replace:: ❎
+.. |uncheck| replace:: ⛔
 
 
 Roadmap
