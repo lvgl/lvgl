@@ -52,6 +52,7 @@ static void res_chg_event_cb(lv_event_t * e);
 #if !LV_TICK_CUSTOM
     static int tick_thread(void * ptr);
 #endif
+static bool inited = false;
 
 /**********************
  *  STATIC VARIABLES
@@ -68,7 +69,6 @@ static lv_timer_t * event_handler_timer;
 
 lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
 {
-    static bool inited = false;
     if(!inited) {
         SDL_Init(SDL_INIT_VIDEO);
         SDL_StartTextInput();
@@ -220,7 +220,10 @@ static void sdl_event_handler(lv_timer_t * t)
         if(event.type == SDL_QUIT) {
             SDL_Quit();
             lv_timer_del(event_handler_timer);
+            inited = false;
+#if LV_SDL_DIRECT_EXIT
             exit(0);
+#endif
         }
     }
 }
@@ -231,6 +234,9 @@ static void clean_up(lv_disp_t * disp)
     SDL_DestroyTexture(dsc->texture);
     SDL_DestroyRenderer(dsc->renderer);
     SDL_DestroyWindow(dsc->window);
+
+    lv_free(dsc);
+    lv_disp_remove(disp);
 }
 
 static void window_create(lv_disp_t * disp)
