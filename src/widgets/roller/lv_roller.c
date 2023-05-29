@@ -14,6 +14,7 @@
 #include "../../core/lv_group.h"
 #include "../../core/lv_indev.h"
 #include "../../core/lv_indev_scroll.h"
+#include "../../core/lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -42,6 +43,7 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
 static lv_coord_t get_selected_label_width(const lv_obj_t * obj);
 static void scroll_anim_ready_cb(lv_anim_t * a);
 static void set_y_anim(void * obj, int32_t v);
+static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect);
 
 /**********************
  *  STATIC VARIABLES
@@ -355,6 +357,8 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_indev_t * indev = lv_indev_get_act();
         lv_point_t p;
         lv_indev_get_vect(indev, &p);
+
+        transform_vect_recursive(obj, &p);
         if(p.y) {
             lv_obj_t * label = get_label(obj);
             lv_obj_set_y(label, lv_obj_get_y(label) + p.y);
@@ -716,7 +720,19 @@ static lv_res_t release_handler(lv_obj_t * obj)
 
             lv_coord_t label_unit = font_h + line_space;
             lv_coord_t mid        = obj->coords.y1 + (obj->coords.y2 - obj->coords.y1) / 2;
-            lv_coord_t label_y1 = label->coords.y1 + lv_indev_scroll_throw_predict(indev, LV_DIR_VER);
+
+            lv_point_t p = indev->pointer.scroll_throw_vect_ori;
+            transform_vect_recursive(obj, &p);
+
+            lv_coord_t scroll_throw = indev->scroll_throw;
+            lv_coord_t sum = 0;
+            int32_t v = p.y;
+            while(v) {
+                sum += v;
+                v = v * (100 - scroll_throw) / 100;
+            }
+
+            lv_coord_t label_y1 = label->coords.y1 + sum;
             int32_t id = (mid - label_y1) / label_unit;
 
             if(id < 0) id = 0;
@@ -792,10 +808,26 @@ static void scroll_anim_ready_cb(lv_anim_t * a)
     inf_normalize(obj);
 }
 
-
 static void set_y_anim(void * obj, int32_t v)
 {
     lv_obj_set_y(obj, v);
+}
+
+
+static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
+{
+    int16_t angle = 0;
+    int32_t zoom = 256;
+    lv_obj_t * parent = roller;
+    while(parent) {
+        angle += lv_obj_get_style_transform_angle(parent, 0);
+        int32_t zoom_act = lv_obj_get_style_transform_zoom_safe(parent, 0);
+        zoom = (zoom * zoom_act) >> 8;
+        parent = lv_obj_get_parent(parent);
+    }
+    lv_point_t pivot = { 0, 0 };
+
+    lv_point_transform(vect, -angle, 256 * 256 / zoom, &pivot);
 }
 
 #endif
