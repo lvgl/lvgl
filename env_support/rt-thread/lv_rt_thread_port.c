@@ -69,7 +69,7 @@ static int lvgl_thread_init(void)
     rt_err_t err;
 
     err = rt_thread_init(&lvgl_thread, "LVGL", lvgl_thread_entry, RT_NULL,
-           &lvgl_thread_stack[0], sizeof(lvgl_thread_stack), PKG_LVGL_THREAD_PRIO, 0);
+           &lvgl_thread_stack[0], sizeof(lvgl_thread_stack), PKG_LVGL_THREAD_PRIO, 10);
     if(err != RT_EOK)
     {
         LOG_E("Failed to create LVGL thread");
