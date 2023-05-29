@@ -2601,6 +2601,15 @@
     #endif
 #endif
 
+/*Driver for /dev/dri/card*/
+#ifndef LV_USE_LINUX_DRM
+    #ifdef CONFIG_LV_USE_LINUX_DRM
+        #define LV_USE_LINUX_DRM CONFIG_LV_USE_LINUX_DRM
+    #else
+        #define LV_USE_LINUX_DRM        0
+    #endif
+#endif
+
 /*Interface for TFT_eSPI*/
 #ifndef LV_USE_TFT_ESPI
     #ifdef CONFIG_LV_USE_TFT_ESPI
