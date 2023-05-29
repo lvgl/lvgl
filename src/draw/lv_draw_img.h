@@ -38,9 +38,8 @@ typedef struct {
 } lv_draw_img_sup_t;
 
 typedef struct {
-
-    int16_t angle;
-    uint16_t zoom;
+    lv_coord_t angle;
+    lv_coord_t zoom;
     lv_point_t pivot;
 
     lv_color_t chroma_key_color;

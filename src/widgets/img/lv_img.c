@@ -327,7 +327,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * obj)
     return img->offset.y;
 }
 
-uint16_t lv_img_get_angle(lv_obj_t * obj)
+lv_coord_t lv_img_get_angle(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -345,7 +345,7 @@ void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot)
     *pivot = img->pivot;
 }
 
-uint16_t lv_img_get_zoom(lv_obj_t * obj)
+lv_coord_t lv_img_get_zoom(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -386,13 +386,13 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->cf        = LV_COLOR_FORMAT_UNKNOWN;
     img->w         = lv_obj_get_width(obj);
     img->h         = lv_obj_get_height(obj);
-    img->angle = 0;
-    img->zoom = LV_ZOOM_NONE;
+    img->angle     = 0;
+    img->zoom      = LV_ZOOM_NONE;
     img->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
     img->offset.x  = 0;
     img->offset.y  = 0;
-    img->pivot.x = 0;
-    img->pivot.y = 0;
+    img->pivot.x   = 0;
+    img->pivot.y   = 0;
     img->obj_size_mode = LV_IMG_SIZE_MODE_VIRTUAL;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
