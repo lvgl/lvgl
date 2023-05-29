@@ -1,9 +1,10 @@
 
+
+
+
+
 .. |check| raw:: html
-
-   <input checked=""  disabled="" type="checkbox">
-
-
+  <input checked=""  disabled="" type="checkbox">
 
 .. |uncheck| raw:: html
 
@@ -19,9 +20,9 @@ Planned for v9
 Naming and API
 ~~~~~~~~~~~~~~
 
-- |check| `lv_style_set_size()` should have separate width and height parameters
-- |check| Reconsider image color formats.
-- |uncheck| More consistent names:
+- <input checked=""  disabled="" type="checkbox"> `lv_style_set_size()` should have separate width and height parameters
+- <input checked=""  disabled="" type="checkbox"> Reconsider image color formats.
+- <input disabled="" type="checkbox"> More consistent names:
 
   - `remove/clear/delete/del` 
   - `offset/ofs`
