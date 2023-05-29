@@ -103,13 +103,33 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
     else if(src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = src;
         const uint32_t data_size = img_dsc->data_size;
+        const uint32_t * size = ((uint32_t *)img_dsc->data) + 4;
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
         if(data_size < sizeof(magic)) return LV_RES_INV;
         if(memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RES_INV;
         header->always_zero = 0;
-        header->cf = img_dsc->header.cf;       /*Save the color format*/
-        header->w = img_dsc->header.w;         /*Save the color width*/
-        header->h = img_dsc->header.h;         /*Save the color height*/
+
+        if(img_dsc->header.cf) {
+            header->cf = img_dsc->header.cf;       /*Save the color format*/
+        }
+        else {
+            header->cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+        }
+
+        if(img_dsc->header.w) {
+            header->w = img_dsc->header.w;         /*Save the image width*/
+        }
+        else {
+            header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
+        }
+
+        if(img_dsc->header.h) {
+            header->h = img_dsc->header.h;         /*Save the color height*/
+        }
+        else {
+            header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
+        }
+
         return LV_RES_OK;
     }
 
@@ -142,13 +162,13 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
             error = lodepng_load_file(&png_data, &png_data_size, fn);   /*Load the file*/
             if(error) {
-                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+                LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
             }
 
             /*Decode the PNG image*/
-            uint32_t png_width;             /*Will be the width of the decoded image*/
-            uint32_t png_height;            /*Will be the width of the decoded image*/
+            unsigned png_width;             /*Will be the width of the decoded image*/
+            unsigned png_height;            /*Will be the width of the decoded image*/
 
             /*Decode the loaded image in ARGB8888 */
             error = lodepng_decode32(&img_data, &png_width, &png_height, png_data, png_data_size);
@@ -157,7 +177,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
                 if(img_data != NULL) {
                     lv_mem_free(img_data);
                 }
-                LV_LOG_WARN("error %u: %s\n", error, lodepng_error_text(error));
+                LV_LOG_WARN("error %" LV_PRIu32 ": %s\n", error, lodepng_error_text(error));
                 return LV_RES_INV;
             }
 
@@ -170,8 +190,8 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     /*If it's a PNG file in a  C array...*/
     else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = dsc->src;
-        uint32_t png_width;             /*No used, just required by he decoder*/
-        uint32_t png_height;            /*No used, just required by he decoder*/
+        unsigned png_width;             /*No used, just required by he decoder*/
+        unsigned png_height;            /*No used, just required by he decoder*/
 
         /*Decode the image in ARGB8888 */
         error = lodepng_decode32(&img_data, &png_width, &png_height, img_dsc->data, img_dsc->data_size);
