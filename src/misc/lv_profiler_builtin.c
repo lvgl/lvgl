@@ -17,6 +17,7 @@
 #if LV_USE_PROFILER_BUILTIN
 
 #define LV_PROFILER_STR_MAX_LEN 128
+#define LV_PROFILER_TICK_PER_SEC_MAX 1000000
 
 /**********************
  *      TYPEDEFS
@@ -51,7 +52,7 @@ static void default_flush_cb(const char * buf);
  *  STATIC VARIABLES
  **********************/
 
-static lv_profiler_builtin_ctx_t profiler_ctx;
+static lv_profiler_builtin_ctx_t profiler_ctx = { 0 };
 
 /**********************
  *      MACROS
@@ -74,9 +75,16 @@ void lv_profiler_builtin_config_init(lv_profiler_builtin_config_t * config)
 void lv_profiler_builtin_init(const lv_profiler_builtin_config_t * config)
 {
     LV_ASSERT_NULL(config);
+    LV_ASSERT_NULL(config->tick_get_cb);
+
     uint32_t num = config->buf_size / sizeof(lv_profiler_builtin_item_t);
     if(num == 0) {
-        LV_LOG_WARN("buf_size need > %d", (int)sizeof(lv_profiler_builtin_item_t));
+        LV_LOG_WARN("buf_size must > %d", (int)sizeof(lv_profiler_builtin_item_t));
+        return;
+    }
+
+    if(config->tick_per_sec == 0 || config->tick_per_sec > LV_PROFILER_TICK_PER_SEC_MAX) {
+        LV_LOG_WARN("tick_per_sec range must be between 1~%d", LV_PROFILER_TICK_PER_SEC_MAX);
         return;
     }
 
@@ -117,12 +125,15 @@ void lv_profiler_builtin_flush(void)
 
     uint32_t cur = 0;
     char buf[LV_PROFILER_STR_MAX_LEN];
-    double tick_per_sec = profiler_ctx.config.tick_per_sec;
+    uint32_t tick_per_sec = profiler_ctx.config.tick_per_sec;
     while(cur < profiler_ctx.cur_index) {
         lv_profiler_builtin_item_t * item = &profiler_ctx.item_arr[cur++];
+        uint32_t sec = item->tick / tick_per_sec;
+        uint32_t usec = (item->tick % tick_per_sec) * (LV_PROFILER_TICK_PER_SEC_MAX / tick_per_sec);
         lv_snprintf(buf, sizeof(buf),
-                    "LVGL-0 [0] %f: tracing_mark_write: %c|0|%s\n",
-                    item->tick / tick_per_sec,
+                    "LVGL-1 [0] %" LV_PRIu32 ".%06" LV_PRIu32 ": tracing_mark_write: %c|1|%s\n",
+                    sec,
+                    usec,
                     item->tag,
                     item->func);
         profiler_ctx.config.flush_cb(buf);
