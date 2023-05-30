@@ -53,6 +53,14 @@ enum {
 typedef uint8_t lv_scale_mode_t;
 
 typedef struct {
+    lv_style_t * main_style;
+    lv_style_t * indicator_style;
+    lv_style_t * items_style;
+    lv_coord_t minor_range;
+    lv_coord_t major_range;
+} lv_scale_section_t;
+
+typedef struct {
     lv_obj_t obj;
     char ** txt_src;
     lv_coord_t major_len;
@@ -142,6 +150,29 @@ void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max);
  * @param txt_src   pointer to an array of strings which will be display at major ticks
  */
 void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src);
+
+/**
+ * Add a section to the given scale
+ * @param obj       pointer to a scale object
+ * @return          pointer to the new section
+ */
+lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj);
+
+/**
+ * Set the range for the given scale section
+ * @param obj       pointer to a scale section object
+ * @param minor_range   section new minor range
+ * @param major_range   section new major range
+ */
+void lv_scale_section_set_range(lv_scale_section_t * section, lv_coord_t minor_range, lv_coord_t major_range);
+
+/**
+ * Set the style of the part for the given scale section
+ * @param obj       pointer to a scale section object
+ * @param part      Section part
+ * @param section_part_style Pointer to the section part style
+ */
+void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style);
 
 /*=====================
  * Getter functions
