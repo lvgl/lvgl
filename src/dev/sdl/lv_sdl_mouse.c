@@ -135,17 +135,17 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 
         case SDL_FINGERUP:
             indev_dev->left_button_down = false;
-            indev_dev->last_x = hor_res * (lv_coord_t)event->tfinger.x / zoom;
-            indev_dev->last_y = ver_res * (lv_coord_t)event->tfinger.y / zoom;
+            indev_dev->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->last_y = ver_res * event->tfinger.y / zoom;
             break;
         case SDL_FINGERDOWN:
             indev_dev->left_button_down = true;
-            indev_dev->last_x = hor_res * (lv_coord_t)event->tfinger.x / zoom;
-            indev_dev->last_y = ver_res * (lv_coord_t)event->tfinger.y / zoom;
+            indev_dev->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->last_y = ver_res * event->tfinger.y / zoom;
             break;
         case SDL_FINGERMOTION:
-            indev_dev->last_x = hor_res * (lv_coord_t)event->tfinger.x / zoom;
-            indev_dev->last_y = ver_res * (lv_coord_t)event->tfinger.y / zoom;
+            indev_dev->last_x = hor_res * event->tfinger.x / zoom;
+            indev_dev->last_y = ver_res * event->tfinger.y / zoom;
             break;
     }
 }
