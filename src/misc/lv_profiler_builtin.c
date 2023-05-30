@@ -16,6 +16,8 @@
 
 #if LV_USE_PROFILER_BUILTIN
 
+#define LV_PROFILER_STR_MAX_LEN 128
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -114,7 +116,7 @@ void lv_profiler_builtin_flush(void)
     }
 
     uint32_t cur = 0;
-    char buf[128];
+    char buf[LV_PROFILER_STR_MAX_LEN];
     double tick_per_sec = profiler_ctx.config.tick_per_sec;
     while(cur < profiler_ctx.cur_index) {
         lv_profiler_builtin_item_t * item = &profiler_ctx.item_arr[cur++];
