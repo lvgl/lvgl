@@ -155,6 +155,39 @@ void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src)
     lv_obj_invalidate(obj);
 }
 
+lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
+{
+    return NULL;
+}
+
+void lv_scale_section_set_range(lv_scale_section_t * section, lv_coord_t minor_range, lv_coord_t major_range)
+{
+    if (NULL == section) return;
+
+    section->minor_range = minor_range;
+    section->major_range = major_range;
+}
+
+void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_style_t * section_part_style)
+{
+    if (NULL == section) return;
+
+    switch (part) {
+        case LV_PART_MAIN:
+            section->main_style = section_part_style;
+            break;
+        case LV_PART_INDICATOR:
+            section->indicator_style = section_part_style;
+            break;
+        case LV_PART_ITEMS:
+            section->items_style = section_part_style;
+            break;
+        default:
+            /* Invalid part */
+            break;
+    }
+}
+
 /*=====================
  * Getter functions
  *====================*/
