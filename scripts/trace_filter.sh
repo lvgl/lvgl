@@ -14,5 +14,5 @@ if [ ! -f "$outfile" ]; then
 fi
 echo "outfile: $outfile"
 
-printf "# trace: nop\n#\n" > $outfile
+printf "# tracer: nop\n#\n" > $outfile
 cat $logfile | grep -E ".*-[0-9]+\s[0-9]*" >> $outfile
