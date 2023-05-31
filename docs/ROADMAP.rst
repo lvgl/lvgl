@@ -1,13 +1,7 @@
 
-.. |check| raw:: html
+.. |check| replace:: ☑
 
-   <input checked=""  disabled="" type="checkbox">
-
-
-
-.. |uncheck| raw:: html
-
-   <input disabled="" type="checkbox">
+.. |uncheck| replace:: 🔲️
 
 
 Roadmap
