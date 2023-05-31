@@ -23,7 +23,7 @@
 #define MY_CLASS &lv_btnmatrix_class
 
 #define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI_DEF / 10)
-#define LV_BTNMATRIX_WIDTH_MASK 0x0007
+#define LV_BTNMATRIX_WIDTH_MASK 0x000F
 
 /**********************
  *      TYPEDEFS
