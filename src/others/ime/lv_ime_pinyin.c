@@ -577,6 +577,7 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 
     lv_btnmatrix_set_one_checked(pinyin_ime->cand_panel, true);
+    lv_obj_clear_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     /* Set cand_panel style*/
     // Default style
