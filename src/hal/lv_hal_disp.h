@@ -189,6 +189,10 @@ uint8_t del_prev  :
     uint16_t inv_p;
     int32_t inv_en_cnt;
 
+    /** Double buffer sync areas */
+    lv_area_t sync_areas[LV_INV_BUF_SIZE];
+    uint16_t sync_p;
+
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/
 } lv_disp_t;
