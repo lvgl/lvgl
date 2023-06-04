@@ -1011,10 +1011,14 @@ menu "LVGL configuration"
 
 		config LV_USE_PROFILER
 			bool "Runtime performance profiler."
+		config LV_USE_PROFILER_BUILTIN
+			bool "Enable the built-in profiler"
+			depends on LV_USE_PROFILER
+			default y
 		config LV_PROFILER_INCLUDE
 			string "Header to include for the profiler"
 			depends on LV_USE_PROFILER
-			default "profiler.h"
+			default "lvgl/src/misc/lv_profiler_builtin.h"
 
 		config LV_USE_GRIDNAV
 			bool "Enable grid navigation"
