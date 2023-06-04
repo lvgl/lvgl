@@ -91,16 +91,7 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period
  * Call it in the super-loop of main() or threads. It will automatically call lv_timer_handler() at the right time.
  * This function is used to simplify the porting.
  */
-static inline LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void)
-{
-    static uint32_t last_tick = 0;
-    static uint32_t time_till_next = 0;
-
-    if(lv_tick_elaps(last_tick) >= time_till_next) {
-        time_till_next = lv_timer_handler();
-        last_tick = lv_tick_get();
-    }
-}
+LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void);
 
 /**
  * Create an "empty" timer. It needs to be initialized with at least

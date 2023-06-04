@@ -29,6 +29,7 @@
  **********************/
 static bool lv_timer_exec(lv_timer_t * timer);
 static uint32_t lv_timer_time_remaining(lv_timer_t * timer);
+static void lv_timer_handler_resume(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -37,6 +38,7 @@ static bool lv_timer_run = false;
 static uint8_t idle_last = 0;
 static bool timer_deleted;
 static bool timer_created;
+static uint32_t timer_time_till_next;
 
 /**********************
  *      MACROS
@@ -142,11 +144,22 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         idle_period_start = lv_tick_get();
     }
 
+    timer_time_till_next = time_till_next;
     already_running = false; /*Release the mutex*/
 
     TIMER_TRACE("finished (%" LV_PRIu32 " ms until the next timer call)", time_till_next);
     LV_PROFILER_END;
     return time_till_next;
+}
+
+LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void)
+{
+    static uint32_t last_tick = 0;
+
+    if(lv_tick_elaps(last_tick) >= timer_time_till_next) {
+        lv_timer_handler();
+        last_tick = lv_tick_get();
+    }
 }
 
 /**
@@ -185,6 +198,8 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
 
     timer_created = true;
 
+    lv_timer_handler_resume();
+
     return new_timer;
 }
 
@@ -222,6 +237,7 @@ void lv_timer_pause(lv_timer_t * timer)
 void lv_timer_resume(lv_timer_t * timer)
 {
     timer->paused = false;
+    lv_timer_handler_resume();
 }
 
 /**
@@ -270,6 +286,7 @@ void lv_timer_reset(lv_timer_t * timer)
 void lv_timer_enable(bool en)
 {
     lv_timer_run = en;
+    if(en) lv_timer_handler_resume();
 }
 
 /**
@@ -350,4 +367,15 @@ static uint32_t lv_timer_time_remaining(lv_timer_t * timer)
     if(elp >= timer->period)
         return 0;
     return timer->period - elp;
+}
+
+/**
+ * Call the ready lv_timer
+ */
+static void lv_timer_handler_resume(void)
+{
+    /*If there is a timer which is ready to run then resume the timer loop*/
+    if(timer_time_till_next == LV_NO_TIMER_READY) {
+        timer_time_till_next = 0;
+    }
 }
