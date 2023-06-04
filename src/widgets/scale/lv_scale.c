@@ -29,6 +29,7 @@
  **********************/
 
 static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
+static void lv_scale_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event);
 
 static void scale_draw_main(lv_obj_t *obj, lv_event_t * event);
@@ -40,6 +41,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event);
  **********************/
 const lv_obj_class_t lv_scale_class  = {
     .constructor_cb = lv_scale_constructor,
+    .destructor_cb = lv_scale_destructor,
     .event_cb = lv_scale_event,
     .instance_size = sizeof(lv_scale_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
@@ -157,7 +159,18 @@ void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src)
 
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
 {
-    return NULL;
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_scale_section_t * section = _lv_ll_ins_head(&scale->section_ll);
+    LV_ASSERT_MALLOC(section);
+    if(section == NULL) return NULL;
+
+    /* Section default values */
+    section->minor_range = 0U;
+    section->major_range = 0U;
+
+    return section;
 }
 
 void lv_scale_section_set_range(lv_scale_section_t * section, lv_coord_t minor_range, lv_coord_t major_range)
@@ -207,10 +220,29 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_scale_t * scale = (lv_scale_t *)obj;
 
+    _lv_ll_init(&scale->section_ll, sizeof(lv_scale_section_t));
+
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
-    scale->mode = LV_SCALE_MODE_VERTICAL_RIGHT;
+    scale->mode = LV_SCALE_MODE_VERTICAL_LEFT;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
+
+    LV_TRACE_OBJ_CREATE("finished");
+}
+
+static void lv_scale_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
+{
+    LV_UNUSED(class_p);
+    LV_TRACE_OBJ_CREATE("begin");
+
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_scale_section_t * section;
+    while(scale->section_ll.head) {
+        section = _lv_ll_get_head(&scale->section_ll);
+        _lv_ll_remove(&scale->section_ll, section);
+        lv_free(section);
+    }
+    _lv_ll_clear(&scale->section_ll);
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -486,6 +518,20 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
             }
 
             tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
+
+            /* Overwrite label properties if tick value is within section range */
+            lv_scale_section_t * section;
+            _LV_LL_READ_BACK(&scale->section_ll, section) {
+                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+                    lv_style_value_t value;
+                    lv_res_t res = lv_style_get_prop(&section->indicator_style, LV_STYLE_TEXT_COLOR, &value);
+                    if(res == LV_RES_OK) {
+                        /* Section property found, overwrite value */
+                        label_dsc.color = value.color;
+                    }
+                }
+            }
+
             lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
             part_draw_dsc.text = text_buffer;
             part_draw_dsc.text_length = sizeof(text_buffer);
