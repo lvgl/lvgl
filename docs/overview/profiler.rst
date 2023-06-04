@@ -95,11 +95,17 @@ Run the UI scenario that you want to measure, such as scrolling a scrollable pag
 Process the logs
 ^^^^^^^^^^^^^^^^
 
-Process the printed log information using the `trace_filter.sh` script:
+Process the printed log information using the `trace_filter.py` script:
 
     .. code:: bash
 
-        ./lvgl/scripts/trace_filter.sh my_trace.txt
+        ./lvgl/scripts/trace_filter.py my_trace.txt
+
+    or
+
+    .. code:: bash
+
+        python3 ./lvgl/scripts/trace_filter.py my_trace.txt
 
 You will obtain a processed text file named `trace.systrace`, which roughly contains the following content:
 
@@ -194,18 +200,3 @@ If the trace logs are not automatically printed when the buffer is not full, you
 
 1. Reduce the value of :c:macro:`LV_PROFILER_BUILTIN_BUF_SIZE` to fill the buffer more quickly and trigger automatic printing.
 2. Manually call or use a timer to call the :cpp:func:`lv_profiler_builtin_flush` function to force the log output.
-
-Permission denied when executing trace_filter.sh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If you receive the following message when executing the script:
-
-.. code:: bash
-
-    bash: ./lvgl/scripts/trace_filter.sh: Permission denied
-
-Run the following command to grant execution permission:
-
-.. code:: bash
-
-    chmod +x ./lvgl/scripts/trace_filter.sh
