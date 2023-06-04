@@ -95,7 +95,7 @@ Run the UI scenario that you want to measure, such as scrolling a scrollable pag
 Process the logs
 ^^^^^^^^^^^^^^^^
 
-Process the printed log information using the `trace_filter.py` script:
+Save the output log as `my_trace.txt`, use `trace_filter.py` for filtering and preprocessing:
 
     .. code:: bash
 
