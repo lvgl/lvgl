@@ -184,7 +184,7 @@ Significant stuttering occurs during profiling
 
 When the buffer used to store trace events becomes full, the profiler will output all the data in the buffer, which can cause UI blocking and stuttering during the output. You can optimize this by taking the following measures:
 
-1. Increase the value of `LV_PROFILER_BUILTIN_BUF_SIZE`. A larger buffer can reduce the frequency of log printing, but it also consumes more memory.
+1. Increase the value of :c:macro:`LV_PROFILER_BUILTIN_BUF_SIZE`. A larger buffer can reduce the frequency of log printing, but it also consumes more memory.
 2. Optimize the execution time of log printing functions, such as increasing the serial port baud rate or improving file writing speed.
 
 Trace logs are not being output
@@ -192,7 +192,7 @@ Trace logs are not being output
 
 If the trace logs are not automatically printed when the buffer is not full, you can try the following methods to force the log output:
 
-1. Reduce the value of `LV_PROFILER_BUILTIN_BUF_SIZE` to fill the buffer more quickly and trigger automatic printing.
+1. Reduce the value of :c:macro:`LV_PROFILER_BUILTIN_BUF_SIZE` to fill the buffer more quickly and trigger automatic printing.
 2. Manually call or use a timer to call the :cpp:func:`lv_profiler_builtin_flush` function to force the log output.
 
 Permission denied when executing trace_filter.sh
