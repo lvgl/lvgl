@@ -75,7 +75,7 @@ To enable the profiler, set :c:macro:`LV_USE_PROFILER` in ``lv_conf.h`` and conf
 
         static void my_log_print_cb(const char * buf)
         {
-            printf(buf);
+            printf("%s", buf);
         }
 
         void my_profiler_init(void)
