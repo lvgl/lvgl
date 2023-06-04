@@ -16,7 +16,7 @@ extern "C" {
 
 #include "../lv_conf_internal.h"
 
-#if LV_USE_PROFILER_BUILTIN
+#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
 #include <stdbool.h>
 #include <stddef.h>
