@@ -434,7 +434,6 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
-    line_dsc.width = 2U; /* NOTE: Had to set up manually, otherwise the ticks were not visible */
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
