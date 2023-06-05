@@ -38,7 +38,7 @@ static bool lv_timer_run = false;
 static uint8_t idle_last = 0;
 static bool timer_deleted;
 static bool timer_created;
-static uint32_t timer_time_till_next;
+static uint32_t timer_time_untill_next;
 
 /**********************
  *      MACROS
@@ -123,13 +123,13 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         }
     } while(LV_GC_ROOT(_lv_timer_act));
 
-    uint32_t time_till_next = LV_NO_TIMER_READY;
+    uint32_t time_untill_next = LV_NO_TIMER_READY;
     next = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
     while(next) {
         if(!next->paused) {
             uint32_t delay = lv_timer_time_remaining(next);
-            if(delay < time_till_next)
-                time_till_next = delay;
+            if(delay < time_untill_next)
+                time_untill_next = delay;
         }
 
         next = _lv_ll_get_next(&LV_GC_ROOT(_lv_timer_ll), next); /*Find the next timer*/
@@ -144,19 +144,19 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
         idle_period_start = lv_tick_get();
     }
 
-    timer_time_till_next = time_till_next;
+    timer_time_untill_next = time_untill_next;
     already_running = false; /*Release the mutex*/
 
-    TIMER_TRACE("finished (%" LV_PRIu32 " ms until the next timer call)", time_till_next);
+    TIMER_TRACE("finished (%" LV_PRIu32 " ms until the next timer call)", time_untill_next);
     LV_PROFILER_END;
-    return time_till_next;
+    return time_untill_next;
 }
 
 LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void)
 {
     static uint32_t last_tick = 0;
 
-    if(lv_tick_elaps(last_tick) >= timer_time_till_next) {
+    if(lv_tick_elaps(last_tick) >= timer_time_untill_next) {
         lv_timer_handler();
         last_tick = lv_tick_get();
     }
@@ -277,6 +277,7 @@ void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count)
 void lv_timer_reset(lv_timer_t * timer)
 {
     timer->last_run = lv_tick_get();
+    lv_timer_handler_resume();
 }
 
 /**
@@ -296,6 +297,15 @@ void lv_timer_enable(bool en)
 uint8_t lv_timer_get_idle(void)
 {
     return idle_last;
+}
+
+/**
+ * Get idle period start tick
+ * @return the lv_timer idle period start tick
+ */
+uint32_t lv_timer_get_time_untill_next(void)
+{
+    return timer_time_untill_next;
 }
 
 /**
@@ -375,7 +385,7 @@ static uint32_t lv_timer_time_remaining(lv_timer_t * timer)
 static void lv_timer_handler_resume(void)
 {
     /*If there is a timer which is ready to run then resume the timer loop*/
-    if(timer_time_till_next == LV_NO_TIMER_READY) {
-        timer_time_till_next = 0;
+    if(timer_time_untill_next == LV_NO_TIMER_READY) {
+        timer_time_untill_next = 0;
     }
 }

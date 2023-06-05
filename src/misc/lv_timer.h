@@ -172,6 +172,12 @@ void lv_timer_enable(bool en);
 uint8_t lv_timer_get_idle(void);
 
 /**
+ * Get the time remaining until the next timer will run
+ * @return the time remaining in ms
+ */
+uint32_t lv_timer_get_time_untill_next(void);
+
+/**
  * Iterate through the timers
  * @param timer NULL to start iteration or the previous return value to get the next timer
  * @return the next timer or NULL if there is no more timer
