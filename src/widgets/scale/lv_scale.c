@@ -167,6 +167,9 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     if(section == NULL) return NULL;
 
     /* Section default values */
+    section->main_style = NULL;
+    section->indicator_style = NULL;
+    section->items_style = NULL;
     section->minor_range = 0U;
     section->major_range = 0U;
 
@@ -267,7 +270,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
             scale_draw_items(obj, event);
         }
         else if (LV_SCALE_MODE_ROUND == scale->mode) {
-            
+
         }
         else {
             /* Invalid mode */
@@ -308,7 +311,7 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t x_ofs = 0U;
     lv_coord_t y_ofs = 0U;
-    
+
     if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
         x_ofs = obj->coords.x1;
         y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
@@ -396,7 +399,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
     /* Get offset on both axis so the widget can be drawn from there */
     lv_coord_t x_ofs = 0U;
     lv_coord_t y_ofs = 0U;
-    
+
     if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
         label_gap = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
         x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
@@ -524,11 +527,18 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
             _LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                     lv_style_value_t value;
-                    lv_res_t res = lv_style_get_prop(&section->indicator_style, LV_STYLE_TEXT_COLOR, &value);
+                    lv_res_t res = lv_style_get_prop(section->indicator_style, LV_STYLE_TEXT_COLOR, &value);
                     if(res == LV_RES_OK) {
                         /* Section property found, overwrite value */
                         label_dsc.color = value.color;
                     }
+                    else {
+                        label_dsc.color = lv_obj_get_style_text_color(scale, LV_PART_INDICATOR);
+                    }
+                }
+                else {
+                    /* If label is not within a range then get the indicator style */
+                    label_dsc.color = lv_obj_get_style_text_color(scale, LV_PART_INDICATOR);
                 }
             }
 
@@ -544,7 +554,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
 
         /* Set the label draw area at some distance of the major tick */
         lv_area_t label_coords;
-        
+
         if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             label_coords.x1 = (tick_point_b.x - size.x / 2);
             label_coords.x2 = (tick_point_b.x + size.x / 2);
@@ -593,7 +603,7 @@ static void scale_draw_main(lv_obj_t *obj, lv_event_t * event)
     lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t x_ofs = 0U;
     lv_coord_t y_ofs = 0U;
-    
+
     if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
         x_ofs = obj->coords.x1;
         y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
