@@ -175,7 +175,7 @@ uint8_t lv_timer_get_idle(void);
  * Get the time remaining until the next timer will run
  * @return the time remaining in ms
  */
-uint32_t lv_timer_get_time_untill_next(void);
+uint32_t lv_timer_get_time_until_next(void);
 
 /**
  * Iterate through the timers
