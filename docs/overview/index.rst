@@ -24,5 +24,6 @@ Overview
     anim
     timer
     draw
+    profiler
     renderers/index
     new_widget

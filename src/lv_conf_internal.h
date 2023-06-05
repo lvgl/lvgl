@@ -2355,12 +2355,35 @@
     #endif
 #endif
 #if LV_USE_PROFILER
+    /*1: Enable the built-in profiler*/
+    #ifndef LV_USE_PROFILER_BUILTIN
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_USE_PROFILER_BUILTIN
+                #define LV_USE_PROFILER_BUILTIN CONFIG_LV_USE_PROFILER_BUILTIN
+            #else
+                #define LV_USE_PROFILER_BUILTIN 0
+            #endif
+        #else
+            #define LV_USE_PROFILER_BUILTIN 1
+        #endif
+    #endif
+    #if LV_USE_PROFILER_BUILTIN
+        /*Default profiler trace buffer size*/
+        #ifndef LV_PROFILER_BUILTIN_BUF_SIZE
+            #ifdef CONFIG_LV_PROFILER_BUILTIN_BUF_SIZE
+                #define LV_PROFILER_BUILTIN_BUF_SIZE CONFIG_LV_PROFILER_BUILTIN_BUF_SIZE
+            #else
+                #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /*[bytes]*/
+            #endif
+        #endif
+    #endif
+
     /*Header to include for the profiler*/
     #ifndef LV_PROFILER_INCLUDE
         #ifdef CONFIG_LV_PROFILER_INCLUDE
             #define LV_PROFILER_INCLUDE CONFIG_LV_PROFILER_INCLUDE
         #else
-            #define LV_PROFILER_INCLUDE <stdint.h>
+            #define LV_PROFILER_INCLUDE "lvgl/src/misc/lv_profiler_builtin.h"
         #endif
     #endif
 
@@ -2369,7 +2392,7 @@
         #ifdef CONFIG_LV_PROFILER_BEGIN
             #define LV_PROFILER_BEGIN CONFIG_LV_PROFILER_BEGIN
         #else
-            #define LV_PROFILER_BEGIN
+            #define LV_PROFILER_BEGIN   LV_PROFILER_BUILTIN_BEGIN
         #endif
     #endif
 
@@ -2378,7 +2401,7 @@
         #ifdef CONFIG_LV_PROFILER_END
             #define LV_PROFILER_END CONFIG_LV_PROFILER_END
         #else
-            #define LV_PROFILER_END
+            #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
         #endif
     #endif
 #endif
