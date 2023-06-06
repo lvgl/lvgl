@@ -120,6 +120,11 @@ void lv_init(void)
 
     LV_LOG_INFO("begin");
 
+    /*First initialize Garbage Collection if needed*/
+#ifdef LV_GC_INIT
+    LV_GC_INIT();
+#endif
+
     /*Initialize the misc modules*/
 #if LV_USE_BUILTIN_MALLOC
     lv_mem_init_builtin();
