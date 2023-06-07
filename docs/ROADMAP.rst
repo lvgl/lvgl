@@ -168,6 +168,7 @@ Widgets
 ~~~~~~~
 
 - |uncheck| `lv_bar`, `lv_arc`: handle max < min for fill direction swapping #4039
+- |uncheck| `lv_bar`, `lv_slider`, `lv_arc`: make possible to move the knob only inside the background (see `here <https://forum.lvgl.io/t/slider-knob-out-of-the-track/11956>`__)
 
 Others
 ~~~~~~
