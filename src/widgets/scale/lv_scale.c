@@ -377,6 +377,68 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
             tick_point_b.y = tick_point_a.y + tick_length;
         }
 
+        int32_t tick_value = 0U;
+        int32_t min_out = 0U;
+        int32_t max_out = 0U;
+
+        if ((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
+            || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+            min_out = scale->range_min;
+            max_out = scale->range_max;
+        }
+        else {
+            /* Circular mode */
+        }
+
+        tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
+
+        /* Overwrite label properties if tick value is within section range */
+        lv_scale_section_t * section;
+        _LV_LL_READ_BACK(&scale->section_ll, section) {
+            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+
+                if (section->indicator_style) {
+                    lv_style_value_t value;
+                    lv_res_t res;
+
+                    /* Tick width */
+                    res = lv_style_get_prop(section->items_style, LV_STYLE_LINE_WIDTH, &value);
+                    if(res == LV_RES_OK) {
+                        line_dsc.width = (lv_coord_t)value.num;
+                    }
+                    else {
+                        line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+                    }
+
+                    /* Tick color */
+                    res = lv_style_get_prop(section->items_style, LV_STYLE_LINE_COLOR, &value);
+                    if(res == LV_RES_OK) {
+                        line_dsc.color = value.color;
+                    }
+                    else {
+                        line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_ITEMS);
+                    }
+
+                    /* Tick opa */
+                    res = lv_style_get_prop(section->items_style, LV_STYLE_LINE_OPA, &value);
+                    if(res == LV_RES_OK) {
+                        line_dsc.opa = (lv_opa_t)value.num;
+                    }
+                    else {
+                        line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_ITEMS);
+                    }
+
+                    /* Tick gap */
+
+                }
+            }
+            else {
+                line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_ITEMS);
+                line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_ITEMS);
+                line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+            }
+        }
+
         lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
         lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
         lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
