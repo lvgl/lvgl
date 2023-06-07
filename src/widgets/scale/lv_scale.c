@@ -333,7 +333,7 @@ static void scale_draw_items(lv_obj_t *obj, lv_event_t * event)
     uint16_t total_tick_count = scale->total_tick_count;
 
     lv_coord_t major_len = scale->major_len;
-    lv_coord_t minor_len = lv_obj_get_style_width(scale, LV_PART_ITEMS);
+    lv_coord_t minor_len = lv_obj_get_style_width(obj, LV_PART_ITEMS);
 
     /* Draw tick lines to the right */
     if (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
@@ -536,7 +536,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                             label_dsc.color = value.color;
                         }
                         else {
-                            label_dsc.color = lv_obj_get_style_text_color(scale, LV_PART_INDICATOR);
+                            label_dsc.color = lv_obj_get_style_text_color(obj, LV_PART_INDICATOR);
                         }
 
                         /* Text opa */
@@ -545,7 +545,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                             label_dsc.opa = (lv_opa_t)value.num;
                         }
                         else {
-                            label_dsc.opa = lv_obj_get_style_text_opa(scale, LV_PART_INDICATOR);
+                            label_dsc.opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
                         }
 
                         /* Text letter space */
@@ -554,7 +554,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                             label_dsc.letter_space = (lv_coord_t)value.num;
                         }
                         else {
-                            label_dsc.letter_space = lv_obj_get_style_text_letter_space(scale, LV_PART_INDICATOR);
+                            label_dsc.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
                         }
 
                         /* Text font */
@@ -563,7 +563,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                             label_dsc.font = (const lv_font_t *)value.ptr;
                         }
                         else {
-                            label_dsc.font = lv_obj_get_style_text_font(scale, LV_PART_INDICATOR);
+                            label_dsc.font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
                         }
 
                         /* Tick width */
@@ -572,7 +572,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                             line_dsc.width = (lv_coord_t)value.num;
                         }
                         else {
-                            line_dsc.width = lv_obj_get_style_line_width(scale, LV_PART_INDICATOR);
+                            line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
                         }
 
                         /* Tick color */
@@ -581,7 +581,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                             line_dsc.color = value.color;
                         }
                         else {
-                            line_dsc.color = lv_obj_get_style_line_color(scale, LV_PART_INDICATOR);
+                            line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
                         }
 
                         /* Tick opa */
@@ -590,7 +590,7 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                             line_dsc.opa = (lv_opa_t)value.num;
                         }
                         else {
-                            line_dsc.opa = lv_obj_get_style_line_opa(scale, LV_PART_INDICATOR);
+                            line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
                         }
 
                         /* Tick gap */
@@ -599,14 +599,14 @@ static void scale_draw_indicator(lv_obj_t *obj, lv_event_t * event)
                 }
                 else {
                     /* If label is not within a range then get the indicator style */
-                    label_dsc.color = lv_obj_get_style_text_color(scale, LV_PART_INDICATOR);
-                    label_dsc.opa = lv_obj_get_style_text_opa(scale, LV_PART_INDICATOR);
-                    label_dsc.letter_space = lv_obj_get_style_text_letter_space(scale, LV_PART_INDICATOR);
-                    label_dsc.font = lv_obj_get_style_text_font(scale, LV_PART_INDICATOR);
+                    label_dsc.color = lv_obj_get_style_text_color(obj, LV_PART_INDICATOR);
+                    label_dsc.opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
+                    label_dsc.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
+                    label_dsc.font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
 
-                    line_dsc.color = lv_obj_get_style_line_color(scale, LV_PART_INDICATOR);
-                    line_dsc.opa = lv_obj_get_style_line_opa(scale, LV_PART_INDICATOR);
-                    line_dsc.width = lv_obj_get_style_line_width(scale, LV_PART_INDICATOR);
+                    line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
+                    line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
+                    line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
                 }
             }
 
