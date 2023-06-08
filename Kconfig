@@ -228,6 +228,16 @@ menu "LVGL configuration"
                     Must be defined to include path of CMSIS header of target processor
                     e.g. "stm32f769xx.h" or "stm32f429xx.h"
 
+            config LV_USE_GPU_RA6M3_G2D
+                bool "Enable RA6M3 G2D GPU."
+            config LV_GPU_RA6M3_G2D_INCLUDE
+                string "include path of target processor"
+                depends on LV_USE_GPU_RA6M3_G2D
+                default "hal_data.h"
+                help
+                    Must be defined to include path of target processor
+                    e.g. "hal_data.h"
+
             config LV_USE_GPU_SWM341_DMA2D
                 bool "Enable SWM341 DMA2D GPU."
             config LV_GPU_SWM341_DMA2D_INCLUDE
