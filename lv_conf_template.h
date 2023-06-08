@@ -187,6 +187,14 @@
     #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*Enable RA6M3 G2D GPU*/
+#define LV_USE_GPU_RA6M3_G2D 0
+#if LV_USE_GPU_RA6M3_G2D
+    /*include path of target processor
+    e.g. "hal_data.h"*/
+    #define LV_GPU_RA6M3_G2D_INCLUDE "hal_data.h"
+#endif
+
 /*Use SWM341's DMA2D GPU*/
 #define LV_USE_GPU_SWM341_DMA2D 0
 #if LV_USE_GPU_SWM341_DMA2D

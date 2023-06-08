@@ -445,6 +445,26 @@
     #endif
 #endif
 
+/*Enable RA6M3 G2D GPU*/
+#ifndef LV_USE_GPU_RA6M3_G2D
+    #ifdef CONFIG_LV_USE_GPU_RA6M3_G2D
+        #define LV_USE_GPU_RA6M3_G2D CONFIG_LV_USE_GPU_RA6M3_G2D
+    #else
+        #define LV_USE_GPU_RA6M3_G2D 0
+    #endif
+#endif
+#if LV_USE_GPU_RA6M3_G2D
+    /*include path of target processor
+    e.g. "hal_data.h"*/
+    #ifndef LV_GPU_RA6M3_G2D_INCLUDE
+        #ifdef CONFIG_LV_GPU_RA6M3_G2D_INCLUDE
+            #define LV_GPU_RA6M3_G2D_INCLUDE CONFIG_LV_GPU_RA6M3_G2D_INCLUDE
+        #else
+            #define LV_GPU_RA6M3_G2D_INCLUDE "hal_data.h"
+        #endif
+    #endif
+#endif
+
 /*Use SWM341's DMA2D GPU*/
 #ifndef LV_USE_GPU_SWM341_DMA2D
     #ifdef CONFIG_LV_USE_GPU_SWM341_DMA2D

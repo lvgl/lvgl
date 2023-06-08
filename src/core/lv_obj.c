@@ -30,6 +30,10 @@
     #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
 #endif
 
+#if LV_USE_GPU_RA6M3_G2D
+    #include "../draw/renesas/lv_gpu_d2_ra6m3.h"
+#endif
+
 #if LV_USE_GPU_SWM341_DMA2D
     #include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
 #endif
@@ -117,6 +121,11 @@ void lv_init(void)
 #if LV_USE_GPU_STM32_DMA2D
     /*Initialize DMA2D GPU*/
     lv_draw_stm32_dma2d_init();
+#endif
+
+#if LV_USE_GPU_RA6M3_G2D
+    /*Initialize G2D GPU*/
+    lv_draw_ra6m3_g2d_init();
 #endif
 
 #if LV_USE_GPU_SWM341_DMA2D
