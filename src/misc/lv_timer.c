@@ -157,6 +157,7 @@ LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void)
     static uint32_t last_tick = 0;
 
     if(lv_tick_elaps(last_tick) >= timer_time_until_next) {
+        TIMER_TRACE("calling lv_timer_handler()");
         lv_timer_handler();
         last_tick = lv_tick_get();
     }
@@ -385,7 +386,5 @@ static uint32_t lv_timer_time_remaining(lv_timer_t * timer)
 static void lv_timer_handler_resume(void)
 {
     /*If there is a timer which is ready to run then resume the timer loop*/
-    if(timer_time_until_next == LV_NO_TIMER_READY) {
-        timer_time_until_next = 0;
-    }
+    timer_time_until_next = 0;
 }
