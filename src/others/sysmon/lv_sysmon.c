@@ -16,13 +16,16 @@
  *********************/
 #define MY_CLASS &lv_sysmon_class
 
+#define SYSMON_REFR_PERIOD_DEF 300 /* ms */
+
 /**********************
  *      TYPEDEFS
  **********************/
 typedef struct {
-    uint32_t    elaps_sum;
-    uint32_t    frame_cnt;
     lv_disp_t * disp;
+    uint32_t    refr_elaps_sum;
+    uint32_t    render_elaps_sum;
+    uint32_t    frame_cnt;
 } perf_info_t;
 
 /**********************
@@ -89,7 +92,7 @@ static void lv_sysmon_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 {
     LV_UNUSED(class_p);
     lv_sysmon_t * sysmon = (lv_sysmon_t *)obj;
-    sysmon->timer = lv_timer_create(lv_sysmon_timer_cb, 1000, obj);
+    sysmon->timer = lv_timer_create(lv_sysmon_timer_cb, SYSMON_REFR_PERIOD_DEF, obj);
     lv_obj_set_style_bg_opa(obj, LV_OPA_50, 0);
     lv_obj_set_style_bg_color(obj, lv_color_black(), 0);
     lv_obj_set_style_text_color(obj, lv_color_white(), 0);
@@ -111,40 +114,51 @@ static void lv_sysmon_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
 #if LV_USE_PERF_MONITOR
 
+static void perf_monitor_refr_start_cb(lv_event_t * e)
+{
+    lv_obj_t * sysmon = lv_event_get_user_data(e);
+    perf_info_t * info = lv_obj_get_user_data(sysmon);
+    info->refr_elaps_sum += lv_tick_elaps(info->disp->last_render_start_time);
+    info->frame_cnt++;
+}
+
 static void perf_monitor_refr_finish_cb(lv_event_t * e)
 {
     lv_obj_t * sysmon = lv_event_get_user_data(e);
     perf_info_t * info = lv_obj_get_user_data(sysmon);
-    info->elaps_sum += lv_tick_elaps(info->disp->last_render_start_time);
-    info->frame_cnt++;
+    info->render_elaps_sum += lv_tick_elaps(info->disp->last_render_start_time);
 }
 
 static void perf_monitor_event_cb(lv_event_t * e)
 {
     lv_obj_t * sysmon = lv_event_get_current_target_obj(e);
     perf_info_t * info = lv_obj_get_user_data(sysmon);
-    uint32_t cpu = 100 - lv_timer_get_idle();
-    uint32_t avg_time = info->frame_cnt ? info->elaps_sum / info->frame_cnt : 0;
 
-    /*Avoid warning*/
-    LV_UNUSED(cpu);
-    LV_UNUSED(avg_time);
+    uint32_t cpu = 100 - lv_timer_get_idle();
+    uint32_t render_avg_time = info->frame_cnt ? (info->render_elaps_sum / info->frame_cnt) : 0;
+    uint32_t fps = info->refr_elaps_sum ? (1000 * info->frame_cnt / info->refr_elaps_sum) : 0;
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
+    /*Avoid warning*/
+    LV_UNUSED(fps);
+    LV_UNUSED(render_avg_time);
+    LV_UNUSED(cpu);
+
     LV_LOG("sysmon: %" LV_PRIu32" FPS / render %" LV_PRIu32" ms / %" LV_PRIu32 "%% CPU\n",
-           info->frame_cnt,
-           avg_time,
+           fps,
+           render_avg_time,
            cpu);
 #else
     lv_label_set_text_fmt(
         sysmon,
         "%" LV_PRIu32" FPS / %" LV_PRIu32" ms\n%" LV_PRIu32 "%% CPU",
-        info->frame_cnt,
-        avg_time,
+        fps,
+        render_avg_time,
         cpu
     );
 #endif /*LV_USE_PERF_MONITOR_LOG_MODE*/
-    info->elaps_sum = 0;
+    info->refr_elaps_sum = 0;
+    info->render_elaps_sum = 0;
     info->frame_cnt = 0;
 }
 
@@ -154,11 +168,11 @@ static void perf_monitor_init(void)
     info.disp = lv_disp_get_default();
 
     lv_obj_t * sysmon = lv_sysmon_create(lv_layer_sys());
-    lv_sysmon_set_refr_period(sysmon, 1000);
     lv_obj_align(sysmon, LV_USE_PERF_MONITOR_POS, 0, 0);
     lv_obj_set_style_text_align(sysmon, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_set_user_data(sysmon, &info);
     lv_obj_add_event(sysmon, perf_monitor_event_cb, LV_EVENT_REFRESH, NULL);
+    lv_disp_add_event(info.disp, perf_monitor_refr_start_cb, LV_EVENT_REFR_START, sysmon);
     lv_disp_add_event(info.disp, perf_monitor_refr_finish_cb, LV_EVENT_REFR_FINISH, sysmon);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
@@ -189,7 +203,6 @@ static void mem_monitor_init(void)
     lv_obj_t * sysmon = lv_sysmon_create(lv_layer_sys());
     lv_obj_add_event(sysmon, mem_monitor_event_cb, LV_EVENT_REFRESH, NULL);
     lv_obj_align(sysmon, LV_USE_MEM_MONITOR_POS, 0, 0);
-    lv_sysmon_set_refr_period(sysmon, 300);
 }
 #endif
 
