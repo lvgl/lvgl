@@ -660,7 +660,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
                 strcat(pinyin_ime->input_char, txt);
                 pinyin_input_proc(obj);
 
-                for(int index = 0; index < (pinyin_ime->ta_count + tmp_btn_str_len); index++) {
+                for(int index = 0; index <  tmp_btn_str_len; index++) {
                     lv_textarea_del_char(ta);
                 }
 
