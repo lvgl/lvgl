@@ -53,40 +53,6 @@ struct _lv_disp_drv_t;
 void lv_draw_stm32_dma2d_init(void);
 void lv_draw_stm32_dma2d_ctx_init(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
 void lv_draw_stm32_dma2d_ctx_deinit(struct _lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx);
-static void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
-static void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx,
-                                            void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
-                                            void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
-static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
-                                        const lv_area_t * src_area, const void * src);
-static void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx);
-static void lv_draw_stm32_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
-                                            const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t color_format);
-static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t color_format);
-static lv_point_t lv_area_get_offset(const lv_area_t * area1, const lv_area_t * area2);
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
-                                                           const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa);
-LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                                          const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset, lv_opa_t opa,
-                                                          dma2d_color_format_t src_color_format, bool ignore_src_alpha);
-LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dst_buf, lv_coord_t dst_stride,
-                                                            const lv_area_t * draw_area, const lv_opa_t * mask_buf, lv_coord_t mask_stride, const lv_point_t * mask_offset,
-                                                            lv_color_t color, lv_opa_t opa);
-LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
-                                                            const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset);
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp_drv_t * disp_drv);
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_start_dma_transfer(void);
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset,
-                                                                lv_coord_t width, lv_coord_t height, uint8_t pixel_size);
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
-                                                           lv_coord_t height, uint8_t pixel_size);
-LV_STM32_DMA2D_STATIC bool _lv_gpu_stm32_dwt_init(void);
-LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dwt_reset(void);
-LV_STM32_DMA2D_STATIC uint32_t _lv_gpu_stm32_dwt_get_us(void);
 
 /**********************
  *      MACROS
