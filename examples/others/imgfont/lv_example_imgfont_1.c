@@ -22,6 +22,7 @@ static bool get_imgfont_path(const lv_font_t * font, void * img_src,
     }
     else {
         char * path = (char *)img_src;
+        LV_UNUSED(path);
 #if LV_USE_FFMPEG
         lv_snprintf(path, len, "%s/%04X.png", "lvgl/examples/assets/emoji", unicode);
 #elif LV_USE_PNG
