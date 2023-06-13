@@ -26,8 +26,8 @@ extern "C" {
 
 typedef struct {
     lv_obj_t obj;
-    lv_obj_t *prev_btn;
-    lv_obj_t *next_btn;
+    lv_obj_t * prev_btn;
+    lv_obj_t * next_btn;
 } lv_calendar_header_arrow_t;
 
 extern const lv_obj_class_t lv_calendar_header_arrow_class;

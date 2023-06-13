@@ -69,7 +69,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     LV_UNUSED(class_p);
 
-    lv_calendar_header_arrow_t *calendar_header = (lv_calendar_header_arrow_t *)obj;
+    lv_calendar_header_arrow_t * calendar_header = (lv_calendar_header_arrow_t *)obj;
 
     lv_obj_move_to_index(obj, 0);
 
@@ -83,7 +83,7 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_coord_t btn_size = lv_obj_get_height(calendar_header->prev_btn);
     lv_obj_set_width(calendar_header->prev_btn, btn_size);
 
-    lv_obj_add_event_cb(calendar_header->prev_btn, month_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event(calendar_header->prev_btn, month_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_clear_flag(calendar_header->prev_btn, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_obj_t * label = lv_label_create(obj);
@@ -95,10 +95,10 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_style_bg_img_src(calendar_header->next_btn, LV_SYMBOL_RIGHT, 0);
     lv_obj_set_size(calendar_header->next_btn, btn_size, btn_size);
 
-    lv_obj_add_event_cb(calendar_header->next_btn, month_event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event(calendar_header->next_btn, month_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_clear_flag(calendar_header->next_btn, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
-    lv_obj_add_event_cb(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event(obj, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     /*Refresh the drop downs*/
     lv_event_send(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
