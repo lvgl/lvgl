@@ -23,6 +23,13 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct {
+    lv_obj_t obj;
+    lv_obj_t *prev_btn;
+    lv_obj_t *next_btn;
+} lv_calendar_header_arrow_t;
+
 extern const lv_obj_class_t lv_calendar_header_arrow_class;
 
 /**********************
@@ -35,6 +42,26 @@ extern const lv_obj_class_t lv_calendar_header_arrow_class;
  * @return          the created header
  */
 lv_obj_t * lv_calendar_header_arrow_create(lv_obj_t * parent);
+
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get the previous button object of the calendar header.
+ * It shows the dates and day names.
+ * @param obj   pointer to a calendar arrow header object
+ * @return      pointer to a button 
+ */
+lv_obj_t * lv_calendar_header_arrow_get_prev_btn(const lv_obj_t * obj);
+
+/**
+ * Get the next button object of the calendar header.
+ * It shows the dates and day names.
+ * @param obj   pointer to a calendar arrow header object
+ * @return      pointer to a button 
+ */
+lv_obj_t * lv_calendar_header_arrow_get_next_btn(const lv_obj_t * obj);
 
 /**********************
  *      MACROS
