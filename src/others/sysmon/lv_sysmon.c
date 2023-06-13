@@ -24,8 +24,9 @@
 typedef struct {
     lv_disp_t * disp;
     uint32_t    refr_elaps_sum;
+    uint32_t    refr_cnt;
     uint32_t    render_elaps_sum;
-    uint32_t    frame_cnt;
+    uint32_t    render_cnt;
 } perf_info_t;
 
 /**********************
@@ -119,7 +120,7 @@ static void perf_monitor_refr_start_cb(lv_event_t * e)
     lv_obj_t * sysmon = lv_event_get_user_data(e);
     perf_info_t * info = lv_obj_get_user_data(sysmon);
     info->refr_elaps_sum += lv_tick_elaps(info->disp->last_render_start_time);
-    info->frame_cnt++;
+    info->refr_cnt++;
 }
 
 static void perf_monitor_refr_finish_cb(lv_event_t * e)
@@ -129,14 +130,21 @@ static void perf_monitor_refr_finish_cb(lv_event_t * e)
     info->render_elaps_sum += lv_tick_elaps(info->disp->last_render_start_time);
 }
 
+static void perf_monitor_render_start_cb(lv_event_t * e)
+{
+    lv_obj_t * sysmon = lv_event_get_user_data(e);
+    perf_info_t * info = lv_obj_get_user_data(sysmon);
+    info->render_cnt++;
+}
+
 static void perf_monitor_event_cb(lv_event_t * e)
 {
     lv_obj_t * sysmon = lv_event_get_current_target_obj(e);
     perf_info_t * info = lv_obj_get_user_data(sysmon);
 
     uint32_t cpu = 100 - lv_timer_get_idle();
-    uint32_t render_avg_time = info->frame_cnt ? (info->render_elaps_sum / info->frame_cnt) : 0;
-    uint32_t fps = info->refr_elaps_sum ? (1000 * info->frame_cnt / info->refr_elaps_sum) : 0;
+    uint32_t render_avg_time = info->refr_cnt ? (info->render_elaps_sum / info->refr_cnt) : 0;
+    uint32_t fps = info->refr_elaps_sum ? (1000 * info->refr_cnt / info->refr_elaps_sum) : 0;
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
     /*Avoid warning*/
@@ -144,8 +152,11 @@ static void perf_monitor_event_cb(lv_event_t * e)
     LV_UNUSED(render_avg_time);
     LV_UNUSED(cpu);
 
-    LV_LOG("sysmon: %" LV_PRIu32" FPS / render %" LV_PRIu32" ms / %" LV_PRIu32 "%% CPU\n",
-           fps,
+    LV_LOG("sysmon: "
+           "%" LV_PRIu32" FPS (redraw: %" LV_PRIu32" / refr: %" LV_PRIu32"), "
+           "render %" LV_PRIu32" ms, "
+           "CPU %" LV_PRIu32 "%%\n",
+           fps, info->render_cnt, info->refr_cnt,
            render_avg_time,
            cpu);
 #else
@@ -158,8 +169,9 @@ static void perf_monitor_event_cb(lv_event_t * e)
     );
 #endif /*LV_USE_PERF_MONITOR_LOG_MODE*/
     info->refr_elaps_sum = 0;
+    info->refr_cnt = 0;
     info->render_elaps_sum = 0;
-    info->frame_cnt = 0;
+    info->render_cnt = 0;
 }
 
 static void perf_monitor_init(void)
@@ -174,6 +186,7 @@ static void perf_monitor_init(void)
     lv_obj_add_event(sysmon, perf_monitor_event_cb, LV_EVENT_REFRESH, NULL);
     lv_disp_add_event(info.disp, perf_monitor_refr_start_cb, LV_EVENT_REFR_START, sysmon);
     lv_disp_add_event(info.disp, perf_monitor_refr_finish_cb, LV_EVENT_REFR_FINISH, sysmon);
+    lv_disp_add_event(info.disp, perf_monitor_render_start_cb, LV_EVENT_RENDER_START, sysmon);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
     /*Reduce rendering performance consumption*/
