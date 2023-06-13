@@ -104,7 +104,7 @@ lv_rb_node_t * lv_rb_find(lv_rb_t * tree, const void * key)
     lv_rb_node_t * current = tree->root;
 
     while(current != NULL) {
-        int cmp = tree->compare(key, current->data);
+        lv_rb_compare_res_t cmp = tree->compare(key, current->data);
 
         if(cmp == 0) {
             return current;

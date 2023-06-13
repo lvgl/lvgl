@@ -41,7 +41,9 @@ typedef struct lv_rb_node_t {
     void * data;
 } lv_rb_node_t;
 
-typedef int (*lv_rb_compare_t)(const void * a, const void * b);
+typedef int8_t lv_rb_compare_res_t;
+
+typedef lv_rb_compare_res_t (*lv_rb_compare_t)(const void * a, const void * b);
 
 typedef struct {
     lv_rb_node_t * root;
