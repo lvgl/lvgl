@@ -66,7 +66,7 @@ lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key)
 {
     LV_ASSERT_NULL(tree);
     if(tree == NULL) {
-        return false;
+        return NULL;
     }
 
     lv_rb_node_t * node = lv_rb_find(tree, key);
@@ -83,7 +83,7 @@ lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key)
         }
     }
 
-    void* new_data = node->data;
+    void * new_data = node->data;
     node->data = key;
     lv_rb_node_t * parent = rb_find_leaf_parent(tree, node);
 
@@ -226,39 +226,32 @@ void lv_rb_destroy(lv_rb_t * tree)
         return;
     }
 
-    lv_rb_node_t * current = tree->root;
+    lv_rb_node_t * node = tree->root;
     lv_rb_node_t * parent = NULL;
 
-    while(current != NULL) {
-        if(current->left != NULL) {
-            lv_rb_node_t * left = current->left;
-            current->left = parent;
-
-            parent = current;
-            current = left;
+    while(node != NULL) {
+        if(node->left != NULL) {
+            node = node->left;
         }
-        else if(current->right != NULL) {
-            lv_rb_node_t * right = current->right;
-            current->right = parent;
-
-            parent = current;
-            current = right;
+        else if(node->right != NULL) {
+            node = node->right;
         }
         else {
-            lv_free(current->data);
-            lv_free(current);
-            current = parent;
-            if(current != NULL) {
-                if(current->left != NULL) {
-                    current->left = NULL;
+            parent = node->parent;
+            if(parent != NULL) {
+                if(parent->left == node) {
+                    parent->left = NULL;
                 }
                 else {
-                    current->right = NULL;
+                    parent->right = NULL;
                 }
             }
-            parent = NULL;
+            lv_free(node->data);
+            lv_free(node);
+            node = parent;
         }
     }
+
     lv_free(tree);
 }
 
