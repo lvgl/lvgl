@@ -930,3 +930,4 @@ static void fade_in_anim_ready(lv_anim_t * a)
 {
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
 }
+
