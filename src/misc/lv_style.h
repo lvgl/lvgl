@@ -41,7 +41,8 @@ extern "C" {
 #define LV_STYLE_PROP_FLAG_LAYOUT_UPDATE            (1 << 2)  /*Requires layout update when changed*/
 #define LV_STYLE_PROP_FLAG_PARENT_LAYOUT_UPDATE     (1 << 3)  /*Requires layout update on parent when changed*/
 #define LV_STYLE_PROP_FLAG_LAYER_UPDATE             (1 << 4)  /*Affects layer handling*/
-#define LV_STYLE_PROP_FLAG_ALL                      (0x1F)     /*Indicating all flags*/
+#define LV_STYLE_PROP_FLAG_TRANSFORM                (1 << 5)  /*Affects the object's transformation*/
+#define LV_STYLE_PROP_FLAG_ALL                      (0x3F)    /*Indicating all flags*/
 
 /**
  * Other constants
