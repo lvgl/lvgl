@@ -43,23 +43,23 @@ static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * node1, lv_rb_node_t *
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_rb_t * lv_rb_create(lv_rb_compare_t compare, size_t node_size)
+bool lv_rb_init(lv_rb_t * tree, lv_rb_compare_t compare, size_t node_size)
 {
-    lv_rb_t * tree = lv_malloc(sizeof(lv_rb_t));
     LV_ASSERT_NULL(tree);
     LV_ASSERT_NULL(compare);
     LV_ASSERT(node_size > 0);
-    lv_memzero(tree, sizeof(lv_rb_t));
 
     if(tree == NULL || compare == NULL || node_size == 0) {
-        return NULL;
+        return false;
     }
+
+    lv_memzero(tree, sizeof(lv_rb_t));
 
     tree->root = NULL;
     tree->compare = compare;
     tree->size = node_size;
 
-    return tree;
+    return true;
 }
 
 lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key)
@@ -251,8 +251,6 @@ void lv_rb_destroy(lv_rb_t * tree)
             node = parent;
         }
     }
-
-    lv_free(tree);
 }
 
 lv_rb_node_t * lv_rb_minimum(lv_rb_t * tree)
