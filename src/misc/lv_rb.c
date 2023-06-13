@@ -20,12 +20,12 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * key, void * data);
+static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * data);
+static lv_rb_node_t * rb_find_leaf_parent(lv_rb_t * tree, lv_rb_node_t * node);
 static void rb_right_rotate(lv_rb_t * tree, lv_rb_node_t * node);
 static void rb_left_rotate(lv_rb_t * tree, lv_rb_node_t * node);
-static lv_rb_node_t * lv_rb_minimum(lv_rb_t * tree, struct lv_rb_node_t * pNode);
 static void rb_insert_color(lv_rb_t * tree, lv_rb_node_t * node);
-static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * pNode, lv_rb_node_t * pNode1);
+static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * node1, lv_rb_node_t * node2);
 
 /**********************
  *  GLOBAL VARIABLES
@@ -59,70 +59,55 @@ lv_rb_t * lv_rb_create(lv_rb_compare_t compare)
 
     return tree;
 }
-bool lv_rb_insert(lv_rb_t * tree, void * key, void * data)
+
+lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * data)
 {
     LV_ASSERT_NULL(tree);
     if(tree == NULL) {
         return false;
     }
 
-    lv_rb_node_t * node = rb_create_node(tree, key, data);
-    LV_ASSERT_NULL(node);
+    lv_rb_node_t * node = lv_rb_find(tree, data);
+    if(node) return node;
+    else {
+        node = rb_create_node(tree, data);
+        if(node == NULL) return NULL;
 
-    if(node == NULL) {
-        return false;
-    }
-
-    if(tree->root == NULL) {
-        tree->root = node;
-        node->parent = NULL;
-        node->color = LV_RB_COLOR_BLACK;
-        return true;
-    }
-
-    lv_rb_node_t * parent = NULL;
-    lv_rb_node_t * current = tree->root;
-
-    while(current != NULL) {
-        parent = current;
-
-        if(tree->compare(key, current->key) < 0) {
-            current = current->left;
-        }
-        else {
-            current = current->right;
+        if(tree->root == NULL) {
+            tree->root = node;
+            node->parent = NULL;
+            node->color = LV_RB_COLOR_BLACK;
+            return node;
         }
     }
+
+    lv_rb_node_t * parent = rb_find_leaf_parent(tree, node);
 
     node->parent = parent;
+    node->color = LV_RB_COLOR_RED;
 
-    if(tree->compare(key, parent->key) < 0) {
-        parent->left = node;
-    }
-    else {
-        parent->right = node;
-    }
+    if(tree->compare(data, parent->data) < 0) parent->left = node;
+    else parent->right = node;
 
     rb_insert_color(tree, node);
 
-    return true;
+    return node;
 }
-void * lv_rb_search(lv_rb_t * tree, const void * key)
+
+lv_rb_node_t * lv_rb_find(lv_rb_t * tree, const void * key)
 {
     LV_ASSERT_NULL(tree);
-    LV_ASSERT_NULL(key);
-
-    if(tree == NULL || key == NULL) {
+    if(tree == NULL) {
         return NULL;
     }
 
     lv_rb_node_t * current = tree->root;
 
     while(current != NULL) {
-        int cmp = tree->compare(key, current->key);
+        int cmp = tree->compare(key, current->data);
 
         if(cmp == 0) {
-            return current->data;
+            return current;
         }
         else if(cmp < 0) {
             current = current->left;
@@ -134,32 +119,19 @@ void * lv_rb_search(lv_rb_t * tree, const void * key)
 
     return NULL;
 }
-void lv_rb_delete(lv_rb_t * tree, const void * key)
+
+bool lv_rb_remove(lv_rb_t * tree, const void * key)
 {
     LV_ASSERT_NULL(tree);
     if(tree == NULL) {
-        return;
+        return false;
     }
 
-    lv_rb_node_t * node = tree->root;
-
-    while(node != NULL) {
-        int cmp = tree->compare(key, node->key);
-
-        if(cmp == 0) {
-            break;
-        }
-        else if(cmp < 0) {
-            node = node->left;
-        }
-        else {
-            node = node->right;
-        }
-    }
-
-
+    lv_rb_node_t * node = lv_rb_find(tree, key);
+    LV_ASSERT_NULL(node);
     if(node == NULL) {
-        return;
+        LV_LOG_WARN("rb delete %d not found", (int)(uintptr_t)key);
+        return false;
     }
 
     lv_rb_node_t * child = NULL;
@@ -168,10 +140,7 @@ void lv_rb_delete(lv_rb_t * tree, const void * key)
 
     if(node->left != NULL && node->right != NULL) {
         lv_rb_node_t * replace = node;
-        replace = replace->right;
-        while(replace->left != NULL) {
-            replace = replace->left;
-        }
+        replace = lv_rb_minimum_from(replace->right);
 
         if(node->parent != NULL) {
             if(node->parent->left == node) {
@@ -211,16 +180,10 @@ void lv_rb_delete(lv_rb_t * tree, const void * key)
         }
 
         lv_free(node);
-        return;
+        return true;
     }
 
-    if(node->left != NULL) {
-        child = node->left;
-    }
-    else {
-        child = node->right;
-    }
-
+    child = node->right != NULL ? node->right : node->left;
     parent = node->parent;
     color = node->color;
 
@@ -245,7 +208,9 @@ void lv_rb_delete(lv_rb_t * tree, const void * key)
     }
 
     lv_free(node);
+    return true;
 }
+
 void lv_rb_destroy(lv_rb_t * tree)
 {
     LV_ASSERT_NULL(tree);
@@ -289,11 +254,47 @@ void lv_rb_destroy(lv_rb_t * tree)
     lv_free(tree);
 }
 
+lv_rb_node_t * lv_rb_minimum(lv_rb_t * tree)
+{
+    LV_ASSERT_NULL(tree);
+    if(tree == NULL) {
+        return NULL;
+    }
+    return lv_rb_minimum_from(tree->root);
+}
+
+lv_rb_node_t * lv_rb_maximum(lv_rb_t * tree)
+{
+    LV_ASSERT_NULL(tree);
+    if(tree == NULL) {
+        return NULL;
+    }
+    return lv_rb_maximum_from(tree->root);
+}
+
+lv_rb_node_t * lv_rb_minimum_from(lv_rb_node_t * node)
+{
+    while(node->left != NULL) {
+        node = node->left;
+    }
+
+    return node;
+}
+
+lv_rb_node_t * lv_rb_maximum_from(lv_rb_node_t * node)
+{
+    while(node->right != NULL) {
+        node = node->right;
+    }
+
+    return node;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * key, void * data)
+static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * data)
 {
     lv_rb_node_t * node = lv_malloc(sizeof(lv_rb_node_t));
     LV_ASSERT_MALLOC(node);
@@ -301,13 +302,31 @@ static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * key, void * data)
         return NULL;
     }
 
-    node->key = key;
     node->data = data;
     node->color = LV_RB_COLOR_RED;
     node->left = NULL;
     node->right = NULL;
 
     return node;
+}
+
+static lv_rb_node_t * rb_find_leaf_parent(lv_rb_t * tree, lv_rb_node_t * node)
+{
+    lv_rb_node_t * current = tree->root;
+    lv_rb_node_t * parent;
+
+    while(current != NULL) {
+        parent = current;
+
+        if(tree->compare(node->data, current->data) < 0) {
+            current = current->left;
+        }
+        else {
+            current = current->right;
+        }
+    }
+
+    return parent;
 }
 
 static void rb_right_rotate(lv_rb_t * tree, lv_rb_node_t * node)
@@ -358,24 +377,6 @@ static void rb_left_rotate(lv_rb_t * tree, lv_rb_node_t * node)
 
     right->left = node;
     node->parent = right;
-}
-
-static lv_rb_node_t * lv_rb_minimum(lv_rb_t * tree, struct lv_rb_node_t * pNode)
-{
-    while(pNode->left != NULL) {
-        pNode = pNode->left;
-    }
-
-    return pNode;
-}
-
-static lv_rb_node_t * lv_rb_maximum(lv_rb_t * tree, struct lv_rb_node_t * pNode)
-{
-    while(pNode->right != NULL) {
-        pNode = pNode->right;
-    }
-
-    return pNode;
 }
 
 static void rb_insert_color(lv_rb_t * tree, lv_rb_node_t * node)
@@ -438,75 +439,76 @@ static void rb_insert_color(lv_rb_t * tree, lv_rb_node_t * node)
 
     tree->root->color = LV_RB_COLOR_BLACK;
 }
-static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * pNode, lv_rb_node_t * pNode1)
+
+static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * node1, lv_rb_node_t * node2)
 {
     LV_ASSERT_NULL(tree);
     if(tree == NULL) {
         return;
     }
 
-    while((pNode == NULL || pNode->color == LV_RB_COLOR_BLACK) && pNode != tree->root) {
-        if(pNode1->left == pNode) {
-            lv_rb_node_t * pNode2 = pNode1->right;
+    while((node1 == NULL || node1->color == LV_RB_COLOR_BLACK) && node1 != tree->root) {
+        if(node2->left == node1) {
+            lv_rb_node_t * pNode2 = node2->right;
             if(pNode2->color == LV_RB_COLOR_RED) {
                 pNode2->color = LV_RB_COLOR_BLACK;
-                pNode1->color = LV_RB_COLOR_RED;
-                rb_left_rotate(tree, pNode1);
-                pNode2 = pNode1->right;
+                node2->color = LV_RB_COLOR_RED;
+                rb_left_rotate(tree, node2);
+                pNode2 = node2->right;
             }
 
-            if((pNode2->left == NULL || pNode2->left->color == LV_RB_COLOR_BLACK) && (pNode2->right == NULL ||
-                                                                                      pNode2->right->color == LV_RB_COLOR_BLACK)) {
+            if((pNode2->left == NULL || pNode2->left->color == LV_RB_COLOR_BLACK)
+               && (pNode2->right == NULL || pNode2->right->color == LV_RB_COLOR_BLACK)) {
                 pNode2->color = LV_RB_COLOR_RED;
-                pNode = pNode1;
-                pNode1 = pNode1->parent;
+                node1 = node2;
+                node2 = node2->parent;
             }
             else {
                 if(pNode2->right == NULL || pNode2->right->color == LV_RB_COLOR_BLACK) {
                     pNode2->left->color = LV_RB_COLOR_BLACK;
                     pNode2->color = LV_RB_COLOR_RED;
                     rb_right_rotate(tree, pNode2);
-                    pNode2 = pNode1->right;
+                    pNode2 = node2->right;
                 }
-                pNode2->color = pNode1->color;
-                pNode1->color = LV_RB_COLOR_BLACK;
+                pNode2->color = node2->color;
+                node2->color = LV_RB_COLOR_BLACK;
                 pNode2->right->color = LV_RB_COLOR_BLACK;
-                rb_left_rotate(tree, pNode1);
-                pNode = tree->root;
+                rb_left_rotate(tree, node2);
+                node1 = tree->root;
                 break;
             }
         }
         else {
-            lv_rb_node_t * pNode2 = pNode1->left;
+            lv_rb_node_t * pNode2 = node2->left;
             if(pNode2->color == LV_RB_COLOR_RED) {
                 pNode2->color = LV_RB_COLOR_BLACK;
-                pNode1->color = LV_RB_COLOR_RED;
-                rb_right_rotate(tree, pNode1);
-                pNode2 = pNode1->left;
+                node2->color = LV_RB_COLOR_RED;
+                rb_right_rotate(tree, node2);
+                pNode2 = node2->left;
             }
 
-            if((pNode2->left == NULL || pNode2->left->color == LV_RB_COLOR_BLACK) && (pNode2->right == NULL ||
-                                                                                      pNode2->right->color == LV_RB_COLOR_BLACK)) {
+            if((pNode2->left == NULL || pNode2->left->color == LV_RB_COLOR_BLACK)
+               && (pNode2->right == NULL || pNode2->right->color == LV_RB_COLOR_BLACK)) {
                 pNode2->color = LV_RB_COLOR_RED;
-                pNode = pNode1;
-                pNode1 = pNode1->parent;
+                node1 = node2;
+                node2 = node2->parent;
             }
             else {
                 if(pNode2->left == NULL || pNode2->left->color == LV_RB_COLOR_BLACK) {
                     pNode2->right->color = LV_RB_COLOR_BLACK;
                     pNode2->color = LV_RB_COLOR_RED;
                     rb_left_rotate(tree, pNode2);
-                    pNode2 = pNode1->left;
+                    pNode2 = node2->left;
                 }
-                pNode2->color = pNode1->color;
-                pNode1->color = LV_RB_COLOR_BLACK;
+                pNode2->color = node2->color;
+                node2->color = LV_RB_COLOR_BLACK;
                 pNode2->left->color = LV_RB_COLOR_BLACK;
-                rb_right_rotate(tree, pNode1);
-                pNode = tree->root;
+                rb_right_rotate(tree, node2);
+                node1 = tree->root;
                 break;
             }
         }
     }
-    if(pNode != NULL)
-        pNode->color = LV_RB_COLOR_BLACK;
+    if(node1 != NULL)
+        node1->color = LV_RB_COLOR_BLACK;
 }
