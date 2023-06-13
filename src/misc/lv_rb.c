@@ -20,7 +20,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * data);
+static lv_rb_node_t * rb_create_node(lv_rb_t * tree);
 static lv_rb_node_t * rb_find_leaf_parent(lv_rb_t * tree, lv_rb_node_t * node);
 static void rb_right_rotate(lv_rb_t * tree, lv_rb_node_t * node);
 static void rb_left_rotate(lv_rb_t * tree, lv_rb_node_t * node);
@@ -43,34 +43,36 @@ static void rb_delete_color(lv_rb_t * tree, lv_rb_node_t * node1, lv_rb_node_t *
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_rb_t * lv_rb_create(lv_rb_compare_t compare)
+lv_rb_t * lv_rb_create(lv_rb_compare_t compare, size_t node_size)
 {
     lv_rb_t * tree = lv_malloc(sizeof(lv_rb_t));
     LV_ASSERT_NULL(tree);
     LV_ASSERT_NULL(compare);
+    LV_ASSERT(node_size > 0);
     lv_memzero(tree, sizeof(lv_rb_t));
 
-    if(tree == NULL || compare == NULL) {
+    if(tree == NULL || compare == NULL || node_size == 0) {
         return NULL;
     }
 
     tree->root = NULL;
     tree->compare = compare;
+    tree->size = node_size;
 
     return tree;
 }
 
-lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * data)
+lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key)
 {
     LV_ASSERT_NULL(tree);
     if(tree == NULL) {
         return false;
     }
 
-    lv_rb_node_t * node = lv_rb_find(tree, data);
+    lv_rb_node_t * node = lv_rb_find(tree, key);
     if(node) return node;
     else {
-        node = rb_create_node(tree, data);
+        node = rb_create_node(tree);
         if(node == NULL) return NULL;
 
         if(tree->root == NULL) {
@@ -81,16 +83,19 @@ lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * data)
         }
     }
 
+    void* new_data = node->data;
+    node->data = key;
     lv_rb_node_t * parent = rb_find_leaf_parent(tree, node);
 
     node->parent = parent;
     node->color = LV_RB_COLOR_RED;
 
-    if(tree->compare(data, parent->data) < 0) parent->left = node;
+    if(tree->compare(key, parent->data) < 0) parent->left = node;
     else parent->right = node;
 
     rb_insert_color(tree, node);
 
+    node->data = new_data;
     return node;
 }
 
@@ -179,6 +184,7 @@ bool lv_rb_remove(lv_rb_t * tree, const void * key)
             rb_delete_color(tree, child, parent);
         }
 
+        lv_free(node->data);
         lv_free(node);
         return true;
     }
@@ -207,6 +213,7 @@ bool lv_rb_remove(lv_rb_t * tree, const void * key)
         rb_delete_color(tree, child, parent);
     }
 
+    lv_free(node->data);
     lv_free(node);
     return true;
 }
@@ -238,6 +245,7 @@ void lv_rb_destroy(lv_rb_t * tree)
             current = right;
         }
         else {
+            lv_free(current->data);
             lv_free(current);
             current = parent;
             if(current != NULL) {
@@ -294,7 +302,7 @@ lv_rb_node_t * lv_rb_maximum_from(lv_rb_node_t * node)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * data)
+static lv_rb_node_t * rb_create_node(lv_rb_t * tree)
 {
     lv_rb_node_t * node = lv_malloc(sizeof(lv_rb_node_t));
     LV_ASSERT_MALLOC(node);
@@ -302,7 +310,13 @@ static lv_rb_node_t * rb_create_node(lv_rb_t * tree, void * data)
         return NULL;
     }
 
-    node->data = data;
+    node->data = lv_malloc(tree->size);
+    LV_ASSERT_MALLOC(node->data);
+    if(node->data == NULL) {
+        lv_free(node);
+        return NULL;
+    }
+
     node->color = LV_RB_COLOR_RED;
     node->left = NULL;
     node->right = NULL;

@@ -48,14 +48,15 @@ typedef lv_rb_compare_res_t (*lv_rb_compare_t)(const void * a, const void * b);
 typedef struct {
     lv_rb_node_t * root;
     lv_rb_compare_t compare;
+    size_t size;
 } lv_rb_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_rb_t * lv_rb_create(lv_rb_compare_t compare);
-lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * data);
+lv_rb_t * lv_rb_create(lv_rb_compare_t compare, size_t node_size);
+lv_rb_node_t * lv_rb_insert(lv_rb_t * tree, void * key);
 lv_rb_node_t * lv_rb_find(lv_rb_t * tree, const void * key);
 bool lv_rb_remove(lv_rb_t * tree, const void * key);
 lv_rb_node_t * lv_rb_minimum(lv_rb_t * node);
