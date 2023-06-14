@@ -88,6 +88,12 @@ static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period
 }
 
 /**
+ * Call it in the super-loop of main() or threads. It will automatically call lv_timer_handler() at the right time.
+ * This function is used to simplify the porting.
+ */
+LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void);
+
+/**
  * Create an "empty" timer. It needs to be initialized with at least
  * `lv_timer_set_cb` and `lv_timer_set_period`
  * @return pointer to the created timer
@@ -164,6 +170,12 @@ void lv_timer_enable(bool en);
  * @return the lv_timer idle in percentage
  */
 uint8_t lv_timer_get_idle(void);
+
+/**
+ * Get the time remaining until the next timer will run
+ * @return the time remaining in ms
+ */
+uint32_t lv_timer_get_time_until_next(void);
 
 /**
  * Iterate through the timers

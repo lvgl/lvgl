@@ -32,6 +32,16 @@ the porting:
       ...
    }
 
+Or use the sleep time automatically calculated by LVGL:
+
+.. code:: c
+
+   while(1) {
+     ...
+     lv_timer_periodic_handler();
+     ...
+   }
+
 In an OS environment, you can use it together with the **delay** or
 **sleep** provided by OS to release CPU whenever possible:
 
