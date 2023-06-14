@@ -84,7 +84,7 @@ void lv_draw_sw_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * d
     lv_area_t blend_area;
     if(!_lv_area_intersect(&blend_area, dsc->blend_area, draw_ctx->clip_area)) return;
 
-    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
+    lv_draw_wait_for_finish(draw_ctx);
 
     ((lv_draw_sw_ctx_t *)draw_ctx)->blend(draw_ctx, dsc);
 }
