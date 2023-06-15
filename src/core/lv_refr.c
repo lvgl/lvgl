@@ -1034,7 +1034,7 @@ static void draw_buf_flush(lv_disp_t * disp)
 {
     /*Flush the rendered content to the display*/
     lv_draw_ctx_t * draw_ctx = disp->draw_ctx;
-    if(draw_ctx->wait_for_finish) draw_ctx->wait_for_finish(draw_ctx);
+    lv_draw_wait_for_finish(draw_ctx);
 
     /* In double buffered mode wait until the other buffer is freed
      * and driver is ready to receive the new buffer.
