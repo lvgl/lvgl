@@ -52,7 +52,6 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void lv_refr_join_area(void);
-static void refr_sync_areas(void);
 static void refr_invalid_areas(void);
 static void refr_area(const lv_area_t * area_p);
 static void refr_area_part(lv_draw_ctx_t * draw_ctx);
@@ -322,26 +321,12 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     lv_refr_join_area();
 
-    refr_sync_areas();
-
     refr_invalid_areas();
 
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
 
-    	/*Copy invalid areas for sync next refresh*/
-    	if (disp_refr->driver->direct_mode)
-    	{
-			uint16_t i;
-			for(i = 0; i < disp_refr->inv_p; i++) {
-				if (disp_refr->inv_area_joined[i])
-					continue;
-
-				disp_refr->sync_areas[disp_refr->sync_p++] = disp_refr->inv_areas[i];
-			}
-    	}
-
-    	/*Clean up*/
+        /*Clean up*/
         lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
         lv_memset_00(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
@@ -508,53 +493,6 @@ static void lv_refr_join_area(void)
             }
         }
     }
-}
-
-static void refr_sync_areas(void)
-{
-	/*Do not sync if no sync areas*/
-	if (disp_refr->sync_p == 0) return;
-
-	/*Do not sync if not double buffered*/
-	if (!disp_refr->driver->direct_mode) return;
-
-	/*The buffers are already swapped.
-	 *So the active buffer is the off screen buffer where LVGL will render*/
-	void * buf_off_screen = disp_refr->driver->draw_buf->buf_act;
-	void * buf_on_screen = disp_refr->driver->draw_buf->buf_act == disp_refr->driver->draw_buf->buf1
-						   ? disp_refr->driver->draw_buf->buf2
-						   : disp_refr->driver->draw_buf->buf1;
-
-	/*Iterate through invalidated areas to see if sync area should be copied*/
-	bool sync;
-	lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
-	uint32_t i, j;
-	for(i = 0; i < disp_refr->sync_p; i++) {
-		sync = true;
-		for(j = 0; j < disp_refr->inv_p; j++) {
-
-			/*Skip joined areas*/
-			if (disp_refr->inv_area_joined[j]) continue;
-
-			/*Sync area is fully inside inv area; Do not sync*/
-			if (_lv_area_is_in(&disp_refr->sync_areas[i], &disp_refr->inv_areas[j], 0)) {
-				sync = false;
-				break;
-			}
-		}
-
-		/*Sync area should be copied*/
-		if (sync) {
-			disp_refr->driver->draw_ctx->buffer_copy(
-				disp_refr->driver->draw_ctx,
-				buf_off_screen, stride, &disp_refr->sync_areas[i],
-				buf_on_screen, stride, &disp_refr->sync_areas[i]
-			);
-		}
-	}
-
-	/*Reset sync area count*/
-	disp_refr->sync_p = 0;
 }
 
 /**
