@@ -76,6 +76,7 @@ void lv_draw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer
                          lv_draw_img_dsc_t * draw_dsc)
 {
     LV_PROFILER_BEGIN;
+    lv_draw_wait_for_finish(draw_ctx);
     if(draw_ctx->layer_blend) draw_ctx->layer_blend(draw_ctx, layer_ctx, draw_dsc);
     LV_PROFILER_END;
 }
