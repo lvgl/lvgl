@@ -39,7 +39,7 @@ static void window_update(lv_disp_t * disp);
 static void clean_up(lv_disp_t * disp);
 static void texture_resize(lv_disp_t * disp);
 static void sdl_event_handler(lv_timer_t * t);
-static void release_disp_cb(lv_event_t *e);
+static void release_disp_cb(lv_event_t * e);
 
 /***********************
  *   GLOBAL PROTOTYPES
@@ -346,7 +346,8 @@ static int tick_thread(void * ptr)
 }
 #endif
 
-static void release_disp_cb(lv_event_t *e){
+static void release_disp_cb(lv_event_t * e)
+{
     lv_disp_t * disp = (lv_disp_t *) lv_event_get_user_data(e);
     clean_up(disp);
 }
