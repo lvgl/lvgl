@@ -16,8 +16,8 @@
  *      TYPEDEFS
  **********************/
 
-#define NEWTON_ITERATIONS       8
-#define CUBIC_PRECISION_BITS    20 /* 10 or 20 bits recommended, int64_t calculation is used for 20bit precision */
+#define CUBIC_NEWTON_ITERATIONS     8
+#define CUBIC_PRECISION_BITS        10 /* 10 or 14 bits recommended, int64_t calculation is used for >14bit precision */
 
 #if CUBIC_PRECISION_BITS < 10 || CUBIC_PRECISION_BITS > 20
     #error "cubic precision bits should be in range of [10, 20] for 32bit/64bit calculations."
@@ -103,12 +103,6 @@ uint32_t lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
     return v1 + v2 + v3 + v4;
 }
 
-static float do_cubic_bezier_f(float t, float a, float b, float c)
-{
-    /*a*t^3 + b*t^2 + c*t*/
-    return ((a * t + b) * t + c) * t;
-}
-
 /**
  * cubic-bezier Reference:
  *
@@ -140,72 +134,10 @@ static float do_cubic_bezier_f(float t, float a, float b, float c)
  *
  */
 
-/**
- * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
- * @param x time in range of [0..1]
- * @param x1 x of control point 1 in range of [0..1]
- * @param y1 y of control point 1 in range of [0..1]
- * @param x2 x of control point 2 in range of [0..1]
- * @param y2 y of control point 2 in range of [0..1]
- * @return the value calculated
- */
-float lv_cubic_bezier_f(float x, float x1, float y1, float x2, float y2)
-{
-    float ax, bx, cx, ay, by, cy;
-    float tl, tr, t;  /*t in cubic-bezier function, used for bisection */
-    float xs;  /*x sampled on curve */
-    float d; /*slope value at specified t*/
-
-    if(x == 0 || x == 1) return x;
-
-    cx = 3.f * x1;
-    bx = 3.f * (x2 - x1) - cx;
-    ax = 1.f - cx - bx;
-
-    cy = 3.f * y1;
-    by = 3.f * (y2 - y1) - cy;
-    ay = 1.f - cy - by;
-
-    /*Try Newton's method firstly */
-    t = x; /*Make a guess*/
-    for(int i = 0; i < NEWTON_ITERATIONS; i++) {
-        xs = do_cubic_bezier_f(t, ax, bx, cx);
-        xs -= x;
-        if(LV_ABS(xs) < 1e-6f) goto found;
-
-        d = (3.f * ax * t + 2.f * bx) * t + cx;
-        if(LV_ABS(d) < 1e-6f) break;
-        t -= xs / d;
-    }
-
-    /*Fallback to bisection method for reliability*/
-    tl = 0.f, tr = 1.f, t = x;
-
-    if(t < tl) {
-        t = tl;
-        goto found;
-    }
-
-    if(t > tr) {
-        t = tr;
-        goto found;
-    }
-
-    while(tl < tr) {
-        xs = do_cubic_bezier_f(t, ax, bx, cx);
-        if(LV_ABS(xs - x) < 1e-6f) goto found;
-        x > xs ? (tl = t) : (tr = t);
-        t = (tr - tl) * .5f + tl;
-    }
-
-found:
-    return do_cubic_bezier_f(t, ay, by, cy);
-}
-
 static int32_t do_cubic_bezier(int32_t t, int32_t a, int32_t b, int32_t c)
 {
     /*a * t^3 + b * t^2 + c * t*/
-#if CUBIC_PRECISION_BITS > 10
+#if CUBIC_PRECISION_BITS > 14
     int64_t ret;
 #else
     int32_t ret;
@@ -232,7 +164,7 @@ int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y
     int32_t ax, bx, cx, ay, by, cy;
     int32_t tl, tr, t;  /*t in cubic-bezier function, used for bisection */
     int32_t xs;  /*x sampled on curve */
-#if CUBIC_PRECISION_BITS > 10
+#if CUBIC_PRECISION_BITS > 14
     int64_t d; /*slope value at specified t*/
 #else
     int32_t d;
@@ -260,7 +192,7 @@ int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y
 
     /*Try Newton's method firstly */
     t = x; /*Make a guess*/
-    for(int i = 0; i < NEWTON_ITERATIONS; i++) {
+    for(int i = 0; i < CUBIC_NEWTON_ITERATIONS; i++) {
         /*Check if x on curve at t matches input x*/
         xs = do_cubic_bezier(t, ax, bx, cx) - x;
         if(LV_ABS(xs) <= 1) goto found;
