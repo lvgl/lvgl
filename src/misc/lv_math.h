@@ -76,17 +76,6 @@ uint32_t lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
 int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y2);
 
 /**
- * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
- * @param x time in range of [0..1]
- * @param x1 x of control point 1 in range of [0..1]
- * @param y1 y of control point 1 in range of [0..1]
- * @param x2 x of control point 2 in range of [0..1]
- * @param y2 y of control point 2 in range of [0..1]
- * @return the value calculated
- */
-float lv_cubic_bezier_f(float x, float x1, float y1, float x2, float y2);
-
-/**
  * Calculate the atan2 of a vector.
  * @param x
  * @param y
