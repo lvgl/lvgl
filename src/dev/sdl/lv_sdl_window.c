@@ -39,6 +39,7 @@ static void window_update(lv_disp_t * disp);
 static void clean_up(lv_disp_t * disp);
 static void texture_resize(lv_disp_t * disp);
 static void sdl_event_handler(lv_timer_t * t);
+static void release_disp_cb(lv_event_t * e);
 
 /***********************
  *   GLOBAL PROTOTYPES
@@ -89,6 +90,7 @@ lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
         lv_free(dsc);
         return NULL;
     }
+    lv_disp_add_event(disp, release_disp_cb, LV_EVENT_DELETE, disp);
     lv_disp_set_driver_data(disp, dsc);
     window_create(disp);
 
@@ -139,6 +141,15 @@ void lv_sdl_window_set_title(lv_disp_t * disp, const char * title)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
     SDL_SetWindowTitle(dsc->window, title);
+}
+
+void lv_sdl_quit()
+{
+    if(inited) {
+        SDL_Quit();
+        lv_timer_del(event_handler_timer);
+        inited = false;
+    }
 }
 
 /**********************
@@ -236,7 +247,6 @@ static void clean_up(lv_disp_t * disp)
     SDL_DestroyWindow(dsc->window);
 
     lv_free(dsc);
-    lv_disp_remove(disp);
 }
 
 static void window_create(lv_disp_t * disp)
@@ -334,5 +344,11 @@ static int tick_thread(void * ptr)
     return 0;
 }
 #endif
+
+static void release_disp_cb(lv_event_t * e)
+{
+    lv_disp_t * disp = (lv_disp_t *) lv_event_get_user_data(e);
+    clean_up(disp);
+}
 
 #endif /*LV_USE_SDL*/
