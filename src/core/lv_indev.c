@@ -1003,16 +1003,20 @@ static void indev_proc_press(lv_indev_t * indev)
 
     /*If there is no last object then search*/
     if(indev_obj_act == NULL) {
-        if(indev_obj_act == NULL) {
-            indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_bottom(disp), &indev->pointer.act_point);
-        }
         indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &indev->pointer.act_point);
+
         if(indev_obj_act == NULL) {
             indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp), &indev->pointer.act_point);
         }
+
         if(indev_obj_act == NULL) {
             indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp), &indev->pointer.act_point);
         }
+
+        if(indev_obj_act == NULL) {
+            indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_bottom(disp), &indev->pointer.act_point);
+        }
+
         new_obj_searched = true;
     }
     /*If there is last object but it is not scrolled and not protected also search*/
