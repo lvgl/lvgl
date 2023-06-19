@@ -25,12 +25,16 @@
  *      TYPEDEFS
  **********************/
 
+#define _path_cubic_bezier(a, x1, x2, y1, y2) lv_anim_path_cubic_bezier(a, (x1) * 1024, (y1) * 1024, (x2) * 1024, (y2) * 1024)
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 static void anim_timer(lv_timer_t * param);
 static void anim_mark_list_change(void);
 static void anim_ready_handler(lv_anim_t * a);
+static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
+                                         int32_t y1, int32_t x2, int32_t y2);
 
 /**********************
  *  STATIC VARIABLES
@@ -221,58 +225,22 @@ int32_t lv_anim_path_linear(const lv_anim_t * a)
 
 int32_t lv_anim_path_ease_in(const lv_anim_t * a)
 {
-    /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
-    int32_t step = lv_bezier3(t, 0, 50, 100, LV_BEZIER_VAL_MAX);
-
-    int32_t new_value;
-    new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
-    new_value += a->start_value;
-
-    return new_value;
+    return _path_cubic_bezier(a, 0.42, 0.0, 1.0, 1.0);
 }
 
 int32_t lv_anim_path_ease_out(const lv_anim_t * a)
 {
-    /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
-    int32_t step = lv_bezier3(t, 0, 900, 950, LV_BEZIER_VAL_MAX);
-
-    int32_t new_value;
-    new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
-    new_value += a->start_value;
-
-    return new_value;
+    return _path_cubic_bezier(a, 0.0, 0.0, 0.58, 1.0);
 }
 
 int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 {
-    /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
-    int32_t step = lv_bezier3(t, 0, 50, 952, LV_BEZIER_VAL_MAX);
-
-    int32_t new_value;
-    new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
-    new_value += a->start_value;
-
-    return new_value;
+    return _path_cubic_bezier(a, 0.42, 0.0, 0.58, 1.0);
 }
 
 int32_t lv_anim_path_overshoot(const lv_anim_t * a)
 {
-    /*Calculate the current step*/
-    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
-    int32_t step = lv_bezier3(t, 0, 1000, 1300, LV_BEZIER_VAL_MAX);
-
-    int32_t new_value;
-    new_value = step * (a->end_value - a->start_value);
-    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
-    new_value += a->start_value;
-
-    return new_value;
+    return lv_anim_path_cubic_bezier(a, 341, 0, 683, 1300);
 }
 
 int32_t lv_anim_path_bounce(const lv_anim_t * a)
@@ -462,4 +430,18 @@ static void anim_mark_list_change(void)
         lv_timer_pause(_lv_anim_tmr);
     else
         lv_timer_resume(_lv_anim_tmr);
+}
+
+static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
+{
+    /*Calculate the current step*/
+    uint32_t t = lv_map(a->act_time, 0, a->time, 0, LV_BEZIER_VAL_MAX);
+    int32_t step = lv_cubic_bezier(t, x1, y1, x2, y2);
+
+    int32_t new_value;
+    new_value = step * (a->end_value - a->start_value);
+    new_value = new_value >> LV_BEZIER_VAL_SHIFT;
+    new_value += a->start_value;
+
+    return new_value;
 }
