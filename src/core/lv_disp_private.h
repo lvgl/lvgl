@@ -147,8 +147,6 @@ struct _lv_disp_t {
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/
 
-    uint32_t last_render_start_time;
-
     /** OPTIONAL: Called periodically while lvgl waits for operation to be completed.
      * For example flushing or GPU
      * User can execute very simple tasks here or yield the task*/
