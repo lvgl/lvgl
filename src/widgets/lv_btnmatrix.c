@@ -520,6 +520,8 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
     else if(code == LV_EVENT_FOCUSED) {
+        if(btnm->btn_cnt == 0) return;
+
         lv_indev_t * indev = lv_event_get_param(e);
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
