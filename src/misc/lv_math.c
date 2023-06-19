@@ -79,31 +79,6 @@ LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_sin(int16_t angle)
 }
 
 /**
- * Calculate a value of a Cubic Bezier function.
- * @param t time in range of [0..LV_BEZIER_VAL_MAX]
- * @param u0 start values in range of [0..LV_BEZIER_VAL_MAX]
- * @param u1 control value 1 values in range of [0..LV_BEZIER_VAL_MAX]
- * @param u2 control value 2 in range of [0..LV_BEZIER_VAL_MAX]
- * @param u3 end values in range of [0..LV_BEZIER_VAL_MAX]
- * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
- */
-uint32_t lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3)
-{
-    uint32_t t_rem  = 1024 - t;
-    uint32_t t_rem2 = (t_rem * t_rem) >> 10;
-    uint32_t t_rem3 = (t_rem2 * t_rem) >> 10;
-    uint32_t t2     = (t * t) >> 10;
-    uint32_t t3     = (t2 * t) >> 10;
-
-    uint32_t v1 = (t_rem3 * u0) >> 10;
-    uint32_t v2 = (3 * t_rem2 * t * u1) >> 20;
-    uint32_t v3 = (3 * t_rem * t2 * u2) >> 20;
-    uint32_t v4 = (t3 * u3) >> 10;
-
-    return v1 + v2 + v3 + v4;
-}
-
-/**
  * cubic-bezier Reference:
  *
  * https://github.com/gre/bezier-easing
@@ -152,11 +127,11 @@ static int32_t do_cubic_bezier(int32_t t, int32_t a, int32_t b, int32_t c)
 
 /**
  * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
- * @param x time in range of [0..1024]
- * @param x1 x of control point 1 in range of [0..1024]
- * @param y1 y of control point 1 in range of [0..1024]
- * @param x2 x of control point 2 in range of [0..1024]
- * @param y2 y of control point 2 in range of [0..1024]
+ * @param x time in range of [0..LV_BEZIER_VAL_MAX]
+ * @param x1 x of control point 1 in range of [0..LV_BEZIER_VAL_MAX]
+ * @param y1 y of control point 1 in range of [0..LV_BEZIER_VAL_MAX]
+ * @param x2 x of control point 2 in range of [0..LV_BEZIER_VAL_MAX]
+ * @param y2 y of control point 2 in range of [0..LV_BEZIER_VAL_MAX]
  * @return the value calculated
  */
 int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
@@ -170,16 +145,16 @@ int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y
     int32_t d;
 #endif
 
-    if(x == 0 || x == 1024) return x;
+    if(x == 0 || x == LV_BEZIER_VAL_MAX) return x;
 
-    /* input is always 10bit precision */
+    /* input is always LV_BEZIER_VAL_SHIFT bit precision */
 
-#if CUBIC_PRECISION_BITS != 10
-    x <<= CUBIC_PRECISION_BITS - 10;
-    x1 <<= CUBIC_PRECISION_BITS - 10;
-    x2 <<= CUBIC_PRECISION_BITS - 10;
-    y1 <<= CUBIC_PRECISION_BITS - 10;
-    y2 <<= CUBIC_PRECISION_BITS - 10;
+#if CUBIC_PRECISION_BITS != LV_BEZIER_VAL_SHIFT
+    x <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    x1 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    x2 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    y1 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    y2 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
 #endif
 
     cx = 3 * x1;
@@ -234,8 +209,8 @@ int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y
     /*Failed to find suitable t for given x, return a value anyway.*/
 found:
     /*Return y at t*/
-#if CUBIC_PRECISION_BITS != 10
-    return do_cubic_bezier(t, ay, by, cy) >> (CUBIC_PRECISION_BITS - 10);
+#if CUBIC_PRECISION_BITS != LV_BEZIER_VAL_SHIFT
+    return do_cubic_bezier(t, ay, by, cy) >> (CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT);
 #else
     return do_cubic_bezier(t, ay, by, cy);
 #endif
