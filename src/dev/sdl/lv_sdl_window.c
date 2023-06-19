@@ -247,7 +247,6 @@ static void clean_up(lv_disp_t * disp)
     SDL_DestroyWindow(dsc->window);
 
     lv_free(dsc);
-    lv_disp_remove(disp);
 }
 
 static void window_create(lv_disp_t * disp)
