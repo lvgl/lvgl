@@ -16,7 +16,7 @@
    COLOR SETTINGS
  *====================*/
 
-/*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/
+/*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 24 (RGB888), 32 (ARGB8888)*/
 #define LV_COLOR_DEPTH 16
 
 #define LV_COLOR_CHROMA_KEY lv_color_hex(0x00ff00)
@@ -43,7 +43,7 @@
     #endif
 #endif  /*LV_USE_BUILTIN_MALLOC*/
 
-/*Enable lv_memcpy_builtin, lv_memset_builtin, lv_strlen_builtin, lv_strncpy_builtin*/
+/*Enable lv_memcpy_builtin, lv_memset_builtin, lv_strlen_builtin, lv_strncpy_builtin, lv_strcpy_builtin*/
 #define LV_USE_BUILTIN_MEMCPY 1
 
 /*Enable and configure the built-in (v)snprintf */
@@ -52,7 +52,7 @@
     #define LV_SPRINTF_USE_FLOAT 0
 #endif  /*LV_USE_BUILTIN_SNPRINTF*/
 
-#define LV_STDLIB_INCLUDE <stdint.h>
+#define LV_STDLIB_INCLUDE <stdlib.h>
 #define LV_STDIO_INCLUDE  <stdio.h>
 #define LV_STRING_INCLUDE <string.h>
 #define LV_MALLOC       lv_malloc_builtin
@@ -64,6 +64,7 @@
 #define LV_VSNPRINTF    lv_vsnprintf_builtin
 #define LV_STRLEN       lv_strlen_builtin
 #define LV_STRNCPY      lv_strncpy_builtin
+#define LV_STRCPY       lv_strcpy_builtin
 
 #define LV_COLOR_EXTERN_INCLUDE <stdint.h>
 #define LV_COLOR_MIX      lv_color_mix
@@ -91,6 +92,9 @@
     #if LV_TICK_CUSTOM
         #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
         #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+        /*If using lvgl as ESP32 component*/
+        // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+        // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
 
@@ -161,19 +165,10 @@
     #endif
 #endif
 
-/*Use SDL renderer API*/
-#define LV_USE_DRAW_SDL 0
-#if LV_USE_DRAW_SDL
-    #define LV_DRAW_SDL_INCLUDE_PATH <SDL2/SDL.h>
-    /*Texture cache size, 8MB by default*/
-    #define LV_DRAW_SDL_LRU_SIZE (1024 * 1024 * 8)
-    /*Custom blend mode for mask drawing, disable if you need to link with older SDL2 lib*/
-    #define LV_DRAW_SDL_CUSTOM_BLEND_MODE (SDL_VERSION_ATLEAST(2, 0, 6))
-#endif
-
 /*=====================
  * GPU CONFIGURATION
  *=====================*/
+
 
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #if LV_USE_GPU_STM32_DMA2D
@@ -259,14 +254,19 @@
  * Others
  *-----------*/
 
-/*1: Show CPU usage and FPS count*/
+/*1: Show CPU usage and FPS count
+ * Requires `LV_USE_SYSMON = 1`*/
 #define LV_USE_PERF_MONITOR 0
 #if LV_USE_PERF_MONITOR
     #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
+
+    /*0: Displays performance data on the screen, 1: Prints performance data using log.*/
+    #define LV_USE_PERF_MONITOR_LOG_MODE 0
 #endif
 
 /*1: Show the used memory and the memory fragmentation
- * Requires `LV_USE_BUILTIN_MALLOC = 1`*/
+ * Requires `LV_USE_BUILTIN_MALLOC = 1`
+ * Requires `LV_USE_SYSMON = 1`*/
 #define LV_USE_MEM_MONITOR 0
 #if LV_USE_MEM_MONITOR
     #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
@@ -323,7 +323,7 @@
 
 /*Will be added where memories needs to be aligned (with -Os data might not be aligned to boundary by default).
  * E.g. __attribute__((aligned(4)))*/
-#define LV_ATTRIBUTE_MEM_ALIGN  __attribute__((aligned(4)))
+#define LV_ATTRIBUTE_MEM_ALIGN __attribute__((aligned(4)))
 
 /*Attribute to mark large constant arrays for example font's bitmaps*/
 #define LV_ATTRIBUTE_LARGE_CONST
@@ -611,6 +611,7 @@
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
+
 /*FreeType library*/
 #if LV_USE_FREETYPE
     /*Memory used by FreeType to cache characters [bytes]*/
@@ -636,6 +637,7 @@
     #define LV_TINY_TTF_FILE_SUPPORT 0
 #endif
 
+
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
 #if LV_USE_FFMPEG
@@ -649,6 +651,29 @@
 
 /*1: Enable API to take snapshot for object*/
 #define LV_USE_SNAPSHOT 0
+
+/*1: Enable system monitor component*/
+#define LV_USE_SYSMON 0
+
+/*1: Enable the runtime performance profiler*/
+#define LV_USE_PROFILER 0
+#if LV_USE_PROFILER
+    /*1: Enable the built-in profiler*/
+    #define LV_USE_PROFILER_BUILTIN 1
+    #if LV_USE_PROFILER_BUILTIN
+        /*Default profiler trace buffer size*/
+        #define LV_PROFILER_BUILTIN_BUF_SIZE (16 * 1024)     /*[bytes]*/
+    #endif
+
+    /*Header to include for the profiler*/
+    #define LV_PROFILER_INCLUDE "lvgl/src/misc/lv_profiler_builtin.h"
+
+    /*Profiler start point function*/
+    #define LV_PROFILER_BEGIN   LV_PROFILER_BUILTIN_BEGIN
+
+    /*Profiler end point function*/
+    #define LV_PROFILER_END     LV_PROFILER_BUILTIN_END
+#endif
 
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0
@@ -697,6 +722,23 @@
     /*Quick access bar, 1:use, 0:not use*/
     /*Requires: lv_list*/
     #define LV_FILE_EXPLORER_QUICK_ACCESS        1
+#endif
+
+/*==================
+ * DEVICES
+ *==================*/
+
+/*Use SDL to open window on PC and handle mouse and keyboard*/
+#if LV_USE_SDL
+    #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
+    #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
+    #define LV_SDL_FULLSCREEN      0
+    #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
+#endif
+
+/*Driver for /dev/fb*/
+#if LV_USE_LINUX_FBDEV
+    #define LV_LINUX_FBDEV_BSD  0
 #endif
 
 /*==================

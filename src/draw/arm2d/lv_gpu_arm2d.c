@@ -3,6 +3,24 @@
  *
  */
 
+/*
+ * Copyright (C) 2010-2023 Arm Limited or its affiliates. All rights reserved.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the License); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /*********************
  *      INCLUDES
  *********************/
@@ -97,6 +115,8 @@
     arm_2dp_rgb565_tile_transform_with_src_mask_and_opacity_prepare
 #define arm_2d_tile_transform_with_opacity_prepare                              \
     arm_2dp_rgb565_tile_transform_with_opacity_prepare
+#define arm_2d_tile_transform_only_with_opacity_prepare                         \
+    arm_2dp_rgb565_tile_transform_only_with_opacity_prepare
 #define arm_2d_tile_transform_prepare                                           \
     arm_2dp_rgb565_tile_transform_prepare
 
@@ -134,6 +154,8 @@
     arm_2dp_cccn888_tile_transform_with_src_mask_and_opacity_prepare
 #define arm_2d_tile_transform_with_opacity_prepare                              \
     arm_2dp_cccn888_tile_transform_with_opacity_prepare
+#define arm_2d_tile_transform_only_with_opacity_prepare                         \
+    arm_2dp_cccn888_tile_transform_only_with_opacity_prepare
 #define arm_2d_tile_transform_prepare                                           \
     arm_2dp_cccn888_tile_transform_prepare
 
@@ -1093,6 +1115,24 @@ static void lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                     );
                     is_accelerated = true;
                 }
+    #if ARM_2D_VERISON >= 10103
+                else if (LV_COLOR_FORMAT_NATIVE == cf) {
+                    __ARM_2D_PREPARE_TRANS_AND_TARGET_REGION(
+                        arm_2d_tile_transform_only_with_opacity_prepare,
+                        &source_tile,
+                        source_center,
+                        ARM_2D_ANGLE((draw_dsc->angle / 10.0f)),
+                        draw_dsc->zoom / 256.0f,
+                        blend_dsc.opa);
+
+                    arm_2d_tile_transform(
+                        &target_tile,
+                        &target_region,
+                        NULL
+                    );
+                    is_accelerated = true;
+                }
+    #endif
                 else if(LV_COLOR_FORMAT_RGB565A8 == cf) {
                     static arm_2d_tile_t mask_tile;
                     mask_tile = source_tile;
