@@ -36,7 +36,11 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-     <release date="2023-03-03" version="8.3.6" url="https://github.com/lvgl/lvgl/raw/release/v8.3/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
+     <release date="2023-05-03" version="8.3.7" url="https://github.com/GorgonMeducer/lvgl/raw/a8195160fcb18b522b4a16c230455d48d99a0368/env_support/cmsis-pack/LVGL.lvgl.8.3.7.pack">
+      - LVGL 8.3.7 release
+      - Various fixes
+    </release>
+     <release date="2023-03-03" version="8.3.6" url="https://github.com/lvgl/lvgl/raw/6b0092c0d91b2c7bfded48e04cc7b486ed3a72bd/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
       - LVGL 8.3.6 release
       - Various fixes
     </release>
@@ -45,7 +49,7 @@
       - New Driver Architecture
       - Other fixes
      </release>
-     <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/release/v8.3/env_support/cmsis-pack/LVGL.lvgl.8.3.5.pack">
+     <release date="2023-02-06" version="8.3.5" url="https://github.com/lvgl/lvgl/raw/6b0092c0d91b2c7bfded48e04cc7b486ed3a72bd/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
       - LVGL 8.3.5 release
       - Use LVGL version as the cmsis-pack version
       - Fix GPU support for NXP PXP and NXP VGLite
@@ -404,6 +408,7 @@
                 <file category="sourceC"            name="src/others/snapshot/lv_snapshot.c" />
                 <file category="sourceC"            name="src/others/imgfont/lv_imgfont.c" />
                 <file category="sourceC"            name="src/others/gridnav/lv_gridnav.c" />
+                <file category="sourceC"            name="src/others/sysmon/lv_sysmon.c" />
 
                 <!-- src/misc-->
                 <file category="sourceC"            name="src/misc/lv_style_gen.c" />
@@ -430,6 +435,7 @@
                 <file category="sourceC"            name="src/misc/lv_color.c" />
                 <file category="sourceC"            name="src/misc/lv_printf.c" />
                 <file category="sourceC"            name="src/misc/lv_event.c" />
+                <file category="sourceC"            name="src/misc/lv_profiler_builtin.c" />
 
                 <!-- src/widgets -->
                 <file category="sourceC"            name="src/widgets/spinner/lv_spinner.c" />
@@ -867,11 +873,10 @@
             </component>
 
             <component Cgroup="lvgl" Csub="File Explorer"  condition="LVGL-Essential">
-              <description>Add Pinyin input method</description>
+              <description>Add a file explorer</description>
               <files>
                 <!-- src/others/file_explorer -->
                 <file category="sourceC"    name="src/others/file_explorer/lv_file_explorer.c" />
-                <file category="header"     name="src/others/file_explorer/lv_file_explorer.h" />
               </files>
 
               <RTE_Components_h>
@@ -883,11 +888,10 @@
             </component>
 
             <component Cgroup="lvgl" Csub="Tiny TTF"  condition="LVGL-Essential">
-              <description>Add tiny ttf support</description>
+              <description>Add the Tiny TTF support</description>
               <files>
                 <!-- src/libs/tiny_ttf -->
                 <file category="sourceC"    name="src/libs/tiny_ttf/lv_tiny_ttf.c" />
-                <file category="header"     name="src/libs/tiny_ttf/lv_tiny_ttf.h" />
                 <!-- src/libs/fsdrv -->
                 <file category="sourceC"    name="src/libs/fsdrv/lv_fs_cbfs.c" />
               </files>

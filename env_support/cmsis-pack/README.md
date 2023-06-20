@@ -42,6 +42,7 @@ remove the misleading guide above this code segment.
 4. Update `LV_STDIO_INCLUDE` and `LV_STRING_INCLUDE`
 
    ```c
+   #define LV_STDLIB_INCLUDE <stdlib.h>
    #define LV_STDIO_INCLUDE  <stdio.h>
    #define LV_STRING_INCLUDE <string.h>
    ```
@@ -61,7 +62,7 @@ remove the misleading guide above this code segment.
    - LV_USE_IME_PINYIN
    - LV_USE_FILE_EXPLORER
 
-6. Update `LV_LOG_PRINTF` to `1`
+6. Update `LV_LOG_PRINTF` to `1` and `LV_LOG_LEVEL` to `LV_LOG_LEVEL_USER`
 
 7. Update `LV_DEMO_BENCHMARK_RGB565A8` to `1`
 
@@ -121,6 +122,9 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
     #if LV_TICK_CUSTOM
         #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
         #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+        /*If using lvgl as ESP32 component*/
+        // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+        // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
 ```
