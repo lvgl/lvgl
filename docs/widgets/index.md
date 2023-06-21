@@ -29,6 +29,7 @@
    msgbox
    roller
    slider
+   scale
    span
    spinbox
    spinner
