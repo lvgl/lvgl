@@ -97,6 +97,22 @@ static int test_cubic_bezier_ease_functions(float fx1, float fy1, float fx2, flo
     return 1;
 }
 
+static uint32_t lv_bezier3_legacy(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3)
+{
+    uint32_t t_rem  = 1024 - t;
+    uint32_t t_rem2 = (t_rem * t_rem) >> 10;
+    uint32_t t_rem3 = (t_rem2 * t_rem) >> 10;
+    uint32_t t2     = (t * t) >> 10;
+    uint32_t t3     = (t2 * t) >> 10;
+
+    uint32_t v1 = (t_rem3 * u0) >> 10;
+    uint32_t v2 = (3 * t_rem2 * t * u1) >> 20;
+    uint32_t v3 = (3 * t_rem * t2 * u2) >> 20;
+    uint32_t v4 = (t3 * u3) >> 10;
+
+    return v1 + v2 + v3 + v4;
+}
+
 void test_math_cubic_bezier_result_should_be_precise(void)
 {
     /*ease-in-out function*/
@@ -110,6 +126,14 @@ void test_math_cubic_bezier_result_should_be_precise(void)
 
     /*ease function*/
     TEST_ASSERT_TRUE(test_cubic_bezier_ease_functions(.25f, .1f, .25f, 1));
+
+    int32_t u0 = 0, u1 = 50, u2 = 952, u3 = LV_BEZIER_VAL_MAX;
+    for(int32_t i = 0; i <= 1024; i++) {
+        int32_t legacy = lv_bezier3_legacy(i, u0, u1, u2, u3);
+        int32_t cubic_bezier = lv_bezier3(i, u0, u1, u2, u3);
+
+        TEST_ASSERT_TRUE(LV_ABS(legacy - cubic_bezier) <= 5);
+    }
 }
 
 #endif
