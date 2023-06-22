@@ -377,7 +377,7 @@ static inline void set_px_argb(uint8_t * buf, lv_color_t color, lv_opa_t opa)
     lv_color_t bg_color;
     lv_color_t res_color;
     lv_opa_t bg_opa = buf[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
     bg_color.full = buf[0];
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf[1]);
     if(buf[1] <= LV_OPA_MIN) return;
@@ -409,7 +409,7 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
     lv_color_t bg_color;
 
     /*Get the BG color*/
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
     if(buf[1] <= LV_OPA_MIN) return;
     bg_color.full = buf[0];
 #elif LV_COLOR_DEPTH == 16
@@ -429,8 +429,8 @@ static inline void set_px_argb_blend(uint8_t * buf, lv_color_t color, lv_opa_t o
     }
 
     /*Set the result color*/
-#if LV_COLOR_DEPTH == 8
-    buf[0] = res_color.full;
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+    buf[0] = last_res_color.full;
 #elif LV_COLOR_DEPTH == 16
     buf[0] = last_res_color.full & 0xff;
     buf[1] = last_res_color.full >> 8;
