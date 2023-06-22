@@ -25,8 +25,6 @@
  *      TYPEDEFS
  **********************/
 
-#define _path_cubic_bezier(a, x1, x2, y1, y2) lv_anim_path_cubic_bezier(a, (x1) * 1024, (y1) * 1024, (x2) * 1024, (y2) * 1024)
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -225,17 +223,20 @@ int32_t lv_anim_path_linear(const lv_anim_t * a)
 
 int32_t lv_anim_path_ease_in(const lv_anim_t * a)
 {
-    return _path_cubic_bezier(a, 0.42, 0.0, 1.0, 1.0);
+    return lv_anim_path_cubic_bezier(a, LV_BEZIER_VAL_FLOAT(0.42), LV_BEZIER_VAL_FLOAT(0),
+                                     LV_BEZIER_VAL_FLOAT(1), LV_BEZIER_VAL_FLOAT(1));
 }
 
 int32_t lv_anim_path_ease_out(const lv_anim_t * a)
 {
-    return _path_cubic_bezier(a, 0.0, 0.0, 0.58, 1.0);
+    return lv_anim_path_cubic_bezier(a, LV_BEZIER_VAL_FLOAT(0), LV_BEZIER_VAL_FLOAT(0),
+                                     LV_BEZIER_VAL_FLOAT(0.58), LV_BEZIER_VAL_FLOAT(1));
 }
 
 int32_t lv_anim_path_ease_in_out(const lv_anim_t * a)
 {
-    return _path_cubic_bezier(a, 0.42, 0.0, 0.58, 1.0);
+    return lv_anim_path_cubic_bezier(a, LV_BEZIER_VAL_FLOAT(0.42), LV_BEZIER_VAL_FLOAT(0),
+                                     LV_BEZIER_VAL_FLOAT(0.58), LV_BEZIER_VAL_FLOAT(1));
 }
 
 int32_t lv_anim_path_overshoot(const lv_anim_t * a)

@@ -24,6 +24,7 @@ extern "C" {
 
 #define LV_BEZIER_VAL_SHIFT 10 /**< log2(LV_BEZIER_VAL_MAX): used to normalize up scaled values*/
 #define LV_BEZIER_VAL_MAX (1L << LV_BEZIER_VAL_SHIFT) /**< Max time in Bezier functions (not [0..1] to use integers)*/
+#define LV_BEZIER_VAL_FLOAT(f) ((int32_t)((f) * LV_BEZIER_VAL_MAX)) /**< Convert const float number cubic-bezier values to fix-point value*/
 
 /**
  * Calculate a value of a Cubic Bezier function.
@@ -34,7 +35,7 @@ extern "C" {
  * @param u3 must be LV_BEZIER_VAL_MAX
  * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
  */
-#define lv_bezier3(t, u0, u1, u2, u3) lv_cubic_bezier(t, 341, u1, 683, u2)
+#define lv_bezier3(t, u0, u1, u2, u3) lv_cubic_bezier(t, LV_BEZIER_VAL_FLOAT(0.333f), u1, LV_BEZIER_VAL_FLOAT(0.667f), u2)
 
 /**********************
  *      TYPEDEFS
