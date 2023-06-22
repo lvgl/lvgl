@@ -47,14 +47,13 @@ zephyr_library_sources(
     ../src/draw/lv_img_buf.c
     ../src/draw/lv_img_cache.c
     ../src/draw/lv_img_decoder.c
-    ../src/draw/nxp/lv_gpu_nxp.c
     ../src/draw/nxp/pxp/lv_draw_pxp_blend.c
     ../src/draw/nxp/pxp/lv_gpu_nxp_pxp.c
     ../src/draw/nxp/pxp/lv_gpu_nxp_pxp_osa.c
     ../src/draw/nxp/vglite/lv_draw_vglite_arc.c
     ../src/draw/nxp/vglite/lv_draw_vglite_blend.c
     ../src/draw/nxp/vglite/lv_draw_vglite_rect.c
-    ../src/draw/nxp/vglite/lv_gpu_nxp_vglite.c
+    ../src/draw/nxp/vglite/lv_draw_vglite.c
     ../src/draw/sdl/lv_draw_sdl.c
     ../src/draw/sdl/lv_draw_sdl_arc.c
     ../src/draw/sdl/lv_draw_sdl_bg.c
