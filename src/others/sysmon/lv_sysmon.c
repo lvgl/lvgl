@@ -127,7 +127,7 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
     perf_info_t * info = lv_obj_get_user_data(sysmon);
     switch(code) {
         case LV_EVENT_REFR_START:
-            /* skip the first record */
+            /*Skip the first record*/
             if(info->refr_start) {
                 info->refr_interval_sum += lv_tick_elaps(info->refr_start);
             }
