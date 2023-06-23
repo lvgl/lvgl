@@ -107,6 +107,7 @@ set(COMPILE_OPTIONS
     -Wundef
     -Wuninitialized
     -Wunreachable-code
+    -Werror=float-conversion
     ${BUILD_OPTIONS}
 )
 

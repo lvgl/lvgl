@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include <stdint.h>
+#include "lv_types.h"
 
 /*********************
  *      DEFINES
@@ -24,17 +25,7 @@ extern "C" {
 
 #define LV_BEZIER_VAL_SHIFT 10 /**< log2(LV_BEZIER_VAL_MAX): used to normalize up scaled values*/
 #define LV_BEZIER_VAL_MAX (1L << LV_BEZIER_VAL_SHIFT) /**< Max time in Bezier functions (not [0..1] to use integers)*/
-
-/**
- * Calculate a value of a Cubic Bezier function.
- * @param t time in range of [0..LV_BEZIER_VAL_MAX]
- * @param u0 must be 0
- * @param u1 control value 1 values in range of [0..LV_BEZIER_VAL_MAX]
- * @param u2 control value 2 in range of [0..LV_BEZIER_VAL_MAX]
- * @param u3 must be LV_BEZIER_VAL_MAX
- * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
- */
-#define lv_bezier3(t, u0, u1, u2, u3) lv_cubic_bezier(t, 341, u1, 683, u2)
+#define LV_BEZIER_VAL_FLOAT(f) ((int32_t)((f) * LV_BEZIER_VAL_MAX)) /**< Convert const float number cubic-bezier values to fix-point value*/
 
 /**********************
  *      TYPEDEFS
@@ -74,6 +65,22 @@ static inline LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_cos(int16_t angle)
  * @return the value calculated
  */
 int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y2);
+
+/**
+ * Calculate a value of a Cubic Bezier function.
+ * @param t time in range of [0..LV_BEZIER_VAL_MAX]
+ * @param u0 must be 0
+ * @param u1 control value 1 values in range of [0..LV_BEZIER_VAL_MAX]
+ * @param u2 control value 2 in range of [0..LV_BEZIER_VAL_MAX]
+ * @param u3 must be LV_BEZIER_VAL_MAX
+ * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
+ */
+static inline int32_t lv_bezier3(int32_t t, int32_t u0, uint32_t u1, int32_t u2, int32_t u3)
+{
+    LV_UNUSED(u0);
+    LV_UNUSED(u3);
+    return lv_cubic_bezier(t, 341, u1, 683, u2);
+}
 
 /**
  * Calculate the atan2 of a vector.
