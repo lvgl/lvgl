@@ -127,10 +127,7 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
     perf_info_t * info = lv_obj_get_user_data(sysmon);
     switch(code) {
         case LV_EVENT_REFR_START:
-            /*Skip the first record*/
-            if(info->refr_start) {
-                info->refr_interval_sum += lv_tick_elaps(info->refr_start);
-            }
+            info->refr_interval_sum += lv_tick_elaps(info->refr_start);
             info->refr_start = lv_tick_get();
             break;
         case LV_EVENT_REFR_FINISH:
@@ -177,8 +174,8 @@ static void perf_monitor_event_cb(lv_event_t * e)
     LV_UNUSED(flush_avg_time);
 
     LV_LOG("sysmon: "
-           "%" LV_PRIu32" FPS (refr: %" LV_PRIu32" | redraw: %" LV_PRIu32" | flush: %" LV_PRIu32"), "
-           "refr %" LV_PRIu32"ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
+           "%" LV_PRIu32 " FPS (refr_cnt: %" LV_PRIu32 " | redraw_cnt: %" LV_PRIu32 " | flush_cnt: %" LV_PRIu32 "), "
+           "refr %" LV_PRIu32 "ms (render %" LV_PRIu32 "ms | flush %" LV_PRIu32 "ms), "
            "CPU %" LV_PRIu32 "%%\n",
            fps, info->refr_cnt, info->render_cnt, info->flush_cnt,
            refr_avg_time, render_real_avg_time, flush_avg_time,
@@ -193,7 +190,14 @@ static void perf_monitor_event_cb(lv_event_t * e)
     );
 #endif /*LV_USE_PERF_MONITOR_LOG_MODE*/
 
+    /*Save the refresh start time of the next period*/
+    uint32_t refr_start = info->refr_start;
+
+    /*Reset the counters*/
     lv_memzero(info, sizeof(perf_info_t));
+
+    /*Restore the refresh start time*/
+    info->refr_start = refr_start;
 }
 
 static void perf_monitor_init(void)
