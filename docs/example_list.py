@@ -55,6 +55,7 @@ widgets = {
 "meter":"Meter",
 "msgbox":"Message box",
 "roller":"Roller",
+"scale":"Scale",
 "slider":"Slider",
 "span":"Span",
 "spinbox":"Spinbox",
