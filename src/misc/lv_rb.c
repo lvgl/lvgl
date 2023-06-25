@@ -318,7 +318,7 @@ static lv_rb_node_t * rb_create_node(lv_rb_t * tree)
 static lv_rb_node_t * rb_find_leaf_parent(lv_rb_t * tree, lv_rb_node_t * node)
 {
     lv_rb_node_t * current = tree->root;
-    lv_rb_node_t * parent;
+    lv_rb_node_t * parent = current;
 
     while(current != NULL) {
         parent = current;
