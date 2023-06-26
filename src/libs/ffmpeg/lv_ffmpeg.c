@@ -256,6 +256,8 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
 
 static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
+    LV_UNUSED(decoder);
+
     /* Get the source type */
     lv_img_src_t src_type = lv_img_src_get_type(src);
 
@@ -276,6 +278,8 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
 
 static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
+    LV_UNUSED(decoder);
+
     if(dsc->src_type == LV_IMG_SRC_FILE) {
         const char * path = dsc->src;
 
@@ -319,6 +323,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 
 static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
+    LV_UNUSED(decoder);
     struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
     ffmpeg_close(ffmpeg_ctx);
 }
@@ -840,6 +845,8 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
 static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
                                          lv_obj_t * obj)
 {
+
+    LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
@@ -856,6 +863,8 @@ static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p,
 static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
                                         lv_obj_t * obj)
 {
+    LV_UNUSED(class_p);
+
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
