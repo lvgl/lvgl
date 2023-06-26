@@ -446,7 +446,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         /*Ignore while scrolling*/
-        if(lv_indev_get_scroll_obj(indev)) {
+        if(indev && lv_indev_get_scroll_obj(indev)) {
             if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
                 invalidate_button_area(obj, btnm->btn_id_sel);
                 btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
