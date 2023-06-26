@@ -1,21 +1,11 @@
 #include "../../lv_examples.h"
 #if LV_USE_TABVIEW && LV_BUILD_EXAMPLES
 
-static void scroll_begin_event(lv_event_t * e)
-{
-    /*Disable the scroll animations. Triggered when a tab button is clicked */
-    if(lv_event_get_code(e) == LV_EVENT_SCROLL_BEGIN) {
-        lv_anim_t * a = lv_event_get_param(e);
-        if(a)  a->time = 0;
-    }
-}
-
 void lv_example_tabview_2(void)
 {
     /*Create a Tab view object*/
     lv_obj_t * tabview;
     tabview = lv_tabview_create(lv_scr_act(), LV_DIR_LEFT, 80);
-    lv_obj_add_event_cb(lv_tabview_get_content(tabview), scroll_begin_event, LV_EVENT_SCROLL_BEGIN, NULL);
 
     lv_obj_set_style_bg_color(tabview, lv_palette_lighten(LV_PALETTE_RED, 2), 0);
 

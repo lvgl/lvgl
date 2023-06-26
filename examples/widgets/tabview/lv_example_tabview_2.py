@@ -1,15 +1,6 @@
-def scroll_begin_event(e):
-
-    #Disable the scroll animations. Triggered when a tab button is clicked */
-    if e.get_code() == lv.EVENT.SCROLL_BEGIN:
-        a = lv.anim_t.__cast__(e.get_param())
-        if a:
-            a.time = 0
 
 # Create a Tab view object
 tabview = lv.tabview(lv.scr_act(), lv.DIR.LEFT, 80)
-tabview.get_content().add_event_cb(scroll_begin_event, lv.EVENT.SCROLL_BEGIN, None)
-
 tabview.set_style_bg_color(lv.palette_lighten(lv.PALETTE.RED, 2), 0)
 
 tab_btns = tabview.get_tab_btns()
