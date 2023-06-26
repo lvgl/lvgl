@@ -403,6 +403,7 @@ void lv_chart_remove_series(lv_obj_t * obj, lv_chart_series_t * series)
 
     lv_chart_t * chart    = (lv_chart_t *)obj;
     if(!series->y_ext_buf_assigned && series->y_points) lv_free(series->y_points);
+    if(!series->x_ext_buf_assigned && series->x_points) lv_free(series->x_points);
 
     _lv_ll_remove(&chart->series_ll, series);
     lv_free(series);
@@ -699,6 +700,7 @@ static void lv_chart_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         if(!ser) continue;
 
         if(!ser->y_ext_buf_assigned) lv_free(ser->y_points);
+        if(!ser->x_ext_buf_assigned) lv_free(ser->x_points);
 
         _lv_ll_remove(&chart->series_ll, ser);
         lv_free(ser);
