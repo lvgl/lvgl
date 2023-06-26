@@ -29,9 +29,6 @@ jobs:
     - name: Update ${{ matrix.port }} port submodules
       if: matrix.port != 'esp32' && matrix.port != 'rp2'
       run: make -C ports/${{ matrix.port }} DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules
-    - name: Update RP2 port submodules
-      if: matrix.port == 'rp2'
-      run: make -C ports/rp2 BOARD=PICO submodules
     - name: Checkout LVGL submodule
       working-directory: ./lib/lv_bindings/lvgl
       run: |
@@ -63,7 +60,9 @@ jobs:
       run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
     - name: Build Raspberry Pi PICO port
       if: matrix.port == 'rp2'
-      run: make -j $(nproc) -C ports/rp2 BOARD=PICO USER_C_MODULES=../../lib/lv_bindings/bindings.cmake
+      run: |
+        make -C ports/rp2 BOARD=PICO submodules
+        make -j $(nproc) -C ports/rp2 BOARD=PICO USER_C_MODULES=../../lib/lv_bindings/bindings.cmake
     # Unix port
     - name: Build Unix port
       if: matrix.port == 'unix'
