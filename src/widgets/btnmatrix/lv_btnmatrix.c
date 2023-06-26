@@ -444,10 +444,19 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_PRESSING) {
+        lv_indev_t * indev = lv_indev_get_act();
+        /*Ignore while scrolling*/
+        if(lv_indev_get_scroll_obj(indev)) {
+            if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
+                invalidate_button_area(obj, btnm->btn_id_sel);
+                btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
+                invalidate_button_area(obj, btnm->btn_id_sel);
+            }
+            return;
+        }
         void * param = lv_event_get_param(e);
         uint16_t btn_pr = LV_BTNMATRIX_BTN_NONE;
         /*Search the pressed area*/
-        lv_indev_t * indev = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) return;
 
