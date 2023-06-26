@@ -255,6 +255,7 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, color_scr);
     lv_style_set_text_color(&styles->scr, color_text);
+    lv_style_set_text_font(&styles->scr, theme.font_normal);
     lv_style_set_pad_row(&styles->scr, PAD_SMALL);
     lv_style_set_pad_column(&styles->scr, PAD_SMALL);
 

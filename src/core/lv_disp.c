@@ -773,7 +773,7 @@ void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
 
     disp->theme = th;
 
-    if(disp->screen_cnt == 3 &&
+    if(disp->screen_cnt == 4 &&
        lv_obj_get_child_cnt(disp->screens[0]) == 0 &&
        lv_obj_get_child_cnt(disp->screens[1]) == 0 &&
        lv_obj_get_child_cnt(disp->screens[2]) == 0) {
