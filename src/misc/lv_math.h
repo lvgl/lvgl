@@ -133,6 +133,22 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32
  */
 uint32_t lv_rand(uint32_t min, uint32_t max);
 
+/**
+ * Get a aligned up value to the given alignment
+ * @param x
+ * @param align the alignment (e.g. 4: x will be divisible with 4) (MUST be power of 2)
+ * @return
+ */
+int32_t lv_align_up(int32_t x, int32_t align);
+
+/**
+ * Get a aligned down value to the given alignment
+ * @param x
+ * @param align the alignment (e.g. 4: x will be divisible with 4) (MUST be power of 2)
+ * @return
+ */
+int32_t lv_align_down(int32_t x, int32_t align);
+
 /**********************
  *      MACROS
  **********************/

@@ -136,4 +136,30 @@ void test_math_cubic_bezier_result_should_be_precise(void)
     }
 }
 
+void test_math_align_up_down(void)
+{
+    int32_t values[] = { 0, 1, 3, 6, 23, 54, 55, 345, 5342, 662, 456, 234, 123, 12, 44, 55, 66, 77, 88, 99, 100, 101, 102, 103, 104, 105, 106, 107 };
+    int32_t values_align_up_4[] = { 0, 4, 4, 8, 24, 56, 56, 348, 5344, 664, 456, 236, 124, 12, 44, 56, 68, 80, 88, 100, 100, 104, 104, 104, 104, 108, 108, 108 };
+    int32_t values_align_up_8[] = { 0, 8, 8, 8, 24, 56, 56, 352, 5344, 664, 456, 240, 128, 16, 48, 56, 72, 80, 88, 104, 104, 104, 104, 104, 104, 112, 112, 112 };
+    int32_t values_align_up_16[] = { 0, 16, 16, 16, 32, 64, 64, 352, 5344, 672, 464, 240, 128, 16, 48, 64, 80, 80, 96, 112, 112, 112, 112, 112, 112, 112, 112, 112 };
+    int32_t values_align_up_64[] = { 0, 64, 64, 64, 64, 64, 64, 384, 5376, 704, 512, 256, 128, 64, 64, 64, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128 };
+
+    int32_t values_align_down_4[] = { 0, 0, 0, 4, 20, 52, 52, 344, 5340, 660, 456, 232, 120, 12, 44, 52, 64, 76, 88, 96, 100, 100, 100, 100, 104, 104, 104, 104 };
+    int32_t values_align_down_8[] = { 0, 0, 0, 0, 16, 48, 48, 344, 5336, 656, 456, 232, 120, 8, 40, 48, 64, 72, 88, 96, 96, 96, 96, 96, 104, 104, 104, 104 };
+    int32_t values_align_down_16[] = { 0, 0, 0, 0, 16, 48, 48, 336, 5328, 656, 448, 224, 112, 0, 32, 48, 64, 64, 80, 96, 96, 96, 96, 96, 96, 96, 96, 96 };
+    int32_t values_align_down_64[] = { 0, 0, 0, 0, 0, 0, 0, 320, 5312, 640, 448, 192, 64, 0, 0, 0, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64 };
+
+    for(uint32_t i = 0; i < sizeof(values) / sizeof(values[0]); i++) {
+        TEST_ASSERT_EQUAL_INT32(values_align_up_4[i], lv_align_up(values[i], 4));
+        TEST_ASSERT_EQUAL_INT32(values_align_up_8[i], lv_align_up(values[i], 8));
+        TEST_ASSERT_EQUAL_INT32(values_align_up_16[i], lv_align_up(values[i], 16));
+        TEST_ASSERT_EQUAL_INT32(values_align_up_64[i], lv_align_up(values[i], 64));
+
+        TEST_ASSERT_EQUAL_INT32(values_align_down_4[i], lv_align_down(values[i], 4));
+        TEST_ASSERT_EQUAL_INT32(values_align_down_8[i], lv_align_down(values[i], 8));
+        TEST_ASSERT_EQUAL_INT32(values_align_down_16[i], lv_align_down(values[i], 16));
+        TEST_ASSERT_EQUAL_INT32(values_align_down_64[i], lv_align_down(values[i], 64));
+    }
+}
+
 #endif

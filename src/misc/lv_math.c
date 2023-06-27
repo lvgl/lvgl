@@ -388,6 +388,16 @@ uint32_t lv_rand(uint32_t min, uint32_t max)
     return (a % (max - min + 1)) + min;
 }
 
+int32_t lv_align_up(int32_t x, int32_t align)
+{
+    return (x + (align - 1)) & ~(align - 1);
+}
+
+int32_t lv_align_down(int32_t x, int32_t align)
+{
+    return x - (x & (align - 1));
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
