@@ -36,7 +36,7 @@
  *      TYPEDEFS
  **********************/
 typedef struct _lv_freetype_font_dsc_t {
-    lv_font_t * font;
+    lv_font_t font;
     char * pathname;
     uint16_t size;
     uint16_t style;
@@ -156,16 +156,13 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16
         return NULL;
     }
 
-    size_t need_size = sizeof(lv_freetype_font_dsc_t) + sizeof(lv_font_t);
-    lv_freetype_font_dsc_t * dsc = lv_malloc(need_size);
+    lv_freetype_font_dsc_t * dsc = lv_malloc(sizeof(lv_freetype_font_dsc_t));
     LV_ASSERT_MALLOC(dsc);
     if(!dsc) {
         LV_LOG_ERROR("malloc failed for lv_freetype_font_dsc");
         return NULL;
     }
-    lv_memzero(dsc, need_size);
-
-    dsc->font = (lv_font_t *)(((uint8_t *)dsc) + sizeof(lv_freetype_font_dsc_t));
+    lv_memzero(dsc, sizeof(lv_freetype_font_dsc_t));
 
     dsc->pathname = lv_malloc(pathname_len + 1);
     LV_ASSERT_MALLOC(dsc->pathname);
@@ -196,13 +193,14 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16
         return NULL;
     }
 
-    lv_font_t * font = dsc->font;
+    lv_font_t * font = &dsc->font;
     font->dsc = dsc;
     font->get_glyph_dsc = freetype_get_glyph_dsc_cb;
     font->get_glyph_bitmap = freetype_get_glyph_bitmap_cb;
     font->subpx = LV_FONT_SUBPX_NONE;
     font->line_height = (face_size->face->size->metrics.height >> 6);
     font->base_line = -(face_size->face->size->metrics.descender >> 6);
+    font->ext_draw = (style & LV_FREETYPE_FONT_STYLE_ITALIC) ? true : false;
 
     FT_Fixed scale = face_size->face->size->metrics.y_scale;
     int8_t thickness = FT_MulFix(scale, face_size->face->underline_thickness) >> 6;

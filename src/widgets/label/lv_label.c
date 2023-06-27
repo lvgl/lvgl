@@ -716,8 +716,10 @@ static void lv_label_event(const lv_obj_class_t * class_p, lv_event_t * e)
          * To avoid this add some extra draw area.
          * font_h / 4 is an empirical value. */
         const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
-        const lv_coord_t font_h = lv_font_get_line_height(font);
-        lv_event_set_ext_draw_size(e, font_h / 4);
+        if(font->ext_draw) {
+            const lv_coord_t font_h = lv_font_get_line_height(font);
+            lv_event_set_ext_draw_size(e, font_h / 4);
+        }
     }
     else if(code == LV_EVENT_GET_SELF_SIZE) {
         lv_label_t * label = (lv_label_t *)obj;

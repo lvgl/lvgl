@@ -76,6 +76,7 @@ typedef struct _lv_font_t {
     lv_coord_t line_height;         /**< The real line height where any text fits*/
     lv_coord_t base_line;           /**< Base line measured from the top of the line_height*/
     uint8_t subpx  : 2;             /**< An element of `lv_font_subpx_t`*/
+    uint8_t ext_draw : 1;           /**< Italic or other non-typical letter needs to expand the drawing area*/
 
     int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
     int8_t underline_thickness;     /**< Thickness of the underline*/
