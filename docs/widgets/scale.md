@@ -12,7 +12,19 @@ The scale widget is divided in the following three parts:
 - `LV_PART_ITEMS` Minor ticks. See red minor ticks in the example image.
 - `LV_PART_INDICATOR` Major ticks and its labels (if enabled). See pink labels and green major ticks in the example image.
 
+<<<<<<< HEAD
 ![](/misc/scale.png "Scale example")
+=======
+![](/misc/scale_major_line.png "Scale major line")
+
+- `LV_PART_ITEMS` Minor ticks. See red minor ticks in the following image:
+
+![](/misc/scale_items.png "Scale minor ticks")
+
+- `LV_PART_INDICATOR` Major ticks and its labels (if enabled). See pink labels and green major ticks in the following image:
+
+![](/misc/scale_indicator.png "Scale major ticks and label")
+>>>>>>> 90d86dcac (lv_scale: Fix image path in docs)
 
 ## Usage
 
