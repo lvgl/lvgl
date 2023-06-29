@@ -27,7 +27,7 @@ extern "C" {
 
 typedef struct {
     lv_obj_t obj;
-    const char ** map;
+    char ** map;
     uint16_t tab_cnt;
     uint16_t tab_cur;
     lv_dir_t tab_pos;
