@@ -8,17 +8,11 @@ Scale allows you to have a linear scale with ranges and sections with custom sty
 
 The scale widget is divided in the following three parts:
 
-- `LV_PART_MAIN` Main line. See blue line in the following image:
+- `LV_PART_MAIN` Main line. See blue line in the example image.
+- `LV_PART_ITEMS` Minor ticks. See red minor ticks in the example image.
+- `LV_PART_INDICATOR` Major ticks and its labels (if enabled). See pink labels and green major ticks in the example image.
 
-<img src="../_static/misc/scale_major_line.png" style="width:100%">
-
-- `LV_PART_ITEMS` Minor ticks. See red minor ticks in the following image:
-
-<img src="../_static/misc/scale_items.png" style="width:100%">
-
-- `LV_PART_INDICATOR` Major ticks and its labels (if enabled). See pink labels and green major ticks in the following image:
-
-<img src="../_static/misc/scale_indicator.png" style="width:100%">
+![](/misc/scale.png "Scale example")
 
 ## Usage
 
