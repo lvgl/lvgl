@@ -29,8 +29,8 @@ An example ``flush_cb`` looks like this:
        int32_t x, y;
        for(y = area->y1; y <= area->y2; y++) {
            for(x = area->x1; x <= area->x2; x++) {
-               put_px(x, y, *color_p);
-               color_p++;
+               put_px(x, y, *buf);
+               buf++;
            }
        }
 
