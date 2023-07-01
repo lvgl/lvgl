@@ -159,11 +159,7 @@ static void draw_main(lv_event_t * e)
     /*Draw the indicator*/
     /*Respect the background's padding*/
     lv_area_t indic_area;
-    lv_area_copy(&indic_area, &obj->coords);
-    indic_area.x1 += bg_left;
-    indic_area.x2 -= bg_right;
-    indic_area.y1 += bg_top;
-    indic_area.y2 -= bg_bottom;
+    lv_obj_get_content_coords(obj, &indic_area);
 
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
