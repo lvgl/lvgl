@@ -150,12 +150,6 @@ static void draw_main(lv_event_t * e)
 
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
-    /*Calculate the indicator area*/
-    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
-    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
-    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
-    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-
     /*Draw the indicator*/
     /*Respect the background's padding*/
     lv_area_t indic_area;
