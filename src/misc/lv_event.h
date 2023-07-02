@@ -81,6 +81,7 @@ typedef enum {
     LV_EVENT_CANCEL,              /**< A process has been cancelled */
 
     /** Other events*/
+    LV_EVENT_CREATE,              /**< Object is being created*/
     LV_EVENT_DELETE,              /**< Object is being deleted*/
     LV_EVENT_CHILD_CHANGED,       /**< Child was removed, added, or its size, position were changed */
     LV_EVENT_CHILD_CREATED,       /**< Child was created, always bubbles up to all parents*/
