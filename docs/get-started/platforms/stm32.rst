@@ -35,34 +35,24 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 .. code:: c
 
    //Frame buffers
-   /*A static or global variable to store the buffers*/
-   static lv_disp_draw_buf_t disp_buf;
-
    /*Static or global buffer(s). The second buffer is optional*/
    static lv_color_t buf_1[BUFF_SIZE]; //TODO: Chose a buffer size. DISPLAY_WIDTH * 10 is one suggestion.
    static lv_color_t buf_2[BUFF_SIZE];
 
 - In your ``main()`` function, after initialising your CPU,
   peripherals, and LCD panel, call :cpp:func:`lv_init` to initialise LVGL.
-  You can then register the frame buffers using
-  :cpp:func:`lv_disp_draw_buf_init`, and create the display driver using
-  :cpp:func:`lv_disp_drv_init`.
+  You can then create the display driver using
+  :cpp:func:`lv_disp_create`, and register the frame buffers using
+  :cpp:func:`lv_disp_set_draw_buffers`.
 
 .. code:: c
 
    //Initialise LVGL UI library
    lv_init();
-   lv_disp_draw_buf_init(&disp_buf, buf_1, NULL, BUFF_SIZE);
 
-   static lv_disp_drv_t disp_drv;          /*A variable to hold the drivers. Must be static or global.*/
-   lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
-   disp_drv.draw_buf = &disp_buf;          /*Set an initialized buffer*/
-   disp_drv.flush_cb = my_flush_cb;        /*Set a flush callback to draw to the display*/
-   disp_drv.hor_res = WIDTH;                 /*Set the horizontal resolution in pixels*/
-   disp_drv.ver_res = HEIGHT;                 /*Set the vertical resolution in pixels*/
-
-   lv_disp_t * disp;
-   disp = lv_disp_drv_register(&disp_drv); /*Register the driver and save the created display objects*/
+   lv_disp_t * disp = lv_disp_create(WIDTH, HEIGHT); /*Basic initialization with horizontal and vertical resolution in pixels*/
+   lv_disp_set_flush_cb(disp, my_flush_cb); /*Set a flush callback to draw to the display*/
+   lv_disp_set_draw_buffers(disp, buf_1, buf_2, sizeof(buf_1), LV_DISP_RENDER_MODE_PARTIAL); /*Set an initialized buffer*/
 
 - Create some dummy objects to test the output:
 
@@ -117,7 +107,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 
 .. code:: c
 
-   void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+   void my_flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
    {
      //Set the drawing region
      set_draw_window(area->x1, area->y1, area->x2, area->y2);
@@ -132,7 +122,9 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 
      //Write colour to each pixel
      for (int i = 0; i < width * height; i++) {
-       parallel_write(color_p->full);
+       uint16_t color_full = (color_p->red << 11) | (color_p->green << 5) | (color_p->blue);
+       parallel_write(color_full);
+
        color_p++;
      }
 
@@ -141,7 +133,7 @@ the *main.c* file. \* Create some frame buffer(s) as global variables:
 
      /* IMPORTANT!!!
      * Inform the graphics library that you are ready with the flushing*/
-     lv_disp_flush_ready(disp_drv);
+     lv_disp_flush_ready(disp);
    }
 
 FreeRTOS Example
