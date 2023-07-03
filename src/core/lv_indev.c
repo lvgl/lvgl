@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  ********************/
-#include "lv_indev.h"
 #include "lv_indev_private.h"
 #include "lv_disp.h"
 #include "lv_disp_private.h"

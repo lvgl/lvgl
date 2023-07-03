@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
+#include "lv_indev.h"
 /*********************
  *      DEFINES
  *********************/
@@ -23,8 +23,6 @@ extern "C" {
  **********************/
 
 struct _lv_indev_t;
-
-typedef void (*lv_indev_read_cb_t)(struct _lv_indev_t * indev, lv_indev_data_t * data);
 
 struct _lv_indev_t {
     /**< Input device type*/
