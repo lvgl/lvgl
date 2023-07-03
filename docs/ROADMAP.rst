@@ -151,6 +151,7 @@ Others
 - |uncheck| Variable binding. I.e create properties which can be bound to
   objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
 - |uncheck| Consider `stagger animations <https://greensock.com/docs/v3/Staggers>`__.
+- |uncheck| Add custom indev type. See [here](https://github.com/lvgl/lvgl/issues/3298#issuecomment-1616706654).
 
 Ideas
 -----
