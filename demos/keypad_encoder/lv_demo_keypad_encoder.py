@@ -3,7 +3,7 @@ class KeyboardEncoder:
         self.g = lv.group_create()
         self.g.set_default()
 
-        cur_drv = lv.indev_t.__cast__(None)
+        cur_drv = lv.indev_t()
         while True:
             cur_drv = cur_drv.get_next()
 
