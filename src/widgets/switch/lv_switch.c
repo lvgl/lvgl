@@ -150,20 +150,10 @@ static void draw_main(lv_event_t * e)
 
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
-    /*Calculate the indicator area*/
-    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
-    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
-    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
-    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-
     /*Draw the indicator*/
-    /*Respect the background's padding*/
     lv_area_t indic_area;
-    lv_area_copy(&indic_area, &obj->coords);
-    indic_area.x1 += bg_left;
-    indic_area.x2 -= bg_right;
-    indic_area.y1 += bg_top;
-    indic_area.y2 -= bg_bottom;
+    /*Exclude background's padding*/
+    lv_obj_get_content_coords(obj, &indic_area);
 
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
@@ -190,11 +180,9 @@ static void draw_main(lv_event_t * e)
     }
 
     lv_area_t knob_area;
-    knob_area.x1 = obj->coords.x1 + anim_value_x;
+    lv_area_copy(&knob_area, &obj->coords);
+    knob_area.x1 += anim_value_x;
     knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
-
-    knob_area.y1 = obj->coords.y1;
-    knob_area.y2 = obj->coords.y2;
 
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
