@@ -30,7 +30,6 @@ static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area);
 static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area);
 static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area);
-static void draw_mid(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area);
 static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_value, int32_t new_value);
 static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value);
 
@@ -307,7 +306,23 @@ static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)
         draw_arcs(obj, draw_ctx, &scale_area);
         draw_ticks_and_labels(obj, draw_ctx, &scale_area);
         draw_needles(obj, draw_ctx, &scale_area);
-        draw_mid(obj, draw_ctx, &scale_area);
+
+        lv_coord_t r_edge = lv_area_get_width(scale_area) / 2;
+        lv_point_t scale_center;
+        scale_center.x = scale_area->x1 + r_edge;
+        scale_center.y = scale_area->y1 + r_edge;
+
+        lv_draw_rect_dsc_t mid_dsc;
+        lv_draw_rect_dsc_init(&mid_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &mid_dsc);
+        lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
+        lv_coord_t h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
+        lv_area_t nm_cord;
+        nm_cord.x1 = scale_center.x - w;
+        nm_cord.y1 = scale_center.y - h;
+        nm_cord.x2 = scale_center.x + w;
+        nm_cord.y2 = scale_center.y + h;
+        lv_draw_rect(draw_ctx, &mid_dsc, &nm_cord);
     }
 }
 
@@ -604,26 +619,6 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
         }
     }
-}
-
-static void draw_mid(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t * scale_area)
-{
-    lv_coord_t r_edge = lv_area_get_width(scale_area) / 2;
-    lv_point_t scale_center;
-    scale_center.x = scale_area->x1 + r_edge;
-    scale_center.y = scale_area->y1 + r_edge;
-
-    lv_draw_rect_dsc_t mid_dsc;
-    lv_draw_rect_dsc_init(&mid_dsc);
-    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &mid_dsc);
-    lv_coord_t w = lv_obj_get_style_width(obj, LV_PART_INDICATOR) / 2;
-    lv_coord_t h = lv_obj_get_style_height(obj, LV_PART_INDICATOR) / 2;
-    lv_area_t nm_cord;
-    nm_cord.x1 = scale_center.x - w;
-    nm_cord.y1 = scale_center.y - h;
-    nm_cord.x2 = scale_center.x + w;
-    nm_cord.y2 = scale_center.y + h;
-    lv_draw_rect(draw_ctx, &mid_dsc, &nm_cord);
 }
 
 static void inv_arc(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t old_value, int32_t new_value)
