@@ -20,7 +20,7 @@
 -->
 
 
-<package schemaVersion="1.4" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="PACK.xsd">
+<package schemaVersion="1.4" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Open-CMSIS-Pack/Open-CMSIS-Pack-Spec/v1.7.7/schema/PACK.xsd">
   <vendor>LVGL</vendor>
   <name>lvgl</name>
   <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
@@ -36,11 +36,17 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-04-28" version="8.3.7" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.7.pack">
+    <release date="2023-07-04" version="8.3.8" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.8.pack">
+      - LVGL 8.3.8
+      - Add renesas-ra6m3 gpu adaptation
+      - Improve performance and add more features for PXP and VGLite
+      - Minor updates
+    </release>
+    <release date="2023-04-28" version="8.3.7" url="https://github.com/lvgl/lvgl/raw/2b56e04205481daa6575bd5f7ab5df59d11676eb/env_support/cmsis-pack/LVGL.lvgl.8.3.7.pack">
       - LVGL 8.3.7
       - Minor updates
     </release>
-    <release date="2023-04-02" version="8.3.6" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
+    <release date="2023-04-02" version="8.3.6" url="https://github.com/lvgl/lvgl/raw/6b0092c0d91b2c7bfded48e04cc7b486ed3a72bd/env_support/cmsis-pack/LVGL.lvgl.8.3.6.pack">
       - LVGL 8.3.6 release
       - Various fixes, See CHANGELOG.md
     </release>
@@ -181,6 +187,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="LVGL-GPU-RA6M3-G2D"/>
         </condition>
         
         <condition id="LVGL-GPU-STM32-DMA2D">
@@ -192,6 +199,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="LVGL-GPU-RA6M3-G2D"/>
         </condition>
         
         <condition id="LVGL-GPU-SWM341-DMA2D">
@@ -203,6 +211,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="LVGL-GPU-RA6M3-G2D"/>
         </condition>
         
         <condition id="LVGL-GPU-NXP-PXP">
@@ -214,6 +223,7 @@
             <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>-->
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="LVGL-GPU-RA6M3-G2D"/>
         </condition>
         
         <condition id="LVGL-GPU-NXP-VGLite">
@@ -225,6 +235,7 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
             <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>-->
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="LVGL-GPU-RA6M3-G2D"/>
         </condition>
         
         <condition id="LVGL-GPU-GD32-IPA">
@@ -236,6 +247,19 @@
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
             <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
             <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>-->
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="LVGL-GPU-RA6M3-G2D"/>
+        </condition>
+
+        <condition id="LVGL-GPU-RA6M3-G2D">
+            <description>Enable LVGL Arm-2D GPU Support</description>
+            <require Cclass="LVGL" Cgroup="lvgl" Csub="Essential"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU Arm-2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU STM32-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU SWM341-DMA2D"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-PXP"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU NXP-VGLite"/>
+            <deny Cclass="LVGL" Cgroup="lvgl" Csub="GPU GD32-IPA"/>
+            <!--<deny Cclass="LVGL" Cgroup="lvgl" Csub="LVGL-GPU-RA6M3-G2D"/>-->
         </condition>
 
     </conditions>
@@ -270,7 +294,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.7">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.8">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
@@ -525,6 +549,22 @@
 #define LV_USE_GPU_NXP_VG_LITE          1
               </RTE_Components_h>
 
+            </component>
+
+
+            <component Cgroup="lvgl" Csub="GPU RA6M3-G2D"  condition="LVGL-GPU-RA6M3-G2D">
+              <description>An hardware acceleration from Renesas RA6M3-G2D</description>
+              <files>
+                <file category="sourceC"            name="src/draw/renesas/lv_gpu_d2_draw_label.c" />
+                <file category="sourceC"            name="src/draw/renesas/lv_gpu_d2_ra6m3.c" />
+              </files>
+              
+              <RTE_Components_h>
+              
+/*! \brief enable RA6M3-G2D */
+#define LV_USE_GPU_RA6M3_G2D      1
+              </RTE_Components_h>
+              
             </component>
 
             <component Cgroup="lvgl" Csub="Extra Themes"  condition="LVGL-Essential">
