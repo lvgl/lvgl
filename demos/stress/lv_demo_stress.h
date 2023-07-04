@@ -30,6 +30,8 @@ extern "C" {
  **********************/
 void lv_demo_stress(void);
 
+void lv_demo_stress_close(void);
+
 /**********************
  *      MACROS
  **********************/

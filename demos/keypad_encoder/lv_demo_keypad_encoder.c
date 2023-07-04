@@ -46,8 +46,11 @@ static lv_obj_t * t2;
 
 void lv_demo_keypad_encoder(void)
 {
-    g = lv_group_create();
-    lv_group_set_default(g);
+    g = lv_group_get_default();
+    if(g == NULL) {
+        g = lv_group_create();
+        lv_group_set_default(g);
+    }
 
     lv_indev_t * cur_drv = NULL;
     for(;;) {
@@ -74,6 +77,12 @@ void lv_demo_keypad_encoder(void)
     text_input_create(t2);
 
     msgbox_create();
+}
+
+void lv_demo_keypad_encoder_close(void)
+{
+    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_layer_top());
 }
 
 /**********************

@@ -130,6 +130,19 @@ lv_obj_t * _lv_demo_music_list_create(lv_obj_t * parent)
     return list;
 }
 
+
+void _lv_demo_music_list_close(void)
+{
+    lv_style_reset(&style_scrollbar);
+    lv_style_reset(&style_btn);
+    lv_style_reset(&style_btn_pr);
+    lv_style_reset(&style_btn_chk);
+    lv_style_reset(&style_btn_dis);
+    lv_style_reset(&style_title);
+    lv_style_reset(&style_artist);
+    lv_style_reset(&style_time);
+}
+
 void _lv_demo_music_list_btn_check(uint32_t track_id, bool state)
 {
     lv_obj_t * btn = lv_obj_get_child(list, track_id);

@@ -188,6 +188,7 @@ typedef struct _lv_obj_t {
     uint16_t style_cnt  : 6;
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
+    uint16_t being_deleted   : 1;
 } lv_obj_t;
 
 
