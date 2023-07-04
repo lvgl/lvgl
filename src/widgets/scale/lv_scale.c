@@ -1,5 +1,5 @@
 /**
- * @file lv_arc.c
+ * @file lv_scale.c
  *
  */
 
@@ -35,6 +35,10 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event);
 static void scale_draw_main(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_items(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
+
+static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event);
+static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event);
+static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event);
 
 /**********************
  *  STATIC VARIABLES
@@ -227,7 +231,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
-    scale->mode = LV_SCALE_MODE_VERTICAL_LEFT;
+    scale->mode = LV_SCALE_MODE_ROUND_OUTTER;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -269,8 +273,8 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
             scale_draw_indicator(obj, event);
             scale_draw_items(obj, event);
         }
-        else if(LV_SCALE_MODE_ROUND == scale->mode) {
-
+        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTTER == scale->mode)) {
+            scale_draw_main_round(obj, event);
         }
         else {
             /* Invalid mode */
@@ -801,6 +805,73 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
     lv_draw_line(draw_ctx, &line_dsc, &main_line_point_a, &main_line_point_b);
     lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+}
+
+static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
+{
+    lv_coord_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    lv_coord_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+    lv_coord_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg,
+                           lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2U;
+
+    center->x = obj->coords.x1 + r + left_bg;
+    center->y = obj->coords.y1 + r + top_bg;
+
+    if(arc_r) *arc_r = r;
+}
+
+static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
+{
+    lv_scale_t * scale = (lv_scale_t *)obj;
+    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
+
+    if(scale->total_tick_count <= 1) return;
+
+    /* Get style properties so they can be used in the tick and label drawing */
+    lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
+    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+    lv_coord_t x_ofs = obj->coords.x1;
+    lv_coord_t y_ofs = obj->coords.y1;
+
+    /* Configure arc draw descriptors for the main part */
+    lv_draw_arc_dsc_t arc_dsc;
+    lv_draw_arc_dsc_init(&arc_dsc);
+    lv_obj_init_draw_arc_dsc(obj, LV_PART_MAIN, &arc_dsc);
+
+    lv_point_t arc_center;
+    lv_coord_t arc_radius;
+    get_center(obj, &arc_center, &arc_radius);
+
+    LV_LOG_USER("Arc center: {X:%d, Y:%d}, radius: %d", arc_center.x, arc_center.y, arc_radius);
+
+    lv_obj_draw_part_dsc_t part_draw_dsc;
+    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
+    part_draw_dsc.class_p = MY_CLASS;
+    part_draw_dsc.id = scale->mode;
+    part_draw_dsc.part = LV_PART_MAIN;
+    part_draw_dsc.p1 = &arc_center;
+    part_draw_dsc.radius = arc_radius;
+    part_draw_dsc.arc_dsc = &arc_dsc;
+
+    /* Draw main line */
+    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
+    lv_draw_arc(draw_ctx, &arc_dsc, &arc_center, part_draw_dsc.radius, 20, 340);
+    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+}
+
+static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
+{
+
+}
+
+static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
+{
+
 }
 
 #endif
