@@ -25,7 +25,7 @@ static void msgbox_del(lv_timer_t * tmr);
 static void set_y_anim(void * obj, int32_t v);
 static void set_width_anim(void * obj, int32_t v);
 static void arc_set_end_angle_anim(void * obj, int32_t v);
-static void obj_test_task_cb(lv_timer_t * tmr);
+static void obj_test_timer_cb(lv_timer_t * tmr);
 
 /**********************
  *  STATIC VARIABLES
@@ -34,6 +34,8 @@ static lv_obj_t * main_page;
 static lv_obj_t * ta;
 static const char * mbox_btns[] = {"Ok", "Cancel", ""};
 static uint32_t mem_free_start = 0;
+static lv_timer_t * obj_test_timer;
+
 /**********************
  *      MACROS
  **********************/
@@ -45,14 +47,21 @@ static uint32_t mem_free_start = 0;
 void lv_demo_stress(void)
 {
     LV_LOG_USER("Starting stress test. (< 100 bytes permanent memory leak is normal due to fragmentation)");
-    lv_timer_create(obj_test_task_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
+    obj_test_timer = lv_timer_create(obj_test_timer_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
+}
+
+void lv_demo_stress_close(void)
+{
+    lv_timer_del(obj_test_timer);
+    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_layer_top());
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void obj_test_task_cb(lv_timer_t * tmr)
+static void obj_test_timer_cb(lv_timer_t * tmr)
 {
     (void) tmr;    /*Unused*/
     static int16_t state = -1;

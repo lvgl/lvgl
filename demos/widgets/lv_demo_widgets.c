@@ -86,6 +86,8 @@ static uint32_t session_desktop = 1000;
 static uint32_t session_tablet = 1000;
 static uint32_t session_mobile = 1000;
 
+static lv_timer_t * meter2_timer;
+
 /**********************
  *      MACROS
  **********************/
@@ -196,6 +198,22 @@ void lv_demo_widgets(void)
     color_changer_create(tv);
 }
 
+void lv_demo_widgets_close(void)
+{
+    /*Delete all animation*/
+    lv_anim_del(NULL, NULL);
+
+    lv_timer_del(meter2_timer);
+    meter2_timer = NULL;
+
+    lv_obj_clean(lv_scr_act());
+
+    lv_style_reset(&style_text_muted);
+    lv_style_reset(&style_title);
+    lv_style_reset(&style_icon);
+    lv_style_reset(&style_bullet);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -204,6 +222,7 @@ static void profile_create(lv_obj_t * parent)
 {
     lv_obj_t * panel1 = lv_obj_create(parent);
     lv_obj_set_height(panel1, LV_SIZE_CONTENT);
+
 
     LV_IMG_DECLARE(img_demo_widgets_avatar);
     lv_obj_t * avatar = lv_img_create(panel1);
@@ -698,7 +717,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_meter_set_indicator_start_value(meter2, meter2_indic[2], 70);
     lv_meter_set_indicator_end_value(meter2, meter2_indic[2], 99);
 
-    lv_timer_create(meter2_timer_cb, 100, meter2_indic);
+    meter2_timer = lv_timer_create(meter2_timer_cb, 100, meter2_indic);
 
     meter3 = create_meter_box(parent, "Network Speed", "Low speed", "Normal Speed", "High Speed");
     if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(meter3), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
