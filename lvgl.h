@@ -25,6 +25,7 @@ extern "C" {
 #include "src/misc/lv_timer.h"
 #include "src/misc/lv_math.h"
 #include "src/misc/lv_mem.h"
+#include "src/misc/lv_mem_dcache.h"
 #include "src/misc/lv_async.h"
 #include "src/misc/lv_anim_timeline.h"
 #include "src/misc/lv_printf.h"
