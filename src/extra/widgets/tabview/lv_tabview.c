@@ -77,8 +77,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
 
-    char ** old_map = tabview->map;
-    char ** new_map;
+    const char ** old_map = (const char **)tabview->map;
+    const char ** new_map;
 
     /*top or bottom dir*/
     if(tabview->tab_pos & LV_DIR_VER) {
@@ -138,6 +138,8 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t id, const char * new_name)
 void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->being_deleted) return;
+
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     if(id >= tabview->tab_cnt) {
