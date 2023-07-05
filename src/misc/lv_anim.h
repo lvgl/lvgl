@@ -88,6 +88,15 @@ typedef struct _lv_anim_t {
     uint32_t playback_time;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
+    union _lv_anim_path_para_t {
+        struct _lv_anim_bezier3_para_t {
+            int16_t x1;
+            int16_t y1;
+            int16_t x2;
+            int16_t y2;
+        } bezier3; /**< Parameter used when path is custom_bezier*/
+    } parameter;
+
     uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay`*/
 
     /*Animation system use these - user shouldn't set*/
@@ -300,6 +309,24 @@ static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
 }
 
 /**
+ * Set parameter for cubic bezier path
+ * @param a         pointer to an initialized `lv_anim_t` variable
+ * @param x1        first control point
+ * @param y1
+ * @param y1        second control point
+ */
+static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
+{
+    struct _lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
+
+    para->x1 = x1;
+    para->x2 = x2;
+    para->y1 = y1;
+    para->y2 = y2;
+}
+
+
+/**
  * Create an animation
  * @param a         an initialized 'anim_t' variable. Not required after call.
  * @return          pointer to the created animation (different from the `a` parameter)
@@ -483,6 +510,13 @@ int32_t lv_anim_path_bounce(const lv_anim_t * a);
  * @return      the current value to set
  */
 int32_t lv_anim_path_step(const lv_anim_t * a);
+
+/**
+ * A custom cubic bezier animation path, need to specify cubic-parameters in a->parameter.bezier3
+ * @param a     pointer to an animation
+ * @return      the current value to set
+ */
+int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a);
 
 /**********************
  *   GLOBAL VARIABLES
