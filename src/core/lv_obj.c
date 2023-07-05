@@ -7,55 +7,20 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "lv_indev.h"
-#include "lv_indev_private.h"
+#include "../indev/lv_indev.h"
+#include "../indev/lv_indev_private.h"
 #include "lv_refr.h"
 #include "lv_group.h"
-#include "lv_disp.h"
-#include "lv_disp_private.h"
-#include "lv_theme.h"
+#include "../disp/lv_disp.h"
+#include "../disp/lv_disp_private.h"
+#include "../themes/lv_theme.h"
 #include "../misc/lv_assert.h"
-#include "../draw/lv_draw.h"
-#include "../draw/lv_img_cache_builtin.h"
-#include "../misc/lv_anim.h"
-#include "../misc/lv_timer.h"
-#include "../misc/lv_async.h"
-#include "../misc/lv_fs.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_math.h"
 #include "../misc/lv_log.h"
-#include "../libs/bmp/lv_bmp.h"
-#include "../libs/ffmpeg/lv_ffmpeg.h"
-#include "../libs/freetype/lv_freetype.h"
-#include "../libs/fsdrv/lv_fsdrv.h"
-#include "../libs/gif/lv_gif.h"
-#include "../libs/png/lv_png.h"
-#include "../libs/sjpg/lv_sjpg.h"
-#include "../layouts/flex/lv_flex.h"
-#include "../layouts/grid/lv_grid.h"
-
-#if LV_USE_BUILTIN_MALLOC
-    #include "../misc/lv_malloc_builtin.h"
-#endif
-#include "../hal/lv_hal.h"
+#include "../tick/lv_tick.h"
+#include "../stdlib/lv_string.h"
 #include <stdint.h>
 #include <string.h>
-
-#if LV_USE_GPU_STM32_DMA2D
-    #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
-#endif
-
-#if LV_USE_GPU_GD32_IPA
-    #include "../draw/gd32_ipa/lv_gpu_gd32_ipa.h"
-#endif
-
-#if LV_USE_GPU_SWM341_DMA2D
-    #include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
-#endif
-
-#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    #include "../draw/nxp/pxp/lv_gpu_nxp_pxp.h"
-#endif
 
 /*********************
  *      DEFINES
@@ -76,7 +41,7 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_draw(lv_event_t * e);
 static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx);
+static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
@@ -84,7 +49,6 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_initialized = false;
 const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
@@ -104,200 +68,6 @@ const lv_obj_class_t lv_obj_class = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
-bool lv_is_initialized(void)
-{
-    return lv_initialized;
-}
-
-void lv_init(void)
-{
-    /*Do nothing if already initialized*/
-    if(lv_initialized) {
-        LV_LOG_WARN("lv_init: already inited");
-        return;
-    }
-
-    LV_LOG_INFO("begin");
-
-    /*First initialize Garbage Collection if needed*/
-#ifdef LV_GC_INIT
-    LV_GC_INIT();
-#endif
-
-    /*Initialize the misc modules*/
-#if LV_USE_BUILTIN_MALLOC
-    lv_mem_init_builtin();
-#endif
-
-#if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
-    lv_profiler_builtin_config_t profiler_config;
-    lv_profiler_builtin_config_init(&profiler_config);
-    lv_profiler_builtin_init(&profiler_config);
-#endif
-
-    _lv_timer_core_init();
-
-    _lv_fs_init();
-
-    _lv_anim_core_init();
-
-    _lv_group_init();
-
-    lv_draw_init();
-
-#if LV_USE_GPU_STM32_DMA2D
-    /*Initialize DMA2D GPU*/
-    lv_draw_stm32_dma2d_init();
-#endif
-
-#if LV_USE_GPU_GD32_IPA
-    /*Initialize IPA GPU*/
-    lv_draw_gd32_ipa_init();
-#endif
-
-#if LV_USE_GPU_SWM341_DMA2D
-    /*Initialize DMA2D GPU*/
-    lv_draw_swm341_dma2d_init();
-#endif
-
-#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    PXP_COND_STOP(!lv_gpu_nxp_pxp_init(), "PXP init failed.");
-#endif
-
-    _lv_obj_style_init();
-    _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
-    _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
-
-    /*Initialize the screen refresh system*/
-    _lv_refr_init();
-
-#if LV_USE_SYSMON
-    _lv_sysmon_builtin_init();
-#endif
-
-    _lv_img_decoder_init();
-
-    _lv_img_cache_builtin_init();
-
-    /*Test if the IDE has UTF-8 encoding*/
-    const char * txt = "Á";
-
-    uint8_t * txt_u8 = (uint8_t *)txt;
-    if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
-        LV_LOG_WARN("The strings have no UTF-8 encoding. Non-ASCII characters won't be displayed.");
-    }
-
-    uint32_t endianess_test = 0x11223344;
-    uint8_t * endianess_test_p = (uint8_t *) &endianess_test;
-    bool big_endian = endianess_test_p[0] == 0x11 ? true : false;
-
-    if(big_endian) {
-        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1,
-                      "It's a big endian system but LV_BIG_ENDIAN_SYSTEM is not enabled in lv_conf.h");
-    }
-    else {
-        LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 0,
-                      "It's a little endian system but LV_BIG_ENDIAN_SYSTEM is enabled in lv_conf.h");
-    }
-
-#if LV_USE_ASSERT_MEM_INTEGRITY
-    LV_LOG_WARN("Memory integrity checks are enabled via LV_USE_ASSERT_MEM_INTEGRITY which makes LVGL much slower");
-#endif
-
-#if LV_USE_ASSERT_OBJ
-    LV_LOG_WARN("Object sanity checks are enabled via LV_USE_ASSERT_OBJ which makes LVGL much slower");
-#endif
-
-#if LV_USE_ASSERT_STYLE
-    LV_LOG_WARN("Style sanity checks are enabled that uses more RAM");
-#endif
-
-#if LV_LOG_LEVEL == LV_LOG_LEVEL_TRACE
-    LV_LOG_WARN("Log level is set to 'Trace' which makes LVGL much slower");
-#endif
-
-
-#if LV_USE_FLEX
-    lv_flex_init();
-#endif
-
-#if LV_USE_GRID
-    lv_grid_init();
-#endif
-
-#if LV_USE_MSG
-    lv_msg_init();
-#endif
-
-#if LV_USE_FS_FATFS != '\0'
-    lv_fs_fatfs_init();
-#endif
-
-#if LV_USE_FS_STDIO != '\0'
-    lv_fs_stdio_init();
-#endif
-
-#if LV_USE_FS_POSIX != '\0'
-    lv_fs_posix_init();
-#endif
-
-#if LV_USE_FS_WIN32 != '\0'
-    lv_fs_win32_init();
-#endif
-
-#if LV_USE_PNG
-    lv_png_init();
-#endif
-
-#if LV_USE_SJPG
-    lv_split_jpeg_init();
-#endif
-
-#if LV_USE_BMP
-    lv_bmp_init();
-#endif
-
-    /*Make FFMPEG last because the last converter will be checked first and
-     *it's superior to any other */
-#if LV_USE_FFMPEG
-    lv_ffmpeg_init();
-#endif
-
-#if LV_USE_FREETYPE
-    /*Init freetype library*/
-#  if LV_FREETYPE_CACHE_SIZE >= 0
-    lv_freetype_init(LV_FREETYPE_CACHE_FT_FACES, LV_FREETYPE_CACHE_FT_SIZES, LV_FREETYPE_CACHE_SIZE);
-#  else
-    lv_freetype_init(0, 0, 0);
-#  endif
-#endif
-
-    lv_initialized = true;
-
-    LV_LOG_TRACE("finished");
-}
-
-#if LV_ENABLE_GC || LV_USE_BUILTIN_MALLOC
-
-void lv_deinit(void)
-{
-    _lv_gc_clear_roots();
-
-    lv_disp_set_default(NULL);
-
-#if LV_USE_BUILTIN_MALLOC
-    lv_mem_deinit_builtin();
-#endif
-    lv_initialized = false;
-
-    LV_LOG_INFO("lv_deinit done");
-
-#if LV_USE_LOG
-    lv_log_register_print_cb(NULL);
-#endif
-}
-#endif
 
 lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
@@ -597,75 +367,27 @@ static void lv_obj_draw(lv_event_t * e)
 
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
+
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
         /*If the border is drawn later disable loading its properties*/
         if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
             draw_dsc.border_post = 1;
         }
 
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
         lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
         lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         lv_area_increase(&coords, w, h);
 
-        lv_obj_draw_part_dsc_t part_dsc;
-        lv_obj_draw_dsc_init(&part_dsc, draw_ctx);
-        part_dsc.class_p = MY_CLASS;
-        part_dsc.type = LV_OBJ_DRAW_PART_RECTANGLE;
-        part_dsc.rect_dsc = &draw_dsc;
-        part_dsc.draw_area = &coords;
-        part_dsc.part = LV_PART_MAIN;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-
-#if LV_USE_DRAW_MASKS
-        /*With clip corner enabled draw the bg img separately to make it clipped*/
-        bool clip_corner = (lv_obj_get_style_clip_corner(obj, LV_PART_MAIN) && draw_dsc.radius != 0) ? true : false;
-        const void * bg_img_src = draw_dsc.bg_img_src;
-        if(clip_corner) {
-            draw_dsc.bg_img_src = NULL;
-        }
-#endif
-
-        lv_draw_rect(draw_ctx, &draw_dsc, &coords);
-
-
-#if LV_USE_DRAW_MASKS
-        if(clip_corner) {
-            lv_draw_mask_radius_param_t * mp = lv_malloc(sizeof(lv_draw_mask_radius_param_t));
-            lv_draw_mask_radius_init(mp, &obj->coords, draw_dsc.radius, false);
-            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
-            lv_draw_mask_add(mp, obj + 8);
-
-            if(bg_img_src) {
-                draw_dsc.bg_opa = LV_OPA_TRANSP;
-                draw_dsc.border_opa = LV_OPA_TRANSP;
-                draw_dsc.outline_opa = LV_OPA_TRANSP;
-                draw_dsc.shadow_opa = LV_OPA_TRANSP;
-                draw_dsc.bg_img_src = bg_img_src;
-                lv_draw_rect(draw_ctx, &draw_dsc, &coords);
-            }
-
-        }
-#endif
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+        lv_draw_rect(layer, &draw_dsc, &coords);
     }
     else if(code == LV_EVENT_DRAW_POST) {
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
-        draw_scrollbar(obj, draw_ctx);
-
-#if LV_USE_DRAW_MASKS
-        if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
-            lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
-            if(param) {
-                lv_draw_mask_free_param(param);
-                lv_free(param);
-            }
-        }
-#endif
+        lv_layer_t * layer = lv_event_get_layer(e);
+        draw_scrollbar(obj, layer);
 
         /*If the border is drawn later disable loading other properties*/
         if(lv_obj_get_style_border_post(obj, LV_PART_MAIN)) {
@@ -683,22 +405,12 @@ static void lv_obj_draw(lv_event_t * e)
             lv_area_copy(&coords, &obj->coords);
             lv_area_increase(&coords, w, h);
 
-            lv_obj_draw_part_dsc_t part_dsc;
-            lv_obj_draw_dsc_init(&part_dsc, draw_ctx);
-            part_dsc.class_p = MY_CLASS;
-            part_dsc.type = LV_OBJ_DRAW_PART_BORDER_POST;
-            part_dsc.rect_dsc = &draw_dsc;
-            part_dsc.draw_area = &coords;
-            part_dsc.part = LV_PART_MAIN;
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-
-            lv_draw_rect(draw_ctx, &draw_dsc, &coords);
-            lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+            lv_draw_rect(layer, &draw_dsc, &coords);
         }
     }
 }
 
-static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
+static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
 {
 
     lv_area_t hor_area;
@@ -711,25 +423,13 @@ static void draw_scrollbar(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     lv_res_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
     if(sb_res != LV_RES_OK) return;
 
-    lv_obj_draw_part_dsc_t part_dsc;
-    lv_obj_draw_dsc_init(&part_dsc, draw_ctx);
-    part_dsc.class_p = MY_CLASS;
-    part_dsc.type = LV_OBJ_DRAW_PART_SCROLLBAR;
-    part_dsc.rect_dsc = &draw_dsc;
-    part_dsc.part = LV_PART_SCROLLBAR;
-
     if(lv_area_get_size(&hor_area) > 0) {
-        part_dsc.draw_area = &hor_area;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-        lv_draw_rect(draw_ctx, &draw_dsc, &hor_area);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+        draw_dsc.base.id1 = 0;
+        lv_draw_rect(layer, &draw_dsc, &hor_area);
     }
     if(lv_area_get_size(&ver_area) > 0) {
-        part_dsc.draw_area = &ver_area;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_dsc);
-        part_dsc.draw_area = &ver_area;
-        lv_draw_rect(draw_ctx, &draw_dsc, &ver_area);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_dsc);
+        draw_dsc.base.id1 = 1;
+        lv_draw_rect(layer, &draw_dsc, &ver_area);
     }
 }
 
@@ -758,7 +458,6 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         }
     }
 
-#if LV_USE_DRAW_MASKS
     dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, LV_PART_SCROLLBAR);
     if(dsc->shadow_opa > LV_OPA_MIN) {
         dsc->shadow_width = lv_obj_get_style_shadow_width(obj, LV_PART_SCROLLBAR);
@@ -785,10 +484,6 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
     else {
         return LV_RES_INV;
     }
-#else
-    if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP) return LV_RES_OK;
-    else return LV_RES_INV;
-#endif
 }
 
 static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)

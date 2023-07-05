@@ -52,8 +52,7 @@ const lv_img_dsc_t img_hand = {
     .header.always_zero = 0,
     .header.w = 100,
     .header.h = 9,
-    .data_size = 900 * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE,
-    .header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .data = img_hand_map,
 };
 

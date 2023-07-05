@@ -18,14 +18,23 @@ void lv_example_canvas_7(void)
     lv_canvas_fill_bg(canvas, lv_color_hex3(0xccc), LV_OPA_COVER);
     lv_obj_center(canvas);
 
+    lv_layer_t layer;
+    lv_canvas_init_layer(canvas, &layer);
+
     lv_draw_line_dsc_t dsc;
     lv_draw_line_dsc_init(&dsc);
     dsc.color = lv_palette_main(LV_PALETTE_RED);
     dsc.width = 4;
     dsc.round_end = 1;
     dsc.round_start = 1;
+    dsc.p1.x = 15;
+    dsc.p1.y = 15;
+    dsc.p2.x = 35;
+    dsc.p2.y = 10;
+    lv_draw_line(&layer, &dsc);
 
-    lv_point_t p[] = {{15, 15}, {35, 10}, {10, 40}};
-    lv_canvas_draw_line(canvas, p, 3, &dsc);
+    lv_canvas_finish_layer(canvas, &layer);
+
+
 }
 #endif

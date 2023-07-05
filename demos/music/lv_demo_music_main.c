@@ -777,9 +777,9 @@ static void spectrum_draw_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_COVER_CHECK) {
         lv_event_set_cover_res(e, LV_COVER_RES_NOT_COVER);
     }
-    else if(code == LV_EVENT_DRAW_POST) {
+    else if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
         lv_obj_t * obj = lv_event_get_target(e);
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
 
         lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
         if(opa < LV_OPA_MIN) return;
@@ -789,8 +789,8 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         center.x = obj->coords.x1 + lv_obj_get_width(obj) / 2;
         center.y = obj->coords.y1 + lv_obj_get_height(obj) / 2;
 
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
+        lv_draw_triangle_dsc_t draw_dsc;
+        lv_draw_triangle_dsc_init(&draw_dsc);
         draw_dsc.bg_opa = LV_OPA_COVER;
 
         uint16_t r[64];
@@ -798,12 +798,12 @@ static void spectrum_draw_event_cb(lv_event_t * e)
 
         lv_coord_t min_a = 5;
 #if LV_DEMO_MUSIC_LARGE == 0
-        lv_coord_t r_in = 77;
+        lv_coord_t r_in = 1;
 #else
         lv_coord_t r_in = 160;
 #endif
         r_in = (r_in * lv_img_get_zoom(album_img_obj)) >> 8;
-        for(i = 0; i < BAR_CNT; i++) r[i] = r_in + min_a;
+        for(i = 0; i < BAR_CNT; i++) r[i] = r_in + min_a + 77;
 
         uint32_t s;
         for(s = 0; s < 4; s++) {
@@ -861,29 +861,29 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             uint32_t di = deg + deg_space;
 
             int32_t x1_out = get_cos(di, v);
-            poly[0].x = center.x + x1_out;
-            poly[0].y = center.y + get_sin(di, v);
+            draw_dsc.p[0].x = center.x + x1_out;
+            draw_dsc.p[0].y = center.y + get_sin(di, v);
 
-            int32_t x1_in = get_cos(di, r_in);
-            poly[1].x = center.x + x1_in;
-            poly[1].y = center.y + get_sin(di, r_in);
+            //            int32_t x1_in = get_cos(di, r_in);
+            //            draw_dsc.p[1].x = center.x + x1_in;
+            //            draw_dsc.p[1].y = center.y + get_sin(di, r_in);
             di += DEG_STEP - deg_space * 2;
 
-            int32_t x2_in = get_cos(di, r_in);
-            poly[2].x = center.x + x2_in;
-            poly[2].y = center.y + get_sin(di, r_in);
-
             int32_t x2_out = get_cos(di, v);
-            poly[3].x = center.x + x2_out;
-            poly[3].y = center.y + get_sin(di, v);
+            draw_dsc.p[1].x = center.x + x2_out;
+            draw_dsc.p[1].y = center.y + get_sin(di, v);
 
-            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
+            int32_t x2_in = get_cos(di, r_in);
+            draw_dsc.p[2].x = center.x + x2_in;
+            draw_dsc.p[2].y = center.y + get_sin(di, r_in);
 
-            poly[0].x = center.x - x1_out;
-            poly[1].x = center.x - x1_in;
-            poly[2].x = center.x - x2_in;
-            poly[3].x = center.x - x2_out;
-            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
+
+            lv_draw_triangle(layer, &draw_dsc);
+
+            draw_dsc.p[0].x = center.x - x1_out;
+            draw_dsc.p[1].x = center.x - x2_out;
+            draw_dsc.p[2].x = center.x - x2_in;
+            lv_draw_triangle(layer, &draw_dsc);
         }
     }
 }

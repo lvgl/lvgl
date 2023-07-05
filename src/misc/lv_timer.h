@@ -13,7 +13,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
-#include "../hal/lv_hal_tick.h"
+#include "../tick/lv_tick.h"
 
 #include <stdint.h>
 #include <stdbool.h>

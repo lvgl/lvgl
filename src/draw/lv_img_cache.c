@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_img_cache.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

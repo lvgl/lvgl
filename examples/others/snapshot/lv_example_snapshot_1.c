@@ -13,7 +13,7 @@ static void event_cb(lv_event_t * e)
         }
 
         /*Update the snapshot, we know parent of object is the container.*/
-        snapshot = lv_snapshot_take(img->parent, LV_COLOR_FORMAT_NATIVE_ALPHA);
+        snapshot = lv_snapshot_take(img->parent, LV_COLOR_FORMAT_ARGB8888);
         if(snapshot == NULL)
             return;
         lv_img_set_src(snapshot_obj, snapshot);

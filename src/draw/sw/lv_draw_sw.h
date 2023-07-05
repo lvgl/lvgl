@@ -13,13 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_sw_blend.h"
+#include "../lv_draw.h"
 #if LV_USE_DRAW_SW
 
-#include "../lv_draw.h"
 #include "../../misc/lv_area.h"
 #include "../../misc/lv_color.h"
-#include "../../core/lv_disp.h"
+#include "../../disp/lv_disp.h"
+#include "../../osal/lv_os.h"
 
 /*********************
  *      DEFINES
@@ -30,67 +30,54 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_ctx_t base_draw;
-
-    /** Fill an area of the destination buffer with a color*/
-    void (*blend)(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
-} lv_draw_sw_ctx_t;
-
-typedef struct {
-    lv_draw_layer_ctx_t base_draw;
-    uint32_t buf_size_bytes;
-} lv_draw_sw_layer_ctx_t;
+    lv_draw_unit_t base_unit;
+    struct _lv_draw_task_t * task_act;
+#if LV_USE_OS
+    //    lv_mutex_t mutex;
+    lv_thread_sync_t sync;
+    lv_thread_t thread;
+#endif
+    uint32_t idx;
+} lv_draw_sw_unit_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_sw_init_ctx(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
-void lv_draw_sw_deinit_ctx(struct _lv_disp_t * disp, lv_draw_ctx_t * draw_ctx);
+void lv_draw_sw_init(void);
 
-void lv_draw_sw_wait_for_finish(lv_draw_ctx_t * draw_ctx);
+lv_layer_t * lv_draw_sw_layer_init(lv_disp_t * disp);
 
-void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, const lv_point_t * center, uint16_t radius,
-                    uint16_t start_angle, uint16_t end_angle);
+void lv_draw_sw_layer_deinit(struct _lv_disp_t * disp, lv_layer_t * layer);
 
-void lv_draw_sw_rect(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt);
 
-void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos_p,
-                       uint32_t letter);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
+                                          const lv_area_t * coords);
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                                                  const lv_area_t * coords,
-                                                  const uint8_t * src_buf, const lv_draw_img_sup_t * sup, lv_color_format_t cf);
+void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
-                                           const lv_point_t * point1, const lv_point_t * point2);
+void lv_draw_sw_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_sw_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc,
-                        const lv_point_t points[], uint16_t point_cnt);
+void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_sw_buffer_copy(lv_draw_ctx_t * draw_ctx,
-                            void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
-                            void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
+void lv_draw_sw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_sw_buffer_convert(lv_draw_ctx_t * draw_ctx);
+void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_sw_buffer_clear(lv_draw_ctx_t * draw_ctx);
+void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_sw_transform(lv_draw_ctx_t * draw_ctx, const lv_area_t * dest_area, const void * src_buf,
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
+
+void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords);
+
+void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_t * dsc);
+
+void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_dsc_t * dsc, const lv_area_t * coords);
+
+void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
                           lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
-                          const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, lv_color_t * cbuf,
-                          lv_opa_t * abuf);
-
-struct _lv_draw_layer_ctx_t * lv_draw_sw_layer_create(struct _lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx,
-                                                      lv_draw_layer_flags_t flags);
-
-void lv_draw_sw_layer_adjust(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
-                             lv_draw_layer_flags_t flags);
-
-void lv_draw_sw_layer_blend(struct _lv_draw_ctx_t * draw_ctx, struct _lv_draw_layer_ctx_t * layer_ctx,
-                            const lv_draw_img_dsc_t * draw_dsc);
-
-void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * layer_ctx);
+                          const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, void * dest_buf);
 
 /***********************
  * GLOBAL VARIABLES
@@ -99,6 +86,8 @@ void lv_draw_sw_layer_destroy(lv_draw_ctx_t * draw_ctx, lv_draw_layer_ctx_t * la
 /**********************
  *      MACROS
  **********************/
+
+#include "blend/lv_draw_sw_blend.h"
 
 #endif /*LV_USE_DRAW_SW*/
 

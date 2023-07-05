@@ -4,17 +4,18 @@ class KeyboardEncoder:
         self.g.set_default()
 
         cur_drv = lv.indev_t()
-        while True:
-            cur_drv = cur_drv.get_next()
+        cur_drv = cur_drv.get_next()
 
-            if not cur_drv :
-                break
+        while cur_drv != None:
+
             if cur_drv.get_type() == lv.INDEV_TYPE.KEYPAD:
                 print("Found keypad")
                 cur_drv.set_group(self.g)
             if cur_drv.get_type() == lv.INDEV_TYPE.ENCODER:
                 print("Found encoder")
                 cur_drv.set_group(self.g)
+
+            cur_drv = cur_drv.get_next()
 
         self.tv = lv.tabview(lv.scr_act(), lv.DIR.TOP, lv.DPI_DEF // 3)
 

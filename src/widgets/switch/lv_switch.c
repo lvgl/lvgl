@@ -13,8 +13,8 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_anim.h"
-#include "../../core/lv_indev.h"
-#include "../../core/lv_disp.h"
+#include "../../indev/lv_indev.h"
+#include "../../disp/lv_disp.h"
 #include "../img/lv_img.h"
 
 /*********************
@@ -148,7 +148,7 @@ static void draw_main(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
 
     /*Draw the indicator*/
     lv_area_t indic_area;
@@ -158,7 +158,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
-    lv_draw_rect(draw_ctx, &draw_indic_dsc, &indic_area);
+    lv_draw_rect(layer, &draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
     lv_coord_t anim_value_x = 0;
@@ -199,7 +199,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
-    lv_draw_rect(draw_ctx, &knob_rect_dsc, &knob_area);
+    lv_draw_rect(layer, &knob_rect_dsc, &knob_area);
 }
 
 static void lv_switch_anim_exec_cb(void * var, int32_t value)

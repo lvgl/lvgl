@@ -55,7 +55,7 @@ lv_obj_t * lv_barcode_create(lv_obj_t * parent)
     return obj;
 }
 
-void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color32_t color)
+void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color_t color)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -63,7 +63,7 @@ void lv_barcode_set_dark_color(lv_obj_t * obj, lv_color32_t color)
     barcode->dark_color = color;
 }
 
-void lv_barcode_set_light_color(lv_obj_t * obj, lv_color32_t color)
+void lv_barcode_set_light_color(lv_obj_t * obj, lv_color_t color)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -116,12 +116,12 @@ lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
         goto failed;
     }
 
-    lv_canvas_set_palette(obj, 0, barcode->dark_color);
-    lv_canvas_set_palette(obj, 1, barcode->light_color);
+    lv_canvas_set_palette(obj, 0, lv_color_to_32(barcode->dark_color, 0xff));
+    lv_canvas_set_palette(obj, 1, lv_color_to_32(barcode->light_color, 0xff));
 
     for(lv_coord_t x = 0; x < barcode_w; x++) {
         lv_color_t color;
-        lv_color_set_int(&color, out_buf[x] ? 0 : 1);
+        color = lv_color_from_int(out_buf[x] ? 0 : 1);
         for(uint16_t i = 0; i < scale; i++) {
             lv_canvas_set_px(obj, x * scale + i, 0, color, LV_OPA_COVER);
         }
@@ -134,7 +134,7 @@ failed:
     return res;
 }
 
-lv_color32_t lv_barcode_get_dark_color(lv_obj_t * obj)
+lv_color_t lv_barcode_get_dark_color(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -142,7 +142,7 @@ lv_color32_t lv_barcode_get_dark_color(lv_obj_t * obj)
     return barcode->dark_color;
 }
 
-lv_color32_t lv_barcode_get_light_color(lv_obj_t * obj)
+lv_color_t lv_barcode_get_light_color(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -167,8 +167,8 @@ static void lv_barcode_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_UNUSED(class_p);
 
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
-    barcode->dark_color = lv_color_to32(lv_color_black());
-    barcode->light_color = lv_color_to32(lv_color_white());
+    barcode->dark_color = lv_color_black();
+    barcode->light_color = lv_color_white();
     barcode->scale = 1;
 }
 

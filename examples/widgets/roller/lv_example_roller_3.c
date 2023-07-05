@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_ROLLER && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES
+//TODO
+#if LV_USE_ROLLER && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES && 0
 
 static void mask_event_cb(lv_event_t * e)
 {
@@ -92,5 +93,4 @@ void lv_example_roller_3(void)
     lv_roller_set_visible_row_count(roller1, 3);
     lv_obj_add_event(roller1, mask_event_cb, LV_EVENT_ALL, NULL);
 }
-
 #endif

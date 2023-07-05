@@ -20,6 +20,16 @@ dsc = lv.draw_arc_dsc_t()
 dsc.init()
 dsc.color = lv.palette_main(lv.PALETTE.RED)
 dsc.width = 5
+dsc.center.x = 25
+dsc.center.y = 25
+dsc.width = 15
+dsc.start_angle = 0
+dsc.end_angle = 220
 
-canvas.draw_arc(25, 25, 15, 0, 220, dsc)
+layer = lv.layer_t()
+canvas.init_layer(layer);
+
+lv.draw_arc(layer, dsc)
+
+canvas.finish_layer(layer)
 

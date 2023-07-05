@@ -47,7 +47,7 @@ extern "C" {
 /**
  * Other constants
  */
-#define LV_ZOOM_NONE                256        /*Value for not zooming the image*/
+#define LV_ZOOM_NONE            256        /*Value for not zooming the image*/
 LV_EXPORT_CONST_INT(LV_ZOOM_NONE);
 
 // *INDENT-OFF*
@@ -91,7 +91,6 @@ enum _lv_blend_mode_t {
     LV_BLEND_MODE_ADDITIVE,   /**< Add the respective color channels*/
     LV_BLEND_MODE_SUBTRACTIVE,/**< Subtract the foreground from the background*/
     LV_BLEND_MODE_MULTIPLY,   /**< Multiply the foreground and background*/
-    LV_BLEND_MODE_REPLACE,    /**< Replace background with foreground in the area*/
 };
 
 #ifdef DOXYGEN
@@ -176,6 +175,7 @@ typedef uint8_t lv_dither_mode_t;
  */
 typedef struct {
     lv_color_t color;   /**< The stop color */
+    lv_opa_t   opa;     /**< The opacity fo the color*/
     uint8_t    frac;    /**< The stop position in 1/255 unit */
 } lv_gradient_stop_t;
 

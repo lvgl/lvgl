@@ -5,32 +5,29 @@
 #if LV_USE_IMGFONT
 
 LV_IMG_DECLARE(emoji_F617)
-static bool get_imgfont_path(const lv_font_t * font, void * img_src,
-                             uint16_t len, uint32_t unicode, uint32_t unicode_next,
-                             lv_coord_t * offset_y, void * user_data)
+char path_buf[128];
+static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, uint32_t unicode_next,
+                                     lv_coord_t * offset_y, void * user_data)
 {
     LV_UNUSED(font);
     LV_UNUSED(unicode_next);
     LV_UNUSED(offset_y);
     LV_UNUSED(user_data);
-    LV_ASSERT_NULL(img_src);
 
-    if(unicode < 0xF000) return false;
+    if(unicode < 0xF000) return NULL;
 
     if(unicode == 0xF617) {
-        memcpy(img_src, &emoji_F617, sizeof(lv_img_dsc_t));
+        return &emoji_F617;
     }
-    else {
-        char * path = (char *)img_src;
-        LV_UNUSED(path);
+    else if(unicode == 0xF600) {
 #if LV_USE_FFMPEG
-        lv_snprintf(path, len, "%s/%04X.png", "lvgl/examples/assets/emoji", unicode);
+        return "lvgl/examples/assets/emoji/F600.png";
 #elif LV_USE_PNG
-        lv_snprintf(path, len, "%s/%04X.png", "A:lvgl/examples/assets/emoji", unicode);
+        return "A:lvgl/examples/assets/emoji/F600.png";
 #endif
     }
 
-    return true;
+    return NULL;
 }
 
 /**

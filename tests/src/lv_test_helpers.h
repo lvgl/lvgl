@@ -1,6 +1,8 @@
 #ifndef LV_TEST_HELPERS_H
 #define LV_TEST_HELPERS_H
 
+#include "lv_test_conf.h"
+
 #ifdef LVGL_CI_USING_SYS_HEAP
 /* Skip checking heap as we don't have the info available */
 #define LV_HEAP_CHECK(x) do {} while(0)

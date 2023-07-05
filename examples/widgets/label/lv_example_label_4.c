@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_LABEL && LV_USE_CANVAS && LV_BUILD_EXAMPLES && LV_USE_DRAW_MASKS
+//TODO
+#if LV_USE_LABEL && LV_USE_CANVAS && LV_BUILD_EXAMPLES && LV_USE_DRAW_MASKS && 0
 
 #define MASK_WIDTH 100
 #define MASK_HEIGHT 45
@@ -44,7 +45,8 @@ void lv_example_label_4(void)
     lv_draw_label_dsc_init(&label_dsc);
     label_dsc.color = lv_color_white();
     label_dsc.align = LV_TEXT_ALIGN_CENTER;
-    lv_canvas_draw_text(canvas, 5, 5, MASK_WIDTH, &label_dsc, "Text with gradient");
+    label_dsc.text = "Text with gradient";
+    lv_canvas_draw_text(canvas, 5, 5, MASK_WIDTH, &label_dsc);
 
     /*The mask is reads the canvas is not required anymore*/
     lv_obj_del(canvas);

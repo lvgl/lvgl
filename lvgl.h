@@ -21,23 +21,26 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "src/lv_init.h"
+
+#include "src/stdlib/lv_mem.h"
+#include "src/stdlib/lv_string.h"
+#include "src/stdlib/lv_sprintf.h"
+
 #include "src/misc/lv_log.h"
 #include "src/misc/lv_timer.h"
 #include "src/misc/lv_math.h"
-#include "src/misc/lv_mem.h"
 #include "src/misc/lv_async.h"
 #include "src/misc/lv_anim_timeline.h"
-#include "src/misc/lv_printf.h"
 #include "src/misc/lv_profiler_builtin.h"
 
-#include "src/hal/lv_hal.h"
+#include "src/tick/lv_tick.h"
 
 #include "src/core/lv_obj.h"
 #include "src/core/lv_group.h"
-#include "src/core/lv_indev.h"
+#include "src/indev/lv_indev.h"
 #include "src/core/lv_refr.h"
-#include "src/core/lv_disp.h"
-#include "src/core/lv_theme.h"
+#include "src/disp/lv_disp.h"
 
 #include "src/font/lv_font.h"
 #include "src/font/lv_font_loader.h"
@@ -52,7 +55,6 @@ extern "C" {
 #include "src/widgets/canvas/lv_canvas.h"
 #include "src/widgets/chart/lv_chart.h"
 #include "src/widgets/checkbox/lv_checkbox.h"
-#include "src/widgets/colorwheel/lv_colorwheel.h"
 #include "src/widgets/dropdown/lv_dropdown.h"
 #include "src/widgets/img/lv_img.h"
 #include "src/widgets/imgbtn/lv_imgbtn.h"
@@ -102,7 +104,7 @@ extern "C" {
 
 #include "src/draw/lv_draw.h"
 
-#include "src/themes/lv_themes.h"
+#include "src/themes/lv_theme.h"
 
 #include "src/lv_api_map.h"
 
@@ -113,8 +115,6 @@ extern "C" {
 
 #include "src/dev/disp/drm/lv_linux_drm.h"
 #include "src/dev/disp/fb/lv_linux_fbdev.h"
-
-#include "src/lvgl_private.h"
 
 /*********************
  *      DEFINES

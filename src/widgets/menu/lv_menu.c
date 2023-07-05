@@ -17,6 +17,7 @@
 
 #include "../../core/lv_obj.h"
 #include "../../layouts/flex/lv_flex.h"
+#include "../../stdlib/lv_string.h"
 #include "../label/lv_label.h"
 #include "../btn/lv_btn.h"
 #include "../img/lv_img.h"

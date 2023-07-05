@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES
+//TODO should be a chart feature
+#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES && 0
 
 static lv_obj_t * chart1;
 static lv_chart_series_t * ser1;
@@ -10,10 +11,9 @@ static void draw_event_cb(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     /*Add the faded area before the lines are drawn*/
-    lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
-    if(dsc->part == LV_PART_ITEMS) {
-        if(!dsc->p1 || !dsc->p2) return;
-
+    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
+    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    if(base_dsc->part == LV_PART_ITEMS) {
         /*Add a line mask that keeps the area below the line*/
         lv_draw_mask_line_param_t line_mask_param;
         lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y,
@@ -38,7 +38,7 @@ static void draw_event_cb(lv_event_t * e)
         a.x2 = dsc->p2->x - 1;
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
         a.y2 = obj->coords.y2;
-        lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
+        lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
 
         /*Remove the masks*/
         lv_draw_mask_free_param(&line_mask_param);
@@ -111,9 +111,10 @@ void lv_example_chart_2(void)
 
     lv_chart_set_div_line_count(chart1, 5, 7);
 
-    lv_obj_add_event(chart1, draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
-    lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
+    lv_obj_add_event(chart1, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_flag(chart1, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
+    lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_CIRCULAR);
     /*Add two data series*/
     ser1 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
     ser2 = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_SECONDARY_Y);

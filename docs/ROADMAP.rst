@@ -15,7 +15,7 @@ Naming and API
 
 - |check| `lv_style_set_size()` should have separate width and height parameters
 - |check| Reconsider image color formats.
-- |uncheck| More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/opacity/alpha`, `scr/screen`, `disp, display`, `finished/complete/completed/ready`, `buf/buffer`,  `..._cb`, `angle/rotation`, `zoom/scale`, `has`, `is`, `enable` 
+- |uncheck| More consistent names:`remove/clear/delete/del`, `offset/ofs`, `add/create/register`, `id/idx/index`, `middle/mid/center`, `img/image`, `txt/text`, `opa/opacity/alpha`, `scr/screen`, `disp, display`, `finished/complete/completed/ready`, `buf/buffer`,  `..._cb`, `angle/rotation`, `zoom/scale`, `has`, `is`, `enable`
 - |check| Update canvas API `LINK <https://github.com/lvgl/lvgl/issues/3393>`__
 - |check| `LV_STYLE_PROP_INHERIT` -> `LV_STYLE_PROP_FLAG_INHERITABLE`
   `LINK <https://github.com/lvgl/lvgl/pull/3390#discussion_r885915769>`__
@@ -25,7 +25,7 @@ Naming and API
 - |uncheck| To define a new stdlib API use defines `LV_USE_CUSTOM_...` and
   let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
 - |uncheck| Generic `lv_date_t` and `lv_time_t`
-- |uncheck| Make layouts with an `lv_layout_dsc_t` instead of registering an ID + callback. 
+- |uncheck| Make layouts with an `lv_layout_dsc_t` instead of registering an ID + callback.
   (see `here <https://github.com/lvgl/lvgl/issues/3481#issuecomment-1206434501>`__)
 
 Architecture
@@ -33,22 +33,22 @@ Architecture
 
 - |check| Consider merging `lv_disp_drv_t`, `lv_disp_t`, `lv_disp_draw_buf_t`, `lv_draw_ctx_t` `struct`'s from the new driver API (or only some of them)
 - |check| New driver architecture #2720
-- |check| `draw_ctx->buffer_convert`? 
+- |check| `draw_ctx->buffer_convert`?
   (see `here <https://github.com/lvgl/lvgl/issues/3379#issuecomment-1147954592>`__)
-  Also remove 16 SWAPPED color format? 
+  Also remove 16 SWAPPED color format?
   (see `here <https://github.com/lvgl/lvgl/issues/3379#issuecomment-1140886258>`__)
 - |uncheck| Reconsider masks. There should be a generic high level mask API which is independent of the drawing engine.
   `#4059 <https://github.com/lvgl/lvgl/issues/4059>`__
 - |check| `get_glyph_bitmap` should return an a8 bitmap that can be blended immediately.
-- |uncheck| Reconsider how themes should work. 
+- |uncheck| Reconsider how themes should work.
   (see `here <https://github.com/lvgl/lvgl/pull/3390#pullrequestreview-990710921>`__)
 - |uncheck| Make LVGL render independent areas in parallel.
   `#4016 <https://github.com/lvgl/lvgl/issues/4016>`__
-- |check| Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too. 
+- |check| Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too.
   Fragmentation is also lower if processes can completely clean up after themselves.
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
 - |uncheck| Condider using `lv_color32_t` on APIs to support e.g. alpha gradient.
-- |uncheck| Add more feature to key presses (long press, release, etc). 
+- |uncheck| Add more feature to key presses (long press, release, etc).
   (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__)
 
 Styles
@@ -61,12 +61,12 @@ Styles
 Widgets
 ~~~~~~~
 
-- |uncheck| `lv_img`: Reconsider image sizing models 
+- |uncheck| `lv_img`: Reconsider image sizing models
   (when the image size is not content): center, top-left, zoom, tile, other?
 - |uncheck| `lv_tabview` Replace button matrix with real buttons for more flexibility
 - |uncheck| `lv_label` reconsider label long modes. (support min/max-width/height too) #3420
 - |uncheck| `lv_roller` make it more flexible #4009
-- |uncheck| Universal scale widget/support 
+- |uncheck| Universal scale widget/support
   (see `here <https://forum.lvgl.io/t/linear-meter-bar-with-ticks/10986>`__ and #4043)
 - |uncheck| Improve `lv_label_align_t` #1656
 - |uncheck| Disabled widgets should absorb indev actions without sending events. `#3860 <https://github.com/lvgl/lvgl/issues/3860>`__
@@ -105,7 +105,7 @@ Architecture
 ~~~~~~~~~~~~
 
 - |uncheck| Unified caching #3116 #3415
-- |uncheck| `lv_img_set_src()` use “type-aware” parameter and rework image decoders. 
+- |uncheck| `lv_img_set_src()` use “type-aware” parameter and rework image decoders.
   (see `here <https://github.com/lvgl/lvgl/tree/arch/img-decode-rework>`__)
 - |uncheck| `C++ binding <https://github.com/lvgl/lv_binding_cpp>`__
 - |uncheck| Markup language #2428
@@ -167,7 +167,7 @@ Ideas
 - lv_mem_alloc_aligned(size, align)
 - Speed up font decompression
 - Support larger images: add support for large image #1892
-- Functional programming support, pure view? 
+- Functional programming support, pure view?
   (see `here <https://www.freecodecamp.org/news/the-revolution-of-pure-views-aed339db7da4/>`__)
 - Style components. (see `this comment <https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911>`__
 - SVG support: integrate an SVG render library

@@ -46,7 +46,7 @@ static void sysmon_async_cb(void * user_data);
     static void perf_monitor_init(void);
 #endif
 
-#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC
+#if LV_USE_MEM_MONITOR && LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     static void mem_monitor_init(void);
 #endif
 
@@ -219,7 +219,7 @@ static void perf_monitor_init(void)
 }
 #endif
 
-#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC
+#if LV_USE_MEM_MONITOR && LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 static void mem_monitor_event_cb(lv_event_t * e)
 {
     lv_obj_t * sysmon = lv_event_get_current_target_obj(e);
@@ -249,7 +249,7 @@ static void sysmon_async_cb(void * user_data)
 #if LV_USE_PERF_MONITOR
     perf_monitor_init();
 #endif
-#if LV_USE_MEM_MONITOR && LV_USE_BUILTIN_MALLOC
+#if LV_USE_MEM_MONITOR && LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
     mem_monitor_init();
 #endif
 }

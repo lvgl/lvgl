@@ -64,8 +64,7 @@ typedef enum {
     LV_EVENT_DRAW_POST_BEGIN,    /**< Starting the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST,          /**< Perform the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST_END,      /**< Finishing the post draw phase (when all children are drawn)*/
-    LV_EVENT_DRAW_PART_BEGIN,    /**< Starting to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. */
-    LV_EVENT_DRAW_PART_END,      /**< Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. */
+    LV_EVENT_DRAW_TASK_ADDED,      /**< Adding a draw task */
 
     /** Special events*/
     LV_EVENT_VALUE_CHANGED,       /**< The object's value has changed (i.e. slider moved)*/

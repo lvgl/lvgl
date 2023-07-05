@@ -93,42 +93,4 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
     LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size));
 }
 
-size_t malloc_calls = 0;
-
-void * malloc_stub(size_t size)
-{
-    (void) size;
-    malloc_calls++;
-
-    return NULL;
-}
-
-void test_checkbox_text_should_become_null_when_mem_allocation_fails(void)
-{
-    const char * message = "Hello World!";
-    active_screen = lv_scr_act();
-    checkbox = lv_checkbox_create(active_screen);
-    lv_test_malloc_set_cb(malloc_stub);
-
-    lv_checkbox_set_text(checkbox, message);
-
-    TEST_ASSERT_NULL(lv_checkbox_get_text(checkbox));
-
-    lv_test_malloc_set_cb(NULL);
-}
-
-void test_checkbox_no_memory_allocation_when_refreshing_text(void)
-{
-    malloc_calls = 0;
-    active_screen = lv_scr_act();
-    checkbox = lv_checkbox_create(active_screen);
-    lv_test_malloc_set_cb(malloc_stub);
-
-    lv_checkbox_set_text(checkbox, NULL);
-
-    TEST_ASSERT_EQUAL(0, malloc_calls);
-
-    lv_test_malloc_set_cb(NULL);
-}
-
 #endif

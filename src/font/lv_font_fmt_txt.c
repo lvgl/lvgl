@@ -13,7 +13,7 @@
 #include "../misc/lv_gc.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_utils.h"
-#include "../misc/lv_mem.h"
+#include "../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES
@@ -41,7 +41,6 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
     static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter);
     static inline void decompress_line(uint8_t * out, lv_coord_t w);
     static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
-    static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
     static inline void rle_init(const uint8_t * in,  uint8_t bpp);
     static inline uint8_t rle_next(void);
 #endif /*LV_USE_FONT_COMPRESSED*/
@@ -58,6 +57,19 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
     static rle_state_t rle_state;
 #endif /*LV_USE_FONT_COMPRESSED*/
 
+static const uint8_t opa4_table[16] = {0,  17, 34,  51,
+                                       68, 85, 102, 119,
+                                       136, 153, 170, 187,
+                                       204, 221, 238, 255
+                                      };
+
+#if LV_USE_FONT_COMPRESSED
+static const uint8_t opa3_table[8] = {0, 36, 73, 109, 146, 182, 218, 255};
+#endif
+
+static const uint8_t opa2_table[4] = {0, 85, 170, 255};
+
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -70,13 +82,8 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Used as `get_glyph_bitmap` callback in lvgl's native font format if the font is uncompressed.
- * @param font pointer to font
- * @param unicode_letter a unicode letter which bitmap should be get
- * @return pointer to the bitmap or NULL if not found
- */
-const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter)
+
+const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_out)
 {
     if(unicode_letter == '\t') unicode_letter = ' ';
 
@@ -86,47 +93,73 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
+    int32_t gsize = (int32_t) gdsc->box_w * gdsc->box_h;
+    if(gsize == 0) return NULL;
+
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-        return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
+        int32_t i;
+        if(fdsc->bpp == 1) {
+            int32_t gsize_floor = gsize & ~(0x7);
+
+            for(i = 0; i < gsize_floor - 7; i += 8) {
+                bitmap_out[i + 0] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
+                bitmap_out[i + 1] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
+                bitmap_out[i + 2] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
+                bitmap_out[i + 3] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
+                bitmap_out[i + 4] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
+                bitmap_out[i + 5] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
+                bitmap_out[i + 6] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
+                bitmap_out[i + 7] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
+                bitmap_in++;
+            }
+
+            uint8_t in_tmp = *bitmap_in;
+            for(; i < gsize; i++) {
+                bitmap_out[i] = in_tmp >> 7 ? 0xff : 0x00;
+                in_tmp = in_tmp << 1;
+
+            }
+        }
+        else if(fdsc->bpp == 2) {
+            int32_t gsize_floor = gsize & ~(0x3);
+
+            for(i = 0; i < gsize_floor - 3; i += 4) {
+                bitmap_out[i + 0] = opa2_table[(*bitmap_in) >> 6];
+                bitmap_out[i + 1] = opa2_table[((*bitmap_in) >> 4) & 0x3];
+                bitmap_out[i + 2] = opa2_table[((*bitmap_in) >> 2) & 0x3];
+                bitmap_out[i + 3] = opa2_table[((*bitmap_in) >> 0) & 0x3];
+                bitmap_in++;
+            }
+
+            uint8_t in_tmp = *bitmap_in;
+            for(; i < gsize; i++) {
+                bitmap_out[i] = opa2_table[in_tmp >> 6];
+                in_tmp = in_tmp << 2;
+
+            }
+        }
+        else if(fdsc->bpp == 4) {
+            int32_t gsize_floor = gsize & ~(0x1);
+            for(i = 0; i < gsize_floor; i += 2) {
+                bitmap_out[i] = opa4_table[(*bitmap_in) >> 4];
+                bitmap_out[i + 1] = opa4_table[(*bitmap_in) & 0xF];
+                bitmap_in++;
+            }
+            /*If gsize was even*/
+            if(i == gsize - 1) {
+                bitmap_out[gsize - 1] = opa4_table[(*bitmap_in) >> 4];
+            }
+        }
+        return bitmap_out;
     }
     /*Handle compressed bitmap*/
     else {
 #if LV_USE_FONT_COMPRESSED
-        static size_t last_buf_size = 0;
-        if(LV_GC_ROOT(_lv_font_decompr_buf) == NULL) last_buf_size = 0;
-
-        uint32_t gsize = gdsc->box_w * gdsc->box_h;
-        if(gsize == 0) return NULL;
-
-        uint32_t buf_size = gsize;
-        /*Compute memory size needed to hold decompressed glyph, rounding up*/
-        switch(fdsc->bpp) {
-            case 1:
-                buf_size = (gsize + 7) >> 3;
-                break;
-            case 2:
-                buf_size = (gsize + 3) >> 2;
-                break;
-            case 3:
-                buf_size = (gsize + 1) >> 1;
-                break;
-            case 4:
-                buf_size = (gsize + 1) >> 1;
-                break;
-        }
-
-        if(last_buf_size < buf_size) {
-            uint8_t * tmp = lv_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
-            LV_ASSERT_MALLOC(tmp);
-            if(tmp == NULL) return NULL;
-            LV_GC_ROOT(_lv_font_decompr_buf) = tmp;
-            last_buf_size = buf_size;
-        }
-
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_decompr_buf), gdsc->box_w, gdsc->box_h,
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
-        return LV_GC_ROOT(_lv_font_decompr_buf);
+        return bitmap_out;
 #else /*!LV_USE_FONT_COMPRESSED*/
         LV_LOG_WARN("Compressed fonts is used but LV_USE_FONT_COMPRESSED is not enabled in lv_conf.h");
         return NULL;
@@ -190,19 +223,6 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     return true;
 }
 
-/**
- * Free the allocated memories.
- */
-void _lv_font_clean_up_fmt_txt(void)
-{
-#if LV_USE_FONT_COMPRESSED
-    if(LV_GC_ROOT(_lv_font_decompr_buf)) {
-        lv_free(LV_GC_ROOT(_lv_font_decompr_buf));
-        LV_GC_ROOT(_lv_font_decompr_buf) = NULL;
-    }
-#endif
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -214,7 +234,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
 
     /*Check the cache first*/
-    if(fdsc->cache && letter == fdsc->cache->last_letter) return fdsc->cache->last_glyph_id;
+    //    if(fdsc->cache && letter == fdsc->cache->last_letter) return fdsc->cache->last_glyph_id;
 
     uint16_t i;
     for(i = 0; i < fdsc->cmap_num; i++) {
@@ -253,17 +273,17 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
 
         /*Update the cache*/
-        if(fdsc->cache) {
-            fdsc->cache->last_letter = letter;
-            fdsc->cache->last_glyph_id = glyph_id;
-        }
+        //        if(fdsc->cache) {
+        //            fdsc->cache->last_letter = letter;
+        //            fdsc->cache->last_glyph_id = glyph_id;
+        //        }
         return glyph_id;
     }
 
-    if(fdsc->cache) {
-        fdsc->cache->last_letter = letter;
-        fdsc->cache->last_glyph_id = 0;
-    }
+    //    if(fdsc->cache) {
+    //        fdsc->cache->last_letter = letter;
+    //        fdsc->cache->last_glyph_id = 0;
+    //    }
     return 0;
 
 }
@@ -356,9 +376,18 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  */
 static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter)
 {
-    uint32_t wrp = 0;
-    uint8_t wr_size = bpp;
-    if(bpp == 3) wr_size = 4;
+    const lv_opa_t * opa_table;
+    switch(bpp) {
+        case 2:
+            opa_table = opa2_table;
+            break;
+        case 3:
+            opa_table = opa3_table;
+            break;
+        case 4:
+            opa_table = opa4_table;
+            break;
+    }
 
     rle_init(in, bpp);
 
@@ -376,9 +405,9 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
     lv_coord_t x;
 
     for(x = 0; x < w; x++) {
-        bits_write(out, wrp, line_buf1[x], bpp);
-        wrp += wr_size;
+        out[x] = opa_table[line_buf1[x]];
     }
+    out += w;
 
     for(y = 1; y < h; y++) {
         if(prefilter) {
@@ -386,18 +415,17 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
             for(x = 0; x < w; x++) {
                 line_buf1[x] = line_buf2[x] ^ line_buf1[x];
-                bits_write(out, wrp, line_buf1[x], bpp);
-                wrp += wr_size;
+                out[x] = opa_table[line_buf1[x]];
             }
         }
         else {
             decompress_line(line_buf1, w);
 
             for(x = 0; x < w; x++) {
-                bits_write(out, wrp, line_buf1[x], bpp);
-                wrp += wr_size;
+                out[x] = opa_table[line_buf1[x]];
             }
         }
+        out += w;
     }
 
     lv_free(line_buf1);
@@ -457,55 +485,6 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
     else {
         return (in[byte_pos] >> (8 - bit_pos - len)) & bit_mask;
     }
-}
-
-/**
- * Write `val` data to `bit_pos` position of `out`. The write can NOT cross byte boundary.
- * @param out buffer where to write
- * @param bit_pos bit index to write
- * @param val value to write
- * @param len length of bits to write from `val`. (Counted from the LSB).
- * @note `len == 3` will be converted to `len = 4` and `val` will be upscaled too
- */
-static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len)
-{
-    if(len == 3) {
-        len = 4;
-        switch(val) {
-            case 0:
-                val = 0;
-                break;
-            case 1:
-                val = 2;
-                break;
-            case 2:
-                val = 4;
-                break;
-            case 3:
-                val = 6;
-                break;
-            case 4:
-                val = 9;
-                break;
-            case 5:
-                val = 11;
-                break;
-            case 6:
-                val = 13;
-                break;
-            case 7:
-                val = 15;
-                break;
-        }
-    }
-
-    uint16_t byte_pos = bit_pos >> 3;
-    bit_pos = bit_pos & 0x7;
-    bit_pos = 8 - bit_pos - len;
-
-    uint8_t bit_mask = (uint16_t)((uint16_t) 1 << len) - 1;
-    out[byte_pos] &= ((~bit_mask) << bit_pos);
-    out[byte_pos] |= (val << bit_pos);
 }
 
 static inline void rle_init(const uint8_t * in,  uint8_t bpp)

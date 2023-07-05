@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "lv_indev.h"
-#include "lv_indev_private.h"
+#include "../indev/lv_indev.h"
+#include "../indev/lv_indev_private.h"
 
 /*********************
  *      DEFINES
@@ -162,19 +162,7 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
     }
 }
 
-lv_obj_draw_part_dsc_t * lv_event_get_draw_part_dsc(lv_event_t * e)
-{
-    if(e->code == LV_EVENT_DRAW_PART_BEGIN ||
-       e->code == LV_EVENT_DRAW_PART_END) {
-        return lv_event_get_param(e);
-    }
-    else {
-        LV_LOG_WARN("Not interpreted with this event code");
-        return NULL;
-    }
-}
-
-lv_draw_ctx_t * lv_event_get_draw_ctx(lv_event_t * e)
+lv_layer_t * lv_event_get_layer(lv_event_t * e)
 {
     if(e->code == LV_EVENT_DRAW_MAIN ||
        e->code == LV_EVENT_DRAW_MAIN_BEGIN ||
@@ -281,6 +269,18 @@ void lv_event_set_cover_res(lv_event_t * e, lv_cover_res_t res)
     }
 }
 
+lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
+{
+    if(e->code == LV_EVENT_DRAW_TASK_ADDED) {
+        return lv_event_get_param(e);
+    }
+    else {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return NULL;
+    }
+
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -347,8 +347,7 @@ static bool event_is_bubbled(lv_event_t * e)
         case LV_EVENT_DRAW_POST_BEGIN:
         case LV_EVENT_DRAW_POST:
         case LV_EVENT_DRAW_POST_END:
-        case LV_EVENT_DRAW_PART_BEGIN:
-        case LV_EVENT_DRAW_PART_END:
+        case LV_EVENT_DRAW_TASK_ADDED:
         case LV_EVENT_REFRESH:
         case LV_EVENT_DELETE:
         case LV_EVENT_CHILD_CREATED:

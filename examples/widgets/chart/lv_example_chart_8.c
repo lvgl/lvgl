@@ -1,5 +1,6 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES
+//TODO Should be a chart feature
+#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES && 0
 
 /*  A struct is used to keep track of the series list because later we need to draw to the series in the reverse order to which they were initialised. */
 typedef struct {
@@ -40,7 +41,7 @@ static void draw_event_cb(lv_event_t * e)
         a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
         a.y2 = obj->coords.y2 -
                13; /* -13 cuts off where the rectangle draws over the chart margin. Without this an area of 0 doesn't look like 0 */
-        lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
+        lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
 
         /*Remove the mask*/
         lv_draw_mask_free_param(&line_mask_param);

@@ -9,10 +9,10 @@
 #include <stdlib.h>
 
 #include "lv_obj.h"
-#include "lv_indev.h"
-#include "lv_indev_private.h"
-#include "lv_disp.h"
-#include "lv_disp_private.h"
+#include "../indev/lv_indev.h"
+#include "../indev/lv_indev_private.h"
+#include "../disp/lv_disp.h"
+#include "../disp/lv_disp_private.h"
 #include "../misc/lv_anim.h"
 #include "../misc/lv_gc.h"
 #include "../misc/lv_async.h"
@@ -385,7 +385,7 @@ static void obj_del_core(lv_obj_t * obj)
     while(indev) {
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
-            if(indev->pointer.act_obj == obj || indev->pointer.last_obj == obj) {
+            if(indev->pointer.act_obj == obj || indev->pointer.last_obj == obj || indev->pointer.scroll_obj == obj) {
                 lv_indev_reset(indev, obj);
             }
             if(indev->pointer.last_pressed == obj) {

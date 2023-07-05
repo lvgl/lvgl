@@ -85,10 +85,6 @@ static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt);
 static void lv_ffmpeg_player_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 
-#if LV_COLOR_DEPTH != 32
-    static void convert_color_depth(uint8_t * img, uint32_t px_cnt);
-#endif
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -171,18 +167,14 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     int height = player->ffmpeg_ctx->video_dec_ctx->height;
     uint32_t data_size = 0;
 
-    if(has_alpha) {
-        data_size = width * height * LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-    }
-    else {
-        data_size = width * height * LV_COLOR_SIZE / 8;
-    }
+    data_size = width * height * 4;
+
 
     player->imgdsc.header.always_zero = 0;
     player->imgdsc.header.w = width;
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
-    player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
+    player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
     player->imgdsc.data = ffmpeg_get_img_data(player->ffmpeg_ctx);
 
     lv_img_set_src(&player->img.obj, &(player->imgdsc));
@@ -304,12 +296,6 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         ffmpeg_close_src_ctx(ffmpeg_ctx);
         uint8_t * img_data = ffmpeg_get_img_data(ffmpeg_ctx);
 
-#if LV_COLOR_DEPTH != 32
-        if(ffmpeg_ctx->has_alpha) {
-            convert_color_depth(img_data, dsc->header.w * dsc->header.h);
-        }
-#endif
-
         dsc->user_data = ffmpeg_ctx;
         dsc->img_data = img_data;
 
@@ -327,25 +313,6 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
     struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
     ffmpeg_close(ffmpeg_ctx);
 }
-
-#if LV_COLOR_DEPTH != 32
-
-static void convert_color_depth(uint8_t * img, uint32_t px_cnt)
-{
-    lv_color32_t * img_src_p = (lv_color32_t *)img;
-    struct lv_img_pixel_color_s * img_dst_p = (struct lv_img_pixel_color_s *)img;
-
-    for(uint32_t i = 0; i < px_cnt; i++) {
-        lv_color32_t temp = *img_src_p;
-        img_dst_p->c = lv_color_hex(temp.full);
-        img_dst_p->alpha = temp.ch.alpha;
-
-        img_src_p++;
-        img_dst_p++;
-    }
-}
-
-#endif
 
 static uint8_t * ffmpeg_get_img_data(struct ffmpeg_context_s * ffmpeg_ctx)
 {
@@ -605,7 +572,7 @@ static int ffmpeg_get_img_header(const char * filepath,
         header->w = video_dec_ctx->width;
         header->h = video_dec_ctx->height;
         header->always_zero = 0;
-        header->cf = (has_alpha ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE);
+        header->cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
 
         ret = 0;
     }
@@ -830,13 +797,6 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
         lv_ffmpeg_player_set_cmd(obj, player->auto_restart ? LV_FFMPEG_PLAYER_CMD_START : LV_FFMPEG_PLAYER_CMD_STOP);
         return;
     }
-
-#if LV_COLOR_DEPTH != 32
-    if(player->ffmpeg_ctx->has_alpha) {
-        convert_color_depth((uint8_t *)(player->imgdsc.data),
-                            player->imgdsc.header.w * player->imgdsc.header.h);
-    }
-#endif
 
     lv_img_cache_invalidate_src(lv_img_get_src(obj));
     lv_obj_invalidate(obj);

@@ -13,8 +13,9 @@
 #include "../btn/lv_btn.h"
 #include "../btnmatrix/lv_btnmatrix.h"
 #include "../../misc/lv_assert.h"
-#include "../../core/lv_disp.h"
+#include "../../disp/lv_disp.h"
 #include "../../layouts/flex/lv_flex.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

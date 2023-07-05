@@ -324,21 +324,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_COLORWHEEL
-    else if(lv_obj_check_type(obj, &lv_colorwheel_class)) {
-        lv_obj_add_style(obj, &styles->light, 0);
-        lv_obj_add_style(obj, &styles->transp, 0);
-        lv_obj_add_style(obj, &styles->arc_line, 0);
-        lv_obj_add_style(obj, &styles->dim, LV_PART_KNOB);
-        lv_obj_add_style(obj, &styles->arc_knob, LV_PART_KNOB);
-    }
-#endif
-
-#if LV_USE_METER
-    else if(lv_obj_check_type(obj, &lv_meter_class)) {
-        lv_obj_add_style(obj, &styles->light, 0);
-    }
-#endif
+    //#if LV_USE_METER
+    //    else if(lv_obj_check_type(obj, &lv_meter_class)) {
+    //        lv_obj_add_style(obj, &styles->light, 0);
+    //    }
+    //#endif
 
 #if LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
@@ -394,13 +384,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
     else if(lv_obj_check_type(obj, &lv_tileview_tile_class)) {
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
-    }
-#endif
-
-#if LV_USE_COLORWHEEL
-    else if(lv_obj_check_type(obj, &lv_colorwheel_class)) {
-        lv_obj_add_style(obj, &styles->light, 0);
-        lv_obj_add_style(obj, &styles->light, LV_PART_KNOB);
     }
 #endif
 

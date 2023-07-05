@@ -8,11 +8,12 @@
  *********************/
 #include "lv_anim.h"
 
-#include "../hal/lv_hal_tick.h"
+#include "../tick/lv_tick.h"
 #include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
-#include "lv_mem.h"
+#include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
 #include "lv_gc.h"
 
 /*********************

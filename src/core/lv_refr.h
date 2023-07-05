@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "lv_disp.h"
+#include "../disp/lv_disp.h"
 #include <stdbool.h>
 
 /*********************
@@ -62,7 +62,7 @@ void lv_refr_now(lv_disp_t * disp);
  * @param draw_ctx  pointer to an initialized draw context
  * @param obj   the start object from the redraw should start
  */
-void lv_obj_redraw(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj);
+void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj);
 
 /**
  * Invalidate an area on display to redraw it

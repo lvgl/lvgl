@@ -20,6 +20,10 @@ void lv_example_btn_1(void)
     lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
     lv_obj_add_event(btn1, event_handler, LV_EVENT_ALL, NULL);
     lv_obj_align(btn1, LV_ALIGN_CENTER, 0, -40);
+    lv_obj_set_size(btn1, 182, 105);
+    lv_obj_set_style_transform_angle(btn1, 300, 0);
+    lv_obj_set_style_radius(btn1, 0, 0);
+    lv_obj_set_style_shadow_width(btn1, 0, 0);
 
     label = lv_label_create(btn1);
     lv_label_set_text(label, "Button");
@@ -34,5 +38,6 @@ void lv_example_btn_1(void)
     label = lv_label_create(btn2);
     lv_label_set_text(label, "Toggle");
     lv_obj_center(label);
+
 }
 #endif
