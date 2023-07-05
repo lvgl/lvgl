@@ -127,7 +127,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_rgb565(_lv_draw_sw_blend_fi
                     dest_buf_u16[x + 1] = lv_color_16_16_mix(color16, dest_buf_u16[x + 1], opa);
                 }
                 else {
-                    uint32_t * dest32 = (uint32_t *)&dest_buf_u16[x];
+                	volatile uint32_t * dest32 = (uint32_t *)&dest_buf_u16[x];
                     if(last_dest32_color == *dest32) {
                         *dest32 = last_res32_color;
                     }
