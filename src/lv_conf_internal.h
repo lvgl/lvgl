@@ -196,6 +196,13 @@
         #define LV_STRING_INCLUDE <stdint.h>
     #endif
 #endif
+#ifndef LV_DCACHE_INCLUDE
+    #ifdef CONFIG_LV_DCACHE_INCLUDE
+        #define LV_DCACHE_INCLUDE CONFIG_LV_DCACHE_INCLUDE
+    #else
+        #define LV_DCACHE_INCLUDE <stdint.h>
+    #endif
+#endif
 #ifndef LV_MALLOC
     #ifdef CONFIG_LV_MALLOC
         #define LV_MALLOC CONFIG_LV_MALLOC
@@ -264,6 +271,48 @@
         #define LV_STRCPY CONFIG_LV_STRCPY
     #else
         #define LV_STRCPY       lv_strcpy_builtin
+    #endif
+#endif
+#ifndef LV_MEM_CLEAN_DCACHE_ALL
+    #ifdef CONFIG_LV_MEM_CLEAN_DCACHE_ALL
+        #define LV_MEM_CLEAN_DCACHE_ALL CONFIG_LV_MEM_CLEAN_DCACHE_ALL
+    #else
+        #define LV_MEM_CLEAN_DCACHE_ALL
+    #endif
+#endif
+#ifndef LV_MEM_CLEAN_DCACHE
+    #ifdef CONFIG_LV_MEM_CLEAN_DCACHE
+        #define LV_MEM_CLEAN_DCACHE CONFIG_LV_MEM_CLEAN_DCACHE
+    #else
+        #define LV_MEM_CLEAN_DCACHE
+    #endif
+#endif
+#ifndef LV_MEM_FLUSH_DCACHE_ALL
+    #ifdef CONFIG_LV_MEM_FLUSH_DCACHE_ALL
+        #define LV_MEM_FLUSH_DCACHE_ALL CONFIG_LV_MEM_FLUSH_DCACHE_ALL
+    #else
+        #define LV_MEM_FLUSH_DCACHE_ALL
+    #endif
+#endif
+#ifndef LV_MEM_FLUSH_DCACHE
+    #ifdef CONFIG_LV_MEM_FLUSH_DCACHE
+        #define LV_MEM_FLUSH_DCACHE CONFIG_LV_MEM_FLUSH_DCACHE
+    #else
+        #define LV_MEM_FLUSH_DCACHE
+    #endif
+#endif
+#ifndef LV_MEM_INVALIDATE_DCACHE_ALL
+    #ifdef CONFIG_LV_MEM_INVALIDATE_DCACHE_ALL
+        #define LV_MEM_INVALIDATE_DCACHE_ALL CONFIG_LV_MEM_INVALIDATE_DCACHE_ALL
+    #else
+        #define LV_MEM_INVALIDATE_DCACHE_ALL
+    #endif
+#endif
+#ifndef LV_MEM_INVALIDATE_DCACHE
+    #ifdef CONFIG_LV_MEM_INVALIDATE_DCACHE
+        #define LV_MEM_INVALIDATE_DCACHE CONFIG_LV_MEM_INVALIDATE_DCACHE
+    #else
+        #define LV_MEM_INVALIDATE_DCACHE
     #endif
 #endif
 

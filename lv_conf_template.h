@@ -62,6 +62,7 @@
 #define LV_STDLIB_INCLUDE <stdint.h>
 #define LV_STDIO_INCLUDE  <stdint.h>
 #define LV_STRING_INCLUDE <stdint.h>
+#define LV_DCACHE_INCLUDE <stdint.h>
 #define LV_MALLOC       lv_malloc_builtin
 #define LV_REALLOC      lv_realloc_builtin
 #define LV_FREE         lv_free_builtin
@@ -72,6 +73,12 @@
 #define LV_STRLEN       lv_strlen_builtin
 #define LV_STRNCPY      lv_strncpy_builtin
 #define LV_STRCPY       lv_strcpy_builtin
+#define LV_MEM_CLEAN_DCACHE_ALL
+#define LV_MEM_CLEAN_DCACHE
+#define LV_MEM_FLUSH_DCACHE_ALL
+#define LV_MEM_FLUSH_DCACHE
+#define LV_MEM_INVALIDATE_DCACHE_ALL
+#define LV_MEM_INVALIDATE_DCACHE
 
 #define LV_COLOR_EXTERN_INCLUDE <stdint.h>
 #define LV_COLOR_MIX      lv_color_mix
