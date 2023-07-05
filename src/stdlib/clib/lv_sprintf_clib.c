@@ -9,7 +9,7 @@
  *      INCLUDES
  *********************/
 #include "../../lv_conf_internal.h"
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_CLIB
+#if LV_USE_STDLIB_SPRINTF == LV_STDLIB_CLIB
 #include <stdio.h>
 #include <stdarg.h>
 #include "../lv_sprintf.h"

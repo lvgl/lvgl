@@ -58,6 +58,8 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
     if(width > dsc->radius) width = dsc->radius;
 
     lv_area_t area_out = *coords;
+    lv_area_t clipped_area;
+    if(!_lv_area_intersect(&clipped_area, &area_out, draw_unit->clip_area)) return;
 
     /*Draw a full ring*/
     if(dsc->img_src == NULL &&
@@ -105,9 +107,6 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         mask_list[2] = &mask_in_param;
         mask_in_param_valid = true;
     }
-
-    lv_area_t clipped_area;
-    if(!_lv_area_intersect(&clipped_area, &area_out, draw_unit->clip_area)) return;
 
     lv_coord_t blend_h = lv_area_get_height(&clipped_area);
     lv_coord_t blend_w = lv_area_get_width(&clipped_area);

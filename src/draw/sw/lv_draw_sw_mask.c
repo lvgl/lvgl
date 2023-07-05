@@ -380,7 +380,7 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
         }
     }
 
-    /*If not found find a free entry with lowest life*/
+    /*If not cached use the free entry with lowest life*/
     _lv_draw_sw_mask_radius_circle_dsc_t * entry = NULL;
     for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
         if(LV_GC_ROOT(_lv_circle_cache[i]).used_cnt == 0) {
@@ -389,6 +389,7 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
         }
     }
 
+    /*There is no unused entry. Allocate one temporarily*/
     if(!entry) {
         entry = lv_malloc(sizeof(_lv_draw_sw_mask_radius_circle_dsc_t));
         LV_ASSERT_MALLOC(entry);
