@@ -97,6 +97,15 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_FILL:
             break;
 
+        case LV_DRAW_TASK_TYPE_BORDER: {
+                const lv_draw_border_dsc_t * draw_dsc = (lv_draw_border_dsc_t *) t->draw_dsc;
+
+                if(draw_dsc->side != (lv_border_side_t)LV_BORDER_SIDE_FULL)
+                    is_supported = false;
+
+                break;
+            }
+
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 const lv_img_dsc_t * img_dsc = draw_dsc->src;
@@ -203,6 +212,9 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_vglite_fill(draw_unit, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_BORDER:
+            lv_draw_vglite_border(draw_unit, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_vglite_img(draw_unit, t->draw_dsc, &t->area);
