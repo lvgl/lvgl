@@ -23,6 +23,9 @@
 
 //temp for clean and invalidate data cache
 #include "lvgl_support.h"
+#if LV_USE_OS
+    #include "vg_lite_gpu.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -45,6 +48,10 @@ static inline void invalidate_cache(void);
  *  STATIC VARIABLES
  **********************/
 
+#if LV_USE_OS
+    static volatile bool _cmd_buf_flushed = false;
+#endif
+
 /**********************
  *      MACROS
  **********************/
@@ -53,11 +60,38 @@ static inline void invalidate_cache(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
+#if LV_USE_OS
+bool vglite_cmd_buf_is_flushed(void)
+{
+    return _cmd_buf_flushed;
+}
+#endif
+
 void vglite_run(void)
 {
+#if LV_USE_OS
+    vg_lite_gpu_state_t gpu_state = vg_lite_get_gpu_state();
+
+    if(gpu_state == VG_LITE_GPU_BUSY) {
+        _cmd_buf_flushed = false;
+
+        return;
+    }
+#endif
+
     invalidate_cache();
 
+    /*
+     * For multithreading version (with OS), we simply flush the command buffer
+     * and the vglite draw thread will signal the dispatcher for completed tasks.
+     * Without OS, we process the tasks and signal them as complete one by one.
+     */
+#if LV_USE_OS
+    LV_ASSERT_MSG(vg_lite_flush() == VG_LITE_SUCCESS, "Flush failed.");
+    _cmd_buf_flushed = true;
+#else
     LV_ASSERT_MSG(vg_lite_finish() == VG_LITE_SUCCESS, "Finish failed.");
+#endif
 }
 
 vg_lite_color_t vglite_get_color(lv_color32_t lv_col32, bool gradient)

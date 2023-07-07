@@ -26,9 +26,23 @@
  *      DEFINES
  *********************/
 
+#if LV_USE_OS
+    #define VGLITE_TASK_BUF_SIZE 10
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
+
+#if LV_USE_OS
+/**
+ * Structure of pending vglite draw task
+ */
+typedef struct _vglite_draw_task_t {
+    lv_draw_task_t * task;
+    bool flushed;
+} vglite_draw_tasks_t;
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -45,6 +59,17 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+#if LV_USE_OS
+    /*
+    * Circular buffer to hold the queued and the flushed tasks.
+    * Two indexes, _head and _tail, are used to signal the beginning
+    * and the end of the valid tasks that are pending.
+    */
+    static vglite_draw_tasks_t _draw_task_buf[VGLITE_TASK_BUF_SIZE];
+    static volatile int _head = 0;
+    static volatile int _tail = 0;
+#endif
 
 /**********************
  *      MACROS
@@ -327,6 +352,39 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 }
 
 #if LV_USE_OS
+static inline void _vglite_queue_task(lv_draw_task_t * task_act)
+{
+    _draw_task_buf[_tail].task = task_act;
+    _draw_task_buf[_tail].flushed = false;
+    _tail = (_tail + 1) % VGLITE_TASK_BUF_SIZE;
+}
+
+static inline void _vglite_signal_task_ready(lv_draw_task_t * task_act)
+{
+    if(vglite_cmd_buf_is_flushed()) {
+        int end = (_head < _tail) ? _tail : _tail + VGLITE_TASK_BUF_SIZE;
+
+        for(int i = _head; i < end; i++) {
+            /* Previous flushed tasks are ready now. */
+            if(_draw_task_buf[i % VGLITE_TASK_BUF_SIZE].flushed) {
+                lv_draw_task_t * task = _draw_task_buf[i % VGLITE_TASK_BUF_SIZE].task;
+
+                /* Signal the ready state to dispatcher. */
+                task->state = LV_DRAW_TASK_STATE_READY;
+                _head = (_head + 1) % VGLITE_TASK_BUF_SIZE;
+                /* No need to cleanup the tasks in buffer as we advance with the _head. */
+            }
+            else {
+                /* Those tasks have been flushed now. */
+                _draw_task_buf[i % VGLITE_TASK_BUF_SIZE].flushed = true;
+            }
+        }
+    }
+
+    if(task_act)
+        LV_ASSERT_MSG(_tail != _head, "VGLite task buffer full.");
+}
+
 static void _vglite_render_thread_cb(void * ptr)
 {
     lv_draw_vglite_unit_t * u = ptr;
@@ -338,13 +396,24 @@ static void _vglite_render_thread_cb(void * ptr)
          * Wait for sync if no task received or _draw_task_buf is empty.
          * The thread will have to run as much as there are pending tasks.
          */
-        while(u->task_act == NULL) {
+        while(u->task_act == NULL && _head == _tail) {
             lv_thread_sync_wait(&u->sync);
         }
 
-        _vglite_execute_drawing(u);
+        if(u->task_act) {
+            _vglite_queue_task((void *)u->task_act);
 
-        u->task_act->state = LV_DRAW_TASK_STATE_READY;
+            _vglite_execute_drawing(u);
+        }
+        else {
+            /*
+             * Update the flush status for last pending tasks.
+             * vg_lite_flush() will early return if there is nothing to submit.
+             */
+            vglite_run();
+        }
+
+        _vglite_signal_task_ready((void *)u->task_act);
 
         /* Cleanup. */
         u->task_act = NULL;

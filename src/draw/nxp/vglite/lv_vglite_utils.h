@@ -60,6 +60,14 @@ static inline void vglite_disable_scissor(void);
  * GLOBAL PROTOTYPES
  **********************/
 
+#if LV_USE_OS
+/**
+ * Get VG-Lite command buffer flushed status.
+ *
+ */
+bool vglite_cmd_buf_is_flushed(void);
+#endif
+
 /**
  * Clear cache and flush command to VG-Lite.
  *
