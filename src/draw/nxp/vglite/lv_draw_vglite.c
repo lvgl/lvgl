@@ -106,6 +106,23 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
                 break;
             }
 
+        case LV_DRAW_TASK_TYPE_BG_IMG: {
+                const lv_draw_bg_img_dsc_t * draw_dsc = (lv_draw_bg_img_dsc_t *) t->draw_dsc;
+                lv_img_src_t src_type = lv_img_src_get_type(draw_dsc->src);
+
+                if(src_type != LV_IMG_SRC_SYMBOL) {
+                    bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
+
+                    if(has_recolor
+                       || (!_vglite_cf_supported(draw_dsc->img_header.cf))
+                       || (!vglite_buf_aligned(draw_dsc->src, draw_dsc->img_header.w))
+                      )
+                        is_supported = false;
+                }
+
+                break;
+            }
+
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 const lv_img_dsc_t * img_dsc = draw_dsc->src;
@@ -215,6 +232,9 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_BORDER:
             lv_draw_vglite_border(draw_unit, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_BG_IMG:
+            lv_draw_vglite_bg_img(draw_unit, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_vglite_img(draw_unit, t->draw_dsc, &t->area);
