@@ -25,6 +25,8 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_event_t;
+
 typedef void (*lv_event_cb_t)(struct _lv_event_t * e);
 
 
