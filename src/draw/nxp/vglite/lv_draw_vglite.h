@@ -82,6 +82,9 @@ void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * 
 void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
                         const lv_area_t * coords);
 
+void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
+                          const lv_area_t * coords);
+
 /**********************
  *      MACROS
  **********************/
