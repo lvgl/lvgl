@@ -58,6 +58,8 @@ lv_layer_t * lv_draw_vglite_layer_init(lv_disp_t * disp)
 {
     lv_vglite_layer_t * vglite_layer = (lv_vglite_layer_t *)lv_draw_sw_layer_init(disp);
 
+    vglite_layer->buffer_copy = lv_draw_vglite_buffer_copy;
+
     return vglite_layer;
 }
 
