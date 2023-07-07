@@ -23,6 +23,9 @@
 #include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
+#if LV_USE_DRAW_VGLITE
+    #include "draw/nxp/vglite/lv_draw_vglite.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -135,6 +138,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_SW
     lv_draw_sw_init();
+#endif
+
+#if LV_USE_DRAW_VGLITE
+    lv_draw_vglite_init();
 #endif
 
     _lv_obj_style_init();
