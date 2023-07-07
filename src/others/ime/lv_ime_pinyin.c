@@ -838,10 +838,10 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
 
     /*if pinyin_ime->cand_str not existed in dict, then do not fill the buffer.
      * - If I input `hu`, it is a legal pinyin (registered in the dictionary);
-     * - if I input `hup`, it is not a legal pinyin (not registered in the dictionary), 
+     * - if I input `hup`, it is not a legal pinyin (not registered in the dictionary),
      *   then not fill the buffer, but returned directly.
      */
-    if (!pinyin_ime->cand_str) return;
+    if(!pinyin_ime->cand_str) return;
 
     if(dir == 0) {
         if(pinyin_ime->py_page) {
