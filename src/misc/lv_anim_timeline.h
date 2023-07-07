@@ -23,7 +23,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
- /*Data of anim_timeline_dsc*/
+/*Data of anim_timeline_dsc*/
 typedef struct {
     lv_anim_t anim;
     uint32_t start_time;
