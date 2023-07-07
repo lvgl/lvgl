@@ -1,6 +1,6 @@
 #include "../../lv_examples.h"
 //TODO
-#if LV_USE_ROLLER && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES && 0
+#if LV_USE_ROLLER && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES && 0
 
 static void mask_event_cb(lv_event_t * e)
 {

@@ -387,6 +387,9 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
         case 4:
             opa_table = opa4_table;
             break;
+        default:
+            LV_LOG_WARN("%d bpp is not handled", bpp);
+            return;
     }
 
     rle_init(in, bpp);

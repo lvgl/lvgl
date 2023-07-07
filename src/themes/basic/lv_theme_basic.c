@@ -34,7 +34,7 @@ typedef struct {
     lv_style_t dark;
     lv_style_t dim;
     lv_style_t scrollbar;
-#if LV_USE_ARC || LV_USE_COLORWHEEL
+#if LV_USE_ARC
     lv_style_t arc_line;
     lv_style_t arc_knob;
 #endif
@@ -113,7 +113,7 @@ static void style_init(void)
     lv_style_set_arc_width(&styles->dim, 2);
     lv_style_set_arc_color(&styles->dim, COLOR_DIM);
 
-#if LV_USE_ARC || LV_USE_COLORWHEEL
+#if LV_USE_ARC
     style_init_reset(&styles->arc_line);
     lv_style_set_arc_width(&styles->arc_line, 6);
     style_init_reset(&styles->arc_knob);
