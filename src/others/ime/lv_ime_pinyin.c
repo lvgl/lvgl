@@ -836,12 +836,10 @@ static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
     uint16_t page_num = pinyin_ime->cand_num / LV_IME_PINYIN_CAND_TEXT_NUM;
     uint16_t sur = pinyin_ime->cand_num % LV_IME_PINYIN_CAND_TEXT_NUM;
 
-    /**
-     * @brief if pinyin_ime->cand_str not existed in dict, then do not fill the buffer.
-     * 
-     * @note If I input `hu`, it is a legal pinyin (registered in the dictionary);
-     * @note if I input `hup`, it is not a legal pinyin (not registered in the dictionary), 
-     * @note then not fill the buffer, but returned directly.
+    /*if pinyin_ime->cand_str not existed in dict, then do not fill the buffer.
+     * - If I input `hu`, it is a legal pinyin (registered in the dictionary);
+     * - if I input `hup`, it is not a legal pinyin (not registered in the dictionary), 
+     *   then not fill the buffer, but returned directly.
      */
     if (!pinyin_ime->cand_str) return;
 
