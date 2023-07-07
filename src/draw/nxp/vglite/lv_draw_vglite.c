@@ -98,6 +98,7 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_LINE:
+        case LV_DRAW_TASK_TYPE_ARC:
             break;
 
         case LV_DRAW_TASK_TYPE_BORDER: {
@@ -260,6 +261,9 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_vglite_img(draw_unit, t->draw_dsc, &t->area);
+            break;
+        case LV_DRAW_TASK_TYPE_ARC:
+            lv_draw_vglite_arc(draw_unit, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LINE:
             lv_draw_vglite_line(draw_unit, t->draw_dsc);

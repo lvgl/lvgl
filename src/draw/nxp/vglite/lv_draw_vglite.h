@@ -74,6 +74,9 @@ void lv_draw_vglite_buffer_copy(lv_layer_t * layer,
                                 void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
                                 void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
+void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc,
+                        const lv_area_t * coords);
+
 void lv_draw_vglite_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_t * dsc,
                            const lv_area_t * coords);
 
