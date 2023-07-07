@@ -70,6 +70,9 @@ void lv_draw_vglite_layer_deinit(lv_disp_t * disp, lv_layer_t * layer);
 
 void lv_draw_vglite_init(void);
 
+void lv_draw_vglite_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
+                         const lv_area_t * coords);
+
 void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
                         const lv_area_t * coords);
 
