@@ -30,6 +30,21 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * Enable BLIT quality degradation workaround for RT595,
+ * recommended for screen's dimension > 352 pixels.
+ */
+#define RT595_BLIT_WRKRND_ENABLED 1
+
+/* Internal compound symbol */
+#if (defined(CPU_MIMXRT595SFFOB) || defined(CPU_MIMXRT595SFFOB_cm33) || \
+    defined(CPU_MIMXRT595SFFOC) || defined(CPU_MIMXRT595SFFOC_cm33)) && \
+    RT595_BLIT_WRKRND_ENABLED
+#define VGLITE_BLIT_SPLIT_ENABLED 1
+#else
+#define VGLITE_BLIT_SPLIT_ENABLED 0
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -54,6 +69,9 @@ lv_layer_t * lv_draw_vglite_layer_init(lv_disp_t * disp);
 void lv_draw_vglite_layer_deinit(lv_disp_t * disp, lv_layer_t * layer);
 
 void lv_draw_vglite_init(void);
+
+void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
+                        const lv_area_t * coords);
 
 /**********************
  *      MACROS

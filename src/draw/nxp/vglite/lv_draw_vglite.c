@@ -17,6 +17,8 @@
 #include "lv_draw_vglite.h"
 
 #if LV_USE_DRAW_VGLITE
+#include "lv_vglite_buf.h"
+#include "lv_vglite_utils.h"
 
 #include "../../../disp/lv_disp_private.h"
 
@@ -78,11 +80,40 @@ void lv_draw_vglite_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
+static inline bool _vglite_cf_supported(lv_color_format_t cf)
+{
+    // Add here the platform specific code for supported formats.
+
+    bool is_cf_unsupported = (cf == LV_COLOR_FORMAT_RGB565A8 || cf == LV_COLOR_FORMAT_RGB888);
+
+    return (!is_cf_unsupported);
+}
+
 static bool _vglite_task_supported(lv_draw_task_t * t)
 {
     bool is_supported = true;
 
     switch(t->type) {
+        case LV_DRAW_TASK_TYPE_IMAGE: {
+                lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
+                const lv_img_dsc_t * img_dsc = draw_dsc->src;
+
+                bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
+#if VGLITE_BLIT_SPLIT_ENABLED
+                bool has_transform = (draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE);
+#endif
+
+                if(has_recolor
+#if VGLITE_BLIT_SPLIT_ENABLED
+                   || has_transform
+#endif
+                   || (!_vglite_cf_supported(img_dsc->header.cf))
+                   || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.w))
+                  )
+                    is_supported = false;
+
+                break;
+            }
         default:
             is_supported = false;
             break;
@@ -97,6 +128,10 @@ static int32_t lv_draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
 
     /* Return immediately if it's busy with draw task. */
     if(draw_vglite_unit->task_act)
+        return 0;
+
+    /* Return if target buffer format is not supported. */
+    if(!_vglite_cf_supported(layer->color_format))
         return 0;
 
     /* Try to get an ready to draw. */
@@ -158,7 +193,14 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     lv_draw_task_t * t = u->task_act;
     lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
 
+    /* Set target buffer */
+    lv_layer_t * layer = draw_unit->target_layer;
+    vglite_set_dest_buf(layer->buf, &layer->buf_area, lv_area_get_width(&layer->buf_area), layer->color_format);
+
     switch(t->type) {
+        case LV_DRAW_TASK_TYPE_IMAGE:
+            lv_draw_vglite_img(draw_unit, t->draw_dsc, &t->area);
+            break;
         default:
             break;
     }
