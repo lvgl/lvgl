@@ -99,6 +99,7 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_FILL:
         case LV_DRAW_TASK_TYPE_LINE:
         case LV_DRAW_TASK_TYPE_ARC:
+        case LV_DRAW_TASK_TYPE_LABEL:
             break;
 
         case LV_DRAW_TASK_TYPE_BORDER: {
@@ -250,6 +251,9 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     vglite_set_dest_buf(layer->buf, &layer->buf_area, lv_area_get_width(&layer->buf_area), layer->color_format);
 
     switch(t->type) {
+        case LV_DRAW_TASK_TYPE_LABEL:
+            lv_draw_vglite_label(draw_unit, t->draw_dsc, &t->area);
+            break;
         case LV_DRAW_TASK_TYPE_FILL:
             lv_draw_vglite_fill(draw_unit, t->draw_dsc, &t->area);
             break;
