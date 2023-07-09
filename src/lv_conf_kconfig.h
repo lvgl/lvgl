@@ -34,6 +34,42 @@ extern "C" {
 #endif
 
 /*******************
+ * LV_USE_STDLIB_MALLOC
+ *******************/
+
+#if defined(CONFIG_LV_USE_BUILTIN_MALLOC)
+#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_BUILTIN
+#elif defined(CONFIG_LV_USE_CLIB_MALLOC)
+#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_CLIB
+#elif defined (CONFIG_LV_USE_CUSTOM_MALLOC)
+#  define CONFIG_LV_USE_STDLIB_MALLOC LV_STDLIB_CUSTOM
+#endif
+
+/*******************
+ * LV_USE_STDLIB_STRING
+ *******************/
+
+#if defined(CONFIG_LV_USE_BUILTIN_STRING)
+#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_BUILTIN
+#elif defined(CONFIG_LV_USE_CLIB_STRING)
+#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_CLIB
+#elif defined (CONFIG_LV_USE_CUSTOM_STRING)
+#  define CONFIG_LV_USE_STDLIB_STRING LV_STDLIB_CUSTOM
+#endif
+
+/*******************
+ * LV_USE_STDLIB_SPRINTF
+ *******************/
+
+#if defined(CONFIG_LV_USE_BUILTIN_SPRINTF)
+#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_BUILTIN
+#elif defined(CONFIG_LV_USE_CLIB_SPRINTF)
+#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_CLIB
+#elif defined (CONFIG_LV_USE_CUSTOM_SPRINTF)
+#  define CONFIG_LV_USE_STDLIB_SPRINTF LV_STDLIB_CUSTOM
+#endif
+
+/*******************
  * LV_MEM_SIZE
  *******************/
 

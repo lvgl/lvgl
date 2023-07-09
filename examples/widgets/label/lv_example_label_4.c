@@ -1,6 +1,6 @@
 #include "../../lv_examples.h"
 //TODO
-#if LV_USE_LABEL && LV_USE_CANVAS && LV_BUILD_EXAMPLES && LV_USE_DRAW_MASKS && 0
+#if LV_USE_LABEL && LV_USE_CANVAS && LV_BUILD_EXAMPLES && LV_DRAW_SW_COMPLEX && 0
 
 #define MASK_WIDTH 100
 #define MASK_HEIGHT 45

@@ -122,10 +122,6 @@ typedef struct {
     lv_style_t calendar_btnm_bg, calendar_btnm_day, calendar_header;
 #endif
 
-#if LV_USE_COLORWHEEL
-    lv_style_t colorwheel_main;
-#endif
-
 #if LV_USE_MENU
     lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_header_btn,
                menu_section, menu_pressed, menu_separator;
@@ -579,11 +575,6 @@ static void style_init(void)
     lv_style_set_pad_top(&styles->calendar_header, PAD_SMALL);
     lv_style_set_pad_bottom(&styles->calendar_header, PAD_TINY);
     lv_style_set_pad_gap(&styles->calendar_header, PAD_SMALL);
-#endif
-
-#if LV_USE_COLORWHEEL
-    style_init_reset(&styles->colorwheel_main);
-    lv_style_set_arc_width(&styles->colorwheel_main, lv_disp_dpx(theme.disp, 10));
 #endif
 
 #if LV_USE_MSGBOX

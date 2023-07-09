@@ -1,6 +1,6 @@
 #include "../../lv_examples.h"
 //TODO should be a chart feature
-#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES && 0
+#if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES && 0
 
 static lv_obj_t * chart1;
 static lv_chart_series_t * ser1;

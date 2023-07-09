@@ -80,5 +80,3 @@
 #define LV_USE_DEMO_MULTILANG   1
 
 
-#define LV_USE_COLORWHEEL   0
-

@@ -1,6 +1,6 @@
 #include "../../lv_examples.h"
 //TODO Should be a chart feature
-#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES && 0
+#if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES && 0
 
 /*  A struct is used to keep track of the series list because later we need to draw to the series in the reverse order to which they were initialised. */
 typedef struct {

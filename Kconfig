@@ -21,6 +21,8 @@ menu "LVGL configuration"
 
 			config LV_COLOR_DEPTH_32
 				bool "32: ARGB8888"
+			config LV_COLOR_DEPTH_24
+				bool "24: RGB888"
 			config LV_COLOR_DEPTH_16
 				bool "16: RGB565"
 			config LV_COLOR_DEPTH_8
@@ -34,6 +36,7 @@ menu "LVGL configuration"
 			default 1 if LV_COLOR_DEPTH_1
 			default 8 if LV_COLOR_DEPTH_8
 			default 16 if LV_COLOR_DEPTH_16
+			default 24 if LV_COLOR_DEPTH_24
 			default 32 if LV_COLOR_DEPTH_32
 
 		config LV_COLOR_MIX_ROUND_OFS
@@ -57,28 +60,65 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "Memory settings"
-		config LV_MEM_CUSTOM
-			bool "If true use custom malloc/free, otherwise use the built-in `lv_malloc()` and `lv_free()`"
+		choice
+			prompt "Malloc functions source"
+			default LV_USE_BUILTIN_MALLOC
+
+		config LV_USE_BUILTIN_MALLOC
+			bool "LVGL's built in implementation"
+
+		config LV_USE_CLIB_MALLOC
+			bool "Standard C functions malloc/realloc/free"
+
+		config LV_USE_CUSTOM_MALLOC
+			bool "Implement the functions externally"
+
+		endchoice # "Malloc functions"
+
+		choice
+			prompt "String functions source"
+			default LV_USE_BUILTIN_STRING
+
+		config LV_USE_BUILTIN_STRING
+			bool "LVGL's built in implementation"
+
+		config LV_USE_CLIB_STRING
+			bool "Standard C functions memcpy/memset/strlen/strcpy"
+
+		config LV_USE_CUSTOM_STRING
+			bool "Implement the functions externally"
+
+		endchoice # "String functions"
+
+		choice
+			prompt "Sprintf functions source"
+			default LV_USE_BUILTIN_SPRINTF
+
+		config LV_USE_BUILTIN_SPRINTF
+			bool "LVGL's built in implementation"
+
+		config LV_USE_CLIB_SPRINTF
+			bool "Standard C functions vsnprintf"
+
+		config LV_USE_CUSTOM_SPRINTF
+			bool "Implement the functions externally"
+
+		endchoice # "Sprintf functions"
 
 		config LV_MEM_SIZE_KILOBYTES
 			int "Size of the memory used by `lv_malloc()` in kilobytes (>= 2kB)"
 			default 32
-			depends on !LV_MEM_CUSTOM
+			depends on LV_USE_BUILTIN_MALLOC
 
 		config LV_MEM_POOL_EXPAND_SIZE_KILOBYTES
 			int "Size of the memory expand for `lv_malloc()` in kilobytes"
 			default 0
-			depends on !LV_MEM_CUSTOM
+			depends on LV_USE_BUILTIN_MALLOC
 
-		config LV_MEM_ADDR
+		config LV_MEM_ADR
 			hex "Address for the memory pool instead of allocating it as a normal array"
 			default 0x0
-			depends on !LV_MEM_CUSTOM
-
-		config LV_MEM_CUSTOM_INCLUDE
-			string "Header to include for the custom memory function"
-			default "stdlib.h"
-			depends on LV_MEM_CUSTOM
+			depends on LV_USE_BUILTIN_MALLOC
 
 		config LV_MEM_BUF_MAX_NUM
 			int "Number of the memory buffer"
@@ -88,8 +128,6 @@ menu "LVGL configuration"
 				internal processing mechanisms.  You will see an error log message if
 				there wasn't enough buffers.
 
-		config LV_MEMCPY_MEMSET_STD
-			bool "Use the standard memcpy and memset instead of LVGL's own functions"
 	endmenu
 
 	menu "HAL Settings"
@@ -112,25 +150,32 @@ menu "LVGL configuration"
 	menu "Feature configuration"
 
 		menu "Drawing"
-			config LV_DRAW_COMPLEX
+			config LV_USE_DRAW_SW
+				bool "Enable software rendering"
+				default y
+			help
+				Required to draw anything on the screen.
+
+			config LV_DRAW_SW_COMPLEX
 				bool "Enable complex draw engine"
 				default y
+				depends on LV_USE_DRAW_SW
 				help
 					Required to draw shadow, gradient, rounded corners, circles, arc, skew lines,
 					image transformations or any masks.
 
-			config LV_SHADOW_CACHE_SIZE
+			config LV_DRAW_SW_SHADOW_CACHE_SIZE
 				int "Allow buffering some shadow calculation"
-				depends on LV_DRAW_COMPLEX
+				depends on LV_DRAW_SW_COMPLEX
 				default 0
 				help
-					LV_SHADOW_CACHE_SIZE is the max shadow size to buffer, where
+					LV_DRAW_SW_SHADOW_CACHE_SIZE is the max shadow size to buffer, where
 					shadow size is `shadow_width + radius`.
-					Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
+					Caching has LV_DRAW_SW_SHADOW_CACHE_SIZE^2 RAM cost.
 
-			config LV_CIRCLE_CACHE_SIZE
+			config LV_DRAW_SW_CIRCLE_CACHE_SIZE
 				int "Set number of maximally cached circle data"
-				depends on LV_DRAW_COMPLEX
+				depends on LV_DRAW_SW_COMPLEX
 				default 4
 				help
 					The circumference of 1/4 circle are saved for anti-aliasing
@@ -138,9 +183,10 @@ menu "LVGL configuration"
 					radiuses are saved).
 					Set to 0 to disable caching.
 
-			config LV_LAYER_SIMPLE_BUF_SIZE
+			config LV_DRAW_SW_LAYER_SIMPLE_BUF_SIZE
 				int "Optimal size to buffer the widget with opacity"
 				default 24576
+				depends on LV_USE_DRAW_SW
 				help
 					"Simple layers" are used when a widget has `style_opa < 255`
 					to buffer the widget into a layer and blend it as an image
@@ -150,6 +196,7 @@ menu "LVGL configuration"
 			config LV_IMG_CACHE_DEF_SIZE
 				int "Default image cache size. 0 to disable caching."
 				default 0
+				depends on LV_USE_DRAW_SW
 				help
 					If only the built-in image formats are used there is no real advantage of caching.
 					(I.e. no new image decoder is added).
@@ -161,6 +208,7 @@ menu "LVGL configuration"
 			config LV_GRADIENT_MAX_STOPS
 				int "Number of stops allowed per gradient."
 				default 2
+				depends on LV_USE_DRAW_SW
 				help
 					Increase this to allow more stops.
 					This adds (sizeof(lv_color_t) + 1) bytes per additional stop
@@ -168,6 +216,7 @@ menu "LVGL configuration"
 			config LV_GRAD_CACHE_DEF_SIZE
 				int "Default gradient buffer size."
 				default 0
+				depends on LV_USE_DRAW_SW
 				help
 					When LVGL calculates the gradient "maps" it can save them into a cache to avoid calculating them again.
 					LV_GRAD_CACHE_DEF_SIZE sets the size of this cache in bytes.
@@ -176,6 +225,7 @@ menu "LVGL configuration"
 
 			config LV_DITHER_GRADIENT
 				bool "Allow dithering the gradients"
+				depends on LV_USE_DRAW_SW
 				help
 					Allow dithering the gradients (to achieve visual smooth color gradients on limited color depth display)
 					LV_DITHER_GRADIENT implies allocating one or two more lines of the object's rendering surface
@@ -191,6 +241,7 @@ menu "LVGL configuration"
 			config LV_DISP_ROT_MAX_BUF
 				int "Maximum buffer size to allocate for rotation"
 				default 10240
+				depends on LV_USE_DRAW_SW
 				help
 					Only used if software rotation is enabled in the display driver.
 		endmenu
@@ -338,7 +389,7 @@ menu "LVGL configuration"
 				bool "Enable/Disable LV_LOG_TRACE in anim module"
 				default y
 				depends on LV_USE_LOG
-			
+
 			config LV_LOG_TRACE_MSG
 				bool "Enable/Disable LV_LOG_TRACE in msg module"
 				default y
@@ -436,17 +487,13 @@ menu "LVGL configuration"
 			config LV_USE_REFR_DEBUG
 				bool "Draw random colored rectangles over the redrawn areas."
 
-			config LV_SPRINTF_CUSTOM
-				bool "Change the built-in (v)snprintf functions"
-
-			config LV_SPRINTF_INCLUDE
-				string "Header to include for the custom sprintf function"
-				depends on LV_SPRINTF_CUSTOM
-				default "stdio.h"
+			config LV_USE_BUILTIN_SNPRINTF
+				bool "Use the built-in (v)snprintf functions"
+				default y
 
 			config LV_SPRINTF_USE_FLOAT
 				bool "Enable float in built-in (v)snprintf functions"
-				depends on !LV_SPRINTF_CUSTOM
+				depends on LV_USE_BUILTIN_SNPRINTF
 
 			config LV_ENABLE_GC
 				bool "Enable garbage collector"
@@ -811,9 +858,6 @@ menu "LVGL configuration"
 		config LV_USE_CHART
 			bool "Chart."
 			default y if !LV_CONF_MINIMAL
-		config LV_USE_COLORWHEEL
-			bool "Colorwheel."
-			default y if !LV_CONF_MINIMAL
 		config LV_USE_IMGBTN
 			bool "Imgbtn."
 			default y if !LV_CONF_MINIMAL
@@ -1068,7 +1112,7 @@ menu "LVGL configuration"
 			help
 				Set the maximum number of candidate panels that can be displayed.
 				This needs to be adjusted according to the size of the screen.
-		
+
 		config LV_USE_FILE_EXPLORER
 			bool "Enable file explorer"
 			default n
