@@ -57,7 +57,6 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
     img_dsc.header.cf = layer_to_draw->color_format;
     img_dsc.header.always_zero = 0;
-    img_dsc.header.chroma_keyed = 0;
     img_dsc.data = layer_to_draw->buf;
 
     lv_draw_img_dsc_t new_draw_dsc;
