@@ -25,9 +25,17 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_event_t;
 
-struct _lv_event_dsc_t;
-typedef struct _lv_event_dsc_t lv_event_dsc_t;
+typedef void (*lv_event_cb_t)(struct _lv_event_t * e);
+
+
+typedef struct {
+    lv_event_cb_t cb;
+    void * user_data;
+    uint32_t filter;
+} lv_event_dsc_t;
+
 
 /**
  * Type of event being sent to the object.
@@ -131,7 +139,6 @@ typedef struct _lv_event_t {
  * Events are used to notify the user of some action being taken on the object.
  * For details, see ::lv_event_t.
  */
-typedef void (*lv_event_cb_t)(lv_event_t * e);
 
 /**********************
  * GLOBAL PROTOTYPES
