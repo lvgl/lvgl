@@ -60,6 +60,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_t * indev);
 static void indev_proc_release(lv_indev_t * indev);
+static lv_obj_t * pointer_search_obj(lv_disp_t * disp, lv_point_t * p);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_click_focus(lv_indev_t * indev);
 static void indev_gesture(lv_indev_t * indev);
@@ -1001,30 +1002,13 @@ static void indev_proc_press(lv_indev_t * indev)
 
     /*If there is no last object then search*/
     if(indev_obj_act == NULL) {
-        indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &indev->pointer.act_point);
-
-        if(indev_obj_act == NULL) {
-            indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp), &indev->pointer.act_point);
-        }
-
-        if(indev_obj_act == NULL) {
-            indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp), &indev->pointer.act_point);
-        }
-
-        if(indev_obj_act == NULL) {
-            indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_bottom(disp), &indev->pointer.act_point);
-        }
-
+        indev_obj_act = pointer_search_obj(disp, &indev->pointer.act_point);
         new_obj_searched = true;
     }
-    /*If there is last object but it is not scrolled and not protected also search*/
+    /*If there is an active object it's not scrolled and not protected also search*/
     else if(indev->pointer.scroll_obj == NULL &&
             lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false) {
-        indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &indev->pointer.act_point);
-        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp),
-                                                                          &indev->pointer.act_point);
-        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp),
-                                                                          &indev->pointer.act_point);
+        indev_obj_act = pointer_search_obj(disp, &indev->pointer.act_point);
         new_obj_searched = true;
     }
 
@@ -1041,13 +1025,18 @@ static void indev_proc_press(lv_indev_t * indev)
         indev->pointer.last_point.x = indev->pointer.act_point.x;
         indev->pointer.last_point.y = indev->pointer.act_point.y;
 
-        /*If a new object found the previous was lost, so send a Call the ancestor's event handler*/
+        /*If a new object found the previous was lost, so send a PRESS_LOST event*/
         if(indev->pointer.act_obj != NULL) {
-            /*Save the obj because in special cases `act_obj` can change in the Call the ancestor's event handler function*/
+            /*Save the obj because in special cases `act_obj` can change in the event */
             lv_obj_t * last_obj = indev->pointer.act_obj;
 
             lv_obj_send_event(last_obj, LV_EVENT_PRESS_LOST, indev_act);
             if(indev_reset_check(indev)) return;
+
+            /*Do nothing until release and a new press*/
+            lv_indev_reset(indev, NULL);
+            lv_indev_wait_release(indev);
+            return;
         }
 
         indev->pointer.act_obj  = indev_obj_act; /*Save the pressed object*/
@@ -1133,7 +1122,7 @@ static void indev_proc_press(lv_indev_t * indev)
  */
 static void indev_proc_release(lv_indev_t * indev)
 {
-    if(indev->wait_until_release != 0) {
+    if(indev->wait_until_release) {
         lv_obj_send_event(indev->pointer.act_obj, LV_EVENT_PRESS_LOST, indev_act);
         if(indev_reset_check(indev)) return;
 
@@ -1201,6 +1190,21 @@ static void indev_proc_release(lv_indev_t * indev)
         _lv_indev_scroll_throw_handler(indev);
         if(indev_reset_check(indev)) return;
     }
+}
+
+static lv_obj_t * pointer_search_obj(lv_disp_t * disp, lv_point_t * p)
+{
+    indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), p);
+    if(indev_obj_act) return indev_obj_act;
+
+    indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp), p);
+    if(indev_obj_act) return indev_obj_act;
+
+    indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp), p);
+    if(indev_obj_act) return indev_obj_act;
+
+    indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_bottom(disp), p);
+    return indev_obj_act;
 }
 
 /**
