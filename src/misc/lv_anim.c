@@ -304,6 +304,12 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
         return a->start_value;
 }
 
+int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
+{
+    const struct _lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
+    return lv_anim_path_cubic_bezier(a, para->x1, para->y1, para->x2, para->y2);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
