@@ -93,6 +93,16 @@ typedef struct _lv_draw_unit_t {
 
     const lv_area_t * clip_area;
 
+    /**
+     * Try to assign a draw task to itself.
+     * `lv_draw_get_next_available_task` can be used to get an independent draw task.
+     * A draw task should be assign only if the draw unit can draw it too
+     * @param draw_unit     pointer to the draw unit
+     * @param layer         pointer to a layer on which the draw task should be drawn
+     * @return              >=0:    The number of taken draw task
+     *                      -1:     There where no available draw tasks at all.
+     *                              Also means to no call the dispatcher of the other draw units as there is no dra task to tkae
+     */
     int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
 } lv_draw_unit_t;
 
