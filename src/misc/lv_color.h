@@ -99,46 +99,59 @@ typedef struct {
 typedef uint8_t lv_opa_t;
 //! @endcond
 
+enum _lv_color_format_t {
+    LV_COLOR_FORMAT_UNKNOWN           = 0,
 
-typedef enum {
-    LV_COLOR_FORMAT_UNKNOWN,
+    LV_COLOR_FORMAT_RAW               = 0x01,
+    LV_COLOR_FORMAT_RAW_ALPHA         = 0x02,
 
     /*<=1 byte (+alpha) formats*/
-    LV_COLOR_FORMAT_L8,
-    LV_COLOR_FORMAT_A8,
-    LV_COLOR_FORMAT_I1,
-    LV_COLOR_FORMAT_I2,
-    LV_COLOR_FORMAT_I4,
-    LV_COLOR_FORMAT_I8,
+    LV_COLOR_FORMAT_L8                = 0x06,
+    LV_COLOR_FORMAT_I1                = 0x07,
+    LV_COLOR_FORMAT_I2                = 0x08,
+    LV_COLOR_FORMAT_I4                = 0x09,
+    LV_COLOR_FORMAT_I8                = 0x0A,
+    LV_COLOR_FORMAT_A8                = 0x0E,
 
     /*2 byte (+alpha) formats*/
-    LV_COLOR_FORMAT_RGB565,
-    LV_COLOR_FORMAT_RGB565A8,       /**< Color array followed by Alpha array*/
+    LV_COLOR_FORMAT_RGB565            = 0x12,
+    LV_COLOR_FORMAT_RGB565A8          = 0x14    /**< Color array followed by Alpha array*/,
 
     /*3 byte (+alpha) formats*/
-    LV_COLOR_FORMAT_RGB888,
-    LV_COLOR_FORMAT_ARGB8888,
-    LV_COLOR_FORMAT_XRGB8888,
+    LV_COLOR_FORMAT_RGB888            = 0x0F,
+    LV_COLOR_FORMAT_ARGB8888          = 0x10,
+    LV_COLOR_FORMAT_XRGB8888          = 0x11,
+
+    /*Miscellaneous formats*/
+    LV_COLOR_FORMAT_NATIVE_REVERSED   = 0x1A,
+
+    /*Formats not supported by software renderer but kept here so GPU can use it*/
+    LV_COLOR_FORMAT_A1                = 0x0B,
+    LV_COLOR_FORMAT_A2                = 0x0C,
+    LV_COLOR_FORMAT_A4                = 0x0D,
 
     /*Color formats in which LVGL can render*/
 #if LV_COLOR_DEPTH == 8
-    LV_COLOR_FORMAT_NATIVE = LV_COLOR_FORMAT_L8,
+    LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_L8,
 #elif LV_COLOR_DEPTH == 16
-    LV_COLOR_FORMAT_NATIVE =  LV_COLOR_FORMAT_RGB565,
+    LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_RGB565,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_RGB565A8,
 #elif LV_COLOR_DEPTH == 24
-    LV_COLOR_FORMAT_NATIVE = LV_COLOR_FORMAT_RGB888,
+    LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_RGB888,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_ARGB8888,
 #elif LV_COLOR_DEPTH == 32
-    LV_COLOR_FORMAT_NATIVE = LV_COLOR_FORMAT_XRGB8888,
+    LV_COLOR_FORMAT_NATIVE            = LV_COLOR_FORMAT_XRGB8888,
     LV_COLOR_FORMAT_NATIVE_WITH_ALPHA = LV_COLOR_FORMAT_ARGB8888,
 #endif
-    /*Miscellaneous formats*/
-    LV_COLOR_FORMAT_NATIVE_REVERSED = 0x1A,
+};
 
-    LV_COLOR_FORMAT_RAW,
-    LV_COLOR_FORMAT_RAW_ALPHA,
-} lv_color_format_t;
+#ifdef DOXYGEN
+typedef _lv_color_format_t lv_color_format_t;
+#else
+typedef uint8_t lv_color_format_t;
+#endif /*DOXYGEN*/
+
+#define LV_COLOR_FORMAT_IS_INDEXED(cf) ((cf) >= LV_COLOR_FORMAT_I1 && (cf) <= LV_COLOR_FORMAT_I8)
 
 
 /**********************
