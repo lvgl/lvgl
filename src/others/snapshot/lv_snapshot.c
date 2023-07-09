@@ -103,7 +103,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_img_ds
             return LV_RES_INV;
     }
 
-    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size) return LV_RES_INV;
+    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size || buff_size == 0) return LV_RES_INV;
 
     /*Width and height determine snapshot image size.*/
     lv_coord_t w = lv_obj_get_width(obj);
@@ -153,6 +153,7 @@ lv_img_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
 {
     LV_ASSERT_NULL(obj);
     uint32_t buff_size = lv_snapshot_buf_size_needed(obj, cf);
+    if(buff_size == 0) return NULL;
 
     void * buf = lv_malloc(buff_size);
     LV_ASSERT_MALLOC(buf);
