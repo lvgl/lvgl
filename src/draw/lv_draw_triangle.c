@@ -62,7 +62,7 @@ void lv_draw_triangle(struct _lv_layer_t * layer, const lv_draw_triangle_dsc_t *
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
-    t->type = LV_DRAW_TASK_TYPE_TRIANLGE;
+    t->type = LV_DRAW_TASK_TYPE_TRIANGLE;
 
     lv_draw_finalize_task_creation(layer, t);
     LV_PROFILER_END;
