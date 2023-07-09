@@ -156,7 +156,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
         if(grad_dir == LV_GRAD_DIR_VER) {
             blend_dsc.color = grad->color_map[y - tri_area.y1];
             blend_dsc.opa = grad->opa_map[y - tri_area.y1];
-            if(dsc->bg_opa < LV_OPA_MAX) blend_dsc.opa = (blend_dsc.opa * dsc->bg_opa) >> 8;
+            if(dsc->bg_opa < LV_OPA_MAX) blend_dsc.opa = LV_OPA_MIX2(blend_dsc.opa, dsc->bg_opa);
         }
         else if(grad_dir == LV_GRAD_DIR_HOR) {
             if(grad_opa_map) {
@@ -164,7 +164,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
                 if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_CHANGED) {
                     blend_dsc.mask_buf = mask_buf;
                     for(i = 0; i < area_w; i++) {
-                        if(grad_opa_map[i] < LV_OPA_MAX) mask_buf[i] = (mask_buf[i] * grad_opa_map[i]) >> 8;
+                        if(grad_opa_map[i] < LV_OPA_MAX) mask_buf[i] = LV_OPA_MIX2(mask_buf[i], grad_opa_map[i]);
                     }
                 }
                 else if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_FULL_COVER) {

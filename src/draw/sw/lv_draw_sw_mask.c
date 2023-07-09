@@ -86,7 +86,7 @@ void lv_draw_sw_mask_init(void)
 }
 
 
-LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * list[], lv_opa_t * mask_buf, lv_coord_t abs_x,
+LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, lv_coord_t abs_x,
                                                                   lv_coord_t abs_y,
                                                                   lv_coord_t len)
 {
@@ -94,10 +94,10 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * list[],
     _lv_draw_sw_mask_common_dsc_t * dsc;
 
     uint32_t i;
-    for(i = 0; list[i]; i++) {
-        dsc = list[i];
+    for(i = 0; masks[i]; i++) {
+        dsc = masks[i];
         lv_draw_sw_mask_res_t res = LV_DRAW_SW_MASK_RES_FULL_COVER;
-        res = dsc->cb(mask_buf, abs_x, abs_y, len, list[i]);
+        res = dsc->cb(mask_buf, abs_x, abs_y, len, masks[i]);
         if(res == LV_DRAW_SW_MASK_RES_TRANSP) return LV_DRAW_SW_MASK_RES_TRANSP;
         else if(res == LV_DRAW_SW_MASK_RES_CHANGED) changed = true;
     }
@@ -1057,7 +1057,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_sw_mask_res_t lv_draw_mask_fade(lv_opa_t * 
         /*Calculate the opa proportionally*/
         int16_t opa_diff = p->cfg.opa_bottom - p->cfg.opa_top;
         int32_t y_diff = p->cfg.y_bottom - p->cfg.y_top + 1;
-        lv_opa_t opa_act = (int32_t)((int32_t)(abs_y - p->cfg.y_top) * opa_diff) / y_diff;
+        lv_opa_t opa_act = LV_OPA_MIX2(abs_y - p->cfg.y_top, opa_diff) / y_diff;
         opa_act += p->cfg.opa_top;
 
         for(i = 0; i < len; i++) {
