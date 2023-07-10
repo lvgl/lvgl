@@ -252,7 +252,7 @@ lv_res_t lv_thread_sync_signal(lv_thread_sync_t * pxCond)
                0,
                ulLocalWaitingThreads)) {
             /* Unblock all. */
-            for(int i = 0; i < ulLocalWaitingThreads; i++) {
+            for(uint32_t i = 0; i < ulLocalWaitingThreads; i++) {
                 xSemaphoreGive(pxCond->xCondWaitSemaphore);
             }
 
