@@ -129,9 +129,9 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t id, const char * new_name)
     if(id >= tabview->tab_cnt) return;
     if(tabview->tab_pos & LV_DIR_HOR) id *= 2;
 
-    lv_mem_free((void*)tabview->map[id]);
+    lv_mem_free((void *)tabview->map[id]);
     tabview->map[id] = lv_mem_alloc(strlen(new_name) + 1);
-    strcpy((void*)tabview->map[id], new_name);
+    strcpy((void *)tabview->map[id], new_name);
     lv_obj_invalidate(obj);
 }
 
@@ -273,13 +273,13 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     uint32_t i;
     if(tabview->tab_pos & LV_DIR_VER) {
         for(i = 0; i < tabview->tab_cnt; i++) {
-            lv_mem_free((void*)tabview->map[i]);
+            lv_mem_free((void *)tabview->map[i]);
             tabview->map[i] = NULL;
         }
     }
     if(tabview->tab_pos & LV_DIR_HOR) {
         for(i = 0; i < tabview->tab_cnt; i++) {
-            lv_mem_free((void*)tabview->map[i * 2]);
+            lv_mem_free((void *)tabview->map[i * 2]);
             tabview->map[i * 2] = NULL;
         }
     }
