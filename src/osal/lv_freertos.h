@@ -34,10 +34,9 @@ extern "C" {
  **********************/
 
 typedef struct {
-    void * (*pvStartRoutine)(void *);     /**< Application thread function. */
+    void (*pvStartRoutine)(void *);       /**< Application thread function. */
     void * xTaskArg;                      /**< Arguments for application thread function. */
     TaskHandle_t xTaskHandle;             /**< FreeRTOS task handle. */
-    void * xReturn;                       /**< Return value of pvStartRoutine. */
 } lv_thread_t;
 
 typedef struct {
