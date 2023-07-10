@@ -132,20 +132,15 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
         }
     }
 
-#if LV_USE_OS
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->base_unit.target_layer = layer;
     draw_sw_unit->base_unit.clip_area = &t->clip_area;
     draw_sw_unit->task_act = t;
 
+#if LV_USE_OS
     /*Let the render thread work*/
     lv_thread_sync_signal(&draw_sw_unit->sync);
 #else
-    t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
-    draw_sw_unit->base_unit.target_layer = layer;
-    draw_sw_unit->base_unit.clip_area = &t->clip_area;
-    draw_sw_unit->task_act = t;
-
     execute_drawing(draw_sw_unit);
 
     draw_sw_unit->task_act->state = LV_DRAW_TASK_STATE_READY;
