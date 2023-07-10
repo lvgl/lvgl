@@ -119,7 +119,24 @@ lv_res_t lv_mutex_lock(lv_mutex_t * pxMutex)
 
 lv_res_t lv_mutex_lock_isr(lv_mutex_t * pxMutex)
 {
-    //xSemaphoreTakeFromISR();
+    /* If mutex in uninitialized, perform initialization. */
+    prvInitializeMutex(pxMutex);
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    BaseType_t xMutexTakeStatus = xSemaphoreTakeFromISR(pxMutex->xMutex, &xHigherPriorityTaskWoken);
+    if(xMutexTakeStatus != pdTRUE) {
+        LV_LOG_ERROR("xSemaphoreTake failed!");
+        return LV_RES_INV;
+    }
+
+    /* If xHigherPriorityTaskWoken is now set to pdTRUE then a context switch
+    should be performed to ensure the interrupt returns directly to the highest
+    priority task.  The macro used for this purpose is dependent on the port in
+    use and may be called portEND_SWITCHING_ISR(). */
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
+    return LV_RES_OK;
 }
 
 lv_res_t lv_mutex_unlock(lv_mutex_t * pxMutex)
