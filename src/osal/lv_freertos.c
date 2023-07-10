@@ -62,7 +62,7 @@ lv_res_t lv_thread_init(lv_thread_t * pxThread, lv_thread_prio_t xSchedPriority,
                         void * xAttr)
 {
     pxThread->xTaskArg = xAttr;
-    pxThread->pvStartRoutine = (void * (*)(void *))pvStartRoutine;
+    pxThread->pvStartRoutine = pvStartRoutine;
 
     BaseType_t xTaskCreateStatus = xTaskCreate(
                                        prvRunThread,
@@ -290,7 +290,7 @@ static void prvRunThread(void * pxArg)
     lv_thread_t * pxThread = (lv_thread_t *)pxArg;
 
     /* Run the thread routine. */
-    pxThread->xReturn = pxThread->pvStartRoutine((void *)pxThread->xTaskArg);
+    pxThread->pvStartRoutine((void *)pxThread->xTaskArg);
 
     vTaskDelete(NULL);
 }
