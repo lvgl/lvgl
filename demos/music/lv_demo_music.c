@@ -104,7 +104,7 @@ static const uint32_t time_list[] = {
 };
 
 #if LV_DEMO_MUSIC_AUTO_PLAY
-static lv_timer_t * auto_step_timer;
+    static lv_timer_t * auto_step_timer;
 #endif
 
 static lv_color_t original_screen_bg_color;
