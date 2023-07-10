@@ -2,7 +2,7 @@ class ScrollExample_3():
     def __init__(self):
         self.btn_cnt = 1
         #
-        # Create a list a with a floating button
+        # Create a list with a floating button
         #
 
         list = lv.list(lv.scr_act())
@@ -20,7 +20,7 @@ class ScrollExample_3():
         float_btn.set_style_radius(lv.RADIUS.CIRCLE, 0)
         float_btn.set_style_bg_img_src(lv.SYMBOL.PLUS, 0)
         float_btn.set_style_text_font(lv.theme_get_font_large(float_btn), 0)
-            
+
     def float_btn_event_cb(self,e,list):
         code = e.get_code()
         float_btn = e.get_target()
@@ -32,7 +32,7 @@ class ScrollExample_3():
             float_btn.move_foreground()
 
             list_btn.scroll_to_view(lv.ANIM.ON)
-            
+
 scroll_example_3 = ScrollExample_3()
 
 

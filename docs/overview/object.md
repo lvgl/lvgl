@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/object.md
-```
 # Objects
 
 In LVGL the **basic building blocks** of a user interface are the objects, also called *Widgets*.
@@ -73,7 +69,7 @@ lv_obj_set_pos(obj1, 10, 10);	                     /*Set the position of the new
 
 Modify the position of the parent:
 
-![](/misc/par_child2.png "Graphical objects are moving together 2")  
+![](/misc/par_child2.png "Graphical objects are moving together 2")
 
 ```c
 lv_obj_set_pos(parent, 50, 50);	/*Move the parent. The child will move with it.*/
@@ -85,7 +81,7 @@ lv_obj_set_pos(parent, 50, 50);	/*Move the parent. The child will move with it.*
 
 If a child is partially or fully outside its parent then the parts outside will not be visible.
 
-![](/misc/par_child3.png "A graphical object is visible on its parent")  
+![](/misc/par_child3.png "A graphical object is visible on its parent")
 
 ```c
 lv_obj_set_x(obj1, -30);	/*Move the child a little bit off the parent*/
@@ -101,7 +97,7 @@ In LVGL, objects can be created and deleted dynamically at run time. It means on
 This allows for the creation of a screen just when a button is clicked to open it, and for deletion of screens when a new screen is loaded.
 
 UIs can be created based on the current environment of the device. For example one can create meters, charts, bars and sliders based on the currently attached sensors.
- 
+
 Every widget has its own **create** function with a prototype like this:
 ```c
 lv_obj_t * lv_<widget>_create(lv_obj_t * parent, <other parameters if any>);
@@ -124,7 +120,7 @@ This is useful e.g. if you want to delete the parent of an object in the child's
 
 You can remove all the children of an object (but not the object itself) using `lv_obj_clean(obj)`.
 
-You can use `lv_obj_del_delayed(obj, 1000)` to delete an object after some time. The delay is expressed in milliseconds. 
+You can use `lv_obj_del_delayed(obj, 1000)` to delete an object after some time. The delay is expressed in milliseconds.
 
 
 ## Screens
@@ -140,7 +136,7 @@ Screens can be created with any object type. For example, a [Base object](/widge
 ### Get the active screen
 There is always an active screen on each display. By default, the library creates and loads a "Base object" as a screen for each display.
 
-To get the currently active screen use the `lv_scr_act()` function. 
+To get the currently active screen use the `lv_scr_act()` function.
 
 ### Load screens
 
@@ -164,12 +160,14 @@ Read the [Layer overview](/overview/layer) section to learn more about layers.
 A new screen can be loaded with animation by using `lv_scr_load_anim(scr, transition_type, time, delay, auto_del)`. The following transition types exist:
 - `LV_SCR_LOAD_ANIM_NONE` Switch immediately after `delay` milliseconds
 - `LV_SCR_LOAD_ANIM_OVER_LEFT/RIGHT/TOP/BOTTOM` Move the new screen over the current towards the given direction
+- `LV_SCR_LOAD_ANIM_OUT_LEFT/RIGHT/TOP/BOTTOM` Move out the old screen over the current towards the given direction
 - `LV_SCR_LOAD_ANIM_MOVE_LEFT/RIGHT/TOP/BOTTOM` Move both the current and new screens towards the given direction
-- `LV_SCR_LOAD_ANIM_FADE_ON` Fade the new screen over the old screen
+- `LV_SCR_LOAD_ANIM_FADE_IN/OUT` Fade the new screen over the old screen, or vice versa
 
 Setting `auto_del` to `true` will automatically delete the old screen when the animation is finished.
 
 The new screen will become active (returned by `lv_scr_act()`) when the animation starts after `delay` time.
+All inputs are disabled during the screen animation.
 
 ### Handling multiple displays
 Screens are created on the currently selected *default display*.
@@ -181,7 +179,7 @@ Visit [Multi-display support](/overview/display) to learn more.
 
 ## Parts
 
-The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scrollbar parts but a [Slider](/widgets/core/slider) uses the main, indicator and knob parts. 
+The widgets are built from multiple parts. For example a [Base object](/widgets/obj) uses the main and scrollbar parts but a [Slider](/widgets/core/slider) uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
 The following predefined parts exist in LVGL:
@@ -195,15 +193,15 @@ The following predefined parts exist in LVGL:
 - `LV_PART_CURSOR` Mark a specific place e.g. text area's or chart's cursor
 - `LV_PART_CUSTOM_FIRST` Custom parts can be added from here.
 
-The main purpose of parts is to allow styling the "components" of the widgets. 
+The main purpose of parts is to allow styling the "components" of the widgets.
 They are described in more detail in the [Style overview](/overview/style) section.
 
 ## States
 The object can be in a combination of the following states:
 - `LV_STATE_DEFAULT` Normal, released state
 - `LV_STATE_CHECKED` Toggled or checked state
-- `LV_STATE_FOCUSED` Focused via keypad or encoder or clicked via touchpad/mouse 
-- `LV_STATE_FOCUS_KEY` Focused via keypad or encoder but not via touchpad/mouse 
+- `LV_STATE_FOCUSED` Focused via keypad or encoder or clicked via touchpad/mouse
+- `LV_STATE_FOCUS_KEY` Focused via keypad or encoder but not via touchpad/mouse
 - `LV_STATE_EDITED` Edit by an encoder
 - `LV_STATE_HOVERED` Hovered by mouse (not supported now)
 - `LV_STATE_PRESSED` Being pressed
@@ -214,8 +212,8 @@ The object can be in a combination of the following states:
 - `LV_STATE_USER_3` Custom state
 - `LV_STATE_USER_4` Custom state
 
-The states are usually automatically changed by the library as the userinteracts qith an object (presses, releases, focuses, etc.). 
-However, the states can be changed manually too. 
+The states are usually automatically changed by the library as the user interacts with an object (presses, releases, focuses, etc.).
+However, the states can be changed manually too.
 To set or clear given state (but leave the other states untouched) use `lv_obj_add/clear_state(obj, LV_STATE_...)`
 In both cases OR-ed state values can be used as well. E.g. `lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 

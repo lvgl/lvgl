@@ -22,7 +22,11 @@ extern "C" {
  *********************/
 
 /**Default value of points. Can be used to not draw a point*/
+#if LV_USE_LARGE_COORD
+#define LV_CHART_POINT_NONE (INT32_MAX)
+#else
 #define LV_CHART_POINT_NONE (INT16_MAX)
+#endif
 LV_EXPORT_CONST_INT(LV_CHART_POINT_NONE);
 
 /**********************
@@ -78,7 +82,7 @@ typedef struct {
 
 typedef struct {
     lv_point_t pos;
-    uint16_t point_id;
+    lv_coord_t point_id;
     lv_color_t color;
     lv_chart_series_t * ser;
     lv_dir_t dir;
@@ -104,7 +108,7 @@ typedef struct {
     lv_coord_t ymax[2];
     lv_coord_t xmin[2];
     lv_coord_t xmax[2];
-    uint16_t pressed_point_id;
+    lv_coord_t pressed_point_id;
     uint16_t hdiv_cnt;      /**< Number of horizontal division lines*/
     uint16_t vdiv_cnt;      /**< Number of vertical division lines*/
     uint16_t point_cnt;    /**< Point number in a data line*/
@@ -339,7 +343,7 @@ void lv_chart_set_cursor_pos(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_po
  * @param obj       pointer to a chart object
  * @param cursor    pointer to the cursor
  * @param ser       pointer to a series
- * @param point_id  the point's index or  `LV_CHART_POINT_NONE` to not assign to any points.
+ * @param point_id  the point's index or `LV_CHART_POINT_NONE` to not assign to any points.
  */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_chart_series_t * ser,
                                uint16_t point_id);

@@ -4,7 +4,7 @@ import fs_driver
 def event_handler(e):
     code = e.get_code()
     obj = e.get_target()
-    if code == lv.EVENT.VALUE_CHANGED: 
+    if code == lv.EVENT.VALUE_CHANGED:
         option = " "*10
         obj.get_selected_str(option, len(option))
         print("Selected value: %s\n" + option.strip())
@@ -25,7 +25,7 @@ except:
     print("montserrat-22 not enabled in lv_conf.h, dynamically loading the font")
     font_montserrat_22 = lv.font_load("S:" + "../../assets/font/montserrat-22.fnt")
     style_sel.set_text_font(font_montserrat_22)
-    
+
 opts = "\n".join(["1","2","3","4","5","6","7","8","9","10"])
 
 # A roller on the left with left aligned text, and custom width

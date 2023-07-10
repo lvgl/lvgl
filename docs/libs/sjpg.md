@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/libs/sjpg.md
-```
 
 # JPG decoder
 
@@ -26,17 +22,17 @@ If enabled in `lv_conf.h` by `LV_USE_SJPG` LVGL will register a new image decode
 lv_img_set_src(my_img, "S:path/to/picture.jpg");
 ```
 
-Note that, a file system driver needs to registered to open images from files. Read more about it [here](https://docs.lvgl.io/master/overview/file-system.html) or just enable one in `lv_conf.h` with `LV_USE_FS_...` 
+Note that, a file system driver needs to registered to open images from files. Read more about it [here](https://docs.lvgl.io/master/overview/file-system.html) or just enable one in `lv_conf.h` with `LV_USE_FS_...`
 
 
 
 ## Converter
 
 ### Converting JPG to C array
-  - Use lvgl online tool https://lvgl.io/tools/imageconverter 
+  - Use lvgl online tool https://lvgl.io/tools/imageconverter
   - Color format = RAW, output format = C Array
-  
-### Converting JPG to SJPG  
+
+### Converting JPG to SJPG
 python3 and the PIL library required. (PIL can be installed with `pip3 install pillow`)
 
 To create SJPG from JPG:

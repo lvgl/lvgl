@@ -1,5 +1,5 @@
 #include "../lv_examples.h"
-#if LV_BUILD_EXAMPLES && LV_USE_SLIDER && LV_USE_CHART && LV_USE_BTN
+#if LV_BUILD_EXAMPLES && LV_USE_SLIDER && LV_USE_CHART && LV_USE_BTN && LV_USE_GRID
 
 /**
  * the example show the use of cubic-bezier3 in animation.
@@ -36,8 +36,8 @@ static void anim_x_cb(void * var, int32_t v);
  */
 void lv_example_anim_3(void)
 {
-    static lv_coord_t col_dsc[] = {LV_GRID_FR(1), 200, LV_GRID_FR(1),LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t row_dsc[] = {30, 10, 10, LV_GRID_FR(1),LV_GRID_TEMPLATE_LAST};
+    static lv_coord_t col_dsc[] = {LV_GRID_FR(1), 200, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static lv_coord_t row_dsc[] = {30, 10, 10, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
     /*Create a container with grid*/
     lv_obj_t * cont = lv_obj_create(lv_scr_act());
@@ -53,7 +53,7 @@ void lv_example_anim_3(void)
     lv_anim_init(&ginfo.a);
     lv_anim_set_var(&ginfo.a, ginfo.anim_obj);
     int32_t end = lv_obj_get_style_width(cont, LV_PART_MAIN) -
-        lv_obj_get_style_width(ginfo.anim_obj, LV_PART_MAIN) - 10;
+                  lv_obj_get_style_width(ginfo.anim_obj, LV_PART_MAIN) - 10;
     lv_anim_set_values(&ginfo.a, 5, end);
     lv_anim_set_time(&ginfo.a, 2000);
     lv_anim_set_exec_cb(&ginfo.a, anim_x_cb);
@@ -124,14 +124,14 @@ static void page_obj_init(lv_obj_t * par)
     lv_obj_set_align(ginfo.anim_obj, LV_ALIGN_TOP_LEFT);
     lv_obj_clear_flag(ginfo.anim_obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(ginfo.anim_obj, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
-    lv_obj_set_grid_cell(ginfo.anim_obj, LV_GRID_ALIGN_START, 0, 1,LV_GRID_ALIGN_START, 0, 1);
+    lv_obj_set_grid_cell(ginfo.anim_obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
 
     ginfo.p1_label = lv_label_create(par);
     ginfo.p2_label = lv_label_create(par);
     lv_label_set_text(ginfo.p1_label, "p1:0");
     lv_label_set_text(ginfo.p2_label, "p2:0");
-    lv_obj_set_grid_cell(ginfo.p1_label, LV_GRID_ALIGN_START, 0, 1,LV_GRID_ALIGN_START, 1, 1);
-    lv_obj_set_grid_cell(ginfo.p2_label, LV_GRID_ALIGN_START, 0, 1,LV_GRID_ALIGN_START, 2, 1);
+    lv_obj_set_grid_cell(ginfo.p1_label, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 1);
+    lv_obj_set_grid_cell(ginfo.p2_label, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 2, 1);
 
     ginfo.p1_slider = lv_slider_create(par);
     ginfo.p2_slider = lv_slider_create(par);
@@ -141,15 +141,15 @@ static void page_obj_init(lv_obj_t * par)
     lv_obj_set_style_pad_all(ginfo.p2_slider, 2, LV_PART_KNOB);
     lv_obj_add_event_cb(ginfo.p1_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ginfo.p2_slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_set_grid_cell(ginfo.p1_slider, LV_GRID_ALIGN_STRETCH, 1, 1,LV_GRID_ALIGN_START, 1, 1);
-    lv_obj_set_grid_cell(ginfo.p2_slider, LV_GRID_ALIGN_STRETCH, 1, 1,LV_GRID_ALIGN_START, 2, 1);
+    lv_obj_set_grid_cell(ginfo.p1_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 1, 1);
+    lv_obj_set_grid_cell(ginfo.p2_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 2, 1);
 
     ginfo.run_btn = lv_btn_create(par);
     lv_obj_add_event_cb(ginfo.run_btn, run_btn_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_t * btn_label = lv_label_create(ginfo.run_btn);
     lv_label_set_text(btn_label, LV_SYMBOL_PLAY);
     lv_obj_center(btn_label);
-    lv_obj_set_grid_cell(ginfo.run_btn, LV_GRID_ALIGN_STRETCH, 2, 1,LV_GRID_ALIGN_STRETCH, 1, 2);
+    lv_obj_set_grid_cell(ginfo.run_btn, LV_GRID_ALIGN_STRETCH, 2, 1, LV_GRID_ALIGN_STRETCH, 1, 2);
 
     ginfo.chart = lv_chart_create(par);
     lv_obj_set_style_pad_all(ginfo.chart, 0, LV_PART_MAIN);
@@ -159,7 +159,7 @@ static void page_obj_init(lv_obj_t * par)
     lv_chart_set_range(ginfo.chart, LV_CHART_AXIS_PRIMARY_Y, 0, 1024);
     lv_chart_set_range(ginfo.chart, LV_CHART_AXIS_PRIMARY_X, 0, 1024);
     lv_chart_set_point_count(ginfo.chart, CHART_POINTS_NUM);
-    lv_obj_set_grid_cell(ginfo.chart, LV_GRID_ALIGN_STRETCH, 0, 3,LV_GRID_ALIGN_STRETCH, 3, 1);
+    lv_obj_set_grid_cell(ginfo.chart, LV_GRID_ALIGN_STRETCH, 0, 3, LV_GRID_ALIGN_STRETCH, 3, 1);
 }
 
 #endif

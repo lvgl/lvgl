@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<index schemaVersion="1.0.0" xs:noNamespaceSchemaLocation="PackIndex.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
+  <vendor>LVGL</vendor>
+  <url>https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/</url>
+  <timestamp>2023-05-03</timestamp>
+  <pindex>
+    <pdsc url="https://raw.githubusercontent.com/lvgl/lvgl/release/v8.3/env_support/cmsis-pack/" vendor="LVGL" name="lvgl" version="8.3.7"/>
+  </pindex>
+</index>

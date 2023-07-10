@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/core/img.md
-```
 # Image (lv_img)
 
 
@@ -35,7 +31,7 @@ To set an image sourced from a file, use `lv_img_set_src(img, "S:folder1/my_img.
 You can also set a symbol similarly to [Labels](/widgets/core/label). In this case, the image will be rendered as text according to the *font* specified in the style.  It enables to use of light-weight monochrome "letters" instead of real images. You can set symbol like `lv_img_set_src(img1, LV_SYMBOL_OK)`.
 
 ### Label as an image
-Images and labels are sometimes used to convey the same thing. For example, to describe what a button does. 
+Images and labels are sometimes used to convey the same thing. For example, to describe what a button does.
 Therefore, images and labels are somewhat interchangeable, that is the images can display texts by using `LV_SYMBOL_DUMMY` as the prefix of the text. For example, `lv_img_set_src(img, LV_SYMBOL_DUMMY "Some text")`.
 
 
@@ -75,7 +71,7 @@ Using the offset parameter a [Texture atlas](https://en.wikipedia.org/wiki/Textu
 
 ## Transformations
 
-Using the `lv_img_set_zoom(img, factor)` the images will be zoomed. Set `factor` to `256` or `LV_IMG_ZOOM_NONE` to disable zooming. 
+Using the `lv_img_set_zoom(img, factor)` the images will be zoomed. Set `factor` to `256` or `LV_IMG_ZOOM_NONE` to disable zooming.
 A larger value enlarges the images (e.g. `512` double size), a smaller value shrinks it (e.g. `128` half size).
 Fractional scale works as well. E.g. `281` for 10% enlargement.
 
@@ -87,16 +83,21 @@ By default, the pivot point of the rotation is the center of the image. It can b
 
 The quality of the transformation can be adjusted with `lv_img_set_antialias(img, true/false)`. With enabled anti-aliasing the transformations are higher quality but slower.
 
-The transformations require the whole image to be available. Therefore indexed images (`LV_IMG_CF_INDEXED_...`), alpha only images (`LV_IMG_CF_ALPHA_...`) or images from files can not be transformed. 
+The transformations require the whole image to be available. Therefore indexed images (`LV_IMG_CF_INDEXED_...`), alpha only images (`LV_IMG_CF_ALPHA_...`) or images from files can not be transformed.
 In other words transformations work only on true color images stored as C array, or if a custom [Image decoder](/overview/images#image-edecoder) returns the whole image.
 
 Note that the real coordinates of image objects won't change during transformation. That is `lv_obj_get_width/height/x/y()` will return the original, non-zoomed coordinates.
 
+**IMPORTANT**
+The transformation of the image is independent of the transformation properties coming from styles. (See [here](/overview/style#opacity-and-transformations)). The main differences are that pure image widget transformation
+- doesn't transform the children of the image widget
+- image is transformed directly without creating an intermediate layer (buffer) to snapshot the widget
+
 ### Size mode
 
-By default, when the image is zoomed or rotated the real coordinates of the image object are not changed. 
-The larger content simply overflows the object's boundaries. 
-It also means the layouts are not affected the by the transformations. 
+By default, when the image is zoomed or rotated the real coordinates of the image object are not changed.
+The larger content simply overflows the object's boundaries.
+It also means the layouts are not affected the by the transformations.
 
 If you need the object size to be updated to the transformed size set `lv_img_set_size_mode(img, LV_IMG_SIZE_MODE_REAL)`. (The previous mode is the default and called `LV_IMG_SIZE_MODE_VIRTUAL`).
 In this case if the width/height of the object is set to `LV_SIZE_CONTENT` the object's size will be set to the zoomed and rotated size.
@@ -104,8 +105,8 @@ If an explicit size is set then the overflowing content will be cropped.
 
 ### Rounded image
 
-You can use `lv_obj_set_style_radius` to set radius to an image, and enable `lv_obj_set_style_clip_corner` to clip the 
-content to rounded rectangle or circular shape. Please note this will have some negative performance impact to CPU 
+You can use `lv_obj_set_style_radius` to set radius to an image, and enable `lv_obj_set_style_clip_corner` to clip the
+content to rounded rectangle or circular shape. Please note this will have some negative performance impact to CPU
 based renderers.
 
 ## Events

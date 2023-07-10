@@ -17,7 +17,7 @@ LV_DPI =130
 LV_ANIM_REPEAT_INFINITE = -1
 
 # Register SDL display driver.
-        
+
 disp_buf1 = lv.disp_buf_t()
 buf1_1 = bytes(480 * 10)
 disp_buf1.init(buf1_1, None, len(buf1_1)//4)
@@ -32,7 +32,7 @@ disp_drv.register()
 # Register SDL mouse driver
 
 indev_drv = lv.indev_drv_t()
-indev_drv.init() 
+indev_drv.init()
 indev_drv.type = lv.INDEV_TYPE.POINTER
 indev_drv.read_cb = SDL.mouse_read
 indev_drv.register()
@@ -55,7 +55,7 @@ def LV_DPX(n):
         return tmp
     else:
         return 1
-    
+
 def color_chg_event_cb(sw, e):
     if e == lv.EVENT.VALUE_CHANGED:
         flag = lv.THEME_MATERIAL_FLAG.LIGHT
@@ -63,7 +63,7 @@ def color_chg_event_cb(sw, e):
             flag=lv.THEME_MATERIAL_FLAG.DARK
         theme = lv.theme_material_init(LV_THEME_DEFAULT_COLOR_PRIMARY,LV_THEME_DEFAULT_COLOR_SECONDARY,flag,
                                        lv.theme_get_font_small(), lv.theme_get_font_normal(), lv.theme_get_font_subtitle(),
-                                       lv.theme_get_font_title())   
+                                       lv.theme_get_font_title())
 def slider_event_cb(slider, e):
     if e == lv.EVENT.VALUE_CHANGED:
         if slider.get_type() == lv.slider.TYPE.NORMAL:
@@ -75,19 +75,19 @@ def slider_event_cb(slider, e):
             slider_string = str(slider_left) + '-' + str(slider_right)
             # print("slider left value: %d, slider right value: %d"%(slider_left,slider_right))
             slider.set_style_local_value_str(lv.slider.PART.INDIC, lv.STATE.DEFAULT, slider_string)
-            
+
 def linemeter_anim(a,lmeter, value):
     lmeter.set_value(value)
     label = lmeter.get_child(None)
     label.set_text(str(value))
     label.align(lmeter, lv.ALIGN.CENTER, 0, 0)
-    
+
 def gauge_anim(a,gauge,val):
     gauge.set_value(0,val)
     label=gauge.get_child(None)
     label.set_text(str(val))
     label.align(gauge, lv.ALIGN.CENTER, 0, 0)
-    
+
 def bar_anim(task,bar):
     val = bar.get_value()
     # print("bar value: ",val)
@@ -95,11 +95,11 @@ def bar_anim(task,bar):
     val += 1
     if val > max_value:
         val=0
-    bar.set_value(val,lv.ANIM.OFF)    
+    bar.set_value(val,lv.ANIM.OFF)
     cpy_string = "Copying %d/%d"% (val, max_value)
     # print(cpy_string)
     bar.set_style_local_value_str(lv.bar.PART.BG, lv.STATE.DEFAULT, cpy_string)
-    
+
 def arc_phase1_ready_cb(a,arc):
     a_arc=lv.anim_t()
     a_arc.init()
@@ -117,19 +117,19 @@ def arc_phase2_ready_cb(a,arc):
     a_arc.set_values(0, 360)
     a_arc.set_ready_cb(lambda a: arc_phase1_ready_cb(a,arc))
     lv.anim_t.start(a_arc)
-    
+
 def anim_phase1(a,arc,val):
     arc.set_end_angle(val)
     label = arc.get_child(None)
     label.set_text(str(val))
     label.align(arc, lv.ALIGN.CENTER, 0, 0)
-    
+
 def anim_phase2(a,arc,val):
     arc.set_end_angle(val)
     label = arc.get_child(None)
     label.set_text(str(val))
     label.align(arc, lv.ALIGN.CENTER, 0, 0)
-    
+
 def controls_create(parent):
     lv.page.set_scrl_layout(lv.page.__cast__(parent), lv.LAYOUT.PRETTY_TOP)
     if LV_DEMO_WIDGETS_SLIDESHOW == 0:
@@ -139,15 +139,15 @@ def controls_create(parent):
         btnm = lv.btnmatrix.__cast__(m.get_btnmatrix())
         # print("type(btnm): ",type(btnm))
         btnm.set_btn_ctrl(1, lv.btnmatrix.CTRL.CHECK_STATE)
-        
+
     h = lv.cont(parent, None)
     h.set_layout(lv.LAYOUT.PRETTY_MID)
     h.add_style(lv.cont.PART.MAIN, style_box)
     h.set_drag_parent(True)
-    
+
     h.set_style_local_value_str(lv.cont.PART.MAIN, lv.STATE.DEFAULT, "Basics")
-    
-    disp_size = display.get_size_category()   
+
+    disp_size = display.get_size_category()
     if disp_size <= lv.DISP_SIZE.SMALL:
         grid_w= lv.page.get_width_grid(lv.page.__cast__(parent),1,1)
         # print("grid_w: ",grid_w)
@@ -157,23 +157,23 @@ def controls_create(parent):
 
     h.set_fit2(lv.FIT.NONE, lv.FIT.TIGHT)
     h.set_width(grid_w)
-    btn = lv.btn(h,None)    
+    btn = lv.btn(h,None)
     btn.set_fit2(lv.FIT.NONE, lv.FIT.TIGHT)
     if disp_size <= lv.DISP_SIZE.SMALL:
         button_width=h.get_width_grid(1,1)
     else:
         button_width=h.get_width_grid(2,1)
     # print("button_width: %d"%button_width)
-    
+
     btn.set_width(button_width)
     label = lv.label(btn, None)
     label.set_text("Button")
-    
+
     btn = lv.btn(h, btn)
     btn.toggle()
     label = lv.label(btn, None)
     label.set_text("Button")
-    
+
     lv.switch(h, None)
 
     lv.checkbox(h, None)
@@ -184,7 +184,7 @@ def controls_create(parent):
     slider.set_value(40, lv.ANIM.OFF)
     slider.set_event_cb(slider_event_cb)
     slider.set_width_margin(fit_w);
-    
+
     # Use the knobs style value the display the current value in focused state
     slider.set_style_local_margin_top(lv.slider.PART.BG, lv.STATE.DEFAULT, LV_DPX(25))
     slider.set_style_local_value_font(lv.slider.PART.KNOB, lv.STATE.DEFAULT, lv.theme_get_font_small())
@@ -194,7 +194,7 @@ def controls_create(parent):
     slider.set_style_local_transition_time(lv.slider.PART.KNOB, lv.STATE.DEFAULT, 300)
     slider.set_style_local_transition_prop_5(lv.slider.PART.KNOB, lv.STATE.DEFAULT, lv.STYLE.VALUE_OFS_Y)
     slider.set_style_local_transition_prop_6(lv.slider.PART.KNOB, lv.STATE.DEFAULT, lv.STYLE.VALUE_OPA)
-    
+
     slider = lv.slider(h, None)
     slider.set_type(lv.slider.TYPE.RANGE)
     slider.set_value(70, lv.ANIM.OFF)
@@ -206,11 +206,11 @@ def controls_create(parent):
     lv.event_send(slider,lv.EVENT.VALUE_CHANGED, None)      # To refresh the text
     if slider.get_width() > fit_w:
         slider.set_width(fit_w)
-        
+
     h = lv.cont(parent, h)
     h.set_fit(lv.FIT.NONE)
     h.set_style_local_value_str(lv.cont.PART.MAIN, lv.STATE.DEFAULT, "Text input")
-    
+
     ta = lv.textarea(h, None)
     lv.cont.set_fit2(h,lv.FIT.PARENT, lv.FIT.NONE)
     ta.set_text("")
@@ -258,7 +258,7 @@ def visuals_create(parent):
     chart.set_div_line_count(3, 0)
     chart.set_point_count(8)
     chart.set_type(lv.chart.TYPE.LINE)
-    
+
     if disp_size > lv.DISP_SIZE.SMALL:
         chart.set_style_local_pad_left(lv.chart.PART.BG, lv.STATE.DEFAULT, 4 * (LV_DPI // 10))
         chart.set_style_local_pad_bottom(lv.chart.PART.BG, lv.STATE.DEFAULT, 3 * (LV_DPI // 10))
@@ -268,7 +268,7 @@ def visuals_create(parent):
         chart.set_x_tick_length(0, 0)
         chart.set_y_tick_texts("600\n500\n400\n300\n200", 0, lv.chart.AXIS.DRAW_LAST_TICK)
         chart.set_x_tick_texts("Jan\nFeb\nMar\nApr\nMay\nJun\nJul\nAug", 0, lv.chart.AXIS.DRAW_LAST_TICK)
-        
+
     s1 = chart.add_series(LV_THEME_DEFAULT_COLOR_PRIMARY)
     s2 = chart.add_series(LV_THEME_DEFAULT_COLOR_SECONDARY)
 
@@ -282,7 +282,7 @@ def visuals_create(parent):
     chart.set_next(s1, 60)
     chart.set_next(s1, 10)
     chart.set_next(s1, 90)
-    
+
     chart.set_next(s2, 32)
     chart.set_next(s2, 66)
     chart.set_next(s2, 5)
@@ -333,7 +333,7 @@ def visuals_create(parent):
         grid_w_meter = lv.page.get_width_grid(page, 2, 1)
     else:
         grid_w_meter = lv.page.get_width_grid(page, 3, 1)
-        
+
     meter_h = lv.page.get_height_fit(page)
     if grid_w_meter < meter_h:
         meter_size = grid_w_meter
@@ -359,7 +359,7 @@ def visuals_create(parent):
     a_lm.set_playback_time(1000)
     a_lm.set_repeat_count(LV_ANIM_REPEAT_INFINITE)
     lv.anim_t.start(a_lm)
-    
+
     gauge = lv.gauge(parent, None)
     gauge.set_drag_parent(True)
     gauge.set_size(meter_size, meter_size)
@@ -378,7 +378,7 @@ def visuals_create(parent):
     a_ga.set_repeat_count(LV_ANIM_REPEAT_INFINITE)
     a_ga.set_custom_exec_cb(lambda a, val: gauge_anim(a,gauge,val))
     lv.anim_t.start(a_ga)
-    
+
     arc = lv.arc(parent,None)
     arc.set_drag_parent(True)
     arc.set_bg_angles(0, 360)
@@ -412,7 +412,7 @@ def visuals_create(parent):
         bar_h.set_width(lv.page.get_width_grid(page, 2, 1))
     else:
         bar_h.set_width(lv.page.get_width_grid(parent, 3, 2))
-    
+
     bar = lv.bar(bar_h,None)
     bar.set_width(lv.cont.get_width_fit(bar_h))
     bar.set_style_local_value_font(lv.bar.PART.BG, lv.STATE.DEFAULT, lv.theme_get_font_small())
@@ -421,7 +421,7 @@ def visuals_create(parent):
     bar.set_style_local_margin_bottom(lv.bar.PART.BG, lv.STATE.DEFAULT, LV_DPI // 7)
     bar.align(None, lv.ALIGN.CENTER, 0, 0)
     bar.set_value(30,lv.ANIM.OFF)
-    
+
     led_h = lv.cont(parent, None)
     led_h.set_layout(lv.LAYOUT.PRETTY_MID)
     if disp_size <= lv.DISP_SIZE.SMALL:
@@ -459,9 +459,9 @@ def visuals_create(parent):
 def selectors_create(parent):
     page = lv.page.__cast__(parent)
     lv.page.set_scrl_layout(page, lv.LAYOUT.PRETTY_MID)
-    
+
     grid_h = page.get_height_grid(1, 1)
-    
+
     if disp_size <= lv.DISP_SIZE.SMALL:
         grid_w = page.get_width_grid(1, 1)
     else:
@@ -497,7 +497,7 @@ def selectors_create(parent):
         h.set_style_local_pad_top(lv.cont.PART_MAIN, LV_STATE_DEFAULT, 0);
         h.set_size(min(grid_h, grid_w), min(grid_h, grid_w))
         h.set_layout(lv.LAYOUT.PRETTY_TOP)
-        
+
     roller = lv.roller(h, None)
     roller.add_style(lv.cont.PART.MAIN, style_box)
     roller.set_style_local_value_str(lv.cont.PART.MAIN, lv.STATE.DEFAULT, "Roller")
@@ -508,8 +508,8 @@ def selectors_create(parent):
         roller.set_width(lv.cont.get_width_grid(h, 1 , 1))
     else:
         roller.set_width(lv.cont.get_width_grid(h, 2 , 1))
-        
-        
+
+
     dd = lv.dropdown(h, None)
     dd.add_style(lv.cont.PART.MAIN, style_box)
     dd.set_style_local_value_str(lv.cont.PART.MAIN, lv.STATE.DEFAULT, "Dropdown")
@@ -517,20 +517,20 @@ def selectors_create(parent):
         dd.set_width(lv.cont.get_width_grid(h, 1 , 1))
     else:
         dd.set_width(lv.cont.get_width_grid(h, 2 , 1))
-        
+
     dd.set_options("Alpha\nBravo\nCharlie\nDelta\nEcho\nFoxtrot\nGolf\nHotel\nIndia\nJuliette\nKilo\nLima\nMike\nNovember\n"
                    "Oscar\nPapa\nQuebec\nRomeo\nSierra\nTango\nUniform\nVictor\nWhiskey\nXray\nYankee\nZulu")
-        
+
     list = lv.list(parent, None)
     list.set_scroll_propagation(True)
     list.set_size(grid_w, grid_h)
-    
+
     txts = [lv.SYMBOL.SAVE, "Save", lv.SYMBOL.CUT, "Cut", lv.SYMBOL.COPY, "Copy",
             lv.SYMBOL.OK, "This is a quite long text to scroll on the list", lv.SYMBOL.EDIT, "Edit", lv.SYMBOL.WIFI, "Wifi",
             lv.SYMBOL.BLUETOOTH, "Bluetooth",  lv.SYMBOL.GPS, "GPS", lv.SYMBOL.USB, "USB",
             lv.SYMBOL.SD_CARD, "SD card", lv.SYMBOL.CLOSE, "Close"]
-    
- 
+
+
     for i in range(0,len(txts)//2,2):
         btn = list.add_btn(txts[i], txts[i + 1]);
         lv.btn.set_checkable(lv.btn.__cast__(btn),True)
@@ -538,9 +538,9 @@ def selectors_create(parent):
         # Make a button disabled
         if i == 4:
             btn.set_state(lv.btn.STATE.DISABLED)
-            
+
     cal.set_highlighted_dates(hl, 2)
-    
+
 tv = lv.tabview(lv.scr_act(), None)
 display = scr.get_disp()
 disp_size = display.get_size_category()
@@ -549,7 +549,7 @@ tv.set_style_local_pad_left(lv.tabview.PART.TAB_BG, lv.STATE.DEFAULT, disp_drv.h
 sw = lv.switch(lv.scr_act(), None)
 if lv.theme_get_flags() & lv.THEME_MATERIAL_FLAG.DARK:
    sw.on(LV_ANIM_OFF)
-sw.set_event_cb(color_chg_event_cb)   
+sw.set_event_cb(color_chg_event_cb)
 sw.set_pos(LV_DPX(10), LV_DPX(10))
 sw.set_style_local_value_str(lv.switch.PART.BG, lv.STATE.DEFAULT, "Dark")
 sw.set_style_local_value_align(lv.switch.PART.BG, lv.STATE.DEFAULT, lv.ALIGN.OUT_RIGHT_MID)
@@ -567,6 +567,6 @@ style_box.set_value_ofs_y(lv.STATE.DEFAULT, - LV_DPX(10))
 style_box.set_margin_top(lv.STATE.DEFAULT, LV_DPX(30))
 
 controls_create(t1)
-visuals_create(t2)                            
+visuals_create(t2)
 selectors_create(t3)
 

@@ -31,9 +31,8 @@ static void ta_event_cb(lv_event_t * e)
     lv_obj_t * ta = lv_event_get_target(e);
     const char * txt = lv_textarea_get_text(ta);
     if(txt[0] >= '0' && txt[0] <= '9' &&
-        txt[1] >= '0' && txt[1] <= '9' &&
-        txt[2] != ':')
-    {
+       txt[1] >= '0' && txt[1] <= '9' &&
+       txt[2] != ':') {
         lv_textarea_set_cursor_pos(ta, 2);
         lv_textarea_add_char(ta, ':');
     }

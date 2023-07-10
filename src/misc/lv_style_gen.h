@@ -13,6 +13,8 @@ void lv_style_set_translate_x(lv_style_t * style, lv_coord_t value);
 void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value);
 void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t value);
 void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value);
+void lv_style_set_transform_pivot_x(lv_style_t * style, lv_coord_t value);
+void lv_style_set_transform_pivot_y(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_top(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_bottom(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_left(lv_style_t * style, lv_coord_t value);
@@ -20,10 +22,8 @@ void lv_style_set_pad_right(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_row(lv_style_t * style, lv_coord_t value);
 void lv_style_set_pad_column(lv_style_t * style, lv_coord_t value);
 void lv_style_set_bg_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_bg_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_bg_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_bg_grad_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_bg_grad_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_bg_grad_dir(lv_style_t * style, lv_grad_dir_t value);
 void lv_style_set_bg_main_stop(lv_style_t * style, lv_coord_t value);
 void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t value);
@@ -32,18 +32,15 @@ void lv_style_set_bg_dither_mode(lv_style_t * style, lv_dither_mode_t value);
 void lv_style_set_bg_img_src(lv_style_t * style, const void * value);
 void lv_style_set_bg_img_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_bg_img_recolor(lv_style_t * style, lv_color_t value);
-void lv_style_set_bg_img_recolor_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_bg_img_recolor_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_bg_img_tiled(lv_style_t * style, bool value);
 void lv_style_set_border_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_border_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_border_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_border_width(lv_style_t * style, lv_coord_t value);
 void lv_style_set_border_side(lv_style_t * style, lv_border_side_t value);
 void lv_style_set_border_post(lv_style_t * style, bool value);
 void lv_style_set_outline_width(lv_style_t * style, lv_coord_t value);
 void lv_style_set_outline_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_outline_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_outline_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_outline_pad(lv_style_t * style, lv_coord_t value);
 void lv_style_set_shadow_width(lv_style_t * style, lv_coord_t value);
@@ -51,27 +48,22 @@ void lv_style_set_shadow_ofs_x(lv_style_t * style, lv_coord_t value);
 void lv_style_set_shadow_ofs_y(lv_style_t * style, lv_coord_t value);
 void lv_style_set_shadow_spread(lv_style_t * style, lv_coord_t value);
 void lv_style_set_shadow_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_shadow_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_img_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value);
-void lv_style_set_img_recolor_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_img_recolor_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_line_width(lv_style_t * style, lv_coord_t value);
 void lv_style_set_line_dash_width(lv_style_t * style, lv_coord_t value);
 void lv_style_set_line_dash_gap(lv_style_t * style, lv_coord_t value);
 void lv_style_set_line_rounded(lv_style_t * style, bool value);
 void lv_style_set_line_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_line_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_line_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_arc_width(lv_style_t * style, lv_coord_t value);
 void lv_style_set_arc_rounded(lv_style_t * style, bool value);
 void lv_style_set_arc_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_arc_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_arc_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_arc_img_src(lv_style_t * style, const void * value);
 void lv_style_set_text_color(lv_style_t * style, lv_color_t value);
-void lv_style_set_text_color_filtered(lv_style_t * style, lv_color_t value);
 void lv_style_set_text_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_text_font(lv_style_t * style, const lv_font_t * value);
 void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t value);
@@ -83,6 +75,7 @@ void lv_style_set_clip_corner(lv_style_t * style, bool value);
 void lv_style_set_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value);
 void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value);
+void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
 void lv_style_set_anim_time(lv_style_t * style, uint32_t value);
 void lv_style_set_anim_speed(lv_style_t * style, uint32_t value);
 void lv_style_set_transition(lv_style_t * style, const lv_style_transition_dsc_t * value);
@@ -165,6 +158,16 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
         .prop = LV_STYLE_TRANSFORM_ANGLE, .value = { .num = (int32_t)val } \
     }
 
+#define LV_STYLE_CONST_TRANSFORM_PIVOT_X(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_PIVOT_X, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_TRANSFORM_PIVOT_Y(val) \
+    { \
+        .prop = LV_STYLE_TRANSFORM_PIVOT_Y, .value = { .num = (int32_t)val } \
+    }
+
 #define LV_STYLE_CONST_PAD_TOP(val) \
     { \
         .prop = LV_STYLE_PAD_TOP, .value = { .num = (int32_t)val } \
@@ -200,11 +203,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
         .prop = LV_STYLE_BG_COLOR, .value = { .color = val } \
     }
 
-#define LV_STYLE_CONST_BG_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_BG_COLOR_FILTERED, .value = { .color = val } \
-    }
-
 #define LV_STYLE_CONST_BG_OPA(val) \
     { \
         .prop = LV_STYLE_BG_OPA, .value = { .num = (int32_t)val } \
@@ -213,11 +211,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_BG_GRAD_COLOR(val) \
     { \
         .prop = LV_STYLE_BG_GRAD_COLOR, .value = { .color = val } \
-    }
-
-#define LV_STYLE_CONST_BG_GRAD_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_BG_GRAD_COLOR_FILTERED, .value = { .color = val } \
     }
 
 #define LV_STYLE_CONST_BG_GRAD_DIR(val) \
@@ -260,11 +253,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
         .prop = LV_STYLE_BG_IMG_RECOLOR, .value = { .color = val } \
     }
 
-#define LV_STYLE_CONST_BG_IMG_RECOLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_BG_IMG_RECOLOR_FILTERED, .value = { .color = val } \
-    }
-
 #define LV_STYLE_CONST_BG_IMG_RECOLOR_OPA(val) \
     { \
         .prop = LV_STYLE_BG_IMG_RECOLOR_OPA, .value = { .num = (int32_t)val } \
@@ -278,11 +266,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_BORDER_COLOR(val) \
     { \
         .prop = LV_STYLE_BORDER_COLOR, .value = { .color = val } \
-    }
-
-#define LV_STYLE_CONST_BORDER_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_BORDER_COLOR_FILTERED, .value = { .color = val } \
     }
 
 #define LV_STYLE_CONST_BORDER_OPA(val) \
@@ -313,11 +296,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_OUTLINE_COLOR(val) \
     { \
         .prop = LV_STYLE_OUTLINE_COLOR, .value = { .color = val } \
-    }
-
-#define LV_STYLE_CONST_OUTLINE_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_OUTLINE_COLOR_FILTERED, .value = { .color = val } \
     }
 
 #define LV_STYLE_CONST_OUTLINE_OPA(val) \
@@ -355,11 +333,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
         .prop = LV_STYLE_SHADOW_COLOR, .value = { .color = val } \
     }
 
-#define LV_STYLE_CONST_SHADOW_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_SHADOW_COLOR_FILTERED, .value = { .color = val } \
-    }
-
 #define LV_STYLE_CONST_SHADOW_OPA(val) \
     { \
         .prop = LV_STYLE_SHADOW_OPA, .value = { .num = (int32_t)val } \
@@ -373,11 +346,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_IMG_RECOLOR(val) \
     { \
         .prop = LV_STYLE_IMG_RECOLOR, .value = { .color = val } \
-    }
-
-#define LV_STYLE_CONST_IMG_RECOLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_IMG_RECOLOR_FILTERED, .value = { .color = val } \
     }
 
 #define LV_STYLE_CONST_IMG_RECOLOR_OPA(val) \
@@ -410,11 +378,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
         .prop = LV_STYLE_LINE_COLOR, .value = { .color = val } \
     }
 
-#define LV_STYLE_CONST_LINE_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_LINE_COLOR_FILTERED, .value = { .color = val } \
-    }
-
 #define LV_STYLE_CONST_LINE_OPA(val) \
     { \
         .prop = LV_STYLE_LINE_OPA, .value = { .num = (int32_t)val } \
@@ -435,11 +398,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
         .prop = LV_STYLE_ARC_COLOR, .value = { .color = val } \
     }
 
-#define LV_STYLE_CONST_ARC_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_ARC_COLOR_FILTERED, .value = { .color = val } \
-    }
-
 #define LV_STYLE_CONST_ARC_OPA(val) \
     { \
         .prop = LV_STYLE_ARC_OPA, .value = { .num = (int32_t)val } \
@@ -453,11 +411,6 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_TEXT_COLOR(val) \
     { \
         .prop = LV_STYLE_TEXT_COLOR, .value = { .color = val } \
-    }
-
-#define LV_STYLE_CONST_TEXT_COLOR_FILTERED(val) \
-    { \
-        .prop = LV_STYLE_TEXT_COLOR_FILTERED, .value = { .color = val } \
     }
 
 #define LV_STYLE_CONST_TEXT_OPA(val) \
@@ -513,6 +466,11 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_COLOR_FILTER_OPA(val) \
     { \
         .prop = LV_STYLE_COLOR_FILTER_OPA, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_ANIM(val) \
+    { \
+        .prop = LV_STYLE_ANIM, .value = { .ptr = val } \
     }
 
 #define LV_STYLE_CONST_ANIM_TIME(val) \

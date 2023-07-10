@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/color.md
-```
 # Colors
 
 The color module handles all color-related functions like changing color depth, creating colors from hex code, converting between color depths, mixing colors, etc.
@@ -19,10 +15,10 @@ Create colors from Red, Green and Blue channel values:
 lv_color_t c = lv_color_make(red, green, blue);
 
 //From hex code 0x000000..0xFFFFFF interpreted as RED + GREEN + BLUE
-lv_color_t c = lv_color_hex(0x123456); 
+lv_color_t c = lv_color_hex(0x123456);
 
 //From 3 digits. Same as lv_color_hex(0x112233)
-lv_color_t c = lv_color_hex3(0x123); 
+lv_color_t c = lv_color_hex3(0x123);
 ```
 
 ### HSV

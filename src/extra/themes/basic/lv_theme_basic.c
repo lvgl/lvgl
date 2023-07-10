@@ -89,7 +89,6 @@ static void style_init(void)
     lv_style_set_arc_width(&styles->white, 2);
     lv_style_set_arc_color(&styles->white, COLOR_WHITE);
 
-
     style_init_reset(&styles->light);
     lv_style_set_bg_opa(&styles->light, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->light, COLOR_LIGHT);
@@ -224,20 +223,17 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_MSGBOX
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
             lv_obj_add_style(obj, &styles->light, LV_PART_ITEMS);
-            lv_obj_add_style(obj, &styles->dark, LV_PART_ITEMS | LV_STATE_PRESSED);
             return;
         }
 #endif
 #if LV_USE_TABVIEW
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_tabview_class)) {
             lv_obj_add_style(obj, &styles->light, LV_PART_ITEMS);
-            lv_obj_add_style(obj, &styles->dark, LV_PART_ITEMS | LV_STATE_PRESSED);
             return;
         }
 #endif
         lv_obj_add_style(obj, &styles->white, 0);
         lv_obj_add_style(obj, &styles->light, LV_PART_ITEMS);
-        lv_obj_add_style(obj, &styles->dark, LV_PART_ITEMS | LV_STATE_PRESSED);
     }
 #endif
 
@@ -273,7 +269,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_SWITCH
     else if(lv_obj_check_type(obj, &lv_switch_class)) {
         lv_obj_add_style(obj, &styles->light, 0);
-        lv_obj_add_style(obj, &styles->dark, LV_PART_INDICATOR | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->dim, LV_PART_KNOB);
     }
 #endif
@@ -349,14 +344,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
         lv_obj_add_style(obj, &styles->white, 0);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
-        lv_obj_add_style(obj, &styles->ta_cursor, LV_PART_CURSOR);
+        lv_obj_add_style(obj, &styles->ta_cursor, LV_PART_CURSOR | LV_STATE_FOCUSED);
     }
 #endif
 
 #if LV_USE_CALENDAR
     else if(lv_obj_check_type(obj, &lv_calendar_class)) {
         lv_obj_add_style(obj, &styles->light, 0);
-        lv_obj_add_style(obj, &styles->light, LV_PART_ITEMS | LV_STATE_PRESSED);
     }
 #endif
 

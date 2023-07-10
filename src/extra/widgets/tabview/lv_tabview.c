@@ -121,6 +121,20 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     return page;
 }
 
+void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t id, const char * new_name)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
+
+    if(id >= tabview->tab_cnt) return;
+    if(tabview->tab_pos & LV_DIR_HOR) id *= 2;
+
+    lv_mem_free(tabview->map[id]);
+    tabview->map[id] = lv_mem_alloc(strlen(new_name) + 1);
+    strcpy(tabview->map[id], new_name);
+    lv_obj_invalidate(obj);
+}
+
 void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -135,14 +149,22 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 
     lv_obj_t * cont = lv_tabview_get_content(obj);
     if(cont == NULL) return;
-    lv_coord_t gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
-    lv_coord_t w = lv_obj_get_content_width(cont);
-    if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
-        lv_obj_scroll_to_x(cont, id * (gap + w), anim_en);
+
+    if((tabview->tab_pos & LV_DIR_VER) != 0) {
+        lv_coord_t gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
+        lv_coord_t w = lv_obj_get_content_width(cont);
+        if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) != LV_BASE_DIR_RTL) {
+            lv_obj_scroll_to_x(cont, id * (gap + w), anim_en);
+        }
+        else {
+            int32_t id_rtl = -(int32_t)id;
+            lv_obj_scroll_to_x(cont, (gap + w) * id_rtl, anim_en);
+        }
     }
     else {
-        int32_t id_rtl = -(int32_t)id;
-        lv_obj_scroll_to_x(cont, (gap + w) * id_rtl, anim_en);
+        lv_coord_t gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
+        lv_coord_t h = lv_obj_get_content_height(cont);
+        lv_obj_scroll_to_y(cont, id * (gap + h), anim_en);
     }
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
@@ -229,8 +251,14 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_group_t * g = lv_group_get_default();
     if(g) lv_group_add_obj(g, btnm);
 
-    lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
-    lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_CENTER);
+    if((tabview->tab_pos & LV_DIR_VER) != 0) {
+        lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_ROW);
+        lv_obj_set_scroll_snap_x(cont, LV_SCROLL_SNAP_CENTER);
+    }
+    else {
+        lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
+        lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
+    }
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
     lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 }
@@ -289,18 +317,29 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
 
     lv_obj_t * tv = lv_obj_get_parent(cont);
+    lv_tabview_t * tv_obj = (lv_tabview_t *)tv;
     if(code == LV_EVENT_LAYOUT_CHANGED) {
         lv_tabview_set_act(tv, lv_tabview_get_tab_act(tv), LV_ANIM_OFF);
     }
     else if(code == LV_EVENT_SCROLL_END) {
+        lv_indev_t * indev = lv_indev_get_act();
+        if(indev && indev->proc.state == LV_INDEV_STATE_PRESSED) {
+            return;
+        }
+
         lv_point_t p;
         lv_obj_get_scroll_end(cont, &p);
 
-        lv_coord_t w = lv_obj_get_content_width(cont);
         lv_coord_t t;
-
-        if(lv_obj_get_style_base_dir(tv, LV_PART_MAIN) == LV_BASE_DIR_RTL)  t = -(p.x - w / 2) / w;
-        else t = (p.x + w / 2) / w;
+        if((tv_obj->tab_pos & LV_DIR_VER) != 0) {
+            lv_coord_t w = lv_obj_get_content_width(cont);
+            if(lv_obj_get_style_base_dir(tv, LV_PART_MAIN) == LV_BASE_DIR_RTL)  t = -(p.x - w / 2) / w;
+            else t = (p.x + w / 2) / w;
+        }
+        else {
+            lv_coord_t h = lv_obj_get_content_height(cont);
+            t = (p.y + h / 2) / h;
+        }
 
         if(t < 0) t = 0;
         bool new_tab = false;

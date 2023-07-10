@@ -29,11 +29,10 @@ static void slider_event_cb(lv_event_t * e)
 
     /*Provide some extra space for the value*/
     if(code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
-        lv_coord_t * size = lv_event_get_param(e);
-        *size = LV_MAX(*size, 50);
+        lv_event_set_ext_draw_size(e, 50);
     }
     else if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
+        lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
         if(dsc->part == LV_PART_INDICATOR) {
             char buf[16];
             lv_snprintf(buf, sizeof(buf), "%d - %d", (int)lv_slider_get_left_value(obj), (int)lv_slider_get_value(obj));
@@ -48,7 +47,7 @@ static void slider_event_cb(lv_event_t * e)
 
             lv_draw_label_dsc_t label_draw_dsc;
             lv_draw_label_dsc_init(&label_draw_dsc);
-
+            label_draw_dsc.color = lv_color_hex3(0x888);
             lv_draw_label(dsc->draw_ctx, &label_draw_dsc, &label_area, buf, NULL);
         }
     }

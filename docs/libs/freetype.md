@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/libs/freetype.md
-```
 
 # FreeType support
 Interface to [FreeType](https://www.freetype.org/) to generate font bitmaps run time.
@@ -34,7 +30,7 @@ Font style supports bold and italic, you can use the following macros to set:
 
 They can be combined.eg:`FT_FONT_STYLE_BOLD | FT_FONT_STYLE_ITALIC`.
 
-Note that, the FreeType extension doesn't use LVGL's file system. 
+Note that, the FreeType extension doesn't use LVGL's file system.
 You can simply pass the path to the font as usual on your operating system or platform.
 
 ## Example
@@ -44,7 +40,7 @@ You can simply pass the path to the font as usual on your operating system or pl
 
 
 ## Learn more
-- FreeType [tutorial](https://www.freetype.org/freetype2/docs/tutorial/step1.html) 
+- FreeType [tutorial](https://www.freetype.org/freetype2/docs/tutorial/step1.html)
 - LVGL's [font interface](https://docs.lvgl.io/v7/en/html/overview/font.html#add-a-new-font-engine)
 
 

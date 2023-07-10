@@ -5,10 +5,10 @@ def event_handler(evt):
     if code == lv.EVENT.VALUE_CHANGED:
         source = evt.get_current_target()
         date = lv.calendar_date_t()
-        if source.get_pressed_date(date) == lv.RES.OK:        
+        if source.get_pressed_date(date) == lv.RES.OK:
             calendar.set_today_date(date.year, date.month, date.day)
             print("Clicked date: %02d.%02d.%02d"%(date.day, date.month, date.year))
-                
+
 
 calendar = lv.calendar(lv.scr_act())
 calendar.set_size(200, 200)

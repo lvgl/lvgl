@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-import sys, os, re
+import os
+import re
+import sys
 
 props = [
 {'section': 'Size and position', 'dsc':'Properties related to size, position, alignment and layout of the objects.' },
@@ -58,11 +60,19 @@ props = [
 
 {'name': 'TRANSFORM_ZOOM',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom image-like objects. Multiplied with the zoom set on the object. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom an objects. The value 256 (or `LV_IMG_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
 {'name': 'TRANSFORM_ANGLE',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Rotate image-like objects. Added to the rotation set on the object. The value is interpreted in 0.1 degree units. E.g. 45 deg. = 450"},
+ 'dsc': "Rotate an objects. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
+
+{'name': 'TRANSFORM_PIVOT_X',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the pivot point's X coordinate for transformations. Relative to the object's top left corner'"},
+
+{'name': 'TRANSFORM_PIVOT_Y',
+ 'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "Set the pivot point's Y coordinate for transformations. Relative to the object's top left corner'"},
 
 {'section': 'Padding', 'dsc' : "Properties to describe spacing between the parent's sides and the children and among the children. Very similar to the padding properties in HTML."},
 {'name': 'PAD_TOP',
@@ -91,22 +101,16 @@ props = [
 
 {'section': 'Background', 'dsc':'Properties to describe the background color and image of the objects.' },
 {'name': 'BG_COLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t', 'default':'`0xffffff`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t', 'default':'`0xffffff`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set the background color of the object."},
-
-{'name': 'BG_COLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t' },
 
 {'name': 'BG_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of the background. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BG_GRAD_COLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set the gradient color of the background. Used only if `grad_dir` is not `LV_GRAD_DIR_NONE`"},
-
-{'name': 'BG_GRAD_COLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t' },
 
 {'name': 'BG_GRAD_DIR',
  'style_type': 'num',   'var_type': 'lv_grad_dir_t',  'default':'`LV_GRAD_DIR_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -137,11 +141,8 @@ props = [
  'dsc': "Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'BG_IMG_RECOLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set a color to mix to the background image."},
-
-{'name': 'BG_IMG_RECOLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t'},
 
 {'name': 'BG_IMG_RECOLOR_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -153,11 +154,8 @@ props = [
 
 {'section': 'Border', 'dsc':'Properties to describe the borders' },
 {'name': 'BORDER_COLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set the color of the border"},
-
-{'name': 'BORDER_COLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t' },
 
 {'name': 'BORDER_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -181,11 +179,8 @@ props = [
  'dsc': "Set the width of the outline in pixels. "},
 
 {'name': 'OUTLINE_COLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set the color of the outline."},
-
-{'name': 'OUTLINE_COLOR_FILTERED',
-'style_type': 'color', 'var_type': 'lv_color_t'},
 
 {'name': 'OUTLINE_OPA',
 'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
@@ -213,11 +208,8 @@ props = [
  'dsc': "Make the shadow calculation to use a larger or smaller rectangle as base. The value can be in pixel to make the area larger/smaller"},
 
 {'name': 'SHADOW_COLOR',
-  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set the color of the shadow"},
-
-{'name': 'SHADOW_COLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t'},
 
 {'name': 'SHADOW_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
@@ -229,11 +221,8 @@ props = [
  'dsc': "Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'name': 'IMG_RECOLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set color to mixt to the image."},
-
-{'name': 'IMG_RECOLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t'},
 
 {'name': 'IMG_RECOLOR_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -257,11 +246,8 @@ props = [
  'dsc': "Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending "},
 
 {'name': 'LINE_COLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set the color fo the lines."},
-
-{'name': 'LINE_COLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t'},
 
 {'name': 'LINE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -277,11 +263,8 @@ props = [
  'dsc': "Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending "},
 
 {'name': 'ARC_COLOR',
- 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set the color of the arc."},
-
-{'name': 'ARC_COLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t' },
 
 {'name': 'ARC_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -293,11 +276,8 @@ props = [
 
 {'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.' },
 {'name': 'TEXT_COLOR',
-'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
+'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 1, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Sets the color of the text."},
-
-{'name': 'TEXT_COLOR_FILTERED',
- 'style_type': 'color', 'var_type': 'lv_color_t'},
 
 {'name': 'TEXT_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 1, 'layout': 0, 'ext_draw': 0,
@@ -344,6 +324,10 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "The intensity of mixing of color filter."},
 
+ {'name': 'ANIM',
+ 'style_type': 'ptr',   'var_type': 'const lv_anim_t *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
+ 'dsc': "The animation template for the object's animation. Should be a pointer to `lv_anim_t`. The animation parameters are widget specific, e.g. animation time could be the E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
+
 {'name': 'ANIM_TIME',
  'style_type': 'num',   'var_type': 'uint32_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "The animation time in milliseconds. Its meaning is widget specific. E.g. blink time of the cursor on the text area or scroll time of a roller. See the widgets' documentation to learn more."},
@@ -387,6 +371,15 @@ def obj_style_get(p):
   print("    return " + cast + "v." + p['style_type'] + ";")
   print("}")
   print("")
+
+  if 'filtered' in p and p['filtered']:
+    print("static inline " + p['var_type'] + " lv_obj_get_style_" + p['name'].lower() +"_filtered(const struct _lv_obj_t * obj, uint32_t part)")
+    print("{")
+    print("    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_" + p['name'] + "));")
+    print("    return " + cast + "v." + p['style_type'] + ";")
+    print("}")
+    print("")
+
 
 
 def style_set_cast(style_type):

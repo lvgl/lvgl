@@ -209,6 +209,14 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
     lv_spangroup_refr_mode(obj);
 }
 
+void lv_spangroup_set_lines(lv_obj_t * obj, int32_t lines)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
+    spans->lines = lines;
+    lv_spangroup_refr_mode(obj);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -287,6 +295,13 @@ lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     return spans->mode;
+}
+
+int32_t lv_spangroup_get_lines(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_spangroup_t * spans = (lv_spangroup_t *)obj;
+    return spans->lines;
 }
 
 void lv_spangroup_refr_mode(lv_obj_t * obj)
@@ -400,6 +415,8 @@ lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
     lv_snippet_t snippet;   /* use to save cur_span info and push it to stack */
     memset(&snippet, 0, sizeof(snippet));
 
+    int32_t line_cnt = 0;
+    int32_t lines = spans->lines < 0 ? INT32_MAX : spans->lines;
     /* the loop control how many lines need to draw */
     while(cur_span) {
         int snippet_cnt = 0;
@@ -467,6 +484,10 @@ lv_coord_t lv_spangroup_get_expand_height(lv_obj_t * obj, lv_coord_t width)
         txt_pos.x = 0;
         txt_pos.y += max_line_h;
         max_w = max_width;
+        line_cnt += 1;
+        if(line_cnt >= lines) {
+            break;
+        }
     }
     txt_pos.y -= line_space;
 
@@ -483,6 +504,7 @@ static void lv_spangroup_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     _lv_ll_init(&spans->child_ll, sizeof(lv_span_t));
     spans->indent = 0;
+    spans->lines = -1;
     spans->mode = LV_SPAN_MODE_EXPAND;
     spans->overflow = LV_SPAN_OVERFLOW_CLIP;
     spans->cache_w = 0;
@@ -780,6 +802,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
         bool is_end_line = false;
         bool ellipsis_valid = false;
         lv_coord_t max_line_h = 0;  /* the max height of span-font when a line have a lot of span */
+        lv_coord_t max_baseline = 0; /*baseline of the highest span*/
         lv_snippet_clear();
 
         /* the loop control to find a line and push the relevant span info into stack  */
@@ -803,15 +826,6 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                 snippet.line_h = lv_font_get_line_height(snippet.font) + line_space;
             }
 
-            if(spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS) {
-                /* curretn line span txt overflow, don't push */
-                if(txt_pos.y + snippet.line_h - line_space > coords.y2 + 1) {
-                    ellipsis_valid = true;
-                    is_end_line = true;
-                    break;
-                }
-            }
-
             /* get current span text line info */
             uint32_t next_ofs = 0;
             lv_coord_t use_width = 0;
@@ -819,24 +833,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                                              max_w, txt_flag, &use_width, &next_ofs);
 
             if(isfill) {
-                lv_coord_t next_line_h = snippet.line_h;
-                if(cur_txt[cur_txt_ofs + next_ofs] == '\0') {
-                    next_line_h = 0;
-                    lv_span_t * next_span = _lv_ll_get_next(&spans->child_ll, cur_span);
-                    if(next_span) { /* have the next line */
-                        next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
-                    }
-                }
-                lv_coord_t cur_line_h = max_line_h < snippet.line_h ? snippet.line_h : max_line_h;
-                if(txt_pos.y + cur_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
-                    if(cur_txt[cur_txt_ofs + next_ofs] != '\0') {
-                        next_ofs = strlen(&cur_txt[cur_txt_ofs]);
-                        use_width = lv_txt_get_width(&cur_txt[cur_txt_ofs], next_ofs, snippet.font, snippet.letter_space, txt_flag);
-                        ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS ? true : false;
-                        is_end_line = true;
-                    }
-                }
-                else if(next_ofs > 0 && lv_get_snippet_cnt() > 0) {
+                if(next_ofs > 0 && lv_get_snippet_cnt() > 0) {
                     /* To prevent infinite loops, the _lv_txt_get_next_line() may return incomplete words, */
                     /* This phenomenon should be avoided when lv_get_snippet_cnt() > 0 */
                     if(max_w < use_width) {
@@ -860,6 +857,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
             cur_txt_ofs += next_ofs;
             if(max_line_h < snippet.line_h) {
                 max_line_h = snippet.line_h;
+                max_baseline = snippet.font->base_line;
             }
 
             lv_snippet_push(&snippet);
@@ -869,11 +867,33 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
             }
         }
 
-        /* start current line deal width */
+        /* start current line deal with */
 
         uint16_t item_cnt = lv_get_snippet_cnt();
         if(item_cnt == 0) {     /* break if stack is empty */
             break;
+        }
+
+        /* Whether the current line is the end line and does overflow processing */
+        {
+            lv_snippet_t * last_snippet = lv_get_snippet(item_cnt - 1);
+            lv_coord_t next_line_h = last_snippet->line_h;
+            if(last_snippet->txt[last_snippet->bytes] == '\0') {
+                next_line_h = 0;
+                lv_span_t * next_span = _lv_ll_get_next(&spans->child_ll, last_snippet->span);
+                if(next_span) { /* have the next line */
+                    next_line_h = lv_font_get_line_height(lv_span_get_style_text_font(obj, next_span)) + line_space;
+                }
+            }
+            if(txt_pos.y + max_line_h + next_line_h - line_space > coords.y2 + 1) { /* for overflow if is end line. */
+                if(last_snippet->txt[last_snippet->bytes] != '\0') {
+                    last_snippet->bytes = strlen(last_snippet->txt);
+                    last_snippet->txt_w = lv_txt_get_width(last_snippet->txt, last_snippet->bytes, last_snippet->font,
+                                                           last_snippet->letter_space, txt_flag);
+                }
+                ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS ? true : false;
+                is_end_line = true;
+            }
         }
 
         /*Go the first visible line*/
@@ -908,7 +928,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
 
             lv_point_t pos;
             pos.x = txt_pos.x;
-            pos.y = txt_pos.y + max_line_h - pinfo->line_h;
+            pos.y = txt_pos.y + max_line_h - pinfo->line_h - (max_baseline - pinfo->font->base_line);
             label_draw_dsc.color = lv_span_get_style_text_color(obj, pinfo->span);
             label_draw_dsc.opa = lv_span_get_style_text_opa(obj, pinfo->span);
             label_draw_dsc.font = lv_span_get_style_text_font(obj, pinfo->span);
@@ -963,13 +983,6 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                 }
             }
 
-            if(ellipsis_valid && i == item_cnt - 1 && pos.x <= ellipsis_width) {
-                for(int ell = 0; ell < 3; ell++) {
-                    lv_draw_letter(draw_ctx, &label_draw_dsc, &pos, '.');
-                    pos.x = pos.x + dot_letter_w + pinfo->letter_space;
-                }
-            }
-
             /* draw decor */
             lv_text_decor_t decor = lv_span_get_style_text_decor(obj, pinfo->span);
             if(decor != LV_TEXT_DECOR_NONE) {
@@ -1021,8 +1034,8 @@ static void refresh_self_size(lv_obj_t * obj)
 {
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     spans->refresh = 1;
-    lv_obj_refresh_self_size(obj);
     lv_obj_invalidate(obj);
+    lv_obj_refresh_self_size(obj);
 }
 
 #endif

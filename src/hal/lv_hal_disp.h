@@ -133,6 +133,9 @@ typedef struct _lv_disp_drv_t {
     /** OPTIONAL: called when driver parameters are updated */
     void (*drv_update_cb)(struct _lv_disp_drv_t * disp_drv);
 
+    /** OPTIONAL: called when start rendering */
+    void (*render_start_cb)(struct _lv_disp_drv_t * disp_drv);
+
     /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_CHROMA_KEY` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
@@ -170,8 +173,11 @@ typedef struct _lv_disp_t {
     struct _lv_obj_t * top_layer;   /**< @see lv_disp_get_layer_top*/
     struct _lv_obj_t * sys_layer;   /**< @see lv_disp_get_layer_sys*/
     uint32_t screen_cnt;
+uint8_t draw_prev_over_act  :
+    1;          /**< 1: Draw previous screen over active screen*/
 uint8_t del_prev  :
     1;          /**< 1: Automatically delete the previous screen when the screen load animation is ready*/
+    uint8_t rendering_in_progress : 1; /**< 1: The current screen rendering is in progress*/
 
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
     lv_color_t bg_color;            /**< Default display color when screens are transparent*/
@@ -181,6 +187,7 @@ uint8_t del_prev  :
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint16_t inv_p;
+    int32_t inv_en_cnt;
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/

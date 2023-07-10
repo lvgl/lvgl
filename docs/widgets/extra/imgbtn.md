@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/imgbtn.md
-```
 # Image button (lv_imgbtn)
 
 ## Overview
@@ -19,7 +15,7 @@ You can set a left, right and center image, and the center image will be repeate
 
 ### Image sources
 To set the image in a state, use the `lv_imgbtn_set_src(imgbtn, LV_IMGBTN_STATE_..., src_left, src_center, src_right)`.
- 
+
 The image sources work the same as described in the [Image object](/widgets/core/img) except that "Symbols" are not supported by the Image button.
 Any of the sources can `NULL`.
 
@@ -31,7 +27,7 @@ The possible states are:
 - `LV_IMGBTN_STATE_CHECKED_PRESSED`
 - `LV_IMGBTN_STATE_CHECKED_DISABLED`
 
-If you set sources only in `LV_IMGBTN_STATE_RELEASED`, these sources will be used in other states too. 
+If you set sources only in `LV_IMGBTN_STATE_RELEASED`, these sources will be used in other states too.
 If you set e.g. `LV_IMGBTN_STATE_PRESSED` they will be used in pressed state instead of the released images.
 
 

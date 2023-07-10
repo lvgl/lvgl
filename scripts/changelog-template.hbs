@@ -21,7 +21,7 @@
   {{/commit-list}}
   {{#commit-list fixes heading='' message='^arch' exclude='BREAKING CHANGE'}}
     - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
-  {{/commit-list}}  
+  {{/commit-list}}
 
   ### New Features
   {{#commit-list merges heading='' message='^feat' exclude='BREAKING CHANGE'}}
@@ -33,8 +33,8 @@
   {{#commit-list fixes heading='' message='^feat' exclude='BREAKING CHANGE'}}
     - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
   {{/commit-list}}
-  
-  
+
+
   ### Performance
   {{#commit-list merges heading='' message='^perf' exclude='BREAKING CHANGE'}}
     - {{message}} [`{{id}}`]({{href}})
@@ -56,8 +56,8 @@
   {{#commit-list fixes heading=''  message='^fix' exclude='(^fix conflict|^fix warning|BREAKING CHANGE)'}}
     - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
   {{/commit-list}}
-  
-  
+
+
   ### Examples
   {{#commit-list merges heading='' message='^example'}}
     - {{message}} [`{{id}}`]({{href}})
@@ -68,8 +68,8 @@
   {{#commit-list fixes heading='' message='^example'}}
     - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
   {{/commit-list}}
-  
-  
+
+
   ### Docs
   {{#commit-list merges heading='' message='^docs'}}
     - {{message}} [`{{id}}`]({{href}})
@@ -80,7 +80,7 @@
   {{#commit-list fixes heading='' message='^docs'}}
     - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
   {{/commit-list}}
-  
+
   ### CI and tests
   {{#commit-list merges heading='' message='(^ci|^test)'}}
     - {{message}} [`{{id}}`]({{href}})
@@ -91,7 +91,7 @@
   {{#commit-list fixes heading='' message='(^ci|^test)'}}
     - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
   {{/commit-list}}
-  
+
   ### Others
   {{#commit-list merges heading='' exclude='(^fix|^feat|^perf|^docs|^example|^ci|^test)'}}
     - {{message}} [`{{id}}`]({{href}})
@@ -102,5 +102,5 @@
   {{#commit-list fixes heading=''  exclude='(^fix|^feat|^perf|^docs|^example|^ci|^test)'}}
     - {{commit.subject}} [`{{commit.shorthash}}`]({{commit.href}})
   {{/commit-list}}
-  
+
 {{/each}}

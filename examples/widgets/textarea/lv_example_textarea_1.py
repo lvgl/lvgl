@@ -23,7 +23,7 @@ btnm_map = ["1", "2", "3", "\n",
             "4", "5", "6", "\n",
             "7", "8", "9", "\n",
             lv.SYMBOL.BACKSPACE, "0", lv.SYMBOL.NEW_LINE, ""]
-         
+
 btnm = lv.btnmatrix(lv.scr_act())
 btnm.set_size(200, 150)
 btnm.align(lv.ALIGN.BOTTOM_MID, 0, -10)

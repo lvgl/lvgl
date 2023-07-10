@@ -456,6 +456,59 @@ void lv_area_align(const lv_area_t * base, lv_area_t * to_align, lv_align_t alig
     to_align->y2 = to_align->y1 + h - 1;
 }
 
+#define _LV_TRANSFORM_TRIGO_SHIFT 10
+void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom, const lv_point_t * pivot)
+{
+    if(angle == 0 && zoom == 256) {
+        return;
+    }
+
+    p->x -= pivot->x;
+    p->y -= pivot->y;
+
+    if(angle == 0) {
+        p->x = (((int32_t)(p->x) * zoom) >> 8) + pivot->x;
+        p->y = (((int32_t)(p->y) * zoom) >> 8) + pivot->y;
+        return;
+    }
+
+    static int32_t angle_prev = INT32_MIN;
+    static int32_t sinma;
+    static int32_t cosma;
+    if(angle_prev != angle) {
+        int32_t angle_limited = angle;
+        if(angle_limited > 3600) angle_limited -= 3600;
+        if(angle_limited < 0) angle_limited += 3600;
+
+        int32_t angle_low = angle_limited / 10;
+        int32_t angle_high = angle_low + 1;
+        int32_t angle_rem = angle_limited  - (angle_low * 10);
+
+        int32_t s1 = lv_trigo_sin(angle_low);
+        int32_t s2 = lv_trigo_sin(angle_high);
+
+        int32_t c1 = lv_trigo_sin(angle_low + 90);
+        int32_t c2 = lv_trigo_sin(angle_high + 90);
+
+        sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
+        cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
+        sinma = sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+        cosma = cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+        angle_prev = angle;
+    }
+    int32_t x = p->x;
+    int32_t y = p->y;
+    if(zoom == 256) {
+        p->x = ((cosma * x - sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+        p->y = ((sinma * x + cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
+    }
+    else {
+        p->x = (((cosma * x - sinma * y) * zoom) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
+        p->y = (((sinma * x + cosma * y) * zoom) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+    }
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

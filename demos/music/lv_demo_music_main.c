@@ -23,11 +23,11 @@
 #define BAR_COLOR2          lv_color_hex(0x6f8af6)
 #define BAR_COLOR3          lv_color_hex(0xffffff)
 #if LV_DEMO_MUSIC_LARGE
-# define BAR_COLOR1_STOP     160
-# define BAR_COLOR2_STOP     200
+    #define BAR_COLOR1_STOP     160
+    #define BAR_COLOR2_STOP     200
 #else
-# define BAR_COLOR1_STOP     80
-# define BAR_COLOR2_STOP     100
+    #define BAR_COLOR1_STOP     80
+    #define BAR_COLOR2_STOP     100
 #endif
 #define BAR_COLOR3_STOP     (2 * LV_HOR_RES / 3)
 #define BAR_CNT             20
@@ -62,6 +62,7 @@ static void timer_cb(lv_timer_t * t);
 static void track_load(uint32_t id);
 static void stop_start_anim(lv_timer_t * t);
 static void spectrum_end_cb(lv_anim_t * a);
+static void album_fade_anim_cb(void * var, int32_t v);
 static int32_t get_cos(int32_t deg, int32_t a);
 static int32_t get_sin(int32_t deg, int32_t a);
 
@@ -82,7 +83,7 @@ static uint32_t bar_ofs = 0;
 static uint32_t spectrum_lane_ofs_start = 0;
 static uint32_t bar_rot = 0;
 static uint32_t time_act;
-static lv_timer_t *  sec_counter_timer;
+static lv_timer_t  * sec_counter_timer;
 static const lv_font_t * font_small;
 static const lv_font_t * font_large;
 static uint32_t track_id;
@@ -106,16 +107,18 @@ static const uint16_t rnd_array[30] = {994, 285, 553, 11, 792, 707, 966, 641, 85
  * Callback adapter function to convert parameter types to avoid compile-time
  * warning.
  */
-static void _img_set_zoom_anim_cb(void * obj, int32_t zoom) {
-  lv_img_set_zoom((lv_obj_t*)obj, (uint16_t)zoom);
+static void _img_set_zoom_anim_cb(void * obj, int32_t zoom)
+{
+    lv_img_set_zoom((lv_obj_t *)obj, (uint16_t)zoom);
 }
 
 /*
  * Callback adapter function to convert parameter types to avoid compile-time
  * warning.
  */
-static void _obj_set_x_anim_cb(void * obj, int32_t x) {
-  lv_obj_set_x((lv_obj_t*)obj, (lv_coord_t)x);
+static void _obj_set_x_anim_cb(void * obj, int32_t x)
+{
+    lv_obj_set_x((lv_obj_t *)obj, (lv_coord_t)x);
 }
 
 lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
@@ -145,16 +148,17 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
     static const lv_coord_t grid_cols[] = {LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     static lv_coord_t grid_rows[] = {LV_DEMO_MUSIC_HANDLE_SIZE,     /*Spacing*/
-                                           0,   /*Spectrum obj, set later*/
-                                           LV_GRID_CONTENT, /*Title box*/
-                                           LV_GRID_FR(3),   /*Spacer*/
-                                           LV_GRID_CONTENT, /*Icon box*/
-                                           LV_GRID_FR(3),   /*Spacer*/
-                                           LV_GRID_CONTENT, /*Control box*/
-                                           LV_GRID_FR(3),   /*Spacer*/
-                                           LV_GRID_CONTENT, /*Handle box*/
-                                           LV_DEMO_MUSIC_HANDLE_SIZE,     /*Spacing*/
-                                           LV_GRID_TEMPLATE_LAST};
+                                     0,   /*Spectrum obj, set later*/
+                                     LV_GRID_CONTENT, /*Title box*/
+                                     LV_GRID_FR(3),   /*Spacer*/
+                                     LV_GRID_CONTENT, /*Icon box*/
+                                     LV_GRID_FR(3),   /*Spacer*/
+                                     LV_GRID_CONTENT, /*Control box*/
+                                     LV_GRID_FR(3),   /*Spacer*/
+                                     LV_GRID_CONTENT, /*Handle box*/
+                                     LV_DEMO_MUSIC_HANDLE_SIZE,     /*Spacing*/
+                                     LV_GRID_TEMPLATE_LAST
+                                    };
 
     grid_rows[1] = LV_VER_RES;
 
@@ -184,7 +188,8 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
                                            LV_GRID_CONTENT, /*Handle box*/
                                            LV_GRID_FR(1),   /*Spacer*/
                                            LV_DEMO_MUSIC_HANDLE_SIZE,     /*Spacing*/
-                                           LV_GRID_TEMPLATE_LAST};
+                                           LV_GRID_TEMPLATE_LAST
+                                          };
 
     lv_obj_set_grid_dsc_array(cont, grid_cols, grid_rows);
     lv_obj_set_style_grid_row_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, 0);
@@ -207,7 +212,8 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
                                            LV_GRID_CONTENT, /*Handle box*/
                                            LV_GRID_FR(1),   /*Spacer*/
                                            LV_DEMO_MUSIC_HANDLE_SIZE,     /*Spacing*/
-                                           LV_GRID_TEMPLATE_LAST};
+                                           LV_GRID_TEMPLATE_LAST
+                                          };
 
     lv_obj_set_grid_dsc_array(cont, grid_cols, grid_rows);
     lv_obj_set_style_grid_row_align(cont, LV_GRID_ALIGN_SPACE_BETWEEN, 0);
@@ -292,17 +298,20 @@ void _lv_demo_music_album_next(bool next)
     if(next) {
         id++;
         if(id >= ACTIVE_TRACK_CNT) id = 0;
-    } else {
+    }
+    else {
         if(id == 0) {
             id = ACTIVE_TRACK_CNT - 1;
-        } else {
+        }
+        else {
             id--;
         }
     }
 
     if(playing) {
         _lv_demo_music_play(id);
-    } else {
+    }
+    else {
         track_load(id);
     }
 }
@@ -381,21 +390,21 @@ static lv_obj_t * create_cont(lv_obj_t * parent)
     lv_obj_t * placeholder1 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder1);
     lv_obj_clear_flag(placeholder1, LV_OBJ_FLAG_CLICKABLE);
-//    lv_obj_set_style_bg_color(placeholder1, lv_color_hex(0xff0000), 0);
-//    lv_obj_set_style_bg_opa(placeholder1, LV_OPA_50, 0);
+    //    lv_obj_set_style_bg_color(placeholder1, lv_color_hex(0xff0000), 0);
+    //    lv_obj_set_style_bg_opa(placeholder1, LV_OPA_50, 0);
 
     lv_obj_t * placeholder2 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder2);
     lv_obj_clear_flag(placeholder2, LV_OBJ_FLAG_CLICKABLE);
-//    lv_obj_set_style_bg_color(placeholder2, lv_color_hex(0x00ff00), 0);
-//    lv_obj_set_style_bg_opa(placeholder2, LV_OPA_50, 0);
+    //    lv_obj_set_style_bg_color(placeholder2, lv_color_hex(0x00ff00), 0);
+    //    lv_obj_set_style_bg_opa(placeholder2, LV_OPA_50, 0);
 
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
     lv_obj_t * placeholder3 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder3);
     lv_obj_clear_flag(placeholder3, LV_OBJ_FLAG_CLICKABLE);
-//    lv_obj_set_style_bg_color(placeholder3, lv_color_hex(0x0000ff), 0);
-//    lv_obj_set_style_bg_opa(placeholder3, LV_OPA_20, 0);
+    //    lv_obj_set_style_bg_color(placeholder3, lv_color_hex(0x0000ff), 0);
+    //    lv_obj_set_style_bg_opa(placeholder3, LV_OPA_20, 0);
 
     lv_obj_set_size(placeholder1, lv_pct(100), LV_VER_RES);
     lv_obj_set_y(placeholder1, 0);
@@ -423,13 +432,13 @@ static void create_wave_images(lv_obj_t * parent)
     LV_IMG_DECLARE(img_lv_demo_music_wave_top);
     LV_IMG_DECLARE(img_lv_demo_music_wave_bottom);
     lv_obj_t * wave_top = lv_img_create(parent);
-    lv_img_set_src(wave_top,&img_lv_demo_music_wave_top);
+    lv_img_set_src(wave_top, &img_lv_demo_music_wave_top);
     lv_obj_set_width(wave_top, LV_HOR_RES);
     lv_obj_align(wave_top, LV_ALIGN_TOP_MID, 0, 0);
     lv_obj_add_flag(wave_top, LV_OBJ_FLAG_IGNORE_LAYOUT);
 
     lv_obj_t * wave_bottom = lv_img_create(parent);
-    lv_img_set_src(wave_bottom,&img_lv_demo_music_wave_bottom);
+    lv_img_set_src(wave_bottom, &img_lv_demo_music_wave_bottom);
     lv_obj_set_width(wave_bottom, LV_HOR_RES);
     lv_obj_align(wave_bottom, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_obj_add_flag(wave_bottom, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -538,7 +547,7 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
 #else
     lv_obj_set_style_pad_bottom(cont, 8, 0);
 #endif
-    static const lv_coord_t grid_col[] = {LV_GRID_FR(2), LV_GRID_FR(3),LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(3), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
+    static const lv_coord_t grid_col[] = {LV_GRID_FR(2), LV_GRID_FR(3), LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(5), LV_GRID_FR(3), LV_GRID_FR(2), LV_GRID_TEMPLATE_LAST};
     static const lv_coord_t grid_row[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
     lv_obj_set_grid_dsc_array(cont, grid_col, grid_row);
 
@@ -659,9 +668,14 @@ static void track_load(uint32_t id)
     lv_label_set_text(artist_label, _lv_demo_music_get_artist(track_id));
     lv_label_set_text(genre_label, _lv_demo_music_get_genre(track_id));
 
-    lv_obj_fade_out(album_img_obj, 500, 0);
-
     lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, album_img_obj);
+    lv_anim_set_values(&a, lv_obj_get_style_img_opa(album_img_obj, 0), LV_OPA_TRANSP);
+    lv_anim_set_exec_cb(&a, album_fade_anim_cb);
+    lv_anim_set_time(&a, 500);
+    lv_anim_start(&a);
+
     lv_anim_init(&a);
     lv_anim_set_var(&a, album_img_obj);
     lv_anim_set_time(&a, 500);
@@ -669,13 +683,15 @@ static void track_load(uint32_t id)
 #if LV_DEMO_MUSIC_LANDSCAPE
     if(next) {
         lv_anim_set_values(&a, 0, - LV_HOR_RES / 7);
-    } else {
+    }
+    else {
         lv_anim_set_values(&a, 0, LV_HOR_RES / 7);
     }
 #else
     if(next) {
         lv_anim_set_values(&a, 0, - LV_HOR_RES / 2);
-    } else {
+    }
+    else {
         lv_anim_set_values(&a, 0, LV_HOR_RES / 2);
     }
 #endif
@@ -692,7 +708,6 @@ static void track_load(uint32_t id)
     lv_anim_start(&a);
 
     album_img_obj = album_img_create(spectrum_obj);
-    lv_obj_fade_in(album_img_obj, 500, 100);
 
     lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
     lv_anim_set_var(&a, album_img_obj);
@@ -701,6 +716,14 @@ static void track_load(uint32_t id)
     lv_anim_set_values(&a, LV_IMG_ZOOM_NONE / 4, LV_IMG_ZOOM_NONE);
     lv_anim_set_exec_cb(&a, _img_set_zoom_anim_cb);
     lv_anim_set_ready_cb(&a, NULL);
+    lv_anim_start(&a);
+
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, album_img_obj);
+    lv_anim_set_values(&a, 0, LV_OPA_COVER);
+    lv_anim_set_exec_cb(&a, album_fade_anim_cb);
+    lv_anim_set_time(&a, 500);
+    lv_anim_set_delay(&a, 100);
     lv_anim_start(&a);
 }
 
@@ -768,18 +791,18 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             uint32_t f;
             uint32_t band_w = 0;    /*Real number of bars in this band.*/
             switch(s) {
-            case 0:
-                band_w = 20;
-                break;
-            case 1:
-                band_w = 8;
-                break;
-            case 2:
-                band_w = 4;
-                break;
-            case 3:
-                band_w = 2;
-                break;
+                case 0:
+                    band_w = 20;
+                    break;
+                case 1:
+                    band_w = 8;
+                    break;
+                case 2:
+                    band_w = 4;
+                    break;
+                case 3:
+                    band_w = 2;
+                    break;
             }
 
             /* Add "side bars" with cosine characteristic.*/
@@ -799,7 +822,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         for(i = 0; i < BAR_CNT; i++) {
             uint32_t deg_space = 1;
             uint32_t deg = i * DEG_STEP + 90;
-            uint32_t j = (i + bar_rot + rnd_array[bar_ofs %10]) % BAR_CNT;
+            uint32_t j = (i + bar_rot + rnd_array[bar_ofs % 10]) % BAR_CNT;
             uint32_t k = (i + bar_rot + rnd_array[(bar_ofs + 1) % 10]) % BAR_CNT;
 
             uint32_t v = (r[k] * animv + r[j] * (amax - animv)) / amax;
@@ -811,8 +834,10 @@ static void spectrum_draw_event_cb(lv_event_t * e)
 
             if(v < BAR_COLOR1_STOP) draw_dsc.bg_color = BAR_COLOR1;
             else if(v > BAR_COLOR3_STOP) draw_dsc.bg_color = BAR_COLOR3;
-            else if(v > BAR_COLOR2_STOP) draw_dsc.bg_color = lv_color_mix(BAR_COLOR3, BAR_COLOR2, ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP-BAR_COLOR2_STOP));
-            else draw_dsc.bg_color = lv_color_mix(BAR_COLOR2, BAR_COLOR1, ((v - BAR_COLOR1_STOP) * 255) / (BAR_COLOR2_STOP - BAR_COLOR1_STOP));
+            else if(v > BAR_COLOR2_STOP) draw_dsc.bg_color = lv_color_mix(BAR_COLOR3, BAR_COLOR2,
+                                                                              ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP - BAR_COLOR2_STOP));
+            else draw_dsc.bg_color = lv_color_mix(BAR_COLOR2, BAR_COLOR1,
+                                                      ((v - BAR_COLOR1_STOP) * 255) / (BAR_COLOR2_STOP - BAR_COLOR1_STOP));
 
             uint32_t di = deg + deg_space;
 
@@ -859,7 +884,7 @@ static void spectrum_anim_cb(void * a, int32_t v)
     static int32_t last_bass = -1000;
     static int32_t dir = 1;
     if(spectrum[spectrum_i][0] > 12) {
-        if(spectrum_i-last_bass > 5) {
+        if(spectrum_i - last_bass > 5) {
             bass_cnt++;
             last_bass = spectrum_i;
             if(bass_cnt >= 2) {
@@ -869,7 +894,7 @@ static void spectrum_anim_cb(void * a, int32_t v)
             }
         }
     }
-    if(spectrum[spectrum_i][0] < 4) bar_rot+= dir;
+    if(spectrum[spectrum_i][0] < 4) bar_rot += dir;
 
     lv_img_set_zoom(album_img_obj, LV_IMG_ZOOM_NONE + spectrum[spectrum_i][0]);
 }
@@ -891,21 +916,21 @@ static lv_obj_t * album_img_create(lv_obj_t * parent)
     img = lv_img_create(parent);
 
     switch(track_id) {
-    case 2:
-        lv_img_set_src(img, &img_lv_demo_music_cover_3);
-        spectrum = spectrum_3;
-        spectrum_len = sizeof(spectrum_3) / sizeof(spectrum_3[0]);
-        break;
-    case 1:
-        lv_img_set_src(img, &img_lv_demo_music_cover_2);
-        spectrum = spectrum_2;
-        spectrum_len = sizeof(spectrum_2) / sizeof(spectrum_2[0]);
-        break;
-    case 0:
-        lv_img_set_src(img, &img_lv_demo_music_cover_1);
-        spectrum = spectrum_1;
-        spectrum_len = sizeof(spectrum_1) / sizeof(spectrum_1[0]);
-        break;
+        case 2:
+            lv_img_set_src(img, &img_lv_demo_music_cover_3);
+            spectrum = spectrum_3;
+            spectrum_len = sizeof(spectrum_3) / sizeof(spectrum_3[0]);
+            break;
+        case 1:
+            lv_img_set_src(img, &img_lv_demo_music_cover_2);
+            spectrum = spectrum_2;
+            spectrum_len = sizeof(spectrum_2) / sizeof(spectrum_2[0]);
+            break;
+        case 0:
+            lv_img_set_src(img, &img_lv_demo_music_cover_1);
+            spectrum = spectrum_1;
+            spectrum_len = sizeof(spectrum_1) / sizeof(spectrum_1[0]);
+            break;
     }
     lv_img_set_antialias(img, false);
     lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
@@ -929,7 +954,8 @@ static void play_event_click_cb(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
         _lv_demo_music_resume();
-    } else {
+    }
+    else {
         _lv_demo_music_pause();
     }
 }
@@ -969,6 +995,11 @@ static void stop_start_anim(lv_timer_t * t)
     LV_UNUSED(t);
     start_anim = false;
     lv_obj_refresh_ext_draw_size(spectrum_obj);
+}
+
+static void album_fade_anim_cb(void * var, int32_t v)
+{
+    lv_obj_set_style_img_opa(var, v, 0);
 }
 #endif /*LV_USE_DEMO_MUSIC*/
 

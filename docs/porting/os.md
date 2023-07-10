@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/porting/os.md
-```
 # Operating system and interrupts
 
 LVGL is **not thread-safe** by default.
@@ -37,7 +33,7 @@ void other_thread(void)
     mutex_lock(&lvgl_mutex);
     lv_obj_t *img = lv_img_create(lv_scr_act());
     mutex_unlock(&lvgl_mutex);
-    
+
     while(1) {
         mutex_lock(&lvgl_mutex);
         /* change to the next image */

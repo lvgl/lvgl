@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/porting/sleep.md
-```
 # Sleep management
 
 The MCU can go to sleep when no user input happens. In this case, the main `while(1)` should look like this:

@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/layouts/flex.md
-```
 
 # Flex
 
@@ -13,14 +9,14 @@ It can arrange items into rows or columns (tracks), handle wrapping, adjust the 
 
 To make an object flex container call `lv_obj_set_layout(obj, LV_LAYOUT_FLEX)`.
 
-Note that the flex layout feature of LVGL needs to be globally enabled with `LV_USE_FLEX` in `lv_conf.h`. 
+Note that the flex layout feature of LVGL needs to be globally enabled with `LV_USE_FLEX` in `lv_conf.h`.
 
 ## Terms
 - tracks: the rows or columns
 - main direction: row or column, the direction in which the items are placed
 - cross direction: perpendicular to the main direction
 - wrap: if there is no more space in the track a new track is started
-- grow: if set on an item it will grow to fill the remaining space on the track. 
+- grow: if set on an item it will grow to fill the remaining space on the track.
 The available space will be distributed among items respective to their grow value (larger value means more space)
 - gap: the space between the rows and columns or the items on a track
 
@@ -54,8 +50,8 @@ The possible values are:
 - `LV_FLEX_ALIGN_END` means right on a horizontally and bottom vertically
 - `LV_FLEX_ALIGN_CENTER` simply center
 - `LV_FLEX_ALIGN_SPACE_EVENLY` items are distributed so that the spacing between any two items (and the space to the edges) is equal. Does not apply to `track_cross_place`.
-- `LV_FLEX_ALIGN_SPACE_AROUND` items are evenly distributed in the track with equal space around them. 
-Note that visually the spaces aren’t equal, since all the items have equal space on both sides. 
+- `LV_FLEX_ALIGN_SPACE_AROUND` items are evenly distributed in the track with equal space around them.
+Note that visually the spaces aren’t equal, since all the items have equal space on both sides.
 The first item will have one unit of space against the container edge, but two units of space between the next item because that next item has its own spacing that applies. Not applies to `track_cross_place`.
 - `LV_FLEX_ALIGN_SPACE_BETWEEN` items are evenly distributed in the track: first item is on the start line, last item on the end line. Not applies to `track_cross_place`.
 
@@ -87,13 +83,13 @@ All the Flex-related values are style properties under the hood and you can use 
 
 To modify the minimum space flexbox inserts between objects, the following properties can be set on the flex container style:
 
-- `pad_row` Sets the padding between the rows. 
+- `pad_row` Sets the padding between the rows.
 
 - `pad_column` Sets the padding between the columns.
 
 These can for example be used if you don't want any padding between your objects: `lv_style_set_pad_column(&row_container_style,0)`
 
-## Other features 
+## Other features
 
 ### RTL
 If the base direction of the container is set the `LV_BASE_DIR_RTL` the meaning of `LV_FLEX_ALIGN_START` and `LV_FLEX_ALIGN_END` is swapped on `ROW` layouts. I.e. `START` will mean right.

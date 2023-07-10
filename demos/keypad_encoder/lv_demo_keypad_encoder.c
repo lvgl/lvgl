@@ -31,7 +31,7 @@ static void ta_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_group_t*  g;
+static lv_group_t * g;
 static lv_obj_t * tv;
 static lv_obj_t * t1;
 static lv_obj_t * t2;
@@ -49,18 +49,18 @@ void lv_demo_keypad_encoder(void)
     g = lv_group_create();
     lv_group_set_default(g);
 
-    lv_indev_t* cur_drv = NULL;
-    for (;;) {
+    lv_indev_t * cur_drv = NULL;
+    for(;;) {
         cur_drv = lv_indev_get_next(cur_drv);
-        if (!cur_drv) {
+        if(!cur_drv) {
             break;
         }
 
-        if (cur_drv->driver->type == LV_INDEV_TYPE_KEYPAD) {
+        if(cur_drv->driver->type == LV_INDEV_TYPE_KEYPAD) {
             lv_indev_set_group(cur_drv, g);
         }
 
-        if (cur_drv->driver->type == LV_INDEV_TYPE_ENCODER) {
+        if(cur_drv->driver->type == LV_INDEV_TYPE_ENCODER) {
             lv_indev_set_group(cur_drv, g);
         }
     }
@@ -152,7 +152,7 @@ static void text_input_create(lv_obj_t * parent)
     lv_textarea_set_one_line(ta2, true);
     lv_textarea_set_placeholder_text(ta2, "Type something");
 
-    lv_obj_t *kb = lv_keyboard_create(lv_scr_act());
+    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
     lv_obj_add_event_cb(ta1, ta_event_cb, LV_EVENT_ALL, kb);
@@ -166,9 +166,6 @@ static void msgbox_create(void)
     lv_obj_add_event_cb(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
     lv_group_focus_obj(lv_msgbox_get_btns(mbox));
     lv_obj_add_state(lv_msgbox_get_btns(mbox), LV_STATE_FOCUS_KEY);
-#if LV_EX_MOUSEWHEEL
-    lv_group_set_editing(g, true);
-#endif
     lv_group_focus_freeze(g, true);
 
     lv_obj_align(mbox, LV_ALIGN_CENTER, 0, 0);

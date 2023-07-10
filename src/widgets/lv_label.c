@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file lv_label.c
  *
  */
@@ -1021,6 +1021,7 @@ static void lv_label_refr_text(lv_obj_t * obj)
     }
     /*In roll inf. mode keep the size but start offset animations*/
     else if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
+        const lv_anim_t * anim_template = lv_obj_get_style_anim(obj, LV_PART_MAIN);
         uint16_t anim_speed = lv_obj_get_style_anim_speed(obj, LV_PART_MAIN);
         if(anim_speed == 0) anim_speed = LV_LABEL_DEF_SCROLL_SPEED;
         lv_anim_t a;
@@ -1055,8 +1056,14 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_x_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
-            if(act_time < a.time) {
-                a.act_time = act_time;      /*To keep the old position*/
+
+            /*If a template animation exists, consider it's start delay and repeat delay*/
+            if(anim_template) {
+                a.act_time = anim_template->act_time;
+                a.repeat_delay = anim_template->repeat_delay;
+            }
+            else if(act_time < a.time) {
+                a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
                 a.early_apply = 0;
             }
 
@@ -1076,8 +1083,14 @@ static void lv_label_refr_text(lv_obj_t * obj)
 
             lv_anim_t * anim_cur = lv_anim_get(obj, set_ofs_y_anim);
             int32_t act_time = anim_cur ? anim_cur->act_time : 0;
-            if(act_time < a.time) {
-                a.act_time = act_time;      /*To keep the old position*/
+
+            /*If a template animation exists, consider it's start delay and repeat delay*/
+            if(anim_template) {
+                a.act_time = anim_template->act_time;
+                a.repeat_delay = anim_template->repeat_delay;
+            }
+            else if(act_time < a.time) {
+                a.act_time = act_time;      /*To keep the old position when the label text is updated mid-scrolling*/
                 a.early_apply = 0;
             }
 

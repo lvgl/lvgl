@@ -81,6 +81,27 @@ void lv_gridnav_remove(lv_obj_t * obj)
     lv_obj_remove_event_cb(obj, gridnav_event_cb);
 }
 
+void lv_gridnav_set_focused(lv_obj_t * cont, lv_obj_t * to_focus, lv_anim_enable_t anim_en)
+{
+    LV_ASSERT_NULL(to_focus);
+    lv_gridnav_dsc_t * dsc = lv_obj_get_event_user_data(cont, gridnav_event_cb);
+    if(dsc == NULL) {
+        LV_LOG_WARN("`cont` is not a gridnav container");
+        return;
+    }
+
+    if(obj_is_focuable(to_focus) == false) {
+        LV_LOG_WARN("The object to focus is not focusable");
+        return;
+    }
+
+    lv_obj_clear_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+    lv_obj_add_state(to_focus, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+    lv_obj_scroll_to_view(to_focus, anim_en);
+    dsc->focused_obj = to_focus;
+
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -98,7 +119,7 @@ static void gridnav_event_cb(lv_event_t * e)
         if(dsc->focused_obj == NULL) dsc->focused_obj = find_first_focusable(obj);
         if(dsc->focused_obj == NULL) return;
 
-        uint32_t key = lv_indev_get_key(lv_indev_get_act());
+        uint32_t key = lv_event_get_key(e);
         lv_obj_t * guess = NULL;
 
         if(key == LV_KEY_RIGHT) {
@@ -196,6 +217,7 @@ static void gridnav_event_cb(lv_event_t * e)
         if(dsc->focused_obj == NULL)  dsc->focused_obj = find_first_focusable(obj);
         if(dsc->focused_obj) {
             lv_obj_add_state(dsc->focused_obj, LV_STATE_FOCUSED | LV_STATE_FOCUS_KEY);
+            lv_obj_clear_state(dsc->focused_obj, LV_STATE_PRESSED); /*Be sure the focuses obj is not stuck in pressed state*/
             lv_obj_scroll_to_view(dsc->focused_obj, LV_ANIM_OFF);
         }
     }
@@ -327,7 +349,7 @@ static lv_obj_t * find_last_focusable(lv_obj_t * obj)
 {
     uint32_t child_cnt = lv_obj_get_child_cnt(obj);
     int32_t i;
-    for(i = child_cnt - 1; i >= 0; i++) {
+    for(i = child_cnt - 1; i >= 0; i--) {
         lv_obj_t * child = lv_obj_get_child(obj, i);
         if(obj_is_focuable(child)) return child;
     }

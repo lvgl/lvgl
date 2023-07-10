@@ -37,7 +37,7 @@ class LvExampleAnim_3():
         self.a.set_custom_exec_cb(lambda a,val: self.anim_x_cb(self.anim_obj,val))
         self.a.set_path_cb(self.anim_path_bezier3_cb)
         self.refer_chart_cubic_bezier()
-        
+
     def page_obj_init(self,par):
         self.anim_obj = lv.obj(par)
         self.anim_obj.set_size(30, 30)
@@ -45,14 +45,14 @@ class LvExampleAnim_3():
         self.anim_obj.clear_flag(lv.obj.FLAG.SCROLLABLE)
         self.anim_obj.set_style_bg_color(lv.palette_main(lv.PALETTE.RED), lv.PART.MAIN)
         self.anim_obj.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,lv.GRID_ALIGN.START, 0, 1)
-        
+
         self.p1_label = lv.label(par)
         self.p2_label = lv.label(par)
         self.p1_label.set_text("p1:0")
         self.p2_label.set_text("p2:0")
         self.p1_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,lv.GRID_ALIGN.START, 1, 1)
         self.p2_label.set_grid_cell(lv.GRID_ALIGN.START, 0, 1,lv.GRID_ALIGN.START, 2, 1)
-            
+
         self.p1_slider = lv.slider(par)
         self.p2_slider = lv.slider(par)
         self.p1_slider.set_range(0, 1024)
@@ -63,14 +63,14 @@ class LvExampleAnim_3():
         self.p2_slider.add_event_cb(self.slider_event_cb, lv.EVENT.VALUE_CHANGED, None)
         self.p1_slider.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1,lv.GRID_ALIGN.START, 1, 1)
         self.p2_slider.set_grid_cell(lv.GRID_ALIGN.STRETCH, 1, 1,lv.GRID_ALIGN.START, 2, 1)
-        
+
         self.run_btn = lv.btn(par)
         self.run_btn.add_event_cb(self.run_btn_event_handler, lv.EVENT.CLICKED, None)
         btn_label = lv.label(self.run_btn)
         btn_label.set_text(lv.SYMBOL.PLAY)
         btn_label.center()
         self.run_btn.set_grid_cell(lv.GRID_ALIGN.STRETCH, 2, 1,lv.GRID_ALIGN.STRETCH, 1, 2)
-        
+
         self.chart = lv.chart(par)
         self.chart.set_style_pad_all(0, lv.PART.MAIN)
         self.chart.set_style_size(0, lv.PART.INDICATOR)
@@ -80,7 +80,7 @@ class LvExampleAnim_3():
         self.chart.set_range(lv.chart.AXIS.PRIMARY_X, 0, 1024)
         self.chart.set_point_count(CHART_POINTS_NUM)
         self.chart.set_grid_cell(lv.GRID_ALIGN.STRETCH, 0, 3,lv.GRID_ALIGN.STRETCH, 3, 1)
-        
+
     def refer_chart_cubic_bezier(self):
         for i in range(CHART_POINTS_NUM+1):
             t = i * (1024 // CHART_POINTS_NUM)
@@ -90,7 +90,7 @@ class LvExampleAnim_3():
 
     def slider_event_cb(self,e):
         slider = e.get_target()
-        
+
         if slider == self.p1_slider:
             label = self.p1_label
             self.p1 = slider.get_value()
@@ -101,7 +101,7 @@ class LvExampleAnim_3():
             label.set_text("p1: {:d}".format(self.p2))
 
         self.refer_chart_cubic_bezier()
-        
+
 
     def run_btn_event_handler(self,e):
 

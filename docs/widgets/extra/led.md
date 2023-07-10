@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/led.md
-```
 # LED (lv_led)
 
 ## Overview
@@ -25,11 +21,11 @@ Use `lv_led_on(led)` and `lv_led_off(led)` to set the brightness to a predefined
 
 ## Events
 - `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END` is sent for the following types:
-    - `LV_LED_DRAW_PART_RECTANGLE` The main rectangle. `LV_OBJ_DRAW_PART_RECTANGLE` is not sent by the base object. 
+    - `LV_LED_DRAW_PART_RECTANGLE` The main rectangle. `LV_OBJ_DRAW_PART_RECTANGLE` is not sent by the base object.
        - `part`: `LV_PART_MAIN`
        - `rect_dsc`
        - `draw_area`: the area of the rectangle
-       
+
 
 See the events of the [Base object](/widgets/obj) too.
 
@@ -48,11 +44,11 @@ Learn more about [Keys](/overview/indev).
 
 ```
 
-## API 
+## API
 
 ```eval_rst
 
 .. doxygenfile:: lv_led.h
   :project: lvgl
-        
+
 ```

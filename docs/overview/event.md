@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/event.md
-```
 # Events
 
 Events are triggered in LVGL when something happens which might be interesting to the user, e.g. when an object
@@ -42,7 +38,7 @@ lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num1);
 lv_obj_add_event_cb(obj, increment_on_click, LV_EVENT_CLICKED, &num2);
 ```
 
-The events will be called in the order as they were added. 
+The events will be called in the order as they were added.
 
 
 Other objects can use the same *event callback*.
@@ -50,7 +46,7 @@ Other objects can use the same *event callback*.
 
 ## Remove event(s) from an object
 
-Events can be removed from an object with the `lv_obj_remove_event_cb(obj, event_cb)` function or `lv_obj_remove_event_dsc(obj, event_dsc)`. `event_dsc` is a pointer returned by `lv_obj_add_event_cb`. 
+Events can be removed from an object with the `lv_obj_remove_event_cb(obj, event_cb)` function or `lv_obj_remove_event_dsc(obj, event_dsc)`. `event_dsc` is a pointer returned by `lv_obj_add_event_cb`.
 
 ## Event codes
 
@@ -61,9 +57,9 @@ The event codes can be grouped into these categories:
 - Special events
 - Custom events
 
-All objects (such as Buttons/Labels/Sliders etc.) regardless their type receive the *Input device*, *Drawing* and *Other* events. 
+All objects (such as Buttons/Labels/Sliders etc.) regardless their type receive the *Input device*, *Drawing* and *Other* events.
 
-However, the *Special events* are specific to a particular widget type. See the [widgets' documentation](/widgets/index) to learn when they are sent, 
+However, the *Special events* are specific to a particular widget type. See the [widgets' documentation](/widgets/index) to learn when they are sent,
 
 *Custom events* are added by the user and are never sent by LVGL.
 
@@ -72,21 +68,21 @@ The following event codes exist:
 ### Input device events
 - `LV_EVENT_PRESSED`      An object has been pressed
 - `LV_EVENT_PRESSING`     An object is being pressed (called continuously while pressing)
-- `LV_EVENT_PRESS_LOST`   An object is still being pressed but slid cursor/finger off of the object 
+- `LV_EVENT_PRESS_LOST`   An object is still being pressed but slid cursor/finger off of the object
 - `LV_EVENT_SHORT_CLICKED`    An object was pressed for a short period of time, then released. Not called if scrolled.
 - `LV_EVENT_LONG_PRESSED` An object has been pressed for at least the `long_press_time` specified in the input device driver.  Not called if scrolled.
 - `LV_EVENT_LONG_PRESSED_REPEAT`  Called after `long_press_time` in every `long_press_repeat_time` ms.  Not called if scrolled.
 - `LV_EVENT_CLICKED`      Called on release if an object did not scroll (regardless of long press)
 - `LV_EVENT_RELEASED`     Called in every case when an object has been released
-- `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required. 
+- `LV_EVENT_SCROLL_BEGIN` Scrolling begins. The event parameter is `NULL` or an `lv_anim_t *` with a scroll animation descriptor that can be modified if required.
 - `LV_EVENT_SCROLL_END`   Scrolling ends.
 - `LV_EVENT_SCROLL`       An object was scrolled
 - `LV_EVENT_GESTURE`      A gesture is detected. Get the gesture with `lv_indev_get_gesture_dir(lv_indev_get_act());`
 - `LV_EVENT_KEY`          A key is sent to an object. Get the key with `lv_indev_get_key(lv_indev_get_act());`
-- `LV_EVENT_FOCUSED`      An object is focused 
+- `LV_EVENT_FOCUSED`      An object is focused
 - `LV_EVENT_DEFOCUSED`    An object is unfocused
 - `LV_EVENT_LEAVE`        An object is unfocused but still selected
-- `LV_EVENT_HIT_TEST`     Perform advanced hit-testing. Use `lv_hit_test_info_t * a = lv_event_get_hit_test_info(e)` and check if `a->point` can click the object or not. If not set `a->res = false` 
+- `LV_EVENT_HIT_TEST`     Perform advanced hit-testing. Use `lv_hit_test_info_t * a = lv_event_get_hit_test_info(e)` and check if `a->point` can click the object or not. If not set `a->res = false`
 
 
 ### Drawing events
@@ -102,7 +98,7 @@ The following event codes exist:
 - `LV_EVENT_DRAW_PART_END`   Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. Learn more [here](/overview/drawing).
 
 In `LV_EVENT_DRAW_...` events it's not allowed to adjust the widgets' properties. E.g. you can not call `lv_obj_set_width()`.
-In other words only `get` functions can be called. 
+In other words only `get` functions can be called.
 
 ### Other events
 - `LV_EVENT_DELETE`       Object is being deleted
@@ -123,11 +119,11 @@ In other words only `get` functions can be called.
 - `LV_EVENT_INSERT`       Text is being inserted into the object. The event data is `char *` being inserted.
 - `LV_EVENT_REFRESH`      Notify the object to refresh something on it (for the user)
 - `LV_EVENT_READY`        A process has finished
-- `LV_EVENT_CANCEL`       A process has been canceled 
+- `LV_EVENT_CANCEL`       A process has been canceled
 
 
 ### Custom events
-Any custom event codes can be registered by `uint32_t MY_EVENT_1 = lv_event_register_id();` 
+Any custom event codes can be registered by `uint32_t MY_EVENT_1 = lv_event_register_id();`
 
 They can be sent to any object with `lv_event_send(obj, MY_EVENT_1, &some_data)`
 
@@ -157,14 +153,14 @@ lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
 - `lv_event_get_current_target(e)` get the object to which an event was sent. I.e. the object whose event handler is being called.
 - `lv_event_get_target(e)` get the object that originally triggered the event (different from `lv_event_get_target` if [event bubbling](#event-bubbling) is enabled)
 - `lv_event_get_user_data(e)` get the pointer passed as the last parameter of `lv_obj_add_event_cb`.
-- `lv_event_get_param(e)` get the parameter passed as the last parameter of `lv_event_send` 
+- `lv_event_get_param(e)` get the parameter passed as the last parameter of `lv_event_send`
 
 
 ## Event bubbling
 
-If `lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE)` is enabled all events will be sent to an object's parent too. If the parent also has `LV_OBJ_FLAG_EVENT_BUBBLE` enabled the event will be sent to its parent and so on. 
+If `lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE)` is enabled all events will be sent to an object's parent too. If the parent also has `LV_OBJ_FLAG_EVENT_BUBBLE` enabled the event will be sent to its parent and so on.
 
-The *target* parameter of the event is always the current target object, not the original object. To get the original target call `lv_event_get_original_target(e)` in the event handler.  
+The *target* parameter of the event is always the current target object, not the original object. To get the original target call `lv_event_get_original_target(e)` in the event handler.
 
 
 

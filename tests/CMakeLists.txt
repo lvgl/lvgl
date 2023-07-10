@@ -97,7 +97,7 @@ set(LVGL_TEST_OPTIONS_16BIT
 
 set(LVGL_TEST_OPTIONS_16BIT_SWAP
     -DLV_COLOR_DEPTH=16
-    -DLV_COLOR_16_SWAP=1  
+    -DLV_COLOR_16_SWAP=1
     -DLV_MEM_SIZE=65536
     -DLV_DPI_DEF=40
     -DLV_DRAW_COMPLEX=1
@@ -123,7 +123,7 @@ set(LVGL_TEST_OPTIONS_16BIT_SWAP
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
 )
-  
+
 set(LVGL_TEST_OPTIONS_FULL_32BIT
     -DLV_COLOR_DEPTH=32
     -DLV_MEM_SIZE=8388608
@@ -181,16 +181,19 @@ set(LVGL_TEST_OPTIONS_FULL_32BIT
     ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_24
     -DLV_USE_FS_STDIO=1
-    -DLV_FS_STDIO_LETTER='A' 
-    -DLV_USE_FS_POSIX=1 
+    -DLV_FS_STDIO_LETTER='A'
+    -DLV_USE_FS_POSIX=1
     -DLV_FS_POSIX_LETTER='B'
     -DLV_USE_PNG=1
     -DLV_USE_BMP=1
     -DLV_USE_SJPG=1
     -DLV_USE_GIF=1
     -DLV_USE_QRCODE=1
+    -DLV_USE_FRAGMENT=1
+    -DLV_USE_IMGFONT=1
+    -DLV_USE_MSG=1
 )
-  
+
 set(LVGL_TEST_OPTIONS_TEST_COMMON
     --coverage
     -DLV_COLOR_DEPTH=32
@@ -227,6 +230,12 @@ set(LVGL_TEST_OPTIONS_TEST_COMMON
     -DLV_USE_BIDI=1
     -DLV_USE_ARABIC_PERSIAN_CHARS=1
     -DLV_LABEL_TEXT_SELECTION=1
+    -DLV_USE_FS_STDIO=1
+    -DLV_FS_STDIO_LETTER='A'
+    -DLV_FS_STDIO_CACHE_SIZE=100
+    -DLV_USE_FS_POSIX=1
+    -DLV_FS_POSIX_LETTER='B'
+    -DLV_FS_POSIX_CACHE_SIZE=0
     ${LVGL_TEST_COMMON_EXAMPLE_OPTIONS}
     -DLV_FONT_DEFAULT=&lv_font_montserrat_14
     -Wno-unused-but-set-variable # unused variables are common in the dual-heap arrangement
@@ -274,7 +283,7 @@ set(COMPILE_OPTIONS
     -pedantic-errors
     -Wall
     -Wclobbered
-    -Wdeprecated 
+    -Wdeprecated
     -Wdouble-promotion
     -Wempty-body
     -Werror
@@ -359,7 +368,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
     add_test(
-        NAME ${test_name} 
+        NAME ${test_name}
         WORKING_DIRECTORY ${LVGL_TEST_DIR}
         COMMAND ${test_name})
 endforeach( test_case_fname ${TEST_CASE_FILES} )

@@ -57,7 +57,7 @@ typedef enum {
 /**********************
  * GLOBAL VARIABLES
  **********************/
-extern uint32_t LV_LAYOUT_FLEX;
+extern uint16_t LV_LAYOUT_FLEX;
 extern lv_style_prop_t LV_STYLE_FLEX_FLOW;
 extern lv_style_prop_t LV_STYLE_FLEX_MAIN_PLACE;
 extern lv_style_prop_t LV_STYLE_FLEX_CROSS_PLACE;
@@ -138,7 +138,6 @@ static inline uint8_t lv_obj_get_style_flex_grow(const lv_obj_t * obj, uint32_t 
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_GROW);
     return (uint8_t)v.num;
 }
-
 
 /**********************
  *      MACROS

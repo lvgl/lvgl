@@ -13,7 +13,6 @@
 #include "../../misc/lv_gc.h"
 #include "../../core/lv_refr.h"
 #include "lv_draw_sdl_composite.h"
-#include "lv_draw_sdl_mask.h"
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_priv.h"
 #include "lv_draw_sdl_texture_cache.h"
@@ -84,18 +83,22 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
     const bool draw_blend = blend_mode != LV_BLEND_MODE_NORMAL;
     if(draw_mask || draw_blend) {
         lv_draw_sdl_context_internals_t * internals = ctx->internals;
-        LV_ASSERT(internals->mask == NULL && internals->composition == NULL);
+        LV_ASSERT(internals->mask == NULL && internals->composition == NULL && internals->target_backup == NULL);
 
         lv_coord_t w = lv_area_get_width(apply_area), h = lv_area_get_height(apply_area);
         internals->composition = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0, w, h);
-        /* Don't need to worry about overflow */
+        /* Don't need to worry about integral overflow */
         lv_coord_t ofs_x = (lv_coord_t) - apply_area->x1, ofs_y = (lv_coord_t) - apply_area->y1;
         /* Offset draw area to start with (0,0) of coords */
         lv_area_move(coords_out, ofs_x, ofs_y);
         lv_area_move(clip_out, ofs_x, ofs_y);
+        internals->target_backup = SDL_GetRenderTarget(ctx->renderer);
         SDL_SetRenderTarget(ctx->renderer, internals->composition);
         SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 0);
-        SDL_RenderClear(ctx->renderer);
+        /* SDL_RenderClear is not working properly, so we overwrite the target with solid color */
+        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_NONE);
+        SDL_RenderFillRect(ctx->renderer, NULL);
+        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
 #if LV_GPU_SDL_CUSTOM_BLEND_MODE
         internals->mask = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0, w, h);
         dump_masks(internals->mask, apply_area);
@@ -140,7 +143,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
         SDL_Rect dst_rect;
         lv_area_to_sdl_rect(apply_area, &dst_rect);
 
-        SDL_SetRenderTarget(ctx->renderer, ctx->base_draw.buf);
+        SDL_SetRenderTarget(ctx->renderer, internals->target_backup);
         switch(blend_mode) {
             case LV_BLEND_MODE_NORMAL:
                 SDL_SetTextureBlendMode(internals->composition, SDL_BLENDMODE_BLEND);
@@ -173,7 +176,7 @@ void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_
         SDL_RenderCopy(ctx->renderer, internals->composition, &src_rect, &dst_rect);
     }
 
-    internals->mask = internals->composition = NULL;
+    internals->mask = internals->composition = internals->target_backup = NULL;
 }
 
 SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_texture_id_t id,
@@ -186,7 +189,10 @@ SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_d
     if(!result || tex_size->x < w || tex_size->y < h) {
         lv_coord_t size = next_pow_of_2(LV_MAX(w, h));
         int access = SDL_TEXTUREACCESS_STREAMING;
-        if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0) {
+        if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TRANSFORM0) {
+            access = SDL_TEXTUREACCESS_TARGET;
+        }
+        else if(id >= LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_TARGET0) {
             access = SDL_TEXTUREACCESS_TARGET;
         }
         result = SDL_CreateTexture(ctx->renderer, LV_DRAW_SDL_TEXTURE_FORMAT, access, size, size);

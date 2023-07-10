@@ -105,7 +105,7 @@ void lv_spinbox_set_range(lv_obj_t * obj, int32_t range_min, int32_t range_max);
  * @param obj pointer to spinbox
  * @param pos selected position in spinbox
  */
-void lv_spinbox_set_pos(lv_obj_t * obj, uint8_t pos);
+void lv_spinbox_set_cursor_pos(lv_obj_t * obj, uint8_t pos);
 
 /**
  * Set direction of digit step when clicking an encoder button while in editing mode
@@ -169,6 +169,10 @@ void lv_spinbox_decrement(lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
+
+/* It was ambiguous in MicroPython. See https://github.com/lvgl/lvgl/issues/3301
+ * TODO remove in v9*/
+#define lv_spinbox_set_pos lv_spinbox_set_cursor_pos
 
 #endif /*LV_USE_SPINBOX*/
 

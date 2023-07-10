@@ -8,7 +8,7 @@ void lv_example_btn_3(void)
 {
     /*Properties to transition*/
     static lv_style_prop_t props[] = {
-            LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_TEXT_LETTER_SPACE, 0
+        LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_TEXT_LETTER_SPACE, 0
     };
 
     /*Transition descriptor when going back to the default state.

@@ -97,8 +97,10 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
     /*Create inner the mask*/
     int16_t mask_in_id = LV_MASK_ID_INV;
     lv_draw_mask_radius_param_t mask_in_param;
+    bool mask_in_param_valid = false;
     if(lv_area_get_width(&area_in) > 0 && lv_area_get_height(&area_in) > 0) {
         lv_draw_mask_radius_init(&mask_in_param, &area_in, LV_RADIUS_CIRCLE, true);
+        mask_in_param_valid = true;
         mask_in_id = lv_draw_mask_add(&mask_in_param, NULL);
     }
 
@@ -115,7 +117,9 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
         if(mask_in_id != LV_MASK_ID_INV) lv_draw_mask_remove_id(mask_in_id);
 
         lv_draw_mask_free_param(&mask_out_param);
-        lv_draw_mask_free_param(&mask_in_param);
+        if(mask_in_param_valid) {
+            lv_draw_mask_free_param(&mask_in_param);
+        }
 
         return;
     }
@@ -162,7 +166,9 @@ void lv_draw_sw_arc(lv_draw_ctx_t * draw_ctx, const lv_draw_arc_dsc_t * dsc, con
 
     lv_draw_mask_free_param(&mask_angle_param);
     lv_draw_mask_free_param(&mask_out_param);
-    lv_draw_mask_free_param(&mask_in_param);
+    if(mask_in_param_valid) {
+        lv_draw_mask_free_param(&mask_in_param);
+    }
 
     lv_draw_mask_remove_id(mask_angle_id);
     lv_draw_mask_remove_id(mask_out_id);
@@ -237,7 +243,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 0 || q->end_quarter == 0) {
@@ -252,7 +258,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 0) {
@@ -265,7 +271,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -282,7 +288,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     q->draw_ctx->clip_area = clip_area_ori;
@@ -304,7 +310,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 1 || q->end_quarter == 1) {
@@ -319,7 +325,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 1) {
@@ -332,7 +338,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -349,7 +355,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     q->draw_ctx->clip_area = clip_area_ori;
@@ -371,7 +377,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 2 || q->end_quarter == 2) {
@@ -386,7 +392,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 2) {
@@ -399,7 +405,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -416,7 +422,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     q->draw_ctx->clip_area = clip_area_ori;
@@ -438,7 +444,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
     else if(q->start_quarter == 3 || q->end_quarter == 3) {
@@ -453,7 +459,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
         if(q->end_quarter == 3) {
@@ -466,7 +472,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
             bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
             if(ok) {
                 q->draw_ctx->clip_area = &quarter_area;
-                lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+                lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
             }
         }
     }
@@ -483,7 +489,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         bool ok = _lv_area_intersect(&quarter_area, &quarter_area, clip_area_ori);
         if(ok) {
             q->draw_ctx->clip_area = &quarter_area;
-            lv_draw_rect(q->draw_ctx, q->draw_dsc, &quarter_area);
+            lv_draw_rect(q->draw_ctx, q->draw_dsc, q->draw_area);
         }
     }
 

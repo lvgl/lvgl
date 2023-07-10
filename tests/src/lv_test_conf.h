@@ -6,6 +6,8 @@
 #ifndef LV_TEST_CONF_H
 #define LV_TEST_CONF_H
 
+#define LV_CONF_SUPPRESS_DEFINE_CHECK 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -17,6 +19,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+
+void lv_test_assert_fail(void);
+#define LV_ASSERT_HANDLER lv_test_assert_fail();
 
 /**********************
  *      TYPEDEFS

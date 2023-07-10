@@ -398,6 +398,26 @@ void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf
     buf[c] = '\0';
 }
 
+int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
+{
+    const char * opts = lv_dropdown_get_options(obj);
+    uint32_t char_i = 0;
+    uint32_t opt_i = 0;
+    const char * start = opts;
+
+    while(start[char_i] != '\0') {
+        for(char_i = 0; (start[char_i] != '\n') && (start[char_i] != '\0'); char_i++);
+
+        if(memcmp(start, option, LV_MIN(strlen(option), char_i)) == 0) return opt_i;
+        start = &start[char_i];
+        if(start[0] == '\n') start++;
+        opt_i++;
+    }
+
+    return -1;
+}
+
+
 const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -515,7 +535,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
             lv_obj_align(label, LV_ALIGN_TOP_RIGHT, 0, 0);
             break;
         case LV_TEXT_ALIGN_CENTER:
-            lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+            lv_obj_align(label, LV_ALIGN_TOP_MID, 0, 0);
             break;
 
     }

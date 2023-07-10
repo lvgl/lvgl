@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../unity/unity.h"
 
 #define HOR_RES 800
 #define VER_RES 480
@@ -30,65 +31,6 @@ void lv_test_deinit(void)
     lv_mem_deinit();
 }
 
-static void * open_cb(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
-{
-    (void) drv;
-    (void) mode;
-
-    FILE * fp = fopen(path, "rb"); // only reading is supported
-
-    return fp;
-}
-
-static lv_fs_res_t close_cb(lv_fs_drv_t * drv, void * file_p)
-{
-    (void) drv;
-
-    fclose(file_p);
-    return LV_FS_RES_OK;
-}
-
-static lv_fs_res_t read_cb(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
-{
-    (void) drv;
-
-    *br = fread(buf, 1, btr, file_p);
-    return (*br <= 0) ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
-}
-
-static lv_fs_res_t seek_cb(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t w)
-{
-    (void) drv;
-
-    uint32_t w2;
-    switch(w) {
-    case LV_FS_SEEK_SET:
-        w2 = SEEK_SET;
-        break;
-    case LV_FS_SEEK_CUR:
-        w2 = SEEK_CUR;
-        break;
-    case LV_FS_SEEK_END:
-        w2 = SEEK_END;
-        break;
-    default:
-        w2 = SEEK_SET;
-    }
-
-    fseek (file_p, pos, w2);
-
-    return LV_FS_RES_OK;
-}
-
-static lv_fs_res_t tell_cb(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
-{
-    (void) drv;
-
-    *pos_p = ftell(file_p);
-
-    return LV_FS_RES_OK;
-}
-
 static void hal_init(void)
 {
     static lv_disp_draw_buf_t draw_buf;
@@ -102,13 +44,13 @@ static void hal_init(void)
     disp_drv.hor_res = HOR_RES;
     disp_drv.ver_res = VER_RES;
     lv_disp_drv_register(&disp_drv);
-    
+
     static lv_indev_drv_t indev_mouse_drv;
     lv_indev_drv_init(&indev_mouse_drv);
     indev_mouse_drv.type = LV_INDEV_TYPE_POINTER;
     indev_mouse_drv.read_cb = lv_test_mouse_read_cb;
     lv_test_mouse_indev = lv_indev_drv_register(&indev_mouse_drv);
-    
+
     static lv_indev_drv_t indev_keypad_drv;
     lv_indev_drv_init(&indev_keypad_drv);
     indev_keypad_drv.type = LV_INDEV_TYPE_KEYPAD;
@@ -120,19 +62,6 @@ static void hal_init(void)
     indev_encoder_drv.type = LV_INDEV_TYPE_ENCODER;
     indev_encoder_drv.read_cb = lv_test_encoder_read_cb;
     lv_test_encoder_indev = lv_indev_drv_register(&indev_encoder_drv);
-
-
-    static lv_fs_drv_t drv;
-    lv_fs_drv_init(&drv);                     /*Basic initialization*/
-
-    drv.letter = 'F';                         /*An uppercase letter to identify the drive*/
-    drv.open_cb = open_cb;                 /*Callback to open a file*/
-    drv.close_cb = close_cb;               /*Callback to close a file*/
-    drv.read_cb = read_cb;                 /*Callback to read a file*/
-    drv.seek_cb = seek_cb;                 /*Callback to seek in a file (Move cursor)*/
-    drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position*/
-
-    lv_fs_drv_register(&drv);                 /*Finally register the drive*/
 }
 
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
@@ -161,6 +90,11 @@ uint32_t custom_tick_get(void)
 
     uint32_t time_ms = now_ms - start_ms;
     return time_ms;
+}
+
+void lv_test_assert_fail(void)
+{
+    TEST_FAIL();
 }
 
 #endif

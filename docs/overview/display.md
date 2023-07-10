@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/display.md
-```
 # Displays
 
 ``` important:: The basic concept of a *display* in LVGL is explained in the [Porting](/porting/display) section. So before reading further, please read the [Porting](/porting/display) section first.
@@ -9,7 +5,7 @@
 
 ## Multiple display support
 
-In LVGL you can have multiple displays, each with their own driver and objects. The only limitation is that every display needs to have the same color depth (as defined in `LV_COLOR_DEPTH`). 
+In LVGL you can have multiple displays, each with their own driver and objects. The only limitation is that every display needs to have the same color depth (as defined in `LV_COLOR_DEPTH`).
 If the displays are different in this regard the rendered image can be converted to the correct format in the drivers `flush_cb`.
 
 Creating more displays is easy: just initialize more display buffers and register another driver for every display.
@@ -61,17 +57,16 @@ Screens can be deleted with `lv_obj_del(scr)`, but ensure that you do not delete
 
 ### Transparent screens
 
-Usually, the opacity of the screen is `LV_OPA_COVER` to provide a solid background for its children. If this is not the case (opacity &lt; 100%) the display's background color or image will be visible. 
-See the [Display background](#display-background) section for more details. If the display's background opacity is also not `LV_OPA_COVER` LVGL has no solid background to draw. 
+Usually, the opacity of the screen is `LV_OPA_COVER` to provide a solid background for its children. If this is not the case (opacity &lt; 100%) the display's background color or image will be visible.
+See the [Display background](#display-background) section for more details. If the display's background opacity is also not `LV_OPA_COVER` LVGL has no solid background to draw.
 
 This configuration (transparent screen and display) could be used to create for example OSD menus where a video is played on a lower layer, and a menu is overlayed on an upper layer.
- 
-To handle transparent displays, special (slower) color mixing algorithms need to be used by LVGL so this feature needs to enabled with `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`. 
-As this mode operates on the Alpha channel of the pixels `LV_COLOR_DEPTH = 32` is also required. The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 where there are solid objects.
+
+To handle transparent displays, special (slower) color mixing algorithms need to be used by LVGL so this feature needs to enabled with `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`.
+The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 where there are solid objects.
 
 In summary, to enable transparent screens and displays for OSD menu-like UIs:
 - Enable `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`
-- Be sure to use `LV_COLOR_DEPTH 32`
 - Set the screen's opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP)`
 - Set the display opacity to `LV_OPA_TRANSP` with `lv_disp_set_bg_opa(NULL, LV_OPA_TRANSP);`
 
@@ -92,7 +87,7 @@ The background color is a simple color to fill the display. It can be adjusted w
 The display background image is a path to a file or a pointer to an `lv_img_dsc_t` variable (converted image data) to be used as wallpaper. It can be set with `lv_disp_set_bg_image(disp, &my_img)`;
 If a background image is configured the background won't be filled with `bg_color`.
 
-The opacity of the background color or image can be adjusted with `lv_disp_set_bg_opa(disp, opa)`. 
+The opacity of the background color or image can be adjusted with `lv_disp_set_bg_opa(disp, opa)`.
 
 The `disp` parameter of these functions can be `NULL` to select the default display.
 

@@ -144,7 +144,7 @@ void _lv_img_decoder_init(void);
  * Get information about an image.
  * Try the created image decoder one by one. Once one is able to get info that info will be used.
  * @param src the image source. Can be
- *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_add_drv()`)
+ *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register()`)
  *  2) Variable: Pointer to an `lv_img_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
  * @param header the image info will be stored here
@@ -154,10 +154,10 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header);
 
 /**
  * Open an image.
- * Try the created image decoder one by one. Once one is able to open the image that decoder is save in `dsc`
- * @param dsc describe a decoding session. Simply a pointer to an `lv_img_decoder_dsc_t` variable.
+ * Try the created image decoders one by one. Once one is able to open the image that decoder is saved in `dsc`
+ * @param dsc describes a decoding session. Simply a pointer to an `lv_img_decoder_dsc_t` variable.
  * @param src the image source. Can be
- *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_add_drv()`)
+ *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_drv_register())`)
  *  2) Variable: Pointer to an `lv_img_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
  * @param color The color of the image with `LV_IMG_CF_ALPHA_...`

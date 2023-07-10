@@ -12,7 +12,7 @@ def draw_event_cb(e):
         # print("cnt: ",cnt)
         # Make older value more transparent
         dsc.rect_dsc.bg_opa = (lv.OPA.COVER *  dsc.id) // (cnt - 1)
-        
+
         # Make smaller values blue, higher values red
         # x_array = chart.get_x_array(ser)
         # y_array = chart.get_y_array(ser)
@@ -23,11 +23,11 @@ def draw_event_cb(e):
         # print("p_act", p_act)
         x_opa = (x_array[p_act] * lv.OPA._50) // 200
         y_opa = (y_array[p_act] * lv.OPA._50) // 1000
-        
+
         dsc.rect_dsc.bg_color = lv.palette_main(lv.PALETTE.RED).color_mix(
                                              lv.palette_main(lv.PALETTE.BLUE),
                                              x_opa + y_opa)
-        
+
 def add_data(timer,chart):
     # print("add_data")
     x = lv.rand(0,200)
@@ -38,7 +38,7 @@ def add_data(timer,chart):
     x_array.append(x)
     y_array.pop(0)
     y_array.append(y)
-    
+
 #
 # A scatter chart
 #
@@ -66,7 +66,7 @@ y_array = []
 for i in range(50):
     x_array.append(lv.rand(0, 200))
     y_array.append(lv.rand(0, 1000))
-                        
+
 ser.x_points = x_array
 ser.y_points = y_array
 

@@ -7,15 +7,16 @@ static lv_obj_t * label = NULL;
 
 static void timer_cb(lv_timer_t * timer)
 {
-    if (n < 3 || n > 32) {
+    if(n < 3 || n > 32) {
         n = 3;
-    } else {
+    }
+    else {
         static uint32_t old_tick = 0;
         uint32_t tick = lv_tick_get();
-        if (!old_tick) {
+        if(!old_tick) {
             old_tick = tick;
         }
-        if (tick - old_tick > 3000) {
+        if(tick - old_tick > 3000) {
             n++;
             lv_label_set_text_fmt(label, "%d sides", n);
             old_tick = tick;
@@ -35,10 +36,10 @@ static void event_cb(lv_event_t * e)
     lv_point_t points[32];
     int i, r = 150;
     uint32_t tick = lv_tick_get();
-    for (i = 0; i < n; i++) {
+    for(i = 0; i < n; i++) {
         int angle = i * 360 / n + ((tick % 36000) / 100);
         lv_coord_t x = 150 + (r * lv_trigo_cos(angle) >> LV_TRIGO_SHIFT), y =
-                150 + (r * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
+                           150 + (r * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
         points[i].x = x;
         points[i].y = y;
     }

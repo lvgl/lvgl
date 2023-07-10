@@ -42,7 +42,11 @@ void lv_extra_init(void)
     lv_grid_init();
 #endif
 
-#if LV_USE_FS_FATFS
+#if LV_USE_MSG
+    lv_msg_init();
+#endif
+
+#if LV_USE_FS_FATFS != '\0'
     lv_fs_fatfs_init();
 #endif
 
@@ -56,6 +60,10 @@ void lv_extra_init(void)
 
 #if LV_USE_FS_WIN32
     lv_fs_win32_init();
+#endif
+
+#if LV_USE_FFMPEG
+    lv_ffmpeg_init();
 #endif
 
 #if LV_USE_PNG
@@ -77,10 +85,6 @@ void lv_extra_init(void)
 #  else
     lv_freetype_init(0, 0, 0);
 #  endif
-#endif
-
-#if LV_USE_FFMPEG
-    lv_ffmpeg_init();
 #endif
 }
 

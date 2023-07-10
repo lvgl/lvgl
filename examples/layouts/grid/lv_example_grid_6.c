@@ -28,7 +28,7 @@ void lv_example_grid_6(void)
         /*Stretch the cell horizontally and vertically too
          *Set span to 1 to make the cell 1 column/row sized*/
         lv_obj_set_grid_cell(obj, LV_GRID_ALIGN_STRETCH, col, 1,
-                                 LV_GRID_ALIGN_STRETCH, row, 1);
+                             LV_GRID_ALIGN_STRETCH, row, 1);
 
         label = lv_label_create(obj);
         lv_label_set_text_fmt(label, "%d,%d", col, row);

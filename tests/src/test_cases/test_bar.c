@@ -5,8 +5,8 @@
 
 #include "lv_test_indev.h"
 
-static lv_obj_t *active_screen = NULL;
-static lv_obj_t *bar = NULL;
+static lv_obj_t * active_screen = NULL;
+static lv_obj_t * bar = NULL;
 
 void setUp(void)
 {
@@ -67,7 +67,7 @@ void test_bar_should_update_indicator_right_coordinate_based_on_bar_value(void)
     lv_test_indev_wait(50);
 
     int32_t actual_coord = lv_area_get_width(&bar_ptr->indic_area);
-    
+
     /* Calculate bar indicator right coordinate, using rule of 3 */
     lv_coord_t bar_max_value = lv_bar_get_max_value(bar);
     lv_coord_t indicator_part_width = lv_obj_get_content_width(bar);

@@ -25,7 +25,7 @@ void lv_example_style_8(void)
     lv_obj_t * obj = lv_label_create(lv_scr_act());
     lv_obj_add_style(obj, &style, 0);
     lv_label_set_text(obj, "Text of\n"
-                            "a label");
+                      "a label");
 
     lv_obj_center(obj);
 }

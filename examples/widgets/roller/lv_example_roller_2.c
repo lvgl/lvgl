@@ -23,7 +23,7 @@ void lv_example_roller_2(void)
     lv_style_set_text_font(&style_sel, &lv_font_montserrat_22);
 
     const char * opts = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
-    lv_obj_t *roller;
+    lv_obj_t * roller;
 
     /*A roller on the left with left aligned text, and custom width*/
     roller = lv_roller_create(lv_scr_act());

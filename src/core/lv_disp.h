@@ -35,7 +35,13 @@ typedef enum {
     LV_SCR_LOAD_ANIM_MOVE_RIGHT,
     LV_SCR_LOAD_ANIM_MOVE_TOP,
     LV_SCR_LOAD_ANIM_MOVE_BOTTOM,
-    LV_SCR_LOAD_ANIM_FADE_ON,
+    LV_SCR_LOAD_ANIM_FADE_IN,
+    LV_SCR_LOAD_ANIM_FADE_ON = LV_SCR_LOAD_ANIM_FADE_IN, /*For backward compatibility*/
+    LV_SCR_LOAD_ANIM_FADE_OUT,
+    LV_SCR_LOAD_ANIM_OUT_LEFT,
+    LV_SCR_LOAD_ANIM_OUT_RIGHT,
+    LV_SCR_LOAD_ANIM_OUT_TOP,
+    LV_SCR_LOAD_ANIM_OUT_BOTTOM,
 } lv_scr_load_anim_t;
 
 /**********************
@@ -116,7 +122,7 @@ void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
 /**
  * Switch screen with animation
  * @param scr pointer to the new screen to load
- * @param anim_type type of the animation from `lv_scr_load_anim_t`. E.g.  `LV_SCR_LOAD_ANIM_MOVE_LEFT`
+ * @param anim_type type of the animation from `lv_scr_load_anim_t`, e.g. `LV_SCR_LOAD_ANIM_MOVE_LEFT`
  * @param time time of the animation
  * @param delay delay before the transition
  * @param auto_del true: automatically delete the old screen
@@ -141,6 +147,20 @@ void lv_disp_trig_activity(lv_disp_t * disp);
  * @param disp pointer to a display (NULL to use the default display)
  */
 void lv_disp_clean_dcache(lv_disp_t * disp);
+
+/**
+ * Temporarily enable and disable the invalidation of the display.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @param en true: enable invalidation; false: invalidation
+ */
+void lv_disp_enable_invalidation(lv_disp_t * disp, bool en);
+
+/**
+ * Get display invalidation is enabled.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return return true if invalidation is enabled
+ */
+bool lv_disp_is_invalidation_enabled(lv_disp_t * disp);
 
 /**
  * Get a pointer to the screen refresher timer to

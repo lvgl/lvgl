@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/libs/index.md
-```
 # 3rd party libraries
 
 
@@ -9,7 +5,7 @@
 
 .. toctree::
    :maxdepth: 1
-   
+
    fsdrv
    bmp
    sjpg

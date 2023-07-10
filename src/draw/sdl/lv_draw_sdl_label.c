@@ -19,6 +19,7 @@
 #include "lv_draw_sdl_utils.h"
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_composite.h"
+#include "lv_draw_sdl_layer.h"
 
 /*********************
  *      DEFINES
@@ -77,6 +78,21 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", letter);
+
+            /* draw placeholder */
+            lv_area_t glyph_coords;
+            lv_draw_rect_dsc_t glyph_dsc;
+            lv_coord_t begin_x = pos_p->x + g.ofs_x;
+            lv_coord_t begin_y = pos_p->y + g.ofs_y;
+            lv_area_set(&glyph_coords, begin_x, begin_y, begin_x + g.box_w, begin_y + g.box_h);
+            lv_draw_rect_dsc_init(&glyph_dsc);
+            glyph_dsc.bg_opa = LV_OPA_MIN;
+            glyph_dsc.outline_opa = LV_OPA_MIN;
+            glyph_dsc.shadow_opa = LV_OPA_MIN;
+            glyph_dsc.bg_img_opa = LV_OPA_MIN;
+            glyph_dsc.border_color = dsc->color;
+            glyph_dsc.border_width = 1;
+            draw_ctx->draw_rect(draw_ctx, &glyph_dsc, &glyph_coords);
         }
         return;
     }
@@ -119,8 +135,10 @@ void lv_draw_sdl_draw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t
     }
 
     lv_area_t t_letter = letter_area, t_clip = *clip_area, apply_area;
-    bool has_mask = lv_draw_sdl_composite_begin(ctx, &letter_area, clip_area, NULL, dsc->blend_mode, &t_letter, &t_clip,
-                                                &apply_area);
+    bool has_composite = lv_draw_sdl_composite_begin(ctx, &letter_area, clip_area, NULL, dsc->blend_mode, &t_letter,
+                                                     &t_clip, &apply_area);
+
+    lv_draw_sdl_transform_areas_offset(ctx, has_composite, &apply_area, &t_letter, &t_clip);
 
     /*If the letter is completely out of mask don't draw it*/
     if(!_lv_area_intersect(&draw_area, &t_letter, &t_clip)) {

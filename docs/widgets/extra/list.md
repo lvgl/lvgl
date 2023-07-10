@@ -1,11 +1,7 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/list.md
-```
 # List (lv_list)
 
 ## Overview
-The List is basically a rectangle with vertical layout to which Buttons and Texts can be added 
+The List is basically a rectangle with vertical layout to which Buttons and Texts can be added
 
 ## Parts and Styles
 
@@ -45,11 +41,11 @@ Learn more about [Keys](/overview/indev).
 
 ```
 
-## API 
+## API
 
 ```eval_rst
 
 .. doxygenfile:: lv_list.h
   :project: lvgl
-        
+
 ```

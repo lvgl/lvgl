@@ -97,13 +97,30 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
 {
     lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(dsc->font, &g, letter, '\0');
-    if(g_ret == false)  {
+    if(g_ret == false) {
         /*Add warning if the dsc is not found
          *but do not print warning for non printable ASCII chars (e.g. '\n')*/
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%X", (unsigned int)letter);
+            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" PRIX32, letter);
+
+#if LV_USE_FONT_PLACEHOLDER
+            /* draw placeholder */
+            lv_area_t glyph_coords;
+            lv_draw_rect_dsc_t glyph_dsc;
+            lv_coord_t begin_x = pos_p->x + g.ofs_x;
+            lv_coord_t begin_y = pos_p->y + g.ofs_y;
+            lv_area_set(&glyph_coords, begin_x, begin_y, begin_x + g.box_w, begin_y + g.box_h);
+            lv_draw_rect_dsc_init(&glyph_dsc);
+            glyph_dsc.bg_opa = LV_OPA_MIN;
+            glyph_dsc.outline_opa = LV_OPA_MIN;
+            glyph_dsc.shadow_opa = LV_OPA_MIN;
+            glyph_dsc.bg_img_opa = LV_OPA_MIN;
+            glyph_dsc.border_color = dsc->color;
+            glyph_dsc.border_width = 1;
+            draw_ctx->draw_rect(draw_ctx, &glyph_dsc, &glyph_coords);
+#endif
         }
         return;
     }
@@ -156,6 +173,24 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, c
     lv_opa_t opa = dsc->opa;
     uint32_t shades;
     if(bpp == 3) bpp = 4;
+
+#if LV_USE_IMGFONT
+    if(bpp == LV_IMGFONT_BPP) { //is imgfont
+        lv_area_t fill_area;
+        fill_area.x1 = pos->x;
+        fill_area.y1 = pos->y;
+        fill_area.x2 = pos->x + g->box_w - 1;
+        fill_area.y2 = pos->y + g->box_h - 1;
+        lv_draw_img_dsc_t img_dsc;
+        lv_draw_img_dsc_init(&img_dsc);
+        img_dsc.angle = 0;
+        img_dsc.zoom = LV_IMG_ZOOM_NONE;
+        img_dsc.opa = dsc->opa;
+        img_dsc.blend_mode = dsc->blend_mode;
+        lv_draw_img(draw_ctx, &img_dsc, &fill_area, map_p);
+        return;
+    }
+#endif
 
     switch(bpp) {
         case 1:
@@ -408,7 +443,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 #endif
 
     lv_draw_sw_blend_dsc_t blend_dsc;
-    lv_memset_00(&blend_dsc, sizeof(&blend_dsc));
+    lv_memset_00(&blend_dsc, sizeof(blend_dsc));
     blend_dsc.blend_area = &map_area;
     blend_dsc.mask_area = &map_area;
     blend_dsc.src_buf = color_buf;
@@ -454,8 +489,8 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
 #endif
 
 #if LV_FONT_SUBPX_BGR
-                res_color.ch.blue = (uint32_t)((uint32_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.red = (uint32_t)((uint32_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8;
 #else
                 res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
                 res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
@@ -507,6 +542,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
             map_area.y2 ++;
         }
         else {
+            blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
             lv_draw_sw_blend(draw_ctx, &blend_dsc);
 
             map_area.y1 = map_area.y2 + 1;
@@ -526,6 +562,7 @@ static void draw_letter_subpx(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_
     /*Flush the last part*/
     if(map_area.y1 != map_area.y2) {
         map_area.y2--;
+        blend_dsc.mask_res = LV_DRAW_MASK_RES_CHANGED;
         lv_draw_sw_blend(draw_ctx, &blend_dsc);
     }
 

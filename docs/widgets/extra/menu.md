@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/menu.md
-```
 # Menu (lv_menu)
 
 ## Overview
@@ -31,7 +27,7 @@ The following header modes exist:
 - `LV_MENU_HEADER_TOP_UNFIXED` Header is positioned at the top and can be scrolled out of view.
 - `LV_MENU_HEADER_BOTTOM_FIXED` Header is positioned at the bottom.
 
-You can set header modes with `lv_menu_set_mode_header(menu, LV_MENU_HEADER...)`. 
+You can set header modes with `lv_menu_set_mode_header(menu, LV_MENU_HEADER...)`.
 
 ### Root back button mode
 The following root back button modes exist:
@@ -66,7 +62,7 @@ The following objects can be created so that it is easier to style the menu:
 - `LV_EVENT_VALUE_CHANGED` Sent when a page is shown.
   - `lv_menu_get_cur_main_page(menu)` returns a pointer to menu page that is currently displayed in main.
   - `lv_menu_get_cur_sidebar_page(menu)` returns a pointer to menu page that is currently displayed in sidebar.
-- `LV_EVENT_CLICKED` Sent when a back btn in a header from either main or sidebar is clicked. `LV_OBJ_FLAG_EVENT_BUBBLE` is enabled on the buttons so you can add events to the menu itself. 
+- `LV_EVENT_CLICKED` Sent when a back btn in a header from either main or sidebar is clicked. `LV_OBJ_FLAG_EVENT_BUBBLE` is enabled on the buttons so you can add events to the menu itself.
   - `lv_menu_back_btn_is_root(menu, btn)` to check if btn is root back btn
 
 See the events of the [Base object](/widgets/obj) too.
@@ -85,10 +81,10 @@ Learn more about [Keys](/overview/indev).
 .. include:: ../../../examples/widgets/menu/index.rst
 ```
 
-## API 
+## API
 
 ```eval_rst
 .. doxygenfile:: lv_menu.h
   :project: lvgl
-        
+
 ```

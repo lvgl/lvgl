@@ -21,6 +21,10 @@
 #include "../draw/sw/lv_draw_sw.h"
 #include "../draw/sdl/lv_draw_sdl.h"
 #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
+#include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
+#include "../draw/arm2d/lv_gpu_arm2d.h"
+#include "../draw/nxp/vglite/lv_draw_vglite.h"
+#include "../draw/nxp/pxp/lv_draw_pxp.h"
 
 #if LV_USE_THEME_DEFAULT
     #include "../extra/themes/default/lv_theme_default.h"
@@ -87,7 +91,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->offset_x         = 0;
     driver->offset_y         = 0;
     driver->antialiasing     = LV_COLOR_DEPTH > 8 ? 1 : 0;
-    driver->screen_transp    = LV_COLOR_SCREEN_TRANSP;
+    driver->screen_transp    = 0;
     driver->dpi              = LV_DPI_DEF;
     driver->color_chroma_key = LV_COLOR_CHROMA_KEY;
 
@@ -96,18 +100,26 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->draw_ctx_init = lv_draw_stm32_dma2d_ctx_init;
     driver->draw_ctx_deinit = lv_draw_stm32_dma2d_ctx_init;
     driver->draw_ctx_size = sizeof(lv_draw_stm32_dma2d_ctx_t);
-#elif LV_USE_GPU_NXP_PXP
-    driver->draw_ctx_init = lv_draw_nxp_pxp_init;
-    driver->draw_ctx_deinit = lv_draw_nxp_pxp_init;
-    driver->draw_ctx_size = sizeof(lv_draw_nxp_pxp_t);
+#elif LV_USE_GPU_SWM341_DMA2D
+    driver->draw_ctx_init = lv_draw_swm341_dma2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_swm341_dma2d_ctx_init;
+    driver->draw_ctx_size = sizeof(lv_draw_swm341_dma2d_ctx_t);
 #elif LV_USE_GPU_NXP_VG_LITE
-    driver->draw_ctx_init = lv_draw_nxp_vglite_init;
-    driver->draw_ctx_deinit = lv_draw_nxp_vglite_init;
-    driver->draw_ctx_size = sizeof(lv_draw_nxp_vglite_t);
+    driver->draw_ctx_init = lv_draw_vglite_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_vglite_ctx_deinit;
+    driver->draw_ctx_size = sizeof(lv_draw_vglite_ctx_t);
+#elif LV_USE_GPU_NXP_PXP
+    driver->draw_ctx_init = lv_draw_pxp_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_pxp_ctx_deinit;
+    driver->draw_ctx_size = sizeof(lv_draw_pxp_ctx_t);
 #elif LV_USE_GPU_SDL
     driver->draw_ctx_init = lv_draw_sdl_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sdl_deinit_ctx;
     driver->draw_ctx_size = sizeof(lv_draw_sdl_ctx_t);
+#elif LV_USE_GPU_ARM2D
+    driver->draw_ctx_init = lv_draw_arm2d_ctx_init;
+    driver->draw_ctx_deinit = lv_draw_arm2d_ctx_init;
+    driver->draw_ctx_size = sizeof(lv_draw_arm2d_ctx_t);
 #else
     driver->draw_ctx_init = lv_draw_sw_init_ctx;
     driver->draw_ctx_deinit = lv_draw_sw_init_ctx;
@@ -150,8 +162,8 @@ void lv_disp_draw_buf_init(lv_disp_draw_buf_t * draw_buf, void * buf1, void * bu
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 {
     lv_disp_t * disp = _lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
+    LV_ASSERT_MALLOC(disp);
     if(!disp) {
-        LV_ASSERT_MALLOC(disp);
         return NULL;
     }
 
@@ -167,6 +179,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     lv_memset_00(disp, sizeof(lv_disp_t));
 
     disp->driver = driver;
+
+    disp->inv_en_cnt = 1;
 
     lv_disp_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
@@ -497,18 +511,6 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
  */
 LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
 {
-    /*If the screen is transparent initialize it when the flushing is ready*/
-#if LV_COLOR_SCREEN_TRANSP
-    if(disp_drv->screen_transp) {
-        if(disp_drv->clear_cb) {
-            disp_drv->clear_cb(disp_drv, disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size);
-        }
-        else {
-            lv_memset_00(disp_drv->draw_buf->buf_act, disp_drv->draw_buf->size * sizeof(lv_color32_t));
-        }
-    }
-#endif
-
     disp_drv->draw_buf->flushing = 0;
     disp_drv->draw_buf->flushing_last = 0;
 }
@@ -677,28 +679,35 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
     lv_img_buf_set_px_alpha(d, x, y, br);
 }
 
-static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
-                                    lv_coord_t y,
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w,
+                                    lv_coord_t x, lv_coord_t y,
                                     lv_color_t color, lv_opa_t opa)
 {
     (void) disp_drv; /*Unused*/
 
-    if(opa <= LV_OPA_MIN) return;
-    lv_img_dsc_t d;
-    d.data = buf;
-    d.header.always_zero = 0;
-    d.header.h = 1;    /*Doesn't matter*/;
-    d.header.w = buf_w;
-    d.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+    uint8_t * buf_px = buf + (buf_w * y * LV_IMG_PX_SIZE_ALPHA_BYTE + x * LV_IMG_PX_SIZE_ALPHA_BYTE);
 
-    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, lv_color_black());
-    lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y);
-
-    lv_opa_t res_opa;
+    lv_color_t bg_color;
     lv_color_t res_color;
+    lv_opa_t bg_opa = buf_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+    bg_color.full = buf_px[0];
+    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf_px[2]);
+    if(buf_px[1] <= LV_OPA_MIN) return;
+    buf_px[0] = res_color.full;
+#elif LV_COLOR_DEPTH == 16
+    bg_color.full = buf_px[0] + (buf_px[1] << 8);
+    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf_px[2]);
+    if(buf_px[2] <= LV_OPA_MIN) return;
+    buf_px[0] = res_color.full & 0xff;
+    buf_px[1] = res_color.full >> 8;
+#elif LV_COLOR_DEPTH == 32
+    bg_color = *((lv_color_t *)buf_px);
+    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &buf_px[3]);
+    if(buf_px[3] <= LV_OPA_MIN) return;
+    buf_px[0] = res_color.ch.blue;
+    buf_px[1] = res_color.ch.green;
+    buf_px[2] = res_color.ch.red;
+#endif
 
-    lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &res_opa);
-
-    lv_img_buf_set_px_alpha(&d, x, y, res_opa);
-    lv_img_buf_set_px_color(&d, x, y, res_color);
 }

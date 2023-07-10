@@ -22,6 +22,7 @@
 #include "lv_draw_sdl_texture_cache.h"
 #include "lv_draw_sdl_composite.h"
 #include "lv_draw_sdl_rect.h"
+#include "lv_draw_sdl_layer.h"
 
 /*********************
  *      DEFINES
@@ -123,10 +124,14 @@ lv_res_t lv_draw_sdl_img_core(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t 
     /* Coords will be translated so coords will start at (0,0) */
     lv_area_t t_coords = zoomed_cords, t_clip = *clip, apply_area;
 
+    bool has_composite = false;
+
     if(!check_mask_simple_radius(&t_coords, &radius)) {
-        lv_draw_sdl_composite_begin(ctx, &zoomed_cords, clip, NULL, draw_dsc->blend_mode,
-                                    &t_coords, &t_clip, &apply_area);
+        has_composite = lv_draw_sdl_composite_begin(ctx, &zoomed_cords, clip, NULL, draw_dsc->blend_mode,
+                                                    &t_coords, &t_clip, &apply_area);
     }
+
+    lv_draw_sdl_transform_areas_offset(ctx, has_composite, &apply_area, &t_coords, &t_clip);
 
     SDL_Rect clip_rect, coords_rect;
     lv_area_to_sdl_rect(&t_clip, &clip_rect);
@@ -385,7 +390,10 @@ static SDL_Texture * img_rounded_frag_obtain(lv_draw_sdl_ctx_t * ctx, SDL_Textur
         SDL_Texture * old_target = SDL_GetRenderTarget(ctx->renderer);
         SDL_SetRenderTarget(ctx->renderer, img_frag);
         SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 0);
-        SDL_RenderClear(ctx->renderer);
+        /* SDL_RenderClear is not working properly, so we overwrite the target with solid color */
+        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_NONE);
+        SDL_RenderFillRect(ctx->renderer, NULL);
+        SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
 
         lv_area_t coords = {0, 0, w - 1, h - 1}, clip;
         lv_area_t frag_coords = {0, 0, full_frag_size - 1, full_frag_size - 1};

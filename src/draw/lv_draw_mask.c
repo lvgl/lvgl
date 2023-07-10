@@ -202,7 +202,7 @@ void * lv_draw_mask_remove_custom(void * custom_id)
 
 /**
  * Free the data from the parameter.
- * It's called inside  `lv_draw_mask_remove_id` and `lv_draw_mask_remove_custom`
+ * It's called inside `lv_draw_mask_remove_id` and `lv_draw_mask_remove_custom`
  * Needs to be called only in special cases when the mask is not added by `lv_draw_mask_add`
  * and not removed by `lv_draw_mask_remove_id` or `lv_draw_mask_remove_custom`
  * @param p pointer to a mask parameter
@@ -445,9 +445,6 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
 
     if(start_angle >= 0 && start_angle < 180) {
         start_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
-    }
-    else if(start_angle >= 180 && start_angle < 360) {
-        start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
     else
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT; /*silence compiler*/

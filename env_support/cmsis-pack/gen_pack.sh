@@ -1,12 +1,12 @@
 #!/bin/bash
-# Version: 1.1 
+# Version: 1.1
 # Date: 2022-01-11
 # This bash script generates a CMSIS Software Pack:
 #
 # Pre-requisites:
 # - bash shell (for Windows: install git for Windows)
 # - 7z in path (zip archiving utility)
-#   e.g. Ubuntu: sudo apt-get install p7zip-full p7zip-rar) 
+#   e.g. Ubuntu: sudo apt-get install p7zip-full p7zip-rar)
 # - PackChk in path with execute permission
 #   (see CMSIS-Pack: CMSIS/Utilities/<os>/PackChk)
 # - xmllint in path (XML schema validation)
@@ -21,14 +21,14 @@ if [ `uname -s` = "Linux" ]
   CMSIS_PACK_PATH="/home/$USER/.arm/Packs/ARM/CMSIS/5.7.0/"
   PATH_TO_ADD="$CMSIS_PACK_PATH/CMSIS/Utilities/Linux64/"
 else
-  CMSIS_PACK_PATH="/C/Users/gabriel/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0"
-  PATH_TO_ADD="/C/Program Files (x86)/7-Zip/:$CMSIS_PACK_PATH/CMSIS/Utilities/Win32/:/C/xmllint/"
+  CMSIS_PACK_PATH="/C/Users/$USER/AppData/Local/Arm/Packs/ARM/CMSIS/5.7.0"
+  PATH_TO_ADD="/C/Program Files (x86)/7-Zip/:/C/Program Files/7-Zip/:$CMSIS_PACK_PATH/CMSIS/Utilities/Win32/:/C/xmllint/"
 fi
 [[ ":$PATH:" != *":$PATH_TO_ADD}:"* ]] && PATH="${PATH}:${PATH_TO_ADD}"
 echo $PATH_TO_ADD appended to PATH
 echo " "
 
-# Pack warehouse directory - destination 
+# Pack warehouse directory - destination
 PACK_WAREHOUSE=./
 
 # Temporary pack build directory
@@ -48,7 +48,7 @@ PACK_DIRS="
   ../../demos
 "
 
-  
+
 # Specify file names to be added to pack base directory
 PACK_BASE_FILES="
   ../../LICENCE.txt
@@ -61,7 +61,7 @@ PACK_BASE_FILES="
 
 ############ DO NOT EDIT BELOW ###########
 echo Starting CMSIS-Pack Generation: `date`
-# Zip utility check 
+# Zip utility check
 ZIP=7z
 type -a $ZIP
 errorlevel=$?
@@ -158,11 +158,11 @@ echo Adding files to pack:
 echo $PACK_BASE_FILES
 echo " "
 for f in $PACK_BASE_FILES
-do 
-  cp -f  "$f" $PACK_BUILD/ 
+do
+  cp -f  "$f" $PACK_BUILD/
 done
 
-mv "${PACK_BUILD}/lv_cmsis_pack.txt" "${PACK_BUILD}/lv_cmsis_pack.c" 
+mv "${PACK_BUILD}/lv_cmsis_pack.txt" "${PACK_BUILD}/lv_cmsis_pack.c"
 
 # Run Schema Check (for Linux only):
 # sudo apt-get install libxml2-utils

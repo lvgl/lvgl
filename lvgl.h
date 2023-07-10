@@ -14,8 +14,8 @@ extern "C" {
  * CURRENT VERSION OF LVGL
  ***************************/
 #define LVGL_VERSION_MAJOR 8
-#define LVGL_VERSION_MINOR 2
-#define LVGL_VERSION_PATCH 0
+#define LVGL_VERSION_MINOR 3
+#define LVGL_VERSION_PATCH 7
 #define LVGL_VERSION_INFO ""
 
 /*********************
@@ -67,11 +67,6 @@ extern "C" {
  * EXTRAS
  *----------------*/
 #include "src/extra/lv_extra.h"
-#include "src/extra/widgets/lv_widgets.h"
-#include "src/extra/layouts/lv_layouts.h"
-#include "src/extra/themes/lv_themes.h"
-#include "src/extra/others/lv_others.h"
-#include "src/extra/libs/lv_libs.h"
 
 /*********************
  *      DEFINES

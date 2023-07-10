@@ -133,29 +133,34 @@ static gd_GIF * gif_open(gd_GIF * gif_base)
 #elif LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
     gif->frame = &gif->canvas[2 * width * height];
 #endif
-    if (gif->bgindex)
+    if (gif->bgindex) {
         memset(gif->frame, gif->bgindex, gif->width * gif->height);
+    }
     bgcolor = &gif->palette->colors[gif->bgindex*3];
 
-    if (bgcolor[0] || bgcolor[1] || bgcolor [2])
-        for (i = 0; i < gif->width * gif->height; i++) {
+    for (i = 0; i < gif->width * gif->height; i++) {
 #if LV_COLOR_DEPTH == 32
-            gif->canvas[i*4 + 0] = *(bgcolor + 2);
-            gif->canvas[i*4 + 1] = *(bgcolor + 1);
-            gif->canvas[i*4 + 2] = *(bgcolor + 0);
-            gif->canvas[i*4 + 3] = 0xff;
+        gif->canvas[i*4 + 0] = *(bgcolor + 2);
+        gif->canvas[i*4 + 1] = *(bgcolor + 1);
+        gif->canvas[i*4 + 2] = *(bgcolor + 0);
+        gif->canvas[i*4 + 3] = 0xff;
 #elif LV_COLOR_DEPTH == 16
-            lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-            gif->canvas[i*3 + 0] = c.full & 0xff;
-            gif->canvas[i*3 + 1] = (c.full >> 8) & 0xff;
-            gif->canvas[i*3 + 2] = 0xff;
+        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+        gif->canvas[i*3 + 0] = c.full & 0xff;
+        gif->canvas[i*3 + 1] = (c.full >> 8) & 0xff;
+        gif->canvas[i*3 + 2] = 0xff;
 #elif LV_COLOR_DEPTH == 8
-            lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
-            gif->canvas[i*2 + 0] = c.full;
-            gif->canvas[i*2 + 1] = 0xff;
+        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+        gif->canvas[i*2 + 0] = c.full;
+        gif->canvas[i*2 + 1] = 0xff;
+#elif LV_COLOR_DEPTH == 1
+        lv_color_t c = lv_color_make(*(bgcolor + 0), *(bgcolor + 1), *(bgcolor + 2));
+        gif->canvas[i*2 + 0] = c.ch.red > 128 ? 1 : 0;
+        gif->canvas[i*2 + 1] = 0xff;
 #endif
-        }
+    }
     gif->anim_start = f_gif_seek(gif, 0, LV_FS_SEEK_CUR);
+    gif->loop_count = -1;
     goto ok;
 fail:
     f_gif_close(gif_base);
@@ -235,6 +240,7 @@ read_application_ext(gd_GIF *gif)
 {
     char app_id[8];
     char app_auth_code[3];
+    uint16_t loop_count;
 
     /* Discard block size (always 0x0B). */
     f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
@@ -245,7 +251,15 @@ read_application_ext(gd_GIF *gif)
     if (!strncmp(app_id, "NETSCAPE", sizeof(app_id))) {
         /* Discard block size (0x03) and constant byte (0x01). */
         f_gif_seek(gif, 2, LV_FS_SEEK_CUR);
-        gif->loop_count = read_num(gif);
+        loop_count = read_num(gif);
+        if(gif->loop_count < 0) {
+            if(loop_count == 0) {
+                gif->loop_count = 0;
+            }
+            else{
+                gif->loop_count = loop_count + 1;
+            }
+        }
         /* Skip block terminator. */
         f_gif_seek(gif, 1, LV_FS_SEEK_CUR);
     } else if (gif->application) {
@@ -564,9 +578,16 @@ gd_get_frame(gd_GIF *gif)
     dispose(gif);
     f_gif_read(gif, &sep, 1);
     while (sep != ',') {
-        if (sep == ';')
-            return 0;
-        if (sep == '!')
+        if (sep == ';') {
+            f_gif_seek(gif, gif->anim_start, LV_FS_SEEK_SET);
+            if(gif->loop_count == 1 || gif->loop_count < 0) {
+                return 0;
+            }
+            else if(gif->loop_count > 1) {
+                gif->loop_count--;
+            }
+        }
+        else if (sep == '!')
             read_ext(gif);
         else return -1;
         f_gif_read(gif, &sep, 1);
@@ -594,6 +615,7 @@ gd_render_frame(gd_GIF *gif, uint8_t *buffer)
 void
 gd_rewind(gd_GIF *gif)
 {
+    gif->loop_count = -1;
     f_gif_seek(gif, gif->anim_start, LV_FS_SEEK_SET);
 }
 

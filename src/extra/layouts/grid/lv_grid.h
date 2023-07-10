@@ -53,7 +53,7 @@ typedef enum {
  * GLOBAL VARIABLES
  **********************/
 
-extern uint32_t LV_LAYOUT_GRID;
+extern uint16_t LV_LAYOUT_GRID;
 extern lv_style_prop_t LV_STYLE_GRID_COLUMN_DSC_ARRAY;
 extern lv_style_prop_t LV_STYLE_GRID_COLUMN_ALIGN;
 extern lv_style_prop_t LV_STYLE_GRID_ROW_DSC_ARRAY;

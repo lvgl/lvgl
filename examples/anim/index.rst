@@ -1,5 +1,5 @@
 
-Start animation on an event 
+Start animation on an event
 """"""""""""""""""""""""""""
 
 .. lv_example:: anim/lv_example_anim_1
@@ -14,4 +14,4 @@ Animation timeline
 """""""""""""""""""
 .. lv_example:: anim/lv_example_anim_timeline_1
   :language: c
-  
+

@@ -1,4 +1,4 @@
-# 
+#
 # A default slider with a label displaying the current value
 #
 def slider_event_cb(e):

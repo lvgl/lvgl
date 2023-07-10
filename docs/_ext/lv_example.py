@@ -57,7 +57,7 @@ class LvExample(Directive):
         env = self.state.document.settings.env
 
         iframe_html = ""
-        
+
         c_path = self.get_example_code_path(example_path, 'c')
         py_path = self.get_example_code_path(example_path, 'py')
 
@@ -69,9 +69,9 @@ class LvExample(Directive):
             '<i class="fa fa-play"></i>&nbsp;Simulator': f"https://sim.lvgl.io/v{env.config.version}/micropython/ports/javascript/index.html?script_startup=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/header.py&script=https://raw.githubusercontent.com/lvgl/lvgl/{env.config.repo_commit_hash}/examples/{example_path}.py"
         })
 
-        if not 'c' in excluded_languages:   
+        if not 'c' in excluded_languages:
             if env.app.tags.has('html'):
-                iframe_html = f"<div class='lv-example' data-real-src='/{env.config.version}/_static/built_lv_examples?example={example_name}&w=320&h=240'></div>"
+                iframe_html = f"<div class='lv-example' data-real-src='/{env.config.version}/_static/built_lv_examples/index.html?example={example_name}&w=320&h=240'></div>"
 
         description_html = f"<div class='lv-example-description'>{self.options.get('description', '')}</div>"
         layout_node = nodes.raw(text=f"<div class='lv-example-container'>{iframe_html}{description_html}</div>", format='html')

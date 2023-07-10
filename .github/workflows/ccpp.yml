@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -55,6 +56,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2.1.0
+      - uses: ammaraskar/gcc-problem-matcher@master
       - name: Setup cache
         uses: actions/cache@v2
         with:

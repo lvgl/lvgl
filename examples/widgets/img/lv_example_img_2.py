@@ -16,10 +16,10 @@ try:
 except:
     print("Could not find img_cogwheel_argb.png")
     sys.exit()
-    
+
 img_cogwheel_argb = lv.img_dsc_t({
   'data_size': len(png_data),
-  'data': png_data 
+  'data': png_data
 })
 
 def create_slider(color):
@@ -37,7 +37,7 @@ def slider_event_cb(e):
     intense = intense_slider.get_value()
     img1.set_style_img_recolor_opa(intense, 0)
     img1.set_style_img_recolor(color, 0)
-    
+
 #
 # Demonstrate runtime image re-coloring
 #

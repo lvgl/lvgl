@@ -21,23 +21,16 @@
     #define GRAD_CONV(t, x) t = x
 #endif
 
+#undef ALIGN
 #if defined(LV_ARCH_64)
     #define ALIGN(X)    (((X) + 7) & ~7)
 #else
     #define ALIGN(X)    (((X) + 3) & ~3)
 #endif
 
-#define MAX_WIN_RES     1024 /**TODO: Find a way to get this information: max(horz_res, vert_res)*/
-
-#if _DITHER_GRADIENT
-    #if LV_DITHER_ERROR_DIFFUSION == 1
-        #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t) + MAX_WIN_RES * sizeof(lv_color_t) + MAX_WIN_RES * sizeof(lv_scolor24_t)
-    #else
-        #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t) + MAX_WIN_RES * sizeof(lv_color_t)
-    #endif /* LV_DITHER_ERROR_DIFFUSION */
-#else
-    #define LV_DEFAULT_GRAD_CACHE_SIZE  sizeof(lv_gradient_cache_t) + MAX_WIN_RES * sizeof(lv_grad_color_t)
-#endif /* _DITHER_GRADIENT */
+#if LV_GRAD_CACHE_DEF_SIZE != 0 && LV_GRAD_CACHE_DEF_SIZE < 256
+    #error "LV_GRAD_CACHE_DEF_SIZE is too small"
+#endif
 
 /**********************
  *  STATIC PROTOTYPES
@@ -94,8 +87,6 @@ static lv_grad_t * next_in_cache(lv_grad_t * item)
 
     if(item == NULL)
         return (lv_grad_t *)LV_GC_ROOT(_lv_grad_cache_mem);
-    if(item == NULL)
-        return NULL;
 
     size_t s = get_cache_item_size(item);
     /*Compute the size for this cache item*/
@@ -333,6 +324,8 @@ LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_gradient_calculate(const lv_grad_dsc_t 
             break;
         }
     }
+
+    LV_ASSERT(d != 0);
 
     /*Then interpolate*/
     frac -= min;

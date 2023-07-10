@@ -5,6 +5,7 @@ on:
 
 jobs:
   verify-formatting:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,12 +29,3 @@ jobs:
             echo "Please apply the preceding diff to your code or run scripts/code-format.py"
             exit 1
           fi
-      - name: Comment PR
-        uses: thollander/actions-comment-pull-request@v1
-        if: github.event_name == 'pull_request' && failure()
-        with:
-          message: |
-            Your PR needs its formatting corrected before it can be merged upstream.
-            
-            Please run `scripts/code-format.py` and commit the resulting change.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

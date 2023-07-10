@@ -65,7 +65,7 @@ static lv_obj_t * get_next_item(lv_obj_t * cont, bool rev, int32_t * item_id);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-uint32_t LV_LAYOUT_FLEX;
+uint16_t LV_LAYOUT_FLEX;
 lv_style_prop_t LV_STYLE_FLEX_FLOW;
 lv_style_prop_t LV_STYLE_FLEX_MAIN_PLACE;
 lv_style_prop_t LV_STYLE_FLEX_CROSS_PLACE;
@@ -93,10 +93,10 @@ void lv_flex_init(void)
 {
     LV_LAYOUT_FLEX = lv_layout_register(flex_update, NULL);
 
-    LV_STYLE_FLEX_FLOW = lv_style_register_prop();
-    LV_STYLE_FLEX_MAIN_PLACE = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
-    LV_STYLE_FLEX_CROSS_PLACE = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
-    LV_STYLE_FLEX_TRACK_PLACE = lv_style_register_prop() | LV_STYLE_PROP_LAYOUT_REFR;
+    LV_STYLE_FLEX_FLOW = lv_style_register_prop(LV_STYLE_PROP_FLAG_NONE);
+    LV_STYLE_FLEX_MAIN_PLACE = lv_style_register_prop(LV_STYLE_PROP_LAYOUT_REFR);
+    LV_STYLE_FLEX_CROSS_PLACE = lv_style_register_prop(LV_STYLE_PROP_LAYOUT_REFR);
+    LV_STYLE_FLEX_TRACK_PLACE = lv_style_register_prop(LV_STYLE_PROP_LAYOUT_REFR);
 }
 
 void lv_obj_set_flex_flow(lv_obj_t * obj, lv_flex_flow_t flow)
@@ -428,6 +428,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
 
         for(i = 0; i < t->grow_item_cnt; i++) {
             if(t->grow_dsc[i].clamped == 0) {
+                LV_ASSERT(grow_value_sum != 0);
                 grow_unit = grow_max_size / grow_value_sum;
                 lv_coord_t size = grow_unit * t->grow_dsc[i].grow_value;
                 lv_coord_t size_clamp = LV_CLAMP(t->grow_dsc[i].min_size, size, t->grow_dsc[i].max_size);
@@ -469,8 +470,14 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
                 }
             }
 
-            if(f->row) item->w_layout = 1;
-            else item->h_layout = 1;
+            if(f->row) {
+                item->w_layout = 1;
+                item->h_layout = 0;
+            }
+            else {
+                item->h_layout = 1;
+                item->w_layout = 0;
+            }
 
             if(s != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
@@ -525,7 +532,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
             item->coords.y1 += diff_y;
             item->coords.y2 += diff_y;
             lv_obj_invalidate(item);
-            lv_obj_move_children_by(item, diff_x, diff_y, true);
+            lv_obj_move_children_by(item, diff_x, diff_y, false);
         }
 
         if(!(f->row && rtl)) main_pos += area_get_main_size(&item->coords) + item_gap + place_gap;

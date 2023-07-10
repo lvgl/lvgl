@@ -1,14 +1,10 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/calendar.md
-```
 # Calendar (lv_calendar)
 
 ## Overview
 
 The Calendar object is a classic calendar which can:
-- show the days of any month in a 7x7 matrix 
-- Show the name of the days 
+- show the days of any month in a 7x7 matrix
+- Show the name of the days
 - highlight the current day (today)
 - highlight any user-defined dates
 
@@ -45,7 +41,7 @@ The name of the days can be adjusted with `lv_calendar_set_day_names(calendar, d
 Only the pointer of the day names is saved so the elements should be static, global or constant variables.
 
 ## Events
-- `LV_EVENT_VALUE_CHANGED` Sent if a date is clicked. `lv_calendar_get_pressed_date(calendar, &date)` set `date` to the date currently being pressed. Returns `LV_RES_OK` if there is a valid pressed date, else `LV_RES_INV`. 
+- `LV_EVENT_VALUE_CHANGED` Sent if a date is clicked. `lv_calendar_get_pressed_date(calendar, &date)` set `date` to the date currently being pressed. Returns `LV_RES_OK` if there is a valid pressed date, else `LV_RES_INV`.
 
 Learn more about [Events](/overview/event).
 
@@ -66,7 +62,7 @@ Learn more about [Keys](/overview/indev).
 
 ### Drop-down
 `lv_calendar_header_dropdown_create(calendar)` creates a header that contains 2 drop-drown lists: one for the year and another for the month.
- 
+
 
 ## Example
 

@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/keyboard.md
-```
 
 
 # Keyboard (lv_keyboard)
@@ -11,7 +7,7 @@
 The Keyboard object is a special [Button matrix](/widgets/core/btnmatrix) with predefined keymaps and other features to realize a virtual keyboard to write texts into a [Text area](/widgets/core/textarea).
 
 ## Parts and Styles
-Similarly to Button matrices Keyboards consist of 2 part: 
+Similarly to Button matrices Keyboards consist of 2 part:
 - `LV_PART_MAIN` The main part. Uses all the typical background properties
 - `LV_PART_ITEMS` The buttons. Also uses all typical background properties as well as the *text* properties.
 
@@ -43,7 +39,7 @@ The popovers currently are merely a visual effect and don't allow selecting addi
 ### New Keymap
 You can specify a new map (layout) for the keyboard with `lv_keyboard_set_map(kb, map)` and `lv_keyboard_set_ctrl_map(kb, ctrl_map)`.
 Learn more about the [Button matrix](/widgets/core/btnmatrix) object.
-Keep in mind that using following keywords will have the same effect as with the original map:  
+Keep in mind that using following keywords will have the same effect as with the original map:
 - `LV_SYMBOL_OK` Apply.
 - `LV_SYMBOL_CLOSE` or `LV_SYMBOL_KEYBOARD` Close.
 - `LV_SYMBOL_BACKSPACE` Delete on the left.

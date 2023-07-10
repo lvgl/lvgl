@@ -124,7 +124,15 @@ lv_obj_t * lv_menu_page_create(lv_obj_t * parent, char * title)
     lv_obj_class_init_obj(obj);
 
     lv_menu_page_t * page = (lv_menu_page_t *)obj;
-    page->title = title;
+    if(title) {
+        page->title = lv_mem_alloc(strlen(title) + 1);
+        LV_ASSERT_MALLOC(page->title);
+        if(page->title == NULL) return NULL;
+        strcpy(page->title, title);
+    }
+    else {
+        page->title = NULL;
+    }
 
     return obj;
 }
@@ -187,6 +195,11 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page)
 
     lv_menu_t * menu = (lv_menu_t *)obj;
 
+    /* Guard against setting the same page again */
+    if(menu->main_page == page) {
+        return;
+    }
+
     /* Hide previous page */
     if(menu->main_page != NULL) {
         lv_obj_set_parent(menu->main_page, menu->storage);
@@ -196,6 +209,7 @@ void lv_menu_set_page(lv_obj_t * obj, lv_obj_t * page)
         /* Add a new node */
         lv_ll_t * history_ll = &(menu->history_ll);
         lv_menu_history_t * new_node = _lv_ll_ins_head(history_ll);
+        LV_ASSERT_MALLOC(new_node);
         new_node->page = page;
         menu->cur_depth++;
 
@@ -352,8 +366,9 @@ void lv_menu_set_load_page_event(lv_obj_t * menu, lv_obj_t * obj, lv_obj_t * pag
 {
     LV_ASSERT_OBJ(menu, MY_CLASS);
 
-    /* Make the object clickable */
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     /* Remove old event */
     if(lv_obj_remove_event_cb(obj, lv_menu_load_page_event_cb)) {
@@ -675,6 +690,11 @@ static void lv_menu_load_page_event_cb(lv_event_t * e)
     }
 
     lv_menu_set_page((lv_obj_t *)menu, page);
+
+    if(lv_group_get_default() != NULL && menu->sidebar_page == NULL) {
+        /* Sidebar is not supported for now*/
+        lv_group_focus_next(lv_group_get_default());
+    }
 }
 
 static void lv_menu_obj_del_event_cb(lv_event_t * e)

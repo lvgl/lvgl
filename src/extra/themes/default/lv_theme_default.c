@@ -218,26 +218,32 @@ static void style_init(void)
     color_card = theme.flags & MODE_DARK ? DARK_COLOR_CARD : LIGHT_COLOR_CARD;
     color_grey = theme.flags & MODE_DARK ? DARK_COLOR_GREY : LIGHT_COLOR_GREY;
 
+    style_init_reset(&styles->transition_delayed);
+    style_init_reset(&styles->transition_normal);
+#if TRANSITION_TIME
     static lv_style_transition_dsc_t trans_delayed;
     lv_style_transition_dsc_init(&trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70, NULL);
 
     static lv_style_transition_dsc_t trans_normal;
     lv_style_transition_dsc_init(&trans_normal, trans_props, lv_anim_path_linear, TRANSITION_TIME, 0, NULL);
 
-    style_init_reset(&styles->transition_delayed);
     lv_style_set_transition(&styles->transition_delayed, &trans_delayed); /*Go back to default state with delay*/
 
-    style_init_reset(&styles->transition_normal);
     lv_style_set_transition(&styles->transition_normal, &trans_normal); /*Go back to default state with delay*/
+#endif
 
     style_init_reset(&styles->scrollbar);
-    lv_style_set_bg_color(&styles->scrollbar, (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY,
-                                                                                            2) : lv_palette_main(LV_PALETTE_GREY));
+    lv_color_t sb_color = (theme.flags & MODE_DARK) ? lv_palette_darken(LV_PALETTE_GREY,
+                                                                        2) : lv_palette_main(LV_PALETTE_GREY);
+    lv_style_set_bg_color(&styles->scrollbar, sb_color);
+
     lv_style_set_radius(&styles->scrollbar, LV_RADIUS_CIRCLE);
     lv_style_set_pad_all(&styles->scrollbar, lv_disp_dpx(theme.disp, 7));
     lv_style_set_width(&styles->scrollbar,  lv_disp_dpx(theme.disp, 5));
     lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_40);
+#if TRANSITION_TIME
     lv_style_set_transition(&styles->scrollbar, &trans_normal);
+#endif
 
     style_init_reset(&styles->scrollbar_scrolled);
     lv_style_set_bg_opa(&styles->scrollbar_scrolled,  LV_OPA_COVER);
@@ -993,6 +999,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
         lv_obj_add_style(obj, &styles->card, 0);
         lv_obj_add_style(obj, &styles->pad_small, 0);
+        lv_obj_add_style(obj, &styles->disabled, LV_STATE_DISABLED);
         lv_obj_add_style(obj, &styles->outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &styles->outline_secondary, LV_STATE_EDITED);
         lv_obj_add_style(obj, &styles->scrollbar, LV_PART_SCROLLBAR);
@@ -1079,11 +1086,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_PRESSED | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &styles->bg_color_primary_muted, LV_STATE_CHECKED);
+        lv_obj_add_style(obj, &styles->bg_color_primary, LV_STATE_FOCUS_KEY);
     }
     else if(lv_obj_check_type(obj, &lv_menu_sidebar_header_cont_class) ||
             lv_obj_check_type(obj, &lv_menu_main_header_cont_class)) {
         lv_obj_add_style(obj, &styles->menu_header_cont, 0);
-        lv_obj_add_style(obj, &styles->menu_pressed, LV_STATE_PRESSED);
     }
     else if(lv_obj_check_type(obj, &lv_menu_page_class)) {
         lv_obj_add_style(obj, &styles->menu_page, 0);

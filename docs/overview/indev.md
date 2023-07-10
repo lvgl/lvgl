@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/overview/indev.md
-```
 # Input devices
 
 An input device usually means:
@@ -66,6 +62,8 @@ To prevent passing the gesture event to the parent from an object use `lv_obj_cl
 
 Note that, gestures are not triggered if an object is being scrolled.
 
+If you did some action on a gesture you can call `lv_indev_wait_release(lv_indev_get_act())` in the event handler to prevent LVGL sending further input device related events. 
+
 ## Keypad and encoder
 
 You can fully control the user interface without a touchpad or mouse by using a keypad or encoder(s). It works similar to the *TAB* key on the PC to select an element in an application or a web page.
@@ -124,9 +122,9 @@ Don't forget to assign one or more input devices to the default group with ` lv_
 
 ### Styling
 
-If an object is focused either by clicking it via touchpad or focused via an encoder or keypad it goes to the `LV_STATE_FOCUSED` state. Hence, focused styles will be applied to it. 
+If an object is focused either by clicking it via touchpad or focused via an encoder or keypad it goes to the `LV_STATE_FOCUSED` state. Hence, focused styles will be applied to it.
 
-If an object switches to edit mode it enters the `LV_STATE_FOCUSED | LV_STATE_EDITED` states so these style properties will be shown. 
+If an object switches to edit mode it enters the `LV_STATE_FOCUSED | LV_STATE_EDITED` states so these style properties will be shown.
 
 For a more detailed description read the [Style](https://docs.lvgl.io/v7/en/html/overview/style.html) section.
 

@@ -25,6 +25,9 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/* imgfont identifier */
+#define LV_IMGFONT_BPP 9
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -37,7 +40,7 @@ struct _lv_font_t;
 /** Describes the properties of a glyph.*/
 typedef struct {
     const struct _lv_font_t *
-        resolved_font; /**< Pointer to a font where the gylph was actually found after handling fallbacks*/
+        resolved_font; /**< Pointer to a font where the glyph was actually found after handling fallbacks*/
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width.*/
     uint16_t box_w; /**< Width of the glyph's bounding box*/
     uint16_t box_h; /**< Height of the glyph's bounding box*/
@@ -87,7 +90,7 @@ typedef struct _lv_font_t {
 /**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
- * @param letter an UNICODE character code
+ * @param letter a UNICODE character code
  * @return pointer to the bitmap of the letter
  */
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter);
@@ -96,7 +99,7 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
  * Get the descriptor of a glyph
  * @param font_p pointer to font
  * @param dsc_out store the result descriptor here
- * @param letter an UNICODE letter code
+ * @param letter a UNICODE letter code
  * @param letter_next the next letter after `letter`. Used for kerning
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
@@ -107,7 +110,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
 /**
  * Get the width of a glyph with kerning
  * @param font pointer to a font
- * @param letter an UNICODE letter
+ * @param letter a UNICODE letter
  * @param letter_next the next letter after `letter`. Used for kerning
  * @return the width of the glyph
  */
@@ -243,7 +246,7 @@ LV_FONT_CUSTOM_DECLARE
 #endif
 
 /**
- * Just a wrapper around LV_FONT_DEFAULT because it might be more convenient to use a function is some cases
+ * Just a wrapper around LV_FONT_DEFAULT because it might be more convenient to use a function in some cases
  * @return  pointer to LV_FONT_DEFAULT
  */
 static inline const lv_font_t * lv_font_default(void)

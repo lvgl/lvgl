@@ -161,17 +161,20 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
 
     /*In infinite mode interpret the new ID relative to the currently visible "page"*/
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
-        int32_t sel_opt_signed = sel_opt;
-        uint16_t page = roller->sel_opt_id / LV_ROLLER_INF_PAGES;
-
-        /*`sel_opt` should be less than the number of options set by the user.
-         *If it's more then probably it's a reference from not the first page
-         *so normalize `sel_opt`*/
-        if(page != 0) {
-            sel_opt_signed -= page * LV_ROLLER_INF_PAGES;
+        uint32_t real_option_cnt = roller->option_cnt / LV_ROLLER_INF_PAGES;
+        uint16_t current_page = roller->sel_opt_id / real_option_cnt;
+        /*Set by the user to e.g. 0, 1, 2, 3...
+         *Upscale the value to the current page*/
+        if(sel_opt < real_option_cnt) {
+            uint16_t act_opt = roller->sel_opt_id - current_page * real_option_cnt;
+            int32_t sel_opt_signed = sel_opt;
+            /*Huge jump? Probably from last to first or first to last option.*/
+            if(LV_ABS((int16_t)act_opt - sel_opt) > real_option_cnt / 2) {
+                if(act_opt > sel_opt) sel_opt_signed += real_option_cnt;
+                else sel_opt_signed -= real_option_cnt;
+            }
+            sel_opt = sel_opt_signed + real_option_cnt * current_page;
         }
-
-        sel_opt = page * LV_ROLLER_INF_PAGES + sel_opt_signed;
     }
 
     roller->sel_opt_id     = sel_opt < roller->option_cnt ? sel_opt : roller->option_cnt - 1;
@@ -474,6 +477,7 @@ static void draw_main(lv_event_t * e)
         area_ok = _lv_area_intersect(&mask_sel, draw_ctx->clip_area, &sel_area);
         if(area_ok) {
             lv_obj_t * label = get_label(obj);
+            if(lv_label_get_recolor(label)) label_dsc.flag |= LV_TEXT_FLAG_RECOLOR;
 
             /*Get the size of the "selected text"*/
             lv_point_t res_p;
@@ -526,6 +530,8 @@ static void draw_label(lv_event_t * e)
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
     lv_obj_init_draw_label_dsc(roller, LV_PART_MAIN, &label_draw_dsc);
+    if(lv_label_get_recolor(label_obj)) label_draw_dsc.flag |= LV_TEXT_FLAG_RECOLOR;
+
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
     /*If the roller has shadow or outline it has some ext. draw size

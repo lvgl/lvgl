@@ -1,11 +1,7 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/spinner.md
-```
 # Spinner (lv_spinner)
 
 ## Overview
-The Spinner object is a spinning arc over a ring. 
+The Spinner object is a spinning arc over a ring.
 
 ## Parts and Styles
 The parts are identical to the parts of [lv_arc](/widgets/core/arc).
@@ -38,11 +34,11 @@ Learn more about [Keys](/overview/indev).
 
 ```
 
-## API 
+## API
 
 ```eval_rst
 
 .. doxygenfile:: lv_spinner.h
   :project: lvgl
-        
+
 ```

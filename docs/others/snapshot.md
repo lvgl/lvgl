@@ -1,7 +1,3 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/others/snapshot.md
-```
 # Snapshot
 
 Snapshot provides APIs to take snapshot image for LVGL object together with its children. The image will look exactly like the object.

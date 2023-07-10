@@ -69,18 +69,19 @@ void lv_draw_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const 
 
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    lv_res_t res;
+    lv_res_t res = LV_RES_INV;
+
     if(draw_ctx->draw_img) {
         res = draw_ctx->draw_img(draw_ctx, dsc, coords, src);
     }
-    else {
+
+    if(res != LV_RES_OK) {
         res = decode_and_draw(draw_ctx, dsc, coords, src);
     }
 
-    if(res == LV_RES_INV) {
+    if(res != LV_RES_OK) {
         LV_LOG_WARN("Image draw error");
         show_error(draw_ctx, coords, "No\ndata");
-        return;
     }
 }
 
@@ -236,11 +237,20 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t decode_and_draw(lv_draw_ctx_t * draw_ctx, 
 
     if(cdsc == NULL) return LV_RES_INV;
 
-
     lv_img_cf_t cf;
     if(lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+    else if(LV_IMG_CF_ALPHA_8BIT == cdsc->dec_dsc.header.cf) cf = LV_IMG_CF_ALPHA_8BIT;
+    else if(LV_IMG_CF_RGB565A8 == cdsc->dec_dsc.header.cf) cf = LV_IMG_CF_RGB565A8;
     else if(lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf)) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
     else cf = LV_IMG_CF_TRUE_COLOR;
+
+    if(cf == LV_IMG_CF_ALPHA_8BIT) {
+        if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
+            /* resume normal method */
+            cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+            cdsc->dec_dsc.img_data = NULL;
+        }
+    }
 
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");

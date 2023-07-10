@@ -13,20 +13,20 @@ void lv_example_scroll_4(void)
 
     lv_obj_t * label = lv_label_create(obj);
     lv_label_set_text(label,
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n"
-            "Etiam dictum, tortor vestibulum lacinia laoreet, mi neque consectetur neque, vel mattis odio dolor egestas ligula. \n"
-            "Sed vestibulum sapien nulla, id convallis ex porttitor nec. \n"
-            "Duis et massa eu libero accumsan faucibus a in arcu. \n"
-            "Ut pulvinar odio lorem, vel tempus turpis condimentum quis. Nam consectetur condimentum sem in auctor. \n"
-            "Sed nisl augue, venenatis in blandit et, gravida ac tortor. \n"
-            "Etiam dapibus elementum suscipit. \n"
-            "Proin mollis sollicitudin convallis. \n"
-            "Integer dapibus tempus arcu nec viverra. \n"
-            "Donec molestie nulla enim, eu interdum velit placerat quis. \n"
-            "Donec id efficitur risus, at molestie turpis. \n"
-            "Suspendisse vestibulum consectetur nunc ut commodo. \n"
-            "Fusce molestie rhoncus nisi sit amet tincidunt. \n"
-            "Suspendisse a nunc ut magna ornare volutpat.");
+                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n"
+                      "Etiam dictum, tortor vestibulum lacinia laoreet, mi neque consectetur neque, vel mattis odio dolor egestas ligula. \n"
+                      "Sed vestibulum sapien nulla, id convallis ex porttitor nec. \n"
+                      "Duis et massa eu libero accumsan faucibus a in arcu. \n"
+                      "Ut pulvinar odio lorem, vel tempus turpis condimentum quis. Nam consectetur condimentum sem in auctor. \n"
+                      "Sed nisl augue, venenatis in blandit et, gravida ac tortor. \n"
+                      "Etiam dapibus elementum suscipit. \n"
+                      "Proin mollis sollicitudin convallis. \n"
+                      "Integer dapibus tempus arcu nec viverra. \n"
+                      "Donec molestie nulla enim, eu interdum velit placerat quis. \n"
+                      "Donec id efficitur risus, at molestie turpis. \n"
+                      "Suspendisse vestibulum consectetur nunc ut commodo. \n"
+                      "Fusce molestie rhoncus nisi sit amet tincidunt. \n"
+                      "Suspendisse a nunc ut magna ornare volutpat.");
 
 
     /*Remove the style of scrollbar to have clean start*/

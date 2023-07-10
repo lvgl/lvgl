@@ -120,7 +120,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month)
     d.month = calendar->showed_date.month;
     d.day = calendar->showed_date.day;
 
-    uint8_t i;
+    uint32_t i;
 
     /*Remove the disabled state but revert it for day names*/
     lv_btnmatrix_clear_btn_ctrl_all(calendar->btnm, LV_BTNMATRIX_CTRL_DISABLED);
@@ -262,7 +262,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
         if(i != 0 && (i + 1) % 8 == 0) {
             calendar->map[i] = "\n";
         }
-        else if(i < 8) {
+        else if(i < 7) {
             calendar->map[i] = day_names_def[i];
         }
         else {

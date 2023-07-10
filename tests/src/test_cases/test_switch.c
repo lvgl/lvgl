@@ -9,8 +9,8 @@
 #define SWITCHES_CNT    10
 
 uint8_t value_changed_event_cnt = 0;
-lv_obj_t *scr = NULL;
-lv_obj_t *sw = NULL;
+lv_obj_t * scr = NULL;
+lv_obj_t * sw = NULL;
 
 void setUp(void)
 {
@@ -30,11 +30,11 @@ static void mouse_click_on_switch(void)
     lv_test_mouse_click_at(sw->coords.x1, sw->coords.y1);
 }
 
-static void event_handler(lv_event_t *e)
+static void event_handler(lv_event_t * e)
 {
     lv_event_code_t event = lv_event_get_code(e);
 
-    if (LV_EVENT_VALUE_CHANGED == event) {
+    if(LV_EVENT_VALUE_CHANGED == event) {
         value_changed_event_cnt++;
     }
 
@@ -52,23 +52,23 @@ void test_switch_should_not_leak_memory_after_deletion(void)
     uint32_t initial_available_memory = 0;
     uint32_t final_available_memory = 0;
     lv_mem_monitor_t monitor;
-    lv_obj_t *switches[SWITCHES_CNT] = {NULL};
+    lv_obj_t * switches[SWITCHES_CNT] = {NULL};
 
     lv_mem_monitor(&monitor);
     initial_available_memory = monitor.free_size;
-    
-    for (idx = 0; idx < SWITCHES_CNT; idx++) {
+
+    for(idx = 0; idx < SWITCHES_CNT; idx++) {
         switches[idx] = lv_switch_create(scr);
     }
-    
-    for (idx = 0; idx < SWITCHES_CNT; idx++) {
+
+    for(idx = 0; idx < SWITCHES_CNT; idx++) {
         lv_obj_del(switches[idx]);
     }
-    
+
     lv_mem_monitor(&monitor);
     final_available_memory = monitor.free_size;
 
-    LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, final_available_memory));
+    LV_HEAP_CHECK(TEST_ASSERT_LESS_OR_EQUAL(initial_available_memory, final_available_memory));
 }
 
 void test_switch_animation(void)

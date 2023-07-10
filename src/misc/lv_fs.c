@@ -95,6 +95,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         file_p->cache = lv_mem_alloc(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
         lv_memset_00(file_p->cache, sizeof(lv_fs_file_cache_t));
+        file_p->cache->start = UINT32_MAX;  /*Set an invalid range by default*/
+        file_p->cache->end = UINT32_MAX - 1;
     }
 
     return LV_FS_RES_OK;
@@ -138,40 +140,38 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
 
     if(start <= file_position && file_position < end) {
         /* Data can be read from cache buffer */
-
         uint16_t buffer_offset = file_position - start;
-        uint16_t buffer_remaining_length = buffer_size - buffer_offset;
+        uint32_t buffer_remaining_length = LV_MIN((uint32_t)buffer_size - buffer_offset, (uint32_t)end - file_position);
 
         if(btr <= buffer_remaining_length) {
             /*Data is in cache buffer, and buffer end not reached, no need to read from FS*/
             lv_memcpy(buf, buffer + buffer_offset, btr);
+            *br = btr;
         }
         else {
             /*First part of data is in cache buffer, but we need to read rest of data from FS*/
             lv_memcpy(buf, buffer + buffer_offset, buffer_remaining_length);
 
+            uint32_t bytes_read_to_buffer = 0;
             if(btr > buffer_size) {
                 /*If remaining data chuck is bigger than buffer size, then do not use cache, instead read it directly from FS*/
                 res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)(buf + buffer_remaining_length),
-                                           btr - buffer_remaining_length, br);
+                                           btr - buffer_remaining_length, &bytes_read_to_buffer);
             }
             else {
                 /*If remaining data chunk is smaller than buffer size, then read into cache buffer*/
-                uint32_t bytes_read_to_buffer = 0;
-
-                /*Read into cache buffer:*/
                 res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buffer, buffer_size, &bytes_read_to_buffer);
-                file_p->cache->start = file_p->cache->end + 1;
+                file_p->cache->start = file_p->cache->end;
                 file_p->cache->end = file_p->cache->start + bytes_read_to_buffer;
 
-                uint16_t data_chunk_remaining = btr - buffer_remaining_length;
-                memcpy(buf + buffer_remaining_length, buffer, data_chunk_remaining);
+                uint16_t data_chunk_remaining = LV_MIN(btr - buffer_remaining_length, bytes_read_to_buffer);
+                lv_memcpy(buf + buffer_remaining_length, buffer, data_chunk_remaining);
             }
+            *br = LV_MIN(buffer_remaining_length + bytes_read_to_buffer, btr);
         }
     }
     else {
         /*Data is not in cache buffer*/
-
         if(btr > buffer_size) {
             /*If bigger data is requested, then do not use cache, instead read it directly*/
             res = file_p->drv->read_cb(file_p->drv, file_p->file_d, (void *)buf, btr, br);
@@ -189,13 +189,14 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
             file_p->cache->start = file_position;
             file_p->cache->end = file_p->cache->start + bytes_read_to_buffer;
 
-            memcpy(buf, buffer, btr);
+            *br = LV_MIN(btr, bytes_read_to_buffer);
+            lv_memcpy(buf, buffer, *br);
+
         }
     }
 
     if(res == LV_FS_RES_OK) {
-        *br = btr;
-        file_p->cache->file_position += btr;
+        file_p->cache->file_position += *br;
     }
 
     return res;

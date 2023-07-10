@@ -1,11 +1,7 @@
-```eval_rst
-.. include:: /header.rst 
-:github_url: |github_link_base|/widgets/extra/colorwheel.md
-```
 # Color wheel (lv_colorwheel)
 
 ## Overview
-As its name implies *Color wheel* allows the user to select a color. The Hue, Saturation and Value of the color can be selected separately. 
+As its name implies *Color wheel* allows the user to select a color. The Hue, Saturation and Value of the color can be selected separately.
 
 Long pressing the object, the color wheel will change to the next parameter of the color (hue, saturation or value). A double click will reset the current parameter.
 
@@ -17,7 +13,7 @@ Long pressing the object, the color wheel will change to the next parameter of t
 
 ### Create a color wheel
 
-`lv_colorwheel_create(parent, knob_recolor)` creates a new color wheel. With `knob_recolor=true` the knob's background color will be set to the current color. 
+`lv_colorwheel_create(parent, knob_recolor)` creates a new color wheel. With `knob_recolor=true` the knob's background color will be set to the current color.
 
 ### Set color
 
