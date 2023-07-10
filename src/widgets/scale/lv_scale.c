@@ -10,7 +10,6 @@
 #if LV_USE_SCALE != 0
 
 #include "../../core/lv_group.h"
-//#include "../../core/lv_indev.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../draw/lv_draw_arc.h"

@@ -469,6 +469,8 @@
 
 #define LV_USE_SCALE      1
 
+#define LV_USE_SCALE      1
+
 #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
 
 #define LV_USE_SPAN       1
