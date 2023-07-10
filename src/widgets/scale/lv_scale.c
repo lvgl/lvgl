@@ -799,9 +799,8 @@ static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * a
 
 static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
 {
-#if 0
     lv_scale_t * scale = (lv_scale_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
+    lv_layer_t * layer = lv_event_get_layer(event);
 
     if(scale->total_tick_count <= 1) return;
 
@@ -824,20 +823,13 @@ static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
 
     LV_LOG_USER("Arc center: {X:%d, Y:%d}, radius: %d", arc_center.x, arc_center.y, arc_radius);
 
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.id = scale->mode;
-    part_draw_dsc.part = LV_PART_MAIN;
-    part_draw_dsc.p1 = &arc_center;
-    part_draw_dsc.radius = arc_radius;
-    part_draw_dsc.arc_dsc = &arc_dsc;
+    arc_dsc.center = arc_center;
+	arc_dsc.radius = arc_radius;
+	/* TODO: Set as properties? */
+	arc_dsc.start_angle = 0U;
+	arc_dsc.end_angle = 360U;
 
-    /* Draw main line */
-    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-    lv_draw_arc(draw_ctx, &arc_dsc, &arc_center, part_draw_dsc.radius, 20, 340);
-    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
-#endif
+    lv_draw_arc(layer, &arc_dsc);
 }
 
 static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
