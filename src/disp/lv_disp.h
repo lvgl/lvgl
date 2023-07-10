@@ -435,10 +435,10 @@ bool lv_disp_remove_event(lv_disp_t * disp, uint32_t index);
  * Send amn event to a display
  * @param disp          pointer to a display
  * @param code          an event code. LV_EVENT_...
- * @param user_data     optional user_data
+ * @param param         optional param
  * @return              LV_RES_OK: disp wasn't deleted in the event.
  */
-lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_data);
+lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * param);
 
 /**
  * Set the theme of a display. If there are no user created widgets yet the screens' theme will be updated

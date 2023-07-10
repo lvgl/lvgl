@@ -142,7 +142,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_color_to_argb8888(_lv_draw_sw_blend_
         lv_color32_t * dest_buf = dsc->dest_buf;
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {
-                color_argb.alpha = (mask[x] * opa) >> 8;
+                color_argb.alpha = LV_OPA_MIX2(mask[x], opa);
                 dest_buf[x] = lv_color_32_32_mix(color_argb, dest_buf[x], &cache);
             }
             dest_buf += dest_stride;
@@ -227,7 +227,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
         else {
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
-                    color_argb.alpha = (mask_buf[x] * opa) >> 8;
+                    color_argb.alpha = LV_OPA_MIX2(mask_buf[x], opa);
                     color_argb.red = (src_buf_c16[x].red * 2106) >> 8;  /*To make it rounded*/
                     color_argb.green = (src_buf_c16[x].green * 1037) >> 8;
                     color_argb.blue = (src_buf_c16[x].blue * 2106) >> 8;
@@ -247,7 +247,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
                 src_argb.green = (src_buf_c16[x].green * 1037) >> 8;
                 src_argb.blue = (src_buf_c16[x].blue * 2106) >> 8;
                 if(mask_buf == NULL) src_argb.alpha = opa;
-                else src_argb.alpha = (mask_buf[x] * opa) >> 8;
+                else src_argb.alpha = LV_OPA_MIX2(mask_buf[x], opa);
                 blend_non_normal_pixel(&dest_buf_c32[x], src_argb, dsc->blend_mode, &cache);
             }
             if(mask_buf) mask_buf += mask_stride;
@@ -352,7 +352,7 @@ LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc
                 src_argb.green = src_buf[src_x + 1];
                 src_argb.blue = src_buf[src_x + 0];
                 if(mask_buf == NULL) src_argb.alpha = opa;
-                else src_argb.alpha = (mask_buf[dest_x] * opa) >> 8;
+                else src_argb.alpha = LV_OPA_MIX2(mask_buf[dest_x], opa);
 
                 blend_non_normal_pixel(&dest_buf_c32[dest_x], src_argb, dsc->blend_mode, &cache);
             }
@@ -396,7 +396,7 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     color_argb = src_buf_c32[x];
-                    color_argb.alpha = (color_argb.alpha * opa) >> 8;
+                    color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
                     dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
                 }
                 dest_buf_c32 += dest_stride;
@@ -407,7 +407,7 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     color_argb = src_buf_c32[x];
-                    color_argb.alpha = (color_argb.alpha * mask_buf[x]) >> 8;
+                    color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, mask_buf[x]);
                     dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
                 }
                 dest_buf_c32 += dest_stride;
@@ -419,7 +419,7 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
             for(y = 0; y < h; y++) {
                 for(x = 0; x < w; x++) {
                     color_argb = src_buf_c32[x];
-                    color_argb.alpha = (color_argb.alpha * opa * mask_buf[x]) >> 16;
+                    color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, opa, mask_buf[x]);
                     dest_buf_c32[x] = lv_color_32_32_mix(color_argb, dest_buf_c32[x], &cache);
                 }
                 dest_buf_c32 += dest_stride;
@@ -432,8 +432,8 @@ LV_ATTRIBUTE_FAST_MEM static void argb8888_image_blend(_lv_draw_sw_blend_image_d
         for(y = 0; y < h; y++) {
             for(x = 0; x < w; x++) {
                 color_argb = src_buf_c32[x];
-                if(mask_buf == NULL) color_argb.alpha = (color_argb.alpha * opa) >> 8;
-                else color_argb.alpha = (color_argb.alpha * mask_buf[x] * opa) >> 16;
+                if(mask_buf == NULL) color_argb.alpha = LV_OPA_MIX2(color_argb.alpha, opa);
+                else color_argb.alpha = LV_OPA_MIX3(color_argb.alpha, mask_buf[x], opa);
                 blend_non_normal_pixel(&dest_buf_c32[x], color_argb, dsc->blend_mode, &cache);
             }
             if(mask_buf) mask_buf += mask_stride;
@@ -466,7 +466,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color32_t lv_color_32_32_mix(lv_color32_t
         if(bg.alpha != cache->bg_saved.alpha || fg.alpha != cache->fg_saved.alpha) {
             /*Info:
              * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
-            cache->res_alpha_saved  = 255 - ((uint32_t)((uint32_t)(255 - fg.alpha) * (255 - bg.alpha)) >> 8);
+            cache->res_alpha_saved  = 255 - LV_OPA_MIX2(255 - fg.alpha, 255 - bg.alpha);
             LV_ASSERT(cache->ratio_saved != 0);
             cache->ratio_saved = (uint32_t)((uint32_t)fg.alpha * 255) / cache->res_alpha_saved;
         }

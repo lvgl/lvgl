@@ -673,7 +673,7 @@ bool lv_disp_remove_event(lv_disp_t * disp, uint32_t index)
     return lv_event_remove(&disp->event_list, index);
 }
 
-lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_data)
+lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * param)
 {
 
     lv_event_t e;
@@ -681,7 +681,7 @@ lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * user_
     e.code = code;
     e.current_target = disp;
     e.original_target = disp;
-    e.param = user_data;
+    e.param = param;
     lv_res_t res;
     res = lv_event_send(&disp->event_list, &e, true);
     if(res != LV_RES_OK) return res;

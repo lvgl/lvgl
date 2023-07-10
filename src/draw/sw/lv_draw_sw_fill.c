@@ -194,7 +194,7 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
             if(grad_dir == LV_GRAD_DIR_VER) {
                 blend_dsc.color = grad->color_map[h - bg_coords.y1];
                 if(opa >= LV_OPA_MAX) blend_dsc.opa = grad->opa_map[h - bg_coords.y1];
-                else blend_dsc.opa = (grad->opa_map[h - bg_coords.y1] * opa) >> 8;
+                else blend_dsc.opa = LV_OPA_MIX2(grad->opa_map[h - bg_coords.y1], opa);
             }
             lv_draw_sw_blend(draw_unit, &blend_dsc);
         }

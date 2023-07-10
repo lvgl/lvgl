@@ -192,6 +192,7 @@ void lv_draw_sw_mask_init(void);
 
 /**
  * Apply the added buffers on a line. Used internally by the library's drawing routines.
+ * @param masks the masks list to apply, must be ended with NULL pointer in array.
  * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
  * @param abs_x absolute X coordinate where the line to calculate start
  * @param abs_y absolute Y coordinate where the line to calculate start
@@ -201,7 +202,7 @@ void lv_draw_sw_mask_init(void);
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * list[], lv_opa_t * mask_buf, lv_coord_t abs_x,
+LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[], lv_opa_t * mask_buf, lv_coord_t abs_x,
                                                                   lv_coord_t abs_y,
                                                                   lv_coord_t len);
 

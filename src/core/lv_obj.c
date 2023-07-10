@@ -482,9 +482,10 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 
     lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_SCROLLBAR);
     if(opa < LV_OPA_MAX) {
-        dsc->bg_opa = (dsc->bg_opa * opa) >> 8;
-        dsc->border_opa = (dsc->bg_opa * opa) >> 8;
-        dsc->shadow_opa = (dsc->bg_opa * opa) >> 8;
+        lv_opa_t v = LV_OPA_MIX2(dsc->bg_opa, opa);
+        dsc->bg_opa = v;
+        dsc->border_opa = v;
+        dsc->shadow_opa = v;
     }
 
     if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP || dsc->shadow_opa != LV_OPA_TRANSP) {

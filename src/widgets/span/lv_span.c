@@ -952,7 +952,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             label_draw_dsc.font = lv_span_get_style_text_font(obj, pinfo->span);
             label_draw_dsc.blend_mode = lv_span_get_style_text_blend_mode(obj, pinfo->span);
             if(obj_opa < LV_OPA_MAX) {
-                label_draw_dsc.opa = (uint16_t)((uint16_t)label_draw_dsc.opa * obj_opa) >> 8;
+                label_draw_dsc.opa = LV_OPA_MIX2(label_draw_dsc.opa, obj_opa);
             }
             uint32_t txt_bytes = pinfo->bytes;
 
