@@ -46,7 +46,7 @@ typedef struct {
 
 typedef struct {
     BaseType_t
-    xIsInitialized;            /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
+    xIsInitialized;                       /**< Set to pdTRUE if this condition variable is initialized, pdFALSE otherwise. */
     SemaphoreHandle_t xCondWaitSemaphore; /**< Threads block on this semaphore in lv_thread_sync_wait. */
     uint32_t ulWaitingThreads;            /**< The number of threads currently waiting on this condition variable. */
     SemaphoreHandle_t xSyncMutex;         /**< Threads take this mutex before accessing the condition variable. */
