@@ -10,7 +10,7 @@
 #if LV_USE_SCALE != 0
 
 #include "../../core/lv_group.h"
-#include "../../core/lv_indev.h"
+//#include "../../core/lv_indev.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../draw/lv_draw_arc.h"
@@ -156,7 +156,7 @@ void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
-    scale->txt_src = txt_src;
+    scale->txt_src = &txt_src;
 
     lv_obj_invalidate(obj);
 }
@@ -231,7 +231,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
-    scale->mode = LV_SCALE_MODE_ROUND_OUTTER;
+    scale->mode = LV_SCALE_MODE_HORIZONTAL_BOTTOM;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -292,7 +292,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
 static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
+    lv_layer_t * layer = lv_event_get_layer(event);
 
     if(scale->total_tick_count <= 1) return;
 
@@ -300,13 +300,6 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
-
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.id = scale->mode;
-    part_draw_dsc.part = LV_PART_ITEMS;
-    part_draw_dsc.line_dsc = &line_dsc;
 
     /* Get style properties so they can be used in the tick and label drawing */
     lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
@@ -444,16 +437,16 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
             }
         }
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        line_dsc.p1 = tick_point_a;
+        line_dsc.p2 = tick_point_b;
+        lv_draw_line(layer, &line_dsc);
     }
 }
 
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
+    lv_layer_t * layer = lv_event_get_layer(event);
 
     if(!scale->label_enabled) return;
 
@@ -501,14 +494,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
-
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.id = scale->mode;
-    part_draw_dsc.part = LV_PART_INDICATOR;
-    part_draw_dsc.label_dsc = &label_dsc;
-    part_draw_dsc.line_dsc = &line_dsc;
 
     lv_coord_t major_len = scale->major_len;
 
@@ -563,12 +548,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         /* Check if the custom text array has element for this major tick index */
         if(scale->txt_src) {
             if(scale->txt_src[major_tick_idx]) {
-                part_draw_dsc.text = scale->txt_src[major_tick_idx];
-                part_draw_dsc.text_length = strlen(scale->txt_src[major_tick_idx]);
+            	label_dsc.text = scale->txt_src[major_tick_idx];
             }
             else {
-                part_draw_dsc.text = NULL;
-                part_draw_dsc.text_length = 0;
+            	label_dsc.text = NULL;
             }
         }
         else { /* Add label with mapped values */
@@ -677,13 +660,12 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             }
 
             lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-            part_draw_dsc.text = text_buffer;
-            part_draw_dsc.text_length = sizeof(text_buffer);
+            label_dsc.text = text_buffer;
         }
 
         /* Reserve appropiate size for the tick label */
         lv_point_t size;
-        lv_txt_get_size(&size, part_draw_dsc.text,
+        lv_txt_get_size(&size, label_dsc.text,
                         label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
         /* Set the label draw area at some distance of the major tick */
@@ -715,10 +697,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         }
         else { /* Nothing to do */ }
 
-        lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_line(draw_ctx, &line_dsc, &tick_point_a, &tick_point_b);
-        lv_draw_label(draw_ctx, &label_dsc, &label_coords, part_draw_dsc.text, NULL);
-        lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        line_dsc.p1 = tick_point_a;
+        line_dsc.p2 = tick_point_b;
+        lv_draw_line(layer, &line_dsc);
+        lv_draw_label(layer, &label_dsc, &label_coords);
 
         major_tick_idx++;
     }
@@ -727,7 +709,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
+    lv_layer_t * layer = lv_event_get_layer(event);
 
     if(scale->total_tick_count <= 1) return;
 
@@ -762,13 +744,6 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.id = scale->mode;
-    part_draw_dsc.part = LV_PART_MAIN;
-    part_draw_dsc.line_dsc = &line_dsc;
-
     lv_point_t main_line_point_a;
     lv_point_t main_line_point_b;
 
@@ -802,9 +777,9 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
     }
 
     /* Draw vertical line that covers all the ticks */
-    lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-    lv_draw_line(draw_ctx, &line_dsc, &main_line_point_a, &main_line_point_b);
-    lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+    line_dsc.p1 = main_line_point_a;
+    line_dsc.p2 = main_line_point_b;
+    lv_draw_line(layer, &line_dsc);
 }
 
 static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
@@ -825,6 +800,7 @@ static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * a
 
 static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
 {
+#if 0
     lv_scale_t * scale = (lv_scale_t *)obj;
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
 
@@ -862,6 +838,7 @@ static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
     lv_draw_arc(draw_ctx, &arc_dsc, &arc_center, part_draw_dsc.radius, 20, 340);
     lv_event_send(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+#endif
 }
 
 static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
@@ -871,6 +848,7 @@ static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
 
 static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
 {
+#if 0
     lv_scale_t * scale = (lv_scale_t *)obj;
     lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
 
@@ -939,7 +917,7 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
 
     lv_draw_mask_free_param(&inner_major_mask);
     lv_draw_mask_free_param(&outer_mask);
-
+#endif
 #if 0
     lv_meter_scale_t * scale;
 
