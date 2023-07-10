@@ -232,12 +232,22 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     bool was_on_layout = lv_obj_is_layout_positioned(obj);
 
+    /* We must invalidate the area occupied by the object before we hide it as calls to invalidate hidden objects are ignored */
     if(f & LV_OBJ_FLAG_HIDDEN) lv_obj_invalidate(obj);
 
     obj->flags |= f;
 
     if(f & LV_OBJ_FLAG_HIDDEN) {
-        lv_obj_invalidate(obj);
+        if(lv_obj_has_state(obj, LV_STATE_FOCUSED)) {
+            lv_group_t * group = lv_obj_get_group(obj);
+            if(group != NULL) {
+                lv_group_focus_next(group);
+                lv_obj_t * next_obj = lv_group_get_focused(group);
+                if(next_obj != NULL) {
+                    lv_obj_invalidate(next_obj);
+                }
+            }
+        }
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
