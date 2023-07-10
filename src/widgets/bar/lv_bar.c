@@ -250,17 +250,14 @@ static void draw_indic(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
 
     lv_area_t bar_coords;
     lv_obj_get_coords(obj, &bar_coords);
 
     lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
     lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-    bar_coords.x1 -= transf_w;
-    bar_coords.x2 += transf_w;
-    bar_coords.y1 -= transf_h;
-    bar_coords.y2 += transf_h;
+    lv_area_increase(&bar_coords, transf_w, transf_h);
     lv_coord_t barw = lv_area_get_width(&bar_coords);
     lv_coord_t barh = lv_area_get_height(&bar_coords);
     int32_t range = bar->max_value - bar->min_value;
@@ -396,18 +393,9 @@ static void draw_indic(lv_event_t * e)
         }
     }
 
-    /*Do not draw a zero length indicator but at least call the draw part events*/
+    /*Do not draw a zero length indicator but at least call the draw task event*/
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) {
-
-        lv_obj_draw_part_dsc_t part_draw_dsc;
-        lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-        part_draw_dsc.part = LV_PART_INDICATOR;
-        part_draw_dsc.class_p = MY_CLASS;
-        part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
-        part_draw_dsc.draw_area = &bar->indic_area;
-
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_obj_send_event(obj, LV_EVENT_DRAW_TASK_ADDED, NULL);
         return;
     }
 
@@ -417,16 +405,6 @@ static void draw_indic(lv_event_t * e)
     lv_draw_rect_dsc_t draw_rect_dsc;
     lv_draw_rect_dsc_init(&draw_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_rect_dsc);
-
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-    part_draw_dsc.part = LV_PART_INDICATOR;
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_BAR_DRAW_PART_INDICATOR;
-    part_draw_dsc.rect_dsc = &draw_rect_dsc;
-    part_draw_dsc.draw_area = &bar->indic_area;
-
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
     lv_coord_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     lv_coord_t short_side = LV_MIN(barw, barh);
@@ -448,24 +426,13 @@ static void draw_indic(lv_event_t * e)
         draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
         draw_rect_dsc.border_opa = LV_OPA_TRANSP;
 
-        lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
+        lv_draw_rect(layer, &draw_rect_dsc, &bar->indic_area);
 
         draw_rect_dsc.bg_opa = bg_opa;
         draw_rect_dsc.bg_img_opa = bg_img_opa;
         draw_rect_dsc.border_opa = border_opa;
     }
 
-#if LV_USE_DRAW_MASKS
-    lv_draw_mask_radius_param_t mask_bg_param;
-    lv_area_t bg_mask_area;
-    bg_mask_area.x1 = obj->coords.x1 + bg_left;
-    bg_mask_area.x2 = obj->coords.x2 - bg_right;
-    bg_mask_area.y1 = obj->coords.y1 + bg_top;
-    bg_mask_area.y2 = obj->coords.y2 - bg_bottom;
-
-    lv_draw_mask_radius_init(&mask_bg_param, &bg_mask_area, bg_radius, false);
-    lv_coord_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
-#endif
 
     /*Draw_only the background and background image*/
     lv_opa_t shadow_opa = draw_rect_dsc.shadow_opa;
@@ -489,40 +456,38 @@ static void draw_indic(lv_event_t * e)
         mask_indic_max_area.x2 = mask_indic_max_area.x1 + LV_BAR_SIZE_MIN;
     }
 
-#if LV_USE_DRAW_MASKS
-    /*Create a mask to the current indicator area to see only this part from the whole gradient.*/
-    lv_draw_mask_radius_param_t mask_indic_param;
-    lv_draw_mask_radius_init(&mask_indic_param, &bar->indic_area, draw_rect_dsc.radius, false);
-    int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
-#endif
-
     lv_area_t indic_clip_area;
-    if(_lv_area_intersect(&indic_clip_area, &indic_area, draw_ctx->clip_area)) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-        draw_ctx->clip_area = &indic_clip_area;
+    if(_lv_area_intersect(&indic_clip_area, &indic_area, &layer->clip_area)) {
+        lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &indic_area);
 
-        lv_draw_rect(draw_ctx, &draw_rect_dsc, &mask_indic_max_area);
+        lv_draw_rect(layer_indic, &draw_rect_dsc, &mask_indic_max_area);
         draw_rect_dsc.border_opa = border_opa;
         draw_rect_dsc.shadow_opa = shadow_opa;
 
-        /*Draw the border*/
+        /*Draw the border. Make the border area and border with 2 pixels larger but
+         *mask this extra area. It avoids color bleeding on the edges.*/
+        lv_area_t border2_area = bar->indic_area;
+        lv_area_increase(&border2_area, 2, 2);
+        draw_rect_dsc.border_width += 2;
         draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
         draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
         draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
-        lv_draw_rect(draw_ctx, &draw_rect_dsc, &bar->indic_area);
+        lv_draw_rect(layer_indic, &draw_rect_dsc, &border2_area);
 
-        draw_ctx->clip_area = clip_area_ori;
+        lv_draw_mask_rect_dsc_t mask_dsc;
+        lv_draw_mask_rect_dsc_init(&mask_dsc);
+        mask_dsc.area = bar->indic_area;
+        mask_dsc.radius = indic_radius;
+        lv_draw_mask_rect(layer_indic, &mask_dsc);
+
+        mask_dsc.area = mask_indic_max_area;
+        lv_draw_mask_rect(layer_indic, &mask_dsc);
+
+        lv_draw_img_dsc_t layer_draw_dsc;
+        lv_draw_img_dsc_init(&layer_draw_dsc);
+        layer_draw_dsc.src = layer_indic;
+        lv_draw_layer(layer, &layer_draw_dsc, &layer_indic->buf_area);
     }
-
-#if LV_USE_DRAW_MASKS
-    lv_draw_mask_free_param(&mask_indic_param);
-    lv_draw_mask_free_param(&mask_bg_param);
-    lv_draw_mask_remove_id(mask_indic_id);
-    lv_draw_mask_remove_id(mask_bg_id);
-#endif
-
-
-    lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
 }
 
 static void lv_bar_event(const lv_obj_class_t * class_p, lv_event_t * e)

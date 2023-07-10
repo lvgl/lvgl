@@ -8,8 +8,9 @@
  *********************/
 #include "lv_obj_draw.h"
 #include "lv_obj.h"
-#include "lv_disp.h"
-#include "lv_indev.h"
+#include "../disp/lv_disp.h"
+#include "../indev/lv_indev.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -38,6 +39,9 @@
 
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
+
     lv_opa_t opa = LV_OPA_COVER;
     if(part != LV_PART_MAIN) {
         opa = lv_obj_get_style_opa(obj, part);
@@ -50,9 +54,6 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
             return;
         }
     }
-
-    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
-#if LV_USE_DRAW_MASKS
 
     draw_dsc->radius = lv_obj_get_style_radius(obj, part);
 
@@ -71,15 +72,17 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
                     draw_dsc->bg_grad.stops[1].color = lv_obj_get_style_bg_grad_color_filtered(obj, part);
                     draw_dsc->bg_grad.stops[0].frac = lv_obj_get_style_bg_main_stop(obj, part);
                     draw_dsc->bg_grad.stops[1].frac = lv_obj_get_style_bg_grad_stop(obj, part);
+                    draw_dsc->bg_grad.stops[0].opa = 0xFF;
+                    draw_dsc->bg_grad.stops[1].opa = 0xFF;
                 }
                 draw_dsc->bg_grad.dither = lv_obj_get_style_bg_dither_mode(obj, part);
             }
         }
     }
 
-    draw_dsc->border_width = lv_obj_get_style_border_width(obj, part);
-    if(draw_dsc->border_width) {
-        if(draw_dsc->border_opa != LV_OPA_TRANSP) {
+    if(draw_dsc->border_opa != LV_OPA_TRANSP) {
+        draw_dsc->border_width = lv_obj_get_style_border_width(obj, part);
+        if(draw_dsc->border_width) {
             draw_dsc->border_opa = lv_obj_get_style_border_opa(obj, part);
             if(draw_dsc->border_opa > LV_OPA_MIN) {
                 draw_dsc->border_side = lv_obj_get_style_border_side(obj, part);
@@ -88,9 +91,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
         }
     }
 
-    draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
-    if(draw_dsc->outline_width) {
-        if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
+    if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
+        draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
+        if(draw_dsc->outline_width) {
             draw_dsc->outline_opa = lv_obj_get_style_outline_opa(obj, part);
             if(draw_dsc->outline_opa > LV_OPA_MIN) {
                 draw_dsc->outline_pad = lv_obj_get_style_outline_pad(obj, part);
@@ -132,55 +135,6 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
         }
     }
 
-#else /*LV_USE_DRAW_MASKS*/
-    if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
-        draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
-        if(draw_dsc->bg_opa > LV_OPA_MIN) {
-            draw_dsc->bg_color = lv_obj_get_style_bg_color_filtered(obj, part);
-        }
-    }
-
-    draw_dsc->border_width = lv_obj_get_style_border_width(obj, part);
-    if(draw_dsc->border_width) {
-        if(draw_dsc->border_opa != LV_OPA_TRANSP) {
-            draw_dsc->border_opa = lv_obj_get_style_border_opa(obj, part);
-            if(draw_dsc->border_opa > LV_OPA_MIN) {
-                draw_dsc->border_color = lv_obj_get_style_border_color_filtered(obj, part);
-                draw_dsc->border_side = lv_obj_get_style_border_side(obj, part);
-            }
-        }
-    }
-
-    draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
-    if(draw_dsc->outline_width) {
-        if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
-            draw_dsc->outline_opa = lv_obj_get_style_outline_opa(obj, part);
-            if(draw_dsc->outline_opa > LV_OPA_MIN) {
-                draw_dsc->outline_pad = lv_obj_get_style_outline_pad(obj, part);
-                draw_dsc->outline_color = lv_obj_get_style_outline_color_filtered(obj, part);
-            }
-        }
-    }
-
-    if(draw_dsc->bg_img_opa != LV_OPA_TRANSP) {
-        draw_dsc->bg_img_src = lv_obj_get_style_bg_img_src(obj, part);
-        if(draw_dsc->bg_img_src) {
-            draw_dsc->bg_img_opa = lv_obj_get_style_bg_img_opa(obj, part);
-            if(draw_dsc->bg_img_opa > LV_OPA_MIN) {
-                if(lv_img_src_get_type(draw_dsc->bg_img_src) == LV_IMG_SRC_SYMBOL) {
-                    draw_dsc->bg_img_symbol_font = lv_obj_get_style_text_font(obj, part);
-                    draw_dsc->bg_img_recolor = lv_obj_get_style_text_color_filtered(obj, part);
-                }
-                else {
-                    draw_dsc->bg_img_recolor = lv_obj_get_style_bg_img_recolor_filtered(obj, part);
-                    draw_dsc->bg_img_recolor_opa = lv_obj_get_style_bg_img_recolor_opa(obj, part);
-                    draw_dsc->bg_img_tiled = lv_obj_get_style_bg_img_tiled(obj, part);
-                }
-            }
-        }
-    }
-#endif
-
     if(part != LV_PART_MAIN) {
         if(opa < LV_OPA_MAX) {
             draw_dsc->bg_opa = (opa * draw_dsc->shadow_opa) >> 8;
@@ -192,8 +146,13 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
     }
 }
 
+
+
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc_t * draw_dsc)
 {
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
+
     draw_dsc->opa = lv_obj_get_style_text_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
@@ -225,6 +184,9 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
 
 void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc)
 {
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
+
     draw_dsc->opa = lv_obj_get_style_img_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
@@ -252,6 +214,9 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t *
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t * draw_dsc)
 {
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
+
     draw_dsc->opa = lv_obj_get_style_line_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 
@@ -284,6 +249,9 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint32_t part, lv_draw_line_dsc_t
 
 void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t * draw_dsc)
 {
+    draw_dsc->base.obj = obj;
+    draw_dsc->base.part = part;
+
     draw_dsc->width = lv_obj_get_style_arc_width(obj, part);
     if(draw_dsc->width == 0) return;
 
@@ -305,8 +273,6 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t *
     draw_dsc->img_src = lv_obj_get_style_arc_img_src(obj, part);
 
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
-
-    if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 }
 
 lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
@@ -341,18 +307,6 @@ lv_coord_t lv_obj_calculate_ext_draw_size(lv_obj_t * obj, uint32_t part)
     if(wh > 0) s += wh;
 
     return s;
-}
-
-void lv_obj_draw_dsc_init(lv_obj_draw_part_dsc_t * dsc, lv_draw_ctx_t * draw_ctx)
-{
-    lv_memzero(dsc, sizeof(lv_obj_draw_part_dsc_t));
-    dsc->draw_ctx = draw_ctx;
-}
-
-bool lv_obj_draw_part_check_type(lv_obj_draw_part_dsc_t * dsc, const lv_obj_class_t * class_p, uint32_t type)
-{
-    if(dsc->class_p == class_p && dsc->type == type) return true;
-    else return false;
 }
 
 void lv_obj_refresh_ext_draw_size(lv_obj_t * obj)

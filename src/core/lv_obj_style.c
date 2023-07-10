@@ -7,10 +7,11 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "lv_disp.h"
-#include "lv_disp_private.h"
+#include "../disp/lv_disp.h"
+#include "../disp/lv_disp_private.h"
 #include "../misc/lv_gc.h"
-#include LV_COLOR_EXTERN_INCLUDE
+#include "../misc/lv_color.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -80,6 +81,9 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
     LV_ASSERT(obj->style_cnt < 63);
 
     trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
+
+    if(style && selector == LV_PART_MAIN && lv_style_prop_has_flag(style->prop1, LV_STYLE_PROP_FLAG_TRANSFORM))
+        lv_obj_invalidate(obj);
 
     /*Try removing the style first to be sure it won't be added twice*/
     lv_obj_remove_style(obj, style, selector);
@@ -163,6 +167,9 @@ void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_sele
     lv_part_t part = lv_obj_style_get_selector_part(selector);
     lv_style_prop_t prop = LV_STYLE_PROP_ANY;
     if(style && style->prop_cnt == 0) prop = LV_STYLE_PROP_INV;
+
+    if(style && selector == LV_PART_MAIN && lv_style_prop_has_flag(style->prop1, LV_STYLE_PROP_FLAG_TRANSFORM))
+        lv_obj_invalidate(obj);
 
     uint32_t i = 0;
     bool deleted = false;
@@ -330,6 +337,8 @@ void lv_obj_set_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_
                                  lv_style_selector_t selector)
 {
     lv_style_t * style = get_local_style(obj, selector);
+    if(selector == LV_PART_MAIN && lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_TRANSFORM))
+        lv_obj_invalidate(obj);
     lv_style_set_prop(style, prop, value);
     lv_obj_refresh_style(obj, selector, prop);
 }
@@ -341,7 +350,6 @@ void lv_obj_set_local_style_prop_meta(lv_obj_t * obj, lv_style_prop_t prop, uint
     lv_style_set_prop_meta(style, prop, meta);
     lv_obj_refresh_style(obj, selector, prop);
 }
-
 
 lv_style_res_t lv_obj_get_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_style_value_t * value,
                                            lv_style_selector_t selector)
@@ -819,7 +827,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
             case LV_STYLE_IMG_RECOLOR:
                 if(v <= 0) value_final.color = tr->start_value.color;
                 else if(v >= 255) value_final.color = tr->end_value.color;
-                else value_final.color = LV_COLOR_MIX(tr->end_value.color, tr->start_value.color, v);
+                else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
                 break;
 
             default:
@@ -923,5 +931,4 @@ static void fade_in_anim_ready(lv_anim_t * a)
 {
     lv_obj_remove_local_style_prop(a->var, LV_STYLE_OPA, 0);
 }
-
 

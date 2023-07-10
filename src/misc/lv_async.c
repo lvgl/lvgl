@@ -8,8 +8,8 @@
  *********************/
 
 #include "lv_async.h"
-#include "lv_mem.h"
 #include "lv_timer.h"
+#include "../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES

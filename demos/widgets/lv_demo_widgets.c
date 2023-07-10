@@ -10,7 +10,7 @@
 
 #if LV_USE_DEMO_WIDGETS
 
-#if LV_USE_BUILTIN_MALLOC && LV_MEM_SIZE < (38ul * 1024ul)
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
 #endif
 
@@ -306,6 +306,7 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_t * slider1 = lv_slider_create(panel3);
     lv_obj_set_width(slider1, LV_PCT(95));
     lv_obj_add_event(slider1, slider_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_add_flag(slider1, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     lv_obj_refresh_ext_draw_size(slider1);
 
     lv_obj_t * team_player_label = lv_label_create(panel3);
@@ -548,7 +549,7 @@ static void analytics_create(lv_obj_t * parent)
 
     chart1 = lv_chart_create(chart1_cont);
     lv_group_add_obj(lv_group_get_default(), chart1);
-    lv_obj_add_flag(chart1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_add_flag(chart1, LV_OBJ_FLAG_SCROLL_ON_FOCUS | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     lv_obj_set_grid_cell(chart1, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
     lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 5, 1, true, 80);
     lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_X, 0, 0, 12, 1, true, 50);
@@ -592,7 +593,7 @@ static void analytics_create(lv_obj_t * parent)
 
     chart2 = lv_chart_create(chart2_cont);
     lv_group_add_obj(lv_group_get_default(), chart2);
-    lv_obj_add_flag(chart2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_add_flag(chart2, LV_OBJ_FLAG_SCROLL_ON_FOCUS | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     lv_obj_set_grid_cell(chart2, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
     lv_chart_set_axis_tick(chart2, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 5, 1, true, 80);
@@ -1278,9 +1279,12 @@ static void slider_event_cb(lv_event_t * e)
         lv_coord_t * s = lv_event_get_param(e);
         *s = LV_MAX(*s, 60);
     }
-    else if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        if(dsc->part == LV_PART_KNOB && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
+    else if(code == LV_EVENT_DRAW_TASK_ADDED) {
+        lv_draw_task_t * draw_task = lv_event_get_param(e);
+        if(draw_task == NULL || draw_task->type != LV_DRAW_TASK_TYPE_FILL) return;
+        lv_draw_rect_dsc_t * draw_rect_dsc = draw_task->draw_dsc;
+
+        if(draw_rect_dsc->base.part == LV_PART_KNOB && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRId32, lv_slider_get_value(obj));
 
@@ -1288,9 +1292,9 @@ static void slider_event_cb(lv_event_t * e)
             lv_txt_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
             lv_area_t txt_area;
-            txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2 - text_size.x / 2;
+            txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2 - text_size.x / 2;
             txt_area.x2 = txt_area.x1 + text_size.x;
-            txt_area.y2 = dsc->draw_area->y1 - 10;
+            txt_area.y2 = draw_task->area.y1 - 10;
             txt_area.y1 = txt_area.y2 - text_size.y;
 
             lv_area_t bg_area;
@@ -1303,13 +1307,15 @@ static void slider_event_cb(lv_event_t * e)
             lv_draw_rect_dsc_init(&rect_dsc);
             rect_dsc.bg_color = lv_palette_darken(LV_PALETTE_GREY, 3);
             rect_dsc.radius = LV_DPX(5);
-            lv_draw_rect(dsc->draw_ctx, &rect_dsc, &bg_area);
+            lv_draw_rect(draw_rect_dsc->base.layer, &rect_dsc, &bg_area);
 
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
             label_dsc.color = lv_color_white();
             label_dsc.font = font_normal;
-            lv_draw_label(dsc->draw_ctx, &label_dsc, &txt_area, buf, NULL);
+            label_dsc.text = buf;
+            label_dsc.text_local = 1;
+            lv_draw_label(draw_rect_dsc->base.layer, &label_dsc, &txt_area);
         }
     }
 }
@@ -1322,176 +1328,217 @@ static void chart_event_cb(lv_event_t * e)
     if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED) {
         lv_obj_invalidate(obj); /*To make the value boxes visible*/
     }
-    else if(code == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        /*Set the markers' text*/
-        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
-            if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
-                const char * month[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
-                lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
-            }
-            else {
-                const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-                lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
-            }
-        }
+    else if(code == LV_EVENT_DRAW_TASK_ADDED) {
+        lv_draw_task_t * draw_task = lv_event_get_param(e);
+        lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-        /*Add the faded area before the lines are drawn */
-        else if(dsc->part == LV_PART_ITEMS) {
-#if LV_USE_DRAW_MASKS
-            /*Add  a line mask that keeps the area below the line*/
-            if(dsc->p1 && dsc->p2) {
-                lv_draw_mask_line_param_t line_mask_param;
-                lv_draw_mask_line_points_init(&line_mask_param, dsc->p1->x, dsc->p1->y, dsc->p2->x, dsc->p2->y,
-                                              LV_DRAW_MASK_LINE_SIDE_BOTTOM);
-                int16_t line_mask_id = lv_draw_mask_add(&line_mask_param, NULL);
-
-                /*Add a fade effect: transparent bottom covering top*/
-                lv_coord_t h = lv_obj_get_height(obj);
-                lv_draw_mask_fade_param_t fade_mask_param;
-                lv_draw_mask_fade_init(&fade_mask_param, &obj->coords, LV_OPA_COVER, obj->coords.y1 + h / 8, LV_OPA_TRANSP,
-                                       obj->coords.y2);
-                int16_t fade_mask_id = lv_draw_mask_add(&fade_mask_param, NULL);
-
-                /*Draw a rectangle that will be affected by the mask*/
-                lv_draw_rect_dsc_t draw_rect_dsc;
-                lv_draw_rect_dsc_init(&draw_rect_dsc);
-                draw_rect_dsc.bg_opa = LV_OPA_50;
-                draw_rect_dsc.bg_color = dsc->line_dsc->color;
-
-                lv_area_t obj_clip_area;
-                _lv_area_intersect(&obj_clip_area, dsc->draw_ctx->clip_area, &obj->coords);
-                const lv_area_t * clip_area_ori = dsc->draw_ctx->clip_area;
-                dsc->draw_ctx->clip_area = &obj_clip_area;
-                lv_area_t a;
-                a.x1 = dsc->p1->x;
-                a.x2 = dsc->p2->x - 1;
-                a.y1 = LV_MIN(dsc->p1->y, dsc->p2->y);
-                a.y2 = obj->coords.y2;
-                lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
-                dsc->draw_ctx->clip_area = clip_area_ori;
-                /*Remove the masks*/
-                lv_draw_mask_remove_id(line_mask_id);
-                lv_draw_mask_remove_id(fade_mask_id);
-            }
-#endif
-
-
-            const lv_chart_series_t * ser = dsc->sub_part_ptr;
-
-            if(lv_chart_get_pressed_point(obj) == dsc->id) {
-                if(lv_chart_get_type(obj) == LV_CHART_TYPE_LINE) {
-                    dsc->rect_dsc->outline_color = lv_color_white();
-                    dsc->rect_dsc->outline_width = 2;
-                }
-                else {
-                    dsc->rect_dsc->shadow_color = ser->color;
-                    dsc->rect_dsc->shadow_width = 15;
-                    dsc->rect_dsc->shadow_spread = 0;
-                }
-
-                char buf[8];
-                lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, dsc->value);
-
-                lv_point_t text_size;
-                lv_txt_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-
-                lv_area_t txt_area;
+        if(base_dsc->part == LV_PART_TICKS && draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
+            /*Set the markers' text*/
+            if(base_dsc->id1 == LV_CHART_AXIS_PRIMARY_X) {
+                lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;
+                if(label_draw_dsc->text_local) lv_free((void *)label_draw_dsc->text);
+                const char * txt;
                 if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
-                    txt_area.y2 = dsc->draw_area->y1 - LV_DPX(15);
-                    txt_area.y1 = txt_area.y2 - text_size.y;
-                    if(ser == lv_chart_get_series_next(obj, NULL)) {
-                        txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2;
-                        txt_area.x2 = txt_area.x1 + text_size.x;
-                    }
-                    else {
-                        txt_area.x2 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2;
-                        txt_area.x1 = txt_area.x2 - text_size.x;
-                    }
+                    const char * month[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
+                    txt = month[base_dsc->id2];
+
                 }
                 else {
-                    txt_area.x1 = dsc->draw_area->x1 + lv_area_get_width(dsc->draw_area) / 2 - text_size.x / 2;
-                    txt_area.x2 = txt_area.x1 + text_size.x;
-                    txt_area.y2 = dsc->draw_area->y1 - LV_DPX(15);
-                    txt_area.y1 = txt_area.y2 - text_size.y;
+                    const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
+                    txt = month[base_dsc->id2];
                 }
+                label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+                label_draw_dsc->text_local = 1;
+                label_draw_dsc->text = lv_malloc(strlen(txt) + 1);
+                strcpy((char *)label_draw_dsc->text, txt);
+                draw_task->area.x1 -= 30;
+                draw_task->area.x2 += 30;
 
-                lv_area_t bg_area;
-                bg_area.x1 = txt_area.x1 - LV_DPX(8);
-                bg_area.x2 = txt_area.x2 + LV_DPX(8);
-                bg_area.y1 = txt_area.y1 - LV_DPX(8);
-                bg_area.y2 = txt_area.y2 + LV_DPX(8);
-
-                lv_draw_rect_dsc_t rect_dsc;
-                lv_draw_rect_dsc_init(&rect_dsc);
-                rect_dsc.bg_color = ser->color;
-                rect_dsc.radius = LV_DPX(5);
-                lv_draw_rect(dsc->draw_ctx, &rect_dsc, &bg_area);
-
-                lv_draw_label_dsc_t label_dsc;
-                lv_draw_label_dsc_init(&label_dsc);
-                label_dsc.color = lv_color_white();
-                label_dsc.font = font_normal;
-                lv_draw_label(dsc->draw_ctx, &label_dsc, &txt_area,  buf, NULL);
             }
-            else {
-                dsc->rect_dsc->outline_width = 0;
-                dsc->rect_dsc->shadow_width = 0;
+
+        }
+        else if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_LINE) {
+            const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
+            if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
+
+            lv_draw_line_dsc_t * draw_line_dsc = draw_task->draw_dsc;
+            lv_draw_triangle_dsc_t tri_dsc;
+
+            lv_draw_triangle_dsc_init(&tri_dsc);
+            tri_dsc.p[0].x = draw_line_dsc->p1.x;
+            tri_dsc.p[0].y = draw_line_dsc->p1.y;
+            tri_dsc.p[1].x = draw_line_dsc->p2.x;
+            tri_dsc.p[1].y = draw_line_dsc->p2.y;
+            tri_dsc.p[2].x = draw_line_dsc->p1.y < draw_line_dsc->p2.y ? draw_line_dsc->p1.x : draw_line_dsc->p2.x;
+            tri_dsc.p[2].y = LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y);
+            tri_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
+
+            lv_coord_t full_h = lv_obj_get_height(obj);
+            lv_coord_t fract_uppter = (LV_MIN(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj->coords.y1) * 255 / full_h;
+            lv_coord_t fract_lower = (LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - obj->coords.y1) * 255 / full_h;
+            tri_dsc.bg_grad.stops[0].color = ser->color;
+            tri_dsc.bg_grad.stops[0].opa = 255 - fract_uppter;
+            tri_dsc.bg_grad.stops[0].frac = 0;
+            tri_dsc.bg_grad.stops[1].color = ser->color;
+            tri_dsc.bg_grad.stops[1].opa = 255 - fract_lower;
+            tri_dsc.bg_grad.stops[1].frac = 255;
+
+            lv_draw_triangle(base_dsc->layer, &tri_dsc);
+
+            lv_draw_rect_dsc_t rect_dsc;
+            lv_draw_rect_dsc_init(&rect_dsc);
+            rect_dsc.bg_grad.dir = LV_GRAD_DIR_VER;
+            rect_dsc.bg_grad.stops[0].color = ser->color;
+            rect_dsc.bg_grad.stops[0].frac = 0;
+            rect_dsc.bg_grad.stops[0].opa = 255 - fract_lower;
+            rect_dsc.bg_grad.stops[1].color = ser->color;
+            rect_dsc.bg_grad.stops[1].frac = 255;
+            rect_dsc.bg_grad.stops[1].opa = 0;
+
+            lv_area_t rect_area;
+            rect_area.x1 = draw_line_dsc->p1.x;
+            rect_area.x2 = draw_line_dsc->p2.x;
+            rect_area.y1 = LV_MAX(draw_line_dsc->p1.y, draw_line_dsc->p2.y) - 1;
+            rect_area.y2 = obj->coords.y2;
+            lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
+        }
+
+
+        bool add_value = false;
+        if(base_dsc->part == LV_PART_INDICATOR && lv_chart_get_pressed_point(obj) == base_dsc->id2) {
+            if(lv_chart_get_type(obj) == LV_CHART_TYPE_LINE) {
+                lv_draw_rect_dsc_t outline_dsc;
+                lv_draw_rect_dsc_init(&outline_dsc);
+                outline_dsc.bg_opa = LV_OPA_TRANSP;
+                outline_dsc.outline_color = lv_color_white();
+                outline_dsc.outline_width = 2;
+                outline_dsc.radius = LV_RADIUS_CIRCLE;
+                lv_draw_rect(base_dsc->layer, &outline_dsc, &draw_task->area);
+                add_value = true;
             }
         }
+        if(base_dsc->part == LV_PART_ITEMS && lv_chart_get_pressed_point(obj) == base_dsc->id2) {
+            const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
+            if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
+
+            if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
+                lv_draw_fill_dsc_t * fill_dsc = draw_task->draw_dsc;
+                lv_draw_rect_dsc_t shadow_dsc;
+                lv_draw_rect_dsc_init(&shadow_dsc);
+                shadow_dsc.radius = fill_dsc->radius;
+                shadow_dsc.bg_opa = LV_OPA_TRANSP;
+                shadow_dsc.shadow_color = ser->color;
+                shadow_dsc.shadow_width = 15;
+                lv_draw_rect(base_dsc->layer, &shadow_dsc, &draw_task->area);
+                add_value = true;
+            }
+        }
+
+        if(add_value) {
+            const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
+            if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
+
+            char buf[8];
+            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, ser->y_points[base_dsc->id2]);
+
+            lv_point_t text_size;
+            lv_txt_get_size(&text_size, buf, font_normal, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+            lv_area_t txt_area;
+            if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
+                txt_area.y2 = draw_task->area.y1 - LV_DPX(15);
+                txt_area.y1 = txt_area.y2 - text_size.y;
+                if(ser == lv_chart_get_series_next(obj, NULL)) {
+                    txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2;
+                    txt_area.x2 = txt_area.x1 + text_size.x;
+                }
+                else {
+                    txt_area.x2 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2;
+                    txt_area.x1 = txt_area.x2 - text_size.x;
+                }
+            }
+            else {
+                txt_area.x1 = draw_task->area.x1 + lv_area_get_width(&draw_task->area) / 2 - text_size.x / 2;
+                txt_area.x2 = txt_area.x1 + text_size.x;
+                txt_area.y2 = draw_task->area.y1 - LV_DPX(15);
+                txt_area.y1 = txt_area.y2 - text_size.y;
+            }
+
+            lv_area_t bg_area;
+            bg_area.x1 = txt_area.x1 - LV_DPX(8);
+            bg_area.x2 = txt_area.x2 + LV_DPX(8);
+            bg_area.y1 = txt_area.y1 - LV_DPX(8);
+            bg_area.y2 = txt_area.y2 + LV_DPX(8);
+
+            lv_draw_rect_dsc_t rect_dsc;
+            lv_draw_rect_dsc_init(&rect_dsc);
+            rect_dsc.bg_color = ser->color;
+            rect_dsc.radius = LV_DPX(5);
+            lv_draw_rect(base_dsc->layer, &rect_dsc, &bg_area);
+
+            lv_draw_label_dsc_t label_dsc;
+            lv_draw_label_dsc_init(&label_dsc);
+            label_dsc.color = lv_color_white();
+            label_dsc.font = font_normal;
+            label_dsc.text = buf;
+            label_dsc.text_local = true;
+            lv_draw_label(base_dsc->layer, &label_dsc, &txt_area);
+        }
+
     }
 }
 
 
 static void shop_chart_event_cb(lv_event_t * e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-    if(code == LV_EVENT_DRAW_PART_BEGIN) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        /*Set the markers' text*/
-        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
-            const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-            lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
-        }
-        if(dsc->part == LV_PART_ITEMS) {
-            dsc->rect_dsc->bg_opa = LV_OPA_TRANSP; /*We will draw it later*/
-        }
-    }
-    if(code == LV_EVENT_DRAW_PART_END) {
-        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-        /*Add the faded area before the lines are drawn */
-        if(dsc->part == LV_PART_ITEMS) {
-            static const uint32_t devices[10] = {32, 43, 21, 56, 29, 36, 19, 25, 62, 35};
-            static const uint32_t clothes[10] = {12, 19, 23, 31, 27, 32, 32, 11, 21, 32};
-            static const uint32_t services[10] = {56, 38, 56, 13, 44, 32, 49, 64, 17, 33};
-
-            lv_draw_rect_dsc_t draw_rect_dsc;
-            lv_draw_rect_dsc_init(&draw_rect_dsc);
-
-            lv_coord_t h = lv_area_get_height(dsc->draw_area);
-
-            lv_area_t a;
-            a.x1 = dsc->draw_area->x1;
-            a.x2 = dsc->draw_area->x2;
-
-            a.y1 = dsc->draw_area->y1;
-            a.y2 = a.y1 + 4 + (devices[dsc->id] * h) / 100; /*+4 to overlap the radius*/
-            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
-            draw_rect_dsc.radius = 4;
-            lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
-
-            a.y1 = a.y2 - 4;                                    /*-4 to overlap the radius*/
-            a.y2 = a.y1 + (clothes[dsc->id] * h) / 100;
-            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
-            draw_rect_dsc.radius = 0;
-            lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
-
-            a.y1 = a.y2;
-            a.y2 = a.y1 + (services[dsc->id] * h) / 100;
-            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_GREEN);
-            lv_draw_rect(dsc->draw_ctx, &draw_rect_dsc, &a);
-        }
-    }
+    LV_UNUSED(e);
+    //    lv_event_code_t code = lv_event_get_code(e);
+    //    if(code == LV_EVENT_DRAW_PART_BEGIN) {
+    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
+    //        /*Set the markers' text*/
+    //        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
+    //            const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
+    //            lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
+    //        }
+    //        if(dsc->part == LV_PART_ITEMS) {
+    //            dsc->rect_dsc->bg_opa = LV_OPA_TRANSP; /*We will draw it later*/
+    //        }
+    //    }
+    //    if(code == LV_EVENT_DRAW_PART_END) {
+    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
+    //        /*Add the faded area before the lines are drawn */
+    //        if(dsc->part == LV_PART_ITEMS) {
+    //            static const uint32_t devices[10] = {32, 43, 21, 56, 29, 36, 19, 25, 62, 35};
+    //            static const uint32_t clothes[10] = {12, 19, 23, 31, 27, 32, 32, 11, 21, 32};
+    //            static const uint32_t services[10] = {56, 38, 56, 13, 44, 32, 49, 64, 17, 33};
+    //
+    //            lv_draw_rect_dsc_t draw_rect_dsc;
+    //            lv_draw_rect_dsc_init(&draw_rect_dsc);
+    //
+    //            lv_coord_t h = lv_area_get_height(dsc->draw_area);
+    //
+    //            lv_area_t a;
+    //            a.x1 = dsc->draw_area->x1;
+    //            a.x2 = dsc->draw_area->x2;
+    //
+    //            a.y1 = dsc->draw_area->y1;
+    //            a.y2 = a.y1 + 4 + (devices[dsc->id] * h) / 100; /*+4 to overlap the radius*/
+    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
+    //            draw_rect_dsc.radius = 4;
+    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
+    //
+    //            a.y1 = a.y2 - 4;                                    /*-4 to overlap the radius*/
+    //            a.y2 = a.y1 + (clothes[dsc->id] * h) / 100;
+    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
+    //            draw_rect_dsc.radius = 0;
+    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
+    //
+    //            a.y1 = a.y2;
+    //            a.y2 = a.y1 + (services[dsc->id] * h) / 100;
+    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_GREEN);
+    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
+    //        }
+    //    }
 }
 
 

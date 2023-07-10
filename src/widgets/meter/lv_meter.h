@@ -17,11 +17,6 @@ extern "C" {
 
 #if LV_USE_METER != 0
 
-/*Testing of dependencies*/
-#if LV_USE_DRAW_MASKS == 0
-#error "lv_meter: Complex drawing is required. Enable it in lv_conf.h (LV_USE_DRAW_MASKS 1)"
-#endif
-
 /*********************
  *      DEFINES
  *********************/
@@ -101,17 +96,6 @@ typedef struct {
 } lv_meter_t;
 
 extern const lv_obj_class_t lv_meter_class;
-
-/**
- * `type` field in `lv_obj_draw_part_dsc_t` if `class_p = lv_meter_class`
- * Used in `LV_EVENT_DRAW_PART_BEGIN` and `LV_EVENT_DRAW_PART_END`
- */
-typedef enum {
-    LV_METER_DRAW_PART_ARC,             /**< The arc indicator*/
-    LV_METER_DRAW_PART_NEEDLE_LINE,     /**< The needle lines*/
-    LV_METER_DRAW_PART_NEEDLE_IMG,      /**< The needle images*/
-    LV_METER_DRAW_PART_TICK,            /**< The tick lines and labels*/
-} lv_meter_draw_part_type_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -16,6 +16,13 @@
  *      TYPEDEFS
  **********************/
 
+#define CUBIC_NEWTON_ITERATIONS     8
+#define CUBIC_PRECISION_BITS        10 /* 10 or 14 bits recommended, int64_t calculation is used for >14bit precision */
+
+#if CUBIC_PRECISION_BITS < 10 || CUBIC_PRECISION_BITS > 20
+    #error "cubic precision bits should be in range of [10, 20] for 32bit/64bit calculations."
+#endif
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -23,13 +30,13 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static const int16_t sin0_90_table[] = {
+static const uint16_t sin0_90_table[] = {
     0,     572,   1144,  1715,  2286,  2856,  3425,  3993,  4560,  5126,  5690,  6252,  6813,  7371,  7927,  8481,
-    9032,  9580,  10126, 10668, 11207, 11743, 12275, 12803, 13328, 13848, 14364, 14876, 15383, 15886, 16383, 16876,
-    17364, 17846, 18323, 18794, 19260, 19720, 20173, 20621, 21062, 21497, 21925, 22347, 22762, 23170, 23571, 23964,
-    24351, 24730, 25101, 25465, 25821, 26169, 26509, 26841, 27165, 27481, 27788, 28087, 28377, 28659, 28932, 29196,
-    29451, 29697, 29934, 30162, 30381, 30591, 30791, 30982, 31163, 31335, 31498, 31650, 31794, 31927, 32051, 32165,
-    32269, 32364, 32448, 32523, 32587, 32642, 32687, 32722, 32747, 32762, 32767
+    9032,  9580,  10126, 10668, 11207, 11743, 12275, 12803, 13328, 13848, 14365, 14876, 15384, 15886, 16384, 16877,
+    17364, 17847, 18324, 18795, 19261, 19720, 20174, 20622, 21063, 21498, 21926, 22348, 22763, 23170, 23571, 23965,
+    24351, 24730, 25102, 25466, 25822, 26170, 26510, 26842, 27166, 27482, 27789, 28088, 28378, 28660, 28932, 29197,
+    29452, 29698, 29935, 30163, 30382, 30592, 30792, 30983, 31164, 31336, 31499, 31651, 31795, 31928, 32052, 32166,
+    32270, 32365, 32449, 32524, 32588, 32643, 32688, 32723, 32748, 32763, 32768
 };
 
 /**********************
@@ -45,12 +52,11 @@ static const int16_t sin0_90_table[] = {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle)
+LV_ATTRIBUTE_FAST_MEM int32_t lv_trigo_sin(int16_t angle)
 {
-    int16_t ret = 0;
-    angle       = angle % 360;
-
-    if(angle < 0) angle = 360 + angle;
+    int32_t ret = 0;
+    while(angle < 0) angle += 360;
+    while(angle >= 360) angle -= 360;
 
     if(angle < 90) {
         ret = sin0_90_table[angle];
@@ -68,32 +74,147 @@ LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle)
         ret   = -sin0_90_table[angle];
     }
 
+    if(ret == 32767) return 32768;
+    else if(ret == -32767) return -32768;
+    else return ret;
+}
+
+/**
+ * cubic-bezier Reference:
+ *
+ * https://github.com/gre/bezier-easing
+ * https://opensource.apple.com/source/WebCore/WebCore-955.66/platform/graphics/UnitBezier.h
+ *
+ * Copyright (c) 2014 Gaëtan Renaudeau
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+static int32_t do_cubic_bezier(int32_t t, int32_t a, int32_t b, int32_t c)
+{
+    /*a * t^3 + b * t^2 + c * t*/
+#if CUBIC_PRECISION_BITS > 14
+    int64_t ret;
+#else
+    int32_t ret;
+#endif
+
+    ret = a;
+    ret = (ret * t) >> CUBIC_PRECISION_BITS;
+    ret = ((ret + b) * t) >> CUBIC_PRECISION_BITS;
+    ret = ((ret + c) * t) >> CUBIC_PRECISION_BITS;
     return ret;
 }
 
 /**
- * Calculate a value of a Cubic Bezier function.
- * @param t time in range of [0..LV_BEZIER_VAL_MAX]
- * @param u0 start values in range of [0..LV_BEZIER_VAL_MAX]
- * @param u1 control value 1 values in range of [0..LV_BEZIER_VAL_MAX]
- * @param u2 control value 2 in range of [0..LV_BEZIER_VAL_MAX]
- * @param u3 end values in range of [0..LV_BEZIER_VAL_MAX]
- * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
+ * Calculate the y value of cubic-bezier(x1, y1, x2, y2) function as specified x.
+ * @param x time in range of [0..LV_BEZIER_VAL_MAX]
+ * @param x1 x of control point 1 in range of [0..LV_BEZIER_VAL_MAX]
+ * @param y1 y of control point 1 in range of [0..LV_BEZIER_VAL_MAX]
+ * @param x2 x of control point 2 in range of [0..LV_BEZIER_VAL_MAX]
+ * @param y2 y of control point 2 in range of [0..LV_BEZIER_VAL_MAX]
+ * @return the value calculated
  */
-uint32_t lv_bezier3(uint32_t t, uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3)
+int32_t lv_cubic_bezier(int32_t x, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
-    uint32_t t_rem  = 1024 - t;
-    uint32_t t_rem2 = (t_rem * t_rem) >> 10;
-    uint32_t t_rem3 = (t_rem2 * t_rem) >> 10;
-    uint32_t t2     = (t * t) >> 10;
-    uint32_t t3     = (t2 * t) >> 10;
+    int32_t ax, bx, cx, ay, by, cy;
+    int32_t tl, tr, t;  /*t in cubic-bezier function, used for bisection */
+    int32_t xs;  /*x sampled on curve */
+#if CUBIC_PRECISION_BITS > 14
+    int64_t d; /*slope value at specified t*/
+#else
+    int32_t d;
+#endif
 
-    uint32_t v1 = (t_rem3 * u0) >> 10;
-    uint32_t v2 = (3 * t_rem2 * t * u1) >> 20;
-    uint32_t v3 = (3 * t_rem * t2 * u2) >> 20;
-    uint32_t v4 = (t3 * u3) >> 10;
+    if(x == 0 || x == LV_BEZIER_VAL_MAX) return x;
 
-    return v1 + v2 + v3 + v4;
+    /* input is always LV_BEZIER_VAL_SHIFT bit precision */
+
+#if CUBIC_PRECISION_BITS != LV_BEZIER_VAL_SHIFT
+    x <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    x1 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    x2 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    y1 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+    y2 <<= CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT;
+#endif
+
+    cx = 3 * x1;
+    bx = 3 * (x2 - x1) - cx;
+    ax = (1L << CUBIC_PRECISION_BITS) - cx - bx;
+
+    cy = 3 * y1;
+    by = 3 * (y2 - y1) - cy;
+    ay = (1L << CUBIC_PRECISION_BITS)  - cy - by;
+
+    /*Try Newton's method firstly */
+    t = x; /*Make a guess*/
+    for(int i = 0; i < CUBIC_NEWTON_ITERATIONS; i++) {
+        /*Check if x on curve at t matches input x*/
+        xs = do_cubic_bezier(t, ax, bx, cx) - x;
+        if(LV_ABS(xs) <= 1) goto found;
+
+        /* get slop at t, d = 3 * ax * t^2 + 2 * bx + t + cx */
+        d = ax; /* use 64bit operation if needed. */
+        d = (3 * d * t) >> CUBIC_PRECISION_BITS;
+        d = ((d + 2 * bx) * t) >> CUBIC_PRECISION_BITS;
+        d += cx;
+
+        if(LV_ABS(d) <= 1) break;
+
+        d = ((int64_t)xs * (1L << CUBIC_PRECISION_BITS)) / d;
+        if(d == 0) break;  /*Reached precision limits*/
+        t -= d;
+    }
+
+    /*Fallback to bisection method for reliability*/
+    tl = 0, tr = 1L << CUBIC_PRECISION_BITS, t = x;
+
+    if(t < tl) {
+        t = tl;
+        goto found;
+    }
+
+    if(t > tr) {
+        t = tr;
+        goto found;
+    }
+
+    while(tl < tr) {
+        xs = do_cubic_bezier(t, ax, bx, cx);
+        if(LV_ABS(xs - x) <= 1) goto found;
+        x > xs ? (tl = t) : (tr = t);
+        t = (tr - tl) / 2 + tl;
+        if(t == tl) break;
+    }
+
+    /*Failed to find suitable t for given x, return a value anyway.*/
+found:
+    /*Return y at t*/
+#if CUBIC_PRECISION_BITS != LV_BEZIER_VAL_SHIFT
+    return do_cubic_bezier(t, ay, by, cy) >> (CUBIC_PRECISION_BITS - LV_BEZIER_VAL_SHIFT);
+#else
+    return do_cubic_bezier(t, ay, by, cy);
+#endif
 }
 
 /**

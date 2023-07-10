@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_event.h"
-#include "lv_mem.h"
+#include "../stdlib/lv_mem.h"
 #include "lv_assert.h"
 #include <stddef.h>
 
@@ -18,11 +18,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-struct _lv_event_dsc_t {
-    lv_event_cb_t cb;
-    void * user_data;
-    uint32_t filter;
-};
 
 /**********************
  *  STATIC PROTOTYPES

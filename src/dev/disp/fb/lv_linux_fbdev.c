@@ -26,6 +26,8 @@
     #include <linux/fb.h>
 #endif /* LV_LINUX_FBDEV_BSD */
 
+#include "../../../stdlib/lv_string.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -65,7 +67,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
+static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -77,6 +79,10 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
 #if LV_LINUX_FBDEV_BSD
     #define FBIOBLANK FBIO_BLANK
 #endif /* LV_LINUX_FBDEV_BSD */
+
+#ifndef DIV_ROUND_UP
+    #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
+#endif
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -184,20 +190,25 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
 
     lv_coord_t hor_res = dsc->vinfo.xres;
     lv_coord_t ver_res = dsc->vinfo.yres;
+    lv_coord_t width = dsc->vinfo.width;
+
     uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
     lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
     lv_disp_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISP_RENDER_MODE_PARTIAL);
     lv_disp_set_res(disp, hor_res, ver_res);
 
-    LV_LOG_INFO("Resolution is set to %dx%d", hor_res, ver_res);
+    if(width) {
+        lv_disp_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
+    }
 
+    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_disp_get_dpi(disp));
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
     lv_linux_fb_t * dsc = lv_disp_get_driver_data(disp);
 
@@ -210,57 +221,14 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, lv_color_t * colo
 
     lv_coord_t w = lv_area_get_width(area);
     long int location = 0;
+    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
 
-    /*32 bit per pixel*/
-    if(dsc->vinfo.bits_per_pixel == 32 && LV_COLOR_DEPTH == 32) {
-        uint32_t * fbp32 = (uint32_t *)dsc->fbp;
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            location = (area->x1 + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->finfo.line_length / 4;
-            lv_memcpy(&fbp32[location], (uint32_t *)color_p, (area->x2 - area->x1 + 1) * 4);
-            color_p += w;
-        }
-    }
-    /*24 bit per pixel*/
-    else if(dsc->vinfo.bits_per_pixel == 24 && LV_COLOR_DEPTH == 32) {
-        uint8_t * fbp8 = (uint8_t *)dsc->fbp;
-        lv_coord_t x;
-        int32_t y;
-        uint8_t * pixel;
-        for(y = area->y1; y <= area->y2; y++) {
-            location = (area->x1 + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->finfo.line_length / 3;
-            for(x = 0; x < w; ++x) {
-                pixel = (uint8_t *)(&color_p[x]);
-                fbp8[3 * (location + x)] = pixel[0];
-                fbp8[3 * (location + x) + 1] = pixel[1];
-                fbp8[3 * (location + x) + 2] = pixel[2];
-            }
-            color_p += w;
-        }
-    }
-    /*16 bit per pixel*/
-    else if(dsc->vinfo.bits_per_pixel == 16 && LV_COLOR_DEPTH == 16) {
-        uint16_t * fbp16 = (uint16_t *)dsc->fbp;
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            location = (area->x1 + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->finfo.line_length / 2;
-            lv_memcpy(&fbp16[location], (uint32_t *)color_p, (area->x2 - area->x1 + 1) * 2);
-            color_p += w;
-        }
-    }
-    /*8 bit per pixel*/
-    else if(dsc->vinfo.bits_per_pixel == 8 && LV_COLOR_DEPTH == 8) {
-        uint8_t * fbp8 = (uint8_t *)dsc->fbp;
-        int32_t y;
-        for(y = area->y1; y <= area->y2; y++) {
-            location = (area->x1 + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->finfo.line_length;
-            lv_memcpy(&fbp8[location], (uint32_t *)color_p, (area->x2 - area->x1 + 1));
-            color_p += w;
-        }
-    }
-    else {
-        LV_LOG_ERROR("Not supported color format. LV_COLOR_DEPTH == %d but FB color depth is %d\n", LV_COLOR_DEPTH,
-                     dsc->vinfo.bits_per_pixel);
+    uint8_t * fbp = (uint8_t *)dsc->fbp;
+    int32_t y;
+    for(y = area->y1; y <= area->y2; y++) {
+        location = (area->x1 + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->finfo.line_length;
+        lv_memcpy(&fbp[location], (uint32_t *)color_p, w * px_size);
+        color_p += w * px_size;
     }
 
     //May be some direct update command is required

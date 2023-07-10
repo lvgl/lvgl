@@ -170,15 +170,12 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
             }
         }
 
-        lv_coord_t line_width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-        w += line_width;
-        h += line_width;
         p->x = w;
         p->y = h;
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         lv_line_t * line = (lv_line_t *)obj;
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
 
         if(line->point_num == 0 || line->point_array == NULL) return;
 
@@ -194,28 +191,25 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Read all points and draw the lines*/
         uint16_t i;
         for(i = 0; i < line->point_num - 1; i++) {
-            lv_point_t p1;
-            lv_point_t p2;
-
             lv_coord_t w = lv_obj_get_width(obj);
             lv_coord_t h = lv_obj_get_height(obj);
 
-            p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
-            p1.y = resolve_point_coord(line->point_array[i].y, h);
+            line_dsc.p1.x = resolve_point_coord(line->point_array[i].x, w) + x_ofs;
+            line_dsc.p1.y = resolve_point_coord(line->point_array[i].y, h);
 
-            p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
-            p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
+            line_dsc.p2.x = resolve_point_coord(line->point_array[i + 1].x, w) + x_ofs;
+            line_dsc.p2.y = resolve_point_coord(line->point_array[i + 1].y, h);
 
             if(line->y_inv == 0) {
-                p1.y = p1.y + y_ofs;
-                p2.y = p2.y + y_ofs;
+                line_dsc.p1.y = line_dsc.p1.y + y_ofs;
+                line_dsc.p2.y = line_dsc.p2.y + y_ofs;
             }
             else {
-                p1.y = h - p1.y + y_ofs;
-                p2.y = h - p2.y + y_ofs;
+                line_dsc.p1.y = h - line_dsc.p1.y + y_ofs;
+                line_dsc.p2.y = h - line_dsc.p2.y + y_ofs;
             }
 
-            lv_draw_line(draw_ctx, &line_dsc, &p1, &p2);
+            lv_draw_line(layer, &line_dsc);
             line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
     }

@@ -12,12 +12,13 @@
 #include <string.h>
 #include "../../core/lv_group.h"
 #include "../../core/lv_refr.h"
-#include "../../core/lv_indev.h"
+#include "../../indev/lv_indev.h"
 #include "../../draw/lv_draw.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_anim.h"
 #include "../../misc/lv_txt.h"
 #include "../../misc/lv_math.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -1286,7 +1287,7 @@ static void draw_placeholder(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
     const char * txt = lv_label_get_text(ta->label);
 
     /*Draw the place holder*/
@@ -1303,7 +1304,8 @@ static void draw_placeholder(lv_event_t * e)
         lv_area_t ph_coords;
         lv_area_copy(&ph_coords, &obj->coords);
         lv_area_move(&ph_coords, left + border_width, top + border_width);
-        lv_draw_label(draw_ctx, &ph_dsc, &ph_coords, ta->placeholder_txt, NULL);
+        ph_dsc.text = ta->placeholder_txt;
+        lv_draw_label(layer, &ph_dsc, &ph_coords);
     }
 }
 
@@ -1311,7 +1313,7 @@ static void draw_cursor(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
     const char * txt = lv_label_get_text(ta->label);
 
     if(ta->cursor.show == 0) return;
@@ -1330,7 +1332,7 @@ static void draw_cursor(lv_event_t * e)
     cur_area.x2 += ta->label->coords.x1;
     cur_area.y2 += ta->label->coords.y1;
 
-    lv_draw_rect(draw_ctx, &cur_dsc, &cur_area);
+    lv_draw_rect(layer, &cur_dsc, &cur_area);
 
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_CURSOR);
     lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_CURSOR) + border_width;
@@ -1349,7 +1351,9 @@ static void draw_cursor(lv_event_t * e)
     lv_draw_label_dsc_init(&cur_label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_CURSOR, &cur_label_dsc);
     if(cur_dsc.bg_opa > LV_OPA_MIN || !lv_color_eq(cur_label_dsc.color, label_color)) {
-        lv_draw_label(draw_ctx, &cur_label_dsc, &cur_area, letter_buf, NULL);
+        cur_label_dsc.text = letter_buf;
+        cur_label_dsc.text_local = true;
+        lv_draw_label(layer, &cur_label_dsc, &cur_area);
     }
 }
 

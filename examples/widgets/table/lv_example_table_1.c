@@ -1,30 +1,42 @@
 #include "../../lv_examples.h"
 #if LV_USE_TABLE && LV_BUILD_EXAMPLES
 
-static void draw_part_event_cb(lv_event_t * e)
+static void draw_event_cb(lv_event_t * e)
 {
-    lv_obj_t * obj = lv_event_get_target(e);
-    lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
+    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
+    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
     /*If the cells are drawn...*/
-    if(dsc->part == LV_PART_ITEMS) {
-        uint32_t row = dsc->id /  lv_table_get_col_cnt(obj);
-        uint32_t col = dsc->id - row * lv_table_get_col_cnt(obj);
+    if(base_dsc->part == LV_PART_ITEMS) {
+        uint32_t row = base_dsc->id1;
+        uint32_t col = base_dsc->id2;
 
         /*Make the texts in the first cell center aligned*/
         if(row == 0) {
-            dsc->label_dsc->align = LV_TEXT_ALIGN_CENTER;
-            dsc->rect_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), dsc->rect_dsc->bg_color, LV_OPA_20);
-            dsc->rect_dsc->bg_opa = LV_OPA_COVER;
+            if(draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
+                lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;
+                label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
+            }
+            if(draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
+                lv_draw_rect_dsc_t * rect_draw_dsc = draw_task->draw_dsc;
+                rect_draw_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_BLUE), rect_draw_dsc->bg_color, LV_OPA_20);
+                rect_draw_dsc->bg_opa = LV_OPA_COVER;
+            }
         }
         /*In the first column align the texts to the right*/
         else if(col == 0) {
-            dsc->label_dsc->align = LV_TEXT_ALIGN_RIGHT;
+            if(draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
+                lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;
+                label_draw_dsc->align = LV_TEXT_ALIGN_RIGHT;
+            }
         }
 
-        /*MAke every 2nd row grayish*/
+        /*Make every 2nd row grayish*/
         if((row != 0 && row % 2) == 0) {
-            dsc->rect_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_GREY), dsc->rect_dsc->bg_color, LV_OPA_10);
-            dsc->rect_dsc->bg_opa = LV_OPA_COVER;
+            if(draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
+                lv_draw_rect_dsc_t * rect_draw_dsc = draw_task->draw_dsc;
+                rect_draw_dsc->bg_color = lv_color_mix(lv_palette_main(LV_PALETTE_GREY), rect_draw_dsc->bg_color, LV_OPA_10);
+                rect_draw_dsc->bg_opa = LV_OPA_COVER;
+            }
         }
     }
 }
@@ -59,7 +71,8 @@ void lv_example_table_1(void)
     lv_obj_center(table);
 
     /*Add an event callback to to apply some custom drawing*/
-    lv_obj_add_event(table, draw_part_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
+    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 }
 
 #endif

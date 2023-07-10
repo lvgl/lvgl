@@ -23,13 +23,12 @@ jobs:
     - name: Clone lv_micropython
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
-        git checkout master
+        git checkout feat/parallel-rendering
     - name: Initialize lv_bindings submodule
       run: git submodule update --init --recursive lib/lv_bindings
     - name: Update ${{ matrix.port }} port submodules
-      if: matrix.port != 'esp32'
-      # VARIANT needed for unix
-      run: make -C ports/${{ matrix.port }} VARIANT=dev DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules
+      if: matrix.port != 'esp32' && matrix.port != 'rp2'
+      run: make -C ports/${{ matrix.port }} DEBUG=1 USER_C_MODULES=../../lib/lv_bindings/bindings.cmake submodules
     - name: Checkout LVGL submodule
       working-directory: ./lib/lv_bindings/lvgl
       run: |
@@ -61,11 +60,13 @@ jobs:
       run: make -j $(nproc) -C ports/stm32 BOARD=STM32F7DISC
     - name: Build Raspberry Pi PICO port
       if: matrix.port == 'rp2'
-      run: make -j $(nproc) -C ports/rp2 BOARD=PICO USER_C_MODULES=../../lib/lv_bindings/bindings.cmake
+      run: |
+        make -C ports/rp2 BOARD=PICO submodules
+        make -j $(nproc) -C ports/rp2 BOARD=PICO USER_C_MODULES=../../lib/lv_bindings/bindings.cmake
     # Unix port
     - name: Build Unix port
       if: matrix.port == 'unix'
-      run: make -j $(nproc) -C ports/unix VARIANT=dev DEBUG=1
+      run: make -j $(nproc) -C ports/unix DEBUG=1
     - name: Run tests
       if: success() && matrix.port == 'unix'
       run: |

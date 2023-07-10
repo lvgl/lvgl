@@ -80,7 +80,9 @@ static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_anim_set_values(&a, arc_length_param, 360 + arc_length_param);
     lv_anim_start(&a);
 
-    lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
+    lv_anim_set_path_cb(&a, lv_anim_path_custom_bezier3);
+    lv_anim_set_bezier3_param(&a, LV_BEZIER_VAL_FLOAT(0.42), LV_BEZIER_VAL_FLOAT(0.58),
+                              LV_BEZIER_VAL_FLOAT(0), LV_BEZIER_VAL_FLOAT(1));
     lv_anim_set_values(&a, 0, 360);
     lv_anim_set_exec_cb(&a, arc_anim_start_angle);
     lv_anim_start(&a);

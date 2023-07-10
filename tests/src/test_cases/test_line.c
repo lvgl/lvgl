@@ -54,10 +54,6 @@ void test_line_size_should_be_updated_after_adding_points(void)
         calculated_width = LV_MAX(points[point_idx].x, calculated_width);
         calculated_height = LV_MAX(points[point_idx].y, calculated_height);
     }
-    /* Add style line width */
-    lv_coord_t line_width = lv_obj_get_style_line_width(line, LV_PART_MAIN);
-    calculated_width += line_width;
-    calculated_height += line_width;
 
     TEST_ASSERT_EQUAL_UINT16(calculated_width, lv_obj_get_self_width(line));
     TEST_ASSERT_EQUAL_UINT16(calculated_height, lv_obj_get_self_height(line));

@@ -12,8 +12,9 @@
 #include "../../misc/lv_math.h"
 #include "../../draw/lv_draw.h"
 #include "../../core/lv_refr.h"
-#include "../../core/lv_disp.h"
+#include "../../disp/lv_disp.h"
 #include "../../draw/sw/lv_draw_sw.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -29,8 +30,6 @@
  **********************/
 static void lv_canvas_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
-static lv_draw_ctx_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area);
-static void deinit_fake_disp(lv_obj_t * canvas, lv_draw_ctx_t * draw_ctx);
 
 /**********************
  *  STATIC VARIABLES
@@ -91,17 +90,45 @@ void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t col
         buf += y * stride;
         buf += x >> 3;
         uint32_t bit = 7 - (x & 0x7);
-        uint32_t c_int = lv_color_to_int(color);
+        uint32_t c_int = color.blue;
 
         *buf &= ~(1 << bit);
         *buf |= c_int << bit;
     }
-    else {
-        uint8_t px_size = lv_color_format_get_size(canvas->dsc.header.cf);
-        uint32_t px = canvas->dsc.header.w * y * px_size + x * px_size;
-        uint32_t native_color = lv_color_to_int(color);
-        native_color += opa << (LV_COLOR_FORMAT_NATIVE_ALPHA_OFS * 8);
-        lv_color_from_native_alpha((uint8_t *)&native_color, (uint8_t *)canvas->dsc.data + px, canvas->dsc.header.cf, 1);
+    else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_A8) {
+        uint8_t * buf = (uint8_t *)canvas->dsc.data;
+        buf += canvas->dsc.header.w * y + x;
+        *buf = opa;
+    }
+    else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_RGB565) {
+        lv_color16_t * buf = (lv_color16_t *)canvas->dsc.data;
+        buf += canvas->dsc.header.w * y + x;
+        buf->red = color.red >> 3;
+        buf->green = color.green >> 2;
+        buf->blue = color.blue >> 3;
+    }
+    else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_RGB888) {
+        uint8_t * buf = (uint8_t *)canvas->dsc.data;
+        buf += canvas->dsc.header.w * y * 3 + x * 3;
+        buf[2] = color.red;
+        buf[1] = color.green;
+        buf[0] = color.blue;
+    }
+    else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_XRGB8888) {
+        uint8_t * buf = (uint8_t *)canvas->dsc.data;
+        buf += canvas->dsc.header.w * y * 4 + x * 4;
+        buf[2] = color.red;
+        buf[1] = color.green;
+        buf[0] = color.blue;
+        buf[3] = 0xFF;
+    }
+    else if(canvas->dsc.header.cf == LV_COLOR_FORMAT_ARGB8888) {
+        lv_color32_t * buf = (lv_color32_t *)canvas->dsc.data;
+        buf += canvas->dsc.header.w * y + x;
+        buf->red = color.red;
+        buf->green = color.green;
+        buf->blue = color.blue;
+        buf->alpha = opa;
     }
     lv_obj_invalidate(obj);
 }
@@ -120,15 +147,50 @@ void lv_canvas_set_palette(lv_obj_t * obj, uint8_t id, lv_color32_t c)
  * Getter functions
  *====================*/
 
-void lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t * color, lv_opa_t * opa)
+lv_color32_t lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_color_t alpha_color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     uint8_t px_size = lv_color_format_get_size(canvas->dsc.header.cf);
-    uint32_t px = canvas->dsc.header.w * y * px_size + x * px_size;
-    lv_color_to_native((uint8_t *)canvas->dsc.data + px, canvas->dsc.header.cf, color, opa, alpha_color, 1);
+    const uint8_t * px = canvas->dsc.data + canvas->dsc.header.w * y * px_size + x * px_size;
+    lv_color32_t ret;
+
+    switch(canvas->dsc.header.cf) {
+        case LV_COLOR_FORMAT_ARGB8888:
+            ret.red = px[0];
+            ret.green = px[1];
+            ret.blue = px[2];
+            ret.alpha = px[3];
+            break;
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            ret.red = px[0];
+            ret.green = px[1];
+            ret.blue = px[2];
+            ret.alpha = 0xFF;
+            break;
+        case LV_COLOR_FORMAT_RGB565: {
+                lv_color16_t * c16 = (lv_color16_t *) px;
+                ret.red = (c16[x].red * 2106) >> 8;  /*To make it rounded*/
+                ret.green = (c16[x].green * 1037) >> 8;
+                ret.blue = (c16[x].blue * 2106) >> 8;
+                ret.alpha = 0xFF;
+                break;
+            }
+        case LV_COLOR_FORMAT_A8: {
+                lv_color_t alpha_color = lv_obj_get_style_img_recolor(obj, LV_PART_MAIN);
+                ret.red = alpha_color.red;
+                ret.green = alpha_color.green;
+                ret.blue = alpha_color.blue;
+                ret.alpha = px[0];
+                break;
+            }
+        default:
+            break;
+    }
+
+    return ret;
 }
 
 lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * obj)
@@ -164,78 +226,6 @@ void lv_canvas_copy_buf(lv_obj_t * obj, const void * to_copy, lv_coord_t x, lv_c
         px += canvas->dsc.header.w * px_size;
         to_copy8 += w * px_size;
     }
-}
-
-void lv_canvas_transform(lv_obj_t * obj, lv_img_dsc_t * src_img, int16_t angle, uint16_t zoom, lv_coord_t offset_x,
-                         lv_coord_t offset_y,
-                         int32_t pivot_x, int32_t pivot_y, bool antialias)
-{
-#if LV_USE_DRAW_MASKS
-    LV_ASSERT_OBJ(obj, MY_CLASS);
-    LV_ASSERT_NULL(src_img);
-
-    lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    lv_img_dsc_t * dest_img = &canvas->dsc;
-
-    int32_t x;
-    int32_t y;
-
-    lv_draw_img_dsc_t draw_dsc;
-    lv_draw_img_dsc_init(&draw_dsc);
-    draw_dsc.angle = angle;
-    draw_dsc.zoom = zoom;
-    draw_dsc.pivot.x = pivot_x;
-    draw_dsc.pivot.y = pivot_y;
-    draw_dsc.antialias = antialias;
-
-    lv_area_t dest_area;
-    dest_area.x1 = -offset_x;
-    dest_area.x2 = dest_area.x1 + dest_img->header.w - 1;
-    dest_area.y1 = -offset_y;
-    dest_area.y2 = -offset_y;
-
-    lv_draw_img_sup_t sup;
-    lv_memzero(&sup, sizeof(sup));
-
-    /*Create a dummy display to fool the lv_draw function.
-     *It will think it draws to real screen.*/
-    lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(obj, &clip_area);
-
-    lv_color_t * cbuf = lv_malloc(dest_img->header.w * sizeof(lv_color_t));
-    lv_opa_t * abuf = lv_malloc(dest_img->header.w * sizeof(lv_opa_t));
-    for(y = 0; y < dest_img->header.h; y++) {
-        if(y + offset_y >= 0) {
-            lv_draw_sw_transform(draw_ctx, &dest_area, src_img->data, src_img->header.w, src_img->header.h, src_img->header.w,
-                                 &draw_dsc, &sup, canvas->dsc.header.cf, cbuf, abuf);
-
-            for(x = 0; x < dest_img->header.w; x++) {
-                if(abuf[x]) {
-                    lv_canvas_set_px(obj, x, y, cbuf[x], abuf[x]);
-                }
-            }
-
-            dest_area.y1++;
-            dest_area.y2++;
-        }
-    }
-    lv_free(cbuf);
-    lv_free(abuf);
-
-    lv_obj_invalidate(obj);
-
-#else
-    LV_UNUSED(obj);
-    LV_UNUSED(src_img);
-    LV_UNUSED(angle);
-    LV_UNUSED(zoom);
-    LV_UNUSED(offset_x);
-    LV_UNUSED(offset_y);
-    LV_UNUSED(pivot_x);
-    LV_UNUSED(pivot_y);
-    LV_UNUSED(antialias);
-    LV_LOG_WARN("Can't transform canvas with LV_USE_DRAW_MASKS == 0");
-#endif
 }
 
 void lv_canvas_blur_hor(lv_obj_t * obj, const lv_area_t * area, uint16_t r)
@@ -474,186 +464,30 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     lv_obj_invalidate(obj);
 }
 
-void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
-                         const lv_draw_rect_dsc_t * draw_dsc)
+
+
+void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
-    LV_ASSERT_OBJ(canvas, MY_CLASS);
+    LV_ASSERT_NULL(canvas);
+    LV_ASSERT_NULL(layer);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
+    lv_area_t canvas_area = {0, 0, dsc->header.w - 1,  dsc->header.h - 1};
+    lv_memzero(layer, sizeof(*layer));
 
-    if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE) {
-        LV_LOG_WARN("can draw only with LV_COLOR_FORMAT_NATIVE");
-        return;
-    }
-
-    /*Create a dummy display to fool the lv_draw function.
-     *It will think it draws to real screen.*/
-    lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
-
-    lv_area_t coords;
-    coords.x1 = x;
-    coords.y1 = y;
-    coords.x2 = x + w - 1;
-    coords.y2 = y + h - 1;
-
-    lv_draw_rect(draw_ctx, draw_dsc, &coords);
-
-    deinit_fake_disp(canvas, draw_ctx);
-
-    lv_obj_invalidate(canvas);
+    layer->color_format = dsc->header.cf;
+    layer->buf_area = canvas_area;
+    layer->clip_area = canvas_area;
+    layer->buf = (uint8_t *)dsc->data;
 }
 
-void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w,
-                         lv_draw_label_dsc_t * draw_dsc, const char * txt)
+
+void lv_canvas_finish_layer(lv_obj_t * canvas, lv_layer_t * layer)
 {
-    LV_ASSERT_OBJ(canvas, MY_CLASS);
-
-    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
-
-    if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE) {
-        LV_LOG_WARN("can draw only with LV_COLOR_FORMAT_NATIVE");
-        return;
+    while(layer->draw_task_head) {
+        lv_draw_dispatch_wait_for_request();
+        lv_draw_dispatch_layer(lv_obj_get_disp(canvas), layer);
     }
-
-    /*Create a dummy display to fool the lv_draw function.
-     *It will think it draws to real screen.*/
-    lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
-
-    lv_area_t coords;
-    coords.x1 = x;
-    coords.y1 = y;
-    coords.x2 = x + max_w - 1;
-    coords.y2 = dsc->header.h - 1;
-    lv_draw_label(draw_ctx, draw_dsc, &coords, txt, NULL);
-
-    deinit_fake_disp(canvas, draw_ctx);
-
-    lv_obj_invalidate(canvas);
-}
-
-void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
-                        const lv_draw_img_dsc_t * draw_dsc)
-{
-    LV_ASSERT_OBJ(canvas, MY_CLASS);
-
-    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
-
-    if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE) {
-        LV_LOG_WARN("can draw only with LV_COLOR_FORMAT_NATIVE");
-        return;
-    }
-
-    lv_img_header_t header;
-    lv_res_t res = lv_img_decoder_get_info(src, &header);
-    if(res != LV_RES_OK) {
-        LV_LOG_WARN("couldn't get the image data.");
-        return;
-    }
-    /*Create a dummy display to fool the lv_draw function.
-     *It will think it draws to real screen.*/
-    lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
-
-    lv_area_t coords;
-    coords.x1 = x;
-    coords.y1 = y;
-    coords.x2 = x + header.w - 1;
-    coords.y2 = y + header.h - 1;
-
-    lv_draw_img(draw_ctx, draw_dsc, &coords, src);
-
-    deinit_fake_disp(canvas, draw_ctx);
-
-    lv_obj_invalidate(canvas);
-}
-
-void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t point_cnt,
-                         const lv_draw_line_dsc_t * draw_dsc)
-{
-    LV_ASSERT_OBJ(canvas, MY_CLASS);
-
-    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
-
-    if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE) {
-        LV_LOG_WARN("can draw only with LV_COLOR_FORMAT_NATIVE");
-        return;
-    }
-
-    /*Create a dummy display to fool the lv_draw function.
-     *It will think it draws to real screen.*/
-    lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
-
-    uint32_t i;
-    for(i = 0; i < point_cnt - 1; i++) {
-        lv_draw_line(draw_ctx, draw_dsc, &points[i], &points[i + 1]);
-    }
-
-    deinit_fake_disp(canvas, draw_ctx);
-
-    lv_obj_invalidate(canvas);
-}
-
-void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32_t point_cnt,
-                            const lv_draw_rect_dsc_t * draw_dsc)
-{
-    LV_ASSERT_OBJ(canvas, MY_CLASS);
-
-    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
-
-    if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE) {
-        LV_LOG_WARN("can draw only with LV_COLOR_FORMAT_NATIVE");
-        return;
-    }
-
-    /*Create a dummy display to fool the lv_draw function.
-     *It will think it draws to real screen.*/
-    lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
-
-    lv_draw_polygon(draw_ctx, draw_dsc, points, point_cnt);
-
-    deinit_fake_disp(canvas, draw_ctx);
-
-    lv_obj_invalidate(canvas);
-}
-
-void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle,
-                        int32_t end_angle, const lv_draw_arc_dsc_t * draw_dsc)
-{
-#if LV_USE_DRAW_MASKS
-    LV_ASSERT_OBJ(canvas, MY_CLASS);
-
-    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
-
-    if(dsc->header.cf != LV_COLOR_FORMAT_NATIVE) {
-        LV_LOG_WARN("can draw only with LV_COLOR_FORMAT_NATIVE");
-        return;
-    }
-
-    /*Create a dummy display to fool the lv_draw function.
-     *It will think it draws to real screen.*/
-    lv_area_t clip_area;
-    lv_draw_ctx_t * draw_ctx = init_fake_disp(canvas, &clip_area);
-
-    lv_point_t p = {x, y};
-    lv_draw_arc(draw_ctx, draw_dsc, &p, r,  start_angle, end_angle);
-
-    deinit_fake_disp(canvas, draw_ctx);
-
-    lv_obj_invalidate(canvas);
-#else
-    LV_UNUSED(canvas);
-    LV_UNUSED(x);
-    LV_UNUSED(y);
-    LV_UNUSED(r);
-    LV_UNUSED(start_angle);
-    LV_UNUSED(end_angle);
-    LV_UNUSED(draw_dsc);
-    LV_LOG_WARN("Can't draw arc with LV_USE_DRAW_MASKS == 0");
-#endif
 }
 
 /**********************
@@ -687,36 +521,6 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
     lv_img_cache_invalidate_src(&canvas->dsc);
 }
-
-
-static lv_draw_ctx_t * init_fake_disp(lv_obj_t * canvas, lv_area_t * clip_area)
-{
-    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
-
-    clip_area->x1 = 0;
-    clip_area->x2 = dsc->header.w - 1;
-    clip_area->y1 = 0;
-    clip_area->y2 = dsc->header.h - 1;
-
-    lv_draw_ctx_t * draw_ctx = lv_malloc(sizeof(lv_draw_sw_ctx_t));
-    LV_ASSERT_MALLOC(draw_ctx);
-    if(draw_ctx == NULL)  return NULL;
-    lv_draw_sw_init_ctx(NULL, draw_ctx);
-    draw_ctx->clip_area = clip_area;
-    draw_ctx->buf_area = clip_area;
-    draw_ctx->buf = (void *)dsc->data;
-    draw_ctx->color_format = dsc->header.cf;
-
-    return draw_ctx;
-}
-
-static void deinit_fake_disp(lv_obj_t * canvas, lv_draw_ctx_t * draw_ctx)
-{
-    LV_UNUSED(canvas);
-    lv_draw_sw_deinit_ctx(NULL, draw_ctx);
-    lv_free(draw_ctx);
-}
-
 
 
 #endif

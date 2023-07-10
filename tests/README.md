@@ -45,6 +45,6 @@ See the list of asserts [here](https://github.com/ThrowTheSwitch/Unity/blob/mast
 There are some custom, LVGL specific asserts:
 - `TEST_ASSERT_EQUAL_SCREENSHOT("image1.png")` Render the active screen and compare its content with an image in the `ref_imgs` folder.
    - If the reference image is not found it will be created automatically from the rendered screen.
-   - If the compare fails `lvgl/test_screenshot_error.h` is created with the content of the frame buffer as an image. To see the that image `#include "test_screenshot_error.h"` and call `test_screenshot_error_show();`.
+   - If the compare fails an `<image_name>_err.png` file will be created with the rendered content next to the reference image.
 - `TEST_ASSERT_EQUAL_COLOR(color1, color2)` Compare two colors.
 

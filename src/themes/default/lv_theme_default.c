@@ -10,9 +10,9 @@
 
 #if LV_USE_THEME_DEFAULT
 
-#include "lv_theme_default.h"
+#include "../lv_theme.h"
 #include "../../misc/lv_gc.h"
-#include LV_COLOR_EXTERN_INCLUDE
+#include "../../misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -122,10 +122,6 @@ typedef struct {
     lv_style_t calendar_btnm_bg, calendar_btnm_day, calendar_header;
 #endif
 
-#if LV_USE_COLORWHEEL
-    lv_style_t colorwheel_main;
-#endif
-
 #if LV_USE_MENU
     lv_style_t menu_bg, menu_cont, menu_sidebar_cont, menu_main_cont, menu_page, menu_header_cont, menu_header_btn,
                menu_section, menu_pressed, menu_separator;
@@ -199,8 +195,8 @@ static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color
 static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t color, lv_opa_t opa)
 {
     LV_UNUSED(f);
-    if(theme.flags & MODE_DARK) return LV_COLOR_MIX(lv_palette_darken(LV_PALETTE_GREY, 2), color, opa);
-    else return LV_COLOR_MIX(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
+    if(theme.flags & MODE_DARK) return lv_color_mix(lv_palette_darken(LV_PALETTE_GREY, 2), color, opa);
+    else return lv_color_mix(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
 }
 
 static void style_init(void)
@@ -255,6 +251,7 @@ static void style_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, color_scr);
     lv_style_set_text_color(&styles->scr, color_text);
+    lv_style_set_text_font(&styles->scr, theme.font_normal);
     lv_style_set_pad_row(&styles->scr, PAD_SMALL);
     lv_style_set_pad_column(&styles->scr, PAD_SMALL);
 
@@ -580,11 +577,6 @@ static void style_init(void)
     lv_style_set_pad_gap(&styles->calendar_header, PAD_SMALL);
 #endif
 
-#if LV_USE_COLORWHEEL
-    style_init_reset(&styles->colorwheel_main);
-    lv_style_set_arc_width(&styles->colorwheel_main, lv_disp_dpx(theme.disp, 10));
-#endif
-
 #if LV_USE_MSGBOX
     /*To add space for for the button shadow*/
     style_init_reset(&styles->msgbox_btn_bg);
@@ -595,7 +587,7 @@ static void style_init(void)
 
     style_init_reset(&styles->msgbox_backdrop_bg);
     lv_style_set_bg_color(&styles->msgbox_backdrop_bg, lv_palette_main(LV_PALETTE_GREY));
-    lv_style_set_bg_opa(&styles->msgbox_backdrop_bg, LV_OPA_50);
+    lv_style_set_bg_opa(&styles->msgbox_backdrop_bg, LV_OPA_100);
 #endif
 #if LV_USE_KEYBOARD
     style_init_reset(&styles->keyboard_btn_bg);
@@ -990,13 +982,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     }
 #endif
 
-#if LV_USE_METER
-    else if(lv_obj_check_type(obj, &lv_meter_class)) {
-        lv_obj_add_style(obj, &styles->card, 0);
-        lv_obj_add_style(obj, &styles->circle, 0);
-        lv_obj_add_style(obj, &styles->meter_indic, LV_PART_INDICATOR);
-    }
-#endif
+    //#if LV_USE_METER
+    //    else if(lv_obj_check_type(obj, &lv_meter_class)) {
+    //        lv_obj_add_style(obj, &styles->card, 0);
+    //        lv_obj_add_style(obj, &styles->circle, 0);
+    //        lv_obj_add_style(obj, &styles->meter_indic, LV_PART_INDICATOR);
+    //    }
+    //#endif
 
 #if LV_USE_TEXTAREA
     else if(lv_obj_check_type(obj, &lv_textarea_class)) {
@@ -1148,15 +1140,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_WIN
     else if(lv_obj_check_type(obj, &lv_win_class)) {
         lv_obj_add_style(obj, &styles->clip_corner, 0);
-    }
-#endif
-
-#if LV_USE_COLORWHEEL
-    else if(lv_obj_check_type(obj, &lv_colorwheel_class)) {
-        lv_obj_add_style(obj, &styles->colorwheel_main, 0);
-        lv_obj_add_style(obj, &styles->pad_normal, 0);
-        lv_obj_add_style(obj, &styles->bg_color_white, LV_PART_KNOB);
-        lv_obj_add_style(obj, &styles->pad_normal, LV_PART_KNOB);
     }
 #endif
 

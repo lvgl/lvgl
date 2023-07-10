@@ -10,8 +10,8 @@
 #if LV_USE_LED
 
 #include "../../misc/lv_assert.h"
-#include "../../themes/lv_themes.h"
-#include LV_COLOR_EXTERN_INCLUDE
+#include "../../themes/lv_theme.h"
+#include "../../misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -180,22 +180,22 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &rect_dsc);
 
         /*Use the original colors brightness to modify color->led*/
-        rect_dsc.bg_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_color));
-        rect_dsc.bg_grad.stops[0].color = LV_COLOR_MIX(led->color, lv_color_black(),
+        rect_dsc.bg_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.bg_color));
+        rect_dsc.bg_grad.stops[0].color = lv_color_mix(led->color, lv_color_black(),
                                                        lv_color_brightness(rect_dsc.bg_grad.stops[0].color));
-        rect_dsc.bg_grad.stops[1].color = LV_COLOR_MIX(led->color, lv_color_black(),
+        rect_dsc.bg_grad.stops[1].color = lv_color_mix(led->color, lv_color_black(),
                                                        lv_color_brightness(rect_dsc.bg_grad.stops[1].color));
-        rect_dsc.shadow_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.shadow_color));
-        rect_dsc.border_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.border_color));
-        rect_dsc.outline_color = LV_COLOR_MIX(led->color, lv_color_black(), lv_color_brightness(rect_dsc.outline_color));
+        rect_dsc.shadow_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.shadow_color));
+        rect_dsc.border_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.border_color));
+        rect_dsc.outline_color = lv_color_mix(led->color, lv_color_black(), lv_color_brightness(rect_dsc.outline_color));
 
         /*Mix. the color with black proportionally with brightness*/
-        rect_dsc.bg_color = LV_COLOR_MIX(rect_dsc.bg_color, lv_color_black(), led->bright);
-        rect_dsc.bg_grad.stops[0].color   = LV_COLOR_MIX(rect_dsc.bg_grad.stops[0].color, lv_color_black(), led->bright);
-        rect_dsc.bg_grad.stops[1].color   = LV_COLOR_MIX(rect_dsc.bg_grad.stops[1].color, lv_color_black(), led->bright);
-        rect_dsc.border_color = LV_COLOR_MIX(rect_dsc.border_color, lv_color_black(), led->bright);
-        rect_dsc.shadow_color = LV_COLOR_MIX(rect_dsc.shadow_color, lv_color_black(), led->bright);
-        rect_dsc.outline_color = LV_COLOR_MIX(rect_dsc.outline_color, lv_color_black(), led->bright);
+        rect_dsc.bg_color = lv_color_mix(rect_dsc.bg_color, lv_color_black(), led->bright);
+        rect_dsc.bg_grad.stops[0].color   = lv_color_mix(rect_dsc.bg_grad.stops[0].color, lv_color_black(), led->bright);
+        rect_dsc.bg_grad.stops[1].color   = lv_color_mix(rect_dsc.bg_grad.stops[1].color, lv_color_black(), led->bright);
+        rect_dsc.border_color = lv_color_mix(rect_dsc.border_color, lv_color_black(), led->bright);
+        rect_dsc.shadow_color = lv_color_mix(rect_dsc.shadow_color, lv_color_black(), led->bright);
+        rect_dsc.outline_color = lv_color_mix(rect_dsc.outline_color, lv_color_black(), led->bright);
 
         /*Set the current shadow width according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/
@@ -204,19 +204,9 @@ static void lv_led_event(const lv_obj_class_t * class_p, lv_event_t * e)
         rect_dsc.shadow_spread = ((led->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_spread) /
                                  (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
 
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
 
-        lv_obj_draw_part_dsc_t  part_draw_dsc;
-        lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-        part_draw_dsc.draw_area = &obj->coords;
-        part_draw_dsc.class_p = MY_CLASS;
-        part_draw_dsc.type = LV_LED_DRAW_PART_RECTANGLE;
-        part_draw_dsc.rect_dsc = &rect_dsc;
-        part_draw_dsc.part = LV_PART_MAIN;
-
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-        lv_draw_rect(draw_ctx, &rect_dsc, &obj->coords);
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        lv_draw_rect(layer, &rect_dsc, &obj->coords);
     }
 }
 

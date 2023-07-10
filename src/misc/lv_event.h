@@ -25,9 +25,17 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+struct _lv_event_t;
 
-struct _lv_event_dsc_t;
-typedef struct _lv_event_dsc_t lv_event_dsc_t;
+typedef void (*lv_event_cb_t)(struct _lv_event_t * e);
+
+
+typedef struct {
+    lv_event_cb_t cb;
+    void * user_data;
+    uint32_t filter;
+} lv_event_dsc_t;
+
 
 /**
  * Type of event being sent to the object.
@@ -64,8 +72,7 @@ typedef enum {
     LV_EVENT_DRAW_POST_BEGIN,    /**< Starting the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST,          /**< Perform the post draw phase (when all children are drawn)*/
     LV_EVENT_DRAW_POST_END,      /**< Finishing the post draw phase (when all children are drawn)*/
-    LV_EVENT_DRAW_PART_BEGIN,    /**< Starting to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. */
-    LV_EVENT_DRAW_PART_END,      /**< Finishing to draw a part. The event parameter is `lv_obj_draw_dsc_t *`. */
+    LV_EVENT_DRAW_TASK_ADDED,      /**< Adding a draw task */
 
     /** Special events*/
     LV_EVENT_VALUE_CHANGED,       /**< The object's value has changed (i.e. slider moved)*/
@@ -99,6 +106,8 @@ typedef enum {
     LV_EVENT_RESOLUTION_CHANGED,
     LV_EVENT_REFR_START,
     LV_EVENT_REFR_FINISH,
+    LV_EVENT_FLUSH_START,
+    LV_EVENT_FLUSH_FINISH,
 
     _LV_EVENT_LAST,               /** Number of default events*/
 
@@ -130,7 +139,6 @@ typedef struct _lv_event_t {
  * Events are used to notify the user of some action being taken on the object.
  * For details, see ::lv_event_t.
  */
-typedef void (*lv_event_cb_t)(lv_event_t * e);
 
 /**********************
  * GLOBAL PROTOTYPES

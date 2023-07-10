@@ -14,8 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../core/lv_disp.h"
-#include "../../core/lv_indev.h"
+#include "../../disp/lv_disp.h"
+#include "../../indev/lv_indev.h"
 
 #if LV_USE_SDL
 
@@ -40,6 +40,8 @@ uint8_t lv_sdl_window_get_zoom(lv_disp_t * disp);
 lv_disp_t * _lv_sdl_get_disp_from_win_id(uint32_t win_id);
 
 void lv_sdl_window_set_title(lv_disp_t * disp, const char * title);
+
+void lv_sdl_quit();
 
 /**********************
  *      MACROS

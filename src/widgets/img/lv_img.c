@@ -9,6 +9,8 @@
 #include "lv_img.h"
 #if LV_USE_IMG != 0
 
+#include "../../stdlib/lv_string.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -327,7 +329,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * obj)
     return img->offset.y;
 }
 
-uint16_t lv_img_get_angle(lv_obj_t * obj)
+lv_coord_t lv_img_get_angle(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -345,7 +347,7 @@ void lv_img_get_pivot(lv_obj_t * obj, lv_point_t * pivot)
     *pivot = img->pivot;
 }
 
-uint16_t lv_img_get_zoom(lv_obj_t * obj)
+lv_coord_t lv_img_get_zoom(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -386,13 +388,13 @@ static void lv_img_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->cf        = LV_COLOR_FORMAT_UNKNOWN;
     img->w         = lv_obj_get_width(obj);
     img->h         = lv_obj_get_height(obj);
-    img->angle = 0;
-    img->zoom = LV_ZOOM_NONE;
+    img->angle     = 0;
+    img->zoom      = LV_ZOOM_NONE;
     img->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
     img->offset.x  = 0;
     img->offset.y  = 0;
-    img->pivot.x = 0;
-    img->pivot.y = 0;
+    img->pivot.x   = 0;
+    img->pivot.y   = 0;
     img->obj_size_mode = LV_IMG_SIZE_MODE_VIRTUAL;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
@@ -603,7 +605,7 @@ static void draw_img(lv_event_t * e)
             if(img->h == 0 || img->w == 0) return;
             if(img->zoom == 0) return;
 
-            lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+            lv_layer_t * layer = lv_event_get_layer(e);
 
             lv_area_t img_max_area;
             lv_area_copy(&img_max_area, &obj->coords);
@@ -636,16 +638,17 @@ static void draw_img(lv_event_t * e)
                 img_dsc.pivot.x = img->pivot.x;
                 img_dsc.pivot.y = img->pivot.y;
                 img_dsc.antialias = img->antialias;
+                img_dsc.src = img->src;
 
                 lv_area_t img_clip_area;
                 img_clip_area.x1 = bg_coords.x1 + pleft;
                 img_clip_area.y1 = bg_coords.y1 + ptop;
                 img_clip_area.x2 = bg_coords.x2 - pright;
                 img_clip_area.y2 = bg_coords.y2 - pbottom;
-                const lv_area_t * clip_area_ori = draw_ctx->clip_area;
+                const lv_area_t clip_area_ori = layer->clip_area;
 
-                if(!_lv_area_intersect(&img_clip_area, draw_ctx->clip_area, &img_clip_area)) return;
-                draw_ctx->clip_area = &img_clip_area;
+                if(!_lv_area_intersect(&img_clip_area, &layer->clip_area, &img_clip_area)) return;
+                layer->clip_area = img_clip_area;
 
                 lv_area_t coords_tmp;
                 lv_coord_t offset_x = img->offset.x % img->w;
@@ -660,17 +663,17 @@ static void draw_img(lv_event_t * e)
                     coords_tmp.x2 = coords_tmp.x1 + img->w - 1;
 
                     for(; coords_tmp.x1 < img_max_area.x2; coords_tmp.x1 += img_size_final.x, coords_tmp.x2 += img_size_final.x) {
-                        lv_draw_img(draw_ctx, &img_dsc, &coords_tmp, img->src);
+                        lv_draw_img(layer, &img_dsc, &coords_tmp);
                     }
                 }
-                draw_ctx->clip_area = clip_area_ori;
+                layer->clip_area = clip_area_ori;
             }
             else if(img->src_type == LV_IMG_SRC_SYMBOL) {
                 lv_draw_label_dsc_t label_dsc;
                 lv_draw_label_dsc_init(&label_dsc);
                 lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_dsc);
-
-                lv_draw_label(draw_ctx, &label_dsc, &obj->coords, img->src, NULL);
+                label_dsc.text = img->src;
+                lv_draw_label(layer, &label_dsc, &obj->coords);
             }
             else if(img->src == NULL) {
                 /*Do not need to draw image when src is NULL*/
@@ -679,7 +682,6 @@ static void draw_img(lv_event_t * e)
             else {
                 /*Trigger the error handler of image draw*/
                 LV_LOG_WARN("image source type is unknown");
-                lv_draw_img(draw_ctx, NULL, &obj->coords, NULL);
             }
         }
     }

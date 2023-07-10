@@ -577,6 +577,7 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 
     lv_btnmatrix_set_one_checked(pinyin_ime->cand_panel, true);
+    lv_obj_clear_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     /* Set cand_panel style*/
     // Default style
@@ -659,7 +660,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
                 strcat(pinyin_ime->input_char, txt);
                 pinyin_input_proc(obj);
 
-                for(int index = 0; index < (pinyin_ime->ta_count + tmp_btn_str_len); index++) {
+                for(int index = 0; index <  tmp_btn_str_len; index++) {
                     lv_textarea_del_char(ta);
                 }
 

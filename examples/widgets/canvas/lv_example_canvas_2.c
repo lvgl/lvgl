@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CANVAS && LV_BUILD_EXAMPLES
+#if LV_USE_CANVAS && LV_BUILD_EXAMPLES && 0
 
 #define CANVAS_WIDTH  50
 #define CANVAS_HEIGHT  50

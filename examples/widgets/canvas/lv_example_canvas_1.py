@@ -7,8 +7,6 @@ rect_dsc.init()
 rect_dsc.radius = 10
 rect_dsc.bg_opa = lv.OPA.COVER
 rect_dsc.bg_grad.dir = lv.GRAD_DIR.HOR
-#rect_dsc.bg_grad.stops[0].color = lv.palette_main(lv.PALETTE.RED)
-#rect_dsc.bg_grad.stops[1].color = lv.palette_main(lv.PALETTE.BLUE)
 
 rect_dsc.bg_grad.stops = [
     lv.gradient_stop_t({'color': lv.palette_main(lv.PALETTE.RED)}),
@@ -25,6 +23,7 @@ rect_dsc.shadow_ofs_y = 5
 label_dsc = lv.draw_label_dsc_t()
 label_dsc.init()
 label_dsc.color = lv.palette_main(lv.PALETTE.ORANGE)
+label_dsc.text = "Some text on text canvas"
 
 cbuf = bytearray(_CANVAS_WIDTH * _CANVAS_HEIGHT * 4)
 # cbuf2 = bytearray(_CANVAS_WIDTH * _CANVAS_HEIGHT * 4)
@@ -34,8 +33,29 @@ canvas.set_buffer(cbuf, _CANVAS_WIDTH, _CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 canvas.center()
 canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
 
-canvas.draw_rect(70, 60, 100, 70, rect_dsc)
-canvas.draw_text(40, 20, 100, label_dsc, "Some text on text canvas")
+layer = lv.layer_t()
+canvas.init_layer(layer);
+
+coords_rect = lv.area_t()
+coords_rect.x1 = 70
+coords_rect.y1 = 60
+coords_rect.x2 = 100
+coords_rect.y2 = 70
+
+lv.draw_rect(layer, rect_dsc, coords_rect)
+
+coords_text = lv.area_t()
+coords_text.x1 = 40
+coords_text.y1 = 80
+coords_text.x2 = 100
+coords_text.y2 = 120
+
+lv.draw_label(layer, label_dsc, coords_text)
+
+
+
+canvas.finish_layer(layer)
+
 
 # Test the rotation. It requires another buffer where the original image is stored.
 # So copy the current image to buffer and rotate it to the canvas
@@ -43,12 +63,25 @@ canvas.draw_text(40, 20, 100, label_dsc, "Some text on text canvas")
 img = lv.img_dsc_t()
 
 img.data = cbuf[:]
-# cbuf2 = cbuf[:]
-# img.data = cbuf2
 img.header.cf = lv.COLOR_FORMAT.NATIVE
 img.header.w = _CANVAS_WIDTH
 img.header.h = _CANVAS_HEIGHT
 
 canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
-canvas.transform(img, 120, LV_IMG_ZOOM_NONE, 0, 0, _CANVAS_WIDTH // 2, _CANVAS_HEIGHT // 2, True)
+
+
+img_dsc = lv.draw_img_dsc_t()
+img_dsc.init();
+img_dsc.angle = 120;
+img_dsc.src = img;
+img_dsc.pivot.x = _CANVAS_WIDTH // 2;
+img_dsc.pivot.y = _CANVAS_HEIGHT // 2;
+
+coords_img = lv.area_t()
+coords_img.x1 = 0
+coords_img.y1 = 0
+coords_img.x2 = _CANVAS_WIDTH - 1
+coords_img.y2 = _CANVAS_HEIGHT - 1
+
+lv.draw_img(layer, img_dsc, coords_img)
 

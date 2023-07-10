@@ -10,12 +10,13 @@
 #if LV_USE_BTNMATRIX != 0
 
 #include "../../misc/lv_assert.h"
-#include "../../core/lv_indev.h"
+#include "../../indev/lv_indev.h"
 #include "../../core/lv_group.h"
 #include "../../draw/lv_draw.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_txt.h"
 #include "../../misc/lv_txt_ap.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -23,7 +24,7 @@
 #define MY_CLASS &lv_btnmatrix_class
 
 #define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI_DEF / 10)
-#define LV_BTNMATRIX_WIDTH_MASK 0x0007
+#define LV_BTNMATRIX_WIDTH_MASK 0x000F
 
 /**********************
  *      TYPEDEFS
@@ -444,10 +445,19 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_PRESSING) {
+        lv_indev_t * indev = lv_indev_get_act();
+        /*Ignore while scrolling*/
+        if(indev && lv_indev_get_scroll_obj(indev)) {
+            if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
+                invalidate_button_area(obj, btnm->btn_id_sel);
+                btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
+                invalidate_button_area(obj, btnm->btn_id_sel);
+            }
+            return;
+        }
         void * param = lv_event_get_param(e);
         uint16_t btn_pr = LV_BTNMATRIX_BTN_NONE;
         /*Search the pressed area*/
-        lv_indev_t * indev = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) return;
 
@@ -521,6 +531,8 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
     }
     else if(code == LV_EVENT_FOCUSED) {
+        if(btnm->btn_cnt == 0) return;
+
         lv_indev_t * indev = lv_event_get_param(e);
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
@@ -676,7 +688,7 @@ static void draw_main(lv_event_t * e)
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
     if(btnm->btn_cnt == 0) return;
 
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
     obj->skip_trans = 1;
 
     lv_area_t area_obj;
@@ -709,17 +721,8 @@ static void draw_main(lv_event_t * e)
     lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    const size_t txt_ap_size = 256 ;
-    char * txt_ap = lv_malloc(txt_ap_size);
+    char txt_ap[256];
 #endif
-
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-    part_draw_dsc.part = LV_PART_ITEMS;
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.type = LV_BTNMATRIX_DRAW_PART_BTN;
-    part_draw_dsc.rect_dsc = &draw_rect_dsc_act;
-    part_draw_dsc.label_dsc = &draw_label_dsc_act;
 
     for(btn_i = 0; btn_i < btnm->btn_cnt; btn_i++, txt_i++) {
         /*Search the next valid text in the map*/
@@ -766,14 +769,11 @@ static void draw_main(lv_event_t * e)
             obj->skip_trans = 0;
         }
 
+        draw_rect_dsc_act.base.id1 = btn_i;
+
         bool recolor = button_is_recolor(btnm->ctrl_bits[btn_i]);
         if(recolor) draw_label_dsc_act.flag |= LV_TEXT_FLAG_RECOLOR;
         else draw_label_dsc_act.flag &= ~LV_TEXT_FLAG_RECOLOR;
-
-
-        part_draw_dsc.draw_area = &btn_area;
-        part_draw_dsc.id = btn_i;
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
         /*Remove borders on the edges if `LV_BORDER_SIDE_INTERNAL`*/
         if(draw_rect_dsc_act.border_side & LV_BORDER_SIDE_INTERNAL) {
@@ -792,7 +792,7 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Draw the background*/
-        lv_draw_rect(draw_ctx, &draw_rect_dsc_act, &btn_area);
+        lv_draw_rect(layer, &draw_rect_dsc_act, &btn_area);
 
         /*Calculate the size of the text*/
         const lv_font_t * font = draw_label_dsc_act.font;
@@ -803,7 +803,7 @@ static void draw_main(lv_event_t * e)
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the Arabic text and process it*/
         size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
-        if(len_ap < txt_ap_size) {
+        if(len_ap < sizeof(txt_ap)) {
             _lv_txt_ap_proc(txt, txt_ap);
             txt = txt_ap;
         }
@@ -824,15 +824,13 @@ static void draw_main(lv_event_t * e)
         }
 
         /*Draw the text*/
-        lv_draw_label(draw_ctx, &draw_label_dsc_act, &btn_area, txt, NULL);
-
-        lv_obj_send_event(obj, LV_EVENT_DRAW_PART_END, &part_draw_dsc);
+        draw_label_dsc_act.text = txt;
+        draw_label_dsc_act.text_local = true;
+        draw_label_dsc_act.base.id1 = btn_i;
+        lv_draw_label(layer, &draw_label_dsc_act, &btn_area);
     }
 
     obj->skip_trans = 0;
-#if LV_USE_ARABIC_PERSIAN_CHARS
-    lv_free(txt_ap);
-#endif
 }
 /**
  * Create the required number of buttons and control bytes according to a map

@@ -316,8 +316,9 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     return true;          /*true: glyph found; false: glyph was not found*/
 }
 
-static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
+static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_buf)
 {
+    LV_UNUSED(bitmap_buf);
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
     const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
     uint8_t * buffer = (uint8_t *)ttf_cache_get(dsc->cache, unicode_letter);

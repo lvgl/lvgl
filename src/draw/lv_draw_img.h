@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_draw.h"
 #include "lv_img_decoder.h"
 #include "lv_img_buf.h"
 #include "../misc/lv_style.h"
@@ -30,17 +31,18 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_color_t chroma_key_color;
     lv_color_t alpha_color;
     const lv_color32_t * palette;
     uint32_t palette_size   : 9;
-    uint32_t chroma_keyed   : 1;
 } lv_draw_img_sup_t;
 
-typedef struct {
+typedef struct _lv_draw_img_dsc_t {
+    lv_draw_dsc_base_t base;
 
-    int16_t angle;
-    uint16_t zoom;
+    const void * src;
+
+    lv_coord_t angle;
+    lv_coord_t zoom;
     lv_point_t pivot;
 
     lv_color_t chroma_key_color;
@@ -55,7 +57,7 @@ typedef struct {
     lv_draw_img_sup_t * sup;
 } lv_draw_img_dsc_t;
 
-struct _lv_draw_ctx_t;
+struct _lv_layer_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -70,22 +72,10 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
  * @param coords        the coordinates of the image
  * @param src           pointer to a lv_color_t array which contains the pixels of the image
  */
-void lv_draw_img(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                 const void * src);
+void lv_draw_img(struct _lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords);
 
 
-/**
- * Draw a decoded image
- * @param draw_ctx      pointer to the current draw context
- * @param dsc           pointer to an initialized `lv_draw_img_dsc_t` variable
- * @param coords        the coordinates of the image
- * @param map_p
- * @param sup
- * @param color_format
- */
-
-void lv_draw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords,
-                         const uint8_t * map_p, const lv_draw_img_sup_t * sup, lv_color_format_t color_format);
+void lv_draw_layer(struct _lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords);
 
 /**
  * Get the type of an image source

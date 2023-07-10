@@ -10,9 +10,10 @@
 #if LV_USE_SNAPSHOT
 
 #include <stdbool.h>
-#include "../../core/lv_disp.h"
+#include "../../disp/lv_disp.h"
 #include "../../core/lv_refr.h"
-#include "../../core/lv_disp_private.h"
+#include "../../disp/lv_disp_private.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -49,9 +50,10 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf)
 {
     LV_ASSERT_NULL(obj);
     switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE:
-        case LV_COLOR_FORMAT_NATIVE_ALPHA:
-        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888:
             break;
         default:
             LV_LOG_WARN("Not supported color format");
@@ -67,8 +69,8 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf)
     w += ext_size * 2;
     h += ext_size * 2;
     uint8_t px_size;
-    if(cf == LV_COLOR_FORMAT_NATIVE_ALPHA) px_size = LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE;
-    else px_size = sizeof(lv_color_t);
+
+    px_size = lv_color_format_get_size(cf);
 
     return w * h * px_size;
 }
@@ -91,9 +93,10 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_img_ds
     LV_ASSERT_NULL(buf);
 
     switch(cf) {
-        case LV_COLOR_FORMAT_NATIVE:
-        case LV_COLOR_FORMAT_NATIVE_ALPHA:
-        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_RGB565:
+        case LV_COLOR_FORMAT_RGB888:
+        case LV_COLOR_FORMAT_XRGB8888:
+        case LV_COLOR_FORMAT_ARGB8888:
             break;
         default:
             LV_LOG_WARN("Not supported color format");
@@ -120,21 +123,21 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_img_ds
     dsc->header.h = h;
     dsc->header.cf = cf;
 
-    lv_disp_t * obj_disp = lv_obj_get_disp(obj);
+    lv_layer_t layer;
+    lv_memzero(&layer, sizeof(layer));
 
-    lv_draw_ctx_t * draw_ctx = lv_malloc(obj_disp->draw_ctx_size);
-    LV_ASSERT_MALLOC(draw_ctx);
-    if(draw_ctx == NULL) return LV_RES_INV;
-    obj_disp->draw_ctx_init(NULL, draw_ctx);
-    draw_ctx->clip_area = &snapshot_area;
-    draw_ctx->buf_area = &snapshot_area;
-    draw_ctx->buf = (void *)buf;
-    draw_ctx->color_format = dsc->header.cf;
+    layer.color_format = dsc->header.cf;
+    layer.buf_area = snapshot_area;
+    layer.clip_area = snapshot_area;
+    layer.buf = buf;
 
-    lv_obj_redraw(draw_ctx, obj);
+    lv_obj_redraw(&layer, obj);
 
-    if(draw_ctx->buffer_convert) draw_ctx->buffer_convert(draw_ctx);
-    lv_free(draw_ctx);
+    while(layer.draw_task_head) {
+        lv_draw_dispatch_wait_for_request();
+        lv_draw_dispatch_layer(NULL, &layer);
+    }
+
 
     return LV_RES_OK;
 }

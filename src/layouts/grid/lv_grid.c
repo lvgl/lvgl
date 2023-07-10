@@ -10,6 +10,8 @@
 
 #if LV_USE_GRID
 
+#include "../../stdlib/lv_string.h"
+
 /*********************
  *      DEFINES
  *********************/
