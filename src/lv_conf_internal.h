@@ -2325,7 +2325,35 @@
         #ifdef CONFIG_LV_LINUX_FBDEV_BSD
             #define LV_LINUX_FBDEV_BSD CONFIG_LV_LINUX_FBDEV_BSD
         #else
-            #define LV_LINUX_FBDEV_BSD  0
+            #define LV_LINUX_FBDEV_BSD           0
+        #endif
+    #endif
+    #ifndef LV_LINUX_FBDEV_NUTTX
+        #ifdef CONFIG_LV_LINUX_FBDEV_NUTTX
+            #define LV_LINUX_FBDEV_NUTTX CONFIG_LV_LINUX_FBDEV_NUTTX
+        #else
+            #define LV_LINUX_FBDEV_NUTTX         0
+        #endif
+    #endif
+    #ifndef LV_LINUX_FBDEV_RENDER_MODE
+        #ifdef CONFIG_LV_LINUX_FBDEV_RENDER_MODE
+            #define LV_LINUX_FBDEV_RENDER_MODE CONFIG_LV_LINUX_FBDEV_RENDER_MODE
+        #else
+            #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
+        #endif
+    #endif
+    #ifndef LV_LINUX_FBDEV_BUFFER_COUNT
+        #ifdef CONFIG_LV_LINUX_FBDEV_BUFFER_COUNT
+            #define LV_LINUX_FBDEV_BUFFER_COUNT CONFIG_LV_LINUX_FBDEV_BUFFER_COUNT
+        #else
+            #define LV_LINUX_FBDEV_BUFFER_COUNT  0
+        #endif
+    #endif
+    #ifndef LV_LINUX_FBDEV_BUFFER_SIZE
+        #ifdef CONFIG_LV_LINUX_FBDEV_BUFFER_SIZE
+            #define LV_LINUX_FBDEV_BUFFER_SIZE CONFIG_LV_LINUX_FBDEV_BUFFER_SIZE
+        #else
+            #define LV_LINUX_FBDEV_BUFFER_SIZE   60
         #endif
     #endif
 #endif

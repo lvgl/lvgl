@@ -719,7 +719,11 @@
 /*Driver for /dev/fb*/
 #define LV_USE_LINUX_FBDEV      0
 #if LV_USE_LINUX_FBDEV
-    #define LV_LINUX_FBDEV_BSD  0
+    #define LV_LINUX_FBDEV_BSD           0
+    #define LV_LINUX_FBDEV_NUTTX         0
+    #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
+    #define LV_LINUX_FBDEV_BUFFER_COUNT  0
+    #define LV_LINUX_FBDEV_BUFFER_SIZE   60
 #endif
 
 /*Driver for /dev/dri/card*/
