@@ -2376,6 +2376,15 @@
     #endif
 #endif
 
+/*Driver for /dev/input*/
+#ifndef LV_USE_NUTTX_TOUCHSCREEN
+    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+    #else
+        #define LV_USE_NUTTX_TOUCHSCREEN    0
+    #endif
+#endif
+
 /*==================
 * EXAMPLES
 *==================*/

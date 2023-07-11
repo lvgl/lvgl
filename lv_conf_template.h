@@ -732,6 +732,9 @@
 /*Interface for TFT_eSPI*/
 #define LV_USE_TFT_ESPI         0
 
+/*Driver for /dev/input*/
+#define LV_USE_NUTTX_TOUCHSCREEN    0
+
 /*==================
 * EXAMPLES
 *==================*/

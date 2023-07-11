@@ -1227,6 +1227,10 @@ menu "LVGL configuration"
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
 			default n
+
+		config LV_USE_NUTTX_TOUCHSCREEN
+			bool "Use NuttX touchscreen driver"
+			default n
 	endmenu
 
 	menu "Examples"
