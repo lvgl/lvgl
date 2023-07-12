@@ -73,6 +73,9 @@ typedef struct {
     uint32_t major_tick_every   : 15;
     lv_scale_mode_t mode;
     uint32_t label_enabled      : 1;
+    /* Round scale */
+    uint16_t angle_range;
+    int16_t rotation;
 } lv_scale_t;
 
 extern const lv_obj_class_t lv_scale_class;
@@ -145,6 +148,14 @@ void lv_scale_set_minor_tick_length(lv_obj_t * obj, lv_coord_t minor_len);
  * @param max       maximum value of the scale
  */
 void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max);
+
+/**
+ * Set properties specific to round scale
+ * @param obj       pointer to a scale object
+ * @param angle_range	the angular range of the scale
+ * @param rotation	the angular offset from the 3 o'clock position (clock-wise)
+ */
+void lv_scale_set_round_props(lv_obj_t * obj, uint16_t angle_range, int16_t rotation);
 
 /**
  * Set custom text source for major ticks labels

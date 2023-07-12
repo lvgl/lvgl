@@ -150,6 +150,17 @@ void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max)
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_round_props(lv_obj_t * obj, uint16_t angle_range, int16_t rotation)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
+    scale->angle_range = angle_range;
+    scale->rotation = rotation;
+
+    lv_obj_invalidate(obj);
+}
+
 void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -230,8 +241,10 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
-    scale->mode = LV_SCALE_MODE_HORIZONTAL_BOTTOM;
+    scale->mode = LV_SCALE_MODE_ROUND_INNER;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
+    scale->angle_range = 270U; /* TODO: Replace with symbol? */
+    scale->rotation = 90 + (360 - scale->angle_range) / 2; /* TODO: Replace magic numbers */
 
     LV_TRACE_OBJ_CREATE("finished");
 }
