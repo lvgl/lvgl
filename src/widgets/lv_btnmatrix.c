@@ -219,10 +219,12 @@ void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
     /* If we hide a button if all buttons are now hidden hide the whole button matrix to make focus behave correctly */
     if(ctrl & LV_BTNMATRIX_CTRL_HIDDEN) {
         bool all_buttons_hidden = true;
-        if(btnm->btn_cnt > 1);
-        for(uint16_t btn_idx = 0; btn_idx < btnm->btn_cnt; btn_idx++) {
-            if(btn_idx == btn_id) continue;
-            if(!(btnm->ctrl_bits[btn_idx] & LV_BTNMATRIX_CTRL_HIDDEN)) all_buttons_hidden = false;
+        if(btnm->btn_cnt > 1) {
+            for(uint16_t btn_idx = 0; btn_idx < btnm->btn_cnt; btn_idx++) {
+                if(btn_idx == btn_id) continue;
+                if(!(btnm->ctrl_bits[btn_idx] & LV_BTNMATRIX_CTRL_HIDDEN)) all_buttons_hidden = false;
+            }
+
         }
         if(all_buttons_hidden) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
     }
