@@ -208,12 +208,23 @@ void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
+    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
 
     if(btn_id >= btnm->btn_cnt) return;
 
     if(btnm->one_check && (ctrl & LV_BTNMATRIX_CTRL_CHECKED)) {
         lv_btnmatrix_clear_btn_ctrl_all(obj, LV_BTNMATRIX_CTRL_CHECKED);
+    }
+
+    /* If we hide a button if all buttons are now hidden hide the whole button matrix to make focus behave correctly */
+    if(ctrl & LV_BTNMATRIX_CTRL_HIDDEN) {
+        bool all_buttons_hidden = true;
+        if(btnm->btn_cnt > 1);
+        for(uint16_t btn_idx = 0; btn_idx < btnm->btn_cnt; btn_idx++) {
+            if(btn_idx == btn_id) continue;
+            if(!(btnm->ctrl_bits[btn_idx] & LV_BTNMATRIX_CTRL_HIDDEN)) all_buttons_hidden = false;
+        }
+        if(all_buttons_hidden) lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
     }
 
     btnm->ctrl_bits[btn_id] |= ctrl;
@@ -228,9 +239,14 @@ void lv_btnmatrix_clear_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_c
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
+    lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;
 
     if(btn_id >= btnm->btn_cnt) return;
+
+    /* If all buttons were hidden the whole button matrix is hidden so we need to check and remove hidden flag if present */
+    if(ctrl & LV_BTNMATRIX_CTRL_HIDDEN) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) lv_obj_clear_flag(obj, LV_OBJ_FLAG_HIDDEN);
+    }
 
     btnm->ctrl_bits[btn_id] &= (~ctrl);
     invalidate_button_area(obj, btn_id);
