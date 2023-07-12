@@ -38,10 +38,14 @@
 
 static void prvRunThread(void * pxArg);
 
-static void prvInitializeMutex(lv_mutex_t * pxMutex);
+static void prvMutexInit(lv_mutex_t * pxMutex);
+
+static void prvCheckMutexInit(lv_mutex_t * pxMutex);
 
 #if !USE_FREERTOS_TASK_NOTIFY
-static void prvInitializeCond(lv_thread_sync_t * pxCond);
+static void prvCondInit(lv_thread_sync_t * pxCond);
+
+static void prvCheckCondInit(lv_thread_sync_t * pxCond);
 
 static void prvTestAndDecrement(lv_thread_sync_t * pxCond,
                                 uint32_t ulLocalWaitingThreads);
@@ -92,15 +96,7 @@ lv_res_t lv_thread_delete(lv_thread_t * pxThread)
 
 lv_res_t lv_mutex_init(lv_mutex_t * pxMutex)
 {
-    pxMutex->xMutex = xSemaphoreCreateMutex();
-
-    /* Ensure that the FreeRTOS mutex was successfully created. */
-    if(pxMutex->xMutex == NULL) {
-        LV_LOG_ERROR("xSemaphoreCreateMutex failed!");
-        return LV_RES_INV;
-    }
-
-    pxMutex->xIsInitialized = pdTRUE;
+    prvMutexInit(pxMutex);
 
     return LV_RES_OK;
 }
@@ -108,7 +104,7 @@ lv_res_t lv_mutex_init(lv_mutex_t * pxMutex)
 lv_res_t lv_mutex_lock(lv_mutex_t * pxMutex)
 {
     /* If mutex in uninitialized, perform initialization. */
-    prvInitializeMutex(pxMutex);
+    prvCheckMutexInit(pxMutex);
 
     BaseType_t xMutexTakeStatus = xSemaphoreTake(pxMutex->xMutex, portMAX_DELAY);
     if(xMutexTakeStatus != pdTRUE) {
@@ -122,7 +118,7 @@ lv_res_t lv_mutex_lock(lv_mutex_t * pxMutex)
 lv_res_t lv_mutex_lock_isr(lv_mutex_t * pxMutex)
 {
     /* If mutex in uninitialized, perform initialization. */
-    prvInitializeMutex(pxMutex);
+    prvCheckMutexInit(pxMutex);
 
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
@@ -144,7 +140,7 @@ lv_res_t lv_mutex_lock_isr(lv_mutex_t * pxMutex)
 lv_res_t lv_mutex_unlock(lv_mutex_t * pxMutex)
 {
     /* If mutex in uninitialized, perform initialization. */
-    prvInitializeMutex(pxMutex);
+    prvCheckMutexInit(pxMutex);
 
     BaseType_t xMutexGiveStatus = xSemaphoreGive(pxMutex->xMutex);
     if(xMutexGiveStatus != pdTRUE) {
@@ -169,25 +165,7 @@ lv_res_t lv_thread_sync_init(lv_thread_sync_t * pxCond)
     /* Store the handle of the calling task. */
     pxCond->xTaskToNotify = xTaskGetCurrentTaskHandle();
 #else
-    pxCond->xCondWaitSemaphore = xSemaphoreCreateCounting(ulMAX_COUNT, 0U);
-
-    /* Ensure that the FreeRTOS semaphore was successfully created. */
-    if(pxCond->xCondWaitSemaphore == NULL) {
-        LV_LOG_ERROR("xSemaphoreCreateCounting failed!");
-        return LV_RES_INV;
-    }
-
-    pxCond->xSyncMutex = xSemaphoreCreateMutex();
-
-    /* Ensure that the FreeRTOS mutex was successfully created. */
-    if(pxCond->xSyncMutex == NULL) {
-        LV_LOG_ERROR("xSemaphoreCreateMutex failed!");
-        return LV_RES_INV;
-    }
-
-    pxCond->ulWaitingThreads = 0;
-    pxCond->xSyncSignal = pdFALSE;
-    pxCond->xIsInitialized = pdTRUE;
+    prvCondInit(pxCond);
 #endif
 
     return LV_RES_OK;
@@ -206,7 +184,7 @@ lv_res_t lv_thread_sync_wait(lv_thread_sync_t * pxCond)
     uint32_t ulLocalWaitingThreads;
 
     /* If the cond is uninitialized, perform initialization. */
-    prvInitializeCond(pxCond);
+    prvCheckCondInit(pxCond);
 
     /* Acquire the mutex. */
     xSemaphoreTake(pxCond->xSyncMutex, portMAX_DELAY);
@@ -269,7 +247,7 @@ lv_res_t lv_thread_sync_signal(lv_thread_sync_t * pxCond)
     xTaskNotifyGive(pxCond->xTaskToNotify);
 #else
     /* If the cond is uninitialized, perform initialization. */
-    prvInitializeCond(pxCond);
+    prvCheckCondInit(pxCond);
 
     /* Acquire the mutex. */
     xSemaphoreTake(pxCond->xSyncMutex, portMAX_DELAY);
@@ -336,7 +314,21 @@ static void prvRunThread(void * pxArg)
     vTaskDelete(NULL);
 }
 
-static void prvInitializeMutex(lv_mutex_t * pxMutex)
+static void prvMutexInit(lv_mutex_t * pxMutex)
+{
+    pxMutex->xMutex = xSemaphoreCreateMutex();
+
+    /* Ensure that the FreeRTOS mutex was successfully created. */
+    if(pxMutex->xMutex == NULL) {
+        LV_LOG_ERROR("xSemaphoreCreateMutex failed!");
+        return;
+    }
+
+    /* Mutex successfully created. */
+    pxMutex->xIsInitialized = pdTRUE;
+}
+
+static void prvCheckMutexInit(lv_mutex_t * pxMutex)
 {
     /* Check if the mutex needs to be initialized. */
     if(pxMutex->xIsInitialized == pdFALSE) {
@@ -348,16 +340,7 @@ static void prvInitializeMutex(lv_mutex_t * pxMutex)
          * initialized while this function was waiting to enter the critical
          * section. */
         if(pxMutex->xIsInitialized == pdFALSE) {
-            pxMutex->xMutex = xSemaphoreCreateMutex();
-
-            /* Ensure that the FreeRTOS mutex was successfully created. */
-            if(pxMutex->xMutex == NULL) {
-                LV_LOG_ERROR("xSemaphoreCreateMutex failed!");
-            }
-            else {
-                /* Mutex successfully created. */
-                pxMutex->xIsInitialized = pdTRUE;
-            }
+            prvMutexInit(pxMutex);
         }
 
         /* Exit the critical section. */
@@ -366,7 +349,33 @@ static void prvInitializeMutex(lv_mutex_t * pxMutex)
 }
 
 #if !USE_FREERTOS_TASK_NOTIFY
-static void prvInitializeCond(lv_thread_sync_t * pxCond)
+static void prvCondInit(lv_thread_sync_t * pxCond)
+{
+    pxCond->xCondWaitSemaphore = xSemaphoreCreateCounting(ulMAX_COUNT, 0U);
+
+    /* Ensure that the FreeRTOS semaphore was successfully created. */
+    if(pxCond->xCondWaitSemaphore == NULL) {
+        LV_LOG_ERROR("xSemaphoreCreateCounting failed!");
+        return;
+    }
+
+    pxCond->xSyncMutex = xSemaphoreCreateMutex();
+
+    /* Ensure that the FreeRTOS mutex was successfully created. */
+    if(pxCond->xSyncMutex == NULL) {
+        LV_LOG_ERROR("xSemaphoreCreateMutex failed!");
+        /* Cleanup. */
+        vSemaphoreDelete(pxCond->xCondWaitSemaphore);
+        return;
+    }
+
+    /* Condition variable successfully created. */
+    pxCond->ulWaitingThreads = 0;
+    pxCond->xSyncSignal = pdFALSE;
+    pxCond->xIsInitialized = pdTRUE;
+}
+
+static void prvCheckCondInit(lv_thread_sync_t * pxCond)
 {
     BaseType_t xSemCreateStatus = pdTRUE;
 
@@ -376,28 +385,13 @@ static void prvInitializeCond(lv_thread_sync_t * pxCond)
          * threads from initializing it at the same time. */
         taskENTER_CRITICAL();
 
-        pxCond->xCondWaitSemaphore = xSemaphoreCreateCounting(ulMAX_COUNT, 0U);
-
-        /* Ensure that the FreeRTOS semapahore was successfully created. */
-        if(pxCond->xCondWaitSemaphore == NULL) {
-            LV_LOG_ERROR("xSemaphoreCreateCounting failed!");
-            xSemCreateStatus = pdFALSE;
+        /* Check again that the condition is still uninitialized, i.e. it wasn't
+         * initialized while this function was waiting to enter the critical
+         * section. */
+        if(pxCond->xIsInitialized == pdFALSE) {
+            prvCondInit(pxCond);
         }
 
-        pxCond->xSyncMutex = xSemaphoreCreateMutex();
-
-        /* Ensure that the FreeRTOS mutex was successfully created. */
-        if(pxCond->xSyncMutex == NULL) {
-            LV_LOG_ERROR("xSemaphoreCreateMutex failed!");
-            xSemCreateStatus = pdFALSE;
-        }
-
-        if(xSemCreateStatus != pdFALSE) {
-            /* Condition variable successfully created. */
-            pxCond->ulWaitingThreads = 0;
-            pxCond->xSyncSignal = pdFALSE;
-            pxCond->xIsInitialized = pdTRUE;
-        }
         /* Exit the critical section. */
         taskEXIT_CRITICAL();
     }
