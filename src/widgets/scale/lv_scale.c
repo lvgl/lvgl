@@ -274,6 +274,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
         }
         else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTTER == scale->mode)) {
             scale_draw_main_round(obj, event);
+            scale_draw_indicator_round(obj, event);
         }
         else {
             /* Invalid mode */
@@ -821,13 +822,13 @@ static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
     lv_coord_t arc_radius;
     get_center(obj, &arc_center, &arc_radius);
 
-    LV_LOG_USER("Arc center: {X:%d, Y:%d}, radius: %d", arc_center.x, arc_center.y, arc_radius);
+    // LV_LOG_USER("Arc center: {X:%d, Y:%d}, radius: %d", arc_center.x, arc_center.y, arc_radius);
 
     arc_dsc.center = arc_center;
 	arc_dsc.radius = arc_radius;
 	/* TODO: Set as properties? */
 	arc_dsc.start_angle = 0U;
-	arc_dsc.end_angle = 360U;
+	arc_dsc.end_angle = 270U;
 
     lv_draw_arc(layer, &arc_dsc);
 }
@@ -839,9 +840,9 @@ static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
 
 static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
 {
-#if 0
+
     lv_scale_t * scale = (lv_scale_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(event);
+    lv_layer_t * layer = lv_event_get_layer(event);
 
     lv_area_t scale_area;
     lv_obj_get_content_coords(obj, &scale_area);
@@ -852,7 +853,7 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
     center_point.x = scale_area.x1 + radius_edge;
     center_point.y = scale_area.y1 + radius_edge;
 
-    LV_LOG_USER("Center at {%d:%d}. Edge: %d", center_point.x, center_point.y, radius_edge);
+    // LV_LOG_USER("Center at {%d:%d}. Edge: %d", center_point.x, center_point.y, radius_edge);
 
     /* Major tick */
     lv_draw_line_dsc_t line_dsc;
@@ -865,50 +866,71 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
 
-    /* Masks */
-    lv_draw_mask_radius_param_t inner_major_mask;
-    lv_draw_mask_radius_param_t outer_mask;
-
-    lv_obj_draw_part_dsc_t part_draw_dsc;
-    lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
-    part_draw_dsc.class_p = MY_CLASS;
-    part_draw_dsc.id = scale->mode;
-    part_draw_dsc.part = LV_PART_INDICATOR;
-    part_draw_dsc.label_dsc = &label_dsc;
-    part_draw_dsc.line_dsc = &line_dsc;
-
     lv_coord_t radius_out = radius_edge;
-    lv_coord_t radius_in_major = radius_out - scale->major_len;;
+    lv_coord_t radius_in_major = radius_out - scale->major_len;
 
-    /* NOTE: Meter (where this code is coming from) only has inner ticks, so that's why we calculate only those */
-    /* Calculate the inner area for the major ticks and initialize their mask (keep the pixels inside the rectangle) */
-    lv_area_t area_inner_major;
-    area_inner_major.x1 = center_point.x - radius_in_major;
-    area_inner_major.y1 = center_point.y - radius_in_major;
-    area_inner_major.x2 = center_point.x + radius_in_major - 1U;
-    area_inner_major.y2 = center_point.y + radius_in_major - 1U;
-    lv_draw_mask_radius_init(&inner_major_mask, &area_inner_major, LV_RADIUS_CIRCLE, true);
+    uint32_t angular_range = 270U; /* TODO: Add property to scale. How big (from 0° to 360°) is the arc */
+    uint32_t rotation = 0U; /* TODO: Add property to scale. Rotation in clock wise from arc 0 to value 0 */
+    uint16_t label_gap = 15U; /* TODO: Add property to scale. Gap between major ticks and labels */
+    uint8_t tick_idx = 0;
+    for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
+		/* A major tick is the one which has a label in it */
+		bool is_major_tick = false;
+		if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
+		if(false == is_major_tick) continue;
 
-    lv_area_t area_outer;
-    area_outer.x1 = center_point.x - radius_out;
-    area_outer.y1 = center_point.y - radius_out;
-    area_outer.x2 = center_point.x + radius_out - 1U;
-    area_outer.y2 = center_point.y + radius_out - 1U;
-    /* Calculate the inner area for the major ticks and initialize their mask (keep the pixels outside of the rectangle) */
-    lv_draw_mask_radius_init(&outer_mask, &area_outer, LV_RADIUS_CIRCLE, false);
-    int16_t outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
+		int32_t angle_upscale = ((tick_idx * angular_range) * 10U) / (scale->total_tick_count - 1U);
+		angle_upscale += rotation * 10U;
 
-    LV_LOG_USER("Radius in major: %d", radius_in_major);
-    LV_LOG_USER("Area inner major: X1: %d, Y1: %d, X2: %d, Y2: %d",
-        area_inner_major.x1, area_inner_major. y1, area_inner_major.x2, area_inner_major.y2);
-    LV_LOG_USER("Area Outter: X1: %d, Y1: %d, X2: %d, Y2: %d",
-        area_outer.x1, area_outer. y1, area_outer.x2, area_outer.y2);
-    
-    lv_draw_mask_remove_id(outer_mask_id);
+        /*Draw a little bit longer lines to be sure the mask will clip them correctly
+         *and to get a better precision*/
+        lv_point_t p_outer;
+        p_outer.x = center_point.x + radius_out;
+        p_outer.y = center_point.y;
+        lv_point_transform(&p_outer, angle_upscale, 256U, &center_point); /* TODO: What is 256? */
 
-    lv_draw_mask_free_param(&inner_major_mask);
-    lv_draw_mask_free_param(&outer_mask);
-#endif
+        lv_point_t p_inner;
+        p_inner.x = center_point.x + radius_in_major;
+        p_inner.y = center_point.y;
+        lv_point_transform(&p_inner, angle_upscale, 256U, &center_point);  /* TODO: What is 256? */
+
+		uint32_t radius_text = radius_in_major - label_gap;
+
+		lv_point_t point;
+		point.x = center_point.x + radius_text;
+		point.y = center_point.y;
+		lv_point_transform(&point, angle_upscale, 256, &center_point);
+
+        int32_t tick_value = 0U;
+        int32_t min_out = scale->range_min;
+        int32_t max_out = scale->range_max;
+
+        tick_value = lv_map(tick_idx, 0U, scale->total_tick_count, min_out, max_out);
+
+        /* TODO: Support custom labels */
+        char buf[16] = {0U};
+        lv_snprintf(buf, sizeof(buf), "%" LV_PRId32, tick_value);
+
+        lv_point_t label_size;
+        label_dsc.text = buf;
+        lv_txt_get_size(&label_size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                        LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+        lv_area_t label_cord;
+        label_cord.x1 = point.x - label_size.x / 2;
+        label_cord.y1 = point.y - label_size.y / 2;
+        label_cord.x2 = label_cord.x1 + label_size.x;
+        label_cord.y2 = label_cord.y1 + label_size.y;
+
+        LV_LOG_USER("Label %s: X1: %d, Y1: %d, X2: %d, Y2: %d", buf, label_cord.x1, label_cord.y1, label_cord.x2, label_cord.y2);
+
+        lv_draw_label(layer, &label_dsc, &label_cord);
+
+		line_dsc.p1 = p_outer;
+		line_dsc.p2 = p_inner;
+		lv_draw_line(layer, &line_dsc);
+    }
+
 #if 0
     lv_meter_scale_t * scale;
 
