@@ -288,6 +288,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
         else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTTER == scale->mode)) {
             scale_draw_main_round(obj, event);
             scale_draw_indicator_round(obj, event);
+            scale_draw_items_round(obj, event);
         }
         else {
             /* Invalid mode */
@@ -850,7 +851,119 @@ static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
 
 static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
 {
+	lv_scale_t * scale = (lv_scale_t *)obj;
+	lv_layer_t * layer = lv_event_get_layer(event);
 
+    if(scale->total_tick_count <= 1) return;
+
+    lv_area_t scale_area;
+	lv_obj_get_content_coords(obj, &scale_area);
+
+	/* Find the center of the scale */
+	lv_point_t center_point;
+	lv_coord_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2U, lv_area_get_height(&scale_area) / 2U);
+	center_point.x = scale_area.x1 + radius_edge;
+	center_point.y = scale_area.y1 + radius_edge;
+
+    lv_coord_t radius_out = radius_edge;
+	lv_coord_t radius_in_major = radius_out - scale->major_len;
+	lv_coord_t radius_in_minor = radius_out - scale->minor_len;
+
+    /* Configure line draw descriptor for the minor tick drawing */
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
+
+    uint16_t total_tick_count = scale->total_tick_count;
+
+    lv_coord_t major_len = scale->major_len;
+    lv_coord_t minor_len = lv_obj_get_style_width(obj, LV_PART_ITEMS);
+    uint32_t angular_range = scale->angle_range; /* TODO: Add property to scale. How big (from 0° to 360°) is the arc */
+	uint32_t rotation = scale->rotation; /* TODO: Add property to scale. Rotation in clock wise from arc 0 to value 0 */
+    uint8_t tick_idx = 0;
+    for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
+        /* The tick is represented by a vertical line. We need two points to draw it */
+        lv_point_t tick_point_a;
+        lv_point_t tick_point_b;
+        /* A major tick is the one which has a label in it */
+        bool is_major_tick = false;
+        if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
+        lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
+
+        if(is_major_tick) continue;
+
+        int32_t tick_value = 0U;
+        int32_t min_out = scale->range_min;
+        int32_t max_out = scale->range_max;
+
+        tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
+
+        /* Overwrite label properties if tick value is within section range */
+        lv_scale_section_t * section;
+        _LV_LL_READ_BACK(&scale->section_ll, section) {
+            if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+
+                if(section->indicator_style) {
+                    lv_style_value_t value;
+                    lv_res_t res;
+
+                    /* Tick width */
+                    res = lv_style_get_prop(section->items_style, LV_STYLE_LINE_WIDTH, &value);
+                    if(res == LV_RES_OK) {
+                        line_dsc.width = (lv_coord_t)value.num;
+                    }
+                    else {
+                        line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+                    }
+
+                    /* Tick color */
+                    res = lv_style_get_prop(section->items_style, LV_STYLE_LINE_COLOR, &value);
+                    if(res == LV_RES_OK) {
+                        line_dsc.color = value.color;
+                    }
+                    else {
+                        line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_ITEMS);
+                    }
+
+                    /* Tick opa */
+                    res = lv_style_get_prop(section->items_style, LV_STYLE_LINE_OPA, &value);
+                    if(res == LV_RES_OK) {
+                        line_dsc.opa = (lv_opa_t)value.num;
+                    }
+                    else {
+                        line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_ITEMS);
+                    }
+
+                    /* Tick gap */
+
+                }
+            }
+            else {
+                line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_ITEMS);
+                line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_ITEMS);
+                line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+            }
+        }
+
+        int32_t angle_upscale = ((tick_idx * angular_range) * 10U) / (total_tick_count - 1U);
+		angle_upscale += rotation * 10U;
+
+        /*Draw a little bit longer lines to be sure the mask will clip them correctly
+         *and to get a better precision*/
+        lv_point_t p_outer;
+        p_outer.x = center_point.x + radius_out;
+        p_outer.y = center_point.y;
+        lv_point_transform(&p_outer, angle_upscale, 256, &center_point);
+
+        lv_point_t p_inner;
+        p_inner.x = center_point.x + radius_in_minor;
+        p_inner.y = center_point.y;
+        lv_point_transform(&p_inner, angle_upscale, 256, &center_point);
+
+        line_dsc.p1 = p_outer;
+		line_dsc.p2 = p_inner;
+        lv_draw_line(layer, &line_dsc);
+    }
 }
 
 static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
