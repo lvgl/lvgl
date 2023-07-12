@@ -39,6 +39,8 @@ static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event);
 
+static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -866,7 +868,6 @@ static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
 	center_point.y = scale_area.y1 + radius_edge;
 
     lv_coord_t radius_out = radius_edge;
-	lv_coord_t radius_in_major = radius_out - scale->major_len;
 	lv_coord_t radius_in_minor = radius_out - scale->minor_len;
 
     /* Configure line draw descriptor for the minor tick drawing */
@@ -882,13 +883,9 @@ static void scale_draw_items_round(lv_obj_t * obj, lv_event_t * event)
 	uint32_t rotation = scale->rotation; /* TODO: Add property to scale. Rotation in clock wise from arc 0 to value 0 */
     uint8_t tick_idx = 0;
     for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
-        /* The tick is represented by a vertical line. We need two points to draw it */
-        lv_point_t tick_point_a;
-        lv_point_t tick_point_b;
         /* A major tick is the one which has a label in it */
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
-        lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
 
         if(is_major_tick) continue;
 
@@ -997,8 +994,8 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
     lv_coord_t radius_out = radius_edge;
     lv_coord_t radius_in_major = radius_out - scale->major_len;
 
-    uint32_t angular_range = scale->angle_range; /* TODO: Add property to scale. How big (from 0° to 360°) is the arc */
-    uint32_t rotation = scale->rotation; /* TODO: Add property to scale. Rotation in clock wise from arc 0 to value 0 */
+    uint32_t angular_range = scale->angle_range;
+    uint32_t rotation = scale->rotation;
     uint16_t label_gap = 15U; /* TODO: Add property to scale. Gap between major ticks and labels */
     uint8_t tick_idx = 0;
     for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
