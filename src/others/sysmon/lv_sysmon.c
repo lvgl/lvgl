@@ -32,6 +32,8 @@ typedef struct {
     uint32_t    flush_start;
     uint32_t    flush_elaps_sum;
     uint32_t    flush_cnt;
+    uint8_t     delay_zero_update_cnt;
+    uint16_t    last_fps;
 } perf_info_t;
 
 /**********************
@@ -131,8 +133,11 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
             info->refr_start = lv_tick_get();
             break;
         case LV_EVENT_REFR_FINISH:
-            info->refr_elaps_sum += lv_tick_elaps(info->refr_start);
-            info->refr_cnt++;
+            uint32_t elapsed_time = lv_tick_elaps(info->refr_start);
+            if (elapsed_time > 0) {
+                info->refr_elaps_sum += elapsed_time;
+                info->refr_cnt++;
+            }
             break;
         case LV_EVENT_RENDER_START:
             info->render_start = lv_tick_get();
@@ -157,7 +162,6 @@ static void perf_monitor_event_cb(lv_event_t * e)
 {
     lv_obj_t * sysmon = lv_event_get_current_target_obj(e);
     perf_info_t * info = lv_obj_get_user_data(sysmon);
-
     uint32_t fps = info->refr_interval_sum ? (1000 * info->refr_cnt / info->refr_interval_sum) : 0;
     uint32_t cpu = 100 - lv_timer_get_idle();
     uint32_t refr_avg_time = info->refr_cnt ? (info->refr_elaps_sum / info->refr_cnt) : 0;
@@ -181,6 +185,19 @@ static void perf_monitor_event_cb(lv_event_t * e)
            refr_avg_time, render_real_avg_time, flush_avg_time,
            cpu);
 #else
+    if (fps == 0) {
+        info->delay_zero_update_cnt += 1;
+        if (info->delay_zero_update_cnt == 10) {
+            info->delay_zero_update_cnt = 0;
+            info->last_fps = 0;
+        } else {
+            fps = (uint32_t) info->last_fps;
+        }
+    } else {
+        info->delay_zero_update_cnt = 0;
+        info->last_fps = (uint16_t) fps;
+    }
+
     lv_label_set_text_fmt(
         sysmon,
         "%" LV_PRIu32" FPS, %" LV_PRIu32 "%% CPU\n"

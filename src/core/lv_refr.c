@@ -346,6 +346,21 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
         return;
     }
 
+    /*Do nothing if there is no active screen*/
+    if(disp_refr->act_scr == NULL) {
+        disp_refr->inv_p = 0;
+        LV_LOG_WARN("there is no active screen");
+        return;
+    }
+
+    if (
+        (disp_refr->act_scr->scr_layout_inv == 0) &&
+        (disp_refr->inv_p == 0) &&
+        ((disp_refr->prev_scr == NULL) || (disp_refr->prev_scr->scr_layout_inv))
+    ) {
+        return;
+    }
+
     lv_disp_send_event(disp_refr, LV_EVENT_REFR_START, NULL);
 
     /*Refresh the screen's layout if required*/
@@ -356,15 +371,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     lv_obj_update_layout(disp_refr->top_layer);
     lv_obj_update_layout(disp_refr->sys_layer);
 
-    /*Do nothing if there is no active screen*/
-    if(disp_refr->act_scr == NULL) {
-        disp_refr->inv_p = 0;
-        LV_LOG_WARN("there is no active screen");
-        goto refr_finish;
-    }
-
     lv_refr_join_area();
-
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
@@ -372,30 +379,6 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     /*If refresh happened ...*/
     /*Call monitor cb if present*/
     lv_disp_send_event(disp_refr, LV_EVENT_RENDER_READY, NULL);
-
-    if(!lv_disp_is_double_buffered(disp_refr) || disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) goto refr_clean_up;
-
-    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-    /*We need to wait for ready here to not mess up the active screen*/
-    while(disp_refr->flushing);
-
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    void * buf_off_screen = disp_refr->draw_buf_act;
-    void * buf_on_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1
-                           ? disp_refr->draw_buf_2
-                           : disp_refr->draw_buf_1;
-
-    lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
-    uint32_t i;
-    for(i = 0; i < disp_refr->inv_p; i++) {
-        if(disp_refr->inv_area_joined[i]) continue;
-        disp_refr->layer_head->buffer_copy(
-            disp_refr->layer_head,
-            buf_off_screen, stride, &disp_refr->inv_areas[i],
-            buf_on_screen, stride, &disp_refr->inv_areas[i]
-        );
-    }
 
 refr_clean_up:
     lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
@@ -901,16 +884,35 @@ static void draw_buf_flush(lv_disp_t * disp)
      * and driver is ready to receive the new buffer.
      * If we need to wait here it means that the content of one buffer is being sent to display
      * and other buffer already contains the new rendered image. */
-    if(lv_disp_is_double_buffered(disp)) {
-        while(disp->flushing);
-    }
-
-    disp->flushing = 1;
 
     if(disp->last_area && disp->last_part) disp->flushing_last = 1;
     else disp->flushing_last = 0;
 
     bool flushing_last = disp->flushing_last;
+
+    if(lv_disp_is_double_buffered(disp)) {
+        while(disp->flushing);
+        /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
+
+        void * buf_on_screen = disp_refr->draw_buf_act;
+        void * buf_off_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
+
+        lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+        uint32_t i;
+        for(i = 0; i < disp_refr->inv_p; i++) {
+            if(disp_refr->inv_area_joined[i]) continue;
+            disp_refr->layer_head->buffer_copy(
+                disp_refr->layer_head,
+                buf_off_screen, stride, &disp_refr->inv_areas[i],
+                buf_on_screen, stride, &disp_refr->inv_areas[i]
+            );
+        }
+        if(disp->render_mode != LV_DISP_RENDER_MODE_DIRECT || flushing_last) {
+            disp->draw_buf_act = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
+        }
+    }
+
+    disp->flushing = 1;
 
     if(disp->flush_cb) {
         /*Rotate the buffer to the display's native orientation if necessary*/
@@ -920,15 +922,6 @@ static void draw_buf_flush(lv_disp_t * disp)
         }
         else {
             call_flush_cb(disp, &disp->refreshed_area, layer->buf);
-        }
-    }
-    /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
-    if(lv_disp_is_double_buffered(disp) && (disp->render_mode != LV_DISP_RENDER_MODE_DIRECT || flushing_last)) {
-        if(disp->draw_buf_act == disp->draw_buf_1) {
-            disp->draw_buf_act = disp->draw_buf_2;
-        }
-        else {
-            disp->draw_buf_act = disp->draw_buf_1;
         }
     }
 }
