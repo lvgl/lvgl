@@ -835,13 +835,15 @@ static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
     lv_coord_t arc_radius;
     get_center(obj, &arc_center, &arc_radius);
 
-    // LV_LOG_USER("Arc center: {X:%d, Y:%d}, radius: %d", arc_center.x, arc_center.y, arc_radius);
+    const int32_t start_angle = lv_map(scale->range_min, scale->range_min, scale->range_max, scale->rotation,
+    							scale->rotation + scale->angle_range);
+    const int32_t end_angle = lv_map(scale->range_max, scale->range_min, scale->range_max, scale->rotation,
+    							scale->rotation + scale->angle_range);
 
     arc_dsc.center = arc_center;
 	arc_dsc.radius = arc_radius;
-	/* TODO: Set as properties? */
-	arc_dsc.start_angle = 0U;
-	arc_dsc.end_angle = 270U;
+	arc_dsc.start_angle = start_angle;
+	arc_dsc.end_angle = end_angle;
 
     lv_draw_arc(layer, &arc_dsc);
 }
@@ -882,8 +884,8 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
     lv_coord_t radius_out = radius_edge;
     lv_coord_t radius_in_major = radius_out - scale->major_len;
 
-    uint32_t angular_range = 270U; /* TODO: Add property to scale. How big (from 0° to 360°) is the arc */
-    uint32_t rotation = 0U; /* TODO: Add property to scale. Rotation in clock wise from arc 0 to value 0 */
+    uint32_t angular_range = scale->angle_range; /* TODO: Add property to scale. How big (from 0° to 360°) is the arc */
+    uint32_t rotation = scale->rotation; /* TODO: Add property to scale. Rotation in clock wise from arc 0 to value 0 */
     uint16_t label_gap = 15U; /* TODO: Add property to scale. Gap between major ticks and labels */
     uint8_t tick_idx = 0;
     for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
@@ -894,6 +896,8 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
 
 		int32_t angle_upscale = ((tick_idx * angular_range) * 10U) / (scale->total_tick_count - 1U);
 		angle_upscale += rotation * 10U;
+
+		LV_LOG_USER("Angle upscale: %d", angle_upscale);
 
         /*Draw a little bit longer lines to be sure the mask will clip them correctly
          *and to get a better precision*/
@@ -917,7 +921,6 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
         int32_t tick_value = 0U;
         int32_t min_out = scale->range_min;
         int32_t max_out = scale->range_max;
-
         tick_value = lv_map(tick_idx, 0U, scale->total_tick_count, min_out, max_out);
 
         /* TODO: Support custom labels */
@@ -941,156 +944,10 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
 
 		line_dsc.p1 = p_outer;
 		line_dsc.p2 = p_inner;
+
+		LV_LOG_USER("Line: X1: %d, Y1: %d, X2: %d, Y2: %d", line_dsc.p1.x, line_dsc.p1.y, line_dsc.p2.x, line_dsc.p2.y);
 		lv_draw_line(layer, &line_dsc);
     }
-
-#if 0
-    lv_meter_scale_t * scale;
-
-    _LV_LL_READ_BACK(&meter->scale_ll, scale) {
-        part_draw_dsc.sub_part_ptr = scale;
-
-        lv_coord_t r_out = r_edge;
-        lv_coord_t r_in_minor = r_out - scale->tick_length;
-        lv_coord_t r_in_major = r_out - scale->tick_major_length;
-
-        lv_area_t area_inner_minor;
-        area_inner_minor.x1 = p_center.x - r_in_minor;
-        area_inner_minor.y1 = p_center.y - r_in_minor;
-        area_inner_minor.x2 = p_center.x + r_in_minor;
-        area_inner_minor.y2 = p_center.y + r_in_minor;
-        lv_draw_mask_radius_init(&inner_minor_mask, &area_inner_minor, LV_RADIUS_CIRCLE, true);
-
-        lv_area_t area_inner_major;
-        area_inner_major.x1 = p_center.x - r_in_major;
-        area_inner_major.y1 = p_center.y - r_in_major;
-        area_inner_major.x2 = p_center.x + r_in_major - 1;
-        area_inner_major.y2 = p_center.y + r_in_major - 1;
-        lv_draw_mask_radius_init(&inner_major_mask, &area_inner_major, LV_RADIUS_CIRCLE, true);
-
-        lv_area_t area_outer;
-        area_outer.x1 = p_center.x - r_out;
-        area_outer.y1 = p_center.y - r_out;
-        area_outer.x2 = p_center.x + r_out - 1;
-        area_outer.y2 = p_center.y + r_out - 1;
-        lv_draw_mask_radius_init(&outer_mask, &area_outer, LV_RADIUS_CIRCLE, false);
-        int16_t outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
-
-        int16_t inner_act_mask_id = LV_MASK_ID_INV; /*Will be added later*/
-
-        uint32_t minor_cnt = scale->tick_major_nth ? scale->tick_major_nth - 1 : 0xFFFF;
-        uint16_t i;
-        for(i = 0; i < scale->tick_cnt; i++) {
-            minor_cnt++;
-            bool major = false;
-            if(minor_cnt == scale->tick_major_nth) {
-                minor_cnt = 0;
-                major = true;
-            }
-
-            int32_t value_of_line = lv_map(i, 0, scale->tick_cnt - 1, scale->min, scale->max);
-            part_draw_dsc.value = value_of_line;
-
-            lv_color_t line_color = major ? scale->tick_major_color : scale->tick_color;
-            lv_color_t line_color_ori = line_color;
-
-            lv_coord_t line_width_ori = major ? scale->tick_major_width : scale->tick_width;
-            lv_coord_t line_width = line_width_ori;
-
-            lv_meter_indicator_t * indic;
-            _LV_LL_READ_BACK(&meter->indicator_ll, indic) {
-                if(indic->type != LV_METER_INDICATOR_TYPE_SCALE_LINES) continue;
-                if(value_of_line >= indic->start_value && value_of_line <= indic->end_value) {
-                    line_width += indic->type_data.scale_lines.width_mod;
-
-                    if(indic->type_data.scale_lines.color_start.full == indic->type_data.scale_lines.color_end.full) {
-                        line_color = indic->type_data.scale_lines.color_start;
-                    }
-                    else {
-                        lv_opa_t ratio;
-                        if(indic->type_data.scale_lines.local_grad) {
-                            ratio = lv_map(value_of_line, indic->start_value, indic->end_value, LV_OPA_TRANSP, LV_OPA_COVER);
-                        }
-                        else {
-                            ratio = lv_map(value_of_line, scale->min, scale->max, LV_OPA_TRANSP, LV_OPA_COVER);
-                        }
-                        line_color = lv_color_mix(indic->type_data.scale_lines.color_end, indic->type_data.scale_lines.color_start, ratio);
-                    }
-                }
-            }
-
-            int32_t angle_upscale = ((i * scale->angle_range) * 10) / (scale->tick_cnt - 1) +  + scale->rotation * 10;
-
-            line_dsc.color = line_color;
-            line_dsc.width = line_width;
-
-            /*Draw a little bit longer lines to be sure the mask will clip them correctly
-             *and to get a better precision*/
-            lv_point_t p_outer;
-            p_outer.x = p_center.x + r_out + LV_MAX(LV_DPI_DEF, r_out);
-            p_outer.y = p_center.y;
-            lv_point_transform(&p_outer, angle_upscale, 256, &p_center);
-
-            part_draw_dsc.p1 = &p_center;
-            part_draw_dsc.p2 = &p_outer;
-            part_draw_dsc.id = i;
-            part_draw_dsc.label_dsc = &label_dsc;
-
-            /*Draw the text*/
-            if(major) {
-                lv_draw_mask_remove_id(outer_mask_id);
-                uint32_t r_text = r_in_major - scale->label_gap;
-                lv_point_t p;
-                p.x = p_center.x + r_text;
-                p.y = p_center.y;
-                lv_point_transform(&p, angle_upscale, 256, &p_center);
-
-                lv_draw_label_dsc_t label_dsc_tmp;
-                lv_memcpy(&label_dsc_tmp, &label_dsc, sizeof(label_dsc_tmp));
-
-                part_draw_dsc.label_dsc = &label_dsc_tmp;
-                char buf[16];
-
-                lv_snprintf(buf, sizeof(buf), "%" LV_PRId32, value_of_line);
-                part_draw_dsc.text = buf;
-
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-
-                lv_point_t label_size;
-                lv_txt_get_size(&label_size, part_draw_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
-                                LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-
-                lv_area_t label_cord;
-                label_cord.x1 = p.x - label_size.x / 2;
-                label_cord.y1 = p.y - label_size.y / 2;
-                label_cord.x2 = label_cord.x1 + label_size.x;
-                label_cord.y2 = label_cord.y1 + label_size.y;
-
-                lv_draw_label(draw_ctx, part_draw_dsc.label_dsc, &label_cord, part_draw_dsc.text, NULL);
-
-                outer_mask_id = lv_draw_mask_add(&outer_mask, NULL);
-            }
-            else {
-                part_draw_dsc.label_dsc = NULL;
-                part_draw_dsc.text = NULL;
-                lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
-            }
-
-            inner_act_mask_id = lv_draw_mask_add(major ? &inner_major_mask : &inner_minor_mask, NULL);
-            lv_draw_line(draw_ctx, &line_dsc, &p_outer, &p_center);
-            lv_draw_mask_remove_id(inner_act_mask_id);
-            lv_event_send(obj, LV_EVENT_DRAW_MAIN_END, &part_draw_dsc);
-
-            line_dsc.color = line_color_ori;
-            line_dsc.width = line_width_ori;
-
-        }
-        lv_draw_mask_free_param(&inner_minor_mask);
-        lv_draw_mask_free_param(&inner_major_mask);
-        lv_draw_mask_free_param(&outer_mask);
-        lv_draw_mask_remove_id(outer_mask_id);
-    }
-#endif
 }
 
 #endif
