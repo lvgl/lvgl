@@ -494,6 +494,8 @@
 
 #define LV_USE_WIN        1
 
+#define LV_WIDGETS_HAS_DEAFULT_VALUE  1
+
 /*==================
  * THEMES
  *==================*/

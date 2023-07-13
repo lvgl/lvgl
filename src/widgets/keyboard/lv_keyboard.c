@@ -438,7 +438,9 @@ static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_add_event(obj, lv_keyboard_def_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_style_base_dir(obj, LV_BASE_DIR_LTR, 0);
 
+#if LV_WIDGETS_HAS_DEAFULT_VALUE
     lv_keyboard_update_map(obj);
+#endif
 }
 
 /**

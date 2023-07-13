@@ -1638,6 +1638,18 @@
     #endif
 #endif
 
+#ifndef LV_WIDGETS_HAS_DEAFULT_VALUE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_WIDGETS_HAS_DEAFULT_VALUE
+            #define LV_WIDGETS_HAS_DEAFULT_VALUE CONFIG_LV_WIDGETS_HAS_DEAFULT_VALUE
+        #else
+            #define LV_WIDGETS_HAS_DEAFULT_VALUE 0
+        #endif
+    #else
+        #define LV_WIDGETS_HAS_DEAFULT_VALUE  1
+    #endif
+#endif
+
 /*==================
  * THEMES
  *==================*/

@@ -130,10 +130,12 @@ static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
+#if LV_WIDGETS_HAS_DEAFULT_VALUE
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
-
     cb->txt = (char *)"Check box";
     cb->static_txt = 1;
+#endif
+
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
