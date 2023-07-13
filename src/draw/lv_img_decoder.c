@@ -352,7 +352,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
         lv_color_format_t cf = img_dsc->header.cf;
-        if(cf >= LV_COLOR_FORMAT_I1 && cf <= LV_COLOR_FORMAT_I8) {
+        if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
             switch(cf) {
                 case LV_COLOR_FORMAT_I1:
                     dsc->palette_size = 2;
@@ -404,7 +404,7 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
     LV_UNUSED(decoder); /*Unused*/
     lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
     lv_color_format_t cf = img_dsc->header.cf;
-    if(cf >= LV_COLOR_FORMAT_I1 && cf <= LV_COLOR_FORMAT_I8) {
+    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
         lv_free((void *)dsc->img_data);
     }
 }

@@ -83,7 +83,7 @@ void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t col
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    if(canvas->dsc.header.cf >= LV_COLOR_FORMAT_I1 && canvas->dsc.header.cf <= LV_COLOR_FORMAT_I8) {
+    if(LV_COLOR_FORMAT_IS_INDEXED(canvas->dsc.header.cf)) {
         uint32_t stride = (canvas->dsc.header.w + 7) >> 3;
         uint8_t * buf = (uint8_t *)canvas->dsc.data;
         buf += 8;
