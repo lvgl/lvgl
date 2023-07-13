@@ -1497,6 +1497,13 @@
             #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
         #endif
     #endif
+    #ifndef LV_LABEL_DEFAULT_TEXT
+        #ifdef CONFIG_LV_LABEL_DEFAULT_TEXT
+            #define LV_LABEL_DEFAULT_TEXT CONFIG_LV_LABEL_DEFAULT_TEXT
+        #else
+            #define LV_LABEL_DEFAULT_TEXT "Text" /*Set default text for label*/
+        #endif
+    #endif
 #endif
 
 #ifndef LV_USE_LINE

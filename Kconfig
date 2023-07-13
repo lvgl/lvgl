@@ -778,6 +778,10 @@ menu "LVGL configuration"
             bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
             depends on LV_USE_LABEL
             default y
+        config LV_LABEL_DEFAULT_TEXT
+            string "Set default text for label"
+            depends on LV_USE_LABEL
+            default "Text"
         config LV_USE_LINE
             bool "Line."
             default y if !LV_CONF_MINIMAL
