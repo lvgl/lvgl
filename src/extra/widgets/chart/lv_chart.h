@@ -78,6 +78,7 @@ typedef struct {
     uint8_t y_ext_buf_assigned : 1;
     uint8_t x_axis_sec : 1;
     uint8_t y_axis_sec : 1;
+    uint8_t rewind : 1;
 } lv_chart_series_t;
 
 typedef struct {

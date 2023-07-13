@@ -280,6 +280,10 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
         p_out->y = 0;
         return;
     }
+    if(chart->type == LV_CHART_TYPE_LINE) {
+        if(ser->rewind == 0 && id < chart->point_cnt - ser->start_point)
+            return;
+    }
 
     lv_coord_t w = ((int32_t)lv_obj_get_content_width(obj) * chart->zoom_x) >> 8;
     lv_coord_t h = ((int32_t)lv_obj_get_content_height(obj) * chart->zoom_y) >> 8;
@@ -315,7 +319,12 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
     p_out->x -= lv_obj_get_scroll_left(obj);
 
     int32_t temp_y = 0;
-    temp_y = (int32_t)((int32_t)ser->y_points[id] - chart->ymin[ser->y_axis_sec]) * h;
+    if(chart->type == LV_CHART_TYPE_LINE) {
+        temp_y = (int32_t)((int32_t)ser->y_points[(id + ser->start_point) % chart->point_cnt] - chart->ymin[ser->y_axis_sec]) *
+                 h;
+    }
+    else
+        temp_y = (int32_t)((int32_t)ser->y_points[id] - chart->ymin[ser->y_axis_sec]) * h;
     temp_y = temp_y / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
     p_out->y = h - temp_y;
     p_out->y += lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
@@ -361,6 +370,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * obj, lv_color_t color, lv_cha
     }
 
     ser->start_point = 0;
+    ser->rewind = 0;
     ser->y_ext_buf_assigned = false;
     ser->hidden = 0;
     ser->x_axis_sec = axis & LV_CHART_AXIS_SECONDARY_X ? 1 : 0;
@@ -526,6 +536,7 @@ void lv_chart_set_all_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t 
         ser->y_points[i] = value;
     }
     ser->start_point = 0;
+    ser->rewind = 0;
     lv_chart_refresh(obj);
 }
 
@@ -537,7 +548,12 @@ void lv_chart_set_next_value(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_t
     lv_chart_t * chart  = (lv_chart_t *)obj;
     ser->y_points[ser->start_point] = value;
     invalidate_point(obj, ser->start_point);
-    ser->start_point = (ser->start_point + 1) % chart->point_cnt;
+
+    ser->start_point += 1;
+    if(ser->start_point >= chart->point_cnt) {
+        ser->rewind = 1;
+    }
+    ser->start_point = (ser->start_point) % chart->point_cnt;
     invalidate_point(obj, ser->start_point);
 }
 
@@ -555,7 +571,11 @@ void lv_chart_set_next_value2(lv_obj_t * obj, lv_chart_series_t * ser, lv_coord_
 
     ser->x_points[ser->start_point] = x_value;
     ser->y_points[ser->start_point] = y_value;
-    ser->start_point = (ser->start_point + 1) % chart->point_cnt;
+    ser->start_point += 1;
+    if(ser->start_point >= chart->point_cnt) {
+        ser->rewind = 1;
+    }
+    ser->start_point = (ser->start_point) % chart->point_cnt;
     invalidate_point(obj, ser->start_point);
 }
 

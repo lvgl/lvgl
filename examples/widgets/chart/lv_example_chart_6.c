@@ -23,7 +23,7 @@ static void event_cb(lv_event_t * e)
         if(dsc->p1 == NULL || dsc->p2 == NULL || dsc->p1->y != dsc->p2->y || last_id < 0) return;
 
         lv_coord_t * data_array = lv_chart_get_y_array(chart, ser);
-        lv_coord_t v = data_array[last_id];
+        lv_coord_t v = data_array[(last_id + lv_chart_get_x_start_point(chart, ser)) % lv_chart_get_point_count(chart)];
         char buf[16];
         lv_snprintf(buf, sizeof(buf), "%d", v);
 
