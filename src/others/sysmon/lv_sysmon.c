@@ -133,11 +133,8 @@ static void perf_monitor_disp_event_cb(lv_event_t * e)
             info->refr_start = lv_tick_get();
             break;
         case LV_EVENT_REFR_FINISH:
-            uint32_t elapsed_time = lv_tick_elaps(info->refr_start);
-            if (elapsed_time > 0) {
-                info->refr_elaps_sum += elapsed_time;
-                info->refr_cnt++;
-            }
+            info->refr_elaps_sum += lv_tick_elaps(info->refr_start);
+            info->refr_cnt++;
             break;
         case LV_EVENT_RENDER_START:
             info->render_start = lv_tick_get();
@@ -185,6 +182,14 @@ static void perf_monitor_event_cb(lv_event_t * e)
            refr_avg_time, render_real_avg_time, flush_avg_time,
            cpu);
 #else
+
+    /* **************************************************
+     * This causes the displayed FPS to persist if the FPS drops down to a zero.
+     * It makes it a little bit easier to see insteaad of flipping to a
+     * zero right away. If the FPS is >0 the new FPS will be displayed
+     * and the mechanics below will get reset.
+     * **************************************************/
+
     if (fps == 0) {
         info->delay_zero_update_cnt += 1;
         if (info->delay_zero_update_cnt == 10) {
@@ -197,6 +202,8 @@ static void perf_monitor_event_cb(lv_event_t * e)
         info->delay_zero_update_cnt = 0;
         info->last_fps = (uint16_t) fps;
     }
+
+    //  ***************************************************
 
     lv_label_set_text_fmt(
         sysmon,

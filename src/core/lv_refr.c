@@ -890,22 +890,32 @@ static void draw_buf_flush(lv_disp_t * disp)
 
     bool flushing_last = disp->flushing_last;
 
+    // This code was moved from _lv_disp_refr_timer as it seem wrong to have a
+    // stall of the program directly after the fluck callback has been called.
+
     if(lv_disp_is_double_buffered(disp)) {
         while(disp->flushing);
         /*If there are 2 buffers swap them. With direct mode swap only on the last area*/
 
-        void * buf_on_screen = disp_refr->draw_buf_act;
-        void * buf_off_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
+        // This might be wrong and some adjustments might need to be made. I
+        // understaand the buffer is being coppied and I don't think it matters if
+        // it happens before the flush function is called or after because after
+        // all it is a copy being made so long as all rendering to the buffer has
+        // been completed before the copy gets made.
+        if (disp_refr->render_mode == LV_DISP_RENDER_MODE_DIRECT) {
+            void * buf_on_screen = disp_refr->draw_buf_act;
+            void * buf_off_screen = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
 
-        lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
-        uint32_t i;
-        for(i = 0; i < disp_refr->inv_p; i++) {
-            if(disp_refr->inv_area_joined[i]) continue;
-            disp_refr->layer_head->buffer_copy(
-                disp_refr->layer_head,
-                buf_off_screen, stride, &disp_refr->inv_areas[i],
-                buf_on_screen, stride, &disp_refr->inv_areas[i]
-            );
+            lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+            uint32_t i;
+            for(i = 0; i < disp_refr->inv_p; i++) {
+                if(disp_refr->inv_area_joined[i]) continue;
+                disp_refr->layer_head->buffer_copy(
+                    disp_refr->layer_head,
+                    buf_off_screen, stride, &disp_refr->inv_areas[i],
+                    buf_on_screen, stride, &disp_refr->inv_areas[i]
+                );
+            }
         }
         if(disp->render_mode != LV_DISP_RENDER_MODE_DIRECT || flushing_last) {
             disp->draw_buf_act = disp_refr->draw_buf_act == disp_refr->draw_buf_1 ? disp_refr->draw_buf_2 : disp_refr->draw_buf_1;
