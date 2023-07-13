@@ -156,6 +156,13 @@ menu "LVGL configuration"
 			help
 				Required to draw anything on the screen.
 
+			config LV_DRAW_SW_DRAW_UNIT_CNT
+				int "Number of draw units"
+				default 1
+				help
+					> 1 requires an operating system enabled in `LV_USE_OS`
+					> 1 means multply threads will render the screen in parallel
+
 			config LV_DRAW_SW_COMPLEX
 				bool "Enable complex draw engine"
 				default y
@@ -1126,6 +1133,104 @@ menu "LVGL configuration"
 			default y
 			help
 				This can save some memory, but not much. After the quick access bar is created, it can be hidden by clicking the button at the top left corner of the browsing area, which is very useful for small screen devices.
+	endmenu
+
+	menu "Devices"
+		config LV_USE_SDL
+			bool "Use SDL to open window on PC and handle mouse and keyboard"
+			default n
+		config LV_SDL_INCLUDE_PATH
+			string "SDL include path"
+			depends on LV_USE_SDL
+			default "SDL/SDL2.h"
+		config LV_SDL_PARTIAL_MODE
+			bool "SDL partial mode"
+			depends on LV_USE_SDL
+			default n
+		config LV_SDL_FULLSCREEN
+			bool "SDL fullscreen"
+			depends on LV_USE_SDL
+			default n
+		config LV_SDL_DIRECT_EXIT
+			bool "Exit the application when all SDL widows are closed"
+			depends on LV_USE_SDL
+			default y
+
+		config LV_USE_LINUX_FBDEV
+			bool "Use Linux framebuffer device"
+			default n
+		config LV_LINUX_FBDEV_BSD
+			bool "Use BSD flavored framebuffer device"
+			depends on LV_USE_LINUX_FBDEV
+			default n
+		config LV_LINUX_FBDEV_NUTTX
+			bool "Use NuttX flavored framebuffer device"
+			depends on LV_USE_LINUX_FBDEV
+			default n
+
+		choice
+			prompt "Framebuffer device render mode"
+			depends on LV_USE_LINUX_FBDEV
+			default LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+			config LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+				bool "Partial mode"
+				help
+					Use the buffer(s) to render the screen is smaller parts. This way the buffers can be smaller then the display to save RAM. At least 1/10 screen size buffer(s) are recommended.
+
+			config LV_LINUX_FBDEV_RENDER_MODE_DIRECT
+				bool "Direct mode"
+				help
+					The buffer(s) has to be screen sized and LVGL will render into the correct location of the buffer. This way the buffer always contain the whole image. Only the changed ares will be updated. With 2 buffers the buffers' content are kept in sync automatically and in flush_cb only address change is required.
+
+			config LV_LINUX_FBDEV_RENDER_MODE_FULL
+				bool "Full mode"
+				help
+					Always redraw the whole screen even if only one pixel has been changed. With 2 buffers in flush_cb only and address change is required.
+
+		endchoice
+
+		choice
+			prompt "Framebuffer size"
+			depends on LV_USE_LINUX_FBDEV
+			default LV_LINUX_FBDEV_SINGLE_BUFFER
+
+			config LV_LINUX_FBDEV_SINGLE_BUFFER
+				bool "One screen-sized buffer"
+
+			config LV_LINUX_FBDEV_DOUBLE_BUFFER
+				bool "Two screen-sized buffer"
+				depends on !LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+			config LV_LINUX_FBDEV_CUSTOM_BUFFER
+				bool "Custom-sized buffer"
+				depends on LV_LINUX_FBDEV_RENDER_MODE_PARTIAL
+
+		endchoice
+
+		config LV_LINUX_FBDEV_BUFFER_COUNT
+			int
+			depends on LV_USE_LINUX_FBDEV
+			default 0 if LV_LINUX_FBDEV_CUSTOM_BUFFER
+			default 1 if LV_LINUX_FBDEV_SINGLE_BUFFER
+			default 2 if LV_LINUX_FBDEV_DOUBLE_BUFFER
+
+		config LV_LINUX_FBDEV_BUFFER_SIZE
+			int "Custom partial buffer size (in number of rows)"
+			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
+			default 60
+
+		config LV_USE_LINUX_DRM
+			bool "Use Linux DRM device"
+			default n
+
+		config LV_USE_TFT_ESPI
+			bool "Use TFT_eSPI driver"
+			default n
+
+		config LV_USE_NUTTX_TOUCHSCREEN
+			bool "Use NuttX touchscreen driver"
+			default n
 	endmenu
 
 	menu "Examples"

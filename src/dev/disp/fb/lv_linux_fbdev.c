@@ -22,11 +22,13 @@
     #include <sys/time.h>
     #include <sys/consio.h>
     #include <sys/fbio.h>
-#else  /* LV_LINUX_FBDEV_BSD */
+#elif LV_LINUX_FBDEV_NUTTX
+    #include <nuttx/video/fb.h>
+#else
     #include <linux/fb.h>
 #endif /* LV_LINUX_FBDEV_BSD */
 
-#include "../../../stdlib/lv_string.h"
+#include <lvgl/lvgl.h>
 
 /*********************
  *      DEFINES
@@ -48,7 +50,6 @@ struct bsd_fb_fix_info {
     long int smem_len;
 };
 
-
 typedef struct {
     const char * devname;
     lv_color_format_t color_format;
@@ -67,6 +68,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
 static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p);
 
 /**********************
@@ -76,6 +78,7 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p
 /**********************
  *      MACROS
  **********************/
+
 #if LV_LINUX_FBDEV_BSD
     #define FBIOBLANK FBIO_BLANK
 #endif /* LV_LINUX_FBDEV_BSD */
@@ -127,11 +130,13 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     }
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
+#if !LV_LINUX_FBDEV_NUTTX
     // Make sure that the display is on.
     if(ioctl(dsc->fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
         perror("ioctl(FBIOBLANK)");
         // Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.
     }
+#endif /* !LV_LINUX_FBDEV_NUTTX */
 
 #if LV_LINUX_FBDEV_BSD
     struct fbtype fb;
@@ -171,7 +176,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     }
 #endif /* LV_LINUX_FBDEV_BSD */
 
-    LV_LOG_INFO("%dx%d, %dbpp", vinfo.xres, vinfo.yres, vinfo.bits_per_pixel);
+    LV_LOG_INFO("%dx%d, %dbpp", dsc->vinfo.xres, dsc->vinfo.yres, dsc->vinfo.bits_per_pixel);
 
     // Figure out the size of the screen in bytes
     dsc->screensize =  dsc->finfo.smem_len; //finfo.line_length * vinfo.yres;
@@ -191,10 +196,20 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     lv_coord_t hor_res = dsc->vinfo.xres;
     lv_coord_t ver_res = dsc->vinfo.yres;
     lv_coord_t width = dsc->vinfo.width;
+    uint32_t draw_buf_size = hor_res * dsc->vinfo.bits_per_pixel >> 3;
+    if(LV_LINUX_FBDEV_BUFFER_COUNT < 1) {
+        draw_buf_size *= LV_LINUX_FBDEV_BUFFER_SIZE;
+    }
+    else {
+        draw_buf_size *= ver_res;
+    }
 
-    uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
-    lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
-    lv_disp_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISP_RENDER_MODE_PARTIAL);
+    lv_color_t * draw_buf = lv_malloc(draw_buf_size);
+    lv_color_t * draw_buf_2 = NULL;
+    if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
+        draw_buf_2 = lv_malloc(draw_buf_size);
+    }
+    lv_disp_set_draw_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
     lv_disp_set_res(disp, hor_res, ver_res);
 
     if(width) {
@@ -220,19 +235,36 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p
     }
 
     lv_coord_t w = lv_area_get_width(area);
-    long int location = 0;
     uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+    uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
+    uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;
 
     uint8_t * fbp = (uint8_t *)dsc->fbp;
     int32_t y;
-    for(y = area->y1; y <= area->y2; y++) {
-        location = (area->x1 + dsc->vinfo.xoffset) + (y + dsc->vinfo.yoffset) * dsc->finfo.line_length;
-        lv_memcpy(&fbp[location], (uint32_t *)color_p, w * px_size);
-        color_p += w * px_size;
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISP_RENDER_MODE_DIRECT) {
+        for(y = area->y1; y <= area->y2; y++) {
+            lv_memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
+            fb_pos += dsc->finfo.line_length;
+            color_pos += dsc->finfo.line_length;
+        }
+    }
+    else {
+        for(y = area->y1; y <= area->y2; y++) {
+            lv_memcpy(&fbp[fb_pos], color_p, w * px_size);
+            fb_pos += dsc->finfo.line_length;
+            color_p += w * px_size;
+        }
     }
 
+#if LV_LINUX_FBDEV_NUTTX && defined(CONFIG_FB_UPDATE)
     //May be some direct update command is required
-    //ret = ioctl(state->fd, FBIO_UPDATE, (unsigned long)((uintptr_t)rect));
+    struct fb_area_s fb_area;
+    fb_area.x = area->x1;
+    fb_area.y = area->y1;
+    fb_area.w = lv_area_get_width(area);
+    fb_area.h = lv_area_get_height(area);
+    ioctl(dsc->fbfd, FBIO_UPDATE, (unsigned long)((uintptr_t)&fb_area));
+#endif
 
     lv_disp_flush_ready(disp);
 }
