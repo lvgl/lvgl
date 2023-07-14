@@ -413,14 +413,14 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_btnmatrix_set_map(obj, btnm->map_p);
     }
     else if(code == LV_EVENT_PRESSED) {
-        void * param = lv_event_get_param(e);
+        lv_indev_t * indev = lv_event_get_indev(e);
         invalidate_button_area(obj, btnm->btn_id_sel);
 
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
             uint16_t btn_pr;
             /*Search the pressed area*/
-            lv_indev_get_point(param, &p);
+            lv_indev_get_point(indev, &p);
             btn_pr = get_button_from_point(obj, &p);
             /*Handle the case where there is no button there*/
             btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
@@ -445,44 +445,14 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_PRESSING) {
-        lv_indev_t * indev = lv_indev_get_act();
-        /*Ignore while scrolling*/
-        if(indev && lv_indev_get_scroll_obj(indev)) {
-            if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
-                invalidate_button_area(obj, btnm->btn_id_sel);
+        /*If a slid to a new button, discard the current button and don't press any buttons*/
+        if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
+            lv_indev_t * indev = lv_event_get_indev(e);
+            lv_indev_get_point(indev, &p);
+            uint16_t btn_pr = get_button_from_point(obj, &p);
+            if(btn_pr != btnm->btn_id_sel) {
+                invalidate_button_area(obj, btnm->btn_id_sel); /*Invalidate the old area*/
                 btnm->btn_id_sel = LV_BTNMATRIX_BTN_NONE;
-                invalidate_button_area(obj, btnm->btn_id_sel);
-            }
-            return;
-        }
-        void * param = lv_event_get_param(e);
-        uint16_t btn_pr = LV_BTNMATRIX_BTN_NONE;
-        /*Search the pressed area*/
-        lv_indev_type_t indev_type = lv_indev_get_type(indev);
-        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) return;
-
-        lv_indev_get_point(indev, &p);
-        btn_pr = get_button_from_point(obj, &p);
-        /*Invalidate to old and the new areas*/
-        if(btn_pr != btnm->btn_id_sel) {
-            if(btnm->btn_id_sel != LV_BTNMATRIX_BTN_NONE) {
-                invalidate_button_area(obj, btnm->btn_id_sel);
-            }
-
-            btnm->btn_id_sel = btn_pr;
-
-            lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
-            if(btn_pr != LV_BTNMATRIX_BTN_NONE &&
-               button_is_inactive(btnm->ctrl_bits[btn_pr]) == false &&
-               button_is_hidden(btnm->ctrl_bits[btn_pr]) == false) {
-                invalidate_button_area(obj, btn_pr);
-                /*Send VALUE_CHANGED for the newly pressed button*/
-                if(button_is_click_trig(btnm->ctrl_bits[btn_pr]) == false &&
-                   button_is_popover(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
-                    uint32_t b = btn_pr;
-                    res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
-                    if(res != LV_RES_OK) return;
-                }
             }
         }
     }
@@ -533,7 +503,7 @@ static void lv_btnmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_FOCUSED) {
         if(btnm->btn_cnt == 0) return;
 
-        lv_indev_t * indev = lv_event_get_param(e);
+        lv_indev_t * indev = lv_event_get_indev(e);
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
         /*If not focused by an input device assume the last input device*/
