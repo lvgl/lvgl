@@ -824,14 +824,6 @@ static void scale_draw_main_round(lv_obj_t * obj, lv_event_t * event)
 
     if(scale->total_tick_count <= 1) return;
 
-    /* Get style properties so they can be used in the tick and label drawing */
-    lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
-    lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-    lv_coord_t x_ofs = obj->coords.x1;
-    lv_coord_t y_ofs = obj->coords.y1;
-
     /* Configure arc draw descriptors for the main part */
     lv_draw_arc_dsc_t arc_dsc;
     lv_draw_arc_dsc_init(&arc_dsc);
