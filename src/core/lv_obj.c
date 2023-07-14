@@ -728,9 +728,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
-        void * param = lv_event_get_param(e);
+        lv_indev_t * indev = lv_event_get_indev(e);
         /*Go the checked state if enabled*/
-        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+        if(lv_indev_get_scroll_obj(indev) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
             else lv_obj_clear_state(obj, LV_STATE_CHECKED);
 
