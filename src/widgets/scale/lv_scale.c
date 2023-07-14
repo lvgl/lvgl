@@ -766,33 +766,26 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
     lv_point_t main_line_point_a;
     lv_point_t main_line_point_b;
 
-    uint8_t tick_idx = 0;
-    for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
-        /* Setup the tick origin */
-        lv_point_t tick_point_a;
+    /* Setup the tick points */
+    if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+        lv_coord_t vertical_position_a = y_ofs + + (((int32_t)((int32_t)(height - line_dsc.width))) /
+                scale->total_tick_count);
+        lv_coord_t vertical_position_b = y_ofs + (((int32_t)((int32_t)(height - line_dsc.width) * (scale->total_tick_count))) /
+                                       scale->total_tick_count);
 
-        /* Setup the tick points */
-        if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) /
-                                           scale->total_tick_count;
-            tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
-            tick_point_a.y = vertical_position;
-        }
-        else {
-            lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - line_dsc.width) * tick_idx) /
-                                             scale->total_tick_count;
-            tick_point_a.x = horizontal_position;
-            tick_point_a.y = y_ofs;
-        }
-
-        if(0 == tick_idx) {
-            main_line_point_a.x = tick_point_a.x;
-            main_line_point_a.y = tick_point_a.y;
-        }
-        else if(scale->total_tick_count == tick_idx) {
-            main_line_point_b.x = tick_point_a.x;
-            main_line_point_b.y = tick_point_a.y;
-        }
+        main_line_point_a.x = x_ofs - 1U;
+		main_line_point_a.y = vertical_position_a;
+		main_line_point_b.x = x_ofs - 1U;
+		main_line_point_b.y = vertical_position_b;
+    }
+    else {
+        lv_coord_t horizontal_position_a = x_ofs;
+        lv_coord_t horizontal_position_b = x_ofs + ((int32_t)((int32_t)(height - line_dsc.width) * (scale->total_tick_count - 1U)) /
+                                         scale->total_tick_count);
+        main_line_point_a.x = horizontal_position_a;
+        main_line_point_a.y = y_ofs;
+        main_line_point_b.x = horizontal_position_b;
+        main_line_point_b.y = y_ofs;
     }
 
     /* Draw vertical line that covers all the ticks */
