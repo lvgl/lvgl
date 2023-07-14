@@ -51,6 +51,15 @@ void lvgl_free(void *ptr)
 	k_spin_unlock(&lvgl_heap_lock, key);
 }
 
+void lvgl_print_heap_info(bool dump_chunks)
+{
+	k_spinlock_key_t key;
+
+	key = k_spin_lock(&lvgl_heap_lock);
+	sys_heap_print_info(&lvgl_heap, dump_chunks);
+	k_spin_unlock(&lvgl_heap_lock, key);
+}
+
 static int lvgl_heap_init(void)
 {
 	sys_heap_init(&lvgl_heap, &lvgl_heap_mem[0], HEAP_BYTES);

@@ -8,6 +8,7 @@
 #define ZEPHYR_LIB_GUI_LVGL_MEM_H_
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +19,8 @@ void *lvgl_malloc(size_t size);
 void *lvgl_realloc(void *ptr, size_t size);
 
 void lvgl_free(void *ptr);
+
+void lvgl_print_heap_info(bool dump_chunks);
 
 #ifdef __cplusplus
 }
