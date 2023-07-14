@@ -22,7 +22,7 @@ Naming and API
 - |check| Replace `disp_drv->direct_mode/full_refresh` with enum.
 - |check| Consider flat directory structure. E.g. `extra/widgets` to `widgets`
 - |uncheck| Use `uint32_t` and `int32_t` in APIs where possible. Consider hardcoding `lv_coord_t` as `int32_t`.
-- |uncheck| To define a new stdlib API use defines `LV_USE_CUSTOM_...` and
+- |check| To define a new stdlib API use defines `LV_USE_CUSTOM_...` and
   let the user implement `lv_...` functions somewhere (instead of defining the name of the custom functions)
 - |uncheck| Generic `lv_date_t` and `lv_time_t`
 - |uncheck| Make layouts with an `lv_layout_dsc_t` instead of registering an ID + callback.
@@ -37,19 +37,19 @@ Architecture
   (see `here <https://github.com/lvgl/lvgl/issues/3379#issuecomment-1147954592>`__)
   Also remove 16 SWAPPED color format?
   (see `here <https://github.com/lvgl/lvgl/issues/3379#issuecomment-1140886258>`__)
-- |uncheck| Reconsider masks. There should be a generic high level mask API which is independent of the drawing engine.
+- |check| Reconsider masks. There should be a generic high level mask API which is independent of the drawing engine.
   `#4059 <https://github.com/lvgl/lvgl/issues/4059>`__
 - |check| `get_glyph_bitmap` should return an a8 bitmap that can be blended immediately.
 - |uncheck| Reconsider how themes should work.
   (see `here <https://github.com/lvgl/lvgl/pull/3390#pullrequestreview-990710921>`__)
-- |uncheck| Make LVGL render independent areas in parallel.
+- |check| Make LVGL render independent areas in parallel.
   `#4016 <https://github.com/lvgl/lvgl/issues/4016>`__
 - |check| Drop `lv_mem_buf_get` as tlsf should be fast enough for normal allocations too.
   Fragmentation is also lower if processes can completely clean up after themselves.
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
-- |uncheck| Condider using `lv_color32_t` on APIs to support e.g. alpha gradient.
 - |uncheck| Add more feature to key presses (long press, release, etc).
   (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__)
+- |uncheck| Integrate `lv_msg` with the widgets to have an easy to use variable binding solution   
 
 Styles
 ~~~~~~
