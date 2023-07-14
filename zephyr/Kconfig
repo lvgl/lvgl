@@ -21,5 +21,6 @@ config LV_Z_USE_FILESYSTEM
 rsource "../Kconfig"
 rsource "Kconfig.memory"
 rsource "Kconfig.input"
+rsource "Kconfig.shell"
 
 endif
