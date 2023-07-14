@@ -50,6 +50,9 @@ Architecture
 - |uncheck| Add more feature to key presses (long press, release, etc).
   (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__)
 - |uncheck| Integrate `lv_msg` with the widgets to have an easy to use variable binding solution   
+- |uncheck| Add GPU abstraction for display rotation 
+- |uncheck| Replace the `read_line_cb` of the image decoders with `get_area_cb`
+- |uncheck| Limit the image caching size in bytes instead of image count 
 
 Styles
 ~~~~~~
