@@ -828,7 +828,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             }
         }
 
-        uint32_t amax = 20;
+        const int32_t amax = 20;
         int32_t animv = spectrum_i - spectrum_lane_ofs_start;
         if(animv > amax) animv = amax;
         for(i = 0; i < BAR_CNT; i++) {
@@ -845,7 +845,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             }
 
             if(v < BAR_COLOR1_STOP) draw_dsc.bg_color = BAR_COLOR1;
-            else if(v > BAR_COLOR3_STOP) draw_dsc.bg_color = BAR_COLOR3;
+            else if(v > (uint32_t)BAR_COLOR3_STOP) draw_dsc.bg_color = BAR_COLOR3;
             else if(v > BAR_COLOR2_STOP) draw_dsc.bg_color = lv_color_mix(BAR_COLOR3, BAR_COLOR2,
                                                                               ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP - BAR_COLOR2_STOP));
             else draw_dsc.bg_color = lv_color_mix(BAR_COLOR2, BAR_COLOR1,
@@ -953,6 +953,7 @@ static lv_obj_t * album_img_create(lv_obj_t * parent)
 
 static void album_gesture_event_cb(lv_event_t * e)
 {
+    LV_UNUSED(e);
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
     if(dir == LV_DIR_LEFT) _lv_demo_music_album_next(true);
     if(dir == LV_DIR_RIGHT) _lv_demo_music_album_next(false);
