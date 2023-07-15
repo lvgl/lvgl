@@ -187,6 +187,7 @@ lv_color32_t lv_canvas_get_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
                 break;
             }
         default:
+            lv_memzero(&ret, sizeof(lv_color32_t));
             break;
     }
 
