@@ -2512,7 +2512,7 @@
     #ifdef CONFIG_LV_USE_DEMO_FLEX_LAYOUT
         #define LV_USE_DEMO_FLEX_LAYOUT CONFIG_LV_USE_DEMO_FLEX_LAYOUT
     #else
-        #define LV_USE_DEMO_FLEX_LAYOUT 0
+        #define LV_USE_DEMO_FLEX_LAYOUT     0
     #endif
 #endif
 
@@ -2521,7 +2521,7 @@
     #ifdef CONFIG_LV_USE_DEMO_MULTILANG
         #define LV_USE_DEMO_MULTILANG CONFIG_LV_USE_DEMO_MULTILANG
     #else
-        #define LV_USE_DEMO_MULTILANG 0
+        #define LV_USE_DEMO_MULTILANG       0
     #endif
 #endif
 
@@ -2534,6 +2534,14 @@
     #endif
 #endif
 
+/*Demonstrate scroll settings*/
+#ifndef LV_USE_DEMO_SCROLL
+    #ifdef CONFIG_LV_USE_DEMO_SCROLL
+        #define LV_USE_DEMO_SCROLL CONFIG_LV_USE_DEMO_SCROLL
+    #else
+        #define LV_USE_DEMO_SCROLL          0
+    #endif
+#endif
 
 
 /*----------------------------------

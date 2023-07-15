@@ -106,7 +106,7 @@ img_transform_avatar_15_map[] = {
 };
 
 const lv_img_dsc_t img_transform_avatar_15 = {
-    .header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA,
+    .header.cf = LV_COLOR_FORMAT_ARGB8888,
     .header.always_zero = 0,
     .header.reserved = 0,
     .header.w = 80,

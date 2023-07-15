@@ -43,6 +43,10 @@ extern "C" {
 #include "transform/lv_demo_transform.h"
 #endif
 
+#if LV_USE_DEMO_SCROLL
+#include "scroll/lv_demo_scroll.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

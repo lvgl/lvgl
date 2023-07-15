@@ -78,5 +78,6 @@
 #define LV_USE_DEMO_STRESS      1
 #define LV_USE_DEMO_TRANSFORM   1
 #define LV_USE_DEMO_MULTILANG   1
+#define LV_USE_DEMO_SCROLL      1
 
 
