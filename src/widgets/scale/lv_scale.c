@@ -37,7 +37,8 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
 
 static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event);
 
-static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
+static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
+static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const uint16_t tick_idx, lv_point_t * tick_point_a, lv_point_t * tick_point_b);
 
 /**********************
  *  STATIC VARIABLES
@@ -301,99 +302,6 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     else {
         /* TODO */
     }
-}
-
-static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const uint16_t tick_idx, lv_point_t * tick_point_a, lv_point_t * tick_point_b)
-{
-	lv_scale_t * scale = (lv_scale_t *)obj;
-
-    if ((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
-		|| (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-		/* Get style properties so they can be used in the tick and label drawing */
-		const lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
-		const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-		const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-		const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-		lv_coord_t x_ofs = 0U;
-		lv_coord_t y_ofs = 0U;
-
-		if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-			x_ofs = obj->coords.x1;
-			y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
-		}
-		else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-			x_ofs = obj->coords.x2;
-			y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
-		}
-		else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-			x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-			y_ofs = obj->coords.y2;
-		}
-		else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
-			x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-			y_ofs = obj->coords.y1;
-		}
-		else { /* Nothing to do */ }
-
-		lv_coord_t minor_len = lv_obj_get_style_width(obj, LV_PART_ITEMS);
-
-		/* Draw tick lines to the right */
-		if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-			minor_len *= -1;
-		}
-		/* Draw tick lines to the top */
-		else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
-			minor_len *= -1;
-		}
-		else { /* Nothing to do */ }
-
-    	lv_coord_t tick_length = minor_len;
-
-		/* Setup the tick points */
-		if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-			lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc->width) *
-															 (scale->total_tick_count - tick_idx)) / scale->total_tick_count;
-
-			tick_point_a->x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
-			tick_point_a->y = vertical_position;
-			tick_point_b->x = tick_point_a->x - tick_length;
-			tick_point_b->y = vertical_position;
-		}
-		else {
-			lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - line_dsc->width) * tick_idx) / scale->total_tick_count;
-
-			tick_point_a->x = horizontal_position;
-			tick_point_a->y = y_ofs;
-			tick_point_b->x = horizontal_position;
-			tick_point_b->y = tick_point_a->y + tick_length;
-		}
-    }
-    else if (LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-        lv_area_t scale_area;
-    	lv_obj_get_content_coords(obj, &scale_area);
-
-    	/* Find the center of the scale */
-    	lv_point_t center_point;
-    	const lv_coord_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2U, lv_area_get_height(&scale_area) / 2U);
-    	center_point.x = scale_area.x1 + radius_edge;
-    	center_point.y = scale_area.y1 + radius_edge;
-
-    	lv_coord_t radius_in_minor = radius_edge - lv_obj_get_style_width(obj, LV_PART_ITEMS);
-
-        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
-		angle_upscale += scale->rotation * 10U;
-
-        /*Draw a little bit longer lines to be sure the mask will clip them correctly
-         *and to get a better precision*/
-        tick_point_a->x = center_point.x + radius_edge;
-        tick_point_a->y = center_point.y;
-        lv_point_transform(tick_point_a, angle_upscale, 256, &center_point);
-
-        tick_point_b->x = center_point.x + radius_in_minor;
-        tick_point_b->y = center_point.y;
-        lv_point_transform(tick_point_b, angle_upscale, 256, &center_point);
-    }
-    else { /* Nothing to do */ }
 }
 
 static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
@@ -825,7 +733,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
         lv_point_t arc_center;
         lv_coord_t arc_radius;
-        get_center(obj, &arc_center, &arc_radius);
+        scale_get_center(obj, &arc_center, &arc_radius);
 
         const int32_t start_angle = lv_map(scale->range_min, scale->range_min, scale->range_max, scale->rotation,
         							scale->rotation + scale->angle_range);
@@ -840,22 +748,6 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_draw_arc(layer, &arc_dsc);
     }
     else { /* Nothing to do */ }
-}
-
-static void get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
-{
-    lv_coord_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
-    lv_coord_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
-    lv_coord_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
-    lv_coord_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-
-    lv_coord_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg,
-                           lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2U;
-
-    center->x = obj->coords.x1 + r + left_bg;
-    center->y = obj->coords.y1 + r + top_bg;
-
-    if(arc_r) *arc_r = r;
 }
 
 static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
@@ -1051,6 +943,132 @@ static void scale_draw_indicator_round(lv_obj_t * obj, lv_event_t * event)
 		line_dsc.p2 = p_inner;
 		lv_draw_line(layer, &line_dsc);
     }
+}
+
+/**
+ * Get center point and radius of scale arc
+ * @param obj       pointer to a scale object
+ * @param center	pointer to center
+ * @param arc_r		pointer to arc radius
+ */
+static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r)
+{
+    lv_coord_t left_bg = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t right_bg = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
+    lv_coord_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+
+    lv_coord_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg,
+                           lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2U;
+
+    center->x = obj->coords.x1 + r + left_bg;
+    center->y = obj->coords.y1 + r + top_bg;
+
+    if(arc_r) *arc_r = r;
+}
+
+/**
+ * Get points for minor ticks
+ *
+ * In order to draw minor ticks we need two points, this interface returns both points for all scale modes.
+ *
+ * @param obj       pointer to a scale object
+ * @param line_dsc	pointer to line descriptor, used for horizontal and vertical modes
+ * @param tick_idx	index of the current tick
+ * @param tick_point_a	pointer to point 'a' of the minor tick
+ * @param tick_point_b	pointer to point 'b' of the minor tick
+ */
+static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const uint16_t tick_idx, lv_point_t * tick_point_a, lv_point_t * tick_point_b)
+{
+	lv_scale_t * scale = (lv_scale_t *)obj;
+
+    if ((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
+		|| (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+		/* Get style properties so they can be used in the tick and label drawing */
+		const lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
+		const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+		const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+		const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
+		lv_coord_t x_ofs = 0U;
+		lv_coord_t y_ofs = 0U;
+
+		if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
+			x_ofs = obj->coords.x1;
+			y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
+		}
+		else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+			x_ofs = obj->coords.x2;
+			y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
+		}
+		else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
+			x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
+			y_ofs = obj->coords.y2;
+		}
+		else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+			x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
+			y_ofs = obj->coords.y1;
+		}
+		else { /* Nothing to do */ }
+
+		lv_coord_t minor_len = lv_obj_get_style_width(obj, LV_PART_ITEMS);
+
+		/* Draw tick lines to the right */
+		if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+			minor_len *= -1;
+		}
+		/* Draw tick lines to the top */
+		else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+			minor_len *= -1;
+		}
+		else { /* Nothing to do */ }
+
+    	lv_coord_t tick_length = minor_len;
+
+		/* Setup the tick points */
+		if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+			lv_coord_t vertical_position = y_ofs + (int32_t)((int32_t)(height - line_dsc->width) *
+															 (scale->total_tick_count - tick_idx)) / scale->total_tick_count;
+
+			tick_point_a->x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
+			tick_point_a->y = vertical_position;
+			tick_point_b->x = tick_point_a->x - tick_length;
+			tick_point_b->y = vertical_position;
+		}
+		else {
+			lv_coord_t horizontal_position = x_ofs + (int32_t)((int32_t)(height - line_dsc->width) * tick_idx) / scale->total_tick_count;
+
+			tick_point_a->x = horizontal_position;
+			tick_point_a->y = y_ofs;
+			tick_point_b->x = horizontal_position;
+			tick_point_b->y = tick_point_a->y + tick_length;
+		}
+    }
+    else if (LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+        lv_area_t scale_area;
+    	lv_obj_get_content_coords(obj, &scale_area);
+
+    	/* Find the center of the scale */
+    	lv_point_t center_point;
+    	const lv_coord_t radius_edge = LV_MIN(lv_area_get_width(&scale_area) / 2U, lv_area_get_height(&scale_area) / 2U);
+    	center_point.x = scale_area.x1 + radius_edge;
+    	center_point.y = scale_area.y1 + radius_edge;
+
+    	lv_coord_t radius_in_minor = radius_edge - lv_obj_get_style_width(obj, LV_PART_ITEMS);
+
+        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
+		angle_upscale += scale->rotation * 10U;
+
+        /*Draw a little bit longer lines to be sure the mask will clip them correctly
+         *and to get a better precision*/
+        tick_point_a->x = center_point.x + radius_edge;
+        tick_point_a->y = center_point.y;
+        lv_point_transform(tick_point_a, angle_upscale, 256, &center_point);
+
+        tick_point_b->x = center_point.x + radius_in_minor;
+        tick_point_b->y = center_point.y;
+        lv_point_transform(tick_point_b, angle_upscale, 256, &center_point);
+    }
+    else { /* Nothing to do */ }
 }
 
 #endif
