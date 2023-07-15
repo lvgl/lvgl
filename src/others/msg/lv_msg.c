@@ -182,7 +182,7 @@ static void notify(lv_msg_t * m)
             if(!s->_checked) {
                 /*Check if this sub_dsc_t is about this msg_id*/
                 if(s->msg_id == m->id && s->callback) {
-                    // Set this flag and notify
+                    /* Set this flag and notify*/
                     s->_checked = 1;
                     m->user_data = s->user_data;
                     m->_priv_data = s->_priv_data;

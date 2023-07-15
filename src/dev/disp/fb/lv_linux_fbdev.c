@@ -122,7 +122,7 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
 
     if(dsc->fbfd > 0) close(dsc->fbfd);
 
-    // Open the file for reading and writing
+    /* Open the file for reading and writing*/
     dsc->fbfd = open(dsc->devname, O_RDWR);
     if(dsc->fbfd == -1) {
         perror("Error: cannot open framebuffer device");
@@ -131,10 +131,10 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     LV_LOG_INFO("The framebuffer device was opened successfully");
 
 #if !LV_LINUX_FBDEV_NUTTX
-    // Make sure that the display is on.
+    /* Make sure that the display is on.*/
     if(ioctl(dsc->fbfd, FBIOBLANK, FB_BLANK_UNBLANK) != 0) {
         perror("ioctl(FBIOBLANK)");
-        // Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.
+        /* Don't return. Some framebuffer drivers like efifb or simplefb don't implement FBIOBLANK.*/
     }
 #endif /* !LV_LINUX_FBDEV_NUTTX */
 
@@ -142,13 +142,13 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     struct fbtype fb;
     unsigned line_length;
 
-    //Get fb type
+    /*Get fb type*/
     if(ioctl(dsc->fbfd, FBIOGTYPE, &fb) != 0) {
         perror("ioctl(FBIOGTYPE)");
         return;
     }
 
-    //Get screen width
+    /*Get screen width*/
     if(ioctl(dsc->fbfd, FBIO_GETLINEWIDTH, &line_length) != 0) {
         perror("ioctl(FBIO_GETLINEWIDTH)");
         return;
@@ -163,13 +163,13 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     dsc->finfo.smem_len = dsc->finfo.line_length * dsc->vinfo.yres;
 #else /* LV_LINUX_FBDEV_BSD */
 
-    // Get fixed screen information
+    /* Get fixed screen information*/
     if(ioctl(dsc->fbfd, FBIOGET_FSCREENINFO, &dsc->finfo) == -1) {
         perror("Error reading fixed information");
         return;
     }
 
-    // Get variable screen information
+    /* Get variable screen information*/
     if(ioctl(dsc->fbfd, FBIOGET_VSCREENINFO, &dsc->vinfo) == -1) {
         perror("Error reading variable information");
         return;
@@ -178,18 +178,18 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
 
     LV_LOG_INFO("%dx%d, %dbpp", dsc->vinfo.xres, dsc->vinfo.yres, dsc->vinfo.bits_per_pixel);
 
-    // Figure out the size of the screen in bytes
+    /* Figure out the size of the screen in bytes*/
     dsc->screensize =  dsc->finfo.smem_len; //finfo.line_length * vinfo.yres;
 
-    // Map the device to memory
+    /* Map the device to memory*/
     dsc->fbp = (char *)mmap(0, dsc->screensize, PROT_READ | PROT_WRITE, MAP_SHARED, dsc->fbfd, 0);
     if((intptr_t)dsc->fbp == -1) {
         perror("Error: failed to map framebuffer device to memory");
         return;
     }
 
-    // Don't initialise the memory to retain what's currently displayed / avoid clearing the screen.
-    // This is important for applications that only draw to a subsection of the full framebuffer.
+    /* Don't initialise the memory to retain what's currently displayed / avoid clearing the screen.
+     * This is important for applications that only draw to a subsection of the full framebuffer.*/
 
     LV_LOG_INFO("The framebuffer device was mapped to memory successfully");
 
@@ -257,7 +257,7 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p
     }
 
 #if LV_LINUX_FBDEV_NUTTX && defined(CONFIG_FB_UPDATE)
-    //May be some direct update command is required
+    /*May be some direct update command is required*/
     struct fb_area_s fb_area;
     fb_area.x = area->x1;
     fb_area.y = area->y1;

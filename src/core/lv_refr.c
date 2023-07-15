@@ -891,7 +891,7 @@ static void draw_buf_flush(lv_disp_t * disp)
 {
     /*Flush the rendered content to the display*/
     lv_layer_t * layer = disp->layer_head;
-    //    if(layer->wait_for_finish) layer->wait_for_finish(layer);
+
     while(layer->draw_task_head) {
         lv_draw_dispatch_wait_for_request();
         lv_draw_dispatch();

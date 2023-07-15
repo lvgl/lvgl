@@ -160,7 +160,6 @@ const lv_img_dsc_t img_multilang_avatar_3 = {
     .header.reserved = 0,
     .header.w = 128,
     .header.h = 128,
-    //  .data_size = 16384 * LV_COLOR_FORMAT_ARGB888,
     .data = img_multilang_avatar_3_map,
 };
 

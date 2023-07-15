@@ -51,7 +51,6 @@ const lv_img_dsc_t img_emoji_red_heart = {
     .header.reserved = 0,
     .header.w = 18,
     .header.h = 19,
-    //  .data_size = 342 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data = img_emoji_red_heart_map,
 };
 

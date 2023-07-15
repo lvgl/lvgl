@@ -1306,7 +1306,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
     if(mask_new >= LV_OPA_MAX) return mask_act;
     if(mask_new <= LV_OPA_MIN) return 0;
 
-    return LV_UDIV255(mask_act * mask_new);// >> 8);
+    return LV_UDIV255(mask_act * mask_new);
 }
 
 

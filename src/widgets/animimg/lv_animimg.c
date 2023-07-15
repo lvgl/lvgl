@@ -144,7 +144,8 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     animimg->dsc = NULL;
     animimg->pic_count = -1;
-    //initial animation
+
+    /*initial animation*/
     lv_anim_init(&animimg->anim);
     lv_anim_set_var(&animimg->anim, obj);
     lv_anim_set_time(&animimg->anim, 30);

@@ -600,15 +600,6 @@ gd_get_frame(gd_GIF * gif)
 void
 gd_render_frame(gd_GIF * gif, uint8_t * buffer)
 {
-    //    uint32_t i;
-    //    uint32_t j;
-    //    for(i = 0, j = 0; i < gif->width * gif->height * 3; i+= 3, j+=4) {
-    //        buffer[j + 0] = gif->canvas[i + 2];
-    //        buffer[j + 1] = gif->canvas[i + 1];
-    //        buffer[j + 2] = gif->canvas[i + 0];
-    //        buffer[j + 3] = 0xFF;
-    //    }
-    //    memcpy(buffer, gif->canvas, gif->width * gif->height * 3);
     render_frame_rect(gif, buffer);
 }
 

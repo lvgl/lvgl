@@ -233,9 +233,6 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
 
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
 
-    /*Check the cache first*/
-    //    if(fdsc->cache && letter == fdsc->cache->last_letter) return fdsc->cache->last_glyph_id;
-
     uint16_t i;
     for(i = 0; i < fdsc->cmap_num; i++) {
 
@@ -272,18 +269,9 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             }
         }
 
-        /*Update the cache*/
-        //        if(fdsc->cache) {
-        //            fdsc->cache->last_letter = letter;
-        //            fdsc->cache->last_glyph_id = glyph_id;
-        //        }
         return glyph_id;
     }
 
-    //    if(fdsc->cache) {
-    //        fdsc->cache->last_letter = letter;
-    //        fdsc->cache->last_glyph_id = 0;
-    //    }
     return 0;
 
 }

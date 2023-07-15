@@ -60,8 +60,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
     lv_anim_t a;
     lv_obj_t * obj;
 
-    //    printf("step start: %d\n", state);
-
     switch(state) {
         case -1: {
                 lv_res_t res = lv_mem_test();
@@ -143,13 +141,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_size(obj, 100, 70);
             lv_obj_set_style_bg_img_src(obj, LV_SYMBOL_DUMMY"Text from\nstyle", 0);
             lv_obj_del_async(obj);  /*Delete on next call of `lv_task_handler` (so not now)*/
-
-            //            obj = lv_btn_create(main_page);
-            //            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            //            lv_obj_set_style_bg_img_src(obj, LV_SYMBOL_LEFT);
-            //            lv_obj_set_style_bg_img_opa(obj, LV_OPA_50);
-            //            lv_obj_set_style_bg_img_tiled(obj, true);
-            //            lv_obj_scroll_to_view(obj, LV_ANIM_ON);
             break;
 
         case 5:
@@ -419,7 +410,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
     }
 
-    //    printf("step end: %d\n", state);
     state++;
 }
 

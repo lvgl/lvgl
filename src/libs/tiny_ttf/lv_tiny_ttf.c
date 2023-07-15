@@ -119,7 +119,7 @@ static void * ttf_cache_add(ttf_cache_handle_t handle, int key, int size)
         }
     }
     while(cache->total_size > 0 && (cache->max_size < cache->total_size + size)) {
-        // expire entries
+        /* expire entries*/
         unsigned long long oldest = ttf_cache_get_oldest_age(handle);
         if(oldest == 0) {
             break;
@@ -216,7 +216,7 @@ static void ttf_cache_destroy(ttf_cache_handle_t handle)
     TTF_CACHE_FREE((ttf_cache_t *)handle);
 }
 #if LV_TINY_TTF_FILE_SUPPORT !=0
-// a hydra stream that can be in memory or from a file
+/* a hydra stream that can be in memory or from a file*/
 typedef struct ttf_cb_stream {
     lv_fs_file_t * file;
     const void * data;

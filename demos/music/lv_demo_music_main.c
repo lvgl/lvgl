@@ -409,21 +409,15 @@ static lv_obj_t * create_cont(lv_obj_t * parent)
     lv_obj_t * placeholder1 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder1);
     lv_obj_clear_flag(placeholder1, LV_OBJ_FLAG_CLICKABLE);
-    //    lv_obj_set_style_bg_color(placeholder1, lv_color_hex(0xff0000), 0);
-    //    lv_obj_set_style_bg_opa(placeholder1, LV_OPA_50, 0);
 
     lv_obj_t * placeholder2 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder2);
     lv_obj_clear_flag(placeholder2, LV_OBJ_FLAG_CLICKABLE);
-    //    lv_obj_set_style_bg_color(placeholder2, lv_color_hex(0x00ff00), 0);
-    //    lv_obj_set_style_bg_opa(placeholder2, LV_OPA_50, 0);
 
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
     lv_obj_t * placeholder3 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder3);
     lv_obj_clear_flag(placeholder3, LV_OBJ_FLAG_CLICKABLE);
-    //    lv_obj_set_style_bg_color(placeholder3, lv_color_hex(0x0000ff), 0);
-    //    lv_obj_set_style_bg_opa(placeholder3, LV_OPA_20, 0);
 
     lv_obj_set_size(placeholder1, lv_pct(100), LV_VER_RES);
     lv_obj_set_y(placeholder1, 0);
@@ -863,9 +857,6 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             draw_dsc.p[0].x = center.x + x1_out;
             draw_dsc.p[0].y = center.y + get_sin(di, v);
 
-            //            int32_t x1_in = get_cos(di, r_in);
-            //            draw_dsc.p[1].x = center.x + x1_in;
-            //            draw_dsc.p[1].y = center.y + get_sin(di, r_in);
             di += DEG_STEP - deg_space * 2;
 
             int32_t x2_out = get_cos(di, v);

@@ -1006,29 +1006,9 @@ static void generate_report(void)
     lv_table_set_col_width(table, 1, w  / 4 - 3);
     lv_obj_set_width(table, lv_pct(100));
 
-    //        static lv_style_t style_cell_slow;
-    //        static lv_style_t style_cell_very_slow;
-    //        static lv_style_t style_cell_title;
-    //
-    //        lv_style_init(&style_cell_title);
-    //        lv_style_set_bg_color(&style_cell_title, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_GREY));
-    //        lv_style_set_bg_opa(&style_cell_title, LV_STATE_DEFAULT, LV_OPA_50);
-    //
-    //        lv_style_init(&style_cell_slow);
-    //        lv_style_set_text_color(&style_cell_slow, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
-    //
-    //        lv_style_init(&style_cell_very_slow);
-    //        lv_style_set_text_color(&style_cell_very_slow, LV_STATE_DEFAULT, lv_palette_main(LV_PALETTE_RED));
-
-    //        lv_obj_add_style(table, LV_TABLE_PART_CELL2, &style_cell_slow);
-    //        lv_obj_add_style(table, LV_TABLE_PART_CELL3, &style_cell_very_slow);
-    //        lv_obj_add_style(table, LV_TABLE_PART_CELL4, &style_cell_title);
-
-
     uint16_t row = 0;
     lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, row, 0, "Slow but common cases");
-    //        lv_table_set_cell_type(table, row, 0, 4);
 
     LV_LOG("\r\n"
            "LVGL v%d.%d.%d " LVGL_VERSION_INFO
@@ -1047,11 +1027,6 @@ static void generate_report(void)
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
             lv_table_set_cell_value(table, row, 1, buf);
 
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-
-            //LV_LOG("%s,%s\r\n", scenes[i].name, buf);
-
             row++;
         }
 
@@ -1059,14 +1034,8 @@ static void generate_report(void)
             lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
             lv_table_set_cell_value(table, row, 0, buf);
 
-            //LV_LOG("%s,", buf);
-
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_opa);
             lv_table_set_cell_value(table, row, 1, buf);
-
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-            //LV_LOG("%s\r\n", buf);
 
             row++;
         }
@@ -1090,15 +1059,6 @@ static void generate_report(void)
         lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, scenes[i].fps_normal);
         lv_table_set_cell_value(table, row, 1, buf);
 
-        if(scenes[i].fps_normal < 10) {
-            //                lv_table_set_cell_type(table, row, 0, 3);
-            //                lv_table_set_cell_type(table, row, 1, 3);
-        }
-        else if(scenes[i].fps_normal < 20) {
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-        }
-
         LV_LOG("%s,%s\r\n", scenes[i].name, buf);
 
         row++;
@@ -1112,21 +1072,11 @@ static void generate_report(void)
         lv_table_set_cell_value(table, row, 1, buf);
 
 
-        if(scenes[i].fps_opa < 10) {
-            //                lv_table_set_cell_type(table, row, 0, 3);
-            //                lv_table_set_cell_type(table, row, 1, 3);
-        }
-        else if(scenes[i].fps_opa < 20) {
-            //                lv_table_set_cell_type(table, row, 0, 2);
-            //                lv_table_set_cell_type(table, row, 1, 2);
-        }
-
         LV_LOG("%s\r\n", buf);
 
         row++;
     }
 
-    //        lv_page_set_scrl_layout(page, LV_LAYOUT_COLUMN_LEFT);
 }
 
 

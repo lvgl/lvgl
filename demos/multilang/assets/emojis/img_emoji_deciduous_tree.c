@@ -51,7 +51,6 @@ const lv_img_dsc_t img_emoji_deciduous_tree = {
     .header.reserved = 0,
     .header.w = 16,
     .header.h = 19,
-    //  .data_size = 304 * LV_IMG_PX_SIZE_ALPHA_BYTE,
     .data = img_emoji_deciduous_tree_map,
 };
 

@@ -1492,53 +1492,6 @@ static void chart_event_cb(lv_event_t * e)
 static void shop_chart_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
-    //    lv_event_code_t code = lv_event_get_code(e);
-    //    if(code == LV_EVENT_DRAW_PART_BEGIN) {
-    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-    //        /*Set the markers' text*/
-    //        if(dsc->part == LV_PART_TICKS && dsc->id == LV_CHART_AXIS_PRIMARY_X) {
-    //            const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-    //            lv_snprintf(dsc->text, dsc->text_length, "%s", month[dsc->value]);
-    //        }
-    //        if(dsc->part == LV_PART_ITEMS) {
-    //            dsc->rect_dsc->bg_opa = LV_OPA_TRANSP; /*We will draw it later*/
-    //        }
-    //    }
-    //    if(code == LV_EVENT_DRAW_PART_END) {
-    //        lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-    //        /*Add the faded area before the lines are drawn */
-    //        if(dsc->part == LV_PART_ITEMS) {
-    //            static const uint32_t devices[10] = {32, 43, 21, 56, 29, 36, 19, 25, 62, 35};
-    //            static const uint32_t clothes[10] = {12, 19, 23, 31, 27, 32, 32, 11, 21, 32};
-    //            static const uint32_t services[10] = {56, 38, 56, 13, 44, 32, 49, 64, 17, 33};
-    //
-    //            lv_draw_rect_dsc_t draw_rect_dsc;
-    //            lv_draw_rect_dsc_init(&draw_rect_dsc);
-    //
-    //            lv_coord_t h = lv_area_get_height(dsc->draw_area);
-    //
-    //            lv_area_t a;
-    //            a.x1 = dsc->draw_area->x1;
-    //            a.x2 = dsc->draw_area->x2;
-    //
-    //            a.y1 = dsc->draw_area->y1;
-    //            a.y2 = a.y1 + 4 + (devices[dsc->id] * h) / 100; /*+4 to overlap the radius*/
-    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_RED);
-    //            draw_rect_dsc.radius = 4;
-    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-    //
-    //            a.y1 = a.y2 - 4;                                    /*-4 to overlap the radius*/
-    //            a.y2 = a.y1 + (clothes[dsc->id] * h) / 100;
-    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_BLUE);
-    //            draw_rect_dsc.radius = 0;
-    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-    //
-    //            a.y1 = a.y2;
-    //            a.y2 = a.y1 + (services[dsc->id] * h) / 100;
-    //            draw_rect_dsc.bg_color = lv_palette_main(LV_PALETTE_GREEN);
-    //            lv_draw_rect(dsc->layer, &draw_rect_dsc, &a);
-    //        }
-    //    }
 }
 
 
