@@ -14,6 +14,7 @@ extern "C" {
  *    INCLUDES
  *********************/
 #include "../core/lv_obj.h"
+#include "../disp/lv_disp.h"
 
 /*********************
  *    DEFINES
@@ -24,15 +25,14 @@ extern "C" {
  **********************/
 
 struct _lv_theme_t;
-struct _lv_disp_t;
-
-typedef void (*lv_theme_apply_cb_t)(struct _lv_theme_t *, lv_obj_t *);
+typedef struct _lv_theme_t lv_theme_t;
+typedef void (*lv_theme_apply_cb_t)(lv_theme_t *, lv_obj_t *);
 
 typedef struct _lv_theme_t {
     lv_theme_apply_cb_t apply_cb;
-    struct _lv_theme_t * parent;    /**< Apply the current theme's style on top of this theme.*/
+    lv_theme_t * parent;    /**< Apply the current theme's style on top of this theme.*/
     void * user_data;
-    struct _lv_disp_t * disp;
+    lv_disp_t * disp;
     lv_color_t color_primary;
     lv_color_t color_secondary;
     const lv_font_t * font_small;

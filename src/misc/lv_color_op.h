@@ -27,13 +27,15 @@ extern "C" {
  **********************/
 
 struct _lv_color_filter_dsc_t;
+typedef struct _lv_color_filter_dsc_t lv_color_filter_dsc_t;
 
-typedef lv_color_t (*lv_color_filter_cb_t)(const struct _lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
 
-typedef struct _lv_color_filter_dsc_t {
+typedef lv_color_t (*lv_color_filter_cb_t)(const lv_color_filter_dsc_t *, lv_color_t, lv_opa_t);
+
+struct _lv_color_filter_dsc_t {
     lv_color_filter_cb_t filter_cb;
     void * user_data;
-} lv_color_filter_dsc_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

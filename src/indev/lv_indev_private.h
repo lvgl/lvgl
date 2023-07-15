@@ -14,6 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_indev.h"
+#include "../core/lv_obj.h"
+#include "../core/lv_group.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -23,6 +26,7 @@ extern "C" {
  **********************/
 
 struct _lv_indev_t;
+typedef struct _lv_indev_t lv_indev_t;
 
 struct _lv_indev_t {
     /**< Input device type*/
@@ -33,7 +37,7 @@ struct _lv_indev_t {
 
     /** Called when an action happened on the input device.
      * The second parameter is the event from `lv_event_t`*/
-    void (*feedback_cb)(struct _lv_indev_t * indev, uint8_t event_code);
+    void (*feedback_cb)(lv_indev_t * indev, uint8_t event_code);
 
     lv_indev_state_t state; /**< Current state of the input device.*/
 
@@ -82,10 +86,10 @@ struct _lv_indev_t {
         lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_SCROLL_LIMIT*/
         lv_point_t scroll_throw_vect;
         lv_point_t scroll_throw_vect_ori;
-        struct _lv_obj_t * act_obj;      /*The object being pressed*/
-        struct _lv_obj_t * last_obj;     /*The last object which was pressed*/
-        struct _lv_obj_t * scroll_obj;   /*The object being scrolled*/
-        struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
+        lv_obj_t * act_obj;      /*The object being pressed*/
+        lv_obj_t * last_obj;     /*The last object which was pressed*/
+        lv_obj_t * scroll_obj;   /*The object being scrolled*/
+        lv_obj_t * last_pressed; /*The lastly pressed object*/
         lv_area_t scroll_area;
         lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
 
@@ -100,8 +104,8 @@ struct _lv_indev_t {
         uint32_t last_key;
     } keypad;
 
-    struct _lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
-    struct _lv_group_t * group;    /**< Keypad destination group*/
+    lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
+    lv_group_t * group;    /**< Keypad destination group*/
     const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
 };

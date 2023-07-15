@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "lv_math.h"
+#include "lv_timer.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -80,17 +81,17 @@ LV_EXPORT_CONST_INT(LV_ANIM_PLAYTIME_INFINITE);
  *      TYPEDEFS
  **********************/
 
+struct _lv_anim_t;
+typedef struct _lv_anim_t lv_anim_t;
+
 /** Can be used to indicate if animations are enabled or disabled in a case*/
 typedef enum {
     LV_ANIM_OFF,
     LV_ANIM_ON,
 } lv_anim_enable_t;
 
-struct _lv_anim_t;
-struct _lv_timer_t;
-
 /** Get the current value during an animation*/
-typedef int32_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
+typedef int32_t (*lv_anim_path_cb_t)(const lv_anim_t *);
 
 /** Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
@@ -102,19 +103,19 @@ typedef void (*lv_anim_exec_xcb_t)(void *, int32_t);
 
 /** Same as `lv_anim_exec_xcb_t` but receives `lv_anim_t *` as the first parameter.
  * It's more consistent but less convenient. Might be used by binding generator functions.*/
-typedef void (*lv_anim_custom_exec_cb_t)(struct _lv_anim_t *, int32_t);
+typedef void (*lv_anim_custom_exec_cb_t)(lv_anim_t *, int32_t);
 
 /** Callback to call when the animation is ready*/
-typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
+typedef void (*lv_anim_ready_cb_t)(lv_anim_t *);
 
 /** Callback to call when the animation really stars (considering `delay`)*/
-typedef void (*lv_anim_start_cb_t)(struct _lv_anim_t *);
+typedef void (*lv_anim_start_cb_t)(lv_anim_t *);
 
 /** Callback used when the animation values are relative to get the current value*/
-typedef int32_t (*lv_anim_get_value_cb_t)(struct _lv_anim_t *);
+typedef int32_t (*lv_anim_get_value_cb_t)(lv_anim_t *);
 
 /** Callback used when the animation is deleted*/
-typedef void (*lv_anim_deleted_cb_t)(struct _lv_anim_t *);
+typedef void (*lv_anim_deleted_cb_t)(lv_anim_t *);
 
 typedef struct _lv_anim_bezier3_para_t {
     int16_t x1;
@@ -124,7 +125,7 @@ typedef struct _lv_anim_bezier3_para_t {
 } lv_anim_bezier3_para_t; /**< Parameter used when path is custom_bezier*/
 
 /** Describes an animation*/
-typedef struct _lv_anim_t {
+struct _lv_anim_t {
     void * var;                          /**<Variable to animate*/
     lv_anim_exec_xcb_t exec_cb;          /**< Function to execute to animate*/
     lv_anim_start_cb_t start_cb;         /**< Call it when the animation is starts (considering `delay`)*/
@@ -153,7 +154,7 @@ typedef struct _lv_anim_t {
     uint8_t playback_now : 1; /**< Play back is in progress*/
     uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
     uint8_t start_cb_called : 1;    /**< Indicates that the `start_cb` was already called*/
-} lv_anim_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -366,7 +367,7 @@ static inline void lv_anim_set_user_data(lv_anim_t * a, void * user_data)
  */
 static inline void lv_anim_set_bezier3_param(lv_anim_t * a, int16_t x1, int16_t y1, int16_t x2, int16_t y2)
 {
-    struct _lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
+    lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
 
     para->x1 = x1;
     para->x2 = x2;
@@ -455,7 +456,7 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb);
  * Get global animation refresher timer.
  * @return pointer to the animation refresher timer.
  */
-struct _lv_timer_t * lv_anim_get_timer(void);
+lv_timer_t * lv_anim_get_timer(void);
 
 /**
  * Delete an animation by getting the animated variable from `a`.

@@ -29,8 +29,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_draw_img_dsc_t;
 struct _lv_disp_t;
+struct _lv_layer_t;
+typedef struct _lv_layer_t lv_layer_t;
 
 typedef enum {
     LV_DRAW_TASK_TYPE_FILL,
@@ -89,7 +90,7 @@ typedef struct _lv_draw_unit_t {
     /**
      * The target_layer on which drawing should happen
      */
-    struct _lv_layer_t * target_layer;
+    lv_layer_t * target_layer;
 
     const lv_area_t * clip_area;
 
@@ -103,11 +104,11 @@ typedef struct _lv_draw_unit_t {
      *                      -1:     There where no available draw tasks at all.
      *                              Also means to no call the dispatcher of the other draw units as there is no dra task to tkae
      */
-    int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
+    int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 } lv_draw_unit_t;
 
 
-typedef struct _lv_layer_t  {
+struct _lv_layer_t  {
     /**
      *  Pointer to a buffer to draw into
      */
@@ -147,7 +148,7 @@ typedef struct _lv_layer_t  {
      *       but can have different x and y position.
      * @note dest_area and src_area must be clipped to the real dimensions of the buffers
      */
-    void (*buffer_copy)(struct _lv_layer_t * target_layer, void * dest_buf, lv_coord_t dest_stride,
+    void (*buffer_copy)(lv_layer_t * target_layer, void * dest_buf, lv_coord_t dest_stride,
                         const lv_area_t * dest_area,
                         void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
@@ -155,20 +156,20 @@ typedef struct _lv_layer_t  {
      * Convert the content of `target_layer->buf` to `target_layer->color_format`
      * @param target_layer
      */
-    void (*buffer_convert)(struct _lv_layer_t * layer);
+    void (*buffer_convert)(lv_layer_t * layer);
 
-    void (*buffer_clear)(struct _lv_layer_t * target_layer, const lv_area_t * a);
+    void (*buffer_clear)(lv_layer_t * target_layer, const lv_area_t * a);
 
     /**
      * Linked list of draw tasks
      */
     lv_draw_task_t * draw_task_head;
 
-    struct _lv_layer_t * parent;
-    struct _lv_layer_t * next;
+    lv_layer_t * parent;
+    lv_layer_t * next;
     bool all_tasks_added;
     void * user_data;
-} lv_layer_t;
+};
 
 typedef struct {
     struct _lv_obj_t * obj;

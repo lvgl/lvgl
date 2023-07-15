@@ -23,6 +23,18 @@ extern "C" {
 #include "../misc/lv_color.h"
 #include "../misc/lv_assert.h"
 
+/*lv_obj_t is needed for below headers, declare it firstly*/
+struct _lv_obj_t;
+typedef struct _lv_obj_t lv_obj_t;
+
+#include "lv_obj_scroll.h"
+#include "lv_obj_tree.h"
+#include "lv_obj_pos.h"
+#include "lv_obj_draw.h"
+#include "lv_obj_class.h"
+#include "lv_obj_event.h"
+#include "lv_group.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -31,7 +43,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_obj_t;
 
 /**
  * Possible states of a widget.
@@ -134,15 +145,8 @@ typedef _lv_obj_flag_t lv_obj_flag_t;
 typedef uint32_t lv_obj_flag_t;
 #endif /*DOXYGEN*/
 
-
-#include "lv_obj_tree.h"
-#include "lv_obj_pos.h"
-#include "lv_obj_scroll.h"
+/*It needs lv_part_t and lv_obj_flag_t defined above.*/
 #include "lv_obj_style.h"
-#include "lv_obj_draw.h"
-#include "lv_obj_class.h"
-#include "lv_obj_event.h"
-#include "lv_group.h"
 
 /**
  * Make the base object's class publicly available.
@@ -154,7 +158,7 @@ extern const lv_obj_class_t lv_obj_class;
  * They are allocated automatically if any elements is set.
  */
 typedef struct {
-    struct _lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
+    lv_obj_t ** children;       /**< Store the pointer of the children in an array.*/
     uint32_t child_cnt;                 /**< Number of children*/
     lv_group_t * group_p;
     lv_event_list_t event_list;
@@ -171,9 +175,9 @@ typedef struct {
     uint8_t layer_type : 2;    /**< Cache the layer type here. Element of @lv_intermediate_layer_type_t */
 } _lv_obj_spec_attr_t;
 
-typedef struct _lv_obj_t {
+struct _lv_obj_t {
     const lv_obj_class_t * class_p;
-    struct _lv_obj_t * parent;
+    lv_obj_t * parent;
     _lv_obj_spec_attr_t * spec_attr;
     _lv_obj_style_t * styles;
     void * user_data;
@@ -186,7 +190,7 @@ typedef struct _lv_obj_t {
     uint16_t style_cnt  : 6;
     uint16_t h_layout   : 1;
     uint16_t w_layout   : 1;
-} lv_obj_t;
+};
 
 /**********************
  * GLOBAL PROTOTYPES

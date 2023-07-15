@@ -14,8 +14,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stdbool.h>
+#include "lv_obj.h"
+#include "lv_obj_class.h"
 #include "../misc/lv_event.h"
 #include "../indev/lv_indev.h"
+#include "../draw/lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -24,9 +27,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-struct _lv_obj_t;
-struct _lv_obj_class_t;
 
 /**
  * Used as the event parameter of ::LV_EVENT_HIT_TEST to check if an `point` can click the object or not.
@@ -69,7 +69,7 @@ typedef struct {
  * @param param         arbitrary data depending on the widget type and the event. (Usually `NULL`)
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event_code
  */
-lv_res_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, void * param);
+lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param);
 
 /**
  * Used by the widgets internally to call the ancestor widget types's event handler
@@ -77,7 +77,7 @@ lv_res_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, v
  * @param e         pointer to the event descriptor
  * @return          LV_RES_OK: the target object was not deleted in the event; LV_RES_INV: it was deleted in the event_code
  */
-lv_res_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * e);
+lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e);
 
 /**
  * Get the current target of the event. It's the object which event handler being called.
@@ -85,14 +85,14 @@ lv_res_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * 
  * @param e     pointer to the event descriptor
  * @return      the target of the event_code
  */
-struct _lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e);
+lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e);
 
 /**
  * Get the object originally targeted by the event. It's the same even if the event is bubbled.
  * @param e     pointer to the event descriptor
  * @return      pointer to the original target of the event_code
  */
-struct _lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
+lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
 
 /**
  * Add an event handler function for an object.
@@ -103,14 +103,14 @@ struct _lv_obj_t * lv_event_get_target_obj(lv_event_t * e);
  * @param event_cb  the new event function
  * @param           user_data custom data data will be available in `event_cb`
  */
-void lv_obj_add_event(struct _lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
+void lv_obj_add_event(lv_obj_t * obj, lv_event_cb_t event_cb, lv_event_code_t filter,
                       void * user_data);
 
-uint32_t lv_obj_get_event_count(struct _lv_obj_t * obj);
+uint32_t lv_obj_get_event_count(lv_obj_t * obj);
 
-lv_event_dsc_t * lv_obj_get_event_dsc(struct _lv_obj_t * obj, uint32_t index);
+lv_event_dsc_t * lv_obj_get_event_dsc(lv_obj_t * obj, uint32_t index);
 
-bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
+bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index);
 
 /**
  * Get the input device passed as parameter to indev related events.

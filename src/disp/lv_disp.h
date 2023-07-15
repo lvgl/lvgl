@@ -16,7 +16,13 @@ extern "C" {
 #include "../misc/lv_timer.h"
 #include "../misc/lv_event.h"
 #include "../misc/lv_color.h"
+
+struct _lv_disp_t;
+typedef struct _lv_disp_t lv_disp_t;
+
 #include "../draw/lv_draw.h"
+#include "../core/lv_obj.h"
+#include "../themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -29,11 +35,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-struct _lv_obj_t;
-struct _lv_theme_t;
-struct _lv_disp_t;
-typedef struct _lv_disp_t lv_disp_t;
 
 typedef enum {
     LV_DISP_ROTATION_0 = 0,
@@ -84,7 +85,7 @@ typedef enum {
 } lv_scr_load_anim_t;
 
 
-typedef void (*lv_disp_flush_cb_t)(struct _lv_disp_t * disp, const lv_area_t * area, uint8_t * px_map);
+typedef void (*lv_disp_flush_cb_t)(lv_disp_t * disp, const lv_area_t * area, uint8_t * px_map);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -315,7 +316,7 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp);
  *                  (NULL to use the default screen)
  * @return          pointer to the active screen object (loaded by 'lv_scr_load()')
  */
-struct _lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp);
+lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp);
 
 /**
  * Return with a pointer to the previous screen. Only used during screen transitions.
@@ -323,27 +324,27 @@ struct _lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp);
  *                  (NULL to use the default screen)
  * @return          pointer to the previous screen object or NULL if not used now
  */
-struct _lv_obj_t * lv_disp_get_scr_prev(lv_disp_t * disp);
+lv_obj_t * lv_disp_get_scr_prev(lv_disp_t * disp);
 
 /**
  * Make a screen active
  * @param scr       pointer to a screen
  */
-void lv_disp_load_scr(struct _lv_obj_t * scr);
+void lv_disp_load_scr(lv_obj_t * scr);
 
 /**
  * Return the top layer. The top layer is the same on all screens and it is above the normal screen layer.
  * @param disp      pointer to display which top layer should be get. (NULL to use the default screen)
  * @return          pointer to the top layer object
  */
-struct _lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
+lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
 
 /**
  * Return the sys. layer. The system layer is the same on all screen and it is above the normal screen and the top layer.
  * @param disp      pointer to display which sys. layer should be retrieved. (NULL to use the default screen)
  * @return          pointer to the sys layer object
  */
-struct _lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
+lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 
 
 /**
@@ -352,7 +353,7 @@ struct _lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
  * @param disp      pointer to display (NULL to use the default screen)
  * @return          pointer to the bottom layer object
  */
-struct _lv_obj_t * lv_disp_get_layer_bottom(lv_disp_t * disp);
+lv_obj_t * lv_disp_get_layer_bottom(lv_disp_t * disp);
 
 
 /**
@@ -363,14 +364,14 @@ struct _lv_obj_t * lv_disp_get_layer_bottom(lv_disp_t * disp);
  * @param delay     delay before the transition
  * @param auto_del  true: automatically delete the old screen
  */
-void lv_scr_load_anim(struct _lv_obj_t * scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay,
+void lv_scr_load_anim(lv_obj_t * scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay,
                       bool auto_del);
 
 /**
  * Get the active screen of the default display
  * @return          pointer to the active screen
  */
-static inline struct _lv_obj_t * lv_scr_act(void)
+static inline lv_obj_t * lv_scr_act(void)
 {
     return lv_disp_get_scr_act(lv_disp_get_default());
 }
@@ -379,7 +380,7 @@ static inline struct _lv_obj_t * lv_scr_act(void)
  * Get the top layer  of the default display
  * @return          pointer to the top layer
  */
-static inline struct _lv_obj_t * lv_layer_top(void)
+static inline lv_obj_t * lv_layer_top(void)
 {
     return lv_disp_get_layer_top(lv_disp_get_default());
 }
@@ -388,7 +389,7 @@ static inline struct _lv_obj_t * lv_layer_top(void)
  * Get the system layer  of the default display
  * @return          pointer to the sys layer
  */
-static inline struct _lv_obj_t * lv_layer_sys(void)
+static inline lv_obj_t * lv_layer_sys(void)
 {
     return lv_disp_get_layer_sys(lv_disp_get_default());
 }
@@ -397,7 +398,7 @@ static inline struct _lv_obj_t * lv_layer_sys(void)
  * Get the bottom layer  of the default display
  * @return          pointer to the bottom layer
  */
-static inline struct _lv_obj_t * lv_layer_bottom(void)
+static inline lv_obj_t * lv_layer_bottom(void)
 {
     return lv_disp_get_layer_bottom(lv_disp_get_default());
 }
@@ -406,7 +407,7 @@ static inline struct _lv_obj_t * lv_layer_bottom(void)
  * Load a screen on the default display
  * @param scr       pointer to a screen
  */
-static inline void lv_scr_load(struct _lv_obj_t * scr)
+static inline void lv_scr_load(lv_obj_t * scr)
 {
     lv_disp_load_scr(scr);
 }
@@ -445,14 +446,14 @@ lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * param
  * @param disp      pointer to a display
  * @param th        pointer to a theme
  */
-void lv_disp_set_theme(lv_disp_t * disp, struct _lv_theme_t * th);
+void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th);
 
 /**
  * Get the theme of a display
  * @param disp      pointer to a display
  * @return          the display's theme (can be NULL)
  */
-struct _lv_theme_t * lv_disp_get_theme(lv_disp_t * disp);
+lv_theme_t * lv_disp_get_theme(lv_disp_t * disp);
 
 /**
  * Get elapsed time since last user activity on a display (e.g. click)
