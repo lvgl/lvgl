@@ -263,10 +263,10 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * obj)
 
 uint16_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
-    LV_UNUSED(obj);
     LV_ASSERT_NULL(ser);
+    lv_chart_t * chart  = (lv_chart_t *)obj;
 
-    return ser->start_point;
+    return chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 }
 
 void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint16_t id, lv_point_t * p_out)
@@ -294,32 +294,34 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
     }
     else if(chart->type == LV_CHART_TYPE_BAR) {
         uint32_t ser_cnt = _lv_ll_get_len(&chart->series_ll);
-        int32_t ser_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
-                                                                LV_PART_ITEMS) * chart->zoom_x) >> 8; /*Gap between the column on the ~same X*/
-        int32_t block_gap = ((int32_t)lv_obj_get_style_pad_column(obj,
-                                                                  LV_PART_MAIN) * chart->zoom_x) >> 8;  /*Gap between the column on ~adjacent X*/
+        int32_t ser_gap = ((int32_t)lv_obj_get_style_pad_column(obj, LV_PART_ITEMS) * chart->zoom_x) >> 8;
+
+        /*Gap between the columns on adjacent X ticks*/
+        int32_t block_gap = ((int32_t)lv_obj_get_style_pad_column(obj, LV_PART_MAIN) * chart->zoom_x) >> 8;
+
         lv_coord_t block_w = (w - ((chart->point_cnt - 1) * block_gap)) / chart->point_cnt;
-        lv_coord_t col_w = (block_w - (ser_cnt - 1) * ser_gap) / ser_cnt;
 
         p_out->x = (int32_t)((int32_t)(w - block_w) * id) / (chart->point_cnt - 1);
         lv_chart_series_t * ser_i = NULL;
+        uint32_t ser_idx = 0;
         _LV_LL_READ_BACK(&chart->series_ll, ser_i) {
             if(ser_i == ser) break;
-            p_out->x += col_w + ser_gap;
+            ser_idx++;
         }
 
+        p_out->x = (int32_t)((int32_t)(w + block_gap) * id) / chart->point_cnt;
+        p_out->x += block_w * ser_idx / ser_cnt;
+
+        lv_coord_t col_w = (block_w - (ser_gap * (ser_cnt - 1))) / ser_cnt;
         p_out->x += col_w / 2;
-    }
-    else {
-        p_out->x = 0;
-        p_out->y = 0;
-        return;
     }
 
     lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     p_out->x += lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     p_out->x -= lv_obj_get_scroll_left(obj);
 
+    uint32_t start_point = lv_chart_get_x_start_point(obj, ser);
+    id = ((int32_t)start_point + id) % chart->point_cnt;
     int32_t temp_y = 0;
     temp_y = (int32_t)((int32_t)ser->y_points[id] - chart->ymin[ser->y_axis_sec]) * h;
     temp_y = temp_y / (chart->ymax[ser->y_axis_sec] - chart->ymin[ser->y_axis_sec]);
@@ -901,7 +903,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.base.id2 = 0;
         point_dsc_default.base.id2 = 0;
 
-        lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        lv_coord_t start_point = lv_chart_get_x_start_point(obj, ser);
 
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
@@ -1039,7 +1041,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.color = ser->color;
         point_dsc_default.bg_color = ser->color;
 
-        lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+        lv_coord_t start_point = lv_chart_get_x_start_point(obj, ser);
 
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
@@ -1167,7 +1169,8 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
         /*Draw the current point of all data line*/
         _LV_LL_READ_BACK(&chart->series_ll, ser) {
             if(ser->hidden) continue;
-            lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+
+            lv_coord_t start_point = lv_chart_get_x_start_point(obj, ser);
 
             col_a.x1 = x_act;
             col_a.x2 = col_a.x1 + col_w - 1;
