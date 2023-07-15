@@ -56,19 +56,17 @@ void lv_example_canvas_6(void);
 void lv_example_canvas_7(void);
 
 void lv_example_chart_1(void);
-void lv_example_chart_2(void);
-void lv_example_chart_3(void);
+//void lv_example_chart_2(void);
+//void lv_example_chart_3(void);
 void lv_example_chart_4(void);
 void lv_example_chart_5(void);
 void lv_example_chart_6(void);
 void lv_example_chart_7(void);
-void lv_example_chart_8(void);
+//void lv_example_chart_8(void);
 void lv_example_chart_9(void);
 
 void lv_example_checkbox_1(void);
 void lv_example_checkbox_2(void);
-
-void lv_example_colorwheel_1(void);
 
 void lv_example_dropdown_1(void);
 void lv_example_dropdown_2(void);
@@ -87,7 +85,7 @@ void lv_example_keyboard_2(void);
 void lv_example_label_1(void);
 void lv_example_label_2(void);
 void lv_example_label_3(void);
-void lv_example_label_4(void);
+//void lv_example_label_4(void);
 void lv_example_label_5(void);
 
 void lv_example_led_1(void);
@@ -105,7 +103,7 @@ void lv_example_menu_5(void);
 
 void lv_example_meter_1(void);
 void lv_example_meter_2(void);
-void lv_example_meter_3(void);
+//void lv_example_meter_3(void);
 void lv_example_meter_4(void);
 
 void lv_example_msgbox_1(void);
@@ -115,7 +113,7 @@ void lv_example_obj_2(void);
 
 void lv_example_roller_1(void);
 void lv_example_roller_2(void);
-void lv_example_roller_3(void);
+//void lv_example_roller_3(void);
 
 void lv_example_slider_1(void);
 void lv_example_slider_2(void);
