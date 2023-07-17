@@ -22,9 +22,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_OBJ_FLAG_FLEX_IN_NEW_TRACK   LV_OBJ_FLAG_LAYOUT_1
-LV_EXPORT_CONST_INT(LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-
 #define _LV_FLEX_COLUMN        (1 << 0)
 #define _LV_FLEX_WRAP       (1 << 2)
 #define _LV_FLEX_REVERSE    (1 << 3)
