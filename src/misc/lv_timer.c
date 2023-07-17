@@ -23,6 +23,13 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    bool lv_timer_run;
+    uint8_t idle_last;
+    bool timer_deleted;
+    bool timer_created;
+    uint32_t timer_time_until_next;
+} lv_timer_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -34,11 +41,7 @@ static void lv_timer_handler_resume(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_timer_run = false;
-static uint8_t idle_last = 0;
-static bool timer_deleted;
-static bool timer_created;
-static uint32_t timer_time_until_next;
+static lv_timer_state_t state;
 
 /**********************
  *      MACROS
@@ -80,7 +83,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     }
     already_running = true;
 
-    if(lv_timer_run == false) {
+    if(state.lv_timer_run == false) {
         already_running = false; /*Release mutex*/
         return 1;
     }
@@ -103,8 +106,8 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     /*Run all timer from the list*/
     lv_timer_t * next;
     do {
-        timer_deleted             = false;
-        timer_created             = false;
+        state.timer_deleted             = false;
+        state.timer_created             = false;
         LV_GC_ROOT(_lv_timer_act) = _lv_ll_get_head(&LV_GC_ROOT(_lv_timer_ll));
         while(LV_GC_ROOT(_lv_timer_act)) {
             /*The timer might be deleted if it runs only once ('repeat_count = 1')
@@ -113,7 +116,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
 
             if(lv_timer_exec(LV_GC_ROOT(_lv_timer_act))) {
                 /*If a timer was created or deleted then this or the next item might be corrupted*/
-                if(timer_created || timer_deleted) {
+                if(state.timer_created || state.timer_deleted) {
                     TIMER_TRACE("Start from the first timer again because a timer was created or deleted");
                     break;
                 }
@@ -138,13 +141,13 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
     busy_time += lv_tick_elaps(handler_start);
     uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
     if(idle_period_time >= IDLE_MEAS_PERIOD) {
-        idle_last         = (busy_time * 100) / idle_period_time;  /*Calculate the busy percentage*/
-        idle_last         = idle_last > 100 ? 0 : 100 - idle_last; /*But we need idle time*/
+        state.idle_last         = (busy_time * 100) / idle_period_time;  /*Calculate the busy percentage*/
+        state.idle_last         = state.idle_last > 100 ? 0 : 100 - state.idle_last; /*But we need idle time*/
         busy_time         = 0;
         idle_period_start = lv_tick_get();
     }
 
-    timer_time_until_next = time_until_next;
+    state.timer_time_until_next = time_until_next;
     already_running = false; /*Release the mutex*/
 
     TIMER_TRACE("finished (%" LV_PRIu32 " ms until the next timer call)", time_until_next);
@@ -156,7 +159,7 @@ LV_ATTRIBUTE_TIMER_HANDLER void lv_timer_periodic_handler(void)
 {
     static uint32_t last_tick = 0;
 
-    if(lv_tick_elaps(last_tick) >= timer_time_until_next) {
+    if(lv_tick_elaps(last_tick) >= state.timer_time_until_next) {
         TIMER_TRACE("calling lv_timer_handler()");
         lv_timer_handler();
         last_tick = lv_tick_get();
@@ -197,7 +200,7 @@ lv_timer_t * lv_timer_create(lv_timer_cb_t timer_xcb, uint32_t period, void * us
     new_timer->last_run = lv_tick_get();
     new_timer->user_data = user_data;
 
-    timer_created = true;
+    state.timer_created = true;
 
     lv_timer_handler_resume();
 
@@ -221,7 +224,7 @@ void lv_timer_set_cb(lv_timer_t * timer, lv_timer_cb_t timer_cb)
 void lv_timer_del(lv_timer_t * timer)
 {
     _lv_ll_remove(&LV_GC_ROOT(_lv_timer_ll), timer);
-    timer_deleted = true;
+    state.timer_deleted = true;
 
     lv_free(timer);
 }
@@ -287,7 +290,7 @@ void lv_timer_reset(lv_timer_t * timer)
  */
 void lv_timer_enable(bool en)
 {
-    lv_timer_run = en;
+    state.lv_timer_run = en;
     if(en) lv_timer_handler_resume();
 }
 
@@ -297,7 +300,7 @@ void lv_timer_enable(bool en)
  */
 uint8_t lv_timer_get_idle(void)
 {
-    return idle_last;
+    return state.idle_last;
 }
 
 /**
@@ -306,7 +309,7 @@ uint8_t lv_timer_get_idle(void)
  */
 uint32_t lv_timer_get_time_until_next(void)
 {
-    return timer_time_until_next;
+    return state.timer_time_until_next;
 }
 
 /**
@@ -345,7 +348,7 @@ static bool lv_timer_exec(lv_timer_t * timer)
 
         if(timer->timer_cb && original_repeat_count != 0) timer->timer_cb(timer);
 
-        if(!timer_deleted) {
+        if(!state.timer_deleted) {
             TIMER_TRACE("timer callback %p finished", *((void **)&timer->timer_cb));
         }
         else {
@@ -356,7 +359,7 @@ static bool lv_timer_exec(lv_timer_t * timer)
         exec = true;
     }
 
-    if(timer_deleted == false) { /*The timer might be deleted by itself as well*/
+    if(state.timer_deleted == false) { /*The timer might be deleted by itself as well*/
         if(timer->repeat_count == 0) { /*The repeat count is over, delete the timer*/
             TIMER_TRACE("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
             lv_timer_del(timer);
@@ -386,5 +389,5 @@ static uint32_t lv_timer_time_remaining(lv_timer_t * timer)
 static void lv_timer_handler_resume(void)
 {
     /*If there is a timer which is ready to run then resume the timer loop*/
-    timer_time_until_next = 0;
+    state.timer_time_until_next = 0;
 }
