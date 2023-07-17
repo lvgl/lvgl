@@ -29,7 +29,7 @@ static void lv_ime_pinyin_style_change_event(lv_event_t * e);
 static void lv_ime_pinyin_kb_event(lv_event_t * e);
 static void lv_ime_pinyin_cand_panel_event(lv_event_t * e);
 
-static void init_pinyin_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict);
+static void init_pinyin_dict(lv_obj_t * obj, const lv_pinyin_dict_t * dict);
 static void pinyin_input_proc(lv_obj_t * obj);
 static void pinyin_page_proc(lv_obj_t * obj, uint16_t btn);
 static char * pinyin_search_matching(lv_obj_t * obj, char * py_str, uint16_t * cand_num);
@@ -508,12 +508,7 @@ lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj)
     return pinyin_ime->cand_panel;
 }
 
-/**
- * Set the dictionary of Pinyin input method.
- * @param obj  pointer to a Pinyin input method object
- * @return     pointer to the Pinyin input method dictionary
- */
-lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj)
+const lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -884,7 +879,7 @@ static void lv_ime_pinyin_style_change_event(lv_event_t * e)
 }
 
 
-static void init_pinyin_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict)
+static void init_pinyin_dict(lv_obj_t * obj, const lv_pinyin_dict_t * dict)
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -923,7 +918,7 @@ static char * pinyin_search_matching(lv_obj_t * obj, char * py_str, uint16_t * c
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    lv_pinyin_dict_t * cpHZ;
+    const lv_pinyin_dict_t * cpHZ;
     uint8_t index, len = 0, offset;
     volatile uint8_t count = 0;
 
@@ -1075,7 +1070,7 @@ static bool pinyin_k9_is_valid_py(lv_obj_t * obj, char * py_str)
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    lv_pinyin_dict_t * cpHZ = NULL;
+    const lv_pinyin_dict_t * cpHZ = NULL;
     uint8_t index = 0, len = 0, offset = 0;
     volatile uint8_t count = 0;
 
