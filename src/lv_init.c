@@ -9,7 +9,7 @@
 #include "core/lv_obj.h"
 #include "disp/lv_disp_private.h"
 #include "indev/lv_indev_private.h"
-#include "layouts/lv_layouts.h"
+#include "layouts/lv_layout.h"
 #include "libs/bmp/lv_bmp.h"
 #include "libs/ffmpeg/lv_ffmpeg.h"
 #include "libs/freetype/lv_freetype.h"
@@ -75,6 +75,7 @@ void lv_init(void)
 
     lv_mem_init();
 
+
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_profiler_builtin_config_t profiler_config;
     lv_profiler_builtin_config_init(&profiler_config);
@@ -84,6 +85,8 @@ void lv_init(void)
     _lv_timer_core_init();
 
     _lv_fs_init();
+
+    _lv_layout_init();
 
     _lv_anim_core_init();
 
@@ -145,15 +148,6 @@ void lv_init(void)
 
 #if LV_LOG_LEVEL == LV_LOG_LEVEL_TRACE
     LV_LOG_WARN("Log level is set to 'Trace' which makes LVGL much slower");
-#endif
-
-
-#if LV_USE_FLEX
-    lv_flex_init();
-#endif
-
-#if LV_USE_GRID
-    lv_grid_init();
 #endif
 
 #if LV_USE_MSG

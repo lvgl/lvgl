@@ -134,6 +134,24 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_BLEND_MODE] =                LV_STYLE_PROP_FLAG_LAYER_UPDATE,
     [LV_STYLE_LAYOUT] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+
+    [LV_STYLE_FLEX_FLOW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_MAIN_PLACE] =              LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_CROSS_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_TRACK_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_GROW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+
+    [LV_STYLE_GRID_COLUMN_DSC_ARRAY] =      LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_ROW_DSC_ARRAY] =         LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_COLUMN_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_ROW_ALIGN] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_ROW_SPAN] =         LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_ROW_POS] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_COLUMN_SPAN] =      LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_COLUMN_POS] =       LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_X_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_Y_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+
 };
 
 uint32_t _lv_style_custom_prop_flag_lookup_table_size = 0;
@@ -374,7 +392,7 @@ bool lv_style_is_empty(const lv_style_t * style)
 uint8_t _lv_style_get_prop_group(lv_style_prop_t prop)
 {
     uint16_t group = (prop & 0x1FF) >> 4;
-    if(group > 7) group = 7;    /*The MSB marks all the custom properties*/
+    if(group > 7) group = 7;    /*The MSB marks all the properties above 112*/
     return (uint8_t)group;
 }
 

@@ -68,7 +68,7 @@ void test_custom_prop_ids(void)
      * that LVGL registers more built-in properties now and this needs adjustment.
      */
     extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
-    TEST_ASSERT_EQUAL(_lv_style_custom_prop_flag_lookup_table_size, 96);
+    TEST_ASSERT_EQUAL(_lv_style_custom_prop_flag_lookup_table_size, 64);
 }
 
 void test_inherit_meta(void)
