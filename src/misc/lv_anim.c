@@ -25,6 +25,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    bool anim_list_changed;
+    bool anim_run_round;
+    lv_timer_t * timer;
+} lv_anim_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -38,9 +43,7 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool anim_list_changed;
-static bool anim_run_round;
-static lv_timer_t * _lv_anim_tmr;
+static lv_anim_state_t state;
 
 /**********************
  *      MACROS
@@ -59,9 +62,9 @@ static lv_timer_t * _lv_anim_tmr;
 void _lv_anim_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
-    _lv_anim_tmr = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
+    state.timer = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation timer*/
-    anim_list_changed = false;
+    state.anim_list_changed = false;
 }
 
 void lv_anim_init(lv_anim_t * a)
@@ -90,7 +93,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     /*Initialize the animation descriptor*/
     lv_memcpy(new_anim, a, sizeof(lv_anim_t));
     if(a->var == a) new_anim->var = new_anim;
-    new_anim->run_round = anim_run_round;
+    new_anim->run_round = state.anim_run_round;
     new_anim->last_timer_run = lv_tick_get();
 
     /*Set the start value*/
@@ -178,7 +181,7 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 
 struct _lv_timer_t * lv_anim_get_timer(void)
 {
-    return _lv_anim_tmr;
+    return state.timer;
 }
 
 uint16_t lv_anim_count_running(void)
@@ -324,7 +327,7 @@ static void anim_timer(lv_timer_t * param)
 
 
     /*Flip the run round*/
-    anim_run_round = anim_run_round ? false : true;
+    state.anim_run_round = state.anim_run_round ? false : true;
 
     lv_anim_t * a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
 
@@ -335,10 +338,10 @@ static void anim_timer(lv_timer_t * param)
          * happened in `anim_ready_handler` which could make this linked list reading corrupt
          * because the list is changed meanwhile
          */
-        anim_list_changed = false;
+        state.anim_list_changed = false;
 
-        if(a->run_round != anim_run_round) {
-            a->run_round = anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
+        if(a->run_round != state.anim_run_round) {
+            a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;
@@ -373,7 +376,7 @@ static void anim_timer(lv_timer_t * param)
 
         /*If the linked list changed due to anim. delete then it's not safe to continue
          *the reading of the list from here -> start from the head*/
-        if(anim_list_changed)
+        if(state.anim_list_changed)
             a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
         else
             a = _lv_ll_get_next(&LV_GC_ROOT(_lv_anim_ll), a);
@@ -433,11 +436,11 @@ static void anim_ready_handler(lv_anim_t * a)
 
 static void anim_mark_list_change(void)
 {
-    anim_list_changed = true;
+    state.anim_list_changed = true;
     if(_lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll)) == NULL)
-        lv_timer_pause(_lv_anim_tmr);
+        lv_timer_pause(state.timer);
     else
-        lv_timer_resume(_lv_anim_tmr);
+        lv_timer_resume(state.timer);
 }
 
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)
