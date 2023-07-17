@@ -186,8 +186,6 @@ static void lv_draw_sw_buffer_convert(lv_layer_t * layer)
     LV_UNUSED(layer);
 }
 
-uint8_t * buf_tmp;
-
 static void lv_draw_sw_buffer_clear(lv_layer_t * layer, const lv_area_t * a)
 {
     uint8_t px_size = lv_color_format_get_size(layer->color_format);

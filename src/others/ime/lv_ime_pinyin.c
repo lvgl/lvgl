@@ -57,12 +57,12 @@ const lv_obj_class_t lv_ime_pinyin_class = {
 };
 
 #if LV_IME_PINYIN_USE_K9_MODE
-static char * lv_btnm_def_pinyin_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 21] = {\
-                                                                                ",\0", "123\0",  "abc \0", "def\0",  LV_SYMBOL_BACKSPACE"\0", "\n\0",
-                                                                                ".\0", "ghi\0", "jkl\0", "mno\0",  LV_SYMBOL_KEYBOARD"\0", "\n\0",
-                                                                                "?\0", "pqrs\0", "tuv\0", "wxyz\0",  LV_SYMBOL_NEW_LINE"\0", "\n\0",
-                                                                                LV_SYMBOL_LEFT"\0", "\0"
-                                                                               };
+static const char * lv_btnm_def_pinyin_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 21] = {\
+                                                                                      ",\0", "123\0",  "abc \0", "def\0",  LV_SYMBOL_BACKSPACE"\0", "\n\0",
+                                                                                      ".\0", "ghi\0", "jkl\0", "mno\0",  LV_SYMBOL_KEYBOARD"\0", "\n\0",
+                                                                                      "?\0", "pqrs\0", "tuv\0", "wxyz\0",  LV_SYMBOL_NEW_LINE"\0", "\n\0",
+                                                                                      LV_SYMBOL_LEFT"\0", "\0"
+                                                                                     };
 
 static lv_btnmatrix_ctrl_t default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 17] = { 1 };
 static char   lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 2][LV_IME_PINYIN_K9_MAX_INPUT] = {0};
@@ -72,7 +72,7 @@ static char   lv_pinyin_cand_str[LV_IME_PINYIN_CAND_TEXT_NUM][4];
 static char * lv_btnm_def_pinyin_sel_map[LV_IME_PINYIN_CAND_TEXT_NUM + 3];
 
 #if LV_IME_PINYIN_USE_DEFAULT_DICT
-lv_pinyin_dict_t lv_ime_pinyin_def_dict[] = {
+static const lv_pinyin_dict_t lv_ime_pinyin_def_dict[] = {
     { "a", "啊" },
     { "ai", "愛" },
     { "an", "安暗案" },
