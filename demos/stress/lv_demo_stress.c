@@ -172,7 +172,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 8:
-            obj = lv_win_create(lv_scr_act(), 50);
+            obj = lv_win_create(lv_scr_act());
             lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
             lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
             lv_win_add_title(obj, "Window title");
