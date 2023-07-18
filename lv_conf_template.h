@@ -409,6 +409,8 @@
 
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
+#define LV_WIDGETS_HAS_DEFAULT_VALUE  1
+
 #define LV_USE_ANIMIMG    1
 
 #define LV_USE_ARC        1
@@ -493,8 +495,6 @@
 #define LV_USE_TILEVIEW   1
 
 #define LV_USE_WIN        1
-
-#define LV_WIDGETS_HAS_DEAFULT_VALUE  1
 
 /*==================
  * THEMES

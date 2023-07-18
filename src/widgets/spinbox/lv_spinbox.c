@@ -354,9 +354,7 @@ static void lv_spinbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_textarea_set_one_line(obj, true);
     lv_textarea_set_cursor_click_pos(obj, true);
 
-#if LV_WIDGETS_HAS_DEAFULT_VALUE
     lv_spinbox_updatevalue(obj);
-#endif
 
     LV_LOG_TRACE("Spinbox constructor finished");
 }

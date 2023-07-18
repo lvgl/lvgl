@@ -660,10 +660,8 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     label->dot_tmp_alloc = 0;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
-#if LV_WIDGETS_HAS_DEAFULT_VALUE
     lv_label_set_long_mode(obj, LV_LABEL_LONG_WRAP);
     lv_label_set_text(obj, LV_LABEL_DEFAULT_TEXT);
-#endif
 
     LV_TRACE_OBJ_CREATE("finished");
 }

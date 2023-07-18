@@ -130,9 +130,13 @@ static void lv_checkbox_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-#if LV_WIDGETS_HAS_DEAFULT_VALUE
     lv_checkbox_t * cb = (lv_checkbox_t *)obj;
+
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
     cb->txt = (char *)"Check box";
+    cb->static_txt = 1;
+#else
+    cb->txt = (char *)"";
     cb->static_txt = 1;
 #endif
 

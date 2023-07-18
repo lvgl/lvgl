@@ -57,7 +57,7 @@ static bool has_popovers_in_top_row(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_WIDGETS_HAS_DEAFULT_VALUE
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
 static const char * lv_btnmatrix_def_map[] = {"Btn1", "Btn2", "Btn3", "\n", "Btn4", "Btn5", ""};
 #endif
 
@@ -369,7 +369,7 @@ static void lv_btnmatrix_constructor(const lv_obj_class_t * class_p, lv_obj_t * 
     btnm->map_p          = NULL;
     btnm->one_check      = 0;
 
-#if LV_WIDGETS_HAS_DEAFULT_VALUE
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_btnmatrix_set_map(obj, lv_btnmatrix_def_map);
 #endif
 

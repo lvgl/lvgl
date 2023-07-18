@@ -231,9 +231,7 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-#if LV_WIDGETS_HAS_DEAFULT_VALUE
     lv_bar_set_value(obj, 0, LV_ANIM_OFF);
-#endif
 
     LV_TRACE_OBJ_CREATE("finished");
 }
