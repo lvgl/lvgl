@@ -655,7 +655,12 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         line_dsc.raw_end = 1;
 
         lv_coord_t radius_out = radius_edge;
-        lv_coord_t radius_in_major = radius_out - scale->major_len;
+        lv_coord_t radius_in_major;
+        if (LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+        	radius_in_major = radius_out - scale->major_len;
+        } else {
+        	radius_in_major = radius_out + scale->major_len;
+        }
 
         uint32_t angular_range = scale->angle_range;
         uint32_t rotation = scale->rotation;
@@ -684,7 +689,12 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             lv_point_transform(&p_inner, angle_upscale, 256U, &center_point);  /* TODO: What is 256? */
 
             /* Also take into consideration the letter space of the style */
-    		uint32_t radius_text = radius_in_major - (label_gap + label_dsc.letter_space);
+    		uint32_t radius_text;
+            if (LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+            	radius_text = radius_in_major - (label_gap + label_dsc.letter_space);
+            } else {
+            	radius_text = radius_in_major + (label_gap + label_dsc.letter_space);
+            }
 
     		lv_point_t point;
     		point.x = center_point.x + radius_text;
@@ -1033,7 +1043,12 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * lin
     	center_point.x = scale_area.x1 + radius_edge;
     	center_point.y = scale_area.y1 + radius_edge;
 
-    	lv_coord_t radius_in_minor = radius_edge - lv_obj_get_style_width(obj, LV_PART_ITEMS);
+    	lv_coord_t radius_in_minor;
+    	if (LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+    		radius_in_minor = radius_edge - lv_obj_get_style_width(obj, LV_PART_ITEMS);
+    	} else {
+    		radius_in_minor = radius_edge + lv_obj_get_style_width(obj, LV_PART_ITEMS);
+    	}
 
         int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
 		angle_upscale += scale->rotation * 10U;
