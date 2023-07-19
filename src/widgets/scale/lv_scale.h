@@ -162,7 +162,7 @@ void lv_scale_set_round_props(lv_obj_t * obj, uint16_t angle_range, int16_t rota
  * @param obj       pointer to a scale object
  * @param txt_src   pointer to an array of strings which will be display at major ticks
  */
-void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src);
+void lv_scale_set_text_src(lv_obj_t * obj, char txt_src[]);
 
 /**
  * Add a section to the given scale
