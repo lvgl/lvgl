@@ -323,7 +323,8 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
         _LV_LL_READ_BACK(&scale->section_ll, section) {
             if(section->minor_range <= tick_value && section->major_range >= tick_value) {
 
-                if(section->indicator_style) {
+
+                if(section->items_style) {
                     lv_style_value_t value;
                     lv_res_t res;
 
