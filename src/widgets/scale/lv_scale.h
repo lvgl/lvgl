@@ -152,8 +152,8 @@ void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max);
 /**
  * Set properties specific to round scale
  * @param obj       pointer to a scale object
- * @param angle_range	the angular range of the scale
- * @param rotation	the angular offset from the 3 o'clock position (clock-wise)
+ * @param angle_range   the angular range of the scale
+ * @param rotation  the angular offset from the 3 o'clock position (clock-wise)
  */
 void lv_scale_set_round_props(lv_obj_t * obj, uint16_t angle_range, int16_t rotation);
 
