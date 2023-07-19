@@ -17,7 +17,7 @@ void lv_example_scale_1(void)
     lv_scale_set_range(scale, 25, 35);
 
     static char * custom_labels[3] = {"One", "Two", NULL};
-    lv_scale_set_text_src(scale, &custom_labels);
+    lv_scale_set_text_src(scale, custom_labels);
 
     static lv_style_t indicator_style;
     lv_style_init(&indicator_style);
