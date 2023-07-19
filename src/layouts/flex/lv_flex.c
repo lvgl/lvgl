@@ -421,7 +421,7 @@ static void children_repos(lv_obj_t * cont, flex_t * f, int32_t item_first_id, i
     /*Calculate the size of grow items first*/
     uint32_t i;
     bool grow_reiterate  = true;
-    while(grow_reiterate) {
+    while(grow_reiterate && t->grow_item_cnt) {
         grow_reiterate = false;
         lv_coord_t grow_value_sum = 0;
         lv_coord_t grow_max_size = t->track_main_size - t->track_fix_main_size;
