@@ -775,6 +775,9 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "Widget usage"
+		config LV_WIDGETS_HAS_DEFAULT_VALUE
+			bool "Widgets has default value."
+			default y if !LV_CONF_MINIMAL
 		config LV_USE_ARC
 			bool "Arc."
 			default y if !LV_CONF_MINIMAL

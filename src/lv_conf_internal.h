@@ -1167,6 +1167,18 @@
 
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
+#ifndef LV_WIDGETS_HAS_DEFAULT_VALUE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_WIDGETS_HAS_DEFAULT_VALUE
+            #define LV_WIDGETS_HAS_DEFAULT_VALUE CONFIG_LV_WIDGETS_HAS_DEFAULT_VALUE
+        #else
+            #define LV_WIDGETS_HAS_DEFAULT_VALUE 0
+        #endif
+    #else
+        #define LV_WIDGETS_HAS_DEFAULT_VALUE  1
+    #endif
+#endif
+
 #ifndef LV_USE_ANIMIMG
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_ANIMIMG

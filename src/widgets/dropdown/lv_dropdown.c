@@ -598,7 +598,9 @@ static void lv_dropdown_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     dropdown->dir = LV_DIR_BOTTOM;
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_dropdown_set_options_static(obj, "Option 1\nOption 2\nOption 3");
+#endif
 
     dropdown->list = lv_dropdown_list_create(lv_obj_get_screen(obj));
     lv_dropdown_list_t * list = (lv_dropdown_list_t *)dropdown->list;
