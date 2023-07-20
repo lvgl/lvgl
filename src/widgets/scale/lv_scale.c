@@ -244,10 +244,14 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     scale->total_tick_count = LV_SCALE_TOTAL_TICK_COUNT_DEFAULT;
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
-    scale->mode = LV_SCALE_MODE_ROUND_INNER;
+    scale->mode = LV_SCALE_MODE_HORIZONTAL_BOTTOM;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
     scale->angle_range = 270U; /* TODO: Replace with symbol? */
     scale->rotation = 90 + (360 - scale->angle_range) / 2; /* TODO: Replace magic numbers */
+    scale->range_min = 0U;
+    scale->range_max = 100U;
+    scale->major_len = 10U;
+    scale->minor_len = 5u;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
