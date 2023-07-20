@@ -649,7 +649,7 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_default_is_inited()) {
         LV_GC_ROOT(_lv_theme_default_data) = lv_malloc(sizeof(my_theme_t));
-        theme = _lv_theme_default_data;
+        theme = (my_theme_t *)LV_GC_ROOT(_lv_theme_default_data);
         lv_memzero(theme, sizeof(my_theme_t));
     }
 
