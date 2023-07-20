@@ -27,7 +27,9 @@
 #if LV_USE_DRAW_SW
     #include "draw/sw/lv_draw_sw.h"
 #endif
-
+#if LV_USE_GPU_AMBIQ_NEMAGFX
+    #include "draw/ambiq/nemagfx/lv_draw_ambiq_nemagfx.h"
+#endif
 /*********************
  *      DEFINES
  *********************/
@@ -93,6 +95,10 @@ void lv_init(void)
 
 #if LV_USE_DRAW_SW
     lv_draw_sw_init();
+#endif
+
+#if LV_USE_GPU_AMBIQ_NEMAGFX
+    lv_draw_ambiq_nemagfx_init();
 #endif
 
     _lv_obj_style_init();

@@ -260,6 +260,12 @@ menu "LVGL configuration"
 				help
 					Must deploy arm-2d library to your project and add include PATH for "arm_2d.h".
 
+			config LV_USE_GPU_AMBIQ_NEMAGFX
+				bool "Enable AMBIQ NEMAGFX GPU."
+				default n
+				help
+					Must deploy NemaGFX library to your project and add include PATH for "nema_core.h".
+
 			config LV_USE_GPU_STM32_DMA2D
 				bool "Enable STM32 DMA2D (aka Chrom Art) GPU."
 			config LV_GPU_DMA2D_CMSIS_INCLUDE

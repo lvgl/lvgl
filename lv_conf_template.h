@@ -123,6 +123,8 @@
     #endif
 #endif
 
+#define LV_USE_GPU_AMBIQ_NEMAGFX 0
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

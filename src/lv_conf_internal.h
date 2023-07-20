@@ -305,6 +305,14 @@
     #endif
 #endif
 
+#ifndef LV_USE_GPU_AMBIQ_NEMAGFX
+    #ifdef CONFIG_LV_USE_GPU_AMBIQ_NEMAGFX
+        #define LV_USE_GPU_AMBIQ_NEMAGFX CONFIG_LV_USE_GPU_AMBIQ_NEMAGFX
+    #else
+        #define LV_USE_GPU_AMBIQ_NEMAGFX 0
+    #endif
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/
