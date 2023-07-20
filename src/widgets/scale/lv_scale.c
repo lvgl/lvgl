@@ -311,6 +311,10 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
+    /* Set tick line width to 2u when is not set */
+    if(0U == line_dsc.width) {
+        line_dsc.width = 2U;
+    }
 
     const int32_t min_out = scale->range_min;
     const int32_t max_out = scale->range_max;
@@ -365,6 +369,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
+    /* Set tick line width to 2u when is not set */
+    if(0U == line_dsc.width) {
+        line_dsc.width = 2U;
+    }
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
@@ -790,6 +798,10 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
+        /* Set main line width to 2u when is not set */
+        if(0U == line_dsc.width) {
+            line_dsc.width = 2U;
+        }
 
         lv_point_t main_line_point_a;
         lv_point_t main_line_point_b;
@@ -885,6 +897,12 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * lin
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
 
+    lv_coord_t minor_len = lv_obj_get_style_width(obj, LV_PART_ITEMS);
+    /* Set default minor length for minor ticks */
+    if(0U == minor_len) {
+        minor_len = scale->minor_len;
+    }
+
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
         /* Get style properties so they can be used in the tick and label drawing */
@@ -915,7 +933,6 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * lin
         }
         else { /* Nothing to do */ }
 
-        lv_coord_t minor_len = lv_obj_get_style_width(obj, LV_PART_ITEMS);
 
         /* Draw tick lines to the right */
         if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
@@ -961,10 +978,10 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * lin
 
         lv_coord_t radius_in_minor;
         if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-            radius_in_minor = radius_edge - lv_obj_get_style_width(obj, LV_PART_ITEMS);
+            radius_in_minor = radius_edge - minor_len;
         }
         else {
-            radius_in_minor = radius_edge + lv_obj_get_style_width(obj, LV_PART_ITEMS);
+            radius_in_minor = radius_edge + minor_len;
         }
 
         int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
