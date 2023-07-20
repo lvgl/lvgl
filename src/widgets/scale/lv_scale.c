@@ -809,7 +809,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         else {
             lv_coord_t horizontal_position_a = x_ofs;
             lv_coord_t horizontal_position_b = x_ofs + ((int32_t)((int32_t)(height - line_dsc.width) *
-                                                                  (scale->total_tick_count - 1U)) /
+                                                                  (scale->total_tick_count)) /
                                                         scale->total_tick_count);
             main_line_point_a.x = horizontal_position_a;
             main_line_point_a.y = y_ofs;
