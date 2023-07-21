@@ -283,8 +283,7 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
     /*Make the display refreshing*/
     lv_disp_t * disp = lv_obj_get_disp(scr);
-    if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
-    lv_disp_send_event(disp, LV_EVENT_LAYOUT_DIRTY, NULL);
+    lv_disp_send_event(disp, LV_EVENT_REFRESH, NULL);
 }
 
 void lv_obj_update_layout(const lv_obj_t * obj)
