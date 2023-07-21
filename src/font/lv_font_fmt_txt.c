@@ -148,10 +148,10 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next)
 {
-    bool is_tab = false;
-    if(unicode_letter == '\t') {
+    /*It fixes a strange compiler optimization issue: https://github.com/lvgl/lvgl/issues/4370*/
+    bool is_tab = unicode_letter == '\t';
+    if(is_tab) {
         unicode_letter = ' ';
-        is_tab = true;
     }
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *)font->dsc;
     uint32_t gid = get_glyph_dsc_id(font, unicode_letter);
