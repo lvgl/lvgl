@@ -6,35 +6,40 @@
 static void draw_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_obj_draw_part_dsc_t * dsc = lv_event_get_draw_part_dsc(e);
-    /*If the cells are drawn...*/
-    if(dsc->part == LV_PART_ITEMS) {
-        bool chk = lv_table_has_cell_ctrl(obj, dsc->id, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
 
+    lv_draw_task_t * draw_task = lv_event_get_draw_task(e);
+    lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
+    /*If the cells are drawn...*/
+    if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
+        /*Draw the background*/
+        bool chk = lv_table_has_cell_ctrl(obj, base_dsc->id1, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
         lv_draw_rect_dsc_t rect_dsc;
         lv_draw_rect_dsc_init(&rect_dsc);
         rect_dsc.bg_color = chk ? lv_theme_get_color_primary(obj) : lv_palette_lighten(LV_PALETTE_GREY, 2);
         rect_dsc.radius = LV_RADIUS_CIRCLE;
 
         lv_area_t sw_area;
-        sw_area.x1 = dsc->draw_area->x2 - 50;
-        sw_area.x2 = sw_area.x1 + 40;
-        sw_area.y1 = dsc->draw_area->y1 + lv_area_get_height(dsc->draw_area) / 2 - 10;
-        sw_area.y2 = sw_area.y1 + 20;
-        lv_draw_rect(dsc->draw_ctx, &rect_dsc, &sw_area);
+        sw_area.x1 = 0;
+        sw_area.x2 = 40;
+        sw_area.y1 = 0;
+        sw_area.y2 = 24;
+        lv_area_align(&draw_task->area, &sw_area, LV_ALIGN_RIGHT_MID, -15, 0);
+        lv_draw_rect(base_dsc->layer, &rect_dsc, &sw_area);
 
+        /*Draw the knob*/
         rect_dsc.bg_color = lv_color_white();
+        lv_area_t knob_area;
+        knob_area.x1 = 0;
+        knob_area.x2 = 18;
+        knob_area.y1 = 0;
+        knob_area.y2 = 18;
         if(chk) {
-            sw_area.x2 -= 2;
-            sw_area.x1 = sw_area.x2 - 16;
+            lv_area_align(&sw_area, &knob_area, LV_ALIGN_RIGHT_MID, -3, 0);
         }
         else {
-            sw_area.x1 += 2;
-            sw_area.x2 = sw_area.x1 + 16;
+            lv_area_align(&sw_area, &knob_area, LV_ALIGN_LEFT_MID, 3, 0);
         }
-        sw_area.y1 += 2;
-        sw_area.y2 -= 2;
-        lv_draw_rect(dsc->draw_ctx, &rect_dsc, &sw_area);
+        lv_draw_rect(base_dsc->layer, &rect_dsc, &knob_area);
     }
 }
 
@@ -81,8 +86,9 @@ void lv_example_table_2(void)
     lv_obj_align(table, LV_ALIGN_CENTER, 0, -20);
 
     /*Add an event callback to to apply some custom drawing*/
-    lv_obj_add_event(table, draw_event_cb, LV_EVENT_DRAW_PART_END, NULL);
+    lv_obj_add_event(table, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_event(table, change_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     lv_mem_monitor_t mon2;
     lv_mem_monitor(&mon2);

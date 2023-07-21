@@ -29,6 +29,10 @@ extern "C" {
 #  define LV_COLOR_SIZE LV_COLOR_DEPTH
 #endif
 
+#ifndef LV_COLOR_SIZE
+#  define LV_COLOR_SIZE LV_COLOR_DEPTH
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/

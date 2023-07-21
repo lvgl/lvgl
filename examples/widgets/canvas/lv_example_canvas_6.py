@@ -31,6 +31,20 @@ canvas.center()
 
 dsc = lv.draw_img_dsc_t()
 dsc.init()
+dsc.src = img_star_argb
 
-canvas.draw_img(5, 5, img_star_argb, dsc)
 
+
+coords = lv.area_t()
+coords.x1 = 5
+coords.y1 = 5
+coords.x2 = 5 + 29
+coords.y2 = 5 + 28
+
+
+layer = lv.layer_t()
+canvas.init_layer(layer);
+
+lv.draw_img(layer, dsc, coords)
+
+canvas.finish_layer(layer)

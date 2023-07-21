@@ -66,7 +66,7 @@
 #define LV_STRNCPY      lv_strncpy_builtin
 #define LV_STRCPY       lv_strcpy_builtin
 
-#define LV_COLOR_EXTERN_INCLUDE <stdint.h>
+#define "../misc/lv_color.h" <stdint.h>
 #define LV_COLOR_MIX      lv_color_mix
 #define LV_COLOR_PREMULT      lv_color_premult
 #define LV_COLOR_MIX_PREMULT      lv_color_mix_premult
@@ -300,7 +300,7 @@
 
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#define LV_COLOR_MIX_ROUND_OFS 0
+#define lv_color_mix_ROUND_OFS 0
 
 /*=====================
  *  COMPILER SETTINGS

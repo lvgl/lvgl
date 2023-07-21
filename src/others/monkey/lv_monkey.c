@@ -125,7 +125,7 @@ void lv_monkey_del(lv_monkey_t * monkey)
 
 static void lv_monkey_read_cb(lv_indev_t * indev, lv_indev_data_t * data)
 {
-    lv_monkey_t * monkey = indev->user_data;
+    lv_monkey_t * monkey = lv_indev_get_user_data(indev);
 
     data->btn_id = monkey->indev_data.btn_id;
     data->point = monkey->indev_data.point;

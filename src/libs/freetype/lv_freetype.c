@@ -73,7 +73,8 @@ static bool freetype_get_glyph_dsc_cb(const lv_font_t * font,
                                       uint32_t unicode_letter,
                                       uint32_t unicode_letter_next);
 static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font,
-                                                    uint32_t unicode_letter);
+                                                    uint32_t unicode_letter,
+                                                    uint8_t * buf_out);
 
 /**********************
 *  STATIC VARIABLES
@@ -397,9 +398,10 @@ end:
     return true;
 }
 
-static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
+static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter, uint8_t * buf_out)
 {
     LV_UNUSED(unicode_letter);
+    LV_UNUSED(buf_out);
 
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)font->dsc;
     if(dsc->style & LV_FREETYPE_FONT_STYLE_BOLD) {
@@ -418,3 +420,4 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font, uint
 }
 
 #endif /*LV_USE_FREETYPE*/
+

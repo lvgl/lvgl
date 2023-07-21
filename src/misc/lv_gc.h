@@ -15,14 +15,15 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include <stdint.h>
-#include "lv_mem.h"
+#include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
 #include "lv_ll.h"
 #include "lv_timer.h"
 #include "lv_types.h"
 #include "../draw/lv_img_cache.h"
-#include "../draw/lv_draw_mask.h"
+#include "../draw/sw/lv_draw_sw_mask.h"
 #include "../core/lv_obj_pos.h"
-#include "../core/lv_disp.h"
+#include "../disp/lv_disp.h"
 
 /*********************
  *      DEFINES
@@ -54,13 +55,11 @@ extern "C" {
     LV_DISPATCH_COND(f, _lv_img_cache_entry_t*, _lv_img_cache_array, LV_IMG_CACHE_DEF, 1)              \
     LV_DISPATCH_COND(f, _lv_img_cache_entry_t, _lv_img_cache_single, LV_IMG_CACHE_DEF, 0)              \
     LV_DISPATCH(f, lv_timer_t*, _lv_timer_act)                                                         \
-    LV_DISPATCH_COND(f, _lv_draw_mask_radius_circle_dsc_arr_t , _lv_circle_cache, LV_USE_DRAW_MASKS, 1)  \
-    LV_DISPATCH_COND(f, _lv_draw_mask_saved_arr_t , _lv_draw_mask_list, LV_USE_DRAW_MASKS, 1)            \
+    LV_DISPATCH_COND(f, _lv_draw_sw_mask_radius_circle_dsc_arr_t , _lv_circle_cache, LV_DRAW_SW_COMPLEX, 1)  \
     LV_DISPATCH(f, void * , _lv_theme_default_styles)                                                  \
     LV_DISPATCH(f, void * , _lv_theme_basic_styles)                                                    \
-    LV_DISPATCH_COND(f, uint8_t *, _lv_font_decompr_buf, LV_USE_FONT_COMPRESSED, 1)                    \
-    LV_DISPATCH(f, uint8_t * , _lv_grad_cache_mem)                                                     \
     LV_DISPATCH(f, uint8_t * , _lv_style_custom_prop_flag_lookup_table)                                \
+    LV_DISPATCH(f, lv_draw_unit_t *, _lv_draw_unit_head)                                               \
     LV_DISPATCH(f, lv_ll_t, _subs_ll)
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;

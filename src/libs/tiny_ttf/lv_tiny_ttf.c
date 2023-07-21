@@ -119,7 +119,7 @@ static void * ttf_cache_add(ttf_cache_handle_t handle, int key, int size)
         }
     }
     while(cache->total_size > 0 && (cache->max_size < cache->total_size + size)) {
-        // expire entries
+        /* expire entries*/
         unsigned long long oldest = ttf_cache_get_oldest_age(handle);
         if(oldest == 0) {
             break;
@@ -216,7 +216,7 @@ static void ttf_cache_destroy(ttf_cache_handle_t handle)
     TTF_CACHE_FREE((ttf_cache_t *)handle);
 }
 #if LV_TINY_TTF_FILE_SUPPORT !=0
-// a hydra stream that can be in memory or from a file
+/* a hydra stream that can be in memory or from a file*/
 typedef struct ttf_cb_stream {
     lv_fs_file_t * file;
     const void * data;
@@ -316,8 +316,9 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     return true;          /*true: glyph found; false: glyph was not found*/
 }
 
-static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
+static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter, uint8_t * bitmap_buf)
 {
+    LV_UNUSED(bitmap_buf);
     ttf_font_desc_t * dsc = (ttf_font_desc_t *)font->dsc;
     const stbtt_fontinfo * info = (const stbtt_fontinfo *)&dsc->info;
     uint8_t * buffer = (uint8_t *)ttf_cache_get(dsc->cache, unicode_letter);

@@ -243,6 +243,8 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     /*Initialize the allocated 'ext'*/
+
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
     calendar->today.year  = 2020;
     calendar->today.month = 1;
     calendar->today.day   = 1;
@@ -250,6 +252,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->showed_date.year  = 2020;
     calendar->showed_date.month = 1;
     calendar->showed_date.day   = 1;
+#endif
 
     calendar->highlighted_dates      = NULL;
     calendar->highlighted_dates_num  = 0;
@@ -276,14 +279,16 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->btnm = lv_btnmatrix_create(obj);
     lv_btnmatrix_set_map(calendar->btnm, calendar->map);
     lv_btnmatrix_set_btn_ctrl_all(calendar->btnm, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);
-    lv_obj_add_event(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
+    lv_obj_add_event(calendar->btnm, draw_part_begin_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_set_width(calendar->btnm, lv_pct(100));
 
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
 
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_calendar_set_showed_date(obj, calendar->showed_date.year, calendar->showed_date.month);
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
+#endif
 
     lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 }
@@ -291,33 +296,36 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
 static void draw_part_begin_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    lv_obj_draw_part_dsc_t * dsc = lv_event_get_param(e);
-    if(dsc->part == LV_PART_ITEMS) {
+    lv_draw_task_t * draw_task = lv_event_get_param(e);
+    if(draw_task->type != LV_DRAW_TASK_TYPE_FILL) return;
+
+    lv_draw_rect_dsc_t * rect_draw_dsc;
+    rect_draw_dsc = draw_task->draw_dsc;
+
+    if(rect_draw_dsc->base.part == LV_PART_ITEMS) {
         /*Day name styles*/
-        if(dsc->id < 7) {
-            dsc->rect_dsc->bg_opa = LV_OPA_TRANSP;
-            dsc->rect_dsc->border_opa = LV_OPA_TRANSP;
+        if(rect_draw_dsc->base.id1 < 7) {
+            rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
+            rect_draw_dsc->border_opa = LV_OPA_TRANSP;
         }
-        else if(lv_btnmatrix_has_btn_ctrl(obj, dsc->id, LV_BTNMATRIX_CTRL_DISABLED)) {
-            dsc->rect_dsc->bg_opa = LV_OPA_TRANSP;
-            dsc->rect_dsc->border_opa = LV_OPA_TRANSP;
-            dsc->label_dsc->color = lv_palette_main(LV_PALETTE_GREY);
+        else if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->base.id1, LV_BTNMATRIX_CTRL_DISABLED)) {
+            rect_draw_dsc->bg_opa = LV_OPA_TRANSP;
+            rect_draw_dsc->border_opa = LV_OPA_TRANSP;
         }
 
-        if(lv_btnmatrix_has_btn_ctrl(obj, dsc->id, LV_CALENDAR_CTRL_HIGHLIGHT)) {
-            dsc->rect_dsc->bg_opa = LV_OPA_40;
-            dsc->rect_dsc->bg_color = lv_theme_get_color_primary(obj);
-            if(lv_btnmatrix_get_selected_btn(obj) == dsc->id) {
-                dsc->rect_dsc->bg_opa = LV_OPA_70;
+        if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_HIGHLIGHT)) {
+            rect_draw_dsc->bg_opa = LV_OPA_40;
+            rect_draw_dsc->bg_color = lv_theme_get_color_primary(obj);
+            if(lv_btnmatrix_get_selected_btn(obj) == rect_draw_dsc->base.id1) {
+                rect_draw_dsc->bg_opa = LV_OPA_70;
             }
         }
 
-        if(lv_btnmatrix_has_btn_ctrl(obj, dsc->id, LV_CALENDAR_CTRL_TODAY)) {
-            dsc->rect_dsc->border_opa = LV_OPA_COVER;
-            dsc->rect_dsc->border_color = lv_theme_get_color_primary(obj);
-            dsc->rect_dsc->border_width += 1;
+        if(lv_btnmatrix_has_btn_ctrl(obj, rect_draw_dsc->base.id1, LV_CALENDAR_CTRL_TODAY)) {
+            rect_draw_dsc->border_opa = LV_OPA_COVER;
+            rect_draw_dsc->border_color = lv_theme_get_color_primary(obj);
+            rect_draw_dsc->border_width += 1;
         }
-
     }
 }
 

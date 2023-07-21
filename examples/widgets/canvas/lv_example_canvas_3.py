@@ -27,5 +27,18 @@ dsc.outline_pad = 2
 dsc.outline_opa = lv.OPA._50
 dsc.radius = 5
 dsc.border_width = 3
-canvas.draw_rect(10, 10, 30, 20, dsc)
+
+
+coords = lv.area_t()
+coords.x1 = 10
+coords.y1 = 10
+coords.x2 = 30
+coords.y2 = 20
+
+layer = lv.layer_t()
+canvas.init_layer(layer);
+
+lv.draw_rect(layer, dsc, coords)
+
+canvas.finish_layer(layer)
 

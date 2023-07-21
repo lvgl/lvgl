@@ -8,7 +8,7 @@
  *      INCLUDES
  *********************/
 #include "lv_ll.h"
-#include "lv_mem.h"
+#include "../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES

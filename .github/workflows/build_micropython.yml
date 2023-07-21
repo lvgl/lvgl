@@ -23,7 +23,7 @@ jobs:
     - name: Clone lv_micropython
       run: |
         git clone https://github.com/lvgl/lv_micropython.git .
-        git checkout master
+        git checkout feat/parallel-rendering
     - name: Initialize lv_bindings submodule
       run: git submodule update --init --recursive lib/lv_bindings
     - name: Update ${{ matrix.port }} port submodules

@@ -37,7 +37,7 @@ if script_path != '':
         # needed for dynamic font loading
         fs_drv = lv.fs_drv_t()
         fs_driver.fs_register(fs_drv, 'S')
-        
+
         print("Loading font montserrat_18")
         font_montserrat_18 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-18.fnt")
         if not font_montserrat_18:
@@ -46,7 +46,22 @@ if script_path != '':
             dsc.font = font_montserrat_18
 
 dsc.decor = lv.TEXT_DECOR.UNDERLINE
-print('Printing "Hello"')
-canvas.draw_text(10, 10, 30, dsc, "Hello")
+dsc.text = "Hello"
+
+
+layer = lv.layer_t()
+canvas.init_layer(layer);
+
+
+coords = lv.area_t()
+coords.x1 = 10
+coords.y1 = 10
+coords.x2 = 40
+coords.y2 = 30
+
+
+lv.draw_label(layer, dsc, coords)
+
+canvas.finish_layer(layer)
 
 

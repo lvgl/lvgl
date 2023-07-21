@@ -11,13 +11,14 @@
 #include "../../core/lv_obj.h"
 #include "../../misc/lv_assert.h"
 #include "../../core/lv_group.h"
-#include "../../core/lv_disp.h"
+#include "../../disp/lv_disp.h"
 #include "../../draw/lv_draw.h"
 #include "../../misc/lv_color.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_bidi.h"
 #include "../../misc/lv_txt_ap.h"
-#include "../../misc/lv_printf.h"
+#include "../../stdlib/lv_sprintf.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -53,8 +54,7 @@ static size_t get_text_length(const char * text);
 static void copy_text_to_label(lv_label_t * label, const char * text);
 static lv_text_flag_t get_label_flags(lv_label_t * label);
 static void calculate_x_coordinate(lv_coord_t * x, const lv_text_align_t align, const char * txt,
-                                   uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
-                                   lv_text_flag_t flag, lv_area_t * txt_coords);
+                                   uint32_t length, const lv_font_t * font, lv_coord_t letter_space, lv_area_t * txt_coords);
 
 /**********************
  *  STATIC VARIABLES
@@ -362,11 +362,11 @@ void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t 
 #endif
 
     /*Calculate the x coordinate*/
-    lv_coord_t x = lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
+    lv_coord_t x = lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space);
     if(char_id != line_start) x += letter_space;
 
     uint32_t length = new_line_start - line_start;
-    calculate_x_coordinate(&x, align, bidi_txt, length, font, letter_space, flag, &txt_coords);
+    calculate_x_coordinate(&x, align, bidi_txt, length, font, letter_space, &txt_coords);
     pos->x = x;
     pos->y = y;
 
@@ -433,9 +433,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
     lv_coord_t x = 0;
     const lv_text_align_t align = lv_obj_calculate_style_text_align(obj, LV_PART_MAIN, label->text);
     uint32_t length = new_line_start - line_start;
-    calculate_x_coordinate(&x, align, bidi_txt, length, font, letter_space, flag, &txt_coords);
-
-    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
+    calculate_x_coordinate(&x, align, bidi_txt, length, font, letter_space, &txt_coords);
 
     uint32_t i = 0;
     uint32_t i_act = i;
@@ -447,13 +445,6 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * obj, lv_point_t * pos_in)
             uint32_t letter;
             uint32_t letter_next;
             _lv_txt_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
-
-            /*Handle the recolor command*/
-            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
-                if(_lv_txt_is_cmd(&cmd_state, bidi_txt[i]) != false) {
-                    continue; /*Skip the letter if it is part of a command*/
-                }
-            }
 
             lv_coord_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
@@ -525,15 +516,13 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
 
     lv_coord_t x = 0;
     if(align == LV_TEXT_ALIGN_CENTER) {
-        const lv_coord_t line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        const lv_coord_t line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        const lv_coord_t line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        const lv_coord_t line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space);
         x += lv_area_get_width(&txt_coords) - line_w;
     }
-
-    lv_text_cmd_state_t cmd_state = LV_TEXT_CMD_STATE_WAIT;
 
     lv_coord_t last_x = 0;
     uint32_t i           = line_start;
@@ -547,12 +536,6 @@ bool lv_label_is_char_under_pos(const lv_obj_t * obj, lv_point_t * pos)
             /*Be careful 'i' already points to the next character*/
             _lv_txt_encoded_letter_next_2(txt, &letter, &letter_next, &i);
 
-            /*Handle the recolor command*/
-            if((flag & LV_TEXT_FLAG_RECOLOR) != 0) {
-                if(_lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-                    continue; /*Skip the letter if it is part of a command*/
-                }
-            }
             last_x = x;
             x += lv_font_get_glyph_width(font, letter, letter_next);
             if(pos->x < x) {
@@ -680,7 +663,6 @@ static void lv_label_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_label_set_long_mode(obj, LV_LABEL_LONG_WRAP);
     lv_label_set_text(obj, LV_LABEL_DEFAULT_TEXT);
 
-
     LV_TRACE_OBJ_CREATE("finished");
 }
 
@@ -751,7 +733,7 @@ static void draw_main(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_label_t * label = (lv_label_t *)obj;
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+    lv_layer_t * layer = lv_event_get_layer(e);
 
     lv_area_t txt_coords;
     lv_obj_get_content_coords(obj, &txt_coords);
@@ -763,9 +745,14 @@ static void draw_main(lv_event_t * e)
 
     lv_draw_label_dsc_t label_draw_dsc;
     lv_draw_label_dsc_init(&label_draw_dsc);
-
+    label_draw_dsc.text = label->text;
     label_draw_dsc.ofs_x = label->offset.x;
     label_draw_dsc.ofs_y = label->offset.y;
+#if LV_LABEL_LONG_TXT_HINT
+    if(label->long_mode != LV_LABEL_LONG_SCROLL_CIRCULAR && lv_area_get_height(&txt_coords) >= LV_LABEL_HINT_HEIGHT_LIMIT) {
+        label_draw_dsc.hint = &label->hint;
+    }
+#endif
 
     label_draw_dsc.flag = flag;
     lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
@@ -789,19 +776,12 @@ static void draw_main(lv_event_t * e)
             label_draw_dsc.align = LV_TEXT_ALIGN_LEFT;
         }
     }
-#if LV_LABEL_LONG_TXT_HINT
-    lv_draw_label_hint_t * hint = &label->hint;
-    if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
-        hint = NULL;
-
-#else
-    /*Just for compatibility*/
-    lv_draw_label_hint_t * hint = NULL;
-#endif
 
     lv_area_t txt_clip;
-    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, draw_ctx->clip_area);
-    if(!is_common) return;
+    bool is_common = _lv_area_intersect(&txt_clip, &txt_coords, &layer->clip_area);
+    if(!is_common) {
+        return;
+    }
 
     if(label->long_mode == LV_LABEL_LONG_WRAP) {
         lv_coord_t s = lv_obj_get_scroll_top(obj);
@@ -809,17 +789,17 @@ static void draw_main(lv_event_t * e)
         txt_coords.y2 = obj->coords.y2;
     }
     if(label->long_mode == LV_LABEL_LONG_SCROLL || label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
-        const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-        draw_ctx->clip_area = &txt_clip;
-        lv_draw_label(draw_ctx, &label_draw_dsc, &txt_coords, label->text, hint);
-        draw_ctx->clip_area = clip_area_ori;
+        const lv_area_t clip_area_ori = layer->clip_area;
+        layer->clip_area = txt_clip;
+        lv_draw_label(layer, &label_draw_dsc, &txt_coords);
+        layer->clip_area = clip_area_ori;
     }
     else {
-        lv_draw_label(draw_ctx, &label_draw_dsc, &txt_coords, label->text, hint);
+        lv_draw_label(layer, &label_draw_dsc, &txt_coords);
     }
 
-    const lv_area_t * clip_area_ori = draw_ctx->clip_area;
-    draw_ctx->clip_area = &txt_clip;
+    lv_area_t clip_area_ori = layer->clip_area;
+    layer->clip_area = txt_clip;
 
     if(label->long_mode == LV_LABEL_LONG_SCROLL_CIRCULAR) {
         lv_point_t size;
@@ -832,7 +812,7 @@ static void draw_main(lv_event_t * e)
                                    lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
             label_draw_dsc.ofs_y = label->offset.y;
 
-            lv_draw_label(draw_ctx, &label_draw_dsc, &txt_coords, label->text, hint);
+            lv_draw_label(layer, &label_draw_dsc, &txt_coords);
         }
 
         /*Draw the text again below the original to make a circular effect */
@@ -840,11 +820,11 @@ static void draw_main(lv_event_t * e)
             label_draw_dsc.ofs_x = label->offset.x;
             label_draw_dsc.ofs_y = label->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
 
-            lv_draw_label(draw_ctx, &label_draw_dsc, &txt_coords, label->text, hint);
+            lv_draw_label(layer, &label_draw_dsc, &txt_coords);
         }
     }
 
-    draw_ctx->clip_area = clip_area_ori;
+    layer->clip_area = clip_area_ori;
 }
 
 static void overwrite_anim_property(lv_anim_t * dest, const lv_anim_t * src, lv_label_long_mode_t mode)
@@ -1297,14 +1277,14 @@ static lv_text_flag_t get_label_flags(lv_label_t * label)
 
 /* Function created because of this pattern be used in multiple functions */
 static void calculate_x_coordinate(lv_coord_t * x, const lv_text_align_t align, const char * txt, uint32_t length,
-                                   const lv_font_t * font, lv_coord_t letter_space, lv_text_flag_t flag, lv_area_t * txt_coords)
+                                   const lv_font_t * font, lv_coord_t letter_space, lv_area_t * txt_coords)
 {
     if(align == LV_TEXT_ALIGN_CENTER) {
-        const lv_coord_t line_w = lv_txt_get_width(txt, length, font, letter_space, flag);
+        const lv_coord_t line_w = lv_txt_get_width(txt, length, font, letter_space);
         *x += lv_area_get_width(txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        const lv_coord_t line_w = lv_txt_get_width(txt, length, font, letter_space, flag);
+        const lv_coord_t line_w = lv_txt_get_width(txt, length, font, letter_space);
         *x += lv_area_get_width(txt_coords) - line_w;
     }
     else {

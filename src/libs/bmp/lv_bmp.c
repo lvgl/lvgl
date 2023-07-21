@@ -95,13 +95,23 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
             header->h = h;
             header->always_zero = 0;
             lv_fs_close(&f);
-#if LV_COLOR_DEPTH == 32
+
             uint16_t bpp;
             memcpy(&bpp, headers + 28, 2);
-            header->cf = bpp == 32 ? LV_COLOR_FORMAT_NATIVE_ALPHA : LV_COLOR_FORMAT_NATIVE;
-#else
-            header->cf = LV_COLOR_FORMAT_NATIVE;
-#endif
+            switch(bpp) {
+                case 16:
+                    header->cf = LV_COLOR_FORMAT_RGB565;
+                    break;
+                case 24:
+                    header->cf = LV_COLOR_FORMAT_RGB888;
+                    break;
+                case 32:
+                    header->cf = LV_COLOR_FORMAT_ARGB8888;
+                    break;
+                default:
+                    LV_LOG_WARN("Not supported bpp: %d", bpp);
+                    return LV_RES_OK;
+            }
             return LV_RES_OK;
         }
     }
@@ -153,26 +163,6 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         memcpy(&b.bpp, header + 28, 2);
         b.row_size_bytes = ((b.bpp * b.px_width + 31) / 32) * 4;
 
-        bool color_depth_error = false;
-        if(LV_COLOR_DEPTH == 32 && (b.bpp != 32 && b.bpp != 24)) {
-            LV_LOG_WARN("LV_COLOR_DEPTH == 32 but bpp is %d (should be 32 or 24)", b.bpp);
-            color_depth_error = true;
-        }
-        else if(LV_COLOR_DEPTH == 16 && b.bpp != 16) {
-            LV_LOG_WARN("LV_COLOR_DEPTH == 16 but bpp is %d (should be 16)", b.bpp);
-            color_depth_error = true;
-        }
-        else if(LV_COLOR_DEPTH == 8 && b.bpp != 8) {
-            LV_LOG_WARN("LV_COLOR_DEPTH == 8 but bpp is %d (should be 8)", b.bpp);
-            color_depth_error = true;
-        }
-
-        if(color_depth_error) {
-            dsc->error_msg = "Color depth mismatch";
-            lv_fs_close(&b.f);
-            return LV_RES_INV;
-        }
-
         dsc->user_data = lv_malloc(sizeof(bmp_dsc_t));
         LV_ASSERT_MALLOC(dsc->user_data);
         if(dsc->user_data == NULL) return LV_RES_INV;
@@ -202,36 +192,6 @@ static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc
     p += x * (b->bpp / 8);
     lv_fs_seek(&b->f, p, LV_FS_SEEK_SET);
     lv_fs_read(&b->f, buf, len * (b->bpp / 8), NULL);
-
-
-#if LV_COLOR_DEPTH == 32
-    if(b->bpp == 32) {
-        lv_coord_t i;
-        for(i = 0; i < len; i++) {
-            uint8_t b0 = buf[i * 4];
-            uint8_t b1 = buf[i * 4 + 1];
-            uint8_t b2 = buf[i * 4 + 2];
-            uint8_t b3 = buf[i * 4 + 3];
-            lv_color32_t * c = (lv_color32_t *)&buf[i * 4];
-            c->red = b2;
-            c->green = b1;
-            c->blue = b0;
-            c->alpha = b3;
-        }
-    }
-    if(b->bpp == 24) {
-        lv_coord_t i;
-
-        for(i = len - 1; i >= 0; i--) {
-            uint8_t * t = &buf[i * 3];
-            lv_color32_t * c = (lv_color32_t *)&buf[i * 4];
-            c->red = t[2];
-            c->green = t[1];
-            c->blue = t[0];
-            c->alpha = 0xff;
-        }
-    }
-#endif
 
     return LV_RES_OK;
 }

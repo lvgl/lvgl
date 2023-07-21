@@ -8,9 +8,9 @@
  *********************/
 #include "lv_obj_scroll.h"
 #include "lv_obj.h"
-#include "lv_indev.h"
-#include "lv_disp.h"
-#include "lv_indev_scroll.h"
+#include "../indev/lv_indev.h"
+#include "../indev/lv_indev_scroll.h"
+#include "../disp/lv_disp.h"
 
 /*********************
  *      DEFINES

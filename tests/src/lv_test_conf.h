@@ -15,29 +15,18 @@ extern "C" {
 /***********************
  * PLATFORM CONFIGS
  ***********************/
-#include "lv_test_malloc.h"
 
 #ifdef LVGL_CI_USING_SYS_HEAP
-#define LV_USE_BUILTIN_MALLOC   0
-#define LV_USE_BUILTIN_MEMCPY   1
-#define LV_USE_BUILTIN_SNPRINTF 1
-#define LV_STDLIB_INCLUDE <stdlib.h>
-#define LV_MALLOC       lv_test_malloc
-#define LV_REALLOC      lv_test_realloc
-#define LV_FREE         lv_test_free
-#define LV_MEMSET       memset
-#define LV_MEMCPY       memcpy
+#define LV_USE_STDLIB_MALLOC        LV_STDLIB_CLIB
+#define LV_USE_STDLIB_STRING        LV_STDLIB_CLIB
+#define LV_USE_STDLIB_SPRINTF       LV_STDLIB_CLIB
+#define LV_USE_OS                   LV_OS_PTHREAD
 #endif
 
 #ifdef LVGL_CI_USING_DEF_HEAP
-#define LV_USE_BUILTIN_MALLOC   1
-#define LV_USE_BUILTIN_MEMCPY   1
-#define LV_USE_BUILTIN_SNPRINTF 1
-#define LV_MALLOC       lv_test_malloc
-#define LV_REALLOC      lv_test_realloc
-#define LV_FREE         lv_test_free
-#define LV_MEMSET       lv_memset_builtin
-#define LV_MEMCPY       lv_memcpy_builtin
+#define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
+#define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
 #endif
 
 
@@ -86,7 +75,7 @@ typedef void * lv_user_data_t;
 #elif LV_TEST_OPTION == 3
 #define  LV_COLOR_DEPTH     16
 #define  LV_DPI_DEF         90
-#include "lv_test_conf_full.h"
+#include "lv_test_conf_minimal.h"
 #elif LV_TEST_OPTION == 2
 #define  LV_COLOR_DEPTH     8
 #define  LV_DPI_DEF         60

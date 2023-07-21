@@ -11,6 +11,7 @@
 #include "../draw/lv_draw_img.h"
 #include "../misc/lv_ll.h"
 #include "../misc/lv_gc.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -29,6 +30,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t y,
+                                    lv_coord_t w_px, const uint8_t * in, lv_color32_t * out);
 
 /**********************
  *  STATIC VARIABLES
@@ -349,7 +352,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
         lv_color_format_t cf = img_dsc->header.cf;
-        if(cf >= LV_COLOR_FORMAT_I1 && cf <= LV_COLOR_FORMAT_I8) {
+        if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
             switch(cf) {
                 case LV_COLOR_FORMAT_I1:
                     dsc->palette_size = 2;
@@ -367,8 +370,15 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
                     LV_LOG_WARN("Unexpected color format");
                     return LV_RES_INV;
             }
-            dsc->img_data = img_dsc->data + sizeof(lv_color32_t) * dsc->palette_size;
+
+            dsc->img_data = lv_malloc(sizeof(lv_color32_t) * img_dsc->header.w *  img_dsc->header.h);
             dsc->palette = (const lv_color32_t *)img_dsc->data;
+            dsc->header.cf = LV_COLOR_FORMAT_ARGB8888;
+
+            uint32_t y;
+            for(y = 0; y < img_dsc->header.h; y++) {
+                decode_indexed_line(cf, dsc->palette, y, img_dsc->header.w, img_dsc->data, (lv_color32_t *) dsc->img_data);
+            }
         }
         else {
             /*In case of uncompressed formats the image stored in the ROM/RAM.
@@ -392,20 +402,72 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-
-    lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-    if(user_data) {
-        if(dsc->src_type == LV_IMG_SRC_FILE) {
-            lv_fs_close(&user_data->f);
-        }
-        if(user_data->palette) lv_free(user_data->palette);
-        if(user_data->opa) lv_free(user_data->opa);
-
-        lv_free(user_data);
-        dsc->user_data = NULL;
+    lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
+    lv_color_format_t cf = img_dsc->header.cf;
+    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        lv_free((void *)dsc->img_data);
     }
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t y,
+                                    lv_coord_t w_px, const uint8_t * in, lv_color32_t * out)
+{
+    uint8_t px_size;
+    uint16_t mask;
+
+    out += w_px * y;
+
+    lv_coord_t w_byte = 0;
+    int8_t pos   = 0;
+    switch(color_format) {
+        case LV_COLOR_FORMAT_I1:
+            px_size = 1;
+            w_byte = (w_px + 7) >> 3; /*E.g. w = 20 -> w = 2 + 1*/
+            in += w_byte * y;            /*First pixel*/
+            in += 8;                /*Skip the palette*/
+            pos = 7;
+            break;
+        case LV_COLOR_FORMAT_I2:
+            px_size = 2;
+            w_byte = (w_px + 3) >> 2; /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
+            in += w_byte * y; /*First pixel*/
+            in += 16;               /*Skip the palette*/
+            pos = 6;
+            break;
+        case LV_COLOR_FORMAT_I4:
+            px_size = 4;
+            w_byte = (w_px + 1) >> 1; /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
+            in += w_byte * y; /*First pixel*/
+            in += 64;               /*Skip the palette*/
+            pos = 4;
+            break;
+        case LV_COLOR_FORMAT_I8:
+            px_size = 8;
+            w_byte = w_px;
+            in += w_byte * y;  /*First pixel*/
+            in += 1024;       /*Skip the palette*/
+            pos = 0;
+            break;
+        default:
+            return LV_RES_INV;
+    }
+
+    mask   = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
+
+    lv_coord_t i;
+    for(i = 0; i < w_px; i++) {
+        uint8_t val_act = (*in >> pos) & mask;
+        out[i] = palette[val_act];
+
+        pos -= px_size;
+        if(pos < 0) {
+            pos = 8 - px_size;
+            in++;
+        }
+    }
+    return LV_RES_OK;
+}

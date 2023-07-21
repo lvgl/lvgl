@@ -60,8 +60,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
     lv_anim_t a;
     lv_obj_t * obj;
 
-    //    printf("step start: %d\n", state);
-
     switch(state) {
         case -1: {
                 lv_res_t res = lv_mem_test();
@@ -97,10 +95,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
                 lv_obj_t * t = lv_tabview_add_tab(obj, "First");
 
                 t = lv_tabview_add_tab(obj, "Second");
-                lv_obj_t * c = lv_colorwheel_create(t, true);
-                lv_obj_set_size(c,  150, 150);
-                //                  c = lv_led_create(t, NULL);
-                //                  lv_obj_set_pos(c, 160, 20);
+                lv_obj_t * label = lv_label_create(t);
+                lv_label_set_text(label, "Label on tabview");
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_EDIT " Edit");
                 t = lv_tabview_add_tab(obj, LV_SYMBOL_CLOSE);
 
@@ -145,13 +141,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_size(obj, 100, 70);
             lv_obj_set_style_bg_img_src(obj, LV_SYMBOL_DUMMY"Text from\nstyle", 0);
             lv_obj_del_async(obj);  /*Delete on next call of `lv_task_handler` (so not now)*/
-
-            //            obj = lv_btn_create(main_page);
-            //            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            //            lv_obj_set_style_bg_img_src(obj, LV_SYMBOL_LEFT);
-            //            lv_obj_set_style_bg_img_opa(obj, LV_OPA_50);
-            //            lv_obj_set_style_bg_img_tiled(obj, true);
-            //            lv_obj_scroll_to_view(obj, LV_ANIM_ON);
             break;
 
         case 5:
@@ -179,6 +168,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             obj = lv_switch_create(main_page);
             lv_obj_add_state(obj, LV_STATE_CHECKED);
             auto_del(obj, 730);
+
             break;
 
         case 8:
@@ -420,7 +410,6 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
     }
 
-    //    printf("step end: %d\n", state);
     state++;
 }
 

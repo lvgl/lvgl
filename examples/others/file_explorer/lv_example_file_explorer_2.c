@@ -83,7 +83,7 @@ void lv_example_file_explorer_2(void)
     char * envvar = "HOME";
     char home_dir[LV_FS_MAX_PATH_LENGTH];
     strcpy(home_dir, "A:");
-    // get the user's home directory from the HOME enviroment variable
+    /* get the user's home directory from the HOME enviroment variable*/
     strcat(home_dir, getenv(envvar));
     LV_LOG_USER("home_dir: %s\n", home_dir);
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_HOME_DIR, home_dir);
@@ -135,7 +135,6 @@ void lv_example_file_explorer_2(void)
     lv_obj_set_size(dd, LV_PCT(30), LV_SIZE_CONTENT);
     lv_dropdown_set_options_static(dd, opts);
     lv_obj_align(dd, LV_ALIGN_RIGHT_MID, 0, 0);
-    //lv_obj_align_to(dd, btn, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
     lv_obj_add_event(dd, dd_event_handler, LV_EVENT_VALUE_CHANGED, file_explorer);
 }

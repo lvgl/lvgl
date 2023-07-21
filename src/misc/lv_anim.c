@@ -8,11 +8,12 @@
  *********************/
 #include "lv_anim.h"
 
-#include "../hal/lv_hal_tick.h"
+#include "../tick/lv_tick.h"
 #include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
-#include "lv_mem.h"
+#include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
 #include "lv_gc.h"
 
 /*********************
@@ -301,6 +302,12 @@ int32_t lv_anim_path_step(const lv_anim_t * a)
         return a->end_value;
     else
         return a->start_value;
+}
+
+int32_t lv_anim_path_custom_bezier3(const lv_anim_t * a)
+{
+    const struct _lv_anim_bezier3_para_t * para = &a->parameter.bezier3;
+    return lv_anim_path_cubic_bezier(a, para->x1, para->y1, para->x2, para->y2);
 }
 
 /**********************

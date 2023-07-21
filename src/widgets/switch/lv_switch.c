@@ -13,8 +13,8 @@
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_anim.h"
-#include "../../core/lv_indev.h"
-#include "../../core/lv_disp.h"
+#include "../../indev/lv_indev.h"
+#include "../../disp/lv_disp.h"
 #include "../img/lv_img.h"
 
 /*********************
@@ -148,27 +148,17 @@ static void draw_main(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_switch_t * sw = (lv_switch_t *)obj;
 
-    lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
-
-    /*Calculate the indicator area*/
-    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
-    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
-    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
-    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
+    lv_layer_t * layer = lv_event_get_layer(e);
 
     /*Draw the indicator*/
-    /*Respect the background's padding*/
     lv_area_t indic_area;
-    lv_area_copy(&indic_area, &obj->coords);
-    indic_area.x1 += bg_left;
-    indic_area.x2 -= bg_right;
-    indic_area.y1 += bg_top;
-    indic_area.y2 -= bg_bottom;
+    /*Exclude background's padding*/
+    lv_obj_get_content_coords(obj, &indic_area);
 
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
-    lv_draw_rect(draw_ctx, &draw_indic_dsc, &indic_area);
+    lv_draw_rect(layer, &draw_indic_dsc, &indic_area);
 
     /*Draw the knob*/
     lv_coord_t anim_value_x = 0;
@@ -190,11 +180,9 @@ static void draw_main(lv_event_t * e)
     }
 
     lv_area_t knob_area;
-    knob_area.x1 = obj->coords.x1 + anim_value_x;
+    lv_area_copy(&knob_area, &obj->coords);
+    knob_area.x1 += anim_value_x;
     knob_area.x2 = knob_area.x1 + (knob_size > 0 ? knob_size - 1 : 0);
-
-    knob_area.y1 = obj->coords.y1;
-    knob_area.y2 = obj->coords.y2;
 
     lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
     lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
@@ -211,7 +199,7 @@ static void draw_main(lv_event_t * e)
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
-    lv_draw_rect(draw_ctx, &knob_rect_dsc, &knob_area);
+    lv_draw_rect(layer, &knob_rect_dsc, &knob_area);
 }
 
 static void lv_switch_anim_exec_cb(void * var, int32_t value)

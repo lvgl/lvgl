@@ -80,10 +80,10 @@ LV_MENU_ITEM_BUILDER_VARIANT_2 = const(1)
 menu = lv.menu(lv.scr_act())
 
 bg_color = menu.get_style_bg_color(0)
-if bg_color.color_brightness() > 127 :
-    menu.set_style_bg_color(menu.get_style_bg_color(0).color_darken(10),0)
+if bg_color.brightness() > 127 :
+    menu.set_style_bg_color(menu.get_style_bg_color(0).darken(10),0)
 else :
-    menu.set_style_bg_color(menu.get_style_bg_color(0).color_darken(50),0)
+    menu.set_style_bg_color(menu.get_style_bg_color(0).darken(50),0)
 
 
 menu.set_mode_root_back_btn(lv.menu.ROOT_BACK_BTN.ENABLED)

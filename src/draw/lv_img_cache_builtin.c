@@ -10,7 +10,7 @@
 #include "lv_img_cache_builtin.h"
 #include "lv_img_decoder.h"
 #include "lv_draw_img.h"
-#include "../hal/lv_hal_tick.h"
+#include "../tick/lv_tick.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_gc.h"
 

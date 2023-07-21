@@ -23,11 +23,16 @@ dsc.color = lv.palette_main(lv.PALETTE.RED)
 dsc.width = 4
 dsc.round_end = 1
 dsc.round_start = 1
+dsc.p1.x = 15;
+dsc.p1.y = 15;
+dsc.p2.x = 35;
+dsc.p2.y = 10;
 
-p = [ {"x":15,"y":15},
-      {"x":35,"y":10},
-      {"x":10,"y":40} ]
+layer = lv.layer_t()
+canvas.init_layer(layer);
 
-canvas.draw_line(p, 3, dsc)
+lv.draw_line(layer, dsc)
+
+canvas.finish_layer(layer)
 
 

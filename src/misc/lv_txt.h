@@ -19,15 +19,12 @@ extern "C" {
 #include <stdarg.h>
 #include "lv_area.h"
 #include "../font/lv_font.h"
-#include "lv_printf.h"
+#include "../stdlib/lv_sprintf.h"
 #include "lv_types.h"
 
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_TXT_COLOR_CMD
-#define LV_TXT_COLOR_CMD "#"
-#endif
 
 #define LV_TXT_ENC_UTF8 1
 #define LV_TXT_ENC_ASCII 2
@@ -51,21 +48,6 @@ enum _lv_text_flag_t {
 typedef _lv_text_flag_t lv_text_flag_t;
 #else
 typedef uint8_t lv_text_flag_t;
-#endif /*DOXYGEN*/
-
-
-/**
- * State machine for text renderer.*/
-enum _lv_text_cmd_state_t {
-    LV_TEXT_CMD_STATE_WAIT, /**< Waiting for command*/
-    LV_TEXT_CMD_STATE_PAR,  /**< Processing the parameter*/
-    LV_TEXT_CMD_STATE_IN,   /**< Processing the command*/
-};
-
-#ifdef DOXYGEN
-typedef _lv_text_cmd_state_t lv_text_cmd_state_t;
-#else
-typedef uint8_t lv_text_cmd_state_t;
 #endif /*DOXYGEN*/
 
 
@@ -126,21 +108,9 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coor
  * UTF-8)
  * @param font pointer to a font
  * @param letter_space letter space
- * @param flag settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
-                            lv_text_flag_t flag);
-
-/**
- * Check next character in a string and decide if the character is part of the command or not
- * @param state pointer to a txt_cmd_state_t variable which stores the current state of command
- * processing
- * @param c the current character
- * @return true: the character is part of a command and should not be written,
- *         false: the character should be written
- */
-bool _lv_txt_is_cmd(lv_text_cmd_state_t * state, uint32_t c);
+lv_coord_t lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space);
 
 /**
  * Insert a string into an other

@@ -131,7 +131,7 @@ static lv_obj_t * btn_create(lv_obj_t * par, const char * str, lv_color_t color)
 static void obj_child_node_def_style_init(lv_style_t * style)
 {
     lv_style_init(style);
-    lv_style_set_size(style, LV_PCT(30), LV_PCT(30));
+    lv_style_set_size(style, LV_PCT(45), LV_PCT(45));
     lv_style_set_flex_flow(style, LV_FLEX_FLOW_ROW);
     lv_style_set_layout(style, LV_LAYOUT_FLEX);
     lv_style_set_radius(style, 0);

@@ -9,7 +9,8 @@ class LV_Example_Event_4:
         self.cont = lv.obj(lv.scr_act())
         self.cont.set_size(200, 200)
         self.cont.center()
-        self.cont.add_event(self.event_cb, lv.EVENT.DRAW_PART_END, None)
+        self.cont.add_event(self.event_cb, lv.EVENT.DRAW_TASK_ADDED, None)
+        self.cont.add_flag(lv.obj.FLAG.SEND_DRAW_TASK_EVENTS)
         lv.timer_create(self.timer_cb, 30, None)
 
     def timer_cb(self,timer) :
@@ -26,18 +27,9 @@ class LV_Example_Event_4:
 
     def event_cb(self,e) :
         obj = e.get_target_obj()
-        dsc = e.get_draw_part_dsc()
-        if dsc.class_p == lv.obj_class and dsc.part == lv.PART.MAIN :
-            draw_dsc = lv.draw_rect_dsc_t()
-            draw_dsc.init()
-            draw_dsc.bg_color = lv.color_hex(0xffaaaa)
-            draw_dsc.radius = lv.RADIUS_CIRCLE
-            draw_dsc.border_color = lv.color_hex(0xff5555)
-            draw_dsc.border_width = 2
-            draw_dsc.outline_color = lv.color_hex(0xff0000)
-            draw_dsc.outline_pad = 3
-            draw_dsc.outline_width = 2
-
+        dsc = e.get_draw_task()
+        base_dsc = lv.draw_dsc_base_t.__cast__(dsc.draw_dsc)
+        if base_dsc.part == lv.PART.MAIN:
             a = lv.area_t()
             a.x1 = 0
             a.y1 = 0
@@ -47,6 +39,15 @@ class LV_Example_Event_4:
             obj.get_coords(coords)
             coords.align(a, lv.ALIGN.CENTER, 0, 0)
 
-            dsc.draw_ctx.rect(draw_dsc, a)
+            draw_dsc = lv.draw_rect_dsc_t()
+            draw_dsc.init()
+            draw_dsc.bg_color = lv.color_hex(0xffaaaa)
+            draw_dsc.radius = lv.RADIUS_CIRCLE
+            draw_dsc.border_color = lv.color_hex(0xff5555)
+            draw_dsc.border_width = 2
+            draw_dsc.outline_color = lv.color_hex(0xff0000)
+            draw_dsc.outline_pad = 3
+            draw_dsc.outline_width = 2
+            lv.draw_rect(base_dsc.layer, draw_dsc, a)
 
 lv_example_event_4 = LV_Example_Event_4()

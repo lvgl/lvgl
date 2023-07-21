@@ -27,7 +27,7 @@
 static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
-static void convert_color_depth(uint8_t ** img_p, uint32_t px_cnt);
+static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt);
 
 /**********************
  *  STATIC VARIABLES
@@ -91,7 +91,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
 
             /*Save the data in the header*/
             header->always_zero = 0;
-            header->cf = LV_COLOR_FORMAT_NATIVE_ALPHA;
+            header->cf = LV_COLOR_FORMAT_ARGB8888;
             /*The width and height are stored in Big endian format so convert them to little endian*/
             header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
             header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
@@ -113,7 +113,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
             header->cf = img_dsc->header.cf;       /*Save the color format*/
         }
         else {
-            header->cf = LV_COLOR_FORMAT_NATIVE_ALPHA;
+            header->cf = LV_COLOR_FORMAT_ARGB8888;
         }
 
         if(img_dsc->header.w) {
@@ -185,7 +185,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
             }
 
             /*Convert the image to the system's color depth*/
-            convert_color_depth(&img_data,  png_width * png_height);
+            convert_color_depth(img_data,  png_width * png_height);
             dsc->img_data = img_data;
             return LV_RES_OK;     /*The image is fully decoded. Return with its pointer*/
         }
@@ -207,7 +207,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         }
 
         /*Convert the image to the system's color depth*/
-        convert_color_depth(&img_data,  png_width * png_height);
+        convert_color_depth(img_data,  png_width * png_height);
 
         dsc->img_data = img_data;
         return LV_RES_OK;     /*Return with its pointer*/
@@ -233,46 +233,15 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
  * @param img the ARGB888 image
  * @param px_cnt number of pixels in `img`
  */
-static void convert_color_depth(uint8_t ** img_p, uint32_t px_cnt)
+static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)
 {
-    uint8_t * img = *img_p;
-
-#if LV_COLOR_DEPTH == 32 || LV_COLOR_DEPTH == 24
-    lv_color32_t * img_argb = (lv_color32_t *)img;
-    lv_color_t c;
-    lv_color_t * img_c = (lv_color_t *)img;
+    lv_color32_t * img_argb = (lv_color32_t *)img_p;
     uint32_t i;
     for(i = 0; i < px_cnt; i++) {
-        c = lv_color_make(img_argb[i].red, img_argb[i].green, img_argb[i].blue);
-        img_c[i].red = c.blue;
-        img_c[i].blue = c.red;
+        uint8_t blue = img_argb[i].blue;
+        img_argb[i].blue = img_argb[i].red;
+        img_argb[i].red = blue;
     }
-#elif LV_COLOR_DEPTH == 16
-    lv_color32_t * img_argb = (lv_color32_t *)img;
-    lv_color_t c;
-    uint32_t i;
-    for(i = 0; i < px_cnt; i++) {
-        c = lv_color_make(img_argb[i].blue, img_argb[i].green, img_argb[i].red);
-        uint16_t c16 = lv_color_to_int(c);
-        img[i * 3 + 2] = img_argb[i].alpha;
-        img[i * 3 + 1] = c16 >> 8;
-        img[i * 3 + 0] = c16 & 0xFF;
-    }
-#elif LV_COLOR_DEPTH == 8
-    lv_color32_t * img_argb = (lv_color32_t *)img;
-    lv_color_t c;
-    uint32_t i;
-    for(i = 0; i < px_cnt; i++) {
-        c = lv_color_make(img_argb[i].red, img_argb[i].green, img_argb[i].blue);
-        img[i * 2 + 1] = img_argb[i].alpha;
-        img[i * 2 + 0] = lv_color_to_int(c);
-    }
-#endif
-
-#if LV_COLOR_DEPTH != 32
-    /*Reallocate memory to reduce memory usage*/
-    *img_p = lv_realloc(img, LV_COLOR_FORMAT_NATIVE_ALPHA_SIZE * px_cnt);
-#endif
 }
 
 #endif /*LV_USE_PNG*/

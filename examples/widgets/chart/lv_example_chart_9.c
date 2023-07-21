@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_USE_DRAW_MASKS && LV_BUILD_EXAMPLES
+#if LV_USE_CHART && LV_DRAW_SW_COMPLEX && LV_BUILD_EXAMPLES
 
 
 static void add_data(lv_timer_t * t)

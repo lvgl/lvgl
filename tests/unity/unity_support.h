@@ -20,7 +20,7 @@ bool lv_test_assert_img_eq(const char * fn_ref);
 #  define TEST_ASSERT_EQUAL_SCREENSHOT(path)                if(LV_HOR_RES != 800 || LV_VER_RES != 480) {          \
         TEST_IGNORE_MESSAGE("Requires 800x480 resolution"); \
     } else {                                              \
-        TEST_ASSERT(lv_test_assert_img_eq(path));            \
+        TEST_ASSERT_MESSAGE(lv_test_assert_img_eq(path), path);            \
     }
 
 #  define TEST_ASSERT_EQUAL_SCREENSHOT_MESSAGE(path, msg)    if(LV_HOR_RES != 800 || LV_VER_RES != 480) {             \
@@ -31,11 +31,11 @@ bool lv_test_assert_img_eq(const char * fn_ref);
     }
 #endif
 
-#  define TEST_ASSERT_EQUAL_COLOR(c1, c2)                   TEST_ASSERT_EQUAL_UINT32(lv_color_to_int(c1), lv_color_to_int(c2))
-#  define TEST_ASSERT_EQUAL_COLOR_MESSAGE(c1, c2, msg)      TEST_ASSERT_EQUAL_UINT32_MESSAGE(c1.full, c2.full, msg)
+#  define TEST_ASSERT_EQUAL_COLOR(c1, c2)                   TEST_ASSERT_TRUE(lv_color_eq(c1, c2))
+#  define TEST_ASSERT_EQUAL_COLOR_MESSAGE(c1, c2, msg)      TEST_ASSERT_TRUE(lv_color_eq(c1, c2), msg)
 
-#  define TEST_ASSERT_EQUAL_COLOR32(c1, c2)                   TEST_ASSERT_EQUAL_UINT32(lv_color32_to_int(c1), lv_color32_to_int(c2))
-#  define TEST_ASSERT_EQUAL_COLOR32_MESSAGE(c1, c2, msg)      TEST_ASSERT_EQUAL_UINT32_MESSAGE(c1.full, c2.full, msg)
+#  define TEST_ASSERT_EQUAL_COLOR32(c1, c2)                   TEST_ASSERT_TRUE(lv_color32_eq(c1, c2))
+#  define TEST_ASSERT_EQUAL_COLOR32_MESSAGE(c1, c2, msg)      TEST_ASSERT_TRUE(lv_color32_eq(c1, c2), msg)
 
 #ifdef __cplusplus
 } /*extern "C"*/

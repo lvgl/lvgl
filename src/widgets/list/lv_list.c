@@ -8,7 +8,7 @@
  *********************/
 #include "lv_list.h"
 #include "../../layouts/flex/lv_flex.h"
-#include "../../core/lv_disp.h"
+#include "../../disp/lv_disp.h"
 #include "../label/lv_label.h"
 #include "../img/lv_img.h"
 #include "../btn/lv_btn.h"
@@ -66,11 +66,8 @@ lv_obj_t * lv_list_create(lv_obj_t * parent)
 lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
 {
     LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_text_class, list);
-    lv_obj_class_init_obj(obj);
+    lv_obj_t * obj = lv_label_create(list);
     lv_label_set_text(obj, txt);
-    lv_label_set_long_mode(obj, LV_LABEL_LONG_SCROLL_CIRCULAR);
-    lv_obj_set_width(obj, LV_PCT(100));
     return obj;
 }
 

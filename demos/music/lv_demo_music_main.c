@@ -409,21 +409,15 @@ static lv_obj_t * create_cont(lv_obj_t * parent)
     lv_obj_t * placeholder1 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder1);
     lv_obj_clear_flag(placeholder1, LV_OBJ_FLAG_CLICKABLE);
-    //    lv_obj_set_style_bg_color(placeholder1, lv_color_hex(0xff0000), 0);
-    //    lv_obj_set_style_bg_opa(placeholder1, LV_OPA_50, 0);
 
     lv_obj_t * placeholder2 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder2);
     lv_obj_clear_flag(placeholder2, LV_OBJ_FLAG_CLICKABLE);
-    //    lv_obj_set_style_bg_color(placeholder2, lv_color_hex(0x00ff00), 0);
-    //    lv_obj_set_style_bg_opa(placeholder2, LV_OPA_50, 0);
 
 #if LV_DEMO_MUSIC_SQUARE || LV_DEMO_MUSIC_ROUND
     lv_obj_t * placeholder3 = lv_obj_create(main_cont);
     lv_obj_remove_style_all(placeholder3);
     lv_obj_clear_flag(placeholder3, LV_OBJ_FLAG_CLICKABLE);
-    //    lv_obj_set_style_bg_color(placeholder3, lv_color_hex(0x0000ff), 0);
-    //    lv_obj_set_style_bg_opa(placeholder3, LV_OPA_20, 0);
 
     lv_obj_set_size(placeholder1, lv_pct(100), LV_VER_RES);
     lv_obj_set_y(placeholder1, 0);
@@ -777,20 +771,19 @@ static void spectrum_draw_event_cb(lv_event_t * e)
     else if(code == LV_EVENT_COVER_CHECK) {
         lv_event_set_cover_res(e, LV_COVER_RES_NOT_COVER);
     }
-    else if(code == LV_EVENT_DRAW_POST) {
+    else if(code == LV_EVENT_DRAW_MAIN_BEGIN) {
         lv_obj_t * obj = lv_event_get_target(e);
-        lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
+        lv_layer_t * layer = lv_event_get_layer(e);
 
         lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
         if(opa < LV_OPA_MIN) return;
 
-        lv_point_t poly[4];
         lv_point_t center;
         center.x = obj->coords.x1 + lv_obj_get_width(obj) / 2;
         center.y = obj->coords.y1 + lv_obj_get_height(obj) / 2;
 
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
+        lv_draw_triangle_dsc_t draw_dsc;
+        lv_draw_triangle_dsc_init(&draw_dsc);
         draw_dsc.bg_opa = LV_OPA_COVER;
 
         uint16_t r[64];
@@ -798,12 +791,12 @@ static void spectrum_draw_event_cb(lv_event_t * e)
 
         lv_coord_t min_a = 5;
 #if LV_DEMO_MUSIC_LARGE == 0
-        lv_coord_t r_in = 77;
+        lv_coord_t r_in = 1;
 #else
         lv_coord_t r_in = 160;
 #endif
         r_in = (r_in * lv_img_get_zoom(album_img_obj)) >> 8;
-        for(i = 0; i < BAR_CNT; i++) r[i] = r_in + min_a;
+        for(i = 0; i < BAR_CNT; i++) r[i] = r_in + min_a + 77;
 
         uint32_t s;
         for(s = 0; s < 4; s++) {
@@ -835,7 +828,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             }
         }
 
-        uint32_t amax = 20;
+        const int32_t amax = 20;
         int32_t animv = spectrum_i - spectrum_lane_ofs_start;
         if(animv > amax) animv = amax;
         for(i = 0; i < BAR_CNT; i++) {
@@ -852,7 +845,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             }
 
             if(v < BAR_COLOR1_STOP) draw_dsc.bg_color = BAR_COLOR1;
-            else if(v > BAR_COLOR3_STOP) draw_dsc.bg_color = BAR_COLOR3;
+            else if(v > (uint32_t)BAR_COLOR3_STOP) draw_dsc.bg_color = BAR_COLOR3;
             else if(v > BAR_COLOR2_STOP) draw_dsc.bg_color = lv_color_mix(BAR_COLOR3, BAR_COLOR2,
                                                                               ((v - BAR_COLOR2_STOP) * 255) / (BAR_COLOR3_STOP - BAR_COLOR2_STOP));
             else draw_dsc.bg_color = lv_color_mix(BAR_COLOR2, BAR_COLOR1,
@@ -861,29 +854,26 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             uint32_t di = deg + deg_space;
 
             int32_t x1_out = get_cos(di, v);
-            poly[0].x = center.x + x1_out;
-            poly[0].y = center.y + get_sin(di, v);
+            draw_dsc.p[0].x = center.x + x1_out;
+            draw_dsc.p[0].y = center.y + get_sin(di, v);
 
-            int32_t x1_in = get_cos(di, r_in);
-            poly[1].x = center.x + x1_in;
-            poly[1].y = center.y + get_sin(di, r_in);
             di += DEG_STEP - deg_space * 2;
 
-            int32_t x2_in = get_cos(di, r_in);
-            poly[2].x = center.x + x2_in;
-            poly[2].y = center.y + get_sin(di, r_in);
-
             int32_t x2_out = get_cos(di, v);
-            poly[3].x = center.x + x2_out;
-            poly[3].y = center.y + get_sin(di, v);
+            draw_dsc.p[1].x = center.x + x2_out;
+            draw_dsc.p[1].y = center.y + get_sin(di, v);
 
-            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
+            int32_t x2_in = get_cos(di, r_in);
+            draw_dsc.p[2].x = center.x + x2_in;
+            draw_dsc.p[2].y = center.y + get_sin(di, r_in);
 
-            poly[0].x = center.x - x1_out;
-            poly[1].x = center.x - x1_in;
-            poly[2].x = center.x - x2_in;
-            poly[3].x = center.x - x2_out;
-            lv_draw_polygon(draw_ctx, &draw_dsc, poly, 4);
+
+            lv_draw_triangle(layer, &draw_dsc);
+
+            draw_dsc.p[0].x = center.x - x1_out;
+            draw_dsc.p[1].x = center.x - x2_out;
+            draw_dsc.p[2].x = center.x - x2_in;
+            lv_draw_triangle(layer, &draw_dsc);
         }
     }
 }
@@ -963,6 +953,7 @@ static lv_obj_t * album_img_create(lv_obj_t * parent)
 
 static void album_gesture_event_cb(lv_event_t * e)
 {
+    LV_UNUSED(e);
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
     if(dir == LV_DIR_LEFT) _lv_demo_music_album_next(true);
     if(dir == LV_DIR_RIGHT) _lv_demo_music_album_next(false);
