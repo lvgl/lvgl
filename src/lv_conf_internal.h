@@ -2199,6 +2199,19 @@
             #define LV_IME_PINYIN_USE_DEFAULT_DICT 1
         #endif
     #endif
+    /*2: Use gb2312 thesaurus*/
+    #ifndef LV_IME_PINYIN_USE_GB2312_DICT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_IME_PINYIN_USE_GB2312_DICT
+                #define LV_IME_PINYIN_USE_GB2312_DICT CONFIG_LV_IME_PINYIN_USE_GB2312_DICT
+            #else
+                #define LV_IME_PINYIN_USE_GB2312_DICT 0
+            #endif
+        #else
+            #define LV_IME_PINYIN_USE_GB2312_DICT 1
+        #endif
+    #endif
+
     /*Set the maximum number of candidate panels that can be displayed*/
     /*This needs to be adjusted according to the size of the screen*/
     #ifndef LV_IME_PINYIN_CAND_TEXT_NUM
