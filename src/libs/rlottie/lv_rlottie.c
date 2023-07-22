@@ -39,10 +39,15 @@ const lv_obj_class_t lv_rlottie_class = {
     .base_class = &lv_img_class
 };
 
-static lv_coord_t create_width;
-static lv_coord_t create_height;
-static const char * rlottie_desc_create;
-static const char * path_create;
+typedef struct {
+    lv_coord_t width;
+    lv_coord_t height;
+    const char * rlottie_desc;
+    const char * path;
+} lv_rlottie_create_info_t;
+
+// only used in lv_obj_class_create_obj, no affect multiple instances
+static lv_rlottie_create_info_t create_info;
 
 /**********************
  *      MACROS
@@ -54,27 +59,24 @@ static const char * path_create;
 
 lv_obj_t * lv_rlottie_create_from_file(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * path)
 {
-
-    create_width = width;
-    create_height = height;
-    path_create = path;
-    rlottie_desc_create = NULL;
+    create_info.width = width;
+    create_info.height = height;
+    create_info.path = path;
+    create_info.rlottie_desc = NULL;
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
     lv_obj_class_init_obj(obj);
 
     return obj;
-
 }
 
 lv_obj_t * lv_rlottie_create_from_raw(lv_obj_t * parent, lv_coord_t width, lv_coord_t height, const char * rlottie_desc)
 {
-
-    create_width = width;
-    create_height = height;
-    rlottie_desc_create = rlottie_desc;
-    path_create = NULL;
+    create_info.width = width;
+    create_info.height = height;
+    create_info.rlottie_desc = rlottie_desc;
+    create_info.path = NULL;
 
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(MY_CLASS, parent);
@@ -109,11 +111,11 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_UNUSED(class_p);
     lv_rlottie_t * rlottie = (lv_rlottie_t *) obj;
 
-    if(rlottie_desc_create) {
-        rlottie->animation = lottie_animation_from_data(rlottie_desc_create, rlottie_desc_create, "");
+    if(create_info.rlottie_desc) {
+        rlottie->animation = lottie_animation_from_data(create_info.rlottie_desc, create_info.rlottie_desc, "");
     }
-    else if(path_create) {
-        rlottie->animation = lottie_animation_from_file(path_create);
+    else if(create_info.path) {
+        rlottie->animation = lottie_animation_from_file(create_info.path);
     }
     if(rlottie->animation == NULL) {
         LV_LOG_WARN("The aniamtion can't be opened");
@@ -124,9 +126,9 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     rlottie->framerate = (size_t)lottie_animation_get_framerate(rlottie->animation);
     rlottie->current_frame = 0;
 
-    rlottie->scanline_width = create_width * LV_ARGB32 / 8;
+    rlottie->scanline_width = create_info.width * LV_ARGB32 / 8;
 
-    size_t allocaled_buf_size = (create_width * create_height * LV_ARGB32 / 8);
+    size_t allocaled_buf_size = (create_info.width * create_info.height * LV_ARGB32 / 8);
     rlottie->allocated_buf = lv_malloc(allocaled_buf_size);
     if(rlottie->allocated_buf != NULL) {
         rlottie->allocated_buffer_size = allocaled_buf_size;
@@ -135,8 +137,8 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     rlottie->imgdsc.header.always_zero = 0;
     rlottie->imgdsc.header.cf = LV_COLOR_FORMAT_ARGB8888;
-    rlottie->imgdsc.header.h = create_height;
-    rlottie->imgdsc.header.w = create_width;
+    rlottie->imgdsc.header.h = create_info.height;
+    rlottie->imgdsc.header.w = create_info.width;
     rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
     rlottie->imgdsc.data_size = allocaled_buf_size;
 
