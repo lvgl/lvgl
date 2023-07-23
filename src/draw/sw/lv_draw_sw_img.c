@@ -50,7 +50,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
 
     /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
      *In this case just return. */
-    if(layer_to_draw->buf == NULL) return;
+    if(layer_to_draw->draw_buf->buf == NULL) return;
 
     lv_img_dsc_t img_dsc;
     img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);

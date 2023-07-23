@@ -241,7 +241,7 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp);
  * @param buf_size_byte     size of the buffer in bytes
  * @param render_mode       LV_DISP_RENDER_MODE_PARTIAL/DIRECT/FULL
  */
-void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_byte,
+void lv_disp_set_draw_buffers(lv_disp_t * disp, lv_draw_buf_t * buf1, lv_draw_buf_t * buf2,
                               lv_disp_render_mode_t render_mode);
 
 /**

@@ -486,7 +486,8 @@ static void draw_indic(lv_event_t * e)
         lv_draw_img_dsc_t layer_draw_dsc;
         lv_draw_img_dsc_init(&layer_draw_dsc);
         layer_draw_dsc.src = layer_indic;
-        lv_draw_layer(layer, &layer_draw_dsc, &layer_indic->buf_area);
+
+        lv_draw_layer(layer, &layer_draw_dsc, &indic_area);
     }
 }
 

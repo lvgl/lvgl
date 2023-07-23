@@ -126,7 +126,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_img_ds
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));
 
-    layer.color_format = dsc->header.cf;
+    layer.draw_bufcolor_format = dsc->header.cf;
     layer.buf_area = snapshot_area;
     layer.clip_area = snapshot_area;
     layer.buf = buf;
