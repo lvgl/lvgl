@@ -39,7 +39,6 @@ h1 = {
 }
 
 widgets = {
-<<<<<<< HEAD
     "obj": "Base object",
     "arc": "Arc",
     "bar": "Bar",
@@ -62,6 +61,7 @@ widgets = {
     "meter": "Meter",
     "msgbox": "Message box",
     "roller": "Roller",
+    "scale":"Scale",
     "slider": "Slider",
     "span": "Span",
     "spinbox": "Spinbox",
@@ -101,41 +101,6 @@ header_defs = {
     2: SECTION,
     3: SUBSECTION,
     4: SUBSUBSECTION
-=======
-"obj":"Base object",
-"arc":"Arc",
-"bar":"Bar",
-"btn":"Button",
-"btnmatrix":"Button matrix",
-"calendar":"Calendar",
-"canvas":"Canvas",
-"chart":"Chart",
-"checkbox":"Checkbox",
-"colorwheel":"Colorwheel",
-"dropdown":"Dropdown",
-"img":"Image",
-"imgbtn":"Image button",
-"keyboard":"Keyboard",
-"label":"Label",
-"led":"LED",
-"line":"Line",
-"list":"List",
-"menu":"Menu",
-"meter":"Meter",
-"msgbox":"Message box",
-"roller":"Roller",
-"scale":"Scale",
-"slider":"Slider",
-"span":"Span",
-"spinbox":"Spinbox",
-"spinner":"Spinner",
-"switch":"Switch",
-"table":"Table",
-"tabview":"Tabview",
-"textarea":"Textarea",
-"tileview":"Tabview",
-"win":"Window",
->>>>>>> b7b3ef434 (lv_scale: Add scale to example list)
 }
 
 layouts = {
