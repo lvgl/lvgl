@@ -96,7 +96,7 @@ struct _lv_disp_t {
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
-    lv_layer_t * (*layer_init)(struct _lv_disp_t * disp);
+    void (*layer_init)(struct _lv_disp_t * disp, lv_layer_t * layer);
     void (*layer_deinit)(struct _lv_disp_t * disp, lv_layer_t * layer);
 
     /*---------------------

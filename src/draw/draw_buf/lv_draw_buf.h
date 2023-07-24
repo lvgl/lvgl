@@ -39,6 +39,12 @@ uint32_t lv_draw_buf_get_stride(const lv_draw_buf_t * draw_buf);
 void * lv_draw_buf_go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y);
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
 
+static inline uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
+{
+    uint32_t width_byte =  w * lv_color_format_get_size(color_format);
+    return (width_byte + LV_DRAW_BUF_STRIDE - 1) & ~(LV_DRAW_BUF_STRIDE - 1);
+}
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

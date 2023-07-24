@@ -123,30 +123,6 @@ typedef struct _lv_layer_t  {
     lv_area_t clip_area;
 
     /**
-     * Copy an area from buffer to an other
-     * @param layer      pointer to a draw context
-     * @param dest_buf      copy the buffer into this buffer
-     * @param dest_stride   the width of the dest_buf in pixels
-     * @param dest_area     the destination area
-     * @param src_buf       copy from this buffer
-     * @param src_stride    the width of src_buf in pixels
-     * @param src_area      the source area.
-     *
-     * @note dest_area and src_area must have the same width and height
-     *       but can have different x and y position.
-     * @note dest_area and src_area must be clipped to the real dimensions of the buffers
-     */
-    void (*buffer_copy)(struct _lv_layer_t * target_layer, void * dest_buf, lv_coord_t dest_stride,
-                        const lv_area_t * dest_area,
-                        void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
-
-    /**
-     * Convert the content of `target_layer->buf` to `target_layer->color_format`
-     * @param target_layer
-     */
-    void (*buffer_convert)(struct _lv_layer_t * layer);
-
-    /**
      * Linked list of draw tasks
      */
     lv_draw_task_t * draw_task_head;

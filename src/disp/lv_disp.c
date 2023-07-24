@@ -71,13 +71,14 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
-#if LV_USE_DRAW_SW == 1
-    disp->layer_init = lv_draw_sw_layer_init;
-    disp->layer_deinit = lv_draw_sw_layer_deinit;
+    disp->layer_head = lv_malloc(sizeof(lv_layer_t));
+    LV_ASSERT_MALLOC(disp->layer_head);
+    if(disp->layer_head == NULL) return NULL;
+    lv_memzero(disp->layer_head, sizeof(lv_layer_t));
 
-#endif
+    if(disp->layer_init) disp->layer_init(disp, disp->layer_head);
 
-    disp->layer_head = disp->layer_init(disp);
+    disp->layer_head->draw_buf = lv_draw_buf_malloc(0, 0, disp->color_format);
 
     disp->inv_en_cnt = 1;
 

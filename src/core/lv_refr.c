@@ -385,16 +385,17 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
                            ? disp_refr->buf_2
                            : disp_refr->buf_1;
 
-    lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
-    uint32_t i;
-    for(i = 0; i < disp_refr->inv_p; i++) {
-        if(disp_refr->inv_area_joined[i]) continue;
-        disp_refr->layer_head->buffer_copy(
-            disp_refr->layer_head,
-            buf_off_screen, stride, &disp_refr->inv_areas[i],
-            buf_on_screen, stride, &disp_refr->inv_areas[i]
-        );
-    }
+    //TODO
+    //    lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+    //    uint32_t i;
+    //    for(i = 0; i < disp_refr->inv_p; i++) {
+    //        if(disp_refr->inv_area_joined[i]) continue;
+    //        disp_refr->layer_head->buffer_copy(
+    //            disp_refr->layer_head,
+    //            buf_off_screen, stride, &disp_refr->inv_areas[i],
+    //            buf_on_screen, stride, &disp_refr->inv_areas[i]
+    //        );
+    //    }
 
 refr_clean_up:
     lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
@@ -507,7 +508,7 @@ static void refr_area(const lv_area_t * area_p)
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
     if(disp_refr->render_mode != LV_DISP_RENDER_MODE_PARTIAL) {
         layer->draw_buf->width = lv_disp_get_hor_res(disp_refr);
-        layer->draw_buf->height = lv_disp_get_hor_res(disp_refr);
+        layer->draw_buf->height = lv_disp_get_ver_res(disp_refr);
         layer->draw_buf_ofs.x = 0;
         layer->draw_buf_ofs.y = 0;
         lv_area_t disp_area;
@@ -955,7 +956,7 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px
         .y2 = area->y2 + disp->offset_y
     };
 
-    if(disp->layer_head->buffer_convert) disp->layer_head->buffer_convert(disp->layer_head);
+    //    if(disp->layer_head->buffer_convert) disp->layer_head->buffer_convert(disp->layer_head);
 
     lv_disp_send_event(disp, LV_EVENT_FLUSH_START, &offset_area);
     disp->flush_cb(disp, &offset_area, px_map);

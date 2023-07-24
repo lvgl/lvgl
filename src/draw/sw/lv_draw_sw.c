@@ -76,24 +76,6 @@ void lv_draw_sw_init(void)
     }
 }
 
-
-lv_layer_t * lv_draw_sw_layer_init(lv_disp_t * disp)
-{
-    lv_layer_t * layer = lv_malloc(sizeof(lv_layer_t));
-    LV_ASSERT_MALLOC(layer);
-    lv_memzero(layer, sizeof(lv_layer_t));
-    layer->buffer_copy = lv_draw_sw_buffer_copy;
-    layer->buffer_convert = lv_draw_sw_buffer_convert;
-
-    return layer;
-}
-
-void lv_draw_sw_layer_deinit(lv_disp_t * disp, lv_layer_t * layer)
-{
-    LV_UNUSED(disp);
-    lv_memzero(layer, sizeof(lv_layer_t));
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -111,8 +93,8 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
 
     /*If the buffer of the layer is not allocated yet, allocate it now*/
     if(layer->draw_buf->buf == NULL) {
-        uint32_t px_size = lv_color_format_get_size(layer->draw_buf->color_format);
-        uint32_t layer_size_byte = layer->draw_buf->width * layer->draw_buf->height * px_size;
+        uint32_t layer_size_byte = layer->draw_buf->height * lv_draw_buf_width_to_stride(layer->draw_buf->width,
+                                                                                         layer->draw_buf->color_format);
 
         uint8_t * buf = lv_malloc(layer_size_byte);
         if(buf == NULL) {
