@@ -237,9 +237,44 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
 
     uint32_t x;
     uint32_t y;
-    for(y = 0; y < dsc->header.h; y++) {
-        for(x = 0; x < dsc->header.w; x++) {
-            lv_canvas_set_px(obj, x, y, color, opa);
+
+    if(dsc->header.cf == LV_COLOR_FORMAT_RGB565) {
+        uint16_t c16 = lv_color_to_u16(color);
+        for(y = 0; y < dsc->header.h; y++) {
+            uint16_t * buf16 = (uint16_t *)(dsc->data + y * dsc->header.w * 2);
+            for(x = 0; x < dsc->header.w; x++) {
+                buf16[x] = c16;
+            }
+        }
+    }
+    else if(dsc->header.cf == LV_COLOR_FORMAT_XRGB8888 || dsc->header.cf == LV_COLOR_FORMAT_ARGB8888) {
+        uint32_t c32 = lv_color_to_u32(color);
+        if(dsc->header.cf == LV_COLOR_FORMAT_ARGB8888) {
+            c32 &= 0x00ffffff;
+            c32 |= opa << 24;
+        }
+        for(y = 0; y < dsc->header.h; y++) {
+            uint32_t * buf32 = (uint32_t *)(dsc->data + y * dsc->header.w * 4);
+            for(x = 0; x < dsc->header.w; x++) {
+                buf32[x] = c32;
+            }
+        }
+    }
+    else if(dsc->header.cf == LV_COLOR_FORMAT_RGB888) {
+        for(y = 0; y < dsc->header.h; y++) {
+            uint8_t * buf8 = (uint8_t *)(dsc->data + y * dsc->header.w * 3);
+            for(x = 0; x < dsc->header.w * 3; x += 3) {
+                buf8[x + 0] = color.blue;
+                buf8[x + 1] = color.green;
+                buf8[x + 2] = color.red;
+            }
+        }
+    }
+    else {
+        for(y = 0; y < dsc->header.h; y++) {
+            for(x = 0; x < dsc->header.w; x++) {
+                lv_canvas_set_px(obj, x, y, color, opa);
+            }
         }
     }
 
