@@ -362,16 +362,16 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
  * BUFFERING
  *--------------------*/
 
-void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_byte,
+void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_in_bytes,
                               lv_disp_render_mode_t render_mode)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return;
 
-    disp->draw_buf_1 = buf1;
-    disp->draw_buf_2 = buf2;
-    disp->draw_buf_act = buf1;
-    disp->draw_buf_size = buf_size_byte;
+    disp->buf_1 = buf1;
+    disp->buf_2 = buf2;
+    disp->buf_act = buf1;
+    disp->buf_size_in_bytes = buf_size_in_bytes;
     disp->render_mode = render_mode;
 }
 
@@ -389,7 +389,7 @@ void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format)
     if(disp == NULL) return;
 
     disp->color_format = color_format;
-    disp->layer_head->color_format = color_format;
+    disp->layer_head->draw_buf->color_format = color_format;
 }
 
 lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp)
@@ -430,7 +430,7 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp)
 
 bool lv_disp_is_double_buffered(lv_disp_t * disp)
 {
-    return disp->draw_buf_2 ? true : false;
+    return disp->buf_2 ? true : false;
 }
 
 /*---------------------

@@ -65,7 +65,6 @@ typedef struct {
     uint8_t cf;          /*Color format: See `lv_color_format_t`*/
     uint16_t w; /*Width of the image*/
     uint16_t h; /*Height of the image*/
-    uint16_t stride; /*Width of the image*/
 
 } lv_img_header_t;
 #endif

@@ -32,8 +32,7 @@ extern const lv_obj_class_t lv_canvas_class;
 /*Data of canvas*/
 typedef struct {
     lv_img_t img;
-    lv_img_dsc_t img_dsc;
-    lv_draw_buf_t * draw_buf;
+    lv_img_dsc_t dsc;
 } lv_canvas_t;
 
 /**********************
@@ -52,12 +51,18 @@ lv_obj_t * lv_canvas_create(lv_obj_t * parent);
  *====================*/
 
 /**
- * Set a buffer for the canvas. It should be created with `lv_draw_buf_malloc()` or
- * manually initializing an `lv_draw_buf_t` struct.
- * @param obj       pointer to a canvas object
- * @param draw_buf  a draw buffer obejct
+ * Set a buffer for the canvas.
+ * @param buf a buffer where the content of the canvas will be.
+ * The required size is (lv_img_color_format_get_px_size(cf) * w) / 8 * h)
+ * It can be allocated with `lv_malloc()` or
+ * it can be statically allocated array (e.g. static lv_color_t buf[100*50]) or
+ * it can be an address in RAM or external SRAM
+ * @param canvas pointer to a canvas object
+ * @param w width of the canvas
+ * @param h height of the canvas
+ * @param cf color format. `LV_IMG_CF_...`
  */
-void lv_canvas_set_buffer(lv_obj_t * obj, lv_draw_buf_t * draw_buf);
+void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_color_format_t cf);
 
 void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
 

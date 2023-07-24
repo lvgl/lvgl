@@ -27,7 +27,6 @@ typedef struct {
     void * buf;
     lv_coord_t width;
     lv_coord_t height;
-    lv_coord_t stride;
     lv_color_format_t color_format;
 } lv_draw_buf_t;
 
@@ -36,6 +35,7 @@ lv_draw_buf_t  * lv_draw_buf_realloc(lv_draw_buf_t  * buf, lv_coord_t w, lv_coor
 void lv_draw_buf_free(lv_draw_buf_t  * buf);
 void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * buf);
 
+uint32_t lv_draw_buf_get_stride(const lv_draw_buf_t * draw_buf);
 void * lv_draw_buf_go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y);
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
 

@@ -53,11 +53,11 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     if(layer_to_draw->draw_buf->buf == NULL) return;
 
     lv_img_dsc_t img_dsc;
-    img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
-    img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
-    img_dsc.header.cf = layer_to_draw->color_format;
+    img_dsc.header.w = layer_to_draw->draw_buf->width;
+    img_dsc.header.h = layer_to_draw->draw_buf->height;
+    img_dsc.header.cf = layer_to_draw->draw_buf->color_format;
     img_dsc.header.always_zero = 0;
-    img_dsc.data = layer_to_draw->buf;
+    img_dsc.data = layer_to_draw->draw_buf->buf;
 
     lv_draw_img_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_img_dsc_t));

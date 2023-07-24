@@ -67,11 +67,17 @@ void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * buf)
 
 }
 
+uint32_t lv_draw_buf_get_stride(const lv_draw_buf_t * draw_buf)
+{
+    return (draw_buf->width + LV_DRAW_BUF_STRIDE - 1) & ~(LV_DRAW_BUF_STRIDE - 1);
+}
+
 void * lv_draw_buf_go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y)
 {
     uint32_t px_size = lv_color_format_get_size(draw_buf->color_format);
+    uint32_t stride = lv_draw_buf_get_stride(draw_buf);
     uint8_t * buf_tmp = draw_buf->buf;
-    buf_tmp += draw_buf->stride * y * px_size;
+    buf_tmp += stride * y * px_size;
     buf_tmp += x * px_size;
 
     return buf_tmp;
@@ -81,7 +87,8 @@ void * lv_draw_buf_go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
     uint8_t px_size = lv_color_format_get_size(draw_buf->color_format);
-    lv_memzero(draw_buf->buf, draw_buf->stride * draw_buf->height * draw_buf->color_format);
+    uint32_t stride = lv_draw_buf_get_stride(draw_buf);
+    lv_memzero(draw_buf->buf, stride * draw_buf->height * draw_buf->color_format);
 }
 
 /**********************

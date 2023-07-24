@@ -59,11 +59,12 @@ struct _lv_disp_t {
     /*---------------------
      * Buffering
      *--------------------*/
-    lv_draw_buf_t * draw_buf_1;
-    lv_draw_buf_t * draw_buf_2;
+    uint8_t * buf_1;
+    uint8_t * buf_2;
 
     /** Internal, used by the library*/
-    lv_draw_buf_t * draw_buf_act;
+    uint8_t * buf_act;
+    uint32_t buf_size_in_bytes;
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished*/
