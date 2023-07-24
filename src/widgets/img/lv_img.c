@@ -182,7 +182,7 @@ void lv_img_set_angle(lv_obj_t * obj, int16_t angle)
     lv_img_t * img = (lv_img_t *)obj;
     if(angle == img->angle) return;
 
-    if (img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
+    if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
         img->angle = angle;
         lv_obj_invalidate_area(obj, &obj->coords);
         return;
@@ -221,7 +221,7 @@ void lv_img_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     lv_img_t * img = (lv_img_t *)obj;
     if(img->pivot.x == x && img->pivot.y == y) return;
 
-    if (img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
+    if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
         img->pivot.x = x;
         img->pivot.y = y;
         lv_obj_invalidate_area(obj, &obj->coords);
@@ -264,7 +264,7 @@ void lv_img_set_zoom(lv_obj_t * obj, uint16_t zoom)
 
     if(zoom == 0) zoom = 1;
 
-    if (img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
+    if(img->obj_size_mode == LV_IMG_SIZE_MODE_REAL) {
         img->zoom = zoom;
         lv_obj_invalidate_area(obj, &obj->coords);
         return;
