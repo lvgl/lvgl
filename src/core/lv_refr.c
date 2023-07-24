@@ -585,9 +585,9 @@ static void refr_area_part(lv_layer_t * layer)
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(&layer->buf_area, lv_disp_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_disp_get_scr_act(disp_refr));
     if(disp_refr->prev_scr) {
-        top_prev_scr = lv_refr_get_top_obj(&layer->buf_area, disp_refr->prev_scr);
+        top_prev_scr = lv_refr_get_top_obj(&layer->clip_area, disp_refr->prev_scr);
     }
 
     /*Draw a bottom layer background if there is no top object*/
