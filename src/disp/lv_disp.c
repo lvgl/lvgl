@@ -122,7 +122,7 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp_def = disp_def_tmp; /*Revert the default display*/
     if(disp_def == NULL) disp_def = disp; /*Initialize the default display*/
 
-    lv_disp_add_event(disp, disp_event_cb, LV_EVENT_REFRESH, NULL);
+    lv_disp_add_event(disp, disp_event_cb, LV_EVENT_REFR_REQUEST, NULL);
 
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
 
@@ -942,7 +942,7 @@ static void disp_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_disp_t * disp = lv_event_get_target(e);
     switch(code) {
-        case LV_EVENT_REFRESH:
+        case LV_EVENT_REFR_REQUEST:
             if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
             break;
 
