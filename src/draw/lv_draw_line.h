@@ -43,7 +43,7 @@ struct _lv_draw_ctx_t;
  * GLOBAL PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
+void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc) /* LV_ATTRIBUTE_FAST_MEM */;
 
 /**
  * Draw a line
@@ -53,7 +53,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
  * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
  */
 void lv_draw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
-                  const lv_point_t * point2);
+                  const lv_point_t * point2) /* LV_ATTRIBUTE_FAST_MEM */;
 
 
 /**********************

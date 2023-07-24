@@ -44,9 +44,9 @@ typedef struct {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle);
+int16_t lv_trigo_sin(int16_t angle) /* LV_ATTRIBUTE_FAST_MEM */;
 
-static inline LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_cos(int16_t angle)
+static inline int16_t lv_trigo_cos(int16_t angle) LV_ATTRIBUTE_FAST_MEM
 {
     return lv_trigo_sin(angle + 90);
 }
@@ -84,7 +84,7 @@ uint16_t lv_atan2(int x, int y);
  * If root < 256: mask = 0x800
  * Else: mask = 0x8000
  */
-LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
+void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask) /* LV_ATTRIBUTE_FAST_MEM */;
 
 //! @endcond
 

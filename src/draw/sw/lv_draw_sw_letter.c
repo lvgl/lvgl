@@ -27,8 +27,8 @@
  *  STATIC PROTOTYPES
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
-                                                     const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p);
+static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+                               const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p) /* LV_ATTRIBUTE_FAST_MEM */;
 
 
 #if LV_DRAW_COMPLEX && LV_USE_FONT_SUBPX
@@ -162,8 +162,8 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
-                                                     const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
+static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+                               const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p) LV_ATTRIBUTE_FAST_MEM
 {
 
     const uint8_t * bpp_opa_table_p;

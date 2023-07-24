@@ -56,7 +56,7 @@ void lv_draw_sw_blend(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_d
  * @param draw_ctx      pointer to a draw context
  * @param dsc           pointer to an initialized blend descriptor
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_blend_basic(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+void lv_draw_sw_blend_basic(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc) /* LV_ATTRIBUTE_FAST_MEM */;
 
 /**********************
  *      MACROS
