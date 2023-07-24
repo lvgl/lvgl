@@ -94,11 +94,6 @@ typedef struct {
     uint8_t v;
 } lv_color_hsv_t;
 
-//! @cond Doxygen_Suppress
-/*No idea where the guard is required but else throws warnings in the docs*/
-typedef uint8_t lv_opa_t;
-//! @endcond
-
 enum _lv_color_format_t {
     LV_COLOR_FORMAT_UNKNOWN           = 0,
 
