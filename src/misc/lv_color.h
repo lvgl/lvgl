@@ -436,7 +436,7 @@ static inline uint32_t lv_color_to32(lv_color_t color)
  * @param mix The ratio of the colors. 0: full `c2`, 255: full `c1`, 127: half `c1` and half`c2`
  * @return the mixed color
  */
-LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
+static inline lv_color_t LV_ATTRIBUTE_FAST_MEM lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
 
@@ -472,7 +472,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
     return ret;
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t mix, uint16_t * out)
+static inline void LV_ATTRIBUTE_FAST_MEM lv_color_premult(lv_color_t c, uint8_t mix, uint16_t * out)
 {
 #if LV_COLOR_DEPTH != 1
     out[0] = (uint16_t)LV_COLOR_GET_R(c) * mix;
@@ -497,7 +497,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t 
  * @return the mixed color
  * @note 255 won't give clearly `c1`.
  */
-LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * premult_c1, lv_color_t c2, uint8_t mix)
+static inline lv_color_t LV_ATTRIBUTE_FAST_MEM lv_color_mix_premult(uint16_t * premult_c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
 #if LV_COLOR_DEPTH != 1
@@ -528,7 +528,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * p
  * @param res_color the result color
  * @param res_opa the result opacity
  */
-LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
+static inline void LV_ATTRIBUTE_FAST_MEM lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
                                                                  lv_color_t fg_color, lv_opa_t fg_opa,
                                                                  lv_color_t * res_color, lv_opa_t * res_opa)
 {
@@ -644,7 +644,7 @@ static inline void lv_color_filter_dsc_init(lv_color_filter_dsc_t * dsc, lv_colo
 
 //! @cond Doxygen_Suppress
 //!
-LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num);
 
 //! @endcond
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl);

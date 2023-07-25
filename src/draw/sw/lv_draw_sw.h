@@ -61,11 +61,13 @@ void lv_draw_sw_bg(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc, con
 void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc, const lv_point_t * pos_p,
                        uint32_t letter);
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * draw_dsc,
-                                                  const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t cf);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
+                                                        const lv_draw_img_dsc_t * draw_dsc,
+                                                        const lv_area_t * coords, const uint8_t * src_buf,
+                                                        lv_img_cf_t cf);
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
-                                           const lv_point_t * point1, const lv_point_t * point2);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_sw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+                                                 const lv_point_t * point1, const lv_point_t * point2);
 
 void lv_draw_sw_polygon(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * draw_dsc,
                         const lv_point_t * points, uint16_t point_cnt);

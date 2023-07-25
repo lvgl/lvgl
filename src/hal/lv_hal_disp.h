@@ -173,10 +173,8 @@ typedef struct _lv_disp_t {
     struct _lv_obj_t * top_layer;   /**< @see lv_disp_get_layer_top*/
     struct _lv_obj_t * sys_layer;   /**< @see lv_disp_get_layer_sys*/
     uint32_t screen_cnt;
-uint8_t draw_prev_over_act  :
-    1;          /**< 1: Draw previous screen over active screen*/
-uint8_t del_prev  :
-    1;          /**< 1: Automatically delete the previous screen when the screen load animation is ready*/
+    uint8_t draw_prev_over_act : 1; /**< 1: Draw previous screen over active screen*/
+    uint8_t del_prev : 1;           /**< 1: Automatically delete the previous screen when the screen load anim. is ready*/
     uint8_t rendering_in_progress : 1; /**< 1: The current screen rendering is in progress*/
 
     lv_opa_t bg_opa;                /**<Opacity of the background color or wallpaper*/
@@ -332,7 +330,7 @@ lv_disp_rot_t lv_disp_get_rotation(lv_disp_t * disp);
  * Call in the display driver's `flush_cb` function when the flushing is finished
  * @param disp_drv pointer to display driver in `flush_cb` where this function is called
  */
-LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv);
+void /* LV_ATTRIBUTE_FLUSH_READY */ lv_disp_flush_ready(lv_disp_drv_t * disp_drv);
 
 /**
  * Tell if it's the last area of the refreshing process.
@@ -340,7 +338,7 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv);
  * @param disp_drv pointer to display driver
  * @return true: it's the last area to flush; false: there are other areas too which will be refreshed soon
  */
-LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_drv_t * disp_drv);
+bool /* LV_ATTRIBUTE_FLUSH_READY */ lv_disp_flush_is_last(lv_disp_drv_t * disp_drv);
 
 //! @endcond
 

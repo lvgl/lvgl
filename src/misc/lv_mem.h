@@ -183,7 +183,7 @@ static inline void lv_memset_ff(void * dst, size_t len)
  * @param src pointer to the source buffer
  * @param len number of byte to copy
  */
-LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len);
+void * /* LV_ATTRIBUTE_FAST_MEM */ lv_memcpy(void * dst, const void * src, size_t len);
 
 /**
  * Same as `memcpy` but optimized to copy only a few bytes.
@@ -191,7 +191,7 @@ LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
  * @param src pointer to the source buffer
  * @param len number of byte to copy
  */
-LV_ATTRIBUTE_FAST_MEM static inline void * lv_memcpy_small(void * dst, const void * src, size_t len)
+static inline void * LV_ATTRIBUTE_FAST_MEM lv_memcpy_small(void * dst, const void * src, size_t len)
 {
     uint8_t * d8 = (uint8_t *)dst;
     const uint8_t * s8 = (const uint8_t *)src;
@@ -212,21 +212,21 @@ LV_ATTRIBUTE_FAST_MEM static inline void * lv_memcpy_small(void * dst, const voi
  * @param v value to set [0..255]
  * @param len number of byte to set
  */
-LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_memset(void * dst, uint8_t v, size_t len);
 
 /**
  * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
-LV_ATTRIBUTE_FAST_MEM void lv_memset_00(void * dst, size_t len);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_memset_00(void * dst, size_t len);
 
 /**
  * Same as `memset(dst, 0xFF, len)` but optimized for 4 byte operation.
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
-LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_memset_ff(void * dst, size_t len);
 
 //! @endcond
 

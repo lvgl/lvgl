@@ -40,7 +40,7 @@ extern const uint8_t _lv_bpp8_opa_table[256];
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
+static void LV_ATTRIBUTE_FAST_MEM draw_letter_normal(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc,
                                                      const lv_point_t * pos, lv_font_glyph_dsc_t * g, const uint8_t * map_p)
 {
 
