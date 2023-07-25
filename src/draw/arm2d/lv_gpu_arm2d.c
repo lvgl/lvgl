@@ -459,7 +459,8 @@ static bool /* LV_ATTRIBUTE_FAST_MEM */ arm_2d_copy_normal(lv_color_t * dest_buf
                                                            lv_coord_t mask_stride);
 #endif
 
-static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
+                                                            const lv_draw_sw_blend_dsc_t * dsc);
 static void /* LV_ATTRIBUTE_FAST_MEM */ lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx);
 static void /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_arm2d_img_decoded(struct _lv_draw_ctx_t * draw_ctx,
                                                                   const lv_draw_img_dsc_t * draw_dsc,
@@ -505,7 +506,8 @@ void lv_draw_arm2d_ctx_deinit(lv_disp_drv_t * drv, lv_draw_ctx_t * draw_ctx)
 extern void test_flush(lv_color_t * color_p);
 
 #if __ARM_2D_HAS_HW_ACC__
-static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
+                                                      const lv_draw_sw_blend_dsc_t * dsc)
 {
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;
@@ -681,7 +683,8 @@ static void lv_gpu_arm2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 #else
 
 
-static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc)
+static void LV_ATTRIBUTE_FAST_MEM lv_draw_arm2d_blend(lv_draw_ctx_t * draw_ctx,
+                                                      const lv_draw_sw_blend_dsc_t * dsc)
 {
     const lv_opa_t * mask;
     if(dsc->mask_buf == NULL) mask = NULL;

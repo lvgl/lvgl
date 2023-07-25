@@ -37,8 +37,8 @@ static void draw_outline(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * ds
 #if LV_DRAW_COMPLEX
 static void /* LV_ATTRIBUTE_FAST_MEM */ draw_shadow(lv_draw_ctx_t * draw_ctx, const lv_draw_rect_dsc_t * dsc,
                                                     const lv_area_t * coords);
-static void /* LV_ATTRIBUTE_FAST_MEM */ shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t s,
-                                                               lv_coord_t r);
+static void /* LV_ATTRIBUTE_FAST_MEM */ shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf,
+                                                               lv_coord_t s, lv_coord_t r);
 static void /* LV_ATTRIBUTE_FAST_MEM */ shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
 #endif
 
@@ -950,8 +950,8 @@ static void LV_ATTRIBUTE_FAST_MEM draw_shadow(lv_draw_ctx_t * draw_ctx, const lv
  * @param sw shadow width
  * @param r radius
  */
-static void LV_ATTRIBUTE_FAST_MEM shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t sw,
-                                                         lv_coord_t r)
+static void LV_ATTRIBUTE_FAST_MEM shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf,
+                                                         lv_coord_t sw, lv_coord_t r)
 {
     int32_t sw_ori = sw;
     int32_t size = sw_ori  + r;

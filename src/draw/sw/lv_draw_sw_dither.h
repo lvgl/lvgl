@@ -45,7 +45,8 @@ typedef void (*lv_dither_func_t)(struct _lv_gradient_cache_t * grad, lv_coord_t 
  **********************/
 #if LV_DRAW_COMPLEX
 #if _DITHER_GRADIENT
-void /* LV_ATTRIBUTE_FAST_MEM */ lv_dither_none(struct _lv_gradient_cache_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w);
+void /* LV_ATTRIBUTE_FAST_MEM */ lv_dither_none(struct _lv_gradient_cache_t * grad, lv_coord_t x, lv_coord_t y,
+                                                lv_coord_t w);
 
 void /* LV_ATTRIBUTE_FAST_MEM */ lv_dither_ordered_hor(struct _lv_gradient_cache_t * grad, const lv_coord_t xs,
                                                        const lv_coord_t y, const lv_coord_t w);

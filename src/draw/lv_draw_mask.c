@@ -45,11 +45,11 @@ static lv_draw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ lv_draw_mask_polygon(lv_op
                                                                            lv_coord_t abs_y, lv_coord_t len,
                                                                            lv_draw_mask_polygon_param_t * param);
 
-static lv_draw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                                     lv_coord_t len,
+static lv_draw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                     lv_coord_t abs_y, lv_coord_t len,
                                                                      lv_draw_mask_line_param_t * p);
-static lv_draw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                                      lv_coord_t len,
+static lv_draw_mask_res_t /* LV_ATTRIBUTE_FAST_MEM */ line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                      lv_coord_t abs_y, lv_coord_t len,
                                                                       lv_draw_mask_line_param_t * p);
 
 static void circ_init(lv_point_t * c, lv_coord_t * tmp, lv_coord_t radius);
@@ -108,8 +108,8 @@ int16_t lv_draw_mask_add(void * param, void * custom_id)
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                            lv_coord_t len)
+lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                            lv_coord_t abs_y, lv_coord_t len)
 {
     bool changed = false;
     _lv_draw_mask_common_dsc_t * dsc;
@@ -142,8 +142,9 @@ lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_apply(lv_opa_t * mask_buf,
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
-                                                                lv_coord_t len, const int16_t * ids, int16_t ids_count)
+lv_draw_mask_res_t LV_ATTRIBUTE_FAST_MEM lv_draw_mask_apply_ids(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                lv_coord_t abs_y, lv_coord_t len,
+                                                                const int16_t * ids, int16_t ids_count)
 {
     bool changed = false;
     _lv_draw_mask_common_dsc_t * dsc;
