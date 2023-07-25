@@ -288,6 +288,8 @@ void lv_obj_enable_style_refresh(bool en)
 
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
+    LV_ASSERT_NULL(obj)
+
     lv_style_value_t value_act = { .ptr = NULL };
     bool inheritable = lv_style_prop_has_flag(prop, LV_STYLE_PROP_FLAG_INHERITABLE);
     lv_style_res_t found = LV_STYLE_RES_NOT_FOUND;
