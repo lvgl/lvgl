@@ -69,8 +69,8 @@ typedef struct _lv_gradient_cache_t {
  * @param range     The range to use in computation.
  * @param frac      The current part used in the range. frac is in [0; range]
  */
-LV_ATTRIBUTE_FAST_MEM lv_grad_color_t lv_gradient_calculate(const lv_grad_dsc_t * dsc, lv_coord_t range,
-                                                            lv_coord_t frac);
+lv_grad_color_t /* LV_ATTRIBUTE_FAST_MEM */ lv_gradient_calculate(const lv_grad_dsc_t * dsc, lv_coord_t range,
+                                                                  lv_coord_t frac);
 
 /**
  * Set the gradient cache size

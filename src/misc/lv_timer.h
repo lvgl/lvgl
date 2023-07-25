@@ -65,7 +65,7 @@ void _lv_timer_core_init(void);
  * Call it periodically to handle lv_timers.
  * @return time till it needs to be run next (in ms)
  */
-LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void);
+uint32_t /* LV_ATTRIBUTE_TIMER_HANDLER */ lv_timer_handler(void);
 
 //! @endcond
 
@@ -75,7 +75,7 @@ LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void);
  * This function is used to simplify the porting.
  * @param __ms the period for running lv_timer_handler()
  */
-static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler_run_in_period(uint32_t ms)
+static inline uint32_t LV_ATTRIBUTE_TIMER_HANDLER lv_timer_handler_run_in_period(uint32_t ms)
 {
     static uint32_t last_tick = 0;
     uint32_t curr_tick = lv_tick_get();

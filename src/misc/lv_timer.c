@@ -64,7 +64,7 @@ void _lv_timer_core_init(void)
  * Call it periodically to handle lv_timers.
  * @return the time after which it must be called again
  */
-LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_timer_handler(void)
+uint32_t LV_ATTRIBUTE_TIMER_HANDLER lv_timer_handler(void)
 {
     TIMER_TRACE("begin");
 
