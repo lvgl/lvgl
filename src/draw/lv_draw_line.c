@@ -34,7 +34,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc) LV_ATTRIBUTE_FAST_MEM
+void LV_ATTRIBUTE_FAST_MEM lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
@@ -42,8 +42,8 @@ void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc) LV_ATTRIBUTE_FAST_MEM
     dsc->color = lv_color_black();
 }
 
-void lv_draw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
-                  const lv_point_t * point1, const lv_point_t * point2) LV_ATTRIBUTE_FAST_MEM
+void LV_ATTRIBUTE_FAST_MEM lv_draw_line(struct _lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc,
+                                        const lv_point_t * point1, const lv_point_t * point2)
 {
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;

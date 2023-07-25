@@ -34,7 +34,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc) LV_ATTRIBUTE_FAST_MEM
+void LV_ATTRIBUTE_FAST_MEM lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_rect_dsc_t));
     dsc->bg_color = lv_color_white();
