@@ -36,7 +36,7 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
 
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
-static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const uint16_t tick_idx,
+static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
                                         lv_point_t * tick_point_a, lv_point_t * tick_point_b);
 static void scale_set_items_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * items_section_style);
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
@@ -345,7 +345,7 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
 
         lv_point_t tick_point_a;
         lv_point_t tick_point_b;
-        scale_get_minor_tick_points(obj, &line_dsc, tick_idx, &tick_point_a, &tick_point_b);
+        scale_get_minor_tick_points(obj, tick_idx, &tick_point_a, &tick_point_b);
 
         line_dsc.p1 = tick_point_a;
         line_dsc.p2 = tick_point_b;
@@ -377,7 +377,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
         /* Get style properties so they can be used in the tick and label drawing */
-        lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
         lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
@@ -894,12 +893,11 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord
  * In order to draw minor ticks we need two points, this interface returns both points for all scale modes.
  *
  * @param obj       pointer to a scale object
- * @param line_dsc  pointer to line descriptor, used for horizontal and vertical modes
  * @param tick_idx  index of the current tick
  * @param tick_point_a  pointer to point 'a' of the minor tick
  * @param tick_point_b  pointer to point 'b' of the minor tick
  */
-static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, const uint16_t tick_idx,
+static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
                                         lv_point_t * tick_point_a, lv_point_t * tick_point_b)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -913,7 +911,6 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, lv_draw_line_dsc_t * lin
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
         /* Get style properties so they can be used in the tick and label drawing */
-        const lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
         const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj,
                                                                                                                LV_PART_MAIN);
