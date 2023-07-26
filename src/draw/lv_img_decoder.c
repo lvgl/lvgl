@@ -360,10 +360,35 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
     }
 
     lv_img_cf_t cf = dsc->header.cf;
+    /*Process A8,  RGB565A8, need load file to ram after https://github.com/lvgl/lvgl/pull/3337*/
+    if(cf == LV_IMG_CF_ALPHA_8BIT || cf == LV_IMG_CF_RGB565A8) {
+        if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
+            /*In case of uncompressed formats the image stored in the ROM/RAM.
+             *So simply give its pointer*/
+            dsc->img_data = ((lv_img_dsc_t *)dsc->src)->data;
+            return LV_RES_OK;
+        }
+        else {
+            /*If it's a file, read all to memory*/
+            uint32_t len = dsc->header.w * dsc->header.h;
+            len *= cf == LV_IMG_CF_RGB565A8 ? 3 : 1;
+            uint8_t * fs_buf = lv_mem_alloc(len);
+            if(fs_buf == NULL) return LV_RES_INV;
+
+            lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
+            lv_fs_seek(&user_data->f, 4, LV_FS_SEEK_SET); /*+4 to skip the header*/
+            lv_fs_res_t res = lv_fs_read(&user_data->f, fs_buf, len, NULL);
+            if(res != LV_FS_RES_OK) {
+                lv_mem_free(fs_buf);
+                return LV_RES_INV;
+            }
+            dsc->img_data = fs_buf;
+            return LV_RES_OK;
+        }
+    }
     /*Process true color formats*/
-    if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
-       cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED || cf == LV_IMG_CF_RGB565A8 ||
-       cf == LV_IMG_CF_ALPHA_8BIT) {
+    else if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
+            cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
             /*In case of uncompressed formats the image stored in the ROM/RAM.
              *So simply give its pointer*/
