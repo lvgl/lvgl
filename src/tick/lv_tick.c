@@ -8,6 +8,7 @@
  *********************/
 #include "lv_tick.h"
 #include <stddef.h>
+#include "../core/lv_global.h"
 
 #if LV_TICK_CUSTOM == 1
     #include LV_TICK_CUSTOM_INCLUDE
@@ -16,6 +17,13 @@
 /*********************
  *      DEFINES
  *********************/
+#if !LV_TICK_CUSTOM
+    /*Warning: sys_time is modified across threads by SDL backend, which prevents the ability to use multiple instances of this variable in SDL.*/
+    #if !LV_USE_SDL
+        #define sys_time lv_global_default()->tick_sys_time
+    #endif
+    #define irq_flag lv_global_default()->tick_irq_flag
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -28,9 +36,8 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if !LV_TICK_CUSTOM
-    static uint32_t sys_time = 0;
-    static volatile uint8_t tick_irq_flag;
+#if !LV_TICK_CUSTOM && LV_USE_SDL
+    static uint32_t sys_time;
 #endif
 
 /**********************
@@ -48,7 +55,7 @@
  */
 LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
 {
-    tick_irq_flag = 0;
+    irq_flag = 0;
     sys_time += tick_period;
 }
 #endif
@@ -64,13 +71,13 @@ uint32_t lv_tick_get(void)
     /*If `lv_tick_inc` is called from an interrupt while `sys_time` is read
      *the result might be corrupted.
      *This loop detects if `lv_tick_inc` was called while reading `sys_time`.
-     *If `tick_irq_flag` was cleared in `lv_tick_inc` try to read again
-     *until `tick_irq_flag` remains `1`.*/
+     *If `irq_flag` was cleared in `lv_tick_inc` try to read again
+     *until `irq_flag` remains `1`.*/
     uint32_t result;
     do {
-        tick_irq_flag = 1;
+        irq_flag = 1;
         result        = sys_time;
-    } while(!tick_irq_flag); /*Continue until see a non interrupted cycle*/
+    } while(!irq_flag); /*Continue until see a non interrupted cycle*/
 
     return result;
 #else

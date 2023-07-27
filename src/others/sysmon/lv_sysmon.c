@@ -11,6 +11,7 @@
 
 #if LV_USE_SYSMON
 
+#include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
@@ -21,18 +22,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    uint32_t    refr_start;
-    uint32_t    refr_interval_sum;
-    uint32_t    refr_elaps_sum;
-    uint32_t    refr_cnt;
-    uint32_t    render_start;
-    uint32_t    render_elaps_sum;
-    uint32_t    render_cnt;
-    uint32_t    flush_start;
-    uint32_t    flush_elaps_sum;
-    uint32_t    flush_cnt;
-} perf_info_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -202,13 +191,12 @@ static void perf_monitor_event_cb(lv_event_t * e)
 
 static void perf_monitor_init(void)
 {
-    static perf_info_t info = { 0 };
     lv_disp_t * disp = lv_disp_get_default();
 
     lv_obj_t * sysmon = lv_sysmon_create(lv_layer_sys());
     lv_obj_align(sysmon, LV_USE_PERF_MONITOR_POS, 0, 0);
     lv_obj_set_style_text_align(sysmon, LV_TEXT_ALIGN_RIGHT, 0);
-    lv_obj_set_user_data(sysmon, &info);
+    lv_obj_set_user_data(sysmon, &(lv_global_default()->sysmon_perf_info));
     lv_obj_add_event(sysmon, perf_monitor_event_cb, LV_EVENT_REFRESH, NULL);
     lv_disp_add_event(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, sysmon);
 

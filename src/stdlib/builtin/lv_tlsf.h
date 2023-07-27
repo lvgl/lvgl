@@ -43,6 +43,9 @@
 
 #include <stddef.h>
 
+#include "../../osal/lv_os.h"
+#include "../../misc/lv_ll.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -51,6 +54,16 @@ extern "C" {
 /* lv_pool_t: a block of memory that TLSF can manage. */
 typedef void * lv_tlsf_t;
 typedef void * lv_pool_t;
+
+typedef struct {
+#if LV_USE_OS
+    lv_mutex_t mutex;
+#endif
+    lv_tlsf_t tlsf;
+    uint32_t cur_used;
+    uint32_t max_used;
+    lv_ll_t  pool_ll;
+} lv_tlsf_state_t;
 
 /* Create/destroy a memory pool. */
 lv_tlsf_t lv_tlsf_create(void * mem);

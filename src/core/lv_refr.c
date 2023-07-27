@@ -17,10 +17,14 @@
 #include "../misc/lv_profiler.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
+#include "lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+/*Display being refreshed*/
+#define disp_refr lv_global_default()->disp_refresh
 
 /**********************
  *      TYPEDEFS
@@ -44,11 +48,10 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px
  *  STATIC VARIABLES
  **********************/
 
-static lv_disp_t * disp_refr; /*Display being refreshed*/
-
 /**********************
  *      MACROS
  **********************/
+
 #if LV_LOG_TRACE_DISP_REFR
     #define REFR_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else

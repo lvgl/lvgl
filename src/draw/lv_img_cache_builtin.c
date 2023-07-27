@@ -13,10 +13,15 @@
 #include "../tick/lv_tick.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_gc.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#if LV_IMG_CACHE_DEF_SIZE
+    #define entry_cnt lv_global_default()->img_cache_entry_cnt
+#endif
+
 
 /** Count the cache entries's life. Add `time_to_open` to `life` when the entry is used.
  * Decrement all lifes by one every in every ::lv_img_cache_open.
@@ -53,9 +58,6 @@ static void lv_img_cache_invalidate_src_builtin(const void * src);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_IMG_CACHE_DEF_SIZE
-    static uint16_t entry_cnt;
-#endif
 
 /**********************
  *      MACROS

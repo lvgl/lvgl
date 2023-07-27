@@ -77,6 +77,9 @@ extern const lv_obj_class_t lv_spangroup_class;
  * GLOBAL PROTOTYPES
  **********************/
 
+void lv_span_stack_init(void);
+void lv_span_stack_deinit(void);
+
 /**
  * Create a spangroup object
  * @param par pointer to an object, it will be the parent of the new spangroup

@@ -50,6 +50,19 @@ typedef struct _lv_timer_t {
     uint32_t paused : 1;
 } lv_timer_t;
 
+typedef struct {
+    bool lv_timer_run;
+    uint8_t idle_last;
+    bool timer_deleted;
+    bool timer_created;
+    uint32_t timer_time_until_next;
+
+    bool already_running;
+    uint32_t periodic_last_tick;
+    uint32_t busy_time;
+    uint32_t idle_period_start;
+} lv_timer_state_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

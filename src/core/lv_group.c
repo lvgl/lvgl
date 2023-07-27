@@ -11,11 +11,13 @@
 #include "lv_group.h"
 #include "../misc/lv_gc.h"
 #include "../core/lv_obj.h"
+#include "../core/lv_global.h"
 #include "../indev/lv_indev.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define default_group lv_global_default()->group_default
 
 /**********************
  *      TYPEDEFS
@@ -32,7 +34,6 @@ static lv_indev_t * get_indev(const lv_group_t * g);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_group_t * default_group;
 
 /**********************
  *      MACROS

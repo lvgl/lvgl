@@ -8,11 +8,13 @@
  *********************/
 #include "lv_layout.h"
 #include "../misc/lv_gc.h"
+#include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define layout_cnt lv_global_default()->layout_count
 
 /**********************
  *      TYPEDEFS
@@ -25,7 +27,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint32_t layout_cnt = _LV_LAYOUT_LAST;
 
 /**********************
  *      MACROS

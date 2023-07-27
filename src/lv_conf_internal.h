@@ -332,6 +332,11 @@
     #endif
 #endif
 
+#if !defined(LV_THREAD_LOCAL) && LV_USE_OS != LV_OS_PTHREAD
+    /*Don't support multi-instance*/
+    #define LV_THREAD_LOCAL
+#endif
+
 
 /*=======================
  * FEATURE CONFIGURATION

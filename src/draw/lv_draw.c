@@ -9,6 +9,7 @@
 #include "lv_draw.h"
 #include "sw/lv_draw_sw.h"
 #include "../disp/lv_disp_private.h"
+#include "../core/lv_global.h"
 #include "../core/lv_refr.h"
 #include "../stdlib/lv_string.h"
 #include "../misc/lv_gc.h"
@@ -16,6 +17,9 @@
 /*********************
  *      DEFINES
  *********************/
+#define used_memory_for_layers_kb lv_global_default()->draw_layer_used_mem_kb
+#define sync lv_global_default()->draw_sync
+#define dispatch_req lv_global_default()->draw_dispatch_req
 
 /**********************
  *      TYPEDEFS
@@ -29,13 +33,6 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_USE_OS
-    static lv_thread_sync_t sync;
-#else
-    static int dispatch_req = 0;
-#endif
-
-static uint32_t used_memory_for_layers_kb = 0;
 
 /**********************
  *  STATIC VARIABLES

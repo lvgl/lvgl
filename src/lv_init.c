@@ -6,6 +6,9 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdlib.h>
+
+#include "core/lv_global.h"
 #include "core/lv_obj.h"
 #include "disp/lv_disp_private.h"
 #include "indev/lv_indev_private.h"
@@ -19,18 +22,14 @@
 #include "libs/sjpg/lv_sjpg.h"
 #include "draw/lv_draw.h"
 #include "draw/lv_img_cache_builtin.h"
-#include "misc/lv_anim.h"
-#include "misc/lv_timer.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
 #include "misc/lv_gc.h"
-#if LV_USE_DRAW_SW
-    #include "draw/sw/lv_draw_sw.h"
-#endif
 
 /*********************
  *      DEFINES
  *********************/
+#define lv_initialized  lv_global_default()->inited
 
 /**********************
  *      TYPEDEFS
@@ -43,7 +42,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_initialized = false;
 
 /**********************
  *      MACROS
@@ -52,6 +50,83 @@ static bool lv_initialized = false;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+static inline void lv_global_init(lv_global_t * global)
+{
+    LV_ASSERT_NULL(global);
+
+    if(global == NULL) {
+        return;
+    }
+
+    memset(global, 0, sizeof(lv_global_t));
+
+    global->style_refresh = true;
+    global->layout_count = _LV_LAYOUT_LAST;
+    global->memory_zero = ZERO_MEM_SENTINEL;
+    global->style_last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
+    global->area_trans_cache.angle_prev = INT32_MIN;
+    global->event_last_register_id = _LV_EVENT_LAST;
+    global->math_rand_seed = 0x1234ABCD;
+
+#if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
+    global->sw_shadow_cache.cache_size = -1;
+    global->sw_shadow_cache.cache_r = -1;
+#endif
+}
+
+#ifdef LV_THREAD_LOCAL
+
+lv_global_t * lv_global_default(void)
+{
+    static LV_THREAD_LOCAL lv_global_t lv_global;
+    return &lv_global;
+}
+
+#else
+
+static pthread_key_t lv_global_key;
+
+static inline lv_global_t * lv_global_create(void)
+{
+    lv_global_t * global = malloc(sizeof(lv_global_t));
+    LV_ASSERT_MALLOC(global);
+
+    lv_global_init(global);
+    return global;
+}
+
+static void lv_global_destroy(void * data)
+{
+    if(data) {
+        free(data);
+    }
+}
+
+static inline void lv_global_cleanup(void)
+{
+    (void) pthread_setspecific(lv_global_key, NULL);
+}
+
+static void lv_global_key_init(void)
+{
+    (void) pthread_key_create(&lv_global_key, lv_global_destroy);
+}
+
+lv_global_t * lv_global_default(void)
+{
+    static pthread_once_t key_once = PTHREAD_ONCE_INIT;
+    (void) pthread_once(&key_once, lv_global_key_init);
+    lv_global_t * data;
+
+    if((data = (lv_global_t *)pthread_getspecific(lv_global_key)) == NULL) {
+        data = lv_global_create();
+        LV_ASSERT_NULL(data);
+
+        (void) pthread_setspecific(lv_global_key, data);
+    }
+    return data;
+}
+#endif /*LV_THREAD_LOCAL*/
 
 bool lv_is_initialized(void)
 {
@@ -66,6 +141,11 @@ void lv_init(void)
         return;
     }
 
+#ifdef LV_THREAD_LOCAL
+    /*Initialize members of static variable lv_global */
+    lv_global_init(lv_global_default());
+#endif
+
     LV_LOG_INFO("begin");
 
     /*First initialize Garbage Collection if needed*/
@@ -75,6 +155,9 @@ void lv_init(void)
 
     lv_mem_init();
 
+#if LV_USE_SPAN != 0
+    lv_span_stack_init();
+#endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_profiler_builtin_config_t profiler_config;
@@ -197,6 +280,7 @@ void lv_init(void)
 #  endif
 #endif
 
+    //
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
@@ -210,7 +294,28 @@ void lv_deinit(void)
 
     lv_disp_set_default(NULL);
 
+#if LV_USE_SPAN != 0
+    lv_span_stack_deinit();
+#endif
+
+#if LV_USE_FREETYPE
+    lv_freetype_uninit();
+#endif
+
+#if LV_USE_THEME_DEFAULT
+    lv_theme_default_deinit();
+#endif
+
+#if LV_USE_THEME_BASIC
+    lv_theme_basic_deinit();
+#endif
+
+#if LV_USE_THEME_MONO
+    lv_theme_mono_deinit();
+#endif
+
     lv_mem_deinit();
+
     lv_initialized = false;
 
     LV_LOG_INFO("lv_deinit done");
@@ -218,10 +323,13 @@ void lv_deinit(void)
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
 #endif
+
+#ifndef LV_THREAD_LOCAL
+    /*Free lv_global dynamically allocated */
+    lv_global_cleanup();
+#endif
 }
 #endif
-
-
 
 /**********************
  *   STATIC FUNCTIONS

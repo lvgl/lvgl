@@ -9,6 +9,7 @@
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 #include "../disp/lv_disp_private.h"
+#include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_group.h"
 #include "../core/lv_refr.h"
@@ -47,6 +48,9 @@
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
 
+#define indev_act lv_global_default()->indev_active
+#define indev_obj_act lv_global_default()->indev_obj_active
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -69,8 +73,6 @@ static bool indev_reset_check(lv_indev_t * indev);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_indev_t * indev_act;
-static lv_obj_t * indev_obj_act = NULL;
 
 /**********************
  *      MACROS

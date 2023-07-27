@@ -8,6 +8,7 @@
  *********************/
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
+#include "../core/lv_global.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_types.h"
 #include "../misc/lv_gc.h"
@@ -18,15 +19,13 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_FONT_COMPRESSED
+    #define font_rle lv_global_default()->font_fmt_rle
+#endif /*LV_USE_FONT_COMPRESSED*/
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
-    RLE_STATE_SINGLE = 0,
-    RLE_STATE_REPEATE,
-    RLE_STATE_COUNTER,
-} rle_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -48,14 +47,6 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_USE_FONT_COMPRESSED
-    static uint32_t rle_rdp;
-    static const uint8_t * rle_in;
-    static uint8_t rle_bpp;
-    static uint8_t rle_prev_v;
-    static uint8_t rle_cnt;
-    static rle_state_t rle_state;
-#endif /*LV_USE_FONT_COMPRESSED*/
 
 static const uint8_t opa4_table[16] = {0,  17, 34,  51,
                                        68, 85, 102, 119,
@@ -480,12 +471,12 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
 
 static inline void rle_init(const uint8_t * in,  uint8_t bpp)
 {
-    rle_in = in;
-    rle_bpp = bpp;
-    rle_state = RLE_STATE_SINGLE;
-    rle_rdp = 0;
-    rle_prev_v = 0;
-    rle_cnt = 0;
+    font_rle.in = in;
+    font_rle.bpp = bpp;
+    font_rle.state = RLE_STATE_SINGLE;
+    font_rle.rdp = 0;
+    font_rle.prev_v = 0;
+    font_rle.count = 0;
 }
 
 static inline uint8_t rle_next(void)
@@ -493,52 +484,52 @@ static inline uint8_t rle_next(void)
     uint8_t v = 0;
     uint8_t ret = 0;
 
-    if(rle_state == RLE_STATE_SINGLE) {
-        ret = get_bits(rle_in, rle_rdp, rle_bpp);
-        if(rle_rdp != 0 && rle_prev_v == ret) {
-            rle_cnt = 0;
-            rle_state = RLE_STATE_REPEATE;
+    if(font_rle.state == RLE_STATE_SINGLE) {
+        ret = get_bits(font_rle.in, font_rle.rdp, font_rle.bpp);
+        if(font_rle.rdp != 0 && font_rle.prev_v == ret) {
+            font_rle.count = 0;
+            font_rle.state = RLE_STATE_REPEATE;
         }
 
-        rle_prev_v = ret;
-        rle_rdp += rle_bpp;
+        font_rle.prev_v = ret;
+        font_rle.rdp += font_rle.bpp;
     }
-    else if(rle_state == RLE_STATE_REPEATE) {
-        v = get_bits(rle_in, rle_rdp, 1);
-        rle_cnt++;
-        rle_rdp += 1;
+    else if(font_rle.state == RLE_STATE_REPEATE) {
+        v = get_bits(font_rle.in, font_rle.rdp, 1);
+        font_rle.count++;
+        font_rle.rdp += 1;
         if(v == 1) {
-            ret = rle_prev_v;
-            if(rle_cnt == 11) {
-                rle_cnt = get_bits(rle_in, rle_rdp, 6);
-                rle_rdp += 6;
-                if(rle_cnt != 0) {
-                    rle_state = RLE_STATE_COUNTER;
+            ret = font_rle.prev_v;
+            if(font_rle.count == 11) {
+                font_rle.count = get_bits(font_rle.in, font_rle.rdp, 6);
+                font_rle.rdp += 6;
+                if(font_rle.count != 0) {
+                    font_rle.state = RLE_STATE_COUNTER;
                 }
                 else {
-                    ret = get_bits(rle_in, rle_rdp, rle_bpp);
-                    rle_prev_v = ret;
-                    rle_rdp += rle_bpp;
-                    rle_state = RLE_STATE_SINGLE;
+                    ret = get_bits(font_rle.in, font_rle.rdp, font_rle.bpp);
+                    font_rle.prev_v = ret;
+                    font_rle.rdp += font_rle.bpp;
+                    font_rle.state = RLE_STATE_SINGLE;
                 }
             }
         }
         else {
-            ret = get_bits(rle_in, rle_rdp, rle_bpp);
-            rle_prev_v = ret;
-            rle_rdp += rle_bpp;
-            rle_state = RLE_STATE_SINGLE;
+            ret = get_bits(font_rle.in, font_rle.rdp, font_rle.bpp);
+            font_rle.prev_v = ret;
+            font_rle.rdp += font_rle.bpp;
+            font_rle.state = RLE_STATE_SINGLE;
         }
 
     }
-    else if(rle_state == RLE_STATE_COUNTER) {
-        ret = rle_prev_v;
-        rle_cnt--;
-        if(rle_cnt == 0) {
-            ret = get_bits(rle_in, rle_rdp, rle_bpp);
-            rle_prev_v = ret;
-            rle_rdp += rle_bpp;
-            rle_state = RLE_STATE_SINGLE;
+    else if(font_rle.state == RLE_STATE_COUNTER) {
+        ret = font_rle.prev_v;
+        font_rle.count--;
+        if(font_rle.count == 0) {
+            ret = get_bits(font_rle.in, font_rle.rdp, font_rle.bpp);
+            font_rle.prev_v = ret;
+            font_rle.rdp += font_rle.bpp;
+            font_rle.state = RLE_STATE_SINGLE;
         }
     }
 

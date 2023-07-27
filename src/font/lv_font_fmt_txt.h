@@ -194,6 +194,23 @@ typedef struct {
     uint16_t bitmap_format  : 2;
 } lv_font_fmt_txt_dsc_t;
 
+#if LV_USE_FONT_COMPRESSED
+typedef enum {
+    RLE_STATE_SINGLE = 0,
+    RLE_STATE_REPEATE,
+    RLE_STATE_COUNTER,
+} lv_font_fmt_rle_state_t;
+
+typedef struct {
+    uint32_t rdp;
+    const uint8_t * in;
+    uint8_t bpp;
+    uint8_t prev_v;
+    uint8_t count;
+    lv_font_fmt_rle_state_t state;
+} lv_font_fmt_rle_t;
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

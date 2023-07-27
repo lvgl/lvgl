@@ -10,11 +10,13 @@
 #if LV_USE_IME_PINYIN != 0
 
 #include <stdio.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS    &lv_ime_pinyin_class
+#define cand_len lv_global_default()->ime_cand_len
 
 /**********************
  *      TYPEDEFS
@@ -1104,7 +1106,6 @@ static bool pinyin_k9_is_valid_py(lv_obj_t * obj, char * py_str)
 
 static void pinyin_k9_fill_cand(lv_obj_t * obj)
 {
-    static uint16_t len = 0;
     uint16_t index = 0, tmp_len = 0;
     ime_pinyin_k9_py_str_t * ll_index = NULL;
 
@@ -1112,11 +1113,11 @@ static void pinyin_k9_fill_cand(lv_obj_t * obj)
 
     tmp_len = pinyin_ime->k9_legal_py_count;
 
-    if(tmp_len != len) {
+    if(tmp_len != cand_len) {
         lv_memzero(lv_pinyin_k9_cand_str, sizeof(lv_pinyin_k9_cand_str));
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM], LV_SYMBOL_RIGHT"\0");
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 1], "\0");
-        len = tmp_len;
+        cand_len = tmp_len;
     }
 
     ll_index = _lv_ll_get_head(&pinyin_ime->k9_legal_py_ll);

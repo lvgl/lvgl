@@ -9,13 +9,16 @@
 #include "lv_msg.h"
 #if LV_USE_MSG
 
+#include "../../core/lv_global.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_ll.h"
 #include "../../misc/lv_gc.h"
-
 /*********************
  *      DEFINES
  *********************/
+
+#define restart_notify lv_global_default()->msg_restart_notify
+#define _recursion_counter lv_global_default()->msg_recursion_counter
 
 /**********************
  *      TYPEDEFS
@@ -40,7 +43,6 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool restart_notify;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -159,7 +161,6 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e)
 
 static void notify(lv_msg_t * m)
 {
-    static unsigned int _recursion_counter = 0;
     _recursion_counter++;
 
     /*First clear all _checked flags*/

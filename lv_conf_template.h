@@ -138,6 +138,11 @@
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
 
+/* Declare the keyword for thread-local storage. Possible options:
+ * -
+ * - __thread
+ */
+#define LV_THREAD_LOCAL     
 
 /*=======================
  * FEATURE CONFIGURATION
