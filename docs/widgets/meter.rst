@@ -29,7 +29,7 @@ Scale
 The Scale has minor and major ticks, and labels on the major ticks.
 
 The minor tick lines can be configured with:
-:cpp:expr:`lv_meter_set_scale_ticks(meter, tick_count, line_width, tick_length, ctick_olor)`.
+:cpp:expr:`lv_meter_set_scale_ticks(meter, tick_count, line_width, tick_length, tick_color)`.
 
 To show major tick lines use
 :cpp:expr:`lv_meter_set_scale_major_ticks(meter, nth_major, tick_width, tick_length, tick_color, label_gap)`.
@@ -70,7 +70,7 @@ needle pointing to the right like this ``-O--->``. ``pivot_x`` and
 ``pivot_y`` sets the pivot point of the rotation relative to the top
 left corner of the image.
 
-:cpp:expr:`lv_meter_set_indicator_value(meter, inidicator, value)` sets the
+:cpp:expr:`lv_meter_set_indicator_value(meter, indicator, value)` sets the
 value of the indicator.
 
 Arc
@@ -81,7 +81,7 @@ and arc indicator. . By default, the radius of the arc is the same as
 the scale's radius but ``r_mod`` changes the radius.
 
 :cpp:expr:`lv_meter_set_indicator_start_value(meter, indic, value)` and
-:cpp:expr:`lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the
+:cpp:expr:`lv_meter_set_indicator_end_value(meter, indicator, value)` sets the
 value of the indicator.
 
 Scale lines (ticks)
@@ -96,8 +96,8 @@ start and end value of the scale and only a "slice" of that color
 gradient will be visible in the indicator's start and end value range.
 ``width_mod`` modifies the width of the tick lines.
 
-:cpp:expr:`lv_meter_set_indicator_start_value(meter, inidicator, value)` and
-:cpp:expr:`lv_meter_set_indicator_end_value(meter, inidicator, value)` sets the
+:cpp:expr:`lv_meter_set_indicator_start_value(meter, indicator, value)` and
+:cpp:expr:`lv_meter_set_indicator_end_value(meter, indicator, value)` sets the
 value of the indicator.
 
 Events

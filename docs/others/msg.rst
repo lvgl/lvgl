@@ -75,7 +75,7 @@ Subscribe with an lv_obj
 ------------------------
 
 It's quite typical that an LVGL widget is interested in some messages.
-To make it simpler :c:expr:`lv_msg_subsribe_obj(msg_id, obj, user_data)` can
+To make it simpler :c:expr:`lv_msg_subscribe_obj(msg_id, obj, user_data)` can
 be used. If a new message is published with ``msg_id`` an
 :c:enumerator:`LV_EVENT_MSG_RECEIVED` event will be sent to the object.
 
@@ -84,7 +84,7 @@ For example:
 .. code:: c
 
    lv_obj_add_event(user_name_label, user_name_label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
-   lv_msg_subsribe_obj(MSG_USER_NAME_CHANGED, user_name_label, NULL);
+   lv_msg_subscribe_obj(MSG_USER_NAME_CHANGED, user_name_label, NULL);
 
    ...
 
@@ -100,7 +100,7 @@ Here ``msg_id`` also can be a variable's address:
 .. code:: c
 
    char name[64];
-   lv_msg_subsribe_obj(name, user_name_label, NULL);
+   lv_msg_subscribe_obj(name, user_name_label, NULL);
 
 Unsubscribe
 ~~~~~~~~~~~
@@ -136,10 +136,10 @@ variable's value the subscribers can be notified like this:
    lv_msg_update_value(&v); //Notify all the subscribers of `(lv_msg_id_t)&v`
 
 It's handy way of creating API for the UI too. If the UI provides some
-global variables (e.g. ``int current_tempereature``) and anyone can
+global variables (e.g. ``int current_temperature``) and anyone can
 read and write this variable. After writing they can notify all the
 elements who are interested in that value. E.g. an ``lv_label`` can
-subscribe to :c:expr:`(lv_msg_id_t)&current_tempereature` and update its text
+subscribe to :c:expr:`(lv_msg_id_t)&current_temperature` and update its text
 when it's notified about the new temperature.
 
 Example
