@@ -103,7 +103,7 @@ other hardware should be used to transfer data to the display so the MCU
 can continue drawing. This way, the rendering and refreshing of the
 display become parallel operations.
 
-Advnaced options
+Advanced options
 ****************
 
 Resolution

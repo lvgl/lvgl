@@ -30,7 +30,7 @@ Features
 
 -  Support all lvgl built-in components
 -  Fully support lvgl flex and grid style
--  support most lvgl style，just write like html5 css
+-  support most lvgl style, just write like html5 css
 -  support dynamic load image
 -  Fully support lvgl animation
 
@@ -85,7 +85,7 @@ Components
 Font
 ----
 
-`Buitin-Symbol <https://github.com/lvgl/lv_binding_js/blob/master/doc/Symbol/symbol.md>`__
+`Builtin-Symbol <https://github.com/lvgl/lv_binding_js/blob/master/doc/Symbol/symbol.md>`__
 
 Animation
 ---------

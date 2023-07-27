@@ -185,7 +185,7 @@ follow some coding conventions:
 - In function arguments use ``type name[]`` declaration for array parameters instead of :cpp:expr:`type * name`
 - Use typed pointers instead of :cpp:expr:`void *` pointers
 - Widget constructor must follow the ``lv_<widget_name>_create(lv_obj_t * parent)`` pattern.
-- Widget members function must start with ``lv_<modul_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
+- Widget members function must start with ``lv_<module_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
   argument which is a pointer to widget object itself.
 - ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
   first argument, and the prefix of the ``struct`` name should be used as the prefix of the
