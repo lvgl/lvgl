@@ -34,29 +34,28 @@ static uint8_t * buf_alloc(void * old_buf, lv_coord_t w, lv_coord_t h);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_draw_buf_t  * lv_draw_buf_malloc(lv_coord_t w, lv_coord_t h, lv_color_format_t color_format)
+void lv_draw_buf_init(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t color_format)
 {
-    lv_draw_buf_t * draw_buf = lv_malloc(sizeof(lv_draw_buf_t));
     draw_buf->width = w;
     draw_buf->height = h;
     draw_buf->color_format = color_format;
-
-    if(w != 0 || h != 0) draw_buf->buf = buf_alloc(NULL, lv_draw_buf_get_stride(draw_buf), h);
-    else draw_buf->buf = NULL;
-
-    return draw_buf;
+    draw_buf->buf = NULL;
 }
 
+void lv_draw_buf_malloc(lv_draw_buf_t * draw_buf)
+{
+    if(draw_buf->width != 0 ||
+       draw_buf->height != 0) draw_buf->buf = buf_alloc(NULL, lv_draw_buf_get_stride(draw_buf), draw_buf->height);
+    else draw_buf->buf = NULL;
+}
 
-lv_draw_buf_t  * lv_draw_buf_realloc(lv_draw_buf_t  * draw_buf, lv_coord_t w, lv_coord_t h,
-                                     lv_color_format_t color_format)
+void lv_draw_buf_realloc(lv_draw_buf_t  * draw_buf, lv_coord_t w, lv_coord_t h,
+                         lv_color_format_t color_format)
 {
     draw_buf->width = w;
     draw_buf->height = h;
     draw_buf->color_format = color_format;
-
     draw_buf->buf = buf_alloc(draw_buf->buf, lv_draw_buf_get_stride(draw_buf), h);
-    return draw_buf;
 }
 
 void lv_draw_buf_free(lv_draw_buf_t  * draw_buf)
@@ -65,8 +64,9 @@ void lv_draw_buf_free(lv_draw_buf_t  * draw_buf)
     lv_free(draw_buf);
 }
 
-void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * buf)
+void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * draw_buf)
 {
+    LV_UNUSED(draw_buf);
 
 }
 
@@ -89,8 +89,35 @@ void * lv_draw_buf_go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y
 
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
+    LV_UNUSED(a);
     uint32_t stride = lv_draw_buf_get_stride(draw_buf);
-    lv_memzero(draw_buf->buf, stride * draw_buf->height * draw_buf->color_format);
+    lv_memzero(draw_buf->buf, stride * draw_buf->height);
+}
+
+void lv_draw_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
+                      void * src_buf, uint32_t src_stride, const lv_area_t * src_area, lv_color_format_t color_format)
+{
+    uint8_t px_size = lv_color_format_get_size(color_format);
+    uint8_t * dest_bufc =  dest_buf;
+    uint8_t * src_bufc =  src_buf;
+
+    /*Got the first pixel of each buffer*/
+    dest_bufc += dest_stride * px_size * dest_area->y1;
+    dest_bufc += dest_area->x1 * px_size;
+
+    src_bufc += src_stride * px_size * src_area->y1;
+    src_bufc += src_area->x1 * px_size;
+
+    src_stride *= px_size;
+    dest_stride *= px_size;
+
+    uint32_t line_length = lv_area_get_width(dest_area) * px_size;
+    lv_coord_t y;
+    for(y = dest_area->y1; y <= dest_area->y2; y++) {
+        lv_memcpy(dest_bufc, src_bufc, line_length);
+        dest_bufc += dest_stride;
+        src_bufc += src_stride;
+    }
 }
 
 /**********************

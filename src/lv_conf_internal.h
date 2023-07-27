@@ -215,6 +215,28 @@
  * RENDERING CONFIGURATION
  *========================*/
 
+/*Align the stride of all layers and images to this bytes*/
+#ifndef LV_DRAW_BUF_STRIDE_ALIGN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+        #else
+            #define LV_DRAW_BUF_STRIDE_ALIGN 0
+        #endif
+    #else
+        #define LV_DRAW_BUF_STRIDE_ALIGN                1
+    #endif
+#endif
+
+/*Align the start address of draw_buf addresses to this bytes*/
+#ifndef LV_DRAW_BUF_ALIGN
+    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
+        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
+    #else
+        #define LV_DRAW_BUF_ALIGN                       4
+    #endif
+#endif
+
 /* Max. memory to be used for layers */
 #ifndef LV_LAYER_MAX_MEMORY_USAGE
     #ifdef CONFIG_LV_LAYER_MAX_MEMORY_USAGE

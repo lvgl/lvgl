@@ -110,7 +110,7 @@ typedef struct _lv_draw_unit_t {
 
 typedef struct _lv_layer_t  {
 
-    lv_draw_buf_t * draw_buf;
+    lv_draw_buf_t draw_buf;
     lv_point_t draw_buf_ofs;
 
     /**

@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MAX_BUF_SIZE (uint32_t) 4 * lv_disp_get_hor_res(_lv_refr_get_disp_refreshing())
+#define MAX_BUF_SIZE (uint32_t) 4 * lv_draw_buf_width_to_stride(lv_disp_get_hor_res(_lv_refr_get_disp_refreshing()), lv_disp_get_color_format(_lv_refr_get_disp_refreshing()))
 
 /**********************
  *      TYPEDEFS
@@ -50,14 +50,14 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
 
     /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
      *In this case just return. */
-    if(layer_to_draw->draw_buf->buf == NULL) return;
+    if(layer_to_draw->draw_buf.buf == NULL) return;
 
     lv_img_dsc_t img_dsc;
-    img_dsc.header.w = layer_to_draw->draw_buf->width;
-    img_dsc.header.h = layer_to_draw->draw_buf->height;
-    img_dsc.header.cf = layer_to_draw->draw_buf->color_format;
+    img_dsc.header.w = layer_to_draw->draw_buf.width;
+    img_dsc.header.h = layer_to_draw->draw_buf.height;
+    img_dsc.header.cf = layer_to_draw->draw_buf.color_format;
     img_dsc.header.always_zero = 0;
-    img_dsc.data = layer_to_draw->draw_buf->buf;
+    img_dsc.data = layer_to_draw->draw_buf.buf;
 
     lv_draw_img_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_img_dsc_t));
@@ -237,7 +237,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         uint32_t max_buf_size = MAX_BUF_SIZE / px_size;
         uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
         uint32_t buf_h;
-        if(buf_stride * buf_h <= max_buf_size) buf_h = blend_h;
+        if(buf_stride * blend_h <= max_buf_size) buf_h = blend_h;
         else buf_h = max_buf_size / buf_stride;    /*Round to full lines*/
 
         uint32_t buf_size = buf_stride * buf_h;
@@ -250,7 +250,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_dsc.src_area = &blend_area;
 
         if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-            blend_dsc.mask_buf =  tmp_buf + buf_stride * buf_h * 2;
+            blend_dsc.mask_buf =  tmp_buf + lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565) * buf_h;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
@@ -275,7 +275,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
             lv_area_copy(&relative_area, &blend_area);
             lv_area_move(&relative_area, -coords->x1, -coords->y1);
             if(transformed) {
-                lv_draw_sw_transform(draw_unit, &relative_area, src_buf, src_w, src_h, src_stride,
+                lv_draw_sw_transform(draw_unit, &relative_area, src_buf, src_w, src_h,
                                      draw_dsc, &sup, cf, tmp_buf);
             }
             else if(draw_dsc->recolor_opa >= LV_OPA_MIN) {
@@ -284,7 +284,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
                     const uint8_t * rgb_src_buf = src_buf + src_stride * relative_area.y1 * 2 + relative_area.x1 * 2;
                     const uint8_t * a_src_buf = src_buf + src_stride * src_h * 2 + src_stride * relative_area.y1 + relative_area.x1;
                     uint8_t * rgb_dest_buf = tmp_buf;
-                    uint8_t * a_dest_buf = tmp_buf + blend_w * h * 2;
+                    uint8_t * a_dest_buf = tmp_buf + buf_stride * h * 2;
                     lv_coord_t i;
                     for(i = 0; i < h; i++) {
                         lv_memcpy(rgb_dest_buf, rgb_src_buf, blend_w * 2);
@@ -351,7 +351,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
             if(blend_area.y2 > y_last) {
                 blend_area.y2 = y_last;
                 if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-                    blend_dsc.mask_buf =  tmp_buf + buf_stride * lv_area_get_height(&blend_area) * 2;
+                    blend_dsc.mask_buf =  tmp_buf + lv_draw_buf_width_to_stride(blend_w,
+                                                                                LV_COLOR_FORMAT_RGB565) * lv_area_get_height(&blend_area);
                 }
             }
         }
