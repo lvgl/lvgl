@@ -311,10 +311,6 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
-    /* Set tick line width to 2u when is not set */
-    if(0U == line_dsc.width) {
-        line_dsc.width = 2U;
-    }
 
     const int32_t min_out = scale->range_min;
     const int32_t max_out = scale->range_max;
@@ -369,10 +365,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
-    /* Set tick line width to 2u when is not set */
-    if(0U == line_dsc.width) {
-        line_dsc.width = 2U;
-    }
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
@@ -811,10 +803,6 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
-        /* Set main line width to 2u when is not set */
-        if(0U == line_dsc.width) {
-            line_dsc.width = 2U;
-        }
 
         LV_LOG_USER("X_ofs: %d, Y ofs: %d", x_ofs, y_ofs);
 
