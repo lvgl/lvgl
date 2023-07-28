@@ -274,7 +274,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     if(disp->render_mode == LV_DISP_RENDER_MODE_FULL) {
         disp->inv_areas[0] = scr_area;
         disp->inv_p = 1;
-        if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
+        lv_disp_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
         return;
     }
 
@@ -296,7 +296,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     lv_area_copy(&disp->inv_areas[disp->inv_p], tmp_area_p);
     disp->inv_p++;
 
-    if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
+    lv_disp_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
 }
 
 /**
