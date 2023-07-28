@@ -145,6 +145,10 @@ typedef struct {
 #if LV_USE_LED
     lv_style_t led;
 #endif
+
+#if LV_USE_SCALE
+    lv_style_t scale;
+#endif
 } my_theme_styles_t;
 
 typedef struct {
@@ -633,6 +637,11 @@ static void style_init(void)
     lv_style_set_shadow_width(&styles->led, lv_disp_dpx(theme.disp, 15));
     lv_style_set_shadow_color(&styles->led, lv_color_white());
     lv_style_set_shadow_spread(&styles->led, lv_disp_dpx(theme.disp, 5));
+#endif
+
+#if LV_USE_SCALE
+    style_init_reset(&styles->scale);
+    lv_style_set_line_width(&styles->scale, 2U);
 #endif
 }
 
@@ -1146,6 +1155,14 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_LED
     else if(lv_obj_check_type(obj, &lv_led_class)) {
         lv_obj_add_style(obj, &styles->led, 0);
+    }
+#endif
+
+#if LV_USE_SCALE
+    else if(lv_obj_check_type(obj, &lv_scale_class)) {
+        lv_obj_add_style(obj, &styles->scale, LV_PART_MAIN);
+        lv_obj_add_style(obj, &styles->scale, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &styles->scale, LV_PART_ITEMS);
     }
 #endif
 }
