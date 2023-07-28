@@ -399,7 +399,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             label_gap = lv_obj_get_style_pad_right(obj, LV_PART_TICKS);
-            x_ofs = obj->coords.x2 - obj->coords.x1;
+            x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U);
             y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
         }
         else {
@@ -797,12 +797,12 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             y_ofs = obj->coords.y1 + pad_top + border_width - scroll_top;
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            x_ofs = obj->coords.x2 - obj->coords.x1;
+            x_ofs = obj->coords.x1 + (line_dsc.width / 2U);
             y_ofs = obj->coords.y1 + pad_top + border_width - scroll_top;
         }
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - scroll_left;
-            y_ofs = obj->coords.y1 + (line_dsc.width / 2U);;
+            y_ofs = obj->coords.y1 + (line_dsc.width / 2U);
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - scroll_left;
@@ -924,7 +924,7 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
             y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            x_ofs = obj->coords.x2 - obj->coords.x1;
+            x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U);
             y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
         }
         else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
