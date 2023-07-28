@@ -27,6 +27,7 @@ Naming and API
 - |uncheck| Generic `lv_date_t` and `lv_time_t`
 - |uncheck| Make layouts with an `lv_layout_dsc_t` instead of registering an ID + callback.
   (see `here <https://github.com/lvgl/lvgl/issues/3481#issuecomment-1206434501>`__)
+- |check| Gradient with alpha
 
 Architecture
 ~~~~~~~~~~~~
@@ -48,11 +49,14 @@ Architecture
   Fragmentation is also lower if processes can completely clean up after themselves.
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
 - |uncheck| Add more feature to key presses (long press, release, etc).
-  (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__)
-- |uncheck| Integrate `lv_msg` with the widgets to have an easy to use variable binding solution   
+  (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__) 
+- |uncheck| Variable binding. I.e create properties which can be bound to
+  objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
 - |uncheck| Add GPU abstraction for display rotation 
 - |uncheck| Replace the `read_line_cb` of the image decoders with `get_area_cb`
 - |uncheck| Limit the image caching size in bytes instead of image count 
+- |uncheck| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
+- |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
 
 Styles
 ~~~~~~
@@ -135,7 +139,6 @@ Drawing and rendering
 - |uncheck| Innter shadow
 - |uncheck| ARGB image stroke/grow on the alpha map
 - |uncheck| Real time blur
-- |uncheck| Gradient with alpha
 
 
 Widgets
@@ -152,8 +155,6 @@ Others
 - |uncheck| Named grid cells to allow updating layouts without touching the children (like CSS `grid-template-areas`)
 - |uncheck| Scene support. See `this comment <https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911>`__
 - |uncheck| Circle layout. #2871
-- |uncheck| Variable binding. I.e create properties which can be bound to
-  objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
 - |uncheck| Consider `stagger animations <https://greensock.com/docs/v3/Staggers>`__.
 - |uncheck| Add custom indev type. See [here](https://github.com/lvgl/lvgl/issues/3298#issuecomment-1616706654).
 
@@ -162,19 +163,17 @@ Ideas
 
 - Better way to reset global variables in `lv_deinit()` #3385
 - `lv_array`: replace linked lists with array where possible (arrays are faster and uses less memory)
-- Reconsider how to handle UTF-8 characters (allow different encoding too) and Bidi. Maybe create an abstraction for typesetting.
+- Reconsider how to handle UTF-8 characters (allow different encoding too) and Bidi. Maybe create an abstraction for textshaping.
 - Consider direct binary font format support
 - Improve groups. `Discussion <https://forum.lvgl.io/t/lv-group-tabindex/2927/3>`__.
   Reconsider focusing logic. Allow having no widget selected (on web it's possible). Keep editing state in `lv_obj_t`
   (see `here <https://github.com/lvgl/lvgl/issues/3646>`__). Support slider
   left knob focusing (see `here <https://github.com/lvgl/lvgl/issues/3246>`__)
-- lv_mem_alloc_aligned(size, align)
 - Speed up font decompression
 - Support larger images: add support for large image #1892
 - Functional programming support, pure view?
   (see `here <https://www.freecodecamp.org/news/the-revolution-of-pure-views-aed339db7da4/>`__)
 - Style components. (see `this comment <https://github.com/lvgl/lvgl/issues/2790#issuecomment-965100911>`__
-- SVG support: integrate an SVG render library
 - Support dot_begin and dot_middle long modes for labels
 - Allow matrix input for image transformation?
 - Radial/skew/conic gradient
