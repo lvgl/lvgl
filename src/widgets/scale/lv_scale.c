@@ -366,6 +366,11 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
 
+    /* Main line style */
+    lv_draw_line_dsc_t main_line_dsc;
+    lv_draw_line_dsc_init(&main_line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
+
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
         /* Get style properties so they can be used in the tick and label drawing */
@@ -380,7 +385,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             label_gap = lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
             x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-            y_ofs = obj->coords.y2 - obj->coords.y1;
+            y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U);
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             label_gap = lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
@@ -763,6 +768,12 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+
+        /* Configure both line and label draw descriptors for the tick and label drawings */
+        lv_draw_line_dsc_t line_dsc;
+        lv_draw_line_dsc_init(&line_dsc);
+        lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
+
         /* Get style properties so they can be used in the main line drawing */
         const lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
         const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
@@ -791,18 +802,13 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         }
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - scroll_left;
-            y_ofs = obj->coords.y2 - obj->coords.y1;
+            y_ofs = obj->coords.y1 + (line_dsc.width / 2U);;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - scroll_left;
             y_ofs = obj->coords.y2 - obj->coords.y1;
         }
         else { /* Nothing to do */ }
-
-        /* Configure both line and label draw descriptors for the tick and label drawings */
-        lv_draw_line_dsc_t line_dsc;
-        lv_draw_line_dsc_init(&line_dsc);
-        lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         LV_LOG_USER("X_ofs: %d, Y ofs: %d", x_ofs, y_ofs);
 
@@ -898,6 +904,12 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+
+        /* Main line style */
+        lv_draw_line_dsc_t main_line_dsc;
+        lv_draw_line_dsc_init(&main_line_dsc);
+        lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
+
         /* Get style properties so they can be used in the tick and label drawing */
         const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj,
@@ -917,7 +929,7 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
         }
         else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-            y_ofs = obj->coords.y2 - obj->coords.y1;
+            y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U);
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
