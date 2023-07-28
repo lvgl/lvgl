@@ -125,7 +125,7 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
 
     [LV_STYLE_RADIUS] = 0,
     [LV_STYLE_CLIP_CORNER] = 0,
-    [LV_STYLE_OPA] =                       0,
+    [LV_STYLE_OPA] =                       LV_STYLE_PROP_FLAG_INHERITABLE,
     [LV_STYLE_OPA_LAYERED] =               LV_STYLE_PROP_FLAG_LAYER_UPDATE,
     [LV_STYLE_COLOR_FILTER_DSC] =          LV_STYLE_PROP_FLAG_INHERITABLE,
     [LV_STYLE_COLOR_FILTER_OPA] =          LV_STYLE_PROP_FLAG_INHERITABLE,

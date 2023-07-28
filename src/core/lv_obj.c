@@ -373,6 +373,11 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
+        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_COVER_RES_NOT_COVER;
+            return;
+        }
+
         info->res = LV_COVER_RES_COVER;
 
     }
