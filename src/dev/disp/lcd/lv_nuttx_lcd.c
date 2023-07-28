@@ -162,11 +162,12 @@ static lv_disp_t * lcd_init(int fd, int hor_res, int ver_res)
         return NULL;
     }
 
+    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
 #if LV_NUTTX_LCD_BUFFER_COUNT > 0
-    uint32_t buf_size = hor_res * ver_res * sizeof(lv_color_t);
+    uint32_t buf_size = hor_res * ver_res * px_size;
     lv_disp_render_mode_t render_mode = LV_DISP_RENDER_MODE_FULL;
 #else
-    uint32_t buf_size = hor_res * LV_NUTTX_LCD_BUFFER_SIZE * sizeof(lv_color_t);
+    uint32_t buf_size = hor_res * LV_NUTTX_LCD_BUFFER_SIZE * px_size;
     lv_disp_render_mode_t render_mode = LV_DISP_RENDER_MODE_PARTIAL;
 #endif
 
