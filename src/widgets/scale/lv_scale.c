@@ -82,7 +82,7 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_scale_mode(lv_obj_t * obj, lv_scale_mode_t mode)
+void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -606,7 +606,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         center_point.y = scale_area.y1 + radius_edge;
 
         /* Major tick */
-        line_dsc.raw_end = 1;
+        line_dsc.raw_end = 0;
 
         lv_coord_t radius_out = radius_edge;
         lv_coord_t radius_in_major;

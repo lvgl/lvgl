@@ -104,7 +104,7 @@ lv_obj_t * lv_scale_create(lv_obj_t * parent);
  * @param   obj     pointer the scale object
  * @param   mode    New scale mode
  */
-void lv_scale_mode(lv_obj_t * obj, lv_scale_mode_t mode);
+void lv_scale_set_mode(lv_obj_t * obj, lv_scale_mode_t mode);
 
 /**
  * Set scale total tick count (including minor and major ticks)
