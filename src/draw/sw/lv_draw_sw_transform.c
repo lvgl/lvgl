@@ -113,8 +113,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
     lv_coord_t src_stride = lv_draw_buf_width_to_stride(src_w, src_cf) / lv_color_format_get_size(src_cf);
 
     lv_coord_t dest_stride_a8 = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_A8);
-    lv_coord_t dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_ARGB8888);
-    if(src_cf == LV_COLOR_FORMAT_RGB888) dest_stride = lv_draw_buf_width_to_stride(dest_w, src_cf);
+    lv_coord_t dest_stride;
+    if(src_cf == LV_COLOR_FORMAT_RGB888) dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_ARGB8888);
     else if(src_cf == LV_COLOR_FORMAT_RGB565A8) dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_RGB565);
     else dest_stride = lv_draw_buf_width_to_stride(dest_w, src_cf);
 
