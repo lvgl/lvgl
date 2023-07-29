@@ -6,8 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdlib.h>
-
 #include "core/lv_global.h"
 #include "core/lv_obj.h"
 #include "disp/lv_disp_private.h"
@@ -55,14 +53,14 @@ static inline void lv_global_init(lv_global_t * global)
     LV_ASSERT_NULL(global);
 
     if(global == NULL) {
+        LV_LOG_ERROR("lv_global cannot be null");
         return;
     }
 
-    memset(global, 0, sizeof(lv_global_t));
+    lv_memset(global, 0, sizeof(lv_global_t));
 
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
-    global->memory_zero = ZERO_MEM_SENTINEL;
     global->style_last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
@@ -74,59 +72,15 @@ static inline void lv_global_init(lv_global_t * global)
 #endif
 }
 
-#ifdef LV_THREAD_LOCAL
+#ifndef LV_GLOBAL_CUSTOM
 
 lv_global_t * lv_global_default(void)
 {
-    static LV_THREAD_LOCAL lv_global_t lv_global;
+    static lv_global_t lv_global;
     return &lv_global;
 }
 
-#else
-
-static pthread_key_t lv_global_key;
-
-static inline lv_global_t * lv_global_create(void)
-{
-    lv_global_t * global = malloc(sizeof(lv_global_t));
-    LV_ASSERT_MALLOC(global);
-
-    lv_global_init(global);
-    return global;
-}
-
-static void lv_global_destroy(void * data)
-{
-    if(data) {
-        free(data);
-    }
-}
-
-static inline void lv_global_cleanup(void)
-{
-    (void) pthread_setspecific(lv_global_key, NULL);
-}
-
-static void lv_global_key_init(void)
-{
-    (void) pthread_key_create(&lv_global_key, lv_global_destroy);
-}
-
-lv_global_t * lv_global_default(void)
-{
-    static pthread_once_t key_once = PTHREAD_ONCE_INIT;
-    (void) pthread_once(&key_once, lv_global_key_init);
-    lv_global_t * data;
-
-    if((data = (lv_global_t *)pthread_getspecific(lv_global_key)) == NULL) {
-        data = lv_global_create();
-        LV_ASSERT_NULL(data);
-
-        (void) pthread_setspecific(lv_global_key, data);
-    }
-    return data;
-}
-#endif /*LV_THREAD_LOCAL*/
+#endif
 
 bool lv_is_initialized(void)
 {
@@ -135,16 +89,14 @@ bool lv_is_initialized(void)
 
 void lv_init(void)
 {
-    /*Do nothing if already initialized*/
-    if(lv_initialized) {
-        LV_LOG_WARN("lv_init: already inited");
-        return;
-    }
-
-#ifdef LV_THREAD_LOCAL
     /*Initialize members of static variable lv_global */
     lv_global_init(lv_global_default());
-#endif
+
+    /*Do nothing if already initialized*/
+    if(lv_initialized) {
+        LV_LOG_WARN("lv_init: already initialized");
+        return;
+    }
 
     LV_LOG_INFO("begin");
 
@@ -280,7 +232,6 @@ void lv_init(void)
 #  endif
 #endif
 
-    //
     lv_initialized = true;
 
     LV_LOG_TRACE("finished");
@@ -290,6 +241,10 @@ void lv_init(void)
 
 void lv_deinit(void)
 {
+#if LV_USE_SYSMON
+    _lv_sysmon_builtin_deinit();
+#endif
+
     _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
@@ -322,11 +277,6 @@ void lv_deinit(void)
 
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
-#endif
-
-#ifndef LV_THREAD_LOCAL
-    /*Free lv_global dynamically allocated */
-    lv_global_cleanup();
 #endif
 }
 #endif

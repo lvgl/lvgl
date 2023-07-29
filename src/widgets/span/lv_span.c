@@ -88,19 +88,16 @@ const lv_obj_class_t lv_spangroup_class  = {
  **********************/
 void lv_span_stack_init(void)
 {
-    snippet_stack = lv_malloc(sizeof(struct _snippet_stack));
-    LV_ASSERT_MALLOC(snippet_stack);
-    if(!snippet_stack) {
+    struct _snippet_stack * stack = snippet_stack = lv_malloc(sizeof(struct _snippet_stack));
+    LV_ASSERT_MALLOC(stack);
+    if(!stack) {
         LV_LOG_ERROR("malloc failed for snippet_stack");
     }
 }
 
 void lv_span_stack_deinit(void)
 {
-    if(snippet_stack) {
-        lv_free(snippet_stack);
-        snippet_stack = NULL;
-    }
+    lv_free(snippet_stack);
 }
 
 lv_obj_t * lv_spangroup_create(lv_obj_t * par)
@@ -654,9 +651,10 @@ static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font,
 
 static void lv_snippet_push(lv_snippet_t * item)
 {
-    if(snippet_stack->index < LV_SPAN_SNIPPET_STACK_SIZE) {
-        memcpy(&snippet_stack->stack[snippet_stack->index], item, sizeof(lv_snippet_t));
-        snippet_stack->index++;
+    struct _snippet_stack * stack_p = snippet_stack;
+    if(stack_p->index < LV_SPAN_SNIPPET_STACK_SIZE) {
+        memcpy(&stack_p->stack[stack_p->index], item, sizeof(lv_snippet_t));
+        stack_p->index++;
     }
     else {
         LV_LOG_ERROR("span draw stack overflow, please set LV_SPAN_SNIPPET_STACK_SIZE too larger");

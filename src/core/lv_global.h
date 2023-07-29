@@ -17,7 +17,10 @@ extern "C" {
 
 #include <stdbool.h>
 #include "../draw/lv_img_cache.h"
+#include "../draw/lv_draw.h"
+#if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
+#endif
 #include "../misc/lv_anim.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_color_op.h"
@@ -25,16 +28,12 @@ extern "C" {
 #include "../misc/lv_profiler_builtin.h"
 #include "../misc/lv_style.h"
 #include "../misc/lv_timer.h"
-#include "../osal/lv_os.h"
 #include "../stdlib/builtin/lv_tlsf.h"
 
 #if LV_USE_FONT_COMPRESSED
 #include "../font/lv_font_fmt_txt.h"
 #endif
 
-#if LV_USE_SYSMON
-#include "../others/sysmon/lv_sysmon.h"
-#endif
 /*********************
  *      DEFINES
  *********************/
@@ -95,21 +94,14 @@ typedef struct {
 
 #if !LV_TICK_CUSTOM
     uint32_t tick_sys_time;
-    volatile uint8_t tick_irq_flag;
+    volatile uint8_t tick_sys_irq_flag;
 #endif
 
 #if LV_IMG_CACHE_DEF_SIZE
     uint16_t img_cache_entry_cnt;
 #endif
 
-    uint32_t draw_layer_used_mem_kb;
-#if LV_USE_OS
-    lv_thread_sync_t draw_sync;
-    lv_mutex_t draw_sw_circle_cache_mutex;
-#else
-    int draw_dispatch_req;
-#endif
-
+    lv_draw_cache_t draw_cache;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
@@ -170,8 +162,8 @@ typedef struct {
     lv_style_t fe_list_btn_style;
 #endif
 
-#if LV_USE_SYSMON
-    perf_info_t sysmon_perf_info;
+#if LV_USE_SYSMON && LV_USE_PERF_MONITOR
+    void * sysmon_perf_info;
 #endif
 
 #if LV_USE_IME_PINYIN != 0

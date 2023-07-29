@@ -46,7 +46,6 @@ lv_res_t lv_mem_test_core(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-//static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variable if 0 byte should be allocated*/
 
 /**********************
  *      MACROS

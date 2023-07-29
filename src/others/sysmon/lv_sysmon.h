@@ -18,19 +18,6 @@ extern "C" {
 
 #if LV_USE_SYSMON
 
-typedef struct {
-    uint32_t    refr_start;
-    uint32_t    refr_interval_sum;
-    uint32_t    refr_elaps_sum;
-    uint32_t    refr_cnt;
-    uint32_t    render_start;
-    uint32_t    render_elaps_sum;
-    uint32_t    render_cnt;
-    uint32_t    flush_start;
-    uint32_t    flush_elaps_sum;
-    uint32_t    flush_cnt;
-} perf_info_t;
-
 #if LV_USE_LABEL == 0
 #error "lv_sysmon: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
@@ -71,6 +58,11 @@ void lv_sysmon_set_refr_period(lv_obj_t * obj, uint32_t period);
  * Initialize built-in system monitor, such as performance and memory monitor.
  */
 void _lv_sysmon_builtin_init(void);
+
+/**
+ * DeInitialize built-in system monitor, such as performance and memory monitor.
+ */
+void _lv_sysmon_builtin_deinit(void);
 
 /**********************
  *      MACROS

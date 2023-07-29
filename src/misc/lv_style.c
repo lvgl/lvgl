@@ -397,8 +397,6 @@ uint8_t _lv_style_get_prop_group(lv_style_prop_t prop)
 
 uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
-    //    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
-    //    extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
     if(prop == LV_STYLE_PROP_ANY) return LV_STYLE_PROP_FLAG_ALL; /*Any prop can have any flags*/
     if(prop == LV_STYLE_PROP_INV) return 0;
 

@@ -118,6 +118,7 @@ extern "C" {
 
 #include "src/dev/input/touchscreen/lv_nuttx_touchscreen.h"
 
+#include "src/core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
@@ -179,7 +180,7 @@ static inline int lv_version_patch(void)
     return LVGL_VERSION_PATCH;
 }
 
-static inline const char *lv_version_info(void)
+static inline const char * lv_version_info(void)
 {
     return LVGL_VERSION_INFO;
 }

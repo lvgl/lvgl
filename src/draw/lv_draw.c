@@ -17,9 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define used_memory_for_layers_kb lv_global_default()->draw_layer_used_mem_kb
-#define sync lv_global_default()->draw_sync
-#define dispatch_req lv_global_default()->draw_dispatch_req
+#define _draw_cache lv_global_default()->draw_cache
 
 /**********************
  *      TYPEDEFS
@@ -49,7 +47,7 @@ static bool is_independent(lv_layer_t * layer, lv_draw_task_t * t_check);
 void lv_draw_init(void)
 {
 #if LV_USE_OS
-    lv_thread_sync_init(&sync);
+    lv_thread_sync_init(&_draw_cache.sync);
 #endif
 }
 
@@ -150,8 +148,8 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
                 if(layer_drawn->buf) {
                     uint32_t layer_px_size = lv_color_format_get_size(layer_drawn->color_format);
                     uint32_t layer_size_byte = lv_area_get_size(&layer_drawn->buf_area) * layer_px_size;
-                    used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
-                    LV_LOG_INFO("Layer memory used: %d kB\n", used_memory_for_layers_kb);
+                    _draw_cache.used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
+                    LV_LOG_INFO("Layer memory used: %d kB\n", _draw_cache.used_memory_for_layers_kb);
                     lv_free(layer_drawn->buf);
                 }
 
@@ -212,7 +210,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
             uint32_t px_size = lv_color_format_get_size(layer->color_format);
             uint32_t layer_size_byte = lv_area_get_size(&layer->buf_area) * px_size;
             uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
-            if(used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
+            if(_draw_cache.used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
                 layer_ok = false;
             }
         }
@@ -239,19 +237,19 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
 void lv_draw_dispatch_wait_for_request(void)
 {
 #if LV_USE_OS
-    lv_thread_sync_wait(&sync);
+    lv_thread_sync_wait(&_draw_cache.sync);
 #else
-    while(!dispatch_req);
-    dispatch_req = 0;
+    while(!_draw_cache.dispatch_req);
+    _draw_cache.dispatch_req = 0;
 #endif
 }
 
 void lv_draw_dispatch_request(void)
 {
 #if LV_USE_OS
-    lv_thread_sync_signal(&sync);
+    lv_thread_sync_signal(&_draw_cache.sync);
 #else
-    dispatch_req = 1;
+    _draw_cache.dispatch_req = 1;
 #endif
 }
 
@@ -312,8 +310,8 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 
 void lv_draw_add_used_layer_size(uint32_t kb)
 {
-    used_memory_for_layers_kb += kb;
-    LV_LOG_INFO("Layer memory used: %d kB\n", used_memory_for_layers_kb);
+    _draw_cache.used_memory_for_layers_kb += kb;
+    LV_LOG_INFO("Layer memory used: %d kB\n", _draw_cache.used_memory_for_layers_kb);
 }
 
 

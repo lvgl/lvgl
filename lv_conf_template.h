@@ -138,12 +138,6 @@
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
 
-/* Declare the keyword for thread-local storage. Possible options:
- * -
- * - __thread
- */
-#define LV_THREAD_LOCAL     
-
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -253,6 +247,9 @@
 #if LV_ENABLE_GC != 0
     #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
 #endif /*LV_ENABLE_GC*/
+
+/*For custom `lv_global_default()` implementation set to 1*/
+#define LV_GLOBAL_CUSTOM 0
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.

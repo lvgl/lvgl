@@ -51,7 +51,6 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px
 /**********************
  *      MACROS
  **********************/
-
 #if LV_LOG_TRACE_DISP_REFR
     #define REFR_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else

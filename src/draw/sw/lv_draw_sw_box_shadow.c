@@ -99,10 +99,11 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     lv_opa_t * sh_buf;
 
 #if LV_DRAW_SW_SHADOW_CACHE_SIZE
-    if(shadow_cache.cache_size == corner_size && shadow_cache.cache_r == r_sh) {
+    lv_draw_sw_shadow_cache_t * cache = &shadow_cache;
+    if(cache->cache_size == corner_size && cache->cache_r == r_sh) {
         /*Use the cache if available*/
         sh_buf = lv_malloc(corner_size * corner_size);
-        lv_memcpy(sh_buf, shadow_cache.cache, corner_size * corner_size);
+        lv_memcpy(sh_buf, cache->cache, corner_size * corner_size);
     }
     else {
         /*A larger buffer is required for calculation*/
@@ -110,10 +111,10 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
         shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->width, r_sh);
 
         /*Cache the corner if it fits into the cache size*/
-        if((uint32_t)corner_size * corner_size < sizeof(shadow_cache.cache)) {
-            lv_memcpy(shadow_cache.cache, sh_buf, corner_size * corner_size);
-            shadow_cache.cache_size = corner_size;
-            shadow_cache.cache_r = r_sh;
+        if((uint32_t)corner_size * corner_size < sizeof(cache->cache)) {
+            lv_memcpy(cache->cache, sh_buf, corner_size * corner_size);
+            cache->cache_size = corner_size;
+            cache->cache_r = r_sh;
         }
     }
 #else

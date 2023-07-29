@@ -24,7 +24,7 @@
 #define CIRCLE_CACHE_LIFE_MAX   1000
 #define CIRCLE_CACHE_AGING(life, r)   life = LV_MIN(life + (r < 16 ? 1 : (r >> 4)), 1000)
 #if LV_USE_OS
-    #define circle_cache_mutex lv_global_default()->draw_sw_circle_cache_mutex
+    #define circle_cache_mutex lv_global_default()->draw_cache.circle_cache_mutex
 #endif
 
 /**********************
