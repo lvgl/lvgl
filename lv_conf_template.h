@@ -583,6 +583,9 @@
 /*QR code library*/
 #define LV_USE_QRCODE 0
 
+/*QR scan library*/
+#define LV_USE_QRSCAN 0
+
 /*Barcode code library*/
 #define LV_USE_BARCODE 0
 

@@ -1014,6 +1014,9 @@ menu "LVGL configuration"
 		config LV_USE_QRCODE
 			bool "QR code library"
 
+		config LV_USE_QRSCAN
+			bool "QR scan library"
+
 		config LV_USE_BARCODE
 			bool "Barcode library"
 

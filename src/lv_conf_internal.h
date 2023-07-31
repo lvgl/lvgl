@@ -1929,6 +1929,15 @@
     #endif
 #endif
 
+/*QR scan library*/
+#ifndef LV_USE_QRSCAN
+    #ifdef CONFIG_LV_USE_QRSCAN
+        #define LV_USE_QRSCAN CONFIG_LV_USE_QRSCAN
+    #else
+        #define LV_USE_QRSCAN 0
+    #endif
+#endif
+
 /*Barcode code library*/
 #ifndef LV_USE_BARCODE
     #ifdef CONFIG_LV_USE_BARCODE
