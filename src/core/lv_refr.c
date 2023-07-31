@@ -247,10 +247,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     if(!disp) return;
     if(!lv_disp_is_invalidation_enabled(disp)) return;
 
-    if(disp->rendering_in_progress) {
-        LV_LOG_ERROR("detected modifying dirty areas in render");
-        return;
-    }
+    LV_ASSERT_MSG(!disp->rendering_in_progress, "Invalidate area is not allowed during rendering.");
 
     /*Clear the invalidate buffer if the parameter is NULL*/
     if(area_p == NULL) {
