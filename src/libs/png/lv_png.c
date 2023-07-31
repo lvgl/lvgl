@@ -109,12 +109,7 @@ static lv_res_t decoder_info(struct _lv_img_decoder_t * decoder, const void * sr
         if(memcmp(magic, img_dsc->data, sizeof(magic))) return LV_RES_INV;
         header->always_zero = 0;
 
-        if(img_dsc->header.cf) {
-            header->cf = img_dsc->header.cf;       /*Save the color format*/
-        }
-        else {
-            header->cf = LV_COLOR_FORMAT_ARGB8888;
-        }
+        header->cf = LV_COLOR_FORMAT_ARGB8888;
 
         if(img_dsc->header.w) {
             header->w = img_dsc->header.w;         /*Save the image width*/
