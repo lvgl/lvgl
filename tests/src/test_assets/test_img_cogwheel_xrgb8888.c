@@ -117,7 +117,6 @@ test_img_cogwheel_xrgb8888_map[] = {
 const lv_img_dsc_t test_img_cogwheel_xrgb8888 = {
     .header.cf = LV_COLOR_FORMAT_XRGB8888,
     .header.always_zero = 0,
-    .header.reserved = 0,
     .header.w = 100,
     .header.h = 100,
     .data_size = 10000 * 4,

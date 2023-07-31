@@ -475,7 +475,12 @@ LV_ATTRIBUTE_FAST_MEM static inline void blend_non_normal_pixel(uint8_t * dest, 
 LV_ATTRIBUTE_FAST_MEM static inline void lv_color_24_24_mix(const uint8_t * src, uint8_t * dest, uint8_t mix)
 {
 
+
     if(mix == 0) return;
+    //    dest[0] = 0xff;
+    //    dest[1] = 0x00;
+    //    dest[2] = 0x00;
+    //    return;
 
     if(mix >= LV_OPA_MAX) {
         dest[0] = src[0];

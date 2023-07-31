@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MAX_BUF_SIZE (uint32_t) 4 * lv_disp_get_hor_res(_lv_refr_get_disp_refreshing())
+#define MAX_BUF_SIZE (uint32_t) 4 * lv_draw_buf_width_to_stride(lv_disp_get_hor_res(_lv_refr_get_disp_refreshing()), lv_disp_get_color_format(_lv_refr_get_disp_refreshing()))
 
 /**********************
  *      TYPEDEFS
@@ -50,14 +50,14 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
 
     /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
      *In this case just return. */
-    if(layer_to_draw->buf == NULL) return;
+    if(layer_to_draw->draw_buf.buf == NULL) return;
 
     lv_img_dsc_t img_dsc;
-    img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
-    img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
-    img_dsc.header.cf = layer_to_draw->color_format;
+    img_dsc.header.w = layer_to_draw->draw_buf.width;
+    img_dsc.header.h = layer_to_draw->draw_buf.height;
+    img_dsc.header.cf = layer_to_draw->draw_buf.color_format;
     img_dsc.header.always_zero = 0;
-    img_dsc.data = layer_to_draw->buf;
+    img_dsc.data = layer_to_draw->draw_buf.buf;
 
     lv_draw_img_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_img_dsc_t));
@@ -200,11 +200,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
     }
     else if(!transformed && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         lv_coord_t src_w = lv_area_get_width(coords);
+        lv_coord_t src_stride = lv_draw_buf_width_to_stride(src_w, cf) / lv_color_format_get_size(cf);
         lv_coord_t src_h = lv_area_get_height(coords);
         blend_dsc.src_area = coords;
         blend_dsc.src_buf = src_buf;
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
-        blend_dsc.mask_buf += 2 * src_w * src_h;
+        blend_dsc.mask_buf += 2 * src_stride * src_h;
         blend_dsc.blend_area = coords;
         blend_dsc.mask_area = coords;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
@@ -225,6 +226,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_dsc.blend_area = &blend_area;
 
         lv_coord_t src_w = lv_area_get_width(coords);
+        lv_coord_t src_stride = lv_draw_buf_width_to_stride(src_w, cf) / lv_color_format_get_size(cf);
         lv_coord_t src_h = lv_area_get_height(coords);
         lv_coord_t blend_w = lv_area_get_width(&blend_area);
         lv_coord_t blend_h = lv_area_get_height(&blend_area);
@@ -237,13 +239,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
 
         uint32_t px_size = lv_color_format_get_size(cf_final);
         uint32_t max_buf_size = MAX_BUF_SIZE / px_size;
-        uint32_t blend_size = lv_area_get_size(&blend_area);
-        uint32_t buf_w = blend_w;
+        uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
         uint32_t buf_h;
-        if(blend_size <= max_buf_size) buf_h = blend_h;
-        else buf_h = max_buf_size / blend_w;    /*Round to full lines*/
+        if(buf_stride * blend_h <= max_buf_size) buf_h = blend_h;
+        else buf_h = max_buf_size / buf_stride;    /*Round to full lines*/
 
-        uint32_t buf_size = buf_w * buf_h;
+        uint32_t buf_size = buf_stride * buf_h;
         uint8_t * tmp_buf = lv_malloc(buf_size * px_size);
         blend_dsc.src_buf = tmp_buf;
         blend_dsc.src_color_format = cf_final;
@@ -253,7 +254,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         blend_dsc.src_area = &blend_area;
 
         if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-            blend_dsc.mask_buf =  tmp_buf + buf_w * buf_h * 2;
+            blend_dsc.mask_buf =  tmp_buf + lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565) * buf_h;
             blend_dsc.mask_area = &blend_area;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
             blend_dsc.src_color_format = LV_COLOR_FORMAT_RGB565;
@@ -278,34 +279,34 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
             lv_area_copy(&relative_area, &blend_area);
             lv_area_move(&relative_area, -coords->x1, -coords->y1);
             if(transformed) {
-                lv_draw_sw_transform(draw_unit, &relative_area, src_buf, src_w, src_h, src_w,
+                lv_draw_sw_transform(draw_unit, &relative_area, src_buf, src_w, src_h,
                                      draw_dsc, &sup, cf, tmp_buf);
             }
             else if(draw_dsc->recolor_opa >= LV_OPA_MIN) {
                 lv_coord_t h = lv_area_get_height(&relative_area);
                 if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-                    const uint8_t * rgb_src_buf = src_buf + src_w * relative_area.y1 * 2 + relative_area.x1 * 2;
-                    const uint8_t * a_src_buf = src_buf + src_w * src_h * 2 + src_w * relative_area.y1 + relative_area.x1;
+                    const uint8_t * rgb_src_buf = src_buf + src_stride * relative_area.y1 * 2 + relative_area.x1 * 2;
+                    const uint8_t * a_src_buf = src_buf + src_stride * src_h * 2 + src_stride * relative_area.y1 + relative_area.x1;
                     uint8_t * rgb_dest_buf = tmp_buf;
-                    uint8_t * a_dest_buf = tmp_buf + blend_w * h * 2;
+                    uint8_t * a_dest_buf = (uint8_t *)blend_dsc.mask_buf;
                     lv_coord_t i;
                     for(i = 0; i < h; i++) {
-                        lv_memcpy(rgb_dest_buf, rgb_src_buf, blend_w * 2);
-                        lv_memcpy(a_dest_buf, a_src_buf, blend_w);
-                        rgb_src_buf += src_w * 2;
-                        a_src_buf += src_w;
-                        rgb_dest_buf += blend_w * 2;
-                        a_dest_buf += blend_w;
+                        lv_memcpy(rgb_dest_buf, rgb_src_buf, src_stride * 2);
+                        lv_memcpy(a_dest_buf, a_src_buf, src_stride);
+                        rgb_src_buf += src_stride * 2;
+                        a_src_buf += src_stride;
+                        rgb_dest_buf += src_stride * 2;
+                        a_dest_buf += src_stride;
                     }
                 }
                 else if(cf_final != LV_COLOR_FORMAT_A8) {
-                    const uint8_t * src_buf_tmp = src_buf + src_w * relative_area.y1 * px_size + relative_area.x1 * px_size;
+                    const uint8_t * src_buf_tmp = src_buf + src_stride * relative_area.y1 * px_size + relative_area.x1 * px_size;
                     uint8_t * dest_buf_tmp = tmp_buf;
                     lv_coord_t i;
                     for(i = 0; i < h; i++) {
                         lv_memcpy(dest_buf_tmp, src_buf_tmp, blend_w * px_size);
                         dest_buf_tmp += blend_w * px_size;
-                        src_buf_tmp += src_w * px_size;
+                        src_buf_tmp += src_stride * px_size;
                     }
                 }
             }
@@ -316,13 +317,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
                 lv_opa_t mix = draw_dsc->recolor_opa;
                 lv_opa_t mix_inv = 255 - mix;
                 if(cf_final == LV_COLOR_FORMAT_RGB565A8 || cf_final == LV_COLOR_FORMAT_RGB565) {
-                    lv_coord_t size = lv_area_get_size(&blend_area);
-                    lv_coord_t i;
                     uint16_t c_mult[3];
                     c_mult[0] = (color.blue >> 3) * mix;
                     c_mult[1] = (color.green >> 2) * mix;
                     c_mult[2] = (color.red >> 3) * mix;
                     uint16_t * buf16 = (uint16_t *)tmp_buf;
+                    lv_coord_t i;
+                    lv_coord_t size = lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565) / 2 * lv_area_get_height(&blend_area);
                     for(i = 0; i < size; i++) {
                         buf16[i] = (((c_mult[2] + ((buf16[i] >> 11) & 0x1F) * mix_inv) << 3) & 0xF800) +
                                    (((c_mult[1] + ((buf16[i] >> 5) & 0x3F) * mix_inv) >> 3) & 0x07E0) +
@@ -354,7 +355,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
             if(blend_area.y2 > y_last) {
                 blend_area.y2 = y_last;
                 if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
-                    blend_dsc.mask_buf =  tmp_buf + buf_w * lv_area_get_height(&blend_area) * 2;
+                    blend_dsc.mask_buf =  tmp_buf + lv_draw_buf_width_to_stride(blend_w,
+                                                                                LV_COLOR_FORMAT_RGB565) * lv_area_get_height(&blend_area);
                 }
             }
         }

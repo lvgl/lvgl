@@ -45,10 +45,6 @@ typedef struct {
 
 void lv_draw_sw_init(void);
 
-lv_layer_t * lv_draw_sw_layer_init(lv_disp_t * disp);
-
-void lv_draw_sw_layer_deinit(struct _lv_disp_t * disp, lv_layer_t * layer);
-
 void lv_draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt);
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
@@ -75,7 +71,7 @@ void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_
 void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
-                          lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                          lv_coord_t src_w, lv_coord_t src_h,
                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, void * dest_buf);
 
 /***********************

@@ -101,9 +101,8 @@ lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
     lv_disp_set_draw_buffers(disp, buf, NULL,
                              32 * 1024, LV_DISP_RENDER_MODE_PARTIAL);
 #else
-    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
-    lv_disp_set_draw_buffers(disp, dsc->fb, NULL,
-                             lv_disp_get_hor_res(disp) * lv_disp_get_hor_res(disp) * px_size, LV_DISP_RENDER_MODE_DIRECT);
+    uint32_t stride = lv_draw_buf_width_to_stride(lv_disp_get_hor_res(disp), lv_disp_get_color_format(disp));
+    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, stride * lv_disp_get_ver_res(disp), LV_DISP_RENDER_MODE_DIRECT);
 #endif
     lv_disp_add_event(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
@@ -281,8 +280,8 @@ static void window_update(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
-    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
-    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb, hor_res * px_size);
+    uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_disp_get_color_format(disp));
+    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb, stride);
 
     SDL_RenderClear(dsc->renderer);
 
@@ -295,14 +294,14 @@ static void texture_resize(lv_disp_t * disp)
 {
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
     lv_coord_t ver_res = lv_disp_get_ver_res(disp);
-    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+    uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_disp_get_color_format(disp));
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
 
-    dsc->fb = realloc(dsc->fb, hor_res * ver_res * px_size);
-    memset(dsc->fb, 0x00, hor_res * ver_res * px_size);
+    dsc->fb = realloc(dsc->fb, stride * ver_res);
+    memset(dsc->fb, 0x00, stride * ver_res);
 
 #if LV_SDL_PARTIAL_MODE == 0
-    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, hor_res * ver_res * px_size, LV_DISP_RENDER_MODE_DIRECT);
+    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, stride * ver_res, LV_DISP_RENDER_MODE_DIRECT);
 #endif
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 

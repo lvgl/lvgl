@@ -150,12 +150,13 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
                 lv_draw_img_dsc_t * draw_img_dsc = t->draw_dsc;
                 lv_layer_t * layer_drawn = (lv_layer_t *)draw_img_dsc->src;
 
-                if(layer_drawn->buf) {
-                    uint32_t layer_px_size = lv_color_format_get_size(layer_drawn->color_format);
-                    uint32_t layer_size_byte = lv_area_get_size(&layer_drawn->buf_area) * layer_px_size;
+                if(layer_drawn->draw_buf.buf) {
+                    uint32_t layer_size_byte = layer_drawn->draw_buf.height * lv_draw_buf_width_to_stride(layer_drawn->draw_buf.width,
+                                                                                                          layer_drawn->draw_buf.color_format);
+
                     used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
                     LV_LOG_INFO("Layer memory used: %d kB\n", used_memory_for_layers_kb);
-                    lv_free(layer_drawn->buf);
+                    lv_free(layer_drawn->draw_buf.buf);
                 }
 
                 /*Remove the layer from  the display's*/
@@ -169,7 +170,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
                         l2 = l2->next;
                     }
 
-                    disp->layer_deinit(disp, layer_drawn);
+                    if(disp->layer_deinit) disp->layer_deinit(disp, layer_drawn);
                     lv_free(layer_drawn);
                 }
             }
@@ -211,9 +212,9 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
     /*Assign draw tasks to the draw_units*/
     else {
         bool layer_ok = true;
-        if(layer->buf == NULL) {
-            uint32_t px_size = lv_color_format_get_size(layer->color_format);
-            uint32_t layer_size_byte = lv_area_get_size(&layer->buf_area) * px_size;
+        if(layer->draw_buf.buf == NULL) {
+            uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
+                                                                                            layer->draw_buf.color_format);
             uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
             if(used_memory_for_layers_kb + kb > LV_LAYER_MAX_MEMORY_USAGE) {
                 layer_ok = false;
@@ -291,14 +292,15 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-    lv_layer_t * new_layer = disp->layer_init(disp);
+    lv_layer_t * new_layer = lv_malloc(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) return NULL;
+    lv_memzero(new_layer, sizeof(lv_layer_t));
 
-    new_layer->buf = NULL;
+    lv_draw_buf_init(&new_layer->draw_buf, lv_area_get_width(area), lv_area_get_height(area), color_format);
+    new_layer->draw_buf_ofs.x = area->x1;
+    new_layer->draw_buf_ofs.y = area->y1;
     new_layer->parent = parent_layer;
-    new_layer->color_format = color_format;
-    new_layer->buf_area = *area;
     new_layer->clip_area = *area;
 
     if(disp->layer_head) {
@@ -313,11 +315,21 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
     return new_layer;
 }
 
+void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area)
+{
+    area->x1 = 0;
+    area->y1 = 0;
+    area->x2 = layer->draw_buf.width - 1;
+    area->y2 = layer->draw_buf.height - 1;
+    lv_area_move(area, layer->draw_buf_ofs.x, layer->draw_buf_ofs.y);
+}
+
 void lv_draw_add_used_layer_size(uint32_t kb)
 {
     used_memory_for_layers_kb += kb;
     LV_LOG_INFO("Layer memory used: %d kB\n", used_memory_for_layers_kb);
 }
+
 
 
 /**********************

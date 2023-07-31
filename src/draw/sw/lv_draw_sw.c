@@ -33,14 +33,6 @@ static void execute_drawing(lv_draw_sw_unit_t * u);
 
 static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
-static void lv_draw_sw_buffer_copy(lv_layer_t * layer,
-                                   void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
-                                   void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
-
-static void lv_draw_sw_buffer_convert(lv_layer_t * layer);
-
-static void lv_draw_sw_buffer_clear(lv_layer_t * layer, const lv_area_t * a);
-
 /**********************
  *  GLOBAL PROTOTYPES
  **********************/
@@ -76,26 +68,6 @@ void lv_draw_sw_init(void)
     }
 }
 
-
-lv_layer_t * lv_draw_sw_layer_init(lv_disp_t * disp)
-{
-    lv_layer_t * layer = lv_malloc(sizeof(lv_layer_t));
-    LV_ASSERT_MALLOC(layer);
-    lv_memzero(layer, sizeof(lv_layer_t));
-    layer->color_format = disp->color_format;
-    layer->buffer_copy = lv_draw_sw_buffer_copy;
-    layer->buffer_convert = lv_draw_sw_buffer_convert;
-    layer->buffer_clear = lv_draw_sw_buffer_clear;
-
-    return layer;
-}
-
-void lv_draw_sw_layer_deinit(lv_disp_t * disp, lv_layer_t * layer)
-{
-    LV_UNUSED(disp);
-    lv_memzero(layer, sizeof(lv_layer_t));
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -112,22 +84,20 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     if(t == NULL) return -1;
 
     /*If the buffer of the layer is not allocated yet, allocate it now*/
-    if(layer->buf == NULL) {
-        uint32_t px_size = lv_color_format_get_size(layer->color_format);
-        uint32_t layer_size_byte = lv_area_get_size(&layer->buf_area) * px_size;
+    if(layer->draw_buf.buf == NULL) {
+        uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
+                                                                                        layer->draw_buf.color_format);
 
-        uint8_t * buf = lv_malloc(layer_size_byte);
-        if(buf == NULL) {
+        lv_draw_buf_malloc(&layer->draw_buf);
+        if(layer->draw_buf.buf == NULL) {
             LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
             return -1;
         }
-        LV_ASSERT_MALLOC(buf);
+        LV_ASSERT_MALLOC(layer->draw_buf.buf);
         lv_draw_add_used_layer_size(layer_size_byte < 1024 ? 1 : layer_size_byte >> 10);
 
-        layer->buf = buf;
-
-        if(lv_color_format_has_alpha(layer->color_format)) {
-            layer->buffer_clear(layer, &layer->buf_area);
+        if(lv_color_format_has_alpha(layer->draw_buf.color_format)) {
+            lv_draw_buf_clear(&layer->draw_buf, NULL);
         }
     }
 
@@ -150,60 +120,6 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
 
 #endif
     return 1;
-}
-
-static void lv_draw_sw_buffer_copy(lv_layer_t * layer,
-                                   void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
-                                   void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area)
-{
-    LV_UNUSED(layer);
-
-    uint8_t px_size = lv_color_format_get_size(layer->color_format);
-    uint8_t * dest_bufc =  dest_buf;
-    uint8_t * src_bufc =  src_buf;
-
-    /*Got the first pixel of each buffer*/
-    dest_bufc += dest_stride * px_size * dest_area->y1;
-    dest_bufc += dest_area->x1 * px_size;
-
-    src_bufc += src_stride * px_size * src_area->y1;
-    src_bufc += src_area->x1 * px_size;
-
-    src_stride *= px_size;
-    dest_stride *= px_size;
-
-    uint32_t line_length = lv_area_get_width(dest_area) * px_size;
-    lv_coord_t y;
-    for(y = dest_area->y1; y <= dest_area->y2; y++) {
-        lv_memcpy(dest_bufc, src_bufc, line_length);
-        dest_bufc += dest_stride;
-        src_bufc += src_stride;
-    }
-}
-
-static void lv_draw_sw_buffer_convert(lv_layer_t * layer)
-{
-    LV_UNUSED(layer);
-}
-
-uint8_t * buf_tmp;
-
-static void lv_draw_sw_buffer_clear(lv_layer_t * layer, const lv_area_t * a)
-{
-    uint8_t px_size = lv_color_format_get_size(layer->color_format);
-    uint8_t * buf =  layer->buf;
-    uint32_t dest_stride = lv_area_get_width(&layer->buf_area) * px_size;
-
-    /*Go to the first pixel of each buffer*/
-    buf += dest_stride * (a->y1 - layer->buf_area.y1);
-    buf += (a->x1 - layer->buf_area.x1) * px_size;
-
-    uint32_t line_length = lv_area_get_width(a) * px_size;
-    lv_coord_t y;
-    for(y = a->y1; y <= a->y2; y++) {
-        lv_memzero(buf, line_length);
-        buf += dest_stride;
-    }
 }
 
 #if LV_USE_OS

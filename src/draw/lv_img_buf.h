@@ -61,14 +61,11 @@ typedef struct {
 } lv_img_header_t;
 #else
 typedef struct {
-    uint32_t cf : 5;          /*Color format: See `lv_color_format_t`*/
-    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
-                                 non-printable character*/
+    uint8_t always_zero;
+    uint8_t cf;          /*Color format: See `lv_color_format_t`*/
+    uint16_t w; /*Width of the image*/
+    uint16_t h; /*Height of the image*/
 
-    uint32_t reserved : 2; /*Reserved to be used later*/
-
-    uint32_t w : 11; /*Width of the image map*/
-    uint32_t h : 11; /*Height of the image map*/
 } lv_img_header_t;
 #endif
 
