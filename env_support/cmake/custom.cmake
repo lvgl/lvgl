@@ -6,9 +6,8 @@ option(LV_LVGL_H_INCLUDE_SIMPLE
 option(LV_CONF_INCLUDE_SIMPLE
        "Use #include \"lv_conf.h\" instead of #include \"../../lv_conf.h\"" ON)
 
-# Option to set LV_CONF_PATH, if set parent path LV_CONF_DIR is added to
-# includes
-option(LV_CONF_PATH "Path defined for lv_conf.h")
+# Option LV_CONF_PATH, which should be the path for lv_conf.h
+# If set parent path LV_CONF_DIR is added to includes
 get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
 
 # Option to build shared libraries (as opposed to static), default: OFF
