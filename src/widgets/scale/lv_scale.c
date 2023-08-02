@@ -431,10 +431,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             /* Setup the tick points */
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Vertical position starts at the bottom side of the main line */
-                lv_coord_t vertical_position = obj->coords.y1;
+                lv_coord_t vertical_position = obj->coords.y2;
                 /* Increment the tick offset depending of its index */
                 if(0 != tick_idx) {
-                    vertical_position += (lv_obj_get_height(obj) / total_tick_count) * tick_idx;
+                    vertical_position -= (lv_obj_get_height(obj) / total_tick_count) * tick_idx;
                 }
 
                 tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
@@ -939,10 +939,10 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
         /* Setup the tick points */
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             /* Vertical position starts at the bottom side of the main line */
-            lv_coord_t vertical_position = obj->coords.y1;
+            lv_coord_t vertical_position = obj->coords.y2;
             /* Increment the tick offset depending of its index */
             if(0 != tick_idx) {
-                vertical_position += (lv_obj_get_height(obj) / scale->total_tick_count) * tick_idx;
+                vertical_position -= (lv_obj_get_height(obj) / scale->total_tick_count) * tick_idx;
             }
 
             tick_point_a->x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
