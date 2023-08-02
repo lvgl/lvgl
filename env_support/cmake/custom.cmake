@@ -8,7 +8,9 @@ option(LV_CONF_INCLUDE_SIMPLE
 
 # Option LV_CONF_PATH, which should be the path for lv_conf.h
 # If set parent path LV_CONF_DIR is added to includes
-get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
+if( LV_CONF_PATH )
+    get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
+endif( LV_CONF_PATH )
 
 # Option to build shared libraries (as opposed to static), default: OFF
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
