@@ -19,6 +19,8 @@
  *********************/
 #define MY_CLASS &lv_scale_class
 
+#define LV_SCALE_LABEL_TXT_LEN	(20U)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -402,18 +404,12 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U);
             y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
         }
-        else {
-            /* Mode not handled */
-            return;
-        }
+        else { /* Nothing to do */ }
 
         lv_coord_t major_len = scale->major_len;
 
         /* Handle tick length being drawn backwards */
-        if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
-            major_len *= -1;
-        }
-        else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+        if((LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
             major_len *= -1;
         }
         else { /* Nothing to do */ }
@@ -452,6 +448,8 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 /* Increment the tick offset depending of its index */
                 if(0 != tick_idx) {
                     horizontal_position += (lv_obj_get_width(obj) / total_tick_count) * tick_idx;
+                    /* Move inside 1px for compensation */
+                    horizontal_position -= 1U;
                 }
 
                 tick_point_a.x = horizontal_position;
@@ -459,26 +457,13 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 tick_point_b.x = horizontal_position;
                 tick_point_b.y = tick_point_a.y + tick_length;
             }
-            else {
-                /* Circular mode */
-            }
+            else { /* Nothing to do */ }
 
             /* Label text setup */
-            char text_buffer[20] = {0};
-            int32_t tick_value = 0U;
-            int32_t min_out = 0U;
-            int32_t max_out = 0U;
-
-            if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
-               || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-                min_out = scale->range_min;
-                max_out = scale->range_max;
-            }
-            else {
-                /* Circular mode */
-            }
-
-            tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
+            char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
+            const int32_t min_out = scale->range_min;
+            const int32_t max_out = scale->range_max;
+            const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
 
             /* Check if the custom text array has element for this major tick index */
             if(scale->txt_src) {
@@ -561,29 +546,31 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 /* Set the label draw area at some distance of the major tick */
                 lv_area_t label_coords;
 
-                if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-                    label_coords.x1 = (tick_point_b.x - size.x / 2);
-                    label_coords.x2 = (tick_point_b.x + size.x / 2);
+                if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+                    label_coords.x1 = (tick_point_b.x - size.x / 2U);
+                    label_coords.x2 = (tick_point_b.x + size.x / 2U);
                     label_coords.y1 = tick_point_b.y + label_gap;
-                    label_coords.y2 = label_coords.y1 + size.y;
+
+                    if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
+                    	label_coords.y1 = tick_point_b.y + label_gap;
+                    	label_coords.y2 = label_coords.y1 + size.y;
+                    }
+                    else {
+                    	label_coords.y1 = label_coords.y2 - size.y;
+                    	label_coords.y2 = tick_point_b.y - label_gap;
+                    }
                 }
-                else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
-                    label_coords.x1 = (tick_point_b.x - size.x / 2);
-                    label_coords.x2 = (tick_point_b.x + size.x / 2);
-                    label_coords.y2 = tick_point_b.y - label_gap;
-                    label_coords.y1 = label_coords.y2 - size.y;
-                }
-                else if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-                    label_coords.x1 = tick_point_b.x - size.x - label_gap;
-                    label_coords.x2 = tick_point_b.x - label_gap;
+                else if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
                     label_coords.y1 = (tick_point_b.y - size.y / 2);
-                    label_coords.y2 = (tick_point_b.y + size.y / 2);
-                }
-                else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                    label_coords.x1 = tick_point_b.x + label_gap;
-                    label_coords.x2 = tick_point_b.x + size.x + label_gap;
-                    label_coords.y1 = (tick_point_b.y - size.y / 2);
-                    label_coords.y2 = (tick_point_b.y + size.y / 2);
+					label_coords.y2 = (tick_point_b.y + size.y / 2);
+
+                    if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
+                    	label_coords.x1 = tick_point_b.x - size.x - label_gap;
+						label_coords.x2 = tick_point_b.x - label_gap;
+                    } else {
+                    	label_coords.x1 = tick_point_b.x + label_gap;
+						label_coords.x2 = tick_point_b.x + size.x + label_gap;
+                    }
                 }
                 else { /* Nothing to do */ }
 
@@ -657,11 +644,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             point.y = center_point.y;
             lv_point_transform(&point, angle_upscale, 256, &center_point);
 
-            char buf[16] = {0U};
-            int32_t tick_value = 0U;
-            int32_t min_out = scale->range_min;
-            int32_t max_out = scale->range_max;
-            tick_value = lv_map(tick_idx, 0U, scale->total_tick_count, min_out, max_out);
+            char buf[LV_SCALE_LABEL_TXT_LEN] = {0U};
+            const int32_t min_out = scale->range_min;
+            const int32_t max_out = scale->range_max;
+            const int32_t tick_value = lv_map(tick_idx, 0U, scale->total_tick_count, min_out, max_out);
 
             /* Check if the custom text array has element for this major tick index */
             if(scale->txt_src) {
