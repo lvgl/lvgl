@@ -19,7 +19,7 @@
  *********************/
 #define MY_CLASS &lv_scale_class
 
-#define LV_SCALE_LABEL_TXT_LEN	(20U)
+#define LV_SCALE_LABEL_TXT_LEN  (20U)
 
 /**********************
  *      TYPEDEFS
@@ -551,25 +551,26 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     label_coords.x2 = (tick_point_b.x + size.x / 2U);
                     label_coords.y1 = tick_point_b.y + label_gap;
 
-                    if (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-                    	label_coords.y1 = tick_point_b.y + label_gap;
-                    	label_coords.y2 = label_coords.y1 + size.y;
+                    if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
+                        label_coords.y1 = tick_point_b.y + label_gap;
+                        label_coords.y2 = label_coords.y1 + size.y;
                     }
                     else {
-                    	label_coords.y1 = label_coords.y2 - size.y;
-                    	label_coords.y2 = tick_point_b.y - label_gap;
+                        label_coords.y1 = label_coords.y2 - size.y;
+                        label_coords.y2 = tick_point_b.y - label_gap;
                     }
                 }
                 else if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
                     label_coords.y1 = (tick_point_b.y - size.y / 2);
-					label_coords.y2 = (tick_point_b.y + size.y / 2);
+                    label_coords.y2 = (tick_point_b.y + size.y / 2);
 
-                    if (LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-                    	label_coords.x1 = tick_point_b.x - size.x - label_gap;
-						label_coords.x2 = tick_point_b.x - label_gap;
-                    } else {
-                    	label_coords.x1 = tick_point_b.x + label_gap;
-						label_coords.x2 = tick_point_b.x + size.x + label_gap;
+                    if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
+                        label_coords.x1 = tick_point_b.x - size.x - label_gap;
+                        label_coords.x2 = tick_point_b.x - label_gap;
+                    }
+                    else {
+                        label_coords.x1 = tick_point_b.x + label_gap;
+                        label_coords.x2 = tick_point_b.x + size.x + label_gap;
                     }
                 }
                 else { /* Nothing to do */ }
