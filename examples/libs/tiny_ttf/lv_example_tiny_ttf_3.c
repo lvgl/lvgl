@@ -1,8 +1,6 @@
 #include "../../lv_examples.h"
 #if LV_USE_TINY_TTF && LV_BUILD_EXAMPLES && LV_USE_MSG
 
-#include "ubuntu_font.h"
-
 #define DISPLAY_TEXT    "Hello World!"
 #define MSG_NEW_SIZE    1
 
@@ -14,12 +12,15 @@ static void label_event_cb(lv_event_t * e);
  */
 void lv_example_tiny_ttf_3(void)
 {
+    extern const uint8_t ubuntu_font[];
+    extern const int ubuntu_font_size;
+
     int lsize = 25;
 
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, sizeof(ubuntu_font), lsize);
+    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, ubuntu_font_size, lsize);
     lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
