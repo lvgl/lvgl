@@ -12,6 +12,16 @@ if( LV_CONF_PATH )
     get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
 endif( LV_CONF_PATH )
 
+find_package(PkgConfig REQUIRED)
+
+# Option LV_USE_FREETYPE
+# If set, libfreetype2 is added to the dependencies of lvgl so that dependants
+# have the compilation and linking flags automatically set.
+if( LV_USE_FREETYPE )
+    pkg_check_modules( FREETYPE freetype2>=2.0 REQUIRED )
+endif( LV_USE_FREETYPE )
+
+
 # Option to build shared libraries (as opposed to static), default: OFF
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
@@ -32,6 +42,16 @@ target_compile_definitions(
 if(LV_CONF_PATH)
   target_compile_definitions(lvgl PUBLIC LV_CONF_PATH=${LV_CONF_PATH})
 endif()
+
+target_compile_options(
+  lvgl PUBLIC $<$<BOOL:${LV_USE_FREETYPE}>:${FREETYPE_CFLAGS}>)
+
+target_link_libraries(
+  lvgl PUBLIC $<$<BOOL:${LV_USE_FREETYPE}>:${FREETYPE_LIBRARIES}>)
+
+target_link_options(
+  lvgl PUBLIC $<$<BOOL:${LV_USE_FREETYPE}>:${FREETYPE_LDFLAGS}>)
+
 
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
