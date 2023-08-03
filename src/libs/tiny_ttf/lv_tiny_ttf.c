@@ -207,8 +207,11 @@ static void ttf_cache_clear(ttf_cache_handle_t handle)
                 }
             }
             TTF_CACHE_FREE(cache->buckets[i].entries);
+            cache->buckets[i].entries = NULL;
+            cache->buckets[i].capacity = 0;
         }
     }
+    cache->total_size = 0;
 }
 static void ttf_cache_destroy(ttf_cache_handle_t handle)
 {
