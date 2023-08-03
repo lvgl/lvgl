@@ -99,31 +99,31 @@ static void lvgl_log(const char *buf)
 
 #ifdef CONFIG_LV_Z_BUFFER_ALLOC_STATIC
 
-static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
+static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_driver)
 {
 	struct lvgl_disp_data *data =
-		(struct lvgl_disp_data *)disp_drv->user_data;
+		(struct lvgl_disp_data *)disp_driver->user_data;
 	int err = 0;
 
 	if (data->cap.x_resolution <= DISPLAY_WIDTH) {
-		disp_drv->hor_res = data->cap.x_resolution;
+		disp_driver->hor_res = data->cap.x_resolution;
 	} else {
 		LOG_ERR("Horizontal resolution is larger than maximum");
 		err = -ENOTSUP;
 	}
 
 	if (data->cap.y_resolution <= DISPLAY_HEIGHT) {
-		disp_drv->ver_res = data->cap.y_resolution;
+		disp_driver->ver_res = data->cap.y_resolution;
 	} else {
 		LOG_ERR("Vertical resolution is larger than maximum");
 		err = -ENOTSUP;
 	}
 
-	disp_drv->draw_buf = &disp_buf;
+	disp_driver->draw_buf = &disp_buf;
 #ifdef CONFIG_LV_Z_DOUBLE_VDB
-	lv_disp_draw_buf_init(disp_drv->draw_buf, &buf0, &buf1, NBR_PIXELS_IN_BUFFER);
+	lv_disp_draw_buf_init(disp_driver->draw_buf, &buf0, &buf1, NBR_PIXELS_IN_BUFFER);
 #else
-	lv_disp_draw_buf_init(disp_drv->draw_buf, &buf0, NULL, NBR_PIXELS_IN_BUFFER);
+	lv_disp_draw_buf_init(disp_driver->draw_buf, &buf0, NULL, NBR_PIXELS_IN_BUFFER);
 #endif /* CONFIG_LV_Z_DOUBLE_VDB  */
 
 	return err;
@@ -131,23 +131,23 @@ static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 
 #else
 
-static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
+static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_driver)
 {
 	void *buf0 = NULL;
 	void *buf1 = NULL;
 	uint16_t buf_nbr_pixels;
 	uint32_t buf_size;
 	struct lvgl_disp_data *data =
-		(struct lvgl_disp_data *)disp_drv->user_data;
+		(struct lvgl_disp_data *)disp_driver->user_data;
 
-	disp_drv->hor_res = data->cap.x_resolution;
-	disp_drv->ver_res = data->cap.y_resolution;
+	disp_driver->hor_res = data->cap.x_resolution;
+	disp_driver->ver_res = data->cap.y_resolution;
 
-	buf_nbr_pixels = (CONFIG_LV_Z_VDB_SIZE * disp_drv->hor_res *
-			disp_drv->ver_res) / 100;
+	buf_nbr_pixels = (CONFIG_LV_Z_VDB_SIZE * disp_driver->hor_res *
+			disp_driver->ver_res) / 100;
 	/* one horizontal line is the minimum buffer requirement for lvgl */
-	if (buf_nbr_pixels < disp_drv->hor_res) {
-		buf_nbr_pixels = disp_drv->hor_res;
+	if (buf_nbr_pixels < disp_driver->hor_res) {
+		buf_nbr_pixels = disp_driver->hor_res;
 	}
 
 	switch (data->cap.current_pixel_format) {
@@ -184,15 +184,15 @@ static int lvgl_allocate_rendering_buffers(lv_disp_drv_t *disp_drv)
 	}
 #endif
 
-	disp_drv->draw_buf = LV_MEM_CUSTOM_ALLOC(sizeof(lv_disp_draw_buf_t));
-	if (disp_drv->draw_buf == NULL) {
+	disp_driver->draw_buf = LV_MEM_CUSTOM_ALLOC(sizeof(lv_disp_draw_buf_t));
+	if (disp_driver->draw_buf == NULL) {
 		LV_MEM_CUSTOM_FREE(buf0);
 		LV_MEM_CUSTOM_FREE(buf1);
 		LOG_ERR("Failed to allocate memory to store rendering buffers");
 		return -ENOMEM;
 	}
 
-	lv_disp_draw_buf_init(disp_drv->draw_buf, buf0, buf1, buf_nbr_pixels);
+	lv_disp_draw_buf_init(disp_driver->draw_buf, buf0, buf1, buf_nbr_pixels);
 	return 0;
 }
 #endif /* CONFIG_LV_Z_BUFFER_ALLOC_STATIC */
