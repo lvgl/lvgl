@@ -565,8 +565,8 @@ static void refr_area(const lv_area_t * area_p)
         layer->draw_buf.buf = disp_refr->buf_act;
         layer->draw_buf.width = lv_area_get_width(&sub_area);
         layer->draw_buf.height = lv_area_get_height(&sub_area);
-        layer->draw_buf_ofs.x = area_p->x1;
-        layer->draw_buf_ofs.y = area_p->y1;
+        layer->draw_buf_ofs.x = sub_area.x1;
+        layer->draw_buf_ofs.y = sub_area.y1;
         layer->clip_area = sub_area;
         disp_refr->last_part = 1;
         refr_area_part(layer);
