@@ -23,6 +23,7 @@ extern "C" {
  **********************/
 
 struct _lv_indev_t;
+struct _lv_event_t;
 
 struct _lv_indev_t {
     /**< Input device type*/
@@ -32,8 +33,8 @@ struct _lv_indev_t {
     lv_indev_read_cb_t read_cb;
 
     /** Called when an action happened on the input device.
-     * The second parameter is the event from `lv_event_t`*/
-    void (*feedback_cb)(struct _lv_indev_t * indev, uint8_t event_code);
+     * The second parameter is the event structure pointer*/
+    void (*feedback_cb)(struct _lv_indev_t * indev, struct _lv_event_t * e);
 
     lv_indev_state_t state; /**< Current state of the input device.*/
 
