@@ -28,6 +28,10 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    uint32_t sys_time;
+    volatile uint8_t sys_irq_flag;
+} lv_tick_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES

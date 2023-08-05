@@ -34,6 +34,7 @@ extern "C" {
 #include "../font/lv_font_fmt_txt.h"
 #endif
 
+#include "../tick/lv_tick.h"
 /*********************
  *      DEFINES
  *********************/
@@ -93,8 +94,7 @@ typedef struct {
     lv_anim_state_t anim_state;
 
 #if !LV_TICK_CUSTOM
-    uint32_t tick_sys_time;
-    volatile uint8_t tick_sys_irq_flag;
+    lv_tick_state_t tick_state;
 #endif
 
 #if LV_IMG_CACHE_DEF_SIZE

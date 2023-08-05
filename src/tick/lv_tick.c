@@ -18,11 +18,11 @@
  *      DEFINES
  *********************/
 #if !LV_TICK_CUSTOM
+    #define state lv_global_default()->tick_state
     /*Warning: sys_time is modified across threads by SDL backend, which prevents the ability to use multiple instances of this variable in SDL.*/
     #if !LV_USE_SDL
-        #define sys_time lv_global_default()->tick_sys_time
+        #define sys_time state.sys_time
     #endif
-    #define tick_irq_flag lv_global_default()->tick_sys_irq_flag
 #endif
 
 /**********************
@@ -55,7 +55,7 @@
  */
 LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
 {
-    tick_irq_flag = 0;
+    state.sys_irq_flag = 0;
     sys_time += tick_period;
 }
 #endif
@@ -67,6 +67,7 @@ LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
 uint32_t lv_tick_get(void)
 {
 #if LV_TICK_CUSTOM == 0
+    lv_tick_state_t * state_p = &state;
 
     /*If `lv_tick_inc` is called from an interrupt while `sys_time` is read
      *the result might be corrupted.
@@ -75,9 +76,9 @@ uint32_t lv_tick_get(void)
      *until `tick_irq_flag` remains `1`.*/
     uint32_t result;
     do {
-        tick_irq_flag = 1;
+        state_p->sys_irq_flag = 1;
         result        = sys_time;
-    } while(!tick_irq_flag); /*Continue until see a non interrupted cycle*/
+    } while(!state_p->sys_irq_flag); /*Continue until see a non interrupted cycle*/
 
     return result;
 #else
