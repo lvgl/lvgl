@@ -953,8 +953,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_coord_t x = i->btn_points[data->btn_id].x;
     lv_coord_t y = i->btn_points[data->btn_id].y;
 
-    static lv_indev_state_t prev_state = LV_INDEV_STATE_RELEASED;
-    if(prev_state != data->state) {
+    if(i->pointer.prev_state != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {
             LV_LOG_INFO("button %" LV_PRIu32 " is pressed (x:%d y:%d)", data->btn_id, (int)x, (int)y);
         }
