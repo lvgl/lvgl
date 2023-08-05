@@ -10,20 +10,10 @@
 #include <stddef.h>
 #include "../core/lv_global.h"
 
-#if LV_TICK_CUSTOM == 1
-    #include LV_TICK_CUSTOM_INCLUDE
-#endif
-
 /*********************
  *      DEFINES
  *********************/
-#if !LV_TICK_CUSTOM
-    #define state lv_global_default()->tick_state
-    /*Warning: sys_time is modified across threads by SDL backend, which prevents the ability to use multiple instances of this variable in SDL.*/
-    #if !LV_USE_SDL
-        #define sys_time state.sys_time
-    #endif
-#endif
+#define state lv_global_default()->tick_state
 
 /**********************
  *      TYPEDEFS
@@ -36,9 +26,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if !LV_TICK_CUSTOM && LV_USE_SDL
-    static uint32_t sys_time;
-#endif
 
 /**********************
  *      MACROS
@@ -48,17 +35,17 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if !LV_TICK_CUSTOM
 /**
  * You have to call this function periodically
  * @param tick_period the call period of this function in milliseconds
  */
 LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
 {
-    state.sys_irq_flag = 0;
-    sys_time += tick_period;
+    lv_tick_state_t * state_p = &state;
+
+    state_p->sys_irq_flag = 0;
+    state_p->sys_time += tick_period;
 }
-#endif
 
 /**
  * Get the elapsed milliseconds since start up
@@ -66,8 +53,10 @@ LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
  */
 uint32_t lv_tick_get(void)
 {
-#if LV_TICK_CUSTOM == 0
     lv_tick_state_t * state_p = &state;
+
+    if(state_p->tick_get_cb)
+        return state_p->tick_get_cb();
 
     /*If `lv_tick_inc` is called from an interrupt while `sys_time` is read
      *the result might be corrupted.
@@ -77,13 +66,10 @@ uint32_t lv_tick_get(void)
     uint32_t result;
     do {
         state_p->sys_irq_flag = 1;
-        result        = sys_time;
+        result        = state_p->sys_time;
     } while(!state_p->sys_irq_flag); /*Continue until see a non interrupted cycle*/
 
     return result;
-#else
-    return LV_TICK_CUSTOM_SYS_TIME_EXPR;
-#endif
 }
 
 /**
@@ -105,6 +91,11 @@ uint32_t lv_tick_elaps(uint32_t prev_tick)
     }
 
     return prev_tick;
+}
+
+void lv_tick_set_cb(lv_tick_get_cb_t cb)
+{
+    state.tick_get_cb = cb;
 }
 
 /**********************

@@ -92,10 +92,7 @@ typedef struct {
 
     lv_timer_state_t timer_state;
     lv_anim_state_t anim_state;
-
-#if !LV_TICK_CUSTOM
     lv_tick_state_t tick_state;
-#endif
 
 #if LV_IMG_CACHE_DEF_SIZE
     uint16_t img_cache_entry_cnt;
