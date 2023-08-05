@@ -61,6 +61,7 @@ typedef struct {
     uint32_t periodic_last_tick;
     uint32_t busy_time;
     uint32_t idle_period_start;
+    uint32_t run_cnt;
 } lv_timer_state_t;
 
 /**********************

@@ -186,6 +186,7 @@ typedef struct {
 #else
     int dispatch_req;
 #endif
+    bool task_running;
 } lv_draw_cache_t;
 
 /**********************

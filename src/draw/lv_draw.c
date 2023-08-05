@@ -97,14 +97,15 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
      *and not on the draw tasks added in the event.
      *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends
      *Dispatching might remove the "main" draw task while it's still being used in the event*/
-    static bool running = false;
-    if(running == false) {
-        running = true;
+    lv_draw_cache_t * cache = &_draw_cache;
+
+    if(cache->task_running == false) {
+        cache->task_running = true;
         if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
             lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
         }
         lv_draw_dispatch();
-        running = false;
+        cache->task_running = false;
     }
 }
 
