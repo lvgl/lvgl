@@ -303,7 +303,6 @@
     #endif
 #endif
 
-
 /*=======================
  * FEATURE CONFIGURATION
  *=======================*/
@@ -647,6 +646,15 @@
         #endif
     #endif
 #endif /*LV_ENABLE_GC*/
+
+/*For custom `lv_global_default()` implementation set to 1*/
+#ifndef LV_GLOBAL_CUSTOM
+    #ifdef CONFIG_LV_GLOBAL_CUSTOM
+        #define LV_GLOBAL_CUSTOM CONFIG_LV_GLOBAL_CUSTOM
+    #else
+        #define LV_GLOBAL_CUSTOM 0
+    #endif
+#endif
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.
