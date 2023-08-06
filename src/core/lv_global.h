@@ -181,7 +181,7 @@ typedef struct {
  * Get the default global object for current thread
  * @return  pointer to the default global object
  */
-lv_global_t * lv_global_default();
+lv_global_t * lv_global_default(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

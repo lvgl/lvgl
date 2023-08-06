@@ -72,8 +72,7 @@ static inline void lv_global_init(lv_global_t * global)
 #endif
 }
 
-#ifndef LV_GLOBAL_CUSTOM
-
+#if LV_GLOBAL_CUSTOM == 0
 lv_global_t * lv_global_default(void)
 {
     static lv_global_t lv_global;
