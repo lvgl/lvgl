@@ -55,7 +55,7 @@ Architecture
 - |uncheck| Add GPU abstraction for display rotation 
 - |uncheck| Replace the `read_line_cb` of the image decoders with `get_area_cb`
 - |uncheck| Limit the image caching size in bytes instead of image count 
-- |uncheck| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
+- |check| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
 - |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
 
 Styles
