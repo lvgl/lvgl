@@ -696,7 +696,7 @@ lv_theme_t * lv_theme_default_get(void)
         return NULL;
     }
 
-    return (lv_theme_t *)&theme_def;
+    return (lv_theme_t *)theme_def;
 }
 
 bool lv_theme_default_is_inited(void)
