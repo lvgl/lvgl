@@ -10,6 +10,7 @@
 
 #if LV_DRAW_SW_COMPLEX
 #include "lv_draw_sw_mask.h"
+#include "../../core/lv_global.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_assert.h"
@@ -22,6 +23,9 @@
  *********************/
 #define CIRCLE_CACHE_LIFE_MAX   1000
 #define CIRCLE_CACHE_AGING(life, r)   life = LV_MIN(life + (r < 16 ? 1 : (r >> 4)), 1000)
+#if LV_USE_OS
+    #define circle_cache_mutex lv_global_default()->draw_cache.circle_cache_mutex
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -66,9 +70,6 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_USE_OS
-    static lv_mutex_t circle_cache_mutex;
-#endif
 
 /**********************
  *      MACROS

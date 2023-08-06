@@ -13,6 +13,7 @@
 #include "../misc/lv_gc.h"
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
+#include "../core/lv_global.h"
 
 #if LV_USE_DRAW_SW
     #include "../draw/sw/lv_draw_sw.h"
@@ -22,6 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define disp_def lv_global_default()->disp_default
 
 /**********************
  *      TYPEDEFS
@@ -43,7 +45,6 @@ static bool is_out_anim(lv_scr_load_anim_t a);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_disp_t * disp_def;
 
 /**********************
  *      MACROS

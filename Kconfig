@@ -131,14 +131,6 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "HAL Settings"
-		config LV_TICK_CUSTOM
-			bool "Use a custom tick source"
-
-		config LV_TICK_CUSTOM_INCLUDE
-			string "Header for the system time function"
-			default "Arduino.h"
-			depends on LV_TICK_CUSTOM
-
 		config LV_DPI_DEF
 			int "Default Dots Per Inch (in px)."
 			default 130

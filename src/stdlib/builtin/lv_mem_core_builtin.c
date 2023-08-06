@@ -15,6 +15,7 @@
 #include "../../misc/lv_ll.h"
 #include "../../misc/lv_math.h"
 #include "../../osal/lv_os.h"
+#include "../../core/lv_global.h"
 
 #ifdef LV_MEM_POOL_INCLUDE
     #include LV_MEM_POOL_INCLUDE
@@ -35,20 +36,12 @@
     #define MEM_UNIT         uint32_t
     #define ALIGN_MASK       0x3
 #endif
+#define state lv_global_default()->tlsf_state
 
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-#if LV_USE_OS
-    lv_mutex_t mutex;
-#endif
-    lv_tlsf_t tlsf;
-    uint32_t cur_used;
-    uint32_t max_used;
-    lv_ll_t  pool_ll;
-} lv_tlsf_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -58,7 +51,6 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_tlsf_state_t state;
 
 /**********************
  *      MACROS
@@ -79,6 +71,8 @@ static lv_tlsf_state_t state;
 
 void lv_mem_init(void)
 {
+    lv_global_default()->memory_zero = ZERO_MEM_SENTINEL;
+
 #if LV_MEM_ADR == 0
 #ifdef LV_MEM_POOL_ALLOC
     state.tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_POOL_ALLOC(LV_MEM_SIZE), LV_MEM_SIZE);

@@ -12,10 +12,12 @@
 
 #include "lv_theme_mono.h"
 #include "../../misc/lv_gc.h"
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define theme_def (lv_global_default()->theme_mono)
 
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()
@@ -55,7 +57,7 @@ typedef struct {
 #endif
 } my_theme_styles_t;
 
-typedef struct {
+typedef struct _my_theme_t {
     lv_theme_t base;
     my_theme_styles_t styles;
     bool inited;
@@ -70,7 +72,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static my_theme_t * theme;
 
 /**********************
  *      MACROS
@@ -80,7 +81,7 @@ static my_theme_t * theme;
  *   STATIC FUNCTIONS
  **********************/
 
-static void style_init(bool dark_bg, const lv_font_t * font)
+static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t * font)
 {
     style_init_reset(&theme->styles.scrollbar);
     lv_style_set_bg_opa(&theme->styles.scrollbar, LV_OPA_COVER);
@@ -173,28 +174,37 @@ static void style_init(bool dark_bg, const lv_font_t * font)
 #endif
 }
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
 bool lv_theme_mono_is_inited(void)
 {
+    struct _my_theme_t * theme = theme_def;
     if(theme == NULL) return false;
     return theme->inited;
 }
 
+void lv_theme_mono_deinit(void)
+{
+    if(theme_def) {
+        lv_free(theme_def);
+        theme_def = NULL;
+    }
+}
+
 lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t * font)
 {
-
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_mono_is_inited()) {
         LV_GC_ROOT(_lv_theme_mono_data) = lv_malloc(sizeof(my_theme_styles_t));
-        theme = (my_theme_t *)LV_GC_ROOT(_lv_theme_mono_data);
-        lv_memzero(theme, sizeof(my_theme_t));
+        theme_def = (my_theme_t *)LV_GC_ROOT(_lv_theme_mono_data);
+        lv_memzero(theme_def, sizeof(my_theme_t));
     }
+
+    struct _my_theme_t * theme = theme_def;
 
     theme->base.disp = disp;
     theme->base.font_small = LV_FONT_DEFAULT;
@@ -202,19 +212,20 @@ lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t 
     theme->base.font_large = LV_FONT_DEFAULT;
     theme->base.apply_cb = theme_apply;
 
-    style_init(dark_bg, font);
+    style_init(theme, dark_bg, font);
 
     if(disp == NULL || lv_disp_get_theme(disp) == (lv_theme_t *) theme) lv_obj_report_style_change(NULL);
 
     theme->inited = true;
 
-    return (lv_theme_t *)&theme;
+    return (lv_theme_t *)theme_def;
 }
-
 
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
+
+    struct _my_theme_t * theme = theme_def;
 
     if(lv_obj_get_parent(obj) == NULL) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);

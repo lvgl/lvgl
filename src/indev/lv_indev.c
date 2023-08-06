@@ -9,6 +9,7 @@
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 #include "../disp/lv_disp_private.h"
+#include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_group.h"
 #include "../core/lv_refr.h"
@@ -47,6 +48,9 @@
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
 
+#define indev_act lv_global_default()->indev_active
+#define indev_obj_act lv_global_default()->indev_obj_active
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -69,8 +73,6 @@ static bool indev_reset_check(lv_indev_t * indev);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_indev_t * indev_act;
-static lv_obj_t * indev_obj_act = NULL;
 
 /**********************
  *      MACROS
@@ -951,8 +953,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_coord_t x = i->btn_points[data->btn_id].x;
     lv_coord_t y = i->btn_points[data->btn_id].y;
 
-    static lv_indev_state_t prev_state = LV_INDEV_STATE_RELEASED;
-    if(prev_state != data->state) {
+    if(LV_INDEV_STATE_RELEASED != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {
             LV_LOG_INFO("button %" LV_PRIu32 " is pressed (x:%d y:%d)", data->btn_id, (int)x, (int)y);
         }

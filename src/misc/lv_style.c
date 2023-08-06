@@ -8,6 +8,7 @@
  *********************/
 #include "lv_style.h"
 #include "lv_gc.h"
+#include "../core/lv_global.h"
 #include "../stdlib/lv_mem.h"
 #include "lv_assert.h"
 #include "lv_types.h"
@@ -15,6 +16,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define _lv_style_custom_prop_flag_lookup_table_size lv_global_default()->style_custom_table_size
+#define last_custom_prop_id lv_global_default()->style_last_custom_prop_id
 
 /**********************
  *      TYPEDEFS
@@ -154,13 +157,9 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
 
 };
 
-uint32_t _lv_style_custom_prop_flag_lookup_table_size = 0;
-
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static uint16_t last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
 static const lv_style_value_t null_style_value = { .num = 0 };
 
 /**********************
@@ -398,8 +397,6 @@ uint8_t _lv_style_get_prop_group(lv_style_prop_t prop)
 
 uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
-    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
-    extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
     if(prop == LV_STYLE_PROP_ANY) return LV_STYLE_PROP_FLAG_ALL; /*Any prop can have any flags*/
     if(prop == LV_STYLE_PROP_INV) return 0;
 

@@ -172,35 +172,6 @@
     #endif
 #endif
 
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#ifndef LV_TICK_CUSTOM
-    #ifdef CONFIG_LV_TICK_CUSTOM
-        #define LV_TICK_CUSTOM CONFIG_LV_TICK_CUSTOM
-    #else
-        #define LV_TICK_CUSTOM 0
-    #endif
-#endif
-#if LV_TICK_CUSTOM
-    #ifndef LV_TICK_CUSTOM_INCLUDE
-        #ifdef CONFIG_LV_TICK_CUSTOM_INCLUDE
-            #define LV_TICK_CUSTOM_INCLUDE CONFIG_LV_TICK_CUSTOM_INCLUDE
-        #else
-            #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-        #endif
-    #endif
-    #ifndef LV_TICK_CUSTOM_SYS_TIME_EXPR
-        #ifdef CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR
-        #else
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-        #endif
-    #endif
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-#endif   /*LV_TICK_CUSTOM*/
-
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI_DEF

@@ -13,10 +13,13 @@
 #include "../lv_theme.h"
 #include "../../misc/lv_gc.h"
 #include "../../misc/lv_color.h"
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define theme_def (lv_global_default()->theme_default)
+
 #define MODE_DARK 1
 #define RADIUS_DEFAULT (theme->disp_size == DISP_LARGE ? lv_disp_dpx(theme->base.disp, 12) : lv_disp_dpx(theme->base.disp, 8))
 
@@ -153,7 +156,7 @@ typedef enum {
     DISP_LARGE = 1,
 } disp_size_t;
 
-typedef struct {
+typedef struct _my_theme_t {
     lv_theme_t base;
     disp_size_t disp_size;
     lv_color_t color_scr;
@@ -162,6 +165,14 @@ typedef struct {
     lv_color_t color_grey;
     bool inited;
     my_theme_styles_t styles;
+
+    lv_color_filter_dsc_t dark_filter;
+    lv_color_filter_dsc_t grey_filter;
+
+#if LV_THEME_DEFAULT_TRANSITION_TIME
+    lv_style_transition_dsc_t trans_delayed;
+    lv_style_transition_dsc_t trans_normal;
+#endif
 } my_theme_t;
 
 
@@ -174,7 +185,6 @@ static void style_init_reset(lv_style_t * style);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static my_theme_t * theme;
 
 /**********************
  *      MACROS
@@ -194,11 +204,11 @@ static lv_color_t dark_color_filter_cb(const lv_color_filter_dsc_t * f, lv_color
 static lv_color_t grey_filter_cb(const lv_color_filter_dsc_t * f, lv_color_t color, lv_opa_t opa)
 {
     LV_UNUSED(f);
-    if(theme->base.flags & MODE_DARK) return lv_color_mix(lv_palette_darken(LV_PALETTE_GREY, 2), color, opa);
+    if(theme_def->base.flags & MODE_DARK) return lv_color_mix(lv_palette_darken(LV_PALETTE_GREY, 2), color, opa);
     else return lv_color_mix(lv_palette_lighten(LV_PALETTE_GREY, 2), color, opa);
 }
 
-static void style_init(void)
+static void style_init(struct _my_theme_t * theme)
 {
 #if TRANSITION_TIME
     static const lv_style_prop_t trans_props[] = {
@@ -219,15 +229,13 @@ static void style_init(void)
     style_init_reset(&theme->styles.transition_delayed);
     style_init_reset(&theme->styles.transition_normal);
 #if TRANSITION_TIME
-    static lv_style_transition_dsc_t trans_delayed;
-    lv_style_transition_dsc_init(&trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70, NULL);
+    lv_style_transition_dsc_init(&theme->trans_delayed, trans_props, lv_anim_path_linear, TRANSITION_TIME, 70, NULL);
+    lv_style_transition_dsc_init(&theme->trans_normal, trans_props, lv_anim_path_linear, TRANSITION_TIME, 0, NULL);
 
-    static lv_style_transition_dsc_t trans_normal;
-    lv_style_transition_dsc_init(&trans_normal, trans_props, lv_anim_path_linear, TRANSITION_TIME, 0, NULL);
+    lv_style_set_transition(&theme->styles.transition_delayed,
+                            &theme->trans_delayed); /*Go back to default state with delay*/
 
-    lv_style_set_transition(&theme->styles.transition_delayed, &trans_delayed); /*Go back to default state with delay*/
-
-    lv_style_set_transition(&theme->styles.transition_normal, &trans_normal); /*Go back to default state with delay*/
+    lv_style_set_transition(&theme->styles.transition_normal, &theme->trans_normal); /*Go back to default state with delay*/
 #endif
 
     style_init_reset(&theme->styles.scrollbar);
@@ -240,7 +248,7 @@ static void style_init(void)
     lv_style_set_width(&theme->styles.scrollbar,  lv_disp_dpx(theme->base.disp, 5));
     lv_style_set_bg_opa(&theme->styles.scrollbar,  LV_OPA_40);
 #if TRANSITION_TIME
-    lv_style_set_transition(&theme->styles.scrollbar, &trans_normal);
+    lv_style_set_transition(&theme->styles.scrollbar, &theme->trans_normal);
 #endif
 
     style_init_reset(&theme->styles.scrollbar_scrolled);
@@ -296,18 +304,15 @@ static void style_init(void)
     lv_style_set_pad_column(&theme->styles.btn, lv_disp_dpx(theme->base.disp, 5));
     lv_style_set_pad_row(&theme->styles.btn, lv_disp_dpx(theme->base.disp, 5));
 
-    static lv_color_filter_dsc_t dark_filter;
-    lv_color_filter_dsc_init(&dark_filter, dark_color_filter_cb);
-
-    static lv_color_filter_dsc_t grey_filter;
-    lv_color_filter_dsc_init(&grey_filter, grey_filter_cb);
+    lv_color_filter_dsc_init(&theme->dark_filter, dark_color_filter_cb);
+    lv_color_filter_dsc_init(&theme->grey_filter, grey_filter_cb);
 
     style_init_reset(&theme->styles.pressed);
-    lv_style_set_color_filter_dsc(&theme->styles.pressed, &dark_filter);
+    lv_style_set_color_filter_dsc(&theme->styles.pressed, &theme->dark_filter);
     lv_style_set_color_filter_opa(&theme->styles.pressed, 35);
 
     style_init_reset(&theme->styles.disabled);
-    lv_style_set_color_filter_dsc(&theme->styles.disabled, &grey_filter);
+    lv_style_set_color_filter_dsc(&theme->styles.disabled, &theme->grey_filter);
     lv_style_set_color_filter_opa(&theme->styles.disabled, LV_OPA_50);
 
     style_init_reset(&theme->styles.clip_corner);
@@ -647,12 +652,14 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
+
     if(!lv_theme_default_is_inited()) {
         LV_GC_ROOT(_lv_theme_default_data) = lv_malloc(sizeof(my_theme_t));
-        theme = (my_theme_t *)LV_GC_ROOT(_lv_theme_default_data);
-        lv_memzero(theme, sizeof(my_theme_t));
+        theme_def = (my_theme_t *)LV_GC_ROOT(_lv_theme_default_data);
+        lv_memzero(theme_def, sizeof(my_theme_t));
     }
 
+    struct _my_theme_t * theme = theme_def;
     if(LV_HOR_RES <= 320) theme->disp_size = DISP_SMALL;
     else if(LV_HOR_RES < 720) theme->disp_size = DISP_MEDIUM;
     else theme->disp_size = DISP_LARGE;
@@ -666,7 +673,7 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
     theme->base.apply_cb = theme_apply;
     theme->base.flags = dark ? MODE_DARK : 0;
 
-    style_init();
+    style_init(theme);
 
     if(disp == NULL || lv_disp_get_theme(disp) == (lv_theme_t *)theme) lv_obj_report_style_change(NULL);
 
@@ -675,17 +682,26 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
     return (lv_theme_t *) theme;
 }
 
+void lv_theme_default_deinit(void)
+{
+    if(theme_def) {
+        lv_free(theme_def);
+        theme_def = NULL;
+    }
+}
+
 lv_theme_t * lv_theme_default_get(void)
 {
     if(!lv_theme_default_is_inited()) {
         return NULL;
     }
 
-    return (lv_theme_t *)&theme;
+    return (lv_theme_t *)&theme_def;
 }
 
 bool lv_theme_default_is_inited(void)
 {
+    struct _my_theme_t * theme = theme_def;
     if(theme == NULL) return false;
     return theme->inited;
 }
@@ -694,6 +710,8 @@ bool lv_theme_default_is_inited(void)
 static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
+
+    struct _my_theme_t * theme = theme_def;
 
     if(lv_obj_get_parent(obj) == NULL) {
         lv_obj_add_style(obj, &theme->styles.scr, 0);
@@ -1157,7 +1175,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 static void style_init_reset(lv_style_t * style)
 {
-    if(theme->inited) {
+    if(theme_def->inited) {
         lv_style_reset(style);
     }
     else {

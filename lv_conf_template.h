@@ -68,17 +68,6 @@
 /*Default display refresh, input device read and animation step period.*/
 #define LV_DEF_REFR_PERIOD  33      /*[ms]*/
 
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#define LV_TICK_CUSTOM 0
-#if LV_TICK_CUSTOM
-    #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-#endif   /*LV_TICK_CUSTOM*/
-
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
@@ -137,7 +126,6 @@
 #if LV_USE_OS == LV_OS_CUSTOM
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
-
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -248,6 +236,9 @@
 #if LV_ENABLE_GC != 0
     #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
 #endif /*LV_ENABLE_GC*/
+
+/*For custom `lv_global_default()` implementation set to 1*/
+#define LV_GLOBAL_CUSTOM 0
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.

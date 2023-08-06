@@ -6,6 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "core/lv_global.h"
 #include "core/lv_obj.h"
 #include "disp/lv_disp_private.h"
 #include "indev/lv_indev_private.h"
@@ -19,18 +20,14 @@
 #include "libs/sjpg/lv_sjpg.h"
 #include "draw/lv_draw.h"
 #include "draw/lv_img_cache_builtin.h"
-#include "misc/lv_anim.h"
-#include "misc/lv_timer.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
 #include "misc/lv_gc.h"
-#if LV_USE_DRAW_SW
-    #include "draw/sw/lv_draw_sw.h"
-#endif
 
 /*********************
  *      DEFINES
  *********************/
+#define lv_initialized  lv_global_default()->inited
 
 /**********************
  *      TYPEDEFS
@@ -43,7 +40,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool lv_initialized = false;
 
 /**********************
  *      MACROS
@@ -52,6 +48,39 @@ static bool lv_initialized = false;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+static inline void lv_global_init(lv_global_t * global)
+{
+    LV_ASSERT_NULL(global);
+
+    if(global == NULL) {
+        LV_LOG_ERROR("lv_global cannot be null");
+        return;
+    }
+
+    lv_memset(global, 0, sizeof(lv_global_t));
+
+    global->style_refresh = true;
+    global->layout_count = _LV_LAYOUT_LAST;
+    global->style_last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
+    global->area_trans_cache.angle_prev = INT32_MIN;
+    global->event_last_register_id = _LV_EVENT_LAST;
+    global->math_rand_seed = 0x1234ABCD;
+
+#if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
+    global->sw_shadow_cache.cache_size = -1;
+    global->sw_shadow_cache.cache_r = -1;
+#endif
+}
+
+#ifndef LV_GLOBAL_CUSTOM
+
+lv_global_t * lv_global_default(void)
+{
+    static lv_global_t lv_global;
+    return &lv_global;
+}
+
+#endif
 
 bool lv_is_initialized(void)
 {
@@ -60,9 +89,12 @@ bool lv_is_initialized(void)
 
 void lv_init(void)
 {
+    /*Initialize members of static variable lv_global */
+    lv_global_init(lv_global_default());
+
     /*Do nothing if already initialized*/
     if(lv_initialized) {
-        LV_LOG_WARN("lv_init: already inited");
+        LV_LOG_WARN("lv_init: already initialized");
         return;
     }
 
@@ -75,6 +107,9 @@ void lv_init(void)
 
     lv_mem_init();
 
+#if LV_USE_SPAN != 0
+    lv_span_stack_init();
+#endif
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
     lv_profiler_builtin_config_t profiler_config;
@@ -206,11 +241,36 @@ void lv_init(void)
 
 void lv_deinit(void)
 {
+#if LV_USE_SYSMON
+    _lv_sysmon_builtin_deinit();
+#endif
+
     _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
 
+#if LV_USE_SPAN != 0
+    lv_span_stack_deinit();
+#endif
+
+#if LV_USE_FREETYPE
+    lv_freetype_uninit();
+#endif
+
+#if LV_USE_THEME_DEFAULT
+    lv_theme_default_deinit();
+#endif
+
+#if LV_USE_THEME_BASIC
+    lv_theme_basic_deinit();
+#endif
+
+#if LV_USE_THEME_MONO
+    lv_theme_mono_deinit();
+#endif
+
     lv_mem_deinit();
+
     lv_initialized = false;
 
     LV_LOG_INFO("lv_deinit done");
@@ -220,8 +280,6 @@ void lv_deinit(void)
 #endif
 }
 #endif
-
-
 
 /**********************
  *   STATIC FUNCTIONS

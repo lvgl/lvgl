@@ -8,6 +8,7 @@
  *********************/
 #include "lv_anim.h"
 
+#include "../core/lv_global.h"
 #include "../tick/lv_tick.h"
 #include "lv_assert.h"
 #include "lv_timer.h"
@@ -21,15 +22,11 @@
  *********************/
 #define LV_ANIM_RESOLUTION 1024
 #define LV_ANIM_RES_SHIFT 10
+#define state lv_global_default()->anim_state
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    bool anim_list_changed;
-    bool anim_run_round;
-    lv_timer_t * timer;
-} lv_anim_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -43,7 +40,6 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_anim_state_t state;
 
 /**********************
  *      MACROS
@@ -65,6 +61,7 @@ void _lv_anim_core_init(void)
     state.timer = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation timer*/
     state.anim_list_changed = false;
+    state.anim_run_round = false;
 }
 
 void lv_anim_init(lv_anim_t * a)

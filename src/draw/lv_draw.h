@@ -20,7 +20,7 @@ extern "C" {
 #include "../misc/lv_profiler.h"
 #include "lv_img_decoder.h"
 #include "lv_img_cache.h"
-
+#include "../osal/lv_os.h"
 /*********************
  *      DEFINES
  *********************/
@@ -177,6 +177,17 @@ typedef struct {
     uint32_t id2;
     lv_layer_t * layer;
 } lv_draw_dsc_base_t;
+
+typedef struct {
+    uint32_t used_memory_for_layers_kb;
+#if LV_USE_OS
+    lv_thread_sync_t sync;
+    lv_mutex_t circle_cache_mutex;
+#else
+    int dispatch_req;
+#endif
+    bool task_running;
+} lv_draw_cache_t;
 
 /**********************
  * GLOBAL PROTOTYPES

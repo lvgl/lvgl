@@ -59,6 +59,11 @@ void lv_sysmon_set_refr_period(lv_obj_t * obj, uint32_t period);
  */
 void _lv_sysmon_builtin_init(void);
 
+/**
+ * DeInitialize built-in system monitor, such as performance and memory monitor.
+ */
+void _lv_sysmon_builtin_deinit(void);
+
 /**********************
  *      MACROS
  **********************/

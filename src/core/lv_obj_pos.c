@@ -11,11 +11,13 @@
 #include "../disp/lv_disp_private.h"
 #include "lv_refr.h"
 #include "../misc/lv_gc.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
+#define update_layout_mutex lv_global_default()->layout_update_mutex
 
 /**********************
  *      TYPEDEFS
@@ -287,12 +289,11 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
 void lv_obj_update_layout(const lv_obj_t * obj)
 {
-    static bool mutex = false;
-    if(mutex) {
+    if(update_layout_mutex) {
         LV_LOG_TRACE("Already running, returning");
         return;
     }
-    mutex = true;
+    update_layout_mutex = true;
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
     /*Repeat until there are no more layout invalidations*/
@@ -303,7 +304,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
         LV_LOG_TRACE("Layout update end");
     }
 
-    mutex = false;
+    update_layout_mutex = false;
 }
 
 void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)

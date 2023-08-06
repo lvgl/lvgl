@@ -12,11 +12,12 @@
 #include "../misc/lv_gc.h"
 #include "../misc/lv_color.h"
 #include "../stdlib/lv_string.h"
-
+#include "../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
+#define style_refr lv_global_default()->style_refresh
 
 /**********************
  *      TYPEDEFS
@@ -61,7 +62,6 @@ static void fade_in_anim_ready(lv_anim_t * a);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool style_refr = true;
 
 /**********************
  *      MACROS
