@@ -63,6 +63,9 @@ typedef struct {
 typedef struct {
     uint8_t always_zero;
     uint8_t cf;          /*Color format: See `lv_color_format_t`*/
+    uint16_t format: 16;
+    uint16_t user: 4;
+    uint16_t reserved: 4;
     uint16_t w; /*Width of the image*/
     uint16_t h; /*Height of the image*/
 
