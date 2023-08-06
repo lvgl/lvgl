@@ -36,7 +36,12 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-07-04" version="8.3.8" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.8.pack">
+    <release date="2023-08-04" version="8.3.9" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.9.pack">
+      - LVGL 8.3.9
+      - Add snapshot, fragment, imgfont, gridnav, msg and monkey
+      - Other minor fixes
+    </release>
+    <release date="2023-07-04" version="8.3.8" url="https://github.com/lvgl/lvgl/raw/15433d69b9d8ae6aa74f49946874af81a0cc5921/env_support/cmsis-pack/LVGL.lvgl.8.3.8.pack">
       - LVGL 8.3.8
       - Add renesas-ra6m3 gpu adaptation
       - Improve performance and add more features for PXP and VGLite
@@ -294,7 +299,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.8">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.9">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
@@ -757,6 +762,97 @@
 
 /*! \brief enable ffmpeg support */
 #define LV_USE_IME_PINYIN         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="Snapshot"  condition="LVGL-Essential">
+              <description>Add the Snapshot service</description>
+              <files>
+                <!-- src/extra/others/snapshot -->
+                <file category="sourceC"            name="src/extra/others/snapshot/lv_snapshot.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable snapshot support */
+#define LV_USE_SNAPSHOT         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="Fragment"  condition="LVGL-Essential">
+              <description>Add the Fragment service</description>
+              <files>
+                <!-- src/extra/others/fragment -->
+                <file category="sourceC"            name="src/extra/others/fragment/lv_fragment.c" />
+                <file category="sourceC"            name="src/extra/others/fragment/lv_fragment_manager.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable fragment support */
+#define LV_USE_FRAGMENT         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="Grid Navigation"  condition="LVGL-Essential">
+              <description>Add the Grid Navigation service</description>
+              <files>
+                <!-- src/extra/others/gridnav -->
+                <file category="sourceC"            name="src/extra/others/gridnav/lv_gridnav.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the Grid Navigation support*/
+#define LV_USE_GRIDNAV         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="Image Font"  condition="LVGL-Essential">
+              <description>Add the Image Font service</description>
+              <files>
+                <!-- src/extra/others/imgfont -->
+                <file category="sourceC"            name="src/extra/others/imgfont/lv_imgfont.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the image font support*/
+#define LV_USE_IMGFONT         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="Monkey"  condition="LVGL-Essential">
+              <description>Add the Monkey service</description>
+              <files>
+                <!-- src/extra/others/monkey -->
+                <file category="sourceC"            name="src/extra/others/monkey/lv_monkey.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the monkey service support*/
+#define LV_USE_MONKEY         1
+              </RTE_Components_h>
+
+            </component>
+
+            <component Cgroup="lvgl" Csub="Message"  condition="LVGL-Essential">
+              <description>Add the Message service</description>
+              <files>
+                <!-- src/extra/others/msg -->
+                <file category="sourceC"            name="src/extra/others/msg/lv_msg.c" />
+              </files>
+
+              <RTE_Components_h>
+
+/*! \brief enable the message service support*/
+#define LV_USE_MSG         1
               </RTE_Components_h>
 
             </component>
