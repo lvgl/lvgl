@@ -16,6 +16,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #include <stdbool.h>
+
 #include "../draw/lv_img_cache.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
@@ -24,6 +25,7 @@ extern "C" {
 #include "../misc/lv_anim.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_color_op.h"
+#include "../misc/lv_ll.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_profiler_builtin.h"
 #include "../misc/lv_style.h"
@@ -35,6 +37,7 @@ extern "C" {
 #endif
 
 #include "../tick/lv_tick.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -61,11 +64,13 @@ struct _lv_freetype_context_t;
 
 typedef struct {
     bool inited;
-
     bool style_refresh;
+
     struct _lv_disp_t * disp_refresh;
-    struct _lv_group_t * group_default;
     struct _lv_disp_t * disp_default;
+    lv_ll_t  disp_ll;
+
+    struct _lv_group_t * group_default;
     lv_img_cache_manager_t img_cache_mgr;
 
     struct _lv_indev_t * indev_active;
