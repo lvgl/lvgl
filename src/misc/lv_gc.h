@@ -44,7 +44,6 @@ extern "C" {
 
 #define LV_ITERATE_ROOTS(f)                                                                            \
     LV_DISPATCH(f, lv_ll_t, _lv_timer_ll) /*Linked list to store the lv_timers*/                       \
-    LV_DISPATCH(f, lv_ll_t, _lv_disp_ll)  /*Linked list of display device*/                            \
     LV_DISPATCH(f, lv_ll_t, _lv_indev_ll) /*Linked list of input device*/                              \
     LV_DISPATCH(f, lv_ll_t, _lv_fsdrv_ll)                                                              \
     LV_DISPATCH(f, lv_ll_t, _lv_anim_ll)                                                               \
