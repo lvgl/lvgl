@@ -31,6 +31,7 @@
  **********************/
 static void lv_refr_join_area(void);
 static void refr_invalid_areas(void);
+static void refr_sync_areas(void);
 static void refr_area(const lv_area_t * area_p);
 static void refr_area_part(lv_layer_t * layer);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
@@ -360,7 +361,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 
     lv_refr_join_area();
-
+    refr_sync_areas();
     refr_invalid_areas();
 
     if(disp_refr->inv_p == 0) goto refr_finish;
@@ -371,28 +372,14 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 
     if(!lv_disp_is_double_buffered(disp_refr) || disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) goto refr_clean_up;
 
-    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
-    /*We need to wait for ready here to not mess up the active screen*/
-    while(disp_refr->flushing);
+    /*Copy invalid areas for sync next refresh*/
+	uint16_t i;
+	for(i = 0; i < disp_refr->inv_p; i++) {
+		if (disp_refr->inv_area_joined[i])
+			continue;
 
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    void * buf_off_screen = disp_refr->buf_act;
-    void * buf_on_screen = disp_refr->buf_act == disp_refr->buf_1
-                           ? disp_refr->buf_2
-                           : disp_refr->buf_1;
-
-    lv_coord_t stride = lv_draw_buf_width_to_stride(lv_disp_get_hor_res(disp_refr),
-                                                    lv_color_format_get_size(disp_refr->color_format));
-    uint32_t i;
-    for(i = 0; i < disp_refr->inv_p; i++) {
-        if(disp_refr->inv_area_joined[i]) continue;
-        lv_draw_buf_copy(
-            buf_off_screen, stride, &disp_refr->inv_areas[i],
-            buf_on_screen, stride, &disp_refr->inv_areas[i],
-            disp_refr->color_format
-        );
-    }
+		disp_refr->sync_areas[disp_refr->sync_p++] = disp_refr->inv_areas[i];
+	}
 
 refr_clean_up:
     lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
@@ -451,6 +438,63 @@ static void lv_refr_join_area(void)
             }
         }
     }
+}
+
+/**
+ * Refresh the sync areas
+ */
+static void refr_sync_areas(void)
+{
+	/*Do not sync if no sync areas*/
+	if (disp_refr->sync_p == 0) return;
+
+	/*Do not sync if not direct*/
+	if (disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) return;
+
+	/*Do not sync if not double buffered*/
+    if(!lv_disp_is_double_buffered(disp_refr)) return;
+
+    /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
+    /*We need to wait for ready here to not mess up the active screen*/
+    while(disp_refr->flushing) {}
+
+    /*The buffers are already swapped.
+     *So the active buffer is the off screen buffer where LVGL will render*/
+    void * buf_off_screen = disp_refr->buf_act;
+    void * buf_on_screen = disp_refr->buf_act == disp_refr->buf_1
+                           ? disp_refr->buf_2
+                           : disp_refr->buf_1;
+
+	/*Iterate through invalidated areas to see if sync area should be copied*/
+	bool sync;
+	lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+	uint32_t i, j;
+	for(i = 0; i < disp_refr->sync_p; i++) {
+		sync = true;
+		for(j = 0; j < disp_refr->inv_p; j++) {
+
+			/*Skip joined areas*/
+			if (disp_refr->inv_area_joined[j]) continue;
+
+			/*Sync area is fully inside inv area; Do not sync*/
+			if (_lv_area_is_in(&disp_refr->sync_areas[i], &disp_refr->inv_areas[j], 0)) {
+				sync = false;
+				break;
+			}
+		}
+
+		/*Sync area should be copied*/
+		if (sync) {
+			lv_draw_buf_copy(
+				buf_off_screen, stride, &disp_refr->sync_areas[i],
+				buf_on_screen, stride, &disp_refr->sync_areas[i],
+				disp_refr->color_format
+			);
+		}
+	}
+
+	/*Reset sync area count*/
+	disp_refr->sync_p = 0;
 }
 
 /**

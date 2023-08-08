@@ -92,6 +92,10 @@ struct _lv_disp_t {
     uint16_t inv_p;
     int32_t inv_en_cnt;
 
+    /** Double buffer sync areas */
+    lv_area_t sync_areas[LV_INV_BUF_SIZE];
+    uint16_t sync_p;
+
     /*---------------------
      * Layer
      *--------------------*/
