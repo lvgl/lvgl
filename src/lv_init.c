@@ -60,6 +60,7 @@ static inline void lv_global_init(lv_global_t * global)
     lv_memset(global, 0, sizeof(lv_global_t));
 
     _lv_ll_init(&(global->disp_ll), sizeof(lv_disp_t));
+    _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
 
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
@@ -135,7 +136,6 @@ void lv_init(void)
 #endif
 
     _lv_obj_style_init();
-    _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
     /*Initialize the screen refresh system*/
     _lv_refr_init();

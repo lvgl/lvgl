@@ -63,12 +63,14 @@ struct _lv_freetype_context_t;
 #endif
 
 typedef struct {
+    lv_ll_t disp_ll;
+    lv_ll_t indev_ll;
+
     bool inited;
     bool style_refresh;
 
     struct _lv_disp_t * disp_refresh;
     struct _lv_disp_t * disp_default;
-    lv_ll_t  disp_ll;
 
     struct _lv_group_t * group_default;
     lv_img_cache_manager_t img_cache_mgr;
