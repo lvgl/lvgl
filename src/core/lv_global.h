@@ -116,6 +116,10 @@ typedef struct {
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
+#if LV_DRAW_SW_COMPLEX
+    _lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
+#endif
+
 
 #if LV_USE_THEME_BASIC
     struct _my_theme_t * theme_basic;
