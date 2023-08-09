@@ -94,6 +94,7 @@ typedef struct {
 
     uint32_t style_custom_table_size;
     uint16_t style_last_custom_prop_id;
+    uint8_t * style_custom_prop_flag_lookup_table;
 
     struct _lv_event_t * event_header;
     uint32_t event_last_register_id;

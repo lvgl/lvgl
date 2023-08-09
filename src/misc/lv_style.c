@@ -17,6 +17,7 @@
  *      DEFINES
  *********************/
 #define _lv_style_custom_prop_flag_lookup_table_size lv_global_default()->style_custom_table_size
+#define _lv_style_custom_prop_flag_lookup_table lv_global_default()->style_custom_prop_flag_lookup_table
 #define last_custom_prop_id lv_global_default()->style_last_custom_prop_id
 
 /**********************
@@ -202,7 +203,7 @@ void lv_style_reset(lv_style_t * style)
 
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
 {
-    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) == NULL) {
+    if(_lv_style_custom_prop_flag_lookup_table == NULL) {
         _lv_style_custom_prop_flag_lookup_table_size = 0;
         last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     }
@@ -220,19 +221,19 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
         /* Round required_size up to the nearest 32-byte value */
         required_size = (required_size + 31) & ~31;
         LV_ASSERT_MSG(required_size > 0, "required size has become 0?");
-        uint8_t * old_p = LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table);
+        uint8_t * old_p = _lv_style_custom_prop_flag_lookup_table;
         uint8_t * new_p = lv_realloc(old_p, required_size * sizeof(uint8_t));
         if(new_p == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
         }
-        LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) = new_p;
+        _lv_style_custom_prop_flag_lookup_table = new_p;
         _lv_style_custom_prop_flag_lookup_table_size = required_size;
     }
     last_custom_prop_id++;
     /* This should never happen - we should bail out above */
-    LV_ASSERT_NULL(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table));
-    LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
+    LV_ASSERT_NULL(_lv_style_custom_prop_flag_lookup_table);
+    _lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
     return last_custom_prop_id;
 }
 
@@ -403,8 +404,8 @@ uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
     if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
         return _lv_style_builtin_prop_flag_lookup_table[prop];
     prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
-    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
-        return LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[prop];
+    if(_lv_style_custom_prop_flag_lookup_table != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
+        return _lv_style_custom_prop_flag_lookup_table[prop];
     return 0;
 }
 
