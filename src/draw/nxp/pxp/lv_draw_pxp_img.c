@@ -20,6 +20,8 @@
 #include "lv_pxp_cfg.h"
 #include "lv_pxp_utils.h"
 
+#include <math.h>
+
 /*********************
  *      DEFINES
  *********************/
@@ -32,6 +34,17 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/* Blit w/ recolor for images w/o opa and alpha channel*/
+static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+                              lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
+                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc);
+
+/* Blit w/ transformation for images w/o opa and alpha channel*/
+static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+                                lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
+                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc);
+
+/* Blit simple w/ opa and alpha channel*/
 static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                       lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
                       lv_coord_t src_stride, lv_color_format_t src_cf, lv_opa_t opa);
@@ -66,7 +79,10 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
     lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
 
     lv_area_t blend_area;
-    if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
+    bool has_transform = dsc->angle != 0 || dsc->zoom != LV_ZOOM_NONE;
+    if(has_transform)
+        lv_area_copy(&blend_area, &rel_coords);
+    else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
     const uint8_t * src_buf = img_dsc->data;
@@ -82,14 +98,195 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
     lv_coord_t dest_stride = lv_area_get_width(&layer->buf_area);
     lv_color_format_t dest_cf = layer->color_format;
     lv_color_format_t src_cf = img_dsc->header.cf;
+    bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
 
-    _pxp_blit(dest_buf, &blend_area, dest_stride, dest_cf, src_buf, &src_area, src_stride, src_cf,
-              dsc->opa);
+    if(has_recolor && !has_transform)
+        _pxp_blit_recolor(dest_buf, &blend_area, dest_stride, dest_cf,
+                          src_buf, &src_area, src_stride, src_cf, dsc);
+    else if(has_transform)
+        _pxp_blit_transform(dest_buf, &blend_area, dest_stride, dest_cf,
+                            src_buf, &src_area, src_stride, src_cf, dsc);
+    else
+        _pxp_blit(dest_buf, &blend_area, dest_stride, dest_cf,
+                  src_buf, &src_area, src_stride, src_cf, dsc->opa);
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+                              lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
+                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc)
+{
+
+    lv_coord_t dest_w = lv_area_get_width(dest_area);
+    lv_coord_t dest_h = lv_area_get_height(dest_area);
+    lv_coord_t src_w = lv_area_get_width(src_area);
+    lv_coord_t src_h = lv_area_get_height(src_area);
+
+    bool src_has_alpha = (src_cf == LV_COLOR_FORMAT_ARGB8888);
+    uint8_t src_px_size = lv_color_format_get_size(src_cf);
+    uint8_t dest_px_size = lv_color_format_get_size(dest_cf);
+
+    lv_pxp_reset();
+
+    /*AS buffer - source image*/
+    pxp_as_buffer_config_t asBufferConfig = {
+        .pixelFormat = pxp_get_as_px_format(src_cf),
+        .bufferAddr = (uint32_t)(src_buf + src_px_size * (src_stride * src_area->y1 + src_area->x1)),
+        .pitchBytes = src_stride * src_px_size
+    };
+    PXP_SetAlphaSurfaceBufferConfig(PXP_ID, &asBufferConfig);
+    PXP_SetAlphaSurfacePosition(PXP_ID, 0U, 0U, src_w - 1U, src_h - 1U);
+
+    /*Disable PS, use as color generator*/
+    PXP_SetProcessSurfacePosition(PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
+    PXP_SetProcessSurfaceBackGroundColor(PXP_ID, lv_color_to_u32(dsc->recolor));
+
+    /*Output buffer*/
+    pxp_output_buffer_config_t outputBufferConfig = {
+        .pixelFormat = pxp_get_out_px_format(dest_cf),
+        .interlacedMode = kPXP_OutputProgressive,
+        .buffer0Addr = (uint32_t)(dest_buf + dest_px_size * (dest_stride * dest_area->y1 + dest_area->x1)),
+        .buffer1Addr = (uint32_t)0U,
+        .pitchBytes = dest_stride * dest_px_size,
+        .width = dest_w,
+        .height = dest_h
+    };
+    PXP_SetOutputBufferConfig(PXP_ID, &outputBufferConfig);
+
+    /**
+     * Configure Porter-Duff blending.
+     *
+     * Note: srcFactorMode and dstFactorMode are inverted in fsl_pxp.h:
+     * srcFactorMode is actually applied on PS alpha value
+     * dstFactorMode is actually applied on AS alpha value
+     */
+    pxp_porter_duff_config_t pdConfig = {
+        .enable = 1,
+        .dstColorMode = kPXP_PorterDuffColorWithAlpha,
+        .srcColorMode = kPXP_PorterDuffColorWithAlpha,
+        .dstGlobalAlphaMode = kPXP_PorterDuffGlobalAlpha,
+        .srcGlobalAlphaMode = src_has_alpha ? kPXP_PorterDuffLocalAlpha : kPXP_PorterDuffGlobalAlpha,
+        .dstFactorMode = kPXP_PorterDuffFactorStraight,
+        .srcFactorMode = kPXP_PorterDuffFactorInversed,
+        .dstGlobalAlpha = dsc->recolor_opa,
+        .srcGlobalAlpha = 0xff,
+        .dstAlphaMode = kPXP_PorterDuffAlphaStraight, /*don't care*/
+        .srcAlphaMode = kPXP_PorterDuffAlphaStraight
+    };
+    PXP_SetPorterDuffConfig(PXP_ID, &pdConfig);
+
+    lv_pxp_run();
+}
+
+/* Blit with opacity and transformation (zoom and rotate) for images without alpha channel*/
+static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
+                                lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
+                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc)
+{
+    lv_coord_t src_w = lv_area_get_width(src_area);
+    lv_coord_t src_h = lv_area_get_height(src_area);
+    lv_coord_t dest_w = lv_area_get_width(dest_area);
+    lv_coord_t dest_h = lv_area_get_height(dest_area);
+
+    lv_point_t pivot = dsc->pivot;
+    /*The offsets are now relative to the transformation result with pivot ULC*/
+    lv_coord_t piv_offset_x = 0;
+    lv_coord_t piv_offset_y = 0;
+
+    lv_coord_t trim_size = 0;
+
+    bool has_rotation = (dsc->angle != 0);
+    bool has_scale = (dsc->zoom != LV_ZOOM_NONE);
+    uint8_t src_px_size = lv_color_format_get_size(src_cf);
+    uint8_t dest_px_size = lv_color_format_get_size(dest_cf);
+
+    lv_pxp_reset();
+
+    if(has_rotation) {
+        /*Convert rotation angle and calculate offsets caused by pivot*/
+        pxp_rotate_degree_t pxp_angle;
+        switch(dsc->angle) {
+            case 0:
+                pxp_angle = kPXP_Rotate0;
+                piv_offset_x = 0;
+                piv_offset_y = 0;
+                break;
+            case 900:
+                pxp_angle = kPXP_Rotate90;
+                piv_offset_x = pivot.x + pivot.y - src_h;
+                piv_offset_y = pivot.y - pivot.x;
+                break;
+            case 1800:
+                pxp_angle = kPXP_Rotate180;
+                piv_offset_x = 2 * pivot.x - src_w;
+                piv_offset_y = 2 * pivot.y - src_h;
+                break;
+            case 2700:
+                pxp_angle = kPXP_Rotate270;
+                piv_offset_x = pivot.x - pivot.y;
+                piv_offset_y = pivot.x + pivot.y - src_w;
+                break;
+            default:
+                pxp_angle = kPXP_Rotate0;
+                piv_offset_x = 0;
+                piv_offset_y = 0;
+        }
+        PXP_SetRotateConfig(PXP_ID, kPXP_RotateOutputBuffer, pxp_angle, kPXP_FlipDisable);
+    }
+
+    if(has_scale) {
+        float scale_factor_fp = (float)dsc->zoom / LV_ZOOM_NONE;
+        lv_coord_t scale_factor_int = (lv_coord_t)scale_factor_fp;
+
+        /*Any scale_factor in (k, k + 1] will result in a trim equal to k*/
+        if(scale_factor_fp == scale_factor_int)
+            trim_size = scale_factor_int - 1;
+        else
+            trim_size = scale_factor_int;
+
+        dest_w = src_w * scale_factor_fp + trim_size;
+        dest_h = src_h * scale_factor_fp + trim_size;
+
+        /*Final pivot offset = scale_factor * rotation_pivot_offset + scaling_pivot_offset*/
+        piv_offset_x = floor(scale_factor_fp * piv_offset_x) - floor((scale_factor_fp - 1) * pivot.x);
+        piv_offset_y = floor(scale_factor_fp * piv_offset_y) - floor((scale_factor_fp - 1) * pivot.y);
+    }
+
+    /*PS buffer - source image*/
+    pxp_ps_buffer_config_t psBufferConfig = {
+        .pixelFormat = pxp_get_ps_px_format(src_cf),
+        .swapByte = false,
+        .bufferAddr = (uint32_t)(src_buf + src_px_size * (src_stride * src_area->y1 + src_area->x1)),
+        .bufferAddrU = 0,
+        .bufferAddrV = 0,
+        .pitchBytes = src_stride * src_px_size
+    };
+    PXP_SetProcessSurfaceBufferConfig(PXP_ID, &psBufferConfig);
+    PXP_SetProcessSurfacePosition(PXP_ID, 0U, 0U, dest_w - trim_size - 1U, dest_h - trim_size - 1U);
+
+    if(has_scale)
+        PXP_SetProcessSurfaceScaler(PXP_ID, src_w, src_h, dest_w, dest_h);
+
+    /*AS disabled */
+    PXP_SetAlphaSurfacePosition(PXP_ID, 0xFFFFU, 0xFFFFU, 0U, 0U);
+
+    /*Output buffer*/
+    pxp_output_buffer_config_t outputBufferConfig = {
+        .pixelFormat = pxp_get_out_px_format(dest_cf),
+        .interlacedMode = kPXP_OutputProgressive,
+        .buffer0Addr = (uint32_t)(dest_buf + dest_px_size * (dest_stride * (dest_area->y1 + piv_offset_y) + (dest_area->x1 + piv_offset_x))),
+        .buffer1Addr = (uint32_t)0U,
+        .pitchBytes = dest_stride * dest_px_size,
+        .width = dest_w - trim_size,
+        .height = dest_h - trim_size
+    };
+    PXP_SetOutputBufferConfig(PXP_ID, &outputBufferConfig);
+
+    lv_pxp_run();
+}
 
 static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                       lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,

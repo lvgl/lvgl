@@ -152,13 +152,51 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
                 lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 const lv_img_dsc_t * img_dsc = draw_dsc->src;
 
+                if(!_pxp_cf_supported(img_dsc->header.cf)) {
+                    is_supported = false;
+                    break;
+                }
+
                 bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
                 bool has_transform = (draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE);
 
-                if(has_recolor || has_transform
-                   || (!_pxp_cf_supported(img_dsc->header.cf))
-                  )
+                /* Recolor and transformation are not supported at the same time. */
+                if(has_recolor && has_transform) {
                     is_supported = false;
+                    break;
+                }
+
+                bool has_opa = (draw_dsc->opa < (lv_opa_t)LV_OPA_MAX);
+                bool src_has_alpha = (img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888);
+
+                /*
+                 * Recolor or transformation for images w/ opa or alpha channel can't
+                 * be obtained in a single PXP configuration. Two steps are required.
+                 */
+                if((has_recolor || has_transform) && (has_opa || src_has_alpha)) {
+                    is_supported = false;
+                    break;
+                }
+
+                /* PXP can only rotate at 90x angles. */
+                if(draw_dsc->angle % 900) {
+                    is_supported = false;
+                    break;
+                }
+
+                /*
+                 * PXP is set to process 16x16 blocks to optimize the system for memory
+                 * bandwidth and image processing time.
+                 * The output engine essentially truncates any output pixels after the
+                 * desired number of pixels has been written.
+                 * When rotating a source image and the output is not divisible by the block
+                 * size, the incorrect pixels could be truncated and the final output image
+                 * can look shifted.
+                 */
+                if((draw_dsc->angle != 0) && (img_dsc->header.w % 16 || img_dsc->header.h % 16)) {
+                    is_supported = false;
+                    break;
+                }
 
                 break;
             }
