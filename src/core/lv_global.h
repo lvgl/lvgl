@@ -37,6 +37,7 @@ extern "C" {
 #endif
 
 #include "../tick/lv_tick.h"
+#include "../layouts/lv_layout.h"
 
 /*********************
  *      DEFINES
@@ -69,6 +70,7 @@ typedef struct {
     lv_ll_t fsdrv_ll;
     lv_ll_t img_decoder_ll;
     lv_ll_t obj_style_trans_ll;
+    lv_layout_dsc_t * layout_list;
 
     bool inited;
     bool style_refresh;

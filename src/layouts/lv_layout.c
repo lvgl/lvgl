@@ -15,6 +15,7 @@
  *      DEFINES
  *********************/
 #define layout_cnt lv_global_default()->layout_count
+#define layout_list lv_global_default()->layout_list
 
 /**********************
  *      TYPEDEFS
@@ -39,7 +40,7 @@
 void _lv_layout_init(void)
 {
     /*Malloc a list for the built in layouts*/
-    LV_GC_ROOT(_lv_layout_list) = lv_malloc(layout_cnt * sizeof(lv_layout_dsc_t));
+    layout_list = lv_malloc(layout_cnt * sizeof(lv_layout_dsc_t));
 
 #if LV_USE_FLEX
     lv_flex_init();
@@ -53,11 +54,11 @@ void _lv_layout_init(void)
 uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 {
     layout_cnt++;
-    LV_GC_ROOT(_lv_layout_list) = lv_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_dsc_t));
-    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
+    layout_list = lv_realloc(layout_list, layout_cnt * sizeof(lv_layout_dsc_t));
+    LV_ASSERT_MALLOC(layout_list);
 
-    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].cb = cb;
-    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].user_data = user_data;
+    layout_list[layout_cnt - 1].cb = cb;
+    layout_list[layout_cnt - 1].user_data = user_data;
     return layout_cnt;  /*No -1 to skip 0th index*/
 }
 
@@ -65,8 +66,8 @@ void _lv_layout_apply(lv_obj_t * obj)
 {
     lv_layout_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
     if(layout_id > 0 && layout_id <= layout_cnt) {
-        void  * user_data = LV_GC_ROOT(_lv_layout_list)[layout_id].user_data;
-        LV_GC_ROOT(_lv_layout_list)[layout_id].cb(obj, user_data);
+        void  * user_data = layout_list[layout_id].user_data;
+        layout_list[layout_id].cb(obj, user_data);
     }
 }
 

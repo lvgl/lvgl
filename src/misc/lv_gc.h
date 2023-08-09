@@ -43,7 +43,6 @@ extern "C" {
 #define LV_DISPATCH11(f, t, n)          LV_DISPATCH(f, t, n)
 
 #define LV_ITERATE_ROOTS(f)                                                                            \
-    LV_DISPATCH(f, lv_layout_dsc_t *, _lv_layout_list)                                                 \
     LV_DISPATCH_COND(f, _lv_img_cache_entry_t*, _lv_img_cache_array, LV_IMG_CACHE_DEF, 1)              \
     LV_DISPATCH_COND(f, _lv_img_cache_entry_t, _lv_img_cache_single, LV_IMG_CACHE_DEF, 0)              \
     LV_DISPATCH(f, lv_timer_t*, _lv_timer_act)                                                         \

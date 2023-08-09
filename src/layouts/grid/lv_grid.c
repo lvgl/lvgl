@@ -14,10 +14,11 @@
 #include "../../misc/lv_gc.h"
 #include "../lv_layout.h"
 #include "../../core/lv_obj.h"
-
+#include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
+#define layout_list lv_global_default()->layout_list
 
 /**
  * Some helper defines
@@ -139,8 +140,8 @@ static inline lv_coord_t get_margin_ver(lv_obj_t * obj)
 
 void lv_grid_init(void)
 {
-    LV_GC_ROOT(_lv_layout_list)[LV_LAYOUT_GRID].cb = grid_update;
-    LV_GC_ROOT(_lv_layout_list)[LV_LAYOUT_GRID].user_data = NULL;
+    layout_list[LV_LAYOUT_GRID].cb = grid_update;
+    layout_list[LV_LAYOUT_GRID].user_data = NULL;
 }
 
 void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const lv_coord_t col_dsc[], const lv_coord_t row_dsc[])
