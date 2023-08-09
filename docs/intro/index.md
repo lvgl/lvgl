@@ -132,7 +132,7 @@ LVGL needs just one simple driver function to copy an array of pixels into a giv
 If you can do this with your display then you can use it with LVGL.
 
 Some examples of the supported display types:
-- TFTs with 16 or 24 bit color depth
+- TFTs with 16 or 32 bit color depth
 - Monitors with an HDMI port
 - Small monochrome displays
 - Gray-scale displays

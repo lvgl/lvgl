@@ -30,6 +30,10 @@
     #include "../draw/stm32_dma2d/lv_gpu_stm32_dma2d.h"
 #endif
 
+#if LV_USE_GPU_RA6M3_G2D
+    #include "../draw/renesas/lv_gpu_d2_ra6m3.h"
+#endif
+
 #if LV_USE_GPU_SWM341_DMA2D
     #include "../draw/swm341_dma2d/lv_gpu_swm341_dma2d.h"
 #endif
@@ -117,6 +121,11 @@ void lv_init(void)
 #if LV_USE_GPU_STM32_DMA2D
     /*Initialize DMA2D GPU*/
     lv_draw_stm32_dma2d_init();
+#endif
+
+#if LV_USE_GPU_RA6M3_G2D
+    /*Initialize G2D GPU*/
+    lv_draw_ra6m3_g2d_init();
 #endif
 
 #if LV_USE_GPU_SWM341_DMA2D
@@ -223,12 +232,22 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
     bool was_on_layout = lv_obj_is_layout_positioned(obj);
 
+    /* We must invalidate the area occupied by the object before we hide it as calls to invalidate hidden objects are ignored */
     if(f & LV_OBJ_FLAG_HIDDEN) lv_obj_invalidate(obj);
 
     obj->flags |= f;
 
     if(f & LV_OBJ_FLAG_HIDDEN) {
-        lv_obj_invalidate(obj);
+        if(lv_obj_has_state(obj, LV_STATE_FOCUSED)) {
+            lv_group_t * group = lv_obj_get_group(obj);
+            if(group != NULL) {
+                lv_group_focus_next(group);
+                lv_obj_t * next_obj = lv_group_get_focused(group);
+                if(next_obj != NULL) {
+                    lv_obj_invalidate(next_obj);
+                }
+            }
+        }
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
@@ -709,9 +728,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     }
     else if(code == LV_EVENT_RELEASED) {
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
-        void * param = lv_event_get_param(e);
+        lv_indev_t * indev = lv_event_get_indev(e);
         /*Go the checked state if enabled*/
-        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+        if(lv_indev_get_scroll_obj(indev) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
             else lv_obj_clear_state(obj, LV_STATE_CHECKED);
 

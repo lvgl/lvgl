@@ -33,7 +33,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num)
+void LV_ATTRIBUTE_FAST_MEM lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num)
 {
 #if LV_COLOR_DEPTH == 16
     uintptr_t buf_int = (uintptr_t)buf;

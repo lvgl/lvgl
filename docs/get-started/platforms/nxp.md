@@ -23,6 +23,7 @@ Supported draw callbacks are available in "src/draw/nxp/pxp/lv_draw_pxp.c":
     pxp_draw_ctx->base_draw.draw_img_decoded = lv_draw_pxp_img_decoded;
     pxp_draw_ctx->blend = lv_draw_pxp_blend;
     pxp_draw_ctx->base_draw.wait_for_finish = lv_draw_pxp_wait_for_finish;
+    pxp_draw_ctx->base_draw.buffer_copy = lv_draw_pxp_buffer_copy;
 ```
 
 #### Features supported:
@@ -35,6 +36,7 @@ Supported draw callbacks are available in "src/draw/nxp/pxp/lv_draw_pxp.c":
   - Color keying
   - Recoloring (color tint)
   - Image Rotation (90, 180, 270 degree)
+  - Buffer copy
   - RTOS integration layer
   - Default FreeRTOS and bare metal code provided
 
@@ -114,6 +116,7 @@ Supported draw callbacks are available in "src/draw/nxp/vglite/lv_draw_vglite.c"
     vglite_draw_ctx->base_draw.draw_img_decoded = lv_draw_vglite_img_decoded;
     vglite_draw_ctx->blend = lv_draw_vglite_blend;
     vglite_draw_ctx->base_draw.wait_for_finish = lv_draw_vglite_wait_for_finish;
+    vglite_draw_ctx->base_draw.buffer_copy = lv_draw_vglite_buffer_copy;
 ```
 
 #### Features supported:
@@ -129,6 +132,7 @@ Supported draw callbacks are available in "src/draw/nxp/vglite/lv_draw_vglite.c"
   - Draw rectangle border/outline with optional rounded corners
   - Draw arc with optional rounded ending
   - Draw line or dashed line with optional rounded ending
+  - Buffer copy
 
 #### Known limitations:
   - Source image alignment:

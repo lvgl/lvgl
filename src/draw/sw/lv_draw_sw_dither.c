@@ -17,7 +17,7 @@
 
 #if _DITHER_GRADIENT
 
-LV_ATTRIBUTE_FAST_MEM void lv_dither_none(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
+void LV_ATTRIBUTE_FAST_MEM lv_dither_none(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
 {
     LV_UNUSED(x);
     LV_UNUSED(y);
@@ -40,7 +40,7 @@ static const uint8_t dither_ordered_threshold_matrix[8 * 8] = {
 }; /* Shift by 6 to normalize */
 
 
-LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_hor(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
+void LV_ATTRIBUTE_FAST_MEM lv_dither_ordered_hor(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
 {
     LV_UNUSED(x);
     /* For vertical dithering, the error is spread on the next column (and not next line).
@@ -63,7 +63,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_hor(lv_grad_t * grad, lv_coord_t x,
         grad->map[j] = lv_color_hex(t.full);
     }
 }
-LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_ver(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
+
+void LV_ATTRIBUTE_FAST_MEM lv_dither_ordered_ver(lv_grad_t * grad, lv_coord_t x, lv_coord_t y, lv_coord_t w)
 {
     /* For vertical dithering, the error is spread on the next column (and not next line).
        Since the renderer is scanline based, it's not obvious what could be used to perform the rendering efficiently.
@@ -97,9 +98,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_ordered_ver(lv_grad_t * grad, lv_coord_t x,
     }
 }
 
-
 #if LV_DITHER_ERROR_DIFFUSION == 1
-LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(lv_grad_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
+void LV_ATTRIBUTE_FAST_MEM lv_dither_err_diff_hor(lv_grad_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
 {
     LV_UNUSED(xs);
     LV_UNUSED(y);
@@ -153,7 +153,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_hor(lv_grad_t * grad, lv_coord_t x
     grad->map[grad->size - 1] = lv_color_hex(grad->hmap[grad->size - 1].full);
 }
 
-LV_ATTRIBUTE_FAST_MEM void lv_dither_err_diff_ver(lv_grad_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
+void LV_ATTRIBUTE_FAST_MEM lv_dither_err_diff_ver(lv_grad_t * grad, lv_coord_t xs, lv_coord_t y, lv_coord_t w)
 {
     /* Try to implement error diffusion on a vertical gradient and an horizontal map using those tricks:
         Since the given hi-resolution gradient (in src) is vertical, the Floyd Steinberg algorithm pass need to be rotated,

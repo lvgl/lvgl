@@ -1,5 +1,89 @@
 # Changelog
 
+
+## [v8.3.9](https://github.com/lvgl/lvgl/compare/v8.3.9...v8.3.8) 6 August 2023
+
+
+### Fixes
+
+- fix(decoder): fix LV_IMG_CF_ALPHA_8BIT bin file decoder [`4406`](https://github.com/lvgl/lvgl/pull/4406)
+- fix(config): fix typo in LV_USE_PERF_MONITOR and LV_USE_MEM_MONITOR [`4403`](https://github.com/lvgl/lvgl/pull/4403)
+- fix(attr): refactor LV_ATTRIBUTE_* for function attributes [`4404`](https://github.com/lvgl/lvgl/pull/4404)
+- fix(font): fix optimizer issue in  lv_font_fmt_txt.c [`4385`](https://github.com/lvgl/lvgl/pull/4385)
+- fix(btnmatrix): Hide button matrix when all buttons hidden [`65f1c93`](https://github.com/lvgl/lvgl/commit/65f1c9305e1b13356010524da4764fe20fe93030)
+- fix(obj) prevent hidden objects keeping focus [`375b3b5`](https://github.com/lvgl/lvgl/commit/375b3b5d3ef2ea8c52f971a1bf20998be7940d5e)
+- fix(btnmatrix): Fix typo in previous commit! [`29ed7c5`](https://github.com/lvgl/lvgl/commit/29ed7c5717f6cfbca5ce888bf4497221525aae85)
+- fix(tabview): fix warning [`223dc1c`](https://github.com/lvgl/lvgl/commit/223dc1cf9d1cad0f40caf244eb435af0871f4153)
+- fix(indev): fix warnings when loggin coordinates is enabled [`645006e`](https://github.com/lvgl/lvgl/commit/645006e35195cab3354f34a1a8cbc8c5ed0fdfad)
+- fix: use const lv_img_dsc_t * dsc function parameter in lv_img_buf.h/ [`4f102d7`](https://github.com/lvgl/lvgl/commit/4f102d7b6b2e9f9fa68ab7b976d93762107549a4)
+- fix(chart): fix lv_chart_get_point_pos_by_id [`f9ffcc9`](https://github.com/lvgl/lvgl/commit/f9ffcc9d8e11beb369dcbab0945ca85eab8f77b2)
+- fix(imgbtn): support LV_OBJ_FLAG_CHECKABLE [`385d999`](https://github.com/lvgl/lvgl/commit/385d999a4a8164fcde6ae05f6a5daa5d5c209dd3)
+
+
+### Docs
+
+- docs(disp): metined that rotation rotates the touch coordinates too [`810852b`](https://github.com/lvgl/lvgl/commit/810852b41be5df66fd7b80f8af69f8b579d142ea)
+
+
+### Others
+
+- demos: add lv_demo_..._close() functions for each demo [`91038a9`](https://github.com/lvgl/lvgl/commit/91038a99e82a2522f693c7cdc77e9e7a672ee9ed)
+
+
+## [v8.3.8](https://github.com/lvgl/lvgl/compare/v8.3.8...v8.3.7) 5 July 2023
+
+### New Features
+
+- feat(rt-thread): make the rt-thread env recursively glob the UI files [`8b83fe7`](https://github.com/lvgl/lvgl/commit/8b83fe7ea53a597cdbae8204d0aa9be8ad3d2b89)
+
+### Performance
+
+- perf(pxp, vglite): improve performance and add more features [`4222`](https://github.com/lvgl/lvgl/pull/4222)
+
+### Fixes
+
+- fix(stm32): static function prototypes moved from .h to .c [`4276`](https://github.com/lvgl/lvgl/pull/4276)
+- fix(png): fix decode image size and some warnings [`4248`](https://github.com/lvgl/lvgl/pull/4248)
+- fix(bidi): add more Hebrew checks to RTL characters set (#4171) [`4239`](https://github.com/lvgl/lvgl/pull/4239)
+- fix(img): fix getting the image type on big endian systems [`4215`](https://github.com/lvgl/lvgl/pull/4215)
+- fix(sdl): destroy texture after use if not stored in cache [`4173`](https://github.com/lvgl/lvgl/pull/4173)
+
+- fix:(BtnMatrix) Backport https://github.com/lvgl/lvgl/pull/4185 [`cb602ea`](https://github.com/lvgl/lvgl/commit/cb602ea7785de21a187ef5ee5f7de4e3aa3f7e0e)
+- fix(arduino): fix messed up variable types [`e3659c4`](https://github.com/lvgl/lvgl/commit/e3659c46b128b2b715b196c3ccfb94b3de4c89f8)
+- fix:(BtnMatrix) Backport https://github.com/lvgl/lvgl/pull/4185 [`07bce74`](https://github.com/lvgl/lvgl/commit/07bce7466d471a15ba241a9db3239f7a116b0b46)
+- fix(chart): fix division by zero if there are no ticks [`67b3011`](https://github.com/lvgl/lvgl/commit/67b3011f835b08c77ff60ae2d1e6592a710ca2b1)
+- fix(msgbox): fix typo [`6a89bd2`](https://github.com/lvgl/lvgl/commit/6a89bd2d7409ac4d49ad32da73ba50a84f7c8990)
+- fix(tabview): remove the animation if the tab is selected by clicking the button on the header [`3de61c7`](https://github.com/lvgl/lvgl/commit/3de61c76af0aed1665e9d61e47b4dd50b9e8bdf1)
+- fix(btnmatrix): fix array out of bounds addressing with groups and no buttons [`edd5ad2`](https://github.com/lvgl/lvgl/commit/edd5ad28ad74d1025db0b442cfa390d8c01ae006)
+- fix(btnmatrix): fix using &gt; 7 as button width [`75e6ef4`](https://github.com/lvgl/lvgl/commit/75e6ef4e1d66a85d68160b97ef931b0717e77212)
+- fix(draw): typo with LV_COLOR_DEPTH 8 [`45b13c3`](https://github.com/lvgl/lvgl/commit/45b13c378f6fc1728ddf1547c25daa61d62c9f76)
+- fix(disp): fix memory leak lv_scr_load_anim with auto_del and time=0 [`1caafc5`](https://github.com/lvgl/lvgl/commit/1caafc55dde46e1b7e3d17d8c5349fbf7cccba9f)
+
+- fix(msgbox): add missing lv_obj_class_init_obj [`6843c19`](https://github.com/lvgl/lvgl/commit/6843c191b792f66829477827279adbbc763541c1)
+- fix(flex): register LV_STYLE_FLEX_GROW [`5ba90a5`](https://github.com/lvgl/lvgl/commit/5ba90a5c41f584a8eb3a4fc8e2f466729652ddb3)
+
+### Examples
+
+- example(tabview): fix tabview disable scrollig example [`9491c3f`](https://github.com/lvgl/lvgl/commit/9491c3ff6d2f8e56b13d8fb493d4b3ee98ef1a4b)
+
+### Docs
+
+- docs: mention incompatibility between software rotation and `direct_mode` or `full_refresh` [`4308`](https://github.com/lvgl/lvgl/pull/4308)
+- docs(faq): don't say 24 bit is support as LVGL can't render in RGB888 directly [`227ac02`](https://github.com/lvgl/lvgl/commit/227ac023419eeb253892b1c36113059f12b1f9f2)
+
+### CI and tests
+
+### Others
+
+- chore(cmsis-pack): update cmsis-pack for v8.3.8 [`4340`](https://github.com/lvgl/lvgl/pull/4340)
+- add(docs): add renesas-ra6m3 get-started document [`4278`](https://github.com/lvgl/lvgl/pull/4278)
+- add(gpu): add renesas-ra6m3 gpu adaptation [`4270`](https://github.com/lvgl/lvgl/pull/4270)
+
+- Revert "fix:(BtnMatrix) Backport https://github.com/lvgl/lvgl/pull/4185" [`1713cd3`](https://github.com/lvgl/lvgl/commit/1713cd3fd8f93aa575fbcf0e34b8626b6ee69ded)
+
+
+
+
 ## [v8.3.7](https://github.com/lvgl/lvgl/compare/v8.3.7...v8.3.6) 3 May 2023
 
 ### New Features

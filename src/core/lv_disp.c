@@ -262,6 +262,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     /*Shortcut for immediate load*/
     if(time == 0 && delay == 0) {
         scr_load_internal(new_scr);
+        if(auto_del) lv_obj_del(act_scr);
         return;
     }
 

@@ -103,6 +103,12 @@ static const uint32_t time_list[] = {
     2 * 60 + 19,
 };
 
+#if LV_DEMO_MUSIC_AUTO_PLAY
+    static lv_timer_t * auto_step_timer;
+#endif
+
+static lv_color_t original_screen_bg_color;
+
 /**********************
  *      MACROS
  **********************/
@@ -113,14 +119,31 @@ static const uint32_t time_list[] = {
 
 void lv_demo_music(void)
 {
+    original_screen_bg_color = lv_obj_get_style_bg_color(lv_scr_act(), 0);
     lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x343247), 0);
 
     list = _lv_demo_music_list_create(lv_scr_act());
     ctrl = _lv_demo_music_main_create(lv_scr_act());
 
 #if LV_DEMO_MUSIC_AUTO_PLAY
-    lv_timer_create(auto_step_cb, 1000, NULL);
+    auto_step_timer = lv_timer_create(auto_step_cb, 1000, NULL);
 #endif
+}
+
+void lv_demo_music_close(void)
+{
+    /*Delete all aniamtions*/
+    lv_anim_del(NULL, NULL);
+
+#if LV_DEMO_MUSIC_AUTO_PLAY
+    lv_timer_del(auto_step_timer);
+#endif
+    _lv_demo_music_list_close();
+    _lv_demo_music_main_close();
+
+    lv_obj_clean(lv_scr_act());
+
+    lv_obj_set_style_bg_color(lv_scr_act(), original_screen_bg_color, 0);
 }
 
 const char * _lv_demo_music_get_title(uint32_t track_id)

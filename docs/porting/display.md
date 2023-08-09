@@ -204,6 +204,10 @@ The default rotation of your display when it is initialized can be set using the
 
 Display rotation can also be changed at runtime using the `lv_disp_set_rotation(disp, rot)` API.
 
+If you enable rotation the coordinates of the pointer input devices (e.g. touchpad) will be rotated too.
+
+Note that when using software rotation, you cannot use neither `direct_mode` nor `full_refresh` in the driver. When using either of these, you will have to rotate the pixels yourself e.g. in the `flush_cb`.
+
 Support for software rotation is a new feature, so there may be some glitches/bugs depending on your configuration. If you encounter a problem please open an issue on [GitHub](https://github.com/lvgl/lvgl/issues).
 
 ### Decoupling the display refresh timer

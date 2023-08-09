@@ -77,8 +77,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
 
     lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
 
-    char ** old_map = tabview->map;
-    char ** new_map;
+    const char ** old_map = (const char **)tabview->map;
+    const char ** new_map;
 
     /*top or bottom dir*/
     if(tabview->tab_pos & LV_DIR_VER) {
@@ -129,15 +129,17 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t id, const char * new_name)
     if(id >= tabview->tab_cnt) return;
     if(tabview->tab_pos & LV_DIR_HOR) id *= 2;
 
-    lv_mem_free(tabview->map[id]);
+    lv_mem_free((void *)tabview->map[id]);
     tabview->map[id] = lv_mem_alloc(strlen(new_name) + 1);
-    strcpy(tabview->map[id], new_name);
+    strcpy((void *)tabview->map[id], new_name);
     lv_obj_invalidate(obj);
 }
 
 void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
+    if(obj->being_deleted) return;
+
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
     if(id >= tabview->tab_cnt) {
@@ -271,13 +273,13 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     uint32_t i;
     if(tabview->tab_pos & LV_DIR_VER) {
         for(i = 0; i < tabview->tab_cnt; i++) {
-            lv_mem_free(tabview->map[i]);
+            lv_mem_free((void *)tabview->map[i]);
             tabview->map[i] = NULL;
         }
     }
     if(tabview->tab_pos & LV_DIR_HOR) {
         for(i = 0; i < tabview->tab_cnt; i++) {
-            lv_mem_free(tabview->map[i * 2]);
+            lv_mem_free((void *)tabview->map[i * 2]);
             tabview->map[i * 2] = NULL;
         }
     }
@@ -308,7 +310,7 @@ static void btns_value_changed_event_cb(lv_event_t * e)
 
     lv_obj_t * tv = lv_obj_get_parent(btns);
     uint32_t id = lv_btnmatrix_get_selected_btn(btns);
-    lv_tabview_set_act(tv, id, LV_ANIM_ON);
+    lv_tabview_set_act(tv, id, LV_ANIM_OFF);
 }
 
 static void cont_scroll_end_event_cb(lv_event_t * e)

@@ -205,6 +205,15 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
             p->x = LV_MAX(p->x, header.w);
         }
     }
+    /*Sent when the widget is checked due to LV_OBJ_FLAG_CHECKABLE */
+    else if(code == LV_EVENT_VALUE_CHANGED) {
+        if(lv_obj_has_state(obj, LV_STATE_CHECKED)) {
+            lv_imgbtn_set_state(obj, LV_IMGBTN_STATE_CHECKED_RELEASED);
+        }
+        else {
+            lv_imgbtn_set_state(obj, LV_IMGBTN_STATE_RELEASED);
+        }
+    }
 }
 
 static void draw_main(lv_event_t * e)

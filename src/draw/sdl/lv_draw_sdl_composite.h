@@ -45,6 +45,7 @@ typedef enum lv_draw_sdl_composite_texture_id_t {
 /**
  * Begin drawing with mask. Render target will be switched to a temporary texture,
  * and drawing coordinates may get clipped or translated
+ * @param ctx Drawing context
  * @param coords_in Original coordinates
  * @param clip_in Original clip area
  * @param extension Useful for shadows or outlines, can be NULL
@@ -59,8 +60,18 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
 
 void lv_draw_sdl_composite_end(lv_draw_sdl_ctx_t * ctx, const lv_area_t * apply_area, lv_blend_mode_t blend_mode);
 
+/**
+ *
+ * @param ctx Drawing context
+ * @param id Texture ID
+ * @param w Maximum width needed
+ * @param h Maximum height needed
+ * @param texture_in_cache output to query if the texture is in cache. If it's not in cache, you'll need to destroy it
+ * by yourself
+ * @return Obtained texture
+ */
 SDL_Texture * lv_draw_sdl_composite_texture_obtain(lv_draw_sdl_ctx_t * ctx, lv_draw_sdl_composite_texture_id_t id,
-                                                   lv_coord_t w, lv_coord_t h);
+                                                   lv_coord_t w, lv_coord_t h, bool * texture_in_cache);
 
 /**********************
  *      MACROS

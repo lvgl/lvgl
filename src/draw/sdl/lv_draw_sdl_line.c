@@ -53,7 +53,7 @@ static SDL_Texture * line_texture_create(lv_draw_sdl_ctx_t * sdl_ctx, const lv_d
  *   GLOBAL FUNCTIONS
  **********************/
 void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * dsc, const lv_point_t * point1,
-                           const lv_point_t * point2)
+                           const lv_point_t * point2, bool * in_cache)
 {
     lv_draw_sdl_ctx_t * sdl_ctx = (lv_draw_sdl_ctx_t *) draw_ctx;
     SDL_Renderer * renderer = sdl_ctx->renderer;
@@ -68,7 +68,7 @@ void lv_draw_sdl_draw_line(lv_draw_ctx_t * draw_ctx, const lv_draw_line_dsc_t * 
     SDL_Texture * texture = lv_draw_sdl_texture_cache_get(sdl_ctx, &key, sizeof(key), NULL);
     if(!texture) {
         texture = line_texture_create(sdl_ctx, dsc, (lv_coord_t) length);
-        lv_draw_sdl_texture_cache_put(sdl_ctx, &key, sizeof(key), texture);
+        *in_cache = lv_draw_sdl_texture_cache_put(sdl_ctx, &key, sizeof(key), texture);
     }
 
     lv_area_t coords = {x1, y1, x2, y2};

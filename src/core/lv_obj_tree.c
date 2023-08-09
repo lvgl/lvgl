@@ -360,6 +360,8 @@ static void obj_del_core(lv_obj_t * obj)
     lv_res_t res = lv_event_send(obj, LV_EVENT_DELETE, NULL);
     if(res == LV_RES_INV) return;
 
+    obj->being_deleted = 1;
+
     /*Recursively delete the children*/
     lv_obj_t * child = lv_obj_get_child(obj, 0);
     while(child) {
