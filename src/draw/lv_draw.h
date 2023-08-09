@@ -179,6 +179,7 @@ typedef struct {
 } lv_draw_dsc_base_t;
 
 typedef struct {
+    lv_draw_unit_t * unit_head;
     uint32_t used_memory_for_layers_kb;
 #if LV_USE_OS
     lv_thread_sync_t sync;

@@ -46,7 +46,6 @@ extern "C" {
     LV_DISPATCH_COND(f, _lv_img_cache_entry_t*, _lv_img_cache_array, LV_IMG_CACHE_DEF, 1)              \
     LV_DISPATCH_COND(f, _lv_img_cache_entry_t, _lv_img_cache_single, LV_IMG_CACHE_DEF, 0)              \
     LV_DISPATCH_COND(f, _lv_draw_sw_mask_radius_circle_dsc_arr_t , _lv_circle_cache, LV_DRAW_SW_COMPLEX, 1)  \
-    LV_DISPATCH(f, lv_draw_unit_t *, _lv_draw_unit_head)                                               \
     LV_DISPATCH(f, lv_ll_t, _subs_ll)
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
