@@ -42,9 +42,8 @@ extern "C" {
 #define LV_DISPATCH10(f, t, n)
 #define LV_DISPATCH11(f, t, n)          LV_DISPATCH(f, t, n)
 
-#define LV_ITERATE_ROOTS(f)                                                                            \
-    LV_DISPATCH_COND(f, _lv_img_cache_entry_t*, _lv_img_cache_array, LV_IMG_CACHE_DEF, 1)              \
-    LV_DISPATCH_COND(f, _lv_img_cache_entry_t, _lv_img_cache_single, LV_IMG_CACHE_DEF, 0)
+#define LV_ITERATE_ROOTS(f)
+
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)

@@ -110,6 +110,9 @@ typedef struct {
 
 #if LV_IMG_CACHE_DEF_SIZE
     uint16_t img_cache_entry_cnt;
+    _lv_img_cache_entry_t* img_cache_array;
+#else
+    _lv_img_cache_entry_t img_cache_single;
 #endif
 
     lv_draw_cache_t draw_cache;
