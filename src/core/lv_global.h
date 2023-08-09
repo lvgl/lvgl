@@ -66,6 +66,7 @@ typedef struct {
     lv_ll_t disp_ll;
     lv_ll_t indev_ll;
     lv_ll_t group_ll;
+    lv_ll_t fsdrv_ll;
 
     bool inited;
     bool style_refresh;

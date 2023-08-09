@@ -13,10 +13,12 @@
 #include "../stdlib/lv_string.h"
 #include "lv_ll.h"
 #include "lv_gc.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define fsdrv_ll_p &(lv_global_default()->fsdrv_ll)
 
 /**********************
  *      TYPEDEFS
@@ -41,7 +43,7 @@ static const char * lv_fs_get_real_path(const char * path);
 
 void _lv_fs_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_fsdrv_ll), sizeof(lv_fs_drv_t *));
+    _lv_ll_init(fsdrv_ll_p, sizeof(lv_fs_drv_t *));
 }
 
 bool lv_fs_is_ready(char letter)
@@ -408,7 +410,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
 {
     /*Save the new driver*/
     lv_fs_drv_t ** new_drv;
-    new_drv = _lv_ll_ins_head(&LV_GC_ROOT(_lv_fsdrv_ll));
+    new_drv = _lv_ll_ins_head(fsdrv_ll_p);
     LV_ASSERT_MALLOC(new_drv);
     if(new_drv == NULL) return;
 
@@ -419,7 +421,7 @@ lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t ** drv;
 
-    _LV_LL_READ(&LV_GC_ROOT(_lv_fsdrv_ll), drv) {
+    _LV_LL_READ(fsdrv_ll_p, drv) {
         if((*drv)->letter == letter) {
             return *drv;
         }
@@ -433,7 +435,7 @@ char * lv_fs_get_letters(char * buf)
     lv_fs_drv_t ** drv;
     uint8_t i = 0;
 
-    _LV_LL_READ(&LV_GC_ROOT(_lv_fsdrv_ll), drv) {
+    _LV_LL_READ(fsdrv_ll_p, drv) {
         buf[i] = (*drv)->letter;
         i++;
     }
