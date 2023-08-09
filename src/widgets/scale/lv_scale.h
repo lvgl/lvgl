@@ -59,6 +59,12 @@ typedef struct {
     lv_style_t * items_style;
     lv_coord_t minor_range;
     lv_coord_t major_range;
+    uint8_t first_tick_idx_in_section;
+    uint8_t last_tick_idx_in_section;
+    uint8_t first_tick_idx_is_major;
+    uint8_t last_tick_idx_is_major;
+    lv_point_t first_tick_in_section;
+    lv_point_t last_tick_in_section;
 } lv_scale_section_t;
 
 typedef struct {
@@ -73,6 +79,8 @@ typedef struct {
     uint32_t major_tick_every   : 15;
     lv_scale_mode_t mode;
     uint32_t label_enabled      : 1;
+    lv_coord_t last_tick_width;
+    lv_coord_t first_tick_width;
     /* Round scale */
     uint16_t angle_range;
     int16_t rotation;
