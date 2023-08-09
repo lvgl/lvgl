@@ -16,9 +16,9 @@
 /*********************
  *      DEFINES
  *********************/
-
 #define restart_notify lv_global_default()->msg_restart_notify
 #define _recursion_counter lv_global_default()->msg_recursion_counter
+#define _msg_subs_ll_p &(lv_global_default()->msg_subs_ll)
 
 /**********************
  *      TYPEDEFS
@@ -63,12 +63,12 @@ static void obj_delete_event_cb(lv_event_t * e);
 
 void lv_msg_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_subs_ll), sizeof(sub_dsc_t));
+    _lv_ll_init(_msg_subs_ll_p, sizeof(sub_dsc_t));
 }
 
 void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
 {
-    sub_dsc_t * s = _lv_ll_ins_tail(&LV_GC_ROOT(_subs_ll));
+    sub_dsc_t * s = _lv_ll_ins_tail(_msg_subs_ll_p);
     LV_ASSERT_MALLOC(s);
     if(s == NULL) return NULL;
 
@@ -110,7 +110,7 @@ void * lv_msg_subscribe_obj(lv_msg_id_t msg_id, lv_obj_t * obj, void * user_data
 void lv_msg_unsubscribe(void * s)
 {
     LV_ASSERT_NULL(s);
-    _lv_ll_remove(&LV_GC_ROOT(_subs_ll), s);
+    _lv_ll_remove(_msg_subs_ll_p, s);
     restart_notify = true;
     lv_free(s);
 }
@@ -166,7 +166,7 @@ static void notify(lv_msg_t * m)
     /*First clear all _checked flags*/
     sub_dsc_t * s;
     if(_recursion_counter == 1) {
-        _LV_LL_READ(&LV_GC_ROOT(_subs_ll), s) {
+        _LV_LL_READ(_msg_subs_ll_p, s) {
             s->_checked = 0;
         }
     }
@@ -174,10 +174,10 @@ static void notify(lv_msg_t * m)
     /*Run all sub_dsc_t from the list*/
     do {
         restart_notify = false;
-        s = _lv_ll_get_head(&LV_GC_ROOT(_subs_ll));
+        s = _lv_ll_get_head(_msg_subs_ll_p);
         while(s) {
             /*get next element while current is surely valid*/
-            sub_dsc_t * next = _lv_ll_get_next(&LV_GC_ROOT(_subs_ll), s);
+            sub_dsc_t * next = _lv_ll_get_next(_msg_subs_ll_p, s);
 
             /*Notify only once*/
             if(!s->_checked) {
@@ -213,11 +213,11 @@ static void obj_delete_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
 
-    sub_dsc_t * s = _lv_ll_get_head(&LV_GC_ROOT(_subs_ll));
+    sub_dsc_t * s = _lv_ll_get_head(_msg_subs_ll_p);
     sub_dsc_t * s_next;
     while(s) {
         /*On unsubscribe the list changes s becomes invalid so get next item while it's surely valid*/
-        s_next = _lv_ll_get_next(&LV_GC_ROOT(_subs_ll), s);
+        s_next = _lv_ll_get_next(_msg_subs_ll_p, s);
         if(s->_priv_data == obj) {
             lv_msg_unsubscribe(s);
         }
