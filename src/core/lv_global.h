@@ -64,53 +64,45 @@ struct _lv_freetype_context_t;
 #endif
 
 typedef struct {
-    lv_ll_t disp_ll;
-    lv_ll_t indev_ll;
-    lv_ll_t group_ll;
-    lv_ll_t fsdrv_ll;
-    lv_ll_t img_decoder_ll;
-    lv_ll_t obj_style_trans_ll;
-    lv_layout_dsc_t * layout_list;
-
     bool inited;
-    bool style_refresh;
 
+    lv_ll_t disp_ll;
     struct _lv_disp_t * disp_refresh;
     struct _lv_disp_t * disp_default;
 
-    struct _lv_group_t * group_default;
-    lv_img_cache_manager_t img_cache_mgr;
-
-    struct _lv_indev_t * indev_active;
-    struct _lv_obj_t * indev_obj_active;
-
-    uint32_t layout_count;
-    uint32_t memory_zero;
-
-    uint32_t math_rand_seed;
-    bool layout_update_mutex;
-
-    lv_area_transform_cache_t area_trans_cache;
-
+    lv_ll_t style_trans_ll;
+    bool style_refresh;
     uint32_t style_custom_table_size;
     uint16_t style_last_custom_prop_id;
     uint8_t * style_custom_prop_flag_lookup_table;
 
+    lv_ll_t group_ll;
+    struct _lv_group_t * group_default;
+
+    lv_ll_t indev_ll;
+    struct _lv_indev_t * indev_active;
+    struct _lv_obj_t * indev_obj_active;
+
+    uint32_t layout_count;
+    lv_layout_dsc_t * layout_list;
+    bool layout_update_mutex;
+
+    uint32_t memory_zero;
+    uint32_t math_rand_seed;
+    lv_area_transform_cache_t area_trans_cache;
+
     struct _lv_event_t * event_header;
     uint32_t event_last_register_id;
-
-    lv_log_print_g_cb_t custom_log_print_cb;
-#if LV_LOG_USE_TIMESTAMP
-    uint32_t log_last_log_time;
-#endif
 
     lv_timer_state_t timer_state;
     lv_anim_state_t anim_state;
     lv_tick_state_t tick_state;
 
+    lv_ll_t img_decoder_ll;
+    lv_img_cache_manager_t img_cache_mgr;
 #if LV_IMG_CACHE_DEF_SIZE
     uint16_t img_cache_entry_cnt;
-    _lv_img_cache_entry_t* img_cache_array;
+    _lv_img_cache_entry_t * img_cache_array;
 #else
     _lv_img_cache_entry_t img_cache_single;
 #endif
@@ -123,6 +115,10 @@ typedef struct {
     _lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
 #endif
 
+    lv_log_print_g_cb_t custom_log_print_cb;
+#if LV_LOG_USE_TIMESTAMP
+    uint32_t log_last_log_time;
+#endif
 
 #if LV_USE_THEME_BASIC
     struct _my_theme_t * theme_basic;
@@ -140,6 +136,7 @@ typedef struct {
     lv_tlsf_state_t tlsf_state;
 #endif
 
+    lv_ll_t fsdrv_ll;
 #if LV_USE_FS_STDIO != '\0'
     lv_fs_drv_t stdio_fs_drv;
 #endif

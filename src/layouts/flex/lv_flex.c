@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define layout_list lv_global_default()->layout_list
+#define layout_list_def lv_global_default()->layout_list
 
 /**********************
  *      TYPEDEFS
@@ -96,8 +96,8 @@ static lv_coord_t lv_obj_get_height_with_margin(const lv_obj_t * obj);
 
 void lv_flex_init(void)
 {
-    layout_list[LV_LAYOUT_FLEX].cb = flex_update;
-    layout_list[LV_LAYOUT_FLEX].user_data = NULL;
+    layout_list_def[LV_LAYOUT_FLEX].cb = flex_update;
+    layout_list_def[LV_LAYOUT_FLEX].user_data = NULL;
 
 }
 

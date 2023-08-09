@@ -18,7 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define layout_list lv_global_default()->layout_list
+#define layout_list_def lv_global_default()->layout_list
 
 /**
  * Some helper defines
@@ -140,8 +140,8 @@ static inline lv_coord_t get_margin_ver(lv_obj_t * obj)
 
 void lv_grid_init(void)
 {
-    layout_list[LV_LAYOUT_GRID].cb = grid_update;
-    layout_list[LV_LAYOUT_GRID].user_data = NULL;
+    layout_list_def[LV_LAYOUT_GRID].cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].user_data = NULL;
 }
 
 void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const lv_coord_t col_dsc[], const lv_coord_t row_dsc[])
