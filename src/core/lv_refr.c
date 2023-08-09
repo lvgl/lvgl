@@ -565,40 +565,13 @@ static void refr_sync_areas(void)
 	}
 
 	/*Copy sync areas (if any remaining)*/
-	for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL; sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+	for (sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL; sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
 		disp_refr->driver->draw_ctx->buffer_copy(
 			disp_refr->driver->draw_ctx,
 			buf_off_screen, stride, sync_area,
 			buf_on_screen, stride, sync_area
 		);
 	}
-
-//	bool sync;
-//	lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
-//	lv_area_t *sync_area;
-//	uint32_t i;
-//	for(sync_area = head_sync_area; sync_area != NULL; sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
-//		sync = true;
-//		for(i = 0; i < disp_refr->inv_p; i++) {
-//			/*Skip joined areas*/
-//			if (disp_refr->inv_area_joined[i]) continue;
-//
-//			/*Sync area is fully inside inv area; Do not sync*/
-//			if (_lv_area_is_in(sync_area, &disp_refr->inv_areas[i], 0)) {
-//				sync = false;
-//				break;
-//			}
-//		}
-//
-//		/*Sync area should be copied*/
-//		if (sync) {
-//			disp_refr->driver->draw_ctx->buffer_copy(
-//				disp_refr->driver->draw_ctx,
-//				buf_off_screen, stride, sync_area,
-//				buf_on_screen, stride, sync_area
-//			);
-//		}
-//	}
 
 	/*Clear sync areas*/
 	_lv_ll_clear(&disp_refr->sync_areas);
