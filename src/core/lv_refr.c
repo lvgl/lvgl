@@ -335,7 +335,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
 				if (disp_refr->inv_area_joined[i])
 					continue;
 
-				disp_refr->sync_areas[disp_refr->sync_p++] = disp_refr->inv_areas[i];
+				lv_area_t *sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
+				*sync_area = disp_refr->inv_areas[i];
 			}
     	}
 
@@ -513,11 +514,11 @@ static void lv_refr_join_area(void)
  */
 static void refr_sync_areas(void)
 {
-	/*Do not sync if no sync areas*/
-	if (disp_refr->sync_p == 0) return;
-
 	/*Do not sync if not double buffered*/
 	if (!disp_refr->driver->direct_mode) return;
+
+	/*Do not sync if no sync areas*/
+	if (_lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
 	/*The buffers are already swapped.
 	 *So the active buffer is the off screen buffer where LVGL will render*/
@@ -526,36 +527,81 @@ static void refr_sync_areas(void)
 						   ? disp_refr->driver->draw_buf->buf2
 						   : disp_refr->driver->draw_buf->buf1;
 
-	/*Iterate through invalidated areas to see if sync area should be copied*/
-	bool sync;
+	/*Get stride for buffer copy*/
 	lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
-	uint32_t i, j;
-	for(i = 0; i < disp_refr->sync_p; i++) {
-		sync = true;
-		for(j = 0; j < disp_refr->inv_p; j++) {
 
-			/*Skip joined areas*/
-			if (disp_refr->inv_area_joined[j]) continue;
+	/*Iterate through invalidated areas to see if sync area should be copied*/
+	lv_area_t res[4] = {0};
+	int8_t res_c;
+	uint32_t i,j;
+	lv_area_t *sync_area, *new_area, *next_area;
+	for (i = 0; i < disp_refr->inv_p; i++) {
+		/*Skip joined areas*/
+		if (disp_refr->inv_area_joined[i]) continue;
 
-			/*Sync area is fully inside inv area; Do not sync*/
-			if (_lv_area_is_in(&disp_refr->sync_areas[i], &disp_refr->inv_areas[j], 0)) {
-				sync = false;
-				break;
+		/*Iterate over sync areas*/
+		sync_area = _lv_ll_get_head(&disp_refr->sync_areas);
+		while (sync_area != NULL) {
+			/*Get next sync area*/
+			next_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area);
+
+			/*Remove intersect of redraw area from sync area and get remaining areas*/
+			res_c = _lv_area_diff(res, sync_area, &disp_refr->inv_areas[i]);
+
+			/*New sub areas created after removing intersect*/
+			if (res_c != -1) {
+				/*Replace old sync area with new areas*/
+				for (j = 0; j < res_c; j++) {
+					new_area = _lv_ll_ins_prev(&disp_refr->sync_areas, sync_area);
+					*new_area = res[j];
+				}
+				_lv_ll_remove(&disp_refr->sync_areas, sync_area);
+				lv_mem_free(sync_area);
 			}
-		}
 
-		/*Sync area should be copied*/
-		if (sync) {
-			disp_refr->driver->draw_ctx->buffer_copy(
-				disp_refr->driver->draw_ctx,
-				buf_off_screen, stride, &disp_refr->sync_areas[i],
-				buf_on_screen, stride, &disp_refr->sync_areas[i]
-			);
+			/*Move on to next sync area*/
+			sync_area = next_area;
 		}
 	}
 
-	/*Reset sync area count*/
-	disp_refr->sync_p = 0;
+	/*Copy sync areas (if any remaining)*/
+	for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL; sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+		disp_refr->driver->draw_ctx->buffer_copy(
+			disp_refr->driver->draw_ctx,
+			buf_off_screen, stride, sync_area,
+			buf_on_screen, stride, sync_area
+		);
+	}
+
+//	bool sync;
+//	lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+//	lv_area_t *sync_area;
+//	uint32_t i;
+//	for(sync_area = head_sync_area; sync_area != NULL; sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+//		sync = true;
+//		for(i = 0; i < disp_refr->inv_p; i++) {
+//			/*Skip joined areas*/
+//			if (disp_refr->inv_area_joined[i]) continue;
+//
+//			/*Sync area is fully inside inv area; Do not sync*/
+//			if (_lv_area_is_in(sync_area, &disp_refr->inv_areas[i], 0)) {
+//				sync = false;
+//				break;
+//			}
+//		}
+//
+//		/*Sync area should be copied*/
+//		if (sync) {
+//			disp_refr->driver->draw_ctx->buffer_copy(
+//				disp_refr->driver->draw_ctx,
+//				buf_off_screen, stride, sync_area,
+//				buf_on_screen, stride, sync_area
+//			);
+//		}
+//	}
+
+	/*Clear sync areas*/
+	_lv_ll_clear(&disp_refr->sync_areas);
 }
 
 /**

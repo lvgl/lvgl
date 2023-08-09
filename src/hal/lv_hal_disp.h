@@ -23,6 +23,7 @@ extern "C" {
 #include "../misc/lv_area.h"
 #include "../misc/lv_ll.h"
 #include "../misc/lv_timer.h"
+#include "../misc/lv_ll.h"
 
 /*********************
  *      DEFINES
@@ -190,8 +191,7 @@ uint8_t del_prev  :
     int32_t inv_en_cnt;
 
     /** Double buffer sync areas */
-    lv_area_t sync_areas[LV_INV_BUF_SIZE];
-    uint16_t sync_p;
+    lv_ll_t sync_areas;
 
     /*Miscellaneous data*/
     uint32_t last_activity_time;        /**< Last time when there was activity on this display*/
