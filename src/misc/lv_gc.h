@@ -44,7 +44,6 @@ extern "C" {
 
 #define LV_ITERATE_ROOTS(f)                                                                            \
     LV_DISPATCH(f, lv_ll_t, _lv_fsdrv_ll)                                                              \
-    LV_DISPATCH(f, lv_ll_t, _lv_group_ll)                                                              \
     LV_DISPATCH(f, lv_ll_t, _lv_img_decoder_ll)                                                        \
     LV_DISPATCH(f, lv_ll_t, _lv_obj_style_trans_ll)                                                    \
     LV_DISPATCH(f, lv_layout_dsc_t *, _lv_layout_list)                                                 \
