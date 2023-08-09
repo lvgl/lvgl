@@ -162,8 +162,7 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_basic_is_inited()) {
-        LV_GC_ROOT(_lv_theme_basic_data) = lv_malloc(sizeof(my_theme_t));
-        theme_def  = (my_theme_t *)LV_GC_ROOT(_lv_theme_basic_data);
+        theme_def  = (my_theme_t *)lv_malloc(sizeof(my_theme_t));
         lv_memzero(theme_def, sizeof(my_theme_t));
     }
 
