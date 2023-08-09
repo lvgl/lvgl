@@ -68,6 +68,7 @@ typedef struct {
     lv_ll_t group_ll;
     lv_ll_t fsdrv_ll;
     lv_ll_t img_decoder_ll;
+    lv_ll_t obj_style_trans_ll;
 
     bool inited;
     bool style_refresh;
