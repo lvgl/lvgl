@@ -383,7 +383,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
                            : disp_refr->buf_1;
 
     lv_coord_t stride = lv_draw_buf_width_to_stride(lv_disp_get_hor_res(disp_refr),
-                                                    lv_color_format_get_size(disp_refr->color_format));
+                                                    lv_disp_get_color_format(disp_refr));
     uint32_t i;
     for(i = 0; i < disp_refr->inv_p; i++) {
         if(disp_refr->inv_area_joined[i]) continue;
