@@ -83,6 +83,8 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 
     disp->inv_en_cnt = 1;
 
+    _lv_ll_init(&disp->sync_areas, sizeof(lv_area_t));
+
     lv_disp_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
@@ -167,6 +169,7 @@ void lv_disp_remove(lv_disp_t * disp)
         lv_obj_del(disp->screens[0]);
     }
 
+    _lv_ll_clear(&disp->sync_areas);
     _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
     if(disp->refr_timer) lv_timer_del(disp->refr_timer);
     lv_free(disp);
