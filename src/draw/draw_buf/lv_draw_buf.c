@@ -102,14 +102,11 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * d
     uint8_t * src_bufc =  src_buf;
 
     /*Got the first pixel of each buffer*/
-    dest_bufc += dest_stride * px_size * dest_area->y1;
+    dest_bufc += dest_stride * dest_area->y1;
     dest_bufc += dest_area->x1 * px_size;
 
-    src_bufc += src_stride * px_size * src_area->y1;
+    src_bufc += src_stride * src_area->y1;
     src_bufc += src_area->x1 * px_size;
-
-    src_stride *= px_size;
-    dest_stride *= px_size;
 
     uint32_t line_length = lv_area_get_width(dest_area) * px_size;
     lv_coord_t y;

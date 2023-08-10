@@ -1258,13 +1258,13 @@ static void indev_click_focus(lv_indev_t * indev)
         }
         /*The object are not in group*/
         else {
-            if(indev->pointer.last_pressed) {
+            if(indev->pointer.last_pressed != indev_obj_act) {
                 lv_obj_send_event(indev->pointer.last_pressed, LV_EVENT_DEFOCUSED, indev_act);
                 if(indev_reset_check(indev)) return;
-            }
 
-            lv_obj_send_event(indev_obj_act, LV_EVENT_FOCUSED, indev_act);
-            if(indev_reset_check(indev)) return;
+                lv_obj_send_event(indev_obj_act, LV_EVENT_FOCUSED, indev_act);
+                if(indev_reset_check(indev)) return;
+            }
         }
     }
     /*The object are not in the same group (in different groups or one has no group)*/

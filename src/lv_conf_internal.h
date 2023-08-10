@@ -2319,18 +2319,29 @@
             #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
         #endif
     #endif
-    #ifndef LV_SDL_PARTIAL_MODE
-        #ifdef CONFIG_LV_SDL_PARTIAL_MODE
-            #define LV_SDL_PARTIAL_MODE CONFIG_LV_SDL_PARTIAL_MODE
+    #ifndef LV_SDL_RENDER_MODE
+        #ifdef CONFIG_LV_SDL_RENDER_MODE
+            #define LV_SDL_RENDER_MODE CONFIG_LV_SDL_RENDER_MODE
         #else
-            #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
+            #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+        #endif
+    #endif
+    #ifndef LV_SDL_BUF_COUNT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_SDL_BUF_COUNT
+                #define LV_SDL_BUF_COUNT CONFIG_LV_SDL_BUF_COUNT
+            #else
+                #define LV_SDL_BUF_COUNT 0
+            #endif
+        #else
+            #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
         #endif
     #endif
     #ifndef LV_SDL_FULLSCREEN
         #ifdef CONFIG_LV_SDL_FULLSCREEN
             #define LV_SDL_FULLSCREEN CONFIG_LV_SDL_FULLSCREEN
         #else
-            #define LV_SDL_FULLSCREEN      0
+            #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
         #endif
     #endif
     #ifndef LV_SDL_DIRECT_EXIT
