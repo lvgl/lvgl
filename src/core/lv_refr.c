@@ -373,14 +373,14 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     if(!lv_disp_is_double_buffered(disp_refr) || disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) goto refr_clean_up;
 
     /*Copy invalid areas for sync next refresh*/
-	uint16_t i;
-	for(i = 0; i < disp_refr->inv_p; i++) {
-		if (disp_refr->inv_area_joined[i])
-			continue;
+    uint16_t i;
+    for(i = 0; i < disp_refr->inv_p; i++) {
+        if(disp_refr->inv_area_joined[i])
+            continue;
 
-		lv_area_t *sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
-		*sync_area = disp_refr->inv_areas[i];
-	}
+        lv_area_t * sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
+        *sync_area = disp_refr->inv_areas[i];
+    }
 
 refr_clean_up:
     lv_memzero(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
@@ -446,14 +446,14 @@ static void lv_refr_join_area(void)
  */
 static void refr_sync_areas(void)
 {
-	/*Do not sync if not direct or double buffered*/
-	if (disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) return;
+    /*Do not sync if not direct or double buffered*/
+    if(disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) return;
 
-	/*Do not sync if not double buffered*/
+    /*Do not sync if not double buffered*/
     if(!lv_disp_is_double_buffered(disp_refr)) return;
 
-	/*Do not sync if no sync areas*/
-	if (_lv_ll_is_empty(&disp_refr->sync_areas)) return;
+    /*Do not sync if no sync areas*/
+    if(_lv_ll_is_empty(&disp_refr->sync_areas)) return;
 
     /*With double buffered direct mode synchronize the rendered areas to the other buffer*/
     /*We need to wait for ready here to not mess up the active screen*/
@@ -467,55 +467,56 @@ static void refr_sync_areas(void)
                            : disp_refr->buf_1;
 
     /*Get stride for buffer copy*/
-	lv_coord_t stride = lv_draw_buf_width_to_stride(
-		lv_disp_get_hor_res(disp_refr),
-		lv_disp_get_color_format(disp_refr));
+    lv_coord_t stride = lv_draw_buf_width_to_stride(
+                            lv_disp_get_hor_res(disp_refr),
+                            lv_disp_get_color_format(disp_refr));
 
-	/*Iterate through invalidated areas to see if sync area should be copied*/
-	lv_area_t res[4] = {0};
-	int8_t res_c;
-	uint32_t i,j;
-	lv_area_t *sync_area, *new_area, *next_area;
-	for (i = 0; i < disp_refr->inv_p; i++) {
-		/*Skip joined areas*/
-		if (disp_refr->inv_area_joined[i]) continue;
+    /*Iterate through invalidated areas to see if sync area should be copied*/
+    lv_area_t res[4] = {0};
+    int8_t res_c;
+    uint32_t i, j;
+    lv_area_t * sync_area, * new_area, * next_area;
+    for(i = 0; i < disp_refr->inv_p; i++) {
+        /*Skip joined areas*/
+        if(disp_refr->inv_area_joined[i]) continue;
 
-		/*Iterate over sync areas*/
-		sync_area = _lv_ll_get_head(&disp_refr->sync_areas);
-		while (sync_area != NULL) {
-			/*Get next sync area*/
-			next_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area);
+        /*Iterate over sync areas*/
+        sync_area = _lv_ll_get_head(&disp_refr->sync_areas);
+        while(sync_area != NULL) {
+            /*Get next sync area*/
+            next_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area);
 
-			/*Remove intersect of redraw area from sync area and get remaining areas*/
-			res_c = _lv_area_diff(res, sync_area, &disp_refr->inv_areas[i]);
+            /*Remove intersect of redraw area from sync area and get remaining areas*/
+            res_c = _lv_area_diff(res, sync_area, &disp_refr->inv_areas[i]);
 
-			/*New sub areas created after removing intersect*/
-			if (res_c != -1) {
-				/*Replace old sync area with new areas*/
-				for (j = 0; j < res_c; j++) {
-					new_area = _lv_ll_ins_prev(&disp_refr->sync_areas, sync_area);
-					*new_area = res[j];
-				}
-				_lv_ll_remove(&disp_refr->sync_areas, sync_area);
-				lv_free(sync_area);
-			}
+            /*New sub areas created after removing intersect*/
+            if(res_c != -1) {
+                /*Replace old sync area with new areas*/
+                for(j = 0; j < res_c; j++) {
+                    new_area = _lv_ll_ins_prev(&disp_refr->sync_areas, sync_area);
+                    *new_area = res[j];
+                }
+                _lv_ll_remove(&disp_refr->sync_areas, sync_area);
+                lv_free(sync_area);
+            }
 
-			/*Move on to next sync area*/
-			sync_area = next_area;
-		}
-	}
+            /*Move on to next sync area*/
+            sync_area = next_area;
+        }
+    }
 
-	/*Copy sync areas (if any remaining)*/
-	for (sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL; sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
-		lv_draw_buf_copy(
-			buf_off_screen, stride, sync_area,
-			buf_on_screen, stride, sync_area,
-			lv_disp_get_color_format(disp_refr)
-		);
-	}
+    /*Copy sync areas (if any remaining)*/
+    for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
+        sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+        lv_draw_buf_copy(
+            buf_off_screen, stride, sync_area,
+            buf_on_screen, stride, sync_area,
+            lv_disp_get_color_format(disp_refr)
+        );
+    }
 
-	/*Clear sync areas*/
-	_lv_ll_clear(&disp_refr->sync_areas);
+    /*Clear sync areas*/
+    _lv_ll_clear(&disp_refr->sync_areas);
 }
 
 /**

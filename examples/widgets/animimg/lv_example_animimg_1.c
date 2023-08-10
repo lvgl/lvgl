@@ -6,8 +6,8 @@ LV_IMG_DECLARE(animimg003)
 
 static const lv_img_dsc_t * anim_imgs[3] = {
     &animimg001,
-    &animimg002,
-    &animimg003,
+    & animimg002,
+    & animimg003,
 };
 
 void lv_example_animimg_1(void)

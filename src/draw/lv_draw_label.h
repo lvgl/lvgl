@@ -67,7 +67,7 @@ typedef struct {
     lv_text_flag_t flag;
     lv_text_decor_t decor : 3;
     lv_blend_mode_t blend_mode: 3;
-uint8_t text_local  :
+    uint8_t text_local  :
     1;        /**< 1: malloc buffer and copy `text` there. 0: `text` is const and it's pointer will be valid during rendering*/
     lv_draw_label_hint_t * hint;
 } lv_draw_label_dsc_t;

@@ -1703,7 +1703,7 @@ static unsigned encodeLZ77(uivector * out, Hash * hash,
     unsigned hashval;
     unsigned current_offset, current_length;
     unsigned prev_offset;
-    const unsigned char * lastptr, *foreptr, *backptr;
+    const unsigned char * lastptr, * foreptr, * backptr;
     unsigned hashpos;
 
     if(windowsize == 0 || windowsize > 32768) return 60; /*error: windowsize smaller/larger than allowed*/
@@ -2717,7 +2717,7 @@ unsigned lodepng_chunk_append(unsigned char ** out, size_t * outsize, const unsi
 {
     unsigned i;
     size_t total_chunk_length, new_length;
-    unsigned char * chunk_start, *new_buffer;
+    unsigned char * chunk_start, * new_buffer;
 
     if(lodepng_addofl(lodepng_chunk_length(chunk), 12, &total_chunk_length)) return 77;
     if(lodepng_addofl(*outsize, total_chunk_length, &new_length)) return 77;
@@ -4761,7 +4761,7 @@ static unsigned readChunk_bKGD(LodePNGInfo * info, const unsigned char * data, s
 static unsigned readChunk_tEXt(LodePNGInfo * info, const unsigned char * data, size_t chunkLength)
 {
     unsigned error = 0;
-    char * key = 0, *str = 0;
+    char * key = 0, * str = 0;
 
     while(!error) { /*not really a while loop, only used to break on error*/
         unsigned length, string2_begin;
@@ -4857,7 +4857,7 @@ static unsigned readChunk_iTXt(LodePNGInfo * info, const LodePNGDecoderSettings 
     LodePNGDecompressSettings zlibsettings = decoder->zlibsettings;
 
     unsigned length, begin, compressed;
-    char * key = 0, *langtag = 0, *transkey = 0;
+    char * key = 0, * langtag = 0, * transkey = 0;
 
     while(!error) { /*not really a while loop, only used to break on error*/
         /*Quick check if the chunk length isn't too small. Even without check
@@ -5484,7 +5484,7 @@ static unsigned writeSignature(ucvector * out)
 static unsigned addChunk_IHDR(ucvector * out, unsigned w, unsigned h,
                               LodePNGColorType colortype, unsigned bitdepth, unsigned interlace_method)
 {
-    unsigned char * chunk, *data;
+    unsigned char * chunk, * data;
     CERROR_TRY_RETURN(lodepng_chunk_init(&chunk, out, 13, "IHDR"));
     data = chunk + 8;
 

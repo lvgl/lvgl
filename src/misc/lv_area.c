@@ -152,71 +152,67 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
  */
 int8_t _lv_area_diff(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
-	/*Areas have no common parts*/
-	if (!_lv_area_is_on(a1_p, a2_p)) return -1;
+    /*Areas have no common parts*/
+    if(!_lv_area_is_on(a1_p, a2_p)) return -1;
 
-	/*No remaining areas after removing common parts*/
-	if (_lv_area_is_in(a1_p, a2_p, 0)) return 0;
+    /*No remaining areas after removing common parts*/
+    if(_lv_area_is_in(a1_p, a2_p, 0)) return 0;
 
-	/*Result counter*/
-	int8_t res_c = 0;
+    /*Result counter*/
+    int8_t res_c = 0;
 
-	/*Get required information*/
-	lv_area_t n;
-	lv_coord_t a1_w = lv_area_get_width(a1_p) - 1;
-	lv_coord_t a1_h = lv_area_get_height(a1_p) - 1;
+    /*Get required information*/
+    lv_area_t n;
+    lv_coord_t a1_w = lv_area_get_width(a1_p) - 1;
+    lv_coord_t a1_h = lv_area_get_height(a1_p) - 1;
 
-	/*Compute top rectangle*/
-	lv_coord_t th = a2_p->y1 - a1_p->y1;
-	if(th > 0)
-	{
-		n.x1 = a1_p->x1;
-		n.y1 = a1_p->y1;
-		n.x2 = a1_p->x2;
-		n.y2 = a1_p->y1 + th;
-		res_p[res_c++] = n;
-	}
+    /*Compute top rectangle*/
+    lv_coord_t th = a2_p->y1 - a1_p->y1;
+    if(th > 0) {
+        n.x1 = a1_p->x1;
+        n.y1 = a1_p->y1;
+        n.x2 = a1_p->x2;
+        n.y2 = a1_p->y1 + th;
+        res_p[res_c++] = n;
+    }
 
-	/*Compute the bottom rectangle*/
-	lv_coord_t bh = a1_h - (a2_p->y2 - a1_p->y1);
-	if (bh > 0 && a2_p->y2 < a1_p->y2)
-	{
-		n.x1 = a1_p->x1;
-		n.y1 = a2_p->y2;
-		n.x2 = a1_p->x2;
-		n.y2 = a2_p->y2 + bh;
-		res_p[res_c++] = n;
-	}
+    /*Compute the bottom rectangle*/
+    lv_coord_t bh = a1_h - (a2_p->y2 - a1_p->y1);
+    if(bh > 0 && a2_p->y2 < a1_p->y2) {
+        n.x1 = a1_p->x1;
+        n.y1 = a2_p->y2;
+        n.x2 = a1_p->x2;
+        n.y2 = a2_p->y2 + bh;
+        res_p[res_c++] = n;
+    }
 
-	/*Compute side height*/
-	lv_coord_t y1 = a2_p->y1 > a1_p->y1 ? a2_p->y1 : a1_p->y1;
-	lv_coord_t y2 = a2_p->y2 < a1_p->y2 ? a2_p->y2 : a1_p->y2;
-	lv_coord_t sh = y2 - y1;
+    /*Compute side height*/
+    lv_coord_t y1 = a2_p->y1 > a1_p->y1 ? a2_p->y1 : a1_p->y1;
+    lv_coord_t y2 = a2_p->y2 < a1_p->y2 ? a2_p->y2 : a1_p->y2;
+    lv_coord_t sh = y2 - y1;
 
-	/*Compute the left rectangle*/
-	lv_coord_t lw = a2_p->x1 - a1_p->x1;
-	if (lw > 0 && sh > 0)
-	{
-		n.x1 = a1_p->x1;
-		n.y1 = y1;
-		n.x2 = a1_p->x1 + lw;
-		n.y2 = y1 + sh;
-		res_p[res_c++] = n;
-	}
+    /*Compute the left rectangle*/
+    lv_coord_t lw = a2_p->x1 - a1_p->x1;
+    if(lw > 0 && sh > 0) {
+        n.x1 = a1_p->x1;
+        n.y1 = y1;
+        n.x2 = a1_p->x1 + lw;
+        n.y2 = y1 + sh;
+        res_p[res_c++] = n;
+    }
 
-	/*Compute the right rectangle*/
-	lv_coord_t rw = a1_w - (a2_p->x2 - a1_p->x1);
-	if (rw > 0)
-	{
-		n.x1 = a2_p->x2;
-		n.y1 = y1;
-		n.x2 = a2_p->x2 + rw;
-		n.y2 = y1 + sh;
-		res_p[res_c++] = n;
-	}
+    /*Compute the right rectangle*/
+    lv_coord_t rw = a1_w - (a2_p->x2 - a1_p->x1);
+    if(rw > 0) {
+        n.x1 = a2_p->x2;
+        n.y1 = y1;
+        n.x2 = a2_p->x2 + rw;
+        n.y2 = y1 + sh;
+        res_p[res_c++] = n;
+    }
 
-	//Return number of results
-	return res_c;
+    //Return number of results
+    return res_c;
 }
 
 /**

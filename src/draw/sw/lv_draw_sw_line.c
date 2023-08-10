@@ -303,7 +303,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
     lv_draw_sw_mask_line_param_t mask_top_param;
     lv_draw_sw_mask_line_param_t mask_bottom_param;
 
-    void * masks[5] = {&mask_left_param, &mask_right_param, NULL, NULL, NULL};
+    void * masks[5] = {&mask_left_param, & mask_right_param, NULL, NULL, NULL};
 
 
     if(flat) {

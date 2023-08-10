@@ -350,7 +350,7 @@ static stbrp__findresult stbrp__skyline_find_best_pos(stbrp_context * c, int wid
 {
     int best_waste = (1 << 30), best_x, best_y = (1 << 30);
     stbrp__findresult fr;
-    stbrp_node ** prev, *node, *tail, **best = NULL;
+    stbrp_node ** prev, * node, * tail, ** best = NULL;
 
     // align to multiple of c->align
     width = (width + c->align - 1);
@@ -453,7 +453,7 @@ static stbrp__findresult stbrp__skyline_pack_rectangle(stbrp_context * context, 
 {
     // find best position according to heuristic
     stbrp__findresult res = stbrp__skyline_find_best_pos(context, width, height);
-    stbrp_node * node, *cur;
+    stbrp_node * node, * cur;
 
     // bail if:
     //    1. it failed
