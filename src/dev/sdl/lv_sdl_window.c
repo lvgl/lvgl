@@ -26,7 +26,9 @@ typedef struct {
     SDL_Window * window;
     SDL_Renderer * renderer;
     SDL_Texture * texture;
-    uint8_t * fb;
+    uint8_t * fb1;
+    uint8_t * fb2;
+    uint8_t * fb_act;
     uint8_t zoom;
     uint8_t ignore_size_chg;
 } lv_sdl_window_t;
@@ -96,14 +98,20 @@ lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
     window_create(disp);
 
     lv_disp_set_flush_cb(disp, flush_cb);
-#if LV_SDL_PARTIAL_MODE
-    uint8_t * buf = malloc(32 * 1024);
-    lv_disp_set_draw_buffers(disp, buf, NULL,
-                             32 * 1024, LV_DISP_RENDER_MODE_PARTIAL);
-#else
-    uint32_t stride = lv_draw_buf_width_to_stride(lv_disp_get_hor_res(disp), lv_disp_get_color_format(disp));
-    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, stride * lv_disp_get_ver_res(disp), LV_DISP_RENDER_MODE_DIRECT);
+    if(LV_SDL_RENDER_MODE == LV_DISP_RENDER_MODE_PARTIAL) {
+        uint8_t * buf1 = malloc(32 * 1024);
+        uint8_t * buf2 = NULL;
+#if LV_SDL_BUF_COUNT == 2
+        buf2 = malloc(32 * 1024);
 #endif
+        lv_disp_set_draw_buffers(disp, buf1, buf2,
+                                 32 * 1024, LV_DISP_RENDER_MODE_PARTIAL);
+    }
+    /*LV_DISP_RENDER_MODE_DIRECT or FULL */
+    else {
+        uint32_t stride = lv_draw_buf_width_to_stride(lv_disp_get_hor_res(disp), lv_disp_get_color_format(disp));
+        lv_disp_set_draw_buffers(disp, dsc->fb1, dsc->fb2, stride * lv_disp_get_ver_res(disp), LV_SDL_RENDER_MODE);
+    }
     lv_disp_add_event(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
     return disp;
@@ -160,29 +168,30 @@ void lv_sdl_quit()
 
 static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
-#if LV_SDL_PARTIAL_MODE
-    int32_t y;
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    uint8_t * fb_tmp = dsc->fb;
-    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
-    uint32_t px_map_stride = lv_area_get_width(area) * px_size;
-    lv_coord_t fb_stride = lv_disp_get_hor_res(disp) * px_size;
-    fb_tmp += area->y1 * fb_stride;
-    fb_tmp += area->x1 * px_size;
-    for(y = area->y1; y <= area->y2; y++) {
-        lv_memcpy(fb_tmp, px_map, px_map_stride);
-        px_map += px_map_stride;
-        fb_tmp += fb_stride;
+    if(LV_SDL_RENDER_MODE == LV_DISP_RENDER_MODE_PARTIAL) {
+        int32_t y;
+        uint8_t * fb_tmp = dsc->fb_act;
+        uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+        uint32_t px_map_stride = lv_area_get_width(area) * px_size;
+        lv_coord_t fb_stride = lv_disp_get_hor_res(disp) * px_size;
+        fb_tmp += area->y1 * fb_stride;
+        fb_tmp += area->x1 * px_size;
+        for(y = area->y1; y <= area->y2; y++) {
+            lv_memcpy(fb_tmp, px_map, px_map_stride);
+            px_map += px_map_stride;
+            fb_tmp += fb_stride;
+        }
     }
-#else
-    LV_UNUSED(area);
-    LV_UNUSED(px_map);
-#endif
 
 
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
     if(lv_disp_flush_is_last(disp)) {
+
+        if(LV_SDL_RENDER_MODE != LV_DISP_RENDER_MODE_PARTIAL) {
+            dsc->fb_act = px_map;
+        }
         window_update(disp);
     }
 
@@ -270,7 +279,10 @@ static void window_create(lv_disp_t * disp)
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
     texture_resize(disp);
     uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
-    lv_memset(dsc->fb, 0xff, hor_res * ver_res * px_size);
+    lv_memset(dsc->fb1, 0xff, hor_res * ver_res * px_size);
+#if LV_SDL_DIRECT_MODE_2_BUF
+    lv_memset(dsc->fb2, 0xff, hor_res * ver_res * px_size);
+#endif
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
     SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
     texture_resize(disp);
@@ -281,7 +293,7 @@ static void window_update(lv_disp_t * disp)
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_disp_get_color_format(disp));
-    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb, stride);
+    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
 
     SDL_RenderClear(dsc->renderer);
 
@@ -297,12 +309,19 @@ static void texture_resize(lv_disp_t * disp)
     uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_disp_get_color_format(disp));
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
 
-    dsc->fb = realloc(dsc->fb, stride * ver_res);
-    memset(dsc->fb, 0x00, stride * ver_res);
+    dsc->fb1 = realloc(dsc->fb1, stride * ver_res);
+    memset(dsc->fb1, 0x00, stride * ver_res);
 
-#if LV_SDL_PARTIAL_MODE == 0
-    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, stride * ver_res, LV_DISP_RENDER_MODE_DIRECT);
+    if(LV_SDL_RENDER_MODE == LV_DISP_RENDER_MODE_PARTIAL) {
+        dsc->fb_act = dsc->fb1;
+    }
+    else {
+#if LV_SDL_BUF_COUNT == 2
+        dsc->fb2 = realloc(dsc->fb2, stride * ver_res);
+        memset(dsc->fb2, 0x00, stride * ver_res);
 #endif
+        lv_disp_set_draw_buffers(disp, dsc->fb1, dsc->fb2, stride * ver_res, LV_SDL_RENDER_MODE);
+    }
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 
 #if LV_COLOR_DEPTH == 32
