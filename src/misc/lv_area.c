@@ -150,7 +150,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
  * @param a2_p pointer to the second area
  * @return number of results or -1 if no intersect
  */
-int8_t _lv_area_diff(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
+int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /*Areas have no common parts*/
     if(!_lv_area_is_on(a1_p, a2_p)) return -1;

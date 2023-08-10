@@ -196,7 +196,7 @@ bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area
  * @param a2_p pointer to the second area
  * @return number of results (max 4) or -1 if no intersect
  */
-int8_t _lv_area_diff(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p);
+int8_t _lv_area_diff(lv_area_t res_p[], const lv_area_t * a1_p, const lv_area_t * a2_p);
 
 /**
  * Join two areas into a third which involves the other two
