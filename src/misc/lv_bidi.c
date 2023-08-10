@@ -248,7 +248,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
         pos_conv_rd++;
         dir = lv_bidi_get_letter_dir(letter);
         if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(str_in, rd, len, letter, base_dir);
-        if(dir != LV_BASE_DIR_NEUTRAL && dir != LV_BASE_DIR_WEAK) break;
+        else if(dir != LV_BASE_DIR_WEAK) break;
     }
 
     if(rd && str_in[rd] != '\0') {
