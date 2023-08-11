@@ -550,6 +550,11 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         /*Set the new value*/
         int16_t old_value = arc->value;
         int16_t new_value = lv_map(angle, arc->bg_angle_start, bg_end, arc->min_value, arc->max_value);
+        if(arc->type == LV_ARC_MODE_REVERSE) {
+            new_value = arc->max_value - new_value + arc->min_value;
+        }
+
+
         if(new_value != lv_arc_get_value(obj)) {
             arc->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
             lv_arc_set_value(obj, new_value); /*set_value caches the last_angle for the next iteration*/
