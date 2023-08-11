@@ -191,11 +191,11 @@ typedef struct _lv_global_t {
 /**********************
  *      MACROS
  **********************/
-#if LV_GLOBAL_CUSTOM == 0
+#ifndef LV_GLOBAL_CUSTOM
 extern lv_global_t lv_global;
 #define LV_GLOBAL_DEFAULT() (&lv_global)
 #else
-#define LV_GLOBAL_DEFAULT() lv_global_default()
+#define LV_GLOBAL_DEFAULT() LV_GLOBAL_CUSTOM
 #endif
 
 /**********************

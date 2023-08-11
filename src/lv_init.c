@@ -39,6 +39,9 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+#ifndef LV_GLOBAL_CUSTOM
+    lv_global_t lv_global;
+#endif
 
 /**********************
  *      MACROS
@@ -73,10 +76,6 @@ static inline void lv_global_init(lv_global_t * global)
     global->sw_shadow_cache.cache_r = -1;
 #endif
 }
-
-#if LV_GLOBAL_CUSTOM == 0
-lv_global_t lv_global;
-#endif
 
 bool lv_is_initialized(void)
 {
@@ -231,7 +230,7 @@ void lv_init(void)
     LV_LOG_TRACE("finished");
 }
 
-#if LV_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 void lv_deinit(void)
 {

@@ -230,8 +230,8 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
-/*For custom `lv_global_default()` implementation set to 1*/
-#define LV_GLOBAL_CUSTOM 0
+/*For custom `lv_global` support by `lv_global_default()`*/
+//#define LV_GLOBAL_CUSTOM lv_global_default()
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.

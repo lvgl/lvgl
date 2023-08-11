@@ -35,7 +35,7 @@ extern "C" {
 void lv_init(void);
 
 
-#if LV_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 /**
  * Deinit the 'lv' library
