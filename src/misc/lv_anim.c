@@ -21,7 +21,7 @@
  *********************/
 #define LV_ANIM_RESOLUTION 1024
 #define LV_ANIM_RES_SHIFT 10
-#define state lv_global_default()->anim_state
+#define state LV_GLOBAL_DEFAULT()->anim_state
 #define anim_ll_p &(state.anim_ll)
 
 /**********************

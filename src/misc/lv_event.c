@@ -16,8 +16,8 @@
  *      DEFINES
  *********************/
 
-#define event_head lv_global_default()->event_header
-#define event_last_id lv_global_default()->event_last_register_id
+#define event_head LV_GLOBAL_DEFAULT()->event_header
+#define event_last_id LV_GLOBAL_DEFAULT()->event_last_register_id
 
 /**********************
  *      TYPEDEFS

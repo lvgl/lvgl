@@ -19,7 +19,7 @@
  *      DEFINES
  *********************/
 #if LV_USE_FONT_COMPRESSED
-    #define font_rle lv_global_default()->font_fmt_rle
+    #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
 #endif /*LV_USE_FONT_COMPRESSED*/
 
 /**********************

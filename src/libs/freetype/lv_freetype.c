@@ -33,7 +33,7 @@
     #error "LV_FREETYPE_CACHE_SIZE must > 0"
 #endif
 
-#define ft_ctx lv_global_default()->ft_context
+#define ft_ctx LV_GLOBAL_DEFAULT()->ft_context
 
 /**********************
  *      TYPEDEFS

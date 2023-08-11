@@ -19,7 +19,7 @@
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
 #define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)
 
-#define quick_access_list_btn_style (lv_global_default()->fe_list_btn_style)
+#define quick_access_list_btn_style (LV_GLOBAL_DEFAULT()->fe_list_btn_style)
 
 /**********************
  *      TYPEDEFS

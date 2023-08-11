@@ -21,7 +21,7 @@
 #define IDLE_MEAS_PERIOD 500 /*[ms]*/
 #define DEF_PERIOD 500
 
-#define state lv_global_default()->timer_state
+#define state LV_GLOBAL_DEFAULT()->timer_state
 #define timer_ll_p &(state.timer_ll)
 
 /**********************

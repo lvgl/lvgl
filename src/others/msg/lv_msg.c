@@ -17,9 +17,9 @@
 /*********************
  *      DEFINES
  *********************/
-#define restart_notify lv_global_default()->msg_restart_notify
-#define _recursion_counter lv_global_default()->msg_recursion_counter
-#define _msg_subs_ll_p &(lv_global_default()->msg_subs_ll)
+#define restart_notify LV_GLOBAL_DEFAULT()->msg_restart_notify
+#define _recursion_counter LV_GLOBAL_DEFAULT()->msg_recursion_counter
+#define _msg_subs_ll_p &(LV_GLOBAL_DEFAULT()->msg_subs_ll)
 
 /**********************
  *      TYPEDEFS

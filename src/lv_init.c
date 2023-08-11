@@ -26,7 +26,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define lv_initialized  lv_global_default()->inited
+#define lv_initialized  LV_GLOBAL_DEFAULT()->inited
 
 /**********************
  *      TYPEDEFS
@@ -75,12 +75,7 @@ static inline void lv_global_init(lv_global_t * global)
 }
 
 #if LV_GLOBAL_CUSTOM == 0
-lv_global_t * lv_global_default(void)
-{
-    static lv_global_t lv_global;
-    return &lv_global;
-}
-
+lv_global_t lv_global;
 #endif
 
 bool lv_is_initialized(void)
@@ -91,7 +86,7 @@ bool lv_is_initialized(void)
 void lv_init(void)
 {
     /*Initialize members of static variable lv_global */
-    lv_global_init(lv_global_default());
+    lv_global_init(LV_GLOBAL_DEFAULT());
 
     /*Do nothing if already initialized*/
     if(lv_initialized) {

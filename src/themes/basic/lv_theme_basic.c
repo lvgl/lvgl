@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (lv_global_default()->theme_basic)
+#define theme_def (LV_GLOBAL_DEFAULT()->theme_basic)
 
 #define COLOR_SCR     lv_palette_lighten(LV_PALETTE_GREY, 4)
 #define COLOR_WHITE   lv_color_white()

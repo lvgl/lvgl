@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (lv_global_default()->theme_mono)
+#define theme_def (LV_GLOBAL_DEFAULT()->theme_mono)
 
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()

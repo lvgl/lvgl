@@ -21,7 +21,7 @@
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
-#define disp_ll_p &(lv_global_default()->disp_ll)
+#define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
 /**********************
  *      TYPEDEFS

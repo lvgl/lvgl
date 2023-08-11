@@ -16,9 +16,9 @@
 /*********************
  *      DEFINES
  *********************/
-#define _lv_style_custom_prop_flag_lookup_table_size lv_global_default()->style_custom_table_size
-#define _lv_style_custom_prop_flag_lookup_table lv_global_default()->style_custom_prop_flag_lookup_table
-#define last_custom_prop_id lv_global_default()->style_last_custom_prop_id
+#define _lv_style_custom_prop_flag_lookup_table_size LV_GLOBAL_DEFAULT()->style_custom_table_size
+#define _lv_style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
+#define last_custom_prop_id LV_GLOBAL_DEFAULT()->style_last_custom_prop_id
 
 /**********************
  *      TYPEDEFS

@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define _draw_cache lv_global_default()->draw_cache
+#define _draw_cache LV_GLOBAL_DEFAULT()->draw_cache
 
 /**********************
  *      TYPEDEFS

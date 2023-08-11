@@ -16,7 +16,7 @@
  *      DEFINES
  *********************/
 #define MY_CLASS    &lv_ime_pinyin_class
-#define cand_len lv_global_default()->ime_cand_len
+#define cand_len LV_GLOBAL_DEFAULT()->ime_cand_len
 
 /**********************
  *      TYPEDEFS

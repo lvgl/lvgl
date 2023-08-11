@@ -16,8 +16,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define default_group lv_global_default()->group_default
-#define group_ll_p &(lv_global_default()->group_ll)
+#define default_group LV_GLOBAL_DEFAULT()->group_default
+#define group_ll_p &(LV_GLOBAL_DEFAULT()->group_ll)
 
 /**********************
  *      TYPEDEFS

@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (lv_global_default()->theme_default)
+#define theme_def (LV_GLOBAL_DEFAULT()->theme_default)
 
 #define MODE_DARK 1
 #define RADIUS_DEFAULT (theme->disp_size == DISP_LARGE ? lv_disp_dpx(theme->base.disp, 12) : lv_disp_dpx(theme->base.disp, 8))

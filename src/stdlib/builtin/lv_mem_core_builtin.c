@@ -36,7 +36,7 @@
     #define MEM_UNIT         uint32_t
     #define ALIGN_MASK       0x3
 #endif
-#define state lv_global_default()->tlsf_state
+#define state LV_GLOBAL_DEFAULT()->tlsf_state
 
 
 /**********************
@@ -71,7 +71,7 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user);
 
 void lv_mem_init(void)
 {
-    lv_global_default()->memory_zero = ZERO_MEM_SENTINEL;
+    LV_GLOBAL_DEFAULT()->memory_zero = ZERO_MEM_SENTINEL;
 
 #if LV_MEM_ADR == 0
 #ifdef LV_MEM_POOL_ALLOC

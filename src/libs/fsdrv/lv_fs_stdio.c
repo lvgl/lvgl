@@ -71,7 +71,7 @@ void lv_fs_stdio_init(void)
      *--------------------------------------------------*/
 
     /*Add a simple drive to open images*/
-    lv_fs_drv_t * fs_drv_p = &(lv_global_default()->stdio_fs_drv);
+    lv_fs_drv_t * fs_drv_p = &(LV_GLOBAL_DEFAULT()->stdio_fs_drv);
     lv_fs_drv_init(fs_drv_p);
 
     /*Set up fields...*/

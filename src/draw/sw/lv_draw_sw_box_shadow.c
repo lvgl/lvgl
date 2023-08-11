@@ -24,7 +24,7 @@
 #define SHADOW_ENHANCE          1
 
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
-    #define shadow_cache lv_global_default()->sw_shadow_cache
+    #define shadow_cache LV_GLOBAL_DEFAULT()->sw_shadow_cache
 #endif
 
 /**********************

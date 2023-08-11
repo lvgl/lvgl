@@ -24,7 +24,7 @@
  *********************/
 
 /*Display being refreshed*/
-#define disp_refr lv_global_default()->disp_refresh
+#define disp_refr LV_GLOBAL_DEFAULT()->disp_refresh
 
 /**********************
  *      TYPEDEFS

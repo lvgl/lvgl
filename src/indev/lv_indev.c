@@ -48,9 +48,9 @@
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
 
-#define indev_act lv_global_default()->indev_active
-#define indev_obj_act lv_global_default()->indev_obj_active
-#define indev_ll_head &(lv_global_default()->indev_ll)
+#define indev_act LV_GLOBAL_DEFAULT()->indev_active
+#define indev_obj_act LV_GLOBAL_DEFAULT()->indev_obj_active
+#define indev_ll_head &(LV_GLOBAL_DEFAULT()->indev_ll)
 
 /**********************
  *      TYPEDEFS

@@ -22,8 +22,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define disp_def lv_global_default()->disp_default
-#define disp_ll_p &(lv_global_default()->disp_ll)
+#define disp_def LV_GLOBAL_DEFAULT()->disp_default
+#define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
 /**********************
  *      TYPEDEFS

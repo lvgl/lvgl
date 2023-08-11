@@ -13,8 +13,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define layout_cnt lv_global_default()->layout_count
-#define layout_list_def lv_global_default()->layout_list
+#define layout_cnt LV_GLOBAL_DEFAULT()->layout_count
+#define layout_list_def LV_GLOBAL_DEFAULT()->layout_list
 
 /**********************
  *      TYPEDEFS

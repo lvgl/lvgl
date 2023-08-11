@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define fsdrv_ll_p &(lv_global_default()->fsdrv_ll)
+#define fsdrv_ll_p &(LV_GLOBAL_DEFAULT()->fsdrv_ll)
 
 /**********************
  *      TYPEDEFS

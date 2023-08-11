@@ -19,10 +19,10 @@
  *      DEFINES
  *********************/
 #if LV_IMG_CACHE_DEF_SIZE
-    #define entry_cnt lv_global_default()->img_cache_entry_cnt
-    #define _img_cache_array lv_global_default()->img_cache_array
+    #define entry_cnt LV_GLOBAL_DEFAULT()->img_cache_entry_cnt
+    #define _img_cache_array LV_GLOBAL_DEFAULT()->img_cache_array
 #else
-    #define _img_cache_single lv_global_default()->img_cache_single
+    #define _img_cache_single LV_GLOBAL_DEFAULT()->img_cache_single
 #endif
 
 

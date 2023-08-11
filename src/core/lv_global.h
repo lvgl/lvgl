@@ -63,7 +63,7 @@ struct _snippet_stack;
 struct _lv_freetype_context_t;
 #endif
 
-typedef struct {
+typedef struct _lv_global_t {
     bool inited;
 
     lv_ll_t disp_ll;
@@ -191,6 +191,12 @@ typedef struct {
 /**********************
  *      MACROS
  **********************/
+#if LV_GLOBAL_CUSTOM == 0
+extern lv_global_t lv_global;
+#define LV_GLOBAL_DEFAULT() (&lv_global)
+#else
+#define LV_GLOBAL_DEFAULT() lv_global_default()
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

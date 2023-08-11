@@ -628,7 +628,7 @@
     #endif
 #endif
 
-/*For custom `lv_global_default()` implementation set to 1*/
+/*For custom `LV_GLOBAL_DEFAULT()` implementation set to 1*/
 #ifndef LV_GLOBAL_CUSTOM
     #ifdef CONFIG_LV_GLOBAL_CUSTOM
         #define LV_GLOBAL_CUSTOM CONFIG_LV_GLOBAL_CUSTOM

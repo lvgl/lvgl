@@ -12,7 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define rand_seed lv_global_default()->math_rand_seed
+#define rand_seed LV_GLOBAL_DEFAULT()->math_rand_seed
 
 /**********************
  *      TYPEDEFS

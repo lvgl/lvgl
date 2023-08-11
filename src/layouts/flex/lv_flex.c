@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define layout_list_def lv_global_default()->layout_list
+#define layout_list_def LV_GLOBAL_DEFAULT()->layout_list
 
 /**********************
  *      TYPEDEFS

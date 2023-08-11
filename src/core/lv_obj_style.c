@@ -16,8 +16,8 @@
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
-#define style_refr lv_global_default()->style_refresh
-#define style_trans_ll_p &(lv_global_default()->style_trans_ll)
+#define style_refr LV_GLOBAL_DEFAULT()->style_refresh
+#define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
 
 /**********************
  *      TYPEDEFS

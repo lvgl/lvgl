@@ -16,7 +16,7 @@
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
-#define update_layout_mutex lv_global_default()->layout_update_mutex
+#define update_layout_mutex LV_GLOBAL_DEFAULT()->layout_update_mutex
 
 /**********************
  *      TYPEDEFS

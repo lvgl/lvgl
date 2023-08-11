@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define img_decoder_ll_p &(lv_global_default()->img_decoder_ll)
+#define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
 
 /**********************
  *      TYPEDEFS
