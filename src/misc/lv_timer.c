@@ -12,7 +12,6 @@
 #include "../stdlib/lv_sprintf.h"
 #include "lv_assert.h"
 #include "lv_ll.h"
-#include "lv_gc.h"
 #include "lv_profiler.h"
 
 /*********************

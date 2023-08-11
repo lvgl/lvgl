@@ -14,7 +14,6 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_assert.h"
-#include "../../misc/lv_gc.h"
 #include "../../osal/lv_os.h"
 #include "../../stdlib/lv_string.h"
 

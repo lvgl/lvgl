@@ -230,13 +230,6 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
-/*Garbage Collector settings
- *Used if lvgl is bound to higher level language and the memory is managed by that language*/
-#define LV_ENABLE_GC 0
-#if LV_ENABLE_GC != 0
-    #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-#endif /*LV_ENABLE_GC*/
-
 /*For custom `lv_global_default()` implementation set to 1*/
 #define LV_GLOBAL_CUSTOM 0
 

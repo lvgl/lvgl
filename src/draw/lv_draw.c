@@ -12,7 +12,6 @@
 #include "../core/lv_global.h"
 #include "../core/lv_refr.h"
 #include "../stdlib/lv_string.h"
-#include "../misc/lv_gc.h"
 
 /*********************
  *      DEFINES

@@ -17,8 +17,8 @@
 #include "../tick/lv_tick.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_profiler.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES

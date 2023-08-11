@@ -11,7 +11,6 @@
 #include "../core/lv_global.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_types.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_utils.h"
 #include "../stdlib/lv_mem.h"

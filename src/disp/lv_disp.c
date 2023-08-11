@@ -10,7 +10,6 @@
 #include "../misc/lv_math.h"
 #include "../core/lv_refr.h"
 #include "../disp/lv_disp_private.h"
-#include "../misc/lv_gc.h"
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
 #include "../core/lv_global.h"

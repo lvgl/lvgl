@@ -9,7 +9,6 @@
 #include <stddef.h>
 
 #include "lv_group.h"
-#include "../misc/lv_gc.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_global.h"
 #include "../indev/lv_indev.h"

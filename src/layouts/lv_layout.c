@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_layout.h"
-#include "../misc/lv_gc.h"
 #include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 

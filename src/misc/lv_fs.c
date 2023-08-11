@@ -12,7 +12,6 @@
 #include "../misc/lv_assert.h"
 #include "../stdlib/lv_string.h"
 #include "lv_ll.h"
-#include "lv_gc.h"
 #include "../core/lv_global.h"
 
 /*********************

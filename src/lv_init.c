@@ -22,7 +22,6 @@
 #include "draw/lv_img_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
-#include "misc/lv_gc.h"
 
 /*********************
  *      DEFINES
@@ -237,15 +236,13 @@ void lv_init(void)
     LV_LOG_TRACE("finished");
 }
 
-#if LV_ENABLE_GC || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 void lv_deinit(void)
 {
 #if LV_USE_SYSMON
     _lv_sysmon_builtin_deinit();
 #endif
-
-    _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
 

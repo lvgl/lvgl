@@ -628,25 +628,6 @@
     #endif
 #endif
 
-/*Garbage Collector settings
- *Used if lvgl is bound to higher level language and the memory is managed by that language*/
-#ifndef LV_ENABLE_GC
-    #ifdef CONFIG_LV_ENABLE_GC
-        #define LV_ENABLE_GC CONFIG_LV_ENABLE_GC
-    #else
-        #define LV_ENABLE_GC 0
-    #endif
-#endif
-#if LV_ENABLE_GC != 0
-    #ifndef LV_GC_INCLUDE
-        #ifdef CONFIG_LV_GC_INCLUDE
-            #define LV_GC_INCLUDE CONFIG_LV_GC_INCLUDE
-        #else
-            #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-        #endif
-    #endif
-#endif /*LV_ENABLE_GC*/
-
 /*For custom `lv_global_default()` implementation set to 1*/
 #ifndef LV_GLOBAL_CUSTOM
     #ifdef CONFIG_LV_GLOBAL_CUSTOM

@@ -14,7 +14,6 @@
 #include "../disp/lv_disp.h"
 #include "../disp/lv_disp_private.h"
 #include "../misc/lv_anim.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_async.h"
 #include "../core/lv_global.h"
 

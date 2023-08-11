@@ -10,7 +10,6 @@
 #include "../misc/lv_assert.h"
 #include "../draw/lv_draw_img.h"
 #include "../misc/lv_ll.h"
-#include "../misc/lv_gc.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
 

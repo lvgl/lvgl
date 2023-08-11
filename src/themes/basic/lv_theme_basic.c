@@ -11,7 +11,6 @@
 #if LV_USE_THEME_BASIC
 
 #include "lv_theme_basic.h"
-#include "../../misc/lv_gc.h"
 #include "../../core/lv_global.h"
 
 /*********************

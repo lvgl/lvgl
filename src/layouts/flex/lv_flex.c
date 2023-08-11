@@ -8,7 +8,6 @@
  *********************/
 #include "lv_flex.h"
 #include "../lv_layout.h"
-#include "../../misc/lv_gc.h"
 #include "../../core/lv_obj.h"
 
 #if LV_USE_FLEX
