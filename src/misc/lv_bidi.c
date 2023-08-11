@@ -211,7 +211,7 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
  * @param len length of the text
  * @param base_dir base dir of the text
  * @param pos_conv_out an `uint16_t` array to store the related logical position of the character.
- * Can be `NULL` is unused
+ * Can be `NULL` if unused
  * @param pos_conv_len length of `pos_conv_out` in element count
  */
 void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_base_dir_t base_dir,
