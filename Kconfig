@@ -493,6 +493,14 @@ menu "LVGL configuration"
 			config LV_SPRINTF_USE_FLOAT
 				bool "Enable float in built-in (v)snprintf functions"
 				depends on LV_USE_BUILTIN_SNPRINTF
+
+			config LV_ENABLE_GLOBAL_CUSTOM
+				bool "Enable 'lv_global' customization"
+
+			config LV_GLOBAL_CUSTOM_INCLUDE
+				string "Header to include for the custom 'lv_global' function"
+				depends on LV_ENABLE_GLOBAL_CUSTOM
+				default "lv_global.h"
 		endmenu
 
 		menu "Compiler settings"

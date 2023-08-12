@@ -39,7 +39,7 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-#ifndef LV_GLOBAL_CUSTOM
+#if LV_ENABLE_GLOBAL_CUSTOM == 0
     lv_global_t lv_global;
 #endif
 
@@ -84,8 +84,10 @@ bool lv_is_initialized(void)
 
 void lv_init(void)
 {
-    /*Initialize members of static variable lv_global */
-    lv_global_init(LV_GLOBAL_DEFAULT());
+    /*First initialize Garbage Collection if needed*/
+#ifdef LV_GC_INIT
+    LV_GC_INIT();
+#endif
 
     /*Do nothing if already initialized*/
     if(lv_initialized) {
@@ -95,10 +97,8 @@ void lv_init(void)
 
     LV_LOG_INFO("begin");
 
-    /*First initialize Garbage Collection if needed*/
-#ifdef LV_GC_INIT
-    LV_GC_INIT();
-#endif
+    /*Initialize members of static variable lv_global */
+    lv_global_init(LV_GLOBAL_DEFAULT());
 
     lv_mem_init();
 
@@ -230,7 +230,7 @@ void lv_init(void)
     LV_LOG_TRACE("finished");
 }
 
-#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 void lv_deinit(void)
 {
