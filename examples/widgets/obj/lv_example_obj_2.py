@@ -12,7 +12,7 @@ def drag_event_handler(e):
 
 
 #
-# Make an object dragable.
+# Make an object draggable.
 #
 
 obj = lv.obj(lv.scr_act())
