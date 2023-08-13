@@ -226,7 +226,7 @@ variables:
      }
    }
    /* LVGL tick source */
-   void LGVLTick(void const * argument)
+   void LVGLTick(void const * argument)
    {
      for(;;)
      {

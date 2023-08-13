@@ -41,6 +41,7 @@ static void set_x_anim(void * obj, int32_t v);
 static void set_y_anim(void * obj, int32_t v);
 static void scr_anim_ready(lv_anim_t * a);
 static bool is_out_anim(lv_scr_load_anim_t a);
+static void disp_event_cb(lv_event_t * e);
 
 /**********************
  *  STATIC VARIABLES
@@ -72,13 +73,14 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp->dpi              = LV_DPI_DEF;
     disp->color_format = LV_COLOR_FORMAT_NATIVE;
 
-#if LV_USE_DRAW_SW == 1
-    disp->layer_init = lv_draw_sw_layer_init;
-    disp->layer_deinit = lv_draw_sw_layer_deinit;
+    disp->layer_head = lv_malloc(sizeof(lv_layer_t));
+    LV_ASSERT_MALLOC(disp->layer_head);
+    if(disp->layer_head == NULL) return NULL;
+    lv_memzero(disp->layer_head, sizeof(lv_layer_t));
 
-#endif
+    if(disp->layer_init) disp->layer_init(disp, disp->layer_head);
 
-    disp->layer_head = disp->layer_init(disp);
+    lv_draw_buf_init(&disp->layer_head->draw_buf, hor_res, ver_res, disp->color_format);
 
     disp->inv_en_cnt = 1;
 
@@ -121,6 +123,8 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 
     disp_def = disp_def_tmp; /*Revert the default display*/
     if(disp_def == NULL) disp_def = disp; /*Initialize the default display*/
+
+    lv_disp_add_event(disp, disp_event_cb, LV_EVENT_REFR_REQUEST, NULL);
 
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
 
@@ -363,16 +367,16 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
  * BUFFERING
  *--------------------*/
 
-void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_byte,
+void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_in_bytes,
                               lv_disp_render_mode_t render_mode)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return;
 
-    disp->draw_buf_1 = buf1;
-    disp->draw_buf_2 = buf2;
-    disp->draw_buf_act = buf1;
-    disp->draw_buf_size = buf_size_byte;
+    disp->buf_1 = buf1;
+    disp->buf_2 = buf2;
+    disp->buf_act = buf1;
+    disp->buf_size_in_bytes = buf_size_in_bytes;
     disp->render_mode = render_mode;
 }
 
@@ -390,7 +394,7 @@ void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format)
     if(disp == NULL) return;
 
     disp->color_format = color_format;
-    disp->layer_head->color_format = color_format;
+    disp->layer_head->draw_buf.color_format = color_format;
 }
 
 lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp)
@@ -431,7 +435,7 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp)
 
 bool lv_disp_is_double_buffered(lv_disp_t * disp)
 {
-    return disp->draw_buf_2 ? true : false;
+    return disp->buf_2 ? true : false;
 }
 
 /*---------------------
@@ -933,4 +937,18 @@ static bool is_out_anim(lv_scr_load_anim_t anim_type)
            anim_type == LV_SCR_LOAD_ANIM_OUT_RIGHT ||
            anim_type == LV_SCR_LOAD_ANIM_OUT_TOP   ||
            anim_type == LV_SCR_LOAD_ANIM_OUT_BOTTOM;
+}
+
+static void disp_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_disp_t * disp = lv_event_get_target(e);
+    switch(code) {
+        case LV_EVENT_REFR_REQUEST:
+            if(disp->refr_timer) lv_timer_resume(disp->refr_timer);
+            break;
+
+        default:
+            break;
+    }
 }

@@ -292,7 +292,7 @@ static lv_res_t event_send_core(lv_event_t * e)
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();
     if(indev_act) {
-        if(indev_act->feedback_cb) indev_act->feedback_cb(indev_act, e->code);
+        if(indev_act->feedback_cb) indev_act->feedback_cb(indev_act, e);
         if(e->stop_processing) return LV_RES_OK;
         if(e->deleted) return LV_RES_INV;
     }

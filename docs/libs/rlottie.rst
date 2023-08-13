@@ -263,7 +263,7 @@ IDF) with the appropriate :c:expr:`MALLOC_CAP` call - for SPIRAM usage this is
 
 .. code:: c
 
-   rlottie->allocated_buf = heap_caps_malloc(allocaled_buf_size+1, MALLOC_CAP_SPIRAM);
+   rlottie->allocated_buf = heap_caps_malloc(allocated_buf_size+1, MALLOC_CAP_SPIRAM);
 
 Example
 -------

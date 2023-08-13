@@ -43,8 +43,13 @@ const lv_obj_class_t lv_tabview_class = {
     .instance_size = sizeof(lv_tabview_t)
 };
 
-static lv_dir_t tabpos_create;
-static lv_coord_t tabsize_create;
+typedef struct {
+    lv_dir_t tab_pos;
+    lv_coord_t tab_size;
+} lv_tabview_create_info_t;
+
+// only used in lv_obj_class_create_obj, no affect multiple instances
+static lv_tabview_create_info_t create_info;
 
 /**********************
  *      MACROS
@@ -57,8 +62,8 @@ static lv_coord_t tabsize_create;
 lv_obj_t * lv_tabview_create(lv_obj_t * parent, lv_dir_t tab_pos, lv_coord_t tab_size)
 {
     LV_LOG_INFO("begin");
-    tabpos_create = tab_pos;
-    tabsize_create = tab_size;
+    create_info.tab_pos = tab_pos;
+    create_info.tab_size = tab_size;
 
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_tabview_class, parent);
     lv_obj_class_init_obj(obj);
@@ -205,7 +210,7 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     LV_UNUSED(class_p);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
 
-    tabview->tab_pos = tabpos_create;
+    tabview->tab_pos = create_info.tab_pos;
 
     switch(tabview->tab_pos) {
         case LV_DIR_TOP:
@@ -243,13 +248,13 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     switch(tabview->tab_pos) {
         case LV_DIR_TOP:
         case LV_DIR_BOTTOM:
-            lv_obj_set_size(btnm, LV_PCT(100), tabsize_create);
+            lv_obj_set_size(btnm, LV_PCT(100), create_info.tab_size);
             lv_obj_set_width(cont, LV_PCT(100));
             lv_obj_set_flex_grow(cont, 1);
             break;
         case LV_DIR_LEFT:
         case LV_DIR_RIGHT:
-            lv_obj_set_size(btnm, tabsize_create, LV_PCT(100));
+            lv_obj_set_size(btnm, create_info.tab_size, LV_PCT(100));
             lv_obj_set_height(cont, LV_PCT(100));
             lv_obj_set_flex_grow(cont, 1);
             break;

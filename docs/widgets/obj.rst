@@ -61,7 +61,7 @@ will shift the object by 10;20 px from the center of its parent:
    lv_obj_align(obj, LV_ALIGN_CENTER, 10, 20);
 
 To align one object to another use:
-:cpp:expr:`lv_obj_align_to(obj_to_align, obj_referece, LV_ALIGN_..., x, y)`
+:cpp:expr:`lv_obj_align_to(obj_to_align, obj_reference, LV_ALIGN_..., x, y)`
 
 For example, to align a text below an image:
 :cpp:expr:`lv_obj_align_to(text, image, LV_ALIGN_OUT_BOTTOM_MID, 0, 10)`.

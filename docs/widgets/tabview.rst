@@ -22,7 +22,7 @@ Parts and Styles
 ****************
 
 There are no special parts on the Tab view but the ``lv_obj`` and
-``lv_btnnmatrix`` widgets are used to create the Tab view.
+``lv_btnmatrix`` widgets are used to create the Tab view.
 
 Usage
 *****

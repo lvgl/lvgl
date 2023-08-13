@@ -1,6 +1,7 @@
-#define LV_MEM_SIZE         8388608
+#define LV_MEM_SIZE         (8 * 1024 * 1024)
+#define LV_LAYER_MAX_MEMORY_USAGE   (1 * 1024)
 #define LV_USE_DRAW_MASKS       1
-#define LV_SHADOW_CACHE_SIZE    10240
+#define LV_SHADOW_CACHE_SIZE    (8 * 1024)
 #define LV_IMG_CACHE_DEF_SIZE   32
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
