@@ -775,7 +775,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         lv_obj_t * obj = lv_event_get_target(e);
         lv_layer_t * layer = lv_event_get_layer(e);
 
-        lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+        lv_opa_t opa = lv_obj_get_style_opa_recursive(obj, LV_PART_MAIN);
         if(opa < LV_OPA_MIN) return;
 
         lv_point_t center;
