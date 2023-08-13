@@ -144,7 +144,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 for(i = 0; i < child_cnt; i++) {
                     lv_obj_t * child = obj->spec_attr->children[i];
                     refr_obj(layer, child);
-
                 }
 
                 /*If the object was visible on the clip area call the post draw events too*/
@@ -177,7 +176,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                         refr_obj(layer_children, child);
                     }
 
-                    /*If all the children are redrawn make 'post draw' draw*/
+                    /*If all the children are redrawn send 'post draw' draw*/
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
@@ -198,7 +197,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                         refr_obj(layer_children, child);
                     }
 
-                    /*If all the children are redrawn make 'post draw' draw*/
+                    /*If all the children are redrawn send 'post draw' draw*/
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
@@ -209,7 +208,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                     lv_draw_layer(layer, &img_draw_dsc, &top);
 
                 }
-
 
                 lv_area_t mid = obj->coords;
                 mid.y1 += rout;
