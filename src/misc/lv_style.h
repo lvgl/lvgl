@@ -175,7 +175,7 @@ typedef uint8_t lv_dither_mode_t;
  */
 typedef struct {
     lv_color_t color;   /**< The stop color */
-    lv_opa_t   opa;     /**< The opacity fo the color*/
+    lv_opa_t   opa;     /**< The opacity of the color*/
     uint8_t    frac;    /**< The stop position in 1/255 unit */
 } lv_gradient_stop_t;
 

@@ -813,7 +813,7 @@ static void refr_cell_size(lv_obj_t * obj, uint32_t row, uint32_t col)
     lv_coord_t prev_row_size = table->row_h[row];
     table->row_h[row] = LV_CLAMP(minh, calculated_height, maxh);
 
-    /*If the row height havn't changed invalidate only this cell*/
+    /*If the row height haven't changed invalidate only this cell*/
     if(prev_row_size == table->row_h[row]) {
         lv_area_t cell_area;
         get_cell_area(obj, row, col, &cell_area);

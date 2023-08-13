@@ -102,7 +102,7 @@ typedef struct _lv_draw_unit_t {
      * @param layer         pointer to a layer on which the draw task should be drawn
      * @return              >=0:    The number of taken draw task
      *                      -1:     There where no available draw tasks at all.
-     *                              Also means to no call the dispatcher of the other draw units as there is no dra task to tkae
+     *                              Also means to no call the dispatcher of the other draw units as there is no draw task to take
      */
     int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
 } lv_draw_unit_t;

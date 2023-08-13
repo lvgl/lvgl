@@ -70,7 +70,7 @@ lv_grad_t * lv_gradient_get(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h)
     /* Step 1: Search cache for the given key */
     lv_grad_t * item = allocate_item(g, w, h);
     if(item == NULL) {
-        LV_LOG_WARN("Faild to allcoate item for teh gradient");
+        LV_LOG_WARN("Failed to allocate item for the gradient");
         return item;
     }
 

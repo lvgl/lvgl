@@ -75,7 +75,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
         gifobj->gif = gd_open_gif_file(src);
     }
     if(gifobj->gif == NULL) {
-        LV_LOG_WARN("Could't load the source");
+        LV_LOG_WARN("Couldn't load the source");
         return;
     }
 
