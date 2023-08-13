@@ -161,7 +161,7 @@ menu "LVGL configuration"
 				default 1
 				help
 					> 1 requires an operating system enabled in `LV_USE_OS`
-					> 1 means multply threads will render the screen in parallel
+					> 1 means multiply threads will render the screen in parallel
 
 			config LV_DRAW_SW_COMPLEX
 				bool "Enable complex draw engine"

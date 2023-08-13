@@ -180,7 +180,7 @@ props = [
 
 {'name': 'BORDER_WIDTH',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set hte width of the border. Only pixel values can be used."},
+ 'dsc': "Set the width of the border. Only pixel values can be used."},
 
 {'name': 'BORDER_SIDE',
  'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -264,7 +264,7 @@ props = [
 
 {'name': 'LINE_COLOR',
  'style_type': 'color', 'var_type': 'lv_color_t' ,  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
- 'dsc': "Set the color fo the lines."},
+ 'dsc': "Set the color of the lines."},
 
 {'name': 'LINE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
