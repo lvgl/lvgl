@@ -1,3 +1,6 @@
+#ifndef LV_OBJ_STYLE_GEN_H
+#define LV_OBJ_STYLE_GEN_H
+
 #include "../misc/lv_area.h"
 #include "../misc/lv_style.h"
 #include "../core/lv_obj_style.h"
@@ -677,3 +680,4 @@ void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transiti
 void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector);
 void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint16_t value, lv_style_selector_t selector);
 void lv_obj_set_style_base_dir(struct _lv_obj_t * obj, lv_base_dir_t value, lv_style_selector_t selector);
+#endif  /* LV_OBJ_STYLE_GEN_H */
