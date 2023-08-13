@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define img_cache_manager lv_global_default()->img_cache_mgr
+#define img_cache_manager LV_GLOBAL_DEFAULT()->img_cache_mgr
 
 /**********************
  *      TYPEDEFS

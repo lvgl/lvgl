@@ -11,7 +11,6 @@
 #include "../core/lv_global.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_types.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_utils.h"
 #include "../stdlib/lv_mem.h"
@@ -20,7 +19,7 @@
  *      DEFINES
  *********************/
 #if LV_USE_FONT_COMPRESSED
-    #define font_rle lv_global_default()->font_fmt_rle
+    #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
 #endif /*LV_USE_FONT_COMPRESSED*/
 
 /**********************

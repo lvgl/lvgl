@@ -17,7 +17,7 @@
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
-#define profiler_ctx lv_global_default()->profiler_context
+#define profiler_ctx LV_GLOBAL_DEFAULT()->profiler_context
 
 
 #define LV_PROFILER_STR_MAX_LEN 128

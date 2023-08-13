@@ -8,14 +8,15 @@
  *********************/
 #include "lv_flex.h"
 #include "../lv_layout.h"
-#include "../../misc/lv_gc.h"
 #include "../../core/lv_obj.h"
 
 #if LV_USE_FLEX
 
+#include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
+#define layout_list_def LV_GLOBAL_DEFAULT()->layout_list
 
 /**********************
  *      TYPEDEFS
@@ -94,8 +95,8 @@ static lv_coord_t lv_obj_get_height_with_margin(const lv_obj_t * obj);
 
 void lv_flex_init(void)
 {
-    LV_GC_ROOT(_lv_layout_list)[LV_LAYOUT_FLEX].cb = flex_update;
-    LV_GC_ROOT(_lv_layout_list)[LV_LAYOUT_FLEX].user_data = NULL;
+    layout_list_def[LV_LAYOUT_FLEX].cb = flex_update;
+    layout_list_def[LV_LAYOUT_FLEX].user_data = NULL;
 
 }
 

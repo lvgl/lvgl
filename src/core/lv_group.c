@@ -9,7 +9,6 @@
 #include <stddef.h>
 
 #include "lv_group.h"
-#include "../misc/lv_gc.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_global.h"
 #include "../indev/lv_indev.h"
@@ -17,7 +16,8 @@
 /*********************
  *      DEFINES
  *********************/
-#define default_group lv_global_default()->group_default
+#define default_group LV_GLOBAL_DEFAULT()->group_default
+#define group_ll_p &(LV_GLOBAL_DEFAULT()->group_ll)
 
 /**********************
  *      TYPEDEFS
@@ -45,12 +45,12 @@ static lv_indev_t * get_indev(const lv_group_t * g);
 
 void _lv_group_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_group_ll), sizeof(lv_group_t));
+    _lv_ll_init(group_ll_p, sizeof(lv_group_t));
 }
 
 lv_group_t * lv_group_create(void)
 {
-    lv_group_t * group = _lv_ll_ins_head(&LV_GC_ROOT(_lv_group_ll));
+    lv_group_t * group = _lv_ll_ins_head(group_ll_p);
     LV_ASSERT_MALLOC(group);
     if(group == NULL) return NULL;
     _lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
@@ -94,7 +94,7 @@ void lv_group_del(lv_group_t * group)
     if(group == lv_group_get_default()) lv_group_set_default(NULL);
 
     _lv_ll_clear(&(group->obj_ll));
-    _lv_ll_remove(&LV_GC_ROOT(_lv_group_ll), group);
+    _lv_ll_remove(group_ll_p, group);
     lv_free(group);
 }
 

@@ -12,12 +12,11 @@
 #include "../core/lv_global.h"
 #include "../core/lv_refr.h"
 #include "../stdlib/lv_string.h"
-#include "../misc/lv_gc.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define _draw_cache lv_global_default()->draw_cache
+#define _draw_cache LV_GLOBAL_DEFAULT()->draw_cache
 
 /**********************
  *      TYPEDEFS
@@ -56,8 +55,8 @@ void * lv_draw_create_unit(size_t size)
     lv_draw_unit_t * new_unit = lv_malloc(size);
     lv_memzero(new_unit, size);
 
-    new_unit->next = LV_GC_ROOT(_lv_draw_unit_head);
-    LV_GC_ROOT(_lv_draw_unit_head) = new_unit;
+    new_unit->next = _draw_cache.unit_head;
+    _draw_cache.unit_head = new_unit;
 
     return new_unit;
 }
@@ -219,7 +218,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
         if(layer_ok) {
             /*Find a draw unit which is not busy and can take at least one task*/
             /*Let all draw units to pick draw tasks*/
-            lv_draw_unit_t * u = LV_GC_ROOT(_lv_draw_unit_head);
+            lv_draw_unit_t * u = _draw_cache.unit_head;
             while(u) {
                 int32_t taken_cnt = u->dispatch(u, layer);
                 if(taken_cnt < 0) {

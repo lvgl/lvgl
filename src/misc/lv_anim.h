@@ -16,6 +16,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 #include "lv_math.h"
 #include "lv_timer.h"
+#include "lv_ll.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -94,6 +95,7 @@ typedef struct {
     bool anim_list_changed;
     bool anim_run_round;
     struct _lv_timer_t * timer;
+    lv_ll_t anim_ll;
 } lv_anim_state_t;
 
 /** Get the current value during an animation*/

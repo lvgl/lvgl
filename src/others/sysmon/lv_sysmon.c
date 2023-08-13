@@ -20,7 +20,7 @@
 
 #define SYSMON_REFR_PERIOD_DEF 300 /* ms */
 
-#define perf_info lv_global_default()->sysmon_perf_info
+#define perf_info LV_GLOBAL_DEFAULT()->sysmon_perf_info
 /**********************
  *      TYPEDEFS
  **********************/

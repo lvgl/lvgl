@@ -11,14 +11,13 @@
 #if LV_USE_THEME_DEFAULT
 
 #include "../lv_theme.h"
-#include "../../misc/lv_gc.h"
 #include "../../misc/lv_color.h"
 #include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (lv_global_default()->theme_default)
+#define theme_def (LV_GLOBAL_DEFAULT()->theme_default)
 
 #define MODE_DARK 1
 #define RADIUS_DEFAULT (theme->disp_size == DISP_LARGE ? lv_disp_dpx(theme->base.disp, 12) : lv_disp_dpx(theme->base.disp, 8))
@@ -654,8 +653,7 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
      *In a general case styles could be in a simple `static lv_style_t my_style...` variables*/
 
     if(!lv_theme_default_is_inited()) {
-        LV_GC_ROOT(_lv_theme_default_data) = lv_malloc(sizeof(my_theme_t));
-        theme_def = (my_theme_t *)LV_GC_ROOT(_lv_theme_default_data);
+        theme_def = (my_theme_t *)lv_malloc(sizeof(my_theme_t));
         lv_memzero(theme_def, sizeof(my_theme_t));
     }
 

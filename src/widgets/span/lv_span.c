@@ -17,7 +17,7 @@
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_spangroup_class
-#define snippet_stack lv_global_default()->span_snippet_stack
+#define snippet_stack LV_GLOBAL_DEFAULT()->span_snippet_stack
 
 /**********************
  *      TYPEDEFS

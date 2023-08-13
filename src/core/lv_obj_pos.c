@@ -10,14 +10,13 @@
 #include "../disp/lv_disp.h"
 #include "../disp/lv_disp_private.h"
 #include "lv_refr.h"
-#include "../misc/lv_gc.h"
 #include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
-#define update_layout_mutex lv_global_default()->layout_update_mutex
+#define update_layout_mutex LV_GLOBAL_DEFAULT()->layout_update_mutex
 
 /**********************
  *      TYPEDEFS

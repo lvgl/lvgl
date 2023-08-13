@@ -16,6 +16,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #include <stdbool.h>
+
 #include "../draw/lv_img_cache.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
@@ -24,6 +25,7 @@ extern "C" {
 #include "../misc/lv_anim.h"
 #include "../misc/lv_area.h"
 #include "../misc/lv_color_op.h"
+#include "../misc/lv_ll.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_profiler_builtin.h"
 #include "../misc/lv_style.h"
@@ -35,6 +37,8 @@ extern "C" {
 #endif
 
 #include "../tick/lv_tick.h"
+#include "../layouts/lv_layout.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -59,48 +63,61 @@ struct _snippet_stack;
 struct _lv_freetype_context_t;
 #endif
 
-typedef struct {
+typedef struct _lv_global_t {
     bool inited;
 
-    bool style_refresh;
+    lv_ll_t disp_ll;
     struct _lv_disp_t * disp_refresh;
-    struct _lv_group_t * group_default;
     struct _lv_disp_t * disp_default;
-    lv_img_cache_manager_t img_cache_mgr;
 
+    lv_ll_t style_trans_ll;
+    bool style_refresh;
+    uint32_t style_custom_table_size;
+    uint16_t style_last_custom_prop_id;
+    uint8_t * style_custom_prop_flag_lookup_table;
+
+    lv_ll_t group_ll;
+    struct _lv_group_t * group_default;
+
+    lv_ll_t indev_ll;
     struct _lv_indev_t * indev_active;
     struct _lv_obj_t * indev_obj_active;
 
     uint32_t layout_count;
-    uint32_t memory_zero;
-
-    uint32_t math_rand_seed;
+    lv_layout_dsc_t * layout_list;
     bool layout_update_mutex;
 
+    uint32_t memory_zero;
+    uint32_t math_rand_seed;
     lv_area_transform_cache_t area_trans_cache;
-
-    uint32_t style_custom_table_size;
-    uint16_t style_last_custom_prop_id;
 
     struct _lv_event_t * event_header;
     uint32_t event_last_register_id;
-
-    lv_log_print_g_cb_t custom_log_print_cb;
-#if LV_LOG_USE_TIMESTAMP
-    uint32_t log_last_log_time;
-#endif
 
     lv_timer_state_t timer_state;
     lv_anim_state_t anim_state;
     lv_tick_state_t tick_state;
 
+    lv_ll_t img_decoder_ll;
+    lv_img_cache_manager_t img_cache_mgr;
 #if LV_IMG_CACHE_DEF_SIZE
     uint16_t img_cache_entry_cnt;
+    _lv_img_cache_entry_t * img_cache_array;
+#else
+    _lv_img_cache_entry_t img_cache_single;
 #endif
 
     lv_draw_cache_t draw_cache;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
+#endif
+#if LV_DRAW_SW_COMPLEX
+    _lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
+#endif
+
+    lv_log_print_g_cb_t custom_log_print_cb;
+#if LV_LOG_USE_TIMESTAMP
+    uint32_t log_last_log_time;
 #endif
 
 #if LV_USE_THEME_BASIC
@@ -119,6 +136,7 @@ typedef struct {
     lv_tlsf_state_t tlsf_state;
 #endif
 
+    lv_ll_t fsdrv_ll;
 #if LV_USE_FS_STDIO != '\0'
     lv_fs_drv_t stdio_fs_drv;
 #endif
@@ -153,6 +171,7 @@ typedef struct {
 #if LV_USE_MSG
     bool msg_restart_notify;
     unsigned int msg_recursion_counter;
+    lv_ll_t msg_subs_ll;
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0
@@ -173,16 +192,28 @@ typedef struct {
  *      MACROS
  **********************/
 
+#if LV_ENABLE_GLOBAL_CUSTOM
+#include LV_GLOBAL_CUSTOM_INCLUDE
+
+#ifndef LV_GLOBAL_CUSTOM
+#define LV_GLOBAL_CUSTOM() lv_global_default()
+#endif
+#define LV_GLOBAL_DEFAULT() LV_GLOBAL_CUSTOM()
+#else
+extern lv_global_t lv_global;
+#define LV_GLOBAL_DEFAULT() (&lv_global)
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
+#if LV_ENABLE_GLOBAL_CUSTOM
 /**
  * Get the default global object for current thread
  * @return  pointer to the default global object
  */
 lv_global_t * lv_global_default(void);
-
+#endif
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

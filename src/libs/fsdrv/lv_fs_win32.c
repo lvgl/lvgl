@@ -67,7 +67,7 @@ void lv_fs_win32_init(void)
      *--------------------------------------------------*/
 
     /*Add a simple driver to open images*/
-    lv_fs_drv_t * fs_drv_p = &(lv_global_default()->win32_fs_drv);
+    lv_fs_drv_t * fs_drv_p = &(LV_GLOBAL_DEFAULT()->win32_fs_drv);
     lv_fs_drv_init(fs_drv_p);
 
     /*Set up fields...*/

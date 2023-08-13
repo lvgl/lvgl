@@ -23,7 +23,7 @@
     #define LV_MEM_ADD_JUNK  0
 #endif
 
-#define zero_mem lv_global_default()->memory_zero
+#define zero_mem LV_GLOBAL_DEFAULT()->memory_zero
 
 /**********************
  *      TYPEDEFS

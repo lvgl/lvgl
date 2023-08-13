@@ -13,7 +13,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define state lv_global_default()->tick_state
+#define state LV_GLOBAL_DEFAULT()->tick_state
 
 /**********************
  *      TYPEDEFS

@@ -63,7 +63,7 @@ void lv_fs_fatfs_init(void)
      *--------------------------------------------------*/
 
     /*Add a simple drive to open images*/
-    lv_fs_drv_t * fs_drv_p = &(lv_global_default()->fatfs_fs_drv);
+    lv_fs_drv_t * fs_drv_p = &(LV_GLOBAL_DEFAULT()->fatfs_fs_drv);
     lv_fs_drv_init(fs_drv_p);
 
     /*Set up fields...*/

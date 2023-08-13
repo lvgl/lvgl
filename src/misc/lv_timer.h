@@ -14,6 +14,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "../tick/lv_tick.h"
+#include "lv_ll.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -51,6 +52,8 @@ typedef struct _lv_timer_t {
 } lv_timer_t;
 
 typedef struct {
+    lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
+
     bool lv_timer_run;
     uint8_t idle_last;
     bool timer_deleted;

@@ -22,12 +22,11 @@
 #include "draw/lv_img_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
-#include "misc/lv_gc.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define lv_initialized  lv_global_default()->inited
+#define lv_initialized  LV_GLOBAL_DEFAULT()->inited
 
 /**********************
  *      TYPEDEFS
@@ -40,6 +39,9 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if LV_ENABLE_GLOBAL_CUSTOM == 0
+    lv_global_t lv_global;
+#endif
 
 /**********************
  *      MACROS
@@ -59,6 +61,9 @@ static inline void lv_global_init(lv_global_t * global)
 
     lv_memset(global, 0, sizeof(lv_global_t));
 
+    _lv_ll_init(&(global->disp_ll), sizeof(lv_disp_t));
+    _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
+
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
     global->style_last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
@@ -72,15 +77,6 @@ static inline void lv_global_init(lv_global_t * global)
 #endif
 }
 
-#if LV_GLOBAL_CUSTOM == 0
-lv_global_t * lv_global_default(void)
-{
-    static lv_global_t lv_global;
-    return &lv_global;
-}
-
-#endif
-
 bool lv_is_initialized(void)
 {
     return lv_initialized;
@@ -88,8 +84,10 @@ bool lv_is_initialized(void)
 
 void lv_init(void)
 {
-    /*Initialize members of static variable lv_global */
-    lv_global_init(lv_global_default());
+    /*First initialize Garbage Collection if needed*/
+#ifdef LV_GC_INIT
+    LV_GC_INIT();
+#endif
 
     /*Do nothing if already initialized*/
     if(lv_initialized) {
@@ -99,10 +97,8 @@ void lv_init(void)
 
     LV_LOG_INFO("begin");
 
-    /*First initialize Garbage Collection if needed*/
-#ifdef LV_GC_INIT
-    LV_GC_INIT();
-#endif
+    /*Initialize members of static variable lv_global */
+    lv_global_init(LV_GLOBAL_DEFAULT());
 
     lv_mem_init();
 
@@ -133,8 +129,6 @@ void lv_init(void)
 #endif
 
     _lv_obj_style_init();
-    _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
-    _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
     /*Initialize the screen refresh system*/
     _lv_refr_init();
@@ -236,15 +230,13 @@ void lv_init(void)
     LV_LOG_TRACE("finished");
 }
 
-#if LV_ENABLE_GC || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+#if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
 
 void lv_deinit(void)
 {
 #if LV_USE_SYSMON
     _lv_sysmon_builtin_deinit();
 #endif
-
-    _lv_gc_clear_roots();
 
     lv_disp_set_default(NULL);
 

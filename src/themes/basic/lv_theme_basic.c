@@ -11,13 +11,12 @@
 #if LV_USE_THEME_BASIC
 
 #include "lv_theme_basic.h"
-#include "../../misc/lv_gc.h"
 #include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (lv_global_default()->theme_basic)
+#define theme_def (LV_GLOBAL_DEFAULT()->theme_basic)
 
 #define COLOR_SCR     lv_palette_lighten(LV_PALETTE_GREY, 4)
 #define COLOR_WHITE   lv_color_white()
@@ -162,8 +161,7 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_basic_is_inited()) {
-        LV_GC_ROOT(_lv_theme_basic_data) = lv_malloc(sizeof(my_theme_t));
-        theme_def  = (my_theme_t *)LV_GC_ROOT(_lv_theme_basic_data);
+        theme_def  = (my_theme_t *)lv_malloc(sizeof(my_theme_t));
         lv_memzero(theme_def, sizeof(my_theme_t));
     }
 

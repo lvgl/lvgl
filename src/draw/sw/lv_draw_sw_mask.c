@@ -14,7 +14,6 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_assert.h"
-#include "../../misc/lv_gc.h"
 #include "../../osal/lv_os.h"
 #include "../../stdlib/lv_string.h"
 
@@ -24,8 +23,9 @@
 #define CIRCLE_CACHE_LIFE_MAX   1000
 #define CIRCLE_CACHE_AGING(life, r)   life = LV_MIN(life + (r < 16 ? 1 : (r >> 4)), 1000)
 #if LV_USE_OS
-    #define circle_cache_mutex lv_global_default()->draw_cache.circle_cache_mutex
+    #define circle_cache_mutex LV_GLOBAL_DEFAULT()->draw_cache.circle_cache_mutex
 #endif
+#define _circle_cache LV_GLOBAL_DEFAULT()->sw_circle_cache
 
 /**********************
  *      TYPEDEFS
@@ -142,10 +142,10 @@ void _lv_draw_sw_mask_cleanup(void)
 {
     uint8_t i;
     for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
-        if(LV_GC_ROOT(_lv_circle_cache[i]).buf) {
-            lv_free(LV_GC_ROOT(_lv_circle_cache[i]).buf);
+        if(_circle_cache[i].buf) {
+            lv_free(_circle_cache[i].buf);
         }
-        lv_memzero(&LV_GC_ROOT(_lv_circle_cache[i]), sizeof(LV_GC_ROOT(_lv_circle_cache[i])));
+        lv_memzero(&(_circle_cache[i]), sizeof(_circle_cache[i]));
     }
 }
 
@@ -370,10 +370,10 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
 
     /*Try to reuse a circle cache entry*/
     for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
-        if(LV_GC_ROOT(_lv_circle_cache[i]).radius == radius) {
-            LV_GC_ROOT(_lv_circle_cache[i]).used_cnt++;
-            CIRCLE_CACHE_AGING(LV_GC_ROOT(_lv_circle_cache[i]).life, radius);
-            param->circle = &LV_GC_ROOT(_lv_circle_cache[i]);
+        if(_circle_cache[i].radius == radius) {
+            _circle_cache[i].used_cnt++;
+            CIRCLE_CACHE_AGING(_circle_cache[i].life, radius);
+            param->circle = &(_circle_cache[i]);
 #if LV_USE_OS
             lv_mutex_unlock(&circle_cache_mutex);
 #endif
@@ -384,9 +384,9 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
     /*If not cached use the free entry with lowest life*/
     _lv_draw_sw_mask_radius_circle_dsc_t * entry = NULL;
     for(i = 0; i < LV_DRAW_SW_CIRCLE_CACHE_SIZE; i++) {
-        if(LV_GC_ROOT(_lv_circle_cache[i]).used_cnt == 0) {
-            if(!entry) entry = &LV_GC_ROOT(_lv_circle_cache[i]);
-            else if(LV_GC_ROOT(_lv_circle_cache[i]).life < entry->life) entry = &LV_GC_ROOT(_lv_circle_cache[i]);
+        if(_circle_cache[i].used_cnt == 0) {
+            if(!entry) entry = &(_circle_cache[i]);
+            else if(_circle_cache[i].life < entry->life) entry = &(_circle_cache[i]);
         }
     }
 

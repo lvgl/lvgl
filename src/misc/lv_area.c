@@ -15,7 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define trans_cache lv_global_default()->area_trans_cache
+#define trans_cache LV_GLOBAL_DEFAULT()->area_trans_cache
 
 /**********************
  *      TYPEDEFS

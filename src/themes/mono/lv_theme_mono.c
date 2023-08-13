@@ -11,13 +11,12 @@
 #if LV_USE_THEME_MONO
 
 #include "lv_theme_mono.h"
-#include "../../misc/lv_gc.h"
 #include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define theme_def (lv_global_default()->theme_mono)
+#define theme_def (LV_GLOBAL_DEFAULT()->theme_mono)
 
 #define COLOR_FG      dark_bg ? lv_color_white() : lv_color_black()
 #define COLOR_BG      dark_bg ? lv_color_black() : lv_color_white()
@@ -199,8 +198,7 @@ lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t 
      *styles' data if LVGL is used in a binding (e.g. Micropython)
      *In a general case styles could be in simple `static lv_style_t my_style...` variables*/
     if(!lv_theme_mono_is_inited()) {
-        LV_GC_ROOT(_lv_theme_mono_data) = lv_malloc(sizeof(my_theme_styles_t));
-        theme_def = (my_theme_t *)LV_GC_ROOT(_lv_theme_mono_data);
+        theme_def = (my_theme_t *)lv_malloc(sizeof(my_theme_styles_t));
         lv_memzero(theme_def, sizeof(my_theme_t));
     }
 

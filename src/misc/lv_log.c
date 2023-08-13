@@ -25,9 +25,9 @@
  *      DEFINES
  *********************/
 #if LV_LOG_USE_TIMESTAMP
-    #define last_log_time lv_global_default()->log_last_log_time
+    #define last_log_time LV_GLOBAL_DEFAULT()->log_last_log_time
 #endif
-#define custom_print_cb lv_global_default()->custom_log_print_cb
+#define custom_print_cb LV_GLOBAL_DEFAULT()->custom_log_print_cb
 
 #if LV_LOG_USE_TIMESTAMP
     #define LOG_TIMESTAMP_FMT  "\t(%" LV_PRIu32 ".%03" LV_PRIu32 ", +%" LV_PRIu32 ")\t"
