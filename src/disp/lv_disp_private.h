@@ -59,18 +59,12 @@ struct _lv_disp_t {
     /*---------------------
      * Buffering
      *--------------------*/
-
-    /** First display buffer.*/
-    void * draw_buf_1;
-
-    /** Second display buffer.*/
-    void * draw_buf_2;
+    uint8_t * buf_1;
+    uint8_t * buf_2;
 
     /** Internal, used by the library*/
-    void * draw_buf_act;
-
-    /** In byte count*/
-    uint32_t draw_buf_size;
+    uint8_t * buf_act;
+    uint32_t buf_size_in_bytes;
 
     /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished*/
@@ -102,7 +96,7 @@ struct _lv_disp_t {
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
-    lv_layer_t * (*layer_init)(struct _lv_disp_t * disp);
+    void (*layer_init)(struct _lv_disp_t * disp, lv_layer_t * layer);
     void (*layer_deinit)(struct _lv_disp_t * disp, lv_layer_t * layer);
 
     /*---------------------

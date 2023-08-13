@@ -101,7 +101,7 @@ that point, column, or line segment.
 
 For :cpp:enumerator:`LV_CHART_TYPE_SCATTER` type
 :cpp:expr:`lv_chart_set_value_by_id2(chart, ser, id, value)` and
-:cpp:expr:`lv_chart_set_next_value2(chart, ser, x_valuem y_value)` can be used
+:cpp:expr:`lv_chart_set_next_value2(chart, ser, x_value, y_value)` can be used
 as well.
 
 Update modes

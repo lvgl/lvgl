@@ -177,7 +177,7 @@ void lv_demo_widgets(void)
 
         lv_obj_t * label = lv_label_create(tab_btns);
         lv_obj_add_style(label, &style_title, 0);
-        lv_label_set_text(label, "LVGL v8");
+        lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
         label = lv_label_create(tab_btns);

@@ -68,11 +68,8 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf)
     lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
     w += ext_size * 2;
     h += ext_size * 2;
-    uint8_t px_size;
 
-    px_size = lv_color_format_get_size(cf);
-
-    return w * h * px_size;
+    return lv_draw_buf_width_to_stride(w, cf) * h;
 }
 
 /** Take snapshot for object with its children, save image info to provided buffer.
@@ -116,20 +113,23 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_img_ds
     lv_obj_get_coords(obj, &snapshot_area);
     lv_area_increase(&snapshot_area, ext_size, ext_size);
 
-    lv_memset(buf, 0x00, buff_size);
+    lv_memzero(buf, buff_size);
     lv_memzero(dsc, sizeof(lv_img_dsc_t));
     dsc->data = buf;
     dsc->header.w = w;
     dsc->header.h = h;
     dsc->header.cf = cf;
+    dsc->header.always_zero = 0;
 
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));
 
-    layer.color_format = dsc->header.cf;
-    layer.buf_area = snapshot_area;
+
+    lv_draw_buf_init(&layer.draw_buf, dsc->header.w, dsc->header.h, dsc->header.cf);
+    layer.draw_buf.buf = buf;
+    layer.draw_buf_ofs.x = snapshot_area.x1;
+    layer.draw_buf_ofs.y = snapshot_area.y1;
     layer.clip_area = snapshot_area;
-    layer.buf = buf;
 
     lv_obj_redraw(&layer, obj);
 

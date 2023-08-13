@@ -76,6 +76,12 @@
  * RENDERING CONFIGURATION
  *========================*/
 
+/*Align the stride of all layers and images to this bytes*/
+#define LV_DRAW_BUF_STRIDE_ALIGN                1
+
+/*Align the start address of draw_buf addresses to this bytes*/
+#define LV_DRAW_BUF_ALIGN                       4
+
 /* Max. memory to be used for layers */
 #define  LV_LAYER_MAX_MEMORY_USAGE             150       /*[kB]*/
 
@@ -396,6 +402,8 @@
 
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
 
+#define LV_WIDGETS_HAS_DEFAULT_VALUE  1
+
 #define LV_USE_ANIMIMG    1
 
 #define LV_USE_ARC        1
@@ -698,8 +706,9 @@
 #define LV_USE_SDL              0
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
-    #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
-    #define LV_SDL_FULLSCREEN      0
+    #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+    #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
+    #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
     #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
 #endif
 
@@ -711,6 +720,13 @@
     #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
     #define LV_LINUX_FBDEV_BUFFER_COUNT  0
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
+#endif
+
+/*Driver for /dev/lcd*/
+#define LV_USE_NUTTX_LCD      0
+#if LV_USE_NUTTX_LCD
+    #define LV_NUTTX_LCD_BUFFER_COUNT    0
+    #define LV_NUTTX_LCD_BUFFER_SIZE     60
 #endif
 
 /*Driver for /dev/dri/card*/

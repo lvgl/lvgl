@@ -243,6 +243,8 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
     /*Initialize the allocated 'ext'*/
+
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
     calendar->today.year  = 2020;
     calendar->today.month = 1;
     calendar->today.day   = 1;
@@ -250,6 +252,7 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     calendar->showed_date.year  = 2020;
     calendar->showed_date.month = 1;
     calendar->showed_date.day   = 1;
+#endif
 
     calendar->highlighted_dates      = NULL;
     calendar->highlighted_dates_num  = 0;
@@ -282,8 +285,10 @@ static void lv_calendar_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_grow(calendar->btnm, 1);
 
+#if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_calendar_set_showed_date(obj, calendar->showed_date.year, calendar->showed_date.month);
     lv_calendar_set_today_date(obj, calendar->today.year, calendar->today.month, calendar->today.day);
+#endif
 
     lv_obj_add_flag(calendar->btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 }

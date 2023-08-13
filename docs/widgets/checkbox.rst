@@ -42,7 +42,7 @@ common state add/clear function:
 
 .. code:: c
 
-   lv_obj_add_state(cb, LV_STATE_CHECKED);   /*Make the chekbox checked*/
+   lv_obj_add_state(cb, LV_STATE_CHECKED);   /*Make the checkbox checked*/
    lv_obj_clear_state(cb, LV_STATE_CHECKED); /*MAke the checkbox unchecked*/
    lv_obj_add_state(cb, LV_STATE_CHECKED | LV_STATE_DISABLED); /*Make the checkbox checked and disabled*/
 

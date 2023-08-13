@@ -66,12 +66,12 @@ New Keymap
 You can specify a new map (layout) for the keyboard with
 :cpp:expr:`lv_keyboard_set_map(kb, LV_KEYBOARD_MODE_..., kb_map, kb_ctrl)`. See
 the `Button matrix </widgets/btnmatrix>`__ for more information about
-creating new maps a ctrls.
+creating new maps and ctrls.
 
 Keep in mind that using following keywords will have the same effect as
 with the original map:
 
-- :c:macro:`LV_SYMBOL_OK` Send ``LV_EVENT_RADY`` to the assigned Text area.
+- :c:macro:`LV_SYMBOL_OK` Send ``LV_EVENT_READY`` to the assigned Text area.
 - :c:macro:`LV_SYMBOL_CLOSE` or :c:macro:`LV_SYMBOL_KEYBOARD` Send :cpp:enumerator:`LV_EVENT_CANCEL` to the assigned Text area.
 - :c:macro:`LV_SYMBOL_BACKSPACE` Delete on the left.
 - :c:macro:`LV_SYMBOL_LEFT` Move the cursor left.

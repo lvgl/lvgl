@@ -66,7 +66,6 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
                          int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                          int32_t x_end, uint8_t * abuf, bool aa);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -80,10 +79,9 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
  **********************/
 
 void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
-                          lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
+                          lv_coord_t src_w, lv_coord_t src_h,
                           const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t src_cf, void * dest_buf)
 {
-
     LV_UNUSED(draw_unit);
     LV_UNUSED(sup);
 
@@ -109,18 +107,21 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
     tr_dsc.pivot_x_256 = tr_dsc.pivot.x * 256;
     tr_dsc.pivot_y_256 = tr_dsc.pivot.y * 256;
 
-    uint32_t dest_px_size;
-    if(src_cf == LV_COLOR_FORMAT_RGB888) dest_px_size = 4;
-    else if(src_cf == LV_COLOR_FORMAT_RGB565A8) dest_px_size = 2;
-    else dest_px_size = lv_color_format_get_size(src_cf);
 
     lv_coord_t dest_w = lv_area_get_width(dest_area);
     lv_coord_t dest_h = lv_area_get_height(dest_area);
+    lv_coord_t src_stride = lv_draw_buf_width_to_stride(src_w, src_cf) / lv_color_format_get_size(src_cf);
+
+    lv_coord_t dest_stride_a8 = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_A8);
+    lv_coord_t dest_stride;
+    if(src_cf == LV_COLOR_FORMAT_RGB888) dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_ARGB8888);
+    else if(src_cf == LV_COLOR_FORMAT_RGB565A8) dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_RGB565);
+    else dest_stride = lv_draw_buf_width_to_stride(dest_w, src_cf);
 
     uint8_t * alpha_buf;
     if(src_cf == LV_COLOR_FORMAT_RGB565 || src_cf == LV_COLOR_FORMAT_RGB565A8) {
         alpha_buf = dest_buf;
-        alpha_buf += dest_w * dest_h * 2;
+        alpha_buf += dest_stride * dest_h;
     }
     else {
         alpha_buf = NULL;
@@ -173,8 +174,8 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
                 break;
         }
 
-        dest_buf = (uint8_t *)dest_buf + dest_w * dest_px_size;
-        if(alpha_buf) alpha_buf += dest_w;
+        dest_buf = (uint8_t *)dest_buf + dest_stride;
+        if(alpha_buf) alpha_buf += dest_stride_a8;
     }
 }
 

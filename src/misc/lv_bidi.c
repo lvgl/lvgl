@@ -216,7 +216,7 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
  * @param len length of the text
  * @param base_dir base dir of the text
  * @param pos_conv_out an `uint16_t` array to store the related logical position of the character.
- * Can be `NULL` is unused
+ * Can be `NULL` if unused
  * @param pos_conv_len length of `pos_conv_out` in element count
  */
 void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_base_dir_t base_dir,
@@ -253,8 +253,8 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
         uint32_t letter = _lv_txt_encoded_next(str_in, &rd);
         pos_conv_rd++;
         dir = lv_bidi_get_letter_dir(letter);
-        if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(&ctx, str_in, rd, len, letter, base_dir);
-        if(dir != LV_BASE_DIR_NEUTRAL && dir != LV_BASE_DIR_WEAK) break;
+        if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(str_in, rd, len, letter, base_dir);
+        else if(dir != LV_BASE_DIR_WEAK) break;
     }
 
     if(rd && str_in[rd] != '\0') {

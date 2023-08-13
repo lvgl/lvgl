@@ -848,6 +848,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_obj_add_event(ta->label, label_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+
     lv_textarea_set_cursor_pos(obj, 0);
 
     start_cursor_blink(obj);

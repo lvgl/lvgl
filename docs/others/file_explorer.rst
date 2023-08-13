@@ -209,7 +209,7 @@ default sorting to :c:enumerator:`LV_EXPLORER_SORT_NONE`. The default is
 Event
 -----
 
--  :c:enumerator:`LV_EVENT_READY` sent shen a directory is opened. You can customize
+-  :c:enumerator:`LV_EVENT_READY` sent when a directory is opened. You can customize
    the sort.
 
 -  :c:enumerator:`LV_EVENT_VALUE_CHANGED` sent when an item(file) in the file list

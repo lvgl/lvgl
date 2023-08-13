@@ -767,6 +767,9 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "Widget usage"
+		config LV_WIDGETS_HAS_DEFAULT_VALUE
+			bool "Widgets has default value."
+			default y if !LV_CONF_MINIMAL
 		config LV_USE_ARC
 			bool "Arc."
 			default y if !LV_CONF_MINIMAL
@@ -1210,6 +1213,38 @@ menu "LVGL configuration"
 		config LV_LINUX_FBDEV_BUFFER_SIZE
 			int "Custom partial buffer size (in number of rows)"
 			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
+			default 60
+
+		config LV_USE_NUTTX_LCD
+			bool "Use NuttX LCD device"
+			default n
+
+		choice
+			prompt "NuttX LCD buffer size"
+			depends on LV_USE_NUTTX_LCD
+			default LV_NUTTX_LCD_SINGLE_BUFFER
+
+			config LV_NUTTX_LCD_SINGLE_BUFFER
+				bool "One screen-sized buffer"
+
+			config LV_NUTTX_LCD_DOUBLE_BUFFER
+				bool "Two screen-sized buffer"
+
+			config LV_NUTTX_LCD_CUSTOM_BUFFER
+				bool "Custom-sized buffer"
+
+		endchoice
+
+		config LV_NUTTX_LCD_BUFFER_COUNT
+			int
+			depends on LV_USE_NUTTX_LCD
+			default 0 if LV_NUTTX_LCD_CUSTOM_BUFFER
+			default 1 if LV_NUTTX_LCD_SINGLE_BUFFER
+			default 2 if LV_NUTTX_LCD_DOUBLE_BUFFER
+
+		config LV_NUTTX_LCD_BUFFER_SIZE
+			int "Custom partial buffer size (in number of rows)"
+			depends on LV_USE_NUTTX_LCD && LV_NUTTX_LCD_CUSTOM_BUFFER
 			default 60
 
 		config LV_USE_LINUX_DRM

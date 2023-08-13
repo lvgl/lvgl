@@ -186,6 +186,28 @@
  * RENDERING CONFIGURATION
  *========================*/
 
+/*Align the stride of all layers and images to this bytes*/
+#ifndef LV_DRAW_BUF_STRIDE_ALIGN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+        #else
+            #define LV_DRAW_BUF_STRIDE_ALIGN 0
+        #endif
+    #else
+        #define LV_DRAW_BUF_STRIDE_ALIGN                1
+    #endif
+#endif
+
+/*Align the start address of draw_buf addresses to this bytes*/
+#ifndef LV_DRAW_BUF_ALIGN
+    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
+        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
+    #else
+        #define LV_DRAW_BUF_ALIGN                       4
+    #endif
+#endif
+
 /* Max. memory to be used for layers */
 #ifndef LV_LAYER_MAX_MEMORY_USAGE
     #ifdef CONFIG_LV_LAYER_MAX_MEMORY_USAGE
@@ -1135,6 +1157,18 @@
  *================*/
 
 /*Documentation of the widgets: https://docs.lvgl.io/latest/en/html/widgets/index.html*/
+
+#ifndef LV_WIDGETS_HAS_DEFAULT_VALUE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_WIDGETS_HAS_DEFAULT_VALUE
+            #define LV_WIDGETS_HAS_DEFAULT_VALUE CONFIG_LV_WIDGETS_HAS_DEFAULT_VALUE
+        #else
+            #define LV_WIDGETS_HAS_DEFAULT_VALUE 0
+        #endif
+    #else
+        #define LV_WIDGETS_HAS_DEFAULT_VALUE  1
+    #endif
+#endif
 
 #ifndef LV_USE_ANIMIMG
     #ifdef _LV_KCONFIG_PRESENT
@@ -2254,18 +2288,29 @@
             #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
         #endif
     #endif
-    #ifndef LV_SDL_PARTIAL_MODE
-        #ifdef CONFIG_LV_SDL_PARTIAL_MODE
-            #define LV_SDL_PARTIAL_MODE CONFIG_LV_SDL_PARTIAL_MODE
+    #ifndef LV_SDL_RENDER_MODE
+        #ifdef CONFIG_LV_SDL_RENDER_MODE
+            #define LV_SDL_RENDER_MODE CONFIG_LV_SDL_RENDER_MODE
         #else
-            #define LV_SDL_PARTIAL_MODE    0    /*Recommended only to emulate a setup with a display controller*/
+            #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+        #endif
+    #endif
+    #ifndef LV_SDL_BUF_COUNT
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_SDL_BUF_COUNT
+                #define LV_SDL_BUF_COUNT CONFIG_LV_SDL_BUF_COUNT
+            #else
+                #define LV_SDL_BUF_COUNT 0
+            #endif
+        #else
+            #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
         #endif
     #endif
     #ifndef LV_SDL_FULLSCREEN
         #ifdef CONFIG_LV_SDL_FULLSCREEN
             #define LV_SDL_FULLSCREEN CONFIG_LV_SDL_FULLSCREEN
         #else
-            #define LV_SDL_FULLSCREEN      0
+            #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
         #endif
     #endif
     #ifndef LV_SDL_DIRECT_EXIT
@@ -2323,6 +2368,31 @@
             #define LV_LINUX_FBDEV_BUFFER_SIZE CONFIG_LV_LINUX_FBDEV_BUFFER_SIZE
         #else
             #define LV_LINUX_FBDEV_BUFFER_SIZE   60
+        #endif
+    #endif
+#endif
+
+/*Driver for /dev/lcd*/
+#ifndef LV_USE_NUTTX_LCD
+    #ifdef CONFIG_LV_USE_NUTTX_LCD
+        #define LV_USE_NUTTX_LCD CONFIG_LV_USE_NUTTX_LCD
+    #else
+        #define LV_USE_NUTTX_LCD      0
+    #endif
+#endif
+#if LV_USE_NUTTX_LCD
+    #ifndef LV_NUTTX_LCD_BUFFER_COUNT
+        #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
+            #define LV_NUTTX_LCD_BUFFER_COUNT CONFIG_LV_NUTTX_LCD_BUFFER_COUNT
+        #else
+            #define LV_NUTTX_LCD_BUFFER_COUNT    0
+        #endif
+    #endif
+    #ifndef LV_NUTTX_LCD_BUFFER_SIZE
+        #ifdef CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
+            #define LV_NUTTX_LCD_BUFFER_SIZE CONFIG_LV_NUTTX_LCD_BUFFER_SIZE
+        #else
+            #define LV_NUTTX_LCD_BUFFER_SIZE     60
         #endif
     #endif
 #endif

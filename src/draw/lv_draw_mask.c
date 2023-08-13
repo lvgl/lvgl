@@ -43,12 +43,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect_dsc_init(lv_draw_mask_rect_dsc_t * 
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_mask_rect(struct _lv_layer_t * layer, const lv_draw_mask_rect_dsc_t * dsc)
 {
-    if(!lv_color_format_has_alpha(layer->color_format)) {
+    if(!lv_color_format_has_alpha(layer->draw_buf.color_format)) {
         LV_LOG_WARN("Only layers with alpha channel can be masked");
         return;
     }
 
-    lv_draw_task_t * t = lv_draw_add_task(layer, &layer->buf_area);
+    lv_area_t a;
+    lv_draw_layer_get_area(layer, &a);
+    lv_draw_task_t * t = lv_draw_add_task(layer, &a);
 
     t->draw_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
