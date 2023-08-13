@@ -15,7 +15,7 @@ The simulator is ported to various IDEs (Integrated Development Environments). C
 
 - [Eclipse with SDL driver](https://github.com/lvgl/lv_sim_eclipse_sdl): Recommended on Linux and Mac
 - [CodeBlocks](https://github.com/lvgl/lv_sim_codeblocks_win): Recommended on Windows
-- [VisualStudio with SDL driver](https://github.com/lvgl/lv_sim_visual_studio_sdl): For Windows
+- [VisualStudio](https://github.com/lvgl/lv_sim_visual_studio_sdl): For Windows
 - [VSCode with SDL driver](https://github.com/lvgl/lv_sim_vscode_sdl): Recommended on Linux and Mac
 - [PlatformIO with SDL driver](https://github.com/lvgl/lv_platformio): Recommended on Linux and Mac
 - [MDK with FastModel](https://github.com/lvgl/lv_port_an547_cm55_sim): For Windows
