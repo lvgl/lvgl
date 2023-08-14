@@ -92,7 +92,7 @@ void lv_animimg_start(lv_obj_t * obj);
 void lv_animimg_set_duration(lv_obj_t * img, uint32_t duration);
 
 /**
- * Set the image animation repeatly play times.
+ * Set the image animation repeatedly play times.
  * @param img pointer to an animation image object
  * @param count the number of times to repeat the animation
  */

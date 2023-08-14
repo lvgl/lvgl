@@ -114,7 +114,7 @@ class UnityTestRunnerGenerator
     # @ is not a valid C character, so there should be no clashes with files genuinely containing these markers
     substring_subs = { '{' => '@co@', '}' => '@cc@', ';' => '@ss@', '/' => '@fs@' }
     substring_re = Regexp.union(substring_subs.keys)
-    substring_unsubs = substring_subs.invert                   # the inverse map will be used to fix the strings afterwords
+    substring_unsubs = substring_subs.invert                   # the inverse map will be used to fix the strings afterwards
     substring_unsubs['@quote@'] = '\\"'
     substring_unsubs['@apos@'] = '\\\''
     substring_unre = Regexp.union(substring_unsubs.keys)
