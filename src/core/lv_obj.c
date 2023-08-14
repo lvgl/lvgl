@@ -513,6 +513,11 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
+        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_COVER_RES_NOT_COVER;
+            return;
+        }
+
         info->res = LV_COVER_RES_COVER;
 
     }
@@ -697,7 +702,7 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         }
     }
 
-    lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_SCROLLBAR);
+    lv_opa_t opa = lv_obj_get_style_opa_recursive(obj, LV_PART_SCROLLBAR);
     if(opa < LV_OPA_MAX) {
         dsc->bg_opa = (dsc->bg_opa * opa) >> 8;
         dsc->border_opa = (dsc->bg_opa * opa) >> 8;
