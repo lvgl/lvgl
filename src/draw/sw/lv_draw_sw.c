@@ -84,12 +84,12 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     if(t == NULL) return -1;
 
     /*If the buffer of the layer is not allocated yet, allocate it now*/
-    if(layer->draw_buf.buf == NULL) {
+    if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
         uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
                                                                                         layer->draw_buf.color_format);
 
         lv_draw_buf_malloc(&layer->draw_buf);
-        if(layer->draw_buf.buf == NULL) {
+        if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
             LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
             return -1;
         }

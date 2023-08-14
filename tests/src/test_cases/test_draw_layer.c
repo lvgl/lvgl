@@ -45,13 +45,13 @@ void test_layer_mixed_rgb(void)
     obj = create_test_obj("Normal", true);
 
     obj = create_test_obj("Opa = 50%", true);
-    lv_obj_set_style_opa(obj, LV_OPA_50, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
 
     obj = create_test_obj("Opa = 20%", true);
-    lv_obj_set_style_opa(obj, LV_OPA_20, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_20, 0);
 
     obj = create_test_obj("Opa = 90%", true);
-    lv_obj_set_style_opa(obj, LV_OPA_90, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_90, 0);
 
     obj = create_test_obj("Subtractive", true);
     lv_obj_set_style_blend_mode(obj, LV_BLEND_MODE_SUBTRACTIVE, 0);
@@ -80,13 +80,13 @@ void test_layer_mixed_argb(void)
     obj = create_test_obj("Normal", false);
 
     obj = create_test_obj("Opa = 50%", false);
-    lv_obj_set_style_opa(obj, LV_OPA_50, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
 
     obj = create_test_obj("Opa = 20%", false);
-    lv_obj_set_style_opa(obj, LV_OPA_20, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_20, 0);
 
     obj = create_test_obj("Opa = 90%", false);
-    lv_obj_set_style_opa(obj, LV_OPA_90, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_90, 0);
 
     obj = create_test_obj("Subtractive", false);
     lv_obj_set_style_blend_mode(obj, LV_BLEND_MODE_SUBTRACTIVE, 0);
@@ -114,7 +114,7 @@ void test_layer_large_opa_argb(void)
     obj = create_test_obj(lorem_ipsum, false);
     lv_obj_set_width(lv_obj_get_child(obj, 0), lv_pct(100));
     lv_obj_set_size(obj, 600, 400);
-    lv_obj_set_style_opa(obj, LV_OPA_50, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/layer_large_opa_argb.png");
 }
@@ -125,7 +125,7 @@ void test_layer_large_opa_rgb(void)
     obj = create_test_obj(lorem_ipsum, true);
     lv_obj_set_width(lv_obj_get_child(obj, 0), lv_pct(100));
     lv_obj_set_size(obj, 600, 400);
-    lv_obj_set_style_opa(obj, LV_OPA_50, 0);
+    lv_obj_set_style_opa_layered(obj, LV_OPA_50, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/layer_large_opa_rgb.png");
 }

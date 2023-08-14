@@ -156,6 +156,8 @@ void lv_style_set_clip_corner(lv_style_t * style, bool value);
 extern const lv_style_prop_t _lv_style_const_prop_id_CLIP_CORNER;
 void lv_style_set_opa(lv_style_t * style, lv_opa_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_OPA;
+void lv_style_set_opa_layered(lv_style_t * style, lv_opa_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_OPA_LAYERED;
 void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value);
 extern const lv_style_prop_t _lv_style_const_prop_id_COLOR_FILTER_DSC;
 void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value);
@@ -568,6 +570,11 @@ extern const lv_style_prop_t _lv_style_const_prop_id_BASE_DIR;
 #define LV_STYLE_CONST_OPA(val) \
     { \
         .prop_ptr = &_lv_style_const_prop_id_OPA, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_OPA_LAYERED(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_OPA_LAYERED, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_COLOR_FILTER_DSC(val) \

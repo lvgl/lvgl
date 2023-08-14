@@ -25,6 +25,7 @@ extern "C" {
  **********************/
 typedef struct {
     void * buf;
+
     lv_coord_t width;
     lv_coord_t height;
     lv_color_format_t color_format;
@@ -34,6 +35,7 @@ void lv_draw_buf_init(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h, lv_c
 void lv_draw_buf_malloc(lv_draw_buf_t * draw_buf);
 void lv_draw_buf_realloc(lv_draw_buf_t  * buf, lv_coord_t w, lv_coord_t h, lv_color_format_t color_format);
 void lv_draw_buf_free(lv_draw_buf_t  * buf);
+void * lv_draw_buf_get_buf(lv_draw_buf_t * draw_buf);
 void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * buf);
 
 uint32_t lv_draw_buf_get_stride(const lv_draw_buf_t * draw_buf);

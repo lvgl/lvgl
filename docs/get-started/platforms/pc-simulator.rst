@@ -27,7 +27,7 @@ Choose your favorite IDE, read its README on GitHub, download the project, and l
 
 - `Eclipse with SDLdriver <https://github.com/lvgl/lv_sim_eclipse_sdl>`__: Recommended on Linux and Mac
 - `CodeBlocks <https://github.com/lvgl/lv_sim_codeblocks_win>`__: Recommended on Windows
-- `VisualStudio with SDL driver <https://github.com/lvgl/lv_sim_visual_studio_sdl>`__: For Windows
+- `VisualStudio <https://github.com/lvgl/lv_sim_visual_studio_sdl>`__: For Windows
 - `VSCode with SDL driver <https://github.com/lvgl/lv_sim_vscode_sdl>`__: Recommended on Linux and Mac
 - `PlatformIO with SDL driver <https://github.com/lvgl/lv_platformio>`__: Recommended on Linux and Mac
 - `MDK with FastModel <https://github.com/lvgl/lv_port_an547_cm55_sim>`__: For Windows
