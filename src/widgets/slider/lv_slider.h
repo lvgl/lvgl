@@ -51,6 +51,7 @@ typedef struct {
     int32_t * value_to_set; /*Which bar value to set*/
     uint8_t dragging : 1;       /*1: the slider is being dragged*/
     uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
+    uint8_t knob_inside : 1;
 } lv_slider_t;
 
 extern const lv_obj_class_t lv_slider_class;
@@ -112,6 +113,13 @@ static inline void lv_slider_set_mode(lv_obj_t * obj, lv_slider_mode_t mode)
 {
     lv_bar_set_mode(obj, (lv_bar_mode_t)mode);
 }
+
+/**
+ * Set the knob inside functionality.
+ * @param obj       pointer to a slider object
+ * @param enable    Configure knob inside functionality
+ */
+void lv_slider_set_knob_inside(lv_obj_t * obj, uint8_t enable);
 
 /*=====================
  * Getter functions

@@ -77,6 +77,16 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
     return slider->dragging ? true : false;
 }
 
+void lv_slider_set_knob_inside(lv_obj_t * obj, uint8_t enable)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_slider_t * slider = (lv_slider_t *)obj;
+
+    slider->knob_inside = enable;
+
+    lv_obj_invalidate(obj);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -90,6 +100,7 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     slider->value_to_set = NULL;
     slider->dragging = 0U;
     slider->left_knob_focus = 0U;
+    slider->knob_inside = 0U;
 
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
