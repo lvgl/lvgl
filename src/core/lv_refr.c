@@ -973,7 +973,7 @@ void refr_obj(lv_draw_ctx_t * draw_ctx, lv_obj_t * obj)
         lv_obj_redraw(draw_ctx, obj);
     }
     else {
-        lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
+        lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
         if(opa < LV_OPA_MIN) return;
 
         lv_area_t layer_area_full;

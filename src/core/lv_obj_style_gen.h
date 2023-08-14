@@ -162,7 +162,8 @@ static inline lv_color_t lv_obj_get_style_bg_grad_color(const struct _lv_obj_t *
 
 static inline lv_color_t lv_obj_get_style_bg_grad_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_GRAD_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                           LV_STYLE_BG_GRAD_COLOR));
     return v.color;
 }
 
@@ -216,7 +217,8 @@ static inline lv_color_t lv_obj_get_style_bg_img_recolor(const struct _lv_obj_t 
 
 static inline lv_color_t lv_obj_get_style_bg_img_recolor_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BG_IMG_RECOLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                           LV_STYLE_BG_IMG_RECOLOR));
     return v.color;
 }
 
@@ -240,7 +242,8 @@ static inline lv_color_t lv_obj_get_style_border_color(const struct _lv_obj_t * 
 
 static inline lv_color_t lv_obj_get_style_border_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_BORDER_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                           LV_STYLE_BORDER_COLOR));
     return v.color;
 }
 
@@ -282,7 +285,8 @@ static inline lv_color_t lv_obj_get_style_outline_color(const struct _lv_obj_t *
 
 static inline lv_color_t lv_obj_get_style_outline_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_OUTLINE_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                           LV_STYLE_OUTLINE_COLOR));
     return v.color;
 }
 
@@ -330,7 +334,8 @@ static inline lv_color_t lv_obj_get_style_shadow_color(const struct _lv_obj_t * 
 
 static inline lv_color_t lv_obj_get_style_shadow_color_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_SHADOW_COLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                           LV_STYLE_SHADOW_COLOR));
     return v.color;
 }
 
@@ -354,7 +359,8 @@ static inline lv_color_t lv_obj_get_style_img_recolor(const struct _lv_obj_t * o
 
 static inline lv_color_t lv_obj_get_style_img_recolor_filtered(const struct _lv_obj_t * obj, uint32_t part)
 {
-    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part, LV_STYLE_IMG_RECOLOR));
+    lv_style_value_t v = _lv_obj_style_apply_color_filter(obj, part, lv_obj_get_style_prop(obj, part,
+                                                                                           LV_STYLE_IMG_RECOLOR));
     return v.color;
 }
 
@@ -508,7 +514,14 @@ static inline lv_opa_t lv_obj_get_style_opa(const struct _lv_obj_t * obj, uint32
     return (lv_opa_t)v.num;
 }
 
-static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_opa_t lv_obj_get_style_opa_layered(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_OPA_LAYERED);
+    return (lv_opa_t)v.num;
+}
+
+static inline const lv_color_filter_dsc_t * lv_obj_get_style_color_filter_dsc(const struct _lv_obj_t * obj,
+                                                                              uint32_t part)
 {
     lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_DSC);
     return (const lv_color_filter_dsc_t *)v.ptr;
@@ -637,12 +650,15 @@ void lv_obj_set_style_text_align(struct _lv_obj_t * obj, lv_text_align_t value, 
 void lv_obj_set_style_radius(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_clip_corner(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector);
 void lv_obj_set_style_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
-void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector);
+void lv_obj_set_style_opa_layered(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
+void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value,
+                                       lv_style_selector_t selector);
 void lv_obj_set_style_color_filter_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim(struct _lv_obj_t * obj, const lv_anim_t * value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_time(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
 void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_style_selector_t selector);
-void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector);
+void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
+                                 lv_style_selector_t selector);
 void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector);
 void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint16_t value, lv_style_selector_t selector);
 void lv_obj_set_style_base_dir(struct _lv_obj_t * obj, lv_base_dir_t value, lv_style_selector_t selector);

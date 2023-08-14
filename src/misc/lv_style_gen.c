@@ -600,6 +600,14 @@ void lv_style_set_opa(lv_style_t * style, lv_opa_t value)
     lv_style_set_prop(style, LV_STYLE_OPA, v);
 }
 
+void lv_style_set_opa_layered(lv_style_t * style, lv_opa_t value)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_style_set_prop(style, LV_STYLE_OPA_LAYERED, v);
+}
+
 void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value)
 {
     lv_style_value_t v = {

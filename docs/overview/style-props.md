@@ -385,7 +385,7 @@ Sets whether the border should be drawn before or after the children are drawn. 
 Properties to describe the outline. It's like a border but drawn outside of the rectangles.
 
 ### outline_width
-Set the width of the outline in pixels. 
+Set the width of the outline in pixels.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -433,7 +433,7 @@ Set the width of the shadow in pixels. The value should be >= 0.
 </ul>
 
 ### shadow_ofs_x
-Set an offset on the shadow in pixels in X direction. 
+Set an offset on the shadow in pixels in X direction.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -442,7 +442,7 @@ Set an offset on the shadow in pixels in X direction.
 </ul>
 
 ### shadow_ofs_y
-Set an offset on the shadow in pixels in Y direction. 
+Set an offset on the shadow in pixels in Y direction.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -538,7 +538,7 @@ Set the gap between dashes in pixel. Note that dash works only on horizontal and
 </ul>
 
 ### line_rounded
-Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -577,7 +577,7 @@ Set the width (thickness) of the arcs in pixel.
 </ul>
 
 ### arc_rounded
-Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -634,7 +634,7 @@ Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 </ul>
 
 ### text_font
-Set the font of the text (a pointer `lv_font_t *`). 
+Set the font of the text (a pointer `lv_font_t *`).
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_FONT_DEFAULT`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
@@ -701,6 +701,15 @@ Enable to clip the overflowed content on the rounded corner. Can be `true` or `f
 
 ### opa
 Scale down all opacity values of the object by this factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
+<ul>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Layout</strong> No</li>
+<li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
+</ul>
+
+### opa_layered
+First draw the object on the layer, then scale down layer opacity factor. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>
