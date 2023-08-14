@@ -563,6 +563,40 @@ lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, 
     return align;
 }
 
+lv_opa_t lv_obj_get_style_opa_recursive(const lv_obj_t * obj, lv_part_t part)
+{
+
+    lv_opa_t opa_obj = lv_obj_get_style_opa(obj, part);
+    if(opa_obj <= LV_OPA_MIN) return LV_OPA_TRANSP;
+
+    lv_opa_t opa_final = LV_OPA_COVER;
+    if(opa_obj < LV_OPA_MAX) {
+        opa_final = LV_OPA_MIX2(opa_final, opa_obj);
+    }
+
+    if(part != LV_PART_MAIN) {
+        part = LV_PART_MAIN;
+    }
+    else {
+        obj = lv_obj_get_parent(obj);
+    }
+
+    while(obj) {
+        opa_obj = lv_obj_get_style_opa(obj, part);
+        if(opa_obj <= LV_OPA_MIN) return LV_OPA_TRANSP;
+        if(opa_obj < LV_OPA_MAX) {
+            opa_final = LV_OPA_MIX2(opa_final, opa_obj);
+        }
+
+        obj = lv_obj_get_parent(obj);
+    }
+
+    if(opa_final <= LV_OPA_MIN) return LV_OPA_TRANSP;
+    if(opa_final >= LV_OPA_MAX) return LV_OPA_COVER;
+    return opa_final;
+}
+
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -919,7 +953,7 @@ static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
 {
     if(lv_obj_get_style_transform_angle(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_transform_zoom(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_opa(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
+    if(lv_obj_get_style_opa_layered(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
     if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
     return LV_LAYER_TYPE_NONE;
 }
