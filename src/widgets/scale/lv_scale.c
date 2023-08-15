@@ -809,7 +809,6 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /* Get style properties so they can be used in the main line drawing */
-        const lv_coord_t height = (lv_coord_t) lv_obj_get_content_height(obj);
         const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
         const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj,
                                                                                                                LV_PART_MAIN);
