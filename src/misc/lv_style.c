@@ -216,7 +216,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
     LV_ASSERT_STYLE(style);
 
-    if(style->prop_cnt == 255) {
+    if(lv_style_is_const(style)) {
         LV_LOG_ERROR("Cannot remove prop from const style");
         return false;
     }
@@ -261,7 +261,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 {
     LV_ASSERT_STYLE(style);
 
-    if(style->prop_cnt == 255) {
+    if(lv_style_is_const(style)) {
         LV_LOG_ERROR("Cannot set property of constant style");
         return;
     }

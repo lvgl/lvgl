@@ -399,6 +399,17 @@ void lv_style_init(lv_style_t * style);
 void lv_style_reset(lv_style_t * style);
 
 /**
+ * Check if a style is constant
+ * @param style     pointer to a style
+ * @return          true: the style is constant
+ */
+static inline bool lv_style_is_const(const lv_style_t * style)
+{
+    if(style->prop_cnt == 255) return true;
+    return false;
+}
+
+/**
  * Register a new style property for custom usage
  * @return a new property ID, or LV_STYLE_PROP_INV if there are no more available.
  * @example
@@ -483,7 +494,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
 static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style, lv_style_prop_t prop,
                                                        lv_style_value_t * value)
 {
-    if(style->prop_cnt == 255) {
+    if(lv_style_is_const(style)) {
         lv_style_const_prop_t * props = (lv_style_const_prop_t *)style->values_and_props;
         uint32_t i;
         for(i = 0; props[i].prop_ptr; i++) {

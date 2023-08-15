@@ -121,7 +121,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 
 #if LV_OBJ_STYLE_CACHE
     uint32_t * prop_is_set = part == LV_PART_MAIN ? &obj->style_main_prop_is_set : &obj->style_other_prop_is_set;
-    if(style->prop_cnt == 255) {
+    if(lv_style_is_const(style)) {
         lv_style_const_prop_t * props = style->values_and_props;
         for(i = 0; props[i].prop_ptr; i++) {
             (*prop_is_set) |= (uint32_t)1 << ((*props[i].prop_ptr) >> 2);
@@ -1058,7 +1058,7 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
             if(lv_obj_style_get_selector_part(obj->styles[i].selector) != LV_PART_MAIN) continue;
             lv_style_t * style = (lv_style_t *)obj->styles[i].style;
             uint32_t j;
-            if(style->prop_cnt == 255) {
+            if(lv_style_is_const(style)) {
                 lv_style_const_prop_t * props = style->values_and_props;
                 for(j = 0; props[j].prop_ptr; j++) {
                     obj->style_main_prop_is_set |= (uint32_t)1 << ((*props[j].prop_ptr) >> 2);
@@ -1078,7 +1078,7 @@ static void full_cache_refresh(lv_obj_t * obj, lv_part_t part)
             if(lv_obj_style_get_selector_part(obj->styles[i].selector) == LV_PART_MAIN) continue;
             lv_style_t * style = (lv_style_t *)obj->styles[i].style;
             uint32_t j;
-            if(style->prop_cnt == 255) {
+            if(lv_style_is_const(style)) {
                 lv_style_const_prop_t * props = style->values_and_props;
                 for(j = 0; props[j].prop_ptr; j++) {
                     obj->style_other_prop_is_set |= (uint32_t)1 << ((*props[j].prop_ptr) >> 2);
@@ -1110,7 +1110,7 @@ static void fade_in_anim_ready(lv_anim_t * a)
 
 static bool style_has_flag(const lv_style_t * style, uint32_t flag)
 {
-    if(style->prop_cnt == 255) {
+    if(lv_style_is_const(style)) {
         lv_style_const_prop_t * props = style->values_and_props;
         uint32_t i;
         for(i = 0; props[i].prop_ptr; i++) {
