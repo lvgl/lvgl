@@ -269,7 +269,11 @@
 
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#define lv_color_mix_ROUND_OFS 0
+#define LV_COLOR_MIX_ROUND_OFS 0
+
+
+/* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
+#define  LV_OBJ_STYLE_CACHE 1
 
 /*=====================
  *  COMPILER SETTINGS

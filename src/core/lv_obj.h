@@ -176,6 +176,10 @@ typedef struct _lv_obj_t {
     struct _lv_obj_t * parent;
     _lv_obj_spec_attr_t * spec_attr;
     _lv_obj_style_t * styles;
+#if LV_OBJ_STYLE_CACHE
+    uint32_t style_main_prop_is_set;
+    uint32_t style_other_prop_is_set;
+#endif
     void * user_data;
     lv_area_t coords;
     lv_obj_flag_t flags;

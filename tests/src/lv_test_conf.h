@@ -21,12 +21,14 @@ extern "C" {
 #define LV_USE_STDLIB_STRING        LV_STDLIB_CLIB
 #define LV_USE_STDLIB_SPRINTF       LV_STDLIB_CLIB
 #define LV_USE_OS                   LV_OS_PTHREAD
+#define LV_OBJ_STYLE_CACHE          0
 #endif
 
 #ifdef LVGL_CI_USING_DEF_HEAP
 #define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
 #define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
 #define LV_USE_STDLIB_SPRINTF   LV_STDLIB_BUILTIN
+#define LV_OBJ_STYLE_CACHE      1
 #endif
 
 

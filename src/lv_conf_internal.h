@@ -725,11 +725,25 @@
 
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#ifndef lv_color_mix_ROUND_OFS
+#ifndef LV_COLOR_MIX_ROUND_OFS
     #ifdef CONFIG_LV_COLOR_MIX_ROUND_OFS
-        #define lv_color_mix_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
+        #define LV_COLOR_MIX_ROUND_OFS CONFIG_LV_COLOR_MIX_ROUND_OFS
     #else
-        #define lv_color_mix_ROUND_OFS 0
+        #define LV_COLOR_MIX_ROUND_OFS 0
+    #endif
+#endif
+
+
+/* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
+#ifndef LV_OBJ_STYLE_CACHE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_OBJ_STYLE_CACHE
+            #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
+        #else
+            #define LV_OBJ_STYLE_CACHE 0
+        #endif
+    #else
+        #define  LV_OBJ_STYLE_CACHE 1
     #endif
 #endif
 

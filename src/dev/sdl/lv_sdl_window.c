@@ -184,11 +184,9 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px_map)
         }
     }
 
-
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
     if(lv_disp_flush_is_last(disp)) {
-
         if(LV_SDL_RENDER_MODE != LV_DISP_RENDER_MODE_PARTIAL) {
             dsc->fb_act = px_map;
         }
