@@ -150,6 +150,24 @@ menu "LVGL configuration"
 	menu "Feature configuration"
 
 		menu "Drawing"
+			config LV_DRAW_BUF_STRIDE_ALIGN
+				int "Buffer stride alignment"
+				default 1
+			help
+				Align the stride of all layers and images to this bytes.
+
+			config LV_DRAW_BUF_ALIGN
+				int "Buffer address alignment"
+				default 4
+			help
+				Align the start address of draw_buf addresses to this bytes.
+
+			config LV_LAYER_MAX_MEMORY_USAGE
+				int "Max layer memory usage(kB)"
+				default 150
+			help
+				Max. memory to be used for layers.
+
 			config LV_USE_DRAW_SW
 				bool "Enable software rendering"
 				default y
