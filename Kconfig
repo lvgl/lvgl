@@ -51,6 +51,10 @@ menu "LVGL configuration"
 				192: round up from x.25
 				254: round up
 
+		config LV_OBJ_STYLE_CACHE
+			bool "Use cache to speed up getting object style properties"
+			default y
+
 		config LV_COLOR_CHROMA_KEY_HEX
 			hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
 			range 0x000000 0xFFFFFF
