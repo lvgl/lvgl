@@ -484,7 +484,7 @@ static inline lv_style_res_t lv_style_get_prop_inlined(const lv_style_t * style,
                                                        lv_style_value_t * value)
 {
     if(style->prop_cnt == 255) {
-        lv_style_const_prop_t * props = style->values_and_props;
+        lv_style_const_prop_t * props = (lv_style_const_prop_t *)style->values_and_props;
         uint32_t i;
         for(i = 0; props[i].prop_ptr; i++) {
             if(*props[i].prop_ptr == prop) {
