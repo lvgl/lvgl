@@ -167,10 +167,10 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
  * @param buf store the data here
  * @return LV_RES_OK: success; LV_RES_INV: an error occurred
  */
-lv_res_t lv_img_decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
+lv_res_t lv_img_decoder_get_area(lv_img_decoder_dsc_t * dsc, const lv_area_t * full_area, lv_area_t * decoded_area)
 {
     lv_res_t res = LV_RES_INV;
-    if(dsc->decoder->read_line_cb) res = dsc->decoder->read_line_cb(dsc->decoder, dsc, x, y, len, buf);
+    if(dsc->decoder->get_area_cb) res = dsc->decoder->get_area_cb(dsc->decoder, dsc, full_area, decoded_area);
 
     return res;
 }
@@ -242,9 +242,9 @@ void lv_img_decoder_set_open_cb(lv_img_decoder_t * decoder, lv_img_decoder_open_
  * @param decoder pointer to an image decoder
  * @param read_line_cb a function to read a line of an image
  */
-void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_read_line_f_t read_line_cb)
+void lv_img_decoder_set_get_area_cb(lv_img_decoder_t * decoder, lv_img_decoder_get_area_cb_t read_line_cb)
 {
-    decoder->read_line_cb = read_line_cb;
+    decoder->get_area_cb = read_line_cb;
 }
 
 /**

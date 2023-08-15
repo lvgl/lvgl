@@ -181,23 +181,29 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
     sup.palette = decoder_dsc.palette;
     sup.palette_size = decoder_dsc.palette_size;
 
-
-
     /*The whole image is available, just draw it*/
     if(decoder_dsc.img_data) {
         img_draw_core(draw_unit, draw_dsc, &draw_area, decoder_dsc.img_data, cf, &sup, coords);
     }
     /*Draw line by line*/
     else {
-        uint8_t read_line_buf[2048];
+        lv_area_t relative_full_area_to_decode = draw_area;
+        lv_area_move(&relative_full_area_to_decode, -coords->x1, -coords->y1);
 
-        uint32_t y;
-        lv_area_t a = draw_area;
-        for(y = draw_area.y1; y <= draw_area.y2; y++) {
-            a.y1 = y;
-            a.y2 = y;
-            lv_img_decoder_read_line(&decoder_dsc, a.x1 - coords->x1, a.y1 - coords->y1, lv_area_get_width(&a), read_line_buf);
-            img_draw_core(draw_unit, draw_dsc, &a, read_line_buf, cf, &sup, &a);
+        lv_area_t relative_decoded_area;
+        relative_decoded_area.x1 = LV_COORD_MIN;
+        relative_decoded_area.y1 = LV_COORD_MIN;
+        relative_decoded_area.x2 = LV_COORD_MIN;
+        relative_decoded_area.y2 = LV_COORD_MIN;
+        res = LV_RES_OK;
+        while(res == LV_RES_OK) {
+            res = lv_img_decoder_get_area(&decoder_dsc, &relative_full_area_to_decode, &relative_decoded_area);
+
+            lv_area_t absolute_decoded_area = relative_decoded_area;
+            lv_area_move(&absolute_decoded_area, coords->x1, coords->y1);
+            if(res == LV_RES_OK) {
+                img_draw_core(draw_unit, draw_dsc, &draw_area, decoder_dsc.img_data, cf, &sup, &absolute_decoded_area);
+            }
         }
     }
 
@@ -307,7 +313,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * 
             lv_area_move(&relative_area, -img_coords->x1, -img_coords->y1);
             if(transformed) {
                 lv_draw_sw_transform(draw_unit, &relative_area, src_buf, src_w, src_h,
-                                     draw_dsc, &sup, cf, tmp_buf);
+                                     draw_dsc, sup, cf, tmp_buf);
             }
             else if(draw_dsc->recolor_opa >= LV_OPA_MIN) {
                 lv_coord_t h = lv_area_get_height(&relative_area);
