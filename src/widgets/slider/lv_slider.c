@@ -271,6 +271,38 @@ static void draw_knob(lv_event_t * e)
     lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
     /* Update knob area with knob style */
     position_knob(obj, &knob_area, knob_size, is_horizontal);
+    LV_LOG_USER("Knob area X1: %d, Y1: %d, X2: %d, Y2: %d", knob_area.x1, knob_area.y1, knob_area.x2, knob_area.y2);
+
+    /* Adjust knob area when knob must be kept inside the bar */
+    /* TODO work on vertical bar */
+    if(slider->knob_inside) {
+        LV_LOG_USER("Keeping knob inside");
+
+        lv_area_t indicator_coords;
+        lv_obj_get_coords((lv_obj_t *) &slider->bar, &indicator_coords);
+        LV_LOG_USER("Indicator area X1: %d, Y1: %d, X2: %d, Y2: %d", indicator_coords.x1, indicator_coords.y1,
+                    indicator_coords.x2, indicator_coords.y2);
+
+        lv_coord_t left_limit = indicator_coords.x1 + (knob_size / 2U);
+        lv_coord_t right_limit = indicator_coords.x2 - (knob_size / 2U);
+
+        LV_LOG_USER("Left limit: %d, Right limit: %d", left_limit, right_limit);
+
+        if(left_limit > knob_area.x1) {
+            /* Indicator value tracks the left side of the knob. See update_knob_pos */
+            knob_area.x1 = left_limit;
+            knob_area.x2 = knob_area.x1 + 22U; /* How can I get this 22 from? Knob size seems to be 13 (is padding missing?) */
+        }
+        else if(right_limit < knob_area.x2) {
+            /* Indicator value tracks the right side of the knob. See update_knob_pos */
+            knob_area.x2 = right_limit;
+            knob_area.x1 = knob_area.x2 - 22U;
+        }
+        else { /* Indicator value tracks knob center */ }
+
+        LV_LOG_USER("Knob area X1: %d, Y1: %d, X2: %d, Y2: %d", knob_area.x1, knob_area.y1, knob_area.x2, knob_area.y2);
+    }
+
     /* Update right knob area with calculated knob area */
     lv_area_copy(&slider->right_knob_area, &knob_area);
 
