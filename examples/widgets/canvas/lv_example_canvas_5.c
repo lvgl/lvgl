@@ -27,7 +27,8 @@ void lv_example_canvas_5(void)
     dsc.width = 5;
     dsc.center.x = 25;
     dsc.center.y = 25;
-    dsc.width = 15;
+    dsc.width = 10;
+    dsc.radius = 15;
     dsc.start_angle = 0;
     dsc.end_angle = 220;
 
