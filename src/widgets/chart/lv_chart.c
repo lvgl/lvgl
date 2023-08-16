@@ -987,7 +987,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                 point_area.x2 = line_dsc.p2.x + point_w;
                 point_area.y1 = line_dsc.p2.y - point_h;
                 point_area.y2 = line_dsc.p2.y + point_h;
-                point_dsc_default.base.id2 = i;
+                point_dsc_default.base.id2 = i - 1;
                 lv_draw_rect(layer, &point_dsc_default, &point_area);
             }
 
