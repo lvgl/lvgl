@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_fs.h
  *
  */
@@ -80,7 +80,7 @@ typedef enum {
 
 typedef struct _lv_fs_drv_t {
     char letter;
-    uint16_t cache_size;
+    uint32_t cache_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
     void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
@@ -109,6 +109,12 @@ typedef struct {
     lv_fs_drv_t * drv;
     lv_fs_file_cache_t * cache;
 } lv_fs_file_t;
+
+typedef struct {
+    char            path[4];   // always "M:x"
+    const uint8_t*  buffer;
+    uint32_t        size;
+} lv_fs_path_ex_t;
 
 typedef struct {
     void * dir_d;
@@ -163,6 +169,14 @@ bool lv_fs_is_ready(char letter);
  * @return          LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
+
+/**
+ * Make a path object for the memory-mapped file compatible with the file system interface
+ * @param path      path to a lv_fs_path_ex object
+ * @param buf       address of the memory buffer
+ * @param size      size of the memory buffer
+ */
+void lv_fs_make_path_ex(lv_fs_path_ex_t* path, const uint8_t* buf, uint32_t size);
 
 /**
  * Close an already opened file

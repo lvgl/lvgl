@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_fsdrv.h
  *
  */
@@ -41,6 +41,10 @@ void lv_fs_posix_init(void);
 
 #if LV_USE_FS_WIN32 != '\0'
 void lv_fs_win32_init(void);
+#endif
+
+#if LV_USE_FS_MEMFS != '\0'
+void lv_fs_memfs_init(void);
 #endif
 
 /**********************

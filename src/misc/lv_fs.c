@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_fs.c
  *
  */
@@ -81,22 +81,35 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_NOT_IMP;
     }
 
-    const char * real_path = lv_fs_get_real_path(path);
-    void * file_d = drv->open_cb(drv, real_path, mode);
-
-    if(file_d == NULL || file_d == (void *)(-1)) {
-        return LV_FS_RES_UNKNOWN;
-    }
-
     file_p->drv = drv;
-    file_p->file_d = file_d;
+
+    if (drv->cache_size == UINT32_MAX) {    // check if this is a memory-mapped file
+        file_p->file_d = file_p;            //NOTE: for memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations
+    }
+    else {
+        const char* real_path = lv_fs_get_real_path(path);
+        void* file_d = drv->open_cb(drv, real_path, mode);
+        if (file_d == NULL || file_d == (void*)(-1)) {
+            return LV_FS_RES_UNKNOWN;
+        }
+        file_p->file_d = file_d;
+    }
 
     if(drv->cache_size) {
         file_p->cache = lv_malloc(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
         lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
-        file_p->cache->start = UINT32_MAX;  /*Set an invalid range by default*/
-        file_p->cache->end = UINT32_MAX - 1;
+        if (drv->cache_size == UINT32_MAX) {    // this is a memory-mapped file: set "cache" to the memory buffer
+            lv_fs_path_ex_t* path_ex = (lv_fs_path_ex_t*)path;
+            file_p->cache->buffer = path_ex->buffer;
+            file_p->cache->start = 0;
+            file_p->cache->file_position = 0;
+            file_p->cache->end = path_ex->size;
+        }
+        else {
+            file_p->cache->start = UINT32_MAX;  /*Set an invalid range by default*/
+            file_p->cache->end = UINT32_MAX - 1;
+        }
     }
 
     return LV_FS_RES_OK;
@@ -115,7 +128,7 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
     lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
     if(file_p->drv->cache_size && file_p->cache) {
-        if(file_p->cache->buffer) {
+        if (file_p->drv->cache_size != UINT32_MAX && file_p->cache->buffer) {   // check if cache was pre-allocated
             lv_free(file_p->cache->buffer);
         }
 
@@ -136,12 +149,17 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
     uint32_t start = file_p->cache->start;
     uint32_t end = file_p->cache->end;
     char * buffer = file_p->cache->buffer;
-    uint16_t buffer_size = file_p->drv->cache_size;
+    uint32_t buffer_size = file_p->drv->cache_size;
 
     if(start <= file_position && file_position <= end) {
         /* Data can be read from cache buffer */
         uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
-        uint16_t buffer_offset = (end - start) - buffer_remaining_length + 1;
+        uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
+
+        if (file_p->drv->cache_size == UINT32_MAX) {    // memory-mapped file: do not allow reading beyond the actual memory block
+            if (btr > buffer_remaining_length)
+                btr = buffer_remaining_length;
+        }
 
         if(btr <= buffer_remaining_length) {
             /*Data is in cache buffer, and buffer end not reached, no need to read from FS*/
