@@ -892,7 +892,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     if(LV_MIN(point_w, point_h) > line_dsc.width / 2) line_dsc.raw_end = 1;
     if(line_dsc.width == 1) line_dsc.raw_end = 1;
 
-    /*If there are at least as much points as pixels then draw only vertical lines*/
+    /*If there are at least as many points as pixels then draw only vertical lines*/
     bool crowded_mode = chart->point_cnt >= w ? true : false;
 
     /*Go through all data lines*/
