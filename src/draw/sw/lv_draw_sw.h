@@ -53,8 +53,6 @@ typedef struct {
 
 void lv_draw_sw_init(void);
 
-void lv_draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt);
-
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
                                           const lv_area_t * coords);
 
