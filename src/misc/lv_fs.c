@@ -83,8 +83,9 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
 
     file_p->drv = drv;
 
-    if (drv->cache_size == UINT32_MAX) {    // check if this is a memory-mapped file
-        file_p->file_d = file_p;            //NOTE: for memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations
+    /* For memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations */
+    if (drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
+        file_p->file_d = file_p;
     }
     else {
         const char* real_path = lv_fs_get_real_path(path);
@@ -99,7 +100,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         file_p->cache = lv_malloc(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
         lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
-        if (drv->cache_size == UINT32_MAX) {    // this is a memory-mapped file: set "cache" to the memory buffer
+        
+        if (drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {   /* If this is a memory-mapped file, then set "cache" to the memory buffer */
             lv_fs_path_ex_t* path_ex = (lv_fs_path_ex_t*)path;
             file_p->cache->buffer = path_ex->buffer;
             file_p->cache->start = 0;
@@ -128,7 +130,8 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
     lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
     if(file_p->drv->cache_size && file_p->cache) {
-        if (file_p->drv->cache_size != UINT32_MAX && file_p->cache->buffer) {   // check if cache was pre-allocated
+        /* Only free cache if it was pre-allocated (for memory-mapped files it is never allocated) */
+        if (file_p->drv->cache_size != LV_FS_CACHE_FROM_BUFFER && file_p->cache->buffer) {
             lv_free(file_p->cache->buffer);
         }
 
@@ -156,7 +159,8 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
         uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
         uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
 
-        if (file_p->drv->cache_size == UINT32_MAX) {    // memory-mapped file: do not allow reading beyond the actual memory block
+        /* Do not allow reading beyond the actual memory block for memory-mapped files */ 
+        if (file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
             if (btr > buffer_remaining_length)
                 btr = buffer_remaining_length;
         }

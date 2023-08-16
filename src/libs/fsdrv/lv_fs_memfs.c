@@ -56,18 +56,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
-//NOTE: although these functions do not do anything, we need them for the file system interface to function correctly
 static void* fs_open(lv_fs_drv_t* drv, const char* path, lv_fs_mode_t mode);
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
-#if 0
-static lv_fs_res_t fs_write(lv_fs_drv_t* drv, void* file_p, const void* buf, uint32_t btw, uint32_t* bw);
-static void * fs_dir_open(lv_fs_drv_t * drv, const char * path);
-static lv_fs_res_t fs_dir_read(lv_fs_drv_t * drv, void * dir_p, char * fn);
-static lv_fs_res_t fs_dir_close(lv_fs_drv_t * drv, void * dir_p);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -97,23 +90,23 @@ void lv_fs_memfs_init(void)
 
     /*Set up fields...*/
     fs_drv.letter = LV_FS_MEMFS_LETTER;
-    fs_drv.cache_size = UINT32_MAX; //LV_FS_MEMFS_CACHE_SIZE;
+    fs_drv.cache_size = LV_FS_CACHE_FROM_BUFFER;
 
     fs_drv.open_cb = fs_open;
     fs_drv.close_cb = fs_close;
     fs_drv.read_cb = fs_read;
-    fs_drv.write_cb = NULL; // fs_write;
+    fs_drv.write_cb = NULL;
     fs_drv.seek_cb = fs_seek;
     fs_drv.tell_cb = fs_tell;
 
-    fs_drv.dir_close_cb = NULL; // fs_dir_close;
-    fs_drv.dir_open_cb = NULL; // fs_dir_open;
-    fs_drv.dir_read_cb = NULL; // fs_dir_read;
+    fs_drv.dir_close_cb = NULL;
+    fs_drv.dir_open_cb = NULL;
+    fs_drv.dir_read_cb = NULL;
 
     lv_fs_drv_register(&fs_drv);
 }
 
-void lv_fs_make_path_ex(lv_fs_path_ex_t* path, const uint8_t* buf, uint32_t size)
+void lv_fs_make_path_ex(lv_fs_path_ex_t* path, void* buf, uint32_t size)
 {
     path->path[0] = LV_FS_MEMFS_LETTER;
     path->path[1] = ':';
@@ -183,7 +176,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
  */
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence)
 {
-    //NOTE: this function is only called when LV_FS_SEEK_END was given to lv_fs_seek to determine the end of the buffer
+    /* NOTE: this function is only called to determine the end of the buffer when LV_FS_SEEK_END was given to lv_fs_seek() */
     LV_UNUSED(drv);
     lv_fs_file_t* fp = (lv_fs_file_t*)file_p;
     switch (whence) {
