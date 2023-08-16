@@ -111,6 +111,20 @@ lv_font_t * lv_font_load(const char * font_name)
 }
 
 /**
+ * Loads a `lv_font_t` object from a memory buffer containing the binary font file
+ * @param buffer address of the font file in the memory
+ * @param size size of the font file buffer
+ * @return a pointer to the font or NULL in case of error
+ */
+lv_font_t* lv_font_load_from_buffer(const void* buffer, uint32_t size)
+{
+    lv_fs_path_ex_t mempath;
+    
+    lv_fs_make_path_ex(&mempath, buffer, size);
+    return lv_font_load(&mempath);
+}
+
+/**
  * Frees the memory allocated by the `lv_font_load()` function
  * @param font lv_font_t object created by the lv_font_load function
  */
