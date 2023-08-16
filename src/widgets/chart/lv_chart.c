@@ -969,7 +969,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                     }
 
                     if(point_w && point_h && ser->y_points[p_prev] != LV_CHART_POINT_NONE) {
-                        point_dsc_default.base.id2 = i;
+                        point_dsc_default.base.id2 = i - 1;
                         lv_draw_rect(layer, &point_dsc_default, &point_area);
                     }
                 }
