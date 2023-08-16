@@ -577,15 +577,14 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
                     label_coords.x1 = (tick_point_b.x - size.x / 2U);
                     label_coords.x2 = (tick_point_b.x + size.x / 2U);
-                    label_coords.y1 = tick_point_b.y + label_gap;
 
                     if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
                         label_coords.y1 = tick_point_b.y + label_gap;
                         label_coords.y2 = label_coords.y1 + size.y;
                     }
                     else {
-                        label_coords.y1 = label_coords.y2 - size.y;
                         label_coords.y2 = tick_point_b.y - label_gap;
+                        label_coords.y1 = label_coords.y2 - size.y;
                     }
                 }
                 else if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
