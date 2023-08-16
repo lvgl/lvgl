@@ -51,6 +51,10 @@ menu "LVGL configuration"
 				192: round up from x.25
 				254: round up
 
+		config LV_OBJ_STYLE_CACHE
+			bool "Use cache to speed up getting object style properties"
+			default y
+
 		config LV_COLOR_CHROMA_KEY_HEX
 			hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
 			range 0x000000 0xFFFFFF
@@ -150,6 +154,24 @@ menu "LVGL configuration"
 	menu "Feature configuration"
 
 		menu "Drawing"
+			config LV_DRAW_BUF_STRIDE_ALIGN
+				int "Buffer stride alignment"
+				default 1
+			help
+				Align the stride of all layers and images to this bytes.
+
+			config LV_DRAW_BUF_ALIGN
+				int "Buffer address alignment"
+				default 4
+			help
+				Align the start address of draw_buf addresses to this bytes.
+
+			config LV_LAYER_MAX_MEMORY_USAGE
+				int "Max layer memory usage(kB)"
+				default 150
+			help
+				Max. memory to be used for layers.
+
 			config LV_USE_DRAW_SW
 				bool "Enable software rendering"
 				default y
