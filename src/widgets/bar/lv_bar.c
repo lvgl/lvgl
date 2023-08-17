@@ -345,7 +345,7 @@ static void draw_indic(lv_event_t * e)
     }
 
     lv_base_dir_t base_dir = lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
-    if(hor && base_dir == LV_BASE_DIR_RTL) {
+    if(base_dir == LV_BASE_DIR_RTL) {
         /*Swap axes*/
         lv_coord_t * tmp;
         tmp = axis1;
