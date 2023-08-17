@@ -64,6 +64,7 @@ static inline void lv_global_init(lv_global_t * global)
     _lv_ll_init(&(global->disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
 
+    global->memory_zero = ZERO_MEM_SENTINEL;
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
     global->style_last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;

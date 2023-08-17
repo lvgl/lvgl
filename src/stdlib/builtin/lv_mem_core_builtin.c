@@ -71,8 +71,6 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user);
 
 void lv_mem_init(void)
 {
-    LV_GLOBAL_DEFAULT()->memory_zero = ZERO_MEM_SENTINEL;
-
 #if LV_MEM_ADR == 0
 #ifdef LV_MEM_POOL_ALLOC
     state.tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_POOL_ALLOC(LV_MEM_SIZE), LV_MEM_SIZE);
