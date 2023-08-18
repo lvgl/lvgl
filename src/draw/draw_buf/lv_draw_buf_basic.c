@@ -1,13 +1,17 @@
 /**
- * @file lv_draw_buf.c
+ * @file lv_draw_buf_basic.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
+#include "../../misc/lv_types.h"
 #include "lv_draw_buf.h"
+#if LV_USE_DRAW_BUF == LV_DRAW_BUF_BASIC
+
 #include "../../stdlib/lv_string.h"
+
 
 /*********************
  *      DEFINES
@@ -74,7 +78,12 @@ void * lv_draw_buf_get_buf(lv_draw_buf_t * draw_buf)
 void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * draw_buf)
 {
     LV_UNUSED(draw_buf);
+}
 
+uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
+{
+    uint32_t width_byte =  w * lv_color_format_get_size(color_format);
+    return (width_byte + LV_DRAW_BUF_STRIDE_ALIGN - 1) & ~(LV_DRAW_BUF_STRIDE_ALIGN - 1);
 }
 
 uint32_t lv_draw_buf_get_stride(const lv_draw_buf_t * draw_buf)
@@ -93,9 +102,9 @@ void * lv_draw_buf_go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y
     return buf_tmp;
 }
 
-
 void lv_draw_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a)
 {
+    //TODO clear the area
     LV_UNUSED(a);
     uint32_t stride = lv_draw_buf_get_stride(draw_buf);
     uint8_t * buf = lv_draw_buf_get_buf(draw_buf);
@@ -139,3 +148,6 @@ static uint8_t * buf_alloc(void * old_buf, lv_coord_t w, lv_coord_t h)
 
     return buf;
 }
+
+
+#endif /*LV_USE DRAW_BUF == LV_DRAW_BUF_BASIC*/
