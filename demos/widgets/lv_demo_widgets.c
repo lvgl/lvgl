@@ -575,7 +575,6 @@ static void analytics_create(lv_obj_t * parent)
     lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
     lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
     lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
 
     lv_obj_t * chart2_cont = lv_obj_create(parent);
     lv_obj_add_flag(chart2_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
@@ -628,10 +627,8 @@ static void analytics_create(lv_obj_t * parent)
     lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
     lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
     lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
 
     ser3 = lv_chart_add_series(chart2, lv_theme_get_color_primary(chart1), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
     lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
     lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
     lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
@@ -810,11 +807,6 @@ void shop_create(lv_obj_t * parent)
     lv_obj_add_event(chart3, shop_chart_event_cb, LV_EVENT_ALL, NULL);
 
     ser4 = lv_chart_add_series(chart3, lv_theme_get_color_primary(chart3), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
-    lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
     lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
     lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
     lv_chart_set_next_value(chart3, ser4, lv_rand(60, 90));
