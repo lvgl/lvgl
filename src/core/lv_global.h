@@ -115,7 +115,10 @@ typedef struct _lv_global_t {
     _lv_draw_sw_mask_radius_circle_dsc_arr_t sw_circle_cache;
 #endif
 
+#if LV_USE_LOG
     lv_log_print_g_cb_t custom_log_print_cb;
+#endif
+
 #if LV_LOG_USE_TIMESTAMP
     uint32_t log_last_log_time;
 #endif
