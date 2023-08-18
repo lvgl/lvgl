@@ -615,6 +615,96 @@ static inline lv_base_dir_t lv_obj_get_style_base_dir(const struct _lv_obj_t * o
     return (lv_base_dir_t)v.num;
 }
 
+static inline lv_flex_flow_t lv_obj_get_style_flex_flow(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_FLOW);
+    return (lv_flex_flow_t)v.num;
+}
+
+static inline lv_flex_align_t lv_obj_get_style_flex_main_place(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_MAIN_PLACE);
+    return (lv_flex_align_t)v.num;
+}
+
+static inline lv_flex_align_t lv_obj_get_style_flex_cross_place(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_CROSS_PLACE);
+    return (lv_flex_align_t)v.num;
+}
+
+static inline lv_flex_align_t lv_obj_get_style_flex_track_place(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_TRACK_PLACE);
+    return (lv_flex_align_t)v.num;
+}
+
+static inline uint8_t lv_obj_get_style_flex_grow(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_FLEX_GROW);
+    return (uint8_t)v.num;
+}
+
+static inline const lv_coord_t * lv_obj_get_style_grid_column_dsc_array(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_COLUMN_DSC_ARRAY);
+    return (const lv_coord_t *)v.ptr;
+}
+
+static inline lv_grid_align_t lv_obj_get_style_grid_column_align(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_COLUMN_ALIGN);
+    return (lv_grid_align_t)v.num;
+}
+
+static inline const lv_coord_t * lv_obj_get_style_grid_row_dsc_array(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_ROW_DSC_ARRAY);
+    return (const lv_coord_t *)v.ptr;
+}
+
+static inline lv_grid_align_t lv_obj_get_style_grid_row_align(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_ROW_ALIGN);
+    return (lv_grid_align_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_grid_cell_column_pos(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_COLUMN_POS);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_grid_align_t lv_obj_get_style_grid_cell_x_align(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_X_ALIGN);
+    return (lv_grid_align_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_grid_cell_column_span(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_COLUMN_SPAN);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_grid_cell_row_pos(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_ROW_POS);
+    return (lv_coord_t)v.num;
+}
+
+static inline lv_grid_align_t lv_obj_get_style_grid_cell_y_align(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_Y_ALIGN);
+    return (lv_grid_align_t)v.num;
+}
+
+static inline lv_coord_t lv_obj_get_style_grid_cell_row_span(const struct _lv_obj_t * obj, uint32_t part)
+{
+    lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_GRID_CELL_ROW_SPAN);
+    return (lv_coord_t)v.num;
+}
+
 void lv_obj_set_style_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_min_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 void lv_obj_set_style_max_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
@@ -708,5 +798,22 @@ void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transiti
 void lv_obj_set_style_blend_mode(struct _lv_obj_t * obj, lv_blend_mode_t value, lv_style_selector_t selector);
 void lv_obj_set_style_layout(struct _lv_obj_t * obj, uint16_t value, lv_style_selector_t selector);
 void lv_obj_set_style_base_dir(struct _lv_obj_t * obj, lv_base_dir_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_flow(struct _lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_main_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_cross_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_track_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_flex_grow(struct _lv_obj_t * obj, uint8_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const lv_coord_t * value,
+                                            lv_style_selector_t selector);
+void lv_obj_set_style_grid_column_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_row_dsc_array(struct _lv_obj_t * obj, const lv_coord_t * value,
+                                         lv_style_selector_t selector);
+void lv_obj_set_style_grid_row_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_cell_column_pos(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_cell_x_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_cell_column_span(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_cell_row_pos(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_cell_y_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector);
+void lv_obj_set_style_grid_cell_row_span(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector);
 
 #endif /* LV_OBJ_STYLE_GEN_H */

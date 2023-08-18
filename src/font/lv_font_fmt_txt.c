@@ -8,9 +8,9 @@
  *********************/
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
+#include "../core/lv_global.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_types.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_utils.h"
 #include "../stdlib/lv_mem.h"
@@ -18,15 +18,13 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_USE_FONT_COMPRESSED
+    #define font_rle LV_GLOBAL_DEFAULT()->font_fmt_rle
+#endif /*LV_USE_FONT_COMPRESSED*/
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef enum {
-    RLE_STATE_SINGLE = 0,
-    RLE_STATE_REPEATE,
-    RLE_STATE_COUNTER,
-} rle_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -48,14 +46,6 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_USE_FONT_COMPRESSED
-    static uint32_t rle_rdp;
-    static const uint8_t * rle_in;
-    static uint8_t rle_bpp;
-    static uint8_t rle_prev_v;
-    static uint8_t rle_cnt;
-    static rle_state_t rle_state;
-#endif /*LV_USE_FONT_COMPRESSED*/
 
 static const uint8_t opa4_table[16] = {0,  17, 34,  51,
                                        68, 85, 102, 119,
@@ -480,65 +470,67 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
 
 static inline void rle_init(const uint8_t * in,  uint8_t bpp)
 {
-    rle_in = in;
-    rle_bpp = bpp;
-    rle_state = RLE_STATE_SINGLE;
-    rle_rdp = 0;
-    rle_prev_v = 0;
-    rle_cnt = 0;
+    lv_font_fmt_rle_t * rle = &font_rle;
+    rle->in = in;
+    rle->bpp = bpp;
+    rle->state = RLE_STATE_SINGLE;
+    rle->rdp = 0;
+    rle->prev_v = 0;
+    rle->count = 0;
 }
 
 static inline uint8_t rle_next(void)
 {
     uint8_t v = 0;
     uint8_t ret = 0;
+    lv_font_fmt_rle_t * rle = &font_rle;
 
-    if(rle_state == RLE_STATE_SINGLE) {
-        ret = get_bits(rle_in, rle_rdp, rle_bpp);
-        if(rle_rdp != 0 && rle_prev_v == ret) {
-            rle_cnt = 0;
-            rle_state = RLE_STATE_REPEATE;
+    if(rle->state == RLE_STATE_SINGLE) {
+        ret = get_bits(rle->in, rle->rdp, rle->bpp);
+        if(rle->rdp != 0 && rle->prev_v == ret) {
+            rle->count = 0;
+            rle->state = RLE_STATE_REPEATE;
         }
 
-        rle_prev_v = ret;
-        rle_rdp += rle_bpp;
+        rle->prev_v = ret;
+        rle->rdp += rle->bpp;
     }
-    else if(rle_state == RLE_STATE_REPEATE) {
-        v = get_bits(rle_in, rle_rdp, 1);
-        rle_cnt++;
-        rle_rdp += 1;
+    else if(rle->state == RLE_STATE_REPEATE) {
+        v = get_bits(rle->in, rle->rdp, 1);
+        rle->count++;
+        rle->rdp += 1;
         if(v == 1) {
-            ret = rle_prev_v;
-            if(rle_cnt == 11) {
-                rle_cnt = get_bits(rle_in, rle_rdp, 6);
-                rle_rdp += 6;
-                if(rle_cnt != 0) {
-                    rle_state = RLE_STATE_COUNTER;
+            ret = rle->prev_v;
+            if(rle->count == 11) {
+                rle->count = get_bits(rle->in, rle->rdp, 6);
+                rle->rdp += 6;
+                if(rle->count != 0) {
+                    rle->state = RLE_STATE_COUNTER;
                 }
                 else {
-                    ret = get_bits(rle_in, rle_rdp, rle_bpp);
-                    rle_prev_v = ret;
-                    rle_rdp += rle_bpp;
-                    rle_state = RLE_STATE_SINGLE;
+                    ret = get_bits(rle->in, rle->rdp, rle->bpp);
+                    rle->prev_v = ret;
+                    rle->rdp += rle->bpp;
+                    rle->state = RLE_STATE_SINGLE;
                 }
             }
         }
         else {
-            ret = get_bits(rle_in, rle_rdp, rle_bpp);
-            rle_prev_v = ret;
-            rle_rdp += rle_bpp;
-            rle_state = RLE_STATE_SINGLE;
+            ret = get_bits(rle->in, rle->rdp, rle->bpp);
+            rle->prev_v = ret;
+            rle->rdp += rle->bpp;
+            rle->state = RLE_STATE_SINGLE;
         }
 
     }
-    else if(rle_state == RLE_STATE_COUNTER) {
-        ret = rle_prev_v;
-        rle_cnt--;
-        if(rle_cnt == 0) {
-            ret = get_bits(rle_in, rle_rdp, rle_bpp);
-            rle_prev_v = ret;
-            rle_rdp += rle_bpp;
-            rle_state = RLE_STATE_SINGLE;
+    else if(rle->state == RLE_STATE_COUNTER) {
+        ret = rle->prev_v;
+        rle->count--;
+        if(rle->count == 0) {
+            ret = get_bits(rle->in, rle->rdp, rle->bpp);
+            rle->prev_v = ret;
+            rle->rdp += rle->bpp;
+            rle->state = RLE_STATE_SINGLE;
         }
     }
 

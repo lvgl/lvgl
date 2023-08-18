@@ -7,14 +7,18 @@
  *      INCLUDES
  *********************/
 #include "lv_style.h"
-#include "lv_gc.h"
+#include "../core/lv_global.h"
 #include "../stdlib/lv_mem.h"
+#include "../stdlib/lv_string.h"
 #include "lv_assert.h"
 #include "lv_types.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define _lv_style_custom_prop_flag_lookup_table_size LV_GLOBAL_DEFAULT()->style_custom_table_size
+#define _lv_style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
+#define last_custom_prop_id LV_GLOBAL_DEFAULT()->style_last_custom_prop_id
 
 /**********************
  *      TYPEDEFS
@@ -128,15 +132,29 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_BLEND_MODE] =                LV_STYLE_PROP_FLAG_LAYER_UPDATE,
     [LV_STYLE_LAYOUT] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
     [LV_STYLE_BASE_DIR] =                  LV_STYLE_PROP_FLAG_INHERITABLE | LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
-};
 
-uint32_t _lv_style_custom_prop_flag_lookup_table_size = 0;
+    [LV_STYLE_FLEX_FLOW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_MAIN_PLACE] =              LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_CROSS_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_TRACK_PLACE] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_FLEX_GROW] =                    LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+
+    [LV_STYLE_GRID_COLUMN_DSC_ARRAY] =      LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_ROW_DSC_ARRAY] =         LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_COLUMN_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_ROW_ALIGN] =             LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_ROW_SPAN] =         LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_ROW_POS] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_COLUMN_SPAN] =      LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_COLUMN_POS] =       LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_X_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+    [LV_STYLE_GRID_CELL_Y_ALIGN] =          LV_STYLE_PROP_FLAG_LAYOUT_UPDATE,
+
+};
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static uint16_t last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
 
 /**********************
  *      MACROS
@@ -173,7 +191,7 @@ void lv_style_reset(lv_style_t * style)
 
 lv_style_prop_t lv_style_register_prop(uint8_t flag)
 {
-    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) == NULL) {
+    if(_lv_style_custom_prop_flag_lookup_table == NULL) {
         _lv_style_custom_prop_flag_lookup_table_size = 0;
         last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     }
@@ -191,19 +209,19 @@ lv_style_prop_t lv_style_register_prop(uint8_t flag)
         /* Round required_size up to the nearest 32-byte value */
         required_size = (required_size + 31) & ~31;
         LV_ASSERT_MSG(required_size > 0, "required size has become 0?");
-        uint8_t * old_p = LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table);
+        uint8_t * old_p = _lv_style_custom_prop_flag_lookup_table;
         uint8_t * new_p = lv_realloc(old_p, required_size * sizeof(uint8_t));
         if(new_p == NULL) {
             LV_LOG_ERROR("Unable to allocate space for custom property lookup table");
             return LV_STYLE_PROP_INV;
         }
-        LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) = new_p;
+        _lv_style_custom_prop_flag_lookup_table = new_p;
         _lv_style_custom_prop_flag_lookup_table_size = required_size;
     }
     last_custom_prop_id++;
     /* This should never happen - we should bail out above */
-    LV_ASSERT_NULL(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table));
-    LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
+    LV_ASSERT_NULL(_lv_style_custom_prop_flag_lookup_table);
+    _lv_style_custom_prop_flag_lookup_table[last_custom_prop_id - _LV_STYLE_NUM_BUILT_IN_PROPS] = flag;
     return last_custom_prop_id;
 }
 
@@ -388,16 +406,14 @@ bool lv_style_is_empty(const lv_style_t * style)
 
 uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)
 {
-    extern const uint8_t _lv_style_builtin_prop_flag_lookup_table[];
-    extern uint32_t _lv_style_custom_prop_flag_lookup_table_size;
     if(prop == LV_STYLE_PROP_ANY) return LV_STYLE_PROP_FLAG_ALL; /*Any prop can have any flags*/
     if(prop == LV_STYLE_PROP_INV) return 0;
 
     if(prop < _LV_STYLE_NUM_BUILT_IN_PROPS)
         return _lv_style_builtin_prop_flag_lookup_table[prop];
     prop -= _LV_STYLE_NUM_BUILT_IN_PROPS;
-    if(LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table) != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
-        return LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[prop];
+    if(_lv_style_custom_prop_flag_lookup_table != NULL && prop < _lv_style_custom_prop_flag_lookup_table_size)
+        return _lv_style_custom_prop_flag_lookup_table[prop];
     return 0;
 }
 

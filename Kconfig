@@ -135,14 +135,6 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "HAL Settings"
-		config LV_TICK_CUSTOM
-			bool "Use a custom tick source"
-
-		config LV_TICK_CUSTOM_INCLUDE
-			string "Header for the system time function"
-			default "Arduino.h"
-			depends on LV_TICK_CUSTOM
-
 		config LV_DPI_DEF
 			int "Default Dots Per Inch (in px)."
 			default 130
@@ -524,13 +516,13 @@ menu "LVGL configuration"
 				bool "Enable float in built-in (v)snprintf functions"
 				depends on LV_USE_BUILTIN_SNPRINTF
 
-			config LV_ENABLE_GC
-				bool "Enable garbage collector"
+			config LV_ENABLE_GLOBAL_CUSTOM
+				bool "Enable 'lv_global' customization"
 
-			config LV_GC_INCLUDE
-				string "Header to include for the garbage collector related things"
-				depends on LV_ENABLE_GC
-				default "gc.h"
+			config LV_GLOBAL_CUSTOM_INCLUDE
+				string "Header to include for the custom 'lv_global' function"
+				depends on LV_ENABLE_GLOBAL_CUSTOM
+				default "lv_global.h"
 		endmenu
 
 		menu "Compiler settings"

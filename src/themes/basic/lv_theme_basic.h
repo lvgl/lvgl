@@ -43,6 +43,11 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp);
 */
 bool lv_theme_basic_is_inited(void);
 
+/**
+ * Deinitialize the basic theme
+ */
+void lv_theme_basic_deinit(void);
+
 /**********************
  *      MACROS
  **********************/

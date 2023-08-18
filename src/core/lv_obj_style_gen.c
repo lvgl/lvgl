@@ -690,7 +690,8 @@ void lv_obj_set_style_anim_speed(struct _lv_obj_t * obj, uint32_t value, lv_styl
     lv_obj_set_local_style_prop(obj, LV_STYLE_ANIM_SPEED, v, selector);
 }
 
-void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value, lv_style_selector_t selector)
+void lv_obj_set_style_transition(struct _lv_obj_t * obj, const lv_style_transition_dsc_t * value,
+                                 lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
@@ -720,4 +721,125 @@ void lv_obj_set_style_base_dir(struct _lv_obj_t * obj, lv_base_dir_t value, lv_s
         .num = (int32_t)value
     };
     lv_obj_set_local_style_prop(obj, LV_STYLE_BASE_DIR, v, selector);
+}
+
+void lv_obj_set_style_flex_flow(struct _lv_obj_t * obj, lv_flex_flow_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_FLOW, v, selector);
+}
+
+void lv_obj_set_style_flex_main_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_MAIN_PLACE, v, selector);
+}
+
+void lv_obj_set_style_flex_cross_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_CROSS_PLACE, v, selector);
+}
+
+void lv_obj_set_style_flex_track_place(struct _lv_obj_t * obj, lv_flex_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_TRACK_PLACE, v, selector);
+}
+
+void lv_obj_set_style_flex_grow(struct _lv_obj_t * obj, uint8_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_FLEX_GROW, v, selector);
+}
+
+void lv_obj_set_style_grid_column_dsc_array(struct _lv_obj_t * obj, const lv_coord_t * value,
+                                            lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_COLUMN_DSC_ARRAY, v, selector);
+}
+
+void lv_obj_set_style_grid_column_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_COLUMN_ALIGN, v, selector);
+}
+
+void lv_obj_set_style_grid_row_dsc_array(struct _lv_obj_t * obj, const lv_coord_t * value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .ptr = value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_ROW_DSC_ARRAY, v, selector);
+}
+
+void lv_obj_set_style_grid_row_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_ROW_ALIGN, v, selector);
+}
+
+void lv_obj_set_style_grid_cell_column_pos(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_COLUMN_POS, v, selector);
+}
+
+void lv_obj_set_style_grid_cell_x_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_X_ALIGN, v, selector);
+}
+
+void lv_obj_set_style_grid_cell_column_span(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_COLUMN_SPAN, v, selector);
+}
+
+void lv_obj_set_style_grid_cell_row_pos(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_ROW_POS, v, selector);
+}
+
+void lv_obj_set_style_grid_cell_y_align(struct _lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_Y_ALIGN, v, selector);
+}
+
+void lv_obj_set_style_grid_cell_row_span(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
+{
+    lv_style_value_t v = {
+        .num = (int32_t)value
+    };
+    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_ROW_SPAN, v, selector);
 }

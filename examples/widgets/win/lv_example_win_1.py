@@ -5,7 +5,7 @@ def event_handler(e):
         print("Button {:d} clicked".format(obj.get_child_id()))
 
 
-win = lv.win(lv.scr_act(), 60)
+win = lv.win(lv.scr_act())
 btn1 = win.add_btn(lv.SYMBOL.LEFT, 40)
 btn1.add_event(event_handler, lv.EVENT.ALL, None)
 win.add_title("A title")

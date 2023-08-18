@@ -44,6 +44,11 @@ lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t 
 */
 bool lv_theme_mono_is_inited(void);
 
+/**
+ * Deinitialize the mono theme
+ */
+void lv_theme_mono_deinit(void);
+
 /**********************
  *      MACROS
  **********************/

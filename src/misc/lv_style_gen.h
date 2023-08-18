@@ -188,6 +188,36 @@ void lv_style_set_layout(lv_style_t * style, uint16_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_LAYOUT;
 void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 extern const lv_style_prop_t _lv_style_const_prop_id_BASE_DIR;
+void lv_style_set_flex_flow(lv_style_t * style, lv_flex_flow_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_FLOW;
+void lv_style_set_flex_main_place(lv_style_t * style, lv_flex_align_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_MAIN_PLACE;
+void lv_style_set_flex_cross_place(lv_style_t * style, lv_flex_align_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_CROSS_PLACE;
+void lv_style_set_flex_track_place(lv_style_t * style, lv_flex_align_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_TRACK_PLACE;
+void lv_style_set_flex_grow(lv_style_t * style, uint8_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_FLEX_GROW;
+void lv_style_set_grid_column_dsc_array(lv_style_t * style, const lv_coord_t * value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_COLUMN_DSC_ARRAY;
+void lv_style_set_grid_column_align(lv_style_t * style, lv_grid_align_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_COLUMN_ALIGN;
+void lv_style_set_grid_row_dsc_array(lv_style_t * style, const lv_coord_t * value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_ROW_DSC_ARRAY;
+void lv_style_set_grid_row_align(lv_style_t * style, lv_grid_align_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_ROW_ALIGN;
+void lv_style_set_grid_cell_column_pos(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_COLUMN_POS;
+void lv_style_set_grid_cell_x_align(lv_style_t * style, lv_grid_align_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_X_ALIGN;
+void lv_style_set_grid_cell_column_span(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_COLUMN_SPAN;
+void lv_style_set_grid_cell_row_pos(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_POS;
+void lv_style_set_grid_cell_y_align(lv_style_t * style, lv_grid_align_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_Y_ALIGN;
+void lv_style_set_grid_cell_row_span(lv_style_t * style, lv_coord_t value);
+extern const lv_style_prop_t _lv_style_const_prop_id_GRID_CELL_ROW_SPAN;
 
 #define LV_STYLE_CONST_WIDTH(val) \
     { \
@@ -634,4 +664,78 @@ extern const lv_style_prop_t _lv_style_const_prop_id_BASE_DIR;
         .prop_ptr = &_lv_style_const_prop_id_BASE_DIR, .value = { .num = (int32_t)val } \
     }
 
+#define LV_STYLE_CONST_FLEX_FLOW(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_FLEX_FLOW, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_MAIN_PLACE(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_FLEX_MAIN_PLACE, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_CROSS_PLACE(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_FLEX_CROSS_PLACE, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_TRACK_PLACE(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_FLEX_TRACK_PLACE, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_FLEX_GROW(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_FLEX_GROW, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_COLUMN_DSC_ARRAY(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_COLUMN_DSC_ARRAY, .value = { .ptr = val } \
+    }
+
+#define LV_STYLE_CONST_GRID_COLUMN_ALIGN(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_COLUMN_ALIGN, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_ROW_DSC_ARRAY(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_ROW_DSC_ARRAY, .value = { .ptr = val } \
+    }
+
+#define LV_STYLE_CONST_GRID_ROW_ALIGN(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_ROW_ALIGN, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_CELL_COLUMN_POS(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_COLUMN_POS, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_CELL_X_ALIGN(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_X_ALIGN, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_CELL_COLUMN_SPAN(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_COLUMN_SPAN, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_CELL_ROW_POS(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_ROW_POS, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_CELL_Y_ALIGN(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_Y_ALIGN, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_GRID_CELL_ROW_SPAN(val) \
+    { \
+        .prop_ptr = &_lv_style_const_prop_id_GRID_CELL_ROW_SPAN, .value = { .num = (int32_t)val } \
+    }
 #endif /* LV_STYLE_GEN_H */

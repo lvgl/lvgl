@@ -372,6 +372,80 @@ props = [
 {'name': 'BASE_DIR',
  'style_type': 'num',   'var_type': 'lv_base_dir_t', 'default':'`LV_BASE_DIR_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
  'dsc': "Set the base direction of the object. The possible values are `LV_BIDI_DIR_LTR/RTL/AUTO`."},
+
+
+
+{'section': 'Flex', 'dsc':'Flex layout properties.' },
+
+
+{'name': 'FLEX_FLOW',
+ 'style_type': 'num',   'var_type': 'lv_flex_flow_t', 'default':'`LV_FLEX_FLOW_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines in which direct the flex layout should arrange the children"},
+
+
+{'name': 'FLEX_MAIN_PLACE',
+ 'style_type': 'num',   'var_type': 'lv_flex_align_t', 'default':'`LV_FLEX_ALIGN_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines how to align the children in the direction of flex flow"},
+
+
+{'name': 'FLEX_CROSS_PLACE',
+ 'style_type': 'num',   'var_type': 'lv_flex_align_t', 'default':'`LV_FLEX_ALIGN_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines how to align the children perpendicular to the direction of flex flow"},
+
+
+{'name': 'FLEX_TRACK_PLACE',
+ 'style_type': 'num',   'var_type': 'lv_flex_align_t', 'default':'`LV_FLEX_ALIGN_NONE`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines how to align the tracks of the flow"},
+
+{'name': 'FLEX_GROW',
+ 'style_type': 'num',   'var_type': 'uint8_t', 'default':'`LV_FLEX_ALIGN_ROW`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines how mayn space to take proprtionally the free space of the object's trach"},
+
+
+
+{'section': 'Grid', 'dsc':'Grid layout properties.' },
+
+
+{'name': 'GRID_COLUMN_DSC_ARRAY',
+ 'style_type': 'ptr',   'var_type': 'const lv_coord_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "An array to describe the columns of the grid. Should be LV_GRID_TEMPLATE_LAST terminated"},
+
+{'name': 'GRID_COLUMN_ALIGN',
+ 'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines how to ditribute the columns"},
+
+
+{'name': 'GRID_ROW_DSC_ARRAY',
+ 'style_type': 'ptr',   'var_type': 'const lv_coord_t *', 'default':'`NULL`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "An array to describe the rows of the grid. Should be LV_GRID_TEMPLATE_LAST terminated"},
+
+{'name': 'GRID_ROW_ALIGN',
+ 'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Defines how to ditribute the rows."},
+
+{'name': 'GRID_CELL_COLUMN_POS',
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Set the column in which the object should be placed"},
+
+{'name': 'GRID_CELL_X_ALIGN',
+ 'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Set how to align the object horizontally."},
+
+{'name': 'GRID_CELL_COLUMN_SPAN',
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Set how many columns the object should span. Needs to be >= 1"},
+
+{'name': 'GRID_CELL_ROW_POS',
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Set the row in which the object should be placed"},
+
+{'name': 'GRID_CELL_Y_ALIGN',
+ 'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Set how to align the object vertically."},
+
+{'name': 'GRID_CELL_ROW_SPAN',
+ 'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
+ 'dsc': "Set how many rows the object should span. Needs to be >= 1"},
 ]
 
 

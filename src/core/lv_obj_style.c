@@ -9,14 +9,16 @@
 #include "lv_obj.h"
 #include "../disp/lv_disp.h"
 #include "../disp/lv_disp_private.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_color.h"
 #include "../stdlib/lv_string.h"
-
+#include "../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
+#define style_refr LV_GLOBAL_DEFAULT()->style_refresh
+#define style_trans_ll_p &(LV_GLOBAL_DEFAULT()->style_trans_ll)
+#define style_custom_prop_flag_lookup_table LV_GLOBAL_DEFAULT()->style_custom_prop_flag_lookup_table
 
 /**********************
  *      TYPEDEFS
@@ -63,7 +65,6 @@ static bool style_has_flag(const lv_style_t * style, uint32_t flag);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool style_refr = true;
 
 /**********************
  *      MACROS
@@ -75,7 +76,7 @@ static bool style_refr = true;
 
 void _lv_obj_style_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(trans_t));
+    _lv_ll_init(style_trans_ll_p, sizeof(trans_t));
 }
 
 void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selector_t selector)
@@ -398,7 +399,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
         inheritable = _lv_style_builtin_prop_flag_lookup_table[prop] & LV_STYLE_PROP_FLAG_INHERITABLE;
     }
     else {
-        inheritable = LV_GC_ROOT(_lv_style_custom_prop_flag_lookup_table)[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
+        inheritable = style_custom_prop_flag_lookup_table[prop - _LV_STYLE_NUM_BUILT_IN_PROPS] &
                       LV_STYLE_PROP_FLAG_INHERITABLE;
     }
 
@@ -535,7 +536,7 @@ void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t 
         }
     }
 
-    tr = _lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+    tr = _lv_ll_ins_head(style_trans_ll_p);
     LV_ASSERT_MALLOC(tr);
     if(tr == NULL) return;
     tr->start_value = v1;
@@ -885,12 +886,12 @@ static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, tran
     trans_t * tr;
     trans_t * tr_prev;
     bool removed = false;
-    tr = _lv_ll_get_tail(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+    tr = _lv_ll_get_tail(style_trans_ll_p);
     while(tr != NULL) {
         if(tr == tr_limit) break;
 
         /*'tr' might be deleted, so get the next object while 'tr' is valid*/
-        tr_prev = _lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
+        tr_prev = _lv_ll_get_prev(style_trans_ll_p, tr);
 
         if(tr->obj == obj && (part == tr->selector || part == LV_PART_ANY) && (prop == tr->prop || prop == LV_STYLE_PROP_ANY)) {
             /*Remove any transitioned properties from the trans. style
@@ -904,7 +905,7 @@ static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, tran
 
             /*Free the transition descriptor too*/
             lv_anim_del(tr, NULL);
-            _lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
+            _lv_ll_remove(style_trans_ll_p, tr);
             lv_free(tr);
             removed = true;
 
@@ -1011,7 +1012,7 @@ static void trans_anim_ready_cb(lv_anim_t * a)
      *It allows changing it by normal styles*/
     bool running = false;
     trans_t * tr_i;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr_i) {
+    _LV_LL_READ(style_trans_ll_p, tr_i) {
         if(tr_i != tr && tr_i->obj == tr->obj && tr_i->selector == tr->selector && tr_i->prop == tr->prop) {
             running = true;
             break;
@@ -1022,7 +1023,7 @@ static void trans_anim_ready_cb(lv_anim_t * a)
         uint32_t i;
         for(i = 0; i < obj->style_cnt; i++) {
             if(obj->styles[i].is_trans && obj->styles[i].selector == tr->selector) {
-                _lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
+                _lv_ll_remove(style_trans_ll_p, tr);
                 lv_free(tr);
 
                 _lv_obj_style_t * obj_style = &obj->styles[i];

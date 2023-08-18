@@ -9,6 +9,8 @@
 #include "lv_file_explorer.h"
 #if LV_USE_FILE_EXPLORER != 0
 
+#include "../../core/lv_global.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -16,6 +18,8 @@
 
 #define FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH       (22)
 #define FILE_EXPLORER_BROWSER_AREA_WIDTH            (100 - FILE_EXPLORER_QUICK_ACCESS_AREA_WIDTH)
+
+#define quick_access_list_btn_style (LV_GLOBAL_DEFAULT()->fe_list_btn_style)
 
 /**********************
  *      TYPEDEFS
@@ -43,7 +47,6 @@ static bool is_end_with(const char * str1, const char * str2);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_style_t quick_access_list_btn_style;
 
 const lv_obj_class_t lv_file_explorer_class = {
     .constructor_cb = lv_file_explorer_constructor,

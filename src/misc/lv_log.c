@@ -15,6 +15,7 @@
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
 #include "../tick/lv_tick.h"
+#include "../core/lv_global.h"
 
 #if LV_LOG_PRINTF
     #include <stdio.h>
@@ -23,6 +24,10 @@
 /*********************
  *      DEFINES
  *********************/
+#if LV_LOG_USE_TIMESTAMP
+    #define last_log_time LV_GLOBAL_DEFAULT()->log_last_log_time
+#endif
+#define custom_print_cb LV_GLOBAL_DEFAULT()->custom_log_print_cb
 
 #if LV_LOG_USE_TIMESTAMP
     #define LOG_TIMESTAMP_FMT  "\t(%" LV_PRIu32 ".%03" LV_PRIu32 ", +%" LV_PRIu32 ")\t"
@@ -43,7 +48,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_log_print_g_cb_t custom_print_cb;
 
 /**********************
  *      MACROS
@@ -76,10 +80,6 @@ void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb)
 void _lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...)
 {
     if(level >= _LV_LOG_LEVEL_NUM) return; /*Invalid level*/
-
-#if LV_LOG_USE_TIMESTAMP
-    static uint32_t last_log_time = 0;
-#endif
 
     if(level >= LV_LOG_LEVEL) {
         va_list args;

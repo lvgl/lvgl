@@ -172,35 +172,6 @@
     #endif
 #endif
 
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#ifndef LV_TICK_CUSTOM
-    #ifdef CONFIG_LV_TICK_CUSTOM
-        #define LV_TICK_CUSTOM CONFIG_LV_TICK_CUSTOM
-    #else
-        #define LV_TICK_CUSTOM 0
-    #endif
-#endif
-#if LV_TICK_CUSTOM
-    #ifndef LV_TICK_CUSTOM_INCLUDE
-        #ifdef CONFIG_LV_TICK_CUSTOM_INCLUDE
-            #define LV_TICK_CUSTOM_INCLUDE CONFIG_LV_TICK_CUSTOM_INCLUDE
-        #else
-            #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-        #endif
-    #endif
-    #ifndef LV_TICK_CUSTOM_SYS_TIME_EXPR
-        #ifdef CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR CONFIG_LV_TICK_CUSTOM_SYS_TIME_EXPR
-        #else
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-        #endif
-    #endif
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-#endif   /*LV_TICK_CUSTOM*/
-
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI_DEF
@@ -246,6 +217,28 @@
         #else
             #define LV_DRAW_BUF_ALIGN                       4
         #endif
+    #endif
+#endif
+
+/*Align the stride of all layers and images to this bytes*/
+#ifndef LV_DRAW_BUF_STRIDE_ALIGN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+        #else
+            #define LV_DRAW_BUF_STRIDE_ALIGN 0
+        #endif
+    #else
+        #define LV_DRAW_BUF_STRIDE_ALIGN                1
+    #endif
+#endif
+
+/*Align the start address of draw_buf addresses to this bytes*/
+#ifndef LV_DRAW_BUF_ALIGN
+    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
+        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
+    #else
+        #define LV_DRAW_BUF_ALIGN                       4
     #endif
 #endif
 
@@ -365,7 +358,6 @@
         #endif
     #endif
 #endif
-
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -692,24 +684,23 @@
     #endif
 #endif
 
-/*Garbage Collector settings
- *Used if lvgl is bound to higher level language and the memory is managed by that language*/
-#ifndef LV_ENABLE_GC
-    #ifdef CONFIG_LV_ENABLE_GC
-        #define LV_ENABLE_GC CONFIG_LV_ENABLE_GC
+#ifndef LV_ENABLE_GLOBAL_CUSTOM
+    #ifdef CONFIG_LV_ENABLE_GLOBAL_CUSTOM
+        #define LV_ENABLE_GLOBAL_CUSTOM CONFIG_LV_ENABLE_GLOBAL_CUSTOM
     #else
-        #define LV_ENABLE_GC 0
+        #define LV_ENABLE_GLOBAL_CUSTOM 0
     #endif
 #endif
-#if LV_ENABLE_GC != 0
-    #ifndef LV_GC_INCLUDE
-        #ifdef CONFIG_LV_GC_INCLUDE
-            #define LV_GC_INCLUDE CONFIG_LV_GC_INCLUDE
+#if LV_ENABLE_GLOBAL_CUSTOM
+    /*Header to include for the custom 'lv_global' function"*/
+    #ifndef LV_GLOBAL_CUSTOM_INCLUDE
+        #ifdef CONFIG_LV_GLOBAL_CUSTOM_INCLUDE
+            #define LV_GLOBAL_CUSTOM_INCLUDE CONFIG_LV_GLOBAL_CUSTOM_INCLUDE
         #else
-            #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
+            #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
         #endif
     #endif
-#endif /*LV_ENABLE_GC*/
+#endif
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.

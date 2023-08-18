@@ -10,11 +10,13 @@
 #if LV_USE_IME_PINYIN != 0
 
 #include <stdio.h>
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS    &lv_ime_pinyin_class
+#define cand_len LV_GLOBAL_DEFAULT()->ime_cand_len
 
 /**********************
  *      TYPEDEFS
@@ -29,7 +31,7 @@ static void lv_ime_pinyin_style_change_event(lv_event_t * e);
 static void lv_ime_pinyin_kb_event(lv_event_t * e);
 static void lv_ime_pinyin_cand_panel_event(lv_event_t * e);
 
-static void init_pinyin_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict);
+static void init_pinyin_dict(lv_obj_t * obj, const lv_pinyin_dict_t * dict);
 static void pinyin_input_proc(lv_obj_t * obj);
 static void pinyin_page_proc(lv_obj_t * obj, uint16_t btn);
 static char * pinyin_search_matching(lv_obj_t * obj, char * py_str, uint16_t * cand_num);
@@ -57,12 +59,12 @@ const lv_obj_class_t lv_ime_pinyin_class = {
 };
 
 #if LV_IME_PINYIN_USE_K9_MODE
-static char * lv_btnm_def_pinyin_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 21] = {\
-                                                                                ",\0", "123\0",  "abc \0", "def\0",  LV_SYMBOL_BACKSPACE"\0", "\n\0",
-                                                                                ".\0", "ghi\0", "jkl\0", "mno\0",  LV_SYMBOL_KEYBOARD"\0", "\n\0",
-                                                                                "?\0", "pqrs\0", "tuv\0", "wxyz\0",  LV_SYMBOL_NEW_LINE"\0", "\n\0",
-                                                                                LV_SYMBOL_LEFT"\0", "\0"
-                                                                               };
+static const char * lv_btnm_def_pinyin_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 21] = {\
+                                                                                      ",\0", "123\0",  "abc \0", "def\0",  LV_SYMBOL_BACKSPACE"\0", "\n\0",
+                                                                                      ".\0", "ghi\0", "jkl\0", "mno\0",  LV_SYMBOL_KEYBOARD"\0", "\n\0",
+                                                                                      "?\0", "pqrs\0", "tuv\0", "wxyz\0",  LV_SYMBOL_NEW_LINE"\0", "\n\0",
+                                                                                      LV_SYMBOL_LEFT"\0", "\0"
+                                                                                     };
 
 static lv_btnmatrix_ctrl_t default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 17] = { 1 };
 static char   lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 2][LV_IME_PINYIN_K9_MAX_INPUT] = {0};
@@ -72,7 +74,7 @@ static char   lv_pinyin_cand_str[LV_IME_PINYIN_CAND_TEXT_NUM][4];
 static char * lv_btnm_def_pinyin_sel_map[LV_IME_PINYIN_CAND_TEXT_NUM + 3];
 
 #if LV_IME_PINYIN_USE_DEFAULT_DICT
-lv_pinyin_dict_t lv_ime_pinyin_def_dict[] = {
+static const lv_pinyin_dict_t lv_ime_pinyin_def_dict[] = {
     { "a", "啊" },
     { "ai", "愛" },
     { "an", "安暗案" },
@@ -508,12 +510,7 @@ lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj)
     return pinyin_ime->cand_panel;
 }
 
-/**
- * Set the dictionary of Pinyin input method.
- * @param obj  pointer to a Pinyin input method object
- * @return     pointer to the Pinyin input method dictionary
- */
-lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj)
+const lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -884,7 +881,7 @@ static void lv_ime_pinyin_style_change_event(lv_event_t * e)
 }
 
 
-static void init_pinyin_dict(lv_obj_t * obj, lv_pinyin_dict_t * dict)
+static void init_pinyin_dict(lv_obj_t * obj, const lv_pinyin_dict_t * dict)
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
@@ -923,7 +920,7 @@ static char * pinyin_search_matching(lv_obj_t * obj, char * py_str, uint16_t * c
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    lv_pinyin_dict_t * cpHZ;
+    const lv_pinyin_dict_t * cpHZ;
     uint8_t index, len = 0, offset;
     volatile uint8_t count = 0;
 
@@ -1075,7 +1072,7 @@ static bool pinyin_k9_is_valid_py(lv_obj_t * obj, char * py_str)
 {
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
-    lv_pinyin_dict_t * cpHZ = NULL;
+    const lv_pinyin_dict_t * cpHZ = NULL;
     uint8_t index = 0, len = 0, offset = 0;
     volatile uint8_t count = 0;
 
@@ -1109,7 +1106,6 @@ static bool pinyin_k9_is_valid_py(lv_obj_t * obj, char * py_str)
 
 static void pinyin_k9_fill_cand(lv_obj_t * obj)
 {
-    static uint16_t len = 0;
     uint16_t index = 0, tmp_len = 0;
     ime_pinyin_k9_py_str_t * ll_index = NULL;
 
@@ -1117,11 +1113,11 @@ static void pinyin_k9_fill_cand(lv_obj_t * obj)
 
     tmp_len = pinyin_ime->k9_legal_py_count;
 
-    if(tmp_len != len) {
+    if(tmp_len != cand_len) {
         lv_memzero(lv_pinyin_k9_cand_str, sizeof(lv_pinyin_k9_cand_str));
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM], LV_SYMBOL_RIGHT"\0");
         lv_strcpy(lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 1], "\0");
-        len = tmp_len;
+        cand_len = tmp_len;
     }
 
     ll_index = _lv_ll_get_head(&pinyin_ime->k9_legal_py_ll);

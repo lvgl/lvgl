@@ -68,17 +68,6 @@
 /*Default display refresh, input device read and animation step period.*/
 #define LV_DEF_REFR_PERIOD  33      /*[ms]*/
 
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#define LV_TICK_CUSTOM 0
-#if LV_TICK_CUSTOM
-    #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-#endif   /*LV_TICK_CUSTOM*/
-
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
@@ -98,6 +87,12 @@
     /*Align the start address of draw_buf addresses to this bytes*/
     #define LV_DRAW_BUF_ALIGN                       4
 #endif
+
+/*Align the stride of all layers and images to this bytes*/
+#define LV_DRAW_BUF_STRIDE_ALIGN                1
+
+/*Align the start address of draw_buf addresses to this bytes*/
+#define LV_DRAW_BUF_ALIGN                       4
 
 /* Max. memory to be used for layers */
 #define  LV_LAYER_MAX_MEMORY_USAGE             150       /*[kB]*/
@@ -149,7 +144,6 @@
 #if LV_USE_OS == LV_OS_CUSTOM
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
-
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -254,12 +248,11 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
-/*Garbage Collector settings
- *Used if lvgl is bound to higher level language and the memory is managed by that language*/
-#define LV_ENABLE_GC 0
-#if LV_ENABLE_GC != 0
-    #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-#endif /*LV_ENABLE_GC*/
+#define LV_ENABLE_GLOBAL_CUSTOM 0
+#if LV_ENABLE_GLOBAL_CUSTOM
+    /*Header to include for the custom 'lv_global' function"*/
+    #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
+#endif
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.
