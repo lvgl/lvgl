@@ -70,8 +70,10 @@ void lv_draw_buf_free(lv_draw_buf_t * draw_buf)
 void * lv_draw_buf_get_buf(lv_draw_buf_t * draw_buf)
 {
     uint8_t * buf = draw_buf->buf;
-    buf += LV_DRAW_BUF_ALIGN - 1;
-    buf = (uint8_t *)((lv_uintptr_t) buf & ~(LV_DRAW_BUF_ALIGN - 1));
+    if(buf) {
+        buf += LV_DRAW_BUF_ALIGN - 1;
+        buf = (uint8_t *)((lv_uintptr_t) buf & ~(LV_DRAW_BUF_ALIGN - 1));
+    }
     return buf;
 }
 
