@@ -77,7 +77,7 @@
  *========================*/
 /* Select a draw buffer implementation. Possible values:
  * - LV_DRAW_BUF_BASIC:     LVGL's built in implementation
- * - LV_DRAW_BUF_CUSTOM:    Implement teh function of lv_draw_buf.h externally
+ * - LV_DRAW_BUF_CUSTOM:    Implement the function of lv_draw_buf.h externally
  */
 #define LV_USE_DRAW_BUF    LV_DRAW_BUF_BASIC
 
