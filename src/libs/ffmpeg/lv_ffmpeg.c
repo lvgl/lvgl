@@ -417,7 +417,7 @@ static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx)
     }
 
     if(!ffmpeg_ctx->has_alpha) {
-        int lv_linesize = sizeof(lv_color_t) * width;
+        int lv_linesize = lv_color_format_get_size(LV_COLOR_FORMAT_NATIVE) * width;
         int dst_linesize = ffmpeg_ctx->video_dst_linesize[0];
         if(dst_linesize != lv_linesize) {
             LV_LOG_WARN("ffmpeg linesize = %d, but lvgl image require %d",
