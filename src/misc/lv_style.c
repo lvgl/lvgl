@@ -286,13 +286,17 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
     LV_ASSERT(prop != LV_STYLE_PROP_INV);
 
-    lv_style_prop_t * props = (lv_style_prop_t *)style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
+    lv_style_prop_t * props;
     int32_t i;
-    for(i = style->prop_cnt - 1; i >= 0; i--) {
-        if(props[i] == prop) {
-            lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
-            values[i] = value;
-            return;
+
+    if(style->values_and_props) {
+        props = (lv_style_prop_t *)style->values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
+        for(i = style->prop_cnt - 1; i >= 0; i--) {
+            if(props[i] == prop) {
+                lv_style_value_t * values = (lv_style_value_t *)style->values_and_props;
+                values[i] = value;
+                return;
+            }
         }
     }
 
