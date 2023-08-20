@@ -394,7 +394,7 @@ Set the opacity of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means full
 </ul>
 
 ### border_width
-Set hte width of the border. Only pixel values can be used.
+Set the width of the border. Only pixel values can be used.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -586,7 +586,7 @@ Make the end points of the lines rounded. `true`: rounded, `false`: perpendicula
 </ul>
 
 ### line_color
-Set the color fo the lines.
+Set the color of the lines.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -898,7 +898,7 @@ An array to describe the columns of the grid. Should be LV_GRID_TEMPLATE_LAST te
 </ul>
 
 ### grid_column_align
-Defines how to ditribute the columns
+Defines how to distribute the columns
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_GRID_ALIGN_START`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -916,7 +916,7 @@ An array to describe the rows of the grid. Should be LV_GRID_TEMPLATE_LAST termi
 </ul>
 
 ### grid_row_align
-Defines how to ditribute the rows.
+Defines how to distribute the rows.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_GRID_ALIGN_START`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>

@@ -312,7 +312,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
     }
     style->prop_cnt++;
 
-    /*Go to the new position wit the props*/
+    /*Go to the new position with the props*/
     props = values_and_props + style->prop_cnt * sizeof(lv_style_value_t);
     lv_style_value_t * values = (lv_style_value_t *)values_and_props;
 

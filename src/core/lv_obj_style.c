@@ -422,7 +422,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, lv_part_t part, lv_
     }
     else {
         /*Get the width and height from the class.
-         * WIDTH and HEIGHT are not inherited so add them in the `else` to skip checking them for inherited proeprties */
+         * WIDTH and HEIGHT are not inherited so add them in the `else` to skip checking them for inherited properties */
         if(part == LV_PART_MAIN && (prop == LV_STYLE_WIDTH || prop == LV_STYLE_HEIGHT)) {
             const lv_obj_class_t * cls = obj->class_p;
             while(cls) {

@@ -412,7 +412,7 @@ props = [
 
 {'name': 'GRID_COLUMN_ALIGN',
  'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how to ditribute the columns"},
+ 'dsc': "Defines how to distribute the columns"},
 
 
 {'name': 'GRID_ROW_DSC_ARRAY',
@@ -421,7 +421,7 @@ props = [
 
 {'name': 'GRID_ROW_ALIGN',
  'style_type': 'num',   'var_type': 'lv_grid_align_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Defines how to ditribute the rows."},
+ 'dsc': "Defines how to distribute the rows."},
 
 {'name': 'GRID_CELL_COLUMN_POS',
  'style_type': 'num',   'var_type': 'lv_coord_t', 'default':'`LV_GRID_ALIGN_START`', 'inherited': 0, 'layout': 1, 'ext_draw': 0,

@@ -323,7 +323,7 @@ static inline lv_coord_t lv_obj_get_style_transform_zoom_safe(const struct _lv_o
 /**
  * Get the `opa` style property from all parents and multiply and `>> 8` them.
  * @param obj       the object whose opacity should be get
- * @param part      the part whose opacity should be get. Non-MAIN parts will consider the `opa` of teh MAIN part too
+ * @param part      the part whose opacity should be get. Non-MAIN parts will consider the `opa` of the MAIN part too
  * @return          the final opacity considering the parents' opacity too
  */
 lv_opa_t lv_obj_get_style_opa_recursive(const struct _lv_obj_t * obj, lv_part_t part);
