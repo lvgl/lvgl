@@ -165,7 +165,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
 
             raw_sjpeg_data += 14; //seek to res info ... refer sjpeg format
             header->always_zero = 0;
-            header->cf = LV_COLOR_FORMAT_RAW;
+            header->cf = LV_COLOR_FORMAT_NATIVE;
 
             header->w = *raw_sjpeg_data++;
             header->w |= *raw_sjpeg_data++ << 8;
@@ -178,7 +178,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
         }
         else if(is_jpg(raw_sjpeg_data, raw_sjpeg_data_size) == true) {
             header->always_zero = 0;
-            header->cf = LV_COLOR_FORMAT_RAW;
+            header->cf = LV_COLOR_FORMAT_NATIVE;
 
             uint8_t * workb_temp = lv_malloc(TJPGD_WORKBUFF_SIZE);
             if(!workb_temp) return LV_RES_INV;
@@ -235,7 +235,7 @@ end:
                     return LV_RES_INV;
                 }
                 header->always_zero = 0;
-                header->cf = LV_COLOR_FORMAT_RAW;
+                header->cf = LV_COLOR_FORMAT_NATIVE;
                 uint8_t * raw_sjpeg_data = buff;
                 header->w = *raw_sjpeg_data++;
                 header->w |= *raw_sjpeg_data++ << 8;
@@ -270,7 +270,7 @@ end:
 
             if(rc == JDR_OK) {
                 header->always_zero = 0;
-                header->cf = LV_COLOR_FORMAT_RAW;
+                header->cf = LV_COLOR_FORMAT_NATIVE;
                 header->w = jd_tmp.width;
                 header->h = jd_tmp.height;
                 return LV_RES_OK;
