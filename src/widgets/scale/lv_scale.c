@@ -435,6 +435,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             bool is_major_tick = false;
             if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
             if(false == is_major_tick) continue;
+            major_tick_idx++;
 
             lv_coord_t tick_length = major_len;
 
@@ -477,14 +478,11 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
             /* Check if the custom text array has element for this major tick index */
             if(scale->txt_src) {
-                if(scale->txt_src[major_tick_idx]) {
-                    label_dsc.text = scale->txt_src[major_tick_idx];
-                    /* Increment major tick counter only when we haven't reached the NULL sentinel */
-                    major_tick_idx++;
+                if(scale->txt_src[major_tick_idx - 1U]) {
+                    label_dsc.text = scale->txt_src[major_tick_idx - 1U];
                 }
                 else {
                     label_dsc.text = NULL;
-                    /* TODO: Out of custom labels */
                 }
             }
             else { /* Add label with mapped values */
