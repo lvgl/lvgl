@@ -6,8 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_sdl_window.h"
 #if LV_USE_SDL
+
+#include "lv_sdl_window.h"
+
 #include <stdbool.h>
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_string.h"
@@ -26,9 +28,7 @@ typedef struct {
     SDL_Window * window;
     SDL_Renderer * renderer;
     SDL_Texture * texture;
-    uint8_t * fb1;
-    uint8_t * fb2;
-    uint8_t * fb_act;
+    uint8_t * fb;
     uint8_t zoom;
     uint8_t ignore_size_chg;
 } lv_sdl_window_t;
@@ -53,6 +53,9 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event);
 void _lv_sdl_keyboard_handler(SDL_Event * event);
 static void res_chg_event_cb(lv_event_t * e);
 
+#if LV_SDL_TICK_THREAD
+    static int tick_thread(void * ptr);
+#endif
 static bool inited = false;
 
 /**********************
@@ -68,13 +71,257 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
+
+const char * lv_sdl_window_get_title(lv_disp_t * disp)
 {
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    return SDL_GetWindowTitle(dsc->window);
+}
+
+void lv_sdl_window_set_pos(lv_disp_t * disp, lv_coord_t x, lv_coord_t y)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_SetWindowPosition(dsc->window, (int) x, (int) y);
+}
+
+lv_coord_t lv_sdl_window_get_x(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *x = 0;
+    int *y = 0;
+
+    SDL_GetWindowPosition(dsc->window, x, y);
+    return (lv_coord_t) *x;
+}
+
+lv_coord_t lv_sdl_window_get_y(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *x = 0;
+    int *y = 0;
+
+    SDL_GetWindowPosition(dsc->window, x, y);
+    return (lv_coord_t) *y;
+}
+
+lv_coord_t lv_sdl_window_get_left_border_width(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *top = 0;
+    int *left = 0;
+    int *bottom = 0;
+    int *right = 0;
+
+    SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
+    return (lv_coord_t) *left;
+}
+
+lv_coord_t lv_sdl_window_get_right_border_width(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *top = 0;
+    int *left = 0;
+    int *bottom = 0;
+    int *right = 0;
+
+    SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
+    return (lv_coord_t) *right;
+}
+
+lv_coord_t lv_sdl_window_get_top_border_width(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *top = 0;
+    int *left = 0;
+    int *bottom = 0;
+    int *right = 0;
+
+    SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
+    return (lv_coord_t) *top;
+}
+
+lv_coord_t lv_sdl_window_get_bottom_border_width(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *top = 0;
+    int *left = 0;
+    int *bottom = 0;
+    int *right = 0;
+
+    SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
+    return (lv_coord_t) *bottom;
+}
+
+void lv_sdl_window_set_minimum_size(lv_disp_t * disp, lv_coord_t width, lv_coord_t height)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+
+    SDL_SetWindowMinimumSize(dsc->window, (int) width, (int) height);
+}
+
+lv_coord_t lv_sdl_window_get_minimum_width(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *w = 0;
+    int *h = 0;
+
+    SDL_GetWindowMinimumSize(dsc->window, w, h);
+    return (lv_coord_t) *w;
+}
+
+lv_coord_t lv_sdl_window_get_minimum_height(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *w = 0;
+    int *h = 0;
+
+    SDL_GetWindowMinimumSize(dsc->window, w, h);
+    return (lv_coord_t) *h;
+}
+
+void lv_sdl_window_set_maximum_size(lv_disp_t * disp, lv_coord_t width, lv_coord_t height)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_SetWindowMaximumSize(dsc->window, (int) width, (int) height);
+}
+
+lv_coord_t lv_sdl_window_get_maximum_width(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *w = 0;
+    int *h = 0;
+
+    SDL_GetWindowMaximumSize(dsc->window, w, h);
+    return (lv_coord_t) *w;
+}
+
+lv_coord_t lv_sdl_window_get_maximum_height(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    int *w = 0;
+    int *h = 0;
+
+    SDL_GetWindowMaximumSize(dsc->window, w, h);
+    return (lv_coord_t) *h;
+}
+
+void lv_sdl_window_set_bordered(lv_disp_t * disp, bool value)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_SetWindowBordered(dsc->window, (SDL_bool) value);
+}
+
+void lv_sdl_window_set_resizeable(lv_disp_t * disp, bool value)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_SetWindowResizable(dsc->window, (SDL_bool) value);
+}
+
+void lv_sdl_window_set_always_on_top(lv_disp_t * disp, bool value)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_SetWindowAlwaysOnTop(dsc->window, (SDL_bool) value);
+}
+
+void lv_sdl_window_set_show(lv_disp_t * disp, bool value)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+
+    if (value) {
+        SDL_ShowWindow(dsc->window);
+    } else {
+        SDL_HideWindow(dsc->window);
+    }
+}
+
+void lv_sdl_window_raise(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_RaiseWindow(dsc->window);
+}
+
+void lv_sdl_window_maximize(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_MaximizeWindow(dsc->window);
+}
+
+void lv_sdl_window_minimize(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_MinimizeWindow(dsc->window);
+}
+
+void lv_sdl_window_restore(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_RestoreWindow(dsc->window);
+}
+
+void lv_sdl_window_fullscreen(lv_disp_t * disp, lv_sdl_fullscreen_flags_t flags)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_SetWindowFullscreen(dsc->window, (uint32_t) flags);
+}
+
+void lv_sdl_window_set_brightness(lv_disp_t * disp, uint8_t level)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    float brightness = (float)level / 255.0F;
+
+    SDL_SetWindowBrightness(dsc->window, brightness);
+}
+
+
+uint8_t lv_sdl_window_get_brightness(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    float brightness = SDL_GetWindowBrightness(dsc->window);
+
+    return (uint8_t)(brightness * 255.0F);
+}
+
+void lv_sdl_window_set_opacity(lv_disp_t * disp, lv_opa_t opa)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    float opacity = (float)opa / 255.0F;
+
+    SDL_SetWindowOpacity(dsc->window, opacity);
+}
+
+lv_opa_t lv_sdl_window_get_opacity(lv_disp_t * disp)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    float * opa = 0;
+
+    SDL_GetWindowOpacity(dsc->window, opa);
+    return (lv_opa_t)((* opa) * 255.0F);
+}
+
+
+void lv_sdl_window_flash(lv_disp_t * disp, lv_sdl_window_flash_t flash)
+{
+    lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
+    SDL_FlashWindow(dsc->window, (SDL_FlashOperation) flash);
+}
+
+
+lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res, lv_sdl_window_flags_t flags)
+{
+    if (flags == -1) {
+        flags = 0;
+    }
+    if (flags == 0) {
+        flags = LV_SDL_WINDOW_FLAGS_DEFAULT;
+    }
+
     if(!inited) {
         SDL_Init(SDL_INIT_VIDEO);
         SDL_StartTextInput();
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
-        lv_tick_set_cb(SDL_GetTicks);
+#if LV_SDL_TICK_THREAD
+        SDL_CreateThread(tick_thread, "LVGL thread", NULL);
+#endif
         inited = true;
     }
 
@@ -90,23 +337,18 @@ lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res)
     }
     lv_disp_add_event(disp, release_disp_cb, LV_EVENT_DELETE, disp);
     lv_disp_set_driver_data(disp, dsc);
-    window_create(disp);
+    window_create(disp, flags);
 
     lv_disp_set_flush_cb(disp, flush_cb);
-    if(LV_SDL_RENDER_MODE == LV_DISP_RENDER_MODE_PARTIAL) {
-        uint8_t * buf1 = malloc(32 * 1024);
-        uint8_t * buf2 = NULL;
-#if LV_SDL_BUF_COUNT == 2
-        buf2 = malloc(32 * 1024);
+#if LV_SDL_PARTIAL_MODE
+    uint8_t * buf = malloc(32 * 1024);
+    lv_disp_set_draw_buffers(disp, buf, NULL,
+                             32 * 1024, LV_DISP_RENDER_MODE_PARTIAL);
+#else
+    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+    lv_disp_set_draw_buffers(disp, dsc->fb, NULL,
+                             lv_disp_get_hor_res(disp) * lv_disp_get_hor_res(disp) * px_size, LV_DISP_RENDER_MODE_DIRECT);
 #endif
-        lv_disp_set_draw_buffers(disp, buf1, buf2,
-                                 32 * 1024, LV_DISP_RENDER_MODE_PARTIAL);
-    }
-    /*LV_DISP_RENDER_MODE_DIRECT or FULL */
-    else {
-        uint32_t stride = lv_draw_buf_width_to_stride(lv_disp_get_hor_res(disp), lv_disp_get_color_format(disp));
-        lv_disp_set_draw_buffers(disp, dsc->fb1, dsc->fb2, stride * lv_disp_get_ver_res(disp), LV_SDL_RENDER_MODE);
-    }
     lv_disp_add_event(disp, res_chg_event_cb, LV_EVENT_RESOLUTION_CHANGED, NULL);
 
     return disp;
@@ -163,28 +405,29 @@ void lv_sdl_quit()
 
 static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
+#if LV_SDL_PARTIAL_MODE
+    int32_t y;
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    if(LV_SDL_RENDER_MODE == LV_DISP_RENDER_MODE_PARTIAL) {
-        int32_t y;
-        uint8_t * fb_tmp = dsc->fb_act;
-        uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
-        uint32_t px_map_stride = lv_area_get_width(area) * px_size;
-        lv_coord_t fb_stride = lv_disp_get_hor_res(disp) * px_size;
-        fb_tmp += area->y1 * fb_stride;
-        fb_tmp += area->x1 * px_size;
-        for(y = area->y1; y <= area->y2; y++) {
-            lv_memcpy(fb_tmp, px_map, px_map_stride);
-            px_map += px_map_stride;
-            fb_tmp += fb_stride;
-        }
+    uint8_t * fb_tmp = dsc->fb;
+    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+    uint32_t px_map_stride = lv_area_get_width(area) * px_size;
+    lv_coord_t fb_stride = lv_disp_get_hor_res(disp) * px_size;
+    fb_tmp += area->y1 * fb_stride;
+    fb_tmp += area->x1 * px_size;
+    for(y = area->y1; y <= area->y2; y++) {
+        lv_memcpy(fb_tmp, px_map, px_map_stride);
+        px_map += px_map_stride;
+        fb_tmp += fb_stride;
     }
+#else
+    LV_UNUSED(area);
+    LV_UNUSED(px_map);
+#endif
+
 
     /* TYPICALLY YOU DO NOT NEED THIS
      * If it was the last part to refresh update the texture of the window.*/
     if(lv_disp_flush_is_last(disp)) {
-        if(LV_SDL_RENDER_MODE != LV_DISP_RENDER_MODE_PARTIAL) {
-            dsc->fb_act = px_map;
-        }
         window_update(disp);
     }
 
@@ -253,29 +496,30 @@ static void clean_up(lv_disp_t * disp)
     lv_free(dsc);
 }
 
-static void window_create(lv_disp_t * disp)
+
+static void window_create(lv_disp_t * disp, lv_sdl_window_flags_t flags)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
     dsc->zoom = 1;
 
-    int flag = SDL_WINDOW_RESIZABLE;
-#if LV_SDL_FULLSCREEN
-    flag |= SDL_WINDOW_FULLSCREEN;
-#endif
+    int flag = 0;
+    unsigned int window_pos = SDL_WINDOWPOS_UNDEFINED;
+
+    if (flags & LV_SDL_WINDOW_FLAGS_CENTERED) {
+        window_pos = SDL_WINDOWPOS_CENTERED;
+        flags ^= LV_SDL_WINDOW_FLAGS_CENTERED;
+    }
 
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
     lv_coord_t ver_res = lv_disp_get_ver_res(disp);
     dsc->window = SDL_CreateWindow("LVGL Simulator",
-                                   SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                   hor_res * dsc->zoom, ver_res * dsc->zoom, flag);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
+                                   window_pos, window_pos,
+                                   hor_res * dsc->zoom, ver_res * dsc->zoom, flags);
 
     dsc->renderer = SDL_CreateRenderer(dsc->window, -1, SDL_RENDERER_SOFTWARE);
     texture_resize(disp);
     uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
-    lv_memset(dsc->fb1, 0xff, hor_res * ver_res * px_size);
-#if LV_SDL_DIRECT_MODE_2_BUF
-    lv_memset(dsc->fb2, 0xff, hor_res * ver_res * px_size);
-#endif
+    lv_memset(dsc->fb, 0xff, hor_res * ver_res * px_size);
     /*Some platforms (e.g. Emscripten) seem to require setting the size again */
     SDL_SetWindowSize(dsc->window, hor_res * dsc->zoom, ver_res * dsc->zoom);
     texture_resize(disp);
@@ -285,8 +529,8 @@ static void window_update(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
-    uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_disp_get_color_format(disp));
-    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb_act, stride);
+    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+    SDL_UpdateTexture(dsc->texture, NULL, dsc->fb, hor_res * px_size);
 
     SDL_RenderClear(dsc->renderer);
 
@@ -299,22 +543,15 @@ static void texture_resize(lv_disp_t * disp)
 {
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
     lv_coord_t ver_res = lv_disp_get_ver_res(disp);
-    uint32_t stride = lv_draw_buf_width_to_stride(hor_res, lv_disp_get_color_format(disp));
+    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
 
-    dsc->fb1 = realloc(dsc->fb1, stride * ver_res);
-    memset(dsc->fb1, 0x00, stride * ver_res);
+    dsc->fb = realloc(dsc->fb, hor_res * ver_res * px_size);
+    memset(dsc->fb, 0x00, hor_res * ver_res * px_size);
 
-    if(LV_SDL_RENDER_MODE == LV_DISP_RENDER_MODE_PARTIAL) {
-        dsc->fb_act = dsc->fb1;
-    }
-    else {
-#if LV_SDL_BUF_COUNT == 2
-        dsc->fb2 = realloc(dsc->fb2, stride * ver_res);
-        memset(dsc->fb2, 0x00, stride * ver_res);
+#if LV_SDL_PARTIAL_MODE == 0
+    lv_disp_set_draw_buffers(disp, dsc->fb, NULL, hor_res * ver_res * px_size, LV_DISP_RENDER_MODE_DIRECT);
 #endif
-        lv_disp_set_draw_buffers(disp, dsc->fb1, dsc->fb2, stride * ver_res, LV_SDL_RENDER_MODE);
-    }
     if(dsc->texture) SDL_DestroyTexture(dsc->texture);
 
 #if LV_COLOR_DEPTH == 32
@@ -346,6 +583,23 @@ static void res_chg_event_cb(lv_event_t * e)
 
     texture_resize(disp);
 }
+
+#if !LV_SDL_TICK_THREAD
+static int tick_thread(void * ptr)
+{
+    LV_UNUSED(ptr);
+    static uint32_t tick_prev = 0;
+
+    while(1) {
+        uint32_t tick_now = SDL_GetTicks();
+        lv_tick_inc(tick_now - tick_prev);
+        tick_prev = tick_now;
+        SDL_Delay(5);
+    }
+
+    return 0;
+}
+#endif
 
 static void release_disp_cb(lv_event_t * e)
 {

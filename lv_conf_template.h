@@ -726,6 +726,9 @@
     #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
     #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
     #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
+    #ifndef LV_SDL_TICK_THREAD
+        #define LV_SDL_TICK_THREAD 1
+    #endif
 #endif
 
 /*Driver for /dev/fb*/
