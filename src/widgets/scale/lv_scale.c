@@ -522,7 +522,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 }
             }
 
-            if(label_dsc.text) {
+            if(label_dsc.text && scale->label_enabled) {
                 /* Reserve appropriate size for the tick label */
                 lv_point_t size;
                 lv_txt_get_size(&size, label_dsc.text,
@@ -725,7 +725,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 }
             }
 
-            if(label_dsc.text) {
+            if(label_dsc.text && scale->label_enabled) {
                 /* Reserve appropriate size for the tick label */
                 lv_point_t label_size;
                 lv_txt_get_size(&label_size, label_dsc.text,
