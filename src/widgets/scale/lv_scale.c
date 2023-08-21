@@ -780,7 +780,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
                     main_point_a.y = section->first_tick_in_section.y;
                 }
                 else {
-                    scale_get_minor_tick_points(obj, section->first_tick_idx_in_section, &main_point_a, &dummy);
+                    scale_get_tick_points(obj, section->first_tick_idx_in_section, section->first_tick_idx_is_major, &main_point_a, &dummy);
                 }
 
                 /* Calculate position of the last tick in the section */
@@ -789,7 +789,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
                     main_point_b.y = section->last_tick_in_section.y;
                 }
                 else {
-                    scale_get_minor_tick_points(obj, section->last_tick_idx_in_section, &main_point_b, &dummy);
+                    scale_get_tick_points(obj, section->last_tick_idx_in_section, section->last_tick_idx_is_major, &main_point_b, &dummy);
                 }
             }
             else {
@@ -799,7 +799,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
                     main_point_a.y = main_line_point_a.y;
                 }
                 else {
-                    scale_get_minor_tick_points(obj, section->first_tick_idx_in_section, &main_point_a, &dummy);
+                    scale_get_tick_points(obj, section->first_tick_idx_in_section, section->first_tick_idx_is_major, &main_point_a, &dummy);
                 }
 
                 /* Calculate position of the last tick in the section */
@@ -808,7 +808,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
                     main_point_b.y = main_line_point_a.y;
                 }
                 else {
-                    scale_get_minor_tick_points(obj, section->last_tick_idx_in_section, &main_point_b, &dummy);
+                    scale_get_tick_points(obj, section->last_tick_idx_in_section, section->last_tick_idx_is_major, &main_point_b, &dummy);
                 }
             }
 
