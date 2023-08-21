@@ -2372,6 +2372,19 @@
             #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
         #endif
     #endif
+    #ifndef LV_SDL_TICK_THREAD
+        #ifndef LV_SDL_TICK_THREAD
+            #ifdef _LV_KCONFIG_PRESENT
+                #ifdef CONFIG_LV_SDL_TICK_THREAD
+                    #define LV_SDL_TICK_THREAD CONFIG_LV_SDL_TICK_THREAD
+                #else
+                    #define LV_SDL_TICK_THREAD 0
+                #endif
+            #else
+                #define LV_SDL_TICK_THREAD 1
+            #endif
+        #endif
+    #endif
 #endif
 
 /*Driver for /dev/fb*/
