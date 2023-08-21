@@ -321,44 +321,36 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
     if(scale->total_tick_count <= 1) return;
 
     /* Configure line draw descriptor for the minor tick drawing */
-    lv_draw_line_dsc_t line_dsc;
-    lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &line_dsc);
+    lv_draw_line_dsc_t minor_tick_dsc;
+    lv_draw_line_dsc_init(&minor_tick_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
 
-    const int32_t min_out = scale->range_min;
-    const int32_t max_out = scale->range_max;
     const uint16_t total_tick_count = scale->total_tick_count;
 
     uint8_t tick_idx = 0;
-    for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
+    for(tick_idx = 0; tick_idx <= total_tick_count; tick_idx++) {
         /* A major tick is the one which has a label in it */
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
         if(is_major_tick) continue;
 
-        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
+        const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, scale->range_min, scale->range_max);
 
         /* Overwrite label properties if tick value is within section range */
         lv_scale_section_t * section;
         _LV_LL_READ_BACK(&scale->section_ll, section) {
             if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                scale_set_items_properties(obj, &line_dsc, section->items_style);
-            }
-            else {
-                /* If line is not within a range then get the items style */
-                line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_ITEMS);
-                line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_ITEMS);
-                line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+                scale_set_items_properties(obj, &minor_tick_dsc, section->items_style);
             }
         }
 
         lv_point_t tick_point_a;
         lv_point_t tick_point_b;
-        scale_get_minor_tick_points(obj, tick_idx, &tick_point_a, &tick_point_b);
+        scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
 
-        line_dsc.p1 = tick_point_a;
-        line_dsc.p2 = tick_point_b;
-        lv_draw_line(layer, &line_dsc);
+        minor_tick_dsc.p1 = tick_point_a;
+        minor_tick_dsc.p2 = tick_point_b;
+        lv_draw_line(layer, &minor_tick_dsc);
     }
 }
 
