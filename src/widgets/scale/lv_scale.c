@@ -43,6 +43,8 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
 static void scale_set_items_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * items_section_style);
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                                  lv_style_t * indicator_section_style);
+static void scale_set_indicator_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc,
+                                                lv_style_t * indicator_section_style);
 static void scale_find_section_tick_idx(lv_obj_t * obj);
 
 /**********************
@@ -1244,6 +1246,56 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         label_dsc->opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
         label_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
         label_dsc->font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
+    }
+}
+
+/**
+ * Set indicator line properties
+ *
+ * Checks if the indicator has a custom section configuration or not and sets the properties accordingly.
+ *
+ * @param obj       pointer to a scale object
+ * @param line_dsc  pointer to line descriptor
+ * @param items_section_style  pointer to indicator section style
+ */
+static void scale_set_indicator_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc,
+                                                lv_style_t * indicator_section_style)
+{
+    if(indicator_section_style) {
+        lv_style_value_t value;
+        lv_res_t res;
+
+        /* Tick width */
+        res = lv_style_get_prop(indicator_section_style, LV_STYLE_LINE_WIDTH, &value);
+        if(res == LV_RES_OK) {
+            line_dsc->width = (lv_coord_t)value.num;
+        }
+        else {
+            line_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
+        }
+
+        /* Tick color */
+        res = lv_style_get_prop(indicator_section_style, LV_STYLE_LINE_COLOR, &value);
+        if(res == LV_RES_OK) {
+            line_dsc->color = value.color;
+        }
+        else {
+            line_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
+        }
+
+        /* Tick opa */
+        res = lv_style_get_prop(indicator_section_style, LV_STYLE_LINE_OPA, &value);
+        if(res == LV_RES_OK) {
+            line_dsc->opa = (lv_opa_t)value.num;
+        }
+        else {
+            line_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
+        }
+    }
+    else {
+        line_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
+        line_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
+        line_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
     }
 }
 
