@@ -44,11 +44,6 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
  *  STATIC PROTOTYPES
  **********************/
 
-#if 0
-static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                                    const lv_area_t * coords, const uint8_t * map_p, lv_color_format_t cf);
-#endif
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -322,90 +317,6 @@ static void _pxp_render_thread_cb(void * ptr)
         /* The draw unit is free now. Request a new dispatching as it can get a new task. */
         lv_draw_dispatch_request();
     }
-}
-#endif
-
-#if 0
-static void lv_draw_pxp_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * dsc,
-                                    const lv_area_t * coords, const uint8_t * map_p, lv_color_format_t cf)
-{
-    if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
-        return;
-
-    const lv_color_t * src_buf = (const lv_color_t *)map_p;
-    if(!src_buf) {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
-        return;
-    }
-
-    lv_area_t rel_coords;
-    lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
-    lv_area_t rel_clip_area;
-    lv_area_copy(&rel_clip_area, draw_ctx->clip_area);
-    lv_area_move(&rel_clip_area, -draw_ctx->buf_area->x1, -draw_ctx->buf_area->y1);
-
-    lv_area_t blend_area;
-
-    bool has_mask = lv_draw_mask_is_any(&blend_area);
-    bool has_scale = (dsc->zoom != LV_ZOOM_NONE);
-    bool has_rotation = (dsc->angle != 0);
-    bool unsup_rotation = false;
-
-    if(has_rotation)
-        lv_area_copy(&blend_area, &rel_coords);
-    else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
-        return; /*Fully clipped, nothing to do*/
-
-    lv_coord_t src_width = lv_area_get_width(coords);
-    lv_coord_t src_height = lv_area_get_height(coords);
-
-    if(has_rotation) {
-        /*
-         * PXP can only rotate at 90x angles.
-         */
-        if(dsc->angle % 900) {
-            PXP_LOG_TRACE("Rotation angle %d is not supported. PXP can rotate only 90x angle.", dsc->angle);
-            unsup_rotation = true;
-        }
-
-        /*
-         * PXP is set to process 16x16 blocks to optimize the system for memory
-         * bandwidth and image processing time.
-         * The output engine essentially truncates any output pixels after the
-         * desired number of pixels has been written.
-         * When rotating a source image and the output is not divisible by the block
-         * size, the incorrect pixels could be truncated and the final output image
-         * can look shifted.
-         */
-        if(src_width % 16 || src_height % 16) {
-            PXP_LOG_TRACE("Rotation is not supported for image w/o alignment to block size 16x16.");
-            unsup_rotation = true;
-        }
-    }
-
-    if(has_mask || has_scale || unsup_rotation || lv_area_get_size(&blend_area) < LV_GPU_NXP_PXP_SIZE_LIMIT
-#if LV_COLOR_DEPTH != 32
-       || lv_color_format_has_alpha(cf)
-#endif
-      ) {
-        lv_draw_sw_img_decoded(draw_ctx, dsc, coords, map_p, cf);
-        return;
-    }
-
-    lv_color_t * dest_buf = draw_ctx->buf;
-    lv_coord_t dest_stride = lv_area_get_width(draw_ctx->buf_area);
-
-    lv_area_t src_area;
-    src_area.x1 = blend_area.x1 - (coords->x1 - draw_ctx->buf_area->x1);
-    src_area.y1 = blend_area.y1 - (coords->y1 - draw_ctx->buf_area->y1);
-    src_area.x2 = src_area.x1 + src_width - 1;
-    src_area.y2 = src_area.y1 + src_height - 1;
-    lv_coord_t src_stride = lv_area_get_width(coords);
-
-    lv_gpu_nxp_pxp_blit_transform(dest_buf, &blend_area, dest_stride, src_buf, &src_area, src_stride,
-                                  dsc, cf);
 }
 #endif
 
