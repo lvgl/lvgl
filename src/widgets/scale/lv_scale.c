@@ -416,6 +416,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             if(scale->label_enabled) {
                 /* Label text setup */
                 char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
+                lv_area_t label_coords;
 
                 /* Check if the custom text array has element for this major tick index */
                 if(scale->txt_src) {
@@ -431,42 +432,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     label_dsc.text = text_buffer;
                 }
 
-                /* Reserve appropriate size for the tick label */
-                lv_point_t size;
-                lv_txt_get_size(&size, label_dsc.text,
-                                label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-
-                /* Set the label draw area at some distance of the major tick */
-                lv_area_t label_coords;
-
-                if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-                    label_coords.x1 = (tick_point_b.x - size.x / 2U);
-                    label_coords.x2 = (tick_point_b.x + size.x / 2U);
-
-                    if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-                        label_coords.y1 = tick_point_b.y + lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
-                        label_coords.y2 = label_coords.y1 + size.y;
-                    }
-                    else {
-                        label_coords.y2 = tick_point_b.y - lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
-                        label_coords.y1 = label_coords.y2 - size.y;
-                    }
-                }
-                else if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-                    label_coords.y1 = (tick_point_b.y - size.y / 2);
-                    label_coords.y2 = (tick_point_b.y + size.y / 2);
-
-                    if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-                        label_coords.x1 = tick_point_b.x - size.x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-                        label_coords.x2 = tick_point_b.x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
-                    }
-                    else {
-                        label_coords.x1 = tick_point_b.x + lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-                        label_coords.x2 = tick_point_b.x + size.x + lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
-                    }
-                }
-                else { /* Nothing to do */ }
-
+                scale_get_label_coords(obj, &label_dsc, &tick_point_b, &label_coords);
                 lv_draw_label(layer, &label_dsc, &label_coords);
             }
 
