@@ -439,53 +439,66 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             }
 
             /* Store initial and last tick widths to be used in the main line drawing */
-            if(is_major_tick) {
-                if(total_tick_count == tick_idx) {
-                    if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-                        scale->last_tick_width = major_tick_dsc.width;
-                    }
-                    else {
-                        scale->first_tick_width = major_tick_dsc.width;
-                    }
+            if(total_tick_count == tick_idx) {
+                if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
+                    scale->last_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
                 }
-                else if(0U == tick_idx) {
-                    if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-                        scale->first_tick_width = major_tick_dsc.width;
-                    }
-                    else {
-                        scale->last_tick_width = major_tick_dsc.width;
-                    }
+                else {
+                    scale->first_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
                 }
-                else { /* Nothing to do */ }
             }
+            else if(0U == tick_idx) {
+                if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
+                    scale->first_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
+                }
+                else {
+                    scale->last_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
+                }
+            }
+            else { /* Nothing to do */ }
 
-            if(is_major_tick) {
-                /* Used to calculate position of main line section */
-                _LV_LL_READ_BACK(&scale->section_ll, section) {
-                    if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-
+            /* Used to calculate position of main line section */
+            _LV_LL_READ_BACK(&scale->section_ll, section) {
+                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+                    if(is_major_tick) {
                         scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
                         scale_set_indicator_line_properties(obj, &major_tick_dsc, section->indicator_style);
                     }
-
-                    /* Store the first and last section tick vertical/horizontal position
-                     * TODO: Move this tick position calculation into an API that can be used in scale_draw_main */
-                    if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                        if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
-                            section->first_tick_in_section.y = tick_point_a.y;
-                        }
-                        else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
-                            /* NOTE: Add the custom line width compensation */
-                            section->last_tick_in_section.y = tick_point_a.y - major_tick_dsc.width / 2U;
-                        }
-                    }
                     else {
-                        if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
-                            section->first_tick_in_section.x = tick_point_a.x;
-                        }
-                        else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
-                            section->last_tick_in_section.x = tick_point_a.x + major_tick_dsc.width / 2U;
-                        }
+                        scale_set_items_properties(obj, &minor_tick_dsc, section->items_style);
+                    }
+                }
+
+                /* Store the first and last section tick vertical/horizontal position
+                 * TODO: Move this tick position calculation into an API that can be used in scale_draw_main */
+                if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+                    if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
+                        section->first_tick_in_section.y = tick_point_a.y;
+                    }
+                    else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
+                        /* NOTE: Add the custom line width compensation */
+                        section->last_tick_in_section.y = tick_point_a.y - major_tick_dsc.width / 2U;
+                    }
+                    else if(tick_idx == section->first_tick_idx_in_section && !section->first_tick_idx_is_major) {
+                        section->first_tick_in_section.y = tick_point_a.y;
+                    }
+                    else if(tick_idx == section->last_tick_idx_in_section && !section->last_tick_idx_is_major) {
+                        /* NOTE: Add the custom line width compensation */
+                        section->last_tick_in_section.y = tick_point_a.y - minor_tick_dsc.width / 2U;
+                    }
+                }
+                else {
+                    if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
+                        section->first_tick_in_section.x = tick_point_a.x - major_tick_dsc.width / 2U;;
+                    }
+                    else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
+                        section->last_tick_in_section.x = tick_point_a.x + major_tick_dsc.width / 2U;
+                    }
+                    else if(tick_idx == section->first_tick_idx_in_section && !section->first_tick_idx_is_major) {
+                        section->first_tick_in_section.x = tick_point_a.x - minor_tick_dsc.width / 2U;;
+                    }
+                    else if(tick_idx == section->last_tick_idx_in_section && !section->last_tick_idx_is_major) {
+                        section->last_tick_in_section.x = tick_point_a.x + minor_tick_dsc.width / 2U;
                     }
                 }
             }
@@ -772,22 +785,12 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             }
             else {
                 /* Calculate position of the first tick in the section */
-                if(section->first_tick_idx_is_major) {
-                    main_point_a.x = section->first_tick_in_section.x;
-                    main_point_a.y = main_line_point_a.y;
-                }
-                else {
-                    scale_get_tick_points(obj, section->first_tick_idx_in_section, section->first_tick_idx_is_major, &main_point_a, &dummy);
-                }
+                main_point_a.x = section->first_tick_in_section.x;
+                main_point_a.y = main_line_point_a.y;
 
                 /* Calculate position of the last tick in the section */
-                if(section->last_tick_idx_is_major) {
-                    main_point_b.x = section->last_tick_in_section.x;
-                    main_point_b.y = main_line_point_a.y;
-                }
-                else {
-                    scale_get_tick_points(obj, section->last_tick_idx_in_section, section->last_tick_idx_is_major, &main_point_b, &dummy);
-                }
+                main_point_b.x = section->last_tick_in_section.x;
+                main_point_b.y = main_line_point_a.y;
             }
 
             if(section->main_style) {
