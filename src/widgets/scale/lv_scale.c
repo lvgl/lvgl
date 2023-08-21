@@ -40,6 +40,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
 static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool is_major_tick,
                                         lv_point_t * tick_point_a, lv_point_t * tick_point_b);
+static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc, lv_point_t * tick_point, lv_area_t * label_coords);
 static void scale_set_items_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * items_section_style);
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                                  lv_style_t * indicator_section_style);
@@ -1030,6 +1031,53 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         lv_point_transform(tick_point_b, angle_upscale, 256, &center_point);
     }
     else { /* Nothing to do */ }
+}
+
+/**
+ * Get coordinates for label
+ *
+ * @param obj       pointer to a scale object
+ * @param label_dsc	pointer to label descriptor
+ * @param tick_point	pointer to reference tick
+ * @param label_coords	pointer to label coordinates output
+ */
+static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc, lv_point_t * tick_point, lv_area_t * label_coords)
+{
+	lv_scale_t * scale = (lv_scale_t *)obj;
+
+    /* Reserve appropriate size for the tick label */
+    lv_point_t label_size;
+    lv_txt_get_size(&label_size, label_dsc->text,
+                    label_dsc->font, label_dsc->letter_space, label_dsc->line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+
+    /* Set the label draw area at some distance of the major tick */
+    if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
+        label_coords->x1 = (tick_point->x - label_size.x / 2U);
+        label_coords->x2 = (tick_point->x + label_size.x / 2U);
+
+        if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
+            label_coords->y1 = tick_point->y + lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
+            label_coords->y2 = label_coords->y1 + label_size.y;
+        }
+        else {
+            label_coords->y2 = tick_point->y - lv_obj_get_style_pad_top(obj, LV_PART_INDICATOR);
+            label_coords->y1 = label_coords->y2 - label_size.y;
+        }
+    }
+    else if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
+        label_coords->y1 = (tick_point->y - label_size.y / 2);
+        label_coords->y2 = (tick_point->y + label_size.y / 2);
+
+        if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
+            label_coords->x1 = tick_point->x - label_size.x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+            label_coords->x2 = tick_point->x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
+        }
+        else {
+            label_coords->x1 = tick_point->x + lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+            label_coords->x2 = tick_point->x + label_size.x + lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
+        }
+    }
+    else { /* TODO: Add support for round modes */ }
 }
 
 /**
