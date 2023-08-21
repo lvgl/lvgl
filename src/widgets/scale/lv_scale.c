@@ -470,25 +470,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             }
             else { /* Nothing to do */ }
 
-            /* Label text setup */
-            char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
-            const int32_t min_out = scale->range_min;
-            const int32_t max_out = scale->range_max;
-            const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, min_out, max_out);
-
-            /* Check if the custom text array has element for this major tick index */
-            if(scale->txt_src) {
-                if(scale->txt_src[major_tick_idx - 1U]) {
-                    label_dsc.text = scale->txt_src[major_tick_idx - 1U];
-                }
-                else {
-                    label_dsc.text = NULL;
-                }
-            }
-            else { /* Add label with mapped values */
-                lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
-                label_dsc.text = text_buffer;
-            }
+            const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, scale->range_min, scale->range_max);
 
             /* Overwrite label properties if tick value is within section range */
             lv_scale_section_t * section;
@@ -520,7 +502,24 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 }
             }
 
-            if(label_dsc.text && scale->label_enabled) {
+            if(scale->label_enabled) {
+                /* Label text setup */
+                char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
+
+                /* Check if the custom text array has element for this major tick index */
+                if(scale->txt_src) {
+                    if(scale->txt_src[major_tick_idx - 1U]) {
+                        label_dsc.text = scale->txt_src[major_tick_idx - 1U];
+                    }
+                    else {
+                        label_dsc.text = NULL;
+                    }
+                }
+                else { /* Add label with mapped values */
+                    lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
+                    label_dsc.text = text_buffer;
+                }
+
                 /* Reserve appropriate size for the tick label */
                 lv_point_t size;
                 lv_txt_get_size(&size, label_dsc.text,
