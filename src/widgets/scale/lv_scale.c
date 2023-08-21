@@ -367,9 +367,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
 
     /* Major tick style */
-    lv_draw_line_dsc_t line_dsc;
-    lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &line_dsc);
+    lv_draw_line_dsc_t major_tick_dsc;
+    lv_draw_line_dsc_init(&major_tick_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
 
     /* Main line style */
     lv_draw_line_dsc_t main_line_dsc;
@@ -396,7 +396,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             _LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                     scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                    scale_set_indicator_line_properties(obj, &line_dsc, section->indicator_style);
+                    scale_set_indicator_line_properties(obj, &major_tick_dsc, section->indicator_style);
                 }
             }
 
@@ -431,30 +431,28 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             /* Store initial and last tick widths to be used in the main line drawing */
             if(total_tick_count == tick_idx) {
                 if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-                    scale->last_tick_width = line_dsc.width;
+                    scale->last_tick_width = major_tick_dsc.width;
                 }
                 else {
-                    scale->first_tick_width = line_dsc.width;
+                    scale->first_tick_width = major_tick_dsc.width;
                 }
             }
             else if(0U == tick_idx) {
                 if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-                    scale->first_tick_width = line_dsc.width;
+                    scale->first_tick_width = major_tick_dsc.width;
                 }
                 else {
-                    scale->last_tick_width = line_dsc.width;
+                    scale->last_tick_width = major_tick_dsc.width;
                 }
             }
             else { /* Nothing to do */ }
-
-            LV_LOG_USER("Tick %d at x %d,%d, tick_width: %d", tick_idx, tick_point_a.x, tick_point_b.y, line_dsc.width);
 
             /* Used to calculate position of main line section */
             _LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
 
                     scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                    scale_set_indicator_line_properties(obj, &line_dsc, section->indicator_style);
+                    scale_set_indicator_line_properties(obj, &major_tick_dsc, section->indicator_style);
                 }
 
                 /* Store the first and last section tick vertical/horizontal position
@@ -465,7 +463,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     }
                     else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
                         /* NOTE: Add the custom line width compensation */
-                        section->last_tick_in_section.y = tick_point_a.y - line_dsc.width / 2U;
+                        section->last_tick_in_section.y = tick_point_a.y - major_tick_dsc.width / 2U;
                     }
                 }
                 else {
@@ -473,14 +471,14 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         section->first_tick_in_section.x = tick_point_a.x;
                     }
                     else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
-                        section->last_tick_in_section.x = tick_point_a.x + line_dsc.width / 2U;
+                        section->last_tick_in_section.x = tick_point_a.x + major_tick_dsc.width / 2U;
                     }
                 }
             }
 
-            line_dsc.p1 = tick_point_a;
-            line_dsc.p2 = tick_point_b;
-            lv_draw_line(layer, &line_dsc);
+            major_tick_dsc.p1 = tick_point_a;
+            major_tick_dsc.p2 = tick_point_b;
+            lv_draw_line(layer, &major_tick_dsc);
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
@@ -494,7 +492,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         center_point.y = scale_area.y1 + radius_edge;
 
         /* Major tick */
-        line_dsc.raw_end = 0;
+        major_tick_dsc.raw_end = 0;
 
         lv_coord_t radius_out = radius_edge;
         lv_coord_t radius_in_major;
@@ -638,9 +636,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 lv_draw_label(layer, &label_dsc, &label_coord);
             }
 
-            line_dsc.p1 = p_outer;
-            line_dsc.p2 = p_inner;
-            lv_draw_line(layer, &line_dsc);
+            major_tick_dsc.p1 = p_outer;
+            major_tick_dsc.p2 = p_inner;
+            lv_draw_line(layer, &major_tick_dsc);
         }
     }
     else { /* Nothing to do */ }
