@@ -498,52 +498,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
 
                     scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-
-                    if(section->indicator_style) {
-                        lv_style_value_t value;
-                        lv_res_t res;
-
-                        /* Tick width */
-                        res = lv_style_get_prop(section->indicator_style, LV_STYLE_LINE_WIDTH, &value);
-                        if(res == LV_RES_OK) {
-                            line_dsc.width = (lv_coord_t)value.num;
-                        }
-                        else {
-                            line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
-                        }
-
-                        /* Tick color */
-                        res = lv_style_get_prop(section->indicator_style, LV_STYLE_LINE_COLOR, &value);
-                        if(res == LV_RES_OK) {
-                            line_dsc.color = value.color;
-                        }
-                        else {
-                            line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
-                        }
-
-                        /* Tick opa */
-                        res = lv_style_get_prop(section->indicator_style, LV_STYLE_LINE_OPA, &value);
-                        if(res == LV_RES_OK) {
-                            line_dsc.opa = (lv_opa_t)value.num;
-                        }
-                        else {
-                            line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
-                        }
-
-                        /* Tick gap */
-
-                    }
-                }
-                else {
-                    /* If label is not within a range then get the indicator style */
-                    label_dsc.color = lv_obj_get_style_text_color(obj, LV_PART_INDICATOR);
-                    label_dsc.opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
-                    label_dsc.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
-                    label_dsc.font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
-
-                    line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
-                    line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
-                    line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
+                    scale_set_indicator_line_properties(obj, &line_dsc, section->indicator_style);
                 }
 
                 /* Store the first and last section tick vertical/horizontal position
