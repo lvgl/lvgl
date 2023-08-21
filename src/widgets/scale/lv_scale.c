@@ -385,39 +385,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-        /* Get style properties so they can be used in the tick and label drawing */
-        lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        /* Get offset on both axis so the widget can be drawn from there */
-        lv_coord_t x_ofs = 0U;
-        lv_coord_t y_ofs = 0U;
-
-        if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-            x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-            y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U);
-        }
-        else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
-            x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-            y_ofs = obj->coords.y2 + (main_line_dsc.width / 2U);
-        }
-        else if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-            x_ofs = obj->coords.x2 + (main_line_dsc.width / 2U);
-            y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
-        }
-        else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U);
-            y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
-        }
-        else { /* Nothing to do */ }
-
-        lv_coord_t major_len = scale->major_len;
-
-        /* Handle tick length being drawn backwards */
-        if((LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-            major_len *= -1;
-        }
-        else { /* Nothing to do */ }
 
         uint16_t total_tick_count = scale->total_tick_count;
         uint8_t tick_idx = 0;
@@ -429,43 +396,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             if(false == is_major_tick) continue;
             major_tick_idx++;
 
-            lv_coord_t tick_length = major_len;
-
-            /* The tick is represented by a vertical line. We need two points to draw it */
-            lv_point_t tick_point_a;
-            lv_point_t tick_point_b;
-
-            /* Setup the tick points */
-            if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                /* Vertical position starts at the bottom side of the main line */
-                lv_coord_t vertical_position = obj->coords.y2;
-                /* Increment the tick offset depending of its index */
-                if(0 != tick_idx) {
-                    vertical_position -= (lv_obj_get_height(obj) / total_tick_count) * tick_idx;
-                }
-
-                tick_point_a.x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
-                tick_point_a.y = vertical_position;
-                tick_point_b.x = tick_point_a.x - tick_length;
-                tick_point_b.y = vertical_position;
-            }
-            else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
-                /* Horizontal position starts at the right most side of the main line */
-                lv_coord_t horizontal_position = obj->coords.x1;
-                /* Increment the tick offset depending of its index */
-                if(0 != tick_idx) {
-                    horizontal_position += (lv_obj_get_width(obj) / total_tick_count) * tick_idx;
-                    /* Move inside 1px for compensation */
-                    horizontal_position -= 1U;
-                }
-
-                tick_point_a.x = horizontal_position;
-                tick_point_a.y = y_ofs;
-                tick_point_b.x = horizontal_position;
-                tick_point_b.y = tick_point_a.y + tick_length;
-            }
-            else { /* Nothing to do */ }
-
             const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, scale->range_min, scale->range_max);
 
             /* Overwrite label properties if tick value is within section range */
@@ -476,6 +406,11 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     scale_set_indicator_line_properties(obj, &line_dsc, section->indicator_style);
                 }
             }
+
+            /* The tick is represented by a vertical line. We need two points to draw it */
+            lv_point_t tick_point_a;
+            lv_point_t tick_point_b;
+            scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
 
             if(scale->label_enabled) {
                 /* Label text setup */
