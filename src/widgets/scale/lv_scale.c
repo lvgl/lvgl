@@ -38,7 +38,7 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
 
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
-static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
+static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool is_major_tick,
                                         lv_point_t * tick_point_a, lv_point_t * tick_point_b);
 static void scale_set_items_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * items_section_style);
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
@@ -964,25 +964,29 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord
 }
 
 /**
- * Get points for minor ticks
+ * Get points for ticks
  *
- * In order to draw minor ticks we need two points, this interface returns both points for all scale modes.
+ * In order to draw ticks we need two points, this interface returns both points for all scale modes.
  *
  * @param obj       pointer to a scale object
  * @param tick_idx  index of the current tick
- * @param tick_point_a  pointer to point 'a' of the minor tick
- * @param tick_point_b  pointer to point 'b' of the minor tick
+ * @param is_major_tick true if tick_idx is a major tick
+ * @param tick_point_a  pointer to point 'a' of the tick
+ * @param tick_point_b  pointer to point 'b' of the tick
  */
-static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
+static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool is_major_tick,
                                         lv_point_t * tick_point_a, lv_point_t * tick_point_b)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
 
-    lv_coord_t minor_len = lv_obj_get_style_width(obj, LV_PART_ITEMS);
-    /* Set default minor length for minor ticks */
-    if(0U == minor_len) {
-        minor_len = scale->minor_len;
-    }
+    lv_coord_t minor_len = 0;
+    lv_coord_t major_len = 0;
+
+    if (is_major_tick) {
+    	major_len = scale->major_len;
+    } else {
+    	minor_len = scale->minor_len;
+	}
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
@@ -1020,17 +1024,16 @@ static void scale_get_minor_tick_points(lv_obj_t * obj, const uint16_t tick_idx,
         else { /* Nothing to do */ }
 
 
-        /* Draw tick lines to the right */
-        if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            minor_len *= -1;
+        if(is_major_tick && ((LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode))) {
+        	major_len *= -1;
         }
-        /* Draw tick lines to the top */
-        else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
+        /* Draw tick lines to the right or top */
+        else if(!is_major_tick && (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
             minor_len *= -1;
         }
         else { /* Nothing to do */ }
 
-        lv_coord_t tick_length = minor_len;
+        const lv_coord_t tick_length = is_major_tick ? major_len : minor_len;
 
         /* Setup the tick points */
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
