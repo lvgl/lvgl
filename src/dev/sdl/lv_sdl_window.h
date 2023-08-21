@@ -27,8 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef enum
-{
+typedef enum {
     LV_SDL_WINDOW_FLASH_CANCEL,                   /**< Cancel any window flash state */
     LV_SDL_WINDOW_FLASH_BRIEFLY,                  /**< Flash the window briefly to get attention */
     LV_SDL_WINDOW_FLASH_UNTIL_FOCUSED             /**< Flash the window until it gets focus */
@@ -46,7 +45,7 @@ typedef enum {
     LV_SDL_WINDOW_FLAGS_MOUSE_GRABBED = 0x00000100,      /**< window has grabbed mouse input */
     LV_SDL_WINDOW_FLAGS_INPUT_FOCUS = 0x00000200,        /**< window has input focus */
     LV_SDL_WINDOW_FLAGS_MOUSE_FOCUS = 0x00000400,        /**< window has mouse focus */
-    LV_SDL_WINDOW_FLAGS_FULLSCREEN_DESKTOP = ( LV_SDL_WINDOW_FLAGS_FULLSCREEN | 0x00001000 ),
+    LV_SDL_WINDOW_FLAGS_FULLSCREEN_DESKTOP = (LV_SDL_WINDOW_FLAGS_FULLSCREEN | 0x00001000),
     // LV_SDL_WINDOW_FLAGS_FOREIGN = 0x00000800,            /**< window not created by SDL */
     LV_SDL_WINDOW_FLAGS_ALLOW_HIGHDPI = 0x00002000,      /**< window should be created in high-DPI mode if supported.
                                                      On macOS NSHighResolutionCapable must be set true in the
@@ -64,7 +63,7 @@ typedef enum {
     LV_SDL_WINDOW_FLAGS_CENTERED         = 0x01000000,   /**< window is centered on desktop */
 
     LV_SDL_WINDOW_FLAGS_INPUT_GRABBED = LV_SDL_WINDOW_FLAGS_MOUSE_GRABBED, /**< equivalent to SDL_WINDOW_MOUSE_GRABBED for compatibility */
-    LV_SDL_WINDOW_FLAGS_DEFAULT = LV_SDL_WINDOW_FLAGS_CENTERED | LV_SDL_WINDOW_FLAGS_RESIZABLE | LV_SDL_WINDOW_FLAGS_SHOWN /**< window flags default value */
+    LV_SDL_WINDOW_FLAGS_DEFAULT = (LV_SDL_WINDOW_FLAGS_CENTERED | LV_SDL_WINDOW_FLAGS_RESIZABLE | LV_SDL_WINDOW_FLAGS_SHOWN) /**< window flags default value */
 } lv_sdl_window_flags_t;
 
 typedef enum {

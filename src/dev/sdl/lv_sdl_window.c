@@ -87,69 +87,69 @@ void lv_sdl_window_set_pos(lv_disp_t * disp, lv_coord_t x, lv_coord_t y)
 lv_coord_t lv_sdl_window_get_x(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *x = 0;
-    int *y = 0;
+    int * x = 0;
+    int * y = 0;
 
     SDL_GetWindowPosition(dsc->window, x, y);
-    return (lv_coord_t) *x;
+    return (lv_coord_t)(* x);
 }
 
 lv_coord_t lv_sdl_window_get_y(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *x = 0;
-    int *y = 0;
+    int * x = 0;
+    int * y = 0;
 
     SDL_GetWindowPosition(dsc->window, x, y);
-    return (lv_coord_t) *y;
+    return (lv_coord_t)(* y);
 }
 
 lv_coord_t lv_sdl_window_get_left_border_width(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *top = 0;
-    int *left = 0;
-    int *bottom = 0;
-    int *right = 0;
+    int * top = 0;
+    int * left = 0;
+    int * bottom = 0;
+    int * right = 0;
 
     SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
-    return (lv_coord_t) *left;
+    return (lv_coord_t)(* left);
 }
 
 lv_coord_t lv_sdl_window_get_right_border_width(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *top = 0;
-    int *left = 0;
-    int *bottom = 0;
-    int *right = 0;
+    int * top = 0;
+    int * left = 0;
+    int * bottom = 0;
+    int * right = 0;
 
     SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
-    return (lv_coord_t) *right;
+    return (lv_coord_t)(* right);
 }
 
 lv_coord_t lv_sdl_window_get_top_border_width(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *top = 0;
-    int *left = 0;
-    int *bottom = 0;
-    int *right = 0;
+    int * top = 0;
+    int * left = 0;
+    int * bottom = 0;
+    int * right = 0;
 
     SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
-    return (lv_coord_t) *top;
+    return (lv_coord_t)(* top);
 }
 
 lv_coord_t lv_sdl_window_get_bottom_border_width(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *top = 0;
-    int *left = 0;
-    int *bottom = 0;
-    int *right = 0;
+    int * top = 0;
+    int * left = 0;
+    int * bottom = 0;
+    int * right = 0;
 
     SDL_GetWindowBordersSize(dsc->window, top, left, bottom, right);
-    return (lv_coord_t) *bottom;
+    return (lv_coord_t)(* bottom);
 }
 
 void lv_sdl_window_set_minimum_size(lv_disp_t * disp, lv_coord_t width, lv_coord_t height)
@@ -162,21 +162,21 @@ void lv_sdl_window_set_minimum_size(lv_disp_t * disp, lv_coord_t width, lv_coord
 lv_coord_t lv_sdl_window_get_minimum_width(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *w = 0;
-    int *h = 0;
+    int * w = 0;
+    int * h = 0;
 
     SDL_GetWindowMinimumSize(dsc->window, w, h);
-    return (lv_coord_t) *w;
+    return (lv_coord_t)(* w);
 }
 
 lv_coord_t lv_sdl_window_get_minimum_height(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *w = 0;
-    int *h = 0;
+    int * w = 0;
+    int * h = 0;
 
     SDL_GetWindowMinimumSize(dsc->window, w, h);
-    return (lv_coord_t) *h;
+    return (lv_coord_t)(* h);
 }
 
 void lv_sdl_window_set_maximum_size(lv_disp_t * disp, lv_coord_t width, lv_coord_t height)
@@ -188,21 +188,21 @@ void lv_sdl_window_set_maximum_size(lv_disp_t * disp, lv_coord_t width, lv_coord
 lv_coord_t lv_sdl_window_get_maximum_width(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *w = 0;
-    int *h = 0;
+    int * w = 0;
+    int * h = 0;
 
     SDL_GetWindowMaximumSize(dsc->window, w, h);
-    return (lv_coord_t) *w;
+    return (lv_coord_t)(* w);
 }
 
 lv_coord_t lv_sdl_window_get_maximum_height(lv_disp_t * disp)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
-    int *w = 0;
-    int *h = 0;
+    int * w = 0;
+    int * h = 0;
 
     SDL_GetWindowMaximumSize(dsc->window, w, h);
-    return (lv_coord_t) *h;
+    return (lv_coord_t)(* h);
 }
 
 void lv_sdl_window_set_bordered(lv_disp_t * disp, bool value)
@@ -227,9 +227,10 @@ void lv_sdl_window_set_show(lv_disp_t * disp, bool value)
 {
     lv_sdl_window_t * dsc = lv_disp_get_driver_data(disp);
 
-    if (value) {
+    if(value) {
         SDL_ShowWindow(dsc->window);
-    } else {
+    }
+    else {
         SDL_HideWindow(dsc->window);
     }
 }
@@ -308,10 +309,10 @@ void lv_sdl_window_flash(lv_disp_t * disp, lv_sdl_window_flash_t flash)
 
 lv_disp_t * lv_sdl_window_create(lv_coord_t hor_res, lv_coord_t ver_res, lv_sdl_window_flags_t flags)
 {
-    if (flags == -1) {
+    if(flags == -1) {
         flags = 0;
     }
-    if (flags == 0) {
+    else if(flags == 0) {
         flags = LV_SDL_WINDOW_FLAGS_DEFAULT;
     }
 
@@ -505,7 +506,7 @@ static void window_create(lv_disp_t * disp, lv_sdl_window_flags_t flags)
     int flag = 0;
     unsigned int window_pos = SDL_WINDOWPOS_UNDEFINED;
 
-    if (flags & LV_SDL_WINDOW_FLAGS_CENTERED) {
+    if(flags & LV_SDL_WINDOW_FLAGS_CENTERED) {
         window_pos = SDL_WINDOWPOS_CENTERED;
         flags ^= LV_SDL_WINDOW_FLAGS_CENTERED;
     }
@@ -584,7 +585,7 @@ static void res_chg_event_cb(lv_event_t * e)
     texture_resize(disp);
 }
 
-#if !LV_SDL_TICK_THREAD
+#if !LV_TICK_CUSTOM
 static int tick_thread(void * ptr)
 {
     LV_UNUSED(ptr);
