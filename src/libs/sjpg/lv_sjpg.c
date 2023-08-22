@@ -55,7 +55,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define TJPGD_WORKBUFF_SIZE             4096    //Recommended by TJPGD libray
+#define TJPGD_WORKBUFF_SIZE             4096    //Recommended by TJPGD library
 
 //NEVER EDIT THESE OFFSET VALUES
 #define SJPEG_VERSION_OFFSET            8

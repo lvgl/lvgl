@@ -8,19 +8,21 @@
  *********************/
 #include "lv_anim.h"
 
+#include "../core/lv_global.h"
 #include "../tick/lv_tick.h"
 #include "lv_assert.h"
 #include "lv_timer.h"
 #include "lv_math.h"
 #include "../stdlib/lv_mem.h"
 #include "../stdlib/lv_string.h"
-#include "lv_gc.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_ANIM_RESOLUTION 1024
 #define LV_ANIM_RES_SHIFT 10
+#define state LV_GLOBAL_DEFAULT()->anim_state
+#define anim_ll_p &(state.anim_ll)
 
 /**********************
  *      TYPEDEFS
@@ -38,9 +40,6 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool anim_list_changed;
-static bool anim_run_round;
-static lv_timer_t * _lv_anim_tmr;
 
 /**********************
  *      MACROS
@@ -58,10 +57,11 @@ static lv_timer_t * _lv_anim_tmr;
 
 void _lv_anim_core_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
-    _lv_anim_tmr = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
+    _lv_ll_init(anim_ll_p, sizeof(lv_anim_t));
+    state.timer = lv_timer_create(anim_timer, LV_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation timer*/
-    anim_list_changed = false;
+    state.anim_list_changed = false;
+    state.anim_run_round = false;
 }
 
 void lv_anim_init(lv_anim_t * a)
@@ -83,14 +83,14 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*exec_cb == NULL would delete all animations of var*/
 
     /*Add the new animation to the animation linked list*/
-    lv_anim_t * new_anim = _lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
+    lv_anim_t * new_anim = _lv_ll_ins_head(anim_ll_p);
     LV_ASSERT_MALLOC(new_anim);
     if(new_anim == NULL) return NULL;
 
     /*Initialize the animation descriptor*/
     lv_memcpy(new_anim, a, sizeof(lv_anim_t));
     if(a->var == a) new_anim->var = new_anim;
-    new_anim->run_round = anim_run_round;
+    new_anim->run_round = state.anim_run_round;
     new_anim->last_timer_run = lv_tick_get();
 
     /*Set the start value*/
@@ -138,13 +138,13 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
     lv_anim_t * a;
     lv_anim_t * a_next;
     bool del = false;
-    a        = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
+    a        = _lv_ll_get_head(anim_ll_p);
     while(a != NULL) {
         /*'a' might be deleted, so get the next object while 'a' is valid*/
-        a_next = _lv_ll_get_next(&LV_GC_ROOT(_lv_anim_ll), a);
+        a_next = _lv_ll_get_next(anim_ll_p, a);
 
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
+            _lv_ll_remove(anim_ll_p, a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
             lv_free(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
@@ -160,14 +160,14 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 
 void lv_anim_del_all(void)
 {
-    _lv_ll_clear(&LV_GC_ROOT(_lv_anim_ll));
+    _lv_ll_clear(anim_ll_p);
     anim_mark_list_change();
 }
 
 lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) {
+    _LV_LL_READ(anim_ll_p, a) {
         if(a->var == var && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             return a;
         }
@@ -178,14 +178,14 @@ lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 
 struct _lv_timer_t * lv_anim_get_timer(void)
 {
-    return _lv_anim_tmr;
+    return state.timer;
 }
 
 uint16_t lv_anim_count_running(void)
 {
     uint16_t cnt = 0;
     lv_anim_t * a;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) cnt++;
+    _LV_LL_READ(anim_ll_p, a) cnt++;
 
     return cnt;
 }
@@ -324,9 +324,9 @@ static void anim_timer(lv_timer_t * param)
 
 
     /*Flip the run round*/
-    anim_run_round = anim_run_round ? false : true;
+    state.anim_run_round = state.anim_run_round ? false : true;
 
-    lv_anim_t * a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
+    lv_anim_t * a = _lv_ll_get_head(anim_ll_p);
 
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
@@ -335,10 +335,10 @@ static void anim_timer(lv_timer_t * param)
          * happened in `anim_ready_handler` which could make this linked list reading corrupt
          * because the list is changed meanwhile
          */
-        anim_list_changed = false;
+        state.anim_list_changed = false;
 
-        if(a->run_round != anim_run_round) {
-            a->run_round = anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
+        if(a->run_round != state.anim_run_round) {
+            a->run_round = state.anim_run_round; /*The list readying might be reset so need to know which anim has run already*/
 
             /*The animation will run now for the first time. Call `start_cb`*/
             int32_t new_act_time = a->act_time + elaps;
@@ -373,10 +373,10 @@ static void anim_timer(lv_timer_t * param)
 
         /*If the linked list changed due to anim. delete then it's not safe to continue
          *the reading of the list from here -> start from the head*/
-        if(anim_list_changed)
-            a = _lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
+        if(state.anim_list_changed)
+            a = _lv_ll_get_head(anim_ll_p);
         else
-            a = _lv_ll_get_next(&LV_GC_ROOT(_lv_anim_ll), a);
+            a = _lv_ll_get_next(anim_ll_p, a);
     }
 
 }
@@ -400,7 +400,7 @@ static void anim_ready_handler(lv_anim_t * a)
 
         /*Delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
-        _lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
+        _lv_ll_remove(anim_ll_p, a);
         /*Flag that the list has changed*/
         anim_mark_list_change();
 
@@ -433,11 +433,11 @@ static void anim_ready_handler(lv_anim_t * a)
 
 static void anim_mark_list_change(void)
 {
-    anim_list_changed = true;
-    if(_lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll)) == NULL)
-        lv_timer_pause(_lv_anim_tmr);
+    state.anim_list_changed = true;
+    if(_lv_ll_get_head(anim_ll_p) == NULL)
+        lv_timer_pause(state.timer);
     else
-        lv_timer_resume(_lv_anim_tmr);
+        lv_timer_resume(state.timer);
 }
 
 static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1, int32_t y1, int32_t x2, int32_t y2)

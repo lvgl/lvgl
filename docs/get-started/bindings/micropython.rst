@@ -185,15 +185,15 @@ follow some coding conventions:
 - In function arguments use ``type name[]`` declaration for array parameters instead of :cpp:expr:`type * name`
 - Use typed pointers instead of :cpp:expr:`void *` pointers
 - Widget constructor must follow the ``lv_<widget_name>_create(lv_obj_t * parent)`` pattern.
-- Widget members function must start with ``lv_<modul_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
+- Widget members function must start with ``lv_<module_name>`` and should receive :cpp:expr:`lv_obj_t *` as first
   argument which is a pointer to widget object itself.
 - ``struct`` APIs should follow the widgets' conventions. That is to receive a pointer to the ``struct`` as the
   first argument, and the prefix of the ``struct`` name should be used as the prefix of the
   function name too (e.g. :cpp:expr:`lv_disp_set_default(lv_disp_t * disp)`)
 - Functions and ``struct``\ s which are not part of the public API must begin with underscore in order to mark them as "private".
 - Argument must be named in H files too.
-- Do not ``malloc`` into a static or global variables. Instead declare the variable in :c:macro:`LV_ITERATE_ROOTS`
-  list in ``lv_gc.h`` and mark the variable with :cpp:expr:`GC_ROOT(variable)` when it's used. **See** :ref:`memory_management`
+- Do not ``malloc`` into a static or global variables. Instead declare the variable in ``lv_global_t``
+  structure in ``lv_global.h`` and mark the variable with :cpp:expr:`(LV_GLOBAL_DEFAULT()->variable)` when it's used. **See** :ref:`memory_management`
 - To register and use callbacks one of the following needs to be followed.  **See** :ref:`callbacks`
 
    - Pass a pointer to a ``struct`` as the first argument of both the registration function and the callback. That
@@ -231,14 +231,12 @@ Problem happens when an allocated memory's pointer (return value of :cpp:func:`l
 Solve The Problem
 ^^^^^^^^^^^^^^^^^
 
-- Replace the global/static local var with :cpp:expr:`LV_GC_ROOT(_var)`
-- Include ``lv_gc.h`` on files that use :c:macro:`LV_GC_ROOT`
-- Add ``_var`` to :c:macro:`LV_ITERATE_ROOTS` on ``lv_gc.h``
+- Replace the global/static local var with :cpp:expr:`(LV_GLOBAL_DEFAULT()->_var)`
+- Include ``lv_global.h`` on files that use ``LV_GLOBAL_DEFAULT``
+- Add ``_var`` to ``lv_global_t`` on ``lv_global.h``
 
 Example
 ^^^^^^^
-
-https://github.com/lvgl/lvgl/commit/adced46eccfa0437f84aa51aedca4895cc3c679c
 
 
 More Information

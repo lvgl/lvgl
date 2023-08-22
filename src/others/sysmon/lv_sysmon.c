@@ -11,6 +11,8 @@
 
 #if LV_USE_SYSMON
 
+#include "../../core/lv_global.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -18,6 +20,7 @@
 
 #define SYSMON_REFR_PERIOD_DEF 300 /* ms */
 
+#define perf_info LV_GLOBAL_DEFAULT()->sysmon_perf_info
 /**********************
  *      TYPEDEFS
  **********************/
@@ -33,6 +36,7 @@ typedef struct {
     uint32_t    flush_elaps_sum;
     uint32_t    flush_cnt;
 } perf_info_t;
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -90,6 +94,15 @@ void _lv_sysmon_builtin_init(void)
     lv_async_call(sysmon_async_cb, NULL);
 }
 
+void _lv_sysmon_builtin_deinit(void)
+{
+    lv_async_call_cancel(sysmon_async_cb, NULL);
+#if LV_USE_PERF_MONITOR
+    if(perf_info) {
+        lv_free(perf_info);
+    }
+#endif
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -202,13 +215,16 @@ static void perf_monitor_event_cb(lv_event_t * e)
 
 static void perf_monitor_init(void)
 {
-    static perf_info_t info = { 0 };
     lv_disp_t * disp = lv_disp_get_default();
 
     lv_obj_t * sysmon = lv_sysmon_create(lv_layer_sys());
     lv_obj_align(sysmon, LV_USE_PERF_MONITOR_POS, 0, 0);
     lv_obj_set_style_text_align(sysmon, LV_TEXT_ALIGN_RIGHT, 0);
-    lv_obj_set_user_data(sysmon, &info);
+
+    perf_info_t * info = perf_info = lv_malloc(sizeof(perf_info_t));
+    LV_ASSERT_MALLOC(info);
+
+    lv_obj_set_user_data(sysmon, info);
     lv_obj_add_event(sysmon, perf_monitor_event_cb, LV_EVENT_REFRESH, NULL);
     lv_disp_add_event(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, sysmon);
 

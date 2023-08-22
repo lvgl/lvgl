@@ -14,6 +14,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 #include "../tick/lv_tick.h"
+#include "lv_ll.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -49,6 +50,22 @@ typedef struct _lv_timer_t {
     int32_t repeat_count; /**< 1: One time;  -1 : infinity;  n>0: residual times*/
     uint32_t paused : 1;
 } lv_timer_t;
+
+typedef struct {
+    lv_ll_t timer_ll; /*Linked list to store the lv_timers*/
+
+    bool lv_timer_run;
+    uint8_t idle_last;
+    bool timer_deleted;
+    bool timer_created;
+    uint32_t timer_time_until_next;
+
+    bool already_running;
+    uint32_t periodic_last_tick;
+    uint32_t busy_time;
+    uint32_t idle_period_start;
+    uint32_t run_cnt;
+} lv_timer_state_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -21,8 +21,8 @@ def label_event_cb(e):
     # Respond only to MSG_NEW_TEMPERATURE message
     if msg.get_id() == MSG_NEW_TEMPERATURE:
         payload = msg.get_payload()
-        temprature = payload.__cast__()
-        label.set_text(str(temprature))
+        temperature = payload.__cast__()
+        label.set_text(str(temperature))
 
 # Create a slider in the center of the display
 slider = lv.slider(lv.scr_act())

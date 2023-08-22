@@ -13,7 +13,7 @@ The music player demo shows what kind of modern, smartphone-like user interfaces
 
 ## How the spectrum animation works
 - `assets/spectrum.py` creates an array of spectrum values from a music. 4 band are created with 33 samples/sec: bass, bass-mid, mid, mid-treble.
-- The spectrum meter UI does the followings:
+- The spectrum meter UI does the following:
 	- Zoom the album cover proportionality to the current bass value
 	- Display the 4 bands on the left side of a circle by default at 0°, 45°, 90°, 135°
 	- Add extra bars next to the "main bars" with a cosine shape. Add more bars for the lower bands.

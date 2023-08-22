@@ -81,7 +81,7 @@ lv_res_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * 
 
 /**
  * Get the current target of the event. It's the object which event handler being called.
- * If the event is not bubbled it's the same as "orignal" target.
+ * If the event is not bubbled it's the same as "original" target.
  * @param e     pointer to the event descriptor
  * @return      the target of the event_code
  */

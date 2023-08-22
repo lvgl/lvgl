@@ -10,6 +10,7 @@
 #if LV_USE_DRAW_SW
 
 #include "blend/lv_draw_sw_blend.h"
+#include "../../core/lv_global.h"
 #include "../../misc/lv_math.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_assert.h"
@@ -21,6 +22,10 @@
  *********************/
 #define SHADOW_UPSCALE_SHIFT    6
 #define SHADOW_ENHANCE          1
+
+#if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
+    #define shadow_cache LV_GLOBAL_DEFAULT()->sw_shadow_cache
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -39,11 +44,6 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
-    static uint8_t sh_cache[LV_DRAW_SW_SHADOW_CACHE_SIZE * LV_DRAW_SW_SHADOW_CACHE_SIZE];
-    static int32_t sh_cache_size = -1;
-    static int32_t sh_cache_r = -1;
-#endif
 
 /**********************
  *      MACROS
@@ -99,10 +99,11 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     lv_opa_t * sh_buf;
 
 #if LV_DRAW_SW_SHADOW_CACHE_SIZE
-    if(sh_cache_size == corner_size && sh_cache_r == r_sh) {
+    lv_draw_sw_shadow_cache_t * cache = &shadow_cache;
+    if(cache->cache_size == corner_size && cache->cache_r == r_sh) {
         /*Use the cache if available*/
         sh_buf = lv_malloc(corner_size * corner_size);
-        lv_memcpy(sh_buf, sh_cache, corner_size * corner_size);
+        lv_memcpy(sh_buf, cache->cache, corner_size * corner_size);
     }
     else {
         /*A larger buffer is required for calculation*/
@@ -110,10 +111,10 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
         shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->width, r_sh);
 
         /*Cache the corner if it fits into the cache size*/
-        if((uint32_t)corner_size * corner_size < sizeof(sh_cache)) {
-            lv_memcpy(sh_cache, sh_buf, corner_size * corner_size);
-            sh_cache_size = corner_size;
-            sh_cache_r = r_sh;
+        if((uint32_t)corner_size * corner_size < sizeof(cache->cache)) {
+            lv_memcpy(cache->cache, sh_buf, corner_size * corner_size);
+            cache->cache_size = corner_size;
+            cache->cache_r = r_sh;
         }
     }
 #else

@@ -53,6 +53,11 @@ lv_theme_t * lv_theme_default_get(void);
  */
 bool lv_theme_default_is_inited(void);
 
+/**
+ * Deinitialize the default theme
+ */
+void lv_theme_default_deinit(void);
+
 /**********************
  *      MACROS
  **********************/

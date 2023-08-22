@@ -99,6 +99,11 @@ typedef _lv_dir_t lv_dir_t;
 typedef uint8_t lv_dir_t;
 #endif /*DOXYGEN*/
 
+typedef struct  {
+    int32_t angle_prev;
+    int32_t sinma;
+    int32_t cosma;
+} lv_area_transform_cache_t;
 
 /**********************
  * GLOBAL PROTOTYPES

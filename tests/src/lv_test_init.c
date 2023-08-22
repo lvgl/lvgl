@@ -46,6 +46,7 @@ static void hal_init(void)
     lv_test_encoder_indev = lv_indev_create();
     lv_indev_set_type(lv_test_encoder_indev, LV_INDEV_TYPE_ENCODER);
     lv_indev_set_read_cb(lv_test_encoder_indev,  lv_test_encoder_read_cb);
+
 }
 
 static void dummy_flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p)
@@ -54,24 +55,6 @@ static void dummy_flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * c
     LV_UNUSED(color_p);
 
     lv_disp_flush_ready(disp);
-}
-
-uint32_t custom_tick_get(void)
-{
-    static uint64_t start_ms = 0;
-    if(start_ms == 0) {
-        struct timeval tv_start;
-        gettimeofday(&tv_start, NULL);
-        start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
-    }
-
-    struct timeval tv_now;
-    gettimeofday(&tv_now, NULL);
-    uint64_t now_ms;
-    now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
-
-    uint32_t time_ms = now_ms - start_ms;
-    return time_ms;
 }
 
 void lv_test_assert_fail(void)

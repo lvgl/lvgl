@@ -20,6 +20,8 @@ extern "C" {
 #include "../misc/lv_profiler.h"
 #include "lv_img_decoder.h"
 #include "lv_img_cache.h"
+#include "../osal/lv_os.h"
+#include "draw_buf/lv_draw_buf.h"
 
 /*********************
  *      DEFINES
@@ -101,22 +103,16 @@ typedef struct _lv_draw_unit_t {
      * @param layer         pointer to a layer on which the draw task should be drawn
      * @return              >=0:    The number of taken draw task
      *                      -1:     There where no available draw tasks at all.
-     *                              Also means to no call the dispatcher of the other draw units as there is no dra task to tkae
+     *                              Also means to no call the dispatcher of the other draw units as there is no draw task to take
      */
     int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
 } lv_draw_unit_t;
 
 
 typedef struct _lv_layer_t  {
-    /**
-     *  Pointer to a buffer to draw into
-     */
-    void * buf;
 
-    /**
-     * The position and size of `buf` (absolute coordinates)
-     */
-    lv_area_t buf_area;
+    lv_draw_buf_t draw_buf;
+    lv_point_t draw_buf_ofs;
 
     /**
      * The current clip area with absolute coordinates, always the same or smaller than `buf_area`
@@ -126,38 +122,6 @@ typedef struct _lv_layer_t  {
      * During drawing the layer's clip area shouldn't be used as it might be already changed for other draw tasks.
      */
     lv_area_t clip_area;
-
-    /**
-     * The rendered image in layer->buf will be converted to this format
-     * using target_layer->buffer_convert.
-     */
-    lv_color_format_t color_format;
-
-    /**
-     * Copy an area from buffer to an other
-     * @param layer      pointer to a draw context
-     * @param dest_buf      copy the buffer into this buffer
-     * @param dest_stride   the width of the dest_buf in pixels
-     * @param dest_area     the destination area
-     * @param src_buf       copy from this buffer
-     * @param src_stride    the width of src_buf in pixels
-     * @param src_area      the source area.
-     *
-     * @note dest_area and src_area must have the same width and height
-     *       but can have different x and y position.
-     * @note dest_area and src_area must be clipped to the real dimensions of the buffers
-     */
-    void (*buffer_copy)(struct _lv_layer_t * target_layer, void * dest_buf, lv_coord_t dest_stride,
-                        const lv_area_t * dest_area,
-                        void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
-
-    /**
-     * Convert the content of `target_layer->buf` to `target_layer->color_format`
-     * @param target_layer
-     */
-    void (*buffer_convert)(struct _lv_layer_t * layer);
-
-    void (*buffer_clear)(struct _lv_layer_t * target_layer, const lv_area_t * a);
 
     /**
      * Linked list of draw tasks
@@ -177,6 +141,18 @@ typedef struct {
     uint32_t id2;
     lv_layer_t * layer;
 } lv_draw_dsc_base_t;
+
+typedef struct {
+    lv_draw_unit_t * unit_head;
+    uint32_t used_memory_for_layers_kb;
+#if LV_USE_OS
+    lv_thread_sync_t sync;
+    lv_mutex_t circle_cache_mutex;
+#else
+    int dispatch_req;
+#endif
+    bool task_running;
+} lv_draw_cache_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -224,6 +200,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
  */
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area);
 
+
+void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area);
 
 /**
  * Call to tell that a layer buffer with X kB size was allocated

@@ -156,11 +156,6 @@ typedef enum {
     LV_FONT_FMT_TXT_COMPRESSED_NO_PREFILTER = 1,
 } lv_font_fmt_txt_bitmap_format_t;
 
-typedef struct {
-    uint32_t last_letter;
-    uint32_t last_glyph_id;
-} lv_font_fmt_txt_glyph_cache_t;
-
 /*Describe store additional data for fonts*/
 typedef struct {
     /*The bitmaps of all glyphs*/
@@ -197,9 +192,24 @@ typedef struct {
      * from `lv_font_fmt_txt_bitmap_format_t`
      */
     uint16_t bitmap_format  : 2;
-
-    lv_font_fmt_txt_glyph_cache_t * cache;
 } lv_font_fmt_txt_dsc_t;
+
+#if LV_USE_FONT_COMPRESSED
+typedef enum {
+    RLE_STATE_SINGLE = 0,
+    RLE_STATE_REPEATE,
+    RLE_STATE_COUNTER,
+} lv_font_fmt_rle_state_t;
+
+typedef struct {
+    uint32_t rdp;
+    const uint8_t * in;
+    uint8_t bpp;
+    uint8_t prev_v;
+    uint8_t count;
+    lv_font_fmt_rle_state_t state;
+} lv_font_fmt_rle_t;
+#endif
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -320,7 +320,7 @@ static void lv_roller_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 #if LV_WIDGETS_HAS_DEFAULT_VALUE
     lv_roller_set_options(obj, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
 #endif
-    LV_LOG_TRACE("finshed");
+    LV_LOG_TRACE("finished");
 }
 
 static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)

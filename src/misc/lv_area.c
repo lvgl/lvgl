@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "../lv_conf_internal.h"
+#include "../core/lv_global.h"
 
 #include "lv_area.h"
 #include "lv_math.h"
@@ -14,6 +15,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define trans_cache LV_GLOBAL_DEFAULT()->area_trans_cache
 
 /**********************
  *      TYPEDEFS
@@ -471,11 +473,8 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom, const lv_po
         p->y = (((int32_t)(p->y) * zoom) >> 8) + pivot->y;
         return;
     }
-
-    static int32_t angle_prev = INT32_MIN;
-    static int32_t sinma;
-    static int32_t cosma;
-    if(angle_prev != angle) {
+    lv_area_transform_cache_t * cache = &trans_cache;
+    if(cache->angle_prev != angle) {
         int32_t angle_limited = angle;
         if(angle_limited > 3600) angle_limited -= 3600;
         if(angle_limited < 0) angle_limited += 3600;
@@ -490,21 +489,21 @@ void lv_point_transform(lv_point_t * p, int32_t angle, int32_t zoom, const lv_po
         int32_t c1 = lv_trigo_sin(angle_low + 90);
         int32_t c2 = lv_trigo_sin(angle_high + 90);
 
-        sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
-        cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
-        sinma = sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
-        cosma = cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
-        angle_prev = angle;
+        cache->sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
+        cache->cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
+        cache->sinma = cache->sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+        cache->cosma = cache->cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+        cache->angle_prev = angle;
     }
     int32_t x = p->x;
     int32_t y = p->y;
     if(zoom == 256) {
-        p->x = ((cosma * x - sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
-        p->y = ((sinma * x + cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
+        p->x = ((cache->cosma * x - cache->sinma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+        p->y = ((cache->sinma * x + cache->cosma * y) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
     }
     else {
-        p->x = (((cosma * x - sinma * y) * zoom) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
-        p->y = (((sinma * x + cosma * y) * zoom) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
+        p->x = (((cache->cosma * x - cache->sinma * y) * zoom) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->x;
+        p->y = (((cache->sinma * x + cache->cosma * y) * zoom) >> (_LV_TRANSFORM_TRIGO_SHIFT + 8)) + pivot->y;
     }
 }
 

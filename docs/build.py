@@ -2,7 +2,7 @@
 
 # ****************************************************************************
 # IMPOTRANT: If you are getting a lexer error for an example you need to check
-#            for extra lines at the edn of the file. Only a single empty line
+#            for extra lines at the end of the file. Only a single empty line
 #            is allowed!!! Ask me how long it took me to figure this out
 # ****************************************************************************
 
@@ -19,7 +19,7 @@ import config_builder
 # due to the modifications that take place to the documentation files
 # when the documentaation builds it is better to copy the source files to a
 # temporary folder and modify the copies. Not setting it up this way makes it
-# a real headache when making alterations that need to be comitted as the
+# a real headache when making alterations that need to be committed as the
 # alterations trigger the files as changed.
 
 # If there is debugging that needs to be done you can provide a command line

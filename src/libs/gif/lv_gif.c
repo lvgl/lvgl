@@ -75,13 +75,13 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
         gifobj->gif = gd_open_gif_file(src);
     }
     if(gifobj->gif == NULL) {
-        LV_LOG_WARN("Could't load the source");
+        LV_LOG_WARN("Couldn't load the source");
         return;
     }
 
     gifobj->imgdsc.data = gifobj->gif->canvas;
     gifobj->imgdsc.header.always_zero = 0;
-    //    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_NATIVE_ALPHA; TODO
+    gifobj->imgdsc.header.cf = LV_COLOR_FORMAT_NATIVE_WITH_ALPHA;
     gifobj->imgdsc.header.h = gifobj->gif->height;
     gifobj->imgdsc.header.w = gifobj->gif->width;
     gifobj->last_call = lv_tick_get();
