@@ -941,12 +941,17 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
 
         /* Setup the tick points */
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            /* Vertical position starts at the bottom side of the main line */
+            /* Vertical position starts at y2 of the scale main line */
             lv_coord_t vertical_position = obj->coords.y2;
-            /* Increment the tick offset depending of its index */
-            if(0 != tick_idx) {
-                vertical_position -= (lv_obj_get_height(obj) / scale->total_tick_count) * tick_idx;
+            if(scale->total_tick_count == tick_idx) {
+            	vertical_position = obj->coords.y1;
             }
+            /* Increment the tick offset depending of its index */
+            else if(0 != tick_idx) {
+            	float section = (float) lv_obj_get_height(obj) / (float) scale->total_tick_count;
+            	float offset = section * tick_idx;
+                vertical_position -= (lv_coord_t) offset;
+            } else { /* Nothing to do */ }
 
             tick_point_a->x = x_ofs - 1U; /* Move extra pixel out of scale boundary */
             tick_point_a->y = vertical_position;
@@ -954,12 +959,18 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
             tick_point_b->y = vertical_position;
         }
         else {
-            /* Horizontal position starts at the right most side of the main line */
+            /* Horizontal position starts at x1 of the scale main line */
             lv_coord_t horizontal_position = obj->coords.x1;
-            /* Increment the tick offset depending of its index */
-            if(0 != tick_idx) {
-                horizontal_position += (lv_obj_get_width(obj) / scale->total_tick_count) * tick_idx;
+            /* Position the last tick at the x2 scale coordinate */
+            if(scale->total_tick_count == tick_idx) {
+            	horizontal_position = obj->coords.x2;
             }
+            /* Increment the tick offset depending of its index */
+            else if (0U != tick_idx){
+                float section = (float) lv_obj_get_width(obj) / (float) scale->total_tick_count;
+                float offset = section * tick_idx;
+                horizontal_position += (lv_coord_t) offset;
+            } else { /* Nothing to do */ }
 
             tick_point_a->x = horizontal_position;
             tick_point_a->y = y_ofs;
