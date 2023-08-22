@@ -398,7 +398,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
             const int32_t tick_value = lv_map(tick_idx, 0U, total_tick_count, scale->range_min, scale->range_max);
 
-            /* Overwrite label properties if tick value is within section range */
+            /* Overwrite label and tick properties if tick value is within section range */
             lv_scale_section_t * section;
             _LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
@@ -412,11 +412,12 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 }
             }
 
-            /* The tick is represented by a vertical line. We need two points to draw it */
+            /* The tick is represented by a line. We need two points to draw it */
             lv_point_t tick_point_a;
             lv_point_t tick_point_b;
             scale_get_tick_points(obj, tick_idx, is_major_tick, &tick_point_a, &tick_point_b);
 
+            /* Setup a label if they're enabled and we're drawing a major tick */
             if(scale->label_enabled && is_major_tick) {
                 /* Label text setup */
                 char text_buffer[LV_SCALE_LABEL_TXT_LEN] = {0};
@@ -443,7 +444,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             /* Store initial and last tick widths to be used in the main line drawing */
             scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
 
-            /* Used to calculate position of main line section */
+            /* Store the first and last section tick vertical/horizontal position */
             _LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                     if(is_major_tick) {
@@ -455,8 +456,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     }
                 }
 
-                /* Store the first and last section tick vertical/horizontal position
-                 * TODO: Move this tick position calculation into an API that can be used in scale_draw_main */
+                /* TODO: Move this tick position calculation into an API that can be used in scale_draw_main */
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                     if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
                         section->first_tick_in_section.y = tick_point_a.y;
