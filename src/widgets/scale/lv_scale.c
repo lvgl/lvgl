@@ -763,17 +763,19 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             lv_coord_t section_arc_radius;
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
 
-            const int32_t section_start_angle = lv_map(scale->range_min, scale->range_min, scale->range_max, scale->rotation,
+            const int32_t section_start_angle = lv_map(section->minor_range, scale->range_min, scale->range_max, scale->rotation,
                                                scale->rotation + scale->angle_range);
-            const int32_t section_end_angle = lv_map(scale->range_max, scale->range_min, scale->range_max, scale->rotation,
+            const int32_t section_end_angle = lv_map(section->major_range, scale->range_min, scale->range_max, scale->rotation,
                                              scale->rotation + scale->angle_range);
+
+            LV_LOG_USER("Start angle: %d, End angle: %d", section_start_angle, section_end_angle);
 
             scale_set_arc_properties(obj, &main_arc_section_dsc, section->main_style);
 
-            arc_dsc.center = section_arc_center; // ok
-            arc_dsc.radius = section_arc_radius; // ok
-            arc_dsc.start_angle = section_start_angle;
-            arc_dsc.end_angle = section_end_angle;
+            main_arc_section_dsc.center = section_arc_center;
+            main_arc_section_dsc.radius = section_arc_radius;
+            main_arc_section_dsc.start_angle = section_start_angle;
+            main_arc_section_dsc.end_angle = section_end_angle;
 
             lv_draw_arc(layer, &main_arc_section_dsc);
         }
