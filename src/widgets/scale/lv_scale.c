@@ -937,7 +937,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         }
         else { /* Nothing to do */ }
 
-        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
+        int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count);
         angle_upscale += scale->rotation * 10U;
 
         /*Draw a little bit longer lines to be sure the mask will clip them correctly
