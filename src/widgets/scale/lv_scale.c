@@ -764,9 +764,9 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
 
             const int32_t section_start_angle = lv_map(section->minor_range, scale->range_min, scale->range_max, scale->rotation,
-                                               scale->rotation + scale->angle_range);
+                                                       scale->rotation + scale->angle_range);
             const int32_t section_end_angle = lv_map(section->major_range, scale->range_min, scale->range_max, scale->rotation,
-                                             scale->rotation + scale->angle_range);
+                                                     scale->rotation + scale->angle_range);
 
             LV_LOG_USER("Start angle: %d, End angle: %d", section_start_angle, section_end_angle);
 
@@ -1076,7 +1076,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         lv_res_t res;
 
         /* Line width */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_WIDTH, &value);
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_WIDTH, &value);
         if(res == LV_RES_OK) {
             arc_dsc->width = (lv_coord_t)value.num;
         }
@@ -1085,7 +1085,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         }
 
         /* Line color */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_COLOR, &value);
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_COLOR, &value);
         if(res == LV_RES_OK) {
             arc_dsc->color = value.color;
         }
@@ -1094,7 +1094,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
         }
 
         /* Line opa */
-        res = lv_style_get_prop(section_style, LV_STYLE_LINE_OPA, &value);
+        res = lv_style_get_prop(section_style, LV_STYLE_ARC_OPA, &value);
         if(res == LV_RES_OK) {
             arc_dsc->opa = (lv_opa_t)value.num;
         }
