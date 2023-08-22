@@ -646,7 +646,10 @@ static void style_init(struct _my_theme_t * theme)
 
 #if LV_USE_SCALE
     style_init_reset(&theme->styles.scale);
+    lv_style_set_line_color(&theme->styles.scale, lv_color_black());
     lv_style_set_line_width(&theme->styles.scale, 2U);
+    lv_style_set_arc_color(&theme->styles.scale, lv_color_black());
+    lv_style_set_arc_width(&theme->styles.scale, 2U);
 #endif
 }
 
