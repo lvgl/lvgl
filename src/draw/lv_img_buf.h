@@ -61,14 +61,16 @@ typedef struct {
 } lv_img_header_t;
 #else
 typedef struct {
-    uint8_t always_zero;
-    uint8_t cf;          /*Color format: See `lv_color_format_t`*/
-    uint16_t format: 16;
-    uint16_t user: 4;
-    uint16_t reserved: 4;
-    uint16_t w; /*Width of the image*/
-    uint16_t h; /*Height of the image*/
+    uint32_t cf : 5;          /*Color format: See `lv_color_format_t`*/
+    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
+                                 non-printable character*/
 
+    uint32_t format: 8;       /*Image format? To be defined by LVGL*/
+    uint32_t user: 8;
+    uint32_t reserved: 8;   /*Reserved to be used later*/
+
+    uint32_t w: 16;
+    uint32_t h: 16;
 } lv_img_header_t;
 #endif
 

@@ -66,7 +66,7 @@ void * lv_msg_subscribe_obj(lv_msg_id_t msg_id, lv_obj_t * obj, void * user_data
 
 /**
  * Cancel a previous subscription
- * @param s             pointer to a "subscibe object".
+ * @param s             pointer to a "subscribe object".
  *                      Return value of `lv_msg_subscribe` or `lv_msg_subscribe_obj`
  */
 void lv_msg_unsubscribe(void * s);

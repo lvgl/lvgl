@@ -892,7 +892,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
     if(LV_MIN(point_w, point_h) > line_dsc.width / 2) line_dsc.raw_end = 1;
     if(line_dsc.width == 1) line_dsc.raw_end = 1;
 
-    /*If there are at least as much points as pixels then draw only vertical lines*/
+    /*If there are at least as many points as pixels then draw only vertical lines*/
     bool crowded_mode = chart->point_cnt >= w ? true : false;
 
     /*Go through all data lines*/
@@ -969,7 +969,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                     }
 
                     if(point_w && point_h && ser->y_points[p_prev] != LV_CHART_POINT_NONE) {
-                        point_dsc_default.base.id2 = i;
+                        point_dsc_default.base.id2 = i - 1;
                         lv_draw_rect(layer, &point_dsc_default, &point_area);
                     }
                 }
@@ -987,7 +987,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
                 point_area.x2 = line_dsc.p2.x + point_w;
                 point_area.y1 = line_dsc.p2.y - point_h;
                 point_area.y2 = line_dsc.p2.y + point_h;
-                point_dsc_default.base.id2 = i;
+                point_dsc_default.base.id2 = i - 1;
                 lv_draw_rect(layer, &point_dsc_default, &point_area);
             }
 

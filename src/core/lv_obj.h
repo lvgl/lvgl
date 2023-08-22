@@ -116,6 +116,9 @@ typedef enum {
     LV_OBJ_FLAG_IGNORE_LAYOUT   = (1L << 17), /**< Make the object position-able by the layouts*/
     LV_OBJ_FLAG_FLOATING        = (1L << 18), /**< Do not scroll the object when the parent scrolls and ignore layout*/
     LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS = (1L << 19), /**< Send `LV_EVENT_DRAW_TASK_ADDED` events*/
+#if LV_USE_FLEX
+    LV_OBJ_FLAG_FLEX_IN_NEW_TRACK = (1L << 20),     /**< Start a new flex track on this item*/
+#endif
 
     LV_OBJ_FLAG_LAYOUT_1        = (1L << 23), /**< Custom flag, free to use by layouts*/
     LV_OBJ_FLAG_LAYOUT_2        = (1L << 24), /**< Custom flag, free to use by layouts*/
@@ -176,6 +179,10 @@ typedef struct _lv_obj_t {
     struct _lv_obj_t * parent;
     _lv_obj_spec_attr_t * spec_attr;
     _lv_obj_style_t * styles;
+#if LV_OBJ_STYLE_CACHE
+    uint32_t style_main_prop_is_set;
+    uint32_t style_other_prop_is_set;
+#endif
     void * user_data;
     lv_area_t coords;
     lv_obj_flag_t flags;

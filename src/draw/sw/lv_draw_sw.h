@@ -39,13 +39,19 @@ typedef struct {
     uint32_t idx;
 } lv_draw_sw_unit_t;
 
+#if LV_DRAW_SW_SHADOW_CACHE_SIZE
+typedef struct {
+    uint8_t cache[LV_DRAW_SW_SHADOW_CACHE_SIZE * LV_DRAW_SW_SHADOW_CACHE_SIZE];
+    int32_t cache_size;
+    int32_t cache_r;
+} lv_draw_sw_shadow_cache_t;
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 void lv_draw_sw_init(void);
-
-void lv_draw_unit_sw_create(lv_disp_t * disp, uint32_t cnt);
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
                                           const lv_area_t * coords);

@@ -15,6 +15,7 @@
 #include "../../misc/lv_ll.h"
 #include "../../misc/lv_math.h"
 #include "../../osal/lv_os.h"
+#include "../../core/lv_global.h"
 
 #ifdef LV_MEM_POOL_INCLUDE
     #include LV_MEM_POOL_INCLUDE
@@ -35,10 +36,8 @@
     #define MEM_UNIT         uint32_t
     #define ALIGN_MASK       0x3
 #endif
+#define state LV_GLOBAL_DEFAULT()->tlsf_state
 
-#if LV_USE_OS
-    lv_mutex_t mutex;
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -52,10 +51,6 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_tlsf_t tlsf;
-static uint32_t cur_used;
-static uint32_t max_used;
-static lv_ll_t pool_ll;
 
 /**********************
  *      MACROS
@@ -78,24 +73,24 @@ void lv_mem_init(void)
 {
 #if LV_MEM_ADR == 0
 #ifdef LV_MEM_POOL_ALLOC
-    tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_POOL_ALLOC(LV_MEM_SIZE), LV_MEM_SIZE);
+    state.tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_POOL_ALLOC(LV_MEM_SIZE), LV_MEM_SIZE);
 #else
     /*Allocate a large array to store the dynamically allocated data*/
     static LV_ATTRIBUTE_LARGE_RAM_ARRAY MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
-    tlsf = lv_tlsf_create_with_pool((void *)work_mem_int, LV_MEM_SIZE);
+    state.tlsf = lv_tlsf_create_with_pool((void *)work_mem_int, LV_MEM_SIZE);
 #endif
 #else
     tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
 #endif
-    _lv_ll_init(&pool_ll, sizeof(lv_pool_t));
+    _lv_ll_init(&state.pool_ll, sizeof(lv_pool_t));
 
     /*Record the first pool*/
-    lv_pool_t * pool_p = _lv_ll_ins_tail(&pool_ll);
+    lv_pool_t * pool_p = _lv_ll_ins_tail(&state.pool_ll);
     LV_ASSERT_MALLOC(pool_p);
-    *pool_p = lv_tlsf_get_pool(tlsf);
+    *pool_p = lv_tlsf_get_pool(state.tlsf);
 
 #if LV_USE_OS
-    lv_mutex_init(&mutex);
+    lv_mutex_init(&state.mutex);
 #endif
 
 #if LV_MEM_ADD_JUNK
@@ -105,20 +100,20 @@ void lv_mem_init(void)
 
 void lv_mem_deinit(void)
 {
-    _lv_ll_clear(&pool_ll);
-    lv_tlsf_destroy(tlsf);
+    _lv_ll_clear(&state.pool_ll);
+    lv_tlsf_destroy(state.tlsf);
     lv_mem_init();
 }
 
 lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes)
 {
-    lv_mem_pool_t new_pool = lv_tlsf_add_pool(tlsf, mem, bytes);
+    lv_mem_pool_t new_pool = lv_tlsf_add_pool(state.tlsf, mem, bytes);
     if(!new_pool) {
         LV_LOG_WARN("failed to add memory pool, address: %p, size: %zu", mem, bytes);
         return NULL;
     }
 
-    lv_pool_t * pool_p = _lv_ll_ins_tail(&pool_ll);
+    lv_pool_t * pool_p = _lv_ll_ins_tail(&state.pool_ll);
     LV_ASSERT_MALLOC(pool_p);
     *pool_p = new_pool;
 
@@ -128,11 +123,11 @@ lv_mem_pool_t lv_mem_add_pool(void * mem, size_t bytes)
 void lv_mem_remove_pool(lv_mem_pool_t pool)
 {
     lv_pool_t * pool_p;
-    _LV_LL_READ(&pool_ll, pool_p) {
+    _LV_LL_READ(&state.pool_ll, pool_p) {
         if(*pool_p == pool) {
-            _lv_ll_remove(&pool_ll, pool_p);
+            _lv_ll_remove(&state.pool_ll, pool_p);
             lv_free(pool_p);
-            lv_tlsf_remove_pool(tlsf, pool);
+            lv_tlsf_remove_pool(state.tlsf, pool);
             return;
         }
     }
@@ -143,14 +138,14 @@ void lv_mem_remove_pool(lv_mem_pool_t pool)
 void * lv_malloc_core(size_t size)
 {
 #if LV_USE_OS
-    lv_mutex_lock(&mutex);
+    lv_mutex_lock(&state.mutex);
 #endif
-    cur_used += size;
-    max_used = LV_MAX(cur_used, max_used);
-    void * p = lv_tlsf_malloc(tlsf, size);
+    state.cur_used += size;
+    state.max_used = LV_MAX(state.cur_used, state.max_used);
+    void * p = lv_tlsf_malloc(state.tlsf, size);
 
 #if LV_USE_OS
-    lv_mutex_unlock(&mutex);
+    lv_mutex_unlock(&state.mutex);
 #endif
     return p;
 }
@@ -158,13 +153,13 @@ void * lv_malloc_core(size_t size)
 void * lv_realloc_core(void * p, size_t new_size)
 {
 #if LV_USE_OS
-    lv_mutex_lock(&mutex);
+    lv_mutex_lock(&state.mutex);
 #endif
 
-    void * p_new = lv_tlsf_realloc(tlsf, p, new_size);
+    void * p_new = lv_tlsf_realloc(state.tlsf, p, new_size);
 
 #if LV_USE_OS
-    lv_mutex_unlock(&mutex);
+    lv_mutex_unlock(&state.mutex);
 #endif
 
     return p_new;
@@ -173,18 +168,18 @@ void * lv_realloc_core(void * p, size_t new_size)
 void lv_free_core(void * p)
 {
 #if LV_USE_OS
-    lv_mutex_lock(&mutex);
+    lv_mutex_lock(&state.mutex);
 #endif
 
 #if LV_MEM_ADD_JUNK
     lv_memset(p, 0xbb, lv_tlsf_block_size(data));
 #endif
-    size_t size = lv_tlsf_free(tlsf, p);
-    if(cur_used > size) cur_used -= size;
-    else cur_used = 0;
+    size_t size = lv_tlsf_free(state.tlsf, p);
+    if(state.cur_used > size) state.cur_used -= size;
+    else state.cur_used = 0;
 
 #if LV_USE_OS
-    lv_mutex_unlock(&mutex);
+    lv_mutex_unlock(&state.mutex);
 #endif
 }
 
@@ -195,7 +190,7 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
     MEM_TRACE("begin");
 
     lv_pool_t * pool_p;
-    _LV_LL_READ(&pool_ll, pool_p) {
+    _LV_LL_READ(&state.pool_ll, pool_p) {
         lv_tlsf_walk_pool(*pool_p, lv_mem_walker, mon_p);
     }
 
@@ -208,7 +203,7 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
         mon_p->frag_pct = 0; /*no fragmentation if all the RAM is used*/
     }
 
-    mon_p->max_used = max_used;
+    mon_p->max_used = state.max_used;
 
     MEM_TRACE("finished");
 }
@@ -217,22 +212,22 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 lv_res_t lv_mem_test_core(void)
 {
 #if LV_USE_OS
-    lv_mutex_lock(&mutex);
+    lv_mutex_lock(&state.mutex);
 #endif
-    if(lv_tlsf_check(tlsf)) {
+    if(lv_tlsf_check(state.tlsf)) {
         LV_LOG_WARN("failed");
 #if LV_USE_OS
-        lv_mutex_unlock(&mutex);
+        lv_mutex_unlock(&state.mutex);
 #endif
         return LV_RES_INV;
     }
 
     lv_pool_t * pool_p;
-    _LV_LL_READ(&pool_ll, pool_p) {
+    _LV_LL_READ(&state.pool_ll, pool_p) {
         if(lv_tlsf_check_pool(*pool_p)) {
             LV_LOG_WARN("pool failed");
 #if LV_USE_OS
-            lv_mutex_unlock(&mutex);
+            lv_mutex_unlock(&state.mutex);
 #endif
             return LV_RES_INV;
         }
@@ -240,7 +235,7 @@ lv_res_t lv_mem_test_core(void)
 
     MEM_TRACE("passed");
 #if LV_USE_OS
-    lv_mutex_unlock(&mutex);
+    lv_mutex_unlock(&state.mutex);
 #endif
     return LV_RES_OK;
 }

@@ -244,7 +244,7 @@ void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32
                               lv_disp_render_mode_t render_mode);
 
 /**
- * Set the flush callback whcih will be called to copy the rendered image to the display.
+ * Set the flush callback which will be called to copy the rendered image to the display.
  * @param disp      pointer to a display
  * @param flush_cb  the flush callback (`px_map` contains the rendered image as raw pixel map and it should be copied to `area` on the display)
  */
@@ -255,7 +255,7 @@ void lv_disp_set_flush_cb(lv_disp_t * disp, lv_disp_flush_cb_t flush_cb);
  * to convert the rendered content to the desired color format.
  * @param disp              pointer to a display
  * @param color_format      By default `LV_COLOR_FORMAT_NATIVE` to render with L8, RGB565, RGB888 or ARGB8888.
- *                          `LV_COLOR_FORMAT_NATIVE_REVERSE` to change endianess.
+ *                          `LV_COLOR_FORMAT_NATIVE_REVERSE` to change endianness.
  *
  */
 void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format);
@@ -347,7 +347,7 @@ struct _lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 
 /**
  * Return the bottom layer. The bottom layer is the same on all screen and it is under the normal screen layer.
- * It's visble only if the the screen is transparent.
+ * It's visible only if the the screen is transparent.
  * @param disp      pointer to display (NULL to use the default screen)
  * @return          pointer to the bottom layer object
  */

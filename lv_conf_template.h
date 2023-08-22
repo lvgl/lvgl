@@ -68,17 +68,6 @@
 /*Default display refresh, input device read and animation step period.*/
 #define LV_DEF_REFR_PERIOD  33      /*[ms]*/
 
-/*Use a custom tick source that tells the elapsed time in milliseconds.
- *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#define LV_TICK_CUSTOM 0
-#if LV_TICK_CUSTOM
-    #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
-    /*If using lvgl as ESP32 component*/
-    // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
-    // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
-#endif   /*LV_TICK_CUSTOM*/
-
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
  *(Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI_DEF 130     /*[px/inch]*/
@@ -86,6 +75,18 @@
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
+/* Select a draw buffer implementation. Possible values:
+ * - LV_DRAW_BUF_BASIC:     LVGL's built in implementation
+ * - LV_DRAW_BUF_CUSTOM:    Implement the function of lv_draw_buf.h externally
+ */
+#define LV_USE_DRAW_BUF    LV_DRAW_BUF_BASIC
+
+#if LV_USE_DRAW_BUF == LV_DRAW_BUF_BASIC
+    /*Align the stride of all layers and images to this bytes*/
+    #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
+    /*Align the start address of draw_buf addresses to this bytes*/
+    #define LV_DRAW_BUF_ALIGN                       4
+#endif
 
 /*Align the stride of all layers and images to this bytes*/
 #define LV_DRAW_BUF_STRIDE_ALIGN                1
@@ -100,7 +101,7 @@
 #if LV_USE_DRAW_SW == 1
     /* Set the number of draw unit.
      * > 1 requires an operating system enabled in `LV_USE_OS`
-     * > 1 means multply threads will render the screen in parallel */
+     * > 1 means multiply threads will render the screen in parallel */
     #define LV_DRAW_SW_DRAW_UNIT_CNT    1
 
     /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
@@ -143,7 +144,6 @@
 #if LV_USE_OS == LV_OS_CUSTOM
     #define LV_OS_CUSTOM_INCLUDE <stdint.h>
 #endif
-
 
 /*=======================
  * FEATURE CONFIGURATION
@@ -248,12 +248,11 @@
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
 
-/*Garbage Collector settings
- *Used if lvgl is bound to higher level language and the memory is managed by that language*/
-#define LV_ENABLE_GC 0
-#if LV_ENABLE_GC != 0
-    #define LV_GC_INCLUDE "gc.h"                           /*Include Garbage Collector related things*/
-#endif /*LV_ENABLE_GC*/
+#define LV_ENABLE_GLOBAL_CUSTOM 0
+#if LV_ENABLE_GLOBAL_CUSTOM
+    /*Header to include for the custom 'lv_global' function"*/
+    #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
+#endif
 
 /*Default image cache size. Image caching keeps some images opened.
  *If only the built-in image formats are used there is no real advantage of caching.
@@ -269,7 +268,11 @@
 
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
-#define lv_color_mix_ROUND_OFS 0
+#define LV_COLOR_MIX_ROUND_OFS 0
+
+
+/* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
+#define  LV_OBJ_STYLE_CACHE 1
 
 /*=====================
  *  COMPILER SETTINGS

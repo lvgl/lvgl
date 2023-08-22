@@ -283,7 +283,7 @@ uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     lv_coord_t line_w = 0;
 
-    /*If max_width doesn't mater simply find the new line character
+    /*If max_width doesn't matter simply find the new line character
      *without thinking about word wrapping*/
     if((flag & LV_TEXT_FLAG_EXPAND) || (flag & LV_TEXT_FLAG_FIT)) {
         uint32_t i;

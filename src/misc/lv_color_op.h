@@ -50,9 +50,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix(lv_color_t c1, lv_co
 {
     lv_color_t ret;
 
-    ret.red = LV_UDIV255((uint16_t)c1.red * mix + c2.red * (255 - mix) + lv_color_mix_ROUND_OFS);
-    ret.green = LV_UDIV255((uint16_t)c1.green * mix + c2.green * (255 - mix) + lv_color_mix_ROUND_OFS);
-    ret.blue = LV_UDIV255((uint16_t)c1.blue * mix + c2.blue * (255 - mix) + lv_color_mix_ROUND_OFS);
+    ret.red = LV_UDIV255((uint16_t)c1.red * mix + c2.red * (255 - mix) + LV_COLOR_MIX_ROUND_OFS);
+    ret.green = LV_UDIV255((uint16_t)c1.green * mix + c2.green * (255 - mix) + LV_COLOR_MIX_ROUND_OFS);
+    ret.blue = LV_UDIV255((uint16_t)c1.blue * mix + c2.blue * (255 - mix) + LV_COLOR_MIX_ROUND_OFS);
     return ret;
 }
 

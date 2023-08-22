@@ -14,13 +14,14 @@
 #include "../disp/lv_disp.h"
 #include "../disp/lv_disp_private.h"
 #include "../misc/lv_anim.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_async.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
+#define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
 /**********************
  *      TYPEDEFS
@@ -288,7 +289,8 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
     else scr = lv_obj_get_screen(obj);  /*get the screen of `obj`*/
 
     lv_disp_t * d;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_disp_ll), d) {
+    lv_ll_t * disp_head = disp_ll_p;
+    _LV_LL_READ(disp_head, d) {
         uint32_t i;
         for(i = 0; i < d->screen_cnt; i++) {
             if(d->screens[i] == scr) return d;

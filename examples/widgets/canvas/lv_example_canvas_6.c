@@ -26,7 +26,7 @@ void lv_example_canvas_6(void)
     lv_draw_img_dsc_init(&dsc);
     dsc.src = &img_star;
 
-    lv_area_t coords = {5, 5, 5 + img_star.header.w - 1, 10 + img_star.header.h - 1};
+    lv_area_t coords = {10, 10, 10 + img_star.header.w - 1, 10 + img_star.header.h - 1};
 
     lv_draw_img(&layer, &dsc, &coords);
 

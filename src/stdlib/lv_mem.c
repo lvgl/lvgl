@@ -9,6 +9,7 @@
 #include "lv_string.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_log.h"
+#include "../core/lv_global.h"
 
 #if LV_USE_OS == LV_OS_PTHREAD
     #include <pthread.h>
@@ -22,7 +23,7 @@
     #define LV_MEM_ADD_JUNK  0
 #endif
 
-#define ZERO_MEM_SENTINEL  0xa1b2c3d4
+#define zero_mem LV_GLOBAL_DEFAULT()->memory_zero
 
 /**********************
  *      TYPEDEFS
@@ -45,7 +46,6 @@ lv_res_t lv_mem_test_core(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint32_t zero_mem = ZERO_MEM_SENTINEL; /*Give the address of this variable if 0 byte should be allocated*/
 
 /**********************
  *      MACROS

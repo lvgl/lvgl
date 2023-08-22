@@ -40,10 +40,6 @@ const lv_obj_class_t lv_tileview_tile_class = {.constructor_cb = lv_tileview_til
                                                .instance_size = sizeof(lv_tileview_tile_t)
                                               };
 
-static lv_dir_t create_dir;
-static uint32_t create_col_id;
-static uint32_t create_row_id;
-
 /**********************
  *      MACROS
  **********************/
@@ -67,12 +63,18 @@ lv_obj_t * lv_tileview_create(lv_obj_t * parent)
 lv_obj_t * lv_tileview_add_tile(lv_obj_t * tv, uint8_t col_id, uint8_t row_id, lv_dir_t dir)
 {
     LV_LOG_INFO("begin");
-    create_dir = dir;
-    create_col_id = col_id;
-    create_row_id = row_id;
 
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_tileview_tile_class, tv);
     lv_obj_class_init_obj(obj);
+    lv_obj_set_pos(obj, col_id * lv_obj_get_content_width(tv),
+                   row_id * lv_obj_get_content_height(tv));
+
+    lv_tileview_tile_t * tile = (lv_tileview_tile_t *)obj;
+    tile->dir = dir;
+
+    if(col_id == 0 && row_id == 0) {
+        lv_obj_set_scroll_dir(tv, dir);
+    }
     return obj;
 }
 
@@ -138,18 +140,8 @@ static void lv_tileview_tile_constructor(const lv_obj_class_t * class_p, lv_obj_
 {
 
     LV_UNUSED(class_p);
-    lv_obj_t * parent = lv_obj_get_parent(obj);
     lv_obj_set_size(obj, LV_PCT(100), LV_PCT(100));
     lv_obj_update_layout(obj);  /*Be sure the size is correct*/
-    lv_obj_set_pos(obj, create_col_id * lv_obj_get_content_width(parent),
-                   create_row_id * lv_obj_get_content_height(parent));
-
-    lv_tileview_tile_t * tile = (lv_tileview_tile_t *)obj;
-    tile->dir = create_dir;
-
-    if(create_col_id == 0 && create_row_id == 0) {
-        lv_obj_set_scroll_dir(parent, create_dir);
-    }
 }
 
 static void tileview_event_cb(lv_event_t * e)

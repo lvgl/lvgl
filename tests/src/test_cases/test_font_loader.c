@@ -45,7 +45,7 @@ extern lv_font_t font_3;
 
 void test_font_loader(void)
 {
-    /*Test with cahce ('A' has cache)*/
+    /*Test with cache ('A' has cache)*/
     lv_font_t * font_1_bin = lv_font_load("A:src/test_assets/font_1.fnt");
     lv_font_t * font_2_bin = lv_font_load("A:src/test_assets/font_2.fnt");
     lv_font_t * font_3_bin = lv_font_load("A:src/test_assets/font_3.fnt");
@@ -58,7 +58,7 @@ void test_font_loader(void)
     lv_font_free(font_2_bin);
     lv_font_free(font_3_bin);
 
-    /*Test with cahce ('B' has NO cache)*/
+    /*Test with cache ('B' has NO cache)*/
     font_1_bin = lv_font_load("B:src/test_assets/font_1.fnt");
     font_2_bin = lv_font_load("B:src/test_assets/font_2.fnt");
     font_3_bin = lv_font_load("B:src/test_assets/font_3.fnt");

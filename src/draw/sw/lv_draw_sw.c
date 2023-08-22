@@ -136,7 +136,7 @@ static void render_thread_cb(void * ptr)
 
         execute_drawing(u);
 
-        /*Cleaup*/
+        /*Cleanup*/
         u->task_act->state = LV_DRAW_TASK_STATE_READY;
         u->task_act = NULL;
 

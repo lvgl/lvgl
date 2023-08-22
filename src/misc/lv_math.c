@@ -7,10 +7,12 @@
  *      INCLUDES
  *********************/
 #include "lv_math.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define rand_seed LV_GLOBAL_DEFAULT()->math_rand_seed
 
 /**********************
  *      TYPEDEFS
@@ -377,16 +379,14 @@ int32_t lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32
 
 uint32_t lv_rand(uint32_t min, uint32_t max)
 {
-    static uint32_t a = 0x1234ABCD; /*Seed*/
-
     /*Algorithm "xor" from p. 4 of Marsaglia, "Xorshift RNGs"*/
-    uint32_t x = a;
+    uint32_t x = rand_seed;
     x ^= x << 13;
     x ^= x >> 17;
     x ^= x << 5;
-    a = x;
+    rand_seed = x;
 
-    return (a % (max - min + 1)) + min;
+    return (rand_seed % (max - min + 1)) + min;
 }
 
 /**********************

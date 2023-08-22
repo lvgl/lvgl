@@ -47,7 +47,7 @@ typedef struct {
     lv_obj_t obj;
     lv_obj_t * kb;
     lv_obj_t * cand_panel;
-    lv_pinyin_dict_t * dict;
+    const lv_pinyin_dict_t * dict;
     lv_ll_t k9_legal_py_ll;
     char * cand_str;            /* Candidate string */
     char   input_char[16];      /* Input box character */
@@ -127,7 +127,7 @@ lv_obj_t * lv_ime_pinyin_get_cand_panel(lv_obj_t * obj);
  * @param obj  pointer to a Pinyin input method object
  * @return     pointer to the Pinyin input method dictionary
  */
-lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj);
+const lv_pinyin_dict_t * lv_ime_pinyin_get_dict(lv_obj_t * obj);
 
 /*=====================
  * Other functions

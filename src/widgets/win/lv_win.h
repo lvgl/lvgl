@@ -32,7 +32,7 @@ extern const lv_obj_class_t lv_win_class;
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * lv_win_create(lv_obj_t * parent, lv_coord_t header_height);
+lv_obj_t * lv_win_create(lv_obj_t * parent);
 
 
 lv_obj_t * lv_win_add_title(lv_obj_t * win, const char * txt);

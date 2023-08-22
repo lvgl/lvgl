@@ -50,8 +50,7 @@ Architecture
 - |check| More color formats: 24 bit, ARGB1555, ARGB4444 etc
 - |uncheck| Add more feature to key presses (long press, release, etc).
   (see `here <https://forum.lvgl.io/t/keypad-input-device-why-lv-event-long-pressed-only-on-enter/10263>`__) 
-- |uncheck| Variable binding. I.e create properties which can be bound to
-  objects and those obejcts are notified on value change. Maybe based on `lv_msg`?
+- |uncheck| Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
 - |uncheck| Add GPU abstraction for display rotation 
 - |uncheck| Replace the `read_line_cb` of the image decoders with `get_area_cb`
 - |uncheck| Limit the image caching size in bytes instead of image count 
@@ -81,7 +80,7 @@ Widgets
 Drawing and rendering
 ~~~~~~~~~~~~~~~~~~~~~
 
-- |uncheck| Automatically recalculate the layout if a coordinte is get with `lv_obj_get_width/height/x/y/etc`
+- |uncheck| Automatically recalculate the layout if a coordinate is get with `lv_obj_get_width/height/x/y/etc`
 
 Animations
 ~~~~~~~~~~
@@ -101,7 +100,7 @@ Planned in general
 CI
 ~~
 
-- |uncheck| Plaform independent bechmarking #3443
+- |uncheck| Platform independent benchmarking #3443
 - |uncheck| Run static analyzer
 - |uncheck| Release script
 - |uncheck| Unit test for all widgets #2337
