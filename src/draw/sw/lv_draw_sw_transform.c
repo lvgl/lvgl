@@ -282,10 +282,13 @@ static void tranform_rgb888(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
     }
 }
 
+#include "../../stdlib/lv_string.h"
+
 static void tranform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                               int32_t xs_ups, int32_t ys_ups, int32_t xs_step, int32_t ys_step,
                               int32_t x_end, uint8_t * dest_buf, bool aa)
 {
+    //    lv_memzero(dest_buf, x_end * 4);
     int32_t xs_ups_start = xs_ups;
     int32_t ys_ups_start = ys_ups;
     lv_color32_t * dest_c32 = (lv_color32_t *) dest_buf;
@@ -300,7 +303,7 @@ static void tranform_argb8888(const uint8_t * src, lv_coord_t src_w, lv_coord_t 
 
         /*Fully out of the image*/
         if(xs_int < 0 || xs_int >= src_w || ys_int < 0 || ys_int >= src_h) {
-            dest_c32[x].alpha = 0x00;
+            ((uint32_t *)dest_buf)[x] = 0x00000000;
             continue;
         }
 
