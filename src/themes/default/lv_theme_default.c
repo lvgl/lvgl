@@ -645,8 +645,8 @@ static void style_init(struct _my_theme_t * theme)
 #endif
 
 #if LV_USE_SCALE
-    style_init_reset(&styles->scale);
-    lv_style_set_line_width(&styles->scale, 2U);
+    style_init_reset(&theme->styles.scale);
+    lv_style_set_line_width(&theme->styles.scale, 2U);
 #endif
 }
 
@@ -1177,9 +1177,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_SCALE
     else if(lv_obj_check_type(obj, &lv_scale_class)) {
-        lv_obj_add_style(obj, &styles->scale, LV_PART_MAIN);
-        lv_obj_add_style(obj, &styles->scale, LV_PART_INDICATOR);
-        lv_obj_add_style(obj, &styles->scale, LV_PART_ITEMS);
+        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_MAIN);
+        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_ITEMS);
     }
 #endif
 }
