@@ -11,11 +11,13 @@
 #if LV_USE_SPAN != 0
 
 #include "../../misc/lv_assert.h"
+#include "../../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_spangroup_class
+#define snippet_stack LV_GLOBAL_DEFAULT()->span_snippet_stack
 
 /**********************
  *      TYPEDEFS
@@ -66,7 +68,6 @@ static lv_coord_t convert_indent_pct(lv_obj_t * spans, lv_coord_t width);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static struct _snippet_stack snippet_stack;
 
 const lv_obj_class_t lv_spangroup_class  = {
     .base_class = &lv_obj_class,
@@ -85,6 +86,19 @@ const lv_obj_class_t lv_spangroup_class  = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+void lv_span_stack_init(void)
+{
+    struct _snippet_stack * stack = snippet_stack = lv_malloc(sizeof(struct _snippet_stack));
+    LV_ASSERT_MALLOC(stack);
+    if(!stack) {
+        LV_LOG_ERROR("malloc failed for snippet_stack");
+    }
+}
+
+void lv_span_stack_deinit(void)
+{
+    lv_free(snippet_stack);
+}
 
 lv_obj_t * lv_spangroup_create(lv_obj_t * par)
 {
@@ -637,9 +651,10 @@ static bool lv_txt_get_snippet(const char * txt, const lv_font_t * font,
 
 static void lv_snippet_push(lv_snippet_t * item)
 {
-    if(snippet_stack.index < LV_SPAN_SNIPPET_STACK_SIZE) {
-        memcpy(&snippet_stack.stack[snippet_stack.index], item, sizeof(lv_snippet_t));
-        snippet_stack.index++;
+    struct _snippet_stack * stack_p = snippet_stack;
+    if(stack_p->index < LV_SPAN_SNIPPET_STACK_SIZE) {
+        memcpy(&stack_p->stack[stack_p->index], item, sizeof(lv_snippet_t));
+        stack_p->index++;
     }
     else {
         LV_LOG_ERROR("span draw stack overflow, please set LV_SPAN_SNIPPET_STACK_SIZE too larger");
@@ -648,17 +663,17 @@ static void lv_snippet_push(lv_snippet_t * item)
 
 static uint16_t lv_get_snippet_cnt(void)
 {
-    return snippet_stack.index;
+    return snippet_stack->index;
 }
 
 static lv_snippet_t * lv_get_snippet(uint16_t index)
 {
-    return &snippet_stack.stack[index];
+    return &snippet_stack->stack[index];
 }
 
 static void lv_snippet_clear(void)
 {
-    snippet_stack.index = 0;
+    snippet_stack->index = 0;
 }
 
 static const lv_font_t * lv_span_get_style_text_font(lv_obj_t * par, lv_span_t * span)

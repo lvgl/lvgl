@@ -12,11 +12,19 @@
 #include "lv_draw_img.h"
 #include "../tick/lv_tick.h"
 #include "../misc/lv_assert.h"
-#include "../misc/lv_gc.h"
+#include "../core/lv_global.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
  *********************/
+#if LV_IMG_CACHE_DEF_SIZE
+    #define entry_cnt LV_GLOBAL_DEFAULT()->img_cache_entry_cnt
+    #define _img_cache_array LV_GLOBAL_DEFAULT()->img_cache_array
+#else
+    #define _img_cache_single LV_GLOBAL_DEFAULT()->img_cache_single
+#endif
+
 
 /** Count the cache entries's life. Add `time_to_open` to `life` when the entry is used.
  * Decrement all lifes by one every in every ::lv_img_cache_open.
@@ -53,9 +61,6 @@ static void lv_img_cache_invalidate_src_builtin(const void * src);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if LV_IMG_CACHE_DEF_SIZE
-    static uint16_t entry_cnt;
-#endif
 
 /**********************
  *      MACROS
@@ -102,7 +107,7 @@ static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const void * src, lv_c
         return NULL;
     }
 
-    _lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+    _lv_img_cache_entry_t * cache = _img_cache_array;
 
     /*Decrement all lifes. Make the entries older*/
     uint16_t i;
@@ -149,7 +154,7 @@ static _lv_img_cache_entry_t * _lv_img_cache_open_builtin(const void * src, lv_c
         LV_LOG_INFO("image draw: cache miss, cached to an empty entry");
     }
 #else
-    cached_src = &LV_GC_ROOT(_lv_img_cache_single);
+    cached_src = &(_img_cache_single);
 #endif
     /*Open the image and measure the time to open*/
     uint32_t t_start  = lv_tick_get();
@@ -185,23 +190,23 @@ static void lv_img_cache_set_size_builtin(uint16_t new_entry_cnt)
     LV_UNUSED(new_entry_cnt);
     LV_LOG_WARN("Can't change cache size because it's disabled by LV_IMG_CACHE_DEF_SIZE = 0");
 #else
-    if(LV_GC_ROOT(_lv_img_cache_array) != NULL) {
+    if(_img_cache_array != NULL) {
         /*Clean the cache before free it*/
         lv_img_cache_invalidate_src_builtin(NULL);
-        lv_free(LV_GC_ROOT(_lv_img_cache_array));
+        lv_free(_img_cache_array);
     }
 
     /*Reallocate the cache*/
-    LV_GC_ROOT(_lv_img_cache_array) = lv_malloc(sizeof(_lv_img_cache_entry_t) * new_entry_cnt);
-    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_img_cache_array));
-    if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
+    _img_cache_array = lv_malloc(sizeof(_lv_img_cache_entry_t) * new_entry_cnt);
+    LV_ASSERT_MALLOC(_img_cache_array);
+    if(_img_cache_array == NULL) {
         entry_cnt = 0;
         return;
     }
     entry_cnt = new_entry_cnt;
 
     /*Clean the cache*/
-    lv_memzero(LV_GC_ROOT(_lv_img_cache_array), entry_cnt * sizeof(_lv_img_cache_entry_t));
+    lv_memzero(_img_cache_array, entry_cnt * sizeof(_lv_img_cache_entry_t));
 #endif
 }
 
@@ -214,7 +219,7 @@ static void lv_img_cache_invalidate_src_builtin(const void * src)
 {
     LV_UNUSED(src);
 #if LV_IMG_CACHE_DEF_SIZE
-    _lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+    _lv_img_cache_entry_t * cache = _img_cache_array;
 
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {

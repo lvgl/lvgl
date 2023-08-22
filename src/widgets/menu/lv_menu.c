@@ -16,7 +16,7 @@
 #define MY_CLASS &lv_menu_class
 
 #include "../../core/lv_obj.h"
-#include "../../layouts/flex/lv_flex.h"
+#include "../../layouts/lv_layout.h"
 #include "../../stdlib/lv_string.h"
 #include "../label/lv_label.h"
 #include "../btn/lv_btn.h"

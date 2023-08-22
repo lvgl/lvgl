@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <limits.h>
 
+#include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
@@ -66,25 +67,25 @@ void lv_fs_win32_init(void)
      *--------------------------------------------------*/
 
     /*Add a simple driver to open images*/
-    static lv_fs_drv_t fs_drv; /*A driver descriptor*/
-    lv_fs_drv_init(&fs_drv);
+    lv_fs_drv_t * fs_drv_p = &(LV_GLOBAL_DEFAULT()->win32_fs_drv);
+    lv_fs_drv_init(fs_drv_p);
 
     /*Set up fields...*/
-    fs_drv.letter = LV_FS_WIN32_LETTER;
-    fs_drv.cache_size = LV_FS_WIN32_CACHE_SIZE;
+    fs_drv_p->letter = LV_FS_WIN32_LETTER;
+    fs_drv_p->cache_size = LV_FS_WIN32_CACHE_SIZE;
 
-    fs_drv.open_cb = fs_open;
-    fs_drv.close_cb = fs_close;
-    fs_drv.read_cb = fs_read;
-    fs_drv.write_cb = fs_write;
-    fs_drv.seek_cb = fs_seek;
-    fs_drv.tell_cb = fs_tell;
+    fs_drv_p->open_cb = fs_open;
+    fs_drv_p->close_cb = fs_close;
+    fs_drv_p->read_cb = fs_read;
+    fs_drv_p->write_cb = fs_write;
+    fs_drv_p->seek_cb = fs_seek;
+    fs_drv_p->tell_cb = fs_tell;
 
-    fs_drv.dir_close_cb = fs_dir_close;
-    fs_drv.dir_open_cb = fs_dir_open;
-    fs_drv.dir_read_cb = fs_dir_read;
+    fs_drv_p->dir_close_cb = fs_dir_close;
+    fs_drv_p->dir_open_cb = fs_dir_open;
+    fs_drv_p->dir_read_cb = fs_dir_read;
 
-    lv_fs_drv_register(&fs_drv);
+    lv_fs_drv_register(fs_drv_p);
 }
 
 /**********************

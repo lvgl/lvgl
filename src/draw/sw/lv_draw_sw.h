@@ -39,6 +39,14 @@ typedef struct {
     uint32_t idx;
 } lv_draw_sw_unit_t;
 
+#if LV_DRAW_SW_SHADOW_CACHE_SIZE
+typedef struct {
+    uint8_t cache[LV_DRAW_SW_SHADOW_CACHE_SIZE * LV_DRAW_SW_SHADOW_CACHE_SIZE];
+    int32_t cache_size;
+    int32_t cache_r;
+} lv_draw_sw_shadow_cache_t;
+#endif
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

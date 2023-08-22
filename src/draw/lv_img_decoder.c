@@ -10,12 +10,13 @@
 #include "../misc/lv_assert.h"
 #include "../draw/lv_draw_img.h"
 #include "../misc/lv_ll.h"
-#include "../misc/lv_gc.h"
 #include "../stdlib/lv_string.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
 
 /**********************
  *      TYPEDEFS
@@ -50,7 +51,7 @@ static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_col
  */
 void _lv_img_decoder_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_img_decoder_ll), sizeof(lv_img_decoder_t));
+    _lv_ll_init(img_decoder_ll_p, sizeof(lv_img_decoder_t));
 
     lv_img_decoder_t * decoder;
 
@@ -88,7 +89,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), d) {
+    _LV_LL_READ(img_decoder_ll_p, d) {
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
             if(res == LV_RES_OK) break;
@@ -130,7 +131,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     lv_res_t res = LV_RES_INV;
 
     lv_img_decoder_t * decoder;
-    _LV_LL_READ(&LV_GC_ROOT(_lv_img_decoder_ll), decoder) {
+    _LV_LL_READ(img_decoder_ll_p, decoder) {
         /*Info and Open callbacks are required*/
         if(decoder->info_cb == NULL || decoder->open_cb == NULL) continue;
 
@@ -198,7 +199,7 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 lv_img_decoder_t * lv_img_decoder_create(void)
 {
     lv_img_decoder_t * decoder;
-    decoder = _lv_ll_ins_head(&LV_GC_ROOT(_lv_img_decoder_ll));
+    decoder = _lv_ll_ins_head(img_decoder_ll_p);
     LV_ASSERT_MALLOC(decoder);
     if(decoder == NULL) return NULL;
 
@@ -213,7 +214,7 @@ lv_img_decoder_t * lv_img_decoder_create(void)
  */
 void lv_img_decoder_delete(lv_img_decoder_t * decoder)
 {
-    _lv_ll_remove(&LV_GC_ROOT(_lv_img_decoder_ll), decoder);
+    _lv_ll_remove(img_decoder_ll_p, decoder);
     lv_free(decoder);
 }
 

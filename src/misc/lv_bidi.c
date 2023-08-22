@@ -32,6 +32,11 @@ typedef struct {
     lv_base_dir_t dir;
 } bracket_stack_t;
 
+typedef struct {
+    bracket_stack_t br_stack[LV_BIDI_BRACKLET_DEPTH];
+    uint8_t br_stack_p;
+} lv_bidi_ctx_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -42,12 +47,14 @@ static bool lv_bidi_letter_is_weak(uint32_t letter);
 static bool lv_bidi_letter_is_rtl(uint32_t letter);
 static bool lv_bidi_letter_is_neutral(uint32_t letter);
 
-static lv_base_dir_t get_next_run(const char * txt, lv_base_dir_t base_dir, uint32_t max_len, uint32_t * len,
+static lv_base_dir_t get_next_run(lv_bidi_ctx_t * ctx, const char * txt, lv_base_dir_t base_dir, uint32_t max_len,
+                                  uint32_t * len,
                                   uint16_t  * pos_conv_len);
 static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * pos_conv_out, uint16_t pos_conv_rd_base,
                         uint16_t pos_conv_len);
 static uint32_t char_change_to_pair(uint32_t letter);
-static lv_base_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter,
+static lv_base_dir_t bracket_process(lv_bidi_ctx_t * ctx, const char * txt, uint32_t next_pos, uint32_t len,
+                                     uint32_t letter,
                                      lv_base_dir_t base_dir);
 static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index);
 static uint32_t get_txt_len(const char * txt, uint32_t max_len);
@@ -57,8 +64,6 @@ static uint32_t get_txt_len(const char * txt, uint32_t max_len);
  **********************/
 static const uint8_t bracket_left[] = {"<({["};
 static const uint8_t bracket_right[] = {">)}]"};
-static bracket_stack_t br_stack[LV_BIDI_BRACKLET_DEPTH];
-static uint8_t br_stack_p;
 
 /**********************
  *      MACROS
@@ -240,14 +245,15 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
     lv_base_dir_t dir = base_dir;
 
     /*Empty the bracket stack*/
-    br_stack_p = 0;
+    lv_bidi_ctx_t ctx;
+    lv_memzero(&ctx, sizeof(ctx));
 
     /*Process neutral chars in the beginning*/
     while(rd < len) {
         uint32_t letter = _lv_txt_encoded_next(str_in, &rd);
         pos_conv_rd++;
         dir = lv_bidi_get_letter_dir(letter);
-        if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(str_in, rd, len, letter, base_dir);
+        if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(&ctx, str_in, rd, len, letter, base_dir);
         else if(dir != LV_BASE_DIR_WEAK) break;
     }
 
@@ -278,7 +284,7 @@ void _lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t le
     /*Get and process the runs*/
 
     while(rd < len && str_in[rd]) {
-        run_dir = get_next_run(&str_in[rd], base_dir, len - rd, &run_len, &pos_conv_run_len);
+        run_dir = get_next_run(&ctx, &str_in[rd], base_dir, len - rd, &run_len, &pos_conv_run_len);
 
         if(base_dir == LV_BASE_DIR_LTR) {
             if(run_dir == LV_BASE_DIR_LTR) {
@@ -429,7 +435,8 @@ static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index)
     }
 }
 
-static lv_base_dir_t get_next_run(const char * txt, lv_base_dir_t base_dir, uint32_t max_len, uint32_t * len,
+static lv_base_dir_t get_next_run(lv_bidi_ctx_t * ctx, const char * txt, lv_base_dir_t base_dir, uint32_t max_len,
+                                  uint32_t * len,
                                   uint16_t  * pos_conv_len)
 {
     uint32_t i = 0;
@@ -439,7 +446,7 @@ static lv_base_dir_t get_next_run(const char * txt, lv_base_dir_t base_dir, uint
 
     letter = _lv_txt_encoded_next(txt, NULL);
     lv_base_dir_t dir = lv_bidi_get_letter_dir(letter);
-    if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(txt, 0, max_len, letter, base_dir);
+    if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(ctx, txt, 0, max_len, letter, base_dir);
 
     /*Find the first strong char. Skip the neutrals*/
     while(dir == LV_BASE_DIR_NEUTRAL || dir == LV_BASE_DIR_WEAK) {
@@ -447,7 +454,7 @@ static lv_base_dir_t get_next_run(const char * txt, lv_base_dir_t base_dir, uint
 
         pos_conv_i++;
         dir = lv_bidi_get_letter_dir(letter);
-        if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(txt, i, max_len, letter, base_dir);
+        if(dir == LV_BASE_DIR_NEUTRAL)  dir = bracket_process(ctx, txt, i, max_len, letter, base_dir);
 
         if(dir == LV_BASE_DIR_LTR || dir == LV_BASE_DIR_RTL)  break;
 
@@ -471,7 +478,7 @@ static lv_base_dir_t get_next_run(const char * txt, lv_base_dir_t base_dir, uint
         letter = _lv_txt_encoded_next(txt, &i);
         pos_conv_i++;
         next_dir  = lv_bidi_get_letter_dir(letter);
-        if(next_dir == LV_BASE_DIR_NEUTRAL)  next_dir = bracket_process(txt, i, max_len, letter, base_dir);
+        if(next_dir == LV_BASE_DIR_NEUTRAL)  next_dir = bracket_process(ctx, txt, i, max_len, letter, base_dir);
 
         if(next_dir == LV_BASE_DIR_WEAK) {
             if(run_dir == LV_BASE_DIR_RTL) {
@@ -605,7 +612,8 @@ static uint32_t char_change_to_pair(uint32_t letter)
     return letter;
 }
 
-static lv_base_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter,
+static lv_base_dir_t bracket_process(lv_bidi_ctx_t * ctx, const char * txt, uint32_t next_pos, uint32_t len,
+                                     uint32_t letter,
                                      lv_base_dir_t base_dir)
 {
     lv_base_dir_t bracket_dir = LV_BASE_DIR_NEUTRAL;
@@ -663,19 +671,19 @@ static lv_base_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
     /*The letter was an opening bracket*/
     if(bracket_left[i] != '\0') {
 
-        if(bracket_dir == LV_BASE_DIR_NEUTRAL || br_stack_p == LV_BIDI_BRACKLET_DEPTH) return LV_BASE_DIR_NEUTRAL;
+        if(bracket_dir == LV_BASE_DIR_NEUTRAL || ctx->br_stack_p == LV_BIDI_BRACKLET_DEPTH) return LV_BASE_DIR_NEUTRAL;
 
-        br_stack[br_stack_p].bracklet_pos = i;
-        br_stack[br_stack_p].dir = bracket_dir;
+        ctx->br_stack[ctx->br_stack_p].bracklet_pos = i;
+        ctx->br_stack[ctx->br_stack_p].dir = bracket_dir;
 
-        br_stack_p++;
+        ctx->br_stack_p++;
         return bracket_dir;
     }
-    else if(br_stack_p > 0) {
+    else if(ctx->br_stack_p > 0) {
         /*Is the letter a closing bracket of the last opening?*/
-        if(letter == bracket_right[br_stack[br_stack_p - 1].bracklet_pos]) {
-            bracket_dir = br_stack[br_stack_p - 1].dir;
-            br_stack_p--;
+        if(letter == bracket_right[ctx->br_stack[ctx->br_stack_p - 1].bracklet_pos]) {
+            bracket_dir = ctx->br_stack[ctx->br_stack_p - 1].dir;
+            ctx->br_stack_p--;
             return bracket_dir;
         }
     }

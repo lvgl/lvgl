@@ -11,7 +11,7 @@ cont.set_style_grid_column_dsc_array(col_dsc, 0)
 cont.set_style_grid_row_dsc_array(row_dsc, 0)
 cont.set_size(300, 220)
 cont.center()
-cont.set_layout(lv.LAYOUT_GRID.value)
+cont.set_layout(lv.LAYOUT.GRID)
 
 for i in range(9):
     col = i % 3

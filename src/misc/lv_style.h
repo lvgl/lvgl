@@ -23,6 +23,7 @@ extern "C" {
 #include "lv_types.h"
 #include "lv_assert.h"
 #include "lv_bidi.h"
+#include "../layouts/lv_layout.h"
 
 /*********************
  *      DEFINES
@@ -319,7 +320,30 @@ enum _lv_style_prop_t {
     LV_STYLE_TRANSFORM_PIVOT_X      = 111,
     LV_STYLE_TRANSFORM_PIVOT_Y      = 112,
 
-    _LV_STYLE_LAST_BUILT_IN_PROP     = 112,
+#if LV_USE_FLEX
+    LV_STYLE_FLEX_FLOW              = 113,
+    LV_STYLE_FLEX_MAIN_PLACE        = 114,
+    LV_STYLE_FLEX_CROSS_PLACE       = 115,
+    LV_STYLE_FLEX_TRACK_PLACE       = 116,
+    LV_STYLE_FLEX_GROW              = 117,
+#endif
+
+#if LV_USE_GRID
+    LV_STYLE_GRID_COLUMN_ALIGN      = 118,
+    LV_STYLE_GRID_ROW_ALIGN         = 119,
+    LV_STYLE_GRID_ROW_DSC_ARRAY     = 120,
+    LV_STYLE_GRID_COLUMN_DSC_ARRAY  = 121,
+    LV_STYLE_GRID_CELL_COLUMN_POS   = 122,
+    LV_STYLE_GRID_CELL_COLUMN_SPAN  = 123,
+    LV_STYLE_GRID_CELL_X_ALIGN      = 124,
+    LV_STYLE_GRID_CELL_ROW_POS      = 125,
+    LV_STYLE_GRID_CELL_ROW_SPAN     = 126,
+    LV_STYLE_GRID_CELL_Y_ALIGN      = 127,
+#endif
+
+    _LV_STYLE_LAST_BUILT_IN_PROP     = 128,
+
+
     _LV_STYLE_NUM_BUILT_IN_PROPS     = _LV_STYLE_LAST_BUILT_IN_PROP + 1,
 
     LV_STYLE_PROP_ANY                = 0xFF,

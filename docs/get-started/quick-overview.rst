@@ -34,8 +34,8 @@ If you would rather try LVGL on your own project follow these steps:
 -  Include ``lvgl/lvgl.h`` in files where you need to use LVGL related functions.
 -  Call :cpp:expr:`lv_tick_inc(x)` every ``x`` milliseconds in a Timer or Task
    (``x`` should be between 1 and 10). It is required for the internal
-   timing of LVGL. Alternatively, configure :c:macro:`LV_TICK_CUSTOM` (see
-   ``lv_conf.h``) so that LVGL can retrieve the current time directly.
+   timing of LVGL. Alternatively, register a ``tick_get_cb`` with
+   :cpp:func:`lv_tick_set_cb` so that LVGL can retrieve the current time directly.
 -  Call :cpp:func:`lv_init`
 -  Create a draw buffer: LVGL will render the graphics here first, and
    send the rendered image to the display. The buffer size can be set

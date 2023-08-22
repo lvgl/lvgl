@@ -9,6 +9,7 @@
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 #include "../disp/lv_disp_private.h"
+#include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_group.h"
 #include "../core/lv_refr.h"
@@ -16,8 +17,8 @@
 #include "../tick/lv_tick.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_profiler.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -47,6 +48,10 @@
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
 
+#define indev_act LV_GLOBAL_DEFAULT()->indev_active
+#define indev_obj_act LV_GLOBAL_DEFAULT()->indev_obj_active
+#define indev_ll_head &(LV_GLOBAL_DEFAULT()->indev_ll)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -69,8 +74,6 @@ static bool indev_reset_check(lv_indev_t * indev);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_indev_t * indev_act;
-static lv_obj_t * indev_obj_act = NULL;
 
 /**********************
  *      MACROS
@@ -92,7 +95,7 @@ lv_indev_t * lv_indev_create(void)
         LV_LOG_WARN("no display was created so far");
     }
 
-    lv_indev_t * indev = _lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
+    lv_indev_t * indev = _lv_ll_ins_head(indev_ll_head);
     LV_ASSERT_MALLOC(indev);
     if(!indev) {
         return NULL;
@@ -120,7 +123,7 @@ void lv_indev_delete(lv_indev_t * indev)
     /*Clean up the read timer first*/
     lv_timer_del(indev->read_timer);
     /*Remove the input device from the list*/
-    _lv_ll_remove(&LV_GC_ROOT(_lv_indev_ll), indev);
+    _lv_ll_remove(indev_ll_head, indev);
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -128,9 +131,9 @@ void lv_indev_delete(lv_indev_t * indev)
 lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
 {
     if(indev == NULL)
-        return _lv_ll_get_head(&LV_GC_ROOT(_lv_indev_ll));
+        return _lv_ll_get_head(indev_ll_head);
     else
-        return _lv_ll_get_next(&LV_GC_ROOT(_lv_indev_ll), indev);
+        return _lv_ll_get_next(indev_ll_head, indev);
 }
 
 void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
@@ -169,53 +172,53 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
 
     lv_indev_data_t data;
 
-    indev_act = timer->user_data;
+    lv_indev_t * indev_p = indev_act = timer->user_data;
 
     /*Read and process all indevs*/
-    if(indev_act->disp == NULL) return; /*Not assigned to any displays*/
+    if(indev_p->disp == NULL) return; /*Not assigned to any displays*/
 
     /*Handle reset query before processing the point*/
-    indev_proc_reset_query_handler(indev_act);
+    indev_proc_reset_query_handler(indev_p);
 
-    if(indev_act->disabled ||
-       indev_act->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
+    if(indev_p->disabled ||
+       indev_p->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
 
     LV_PROFILER_BEGIN;
 
     bool continue_reading;
     do {
         /*Read the data*/
-        _lv_indev_read(indev_act, &data);
+        _lv_indev_read(indev_p, &data);
         continue_reading = data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
-        indev_proc_reset_query_handler(indev_act);
+        indev_proc_reset_query_handler(indev_p);
         indev_obj_act = NULL;
 
-        indev_act->state = data.state;
+        indev_p->state = data.state;
 
         /*Save the last activity time*/
-        if(indev_act->state == LV_INDEV_STATE_PRESSED) {
-            indev_act->disp->last_activity_time = lv_tick_get();
+        if(indev_p->state == LV_INDEV_STATE_PRESSED) {
+            indev_p->disp->last_activity_time = lv_tick_get();
         }
-        else if(indev_act->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
-            indev_act->disp->last_activity_time = lv_tick_get();
+        else if(indev_p->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
+            indev_p->disp->last_activity_time = lv_tick_get();
         }
 
-        if(indev_act->type == LV_INDEV_TYPE_POINTER) {
-            indev_pointer_proc(indev_act, &data);
+        if(indev_p->type == LV_INDEV_TYPE_POINTER) {
+            indev_pointer_proc(indev_p, &data);
         }
-        else if(indev_act->type == LV_INDEV_TYPE_KEYPAD) {
-            indev_keypad_proc(indev_act, &data);
+        else if(indev_p->type == LV_INDEV_TYPE_KEYPAD) {
+            indev_keypad_proc(indev_p, &data);
         }
-        else if(indev_act->type == LV_INDEV_TYPE_ENCODER) {
-            indev_encoder_proc(indev_act, &data);
+        else if(indev_p->type == LV_INDEV_TYPE_ENCODER) {
+            indev_encoder_proc(indev_p, &data);
         }
-        else if(indev_act->type == LV_INDEV_TYPE_BUTTON) {
-            indev_button_proc(indev_act, &data);
+        else if(indev_p->type == LV_INDEV_TYPE_BUTTON) {
+            indev_button_proc(indev_p, &data);
         }
         /*Handle reset query if it happened in during processing*/
-        indev_proc_reset_query_handler(indev_act);
+        indev_proc_reset_query_handler(indev_p);
     } while(continue_reading);
 
     /*End of indev processing, so no act indev*/
@@ -951,8 +954,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_coord_t x = i->btn_points[data->btn_id].x;
     lv_coord_t y = i->btn_points[data->btn_id].y;
 
-    static lv_indev_state_t prev_state = LV_INDEV_STATE_RELEASED;
-    if(prev_state != data->state) {
+    if(LV_INDEV_STATE_RELEASED != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {
             LV_LOG_INFO("button %" LV_PRIu32 " is pressed (x:%d y:%d)", data->btn_id, (int)x, (int)y);
         }
