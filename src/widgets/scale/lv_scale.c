@@ -47,7 +47,9 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
                                                  lv_style_t * indicator_section_style);
 static void scale_set_indicator_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc,
                                                 lv_style_t * indicator_section_style);
+/* Helpers */
 static void scale_find_section_tick_idx(lv_obj_t * obj);
+static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint8_t tick_idx, const bool is_major_tick, const lv_coord_t major_tick_width, const lv_coord_t minor_tick_width);
 
 /**********************
  *  STATIC VARIABLES
@@ -439,23 +441,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             }
 
             /* Store initial and last tick widths to be used in the main line drawing */
-            if(total_tick_count == tick_idx) {
-                if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-                    scale->last_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
-                }
-                else {
-                    scale->first_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
-                }
-            }
-            else if(0U == tick_idx) {
-                if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-                    scale->first_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
-                }
-                else {
-                    scale->last_tick_width = is_major_tick ? major_tick_dsc.width : minor_tick_dsc.width;
-                }
-            }
-            else { /* Nothing to do */ }
+            scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
 
             /* Used to calculate position of main line section */
             _LV_LL_READ_BACK(&scale->section_ll, section) {
@@ -1257,6 +1243,40 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
             else { /* Nothing to do */ }
         }
     }
+}
+
+/**
+ * Stores the width of the initial and last tick of the main line
+ *
+ * This width is used to compensate the main line drawing taking into consideration the widths of both ticks
+ *
+ * @param obj       pointer to a scale object
+ * @param tick_idx  index of the current tick
+ * @param is_major_tick true if tick_idx is a major tick
+ * @param major_tick_width width of the major tick
+ * @param minor_tick_width width of the minor tick
+ */
+static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint8_t tick_idx, const bool is_major_tick, const lv_coord_t major_tick_width, const lv_coord_t minor_tick_width)
+{
+	lv_scale_t * scale = (lv_scale_t *)obj;
+
+	if(scale->total_tick_count == tick_idx) {
+		if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
+			scale->last_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
+		}
+		else {
+			scale->first_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
+		}
+	}
+	else if(0U == tick_idx) {
+		if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
+			scale->first_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
+		}
+		else {
+			scale->last_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
+		}
+	}
+	else { /* Nothing to do */ }
 }
 
 #endif
