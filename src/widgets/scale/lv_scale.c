@@ -609,9 +609,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 lv_draw_line(layer, &major_tick_dsc);
             }
             else {
-                major_tick_dsc.p1 = tick_point_a;
-                major_tick_dsc.p2 = tick_point_b;
-                lv_draw_line(layer, &major_tick_dsc);
+                minor_tick_dsc.p1 = tick_point_a;
+                minor_tick_dsc.p2 = tick_point_b;
+                lv_draw_line(layer, &minor_tick_dsc);
             }
         }
     }
