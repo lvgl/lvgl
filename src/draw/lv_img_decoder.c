@@ -24,7 +24,7 @@
 
 typedef struct {
     lv_fs_file_t f;
-    lv_color_t * palette;
+    lv_color32_t * palette;
     uint8_t * img_data;
     lv_opa_t * opa;
 } lv_img_decoder_built_in_data_t;
@@ -32,7 +32,8 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t y,
+static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t x,
+                                    lv_coord_t y,
                                     lv_coord_t w_px, const uint8_t * in, lv_color32_t * out);
 
 /**********************
@@ -66,6 +67,7 @@ void _lv_img_decoder_init(void)
 
     lv_img_decoder_set_info_cb(decoder, lv_img_decoder_built_in_info);
     lv_img_decoder_set_open_cb(decoder, lv_img_decoder_built_in_open);
+    lv_img_decoder_set_get_area_cb(decoder, lv_img_decoder_built_in_get_area);
     lv_img_decoder_set_close_cb(decoder, lv_img_decoder_built_in_close);
 }
 
@@ -354,36 +356,50 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
 
         lv_memcpy(&decoder_data->f, &f, sizeof(f));
+        dsc->user_data = decoder_data;
+
+        /*read palette for indexed image*/
+        if(LV_COLOR_FORMAT_IS_INDEXED(dsc->header.cf)) {
+            uint32_t size = LV_COLOR_INDEXED_PALETTE_SIZE(dsc->header.cf);
+            lv_color32_t * palette = lv_malloc(sizeof(lv_color32_t) * size);
+            LV_ASSERT_MALLOC(palette);
+            if(palette == NULL) {
+                LV_LOG_ERROR("out of memory");
+                lv_fs_close(&f);
+                return LV_RES_INV;
+            }
+
+            uint32_t rn;
+            res = lv_fs_seek(&f, sizeof(lv_img_header_t), LV_FS_SEEK_SET);
+            res |= lv_fs_read(&f, palette, sizeof(lv_color32_t) * size, &rn);
+            if(res != LV_FS_RES_OK || rn != sizeof(lv_color32_t) * size) {
+                LV_LOG_WARN("Built-in image decoder can't read the palette");
+                lv_fs_close(&f);
+                return LV_RES_INV;
+            }
+
+            dsc->palette = palette;
+            dsc->palette_size = size;
+
+            decoder_data->palette = palette; /*Free decoder data on close*/
+
+            /*It needs to be read by get_area_cb later*/
+            return LV_RES_OK;
+        }
+        else {
+            /*It needs to be read by get_area_cb later*/
+            return LV_RES_OK;
+        }
     }
     else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         /*The variables should have valid data*/
-        if(((lv_img_dsc_t *)dsc->src)->data == NULL) {
+        lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
+        if(img_dsc->data == NULL) {
             return LV_RES_INV;
         }
-    }
 
-    if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
-        lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
         lv_color_format_t cf = img_dsc->header.cf;
         if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-            switch(cf) {
-                case LV_COLOR_FORMAT_I1:
-                    dsc->palette_size = 2;
-                    break;
-                case LV_COLOR_FORMAT_I2:
-                    dsc->palette_size = 4;
-                    break;
-                case LV_COLOR_FORMAT_I4:
-                    dsc->palette_size = 16;
-                    break;
-                case LV_COLOR_FORMAT_I8:
-                    dsc->palette_size = 256;
-                    break;
-                default:
-                    LV_LOG_WARN("Unexpected color format");
-                    return LV_RES_INV;
-            }
-
             /*Need decoder data to store converted image*/
             lv_img_decoder_built_in_data_t * decoder_data = get_decoder_data(dsc);
             if(decoder_data == NULL) {
@@ -392,19 +408,24 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
             uint8_t * img_data = lv_malloc(sizeof(lv_color32_t) * img_dsc->header.w *  img_dsc->header.h);
             LV_ASSERT_NULL(img_data);
-            if (img_data == NULL) {
+            if(img_data == NULL) {
                 return LV_RES_INV;
             }
             decoder_data->img_data = img_data; /*Put to decoder data for later free*/
 
             /*Assemble the decoded image dsc*/
+            uint32_t palette_size = LV_COLOR_INDEXED_PALETTE_SIZE(cf);
+            dsc->palette_size = palette_size;
             dsc->palette = (const lv_color32_t *)img_dsc->data;
-            dsc->header.cf = cf;
             dsc->img_data = img_data; /*Return decoded image data.*/
+            dsc->header.cf = cf;
 
             uint32_t y;
+            lv_color32_t * out = (lv_color32_t *) dsc->img_data;
+            const uint8_t * in = img_dsc->data;
+            in += palette_size * 4;
             for(y = 0; y < img_dsc->header.h; y++) {
-                decode_indexed_line(cf, dsc->palette, y, img_dsc->header.w, img_dsc->data, (lv_color32_t *) dsc->img_data);
+                decode_indexed_line(cf, dsc->palette, 0, y, img_dsc->header.w, in, out);
             }
         }
         else {
@@ -414,11 +435,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
         return LV_RES_OK;
     }
-    else {
-        /*TODO indexed formats needs to be read here*/
-        /*If it's a file it need to be read line by line later*/
-        return LV_RES_OK;
-    }
+    else
+        return LV_RES_INV;
 }
 
 /**
@@ -430,18 +448,74 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
 {
     LV_UNUSED(decoder); /*Unused*/
     lv_img_decoder_built_in_data_t * decoder_data = dsc->user_data;
-    if (decoder_data) {
+    if(decoder_data) {
         lv_free(decoder_data->img_data);
         lv_free(decoder_data->palette);
         lv_free(decoder_data);
     }
 }
 
+lv_res_t lv_img_decoder_built_in_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+                                          const lv_area_t * full_area, lv_area_t * decoded_area)
+{
+    LV_UNUSED(decoder); /*Unused*/
+
+    lv_res_t res = LV_RES_INV;
+    lv_color_format_t cf = dsc->header.cf;
+    lv_img_decoder_built_in_data_t * decoder_data = dsc->user_data;
+    lv_coord_t w_px = lv_area_get_width(full_area);
+
+    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
+        if(decoded_area->y1 == LV_COORD_MIN) {
+            dsc->img_data = lv_malloc(sizeof(lv_color32_t) * w_px);
+            LV_ASSERT_NULL(dsc->img_data);
+            if(dsc->img_data == NULL)
+                return LV_RES_INV;
+
+            *decoded_area = *full_area;
+            decoded_area->y2 = decoded_area->y1;
+        }
+        else {
+            decoded_area->y1++;
+            decoded_area->y2++;
+        }
+
+        if(decoded_area->y1 > full_area->y2) {
+            return LV_RES_INV;
+        }
+        else {
+            lv_coord_t bpp = lv_color_format_get_bpp(cf);
+            lv_coord_t x_fraction = decoded_area->x1 % (8 / bpp);
+            uint32_t len = (w_px * bpp + 7) / 8 + 1; /*10px for 1bpp may across 3bytes*/
+            uint8_t * buf = lv_malloc(len);
+            LV_ASSERT_NULL(buf);
+            if(buf == NULL)
+                return LV_RES_INV;
+
+            uint32_t offset = sizeof(lv_img_header_t) + dsc->palette_size * 4;
+            offset += decoded_area->y1 * dsc->header.w * bpp / 8; /*Move to y1*/
+            offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
+            lv_fs_seek(&decoder_data->f, offset, LV_FS_SEEK_SET);
+            lv_fs_read(&decoder_data->f, buf, len, NULL);
+            decode_indexed_line(cf, dsc->palette, x_fraction, 0, w_px, buf, (lv_color32_t *) dsc->img_data);
+            lv_free(buf);
+            return LV_RES_OK;
+        }
+    }
+    else {
+        LV_LOG_WARN("Built-in image decoder read not supports the color format");
+        return LV_RES_INV;
+    }
+
+    return res;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t y,
+static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t x,
+                                    lv_coord_t y,
                                     lv_coord_t w_px, const uint8_t * in, lv_color32_t * out)
 {
     uint8_t px_size;
@@ -450,35 +524,35 @@ static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_col
     out += w_px * y;
 
     lv_coord_t w_byte = 0;
-    int8_t pos   = 0;
+    int8_t shift   = 0;
     switch(color_format) {
         case LV_COLOR_FORMAT_I1:
             px_size = 1;
-            w_byte = (w_px + 7) >> 3; /*E.g. w = 20 -> w = 2 + 1*/
-            in += w_byte * y;            /*First pixel*/
-            in += 8;                /*Skip the palette*/
-            pos = 7;
+            w_byte = (w_px + 7) >> 3;   /*E.g. w = 20 -> w = 2 + 1*/
+            in += w_byte * y;           /*First pixel*/
+            in += x / 8;                /*8pixel per byte*/
+            shift = 7 - (x & 0x7);
             break;
         case LV_COLOR_FORMAT_I2:
             px_size = 2;
-            w_byte = (w_px + 3) >> 2; /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
-            in += w_byte * y; /*First pixel*/
-            in += 16;               /*Skip the palette*/
-            pos = 6;
+            w_byte = (w_px + 3) >> 2;   /*E.g. w = 13 -> w = 3 + 1 (bytes)*/
+            in += w_byte * y;           /*First pixel*/
+            in += x / 4;                /*4pixel per byte*/
+            shift = 6 - 2 * (x & 0x3);
             break;
         case LV_COLOR_FORMAT_I4:
             px_size = 4;
-            w_byte = (w_px + 1) >> 1; /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
-            in += w_byte * y; /*First pixel*/
-            in += 64;               /*Skip the palette*/
-            pos = 4;
+            w_byte = (w_px + 1) >> 1;   /*E.g. w = 13 -> w = 6 + 1 (bytes)*/
+            in += w_byte * y;           /*First pixel*/
+            in += x / 2;                /*2pixel per byte*/
+            shift = 4 - 4 * (x & 0x1);
             break;
         case LV_COLOR_FORMAT_I8:
             px_size = 8;
             w_byte = w_px;
             in += w_byte * y;  /*First pixel*/
-            in += 1024;       /*Skip the palette*/
-            pos = 0;
+            in += x;
+            shift = 0;
             break;
         default:
             return LV_RES_INV;
@@ -488,12 +562,12 @@ static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_col
 
     lv_coord_t i;
     for(i = 0; i < w_px; i++) {
-        uint8_t val_act = (*in >> pos) & mask;
+        uint8_t val_act = (*in >> shift) & mask;
         out[i] = palette[val_act];
 
-        pos -= px_size;
-        if(pos < 0) {
-            pos = 8 - px_size;
+        shift -= px_size;
+        if(shift < 0) {
+            shift = 8 - px_size;
             in++;
         }
     }

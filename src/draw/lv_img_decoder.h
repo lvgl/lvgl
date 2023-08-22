@@ -237,6 +237,9 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  */
 lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
 
+lv_res_t lv_img_decoder_built_in_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+                                          const lv_area_t * full_area, lv_area_t * decoded_area);
+
 /**
  * Open a built in image
  * @param decoder the decoder where this function belongs
