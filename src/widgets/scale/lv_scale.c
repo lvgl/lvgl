@@ -747,27 +747,16 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             /* Calculate the points of the section line */
             lv_point_t main_point_a;
             lv_point_t main_point_b;
-            lv_point_t dummy; /* Dummy point used when we calculate the position of a minor tick position */
 
             /* Calculate the position of the section based on the ticks (first and last) index */
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Calculate position of the first tick in the section */
-                if(section->first_tick_idx_is_major) {
-                    main_point_a.x = main_line_point_a.x;
-                    main_point_a.y = section->first_tick_in_section.y;
-                }
-                else {
-                    scale_get_tick_points(obj, section->first_tick_idx_in_section, section->first_tick_idx_is_major, &main_point_a, &dummy);
-                }
+				main_point_a.x = main_line_point_a.x;
+				main_point_a.y = section->first_tick_in_section.y;
 
                 /* Calculate position of the last tick in the section */
-                if(section->last_tick_idx_is_major) {
-                    main_point_b.x = main_line_point_a.x;
-                    main_point_b.y = section->last_tick_in_section.y;
-                }
-                else {
-                    scale_get_tick_points(obj, section->last_tick_idx_in_section, section->last_tick_idx_is_major, &main_point_b, &dummy);
-                }
+				main_point_b.x = main_line_point_a.x;
+				main_point_b.y = section->last_tick_in_section.y;
             }
             else {
                 /* Calculate position of the first tick in the section */
