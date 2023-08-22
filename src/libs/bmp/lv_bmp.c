@@ -190,7 +190,8 @@ static lv_res_t decoder_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_
         *decoded_area = *full_area;
         decoded_area->y2 = decoded_area->y1;
         dsc->img_data = lv_malloc(line_width_byte);
-    } else {
+    }
+    else {
         decoded_area->y1++;
         decoded_area->y2++;
     }
@@ -198,12 +199,13 @@ static lv_res_t decoder_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_
 
     if(decoded_area->y1 > full_area->y2) {
         return LV_RES_INV;
-    } else {
+    }
+    else {
         lv_coord_t y = (b->px_height - 1) - (decoded_area->y1); /*BMP images are stored upside down*/
         uint32_t p = b->px_offset + b->row_size_bytes * y;
         p += (decoded_area->x1) * (b->bpp / 8);
         lv_fs_seek(&b->f, p, LV_FS_SEEK_SET);
-        lv_fs_read(&b->f, (void*)dsc->img_data, line_width_byte, NULL);
+        lv_fs_read(&b->f, (void *)dsc->img_data, line_width_byte, NULL);
 
         return LV_RES_OK;
     }
@@ -219,7 +221,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
     bmp_dsc_t * b = dsc->user_data;
     lv_fs_close(&b->f);
     lv_free(dsc->user_data);
-    if(dsc->img_data) lv_free((void*)dsc->img_data);
+    if(dsc->img_data) lv_free((void *)dsc->img_data);
 
 }
 
