@@ -25,6 +25,7 @@
 typedef struct {
     lv_fs_file_t f;
     lv_color_t * palette;
+    uint8_t * img_data;
     lv_opa_t * opa;
 } lv_img_decoder_built_in_data_t;
 
@@ -307,6 +308,24 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
     return LV_RES_OK;
 }
 
+static lv_img_decoder_built_in_data_t * get_decoder_data(lv_img_decoder_dsc_t * dsc)
+{
+    lv_img_decoder_built_in_data_t * data = dsc->user_data;
+    if(data == NULL) {
+        data = lv_malloc(sizeof(lv_img_decoder_built_in_data_t));
+        LV_ASSERT_MALLOC(data);
+        if(data == NULL) {
+            LV_LOG_ERROR("out of memory");
+            return NULL;
+        }
+
+        lv_memzero(data, sizeof(lv_img_decoder_built_in_data_t));
+        dsc->user_data = data;
+    }
+
+    return data;
+}
+
 /**
  * Open a built in image
  * @param decoder the decoder where this function belongs
@@ -329,19 +348,12 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
 
         /*If the file was open successfully save the file descriptor*/
-        if(dsc->user_data == NULL) {
-            dsc->user_data = lv_malloc(sizeof(lv_img_decoder_built_in_data_t));
-            LV_ASSERT_MALLOC(dsc->user_data);
-            if(dsc->user_data == NULL) {
-                LV_LOG_ERROR("out of memory");
-                lv_fs_close(&f);
-                return LV_RES_INV;
-            }
-            lv_memzero(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
+        lv_img_decoder_built_in_data_t * decoder_data = get_decoder_data(dsc);
+        if(decoder_data == NULL) {
+            return LV_RES_INV;
         }
 
-        lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-        lv_memcpy(&user_data->f, &f, sizeof(f));
+        lv_memcpy(&decoder_data->f, &f, sizeof(f));
     }
     else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         /*The variables should have valid data*/
@@ -372,9 +384,23 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
                     return LV_RES_INV;
             }
 
-            dsc->img_data = lv_malloc(sizeof(lv_color32_t) * img_dsc->header.w *  img_dsc->header.h);
+            /*Need decoder data to store converted image*/
+            lv_img_decoder_built_in_data_t * decoder_data = get_decoder_data(dsc);
+            if(decoder_data == NULL) {
+                return LV_RES_INV;
+            }
+
+            uint8_t * img_data = lv_malloc(sizeof(lv_color32_t) * img_dsc->header.w *  img_dsc->header.h);
+            LV_ASSERT_NULL(img_data);
+            if (img_data == NULL) {
+                return LV_RES_INV;
+            }
+            decoder_data->img_data = img_data; /*Put to decoder data for later free*/
+
+            /*Assemble the decoded image dsc*/
             dsc->palette = (const lv_color32_t *)img_dsc->data;
             dsc->header.cf = LV_COLOR_FORMAT_ARGB8888;
+            dsc->img_data = img_data; /*Return decoded image data.*/
 
             uint32_t y;
             for(y = 0; y < img_dsc->header.h; y++) {
@@ -403,10 +429,11 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
-    lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
-    lv_color_format_t cf = img_dsc->header.cf;
-    if(LV_COLOR_FORMAT_IS_INDEXED(cf)) {
-        lv_free((void *)dsc->img_data);
+    lv_img_decoder_built_in_data_t * decoder_data = dsc->user_data;
+    if (decoder_data) {
+        lv_free(decoder_data->img_data);
+        lv_free(decoder_data->palette);
+        lv_free(decoder_data);
     }
 }
 
