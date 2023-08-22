@@ -42,11 +42,9 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
                                   lv_point_t * tick_point_a, lv_point_t * tick_point_b);
 static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc, lv_point_t * tick_point,
                                    lv_area_t * label_coords);
-static void scale_set_items_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * items_section_style);
 static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                                  lv_style_t * indicator_section_style);
-static void scale_set_indicator_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc,
-                                                lv_style_t * indicator_section_style);
+static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * section_style, uint32_t part);
 /* Helpers */
 static void scale_find_section_tick_idx(lv_obj_t * obj);
 static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint8_t tick_idx, const bool is_major_tick, const lv_coord_t major_tick_width, const lv_coord_t minor_tick_width);
@@ -343,7 +341,7 @@ static void scale_draw_items(lv_obj_t * obj, lv_event_t * event)
         lv_scale_section_t * section;
         _LV_LL_READ_BACK(&scale->section_ll, section) {
             if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                scale_set_items_properties(obj, &minor_tick_dsc, section->items_style);
+                // scale_set_items_properties(obj, &minor_tick_dsc, section->items_style);
             }
         }
 
@@ -404,10 +402,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                     if(is_major_tick) {
                         scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_indicator_line_properties(obj, &major_tick_dsc, section->indicator_style);
+                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                     }
                     else {
-                        scale_set_items_properties(obj, &minor_tick_dsc, section->items_style);
+                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
                 }
             }
@@ -449,10 +447,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
                     if(is_major_tick) {
                         scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_indicator_line_properties(obj, &major_tick_dsc, section->indicator_style);
+                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                     }
                     else {
-                        scale_set_items_properties(obj, &minor_tick_dsc, section->items_style);
+                    	scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
                 }
 
@@ -589,55 +587,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             lv_scale_section_t * section;
             _LV_LL_READ_BACK(&scale->section_ll, section) {
                 if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-
                     scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-
-                    if(section->indicator_style) {
-                        lv_style_value_t value;
-                        lv_res_t res;
-
-                        /* Tick width */
-                        res = lv_style_get_prop(section->indicator_style, LV_STYLE_LINE_WIDTH, &value);
-                        if(res == LV_RES_OK) {
-                            line_dsc.width = (lv_coord_t)value.num;
-                        }
-                        else {
-                            line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
-                        }
-
-                        /* Tick color */
-                        res = lv_style_get_prop(section->indicator_style, LV_STYLE_LINE_COLOR, &value);
-                        if(res == LV_RES_OK) {
-                            line_dsc.color = value.color;
-                        }
-                        else {
-                            line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
-                        }
-
-                        /* Tick opa */
-                        res = lv_style_get_prop(section->indicator_style, LV_STYLE_LINE_OPA, &value);
-                        if(res == LV_RES_OK) {
-                            line_dsc.opa = (lv_opa_t)value.num;
-                        }
-                        else {
-                            line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
-                        }
-
-                        /* Tick gap */
-
-                    }
+                    scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                 }
-                else {
-                    /* If label is not within a range then get the indicator style */
-                    label_dsc.color = lv_obj_get_style_text_color(obj, LV_PART_INDICATOR);
-                    label_dsc.opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
-                    label_dsc.letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
-                    label_dsc.font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
 
-                    line_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
-                    line_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
-                    line_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
-                }
             }
 
             if(label_dsc.text && scale->label_enabled) {
@@ -768,43 +721,13 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
                 main_point_b.y = main_line_point_a.y;
             }
 
-            if(section->main_style) {
-                lv_style_value_t value;
-                lv_res_t res;
+            scale_set_line_properties(obj, &main_line_section_dsc, section->main_style, LV_PART_MAIN);
 
-                /* Tick width */
-                res = lv_style_get_prop(section->main_style, LV_STYLE_LINE_WIDTH, &value);
-                if(res == LV_RES_OK) {
-                    main_line_section_dsc.width = (lv_coord_t)value.num;
-                }
-                else {
-                    main_line_section_dsc.width = lv_obj_get_style_line_width(obj, LV_PART_MAIN);
-                }
+            LV_LOG_USER("Main line section: %d - %d", main_point_a.x, main_line_point_b.x);
 
-                /* Tick color */
-                res = lv_style_get_prop(section->main_style, LV_STYLE_LINE_COLOR, &value);
-                if(res == LV_RES_OK) {
-                    main_line_section_dsc.color = value.color;
-                }
-                else {
-                    main_line_section_dsc.color = lv_obj_get_style_line_color(obj, LV_PART_MAIN);
-                }
-
-                /* Tick opa */
-                res = lv_style_get_prop(section->main_style, LV_STYLE_LINE_OPA, &value);
-                if(res == LV_RES_OK) {
-                    main_line_section_dsc.opa = (lv_opa_t)value.num;
-                }
-                else {
-                    main_line_section_dsc.opa = lv_obj_get_style_line_opa(obj, LV_PART_MAIN);
-                }
-
-                /* Tick gap */
-                main_line_section_dsc.p1 = main_point_a;
-                main_line_section_dsc.p2 = main_point_b;
-                lv_draw_line(layer, &main_line_section_dsc);
-            }
-            else { /* Nothing to do */ }
+            main_line_section_dsc.p1 = main_point_a;
+            main_line_section_dsc.p2 = main_point_b;
+            lv_draw_line(layer, &main_line_section_dsc);
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
@@ -1050,54 +973,52 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
 }
 
 /**
- * Set item (minor tick) line properties
+ * Set line properties
  *
- * Checks if the item has a custom section configuration or not and sets the properties accordingly.
+ * Checks if the line has a custom section configuration or not and sets the properties accordingly.
  *
  * @param obj       pointer to a scale object
  * @param line_dsc  pointer to line descriptor
- * @param items_section_style  pointer to items section style
+ * @param items_section_style  pointer to indicator section style
+ * @param part		line part, example: LV_PART_INDICATOR, LV_PART_ITEMS, LV_PART_MAIN
  */
-static void scale_set_items_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * items_section_style)
+static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * section_style, uint32_t part)
 {
-    if(items_section_style) {
+    if(section_style) {
         lv_style_value_t value;
         lv_res_t res;
 
-        /* Tick width */
-        res = lv_style_get_prop(items_section_style, LV_STYLE_LINE_WIDTH, &value);
+        /* Line width */
+        res = lv_style_get_prop(section_style, LV_STYLE_LINE_WIDTH, &value);
         if(res == LV_RES_OK) {
             line_dsc->width = (lv_coord_t)value.num;
         }
         else {
-            line_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+            line_dsc->width = lv_obj_get_style_line_width(obj, part);
         }
 
-        /* Tick color */
-        res = lv_style_get_prop(items_section_style, LV_STYLE_LINE_COLOR, &value);
+        /* Line color */
+        res = lv_style_get_prop(section_style, LV_STYLE_LINE_COLOR, &value);
         if(res == LV_RES_OK) {
             line_dsc->color = value.color;
         }
         else {
-            line_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_ITEMS);
+            line_dsc->color = lv_obj_get_style_line_color(obj, part);
         }
 
-        /* Tick opa */
-        res = lv_style_get_prop(items_section_style, LV_STYLE_LINE_OPA, &value);
+        /* Line opa */
+        res = lv_style_get_prop(section_style, LV_STYLE_LINE_OPA, &value);
         if(res == LV_RES_OK) {
             line_dsc->opa = (lv_opa_t)value.num;
         }
         else {
-            line_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_ITEMS);
+            line_dsc->opa = lv_obj_get_style_line_opa(obj, part);
         }
-
-        /* Tick gap */
-
     }
     else {
-        line_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_ITEMS);
-        line_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_ITEMS);
-        line_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_ITEMS);
+        line_dsc->color = lv_obj_get_style_line_color(obj, part);
+        line_dsc->opa = lv_obj_get_style_line_opa(obj, part);
+        line_dsc->width = lv_obj_get_style_line_width(obj, part);
     }
 }
 
@@ -1159,56 +1080,6 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
         label_dsc->opa = lv_obj_get_style_text_opa(obj, LV_PART_INDICATOR);
         label_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_INDICATOR);
         label_dsc->font = lv_obj_get_style_text_font(obj, LV_PART_INDICATOR);
-    }
-}
-
-/**
- * Set indicator line properties
- *
- * Checks if the indicator has a custom section configuration or not and sets the properties accordingly.
- *
- * @param obj       pointer to a scale object
- * @param line_dsc  pointer to line descriptor
- * @param items_section_style  pointer to indicator section style
- */
-static void scale_set_indicator_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc,
-                                                lv_style_t * indicator_section_style)
-{
-    if(indicator_section_style) {
-        lv_style_value_t value;
-        lv_res_t res;
-
-        /* Tick width */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_LINE_WIDTH, &value);
-        if(res == LV_RES_OK) {
-            line_dsc->width = (lv_coord_t)value.num;
-        }
-        else {
-            line_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
-        }
-
-        /* Tick color */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_LINE_COLOR, &value);
-        if(res == LV_RES_OK) {
-            line_dsc->color = value.color;
-        }
-        else {
-            line_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
-        }
-
-        /* Tick opa */
-        res = lv_style_get_prop(indicator_section_style, LV_STYLE_LINE_OPA, &value);
-        if(res == LV_RES_OK) {
-            line_dsc->opa = (lv_opa_t)value.num;
-        }
-        else {
-            line_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
-        }
-    }
-    else {
-        line_dsc->color = lv_obj_get_style_line_color(obj, LV_PART_INDICATOR);
-        line_dsc->opa = lv_obj_get_style_line_opa(obj, LV_PART_INDICATOR);
-        line_dsc->width = lv_obj_get_style_line_width(obj, LV_PART_INDICATOR);
     }
 }
 
