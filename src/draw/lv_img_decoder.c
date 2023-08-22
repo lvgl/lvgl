@@ -399,7 +399,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
             /*Assemble the decoded image dsc*/
             dsc->palette = (const lv_color32_t *)img_dsc->data;
-            dsc->header.cf = LV_COLOR_FORMAT_ARGB8888;
+            dsc->header.cf = cf;
             dsc->img_data = img_data; /*Return decoded image data.*/
 
             uint32_t y;
