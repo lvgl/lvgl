@@ -488,7 +488,12 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
     /*If the point is on this object check its children too*/
-    if(_lv_area_is_point_on(&obj->coords, &p_trans, 0)) {
+    lv_area_t obj_coords = obj->coords;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+        lv_area_increase(&obj_coords, ext_draw_size, ext_draw_size);
+    }
+    if(_lv_area_is_point_on(&obj_coords, &p_trans, 0)) {
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
 

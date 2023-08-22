@@ -115,9 +115,16 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     lv_draw_rect(layer, &draw_dsc, &obj_coords_ext);
 #endif
 
+    const lv_area_t * obj_coords;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        obj_coords = &obj_coords_ext;
+    }
+    else {
+        obj_coords = &obj->coords;
+    }
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, &obj->coords)) {
+    if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords)) {
         refr_children = false;
     }
 
