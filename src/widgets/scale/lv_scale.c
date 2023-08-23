@@ -414,7 +414,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     }
                 }
 
-                /* TODO: Move this tick position calculation into an API that can be used in scale_draw_main */
+                /* TODO: Maybe move this tick position calculation into an API that can be used in scale_draw_main? or a helper? */
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                     if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
                         section->first_tick_in_section.y = tick_point_a.y;
@@ -472,8 +472,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         /* Major tick */
         major_tick_dsc.raw_end = 0;
 
-        // uint32_t angular_range = scale->angle_range;
-        // uint32_t rotation = scale->rotation;
         uint16_t label_gap = 15U; /* TODO: Consider lv_style_set_text_letter_space on sections */
         uint8_t tick_idx = 0;
         uint16_t major_tick_idx = 0;
@@ -556,52 +554,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             /* Store initial and last tick widths to be used in the main line drawing */
             scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
 
-            /* Store the first and last section tick vertical/horizontal position */
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
-                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                    if(is_major_tick) {
-                        scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
-                    }
-                    else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
-                    }
-                }
-
-                /* TODO: This approach doesn't work in round modes, we need to store start and end angles */
-#if 0
-                if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                    if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.y = tick_point_a.y;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
-                        /* NOTE: Add the custom line width compensation */
-                        section->last_tick_in_section.y = tick_point_a.y - major_tick_dsc.width / 2U;
-                    }
-                    else if(tick_idx == section->first_tick_idx_in_section && !section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.y = tick_point_a.y;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section && !section->last_tick_idx_is_major) {
-                        /* NOTE: Add the custom line width compensation */
-                        section->last_tick_in_section.y = tick_point_a.y - minor_tick_dsc.width / 2U;
-                    }
-                }
-                else {
-                    if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.x = tick_point_a.x - major_tick_dsc.width / 2U;;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
-                        section->last_tick_in_section.x = tick_point_a.x + major_tick_dsc.width / 2U;
-                    }
-                    else if(tick_idx == section->first_tick_idx_in_section && !section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.x = tick_point_a.x - minor_tick_dsc.width / 2U;;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section && !section->last_tick_idx_is_major) {
-                        section->last_tick_in_section.x = tick_point_a.x + minor_tick_dsc.width / 2U;
-                    }
-                }
-#endif
-            }
+            /* TODO: Store first and last tick widths to be used in the sections main line drawing */
 
             if(is_major_tick) {
                 major_tick_dsc.p1 = tick_point_a;
@@ -724,8 +677,6 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
             scale_set_line_properties(obj, &main_line_section_dsc, section->main_style, LV_PART_MAIN);
 
-            LV_LOG_USER("Main line section: %d - %d", main_point_a.x, main_line_point_b.x);
-
             main_line_section_dsc.p1 = main_point_a;
             main_line_section_dsc.p2 = main_point_b;
             lv_draw_line(layer, &main_line_section_dsc);
@@ -741,6 +692,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_coord_t arc_radius;
         scale_get_center(obj, &arc_center, &arc_radius);
 
+        /* TODO: Take into consideration the width of the first and last tick over the arc */
         const int32_t start_angle = lv_map(scale->range_min, scale->range_min, scale->range_max, scale->rotation,
                                            scale->rotation + scale->angle_range);
         const int32_t end_angle = lv_map(scale->range_max, scale->range_min, scale->range_max, scale->rotation,
@@ -763,12 +715,11 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             lv_coord_t section_arc_radius;
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
 
+            /* TODO: Take into consideration the width of the first and last tick over the arc */
             const int32_t section_start_angle = lv_map(section->minor_range, scale->range_min, scale->range_max, scale->rotation,
                                                        scale->rotation + scale->angle_range);
             const int32_t section_end_angle = lv_map(section->major_range, scale->range_min, scale->range_max, scale->rotation,
                                                      scale->rotation + scale->angle_range);
-
-            LV_LOG_USER("Start angle: %d, End angle: %d", section_start_angle, section_end_angle);
 
             scale_set_arc_properties(obj, &main_arc_section_dsc, section->main_style);
 
