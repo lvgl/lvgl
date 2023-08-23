@@ -218,23 +218,23 @@ void lv_init(void)
     lv_msg_init();
 #endif
 
-#if LV_USE_FS_FATFS != '\0'
+#if LV_USE_FS_FATFS
     lv_fs_fatfs_init();
 #endif
 
-#if LV_USE_FS_STDIO != '\0'
+#if LV_USE_FS_STDIO
     lv_fs_stdio_init();
 #endif
 
-#if LV_USE_FS_POSIX != '\0'
+#if LV_USE_FS_POSIX
     lv_fs_posix_init();
 #endif
 
-#if LV_USE_FS_WIN32 != '\0'
+#if LV_USE_FS_WIN32
     lv_fs_win32_init();
 #endif
 
-#if LV_USE_FS_MEMFS != '\0'
+#if LV_USE_FS_MEMFS
     lv_fs_memfs_init();
 #endif
 

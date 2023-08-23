@@ -42,7 +42,7 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-#if LV_USE_FS_MEMFS != '\0'
+#if LV_USE_FS_MEMFS
 
 /*********************
  *      DEFINES
