@@ -129,6 +129,7 @@ void lv_fs_make_path_ex(lv_fs_path_ex_t* path, void* buf, uint32_t size)
 static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     LV_UNUSED(drv);
+    LV_UNUSED(mode);
     return (void*)path;
 }
 

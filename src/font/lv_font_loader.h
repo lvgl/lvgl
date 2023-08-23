@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 lv_font_t * lv_font_load(const char * fontName);
-lv_font_t* lv_font_load_from_buffer(const void* buffer, uint32_t size);
+lv_font_t* lv_font_load_from_buffer(void* buffer, uint32_t size);
 void lv_font_free(lv_font_t * font);
 
 /**********************

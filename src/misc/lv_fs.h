@@ -179,7 +179,7 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
  * @param buf       address of the memory buffer
  * @param size      size of the memory buffer
  */
-void lv_fs_make_path_ex(lv_fs_path_ex_t* path, const void* buf, uint32_t size);
+void lv_fs_make_path_ex(lv_fs_path_ex_t* path, void* buf, uint32_t size);
 
 /**
  * Close an already opened file

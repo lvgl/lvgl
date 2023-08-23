@@ -116,12 +116,12 @@ lv_font_t * lv_font_load(const char * font_name)
  * @param size size of the font file buffer
  * @return a pointer to the font or NULL in case of error
  */
-lv_font_t* lv_font_load_from_buffer(const void* buffer, uint32_t size)
+lv_font_t* lv_font_load_from_buffer(void* buffer, uint32_t size)
 {
     lv_fs_path_ex_t mempath;
     
     lv_fs_make_path_ex(&mempath, buffer, size);
-    return lv_font_load(&mempath);
+    return lv_font_load((const char*)&mempath);
 }
 
 /**
