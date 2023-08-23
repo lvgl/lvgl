@@ -2165,7 +2165,7 @@
     #endif
 #endif
 
-/*API for memory-mapped file access */
+/*API for memory-mapped file access. */
 #ifndef LV_USE_FS_MEMFS
     #ifdef CONFIG_LV_USE_FS_MEMFS
         #define LV_USE_FS_MEMFS CONFIG_LV_USE_FS_MEMFS
@@ -2179,13 +2179,6 @@
             #define LV_FS_MEMFS_LETTER CONFIG_LV_FS_MEMFS_LETTER
         #else
             #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
-        #endif
-    #endif
-    #ifndef LV_FS_MEMFS_PATH
-        #ifdef CONFIG_LV_FS_MEMFS_PATH
-            #define LV_FS_MEMFS_PATH CONFIG_LV_FS_MEMFS_PATH
-        #else
-            #define LV_FS_MEMFS_PATH ""         /*Set the working directory. File/directory paths will be appended to it.*/
         #endif
     #endif
 #endif
