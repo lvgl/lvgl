@@ -181,8 +181,11 @@ should look like ``const lv_point_t points_array[] = { {12,30},{60,90}, ...}``
           data->state = LV_INDEV_STATE_RELEASED; /*Set the released state*/
        }
 
-       data->btn = last_btn;            /*Save the last button*/
+       data->btn_id = last_btn;         /*Save the last button*/
    }
+
+When the ``button_read`` callback in the example above changes the ``data->btn_id`` to ``0``
+a press/release action at the first index of the ``points_array`` will be performed (``{12,30}``).
 
 Other features
 **************
