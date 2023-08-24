@@ -1344,6 +1344,9 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_FLEX_LAYOUT
 			bool "Flex layout previewer"
 			default n
+		config LV_USE_DEMO_MULTILANG
+			bool "multi-language demo"
+			default n
 	endmenu
 
 endmenu
