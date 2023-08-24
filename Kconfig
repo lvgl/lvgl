@@ -135,6 +135,10 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "HAL Settings"
+		config LV_DEF_REFR_PERIOD
+			int "Default refresh period (ms)."
+			default 33
+
 		config LV_DPI_DEF
 			int "Default Dots Per Inch (in px)."
 			default 130
