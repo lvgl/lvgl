@@ -418,7 +418,7 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return false;
 
-    return disp->antialiasing ? true : false;
+    return disp->antialiasing;
 }
 
 
@@ -435,7 +435,7 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp)
 
 bool lv_disp_is_double_buffered(lv_disp_t * disp)
 {
-    return disp->buf_2 ? true : false;
+    return disp->buf_2 != NULL;
 }
 
 /*---------------------

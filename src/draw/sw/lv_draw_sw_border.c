@@ -131,12 +131,12 @@ void draw_border_complex(lv_draw_unit_t * draw_unit, const lv_area_t * outer_are
     core_area.y2 = LV_MIN(outer_area->y2 - rout, inner_area->y2);
     lv_coord_t core_w = lv_area_get_width(&core_area);
 
-    bool top_side = outer_area->y1 <= inner_area->y1 ? true : false;
-    bool bottom_side = outer_area->y2 >= inner_area->y2 ? true : false;
+    bool top_side = outer_area->y1 <= inner_area->y1;
+    bool bottom_side = outer_area->y2 >= inner_area->y2;
 
     /*No masks*/
-    bool left_side = outer_area->x1 <= inner_area->x1 ? true : false;
-    bool right_side = outer_area->x2 >= inner_area->x2 ? true : false;
+    bool left_side = outer_area->x1 <= inner_area->x1;
+    bool right_side = outer_area->x2 >= inner_area->x2;
 
     bool split_hor = true;
     if(left_side && right_side && top_side && bottom_side &&
@@ -296,10 +296,10 @@ static void draw_border_simple(lv_draw_unit_t * draw_unit, const lv_area_t * out
     blend_dsc.color = color;
     blend_dsc.opa = opa;
 
-    bool top_side = outer_area->y1 <= inner_area->y1 ? true : false;
-    bool bottom_side = outer_area->y2 >= inner_area->y2 ? true : false;
-    bool left_side = outer_area->x1 <= inner_area->x1 ? true : false;
-    bool right_side = outer_area->x2 >= inner_area->x2 ? true : false;
+    bool top_side = outer_area->y1 <= inner_area->y1;
+    bool bottom_side = outer_area->y2 >= inner_area->y2;
+    bool left_side = outer_area->x1 <= inner_area->x1;
+    bool right_side = outer_area->x2 >= inner_area->x2;
 
     /*Top*/
     a.x1 = outer_area->x1;
