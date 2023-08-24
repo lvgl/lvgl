@@ -402,6 +402,16 @@
     #endif
 #endif
 
+/* Allow opacity (alpha) channel for gradient color stops.
+ * */
+#ifndef LV_GRADIENT_OPACITY
+    #ifdef CONFIG_LV_GRADIENT_OPACITY
+        #define LV_GRADIENT_OPACITY CONFIG_LV_GRADIENT_OPACITY
+    #else
+        #define LV_GRADIENT_OPACITY 0
+    #endif
+#endif
+
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
 #ifndef LV_DISP_ROT_MAX_BUF

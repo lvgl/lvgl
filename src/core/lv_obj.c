@@ -508,10 +508,35 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
-        if(lv_obj_get_style_bg_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+        lv_opa_t bg_opa = lv_obj_get_style_bg_opa(obj, LV_PART_MAIN);
+        if(bg_opa < LV_OPA_MAX) {
             info->res = LV_COVER_RES_NOT_COVER;
             return;
         }
+#if LV_GRADIENT_OPACITY
+        if(bg_opa > LV_OPA_MIN) {
+            const lv_grad_dsc_t * grad = lv_obj_get_style_bg_grad(obj, LV_PART_MAIN);
+            if(grad && grad->dir != LV_GRAD_DIR_NONE) {
+                for(int i = 0; i < grad->stops_count; i++) {
+                    if(grad->stops[i].color.ch.alpha < LV_OPA_MAX) {
+                        info->res = LV_COVER_RES_NOT_COVER;
+                        return;
+                    }
+                }
+            }
+            else {
+                lv_grad_dir_t bg_grad_dir = lv_obj_get_style_bg_grad_dir(obj, LV_PART_MAIN);
+                if(bg_grad_dir != LV_GRAD_DIR_NONE) {
+                    lv_color_t color_0 = lv_obj_get_style_bg_color_filtered(obj, LV_PART_MAIN);
+                    lv_color_t color_1 = lv_obj_get_style_bg_grad_color_filtered(obj, LV_PART_MAIN);
+                    if(color_0.ch.alpha < LV_OPA_MAX || color_1.ch.alpha < LV_OPA_MAX) {
+                        info->res = LV_COVER_RES_NOT_COVER;
+                        return;
+                    }
+                }
+            }
+        }
+#endif
 
         info->res = LV_COVER_RES_COVER;
 

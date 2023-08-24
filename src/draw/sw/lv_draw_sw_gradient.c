@@ -335,6 +335,9 @@ lv_grad_color_t LV_ATTRIBUTE_FAST_MEM lv_gradient_calculate(const lv_grad_dsc_t 
     lv_grad_color_t r = GRAD_CM(LV_UDIV255(two.ch.red * mix   + one.ch.red * imix),
                                 LV_UDIV255(two.ch.green * mix + one.ch.green * imix),
                                 LV_UDIV255(two.ch.blue * mix  + one.ch.blue * imix));
+#if LV_GRADIENT_OPACITY
+    r.ch.alpha = LV_UDIV255(two.ch.alpha * mix + one.ch.alpha * imix);
+#endif
     return r;
 }
 

@@ -168,6 +168,10 @@
     #define LV_DITHER_ERROR_DIFFUSION 0
 #endif
 
+/* Allow opacity (alpha) channel for gradient color stops.
+ * */
+#define LV_GRADIENT_OPACITY 0
+
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
 #define LV_DISP_ROT_MAX_BUF (10*1024)
