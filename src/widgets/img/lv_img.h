@@ -127,6 +127,7 @@ void lv_img_set_angle(lv_obj_t * obj, int16_t angle);
 /**
  * Set the rotation center of the image.
  * The image will be rotated around this point.
+ * x, y can be set with value of LV_PCT, lv_img_get_pivot will return the true pixel coordinate of pivot in this case.
  * @param obj       pointer to an image object
  * @param x         rotation center x of the image
  * @param y         rotation center y of the image
@@ -196,6 +197,7 @@ lv_coord_t lv_img_get_angle(lv_obj_t * obj);
 
 /**
  * Get the pivot (rotation center) of the image.
+ * If pivot is set with LV_PCT, convert it to px before return.
  * @param obj       pointer to an image object
  * @param pivot     store the rotation center here
  */
