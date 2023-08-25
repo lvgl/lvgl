@@ -449,6 +449,10 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
     LV_UNUSED(decoder); /*Unused*/
     lv_img_decoder_built_in_data_t * decoder_data = dsc->user_data;
     if(decoder_data) {
+        if (dsc->src_type == LV_IMG_SRC_FILE) {
+            lv_fs_close(&decoder_data->f);
+        }
+
         lv_free(decoder_data->img_data);
         lv_free(decoder_data->palette);
         lv_free(decoder_data);
