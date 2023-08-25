@@ -499,13 +499,14 @@ lv_res_t lv_img_decoder_built_in_get_area(lv_img_decoder_t * decoder, lv_img_dec
                      || cf == LV_COLOR_FORMAT_ARGB8888 || cf == LV_COLOR_FORMAT_XRGB8888 || cf == LV_COLOR_FORMAT_RGB888
                      || cf == LV_COLOR_FORMAT_RGB565 || cf == LV_COLOR_FORMAT_RGB565A8;
     if(!supported) {
+        LV_LOG_WARN("CF: %d is not supported", cf);
         return LV_RES_INV;
     }
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_built_in_data_t * decoder_data = dsc->user_data;
-    lv_fs_file_t *f = &decoder_data->f;
-    lv_coord_t bpp = lv_color_format_get_bpp(cf);
+    lv_fs_file_t * f = &decoder_data->f;
+    uint32_t bpp = lv_color_format_get_bpp(cf);
     lv_coord_t w_px = lv_area_get_width(full_area);
     uint8_t * img_data = NULL;
     uint32_t offset = sizeof(lv_img_header_t); /*All image starts with image header*/
@@ -597,7 +598,6 @@ lv_res_t lv_img_decoder_built_in_get_area(lv_img_decoder_t * decoder, lv_img_dec
         return LV_RES_OK;
     }
 
-    LV_LOG_WARN("CF: %d is not supported", cf);
     return LV_RES_INV;
 }
 
@@ -668,7 +668,7 @@ static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_col
 static lv_fs_res_t fs_read_file_at(lv_fs_file_t * f, uint32_t pos, uint8_t * buff, uint32_t btr, uint32_t * br)
 {
     lv_fs_res_t res;
-    if (br) *br = 0;
+    if(br) *br = 0;
 
     res = lv_fs_seek(f, pos, LV_FS_SEEK_SET);
     if(res != LV_FS_RES_OK) {
