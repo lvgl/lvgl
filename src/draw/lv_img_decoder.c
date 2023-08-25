@@ -374,6 +374,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             res |= lv_fs_read(&f, palette, sizeof(lv_color32_t) * size, &rn);
             if(res != LV_FS_RES_OK || rn != sizeof(lv_color32_t) * size) {
                 LV_LOG_WARN("Built-in image decoder can't read the palette");
+                lv_free(palette);
                 lv_fs_close(&f);
                 return LV_RES_INV;
             }
@@ -386,12 +387,38 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             /*It needs to be read by get_area_cb later*/
             return LV_RES_OK;
         }
-        else {
-            /*It needs to be read by get_area_cb later*/
+
+        if (dsc->header.cf == LV_COLOR_FORMAT_A8) {
+            /*For A8, we read directly to RAM since it takes much less memory than ARGB*/
+            uint32_t len = (uint32_t)dsc->header.w * dsc->header.h * 1;
+            uint8_t * data = lv_malloc(len);
+            LV_ASSERT_MALLOC(data);
+            if(data == NULL) {
+                LV_LOG_ERROR("out of memory");
+                lv_fs_close(&f);
+                return LV_RES_INV;
+            }
+
+            uint32_t rn;
+            res = lv_fs_seek(&f, sizeof(lv_img_header_t), LV_FS_SEEK_SET);
+            res |= lv_fs_read(&f, data, len, &rn);
+            if(res != LV_FS_RES_OK || rn != len) {
+                LV_LOG_WARN("Built-in image decoder can't read the palette");
+                lv_free(data);
+                lv_fs_close(&f);
+                return LV_RES_INV;
+            }
+
+            decoder_data->img_data = data;
+            dsc->img_data = data;
             return LV_RES_OK;
         }
+
+        /*It needs to be read by get_area_cb later*/
+        return LV_RES_OK;
     }
-    else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
+
+    if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         /*The variables should have valid data*/
         lv_img_dsc_t * img_dsc = (lv_img_dsc_t *)dsc->src;
         if(img_dsc->data == NULL) {
@@ -433,10 +460,11 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
              *So simply give its pointer*/
             dsc->img_data = ((lv_img_dsc_t *)dsc->src)->data;
         }
+
         return LV_RES_OK;
     }
-    else
-        return LV_RES_INV;
+
+    return LV_RES_INV;
 }
 
 /**
