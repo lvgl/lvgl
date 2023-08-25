@@ -36,7 +36,8 @@ lv_font_t * lv_font_load(const char * fontName);
 
 #if LV_USE_FS_MEMFS
 /**
- * Loads a `lv_font_t` object from a memory buffer containing the binary font file
+ * Loads a `lv_font_t` object from a memory buffer containing the binary font file.
+ * Requires LV_USE_FS_MEMFS
  * @param buffer address of the font file in the memory
  * @param size size of the font file buffer
  * @return a pointer to the font or NULL in case of error

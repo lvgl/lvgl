@@ -103,21 +103,31 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         LV_ASSERT_MALLOC(file_p->cache);
         lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
 
-        if(drv->cache_size ==
-           LV_FS_CACHE_FROM_BUFFER) {    /* If this is a memory-mapped file, then set "cache" to the memory buffer */
+        /* If this is a memory-mapped file, then set "cache" to the memory buffer */
+        if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
             lv_fs_path_ex_t * path_ex = (lv_fs_path_ex_t *)path;
             file_p->cache->buffer = path_ex->buffer;
             file_p->cache->start = 0;
             file_p->cache->file_position = 0;
             file_p->cache->end = path_ex->size;
         }
+        /*Set an invalid range by default*/
         else {
-            file_p->cache->start = UINT32_MAX;  /*Set an invalid range by default*/
+            file_p->cache->start = UINT32_MAX;
             file_p->cache->end = UINT32_MAX - 1;
         }
     }
 
     return LV_FS_RES_OK;
+}
+
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, void * buf, uint32_t size)
+{
+    path->path[0] = letter;
+    path->path[1] = ':';
+    path->path[2] = 0;
+    path->buffer = buf;
+    path->size = size;
 }
 
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)

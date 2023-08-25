@@ -111,11 +111,10 @@ lv_font_t * lv_font_load_from_buffer(void * buffer, uint32_t size)
 {
     lv_fs_path_ex_t mempath;
 
-    lv_fs_make_path_ex(&mempath, buffer, size);
+    lv_fs_make_path_from_buffer(&mempath, LV_FS_MEMFS_LETTER, buffer, size);
     return lv_font_load((const char *)&mempath);
 }
 #endif
-
 
 void lv_font_free(lv_font_t * font)
 {

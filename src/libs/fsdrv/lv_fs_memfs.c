@@ -106,15 +106,6 @@ void lv_fs_memfs_init(void)
     lv_fs_drv_register(&fs_drv);
 }
 
-void lv_fs_make_path_ex(lv_fs_path_ex_t * path, void * buf, uint32_t size)
-{
-    path->path[0] = LV_FS_MEMFS_LETTER;
-    path->path[1] = ':';
-    path->path[2] = 0;
-    path->buffer = buf;
-    path->size = size;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
