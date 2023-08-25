@@ -543,7 +543,7 @@ lv_res_t lv_img_decoder_built_in_get_area(lv_img_decoder_t * decoder, lv_img_dec
             return LV_RES_INV;
 
         offset += dsc->palette_size * 4; /*Skip palette*/
-        offset += decoded_area->y1 * dsc->header.w * bpp / 8; /*Move to y1*/
+        offset += decoded_area->y1 * ((dsc->header.w * bpp + 7) / 8); /*Move to y1*/
         offset += decoded_area->x1 * bpp / 8; /*Move to x1*/
         res = fs_read_file_at(f, offset, buf, len, NULL);
         if(res != LV_FS_RES_OK) {
