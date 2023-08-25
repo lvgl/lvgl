@@ -7,9 +7,9 @@
  * be used, e.g., to store font files in slow flash memory, and load them into RAM on demand.
  *
  * You can enable it in lv_conf.h:
- * 
+ *
  * #define LV_USE_FS_MEMFS 1
- * 
+ *
  * The actual implementation uses the built-in cache mechanism of the file system interface.
  *
  * Since this is not an actual file system, file write and directories are not supported.
@@ -52,11 +52,11 @@
  *      TYPEDEFS
  **********************/
 
- /**********************
- *  STATIC PROTOTYPES
- **********************/
+/**********************
+*  STATIC PROTOTYPES
+**********************/
 
-static void* fs_open(lv_fs_drv_t* drv, const char* path, lv_fs_mode_t mode);
+static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p);
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
 static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
@@ -106,7 +106,7 @@ void lv_fs_memfs_init(void)
     lv_fs_drv_register(&fs_drv);
 }
 
-void lv_fs_make_path_ex(lv_fs_path_ex_t* path, void* buf, uint32_t size)
+void lv_fs_make_path_ex(lv_fs_path_ex_t * path, void * buf, uint32_t size)
 {
     path->path[0] = LV_FS_MEMFS_LETTER;
     path->path[1] = ':';
@@ -130,7 +130,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 {
     LV_UNUSED(drv);
     LV_UNUSED(mode);
-    return (void*)path;
+    return (void *)path;
 }
 
 /**
@@ -179,24 +179,24 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 {
     /* NOTE: this function is only called to determine the end of the buffer when LV_FS_SEEK_END was given to lv_fs_seek() */
     LV_UNUSED(drv);
-    lv_fs_file_t* fp = (lv_fs_file_t*)file_p;
-    switch (whence) {
-    case LV_FS_SEEK_SET: {
-        fp->cache->file_position = pos;
-        break;
+    lv_fs_file_t * fp = (lv_fs_file_t *)file_p;
+    switch(whence) {
+        case LV_FS_SEEK_SET: {
+                fp->cache->file_position = pos;
+                break;
+            }
+        case LV_FS_SEEK_CUR: {
+                fp->cache->file_position += pos;
+                break;
+            }
+        case LV_FS_SEEK_END: {
+                fp->cache->file_position = fp->cache->end - pos;
+                break;
+            }
     }
-    case LV_FS_SEEK_CUR: {
-        fp->cache->file_position += pos;
-        break;
-    }
-    case LV_FS_SEEK_END: {
-        fp->cache->file_position = fp->cache->end - pos;
-        break;
-    }
-    }
-    if (fp->cache->file_position < fp->cache->start)
+    if(fp->cache->file_position < fp->cache->start)
         fp->cache->file_position = fp->cache->start;
-    else if (fp->cache->file_position > fp->cache->end)
+    else if(fp->cache->file_position > fp->cache->end)
         fp->cache->file_position = fp->cache->end;
     return LV_FS_RES_OK;
 }
@@ -212,7 +212,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    *pos_p = ((lv_fs_file_t*)file_p)->cache->file_position;
+    *pos_p = ((lv_fs_file_t *)file_p)->cache->file_position;
     return LV_FS_RES_OK;
 }
 

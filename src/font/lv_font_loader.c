@@ -78,11 +78,7 @@ static unsigned int read_bits(bit_iterator_t * it, int n_bits, lv_fs_res_t * res
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**
- * Loads a `lv_font_t` object from a binary font file
- * @param font_name filename where the font file is located
- * @return a pointer to the font or NULL in case of error
- */
+
 lv_font_t * lv_font_load(const char * font_name)
 {
     lv_fs_file_t file;
@@ -110,24 +106,17 @@ lv_font_t * lv_font_load(const char * font_name)
     return font;
 }
 
-/**
- * Loads a `lv_font_t` object from a memory buffer containing the binary font file
- * @param buffer address of the font file in the memory
- * @param size size of the font file buffer
- * @return a pointer to the font or NULL in case of error
- */
-lv_font_t* lv_font_load_from_buffer(void* buffer, uint32_t size)
+#if LV_USE_FS_MEMFS
+lv_font_t * lv_font_load_from_buffer(void * buffer, uint32_t size)
 {
     lv_fs_path_ex_t mempath;
-    
-    lv_fs_make_path_ex(&mempath, buffer, size);
-    return lv_font_load((const char*)&mempath);
-}
 
-/**
- * Frees the memory allocated by the `lv_font_load()` function
- * @param font lv_font_t object created by the lv_font_load function
- */
+    lv_fs_make_path_ex(&mempath, buffer, size);
+    return lv_font_load((const char *)&mempath);
+}
+#endif
+
+
 void lv_font_free(lv_font_t * font)
 {
     if(NULL != font) {
