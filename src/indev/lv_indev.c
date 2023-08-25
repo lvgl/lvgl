@@ -1373,5 +1373,5 @@ static bool indev_reset_check(lv_indev_t * indev)
         indev_obj_act = NULL;
     }
 
-    return indev->reset_query ? true : false;
+    return indev->reset_query;
 }

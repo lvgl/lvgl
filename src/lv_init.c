@@ -154,7 +154,7 @@ void lv_init(void)
 
     uint32_t endianess_test = 0x11223344;
     uint8_t * endianess_test_p = (uint8_t *) &endianess_test;
-    bool big_endian = endianess_test_p[0] == 0x11 ? true : false;
+    bool big_endian = endianess_test_p[0] == 0x11;
 
     if(big_endian) {
         LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1,

@@ -611,7 +611,7 @@ bool lv_textarea_get_cursor_click_pos(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_textarea_t * ta = (lv_textarea_t *)obj;
-    return ta->cursor.click_pos ? true : false;
+    return ta->cursor.click_pos;
 }
 
 bool lv_textarea_get_password_mode(const lv_obj_t * obj)

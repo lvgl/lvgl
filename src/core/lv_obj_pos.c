@@ -97,8 +97,8 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        w_is_content = w == LV_SIZE_CONTENT ? true : false;
-        w_is_pct = LV_COORD_IS_PCT(w) ? true : false;
+        w_is_content = w == LV_SIZE_CONTENT;
+        w_is_pct = LV_COORD_IS_PCT(w);
         lv_coord_t parent_w = lv_obj_get_content_width(parent);
 
         if(w_is_content) {
@@ -129,8 +129,8 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         h = lv_obj_get_style_height(obj, LV_PART_MAIN);
-        h_is_content = h == LV_SIZE_CONTENT ? true : false;
-        h_is_pct = LV_COORD_IS_PCT(h) ? true : false;
+        h_is_content = h == LV_SIZE_CONTENT;
+        h_is_pct = LV_COORD_IS_PCT(h);
         lv_coord_t parent_h = lv_obj_get_content_height(parent);
 
         if(h_is_content) {
@@ -761,7 +761,7 @@ void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive
 {
     if(obj) {
         lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
-        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM ? true : false;
+        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
         if(inv) {
             if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
             if(do_tranf) transform_point(obj, p, inv);

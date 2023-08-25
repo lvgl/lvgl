@@ -74,7 +74,7 @@ bool lv_slider_is_dragged(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_slider_t * slider = (lv_slider_t *)obj;
 
-    return slider->dragging ? true : false;
+    return slider->dragging;
 }
 
 /**********************

@@ -405,7 +405,7 @@ bool lv_style_is_empty(const lv_style_t * style)
 {
     LV_ASSERT_STYLE(style);
 
-    return style->prop_cnt == 0 ? true : false;
+    return style->prop_cnt == 0;
 }
 
 uint8_t _lv_style_prop_lookup_flags(lv_style_prop_t prop)

@@ -5,8 +5,8 @@ static void event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     uint32_t id = lv_btnmatrix_get_selected_btn(obj);
-    bool prev = id == 0 ? true : false;
-    bool next = id == 6 ? true : false;
+    bool prev = id == 0;
+    bool next = id == 6;
     if(prev || next) {
         /*Find the checked button*/
         uint32_t i;

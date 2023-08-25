@@ -340,7 +340,7 @@ bool lv_btnmatrix_has_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
     lv_btnmatrix_t * btnm = (lv_btnmatrix_t *)obj;;
     if(btn_id >= btnm->btn_cnt) return false;
 
-    return ((btnm->ctrl_bits[btn_id] & ctrl) == ctrl) ? true : false;
+    return (btnm->ctrl_bits[btn_id] & ctrl) == ctrl;
 }
 
 bool lv_btnmatrix_get_one_checked(const lv_obj_t * obj)
@@ -865,47 +865,47 @@ static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits)
 
 static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_HIDDEN) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_HIDDEN;
 }
 
 static bool button_is_checked(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECKED) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_CHECKED;
 }
 
 static bool button_is_repeat_disabled(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_NO_REPEAT) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_NO_REPEAT;
 }
 
 static bool button_is_inactive(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_DISABLED) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_DISABLED;
 }
 
 static bool button_is_click_trig(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_CLICK_TRIG) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_CLICK_TRIG;
 }
 
 static bool button_is_popover(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_POPOVER) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_POPOVER;
 }
 
 static bool button_is_checkable(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECKABLE) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_CHECKABLE;
 }
 
 static bool button_get_checked(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECKED) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_CHECKED;
 }
 
 static bool button_is_recolor(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_RECOLOR) ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_RECOLOR;
 }
 /**
  * Gives the button id of a button under a given point
