@@ -204,10 +204,11 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area);
 
 /**
- * Call to tell that a layer buffer with X kB size was allocated
- * @param kb        size of the layer buffer in kB (if < 1024 use 1)
+ * Try to allocate a buffer for the layer.
+ * @param layer         pointer to a layer
+ * @return              pointer to the allocated aligned buffer or NULL on failure
  */
-void lv_draw_add_used_layer_size(uint32_t kb);
+void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
 
 /**********************
  *  GLOBAL VARIABLES
