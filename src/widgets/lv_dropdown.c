@@ -285,6 +285,10 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
     dropdown->sel_opt_id      = sel_opt < dropdown->option_cnt ? sel_opt : dropdown->option_cnt - 1;
     dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
 
+    if(dropdown->list) {
+        position_to_selected(obj);
+    }
+
     lv_obj_invalidate(obj);
 }
 
