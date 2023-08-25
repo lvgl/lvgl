@@ -185,38 +185,25 @@
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
-/* Select a draw buffer implementation. Possible values:
- * - LV_DRAW_BUF_BASIC:     LVGL's built in implementation
- * - LV_DRAW_BUF_CUSTOM:    Implement the function of lv_draw_buf.h externally
- */
-#ifndef LV_USE_DRAW_BUF
-    #ifdef CONFIG_LV_USE_DRAW_BUF
-        #define LV_USE_DRAW_BUF CONFIG_LV_USE_DRAW_BUF
+
+/*Align the stride of all layers and images to this bytes*/
+#ifndef LV_DRAW_BUF_STRIDE_ALIGN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+        #else
+            #define LV_DRAW_BUF_STRIDE_ALIGN 0
+        #endif
     #else
-        #define LV_USE_DRAW_BUF    LV_DRAW_BUF_BASIC
+        #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
     #endif
 #endif
-
-#if LV_USE_DRAW_BUF == LV_DRAW_BUF_BASIC
-    /*Align the stride of all layers and images to this bytes*/
-    #ifndef LV_DRAW_BUF_STRIDE_ALIGN
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-                #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-            #else
-                #define LV_DRAW_BUF_STRIDE_ALIGN 0
-            #endif
-        #else
-            #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
-        #endif
-    #endif
-    /*Align the start address of draw_buf addresses to this bytes*/
-    #ifndef LV_DRAW_BUF_ALIGN
-        #ifdef CONFIG_LV_DRAW_BUF_ALIGN
-            #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
-        #else
-            #define LV_DRAW_BUF_ALIGN                       4
-        #endif
+/*Align the start address of draw_buf addresses to this bytes*/
+#ifndef LV_DRAW_BUF_ALIGN
+    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
+        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
+    #else
+        #define LV_DRAW_BUF_ALIGN                       4
     #endif
 #endif
 

@@ -103,6 +103,8 @@ void lv_init(void)
 
     lv_mem_init();
 
+    _lv_draw_buf_init_handlers();
+
 #if LV_USE_SPAN != 0
     lv_span_stack_init();
 #endif

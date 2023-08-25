@@ -21,7 +21,7 @@ extern "C" {
 #include "lv_img_decoder.h"
 #include "lv_img_cache.h"
 #include "../osal/lv_os.h"
-#include "draw_buf/lv_draw_buf.h"
+#include "lv_draw_buf.h"
 
 /*********************
  *      DEFINES

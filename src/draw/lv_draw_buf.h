@@ -13,8 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../misc/lv_area.h"
-#include "../../misc/lv_color.h"
+#include "../misc/lv_area.h"
+#include "../misc/lv_color.h"
 
 /*********************
  *      DEFINES
@@ -33,9 +33,60 @@ typedef struct {
 } lv_draw_buf_t;
 
 
+typedef void (*lv_draw_buf_init_cb)(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h,
+                                    lv_color_format_t color_format);
+
+typedef void (*lv_draw_buf_malloc_cb)(lv_draw_buf_t * draw_buf);
+
+typedef void (*lv_draw_buf_realloc_cb)(lv_draw_buf_t  * draw_buf, lv_coord_t w, lv_coord_t h,
+                                       lv_color_format_t color_format);
+
+typedef void (*lv_draw_buf_free_cb)(lv_draw_buf_t  * draw_buf);
+
+typedef void * (*lv_draw_buf_get_buf_cb)(lv_draw_buf_t * draw_buf);
+
+typedef void (*lv_draw_buf_invalidate_cache_cb)(lv_draw_buf_t  * draw_buf, const char * area);
+
+typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
+
+typedef uint32_t (*lv_draw_buf_get_stride_cb)(const lv_draw_buf_t * draw_buf);
+
+typedef void * (*lv_draw_buf_go_to_xy_cb)(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y);
+
+typedef void (*lv_draw_buf_clear_cb)(lv_draw_buf_t * draw_buf, const lv_area_t * a);
+
+typedef void (*lv_draw_buf_copy_cb)(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
+                                    void * src_buf, uint32_t src_stride, const lv_area_t * src_area, lv_color_format_t color_format);
+
+typedef struct {
+    lv_draw_buf_init_cb init_cb;
+    lv_draw_buf_malloc_cb buf_malloc_cb;
+    lv_draw_buf_realloc_cb buf_realloc_cb;
+    lv_draw_buf_free_cb buf_free_cb;
+    lv_draw_buf_get_buf_cb buf_get_cb;
+    lv_draw_buf_invalidate_cache_cb invalidate_cache_cb;
+    lv_draw_buf_width_to_stride_cb width_to_stride_cb;
+    lv_draw_buf_get_stride_cb get_stride_cb;
+    lv_draw_buf_go_to_xy_cb go_to_xy_cb;
+    lv_draw_buf_clear_cb buf_clear_cb;
+    lv_draw_buf_copy_cb buf_copy_cb;
+} lv_draw_buf_handlers_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Called internally to initialize the draw_buf_handlers in lv_global
+ */
+void _lv_draw_buf_init_handlers(void);
+
+/**
+ * Get the struct which holds the callbacks for draw buf management.
+ * Custom callback can be set on the returned value
+ * @return                  pointer to the struct of handlers
+ */
+lv_draw_buf_handlers_t * lv_draw_bug_get_handlers(void);
 
 /**
  * Initialize a draw buffer object. The buffer won't be allocated
@@ -78,9 +129,9 @@ void * lv_draw_buf_get_buf(lv_draw_buf_t * draw_buf);
 /**
  * Invalidate the cache of the buffer
  * @param draw_buf          pointer to a draw buffer
+ * @param arae              the whose cache needs to be invalidated
  */
-void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * draw_buf);
-
+void lv_draw_buf_invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
 
 /**
  * Calculate the stride in bytes based on a width and color format

@@ -98,6 +98,8 @@ typedef struct _lv_global_t {
     lv_anim_state_t anim_state;
     lv_tick_state_t tick_state;
 
+    lv_draw_buf_handlers_t draw_buf_handlers;
+
     lv_ll_t img_decoder_ll;
     lv_img_cache_manager_t img_cache_mgr;
 #if LV_IMG_CACHE_DEF_SIZE
