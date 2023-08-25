@@ -101,7 +101,8 @@ bool lv_draw_sdl_composite_begin(lv_draw_sdl_ctx_t * ctx, const lv_area_t * coor
         SDL_RenderFillRect(ctx->renderer, NULL);
         SDL_SetRenderDrawBlendMode(ctx->renderer, SDL_BLENDMODE_BLEND);
 #if LV_GPU_SDL_CUSTOM_BLEND_MODE
-        internals->mask = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0, w, h);
+        internals->mask = lv_draw_sdl_composite_texture_obtain(ctx, LV_DRAW_SDL_COMPOSITE_TEXTURE_ID_STREAM0, w, h,
+                                                               &internals->composition_cached);
         dump_masks(internals->mask, apply_area);
 #endif
     }
