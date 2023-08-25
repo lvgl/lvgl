@@ -326,6 +326,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_label_dsc_init(&label_dsc);
     /* Formatting the labels with the configured style for LV_PART_INDICATOR */
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+    label_dsc.text_local = 1;
 
     /* Major tick style */
     lv_draw_line_dsc_t major_tick_dsc;
