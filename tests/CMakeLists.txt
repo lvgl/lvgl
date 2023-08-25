@@ -154,6 +154,9 @@ add_library(test_common
         src/test_assets/test_font_montserrat_ascii_2bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp.c
         src/test_assets/test_font_montserrat_ascii_4bpp_compressed.c
+        src/test_assets/font_1_bin.c
+        src/test_assets/font_2_bin.c
+        src/test_assets/font_3_bin.c
         src/test_assets/test_img_caret_down.c
         src/test_assets/test_arc_bg.c
         src/test_assets/ubuntu_font.c
