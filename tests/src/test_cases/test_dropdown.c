@@ -355,10 +355,10 @@ void test_dropdown_render_1(void)
 
     lv_dropdown_set_options(dd3, "a0\na1\na2\na3\na4\na5\na6\na7\na8\na9\na10\na11\na12\na13\na14\na15\na16");
     lv_dropdown_open(dd3);
-    lv_dropdown_set_selected(dd3, 3);
     lv_obj_t * list = lv_dropdown_get_list(dd3);
     lv_obj_set_style_text_line_space(list, 5, 0);
     lv_obj_set_style_bg_color(list, lv_color_hex3(0xf00), LV_PART_SELECTED | LV_STATE_CHECKED);
+    lv_dropdown_set_selected(dd3, 3);
 
 
     TEST_ASSERT_EQUAL_SCREENSHOT("dropdown_1.png");
