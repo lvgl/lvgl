@@ -124,8 +124,14 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     }
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords)) {
-        refr_children = false;
+
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        clip_coords_for_children  = clip_area_ori;
+    }
+    else {
+        if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, &obj->coords)) {
+            refr_children = false;
+        }
     }
 
     if(refr_children) {
