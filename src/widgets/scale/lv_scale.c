@@ -623,7 +623,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         /* Setup the tick points */
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             main_line_point_a.x = x_ofs - 1U;
-            main_line_point_a.y = y_ofs - 1U;
+            main_line_point_a.y = y_ofs;
             main_line_point_b.x = x_ofs - 1U;
             main_line_point_b.y = obj->coords.y2 + pad_left - scroll_top;
 
