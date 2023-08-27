@@ -80,7 +80,12 @@ static inline void lv_global_init(lv_global_t * global)
 
 bool lv_is_initialized(void)
 {
+#if LV_ENABLE_GLOBAL_CUSTOM
+    if(LV_GLOBAL_DEFAULT()) return lv_initialized;
+    else return false;
+#else
     return lv_initialized;
+#endif
 }
 
 void lv_init(void)
