@@ -86,7 +86,7 @@ void _lv_draw_buf_init_handlers(void);
  * Custom callback can be set on the returned value
  * @return                  pointer to the struct of handlers
  */
-lv_draw_buf_handlers_t * lv_draw_bug_get_handlers(void);
+lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
 
 /**
  * Initialize a draw buffer object. The buffer won't be allocated

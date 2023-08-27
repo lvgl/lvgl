@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_buf_basic.c
+ * @file lv_draw_buf.c
  *
  */
 
@@ -66,7 +66,7 @@ void _lv_draw_buf_init_handlers(void)
     handlers.buf_copy_cb = buf_copy;
 }
 
-lv_draw_buf_handlers_t * lv_draw_bug_get_handlers(void)
+lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void)
 {
     return &handlers;
 }
