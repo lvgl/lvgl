@@ -20,6 +20,7 @@
 #define MY_CLASS &lv_scale_class
 
 #define LV_SCALE_LABEL_TXT_LEN  (20U)
+#define LV_SCALE_DEFAULT_ZOOM	((int32_t) 256U)
 
 /**********************
  *      TYPEDEFS
@@ -572,7 +573,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 lv_point_t point;
                 point.x = center_point.x + radius_text;
                 point.y = center_point.y;
-                lv_point_transform(&point, angle_upscale, 256U, &center_point);
+                lv_point_transform(&point, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
 
                 scale_get_label_coords(obj, &label_dsc, &point, &label_coords);
                 lv_draw_label(layer, &label_dsc, &label_coords);
@@ -930,11 +931,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
          *and to get a better precision*/
         tick_point_a->x = center_point.x + radius_edge;
         tick_point_a->y = center_point.y;
-        lv_point_transform(tick_point_a, angle_upscale, 256U, &center_point);
+        lv_point_transform(tick_point_a, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
 
         tick_point_b->x = center_point.x + radius;
         tick_point_b->y = center_point.y;
-        lv_point_transform(tick_point_b, angle_upscale, 256U, &center_point);
+        lv_point_transform(tick_point_b, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
     }
     else { /* Nothing to do */ }
 }
