@@ -202,6 +202,8 @@ lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
     section->last_tick_idx_in_section = 255U;
     section->first_tick_idx_is_major = 0U;
     section->last_tick_idx_is_major = 0U;
+    section->first_tick_in_section_width = 0U;
+    section->last_tick_in_section_width = 0U;
 
     return section;
 }

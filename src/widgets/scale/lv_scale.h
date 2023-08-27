@@ -63,6 +63,8 @@ typedef struct {
     uint8_t last_tick_idx_in_section;
     uint8_t first_tick_idx_is_major;
     uint8_t last_tick_idx_is_major;
+    lv_coord_t first_tick_in_section_width;
+    lv_coord_t last_tick_in_section_width;
     lv_point_t first_tick_in_section;
     lv_point_t last_tick_in_section;
 } lv_scale_section_t;
