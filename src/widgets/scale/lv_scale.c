@@ -417,34 +417,54 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
                 /* TODO: Maybe move this tick position calculation into an API that can be used in scale_draw_main? or a helper? */
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                    if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.y = tick_point_a.y;
+                    lv_coord_t tmp_width = 0;
+
+                    if(tick_idx == section->first_tick_idx_in_section) {
+                        if(section->first_tick_idx_is_major) {
+                            tmp_width = major_tick_dsc.width;
+                        }
+                        else {
+                            tmp_width = minor_tick_dsc.width;
+                        }
+
+                        section->first_tick_in_section.y = tick_point_a.y + (tmp_width / 2U);
                     }
-                    else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
-                        /* NOTE: Add the custom line width compensation */
-                        section->last_tick_in_section.y = tick_point_a.y - major_tick_dsc.width / 2U;
+                    else if(tick_idx == section->last_tick_idx_in_section) {
+                        if(section->last_tick_idx_is_major) {
+                            tmp_width = major_tick_dsc.width;
+                        }
+                        else {
+                            tmp_width = minor_tick_dsc.width;
+                        }
+
+                        section->last_tick_in_section.y = tick_point_a.y - (tmp_width / 2U);
                     }
-                    else if(tick_idx == section->first_tick_idx_in_section && !section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.y = tick_point_a.y;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section && !section->last_tick_idx_is_major) {
-                        /* NOTE: Add the custom line width compensation */
-                        section->last_tick_in_section.y = tick_point_a.y - minor_tick_dsc.width / 2U;
-                    }
+                    else { /* Nothing to do */ }
                 }
                 else {
-                    if(tick_idx == section->first_tick_idx_in_section && section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.x = tick_point_a.x - major_tick_dsc.width / 2U;;
+                    lv_coord_t tmp_width = 0;
+
+                    if(tick_idx == section->first_tick_idx_in_section) {
+                        if(section->first_tick_idx_is_major) {
+                            tmp_width = major_tick_dsc.width;
+                        }
+                        else {
+                            tmp_width = minor_tick_dsc.width;
+                        }
+
+                        section->first_tick_in_section.x = tick_point_a.x - (tmp_width / 2U);
                     }
-                    else if(tick_idx == section->last_tick_idx_in_section && section->last_tick_idx_is_major) {
-                        section->last_tick_in_section.x = tick_point_a.x + major_tick_dsc.width / 2U;
+                    else if(tick_idx == section->last_tick_idx_in_section) {
+                        if(section->last_tick_idx_is_major) {
+                            tmp_width = major_tick_dsc.width;
+                        }
+                        else {
+                            tmp_width = minor_tick_dsc.width;
+                        }
+
+                        section->last_tick_in_section.x = tick_point_a.x + (tmp_width / 2U);
                     }
-                    else if(tick_idx == section->first_tick_idx_in_section && !section->first_tick_idx_is_major) {
-                        section->first_tick_in_section.x = tick_point_a.x - minor_tick_dsc.width / 2U;;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section && !section->last_tick_idx_is_major) {
-                        section->last_tick_in_section.x = tick_point_a.x + minor_tick_dsc.width / 2U;
-                    }
+                    else { /* Nothing to do */ }
                 }
             }
 
