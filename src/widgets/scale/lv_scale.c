@@ -429,7 +429,8 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                             tmp_width = minor_tick_dsc.width;
                         }
 
-                        section->first_tick_in_section.y = tick_point_a.y + (tmp_width / 2U);
+                        section->first_tick_in_section.y = tick_point_a.y;
+                        section->first_tick_in_section_width = tmp_width;
                     }
                     else if(tick_idx == section->last_tick_idx_in_section) {
                         if(section->last_tick_idx_is_major) {
@@ -439,7 +440,8 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                             tmp_width = minor_tick_dsc.width;
                         }
 
-                        section->last_tick_in_section.y = tick_point_a.y - (tmp_width / 2U);
+                        section->last_tick_in_section.y = tick_point_a.y;
+                        section->last_tick_in_section_width = tmp_width;
                     }
                     else { /* Nothing to do */ }
                 }
@@ -454,7 +456,8 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                             tmp_width = minor_tick_dsc.width;
                         }
 
-                        section->first_tick_in_section.x = tick_point_a.x - (tmp_width / 2U);
+                        section->first_tick_in_section.x = tick_point_a.x;
+                        section->first_tick_in_section_width = tmp_width;
                     }
                     else if(tick_idx == section->last_tick_idx_in_section) {
                         if(section->last_tick_idx_is_major) {
@@ -464,7 +467,8 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                             tmp_width = minor_tick_dsc.width;
                         }
 
-                        section->last_tick_in_section.x = tick_point_a.x + (tmp_width / 2U);
+                        section->last_tick_in_section.x = tick_point_a.x;
+                        section->last_tick_in_section_width = tmp_width;
                     }
                     else { /* Nothing to do */ }
                 }
@@ -682,19 +686,25 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Calculate position of the first tick in the section */
                 main_point_a.x = main_line_point_a.x;
-                main_point_a.y = section->first_tick_in_section.y;
+                float tmp = (float) section->first_tick_in_section.y + (float) (section->first_tick_in_section_width / 2U);
+                main_point_a.y = (lv_coord_t) tmp;
 
                 /* Calculate position of the last tick in the section */
                 main_point_b.x = main_line_point_a.x;
-                main_point_b.y = section->last_tick_in_section.y;
+                tmp = (float) section->last_tick_in_section.y - (float) (section->last_tick_in_section_width / 2U);
+                main_point_b.y = (lv_coord_t) tmp;
+
+                LV_LOG_USER("Main section {%d:%d}, {%d:%d}", main_point_a.x, main_point_a.y, main_point_b.x, main_point_b.y);
             }
             else {
                 /* Calculate position of the first tick in the section */
-                main_point_a.x = section->first_tick_in_section.x;
+				float tmp = (float) section->first_tick_in_section.x - (float) (section->first_tick_in_section_width / 2U);
+                main_point_a.x = (lv_coord_t) tmp;
                 main_point_a.y = main_line_point_a.y;
 
                 /* Calculate position of the last tick in the section */
-                main_point_b.x = section->last_tick_in_section.x;
+                tmp = (float) section->last_tick_in_section.x + (float) (section->last_tick_in_section_width / 2U);
+                main_point_b.x = (lv_coord_t) tmp;
                 main_point_b.y = main_line_point_a.y;
             }
 
