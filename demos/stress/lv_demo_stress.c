@@ -35,6 +35,8 @@ static lv_obj_t * ta;
 static const char * mbox_btns[] = {"Ok", "Cancel", ""};
 static uint32_t mem_free_start = 0;
 static lv_timer_t * obj_test_timer;
+static int16_t state;
+static lv_timer_t * msgbox_tmr;
 
 /**********************
  *      MACROS
@@ -48,11 +50,18 @@ void lv_demo_stress(void)
 {
     LV_LOG_USER("Starting stress test. (< 100 bytes permanent memory leak is normal due to fragmentation)");
     obj_test_timer = lv_timer_create(obj_test_timer_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
+    state = -1;
 }
 
 void lv_demo_stress_close(void)
 {
     lv_timer_del(obj_test_timer);
+    obj_test_timer = NULL;
+    if(msgbox_tmr) {
+        lv_timer_del(msgbox_tmr);
+        msgbox_tmr = NULL;
+    }
+
     lv_obj_clean(lv_scr_act());
     lv_obj_clean(lv_layer_top());
 }
@@ -64,12 +73,9 @@ void lv_demo_stress_close(void)
 static void obj_test_timer_cb(lv_timer_t * tmr)
 {
     (void) tmr;    /*Unused*/
-    static int16_t state = -1;
 
     lv_anim_t a;
     lv_obj_t * obj;
-
-    //    printf("step start: %d\n", state);
 
     switch(state) {
         case -1: {
@@ -255,8 +261,7 @@ static void obj_test_timer_cb(lv_timer_t * tmr)
 
         case 14:
             obj = lv_msgbox_create(NULL, "Title", "Some text on the message box with average length", mbox_btns, true);
-
-            lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_del, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
+            msgbox_tmr = lv_timer_create(msgbox_del, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
             lv_timer_set_repeat_count(msgbox_tmr, 1);
             lv_obj_align(obj, LV_ALIGN_RIGHT_MID, -10, 0);
             break;
@@ -448,6 +453,7 @@ static void auto_del(lv_obj_t * obj, uint32_t delay)
 
 static void msgbox_del(lv_timer_t * tmr)
 {
+    msgbox_tmr = NULL;
     lv_msgbox_close(tmr->user_data);
 }
 
