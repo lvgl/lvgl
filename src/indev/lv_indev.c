@@ -70,6 +70,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_click_focus(lv_indev_t * indev);
 static void indev_gesture(lv_indev_t * indev);
 static bool indev_reset_check(lv_indev_t * indev);
+static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  *  STATIC VARIABLES
@@ -121,7 +122,7 @@ void lv_indev_delete(lv_indev_t * indev)
 {
     LV_ASSERT_NULL(indev);
     /*Clean up the read timer first*/
-    lv_timer_del(indev->read_timer);
+    if(indev->read_timer) lv_timer_del(indev->read_timer);
     /*Remove the input device from the list*/
     _lv_ll_remove(indev_ll_head, indev);
     /*Free the memory of the input device*/
@@ -136,7 +137,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
         return _lv_ll_get_next(indev_ll_head, indev);
 }
 
-void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
+void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_PROFILER_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
@@ -168,11 +169,16 @@ void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
 void lv_indev_read_timer_cb(lv_timer_t * timer)
 {
+    lv_indev_read(timer->user_data);
+}
+
+void lv_indev_read(lv_indev_t * indev_p)
+{
+    if(!indev_p) return;
+
     INDEV_TRACE("begin");
 
-    lv_indev_data_t data;
-
-    lv_indev_t * indev_p = indev_act = timer->user_data;
+    indev_act = indev_p;
 
     /*Read and process all indevs*/
     if(indev_p->disp == NULL) return; /*Not assigned to any displays*/
@@ -186,9 +192,11 @@ void lv_indev_read_timer_cb(lv_timer_t * timer)
     LV_PROFILER_BEGIN;
 
     bool continue_reading;
+    lv_indev_data_t data;
+
     do {
         /*Read the data*/
-        _lv_indev_read(indev_p, &data);
+        indev_read_core(indev_p, &data);
         continue_reading = data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
@@ -523,7 +531,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
     lv_disp_t * disp = i->disp;
-    /*Save the raw points so they can be used again in _lv_indev_read*/
+    /*Save the raw points so they can be used again in indev_read_core*/
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
