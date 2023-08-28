@@ -535,8 +535,8 @@ static void refr_sync_areas(void)
 
 	/*Iterate through invalidated areas to see if sync area should be copied*/
 	lv_area_t res[4] = {0};
-	int8_t res_c;
-	uint32_t i,j;
+	int8_t res_c, j;
+	uint32_t i;
 	lv_area_t *sync_area, *new_area, *next_area;
 	for (i = 0; i < disp_refr->inv_p; i++) {
 		/*Skip joined areas*/
