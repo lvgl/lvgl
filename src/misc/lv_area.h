@@ -306,6 +306,15 @@ static inline lv_coord_t lv_pct(lv_coord_t x)
     return LV_PCT(x);
 }
 
+static inline lv_coord_t lv_pct_to_px(lv_coord_t v, lv_coord_t base)
+{
+    if(LV_COORD_IS_PCT(v)) {
+        return (LV_COORD_GET_PCT(v) * base) / 100;
+    }
+
+    return v;
+}
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
