@@ -551,31 +551,24 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 }
 
                 /* Also take into consideration the letter space of the style */
-                int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count - 1U);
+                int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count);
                 angle_upscale += scale->rotation * 10U;
-                lv_coord_t radius = 0;
-                if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-                    radius = radius_edge - (is_major_tick ? scale->major_len : scale->minor_len);
-                }
-                else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode) {
-                    radius = radius_edge + (is_major_tick ? scale->major_len : scale->minor_len);
-                }
-                else { /* Nothing to do */ }
 
                 uint32_t radius_text;
                 if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-                    radius_text = radius - (label_gap + label_dsc.letter_space);
+                    radius_text = (radius_edge - scale->major_len) - (label_gap + label_dsc.letter_space);
                 }
-                else {
-                    radius_text = radius + (label_gap + label_dsc.letter_space);
+                else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode) {
+                    radius_text = (radius_edge + scale->major_len) + (label_gap + label_dsc.letter_space);
                 }
+                else { /* Nothing to do */ }
 
                 lv_point_t point;
                 point.x = center_point.x + radius_text;
                 point.y = center_point.y;
                 lv_point_transform(&point, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
-
                 scale_get_label_coords(obj, &label_dsc, &point, &label_coords);
+
                 lv_draw_label(layer, &label_dsc, &label_coords);
             }
 
