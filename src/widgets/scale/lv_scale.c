@@ -654,7 +654,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         else {
             main_line_point_a.x = x_ofs;
             main_line_point_a.y = y_ofs;
-            main_line_point_b.x = obj->coords.x2 + pad_left - scroll_left;
+            main_line_point_b.x = obj->coords.x2 + (pad_left - scroll_left);
             main_line_point_b.y = y_ofs;
 
             /* Adjust main line with initial and last tick width */
@@ -680,24 +680,22 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Calculate position of the first tick in the section */
                 main_point_a.x = main_line_point_a.x;
-                float tmp = (float) section->first_tick_in_section.y + (float) (section->first_tick_in_section_width / 2U);
+                float tmp = (float) section->first_tick_in_section.y + (float)(section->first_tick_in_section_width / 2U);
                 main_point_a.y = (lv_coord_t) tmp;
 
                 /* Calculate position of the last tick in the section */
                 main_point_b.x = main_line_point_a.x;
-                tmp = (float) section->last_tick_in_section.y - (float) (section->last_tick_in_section_width / 2U);
+                tmp = (float) section->last_tick_in_section.y - (float)(section->last_tick_in_section_width / 2U);
                 main_point_b.y = (lv_coord_t) tmp;
-
-                LV_LOG_USER("Main section {%d:%d}, {%d:%d}", main_point_a.x, main_point_a.y, main_point_b.x, main_point_b.y);
             }
             else {
                 /* Calculate position of the first tick in the section */
-				float tmp = (float) section->first_tick_in_section.x - (float) (section->first_tick_in_section_width / 2U);
+                float tmp = (float) section->first_tick_in_section.x - (float)(section->first_tick_in_section_width / 2U);
                 main_point_a.x = (lv_coord_t) tmp;
                 main_point_a.y = main_line_point_a.y;
 
                 /* Calculate position of the last tick in the section */
-                tmp = (float) section->last_tick_in_section.x + (float) (section->last_tick_in_section_width / 2U);
+                tmp = (float) section->last_tick_in_section.x + (float)(section->last_tick_in_section_width / 2U);
                 main_point_b.x = (lv_coord_t) tmp;
                 main_point_b.y = main_line_point_a.y;
             }
@@ -953,8 +951,8 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
 
     /* Set the label draw area at some distance of the major tick */
     if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-        label_coords->x1 = (tick_point->x - label_size.x / 2U);
-        label_coords->x2 = (tick_point->x + label_size.x / 2U);
+        label_coords->x1 = tick_point->x - (label_size.x / 2U);
+        label_coords->x2 = tick_point->x + (label_size.x / 2U);
 
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             label_coords->y1 = tick_point->y + lv_obj_get_style_pad_bottom(obj, LV_PART_INDICATOR);
@@ -966,8 +964,8 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
         }
     }
     else if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) || (LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)) {
-        label_coords->y1 = (tick_point->y - label_size.y / 2);
-        label_coords->y2 = (tick_point->y + label_size.y / 2);
+        label_coords->y1 = tick_point->y - (label_size.y / 2U);
+        label_coords->y2 = tick_point->y + (label_size.y / 2U);
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
             label_coords->x1 = tick_point->x - label_size.x - lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
@@ -979,8 +977,8 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
         }
     }
     else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-        label_coords->x1 = tick_point->x - label_size.x / 2U;
-        label_coords->y1 = tick_point->y - label_size.y / 2U;
+        label_coords->x1 = tick_point->x - (label_size.x / 2U);
+        label_coords->y1 = tick_point->y - (label_size.y / 2U);
         label_coords->x2 = label_coords->x1 + label_size.x;
         label_coords->y2 = label_coords->y1 + label_size.y;
     }
