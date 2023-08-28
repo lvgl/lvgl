@@ -80,7 +80,7 @@ void lv_mem_init(void)
     state.tlsf = lv_tlsf_create_with_pool((void *)work_mem_int, LV_MEM_SIZE);
 #endif
 #else
-    tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
+    state.tlsf = lv_tlsf_create_with_pool((void *)LV_MEM_ADR, LV_MEM_SIZE);
 #endif
     _lv_ll_init(&state.pool_ll, sizeof(lv_pool_t));
 
