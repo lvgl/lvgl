@@ -201,7 +201,7 @@ The default value of the following parameters can be changed in :cpp:type:`lv_in
 - ``long_press_repeat_time`` Interval of sending :cpp:enumerator:`LV_EVENT_LONG_PRESSED_REPEAT` (in milliseconds)
 - ``read_timer`` pointer to the ``lv_timer`` which reads the input device. Its parameters
   can be changed by ``lv_timer_...()`` functions. :c:macro:`LV_DEF_REFR_PERIOD`
-  in ``lv_hal_disp.h`` sets the default read period.
+  in ``lv_conf.h`` sets the default read period.
 
 Feedback
 --------
@@ -231,6 +231,28 @@ that buffers measured data. In ``read_cb`` you can report the buffered
 data instead of directly reading the input device. Setting the
 ``data->continue_reading`` flag will tell LVGL there is more data to
 read and it should call ``read_cb`` again.
+
+Decoupling the input device read timer
+--------------------------------------
+
+Normally the input event is read every :c:macro:`LV_DEF_REFR_PERIOD`
+milliseconds (set in ``lv_conf.h``).  However, in some cases, you might
+need more control over when to read the input device. For example, you
+might need to read it by polling file descriptor (fd).
+
+You can do this in the following way:
+
+.. code:: c
+
+   /*Delete the original input device read timer*/
+   lv_timer_del(indev->read_timer);
+   indev->read_timer = NULL;
+
+
+   /*Call this anywhere you want to read the input device*/
+   lv_indev_read(indev);
+
+.. note:: that :cpp:func:`lv_indev_read`, :cpp:func:`lv_timer_handler` and :cpp:func:`_lv_disp_refr_timer` can not run at the same time.
 
 Further reading
 ***************
