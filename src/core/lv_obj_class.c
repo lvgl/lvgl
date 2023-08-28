@@ -146,7 +146,7 @@ bool lv_obj_is_editable(lv_obj_t * obj)
 
     if(class_p == NULL) return false;
 
-    return class_p->editable == LV_OBJ_CLASS_EDITABLE_TRUE ? true : false;
+    return class_p->editable == LV_OBJ_CLASS_EDITABLE_TRUE;
 }
 
 bool lv_obj_is_group_def(lv_obj_t * obj)
@@ -158,7 +158,7 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
 
     if(class_p == NULL) return false;
 
-    return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE ? true : false;
+    return class_p->group_def == LV_OBJ_CLASS_GROUP_DEF_TRUE;
 }
 
 /**********************

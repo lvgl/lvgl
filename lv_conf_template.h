@@ -75,18 +75,11 @@
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
-/* Select a draw buffer implementation. Possible values:
- * - LV_DRAW_BUF_BASIC:     LVGL's built in implementation
- * - LV_DRAW_BUF_CUSTOM:    Implement the function of lv_draw_buf.h externally
- */
-#define LV_USE_DRAW_BUF    LV_DRAW_BUF_BASIC
 
-#if LV_USE_DRAW_BUF == LV_DRAW_BUF_BASIC
-    /*Align the stride of all layers and images to this bytes*/
-    #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
-    /*Align the start address of draw_buf addresses to this bytes*/
-    #define LV_DRAW_BUF_ALIGN                       4
-#endif
+/*Align the stride of all layers and images to this bytes*/
+#define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
+/*Align the start address of draw_buf addresses to this bytes*/
+#define LV_DRAW_BUF_ALIGN                       4
 
 /*Align the stride of all layers and images to this bytes*/
 #define LV_DRAW_BUF_STRIDE_ALIGN                1

@@ -47,6 +47,10 @@ extern "C" {
 #include "scroll/lv_demo_scroll.h"
 #endif
 
+#if LV_USE_DEMO_MULTILANG
+#include "multilang/lv_demo_multilang.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/

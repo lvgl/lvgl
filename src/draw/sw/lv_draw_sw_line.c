@@ -118,7 +118,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(lv_draw_unit_t * draw_unit, cons
     is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
     if(!is_common) return;
 
-    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
+    bool dashed = dsc->dash_gap && dsc->dash_width;
 
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(blend_dsc));
@@ -193,7 +193,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
     is_common = _lv_area_intersect(&blend_area, &blend_area, draw_unit->clip_area);
     if(!is_common) return;
 
-    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
+    bool dashed = dsc->dash_gap && dsc->dash_width;
 
     lv_draw_sw_blend_dsc_t blend_dsc;
     lv_memzero(&blend_dsc, sizeof(blend_dsc));
@@ -267,7 +267,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
 
     int32_t xdiff = p2.x - p1.x;
     int32_t ydiff = p2.y - p1.y;
-    bool flat = LV_ABS(xdiff) > LV_ABS(ydiff) ? true : false;
+    bool flat = LV_ABS(xdiff) > LV_ABS(ydiff);
 
     static const uint8_t wcorr[] = {
         128, 128, 128, 129, 129, 130, 130, 131,

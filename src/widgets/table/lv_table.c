@@ -732,7 +732,7 @@ static void draw_main(lv_event_t * e)
                 txt_area.y2 = cell_area.y2 - cell_bottom;
 
                 /*Align the content to the middle if not cropped*/
-                bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP ? true : false;
+                bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP;
                 if(crop) txt_flags = LV_TEXT_FLAG_EXPAND;
 
                 lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,

@@ -319,10 +319,30 @@ void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area)
     lv_area_move(area, layer->draw_buf_ofs.x, layer->draw_buf_ofs.y);
 }
 
-void lv_draw_add_used_layer_size(uint32_t kb)
+void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
 {
-    _draw_cache.used_memory_for_layers_kb += kb;
-    LV_LOG_INFO("Layer memory used: %d kB\n", _draw_cache.used_memory_for_layers_kb);
+    /*If the buffer of the layer is not allocated yet, allocate it now*/
+    if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
+        uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
+                                                                                        layer->draw_buf.color_format);
+
+        lv_draw_buf_malloc(&layer->draw_buf);
+        if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
+            LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
+            return NULL;
+        }
+
+        uint32_t kb = layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
+        _draw_cache.used_memory_for_layers_kb += kb;
+        LV_LOG_INFO("Layer memory used: %d kB\n", _draw_cache.used_memory_for_layers_kb);
+
+
+        if(lv_color_format_has_alpha(layer->draw_buf.color_format)) {
+            lv_draw_buf_clear(&layer->draw_buf, NULL);
+        }
+    }
+
+    return lv_draw_buf_get_buf(&layer->draw_buf);
 }
 
 

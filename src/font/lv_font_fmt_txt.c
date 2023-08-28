@@ -146,7 +146,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     /*Handle compressed bitmap*/
     else {
 #if LV_USE_FONT_COMPRESSED
-        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
+        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED;
         decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], bitmap_out, gdsc->box_w, gdsc->box_h,
                    (uint8_t)fdsc->bpp, prefilter);
         return bitmap_out;

@@ -1122,7 +1122,7 @@ static void circ_init(lv_point_t * c, lv_coord_t * tmp, lv_coord_t radius)
  */
 static bool circ_cont(lv_point_t * c)
 {
-    return c->y <= c->x ? true : false;
+    return c->y <= c->x;
 }
 
 /**

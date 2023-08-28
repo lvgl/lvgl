@@ -6,6 +6,7 @@ LVGL has a :ref:`file-system` module
 to provide an abstraction layer for various file system drivers.
 
 LVG has built in support for:
+
 - `FATFS <http://elm-chan.org/fsw/ff/00index_e.html>`__
 - STDIO (Linux and Windows using C standard function .e.g fopen, fread)
 - POSIX (Linux and Windows using POSIX function .e.g open, read)

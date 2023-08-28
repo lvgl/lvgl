@@ -493,7 +493,7 @@ void lv_obj_get_scrollbar_area(lv_obj_t * obj, lv_area_t * hor_area, lv_area_t *
 
     if(!hor_draw && !ver_draw) return;
 
-    bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_SCROLLBAR) == LV_BASE_DIR_RTL ? true : false;
+    bool rtl = lv_obj_get_style_base_dir(obj, LV_PART_SCROLLBAR) == LV_BASE_DIR_RTL;
 
     lv_coord_t top_space = lv_obj_get_style_pad_top(obj, LV_PART_SCROLLBAR);
     lv_coord_t bottom_space = lv_obj_get_style_pad_bottom(obj, LV_PART_SCROLLBAR);

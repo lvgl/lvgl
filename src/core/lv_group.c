@@ -359,13 +359,13 @@ lv_group_edge_cb_t lv_group_get_edge_cb(const lv_group_t * group)
 bool lv_group_get_editing(const lv_group_t * group)
 {
     if(!group) return false;
-    return group->editing ? true : false;
+    return group->editing;
 }
 
 bool lv_group_get_wrap(lv_group_t * group)
 {
     if(!group) return false;
-    return group->wrap ? true : false;
+    return group->wrap;
 }
 
 uint32_t lv_group_get_obj_count(lv_group_t * group)

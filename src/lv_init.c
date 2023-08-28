@@ -80,7 +80,12 @@ static inline void lv_global_init(lv_global_t * global)
 
 bool lv_is_initialized(void)
 {
+#if LV_ENABLE_GLOBAL_CUSTOM
+    if(LV_GLOBAL_DEFAULT()) return lv_initialized;
+    else return false;
+#else
     return lv_initialized;
+#endif
 }
 
 void lv_init(void)
@@ -102,6 +107,8 @@ void lv_init(void)
     lv_global_init(LV_GLOBAL_DEFAULT());
 
     lv_mem_init();
+
+    _lv_draw_buf_init_handlers();
 
 #if LV_USE_SPAN != 0
     lv_span_stack_init();
@@ -152,7 +159,7 @@ void lv_init(void)
 
     uint32_t endianess_test = 0x11223344;
     uint8_t * endianess_test_p = (uint8_t *) &endianess_test;
-    bool big_endian = endianess_test_p[0] == 0x11 ? true : false;
+    bool big_endian = endianess_test_p[0] == 0x11;
 
     if(big_endian) {
         LV_ASSERT_MSG(LV_BIG_ENDIAN_SYSTEM == 1,

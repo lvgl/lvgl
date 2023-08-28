@@ -165,7 +165,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         return;
     }
 
-    bool transformed = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
+    bool transformed = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE;
 
     lv_img_decoder_dsc_t decoder_dsc;
     lv_res_t res = lv_img_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
