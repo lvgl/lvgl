@@ -554,7 +554,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count);
                 angle_upscale += scale->rotation * 10U;
 
-                uint32_t radius_text;
+                uint32_t radius_text = 0;
                 if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
                     radius_text = (radius_edge - scale->major_len) - (label_gap + label_dsc.letter_space);
                 }
