@@ -1,7 +1,7 @@
 /**
-* @file lv_rb.c
-*
-*/
+ * @file lv_rb.c
+ *
+ */
 
 /*********************
  *      INCLUDES
