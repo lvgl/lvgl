@@ -514,8 +514,11 @@ static void lv_refr_join_area(void)
  */
 static void refr_sync_areas(void)
 {
-	/*Do not sync if not double buffered*/
+	/*Do not sync if not direct mode*/
 	if (!disp_refr->driver->direct_mode) return;
+
+	/*Do not sync if not double buffered*/
+	if (disp_refr->driver->draw_buf->buf2 == NULL) return;
 
 	/*Do not sync if no sync areas*/
 	if (_lv_ll_is_empty(&disp_refr->sync_areas)) return;
