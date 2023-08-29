@@ -53,6 +53,7 @@ typedef struct {
  **********************/
 static void lv_refr_join_area(void);
 static void refr_invalid_areas(void);
+static void refr_sync_areas(void);
 static void refr_area(const lv_area_t * area_p);
 static void refr_area_part(lv_draw_ctx_t * draw_ctx);
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj);
@@ -320,11 +321,23 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     }
 
     lv_refr_join_area();
-
+    refr_sync_areas();
     refr_invalid_areas();
 
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
+
+        /*Copy invalid areas for sync next refresh*/
+        if(disp_refr->driver->direct_mode) {
+            uint16_t i;
+            for(i = 0; i < disp_refr->inv_p; i++) {
+                if(disp_refr->inv_area_joined[i])
+                    continue;
+
+                lv_area_t * sync_area = _lv_ll_ins_tail(&disp_refr->sync_areas);
+                *sync_area = disp_refr->inv_areas[i];
+            }
+        }
 
         /*Clean up*/
         lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
@@ -493,6 +506,78 @@ static void lv_refr_join_area(void)
             }
         }
     }
+}
+
+/**
+ * Refresh the sync areas
+ */
+static void refr_sync_areas(void)
+{
+    /*Do not sync if not direct mode*/
+    if(!disp_refr->driver->direct_mode) return;
+
+    /*Do not sync if not double buffered*/
+    if(disp_refr->driver->draw_buf->buf2 == NULL) return;
+
+    /*Do not sync if no sync areas*/
+    if(_lv_ll_is_empty(&disp_refr->sync_areas)) return;
+
+    /*The buffers are already swapped.
+     *So the active buffer is the off screen buffer where LVGL will render*/
+    void * buf_off_screen = disp_refr->driver->draw_buf->buf_act;
+    void * buf_on_screen = disp_refr->driver->draw_buf->buf_act == disp_refr->driver->draw_buf->buf1
+                           ? disp_refr->driver->draw_buf->buf2
+                           : disp_refr->driver->draw_buf->buf1;
+
+    /*Get stride for buffer copy*/
+    lv_coord_t stride = lv_disp_get_hor_res(disp_refr);
+
+    /*Iterate through invalidated areas to see if sync area should be copied*/
+    lv_area_t res[4] = {0};
+    int8_t res_c, j;
+    uint32_t i;
+    lv_area_t * sync_area, *new_area, *next_area;
+    for(i = 0; i < disp_refr->inv_p; i++) {
+        /*Skip joined areas*/
+        if(disp_refr->inv_area_joined[i]) continue;
+
+        /*Iterate over sync areas*/
+        sync_area = _lv_ll_get_head(&disp_refr->sync_areas);
+        while(sync_area != NULL) {
+            /*Get next sync area*/
+            next_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area);
+
+            /*Remove intersect of redraw area from sync area and get remaining areas*/
+            res_c = _lv_area_diff(res, sync_area, &disp_refr->inv_areas[i]);
+
+            /*New sub areas created after removing intersect*/
+            if(res_c != -1) {
+                /*Replace old sync area with new areas*/
+                for(j = 0; j < res_c; j++) {
+                    new_area = _lv_ll_ins_prev(&disp_refr->sync_areas, sync_area);
+                    *new_area = res[j];
+                }
+                _lv_ll_remove(&disp_refr->sync_areas, sync_area);
+                lv_mem_free(sync_area);
+            }
+
+            /*Move on to next sync area*/
+            sync_area = next_area;
+        }
+    }
+
+    /*Copy sync areas (if any remaining)*/
+    for(sync_area = _lv_ll_get_head(&disp_refr->sync_areas); sync_area != NULL;
+        sync_area = _lv_ll_get_next(&disp_refr->sync_areas, sync_area)) {
+        disp_refr->driver->draw_ctx->buffer_copy(
+            disp_refr->driver->draw_ctx,
+            buf_off_screen, stride, sync_area,
+            buf_on_screen, stride, sync_area
+        );
+    }
+
+    /*Clear sync areas*/
+    _lv_ll_clear(&disp_refr->sync_areas);
 }
 
 /**
