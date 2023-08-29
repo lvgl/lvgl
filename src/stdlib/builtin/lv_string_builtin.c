@@ -11,6 +11,7 @@
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_string.h"
+#include "../../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES
@@ -168,6 +169,16 @@ char * lv_strcpy(char * dst, const char * src)
     char * tmp = dst;
     while((*dst++ = *src++) != '\0');
     return tmp;
+}
+
+char * lv_strdup(const char * src)
+{
+    size_t len = lv_strlen(src) + 1;
+    char * dst = lv_malloc(len);
+    if(dst == NULL) return NULL;
+
+    lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
+    return dst;
 }
 
 /**********************

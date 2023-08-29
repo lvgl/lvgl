@@ -118,15 +118,8 @@ void lv_file_explorer_set_quick_access_path(lv_obj_t * obj, lv_file_explorer_dir
         *dir_str = NULL;
     }
 
-    /*Get the size of the text*/
-    size_t len = lv_strlen(path) + 1;
-
     /*Allocate space for the new text*/
-    *dir_str = lv_malloc(len);
-    LV_ASSERT_MALLOC(*dir_str);
-    if(*dir_str == NULL) return;
-
-    lv_strcpy(*dir_str, path);
+    *dir_str = lv_strdup(path);
 }
 
 #endif

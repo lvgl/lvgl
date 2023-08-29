@@ -83,6 +83,12 @@ char * lv_strncpy(char * dst, const char * src, size_t dest_size);
  */
 char * lv_strcpy(char * dst, const char * src);
 
+/**
+ * @brief Duplicate a string by allocating a new one and copying the content.
+ * @param src Pointer to the source of data to be copied.
+ * @return A pointer to the new allocated string. NULL if failed.
+ */
+char * lv_strdup(const char * src);
 
 /**********************
  *      MACROS
