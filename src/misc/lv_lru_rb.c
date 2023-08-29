@@ -122,7 +122,7 @@ lv_lru_rb_t* lv_lru_rb_create(size_t node_size, size_t max_size, lv_lru_rb_compa
     return lru;
 }
 
-void lv_lru_rb_destroy(lv_lru_rb_t* lru)
+void lv_lru_rb_destroy(lv_lru_rb_t* lru, void* user_data)
 {
     LV_ASSERT_NULL(lru);
 
@@ -130,8 +130,7 @@ void lv_lru_rb_destroy(lv_lru_rb_t* lru)
         return;
     }
 
-    lv_rb_destroy(&lru->rb);
-    _lv_ll_clear(&lru->lru_ll);
+    lv_lru_rb_clear(lru, user_data);
 
     lv_free(lru);
 }
@@ -155,7 +154,7 @@ void* lv_lru_rb_get(lv_lru_rb_t* lru, const void* key, void* user_data)
     }
 
     if (lru->size >= lru->max_size) {
-        lv_rb_node_t * tail = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->lru_ll);
+        lv_rb_node_t* tail = *(lv_rb_node_t**)_lv_ll_get_tail(&lru->lru_ll);
         lv_lru_rb_remove(lru, tail->data, user_data);
     }
 
@@ -200,6 +199,23 @@ void lv_lru_rb_remove(lv_lru_rb_t* lru, const void* key, void* user_data)
 
 void lv_lru_rb_clear(lv_lru_rb_t* lru, void* user_data)
 {
+    LV_ASSERT_NULL(lru);
+
+    if (lru == NULL) {
+        return;
+    }
+
+    lv_rb_node_t** node;
+    _LV_LL_READ(&lru->lru_ll, node)
+    {
+        // free user handled data and do other clean up
+        lru->free_cb((*node)->data, user_data);
+    }
+
+    lv_rb_destroy(&lru->rb);
+    _lv_ll_clear(&lru->lru_ll);
+
+    lru->size = 0;
 }
 
 void lv_lru_rb_set_max_size(lv_lru_rb_t* lru, size_t max_size, void* user_data)
