@@ -70,6 +70,7 @@ struct _lv_lru_rb_t {
  *  STATIC PROTOTYPES
  **********************/
 static void* alloc_new_node(lv_lru_rb_t* lru, void* key, void* user_data);
+inline static void** get_lru_node(lv_lru_rb_t* lru, lv_rb_node_t* node);
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -131,6 +132,8 @@ void lv_lru_rb_destroy(lv_lru_rb_t* lru)
 
     lv_rb_destroy(&lru->rb);
     _lv_ll_clear(&lru->lru_ll);
+
+    lv_free(lru);
 }
 
 void* lv_lru_rb_get(lv_lru_rb_t* lru, const void* key, void* user_data)
@@ -145,7 +148,7 @@ void* lv_lru_rb_get(lv_lru_rb_t* lru, const void* key, void* user_data)
     lv_rb_node_t* node = lv_rb_find(&lru->rb, key);
     // cache hit
     if (node) {
-        void* lru_node = *((void**)((char*)node->data - sizeof(void*)));
+        void* lru_node = *get_lru_node(lru, node);
         void* head = _lv_ll_get_head(&lru->lru_ll);
         _lv_ll_move_before(&lru->lru_ll, lru_node, head);
         return node->data;
@@ -167,6 +170,27 @@ void lv_lru_rb_put(lv_lru_rb_t* lru, const void* key, void* value, void* user_da
 
 void lv_lru_rb_remove(lv_lru_rb_t* lru, const void* key, void* user_data)
 {
+    LV_ASSERT_NULL(lru);
+    LV_ASSERT_NULL(key);
+
+    if (lru == NULL || key == NULL) {
+        return;
+    }
+
+    lv_rb_node_t* node = lv_rb_find(&lru->rb, key);
+    if (node == NULL) {
+        return;
+    }
+
+    lru->free_cb(node->data, user_data);
+
+    void* lru_node = *get_lru_node(lru, node);
+    lv_rb_remove(&lru->rb, key);
+    _lv_ll_remove(&lru->lru_ll, lru_node);
+
+    lv_free(lru_node);
+
+    lru->size--;
 }
 
 void lv_lru_rb_clear(lv_lru_rb_t* lru, void* user_data)
@@ -241,8 +265,13 @@ static void* alloc_new_node(lv_lru_rb_t* lru, void* key, void* user_data)
     }
 
     lv_memcpy(lru_node, &node, sizeof(void*));
-    lv_memcpy((char*)node->data - sizeof(void*), &lru_node, sizeof(void*));
+    lv_memcpy(get_lru_node(lru, node), &lru_node, sizeof(void*));
 
     // TODO: simplify error handling
     return node;
+}
+
+inline static void** get_lru_node(lv_lru_rb_t* lru, lv_rb_node_t* node)
+{
+    return (void**)((char*)node->data + lru->rb.size - sizeof(void*));
 }
