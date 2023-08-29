@@ -154,6 +154,11 @@ void* lv_lru_rb_get(lv_lru_rb_t* lru, const void* key, void* user_data)
         return node->data;
     }
 
+    if (lru->size >= lru->max_size) {
+        lv_rb_node_t * tail = *(lv_rb_node_t **)_lv_ll_get_tail(&lru->lru_ll);
+        lv_lru_rb_remove(lru, tail->data, user_data);
+    }
+
     // cache miss
     lv_rb_node_t* new_node = alloc_new_node(lru, (void*)key, user_data);
     if (new_node == NULL) {
