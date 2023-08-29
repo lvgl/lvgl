@@ -178,6 +178,15 @@ void lv_area_move(lv_area_t * area, lv_coord_t x_ofs, lv_coord_t y_ofs);
 bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p);
 
 /**
+ * Get resulting sub areas after removing the common parts of two areas from the first area
+ * @param res_p pointer to an array of areas with a count of 4, the resulting areas will be stored here
+ * @param a1_p pointer to the first area
+ * @param a2_p pointer to the second area
+ * @return number of results (max 4) or -1 if no intersect
+ */
+int8_t _lv_area_diff(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p);
+
+/**
  * Join two areas into a third which involves the other two
  * @param res_p pointer to an area, the result will be stored here
  * @param a1_p pointer to the first area
