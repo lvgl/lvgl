@@ -271,29 +271,29 @@ static void* alloc_new_node(lv_lru_rb_t* lru, void* key, void* user_data)
     }
 
     lv_rb_node_t* node = lv_rb_insert(&lru->rb, key);
-    if (node == NULL) {
-        return NULL;
-    }
+    if (node == NULL)
+        goto FAILED_HANDLER3;
 
     lv_memcpy(node->data, key, lru->rb.size - sizeof(void*));
 
     bool alloc_res = lru->alloc_cb(node->data, user_data);
-    if (alloc_res == false) {
-        lv_rb_remove(&lru->rb, key);
-        return NULL;
-    }
+    if (alloc_res == false)
+        goto FAILED_HANDLER2;
 
     void* lru_node = _lv_ll_ins_head(&lru->lru_ll);
-    if (lru_node == NULL) {
-        lru->free_cb(node->data, user_data);
-        lv_rb_remove(&lru->rb, key);
-        return NULL;
-    }
+    if (lru_node == NULL)
+        goto FAILED_HANDLER1;
 
     lv_memcpy(lru_node, &node, sizeof(void*));
     lv_memcpy(get_lru_node(lru, node), &lru_node, sizeof(void*));
+    goto FAILED_HANDLER3;
 
-    // TODO: simplify error handling
+FAILED_HANDLER1:
+    lru->free_cb(node->data, user_data);
+FAILED_HANDLER2:
+    node = NULL;
+    lv_rb_remove(&lru->rb, key);
+FAILED_HANDLER3:
     return node;
 }
 
