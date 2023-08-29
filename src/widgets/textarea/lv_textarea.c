@@ -301,11 +301,9 @@ void lv_textarea_set_text(lv_obj_t * obj, const char * txt)
     }
 
     if(ta->pwd_mode) {
-        size_t len = lv_strlen(txt) + 1;
-        ta->pwd_tmp = lv_realloc(ta->pwd_tmp, len);
+        ta->pwd_tmp = lv_strdup(txt);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
-        lv_strcpy(ta->pwd_tmp, txt);
 
         /*Auto hide characters*/
         auto_hide_characters(obj);
@@ -414,13 +412,9 @@ void lv_textarea_set_password_mode(lv_obj_t * obj, bool en)
     /*Pwd mode is now enabled*/
     if(en) {
         char * txt = lv_label_get_text(ta->label);
-        size_t len = lv_strlen(txt);
-
-        ta->pwd_tmp = lv_malloc(len + 1);
+        ta->pwd_tmp = lv_strdup(txt);
         LV_ASSERT_MALLOC(ta->pwd_tmp);
         if(ta->pwd_tmp == NULL) return;
-
-        lv_strcpy(ta->pwd_tmp, txt);
 
         pwd_char_hider(obj);
 
@@ -460,7 +454,7 @@ void lv_textarea_set_password_bullet(lv_obj_t * obj, const char * bullet)
             return;
         }
 
-        lv_strcpy(ta->pwd_bullet, bullet);
+        lv_memcpy(ta->pwd_bullet, bullet, txt_len);
         ta->pwd_bullet[txt_len] = '\0';
     }
 

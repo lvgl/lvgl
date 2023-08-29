@@ -177,7 +177,7 @@ char * lv_strdup(const char * src)
     char * dst = lv_malloc(len);
     if(dst == NULL) return NULL;
 
-    lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy since we already know string length*/
+    lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
     return dst;
 }
 
