@@ -144,11 +144,20 @@ void* lv_lru_rb_get(lv_lru_rb_t* lru, const void* key, void* user_data)
         return NULL;
     }
 
+    // try the first ll node first
+    void* head = _lv_ll_get_head(&lru->lru_ll);
+    if (head) {
+        lv_rb_node_t* node = *(lv_rb_node_t**)head;
+        if (lru->rb.compare(node->data, key) == 0) {
+            return node->data;
+        }
+    }
+
     lv_rb_node_t* node = lv_rb_find(&lru->rb, key);
     // cache hit
     if (node) {
         void* lru_node = *get_lru_node(lru, node);
-        void* head = _lv_ll_get_head(&lru->lru_ll);
+        head = _lv_ll_get_head(&lru->lru_ll);
         _lv_ll_move_before(&lru->lru_ll, lru_node, head);
         return node->data;
     }
