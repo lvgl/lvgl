@@ -49,8 +49,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef lv_layer_t lv_vglite_layer_t;
-
 typedef struct {
     lv_draw_unit_t base_unit;
     struct _lv_draw_task_t * task_act;
@@ -64,15 +62,9 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_layer_t * lv_draw_vglite_layer_init(lv_disp_t * disp);
-
-void lv_draw_vglite_layer_deinit(lv_disp_t * disp, lv_layer_t * layer);
+void lv_draw_buf_vglite_init_handlers(void);
 
 void lv_draw_vglite_init(void);
-
-void lv_draw_vglite_buffer_copy(lv_layer_t * layer,
-                                void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
-                                void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
 
 void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc,
                         const lv_area_t * coords);

@@ -45,13 +45,13 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
  * @param[in] dest_area Area with relative coordinates of destination buffer
  * @param[in] mask_buf Mask buffer
  * @param[in] mask_area Mask area with relative coordinates of source buffer
- * @param[in] mask_stride Stride of mask buffer in pixels
+ * @param[in] mask_stride Stride of mask buffer in bytes
  * @param[in] color Color
  * @param[in] opa Opacity
  *
  */
 static void _vglite_draw_letter(const lv_area_t * dest_area,
-                                const uint8_t * mask_buf, const lv_area_t * mask_area, lv_coord_t mask_stride,
+                                const void * mask_buf, const lv_area_t * mask_area, uint32_t mask_stride,
                                 lv_color_t color, lv_opa_t opa);
 
 /**********************
@@ -107,26 +107,26 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
             lv_area_t blend_area;
             if(!_lv_area_intersect(&blend_area, glyph_draw_dsc->letter_coords, draw_unit->clip_area))
                 return;
-            lv_area_move(&blend_area, -layer->buf_area.x1, -layer->buf_area.y1);
+            lv_area_move(&blend_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
-            //lv_coord_t dest_stride = lv_area_get_width(&layer->buf_area);
-            //uint32_t px_size = lv_color_format_get_size(layer->color_format);
-            //uint8_t * dest_buf = layer->buf;
-            //dest_buf += dest_stride * (blend_area.y1 - layer->buf_area.y1) * px_size;
-            //dest_buf += (blend_area.x1 - layer->buf_area.x1) * px_size;
+            //void * dest_buf = lv_draw_buf_go_to_xy(&layer->draw_buf,
+            //                                       blend_area.x1 - layer->draw_buf_ofs.x,
+            //                                       blend_area.y1 - layer->draw_buf_ofs.y);
 
             const uint8_t * mask_buf = glyph_draw_dsc->bitmap;
             lv_area_t mask_area;
             lv_area_copy(&mask_area, glyph_draw_dsc->letter_coords);
-            lv_area_move(&mask_area, -layer->buf_area.x1, -layer->buf_area.y1);
+            lv_area_move(&mask_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
-            lv_coord_t mask_stride = lv_area_get_width(glyph_draw_dsc->letter_coords);
+            uint32_t mask_stride = lv_draw_buf_width_to_stride(
+                                       lv_area_get_width(glyph_draw_dsc->letter_coords),
+                                       LV_COLOR_FORMAT_A8);
             if(mask_buf) {
                 mask_buf += mask_stride * (blend_area.y1 - glyph_draw_dsc->letter_coords->y1) +
                             (blend_area.x1 - glyph_draw_dsc->letter_coords->x1);
             }
 
-            if(!vglite_buf_aligned(mask_buf, mask_stride)) {
+            if(!vglite_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
                 /* Draw a placeholder rectangle*/
                 lv_draw_border_dsc_t border_draw_dsc;
                 lv_draw_border_dsc_init(&border_draw_dsc);
@@ -160,13 +160,13 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
 }
 
 static void _vglite_draw_letter(const lv_area_t * dest_area,
-                                const uint8_t * mask_buf, const lv_area_t * mask_area, lv_coord_t mask_stride,
+                                const void * mask_buf, const lv_area_t * mask_area, uint32_t mask_stride,
                                 lv_color_t color, lv_opa_t opa)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
 
-    int32_t stride = (mask_stride + 15) & ~0xf; /*Closest multiple of 16*/
+    //int32_t stride = (mask_stride + 15) & ~0xf; /*Closest multiple of 16*/
 
     vg_lite_buffer_t mask_vgbuf;
     mask_vgbuf.format = VG_LITE_A8;
@@ -175,7 +175,7 @@ static void _vglite_draw_letter(const lv_area_t * dest_area,
     mask_vgbuf.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     mask_vgbuf.width = (int32_t)lv_area_get_width(mask_area);
     mask_vgbuf.height = (int32_t)lv_area_get_height(mask_area);
-    mask_vgbuf.stride = (int32_t)stride;
+    mask_vgbuf.stride = (int32_t)mask_stride;
 
     lv_memset(&mask_vgbuf.yuv, 0, sizeof(mask_vgbuf.yuv));
 

@@ -26,6 +26,8 @@
  *      DEFINES
  *********************/
 
+#define DRAW_UNIT_ID_VGLITE 2
+
 #if LV_USE_OS
     #define VGLITE_TASK_BUF_SIZE 10
 #endif
@@ -48,7 +50,7 @@ typedef struct _vglite_draw_task_t {
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t lv_draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t _draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 #if LV_USE_OS
     static void _vglite_render_thread_cb(void * ptr);
@@ -79,24 +81,12 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_layer_t * lv_draw_vglite_layer_init(lv_disp_t * disp)
-{
-    lv_vglite_layer_t * vglite_layer = (lv_vglite_layer_t *)lv_draw_sw_layer_init(disp);
-
-    vglite_layer->buffer_copy = lv_draw_vglite_buffer_copy;
-
-    return vglite_layer;
-}
-
-void lv_draw_vglite_layer_deinit(lv_disp_t * disp, lv_layer_t * layer)
-{
-    lv_draw_sw_layer_deinit(disp, layer);
-}
-
 void lv_draw_vglite_init(void)
 {
+    lv_draw_buf_vglite_init_handlers();
+
     lv_draw_vglite_unit_t * draw_vglite_unit = lv_draw_create_unit(sizeof(lv_draw_vglite_unit_t));
-    draw_vglite_unit->base_unit.dispatch = lv_draw_vglite_dispatch;
+    draw_vglite_unit->base_unit.dispatch_cb = _draw_vglite_dispatch;
 
 #if LV_USE_OS
     lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 8 * 1024, draw_vglite_unit);
@@ -145,7 +135,7 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
 
                     if(has_recolor
                        || (!_vglite_cf_supported(draw_dsc->img_header.cf))
-                       || (!vglite_buf_aligned(draw_dsc->src, draw_dsc->img_header.w))
+                       || (!vglite_buf_aligned(draw_dsc->src, draw_dsc->img_header.stride, draw_dsc->img_header.cf))
                       )
                         is_supported = false;
                 }
@@ -156,16 +146,16 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
         case LV_DRAW_TASK_TYPE_LAYER: {
                 const lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
+                lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
                 /* Return supported so this task is marked as complete once it gets in execution. */
-                if(layer_to_draw->buf == NULL)
+                if(draw_buf->buf == NULL)
                     break;
 
                 bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
 
                 if(has_recolor
-                   || (!_vglite_cf_supported(layer_to_draw->color_format))
-                   || (!vglite_buf_aligned(layer_to_draw->buf, lv_area_get_width(&layer_to_draw->buf_area)))
+                   || (!_vglite_cf_supported(draw_buf->color_format))
                   )
                     is_supported = false;
 
@@ -186,7 +176,7 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
                    || has_transform
 #endif
                    || (!_vglite_cf_supported(img_dsc->header.cf))
-                   || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.w))
+                   || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
                   )
                     is_supported = false;
 
@@ -200,7 +190,7 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
     return is_supported;
 }
 
-static int32_t lv_draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t _draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
 
@@ -208,42 +198,29 @@ static int32_t lv_draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * 
     if(draw_vglite_unit->task_act)
         return 0;
 
-    /* Return if target buffer format is not supported. */
-    if(!_vglite_cf_supported(layer->color_format))
+    /* Return if target buffer format is not supported.
+     *
+     * FIXME: Source format and destination format support is different!
+     */
+    if(!_vglite_cf_supported(layer->draw_buf.color_format))
         return 0;
 
     /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL);
+    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_VGLITE);
     while(t != NULL) {
         if(_vglite_task_supported(t))
             break;
 
-        t = lv_draw_get_next_available_task(layer, t);
+        t = lv_draw_get_next_available_task(layer, t, DRAW_UNIT_ID_VGLITE);
     }
 
     /* Return 0 is no selection, some tasks can be supported only by SW. */
     if(t == NULL)
         return 0;
 
-    /* If the buffer of the layer is not allocated yet, allocate it now. */
-    if(layer->buf == NULL) {
-        uint32_t px_size = lv_color_format_get_size(layer->color_format);
-        uint32_t layer_size_byte = lv_area_get_size(&layer->buf_area) * px_size;
-
-        uint8_t * buf = lv_malloc(layer_size_byte);
-        if(buf == NULL) {
-            LV_LOG_WARN("Allocating %d bytes of layer buffer failed. Try later", layer_size_byte);
-            return -1;
-        }
-        LV_ASSERT_MALLOC(buf);
-        lv_draw_add_used_layer_size(layer_size_byte < 1024 ? 1 : layer_size_byte >> 10);
-
-        layer->buf = buf;
-
-        if(lv_color_format_has_alpha(layer->color_format)) {
-            layer->buffer_clear(layer, &layer->buf_area);
-        }
-    }
+    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(buf == NULL)
+        return -1;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_vglite_unit->base_unit.target_layer = layer;
@@ -273,7 +250,10 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
 
     /* Set target buffer */
     lv_layer_t * layer = draw_unit->target_layer;
-    vglite_set_dest_buf(layer->buf, &layer->buf_area, lv_area_get_width(&layer->buf_area), layer->color_format);
+    vglite_set_dest_buf(&layer->draw_buf);
+
+    /* Invalidate cache */
+    lv_draw_buf_invalidate_cache(&layer->draw_buf, (const char *)&t->area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:

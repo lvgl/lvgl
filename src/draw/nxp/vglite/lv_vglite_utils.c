@@ -21,8 +21,6 @@
 
 #include "../../../core/lv_refr.h"
 
-//temp for clean and invalidate data cache
-#include "lvgl_support.h"
 #if LV_USE_OS
     #include "vg_lite_gpu.h"
 #endif
@@ -38,11 +36,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-/**
- * Clean and invalidate cache.
- */
-static inline void invalidate_cache(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -78,8 +71,6 @@ void vglite_run(void)
         return;
     }
 #endif
-
-    invalidate_cache();
 
     /*
      * For multithreading version (with OS), we simply flush the command buffer
@@ -191,21 +182,89 @@ vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf)
     return vg_buffer_format;
 }
 
-bool vglite_buf_aligned(const uint8_t * src_buf, lv_coord_t src_stride)
+uint8_t vglite_get_px_size(lv_color_format_t cf)
 {
-    /* No alignment requirement for destination pixel buffer when using mode VG_LITE_LINEAR */
+    uint8_t bits_per_pixel = 32;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_I1:
+            bits_per_pixel = 1;
+            break;
+        case LV_COLOR_FORMAT_I2:
+            bits_per_pixel = 2;
+            break;
+        case LV_COLOR_FORMAT_I4:
+            bits_per_pixel = 4;
+            break;
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
+            bits_per_pixel = 8;
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            bits_per_pixel = 16;
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            bits_per_pixel = 32;
+            break;
+
+        default:
+            LV_ASSERT_MSG(false, "Unsupported buffer format.");
+            break;
+    }
+
+    return bits_per_pixel;
+}
+
+uint8_t vglite_get_alignment(lv_color_format_t cf)
+{
+    uint8_t align_bytes = 64;
+
+    switch(cf) {
+        case LV_COLOR_FORMAT_I1:
+        case LV_COLOR_FORMAT_I2:
+        case LV_COLOR_FORMAT_I4:
+            align_bytes = 8;
+            break;
+        case LV_COLOR_FORMAT_I8:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_L8:
+            align_bytes = 16;
+            break;
+        case LV_COLOR_FORMAT_RGB565:
+            align_bytes = 32;
+            break;
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            align_bytes = 64;
+            break;
+
+        default:
+            LV_ASSERT_MSG(false, "Unsupported buffer format.");
+            break;
+    }
+
+    return align_bytes;
+}
+
+bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
+{
+    uint8_t align_bytes = vglite_get_alignment(cf);
+
+    /* No alignment requirement for destination buffer when using mode VG_LITE_LINEAR */
 
     /* Test for pointer alignment */
-    if((((uintptr_t)src_buf) % (uintptr_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) != (uintptr_t)0x0U) {
+    if((uintptr_t)buf % align_bytes) {
         LV_LOG_ERROR("Buffer address (0x%x) not aligned to 0x%x bytes.",
-                     (size_t)src_buf, LV_ATTRIBUTE_MEM_ALIGN_SIZE);
+                     (size_t)buf, align_bytes);
         return false;
     }
 
     /* Test for stride alignment */
-    if((src_stride % (lv_coord_t)VGLITE_STRIDE_ALIGN_PX) != 0x0U) {
-        LV_LOG_ERROR("Buffer stride (%d px) not aligned to %d px.",
-                     src_stride, VGLITE_STRIDE_ALIGN_PX);
+    if(stride % align_bytes) {
+        LV_LOG_ERROR("Buffer stride (%d bytes) not aligned to %d bytes.",
+                     stride, align_bytes);
         return false;
     }
 
@@ -215,10 +274,5 @@ bool vglite_buf_aligned(const uint8_t * src_buf, lv_coord_t src_stride)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static inline void invalidate_cache(void)
-{
-    DEMO_CleanInvalidateCache();
-}
 
 #endif /*LV_USE_DRAW_VGLITE*/

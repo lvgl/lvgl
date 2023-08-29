@@ -107,15 +107,36 @@ vg_lite_blend_t vglite_get_blend_mode(lv_blend_mode_t lv_blend_mode);
 vg_lite_buffer_format_t vglite_get_buf_format(lv_color_format_t cf);
 
 /**
- * Check source memory and stride alignment.
+ * Get vglite buffer pixel size.
  *
- * @param[in] src_buf Source buffer
- * @param[in] src_stride Stride of source buffer in pixels
+ * @param[in] cf Color format
+ *
+ * @retval Bits per pixel
+ *
+ */
+uint8_t vglite_get_px_size(lv_color_format_t cf);
+
+/**
+ * Get vglite buffer alignment.
+ *
+ * @param[in] cf Color format
+ *
+ * @retval Alignment requirement in bytes
+ *
+ */
+uint8_t vglite_get_alignment(lv_color_format_t cf);
+
+/**
+ * Check memory and stride alignment.
+ *
+ * @param[in] buf Buffer address
+ * @param[in] stride Stride of buffer in bytes
+ * @param[in] cf Color format - to calculate the expected alignment
  *
  * @retval true Alignment OK
  *
  */
-bool vglite_buf_aligned(const uint8_t * src_buf, lv_coord_t src_stride);
+bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf);
 
 /**********************
  *      MACROS

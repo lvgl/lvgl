@@ -61,7 +61,7 @@ vg_lite_buffer_t * vglite_get_src_buf(void);
  * @param[in] buf Destination buffer address (does not require alignment for VG_LITE_LINEAR mode)
  *
  */
-void vglite_set_dest_buf_ptr(const uint8_t * buf);
+void vglite_set_dest_buf_ptr(void * buf);
 
 /**
  * Set vglite source buffer address only.
@@ -69,30 +69,27 @@ void vglite_set_dest_buf_ptr(const uint8_t * buf);
  * @param[in] buf Source buffer address
  *
  */
-void vglite_set_src_buf_ptr(const uint8_t * buf);
+void vglite_set_src_buf_ptr(const void * buf);
 
 /**
  * Set vglite target (destination) buffer.
  *
- * @param[in] buf Destination buffer address
- * @param[in] area Destination buffer area (for width and height)
- * @param[in] stride Destination buffer stride
- * @param[in] cf Destination buffer color format
+ * @param[in] draw_buf Destination draw buffer descriptor
  *
  */
-void vglite_set_dest_buf(const uint8_t * buf, const lv_area_t * area, lv_coord_t stride,
-                         lv_color_format_t cf);
+void vglite_set_dest_buf(const lv_draw_buf_t * draw_buf);
 
 /**
  * Set vglite source buffer.
  *
  * @param[in] buf Source buffer address
- * @param[in] area Source buffer area (for width and height)
- * @param[in] stride Source buffer stride
+ * @param[in] width Source buffer width
+ * @param[in] height Source buffer height
+ * @param[in] stride Source buffer stride in bytes
  * @param[in] cf Source buffer color format
  *
  */
-void vglite_set_src_buf(const uint8_t * buf, const lv_area_t * area, lv_coord_t stride,
+void vglite_set_src_buf(const void * buf, lv_coord_t width, lv_coord_t height, uint32_t stride,
                         lv_color_format_t cf);
 
 /**
@@ -100,14 +97,15 @@ void vglite_set_src_buf(const uint8_t * buf, const lv_area_t * area, lv_coord_t 
  *
  * @param[in] vgbuf Address of the VGLite buffer object
  * @param[in] buf Address of the memory for the VGLite buffer
- * @param[in] area Buffer area (for width and height)
- * @param[in] stride Buffer stride
- * @param[in] vgformat Buffer format
+ * @param[in] width Buffer width
+ * @param[in] height Buffer height
+ * @param[in] stride Buffer stride in bytes
+ * @param[in] cf Buffer color format
  *
  */
-void vglite_set_buf(vg_lite_buffer_t * vgbuf, const uint8_t * buf,
-                    const lv_area_t * area, lv_coord_t stride,
-                    vg_lite_buffer_format_t vgformat);
+void vglite_set_buf(vg_lite_buffer_t * vgbuf, void * buf,
+                    lv_coord_t width, lv_coord_t height, uint32_t stride,
+                    lv_color_format_t cf);
 
 /**********************
  *      MACROS

@@ -110,11 +110,11 @@ void lv_draw_vglite_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * ds
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    lv_point_t rel_center = {dsc->center.x - layer->buf_area.x1, dsc->center.y - layer->buf_area.y1};
+    lv_point_t rel_center = {dsc->center.x - layer->draw_buf_ofs.x, dsc->center.y - layer->draw_buf_ofs.y};
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     _vglite_draw_arc(&rel_center, &rel_clip_area, dsc);
 }

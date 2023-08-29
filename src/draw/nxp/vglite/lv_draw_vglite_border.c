@@ -88,11 +88,11 @@ void lv_draw_vglite_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_
     //rel_coords.y1 = coords->y1 - outline_pad - floor(dsc->outline_width / 2.0f);
     //rel_coords.y2 = coords->y2 + outline_pad + ceil(dsc->outline_width / 2.0f);
 
-    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&rel_coords, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     lv_area_t clipped_coords;
     if(!_lv_area_intersect(&clipped_coords, &rel_coords, &rel_clip_area))

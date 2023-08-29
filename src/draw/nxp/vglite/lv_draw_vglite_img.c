@@ -64,22 +64,22 @@
  *
  * @param dest_buf Destination buffer
  * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] dest_stride Stride of destination buffer in pixels
+ * @param[in] dest_stride Stride of destination buffer in bytes
  * @param[in] src_buf Source buffer
  * @param[in] src_area Source area with relative coordinates of source buffer
- * @param[in] src_stride Stride of source buffer in pixels
+ * @param[in] src_stride Stride of source buffer in bytes
  * @param[in] opa Opacity
  *
  */
-static void _vglite_blit_split(uint8_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
-                               const uint8_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
+static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride,
+                               const void * src_buf, lv_area_t * src_area, uint32_t src_stride,
                                lv_opa_t opa);
 #else
 /**
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
  * By default, image is copied directly, with optional opacity.
  *
- * @param[in] dest_stride Stride of destination buffer in pixels
+ * @param[in] dest_area Destination area
  * @param[in] src_area Source area with relative coordinates of source buffer
  * @param[in] opa Opacity
  *
@@ -123,11 +123,11 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * ds
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&rel_coords, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     lv_area_t blend_area;
     bool has_transform = dsc->angle != 0 || dsc->zoom != LV_ZOOM_NONE;
@@ -136,22 +136,23 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * ds
     else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
         return; /*Fully clipped, nothing to do*/
 
-    const uint8_t * src_buf = img_dsc->data;
+    const void * src_buf = img_dsc->data;
 
     lv_area_t src_area;
-    src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area.x1);
-    src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area.y1);
+    src_area.x1 = blend_area.x1 - (coords->x1 - layer->draw_buf_ofs.x);
+    src_area.y1 = blend_area.y1 - (coords->y1 - layer->draw_buf_ofs.y);
     src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
     src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
-    lv_coord_t src_stride = lv_area_get_width(coords);
+
+    lv_color_format_t cf = img_dsc->header.cf;
+    uint32_t src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(coords), cf);
 
     /* Set src_vgbuf structure. */
-    lv_color_format_t cf = img_dsc->header.cf;
-    vglite_set_src_buf(src_buf, &src_area, src_stride, cf);
+    vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, cf);
 
 #if VGLITE_BLIT_SPLIT_ENABLED
-    uint8_t * dest_buf = layer->buf;
-    lv_coord_t dest_stride = lv_area_get_width(&layer->buf_area);
+    void * dest_buf = lv_draw_buf_get_buf(&layer->draw_buf);
+    uint32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
 
     if(!has_transform)
         _vglite_blit_split(dest_buf, &blend_area, dest_stride,
@@ -219,7 +220,7 @@ static void _vglite_blit_single(const lv_area_t * src_area, lv_opa_t opa)
  */
 static void _align_x(lv_area_t * area, uint8_t ** buf)
 {
-    int alignedAreaStartPx = area->x1 - (area->x1 % (LV_ATTRIBUTE_MEM_ALIGN_SIZE / sizeof(lv_color_t))); //fixme
+    int alignedAreaStartPx = area->x1 - (area->x1 % (LV_DRAW_BUF_ALIGN / sizeof(lv_color_t))); // FIXME
     LV_ASSERT_MSG(alignedAreaStartPx < 0, "Negative X alignment.");
 
     area->x1 -= alignedAreaStartPx;
@@ -231,17 +232,17 @@ static void _align_x(lv_area_t * area, uint8_t ** buf)
  * Move buffer pointer to the area start and update variables, Y-axis only.
  *
  */
-static void _align_y(lv_area_t * area, uint8_t ** buf, lv_coord_t stride)
+static void _align_y(lv_area_t * area, uint8_t ** buf, uint32_t stride) // FIXME
 {
     int LineToAlignMem;
     int alignedAreaStartPy;
     /* find how many lines of pixels will respect memory alignment requirement */
-    if((stride % (lv_coord_t)LV_ATTRIBUTE_MEM_ALIGN_SIZE) == 0x0U) {
+    if((stride % (uint32_t)LV_DRAW_BUF_ALIGN) == 0x0U) {
         alignedAreaStartPy = area->y1;
     }
     else {
-        LineToAlignMem = LV_ATTRIBUTE_MEM_ALIGN_SIZE / (VGLITE_STRIDE_ALIGN_PX * sizeof(lv_color_t));
-        LV_ASSERT_MSG(LV_ATTRIBUTE_MEM_ALIGN_SIZE % (VGLITE_STRIDE_ALIGN_PX * sizeof(lv_color_t)),
+        LineToAlignMem = LV_DRAW_BUF_ALIGN / LV_DRAW_BUF_STRIDE_ALIGN;
+        LV_ASSERT_MSG(LV_DRAW_BUF_ALIGN % LV_DRAW_BUF_STRIDE_ALIGN,
                       "Complex case: need gcd function.");
         alignedAreaStartPy = area->y1 - (area->y1 % LineToAlignMem);
         LV_ASSERT_MSG(alignedAreaStartPy < 0, "Negative Y alignment.");
@@ -252,8 +253,8 @@ static void _align_y(lv_area_t * area, uint8_t ** buf, lv_coord_t stride)
     *buf += (uint32_t)(alignedAreaStartPy * stride);
 }
 
-static void _vglite_blit_split(uint8_t * dest_buf, lv_area_t * dest_area, lv_coord_t dest_stride,
-                               const uint8_t * src_buf, lv_area_t * src_area, lv_coord_t src_stride,
+static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride,
+                               const void * src_buf, lv_area_t * src_area, uint32_t src_stride,
                                lv_opa_t opa)
 {
     VGLITE_TRACE("Blit "
@@ -269,8 +270,8 @@ static void _vglite_blit_split(uint8_t * dest_buf, lv_area_t * dest_area, lv_coo
     /* Stage 1: Move starting pointers as close as possible to [x1, y1], so coordinates are as small as possible. */
     _align_x(src_area, (uint8_t **)&src_buf);
     _align_y(src_area, (uint8_t **)&src_buf, src_stride);
-    _align_x(dest_area, &dest_buf);
-    _align_y(dest_area, &dest_buf, dest_stride);
+    _align_x(dest_area, (uint8_t **)&dest_buf);
+    _align_y(dest_area, (uint8_t **)&dest_buf, dest_stride);
 
     /* Stage 2: If we're in limit, do a single BLIT */
     if((src_area->x2 < VGLITE_BLIT_SPLIT_THR) &&
@@ -343,12 +344,12 @@ static void _vglite_blit_split(uint8_t * dest_buf, lv_area_t * dest_area, lv_coo
         if(tile_src_area.y2 >= VGLITE_BLIT_SPLIT_THR) {
             tile_src_area.y2 = VGLITE_BLIT_SPLIT_THR - 1; /* Should never happen */
         }
-        tile_src_buf = src_buf + y * VGLITE_BLIT_SPLIT_THR * src_stride;
+        tile_src_buf = (uint8_t *)src_buf + y * VGLITE_BLIT_SPLIT_THR * src_stride;
 
         tile_dest_area.y1 = tile_src_area.y1; /* y has no alignment, always in sync with src */
         tile_dest_area.y2 = tile_src_area.y2;
 
-        tile_dest_buf = dest_buf + y * VGLITE_BLIT_SPLIT_THR * dest_stride;
+        tile_dest_buf = (uint8_t *)dest_buf + y * VGLITE_BLIT_SPLIT_THR * dest_stride;
 
         for(int x = 0; x < total_tiles_x; x++) {
 
