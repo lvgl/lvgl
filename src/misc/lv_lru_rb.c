@@ -145,7 +145,9 @@ void* lv_lru_rb_get(lv_lru_rb_t* lru, const void* key, void* user_data)
     lv_rb_node_t* node = lv_rb_find(&lru->rb, key);
     // cache hit
     if (node) {
-        // TODO: use lv_ll_move_to_head
+        void* lru_node = *((void**)((char*)node->data - sizeof(void*)));
+        void* head = _lv_ll_get_head(&lru->lru_ll);
+        _lv_ll_move_before(&lru->lru_ll, lru_node, head);
         return node->data;
     }
 
@@ -155,7 +157,7 @@ void* lv_lru_rb_get(lv_lru_rb_t* lru, const void* key, void* user_data)
         return NULL;
     }
 
-    // TODO: RETURN THE NEW NODE
+    lru->size++;
     return new_node->data;
 }
 
@@ -223,7 +225,7 @@ static void* alloc_new_node(lv_lru_rb_t* lru, void* key, void* user_data)
         return NULL;
     }
 
-    lv_memzero(node->data, lru->rb.size);
+    lv_memcpy(node->data, key, lru->rb.size - sizeof(void*));
 
     bool alloc_res = lru->alloc_cb(node->data, user_data);
     if (alloc_res == false) {
