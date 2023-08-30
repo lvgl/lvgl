@@ -1,5 +1,7 @@
 # Calendar (lv_calendar)
 
+**From v8.1 the header is added directly into the Calendar widget and the API of the headers has been changed.**
+
 ## Overview
 
 The Calendar object is a classic calendar which can:
@@ -13,13 +15,16 @@ The Calendar is added to the default group (if it is set). Calendar is an editab
 To make the Calendar flexible, by default it doesn't show the current year or month. Instead, there are optional "headers" that can be attached to the calendar.
 
 ## Parts and Styles
-The calendar object uses the [Button matrix](/widgets/core/btnmatrix) object under the hood to arrange the days into a matrix.
-- `LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.
-- `LV_PART_ITEMS` Refers to the dates and day names. Button matrix control flags are set to differentiate the buttons and a custom drawer event is added modify the properties of the buttons as follows:
-   - day names have no border, no background and drawn with a gray color
-   - days of the previous and next month have `LV_BTNMATRIX_CTRL_DISABLED` flag
-   - today has a thicker border with the theme's primary color
-   - highlighted days have some opacity with the theme's primary color.
+The Calendar is composed of 3 widegets
+- Container: A rectangle which is a container for the *Header* and the *Days*. Uses only `LV_PART_MAIN` where all the background related style properties are working.
+- Days: It's a [Button matrix](/widgets/core/btnmatrix) object under the hood to arrange the days into a matrix. `lv_calendar_get_btnmatrix(calendar)` can be used to get it.
+    - `LV_PART_MAIN` The background of the calendar. Uses all the background related style properties.
+    - `LV_PART_ITEMS` Refers to the dates and day names. Button matrix control flags are set to differentiate the buttons and a custom drawer event is added modify the properties of the buttons as follows:
+       - day names have no border, no background and drawn with a gray color
+       - days of the previous and next month have `LV_BTNMATRIX_CTRL_DISABLED` flag
+       - today has a thicker border with the theme's primary color
+       - highlighted days have some opacity with the theme's primary color.
+- Header: Not created by default, the details are up to the given header.
 
 ## Usage
 
@@ -52,8 +57,6 @@ Learn more about [Events](/overview/event).
 Learn more about [Keys](/overview/indev).
 
 ## Headers
-
-**From v8.1 the header is added directly into the Calendar widget and the API of the headers has been changed.**
 
 ### Arrow buttons
 
