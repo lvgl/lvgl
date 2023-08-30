@@ -109,7 +109,7 @@ typedef struct _lv_global_t {
     _lv_img_cache_entry_t img_cache_single;
 #endif
 
-    lv_draw_cache_t draw_cache;
+    lv_draw_global_info_t draw_info;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
