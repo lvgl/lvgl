@@ -797,6 +797,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
 
+    /* Main line style */
+    lv_draw_line_dsc_t main_line_dsc;
+    lv_draw_line_dsc_init(&main_line_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
+
     lv_coord_t minor_len = 0;
     lv_coord_t major_len = 0;
 
@@ -809,11 +814,6 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
 
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
-
-        /* Main line style */
-        lv_draw_line_dsc_t main_line_dsc;
-        lv_draw_line_dsc_init(&main_line_dsc);
-        lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &main_line_dsc);
 
         /* Get style properties so they can be used in the tick and label drawing */
         const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
@@ -906,25 +906,29 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         center_point.x = scale_area.x1 + radius_edge;
         center_point.y = scale_area.y1 + radius_edge;
 
-        lv_coord_t radius = 0;
-        if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
-            radius = radius_edge - (is_major_tick ? major_len : minor_len);
-        }
-        else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode) {
-            radius = radius_edge + (is_major_tick ? major_len : minor_len);
-        }
-        else { /* Nothing to do */ }
-
         int32_t angle_upscale = ((tick_idx * scale->angle_range) * 10U) / (scale->total_tick_count);
         angle_upscale += scale->rotation * 10U;
 
-        /*Draw a little bit longer lines to be sure the mask will clip them correctly
-         *and to get a better precision*/
-        tick_point_a->x = center_point.x + radius_edge;
+        /* Draw a little bit longer lines to be sure the mask will clip them correctly
+         * and to get a better precision. Adding the main line width to the calculation so we don't have gaps
+         * between the arc and the ticks */
+        lv_coord_t point_closer_to_arc = 0;
+        lv_coord_t adjusted_radio_with_tick_len = 0;
+        if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+            point_closer_to_arc = radius_edge - main_line_dsc.width;
+            adjusted_radio_with_tick_len = point_closer_to_arc - (is_major_tick ? major_len : minor_len);
+        }
+        else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode) {
+            point_closer_to_arc = radius_edge - main_line_dsc.width;
+            adjusted_radio_with_tick_len = point_closer_to_arc + (is_major_tick ? major_len : minor_len);
+        }
+        else { /* Nothing to do */ }
+
+        tick_point_a->x = center_point.x + point_closer_to_arc;
         tick_point_a->y = center_point.y;
         lv_point_transform(tick_point_a, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
 
-        tick_point_b->x = center_point.x + radius;
+        tick_point_b->x = center_point.x + adjusted_radio_with_tick_len;
         tick_point_b->y = center_point.y;
         lv_point_transform(tick_point_b, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
     }
