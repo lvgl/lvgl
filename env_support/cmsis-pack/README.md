@@ -168,6 +168,8 @@ Make sure `LV_MEM_SIZE` is no less than `(64*1024U)`.
 
     - LV_USE_LINUX_FBDEV
 
+    - LV_USE_NUTTX_FBDEV
+
     - LV_USE_LINUX_DRM
 
     - LV_USE_TFT_ESPI
