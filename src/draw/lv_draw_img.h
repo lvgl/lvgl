@@ -40,6 +40,8 @@ typedef struct _lv_draw_img_dsc_t {
     lv_draw_dsc_base_t base;
 
     const void * src;
+    lv_img_header_t header;
+
 
     lv_coord_t angle;
     lv_coord_t zoom;
