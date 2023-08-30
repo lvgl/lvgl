@@ -658,11 +658,26 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
     }
 
     struct _my_theme_t * theme = theme_def;
-    if(LV_HOR_RES <= 320) theme->disp_size = DISP_SMALL;
-    else if(LV_HOR_RES < 720) theme->disp_size = DISP_MEDIUM;
-    else theme->disp_size = DISP_LARGE;
+    lv_coord_t hor_res = lv_disp_get_hor_res(disp);
+    disp_size_t new_disp_size;
 
-    theme->base.disp = disp;
+    if(hor_res <= 320) new_disp_size = DISP_SMALL;
+    else if(hor_res < 720) new_disp_size = DISP_MEDIUM;
+    else new_disp_size = DISP_LARGE;
+
+    /* check theme information whether will change or not*/
+    if(theme->inited && (theme->base.disp == disp || lv_disp_get_dpi(theme->base.disp) == lv_disp_get_dpi(disp)) &&
+       theme->disp_size == new_disp_size &&
+       lv_color_eq(theme->base.color_primary, color_primary) &&
+       lv_color_eq(theme->base.color_secondary, color_secondary) &&
+       theme->base.flags == dark ? MODE_DARK : 0 &&
+       theme->base.font_small == font) {
+        return (lv_theme_t *) theme;
+
+    }
+
+    theme->disp_size = new_disp_size;
+    theme->base.disp = disp == NULL ? lv_disp_get_default() : disp;
     theme->base.color_primary = color_primary;
     theme->base.color_secondary = color_secondary;
     theme->base.font_small = font;
