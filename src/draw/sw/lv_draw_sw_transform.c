@@ -273,7 +273,7 @@ static void argb_and_rgb_aa(const uint8_t * src, lv_coord_t src_w, lv_coord_t sr
     int32_t ys_ups_start = ys_ups;
     bool has_alpha;
     int32_t px_size;
-    lv_color_t ck = {0};
+    lv_color_t ck = _LV_COLOR_ZERO_INITIALIZER;
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR:
             has_alpha = false;

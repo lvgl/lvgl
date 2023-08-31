@@ -1,6 +1,14 @@
 # Changelog
 
 
+## [v8.3.10](https://github.com/lvgl/lvgl/compare/v8.3.10...v8.3.9) Date TBD
+
+
+### Fixes
+
+- fix(draw): fix compiler error in lv_draw_sw_transform.c [`?`](https://github.com/lvgl/lvgl/pull/?)
+
+
 ## [v8.3.9](https://github.com/lvgl/lvgl/compare/v8.3.9...v8.3.8) 6 August 2023
 
 
