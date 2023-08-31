@@ -144,6 +144,8 @@ void test_bar_normal(void)
     lv_coord_t w_gap = 20;
     lv_coord_t y = h_gap;
     lv_coord_t x = w_gap;
+    lv_color_t bg_color = lv_color_black();
+    lv_color_t indic_color = lv_color_hex(0x0000FF);
 
     lv_obj_t* screen = lv_obj_create(lv_scr_act());
     lv_obj_remove_style_all(screen);
@@ -157,8 +159,8 @@ void test_bar_normal(void)
     lv_obj_set_style_radius(test_bar, 100, 0);
     lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
     lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_black(), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_hex(0x0000FF), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
     lv_bar_set_range(test_bar, 0, 100);
     lv_bar_set_value(test_bar, 30, LV_ANIM_OFF);
     lv_obj_set_size(test_bar, w, h);
@@ -169,8 +171,8 @@ void test_bar_normal(void)
     lv_obj_set_style_radius(test_bar, 100, 0);
     lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
     lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_black(), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_hex(0x0000FF), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
     lv_bar_set_range(test_bar, 0, 100);
     lv_bar_set_value(test_bar, 30, LV_ANIM_OFF);
     lv_obj_set_size(test_bar, w, h);
@@ -183,8 +185,8 @@ void test_bar_normal(void)
     lv_obj_set_style_radius(test_bar, 100, 0);
     lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
     lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_black(), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_hex(0x0000FF), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
     lv_bar_set_range(test_bar, 0, 100);
     lv_bar_set_value(test_bar, 30, LV_ANIM_OFF);
     lv_obj_set_size(test_bar, h, w);
@@ -195,8 +197,8 @@ void test_bar_normal(void)
     lv_obj_set_style_radius(test_bar, 100, 0);
     lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
     lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_black(), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(test_bar, lv_color_hex(0x0000FF), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(test_bar, bg_color, LV_PART_MAIN);
+    lv_obj_set_style_bg_color(test_bar, indic_color, LV_PART_INDICATOR);
     lv_bar_set_range(test_bar, 0, 100);
     lv_bar_set_value(test_bar, 30, LV_ANIM_OFF);
     lv_obj_set_size(test_bar, h, w);
