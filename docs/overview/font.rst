@@ -287,6 +287,35 @@ Example
    /*Free the font if not required anymore*/
    lv_font_free(my_font);
 
+Load a font from a memory buffer at run-time
+******************************************
+
+:cpp:func:`lv_font_load_from_buffer` can be used to load a font from a memory buffer.
+This function may be useful to load a font from an external file system, which is not
+supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
+
+:note: To load a font from a buffer `LVGL's filesystem </overview/file-system>`__
+       needs to be enabled and the MEMFS driver must be added.
+
+Example
+
+.. code:: c
+
+   lv_font_t * my_font;
+   uint8_t *buf;
+   uint32_t bufsize;
+
+   /*Read font file into the buffer from the external file system*/
+   ...
+
+   /*Load font from the buffer*/
+   my_font = lv_font_load_from_buffer((void *)buf, buf));
+
+   /*Use the font*/
+
+   /*Free the font if not required anymore*/
+   lv_font_free(my_font);
+
 Add a new font engine
 *********************
 
