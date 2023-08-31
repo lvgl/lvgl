@@ -131,6 +131,7 @@ static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
     lv_img_dsc_t img;
     img.header.w = 180;
     img.header.h = 180;
+    img.header.stride = 0;
     img.header.always_zero = 0;
     img.data = canvas_buf;
 
