@@ -71,6 +71,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.header.cf = cf;
     canvas->dsc.header.w  = w;
     canvas->dsc.header.h  = h;
+    canvas->dsc.header.stride  = 0; /*Let LVGL calculate it automatically*/
     canvas->dsc.data      = buf;
     canvas->dsc.data_size = w * h * lv_color_format_get_size(cf);
 

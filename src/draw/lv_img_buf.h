@@ -71,6 +71,7 @@ typedef struct {
 
     uint32_t w: 16;
     uint32_t h: 16;
+    uint32_t stride: 16;    /*Number of bytes in a row*/
 } lv_img_header_t;
 #endif
 

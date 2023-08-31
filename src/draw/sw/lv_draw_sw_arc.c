@@ -135,7 +135,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_dsc.src_area = &img_area;
         blend_dsc.src_buf = decoder_dsc.img_data;
         blend_dsc.src_color_format = decoder_dsc.header.cf;
-        blend_dsc.src_stride = decoder_dsc.header.cf;
+        blend_dsc.src_stride = decoder_dsc.header.stride;
     }
 
 
@@ -172,8 +172,20 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_dsc.mask_res = lv_draw_sw_mask_apply(mask_list, mask_buf, blend_area.x1, blend_area.y1, blend_w);
 
         if(dsc->rounded) {
-            add_circle(circle_mask, &blend_area, &round_area_1, mask_buf, width);
-            add_circle(circle_mask, &blend_area, &round_area_2, mask_buf, width);
+            if(blend_area.y1 >= round_area_1.y1 && blend_area.y1 <= round_area_1.y2) {
+                if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
+                    lv_memset(mask_buf, 0x00, blend_w);
+                    blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+                }
+                add_circle(circle_mask, &blend_area, &round_area_1, mask_buf, width);
+            }
+            if(blend_area.y1 >= round_area_2.y1 && blend_area.y1 <= round_area_2.y2) {
+                if(blend_dsc.mask_res == LV_DRAW_SW_MASK_RES_TRANSP) {
+                    lv_memset(mask_buf, 0x00, blend_w);
+                    blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
+                }
+                add_circle(circle_mask, &blend_area, &round_area_2, mask_buf, width);
+            }
         }
 
         lv_draw_sw_blend(draw_unit, &blend_dsc);

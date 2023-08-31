@@ -92,7 +92,12 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
     _LV_LL_READ(img_decoder_ll_p, d) {
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
-            if(res == LV_RES_OK) break;
+            if(res == LV_RES_OK) {
+                if(header->stride == 0) {
+                    header->stride = header->w * lv_color_format_get_size(header->cf);
+                }
+                break;
+            }
         }
     }
 
@@ -137,6 +142,10 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
 
         res = decoder->info_cb(decoder, src, &dsc->header);
         if(res != LV_RES_OK) continue;
+
+        if(dsc->header.stride == 0) {
+            dsc->header.stride = dsc->header.w * lv_color_format_get_size(dsc->header.cf);
+        }
 
         dsc->decoder = decoder;
         res = decoder->open_cb(decoder, dsc);
@@ -274,6 +283,7 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
         header->w  = ((lv_img_dsc_t *)src)->header.w;
         header->h  = ((lv_img_dsc_t *)src)->header.h;
         header->cf = ((lv_img_dsc_t *)src)->header.cf;
+        header->stride = ((lv_img_dsc_t *)src)->header.stride;
     }
     else if(src_type == LV_IMG_SRC_FILE) {
         /*Support only "*.bin" files*/
@@ -375,6 +385,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             dsc->img_data = lv_malloc(sizeof(lv_color32_t) * img_dsc->header.w *  img_dsc->header.h);
             dsc->palette = (const lv_color32_t *)img_dsc->data;
             dsc->header.cf = LV_COLOR_FORMAT_ARGB8888;
+            dsc->header.stride = dsc->header.w * 4;
 
             uint32_t y;
             for(y = 0; y < img_dsc->header.h; y++) {

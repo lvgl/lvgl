@@ -13,7 +13,6 @@
  *********************/
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -69,14 +68,12 @@ bool lv_test_assert_img_eq(const char * fn_ref)
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
-    uint8_t * screen_buf;
 
-    lv_obj_invalidate(lv_scr_act());
+    //lv_obj_invalidate(lv_scr_act());
     lv_refr_now(NULL);
 
-    extern lv_color32_t test_fb[];
-
-    screen_buf = (uint8_t *)test_fb;
+    extern uint8_t * last_flushed_buf;
+    uint8_t * screen_buf = last_flushed_buf;
 
     png_img_t p;
     int res = read_png_file(&p, fn_ref_full);
