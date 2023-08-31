@@ -67,7 +67,7 @@ The Alpha channel of 32-bit colors will be 0 where there are no objects and 255 
 
 In summary, to enable transparent screens and displays for OSD menu-like UIs:
 - Enable `LV_COLOR_SCREEN_TRANSP` in `lv_conf.h`
-- Set the screen's opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP)`
+- Set the screen's opacity to `LV_OPA_TRANSP` e.g. with `lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_TRANSP, LV_PART_MAIN)`
 - Set the display opacity to `LV_OPA_TRANSP` with `lv_disp_set_bg_opa(NULL, LV_OPA_TRANSP);`
 
 ## Features of displays
