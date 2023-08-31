@@ -136,22 +136,6 @@ void test_bar_rtl_should_update_indicator_left_coordinate_based_on_bar_value(voi
     TEST_ASSERT_EQUAL_INT32(expected_coord, actual_coord);
 }
 
-/*
- * Bar has two parts, main and indicator, coordinates of the latter are
- * calculated based on:
- * - Bar size
- * - Bar (main part) padding
- * - Bar value
- * - Bar coordinates
- * - Bar base direction
- * See Boxing model in docs for reference.
- *
- * Bar properties assumed:
- * - mode: LV_BAR_MODE_NORMAL
- * - min value: 0
- * - max value: 100
- * - base direction: LTR
- */
 void test_bar_normal(void)
 {
     lv_coord_t w = 300;
