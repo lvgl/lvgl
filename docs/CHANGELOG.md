@@ -37,6 +37,14 @@
 - chore: code formatting [`eb87767`](https://github.com/lvgl/lvgl/commit/eb87767cc65fec93f9cc4f87a1f8fb5b32f7e41d)
 
 
+## [v8.3.10](https://github.com/lvgl/lvgl/compare/v8.3.10...v8.3.9) Date TBD
+
+
+### Fixes
+
+- fix(draw): fix compiler error in lv_draw_sw_transform.c [`?`](https://github.com/lvgl/lvgl/pull/?)
+
+
 ## [v8.3.9](https://github.com/lvgl/lvgl/compare/v8.3.9...v8.3.8) 6 August 2023
 
 
