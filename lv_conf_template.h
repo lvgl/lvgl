@@ -75,18 +75,11 @@
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
-/* Select a draw buffer implementation. Possible values:
- * - LV_DRAW_BUF_BASIC:     LVGL's built in implementation
- * - LV_DRAW_BUF_CUSTOM:    Implement the function of lv_draw_buf.h externally
- */
-#define LV_USE_DRAW_BUF    LV_DRAW_BUF_BASIC
 
-#if LV_USE_DRAW_BUF == LV_DRAW_BUF_BASIC
-    /*Align the stride of all layers and images to this bytes*/
-    #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
-    /*Align the start address of draw_buf addresses to this bytes*/
-    #define LV_DRAW_BUF_ALIGN                       4
-#endif
+/*Align the stride of all layers and images to this bytes*/
+#define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
+/*Align the start address of draw_buf addresses to this bytes*/
+#define LV_DRAW_BUF_ALIGN                       4
 
 /*Align the stride of all layers and images to this bytes*/
 #define LV_DRAW_BUF_STRIDE_ALIGN                1
@@ -478,6 +471,8 @@
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
 
+#define LV_USE_SCALE      1
+
 #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
 
 #define LV_USE_SPAN       1
@@ -574,6 +569,12 @@
 #if LV_USE_FS_FATFS
     #define LV_FS_FATFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for memory-mapped file access. */
+#define LV_USE_FS_MEMFS 0
+#if LV_USE_FS_MEMFS
+    #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
 #endif
 
 /*PNG decoder library*/

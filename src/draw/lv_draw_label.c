@@ -85,8 +85,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(lv_layer_t * layer, const lv_draw_label
     /*The text is stored in a local variable so malloc memory for it*/
     if(dsc->text_local) {
         lv_draw_label_dsc_t * new_dsc = t->draw_dsc;
-        new_dsc->text = lv_malloc(lv_strlen(new_dsc->text) + 1);
-        lv_strcpy((char *)new_dsc->text, dsc->text);
+        new_dsc->text = lv_strdup(dsc->text);
     }
 
     lv_draw_finalize_task_creation(layer, t);
@@ -394,7 +393,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
         return;
     }
 
-    uint32_t bitmap_size = g.box_w * g.box_h;
+    uint32_t bitmap_size = lv_draw_buf_width_to_stride(g.box_w, LV_COLOR_FORMAT_A8) * g.box_h;
     if(dsc->_bitmap_buf_size < bitmap_size) {
         dsc->bitmap_buf = lv_realloc(dsc->bitmap_buf, bitmap_size);
         LV_ASSERT_MALLOC(dsc->bitmap_buf);

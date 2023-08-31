@@ -165,6 +165,7 @@ void create_test_screen(lv_color_format_t render_cf, const char * name)
     img.header.cf = render_cf;
     img.header.w = 100;
     img.header.h = 100;
+    img.header.stride = 100 * lv_color_format_get_size(render_cf);
     img.header.always_zero = 0;
 
     lv_draw_img_dsc_t img_dsc;

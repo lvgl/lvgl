@@ -112,6 +112,7 @@ void _lv_sdl_mouse_handler(SDL_Event * event)
 
     if(indev == NULL) return;
     lv_sdl_mouse_t * indev_dev = lv_indev_get_driver_data(indev);
+    if(indev_dev == NULL) return;
 
     lv_coord_t hor_res = lv_disp_get_hor_res(disp);
     lv_coord_t ver_res = lv_disp_get_ver_res(disp);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file test_font_loader.c
  *
  */
@@ -9,6 +9,7 @@
 
 #if LV_BUILD_TEST
 #include "../../lvgl.h"
+//#include "lvgl.h"
 
 #include "unity/unity.h"
 
@@ -25,7 +26,9 @@
  **********************/
 
 static int compare_fonts(lv_font_t * f1, lv_font_t * f2);
-void test_font_loader(void);
+void test_font_loader_with_cache(void);
+void test_font_loader_no_cache(void);
+void test_font_loader_from_buffer(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -39,37 +42,88 @@ void test_font_loader(void);
  *   GLOBAL FUNCTIONS
  **********************/
 
+/* fonts converted to C structs using the LVGL Font Converter */
 extern lv_font_t font_1;
 extern lv_font_t font_2;
 extern lv_font_t font_3;
 
-void test_font_loader(void)
-{
-    /*Test with cache ('A' has cache)*/
-    lv_font_t * font_1_bin = lv_font_load("A:src/test_assets/font_1.fnt");
-    lv_font_t * font_2_bin = lv_font_load("A:src/test_assets/font_2.fnt");
-    lv_font_t * font_3_bin = lv_font_load("A:src/test_assets/font_3.fnt");
+/* font binaries converted to plain C arrays */
+extern uint8_t const font_1_buf[6876];
+extern uint8_t const font_2_buf[7252];
+extern uint8_t const font_3_buf[4892];
 
-    compare_fonts(&font_1, font_1_bin);
-    compare_fonts(&font_2, font_2_bin);
-    compare_fonts(&font_3, font_3_bin);
+static lv_font_t * font_1_bin;
+static lv_font_t * font_2_bin;
+static lv_font_t * font_3_bin;
+
+void setUp(void)
+{
+    /* Function run before every test */
+}
+
+void tearDown(void)
+{
+    /* Function run after every test */
+    lv_obj_clean(lv_scr_act());
 
     lv_font_free(font_1_bin);
     lv_font_free(font_2_bin);
     lv_font_free(font_3_bin);
+}
 
-    /*Test with cache ('B' has NO cache)*/
+static void common(void)
+{
+    compare_fonts(&font_1, font_1_bin);
+    compare_fonts(&font_2, font_2_bin);
+    compare_fonts(&font_3, font_3_bin);
+
+    /* create labels for testing */
+    lv_obj_t * scr = lv_scr_act();
+    lv_obj_t * label1 = lv_label_create(scr);
+    lv_obj_t * label2 = lv_label_create(scr);
+    lv_obj_t * label3 = lv_label_create(scr);
+
+    lv_obj_set_flex_flow(scr, LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_align(scr, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    lv_label_set_text(label1, "The quick brown fox jumped over the lazy dog");
+    lv_obj_set_style_text_font(label1, font_1_bin, 0);
+    lv_label_set_text(label2, "The quick brown fox jumped over the lazy dog");
+    lv_obj_set_style_text_font(label2, font_2_bin, 0);
+    lv_label_set_text(label3, "The quick brown fox jumped over the lazy dog");
+    lv_obj_set_style_text_font(label3, font_3_bin, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("font_loader_1.png");
+}
+
+void test_font_loader_with_cache(void)
+{
+    /*Test with cache ('A' has cache)*/
+    font_1_bin = lv_font_load("A:src/test_assets/font_1.fnt");
+    font_2_bin = lv_font_load("A:src/test_assets/font_2.fnt");
+    font_3_bin = lv_font_load("A:src/test_assets/font_3.fnt");
+
+    common();
+}
+
+void test_font_loader_no_cache(void)
+{
+    /*Test without cache ('B' has NO cache)*/
     font_1_bin = lv_font_load("B:src/test_assets/font_1.fnt");
     font_2_bin = lv_font_load("B:src/test_assets/font_2.fnt");
     font_3_bin = lv_font_load("B:src/test_assets/font_3.fnt");
 
-    compare_fonts(&font_1, font_1_bin);
-    compare_fonts(&font_2, font_2_bin);
-    compare_fonts(&font_3, font_3_bin);
+    common();
+}
 
-    lv_font_free(font_1_bin);
-    lv_font_free(font_2_bin);
-    lv_font_free(font_3_bin);
+void test_font_loader_from_buffer(void)
+{
+    /*Test with memfs*/
+    font_1_bin = lv_font_load_from_buffer((void *)&font_1_buf, sizeof(font_1_buf));
+    font_2_bin = lv_font_load_from_buffer((void *)&font_2_buf, sizeof(font_2_buf));
+    font_3_bin = lv_font_load_from_buffer((void *)&font_3_buf, sizeof(font_3_buf));
+
+    common();
 }
 
 static int compare_fonts(lv_font_t * f1, lv_font_t * f2)

@@ -178,7 +178,7 @@ void lv_span_set_text(lv_span_t * span, const char * text)
     if(span->txt == NULL) return;
 
     span->static_flag = 0;
-    lv_strcpy(span->txt, text);
+    lv_memcpy(span->txt, text, text_alloc_len);
 
     refresh_self_size(span->spangroup);
 }
@@ -924,7 +924,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
                     last_snippet->txt_w = lv_txt_get_width(last_snippet->txt, last_snippet->bytes, last_snippet->font,
                                                            last_snippet->letter_space);
                 }
-                ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS ? true : false;
+                ellipsis_valid = spans->overflow == LV_SPAN_OVERFLOW_ELLIPSIS;
                 is_end_line = true;
             }
         }

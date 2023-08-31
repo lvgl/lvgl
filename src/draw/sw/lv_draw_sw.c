@@ -17,6 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define DRAW_UNIT_ID_SW     1
 
 /**********************
  *      TYPEDEFS
@@ -59,7 +60,7 @@ void lv_draw_sw_init(void)
     uint32_t i;
     for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
         lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
-        draw_sw_unit->base_unit.dispatch = lv_draw_sw_dispatch;
+        draw_sw_unit->base_unit.dispatch_cb = lv_draw_sw_dispatch;
         draw_sw_unit->idx = i;
 
 #if LV_USE_OS
@@ -80,26 +81,12 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     if(draw_sw_unit->task_act) return 0;
 
     lv_draw_task_t * t = NULL;
-    t = lv_draw_get_next_available_task(layer, NULL);
+    t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SW);
     if(t == NULL) return -1;
 
-    /*If the buffer of the layer is not allocated yet, allocate it now*/
-    if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
-        uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
-                                                                                        layer->draw_buf.color_format);
+    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(buf == NULL) return -1;
 
-        lv_draw_buf_malloc(&layer->draw_buf);
-        if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
-            LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
-            return -1;
-        }
-        LV_ASSERT_MALLOC(layer->draw_buf.buf);
-        lv_draw_add_used_layer_size(layer_size_byte < 1024 ? 1 : layer_size_byte >> 10);
-
-        if(lv_color_format_has_alpha(layer->draw_buf.color_format)) {
-            lv_draw_buf_clear(&layer->draw_buf, NULL);
-        }
-    }
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_sw_unit->base_unit.target_layer = layer;

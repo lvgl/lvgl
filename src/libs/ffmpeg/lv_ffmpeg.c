@@ -337,7 +337,7 @@ static bool ffmpeg_pix_fmt_has_alpha(enum AVPixelFormat pix_fmt)
         return true;
     }
 
-    return (desc->flags & AV_PIX_FMT_FLAG_ALPHA) ? true : false;
+    return desc->flags & AV_PIX_FMT_FLAG_ALPHA;
 }
 
 static bool ffmpeg_pix_fmt_is_yuv(enum AVPixelFormat pix_fmt)

@@ -115,6 +115,12 @@ void lv_example_roller_1(void);
 void lv_example_roller_2(void);
 //void lv_example_roller_3(void);
 
+void lv_example_scale_1(void);
+void lv_example_scale_2(void);
+void lv_example_scale_3(void);
+void lv_example_scale_4(void);
+void lv_example_scale_5(void);
+
 void lv_example_slider_1(void);
 void lv_example_slider_2(void);
 void lv_example_slider_3(void);

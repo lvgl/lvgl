@@ -268,7 +268,7 @@ bool lv_label_get_recolor(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_label_t * label = (lv_label_t *)obj;
-    return label->recolor ? true : false;
+    return label->recolor;
 }
 
 void lv_label_get_letter_pos(const lv_obj_t * obj, uint32_t char_id, lv_point_t * pos)

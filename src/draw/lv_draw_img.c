@@ -73,11 +73,20 @@ void lv_draw_img(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_are
     }
     if(dsc->opa <= LV_OPA_MIN) return;
 
-    LV_PROFILER_BEGIN;
-    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
-    t->draw_dsc = lv_malloc(sizeof(*dsc));
-    lv_memcpy(t->draw_dsc, dsc, sizeof(*dsc));
+    LV_PROFILER_BEGIN;
+
+    lv_draw_img_dsc_t * new_img_dsc = lv_malloc(sizeof(*dsc));
+    lv_memcpy(new_img_dsc, dsc, sizeof(*dsc));
+    lv_res_t res = lv_img_decoder_get_info(new_img_dsc->src, &new_img_dsc->header);
+    if(res != LV_RES_OK) {
+        LV_LOG_WARN("Couldn't get info about the image");
+        lv_free(new_img_dsc);
+        return;
+    }
+
+    lv_draw_task_t * t = lv_draw_add_task(layer, coords);
+    t->draw_dsc = new_img_dsc;
     t->type = LV_DRAW_TASK_TYPE_IMAGE;
 
     lv_draw_finalize_task_creation(layer, t);

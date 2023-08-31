@@ -220,6 +220,7 @@ const lv_img_dsc_t test_img_cogwheel_rgb565a8 = {
     .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
+    .header.stride = 200,
     .data_size = 30000,
     .data = test_img_cogwheel_rgb565a8_map,
 };

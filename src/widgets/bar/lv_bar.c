@@ -267,7 +267,7 @@ static void draw_indic(lv_event_t * e)
         range = 1;
     }
 
-    bool hor = barw >= barh ? true : false;
+    bool hor = barw >= barh;
     bool sym = false;
     if(bar->mode == LV_BAR_MODE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
        bar->start_value == bar->min_value) sym = true;

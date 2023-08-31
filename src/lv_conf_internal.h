@@ -185,38 +185,25 @@
 /*========================
  * RENDERING CONFIGURATION
  *========================*/
-/* Select a draw buffer implementation. Possible values:
- * - LV_DRAW_BUF_BASIC:     LVGL's built in implementation
- * - LV_DRAW_BUF_CUSTOM:    Implement the function of lv_draw_buf.h externally
- */
-#ifndef LV_USE_DRAW_BUF
-    #ifdef CONFIG_LV_USE_DRAW_BUF
-        #define LV_USE_DRAW_BUF CONFIG_LV_USE_DRAW_BUF
+
+/*Align the stride of all layers and images to this bytes*/
+#ifndef LV_DRAW_BUF_STRIDE_ALIGN
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
+        #else
+            #define LV_DRAW_BUF_STRIDE_ALIGN 0
+        #endif
     #else
-        #define LV_USE_DRAW_BUF    LV_DRAW_BUF_BASIC
+        #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
     #endif
 #endif
-
-#if LV_USE_DRAW_BUF == LV_DRAW_BUF_BASIC
-    /*Align the stride of all layers and images to this bytes*/
-    #ifndef LV_DRAW_BUF_STRIDE_ALIGN
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-                #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-            #else
-                #define LV_DRAW_BUF_STRIDE_ALIGN 0
-            #endif
-        #else
-            #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
-        #endif
-    #endif
-    /*Align the start address of draw_buf addresses to this bytes*/
-    #ifndef LV_DRAW_BUF_ALIGN
-        #ifdef CONFIG_LV_DRAW_BUF_ALIGN
-            #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
-        #else
-            #define LV_DRAW_BUF_ALIGN                       4
-        #endif
+/*Align the start address of draw_buf addresses to this bytes*/
+#ifndef LV_DRAW_BUF_ALIGN
+    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
+        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
+    #else
+        #define LV_DRAW_BUF_ALIGN                       4
     #endif
 #endif
 
@@ -1550,6 +1537,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_SCALE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SCALE
+            #define LV_USE_SCALE CONFIG_LV_USE_SCALE
+        #else
+            #define LV_USE_SCALE 0
+        #endif
+    #else
+        #define LV_USE_SCALE      1
+    #endif
+#endif
+
 #ifndef LV_USE_SLIDER
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SLIDER
@@ -1918,6 +1917,24 @@
             #define LV_FS_FATFS_CACHE_SIZE CONFIG_LV_FS_FATFS_CACHE_SIZE
         #else
             #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+        #endif
+    #endif
+#endif
+
+/*API for memory-mapped file access. */
+#ifndef LV_USE_FS_MEMFS
+    #ifdef CONFIG_LV_USE_FS_MEMFS
+        #define LV_USE_FS_MEMFS CONFIG_LV_USE_FS_MEMFS
+    #else
+        #define LV_USE_FS_MEMFS 0
+    #endif
+#endif
+#if LV_USE_FS_MEMFS
+    #ifndef LV_FS_MEMFS_LETTER
+        #ifdef CONFIG_LV_FS_MEMFS_LETTER
+            #define LV_FS_MEMFS_LETTER CONFIG_LV_FS_MEMFS_LETTER
+        #else
+            #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
         #endif
     #endif
 #endif

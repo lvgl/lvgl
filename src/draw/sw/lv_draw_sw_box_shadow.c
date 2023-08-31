@@ -123,7 +123,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 #endif
 
     /*Skip a lot of masking if the background will cover the shadow that would be masked out*/
-    bool simple = dsc->bg_cover ? true : false;
+    bool simple = dsc->bg_cover;
 
     /*Create a radius mask to clip remove shadow on the bg area*/
 
