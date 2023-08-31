@@ -19,10 +19,10 @@
  *********************/
 #define MY_CLASS &lv_scale_class
 
-#define LV_SCALE_LABEL_TXT_LEN  		(20U)
-#define LV_SCALE_DEFAULT_ZOOM   		((int32_t) 256U)
-#define LV_SCALE_DEFAULT_ANGLE_RANGE	((uint16_t) 270U)
-#define LV_SCALE_DEFAULT_ROTATION		((int16_t) 135U)
+#define LV_SCALE_LABEL_TXT_LEN          (20U)
+#define LV_SCALE_DEFAULT_ZOOM           ((int32_t) 256U)
+#define LV_SCALE_DEFAULT_ANGLE_RANGE    ((uint16_t) 270U)
+#define LV_SCALE_DEFAULT_ROTATION       ((int16_t) 135U)
 
 /**********************
  *      TYPEDEFS
