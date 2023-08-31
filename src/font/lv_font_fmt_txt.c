@@ -88,57 +88,59 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
     if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
         const uint8_t * bitmap_in = &fdsc->glyph_bitmap[gdsc->bitmap_index];
-        int32_t i;
+        uint8_t * bitmap_out_tmp = bitmap_out;
+        int32_t i = 0;
+        int32_t x, y;
+        uint32_t stride = lv_draw_buf_width_to_stride(gdsc->box_w, LV_COLOR_FORMAT_A8);
+
         if(fdsc->bpp == 1) {
-            int32_t gsize_floor = gsize & ~(0x7);
-
-            for(i = 0; i < gsize_floor - 7; i += 8) {
-                bitmap_out[i + 0] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
-                bitmap_out[i + 1] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
-                bitmap_out[i + 2] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
-                bitmap_out[i + 3] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
-                bitmap_out[i + 4] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
-                bitmap_out[i + 5] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
-                bitmap_out[i + 6] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
-                bitmap_out[i + 7] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
-                bitmap_in++;
-            }
-
-            uint8_t in_tmp = *bitmap_in;
-            for(; i < gsize; i++) {
-                bitmap_out[i] = in_tmp >> 7 ? 0xff : 0x00;
-                in_tmp = in_tmp << 1;
-
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x7;
+                    if(i == 0) bitmap_out_tmp[x] = (*bitmap_in) & 0x80 ? 0xff : 0x00;
+                    else if(i == 1) bitmap_out_tmp[x] = (*bitmap_in) & 0x40 ? 0xff : 0x00;
+                    else if(i == 2) bitmap_out_tmp[x] = (*bitmap_in) & 0x20 ? 0xff : 0x00;
+                    else if(i == 3) bitmap_out_tmp[x] = (*bitmap_in) & 0x10 ? 0xff : 0x00;
+                    else if(i == 4) bitmap_out_tmp[x] = (*bitmap_in) & 0x08 ? 0xff : 0x00;
+                    else if(i == 5) bitmap_out_tmp[x] = (*bitmap_in) & 0x04 ? 0xff : 0x00;
+                    else if(i == 6) bitmap_out_tmp[x] = (*bitmap_in) & 0x02 ? 0xff : 0x00;
+                    else if(i == 7) {
+                        bitmap_out_tmp[x] = (*bitmap_in) & 0x01 ? 0xff : 0x00;
+                        bitmap_in++;
+                    }
+                }
+                bitmap_out_tmp += stride;
             }
         }
         else if(fdsc->bpp == 2) {
-            int32_t gsize_floor = gsize & ~(0x3);
-
-            for(i = 0; i < gsize_floor - 3; i += 4) {
-                bitmap_out[i + 0] = opa2_table[(*bitmap_in) >> 6];
-                bitmap_out[i + 1] = opa2_table[((*bitmap_in) >> 4) & 0x3];
-                bitmap_out[i + 2] = opa2_table[((*bitmap_in) >> 2) & 0x3];
-                bitmap_out[i + 3] = opa2_table[((*bitmap_in) >> 0) & 0x3];
-                bitmap_in++;
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x3;
+                    if(i == 0) bitmap_out_tmp[x] = opa2_table[(*bitmap_in) >> 6];
+                    else if(i == 1) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 4) & 0x3];
+                    else if(i == 2) bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 2) & 0x3];
+                    else if(i == 3) {
+                        bitmap_out_tmp[x] = opa2_table[((*bitmap_in) >> 0) & 0x3];
+                        bitmap_in++;
+                    }
+                }
+                bitmap_out_tmp += stride;
             }
 
-            uint8_t in_tmp = *bitmap_in;
-            for(; i < gsize; i++) {
-                bitmap_out[i] = opa2_table[in_tmp >> 6];
-                in_tmp = in_tmp << 2;
-
-            }
         }
         else if(fdsc->bpp == 4) {
-            int32_t gsize_floor = gsize & ~(0x1);
-            for(i = 0; i < gsize_floor; i += 2) {
-                bitmap_out[i] = opa4_table[(*bitmap_in) >> 4];
-                bitmap_out[i + 1] = opa4_table[(*bitmap_in) & 0xF];
-                bitmap_in++;
-            }
-            /*If gsize was even*/
-            if(i == gsize - 1) {
-                bitmap_out[gsize - 1] = opa4_table[(*bitmap_in) >> 4];
+            for(y = 0; y < gdsc->box_h; y ++) {
+                for(x = 0; x < gdsc->box_w; x++, i++) {
+                    i = i & 0x1;
+                    if(i == 0) {
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) >> 4];
+                    }
+                    else if(i == 1) {
+                        bitmap_out_tmp[x] = opa4_table[(*bitmap_in) & 0xF];
+                        bitmap_in++;
+                    }
+                }
+                bitmap_out_tmp += stride;
             }
         }
         return bitmap_out;

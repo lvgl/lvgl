@@ -393,7 +393,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
         return;
     }
 
-    uint32_t bitmap_size = g.box_w * g.box_h;
+    uint32_t bitmap_size = lv_draw_buf_width_to_stride(g.box_w, LV_COLOR_FORMAT_A8) * g.box_h;
     if(dsc->_bitmap_buf_size < bitmap_size) {
         dsc->bitmap_buf = lv_realloc(dsc->bitmap_buf, bitmap_size);
         LV_ASSERT_MALLOC(dsc->bitmap_buf);
