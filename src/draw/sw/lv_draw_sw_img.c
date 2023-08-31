@@ -183,7 +183,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
 
     /*The whole image is available, just draw it*/
     if(decoder_dsc.img_data) {
-        img_draw_core(draw_unit, draw_dsc, &draw_area, decoder_dsc.img_data, cf, &sup, coords);
+        img_draw_core(draw_unit, draw_dsc, &draw_area, decoder_dsc.img_data,
+                      LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf,
+                      &sup, coords);
     }
     /*Draw line by line*/
     else {
@@ -202,7 +204,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
             lv_area_t absolute_decoded_area = relative_decoded_area;
             lv_area_move(&absolute_decoded_area, coords->x1, coords->y1);
             if(res == LV_RES_OK) {
-                img_draw_core(draw_unit, draw_dsc, &draw_area, decoder_dsc.img_data, cf, &sup, &absolute_decoded_area);
+                /*Limit draw area to the current decoded area and draw the image*/
+                lv_area_t draw_area_sub;
+                if(_lv_area_intersect(&draw_area_sub, &draw_area, &absolute_decoded_area)) {
+                    img_draw_core(draw_unit, draw_dsc, &draw_area_sub, decoder_dsc.img_data,
+                                  LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf,
+                                  &sup, &absolute_decoded_area);
+                }
             }
         }
     }
