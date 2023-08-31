@@ -10,7 +10,6 @@ void lv_example_scale_5(void)
     lv_obj_set_size(scale, lv_disp_get_hor_res(NULL) / 2, lv_disp_get_ver_res(NULL) / 2);
     lv_scale_set_label_show(scale, true);
 
-    return;
     lv_scale_set_total_tick_count(scale, 10);
     lv_scale_set_major_tick_every(scale, 5);
 

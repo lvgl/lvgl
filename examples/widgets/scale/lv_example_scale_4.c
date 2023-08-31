@@ -77,7 +77,7 @@ void lv_example_scale_4(void)
     lv_scale_section_set_range(section, 80, 100);
     lv_scale_section_set_style(section, LV_PART_INDICATOR, &section_label_style);
     lv_scale_section_set_style(section, LV_PART_ITEMS, &section_minor_tick_style);
-    lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);        //TODO not applied
+    lv_scale_section_set_style(section, LV_PART_MAIN, &section_main_line_style);
 }
 
 #endif
