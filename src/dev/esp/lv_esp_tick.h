@@ -33,11 +33,10 @@ extern "C" {
  **********************/
 
 /**
- * Create tick
- * @param parent    pointer to a calendar object.
- * @return          the created header
+ * Create tick timer for LVGL using esp_timer to generate 2ms periodic event
+ * @return          the created timer
  */
-void lv_esp_tick_init(void);
+esp_timer_handle_t lv_esp_tick_init(void);
 
 /**********************
  *      MACROS

@@ -754,6 +754,9 @@
     #define LV_ESP_LCD_BUFFER_SIZE     60
 #endif
 #define LV_USE_ESP_TICK			0
+#if LV_USE_ESP_TICK
+    #define LV_ESP_TICK_PERIOD_MS    2
+#endif
 
 /*==================
 * EXAMPLES

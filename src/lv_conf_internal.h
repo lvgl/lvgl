@@ -2490,6 +2490,15 @@
         #define LV_USE_ESP_TICK			0
     #endif
 #endif
+#if LV_USE_ESP_TICK
+    #ifndef LV_ESP_TICK_PERIOD_MS
+        #ifdef CONFIG_LV_ESP_TICK_PERIOD_MS
+            #define LV_ESP_TICK_PERIOD_MS CONFIG_LV_ESP_TICK_PERIOD_MS
+        #else
+            #define LV_ESP_TICK_PERIOD_MS    2
+        #endif
+    #endif
+#endif
 
 /*==================
 * EXAMPLES

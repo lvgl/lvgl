@@ -14,13 +14,15 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../disp/lv_disp.h"
+#include "../../disp/lv_disp.h"
 
 #if LV_USE_ESP_LCD
 
-#include "esp_lcd_panel_io.h"
-#include "esp_lcd_panel_vendor.h"
-#include "esp_lcd_panel_ops.h"
+//#include "esp_lcd_panel_io.h"
+//#include "esp_lcd_panel_vendor.h"
+
+#include "c:\Espressif\frameworks\esp-idf\components\esp_lcd\include\esp_lcd_panel_io.h"
+#include "c:\Espressif\frameworks\esp-idf\components\esp_lcd\include\esp_lcd_panel_vendor.h"
 
 /*********************
  *      DEFINES

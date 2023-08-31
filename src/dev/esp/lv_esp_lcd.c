@@ -11,9 +11,10 @@
 #if LV_USE_ESP_LCD
 
 #include <lvgl/lvgl.h>
-#include "../../../lvgl_private.h"
+//#include "../../../lvgl_private.h"
 
-#include "esp_timer.h"
+#include "c:\Espressif\frameworks\esp-idf\components\esp_lcd\include\esp_lcd_panel_ops.h"
+#include "c:\Espressif\frameworks\esp-idf\components\heap\include\esp_heap_caps.h"
 
 
 /*********************
@@ -29,7 +30,6 @@
 
 typedef struct {
     //    lv_disp_t                 * disp;
-    esp_timer_handle_t      tick_timer;
     esp_lcd_panel_handle_t  panel_handle;
 } lv_esp_lcd_t;
 
@@ -106,7 +106,7 @@ lv_disp_t * lv_esp_lcd_create(uint32_t hor_res, uint32_t ver_res, esp_lcd_panel_
                                        LV_ESP_LCD_COLOR_IN_PSRAM ? MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT : MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     if(draw_buf == NULL) {
         LV_LOG_ERROR("display draw_buf malloc failed");
-        lv_free(lcd);
+        lv_free(dsc);
         return NULL;
     }
 
@@ -151,20 +151,13 @@ static inline void swap16_buffer(uint8_t * buf, int length)
     }
 }
 
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area_p, uint8_t * color_p)
+static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     esp_lcd_panel_handle_t panel_handle = ((lv_esp_lcd_t *) lv_disp_get_driver_data(disp))->panel_handle;
     /*NOTE: this is just a temporary solution to swap the bytes of the buffer*/
     swap16_buffer(px_map, lv_area_get_size(area));
     /*Copy a buffer's content to a specific area of the display*/
     esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1, area->y2 + 1, px_map);
-}
-
-
-static void tick_timer_cb(void * arg)
-{
-    /* Tell LVGL how many milliseconds has elapsed */
-    lv_tick_inc(LVGL_TICK_PERIOD_MS);
 }
 
 
