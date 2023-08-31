@@ -33,7 +33,9 @@ number of actual reads from the storage.
 
 To use the memory-mapped file emulation an ``lv_fs_path_ex_t`` object must be
 created and initialized. This object can be passed to :c:func:`lv_fs_open()` as
-the file name::
+the file name:
+
+.. code:: c
 
   lv_fs_path_ex_t mempath;
   lv_fs_file_t file;
