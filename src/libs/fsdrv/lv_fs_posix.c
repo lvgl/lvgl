@@ -30,6 +30,12 @@
     #error "LV_FS_POSIX_LETTER must be an upper case ASCII letter"
 #endif
 
+/** The reason for 'fd + 1' is because open() may return a legal fd with a value of 0,
+  * preventing it from being judged as NULL when converted to a pointer type.
+  */
+#define FILEP2FD(file_p) ((lv_uintptr_t)file_p - 1)
+#define FD2FILEP(fd) ((void *)(lv_uintptr_t)(fd + 1))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -117,7 +123,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     int f = open(buf, flags, 0666);
     if(f < 0) return NULL;
 
-    return (void *)(lv_uintptr_t)f;
+    return FD2FILEP(f);
 }
 
 /**
@@ -130,7 +136,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
     LV_UNUSED(drv);
-    close((lv_uintptr_t)file_p);
+    close(FILEP2FD(file_p));
     return LV_FS_RES_OK;
 }
 
@@ -147,7 +153,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     LV_UNUSED(drv);
-    *br = read((lv_uintptr_t)file_p, buf, btr);
+    *br = read(FILEP2FD(file_p), buf, btr);
     return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
@@ -163,7 +169,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     LV_UNUSED(drv);
-    *bw = write((lv_uintptr_t)file_p, buf, btw);
+    *bw = write(FILEP2FD(file_p), buf, btw);
     return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
@@ -193,7 +199,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
             return LV_FS_RES_INV_PARAM;
     }
 
-    off_t offset = lseek((lv_uintptr_t)file_p, pos, w);
+    off_t offset = lseek(FILEP2FD(file_p), pos, w);
     return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }
 
@@ -208,7 +214,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    off_t offset = lseek((lv_uintptr_t)file_p, 0, SEEK_CUR);
+    off_t offset = lseek(FILEP2FD(file_p), 0, SEEK_CUR);
     *pos_p = offset;
     return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }
