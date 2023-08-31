@@ -162,6 +162,7 @@ typedef struct _lv_anim_t {
     uint8_t playback_now : 1; /**< Play back is in progress*/
     uint8_t run_round : 1;    /**< Indicates the animation has run in this round*/
     uint8_t start_cb_called : 1;    /**< Indicates that the `start_cb` was already called*/
+    uint8_t mark_deleted : 1;
 } lv_anim_t;
 
 /**********************

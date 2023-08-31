@@ -92,6 +92,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     if(a->var == a) new_anim->var = new_anim;
     new_anim->run_round = state.anim_run_round;
     new_anim->last_timer_run = lv_tick_get();
+    new_anim->mark_deleted = false;
 
     /*Set the start value*/
     if(new_anim->early_apply) {
@@ -135,24 +136,35 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a)
 
 bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 {
+    static uint32_t enter_cnt = 0;
     lv_anim_t * a;
     lv_anim_t * a_next;
     bool del = false;
-    a        = _lv_ll_get_head(anim_ll_p);
-    while(a != NULL) {
-        /*'a' might be deleted, so get the next object while 'a' is valid*/
-        a_next = _lv_ll_get_next(anim_ll_p, a);
 
-        if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            _lv_ll_remove(anim_ll_p, a);
+    enter_cnt ++;
+
+    _LV_LL_READ(anim_ll_p, a) {
+        if(!a->mark_deleted && (a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
+            a->mark_deleted = true;
             if(a->deleted_cb != NULL) a->deleted_cb(a);
-            lv_free(a);
-            anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
-                                       the linked list*/
             del = true;
         }
+    }
 
-        a = a_next;
+    enter_cnt --;
+
+    if(del && enter_cnt == 0) {
+        a = _lv_ll_get_head(anim_ll_p);
+        while(a != NULL) {
+            a_next = _lv_ll_get_next(anim_ll_p, a);
+            if(a->mark_deleted) {
+                _lv_ll_remove(anim_ll_p, a);
+                lv_free(a);
+            }
+            a = a_next;
+        }
+        anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
+                                       the linked list*/
     }
 
     return del;
