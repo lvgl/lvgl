@@ -147,7 +147,7 @@ void test_bar_normal(void)
     lv_color_t bg_color = lv_color_black();
     lv_color_t indic_color = lv_color_hex(0x0000FF);
 
-    lv_obj_t* screen = lv_obj_create(lv_scr_act());
+    lv_obj_t * screen = lv_obj_create(lv_scr_act());
     lv_obj_remove_style_all(screen);
     lv_obj_set_size(screen, 800, 480);
     lv_obj_center(screen);
@@ -155,7 +155,7 @@ void test_bar_normal(void)
     lv_obj_set_style_bg_opa(screen, LV_OPA_100, 0);
     lv_obj_set_style_pad_all(screen, 0, 0);
 
-    lv_obj_t* test_bar = lv_bar_create(screen);
+    lv_obj_t * test_bar = lv_bar_create(screen);
     lv_obj_set_style_radius(test_bar, 100, 0);
     lv_obj_set_style_radius(test_bar, 100, LV_PART_MAIN);
     lv_obj_set_style_bg_opa(test_bar, LV_OPA_30, LV_PART_MAIN);
