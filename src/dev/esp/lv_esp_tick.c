@@ -19,26 +19,16 @@
 /*********************
  *      DEFINES
  *********************/
-#ifndef LV_ESP_LCD_COLOR_IN_PSRAM
-    #define LV_ESP_LCD_COLOR_IN_PSRAM 0
-#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-typedef struct {
-    //    lv_disp_t                 * disp;
-    esp_timer_handle_t      tick_timer;
-    esp_lcd_panel_handle_t  panel_handle;
-} lv_esp_lcd_t;
-
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area_p, uint8_t * color_p);
+ static void flush_cb(lv_disp_t * disp, const lv_area_t * area_p, uint8_t * color_p);
 static void res_chg_event_cb(lv_event_t * e);
 static void tick_timer_cb(void * arg);
 
