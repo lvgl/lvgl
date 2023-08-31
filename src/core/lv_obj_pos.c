@@ -10,12 +10,13 @@
 #include "../disp/lv_disp.h"
 #include "../disp/lv_disp_private.h"
 #include "lv_refr.h"
-#include "../misc/lv_gc.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define MY_CLASS &lv_obj_class
+#define update_layout_mutex LV_GLOBAL_DEFAULT()->layout_update_mutex
 
 /**********************
  *      TYPEDEFS
@@ -32,7 +33,6 @@ static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint32_t layout_cnt;
 
 /**********************
  *      MACROS
@@ -97,8 +97,8 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         w = lv_obj_get_style_width(obj, LV_PART_MAIN);
-        w_is_content = w == LV_SIZE_CONTENT ? true : false;
-        w_is_pct = LV_COORD_IS_PCT(w) ? true : false;
+        w_is_content = w == LV_SIZE_CONTENT;
+        w_is_pct = LV_COORD_IS_PCT(w);
         lv_coord_t parent_w = lv_obj_get_content_width(parent);
 
         if(w_is_content) {
@@ -129,8 +129,8 @@ bool lv_obj_refr_size(lv_obj_t * obj)
     }
     else {
         h = lv_obj_get_style_height(obj, LV_PART_MAIN);
-        h_is_content = h == LV_SIZE_CONTENT ? true : false;
-        h_is_pct = LV_COORD_IS_PCT(h) ? true : false;
+        h_is_content = h == LV_SIZE_CONTENT;
+        h_is_pct = LV_COORD_IS_PCT(h);
         lv_coord_t parent_h = lv_obj_get_content_height(parent);
 
         if(h_is_content) {
@@ -288,12 +288,11 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
 
 void lv_obj_update_layout(const lv_obj_t * obj)
 {
-    static bool mutex = false;
-    if(mutex) {
+    if(update_layout_mutex) {
         LV_LOG_TRACE("Already running, returning");
         return;
     }
-    mutex = true;
+    update_layout_mutex = true;
 
     lv_obj_t * scr = lv_obj_get_screen(obj);
     /*Repeat until there are no more layout invalidations*/
@@ -304,18 +303,7 @@ void lv_obj_update_layout(const lv_obj_t * obj)
         LV_LOG_TRACE("Layout update end");
     }
 
-    mutex = false;
-}
-
-uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
-{
-    layout_cnt++;
-    LV_GC_ROOT(_lv_layout_list) = lv_realloc(LV_GC_ROOT(_lv_layout_list), layout_cnt * sizeof(lv_layout_dsc_t));
-    LV_ASSERT_MALLOC(LV_GC_ROOT(_lv_layout_list));
-
-    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].cb = cb;
-    LV_GC_ROOT(_lv_layout_list)[layout_cnt - 1].user_data = user_data;
-    return layout_cnt;  /*No -1 to skip 0th index*/
+    update_layout_mutex = false;
 }
 
 void lv_obj_set_align(lv_obj_t * obj, lv_align_t align)
@@ -773,7 +761,7 @@ void lv_obj_transform_point(const lv_obj_t * obj, lv_point_t * p, bool recursive
 {
     if(obj) {
         lv_layer_type_t layer_type = _lv_obj_get_layer_type(obj);
-        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM ? true : false;
+        bool do_tranf = layer_type == LV_LAYER_TYPE_TRANSFORM;
         if(inv) {
             if(recursive) lv_obj_transform_point(lv_obj_get_parent(obj), p, recursive, inv);
             if(do_tranf) transform_point(obj, p, inv);
@@ -856,29 +844,30 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
     lv_area_t obj_coords;
     lv_coord_t ext_size = _lv_obj_get_ext_draw_size(obj);
     lv_area_copy(&obj_coords, &obj->coords);
-    obj_coords.x1 -= ext_size;
-    obj_coords.y1 -= ext_size;
-    obj_coords.x2 += ext_size;
-    obj_coords.y2 += ext_size;
+    lv_area_increase(&obj_coords, ext_size, ext_size);
 
     /*The area is not on the object*/
     if(!_lv_area_intersect(area, area, &obj_coords)) return false;
 
     lv_obj_get_transformed_area(obj, area, true, false);
 
-
     /*Truncate recursively to the parents*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    while(par != NULL) {
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    while(parent != NULL) {
         /*If the parent is hidden then the child is hidden and won't be drawn*/
-        if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false;
+        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_HIDDEN)) return false;
 
         /*Truncate to the parent and if no common parts break*/
-        lv_area_t par_area = par->coords;
-        lv_obj_get_transformed_area(par, &par_area, true, false);
-        if(!_lv_area_intersect(area, area, &par_area)) return false;
+        lv_area_t parent_coords = parent->coords;
+        if(lv_obj_has_flag(parent, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+            lv_coord_t parent_ext_size = _lv_obj_get_ext_draw_size(parent);
+            lv_area_increase(&parent_coords, parent_ext_size, parent_ext_size);
+        }
 
-        par = lv_obj_get_parent(par);
+        lv_obj_get_transformed_area(parent, &parent_coords, true, false);
+        if(!_lv_area_intersect(area, area, &parent_coords)) return false;
+
+        parent = lv_obj_get_parent(parent);
     }
 
     return true;
@@ -1120,11 +1109,7 @@ static void layout_update_core(lv_obj_t * obj)
     lv_obj_refr_pos(obj);
 
     if(child_cnt > 0) {
-        uint32_t layout_id = lv_obj_get_style_layout(obj, LV_PART_MAIN);
-        if(layout_id > 0 && layout_id <= layout_cnt) {
-            void  * user_data = LV_GC_ROOT(_lv_layout_list)[layout_id - 1].user_data;
-            LV_GC_ROOT(_lv_layout_list)[layout_id - 1].cb(obj, user_data);
-        }
+        _lv_layout_apply(obj);
     }
 }
 

@@ -64,6 +64,11 @@ char * lv_strcpy(char * dst, const char * src)
     return strcpy(dst, src);
 }
 
+char * lv_strdup(const char * src)
+{
+    return strdup(src);
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

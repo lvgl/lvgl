@@ -146,7 +146,7 @@ Fixes
    `3856 <https://github.com/lvgl/lvgl/pull/3856>`__
 -  fix(esp.cmake): add demos and examples
    `3784 <https://github.com/lvgl/lvgl/pull/3784>`__
--  fix(indev): fix scrolling on transformed obejcts
+-  fix(indev): fix scrolling on transformed objects
    `84cf05d <https://github.com/lvgl/lvgl/commit/84cf05d8b23b31e000db757a278545e58fcbcbe8>`__
 -  fix(style): add the missing support for pct pivot in tranasform style
    properties
@@ -168,13 +168,13 @@ Fixes
    `716e5e2 <https://github.com/lvgl/lvgl/commit/716e5e2c8bd2a22e7d56e8d7ca33054a11a1f4ed>`__
 -  fix(gridnav): fix stucking in pressed state with encoder
    `ad56dfa <https://github.com/lvgl/lvgl/commit/ad56dfaf7046a9bb8c05e877a8c8852cd14a59af>`__
--  fix(darw): add back the disappeared antialising=0 support
+-  fix(darw): add back the disappeared antialiasing=0 support
    `2c17b28 <https://github.com/lvgl/lvgl/commit/2c17b28ac476c95a4153ab6cabb77b1c7208bb74>`__
 -  fix(msg): fix typos in API by adding wrappers
    `41fa416 <https://github.com/lvgl/lvgl/commit/41fa41613455260ccdeb87ecb890ce026ff0a435>`__
 -  fix(draw): fix transformation accuracy
    `e06f03d <https://github.com/lvgl/lvgl/commit/e06f03db72f98439078118518158f52439dd7bf8>`__
--  fix(style): remove the reduntant define of LV_GRADIENT_MAX_STOPS
+-  fix(style): remove the redundant define of LV_GRADIENT_MAX_STOPS
    `903e94b <https://github.com/lvgl/lvgl/commit/903e94b716ca1b32cdb51de11df679953699e53b>`__
 -  demo(benchmark): fix lv_label_set_text_fmt format strings
    `ae38258 <https://github.com/lvgl/lvgl/commit/ae3825871e31cd42cad2f310bdfc605150670511>`__
@@ -803,12 +803,12 @@ Examples
    `3428 <https://github.com/lvgl/lvgl/pull/3428>`__
 -  example(imgfont): fix lvgl.h include path
    `3405 <https://github.com/lvgl/lvgl/pull/3405>`__
--  example(btnmatrix): update lv_example_btnmatrix_2 to expicitly check
+-  example(btnmatrix): update lv_example_btnmatrix_2 to explicitly check
    which part is drawn
    `6b2eac1 <https://github.com/lvgl/lvgl/commit/6b2eac1dd70df62916b46cee8d4b981ff088b1a7>`__
 -  example(slider): make lv_example_slider_3 work with dark theme too
    `4a766c5 <https://github.com/lvgl/lvgl/commit/4a766c516db7c2572a075ec5ffe748d30af8c7b9>`__
--  example(span): avoid ambiguous meaing
+-  example(span): avoid ambiguous meaning
    `7bb09e3 <https://github.com/lvgl/lvgl/commit/7bb09e358026aff3d55d881237624baac77db890>`__
 -  demo(benchmark): add LV_DEMO_BENCHMARK_RGB565A8 option
    `afaa8c9 <https://github.com/lvgl/lvgl/commit/afaa8c93006a88db9f115b2b318eef790928d2a6>`__
@@ -1206,7 +1206,7 @@ Fixes
 -  fix(align) fix LV_SIZE_CONTENT size calculation with not LEFT or TOP
    alignment
    `9c67642 <https://github.com/littlevgl/lvgl/commit/9c676421ff159de1a96409f5557d36090c1728f9>`__
--  fix(draw): futher bg_img draw fixes
+-  fix(draw): further bg_img draw fixes
    `81bfb76 <https://github.com/littlevgl/lvgl/commit/81bfb765e5baba359e61dcb030f3ee96160a6335>`__
 -  fix(btnmatrix): keep the selected button even on release
    `d47cd1d <https://github.com/littlevgl/lvgl/commit/d47cd1d7fe910efc189e2f43f046a09184cfff13>`__
@@ -3962,7 +3962,7 @@ Bugfixes
    settings)
 -  lv_chart fix X tick drawing
 -  Fix vertical dashed line drawing
--  Some additional minor fixes and formattings
+-  Some additional minor fixes and formatting
 
 v7.0.0 (18.05.2020)
 -------------------

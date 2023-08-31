@@ -11,10 +11,14 @@
 #if LV_USE_GRID
 
 #include "../../stdlib/lv_string.h"
-
+#include "../lv_layout.h"
+#include "../../core/lv_obj.h"
+#include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
+#define layout_list_def LV_GLOBAL_DEFAULT()->layout_list
+
 /**
  * Some helper defines
  */
@@ -114,17 +118,6 @@ static inline lv_coord_t get_margin_ver(lv_obj_t * obj)
 /**********************
  *  GLOBAL VARIABLES
  **********************/
-uint16_t LV_LAYOUT_GRID;
-lv_style_prop_t LV_STYLE_GRID_COLUMN_DSC_ARRAY;
-lv_style_prop_t LV_STYLE_GRID_COLUMN_ALIGN;
-lv_style_prop_t LV_STYLE_GRID_ROW_DSC_ARRAY;
-lv_style_prop_t LV_STYLE_GRID_ROW_ALIGN;
-lv_style_prop_t LV_STYLE_GRID_CELL_COLUMN_POS;
-lv_style_prop_t LV_STYLE_GRID_CELL_COLUMN_SPAN;
-lv_style_prop_t LV_STYLE_GRID_CELL_X_ALIGN;
-lv_style_prop_t LV_STYLE_GRID_CELL_ROW_POS;
-lv_style_prop_t LV_STYLE_GRID_CELL_ROW_SPAN;
-lv_style_prop_t LV_STYLE_GRID_CELL_Y_ALIGN;
 
 /**********************
  *  STATIC VARIABLES
@@ -146,19 +139,8 @@ lv_style_prop_t LV_STYLE_GRID_CELL_Y_ALIGN;
 
 void lv_grid_init(void)
 {
-    LV_LAYOUT_GRID = lv_layout_register(grid_update, NULL);
-
-    LV_STYLE_GRID_COLUMN_DSC_ARRAY = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_ROW_DSC_ARRAY = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_COLUMN_ALIGN = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_ROW_ALIGN = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-
-    LV_STYLE_GRID_CELL_ROW_SPAN = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_CELL_ROW_POS = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_CELL_COLUMN_SPAN = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_CELL_COLUMN_POS = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_CELL_X_ALIGN = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
-    LV_STYLE_GRID_CELL_Y_ALIGN = lv_style_register_prop(LV_STYLE_PROP_FLAG_LAYOUT_UPDATE);
+    layout_list_def[LV_LAYOUT_GRID].cb = grid_update;
+    layout_list_def[LV_LAYOUT_GRID].user_data = NULL;
 }
 
 void lv_obj_set_grid_dsc_array(lv_obj_t * obj, const lv_coord_t col_dsc[], const lv_coord_t row_dsc[])
@@ -188,171 +170,6 @@ void lv_obj_set_grid_cell(lv_obj_t * obj, lv_grid_align_t x_align, lv_coord_t co
 
     lv_obj_mark_layout_as_dirty(lv_obj_get_parent(obj));
 }
-
-
-void lv_style_set_grid_row_dsc_array(lv_style_t * style, const lv_coord_t value[])
-{
-    lv_style_value_t v = {
-        .ptr = (const void *)value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_ROW_DSC_ARRAY, v);
-}
-
-void lv_style_set_grid_column_dsc_array(lv_style_t * style, const lv_coord_t value[])
-{
-    lv_style_value_t v = {
-        .ptr = (const void *)value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_COLUMN_DSC_ARRAY, v);
-}
-
-void lv_style_set_grid_row_align(lv_style_t * style, lv_grid_align_t value)
-{
-    lv_style_value_t v = {
-        .num = (lv_grid_align_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_ROW_ALIGN, v);
-}
-
-void lv_style_set_grid_column_align(lv_style_t * style, lv_grid_align_t value)
-{
-    lv_style_value_t v = {
-        .num = (lv_grid_align_t)value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_COLUMN_ALIGN, v);
-}
-
-
-void lv_style_set_grid_cell_column_pos(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_CELL_COLUMN_POS, v);
-}
-
-void lv_style_set_grid_cell_column_span(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_CELL_COLUMN_SPAN, v);
-}
-
-void lv_style_set_grid_cell_row_pos(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_CELL_ROW_POS, v);
-}
-
-void lv_style_set_grid_cell_row_span(lv_style_t * style, lv_coord_t value)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_CELL_ROW_SPAN, v);
-}
-
-void lv_style_set_grid_cell_x_align(lv_style_t * style, lv_grid_align_t value)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_CELL_X_ALIGN, v);
-}
-
-void lv_style_set_grid_cell_y_align(lv_style_t * style, lv_grid_align_t value)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_style_set_prop(style, LV_STYLE_GRID_CELL_Y_ALIGN, v);
-}
-
-void lv_obj_set_style_grid_row_dsc_array(lv_obj_t * obj, const lv_coord_t value[], lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .ptr = (const void *)value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_ROW_DSC_ARRAY, v, selector);
-}
-
-void lv_obj_set_style_grid_column_dsc_array(lv_obj_t * obj, const lv_coord_t value[], lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .ptr = (const void *)value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_COLUMN_DSC_ARRAY, v, selector);
-}
-
-
-void lv_obj_set_style_grid_row_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t) value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_ROW_ALIGN, v, selector);
-}
-
-void lv_obj_set_style_grid_column_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = (int32_t) value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_COLUMN_ALIGN, v, selector);
-}
-
-
-void lv_obj_set_style_grid_cell_column_pos(lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_COLUMN_POS, v, selector);
-}
-
-void lv_obj_set_style_grid_cell_column_span(lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_COLUMN_SPAN, v, selector);
-}
-
-void lv_obj_set_style_grid_cell_row_pos(lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_ROW_POS, v, selector);
-}
-
-void lv_obj_set_style_grid_cell_row_span(lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_ROW_SPAN, v, selector);
-}
-
-void lv_obj_set_style_grid_cell_x_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_X_ALIGN, v, selector);
-}
-
-void lv_obj_set_style_grid_cell_y_align(lv_obj_t * obj, lv_grid_align_t value, lv_style_selector_t selector)
-{
-    lv_style_value_t v = {
-        .num = value
-    };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_GRID_CELL_Y_ALIGN, v, selector);
-}
-
 
 /**********************
  *   STATIC FUNCTIONS
@@ -417,16 +234,16 @@ static void calc(lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     lv_coord_t col_gap = lv_obj_get_style_pad_column(cont, LV_PART_MAIN);
     lv_coord_t row_gap = lv_obj_get_style_pad_row(cont, LV_PART_MAIN);
 
-    bool rev = lv_obj_get_style_base_dir(cont, LV_PART_MAIN) == LV_BASE_DIR_RTL ? true : false;
+    bool rev = lv_obj_get_style_base_dir(cont, LV_PART_MAIN) == LV_BASE_DIR_RTL;
 
     lv_coord_t w_set = lv_obj_get_style_width(cont, LV_PART_MAIN);
     lv_coord_t h_set = lv_obj_get_style_height(cont, LV_PART_MAIN);
-    bool auto_w = (w_set == LV_SIZE_CONTENT && !cont->w_layout) ? true : false;
+    bool auto_w = w_set == LV_SIZE_CONTENT && !cont->w_layout;
     lv_coord_t cont_w = lv_obj_get_content_width(cont);
     calc_out->grid_w = grid_align(cont_w, auto_w, get_grid_col_align(cont), col_gap, calc_out->col_num, calc_out->w,
                                   calc_out->x, rev);
 
-    bool auto_h = (h_set == LV_SIZE_CONTENT && !cont->h_layout) ? true : false;
+    bool auto_h = h_set == LV_SIZE_CONTENT && !cont->h_layout;
     lv_coord_t cont_h = lv_obj_get_content_height(cont);
     calc_out->grid_h = grid_align(cont_h, auto_h, get_grid_row_align(cont), row_gap, calc_out->row_num, calc_out->h,
                                   calc_out->y, false);

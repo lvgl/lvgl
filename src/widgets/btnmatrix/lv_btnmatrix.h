@@ -121,7 +121,7 @@ void lv_btnmatrix_set_selected_btn(lv_obj_t * obj, uint16_t btn_id);
  * Set the attributes of a button of the button matrix
  * @param obj       pointer to button matrix object
  * @param btn_id    0 based index of the button to modify. (Not counting new lines)
- * @param ctrl      OR-ed attributs. E.g. `LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_CHECKABLE`
+ * @param ctrl      OR-ed attributes. E.g. `LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_CHECKABLE`
  */
 void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
 
@@ -129,7 +129,7 @@ void lv_btnmatrix_set_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctr
  * Clear the attributes of a button of the button matrix
  * @param obj       pointer to button matrix object
  * @param btn_id    0 based index of the button to modify. (Not counting new lines)
- * @param ctrl      OR-ed attributs. E.g. `LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_CHECKABLE`
+ * @param ctrl      OR-ed attributes. E.g. `LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_CHECKABLE`
  */
 void lv_btnmatrix_clear_btn_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
 

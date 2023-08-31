@@ -54,7 +54,7 @@ class LV_Example_Msg_2:
         # Slider
         slider = lv.slider(panel)
         slider.set_flex_grow(1)
-        slider.add_flag(lv.OBJ_FLAG_FLEX_IN_NEW_TRACK)
+        slider.add_flag(lv.obj.FLAG.FLEX_IN_NEW_TRACK)
         slider.add_event(self.slider_event_cb, lv.EVENT.ALL, None)
         lv.msg_subscribe_obj(MSG_UPDATE, slider, None)
 

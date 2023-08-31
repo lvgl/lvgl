@@ -9,6 +9,7 @@
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
 #include "../disp/lv_disp_private.h"
+#include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_group.h"
 #include "../core/lv_refr.h"
@@ -16,8 +17,8 @@
 #include "../tick/lv_tick.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_profiler.h"
+#include "../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
@@ -47,6 +48,10 @@
     #warning "LV_INDEV_DRAG_THROW must be greater than 0"
 #endif
 
+#define indev_act LV_GLOBAL_DEFAULT()->indev_active
+#define indev_obj_act LV_GLOBAL_DEFAULT()->indev_obj_active
+#define indev_ll_head &(LV_GLOBAL_DEFAULT()->indev_ll)
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -65,12 +70,11 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_click_focus(lv_indev_t * indev);
 static void indev_gesture(lv_indev_t * indev);
 static bool indev_reset_check(lv_indev_t * indev);
+static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_indev_t * indev_act;
-static lv_obj_t * indev_obj_act = NULL;
 
 /**********************
  *      MACROS
@@ -92,7 +96,7 @@ lv_indev_t * lv_indev_create(void)
         LV_LOG_WARN("no display was created so far");
     }
 
-    lv_indev_t * indev = _lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
+    lv_indev_t * indev = _lv_ll_ins_head(indev_ll_head);
     LV_ASSERT_MALLOC(indev);
     if(!indev) {
         return NULL;
@@ -118,9 +122,9 @@ void lv_indev_delete(lv_indev_t * indev)
 {
     LV_ASSERT_NULL(indev);
     /*Clean up the read timer first*/
-    lv_timer_del(indev->read_timer);
+    if(indev->read_timer) lv_timer_del(indev->read_timer);
     /*Remove the input device from the list*/
-    _lv_ll_remove(&LV_GC_ROOT(_lv_indev_ll), indev);
+    _lv_ll_remove(indev_ll_head, indev);
     /*Free the memory of the input device*/
     lv_free(indev);
 }
@@ -128,12 +132,12 @@ void lv_indev_delete(lv_indev_t * indev)
 lv_indev_t * lv_indev_get_next(lv_indev_t * indev)
 {
     if(indev == NULL)
-        return _lv_ll_get_head(&LV_GC_ROOT(_lv_indev_ll));
+        return _lv_ll_get_head(indev_ll_head);
     else
-        return _lv_ll_get_next(&LV_GC_ROOT(_lv_indev_ll), indev);
+        return _lv_ll_get_next(indev_ll_head, indev);
 }
 
-void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
+void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
 {
     LV_PROFILER_BEGIN;
     lv_memzero(data, sizeof(lv_indev_data_t));
@@ -165,57 +169,64 @@ void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 
 void lv_indev_read_timer_cb(lv_timer_t * timer)
 {
+    lv_indev_read(timer->user_data);
+}
+
+void lv_indev_read(lv_indev_t * indev_p)
+{
+    if(!indev_p) return;
+
     INDEV_TRACE("begin");
 
-    lv_indev_data_t data;
-
-    indev_act = timer->user_data;
+    indev_act = indev_p;
 
     /*Read and process all indevs*/
-    if(indev_act->disp == NULL) return; /*Not assigned to any displays*/
+    if(indev_p->disp == NULL) return; /*Not assigned to any displays*/
 
     /*Handle reset query before processing the point*/
-    indev_proc_reset_query_handler(indev_act);
+    indev_proc_reset_query_handler(indev_p);
 
-    if(indev_act->disabled ||
-       indev_act->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
+    if(indev_p->disabled ||
+       indev_p->disp->prev_scr != NULL) return; /*Input disabled or screen animation active*/
 
     LV_PROFILER_BEGIN;
 
     bool continue_reading;
+    lv_indev_data_t data;
+
     do {
         /*Read the data*/
-        _lv_indev_read(indev_act, &data);
+        indev_read_core(indev_p, &data);
         continue_reading = data.continue_reading;
 
         /*The active object might be deleted even in the read function*/
-        indev_proc_reset_query_handler(indev_act);
+        indev_proc_reset_query_handler(indev_p);
         indev_obj_act = NULL;
 
-        indev_act->state = data.state;
+        indev_p->state = data.state;
 
         /*Save the last activity time*/
-        if(indev_act->state == LV_INDEV_STATE_PRESSED) {
-            indev_act->disp->last_activity_time = lv_tick_get();
+        if(indev_p->state == LV_INDEV_STATE_PRESSED) {
+            indev_p->disp->last_activity_time = lv_tick_get();
         }
-        else if(indev_act->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
-            indev_act->disp->last_activity_time = lv_tick_get();
+        else if(indev_p->type == LV_INDEV_TYPE_ENCODER && data.enc_diff) {
+            indev_p->disp->last_activity_time = lv_tick_get();
         }
 
-        if(indev_act->type == LV_INDEV_TYPE_POINTER) {
-            indev_pointer_proc(indev_act, &data);
+        if(indev_p->type == LV_INDEV_TYPE_POINTER) {
+            indev_pointer_proc(indev_p, &data);
         }
-        else if(indev_act->type == LV_INDEV_TYPE_KEYPAD) {
-            indev_keypad_proc(indev_act, &data);
+        else if(indev_p->type == LV_INDEV_TYPE_KEYPAD) {
+            indev_keypad_proc(indev_p, &data);
         }
-        else if(indev_act->type == LV_INDEV_TYPE_ENCODER) {
-            indev_encoder_proc(indev_act, &data);
+        else if(indev_p->type == LV_INDEV_TYPE_ENCODER) {
+            indev_encoder_proc(indev_p, &data);
         }
-        else if(indev_act->type == LV_INDEV_TYPE_BUTTON) {
-            indev_button_proc(indev_act, &data);
+        else if(indev_p->type == LV_INDEV_TYPE_BUTTON) {
+            indev_button_proc(indev_p, &data);
         }
         /*Handle reset query if it happened in during processing*/
-        indev_proc_reset_query_handler(indev_act);
+        indev_proc_reset_query_handler(indev_p);
     } while(continue_reading);
 
     /*End of indev processing, so no act indev*/
@@ -485,7 +496,12 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     bool hit_test_ok = lv_obj_hit_test(obj, &p_trans);
 
     /*If the point is on this object check its children too*/
-    if(_lv_area_is_point_on(&obj->coords, &p_trans, 0)) {
+    lv_area_t obj_coords = obj->coords;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        lv_coord_t ext_draw_size = _lv_obj_get_ext_draw_size(obj);
+        lv_area_increase(&obj_coords, ext_draw_size, ext_draw_size);
+    }
+    if(_lv_area_is_point_on(&obj_coords, &p_trans, 0)) {
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
 
@@ -515,7 +531,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
     lv_disp_t * disp = i->disp;
-    /*Save the raw points so they can be used again in _lv_indev_read*/
+    /*Save the raw points so they can be used again in indev_read_core*/
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
@@ -951,8 +967,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
     lv_coord_t x = i->btn_points[data->btn_id].x;
     lv_coord_t y = i->btn_points[data->btn_id].y;
 
-    static lv_indev_state_t prev_state = LV_INDEV_STATE_RELEASED;
-    if(prev_state != data->state) {
+    if(LV_INDEV_STATE_RELEASED != data->state) {
         if(data->state == LV_INDEV_STATE_PRESSED) {
             LV_LOG_INFO("button %" LV_PRIu32 " is pressed (x:%d y:%d)", data->btn_id, (int)x, (int)y);
         }
@@ -1258,13 +1273,13 @@ static void indev_click_focus(lv_indev_t * indev)
         }
         /*The object are not in group*/
         else {
-            if(indev->pointer.last_pressed) {
+            if(indev->pointer.last_pressed != indev_obj_act) {
                 lv_obj_send_event(indev->pointer.last_pressed, LV_EVENT_DEFOCUSED, indev_act);
                 if(indev_reset_check(indev)) return;
-            }
 
-            lv_obj_send_event(indev_obj_act, LV_EVENT_FOCUSED, indev_act);
-            if(indev_reset_check(indev)) return;
+                lv_obj_send_event(indev_obj_act, LV_EVENT_FOCUSED, indev_act);
+                if(indev_reset_check(indev)) return;
+            }
         }
     }
     /*The object are not in the same group (in different groups or one has no group)*/
@@ -1366,5 +1381,5 @@ static bool indev_reset_check(lv_indev_t * indev)
         indev_obj_act = NULL;
     }
 
-    return indev->reset_query ? true : false;
+    return indev->reset_query;
 }

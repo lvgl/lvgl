@@ -36,7 +36,7 @@ typedef enum {
 
     /**Temporarily display the `flush_cb` so the pure rendering time will be measured.
      * The display is not updated during the benchmark, only at the end when the summary table is shown.
-     * Render a given number of frames from each scene adn calculate the FPS from them.*/
+     * Render a given number of frames from each scene and calculate the FPS from them.*/
     LV_DEMO_BENCHMARK_MODE_RENDER_ONLY,
 } lv_demo_benchmark_mode_t;
 

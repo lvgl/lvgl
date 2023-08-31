@@ -13,14 +13,18 @@
 #include "../tick/lv_tick.h"
 #include "../misc/lv_timer.h"
 #include "../misc/lv_math.h"
-#include "../misc/lv_gc.h"
 #include "../misc/lv_profiler.h"
 #include "../draw/lv_draw.h"
 #include "../font/lv_font_fmt_txt.h"
+#include "../stdlib/lv_string.h"
+#include "lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+/*Display being refreshed*/
+#define disp_refr LV_GLOBAL_DEFAULT()->disp_refresh
 
 /**********************
  *      TYPEDEFS
@@ -43,8 +47,6 @@ static void call_flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * px
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static lv_disp_t * disp_refr; /*Display being refreshed*/
 
 /**********************
  *      MACROS
@@ -113,9 +115,16 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
     lv_draw_rect(layer, &draw_dsc, &obj_coords_ext);
 #endif
 
+    const lv_area_t * obj_coords;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_OVERFLOW_VISIBLE)) {
+        obj_coords = &obj_coords_ext;
+    }
+    else {
+        obj_coords = &obj->coords;
+    }
     lv_area_t clip_coords_for_children;
     bool refr_children = true;
-    if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, &obj->coords)) {
+    if(!_lv_area_intersect(&clip_coords_for_children, &clip_area_ori, obj_coords)) {
         refr_children = false;
     }
 
@@ -144,7 +153,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 for(i = 0; i < child_cnt; i++) {
                     lv_obj_t * child = obj->spec_attr->children[i];
                     refr_obj(layer, child);
-
                 }
 
                 /*If the object was visible on the clip area call the post draw events too*/
@@ -177,7 +185,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                         refr_obj(layer_children, child);
                     }
 
-                    /*If all the children are redrawn make 'post draw' draw*/
+                    /*If all the children are redrawn send 'post draw' draw*/
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
@@ -198,7 +206,7 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                         refr_obj(layer_children, child);
                     }
 
-                    /*If all the children are redrawn make 'post draw' draw*/
+                    /*If all the children are redrawn send 'post draw' draw*/
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_BEGIN, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST, layer_children);
                     lv_obj_send_event(obj, LV_EVENT_DRAW_POST_END, layer_children);
@@ -209,7 +217,6 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                     lv_draw_layer(layer, &img_draw_dsc, &top);
 
                 }
-
 
                 lv_area_t mid = obj->coords;
                 mid.y1 += rout;
@@ -383,7 +390,7 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
                            : disp_refr->buf_1;
 
     lv_coord_t stride = lv_draw_buf_width_to_stride(lv_disp_get_hor_res(disp_refr),
-                                                    lv_color_format_get_size(disp_refr->color_format));
+                                                    lv_disp_get_color_format(disp_refr));
     uint32_t i;
     for(i = 0; i < disp_refr->inv_p; i++) {
         if(disp_refr->inv_area_joined[i]) continue;
@@ -791,7 +798,7 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
         lv_obj_redraw(layer, obj);
     }
     else {
-        lv_opa_t opa = lv_obj_get_style_opa(obj, 0);
+        lv_opa_t opa = lv_obj_get_style_opa_layered(obj, 0);
         if(opa < LV_OPA_MIN) return;
 
         lv_area_t layer_area_full;

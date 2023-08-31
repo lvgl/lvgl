@@ -97,7 +97,7 @@ void lv_example_file_explorer_3(void)
     char * envvar = "HOME";
     char home_dir[LV_FS_MAX_PATH_LENGTH];
     strcpy(home_dir, "A:");
-    /* get the user's home directory from the HOME enviroment variable*/
+    /* get the user's home directory from the HOME environment variable*/
     strcat(home_dir, getenv(envvar));
     LV_LOG_USER("home_dir: %s\n", home_dir);
     lv_file_explorer_set_quick_access_path(file_explorer, LV_EXPLORER_HOME_DIR, home_dir);

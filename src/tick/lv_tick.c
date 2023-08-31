@@ -8,14 +8,12 @@
  *********************/
 #include "lv_tick.h"
 #include <stddef.h>
-
-#if LV_TICK_CUSTOM == 1
-    #include LV_TICK_CUSTOM_INCLUDE
-#endif
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define state LV_GLOBAL_DEFAULT()->tick_state
 
 /**********************
  *      TYPEDEFS
@@ -28,10 +26,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if !LV_TICK_CUSTOM
-    static uint32_t sys_time = 0;
-    static volatile uint8_t tick_irq_flag;
-#endif
 
 /**********************
  *      MACROS
@@ -41,17 +35,17 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-#if !LV_TICK_CUSTOM
 /**
  * You have to call this function periodically
  * @param tick_period the call period of this function in milliseconds
  */
 LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
 {
-    tick_irq_flag = 0;
-    sys_time += tick_period;
+    lv_tick_state_t * state_p = &state;
+
+    state_p->sys_irq_flag = 0;
+    state_p->sys_time += tick_period;
 }
-#endif
 
 /**
  * Get the elapsed milliseconds since start up
@@ -59,7 +53,10 @@ LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period)
  */
 uint32_t lv_tick_get(void)
 {
-#if LV_TICK_CUSTOM == 0
+    lv_tick_state_t * state_p = &state;
+
+    if(state_p->tick_get_cb)
+        return state_p->tick_get_cb();
 
     /*If `lv_tick_inc` is called from an interrupt while `sys_time` is read
      *the result might be corrupted.
@@ -68,14 +65,11 @@ uint32_t lv_tick_get(void)
      *until `tick_irq_flag` remains `1`.*/
     uint32_t result;
     do {
-        tick_irq_flag = 1;
-        result        = sys_time;
-    } while(!tick_irq_flag); /*Continue until see a non interrupted cycle*/
+        state_p->sys_irq_flag = 1;
+        result        = state_p->sys_time;
+    } while(!state_p->sys_irq_flag); /*Continue until see a non interrupted cycle*/
 
     return result;
-#else
-    return LV_TICK_CUSTOM_SYS_TIME_EXPR;
-#endif
 }
 
 /**
@@ -97,6 +91,11 @@ uint32_t lv_tick_elaps(uint32_t prev_tick)
     }
 
     return prev_tick;
+}
+
+void lv_tick_set_cb(lv_tick_get_cb_t cb)
+{
+    state.tick_get_cb = cb;
 }
 
 /**********************

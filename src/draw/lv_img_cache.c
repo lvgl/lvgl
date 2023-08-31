@@ -8,10 +8,12 @@
  *********************/
 #include "lv_img_cache.h"
 #include "../stdlib/lv_string.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define img_cache_manager LV_GLOBAL_DEFAULT()->img_cache_mgr
 
 /**********************
  *      TYPEDEFS
@@ -24,8 +26,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static lv_img_cache_manager_t img_cache_manager = { 0 };
 
 /**********************
  *      MACROS

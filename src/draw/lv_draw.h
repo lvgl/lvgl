@@ -20,11 +20,13 @@ extern "C" {
 #include "../misc/lv_profiler.h"
 #include "lv_img_decoder.h"
 #include "lv_img_cache.h"
-#include "draw_buf/lv_draw_buf.h"
+#include "../osal/lv_os.h"
+#include "lv_draw_buf.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_DRAW_UNIT_ID_ANY  0
 
 /**********************
  *      TYPEDEFS
@@ -78,6 +80,20 @@ typedef struct _lv_draw_task_t {
     volatile int state;              /*int instead of lv_draw_task_state_t to be sure its atomic*/
 
     void * draw_dsc;
+
+    /**
+     * The ID of the draw_unit which should take this task
+     */
+    uint8_t preferred_draw_unit_id;
+
+    /**
+     * Set to which extent `preferred_draw_unit_id` is good at this task.
+     * 80: means 20% better (faster) than software rendering
+     * 100: the default value
+     * 110: means 10% better (faster) than software rendering
+     */
+    uint8_t preference_score;
+
 } lv_draw_task_t;
 
 typedef struct {
@@ -95,16 +111,24 @@ typedef struct _lv_draw_unit_t {
     const lv_area_t * clip_area;
 
     /**
-     * Try to assign a draw task to itself.
+     * Called to try to assign a draw task to itself.
      * `lv_draw_get_next_available_task` can be used to get an independent draw task.
      * A draw task should be assign only if the draw unit can draw it too
      * @param draw_unit     pointer to the draw unit
      * @param layer         pointer to a layer on which the draw task should be drawn
      * @return              >=0:    The number of taken draw task
      *                      -1:     There where no available draw tasks at all.
-     *                              Also means to no call the dispatcher of the other draw units as there is no dra task to tkae
+     *                              Also means to no call the dispatcher of the other draw units as there is no draw task to take
      */
-    int32_t (*dispatch)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
+    int32_t (*dispatch_cb)(struct _lv_draw_unit_t * draw_unit, struct _lv_layer_t * layer);
+
+    /**
+     *
+     * @param draw_unit
+     * @param task
+     * @return
+     */
+    int32_t (*evaluate_cb)(struct _lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 } lv_draw_unit_t;
 
 
@@ -141,6 +165,18 @@ typedef struct {
     lv_layer_t * layer;
 } lv_draw_dsc_base_t;
 
+typedef struct {
+    lv_draw_unit_t * unit_head;
+    uint32_t used_memory_for_layers_kb;
+#if LV_USE_OS
+    lv_thread_sync_t sync;
+    lv_mutex_t circle_cache_mutex;
+#else
+    int dispatch_req;
+#endif
+    bool task_running;
+} lv_draw_global_info_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -172,11 +208,12 @@ void lv_draw_dispatch_request(void);
 
 /**
  * Find and available draw task
- * @param layer      the draw ctx to search in
- * @param t_prev        continue searching from this task
- * @return              tan available draw task or NULL if there is no any
+ * @param layer             the draw ctx to search in
+ * @param t_prev            continue searching from this task
+ * @param draw_unit_id      check the task where `preferred_draw_unit_id` equals this value or `LV_DRAW_UNIT_ID_ANY`
+ * @return                  tan available draw task or NULL if there is no any
  */
-lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev);
+lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_task_t * t_prev, uint8_t draw_unit_id);
 
 /**
  * Create a new layer on a parent layer
@@ -191,10 +228,11 @@ lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t c
 void lv_draw_layer_get_area(lv_layer_t * layer, lv_area_t * area);
 
 /**
- * Call to tell that a layer buffer with X kB size was allocated
- * @param kb        size of the layer buffer in kB (if < 1024 use 1)
+ * Try to allocate a buffer for the layer.
+ * @param layer             pointer to a layer
+ * @return                  pointer to the allocated aligned buffer or NULL on failure
  */
-void lv_draw_add_used_layer_size(uint32_t kb);
+void * lv_draw_layer_alloc_buf(lv_layer_t * layer);
 
 /**********************
  *  GLOBAL VARIABLES

@@ -16,7 +16,7 @@
 #define MY_CLASS &lv_menu_class
 
 #include "../../core/lv_obj.h"
-#include "../../layouts/flex/lv_flex.h"
+#include "../../layouts/lv_layout.h"
 #include "../../stdlib/lv_string.h"
 #include "../label/lv_label.h"
 #include "../btn/lv_btn.h"
@@ -393,15 +393,12 @@ void lv_menu_set_page_title(lv_obj_t * page_obj, char const * const title)
     }
 
     if(title) {
-        size_t len = lv_strlen(title) + 1;
-        page->title        = lv_malloc(len);
         page->static_title = false;
-
+        page->title = lv_strdup(title);
         LV_ASSERT_MALLOC(page->title);
         if(page->title == NULL) {
             return;
         }
-        lv_strcpy(page->title, title);
     }
     else {
         page->title        = NULL;

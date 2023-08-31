@@ -33,7 +33,7 @@ void lv_example_canvas_3(void)
     dsc.radius = 5;
     dsc.border_width = 3;
 
-    lv_area_t coords = {10, 10, 30, 20};
+    lv_area_t coords = {10, 10, 40, 30};
 
     lv_draw_rect(&layer, &dsc, &coords);
 

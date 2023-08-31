@@ -104,6 +104,21 @@ from ``lv_conf.h`` or build settings (``-D...``) overwrite the values
 set in Kconfig. To ignore the configs from ``lv_conf.h`` simply remove
 its content, or define :c:macro:`LV_CONF_SKIP`.
 
+To enable multi-instance feature, set :c:macro:`LV_GLOBAL_CUSTOM` in
+``lv_conf.h`` and provide a custom function to
+:cpp:func:`lv_global_default` using ``__thread`` or ``pthread_key_t``.
+
+For example:
+
+.. code:: c
+
+   lv_global_t * lv_global_default(void)
+   {
+     static __thread lv_global_t lv_global;
+     return &lv_global;
+   }
+
+
 Initialization
 --------------
 

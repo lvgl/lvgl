@@ -82,9 +82,8 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev);
 /**
  * Read data from an input device.
  * @param indev pointer to an input device
- * @param data input device will write its data here
  */
-void _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
+void lv_indev_read(lv_indev_t * indev);
 
 /**
  * Called periodically to read the input devices

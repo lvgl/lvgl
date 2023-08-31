@@ -479,7 +479,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * obj)
         cur_shift_left++;
     }
 
-    /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
+    /*Convert the numbers to string (the sign is already handled so always convert positive number)*/
     char digits[LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES];
     lv_snprintf(digits, LV_SPINBOX_MAX_DIGIT_COUNT_WITH_4BYTES, "%" LV_PRId32, LV_ABS(spinbox->value));
 

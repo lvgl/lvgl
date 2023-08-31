@@ -198,13 +198,9 @@ void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
     /*Convert static options to dynamic*/
     if(dropdown->static_txt != 0) {
         char * static_options = dropdown->options;
-        size_t len = lv_strlen(static_options) + 1;
-
-        dropdown->options = lv_malloc(len);
+        dropdown->options = lv_strdup(static_options);
         LV_ASSERT_MALLOC(dropdown->options);
         if(dropdown->options == NULL) return;
-
-        lv_strcpy(dropdown->options, static_options);
         dropdown->static_txt = 0;
     }
 
@@ -285,6 +281,10 @@ void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
 
     dropdown->sel_opt_id      = sel_opt < dropdown->option_cnt ? sel_opt : dropdown->option_cnt - 1;
     dropdown->sel_opt_id_orig = dropdown->sel_opt_id;
+
+    if(dropdown->list) {
+        position_to_selected(obj);
+    }
 
     lv_obj_invalidate(obj);
 }

@@ -10,9 +10,9 @@
 #include "../misc/lv_math.h"
 #include "../core/lv_refr.h"
 #include "../disp/lv_disp_private.h"
-#include "../misc/lv_gc.h"
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
+#include "../core/lv_global.h"
 
 #if LV_USE_DRAW_SW
     #include "../draw/sw/lv_draw_sw.h"
@@ -22,6 +22,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define disp_def LV_GLOBAL_DEFAULT()->disp_default
+#define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
 /**********************
  *      TYPEDEFS
@@ -44,7 +46,6 @@ static void disp_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_disp_t * disp_def;
 
 /**********************
  *      MACROS
@@ -56,7 +57,7 @@ static lv_disp_t * disp_def;
 
 lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 {
-    lv_disp_t * disp = _lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
+    lv_disp_t * disp = _lv_ll_ins_head(disp_ll_p);
     LV_ASSERT_MALLOC(disp);
     if(!disp) return NULL;
 
@@ -167,11 +168,11 @@ void lv_disp_remove(lv_disp_t * disp)
         lv_obj_del(disp->screens[0]);
     }
 
-    _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
+    _lv_ll_remove(disp_ll_p, disp);
     if(disp->refr_timer) lv_timer_del(disp->refr_timer);
     lv_free(disp);
 
-    if(was_default) lv_disp_set_default(_lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
+    if(was_default) lv_disp_set_default(_lv_ll_get_head(disp_ll_p));
 }
 
 void lv_disp_set_default(lv_disp_t * disp)
@@ -187,9 +188,9 @@ lv_disp_t * lv_disp_get_default(void)
 lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
 {
     if(disp == NULL)
-        return _lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
+        return _lv_ll_get_head(disp_ll_p);
     else
-        return _lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
+        return _lv_ll_get_next(disp_ll_p, disp);
 }
 
 /*---------------------
@@ -417,7 +418,7 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return false;
 
-    return disp->antialiasing ? true : false;
+    return disp->antialiasing;
 }
 
 
@@ -434,7 +435,7 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp)
 
 bool lv_disp_is_double_buffered(lv_disp_t * disp)
 {
-    return disp->buf_2 ? true : false;
+    return disp->buf_2 != NULL;
 }
 
 /*---------------------
@@ -506,9 +507,13 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     lv_disp_t * d = lv_obj_get_disp(new_scr);
     lv_obj_t * act_scr = lv_scr_act();
 
+    if(act_scr == new_scr || d->scr_to_load == new_scr) {
+        return;
+    }
+
     /*If another screen load animation is in progress
      *make target screen loaded immediately. */
-    if(d->scr_to_load && act_scr != d->scr_to_load) {
+    if(d->scr_to_load) {
         scr_load_internal(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
@@ -545,6 +550,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     if(time == 0 && delay == 0) {
 
         scr_load_internal(new_scr);
+        d->scr_to_load = NULL;
         if(auto_del) lv_obj_del(act_scr);
         return;
     }

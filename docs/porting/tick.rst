@@ -7,6 +7,16 @@ Tick interface
 LVGL needs a system tick to know elapsed time for animations and other
 tasks.
 
+If you want to use a custom function to :cpp:func:`lv_tick_get`, you can
+register a "tick_get_cb" with :cpp:func:`lv_tick_set_cb`.
+
+For example:
+
+.. code:: c
+
+   lv_tick_set_cb(SDL_GetTicks);
+
+
 You need to call the :cpp:expr:`lv_tick_inc(tick_period)` function periodically
 and provide the call period in milliseconds. For example,
 :cpp:expr:`lv_tick_inc(1)` when calling every millisecond.

@@ -6,8 +6,8 @@ menu "LVGL configuration"
 	# without lv_conf.h file, the lv_conf_internal.h and
 	# lv_conf_kconfig.h files are used instead.
 	config LV_CONF_SKIP
-		bool "Uncheck this to use custom lv_conf.h"
-		default y
+		bool "Check this to not use custom lv_conf.h"
+		default n
 
 	config LV_CONF_MINIMAL
 		bool "LVGL minimal configuration."
@@ -50,6 +50,10 @@ menu "LVGL configuration"
 				128: round up from half
 				192: round up from x.25
 				254: round up
+
+		config LV_OBJ_STYLE_CACHE
+			bool "Use cache to speed up getting object style properties"
+			default y
 
 		config LV_COLOR_CHROMA_KEY_HEX
 			hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
@@ -131,13 +135,9 @@ menu "LVGL configuration"
 	endmenu
 
 	menu "HAL Settings"
-		config LV_TICK_CUSTOM
-			bool "Use a custom tick source"
-
-		config LV_TICK_CUSTOM_INCLUDE
-			string "Header for the system time function"
-			default "Arduino.h"
-			depends on LV_TICK_CUSTOM
+		config LV_DEF_REFR_PERIOD
+			int "Default refresh period (ms)."
+			default 33
 
 		config LV_DPI_DEF
 			int "Default Dots Per Inch (in px)."
@@ -150,6 +150,24 @@ menu "LVGL configuration"
 	menu "Feature configuration"
 
 		menu "Drawing"
+			config LV_DRAW_BUF_STRIDE_ALIGN
+				int "Buffer stride alignment"
+				default 1
+			help
+				Align the stride of all layers and images to this bytes.
+
+			config LV_DRAW_BUF_ALIGN
+				int "Buffer address alignment"
+				default 4
+			help
+				Align the start address of draw_buf addresses to this bytes.
+
+			config LV_LAYER_MAX_MEMORY_USAGE
+				int "Max layer memory usage(kB)"
+				default 150
+			help
+				Max. memory to be used for layers.
+
 			config LV_USE_DRAW_SW
 				bool "Enable software rendering"
 				default y
@@ -161,7 +179,7 @@ menu "LVGL configuration"
 				default 1
 				help
 					> 1 requires an operating system enabled in `LV_USE_OS`
-					> 1 means multply threads will render the screen in parallel
+					> 1 means multiply threads will render the screen in parallel
 
 			config LV_DRAW_SW_COMPLEX
 				bool "Enable complex draw engine"
@@ -502,13 +520,13 @@ menu "LVGL configuration"
 				bool "Enable float in built-in (v)snprintf functions"
 				depends on LV_USE_BUILTIN_SNPRINTF
 
-			config LV_ENABLE_GC
-				bool "Enable garbage collector"
+			config LV_ENABLE_GLOBAL_CUSTOM
+				bool "Enable 'lv_global' customization"
 
-			config LV_GC_INCLUDE
-				string "Header to include for the garbage collector related things"
-				depends on LV_ENABLE_GC
-				default "gc.h"
+			config LV_GLOBAL_CUSTOM_INCLUDE
+				string "Header to include for the custom 'lv_global' function"
+				depends on LV_ENABLE_GLOBAL_CUSTOM
+				default "lv_global.h"
 		endmenu
 
 		menu "Compiler settings"
@@ -827,6 +845,9 @@ menu "LVGL configuration"
 			int "Number of extra 'pages' when the controller is infinite."
 			default 7
 			depends on LV_USE_ROLLER
+		config LV_USE_SCALE
+			bool "Scale."
+			default y if !LV_CONF_MINIMAL
 		config LV_USE_SLIDER
 			bool "Slider. Requires: lv_bar."
 			select LV_USE_BAR
@@ -1325,6 +1346,9 @@ menu "LVGL configuration"
 
 		config LV_USE_DEMO_FLEX_LAYOUT
 			bool "Flex layout previewer"
+			default n
+		config LV_USE_DEMO_MULTILANG
+			bool "multi-language demo"
 			default n
 	endmenu
 

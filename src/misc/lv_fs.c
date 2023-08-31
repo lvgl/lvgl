@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_fs.c
  *
  */
@@ -12,11 +12,12 @@
 #include "../misc/lv_assert.h"
 #include "../stdlib/lv_string.h"
 #include "lv_ll.h"
-#include "lv_gc.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define fsdrv_ll_p &(LV_GLOBAL_DEFAULT()->fsdrv_ll)
 
 /**********************
  *      TYPEDEFS
@@ -41,7 +42,7 @@ static const char * lv_fs_get_real_path(const char * path);
 
 void _lv_fs_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_lv_fsdrv_ll), sizeof(lv_fs_drv_t *));
+    _lv_ll_init(fsdrv_ll_p, sizeof(lv_fs_drv_t *));
 }
 
 bool lv_fs_is_ready(char letter)
@@ -82,25 +83,51 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_NOT_IMP;
     }
 
-    const char * real_path = lv_fs_get_real_path(path);
-    void * file_d = drv->open_cb(drv, real_path, mode);
-
-    if(file_d == NULL || file_d == (void *)(-1)) {
-        return LV_FS_RES_UNKNOWN;
-    }
-
     file_p->drv = drv;
-    file_p->file_d = file_d;
+
+    /* For memory-mapped files we set the file handle to our file descriptor so that we can access the cache from the file operations */
+    if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
+        file_p->file_d = file_p;
+    }
+    else {
+        const char * real_path = lv_fs_get_real_path(path);
+        void * file_d = drv->open_cb(drv, real_path, mode);
+        if(file_d == NULL || file_d == (void *)(-1)) {
+            return LV_FS_RES_UNKNOWN;
+        }
+        file_p->file_d = file_d;
+    }
 
     if(drv->cache_size) {
         file_p->cache = lv_malloc(sizeof(lv_fs_file_cache_t));
         LV_ASSERT_MALLOC(file_p->cache);
         lv_memzero(file_p->cache, sizeof(lv_fs_file_cache_t));
-        file_p->cache->start = UINT32_MAX;  /*Set an invalid range by default*/
-        file_p->cache->end = UINT32_MAX - 1;
+
+        /* If this is a memory-mapped file, then set "cache" to the memory buffer */
+        if(drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
+            lv_fs_path_ex_t * path_ex = (lv_fs_path_ex_t *)path;
+            file_p->cache->buffer = path_ex->buffer;
+            file_p->cache->start = 0;
+            file_p->cache->file_position = 0;
+            file_p->cache->end = path_ex->size;
+        }
+        /*Set an invalid range by default*/
+        else {
+            file_p->cache->start = UINT32_MAX;
+            file_p->cache->end = UINT32_MAX - 1;
+        }
     }
 
     return LV_FS_RES_OK;
+}
+
+void lv_fs_make_path_from_buffer(lv_fs_path_ex_t * path, char letter, void * buf, uint32_t size)
+{
+    path->path[0] = letter;
+    path->path[1] = ':';
+    path->path[2] = 0;
+    path->buffer = buf;
+    path->size = size;
 }
 
 lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
@@ -116,7 +143,8 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
     lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
     if(file_p->drv->cache_size && file_p->cache) {
-        if(file_p->cache->buffer) {
+        /* Only free cache if it was pre-allocated (for memory-mapped files it is never allocated) */
+        if(file_p->drv->cache_size != LV_FS_CACHE_FROM_BUFFER && file_p->cache->buffer) {
             lv_free(file_p->cache->buffer);
         }
 
@@ -137,12 +165,18 @@ static lv_fs_res_t lv_fs_read_cached(lv_fs_file_t * file_p, char * buf, uint32_t
     uint32_t start = file_p->cache->start;
     uint32_t end = file_p->cache->end;
     char * buffer = file_p->cache->buffer;
-    uint16_t buffer_size = file_p->drv->cache_size;
+    uint32_t buffer_size = file_p->drv->cache_size;
 
     if(start <= file_position && file_position <= end) {
         /* Data can be read from cache buffer */
         uint32_t buffer_remaining_length = (uint32_t)end - file_position + 1;
-        uint16_t buffer_offset = (end - start) - buffer_remaining_length + 1;
+        uint32_t buffer_offset = (end - start) - buffer_remaining_length + 1;
+
+        /* Do not allow reading beyond the actual memory block for memory-mapped files */
+        if(file_p->drv->cache_size == LV_FS_CACHE_FROM_BUFFER) {
+            if(btr > buffer_remaining_length)
+                btr = buffer_remaining_length;
+        }
 
         if(btr <= buffer_remaining_length) {
             /*Data is in cache buffer, and buffer end not reached, no need to read from FS*/
@@ -408,7 +442,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
 {
     /*Save the new driver*/
     lv_fs_drv_t ** new_drv;
-    new_drv = _lv_ll_ins_head(&LV_GC_ROOT(_lv_fsdrv_ll));
+    new_drv = _lv_ll_ins_head(fsdrv_ll_p);
     LV_ASSERT_MALLOC(new_drv);
     if(new_drv == NULL) return;
 
@@ -419,7 +453,7 @@ lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t ** drv;
 
-    _LV_LL_READ(&LV_GC_ROOT(_lv_fsdrv_ll), drv) {
+    _LV_LL_READ(fsdrv_ll_p, drv) {
         if((*drv)->letter == letter) {
             return *drv;
         }
@@ -433,7 +467,7 @@ char * lv_fs_get_letters(char * buf)
     lv_fs_drv_t ** drv;
     uint8_t i = 0;
 
-    _LV_LL_READ(&LV_GC_ROOT(_lv_fsdrv_ll), drv) {
+    _LV_LL_READ(fsdrv_ll_p, drv) {
         buf[i] = (*drv)->letter;
         i++;
     }

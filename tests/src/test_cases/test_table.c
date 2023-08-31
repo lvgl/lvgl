@@ -34,7 +34,7 @@ void test_table_should_grow_columns_automatically_when_setting_formatted_cell_va
     uint16_t original_column_count = lv_table_get_col_cnt(table);
     TEST_ASSERT_EQUAL_UINT16(1, original_column_count);
 
-    /* Table currently only has a cell at 0,0 (row, colum) */
+    /* Table currently only has a cell at 0,0 (row, column) */
     lv_table_set_cell_value_fmt(table, 0, 1, "LVGL %s", "Rocks!");
 
     /* Table now should have cells at 0,0 and 0,1, so 2 columns */

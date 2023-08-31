@@ -224,7 +224,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
 }
 
 /**
- * If the display is not in 32 bit format (ARGB888) then covert the image to the current color depth
+ * If the display is not in 32 bit format (ARGB888) then convert the image to the current color depth
  * @param img the ARGB888 image
  * @param px_cnt number of pixels in `img`
  */

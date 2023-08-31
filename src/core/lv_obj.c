@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_obj.c
  *
  */
@@ -183,14 +183,14 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    return (obj->flags & f)  == f ? true : false;
+    return (obj->flags & f)  == f;
 }
 
 bool lv_obj_has_flag_any(const lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    return (obj->flags & f) ? true : false;
+    return !!(obj->flags & f);
 }
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj)
@@ -204,7 +204,7 @@ bool lv_obj_has_state(const lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    return obj->state & state ? true : false;
+    return !!(obj->state & state);
 }
 
 lv_group_t * lv_obj_get_group(const lv_obj_t * obj)
@@ -238,7 +238,7 @@ void lv_obj_allocate_spec_attr(lv_obj_t * obj)
 bool lv_obj_check_type(const lv_obj_t * obj, const lv_obj_class_t * class_p)
 {
     if(obj == NULL) return false;
-    return obj->class_p == class_p ? true : false;
+    return obj->class_p == class_p;
 }
 
 bool lv_obj_has_class(const lv_obj_t * obj, const lv_obj_class_t * class_p)
@@ -373,6 +373,11 @@ static void lv_obj_draw(lv_event_t * e)
             return;
         }
 
+        if(lv_obj_get_style_opa(obj, LV_PART_MAIN) < LV_OPA_MAX) {
+            info->res = LV_COVER_RES_NOT_COVER;
+            return;
+        }
+
         info->res = LV_COVER_RES_COVER;
 
     }
@@ -480,7 +485,7 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         }
     }
 
-    lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_SCROLLBAR);
+    lv_opa_t opa = lv_obj_get_style_opa_recursive(obj, LV_PART_SCROLLBAR);
     if(opa < LV_OPA_MAX) {
         lv_opa_t v = LV_OPA_MIX2(dsc->bg_opa, opa);
         dsc->bg_opa = v;

@@ -18,7 +18,7 @@ def create_text(parent, icon, txt, builder_variant):
         label.set_flex_grow(1)
 
     if builder_variant == LV_MENU_ITEM_BUILDER_VARIANT_2 and icon and txt :
-        img.add_flag(lv.OBJ_FLAG_FLEX_IN_NEW_TRACK)
+        img.add_flag(lv.obj.FLAG.FLEX_IN_NEW_TRACK)
         img.swap(label)
 
     return obj
@@ -34,7 +34,7 @@ def create_slider(parent, icon, txt, min, max, val) :
     slider.set_value(val, lv.ANIM.OFF)
 
     if icon == None :
-        slider.add_flag(lv.obj.FLAG_FLEX.IN_NEW_TRACK)
+        slider.add_flag(lv.obj.FLAG.FLEX_IN_NEW_TRACK)
 
     return obj
 

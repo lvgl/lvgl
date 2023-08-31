@@ -21,6 +21,7 @@
     #include <windows.h>
 #endif
 
+#include "../../core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
@@ -28,6 +29,12 @@
 #if LV_FS_POSIX_LETTER == '\0'
     #error "LV_FS_POSIX_LETTER must be an upper case ASCII letter"
 #endif
+
+/** The reason for 'fd + 1' is because open() may return a legal fd with a value of 0,
+  * preventing it from being judged as NULL when converted to a pointer type.
+  */
+#define FILEP2FD(file_p) ((lv_uintptr_t)file_p - 1)
+#define FD2FILEP(fd) ((void *)(lv_uintptr_t)(fd + 1))
 
 /**********************
  *      TYPEDEFS
@@ -68,25 +75,25 @@ void lv_fs_posix_init(void)
      *--------------------------------------------------*/
 
     /*Add a simple drive to open images*/
-    static lv_fs_drv_t fs_drv; /*A driver descriptor*/
-    lv_fs_drv_init(&fs_drv);
+    lv_fs_drv_t * fs_drv_p = &(LV_GLOBAL_DEFAULT()->posix_fs_drv);
+    lv_fs_drv_init(fs_drv_p);
 
     /*Set up fields...*/
-    fs_drv.letter = LV_FS_POSIX_LETTER;
-    fs_drv.cache_size = LV_FS_POSIX_CACHE_SIZE;
+    fs_drv_p->letter = LV_FS_POSIX_LETTER;
+    fs_drv_p->cache_size = LV_FS_POSIX_CACHE_SIZE;
 
-    fs_drv.open_cb = fs_open;
-    fs_drv.close_cb = fs_close;
-    fs_drv.read_cb = fs_read;
-    fs_drv.write_cb = fs_write;
-    fs_drv.seek_cb = fs_seek;
-    fs_drv.tell_cb = fs_tell;
+    fs_drv_p->open_cb = fs_open;
+    fs_drv_p->close_cb = fs_close;
+    fs_drv_p->read_cb = fs_read;
+    fs_drv_p->write_cb = fs_write;
+    fs_drv_p->seek_cb = fs_seek;
+    fs_drv_p->tell_cb = fs_tell;
 
-    fs_drv.dir_close_cb = fs_dir_close;
-    fs_drv.dir_open_cb = fs_dir_open;
-    fs_drv.dir_read_cb = fs_dir_read;
+    fs_drv_p->dir_close_cb = fs_dir_close;
+    fs_drv_p->dir_open_cb = fs_dir_open;
+    fs_drv_p->dir_read_cb = fs_dir_read;
 
-    lv_fs_drv_register(&fs_drv);
+    lv_fs_drv_register(fs_drv_p);
 }
 
 /**********************
@@ -116,7 +123,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
     int f = open(buf, flags, 0666);
     if(f < 0) return NULL;
 
-    return (void *)(lv_uintptr_t)f;
+    return FD2FILEP(f);
 }
 
 /**
@@ -129,7 +136,7 @@ static void * fs_open(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode)
 static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 {
     LV_UNUSED(drv);
-    close((lv_uintptr_t)file_p);
+    close(FILEP2FD(file_p));
     return LV_FS_RES_OK;
 }
 
@@ -146,7 +153,7 @@ static lv_fs_res_t fs_close(lv_fs_drv_t * drv, void * file_p)
 static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
 {
     LV_UNUSED(drv);
-    *br = read((lv_uintptr_t)file_p, buf, btr);
+    *br = read(FILEP2FD(file_p), buf, btr);
     return (int32_t)(*br) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
@@ -162,7 +169,7 @@ static lv_fs_res_t fs_read(lv_fs_drv_t * drv, void * file_p, void * buf, uint32_
 static lv_fs_res_t fs_write(lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw)
 {
     LV_UNUSED(drv);
-    *bw = write((lv_uintptr_t)file_p, buf, btw);
+    *bw = write(FILEP2FD(file_p), buf, btw);
     return (int32_t)(*bw) < 0 ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
 }
 
@@ -192,7 +199,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
             return LV_FS_RES_INV_PARAM;
     }
 
-    off_t offset = lseek((lv_uintptr_t)file_p, pos, w);
+    off_t offset = lseek(FILEP2FD(file_p), pos, w);
     return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }
 
@@ -207,7 +214,7 @@ static lv_fs_res_t fs_seek(lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs
 static lv_fs_res_t fs_tell(lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
 {
     LV_UNUSED(drv);
-    off_t offset = lseek((lv_uintptr_t)file_p, 0, SEEK_CUR);
+    off_t offset = lseek(FILEP2FD(file_p), 0, SEEK_CUR);
     *pos_p = offset;
     return offset < 0 ? LV_FS_RES_FS_ERR : LV_FS_RES_OK;
 }

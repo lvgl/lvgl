@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_event.h"
+#include "../core/lv_global.h"
 #include "../stdlib/lv_mem.h"
 #include "lv_assert.h"
 #include <stddef.h>
@@ -14,6 +15,9 @@
 /*********************
  *      DEFINES
  *********************/
+
+#define event_head LV_GLOBAL_DEFAULT()->event_header
+#define event_last_id LV_GLOBAL_DEFAULT()->event_last_register_id
 
 /**********************
  *      TYPEDEFS
@@ -26,11 +30,11 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_event_t * event_head;
 
 /**********************
  *      MACROS
  **********************/
+
 #if LV_LOG_TRACE_EVENT
     #define EVENT_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
@@ -173,9 +177,8 @@ void lv_event_stop_processing(lv_event_t * e)
 
 uint32_t lv_event_register_id(void)
 {
-    static uint32_t last_id = _LV_EVENT_LAST;
-    last_id ++;
-    return last_id;
+    event_last_id ++;
+    return event_last_id;
 }
 
 void _lv_event_mark_deleted(void * target)

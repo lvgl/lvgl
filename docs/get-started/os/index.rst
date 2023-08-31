@@ -8,3 +8,4 @@
     rt-thread
     freertos
     zephyr
+    px5

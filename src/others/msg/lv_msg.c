@@ -9,13 +9,17 @@
 #include "lv_msg.h"
 #if LV_USE_MSG
 
+#include "../../core/lv_global.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_ll.h"
-#include "../../misc/lv_gc.h"
+#include "../../stdlib/lv_string.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define restart_notify LV_GLOBAL_DEFAULT()->msg_restart_notify
+#define _recursion_counter LV_GLOBAL_DEFAULT()->msg_recursion_counter
+#define _msg_subs_ll_p &(LV_GLOBAL_DEFAULT()->msg_subs_ll)
 
 /**********************
  *      TYPEDEFS
@@ -40,7 +44,6 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static bool restart_notify;
 
 /**********************
  *  GLOBAL VARIABLES
@@ -61,12 +64,12 @@ static bool restart_notify;
 
 void lv_msg_init(void)
 {
-    _lv_ll_init(&LV_GC_ROOT(_subs_ll), sizeof(sub_dsc_t));
+    _lv_ll_init(_msg_subs_ll_p, sizeof(sub_dsc_t));
 }
 
 void * lv_msg_subscribe(lv_msg_id_t msg_id, lv_msg_subscribe_cb_t cb, void * user_data)
 {
-    sub_dsc_t * s = _lv_ll_ins_tail(&LV_GC_ROOT(_subs_ll));
+    sub_dsc_t * s = _lv_ll_ins_tail(_msg_subs_ll_p);
     LV_ASSERT_MALLOC(s);
     if(s == NULL) return NULL;
 
@@ -108,7 +111,7 @@ void * lv_msg_subscribe_obj(lv_msg_id_t msg_id, lv_obj_t * obj, void * user_data
 void lv_msg_unsubscribe(void * s)
 {
     LV_ASSERT_NULL(s);
-    _lv_ll_remove(&LV_GC_ROOT(_subs_ll), s);
+    _lv_ll_remove(_msg_subs_ll_p, s);
     restart_notify = true;
     lv_free(s);
 }
@@ -159,13 +162,12 @@ lv_msg_t * lv_event_get_msg(lv_event_t * e)
 
 static void notify(lv_msg_t * m)
 {
-    static unsigned int _recursion_counter = 0;
     _recursion_counter++;
 
     /*First clear all _checked flags*/
     sub_dsc_t * s;
     if(_recursion_counter == 1) {
-        _LV_LL_READ(&LV_GC_ROOT(_subs_ll), s) {
+        _LV_LL_READ(_msg_subs_ll_p, s) {
             s->_checked = 0;
         }
     }
@@ -173,10 +175,10 @@ static void notify(lv_msg_t * m)
     /*Run all sub_dsc_t from the list*/
     do {
         restart_notify = false;
-        s = _lv_ll_get_head(&LV_GC_ROOT(_subs_ll));
+        s = _lv_ll_get_head(_msg_subs_ll_p);
         while(s) {
             /*get next element while current is surely valid*/
-            sub_dsc_t * next = _lv_ll_get_next(&LV_GC_ROOT(_subs_ll), s);
+            sub_dsc_t * next = _lv_ll_get_next(_msg_subs_ll_p, s);
 
             /*Notify only once*/
             if(!s->_checked) {
@@ -212,11 +214,11 @@ static void obj_delete_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
 
-    sub_dsc_t * s = _lv_ll_get_head(&LV_GC_ROOT(_subs_ll));
+    sub_dsc_t * s = _lv_ll_get_head(_msg_subs_ll_p);
     sub_dsc_t * s_next;
     while(s) {
         /*On unsubscribe the list changes s becomes invalid so get next item while it's surely valid*/
-        s_next = _lv_ll_get_next(&LV_GC_ROOT(_subs_ll), s);
+        s_next = _lv_ll_get_next(_msg_subs_ll_p, s);
         if(s->_priv_data == obj) {
             lv_msg_unsubscribe(s);
         }

@@ -67,6 +67,7 @@ extern "C" {
 #include "src/widgets/meter/lv_meter.h"
 #include "src/widgets/msgbox/lv_msgbox.h"
 #include "src/widgets/roller/lv_roller.h"
+#include "src/widgets/scale/lv_scale.h"
 #include "src/widgets/slider/lv_slider.h"
 #include "src/widgets/span/lv_span.h"
 #include "src/widgets/spinbox/lv_spinbox.h"
@@ -100,7 +101,7 @@ extern "C" {
 #include "src/libs/ffmpeg/lv_ffmpeg.h"
 #include "src/libs/tiny_ttf/lv_tiny_ttf.h"
 
-#include "src/layouts/lv_layouts.h"
+#include "src/layouts/lv_layout.h"
 
 #include "src/draw/lv_draw.h"
 
@@ -119,6 +120,7 @@ extern "C" {
 
 #include "src/dev/input/touchscreen/lv_nuttx_touchscreen.h"
 
+#include "src/core/lv_global.h"
 /*********************
  *      DEFINES
  *********************/
@@ -180,7 +182,7 @@ static inline int lv_version_patch(void)
     return LVGL_VERSION_PATCH;
 }
 
-static inline const char *lv_version_info(void)
+static inline const char * lv_version_info(void)
 {
     return LVGL_VERSION_INFO;
 }

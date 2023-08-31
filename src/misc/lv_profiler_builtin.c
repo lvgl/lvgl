@@ -9,6 +9,7 @@
 
 #include "lv_profiler_builtin.h"
 #include "../lvgl.h"
+#include "../core/lv_global.h"
 
 /*********************
  *      DEFINES
@@ -16,31 +17,15 @@
 
 #if LV_USE_PROFILER && LV_USE_PROFILER_BUILTIN
 
+#define profiler_ctx LV_GLOBAL_DEFAULT()->profiler_context
+
+
 #define LV_PROFILER_STR_MAX_LEN 128
 #define LV_PROFILER_TICK_PER_SEC_MAX 1000000
 
 /**********************
  *      TYPEDEFS
  **********************/
-
-/**
- * @brief Structure representing a built-in profiler item in LVGL
- */
-typedef struct {
-    char tag;          /**< The tag of the profiler item */
-    uint32_t tick;     /**< The tick value of the profiler item */
-    const char * func; /**< A pointer to the function associated with the profiler item */
-} lv_profiler_builtin_item_t;
-
-/**
- * @brief Structure representing a context for the LVGL built-in profiler
- */
-typedef struct {
-    lv_profiler_builtin_item_t * item_arr; /**< Pointer to an array of profiler items */
-    uint32_t item_num;                     /**< Number of profiler items in the array */
-    uint32_t cur_index;                    /**< Index of the current profiler item */
-    lv_profiler_builtin_config_t config;   /**< Configuration for the built-in profiler */
-} lv_profiler_builtin_ctx_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -51,8 +36,6 @@ static void default_flush_cb(const char * buf);
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static lv_profiler_builtin_ctx_t profiler_ctx = { 0 };
 
 /**********************
  *      MACROS
