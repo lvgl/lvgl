@@ -67,11 +67,12 @@ typedef struct {
 
     uint32_t format: 8;       /*Image format? To be defined by LVGL*/
     uint32_t user: 8;
-    uint32_t reserved: 8;   /*Reserved to be used later*/
+    uint32_t reserved_1: 16;   /*Reserved to be used later*/
 
     uint32_t w: 16;
     uint32_t h: 16;
-    uint32_t stride: 16;    /*Number of bytes in a row*/
+    uint32_t stride: 16;       /*Number of bytes in a row*/
+    uint32_t reserved_2: 16;   /*Reserved to be used later*/
 } lv_img_header_t;
 #endif
 
