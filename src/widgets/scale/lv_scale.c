@@ -19,8 +19,10 @@
  *********************/
 #define MY_CLASS &lv_scale_class
 
-#define LV_SCALE_LABEL_TXT_LEN  (20U)
-#define LV_SCALE_DEFAULT_ZOOM   ((int32_t) 256U)
+#define LV_SCALE_LABEL_TXT_LEN  		(20U)
+#define LV_SCALE_DEFAULT_ZOOM   		((int32_t) 256U)
+#define LV_SCALE_DEFAULT_ANGLE_RANGE	((uint16_t) 270U)
+#define LV_SCALE_DEFAULT_ROTATION		((int16_t) 135U)
 
 /**********************
  *      TYPEDEFS
@@ -262,8 +264,8 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->major_tick_every = LV_SCALE_MAJOR_TICK_EVERY_DEFAULT;
     scale->mode = LV_SCALE_MODE_HORIZONTAL_BOTTOM;
     scale->label_enabled = LV_SCALE_LABEL_ENABLED_DEFAULT;
-    scale->angle_range = 270U; /* TODO: Replace with symbol? */
-    scale->rotation = 90 + (360 - scale->angle_range) / 2; /* TODO: Replace magic numbers */
+    scale->angle_range = LV_SCALE_DEFAULT_ANGLE_RANGE;
+    scale->rotation = LV_SCALE_DEFAULT_ROTATION;
     scale->range_min = 0U;
     scale->range_max = 100U;
     scale->major_len = 10U;
@@ -314,7 +316,7 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
         lv_event_set_ext_draw_size(event, 100);
     }
     else {
-        /* TODO */
+        /* Nothing to do. Invalid event */
     }
 }
 
@@ -418,7 +420,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     }
                 }
 
-                /* TODO: Maybe move this tick position calculation into an API that can be used in scale_draw_main? or a helper? */
                 if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                     lv_coord_t tmp_width = 0;
 
@@ -500,7 +501,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         /* Major tick */
         major_tick_dsc.raw_end = 0;
 
-        uint16_t label_gap = 15U; /* TODO: Consider lv_style_set_text_letter_space on sections */
+        uint16_t label_gap = 15U; /* TODO: Add to style properties */
         uint8_t tick_idx = 0;
         uint16_t major_tick_idx = 0;
         for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
@@ -574,8 +575,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
             /* Store initial and last tick widths to be used in the main line drawing */
             scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
-
-            /* TODO: Store first and last tick widths to be used in the sections main line drawing */
 
             if(is_major_tick) {
                 major_tick_dsc.p1 = tick_point_a;
@@ -717,7 +716,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         lv_coord_t arc_radius;
         scale_get_center(obj, &arc_center, &arc_radius);
 
-        /* TODO: Take into consideration the width of the first and last tick over the arc */
+        /* TODO: Add compensation for the width of the first and last tick over the arc */
         const int32_t start_angle = lv_map(scale->range_min, scale->range_min, scale->range_max, scale->rotation,
                                            scale->rotation + scale->angle_range);
         const int32_t end_angle = lv_map(scale->range_max, scale->range_min, scale->range_max, scale->rotation,
@@ -740,7 +739,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             lv_coord_t section_arc_radius;
             scale_get_center(obj, &section_arc_center, &section_arc_radius);
 
-            /* TODO: Take into consideration the width of the first and last tick over the arc */
+            /* TODO: Add compensation for the width of the first and last tick over the arc */
             const int32_t section_start_angle = lv_map(section->minor_range, scale->range_min, scale->range_max, scale->rotation,
                                                        scale->rotation + scale->angle_range);
             const int32_t section_end_angle = lv_map(section->major_range, scale->range_min, scale->range_max, scale->rotation,
@@ -772,8 +771,7 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord
     lv_coord_t top_bg = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
     lv_coord_t bottom_bg = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
-    lv_coord_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg,
-                           lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2U;
+    lv_coord_t r = (LV_MIN(lv_obj_get_width(obj) - left_bg - right_bg, lv_obj_get_height(obj) - top_bg - bottom_bg)) / 2U;
 
     center->x = obj->coords.x1 + r + left_bg;
     center->y = obj->coords.y1 + r + top_bg;
