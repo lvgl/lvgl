@@ -1281,6 +1281,38 @@ menu "LVGL configuration"
 			bool "Use TFT_eSPI driver"
 			default n
 
+		config LV_USE_ESP_LCD
+			bool "Use ESP-IDF LCD driver"
+			default n
+
+		choice
+			prompt "ESP_LCD buffer size"
+			depends on LV_USE_ESP_LCD
+			default LV_ESP_LCD_SINGLE_BUFFER
+
+			config LV_ESP_LCD_SINGLE_BUFFER
+				bool "One screen-sized buffer"
+
+			config LV_ESP_LCD_DOUBLE_BUFFER
+				bool "Two screen-sized buffer"
+
+			config LV_ESP_LCD_CUSTOM_BUFFER
+				bool "Custom-sized buffer"
+
+		endchoice
+
+		config LV_ESP_LCD_BUFFER_COUNT
+			int
+			depends on LV_USE_ESP_LCD
+			default 0 if LV_ESP_LCD_CUSTOM_BUFFER
+			default 1 if LV_ESP_LCD_SINGLE_BUFFER
+			default 2 if LV_ESP_LCD_DOUBLE_BUFFER
+
+		config LV_ESP_LCD_BUFFER_SIZE
+			int "Custom partial buffer size (in number of rows)"
+			depends on LV_USE_ESP_LCD && LV_ESP_LCD_CUSTOM_BUFFER
+			default 60
+
 		config LV_USE_NUTTX_TOUCHSCREEN
 			bool "Use NuttX touchscreen driver"
 			default n

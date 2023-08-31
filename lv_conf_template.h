@@ -738,14 +738,22 @@
     #define LV_NUTTX_LCD_BUFFER_SIZE     60
 #endif
 
+/*Driver for /dev/input*/
+#define LV_USE_NUTTX_TOUCHSCREEN    0
+
 /*Driver for /dev/dri/card*/
 #define LV_USE_LINUX_DRM        0
 
 /*Interface for TFT_eSPI*/
 #define LV_USE_TFT_ESPI         0
 
-/*Driver for /dev/input*/
-#define LV_USE_NUTTX_TOUCHSCREEN    0
+/*Interface for ESP_LCD*/
+#define LV_USE_ESP_LCD          0
+#if LV_USE_ESP_LCD
+    #define LV_ESP_LCD_BUFFER_COUNT    0
+    #define LV_ESP_LCD_BUFFER_SIZE     60
+#endif
+#define LV_USE_ESP_TICK			0
 
 /*==================
 * EXAMPLES

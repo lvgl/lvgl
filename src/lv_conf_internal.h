@@ -2432,6 +2432,15 @@
     #endif
 #endif
 
+/*Driver for /dev/input*/
+#ifndef LV_USE_NUTTX_TOUCHSCREEN
+    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+    #else
+        #define LV_USE_NUTTX_TOUCHSCREEN    0
+    #endif
+#endif
+
 /*Driver for /dev/dri/card*/
 #ifndef LV_USE_LINUX_DRM
     #ifdef CONFIG_LV_USE_LINUX_DRM
@@ -2450,12 +2459,35 @@
     #endif
 #endif
 
-/*Driver for /dev/input*/
-#ifndef LV_USE_NUTTX_TOUCHSCREEN
-    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+/*Interface for ESP_LCD*/
+#ifndef LV_USE_ESP_LCD
+    #ifdef CONFIG_LV_USE_ESP_LCD
+        #define LV_USE_ESP_LCD CONFIG_LV_USE_ESP_LCD
     #else
-        #define LV_USE_NUTTX_TOUCHSCREEN    0
+        #define LV_USE_ESP_LCD          0
+    #endif
+#endif
+#if LV_USE_ESP_LCD
+    #ifndef LV_ESP_LCD_BUFFER_COUNT
+        #ifdef CONFIG_LV_ESP_LCD_BUFFER_COUNT
+            #define LV_ESP_LCD_BUFFER_COUNT CONFIG_LV_ESP_LCD_BUFFER_COUNT
+        #else
+            #define LV_ESP_LCD_BUFFER_COUNT    0
+        #endif
+    #endif
+    #ifndef LV_ESP_LCD_BUFFER_SIZE
+        #ifdef CONFIG_LV_ESP_LCD_BUFFER_SIZE
+            #define LV_ESP_LCD_BUFFER_SIZE CONFIG_LV_ESP_LCD_BUFFER_SIZE
+        #else
+            #define LV_ESP_LCD_BUFFER_SIZE     60
+        #endif
+    #endif
+#endif
+#ifndef LV_USE_ESP_TICK
+    #ifdef CONFIG_LV_USE_ESP_TICK
+        #define LV_USE_ESP_TICK CONFIG_LV_USE_ESP_TICK
+    #else
+        #define LV_USE_ESP_TICK			0
     #endif
 #endif
 
