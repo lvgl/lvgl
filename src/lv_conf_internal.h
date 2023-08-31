@@ -1537,6 +1537,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_SCALE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SCALE
+            #define LV_USE_SCALE CONFIG_LV_USE_SCALE
+        #else
+            #define LV_USE_SCALE 0
+        #endif
+    #else
+        #define LV_USE_SCALE      1
+    #endif
+#endif
+
 #ifndef LV_USE_SLIDER
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SLIDER
@@ -1905,6 +1917,24 @@
             #define LV_FS_FATFS_CACHE_SIZE CONFIG_LV_FS_FATFS_CACHE_SIZE
         #else
             #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+        #endif
+    #endif
+#endif
+
+/*API for memory-mapped file access. */
+#ifndef LV_USE_FS_MEMFS
+    #ifdef CONFIG_LV_USE_FS_MEMFS
+        #define LV_USE_FS_MEMFS CONFIG_LV_USE_FS_MEMFS
+    #else
+        #define LV_USE_FS_MEMFS 0
+    #endif
+#endif
+#if LV_USE_FS_MEMFS
+    #ifndef LV_FS_MEMFS_LETTER
+        #ifdef CONFIG_LV_FS_MEMFS_LETTER
+            #define LV_FS_MEMFS_LETTER CONFIG_LV_FS_MEMFS_LETTER
+        #else
+            #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
         #endif
     #endif
 #endif

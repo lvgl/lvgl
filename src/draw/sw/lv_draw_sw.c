@@ -17,6 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define DRAW_UNIT_ID_SW     1
 
 /**********************
  *      TYPEDEFS
@@ -59,7 +60,7 @@ void lv_draw_sw_init(void)
     uint32_t i;
     for(i = 0; i < LV_DRAW_SW_DRAW_UNIT_CNT; i++) {
         lv_draw_sw_unit_t * draw_sw_unit = lv_draw_create_unit(sizeof(lv_draw_sw_unit_t));
-        draw_sw_unit->base_unit.dispatch = lv_draw_sw_dispatch;
+        draw_sw_unit->base_unit.dispatch_cb = lv_draw_sw_dispatch;
         draw_sw_unit->idx = i;
 
 #if LV_USE_OS
@@ -80,7 +81,7 @@ static int32_t lv_draw_sw_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * laye
     if(draw_sw_unit->task_act) return 0;
 
     lv_draw_task_t * t = NULL;
-    t = lv_draw_get_next_available_task(layer, NULL);
+    t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_SW);
     if(t == NULL) return -1;
 
     void * buf = lv_draw_layer_alloc_buf(layer);

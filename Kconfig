@@ -845,6 +845,9 @@ menu "LVGL configuration"
 			int "Number of extra 'pages' when the controller is infinite."
 			default 7
 			depends on LV_USE_ROLLER
+		config LV_USE_SCALE
+			bool "Scale."
+			default y if !LV_CONF_MINIMAL
 		config LV_USE_SLIDER
 			bool "Slider. Requires: lv_bar."
 			select LV_USE_BAR

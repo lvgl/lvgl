@@ -206,6 +206,10 @@ void lv_init(void)
     lv_fs_win32_init();
 #endif
 
+#if LV_USE_FS_MEMFS
+    lv_fs_memfs_init();
+#endif
+
 #if LV_USE_PNG
     lv_png_init();
 #endif

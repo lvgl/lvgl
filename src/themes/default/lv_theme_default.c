@@ -147,6 +147,10 @@ typedef struct {
 #if LV_USE_LED
     lv_style_t led;
 #endif
+
+#if LV_USE_SCALE
+    lv_style_t scale;
+#endif
 } my_theme_styles_t;
 
 typedef enum {
@@ -638,6 +642,14 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_shadow_width(&theme->styles.led, lv_disp_dpx(theme->base.disp, 15));
     lv_style_set_shadow_color(&theme->styles.led, lv_color_white());
     lv_style_set_shadow_spread(&theme->styles.led, lv_disp_dpx(theme->base.disp, 5));
+#endif
+
+#if LV_USE_SCALE
+    style_init_reset(&theme->styles.scale);
+    lv_style_set_line_color(&theme->styles.scale, lv_color_black());
+    lv_style_set_line_width(&theme->styles.scale, 2U);
+    lv_style_set_arc_color(&theme->styles.scale, lv_color_black());
+    lv_style_set_arc_width(&theme->styles.scale, 2U);
 #endif
 }
 
@@ -1163,6 +1175,14 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_LED
     else if(lv_obj_check_type(obj, &lv_led_class)) {
         lv_obj_add_style(obj, &theme->styles.led, 0);
+    }
+#endif
+
+#if LV_USE_SCALE
+    else if(lv_obj_check_type(obj, &lv_scale_class)) {
+        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_MAIN);
+        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_ITEMS);
     }
 #endif
 }

@@ -471,6 +471,8 @@
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
 
+#define LV_USE_SCALE      1
+
 #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
 
 #define LV_USE_SPAN       1
@@ -567,6 +569,12 @@
 #if LV_USE_FS_FATFS
     #define LV_FS_FATFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
+#endif
+
+/*API for memory-mapped file access. */
+#define LV_USE_FS_MEMFS 0
+#if LV_USE_FS_MEMFS
+    #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
 #endif
 
 /*PNG decoder library*/
