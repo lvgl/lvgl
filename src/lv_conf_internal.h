@@ -1537,6 +1537,18 @@
     #endif
 #endif
 
+#ifndef LV_USE_SCALE
+    #ifdef _LV_KCONFIG_PRESENT
+        #ifdef CONFIG_LV_USE_SCALE
+            #define LV_USE_SCALE CONFIG_LV_USE_SCALE
+        #else
+            #define LV_USE_SCALE 0
+        #endif
+    #else
+        #define LV_USE_SCALE      1
+    #endif
+#endif
+
 #ifndef LV_USE_SLIDER
     #ifdef _LV_KCONFIG_PRESENT
         #ifdef CONFIG_LV_USE_SLIDER
