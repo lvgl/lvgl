@@ -76,8 +76,8 @@ typedef lv_res_t (*lv_img_decoder_open_f_t)(struct _lv_img_decoder_t * decoder, 
  * @param buf a buffer to store the decoded pixels
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
-typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder_t * decoder, struct _lv_img_decoder_dsc_t * dsc,
-                                                 lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+typedef lv_res_t (*lv_img_decoder_get_area_cb_t)(struct _lv_img_decoder_t * decoder, struct _lv_img_decoder_dsc_t * dsc,
+                                                 const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
  * Close the pending decoding. Free resources etc.
@@ -90,7 +90,7 @@ typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder_t * decoder, str
 typedef struct _lv_img_decoder_t {
     lv_img_decoder_info_f_t info_cb;
     lv_img_decoder_open_f_t open_cb;
-    lv_img_decoder_read_line_f_t read_line_cb;
+    lv_img_decoder_get_area_cb_t get_area_cb;
     lv_img_decoder_close_f_t close_cb;
     void * user_data;
 } lv_img_decoder_t;
@@ -180,8 +180,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
  * @param buf store the data here
  * @return LV_RES_OK: success; LV_RES_INV: an error occurred
  */
-lv_res_t lv_img_decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_coord_t len,
-                                  uint8_t * buf);
+lv_res_t lv_img_decoder_get_area(lv_img_decoder_dsc_t * dsc, const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
  * Close a decoding session
@@ -220,7 +219,7 @@ void lv_img_decoder_set_open_cb(lv_img_decoder_t * decoder, lv_img_decoder_open_
  * @param decoder pointer to an image decoder
  * @param read_line_cb a function to read a line of an image
  */
-void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_read_line_f_t read_line_cb);
+void lv_img_decoder_set_get_area_cb(lv_img_decoder_t * decoder, lv_img_decoder_get_area_cb_t read_line_cb);
 
 /**
  * Set a callback to close a decoding session. E.g. close files and free other resources.
@@ -237,6 +236,9 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
  * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
  */
 lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
+
+lv_res_t lv_img_decoder_built_in_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+                                          const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
  * Open a built in image

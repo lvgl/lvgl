@@ -34,9 +34,8 @@ typedef struct {
 static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
 static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 
-
-static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
-                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+static lv_res_t decoder_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+                                 const lv_area_t * full_area, lv_area_t * decoded_area);
 
 static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
 
@@ -56,7 +55,7 @@ void lv_bmp_init(void)
     lv_img_decoder_t * dec = lv_img_decoder_create();
     lv_img_decoder_set_info_cb(dec, decoder_info);
     lv_img_decoder_set_open_cb(dec, decoder_open);
-    lv_img_decoder_set_read_line_cb(dec, decoder_read_line);
+    lv_img_decoder_set_get_area_cb(dec, decoder_get_area);
     lv_img_decoder_set_close_cb(dec, decoder_close);
 }
 
@@ -167,7 +166,6 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         LV_ASSERT_MALLOC(dsc->user_data);
         if(dsc->user_data == NULL) return LV_RES_INV;
         memcpy(dsc->user_data, &b, sizeof(b));
-
         dsc->img_data = NULL;
         return LV_RES_OK;
     }
@@ -181,19 +179,36 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 }
 
 
-static lv_res_t decoder_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
-                                  lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
+static lv_res_t decoder_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+                                 const lv_area_t * full_area, lv_area_t * decoded_area)
 {
     LV_UNUSED(decoder);
-
     bmp_dsc_t * b = dsc->user_data;
-    y = (b->px_height - 1) - y; /*BMP images are stored upside down*/
-    uint32_t p = b->px_offset + b->row_size_bytes * y;
-    p += x * (b->bpp / 8);
-    lv_fs_seek(&b->f, p, LV_FS_SEEK_SET);
-    lv_fs_read(&b->f, buf, len * (b->bpp / 8), NULL);
+    uint32_t line_width_byte = lv_area_get_width(full_area) * (b->bpp / 8);
 
-    return LV_RES_OK;
+    if(decoded_area->y1 == LV_COORD_MIN) {
+        *decoded_area = *full_area;
+        decoded_area->y2 = decoded_area->y1;
+        dsc->img_data = lv_malloc(line_width_byte);
+    }
+    else {
+        decoded_area->y1++;
+        decoded_area->y2++;
+    }
+
+
+    if(decoded_area->y1 > full_area->y2) {
+        return LV_RES_INV;
+    }
+    else {
+        lv_coord_t y = (b->px_height - 1) - (decoded_area->y1); /*BMP images are stored upside down*/
+        uint32_t p = b->px_offset + b->row_size_bytes * y;
+        p += (decoded_area->x1) * (b->bpp / 8);
+        lv_fs_seek(&b->f, p, LV_FS_SEEK_SET);
+        lv_fs_read(&b->f, (void *)dsc->img_data, line_width_byte, NULL);
+
+        return LV_RES_OK;
+    }
 }
 
 
@@ -206,6 +221,7 @@ static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc
     bmp_dsc_t * b = dsc->user_data;
     lv_fs_close(&b->f);
     lv_free(dsc->user_data);
+    if(dsc->img_data) lv_free((void *)dsc->img_data);
 
 }
 

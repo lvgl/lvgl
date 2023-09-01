@@ -22,8 +22,9 @@ void tearDown(void)
 static void img_create(const char * name, const void * img_src, bool rotate, bool recolor)
 {
     lv_obj_t * cont = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(cont, 150, LV_SIZE_CONTENT);
+    lv_obj_set_size(cont, 120, LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(cont, lv_palette_main(LV_PALETTE_LIGHT_BLUE), 0);
+    lv_obj_set_style_pad_all(cont, 5, 0);
 
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);
 
@@ -54,6 +55,17 @@ void test_image_built_in_decode(void)
     img_create("XRGB8888", &test_img_cogwheel_xrgb8888, false, false);
     img_create("ARGB8888", &test_img_cogwheel_argb8888, false, false);
 
+    img_create("binI1", "A:src/test_files/binimages/cogwheel.I1.bin", false, false);
+    img_create("binI2", "A:src/test_files/binimages/cogwheel.I2.bin", false, false);
+    img_create("binI4", "A:src/test_files/binimages/cogwheel.I4.bin", false, false);
+    img_create("binI8", "A:src/test_files/binimages/cogwheel.I8.bin", false, false);
+    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", false, false);
+    img_create("binRGB565A8", "A:src/test_files/binimages/cogwheel.RGB565A8.bin", false, false);
+    img_create("binRGB565", "A:src/test_files/binimages/cogwheel.RGB565.bin", false, false);
+    img_create("binRGB888", "A:src/test_files/binimages/cogwheel.RGB888.bin", false, false);
+    img_create("binXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.bin", false, false);
+    img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", false, false);
+
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_simple.png");
 }
 
@@ -72,6 +84,9 @@ void test_image_built_in_decode_rotate(void)
     img_create("RGB565A8", &test_img_cogwheel_rgb565a8, true, false);
     img_create("XRGB8888", &test_img_cogwheel_xrgb8888, true, false);
     img_create("ARGB8888", &test_img_cogwheel_argb8888, true, false);
+
+    /*Only A8 is read to ram thus can rotate for now*/
+    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", true, false);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotated.png");
 }
@@ -92,6 +107,17 @@ void test_image_built_in_decode_recolor(void)
     img_create("XRGB8888", &test_img_cogwheel_xrgb8888, false, true);
     img_create("ARGB8888", &test_img_cogwheel_argb8888, false, true);
 
+    img_create("binI1", "A:src/test_files/binimages/cogwheel.I1.bin", false, true);
+    img_create("binI2", "A:src/test_files/binimages/cogwheel.I2.bin", false, true);
+    img_create("binI4", "A:src/test_files/binimages/cogwheel.I4.bin", false, true);
+    img_create("binI8", "A:src/test_files/binimages/cogwheel.I8.bin", false, true);
+    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", false, true);
+    img_create("binRGB565A8", "A:src/test_files/binimages/cogwheel.RGB565A8.bin", false, true);
+    img_create("binRGB565", "A:src/test_files/binimages/cogwheel.RGB565.bin", false, true);
+    img_create("binRGB888", "A:src/test_files/binimages/cogwheel.RGB888.bin", false, true);
+    img_create("binXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.bin", false, true);
+    img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", false, true);
+
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_recolor.png");
 }
 
@@ -110,6 +136,10 @@ void test_image_built_in_decode_rotate_and_recolor(void)
     img_create("RGB565A8", &test_img_cogwheel_rgb565a8, true, true);
     img_create("XRGB8888", &test_img_cogwheel_xrgb8888, true, true);
     img_create("ARGB8888", &test_img_cogwheel_argb8888, true, true);
+
+    /*Only A8 is read to ram thus can rotate for now*/
+    img_create("binA8", "A:src/test_files/binimages/cogwheel.A8.bin", true, true);
+
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_rotate_and_recolor.png");
 }
