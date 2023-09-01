@@ -753,6 +753,8 @@ static void benchmark_init(void)
     lv_obj_t * scr = lv_scr_act();
     lv_obj_remove_style_all(scr);
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
+    lv_obj_set_style_bg_color(scr, lv_palette_lighten(LV_PALETTE_GREY, 4), 0);
+    lv_obj_set_style_text_color(scr, lv_color_black(), 0);
 
     title = lv_label_create(scr);
     lv_obj_set_pos(title, LV_DPI_DEF / 30, LV_DPI_DEF / 30);
