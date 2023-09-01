@@ -76,12 +76,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
 #endif
         }
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_A8) {
+            lv_area_t mask_area = *glyph_draw_dsc->letter_coords;
+            mask_area.x2 = mask_area.x1 + lv_draw_buf_width_to_stride(lv_area_get_width(&mask_area), LV_COLOR_FORMAT_A8) - 1;
             lv_draw_sw_blend_dsc_t blend_dsc;
             lv_memzero(&blend_dsc, sizeof(blend_dsc));
             blend_dsc.color = glyph_draw_dsc->color;
             blend_dsc.opa = glyph_draw_dsc->opa;
             blend_dsc.mask_buf = glyph_draw_dsc->bitmap;
-            blend_dsc.mask_area = glyph_draw_dsc->letter_coords;
+            blend_dsc.mask_area = &mask_area;
             blend_dsc.blend_area = glyph_draw_dsc->letter_coords;
             blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;
 

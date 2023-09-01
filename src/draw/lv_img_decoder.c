@@ -34,6 +34,7 @@ typedef struct {
 static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_color32_t * palette, lv_coord_t y,
                                     lv_coord_t w_px, const uint8_t * in, lv_color32_t * out);
 
+static uint32_t img_width_to_stride(lv_img_header_t * header);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -93,9 +94,7 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
             if(res == LV_RES_OK) {
-                if(header->stride == 0) {
-                    header->stride = header->w * lv_color_format_get_size(header->cf);
-                }
+                if(header->stride == 0) header->stride = img_width_to_stride(header);
                 break;
             }
         }
@@ -143,9 +142,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         res = decoder->info_cb(decoder, src, &dsc->header);
         if(res != LV_RES_OK) continue;
 
-        if(dsc->header.stride == 0) {
-            dsc->header.stride = dsc->header.w * lv_color_format_get_size(dsc->header.cf);
-        }
+        if(dsc->header.stride == 0) dsc->header.stride = img_width_to_stride(&dsc->header);
 
         dsc->decoder = decoder;
         res = decoder->open_cb(decoder, dsc);
@@ -482,4 +479,15 @@ static lv_res_t decode_indexed_line(lv_color_format_t color_format, const lv_col
         }
     }
     return LV_RES_OK;
+}
+
+
+static uint32_t img_width_to_stride(lv_img_header_t * header)
+{
+    if(header->cf == LV_COLOR_FORMAT_RGB565A8) {
+        return header->w * 2;
+    }
+    else {
+        return header->w * lv_color_format_get_size(header->cf);
+    }
 }
