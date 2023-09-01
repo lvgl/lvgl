@@ -32,8 +32,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * draw_area,
-                          const uint8_t * src_buf, lv_color_format_t cf, lv_draw_img_sup_t * sup, const lv_area_t * img_coords,
-                          lv_coord_t img_stride);
+                          const lv_img_decoder_dsc_t * src, lv_draw_img_sup_t * sup, const lv_area_t * img_coords);
 
 /**********************
  *  STATIC VARIABLES
@@ -176,8 +175,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         return;
     }
 
-    lv_color_format_t cf = decoder_dsc.header.cf;
-
     lv_draw_img_sup_t sup;
     sup.alpha_color = draw_dsc->recolor;
     sup.palette = decoder_dsc.palette;
@@ -185,9 +182,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
 
     /*The whole image is available, just draw it*/
     if(decoder_dsc.img_data) {
-        img_draw_core(draw_unit, draw_dsc, &draw_area, decoder_dsc.img_data,
-                      LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf,
-                      &sup, coords, decoder_dsc.header.stride);
+        img_draw_core(draw_unit, draw_dsc, &draw_area, &decoder_dsc,
+                      &sup, coords);
     }
     /*Draw line by line*/
     else {
@@ -209,9 +205,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
                 /*Limit draw area to the current decoded area and draw the image*/
                 lv_area_t draw_area_sub;
                 if(_lv_area_intersect(&draw_area_sub, &draw_area, &absolute_decoded_area)) {
-                    img_draw_core(draw_unit, draw_dsc, &draw_area_sub, decoder_dsc.img_data,
-                                  LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf,
-                                  &sup, &absolute_decoded_area, decoder_dsc.header.stride);
+                    img_draw_core(draw_unit, draw_dsc, &draw_area_sub, &decoder_dsc,
+                                  &sup, &absolute_decoded_area);
                 }
             }
         }
@@ -221,13 +216,17 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
 }
 
 static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * draw_area,
-                          const uint8_t * src_buf, lv_color_format_t cf, lv_draw_img_sup_t * sup, const lv_area_t * img_coords,
-                          lv_coord_t img_stride)
+                          const lv_img_decoder_dsc_t * src, lv_draw_img_sup_t * sup, const lv_area_t * img_coords)
 {
-
     bool transformed = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
 
     lv_draw_sw_blend_dsc_t blend_dsc;
+    const uint8_t * src_buf = src->img_data;
+    const lv_img_header_t * header = &src->header;
+    uint32_t img_stride = header->stride;
+    lv_color_format_t cf = header->cf;
+
+    cf = LV_COLOR_FORMAT_IS_INDEXED(cf) ? LV_COLOR_FORMAT_ARGB8888 : cf,
 
     lv_memzero(&blend_dsc, sizeof(lv_draw_sw_blend_dsc_t));
     blend_dsc.opa = draw_dsc->opa;
@@ -249,10 +248,11 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * 
     }
     else if(!transformed && cf == LV_COLOR_FORMAT_RGB565A8 && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         lv_coord_t src_h = lv_area_get_height(img_coords);
+        lv_coord_t src_w = lv_area_get_width(img_coords);
         blend_dsc.src_area = img_coords;
         blend_dsc.src_buf = src_buf;
         blend_dsc.mask_buf = (lv_opa_t *)src_buf;
-        blend_dsc.mask_buf += img_stride * src_h;
+        blend_dsc.mask_buf += img_stride * src_w / header->w * src_h;
         blend_dsc.blend_area = img_coords;
         blend_dsc.mask_area = img_coords;
         blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_CHANGED;

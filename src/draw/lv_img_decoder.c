@@ -99,7 +99,10 @@ lv_res_t lv_img_decoder_get_info(const void * src, lv_img_header_t * header)
             res = d->info_cb(d, src, header);
             if(res == LV_RES_OK) {
                 if(header->stride == 0) {
-                    header->stride = header->w * lv_color_format_get_size(header->cf);
+                    if(header->cf == LV_COLOR_FORMAT_RGB565A8)
+                        header->stride = header->w * 2;
+                    else
+                        header->stride = header->w * lv_color_format_get_size(header->cf);
                 }
                 break;
             }
@@ -149,7 +152,10 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         if(res != LV_RES_OK) continue;
 
         if(dsc->header.stride == 0) {
-            dsc->header.stride = dsc->header.w * lv_color_format_get_size(dsc->header.cf);
+            if(dsc->header.cf == LV_COLOR_FORMAT_RGB565A8)
+                dsc->header.stride = dsc->header.w * 2;
+            else
+                dsc->header.stride = dsc->header.w * lv_color_format_get_size(dsc->header.cf);
         }
 
         dsc->decoder = decoder;
