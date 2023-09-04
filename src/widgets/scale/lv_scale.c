@@ -1204,7 +1204,7 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
         else if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
             scale->first_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
         }
-        else if((LV_SCALE_MODE_ROUND_INNER) || (LV_SCALE_MODE_ROUND_OUTTER)) {
+        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTTER == scale->mode)) {
             /* TODO */
         }
         else { /* Nothing to do */ }
@@ -1216,7 +1216,7 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
         else if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
             scale->last_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
         }
-        else if((LV_SCALE_MODE_ROUND_INNER) || (LV_SCALE_MODE_ROUND_OUTTER)) {
+        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTTER == scale->mode)) {
             /* TODO */
         }
         else { /* Nothing to do */ }
