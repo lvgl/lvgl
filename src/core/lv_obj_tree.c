@@ -48,12 +48,15 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 
 void lv_obj_del(lv_obj_t * obj)
 {
+    if(obj->is_deleting)
+        return;
+
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
     lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par) {
+    if(par && !par->is_deleting) {
         lv_obj_scrollbar_invalidate(par);
     }
 
@@ -68,7 +71,7 @@ void lv_obj_del(lv_obj_t * obj)
     obj_del_core(obj);
 
     /*Call the ancestor's event handler to the parent to notify it about the child delete*/
-    if(par) {
+    if(par && !par->is_deleting) {
         lv_obj_update_layout(par);
         lv_obj_readjust_scroll(par, LV_ANIM_OFF);
         lv_obj_scrollbar_invalidate(par);
@@ -372,6 +375,14 @@ static void obj_del_core(lv_obj_t * obj)
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
     lv_res_t res = lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
     if(res == LV_RES_INV) return;
+
+    obj->is_deleting = true;
+
+    /*Clean registered event_cb*/
+    uint32_t event_cnt = lv_obj_get_event_count(obj);
+    for(uint32_t i = 0; i < event_cnt; i++) {
+        lv_obj_remove_event(obj, i);
+    }
 
     /*Recursively delete the children*/
     lv_obj_t * child = lv_obj_get_child(obj, 0);
