@@ -48,6 +48,7 @@ static void calendar_event_cb(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
 static void chart_event_cb(lv_event_t * e);
 static void shop_chart_event_cb(lv_event_t * e);
+static void meter2_event_cb(lv_event_t * e);
 static void meter1_indic1_anim_cb(void * var, int32_t v);
 static void meter1_indic2_anim_cb(void * var, int32_t v);
 static void meter1_indic3_anim_cb(void * var, int32_t v);
@@ -693,7 +694,9 @@ static void analytics_create(lv_obj_t * parent)
     lv_meter_set_indicator_start_value(meter2, meter2_indic[2], 70);
     lv_meter_set_indicator_end_value(meter2, meter2_indic[2], 99);
 
-    lv_timer_create(meter2_timer_cb, 100, meter2_indic);
+    lv_timer_t * meter2_timer = lv_timer_create(meter2_timer_cb, 100, meter2_indic);
+    lv_obj_add_event(meter2, meter2_event_cb, LV_EVENT_DELETE, meter2_timer);
+
 
     meter3 = create_meter_box(parent, "Network Speed", "Low speed", "Normal Speed", "High Speed");
     if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(meter3), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
@@ -1513,6 +1516,15 @@ static void meter1_indic3_anim_cb(void * var, int32_t v)
     lv_obj_t * card = lv_obj_get_parent(meter1);
     lv_obj_t * label = lv_obj_get_child(card, -1);
     lv_label_set_text_fmt(label, "Costs: %"LV_PRId32" %%", v);
+}
+
+static void meter2_event_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_DELETE) {
+        lv_timer_t * meter2_timer = lv_event_get_user_data(e);
+        if(meter2_timer) lv_timer_del(meter2_timer);
+    }
 }
 
 static void meter2_timer_cb(lv_timer_t * timer)
