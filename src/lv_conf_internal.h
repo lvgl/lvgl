@@ -319,6 +319,15 @@
     #endif
 #endif
 
+/*Enable Vector APIs*/
+#ifndef LV_USE_VECTOR
+    #ifdef CONFIG_LV_USE_VECTOR
+        #define LV_USE_VECTOR CONFIG_LV_USE_VECTOR
+    #else
+        #define LV_USE_VECTOR   0
+    #endif
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

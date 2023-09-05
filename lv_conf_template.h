@@ -123,6 +123,9 @@
     #endif
 #endif
 
+/*Enable Vector APIs*/
+#define LV_USE_VECTOR   0
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

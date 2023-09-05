@@ -269,6 +269,12 @@ menu "LVGL configuration"
 				depends on LV_USE_DRAW_SW
 				help
 					Only used if software rotation is enabled in the display driver.
+
+			config LV_USE_VECTOR
+				bool "Use Vector APIs"
+				default n
+				help
+					Enable drawing with vector graphic APIs.
 		endmenu
 
 		menu "GPU"
