@@ -107,11 +107,11 @@ lv_lru_rb_t * lv_lru_rb_create(size_t node_size, size_t max_size, lv_lru_rb_comp
         return NULL;
     }
 
-    lv_memzero(lru, sizeof(lv_rb_t));
+    lv_memzero(lru, sizeof(lv_lru_rb_t));
 
-    // add void* to store the ll node pointer
+    /*add void* to store the ll node pointer*/
     if(!lv_rb_init(&lru->rb, (lv_rb_compare_t)compare_cb, node_size + sizeof(void *))) {
-        return false;
+        return NULL;
     }
     _lv_ll_init(&lru->lru_ll, sizeof(void *));
 
@@ -145,7 +145,7 @@ void * lv_lru_rb_get(lv_lru_rb_t * lru, const void * key, void * user_data)
         return NULL;
     }
 
-    // try the first ll node first
+    /*try the first ll node first*/
     void * head = _lv_ll_get_head(&lru->lru_ll);
     if(head) {
         lv_rb_node_t * node = *(lv_rb_node_t **)head;
@@ -155,7 +155,7 @@ void * lv_lru_rb_get(lv_lru_rb_t * lru, const void * key, void * user_data)
     }
 
     lv_rb_node_t * node = lv_rb_find(&lru->rb, key);
-    // cache hit
+    /*cache hit*/
     if(node) {
         void * lru_node = *get_lru_node(lru, node);
         head = _lv_ll_get_head(&lru->lru_ll);
@@ -168,7 +168,7 @@ void * lv_lru_rb_get(lv_lru_rb_t * lru, const void * key, void * user_data)
         lv_lru_rb_reset(lru, tail->data, user_data);
     }
 
-    // cache miss
+    /*cache miss*/
     lv_rb_node_t * new_node = alloc_new_node(lru, (void *)key, user_data);
     if(new_node == NULL) {
         return NULL;
@@ -213,7 +213,7 @@ void lv_lru_rb_clear(lv_lru_rb_t * lru, void * user_data)
 
     lv_rb_node_t ** node;
     _LV_LL_READ(&lru->lru_ll, node) {
-        // free user handled data and do other clean up
+        /*free user handled data and do other clean up*/
         lru->free_cb((*node)->data, user_data);
     }
 
