@@ -161,7 +161,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
 
                     _draw_info.used_memory_for_layers_kb -= layer_size_byte < 1024 ? 1 : layer_size_byte >> 10;
                     LV_LOG_INFO("Layer memory used: %d kB\n", _draw_info.used_memory_for_layers_kb);
-                    lv_draw_buf_free(&layer_drawn->draw_buf);
+                    lv_draw_buf_free(layer_drawn->draw_buf.buf);
                 }
 
                 /*Remove the layer from  the display's*/
@@ -337,8 +337,9 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
     if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
         uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
                                                                                         layer->draw_buf.color_format);
+        size_t s = lv_draw_buf_get_stride(&layer->draw_buf) * layer->draw_buf.height;
+        layer->draw_buf.buf = lv_draw_buf_malloc(s);
 
-        lv_draw_buf_malloc(&layer->draw_buf);
         if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
             LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);
             return NULL;
