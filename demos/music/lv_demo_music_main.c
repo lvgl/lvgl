@@ -83,6 +83,7 @@ static uint32_t bar_ofs = 0;
 static uint32_t spectrum_lane_ofs_start = 0;
 static uint32_t bar_rot = 0;
 static uint32_t time_act;
+static lv_timer_t  * stop_start_anim_timer;
 static lv_timer_t  * sec_counter_timer;
 static const lv_font_t * font_small;
 static const lv_font_t * font_large;
@@ -251,8 +252,8 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 
     start_anim = true;
 
-    lv_timer_t * timer = lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
-    lv_timer_set_repeat_count(timer, 1);
+    stop_start_anim_timer = lv_timer_create(stop_start_anim, INTRO_TIME + 6000, NULL);
+    lv_timer_set_repeat_count(stop_start_anim_timer, 1);
 
     lv_anim_init(&a);
     lv_anim_set_path_cb(&a, lv_anim_path_bounce);
@@ -875,6 +876,11 @@ static void spectrum_draw_event_cb(lv_event_t * e)
             draw_dsc.p[2].x = center.x - x2_in;
             lv_draw_triangle(layer, &draw_dsc);
         }
+    }
+    else if(code == LV_EVENT_DELETE) {
+        lv_anim_del(NULL, start_anim_cb);
+        lv_anim_del(NULL, spectrum_anim_cb);
+        if(start_anim && stop_start_anim_timer) lv_timer_del(stop_start_anim_timer);
     }
 }
 
