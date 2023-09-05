@@ -273,6 +273,12 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
+            /*Always set the bg_coordinates for placeholder drawing*/
+            bg_coords.x1 = pos.x;
+            bg_coords.y1 = pos.y;
+            bg_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
+            bg_coords.y2 = pos.y + line_height - 1;
+
             if(i >= line_end - line_start) {
                 if(dsc->decor & LV_TEXT_DECOR_UNDERLINE) {
                     lv_area_t fill_area;
@@ -296,20 +302,17 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
                 }
             }
 
+
+
             if(sel_start != 0xFFFF && sel_end != 0xFFFF && logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                 draw_letter_dsc.color = dsc->sel_color;
-
-                bg_coords.x1 = pos.x;
-                bg_coords.y1 = pos.y;
-                bg_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
-                bg_coords.y2 = pos.y + line_height - 1;
-
                 fill_dsc.color = dsc->sel_bg_color;
                 cb(draw_unit, NULL, &fill_dsc, &bg_coords);
             }
             else {
                 draw_letter_dsc.color = dsc->color;
             }
+
 
             draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter, cb);
 
