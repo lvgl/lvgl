@@ -48,6 +48,11 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
 
 void lv_obj_del(lv_obj_t * obj)
 {
+    /*Avoid obj be deleted twice or more. */
+    if (obj->deleted == 1) return;
+
+    obj->deleted = 1;
+
     LV_LOG_TRACE("begin (delete %p)", (void *)obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
