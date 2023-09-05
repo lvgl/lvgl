@@ -330,6 +330,9 @@ void lv_obj_align_to(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv
     lv_coord_t y = 0;
 
     lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    LV_ASSERT_OBJ(parent, MY_CLASS);
+
     lv_coord_t pleft = lv_obj_get_style_space_left(parent, LV_PART_MAIN);
     lv_coord_t ptop = lv_obj_get_style_space_top(parent, LV_PART_MAIN);
 
