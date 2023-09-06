@@ -51,7 +51,7 @@ void lv_obj_del(lv_obj_t * obj)
     if(obj->is_deleting)
         return;
 
-    LV_LOG_TRACE("begin (delete %p)", (void *)obj);
+    LV_LOG_INFO("begin (delete %p)", (void *)obj);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_obj_invalidate(obj);
 
@@ -86,7 +86,7 @@ void lv_obj_del(lv_obj_t * obj)
     }
 
     LV_ASSERT_MEM_INTEGRITY();
-    LV_LOG_TRACE("finished (delete %p)", (void *)obj);
+    LV_LOG_INFO("finished (delete %p)", (void *)obj);
 }
 
 void lv_obj_clean(lv_obj_t * obj)
@@ -375,11 +375,11 @@ static void obj_del_core(lv_obj_t * obj)
     if(obj->is_deleting)
         return;
 
+    obj->is_deleting = true;
+
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
     lv_res_t res = lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
     if(res == LV_RES_INV) return;
-
-    obj->is_deleting = true;
 
     /*Clean registered event_cb*/
     uint32_t event_cnt = lv_obj_get_event_count(obj);
