@@ -25,9 +25,9 @@
  *  STATIC PROTOTYPES
  **********************/
 static void buf_init(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t color_format);
-static void * buf_malloc(size_t size);
+static void * buf_malloc(size_t size, lv_color_format_t color_format);
 static void buf_free(void * buf);
-static void * aligne_buf(void * buf);
+static void * align_buf(void * buf, lv_color_format_t color_format);
 static uint32_t width_to_stride(uint32_t w, lv_color_format_t color_format);
 static void * go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y);
 static void buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * a);
@@ -52,7 +52,7 @@ void _lv_draw_buf_init_handlers(void)
     handlers.init_cb = buf_init;
     handlers.buf_malloc_cb = buf_malloc;
     handlers.buf_free_cb = buf_free;
-    handlers.align_pointer_cb = aligne_buf;
+    handlers.align_pointer_cb = align_buf;
     handlers.invalidate_cache_cb = NULL;
     handlers.width_to_stride_cb = width_to_stride;
     handlers.go_to_xy_cb = go_to_xy;
@@ -76,7 +76,7 @@ void lv_draw_buf_init_alloc(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h
     lv_draw_buf_init(draw_buf, w, h, color_format);
 
     size_t s = lv_draw_buf_get_stride(draw_buf) * h;
-    draw_buf->buf = lv_draw_buf_malloc(s);
+    draw_buf->buf = lv_draw_buf_malloc(s, color_format);
 }
 
 uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
@@ -85,9 +85,9 @@ uint32_t lv_draw_buf_width_to_stride(uint32_t w, lv_color_format_t color_format)
     else return 0;
 }
 
-void * lv_draw_buf_malloc(size_t size)
+void * lv_draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format)
 {
-    if(handlers.buf_malloc_cb) return handlers.buf_malloc_cb(size);
+    if(handlers.buf_malloc_cb) return handlers.buf_malloc_cb(size_bytes, color_format);
     else return NULL;
 }
 
@@ -96,9 +96,9 @@ void lv_draw_buf_free(void * buf)
     if(handlers.buf_free_cb) handlers.buf_free_cb(buf);
 }
 
-void * lv_draw_buf_align_buf(void * data)
+void * lv_draw_buf_align_buf(void * data, lv_color_format_t color_format)
 {
-    if(handlers.align_pointer_cb) return handlers.align_pointer_cb(data);
+    if(handlers.align_pointer_cb) return handlers.align_pointer_cb(data, color_format);
     else return NULL;
 }
 
@@ -127,7 +127,7 @@ void lv_draw_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * d
 
 void * lv_draw_buf_get_buf(lv_draw_buf_t * draw_buf)
 {
-    if(draw_buf->buf) return lv_draw_buf_align_buf(draw_buf->buf);
+    if(draw_buf->buf) return lv_draw_buf_align_buf(draw_buf->buf, draw_buf->color_format);
     else return NULL;
 }
 
@@ -151,10 +151,13 @@ static void buf_init(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h, lv_co
     draw_buf->buf = NULL;
 }
 
-static void * buf_malloc(size_t size)
+static void * buf_malloc(size_t size_bytes, lv_color_format_t color_format)
 {
-    size += LV_DRAW_BUF_ALIGN - 1;  /*Allocate larger memory to be sure it can be aligned as needed*/
-    return lv_malloc(size);
+    LV_UNUSED(color_format);
+
+    /*Allocate larger memory to be sure it can be aligned as needed*/
+    size_bytes += LV_DRAW_BUF_ALIGN - 1;
+    return lv_malloc(size_bytes);
 }
 
 static void buf_free(void * buf)
@@ -162,8 +165,10 @@ static void buf_free(void * buf)
     lv_free(buf);
 }
 
-static void * aligne_buf(void * buf)
+static void * align_buf(void * buf, lv_color_format_t color_format)
 {
+    LV_UNUSED(color_format);
+
     uint8_t * buf_u8 = buf;
     if(buf_u8) {
         buf_u8 += LV_DRAW_BUF_ALIGN - 1;

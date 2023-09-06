@@ -338,7 +338,7 @@ void * lv_draw_layer_alloc_buf(lv_layer_t * layer)
         uint32_t layer_size_byte = layer->draw_buf.height * lv_draw_buf_width_to_stride(layer->draw_buf.width,
                                                                                         layer->draw_buf.color_format);
         size_t s = lv_draw_buf_get_stride(&layer->draw_buf) * layer->draw_buf.height;
-        layer->draw_buf.buf = lv_draw_buf_malloc(s);
+        layer->draw_buf.buf = lv_draw_buf_malloc(s, layer->draw_buf.color_format);
 
         if(lv_draw_buf_get_buf(&layer->draw_buf) == NULL) {
             LV_LOG_WARN("Allocating %"LV_PRIu32" bytes of layer buffer failed. Try later", layer_size_byte);

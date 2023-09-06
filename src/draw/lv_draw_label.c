@@ -400,9 +400,9 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     bitmap_size = (bitmap_size + 63) & (~63);   /*Round up*/
     if(dsc->_bitmap_buf_size < bitmap_size) {
         lv_draw_buf_free(dsc->_bitmap_buf_unaligned);
-        dsc->_bitmap_buf_unaligned = lv_draw_buf_malloc(bitmap_size);
+        dsc->_bitmap_buf_unaligned = lv_draw_buf_malloc(bitmap_size, LV_COLOR_FORMAT_A8);
         LV_ASSERT_MALLOC(dsc->_bitmap_buf_unaligned);
-        dsc->bitmap_buf = lv_draw_buf_align_buf(dsc->_bitmap_buf_unaligned);
+        dsc->bitmap_buf = lv_draw_buf_align_buf(dsc->_bitmap_buf_unaligned, LV_COLOR_FORMAT_A8);
         dsc->_bitmap_buf_size = bitmap_size;
     }
 
