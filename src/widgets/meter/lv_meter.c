@@ -286,8 +286,13 @@ static void lv_meter_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_meter_t * meter = (lv_meter_t *)obj;
-    _lv_ll_clear(&meter->indicator_ll);
 
+    lv_meter_indicator_t * indic;
+    _LV_LL_READ_BACK(&meter->indicator_ll, indic) {
+        lv_anim_del(indic, NULL);
+    }
+
+    _lv_ll_clear(&meter->indicator_ll);
 }
 
 static void lv_meter_event(const lv_obj_class_t * class_p, lv_event_t * e)

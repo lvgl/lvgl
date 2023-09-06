@@ -273,6 +273,12 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
+            /*Always set the bg_coordinates for placeholder drawing*/
+            bg_coords.x1 = pos.x;
+            bg_coords.y1 = pos.y;
+            bg_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
+            bg_coords.y2 = pos.y + line_height - 1;
+
             if(i >= line_end - line_start) {
                 if(dsc->decor & LV_TEXT_DECOR_UNDERLINE) {
                     lv_area_t fill_area;
@@ -296,20 +302,17 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
                 }
             }
 
+
+
             if(sel_start != 0xFFFF && sel_end != 0xFFFF && logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                 draw_letter_dsc.color = dsc->sel_color;
-
-                bg_coords.x1 = pos.x;
-                bg_coords.y1 = pos.y;
-                bg_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
-                bg_coords.y2 = pos.y + line_height - 1;
-
                 fill_dsc.color = dsc->sel_bg_color;
                 cb(draw_unit, NULL, &fill_dsc, &bg_coords);
             }
             else {
                 draw_letter_dsc.color = dsc->color;
             }
+
 
             draw_letter(draw_unit, &draw_letter_dsc, &pos, font, letter, cb);
 
@@ -346,7 +349,7 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
 
         if(pos.y > draw_unit->clip_area->y2) break;
     }
-    lv_free(draw_letter_dsc.bitmap_buf);
+    lv_draw_buf_free(draw_letter_dsc._bitmap_buf_unaligned);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -394,9 +397,12 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
 
     uint32_t bitmap_size = lv_draw_buf_width_to_stride(g.box_w, LV_COLOR_FORMAT_A8) * g.box_h;
+    bitmap_size = (bitmap_size + 63) & (~63);   /*Round up*/
     if(dsc->_bitmap_buf_size < bitmap_size) {
-        dsc->bitmap_buf = lv_realloc(dsc->bitmap_buf, bitmap_size);
-        LV_ASSERT_MALLOC(dsc->bitmap_buf);
+        lv_draw_buf_free(dsc->_bitmap_buf_unaligned);
+        dsc->_bitmap_buf_unaligned = lv_draw_buf_malloc(bitmap_size);
+        LV_ASSERT_MALLOC(dsc->_bitmap_buf_unaligned);
+        dsc->bitmap_buf = lv_draw_buf_align_buf(dsc->_bitmap_buf_unaligned);
         dsc->_bitmap_buf_size = bitmap_size;
     }
 
