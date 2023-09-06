@@ -35,11 +35,9 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _buf_malloc(lv_draw_buf_t * draw_buf);
+static void * _buf_malloc(size_t size_bytes, lv_color_format_t cf);
 
-static void _buf_realloc(lv_draw_buf_t  * draw_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t cf);
-
-static void * _buf_get(lv_draw_buf_t * draw_buf);
+static void * _align_buf(void * buf, lv_color_format_t cf);
 
 static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
 
@@ -51,8 +49,6 @@ static void _vglite_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * area);
 
 static void _vglite_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_area_t * dest_area,
                              void * src_buf, uint32_t src_stride, const lv_area_t * src_area, lv_color_format_t cf);
-
-static uint8_t * _buf_alloc_core(void * old_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t cf);
 
 /**********************
  *  STATIC VARIABLES
@@ -71,8 +67,7 @@ void lv_draw_buf_vglite_init_handlers(void)
     lv_draw_buf_handlers_t * handlers = lv_draw_buf_get_handlers();
 
     handlers->buf_malloc_cb = _buf_malloc;
-    handlers->buf_realloc_cb = _buf_realloc;
-    handlers->buf_get_cb = _buf_get;
+    handlers->align_pointer_cb = _align_buf;
     handlers->invalidate_cache_cb = _invalidate_cache;
     handlers->width_to_stride_cb = _width_to_stride;
     handlers->go_to_xy_cb = _go_to_xy;
@@ -84,33 +79,27 @@ void lv_draw_buf_vglite_init_handlers(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void _buf_malloc(lv_draw_buf_t * draw_buf)
+static void * _buf_malloc(size_t size_bytes, lv_color_format_t cf)
 {
-    if(draw_buf->width != 0 || draw_buf->height != 0)
-        draw_buf->buf = _buf_alloc_core(NULL, lv_draw_buf_get_stride(draw_buf), draw_buf->height, draw_buf->color_format);
-    else
-        draw_buf->buf = NULL;
+    uint8_t align_bytes = vglite_get_alignment(cf);
+
+    /*Allocate larger memory to be sure it can be aligned as needed*/
+    size_bytes += align_bytes - 1;
+
+    return lv_malloc(size_bytes);
 }
 
-static void _buf_realloc(lv_draw_buf_t  * draw_buf, lv_coord_t w, lv_coord_t h,
-                         lv_color_format_t cf)
+static void * _align_buf(void * buf, lv_color_format_t cf)
 {
-    draw_buf->width = w;
-    draw_buf->height = h;
-    draw_buf->color_format = cf;
-    draw_buf->buf = _buf_alloc_core(draw_buf->buf, lv_draw_buf_get_stride(draw_buf), h, cf);
-}
+    uint8_t align_bytes = vglite_get_alignment(cf);
 
-static void * _buf_get(lv_draw_buf_t * draw_buf)
-{
-    uint8_t * buf = draw_buf->buf;
-    uint8_t align_bytes = vglite_get_alignment(draw_buf->color_format);
-
-    if(buf) {
-        buf += align_bytes - 1;
-        buf = (uint8_t *)((lv_uintptr_t)buf & ~(align_bytes - 1));
+    uint8_t * buf_u8 = buf;
+    if(buf_u8) {
+        buf_u8 += align_bytes - 1;
+        buf_u8 = (uint8_t *)((lv_uintptr_t)buf_u8 & ~(align_bytes - 1));
     }
-    return buf;
+
+    return buf_u8;
 }
 
 static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area)
@@ -200,20 +189,6 @@ static void _vglite_buf_copy(void * dest_buf, uint32_t dest_stride, const lv_are
 
     /* Disable scissor. */
     vglite_disable_scissor();
-}
-
-static uint8_t * _buf_alloc_core(void * old_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t cf)
-{
-    uint8_t * buf;
-    uint8_t align_bytes = vglite_get_alignment(cf);
-    size_t s = w * h + align_bytes - 1;
-
-    if(old_buf)
-        buf = lv_realloc(old_buf, s);
-    else
-        buf = lv_malloc(s);
-
-    return buf;
 }
 
 #endif /*LV_USE_DRAW_VGLITE*/
