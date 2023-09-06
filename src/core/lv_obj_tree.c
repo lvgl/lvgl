@@ -374,6 +374,11 @@ static void lv_obj_del_async_cb(void * obj)
 
 static void obj_del_core(lv_obj_t * obj)
 {
+    if(obj->is_deleting)
+        return;
+
+    obj->is_deleting = true;
+
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
     lv_res_t res = lv_obj_send_event(obj, LV_EVENT_DELETE, NULL);
     if(res == LV_RES_INV) return;
