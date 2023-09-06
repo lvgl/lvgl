@@ -145,7 +145,7 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * ds
     src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
 
     lv_color_format_t cf = img_dsc->header.cf;
-    uint32_t src_stride = lv_draw_buf_width_to_stride(lv_area_get_width(coords), cf);
+    uint32_t src_stride = img_dsc->header.stride;
 
     /* Set src_vgbuf structure. */
     vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, cf);
