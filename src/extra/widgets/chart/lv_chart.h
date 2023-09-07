@@ -54,6 +54,15 @@ enum {
 typedef uint8_t lv_chart_update_mode_t;
 
 /**
+ * Chart line series style`
+ */
+enum {
+    LV_CHART_LINE_SOLID,  // Solid line (default)
+    LV_CHART_LINE_DASHED, // Dashed line
+};
+typedef uint8_t lv_chart_line_style_t;
+
+/**
  * Enumeration of the axis'
  */
 enum {
@@ -78,6 +87,7 @@ typedef struct {
     uint8_t y_ext_buf_assigned : 1;
     uint8_t x_axis_sec : 1;
     uint8_t y_axis_sec : 1;
+    lv_chart_line_style_t line_style;
 } lv_chart_series_t;
 
 typedef struct {
@@ -261,6 +271,12 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint1
  * @param   chart pointer to chart object
  */
 void lv_chart_refresh(lv_obj_t * obj);
+
+/*======================
+ * Series Styles
+ *=====================*/
+
+void lv_chart_set_series_line_style(lv_chart_series_t * ser, lv_chart_line_style_t line_style);
 
 /*======================
  * Series
