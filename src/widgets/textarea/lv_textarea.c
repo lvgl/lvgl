@@ -73,7 +73,8 @@ const lv_obj_class_t lv_textarea_class = {
     .width_def = LV_DPI_DEF * 2,
     .height_def = LV_DPI_DEF,
     .instance_size = sizeof(lv_textarea_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "textarea",
 };
 
 static const char * ta_insert_replace;

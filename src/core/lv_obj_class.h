@@ -62,6 +62,7 @@ typedef struct _lv_obj_class_t {
     void (*event_cb)(const struct _lv_obj_class_t * class_p,
                      struct _lv_event_t * e);  /**< Widget type specific event function*/
     void * user_data;
+    const char * name;
     lv_coord_t width_def;
     lv_coord_t height_def;
     uint32_t editable : 2;             /**< Value from ::lv_obj_class_editable_t*/

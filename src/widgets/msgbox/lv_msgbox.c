@@ -39,21 +39,24 @@ const lv_obj_class_t lv_msgbox_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_DPI_DEF * 2,
     .height_def = LV_SIZE_CONTENT,
-    .instance_size = sizeof(lv_msgbox_t)
+    .instance_size = sizeof(lv_msgbox_t),
+    .name = "msgbox",
 };
 
 const lv_obj_class_t lv_msgbox_content_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .instance_size = sizeof(lv_obj_t)
+    .instance_size = sizeof(lv_obj_t),
+    .name = "msgbox-content",
 };
 
 const lv_obj_class_t lv_msgbox_backdrop_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_PCT(100),
-    .instance_size = sizeof(lv_obj_t)
+    .instance_size = sizeof(lv_obj_t),
+    .name = "msgbox-backdrop",
 };
 
 /**********************

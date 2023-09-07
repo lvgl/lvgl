@@ -36,7 +36,8 @@ const lv_obj_class_t lv_barcode_class = {
     .destructor_cb = lv_barcode_destructor,
     .width_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_barcode_t),
-    .base_class = &lv_canvas_class
+    .base_class = &lv_canvas_class,
+    .name = "barcode",
 };
 
 /**********************

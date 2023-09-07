@@ -30,15 +30,19 @@ static void tileview_event_cb(lv_event_t * e);
  *  STATIC VARIABLES
  **********************/
 
-const lv_obj_class_t lv_tileview_class = {.constructor_cb = lv_tileview_constructor,
-                                          .base_class = &lv_obj_class,
-                                          .instance_size = sizeof(lv_tileview_t)
-                                         };
+const lv_obj_class_t lv_tileview_class = {
+    .constructor_cb = lv_tileview_constructor,
+    .base_class = &lv_obj_class,
+    .instance_size = sizeof(lv_tileview_t),
+    .name = "tileview",
+};
 
-const lv_obj_class_t lv_tileview_tile_class = {.constructor_cb = lv_tileview_tile_constructor,
-                                               .base_class = &lv_obj_class,
-                                               .instance_size = sizeof(lv_tileview_tile_t)
-                                              };
+const lv_obj_class_t lv_tileview_tile_class = {
+    .constructor_cb = lv_tileview_tile_constructor,
+    .base_class = &lv_obj_class,
+    .instance_size = sizeof(lv_tileview_tile_t),
+    .name = "tile",
+};
 
 /**********************
  *      MACROS

@@ -60,6 +60,7 @@ static lv_obj_t * get_label(const lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_dropdown_class = {
     .constructor_cb = lv_dropdown_constructor,
     .destructor_cb = lv_dropdown_destructor,
@@ -69,7 +70,8 @@ const lv_obj_class_t lv_dropdown_class = {
     .instance_size = sizeof(lv_dropdown_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "dropdown",
 };
 
 const lv_obj_class_t lv_dropdownlist_class = {
@@ -77,7 +79,8 @@ const lv_obj_class_t lv_dropdownlist_class = {
     .destructor_cb = lv_dropdownlist_destructor,
     .event_cb = lv_dropdown_list_event,
     .instance_size = sizeof(lv_dropdown_list_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "dropdown-list",
 };
 
 

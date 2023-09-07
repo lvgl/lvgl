@@ -37,12 +37,14 @@ static void inv_line(lv_obj_t * obj, lv_meter_indicator_t * indic, int32_t value
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_meter_class = {
     .constructor_cb = lv_meter_constructor,
     .destructor_cb = lv_meter_destructor,
     .event_cb = lv_meter_event,
     .instance_size = sizeof(lv_meter_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "meter",
 };
 
 /**********************

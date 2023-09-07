@@ -56,13 +56,15 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_scale_class  = {
     .constructor_cb = lv_scale_constructor,
     .destructor_cb = lv_scale_destructor,
     .event_cb = lv_scale_event,
     .instance_size = sizeof(lv_scale_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "scale",
 };
 
 /**********************

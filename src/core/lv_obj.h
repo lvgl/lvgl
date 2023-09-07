@@ -185,6 +185,9 @@ typedef struct _lv_obj_t {
     uint32_t style_other_prop_is_set;
 #endif
     void * user_data;
+#if LV_USE_OBJ_ID
+    void * id;
+#endif
     lv_area_t coords;
     lv_obj_flag_t flags;
     lv_state_t state;
@@ -346,6 +349,42 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj);
  * @return          true: valid
  */
 bool lv_obj_is_valid(const lv_obj_t * obj);
+
+#if LV_USE_OBJ_ID
+
+/**
+ * Assign an id to an object if not previously assigned
+ * Set `LV_USE_OBJ_ID_BUILTIN` to 1 to use builtin method to generate object ID.
+ * Otherwise, these functions including `lv_obj_[assign|free|stringify]_id` should be implemented externally.
+ *
+ * @param class_p   the class this obj belongs to. Note obj->class_p is the class currently being constructed.
+ * @param obj   pointer to an object
+ */
+void lv_obj_assign_id(const lv_obj_class_t * class_p, lv_obj_t * obj);
+
+/**
+ * Free resources allocated by `lv_obj_assign_id`
+ * @param obj   pointer to an object
+ */
+void lv_obj_free_id(lv_obj_t * obj);
+
+/**
+ * Format an object's id into a string.
+ * @param obj   pointer to an object
+ * @param buf   buffer to write the string into
+ * @param len   length of the buffer
+ */
+const char * lv_obj_stringify_id(lv_obj_t * obj, char * buf, uint32_t len);
+
+#if LV_USE_OBJ_ID_BUILTIN
+/**
+ * Free resources used by builtin ID generator.
+ */
+void lv_objid_builtin_destroy(void);
+
+#endif
+
+#endif /*LV_USE_OBJ_ID*/
 
 /**********************
  *      MACROS

@@ -70,7 +70,8 @@ const lv_obj_class_t lv_buttonmatrix_class = {
     .instance_size = sizeof(lv_buttonmatrix_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "btnmatrix",
 };
 
 /**********************
