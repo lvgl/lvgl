@@ -984,14 +984,35 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                             p1.y = y_min;
                             p2.y = y_max;
                             if(p1.y == p2.y) p2.y++;    /*If they are the same no line will be drawn*/
-                            if(ser->line_style == LV_CHART_LINE_DASHED) {
+                            if (ser->line_style == LV_CHART_LINE_DASHED) {
                                 lv_draw_line_dsc_t draw_dashed_line;
                                 lv_draw_line_dsc_init(&draw_dashed_line);
+
+                                // Set the dash gap and dash width
                                 draw_dashed_line.dash_gap = lv_dpx(10);
                                 draw_dashed_line.dash_width = lv_dpx(10);
                                 draw_dashed_line.width = lv_dpx(3);
+
+                                // Set the color
                                 draw_dashed_line.color = ser->color;
-                                lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
+
+                                // Calculate the absolute difference between x and y coordinates of p1 and p2
+                                lv_coord_t dx = LV_ABS(p1.x - p2.x);
+                                lv_coord_t dy = LV_ABS(p1.y - p2.y);
+
+                                // Determine if the line is closer to horizontal or vertical based on the difference
+                                if (dx > dy) {
+                                    // Line is closer to horizontal, draw a dashed horizontal line
+                                    lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
+                                } else {
+                                    // Line is closer to vertical, draw a dashed vertical line
+                                    lv_area_t vline;
+                                    vline.x1 = p1.x;
+                                    vline.x2 = p1.x + 5; // Very narrow width
+                                    vline.y1 = LV_MIN(p1.y, p2.y);
+                                    vline.y2 = LV_MAX(p1.y, p2.y)+5;
+                                    lv_draw_rect(draw_ctx, (const lv_draw_rect_dsc_t *)&draw_dashed_line, &vline);
+                                }
                             }
                             else { // Draw a solid line (Default)
                                 lv_draw_line(draw_ctx, &line_dsc_default, &p1, &p2);
@@ -1018,14 +1039,35 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
                     if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                        if(ser->line_style == LV_CHART_LINE_DASHED) {
+                        if (ser->line_style == LV_CHART_LINE_DASHED) {
                             lv_draw_line_dsc_t draw_dashed_line;
                             lv_draw_line_dsc_init(&draw_dashed_line);
+
+                            // Set the dash gap and dash width
                             draw_dashed_line.dash_gap = lv_dpx(10);
                             draw_dashed_line.dash_width = lv_dpx(10);
                             draw_dashed_line.width = lv_dpx(3);
+
+                            // Set the color
                             draw_dashed_line.color = ser->color;
-                            lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
+
+                            // Calculate the absolute difference between x and y coordinates of p1 and p2
+                            lv_coord_t dx = LV_ABS(p1.x - p2.x);
+                            lv_coord_t dy = LV_ABS(p1.y - p2.y);
+
+                            // Determine if the line is closer to horizontal or vertical based on the difference
+                            if (dx >= dy) {
+                                // Line is closer to horizontal, draw a dashed horizontal line
+                                lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
+                            } else {
+                                // Line is closer to vertical, draw a dashed vertical line
+                                lv_area_t vline;
+                                vline.x1 = p1.x;
+                                vline.x2 = p1.x + 5; // Very narrow width
+                                vline.y1 = LV_MIN(p1.y, p2.y);
+                                vline.y2 = LV_MAX(p1.y, p2.y)+5;
+                                lv_draw_rect(draw_ctx, (const lv_draw_rect_dsc_t *)&draw_dashed_line, &vline);
+                            }
                         }
                         else { // Draw a solid line (Default)
                             lv_draw_line(draw_ctx, &line_dsc_default, &p1, &p2);
