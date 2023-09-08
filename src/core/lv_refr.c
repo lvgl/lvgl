@@ -327,12 +327,8 @@ void _lv_disp_refr_timer(lv_timer_t * tmr)
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
 
-        /*Copy invalid areas for sync next refresh*/
-        if(disp_refr->driver->direct_mode) {
-
-            /*Do not copy areas if not double buffered*/
-            if(disp_refr->driver->draw_buf->buf2 == NULL)
-                return;
+        /*Copy invalid areas for sync next refresh in double buffered direct mode*/
+        if(disp_refr->driver->direct_mode && disp_refr->driver->draw_buf->buf2) {
 
             uint16_t i;
             for(i = 0; i < disp_refr->inv_p; i++) {
