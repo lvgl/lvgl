@@ -649,6 +649,9 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_DRAW_MAIN || code == LV_EVENT_DRAW_POST || code == LV_EVENT_COVER_CHECK) {
         lv_obj_draw(e);
     }
+    else if(code == LV_EVENT_INDEV_RESET) {
+        lv_obj_set_state(obj, LV_STATE_DEFAULT);
+    }
 }
 
 /**

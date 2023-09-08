@@ -350,7 +350,7 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
                     /* Avoid recursive calls */
                     act_obj = indev->pointer.act_obj;
                     indev->pointer.act_obj = NULL;
-                    lv_obj_send_event(act_obj, LV_EVENT_PRESS_LOST, indev);
+                    lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
                     act_obj = NULL;
                 }
             }
@@ -372,7 +372,7 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
                         /* Avoid recursive calls */
                         act_obj = i->pointer.act_obj;
                         i->pointer.act_obj = NULL;
-                        lv_obj_send_event(act_obj, LV_EVENT_PRESS_LOST, i);
+                        lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, i);
                         act_obj = NULL;
                     }
                 }
