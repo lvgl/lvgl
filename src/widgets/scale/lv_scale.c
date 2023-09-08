@@ -186,6 +186,16 @@ void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src[])
     lv_obj_invalidate(obj);
 }
 
+void lv_scale_set_post_draw(lv_obj_t * obj, bool en)
+{
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_scale_t * scale = (lv_scale_t *)obj;
+
+    scale->post_draw = en;
+
+    lv_obj_invalidate(obj);
+}
+
 lv_scale_section_t * lv_scale_add_section(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -238,6 +248,7 @@ void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_
             break;
     }
 }
+
 
 /*=====================
  * Getter functions
@@ -307,9 +318,18 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     LV_UNUSED(scale);
 
     if(event_code == LV_EVENT_DRAW_MAIN) {
-        scale_find_section_tick_idx(obj);
-        scale_draw_indicator(obj, event);
-        scale_draw_main(obj, event);
+        if(scale->post_draw == false) {
+            scale_find_section_tick_idx(obj);
+            scale_draw_indicator(obj, event);
+            scale_draw_main(obj, event);
+        }
+    }
+    if(event_code == LV_EVENT_DRAW_POST) {
+        if(scale->post_draw == true) {
+            scale_find_section_tick_idx(obj);
+            scale_draw_indicator(obj, event);
+            scale_draw_main(obj, event);
+        }
     }
     else if(event_code == LV_EVENT_REFR_EXT_DRAW_SIZE) {
         /* NOTE: Extend scale draw size so the first tick label can be shown */
@@ -331,7 +351,6 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     lv_draw_label_dsc_init(&label_dsc);
     /* Formatting the labels with the configured style for LV_PART_INDICATOR */
     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
-    label_dsc.text_local = 1;
 
     /* Major tick style */
     lv_draw_line_dsc_t major_tick_dsc;
@@ -391,6 +410,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 if(scale->txt_src) {
                     if(scale->txt_src[major_tick_idx - 1U]) {
                         label_dsc.text = scale->txt_src[major_tick_idx - 1U];
+                        label_dsc.text_local = 0;
                     }
                     else {
                         label_dsc.text = NULL;
@@ -399,6 +419,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 else { /* Add label with mapped values */
                     lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
                     label_dsc.text = text_buffer;
+                    label_dsc.text_local = 1;
                 }
 
                 scale_get_label_coords(obj, &label_dsc, &tick_point_b, &label_coords);
@@ -541,6 +562,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 if(scale->txt_src) {
                     if(scale->txt_src[major_tick_idx - 1U]) {
                         label_dsc.text = scale->txt_src[major_tick_idx - 1U];
+                        label_dsc.text_local = 0;
                     }
                     else {
                         label_dsc.text = NULL;
@@ -549,6 +571,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 else { /* Add label with mapped values */
                     lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
                     label_dsc.text = text_buffer;
+                    label_dsc.text_local = 1;
                 }
 
                 /* Also take into consideration the letter space of the style */
