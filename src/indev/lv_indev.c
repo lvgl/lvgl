@@ -336,6 +336,8 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev)
 
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
+    lv_obj_t* act_obj = NULL;
+
     if(indev) {
         indev->reset_query = 1;
         if(indev_act == indev) indev_obj_act = NULL;
@@ -344,7 +346,13 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
                 indev->pointer.last_pressed = NULL;
             }
             if(obj == NULL || indev->pointer.act_obj == obj) {
-                indev->pointer.act_obj = NULL;
+                if(indev->pointer.act_obj) {
+                    /* Avoid recursive calls */
+                    act_obj = indev->pointer.act_obj;
+                    indev->pointer.act_obj = NULL;
+                    lv_obj_send_event(act_obj, LV_EVENT_PRESS_LOST, indev);
+                    act_obj = NULL;
+                }
             }
             if(obj == NULL || indev->pointer.last_obj == obj) {
                 indev->pointer.last_obj = NULL;
@@ -360,7 +368,13 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
                     i->pointer.last_pressed = NULL;
                 }
                 if(obj == NULL || i->pointer.act_obj == obj) {
-                    i->pointer.act_obj = NULL;
+                    if(i->pointer.act_obj) {
+                        /* Avoid recursive calls */
+                        act_obj = i->pointer.act_obj;
+                        i->pointer.act_obj = NULL;
+                        lv_obj_send_event(act_obj, LV_EVENT_PRESS_LOST, i);
+                        act_obj = NULL;
+                    }
                 }
                 if(obj == NULL || i->pointer.last_obj == obj) {
                     i->pointer.last_obj = NULL;
