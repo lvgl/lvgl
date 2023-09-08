@@ -988,6 +988,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                                 lv_draw_line_dsc_init(&draw_dashed_line);
                                 draw_dashed_line.dash_gap = lv_dpx(10);
                                 draw_dashed_line.dash_width = lv_dpx(10);
+                                draw_dashed_line.width = lv_dpx(3);
                                 draw_dashed_line.color = ser->color;
                                 lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
                             } else {
@@ -1021,6 +1022,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                             lv_draw_line_dsc_init(&draw_dashed_line);
                             draw_dashed_line.dash_gap = lv_dpx(10);
                             draw_dashed_line.dash_width = lv_dpx(10);
+                            draw_dashed_line.width = lv_dpx(3);
                             draw_dashed_line.color = ser->color;
                             lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
                         } else { // Draw a solid line (Default)
