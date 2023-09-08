@@ -43,7 +43,7 @@ Options are passed to the drop-down list as a string with `lv_dropdown_set_optio
 
 The `lv_dropdown_add_option(dropdown, "New option", pos)` function inserts a new option to `pos` index.
 
-To save memory the options can set from a static(constant) string too with `lv_dropdown_set_static_options(dropdown, options)`.
+To save memory the options can set from a static(constant) string too with `lv_dropdown_set_options_static(dropdown, options)`.
 In this case the options string should be alive while the drop-down list exists and `lv_dropdown_add_option` can't be used
 
 You can select an option manually with `lv_dropdown_set_selected(dropdown, id)`, where `id` is the index of an option.
