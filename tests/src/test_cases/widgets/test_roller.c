@@ -161,6 +161,14 @@ void test_roller_keypad_events(void)
     TEST_ASSERT_EQUAL(expected_index, actual_index);
 }
 
+void test_roller_with_overlay_and_bubble_events_enabled(void)
+{
+    lv_obj_t * overlay = lv_obj_create(roller);
+    lv_obj_add_flag(overlay, LV_OBJ_FLAG_EVENT_BUBBLE);
+
+    lv_obj_send_event(overlay, LV_EVENT_PRESSED, NULL);
+}
+
 //void test_roller_infinite_mode_first_option_gets_selected_after_last_option(void)
 //{
 //    char actual_str[OPTION_BUFFER_SZ] = {0x00};
