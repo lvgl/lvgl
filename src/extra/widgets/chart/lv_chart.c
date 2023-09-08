@@ -339,7 +339,8 @@ void lv_chart_refresh(lv_obj_t * obj)
  * Series Styles
  *=====================*/
 
-void lv_chart_set_series_line_style(lv_chart_series_t * ser, lv_chart_line_style_t line_style) {
+void lv_chart_set_series_line_style(lv_chart_series_t * ser, lv_chart_line_style_t line_style)
+{
     ser->line_style = line_style;
 }
 
@@ -983,7 +984,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                             p1.y = y_min;
                             p2.y = y_max;
                             if(p1.y == p2.y) p2.y++;    /*If they are the same no line will be drawn*/
-                            if (ser->line_style == LV_CHART_LINE_DASHED) {
+                            if(ser->line_style == LV_CHART_LINE_DASHED) {
                                 lv_draw_line_dsc_t draw_dashed_line;
                                 lv_draw_line_dsc_init(&draw_dashed_line);
                                 draw_dashed_line.dash_gap = lv_dpx(10);
@@ -991,8 +992,8 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                                 draw_dashed_line.width = lv_dpx(3);
                                 draw_dashed_line.color = ser->color;
                                 lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
-                            } else {
-                                // Draw a solid line
+                            }
+                            else { // Draw a solid line (Default)
                                 lv_draw_line(draw_ctx, &line_dsc_default, &p1, &p2);
                             }
                             p2.x++;         /*Compensate the previous x--*/
@@ -1017,7 +1018,7 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                     lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
                     if(ser->y_points[p_prev] != LV_CHART_POINT_NONE && ser->y_points[p_act] != LV_CHART_POINT_NONE) {
-                        if (ser->line_style == LV_CHART_LINE_DASHED) {
+                        if(ser->line_style == LV_CHART_LINE_DASHED) {
                             lv_draw_line_dsc_t draw_dashed_line;
                             lv_draw_line_dsc_init(&draw_dashed_line);
                             draw_dashed_line.dash_gap = lv_dpx(10);
@@ -1025,7 +1026,8 @@ static void draw_series_line(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
                             draw_dashed_line.width = lv_dpx(3);
                             draw_dashed_line.color = ser->color;
                             lv_draw_line(draw_ctx, &draw_dashed_line, &p1, &p2);
-                        } else { // Draw a solid line (Default)
+                        }
+                        else { // Draw a solid line (Default)
                             lv_draw_line(draw_ctx, &line_dsc_default, &p1, &p2);
                         }
                     }
