@@ -336,7 +336,7 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev)
 
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
-    lv_obj_t* act_obj = NULL;
+    lv_obj_t * act_obj = NULL;
 
     if(indev) {
         indev->reset_query = 1;
