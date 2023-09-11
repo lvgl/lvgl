@@ -779,7 +779,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx)
     lv_coord_t max_width = lv_area_get_width(&coords);
     lv_coord_t indent = convert_indent_pct(obj, max_width);
     lv_coord_t max_w  = max_width - indent; /* first line need minus indent */
-    lv_opa_t obj_opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+    lv_opa_t obj_opa = lv_obj_get_style_opa_recursive(obj, LV_PART_MAIN);
 
     /* coords of draw span-txt */
     lv_point_t txt_pos;

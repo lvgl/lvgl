@@ -336,7 +336,7 @@ static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t 
     scale_center.x = scale_area->x1 + r_out;
     scale_center.y = scale_area->y1 + r_out;
 
-    lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+    lv_opa_t opa_main = lv_obj_get_style_opa_recursive(obj, LV_PART_MAIN);
     lv_meter_indicator_t * indic;
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
@@ -563,7 +563,7 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
     lv_draw_img_dsc_t img_dsc;
     lv_draw_img_dsc_init(&img_dsc);
     lv_obj_init_draw_img_dsc(obj, LV_PART_ITEMS, &img_dsc);
-    lv_opa_t opa_main = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+    lv_opa_t opa_main = lv_obj_get_style_opa_recursive(obj, LV_PART_MAIN);
 
     lv_obj_draw_part_dsc_t part_draw_dsc;
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);

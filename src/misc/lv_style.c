@@ -119,7 +119,8 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
 
     [LV_STYLE_RADIUS] = 0,
     [LV_STYLE_CLIP_CORNER] = 0,
-    [LV_STYLE_OPA] =                       LV_STYLE_PROP_LAYER_REFR,
+    [LV_STYLE_OPA] =                       0,
+    [LV_STYLE_OPA_LAYERED] =               LV_STYLE_PROP_LAYER_REFR,
     [LV_STYLE_COLOR_FILTER_DSC] =          LV_STYLE_PROP_INHERIT,
     [LV_STYLE_COLOR_FILTER_OPA] =          LV_STYLE_PROP_INHERIT,
     [LV_STYLE_ANIM_TIME] = 0,
@@ -330,6 +331,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.color = lv_color_black();
             break;
         case LV_STYLE_OPA:
+        case LV_STYLE_OPA_LAYERED:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
         case LV_STYLE_IMG_OPA:

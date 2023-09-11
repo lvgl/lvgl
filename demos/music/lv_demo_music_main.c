@@ -769,7 +769,7 @@ static void spectrum_draw_event_cb(lv_event_t * e)
         lv_obj_t * obj = lv_event_get_target(e);
         lv_draw_ctx_t * draw_ctx = lv_event_get_draw_ctx(e);
 
-        lv_opa_t opa = lv_obj_get_style_opa(obj, LV_PART_MAIN);
+        lv_opa_t opa = lv_obj_get_style_opa_recursive(obj, LV_PART_MAIN);
         if(opa < LV_OPA_MIN) return;
 
         lv_point_t poly[4];

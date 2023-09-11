@@ -73,6 +73,7 @@ void lv_style_set_text_align(lv_style_t * style, lv_text_align_t value);
 void lv_style_set_radius(lv_style_t * style, lv_coord_t value);
 void lv_style_set_clip_corner(lv_style_t * style, bool value);
 void lv_style_set_opa(lv_style_t * style, lv_opa_t value);
+void lv_style_set_opa_layered(lv_style_t * style, lv_opa_t value);
 void lv_style_set_color_filter_dsc(lv_style_t * style, const lv_color_filter_dsc_t * value);
 void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value);
 void lv_style_set_anim(lv_style_t * style, const lv_anim_t * value);
@@ -456,6 +457,11 @@ void lv_style_set_base_dir(lv_style_t * style, lv_base_dir_t value);
 #define LV_STYLE_CONST_OPA(val) \
     { \
         .prop = LV_STYLE_OPA, .value = { .num = (int32_t)val } \
+    }
+
+#define LV_STYLE_CONST_OPA_LAYERED(val) \
+    { \
+        .prop = LV_STYLE_OPA_LAYERED, .value = { .num = (int32_t)val } \
     }
 
 #define LV_STYLE_CONST_COLOR_FILTER_DSC(val) \
