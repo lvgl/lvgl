@@ -71,8 +71,8 @@ static lv_lru_item_t * lv_lru_pop_or_create_item(lv_lru_t * cache);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_t * value_free,
-                         lv_lru_free_t * key_free)
+lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_cb_t value_free,
+                         lv_lru_free_cb_t key_free)
 {
     // create the cache
     lv_lru_t * cache = (lv_lru_t *) lv_malloc(sizeof(lv_lru_t));
