@@ -321,7 +321,7 @@ static uint32_t keypad_get_key(void)
  * Encoder
  * -----------------*/
 
-/*Initialize your keypad*/
+/*Initialize your encoder*/
 static void encoder_init(void)
 {
     /*Your code comes here*/
