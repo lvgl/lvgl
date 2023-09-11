@@ -127,7 +127,7 @@ static void * _go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y)
     uint8_t * buf_tmp = lv_draw_buf_get_buf(draw_buf);
 
     buf_tmp += stride * y;
-    buf_tmp += x * bits_per_pixel / 8;
+    buf_tmp += (x * bits_per_pixel) / 8;
 
     return buf_tmp;
 }

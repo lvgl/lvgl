@@ -256,7 +256,7 @@ bool vglite_buf_aligned(const void * buf, uint32_t stride, lv_color_format_t cf)
 
     /* Test for pointer alignment */
     if((uintptr_t)buf % align_bytes) {
-        LV_LOG_ERROR("Buffer address (0x%x) not aligned to 0x%x bytes.",
+        LV_LOG_ERROR("Buffer address (0x%x) not aligned to %d bytes.",
                      (size_t)buf, align_bytes);
         return false;
     }

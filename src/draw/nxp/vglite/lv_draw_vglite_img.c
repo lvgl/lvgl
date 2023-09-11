@@ -29,8 +29,9 @@
 
 #if VGLITE_BLIT_SPLIT_ENABLED
 /**
-* BLIT split threshold - BLITs with width or height higher than this value will be done
-* in multiple steps. Value must be 16-aligned. Don't change.
+* BLIT split threshold - BLITs with width or height higher than this value will
+* be done in multiple steps. Value must be multiple of stride alignment in px.
+* For most color formats the alignment is 16px (except the index formats).
 */
 #define VGLITE_BLIT_SPLIT_THR 352
 
@@ -57,42 +58,54 @@
  *  STATIC PROTOTYPES
  **********************/
 
+/**
+ * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
+ * By default, image is copied directly, with optional opacity.
+ *
+ * @param[in] dest_area Destination area with relative coordinates to dest buffer
+ * @param[in] src_area Source area with relative coordinates to src buffer
+ * @param[in] opa Opacity
+ *
+ */
+static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa);
+
 #if VGLITE_BLIT_SPLIT_ENABLED
+/**
+ * Move buffer pointer as close as possible to area, but with respect to alignment requirements.
+ *
+ * @param[in] buf Buffer address pointer
+ * @param[in] area Area with relative coordinates to the buffer
+ * @param[in] stride Stride of buffer in bytes
+ * @param[in] cf Color format of buffer
+ */
+static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf);
+
 /**
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
  * By default, image is copied directly, with optional opacity.
  *
  * @param dest_buf Destination buffer
- * @param[in] dest_area Area with relative coordinates of destination buffer
+ * @param[in] dest_area Destination area with relative coordinates to dest buffer
  * @param[in] dest_stride Stride of destination buffer in bytes
+ * @param[in] dest_cf Color format of destination buffer
  * @param[in] src_buf Source buffer
- * @param[in] src_area Source area with relative coordinates of source buffer
+ * @param[in] src_area Source area with relative coordinates to src buffer
  * @param[in] src_stride Stride of source buffer in bytes
+ * @param[in] src_cf Color format of source buffer
  * @param[in] opa Opacity
  *
  */
-static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride,
-                               const void * src_buf, lv_area_t * src_area, uint32_t src_stride,
+static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride, lv_color_format_t dest_cf,
+                               const void * src_buf, lv_area_t * src_area, uint32_t src_stride, lv_color_format_t src_cf,
                                lv_opa_t opa);
 #else
-/**
- * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with effects.
- * By default, image is copied directly, with optional opacity.
- *
- * @param[in] dest_area Destination area
- * @param[in] src_area Source area with relative coordinates of source buffer
- * @param[in] opa Opacity
- *
- */
-static void _vglite_blit(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa);
-
 /**
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
  * By default, image is copied directly, with optional opacity.
  *
- * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] clip_area Clip area with relative coordinates of destination buffer
- * @param[in] src_area Source area with relative coordinates of source buffer
+ * @param[in] dest_area Area with relative coordinates to dest buffer
+ * @param[in] clip_area Clip area with relative coordinates to dest buffer
+ * @param[in] src_area Source area with relative coordinates to src buffer
  * @param[in] dsc Image descriptor
  *
  */
@@ -144,36 +157,32 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * ds
     src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
     src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
 
-    lv_color_format_t cf = img_dsc->header.cf;
+    lv_color_format_t src_cf = img_dsc->header.cf;
     uint32_t src_stride = img_dsc->header.stride;
 
     /* Set src_vgbuf structure. */
-    vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, cf);
+    vglite_set_src_buf(src_buf, lv_area_get_width(&src_area), lv_area_get_height(&src_area), src_stride, src_cf);
 
 #if VGLITE_BLIT_SPLIT_ENABLED
     void * dest_buf = lv_draw_buf_get_buf(&layer->draw_buf);
     uint32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
+    lv_color_format_t dest_cf = layer->draw_buf.color_format;
 
     if(!has_transform)
-        _vglite_blit_split(dest_buf, &blend_area, dest_stride,
-                           src_buf, &src_area, src_stride, dsc->opa);
+        _vglite_blit_split(dest_buf, &blend_area, dest_stride, dest_cf,
+                           src_buf, &src_area, src_stride, src_cf, dsc->opa);
 #else
     if(has_transform)
         _vglite_blit_transform(&blend_area, &rel_clip_area, &src_area, dsc);
     else
-        _vglite_blit(&blend_area, &src_area, dsc->opa);
+        _vglite_blit_single(&blend_area, &src_area, dsc->opa);
 #endif
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-/**
- * Blit single image, with optional opacity.
- *
- */
-static void _vglite_blit_single(const lv_area_t * src_area, lv_opa_t opa)
+static void _vglite_blit(const lv_area_t * src_area, lv_opa_t opa)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
@@ -213,48 +222,49 @@ static void _vglite_blit_single(const lv_area_t * src_area, lv_opa_t opa)
     vglite_run();
 }
 
+static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa)
+{
+    /* Set scissor. */
+    vglite_set_scissor(dest_area);
+
+    /* Set vgmatrix. */
+    vglite_set_translation_matrix(dest_area);
+
+    /* Start blit. */
+    _vglite_blit(src_area, opa);
+
+    /* Disable scissor. */
+    vglite_disable_scissor();
+}
+
 #if VGLITE_BLIT_SPLIT_ENABLED
-/**
- * Move buffer pointer as close as possible to area, but with respect to alignment requirements. X-axis only.
- *
- */
-static void _align_x(lv_area_t * area, uint8_t ** buf)
+static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf)
 {
-    int alignedAreaStartPx = area->x1 - (area->x1 % (LV_DRAW_BUF_ALIGN / sizeof(lv_color_t))); // FIXME
-    LV_ASSERT_MSG(alignedAreaStartPx < 0, "Negative X alignment.");
+    uint8_t ** buf_u8 = (uint8_t **)buf;
+    uint8_t align_bytes = vglite_get_alignment(cf);
+    uint8_t bits_per_pixel = vglite_get_px_size(cf);
 
-    area->x1 -= alignedAreaStartPx;
-    area->x2 -= alignedAreaStartPx;
-    *buf += alignedAreaStartPx;
-}
+    uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
 
-/**
- * Move buffer pointer to the area start and update variables, Y-axis only.
- *
- */
-static void _align_y(lv_area_t * area, uint8_t ** buf, uint32_t stride) // FIXME
-{
-    int LineToAlignMem;
-    int alignedAreaStartPy;
-    /* find how many lines of pixels will respect memory alignment requirement */
-    if((stride % (uint32_t)LV_DRAW_BUF_ALIGN) == 0x0U) {
-        alignedAreaStartPy = area->y1;
-    }
-    else {
-        LineToAlignMem = LV_DRAW_BUF_ALIGN / LV_DRAW_BUF_STRIDE_ALIGN;
-        LV_ASSERT_MSG(LV_DRAW_BUF_ALIGN % LV_DRAW_BUF_STRIDE_ALIGN,
-                      "Complex case: need gcd function.");
-        alignedAreaStartPy = area->y1 - (area->y1 % LineToAlignMem);
-        LV_ASSERT_MSG(alignedAreaStartPy < 0, "Negative Y alignment.");
+    if(area->x1 >= (lv_coord_t)(area->x1 % align_pixels)) {
+        uint16_t shift_x = area->x1 - (area->x1 % align_pixels);
+
+        area->x1 -= shift_x;
+        area->x2 -= shift_x;
+        *buf_u8 += (shift_x * bits_per_pixel) / 8;
     }
 
-    area->y1 -= alignedAreaStartPy;
-    area->y2 -= alignedAreaStartPy;
-    *buf += (uint32_t)(alignedAreaStartPy * stride);
+    if(area->y1) {
+        uint16_t shift_y = area->y1;
+
+        area->y1 -= shift_y;
+        area->y2 -= shift_y;
+        *buf_u8 += shift_y * stride;
+    }
 }
 
-static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride,
-                               const void * src_buf, lv_area_t * src_area, uint32_t src_stride,
+static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride, lv_color_format_t dest_cf,
+                               const void * src_buf, lv_area_t * src_area, uint32_t src_stride, lv_color_format_t src_cf,
                                lv_opa_t opa)
 {
     VGLITE_TRACE("Blit "
@@ -267,30 +277,19 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
                  lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                  (uintptr_t)src_buf, (uintptr_t)dest_buf);
 
-    /* Stage 1: Move starting pointers as close as possible to [x1, y1], so coordinates are as small as possible. */
-    _align_x(src_area, (uint8_t **)&src_buf);
-    _align_y(src_area, (uint8_t **)&src_buf, src_stride);
-    _align_x(dest_area, (uint8_t **)&dest_buf);
-    _align_y(dest_area, (uint8_t **)&dest_buf, dest_stride);
+    /* Move starting pointers as close as possible to [x1, y1], so coordinates are as small as possible */
+    _move_buf_close_to_area((void **)&src_buf, src_area, src_stride, src_cf);
+    _move_buf_close_to_area(&dest_buf, dest_area, dest_stride, dest_cf);
 
-    /* Stage 2: If we're in limit, do a single BLIT */
+    /* If we're in limit, do a single BLIT */
     if((src_area->x2 < VGLITE_BLIT_SPLIT_THR) &&
        (src_area->y2 < VGLITE_BLIT_SPLIT_THR)) {
-        /* Set new dest_vgbuf and src_vgbuf memory addresses. */
+
+        /* Set new dest_vgbuf and src_vgbuf memory addresses */
         vglite_set_dest_buf_ptr(dest_buf);
         vglite_set_src_buf_ptr(src_buf);
 
-        /* Set scissor */
-        vglite_set_scissor(dest_area);
-
-        /* Set vgmatrix. */
-        vglite_set_translation_matrix(dest_area);
-
-        /* Start blit. */
-        _vglite_blit_single(src_area, opa);
-
-        /* Disable scissor. */
-        vglite_disable_scissor();
+        _vglite_blit_single(dest_area, src_area, opa);
 
         VGLITE_TRACE("Single "
                      "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -303,7 +302,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
                      (uintptr_t)src_buf, (uintptr_t)dest_buf);
     };
 
-    /* Stage 3: Split the BLIT into multiple tiles */
+    /* Split the BLIT into multiple tiles */
     VGLITE_TRACE("Split "
                  "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
                  "Size: ([%dx%d] -> [%dx%d]) | "
@@ -314,21 +313,17 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
                  lv_area_get_width(dest_area), lv_area_get_height(dest_area),
                  (uintptr_t)src_buf, (uintptr_t)dest_buf);
 
-
-    lv_coord_t width = lv_area_get_width(src_area);
-    lv_coord_t height = lv_area_get_height(src_area);
+    lv_coord_t width = LV_MIN(lv_area_get_width(src_area), lv_area_get_width(dest_area));
+    lv_coord_t height = LV_MIN(lv_area_get_height(src_area), lv_area_get_height(dest_area));
 
     /* Number of tiles needed */
-    int total_tiles_x = (src_area->x1 + width + VGLITE_BLIT_SPLIT_THR - 1) /
-                        VGLITE_BLIT_SPLIT_THR;
-    int total_tiles_y = (src_area->y1 + height + VGLITE_BLIT_SPLIT_THR - 1) /
-                        VGLITE_BLIT_SPLIT_THR;
+    uint8_t total_tiles_x = (src_area->x1 + width + VGLITE_BLIT_SPLIT_THR - 1) /
+                            VGLITE_BLIT_SPLIT_THR;
+    uint8_t total_tiles_y = (src_area->y1 + height + VGLITE_BLIT_SPLIT_THR - 1) /
+                            VGLITE_BLIT_SPLIT_THR;
 
-    /* src and dst buffer shift against each other. Src buffer real data [0,0] may start actually at [3,0] in buffer, as
-     * the buffer pointer has to be aligned, while dst buffer real data [0,0] may start at [1,0] in buffer. alignment may be
-     * different */
-    int shift_src_x = (src_area->x1 > dest_area->x1) ? (src_area->x1 - dest_area->x1) : 0;
-    int shift_dest_x = (src_area->x1 < dest_area->x1) ? (dest_area->x1 - src_area->x1) : 0;
+    uint16_t shift_src_x = src_area->x1;
+    uint16_t shift_dest_x = dest_area->x1;
 
     VGLITE_TRACE("X shift: src: %d, dst: %d", shift_src_x, shift_dest_x);
 
@@ -337,71 +332,51 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
     const uint8_t * tile_src_buf;
     lv_area_t tile_src_area;
 
-    for(int y = 0; y < total_tiles_y; y++) {
+    for(uint8_t y = 0; y < total_tiles_y; y++) {
+        /* y1 always start from 0 */
+        tile_src_area.y1 = 0;
 
-        tile_src_area.y1 = 0; /* no vertical alignment, always start from 0 */
-        tile_src_area.y2 = height - y * VGLITE_BLIT_SPLIT_THR - 1;
-        if(tile_src_area.y2 >= VGLITE_BLIT_SPLIT_THR) {
-            tile_src_area.y2 = VGLITE_BLIT_SPLIT_THR - 1; /* Should never happen */
-        }
-        tile_src_buf = (uint8_t *)src_buf + y * VGLITE_BLIT_SPLIT_THR * src_stride;
+        /* Calculate y2 coordinates */
+        if(y < total_tiles_y - 1)
+            tile_src_area.y2 = VGLITE_BLIT_SPLIT_THR - 1;
+        else
+            tile_src_area.y2 = height - y * VGLITE_BLIT_SPLIT_THR - 1;
 
-        tile_dest_area.y1 = tile_src_area.y1; /* y has no alignment, always in sync with src */
+        /* No vertical shift, dest y is always in sync with src y */
+        tile_dest_area.y1 = tile_src_area.y1;
         tile_dest_area.y2 = tile_src_area.y2;
 
+        /* Advance start pointer for every tile, except the first column (y = 0) */
+        tile_src_buf = (uint8_t *)src_buf + y * VGLITE_BLIT_SPLIT_THR * src_stride;
         tile_dest_buf = (uint8_t *)dest_buf + y * VGLITE_BLIT_SPLIT_THR * dest_stride;
 
-        for(int x = 0; x < total_tiles_x; x++) {
-
-            if(x == 0) {
-                /* 1st tile is special - there may be a gap between buffer start pointer
-                 * and area.x1 value, as the pointer has to be aligned.
-                 * tile_src_buf pointer - keep init value from Y-loop.
-                 * Also, 1st tile start is not shifted! shift is applied from 2nd tile */
-                tile_src_area.x1 = src_area->x1;
-                tile_dest_area.x1 = dest_area->x1;
-            }
-            else {
-                /* subsequent tiles always starts from 0, but shifted*/
-                tile_src_area.x1 = 0 + shift_src_x;
-                tile_dest_area.x1 = 0 + shift_dest_x;
-                /* and advance start pointer + 1 tile size */
-                tile_src_buf += VGLITE_BLIT_SPLIT_THR;
-                tile_dest_buf += VGLITE_BLIT_SPLIT_THR;
+        for(uint8_t x = 0; x < total_tiles_x; x++) {
+            /* x1 always start from the same shift */
+            tile_src_area.x1 = shift_src_x;
+            tile_dest_area.x1 = shift_dest_x;
+            if(x > 0) {
+                /* Advance start pointer for every tile, except the first raw (x = 0) */
+                tile_src_buf += VGLITE_BLIT_SPLIT_THR * vglite_get_px_size(src_cf) / 8;
+                tile_dest_buf += VGLITE_BLIT_SPLIT_THR * vglite_get_px_size(dest_cf) / 8;
             }
 
-            /* Clip tile end coordinates */
-            tile_src_area.x2 = width + src_area->x1 - x * VGLITE_BLIT_SPLIT_THR - 1;
-            if(tile_src_area.x2 >= VGLITE_BLIT_SPLIT_THR) {
+            /* Calculate x2 coordinates */
+            if(x < total_tiles_x - 1)
                 tile_src_area.x2 = VGLITE_BLIT_SPLIT_THR - 1;
-            }
+            else
+                tile_src_area.x2 = width - x * VGLITE_BLIT_SPLIT_THR - 1;
 
-            tile_dest_area.x2 = width + dest_area->x1 - x * VGLITE_BLIT_SPLIT_THR - 1;
-            if(tile_dest_area.x2 >= VGLITE_BLIT_SPLIT_THR) {
-                tile_dest_area.x2 = VGLITE_BLIT_SPLIT_THR - 1;
-            }
+            tile_dest_area.x2 = tile_src_area.x2;
 
-            if(x < (total_tiles_x - 1)) {
-                /* And adjust end coords if shifted, but not for last tile! */
-                tile_src_area.x2 += shift_src_x;
-                tile_dest_area.x2 += shift_dest_x;
-            }
+            /* Shift x2 coordinates */
+            tile_src_area.x2 += shift_src_x;
+            tile_dest_area.x2 += shift_dest_x;
 
-            /* Set new dest_vgbuf and src_vgbuf memory addresses. */
+            /* Set new dest_vgbuf and src_vgbuf memory addresses */
             vglite_set_dest_buf_ptr(tile_dest_buf);
             vglite_set_src_buf_ptr(tile_src_buf);
 
-            /* Set scissor */
-            vglite_set_scissor(&tile_dest_area);
-
-            /* Set vgmatrix. */
-            vglite_set_translation_matrix(&tile_dest_area);
-
-            /* Start blit. */
-            _vglite_blit_single(&tile_src_area, opa);
-
-            /* Disable scissor. */
-            vglite_disable_scissor();
+            _vglite_blit_single(&tile_dest_area, &tile_src_area, opa);
 
             VGLITE_TRACE("Tile [%d, %d] "
                          "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -417,32 +392,17 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
     }
 }
 #else
-static void _vglite_blit(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa)
-{
-    /* Set scissor. */
-    vglite_set_scissor(dest_area);
-
-    /* Set vgmatrix. */
-    vglite_set_translation_matrix(dest_area);
-
-    /* Start blit. */
-    _vglite_blit_single(src_area, opa);
-
-    /* Disable scissor. */
-    vglite_disable_scissor();
-}
-
 static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * clip_area,
                                    const lv_area_t * src_area, const lv_draw_img_dsc_t * dsc)
 {
-    /* Set scissor */
+    /* Set scissor. */
     vglite_set_scissor(clip_area);
 
     /* Set vgmatrix. */
     vglite_set_transformation_matrix(dest_area, dsc);
 
     /* Start blit. */
-    _vglite_blit_single(src_area, dsc->opa);
+    _vglite_blit(src_area, dsc->opa);
 
     /* Disable scissor. */
     vglite_disable_scissor();

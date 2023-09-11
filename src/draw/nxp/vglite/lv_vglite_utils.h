@@ -31,9 +31,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/** Stride in px required by VG-Lite HW*/
-#define VGLITE_STRIDE_ALIGN_PX 16U
-
 /**********************
  *      TYPEDEFS
  **********************/
