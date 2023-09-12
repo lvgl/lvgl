@@ -1002,7 +1002,6 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 /**
  * Process the pressed state of LV_INDEV_TYPE_POINTER input devices
  * @param indev pointer to an input device 'proc'
- * @return LV_RES_OK: no indev reset required; LV_RES_INV: indev reset is required
  */
 static void indev_proc_press(lv_indev_t * indev)
 {
@@ -1215,6 +1214,7 @@ static lv_obj_t * pointer_search_obj(lv_disp_t * disp, lv_point_t * p)
     indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
+    /* Search the object in the active screen */
     indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
