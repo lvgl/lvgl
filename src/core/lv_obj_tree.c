@@ -385,10 +385,7 @@ static void obj_del_core(lv_obj_t * obj)
     }
 
     /*Clean registered event_cb*/
-    uint32_t event_cnt = lv_obj_get_event_count(obj);
-    for(uint32_t i = 0; i < event_cnt; i++) {
-        lv_obj_remove_event(obj, i);
-    }
+    if(obj->spec_attr) lv_event_remove_all(&(obj->spec_attr->event_list));
 
     /*Recursively delete the children*/
     lv_obj_t * child = lv_obj_get_child(obj, 0);

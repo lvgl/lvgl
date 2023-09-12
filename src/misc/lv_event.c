@@ -140,6 +140,16 @@ bool lv_event_remove(lv_event_list_t * list, uint32_t index)
     return true;
 }
 
+void lv_event_remove_all(lv_event_list_t * list)
+{
+    LV_ASSERT_NULL(list);
+    if(list && list->dsc) {
+        lv_free(list->dsc);
+        list->dsc = NULL;
+        list->cnt = 0;
+    }
+}
+
 void * lv_event_get_current_target(lv_event_t * e)
 {
     return e->current_target;
