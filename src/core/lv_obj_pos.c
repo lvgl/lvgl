@@ -910,7 +910,6 @@ void lv_obj_get_click_area(const lv_obj_t * obj, lv_area_t * area)
 bool lv_obj_hit_test(lv_obj_t * obj, const lv_point_t * point)
 {
     if(!lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) return false;
-    if(lv_obj_has_state(obj, LV_STATE_DISABLED)) return false;
 
     lv_area_t a;
     lv_obj_get_click_area(obj, &a);
