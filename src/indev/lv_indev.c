@@ -1153,6 +1153,8 @@ static void indev_proc_release(lv_indev_t * indev)
     if(indev_obj_act) {
         LV_LOG_INFO("released");
 
+        const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
         /*Send RELEASE Call the ancestor's event handler and event*/
         lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
         if(indev_reset_check(indev)) return;
@@ -1164,7 +1166,7 @@ static void indev_proc_release(lv_indev_t * indev)
                 if(indev_reset_check(indev)) return;
             }
 
-            lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
+            if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
             if(indev_reset_check(indev)) return;
         }
         else {
