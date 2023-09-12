@@ -138,6 +138,7 @@ void lv_disp_remove(lv_disp_t * disp)
     if(disp == lv_disp_get_default()) was_default = true;
 
     lv_disp_send_event(disp, LV_EVENT_DELETE, NULL);
+    lv_event_remove_all(&(disp->event_list));
 
     /*Detach the input devices*/
     lv_indev_t * indev;
