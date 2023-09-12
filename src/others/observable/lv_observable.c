@@ -1,7 +1,6 @@
 ﻿#include "lv_observable.h"
 
 #include "../../../misc/lv_ll.h"
-//#include "../../../misc/lv_style.h"
 
 /**********************
  *      TYPEDEFS
@@ -82,14 +81,32 @@ const lv_cond_fn_t lv_cond_int_fn[LV_COND_NUM] = {
     lv_cond_int_ge,
 };
 
+void lv_observable_update(lv_observable_t* obs, lv_observable_sub_dsc_t* s)
+{
+    if (s->callback) {
+        s->callback(s, s->cond ? s->cond(obs->value, s->cond_val) : true);
+    }
+}
+
 static void notify(lv_observable_t* obs)
 {
     lv_observable_sub_dsc_t* s;
     _LV_LL_READ(&(obs->subs_ll), s) {
-        if (s->callback) {
-            s->callback(s, s->cond ? s->cond(obs->value, s->cond_val) : true);
-        }
+        lv_observable_update(obs, s);
     }
+}
+
+void lv_observable_unsubscribe(lv_observable_sub_dsc_t* s)
+{
+    LV_ASSERT_NULL(s);
+    _lv_ll_remove(&(s->obs->subs_ll), s);
+    lv_mem_free(s);
+}
+
+void lv_observable_unsubscribe_on_delete_cb(lv_event_t* e)
+{
+    lv_observable_sub_dsc_t* s = lv_event_get_user_data(e);
+    lv_observable_unsubscribe(s);
 }
 
 void* lv_observable_subscribe_obj(lv_observable_t* obs, lv_observable_cb_t cb, lv_obj_t* obj, void* data1, void* data2, lv_cond_fn_t cond, lv_observable_value_t cond_val)
@@ -100,6 +117,7 @@ void* lv_observable_subscribe_obj(lv_observable_t* obs, lv_observable_cb_t cb, l
 
     lv_memset_00(s, sizeof(*s));
 
+    s->obs = obs;
     s->cond = cond;
     s->cond_val = cond_val;
     s->obj = obj;
@@ -107,7 +125,14 @@ void* lv_observable_subscribe_obj(lv_observable_t* obs, lv_observable_cb_t cb, l
     s->data1 = data1;
     s->data2 = data2;
 
-    notify(obs);        /**/
+    /* subscribe to delete event of the object */
+    if (obj != NULL) {
+        lv_obj_add_event_cb(obj, lv_observable_unsubscribe_on_delete_cb, LV_EVENT_DELETE, s);
+    }
+
+    /* update object immediately */
+    lv_observable_update(obs, s);
+
     return s;
 }
 
@@ -137,10 +162,33 @@ void lv_bind_int_to_obj_flag_cond(lv_observable_t* obs, lv_obj_t* obj, lv_obj_fl
     lv_observable_subscribe_obj(obs, lv_observable_set_obj_flag_cb, obj, (void*)flag, NULL, lv_cond_int_fn[cond], v);
 }
 
-void lv_bind_int_to_obj_flag(lv_observable_t* obs, lv_obj_t* obj, lv_obj_flag_t flag)
+void lv_observable_set_obj_state_cb(void* s, bool cond)
 {
-    lv_bind_int_to_obj_flag_cond(obs, obj, flag, LV_COND_NE, 0);
+    lv_observable_sub_dsc_t* dsc = (lv_observable_sub_dsc_t*)s;
+    if (cond) {
+        lv_obj_add_state(dsc->obj, (lv_state_t)dsc->data1);
+    }
+    else {
+        lv_obj_clear_state(dsc->obj, (lv_state_t)dsc->data1);
+    }
 }
+
+void lv_bind_int_to_obj_state_cond(lv_observable_t* obs, lv_obj_t* obj, lv_state_t flag, lv_cond_t cond, int32_t cond_val)
+{
+    lv_observable_value_t v;
+
+    v.num = cond_val;
+    lv_observable_subscribe_obj(obs, lv_observable_set_obj_state_cb, obj, (void*)flag, NULL, lv_cond_int_fn[cond], v);
+}
+
+void lv_bind_int_to_callback_cond(lv_observable_t* obs, lv_observable_cb_t cb, lv_obj_t* obj, void* data1, void* data2, lv_cond_t cond, int32_t cond_val)
+{
+    lv_observable_value_t v;
+
+    v.num = cond_val;
+    lv_observable_subscribe_obj(obs, cb, obj, data1, data2, lv_cond_int_fn[cond], v);
+}
+
 
 #if 0
 
