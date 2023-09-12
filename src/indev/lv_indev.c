@@ -505,9 +505,17 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
         int32_t i;
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
 
-        /*If a child matches use it*/
+        /*If a child matches (and it's not disabled) use it*/
         for(i = child_cnt - 1; i >= 0; i--) {
             lv_obj_t * child = obj->spec_attr->children[i];
+
+            /* When a child has LV_STATE_DISABLED state
+             * Stop the search and 'drop' the press/release event */
+            if(lv_obj_has_state(child, LV_STATE_DISABLED)) {
+                hit_test_ok = false;
+                break;
+            }
+
             found_p = lv_indev_search_obj(child, &p_trans);
             if(found_p) return found_p;
         }
