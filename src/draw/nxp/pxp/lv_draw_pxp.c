@@ -34,7 +34,17 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t _draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+/*
+ * Dispatch a task to the PXP unit.
+ * Return 1 if task was dispatched, 0 otherwise (task not supported).
+ */
+static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+
+/*
+ * Evaluate a task and set the score and preferred PXP unit.
+ * Return 1 if task is preferred, 0 otherwise (task is not supported).
+ */
+static int32_t _pxp_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 #if LV_USE_OS
     static void _pxp_render_thread_cb(void * ptr);
@@ -63,7 +73,8 @@ void lv_draw_pxp_init(void)
     lv_draw_buf_pxp_init_handlers();
 
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
-    draw_pxp_unit->base_unit.dispatch_cb = _draw_pxp_dispatch;
+    draw_pxp_unit->base_unit.dispatch_cb = _pxp_dispatch;
+    draw_pxp_unit->base_unit.evaluate_cb = _pxp_evaluate;
 
     lv_pxp_init();
 
@@ -127,9 +138,9 @@ static bool _pxp_draw_img_supported(const lv_draw_img_dsc_t * draw_dsc)
     return true;
 }
 
-static bool _pxp_task_supported(lv_draw_task_t * t)
+static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
-    bool is_supported = true;
+    LV_UNUSED(u);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL: {
@@ -137,26 +148,30 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
 
                 /* Most simple case: just a plain rectangle (no radius, no gradient). */
                 if((draw_dsc->radius != 0) || (draw_dsc->grad.dir != (lv_grad_dir_t)LV_GRAD_DIR_NONE))
-                    is_supported = false;
+                    return 0;
 
-                break;
+                if(t->preference_score > 70) {
+                    t->preference_score = 70;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
+                }
+                return 1;
             }
 
         case LV_DRAW_TASK_TYPE_BG_IMG: {
                 const lv_draw_bg_img_dsc_t * draw_dsc = (lv_draw_bg_img_dsc_t *) t->draw_dsc;
                 lv_img_src_t src_type = lv_img_src_get_type(draw_dsc->src);
 
-                if(src_type == LV_IMG_SRC_SYMBOL) {
-                    is_supported = false;
-                    break;
-                }
+                if(src_type == LV_IMG_SRC_SYMBOL)
+                    return 0;
 
-                if(!_pxp_cf_supported(draw_dsc->img_header.cf)) {
-                    is_supported = false;
-                    break;
-                }
+                if(!_pxp_cf_supported(draw_dsc->img_header.cf))
+                    return 0;
 
-                break;
+                if(t->preference_score > 70) {
+                    t->preference_score = 70;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
+                }
+                return 1;
             }
 
         case LV_DRAW_TASK_TYPE_LAYER: {
@@ -164,36 +179,43 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
                 lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
-                if(!_pxp_cf_supported(draw_buf->color_format)) {
-                    is_supported = false;
-                    break;
-                }
+                if(!_pxp_cf_supported(draw_buf->color_format))
+                    return 0;
 
-                is_supported = _pxp_draw_img_supported(draw_dsc);
-                break;
+                if(!_pxp_draw_img_supported(draw_dsc))
+                    return 0;
+
+                if(t->preference_score > 70) {
+                    t->preference_score = 70;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
+                }
+                return 1;
             }
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 const lv_img_dsc_t * img_dsc = draw_dsc->src;
 
-                if(!_pxp_cf_supported(img_dsc->header.cf)) {
-                    is_supported = false;
-                    break;
-                }
+                if(!_pxp_cf_supported(img_dsc->header.cf))
+                    return 0;
 
-                is_supported = _pxp_draw_img_supported(draw_dsc);
-                break;
+                if(!_pxp_draw_img_supported(draw_dsc))
+                    return 0;
+
+                if(t->preference_score > 70) {
+                    t->preference_score = 70;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_PXP;
+                }
+                return 1;
             }
         default:
-            is_supported = false;
-            break;
+            return 0;
     }
 
-    return is_supported;
+    return 0;
 }
 
-static int32_t _draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
 
@@ -207,14 +229,8 @@ static int32_t _draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer
 
     /* Try to get an ready to draw. */
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
-    while(t != NULL) {
-        if(_pxp_task_supported(t))
-            break;
 
-        t = lv_draw_get_next_available_task(layer, t, DRAW_UNIT_ID_PXP);
-    }
-
-    /* Return 0 is no selection, some tasks can be supported only by SW. */
+    /* Return 0 is no selection, some tasks can be supported only by other units. */
     if(t == NULL)
         return 0;
 
