@@ -394,6 +394,12 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
                 }
+                else {
+                    /* Tick is not in section, get the proper styles */
+                    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+                }
             }
 
             /* The tick is represented by a line. We need two points to draw it */
@@ -561,6 +567,12 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     else {
                         scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
+                }
+                else {
+                    /* Tick is not in section, get the proper styles */
+                    lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
                 }
             }
 
