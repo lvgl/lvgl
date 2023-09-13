@@ -471,7 +471,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         section->last_tick_in_section.y = tick_point_a.y;
                         /* Add 1px as adjustment if tmp_width is odd */
                         if(tmp_width & 0x01U) {
-                            tmp_width += 1U;
+                            tmp_width -= 1U;
                         }
                         section->last_tick_in_section_width = tmp_width;
                     }
@@ -491,7 +491,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         section->first_tick_in_section.x = tick_point_a.x;
                         /* Add 1px as adjustment if tmp_width is odd */
                         if(tmp_width & 0x01U) {
-                            tmp_width += 1U;
+                            tmp_width -= 1U;
                         }
                         section->first_tick_in_section_width = tmp_width;
                     }
