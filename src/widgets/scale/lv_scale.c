@@ -283,6 +283,7 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->minor_len = 5u;
     scale->last_tick_width = 0U;
     scale->first_tick_width = 0U;
+    scale->post_draw = false;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
