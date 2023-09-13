@@ -50,7 +50,17 @@ typedef struct _vglite_draw_task_t {
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t _draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+/*
+ * Dispatch a task to the VGLite unit.
+ * Return 1 if task was dispatched, 0 otherwise (task not supported).
+ */
+static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+
+/*
+ * Evaluate a task and set the score and preferred VGLite unit.
+ * Return 1 if task is preferred, 0 otherwise (task is not supported).
+ */
+static int32_t _vglite_evaluate(lv_draw_unit_t * draw_unit, lv_draw_task_t * task);
 
 #if LV_USE_OS
     static void _vglite_render_thread_cb(void * ptr);
@@ -86,7 +96,8 @@ void lv_draw_vglite_init(void)
     lv_draw_buf_vglite_init_handlers();
 
     lv_draw_vglite_unit_t * draw_vglite_unit = lv_draw_create_unit(sizeof(lv_draw_vglite_unit_t));
-    draw_vglite_unit->base_unit.dispatch_cb = _draw_vglite_dispatch;
+    draw_vglite_unit->base_unit.dispatch_cb = _vglite_dispatch;
+    draw_vglite_unit->base_unit.evaluate_cb = _vglite_evaluate;
 
 #if LV_USE_OS
     lv_thread_init(&draw_vglite_unit->thread, LV_THREAD_PRIO_HIGH, _vglite_render_thread_cb, 8 * 1024, draw_vglite_unit);
@@ -106,24 +117,44 @@ static inline bool _vglite_cf_supported(lv_color_format_t cf)
     return (!is_cf_unsupported);
 }
 
-static bool _vglite_task_supported(lv_draw_task_t * t)
+static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 {
-    bool is_supported = true;
+    LV_UNUSED(u);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
+            if(t->preference_score > 80) {
+                t->preference_score = 80;
+                t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
+            }
+            return 1;
+
         case LV_DRAW_TASK_TYPE_LINE:
         case LV_DRAW_TASK_TYPE_ARC:
+            if(t->preference_score > 90) {
+                t->preference_score = 90;
+                t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
+            }
+            return 1;
+
         case LV_DRAW_TASK_TYPE_LABEL:
-            break;
+            if(t->preference_score > 95) {
+                t->preference_score = 95;
+                t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
+            }
+            return 1;
 
         case LV_DRAW_TASK_TYPE_BORDER: {
                 const lv_draw_border_dsc_t * draw_dsc = (lv_draw_border_dsc_t *) t->draw_dsc;
 
                 if(draw_dsc->side != (lv_border_side_t)LV_BORDER_SIDE_FULL)
-                    is_supported = false;
+                    return 0;
 
-                break;
+                if(t->preference_score > 90) {
+                    t->preference_score = 90;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
+                }
+                return 1;
             }
 
         case LV_DRAW_TASK_TYPE_BG_IMG: {
@@ -137,10 +168,14 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
                        || (!_vglite_cf_supported(draw_dsc->img_header.cf))
                        || (!vglite_buf_aligned(draw_dsc->src, draw_dsc->img_header.stride, draw_dsc->img_header.cf))
                       )
-                        is_supported = false;
+                        return 0;
                 }
 
-                break;
+                if(t->preference_score > 80) {
+                    t->preference_score = 80;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
+                }
+                return 1;
             }
 
         case LV_DRAW_TASK_TYPE_LAYER: {
@@ -148,18 +183,18 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
                 lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
-                /* Return supported so this task is marked as complete once it gets in execution. */
-                if(draw_buf->buf == NULL)
-                    break;
-
                 bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
 
                 if(has_recolor
                    || (!_vglite_cf_supported(draw_buf->color_format))
                   )
-                    is_supported = false;
+                    return 0;
 
-                break;
+                if(t->preference_score > 80) {
+                    t->preference_score = 80;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
+                }
+                return 1;
             }
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
@@ -178,19 +213,22 @@ static bool _vglite_task_supported(lv_draw_task_t * t)
                    || (!_vglite_cf_supported(img_dsc->header.cf))
                    || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
                   )
-                    is_supported = false;
+                    return 0;
 
-                break;
+                if(t->preference_score > 80) {
+                    t->preference_score = 80;
+                    t->preferred_draw_unit_id = DRAW_UNIT_ID_VGLITE;
+                }
+                return 1;
             }
         default:
-            is_supported = false;
-            break;
+            return 0;
     }
 
-    return is_supported;
+    return 0;
 }
 
-static int32_t _draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t _vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_vglite_unit_t * draw_vglite_unit = (lv_draw_vglite_unit_t *) draw_unit;
 
@@ -207,14 +245,8 @@ static int32_t _draw_vglite_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * la
 
     /* Try to get an ready to draw. */
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_VGLITE);
-    while(t != NULL) {
-        if(_vglite_task_supported(t))
-            break;
 
-        t = lv_draw_get_next_available_task(layer, t, DRAW_UNIT_ID_VGLITE);
-    }
-
-    /* Return 0 is no selection, some tasks can be supported only by SW. */
+    /* Return 0 is no selection, some tasks can be supported by other units. */
     if(t == NULL)
         return 0;
 

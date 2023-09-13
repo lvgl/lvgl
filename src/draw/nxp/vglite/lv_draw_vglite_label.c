@@ -166,8 +166,6 @@ static void _vglite_draw_letter(const lv_area_t * dest_area,
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
 
-    //int32_t stride = (mask_stride + 15) & ~0xf; /*Closest multiple of 16*/
-
     vg_lite_buffer_t mask_vgbuf;
     mask_vgbuf.format = VG_LITE_A8;
     mask_vgbuf.tiled = VG_LITE_LINEAR;
