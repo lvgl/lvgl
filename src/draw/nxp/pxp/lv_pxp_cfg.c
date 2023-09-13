@@ -19,9 +19,6 @@
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_osa.h"
 
-//temp for clean and invalidate data cache
-#include "lvgl_support.h"
-
 /*********************
  *      DEFINES
  *********************/
@@ -33,11 +30,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-/**
- * Clean and invalidate cache.
- */
-static inline void invalidate_cache(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -88,8 +80,6 @@ void lv_pxp_reset(void)
 
 void lv_pxp_run(void)
 {
-    invalidate_cache();
-
     _pxp_cfg->pxp_run();
     _pxp_cfg->pxp_wait();
 }
@@ -102,10 +92,5 @@ void lv_pxp_wait(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static inline void invalidate_cache(void)
-{
-    DEMO_CleanInvalidateCache();
-}
 
 #endif /*LV_USE_DRAW_PXP*/

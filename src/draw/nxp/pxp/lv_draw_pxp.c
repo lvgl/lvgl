@@ -24,6 +24,8 @@
  *      DEFINES
  *********************/
 
+#define DRAW_UNIT_ID_PXP 3
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -32,7 +34,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t lv_draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
+static int32_t _draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer);
 
 #if LV_USE_OS
     static void _pxp_render_thread_cb(void * ptr);
@@ -56,24 +58,12 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_layer_t * lv_draw_pxp_layer_init(lv_disp_t * disp)
-{
-    lv_pxp_layer_t * pxp_layer = (lv_pxp_layer_t *)lv_draw_sw_layer_init(disp);
-
-    pxp_layer->buffer_copy = lv_draw_pxp_buffer_copy;
-
-    return pxp_layer;
-}
-
-void lv_draw_pxp_layer_deinit(lv_disp_t * disp, lv_layer_t * layer)
-{
-    lv_draw_sw_layer_deinit(disp, layer);
-}
-
 void lv_draw_pxp_init(void)
 {
+    lv_draw_buf_pxp_init_handlers();
+
     lv_draw_pxp_unit_t * draw_pxp_unit = lv_draw_create_unit(sizeof(lv_draw_pxp_unit_t));
-    draw_pxp_unit->base_unit.dispatch = lv_draw_pxp_dispatch;
+    draw_pxp_unit->base_unit.dispatch_cb = _draw_pxp_dispatch;
 
     lv_pxp_init();
 
@@ -203,7 +193,7 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
     return is_supported;
 }
 
-static int32_t lv_draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
+static int32_t _draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
 {
     lv_draw_pxp_unit_t * draw_pxp_unit = (lv_draw_pxp_unit_t *) draw_unit;
 
@@ -212,41 +202,25 @@ static int32_t lv_draw_pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * lay
         return 0;
 
     /* Return if target buffer format is not supported. */
-    if(!_pxp_cf_supported(layer->color_format))
+    if(!_pxp_cf_supported(layer->draw_buf.color_format))
         return 0;
 
     /* Try to get an ready to draw. */
-    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL);
+    lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
     while(t != NULL) {
         if(_pxp_task_supported(t))
             break;
 
-        t = lv_draw_get_next_available_task(layer, t);
+        t = lv_draw_get_next_available_task(layer, t, DRAW_UNIT_ID_PXP);
     }
 
     /* Return 0 is no selection, some tasks can be supported only by SW. */
     if(t == NULL)
         return 0;
 
-    /* If the buffer of the layer is not allocated yet, allocate it now. */
-    if(layer->buf == NULL) {
-        uint32_t px_size = lv_color_format_get_size(layer->color_format);
-        uint32_t layer_size_byte = lv_area_get_size(&layer->buf_area) * px_size;
-
-        uint8_t * buf = lv_malloc(layer_size_byte);
-        if(buf == NULL) {
-            LV_LOG_WARN("Allocating %d bytes of layer buffer failed. Try later", layer_size_byte);
-            return -1;
-        }
-        LV_ASSERT_MALLOC(buf);
-        lv_draw_add_used_layer_size(layer_size_byte < 1024 ? 1 : layer_size_byte >> 10);
-
-        layer->buf = buf;
-
-        if(lv_color_format_has_alpha(layer->color_format)) {
-            layer->buffer_clear(layer, &layer->buf_area);
-        }
-    }
+    void * buf = lv_draw_layer_alloc_buf(layer);
+    if(buf == NULL)
+        return -1;
 
     t->state = LV_DRAW_TASK_STATE_IN_PROGRESS;
     draw_pxp_unit->base_unit.target_layer = layer;
@@ -273,6 +247,10 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
 {
     lv_draw_task_t * t = u->task_act;
     lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
+
+    /* Invalidate cache */
+    lv_layer_t * layer = draw_unit->target_layer;
+    lv_draw_buf_invalidate_cache(&layer->draw_buf, (const char *)&t->area);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:

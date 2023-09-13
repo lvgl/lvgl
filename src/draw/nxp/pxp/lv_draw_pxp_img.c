@@ -72,11 +72,11 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
-    lv_area_move(&rel_coords, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&rel_coords, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     lv_area_t rel_clip_area;
     lv_area_copy(&rel_clip_area, draw_unit->clip_area);
-    lv_area_move(&rel_clip_area, -layer->buf_area.x1, -layer->buf_area.y1);
+    lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     lv_area_t blend_area;
     bool has_transform = dsc->angle != 0 || dsc->zoom != LV_ZOOM_NONE;
@@ -88,16 +88,16 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
     const uint8_t * src_buf = img_dsc->data;
 
     lv_area_t src_area;
-    src_area.x1 = blend_area.x1 - (coords->x1 - layer->buf_area.x1);
-    src_area.y1 = blend_area.y1 - (coords->y1 - layer->buf_area.y1);
+    src_area.x1 = blend_area.x1 - (coords->x1 - layer->draw_buf_ofs.x);
+    src_area.y1 = blend_area.y1 - (coords->y1 - layer->draw_buf_ofs.y);
     src_area.x2 = src_area.x1 + lv_area_get_width(coords) - 1;
     src_area.y2 = src_area.y1 + lv_area_get_height(coords) - 1;
-    lv_coord_t src_stride = lv_area_get_width(coords);
-
-    uint8_t * dest_buf = layer->buf;
-    lv_coord_t dest_stride = lv_area_get_width(&layer->buf_area);
-    lv_color_format_t dest_cf = layer->color_format;
+    lv_coord_t src_stride = img_dsc->header.stride;
     lv_color_format_t src_cf = img_dsc->header.cf;
+
+    uint8_t * dest_buf = layer->draw_buf.buf;
+    lv_coord_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
+    lv_color_format_t dest_cf = layer->draw_buf.color_format;
     bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
 
     if(has_recolor && !has_transform)
@@ -134,8 +134,8 @@ static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, l
     /*AS buffer - source image*/
     pxp_as_buffer_config_t asBufferConfig = {
         .pixelFormat = pxp_get_as_px_format(src_cf),
-        .bufferAddr = (uint32_t)(src_buf + src_px_size * (src_stride * src_area->y1 + src_area->x1)),
-        .pitchBytes = src_stride * src_px_size
+        .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_px_size * src_area->x1),
+        .pitchBytes = src_stride
     };
     PXP_SetAlphaSurfaceBufferConfig(PXP_ID, &asBufferConfig);
     PXP_SetAlphaSurfacePosition(PXP_ID, 0U, 0U, src_w - 1U, src_h - 1U);
@@ -148,9 +148,9 @@ static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, l
     pxp_output_buffer_config_t outputBufferConfig = {
         .pixelFormat = pxp_get_out_px_format(dest_cf),
         .interlacedMode = kPXP_OutputProgressive,
-        .buffer0Addr = (uint32_t)(dest_buf + dest_px_size * (dest_stride * dest_area->y1 + dest_area->x1)),
+        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_px_size * dest_area->x1),
         .buffer1Addr = (uint32_t)0U,
-        .pitchBytes = dest_stride * dest_px_size,
+        .pitchBytes = dest_stride,
         .width = dest_w,
         .height = dest_h
     };
@@ -259,10 +259,10 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
     pxp_ps_buffer_config_t psBufferConfig = {
         .pixelFormat = pxp_get_ps_px_format(src_cf),
         .swapByte = false,
-        .bufferAddr = (uint32_t)(src_buf + src_px_size * (src_stride * src_area->y1 + src_area->x1)),
+        .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_px_size * src_area->x1),
         .bufferAddrU = 0,
         .bufferAddrV = 0,
-        .pitchBytes = src_stride * src_px_size
+        .pitchBytes = src_stride
     };
     PXP_SetProcessSurfaceBufferConfig(PXP_ID, &psBufferConfig);
     PXP_SetProcessSurfacePosition(PXP_ID, 0U, 0U, dest_w - trim_size - 1U, dest_h - trim_size - 1U);
@@ -277,9 +277,9 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
     pxp_output_buffer_config_t outputBufferConfig = {
         .pixelFormat = pxp_get_out_px_format(dest_cf),
         .interlacedMode = kPXP_OutputProgressive,
-        .buffer0Addr = (uint32_t)(dest_buf + dest_px_size * (dest_stride * (dest_area->y1 + piv_offset_y) + (dest_area->x1 + piv_offset_x))),
+        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * (dest_area->y1 + piv_offset_y) + dest_px_size * (dest_area->x1 + piv_offset_x)),
         .buffer1Addr = (uint32_t)0U,
-        .pitchBytes = dest_stride * dest_px_size,
+        .pitchBytes = dest_stride,
         .width = dest_w - trim_size,
         .height = dest_h - trim_size
     };
@@ -320,10 +320,10 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_
         pxp_ps_buffer_config_t psBufferConfig = {
             .pixelFormat = pxp_get_ps_px_format(dest_cf),
             .swapByte = false,
-            .bufferAddr = (uint32_t)(dest_buf + dest_px_size * (dest_stride * dest_area->y1 + dest_area->x1)),
+            .bufferAddr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_px_size * dest_area->x1),
             .bufferAddrU = 0U,
             .bufferAddrV = 0U,
-            .pitchBytes = dest_stride * dest_px_size
+            .pitchBytes = dest_stride
         };
 
         if(opa >= (lv_opa_t)LV_OPA_MAX)
@@ -338,8 +338,8 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_
     /*AS buffer - source image*/
     pxp_as_buffer_config_t asBufferConfig = {
         .pixelFormat = pxp_get_as_px_format(src_cf),
-        .bufferAddr = (uint32_t)(src_buf + src_px_size * (src_stride * src_area->y1 + src_area->x1)),
-        .pitchBytes = src_stride * src_px_size
+        .bufferAddr = (uint32_t)(src_buf + src_stride * src_area->y1 + src_px_size * src_area->x1),
+        .pitchBytes = src_stride
     };
     PXP_SetAlphaSurfaceBufferConfig(PXP_ID, &asBufferConfig);
     PXP_SetAlphaSurfacePosition(PXP_ID, 0U, 0U, src_w - 1U, src_h - 1U);
@@ -350,9 +350,9 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_
     pxp_output_buffer_config_t outputBufferConfig = {
         .pixelFormat = pxp_get_out_px_format(dest_cf),
         .interlacedMode = kPXP_OutputProgressive,
-        .buffer0Addr = (uint32_t)(dest_buf + dest_px_size * (dest_stride * dest_area->y1 + dest_area->x1)),
+        .buffer0Addr = (uint32_t)(dest_buf + dest_stride * dest_area->y1 + dest_px_size * dest_area->x1),
         .buffer1Addr = (uint32_t)0U,
-        .pitchBytes = dest_stride * dest_px_size,
+        .pitchBytes = dest_stride,
         .width = dest_w,
         .height = dest_h
     };
