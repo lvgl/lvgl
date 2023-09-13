@@ -84,6 +84,49 @@ static inline bool _pxp_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
+static bool _pxp_draw_img_supported(const lv_draw_img_dsc_t * draw_dsc)
+{
+    const lv_img_dsc_t * img_dsc = draw_dsc->src;
+
+    bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
+    bool has_transform = (draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE);
+
+    /* Recolor and transformation are not supported at the same time. */
+    if(has_recolor && has_transform)
+        return false;
+
+    bool has_opa = (draw_dsc->opa < (lv_opa_t)LV_OPA_MAX);
+    bool src_has_alpha = (img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888);
+
+    /*
+     * Recolor or transformation for images w/ opa or alpha channel can't
+     * be obtained in a single PXP configuration. Two steps are required.
+     */
+    if((has_recolor || has_transform) && (has_opa || src_has_alpha))
+        return false;
+
+    /* PXP can only rotate at 90x angles. */
+    if(draw_dsc->angle % 900)
+        return false;
+
+    /*
+     * PXP is set to process 16x16 blocks to optimize the system for memory
+     * bandwidth and image processing time.
+     * The output engine essentially truncates any output pixels after the
+     * desired number of pixels has been written.
+     * When rotating a source image and the output is not divisible by the block
+     * size, the incorrect pixels could be truncated and the final output image
+     * can look shifted.
+     *
+     * No combination of rotate with flip, scaling or decimation is possible
+     * if buffer is unaligned.
+     */
+    if(has_transform && (img_dsc->header.w % 16 || img_dsc->header.h % 16))
+        return false;
+
+    return true;
+}
+
 static bool _pxp_task_supported(lv_draw_task_t * t)
 {
     bool is_supported = true;
@@ -115,25 +158,21 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
 
                 break;
             }
-#if 0
+
         case LV_DRAW_TASK_TYPE_LAYER: {
                 const lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
+                lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
-                /* Return supported so this task is marked as complete once it gets in execution. */
-                if(layer_to_draw->buf == NULL)
-                    break;
-
-                bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
-
-                if(has_recolor
-                   || (!_pxp_cf_supported(layer_to_draw->color_format))
-                  )
+                if(!_pxp_cf_supported(draw_buf->color_format)) {
                     is_supported = false;
+                    break;
+                }
 
+                is_supported = _pxp_draw_img_supported(draw_dsc);
                 break;
             }
-#endif
+
         case LV_DRAW_TASK_TYPE_IMAGE: {
                 lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 const lv_img_dsc_t * img_dsc = draw_dsc->src;
@@ -143,50 +182,7 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
                     break;
                 }
 
-                bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
-                bool has_transform = (draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE);
-
-                /* Recolor and transformation are not supported at the same time. */
-                if(has_recolor && has_transform) {
-                    is_supported = false;
-                    break;
-                }
-
-                bool has_opa = (draw_dsc->opa < (lv_opa_t)LV_OPA_MAX);
-                bool src_has_alpha = (img_dsc->header.cf == LV_COLOR_FORMAT_ARGB8888);
-
-                /*
-                 * Recolor or transformation for images w/ opa or alpha channel can't
-                 * be obtained in a single PXP configuration. Two steps are required.
-                 */
-                if((has_recolor || has_transform) && (has_opa || src_has_alpha)) {
-                    is_supported = false;
-                    break;
-                }
-
-                /* PXP can only rotate at 90x angles. */
-                if(draw_dsc->angle % 900) {
-                    is_supported = false;
-                    break;
-                }
-
-                /*
-                 * PXP is set to process 16x16 blocks to optimize the system for memory
-                 * bandwidth and image processing time.
-                 * The output engine essentially truncates any output pixels after the
-                 * desired number of pixels has been written.
-                 * When rotating a source image and the output is not divisible by the block
-                 * size, the incorrect pixels could be truncated and the final output image
-                 * can look shifted.
-                 *
-                 * No combination of rotate with flip, scaling or decimation is possible
-                 * if buffer is unaligned.
-                 */
-                if(has_transform && (img_dsc->header.w % 16 || img_dsc->header.h % 16)) {
-                    is_supported = false;
-                    break;
-                }
-
+                is_supported = _pxp_draw_img_supported(draw_dsc);
                 break;
             }
         default:
@@ -267,7 +263,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
             lv_draw_pxp_img(draw_unit, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LAYER:
-            //lv_draw_pxp_layer(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_pxp_layer(draw_unit, t->draw_dsc, &t->area);
             break;
         default:
             break;
