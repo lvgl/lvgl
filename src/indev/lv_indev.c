@@ -720,7 +720,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(indev_reset_check(i)) return;
             }
 
-            if (!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
+            if(!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
             if(indev_reset_check(i)) return;
 
         }
@@ -875,7 +875,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(i->long_pr_sent == 0) lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(i)) return;
 
-                if (!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
+                if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
                 if(indev_reset_check(i)) return;
 
             }
@@ -889,7 +889,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                     lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                     if(indev_reset_check(i)) return;
 
-                    if (!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
+                    if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
                     if(indev_reset_check(i)) return;
 
                     lv_group_send_data(g, LV_KEY_ENTER);
