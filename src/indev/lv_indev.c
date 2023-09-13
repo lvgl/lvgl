@@ -720,7 +720,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(indev_reset_check(i)) return;
             }
 
-            lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
+            if (!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
             if(indev_reset_check(i)) return;
 
         }
