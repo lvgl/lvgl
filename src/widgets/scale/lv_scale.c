@@ -702,23 +702,23 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Calculate position of the first tick in the section */
                 main_point_a.x = main_line_point_a.x;
-                float tmp = (float) section->first_tick_in_section.y + (float)(section->first_tick_in_section_width / 2U);
-                main_point_a.y = (lv_coord_t) tmp;
+                float tmp = (float)(section->first_tick_in_section_width / 2U);
+                main_point_a.y = section->first_tick_in_section.y + (lv_coord_t) tmp;
 
                 /* Calculate position of the last tick in the section */
                 main_point_b.x = main_line_point_a.x;
-                tmp = (float) section->last_tick_in_section.y - (float)(section->last_tick_in_section_width / 2U);
-                main_point_b.y = (lv_coord_t) tmp;
+                tmp = (float)(section->last_tick_in_section_width / 2U);
+                main_point_b.y = section->last_tick_in_section.y - (lv_coord_t) tmp;
             }
             else {
                 /* Calculate position of the first tick in the section */
-                float tmp = (float) section->first_tick_in_section.x - (float)(section->first_tick_in_section_width / 2U);
-                main_point_a.x = (lv_coord_t) tmp;
+                float tmp = (float)(section->first_tick_in_section_width / 2U);
+                main_point_a.x = section->first_tick_in_section.x - (lv_coord_t) tmp;
                 main_point_a.y = main_line_point_a.y;
 
                 /* Calculate position of the last tick in the section */
-                tmp = (float) section->last_tick_in_section.x + (float)(section->last_tick_in_section_width / 2U);
-                main_point_b.x = (lv_coord_t) tmp;
+                tmp = (float)(section->last_tick_in_section_width / 2U);
+                main_point_b.x = section->last_tick_in_section.x + (lv_coord_t) tmp;
                 main_point_b.y = main_line_point_a.y;
             }
 
