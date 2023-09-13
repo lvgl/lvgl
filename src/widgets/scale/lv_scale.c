@@ -453,6 +453,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         }
 
                         section->first_tick_in_section.y = tick_point_a.y;
+                        /* Add 1px as adjustment if tmp_width is odd */
+                        if(tmp_width & 0x01U) {
+                            tmp_width += 1U;
+                        }
                         section->first_tick_in_section_width = tmp_width;
                     }
                     else if(tick_idx == section->last_tick_idx_in_section) {
@@ -464,6 +468,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         }
 
                         section->last_tick_in_section.y = tick_point_a.y;
+                        /* Add 1px as adjustment if tmp_width is odd */
+                        if(tmp_width & 0x01U) {
+                            tmp_width += 1U;
+                        }
                         section->last_tick_in_section_width = tmp_width;
                     }
                     else { /* Nothing to do */ }
@@ -480,6 +488,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         }
 
                         section->first_tick_in_section.x = tick_point_a.x;
+                        /* Add 1px as adjustment if tmp_width is odd */
+                        if(tmp_width & 0x01U) {
+                            tmp_width += 1U;
+                        }
                         section->first_tick_in_section_width = tmp_width;
                     }
                     else if(tick_idx == section->last_tick_idx_in_section) {
@@ -491,6 +503,10 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         }
 
                         section->last_tick_in_section.x = tick_point_a.x;
+                        /* Add 1px as adjustment if tmp_width is odd */
+                        if(tmp_width & 0x01U) {
+                            tmp_width += 1U;
+                        }
                         section->last_tick_in_section_width = tmp_width;
                     }
                     else { /* Nothing to do */ }
@@ -702,23 +718,23 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                 /* Calculate position of the first tick in the section */
                 main_point_a.x = main_line_point_a.x;
-                float tmp = (float)(section->first_tick_in_section_width / 2U);
-                main_point_a.y = section->first_tick_in_section.y + (lv_coord_t) tmp;
+                lv_coord_t tmp = (lv_coord_t)(section->first_tick_in_section_width / 2U);
+                main_point_a.y = section->first_tick_in_section.y + tmp;
 
                 /* Calculate position of the last tick in the section */
                 main_point_b.x = main_line_point_a.x;
-                tmp = (float)(section->last_tick_in_section_width / 2U);
-                main_point_b.y = section->last_tick_in_section.y - (lv_coord_t) tmp;
+                tmp = (lv_coord_t)(section->last_tick_in_section_width / 2U);
+                main_point_b.y = section->last_tick_in_section.y - tmp;
             }
             else {
                 /* Calculate position of the first tick in the section */
-                float tmp = (float)(section->first_tick_in_section_width / 2U);
-                main_point_a.x = section->first_tick_in_section.x - (lv_coord_t) tmp;
+                lv_coord_t tmp = (lv_coord_t)(section->first_tick_in_section_width / 2U);
+                main_point_a.x = section->first_tick_in_section.x - tmp;
                 main_point_a.y = main_line_point_a.y;
 
                 /* Calculate position of the last tick in the section */
-                tmp = (float)(section->last_tick_in_section_width / 2U);
-                main_point_b.x = section->last_tick_in_section.x + (lv_coord_t) tmp;
+                tmp = (lv_coord_t)(section->last_tick_in_section_width / 2U);
+                main_point_b.x = section->last_tick_in_section.x + tmp;
                 main_point_b.y = main_line_point_a.y;
             }
 
