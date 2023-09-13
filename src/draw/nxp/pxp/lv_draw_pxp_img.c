@@ -34,17 +34,17 @@
  *  STATIC PROTOTYPES
  **********************/
 
-/* Blit w/ recolor for images w/o opa and alpha channel*/
+/* Blit w/ recolor for images w/o opa and alpha channel */
 static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                               lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
                               lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc);
 
-/* Blit w/ transformation for images w/o opa and alpha channel*/
+/* Blit w/ transformation for images w/o opa and alpha channel */
 static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                 lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
                                 lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc);
 
-/* Blit simple w/ opa and alpha channel*/
+/* Blit simple w/ opa and alpha channel */
 static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                       lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
                       lv_coord_t src_stride, lv_color_format_t src_cf, lv_opa_t opa);
@@ -181,7 +181,6 @@ static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, l
     lv_pxp_run();
 }
 
-/* Blit with opacity and transformation (zoom and rotate) for images without alpha channel*/
 static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                 lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
                                 lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc)
@@ -234,6 +233,7 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
                 piv_offset_x = 0;
                 piv_offset_y = 0;
         }
+        /*PS buffer rotation and decimation does not function at the same time*/
         PXP_SetRotateConfig(PXP_ID, kPXP_RotateOutputBuffer, pxp_angle, kPXP_FlipDisable);
     }
 

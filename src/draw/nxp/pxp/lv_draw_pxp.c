@@ -177,8 +177,11 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
                  * When rotating a source image and the output is not divisible by the block
                  * size, the incorrect pixels could be truncated and the final output image
                  * can look shifted.
+                 *
+                 * No combination of rotate with flip, scaling or decimation is possible
+                 * if buffer is unaligned.
                  */
-                if((draw_dsc->angle != 0) && (img_dsc->header.w % 16 || img_dsc->header.h % 16)) {
+                if(has_transform && (img_dsc->header.w % 16 || img_dsc->header.h % 16)) {
                     is_supported = false;
                     break;
                 }
