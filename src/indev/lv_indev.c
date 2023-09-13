@@ -865,6 +865,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         if(data->key == LV_KEY_ENTER) {
             bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
                                           lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
+            const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
             /*The button was released on a non-editable object. Just send enter*/
             if(editable_or_scrollable == false) {
@@ -874,7 +875,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 if(i->long_pr_sent == 0) lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(i)) return;
 
-                lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
+                if (!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
                 if(indev_reset_check(i)) return;
 
             }
@@ -888,7 +889,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                     lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                     if(indev_reset_check(i)) return;
 
-                    lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
+                    if (!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
                     if(indev_reset_check(i)) return;
 
                     lv_group_send_data(g, LV_KEY_ENTER);
