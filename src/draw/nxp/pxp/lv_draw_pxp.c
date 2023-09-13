@@ -98,23 +98,24 @@ static bool _pxp_task_supported(lv_draw_task_t * t)
 
                 break;
             }
-#if 0
+
         case LV_DRAW_TASK_TYPE_BG_IMG: {
                 const lv_draw_bg_img_dsc_t * draw_dsc = (lv_draw_bg_img_dsc_t *) t->draw_dsc;
                 lv_img_src_t src_type = lv_img_src_get_type(draw_dsc->src);
 
-                if(src_type != LV_IMG_SRC_SYMBOL) {
-                    bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
+                if(src_type == LV_IMG_SRC_SYMBOL) {
+                    is_supported = false;
+                    break;
+                }
 
-                    if(has_recolor
-                       || (!_pxp_cf_supported(draw_dsc->img_header.cf))
-                      )
-                        is_supported = false;
+                if(!_pxp_cf_supported(draw_dsc->img_header.cf)) {
+                    is_supported = false;
+                    break;
                 }
 
                 break;
             }
-
+#if 0
         case LV_DRAW_TASK_TYPE_LAYER: {
                 const lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
@@ -260,7 +261,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
             lv_draw_pxp_fill(draw_unit, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BG_IMG:
-            //lv_draw_pxp_bg_img(draw_unit, t->draw_dsc, &t->area);
+            lv_draw_pxp_bg_img(draw_unit, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
             lv_draw_pxp_img(draw_unit, t->draw_dsc, &t->area);
