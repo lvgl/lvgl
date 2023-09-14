@@ -52,6 +52,7 @@ static lv_obj_t * create_handle(lv_obj_t * parent);
 
 static void spectrum_anim_cb(void * a, int32_t v);
 static void start_anim_cb(void * a, int32_t v);
+static void del_counter_timer_cb(lv_event_t * e);
 static void spectrum_draw_event_cb(lv_event_t * e);
 static lv_obj_t * album_img_create(lv_obj_t * parent);
 static void album_gesture_event_cb(lv_event_t * e);
@@ -153,6 +154,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
 
     /*Create the content of the music player*/
     lv_obj_t * cont = create_cont(parent);
+
     create_wave_images(cont);
     lv_obj_t * title_box = create_title_box(cont);
     lv_obj_t * icon_box = create_icon_box(cont);
@@ -357,7 +359,7 @@ void _lv_demo_music_resume(void)
     lv_anim_set_ready_cb(&a, spectrum_end_cb);
     lv_anim_start(&a);
 
-    lv_timer_resume(sec_counter_timer);
+    if(sec_counter_timer) lv_timer_resume(sec_counter_timer);
     lv_slider_set_range(slider_obj, 0, _lv_demo_music_get_track_length(track_id));
 
     lv_obj_add_state(play_obj, LV_STATE_CHECKED);
@@ -372,7 +374,7 @@ void _lv_demo_music_pause(void)
     lv_anim_del(spectrum_obj, spectrum_anim_cb);
     lv_obj_invalidate(spectrum_obj);
     lv_img_set_zoom(album_img_obj, LV_ZOOM_NONE);
-    lv_timer_pause(sec_counter_timer);
+    if(sec_counter_timer) lv_timer_pause(sec_counter_timer);
     lv_obj_clear_state(play_obj, LV_STATE_CHECKED);
 }
 
@@ -621,12 +623,14 @@ static lv_obj_t * create_ctrl_box(lv_obj_t * parent)
     lv_obj_set_style_bg_color(slider_obj, lv_color_hex(0x569af8), LV_PART_INDICATOR);
     lv_obj_set_style_bg_grad_color(slider_obj, lv_color_hex(0xa666f1), LV_PART_INDICATOR);
     lv_obj_set_style_outline_width(slider_obj, 0, 0);
+    lv_obj_add_event(slider_obj, del_counter_timer_cb, LV_EVENT_DELETE, NULL);
 
     time_obj = lv_label_create(cont);
     lv_obj_set_style_text_font(time_obj, font_small, 0);
     lv_obj_set_style_text_color(time_obj, lv_color_hex(0x8a86b8), 0);
     lv_label_set_text(time_obj, "0:00");
     lv_obj_set_grid_cell(time_obj, LV_GRID_ALIGN_END, 5, 1, LV_GRID_ALIGN_CENTER, 1, 1);
+    lv_obj_add_event(time_obj, del_counter_timer_cb, LV_EVENT_DELETE, NULL);
 
     return cont;
 }
@@ -756,6 +760,15 @@ int32_t get_sin(int32_t deg, int32_t a)
     r += LV_TRIGO_SIN_MAX / 2;
     return r >> LV_TRIGO_SHIFT;
 
+}
+
+static void del_counter_timer_cb(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    if(code == LV_EVENT_DELETE && sec_counter_timer) {
+        lv_timer_del(sec_counter_timer);
+        sec_counter_timer = NULL;
+    }
 }
 
 static void spectrum_draw_event_cb(lv_event_t * e)
