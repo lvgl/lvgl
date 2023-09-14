@@ -174,7 +174,10 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
         rlottie->dest_frame = 0;
     }
 
-    lv_image_cache_invalidate_src(&rlottie->imgdsc);
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(&rlottie->imgdsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
+
     if(rlottie->allocated_buf) {
         lv_free(rlottie->allocated_buf);
         rlottie->allocated_buf = NULL;
