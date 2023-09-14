@@ -673,7 +673,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            x_ofs = obj->coords.x1 + (line_dsc.width / 2U);
+            x_ofs = obj->coords.x1 + (line_dsc.width / 2U) + pad_left;
             y_ofs = obj->coords.y1 + pad_top;
         }
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
@@ -694,7 +694,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             main_line_point_a.x = x_ofs - 1U;
             main_line_point_a.y = y_ofs;
             main_line_point_b.x = x_ofs - 1U;
-            main_line_point_b.y = obj->coords.y2 + pad_left;
+            main_line_point_b.y = obj->coords.y2 - pad_left;
 
             /* Adjust main line with initial and last tick width */
             main_line_point_a.y -= scale->last_tick_width / 2U;
@@ -875,11 +875,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         lv_coord_t y_ofs = 0U;
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
-            x_ofs = obj->coords.x2 + (main_line_dsc.width / 2U);
+            x_ofs = obj->coords.x2 + (main_line_dsc.width / 2U) + pad_right;
             y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U);
+            x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U) + pad_left;
             y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
@@ -908,10 +908,10 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         /* Setup the tick points */
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             /* Vertical position starts at y2 of the scale main line */
-            lv_coord_t vertical_position = obj->coords.y2;
+            lv_coord_t vertical_position = obj->coords.y2 - pad_bottom;
 
             if(scale->total_tick_count == tick_idx) {
-                vertical_position = obj->coords.y1;
+                vertical_position = y_ofs;
             }
             /* Increment the tick offset depending of its index */
             else if(0 != tick_idx) {
