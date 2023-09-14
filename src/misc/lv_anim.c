@@ -136,13 +136,9 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a)
 bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
-    lv_anim_t * a_next;
     bool del = false;
     a        = _lv_ll_get_head(anim_ll_p);
     while(a != NULL) {
-        /*'a' might be deleted, so get the next object while 'a' is valid*/
-        a_next = _lv_ll_get_next(anim_ll_p, a);
-
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             _lv_ll_remove(anim_ll_p, a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
@@ -152,7 +148,9 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
             del = true;
         }
 
-        a = a_next;
+        /*Always start from the head on delete, because we don't know
+         *how `anim_ll_p` was changes in `a->deleted_cb` */
+        a = del ? _lv_ll_get_head(anim_ll_p) : _lv_ll_get_next(anim_ll_p, a);
     }
 
     return del;
