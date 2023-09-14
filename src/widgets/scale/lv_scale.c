@@ -660,10 +660,10 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
         /* Get style properties so they can be used in the main line drawing */
         const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj,
-                                                                                                               LV_PART_MAIN);
-        const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj,
-                                                                                                                 LV_PART_MAIN);
+        const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
+        const lv_coord_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
+        const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+        const lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
         const lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
         const lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
 
@@ -867,10 +867,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
 
         /* Get style properties so they can be used in the tick and label drawing */
         const lv_coord_t border_width = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
-        const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj,
-                                                                                                               LV_PART_MAIN);
-        const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + lv_obj_get_style_border_width(obj,
-                                                                                                                 LV_PART_MAIN);
+        const lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + border_width;
+        const lv_coord_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
+        const lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
+        const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+
         lv_coord_t x_ofs = 0U;
         lv_coord_t y_ofs = 0U;
 
