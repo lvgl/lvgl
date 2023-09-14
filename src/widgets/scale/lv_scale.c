@@ -679,8 +679,8 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             y_ofs = obj->coords.y1 + pad_top + border_width - scroll_top;
         }
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-            x_ofs = obj->coords.x1 + pad_left - scroll_left;
-            y_ofs = obj->coords.y1 + (line_dsc.width / 2U);
+            x_ofs = obj->coords.x1 + pad_right;
+            y_ofs = obj->coords.y1 + (line_dsc.width / 2U) + pad_top;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - scroll_left;
@@ -705,7 +705,8 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         else {
             main_line_point_a.x = x_ofs;
             main_line_point_a.y = y_ofs;
-            main_line_point_b.x = obj->coords.x2 + (pad_left - scroll_left);
+            /* X of second point starts at the edge of the object minus the left pad */
+            main_line_point_b.x = obj->coords.x2 - (pad_left);
             main_line_point_b.y = y_ofs;
 
             /* Adjust main line with initial and last tick width */
@@ -884,8 +885,8 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
             y_ofs = obj->coords.y1 + pad_top + border_width - lv_obj_get_scroll_top(obj);
         }
         else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-            x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
-            y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U);
+            x_ofs = obj->coords.x1 + pad_right;
+            y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U) + pad_top;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left - lv_obj_get_scroll_left(obj);
@@ -910,12 +911,14 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             /* Vertical position starts at y2 of the scale main line */
             lv_coord_t vertical_position = obj->coords.y2;
+
             if(scale->total_tick_count == tick_idx) {
                 vertical_position = obj->coords.y1;
             }
             /* Increment the tick offset depending of its index */
             else if(0 != tick_idx) {
-                float section = (float) lv_obj_get_height(obj) / (float) scale->total_tick_count;
+                const lv_coord_t scale_total_height = lv_obj_get_height(obj) - (pad_top + pad_bottom);
+                float section = (float) scale_total_height / (float) scale->total_tick_count;
                 float offset = section * tick_idx;
                 vertical_position -= (lv_coord_t) offset;
             }
@@ -928,14 +931,15 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         }
         else {
             /* Horizontal position starts at x1 of the scale main line */
-            lv_coord_t horizontal_position = obj->coords.x1;
+            lv_coord_t horizontal_position = x_ofs;
             /* Position the last tick at the x2 scale coordinate */
             if(scale->total_tick_count == tick_idx) {
-                horizontal_position = obj->coords.x2;
+                horizontal_position = obj->coords.x2 - pad_left;
             }
             /* Increment the tick offset depending of its index */
             else if(0U != tick_idx) {
-                float section = (float) lv_obj_get_width(obj) / (float) scale->total_tick_count;
+                const lv_coord_t scale_total_width = lv_obj_get_width(obj) - (pad_right + pad_left);
+                float section = (float) scale_total_width / (float) scale->total_tick_count;
                 float offset = section * tick_idx;
                 horizontal_position += (lv_coord_t) offset;
             }
