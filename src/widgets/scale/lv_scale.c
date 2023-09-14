@@ -670,11 +670,11 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
             x_ofs = obj->coords.x2 + (line_dsc.width / 2U);
-            y_ofs = obj->coords.y1 + pad_top + border_width;
+            y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             x_ofs = obj->coords.x1 + (line_dsc.width / 2U);
-            y_ofs = obj->coords.y1 + pad_top + border_width;
+            y_ofs = obj->coords.y1 + pad_top;
         }
         if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             x_ofs = obj->coords.x1 + pad_right;
@@ -876,11 +876,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
 
         if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode) {
             x_ofs = obj->coords.x2 + (main_line_dsc.width / 2U);
-            y_ofs = obj->coords.y1 + pad_top + border_width;
+            y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
             x_ofs = obj->coords.x1 + (main_line_dsc.width / 2U);
-            y_ofs = obj->coords.y1 + pad_top + border_width;
+            y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
             x_ofs = obj->coords.x1 + pad_right;
