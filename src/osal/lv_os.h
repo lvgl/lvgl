@@ -19,11 +19,12 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_OS
-
 #include "../misc/lv_types.h"
+#include <stddef.h>
 
-#if LV_USE_OS == LV_OS_PTHREAD
+#if LV_USE_OS == LV_OS_NONE
+#include "lv_os_none.h"
+#elif LV_USE_OS == LV_OS_PTHREAD
 #include "lv_pthread.h"
 #elif LV_USE_OS == LV_OS_FREERTOS
 #include "lv_freertos.h"
@@ -142,8 +143,6 @@ lv_res_t lv_thread_sync_delete(lv_thread_sync_t * sync);
 /**********************
  *      MACROS
  **********************/
-
-#endif /*LV_USE_OS*/
 
 #ifdef __cplusplus
 } /*extern "C"*/

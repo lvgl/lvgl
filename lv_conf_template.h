@@ -247,13 +247,11 @@
     #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
 #endif
 
-/*Default image cache size. Image caching keeps some images opened.
- *If only the built-in image formats are used there is no real advantage of caching.
- *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
- *However the opened images consume additional RAM.
- *0: to disable caching*/
-#define LV_IMAGE_CACHE_DEF_SIZE 0
-
+/*Default cache size in bytes.
+ *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Data larger than the size of the cache also can be allocated but
+ *will be dropped immediately after usage.*/
+#define LV_CACHE_DEF_SIZE       0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/

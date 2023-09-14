@@ -76,7 +76,9 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.data_size = w * h * lv_color_format_get_size(cf);
 
     lv_image_set_src(obj, &canvas->dsc);
-    lv_image_cache_invalidate_src(&canvas->dsc);
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(&canvas->dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 }
 
 void lv_canvas_set_px(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa)
@@ -336,7 +338,10 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_TRACE_OBJ_CREATE("begin");
 
     lv_canvas_t * canvas = (lv_canvas_t *)obj;
-    lv_image_cache_invalidate_src(&canvas->dsc);
+
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(&canvas->dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 }
 
 

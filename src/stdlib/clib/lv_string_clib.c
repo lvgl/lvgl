@@ -10,6 +10,10 @@
 #include "../lv_string.h"
 #include <string.h>
 
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    #include "../lv_mem.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -66,7 +70,17 @@ char * lv_strcpy(char * dst, const char * src)
 
 char * lv_strdup(const char * src)
 {
+    /*strdup uses malloc, so use the built in malloc if it's enabled */
+#if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+    size_t len = lv_strlen(src) + 1;
+    char * dst = lv_malloc(len);
+    if(dst == NULL) return NULL;
+
+    lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
+    return dst;
+#else
     return strdup(src);
+#endif
 }
 
 /**********************

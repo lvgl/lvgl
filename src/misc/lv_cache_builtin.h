@@ -1,10 +1,10 @@
 /**
- * @file lv_image_cache_builtin.h
+ * @file lv_cache_builtin.h
  *
  */
 
-#ifndef LV_IMAGE_CACHE_BUILTIN_H
-#define LV_IMAGE_CACHE_BUILTIN_H
+#ifndef LV_CACHE_BUILTIN_H
+#define LV_CACHE_BUILTIN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "lv_ll.h"
 
 /*********************
  *      DEFINES
@@ -22,11 +23,16 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+    uint32_t cur_size;
+    lv_ll_t entry_ll;
+} lv_cache_builtin_dsc_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-void _lv_image_cache_builtin_init(void);
+void _lv_cache_builtin_init(void);
 
 /**********************
  *      MACROS
@@ -36,4 +42,4 @@ void _lv_image_cache_builtin_init(void);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_IMAGE_CACHE_BUILTIN_H*/
+#endif /*LV_CACHE_BUILTIN_H*/

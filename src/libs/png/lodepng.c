@@ -5308,7 +5308,7 @@ static void decodeGeneric(unsigned char ** out, unsigned * w, unsigned * h,
 
     if(!state->error) {
         outsize = lodepng_get_raw_size(*w, *h, &state->info_png.color);
-        *out = (unsigned char *)lodepng_malloc(outsize);
+        *out = (unsigned char *)lv_draw_buf_malloc(outsize, LV_COLOR_FORMAT_ARGB8888);
         if(!*out) state->error = 83; /*alloc fail*/
     }
     if(!state->error) {

@@ -20,12 +20,10 @@
 /*********************
  *      DEFINES
  *********************/
-#define CIRCLE_CACHE_LIFE_MAX   1000
-#define CIRCLE_CACHE_AGING(life, r)   life = LV_MIN(life + (r < 16 ? 1 : (r >> 4)), 1000)
-#if LV_USE_OS
-    #define circle_cache_mutex LV_GLOBAL_DEFAULT()->draw_info.circle_cache_mutex
-#endif
-#define _circle_cache LV_GLOBAL_DEFAULT()->sw_circle_cache
+#define CIRCLE_CACHE_LIFE_MAX           1000
+#define CIRCLE_CACHE_AGING(life, r)     life = LV_MIN(life + (r < 16 ? 1 : (r >> 4)), 1000)
+#define circle_cache_mutex              LV_GLOBAL_DEFAULT()->draw_info.circle_cache_mutex
+#define _circle_cache                   LV_GLOBAL_DEFAULT()->sw_circle_cache
 
 /**********************
  *      TYPEDEFS
@@ -81,9 +79,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_
 
 void lv_draw_sw_mask_init(void)
 {
-#if LV_USE_OS
     lv_mutex_init(&circle_cache_mutex);
-#endif
 }
 
 
@@ -115,10 +111,7 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_sw_mask_res_t lv_draw_sw_mask_apply(void * masks[]
  */
 void lv_draw_sw_mask_free_param(void * p)
 {
-
-#if LV_USE_OS
     lv_mutex_lock(&circle_cache_mutex);
-#endif
     _lv_draw_sw_mask_common_dsc_t * pdsc = p;
     if(pdsc->type == LV_DRAW_SW_MASK_TYPE_RADIUS) {
         lv_draw_sw_mask_radius_param_t * radius_p = (lv_draw_sw_mask_radius_param_t *) p;
@@ -133,9 +126,7 @@ void lv_draw_sw_mask_free_param(void * p)
         }
     }
 
-#if LV_USE_OS
     lv_mutex_unlock(&circle_cache_mutex);
-#endif
 }
 
 void _lv_draw_sw_mask_cleanup(void)
@@ -362,9 +353,7 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
         return;
     }
 
-#if LV_USE_OS
     lv_mutex_lock(&circle_cache_mutex);
-#endif
 
     uint32_t i;
 
@@ -374,9 +363,7 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
             _circle_cache[i].used_cnt++;
             CIRCLE_CACHE_AGING(_circle_cache[i].life, radius);
             param->circle = &(_circle_cache[i]);
-#if LV_USE_OS
             lv_mutex_unlock(&circle_cache_mutex);
-#endif
             return;
         }
     }
@@ -406,9 +393,7 @@ void lv_draw_sw_mask_radius_init(lv_draw_sw_mask_radius_param_t * param, const l
     param->circle = entry;
 
     circ_calc_aa4(param->circle, radius);
-#if LV_USE_OS
     lv_mutex_unlock(&circle_cache_mutex);
-#endif
 
 }
 
