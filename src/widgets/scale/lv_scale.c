@@ -916,9 +916,8 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
             /* Increment the tick offset depending of its index */
             else if(0 != tick_idx) {
                 const lv_coord_t scale_total_height = lv_obj_get_height(obj) - (pad_top + pad_bottom);
-                float section = (float) scale_total_height / (float) scale->total_tick_count;
-                float offset = section * tick_idx;
-                vertical_position -= (lv_coord_t) offset;
+                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_height) / (lv_coord_t) scale->total_tick_count;
+                vertical_position -= offset;
             }
             else { /* Nothing to do */ }
 
@@ -937,9 +936,8 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
             /* Increment the tick offset depending of its index */
             else if(0U != tick_idx) {
                 const lv_coord_t scale_total_width = lv_obj_get_width(obj) - (pad_right + pad_left);
-                float section = (float) scale_total_width / (float) scale->total_tick_count;
-                float offset = section * tick_idx;
-                horizontal_position += (lv_coord_t) offset;
+                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_width) / (lv_coord_t) scale->total_tick_count;
+                horizontal_position += offset;
             }
             else { /* Nothing to do */ }
 
