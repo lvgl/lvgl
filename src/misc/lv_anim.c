@@ -136,15 +136,17 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a)
 bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
-    bool del = false;
+    bool del_any = false;
     a        = _lv_ll_get_head(anim_ll_p);
     while(a != NULL) {
+        bool del = false;
         if((a->var == var || var == NULL) && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             _lv_ll_remove(anim_ll_p, a);
             if(a->deleted_cb != NULL) a->deleted_cb(a);
             lv_free(a);
             anim_mark_list_change(); /*Read by `anim_timer`. It need to know if a delete occurred in
                                        the linked list*/
+            del_any = true;
             del = true;
         }
 
@@ -153,7 +155,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
         a = del ? _lv_ll_get_head(anim_ll_p) : _lv_ll_get_next(anim_ll_p, a);
     }
 
-    return del;
+    return del_any;
 }
 
 void lv_anim_del_all(void)
