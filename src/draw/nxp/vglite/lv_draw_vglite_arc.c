@@ -595,7 +595,7 @@ static void add_split_arc_path(int32_t * arc_path, int * pidx, vg_arc * q_arc, c
 static void add_arc_path(int32_t * arc_path, int * pidx, int32_t radius,
                          int32_t start_angle, int32_t end_angle, const lv_point_t * center, bool cw)
 {
-    if (end_angle < start_angle) end_angle += 360;
+    if(end_angle < start_angle) end_angle += 360;
 
     /* set number of arcs to draw */
     vg_arc q_arc;
