@@ -682,7 +682,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left;
-            y_ofs = obj->coords.y2 + (line_dsc.width / 2U);
+            y_ofs = obj->coords.y2 + (line_dsc.width / 2U) - pad_bottom;
         }
         else { /* Nothing to do */ }
 
@@ -888,7 +888,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
             x_ofs = obj->coords.x1 + pad_left;
-            y_ofs = obj->coords.y2 + (main_line_dsc.width / 2U);
+            y_ofs = obj->coords.y2 + (main_line_dsc.width / 2U) - pad_bottom;
         }
         else { /* Nothing to do */ }
 
