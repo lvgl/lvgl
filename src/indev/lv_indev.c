@@ -337,6 +337,7 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev)
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
     lv_obj_t * act_obj = NULL;
+    lv_obj_t * scroll_obj = NULL;
 
     if(indev) {
         indev->reset_query = 1;
@@ -356,6 +357,15 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
             }
             if(obj == NULL || indev->pointer.last_obj == obj) {
                 indev->pointer.last_obj = NULL;
+            }
+            if(obj == NULL || indev->pointer.scroll_obj == obj) {
+                if(indev->pointer.scroll_obj) {
+                    /* Avoid recursive calls */
+                    scroll_obj = indev->pointer.scroll_obj;
+                    indev->pointer.scroll_obj = NULL;
+                    lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
+                    scroll_obj = NULL;
+                }
             }
         }
     }
@@ -378,6 +388,15 @@ void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
                 }
                 if(obj == NULL || i->pointer.last_obj == obj) {
                     i->pointer.last_obj = NULL;
+                }
+                if(obj == NULL || i->pointer.scroll_obj == obj) {
+                    if(i->pointer.scroll_obj) {
+                        /* Avoid recursive calls */
+                        scroll_obj = i->pointer.scroll_obj;
+                        i->pointer.scroll_obj = NULL;
+                        lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, i);
+                        scroll_obj = NULL;
+                    }
                 }
             }
             i = lv_indev_get_next(i);

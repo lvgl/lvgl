@@ -650,7 +650,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_draw(e);
     }
     else if(code == LV_EVENT_INDEV_RESET) {
-        lv_obj_set_state(obj, LV_STATE_DEFAULT);
+        lv_obj_clear_state(obj, LV_STATE_PRESSED);
+        lv_obj_clear_state(obj, LV_STATE_SCROLLED);
     }
 }
 
