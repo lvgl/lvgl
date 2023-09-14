@@ -27,7 +27,7 @@ void lv_example_scroll_2(void)
 
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_obj_t * btn = lv_btn_create(panel);
+        lv_obj_t * btn = lv_button_create(panel);
         lv_obj_set_size(btn, 150, lv_pct(100));
 
         lv_obj_t * label = lv_label_create(btn);

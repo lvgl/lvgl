@@ -124,8 +124,8 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
         blend_dsc.color = dsc->color;
     }
     else {
-        lv_img_decoder_dsc_t decoder_dsc;
-        lv_img_decoder_open(&decoder_dsc, dsc->img_src, dsc->color, 0);
+        lv_image_decoder_dsc_t decoder_dsc;
+        lv_image_decoder_open(&decoder_dsc, dsc->img_src, dsc->color, 0);
         img_area.x1 = 0;
         img_area.y1 = 0;
         img_area.x2 = decoder_dsc.header.w - 1;

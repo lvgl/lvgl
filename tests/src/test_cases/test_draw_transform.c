@@ -48,36 +48,36 @@ static void canvas_basic_render(lv_color_format_t render_cf, uint8_t * canvas_bu
     lv_obj_del(canvas);
 }
 
-static void draw_images(lv_layer_t * layer, lv_draw_img_dsc_t * dsc)
+static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
 {
     /* Angle */
     lv_area_t area = { 10, 30, 109, 129};
     dsc->pivot.x = 50;
     dsc->pivot.y = 50;
 
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
     dsc->angle = 900;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
     dsc->angle = 1800;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
     dsc->angle = -900;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 150, 0);
     dsc->angle = 300;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     dsc->pivot.x = 0;
     dsc->pivot.y = 0;
     dsc->angle = 300;
     lv_area_move(&area, 150, 0);
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     /* Zoom */
     area.x1 = 10;
@@ -88,27 +88,27 @@ static void draw_images(lv_layer_t * layer, lv_draw_img_dsc_t * dsc)
     dsc->pivot.y = 50;
     dsc->angle = 0;
     dsc->zoom = 128;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
     dsc->zoom = 300;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
     dsc->pivot.x = 0;
     dsc->pivot.y = 0;
     dsc->zoom = 128;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
     dsc->zoom = 300;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     /* Zoom + Angle*/
     dsc->angle = 650;
     dsc->zoom = 200;
     lv_area_move(&area, 200, 0);
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     /*Edge color bleeding test*/
     lv_draw_rect_dsc_t rect_dsc;
@@ -128,22 +128,22 @@ static void draw_images(lv_layer_t * layer, lv_draw_img_dsc_t * dsc)
     dsc->pivot.y = 50;
     dsc->angle = 0;
     dsc->zoom = 256;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 180, 0);
     dsc->angle = 300;
     dsc->zoom = 200;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 150, 0);
     dsc->angle = 1400;
     dsc->zoom = 150;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 120, 0);
     dsc->angle = 2000;
     dsc->zoom = 100;
-    lv_draw_img(layer, dsc, &area);
+    lv_draw_image(layer, dsc, &area);
 }
 
 void create_test_screen(lv_color_format_t render_cf, const char * name)
@@ -160,7 +160,7 @@ void create_test_screen(lv_color_format_t render_cf, const char * name)
 
     static uint8_t canvas_buf_small[100 * 100 * 4];
 
-    lv_img_dsc_t img;
+    lv_image_dsc_t img;
     img.data = canvas_buf_small;
     img.header.cf = render_cf;
     img.header.w = 100;
@@ -168,8 +168,8 @@ void create_test_screen(lv_color_format_t render_cf, const char * name)
     img.header.stride = 100 * lv_color_format_get_size(render_cf);
     img.header.always_zero = 0;
 
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
     img_dsc.src = &img;
 
     canvas_basic_render(render_cf, canvas_buf_small);

@@ -23,11 +23,11 @@ cont.center()
 cont.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)
 
 for i in range(30):
-    btn = lv.btn(cont)
-    btn.set_size(70, 50)
-    btn.add_flag(lv.obj.FLAG.EVENT_BUBBLE)
+    button = lv.button(cont)
+    button.set_size(70, 50)
+    button.add_flag(lv.obj.FLAG.EVENT_BUBBLE)
 
-    label = lv.label(btn)
+    label = lv.label(button)
     label.set_text("{:d}".format(i))
     label.center()
 

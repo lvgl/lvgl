@@ -148,13 +148,13 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
             lv_draw_sw_box_shadow((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BG_IMG:
-            lv_draw_sw_bg_img((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            lv_draw_sw_bg_image((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
             lv_draw_sw_label((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_sw_img((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            lv_draw_sw_image((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
             lv_draw_sw_arc((lv_draw_unit_t *)u, t->draw_dsc, &t->area);

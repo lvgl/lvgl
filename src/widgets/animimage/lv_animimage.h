@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_ANIM_IMG_H
-#define LV_ANIM_IMG_H
+#ifndef LV_ANIM_IMAGE_H
+#define LV_ANIM_IMAGE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../img/lv_img.h"
+#include "../image/lv_image.h"
 
 #if LV_USE_ANIMIMG != 0
 
@@ -34,7 +34,7 @@ extern const lv_obj_class_t lv_animimg_class;
 
 /*Data of image*/
 typedef struct {
-    lv_img_t img;
+    lv_image_t img;
     lv_anim_t anim;
     /*picture sequence */
     const void ** dsc;
@@ -44,7 +44,7 @@ typedef struct {
 
 /*Image parts*/
 enum _lv_animimg_part_t {
-    LV_ANIM_IMG_PART_MAIN,
+    LV_ANIM_IMAGE_PART_MAIN,
 };
 
 
@@ -136,4 +136,4 @@ uint16_t lv_animimg_get_repeat_count(lv_obj_t * img);
 } /* extern "C" */
 #endif
 
-#endif /*LV_ANIM_IMG_H*/
+#endif /*LV_ANIM_IMAGE_H*/

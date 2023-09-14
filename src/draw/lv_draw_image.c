@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw_img.h"
-#include "lv_img_cache.h"
+#include "lv_draw_image.h"
+#include "lv_image_cache.h"
 #include "../disp/lv_disp.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_math.h"
@@ -39,9 +39,9 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
+void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
 {
-    lv_memzero(dsc, sizeof(lv_draw_img_dsc_t));
+    lv_memzero(dsc, sizeof(lv_draw_image_dsc_t));
     dsc->recolor = lv_color_black();
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_ZOOM_NONE;
@@ -49,7 +49,7 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
 }
 
 
-void lv_draw_layer(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_layer(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
 
@@ -65,7 +65,7 @@ void lv_draw_layer(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_a
 }
 
 
-void lv_draw_img(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_area_t * coords)
+void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv_area_t * coords)
 {
     if(dsc->src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -76,17 +76,17 @@ void lv_draw_img(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_are
 
     LV_PROFILER_BEGIN;
 
-    lv_draw_img_dsc_t * new_img_dsc = lv_malloc(sizeof(*dsc));
-    lv_memcpy(new_img_dsc, dsc, sizeof(*dsc));
-    lv_res_t res = lv_img_decoder_get_info(new_img_dsc->src, &new_img_dsc->header);
+    lv_draw_image_dsc_t * new_image_dsc = lv_malloc(sizeof(*dsc));
+    lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
+    lv_res_t res = lv_image_decoder_get_info(new_image_dsc->src, &new_image_dsc->header);
     if(res != LV_RES_OK) {
         LV_LOG_WARN("Couldn't get info about the image");
-        lv_free(new_img_dsc);
+        lv_free(new_image_dsc);
         return;
     }
 
     lv_draw_task_t * t = lv_draw_add_task(layer, coords);
-    t->draw_dsc = new_img_dsc;
+    t->draw_dsc = new_image_dsc;
     t->type = LV_DRAW_TASK_TYPE_IMAGE;
 
     lv_draw_finalize_task_creation(layer, t);
@@ -96,30 +96,30 @@ void lv_draw_img(lv_layer_t * layer, const lv_draw_img_dsc_t * dsc, const lv_are
 /**
  * Get the type of an image source
  * @param src pointer to an image source:
- *  - pointer to an 'lv_img_t' variable (image stored internally and compiled into the code)
+ *  - pointer to an 'lv_image_t' variable (image stored internally and compiled into the code)
  *  - a path to a file (e.g. "S:/folder/image.bin")
  *  - or a symbol (e.g. LV_SYMBOL_CLOSE)
- * @return type of the image source LV_IMG_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
+ * @return type of the image source LV_IMAGE_SRC_VARIABLE/FILE/SYMBOL/UNKNOWN
  */
-lv_img_src_t lv_img_src_get_type(const void * src)
+lv_image_src_t lv_image_src_get_type(const void * src)
 {
-    lv_img_src_t img_src_type = LV_IMG_SRC_UNKNOWN;
+    lv_image_src_t img_src_type = LV_IMAGE_SRC_UNKNOWN;
 
     if(src == NULL) return img_src_type;
     const uint8_t * u8_p = src;
 
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
-        img_src_type = LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
+        img_src_type = LV_IMAGE_SRC_FILE; /*If it's an ASCII character then it's file name*/
     }
     else if(u8_p[0] >= 0x80) {
-        img_src_type = LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
+        img_src_type = LV_IMAGE_SRC_SYMBOL; /*Symbols begins after 0x7F*/
     }
     else {
-        img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is draw to the first byte < 0x20*/
+        img_src_type = LV_IMAGE_SRC_VARIABLE; /*`lv_image_dsc_t` is draw to the first byte < 0x20*/
     }
 
-    if(LV_IMG_SRC_UNKNOWN == img_src_type) {
+    if(LV_IMAGE_SRC_UNKNOWN == img_src_type) {
         LV_LOG_WARN("unknown image type");
     }
 

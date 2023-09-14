@@ -151,7 +151,7 @@ props = [
 
 {'name': 'BG_IMG_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
- 'dsc': "Set a background image. Can be a pointer to `lv_img_dsc_t`, a path to a file or an `LV_SYMBOL_...`"},
+ 'dsc': "Set a background image. Can be a pointer to `lv_image_dsc_t`, a path to a file or an `LV_SYMBOL_...`"},
 
 {'name': 'BG_IMG_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -289,7 +289,7 @@ props = [
 
 {'name': 'ARC_IMG_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
- 'dsc': "Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_img_dsc_t` or a path to a file"},
+ 'dsc': "Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file"},
 
 {'section': 'Text', 'dsc':'Properties to describe the properties of text. All these properties are inherited.' },
 {'name': 'TEXT_COLOR',

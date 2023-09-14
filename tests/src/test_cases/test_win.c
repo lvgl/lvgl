@@ -84,9 +84,9 @@ void test_win_add_title_multiple(void)
     TEST_ASSERT_EQUAL(2, lv_obj_get_child_cnt(header));
 }
 
-void test_win_add_btn(void)
+void test_win_add_button(void)
 {
-    int win_btn_width = 50;
+    int win_button_width = 50;
 
     // Create the win object, get the header and update layout
     win = lv_win_create(active_screen);
@@ -94,7 +94,7 @@ void test_win_add_btn(void)
     lv_obj_update_layout(win);
 
     // Add a button to the window header
-    lv_win_add_btn(win, LV_SYMBOL_OK, win_btn_width);
+    lv_win_add_button(win, LV_SYMBOL_OK, win_button_width);
     lv_obj_update_layout(win);
 
     // Check that no additional children have been created under win
@@ -105,7 +105,7 @@ void test_win_add_btn(void)
     // Check that the button has been created properly
     lv_obj_t * btn = lv_obj_get_child(header, 0);
     TEST_ASSERT_EQUAL(1, lv_obj_get_child_cnt(btn));
-    TEST_ASSERT_EQUAL(win_btn_width, lv_obj_get_width(btn));
+    TEST_ASSERT_EQUAL(win_button_width, lv_obj_get_width(btn));
 
     // Check the output remains visually consistent
     TEST_ASSERT_EQUAL_SCREENSHOT("win_01.png");
@@ -116,15 +116,15 @@ void test_win_add_multiple_elements(void)
     lv_obj_t * btn;
     lv_obj_t * title;
 
-    int win_btn_width = 50;
-    int win_btn_close_width = 60;
+    int win_button_width = 50;
+    int win_button_close_width = 60;
 
     // Create the win object, get the header and update layout
     win = lv_win_create(active_screen);
-    lv_win_add_btn(win, LV_SYMBOL_LEFT, win_btn_width);
+    lv_win_add_button(win, LV_SYMBOL_LEFT, win_button_width);
     lv_win_add_title(win, dummy_text);
-    lv_win_add_btn(win, LV_SYMBOL_RIGHT, win_btn_width);
-    lv_win_add_btn(win, LV_SYMBOL_CLOSE, win_btn_close_width);
+    lv_win_add_button(win, LV_SYMBOL_RIGHT, win_button_width);
+    lv_win_add_button(win, LV_SYMBOL_CLOSE, win_button_close_width);
 
     header = lv_win_get_header(win);
     lv_obj_update_layout(win);
@@ -137,7 +137,7 @@ void test_win_add_multiple_elements(void)
     // Check that the left button has been created properly
     btn = lv_obj_get_child(header, 0);
     TEST_ASSERT_EQUAL(1, lv_obj_get_child_cnt(btn));
-    TEST_ASSERT_EQUAL(win_btn_width, lv_obj_get_width(btn));
+    TEST_ASSERT_EQUAL(win_button_width, lv_obj_get_width(btn));
 
     // Check that the title is a label and has been created properly
     title = lv_obj_get_child(header, 1);
@@ -147,12 +147,12 @@ void test_win_add_multiple_elements(void)
     // Check that the right button has been created properly
     btn = lv_obj_get_child(header, 2);
     TEST_ASSERT_EQUAL(1, lv_obj_get_child_cnt(btn));
-    TEST_ASSERT_EQUAL(win_btn_width, lv_obj_get_width(btn));
+    TEST_ASSERT_EQUAL(win_button_width, lv_obj_get_width(btn));
 
     // Check that the close button has been created properly
     btn = lv_obj_get_child(header, 3);
     TEST_ASSERT_EQUAL(1, lv_obj_get_child_cnt(btn));
-    TEST_ASSERT_EQUAL(win_btn_close_width, lv_obj_get_width(btn));
+    TEST_ASSERT_EQUAL(win_button_close_width, lv_obj_get_width(btn));
 
     // Check the output remains visually consistent
     TEST_ASSERT_EQUAL_SCREENSHOT("win_02.png");

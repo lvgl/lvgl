@@ -10,8 +10,8 @@
 #include "../../layouts/flex/lv_flex.h"
 #include "../../disp/lv_disp.h"
 #include "../label/lv_label.h"
-#include "../img/lv_img.h"
-#include "../btn/lv_btn.h"
+#include "../image/lv_image.h"
+#include "../button/lv_button.h"
 
 #if LV_USE_LIST
 
@@ -34,8 +34,8 @@ const lv_obj_class_t lv_list_class = {
     .height_def = LV_DPI_DEF * 2
 };
 
-const lv_obj_class_t lv_list_btn_class = {
-    .base_class = &lv_btn_class,
+const lv_obj_class_t lv_list_button_class = {
+    .base_class = &lv_button_class,
 };
 
 const lv_obj_class_t lv_list_text_class = {
@@ -71,18 +71,18 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     return obj;
 }
 
-lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
+lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt)
 {
     LV_LOG_INFO("begin");
-    lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_btn_class, list);
+    lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_button_class, list);
     lv_obj_class_init_obj(obj);
     lv_obj_set_size(obj, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
 
 #if LV_USE_IMG == 1
     if(icon) {
-        lv_obj_t * img = lv_img_create(obj);
-        lv_img_set_src(img, icon);
+        lv_obj_t * img = lv_image_create(obj);
+        lv_image_set_src(img, icon);
     }
 #endif
 
@@ -96,7 +96,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
     return obj;
 }
 
-const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn)
+const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn)
 {
     LV_UNUSED(list);
     uint32_t i;
@@ -111,7 +111,7 @@ const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn)
     return "";
 }
 
-void lv_list_set_btn_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
+void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt)
 {
     LV_UNUSED(list);
     uint32_t i;

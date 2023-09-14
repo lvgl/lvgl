@@ -113,7 +113,7 @@ void lv_example_file_explorer_2(void)
     /*Quick access status control button*/
     lv_obj_t * fe_quick_access_obj = lv_file_explorer_get_quick_access_area(file_explorer);
     lv_obj_t * fe_header_obj = lv_file_explorer_get_header(file_explorer);
-    lv_obj_t * btn = lv_btn_create(fe_header_obj);
+    lv_obj_t * btn = lv_button_create(fe_header_obj);
     lv_obj_set_style_radius(btn, 2, 0);
     lv_obj_set_style_pad_all(btn, 4, 0);
     lv_obj_align(btn, LV_ALIGN_LEFT_MID, 0, 0);

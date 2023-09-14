@@ -291,7 +291,7 @@
  *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
  *However the opened images consume additional RAM.
  *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE 0
+#define LV_IMAGE_CACHE_DEF_SIZE 0
 
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
@@ -691,7 +691,7 @@
     #define LV_IMGFONT_PATH_MAX_LEN 64
 
     /*1: Use img cache to buffer header information*/
-    #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+    #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
 
 /*1: Enable a published subscriber based messaging system */

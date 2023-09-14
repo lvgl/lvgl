@@ -428,16 +428,16 @@ static void draw_indic(lv_event_t * e)
         if((hor && lv_area_get_width(&bar->indic_area) > indic_radius * 2) ||
            (!hor && lv_area_get_height(&bar->indic_area) > indic_radius * 2)) {
             lv_opa_t bg_opa = draw_rect_dsc.bg_opa;
-            lv_opa_t bg_img_opa = draw_rect_dsc.bg_img_opa;
+            lv_opa_t bg_image_opa = draw_rect_dsc.bg_image_opa;
             lv_opa_t border_opa = draw_rect_dsc.border_opa;
             draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
-            draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
+            draw_rect_dsc.bg_image_opa = LV_OPA_TRANSP;
             draw_rect_dsc.border_opa = LV_OPA_TRANSP;
 
             lv_draw_rect(layer, &draw_rect_dsc, &bar->indic_area);
 
             draw_rect_dsc.bg_opa = bg_opa;
-            draw_rect_dsc.bg_img_opa = bg_img_opa;
+            draw_rect_dsc.bg_image_opa = bg_image_opa;
             draw_rect_dsc.border_opa = border_opa;
         }
 
@@ -477,7 +477,7 @@ static void draw_indic(lv_event_t * e)
             lv_area_increase(&border2_area, 2, 2);
             draw_rect_dsc.border_width += 2;
             draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
-            draw_rect_dsc.bg_img_opa = LV_OPA_TRANSP;
+            draw_rect_dsc.bg_image_opa = LV_OPA_TRANSP;
             draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
             lv_draw_rect(layer_indic, &draw_rect_dsc, &border2_area);
 
@@ -490,8 +490,8 @@ static void draw_indic(lv_event_t * e)
             mask_dsc.area = mask_indic_max_area;
             lv_draw_mask_rect(layer_indic, &mask_dsc);
 
-            lv_draw_img_dsc_t layer_draw_dsc;
-            lv_draw_img_dsc_init(&layer_draw_dsc);
+            lv_draw_image_dsc_t layer_draw_dsc;
+            lv_draw_image_dsc_init(&layer_draw_dsc);
             layer_draw_dsc.src = layer_indic;
 
             lv_draw_layer(layer, &layer_draw_dsc, &indic_area);

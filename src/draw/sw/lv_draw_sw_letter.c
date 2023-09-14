@@ -91,13 +91,13 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
         }
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {
 #if LV_USE_IMGFONT
-            lv_draw_img_dsc_t img_dsc;
-            lv_draw_img_dsc_init(&img_dsc);
+            lv_draw_image_dsc_t img_dsc;
+            lv_draw_image_dsc_init(&img_dsc);
             img_dsc.angle = 0;
             img_dsc.zoom = LV_ZOOM_NONE;
             img_dsc.opa = glyph_draw_dsc->opa;
             img_dsc.src = glyph_draw_dsc->bitmap;
-            lv_draw_sw_img(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
+            lv_draw_sw_image(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);
 #endif
         }
     }

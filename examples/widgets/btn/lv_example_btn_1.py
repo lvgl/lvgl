@@ -7,26 +7,26 @@ def event_handler(evt):
         print("Value changed seen")
 
 # create a simple button
-btn1 = lv.btn(lv.scr_act())
+button1 = lv.button(lv.scr_act())
 
 # attach the callback
-btn1.add_event(event_handler,lv.EVENT.ALL, None)
+button1.add_event(event_handler,lv.EVENT.ALL, None)
 
-btn1.align(lv.ALIGN.CENTER,0,-40)
-label=lv.label(btn1)
+button1.align(lv.ALIGN.CENTER,0,-40)
+label=lv.label(button1)
 label.set_text("Button")
 
 # create a toggle button
-btn2 = lv.btn(lv.scr_act())
+button2 = lv.button(lv.scr_act())
 
 # attach the callback
-#btn2.add_event(event_handler,lv.EVENT.VALUE_CHANGED,None)
-btn2.add_event(event_handler,lv.EVENT.ALL, None)
+#button2.add_event(event_handler,lv.EVENT.VALUE_CHANGED,None)
+button2.add_event(event_handler,lv.EVENT.ALL, None)
 
-btn2.align(lv.ALIGN.CENTER,0,40)
-btn2.add_flag(lv.obj.FLAG.CHECKABLE)
-btn2.set_height(lv.SIZE_CONTENT)
+button2.align(lv.ALIGN.CENTER,0,40)
+button2.add_flag(lv.obj.FLAG.CHECKABLE)
+button2.set_height(lv.SIZE_CONTENT)
 
-label=lv.label(btn2)
+label=lv.label(button2)
 label.set_text("Toggle")
 label.center()

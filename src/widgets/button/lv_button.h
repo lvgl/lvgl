@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_BTN_H
-#define LV_BTN_H
+#ifndef LV_BUTTON_H
+#define LV_BUTTON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +28,9 @@ extern "C" {
 
 typedef struct {
     lv_obj_t obj;
-} lv_btn_t;
+} lv_button_t;
 
-extern const lv_obj_class_t lv_btn_class;
+extern const lv_obj_class_t lv_button_class;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -41,7 +41,7 @@ extern const lv_obj_class_t lv_btn_class;
  * @param parent    pointer to an object, it will be the parent of the new button
  * @return          pointer to the created button
  */
-lv_obj_t * lv_btn_create(lv_obj_t * parent);
+lv_obj_t * lv_button_create(lv_obj_t * parent);
 
 /**********************
  *      MACROS
@@ -53,4 +53,4 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_BTN_H*/
+#endif /*LV_BUTTON_H*/

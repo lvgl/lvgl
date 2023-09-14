@@ -13,7 +13,7 @@ lv.group_get_default().add_obj(list1)
 
 for i in range(15):
     item_text = "File {:d}".format(i)
-    item = list1.add_btn(lv.SYMBOL.FILE, item_text)
+    item = list1.add_button(lv.SYMBOL.FILE, item_text)
     item.set_style_bg_opa(0, 0)
     lv.group_remove_obj(item)   # Not needed, we use the gridnav instead
 
@@ -26,7 +26,7 @@ lv.group_get_default().add_obj(list2)
 
 for i in range(15):
     item_text = "Folder {:d}".format(i)
-    item = list2.add_btn(lv.SYMBOL.DIRECTORY, item_text)
+    item = list2.add_button(lv.SYMBOL.DIRECTORY, item_text)
     item.set_style_bg_opa(0, 0)
     lv.group_remove_obj(item)
 

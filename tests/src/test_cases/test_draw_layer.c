@@ -22,7 +22,7 @@ static const char * lorem_ipsum =
 
 static lv_obj_t * create_test_obj(const char * text, bool simple)
 {
-    lv_obj_t * obj = lv_btn_create(lv_scr_act());
+    lv_obj_t * obj = lv_button_create(lv_scr_act());
     lv_obj_set_size(obj, 120, 80);
 
     if(simple) {

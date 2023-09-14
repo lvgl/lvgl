@@ -16,16 +16,16 @@ void lv_example_style_6(void)
     lv_style_set_border_width(&style, 2);
     lv_style_set_border_color(&style, lv_palette_main(LV_PALETTE_BLUE));
 
-    lv_style_set_img_recolor(&style, lv_palette_main(LV_PALETTE_BLUE));
-    lv_style_set_img_recolor_opa(&style, LV_OPA_50);
+    lv_style_set_image_recolor(&style, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_image_recolor_opa(&style, LV_OPA_50);
     lv_style_set_transform_angle(&style, 300);
 
     /*Create an object with the new style*/
-    lv_obj_t * obj = lv_img_create(lv_scr_act());
+    lv_obj_t * obj = lv_image_create(lv_scr_act());
     lv_obj_add_style(obj, &style, 0);
 
-    LV_IMG_DECLARE(img_cogwheel_argb);
-    lv_img_set_src(obj, &img_cogwheel_argb);
+    LV_IMAGE_DECLARE(img_cogwheel_argb);
+    lv_image_set_src(obj, &img_cogwheel_argb);
 
     lv_obj_center(obj);
 }

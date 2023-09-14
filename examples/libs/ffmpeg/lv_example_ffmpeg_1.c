@@ -8,8 +8,8 @@
  */
 void lv_example_ffmpeg_1(void)
 {
-    lv_obj_t * img = lv_img_create(lv_scr_act());
-    lv_img_set_src(img, "./lvgl/examples/libs/ffmpeg/ffmpeg.png");
+    lv_obj_t * img = lv_image_create(lv_scr_act());
+    lv_image_set_src(img, "./lvgl/examples/libs/ffmpeg/ffmpeg.png");
     lv_obj_center(img);
 }
 

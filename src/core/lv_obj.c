@@ -409,7 +409,7 @@ static void lv_obj_draw(lv_event_t * e)
             lv_draw_rect_dsc_t draw_dsc;
             lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
-            draw_dsc.bg_img_opa = LV_OPA_TRANSP;
+            draw_dsc.bg_image_opa = LV_OPA_TRANSP;
             draw_dsc.outline_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);

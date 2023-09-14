@@ -11,7 +11,7 @@ except:
     print("Could not find star.png")
     sys.exit()
 
-img_star_argb = lv.img_dsc_t({
+image_star_argb = lv.image_dsc_t({
   'data_size': len(png_data),
   'data': png_data
 })
@@ -29,9 +29,9 @@ canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 canvas.fill_bg(lv.color_hex3(0xccc), lv.OPA.COVER)
 canvas.center()
 
-dsc = lv.draw_img_dsc_t()
+dsc = lv.draw_image_dsc_t()
 dsc.init()
-dsc.src = img_star_argb
+dsc.src = image_star_argb
 
 
 
@@ -45,6 +45,6 @@ coords.y2 = 5 + 28
 layer = lv.layer_t()
 canvas.init_layer(layer);
 
-lv.draw_img(layer, dsc, coords)
+lv.draw_image(layer, dsc, coords)
 
 canvas.finish_layer(layer)

@@ -46,7 +46,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
     if(part != LV_PART_MAIN) {
         if(opa <= LV_OPA_MIN) {
             draw_dsc->bg_opa = LV_OPA_TRANSP;
-            draw_dsc->bg_img_opa = LV_OPA_TRANSP;
+            draw_dsc->bg_image_opa = LV_OPA_TRANSP;
             draw_dsc->border_opa = LV_OPA_TRANSP;
             draw_dsc->outline_opa = LV_OPA_TRANSP;
             draw_dsc->shadow_opa = LV_OPA_TRANSP;
@@ -101,19 +101,19 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
         }
     }
 
-    if(draw_dsc->bg_img_opa != LV_OPA_TRANSP) {
-        draw_dsc->bg_img_src = lv_obj_get_style_bg_img_src(obj, part);
-        if(draw_dsc->bg_img_src) {
-            draw_dsc->bg_img_opa = lv_obj_get_style_bg_img_opa(obj, part);
-            if(draw_dsc->bg_img_opa > LV_OPA_MIN) {
-                if(lv_img_src_get_type(draw_dsc->bg_img_src) == LV_IMG_SRC_SYMBOL) {
-                    draw_dsc->bg_img_symbol_font = lv_obj_get_style_text_font(obj, part);
-                    draw_dsc->bg_img_recolor = lv_obj_get_style_text_color_filtered(obj, part);
+    if(draw_dsc->bg_image_opa != LV_OPA_TRANSP) {
+        draw_dsc->bg_image_src = lv_obj_get_style_bg_image_src(obj, part);
+        if(draw_dsc->bg_image_src) {
+            draw_dsc->bg_image_opa = lv_obj_get_style_bg_image_opa(obj, part);
+            if(draw_dsc->bg_image_opa > LV_OPA_MIN) {
+                if(lv_image_src_get_type(draw_dsc->bg_image_src) == LV_IMAGE_SRC_SYMBOL) {
+                    draw_dsc->bg_image_symbol_font = lv_obj_get_style_text_font(obj, part);
+                    draw_dsc->bg_image_recolor = lv_obj_get_style_text_color_filtered(obj, part);
                 }
                 else {
-                    draw_dsc->bg_img_recolor = lv_obj_get_style_bg_img_recolor_filtered(obj, part);
-                    draw_dsc->bg_img_recolor_opa = lv_obj_get_style_bg_img_recolor_opa(obj, part);
-                    draw_dsc->bg_img_tiled = lv_obj_get_style_bg_img_tiled(obj, part);
+                    draw_dsc->bg_image_recolor = lv_obj_get_style_bg_image_recolor_filtered(obj, part);
+                    draw_dsc->bg_image_recolor_opa = lv_obj_get_style_bg_image_recolor_opa(obj, part);
+                    draw_dsc->bg_image_tiled = lv_obj_get_style_bg_image_tiled(obj, part);
                 }
             }
         }
@@ -136,7 +136,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint32_t part, lv_draw_rect_dsc_t
 
     if(opa < LV_OPA_MAX) {
         draw_dsc->bg_opa = LV_OPA_MIX2(draw_dsc->bg_opa, opa);
-        draw_dsc->bg_img_opa = LV_OPA_MIX2(draw_dsc->bg_img_opa, opa);
+        draw_dsc->bg_image_opa = LV_OPA_MIX2(draw_dsc->bg_image_opa, opa);
         draw_dsc->border_opa = LV_OPA_MIX2(draw_dsc->border_opa, opa);
         draw_dsc->shadow_opa = LV_OPA_MIX2(draw_dsc->shadow_opa, opa);
         draw_dsc->outline_opa = LV_OPA_MIX2(draw_dsc->outline_opa, opa);
@@ -172,12 +172,12 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint32_t part, lv_draw_label_dsc
     draw_dsc->align = lv_obj_get_style_text_align(obj, part);
 }
 
-void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t * draw_dsc)
+void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc_t * draw_dsc)
 {
     draw_dsc->base.obj = obj;
     draw_dsc->base.part = part;
 
-    draw_dsc->opa = lv_obj_get_style_img_opa(obj, part);
+    draw_dsc->opa = lv_obj_get_style_image_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
     lv_opa_t opa = lv_obj_get_style_opa_recursive(obj, part);
@@ -191,8 +191,8 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint32_t part, lv_draw_img_dsc_t *
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 
-    draw_dsc->recolor_opa = lv_obj_get_style_img_recolor_opa(obj, part);
-    draw_dsc->recolor = lv_obj_get_style_img_recolor_filtered(obj, part);
+    draw_dsc->recolor_opa = lv_obj_get_style_image_recolor_opa(obj, part);
+    draw_dsc->recolor = lv_obj_get_style_image_recolor_filtered(obj, part);
 
     if(part != LV_PART_MAIN) draw_dsc->blend_mode = lv_obj_get_style_blend_mode(obj, part);
 }
@@ -245,7 +245,7 @@ void lv_obj_init_draw_arc_dsc(lv_obj_t * obj, uint32_t part, lv_draw_arc_dsc_t *
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
     draw_dsc->color = lv_obj_get_style_arc_color_filtered(obj, part);
-    draw_dsc->img_src = lv_obj_get_style_arc_img_src(obj, part);
+    draw_dsc->img_src = lv_obj_get_style_arc_image_src(obj, part);
 
     draw_dsc->rounded = lv_obj_get_style_arc_rounded(obj, part);
 }

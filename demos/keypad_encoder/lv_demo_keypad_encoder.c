@@ -102,7 +102,7 @@ static void selectors_create(lv_obj_t * parent)
     obj = lv_calendar_create(parent);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
-    obj = lv_btnmatrix_create(parent);
+    obj = lv_buttonmatrix_create(parent);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 
     obj = lv_checkbox_create(parent);
@@ -130,13 +130,13 @@ static void selectors_create(lv_obj_t * parent)
         lv_obj_set_height(list, lv_obj_get_content_height(parent));
     }
 
-    lv_list_add_btn(list, LV_SYMBOL_OK, "Apply");
-    lv_list_add_btn(list, LV_SYMBOL_CLOSE, "Close");
-    lv_list_add_btn(list, LV_SYMBOL_EYE_OPEN, "Show");
-    lv_list_add_btn(list, LV_SYMBOL_EYE_CLOSE, "Hide");
-    lv_list_add_btn(list, LV_SYMBOL_TRASH, "Delete");
-    lv_list_add_btn(list, LV_SYMBOL_COPY, "Copy");
-    lv_list_add_btn(list, LV_SYMBOL_PASTE, "Paste");
+    lv_list_add_button(list, LV_SYMBOL_OK, "Apply");
+    lv_list_add_button(list, LV_SYMBOL_CLOSE, "Close");
+    lv_list_add_button(list, LV_SYMBOL_EYE_OPEN, "Show");
+    lv_list_add_button(list, LV_SYMBOL_EYE_CLOSE, "Hide");
+    lv_list_add_button(list, LV_SYMBOL_TRASH, "Delete");
+    lv_list_add_button(list, LV_SYMBOL_COPY, "Copy");
+    lv_list_add_button(list, LV_SYMBOL_PASTE, "Paste");
 }
 
 static void text_input_create(lv_obj_t * parent)
@@ -162,11 +162,11 @@ static void text_input_create(lv_obj_t * parent)
 
 static void msgbox_create(void)
 {
-    static const char * btns[] = {"Ok", "Cancel", ""};
-    lv_obj_t * mbox = lv_msgbox_create(NULL, "Hi", "Welcome to the keyboard and encoder demo", btns, false);
+    static const char * buttons[] = {"Ok", "Cancel", ""};
+    lv_obj_t * mbox = lv_msgbox_create(NULL, "Hi", "Welcome to the keyboard and encoder demo", buttons, false);
     lv_obj_add_event(mbox, msgbox_event_cb, LV_EVENT_ALL, NULL);
-    lv_group_focus_obj(lv_msgbox_get_btns(mbox));
-    lv_obj_add_state(lv_msgbox_get_btns(mbox), LV_STATE_FOCUS_KEY);
+    lv_group_focus_obj(lv_msgbox_get_buttons(mbox));
+    lv_obj_add_state(lv_msgbox_get_buttons(mbox), LV_STATE_FOCUS_KEY);
     lv_group_focus_freeze(g, true);
 
     lv_obj_align(mbox, LV_ALIGN_CENTER, 0, 0);
@@ -182,7 +182,7 @@ static void msgbox_event_cb(lv_event_t * e)
     lv_obj_t * msgbox = lv_event_get_current_target(e);
 
     if(code == LV_EVENT_VALUE_CHANGED) {
-        const char * txt = lv_msgbox_get_active_btn_text(msgbox);
+        const char * txt = lv_msgbox_get_active_button_text(msgbox);
         if(txt) {
             lv_msgbox_close(msgbox);
             lv_group_focus_freeze(g, false);

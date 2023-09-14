@@ -10,7 +10,7 @@
 #if LV_USE_CALENDAR && LV_USE_CALENDAR_HEADER_ARROW
 
 #include "lv_calendar.h"
-#include "../btn/lv_btn.h"
+#include "../button/lv_button.h"
 #include "../label/lv_label.h"
 #include "../../layouts/flex/lv_flex.h"
 
@@ -71,8 +71,8 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(obj, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START);
 
-    lv_obj_t * mo_prev = lv_btn_create(obj);
-    lv_obj_set_style_bg_img_src(mo_prev, LV_SYMBOL_LEFT, 0);
+    lv_obj_t * mo_prev = lv_button_create(obj);
+    lv_obj_set_style_bg_image_src(mo_prev, LV_SYMBOL_LEFT, 0);
     lv_obj_set_height(mo_prev, lv_pct(100));
     lv_obj_update_layout(mo_prev);
     lv_coord_t btn_size = lv_obj_get_height(mo_prev);
@@ -86,8 +86,8 @@ static void my_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_flex_grow(label, 1);
 
-    lv_obj_t * mo_next = lv_btn_create(obj);
-    lv_obj_set_style_bg_img_src(mo_next, LV_SYMBOL_RIGHT, 0);
+    lv_obj_t * mo_next = lv_button_create(obj);
+    lv_obj_set_style_bg_image_src(mo_next, LV_SYMBOL_RIGHT, 0);
     lv_obj_set_size(mo_next, btn_size, btn_size);
 
     lv_obj_add_event(mo_next, month_event_cb, LV_EVENT_CLICKED, NULL);

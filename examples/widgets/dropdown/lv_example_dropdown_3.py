@@ -3,10 +3,10 @@ try:
     with open('../../assets/img_caret_down.png','rb') as f:
         png_data = f.read()
 except:
-    print("Could not find img_caret_down.png")
+    print("Could not find image_caret_down.png")
     sys.exit()
 
-img_caret_down_argb = lv.img_dsc_t({
+image_caret_down_argb = lv.image_dsc_t({
   'data_size': len(png_data),
   'data': png_data
 })
@@ -35,8 +35,8 @@ dropdown.set_options("\n".join([
 dropdown.set_text("Menu")
 
 # Use a custom image as down icon and flip it when the list is opened
-# LV_IMG_DECLARE(img_caret_down)
-dropdown.set_symbol(img_caret_down_argb)
+# LV_IMAGE_DECLARE(image_caret_down)
+dropdown.set_symbol(image_caret_down_argb)
 dropdown.set_style_transform_angle(1800, lv.PART.INDICATOR | lv.STATE.CHECKED)
 
 # In a menu we don't need to show the last clicked item

@@ -28,7 +28,7 @@ void lv_example_menu_5(void)
     else {
         lv_obj_set_style_bg_color(menu, lv_color_darken(lv_obj_get_style_bg_color(menu, 0), 50), 0);
     }
-    lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
+    lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BUTTON_ENABLED);
     lv_obj_add_event(menu, back_event_handler, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);
@@ -116,7 +116,7 @@ static void back_event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_obj_t * menu = lv_event_get_user_data(e);
 
-    if(lv_menu_back_btn_is_root(menu, obj)) {
+    if(lv_menu_back_button_is_root(menu, obj)) {
         lv_obj_t * mbox1 = lv_msgbox_create(NULL, "Hello", "Root back btn click.", NULL, true);
         lv_obj_center(mbox1);
     }
@@ -151,8 +151,8 @@ static lv_obj_t * create_text(lv_obj_t * parent, const char * icon, const char *
     lv_obj_t * label = NULL;
 
     if(icon) {
-        img = lv_img_create(obj);
-        lv_img_set_src(img, icon);
+        img = lv_image_create(obj);
+        lv_image_set_src(img, icon);
     }
 
     if(txt) {

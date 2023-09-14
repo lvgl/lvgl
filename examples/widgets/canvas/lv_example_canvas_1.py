@@ -1,6 +1,6 @@
 _CANVAS_WIDTH = 200
 _CANVAS_HEIGHT = 150
-LV_IMG_ZOOM_NONE = 256
+LV_IMAGE_ZOOM_NONE = 256
 
 rect_dsc = lv.draw_rect_dsc_t()
 rect_dsc.init()
@@ -60,28 +60,28 @@ canvas.finish_layer(layer)
 # Test the rotation. It requires another buffer where the original image is stored.
 # So copy the current image to buffer and rotate it to the canvas
 
-img = lv.img_dsc_t()
+image = lv.image_dsc_t()
 
-img.data = cbuf[:]
-img.header.cf = lv.COLOR_FORMAT.NATIVE
-img.header.w = _CANVAS_WIDTH
-img.header.h = _CANVAS_HEIGHT
+image.data = cbuf[:]
+image.header.cf = lv.COLOR_FORMAT.NATIVE
+image.header.w = _CANVAS_WIDTH
+image.header.h = _CANVAS_HEIGHT
 
 canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
 
 
-img_dsc = lv.draw_img_dsc_t()
-img_dsc.init();
-img_dsc.angle = 120;
-img_dsc.src = img;
-img_dsc.pivot.x = _CANVAS_WIDTH // 2;
-img_dsc.pivot.y = _CANVAS_HEIGHT // 2;
+image_dsc = lv.draw_image_dsc_t()
+image_dsc.init();
+image_dsc.angle = 120;
+image_dsc.src = image;
+image_dsc.pivot.x = _CANVAS_WIDTH // 2;
+image_dsc.pivot.y = _CANVAS_HEIGHT // 2;
 
-coords_img = lv.area_t()
-coords_img.x1 = 0
-coords_img.y1 = 0
-coords_img.x2 = _CANVAS_WIDTH - 1
-coords_img.y2 = _CANVAS_HEIGHT - 1
+coords_image = lv.area_t()
+coords_image.x1 = 0
+coords_image.y1 = 0
+coords_image.x2 = _CANVAS_WIDTH - 1
+coords_image.y2 = _CANVAS_HEIGHT - 1
 
-lv.draw_img(layer, img_dsc, coords_img)
+lv.draw_image(layer, image_dsc, coords_image)
 

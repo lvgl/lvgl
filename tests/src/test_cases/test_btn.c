@@ -15,10 +15,10 @@ void tearDown(void)
     lv_obj_clean(active_screen);
 }
 
-void test_btn_creation(void)
+void test_button_creation(void)
 {
     lv_obj_t * btn;
-    btn = lv_btn_create(active_screen);
+    btn = lv_button_create(active_screen);
     TEST_ASSERT_NOT_NULL(btn);
     /* These flags are set in the object's constructor. */
     TEST_ASSERT_TRUE(lv_obj_has_flag(btn, LV_OBJ_FLAG_SCROLL_ON_FOCUS));

@@ -15,7 +15,6 @@
 #include "../../misc/lv_anim.h"
 #include "../../indev/lv_indev.h"
 #include "../../disp/lv_disp.h"
-#include "../img/lv_img.h"
 
 /*********************
  *      DEFINES

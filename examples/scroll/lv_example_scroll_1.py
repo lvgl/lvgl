@@ -17,7 +17,7 @@ child = lv.obj(panel)
 child.set_pos(160, 80)
 child.set_size(80, 80)
 
-child2 = lv.btn(child)
+child2 = lv.button(child)
 child2.set_size(100, 50)
 
 label = lv.label(child2)

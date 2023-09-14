@@ -1,12 +1,12 @@
 def back_event_handler(e):
     obj = e.get_target_obj()
-    if menu.back_btn_is_root(obj):
-        mbox1 = lv.msgbox(lv.scr_act(), "Hello", "Root back btn click.", None, True)
+    if menu.back_button_is_root(obj):
+        mbox1 = lv.msgbox(lv.scr_act(), "Hello", "Root back button click.", None, True)
         mbox1.center()
 
 # Create a menu object
 menu = lv.menu(lv.scr_act())
-menu.set_mode_root_back_btn(lv.menu.ROOT_BACK_BTN.ENABLED)
+menu.set_mode_root_back_button(lv.menu.ROOT_BACK_BUTTON.ENABLED)
 menu.add_event(back_event_handler, lv.EVENT.CLICKED, None)
 menu.set_size(320, 240)
 menu.center()

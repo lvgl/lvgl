@@ -26,7 +26,7 @@ struct {
 
 static int32_t anim_path_bezier3_cb(const lv_anim_t * a);
 static void refer_chart_cubic_bezier(void);
-static void run_btn_event_handler(lv_event_t * e);
+static void run_button_event_handler(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
 static void page_obj_init(lv_obj_t * par);
 static void anim_x_cb(void * var, int32_t v);
@@ -88,7 +88,7 @@ static void anim_x_cb(void * var, int32_t v)
     lv_obj_set_style_translate_x(var, v, LV_PART_MAIN);
 }
 
-static void run_btn_event_handler(lv_event_t * e)
+static void run_button_event_handler(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_CLICKED) {
@@ -144,8 +144,8 @@ static void page_obj_init(lv_obj_t * par)
     lv_obj_set_grid_cell(ginfo.p1_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 1, 1);
     lv_obj_set_grid_cell(ginfo.p2_slider, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 2, 1);
 
-    ginfo.run_btn = lv_btn_create(par);
-    lv_obj_add_event(ginfo.run_btn, run_btn_event_handler, LV_EVENT_CLICKED, NULL);
+    ginfo.run_btn = lv_button_create(par);
+    lv_obj_add_event(ginfo.run_btn, run_button_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_t * btn_label = lv_label_create(ginfo.run_btn);
     lv_label_set_text(btn_label, LV_SYMBOL_PLAY);
     lv_obj_center(btn_label);

@@ -17,7 +17,7 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include "../draw/lv_img_cache.h"
+#include "../draw/lv_image_cache.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
@@ -101,12 +101,12 @@ typedef struct _lv_global_t {
     lv_draw_buf_handlers_t draw_buf_handlers;
 
     lv_ll_t img_decoder_ll;
-    lv_img_cache_manager_t img_cache_mgr;
-#if LV_IMG_CACHE_DEF_SIZE
+    lv_image_cache_manager_t img_cache_mgr;
+#if LV_IMAGE_CACHE_DEF_SIZE
     uint16_t img_cache_entry_cnt;
-    _lv_img_cache_entry_t * img_cache_array;
+    _lv_image_cache_entry_t * img_cache_array;
 #else
-    _lv_img_cache_entry_t img_cache_single;
+    _lv_image_cache_entry_t img_cache_single;
 #endif
 
     lv_draw_global_info_t draw_info;
@@ -180,7 +180,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0
-    lv_style_t fe_list_btn_style;
+    lv_style_t fe_list_button_style;
 #endif
 
 #if LV_USE_SYSMON && LV_USE_PERF_MONITOR

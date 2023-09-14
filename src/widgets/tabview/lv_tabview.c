@@ -27,7 +27,7 @@
 static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void btns_value_changed_event_cb(lv_event_t * e);
+static void buttons_value_changed_event_cb(lv_event_t * e);
 static void cont_scroll_end_event_cb(lv_event_t * e);
 
 /**********************
@@ -80,7 +80,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
     lv_obj_set_size(page, LV_PCT(100), LV_PCT(100));
     uint32_t tab_id = lv_obj_get_child_cnt(cont);
 
-    lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
+    lv_obj_t * buttons = lv_tabview_get_tab_buttons(obj);
 
     char ** old_map = tabview->map;
     char ** new_map;
@@ -109,18 +109,18 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * obj, const char * name)
         }
     }
     tabview->map = new_map;
-    lv_btnmatrix_set_map(btns, (const char **)new_map);
+    lv_buttonmatrix_set_map(buttons, (const char **)new_map);
     lv_free(old_map);
 
-    lv_btnmatrix_set_btn_ctrl_all(btns, LV_BTNMATRIX_CTRL_CHECKABLE | LV_BTNMATRIX_CTRL_CLICK_TRIG |
-                                  LV_BTNMATRIX_CTRL_NO_REPEAT);
+    lv_buttonmatrix_set_button_ctrl_all(buttons, LV_BUTTONMATRIX_CTRL_CHECKABLE | LV_BUTTONMATRIX_CTRL_CLICK_TRIG |
+                                        LV_BUTTONMATRIX_CTRL_NO_REPEAT);
 
     tabview->tab_cnt++;
     if(tabview->tab_cnt == 1) {
         lv_tabview_set_act(obj, 0, LV_ANIM_OFF);
     }
 
-    lv_btnmatrix_set_btn_ctrl(btns, tabview->tab_cur, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_buttonmatrix_set_button_ctrl(buttons, tabview->tab_cur, LV_BUTTONMATRIX_CTRL_CHECKED);
 
     return page;
 }
@@ -171,8 +171,8 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
         lv_obj_scroll_to_y(cont, id * (gap + h), anim_en);
     }
 
-    lv_obj_t * btns = lv_tabview_get_tab_btns(obj);
-    lv_btnmatrix_set_btn_ctrl(btns, id, LV_BTNMATRIX_CTRL_CHECKED);
+    lv_obj_t * buttons = lv_tabview_get_tab_buttons(obj);
+    lv_buttonmatrix_set_button_ctrl(buttons, id, LV_BUTTONMATRIX_CTRL_CHECKED);
     tabview->tab_cur = id;
 }
 
@@ -188,7 +188,7 @@ lv_obj_t * lv_tabview_get_content(lv_obj_t * tv)
     return lv_obj_get_child(tv, 1);
 }
 
-lv_obj_t * lv_tabview_get_tab_btns(lv_obj_t * tv)
+lv_obj_t * lv_tabview_get_tab_buttons(lv_obj_t * tv)
 {
     return lv_obj_get_child(tv, 0);
 }
@@ -224,14 +224,14 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_obj_t * btnm;
     lv_obj_t * cont;
 
-    btnm = lv_btnmatrix_create(obj);
+    btnm = lv_buttonmatrix_create(obj);
     cont = lv_obj_create(obj);
 
-    lv_btnmatrix_set_one_checked(btnm, true);
+    lv_buttonmatrix_set_one_checked(btnm, true);
     tabview->map = lv_malloc(sizeof(const char *));
     tabview->map[0] = (char *)"";
-    lv_btnmatrix_set_map(btnm, (const char **)tabview->map);
-    lv_obj_add_event(btnm, btns_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_buttonmatrix_set_map(btnm, (const char **)tabview->map);
+    lv_obj_add_event(btnm, buttons_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     lv_obj_add_event(cont, cont_scroll_end_event_cb, LV_EVENT_ALL, NULL);
@@ -306,12 +306,12 @@ static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
 }
 
 
-static void btns_value_changed_event_cb(lv_event_t * e)
+static void buttons_value_changed_event_cb(lv_event_t * e)
 {
-    lv_obj_t * btns = lv_event_get_target(e);
+    lv_obj_t * buttons = lv_event_get_target(e);
 
-    lv_obj_t * tv = lv_obj_get_parent(btns);
-    uint32_t id = lv_btnmatrix_get_selected_btn(btns);
+    lv_obj_t * tv = lv_obj_get_parent(buttons);
+    uint32_t id = lv_buttonmatrix_get_selected_button(buttons);
     lv_tabview_set_act(tv, id, LV_ANIM_OFF);
 }
 

@@ -36,7 +36,7 @@ const lv_obj_class_t lv_rlottie_class = {
     .constructor_cb = lv_rlottie_constructor,
     .destructor_cb = lv_rlottie_destructor,
     .instance_size = sizeof(lv_rlottie_t),
-    .base_class = &lv_img_class
+    .base_class = &lv_image_class
 };
 
 typedef struct {
@@ -142,7 +142,7 @@ static void lv_rlottie_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     rlottie->imgdsc.data = (void *)rlottie->allocated_buf;
     rlottie->imgdsc.data_size = allocaled_buf_size;
 
-    lv_img_set_src(obj, &rlottie->imgdsc);
+    lv_image_set_src(obj, &rlottie->imgdsc);
 
     rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD | LV_RLOTTIE_CTRL_PLAY | LV_RLOTTIE_CTRL_LOOP;
     rlottie->dest_frame = rlottie->total_frames; /* invalid destination frame so it's possible to pause on frame 0 */
@@ -174,7 +174,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
         rlottie->dest_frame = 0;
     }
 
-    lv_img_cache_invalidate_src(&rlottie->imgdsc);
+    lv_image_cache_invalidate_src(&rlottie->imgdsc);
     if(rlottie->allocated_buf) {
         lv_free(rlottie->allocated_buf);
         rlottie->allocated_buf = NULL;

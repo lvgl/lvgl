@@ -22,13 +22,13 @@ panel.set_flex_flow(lv.FLEX_FLOW.ROW)
 panel.center()
 
 for i in range(10):
-    btn = lv.btn(panel)
-    btn.set_size(150, 100)
+    button = lv.button(panel)
+    button.set_size(150, 100)
 
-    label = lv.label(btn)
+    label = lv.label(button)
     if i == 3:
         label.set_text("Panel {:d}\nno snap".format(i))
-        btn.clear_flag(lv.obj.FLAG.SNAPPABLE)
+        button.clear_flag(lv.obj.FLAG.SNAPPABLE)
     else:
         label.set_text("Panel {:d}".format(i))
     label.center()

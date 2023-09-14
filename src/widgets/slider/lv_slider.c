@@ -17,7 +17,7 @@
 #include "../../draw/lv_draw.h"
 #include "../../stdlib/lv_string.h"
 #include "../../misc/lv_math.h"
-#include "../img/lv_img.h"
+#include "../image/lv_image.h"
 
 /*********************
  *      DEFINES

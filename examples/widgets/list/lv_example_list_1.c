@@ -8,7 +8,7 @@ static void event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_CLICKED) {
         LV_UNUSED(obj);
-        LV_LOG_USER("Clicked: %s", lv_list_get_btn_text(list1, obj));
+        LV_LOG_USER("Clicked: %s", lv_list_get_button_text(list1, obj));
     }
 }
 void lv_example_list_1(void)
@@ -21,31 +21,31 @@ void lv_example_list_1(void)
     /*Add buttons to the list*/
     lv_obj_t * btn;
     lv_list_add_text(list1, "File");
-    btn = lv_list_add_btn(list1, LV_SYMBOL_FILE, "New");
+    btn = lv_list_add_button(list1, LV_SYMBOL_FILE, "New");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_DIRECTORY, "Open");
+    btn = lv_list_add_button(list1, LV_SYMBOL_DIRECTORY, "Open");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_SAVE, "Save");
+    btn = lv_list_add_button(list1, LV_SYMBOL_SAVE, "Save");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_CLOSE, "Delete");
+    btn = lv_list_add_button(list1, LV_SYMBOL_CLOSE, "Delete");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_EDIT, "Edit");
+    btn = lv_list_add_button(list1, LV_SYMBOL_EDIT, "Edit");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
 
     lv_list_add_text(list1, "Connectivity");
-    btn = lv_list_add_btn(list1, LV_SYMBOL_BLUETOOTH, "Bluetooth");
+    btn = lv_list_add_button(list1, LV_SYMBOL_BLUETOOTH, "Bluetooth");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_GPS, "Navigation");
+    btn = lv_list_add_button(list1, LV_SYMBOL_GPS, "Navigation");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_USB, "USB");
+    btn = lv_list_add_button(list1, LV_SYMBOL_USB, "USB");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_BATTERY_FULL, "Battery");
+    btn = lv_list_add_button(list1, LV_SYMBOL_BATTERY_FULL, "Battery");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
 
     lv_list_add_text(list1, "Exit");
-    btn = lv_list_add_btn(list1, LV_SYMBOL_OK, "Apply");
+    btn = lv_list_add_button(list1, LV_SYMBOL_OK, "Apply");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
-    btn = lv_list_add_btn(list1, LV_SYMBOL_CLOSE, "Close");
+    btn = lv_list_add_button(list1, LV_SYMBOL_CLOSE, "Close");
     lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
 }
 

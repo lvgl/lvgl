@@ -6,7 +6,7 @@ static void back_event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
     lv_obj_t * menu = lv_event_get_user_data(e);
 
-    if(lv_menu_back_btn_is_root(menu, obj)) {
+    if(lv_menu_back_button_is_root(menu, obj)) {
         lv_obj_t * mbox1 = lv_msgbox_create(NULL, "Hello", "Root back btn click.", NULL, true);
         lv_obj_center(mbox1);
     }
@@ -15,7 +15,7 @@ static void back_event_handler(lv_event_t * e)
 void lv_example_menu_2(void)
 {
     lv_obj_t * menu = lv_menu_create(lv_scr_act());
-    lv_menu_set_mode_root_back_btn(menu, LV_MENU_ROOT_BACK_BTN_ENABLED);
+    lv_menu_set_mode_root_back_button(menu, LV_MENU_ROOT_BACK_BUTTON_ENABLED);
     lv_obj_add_event(menu, back_event_handler, LV_EVENT_CLICKED, menu);
     lv_obj_set_size(menu, lv_disp_get_hor_res(NULL), lv_disp_get_ver_res(NULL));
     lv_obj_center(menu);

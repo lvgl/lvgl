@@ -18,7 +18,7 @@ void test_tabview_add_several_tabs_no_scroll(void);
 void test_tabview_rename_tab(void);
 void test_tabview_add_several_tabs_hor(void);
 void test_tabview_get_content(void);
-void test_tabview_get_tab_btns(void);
+void test_tabview_get_tab_buttons(void);
 void test_tabview_set_act_non_existent(void);
 void test_tabview_tab2_selected_event(void);
 void test_tabview_update_on_external_scroll(void);
@@ -193,13 +193,13 @@ void test_tabview_get_content(void)
     TEST_ASSERT_NOT_NULL(content);
 }
 
-void test_tabview_get_tab_btns(void)
+void test_tabview_get_tab_buttons(void)
 {
     tabview = lv_tabview_create(active_screen, LV_DIR_TOP, 50);
 
-    lv_obj_t * btns = lv_tabview_get_tab_btns(tabview);
+    lv_obj_t * buttons = lv_tabview_get_tab_buttons(tabview);
 
-    TEST_ASSERT_NOT_NULL(btns);
+    TEST_ASSERT_NOT_NULL(buttons);
 }
 
 void test_tabview_set_act_non_existent(void)

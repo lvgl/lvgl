@@ -169,19 +169,19 @@ void lv_demo_widgets(void)
     lv_obj_set_style_text_font(lv_scr_act(), font_normal, 0);
 
     if(disp_size == DISP_LARGE) {
-        lv_obj_t * tab_btns = lv_tabview_get_tab_btns(tv);
-        lv_obj_set_style_pad_left(tab_btns, LV_HOR_RES / 2, 0);
-        lv_obj_t * logo = lv_img_create(tab_btns);
-        LV_IMG_DECLARE(img_lvgl_logo);
-        lv_img_set_src(logo, &img_lvgl_logo);
+        lv_obj_t * tab_buttons = lv_tabview_get_tab_buttons(tv);
+        lv_obj_set_style_pad_left(tab_buttons, LV_HOR_RES / 2, 0);
+        lv_obj_t * logo = lv_image_create(tab_buttons);
+        LV_IMAGE_DECLARE(img_lvgl_logo);
+        lv_image_set_src(logo, &img_lvgl_logo);
         lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
-        lv_obj_t * label = lv_label_create(tab_btns);
+        lv_obj_t * label = lv_label_create(tab_buttons);
         lv_obj_add_style(label, &style_title, 0);
         lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
-        label = lv_label_create(tab_btns);
+        label = lv_label_create(tab_buttons);
         lv_label_set_text(label, "Widgets demo");
         lv_obj_add_style(label, &style_text_muted, 0);
         lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
@@ -206,9 +206,9 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_t * panel1 = lv_obj_create(parent);
     lv_obj_set_height(panel1, LV_SIZE_CONTENT);
 
-    LV_IMG_DECLARE(img_demo_widgets_avatar);
-    lv_obj_t * avatar = lv_img_create(panel1);
-    lv_img_set_src(avatar, &img_demo_widgets_avatar);
+    LV_IMAGE_DECLARE(img_demo_widgets_avatar);
+    lv_obj_t * avatar = lv_image_create(panel1);
+    lv_image_set_src(avatar, &img_demo_widgets_avatar);
 
     lv_obj_t * name = lv_label_create(panel1);
     lv_label_set_text(name, "Elena Smith");
@@ -233,14 +233,14 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_t * call_label = lv_label_create(panel1);
     lv_label_set_text(call_label, "+79 246 123 4567");
 
-    lv_obj_t * log_out_btn = lv_btn_create(panel1);
+    lv_obj_t * log_out_btn = lv_button_create(panel1);
     lv_obj_set_height(log_out_btn, LV_SIZE_CONTENT);
 
     lv_obj_t * label = lv_label_create(log_out_btn);
     lv_label_set_text(label, "Log out");
     lv_obj_center(label);
 
-    lv_obj_t * invite_btn = lv_btn_create(panel1);
+    lv_obj_t * invite_btn = lv_button_create(panel1);
     lv_obj_add_state(invite_btn, LV_STATE_DISABLED);
     lv_obj_set_height(invite_btn, LV_SIZE_CONTENT);
 
@@ -902,7 +902,7 @@ void shop_create(lv_obj_t * parent)
     lv_label_set_text(title, "Top products");
     lv_obj_add_style(title, &style_title, 0);
 
-    LV_IMG_DECLARE(img_clothes);
+    LV_IMAGE_DECLARE(img_clothes);
     create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$722");
     create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$411");
     create_shop_item(list, &img_clothes, "Blue jeans", "Clothes", "$917");
@@ -976,7 +976,7 @@ static void color_changer_create(lv_obj_t * parent)
 
     uint32_t i;
     for(i = 0; palette[i] != _LV_PALETTE_LAST; i++) {
-        lv_obj_t * c = lv_btn_create(color_cont);
+        lv_obj_t * c = lv_button_create(color_cont);
         lv_obj_set_style_bg_color(c, lv_palette_main(palette[i]), 0);
         lv_obj_set_style_radius(c, LV_RADIUS_CIRCLE, 0);
         lv_obj_set_style_opa(c, LV_OPA_TRANSP, 0);
@@ -985,14 +985,14 @@ static void color_changer_create(lv_obj_t * parent)
         lv_obj_clear_flag(c, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     }
 
-    lv_obj_t * btn = lv_btn_create(parent);
+    lv_obj_t * btn = lv_button_create(parent);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_FLOATING | LV_OBJ_FLAG_CLICKABLE);
     lv_obj_set_style_bg_color(btn, lv_color_white(), LV_STATE_CHECKED);
     lv_obj_set_style_pad_all(btn, 10, 0);
     lv_obj_set_style_radius(btn, LV_RADIUS_CIRCLE, 0);
     lv_obj_add_event(btn, color_changer_event_cb, LV_EVENT_ALL, color_cont);
     lv_obj_set_style_shadow_width(btn, 0, 0);
-    lv_obj_set_style_bg_img_src(btn, LV_SYMBOL_TINT, 0);
+    lv_obj_set_style_bg_image_src(btn, LV_SYMBOL_TINT, 0);
 
     if(disp_size == DISP_SMALL) {
         lv_obj_set_size(btn, LV_DPX(42), LV_DPX(42));
@@ -1170,8 +1170,8 @@ static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, cons
     lv_obj_set_size(cont, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_grid_dsc_array(cont, grid_col_dsc, grid_row_dsc);
 
-    lv_obj_t * img = lv_img_create(cont);
-    lv_img_set_src(img, img_src);
+    lv_obj_t * img = lv_image_create(cont);
+    lv_image_set_src(img, img_src);
     lv_obj_set_grid_cell(img, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 2);
 
     lv_obj_t * label;

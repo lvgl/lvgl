@@ -80,7 +80,7 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
 
 void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
                           lv_coord_t src_w, lv_coord_t src_h,
-                          const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t src_cf, void * dest_buf)
+                          const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t src_cf, void * dest_buf)
 {
     LV_UNUSED(draw_unit);
     LV_UNUSED(sup);

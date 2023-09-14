@@ -152,8 +152,8 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
 
             /*If it was layer drawing free the layer too*/
             if(t->type == LV_DRAW_TASK_TYPE_LAYER) {
-                lv_draw_img_dsc_t * draw_img_dsc = t->draw_dsc;
-                lv_layer_t * layer_drawn = (lv_layer_t *)draw_img_dsc->src;
+                lv_draw_image_dsc_t * draw_image_dsc = t->draw_dsc;
+                lv_layer_t * layer_drawn = (lv_layer_t *)draw_image_dsc->src;
 
                 if(lv_draw_buf_get_buf(&layer_drawn->draw_buf)) {
                     uint32_t layer_size_byte = layer_drawn->draw_buf.height * lv_draw_buf_width_to_stride(layer_drawn->draw_buf.width,
@@ -204,7 +204,7 @@ bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
         lv_draw_task_t * t_src = layer->parent->draw_task_head;
         while(t_src) {
             if(t_src->type == LV_DRAW_TASK_TYPE_LAYER && t_src->state == LV_DRAW_TASK_STATE_WAITING) {
-                lv_draw_img_dsc_t * draw_dsc = t_src->draw_dsc;
+                lv_draw_image_dsc_t * draw_dsc = t_src->draw_dsc;
                 if(draw_dsc->src == layer) {
                     t_src->state = LV_DRAW_TASK_STATE_QUEUED;
                     lv_draw_dispatch_request();

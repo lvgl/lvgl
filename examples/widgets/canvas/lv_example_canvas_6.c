@@ -21,14 +21,14 @@ void lv_example_canvas_6(void)
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
-    LV_IMG_DECLARE(img_star);
-    lv_draw_img_dsc_t dsc;
-    lv_draw_img_dsc_init(&dsc);
+    LV_IMAGE_DECLARE(img_star);
+    lv_draw_image_dsc_t dsc;
+    lv_draw_image_dsc_init(&dsc);
     dsc.src = &img_star;
 
     lv_area_t coords = {10, 10, 10 + img_star.header.w - 1, 10 + img_star.header.h - 1};
 
-    lv_draw_img(&layer, &dsc, &coords);
+    lv_draw_image(&layer, &dsc, &coords);
 
     lv_canvas_finish_layer(canvas, &layer);
 

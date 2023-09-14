@@ -40,7 +40,7 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_set_style_bg_color(obj_child_1, lv_palette_main(LV_PALETTE_PURPLE), 0);
     lv_obj_align(obj_child_1, LV_ALIGN_LEFT_MID, -100, 0);
 
-    lv_obj_t * btn_1 = lv_btn_create(obj_child_1);
+    lv_obj_t * btn_1 = lv_button_create(obj_child_1);
     lv_obj_set_size(btn_1, 100, 100);
     lv_obj_align(btn_1, LV_ALIGN_LEFT_MID, -75, 0);
     lv_obj_clear_flag(btn_1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
@@ -58,7 +58,7 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_align(obj_child_2, LV_ALIGN_RIGHT_MID, 100, 0);
     lv_obj_add_event(obj_child_2, ext_draw_size_event_cb, LV_EVENT_REFR_EXT_DRAW_SIZE, NULL);
 
-    lv_obj_t * btn_2 = lv_btn_create(obj_child_2);
+    lv_obj_t * btn_2 = lv_button_create(obj_child_2);
     lv_obj_set_size(btn_2, 100, 100);
     lv_obj_align(btn_2, LV_ALIGN_RIGHT_MID, 75, 0);
     lv_obj_clear_flag(btn_2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);

@@ -169,8 +169,8 @@ void lv_obj_redraw(lv_layer_t * layer, lv_obj_t * obj)
                 mask_draw_dsc.radius = radius;
                 mask_draw_dsc.area = obj->coords;
 
-                lv_draw_img_dsc_t img_draw_dsc;
-                lv_draw_img_dsc_init(&img_draw_dsc);
+                lv_draw_image_dsc_t img_draw_dsc;
+                lv_draw_image_dsc_init(&img_draw_dsc);
 
                 int32_t short_side = LV_MIN(lv_area_get_width(&obj->coords), lv_area_get_height(&obj->coords));
                 int32_t rout = LV_MIN(radius, short_side >> 1);
@@ -836,8 +836,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
                                                           area_need_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE, &layer_area_act);
             lv_obj_redraw(new_layer, obj);
 
-            lv_draw_img_dsc_t layer_draw_dsc;
-            lv_draw_img_dsc_init(&layer_draw_dsc);
+            lv_draw_image_dsc_t layer_draw_dsc;
+            lv_draw_image_dsc_init(&layer_draw_dsc);
             layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->draw_buf_ofs.x;
             layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->draw_buf_ofs.y;
 

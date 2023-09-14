@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_animimg.h"
+#include "lv_animimage.h"
 #if LV_USE_ANIMIMG != 0
 
 /*Testing of dependencies*/
@@ -14,7 +14,7 @@
     #error "lv_animimg: lv_img is required. Enable it in lv_conf.h (LV_USE_IMG  1) "
 #endif
 
-#include "../../draw/lv_img_decoder.h"
+#include "../../draw/lv_image_decoder.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_fs.h"
 #include "../../misc/lv_txt.h"
@@ -45,7 +45,7 @@ static void lv_animimg_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 const lv_obj_class_t lv_animimg_class = {
     .constructor_cb = lv_animimg_constructor,
     .instance_size = sizeof(lv_animimg_t),
-    .base_class = &lv_img_class
+    .base_class = &lv_image_class
 };
 
 /**********************
@@ -161,7 +161,7 @@ static void index_change(lv_obj_t * obj, int32_t index)
 
     idx = index % animimg->pic_count;
 
-    lv_img_set_src(obj, animimg->dsc[idx]);
+    lv_image_set_src(obj, animimg->dsc[idx]);
 }
 
 #endif

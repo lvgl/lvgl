@@ -7,7 +7,7 @@ static void event_cb(lv_event_t * e)
     lv_obj_t * img = lv_event_get_target(e);
 
     if(snapshot_obj) {
-        lv_img_dsc_t * snapshot = (void *)lv_img_get_src(snapshot_obj);
+        lv_image_dsc_t * snapshot = (void *)lv_image_get_src(snapshot_obj);
         if(snapshot) {
             lv_snapshot_free(snapshot);
         }
@@ -16,22 +16,22 @@ static void event_cb(lv_event_t * e)
         snapshot = lv_snapshot_take(img->parent, LV_COLOR_FORMAT_ARGB8888);
         if(snapshot == NULL)
             return;
-        lv_img_set_src(snapshot_obj, snapshot);
+        lv_image_set_src(snapshot_obj, snapshot);
     }
 }
 
 void lv_example_snapshot_1(void)
 {
-    LV_IMG_DECLARE(img_star);
+    LV_IMAGE_DECLARE(img_star);
     lv_obj_t * root = lv_scr_act();
     lv_obj_set_style_bg_color(root, lv_palette_main(LV_PALETTE_LIGHT_BLUE), 0);
 
     /*Create an image object to show snapshot*/
-    lv_obj_t * snapshot_obj = lv_img_create(root);
+    lv_obj_t * snapshot_obj = lv_image_create(root);
     lv_obj_set_style_bg_color(snapshot_obj, lv_palette_main(LV_PALETTE_PURPLE), 0);
     lv_obj_set_style_bg_opa(snapshot_obj, LV_OPA_100, 0);
-    lv_img_set_zoom(snapshot_obj, 128);
-    lv_img_set_angle(snapshot_obj, 300);
+    lv_image_set_zoom(snapshot_obj, 128);
+    lv_image_set_angle(snapshot_obj, 300);
 
     /*Create the container and its children*/
     lv_obj_t * container = lv_obj_create(root);
@@ -44,8 +44,8 @@ void lv_example_snapshot_1(void)
     lv_obj_t * img;
     int i;
     for(i = 0; i < 4; i++) {
-        img = lv_img_create(container);
-        lv_img_set_src(img, &img_star);
+        img = lv_image_create(container);
+        lv_image_set_src(img, &img_star);
         lv_obj_set_style_bg_color(img, lv_color_black(), 0);
         lv_obj_set_style_bg_opa(img, LV_OPA_COVER, 0);
         //        lv_obj_set_style_transform_zoom(img, 400, LV_STATE_PRESSED);

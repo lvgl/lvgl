@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../btnmatrix/lv_btnmatrix.h"
+#include "../buttonmatrix/lv_buttonmatrix.h"
 
 #if LV_USE_CALENDAR
 

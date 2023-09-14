@@ -29,7 +29,7 @@ void lv_example_event_3(void)
 
     uint32_t i;
     for(i = 0; i < 30; i++) {
-        lv_obj_t * btn = lv_btn_create(cont);
+        lv_obj_t * btn = lv_button_create(cont);
         lv_obj_set_size(btn, 70, 50);
         lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
 

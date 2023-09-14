@@ -4,11 +4,11 @@
 #include "unity/unity.h"
 #include "lv_test_indev.h"
 
-LV_IMG_DECLARE(test_animimg001)
-LV_IMG_DECLARE(test_animimg002)
-LV_IMG_DECLARE(test_animimg003)
+LV_IMAGE_DECLARE(test_animimg001)
+LV_IMAGE_DECLARE(test_animimg002)
+LV_IMAGE_DECLARE(test_animimg003)
 
-static const lv_img_dsc_t * anim_imgs[3] = {
+static const lv_image_dsc_t * anim_imgs[3] = {
     &test_animimg001,
     &test_animimg002,
     &test_animimg003,

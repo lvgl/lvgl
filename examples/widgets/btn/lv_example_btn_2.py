@@ -47,14 +47,14 @@ trans.init(props, lv.anim_t.path_linear, 300, 0, None)
 
 style_pr.set_transition(trans)
 
-btn1 = lv.btn(lv.scr_act())
-btn1.remove_style_all()                          # Remove the style coming from the theme
-btn1.add_style(style, 0)
-btn1.add_style(style_pr, lv.STATE.PRESSED)
-btn1.set_size(lv.SIZE_CONTENT, lv.SIZE_CONTENT)
-btn1.center()
+button1 = lv.button(lv.scr_act())
+button1.remove_style_all()                          # Remove the style coming from the theme
+button1.add_style(style, 0)
+button1.add_style(style_pr, lv.STATE.PRESSED)
+button1.set_size(lv.SIZE_CONTENT, lv.SIZE_CONTENT)
+button1.center()
 
-label = lv.label(btn1)
+label = lv.label(button1)
 label.set_text("Button")
 label.center()
 

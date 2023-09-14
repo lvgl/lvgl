@@ -54,10 +54,10 @@ cont.set_scroll_snap_y(lv.SCROLL_SNAP.CENTER)
 cont.set_scrollbar_mode(lv.SCROLLBAR_MODE.OFF)
 
 for i in range(20):
-    btn = lv.btn(cont)
-    btn.set_width(lv.pct(100))
+    button = lv.button(cont)
+    button.set_width(lv.pct(100))
 
-    label = lv.label(btn)
+    label = lv.label(button)
     label.set_text("Button " + str(i))
 
     # Update the buttons position manually for first*

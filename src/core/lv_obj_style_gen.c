@@ -290,44 +290,44 @@ void lv_obj_set_style_bg_dither_mode(struct _lv_obj_t * obj, lv_dither_mode_t va
     lv_obj_set_local_style_prop(obj, LV_STYLE_BG_DITHER_MODE, v, selector);
 }
 
-void lv_obj_set_style_bg_img_src(struct _lv_obj_t * obj, const void * value, lv_style_selector_t selector)
+void lv_obj_set_style_bg_image_src(struct _lv_obj_t * obj, const void * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMG_SRC, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMAGE_SRC, v, selector);
 }
 
-void lv_obj_set_style_bg_img_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+void lv_obj_set_style_bg_image_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMG_OPA, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMAGE_OPA, v, selector);
 }
 
-void lv_obj_set_style_bg_img_recolor(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+void lv_obj_set_style_bg_image_recolor(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .color = value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMG_RECOLOR, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMAGE_RECOLOR, v, selector);
 }
 
-void lv_obj_set_style_bg_img_recolor_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+void lv_obj_set_style_bg_image_recolor_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMG_RECOLOR_OPA, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMAGE_RECOLOR_OPA, v, selector);
 }
 
-void lv_obj_set_style_bg_img_tiled(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector)
+void lv_obj_set_style_bg_image_tiled(struct _lv_obj_t * obj, bool value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMG_TILED, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_BG_IMAGE_TILED, v, selector);
 }
 
 void lv_obj_set_style_border_color(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
@@ -450,28 +450,28 @@ void lv_obj_set_style_shadow_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_styl
     lv_obj_set_local_style_prop(obj, LV_STYLE_SHADOW_OPA, v, selector);
 }
 
-void lv_obj_set_style_img_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+void lv_obj_set_style_image_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_IMG_OPA, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_IMAGE_OPA, v, selector);
 }
 
-void lv_obj_set_style_img_recolor(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
+void lv_obj_set_style_image_recolor(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .color = value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_IMG_RECOLOR, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_IMAGE_RECOLOR, v, selector);
 }
 
-void lv_obj_set_style_img_recolor_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
+void lv_obj_set_style_image_recolor_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_IMG_RECOLOR_OPA, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_IMAGE_RECOLOR_OPA, v, selector);
 }
 
 void lv_obj_set_style_line_width(struct _lv_obj_t * obj, lv_coord_t value, lv_style_selector_t selector)
@@ -554,12 +554,12 @@ void lv_obj_set_style_arc_opa(struct _lv_obj_t * obj, lv_opa_t value, lv_style_s
     lv_obj_set_local_style_prop(obj, LV_STYLE_ARC_OPA, v, selector);
 }
 
-void lv_obj_set_style_arc_img_src(struct _lv_obj_t * obj, const void * value, lv_style_selector_t selector)
+void lv_obj_set_style_arc_image_src(struct _lv_obj_t * obj, const void * value, lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value
     };
-    lv_obj_set_local_style_prop(obj, LV_STYLE_ARC_IMG_SRC, v, selector);
+    lv_obj_set_local_style_prop(obj, LV_STYLE_ARC_IMAGE_SRC, v, selector);
 }
 
 void lv_obj_set_style_text_color(struct _lv_obj_t * obj, lv_color_t value, lv_style_selector_t selector)
@@ -650,7 +650,8 @@ void lv_obj_set_style_opa_layered(struct _lv_obj_t * obj, lv_opa_t value, lv_sty
     lv_obj_set_local_style_prop(obj, LV_STYLE_OPA_LAYERED, v, selector);
 }
 
-void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value, lv_style_selector_t selector)
+void lv_obj_set_style_color_filter_dsc(struct _lv_obj_t * obj, const lv_color_filter_dsc_t * value,
+                                       lv_style_selector_t selector)
 {
     lv_style_value_t v = {
         .ptr = value

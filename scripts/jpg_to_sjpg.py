@@ -113,7 +113,7 @@ for i in range(len(sjpeg)):
         new_line_threshold = 0
 
 
-c_code = c_code + "\n};\n\nlv_img_dsc_t "
+c_code = c_code + "\n};\n\nlv_image_dsc_t "
 c_code = c_code + OUTPUT_FILE_NAME + " = {\n"
 c_code = c_code + "\t.header.always_zero = 0,\n"
 c_code = c_code + "\t.header.w = " + str(width) + ",\n"

@@ -14,14 +14,14 @@ def file_explorer_event_handler(e):
         sel_fn = obj.explorer_get_selected_file_name()
         print(str(cur_path) + str(sel_fn))
 
-def btn_event_handler(e,fe_quick_access_obj):
+def button_event_handler(e,fe_quick_access_obj):
 
     code = e.get_code()
-    btn = e.get_target_obj()
+    button = e.get_target_obj()
     # lv_obj_t * file_explorer = lv_event_get_user_data(e);
 
     if code == lv.EVENT.VALUE_CHANGED :
-        if btn.has_state(lv.STATE.CHECKED) :
+        if button.has_state(lv.STATE.CHECKED) :
             fe_quick_access_obj.add_flag(lv.obj.FLAG.HIDDEN)
         else :
             fe_quick_access_obj.clear_flag(lv.obj.FLAG.HIDDEN)
@@ -73,18 +73,18 @@ file_explorer.add_event(file_explorer_event_handler, lv.EVENT.ALL, None)
 # Quick access status control button
 fe_quick_access_obj = file_explorer.explorer_get_quick_access_area()
 fe_header_obj = file_explorer.explorer_get_header()
-btn = lv.btn(fe_header_obj)
-btn.set_style_radius(2, 0)
-btn.set_style_pad_all(4, 0)
-btn.align(lv.ALIGN.LEFT_MID, 0, 0)
-btn.add_flag(lv.obj.FLAG.CHECKABLE)
+button = lv.button(fe_header_obj)
+button.set_style_radius(2, 0)
+button.set_style_pad_all(4, 0)
+button.align(lv.ALIGN.LEFT_MID, 0, 0)
+button.add_flag(lv.obj.FLAG.CHECKABLE)
 
-label = lv.label(btn)
+label = lv.label(button)
 label.set_text(lv.SYMBOL.LIST)
 label.center()
 
-btn.add_event(lambda evt: btn_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
-#btn.add_event(lambda evt: btn_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
+button.add_event(lambda evt: button_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)
+#button.add_event(lambda evt: button_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
 
 # Sort control
 opts = "NONE\nKIND"
@@ -95,7 +95,7 @@ dd.set_style_pad_all(0, 0)
 dd.set_size(lv.pct(30), lv.SIZE_CONTENT)
 dd.set_options_static(opts)
 dd.align(lv.ALIGN.RIGHT_MID, 0, 0)
-# lv_obj_align_to(dd, btn, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
+# lv_obj_align_to(dd, button, LV_ALIGN_OUT_RIGHT_MID, 0, 0);
 
 dd.add_event(lambda evt: dd_event_handler(evt,file_explorer), lv.EVENT.VALUE_CHANGED, None)
 #dd.add_event(lambda evt: dd_event_handler(evt,fe_quick_access_obj), lv.EVENT.VALUE_CHANGED, None)

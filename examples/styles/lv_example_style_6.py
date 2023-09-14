@@ -6,7 +6,7 @@ except:
     print("Could not find img_cogwheel_argb.png")
     sys.exit()
 
-img_cogwheel_argb = lv.img_dsc_t({
+image_cogwheel_argb = lv.image_dsc_t({
   'data_size': len(png_data),
   'data': png_data
 })
@@ -24,14 +24,14 @@ style.set_bg_color(lv.palette_lighten(lv.PALETTE.GREY, 3))
 style.set_border_width(2)
 style.set_border_color(lv.palette_main(lv.PALETTE.BLUE))
 
-style.set_img_recolor(lv.palette_main(lv.PALETTE.BLUE))
-style.set_img_recolor_opa(lv.OPA._50)
+style.set_image_recolor(lv.palette_main(lv.PALETTE.BLUE))
+style.set_image_recolor_opa(lv.OPA._50)
 style.set_transform_angle(300)
 
 # Create an object with the new style
-obj = lv.img(lv.scr_act())
+obj = lv.image(lv.scr_act())
 obj.add_style(style, 0)
 
-obj.set_src(img_cogwheel_argb)
+obj.set_src(image_cogwheel_argb)
 
 obj.center()

@@ -28,7 +28,7 @@
 static void lv_imgbtn_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void draw_main(lv_event_t * e);
 static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e);
-static void refr_img(lv_obj_t * imgbtn);
+static void refr_image(lv_obj_t * imgbtn);
 static lv_imgbtn_state_t suggest_state(lv_obj_t * imgbtn, lv_imgbtn_state_t state);
 static lv_imgbtn_state_t get_state(const lv_obj_t * imgbtn);
 static void update_src_info(lv_imgbtn_src_info_t * info, const void * src);
@@ -90,7 +90,7 @@ void lv_imgbtn_set_src(lv_obj_t * obj, lv_imgbtn_state_t state, const void * src
     update_src_info(&imgbtn->src_mid[state], src_mid);
     update_src_info(&imgbtn->src_right[state], src_right);
 
-    refr_img(obj);
+    refr_image(obj);
 }
 
 void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
@@ -108,7 +108,7 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
     lv_obj_clear_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
     lv_obj_add_state(obj, obj_state);
 
-    refr_img(obj);
+    refr_image(obj);
 }
 
 /*=====================
@@ -119,7 +119,7 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
 /**
  * Get the left image in a given state
  * @param obj pointer to an image button object
- * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @param state the state where to get the image (from `lv_button_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
 const void * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
@@ -134,7 +134,7 @@ const void * lv_imgbtn_get_src_left(lv_obj_t * obj, lv_imgbtn_state_t state)
 /**
  * Get the middle image in a given state
  * @param obj pointer to an image button object
- * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @param state the state where to get the image (from `lv_button_state_t`) `
  * @return pointer to the middle image source (a C array or path to a file)
  */
 const void * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
@@ -148,7 +148,7 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * obj, lv_imgbtn_state_t state)
 /**
  * Get the right image in a given state
  * @param obj pointer to an image button object
- * @param state the state where to get the image (from `lv_btn_state_t`) `
+ * @param state the state where to get the image (from `lv_button_state_t`) `
  * @return pointer to the left image source (a C array or path to a file)
  */
 const void * lv_imgbtn_get_src_right(lv_obj_t * obj, lv_imgbtn_state_t state)
@@ -186,7 +186,7 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_PRESSED || code == LV_EVENT_RELEASED || code == LV_EVENT_PRESS_LOST) {
-        refr_img(obj);
+        refr_image(obj);
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
         draw_main(e);
@@ -225,9 +225,9 @@ static void draw_main(lv_event_t * e)
     lv_area_copy(&coords, &obj->coords);
     lv_area_increase(&coords, tw, th);
 
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
-    lv_obj_init_draw_img_dsc(obj, LV_PART_MAIN, &img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
+    lv_obj_init_draw_image_dsc(obj, LV_PART_MAIN, &img_dsc);
 
     lv_area_t coords_part;
     lv_coord_t left_w = 0;
@@ -240,7 +240,7 @@ static void draw_main(lv_event_t * e)
         coords_part.x2 = coords.x1 + src_info->header.w - 1;
         coords_part.y2 = coords.y1 + src_info->header.h - 1;
         img_dsc.src = src_info->img_src;
-        lv_draw_img(layer, &img_dsc, &coords_part);
+        lv_draw_image(layer, &img_dsc, &coords_part);
     }
 
     src_info = &imgbtn->src_right[state];
@@ -251,7 +251,7 @@ static void draw_main(lv_event_t * e)
         coords_part.x2 = coords.x2;
         coords_part.y2 = coords.y1 + src_info->header.h - 1;
         img_dsc.src = src_info->img_src;
-        lv_draw_img(layer, &img_dsc, &coords_part);
+        lv_draw_image(layer, &img_dsc, &coords_part);
     }
 
     src_info = &imgbtn->src_mid[state];
@@ -277,7 +277,7 @@ static void draw_main(lv_event_t * e)
 
             for(i = coords_part.x1; i < (lv_coord_t)(clip_area_center.x2 + src_info->header.w - 1); i += src_info->header.w) {
                 img_dsc.src = src_info->img_src;
-                lv_draw_img(layer, &img_dsc, &coords_part);
+                lv_draw_image(layer, &img_dsc, &coords_part);
                 coords_part.x1 = coords_part.x2 + 1;
                 coords_part.x2 += src_info->header.w;
             }
@@ -286,7 +286,7 @@ static void draw_main(lv_event_t * e)
     }
 }
 
-static void refr_img(lv_obj_t * obj)
+static void refr_image(lv_obj_t * obj)
 {
     lv_imgbtn_t * imgbtn = (lv_imgbtn_t *)obj;
     lv_imgbtn_state_t state  = suggest_state(obj, get_state(obj));
@@ -366,7 +366,7 @@ static void update_src_info(lv_imgbtn_src_info_t * info, const void * src)
         return;
     }
 
-    lv_res_t res = lv_img_decoder_get_info(src, &info->header);
+    lv_res_t res = lv_image_decoder_get_info(src, &info->header);
     if(res != LV_RES_OK) {
         LV_LOG_WARN("can't get info");
         return;

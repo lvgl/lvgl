@@ -27,7 +27,7 @@ extern "C" {
 
 extern const lv_obj_class_t lv_list_class;
 extern const lv_obj_class_t lv_list_text_class;
-extern const lv_obj_class_t lv_list_btn_class;
+extern const lv_obj_class_t lv_list_button_class;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -54,7 +54,7 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt);
  * @param txt       Text of the new button, when NULL no text will be added
  * @return          pointer to the created button
  */
-lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt);
+lv_obj_t * lv_list_add_button(lv_obj_t * list, const void * icon, const char * txt);
 
 /**
  * Get text of a given list button
@@ -62,7 +62,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
  * @param btn       pointer to the button
  * @return          Text of btn, if btn doesn't have text "" will be returned
  */
-const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn);
+const char * lv_list_get_button_text(lv_obj_t * list, lv_obj_t * btn);
 
 /**
  * Set text of a given list button
@@ -71,7 +71,7 @@ const char * lv_list_get_btn_text(lv_obj_t * list, lv_obj_t * btn);
  * @param txt       pointer to the text
  * @return          Text of btn, if btn doesn't have text "" will be returned
  */
-void lv_list_set_btn_text(lv_obj_t * list, lv_obj_t * btn, const char * txt);
+void lv_list_set_button_text(lv_obj_t * list, lv_obj_t * btn, const char * txt);
 
 /**********************
  *      MACROS

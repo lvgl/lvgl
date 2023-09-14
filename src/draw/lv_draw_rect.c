@@ -46,9 +46,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->bg_grad.stops_count = 2;
     dsc->border_color = lv_color_black();
     dsc->shadow_color = lv_color_black();
-    dsc->bg_img_symbol_font = LV_FONT_DEFAULT;
+    dsc->bg_image_symbol_font = LV_FONT_DEFAULT;
     dsc->bg_opa = LV_OPA_COVER;
-    dsc->bg_img_opa = LV_OPA_COVER;
+    dsc->bg_image_opa = LV_OPA_COVER;
     dsc->outline_opa = LV_OPA_COVER;
     dsc->border_opa = LV_OPA_COVER;
     dsc->shadow_opa = LV_OPA_COVER;
@@ -74,7 +74,7 @@ void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc)
     dsc->opa = LV_OPA_COVER;
 }
 
-void lv_draw_bg_img_dsc_init(lv_draw_bg_img_dsc_t * dsc)
+void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc)
 {
     lv_memzero(dsc, sizeof(*dsc));
     dsc->opa = LV_OPA_COVER;
@@ -104,7 +104,7 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
     if(dsc->bg_opa <= LV_OPA_MIN) has_fill = false;
     else has_fill = true;
 
-    if(dsc->bg_img_opa <= LV_OPA_MIN || dsc->bg_img_src == NULL) has_bg_img = false;
+    if(dsc->bg_image_opa <= LV_OPA_MIN || dsc->bg_image_src == NULL) has_bg_img = false;
     else has_bg_img = true;
 
     if(dsc->border_opa <= LV_OPA_MIN || dsc->border_width == 0 || dsc->border_post == true) has_border = false;
@@ -175,13 +175,13 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         t = lv_draw_add_task(layer, coords);
 
 
-        lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
+        lv_image_src_t src_type = lv_image_src_get_type(dsc->bg_image_src);
         lv_res_t res = LV_RES_OK;
-        lv_img_header_t header;
-        if(src_type == LV_IMG_SRC_VARIABLE || src_type == LV_IMG_SRC_FILE) {
-            res  = lv_img_decoder_get_info(dsc->bg_img_src, &header);
+        lv_image_header_t header;
+        if(src_type == LV_IMAGE_SRC_VARIABLE || src_type == LV_IMAGE_SRC_FILE) {
+            res  = lv_image_decoder_get_info(dsc->bg_image_src, &header);
         }
-        else if(src_type == LV_IMG_SRC_UNKNOWN) {
+        else if(src_type == LV_IMAGE_SRC_UNKNOWN) {
             res = LV_RES_INV;
         }
         else {
@@ -189,17 +189,17 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
         }
 
         if(res == LV_RES_OK) {
-            lv_draw_bg_img_dsc_t * bg_img_dsc = lv_malloc(sizeof(lv_draw_bg_img_dsc_t));
-            t->draw_dsc = bg_img_dsc;
-            bg_img_dsc->base = dsc->base;
-            bg_img_dsc->radius = dsc->radius;
-            bg_img_dsc->src = dsc->bg_img_src;
-            bg_img_dsc->font = dsc->bg_img_symbol_font;
-            bg_img_dsc->opa = dsc->bg_img_opa;
-            bg_img_dsc->recolor = dsc->bg_img_recolor;
-            bg_img_dsc->recolor_opa = dsc->bg_img_recolor_opa;
-            bg_img_dsc->tiled = dsc->bg_img_tiled;
-            bg_img_dsc->img_header = header;
+            lv_draw_bg_image_dsc_t * bg_image_dsc = lv_malloc(sizeof(lv_draw_bg_image_dsc_t));
+            t->draw_dsc = bg_image_dsc;
+            bg_image_dsc->base = dsc->base;
+            bg_image_dsc->radius = dsc->radius;
+            bg_image_dsc->src = dsc->bg_image_src;
+            bg_image_dsc->font = dsc->bg_image_symbol_font;
+            bg_image_dsc->opa = dsc->bg_image_opa;
+            bg_image_dsc->recolor = dsc->bg_image_recolor;
+            bg_image_dsc->recolor_opa = dsc->bg_image_recolor_opa;
+            bg_image_dsc->tiled = dsc->bg_image_tiled;
+            bg_image_dsc->img_header = header;
             t->type = LV_DRAW_TASK_TYPE_BG_IMG;
             lv_draw_finalize_task_creation(layer, t);
         }

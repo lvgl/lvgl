@@ -9,9 +9,9 @@ void lv_example_menu_3(void)
     lv_obj_center(menu);
 
     /*Modify the header*/
-    lv_obj_t * back_btn = lv_menu_get_main_header_back_btn(menu);
-    lv_obj_t * back_btn_label = lv_label_create(back_btn);
-    lv_label_set_text(back_btn_label, "Back");
+    lv_obj_t * back_btn = lv_menu_get_main_header_back_button(menu);
+    lv_obj_t * back_button_label = lv_label_create(back_btn);
+    lv_label_set_text(back_button_label, "Back");
 
     lv_obj_t * cont;
     lv_obj_t * label;

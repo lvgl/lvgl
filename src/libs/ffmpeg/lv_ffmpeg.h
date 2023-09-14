@@ -27,9 +27,9 @@ struct ffmpeg_context_s;
 extern const lv_obj_class_t lv_ffmpeg_player_class;
 
 typedef struct {
-    lv_img_t img;
+    lv_image_t img;
     lv_timer_t * timer;
-    lv_img_dsc_t imgdsc;
+    lv_image_dsc_t imgdsc;
     bool auto_restart;
     struct ffmpeg_context_s * ffmpeg_ctx;
 } lv_ffmpeg_player_t;

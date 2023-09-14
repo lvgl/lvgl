@@ -804,10 +804,10 @@ static void draw_main(lv_event_t * e)
     if(lv_obj_get_style_base_dir(obj, LV_PART_MAIN) == LV_BASE_DIR_RTL) symbol_to_left = true;
 
     if(dropdown->symbol) {
-        lv_img_src_t symbol_type = lv_img_src_get_type(dropdown->symbol);
+        lv_image_src_t symbol_type = lv_image_src_get_type(dropdown->symbol);
         lv_coord_t symbol_w;
         lv_coord_t symbol_h;
-        if(symbol_type == LV_IMG_SRC_SYMBOL) {
+        if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
             lv_point_t size;
             lv_txt_get_size(&size, dropdown->symbol, symbol_dsc.font, symbol_dsc.letter_space, symbol_dsc.line_space, LV_COORD_MAX,
                             symbol_dsc.flag);
@@ -815,8 +815,8 @@ static void draw_main(lv_event_t * e)
             symbol_h = size.y;
         }
         else {
-            lv_img_header_t header;
-            lv_res_t res = lv_img_decoder_get_info(dropdown->symbol, &header);
+            lv_image_header_t header;
+            lv_res_t res = lv_image_decoder_get_info(dropdown->symbol, &header);
             if(res == LV_RES_OK) {
                 symbol_w = header.w;
                 symbol_h = header.h;
@@ -837,7 +837,7 @@ static void draw_main(lv_event_t * e)
             symbol_area.x2 = symbol_area.x1 + symbol_w - 1;
         }
 
-        if(symbol_type == LV_IMG_SRC_SYMBOL) {
+        if(symbol_type == LV_IMAGE_SRC_SYMBOL) {
             symbol_area.y1 = obj->coords.y1 + top;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
             symbol_dsc.text = dropdown->symbol;
@@ -846,14 +846,14 @@ static void draw_main(lv_event_t * e)
         else {
             symbol_area.y1 = obj->coords.y1 + (lv_obj_get_height(obj) - symbol_h) / 2;
             symbol_area.y2 = symbol_area.y1 + symbol_h - 1;
-            lv_draw_img_dsc_t img_dsc;
-            lv_draw_img_dsc_init(&img_dsc);
-            lv_obj_init_draw_img_dsc(obj, LV_PART_INDICATOR, &img_dsc);
+            lv_draw_image_dsc_t img_dsc;
+            lv_draw_image_dsc_init(&img_dsc);
+            lv_obj_init_draw_image_dsc(obj, LV_PART_INDICATOR, &img_dsc);
             img_dsc.pivot.x = symbol_w / 2;
             img_dsc.pivot.y = symbol_h / 2;
             img_dsc.angle = lv_obj_get_style_transform_angle(obj, LV_PART_INDICATOR);
             img_dsc.src = dropdown->symbol;
-            lv_draw_img(layer, &img_dsc, &symbol_area);
+            lv_draw_image(layer, &img_dsc, &symbol_area);
         }
     }
 

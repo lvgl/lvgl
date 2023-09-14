@@ -31,13 +31,13 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_res_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
-static lv_res_t decoder_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                  const lv_area_t * full_area, lv_area_t * decoded_area);
 
-static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -52,11 +52,11 @@ static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
  **********************/
 void lv_bmp_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
-    lv_img_decoder_set_info_cb(dec, decoder_info);
-    lv_img_decoder_set_open_cb(dec, decoder_open);
-    lv_img_decoder_set_get_area_cb(dec, decoder_get_area);
-    lv_img_decoder_set_close_cb(dec, decoder_close);
+    lv_image_decoder_t * dec = lv_image_decoder_create();
+    lv_image_decoder_set_info_cb(dec, decoder_info);
+    lv_image_decoder_set_open_cb(dec, decoder_open);
+    lv_image_decoder_set_get_area_cb(dec, decoder_get_area);
+    lv_image_decoder_set_close_cb(dec, decoder_close);
 }
 
 /**********************
@@ -69,14 +69,14 @@ void lv_bmp_init(void)
  * @param header store the info here
  * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
  */
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
-    lv_img_src_t src_type = lv_img_src_get_type(src);          /*Get the source type*/
+    lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
 
     /*If it's a BMP file...*/
-    if(src_type == LV_IMG_SRC_FILE) {
+    if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
         if(strcmp(lv_fs_get_ext(fn), "bmp") == 0) {              /*Check the extension*/
             /*Save the data in the header*/
@@ -116,7 +116,7 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     }
     /* BMP file as data not supported for simplicity.
      * Convert them to LVGL compatible C arrays directly. */
-    else if(src_type == LV_IMG_SRC_VARIABLE) {
+    else if(src_type == LV_IMAGE_SRC_VARIABLE) {
         return LV_RES_INV;
     }
 
@@ -128,14 +128,14 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
  * Open a PNG image and return the decided image
  * @param src can be file name or pointer to a C array
  * @param style style of the image object (unused now but certain formats might use it)
- * @return pointer to the decoded image or `LV_IMG_DECODER_OPEN_FAIL` if failed
+ * @return pointer to the decoded image or `LV_IMAGE_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
 
     /*If it's a PNG file...*/
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
 
         if(strcmp(lv_fs_get_ext(fn), "bmp") != 0) {
@@ -171,7 +171,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     }
     /* BMP file as data not supported for simplicity.
      * Convert them to LVGL compatible C arrays directly. */
-    else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
+    else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
         return LV_RES_INV;
     }
 
@@ -179,7 +179,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
 }
 
 
-static lv_res_t decoder_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc,
+static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                  const lv_area_t * full_area, lv_area_t * decoded_area)
 {
     LV_UNUSED(decoder);
@@ -215,7 +215,7 @@ static lv_res_t decoder_get_area(lv_img_decoder_t * decoder, lv_img_decoder_dsc_
 /**
  * Free the allocated resources
  */
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
     bmp_dsc_t * b = dsc->user_data;

@@ -62,7 +62,7 @@ void lv_qrcode_set_size(lv_obj_t * obj, lv_coord_t size)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_img_dsc_t * img_dsc = lv_canvas_get_img(obj);
+    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
     void * buf = (void *)img_dsc->data;
 
     uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(size, size);
@@ -98,7 +98,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
 
-    lv_img_dsc_t * img_dsc = lv_canvas_get_img(obj);
+    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
     if(!img_dsc->data) {
         LV_LOG_ERROR("canvas buffer is NULL");
         return LV_RES_INV;
@@ -223,8 +223,8 @@ static void lv_qrcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
 
-    lv_img_dsc_t * img_dsc = lv_canvas_get_img(obj);
-    lv_img_cache_invalidate_src(img_dsc);
+    lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
+    lv_image_cache_invalidate_src(img_dsc);
 
     if(!img_dsc->data) {
         return;

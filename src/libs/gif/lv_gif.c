@@ -35,7 +35,7 @@ const lv_obj_class_t lv_gif_class = {
     .constructor_cb = lv_gif_constructor,
     .destructor_cb = lv_gif_destructor,
     .instance_size = sizeof(lv_gif_t),
-    .base_class = &lv_img_class
+    .base_class = &lv_image_class
 };
 
 /**********************
@@ -61,17 +61,17 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
 
     /*Close previous gif if any*/
     if(gifobj->gif) {
-        lv_img_cache_invalidate_src(&gifobj->imgdsc);
+        lv_image_cache_invalidate_src(&gifobj->imgdsc);
         gd_close_gif(gifobj->gif);
         gifobj->gif = NULL;
         gifobj->imgdsc.data = NULL;
     }
 
-    if(lv_img_src_get_type(src) == LV_IMG_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = src;
+    if(lv_image_src_get_type(src) == LV_IMAGE_SRC_VARIABLE) {
+        const lv_image_dsc_t * img_dsc = src;
         gifobj->gif = gd_open_gif_data(img_dsc->data);
     }
-    else if(lv_img_src_get_type(src) == LV_IMG_SRC_FILE) {
+    else if(lv_image_src_get_type(src) == LV_IMAGE_SRC_FILE) {
         gifobj->gif = gd_open_gif_file(src);
     }
     if(gifobj->gif == NULL) {
@@ -86,7 +86,7 @@ void lv_gif_set_src(lv_obj_t * obj, const void * src)
     gifobj->imgdsc.header.w = gifobj->gif->width;
     gifobj->last_call = lv_tick_get();
 
-    lv_img_set_src(obj, &gifobj->imgdsc);
+    lv_image_set_src(obj, &gifobj->imgdsc);
 
     lv_timer_resume(gifobj->timer);
     lv_timer_reset(gifobj->timer);
@@ -122,7 +122,7 @@ static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
     lv_gif_t * gifobj = (lv_gif_t *) obj;
-    lv_img_cache_invalidate_src(&gifobj->imgdsc);
+    lv_image_cache_invalidate_src(&gifobj->imgdsc);
     if(gifobj->gif)
         gd_close_gif(gifobj->gif);
     lv_timer_del(gifobj->timer);
@@ -147,7 +147,7 @@ static void next_frame_task_cb(lv_timer_t * t)
 
     gd_render_frame(gifobj->gif, (uint8_t *)gifobj->imgdsc.data);
 
-    lv_img_cache_invalidate_src(lv_img_get_src(obj));
+    lv_image_cache_invalidate_src(lv_image_get_src(obj));
     lv_obj_invalidate(obj);
 }
 

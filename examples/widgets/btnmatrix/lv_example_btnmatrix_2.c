@@ -10,7 +10,7 @@ static void event_cb(lv_event_t * e)
     /*When the button matrix draws the buttons...*/
     if(base_dsc->part == LV_PART_ITEMS) {
         bool pressed = false;
-        if(lv_btnmatrix_get_selected_btn(obj) == base_dsc->id1 && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
+        if(lv_buttonmatrix_get_selected_button(obj) == base_dsc->id1 && lv_obj_has_state(obj, LV_STATE_PRESSED)) {
             pressed = true;
         }
 
@@ -46,9 +46,9 @@ static void event_cb(lv_event_t * e)
                 label_draw_dsc->opa = 0;
             }
             if(draw_task->type == LV_DRAW_TASK_TYPE_FILL) {
-                LV_IMG_DECLARE(img_star);
-                lv_img_header_t header;
-                lv_res_t res = lv_img_decoder_get_info(&img_star, &header);
+                LV_IMAGE_DECLARE(img_star);
+                lv_image_header_t header;
+                lv_res_t res = lv_image_decoder_get_info(&img_star, &header);
                 if(res != LV_RES_OK) return;
 
                 lv_area_t a;
@@ -58,13 +58,13 @@ static void event_cb(lv_event_t * e)
                 a.y2 = header.h - 1;
                 lv_area_align(&draw_task->area, &a, LV_ALIGN_CENTER, 0, 0);
 
-                lv_draw_img_dsc_t img_draw_dsc;
-                lv_draw_img_dsc_init(&img_draw_dsc);
+                lv_draw_image_dsc_t img_draw_dsc;
+                lv_draw_image_dsc_init(&img_draw_dsc);
                 img_draw_dsc.src = &img_star;
                 img_draw_dsc.recolor = lv_color_black();
                 if(pressed) img_draw_dsc.recolor_opa = LV_OPA_30;
 
-                lv_draw_img(base_dsc->layer, &img_draw_dsc, &a);
+                lv_draw_image(base_dsc->layer, &img_draw_dsc, &a);
 
             }
         }
@@ -74,9 +74,9 @@ static void event_cb(lv_event_t * e)
 /**
  * Add custom drawer to the button matrix to customize buttons one by one
  */
-void lv_example_btnmatrix_2(void)
+void lv_example_buttonmatrix_2(void)
 {
-    lv_obj_t * btnm = lv_btnmatrix_create(lv_scr_act());
+    lv_obj_t * btnm = lv_buttonmatrix_create(lv_scr_act());
     lv_obj_add_event(btnm, event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);
     lv_obj_add_flag(btnm, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
     lv_obj_center(btnm);

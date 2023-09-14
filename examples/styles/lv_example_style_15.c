@@ -12,7 +12,7 @@ void lv_example_style_15(void)
     lv_obj_t * label;
 
     /*Normal button*/
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_scr_act());
     lv_obj_set_size(btn, 100, 40);
     lv_obj_align(btn, LV_ALIGN_CENTER, 0, -70);
 
@@ -22,7 +22,7 @@ void lv_example_style_15(void)
 
     /*Set opacity
      *The button and the label is rendered to a layer first and that layer is blended*/
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_scr_act());
     lv_obj_set_size(btn, 100, 40);
     lv_obj_set_style_opa(btn, LV_OPA_50, 0);
     lv_obj_align(btn, LV_ALIGN_CENTER, 0, 0);
@@ -33,7 +33,7 @@ void lv_example_style_15(void)
 
     /*Set transformations
      *The button and the label is rendered to a layer first and that layer is transformed*/
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_scr_act());
     lv_obj_set_size(btn, 100, 40);
     lv_obj_set_style_transform_angle(btn, 150, 0);        /*15 deg*/
     lv_obj_set_style_transform_zoom(btn, 256 + 64, 0);   /*1.25x*/

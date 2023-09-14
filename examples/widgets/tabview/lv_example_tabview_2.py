@@ -4,10 +4,10 @@ tabview = lv.tabview(lv.scr_act(), lv.DIR.LEFT, 80)
 
 tabview.set_style_bg_color(lv.palette_lighten(lv.PALETTE.RED, 2), 0)
 
-tab_btns = tabview.get_tab_btns()
-tab_btns.set_style_bg_color(lv.palette_darken(lv.PALETTE.GREY, 3), 0)
-tab_btns.set_style_text_color(lv.palette_lighten(lv.PALETTE.GREY, 5), 0)
-tab_btns.set_style_border_side(lv.BORDER_SIDE.RIGHT, lv.PART.ITEMS | lv.STATE.CHECKED)
+tab_buttons = tabview.get_tab_buttons()
+tab_buttons.set_style_bg_color(lv.palette_darken(lv.PALETTE.GREY, 3), 0)
+tab_buttons.set_style_text_color(lv.palette_lighten(lv.PALETTE.GREY, 5), 0)
+tab_buttons.set_style_border_side(lv.BORDER_SIDE.RIGHT, lv.PART.ITEMS | lv.STATE.CHECKED)
 
 
 # Add 3 tabs (the tabs are page (lv_page) and can be scrolled

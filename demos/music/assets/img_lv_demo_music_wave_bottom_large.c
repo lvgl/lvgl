@@ -6,11 +6,11 @@
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_WAVE_BOTTOM
-    #define LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_WAVE_BOTTOM
+#ifndef LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_WAVE_BOTTOM
+    #define LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_WAVE_BOTTOM
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_WAVE_BOTTOM uint8_t
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_WAVE_BOTTOM uint8_t
 img_lv_demo_music_wave_bottom_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     /*Pixel format: Blue: 2 bit, Green: 3 bit, Red: 3 bit*/
@@ -245,7 +245,7 @@ img_lv_demo_music_wave_bottom_map[] = {
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_wave_bottom = {
+const lv_image_dsc_t img_lv_demo_music_wave_bottom = {
     .header.always_zero = 0,
     .header.w = 479,
     .header.h = 74,

@@ -130,11 +130,11 @@ typedef struct {
 #endif
 
 #if LV_USE_MSGBOX
-    lv_style_t msgbox_bg, msgbox_btn_bg, msgbox_backdrop_bg;
+    lv_style_t msgbox_bg, msgbox_button_bg, msgbox_backdrop_bg;
 #endif
 
 #if LV_USE_KEYBOARD
-    lv_style_t keyboard_btn_bg;
+    lv_style_t keyboard_button_bg;
 #endif
 
 #if LV_USE_LIST
@@ -430,7 +430,7 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_radius(&theme->styles.cb_marker, RADIUS_DEFAULT / 2);
 
     style_init_reset(&theme->styles.cb_marker_checked);
-    lv_style_set_bg_img_src(&theme->styles.cb_marker_checked, LV_SYMBOL_OK);
+    lv_style_set_bg_image_src(&theme->styles.cb_marker_checked, LV_SYMBOL_OK);
     lv_style_set_text_color(&theme->styles.cb_marker_checked, lv_color_white());
     lv_style_set_text_font(&theme->styles.cb_marker_checked, theme->base.font_small);
 #endif
@@ -594,8 +594,8 @@ static void style_init(struct _my_theme_t * theme)
 
 #if LV_USE_MSGBOX
     /*To add space for for the button shadow*/
-    style_init_reset(&theme->styles.msgbox_btn_bg);
-    lv_style_set_pad_all(&theme->styles.msgbox_btn_bg, _LV_DPX_CALC(theme->disp_dpi, 4));
+    style_init_reset(&theme->styles.msgbox_button_bg);
+    lv_style_set_pad_all(&theme->styles.msgbox_button_bg, _LV_DPX_CALC(theme->disp_dpi, 4));
 
     style_init_reset(&theme->styles.msgbox_bg);
     lv_style_set_max_width(&theme->styles.msgbox_bg, lv_pct(100));
@@ -605,9 +605,9 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_bg_opa(&theme->styles.msgbox_backdrop_bg, LV_OPA_100);
 #endif
 #if LV_USE_KEYBOARD
-    style_init_reset(&theme->styles.keyboard_btn_bg);
-    lv_style_set_shadow_width(&theme->styles.keyboard_btn_bg, 0);
-    lv_style_set_radius(&theme->styles.keyboard_btn_bg,
+    style_init_reset(&theme->styles.keyboard_button_bg);
+    lv_style_set_shadow_width(&theme->styles.keyboard_button_bg, 0);
+    lv_style_set_radius(&theme->styles.keyboard_button_bg,
                         theme->disp_size == DISP_SMALL ? RADIUS_DEFAULT / 2 : RADIUS_DEFAULT);
 #endif
 
@@ -802,7 +802,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
     }
 #if LV_USE_BTN
-    else if(lv_obj_check_type(obj, &lv_btn_class)) {
+    else if(lv_obj_check_type(obj, &lv_button_class)) {
         lv_obj_add_style(obj, &theme->styles.btn, 0);
         lv_obj_add_style(obj, &theme->styles.bg_color_primary, 0);
         lv_obj_add_style(obj, &theme->styles.transition_delayed, 0);
@@ -832,10 +832,10 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 
 #if LV_USE_BTNMATRIX
-    else if(lv_obj_check_type(obj, &lv_btnmatrix_class)) {
+    else if(lv_obj_check_type(obj, &lv_buttonmatrix_class)) {
 #if LV_USE_MSGBOX
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
-            lv_obj_add_style(obj, &theme->styles.msgbox_btn_bg, 0);
+            lv_obj_add_style(obj, &theme->styles.msgbox_button_bg, 0);
             lv_obj_add_style(obj, &theme->styles.pad_gap, 0);
             lv_obj_add_style(obj, &theme->styles.btn, LV_PART_ITEMS);
             lv_obj_add_style(obj, &theme->styles.pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
@@ -1087,7 +1087,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.btn, LV_PART_ITEMS);
         lv_obj_add_style(obj, &theme->styles.disabled, LV_PART_ITEMS | LV_STATE_DISABLED);
         lv_obj_add_style(obj, &theme->styles.bg_color_white, LV_PART_ITEMS);
-        lv_obj_add_style(obj, &theme->styles.keyboard_btn_bg, LV_PART_ITEMS);
+        lv_obj_add_style(obj, &theme->styles.keyboard_button_bg, LV_PART_ITEMS);
         lv_obj_add_style(obj, &theme->styles.pressed, LV_PART_ITEMS | LV_STATE_PRESSED);
         lv_obj_add_style(obj, &theme->styles.bg_color_grey, LV_PART_ITEMS | LV_STATE_CHECKED);
         lv_obj_add_style(obj, &theme->styles.bg_color_primary_muted, LV_PART_ITEMS | LV_STATE_FOCUS_KEY);
@@ -1106,7 +1106,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.bg_color_grey, 0);
         lv_obj_add_style(obj, &theme->styles.list_item_grow, 0);
     }
-    else if(lv_obj_check_type(obj, &lv_list_btn_class)) {
+    else if(lv_obj_check_type(obj, &lv_list_button_class)) {
         lv_obj_add_style(obj, &theme->styles.bg_color_white, 0);
         lv_obj_add_style(obj, &theme->styles.list_btn, 0);
         lv_obj_add_style(obj, &theme->styles.bg_color_primary, LV_STATE_FOCUS_KEY);

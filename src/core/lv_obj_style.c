@@ -334,7 +334,7 @@ static inline lv_style_value_t lv_style_prop_get_default_inlined(lv_style_prop_t
         case LV_STYLE_ARC_COLOR:
         case LV_STYLE_LINE_COLOR:
         case LV_STYLE_TEXT_COLOR:
-        case LV_STYLE_IMG_RECOLOR:
+        case LV_STYLE_IMAGE_RECOLOR:
             return (lv_style_value_t) {
                 .color = white
             };
@@ -342,8 +342,8 @@ static inline lv_style_value_t lv_style_prop_get_default_inlined(lv_style_prop_t
         case LV_STYLE_OPA_LAYERED:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
-        case LV_STYLE_IMG_OPA:
-        case LV_STYLE_BG_IMG_OPA:
+        case LV_STYLE_IMAGE_OPA:
+        case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
         case LV_STYLE_LINE_OPA:
@@ -950,7 +950,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
             case LV_STYLE_TEXT_COLOR:
             case LV_STYLE_SHADOW_COLOR:
             case LV_STYLE_OUTLINE_COLOR:
-            case LV_STYLE_IMG_RECOLOR:
+            case LV_STYLE_IMAGE_RECOLOR:
                 if(v <= 0) value_final.color = tr->start_value.color;
                 else if(v >= 255) value_final.color = tr->end_value.color;
                 else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);

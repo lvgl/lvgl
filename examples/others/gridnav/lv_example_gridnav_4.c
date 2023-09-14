@@ -6,7 +6,7 @@ static void event_handler(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     lv_obj_t * list = lv_obj_get_parent(obj);
-    LV_LOG_USER("Clicked: %s", lv_list_get_btn_text(list, obj));
+    LV_LOG_USER("Clicked: %s", lv_list_get_button_text(list, obj));
 }
 
 /**
@@ -33,12 +33,12 @@ void lv_example_gridnav_4(void)
         }
 
         lv_snprintf(buf, sizeof(buf), "File %d", i + 1);
-        lv_obj_t * item = lv_list_add_btn(list, LV_SYMBOL_FILE, buf);
+        lv_obj_t * item = lv_list_add_button(list, LV_SYMBOL_FILE, buf);
         lv_obj_add_event(item, event_handler, LV_EVENT_CLICKED, NULL);
         lv_group_remove_obj(item);  /*The default group adds it automatically*/
     }
 
-    lv_obj_t * btn = lv_btn_create(lv_scr_act());
+    lv_obj_t * btn = lv_button_create(lv_scr_act());
     lv_obj_align(btn, LV_ALIGN_RIGHT_MID, -10, 0);
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, "Button");

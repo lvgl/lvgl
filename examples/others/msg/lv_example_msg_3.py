@@ -28,10 +28,10 @@ class LV_Example_Msg_2:
         panel.set_flex_align(lv.FLEX_ALIGN.SPACE_BETWEEN, lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.START)
 
         # Up button
-        btn = lv.btn(panel)
-        btn.set_flex_grow(1)
-        btn.add_event(self.btn_event_cb, lv.EVENT.ALL, None)
-        label = lv.label(btn)
+        button = lv.button(panel)
+        button.set_flex_grow(1)
+        button.add_event(self.button_event_cb, lv.EVENT.ALL, None)
+        label = lv.label(button)
         label.set_text(lv.SYMBOL.LEFT)
         label.center()
 
@@ -44,10 +44,10 @@ class LV_Example_Msg_2:
         label.add_event(self.label_event_cb, lv.EVENT.MSG_RECEIVED, None)
 
         # Down button
-        btn = lv.btn(panel)
-        btn.set_flex_grow(1)
-        btn.add_event(self.btn_event_cb, lv.EVENT.ALL, None)
-        label = lv.label(btn)
+        button = lv.button(panel)
+        button.set_flex_grow(1)
+        button.add_event(self.button_event_cb, lv.EVENT.ALL, None)
+        label = lv.label(button)
         label.set_text(lv.SYMBOL.RIGHT)
         label.center()
 
@@ -83,11 +83,11 @@ class LV_Example_Msg_2:
         if self.value != old_value:
                 lv.msg_send(MSG_UPDATE, NewValue(self.value));
 
-    def btn_event_cb(self,e):
-        btn = e.get_target_obj()
+    def button_event_cb(self,e):
+        button = e.get_target_obj()
         code = e.get_code()
         if code == lv.EVENT.CLICKED or code == lv.EVENT.LONG_PRESSED_REPEAT:
-            if btn.get_index() == 0:      # rst object is the dec. button
+            if button.get_index() == 0:      # rst object is the dec. button
                 lv.msg_send(MSG_DEC, None)
             else :
                 lv.msg_send(MSG_INC, None)

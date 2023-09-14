@@ -244,12 +244,12 @@ enum _lv_style_prop_t {
     LV_STYLE_BG_DITHER_MODE         = 37,
     LV_STYLE_BASE_DIR               = 38,
 
-    LV_STYLE_BG_IMG_SRC             = 40,
-    LV_STYLE_BG_IMG_OPA             = 41,
-    LV_STYLE_BG_IMG_RECOLOR         = 42,
-    LV_STYLE_BG_IMG_RECOLOR_OPA     = 43,
+    LV_STYLE_BG_IMAGE_SRC             = 40,
+    LV_STYLE_BG_IMAGE_OPA             = 41,
+    LV_STYLE_BG_IMAGE_RECOLOR         = 42,
+    LV_STYLE_BG_IMAGE_RECOLOR_OPA     = 43,
 
-    LV_STYLE_BG_IMG_TILED           = 44,
+    LV_STYLE_BG_IMAGE_TILED           = 44,
     LV_STYLE_CLIP_CORNER            = 45,
 
 
@@ -275,9 +275,9 @@ enum _lv_style_prop_t {
     LV_STYLE_SHADOW_OFS_Y           = 65,
     LV_STYLE_SHADOW_SPREAD          = 66,
 
-    LV_STYLE_IMG_OPA                = 68,
-    LV_STYLE_IMG_RECOLOR            = 69,
-    LV_STYLE_IMG_RECOLOR_OPA        = 70,
+    LV_STYLE_IMAGE_OPA                = 68,
+    LV_STYLE_IMAGE_RECOLOR            = 69,
+    LV_STYLE_IMAGE_RECOLOR_OPA        = 70,
 
     LV_STYLE_LINE_WIDTH             = 72,
     LV_STYLE_LINE_DASH_WIDTH        = 73,
@@ -291,7 +291,7 @@ enum _lv_style_prop_t {
     LV_STYLE_ARC_ROUNDED            = 81,
     LV_STYLE_ARC_COLOR              = 82,
     LV_STYLE_ARC_OPA                = 83,
-    LV_STYLE_ARC_IMG_SRC            = 84,
+    LV_STYLE_ARC_IMAGE_SRC            = 84,
 
     LV_STYLE_TEXT_COLOR             = 88,
     LV_STYLE_TEXT_OPA               = 89,

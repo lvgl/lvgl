@@ -50,26 +50,26 @@ extern lv_font_t font_multilang_large;
  **********************/
 #define CARD_INFO_SET(_image, _name, _description) {.image = _image, .name = _name, .description = _description}
 
-LV_IMG_DECLARE(img_multilang_avatar_1)
-LV_IMG_DECLARE(img_multilang_avatar_2)
-LV_IMG_DECLARE(img_multilang_avatar_3)
-LV_IMG_DECLARE(img_multilang_avatar_4)
-LV_IMG_DECLARE(img_multilang_avatar_5)
-LV_IMG_DECLARE(img_multilang_avatar_6)
-LV_IMG_DECLARE(img_multilang_avatar_7)
-LV_IMG_DECLARE(img_multilang_avatar_8)
-LV_IMG_DECLARE(img_multilang_avatar_9)
-LV_IMG_DECLARE(img_multilang_avatar_10)
-LV_IMG_DECLARE(img_multilang_avatar_11)
-LV_IMG_DECLARE(img_multilang_avatar_12)
-LV_IMG_DECLARE(img_multilang_avatar_13)
-LV_IMG_DECLARE(img_multilang_avatar_14)
-LV_IMG_DECLARE(img_multilang_avatar_15)
-LV_IMG_DECLARE(img_multilang_avatar_16)
-LV_IMG_DECLARE(img_multilang_avatar_17)
-LV_IMG_DECLARE(img_multilang_avatar_18)
-LV_IMG_DECLARE(img_multilang_avatar_22)
-LV_IMG_DECLARE(img_multilang_avatar_25)
+LV_IMAGE_DECLARE(img_multilang_avatar_1)
+LV_IMAGE_DECLARE(img_multilang_avatar_2)
+LV_IMAGE_DECLARE(img_multilang_avatar_3)
+LV_IMAGE_DECLARE(img_multilang_avatar_4)
+LV_IMAGE_DECLARE(img_multilang_avatar_5)
+LV_IMAGE_DECLARE(img_multilang_avatar_6)
+LV_IMAGE_DECLARE(img_multilang_avatar_7)
+LV_IMAGE_DECLARE(img_multilang_avatar_8)
+LV_IMAGE_DECLARE(img_multilang_avatar_9)
+LV_IMAGE_DECLARE(img_multilang_avatar_10)
+LV_IMAGE_DECLARE(img_multilang_avatar_11)
+LV_IMAGE_DECLARE(img_multilang_avatar_12)
+LV_IMAGE_DECLARE(img_multilang_avatar_13)
+LV_IMAGE_DECLARE(img_multilang_avatar_14)
+LV_IMAGE_DECLARE(img_multilang_avatar_15)
+LV_IMAGE_DECLARE(img_multilang_avatar_16)
+LV_IMAGE_DECLARE(img_multilang_avatar_17)
+LV_IMAGE_DECLARE(img_multilang_avatar_18)
+LV_IMAGE_DECLARE(img_multilang_avatar_22)
+LV_IMAGE_DECLARE(img_multilang_avatar_25)
 
 static card_info_t card_info[] = {
     CARD_INFO_SET(&img_multilang_avatar_5, "Zhang Wei", "对编程和技术充满热情。 开源倡导者🚀"),
@@ -107,18 +107,18 @@ static const void * get_imgfont_path(const lv_font_t * font,
     LV_UNUSED(unicode_next);
     LV_UNUSED(font);
 
-    LV_IMG_DECLARE(img_emoji_artist_palette);
-    LV_IMG_DECLARE(img_emoji_books);
-    LV_IMG_DECLARE(img_emoji_camera_with_flash);
-    LV_IMG_DECLARE(img_emoji_cat_face);
-    LV_IMG_DECLARE(img_emoji_deciduous_tree);
-    LV_IMG_DECLARE(img_emoji_dog_face);
-    LV_IMG_DECLARE(img_emoji_earth_globe_europe_africa);
-    LV_IMG_DECLARE(img_emoji_flexed_biceps);
-    LV_IMG_DECLARE(img_emoji_movie_camera);
-    LV_IMG_DECLARE(img_emoji_red_heart);
-    LV_IMG_DECLARE(img_emoji_soccer_ball);
-    LV_IMG_DECLARE(img_emoji_rocket);
+    LV_IMAGE_DECLARE(img_emoji_artist_palette);
+    LV_IMAGE_DECLARE(img_emoji_books);
+    LV_IMAGE_DECLARE(img_emoji_camera_with_flash);
+    LV_IMAGE_DECLARE(img_emoji_cat_face);
+    LV_IMAGE_DECLARE(img_emoji_deciduous_tree);
+    LV_IMAGE_DECLARE(img_emoji_dog_face);
+    LV_IMAGE_DECLARE(img_emoji_earth_globe_europe_africa);
+    LV_IMAGE_DECLARE(img_emoji_flexed_biceps);
+    LV_IMAGE_DECLARE(img_emoji_movie_camera);
+    LV_IMAGE_DECLARE(img_emoji_red_heart);
+    LV_IMAGE_DECLARE(img_emoji_soccer_ball);
+    LV_IMAGE_DECLARE(img_emoji_rocket);
 
     *offset_y = -1;
     switch(unicode) {
@@ -316,8 +316,8 @@ static void card_create(lv_obj_t * parent, card_info_t * info)
     lv_obj_add_style(card, &style_card, 0);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
 
-    lv_obj_t * avatar = lv_img_create(card);
-    lv_img_set_src(avatar, info->image);
+    lv_obj_t * avatar = lv_image_create(card);
+    lv_image_set_src(avatar, info->image);
     lv_obj_set_grid_cell(avatar, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 4);
     lv_obj_add_style(avatar, &style_avatar, 0);
 
@@ -332,14 +332,14 @@ static void card_create(lv_obj_t * parent, card_info_t * info)
     lv_obj_set_style_text_color(description, lv_color_hex(0x5b5b5b), 0);
     lv_obj_set_style_text_line_space(description, -3, 0);
 
-    lv_obj_t * btn = lv_btn_create(card);
+    lv_obj_t * btn = lv_button_create(card);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
     lv_obj_set_grid_cell(btn, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_CENTER, 3, 1);
     lv_obj_add_style(btn, &style_btn, 0);
 
-    LV_IMG_DECLARE(img_multilang_like);
-    lv_obj_t * btn_img = lv_img_create(btn);
-    lv_img_set_src(btn_img, &img_multilang_like);
+    LV_IMAGE_DECLARE(img_multilang_like);
+    lv_obj_t * btn_img = lv_image_create(btn);
+    lv_image_set_src(btn_img, &img_multilang_like);
     lv_obj_align(btn_img, LV_ALIGN_LEFT_MID, 30, 0);
 
     lv_obj_t * btn_label = lv_label_create(btn);

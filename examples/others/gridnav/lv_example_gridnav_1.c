@@ -25,7 +25,7 @@ void lv_example_gridnav_1(void)
 
     uint32_t i;
     for(i = 0; i < 10; i++) {
-        lv_obj_t * obj = lv_btn_create(cont1);
+        lv_obj_t * obj = lv_button_create(cont1);
         lv_obj_set_size(obj, 70, LV_SIZE_CONTENT);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_CHECKABLE);
         lv_group_remove_obj(obj);   /*Not needed, we use the gridnav instead*/

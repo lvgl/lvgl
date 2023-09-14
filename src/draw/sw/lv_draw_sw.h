@@ -53,8 +53,8 @@ typedef struct {
 
 void lv_draw_sw_init(void);
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
-                                          const lv_area_t * coords);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                            const lv_area_t * coords);
 
 void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc, const lv_area_t * coords);
 
@@ -62,7 +62,7 @@ void lv_draw_sw_border(lv_draw_unit_t * draw_unit, const lv_draw_border_dsc_t * 
 
 void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_dsc_t * dsc, const lv_area_t * coords);
 
-void lv_draw_sw_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_t * dsc, const lv_area_t * coords);
+void lv_draw_sw_bg_image(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_t * dsc, const lv_area_t * coords);
 
 void lv_draw_sw_label(lv_draw_unit_t * draw_unit, const lv_draw_label_dsc_t * dsc, const lv_area_t * coords);
 
@@ -70,7 +70,7 @@ void lv_draw_sw_arc(lv_draw_unit_t * draw_unit, const lv_draw_arc_dsc_t * dsc, c
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_line(lv_draw_unit_t * draw_unit, const lv_draw_line_dsc_t * dsc);
 
-void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords);
+void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords);
 
 void lv_draw_sw_triangle(lv_draw_unit_t * draw_unit, const lv_draw_triangle_dsc_t * dsc);
 
@@ -78,7 +78,7 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
 
 void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
                           lv_coord_t src_w, lv_coord_t src_h,
-                          const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t cf, void * dest_buf);
+                          const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t cf, void * dest_buf);
 
 /***********************
  * GLOBAL VARIABLES

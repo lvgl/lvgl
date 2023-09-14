@@ -66,7 +66,7 @@ static const char * lv_btnm_def_pinyin_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 2
                                                                                       LV_SYMBOL_LEFT"\0", "\0"
                                                                                      };
 
-static lv_btnmatrix_ctrl_t default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 17] = { 1 };
+static lv_buttonmatrix_ctrl_t default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 17] = { 1 };
 static char   lv_pinyin_k9_cand_str[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 2][LV_IME_PINYIN_K9_MAX_INPUT] = {0};
 #endif
 
@@ -568,12 +568,12 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
 #endif
 
     /* Init pinyin_ime->cand_panel */
-    pinyin_ime->cand_panel = lv_btnmatrix_create(lv_obj_get_parent(obj));
-    lv_btnmatrix_set_map(pinyin_ime->cand_panel, (const char **)lv_btnm_def_pinyin_sel_map);
+    pinyin_ime->cand_panel = lv_buttonmatrix_create(lv_obj_get_parent(obj));
+    lv_buttonmatrix_set_map(pinyin_ime->cand_panel, (const char **)lv_btnm_def_pinyin_sel_map);
     lv_obj_set_size(pinyin_ime->cand_panel, LV_PCT(100), LV_PCT(5));
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 
-    lv_btnmatrix_set_one_checked(pinyin_ime->cand_panel, true);
+    lv_buttonmatrix_set_one_checked(pinyin_ime->cand_panel, true);
     lv_obj_clear_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     /* Set cand_panel style*/
@@ -640,10 +640,10 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 #endif
 
     if(code == LV_EVENT_VALUE_CHANGED) {
-        uint16_t btn_id  = lv_btnmatrix_get_selected_btn(kb);
-        if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
+        uint16_t btn_id  = lv_buttonmatrix_get_selected_button(kb);
+        if(btn_id == LV_BUTTONMATRIX_BUTTON_NONE) return;
 
-        const char * txt = lv_btnmatrix_get_btn_text(kb, lv_btnmatrix_get_selected_btn(kb));
+        const char * txt = lv_buttonmatrix_get_button_text(kb, lv_buttonmatrix_get_selected_button(kb));
         if(txt == NULL) return;
 
         lv_obj_t * ta = lv_keyboard_get_textarea(pinyin_ime->kb);
@@ -651,18 +651,18 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
 #if LV_IME_PINYIN_USE_K9_MODE
         if(pinyin_ime->mode == LV_IME_PINYIN_MODE_K9) {
 
-            uint16_t tmp_btn_str_len = lv_strlen(pinyin_ime->input_char);
-            if((btn_id >= 16) && (tmp_btn_str_len > 0) && (btn_id < (16 + LV_IME_PINYIN_K9_CAND_TEXT_NUM))) {
+            uint16_t tmp_button_str_len = lv_strlen(pinyin_ime->input_char);
+            if((btn_id >= 16) && (tmp_button_str_len > 0) && (btn_id < (16 + LV_IME_PINYIN_K9_CAND_TEXT_NUM))) {
                 lv_memzero(pinyin_ime->input_char, sizeof(pinyin_ime->input_char));
                 strcat(pinyin_ime->input_char, txt);
                 pinyin_input_proc(obj);
 
-                for(int index = 0; index <  tmp_btn_str_len; index++) {
+                for(int index = 0; index <  tmp_button_str_len; index++) {
                     lv_textarea_del_char(ta);
                 }
 
-                pinyin_ime->ta_count = tmp_btn_str_len;
-                pinyin_ime->k9_input_str_len = tmp_btn_str_len;
+                pinyin_ime->ta_count = tmp_button_str_len;
+                pinyin_ime->k9_input_str_len = tmp_button_str_len;
                 lv_textarea_add_text(ta, pinyin_ime->input_char);
 
                 return;
@@ -776,8 +776,8 @@ static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
         lv_obj_t * ta = lv_keyboard_get_textarea(pinyin_ime->kb);
         if(ta == NULL) return;
 
-        uint32_t id = lv_btnmatrix_get_selected_btn(cand_panel);
-        if(id == LV_BTNMATRIX_BTN_NONE) {
+        uint32_t id = lv_buttonmatrix_get_selected_button(cand_panel);
+        if(id == LV_BUTTONMATRIX_BUTTON_NONE) {
             return;
         }
         else if(id == 0) {
@@ -789,7 +789,7 @@ static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
             return;
         }
 
-        const char * txt = lv_btnmatrix_get_btn_text(cand_panel, id);
+        const char * txt = lv_buttonmatrix_get_button_text(cand_panel, id);
         uint16_t index = 0;
         for(index = 0; index < pinyin_ime->ta_count; index++)
             lv_textarea_del_char(ta);
@@ -999,14 +999,14 @@ static void pinyin_k9_init_data(lv_obj_t * obj)
         py_str_i++;
     }
 
-    default_kb_ctrl_k9_map[0]  = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
-    default_kb_ctrl_k9_map[4]  = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
-    default_kb_ctrl_k9_map[5]  = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
-    default_kb_ctrl_k9_map[9]  = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
-    default_kb_ctrl_k9_map[10] = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
-    default_kb_ctrl_k9_map[14] = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
-    default_kb_ctrl_k9_map[15] = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
-    default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 16] = LV_KEYBOARD_CTRL_BTN_FLAGS | 1;
+    default_kb_ctrl_k9_map[0]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[4]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[5]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[9]  = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[10] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[14] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[15] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
+    default_kb_ctrl_k9_map[LV_IME_PINYIN_K9_CAND_TEXT_NUM + 16] = LV_KEYBOARD_CTRL_BUTTON_FLAGS | 1;
 }
 
 static void pinyin_k9_get_legal_py(lv_obj_t * obj, char * k9_input, const char * py9_map[])

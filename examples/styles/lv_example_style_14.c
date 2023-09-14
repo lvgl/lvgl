@@ -10,7 +10,7 @@ static void new_theme_apply_cb(lv_theme_t * th, lv_obj_t * obj)
 {
     LV_UNUSED(th);
 
-    if(lv_obj_check_type(obj, &lv_btn_class)) {
+    if(lv_obj_check_type(obj, &lv_button_class)) {
         lv_obj_add_style(obj, &style_btn, 0);
     }
 }
@@ -46,7 +46,7 @@ void lv_example_style_14(void)
     lv_obj_t * btn;
     lv_obj_t * label;
 
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_scr_act());
     lv_obj_align(btn, LV_ALIGN_TOP_MID, 0, 20);
 
     label = lv_label_create(btn);
@@ -54,7 +54,7 @@ void lv_example_style_14(void)
 
     new_theme_init_and_set();
 
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_scr_act());
     lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, -20);
 
     label = lv_label_create(btn);

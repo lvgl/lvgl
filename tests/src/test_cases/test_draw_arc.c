@@ -117,7 +117,7 @@ void test_image_arc(void)
     lv_draw_arc_dsc_t arc_dsc;
     lv_draw_arc_dsc_init(&arc_dsc);
 
-    LV_IMG_DECLARE(test_arc_bg);
+    LV_IMAGE_DECLARE(test_arc_bg);
     arc_dsc.img_src = &test_arc_bg;
 
     draw_arcs(&arc_dsc, "image");

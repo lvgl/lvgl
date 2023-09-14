@@ -54,7 +54,7 @@ struct ffmpeg_context_s {
 
 #pragma pack(1)
 
-struct lv_img_pixel_color_s {
+struct lv_image_pixel_color_s {
     lv_color_t c;
     uint8_t alpha;
 };
@@ -65,18 +65,18 @@ struct lv_img_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t decoder_open(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
-static void decoder_close(lv_img_decoder_t * dec, lv_img_decoder_dsc_t * dsc);
+static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_res_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
+static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
 static void ffmpeg_close(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_src_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static void ffmpeg_close_dst_ctx(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_image_allocate(struct ffmpeg_context_s * ffmpeg_ctx);
-static int ffmpeg_get_img_header(const char * path, lv_img_header_t * header);
+static int ffmpeg_get_image_header(const char * path, lv_image_header_t * header);
 static int ffmpeg_get_frame_refr_period(struct ffmpeg_context_s * ffmpeg_ctx);
-static uint8_t * ffmpeg_get_img_data(struct ffmpeg_context_s * ffmpeg_ctx);
+static uint8_t * ffmpeg_get_image_data(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_update_next_frame(struct ffmpeg_context_s * ffmpeg_ctx);
 static int ffmpeg_output_video_frame(struct ffmpeg_context_s * ffmpeg_ctx);
 static bool ffmpeg_pix_fmt_has_alpha(enum AVPixelFormat pix_fmt);
@@ -92,7 +92,7 @@ const lv_obj_class_t lv_ffmpeg_player_class = {
     .constructor_cb = lv_ffmpeg_player_constructor,
     .destructor_cb = lv_ffmpeg_player_destructor,
     .instance_size = sizeof(lv_ffmpeg_player_t),
-    .base_class = &lv_img_class
+    .base_class = &lv_image_class
 };
 
 /**********************
@@ -105,10 +105,10 @@ const lv_obj_class_t lv_ffmpeg_player_class = {
 
 void lv_ffmpeg_init(void)
 {
-    lv_img_decoder_t * dec = lv_img_decoder_create();
-    lv_img_decoder_set_info_cb(dec, decoder_info);
-    lv_img_decoder_set_open_cb(dec, decoder_open);
-    lv_img_decoder_set_close_cb(dec, decoder_close);
+    lv_image_decoder_t * dec = lv_image_decoder_create();
+    lv_image_decoder_set_info_cb(dec, decoder_info);
+    lv_image_decoder_set_open_cb(dec, decoder_open);
+    lv_image_decoder_set_close_cb(dec, decoder_close);
 
 #if LV_FFMPEG_AV_DUMP_FORMAT == 0
     av_log_set_level(AV_LOG_QUIET);
@@ -175,9 +175,9 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
     player->imgdsc.header.h = height;
     player->imgdsc.data_size = data_size;
     player->imgdsc.header.cf = has_alpha ? LV_COLOR_FORMAT_ARGB8888 : LV_COLOR_FORMAT_NATIVE;
-    player->imgdsc.data = ffmpeg_get_img_data(player->ffmpeg_ctx);
+    player->imgdsc.data = ffmpeg_get_image_data(player->ffmpeg_ctx);
 
-    lv_img_set_src(&player->img.obj, &(player->imgdsc));
+    lv_image_set_src(&player->img.obj, &(player->imgdsc));
 
     int period = ffmpeg_get_frame_refr_period(player->ffmpeg_ctx);
 
@@ -246,17 +246,17 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
     /* Get the source type */
-    lv_img_src_t src_type = lv_img_src_get_type(src);
+    lv_image_src_t src_type = lv_image_src_get_type(src);
 
-    if(src_type == LV_IMG_SRC_FILE) {
+    if(src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = src;
 
-        if(ffmpeg_get_img_header(fn, header) < 0) {
+        if(ffmpeg_get_image_header(fn, header) < 0) {
             LV_LOG_ERROR("ffmpeg can't get image header");
             return LV_RES_INV;
         }
@@ -268,11 +268,11 @@ static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_im
     return LV_RES_INV;
 }
 
-static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
 
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
+    if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * path = dsc->src;
 
         struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path);
@@ -294,7 +294,7 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
         }
 
         ffmpeg_close_src_ctx(ffmpeg_ctx);
-        uint8_t * img_data = ffmpeg_get_img_data(ffmpeg_ctx);
+        uint8_t * img_data = ffmpeg_get_image_data(ffmpeg_ctx);
 
         dsc->user_data = ffmpeg_ctx;
         dsc->img_data = img_data;
@@ -307,14 +307,14 @@ static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * 
     return LV_RES_INV;
 }
 
-static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
     struct ffmpeg_context_s * ffmpeg_ctx = dsc->user_data;
     ffmpeg_close(ffmpeg_ctx);
 }
 
-static uint8_t * ffmpeg_get_img_data(struct ffmpeg_context_s * ffmpeg_ctx)
+static uint8_t * ffmpeg_get_image_data(struct ffmpeg_context_s * ffmpeg_ctx)
 {
     uint8_t * img_data = ffmpeg_ctx->video_dst_data[0];
 
@@ -542,8 +542,8 @@ static int ffmpeg_open_codec_context(int * stream_idx,
     return 0;
 }
 
-static int ffmpeg_get_img_header(const char * filepath,
-                                 lv_img_header_t * header)
+static int ffmpeg_get_image_header(const char * filepath,
+                                   lv_image_header_t * header)
 {
     int ret = -1;
 
@@ -798,7 +798,7 @@ static void lv_ffmpeg_player_frame_update_cb(lv_timer_t * timer)
         return;
     }
 
-    lv_img_cache_invalidate_src(lv_img_get_src(obj));
+    lv_image_cache_invalidate_src(lv_image_get_src(obj));
     lv_obj_invalidate(obj);
 }
 
@@ -834,7 +834,7 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
         player->timer = NULL;
     }
 
-    lv_img_cache_invalidate_src(lv_img_get_src(obj));
+    lv_image_cache_invalidate_src(lv_image_get_src(obj));
 
     ffmpeg_close(player->ffmpeg_ctx);
     player->ffmpeg_ctx = NULL;

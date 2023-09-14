@@ -46,7 +46,7 @@ void lv_tabview_rename_tab(lv_obj_t * obj, uint32_t tab_id, const char * new_nam
 
 lv_obj_t * lv_tabview_get_content(lv_obj_t * tv);
 
-lv_obj_t * lv_tabview_get_tab_btns(lv_obj_t * tv);
+lv_obj_t * lv_tabview_get_tab_buttons(lv_obj_t * tv);
 
 void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en);
 

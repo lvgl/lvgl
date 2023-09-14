@@ -360,55 +360,55 @@ void lv_style_set_bg_dither_mode(lv_style_t * style, lv_dither_mode_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_BG_DITHER_MODE = LV_STYLE_BG_DITHER_MODE;
 
-void lv_style_set_bg_img_src(lv_style_t * style, const void * value)
+void lv_style_set_bg_image_src(lv_style_t * style, const void * value)
 {
     lv_style_value_t v = {
         .ptr = value
     };
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_SRC, v);
+    lv_style_set_prop(style, LV_STYLE_BG_IMAGE_SRC, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_BG_IMG_SRC = LV_STYLE_BG_IMG_SRC;
+const lv_style_prop_t _lv_style_const_prop_id_BG_IMAGE_SRC = LV_STYLE_BG_IMAGE_SRC;
 
-void lv_style_set_bg_img_opa(lv_style_t * style, lv_opa_t value)
+void lv_style_set_bg_image_opa(lv_style_t * style, lv_opa_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_OPA, v);
+    lv_style_set_prop(style, LV_STYLE_BG_IMAGE_OPA, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_BG_IMG_OPA = LV_STYLE_BG_IMG_OPA;
+const lv_style_prop_t _lv_style_const_prop_id_BG_IMAGE_OPA = LV_STYLE_BG_IMAGE_OPA;
 
-void lv_style_set_bg_img_recolor(lv_style_t * style, lv_color_t value)
+void lv_style_set_bg_image_recolor(lv_style_t * style, lv_color_t value)
 {
     lv_style_value_t v = {
         .color = value
     };
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR, v);
+    lv_style_set_prop(style, LV_STYLE_BG_IMAGE_RECOLOR, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_BG_IMG_RECOLOR = LV_STYLE_BG_IMG_RECOLOR;
+const lv_style_prop_t _lv_style_const_prop_id_BG_IMAGE_RECOLOR = LV_STYLE_BG_IMAGE_RECOLOR;
 
-void lv_style_set_bg_img_recolor_opa(lv_style_t * style, lv_opa_t value)
+void lv_style_set_bg_image_recolor_opa(lv_style_t * style, lv_opa_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_RECOLOR_OPA, v);
+    lv_style_set_prop(style, LV_STYLE_BG_IMAGE_RECOLOR_OPA, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_BG_IMG_RECOLOR_OPA = LV_STYLE_BG_IMG_RECOLOR_OPA;
+const lv_style_prop_t _lv_style_const_prop_id_BG_IMAGE_RECOLOR_OPA = LV_STYLE_BG_IMAGE_RECOLOR_OPA;
 
-void lv_style_set_bg_img_tiled(lv_style_t * style, bool value)
+void lv_style_set_bg_image_tiled(lv_style_t * style, bool value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_BG_IMG_TILED, v);
+    lv_style_set_prop(style, LV_STYLE_BG_IMAGE_TILED, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_BG_IMG_TILED = LV_STYLE_BG_IMG_TILED;
+const lv_style_prop_t _lv_style_const_prop_id_BG_IMAGE_TILED = LV_STYLE_BG_IMAGE_TILED;
 
 void lv_style_set_border_color(lv_style_t * style, lv_color_t value)
 {
@@ -560,35 +560,35 @@ void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_SHADOW_OPA = LV_STYLE_SHADOW_OPA;
 
-void lv_style_set_img_opa(lv_style_t * style, lv_opa_t value)
+void lv_style_set_image_opa(lv_style_t * style, lv_opa_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_IMG_OPA, v);
+    lv_style_set_prop(style, LV_STYLE_IMAGE_OPA, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_IMG_OPA = LV_STYLE_IMG_OPA;
+const lv_style_prop_t _lv_style_const_prop_id_IMAGE_OPA = LV_STYLE_IMAGE_OPA;
 
-void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value)
+void lv_style_set_image_recolor(lv_style_t * style, lv_color_t value)
 {
     lv_style_value_t v = {
         .color = value
     };
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, v);
+    lv_style_set_prop(style, LV_STYLE_IMAGE_RECOLOR, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_IMG_RECOLOR = LV_STYLE_IMG_RECOLOR;
+const lv_style_prop_t _lv_style_const_prop_id_IMAGE_RECOLOR = LV_STYLE_IMAGE_RECOLOR;
 
-void lv_style_set_img_recolor_opa(lv_style_t * style, lv_opa_t value)
+void lv_style_set_image_recolor_opa(lv_style_t * style, lv_opa_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_OPA, v);
+    lv_style_set_prop(style, LV_STYLE_IMAGE_RECOLOR_OPA, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_IMG_RECOLOR_OPA = LV_STYLE_IMG_RECOLOR_OPA;
+const lv_style_prop_t _lv_style_const_prop_id_IMAGE_RECOLOR_OPA = LV_STYLE_IMAGE_RECOLOR_OPA;
 
 void lv_style_set_line_width(lv_style_t * style, lv_coord_t value)
 {
@@ -690,15 +690,15 @@ void lv_style_set_arc_opa(lv_style_t * style, lv_opa_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_ARC_OPA = LV_STYLE_ARC_OPA;
 
-void lv_style_set_arc_img_src(lv_style_t * style, const void * value)
+void lv_style_set_arc_image_src(lv_style_t * style, const void * value)
 {
     lv_style_value_t v = {
         .ptr = value
     };
-    lv_style_set_prop(style, LV_STYLE_ARC_IMG_SRC, v);
+    lv_style_set_prop(style, LV_STYLE_ARC_IMAGE_SRC, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_ARC_IMG_SRC = LV_STYLE_ARC_IMG_SRC;
+const lv_style_prop_t _lv_style_const_prop_id_ARC_IMAGE_SRC = LV_STYLE_ARC_IMAGE_SRC;
 
 void lv_style_set_text_color(lv_style_t * style, lv_color_t value)
 {

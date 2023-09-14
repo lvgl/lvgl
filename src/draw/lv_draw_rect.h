@@ -40,12 +40,12 @@ typedef struct {
     lv_grad_dsc_t bg_grad;
 
     /*Background img*/
-    const void * bg_img_src;
-    const void * bg_img_symbol_font;
-    lv_color_t bg_img_recolor;
-    lv_opa_t bg_img_opa;
-    lv_opa_t bg_img_recolor_opa;
-    uint8_t bg_img_tiled;
+    const void * bg_image_src;
+    const void * bg_image_symbol_font;
+    lv_color_t bg_image_recolor;
+    lv_opa_t bg_image_opa;
+    lv_opa_t bg_image_recolor_opa;
+    uint8_t bg_image_tiled;
 
     /*Border*/
     lv_color_t border_color;
@@ -89,9 +89,9 @@ typedef struct {
     lv_color_t recolor;
     lv_opa_t opa;
     lv_opa_t recolor_opa;
-    lv_img_header_t img_header; /*To make it easier for draw_unit to decide if they can draw this image */
+    lv_image_header_t img_header; /*To make it easier for draw_unit to decide if they can draw this image */
     uint8_t tiled : 1;
-} lv_draw_bg_img_dsc_t;
+} lv_draw_bg_image_dsc_t;
 
 typedef struct {
     lv_draw_dsc_base_t base;
@@ -131,7 +131,7 @@ void lv_draw_border_dsc_init(lv_draw_border_dsc_t * dsc);
 
 void lv_draw_box_shadow_dsc_init(lv_draw_box_shadow_dsc_t * dsc);
 
-void lv_draw_bg_img_dsc_init(lv_draw_bg_img_dsc_t * dsc);
+void lv_draw_bg_image_dsc_init(lv_draw_bg_image_dsc_t * dsc);
 
 
 /**

@@ -71,11 +71,11 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_BG_GRAD] = 0,
     [LV_STYLE_BG_DITHER_MODE] = 0,
 
-    [LV_STYLE_BG_IMG_SRC] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
-    [LV_STYLE_BG_IMG_OPA] = 0,
-    [LV_STYLE_BG_IMG_RECOLOR] = 0,
-    [LV_STYLE_BG_IMG_RECOLOR_OPA] = 0,
-    [LV_STYLE_BG_IMG_TILED] = 0,
+    [LV_STYLE_BG_IMAGE_SRC] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
+    [LV_STYLE_BG_IMAGE_OPA] = 0,
+    [LV_STYLE_BG_IMAGE_RECOLOR] = 0,
+    [LV_STYLE_BG_IMAGE_RECOLOR_OPA] = 0,
+    [LV_STYLE_BG_IMAGE_TILED] = 0,
 
     [LV_STYLE_BORDER_COLOR] = 0,
     [LV_STYLE_BORDER_OPA] = 0,
@@ -95,9 +95,9 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_SHADOW_COLOR] = 0,
     [LV_STYLE_SHADOW_OPA] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
 
-    [LV_STYLE_IMG_OPA] = 0,
-    [LV_STYLE_IMG_RECOLOR] = 0,
-    [LV_STYLE_IMG_RECOLOR_OPA] = 0,
+    [LV_STYLE_IMAGE_OPA] = 0,
+    [LV_STYLE_IMAGE_RECOLOR] = 0,
+    [LV_STYLE_IMAGE_RECOLOR_OPA] = 0,
 
     [LV_STYLE_LINE_WIDTH] =                LV_STYLE_PROP_FLAG_EXT_DRAW_UPDATE,
     [LV_STYLE_LINE_DASH_WIDTH] = 0,
@@ -110,7 +110,7 @@ const uint8_t _lv_style_builtin_prop_flag_lookup_table[_LV_STYLE_NUM_BUILT_IN_PR
     [LV_STYLE_ARC_ROUNDED] = 0,
     [LV_STYLE_ARC_COLOR] = 0,
     [LV_STYLE_ARC_OPA] = 0,
-    [LV_STYLE_ARC_IMG_SRC] = 0,
+    [LV_STYLE_ARC_IMAGE_SRC] = 0,
 
     [LV_STYLE_TEXT_COLOR] =                LV_STYLE_PROP_FLAG_INHERITABLE,
     [LV_STYLE_TEXT_OPA] =                  LV_STYLE_PROP_FLAG_INHERITABLE,
@@ -360,7 +360,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_ARC_COLOR:
         case LV_STYLE_LINE_COLOR:
         case LV_STYLE_TEXT_COLOR:
-        case LV_STYLE_IMG_RECOLOR:
+        case LV_STYLE_IMAGE_RECOLOR:
             return (lv_style_value_t) {
                 .color = white
             };
@@ -368,8 +368,8 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_OPA_LAYERED:
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
-        case LV_STYLE_IMG_OPA:
-        case LV_STYLE_BG_IMG_OPA:
+        case LV_STYLE_IMAGE_OPA:
+        case LV_STYLE_BG_IMAGE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
         case LV_STYLE_LINE_OPA:
