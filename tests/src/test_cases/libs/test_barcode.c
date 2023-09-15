@@ -22,7 +22,6 @@ void test_barcode_normal(void)
     lv_obj_t * barcode = lv_barcode_create(active_screen);
     TEST_ASSERT_NOT_NULL(barcode);
 
-    lv_obj_set_height(barcode, 50);
     lv_obj_center(barcode);
 
     lv_color_t dark_color = lv_color_black();
@@ -37,9 +36,26 @@ void test_barcode_normal(void)
     TEST_ASSERT_EQUAL_COLOR(lv_barcode_get_light_color(barcode), light_color);
     TEST_ASSERT_EQUAL(lv_barcode_get_scale(barcode), scale);
 
+    lv_barcode_set_direction(barcode, LV_DIR_HOR);
     lv_result_t res = lv_barcode_update(barcode, "https://lvgl.io");
     TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
+
+    lv_image_dsc_t * image_dsc = lv_canvas_get_image(barcode);
+    TEST_ASSERT_NOT_NULL(image_dsc);
+
+    lv_obj_set_size(barcode, image_dsc->header.w, 50);
     TEST_ASSERT_EQUAL_SCREENSHOT("barcode_1.png");
+
+    lv_barcode_set_direction(barcode, LV_DIR_VER);
+    res = lv_barcode_update(barcode, "https://lvgl.io");
+    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
+
+    image_dsc = lv_canvas_get_image(barcode);
+    TEST_ASSERT_NOT_NULL(image_dsc);
+
+    lv_obj_set_size(barcode, 50, image_dsc->header.h);
+    TEST_ASSERT_EQUAL_SCREENSHOT("barcode_2.png");
+
 }
 
 #else
