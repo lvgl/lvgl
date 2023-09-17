@@ -71,6 +71,7 @@ static void indev_click_focus(lv_indev_t * indev);
 static void indev_gesture(lv_indev_t * indev);
 static bool indev_reset_check(lv_indev_t * indev);
 static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
+static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -337,35 +338,12 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev)
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
     if(indev) {
-        indev->reset_query = 1;
-        if(indev_act == indev) indev_obj_act = NULL;
-        if(indev->type == LV_INDEV_TYPE_POINTER || indev->type == LV_INDEV_TYPE_KEYPAD) {
-            if(obj == NULL || indev->pointer.last_pressed == obj) {
-                indev->pointer.last_pressed = NULL;
-            }
-            if(obj == NULL || indev->pointer.act_obj == obj) {
-                indev->pointer.act_obj = NULL;
-            }
-            if(obj == NULL || indev->pointer.last_obj == obj) {
-                indev->pointer.last_obj = NULL;
-            }
-        }
+        indev_reset_core(indev, obj);
     }
     else {
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
-            i->reset_query = 1;
-            if(i->type == LV_INDEV_TYPE_POINTER || i->type == LV_INDEV_TYPE_KEYPAD) {
-                if(obj == NULL || i->pointer.last_pressed == obj) {
-                    i->pointer.last_pressed = NULL;
-                }
-                if(obj == NULL || i->pointer.act_obj == obj) {
-                    i->pointer.act_obj = NULL;
-                }
-                if(obj == NULL || i->pointer.last_obj == obj) {
-                    i->pointer.last_obj = NULL;
-                }
-            }
+            indev_reset_core(i, obj);
             i = lv_indev_get_next(i);
         }
         indev_obj_act = NULL;
@@ -1382,4 +1360,44 @@ static bool indev_reset_check(lv_indev_t * indev)
     }
 
     return indev->reset_query;
+}
+
+/**
+ * Reset the indev and send event to active obj and scroll obj
+ * @param indev pointer to an input device
+ * @param obj pointer to obj
+*/
+static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
+{
+    lv_obj_t * act_obj = NULL;
+    lv_obj_t * scroll_obj = NULL;
+
+    indev->reset_query = 1;
+    if(indev_act == indev) indev_obj_act = NULL;
+    if(indev->type == LV_INDEV_TYPE_POINTER || indev->type == LV_INDEV_TYPE_KEYPAD) {
+        if(obj == NULL || indev->pointer.last_pressed == obj) {
+            indev->pointer.last_pressed = NULL;
+        }
+        if(obj == NULL || indev->pointer.act_obj == obj) {
+            if(indev->pointer.act_obj) {
+                /* Avoid recursive calls */
+                act_obj = indev->pointer.act_obj;
+                indev->pointer.act_obj = NULL;
+                lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
+                act_obj = NULL;
+            }
+        }
+        if(obj == NULL || indev->pointer.last_obj == obj) {
+            indev->pointer.last_obj = NULL;
+        }
+        if(obj == NULL || indev->pointer.scroll_obj == obj) {
+            if(indev->pointer.scroll_obj) {
+                /* Avoid recursive calls */
+                scroll_obj = indev->pointer.scroll_obj;
+                indev->pointer.scroll_obj = NULL;
+                lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
+                scroll_obj = NULL;
+            }
+        }
+    }
 }
