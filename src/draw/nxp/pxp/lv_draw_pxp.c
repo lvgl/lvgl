@@ -231,7 +231,7 @@ static int32_t _pxp_dispatch(lv_draw_unit_t * draw_unit, lv_layer_t * layer)
     lv_draw_task_t * t = lv_draw_get_next_available_task(layer, NULL, DRAW_UNIT_ID_PXP);
 
     /* Return 0 is no selection, some tasks can be supported only by other units. */
-    if(t == NULL)
+    if(t == NULL || t->preferred_draw_unit_id != DRAW_UNIT_ID_PXP)
         return 0;
 
     void * buf = lv_draw_layer_alloc_buf(layer);
