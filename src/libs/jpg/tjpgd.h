@@ -57,8 +57,8 @@ typedef struct {
 typedef struct JDEC JDEC;
 struct JDEC {
     size_t dctr;                /* Number of bytes available in the input buffer */
-    uint8_t* dptr;              /* Current data read ptr */
-    uint8_t* inbuf;             /* Bit stream input buffer */
+    uint8_t * dptr;             /* Current data read ptr */
+    uint8_t * inbuf;            /* Bit stream input buffer */
     uint8_t dbit;               /* Number of bits availavble in wreg or reading bit mask */
     uint8_t scale;              /* Output scaling ratio */
     uint8_t msx, msy;           /* MCU size in unit of block (width, height) */
@@ -69,40 +69,40 @@ struct JDEC {
     uint16_t rst;              /* Restart count*/
     uint16_t rsc;               /* Expected restart sequence ID*/
     uint16_t width, height;     /* Size of the input image (pixel) */
-    uint8_t* huffbits[2][2];    /* Huffman bit distribution tables [id][dcac] */
-    uint16_t* huffcode[2][2];   /* Huffman code word tables [id][dcac] */
-    uint8_t* huffdata[2][2];    /* Huffman decoded data tables [id][dcac] */
-    int32_t* qttbl[4];          /* Dequantizer tables [id] */
+    uint8_t * huffbits[2][2];   /* Huffman bit distribution tables [id][dcac] */
+    uint16_t * huffcode[2][2];  /* Huffman code word tables [id][dcac] */
+    uint8_t * huffdata[2][2];   /* Huffman decoded data tables [id][dcac] */
+    int32_t * qttbl[4];         /* Dequantizer tables [id] */
 #if JD_FASTDECODE >= 1
     uint32_t wreg;              /* Working shift register */
     uint8_t marker;             /* Detected marker (0:None) */
 #if JD_FASTDECODE == 2
     uint8_t longofs[2][2];      /* Table offset of long code [id][dcac] */
-    uint16_t* hufflut_ac[2];    /* Fast huffman decode tables for AC short code [id] */
-    uint8_t* hufflut_dc[2];     /* Fast huffman decode tables for DC short code [id] */
+    uint16_t * hufflut_ac[2];   /* Fast huffman decode tables for AC short code [id] */
+    uint8_t * hufflut_dc[2];    /* Fast huffman decode tables for DC short code [id] */
 #endif
 #endif
-    void* workbuf;              /* Working buffer for IDCT and RGB output */
-    jd_yuv_t* mcubuf;           /* Working buffer for the MCU */
-    void* pool;                 /* Pointer to available memory pool */
-    void* pool_original;        /* Pointer to original pool */
+    void * workbuf;             /* Working buffer for IDCT and RGB output */
+    jd_yuv_t * mcubuf;          /* Working buffer for the MCU */
+    void * pool;                /* Pointer to available memory pool */
+    void * pool_original;       /* Pointer to original pool */
     size_t sz_pool;             /* Size of momory pool (bytes available) */
-    size_t (*infunc)(JDEC*, uint8_t*, size_t);  /* Pointer to jpeg stream input function */
-    void* device;               /* Pointer to I/O device identifiler for the session */
+    size_t (*infunc)(JDEC *, uint8_t *, size_t); /* Pointer to jpeg stream input function */
+    void * device;              /* Pointer to I/O device identifiler for the session */
 };
 
 
 
 /* TJpgDec API functions */
-JRESULT jd_prepare (JDEC* jd, size_t (*infunc)(JDEC*,uint8_t*,size_t), void* pool, size_t sz_pool, void* dev);
+JRESULT jd_prepare(JDEC * jd, size_t (*infunc)(JDEC *, uint8_t *, size_t), void * pool, size_t sz_pool, void * dev);
 
-JRESULT jd_decomp (JDEC* jd, int (*outfunc)(JDEC*,void*,JRECT*), uint8_t scale);
+JRESULT jd_decomp(JDEC * jd, int (*outfunc)(JDEC *, void *, JRECT *), uint8_t scale);
 
-JRESULT jd_mcu_load (JDEC* jd);
+JRESULT jd_mcu_load(JDEC * jd);
 
-JRESULT jd_mcu_output(JDEC* jd, int (*outfunc)(JDEC*, void*, JRECT*), unsigned int x, unsigned int y);
+JRESULT jd_mcu_output(JDEC * jd, int (*outfunc)(JDEC *, void *, JRECT *), unsigned int x, unsigned int y);
 
-JRESULT jd_restart(JDEC* jd, uint16_t rstn);
+JRESULT jd_restart(JDEC * jd, uint16_t rstn);
 
 
 #ifdef __cplusplus

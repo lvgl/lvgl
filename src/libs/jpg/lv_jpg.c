@@ -68,7 +68,7 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
 static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-        const lv_area_t * full_area, lv_area_t * decoded_area);
+                                 const lv_area_t * full_area, lv_area_t * decoded_area);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata);
 static int is_jpg(const uint8_t * raw_data, size_t len);
@@ -218,7 +218,7 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
 }
 
 static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-        const lv_area_t * full_area, lv_area_t * decoded_area)
+                                 const lv_area_t * full_area, lv_area_t * decoded_area)
 {
     LV_UNUSED(decoder);
     LV_UNUSED(full_area);
@@ -252,15 +252,16 @@ static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_
     }
 
     JRESULT rc;
-    if (jd->nrst && jd->rst++ == jd->nrst) {    /* Process restart interval if enabled */
+    if(jd->nrst && jd->rst++ == jd->nrst) {     /* Process restart interval if enabled */
         rc = jd_restart(jd, jd->rsc++);
-        if (rc != JDR_OK) return rc;
+        if(rc != JDR_OK) return rc;
         jd->rst = 1;
     }
     rc = jd_mcu_load(jd);                  /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
-    if (rc != JDR_OK) return rc;
-    rc = jd_mcu_output(jd, NULL, decoded_area->x1,  decoded_area->y1); /* Output the MCU (YCbCr to RGB, scaling and output) */
-    if (rc != JDR_OK) return rc;
+    if(rc != JDR_OK) return rc;
+    rc = jd_mcu_output(jd, NULL, decoded_area->x1,
+                       decoded_area->y1); /* Output the MCU (YCbCr to RGB, scaling and output) */
+    if(rc != JDR_OK) return rc;
 
     return LV_RES_OK;
 }
