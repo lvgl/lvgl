@@ -870,6 +870,10 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
         const lv_coord_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
         const lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
         const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
+        const lv_coord_t tick_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_TICKS);
+        const lv_coord_t tick_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_TICKS);
+        const lv_coord_t tick_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_TICKS);
+        const lv_coord_t tick_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_TICKS);
 
         lv_coord_t x_ofs = 0U;
         lv_coord_t y_ofs = 0U;
@@ -883,11 +887,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
             y_ofs = obj->coords.y1 + pad_top;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) {
-            x_ofs = obj->coords.x1 + pad_right;
+            x_ofs = obj->coords.x1 + (pad_right + tick_pad_right);
             y_ofs = obj->coords.y1 + (main_line_dsc.width / 2U) + pad_top;
         }
         else if(LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode) {
-            x_ofs = obj->coords.x1 + pad_left;
+            x_ofs = obj->coords.x1 + (pad_left + tick_pad_left);
             y_ofs = obj->coords.y2 + (main_line_dsc.width / 2U) - pad_bottom;
         }
         else { /* Nothing to do */ }
@@ -931,11 +935,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
             lv_coord_t horizontal_position = x_ofs;
             /* Position the last tick at the x2 scale coordinate */
             if(scale->total_tick_count == tick_idx) {
-                horizontal_position = obj->coords.x2 - pad_left;
+                horizontal_position = obj->coords.x2 - (pad_left + tick_pad_left);
             }
             /* Increment the tick offset depending of its index */
             else if(0U != tick_idx) {
-                const lv_coord_t scale_total_width = lv_obj_get_width(obj) - (pad_right + pad_left);
+                const lv_coord_t scale_total_width = lv_obj_get_width(obj) - (pad_right + pad_left + tick_pad_right + tick_pad_left);
                 lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_width) / (lv_coord_t) scale->total_tick_count;
                 horizontal_position += offset;
             }
