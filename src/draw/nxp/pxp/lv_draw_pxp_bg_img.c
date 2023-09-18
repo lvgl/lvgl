@@ -42,7 +42,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_pxp_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_t * dsc,
+void lv_draw_pxp_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_t * dsc,
                         const lv_area_t * coords)
 {
     if(dsc->src == NULL) return;
@@ -56,8 +56,8 @@ void lv_draw_pxp_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_t *
     const lv_area_t * clip_area_ori = draw_unit->clip_area;
     draw_unit->clip_area = &clip_area;
 
-    lv_draw_img_dsc_t img_dsc;
-    lv_draw_img_dsc_init(&img_dsc);
+    lv_draw_image_dsc_t img_dsc;
+    lv_draw_image_dsc_init(&img_dsc);
     img_dsc.recolor = dsc->recolor;
     img_dsc.recolor_opa = dsc->recolor_opa;
     img_dsc.opa = dsc->opa;

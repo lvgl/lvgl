@@ -37,12 +37,12 @@
 /* Blit w/ recolor for images w/o opa and alpha channel */
 static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                               lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc);
+                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit w/ transformation for images w/o opa and alpha channel */
 static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                 lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc);
+                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc);
 
 /* Blit simple w/ opa and alpha channel */
 static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
@@ -61,14 +61,14 @@ static void _pxp_blit(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
+void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
                      const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    const lv_img_dsc_t * img_dsc = dsc->src;
+    const lv_image_dsc_t * img_dsc = dsc->src;
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
@@ -117,7 +117,7 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
 
 static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                               lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc)
+                              lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc)
 {
 
     lv_coord_t dest_w = lv_area_get_width(dest_area);
@@ -183,7 +183,7 @@ static void _pxp_blit_recolor(uint8_t * dest_buf, const lv_area_t * dest_area, l
 
 static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area, lv_coord_t dest_stride,
                                 lv_color_format_t dest_cf, const uint8_t * src_buf, const lv_area_t * src_area,
-                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_img_dsc_t * dsc)
+                                lv_coord_t src_stride, lv_color_format_t src_cf, const lv_draw_image_dsc_t * dsc)
 {
     lv_coord_t src_w = lv_area_get_width(src_area);
     lv_coord_t src_h = lv_area_get_height(src_area);

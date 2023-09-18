@@ -95,9 +95,9 @@ static inline bool _pxp_cf_supported(lv_color_format_t cf)
     return is_cf_supported;
 }
 
-static bool _pxp_draw_img_supported(const lv_draw_img_dsc_t * draw_dsc)
+static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
 {
-    const lv_img_dsc_t * img_dsc = draw_dsc->src;
+    const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
     bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
     bool has_transform = (draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE);
@@ -158,10 +158,10 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
         case LV_DRAW_TASK_TYPE_BG_IMG: {
-                const lv_draw_bg_img_dsc_t * draw_dsc = (lv_draw_bg_img_dsc_t *) t->draw_dsc;
-                lv_img_src_t src_type = lv_img_src_get_type(draw_dsc->src);
+                const lv_draw_bg_image_dsc_t * draw_dsc = (lv_draw_bg_image_dsc_t *) t->draw_dsc;
+                lv_image_src_t src_type = lv_image_src_get_type(draw_dsc->src);
 
-                if(src_type == LV_IMG_SRC_SYMBOL)
+                if(src_type == LV_IMAGE_SRC_SYMBOL)
                     return 0;
 
                 if(!_pxp_cf_supported(draw_dsc->img_header.cf))
@@ -175,7 +175,7 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
         case LV_DRAW_TASK_TYPE_LAYER: {
-                const lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
+                const lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
                 lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
@@ -193,8 +193,8 @@ static int32_t _pxp_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
             }
 
         case LV_DRAW_TASK_TYPE_IMAGE: {
-                lv_draw_img_dsc_t * draw_dsc = (lv_draw_img_dsc_t *) t->draw_dsc;
-                const lv_img_dsc_t * img_dsc = draw_dsc->src;
+                lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
+                const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
                 if(!_pxp_cf_supported(img_dsc->header.cf))
                     return 0;

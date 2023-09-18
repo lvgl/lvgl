@@ -44,7 +44,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
+void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
                        const lv_area_t * coords)
 {
     lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
@@ -54,15 +54,15 @@ void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dra
     if(layer_to_draw->draw_buf.buf == NULL)
         return;
 
-    lv_img_dsc_t img_dsc;
+    lv_image_dsc_t img_dsc;
     img_dsc.header.w = layer_to_draw->draw_buf.width;
     img_dsc.header.h = layer_to_draw->draw_buf.height;
     img_dsc.header.cf = layer_to_draw->draw_buf.color_format;
     img_dsc.header.always_zero = 0;
     img_dsc.data = lv_draw_buf_get_buf(&layer_to_draw->draw_buf);
 
-    lv_draw_img_dsc_t new_draw_dsc;
-    lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_img_dsc_t));
+    lv_draw_image_dsc_t new_draw_dsc;
+    lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
     new_draw_dsc.src = &img_dsc;
 
     lv_draw_pxp_img(draw_unit, &new_draw_dsc, coords);

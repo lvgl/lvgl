@@ -55,7 +55,7 @@ void vglite_set_translation_matrix(const lv_area_t * dest_area)
     vg_lite_translate((vg_lite_float_t)dest_area->x1, (vg_lite_float_t)dest_area->y1, &_vgmatrix);
 }
 
-void vglite_set_transformation_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc)
+void vglite_set_transformation_matrix(const lv_area_t * dest_area, const lv_draw_image_dsc_t * dsc)
 {
     vglite_set_translation_matrix(dest_area);
 

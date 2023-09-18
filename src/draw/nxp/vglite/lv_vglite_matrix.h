@@ -60,7 +60,7 @@ void vglite_set_translation_matrix(const lv_area_t * dest_area);
  * @param[in] dsc Image descriptor
  *
  */
-void vglite_set_transformation_matrix(const lv_area_t * dest_area, const lv_draw_img_dsc_t * dsc);
+void vglite_set_transformation_matrix(const lv_area_t * dest_area, const lv_draw_image_dsc_t * dsc);
 
 /**********************
  *      MACROS

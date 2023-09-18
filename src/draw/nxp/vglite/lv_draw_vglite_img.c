@@ -110,7 +110,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
  *
  */
 static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * clip_area,
-                                   const lv_area_t * src_area, const lv_draw_img_dsc_t * dsc);
+                                   const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc);
 #endif /*VGLITE_BLIT_SPLIT_ENABLED*/
 
 /**********************
@@ -125,14 +125,14 @@ static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t 
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * dsc,
+void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc,
                         const lv_area_t * coords)
 {
     if(dsc->opa <= (lv_opa_t)LV_OPA_MIN)
         return;
 
     lv_layer_t * layer = draw_unit->target_layer;
-    const lv_img_dsc_t * img_dsc = dsc->src;
+    const lv_image_dsc_t * img_dsc = dsc->src;
 
     lv_area_t rel_coords;
     lv_area_copy(&rel_coords, coords);
@@ -393,7 +393,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
 }
 #else
 static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t * clip_area,
-                                   const lv_area_t * src_area, const lv_draw_img_dsc_t * dsc)
+                                   const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc)
 {
     /* Set scissor. */
     vglite_set_scissor(clip_area);

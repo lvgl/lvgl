@@ -42,7 +42,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_vglite_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_t * dsc,
+void lv_draw_vglite_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_t * dsc,
                            const lv_area_t * coords)
 {
     if(dsc->src == NULL) return;
@@ -56,8 +56,8 @@ void lv_draw_vglite_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_
     const lv_area_t * clip_area_ori = draw_unit->clip_area;
     draw_unit->clip_area = &clip_area;
 
-    lv_img_src_t src_type = lv_img_src_get_type(dsc->src);
-    if(src_type == LV_IMG_SRC_SYMBOL) {
+    lv_image_src_t src_type = lv_image_src_get_type(dsc->src);
+    if(src_type == LV_IMAGE_SRC_SYMBOL) {
         lv_point_t size;
         lv_txt_get_size(&size, dsc->src, dsc->font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_area_t a;
@@ -75,8 +75,8 @@ void lv_draw_vglite_bg_img(lv_draw_unit_t * draw_unit, const lv_draw_bg_img_dsc_
         lv_draw_vglite_label(draw_unit, &label_draw_dsc, &a);
     }
     else {
-        lv_draw_img_dsc_t img_dsc;
-        lv_draw_img_dsc_init(&img_dsc);
+        lv_draw_image_dsc_t img_dsc;
+        lv_draw_image_dsc_init(&img_dsc);
         img_dsc.recolor = dsc->recolor;
         img_dsc.recolor_opa = dsc->recolor_opa;
         img_dsc.opa = dsc->opa;
