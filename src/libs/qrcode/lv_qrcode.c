@@ -93,7 +93,7 @@ void lv_qrcode_set_light_color(lv_obj_t * obj, lv_color_t color)
     qrcode->light_color = color;
 }
 
-lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
+lv_result_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_qrcode_t * qrcode = (lv_qrcode_t *)obj;
@@ -101,7 +101,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
     lv_image_dsc_t * img_dsc = lv_canvas_get_image(obj);
     if(!img_dsc->data) {
         LV_LOG_ERROR("canvas buffer is NULL");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_canvas_set_palette(obj, 0, lv_color_to_32(qrcode->dark_color, 0xff));
@@ -109,14 +109,14 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
     lv_color_t c = lv_color_from_int(1);
     lv_canvas_fill_bg(obj, c, LV_OPA_COVER);
 
-    if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RES_INV;
+    if(data_len > qrcodegen_BUFFER_LEN_MAX) return LV_RESULT_INVALID;
 
     int32_t qr_version = qrcodegen_getMinFitVersion(qrcodegen_Ecc_MEDIUM, data_len);
-    if(qr_version <= 0) return LV_RES_INV;
+    if(qr_version <= 0) return LV_RESULT_INVALID;
     int32_t qr_size = qrcodegen_version2size(qr_version);
-    if(qr_size <= 0) return LV_RES_INV;
+    if(qr_size <= 0) return LV_RESULT_INVALID;
     int32_t scale = img_dsc->header.w / qr_size;
-    if(scale <= 0) return LV_RES_INV;
+    if(scale <= 0) return LV_RESULT_INVALID;
     int32_t remain = img_dsc->header.w % qr_size;
 
     /* The qr version is incremented by four point */
@@ -140,7 +140,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
     if(!ok) {
         lv_free(qr0);
         lv_free(data_tmp);
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_coord_t obj_w = img_dsc->header.w;
@@ -200,7 +200,7 @@ lv_res_t lv_qrcode_update(lv_obj_t * obj, const void * data, uint32_t data_len)
 
     lv_free(qr0);
     lv_free(data_tmp);
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /**********************

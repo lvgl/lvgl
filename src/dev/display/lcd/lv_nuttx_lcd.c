@@ -32,7 +32,7 @@
 
 typedef struct {
     int fd;
-    lv_disp_t * disp;
+    lv_display_t * disp;
     struct lcddev_area_s area;
     struct lcddev_area_align_s align_info;
 } lv_nuttx_lcd_t;
@@ -43,9 +43,9 @@ typedef struct {
 
 static lv_coord_t align_round_up(lv_coord_t v, uint16_t align);
 static void rounder_cb(lv_event_t * e);
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area_p,
+static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p);
-static lv_disp_t * lcd_init(int fd, int hor_res, int ver_res);
+static lv_display_t * lcd_init(int fd, int hor_res, int ver_res);
 
 /**********************
  *  STATIC VARIABLES
@@ -59,11 +59,11 @@ static lv_disp_t * lcd_init(int fd, int hor_res, int ver_res);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_nuttx_lcd_create(const char * dev_path)
+lv_display_t * lv_nuttx_lcd_create(const char * dev_path)
 {
     struct fb_videoinfo_s vinfo;
     struct lcd_planeinfo_s pinfo;
-    lv_disp_t * disp;
+    lv_display_t * disp;
     int fd;
     int ret;
 
@@ -130,7 +130,7 @@ static void rounder_cb(lv_event_t * e)
     area->y2 = area->y1 + h - 1;
 }
 
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area_p,
+static void flush_cb(lv_display_t * disp, const lv_area_t * area_p,
                      uint8_t * color_p)
 {
     lv_nuttx_lcd_t * lcd = disp->user_data;
@@ -141,10 +141,10 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area_p,
     lcd->area.col_end = area_p->x2;
     lcd->area.data = (uint8_t *)color_p;
     ioctl(lcd->fd, LCDDEVIO_PUTAREA, (unsigned long) & (lcd->area));
-    lv_disp_flush_ready(disp);
+    lv_display_flush_ready(disp);
 }
 
-static lv_disp_t * lcd_init(int fd, int hor_res, int ver_res)
+static lv_display_t * lcd_init(int fd, int hor_res, int ver_res)
 {
     lv_color_t * draw_buf = NULL;
     lv_color_t * draw_buf_2 = NULL;
@@ -156,19 +156,19 @@ static lv_disp_t * lcd_init(int fd, int hor_res, int ver_res)
     }
     lv_memzero(lcd, sizeof(lv_nuttx_lcd_t));
 
-    lv_disp_t * disp = lv_disp_create(hor_res, ver_res);
+    lv_display_t * disp = lv_display_create(hor_res, ver_res);
     if(disp == NULL) {
         lv_free(lcd);
         return NULL;
     }
 
-    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+    uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
 #if LV_NUTTX_LCD_BUFFER_COUNT > 0
     uint32_t buf_size = hor_res * ver_res * px_size;
-    lv_disp_render_mode_t render_mode = LV_DISP_RENDER_MODE_FULL;
+    lv_display_render_mode_t render_mode = LV_DISPLAY_RENDER_MODE_FULL;
 #else
     uint32_t buf_size = hor_res * LV_NUTTX_LCD_BUFFER_SIZE * px_size;
-    lv_disp_render_mode_t render_mode = LV_DISP_RENDER_MODE_PARTIAL;
+    lv_display_render_mode_t render_mode = LV_DISPLAY_RENDER_MODE_PARTIAL;
 #endif
 
     draw_buf = lv_malloc(buf_size);
@@ -194,8 +194,8 @@ static lv_disp_t * lcd_init(int fd, int hor_res, int ver_res)
     }
 
     lcd->disp = disp;
-    lv_disp_set_draw_buffers(lcd->disp, draw_buf, draw_buf_2, buf_size, render_mode);
-    lv_disp_set_flush_cb(lcd->disp, flush_cb);
+    lv_display_set_draw_buffers(lcd->disp, draw_buf, draw_buf_2, buf_size, render_mode);
+    lv_display_set_flush_cb(lcd->disp, flush_cb);
     lv_event_add(&lcd->disp->event_list, rounder_cb, LV_EVENT_INVALIDATE_AREA, lcd);
     lcd->disp->user_data = lcd;
 

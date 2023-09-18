@@ -49,7 +49,7 @@ class ExampleStyle_14:
         # Initialize the new theme from the current theme
         self.th_new = NewTheme()
         self.th_new.set_apply_cb(self.new_theme_apply_cb)
-        lv.disp_get_default().set_theme(self.th_new)
+        lv.display_get_default().set_theme(self.th_new)
 
 
 exampleStyle_14 = ExampleStyle_14()

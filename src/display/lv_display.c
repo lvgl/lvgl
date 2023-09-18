@@ -6,10 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_disp.h"
+#include "lv_display.h"
 #include "../misc/lv_math.h"
 #include "../core/lv_refr.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display_private.h"
 #include "../stdlib/lv_string.h"
 #include "../themes/lv_theme.h"
 #include "../core/lv_global.h"
@@ -33,7 +33,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data);
-static void update_resolution(lv_disp_t * disp);
+static void update_resolution(lv_display_t * disp);
 static void scr_load_internal(lv_obj_t * scr);
 static void scr_load_anim_start(lv_anim_t * a);
 static void opa_scale_anim(void * obj, int32_t v);
@@ -55,13 +55,13 @@ static void disp_event_cb(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
+lv_display_t * lv_display_create(lv_coord_t hor_res, lv_coord_t ver_res)
 {
-    lv_disp_t * disp = _lv_ll_ins_head(disp_ll_p);
+    lv_display_t * disp = _lv_ll_ins_head(disp_ll_p);
     LV_ASSERT_MALLOC(disp);
     if(!disp) return NULL;
 
-    lv_memzero(disp, sizeof(lv_disp_t));
+    lv_memzero(disp, sizeof(lv_display_t));
 
     disp->hor_res          = hor_res;
     disp->ver_res          = ver_res;
@@ -84,11 +84,11 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 
     disp->inv_en_cnt = 1;
 
-    lv_disp_t * disp_def_tmp = disp_def;
+    lv_display_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh timer*/
-    disp->refr_timer = lv_timer_create(_lv_disp_refr_timer, LV_DEF_REFR_PERIOD, disp);
+    disp->refr_timer = lv_timer_create(_lv_display_refr_timer, LV_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MALLOC(disp->refr_timer);
     if(disp->refr_timer == NULL) {
         lv_free(disp);
@@ -124,7 +124,7 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
     disp_def = disp_def_tmp; /*Revert the default display*/
     if(disp_def == NULL) disp_def = disp; /*Initialize the default display*/
 
-    lv_disp_add_event(disp, disp_event_cb, LV_EVENT_REFR_REQUEST, NULL);
+    lv_display_add_event(disp, disp_event_cb, LV_EVENT_REFR_REQUEST, NULL);
 
     lv_timer_ready(disp->refr_timer); /*Be sure the screen will be refreshed immediately on start up*/
 
@@ -132,12 +132,12 @@ lv_disp_t * lv_disp_create(lv_coord_t hor_res, lv_coord_t ver_res)
 }
 
 
-void lv_disp_remove(lv_disp_t * disp)
+void lv_display_remove(lv_display_t * disp)
 {
     bool was_default = false;
-    if(disp == lv_disp_get_default()) was_default = true;
+    if(disp == lv_display_get_default()) was_default = true;
 
-    lv_disp_send_event(disp, LV_EVENT_DELETE, NULL);
+    lv_display_send_event(disp, LV_EVENT_DELETE, NULL);
     lv_event_remove_all(&(disp->event_list));
 
     /*Detach the input devices*/
@@ -173,20 +173,20 @@ void lv_disp_remove(lv_disp_t * disp)
     if(disp->refr_timer) lv_timer_del(disp->refr_timer);
     lv_free(disp);
 
-    if(was_default) lv_disp_set_default(_lv_ll_get_head(disp_ll_p));
+    if(was_default) lv_display_set_default(_lv_ll_get_head(disp_ll_p));
 }
 
-void lv_disp_set_default(lv_disp_t * disp)
+void lv_display_set_default(lv_display_t * disp)
 {
     disp_def = disp;
 }
 
-lv_disp_t * lv_disp_get_default(void)
+lv_display_t * lv_display_get_default(void)
 {
     return disp_def;
 }
 
-lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
+lv_display_t * lv_display_get_next(lv_display_t * disp)
 {
     if(disp == NULL)
         return _lv_ll_get_head(disp_ll_p);
@@ -198,9 +198,9 @@ lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
  * RESOLUTION
  *--------------------*/
 
-void lv_disp_set_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+void lv_display_set_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     if(disp->hor_res == hor_res && disp->ver_res == ver_res) return;
@@ -211,9 +211,9 @@ void lv_disp_set_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
     update_resolution(disp);
 }
 
-void lv_disp_set_physical_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
+void lv_display_set_physical_resolution(lv_display_t * disp, lv_coord_t hor_res, lv_coord_t ver_res)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->physical_hor_res = hor_res;
@@ -223,9 +223,9 @@ void lv_disp_set_physical_res(lv_disp_t * disp, lv_coord_t hor_res, lv_coord_t v
 
 }
 
-void lv_disp_set_offset(lv_disp_t * disp, lv_coord_t x, lv_coord_t y)
+void lv_display_set_offset(lv_display_t * disp, lv_coord_t x, lv_coord_t y)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->offset_x = x;
@@ -235,25 +235,25 @@ void lv_disp_set_offset(lv_disp_t * disp, lv_coord_t x, lv_coord_t y)
 
 }
 
-void lv_disp_set_dpi(lv_disp_t * disp, lv_coord_t dpi)
+void lv_display_set_dpi(lv_display_t * disp, lv_coord_t dpi)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->dpi = dpi;
 }
 
-lv_coord_t lv_disp_get_hor_res(const lv_disp_t * disp)
+lv_coord_t lv_display_get_horizontal_resolution(const lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
 
     if(disp == NULL) {
         return 0;
     }
     else {
         switch(disp->rotation) {
-            case LV_DISP_ROTATION_90:
-            case LV_DISP_ROTATION_270:
+            case LV_DISPLAY_ROTATION_90:
+            case LV_DISPLAY_ROTATION_270:
                 return disp->ver_res;
             default:
                 return disp->hor_res;
@@ -261,17 +261,17 @@ lv_coord_t lv_disp_get_hor_res(const lv_disp_t * disp)
     }
 }
 
-lv_coord_t lv_disp_get_ver_res(const lv_disp_t * disp)
+lv_coord_t lv_display_get_vertical_resolution(const lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
 
     if(disp == NULL) {
         return 0;
     }
     else {
         switch(disp->rotation) {
-            case LV_DISP_ROTATION_90:
-            case LV_DISP_ROTATION_270:
+            case LV_DISPLAY_ROTATION_90:
+            case LV_DISPLAY_ROTATION_270:
                 return disp->hor_res;
             default:
                 return disp->ver_res;
@@ -279,17 +279,17 @@ lv_coord_t lv_disp_get_ver_res(const lv_disp_t * disp)
     }
 }
 
-lv_coord_t lv_disp_get_physical_hor_res(const lv_disp_t * disp)
+lv_coord_t lv_display_get_physical_horizontal_resolution(const lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
 
     if(disp == NULL) {
         return 0;
     }
     else {
         switch(disp->rotation) {
-            case LV_DISP_ROTATION_90:
-            case LV_DISP_ROTATION_270:
+            case LV_DISPLAY_ROTATION_90:
+            case LV_DISPLAY_ROTATION_270:
                 return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
             default:
                 return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
@@ -297,17 +297,17 @@ lv_coord_t lv_disp_get_physical_hor_res(const lv_disp_t * disp)
     }
 }
 
-lv_coord_t lv_disp_get_physical_ver_res(const lv_disp_t * disp)
+lv_coord_t lv_display_get_physical_vertical_resolution(const lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
 
     if(disp == NULL) {
         return 0;
     }
     else {
         switch(disp->rotation) {
-            case LV_DISP_ROTATION_90:
-            case LV_DISP_ROTATION_270:
+            case LV_DISPLAY_ROTATION_90:
+            case LV_DISPLAY_ROTATION_270:
                 return disp->physical_hor_res > 0 ? disp->physical_hor_res : disp->hor_res;
             default:
                 return disp->physical_ver_res > 0 ? disp->physical_ver_res : disp->ver_res;
@@ -315,51 +315,51 @@ lv_coord_t lv_disp_get_physical_ver_res(const lv_disp_t * disp)
     }
 }
 
-lv_coord_t lv_disp_get_offset_x(const lv_disp_t * disp)
+lv_coord_t lv_display_get_offset_x(const lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
 
     if(disp == NULL) {
         return 0;
     }
     else {
         switch(disp->rotation) {
-            case LV_DISP_ROTATION_90:
+            case LV_DISPLAY_ROTATION_90:
                 return disp->offset_y;
-            case LV_DISP_ROTATION_180:
-                return lv_disp_get_physical_hor_res(disp) - disp->offset_x;
-            case LV_DISP_ROTATION_270:
-                return lv_disp_get_physical_hor_res(disp) - disp->offset_y;
+            case LV_DISPLAY_ROTATION_180:
+                return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_x;
+            case LV_DISPLAY_ROTATION_270:
+                return lv_display_get_physical_horizontal_resolution(disp) - disp->offset_y;
             default:
                 return disp->offset_x;
         }
     }
 }
 
-lv_coord_t lv_disp_get_offset_y(const lv_disp_t * disp)
+lv_coord_t lv_display_get_offset_y(const lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
 
     if(disp == NULL) {
         return 0;
     }
     else {
         switch(disp->rotation) {
-            case LV_DISP_ROTATION_90:
+            case LV_DISPLAY_ROTATION_90:
                 return disp->offset_x;
-            case LV_DISP_ROTATION_180:
-                return lv_disp_get_physical_ver_res(disp) - disp->offset_y;
-            case LV_DISP_ROTATION_270:
-                return lv_disp_get_physical_ver_res(disp) - disp->offset_x;
+            case LV_DISPLAY_ROTATION_180:
+                return lv_display_get_physical_vertical_resolution(disp) - disp->offset_y;
+            case LV_DISPLAY_ROTATION_270:
+                return lv_display_get_physical_vertical_resolution(disp) - disp->offset_x;
             default:
                 return disp->offset_y;
         }
     }
 }
 
-lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
+lv_coord_t lv_display_get_dpi(const lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return LV_DPI_DEF;  /*Do not return 0 because it might be a divider*/
     return disp->dpi;
 }
@@ -368,10 +368,10 @@ lv_coord_t lv_disp_get_dpi(const lv_disp_t * disp)
  * BUFFERING
  *--------------------*/
 
-void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32_t buf_size_in_bytes,
-                              lv_disp_render_mode_t render_mode)
+void lv_display_set_draw_buffers(lv_display_t * disp, void * buf1, void * buf2, uint32_t buf_size_in_bytes,
+                                 lv_display_render_mode_t render_mode)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->buf_1 = buf1;
@@ -381,60 +381,60 @@ void lv_disp_set_draw_buffers(lv_disp_t * disp, void * buf1, void * buf2, uint32
     disp->render_mode = render_mode;
 }
 
-void lv_disp_set_flush_cb(lv_disp_t * disp, lv_disp_flush_cb_t flush_cb)
+void lv_display_set_flush_cb(lv_display_t * disp, lv_display_flush_cb_t flush_cb)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->flush_cb = flush_cb;
 }
 
-void lv_disp_set_color_format(lv_disp_t * disp, lv_color_format_t color_format)
+void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_format)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->color_format = color_format;
     disp->layer_head->draw_buf.color_format = color_format;
 }
 
-lv_color_format_t lv_disp_get_color_format(lv_disp_t * disp)
+lv_color_format_t lv_display_get_color_format(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return LV_COLOR_FORMAT_UNKNOWN;
 
     return disp->color_format;
 }
 
-void lv_disp_set_antialiasing(lv_disp_t * disp, bool en)
+void lv_display_set_antialiasing(lv_display_t * disp, bool en)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->antialiasing = en;
 }
 
-bool lv_disp_get_antialiasing(lv_disp_t * disp)
+bool lv_display_get_antialiasing(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return false;
 
     return disp->antialiasing;
 }
 
 
-LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_t * disp)
+LV_ATTRIBUTE_FLUSH_READY void lv_display_flush_ready(lv_display_t * disp)
 {
     disp->flushing = 0;
     disp->flushing_last = 0;
 }
 
-LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_t * disp)
+LV_ATTRIBUTE_FLUSH_READY bool lv_display_flush_is_last(lv_display_t * disp)
 {
     return disp->flushing_last;
 }
 
-bool lv_disp_is_double_buffered(lv_disp_t * disp)
+bool lv_display_is_double_buffered(lv_display_t * disp)
 {
     return disp->buf_2 != NULL;
 }
@@ -443,9 +443,9 @@ bool lv_disp_is_double_buffered(lv_disp_t * disp)
   * SCREENS
   *--------------------*/
 
-lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp)
+lv_obj_t * lv_display_get_scr_act(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("no display registered to get its active screen");
         return NULL;
@@ -454,9 +454,9 @@ lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp)
     return disp->act_scr;
 }
 
-lv_obj_t * lv_disp_get_scr_prev(lv_disp_t * disp)
+lv_obj_t * lv_display_get_scr_prev(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("no display registered to get its previous screen");
         return NULL;
@@ -465,14 +465,14 @@ lv_obj_t * lv_disp_get_scr_prev(lv_disp_t * disp)
     return disp->prev_scr;
 }
 
-void lv_disp_load_scr(lv_obj_t * scr)
+void lv_display_load_scr(lv_obj_t * scr)
 {
     lv_scr_load_anim(scr, LV_SCR_LOAD_ANIM_NONE, 0, 0, false);
 }
 
-lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp)
+lv_obj_t * lv_display_get_layer_top(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("lv_layer_top: no display registered to get its top layer");
         return NULL;
@@ -481,9 +481,9 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp)
     return disp->top_layer;
 }
 
-lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
+lv_obj_t * lv_display_get_layer_sys(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("lv_layer_sys: no display registered to get its sys. layer");
         return NULL;
@@ -492,9 +492,9 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
     return disp->sys_layer;
 }
 
-lv_obj_t * lv_disp_get_layer_bottom(lv_disp_t * disp)
+lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("lv_layer_bottom: no display registered to get its bottom layer");
         return NULL;
@@ -505,7 +505,7 @@ lv_obj_t * lv_disp_get_layer_bottom(lv_disp_t * disp)
 
 void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay, bool auto_del)
 {
-    lv_disp_t * d = lv_obj_get_disp(new_scr);
+    lv_display_t * d = lv_obj_get_disp(new_scr);
     lv_obj_t * act_scr = lv_scr_act();
 
     if(act_scr == new_scr || d->scr_to_load == new_scr) {
@@ -578,47 +578,47 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             break;
         case LV_SCR_LOAD_ANIM_OVER_LEFT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, lv_display_get_horizontal_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_OVER_RIGHT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_display_get_horizontal_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_OVER_TOP:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, lv_display_get_vertical_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_OVER_BOTTOM:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_display_get_vertical_resolution(d), 0);
             break;
         case LV_SCR_LOAD_ANIM_MOVE_LEFT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, lv_display_get_horizontal_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_display_get_horizontal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_MOVE_RIGHT:
             lv_anim_set_exec_cb(&a_new, set_x_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_display_get_horizontal_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, lv_display_get_horizontal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_MOVE_TOP:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, lv_display_get_vertical_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_display_get_vertical_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_MOVE_BOTTOM:
             lv_anim_set_exec_cb(&a_new, set_y_anim);
-            lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
+            lv_anim_set_values(&a_new, -lv_display_get_vertical_resolution(d), 0);
 
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, lv_display_get_vertical_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_FADE_IN:
             lv_anim_set_exec_cb(&a_new, opa_scale_anim);
@@ -630,19 +630,19 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
             break;
         case LV_SCR_LOAD_ANIM_OUT_LEFT:
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_display_get_horizontal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_OUT_RIGHT:
             lv_anim_set_exec_cb(&a_old, set_x_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_hor_res(d));
+            lv_anim_set_values(&a_old, 0, lv_display_get_horizontal_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_OUT_TOP:
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, -lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, -lv_display_get_vertical_resolution(d));
             break;
         case LV_SCR_LOAD_ANIM_OUT_BOTTOM:
             lv_anim_set_exec_cb(&a_old, set_y_anim);
-            lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
+            lv_anim_set_values(&a_old, 0, lv_display_get_vertical_resolution(d));
             break;
     }
 
@@ -656,35 +656,35 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
  * OTHERS
  *--------------------*/
 
-void lv_disp_add_event(lv_disp_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
+void lv_display_add_event(lv_display_t * disp, lv_event_cb_t event_cb, lv_event_code_t filter, void * user_data)
 {
     LV_ASSERT_NULL(disp);
 
     lv_event_add(&disp->event_list, event_cb, filter, user_data);
 }
 
-uint32_t lv_disp_get_event_count(lv_disp_t * disp)
+uint32_t lv_display_get_event_count(lv_display_t * disp)
 {
     LV_ASSERT_NULL(disp);
     return lv_event_get_count(&disp->event_list);
 }
 
 
-lv_event_dsc_t * lv_disp_get_event_dsc(lv_disp_t * disp, uint32_t index)
+lv_event_dsc_t * lv_display_get_event_dsc(lv_display_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
     return lv_event_get_dsc(&disp->event_list, index);
 
 }
 
-bool lv_disp_remove_event(lv_disp_t * disp, uint32_t index)
+bool lv_display_remove_event(lv_display_t * disp, uint32_t index)
 {
     LV_ASSERT_NULL(disp);
 
     return lv_event_remove(&disp->event_list, index);
 }
 
-lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * param)
+lv_result_t lv_display_send_event(lv_display_t * disp, lv_event_code_t code, void * param)
 {
 
     lv_event_t e;
@@ -693,19 +693,19 @@ lv_res_t lv_disp_send_event(lv_disp_t * disp, lv_event_code_t code, void * param
     e.current_target = disp;
     e.original_target = disp;
     e.param = param;
-    lv_res_t res;
+    lv_result_t res;
     res = lv_event_send(&disp->event_list, &e, true);
-    if(res != LV_RES_OK) return res;
+    if(res != LV_RESULT_OK) return res;
 
     res = lv_event_send(&disp->event_list, &e, false);
-    if(res != LV_RES_OK) return res;
+    if(res != LV_RESULT_OK) return res;
 
     return res;
 }
 
-void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rotation_t rotation, bool sw_rotate)
+void lv_display_set_rotation(lv_display_t * disp, lv_display_rotation_t rotation, bool sw_rotate)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     if(disp == NULL) return;
 
     disp->rotation = rotation;
@@ -713,16 +713,16 @@ void lv_disp_set_rotation(lv_disp_t * disp, lv_disp_rotation_t rotation, bool sw
     update_resolution(disp);
 }
 
-lv_disp_rotation_t lv_disp_get_rotation(lv_disp_t * disp)
+lv_display_rotation_t lv_display_get_rotation(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
-    if(disp == NULL) return LV_DISP_ROTATION_0;
+    if(disp == NULL) disp = lv_display_get_default();
+    if(disp == NULL) return LV_DISPLAY_ROTATION_0;
     return disp->rotation;
 }
 
-void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
+void lv_display_set_theme(lv_display_t * disp, lv_theme_t * th)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("no display registered");
         return;
@@ -738,42 +738,42 @@ void lv_disp_set_theme(lv_disp_t * disp, lv_theme_t * th)
     }
 }
 
-lv_theme_t * lv_disp_get_theme(lv_disp_t * disp)
+lv_theme_t * lv_display_get_theme(lv_display_t * disp)
 {
-    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) disp = lv_display_get_default();
     return disp->theme;
 }
 
-uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp)
+uint32_t lv_display_get_inactive_time(const lv_display_t * disp)
 {
     if(disp) return lv_tick_elaps(disp->last_activity_time);
 
-    lv_disp_t * d;
+    lv_display_t * d;
     uint32_t t = UINT32_MAX;
-    d          = lv_disp_get_next(NULL);
+    d          = lv_display_get_next(NULL);
     while(d) {
         uint32_t elaps = lv_tick_elaps(d->last_activity_time);
         t = LV_MIN(t, elaps);
-        d = lv_disp_get_next(d);
+        d = lv_display_get_next(d);
     }
 
     return t;
 }
 
-void lv_disp_trig_activity(lv_disp_t * disp)
+void lv_display_trig_activity(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
-        LV_LOG_WARN("lv_disp_trig_activity: no display registered");
+        LV_LOG_WARN("lv_display_trig_activity: no display registered");
         return;
     }
 
     disp->last_activity_time = lv_tick_get();
 }
 
-void lv_disp_enable_invalidation(lv_disp_t * disp, bool en)
+void lv_display_enable_invalidation(lv_display_t * disp, bool en)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("no display registered");
         return;
@@ -782,9 +782,9 @@ void lv_disp_enable_invalidation(lv_disp_t * disp, bool en)
     disp->inv_en_cnt += en ? 1 : -1;
 }
 
-bool lv_disp_is_invalidation_enabled(lv_disp_t * disp)
+bool lv_display_is_invalidation_enabled(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) {
         LV_LOG_WARN("no display registered");
         return false;
@@ -793,39 +793,39 @@ bool lv_disp_is_invalidation_enabled(lv_disp_t * disp)
     return (disp->inv_en_cnt > 0);
 }
 
-lv_timer_t * _lv_disp_get_refr_timer(lv_disp_t * disp)
+lv_timer_t * _lv_display_get_refr_timer(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) return NULL;
 
     return disp->refr_timer;
 }
 
-void lv_disp_set_user_data(lv_disp_t * disp, void * user_data)
+void lv_display_set_user_data(lv_display_t * disp, void * user_data)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) return;
     disp->user_data = user_data;
 }
 
-void lv_disp_set_driver_data(lv_disp_t * disp, void * driver_data)
+void lv_display_set_driver_data(lv_display_t * disp, void * driver_data)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) return;
 
     disp->driver_data = driver_data;
 }
 
-void * lv_disp_get_user_data(lv_disp_t * disp)
+void * lv_display_get_user_data(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) return NULL;
     return disp->user_data;
 }
 
-void * lv_disp_get_driver_data(lv_disp_t * disp)
+void * lv_display_get_driver_data(lv_display_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
+    if(!disp) disp = lv_display_get_default();
     if(!disp) return NULL;
 
     return disp->driver_data;
@@ -835,10 +835,10 @@ void * lv_disp_get_driver_data(lv_disp_t * disp)
  *   STATIC FUNCTIONS
  **********************/
 
-static void update_resolution(lv_disp_t * disp)
+static void update_resolution(lv_display_t * disp)
 {
-    lv_coord_t hor_res = lv_disp_get_hor_res(disp);
-    lv_coord_t ver_res = lv_disp_get_ver_res(disp);
+    lv_coord_t hor_res = lv_display_get_horizontal_resolution(disp);
+    lv_coord_t ver_res = lv_display_get_vertical_resolution(disp);
 
     lv_area_t prev_coords;
     lv_obj_get_coords(disp->sys_layer, &prev_coords);
@@ -868,7 +868,7 @@ static void update_resolution(lv_disp_t * disp)
 
     lv_obj_tree_walk(NULL, invalidate_layout_cb, NULL);
 
-    lv_disp_send_event(disp, LV_EVENT_RESOLUTION_CHANGED, NULL);
+    lv_display_send_event(disp, LV_EVENT_RESOLUTION_CHANGED, NULL);
 }
 
 static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_data)
@@ -880,7 +880,7 @@ static lv_obj_tree_walk_res_t invalidate_layout_cb(lv_obj_t * obj, void * user_d
 
 static void scr_load_internal(lv_obj_t * scr)
 {
-    lv_disp_t * d = lv_obj_get_disp(scr);
+    lv_display_t * d = lv_obj_get_disp(scr);
     if(!d) return;  /*Shouldn't happen, just to be sure*/
 
     lv_obj_t * old_scr = d->act_scr;
@@ -898,7 +898,7 @@ static void scr_load_internal(lv_obj_t * scr)
 
 static void scr_load_anim_start(lv_anim_t * a)
 {
-    lv_disp_t * d = lv_obj_get_disp(a->var);
+    lv_display_t * d = lv_obj_get_disp(a->var);
 
     d->prev_scr = lv_scr_act();
     d->act_scr = a->var;
@@ -923,7 +923,7 @@ static void set_y_anim(void * obj, int32_t v)
 
 static void scr_anim_ready(lv_anim_t * a)
 {
-    lv_disp_t * d = lv_obj_get_disp(a->var);
+    lv_display_t * d = lv_obj_get_disp(a->var);
 
     lv_obj_send_event(d->act_scr, LV_EVENT_SCREEN_LOADED, NULL);
     lv_obj_send_event(d->prev_scr, LV_EVENT_SCREEN_UNLOADED, NULL);
@@ -948,7 +948,7 @@ static bool is_out_anim(lv_scr_load_anim_t anim_type)
 static void disp_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_disp_t * disp = lv_event_get_target(e);
+    lv_display_t * disp = lv_event_get_target(e);
     switch(code) {
         case LV_EVENT_REFR_REQUEST:
             if(disp->refr_timer) lv_timer_resume(disp->refr_timer);

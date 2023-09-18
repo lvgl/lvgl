@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_TFT_ESPI_H
-#define LV_TFT_ESPI_H
+#ifndef LV_LINUX_FB_DEV_H
+#define LV_LINUX_FB_DEV_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,9 +13,10 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "../../../disp/lv_disp.h"
 
-#if LV_USE_TFT_ESPI
+#include "../../../display/lv_display.h"
+
+#if LV_USE_LINUX_FBDEV
 
 /*********************
  *      DEFINES
@@ -28,16 +29,18 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_disp_t * lv_tft_espi_create(uint32_t hor_res, uint32_t ver_res, void * buf, uint32_t buf_size_bytes);
+lv_display_t * lv_linux_fbdev_create(void);
+
+void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /* LV_USE_TFT_ESPI */
+#endif /* LV_USE_LINUX_FBDEV */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* LV_TFT_ESPI_H */
+#endif /* LV_LINUX_FB_DEV_H */

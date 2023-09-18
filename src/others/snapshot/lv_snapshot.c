@@ -10,9 +10,9 @@
 #if LV_USE_SNAPSHOT
 
 #include <stdbool.h>
-#include "../../disp/lv_disp.h"
+#include "../../display/lv_display.h"
 #include "../../core/lv_refr.h"
-#include "../../disp/lv_disp_private.h"
+#include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -80,10 +80,10 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf)
  * @param buf    the buffer to store image data.
  * @param buff_size provided buffer size in bytes.
  *
- * @return LV_RES_OK on success, LV_RES_INV on error.
+ * @return LV_RESULT_OK on success, LV_RESULT_INVALID on error.
  */
-lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf,
-                                 uint32_t buff_size)
+lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf,
+                                    uint32_t buff_size)
 {
     LV_ASSERT_NULL(obj);
     LV_ASSERT_NULL(dsc);
@@ -97,10 +97,10 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_
             break;
         default:
             LV_LOG_WARN("Not supported color format");
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
     }
 
-    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size || buff_size == 0) return LV_RES_INV;
+    if(lv_snapshot_buf_size_needed(obj, cf) > buff_size || buff_size == 0) return LV_RESULT_INVALID;
 
     /*Width and height determine snapshot image size.*/
     lv_coord_t w = lv_obj_get_width(obj);
@@ -139,7 +139,7 @@ lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_
     }
 
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /** Take snapshot for object with its children, alloc the memory needed.
@@ -168,7 +168,7 @@ lv_image_dsc_t * lv_snapshot_take(lv_obj_t * obj, lv_color_format_t cf)
         return NULL;
     }
 
-    if(lv_snapshot_take_to_buf(obj, cf, dsc, buf, buff_size) == LV_RES_INV) {
+    if(lv_snapshot_take_to_buf(obj, cf, dsc, buf, buff_size) == LV_RESULT_INVALID) {
         lv_free(buf);
         lv_free(dsc);
         return NULL;

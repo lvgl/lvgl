@@ -10,7 +10,7 @@
 #include "lv_obj.h"
 #include "../indev/lv_indev.h"
 #include "../indev/lv_indev_scroll.h"
-#include "../disp/lv_disp.h"
+#include "../display/lv_display.h"
 
 /*********************
  *      DEFINES
@@ -306,14 +306,14 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enab
 {
     if(dx == 0 && dy == 0) return;
     if(anim_en == LV_ANIM_ON) {
-        lv_disp_t * d = lv_obj_get_disp(obj);
+        lv_display_t * d = lv_obj_get_disp(obj);
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
         lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
 
         if(dx) {
-            uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 2) >> 2, 0, dx);
+            uint32_t t = lv_anim_speed_to_time((lv_display_get_horizontal_resolution(d) * 2) >> 2, 0, dx);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);
@@ -322,14 +322,14 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enab
             lv_anim_set_exec_cb(&a, scroll_x_anim);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
 
-            lv_res_t res;
+            lv_result_t res;
             res = lv_obj_send_event(obj, LV_EVENT_SCROLL_BEGIN, &a);
-            if(res != LV_RES_OK) return;
+            if(res != LV_RESULT_OK) return;
             lv_anim_start(&a);
         }
 
         if(dy) {
-            uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 2) >> 2, 0, dy);
+            uint32_t t = lv_anim_speed_to_time((lv_display_get_vertical_resolution(d) * 2) >> 2, 0, dy);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);
@@ -338,9 +338,9 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enab
             lv_anim_set_exec_cb(&a,  scroll_y_anim);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
 
-            lv_res_t res;
+            lv_result_t res;
             res = lv_obj_send_event(obj, LV_EVENT_SCROLL_BEGIN, &a);
-            if(res != LV_RES_OK) return;
+            if(res != LV_RESULT_OK) return;
             lv_anim_start(&a);
         }
     }
@@ -349,15 +349,15 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enab
         lv_anim_del(obj, scroll_y_anim);
         lv_anim_del(obj, scroll_x_anim);
 
-        lv_res_t res;
+        lv_result_t res;
         res = lv_obj_send_event(obj, LV_EVENT_SCROLL_BEGIN, NULL);
-        if(res != LV_RES_OK) return;
+        if(res != LV_RESULT_OK) return;
 
         res = _lv_obj_scroll_by_raw(obj, dx, dy);
-        if(res != LV_RES_OK) return;
+        if(res != LV_RESULT_OK) return;
 
         res = lv_obj_send_event(obj, LV_EVENT_SCROLL_END, NULL);
-        if(res != LV_RES_OK) return;
+        if(res != LV_RESULT_OK) return;
     }
 }
 
@@ -411,9 +411,9 @@ void lv_obj_scroll_to_view_recursive(lv_obj_t * obj, lv_anim_enable_t anim_en)
     }
 }
 
-lv_res_t _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+lv_result_t _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
-    if(x == 0 && y == 0) return LV_RES_OK;
+    if(x == 0 && y == 0) return LV_RESULT_OK;
 
     lv_obj_allocate_spec_attr(obj);
 
@@ -421,10 +421,10 @@ lv_res_t _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->spec_attr->scroll.y += y;
 
     lv_obj_move_children_by(obj, x, y, true);
-    lv_res_t res = lv_obj_send_event(obj, LV_EVENT_SCROLL, NULL);
-    if(res != LV_RES_OK) return res;
+    lv_result_t res = lv_obj_send_event(obj, LV_EVENT_SCROLL, NULL);
+    if(res != LV_RESULT_OK) return res;
     lv_obj_invalidate(obj);
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 
@@ -785,9 +785,9 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     bool y_del = lv_anim_del(parent, scroll_y_anim);
     bool x_del = lv_anim_del(parent, scroll_x_anim);
     if(y_del || x_del) {
-        lv_res_t res;
+        lv_result_t res;
         res = lv_obj_send_event(parent, LV_EVENT_SCROLL_END, NULL);
-        if(res != LV_RES_OK) return;
+        if(res != LV_RESULT_OK) return;
     }
 
     if((scroll_dir & LV_DIR_LEFT) == 0 && x_scroll < 0) x_scroll = 0;

@@ -209,7 +209,7 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 }
 
 
-lv_res_t lv_mem_test_core(void)
+lv_result_t lv_mem_test_core(void)
 {
 #if LV_USE_OS
     lv_mutex_lock(&state.mutex);
@@ -219,7 +219,7 @@ lv_res_t lv_mem_test_core(void)
 #if LV_USE_OS
         lv_mutex_unlock(&state.mutex);
 #endif
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_pool_t * pool_p;
@@ -229,7 +229,7 @@ lv_res_t lv_mem_test_core(void)
 #if LV_USE_OS
             lv_mutex_unlock(&state.mutex);
 #endif
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
     }
 
@@ -237,7 +237,7 @@ lv_res_t lv_mem_test_core(void)
 #if LV_USE_OS
     lv_mutex_unlock(&state.mutex);
 #endif
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /**********************

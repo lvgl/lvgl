@@ -64,10 +64,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
-static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                  const lv_area_t * full_area, lv_area_t * decoded_area);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata);
@@ -98,7 +98,7 @@ void lv_jpg_init(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
@@ -115,7 +115,7 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
             header->w = img_dsc->header.w;
             header->h = img_dsc->header.h;
             header->stride = img_dsc->header.w * 3;
-            return LV_RES_OK;
+            return LV_RESULT_OK;
 
         }
     }
@@ -125,7 +125,7 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
             lv_fs_file_t f;
             lv_fs_res_t res;
             res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
-            if(res != LV_FS_RES_OK) return LV_RES_INV;
+            if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
 
             uint8_t workb[TJPGD_WORKBUFF_SIZE];
             JDEC jd;
@@ -133,7 +133,7 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
             if(rc) {
                 LV_LOG_WARN("jd_prepare error: %d", rc);
                 lv_fs_close(&f);
-                return LV_RES_INV;
+                return LV_RESULT_INVALID;
             }
             header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
@@ -142,10 +142,10 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
             header->stride = jd.width * 3;
 
             lv_fs_close(&f);
-            return LV_RES_OK;
+            return LV_RESULT_OK;
         }
     }
-    return LV_RES_INV;
+    return LV_RESULT_INVALID;
 }
 
 static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
@@ -167,7 +167,7 @@ static size_t input_func(JDEC * jd, uint8_t * buff, size_t ndata)
     return 0;
 }
 
-static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
     lv_fs_file_t * f = lv_malloc(sizeof(lv_fs_file_t));
@@ -180,7 +180,7 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
             res = lv_fs_open(f, (const char *)&path, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
                 lv_free(f);
-                return LV_RES_INV;
+                return LV_RESULT_INVALID;
             }
         }
     }
@@ -191,7 +191,7 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
             res = lv_fs_open(f, fn, LV_FS_MODE_RD);
             if(res != LV_FS_RES_OK) {
                 lv_free(f);
-                return LV_RES_INV;
+                return LV_RESULT_INVALID;
             }
         }
     }
@@ -211,13 +211,13 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
     if(rc != JDR_OK) {
         lv_free(workb_temp);
         lv_free(jd);
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
-static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                  const lv_area_t * full_area, lv_area_t * decoded_area)
 {
     LV_UNUSED(decoder);
@@ -263,7 +263,7 @@ static lv_res_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_
                        decoded_area->y1); /* Output the MCU (YCbCr to RGB, scaling and output) */
     if(rc != JDR_OK) return rc;
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /**

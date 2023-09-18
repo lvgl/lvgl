@@ -66,10 +66,10 @@ uint32_t lv_snapshot_buf_size_needed(lv_obj_t * obj, lv_color_format_t cf);
  * @param buf   the buffer to store image data.
  * @param buff_size provided buffer size in bytes.
  *
- * @return LV_RES_OK on success, LV_RES_INV on error.
+ * @return LV_RESULT_OK on success, LV_RESULT_INVALID on error.
  */
-lv_res_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf,
-                                 uint32_t buff_size);
+lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_image_dsc_t * dsc, void * buf,
+                                    uint32_t buff_size);
 
 
 /**********************

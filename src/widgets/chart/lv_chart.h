@@ -189,14 +189,14 @@ void lv_chart_set_div_line_count(lv_obj_t * obj, uint8_t hdiv, uint8_t vdiv);
 /**
  * Zoom into the chart in X direction
  * @param obj       pointer to a chart object
- * @param zoom_x    zoom in x direction. LV_ZOOM_NONE or 256 for no zoom, 512 double zoom
+ * @param zoom_x    zoom in x direction. LV_SCALE_NONE or 256 for no zoom, 512 double zoom
  */
 void lv_chart_set_zoom_x(lv_obj_t * obj, uint16_t zoom_x);
 
 /**
  * Zoom into the chart in Y direction
  * @param obj       pointer to a chart object
- * @param zoom_y    zoom in y direction. LV_ZOOM_NONE or 256 for no zoom, 512 double zoom
+ * @param zoom_y    zoom in y direction. LV_SCALE_NONE or 256 for no zoom, 512 double zoom
  */
 void lv_chart_set_zoom_y(lv_obj_t * obj, uint16_t zoom_y);
 

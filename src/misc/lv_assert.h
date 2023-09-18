@@ -67,7 +67,7 @@ extern "C" {
 #endif
 
 #if LV_USE_ASSERT_MEM_INTEGRITY
-#   define LV_ASSERT_MEM_INTEGRITY() LV_ASSERT_MSG(lv_mem_test() == LV_RES_OK, "Memory integrity error");
+#   define LV_ASSERT_MEM_INTEGRITY() LV_ASSERT_MSG(lv_mem_test() == LV_RESULT_OK, "Memory integrity error");
 #else
 #   define LV_ASSERT_MEM_INTEGRITY()
 #endif

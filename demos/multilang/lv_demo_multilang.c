@@ -249,8 +249,8 @@ static void inactive_timer_cb(lv_timer_t * t)
         return;
     }
 
-    if(lv_disp_get_inactive_time(NULL) > 8000) {
-        lv_disp_trig_activity(NULL);
+    if(lv_display_get_inactive_time(NULL) > 8000) {
+        lv_display_trig_activity(NULL);
         lv_obj_scroll_by(cont, 100, 0, LV_ANIM_ON);
         lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
         scrolled = true;

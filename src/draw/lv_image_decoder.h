@@ -53,18 +53,18 @@ struct _lv_image_decoder_t;
  * @param src the image source. Can be a pointer to a C array or a file name (Use
  * `lv_image_src_get_type` to determine the type)
  * @param header store the info here
- * @return LV_RES_OK: info written correctly; LV_RES_INV: failed
+ * @return LV_RESULT_OK: info written correctly; LV_RESULT_INVALID: failed
  */
-typedef lv_res_t (*lv_image_decoder_info_f_t)(struct _lv_image_decoder_t * decoder, const void * src,
-                                              lv_image_header_t * header);
+typedef lv_result_t (*lv_image_decoder_info_f_t)(struct _lv_image_decoder_t * decoder, const void * src,
+                                                 lv_image_header_t * header);
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
  * @param decoder pointer to the decoder the function associated with
  * @param dsc pointer to decoder descriptor. `src`, `color` are already initialized in it.
  */
-typedef lv_res_t (*lv_image_decoder_open_f_t)(struct _lv_image_decoder_t * decoder,
-                                              struct _lv_image_decoder_dsc_t * dsc);
+typedef lv_result_t (*lv_image_decoder_open_f_t)(struct _lv_image_decoder_t * decoder,
+                                                 struct _lv_image_decoder_dsc_t * dsc);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
@@ -75,11 +75,11 @@ typedef lv_res_t (*lv_image_decoder_open_f_t)(struct _lv_image_decoder_t * decod
  * @param y start y coordinate
  * @param len number of pixels to decode
  * @param buf a buffer to store the decoded pixels
- * @return LV_RES_OK: ok; LV_RES_INV: failed
+ * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed
  */
-typedef lv_res_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t * decoder,
-                                                   struct _lv_image_decoder_dsc_t * dsc,
-                                                   const lv_area_t * full_area, lv_area_t * decoded_area);
+typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t * decoder,
+                                                      struct _lv_image_decoder_dsc_t * dsc,
+                                                      const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
  * Close the pending decoding. Free resources etc.
@@ -153,9 +153,9 @@ void _lv_image_decoder_init(void);
  *  2) Variable: Pointer to an `lv_image_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
  * @param header the image info will be stored here
- * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
+ * @return LV_RESULT_OK: success; LV_RESULT_INVALID: wasn't able to get info about the image
  */
-lv_res_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header);
+lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header);
 
 /**
  * Open an image.
@@ -167,10 +167,10 @@ lv_res_t lv_image_decoder_get_info(const void * src, lv_image_header_t * header)
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
  * @param color The color of the image with `LV_IMAGE_CF_ALPHA_...`
  * @param frame_id the index of the frame. Used only with animated images, set 0 for normal images
- * @return LV_RES_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
- *         LV_RES_INV: none of the registered image decoders were able to open the image.
+ * @return LV_RESULT_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
+ *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
-lv_res_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id);
+lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id);
 
 /**
  * Read a line from an opened image
@@ -179,9 +179,10 @@ lv_res_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, l
  * @param y start Y coordinate (from top)
  * @param len number of pixels to read
  * @param buf store the data here
- * @return LV_RES_OK: success; LV_RES_INV: an error occurred
+ * @return LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
  */
-lv_res_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area, lv_area_t * decoded_area);
+lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
+                                      lv_area_t * decoded_area);
 
 /**
  * Close a decoding session
@@ -234,23 +235,20 @@ void lv_image_decoder_set_close_cb(lv_image_decoder_t * decoder, lv_image_decode
  * @param decoder the decoder where this function belongs
  * @param src the image source: pointer to an `lv_image_dsc_t` variable, a file path or a symbol
  * @param header store the image data here
- * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
+ * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
  */
-lv_res_t lv_image_decoder_built_in_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+lv_result_t lv_image_decoder_built_in_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
 
-lv_res_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                            const lv_area_t * full_area, lv_area_t * decoded_area);
-
-lv_res_t lv_img_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                          const lv_area_t * full_area, lv_area_t * decoded_area);
+lv_result_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                               const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
  * Open a built in image
  * @param decoder the decoder where this function belongs
  * @param dsc pointer to decoder descriptor. `src`, `style` are already initialized in it.
- * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
+ * @return LV_RESULT_OK: the info is successfully stored in `header`; LV_RESULT_INVALID: unknown format or other error.
  */
-lv_res_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+lv_result_t lv_image_decoder_built_in_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 
 /**
  * Close the pending decoding. Free resources etc.

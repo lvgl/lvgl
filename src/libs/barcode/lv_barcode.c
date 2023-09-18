@@ -83,17 +83,17 @@ void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale)
     barcode->scale = scale;
 }
 
-lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
+lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(data);
 
-    lv_res_t res = LV_RES_INV;
+    lv_result_t res = LV_RESULT_INVALID;
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
     if(data == NULL || lv_strlen(data) == 0) {
         LV_LOG_WARN("data is empty");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     size_t len = code128_estimate_len(data);
@@ -103,7 +103,7 @@ lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
     LV_ASSERT_MALLOC(out_buf);
     if(!out_buf) {
         LV_LOG_ERROR("malloc failed for out_buf");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_coord_t barcode_w = code128_encode_gs1(data, out_buf, len);
@@ -127,7 +127,7 @@ lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
         }
     }
 
-    res = LV_RES_OK;
+    res = LV_RESULT_OK;
 
 failed:
     lv_free(out_buf);

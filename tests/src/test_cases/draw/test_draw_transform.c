@@ -58,24 +58,24 @@ static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
-    dsc->angle = 900;
+    dsc->rotation = 900;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
-    dsc->angle = 1800;
+    dsc->rotation = 1800;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 110, 0);
-    dsc->angle = -900;
+    dsc->rotation = -900;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 150, 0);
-    dsc->angle = 300;
+    dsc->rotation = 300;
     lv_draw_image(layer, dsc, &area);
 
     dsc->pivot.x = 0;
     dsc->pivot.y = 0;
-    dsc->angle = 300;
+    dsc->rotation = 300;
     lv_area_move(&area, 150, 0);
     lv_draw_image(layer, dsc, &area);
 
@@ -86,7 +86,7 @@ static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
     area.y2 = 249;
     dsc->pivot.x = 50;
     dsc->pivot.y = 50;
-    dsc->angle = 0;
+    dsc->rotation = 0;
     dsc->zoom = 128;
     lv_draw_image(layer, dsc, &area);
 
@@ -105,7 +105,7 @@ static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
     lv_draw_image(layer, dsc, &area);
 
     /* Zoom + Angle*/
-    dsc->angle = 650;
+    dsc->rotation = 650;
     dsc->zoom = 200;
     lv_area_move(&area, 200, 0);
     lv_draw_image(layer, dsc, &area);
@@ -126,22 +126,22 @@ static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
     area.y2 = 409;
     dsc->pivot.x = 50;
     dsc->pivot.y = 50;
-    dsc->angle = 0;
+    dsc->rotation = 0;
     dsc->zoom = 256;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 180, 0);
-    dsc->angle = 300;
+    dsc->rotation = 300;
     dsc->zoom = 200;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 150, 0);
-    dsc->angle = 1400;
+    dsc->rotation = 1400;
     dsc->zoom = 150;
     lv_draw_image(layer, dsc, &area);
 
     lv_area_move(&area, 120, 0);
-    dsc->angle = 2000;
+    dsc->rotation = 2000;
     dsc->zoom = 100;
     lv_draw_image(layer, dsc, &area);
 }

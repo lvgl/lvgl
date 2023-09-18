@@ -180,8 +180,8 @@ static void lv_imgbtn_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res = lv_obj_event_base(&lv_imgbtn_class, e);
-    if(res != LV_RES_OK) return;
+    lv_result_t res = lv_obj_event_base(&lv_imgbtn_class, e);
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -366,8 +366,8 @@ static void update_src_info(lv_imgbtn_src_info_t * info, const void * src)
         return;
     }
 
-    lv_res_t res = lv_image_decoder_get_info(src, &info->header);
-    if(res != LV_RES_OK) {
+    lv_result_t res = lv_image_decoder_get_info(src, &info->header);
+    if(res != LV_RESULT_OK) {
         LV_LOG_WARN("can't get info");
         return;
     }

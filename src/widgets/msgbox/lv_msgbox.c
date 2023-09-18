@@ -13,7 +13,7 @@
 #include "../button/lv_button.h"
 #include "../buttonmatrix/lv_buttonmatrix.h"
 #include "../../misc/lv_assert.h"
-#include "../../disp/lv_disp.h"
+#include "../../display/lv_display.h"
 #include "../../layouts/flex/lv_flex.h"
 #include "../../stdlib/lv_string.h"
 

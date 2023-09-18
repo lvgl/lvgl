@@ -17,7 +17,7 @@
 #include "../../draw/lv_image_decoder.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_fs.h"
-#include "../../misc/lv_txt.h"
+#include "../../misc/lv_text.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_anim.h"

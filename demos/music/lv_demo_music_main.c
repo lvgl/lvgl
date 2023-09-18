@@ -281,7 +281,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_set_var(&a, album_image_obj);
     lv_anim_set_time(&a, 1000);
     lv_anim_set_delay(&a, INTRO_TIME + 1000);
-    lv_anim_set_values(&a, 1, LV_ZOOM_NONE);
+    lv_anim_set_values(&a, 1, LV_SCALE_NONE);
     lv_anim_set_exec_cb(&a, _image_set_zoom_anim_cb);
     lv_anim_set_ready_cb(&a, NULL);
     lv_anim_start(&a);
@@ -305,7 +305,7 @@ lv_obj_t * _lv_demo_music_main_create(lv_obj_t * parent)
     lv_anim_set_var(&a, logo);
     lv_anim_set_time(&a, 400);
     lv_anim_set_delay(&a, INTRO_TIME + 800);
-    lv_anim_set_values(&a, LV_ZOOM_NONE, 10);
+    lv_anim_set_values(&a, LV_SCALE_NONE, 10);
     lv_anim_set_ready_cb(&a, lv_obj_del_anim_ready_cb);
     lv_anim_start(&a);
 
@@ -373,7 +373,7 @@ void _lv_demo_music_pause(void)
     spectrum_i = 0;
     lv_anim_del(spectrum_obj, spectrum_anim_cb);
     lv_obj_invalidate(spectrum_obj);
-    lv_image_set_zoom(album_image_obj, LV_ZOOM_NONE);
+    lv_image_set_zoom(album_image_obj, LV_SCALE_NONE);
     if(sec_counter_timer) lv_timer_pause(sec_counter_timer);
     lv_obj_clear_state(play_obj, LV_STATE_CHECKED);
 }
@@ -720,7 +720,7 @@ static void track_load(uint32_t id)
     lv_anim_set_path_cb(&a, lv_anim_path_linear);
     lv_anim_set_var(&a, album_image_obj);
     lv_anim_set_time(&a, 500);
-    lv_anim_set_values(&a, LV_ZOOM_NONE, LV_ZOOM_NONE / 2);
+    lv_anim_set_values(&a, LV_SCALE_NONE, LV_SCALE_NONE / 2);
     lv_anim_set_exec_cb(&a, _image_set_zoom_anim_cb);
     lv_anim_set_ready_cb(&a, NULL);
     lv_anim_start(&a);
@@ -731,7 +731,7 @@ static void track_load(uint32_t id)
     lv_anim_set_var(&a, album_image_obj);
     lv_anim_set_time(&a, 500);
     lv_anim_set_delay(&a, 100);
-    lv_anim_set_values(&a, LV_ZOOM_NONE / 4, LV_ZOOM_NONE);
+    lv_anim_set_values(&a, LV_SCALE_NONE / 4, LV_SCALE_NONE);
     lv_anim_set_exec_cb(&a, _image_set_zoom_anim_cb);
     lv_anim_set_ready_cb(&a, NULL);
     lv_anim_start(&a);
@@ -924,7 +924,7 @@ static void spectrum_anim_cb(void * a, int32_t v)
     }
     if(spectrum[spectrum_i][0] < 4) bar_rot += dir;
 
-    lv_image_set_zoom(album_image_obj, LV_ZOOM_NONE + spectrum[spectrum_i][0]);
+    lv_image_set_zoom(album_image_obj, LV_SCALE_NONE + spectrum[spectrum_i][0]);
 }
 
 static void start_anim_cb(void * a, int32_t v)

@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../disp/lv_disp.h"
+#include "../../../display/lv_display.h"
 
 #if LV_USE_NUTTX_LCD
 
@@ -30,7 +30,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_disp_t * lv_nuttx_lcd_create(const char * dev_path);
+lv_display_t * lv_nuttx_lcd_create(const char * dev_path);
 
 /**********************
  *      MACROS

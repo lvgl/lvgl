@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "../lv_theme.h"
-#include "../../disp/lv_disp.h"
+#include "../../display/lv_display.h"
 
 #if LV_USE_THEME_BASIC
 
@@ -35,7 +35,7 @@ extern "C" {
  * @param disp pointer to display to attach the theme
  * @return a pointer to reference this theme later
  */
-lv_theme_t * lv_theme_basic_init(lv_disp_t * disp);
+lv_theme_t * lv_theme_basic_init(lv_display_t * disp);
 
 /**
 * Check if the theme is initialized

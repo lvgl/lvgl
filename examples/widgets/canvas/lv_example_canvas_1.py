@@ -72,7 +72,7 @@ canvas.fill_bg(lv.palette_lighten(lv.PALETTE.GREY, 3), lv.OPA.COVER)
 
 image_dsc = lv.draw_image_dsc_t()
 image_dsc.init();
-image_dsc.angle = 120;
+image_dsc.rotation = 120;
 image_dsc.src = image;
 image_dsc.pivot.x = _CANVAS_WIDTH // 2;
 image_dsc.pivot.y = _CANVAS_HEIGHT // 2;

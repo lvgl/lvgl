@@ -1,10 +1,10 @@
 /**
- * @file lv_txt_ap.h
+ * @file lv_text_ap.h
  *
  */
 
-#ifndef LV_TXT_AP_H
-#define LV_TXT_AP_H
+#ifndef LV_TEXT_AP_H
+#define LV_TEXT_AP_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include <stddef.h>
-#include "lv_txt.h"
+#include "lv_text.h"
 #include "../draw/lv_draw.h"
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
@@ -33,8 +33,8 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt);
-void _lv_txt_ap_proc(const char * txt, char * txt_out);
+uint32_t _lv_text_ap_calc_bytes_cnt(const char * txt);
+void _lv_text_ap_proc(const char * txt, char * txt_out);
 
 /**********************
  *      MACROS
@@ -46,4 +46,4 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out);
 } /*extern "C"*/
 #endif
 
-#endif /*LV_TXT_AP_H*/
+#endif /*LV_TEXT_AP_H*/

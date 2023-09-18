@@ -219,7 +219,7 @@ static void style_init(struct _my_theme_t * theme)
         LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
         LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
         LV_STYLE_TRANSLATE_Y, LV_STYLE_TRANSLATE_X,
-        LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE,
+        LV_STYLE_TRANSFORM_SCALE, LV_STYLE_TRANSFORM_ROTATION,
         LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_DSC,
         0
     };
@@ -664,7 +664,7 @@ static void style_init(struct _my_theme_t * theme)
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, lv_color_t color_secondary, bool dark,
+lv_theme_t * lv_theme_default_init(lv_display_t * disp, lv_color_t color_primary, lv_color_t color_secondary, bool dark,
                                    const lv_font_t * font)
 {
     /*This trick is required only to avoid the garbage collection of
@@ -678,9 +678,9 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
 
     struct _my_theme_t * theme = theme_def;
 
-    lv_disp_t * new_disp = disp == NULL ? lv_disp_get_default() : disp;
-    lv_coord_t new_dpi = lv_disp_get_dpi(new_disp);
-    lv_coord_t hor_res = lv_disp_get_hor_res(new_disp);
+    lv_display_t * new_disp = disp == NULL ? lv_display_get_default() : disp;
+    lv_coord_t new_dpi = lv_display_get_dpi(new_disp);
+    lv_coord_t hor_res = lv_display_get_horizontal_resolution(new_disp);
     disp_size_t new_size;
 
     if(hor_res <= 320) new_size = DISP_SMALL;
@@ -711,7 +711,7 @@ lv_theme_t * lv_theme_default_init(lv_disp_t * disp, lv_color_t color_primary, l
 
     style_init(theme);
 
-    if(disp == NULL || lv_disp_get_theme(disp) == (lv_theme_t *)theme) lv_obj_report_style_change(NULL);
+    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) lv_obj_report_style_change(NULL);
 
     theme->inited = true;
 

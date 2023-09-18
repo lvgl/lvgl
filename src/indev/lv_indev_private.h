@@ -51,7 +51,7 @@ struct _lv_indev_t {
     void * user_data;
 
     /**< Pointer to the assigned display*/
-    struct _lv_disp_t * disp;
+    struct _lv_display_t * disp;
 
     /**< Timer to periodically read the input device*/
     lv_timer_t * read_timer;

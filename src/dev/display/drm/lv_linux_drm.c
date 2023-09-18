@@ -99,7 +99,7 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
 static int drm_setup_buffers(drm_dev_t * drm_dev);
 static void drm_wait_vsync(drm_dev_t * drm_dev);
-static void drm_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p);
+static void drm_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -121,28 +121,28 @@ static void drm_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * col
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_linux_drm_create(void)
+lv_display_t * lv_linux_drm_create(void)
 {
     drm_dev_t * drm_dev = lv_malloc(sizeof(drm_dev_t));
     LV_ASSERT_MALLOC(drm_dev);
     if(drm_dev == NULL) return NULL;
     lv_memzero(drm_dev, sizeof(drm_dev_t));
 
-    lv_disp_t * disp = lv_disp_create(800, 480);
+    lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {
         lv_free(drm_dev);
         return NULL;
     }
     drm_dev->fd = -1;
-    lv_disp_set_driver_data(disp, drm_dev);
-    lv_disp_set_flush_cb(disp, drm_flush);
+    lv_display_set_driver_data(disp, drm_dev);
+    lv_display_set_flush_cb(disp, drm_flush);
 
     return disp;
 }
 
-void lv_linux_drm_set_file(lv_disp_t * disp, const char * file, int64_t connector_id)
+void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id)
 {
-    drm_dev_t * drm_dev = lv_disp_get_driver_data(disp);
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
     int ret;
 
     ret = drm_setup(drm_dev, file, connector_id, DRM_FOURCC);
@@ -168,14 +168,14 @@ void lv_linux_drm_set_file(lv_disp_t * disp, const char * file, int64_t connecto
 
     uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
     lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
-    lv_disp_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISP_RENDER_MODE_PARTIAL);
-    lv_disp_set_res(disp, hor_res, ver_res);
+    lv_display_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_res(disp, hor_res, ver_res);
 
     if(width) {
-        lv_disp_set_dpi(disp, DIV_ROUND_UP(hor_res * 25400, width * 1000));
+        lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 25400, width * 1000));
     }
 
-    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_disp_get_dpi(disp));
+    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_display_get_dpi(disp));
 }
 
 /**********************
@@ -827,9 +827,9 @@ static void drm_wait_vsync(drm_dev_t * drm_dev)
     drm_dev->req = NULL;
 }
 
-static void drm_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
+static void drm_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
 {
-    drm_dev_t * drm_dev = lv_disp_get_driver_data(disp);
+    drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
     drm_buffer_t * fbuf = drm_dev->cur_bufs[1];
     uint32_t w = (area->x2 - area->x1 + 1);
     uint32_t h = (area->y2 - area->y1 + 1);
@@ -865,7 +865,7 @@ static void drm_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * col
 
     drm_dev->cur_bufs[0] = fbuf;
 
-    lv_disp_flush_ready(disp);
+    lv_display_flush_ready(disp);
 }
 
 #endif /*LV_USE_LINUX_DRM*/

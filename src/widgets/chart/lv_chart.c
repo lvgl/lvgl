@@ -188,7 +188,7 @@ void lv_chart_set_zoom_x(lv_obj_t * obj, uint16_t zoom_x)
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->zoom_x == zoom_x) return;
-    if(LV_ZOOM_NONE > zoom_x) zoom_x = LV_ZOOM_NONE;
+    if(LV_SCALE_NONE > zoom_x) zoom_x = LV_SCALE_NONE;
 
     chart->zoom_x = zoom_x;
     lv_obj_refresh_self_size(obj);
@@ -203,7 +203,7 @@ void lv_chart_set_zoom_y(lv_obj_t * obj, uint16_t zoom_y)
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(chart->zoom_y == zoom_y) return;
-    if(LV_ZOOM_NONE > zoom_y) zoom_y = LV_ZOOM_NONE;
+    if(LV_SCALE_NONE > zoom_y) zoom_y = LV_SCALE_NONE;
 
     chart->zoom_y = zoom_y;
     lv_obj_refresh_self_size(obj);
@@ -683,8 +683,8 @@ static void lv_chart_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     chart->pressed_point_id  = LV_CHART_POINT_NONE;
     chart->type        = LV_CHART_TYPE_LINE;
     chart->update_mode = LV_CHART_UPDATE_MODE_SHIFT;
-    chart->zoom_x      = LV_ZOOM_NONE;
-    chart->zoom_y      = LV_ZOOM_NONE;
+    chart->zoom_x      = LV_SCALE_NONE;
+    chart->zoom_y      = LV_SCALE_NONE;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -724,10 +724,10 @@ static void lv_chart_event(const lv_obj_class_t * class_p, lv_event_t * e)
     LV_UNUSED(class_p);
 
     /*Call the ancestor's event handler*/
-    lv_res_t res;
+    lv_result_t res;
 
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -1369,8 +1369,8 @@ static void draw_y_ticks(lv_obj_t * obj, lv_layer_t * layer, lv_chart_axis_t axi
 
             /*reserve appropriate area*/
             lv_point_t size;
-            lv_txt_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                            LV_TEXT_FLAG_NONE);
+            lv_text_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                             LV_TEXT_FLAG_NONE);
 
             /*set the area at some distance of the major tick len left of the tick*/
             lv_area_t a;
@@ -1489,8 +1489,8 @@ static void draw_x_ticks(lv_obj_t * obj, lv_layer_t * layer, lv_chart_axis_t axi
             label_dsc.text_local = true;
             /*reserve appropriate area*/
             lv_point_t size;
-            lv_txt_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                            LV_TEXT_FLAG_NONE);
+            lv_text_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                             LV_TEXT_FLAG_NONE);
 
             /*set the area at some distance of the major tick len under of the tick*/
             lv_area_t a;

@@ -8,7 +8,7 @@
  *********************/
 #include "lv_draw.h"
 #include "sw/lv_draw_sw.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_refr.h"
 #include "../stdlib/lv_string.h"
@@ -122,7 +122,7 @@ void lv_draw_dispatch(void)
 {
     LV_PROFILER_BEGIN;
     bool one_taken = false;
-    lv_disp_t * disp = lv_disp_get_next(NULL);
+    lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         lv_layer_t * layer = disp->layer_head;
         while(layer) {
@@ -134,12 +134,12 @@ void lv_draw_dispatch(void)
         if(!one_taken) {
             lv_draw_dispatch_request();
         }
-        disp = lv_disp_get_next(disp);
+        disp = lv_display_get_next(disp);
     }
     LV_PROFILER_END;
 }
 
-bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer)
+bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer)
 {
     /*Remove the finished tasks first*/
     lv_draw_task_t * t_prev = NULL;
@@ -269,8 +269,8 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
     LV_PROFILER_BEGIN;
     /*If the first task is screen sized, there cannot be independent areas*/
     if(layer->draw_task_head) {
-        lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
-        lv_coord_t ver_res = lv_disp_get_ver_res(_lv_refr_get_disp_refreshing());
+        lv_coord_t hor_res = lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
+        lv_coord_t ver_res = lv_display_get_vertical_resolution(_lv_refr_get_disp_refreshing());
         lv_draw_task_t * t = layer->draw_task_head;
         if(t->state != LV_DRAW_TASK_STATE_QUEUED &&
            t->area.x1 <= 0 && t->area.x2 >= hor_res - 1 &&
@@ -298,7 +298,7 @@ lv_draw_task_t * lv_draw_get_next_available_task(lv_layer_t * layer, lv_draw_tas
 
 lv_layer_t * lv_draw_layer_create(lv_layer_t * parent_layer, lv_color_format_t color_format, const lv_area_t * area)
 {
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = _lv_refr_get_disp_refreshing();
     lv_layer_t * new_layer = lv_malloc(sizeof(lv_layer_t));
     LV_ASSERT_MALLOC(new_layer);
     if(new_layer == NULL) return NULL;

@@ -8,7 +8,7 @@
  *********************/
 #include "core/lv_global.h"
 #include "core/lv_obj.h"
-#include "disp/lv_disp_private.h"
+#include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout.h"
 #include "libs/bmp/lv_bmp.h"
@@ -62,7 +62,7 @@ static inline void lv_global_init(lv_global_t * global)
 
     lv_memset(global, 0, sizeof(lv_global_t));
 
-    _lv_ll_init(&(global->disp_ll), sizeof(lv_disp_t));
+    _lv_ll_init(&(global->disp_ll), sizeof(lv_display_t));
     _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
 
     global->memory_zero = ZERO_MEM_SENTINEL;
@@ -255,7 +255,7 @@ void lv_deinit(void)
     _lv_sysmon_builtin_deinit();
 #endif
 
-    lv_disp_set_default(NULL);
+    lv_display_set_default(NULL);
 
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();

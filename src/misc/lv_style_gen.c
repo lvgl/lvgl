@@ -140,25 +140,25 @@ void lv_style_set_translate_y(lv_style_t * style, lv_coord_t value)
 
 const lv_style_prop_t _lv_style_const_prop_id_TRANSLATE_Y = LV_STYLE_TRANSLATE_Y;
 
-void lv_style_set_transform_zoom(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_scale(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ZOOM, v);
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_SCALE, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_ZOOM = LV_STYLE_TRANSFORM_ZOOM;
+const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_SCALE = LV_STYLE_TRANSFORM_SCALE;
 
-void lv_style_set_transform_angle(lv_style_t * style, lv_coord_t value)
+void lv_style_set_transform_rotation(lv_style_t * style, lv_coord_t value)
 {
     lv_style_value_t v = {
         .num = (int32_t)value
     };
-    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ANGLE, v);
+    lv_style_set_prop(style, LV_STYLE_TRANSFORM_ROTATION, v);
 }
 
-const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_ANGLE = LV_STYLE_TRANSFORM_ANGLE;
+const lv_style_prop_t _lv_style_const_prop_id_TRANSFORM_ROTATION = LV_STYLE_TRANSFORM_ROTATION;
 
 void lv_style_set_transform_pivot_x(lv_style_t * style, lv_coord_t value)
 {

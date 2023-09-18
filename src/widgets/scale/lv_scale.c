@@ -309,8 +309,8 @@ static void lv_scale_event(const lv_obj_class_t * class_p, lv_event_t * event)
     LV_UNUSED(class_p);
 
     /*Call the ancestor's event handler*/
-    lv_res_t res = lv_obj_event_base(MY_CLASS, event);
-    if(res != LV_RES_OK) return;
+    lv_result_t res = lv_obj_event_base(MY_CLASS, event);
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t event_code = lv_event_get_code(event);
     lv_obj_t * obj = lv_event_get_target(event);
@@ -971,8 +971,8 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
 
     /* Reserve appropriate size for the tick label */
     lv_point_t label_size;
-    lv_txt_get_size(&label_size, label_dsc->text,
-                    label_dsc->font, label_dsc->letter_space, label_dsc->line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    lv_text_get_size(&label_size, label_dsc->text,
+                     label_dsc->font, label_dsc->letter_space, label_dsc->line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
     /* Set the label draw area at some distance of the major tick */
     if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
@@ -1025,11 +1025,11 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
 {
     if(section_style) {
         lv_style_value_t value;
-        lv_res_t res;
+        lv_result_t res;
 
         /* Line width */
         res = lv_style_get_prop(section_style, LV_STYLE_LINE_WIDTH, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             line_dsc->width = (lv_coord_t)value.num;
         }
         else {
@@ -1038,7 +1038,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
 
         /* Line color */
         res = lv_style_get_prop(section_style, LV_STYLE_LINE_COLOR, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             line_dsc->color = value.color;
         }
         else {
@@ -1047,7 +1047,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
 
         /* Line opa */
         res = lv_style_get_prop(section_style, LV_STYLE_LINE_OPA, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             line_dsc->opa = (lv_opa_t)value.num;
         }
         else {
@@ -1074,11 +1074,11 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
 {
     if(section_style) {
         lv_style_value_t value;
-        lv_res_t res;
+        lv_result_t res;
 
         /* Line width */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_WIDTH, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             arc_dsc->width = (lv_coord_t)value.num;
         }
         else {
@@ -1087,7 +1087,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
 
         /* Line color */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_COLOR, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             arc_dsc->color = value.color;
         }
         else {
@@ -1096,7 +1096,7 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
 
         /* Line opa */
         res = lv_style_get_prop(section_style, LV_STYLE_ARC_OPA, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             arc_dsc->opa = (lv_opa_t)value.num;
         }
         else {
@@ -1124,11 +1124,11 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
 {
     if(indicator_section_style) {
         lv_style_value_t value;
-        lv_res_t res;
+        lv_result_t res;
 
         /* Text color */
         res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_COLOR, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             label_dsc->color = value.color;
         }
         else {
@@ -1137,7 +1137,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
 
         /* Text opa */
         res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_OPA, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             label_dsc->opa = (lv_opa_t)value.num;
         }
         else {
@@ -1146,7 +1146,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
 
         /* Text letter space */
         res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_LETTER_SPACE, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             label_dsc->letter_space = (lv_coord_t)value.num;
         }
         else {
@@ -1155,7 +1155,7 @@ static void scale_set_indicator_label_properties(lv_obj_t * obj, lv_draw_label_d
 
         /* Text font */
         res = lv_style_get_prop(indicator_section_style, LV_STYLE_TEXT_FONT, &value);
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             label_dsc->font = (const lv_font_t *)value.ptr;
         }
         else {

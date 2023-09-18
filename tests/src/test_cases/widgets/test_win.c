@@ -39,7 +39,7 @@ void test_win_should_have_valid_documented_defualt_values(void)
     TEST_ASSERT_EQUAL(content, lv_obj_get_child(win, 1));
 
     // Check that the header is correctly sized and empty
-    TEST_ASSERT_EQUAL(lv_disp_get_dpi(lv_obj_get_disp(win)) / 2, lv_obj_get_height(header));
+    TEST_ASSERT_EQUAL(lv_display_get_dpi(lv_obj_get_disp(win)) / 2, lv_obj_get_height(header));
     TEST_ASSERT_EQUAL(0, lv_obj_get_child_cnt(header));
 
     // Check that the content is empty

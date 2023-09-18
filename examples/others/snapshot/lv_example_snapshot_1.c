@@ -31,7 +31,7 @@ void lv_example_snapshot_1(void)
     lv_obj_set_style_bg_color(snapshot_obj, lv_palette_main(LV_PALETTE_PURPLE), 0);
     lv_obj_set_style_bg_opa(snapshot_obj, LV_OPA_100, 0);
     lv_image_set_zoom(snapshot_obj, 128);
-    lv_image_set_angle(snapshot_obj, 300);
+    lv_image_set_rotation(snapshot_obj, 300);
 
     /*Create the container and its children*/
     lv_obj_t * container = lv_obj_create(root);
@@ -48,7 +48,7 @@ void lv_example_snapshot_1(void)
         lv_image_set_src(img, &img_star);
         lv_obj_set_style_bg_color(img, lv_color_black(), 0);
         lv_obj_set_style_bg_opa(img, LV_OPA_COVER, 0);
-        //        lv_obj_set_style_transform_zoom(img, 400, LV_STATE_PRESSED);
+        //        lv_obj_set_style_transform_scale(img, 400, LV_STATE_PRESSED);
         lv_obj_add_flag(img, LV_OBJ_FLAG_CLICKABLE);
         lv_obj_add_event(img, event_cb, LV_EVENT_PRESSED, snapshot_obj);
         lv_obj_add_event(img, event_cb, LV_EVENT_RELEASED, snapshot_obj);

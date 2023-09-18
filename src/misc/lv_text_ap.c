@@ -1,5 +1,5 @@
 /**
- * @file lv_txt_ap.c
+ * @file lv_text_ap.c
  *
  */
 
@@ -8,8 +8,8 @@
  *********************/
 #include <stddef.h>
 #include "lv_bidi.h"
-#include "lv_txt.h"
-#include "lv_txt_ap.h"
+#include "lv_text.h"
+#include "lv_text_ap.h"
 #include "../stdlib/lv_mem.h"
 #include "../draw/lv_draw.h"
 
@@ -37,8 +37,8 @@ typedef struct {
  **********************/
 #if LV_USE_ARABIC_PERSIAN_CHARS == 1
 static uint32_t lv_ap_get_char_index(uint16_t c);
-static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next);
-static bool lv_txt_is_arabic_vowel(uint16_t c);
+static uint32_t lv_text_lam_alef(uint32_t ch_curr, uint32_t ch_next);
+static bool lv_text_is_arabic_vowel(uint16_t c);
 
 /**********************
  *  STATIC VARIABLES
@@ -106,7 +106,7 @@ const ap_chars_map_t ap_chars_map[] = {
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
-uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
+uint32_t _lv_text_ap_calc_bytes_cnt(const char * txt)
 {
     uint32_t txt_length = 0;
     uint32_t chars_cnt = 0;
@@ -114,12 +114,12 @@ uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
     uint32_t i, j;
     uint32_t ch_enc;
 
-    txt_length = _lv_txt_get_encoded_length(txt);
+    txt_length = _lv_text_get_encoded_length(txt);
 
     i = 0;
     j = 0;
     while(i < txt_length) {
-        ch_enc = _lv_txt_encoded_next(txt, &j);
+        ch_enc = _lv_text_encoded_next(txt, &j);
         current_ap_idx = lv_ap_get_char_index(ch_enc);
 
         if(current_ap_idx != LV_UNDEF_ARABIC_PERSIAN_CHARS)
@@ -140,7 +140,7 @@ uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
     return chars_cnt + 1;
 }
 
-void _lv_txt_ap_proc(const char * txt, char * txt_out)
+void _lv_text_ap_proc(const char * txt, char * txt_out)
 {
     uint32_t txt_length = 0;
     uint32_t index_current, idx_next, idx_previous, i, j;
@@ -148,7 +148,7 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
     uint32_t * ch_fin;
     char * txt_out_temp;
 
-    txt_length = _lv_txt_get_encoded_length(txt);
+    txt_length = _lv_text_get_encoded_length(txt);
 
     ch_enc = (uint32_t *)lv_malloc(sizeof(uint32_t) * (txt_length + 1));
     ch_fin = (uint32_t *)lv_malloc(sizeof(uint32_t) * (txt_length + 1));
@@ -156,7 +156,7 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
     i = 0;
     j = 0;
     while(j < txt_length)
-        ch_enc[j++] = _lv_txt_encoded_next(txt, &i);
+        ch_enc[j++] = _lv_text_encoded_next(txt, &i);
 
     ch_enc[j] = 0;
 
@@ -167,13 +167,13 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
         index_current = lv_ap_get_char_index(ch_enc[i]);
         idx_next = lv_ap_get_char_index(ch_enc[i + 1]);
 
-        if(lv_txt_is_arabic_vowel(ch_enc[i])) {  // Current character is a vowel
+        if(lv_text_is_arabic_vowel(ch_enc[i])) {  // Current character is a vowel
             ch_fin[j] = ch_enc[i];
             i++;
             j++;
             continue;   // Skip this character
         }
-        else if(lv_txt_is_arabic_vowel(ch_enc[i + 1])) {    // Next character is a vowel
+        else if(lv_text_is_arabic_vowel(ch_enc[i + 1])) {    // Next character is a vowel
             idx_next = lv_ap_get_char_index(ch_enc[i + 2]); // Skip the vowel character to join with the character after it
         }
 
@@ -190,7 +190,7 @@ void _lv_txt_ap_proc(const char * txt, char * txt_out)
         uint8_t conjunction_to_next = ((i == txt_length - 1) ||
                                        idx_next == LV_UNDEF_ARABIC_PERSIAN_CHARS) ? 0 : ap_chars_map[idx_next].ap_chars_conjunction.conj_to_previous;
 
-        uint32_t lam_alef = lv_txt_lam_alef(index_current, idx_next);
+        uint32_t lam_alef = lv_text_lam_alef(index_current, idx_next);
         if(lam_alef) {
             if(conjunction_to_previuse) {
                 lam_alef ++;
@@ -268,7 +268,7 @@ static uint32_t lv_ap_get_char_index(uint16_t c)
     return LV_UNDEF_ARABIC_PERSIAN_CHARS;
 }
 
-static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next)
+static uint32_t lv_text_lam_alef(uint32_t ch_curr, uint32_t ch_next)
 {
     uint32_t ch_code = 0;
     if(ap_chars_map[ch_curr].char_offset != 34) {
@@ -293,7 +293,7 @@ static uint32_t lv_txt_lam_alef(uint32_t ch_curr, uint32_t ch_next)
     return 0;
 }
 
-static bool lv_txt_is_arabic_vowel(uint16_t c)
+static bool lv_text_is_arabic_vowel(uint16_t c)
 {
     return (c >= 0x064B) && (c <= 0x0652);
 }

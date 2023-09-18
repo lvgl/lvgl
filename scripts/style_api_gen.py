@@ -58,11 +58,11 @@ props = [
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
  'dsc': "Move the object with this value in Y direction. Applied after layouts, aligns and other positioning. Pixel and percentage (with `lv_pct(x)`) values can be used. Percentage values are relative to the object's height." },
 
-{'name': 'TRANSFORM_ZOOM',
+{'name': 'TRANSFORM_SCALE',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
- 'dsc': "Zoom an objects. The value 256 (or `LV_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on" },
+ 'dsc': "Zoom an objects. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on" },
 
-{'name': 'TRANSFORM_ANGLE',
+{'name': 'TRANSFORM_ROTATION',
  'style_type': 'num',   'var_type': 'lv_coord_t',  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 1,
  'dsc': "Rotate an objects. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg."},
 
@@ -149,23 +149,23 @@ props = [
  'style_type': 'num',   'var_type': 'lv_dither_mode_t',  'default':'`LV_DITHER_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the dithering mode of the gradient of the background. The possible values are `LV_DITHER_NONE/ORDERED/ERR_DIFF`."},
 
-{'name': 'BG_IMG_SRC',
+{'name': 'BG_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 1,
  'dsc': "Set a background image. Can be a pointer to `lv_image_dsc_t`, a path to a file or an `LV_SYMBOL_...`"},
 
-{'name': 'BG_IMG_OPA',
+{'name': 'BG_IMAGE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
-{'name': 'BG_IMG_RECOLOR',
+{'name': 'BG_IMAGE_RECOLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set a color to mix to the background image."},
 
-{'name': 'BG_IMG_RECOLOR_OPA',
+{'name': 'BG_IMAGE_RECOLOR_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t',  'default':'`LV_OPA_TRANSP`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 255, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other values or LV_OPA_10, LV_OPA_20, etc are interpreted proportionally."},
 
-{'name': 'BG_IMG_TILED',
+{'name': 'BG_IMAGE_TILED',
  'style_type': 'num',   'var_type': 'bool',  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "If enabled the background image will be tiled. The possible values are `true` or `false`."},
 
@@ -233,15 +233,15 @@ props = [
  'dsc': "Set the opacity of the shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
 {'section': 'Image', 'dsc':'Properties to describe the images' },
-{'name': 'IMG_OPA',
+{'name': 'IMAGE_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
-{'name': 'IMG_RECOLOR',
+{'name': 'IMAGE_RECOLOR',
  'style_type': 'color', 'var_type': 'lv_color_t',  'default':'`0x000000`', 'inherited': 0, 'layout': 0, 'ext_draw': 0, 'filtered': 1,
  'dsc': "Set color to mixt to the image."},
 
-{'name': 'IMG_RECOLOR_OPA',
+{'name': 'IMAGE_RECOLOR_OPA',
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':0, 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the intensity of the color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency."},
 
@@ -287,7 +287,7 @@ props = [
  'style_type': 'num',   'var_type': 'lv_opa_t' ,  'default':'`LV_OPA_COVER`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set the opacity of the arcs."},
 
-{'name': 'ARC_IMG_SRC',
+{'name': 'ARC_IMAGE_SRC',
  'style_type': 'ptr',   'var_type': 'const void *',  'default':'`NULL`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
  'dsc': "Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file"},
 

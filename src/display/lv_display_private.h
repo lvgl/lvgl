@@ -1,10 +1,10 @@
 /**
- * @file lv_disp_private.h
+ * @file lv_display_private.h
  *
  */
 
-#ifndef LV_DISP_PRIVATE_H
-#define LV_DISP_PRIVATE_H
+#ifndef LV_DISPLAY_PRIVATE_H
+#define LV_DISPLAY_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../core/lv_obj.h"
 #include "../draw/lv_draw.h"
-#include "lv_disp.h"
+#include "lv_display.h"
 
 /*********************
  *      DEFINES
@@ -28,9 +28,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_disp_t;
+struct _lv_display_t;
 
-struct _lv_disp_t {
+struct _lv_display_t {
 
     /*---------------------
      * Resolution
@@ -66,9 +66,9 @@ struct _lv_disp_t {
     uint8_t * buf_act;
     uint32_t buf_size_in_bytes;
 
-    /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_disp_flush_ready()' has to be
+    /** MANDATORY: Write the internal buffer (draw_buf) to the display. 'lv_display_flush_ready()' has to be
      * called when finished*/
-    lv_disp_flush_cb_t flush_cb;
+    lv_display_flush_cb_t flush_cb;
 
     /*1: flushing is in progress. (It can't be a bit field because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
     volatile int flushing;
@@ -78,7 +78,7 @@ struct _lv_disp_t {
     volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
     volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
 
-    lv_disp_render_mode_t render_mode;
+    lv_display_render_mode_t render_mode;
     uint32_t antialiasing : 1;       /**< 1: anti-aliasing is enabled on this display.*/
 
     /** 1: The current screen rendering is in progress*/
@@ -96,8 +96,8 @@ struct _lv_disp_t {
      * Layer
      *--------------------*/
     lv_layer_t * layer_head;
-    void (*layer_init)(struct _lv_disp_t * disp, lv_layer_t * layer);
-    void (*layer_deinit)(struct _lv_disp_t * disp, lv_layer_t * layer);
+    void (*layer_init)(struct _lv_display_t * disp, lv_layer_t * layer);
+    void (*layer_deinit)(struct _lv_display_t * disp, lv_layer_t * layer);
 
     /*---------------------
      * Screens
@@ -108,9 +108,9 @@ struct _lv_disp_t {
     struct _lv_obj_t * act_scr;     /**< Currently active screen on this display*/
     struct _lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
     struct _lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_scr_load_anim*/
-    struct _lv_obj_t * bottom_layer;    /**< @see lv_disp_get_layer_bottom*/
-    struct _lv_obj_t * top_layer;       /**< @see lv_disp_get_layer_top*/
-    struct _lv_obj_t * sys_layer;       /**< @see lv_disp_get_layer_sys*/
+    struct _lv_obj_t * bottom_layer;    /**< @see lv_display_get_layer_bottom*/
+    struct _lv_obj_t * top_layer;       /**< @see lv_display_get_layer_top*/
+    struct _lv_obj_t * sys_layer;       /**< @see lv_display_get_layer_sys*/
     uint32_t screen_cnt;
     uint8_t draw_prev_over_act  : 1;/** 1: Draw previous screen over active screen*/
     uint8_t del_prev  : 1; /** 1: Automatically delete the previous screen when the screen load animation is ready*/
@@ -126,7 +126,7 @@ struct _lv_disp_t {
     lv_event_list_t event_list;
 
     uint32_t sw_rotate : 1; /**< 1: use software rotation (slower)*/
-    uint32_t rotation  : 2; /**< Element of  @lv_disp_rotation_t*/
+    uint32_t rotation  : 2; /**< Element of  @lv_display_rotation_t*/
 
     /**< The theme assigned to the screen*/
     struct _lv_theme_t * theme;
@@ -153,4 +153,4 @@ struct _lv_disp_t {
 } /*extern "C"*/
 #endif
 
-#endif /*LV_DISP_PRIVATE_H*/
+#endif /*LV_DISPLAY_PRIVATE_H*/

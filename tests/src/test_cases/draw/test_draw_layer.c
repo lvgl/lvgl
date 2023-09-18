@@ -57,18 +57,18 @@ void test_layer_mixed_rgb(void)
     lv_obj_set_style_blend_mode(obj, LV_BLEND_MODE_SUBTRACTIVE, 0);
 
     obj = create_test_obj("angle = 30°", true);
-    lv_obj_set_style_transform_angle(obj, 300, 0);
+    lv_obj_set_style_transform_rotation(obj, 300, 0);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
     obj = create_test_obj("Zoom = 120%", true);
-    lv_obj_set_style_transform_zoom(obj, 307, 0);
+    lv_obj_set_style_transform_scale(obj, 307, 0);
 
     obj = create_test_obj("Zoom = 70%", true);
-    lv_obj_set_style_transform_zoom(obj, 180, 0);
+    lv_obj_set_style_transform_scale(obj, 180, 0);
 
     obj = create_test_obj("Zoom = 70%\nAngle = 70°", true);
-    lv_obj_set_style_transform_zoom(obj, 180, 0);
-    lv_obj_set_style_transform_angle(obj, 700, 0);
+    lv_obj_set_style_transform_scale(obj, 180, 0);
+    lv_obj_set_style_transform_rotation(obj, 700, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/layer_mixed_rgb.png");
 }
@@ -92,18 +92,18 @@ void test_layer_mixed_argb(void)
     lv_obj_set_style_blend_mode(obj, LV_BLEND_MODE_SUBTRACTIVE, 0);
 
     obj = create_test_obj("angle = 30°", false);
-    lv_obj_set_style_transform_angle(obj, 300, 0);
+    lv_obj_set_style_transform_rotation(obj, 300, 0);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
     obj = create_test_obj("Zoom = 120%", false);
-    lv_obj_set_style_transform_zoom(obj, 307, 0);
+    lv_obj_set_style_transform_scale(obj, 307, 0);
 
     obj = create_test_obj("Zoom = 70%", false);
-    lv_obj_set_style_transform_zoom(obj, 180, 0);
+    lv_obj_set_style_transform_scale(obj, 180, 0);
 
     obj = create_test_obj("Zoom = 70%\nAngle = 70°", false);
-    lv_obj_set_style_transform_zoom(obj, 180, 0);
-    lv_obj_set_style_transform_angle(obj, 700, 0);
+    lv_obj_set_style_transform_scale(obj, 180, 0);
+    lv_obj_set_style_transform_rotation(obj, 700, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/layer_mixed_argb.png");
 }
@@ -136,8 +136,8 @@ void test_layer_large_transform(void)
     obj = create_test_obj(lorem_ipsum, false);
     lv_obj_set_width(lv_obj_get_child(obj, 0), lv_pct(100));
     lv_obj_set_size(obj, 200, 150);
-    lv_obj_set_style_transform_zoom(obj, 200, 0);
-    lv_obj_set_style_transform_angle(obj, 200, 0);
+    lv_obj_set_style_transform_scale(obj, 200, 0);
+    lv_obj_set_style_transform_rotation(obj, 200, 0);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/layer_large_transform.png");
 }

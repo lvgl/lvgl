@@ -8,7 +8,7 @@
  *********************/
 #include "lv_obj_draw.h"
 #include "lv_obj.h"
-#include "../disp/lv_disp.h"
+#include "../display/lv_display.h"
 #include "../indev/lv_indev.h"
 #include "../stdlib/lv_string.h"
 
@@ -186,8 +186,8 @@ void lv_obj_init_draw_image_dsc(lv_obj_t * obj, uint32_t part, lv_draw_image_dsc
     }
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
-    draw_dsc->angle = 0;
-    draw_dsc->zoom = LV_ZOOM_NONE;
+    draw_dsc->rotation = 0;
+    draw_dsc->zoom = LV_SCALE_NONE;
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 

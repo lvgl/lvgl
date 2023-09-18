@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_image.h"
-#include "../disp/lv_disp.h"
+#include "../display/lv_display.h"
 #include "../misc/lv_log.h"
 #include "../misc/lv_math.h"
 #include "../core/lv_refr.h"
@@ -43,7 +43,7 @@ void lv_draw_image_dsc_init(lv_draw_image_dsc_t * dsc)
     lv_memzero(dsc, sizeof(lv_draw_image_dsc_t));
     dsc->recolor = lv_color_black();
     dsc->opa = LV_OPA_COVER;
-    dsc->zoom = LV_ZOOM_NONE;
+    dsc->zoom = LV_SCALE_NONE;
     dsc->antialias = LV_COLOR_DEPTH > 8 ? 1 : 0;
 }
 
@@ -77,8 +77,8 @@ void lv_draw_image(lv_layer_t * layer, const lv_draw_image_dsc_t * dsc, const lv
 
     lv_draw_image_dsc_t * new_image_dsc = lv_malloc(sizeof(*dsc));
     lv_memcpy(new_image_dsc, dsc, sizeof(*dsc));
-    lv_res_t res = lv_image_decoder_get_info(new_image_dsc->src, &new_image_dsc->header);
-    if(res != LV_RES_OK) {
+    lv_result_t res = lv_image_decoder_get_info(new_image_dsc->src, &new_image_dsc->header);
+    if(res != LV_RESULT_OK) {
         LV_LOG_WARN("Couldn't get info about the image");
         lv_free(new_image_dsc);
         return;

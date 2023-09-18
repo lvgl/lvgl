@@ -49,7 +49,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_disp_t;
+struct _lv_display_t;
 struct _lv_group_t;
 struct _my_theme_t;
 struct _lv_indev_t;
@@ -68,8 +68,8 @@ typedef struct _lv_global_t {
     bool inited;
 
     lv_ll_t disp_ll;
-    struct _lv_disp_t * disp_refresh;
-    struct _lv_disp_t * disp_default;
+    struct _lv_display_t * disp_refresh;
+    struct _lv_display_t * disp_default;
 
     lv_ll_t style_trans_ll;
     bool style_refresh;

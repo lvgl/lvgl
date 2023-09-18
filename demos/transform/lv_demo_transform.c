@@ -87,7 +87,7 @@ void lv_demo_transform(void)
     card_to_transform = card_create();
     lv_obj_center(card_to_transform);
 
-    lv_coord_t disp_w = lv_disp_get_hor_res(NULL);
+    lv_coord_t disp_w = lv_display_get_horizontal_resolution(NULL);
     lv_obj_t * arc = lv_arc_create(lv_scr_act());
     lv_obj_set_size(arc, disp_w - 20, disp_w - 20);
     lv_arc_set_range(arc, 0, 270);
@@ -148,14 +148,14 @@ static void arc_event_cb(lv_event_t * e)
     lv_obj_t * arc = lv_event_get_target(e);
 
     int32_t v = lv_arc_get_angle_end(arc);
-    lv_obj_set_style_transform_angle(card_to_transform, v * 10, 0);
+    lv_obj_set_style_transform_rotation(card_to_transform, v * 10, 0);
 }
 
 static void slider_event_cb(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(slider);
-    lv_obj_set_style_transform_zoom(card_to_transform, v, 0);
+    lv_obj_set_style_transform_scale(card_to_transform, v, 0);
 }
 
 #endif

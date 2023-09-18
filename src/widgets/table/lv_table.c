@@ -11,8 +11,8 @@
 
 #include "../../indev/lv_indev.h"
 #include "../../misc/lv_assert.h"
-#include "../../misc/lv_txt.h"
-#include "../../misc/lv_txt_ap.h"
+#include "../../misc/lv_text.h"
+#include "../../misc/lv_text_ap.h"
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_sprintf.h"
 #include "../../draw/lv_draw.h"
@@ -39,7 +39,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
                                  lv_coord_t cell_left, lv_coord_t cell_right, lv_coord_t cell_top, lv_coord_t cell_bottom);
 static void refr_size_form_row(lv_obj_t * obj, uint32_t start_row);
 static void refr_cell_size(lv_obj_t * obj, uint32_t row, uint32_t col);
-static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
+static lv_result_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col);
 static size_t get_cell_txt_len(const char * txt);
 static void copy_cell_txt(char * dst, const char * txt);
 static void get_cell_area(lv_obj_t * obj, uint16_t row, uint16_t col, lv_area_t * area);
@@ -154,14 +154,14 @@ void lv_table_set_cell_value_fmt(lv_obj_t * obj, uint16_t row, uint16_t col, con
     lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
+    size_t len_ap = _lv_text_ap_calc_bytes_cnt(raw_txt);
     table->cell_data[cell] = lv_realloc(table->cell_data[cell], len_ap + 1);
     LV_ASSERT_MALLOC(table->cell_data[cell]);
     if(table->cell_data[cell] == NULL) {
         va_end(ap2);
         return;
     }
-    _lv_txt_ap_proc(raw_txt, &table->cell_data[cell][1]);
+    _lv_text_ap_proc(raw_txt, &table->cell_data[cell][1]);
 
     lv_free(raw_txt);
 #else
@@ -457,11 +457,11 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -485,9 +485,9 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_PRESSED || code == LV_EVENT_PRESSING) {
         uint16_t col;
         uint16_t row;
-        lv_res_t pr_res = get_pressed_cell(obj, &row, &col);
+        lv_result_t pr_res = get_pressed_cell(obj, &row, &col);
 
-        if(pr_res == LV_RES_OK && (table->col_act != col || table->row_act != row)) {
+        if(pr_res == LV_RESULT_OK && (table->col_act != col || table->row_act != row)) {
             table->col_act = col;
             table->row_act = row;
             lv_obj_invalidate(obj);
@@ -499,7 +499,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_t * scroll_obj = lv_indev_get_scroll_obj(indev);
         if(table->col_act != LV_TABLE_CELL_NONE && table->row_act != LV_TABLE_CELL_NONE && scroll_obj == NULL) {
             res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return;
+            if(res != LV_RESULT_OK) return;
         }
 
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
@@ -566,7 +566,7 @@ static void lv_table_event(const lv_obj_class_t * class_p, lv_event_t * e)
             scroll_to_selected_cell(obj);
             res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 
-            if(res != LV_RES_OK) return;
+            if(res != LV_RESULT_OK) return;
         }
     }
     else if(code == LV_EVENT_DRAW_MAIN) {
@@ -735,9 +735,9 @@ static void draw_main(lv_event_t * e)
                 bool crop = ctrl & LV_TABLE_CELL_CTRL_TEXT_CROP;
                 if(crop) txt_flags = LV_TEXT_FLAG_EXPAND;
 
-                lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,
-                                label_dsc_act.letter_space, label_dsc_act.line_space,
-                                lv_area_get_width(&txt_area), txt_flags);
+                lv_text_get_size(&txt_size, table->cell_data[cell] + 1, label_dsc_def.font,
+                                 label_dsc_act.letter_space, label_dsc_act.line_space,
+                                 lv_area_get_width(&txt_area), txt_flags);
 
                 /*Align the content to the middle if not cropped*/
                 if(!crop) {
@@ -878,8 +878,8 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
             lv_point_t txt_size;
             txt_w -= cell_left + cell_right;
 
-            lv_txt_get_size(&txt_size, table->cell_data[cell] + 1, font,
-                            letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
+            lv_text_get_size(&txt_size, table->cell_data[cell] + 1, font,
+                             letter_space, line_space, txt_w, LV_TEXT_FLAG_NONE);
 
             h_max = LV_MAX(txt_size.y + cell_top + cell_bottom, h_max);
             /*Skip until one element after the last merged column*/
@@ -891,7 +891,7 @@ static lv_coord_t get_row_height(lv_obj_t * obj, uint16_t row_id, const lv_font_
     return h_max;
 }
 
-static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
+static lv_result_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
 {
     lv_table_t * table = (lv_table_t *)obj;
 
@@ -899,7 +899,7 @@ static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
     if(type != LV_INDEV_TYPE_POINTER && type != LV_INDEV_TYPE_BUTTON) {
         if(col) *col = LV_TABLE_CELL_NONE;
         if(row) *row = LV_TABLE_CELL_NONE;
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_point_t p;
@@ -939,7 +939,7 @@ static lv_res_t get_pressed_cell(lv_obj_t * obj, uint16_t * row, uint16_t * col)
         }
     }
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /* Returns number of bytes to allocate based on chars configuration */
@@ -948,7 +948,7 @@ static size_t get_cell_txt_len(const char * txt)
     size_t retval = 0;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    retval = _lv_txt_ap_calc_bytes_cnt(txt) + 1;
+    retval = _lv_text_ap_calc_bytes_cnt(txt) + 1;
 #else
     /* cell_data layout: [ctrl][txt][trailing '\0' terminator]
      * +2 because of the trailing '\0' and the ctrl */
@@ -962,7 +962,7 @@ static size_t get_cell_txt_len(const char * txt)
 static void copy_cell_txt(char * dst, const char * txt)
 {
 #if LV_USE_ARABIC_PERSIAN_CHARS
-    _lv_txt_ap_proc(txt, &dst[1]);
+    _lv_text_ap_proc(txt, &dst[1]);
 #else
     lv_strcpy(&dst[1], txt);
 #endif

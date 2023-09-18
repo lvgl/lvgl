@@ -1,10 +1,10 @@
 /**
- * @file lv_linux_fb_dev_h
+ * @file lv_linux_drm_h
  *
  */
 
-#ifndef LV_LINUX_FB_DEV_H
-#define LV_LINUX_FB_DEV_H
+#ifndef LV_LINUX_DRM_H
+#define LV_LINUX_DRM_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,9 +14,9 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "../../../disp/lv_disp.h"
+#include "../../../display/lv_display.h"
 
-#if LV_USE_LINUX_FBDEV
+#if LV_USE_LINUX_DRM
 
 /*********************
  *      DEFINES
@@ -29,18 +29,18 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-lv_disp_t * lv_linux_fbdev_create(void);
+lv_display_t * lv_linux_drm_create(void);
 
-void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file);
+void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t connector_id);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /* LV_USE_LINUX_FBDEV */
+#endif /* LV_USE_LINUX_DRM */
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /* LV_LINUX_FB_DEV_H */
+#endif /* LV_LINUX_DRM_H */

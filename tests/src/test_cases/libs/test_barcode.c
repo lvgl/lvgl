@@ -37,8 +37,8 @@ void test_barcode_normal(void)
     TEST_ASSERT_EQUAL_COLOR(lv_barcode_get_light_color(barcode), light_color);
     TEST_ASSERT_EQUAL(lv_barcode_get_scale(barcode), scale);
 
-    lv_res_t res = lv_barcode_update(barcode, "https://lvgl.io");
-    TEST_ASSERT_EQUAL(res, LV_RES_OK);
+    lv_result_t res = lv_barcode_update(barcode, "https://lvgl.io");
+    TEST_ASSERT_EQUAL(res, LV_RESULT_OK);
     TEST_ASSERT_EQUAL_SCREENSHOT("barcode_1.png");
 }
 

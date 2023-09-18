@@ -69,7 +69,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p);
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p);
 
 /**********************
  *  STATIC VARIABLES
@@ -91,33 +91,33 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_disp_t * lv_linux_fbdev_create(void)
+lv_display_t * lv_linux_fbdev_create(void)
 {
     lv_linux_fb_t * dsc = lv_malloc(sizeof(lv_linux_fb_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
     lv_memzero(dsc, sizeof(lv_linux_fb_t));
 
-    lv_disp_t * disp = lv_disp_create(800, 480);
+    lv_display_t * disp = lv_display_create(800, 480);
     if(disp == NULL) {
         lv_free(dsc);
         return NULL;
     }
     dsc->fbfd = -1;
-    lv_disp_set_driver_data(disp, dsc);
-    lv_disp_set_flush_cb(disp, flush_cb);
+    lv_display_set_driver_data(disp, dsc);
+    lv_display_set_flush_cb(disp, flush_cb);
 
     return disp;
 }
 
-void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
+void lv_linux_fbdev_set_file(lv_display_t * disp, const char * file)
 {
     char * devname = lv_malloc(lv_strlen(file) + 1);
     LV_ASSERT_MALLOC(devname);
     if(devname == NULL) return;
     lv_strcpy(devname, file);
 
-    lv_linux_fb_t * dsc = lv_disp_get_driver_data(disp);
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
     dsc->devname = devname;
 
     if(dsc->fbfd > 0) close(dsc->fbfd);
@@ -209,39 +209,39 @@ void lv_linux_fbdev_set_file(lv_disp_t * disp, const char * file)
     if(LV_LINUX_FBDEV_BUFFER_COUNT == 2) {
         draw_buf_2 = lv_malloc(draw_buf_size);
     }
-    lv_disp_set_draw_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
-    lv_disp_set_res(disp, hor_res, ver_res);
+    lv_display_set_draw_buffers(disp, draw_buf, draw_buf_2, draw_buf_size, LV_LINUX_FBDEV_RENDER_MODE);
+    lv_display_set_resolution(disp, hor_res, ver_res);
 
     if(width) {
-        lv_disp_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
+        lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 254, width * 10));
     }
 
-    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_disp_get_dpi(disp));
+    LV_LOG_INFO("Resolution is set to %dx%d at %ddpi", hor_res, ver_res, lv_display_get_dpi(disp));
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p)
+static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * color_p)
 {
-    lv_linux_fb_t * dsc = lv_disp_get_driver_data(disp);
+    lv_linux_fb_t * dsc = lv_display_get_driver_data(disp);
 
     if(dsc->fbp == NULL ||
        area->x2 < 0 || area->y2 < 0 ||
        area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
-        lv_disp_flush_ready(disp);
+        lv_display_flush_ready(disp);
         return;
     }
 
     lv_coord_t w = lv_area_get_width(area);
-    uint32_t px_size = lv_color_format_get_size(lv_disp_get_color_format(disp));
+    uint32_t px_size = lv_color_format_get_size(lv_display_get_color_format(disp));
     uint32_t color_pos = (area->x1 + dsc->vinfo.xoffset) * px_size + area->y1 * dsc->finfo.line_length;
     uint32_t fb_pos = color_pos + dsc->vinfo.yoffset * dsc->finfo.line_length;
 
     uint8_t * fbp = (uint8_t *)dsc->fbp;
     int32_t y;
-    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISP_RENDER_MODE_DIRECT) {
+    if(LV_LINUX_FBDEV_RENDER_MODE == LV_DISPLAY_RENDER_MODE_DIRECT) {
         for(y = area->y1; y <= area->y2; y++) {
             lv_memcpy(&fbp[fb_pos], &color_p[color_pos], w * px_size);
             fb_pos += dsc->finfo.line_length;
@@ -266,7 +266,7 @@ static void flush_cb(lv_disp_t * disp, const lv_area_t * area, uint8_t * color_p
     ioctl(dsc->fbfd, FBIO_UPDATE, (unsigned long)((uintptr_t)&fb_area));
 #endif
 
-    lv_disp_flush_ready(disp);
+    lv_display_flush_ready(disp);
 }
 
 #endif /*LV_USE_LINUX_FBDEV*/

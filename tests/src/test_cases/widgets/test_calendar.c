@@ -196,9 +196,9 @@ void test_calendar_get_pressed_date_null(void)
 
     lv_calendar_date_t pressed_date;
 
-    lv_res_t result = lv_calendar_get_pressed_date(calendar, &pressed_date);
+    lv_result_t result = lv_calendar_get_pressed_date(calendar, &pressed_date);
 
-    TEST_ASSERT_EQUAL(result, LV_RES_INV);
+    TEST_ASSERT_EQUAL(result, LV_RESULT_INVALID);
 }
 
 void test_calendar_get_btnmatrix(void)

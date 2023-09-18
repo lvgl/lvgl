@@ -25,10 +25,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 struct _lv_obj_t;
-struct _lv_disp_t;
+struct _lv_display_t;
 struct _lv_group_t;
 struct _lv_indev_t;
-struct _lv_disp_t;
+struct _lv_display_t;
 typedef struct _lv_indev_t lv_indev_t;
 
 /** Possible input device types*/
@@ -129,9 +129,9 @@ lv_indev_state_t lv_indev_get_state(const lv_indev_t * indev);
 
 lv_group_t * lv_indev_get_group(const lv_indev_t * indev);
 
-struct _lv_disp_t * lv_indev_get_disp(const lv_indev_t * indev);
+struct _lv_display_t * lv_indev_get_disp(const lv_indev_t * indev);
 
-void lv_indev_set_disp(lv_indev_t * indev, struct _lv_disp_t * disp);
+void lv_indev_set_disp(lv_indev_t * indev, struct _lv_display_t * disp);
 
 void * lv_indev_get_user_data(const lv_indev_t * indev);
 

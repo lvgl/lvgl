@@ -167,7 +167,7 @@ static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t
 #if LV_USE_CHART
     style_init_reset(&theme->styles.chart_indic);
     lv_style_set_radius(&theme->styles.chart_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_size(&theme->styles.chart_indic, lv_disp_dpx(theme->base.disp, 8), lv_disp_dpx(theme->base.disp, 8));
+    lv_style_set_size(&theme->styles.chart_indic, lv_display_dpx(theme->base.disp, 8), lv_display_dpx(theme->base.disp, 8));
     lv_style_set_bg_color(&theme->styles.chart_indic, COLOR_FG);
     lv_style_set_bg_opa(&theme->styles.chart_indic, LV_OPA_COVER);
 #endif
@@ -192,7 +192,7 @@ void lv_theme_mono_deinit(void)
     }
 }
 
-lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t * font)
+lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font_t * font)
 {
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. Micropython)
@@ -212,7 +212,7 @@ lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t 
 
     style_init(theme, dark_bg, font);
 
-    if(disp == NULL || lv_disp_get_theme(disp) == (lv_theme_t *) theme) lv_obj_report_style_change(NULL);
+    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *) theme) lv_obj_report_style_change(NULL);
 
     theme->inited = true;
 

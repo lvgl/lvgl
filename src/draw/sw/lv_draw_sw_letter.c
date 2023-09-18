@@ -9,7 +9,7 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../../disp/lv_disp.h"
+#include "../../display/lv_display.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_assert.h"
 #include "../../misc/lv_area.h"
@@ -93,8 +93,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_cb(lv_draw_unit_t * draw_unit, lv_
 #if LV_USE_IMGFONT
             lv_draw_image_dsc_t img_dsc;
             lv_draw_image_dsc_init(&img_dsc);
-            img_dsc.angle = 0;
-            img_dsc.zoom = LV_ZOOM_NONE;
+            img_dsc.rotation = 0;
+            img_dsc.zoom = LV_SCALE_NONE;
             img_dsc.opa = glyph_draw_dsc->opa;
             img_dsc.src = glyph_draw_dsc->bitmap;
             lv_draw_sw_image(draw_unit, &img_dsc, glyph_draw_dsc->letter_coords);

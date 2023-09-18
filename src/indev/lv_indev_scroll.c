@@ -67,13 +67,13 @@ void _lv_indev_scroll_handler(lv_indev_t * indev)
     int16_t zoom = 256;
     lv_obj_t * parent = scroll_obj;
     while(parent) {
-        angle += lv_obj_get_style_transform_angle(parent, 0);
-        int32_t zoom_act = lv_obj_get_style_transform_zoom_safe(parent, 0);
+        angle += lv_obj_get_style_transform_rotation(parent, 0);
+        int32_t zoom_act = lv_obj_get_style_transform_scale_safe(parent, 0);
         zoom = (zoom * zoom_act) >> 8;
         parent = lv_obj_get_parent(parent);
     }
 
-    if(angle != 0 || zoom != LV_ZOOM_NONE) {
+    if(angle != 0 || zoom != LV_SCALE_NONE) {
         angle = -angle;
         zoom = (256 * 256) / zoom;
         lv_point_t pivot = { 0, 0 };
@@ -293,14 +293,14 @@ static lv_obj_t * find_scroll_obj(lv_indev_t * indev)
         lv_point_t pivot = { 0, 0 };
         lv_obj_t * parent = obj_act;
         while(parent) {
-            angle += lv_obj_get_style_transform_angle(parent, 0);
-            int32_t zoom_act = lv_obj_get_style_transform_zoom_safe(parent, 0);
+            angle += lv_obj_get_style_transform_rotation(parent, 0);
+            int32_t zoom_act = lv_obj_get_style_transform_scale_safe(parent, 0);
             zoom = (zoom * zoom_act) >> 8;
             parent = lv_obj_get_parent(parent);
         }
 
         lv_point_t obj_scroll_sum = indev->pointer.scroll_sum;
-        if(angle != 0 || zoom != LV_ZOOM_NONE) {
+        if(angle != 0 || zoom != LV_SCALE_NONE) {
             angle = -angle;
             zoom = (256 * 256) / zoom;
             lv_point_transform(&obj_scroll_sum, angle, zoom, &pivot);

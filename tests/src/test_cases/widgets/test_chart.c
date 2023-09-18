@@ -107,13 +107,13 @@ void test_chart_one_point_when_setting_point_count_to_zero(void)
 void test_chart_set_zoom_y_to_none_when_factor_is_less_than_256(void)
 {
     lv_chart_set_zoom_y(chart, 128);
-    TEST_ASSERT_EQUAL(LV_ZOOM_NONE, lv_chart_get_zoom_y(chart));
+    TEST_ASSERT_EQUAL(LV_SCALE_NONE, lv_chart_get_zoom_y(chart));
 }
 
 void test_chart_set_zoom_x_to_none_when_factor_is_less_than_256(void)
 {
     lv_chart_set_zoom_x(chart, 128);
-    TEST_ASSERT_EQUAL(LV_ZOOM_NONE, lv_chart_get_zoom_x(chart));
+    TEST_ASSERT_EQUAL(LV_SCALE_NONE, lv_chart_get_zoom_x(chart));
 }
 
 #endif
