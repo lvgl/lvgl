@@ -88,7 +88,6 @@ typedef lv_res_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t * 
  */
 typedef void (*lv_image_decoder_close_f_t)(struct _lv_image_decoder_t * decoder, struct _lv_image_decoder_dsc_t * dsc);
 
-
 typedef struct _lv_image_decoder_t {
     lv_image_decoder_info_f_t info_cb;
     lv_image_decoder_open_f_t open_cb;
@@ -241,6 +240,9 @@ lv_res_t lv_image_decoder_built_in_info(lv_image_decoder_t * decoder, const void
 
 lv_res_t lv_image_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
                                             const lv_area_t * full_area, lv_area_t * decoded_area);
+
+lv_res_t lv_img_decoder_built_in_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                          const lv_area_t * full_area, lv_area_t * decoded_area);
 
 /**
  * Open a built in image

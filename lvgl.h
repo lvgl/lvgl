@@ -95,7 +95,7 @@ extern "C" {
 #include "src/libs/png/lv_png.h"
 #include "src/libs/gif/lv_gif.h"
 #include "src/libs/qrcode/lv_qrcode.h"
-#include "src/libs/sjpg/lv_sjpg.h"
+#include "src/libs/jpg/lv_jpg.h"
 #include "src/libs/freetype/lv_freetype.h"
 #include "src/libs/rlottie/lv_rlottie.h"
 #include "src/libs/ffmpeg/lv_ffmpeg.h"

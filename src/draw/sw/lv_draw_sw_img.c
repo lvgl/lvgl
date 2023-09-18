@@ -215,6 +215,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv
     lv_image_decoder_close(&decoder_dsc);
 }
 
+
 static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * draw_area,
                           const lv_image_decoder_dsc_t * src, lv_draw_image_sup_t * sup, const lv_area_t * img_coords)
 {

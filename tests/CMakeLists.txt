@@ -159,6 +159,8 @@ add_library(test_common
         src/test_assets/font_3_bin.c
         src/test_assets/test_img_caret_down.c
         src/test_assets/test_arc_bg.c
+        src/test_assets/test_img_lvgl_logo_png.c
+        src/test_assets/test_img_lvgl_logo_jpg.c
         src/test_assets/ubuntu_font.c
         unity/unity_support.c
         unity/unity.c
@@ -176,7 +178,7 @@ set(generate_test_runner_config ${CMAKE_CURRENT_SOURCE_DIR}/config.yml)
 
 # disable test targets for build only tests
 if (ENABLE_TESTS)
-    file( GLOB TEST_CASE_FILES src/test_cases/*.c )
+    file( GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c )
 else()
     set(TEST_CASE_FILES)
 endif()

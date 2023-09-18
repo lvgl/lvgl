@@ -118,6 +118,7 @@ void test_image_built_in_decode_recolor(void)
     img_create("binXRGB8888", "A:src/test_files/binimages/cogwheel.XRGB8888.bin", false, true);
     img_create("binARGB8888", "A:src/test_files/binimages/cogwheel.ARGB8888.bin", false, true);
 
+
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/image_format_recolor.png");
 }
 

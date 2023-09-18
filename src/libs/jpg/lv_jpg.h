@@ -28,7 +28,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_split_jpeg_init(void);
+void lv_jpeg_init(void);
 
 /**********************
  *      MACROS
