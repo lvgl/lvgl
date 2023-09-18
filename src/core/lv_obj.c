@@ -767,10 +767,11 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 
 static void obj_hidden_indev_reset(lv_obj_t * obj)
 {
-    lv_obj_t * child = lv_obj_get_child(obj, 0);
-    while(child) {
+    uint32_t i;
+    uint32_t child_cnt = lv_obj_get_child_cnt(obj);
+    for(i = 0; i < child_cnt; i++) {
+        lv_obj_t * child = obj->spec_attr->children[i];
         obj_hidden_indev_reset(child);
-        child = lv_obj_get_child(obj, 0);
     }
 
     lv_group_t * group = lv_obj_get_group(obj);
