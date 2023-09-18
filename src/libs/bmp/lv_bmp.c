@@ -35,7 +35,7 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
 static lv_result_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                 const lv_area_t * full_area, lv_area_t * decoded_area);
+                                    const lv_area_t * full_area, lv_area_t * decoded_area);
 
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
@@ -180,7 +180,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
 
 
 static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
-                                 const lv_area_t * full_area, lv_area_t * decoded_area)
+                                    const lv_area_t * full_area, lv_area_t * decoded_area)
 {
     LV_UNUSED(decoder);
     bmp_dsc_t * b = dsc->user_data;
