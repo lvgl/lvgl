@@ -45,10 +45,11 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-typedef lv_result_t lv_res_t ;
-typedef lv_image_dsc_t lv_img_dsc_t;
-typedef lv_display_rotation_t lv_disp_rotation_t;
-typedef lv_display_render_mode_t lv_disp_render_t;
+typedef lv_result_t                 lv_res_t;
+typedef lv_image_dsc_t              lv_img_dsc_t;
+typedef lv_display_t                lv_disp_t;
+typedef lv_display_rotation_t       lv_disp_rotation_t;
+typedef lv_display_render_mode_t    lv_disp_render_t;
 
 /**********************
  * GLOBAL PROTOTYPES
