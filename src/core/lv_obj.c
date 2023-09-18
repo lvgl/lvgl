@@ -45,6 +45,7 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
+static void obj_hidden_indev_reset(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -107,6 +108,8 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
                 }
             }
         }
+
+        obj_hidden_indev_reset(obj);
     }
 
     if((was_on_layout != lv_obj_is_layout_positioned(obj)) || (f & (LV_OBJ_FLAG_LAYOUT_1 |  LV_OBJ_FLAG_LAYOUT_2))) {
@@ -760,4 +763,34 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
         }
     }
     return false;
+}
+
+static void obj_hidden_indev_reset(lv_obj_t * obj)
+{
+    lv_obj_t * child = lv_obj_get_child(obj, 0);
+    while(child) {
+        obj_hidden_indev_reset(child);
+        child = lv_obj_get_child(obj, 0);
+    }
+
+    lv_group_t * group = lv_obj_get_group(obj);
+
+    /*Reset all input devices if the object to hidden is used*/
+    lv_indev_t * indev = lv_indev_get_next(NULL);
+    while(indev) {
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
+            if(indev->pointer.act_obj == obj || indev->pointer.last_obj == obj || indev->pointer.scroll_obj == obj) {
+                lv_indev_reset(indev, obj);
+            }
+            if(indev->pointer.last_pressed == obj) {
+                indev->pointer.last_pressed = NULL;
+            }
+        }
+
+        if(indev->group == group && obj == lv_indev_get_obj_act()) {
+            lv_indev_reset(indev, obj);
+        }
+        indev = lv_indev_get_next(indev);
+    }
 }
