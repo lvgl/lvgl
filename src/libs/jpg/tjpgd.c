@@ -794,7 +794,8 @@ JRESULT jd_mcu_load(
 
             if(JD_FORMAT != 2 || !cmp) {    /* C components may not be processed if in grayscale output */
                 if(z == 1 || (JD_USE_SCALE &&
-                              jd->scale == 3)) {    /* If no AC element or scale ratio is 1/8, IDCT can be ommited and the block is filled with DC value */
+                              jd->scale ==
+                              3)) {    /* If no AC element or scale ratio is 1/8, IDCT can be ommited and the block is filled with DC value */
                     d = (jd_yuv_t)((*tmp / 256) + 128);
                     if(JD_FASTDECODE >= 1) {
                         for(i = 0; i < 64; bp[i++] = d) ;
