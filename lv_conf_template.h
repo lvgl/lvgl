@@ -583,7 +583,7 @@
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#define LV_USE_SJPG 0
+#define LV_USE_JPG 0
 
 /*GIF decoder library*/
 #define LV_USE_GIF 0

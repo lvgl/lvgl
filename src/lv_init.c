@@ -219,8 +219,8 @@ void lv_init(void)
     lv_png_init();
 #endif
 
-#if LV_USE_SJPG
-    lv_jpeg_init();
+#if LV_USE_JPG
+    lv_jpg_init();
 #endif
 
 #if LV_USE_BMP

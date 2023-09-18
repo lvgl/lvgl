@@ -1957,11 +1957,11 @@
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#ifndef LV_USE_SJPG
-    #ifdef CONFIG_LV_USE_SJPG
-        #define LV_USE_SJPG CONFIG_LV_USE_SJPG
+#ifndef LV_USE_JPG
+    #ifdef CONFIG_LV_USE_JPG
+        #define LV_USE_JPG CONFIG_LV_USE_JPG
     #else
-        #define LV_USE_SJPG 0
+        #define LV_USE_JPG 0
     #endif
 #endif
 

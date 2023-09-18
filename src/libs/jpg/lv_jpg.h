@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#if LV_USE_SJPG
+#if LV_USE_JPG
 
 /*********************
  *      DEFINES
@@ -28,13 +28,13 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_jpeg_init(void);
+void lv_jpg_init(void);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_SJPG*/
+#endif /*LV_USE_JPG*/
 
 #ifdef __cplusplus
 }
