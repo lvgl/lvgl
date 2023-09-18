@@ -83,7 +83,7 @@ The expected result is:
 Example
 -------
 
-.. include:: ../examples/libs/sjpg/index.rst
+.. include:: ../examples/libs/jpg/index.rst
 
 
 API
