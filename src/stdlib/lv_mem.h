@@ -114,13 +114,13 @@ void * lv_realloc_core(void * p, size_t new_size);
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
 
 
-lv_res_t lv_mem_test_core(void);
+lv_result_t lv_mem_test_core(void);
 
 /**
  * @brief Tests the memory allocation system by allocating and freeing a block of memory.
- * @return LV_RES_OK if the memory allocation system is working properly, or LV_RES_INV if there is an error.
+ * @return LV_RESULT_OK if the memory allocation system is working properly, or LV_RESULT_INVALID if there is an error.
  */
-lv_res_t lv_mem_test(void);
+lv_result_t lv_mem_test(void);
 
 /**
  * Give information about the work memory of dynamic allocation

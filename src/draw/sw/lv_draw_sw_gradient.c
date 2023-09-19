@@ -29,7 +29,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-typedef lv_res_t (*op_cache_t)(lv_grad_t * c, void * ctx);
+typedef lv_result_t (*op_cache_t)(lv_grad_t * c, void * ctx);
 static lv_grad_t * allocate_item(const lv_grad_dsc_t * g, lv_coord_t w, lv_coord_t h);
 
 /**********************

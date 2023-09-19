@@ -3,7 +3,7 @@
 
 static void set_angle(void * img, int32_t v)
 {
-    lv_image_set_angle(img, v);
+    lv_image_set_rotation(img, v);
 }
 
 static void set_zoom(void * img, int32_t v)

@@ -98,23 +98,23 @@ void test_obj_flag_overflow_visible_1(void)
     TEST_ASSERT_EQUAL_SCREENSHOT("obj_flag_overflow_visible_1_3.png");
 
     /*Test with rotation*/
-    lv_obj_set_style_transform_angle(obj_main, 300, 0);
+    lv_obj_set_style_transform_rotation(obj_main, 300, 0);
     lv_obj_set_style_transform_pivot_x(obj_main, 200, 0);
     lv_obj_set_style_transform_pivot_y(obj_main, 150, 0);
 
-    lv_obj_set_style_transform_angle(obj_child_1, 300, 0);
+    lv_obj_set_style_transform_rotation(obj_child_1, 300, 0);
     lv_obj_set_style_transform_pivot_x(obj_child_1, 100, 0);
     lv_obj_set_style_transform_pivot_y(obj_child_1, 100, 0);
 
-    lv_obj_set_style_transform_angle(obj_child_2, 300, 0);
+    lv_obj_set_style_transform_rotation(obj_child_2, 300, 0);
     lv_obj_set_style_transform_pivot_x(obj_child_2, 100, 0);
     lv_obj_set_style_transform_pivot_y(obj_child_2, 100, 0);
 
-    lv_obj_set_style_transform_angle(btn_1, 300, 0);
+    lv_obj_set_style_transform_rotation(btn_1, 300, 0);
     lv_obj_set_style_transform_pivot_x(btn_1, 100, 0);
     lv_obj_set_style_transform_pivot_y(btn_1, 100, 0);
 
-    lv_obj_set_style_transform_angle(btn_2, 300, 0);
+    lv_obj_set_style_transform_rotation(btn_2, 300, 0);
     lv_obj_set_style_transform_pivot_x(btn_2, 100, 0);
     lv_obj_set_style_transform_pivot_y(btn_2, 100, 0);
 

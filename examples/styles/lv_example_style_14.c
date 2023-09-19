@@ -24,7 +24,7 @@ static void new_theme_init_and_set(void)
     lv_style_set_border_width(&style_btn, 3);
 
     /*Initialize the new theme from the current theme*/
-    lv_theme_t * th_act = lv_disp_get_theme(NULL);
+    lv_theme_t * th_act = lv_display_get_theme(NULL);
     static lv_theme_t th_new;
     th_new = *th_act;
 
@@ -33,7 +33,7 @@ static void new_theme_init_and_set(void)
     lv_theme_set_apply_cb(&th_new, new_theme_apply_cb);
 
     /*Assign the new theme to the current display*/
-    lv_disp_set_theme(NULL, &th_new);
+    lv_display_set_theme(NULL, &th_new);
 }
 
 

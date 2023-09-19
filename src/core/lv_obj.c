@@ -11,8 +11,8 @@
 #include "../indev/lv_indev_private.h"
 #include "lv_refr.h"
 #include "lv_group.h"
-#include "../disp/lv_disp.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display.h"
+#include "../display/lv_display_private.h"
 #include "../themes/lv_theme.h"
 #include "../misc/lv_assert.h"
 #include "../misc/lv_math.h"
@@ -42,7 +42,7 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_obj_draw(lv_event_t * e);
 static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
-static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
+static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 
@@ -259,7 +259,7 @@ const lv_obj_class_t * lv_obj_get_class(const lv_obj_t * obj)
 
 bool lv_obj_is_valid(const lv_obj_t * obj)
 {
-    lv_disp_t * disp = lv_disp_get_next(NULL);
+    lv_display_t * disp = lv_display_get_next(NULL);
     while(disp) {
         uint32_t i;
         for(i = 0; i < disp->screen_cnt; i++) {
@@ -268,7 +268,7 @@ bool lv_obj_is_valid(const lv_obj_t * obj)
             if(found) return true;
         }
 
-        disp = lv_disp_get_next(disp);
+        disp = lv_display_get_next(disp);
     }
 
     return false;
@@ -435,8 +435,8 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
     if(lv_area_get_size(&hor_area) <= 0 && lv_area_get_size(&ver_area) <= 0) return;
 
     lv_draw_rect_dsc_t draw_dsc;
-    lv_res_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
-    if(sb_res != LV_RES_OK) return;
+    lv_result_t sb_res = scrollbar_init_draw_dsc(obj, &draw_dsc);
+    if(sb_res != LV_RESULT_OK) return;
 
     if(lv_area_get_size(&hor_area) > 0) {
         draw_dsc.base.id1 = 0;
@@ -452,9 +452,9 @@ static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer)
  * Initialize the draw descriptor for the scrollbar
  * @param obj pointer to an object
  * @param dsc the draw descriptor to initialize
- * @return LV_RES_OK: the scrollbar is visible; LV_RES_INV: the scrollbar is not visible
+ * @return LV_RESULT_OK: the scrollbar is visible; LV_RESULT_INVALID: the scrollbar is not visible
  */
-static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc)
+static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc)
 {
     lv_draw_rect_dsc_init(dsc);
     dsc->bg_opa = lv_obj_get_style_bg_opa(obj, LV_PART_SCROLLBAR);
@@ -495,10 +495,10 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
 
     if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP || dsc->shadow_opa != LV_OPA_TRANSP) {
         dsc->radius = lv_obj_get_style_radius(obj, LV_PART_SCROLLBAR);
-        return LV_RES_OK;
+        return LV_RESULT_OK;
     }
     else {
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 }
 
@@ -519,8 +519,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
             else lv_obj_clear_state(obj, LV_STATE_CHECKED);
 
-            lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return;
+            lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RESULT_OK) return;
         }
     }
     else if(code == LV_EVENT_PRESS_LOST) {
@@ -545,8 +545,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
             /*With Enter LV_EVENT_RELEASED will send VALUE_CHANGE event*/
             if(c != LV_KEY_ENTER) {
-                lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return;
+                lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RESULT_OK) return;
             }
         }
         else if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_WITH_ARROW) && !lv_obj_is_editable(obj)) {

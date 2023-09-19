@@ -40,7 +40,7 @@ void * lv_malloc_core(size_t size);
 void * lv_realloc_core(void * p, size_t new_size);
 void lv_free_core(void * p);
 void lv_mem_monitor_core(lv_mem_monitor_t * mon_p);
-lv_res_t lv_mem_test_core(void);
+lv_result_t lv_mem_test_core(void);
 
 
 /**********************
@@ -139,11 +139,11 @@ void * lv_realloc(void * data_p, size_t new_size)
     return new_p;
 }
 
-lv_res_t lv_mem_test(void)
+lv_result_t lv_mem_test(void)
 {
     if(zero_mem != ZERO_MEM_SENTINEL) {
         LV_LOG_WARN("zero_mem is written");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     return lv_mem_test_core();

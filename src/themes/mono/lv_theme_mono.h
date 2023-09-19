@@ -36,7 +36,7 @@ extern "C" {
  * @param font pointer to a font to use.
  * @return a pointer to reference this theme later
  */
-lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t * font);
+lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font_t * font);
 
 /**
 * Check if the theme is initialized

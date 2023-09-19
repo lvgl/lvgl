@@ -69,9 +69,9 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent);
  * Set the path of the file to be played
  * @param obj pointer to a ffmpeg_player object
  * @param path video file path
- * @return LV_RES_OK: no error; LV_RES_INV: can't get the info.
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info.
  */
-lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path);
+lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path);
 
 /**
  * Set command control video player

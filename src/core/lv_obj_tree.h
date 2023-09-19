@@ -16,7 +16,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "../misc/lv_anim.h"
-#include "../disp/lv_disp.h"
+#include "../display/lv_display.h"
 
 /*********************
  *      DEFINES
@@ -28,7 +28,7 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
-struct _lv_disp_t;
+struct _lv_display_t;
 struct _lv_obj_class_t;
 
 typedef enum {
@@ -118,7 +118,7 @@ struct _lv_obj_t * lv_obj_get_screen(const struct _lv_obj_t * obj);
  * @param obj       pointer to an object
  * @return          pointer to the object's display
  */
-struct _lv_disp_t * lv_obj_get_disp(const struct _lv_obj_t * obj);
+struct _lv_display_t * lv_obj_get_disp(const struct _lv_obj_t * obj);
 
 /**
  * Get the parent of an object

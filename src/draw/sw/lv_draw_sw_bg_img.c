@@ -11,7 +11,7 @@
 
 #include "blend/lv_draw_sw_blend.h"
 #include "../../misc/lv_math.h"
-#include "../../misc/lv_txt_ap.h"
+#include "../../misc/lv_text_ap.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_assert.h"
 #include "../lv_draw_mask.h"
@@ -56,7 +56,7 @@ void lv_draw_sw_bg_image(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_
     lv_image_src_t src_type = lv_image_src_get_type(dsc->src);
     if(src_type == LV_IMAGE_SRC_SYMBOL) {
         lv_point_t size;
-        lv_txt_get_size(&size, dsc->src, dsc->font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&size, dsc->src, dsc->font, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
         lv_area_t a;
         a.x1 = coords->x1 + lv_area_get_width(coords) / 2 - size.x / 2;
         a.x2 = a.x1 + size.x - 1;

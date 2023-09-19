@@ -208,7 +208,7 @@ uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj)
     return calendar->highlighted_dates_num;
 }
 
-lv_res_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * date)
+lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t * date)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
@@ -218,7 +218,7 @@ lv_res_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t *
         date->year = 0;
         date->month = 0;
         date->day = 0;
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     const char * txt = lv_buttonmatrix_get_button_text(calendar->btnm, lv_buttonmatrix_get_selected_button(calendar->btnm));
@@ -229,7 +229,7 @@ lv_res_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_t *
     date->year = calendar->showed_date.year;
     date->month = calendar->showed_date.month;
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 

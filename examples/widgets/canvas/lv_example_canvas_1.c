@@ -64,7 +64,7 @@ void lv_example_canvas_1(void)
 
     lv_draw_image_dsc_t img_dsc;
     lv_draw_image_dsc_init(&img_dsc);
-    img_dsc.angle = 120;
+    img_dsc.rotation = 120;
     img_dsc.src = &img;
     img_dsc.pivot.x = CANVAS_WIDTH / 2;
     img_dsc.pivot.y = CANVAS_HEIGHT / 2;

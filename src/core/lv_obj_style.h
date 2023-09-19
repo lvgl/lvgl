@@ -313,9 +313,9 @@ static inline lv_coord_t lv_obj_get_style_space_bottom(const struct _lv_obj_t * 
 
 lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t * obj, lv_part_t part, const char * txt);
 
-static inline lv_coord_t lv_obj_get_style_transform_zoom_safe(const struct _lv_obj_t * obj, uint32_t part)
+static inline lv_coord_t lv_obj_get_style_transform_scale_safe(const struct _lv_obj_t * obj, uint32_t part)
 {
-    int16_t zoom = lv_obj_get_style_transform_zoom(obj, part);
+    int16_t zoom = lv_obj_get_style_transform_scale(obj, part);
     return zoom != 0 ? zoom : 1;
 }
 

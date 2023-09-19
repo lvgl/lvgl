@@ -38,7 +38,7 @@ static void draw_main(lv_event_t * e);
 static void draw_label(lv_event_t * e);
 static void get_sel_area(lv_obj_t * obj, lv_area_t * sel_area);
 static void refr_position(lv_obj_t * obj, lv_anim_enable_t animen);
-static lv_res_t release_handler(lv_obj_t * obj);
+static lv_result_t release_handler(lv_obj_t * obj);
 static void inf_normalize(lv_obj_t * obj_scrl);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 static lv_coord_t get_selected_label_width(const lv_obj_t * obj);
@@ -327,11 +327,11 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -432,14 +432,14 @@ static void lv_roller_label_event(const lv_obj_class_t * class_p, lv_event_t * e
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     lv_event_code_t code = lv_event_get_code(e);
     /*LV_EVENT_DRAW_MAIN will be called in the draw function*/
     if(code != LV_EVENT_DRAW_MAIN) {
         /* Call the ancestor's event handler */
         res = lv_obj_event_base(MY_CLASS_LABEL, e);
-        if(res != LV_RES_OK) return;
+        if(res != LV_RESULT_OK) return;
     }
 
     lv_obj_t * label = lv_event_get_target(e);
@@ -494,8 +494,8 @@ static void draw_main(lv_event_t * e)
 
             /*Get the size of the "selected text"*/
             lv_point_t res_p;
-            lv_txt_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
-                            lv_obj_get_width(obj), LV_TEXT_FLAG_EXPAND);
+            lv_text_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                             lv_obj_get_width(obj), LV_TEXT_FLAG_EXPAND);
 
             /*Move the selected label proportionally with the background label*/
             lv_coord_t roller_h = lv_obj_get_height(obj);
@@ -671,10 +671,10 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     }
 }
 
-static lv_res_t release_handler(lv_obj_t * obj)
+static lv_result_t release_handler(lv_obj_t * obj)
 {
     lv_obj_t * label = get_label(obj);
-    if(label == NULL) return LV_RES_OK;
+    if(label == NULL) return LV_RESULT_OK;
 
     lv_indev_t * indev = lv_indev_get_act();
     lv_roller_t * roller = (lv_roller_t *)obj;
@@ -710,7 +710,7 @@ static lv_res_t release_handler(lv_obj_t * obj)
 
             uint32_t letter_cnt = 0;
             for(letter_cnt = 0; letter_cnt < letter_i; letter_cnt++) {
-                uint32_t letter = _lv_txt_encoded_next(txt, &i);
+                uint32_t letter = _lv_text_encoded_next(txt, &i);
                 /*Count he lines to reach the clicked letter. But ignore the last '\n' because it
                  * still belongs to the clicked line*/
                 if(letter == '\n' && i_prev != letter_i) new_opt++;
@@ -752,7 +752,7 @@ static lv_res_t release_handler(lv_obj_t * obj)
     }
 
     uint32_t id  = roller->sel_opt_id; /*Just to use uint32_t in event data*/
-    lv_res_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
+    lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &id);
     return res;
 }
 
@@ -803,7 +803,7 @@ static lv_coord_t get_selected_label_width(const lv_obj_t * obj)
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_SELECTED);
     const char * txt = lv_label_get_text(label);
     lv_point_t size;
-    lv_txt_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TEXT_FLAG_NONE);
+    lv_text_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TEXT_FLAG_NONE);
     return size.x;
 }
 
@@ -825,8 +825,8 @@ static void transform_vect_recursive(lv_obj_t * roller, lv_point_t * vect)
     int32_t zoom = 256;
     lv_obj_t * parent = roller;
     while(parent) {
-        angle += lv_obj_get_style_transform_angle(parent, 0);
-        int32_t zoom_act = lv_obj_get_style_transform_zoom_safe(parent, 0);
+        angle += lv_obj_get_style_transform_rotation(parent, 0);
+        int32_t zoom_act = lv_obj_get_style_transform_scale_safe(parent, 0);
         zoom = (zoom * zoom_act) >> 8;
         parent = lv_obj_get_parent(parent);
     }

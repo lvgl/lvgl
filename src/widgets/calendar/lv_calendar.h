@@ -143,9 +143,9 @@ uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar);
  * Get the currently pressed day
  * @param calendar pointer to a calendar object
  * @param date store the pressed date here
- * @return LV_RES_OK: there is a valid pressed date; LV_RES_INV: there is no pressed data
+ * @return LV_RESULT_OK: there is a valid pressed date; LV_RESULT_INVALID: there is no pressed data
  */
-lv_res_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date);
+lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * calendar, lv_calendar_date_t * date);
 
 /*=====================
  * Other functions

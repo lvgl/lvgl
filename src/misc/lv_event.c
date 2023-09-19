@@ -60,9 +60,9 @@ void _lv_event_pop(lv_event_t * e)
     event_head = e->prev;
 }
 
-lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess)
+lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess)
 {
-    if(list == NULL) return LV_RES_OK;
+    if(list == NULL) return LV_RESULT_OK;
 
     uint32_t i = 0;
     for(i = 0; i < list->cnt; i++) {
@@ -73,14 +73,14 @@ lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess)
         if(filter == LV_EVENT_ALL || filter == e->code) {
             e->user_data = list->dsc[i].user_data;
             list->dsc[i].cb(e);
-            if(e->stop_processing) return LV_RES_OK;
+            if(e->stop_processing) return LV_RESULT_OK;
 
             /*Stop if the object is deleted*/
-            if(e->deleted) return LV_RES_INV;
+            if(e->deleted) return LV_RESULT_INVALID;
 
         }
     }
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter,

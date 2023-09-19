@@ -19,7 +19,7 @@ extern "C" {
 #include "lv_color.h"
 #include "lv_area.h"
 #include "lv_anim.h"
-#include "lv_txt.h"
+#include "lv_text.h"
 #include "lv_types.h"
 #include "lv_assert.h"
 #include "lv_bidi.h"
@@ -48,8 +48,8 @@ extern "C" {
 /**
  * Other constants
  */
-#define LV_ZOOM_NONE            256        /*Value for not zooming the image*/
-LV_EXPORT_CONST_INT(LV_ZOOM_NONE);
+#define LV_SCALE_NONE            256        /*Value for not zooming the image*/
+LV_EXPORT_CONST_INT(LV_SCALE_NONE);
 
 // *INDENT-OFF*
 #if LV_USE_ASSERT_STYLE
@@ -315,8 +315,8 @@ enum _lv_style_prop_t {
     LV_STYLE_TRANSFORM_HEIGHT       = 106,
     LV_STYLE_TRANSLATE_X            = 107,
     LV_STYLE_TRANSLATE_Y            = 108,
-    LV_STYLE_TRANSFORM_ZOOM         = 109,
-    LV_STYLE_TRANSFORM_ANGLE        = 110,
+    LV_STYLE_TRANSFORM_SCALE        = 109,
+    LV_STYLE_TRANSFORM_ROTATION     = 110,
     LV_STYLE_TRANSFORM_PIVOT_X      = 111,
     LV_STYLE_TRANSFORM_PIVOT_Y      = 112,
 
@@ -476,8 +476,8 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
  * @param style pointer to a style
  * @param prop  the ID of a property
  * @param value pointer to a `lv_style_value_t` variable to store the value
- * @return LV_RES_INV: the property wasn't found in the style (`value` is unchanged)
- *         LV_RES_OK: the property was fond, and `value` is set accordingly
+ * @return LV_RESULT_INVALID: the property wasn't found in the style (`value` is unchanged)
+ *         LV_RESULT_OK: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
  */
 lv_style_res_t lv_style_get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
@@ -510,8 +510,8 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
  * @param style pointer to a style
  * @param prop  the ID of a property
  * @param value pointer to a `lv_style_value_t` variable to store the value
- * @return LV_RES_INV: the property wasn't found in the style (`value` is unchanged)
- *         LV_RES_OK: the property was fond, and `value` is set accordingly
+ * @return LV_RESULT_INVALID: the property wasn't found in the style (`value` is unchanged)
+ *         LV_RESULT_OK: the property was fond, and `value` is set accordingly
  * @note For performance reasons there are no sanity check on `style`
  * @note This function is the same as ::lv_style_get_prop but inlined. Use it only on performance critical places
  */

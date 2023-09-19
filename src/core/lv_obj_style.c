@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "../disp/lv_disp.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display.h"
+#include "../display/lv_display_private.h"
 #include "../misc/lv_color.h"
 #include "../stdlib/lv_string.h"
 #include "../core/lv_global.h"
@@ -246,14 +246,14 @@ void lv_obj_remove_style_all(struct _lv_obj_t * obj)
 void lv_obj_report_style_change(lv_style_t * style)
 {
     if(!style_refr) return;
-    lv_disp_t * d = lv_disp_get_next(NULL);
+    lv_display_t * d = lv_display_get_next(NULL);
 
     while(d) {
         uint32_t i;
         for(i = 0; i < d->screen_cnt; i++) {
             report_style_change_core(style, d->screens[i]);
         }
-        d = lv_disp_get_next(d);
+        d = lv_display_get_next(d);
     }
 }
 
@@ -319,9 +319,9 @@ static inline lv_style_value_t lv_style_prop_get_default_inlined(lv_style_prop_t
     const lv_color_t black = LV_COLOR_MAKE(0x00, 0x00, 0x00);
     const lv_color_t white = LV_COLOR_MAKE(0xff, 0xff, 0xff);
     switch(prop) {
-        case LV_STYLE_TRANSFORM_ZOOM:
+        case LV_STYLE_TRANSFORM_SCALE:
             return (lv_style_value_t) {
-                .num = LV_ZOOM_NONE
+                .num = LV_SCALE_NONE
             };
         case LV_STYLE_BG_COLOR:
             return (lv_style_value_t) {
@@ -497,8 +497,8 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
     /*The style is not found*/
     if(i == obj->style_cnt) return false;
 
-    lv_res_t res = lv_style_remove_prop((lv_style_t *)obj->styles[i].style, prop);
-    if(res == LV_RES_OK) {
+    lv_result_t res = lv_style_remove_prop((lv_style_t *)obj->styles[i].style, prop);
+    if(res == LV_RESULT_OK) {
         full_cache_refresh(obj, lv_obj_style_get_selector_part(selector));
         lv_obj_refresh_style(obj, selector, prop);
     }
@@ -606,8 +606,8 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(lv_style_get_prop(style, LV_STYLE_MIN_HEIGHT, &v)) layout_diff = true;
             else if(lv_style_get_prop(style, LV_STYLE_MAX_HEIGHT, &v)) layout_diff = true;
             else if(lv_style_get_prop(style, LV_STYLE_BORDER_WIDTH, &v)) layout_diff = true;
-            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ANGLE, &v)) layout_diff = true;
-            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ZOOM, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ROTATION, &v)) layout_diff = true;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_SCALE, &v)) layout_diff = true;
 
             if(layout_diff) {
                 return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
@@ -616,8 +616,8 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             /*Check for draw pad changes*/
             if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_WIDTH, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_HEIGHT, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ANGLE, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ZOOM, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_ROTATION, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(lv_style_get_prop(style, LV_STYLE_TRANSFORM_SCALE, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_OUTLINE_OPA, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_OUTLINE_PAD, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(lv_style_get_prop(style, LV_STYLE_OUTLINE_WIDTH, &v)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
@@ -1041,8 +1041,8 @@ static void trans_anim_ready_cb(lv_anim_t * a)
 
 static lv_layer_type_t calculate_layer_type(lv_obj_t * obj)
 {
-    if(lv_obj_get_style_transform_angle(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
-    if(lv_obj_get_style_transform_zoom(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_rotation(obj, 0) != 0) return LV_LAYER_TYPE_TRANSFORM;
+    if(lv_obj_get_style_transform_scale(obj, 0) != 256) return LV_LAYER_TYPE_TRANSFORM;
     if(lv_obj_get_style_opa_layered(obj, 0) != LV_OPA_COVER) return LV_LAYER_TYPE_SIMPLE;
     if(lv_obj_get_style_blend_mode(obj, 0) != LV_BLEND_MODE_NORMAL) return LV_LAYER_TYPE_SIMPLE;
     return LV_LAYER_TYPE_NONE;

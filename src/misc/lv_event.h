@@ -150,7 +150,7 @@ void _lv_event_push(lv_event_t * e);
 
 void _lv_event_pop(lv_event_t * e);
 
-lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
+lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
 void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
 
@@ -231,7 +231,7 @@ uint32_t lv_event_register_id(void);
 
 /**
  * Nested events can be called and one of them might belong to an object that is being deleted.
- * Mark this object's `event_temp_data` deleted to know that its `lv_obj_send_event` should return `LV_RES_INV`
+ * Mark this object's `event_temp_data` deleted to know that its `lv_obj_send_event` should return `LV_RESULT_INVALID`
  * @param target     pointer to an event target which was deleted
  */
 void _lv_event_mark_deleted(void * target);

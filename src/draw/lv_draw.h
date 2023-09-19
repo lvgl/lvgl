@@ -16,7 +16,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #include "../misc/lv_style.h"
-#include "../misc/lv_txt.h"
+#include "../misc/lv_text.h"
 #include "../misc/lv_profiler.h"
 #include "../misc/lv_cache.h"
 #include "lv_image_decoder.h"
@@ -33,7 +33,7 @@ extern "C" {
  **********************/
 
 struct _lv_draw_image_dsc_t;
-struct _lv_disp_t;
+struct _lv_display_t;
 
 typedef enum {
     LV_DRAW_TASK_TYPE_FILL,
@@ -196,7 +196,7 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t);
 
 void lv_draw_dispatch(void);
 
-bool lv_draw_dispatch_layer(struct _lv_disp_t * disp, lv_layer_t * layer);
+bool lv_draw_dispatch_layer(struct _lv_display_t * disp, lv_layer_t * layer);
 
 /**
  * Wait for a new dispatch request.

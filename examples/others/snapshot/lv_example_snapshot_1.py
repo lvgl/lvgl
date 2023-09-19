@@ -44,7 +44,7 @@ root.set_style_bg_color(lv.palette_main(lv.PALETTE.LIGHT_BLUE), 0)
 snapshot_obj = lv.image(root)
 snapshot_obj.set_style_bg_color(lv.palette_main(lv.PALETTE.PURPLE), 0)
 snapshot_obj.set_style_bg_opa(lv.OPA.COVER, 0)
-snapshot_obj.set_zoom(128)
+snapshot_obj.set_scale(128)
 
 # Create the container and its children
 container = lv.obj(root)
@@ -59,7 +59,7 @@ for i in range(4):
     image.set_src(image_star)
     image.set_style_bg_color(lv.palette_main(lv.PALETTE.GREY), 0)
     image.set_style_bg_opa(lv.OPA.COVER, 0)
-    image.set_style_transform_zoom(400, lv.STATE.PRESSED)
+    image.set_style_transform_scale(400, lv.STATE.PRESSED)
     image.add_flag(image.FLAG.CLICKABLE)
     image.add_event(lambda e: event_cb(e, snapshot_obj), lv.EVENT.PRESSED, None)
     image.add_event(lambda e: event_cb(e, snapshot_obj), lv.EVENT.RELEASED, None)

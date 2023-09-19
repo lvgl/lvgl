@@ -663,11 +663,11 @@
 
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
-#ifndef LV_DISP_ROT_MAX_BUF
-    #ifdef CONFIG_LV_DISP_ROT_MAX_BUF
-        #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
+#ifndef LV_DISPLAY_ROT_MAX_BUF
+    #ifdef CONFIG_LV_DISPLAY_ROT_MAX_BUF
+        #define LV_DISPLAY_ROT_MAX_BUF CONFIG_LV_DISPLAY_ROT_MAX_BUF
     #else
-        #define LV_DISP_ROT_MAX_BUF (10*1024)
+        #define LV_DISPLAY_ROT_MAX_BUF (10*1024)
     #endif
 #endif
 
@@ -766,7 +766,7 @@
     #endif
 #endif
 
-/*Define a custom attribute to `lv_disp_flush_ready` function*/
+/*Define a custom attribute to `lv_display_flush_ready` function*/
 #ifndef LV_ATTRIBUTE_FLUSH_READY
     #ifdef CONFIG_LV_ATTRIBUTE_FLUSH_READY
         #define LV_ATTRIBUTE_FLUSH_READY CONFIG_LV_ATTRIBUTE_FLUSH_READY
@@ -1957,11 +1957,11 @@
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#ifndef LV_USE_SJPG
-    #ifdef CONFIG_LV_USE_SJPG
-        #define LV_USE_SJPG CONFIG_LV_USE_SJPG
+#ifndef LV_USE_JPG
+    #ifdef CONFIG_LV_USE_JPG
+        #define LV_USE_JPG CONFIG_LV_USE_JPG
     #else
-        #define LV_USE_SJPG 0
+        #define LV_USE_JPG 0
     #endif
 #endif
 
@@ -2355,7 +2355,7 @@
         #ifdef CONFIG_LV_SDL_RENDER_MODE
             #define LV_SDL_RENDER_MODE CONFIG_LV_SDL_RENDER_MODE
         #else
-            #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+            #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
         #endif
     #endif
     #ifndef LV_SDL_BUF_COUNT
@@ -2416,7 +2416,7 @@
         #ifdef CONFIG_LV_LINUX_FBDEV_RENDER_MODE
             #define LV_LINUX_FBDEV_RENDER_MODE CONFIG_LV_LINUX_FBDEV_RENDER_MODE
         #else
-            #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
+            #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
         #endif
     #endif
     #ifndef LV_LINUX_FBDEV_BUFFER_COUNT

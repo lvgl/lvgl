@@ -176,19 +176,19 @@ void lv_draw_rect(lv_layer_t * layer, const lv_draw_rect_dsc_t * dsc, const lv_a
 
 
         lv_image_src_t src_type = lv_image_src_get_type(dsc->bg_image_src);
-        lv_res_t res = LV_RES_OK;
+        lv_result_t res = LV_RESULT_OK;
         lv_image_header_t header;
         if(src_type == LV_IMAGE_SRC_VARIABLE || src_type == LV_IMAGE_SRC_FILE) {
             res  = lv_image_decoder_get_info(dsc->bg_image_src, &header);
         }
         else if(src_type == LV_IMAGE_SRC_UNKNOWN) {
-            res = LV_RES_INV;
+            res = LV_RESULT_INVALID;
         }
         else {
             lv_memzero(&header, sizeof(header));
         }
 
-        if(res == LV_RES_OK) {
+        if(res == LV_RESULT_OK) {
             lv_draw_bg_image_dsc_t * bg_image_dsc = lv_malloc(sizeof(lv_draw_bg_image_dsc_t));
             t->draw_dsc = bg_image_dsc;
             bg_image_dsc->base = dsc->base;

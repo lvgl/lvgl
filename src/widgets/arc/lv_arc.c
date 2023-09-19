@@ -389,7 +389,7 @@ void lv_arc_rotate_obj_to_angle(const lv_obj_t * obj, lv_obj_t * obj_to_rotate, 
     lv_coord_t pivot_y = obj_to_rotate->coords.y1 - center.y;
     lv_obj_set_style_transform_pivot_x(obj_to_rotate, -pivot_x, 0);
     lv_obj_set_style_transform_pivot_y(obj_to_rotate, -pivot_y, 0);
-    lv_obj_set_style_transform_angle(obj_to_rotate, angle * 10 + 900, 0);
+    lv_obj_set_style_transform_rotation(obj_to_rotate, angle * 10 + 900, 0);
 }
 
 
@@ -432,11 +432,11 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -551,7 +551,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             lv_arc_set_value(obj, new_value); /*set_value caches the last_angle for the next iteration*/
             if(new_value != old_value) {
                 res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return;
+                if(res != LV_RESULT_OK) return;
             }
         }
 
@@ -585,7 +585,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         if(old_value != arc->value) {
             res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return;
+            if(res != LV_RESULT_OK) return;
         }
     }
     else if(code == LV_EVENT_HIT_TEST) {

@@ -91,20 +91,20 @@ static const uint8_t * freetype_get_glyph_bitmap_cb(const lv_font_t * font,
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_bytes)
+lv_result_t lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_bytes)
 {
     FT_Error error;
     lv_freetype_context_t * context = ft_ctx = lv_malloc(sizeof(lv_freetype_context_t));
     LV_ASSERT_MALLOC(context);
     if(!context) {
         LV_LOG_ERROR("malloc failed for lv_freetype_context_t");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     error = FT_Init_FreeType(&context->library);
     if(error) {
         FT_ERROR_MSG("FT_Init_FreeType", error);
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     error = FTC_Manager_New(context->library,
@@ -117,7 +117,7 @@ lv_res_t lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_b
     if(error) {
         FT_Done_FreeType(context->library);
         FT_ERROR_MSG("FTC_Manager_New", error);
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     error = FTC_CMapCache_New(context->cache_manager, &context->cmap_cache);
@@ -140,11 +140,11 @@ lv_res_t lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_b
     }
 #endif
 
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 failed:
     FTC_Manager_Done(context->cache_manager);
     FT_Done_FreeType(context->library);
-    return LV_RES_INV;
+    return LV_RESULT_INVALID;
 }
 
 void lv_freetype_uninit(void)

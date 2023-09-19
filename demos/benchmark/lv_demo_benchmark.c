@@ -9,7 +9,7 @@
 #include "lv_demo_benchmark.h"
 
 #if LV_USE_DEMO_BENCHMARK
-#include "../../src/disp/lv_disp_private.h"
+#include "../../src/display/lv_display_private.h"
 
 /*********************
  *      DEFINES
@@ -74,7 +74,7 @@ static lv_style_t style_common;
 static bool scene_with_opa = true;
 static uint32_t last_flush_cb_call;
 static uint32_t render_start_time;
-static void (*flush_cb_ori)(lv_disp_t *, const lv_area_t *, uint8_t *);
+static void (*flush_cb_ori)(lv_display_t *, const lv_area_t *, uint8_t *);
 static uint32_t disp_ori_timer_period;
 static uint32_t anim_ori_timer_period;
 
@@ -100,10 +100,10 @@ static void benchmark_event_remove(void);
 
 static void show_scene_report(void);
 static void calc_scene_statistics(void);
-static lv_res_t load_next_scene(void);
+static lv_result_t load_next_scene(void);
 static void next_scene_timer_cb(lv_timer_t * timer);
 static void single_scene_finsih_timer_cb(lv_timer_t * timer);
-static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, uint8_t * pxmap);
+static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap);
 static void generate_report(void);
 
 static void rect_create(lv_style_t * style);
@@ -666,7 +666,7 @@ void lv_demo_benchmark(lv_demo_benchmark_mode_t _mode)
     benchmark_init();
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        while(load_next_scene() == LV_RES_OK) {
+        while(load_next_scene() == LV_RESULT_OK) {
             uint32_t i;
             for(i = 0; i < RENDER_REPEAT_CNT; i++) {
                 /*Wait a little to be sure something happens with the animations*/
@@ -733,9 +733,9 @@ void lv_demo_benchmark_run_scene(lv_demo_benchmark_mode_t _mode, uint16_t scene_
 
 static void benchmark_init(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
 
-    lv_disp_add_event(disp, benchmark_event_cb, LV_EVENT_ALL, NULL);
+    lv_display_add_event(disp, benchmark_event_cb, LV_EVENT_ALL, NULL);
     flush_cb_ori = disp->flush_cb;
     disp->flush_cb = dummy_flush_cb;
 
@@ -785,12 +785,12 @@ static void benchmark_event_cb(lv_event_t * e)
 
 static void benchmark_event_remove(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
     uint32_t i;
-    for(i = 0; i < lv_disp_get_event_count(disp); i++) {
-        lv_event_dsc_t * dsc = lv_disp_get_event_dsc(disp, i);
+    for(i = 0; i < lv_display_get_event_count(disp); i++) {
+        lv_event_dsc_t * dsc = lv_display_get_event_dsc(disp, i);
         if(lv_event_dsc_get_cb(dsc) == benchmark_event_cb) {
-            lv_disp_remove_event(disp, i);
+            lv_display_remove_event(disp, i);
             return;
         }
     }
@@ -827,9 +827,9 @@ static void calc_scene_statistics(void)
     }
 }
 
-static lv_res_t load_next_scene(void)
+static lv_result_t load_next_scene(void)
 {
-    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RES_INV;
+    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RESULT_INVALID;
 
     lv_obj_clean(scene_bg);
 
@@ -841,14 +841,14 @@ static lv_res_t load_next_scene(void)
         scene_with_opa = true;
     }
 
-    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RES_INV;
+    if(scene_act >= 0 && scenes[scene_act].create_cb == NULL) return LV_RESULT_INVALID;
 
     last_flush_cb_call = 0;
     rnd_reset();
     scenes[scene_act].create_cb();
 
     lv_label_set_text_fmt(title, "%s%s", scenes[scene_act].name, scene_with_opa ? " + opa" : "");
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 static void next_scene_timer_cb(lv_timer_t * timer)
@@ -857,9 +857,9 @@ static void next_scene_timer_cb(lv_timer_t * timer)
 
     calc_scene_statistics();
     show_scene_report();
-    lv_res_t res = load_next_scene();
+    lv_result_t res = load_next_scene();
 
-    if(res == LV_RES_INV) {
+    if(res == LV_RESULT_INVALID) {
         lv_timer_del(timer);
         generate_report();
     }
@@ -870,7 +870,7 @@ static void single_scene_finsih_timer_cb(lv_timer_t * timer)
     LV_UNUSED(timer);
     calc_scene_statistics();
 
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
     disp->flush_cb = flush_cb_ori;
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
@@ -886,13 +886,13 @@ static void single_scene_finsih_timer_cb(lv_timer_t * timer)
     lv_obj_invalidate(lv_scr_act());
 }
 
-static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, uint8_t * pxmap)
+static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap)
 {
     LV_UNUSED(area);
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER) {
         /*Measure the time since render start after flushing*/
-        bool last = lv_disp_flush_is_last(drv);
+        bool last = lv_display_flush_is_last(drv);
         flush_cb_ori(drv, area, pxmap);
 
         if(last) {
@@ -908,7 +908,7 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, uint8_t * px
         }
     }
     else if(mode == LV_DEMO_BENCHMARK_MODE_REAL) {
-        bool last = lv_disp_flush_is_last(drv);
+        bool last = lv_display_flush_is_last(drv);
         flush_cb_ori(drv, area, pxmap);
 
         /*Measure the time since the previous last flush (full render)*/
@@ -929,10 +929,10 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, uint8_t * px
         }
     }
     else if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
-        bool last = lv_disp_flush_is_last(drv);
+        bool last = lv_display_flush_is_last(drv);
 
         /*Just bypass the driver and measure the pure rendering time*/
-        lv_disp_flush_ready(drv);
+        lv_display_flush_ready(drv);
 
         if(last) {
             uint32_t t = lv_tick_elaps(render_start_time);
@@ -950,7 +950,7 @@ static void dummy_flush_cb(lv_disp_t * drv, const lv_area_t * area, uint8_t * px
 
 static void generate_report(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
     disp->flush_cb = flush_cb_ori;
 
     if(mode == LV_DEMO_BENCHMARK_MODE_RENDER_ONLY) {
@@ -1114,7 +1114,7 @@ static void img_create(lv_style_t * style, const void * src, bool rotate, bool z
         lv_image_set_src(obj, src);
         lv_obj_set_style_image_recolor(obj, lv_color_hex(rnd_next(0, 0xFFFFF0)), 0);
 
-        if(rotate) lv_image_set_angle(obj, rnd_next(0, 3599));
+        if(rotate) lv_image_set_rotation(obj, rnd_next(0, 3599));
         if(zoom) lv_image_set_zoom(obj, rnd_next(IMG_ZOOM_MIN, IMG_ZOOM_MAX));
         lv_image_set_antialias(obj, aa);
 

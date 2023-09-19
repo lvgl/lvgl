@@ -94,7 +94,7 @@ static void lv_win_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_COLUMN);
 
     lv_obj_t * header = lv_obj_create(obj);
-    lv_obj_set_size(header, LV_PCT(100), lv_disp_get_dpi(lv_obj_get_disp(obj)) / 2);
+    lv_obj_set_size(header, LV_PCT(100), lv_display_get_dpi(lv_obj_get_disp(obj)) / 2);
     lv_obj_set_flex_flow(header, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(header, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 

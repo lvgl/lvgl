@@ -14,8 +14,8 @@
 #include "../../core/lv_group.h"
 #include "../../draw/lv_draw.h"
 #include "../../core/lv_refr.h"
-#include "../../misc/lv_txt.h"
-#include "../../misc/lv_txt_ap.h"
+#include "../../misc/lv_text.h"
+#include "../../misc/lv_text_ap.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -392,11 +392,11 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -444,7 +444,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
                 res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
-                if(res != LV_RES_OK) return;
+                if(res != LV_RESULT_OK) return;
             }
         }
     }
@@ -481,7 +481,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
                 res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
-                if(res != LV_RES_OK) return;
+                if(res != LV_RESULT_OK) return;
             }
         }
 
@@ -496,7 +496,7 @@ static void lv_buttonmatrix_event(const lv_obj_class_t * class_p, lv_event_t * e
                button_is_hidden(btnm->ctrl_bits[btnm->btn_id_sel]) == false) {
                 uint32_t b = btnm->btn_id_sel;
                 res        = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, &b);
-                if(res != LV_RES_OK) return;
+                if(res != LV_RESULT_OK) return;
             }
         }
     }
@@ -777,15 +777,15 @@ static void draw_main(lv_event_t * e)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the Arabic text and process it*/
-        size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
+        size_t len_ap = _lv_text_ap_calc_bytes_cnt(txt);
         if(len_ap < sizeof(txt_ap)) {
-            _lv_txt_ap_proc(txt, txt_ap);
+            _lv_text_ap_proc(txt, txt_ap);
             txt = txt_ap;
         }
 #endif
         lv_point_t txt_size;
-        lv_txt_get_size(&txt_size, txt, font, letter_space,
-                        line_space, lv_area_get_width(&area_obj), draw_label_dsc_act.flag);
+        lv_text_get_size(&txt_size, txt, font, letter_space,
+                         line_space, lv_area_get_width(&area_obj), draw_label_dsc_act.flag);
 
         btn_area.x1 += (lv_area_get_width(&btn_area) - txt_size.x) / 2;
         btn_area.y1 += (lv_area_get_height(&btn_area) - txt_size.y) / 2;
@@ -985,7 +985,7 @@ static void invalidate_button_area(const lv_obj_t * obj, uint16_t btn_idx)
     lv_coord_t col_gap = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     /*Be sure to have a minimal extra space if row/col_gap is small*/
-    lv_coord_t dpi = lv_disp_get_dpi(lv_obj_get_disp(obj));
+    lv_coord_t dpi = lv_display_get_dpi(lv_obj_get_disp(obj));
     row_gap = LV_MAX(row_gap, dpi / 10);
     col_gap = LV_MAX(col_gap, dpi / 10);
 

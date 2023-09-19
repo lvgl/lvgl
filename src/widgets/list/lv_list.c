@@ -8,7 +8,7 @@
  *********************/
 #include "lv_list.h"
 #include "../../layouts/flex/lv_flex.h"
-#include "../../disp/lv_disp.h"
+#include "../../display/lv_display.h"
 #include "../label/lv_label.h"
 #include "../image/lv_image.h"
 #include "../button/lv_button.h"

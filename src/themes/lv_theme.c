@@ -36,8 +36,8 @@ static void apply_theme_recursion(lv_theme_t * th, lv_obj_t * obj);
 
 lv_theme_t  * lv_theme_get_from_obj(lv_obj_t * obj)
 {
-    lv_disp_t * disp = obj ? lv_obj_get_disp(obj) : lv_disp_get_default();
-    return lv_disp_get_theme(disp);
+    lv_display_t * disp = obj ? lv_obj_get_disp(obj) : lv_display_get_default();
+    return lv_display_get_theme(disp);
 }
 
 /**

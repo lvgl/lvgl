@@ -8,8 +8,8 @@
  *********************/
 #include "lv_obj.h"
 #include "../themes/lv_theme.h"
-#include "../disp/lv_disp.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display.h"
+#include "../display/lv_display_private.h"
 #include "../stdlib/lv_string.h"
 
 /*********************
@@ -56,7 +56,7 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     /*Create a screen*/
     if(parent == NULL) {
         LV_TRACE_OBJ_CREATE("creating a screen");
-        lv_disp_t * disp = lv_disp_get_default();
+        lv_display_t * disp = lv_display_get_default();
         if(!disp) {
             LV_LOG_WARN("No display created yet. No place to assign the new screen");
             lv_free(obj);
@@ -74,8 +74,8 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         /*Set coordinates to full screen size*/
         obj->coords.x1 = 0;
         obj->coords.y1 = 0;
-        obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
-        obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
+        obj->coords.x2 = lv_display_get_horizontal_resolution(NULL) - 1;
+        obj->coords.y2 = lv_display_get_vertical_resolution(NULL) - 1;
     }
     /*Create a normal object*/
     else {

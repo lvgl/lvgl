@@ -65,8 +65,8 @@ struct lv_image_pixel_color_s {
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_res_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_open(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc);
 
 static struct ffmpeg_context_s * ffmpeg_open_file(const char * path);
@@ -135,10 +135,10 @@ lv_obj_t * lv_ffmpeg_player_create(lv_obj_t * parent)
     return obj;
 }
 
-lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
+lv_result_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_res_t res = LV_RES_INV;
+    lv_result_t res = LV_RESULT_INVALID;
 
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
@@ -190,7 +190,7 @@ lv_res_t lv_ffmpeg_player_set_src(lv_obj_t * obj, const char * path)
         LV_LOG_WARN("unable to get frame refresh period");
     }
 
-    res = LV_RES_OK;
+    res = LV_RESULT_OK;
 
 failed:
     return res;
@@ -246,7 +246,7 @@ void lv_ffmpeg_player_set_auto_restart(lv_obj_t * obj, bool en)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder);
 
@@ -258,17 +258,17 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
 
         if(ffmpeg_get_image_header(fn, header) < 0) {
             LV_LOG_ERROR("ffmpeg can't get image header");
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
-        return LV_RES_OK;
+        return LV_RESULT_OK;
     }
 
     /* If didn't succeeded earlier then it's an error */
-    return LV_RES_INV;
+    return LV_RESULT_INVALID;
 }
 
-static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder);
 
@@ -278,19 +278,19 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
         struct ffmpeg_context_s * ffmpeg_ctx = ffmpeg_open_file(path);
 
         if(ffmpeg_ctx == NULL) {
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         if(ffmpeg_image_allocate(ffmpeg_ctx) < 0) {
             LV_LOG_ERROR("ffmpeg image allocate failed");
             ffmpeg_close(ffmpeg_ctx);
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         if(ffmpeg_update_next_frame(ffmpeg_ctx) < 0) {
             ffmpeg_close(ffmpeg_ctx);
             LV_LOG_ERROR("ffmpeg update frame failed");
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         ffmpeg_close_src_ctx(ffmpeg_ctx);
@@ -300,11 +300,11 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
         dsc->img_data = img_data;
 
         /* The image is fully decoded. Return with its pointer */
-        return LV_RES_OK;
+        return LV_RESULT_OK;
     }
 
     /* If not returned earlier then it failed */
-    return LV_RES_INV;
+    return LV_RESULT_INVALID;
 }
 
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)

@@ -155,7 +155,7 @@ void lv_theme_basic_deinit(void)
     }
 }
 
-lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
+lv_theme_t * lv_theme_basic_init(lv_display_t * disp)
 {
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. Micropython)
@@ -175,7 +175,7 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
 
     style_init(theme);
 
-    if(disp == NULL || lv_disp_get_theme(disp) == (lv_theme_t *)theme) {
+    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 

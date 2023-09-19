@@ -22,7 +22,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t event_send_core(lv_event_t * e);
+static lv_result_t event_send_core(lv_event_t * e);
 static bool event_is_bubbled(lv_event_t * e);
 
 /**********************
@@ -42,9 +42,9 @@ static bool event_is_bubbled(lv_event_t * e);
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
+lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 {
-    if(obj == NULL) return LV_RES_OK;
+    if(obj == NULL) return LV_RESULT_OK;
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -61,7 +61,7 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
     _lv_event_push(&e);
 
     /*Send the event*/
-    lv_res_t res = event_send_core(&e);
+    lv_result_t res = event_send_core(&e);
 
     /*Remove this element from the list*/
     _lv_event_pop(&e);
@@ -70,7 +70,7 @@ lv_res_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * pa
 }
 
 
-lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
+lv_result_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     const lv_obj_class_t * base;
     if(class_p == NULL) base = ((lv_obj_t *)e->current_target)->class_p;
@@ -79,16 +79,16 @@ lv_res_t lv_obj_event_base(const lv_obj_class_t * class_p, lv_event_t * e)
     /*Find a base in which call the ancestor's event handler_cb if set*/
     while(base && base->event_cb == NULL) base = base->base_class;
 
-    if(base == NULL) return LV_RES_OK;
-    if(base->event_cb == NULL) return LV_RES_OK;
+    if(base == NULL) return LV_RESULT_OK;
+    if(base->event_cb == NULL) return LV_RESULT_OK;
 
     /*Call the actual event callback*/
     e->user_data = NULL;
     base->event_cb(base, e);
 
-    lv_res_t res = LV_RES_OK;
+    lv_result_t res = LV_RESULT_OK;
     /*Stop if the object is deleted*/
-    if(e->deleted) res = LV_RES_INV;
+    if(e->deleted) res = LV_RESULT_INVALID;
 
     return res;
 }
@@ -285,7 +285,7 @@ lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t event_send_core(lv_event_t * e)
+static lv_result_t event_send_core(lv_event_t * e)
 {
     EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
@@ -293,28 +293,28 @@ static lv_res_t event_send_core(lv_event_t * e)
     lv_indev_t * indev_act = lv_indev_get_act();
     if(indev_act) {
         if(indev_act->feedback_cb) indev_act->feedback_cb(indev_act, e);
-        if(e->stop_processing) return LV_RES_OK;
-        if(e->deleted) return LV_RES_INV;
+        if(e->stop_processing) return LV_RESULT_OK;
+        if(e->deleted) return LV_RESULT_INVALID;
     }
 
     lv_obj_t * target = e->current_target;
-    lv_res_t res = LV_RES_OK;
+    lv_result_t res = LV_RESULT_OK;
     lv_event_list_t * list = target->spec_attr ?  &target->spec_attr->event_list : NULL;
 
     res = lv_event_send(list, e, true);
-    if(res != LV_RES_OK) return res;
+    if(res != LV_RESULT_OK) return res;
 
     res = lv_obj_event_base(NULL, e);
-    if(res != LV_RES_OK) return res;
+    if(res != LV_RESULT_OK) return res;
 
     res = lv_event_send(list, e, false);
-    if(res != LV_RES_OK) return res;
+    if(res != LV_RESULT_OK) return res;
 
     lv_obj_t * parent = lv_obj_get_parent(e->current_target);
     if(parent && event_is_bubbled(e)) {
         e->current_target = parent;
         res = event_send_core(e);
-        if(res != LV_RES_OK) return res;
+        if(res != LV_RESULT_OK) return res;
     }
 
     return res;

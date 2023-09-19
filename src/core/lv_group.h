@@ -178,7 +178,7 @@ void lv_group_focus_freeze(lv_group_t * group, bool en);
  * @param c         a character (use LV_KEY_.. to navigate)
  * @return          result of focused object in group.
  */
-lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c);
+lv_result_t lv_group_send_data(lv_group_t * group, uint32_t c);
 
 /**
  * Set a function for a group which will be called when a new object is focused

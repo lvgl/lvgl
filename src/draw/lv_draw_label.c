@@ -146,8 +146,8 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
     else {
         /*If EXPAND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
-        lv_txt_get_size(&p, dsc->text, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
-                        dsc->flag);
+        lv_text_get_size(&p, dsc->text, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
+                         dsc->flag);
         w = p.x;
     }
 
@@ -184,14 +184,14 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
         pos.y += dsc->hint->y;
     }
 
-    uint32_t line_end = line_start + _lv_txt_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL,
-                                                           dsc->flag);
+    uint32_t line_end = line_start + _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL,
+                                                            dsc->flag);
 
     /*Go the first visible line*/
     while(pos.y + line_height_font < draw_unit->clip_area->y1) {
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_txt_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
+        line_end += _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
         pos.y += line_height;
 
         /*Save at the threshold coordinate*/
@@ -206,14 +206,14 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
 
     /*Align to middle*/
     if(align == LV_TEXT_ALIGN_CENTER) {
-        line_width = lv_txt_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
+        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
 
         pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
     }
     /*Align to the right*/
     else if(align == LV_TEXT_ALIGN_RIGHT) {
-        line_width = lv_txt_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
+        line_width = lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
         pos.x += lv_area_get_width(coords) - line_width;
     }
 
@@ -259,17 +259,17 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
             uint32_t logical_char_pos = 0;
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
 #if LV_USE_BIDI
-                logical_char_pos = _lv_txt_encoded_get_char_id(dsc->text, line_start);
-                uint32_t t = _lv_txt_encoded_get_char_id(bidi_txt, i);
+                logical_char_pos = _lv_text_encoded_get_char_id(dsc->text, line_start);
+                uint32_t t = _lv_text_encoded_get_char_id(bidi_txt, i);
                 logical_char_pos += _lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, base_dir, t, NULL);
 #else
-                logical_char_pos = _lv_txt_encoded_get_char_id(dsc->text, line_start + i);
+                logical_char_pos = _lv_text_encoded_get_char_id(dsc->text, line_start + i);
 #endif
             }
 
             uint32_t letter;
             uint32_t letter_next;
-            _lv_txt_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
+            _lv_text_encoded_letter_next_2(bidi_txt, &letter, &letter_next, &i);
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
@@ -327,20 +327,20 @@ void lv_draw_label_interate_letters(lv_draw_unit_t * draw_unit, const lv_draw_la
 #endif
         /*Go to next line*/
         line_start = line_end;
-        line_end += _lv_txt_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
+        line_end += _lv_text_get_next_line(&dsc->text[line_start], font, dsc->letter_space, w, NULL, dsc->flag);
 
         pos.x = coords->x1;
         /*Align to middle*/
         if(align == LV_TEXT_ALIGN_CENTER) {
             line_width =
-                lv_txt_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
+                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
 
             pos.x += (lv_area_get_width(coords) - line_width) / 2;
         }
         /*Align to the right*/
         else if(align == LV_TEXT_ALIGN_RIGHT) {
             line_width =
-                lv_txt_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
+                lv_text_get_width(&dsc->text[line_start], line_end - line_start, font, dsc->letter_space);
             pos.x += lv_area_get_width(coords) - line_width;
         }
 

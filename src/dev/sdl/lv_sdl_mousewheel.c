@@ -84,7 +84,7 @@ void _lv_sdl_mousewheel_handler(SDL_Event * event)
             return;
     }
 
-    lv_disp_t * disp = _lv_sdl_get_disp_from_win_id(win_id);
+    lv_display_t * disp = _lv_sdl_get_disp_from_win_id(win_id);
 
     /*Find a suitable indev*/
     lv_indev_t * indev = lv_indev_get_next(NULL);

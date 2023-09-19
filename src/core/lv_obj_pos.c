@@ -7,8 +7,8 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "../disp/lv_disp.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display.h"
+#include "../display/lv_display_private.h"
 #include "lv_refr.h"
 #include "../core/lv_global.h"
 
@@ -54,12 +54,12 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_res_t res_x;
+    lv_result_t res_x;
     lv_style_value_t v_x;
 
     res_x = lv_obj_get_local_style_prop(obj, LV_STYLE_X, &v_x, 0);
 
-    if((res_x == LV_RES_OK && v_x.num != x) || res_x == LV_RES_INV) {
+    if((res_x == LV_RESULT_OK && v_x.num != x) || res_x == LV_RESULT_INVALID) {
         lv_obj_set_style_x(obj, x, 0);
     }
 }
@@ -68,12 +68,12 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_res_t res_y;
+    lv_result_t res_y;
     lv_style_value_t v_y;
 
     res_y = lv_obj_get_local_style_prop(obj, LV_STYLE_Y, &v_y, 0);
 
-    if((res_y == LV_RES_OK && v_y.num != y) || res_y == LV_RES_INV) {
+    if((res_y == LV_RESULT_OK && v_y.num != y) || res_y == LV_RESULT_INVALID) {
         lv_obj_set_style_y(obj, y, 0);
     }
 }
@@ -215,12 +215,12 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_res_t res_w;
+    lv_result_t res_w;
     lv_style_value_t v_w;
 
     res_w = lv_obj_get_local_style_prop(obj, LV_STYLE_WIDTH, &v_w, 0);
 
-    if((res_w == LV_RES_OK && v_w.num != w) || res_w == LV_RES_INV) {
+    if((res_w == LV_RESULT_OK && v_w.num != w) || res_w == LV_RESULT_INVALID) {
         lv_obj_set_style_width(obj, w, 0);
     }
 }
@@ -228,12 +228,12 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_res_t res_h;
+    lv_result_t res_h;
     lv_style_value_t v_h;
 
     res_h = lv_obj_get_local_style_prop(obj, LV_STYLE_HEIGHT, &v_h, 0);
 
-    if((res_h == LV_RES_OK && v_h.num != h) || res_h == LV_RES_INV) {
+    if((res_h == LV_RESULT_OK && v_h.num != h) || res_h == LV_RESULT_INVALID) {
         lv_obj_set_style_height(obj, h, 0);
     }
 }
@@ -282,8 +282,8 @@ void lv_obj_mark_layout_as_dirty(lv_obj_t * obj)
     scr->scr_layout_inv = 1;
 
     /*Make the display refreshing*/
-    lv_disp_t * disp = lv_obj_get_disp(scr);
-    lv_disp_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
+    lv_display_t * disp = lv_obj_get_disp(scr);
+    lv_display_send_event(disp, LV_EVENT_REFR_REQUEST, NULL);
 }
 
 void lv_obj_update_layout(const lv_obj_t * obj)
@@ -802,8 +802,8 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_disp_t * disp   = lv_obj_get_disp(obj);
-    if(!lv_disp_is_invalidation_enabled(disp)) return;
+    lv_display_t * disp   = lv_obj_get_disp(obj);
+    if(!lv_display_is_invalidation_enabled(disp)) return;
 
     lv_area_t area_tmp;
     lv_area_copy(&area_tmp, area);
@@ -834,12 +834,12 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 
     /*Invalidate the object only if it belongs to the current or previous or one of the layers'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
-    if(obj_scr != lv_disp_get_scr_act(disp) &&
-       obj_scr != lv_disp_get_scr_prev(disp) &&
-       obj_scr != lv_disp_get_layer_bottom(disp) &&
-       obj_scr != lv_disp_get_layer_top(disp) &&
-       obj_scr != lv_disp_get_layer_sys(disp)) {
+    lv_display_t * disp   = lv_obj_get_disp(obj_scr);
+    if(obj_scr != lv_display_get_scr_act(disp) &&
+       obj_scr != lv_display_get_scr_prev(disp) &&
+       obj_scr != lv_display_get_layer_bottom(disp) &&
+       obj_scr != lv_display_get_layer_top(disp) &&
+       obj_scr != lv_display_get_layer_sys(disp)) {
         return false;
     }
 
@@ -1118,10 +1118,10 @@ static void layout_update_core(lv_obj_t * obj)
 
 static void transform_point(const lv_obj_t * obj, lv_point_t * p, bool inv)
 {
-    lv_coord_t angle = lv_obj_get_style_transform_angle(obj, 0);
-    lv_coord_t zoom = lv_obj_get_style_transform_zoom_safe(obj, 0);
+    lv_coord_t angle = lv_obj_get_style_transform_rotation(obj, 0);
+    lv_coord_t zoom = lv_obj_get_style_transform_scale_safe(obj, 0);
 
-    if(angle == 0 && zoom == LV_ZOOM_NONE) return;
+    if(angle == 0 && zoom == LV_SCALE_NONE) return;
 
     lv_point_t pivot = {
         .x = lv_obj_get_style_transform_pivot_x(obj, 0),

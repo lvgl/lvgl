@@ -294,8 +294,8 @@ static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 static void lv_tabview_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
-    lv_res_t res = lv_obj_event_base(&lv_tabview_class, e);
-    if(res != LV_RES_OK) return;
+    lv_result_t res = lv_obj_event_base(&lv_tabview_class, e);
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * target = lv_event_get_target(e);

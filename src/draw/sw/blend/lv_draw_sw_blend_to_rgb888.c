@@ -11,7 +11,7 @@
 
 #include "lv_draw_sw_blend.h"
 #include "../../../misc/lv_math.h"
-#include "../../../disp/lv_disp.h"
+#include "../../../display/lv_display.h"
 #include "../../../core/lv_refr.h"
 #include "../../../misc/lv_color.h"
 #include "../../../stdlib/lv_string.h"

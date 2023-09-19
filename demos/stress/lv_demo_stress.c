@@ -62,8 +62,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
 
     switch(state) {
         case -1: {
-                lv_res_t res = lv_mem_test();
-                if(res != LV_RES_OK) {
+                lv_result_t res = lv_mem_test();
+                if(res != LV_RESULT_OK) {
                     LV_LOG_ERROR("Memory integrity error");
                 }
 

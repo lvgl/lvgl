@@ -83,10 +83,10 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 }
 
 
-lv_res_t lv_mem_test_core(void)
+lv_result_t lv_mem_test_core(void)
 {
     /*Not supported*/
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /**********************
