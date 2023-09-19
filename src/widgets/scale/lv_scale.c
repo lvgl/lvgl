@@ -53,6 +53,8 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
 static void scale_find_section_tick_idx(lv_obj_t * obj);
 static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint8_t tick_idx,
                                                           const bool is_major_tick, const lv_coord_t major_tick_width, const lv_coord_t minor_tick_width);
+static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
+                                          const uint16_t major_tick_idx);
 
 /**********************
  *  STATIC VARIABLES
@@ -183,6 +185,12 @@ void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src[])
 
     scale->txt_src = txt_src;
 
+    scale->custom_label_cnt = 0;
+    lv_coord_t idx;
+    for(idx = 0; txt_src[idx]; ++idx) {
+        scale->custom_label_cnt++;
+    }
+
     lv_obj_invalidate(obj);
 }
 
@@ -284,6 +292,8 @@ static void lv_scale_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     scale->last_tick_width = 0U;
     scale->first_tick_width = 0U;
     scale->post_draw = false;
+    scale->custom_label_cnt = 0U;
+    scale->txt_src = NULL;
 
     LV_TRACE_OBJ_CREATE("finished");
 }
@@ -415,13 +425,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
                 /* Check if the custom text array has element for this major tick index */
                 if(scale->txt_src) {
-                    if(scale->txt_src[major_tick_idx - 1U]) {
-                        label_dsc.text = scale->txt_src[major_tick_idx - 1U];
-                        label_dsc.text_local = 0;
-                    }
-                    else {
-                        label_dsc.text = NULL;
-                    }
+                    scale_build_custom_label_text(obj, &label_dsc, major_tick_idx);
                 }
                 else { /* Add label with mapped values */
                     lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
@@ -589,13 +593,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
 
                 /* Check if the custom text array has element for this major tick index */
                 if(scale->txt_src) {
-                    if(scale->txt_src[major_tick_idx - 1U]) {
-                        label_dsc.text = scale->txt_src[major_tick_idx - 1U];
-                        label_dsc.text_local = 0;
-                    }
-                    else {
-                        label_dsc.text = NULL;
-                    }
+                    scale_build_custom_label_text(obj, &label_dsc, major_tick_idx);
                 }
                 else { /* Add label with mapped values */
                     lv_snprintf(text_buffer, sizeof(text_buffer), "%" LV_PRId32, tick_value);
@@ -1279,6 +1277,36 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
         else { /* Nothing to do */ }
     }
     else { /* Nothing to do */ }
+}
+
+/**
+ * Sets the text of the tick label descriptor when using custom labels
+ *
+ * Sets the text pointer when valid custom label is available, otherwise set it to NULL.
+ *
+ * @param obj       pointer to a scale object
+ * @param label_dsc pointer to the label descriptor
+ * @param major_tick_idx  index of the current major tick
+ */
+static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
+                                          const uint16_t major_tick_idx)
+{
+    lv_scale_t * scale = (lv_scale_t *) obj;
+
+    /* Check if the scale has valid custom labels available,
+     * this avoids reading past txt_src array when the scale requires more tick labels than available */
+    if(major_tick_idx <= scale->custom_label_cnt) {
+        if(scale->txt_src[major_tick_idx - 1U]) {
+            label_dsc->text = scale->txt_src[major_tick_idx - 1U];
+            label_dsc->text_local = 0;
+        }
+        else {
+            label_dsc->text = NULL;
+        }
+    }
+    else {
+        label_dsc->text = NULL;
+    }
 }
 
 #endif

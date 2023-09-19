@@ -73,6 +73,7 @@ typedef struct {
     lv_obj_t obj;
     lv_ll_t section_ll;     /**< Linked list for the sections (stores lv_scale_section_t)*/
     char ** txt_src;
+    lv_coord_t custom_label_cnt;
     lv_coord_t major_len;
     lv_coord_t minor_len;
     lv_coord_t range_min;
