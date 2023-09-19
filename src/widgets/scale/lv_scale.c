@@ -1262,76 +1262,49 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
             }
         }
 
-        if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-            lv_coord_t tmp_width = 0;
+        lv_coord_t tmp_width = 0;
 
-            if(tick_idx == section->first_tick_idx_in_section) {
-                if(section->first_tick_idx_is_major) {
-                    tmp_width = major_tick_dsc->width;
-                }
-                else {
-                    tmp_width = minor_tick_dsc->width;
-                }
+        if(tick_idx == section->first_tick_idx_in_section) {
+            if(section->first_tick_idx_is_major) {
+                tmp_width = major_tick_dsc->width;
+            }
+            else {
+                tmp_width = minor_tick_dsc->width;
+            }
 
-                section->first_tick_in_section.y = tick_point_a->y;
-                /* Add 1px as adjustment if tmp_width is odd */
-                if(tmp_width & 0x01U) {
+            section->first_tick_in_section.y = tick_point_a->y;
+            /* Add 1px as adjustment if tmp_width is odd */
+            if(tmp_width & 0x01U) {
+                if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                     tmp_width += 1U;
                 }
-                section->first_tick_in_section_width = tmp_width;
-            }
-            else if(tick_idx == section->last_tick_idx_in_section) {
-                if(section->last_tick_idx_is_major) {
-                    tmp_width = major_tick_dsc->width;
-                }
                 else {
-                    tmp_width = minor_tick_dsc->width;
-                }
-
-                section->last_tick_in_section.y = tick_point_a->y;
-                /* Add 1px as adjustment if tmp_width is odd */
-                if(tmp_width & 0x01U) {
                     tmp_width -= 1U;
                 }
-                section->last_tick_in_section_width = tmp_width;
             }
-            else { /* Nothing to do */ }
+            section->first_tick_in_section_width = tmp_width;
         }
-        else {
-            lv_coord_t tmp_width = 0;
+        else if(tick_idx == section->last_tick_idx_in_section) {
+            if(section->last_tick_idx_is_major) {
+                tmp_width = major_tick_dsc->width;
+            }
+            else {
+                tmp_width = minor_tick_dsc->width;
+            }
 
-            if(tick_idx == section->first_tick_idx_in_section) {
-                if(section->first_tick_idx_is_major) {
-                    tmp_width = major_tick_dsc->width;
-                }
-                else {
-                    tmp_width = minor_tick_dsc->width;
-                }
-
-                section->first_tick_in_section.x = tick_point_a->x;
-                /* Add 1px as adjustment if tmp_width is odd */
-                if(tmp_width & 0x01U) {
+            section->last_tick_in_section.y = tick_point_a->y;
+            /* Add 1px as adjustment if tmp_width is odd */
+            if(tmp_width & 0x01U) {
+                if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
                     tmp_width -= 1U;
                 }
-                section->first_tick_in_section_width = tmp_width;
-            }
-            else if(tick_idx == section->last_tick_idx_in_section) {
-                if(section->last_tick_idx_is_major) {
-                    tmp_width = major_tick_dsc->width;
-                }
                 else {
-                    tmp_width = minor_tick_dsc->width;
-                }
-
-                section->last_tick_in_section.x = tick_point_a->x;
-                /* Add 1px as adjustment if tmp_width is odd */
-                if(tmp_width & 0x01U) {
                     tmp_width += 1U;
                 }
-                section->last_tick_in_section_width = tmp_width;
             }
-            else { /* Nothing to do */ }
+            section->last_tick_in_section_width = tmp_width;
         }
+        else { /* Nothing to do */ }
     }
 }
 
