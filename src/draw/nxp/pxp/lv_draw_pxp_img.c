@@ -79,7 +79,7 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     lv_area_move(&rel_clip_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
 
     lv_area_t blend_area;
-    bool has_transform = dsc->angle != 0 || dsc->zoom != LV_ZOOM_NONE;
+    bool has_transform = dsc->rotation != 0 || dsc->zoom != LV_SCALE_NONE;
     if(has_transform)
         lv_area_copy(&blend_area, &rel_coords);
     else if(!_lv_area_intersect(&blend_area, &rel_coords, &rel_clip_area))
@@ -197,8 +197,8 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
 
     lv_coord_t trim_size = 0;
 
-    bool has_rotation = (dsc->angle != 0);
-    bool has_scale = (dsc->zoom != LV_ZOOM_NONE);
+    bool has_rotation = (dsc->rotation != 0);
+    bool has_scale = (dsc->zoom != LV_SCALE_NONE);
     uint8_t src_px_size = lv_color_format_get_size(src_cf);
     uint8_t dest_px_size = lv_color_format_get_size(dest_cf);
 
@@ -207,7 +207,7 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
     if(has_rotation) {
         /*Convert rotation angle and calculate offsets caused by pivot*/
         pxp_rotate_degree_t pxp_angle;
-        switch(dsc->angle) {
+        switch(dsc->rotation) {
             case 0:
                 pxp_angle = kPXP_Rotate0;
                 piv_offset_x = 0;
@@ -238,7 +238,7 @@ static void _pxp_blit_transform(uint8_t * dest_buf, const lv_area_t * dest_area,
     }
 
     if(has_scale) {
-        float scale_factor_fp = (float)dsc->zoom / LV_ZOOM_NONE;
+        float scale_factor_fp = (float)dsc->zoom / LV_SCALE_NONE;
         lv_coord_t scale_factor_int = (lv_coord_t)scale_factor_fp;
 
         /*Any scale_factor in (k, k + 1] will result in a trim equal to k*/

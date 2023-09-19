@@ -18,7 +18,7 @@
 
 #if LV_USE_DRAW_PXP
 #include "lv_pxp_cfg.h"
-#include "../../../disp/lv_disp_private.h"
+#include "../../../display/lv_display_private.h"
 
 /*********************
  *      DEFINES
@@ -100,7 +100,7 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
     const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
     bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
-    bool has_transform = (draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE);
+    bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->zoom != LV_SCALE_NONE);
 
     /* Recolor and transformation are not supported at the same time. */
     if(has_recolor && has_transform)
@@ -117,7 +117,7 @@ static bool _pxp_draw_img_supported(const lv_draw_image_dsc_t * draw_dsc)
         return false;
 
     /* PXP can only rotate at 90x angles. */
-    if(draw_dsc->angle % 900)
+    if(draw_dsc->rotation % 900)
         return false;
 
     /*

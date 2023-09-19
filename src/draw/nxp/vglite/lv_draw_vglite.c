@@ -20,7 +20,7 @@
 #include "lv_vglite_buf.h"
 #include "lv_vglite_utils.h"
 
-#include "../../../disp/lv_disp_private.h"
+#include "../../../display/lv_display_private.h"
 
 /*********************
  *      DEFINES
