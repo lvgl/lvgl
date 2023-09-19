@@ -319,6 +319,24 @@
     #endif
 #endif
 
+/* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+#ifndef LV_USE_DRAW_VGLITE
+    #ifdef CONFIG_LV_USE_DRAW_VGLITE
+        #define LV_USE_DRAW_VGLITE CONFIG_LV_USE_DRAW_VGLITE
+    #else
+        #define LV_USE_DRAW_VGLITE 0
+    #endif
+#endif
+
+/* Use NXP's PXP on iMX RTxxx platforms. */
+#ifndef LV_USE_DRAW_PXP
+    #ifdef CONFIG_LV_USE_DRAW_PXP
+        #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+    #else
+        #define LV_USE_DRAW_PXP 0
+    #endif
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/

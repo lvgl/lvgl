@@ -298,23 +298,11 @@ menu "LVGL configuration"
 					Must be defined to include path of CMSIS header of target processor
 					e.g. "SWM341.h"
 
-			config LV_USE_GPU_NXP_PXP
-				bool "Use NXP's PXP GPU iMX RTxxx platforms."
-			config LV_USE_GPU_NXP_PXP_AUTO_INIT
-				bool "Call lv_gpu_nxp_pxp_init() automatically or manually."
-				depends on LV_USE_GPU_NXP_PXP
-				help
-					1: Add default bare metal and FreeRTOS interrupt handling
-					routines for PXP (lv_gpu_nxp_pxp_osa.c) and call
-					lv_gpu_nxp_pxp_init() automatically during lv_init().
-					Note that symbol SDK_OS_FREE_RTOS has to be defined in order
-					to use FreeRTOS OSA, otherwise bare-metal implementation is
-					selected.
-					0: lv_gpu_nxp_pxp_init() has to be called manually before
-					lv_init().
+			config LV_USE_DRAW_VGLITE
+				bool "Use NXP's VG-Lite GPU on iMX RTxxx platforms."
 
-			config LV_USE_GPU_NXP_VG_LITE
-				bool "Use NXP's VG-Lite GPU iMX RTxxx platforms."
+			config LV_USE_DRAW_PXP
+				bool "Use NXP's PXP on iMX RTxxx platforms."
 
 			config LV_USE_GPU_SDL
 				bool "Use SDL renderer API"

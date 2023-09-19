@@ -123,6 +123,12 @@
     #endif
 #endif
 
+/* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+#define LV_USE_DRAW_VGLITE 0
+
+/* Use NXP's PXP on iMX RTxxx platforms. */
+#define LV_USE_DRAW_PXP 0
+
 /*=================
  * OPERATING SYSTEM
  *=================*/
