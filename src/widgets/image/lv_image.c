@@ -28,6 +28,51 @@ static void lv_image_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static void lv_image_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_image(lv_event_t * e);
 
+#if LV_USE_OBJ_PROPERTY
+static const lv_property_ops_t properties[] = {
+    {
+        .id = LV_PROPERTY_IMAGE_SRC,
+        .setter = lv_image_set_src,
+        .getter = lv_image_get_src,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_OFFSET_X,
+        .setter = lv_image_set_offset_x,
+        .getter = lv_image_get_offset_x,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_OFFSET_Y,
+        .setter = lv_image_set_offset_y,
+        .getter = lv_image_get_offset_y,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_ROTATION,
+        .setter = lv_image_set_rotation,
+        .getter = lv_image_get_rotation,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_PIVOT,
+        .setter = _lv_image_set_pivot,
+        .getter = lv_image_get_pivot,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_SCALE,
+        .setter = lv_image_set_scale,
+        .getter = lv_image_get_scale,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_ANTIALIAS,
+        .setter = lv_image_set_antialias,
+        .getter = lv_image_get_antialias,
+    },
+    {
+        .id = LV_PROPERTY_IMAGE_SIZE_MODE,
+        .setter = lv_image_set_size_mode,
+        .getter = lv_image_get_size_mode,
+    },
+};
+#endif
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -40,6 +85,12 @@ const lv_obj_class_t lv_image_class = {
     .instance_size = sizeof(lv_image_t),
     .base_class = &lv_obj_class,
     .name = "image",
+#if LV_USE_OBJ_PROPERTY
+    .prop_index_start = LV_PROPERTY_IMAGE_START,
+    .prop_index_end = LV_PROPERTY_IMAGE_END,
+    .properties = properties,
+    .properties_count = sizeof(properties) / sizeof(properties[0]),
+#endif
 };
 
 /**********************

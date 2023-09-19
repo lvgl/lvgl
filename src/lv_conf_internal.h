@@ -778,6 +778,15 @@
     #endif
 #endif
 
+/*Use obj property set/get API*/
+#ifndef LV_USE_OBJ_PROPERTY
+    #ifdef CONFIG_LV_USE_OBJ_PROPERTY
+        #define LV_USE_OBJ_PROPERTY CONFIG_LV_USE_OBJ_PROPERTY
+    #else
+        #define LV_USE_OBJ_PROPERTY 0
+    #endif
+#endif
+
 /*=====================
  *  COMPILER SETTINGS
  *====================*/
