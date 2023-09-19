@@ -29,7 +29,7 @@ extern "C" {
  **********************/
 
 /**
- * Register the JPEG decoder functions in LVGL
+ * Register the JPEG-Turbo decoder functions in LVGL
  */
 void lv_jpeg_turbo_init(void);
 

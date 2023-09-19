@@ -6,11 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_jpeg_turbo.h"
-
+#include "../../../lvgl.h"
 #if LV_USE_JPEG_TURBO
 
-#include "lvgl/lvgl.h"
+#include "lv_jpeg_turbo.h"
 #include <stdio.h>
 #include <jpeglib.h>
 #include <setjmp.h>
