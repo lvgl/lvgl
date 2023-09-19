@@ -53,6 +53,9 @@ static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc
 static void scale_find_section_tick_idx(lv_obj_t * obj);
 static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint8_t tick_idx,
                                                           const bool is_major_tick, const lv_coord_t major_tick_width, const lv_coord_t minor_tick_width);
+static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, const bool is_major_tick,
+                                                             lv_draw_label_dsc_t * label_dsc, lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
+                                                             const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a);
 static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc,
                                           const uint16_t major_tick_idx);
 
@@ -441,88 +444,8 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             scale_store_main_line_tick_width_compensation(obj, tick_idx, is_major_tick, major_tick_dsc.width, minor_tick_dsc.width);
 
             /* Store the first and last section tick vertical/horizontal position */
-            _LV_LL_READ_BACK(&scale->section_ll, section) {
-                if(section->minor_range <= tick_value && section->major_range >= tick_value) {
-                    if(is_major_tick) {
-                        scale_set_indicator_label_properties(obj, &label_dsc, section->indicator_style);
-                        scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
-                    }
-                    else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
-                    }
-                }
-
-                if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
-                    lv_coord_t tmp_width = 0;
-
-                    if(tick_idx == section->first_tick_idx_in_section) {
-                        if(section->first_tick_idx_is_major) {
-                            tmp_width = major_tick_dsc.width;
-                        }
-                        else {
-                            tmp_width = minor_tick_dsc.width;
-                        }
-
-                        section->first_tick_in_section.y = tick_point_a.y;
-                        /* Add 1px as adjustment if tmp_width is odd */
-                        if(tmp_width & 0x01U) {
-                            tmp_width += 1U;
-                        }
-                        section->first_tick_in_section_width = tmp_width;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section) {
-                        if(section->last_tick_idx_is_major) {
-                            tmp_width = major_tick_dsc.width;
-                        }
-                        else {
-                            tmp_width = minor_tick_dsc.width;
-                        }
-
-                        section->last_tick_in_section.y = tick_point_a.y;
-                        /* Add 1px as adjustment if tmp_width is odd */
-                        if(tmp_width & 0x01U) {
-                            tmp_width -= 1U;
-                        }
-                        section->last_tick_in_section_width = tmp_width;
-                    }
-                    else { /* Nothing to do */ }
-                }
-                else {
-                    lv_coord_t tmp_width = 0;
-
-                    if(tick_idx == section->first_tick_idx_in_section) {
-                        if(section->first_tick_idx_is_major) {
-                            tmp_width = major_tick_dsc.width;
-                        }
-                        else {
-                            tmp_width = minor_tick_dsc.width;
-                        }
-
-                        section->first_tick_in_section.x = tick_point_a.x;
-                        /* Add 1px as adjustment if tmp_width is odd */
-                        if(tmp_width & 0x01U) {
-                            tmp_width -= 1U;
-                        }
-                        section->first_tick_in_section_width = tmp_width;
-                    }
-                    else if(tick_idx == section->last_tick_idx_in_section) {
-                        if(section->last_tick_idx_is_major) {
-                            tmp_width = major_tick_dsc.width;
-                        }
-                        else {
-                            tmp_width = minor_tick_dsc.width;
-                        }
-
-                        section->last_tick_in_section.x = tick_point_a.x;
-                        /* Add 1px as adjustment if tmp_width is odd */
-                        if(tmp_width & 0x01U) {
-                            tmp_width += 1U;
-                        }
-                        section->last_tick_in_section_width = tmp_width;
-                    }
-                    else { /* Nothing to do */ }
-                }
-            }
+            scale_store_section_line_tick_width_compensation(obj, is_major_tick, &label_dsc, &major_tick_dsc, &minor_tick_dsc,
+                                                             tick_value, tick_idx, &tick_point_a);
 
             if(is_major_tick) {
                 major_tick_dsc.p1 = tick_point_a;
@@ -1306,6 +1229,109 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
     }
     else {
         label_dsc->text = NULL;
+    }
+}
+
+/**
+ * Stores tick width compensation information for main line sections
+ *
+ * @param obj       pointer to a scale object
+ * @param is_major_tick Indicates if tick is major or not
+ * @param label_dsc pointer to the label descriptor
+ * @param major_tick_dsc pointer to the major_tick_dsc
+ * @param minor_tick_dsc pointer to the minor_tick_dsc
+ * @param tick_value Current tick value, used to know if tick_idx belongs to a section or not
+ * @param tick_idx Current tick index
+ * @param tick_point_a Pointer to tick point a
+ */
+static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, const bool is_major_tick,
+                                                             lv_draw_label_dsc_t * label_dsc, lv_draw_line_dsc_t * major_tick_dsc, lv_draw_line_dsc_t * minor_tick_dsc,
+                                                             const int32_t tick_value, const uint8_t tick_idx, lv_point_t * tick_point_a)
+{
+    lv_scale_t * scale = (lv_scale_t *) obj;
+    lv_scale_section_t * section;
+
+    _LV_LL_READ_BACK(&scale->section_ll, section) {
+        if(section->minor_range <= tick_value && section->major_range >= tick_value) {
+            if(is_major_tick) {
+                scale_set_indicator_label_properties(obj, label_dsc, section->indicator_style);
+                scale_set_line_properties(obj, major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
+            }
+            else {
+                scale_set_line_properties(obj, minor_tick_dsc, section->items_style, LV_PART_ITEMS);
+            }
+        }
+
+        if(LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode) {
+            lv_coord_t tmp_width = 0;
+
+            if(tick_idx == section->first_tick_idx_in_section) {
+                if(section->first_tick_idx_is_major) {
+                    tmp_width = major_tick_dsc->width;
+                }
+                else {
+                    tmp_width = minor_tick_dsc->width;
+                }
+
+                section->first_tick_in_section.y = tick_point_a->y;
+                /* Add 1px as adjustment if tmp_width is odd */
+                if(tmp_width & 0x01U) {
+                    tmp_width += 1U;
+                }
+                section->first_tick_in_section_width = tmp_width;
+            }
+            else if(tick_idx == section->last_tick_idx_in_section) {
+                if(section->last_tick_idx_is_major) {
+                    tmp_width = major_tick_dsc->width;
+                }
+                else {
+                    tmp_width = minor_tick_dsc->width;
+                }
+
+                section->last_tick_in_section.y = tick_point_a->y;
+                /* Add 1px as adjustment if tmp_width is odd */
+                if(tmp_width & 0x01U) {
+                    tmp_width -= 1U;
+                }
+                section->last_tick_in_section_width = tmp_width;
+            }
+            else { /* Nothing to do */ }
+        }
+        else {
+            lv_coord_t tmp_width = 0;
+
+            if(tick_idx == section->first_tick_idx_in_section) {
+                if(section->first_tick_idx_is_major) {
+                    tmp_width = major_tick_dsc->width;
+                }
+                else {
+                    tmp_width = minor_tick_dsc->width;
+                }
+
+                section->first_tick_in_section.x = tick_point_a->x;
+                /* Add 1px as adjustment if tmp_width is odd */
+                if(tmp_width & 0x01U) {
+                    tmp_width -= 1U;
+                }
+                section->first_tick_in_section_width = tmp_width;
+            }
+            else if(tick_idx == section->last_tick_idx_in_section) {
+                if(section->last_tick_idx_is_major) {
+                    tmp_width = major_tick_dsc->width;
+                }
+                else {
+                    tmp_width = minor_tick_dsc->width;
+                }
+
+                section->last_tick_in_section.x = tick_point_a->x;
+                /* Add 1px as adjustment if tmp_width is odd */
+                if(tmp_width & 0x01U) {
+                    tmp_width += 1U;
+                }
+                section->last_tick_in_section_width = tmp_width;
+            }
+            else { /* Nothing to do */ }
+        }
     }
 }
 
