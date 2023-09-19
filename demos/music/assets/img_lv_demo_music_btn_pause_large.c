@@ -6,11 +6,11 @@
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_BTN_PAUSE
-    #define LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_BTN_PAUSE
+#ifndef LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_BTN_PAUSE
+    #define LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_BTN_PAUSE
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMG_LV_DEMO_MUSIC_BTN_PAUSE uint8_t
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_LV_DEMO_MUSIC_BTN_PAUSE uint8_t
 img_lv_demo_music_btn_pause_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     /*Pixel format: Blue: 2 bit, Green: 3 bit, Red: 3 bit, Alpha 8 bit */
@@ -449,7 +449,7 @@ img_lv_demo_music_btn_pause_map[] = {
 #endif
 };
 
-const lv_img_dsc_t img_lv_demo_music_btn_pause = {
+const lv_image_dsc_t img_lv_demo_music_btn_pause = {
     .header.always_zero = 0,
     .header.w = 141,
     .header.h = 142,

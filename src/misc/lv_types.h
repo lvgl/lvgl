@@ -51,16 +51,16 @@ extern "C" {
 /**
  * LVGL error codes.
  */
-enum _lv_res_t {
-    LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
+enum _lv_result_t {
+    LV_RESULT_INVALID = 0, /*Typically indicates that the object is deleted (become invalid) in the action
                       function or an operation was failed*/
-    LV_RES_OK,      /*The object is valid (no deleted) after the action*/
+    LV_RESULT_OK,      /*The object is valid (no deleted) after the action*/
 };
 
 #ifdef DOXYGEN
-typedef _lv_res_t lv_res_t;
+typedef _lv_result_t lv_result_t;
 #else
-typedef uint8_t lv_res_t;
+typedef uint8_t lv_result_t;
 #endif /*DOXYGEN*/
 
 

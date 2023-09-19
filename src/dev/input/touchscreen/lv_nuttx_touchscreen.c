@@ -96,7 +96,7 @@ static void touchscreen_read(lv_indev_t * drv, lv_indev_data_t * data)
         uint8_t touch_flags = sample.point[0].flags;
 
         if(touch_flags & TOUCH_DOWN || touch_flags & TOUCH_MOVE) {
-            const lv_disp_t * disp_drv = drv->disp;
+            const lv_display_t * disp_drv = drv->disp;
             lv_coord_t ver_max = disp_drv->ver_res - 1;
             lv_coord_t hor_max = disp_drv->hor_res - 1;
 

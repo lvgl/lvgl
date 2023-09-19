@@ -52,7 +52,7 @@ To set the descriptors on a parent use
 Besides simple settings the size in pixel you can use two special
 values:
 
-- :c:macro:`LV_GRID_CONTENT` set the width to the largest children on this track
+- :c:macro:`LV_GRID_CONTENT` set the size to fit the largest child on this track
 - :c:expr:`LV_GRID_FR(X)` tell what portion of the remaining space
   should be used by this track. Larger value means larger space.
 
@@ -74,7 +74,7 @@ in its cell. The possible values are:
   means the zero based index of the cell into the item should be placed.
 
 ``colum_span`` and ``row_span`` means how many tracks should the item
-involve from the start cell. Must be > 1.
+involve from the start cell. Must be >= 1.
 
 Grid align
 ----------

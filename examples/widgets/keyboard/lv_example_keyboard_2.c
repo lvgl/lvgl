@@ -11,11 +11,11 @@ void lv_example_keyboard_2(void)
                                    };
 
     /*Set the relative width of the buttons and other controls*/
-    static const lv_btnmatrix_ctrl_t kb_ctrl[] = {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6,
-                                                  4, 4, 4, 4, 4, 4, 4, 4, 4, 6,
-                                                  4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-                                                  2, LV_BTNMATRIX_CTRL_HIDDEN | 2, 6, LV_BTNMATRIX_CTRL_HIDDEN | 2, 2
-                                                 };
+    static const lv_buttonmatrix_ctrl_t kb_ctrl[] = {4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6,
+                                                     4, 4, 4, 4, 4, 4, 4, 4, 4, 6,
+                                                     4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+                                                     2, LV_BUTTONMATRIX_CTRL_HIDDEN | 2, 6, LV_BUTTONMATRIX_CTRL_HIDDEN | 2, 2
+                                                    };
 
     /*Create a keyboard and add the new map as USER_1 mode*/
     lv_obj_t * kb = lv_keyboard_create(lv_scr_act());

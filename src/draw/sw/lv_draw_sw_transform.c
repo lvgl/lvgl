@@ -80,13 +80,13 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
 
 void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
                           lv_coord_t src_w, lv_coord_t src_h,
-                          const lv_draw_img_dsc_t * draw_dsc, const lv_draw_img_sup_t * sup, lv_color_format_t src_cf, void * dest_buf)
+                          const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t src_cf, void * dest_buf)
 {
     LV_UNUSED(draw_unit);
     LV_UNUSED(sup);
 
     point_transform_dsc_t tr_dsc;
-    tr_dsc.angle = -draw_dsc->angle;
+    tr_dsc.angle = -draw_dsc->rotation;
     tr_dsc.zoom = (256 * 256) / draw_dsc->zoom;
     tr_dsc.pivot = draw_dsc->pivot;
 
@@ -570,7 +570,7 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
 static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int32_t yin, int32_t * xout,
                                      int32_t * yout)
 {
-    if(t->angle == 0 && t->zoom == LV_ZOOM_NONE) {
+    if(t->angle == 0 && t->zoom == LV_SCALE_NONE) {
         *xout = xin * 256;
         *yout = yin * 256;
         return;
@@ -583,7 +583,7 @@ static void transform_point_upscaled(point_transform_dsc_t * t, int32_t xin, int
         *xout = ((int32_t)(xin * t->zoom)) + (t->pivot_x_256);
         *yout = ((int32_t)(yin * t->zoom)) + (t->pivot_y_256);
     }
-    else if(t->zoom == LV_ZOOM_NONE) {
+    else if(t->zoom == LV_SCALE_NONE) {
         *xout = ((t->cosma * xin - t->sinma * yin) >> 2) + (t->pivot_x_256);
         *yout = ((t->sinma * xin + t->cosma * yin) >> 2) + (t->pivot_y_256);
     }

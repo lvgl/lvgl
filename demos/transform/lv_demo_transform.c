@@ -37,7 +37,7 @@ static lv_style_t style_card;
 static lv_style_t style_avatar;
 static lv_style_t style_btn;
 static lv_obj_t * card_to_transform;
-LV_IMG_DECLARE(img_transform_avatar_15)
+LV_IMAGE_DECLARE(img_transform_avatar_15)
 
 /**********************
  *      MACROS
@@ -87,7 +87,7 @@ void lv_demo_transform(void)
     card_to_transform = card_create();
     lv_obj_center(card_to_transform);
 
-    lv_coord_t disp_w = lv_disp_get_hor_res(NULL);
+    lv_coord_t disp_w = lv_display_get_horizontal_resolution(NULL);
     lv_obj_t * arc = lv_arc_create(lv_scr_act());
     lv_obj_set_size(arc, disp_w - 20, disp_w - 20);
     lv_arc_set_range(arc, 0, 270);
@@ -114,8 +114,8 @@ static lv_obj_t * card_create(void)
     lv_obj_add_style(card, &style_card, 0);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
 
-    lv_obj_t * avatar = lv_img_create(card);
-    lv_img_set_src(avatar, &img_transform_avatar_15);
+    lv_obj_t * avatar = lv_image_create(card);
+    lv_image_set_src(avatar, &img_transform_avatar_15);
     lv_obj_set_grid_cell(avatar, LV_GRID_ALIGN_CENTER, 0, 1, LV_GRID_ALIGN_CENTER, 0, 4);
     lv_obj_add_style(avatar, &style_avatar, 0);
 
@@ -124,14 +124,14 @@ static lv_obj_t * card_create(void)
     lv_obj_set_grid_cell(name, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_CENTER, 0, 1);
     lv_obj_set_style_text_font(name, &lv_font_montserrat_18, 0);
 
-    lv_obj_t * btn = lv_btn_create(card);
+    lv_obj_t * btn = lv_button_create(card);
     lv_obj_clear_flag(card, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
     lv_obj_set_grid_cell(btn, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_CENTER, 3, 1);
     lv_obj_add_style(btn, &style_btn, 0);
 
-    LV_IMG_DECLARE(img_multilang_like)
-    lv_obj_t * btn_img = lv_img_create(btn);
-    lv_img_set_src(btn_img, &img_multilang_like);
+    LV_IMAGE_DECLARE(img_multilang_like)
+    lv_obj_t * btn_img = lv_image_create(btn);
+    lv_image_set_src(btn_img, &img_multilang_like);
     lv_obj_align(btn_img, LV_ALIGN_LEFT_MID, 30, 0);
 
     lv_obj_t * btn_label = lv_label_create(btn);
@@ -148,14 +148,14 @@ static void arc_event_cb(lv_event_t * e)
     lv_obj_t * arc = lv_event_get_target(e);
 
     int32_t v = lv_arc_get_angle_end(arc);
-    lv_obj_set_style_transform_angle(card_to_transform, v * 10, 0);
+    lv_obj_set_style_transform_rotation(card_to_transform, v * 10, 0);
 }
 
 static void slider_event_cb(lv_event_t * e)
 {
     lv_obj_t * slider = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(slider);
-    lv_obj_set_style_transform_zoom(card_to_transform, v, 0);
+    lv_obj_set_style_transform_scale(card_to_transform, v, 0);
 }
 
 #endif

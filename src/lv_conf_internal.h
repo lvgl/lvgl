@@ -663,11 +663,11 @@
 
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
-#ifndef LV_DISP_ROT_MAX_BUF
-    #ifdef CONFIG_LV_DISP_ROT_MAX_BUF
-        #define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
+#ifndef LV_DISPLAY_ROT_MAX_BUF
+    #ifdef CONFIG_LV_DISPLAY_ROT_MAX_BUF
+        #define LV_DISPLAY_ROT_MAX_BUF CONFIG_LV_DISPLAY_ROT_MAX_BUF
     #else
-        #define LV_DISP_ROT_MAX_BUF (10*1024)
+        #define LV_DISPLAY_ROT_MAX_BUF (10*1024)
     #endif
 #endif
 
@@ -689,19 +689,17 @@
     #endif
 #endif
 
-/*Default image cache size. Image caching keeps some images opened.
- *If only the built-in image formats are used there is no real advantage of caching.
- *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
- *However the opened images consume additional RAM.
- *0: to disable caching*/
-#ifndef LV_IMG_CACHE_DEF_SIZE
-    #ifdef CONFIG_LV_IMG_CACHE_DEF_SIZE
-        #define LV_IMG_CACHE_DEF_SIZE CONFIG_LV_IMG_CACHE_DEF_SIZE
+/*Default cache size in bytes.
+ *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Data larger than the size of the cache also can be allocated but
+ *will be dropped immediately after usage.*/
+#ifndef LV_CACHE_DEF_SIZE
+    #ifdef CONFIG_LV_CACHE_DEF_SIZE
+        #define LV_CACHE_DEF_SIZE CONFIG_LV_CACHE_DEF_SIZE
     #else
-        #define LV_IMG_CACHE_DEF_SIZE 0
+        #define LV_CACHE_DEF_SIZE       0
     #endif
 #endif
-
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
@@ -768,7 +766,7 @@
     #endif
 #endif
 
-/*Define a custom attribute to `lv_disp_flush_ready` function*/
+/*Define a custom attribute to `lv_display_flush_ready` function*/
 #ifndef LV_ATTRIBUTE_FLUSH_READY
     #ifdef CONFIG_LV_ATTRIBUTE_FLUSH_READY
         #define LV_ATTRIBUTE_FLUSH_READY CONFIG_LV_ATTRIBUTE_FLUSH_READY
@@ -1959,11 +1957,11 @@
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#ifndef LV_USE_SJPG
-    #ifdef CONFIG_LV_USE_SJPG
-        #define LV_USE_SJPG CONFIG_LV_USE_SJPG
+#ifndef LV_USE_JPG
+    #ifdef CONFIG_LV_USE_JPG
+        #define LV_USE_JPG CONFIG_LV_USE_JPG
     #else
-        #define LV_USE_SJPG 0
+        #define LV_USE_JPG 0
     #endif
 #endif
 
@@ -2226,11 +2224,11 @@
     #endif
 
     /*1: Use img cache to buffer header information*/
-    #ifndef LV_IMGFONT_USE_IMG_CACHE_HEADER
-        #ifdef CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
-            #define LV_IMGFONT_USE_IMG_CACHE_HEADER CONFIG_LV_IMGFONT_USE_IMG_CACHE_HEADER
+    #ifndef LV_IMGFONT_USE_IMAGE_CACHE_HEADER
+        #ifdef CONFIG_LV_IMGFONT_USE_IMAGE_CACHE_HEADER
+            #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER CONFIG_LV_IMGFONT_USE_IMAGE_CACHE_HEADER
         #else
-            #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+            #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
         #endif
     #endif
 #endif
@@ -2357,7 +2355,7 @@
         #ifdef CONFIG_LV_SDL_RENDER_MODE
             #define LV_SDL_RENDER_MODE CONFIG_LV_SDL_RENDER_MODE
         #else
-            #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+            #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
         #endif
     #endif
     #ifndef LV_SDL_BUF_COUNT
@@ -2418,7 +2416,7 @@
         #ifdef CONFIG_LV_LINUX_FBDEV_RENDER_MODE
             #define LV_LINUX_FBDEV_RENDER_MODE CONFIG_LV_LINUX_FBDEV_RENDER_MODE
         #else
-            #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
+            #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
         #endif
     #endif
     #ifndef LV_LINUX_FBDEV_BUFFER_COUNT

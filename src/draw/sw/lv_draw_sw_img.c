@@ -9,12 +9,12 @@
 #include "lv_draw_sw.h"
 #if LV_USE_DRAW_SW
 
-#include "../lv_img_cache.h"
-#include "../../disp/lv_disp.h"
-#include "../../disp/lv_disp_private.h"
+#include "../../display/lv_display.h"
+#include "../../display/lv_display_private.h"
 #include "../../misc/lv_log.h"
 #include "../../core/lv_refr.h"
 #include "../../stdlib/lv_mem.h"
+#include "../../misc/lv_cache.h"
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_color.h"
 #include "../../stdlib/lv_string.h"
@@ -22,7 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define MAX_BUF_SIZE (uint32_t) 4 * lv_draw_buf_width_to_stride(lv_disp_get_hor_res(_lv_refr_get_disp_refreshing()), lv_disp_get_color_format(_lv_refr_get_disp_refreshing()))
+#define MAX_BUF_SIZE (uint32_t) 4 * lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing()), lv_display_get_color_format(_lv_refr_get_disp_refreshing()))
 
 /**********************
  *      TYPEDEFS
@@ -31,8 +31,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * draw_area,
-                          const lv_img_decoder_dsc_t * src, lv_draw_img_sup_t * sup, const lv_area_t * img_coords);
+static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * draw_area,
+                          const lv_image_decoder_dsc_t * src, lv_draw_image_sup_t * sup, const lv_area_t * img_coords);
 
 /**********************
  *  STATIC VARIABLES
@@ -46,7 +46,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * 
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * coords)
+void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * coords)
 {
     lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
 
@@ -54,7 +54,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
      *In this case just return. */
     if(layer_to_draw->draw_buf.buf == NULL) return;
 
-    lv_img_dsc_t img_dsc;
+    lv_image_dsc_t img_dsc;
     img_dsc.header.w = layer_to_draw->draw_buf.width;
     img_dsc.header.h = layer_to_draw->draw_buf.height;
     img_dsc.header.cf = layer_to_draw->draw_buf.color_format;
@@ -62,20 +62,20 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     img_dsc.header.always_zero = 0;
     img_dsc.data = lv_draw_buf_get_buf(&layer_to_draw->draw_buf);
 
-    lv_draw_img_dsc_t new_draw_dsc;
-    lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_img_dsc_t));
+    lv_draw_image_dsc_t new_draw_dsc;
+    lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
     new_draw_dsc.src = &img_dsc;
 
-    lv_draw_sw_img(draw_unit, &new_draw_dsc, coords);
+    lv_draw_sw_image(draw_unit, &new_draw_dsc, coords);
 
 #if LV_USE_LAYER_DEBUG || LV_USE_PARALLEL_DRAW_DEBUG
     lv_area_t area_rot;
     lv_area_copy(&area_rot, coords);
-    if(draw_dsc->angle || draw_dsc->zoom != LV_ZOOM_NONE) {
+    if(draw_dsc->rotation || draw_dsc->zoom != LV_SCALE_NONE) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
-        _lv_img_buf_get_transformed_area(&area_rot, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
+        _lv_image_buf_get_transformed_area(&area_rot, w, h, draw_dsc->rotation, draw_dsc->zoom, &draw_dsc->pivot);
 
         area_rot.x1 += coords->x1;
         area_rot.y1 += coords->y1;
@@ -104,7 +104,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
 
 #if LV_USE_PARALLEL_DRAW_DEBUG
     uint32_t idx = 0;
-    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    lv_display_t * disp = _lv_refr_get_disp_refreshing();
     lv_draw_unit_t * draw_unit_tmp = disp->draw_unit_head;
     while(draw_unit_tmp != draw_unit) {
         draw_unit_tmp = draw_unit_tmp->next;
@@ -121,7 +121,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
     lv_draw_sw_rect(draw_unit, &rect_dsc, &area_rot);
 
     lv_point_t txt_size;
-    lv_txt_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+    lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
     lv_area_t txt_area;
     txt_area.x1 = draw_area.x1;
@@ -145,16 +145,16 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw
 
 
 
-LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc,
-                                          const lv_area_t * coords)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_image(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc,
+                                            const lv_area_t * coords)
 {
     lv_area_t transformed_area;
     lv_area_copy(&transformed_area, coords);
-    if(draw_dsc->angle || draw_dsc->zoom != LV_ZOOM_NONE) {
+    if(draw_dsc->rotation || draw_dsc->zoom != LV_SCALE_NONE) {
         int32_t w = lv_area_get_width(coords);
         int32_t h = lv_area_get_height(coords);
 
-        _lv_img_buf_get_transformed_area(&transformed_area, w, h, draw_dsc->angle, draw_dsc->zoom, &draw_dsc->pivot);
+        _lv_image_buf_get_transformed_area(&transformed_area, w, h, draw_dsc->rotation, draw_dsc->zoom, &draw_dsc->pivot);
 
         transformed_area.x1 += coords->x1;
         transformed_area.y1 += coords->y1;
@@ -168,14 +168,14 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         return;
     }
 
-    lv_img_decoder_dsc_t decoder_dsc;
-    lv_res_t res = lv_img_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
-    if(res != LV_RES_OK) {
+    lv_image_decoder_dsc_t decoder_dsc;
+    lv_result_t res = lv_image_decoder_open(&decoder_dsc, draw_dsc->src, draw_dsc->recolor, -1);
+    if(res != LV_RESULT_OK) {
         LV_LOG_ERROR("Failed to open image");
         return;
     }
 
-    lv_draw_img_sup_t sup;
+    lv_draw_image_sup_t sup;
     sup.alpha_color = draw_dsc->recolor;
     sup.palette = decoder_dsc.palette;
     sup.palette_size = decoder_dsc.palette_size;
@@ -195,13 +195,13 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         relative_decoded_area.y1 = LV_COORD_MIN;
         relative_decoded_area.x2 = LV_COORD_MIN;
         relative_decoded_area.y2 = LV_COORD_MIN;
-        res = LV_RES_OK;
-        while(res == LV_RES_OK) {
-            res = lv_img_decoder_get_area(&decoder_dsc, &relative_full_area_to_decode, &relative_decoded_area);
+        res = LV_RESULT_OK;
+        while(res == LV_RESULT_OK) {
+            res = lv_image_decoder_get_area(&decoder_dsc, &relative_full_area_to_decode, &relative_decoded_area);
 
             lv_area_t absolute_decoded_area = relative_decoded_area;
             lv_area_move(&absolute_decoded_area, coords->x1, coords->y1);
-            if(res == LV_RES_OK) {
+            if(res == LV_RESULT_OK) {
                 /*Limit draw area to the current decoded area and draw the image*/
                 lv_area_t draw_area_sub;
                 if(_lv_area_intersect(&draw_area_sub, &draw_area, &absolute_decoded_area)) {
@@ -212,17 +212,18 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_sw_img(lv_draw_unit_t * draw_unit, const lv_d
         }
     }
 
-    lv_img_decoder_close(&decoder_dsc);
+    lv_image_decoder_close(&decoder_dsc);
 }
 
-static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_img_dsc_t * draw_dsc, const lv_area_t * draw_area,
-                          const lv_img_decoder_dsc_t * src, lv_draw_img_sup_t * sup, const lv_area_t * img_coords)
+
+static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * draw_dsc, const lv_area_t * draw_area,
+                          const lv_image_decoder_dsc_t * src, lv_draw_image_sup_t * sup, const lv_area_t * img_coords)
 {
-    bool transformed = draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE ? true : false;
+    bool transformed = draw_dsc->rotation != 0 || draw_dsc->zoom != LV_SCALE_NONE ? true : false;
 
     lv_draw_sw_blend_dsc_t blend_dsc;
     const uint8_t * src_buf = src->img_data;
-    const lv_img_header_t * header = &src->header;
+    const lv_image_header_t * header = &src->header;
     uint32_t img_stride = header->stride;
     lv_color_format_t cf = header->cf;
 

@@ -11,7 +11,7 @@ static lv_obj_t * img1;
 /**
  * Demonstrate runtime image re-coloring
  */
-void lv_example_img_2(void)
+void lv_example_image_2(void)
 {
     /*Create 4 sliders to adjust RGB color and re-color intensity*/
     red_slider = create_slider(lv_palette_main(LV_PALETTE_RED));
@@ -30,9 +30,9 @@ void lv_example_img_2(void)
     lv_obj_align_to(intense_slider, blue_slider, LV_ALIGN_OUT_RIGHT_MID, 25, 0);
 
     /*Now create the actual image*/
-    LV_IMG_DECLARE(img_cogwheel_argb)
-    img1 = lv_img_create(lv_scr_act());
-    lv_img_set_src(img1, &img_cogwheel_argb);
+    LV_IMAGE_DECLARE(img_cogwheel_argb)
+    img1 = lv_image_create(lv_scr_act());
+    lv_image_set_src(img1, &img_cogwheel_argb);
     lv_obj_align(img1, LV_ALIGN_RIGHT_MID, -20, 0);
 
     lv_obj_send_event(intense_slider, LV_EVENT_VALUE_CHANGED, NULL);
@@ -46,8 +46,8 @@ static void slider_event_cb(lv_event_t * e)
     lv_color_t color  = lv_color_make(lv_slider_get_value(red_slider), lv_slider_get_value(green_slider),
                                       lv_slider_get_value(blue_slider));
     lv_opa_t intense = lv_slider_get_value(intense_slider);
-    lv_obj_set_style_img_recolor_opa(img1, intense, 0);
-    lv_obj_set_style_img_recolor(img1, color, 0);
+    lv_obj_set_style_image_recolor_opa(img1, intense, 0);
+    lv_obj_set_style_image_recolor(img1, color, 0);
 }
 
 static lv_obj_t * create_slider(lv_color_t color)

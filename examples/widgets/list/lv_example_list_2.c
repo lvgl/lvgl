@@ -14,7 +14,7 @@ static void event_handler(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
     if(code == LV_EVENT_CLICKED) {
-        LV_LOG_USER("Clicked: %s", lv_list_get_btn_text(list1, obj));
+        LV_LOG_USER("Clicked: %s", lv_list_get_button_text(list1, obj));
 
         if(currentButton == obj) {
             currentButton = NULL;
@@ -123,7 +123,7 @@ void lv_example_list_2(void)
     lv_obj_t * btn;
     int i;
     for(i = 0; i < 15; i++) {
-        btn = lv_btn_create(list1);
+        btn = lv_button_create(list1);
         lv_obj_set_width(btn, lv_pct(50));
         lv_obj_add_event(btn, event_handler, LV_EVENT_CLICKED, NULL);
 
@@ -141,27 +141,27 @@ void lv_example_list_2(void)
     lv_obj_align(list2, LV_ALIGN_TOP_RIGHT, 0, 0);
     lv_obj_set_flex_flow(list2, LV_FLEX_FLOW_COLUMN);
 
-    btn = lv_list_add_btn(list2, NULL, "Top");
+    btn = lv_list_add_button(list2, NULL, "Top");
     lv_obj_add_event(btn, event_handler_top, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, LV_SYMBOL_UP, "Up");
+    btn = lv_list_add_button(list2, LV_SYMBOL_UP, "Up");
     lv_obj_add_event(btn, event_handler_up, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, LV_SYMBOL_LEFT, "Center");
+    btn = lv_list_add_button(list2, LV_SYMBOL_LEFT, "Center");
     lv_obj_add_event(btn, event_handler_center, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, LV_SYMBOL_DOWN, "Down");
+    btn = lv_list_add_button(list2, LV_SYMBOL_DOWN, "Down");
     lv_obj_add_event(btn, event_handler_dn, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, NULL, "Bottom");
+    btn = lv_list_add_button(list2, NULL, "Bottom");
     lv_obj_add_event(btn, event_handler_bottom, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 
-    btn = lv_list_add_btn(list2, LV_SYMBOL_SHUFFLE, "Shuffle");
+    btn = lv_list_add_button(list2, LV_SYMBOL_SHUFFLE, "Shuffle");
     lv_obj_add_event(btn, event_handler_swap, LV_EVENT_ALL, NULL);
     lv_group_remove_obj(btn);
 }

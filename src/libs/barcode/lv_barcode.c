@@ -83,17 +83,17 @@ void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale)
     barcode->scale = scale;
 }
 
-lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
+lv_result_t lv_barcode_update(lv_obj_t * obj, const char * data)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     LV_ASSERT_NULL(data);
 
-    lv_res_t res = LV_RES_INV;
+    lv_result_t res = LV_RESULT_INVALID;
     lv_barcode_t * barcode = (lv_barcode_t *)obj;
 
     if(data == NULL || lv_strlen(data) == 0) {
         LV_LOG_WARN("data is empty");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     size_t len = code128_estimate_len(data);
@@ -103,7 +103,7 @@ lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
     LV_ASSERT_MALLOC(out_buf);
     if(!out_buf) {
         LV_LOG_ERROR("malloc failed for out_buf");
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_coord_t barcode_w = code128_encode_gs1(data, out_buf, len);
@@ -127,7 +127,7 @@ lv_res_t lv_barcode_update(lv_obj_t * obj, const char * data)
         }
     }
 
-    res = LV_RES_OK;
+    res = LV_RESULT_OK;
 
 failed:
     lv_free(out_buf);
@@ -176,8 +176,10 @@ static void lv_barcode_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
 {
     LV_UNUSED(class_p);
 
-    lv_img_dsc_t * img = lv_canvas_get_img(obj);
-    lv_img_cache_invalidate_src(img);
+    lv_image_dsc_t * img = lv_canvas_get_image(obj);
+    lv_cache_lock();
+    lv_cache_invalidate(lv_cache_find(img, LV_CACHE_SRC_TYPE_PTR, 0, 0));
+    lv_cache_unlock();
 
     if(!img->data) {
         LV_LOG_INFO("canvas buffer is NULL");
@@ -195,7 +197,7 @@ static bool lv_barcode_change_buf_size(lv_obj_t * obj, lv_coord_t w)
     LV_ASSERT_NULL(obj);
     LV_ASSERT(w > 0);
 
-    lv_img_dsc_t * img = lv_canvas_get_img(obj);
+    lv_image_dsc_t * img = lv_canvas_get_image(obj);
     void * buf = (void *)img->data;
 
     uint32_t buf_size = LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, 1);

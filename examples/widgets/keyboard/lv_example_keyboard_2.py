@@ -8,7 +8,7 @@ kb_map = ["A", "Z", "E", "R", "T", "Y", "U", "I", "O", "P", lv.SYMBOL.BACKSPACE,
 kb_ctrl = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 6,
            4, 4, 4, 4, 4, 4, 4, 4, 4, 6,
            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-           2, lv.btnmatrix.CTRL.HIDDEN | 2, 6, lv.btnmatrix.CTRL.HIDDEN | 2, 2]
+           2, lv.buttonmatrix.CTRL.HIDDEN | 2, 6, lv.buttonmatrix.CTRL.HIDDEN | 2, 2]
 
 # Create a keyboard and add the new map as USER_1 mode
 kb = lv.keyboard(lv.scr_act())

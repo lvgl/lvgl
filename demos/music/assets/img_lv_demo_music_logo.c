@@ -308,7 +308,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_logo_map[] = {
 #endif
 };
 
-lv_img_dsc_t img_lv_demo_music_logo = {
+lv_image_dsc_t img_lv_demo_music_logo = {
     .header.always_zero = 0,
     .header.w = 97,
     .header.h = 97,

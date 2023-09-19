@@ -12,7 +12,7 @@ def slider_event_cb(e):
         if base_dsc.part == lv.PART.INDICATOR:
             label_text = "{:d} - {:d}".format(obj.get_left_value(),slider.get_value())
             label_size = lv.point_t()
-            lv.txt_get_size(label_size, label_text, lv.font_default(), 0, 0, lv.COORD.MAX, 0)
+            lv.text_get_size(label_size, label_text, lv.font_default(), 0, 0, lv.COORD.MAX, 0)
             # print(label_size.x,label_size.y)
             label_area = lv.area_t()
             label_area.x1 = dsc.area.x1 + dsc.area.get_width() // 2 - label_size.x // 2

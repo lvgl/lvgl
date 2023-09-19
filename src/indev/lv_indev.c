@@ -8,7 +8,7 @@
  ********************/
 #include "lv_indev_private.h"
 #include "lv_indev_scroll.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display_private.h"
 #include "../core/lv_global.h"
 #include "../core/lv_obj.h"
 #include "../core/lv_group.h"
@@ -65,12 +65,13 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_t * indev);
 static void indev_proc_release(lv_indev_t * indev);
-static lv_obj_t * pointer_search_obj(lv_disp_t * disp, lv_point_t * p);
+static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_click_focus(lv_indev_t * indev);
 static void indev_gesture(lv_indev_t * indev);
 static bool indev_reset_check(lv_indev_t * indev);
 static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
+static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -91,7 +92,7 @@ static void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data);
 
 lv_indev_t * lv_indev_create(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
     if(disp == NULL) {
         LV_LOG_WARN("no display was created so far");
     }
@@ -106,7 +107,7 @@ lv_indev_t * lv_indev_create(void)
     indev->reset_query  = 1;
     indev->read_timer = lv_timer_create(lv_indev_read_timer_cb, LV_DEF_REFR_PERIOD, indev);
 
-    indev->disp                 = lv_disp_get_default();
+    indev->disp                 = lv_display_get_default();
     indev->type                 = LV_INDEV_TYPE_NONE;
     indev->scroll_limit         = LV_INDEV_DEF_SCROLL_LIMIT;
     indev->scroll_throw         = LV_INDEV_DEF_SCROLL_THROW;
@@ -307,14 +308,14 @@ lv_group_t * lv_indev_get_group(const lv_indev_t * indev)
     return indev->group;
 }
 
-lv_disp_t * lv_indev_get_disp(const lv_indev_t * indev)
+lv_display_t * lv_indev_get_disp(const lv_indev_t * indev)
 {
     if(indev == NULL) return NULL;
 
     return indev->disp;
 }
 
-void lv_indev_set_disp(lv_indev_t * indev, lv_disp_t * disp)
+void lv_indev_set_disp(lv_indev_t * indev, lv_display_t * disp)
 {
     if(indev == NULL) return;
 
@@ -337,35 +338,12 @@ void * lv_indev_get_driver_data(const lv_indev_t * indev)
 void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
     if(indev) {
-        indev->reset_query = 1;
-        if(indev_act == indev) indev_obj_act = NULL;
-        if(indev->type == LV_INDEV_TYPE_POINTER || indev->type == LV_INDEV_TYPE_KEYPAD) {
-            if(obj == NULL || indev->pointer.last_pressed == obj) {
-                indev->pointer.last_pressed = NULL;
-            }
-            if(obj == NULL || indev->pointer.act_obj == obj) {
-                indev->pointer.act_obj = NULL;
-            }
-            if(obj == NULL || indev->pointer.last_obj == obj) {
-                indev->pointer.last_obj = NULL;
-            }
-        }
+        indev_reset_core(indev, obj);
     }
     else {
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
-            i->reset_query = 1;
-            if(i->type == LV_INDEV_TYPE_POINTER || i->type == LV_INDEV_TYPE_KEYPAD) {
-                if(obj == NULL || i->pointer.last_pressed == obj) {
-                    i->pointer.last_pressed = NULL;
-                }
-                if(obj == NULL || i->pointer.act_obj == obj) {
-                    i->pointer.act_obj = NULL;
-                }
-                if(obj == NULL || i->pointer.last_obj == obj) {
-                    i->pointer.last_obj = NULL;
-                }
-            }
+            indev_reset_core(i, obj);
             i = lv_indev_get_next(i);
         }
         indev_obj_act = NULL;
@@ -384,7 +362,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     if(indev->type != LV_INDEV_TYPE_POINTER) return;
 
     indev->cursor = cur_obj;
-    lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->disp));
+    lv_obj_set_parent(indev->cursor, lv_display_get_layer_sys(indev->disp));
     lv_obj_set_pos(indev->cursor, indev->pointer.act_point.x, indev->pointer.act_point.y);
     lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_FLOATING);
@@ -530,16 +508,16 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
  */
 static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
-    lv_disp_t * disp = i->disp;
+    lv_display_t * disp = i->disp;
     /*Save the raw points so they can be used again in indev_read_core*/
     i->pointer.last_raw_point.x = data->point.x;
     i->pointer.last_raw_point.y = data->point.y;
 
-    if(disp->rotation == LV_DISP_ROTATION_180 || disp->rotation == LV_DISP_ROTATION_270) {
+    if(disp->rotation == LV_DISPLAY_ROTATION_180 || disp->rotation == LV_DISPLAY_ROTATION_270) {
         data->point.x = disp->hor_res - data->point.x - 1;
         data->point.y = disp->ver_res - data->point.y - 1;
     }
-    if(disp->rotation == LV_DISP_ROTATION_90 || disp->rotation == LV_DISP_ROTATION_270) {
+    if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
         lv_coord_t tmp = data->point.y;
         data->point.y = data->point.x;
         data->point.x = disp->ver_res - tmp - 1;
@@ -549,13 +527,13 @@ static void indev_pointer_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(data->point.x < 0) {
         LV_LOG_WARN("X is %d which is smaller than zero", (int)data->point.x);
     }
-    if(data->point.x >= lv_disp_get_hor_res(i->disp)) {
+    if(data->point.x >= lv_display_get_horizontal_resolution(i->disp)) {
         LV_LOG_WARN("X is %d which is greater than hor. res", (int)data->point.x);
     }
     if(data->point.y < 0) {
         LV_LOG_WARN("Y is %d which is smaller than zero", (int)data->point.y);
     }
-    if(data->point.y >= lv_disp_get_ver_res(i->disp)) {
+    if(data->point.y >= lv_display_get_vertical_resolution(i->disp)) {
         LV_LOG_WARN("Y is %d which is greater than ver. res", (int)data->point.y);
     }
 
@@ -611,7 +589,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     i->keypad.last_key = data->key;
 
     /*Save the previous state so we can detect state changes below and also set the last state now
-     *so if any event handler on the way returns `LV_RES_INV` the last state is remembered
+     *so if any event handler on the way returns `LV_RESULT_INVALID` the last state is remembered
      *for the next time*/
     uint32_t prev_state             = i->keypad.last_state;
     i->keypad.last_state = data->state;
@@ -1012,7 +990,7 @@ static void indev_proc_press(lv_indev_t * indev)
 
     if(indev->wait_until_release != 0) return;
 
-    lv_disp_t * disp = indev_act->disp;
+    lv_display_t * disp = indev_act->disp;
     bool new_obj_searched = false;
 
     /*If there is no last object then search*/
@@ -1187,13 +1165,13 @@ static void indev_proc_release(lv_indev_t * indev)
             lv_point_t pivot = { 0, 0 };
             lv_obj_t * parent = scroll_obj;
             while(parent) {
-                angle += lv_obj_get_style_transform_angle(parent, 0);
-                int32_t zoom_act = lv_obj_get_style_transform_zoom_safe(parent, 0);
+                angle += lv_obj_get_style_transform_rotation(parent, 0);
+                int32_t zoom_act = lv_obj_get_style_transform_scale_safe(parent, 0);
                 zoom = (zoom * zoom_act) >> 8;
                 parent = lv_obj_get_parent(parent);
             }
 
-            if(angle != 0 || zoom != LV_ZOOM_NONE) {
+            if(angle != 0 || zoom != LV_SCALE_NONE) {
                 angle = -angle;
                 zoom = (256 * 256) / zoom;
                 lv_point_transform(&indev->pointer.scroll_throw_vect, angle, zoom, &pivot);
@@ -1209,19 +1187,19 @@ static void indev_proc_release(lv_indev_t * indev)
     }
 }
 
-static lv_obj_t * pointer_search_obj(lv_disp_t * disp, lv_point_t * p)
+static lv_obj_t * pointer_search_obj(lv_display_t * disp, lv_point_t * p)
 {
-    indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), p);
+    indev_obj_act = lv_indev_search_obj(lv_display_get_layer_sys(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
-    indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp), p);
+    indev_obj_act = lv_indev_search_obj(lv_display_get_layer_top(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
     /* Search the object in the active screen */
-    indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp), p);
+    indev_obj_act = lv_indev_search_obj(lv_display_get_scr_act(disp), p);
     if(indev_obj_act) return indev_obj_act;
 
-    indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_bottom(disp), p);
+    indev_obj_act = lv_indev_search_obj(lv_display_get_layer_bottom(disp), p);
     return indev_obj_act;
 }
 
@@ -1385,4 +1363,44 @@ static bool indev_reset_check(lv_indev_t * indev)
     }
 
     return indev->reset_query;
+}
+
+/**
+ * Reset the indev and send event to active obj and scroll obj
+ * @param indev pointer to an input device
+ * @param obj pointer to obj
+*/
+static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj)
+{
+    lv_obj_t * act_obj = NULL;
+    lv_obj_t * scroll_obj = NULL;
+
+    indev->reset_query = 1;
+    if(indev_act == indev) indev_obj_act = NULL;
+    if(indev->type == LV_INDEV_TYPE_POINTER || indev->type == LV_INDEV_TYPE_KEYPAD) {
+        if(obj == NULL || indev->pointer.last_pressed == obj) {
+            indev->pointer.last_pressed = NULL;
+        }
+        if(obj == NULL || indev->pointer.act_obj == obj) {
+            if(indev->pointer.act_obj) {
+                /* Avoid recursive calls */
+                act_obj = indev->pointer.act_obj;
+                indev->pointer.act_obj = NULL;
+                lv_obj_send_event(act_obj, LV_EVENT_INDEV_RESET, indev);
+                act_obj = NULL;
+            }
+        }
+        if(obj == NULL || indev->pointer.last_obj == obj) {
+            indev->pointer.last_obj = NULL;
+        }
+        if(obj == NULL || indev->pointer.scroll_obj == obj) {
+            if(indev->pointer.scroll_obj) {
+                /* Avoid recursive calls */
+                scroll_obj = indev->pointer.scroll_obj;
+                indev->pointer.scroll_obj = NULL;
+                lv_obj_send_event(scroll_obj, LV_EVENT_INDEV_RESET, indev);
+                scroll_obj = NULL;
+            }
+        }
+    }
 }

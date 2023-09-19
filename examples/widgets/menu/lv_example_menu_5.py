@@ -4,12 +4,12 @@ def create_text(parent, icon, txt, builder_variant):
 
     obj = lv.menu_cont(parent)
 
-    img = None
+    image = None
     label = None
 
     if icon  :
-        img = lv.img(obj)
-        img.set_src(icon)
+        image = lv.image(obj)
+        image.set_src(icon)
 
     if txt :
         label = lv.label(obj)
@@ -18,8 +18,8 @@ def create_text(parent, icon, txt, builder_variant):
         label.set_flex_grow(1)
 
     if builder_variant == LV_MENU_ITEM_BUILDER_VARIANT_2 and icon and txt :
-        img.add_flag(lv.obj.FLAG.FLEX_IN_NEW_TRACK)
-        img.swap(label)
+        image.add_flag(lv.obj.FLAG.FLEX_IN_NEW_TRACK)
+        image.swap(label)
 
     return obj
 
@@ -56,8 +56,8 @@ def back_event_handler(e,menu):
     obj = e.get_target_obj()
     # menu = lv_event_get_user_data(e);
 
-    if menu.back_btn_is_root(obj) :
-        mbox1 = lv.msgbox(None, "Hello", "Root back btn click.", None, True)
+    if menu.back_button_is_root(obj) :
+        mbox1 = lv.msgbox(None, "Hello", "Root back button click.", None, True)
         mbox1.center()
 
 def switch_handler(e,menu):
@@ -86,7 +86,7 @@ else :
     menu.set_style_bg_color(menu.get_style_bg_color(0).darken(50),0)
 
 
-menu.set_mode_root_back_btn(lv.menu.ROOT_BACK_BTN.ENABLED)
+menu.set_mode_root_back_button(lv.menu.ROOT_BACK_BUTTON.ENABLED)
 menu.add_event(lambda evt: back_event_handler(evt,menu), lv.EVENT.CLICKED, None)
 menu.set_size(lv.pct(100), lv.pct(100))
 menu.center()

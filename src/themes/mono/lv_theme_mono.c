@@ -167,7 +167,7 @@ static void style_init(struct _my_theme_t * theme, bool dark_bg, const lv_font_t
 #if LV_USE_CHART
     style_init_reset(&theme->styles.chart_indic);
     lv_style_set_radius(&theme->styles.chart_indic, LV_RADIUS_CIRCLE);
-    lv_style_set_size(&theme->styles.chart_indic, lv_disp_dpx(theme->base.disp, 8), lv_disp_dpx(theme->base.disp, 8));
+    lv_style_set_size(&theme->styles.chart_indic, lv_display_dpx(theme->base.disp, 8), lv_display_dpx(theme->base.disp, 8));
     lv_style_set_bg_color(&theme->styles.chart_indic, COLOR_FG);
     lv_style_set_bg_opa(&theme->styles.chart_indic, LV_OPA_COVER);
 #endif
@@ -192,7 +192,7 @@ void lv_theme_mono_deinit(void)
     }
 }
 
-lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t * font)
+lv_theme_t * lv_theme_mono_init(lv_display_t * disp, bool dark_bg, const lv_font_t * font)
 {
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. Micropython)
@@ -212,7 +212,7 @@ lv_theme_t * lv_theme_mono_init(lv_disp_t * disp, bool dark_bg, const lv_font_t 
 
     style_init(theme, dark_bg, font);
 
-    if(disp == NULL || lv_disp_get_theme(disp) == (lv_theme_t *) theme) lv_obj_report_style_change(NULL);
+    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *) theme) lv_obj_report_style_change(NULL);
 
     theme->inited = true;
 
@@ -266,7 +266,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
     }
 #if LV_USE_BTN
-    else if(lv_obj_check_type(obj, &lv_btn_class)) {
+    else if(lv_obj_check_type(obj, &lv_button_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pr, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &theme->styles.inv, LV_STATE_CHECKED);
@@ -277,7 +277,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #endif
 
 #if LV_USE_BTNMATRIX
-    else if(lv_obj_check_type(obj, &lv_btnmatrix_class)) {
+    else if(lv_obj_check_type(obj, &lv_buttonmatrix_class)) {
 #if LV_USE_MSGBOX
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
             lv_obj_add_style(obj, &theme->styles.pad_gap, 0);
@@ -473,7 +473,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_list_text_class)) {
 
     }
-    else if(lv_obj_check_type(obj, &lv_list_btn_class)) {
+    else if(lv_obj_check_type(obj, &lv_list_button_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);
         lv_obj_add_style(obj, &theme->styles.pr, LV_STATE_PRESSED);
         lv_obj_add_style(obj, &theme->styles.focus, LV_STATE_FOCUS_KEY);

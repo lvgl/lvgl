@@ -27,7 +27,7 @@ void lv_example_msg_3(void)
     lv_obj_t * label;
 
     /*Up button*/
-    btn = lv_btn_create(panel);
+    btn = lv_button_create(panel);
     lv_obj_set_flex_grow(btn, 1);
     lv_obj_add_event(btn, btn_event_cb, LV_EVENT_ALL, NULL);
     label = lv_label_create(btn);
@@ -43,7 +43,7 @@ void lv_example_msg_3(void)
     lv_obj_add_event(label, label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
 
     /*Down button*/
-    btn = lv_btn_create(panel);
+    btn = lv_button_create(panel);
     lv_obj_set_flex_grow(btn, 1);
     lv_obj_add_event(btn, btn_event_cb, LV_EVENT_ALL, NULL);
     label = lv_label_create(btn);

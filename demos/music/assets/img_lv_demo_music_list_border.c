@@ -28,7 +28,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_list_border_map[] = {
 #endif
 };
 
-lv_img_dsc_t img_lv_demo_music_list_border = {
+lv_image_dsc_t img_lv_demo_music_list_border = {
     .header.always_zero = 0,
     .header.w = 272,
     .header.h = 4,

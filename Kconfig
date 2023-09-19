@@ -1026,8 +1026,8 @@ menu "LVGL configuration"
 		config LV_USE_BMP
 			bool "BMP decoder library"
 
-		config LV_USE_SJPG
-			bool "JPG + split JPG decoder library"
+		config LV_USE_JPG
+			bool "JPG decoder library"
 
 		config LV_USE_GIF
 			bool "GIF decoder library"

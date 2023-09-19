@@ -239,7 +239,7 @@
 
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
-#define LV_DISP_ROT_MAX_BUF (10*1024)
+#define LV_DISPLAY_ROT_MAX_BUF (10*1024)
 
 #define LV_ENABLE_GLOBAL_CUSTOM 0
 #if LV_ENABLE_GLOBAL_CUSTOM
@@ -247,13 +247,11 @@
     #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
 #endif
 
-/*Default image cache size. Image caching keeps some images opened.
- *If only the built-in image formats are used there is no real advantage of caching.
- *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
- *However the opened images consume additional RAM.
- *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE 0
-
+/*Default cache size in bytes.
+ *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Data larger than the size of the cache also can be allocated but
+ *will be dropped immediately after usage.*/
+#define LV_CACHE_DEF_SIZE       0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
@@ -280,7 +278,7 @@
 /*Define a custom attribute to `lv_timer_handler` function*/
 #define LV_ATTRIBUTE_TIMER_HANDLER
 
-/*Define a custom attribute to `lv_disp_flush_ready` function*/
+/*Define a custom attribute to `lv_display_flush_ready` function*/
 #define LV_ATTRIBUTE_FLUSH_READY
 
 /*Required alignment size for buffers*/
@@ -585,7 +583,7 @@
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#define LV_USE_SJPG 0
+#define LV_USE_JPG 0
 
 /*GIF decoder library*/
 #define LV_USE_GIF 0
@@ -680,7 +678,7 @@
     #define LV_IMGFONT_PATH_MAX_LEN 64
 
     /*1: Use img cache to buffer header information*/
-    #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+    #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
 
 /*1: Enable a published subscriber based messaging system */
@@ -723,7 +721,7 @@
 #define LV_USE_SDL              0
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
-    #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+    #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
     #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
     #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
     #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
@@ -734,7 +732,7 @@
 #if LV_USE_LINUX_FBDEV
     #define LV_LINUX_FBDEV_BSD           0
     #define LV_LINUX_FBDEV_NUTTX         0
-    #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
+    #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
     #define LV_LINUX_FBDEV_BUFFER_COUNT  0
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
 #endif

@@ -62,6 +62,7 @@ typedef enum {
     LV_EVENT_DEFOCUSED,           /**< The object is defocused*/
     LV_EVENT_LEAVE,               /**< The object is defocused but still selected*/
     LV_EVENT_HIT_TEST,            /**< Perform advanced hit-testing*/
+    LV_EVENT_INDEV_RESET,         /**< Indev has been reseted*/
 
     /** Drawing events*/
     LV_EVENT_COVER_CHECK,        /**< Check if the object fully covers an area. The event parameter is `lv_cover_check_info_t *`.*/
@@ -149,7 +150,7 @@ void _lv_event_push(lv_event_t * e);
 
 void _lv_event_pop(lv_event_t * e);
 
-lv_res_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
+lv_result_t lv_event_send(lv_event_list_t * list, lv_event_t * e, bool preprocess);
 
 void lv_event_add(lv_event_list_t * list, lv_event_cb_t cb, lv_event_code_t filter, void * user_data);
 
@@ -162,6 +163,8 @@ lv_event_cb_t lv_event_dsc_get_cb(lv_event_dsc_t * dsc);
 void * lv_event_dsc_get_user_data(lv_event_dsc_t * dsc);
 
 bool lv_event_remove(lv_event_list_t * list, uint32_t index);
+
+void lv_event_remove_all(lv_event_list_t * list);
 
 /**
  * Get the object originally targeted by the event. It's the same even if the event is bubbled.
@@ -228,7 +231,7 @@ uint32_t lv_event_register_id(void);
 
 /**
  * Nested events can be called and one of them might belong to an object that is being deleted.
- * Mark this object's `event_temp_data` deleted to know that its `lv_obj_send_event` should return `LV_RES_INV`
+ * Mark this object's `event_temp_data` deleted to know that its `lv_obj_send_event` should return `LV_RESULT_INVALID`
  * @param target     pointer to an event target which was deleted
  */
 void _lv_event_mark_deleted(void * target);

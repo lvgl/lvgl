@@ -346,7 +346,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(lv_draw_unit_t * draw_unit, con
 
     /*Draw the background line by line*/
     int32_t h;
-    uint32_t hor_res = (uint32_t)lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
+    uint32_t hor_res = (uint32_t)lv_display_get_horizontal_resolution(_lv_refr_get_disp_refreshing());
     size_t mask_buf_size = LV_MIN(lv_area_get_size(&blend_area), hor_res);
     lv_opa_t * mask_buf = lv_malloc(mask_buf_size);
 

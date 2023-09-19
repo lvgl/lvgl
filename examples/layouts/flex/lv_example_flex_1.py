@@ -16,7 +16,7 @@ cont_col.set_flex_flow(lv.FLEX_FLOW.COLUMN)
 
 for i in range(10):
     # Add items to the row
-    obj = lv.btn(cont_row)
+    obj = lv.button(cont_row)
     obj.set_size(100, lv.pct(100))
 
     label = lv.label(obj)
@@ -24,7 +24,7 @@ for i in range(10):
     label.center()
 
     # Add items to the column
-    obj = lv.btn(cont_col)
+    obj = lv.button(cont_col)
     obj.set_size(lv.pct(100), lv.SIZE_CONTENT)
 
     label = lv.label(obj)

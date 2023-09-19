@@ -325,13 +325,13 @@ img_wink_png_map = bytes([
   0x4e, 0x44, 0xae, 0x42, 0x60, 0x82,
 ])
 '''
-const lv_img_dsc_t img_wink_png = {
+const lv_image_dsc_t image_wink_png = {
   .header.always_zero = 0,
   .header.w = 50,
   .header.h = 50,
   .data_size = 5158,
-  .header.cf = LV_IMG_CF_RAW_ALPHA,
-  .data = img_wink_png_map,
+  .header.cf = LV_IMAGE_CF_RAW_ALPHA,
+  .data = image_wink_png_map,
 };
 
 '''

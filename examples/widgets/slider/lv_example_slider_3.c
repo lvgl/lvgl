@@ -40,7 +40,7 @@ static void slider_event_cb(lv_event_t * e)
         lv_snprintf(buf, sizeof(buf), "%d - %d", (int)lv_slider_get_left_value(obj), (int)lv_slider_get_value(obj));
 
         lv_point_t label_size;
-        lv_txt_get_size(&label_size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, 0);
+        lv_text_get_size(&label_size, buf, LV_FONT_DEFAULT, 0, 0, LV_COORD_MAX, 0);
         lv_area_t label_area;
         label_area.x1 = 0;
         label_area.x2 = label_size.x - 1;

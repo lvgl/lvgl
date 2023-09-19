@@ -215,7 +215,7 @@ static void perf_monitor_event_cb(lv_event_t * e)
 
 static void perf_monitor_init(void)
 {
-    lv_disp_t * disp = lv_disp_get_default();
+    lv_display_t * disp = lv_display_get_default();
 
     lv_obj_t * sysmon = lv_sysmon_create(lv_layer_sys());
     lv_obj_align(sysmon, LV_USE_PERF_MONITOR_POS, 0, 0);
@@ -226,7 +226,7 @@ static void perf_monitor_init(void)
 
     lv_obj_set_user_data(sysmon, info);
     lv_obj_add_event(sysmon, perf_monitor_event_cb, LV_EVENT_REFRESH, NULL);
-    lv_disp_add_event(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, sysmon);
+    lv_display_add_event(disp, perf_monitor_disp_event_cb, LV_EVENT_ALL, sysmon);
 
 #if LV_USE_PERF_MONITOR_LOG_MODE
     /*Reduce rendering performance consumption*/

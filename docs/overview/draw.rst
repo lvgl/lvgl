@@ -56,7 +56,7 @@ chart is changed, an animation happened, etc.
   - Areas partially out of the parent are cropped to the parent's area.
   - Objects on other screens are not added.
 
-3. In every :c:macro:`LV_DEF_REFR_PERIOD` (set in ``lv_hal_disp.h``) the
+3. In every :c:macro:`LV_DEF_REFR_PERIOD` (set in ``lv_conf.h``) the
    following happens:
 
   - LVGL checks the invalid areas and joins those that are adjacent or intersecting.

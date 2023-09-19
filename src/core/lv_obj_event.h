@@ -67,17 +67,17 @@ typedef struct {
  * @param obj           pointer to an object
  * @param event_code    the type of the event from `lv_event_t`
  * @param param         arbitrary data depending on the widget type and the event. (Usually `NULL`)
- * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event_code
+ * @return LV_RESULT_OK: `obj` was not deleted in the event; LV_RESULT_INVALID: `obj` was deleted in the event_code
  */
-lv_res_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, void * param);
+lv_result_t lv_obj_send_event(struct _lv_obj_t * obj, lv_event_code_t event_code, void * param);
 
 /**
  * Used by the widgets internally to call the ancestor widget types's event handler
  * @param class_p   pointer to the class of the widget (NOT the ancestor class)
  * @param e         pointer to the event descriptor
- * @return          LV_RES_OK: the target object was not deleted in the event; LV_RES_INV: it was deleted in the event_code
+ * @return          LV_RESULT_OK: the target object was not deleted in the event; LV_RESULT_INVALID: it was deleted in the event_code
  */
-lv_res_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * e);
+lv_result_t lv_obj_event_base(const struct _lv_obj_class_t * class_p, lv_event_t * e);
 
 /**
  * Get the current target of the event. It's the object which event handler being called.

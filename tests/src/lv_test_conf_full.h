@@ -2,7 +2,7 @@
 #define LV_LAYER_MAX_MEMORY_USAGE   (4 * 1024)
 #define LV_USE_DRAW_MASKS       1
 #define LV_SHADOW_CACHE_SIZE    (8 * 1024)
-#define LV_IMG_CACHE_DEF_SIZE   32
+#define LV_IMAGE_CACHE_DEF_SIZE   32
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
 #define LV_LOG_PRINTF           1
@@ -63,7 +63,7 @@
 
 #define LV_USE_PNG          1
 #define LV_USE_BMP          1
-#define LV_USE_SJPG         1
+#define LV_USE_JPG         1
 #define LV_USE_GIF          1
 #define LV_USE_QRCODE       1
 #define LV_USE_BARCODE      1

@@ -8,7 +8,7 @@
  *********************/
 #include "core/lv_global.h"
 #include "core/lv_obj.h"
-#include "disp/lv_disp_private.h"
+#include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout.h"
 #include "libs/bmp/lv_bmp.h"
@@ -17,9 +17,10 @@
 #include "libs/fsdrv/lv_fsdrv.h"
 #include "libs/gif/lv_gif.h"
 #include "libs/png/lv_png.h"
-#include "libs/sjpg/lv_sjpg.h"
+#include "libs/jpg/lv_jpg.h"
 #include "draw/lv_draw.h"
-#include "draw/lv_img_cache_builtin.h"
+#include "misc/lv_cache.h"
+#include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
 
@@ -61,7 +62,7 @@ static inline void lv_global_init(lv_global_t * global)
 
     lv_memset(global, 0, sizeof(lv_global_t));
 
-    _lv_ll_init(&(global->disp_ll), sizeof(lv_disp_t));
+    _lv_ll_init(&(global->disp_ll), sizeof(lv_display_t));
     _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
 
     global->memory_zero = ZERO_MEM_SENTINEL;
@@ -145,9 +146,13 @@ void lv_init(void)
     _lv_sysmon_builtin_init();
 #endif
 
-    _lv_img_decoder_init();
+    _lv_image_decoder_init();
 
-    _lv_img_cache_builtin_init();
+    _lv_cache_init();
+    _lv_cache_builtin_init();
+    lv_cache_lock();
+    lv_cache_set_max_size(LV_CACHE_DEF_SIZE);
+    lv_cache_unlock();
 
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";
@@ -214,8 +219,8 @@ void lv_init(void)
     lv_png_init();
 #endif
 
-#if LV_USE_SJPG
-    lv_split_jpeg_init();
+#if LV_USE_JPG
+    lv_jpg_init();
 #endif
 
 #if LV_USE_BMP
@@ -250,7 +255,7 @@ void lv_deinit(void)
     _lv_sysmon_builtin_deinit();
 #endif
 
-    lv_disp_set_default(NULL);
+    lv_display_set_default(NULL);
 
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();

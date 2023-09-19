@@ -17,7 +17,7 @@ for i in range(9):
     col = i % 3
     row = i // 3
 
-    obj = lv.btn(cont)
+    obj = lv.button(cont)
     # Stretch the cell horizontally and vertically too
     # Set span to 1 to make the cell 1 column/row sized
     obj.set_grid_cell(lv.GRID_ALIGN.STRETCH, col, 1,

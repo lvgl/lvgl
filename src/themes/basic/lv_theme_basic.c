@@ -155,7 +155,7 @@ void lv_theme_basic_deinit(void)
     }
 }
 
-lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
+lv_theme_t * lv_theme_basic_init(lv_display_t * disp)
 {
     /*This trick is required only to avoid the garbage collection of
      *styles' data if LVGL is used in a binding (e.g. Micropython)
@@ -175,7 +175,7 @@ lv_theme_t * lv_theme_basic_init(lv_disp_t * disp)
 
     style_init(theme);
 
-    if(disp == NULL || lv_disp_get_theme(disp) == (lv_theme_t *)theme) {
+    if(disp == NULL || lv_display_get_theme(disp) == (lv_theme_t *)theme) {
         lv_obj_report_style_change(NULL);
     }
 
@@ -229,13 +229,13 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.scrollbar, LV_PART_SCROLLBAR);
     }
 #if LV_USE_BTN
-    else if(lv_obj_check_type(obj, &lv_btn_class)) {
+    else if(lv_obj_check_type(obj, &lv_button_class)) {
         lv_obj_add_style(obj, &theme->styles.dark, 0);
     }
 #endif
 
 #if LV_USE_BTNMATRIX
-    else if(lv_obj_check_type(obj, &lv_btnmatrix_class)) {
+    else if(lv_obj_check_type(obj, &lv_buttonmatrix_class)) {
 #if LV_USE_MSGBOX
         if(lv_obj_check_type(lv_obj_get_parent(obj), &lv_msgbox_class)) {
             lv_obj_add_style(obj, &theme->styles.light, LV_PART_ITEMS);
@@ -376,7 +376,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_list_text_class)) {
 
     }
-    else if(lv_obj_check_type(obj, &lv_list_btn_class)) {
+    else if(lv_obj_check_type(obj, &lv_list_button_class)) {
         lv_obj_add_style(obj, &theme->styles.dark, 0);
 
     }

@@ -49,16 +49,16 @@ void lv_demo_scroll(void)
     lv_obj_set_flex_align(panel, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     list = lv_list_create(panel);
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image1.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image2.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image3.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image4.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image5.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image6.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image7.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image8.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image9.png");
-    lv_list_add_btn(list, LV_SYMBOL_IMAGE, "Image10.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image1.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image2.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image3.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image4.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image5.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image6.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image7.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image8.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image9.png");
+    lv_list_add_button(list, LV_SYMBOL_IMAGE, "Image10.png");
 
     switch_create(panel, "Scrollable", LV_OBJ_FLAG_SCROLLABLE, true);
     switch_create(panel, "Scroll chain", LV_OBJ_FLAG_SCROLL_CHAIN, true);

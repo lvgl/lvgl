@@ -70,7 +70,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_corner_left_map[] = {
 #endif
 };
 
-lv_img_dsc_t img_lv_demo_music_corner_left = {
+lv_image_dsc_t img_lv_demo_music_corner_left = {
     .header.always_zero = 0,
     .header.w = 18,
     .header.h = 18,

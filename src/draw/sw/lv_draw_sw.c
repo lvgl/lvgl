@@ -11,7 +11,7 @@
 
 #include "../../core/lv_refr.h"
 #include "lv_draw_sw.h"
-#include "../../disp/lv_disp_private.h"
+#include "../../display/lv_display_private.h"
 #include "../../stdlib/lv_string.h"
 
 /*********************
@@ -148,13 +148,13 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
             lv_draw_sw_box_shadow((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_BG_IMG:
-            lv_draw_sw_bg_img((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            lv_draw_sw_bg_image((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_LABEL:
             lv_draw_sw_label((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_IMAGE:
-            lv_draw_sw_img((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
+            lv_draw_sw_image((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
             break;
         case LV_DRAW_TASK_TYPE_ARC:
             lv_draw_sw_arc((lv_draw_unit_t *)u, t->draw_dsc, &t->area);
@@ -182,7 +182,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         if(!_lv_area_intersect(&draw_area, &t->area, u->base_unit.clip_area)) return;
 
         int32_t idx = 0;
-        lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+        lv_display_t * disp = _lv_refr_get_disp_refreshing();
         lv_draw_unit_t * draw_unit_tmp = disp->draw_unit_head;
         while(draw_unit_tmp != (lv_draw_unit_t *)u) {
             draw_unit_tmp = draw_unit_tmp->next;
@@ -198,7 +198,7 @@ static void execute_drawing(lv_draw_sw_unit_t * u)
         lv_draw_sw_fill((lv_draw_unit_t *)u, &rect_dsc, &draw_area);
 
         lv_point_t txt_size;
-        lv_txt_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&txt_size, "W", LV_FONT_DEFAULT, 0, 0, 100, LV_TEXT_FLAG_NONE);
 
         lv_area_t txt_area;
         txt_area.x1 = draw_area.x1;

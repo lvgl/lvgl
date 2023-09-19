@@ -3,26 +3,26 @@
 
 static void ofs_y_anim(void * img, int32_t v)
 {
-    lv_img_set_offset_y(img, v);
+    lv_image_set_offset_y(img, v);
 }
 
 /**
  * Image styling and offset
  */
-void lv_example_img_4(void)
+void lv_example_image_4(void)
 {
-    LV_IMG_DECLARE(img_skew_strip);
+    LV_IMAGE_DECLARE(img_skew_strip);
 
     static lv_style_t style;
     lv_style_init(&style);
     lv_style_set_bg_color(&style, lv_palette_main(LV_PALETTE_YELLOW));
     lv_style_set_bg_opa(&style, LV_OPA_COVER);
-    lv_style_set_img_recolor_opa(&style, LV_OPA_COVER);
-    lv_style_set_img_recolor(&style, lv_color_black());
+    lv_style_set_image_recolor_opa(&style, LV_OPA_COVER);
+    lv_style_set_image_recolor(&style, lv_color_black());
 
-    lv_obj_t * img = lv_img_create(lv_scr_act());
+    lv_obj_t * img = lv_image_create(lv_scr_act());
     lv_obj_add_style(img, &style, 0);
-    lv_img_set_src(img, &img_skew_strip);
+    lv_image_set_src(img, &img_skew_strip);
     lv_obj_set_size(img, 150, 100);
     lv_obj_center(img);
 

@@ -120,8 +120,8 @@ Move the object with this value in Y direction. Applied after layouts, aligns an
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### transform_zoom
-Zoom an objects. The value 256 (or `LV_ZOOM_NONE`) means normal size, 128 half size, 512 double size, and so on
+### transform_scale
+Zoom an objects. The value 256 (or `LV_SCALE_NONE`) means normal size, 128 half size, 512 double size, and so on
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -129,7 +129,7 @@ Zoom an objects. The value 256 (or `LV_ZOOM_NONE`) means normal size, 128 half s
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
 </ul>
 
-### transform_angle
+### transform_rotation
 Rotate an objects. The value is interpreted in 0.1 degree units. E.g. 450 means 45 deg.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
@@ -217,7 +217,7 @@ Sets the padding between the columns. Used by the layouts.
 Properties to describe spacing around an object. Very similar to the margin properties in HTML.
 
 ### margin_top
-Sets the margin on the top. The object will keep this space from its siblings in layouts. 
+Sets the margin on the top. The object will keep this space from its siblings in layouts.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -327,8 +327,8 @@ Set the dithering mode of the gradient of the background. The possible values ar
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### bg_img_src
-Set a background image. Can be a pointer to `lv_img_dsc_t`, a path to a file or an `LV_SYMBOL_...`
+### bg_image_src
+Set a background image. Can be a pointer to `lv_image_dsc_t`, a path to a file or an `LV_SYMBOL_...`
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -336,7 +336,7 @@ Set a background image. Can be a pointer to `lv_img_dsc_t`, a path to a file or 
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> Yes</li>
 </ul>
 
-### bg_img_opa
+### bg_image_opa
 Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
@@ -345,7 +345,7 @@ Set the opacity of the background image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` 
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### bg_img_recolor
+### bg_image_recolor
 Set a color to mix to the background image.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
@@ -354,7 +354,7 @@ Set a color to mix to the background image.
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### bg_img_recolor_opa
+### bg_image_recolor_opa
 Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means no mixing, 255, `LV_OPA_100` or `LV_OPA_COVER` means full recoloring, other values or LV_OPA_10, LV_OPA_20, etc are interpreted proportionally.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_TRANSP`</li>
@@ -363,7 +363,7 @@ Set the intensity of background image recoloring. Value 0, `LV_OPA_0` or `LV_OPA
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### bg_img_tiled
+### bg_image_tiled
 If enabled the background image will be tiled. The possible values are `true` or `false`.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
@@ -424,7 +424,7 @@ Sets whether the border should be drawn before or after the children are drawn. 
 Properties to describe the outline. It's like a border but drawn outside of the rectangles.
 
 ### outline_width
-Set the width of the outline in pixels. 
+Set the width of the outline in pixels.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -472,7 +472,7 @@ Set the width of the shadow in pixels. The value should be >= 0.
 </ul>
 
 ### shadow_ofs_x
-Set an offset on the shadow in pixels in X direction. 
+Set an offset on the shadow in pixels in X direction.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -481,7 +481,7 @@ Set an offset on the shadow in pixels in X direction.
 </ul>
 
 ### shadow_ofs_y
-Set an offset on the shadow in pixels in Y direction. 
+Set an offset on the shadow in pixels in Y direction.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -519,7 +519,7 @@ Set the opacity of the shadow. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means full
 ## Image
 Properties to describe the images
 
-### img_opa
+### image_opa
 Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_OPA_COVER`</li>
@@ -528,7 +528,7 @@ Set the opacity of an image. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### img_recolor
+### image_recolor
 Set color to mixt to the image.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `0x000000`</li>
@@ -537,7 +537,7 @@ Set color to mixt to the image.
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### img_recolor_opa
+### image_recolor_opa
 Set the intensity of the color mixing. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully transparent, 255, `LV_OPA_100` or `LV_OPA_COVER` means fully covering, other values or LV_OPA_10, LV_OPA_20, etc means semi transparency.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
@@ -577,7 +577,7 @@ Set the gap between dashes in pixel. Note that dash works only on horizontal and
 </ul>
 
 ### line_rounded
-Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the lines rounded. `true`: rounded, `false`: perpendicular line ending
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -616,7 +616,7 @@ Set the width (thickness) of the arcs in pixel.
 </ul>
 
 ### arc_rounded
-Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending 
+Make the end points of the arcs rounded. `true`: rounded, `false`: perpendicular line ending
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -642,8 +642,8 @@ Set the opacity of the arcs.
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Ext. draw</strong> No</li>
 </ul>
 
-### arc_img_src
-Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_img_dsc_t` or a path to a file
+### arc_image_src
+Set an image from which the arc will be masked out. It's useful to display complex effects on the arcs. Can be a pointer to `lv_image_dsc_t` or a path to a file
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `NULL`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -673,7 +673,7 @@ Set the opacity of the text. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means fully 
 </ul>
 
 ### text_font
-Set the font of the text (a pointer `lv_font_t *`). 
+Set the font of the text (a pointer `lv_font_t *`).
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> `LV_FONT_DEFAULT`</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> Yes</li>

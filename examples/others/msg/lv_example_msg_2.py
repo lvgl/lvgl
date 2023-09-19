@@ -51,22 +51,22 @@ def log_out_event_cb(e):
         lv.msg_send(MSG_LOG_OUT, None)
     elif code == lv.EVENT.MSG_RECEIVED:
         m = e.get_msg()
-        btn = e.get_target_obj()
+        button = e.get_target_obj()
         id = m.get_id()
         if id == MSG_LOGIN_OK:
-            btn.clear_state(lv.STATE.DISABLED)
+            button.clear_state(lv.STATE.DISABLED)
         elif id == MSG_LOG_OUT:
-            btn.add_state(lv.STATE.DISABLED)
+            button.add_state(lv.STATE.DISABLED)
 
 def start_engine_msg_event_cb(e):
 
     m = e.get_msg()
-    btn = e.get_target_obj()
+    button = e.get_target_obj()
     id = m.get_id()
     if id == MSG_LOGIN_OK:
-        btn.clear_state(lv.STATE.DISABLED)
+        button.clear_state(lv.STATE.DISABLED)
     elif id == MSG_LOG_OUT:
-        btn.add_state(lv.STATE.DISABLED)
+        button.add_state(lv.STATE.DISABLED)
 
 
 def info_label_msg_event_cb(e):
@@ -109,13 +109,13 @@ kb = lv.keyboard(lv.scr_act())
 kb.set_textarea(ta)
 
 # Create a log out button which will be active only when logged in
-btn = lv.btn(lv.scr_act())
-btn.set_pos(240, 10)
-btn.add_event(log_out_event_cb, lv.EVENT.ALL, None)
-lv.msg_subscribe_obj(MSG_LOGIN_OK, btn, None)
-lv.msg_subscribe_obj(MSG_LOG_OUT, btn, None)
+button = lv.button(lv.scr_act())
+button.set_pos(240, 10)
+button.add_event(log_out_event_cb, lv.EVENT.ALL, None)
+lv.msg_subscribe_obj(MSG_LOGIN_OK, button, None)
+lv.msg_subscribe_obj(MSG_LOG_OUT, button, None)
 
-label = lv.label(btn);
+label = lv.label(button);
 label.set_text("LOG OUT")
 
 # Create a label to show info
@@ -128,14 +128,14 @@ lv.msg_subscribe_obj(MSG_LOGIN_OK, label, None)
 lv.msg_subscribe_obj(MSG_LOG_OUT, label, None)
 
 #Create button which will be active only when logged in
-btn = lv.btn(lv.scr_act())
-btn.set_pos(10, 80)
-btn.add_event(start_engine_msg_event_cb, lv.EVENT.MSG_RECEIVED, None)
-btn.add_flag(lv.obj.FLAG.CHECKABLE)
-lv.msg_subscribe_obj(MSG_LOGIN_OK, btn, None)
-lv.msg_subscribe_obj(MSG_LOG_OUT, btn, None)
+button = lv.button(lv.scr_act())
+button.set_pos(10, 80)
+button.add_event(start_engine_msg_event_cb, lv.EVENT.MSG_RECEIVED, None)
+button.add_flag(lv.obj.FLAG.CHECKABLE)
+lv.msg_subscribe_obj(MSG_LOGIN_OK, button, None)
+lv.msg_subscribe_obj(MSG_LOG_OUT, button, None)
 
-label = lv.label(btn)
+label = lv.label(button)
 label.set_text("START ENGINE")
 
 lv.msg_send(MSG_LOG_OUT, None)

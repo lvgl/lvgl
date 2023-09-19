@@ -81,6 +81,7 @@ typedef struct {
     uint32_t major_tick_every   : 15;
     lv_scale_mode_t mode;
     uint32_t label_enabled      : 1;
+    uint32_t post_draw      : 1;
     lv_coord_t last_tick_width;
     lv_coord_t first_tick_width;
     /* Round scale */
@@ -173,6 +174,13 @@ void lv_scale_set_round_props(lv_obj_t * obj, uint16_t angle_range, int16_t rota
  * @param txt_src   pointer to an array of strings which will be display at major ticks
  */
 void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src[]);
+
+/**
+ * Draw the scale after all the children are drawn
+ * @param obj       pointer to a scale object
+ * @param en        true: eanble post draw
+ */
+void lv_scale_set_post_draw(lv_obj_t * obj, bool en);
 
 /**
  * Add a section to the given scale

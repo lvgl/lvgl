@@ -1,6 +1,6 @@
 class ScrollExample_3():
     def __init__(self):
-        self.btn_cnt = 1
+        self.button_cnt = 1
         #
         # Create a list with a floating button
         #
@@ -9,29 +9,29 @@ class ScrollExample_3():
         list.set_size(280, 220)
         list.center()
 
-        for btn_cnt in range(2):
-            list.add_btn(lv.SYMBOL.AUDIO,"Track {:d}".format(btn_cnt))
+        for button_cnt in range(2):
+            list.add_button(lv.SYMBOL.AUDIO,"Track {:d}".format(button_cnt))
 
-        float_btn = lv.btn(list)
-        float_btn.set_size(50, 50)
-        float_btn.add_flag(lv.obj.FLAG.FLOATING)
-        float_btn.align(lv.ALIGN.BOTTOM_RIGHT, 0, -list.get_style_pad_right(lv.PART.MAIN))
-        float_btn.add_event(lambda evt: self.float_btn_event_cb(evt,list), lv.EVENT.ALL, None)
-        float_btn.set_style_radius(lv.RADIUS_CIRCLE, 0)
-        float_btn.set_style_bg_img_src(lv.SYMBOL.PLUS, 0)
-        float_btn.set_style_text_font(lv.theme_get_font_large(float_btn), 0)
+        float_button = lv.button(list)
+        float_button.set_size(50, 50)
+        float_button.add_flag(lv.obj.FLAG.FLOATING)
+        float_button.align(lv.ALIGN.BOTTOM_RIGHT, 0, -list.get_style_pad_right(lv.PART.MAIN))
+        float_button.add_event(lambda evt: self.float_button_event_cb(evt,list), lv.EVENT.ALL, None)
+        float_button.set_style_radius(lv.RADIUS_CIRCLE, 0)
+        float_button.set_style_bg_image_src(lv.SYMBOL.PLUS, 0)
+        float_button.set_style_text_font(lv.theme_get_font_large(float_button), 0)
 
-    def float_btn_event_cb(self,e,list):
+    def float_button_event_cb(self,e,list):
         code = e.get_code()
-        float_btn = e.get_target_obj()
+        float_button = e.get_target_obj()
 
         if code == lv.EVENT.CLICKED:
-            list_btn = list.add_btn(lv.SYMBOL.AUDIO, "Track {:d}".format(self.btn_cnt))
-            self.btn_cnt += 1
+            list_button = list.add_button(lv.SYMBOL.AUDIO, "Track {:d}".format(self.button_cnt))
+            self.button_cnt += 1
 
-            float_btn.move_foreground()
+            float_button.move_foreground()
 
-            list_btn.scroll_to_view(lv.ANIM.ON)
+            list_button.scroll_to_view(lv.ANIM.ON)
 
 scroll_example_3 = ScrollExample_3()
 

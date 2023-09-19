@@ -9,19 +9,19 @@ fs_driver.fs_register(fs_drv, 'S')
 #
 # Open a GIF image from a file and a variable
 #
-img_bulb_gif = lv.img_dsc_t(
+image_bulb_gif = lv.image_dsc_t(
     {
         "header": {"always_zero": 0, "w": 0, "h": 0,  "cf": lv.COLOR_FORMAT.RAW},
         "data_size": 0,
         "data": img_bulb_gif_map,
     }
 )
-img1 = lv.gif(lv.scr_act())
-img1.set_src(img_bulb_gif)
-img1.align(lv.ALIGN.RIGHT_MID, -150, 0)
+image1 = lv.gif(lv.scr_act())
+image1.set_src(image_bulb_gif)
+image1.align(lv.ALIGN.RIGHT_MID, -150, 0)
 
-img2 = lv.gif(lv.scr_act())
+image2 = lv.gif(lv.scr_act())
 # The File system is attached to letter 'S'
 
-img2.set_src("S:bulb.gif")
-img2.align(lv.ALIGN.RIGHT_MID, -250, 0)
+image2.set_src("S:bulb.gif")
+image2.align(lv.ALIGN.RIGHT_MID, -250, 0)

@@ -161,14 +161,14 @@ lv_meter_indicator_t * lv_meter_add_needle_line(lv_obj_t * obj, uint16_t width,
 /**
  * Add a needle image indicator the scale
  * @param obj           pointer to a meter object
- * @param src           the image source of the indicator. path or pointer to ::lv_img_dsc_t
+ * @param src           the image source of the indicator. path or pointer to ::lv_image_dsc_t
  * @param pivot_x       the X pivot point of the needle
  * @param pivot_y       the Y pivot point of the needle
  * @return              the new indicator or NULL on allocation failure.
  * @note                the needle image should point to the right, like -O----->
  */
-lv_meter_indicator_t * lv_meter_add_needle_img(lv_obj_t * obj, const void * src,
-                                               lv_coord_t pivot_x, lv_coord_t pivot_y);
+lv_meter_indicator_t * lv_meter_add_needle_image(lv_obj_t * obj, const void * src,
+                                                 lv_coord_t pivot_x, lv_coord_t pivot_y);
 
 /**
  * Add an arc indicator the scale

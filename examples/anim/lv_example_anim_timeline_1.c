@@ -141,7 +141,7 @@ void lv_example_anim_timeline_1(void)
     lv_obj_set_flex_align(par, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     /* create btn_start */
-    lv_obj_t * btn_start = lv_btn_create(par);
+    lv_obj_t * btn_start = lv_button_create(par);
     lv_obj_add_event(btn_start, btn_start_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_flag(btn_start, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_add_flag(btn_start, LV_OBJ_FLAG_CHECKABLE);
@@ -152,7 +152,7 @@ void lv_example_anim_timeline_1(void)
     lv_obj_center(label_start);
 
     /* create btn_del */
-    lv_obj_t * btn_del = lv_btn_create(par);
+    lv_obj_t * btn_del = lv_button_create(par);
     lv_obj_add_event(btn_del, btn_del_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_del, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(btn_del, LV_ALIGN_TOP_MID, 0, 20);
@@ -162,7 +162,7 @@ void lv_example_anim_timeline_1(void)
     lv_obj_center(label_del);
 
     /* create btn_stop */
-    lv_obj_t * btn_stop = lv_btn_create(par);
+    lv_obj_t * btn_stop = lv_button_create(par);
     lv_obj_add_event(btn_stop, btn_stop_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_stop, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(btn_stop, LV_ALIGN_TOP_MID, 100, 20);

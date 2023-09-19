@@ -6,7 +6,7 @@ except:
     print("Could not find img_strip.png")
     sys.exit()
 
-img_skew_strip_dsc = lv.img_dsc_t({
+image_skew_strip_dsc = lv.image_dsc_t({
   'data_size': len(png_data),
   'data': png_data
 })
@@ -18,9 +18,9 @@ img_skew_strip_dsc = lv.img_dsc_t({
 style_indic = lv.style_t()
 
 style_indic.init()
-style_indic.set_bg_img_src(img_skew_strip_dsc)
-style_indic.set_bg_img_tiled(True)
-style_indic.set_bg_img_opa(lv.OPA._30)
+style_indic.set_bg_image_src(image_skew_strip_dsc)
+style_indic.set_bg_image_tiled(True)
+style_indic.set_bg_image_opa(lv.OPA._30)
 
 bar = lv.bar(lv.scr_act())
 bar.add_style(style_indic, lv.PART.INDICATOR)

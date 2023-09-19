@@ -364,9 +364,9 @@ static void lv_spinbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
     LV_UNUSED(class_p);
 
     /*Call the ancestor's event handler*/
-    lv_res_t res = LV_RES_OK;
+    lv_result_t res = LV_RESULT_OK;
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     const lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
