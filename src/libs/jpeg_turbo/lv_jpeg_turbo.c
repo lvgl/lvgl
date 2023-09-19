@@ -204,18 +204,6 @@ static lv_res_t try_cache(lv_image_decoder_dsc_t * dsc)
         }
     }
 
-    else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = dsc->src;
-
-        lv_cache_entry_t * cache = lv_cache_find(img_dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0);
-        if(cache) {
-            dsc->img_data = lv_cache_get_data(cache);
-            dsc->user_data = cache;     /*Save the cache to release it in decoder_close*/
-            lv_cache_unlock();
-            return LV_RES_OK;
-        }
-    }
-
     lv_cache_unlock();
     return LV_RES_INV;
 }
