@@ -291,7 +291,7 @@ static const void * decode_jpeg_file(const char * filename)
     JSAMPARRAY buffer;  /* Output row buffer */
     int row_stride;     /* physical row width in output buffer */
 
-    lv_color_t * output_buffer = NULL;
+    uint8_t * output_buffer = NULL;
 
     /* In this example we want to open the input file before doing anything else,
      * so that the setjmp() error recovery below can assume the file is open.
@@ -375,7 +375,8 @@ static const void * decode_jpeg_file(const char * filename)
     size_t output_buffer_size = cinfo.output_width * cinfo.output_height * JPEG_PIXEL_SIZE;
     output_buffer = lv_draw_buf_malloc(output_buffer_size, LV_COLOR_FORMAT_RGB888);
     if(output_buffer) {
-        lv_color_t * cur_pos = output_buffer;
+        uint8_t * cur_pos = output_buffer;
+        size_t stride = cinfo.output_width * JPEG_PIXEL_SIZE;
 
         /* while (scan lines remain to be read) */
         /* jpeg_read_scanlines(...); */
@@ -391,8 +392,8 @@ static const void * decode_jpeg_file(const char * filename)
             jpeg_read_scanlines(&cinfo, buffer, 1);
 
             /* Assume put_scanline_someplace wants a pointer and sample count. */
-            lv_memcpy(cur_pos, buffer[0], cinfo.output_width * JPEG_PIXEL_SIZE);
-            cur_pos += cinfo.output_width;
+            lv_memcpy(cur_pos, buffer[0], stride);
+            cur_pos += stride;
         }
     }
 
