@@ -18,6 +18,7 @@
 #include "libs/gif/lv_gif.h"
 #include "libs/tjpgd/lv_tjpgd.h"
 #include "libs/lodepng/lv_lodepng.h"
+#include "libs/libpng/lv_libpng.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_cache.h"
 #include "misc/lv_cache_builtin.h"
@@ -233,8 +234,17 @@ void lv_init(void)
     lv_lodepng_init();
 #endif
 
+<<<<<<< HEAD
 #if LV_USE_TJPGD
     lv_tjpgd_init();
+=======
+#if LV_USE_LIBPNG
+    lv_libpng_init();
+#endif
+
+#if LV_USE_JPG
+    lv_jpg_init();
+>>>>>>> feat(libs): add libpng decoder porting
 #endif
 
 #if LV_USE_BMP

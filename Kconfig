@@ -1011,6 +1011,9 @@ menu "LVGL configuration"
 		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 
+		config LV_USE_LIBPNG
+			bool "PNG decoder(libpng) library"
+
 		config LV_USE_BMP
 			bool "BMP decoder library"
 
