@@ -6,14 +6,12 @@
  */
 void lv_example_lodepng_1(void)
 {
+    LV_IMAGE_DECLARE(img_wink_png);
     lv_obj_t * img;
 
-#if LV_USE_PNG
-    LV_IMAGE_DECLARE(img_wink_png);
     img = lv_image_create(lv_scr_act());
     lv_image_set_src(img, &img_wink_png);
     lv_obj_align(img, LV_ALIGN_LEFT_MID, 20, 0);
-#endif
 
     img = lv_image_create(lv_scr_act());
     /* Assuming a File system is attached to letter 'A'

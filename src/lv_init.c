@@ -234,17 +234,12 @@ void lv_init(void)
     lv_lodepng_init();
 #endif
 
-<<<<<<< HEAD
-#if LV_USE_TJPGD
-    lv_tjpgd_init();
-=======
 #if LV_USE_LIBPNG
     lv_libpng_init();
 #endif
 
-#if LV_USE_JPG
-    lv_jpg_init();
->>>>>>> feat(libs): add libpng decoder porting
+#if LV_USE_TJPGD
+    lv_tjpgd_init();
 #endif
 
 #if LV_USE_BMP
