@@ -1983,6 +1983,15 @@
     #endif
 #endif
 
+/*JPEG-Turbo decoder library*/
+#ifndef LV_USE_JPEG_TURBO
+    #ifdef CONFIG_LV_USE_JPEG_TURBO
+        #define LV_USE_JPEG_TURBO CONFIG_LV_USE_JPEG_TURBO
+    #else
+        #define LV_USE_JPEG_TURBO 0
+    #endif
+#endif
+
 /*GIF decoder library*/
 #ifndef LV_USE_GIF
     #ifdef CONFIG_LV_USE_GIF

@@ -591,6 +591,9 @@
  * Split JPG is a custom format optimized for embedded systems. */
 #define LV_USE_TJPGD 0
 
+/*JPEG-Turbo decoder library*/
+#define LV_USE_JPEG_TURBO 0
+
 /*GIF decoder library*/
 #define LV_USE_GIF 0
 

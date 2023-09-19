@@ -1017,6 +1017,9 @@ menu "LVGL configuration"
 		config LV_USE_TJPGD
 			bool "TJPGD decoder library"
 
+		config LV_USE_JPEG_TURBO
+			bool "JPEG-Turbo decoder library"
+
 		config LV_USE_GIF
 			bool "GIF decoder library"
 
