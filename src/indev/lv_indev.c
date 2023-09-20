@@ -749,13 +749,15 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_RELEASED) {
         LV_LOG_INFO("pressed");
 
+        const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
         i->pr_timestamp = lv_tick_get();
 
         if(data->key == LV_KEY_ENTER) {
             bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
                                           lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
             if(lv_group_get_editing(g) == true || editable_or_scrollable == false) {
-                lv_obj_send_event(indev_obj_act, LV_EVENT_PRESSED, indev_act);
+                if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_PRESSED, indev_act);
                 if(indev_reset_check(i)) return;
             }
         }
@@ -1036,6 +1038,8 @@ static void indev_proc_press(lv_indev_t * indev)
         indev->pointer.last_obj = indev_obj_act;
 
         if(indev_obj_act != NULL) {
+            const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
             /*Save the time when the obj pressed to count long press time.*/
             indev->pr_timestamp                 = lv_tick_get();
             indev->long_pr_sent                 = 0;
@@ -1050,7 +1054,7 @@ static void indev_proc_press(lv_indev_t * indev)
             indev->pointer.vect.y         = 0;
 
             /*Call the ancestor's event handler about the press*/
-            lv_obj_send_event(indev_obj_act, LV_EVENT_PRESSED, indev_act);
+            if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_PRESSED, indev_act);
             if(indev_reset_check(indev)) return;
 
             if(indev_act->wait_until_release) return;
