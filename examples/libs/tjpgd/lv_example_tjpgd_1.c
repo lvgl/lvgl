@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if ( LV_USE_TJPGD || LV_USE_JPEG_TURBO ) && LV_BUILD_EXAMPLES
+#if LV_USE_TJPGD && LV_BUILD_EXAMPLES
 
 /**
  * Load a JPG image
