@@ -1984,11 +1984,11 @@
 #endif
 
 /*JPEG-Turbo decoder library*/
-#ifndef LV_USE_JPEG_TURBO
-    #ifdef CONFIG_LV_USE_JPEG_TURBO
-        #define LV_USE_JPEG_TURBO CONFIG_LV_USE_JPEG_TURBO
+#ifndef LV_USE_LIBJPEG_TURBO
+    #ifdef CONFIG_LV_USE_LIBJPEG_TURBO
+        #define LV_USE_LIBJPEG_TURBO CONFIG_LV_USE_LIBJPEG_TURBO
     #else
-        #define LV_USE_JPEG_TURBO 0
+        #define LV_USE_LIBJPEG_TURBO 0
     #endif
 #endif
 

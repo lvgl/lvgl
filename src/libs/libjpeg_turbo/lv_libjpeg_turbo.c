@@ -1,5 +1,5 @@
 /**
- * @file lv_jpeg_turbo.c
+ * @file lv_libjpeg_turbo.c
  *
  */
 
@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-#if LV_USE_JPEG_TURBO
+#if LV_USE_LIBJPEG_TURBO
 
-#include "lv_jpeg_turbo.h"
+#include "lv_libjpeg_turbo.h"
 #include <stdio.h>
 #include <jpeglib.h>
 #include <setjmp.h>
@@ -55,7 +55,7 @@ static lv_res_t try_cache(lv_image_decoder_dsc_t * dsc);
 /**
  * Register the JPEG decoder functions in LVGL
  */
-void lv_jpeg_turbo_init(void)
+void lv_libjpeg_turbo_init(void)
 {
     lv_image_decoder_t * dec = lv_image_decoder_create();
     lv_image_decoder_set_info_cb(dec, decoder_info);
@@ -463,4 +463,4 @@ static void error_exit(j_common_ptr cinfo)
     longjmp(myerr->jb, 1);
 }
 
-#endif /*LV_USE_JPEG_TURBO*/
+#endif /*LV_USE_LIBJPEG_TURBO*/

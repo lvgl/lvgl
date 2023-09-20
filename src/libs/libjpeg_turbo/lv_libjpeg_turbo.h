@@ -1,10 +1,10 @@
 /**
- * @file lv_example_jpeg_turbo.h
+ * @file lv_libjpeg_turbo.h
  *
  */
 
-#ifndef LV_EXAMPLE_JPEG_TURBO_H
-#define LV_EXAMPLE_JPEG_TURBO_H
+#ifndef LV_LIBJPEG_TURBO_H
+#define LV_LIBJPEG_TURBO_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../../lv_conf_internal.h"
+#if LV_USE_LIBJPEG_TURBO
 
 /*********************
  *      DEFINES
@@ -25,14 +27,20 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_jpeg_turbo_1(void);
+
+/**
+ * Register the JPEG-Turbo decoder functions in LVGL
+ */
+void lv_libjpeg_turbo_init(void);
 
 /**********************
  *      MACROS
  **********************/
 
+#endif /*LV_USE_LIBJPEG_TURBO*/
+
 #ifdef __cplusplus
-} /*extern "C"*/
+} /* extern "C" */
 #endif
 
-#endif /*LV_EXAMPLE_JPEG_TURBO_H*/
+#endif /*LV_LIBJPEG_TURBO_H*/
