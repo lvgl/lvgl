@@ -436,11 +436,18 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 
     _LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
-
-        if(base_dir == LV_BIDI_DIR_RTL) lv_obj_align(child, cont, align, -last_cord, vpad_corr);
-        else lv_obj_align(child, cont, align, last_cord, vpad_corr);
-
-        last_cord += lv_obj_get_width(child) + inner;
+        lv_style_int_t mtop = lv_obj_get_style_margin_top(child, LV_OBJ_PART_MAIN);
+        lv_style_int_t mleft = lv_obj_get_style_margin_left(child, LV_OBJ_PART_MAIN);
+        lv_style_int_t mright = lv_obj_get_style_margin_right(child, LV_OBJ_PART_MAIN);
+        if(base_dir == LV_BIDI_DIR_RTL)
+        {
+            lv_obj_align(child, cont, align, -(last_cord + mright), vpad_corr + mtop);
+        }
+        else
+        {
+            lv_obj_align(child, cont, align, last_cord + mleft, vpad_corr + mtop);
+        }
+        last_cord += lv_obj_get_width(child) + mleft + mright + inner;
     }
 
     lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
