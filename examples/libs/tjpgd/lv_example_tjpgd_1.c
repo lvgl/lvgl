@@ -1,10 +1,10 @@
 #include "../../lv_examples.h"
-#if LV_USE_JPG && LV_BUILD_EXAMPLES
+#if LV_USE_TJPGD && LV_BUILD_EXAMPLES
 
 /**
  * Load a JPG image
  */
-void lv_example_jpg_1(void)
+void lv_example_tjpgd_1(void)
 {
     lv_obj_t * wp;
 

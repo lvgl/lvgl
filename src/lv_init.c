@@ -17,7 +17,7 @@
 #include "libs/fsdrv/lv_fsdrv.h"
 #include "libs/gif/lv_gif.h"
 #include "libs/png/lv_png.h"
-#include "libs/jpg/lv_jpg.h"
+#include "libs/jpg/lv_tjpgd.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_cache.h"
 #include "misc/lv_cache_builtin.h"
@@ -219,8 +219,8 @@ void lv_init(void)
     lv_png_init();
 #endif
 
-#if LV_USE_JPG
-    lv_jpg_init();
+#if LV_USE_TJPGD
+    lv_tjpgd_init();
 #endif
 
 #if LV_USE_BMP

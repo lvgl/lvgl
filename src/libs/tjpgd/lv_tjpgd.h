@@ -1,10 +1,10 @@
 /**
- * @file lv_example_jpg.h
+ * @file lv_tjpgd.h
  *
  */
 
-#ifndef LV_EXAMPLE_JPG_H
-#define LV_EXAMPLE_JPG_H
+#ifndef LV_TJPGD_H
+#define LV_TJPGD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +13,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+
+#if LV_USE_TJPGD
 
 /*********************
  *      DEFINES
@@ -25,14 +27,17 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_jpg_1(void);
+
+void lv_tjpgd_init(void);
 
 /**********************
  *      MACROS
  **********************/
 
+#endif /*LV_USE_TJPGD*/
+
 #ifdef __cplusplus
-} /*extern "C"*/
+}
 #endif
 
-#endif /*LV_EXAMPLE_JPG_H*/
+#endif /* LV_TJPGD_H */

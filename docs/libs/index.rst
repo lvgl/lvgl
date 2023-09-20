@@ -8,7 +8,7 @@
 
     fs
     bmp
-    sjpg
+    tjpgd
     png
     gif
     freetype
