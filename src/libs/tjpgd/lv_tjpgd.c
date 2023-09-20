@@ -1,5 +1,5 @@
 /**
- * @file lv_sjpg.c
+ * @file lv_tjpgd.c
  *
  */
 
@@ -46,10 +46,10 @@
  *********************/
 
 #include "../../../lvgl.h"
-#if LV_USE_JPG
+#if LV_USE_TJPGD
 
 #include "tjpgd.h"
-#include "lv_jpg.h"
+#include "lv_tjpgd.h"
 #include "../../misc/lv_fs.h"
 
 /*********************
@@ -85,7 +85,7 @@ static int is_jpg(const uint8_t * raw_data, size_t len);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_jpg_init(void)
+void lv_tjpgd_init(void)
 {
     lv_image_decoder_t * dec = lv_image_decoder_create();
     lv_image_decoder_set_info_cb(dec, decoder_info);
@@ -288,4 +288,4 @@ static int is_jpg(const uint8_t * raw_data, size_t len)
     return memcmp(jpg_signature, raw_data, sizeof(jpg_signature)) == 0;
 }
 
-#endif /*LV_USE_JPG*/
+#endif /*LV_USE_TJPGD*/

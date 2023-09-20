@@ -1,6 +1,6 @@
-===========
-JPG decoder
-===========
+=============
+TJPGD decoder
+=============
 
 Allow the use of JPG images in LVGL. Besides that it also allows the use
 of a custom format, called Split JPG (SJPG), which can be decoded in
@@ -83,13 +83,13 @@ The expected result is:
 Example
 -------
 
-.. include:: ../examples/libs/jpg/index.rst
+.. include:: ../examples/libs/tjpgd/index.rst
 
 
 API
 ---
 
-:ref:`lv_sjpg`
+:ref:`lv_tjpgd`
 
 :ref:`tjpgd`
 

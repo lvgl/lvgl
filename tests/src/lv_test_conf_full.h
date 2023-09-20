@@ -63,7 +63,7 @@
 
 #define LV_USE_LODEPNG      1
 #define LV_USE_BMP          1
-#define LV_USE_JPG         1
+#define LV_USE_TJPGD        1
 #define LV_USE_GIF          1
 #define LV_USE_QRCODE       1
 #define LV_USE_BARCODE      1

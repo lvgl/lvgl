@@ -8,6 +8,7 @@
 
     fs
     bmp
+    tjpgd
     sjpg
     lodepng
     gif

@@ -1,6 +1,6 @@
 Load an SJPG image
 ------------------
 
-.. lv_example:: libs/sjpg/lv_example_sjpg_1
+.. lv_example:: libs/tjpgd/lv_example_tjpgd_1
   :language: c
 

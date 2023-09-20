@@ -486,8 +486,8 @@
                 <file category="sourceC"            name="src/libs/rlottie/lv_rlottie.c" />
                 <file category="sourceC"            name="src/libs/qrcode/lv_qrcode.c" />
                 <file category="sourceC"            name="src/libs/qrcode/qrcodegen.c" />
-                <file category="sourceC"            name="src/libs/sjpg/tjpgd.c" />
-                <file category="sourceC"            name="src/libs/sjpg/lv_sjpg.c" />
+                <file category="sourceC"            name="src/libs/tjpgd/tjpgd.c" />
+                <file category="sourceC"            name="src/libs/tjpgd/lv_tjpgd.c" />
                 <file category="sourceC"            name="src/libs/bmp/lv_bmp.c" />
                 <file category="sourceC"            name="src/layouts/grid/lv_grid.c" />
                 <file category="sourceC"            name="src/layouts/flex/lv_flex.c" />
@@ -787,9 +787,9 @@
             <component Cgroup="lvgl" Csub="Libs sJPG"  condition="LVGL-Essential">
               <description>Add sJPG support</description>
               <files>
-                <!-- src/libs/sjpg -->
-                <file category="sourceC"    name="src/libs/sjpg/lv_sjpg.c" />
-                <file category="sourceC"    name="src/libs/sjpg/tjpgd.c" />
+                <!-- src/libs/tjpgd -->
+                <file category="sourceC"    name="src/libs/tjpgd/lv_tjpgd.c" />
+                <file category="sourceC"    name="src/libs/tjpgd/tjpgd.c" />
               </files>
 
               <RTE_Components_h>
