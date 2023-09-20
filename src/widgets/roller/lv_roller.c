@@ -334,7 +334,7 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
     if(res != LV_RESULT_OK) return;
 
     const lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * obj = lv_event_get_target(e);
+    lv_obj_t * obj = lv_event_get_current_target(e);
     lv_roller_t * roller = (lv_roller_t *)obj;
 
     if(code == LV_EVENT_GET_SELF_SIZE) {
