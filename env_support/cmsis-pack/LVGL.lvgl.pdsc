@@ -36,8 +36,12 @@
   <repository type="git">https://github.com/lvgl/lvgl.git</repository>
 
   <releases>
-    <release date="2023-08-04" version="8.3.9" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.9.pack">
-      - LVGL 8.3.9
+    <release date="2023-09-19" version="8.3.10" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/LVGL.lvgl.8.3.10.pack">
+      - LVGL 8.3.10
+      - Some minor fixes
+    </release>
+    <release date="2023-08-04" version="8.3.9" url="https://github.com/lvgl/lvgl/raw/bdf5bfb88ce107f16cf9128cf75e61394b3219d0/env_support/cmsis-pack/LVGL.lvgl.8.3.9.pack">
+      - LVGL 8.3.10
       - Add snapshot, fragment, imgfont, gridnav, msg and monkey
       - Other minor fixes
     </release>
@@ -299,7 +303,7 @@
   -->
 
     <components>
-        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.9">
+        <bundle Cbundle="LVGL" Cclass="LVGL" Cversion="8.3.10">
             <description>LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library providing everything you need to create an embedded GUI with easy-to-use graphical elements, beautiful visual effects and a low memory footprint.</description>
             <doc></doc>
             <component Cgroup="lvgl" Csub="Essential" >
