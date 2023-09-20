@@ -1,11 +1,11 @@
-===========
-PNG decoder
-===========
+===============
+LODEPNG decoder
+===============
 
 Allow the use of PNG images in LVGL. This implementation uses
 `lodepng <https://github.com/lvandeve/lodepng>`__ library.
 
-If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_PNG` LVGL will register a new
+If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_LODEPNG` LVGL will register a new
 image decoder automatically so PNG files can be directly used as any
 other image sources.
 
@@ -21,7 +21,7 @@ As it might take significant time to decode PNG images LVGL's :ref:`image-cachin
 Example
 -------
 
-.. include:: ../examples/libs/png/index.rst
+.. include:: ../examples/libs/lodepng/index.rst
 
 API
 ---

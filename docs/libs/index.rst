@@ -9,7 +9,7 @@
     fs
     bmp
     sjpg
-    png
+    lodepng
     gif
     freetype
     tiny_ttf

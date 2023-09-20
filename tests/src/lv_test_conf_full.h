@@ -61,7 +61,7 @@
 #define LV_USE_FS_MEMFS     1
 #define LV_FS_MEMFS_LETTER  'M'
 
-#define LV_USE_PNG          1
+#define LV_USE_LODEPNG      1
 #define LV_USE_BMP          1
 #define LV_USE_JPG         1
 #define LV_USE_GIF          1

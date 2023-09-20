@@ -479,8 +479,8 @@
                 <file category="sourceC"            name="src/libs/fsdrv/lv_fs_win32.c" />
                 <file category="sourceC"            name="src/libs/freetype/lv_freetype.c" />
                 <file category="sourceC"            name="src/libs/ffmpeg/lv_ffmpeg.c" />
-                <file category="sourceC"            name="src/libs/png/lv_png.c" />
-                <file category="sourceC"            name="src/libs/png/lodepng.c" />
+                <file category="sourceC"            name="src/libs/lodepng/lv_lodepng.c" />
+                <file category="sourceC"            name="src/libs/lodepng/lodepng.c" />
                 <file category="sourceC"            name="src/libs/gif/gifdec.c" />
                 <file category="sourceC"            name="src/libs/gif/lv_gif.c" />
                 <file category="sourceC"            name="src/libs/rlottie/lv_rlottie.c" />
@@ -706,14 +706,14 @@
               <description>Add PNG support</description>
               <files>
                 <!-- src/libs/png -->
-                <file category="sourceC"    name="src/libs/png/lodepng.c" />
-                <file category="sourceC"    name="src/libs/png/lv_png.c" />
+                <file category="sourceC"    name="src/libs/lodepng/lodepng.c" />
+                <file category="sourceC"    name="src/libs/lodepng/lv_lodepng.c" />
               </files>
 
               <RTE_Components_h>
 
 /*! \brief enable PNG support */
-#define LV_USE_PNG          1
+#define LV_USE_LODEPNG          1
               </RTE_Components_h>
 
             </component>

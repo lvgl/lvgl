@@ -1,5 +1,5 @@
 /**
- * @file lv_example_png.h
+ * @file lv_example_lodepng.h
  *
  */
 
@@ -25,7 +25,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_example_png_1(void);
+void lv_example_lodepng_1(void);
 
 /**********************
  *      MACROS
