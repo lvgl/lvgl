@@ -45,10 +45,10 @@ static void bitmask_set_obj_state_cb(void* s);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_subject_update(lv_subject_t* subject, lv_observer_t* obsvr)
+void lv_subject_update(lv_subject_t* subject, lv_observer_t* observer)
 {
-    if (obsvr->cb) {
-        obsvr->cb(obsvr);
+    if (observer->cb) {
+        observer->cb(observer);
     }
 }
 
@@ -80,31 +80,31 @@ void lv_subject_init_color(lv_subject_t* subject, lv_color_t color)
     subject->value.color = color;
 }
 
-void lv_subject_unsubscribe(lv_observer_t* s)
+void lv_observer_unsubscribe(lv_observer_t* observer)
 {
-    LV_ASSERT_NULL(s);
-    _lv_ll_remove(&(s->subject->subs_ll), s);
-    lv_mem_free(s);
+    LV_ASSERT_NULL(observer);
+    _lv_ll_remove(&(observer->subject->subs_ll), observer);
+    lv_mem_free(observer);
 }
 
 void lv_subject_unsubscribe_all(lv_subject_t* subject)
 {
     LV_ASSERT_NULL(subject);
-    lv_observer_t* s;
-    _LV_LL_READ(&(subject->subs_ll), s) {
-        lv_subject_unsubscribe(s);
+    lv_observer_t* observer;
+    _LV_LL_READ(&(subject->subs_ll), observer) {
+        lv_observer_unsubscribe(observer);
     }
 }
 
 void lv_subject_unsubscribe_obj(lv_subject_t* subject, lv_obj_t* obj)
 {
-    lv_observer_t* s = _lv_ll_get_head(&subject->subs_ll);
-    while (s) {
-        lv_observer_t* s_next = _lv_ll_get_next(&subject->subs_ll, s);
-        if (s->obj == obj) {
-            lv_subject_unsubscribe(s);
+    lv_observer_t* observer = _lv_ll_get_head(&subject->subs_ll);
+    while (observer) {
+        lv_observer_t* observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
+        if (observer->obj == obj) {
+            lv_observer_unsubscribe(observer);
         }
-        s = s_next;
+        observer = observer_next;
     }
 }
 
@@ -138,27 +138,27 @@ void lv_subject_set_color(lv_subject_t* subject, lv_color_t color)
 
 void* lv_subject_subscribe_obj(lv_subject_t* subject, lv_observer_cb_t cb, lv_obj_t* obj, void* data1, void* data2)
 {
-    lv_observer_t* s = _lv_ll_ins_tail(&(subject->subs_ll));
-    LV_ASSERT_MALLOC(s);
-    if (s == NULL) return NULL;
+    lv_observer_t* observer = _lv_ll_ins_tail(&(subject->subs_ll));
+    LV_ASSERT_MALLOC(observer);
+    if (observer == NULL) return NULL;
 
-    lv_memset_00(s, sizeof(*s));
+    lv_memset_00(observer, sizeof(*observer));
 
-    s->subject = subject;
-    s->obj = obj;
-    s->cb = cb;
-    s->data1 = data1;
-    s->data2 = data2;
+    observer->subject = subject;
+    observer->obj = obj;
+    observer->cb = cb;
+    observer->data1 = data1;
+    observer->data2 = data2;
 
     /* subscribe to delete event of the object */
     if (obj != NULL) {
-        lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, s);
+        lv_obj_add_event_cb(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
     }
 
     /* update object immediately */
-    lv_subject_update(subject, s);
+    lv_subject_update(subject, observer);
 
-    return s;
+    return observer;
 }
 
 void* lv_bind_int_to_callback(lv_subject_t* subject, lv_observer_cb_t cb, lv_obj_t* obj, void* data1, void* data2)
@@ -176,10 +176,10 @@ void* lv_bind_string_to_label_text(lv_subject_t* subject, lv_obj_t* obj)
     return lv_subject_subscribe_obj(subject, string_set_label_text_cb, obj, NULL, NULL);
 }
 
-void lv_observer_int_set_label_text_format(lv_observer_t* obsvr, const char* fmt)
+void lv_observer_int_set_label_text_format(lv_observer_t* observer, const char* fmt)
 {
-    obsvr->data1 = (void*)fmt;
-    notify(obsvr->subject);
+    observer->data1 = (void*)fmt;
+    notify(observer->subject);
 }
 
 void* lv_bind_int_to_label_text_fmt(lv_subject_t* subject, lv_obj_t* obj, const char* fmt)
@@ -190,16 +190,16 @@ void* lv_bind_int_to_label_text_fmt(lv_subject_t* subject, lv_obj_t* obj, const 
 void* lv_bind_formatted_int_to_label_text(lv_subject_t* subject, lv_subject_t* fmt, lv_obj_t* obj)
 {
     /* 'fmt' should be an observable string */
-    lv_observer_t* int_obsvr = lv_bind_int_to_label_text_fmt(subject, obj, fmt->value.ptr);
+    lv_observer_t* int_observer = lv_bind_int_to_label_text_fmt(subject, obj, fmt->value.ptr);
     /* bind the observable format string to the same object, and pass the int observer to the binding, so that when the format changes, the int observer would be notified as well */
-    lv_subject_subscribe_obj(fmt, formatted_int_set_format_cb, obj, int_obsvr, NULL);
-    return int_obsvr;
+    lv_subject_subscribe_obj(fmt, formatted_int_set_format_cb, obj, int_observer, NULL);
+    return int_observer;
 }
 
-void lv_observer_bitmask_set_mask(lv_observer_t* obsvr, lv_bitmask_pattern_t pattern)
+void lv_observer_bitmask_set_pattern(lv_observer_t* observer, lv_bitmask_pattern_t pattern)
 {
-    obsvr->data2 = (void*)pattern;
-    notify(obsvr->subject);
+    observer->data2 = (void*)pattern;
+    notify(observer->subject);
 }
 
 void* lv_bind_bitmask_to_obj_flag(lv_subject_t* subject, lv_obj_t* obj, lv_obj_flag_t flag, lv_bitmask_pattern_t pattern)
@@ -219,40 +219,40 @@ void* lv_bind_bitmask_to_obj_state(lv_subject_t* subject, lv_obj_t* obj, lv_stat
 
 static void notify(lv_subject_t* subject)
 {
-    lv_observer_t* s;
-    _LV_LL_READ(&(subject->subs_ll), s) {
-        lv_subject_update(subject, s);
+    lv_observer_t* observer;
+    _LV_LL_READ(&(subject->subs_ll), observer) {
+        lv_subject_update(subject, observer);
     }
 }
 
 static void unsubscribe_on_delete_cb(lv_event_t* e)
 {
-    lv_observer_t* s = lv_event_get_user_data(e);
-    lv_subject_unsubscribe(s);
+    lv_observer_t* observer = lv_event_get_user_data(e);
+    lv_observer_unsubscribe(observer);
 }
 
 void int_set_obj_local_style_prop_cb(void* s)
 {
-    lv_observer_t* obsvr = (lv_observer_t*)s;
-    lv_obj_set_local_style_prop(obsvr->obj, (lv_style_prop_t)obsvr->data1, *(lv_style_value_t*)&obsvr->subject->value, (lv_style_selector_t)obsvr->data2);
+    lv_observer_t* observer = (lv_observer_t*)s;
+    lv_obj_set_local_style_prop(observer->obj, (lv_style_prop_t)observer->data1, *(lv_style_value_t*)&observer->subject->value, (lv_style_selector_t)observer->data2);
 }
 
 static void string_set_label_text_cb(void* s)
 {
-    lv_observer_t* obsvr = (lv_observer_t*)s;
-    lv_label_set_text(obsvr->obj, obsvr->subject->value.ptr);
+    lv_observer_t* observer = (lv_observer_t*)s;
+    lv_label_set_text(observer->obj, observer->subject->value.ptr);
 }
 
 static void int_set_label_text_cb(void* s)
 {
-    lv_observer_t* obsvr = (lv_observer_t*)s;
-    lv_label_set_text_fmt(obsvr->obj, (const char*)obsvr->data1, obsvr->subject->value.num);
+    lv_observer_t* observer = (lv_observer_t*)s;
+    lv_label_set_text_fmt(observer->obj, (const char*)observer->data1, observer->subject->value.num);
 }
 
 static void formatted_int_set_format_cb(void* s)
 {
-    lv_observer_t* obsvr = (lv_observer_t*)s;
-    lv_observer_int_set_label_text_format((lv_observer_t*)obsvr->data1, (const char*)obsvr->subject->value.ptr);
+    lv_observer_t* observer = (lv_observer_t*)s;
+    lv_observer_int_set_label_text_format((lv_observer_t*)observer->data1, (const char*)observer->subject->value.ptr);
 }
 
 static void set_obj_flag_to(lv_obj_t* obj, lv_obj_flag_t flag, bool cond)
@@ -273,18 +273,18 @@ static void set_obj_state_to(lv_obj_t* obj, lv_state_t flag, bool cond)
 
 static void bitmask_set_obj_flag_cb(void* s)
 {
-    lv_observer_t* obsvr = (lv_observer_t*)s;
-    uint32_t mask = (uint32_t)obsvr->data2 & 0x3fffffff; /* mask: bits 0..29 */
-    uint32_t value = (((uint32_t)obsvr->data2) & LV_OBSERVER_BITMASK_ALL_SET) ? mask : 0UL;
-    bool cond = (obsvr->subject->value.num & mask) == value;
-    set_obj_flag_to(obsvr->obj, (lv_obj_flag_t)obsvr->data1, (((uint32_t)obsvr->data2) & LV_OBSERVER_BITMASK_NEGATE) ? !cond : cond);
+    lv_observer_t* observer = (lv_observer_t*)s;
+    uint32_t mask = (uint32_t)observer->data2 & 0x3fffffff; /* mask: bits 0..29 */
+    uint32_t value = (((uint32_t)observer->data2) & LV_OBSERVER_BITMASK_ALL_SET) ? mask : 0UL;
+    bool cond = (observer->subject->value.num & mask) == value;
+    set_obj_flag_to(observer->obj, (lv_obj_flag_t)observer->data1, (((uint32_t)observer->data2) & LV_OBSERVER_BITMASK_NEGATE) ? !cond : cond);
 }
 
 static void bitmask_set_obj_state_cb(void* s)
 {
-    lv_observer_t* obsvr = (lv_observer_t*)s;
-    uint32_t mask = (uint32_t)obsvr->data2 & 0x3fffffff; /* mask: bits 0..29 */
-    uint32_t value = (((uint32_t)obsvr->data2) & LV_OBSERVER_BITMASK_ALL_SET) ? mask : 0UL;
-    bool cond = (obsvr->subject->value.num & mask) == value;
-    set_obj_state_to(obsvr->obj, (lv_state_t)obsvr->data1, (((uint32_t)obsvr->data2) & LV_OBSERVER_BITMASK_NEGATE) ? !cond : cond);
+    lv_observer_t* observer = (lv_observer_t*)s;
+    uint32_t mask = (uint32_t)observer->data2 & 0x3fffffff; /* mask: bits 0..29 */
+    uint32_t value = (((uint32_t)observer->data2) & LV_OBSERVER_BITMASK_ALL_SET) ? mask : 0UL;
+    bool cond = (observer->subject->value.num & mask) == value;
+    set_obj_state_to(observer->obj, (lv_state_t)observer->data1, (((uint32_t)observer->data2) & LV_OBSERVER_BITMASK_NEGATE) ? !cond : cond);
 }

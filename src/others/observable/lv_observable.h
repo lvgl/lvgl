@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 
 #include "lvgl/lvgl.h"
+//#include "../../misc/lv_ll.h"
 
 /*********************
  *      DEFINES
@@ -24,7 +25,7 @@ extern "C" {
 #define LV_SUBJECT_TYPE_POINTER 1 /**< a void pointer*/
 #define LV_SUBJECT_TYPE_COLOR   2 /**< an lv_color_t*/
 #define LV_SUBJECT_TYPE_FLOAT   3 /**< a float*/
-#define LV_SUBJECT_TYPE_BITMASK 4 /**< an array of up to 15 binary flags*/
+#define LV_SUBJECT_TYPE_BITMASK 4 /**< an array of up to 30 binary flags*/
 #define LV_SUBJECT_TYPE_STRING  256 /**< a char pointer*/
 
 #define LV_OBSERVER_BITMASK_NEGATE  0x80000000UL /**< negate result of bitmask comparison*/
@@ -120,9 +121,9 @@ void* lv_subject_subscribe_obj(lv_subject_t* subject, lv_observer_cb_t cb, lv_ob
 
 /**
  * Remove observer from the list of subscribers
- * @param subject address of the observer object returned when a widget was subscribed to the subject
+ * @param observer address of the observer object returned when a widget was subscribed to the subject
  */
-void lv_observer_unsubscribe(lv_observer_t* subject);
+void lv_observer_unsubscribe(lv_observer_t* observer);
 
 /**
  * Remove all observers of a specified widget from the list of observers
@@ -175,7 +176,7 @@ void lv_subject_copy_string(lv_subject_t* subject, char* buf);
  * @param pattern pattern used to mask out interested bits from the bitmask's value and compare it with a constant value
  * @note The value
  */
-void lv_observer_bitmask_set_cond(lv_observer_t* observer, lv_bitmask_pattern_t pattern);
+void lv_observer_bitmask_set_pattern(lv_observer_t* observer, lv_bitmask_pattern_t pattern);
 
 /**
  * Bind bitmask to object flag
@@ -224,6 +225,7 @@ void* lv_bind_int_to_label_text_fmt(lv_subject_t* subject, lv_obj_t* obj, const 
  * @param subject address of the subject
  * @param fmt the address of the format string (an observable string value)
  * @param obj the LVGL object what will be affected by the change
+ * @note If either the value or the formwat string changes the label's text will be updated.
  */
 void* lv_bind_formatted_int_to_label_text(lv_subject_t* subject, lv_subject_t* fmt, lv_obj_t* obj);
 
