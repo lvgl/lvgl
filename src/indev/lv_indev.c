@@ -694,7 +694,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             if(indev_reset_check(i)) return;
 
             if(i->long_pr_sent == 0) {
-                lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
+                if(!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(i)) return;
             }
 
@@ -850,7 +850,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
                 if(indev_reset_check(i)) return;
 
-                if(i->long_pr_sent == 0) lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
+                if(i->long_pr_sent == 0 && !is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(i)) return;
 
                 if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
@@ -864,7 +864,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                     lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
                     if(indev_reset_check(i)) return;
 
-                    lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
+                    if(!is_disabled)lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                     if(indev_reset_check(i)) return;
 
                     if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_CLICKED, indev_act);
@@ -1141,7 +1141,7 @@ static void indev_proc_release(lv_indev_t * indev)
         /*Send CLICK if no scrolling*/
         if(scroll_obj == NULL) {
             if(indev->long_pr_sent == 0) {
-                lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
+                if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
                 if(indev_reset_check(indev)) return;
             }
 
