@@ -1,5 +1,41 @@
 # Changelog
 
+## [v8.3.10](https://github.com/lvgl/lvgl/compare/v8.3.10...v8.3.9) 20 September 2023
+
+### New Features
+
+- feat(disp): add double buffered direct-mode efficient sync algorithm (v8.3) [`4497`](https://github.com/lvgl/lvgl/pull/4497)
+- feat(style): backport opa_layered [`6548ea0`](https://github.com/lvgl/lvgl/commit/6548ea0f291be8a97afb3c4d7dcabbe465ae5a04)
+
+
+### Fixes
+
+- fix: build on Windows (MinGW environment) [`4538`](https://github.com/lvgl/lvgl/pull/4538)
+- fix(docs): dropdown: fix function name in description of static options [`4535`](https://github.com/lvgl/lvgl/pull/4535)
+- fix: do not copy invalid areas if not double buffered mode [`4526`](https://github.com/lvgl/lvgl/pull/4526)
+- fix(sdl): add missing parameter in lv_draw_sdl_composite_texture_obtain [`4490`](https://github.com/lvgl/lvgl/pull/4490)
+- fix(dropdown): position to the selected item in lv_dropdown_set_selected [`f174589`](https://github.com/lvgl/lvgl/commit/f174589240b099a349e54ba09aa9b39c2b347341)
+- fix(vglite): be sure end_angle > start_angle in arc drawing [`01cd1fe`](https://github.com/lvgl/lvgl/commit/01cd1fed9db974aa616a6289a29171b7a971cd89)
+- fix(btnmatrix): fix tapping just outside a button in a buttonmatrix [`8063fac`](https://github.com/lvgl/lvgl/commit/8063fac793b0a09add1e57c1115b734659274e6f)
+
+
+### Docs
+
+- docs(calendar): update according to v8.2 changes [`a296456`](https://github.com/lvgl/lvgl/commit/a296456591f6ff0e3b3ae6cdcdd9ec5b1711c357)
+- docs(simulator): remove SDL support from the Visual Studio project [`bcebafe`](https://github.com/lvgl/lvgl/commit/bcebafe4fb72e336b7dedca89c07e334427eef8d)
+
+### CI and tests
+
+- ci: update screenshot compare from v9 to automatically create missing reference images [`fd21ed0`](https://github.com/lvgl/lvgl/commit/fd21ed0eb82bacb1e482180ab0aaed6a667f000d)
+- ci(dropdown): fix test [`5fc488a`](https://github.com/lvgl/lvgl/commit/5fc488a088639dbfb5eb44f65b05e13b6ba881bf)
+
+### Others
+
+- chore(cmsis-pack): create cmsis-pack for v8.3.10 [`4572`](https://github.com/lvgl/lvgl/pull/4572)
+- Update screen object opacity function documentation [`4505`](https://github.com/lvgl/lvgl/pull/4505)
+- demo(sress): fix issues when the stress test is opened/clsoed multiple times [`1c5df6c`](https://github.com/lvgl/lvgl/commit/1c5df6c665b0d5f6f346d45b13109ff1f6ea78a6)
+- chore: code formatting [`eb87767`](https://github.com/lvgl/lvgl/commit/eb87767cc65fec93f9cc4f87a1f8fb5b32f7e41d)
+
 
 ## [v8.3.9](https://github.com/lvgl/lvgl/compare/v8.3.9...v8.3.8) 6 August 2023
 
