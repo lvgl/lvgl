@@ -110,13 +110,17 @@ static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, 
         const uint32_t raw_sjpeg_data_size = img_dsc->data_size;
 
         if(is_jpg(raw_data, raw_sjpeg_data_size) == true) {
+#if LV_USE_FS_MEMFS
             header->always_zero = 0;
             header->cf = LV_COLOR_FORMAT_RAW;
             header->w = img_dsc->header.w;
             header->h = img_dsc->header.h;
             header->stride = img_dsc->header.w * 3;
             return LV_RESULT_OK;
-
+#else
+            LV_LOG_WARN("LV_USE_FS_MEMFS needs to enabled to decode from data");
+            return LV_RESULT_INVALID;
+#endif
         }
     }
     else if(src_type == LV_IMAGE_SRC_FILE) {
@@ -172,6 +176,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     LV_UNUSED(decoder);
     lv_fs_file_t * f = lv_malloc(sizeof(lv_fs_file_t));
     if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
+#if LV_USE_FS_MEMFS
         const lv_image_dsc_t * img_dsc = dsc->src;
         if(is_jpg(img_dsc->data, img_dsc->data_size) == true) {
             lv_fs_path_ex_t path;
@@ -183,6 +188,10 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
                 return LV_RESULT_INVALID;
             }
         }
+#else
+        LV_LOG_WARN("LV_USE_FS_MEMFS needs to enabled to decode from data");
+        return LV_RESULT_INVALID;
+#endif
     }
     else if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
