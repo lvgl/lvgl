@@ -690,7 +690,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
         data->key = prev_key;
         if(data->key == LV_KEY_ENTER) {
 
-            lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
+            if(!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
             if(indev_reset_check(i)) return;
 
             if(i->long_pr_sent == 0) {
@@ -847,7 +847,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             /*The button was released on a non-editable object. Just send enter*/
             if(editable_or_scrollable == false) {
-                lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
+                if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
                 if(indev_reset_check(i)) return;
 
                 if(i->long_pr_sent == 0 && !is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
@@ -861,7 +861,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             else if(lv_group_get_editing(g)) {
                 /*Ignore long pressed enter release because it comes from mode switch*/
                 if(!i->long_pr_sent || lv_group_get_obj_count(g) <= 1) {
-                    lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
+                    if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
                     if(indev_reset_check(i)) return;
 
                     if(!is_disabled)lv_obj_send_event(indev_obj_act, LV_EVENT_SHORT_CLICKED, indev_act);
@@ -1135,7 +1135,7 @@ static void indev_proc_release(lv_indev_t * indev)
         const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
         /*Send RELEASE Call the ancestor's event handler and event*/
-        lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
+        if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_RELEASED, indev_act);
         if(indev_reset_check(indev)) return;
 
         /*Send CLICK if no scrolling*/
