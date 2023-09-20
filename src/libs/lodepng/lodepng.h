@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #include <string.h> /*for size_t*/
 
 #include "../../../lvgl.h"
-#if LV_USE_PNG
+#if LV_USE_LODEPNG
 extern const char * LODEPNG_VERSION_STRING;
 
 /*
@@ -1090,7 +1090,7 @@ TODO:
 [X] provide alternatives for C library functions not present on some platforms (memcpy, ...)
 */
 
-#endif /*LV_USE_PNG*/
+#endif /*LV_USE_LODEPNG*/
 
 #endif /*LODEPNG_H inclusion guard*/
 

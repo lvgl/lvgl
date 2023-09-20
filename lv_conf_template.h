@@ -248,7 +248,7 @@
 #endif
 
 /*Default cache size in bytes.
- *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Used by image decoders such as `lv_lodepng` to keep the decoded image in the memory.
  *Data larger than the size of the cache also can be allocated but
  *will be dropped immediately after usage.*/
 #define LV_CACHE_DEF_SIZE       0
@@ -575,8 +575,8 @@
     #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
 #endif
 
-/*PNG decoder library*/
-#define LV_USE_PNG 0
+/*LODEPNG decoder library*/
+#define LV_USE_LODEPNG 0
 
 /*BMP decoder library*/
 #define LV_USE_BMP 0

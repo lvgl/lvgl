@@ -690,7 +690,7 @@
 #endif
 
 /*Default cache size in bytes.
- *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Used by image decoders such as `lv_lodepng` to keep the decoded image in the memory.
  *Data larger than the size of the cache also can be allocated but
  *will be dropped immediately after usage.*/
 #ifndef LV_CACHE_DEF_SIZE
@@ -1937,12 +1937,12 @@
     #endif
 #endif
 
-/*PNG decoder library*/
-#ifndef LV_USE_PNG
-    #ifdef CONFIG_LV_USE_PNG
-        #define LV_USE_PNG CONFIG_LV_USE_PNG
+/*LODEPNG decoder library*/
+#ifndef LV_USE_LODEPNG
+    #ifdef CONFIG_LV_USE_LODEPNG
+        #define LV_USE_LODEPNG CONFIG_LV_USE_LODEPNG
     #else
-        #define LV_USE_PNG 0
+        #define LV_USE_LODEPNG 0
     #endif
 #endif
 

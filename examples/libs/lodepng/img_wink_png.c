@@ -1,5 +1,5 @@
 #include "../../../lvgl.h"
-#if LV_USE_PNG && LV_BUILD_EXAMPLES
+#if LV_USE_LODEPNG && LV_BUILD_EXAMPLES
 
 
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
@@ -345,4 +345,4 @@ const lv_image_dsc_t img_wink_png = {
     .data = img_wink_png_map,
 };
 
-#endif /*LV_USE_PNG && LV_BUILD_EXAMPLES*/
+#endif /*LV_USE_LODEPNG && LV_BUILD_EXAMPLES*/
