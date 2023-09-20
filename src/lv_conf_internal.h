@@ -1983,7 +1983,7 @@
     #endif
 #endif
 
-/*JPEG-Turbo decoder library*/
+/*libjpeg-turbo decoder library*/
 #ifndef LV_USE_LIBJPEG_TURBO
     #ifdef CONFIG_LV_USE_LIBJPEG_TURBO
         #define LV_USE_LIBJPEG_TURBO CONFIG_LV_USE_LIBJPEG_TURBO
