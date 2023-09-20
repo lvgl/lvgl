@@ -1020,7 +1020,7 @@ menu "LVGL configuration"
 			default 0
 			depends on LV_USE_FS_FATFS
 
-		config LV_USE_PNG
+		config LV_USE_LODEPNG
 			bool "PNG decoder library"
 
 		config LV_USE_BMP

@@ -1,5 +1,5 @@
 /**
- * @file lv_png.c
+ * @file lv_lodepng.c
  *
  */
 
@@ -7,9 +7,9 @@
  *      INCLUDES
  *********************/
 #include "../../../lvgl.h"
-#if LV_USE_PNG
+#if LV_USE_LODEPNG
 
-#include "lv_png.h"
+#include "lv_lodepng.h"
 #include "lodepng.h"
 #include <stdlib.h>
 
@@ -46,7 +46,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 /**
  * Register the PNG decoder functions in LVGL
  */
-void lv_png_init(void)
+void lv_lodepng_init(void)
 {
     lv_image_decoder_t * dec = lv_image_decoder_create();
     lv_image_decoder_set_info_cb(dec, decoder_info);
@@ -283,6 +283,6 @@ static void convert_color_depth(uint8_t * img_p, uint32_t px_cnt)
     }
 }
 
-#endif /*LV_USE_PNG*/
+#endif /*LV_USE_LODEPNG*/
 
 

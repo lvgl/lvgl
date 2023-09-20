@@ -18,7 +18,7 @@ extern "C" {
 #include "ffmpeg/lv_example_ffmpeg.h"
 #include "freetype/lv_example_freetype.h"
 #include "gif/lv_example_gif.h"
-#include "png/lv_example_png.h"
+#include "lodepng/lv_example_lodepng.h"
 #include "qrcode/lv_example_qrcode.h"
 #include "rlottie/lv_example_rlottie.h"
 #include "jpg/lv_example_jpg.h"

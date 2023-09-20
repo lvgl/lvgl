@@ -29,7 +29,7 @@ Rename this file to lodepng.cpp to use it for C++, or to lodepng.c to use it for
 */
 
 #include "lodepng.h"
-#if LV_USE_PNG
+#if LV_USE_LODEPNG
 
 #ifdef LODEPNG_COMPILE_DISK
     #include <limits.h> /* LONG_MAX */
@@ -7039,4 +7039,4 @@ unsigned encode(const std::string & filename,
 } /* namespace lodepng */
 #endif /*LODEPNG_COMPILE_CPP*/
 
-#endif /*LV_USE_PNG*/
+#endif /*LV_USE_LODEPNG*/

@@ -22,7 +22,7 @@ static const void * get_imgfont_path(const lv_font_t * font, uint32_t unicode, u
     else if(unicode == 0xF600) {
 #if LV_USE_FFMPEG
         return "lvgl/examples/assets/emoji/F600.png";
-#elif LV_USE_PNG
+#elif LV_USE_LODEPNG
         return "A:lvgl/examples/assets/emoji/F600.png";
 #endif
     }

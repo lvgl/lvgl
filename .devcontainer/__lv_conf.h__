@@ -627,8 +627,8 @@
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
-/*PNG decoder library*/
-#define LV_USE_PNG 0
+/*LODEPNG decoder library*/
+#define LV_USE_LODEPNG 0
 
 /*BMP decoder library*/
 #define LV_USE_BMP 0

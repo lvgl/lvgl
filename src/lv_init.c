@@ -16,7 +16,7 @@
 #include "libs/freetype/lv_freetype.h"
 #include "libs/fsdrv/lv_fsdrv.h"
 #include "libs/gif/lv_gif.h"
-#include "libs/png/lv_png.h"
+#include "libs/lodepng/lv_lodepng.h"
 #include "libs/jpg/lv_jpg.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_cache.h"
@@ -215,8 +215,8 @@ void lv_init(void)
     lv_fs_memfs_init();
 #endif
 
-#if LV_USE_PNG
-    lv_png_init();
+#if LV_USE_LODEPNG
+    lv_lodepng_init();
 #endif
 
 #if LV_USE_JPG

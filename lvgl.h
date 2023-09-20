@@ -92,7 +92,7 @@ extern "C" {
 #include "src/libs/barcode/lv_barcode.h"
 #include "src/libs/bmp/lv_bmp.h"
 #include "src/libs/fsdrv/lv_fsdrv.h"
-#include "src/libs/png/lv_png.h"
+#include "src/libs/lodepng/lv_lodepng.h"
 #include "src/libs/gif/lv_gif.h"
 #include "src/libs/qrcode/lv_qrcode.h"
 #include "src/libs/jpg/lv_jpg.h"

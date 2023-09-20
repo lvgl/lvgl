@@ -39,7 +39,7 @@ static void create_images(void)
     lv_obj_align(label, LV_ALIGN_CENTER, 100, 20);
 }
 
-void test_png_1(void)
+void test_lodepng_1(void)
 {
     create_images();
 
