@@ -661,7 +661,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
 
             /*Send LONG_PRESS_REP on ENTER*/
             if(data->key == LV_KEY_ENTER) {
-            	if(!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, indev_act);
+                if(!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, indev_act);
                 if(indev_reset_check(i)) return;
             }
             /*Move the focus on NEXT again*/
@@ -819,7 +819,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->longpr_rep_timestamp = lv_tick_get();
 
             if(data->key == LV_KEY_ENTER) {
-            	if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, indev_act);
+                if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, indev_act);
                 if(indev_reset_check(i)) return;
             }
             else if(data->key == LV_KEY_LEFT) {
@@ -1075,7 +1075,7 @@ static void indev_proc_press(lv_indev_t * indev)
     indev->pointer.scroll_throw_vect_ori = indev->pointer.scroll_throw_vect;
 
     if(indev_obj_act) {
-    	const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+        const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
         lv_obj_send_event(indev_obj_act, LV_EVENT_PRESSING, indev_act);
         if(indev_reset_check(indev)) return;
@@ -1106,7 +1106,7 @@ static void indev_proc_press(lv_indev_t * indev)
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 1) {
             /*Call the ancestor's event handler about the long press repeat if enough time elapsed*/
             if(lv_tick_elaps(indev->longpr_rep_timestamp) > indev_act->long_press_repeat_time) {
-            	if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, indev_act);
+                if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED_REPEAT, indev_act);
                 if(indev_reset_check(indev)) return;
                 indev->longpr_rep_timestamp = lv_tick_get();
             }
