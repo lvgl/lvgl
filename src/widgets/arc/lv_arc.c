@@ -590,7 +590,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_HIT_TEST) {
-        lv_hit_test_info_t * info = lv_event_get_param(e);;
+        lv_hit_test_info_t * info = lv_event_get_param(e);
 
         lv_point_t p;
         lv_coord_t r;
