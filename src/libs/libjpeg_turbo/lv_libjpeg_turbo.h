@@ -33,6 +33,8 @@ extern "C" {
  */
 void lv_libjpeg_turbo_init(void);
 
+void lv_libjpeg_turbo_deinit(void);
+
 /**********************
  *      MACROS
  **********************/
