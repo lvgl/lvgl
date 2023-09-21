@@ -19,6 +19,7 @@ extern "C" {
 #include "freetype/lv_example_freetype.h"
 #include "gif/lv_example_gif.h"
 #include "lodepng/lv_example_lodepng.h"
+#include "libpng/lv_example_libpng.h"
 #include "qrcode/lv_example_qrcode.h"
 #include "rlottie/lv_example_rlottie.h"
 #include "tjpgd/lv_example_tjpgd.h"
