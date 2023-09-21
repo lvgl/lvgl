@@ -277,7 +277,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
 
     lv_chart_t * chart  = (lv_chart_t *)obj;
     if(id >= chart->point_cnt) {
-        LV_LOG_WARN("Invalid index: %d", id);
+        LV_LOG_WARN("Invalid index: %"LV_PRIu32, id);
         p_out->x = 0;
         p_out->y = 0;
         return;
