@@ -13,8 +13,14 @@ void setUp(void)
 
 void tearDown(void)
 {
-    // TODO: free-me
+    lv_obj_del(spangroup);
+
+    if (active_screen) {
+            lv_obj_clean(active_screen);
+    }           
+    
     spangroup = NULL;
+    active_screen = NULL;
 }
 
 void test_spangroup_create_not_null(void)
@@ -68,6 +74,28 @@ void test_span_set_text(void)
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
 }
 
+void test_span_set_text_with_bad_parameter_no_action_performed(void)
+{
+    const char * test_text = "Test Text";    
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span, test_text);
+    lv_span_set_text(span, NULL);
+
+    TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
+}
+
+
+void test_span_set_text_with_previous_test_overwrites(void)
+{
+    const char * old_test_text = "Old Test Text";    
+    const char * new_test_text = "New Test Text and it is longer";    
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span, old_test_text);
+    lv_span_set_text(span, new_test_text);
+
+    TEST_ASSERT_EQUAL_STRING(span->txt, new_test_text);
+}
+
 void test_span_set_text_static(void)
 {
     const char * test_text = "Test Text";    
@@ -75,6 +103,27 @@ void test_span_set_text_static(void)
     lv_span_set_text_static(span, test_text);
 
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
+}
+
+void test_span_set_text_static_with_bad_parameter_no_action_performed(void)
+{
+    const char * test_text = "Test Text";    
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(span, test_text);
+    lv_span_set_text_static(span, NULL);
+    
+    TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
+}
+
+void test_span_set_text_static_with_previous_text_overwrites(void)
+{
+    const char * old_test_text = "Old Test Text";    
+    const char * new_test_text = "New Test Text and it is longer";    
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text_static(span, old_test_text);
+    lv_span_set_text_static(span, new_test_text);
+
+    TEST_ASSERT_EQUAL_STRING(span->txt, new_test_text);
 }
 
 void test_spangroup_set_align(void)
@@ -160,7 +209,7 @@ void test_spangroup_get_max_line_h(void)
 
 }
 
-void test_spangroup_test(void)
+void test_spangroup_draw(void)
 {
         active_screen = lv_scr_act();
         
@@ -171,6 +220,16 @@ void test_spangroup_test(void)
         lv_span_set_text(span, "This text is over 100 pixels width");
 
         TEST_ASSERT_EQUAL_SCREENSHOT("testb.png");
+            
+        lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
+
+        TEST_ASSERT_EQUAL_SCREENSHOT("testc.png");
+        
+        lv_span_t * span2 = lv_spangroup_new_span(spangroup);
+        lv_style_set_text_decor(&span2->style, LV_TEXT_DECOR_STRIKETHROUGH);
+        lv_spangroup_refr_mode(spangroup);
+
+        TEST_ASSERT_EQUAL_SCREENSHOT("testz.png");
 }
 
 void test_spangroup_get_child(void)
