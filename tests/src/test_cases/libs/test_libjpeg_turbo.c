@@ -27,6 +27,9 @@ static void create_images(void)
 
 void test_jpg_2(void)
 {
+    /* Temporarily remove tjpgd decoder */
+    lv_tjpgd_deinit();
+
     create_images();
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
@@ -44,6 +47,8 @@ void test_jpg_2(void)
 
     TEST_ASSERT_EQUAL(mem_before, lv_test_get_free_mem());
 
+    /* Re-add tjpgd decoder */
+    lv_tjpgd_init();
 }
 
 #endif
