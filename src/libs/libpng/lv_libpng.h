@@ -33,6 +33,8 @@ extern "C" {
  */
 void lv_libpng_init(void);
 
+void lv_libpng_deinit(void);
+
 /**********************
  *      MACROS
  **********************/
