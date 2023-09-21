@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_construct(lv_obj_t * obj);
+static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static uint32_t get_instance_size(const lv_obj_class_t * class_p);
 
 /**********************
@@ -100,7 +100,7 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     lv_obj_enable_style_refresh(false);
 
     lv_theme_apply(obj);
-    lv_obj_construct(obj);
+    lv_obj_construct(obj->class_p, obj);
 
     lv_obj_enable_style_refresh(true);
     lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
@@ -165,22 +165,23 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_construct(lv_obj_t * obj)
+static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    const lv_obj_class_t * original_class_p = obj->class_p;
-
     if(obj->class_p->base_class) {
+        const lv_obj_class_t * original_class_p = obj->class_p;
+
         /*Don't let the descendant methods run during constructing the ancestor type*/
         obj->class_p = obj->class_p->base_class;
 
         /*Construct the base first*/
-        lv_obj_construct(obj);
+        lv_obj_construct(class_p, obj);
+
+        /*Restore the original class*/
+        obj->class_p = original_class_p;
     }
 
-    /*Restore the original class*/
-    obj->class_p = original_class_p;
 
-    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(obj->class_p, obj);
+    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(class_p, obj);
 }
 
 static uint32_t get_instance_size(const lv_obj_class_t * class_p)
