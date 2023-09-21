@@ -649,7 +649,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
             i->long_pr_sent = 1;
             if(data->key == LV_KEY_ENTER) {
                 i->longpr_rep_timestamp = lv_tick_get();
-                lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED, indev_act);
+                if(!dis) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED, indev_act);
                 if(indev_reset_check(i)) return;
             }
         }
@@ -785,6 +785,8 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_PRESSED) {
+    	const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
         /*Long press*/
         if(i->long_pr_sent == 0 && lv_tick_elaps(i->pr_timestamp) > i->long_press_time) {
 
@@ -806,7 +808,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
                 }
                 /*If not editable then just send a long press Call the ancestor's event handler*/
                 else {
-                    lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED, indev_act);
+                    if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED, indev_act);
                     if(indev_reset_check(i)) return;
                 }
             }
@@ -1076,6 +1078,8 @@ static void indev_proc_press(lv_indev_t * indev)
     indev->pointer.scroll_throw_vect_ori = indev->pointer.scroll_throw_vect;
 
     if(indev_obj_act) {
+    	const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
         lv_obj_send_event(indev_obj_act, LV_EVENT_PRESSING, indev_act);
         if(indev_reset_check(indev)) return;
 
@@ -1090,7 +1094,7 @@ static void indev_proc_press(lv_indev_t * indev)
         if(indev->pointer.scroll_obj == NULL && indev->long_pr_sent == 0) {
             /*Call the ancestor's event handler about the long press if enough time elapsed*/
             if(lv_tick_elaps(indev->pr_timestamp) > indev_act->long_press_time) {
-                lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED, indev_act);
+                if(!is_disabled) lv_obj_send_event(indev_obj_act, LV_EVENT_LONG_PRESSED, indev_act);
                 if(indev_reset_check(indev)) return;
 
                 /*Mark the Call the ancestor's event handler sending to do not send it again*/
