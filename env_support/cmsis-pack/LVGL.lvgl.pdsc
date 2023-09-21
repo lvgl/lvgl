@@ -479,15 +479,15 @@
                 <file category="sourceC"            name="src/libs/fsdrv/lv_fs_win32.c" />
                 <file category="sourceC"            name="src/libs/freetype/lv_freetype.c" />
                 <file category="sourceC"            name="src/libs/ffmpeg/lv_ffmpeg.c" />
-                <file category="sourceC"            name="src/libs/png/lv_png.c" />
-                <file category="sourceC"            name="src/libs/png/lodepng.c" />
+                <file category="sourceC"            name="src/libs/lodepng/lv_lodepng.c" />
+                <file category="sourceC"            name="src/libs/lodepng/lodepng.c" />
                 <file category="sourceC"            name="src/libs/gif/gifdec.c" />
                 <file category="sourceC"            name="src/libs/gif/lv_gif.c" />
                 <file category="sourceC"            name="src/libs/rlottie/lv_rlottie.c" />
                 <file category="sourceC"            name="src/libs/qrcode/lv_qrcode.c" />
                 <file category="sourceC"            name="src/libs/qrcode/qrcodegen.c" />
-                <file category="sourceC"            name="src/libs/sjpg/tjpgd.c" />
-                <file category="sourceC"            name="src/libs/sjpg/lv_sjpg.c" />
+                <file category="sourceC"            name="src/libs/tjpgd/tjpgd.c" />
+                <file category="sourceC"            name="src/libs/tjpgd/lv_tjpgd.c" />
                 <file category="sourceC"            name="src/libs/bmp/lv_bmp.c" />
                 <file category="sourceC"            name="src/layouts/grid/lv_grid.c" />
                 <file category="sourceC"            name="src/layouts/flex/lv_flex.c" />
@@ -706,14 +706,14 @@
               <description>Add PNG support</description>
               <files>
                 <!-- src/libs/png -->
-                <file category="sourceC"    name="src/libs/png/lodepng.c" />
-                <file category="sourceC"    name="src/libs/png/lv_png.c" />
+                <file category="sourceC"    name="src/libs/lodepng/lodepng.c" />
+                <file category="sourceC"    name="src/libs/lodepng/lv_lodepng.c" />
               </files>
 
               <RTE_Components_h>
 
 /*! \brief enable PNG support */
-#define LV_USE_PNG          1
+#define LV_USE_LODEPNG          1
               </RTE_Components_h>
 
             </component>
@@ -787,9 +787,9 @@
             <component Cgroup="lvgl" Csub="Libs sJPG"  condition="LVGL-Essential">
               <description>Add sJPG support</description>
               <files>
-                <!-- src/libs/sjpg -->
-                <file category="sourceC"    name="src/libs/sjpg/lv_sjpg.c" />
-                <file category="sourceC"    name="src/libs/sjpg/tjpgd.c" />
+                <!-- src/libs/tjpgd -->
+                <file category="sourceC"    name="src/libs/tjpgd/lv_tjpgd.c" />
+                <file category="sourceC"    name="src/libs/tjpgd/tjpgd.c" />
               </files>
 
               <RTE_Components_h>

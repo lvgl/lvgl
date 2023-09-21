@@ -16,13 +16,19 @@
 #include "libs/freetype/lv_freetype.h"
 #include "libs/fsdrv/lv_fsdrv.h"
 #include "libs/gif/lv_gif.h"
-#include "libs/png/lv_png.h"
-#include "libs/jpg/lv_jpg.h"
+#include "libs/tjpgd/lv_tjpgd.h"
+#include "libs/lodepng/lv_lodepng.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_cache.h"
 #include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
+#if LV_USE_DRAW_VGLITE
+    #include "draw/nxp/vglite/lv_draw_vglite.h"
+#endif
+#if LV_USE_DRAW_PXP
+    #include "draw/nxp/pxp/lv_draw_pxp.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -137,6 +143,14 @@ void lv_init(void)
     lv_draw_sw_init();
 #endif
 
+#if LV_USE_DRAW_VGLITE
+    lv_draw_vglite_init();
+#endif
+
+#if LV_USE_DRAW_PXP
+    lv_draw_pxp_init();
+#endif
+
     _lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
@@ -215,12 +229,12 @@ void lv_init(void)
     lv_fs_memfs_init();
 #endif
 
-#if LV_USE_PNG
-    lv_png_init();
+#if LV_USE_LODEPNG
+    lv_lodepng_init();
 #endif
 
-#if LV_USE_JPG
-    lv_jpg_init();
+#if LV_USE_TJPGD
+    lv_tjpgd_init();
 #endif
 
 #if LV_USE_BMP

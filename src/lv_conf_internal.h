@@ -319,6 +319,24 @@
     #endif
 #endif
 
+/* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+#ifndef LV_USE_DRAW_VGLITE
+    #ifdef CONFIG_LV_USE_DRAW_VGLITE
+        #define LV_USE_DRAW_VGLITE CONFIG_LV_USE_DRAW_VGLITE
+    #else
+        #define LV_USE_DRAW_VGLITE 0
+    #endif
+#endif
+
+/* Use NXP's PXP on iMX RTxxx platforms. */
+#ifndef LV_USE_DRAW_PXP
+    #ifdef CONFIG_LV_USE_DRAW_PXP
+        #define LV_USE_DRAW_PXP CONFIG_LV_USE_DRAW_PXP
+    #else
+        #define LV_USE_DRAW_PXP 0
+    #endif
+#endif
+
 /*=================
  * OPERATING SYSTEM
  *=================*/
@@ -690,7 +708,7 @@
 #endif
 
 /*Default cache size in bytes.
- *Used by image decoders such as `lv_png` to keep the decoded image in the memory.
+ *Used by image decoders such as `lv_lodepng` to keep the decoded image in the memory.
  *Data larger than the size of the cache also can be allocated but
  *will be dropped immediately after usage.*/
 #ifndef LV_CACHE_DEF_SIZE
@@ -1937,12 +1955,12 @@
     #endif
 #endif
 
-/*PNG decoder library*/
-#ifndef LV_USE_PNG
-    #ifdef CONFIG_LV_USE_PNG
-        #define LV_USE_PNG CONFIG_LV_USE_PNG
+/*LODEPNG decoder library*/
+#ifndef LV_USE_LODEPNG
+    #ifdef CONFIG_LV_USE_LODEPNG
+        #define LV_USE_LODEPNG CONFIG_LV_USE_LODEPNG
     #else
-        #define LV_USE_PNG 0
+        #define LV_USE_LODEPNG 0
     #endif
 #endif
 
@@ -1957,11 +1975,11 @@
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#ifndef LV_USE_JPG
-    #ifdef CONFIG_LV_USE_JPG
-        #define LV_USE_JPG CONFIG_LV_USE_JPG
+#ifndef LV_USE_TJPGD
+    #ifdef CONFIG_LV_USE_TJPGD
+        #define LV_USE_TJPGD CONFIG_LV_USE_TJPGD
     #else
-        #define LV_USE_JPG 0
+        #define LV_USE_TJPGD 0
     #endif
 #endif
 
