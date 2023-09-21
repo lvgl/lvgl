@@ -745,11 +745,11 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     indev_obj_act = lv_group_get_focused(g);
     if(indev_obj_act == NULL) return;
 
+    const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
+
     /*Button press happened*/
     if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_RELEASED) {
         LV_LOG_INFO("pressed");
-
-        const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
         i->pr_timestamp = lv_tick_get();
 
@@ -785,8 +785,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PRESSED && last_state == LV_INDEV_STATE_PRESSED) {
-    	const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
-
         /*Long press*/
         if(i->long_pr_sent == 0 && lv_tick_elaps(i->pr_timestamp) > i->long_press_time) {
 
@@ -847,7 +845,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         if(data->key == LV_KEY_ENTER) {
             bool editable_or_scrollable = lv_obj_is_editable(indev_obj_act) ||
                                           lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_SCROLLABLE);
-            const bool is_disabled = lv_obj_has_state(indev_obj_act, LV_STATE_DISABLED);
 
             /*The button was released on a non-editable object. Just send enter*/
             if(editable_or_scrollable == false) {
