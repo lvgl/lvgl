@@ -180,7 +180,7 @@ lv_obj_t * lv_msgbox_get_buttons(lv_obj_t * obj)
     return mbox->buttons;
 }
 
-uint16_t lv_msgbox_get_active_button(lv_obj_t * mbox)
+uint32_t lv_msgbox_get_active_button(lv_obj_t * mbox)
 {
     lv_obj_t * btnm = lv_msgbox_get_buttons(mbox);
     return lv_buttonmatrix_get_selected_button(btnm);

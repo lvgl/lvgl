@@ -131,7 +131,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
 
         size_t opt_len = lv_strlen(options) + 1; /*+1 to add '\n' after option lists*/
         char * opt_extra = lv_malloc(opt_len * roller->inf_page_cnt);
-        uint8_t i;
+        uint32_t i;
         for(i = 0; i < roller->inf_page_cnt; i++) {
             lv_strcpy(&opt_extra[opt_len * i], options);
             opt_extra[opt_len * (i + 1) - 1] = '\n';
@@ -159,7 +159,7 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
  * @param sel_opt id of the selected option (0 ... number of option - 1);
  * @param anim_en LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
  */
-void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t anim)
+void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -172,14 +172,14 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
     /*In infinite mode interpret the new ID relative to the currently visible "page"*/
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
         uint32_t real_option_cnt = roller->option_cnt / roller->inf_page_cnt;
-        uint16_t current_page = roller->sel_opt_id / real_option_cnt;
+        uint32_t current_page = roller->sel_opt_id / real_option_cnt;
         /*Set by the user to e.g. 0, 1, 2, 3...
          *Upscale the value to the current page*/
         if(sel_opt < real_option_cnt) {
-            uint16_t act_opt = roller->sel_opt_id - current_page * real_option_cnt;
+            uint32_t act_opt = roller->sel_opt_id - current_page * real_option_cnt;
             int32_t sel_opt_signed = sel_opt;
             /*Huge jump? Probably from last to first or first to last option.*/
-            if((uint16_t)LV_ABS((int16_t)act_opt - sel_opt) > real_option_cnt / 2) {
+            if((uint32_t)LV_ABS((int16_t)act_opt - sel_opt) > real_option_cnt / 2) {
                 if(act_opt > sel_opt) sel_opt_signed += real_option_cnt;
                 else sel_opt_signed -= real_option_cnt;
             }
@@ -198,7 +198,7 @@ void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t a
  * @param roller pointer to a roller object
  * @param row_cnt number of desired visible rows
  */
-void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt)
+void lv_roller_set_visible_row_count(lv_obj_t * obj, uint32_t row_cnt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -217,13 +217,13 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt)
  * @param roller pointer to a roller object
  * @return id of the selected option (0 ... number of option - 1);
  */
-uint16_t lv_roller_get_selected(const lv_obj_t * obj)
+uint32_t lv_roller_get_selected(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_roller_t * roller = (lv_roller_t *)obj;
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
-        uint16_t real_id_cnt = roller->option_cnt / roller->inf_page_cnt;
+        uint32_t real_id_cnt = roller->option_cnt / roller->inf_page_cnt;
         return roller->sel_opt_id % real_id_cnt;
     }
     else {
@@ -244,7 +244,7 @@ void lv_roller_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_s
     lv_roller_t * roller = (lv_roller_t *)obj;
     lv_obj_t * label = get_label(obj);
     uint32_t i;
-    uint16_t line        = 0;
+    uint32_t line        = 0;
     const char * opt_txt = lv_label_get_text(label);
     size_t txt_len     = lv_strlen(opt_txt);
 
@@ -283,7 +283,7 @@ const char * lv_roller_get_options(const lv_obj_t * obj)
  * @param roller pointer to a roller object
  * @return the total number of options
  */
-uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj)
+uint32_t lv_roller_get_option_cnt(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -406,14 +406,14 @@ static void lv_roller_event(const lv_obj_class_t * class_p, lv_event_t * e)
         char c = *((char *)lv_event_get_param(e));
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(roller->sel_opt_id + 1 < roller->option_cnt) {
-                uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
+                uint32_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
                 lv_roller_set_selected(obj, roller->sel_opt_id + 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(roller->sel_opt_id > 0) {
-                uint16_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
+                uint32_t ori_id = roller->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
                 lv_roller_set_selected(obj, roller->sel_opt_id - 1, LV_ANIM_ON);
                 roller->sel_opt_id_ori = ori_id;
             }
@@ -639,7 +639,7 @@ static void refr_position(lv_obj_t * obj, lv_anim_enable_t anim_en)
     const lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
     const lv_coord_t font_h = lv_font_get_line_height(font);
     const lv_coord_t h = lv_obj_get_content_height(obj);
-    uint16_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
+    uint32_t anim_time = lv_obj_get_style_anim_time(obj, LV_PART_MAIN);
 
     /*Normally the animation's `end_cb` sets correct position of the roller if infinite.
      *But without animations we have to do it manually*/
@@ -741,7 +741,7 @@ static lv_result_t release_handler(lv_obj_t * obj)
             int32_t id = (mid - label_y1) / label_unit;
 
             if(id < 0) id = 0;
-            if(id >= roller->option_cnt) id = roller->option_cnt - 1;
+            if(id >= (int32_t)roller->option_cnt) id = roller->option_cnt - 1;
 
             new_opt = id;
         }
@@ -765,7 +765,7 @@ static void inf_normalize(lv_obj_t * obj)
     lv_roller_t * roller = (lv_roller_t *)obj;
 
     if(roller->mode == LV_ROLLER_MODE_INFINITE) {
-        uint16_t real_id_cnt = roller->option_cnt / roller->inf_page_cnt;
+        uint32_t real_id_cnt = roller->option_cnt / roller->inf_page_cnt;
         roller->sel_opt_id = roller->sel_opt_id % real_id_cnt;
         roller->sel_opt_id += (roller->inf_page_cnt / 2) * real_id_cnt; /*Select the middle page*/
 
@@ -779,7 +779,6 @@ static void inf_normalize(lv_obj_t * obj)
         lv_coord_t h                   = lv_obj_get_content_height(obj);
 
         lv_obj_t * label = get_label(obj);
-
 
         lv_coord_t sel_y1 = roller->sel_opt_id * (font_h + line_space);
         lv_coord_t mid_y1 = h / 2 - font_h / 2;

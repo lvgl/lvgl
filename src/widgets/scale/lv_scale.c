@@ -20,9 +20,8 @@
 #define MY_CLASS &lv_scale_class
 
 #define LV_SCALE_LABEL_TXT_LEN          (20U)
-#define LV_SCALE_DEFAULT_ZOOM           ((int32_t) 256U)
-#define LV_SCALE_DEFAULT_ANGLE_RANGE    ((uint16_t) 270U)
-#define LV_SCALE_DEFAULT_ROTATION       ((int16_t) 135U)
+#define LV_SCALE_DEFAULT_ANGLE_RANGE    ((uint32_t) 270U)
+#define LV_SCALE_DEFAULT_ROTATION       ((int32_t) 135U)
 
 /**********************
  *      TYPEDEFS
@@ -40,7 +39,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event);
 static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event);
 
 static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord_t * arc_r);
-static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool is_major_tick,
+static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool is_major_tick,
                                   lv_point_t * tick_point_a, lv_point_t * tick_point_b);
 static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_dsc, lv_point_t * tick_point,
                                    lv_area_t * label_coords);
@@ -51,7 +50,7 @@ static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_
 static void scale_set_arc_properties(lv_obj_t * obj, lv_draw_arc_dsc_t * arc_dsc, lv_style_t * section_style);
 /* Helpers */
 static void scale_find_section_tick_idx(lv_obj_t * obj);
-static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint8_t tick_idx,
+static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint32_t tick_idx,
                                                           const bool is_major_tick, const lv_coord_t major_tick_width, const lv_coord_t minor_tick_width);
 
 /**********************
@@ -165,7 +164,7 @@ void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max)
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_round_props(lv_obj_t * obj, uint16_t angle_range, int16_t rotation)
+void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rotation)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -370,9 +369,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     if((LV_SCALE_MODE_VERTICAL_LEFT == scale->mode || LV_SCALE_MODE_VERTICAL_RIGHT == scale->mode)
        || (LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode || LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
 
-        uint16_t total_tick_count = scale->total_tick_count;
-        uint8_t tick_idx = 0;
-        uint16_t major_tick_idx = 0;
+        uint32_t total_tick_count = scale->total_tick_count;
+        uint32_t tick_idx = 0;
+        uint32_t major_tick_idx = 0;
         for(tick_idx = 0; tick_idx <= total_tick_count; tick_idx++) {
             /* A major tick is the one which has a label in it */
             bool is_major_tick = false;
@@ -522,9 +521,9 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         /* Major tick */
         major_tick_dsc.raw_end = 0;
 
-        uint16_t label_gap = 15U; /* TODO: Add to style properties */
-        uint8_t tick_idx = 0;
-        uint16_t major_tick_idx = 0;
+        uint32_t label_gap = 15U; /* TODO: Add to style properties */
+        uint32_t tick_idx = 0;
+        uint32_t major_tick_idx = 0;
         for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
             /* A major tick is the one which has a label in it */
             bool is_major_tick = false;
@@ -590,7 +589,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 lv_point_t point;
                 point.x = center_point.x + radius_text;
                 point.y = center_point.y;
-                lv_point_transform(&point, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
+                lv_point_transform(&point, angle_upscale, LV_SCALE_NONE, &center_point);
                 scale_get_label_coords(obj, &label_dsc, &point, &label_coords);
 
                 lv_draw_label(layer, &label_dsc, &label_coords);
@@ -813,7 +812,7 @@ static void scale_get_center(const lv_obj_t * obj, lv_point_t * center, lv_coord
  * @param tick_point_a  pointer to point 'a' of the tick
  * @param tick_point_b  pointer to point 'b' of the tick
  */
-static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool is_major_tick,
+static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool is_major_tick,
                                   lv_point_t * tick_point_a, lv_point_t * tick_point_b)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;
@@ -947,11 +946,11 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint16_t tick_idx, bool 
 
         tick_point_a->x = center_point.x + point_closer_to_arc;
         tick_point_a->y = center_point.y;
-        lv_point_transform(tick_point_a, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
+        lv_point_transform(tick_point_a, angle_upscale, LV_SCALE_NONE, &center_point);
 
         tick_point_b->x = center_point.x + adjusted_radio_with_tick_len;
         tick_point_b->y = center_point.y;
-        lv_point_transform(tick_point_b, angle_upscale, LV_SCALE_DEFAULT_ZOOM, &center_point);
+        lv_point_transform(tick_point_b, angle_upscale, LV_SCALE_NONE, &center_point);
     }
     else { /* Nothing to do */ }
 }
@@ -1177,10 +1176,10 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
 
     const int32_t min_out = scale->range_min;
     const int32_t max_out = scale->range_max;
-    const uint16_t total_tick_count = scale->total_tick_count;
+    const uint32_t total_tick_count = scale->total_tick_count;
 
     /* Section handling */
-    uint8_t tick_idx = 0;
+    uint32_t tick_idx = 0;
     for(tick_idx = 0; tick_idx <= total_tick_count; tick_idx++) {
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
@@ -1215,7 +1214,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
  * @param major_tick_width width of the major tick
  * @param minor_tick_width width of the minor tick
  */
-static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint8_t tick_idx,
+static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const uint32_t tick_idx,
                                                           const bool is_major_tick, const lv_coord_t major_tick_width, const lv_coord_t minor_tick_width)
 {
     lv_scale_t * scale = (lv_scale_t *)obj;

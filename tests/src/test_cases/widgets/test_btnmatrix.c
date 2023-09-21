@@ -281,8 +281,6 @@ void test_button_matrix_get_button_text_works(void)
     static const char * btn_map[] = {"A", "B", "\n", "C", "D", ""};
     lv_buttonmatrix_set_map(btnm, btn_map);
 
-    const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint16_t btn_id);
-
     TEST_ASSERT_EQUAL_STRING("A", lv_buttonmatrix_get_button_text(btnm, 0));
     TEST_ASSERT_EQUAL_STRING("B", lv_buttonmatrix_get_button_text(btnm, 1));
     TEST_ASSERT_EQUAL_STRING("C", lv_buttonmatrix_get_button_text(btnm, 2));

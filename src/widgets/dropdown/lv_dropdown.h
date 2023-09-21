@@ -41,10 +41,10 @@ typedef struct {
     const char * text;              /**< Text to display on the dropdown's button*/
     const void * symbol;            /**< Arrow or other icon when the drop-down list is closed*/
     char * options;                 /**< Options in a '\n' separated list*/
-    uint16_t option_cnt;            /**< Number of options*/
-    uint16_t sel_opt_id;            /**< Index of the currently selected option*/
-    uint16_t sel_opt_id_orig;       /**< Store the original index on focus*/
-    uint16_t pr_opt_id;             /**< Index of the currently pressed option*/
+    uint32_t option_cnt;            /**< Number of options*/
+    uint32_t sel_opt_id;            /**< Index of the currently selected option*/
+    uint32_t sel_opt_id_orig;       /**< Store the original index on focus*/
+    uint32_t pr_opt_id;             /**< Index of the currently pressed option*/
     lv_dir_t dir              : 4;  /**< Direction in which the list should open*/
     uint8_t static_txt        : 1;  /**< 1: Only a pointer is saved in `options`*/
     uint8_t selected_highlight: 1;  /**< 1: Make the selected option highlighted in the list*/
@@ -117,7 +117,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj);
  * @param obj       pointer to drop-down list object
  * @param sel_opt   id of the selected option (0 ... number of option - 1);
  */
-void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt);
+void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt);
 
 /**
  * Set the direction of the a drop-down list
@@ -172,14 +172,14 @@ const char * lv_dropdown_get_options(const lv_obj_t * obj);
  * @param obj       pointer to drop-down list object
  * @return          index of the selected option (0 ... number of option - 1);
  */
-uint16_t lv_dropdown_get_selected(const lv_obj_t * obj);
+uint32_t lv_dropdown_get_selected(const lv_obj_t * obj);
 
 /**
  * Get the total number of options
  * @param obj       pointer to drop-down list object
  * @return          the total number of options in the list
  */
-uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj);
+uint32_t lv_dropdown_get_option_cnt(const lv_obj_t * obj);
 
 /**
  * Get the current selected option as a string

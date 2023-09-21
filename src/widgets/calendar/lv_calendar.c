@@ -93,7 +93,7 @@ void lv_calendar_set_today_date(lv_obj_t * obj, uint32_t year, uint32_t month, u
     highlight_update(obj);
 }
 
-void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], uint16_t date_num)
+void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num)
 {
     LV_ASSERT_NULL(highlighted);
 
@@ -200,7 +200,7 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * obj)
     return calendar->highlighted_dates;
 }
 
-uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj)
+size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
@@ -213,7 +213,7 @@ lv_result_t lv_calendar_get_pressed_date(const lv_obj_t * obj, lv_calendar_date_
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
 
-    uint16_t d = lv_buttonmatrix_get_selected_button(calendar->btnm);
+    uint32_t d = lv_buttonmatrix_get_selected_button(calendar->btnm);
     if(d == LV_BUTTONMATRIX_BUTTON_NONE) {
         date->year = 0;
         date->month = 0;
@@ -386,7 +386,7 @@ static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
 static void highlight_update(lv_obj_t * obj)
 {
     lv_calendar_t * calendar = (lv_calendar_t *)obj;
-    uint16_t i;
+    uint32_t i;
 
     /*Clear all kind of selection*/
     lv_buttonmatrix_clear_button_ctrl_all(calendar->btnm, LV_CALENDAR_CTRL_TODAY | LV_CALENDAR_CTRL_HIGHLIGHT);

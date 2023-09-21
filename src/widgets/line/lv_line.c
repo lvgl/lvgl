@@ -63,7 +63,7 @@ lv_obj_t * lv_line_create(lv_obj_t * parent)
  * Setter functions
  *====================*/
 
-void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint16_t point_num)
+void lv_line_set_points(lv_obj_t * obj, const lv_point_t points[], uint32_t point_num)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -159,7 +159,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t w = 0;
         lv_coord_t h = 0;
 
-        uint16_t i;
+        uint32_t i;
         for(i = 0; i < line->point_num; i++) {
             if(!LV_COORD_IS_PCT(line->point_array[i].x)) {
                 w = LV_MAX(line->point_array[i].x, w);
@@ -189,7 +189,7 @@ static void lv_line_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_init_draw_line_dsc(obj, LV_PART_MAIN, &line_dsc);
 
         /*Read all points and draw the lines*/
-        uint16_t i;
+        uint32_t i;
         for(i = 0; i < line->point_num - 1; i++) {
             lv_coord_t w = lv_obj_get_width(obj);
             lv_coord_t h = lv_obj_get_height(obj);

@@ -51,7 +51,7 @@ enum {
     LV_SCALE_MODE_ROUND_OUTTER      = 0x10U,
     _LV_SCALE_MODE_LAST
 };
-typedef uint8_t lv_scale_mode_t;
+typedef uint32_t lv_scale_mode_t;
 
 typedef struct {
     lv_style_t * main_style;
@@ -59,10 +59,10 @@ typedef struct {
     lv_style_t * items_style;
     lv_coord_t minor_range;
     lv_coord_t major_range;
-    uint8_t first_tick_idx_in_section;
-    uint8_t last_tick_idx_in_section;
-    uint8_t first_tick_idx_is_major;
-    uint8_t last_tick_idx_is_major;
+    uint32_t first_tick_idx_in_section;
+    uint32_t last_tick_idx_in_section;
+    uint32_t first_tick_idx_is_major;
+    uint32_t last_tick_idx_is_major;
     lv_coord_t first_tick_in_section_width;
     lv_coord_t last_tick_in_section_width;
     lv_point_t first_tick_in_section;
@@ -85,8 +85,8 @@ typedef struct {
     lv_coord_t last_tick_width;
     lv_coord_t first_tick_width;
     /* Round scale */
-    uint16_t angle_range;
-    int16_t rotation;
+    uint32_t angle_range;
+    int32_t rotation;
 } lv_scale_t;
 
 extern const lv_obj_class_t lv_scale_class;
@@ -166,7 +166,7 @@ void lv_scale_set_range(lv_obj_t * obj, lv_coord_t min, lv_coord_t max);
  * @param angle_range   the angular range of the scale
  * @param rotation  the angular offset from the 3 o'clock position (clock-wise)
  */
-void lv_scale_set_round_props(lv_obj_t * obj, uint16_t angle_range, int16_t rotation);
+void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rotation);
 
 /**
  * Set custom text source for major ticks labels

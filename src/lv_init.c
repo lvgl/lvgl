@@ -74,7 +74,7 @@ static inline void lv_global_init(lv_global_t * global)
     global->memory_zero = ZERO_MEM_SENTINEL;
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
-    global->style_last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
+    global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
     global->math_rand_seed = 0x1234ABCD;
