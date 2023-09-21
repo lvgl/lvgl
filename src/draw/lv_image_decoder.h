@@ -203,6 +203,13 @@ lv_image_decoder_t * lv_image_decoder_create(void);
 void lv_image_decoder_delete(lv_image_decoder_t * decoder);
 
 /**
+ * Get the next image decoder in the linked list of image decoders
+ * @param decoder pointer to an image decoder or NULL to get the first one
+ * @return the next image decoder or NULL if no more image decoder exists
+ */
+lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder);
+
+/**
  * Set a callback to get information about the image
  * @param decoder pointer to an image decoder
  * @param info_cb a function to collect info about an image (fill an `lv_image_header_t` struct)
