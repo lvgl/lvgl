@@ -94,6 +94,17 @@ void lv_tjpgd_init(void)
     lv_image_decoder_set_close_cb(dec, decoder_close);
 }
 
+void lv_tjpgd_deinit(void)
+{
+    lv_image_decoder_t * dec = NULL;
+    while((dec = lv_image_decoder_get_next(dec)) != NULL) {
+        if(dec->info_cb == decoder_info) {
+            lv_image_decoder_delete(dec);
+            break;
+        }
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

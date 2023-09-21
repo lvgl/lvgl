@@ -33,6 +33,8 @@ extern "C" {
  */
 void lv_lodepng_init(void);
 
+void lv_lodepng_deinit(void);
+
 /**********************
  *      MACROS
  **********************/
