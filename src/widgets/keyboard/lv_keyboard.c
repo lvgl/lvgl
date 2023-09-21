@@ -322,7 +322,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
-    uint16_t btn_id = lv_buttonmatrix_get_selected_button(obj);
+    uint32_t btn_id = lv_buttonmatrix_get_selected_button(obj);
     if(btn_id == LV_BUTTONMATRIX_BUTTON_NONE) return;
 
     const char * txt = lv_buttonmatrix_get_button_text(obj, btn_id);
@@ -395,7 +395,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
         lv_textarea_del_char(keyboard->ta);
     }
     else if(strcmp(txt, "+/-") == 0) {
-        uint16_t cur        = lv_textarea_get_cursor_pos(keyboard->ta);
+        uint32_t cur        = lv_textarea_get_cursor_pos(keyboard->ta);
         const char * ta_txt = lv_textarea_get_text(keyboard->ta);
         if(ta_txt[0] == '-') {
             lv_textarea_set_cursor_pos(keyboard->ta, 1);
@@ -471,7 +471,8 @@ static void lv_keyboard_update_ctrl_map(lv_obj_t * obj)
         lv_memcpy(ctrl_map, kb_ctrl[keyboard->mode], sizeof(lv_buttonmatrix_ctrl_t) * btnm->btn_cnt);
 
         /*Remove all LV_BUTTONMATRIX_CTRL_POPOVER flags*/
-        for(uint16_t i = 0; i < btnm->btn_cnt; i++) {
+        uint32_t i;
+        for(i = 0; i < btnm->btn_cnt; i++) {
             ctrl_map[i] &= (~LV_BUTTONMATRIX_CTRL_POPOVER);
         }
 

@@ -156,7 +156,7 @@ static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
  * @param obj       pointer to button matrix object
  * @return          index of the last released button (LV_BUTTONMATRIX_BUTTON_NONE: if unset)
  */
-static inline uint16_t lv_keyboard_get_selected_button(const lv_obj_t * obj)
+static inline uint32_t lv_keyboard_get_selected_button(const lv_obj_t * obj)
 {
     return lv_buttonmatrix_get_selected_button(obj);
 }
@@ -167,7 +167,7 @@ static inline uint16_t lv_keyboard_get_selected_button(const lv_obj_t * obj)
  * @param btn_id    the index a button not counting new line characters.
  * @return          text of btn_index` button
  */
-static inline const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint16_t btn_id)
+static inline const char * lv_keyboard_get_button_text(const lv_obj_t * obj, uint32_t btn_id)
 {
     return lv_buttonmatrix_get_button_text(obj, btn_id);
 }

@@ -94,13 +94,13 @@ static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
 static void arc_anim_start_angle(void * obj, int32_t v)
 {
-    lv_arc_set_start_angle(obj, (uint16_t) v);
+    lv_arc_set_start_angle(obj, (uint32_t) v);
 }
 
 
 static void arc_anim_end_angle(void * obj, int32_t v)
 {
-    lv_arc_set_end_angle(obj, (uint16_t) v);
+    lv_arc_set_end_angle(obj, (uint32_t) v);
 }
 
 #endif /*LV_USE_SPINNER*/

@@ -18,7 +18,6 @@
     #include "../draw/sw/lv_draw_sw.h"
 #endif
 
-
 /*********************
  *      DEFINES
  *********************/

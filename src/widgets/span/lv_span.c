@@ -26,7 +26,7 @@ typedef struct {
     lv_span_t * span;
     const char * txt;
     const lv_font_t * font;
-    uint16_t   bytes;
+    uint32_t   bytes;
     lv_coord_t txt_w;
     lv_coord_t line_h;
     lv_coord_t letter_space;
@@ -34,7 +34,7 @@ typedef struct {
 
 struct _snippet_stack {
     lv_snippet_t    stack[LV_SPAN_SNIPPET_STACK_SIZE];
-    uint16_t        index;
+    uint32_t        index;
 };
 
 /**********************
@@ -60,9 +60,9 @@ static bool lv_text_get_snippet(const char * txt, const lv_font_t * font, lv_coo
                                 uint32_t * end_ofs);
 
 static void lv_snippet_clear(void);
-static uint16_t lv_get_snippet_cnt(void);
+static uint32_t lv_get_snippet_cnt(void);
 static void lv_snippet_push(lv_snippet_t * item);
-static lv_snippet_t * lv_get_snippet(uint16_t index);
+static lv_snippet_t * lv_get_snippet(uint32_t index);
 static lv_coord_t convert_indent_pct(lv_obj_t * spans, lv_coord_t width);
 
 /**********************
@@ -404,7 +404,7 @@ uint32_t lv_spangroup_get_expand_width(lv_obj_t * obj, uint32_t max_width)
             }
             uint32_t letter      = _lv_text_encoded_next(cur_txt, &j);
             uint32_t letter_next = _lv_text_encoded_next(&cur_txt[j], NULL);
-            uint16_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
+            uint32_t letter_w = lv_font_get_glyph_width(font, letter, letter_next);
             width = width + letter_w + letter_space;
         }
     }
@@ -661,12 +661,12 @@ static void lv_snippet_push(lv_snippet_t * item)
     }
 }
 
-static uint16_t lv_get_snippet_cnt(void)
+static uint32_t lv_get_snippet_cnt(void)
 {
     return snippet_stack->index;
 }
 
-static lv_snippet_t * lv_get_snippet(uint16_t index)
+static lv_snippet_t * lv_get_snippet(uint32_t index)
 {
     return &snippet_stack->stack[index];
 }
@@ -902,7 +902,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
 
         /* start current line deal with */
 
-        uint16_t item_cnt = lv_get_snippet_cnt();
+        uint32_t item_cnt = lv_get_snippet_cnt();
         if(item_cnt == 0) {     /* break if stack is empty */
             break;
         }
@@ -939,7 +939,8 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
         if(align == LV_TEXT_ALIGN_CENTER || align == LV_TEXT_ALIGN_RIGHT) {
             lv_coord_t align_ofs = 0;
             lv_coord_t txts_w = is_first_line ? indent : 0;
-            for(int i = 0; i < item_cnt; i++) {
+            uint32_t i;
+            for(i = 0; i < item_cnt; i++) {
                 lv_snippet_t * pinfo = lv_get_snippet(i);
                 txts_w = txts_w + pinfo->txt_w + pinfo->letter_space;
             }
@@ -952,7 +953,7 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
         }
 
         /* draw line letters */
-        int i;
+        uint32_t i;
         for(i = 0; i < item_cnt; i++) {
             lv_snippet_t * pinfo = lv_get_snippet(i);
 
@@ -972,8 +973,8 @@ static void lv_draw_span(lv_obj_t * obj, lv_layer_t * layer)
             uint32_t txt_bytes = pinfo->bytes;
 
             /* overflow */
-            uint16_t dot_letter_w = 0;
-            uint16_t dot_width = 0;
+            uint32_t dot_letter_w = 0;
+            uint32_t dot_width = 0;
             if(ellipsis_valid) {
                 dot_letter_w = lv_font_get_glyph_width(pinfo->font, '.', '.');
                 dot_width = dot_letter_w * 3;

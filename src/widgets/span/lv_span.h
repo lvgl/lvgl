@@ -35,7 +35,7 @@ enum _lv_span_overflow_t {
 #ifdef DOXYGEN
 typedef _lv_span_overflow_t lv_span_overflow_t;
 #else
-typedef uint8_t lv_span_overflow_t;
+typedef uint32_t lv_span_overflow_t;
 #endif /*DOXYGEN*/
 
 enum _lv_span_mode_t {
@@ -47,7 +47,7 @@ enum _lv_span_mode_t {
 #ifdef DOXYGEN
 typedef _lv_span_mode_t lv_span_mode_t;
 #else
-typedef uint8_t lv_span_mode_t;
+typedef uint32_t lv_span_mode_t;
 #endif /*DOXYGEN*/
 
 
@@ -55,7 +55,7 @@ typedef struct {
     char * txt;             /* a pointer to display text */
     lv_obj_t * spangroup;   /* a pointer to spangroup */
     lv_style_t style;       /* display text style */
-    uint8_t static_flag : 1;/* the text is static flag */
+    uint32_t static_flag : 1;/* the text is static flag */
 } lv_span_t;
 
 /** Data of label*/
@@ -66,9 +66,9 @@ typedef struct {
     lv_coord_t cache_w;     /* the cache automatically calculates the width */
     lv_coord_t cache_h;     /* similar cache_w */
     lv_ll_t  child_ll;
-    uint8_t mode : 2;       /* details see lv_span_mode_t */
-    uint8_t overflow : 1;   /* details see lv_span_overflow_t */
-    uint8_t refresh : 1;    /* the spangroup need refresh cache_w and cache_h */
+    uint32_t mode : 2;       /* details see lv_span_mode_t */
+    uint32_t overflow : 1;   /* details see lv_span_overflow_t */
+    uint32_t refresh : 1;    /* the spangroup need refresh cache_w and cache_h */
 } lv_spangroup_t;
 
 extern const lv_obj_class_t lv_spangroup_class;

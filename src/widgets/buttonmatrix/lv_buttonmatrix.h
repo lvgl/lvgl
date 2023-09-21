@@ -50,7 +50,7 @@ enum _lv_buttonmatrix_ctrl_t {
 #ifdef DOXYGEN
 typedef _lv_buttonmatrix_ctrl_t lv_buttonmatrix_ctrl_t;
 #else
-typedef uint16_t lv_buttonmatrix_ctrl_t;
+typedef uint32_t lv_buttonmatrix_ctrl_t;
 #endif /*DOXYGEN*/
 
 
@@ -63,10 +63,10 @@ typedef struct {
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_buttonmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
-    uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t row_cnt;                                 /*Number of rows in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_sel;    /*Index of the active button (being pressed/released etc) or LV_BUTTONMATRIX_BUTTON_NONE*/
-    uint8_t one_check : 1;  /*Single button toggled at once*/
+    uint32_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
+    uint32_t row_cnt;                                 /*Number of rows in 'map_p'(Handled by the library)*/
+    uint32_t btn_id_sel;    /*Index of the active button (being pressed/released etc) or LV_BUTTONMATRIX_BUTTON_NONE*/
+    uint32_t one_check : 1;  /*Single button toggled at once*/
 } lv_buttonmatrix_t;
 
 extern const lv_obj_class_t lv_buttonmatrix_class;
@@ -115,7 +115,7 @@ void lv_buttonmatrix_set_ctrl_map(lv_obj_t * obj, const lv_buttonmatrix_ctrl_t c
  * @param obj        pointer to button matrix object
  * @param btn_id         0 based index of the button to modify. (Not counting new lines)
  */
-void lv_buttonmatrix_set_selected_button(lv_obj_t * obj, uint16_t btn_id);
+void lv_buttonmatrix_set_selected_button(lv_obj_t * obj, uint32_t btn_id);
 
 /**
  * Set the attributes of a button of the button matrix
@@ -123,7 +123,7 @@ void lv_buttonmatrix_set_selected_button(lv_obj_t * obj, uint16_t btn_id);
  * @param btn_id    0 based index of the button to modify. (Not counting new lines)
  * @param ctrl      OR-ed attributes. E.g. `LV_BUTTONMATRIX_CTRL_NO_REPEAT | LV_BUTTONMATRIX_CTRL_CHECKABLE`
  */
-void lv_buttonmatrix_set_button_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_buttonmatrix_ctrl_t ctrl);
+void lv_buttonmatrix_set_button_ctrl(lv_obj_t * obj, uint32_t btn_id, lv_buttonmatrix_ctrl_t ctrl);
 
 /**
  * Clear the attributes of a button of the button matrix
@@ -131,7 +131,7 @@ void lv_buttonmatrix_set_button_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_buttonm
  * @param btn_id    0 based index of the button to modify. (Not counting new lines)
  * @param ctrl      OR-ed attributes. E.g. `LV_BUTTONMATRIX_CTRL_NO_REPEAT | LV_BUTTONMATRIX_CTRL_CHECKABLE`
  */
-void lv_buttonmatrix_clear_button_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_buttonmatrix_ctrl_t ctrl);
+void lv_buttonmatrix_clear_button_ctrl(lv_obj_t * obj, uint32_t btn_id, lv_buttonmatrix_ctrl_t ctrl);
 
 /**
  * Set attributes of all buttons of a button matrix
@@ -155,9 +155,9 @@ void lv_buttonmatrix_clear_button_ctrl_all(lv_obj_t * obj, lv_buttonmatrix_ctrl_
  * `lv_buttonmatrix_set_ctrl_map` and this method only be used for dynamic changes.
  * @param obj       pointer to button matrix object
  * @param btn_id    0 based index of the button to modify.
- * @param width     relative width compared to the buttons in the same row. [1..7]
+ * @param width     relative width compared to the buttons in the same row. [1..15]
  */
-void lv_buttonmatrix_set_button_width(lv_obj_t * obj, uint16_t btn_id, uint8_t width);
+void lv_buttonmatrix_set_button_width(lv_obj_t * obj, uint32_t btn_id, uint32_t width);
 
 /**
  * Make the button matrix like a selector widget (only one button may be checked at a time).
@@ -185,7 +185,7 @@ const char ** lv_buttonmatrix_get_map(const lv_obj_t * obj);
  * @param obj       pointer to button matrix object
  * @return          index of the last released button (LV_BUTTONMATRIX_BUTTON_NONE: if unset)
  */
-uint16_t lv_buttonmatrix_get_selected_button(const lv_obj_t * obj);
+uint32_t lv_buttonmatrix_get_selected_button(const lv_obj_t * obj);
 
 /**
  * Get the button's text
@@ -193,7 +193,7 @@ uint16_t lv_buttonmatrix_get_selected_button(const lv_obj_t * obj);
  * @param btn_id    the index a button not counting new line characters.
  * @return          text of btn_index` button
  */
-const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint16_t btn_id);
+const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint32_t btn_id);
 
 /**
  * Get the whether a control value is enabled or disabled for button of a button matrix
@@ -202,7 +202,7 @@ const char * lv_buttonmatrix_get_button_text(const lv_obj_t * obj, uint16_t btn_
  * @param ctrl      control values to check (ORed value can be used)
  * @return          true: the control attribute is enabled false: disabled
  */
-bool lv_buttonmatrix_has_button_ctrl(lv_obj_t * obj, uint16_t btn_id, lv_buttonmatrix_ctrl_t ctrl);
+bool lv_buttonmatrix_has_button_ctrl(lv_obj_t * obj, uint32_t btn_id, lv_buttonmatrix_ctrl_t ctrl);
 
 /**
  * Tell whether "one check" mode is enabled or not.

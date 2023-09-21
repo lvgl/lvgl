@@ -8,8 +8,9 @@
 
     fs
     bmp
+    tjpgd
     sjpg
-    png
+    lodepng
     gif
     freetype
     tiny_ttf

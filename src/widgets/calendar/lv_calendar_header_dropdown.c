@@ -100,7 +100,7 @@ static void month_event_cb(lv_event_t * e)
     lv_obj_t * dropdown = lv_event_get_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
 
-    uint16_t sel = lv_dropdown_get_selected(dropdown);
+    uint32_t sel = lv_dropdown_get_selected(dropdown);
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);
@@ -115,7 +115,7 @@ static void year_event_cb(lv_event_t * e)
     lv_obj_t * dropdown = lv_event_get_target(e);
     lv_obj_t * calendar = lv_event_get_user_data(e);
 
-    uint16_t sel = lv_dropdown_get_selected(dropdown);
+    uint32_t sel = lv_dropdown_get_selected(dropdown);
 
     const lv_calendar_date_t * d;
     d = lv_calendar_get_showed_date(calendar);

@@ -49,8 +49,8 @@ Architecture
 - |check| Unified caching #3116 #3415
 - |uncheck| Variable binding. I.e create properties which can be bound to objects and those objects are notified on value change. Maybe based on `lv_msg`?
 - |uncheck| Add GPU abstraction for display rotation 
-- |uncheck| Replace the `read_line_cb` of the image decoders with `get_area_cb`
-- |uncheck| Limit the image caching size in bytes instead of image count 
+- |check| Replace the `read_line_cb` of the image decoders with `get_area_cb`
+- |check| Limit the image caching size in bytes instead of image count 
 - |check| lv_draw_buf for unified stride, buffer and cache invalidation management. `4241 <https://github.com/lvgl/lvgl/pull/4241>`__
 - |uncheck| SVG support: integrate an SVG render library `4388 <https://github.com/lvgl/lvgl/issues/4388>`__
 

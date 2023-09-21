@@ -76,7 +76,7 @@ lv_obj_t * lv_animimg_create(lv_obj_t * parent);
  * @param dsc pointer to a series images
  * @param num images' number
  */
-void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], uint8_t num);
+void lv_animimg_set_src(lv_obj_t * img, const void * dsc[], size_t num);
 
 /**
  * Startup the image animation.
@@ -96,7 +96,7 @@ void lv_animimg_set_duration(lv_obj_t * img, uint32_t duration);
  * @param img pointer to an animation image object
  * @param count the number of times to repeat the animation
  */
-void lv_animimg_set_repeat_count(lv_obj_t * img, uint16_t count);
+void lv_animimg_set_repeat_count(lv_obj_t * img, uint32_t count);
 
 /*=====================
  * Getter functions
@@ -128,7 +128,7 @@ uint32_t lv_animimg_get_duration(lv_obj_t * img);
  * @param img pointer to an animation image object
  * @return the repeat count
  */
-uint16_t lv_animimg_get_repeat_count(lv_obj_t * img);
+uint32_t lv_animimg_get_repeat_count(lv_obj_t * img);
 
 #endif /*LV_USE_ANIMIMG*/
 

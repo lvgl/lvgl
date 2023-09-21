@@ -176,7 +176,7 @@ void lv_tabview_set_act(lv_obj_t * obj, uint32_t id, lv_anim_enable_t anim_en)
     tabview->tab_cur = id;
 }
 
-uint16_t lv_tabview_get_tab_act(lv_obj_t * obj)
+uint32_t lv_tabview_get_tab_act(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_tabview_t * tabview = (lv_tabview_t *)obj;
@@ -334,7 +334,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
         lv_point_t p;
         lv_obj_get_scroll_end(cont, &p);
 
-        lv_coord_t t;
+        int32_t t;
         if((tv_obj->tab_pos & LV_DIR_VER) != 0) {
             lv_coord_t w = lv_obj_get_content_width(cont);
             if(lv_obj_get_style_base_dir(tv, LV_PART_MAIN) == LV_BASE_DIR_RTL)  t = -(p.x - w / 2) / w;
@@ -347,7 +347,7 @@ static void cont_scroll_end_event_cb(lv_event_t * e)
 
         if(t < 0) t = 0;
         bool new_tab = false;
-        if(t != lv_tabview_get_tab_act(tv)) new_tab = true;
+        if(t != (int32_t)lv_tabview_get_tab_act(tv)) new_tab = true;
 
 
         /*If not scrolled by an indev set the tab immediately*/

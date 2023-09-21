@@ -171,13 +171,13 @@ void lv_image_set_offset_y(lv_obj_t * obj, lv_coord_t y)
     lv_obj_invalidate(obj);
 }
 
-void lv_image_set_rotation(lv_obj_t * obj, int16_t angle)
+void lv_image_set_rotation(lv_obj_t * obj, int32_t angle)
 {
     while(angle >= 3600) angle -= 3600;
     while(angle < 0) angle += 3600;
 
     lv_image_t * img = (lv_image_t *)obj;
-    if(angle == img->rotation) return;
+    if((uint32_t)angle == img->rotation) return;
 
     if(img->obj_size_mode == LV_IMAGE_SIZE_MODE_REAL) {
         img->rotation = angle;
@@ -259,7 +259,7 @@ void lv_image_set_pivot(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     lv_obj_invalidate_area(obj, &a);
 }
 
-void lv_image_set_scale(lv_obj_t * obj, uint16_t zoom)
+void lv_image_set_scale(lv_obj_t * obj, uint32_t zoom)
 {
     lv_image_t * img = (lv_image_t *)obj;
     if(zoom == img->zoom) return;

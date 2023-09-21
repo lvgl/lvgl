@@ -486,7 +486,7 @@ static void refr_invalid_areas(void)
     disp_refr->last_part = 0;
     disp_refr->rendering_in_progress = true;
 
-    for(i = 0; i < disp_refr->inv_p; i++) {
+    for(i = 0; i < (int32_t)disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
         if(disp_refr->inv_area_joined[i] == 0) {
 

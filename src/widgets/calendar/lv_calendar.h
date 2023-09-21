@@ -37,13 +37,12 @@ typedef struct {
 /*Data of calendar*/
 typedef struct {
     lv_obj_t obj;
-    lv_obj_t * btnm;
     /*New data for this type*/
-    lv_calendar_date_t today;               /*Date of today*/
-    lv_calendar_date_t showed_date;         /*Currently visible month (day is ignored)*/
-    lv_calendar_date_t *
-    highlighted_dates; /*Apply different style on these days (pointer to an array defined by the user)*/
-    uint16_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
+    lv_obj_t * btnm;
+    lv_calendar_date_t today;           /**< Date of today*/
+    lv_calendar_date_t showed_date;     /**< Currently visible month (day is ignored)*/
+    lv_calendar_date_t * highlighted_dates; /**< Apply different style on these days (pointer to user-defined array)*/
+    size_t highlighted_dates_num;          /**< Number of elements in `highlighted_days`*/
     const char * map[8 * 7];
     char nums [7 * 6][4];
 } lv_calendar_t;
@@ -88,7 +87,7 @@ void lv_calendar_set_showed_date(lv_obj_t * obj, uint32_t year, uint32_t month);
  *                      Only the pointer will be saved so this variable can't be local which will be destroyed later.
  * @param date_num number of dates in the array
  */
-void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], uint16_t date_num);
+void lv_calendar_set_highlighted_dates(lv_obj_t * obj, lv_calendar_date_t highlighted[], size_t date_num);
 
 /**
  * Set the name of the days
@@ -137,7 +136,7 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar
  * @param calendar pointer to a calendar object
  * @return number of highlighted days
  */
-uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar);
+size_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar);
 
 /**
  * Get the currently pressed day

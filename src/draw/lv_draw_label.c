@@ -111,13 +111,18 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
     a.x2 = a.x1 + g.adv_w;
     a.y2 = a.y1 + lv_font_get_line_height(g.resolved_font);
 
-    const char * letter_buf = (char *)&unicode_letter;
+    /*lv_draw_label needs UTF8 text so convert the Unicode character to an UTF8 string */
+    uint32_t letter_buf[2];
+    letter_buf[0] = _lv_text_unicode_to_encoded(unicode_letter);
+    letter_buf[1] = '\0';
+
+    const char * letter_buf_char = (const char *)letter_buf;
 
 #if LV_BIG_ENDIAN_SYSTEM
-    if(c != 0) while(*letter_buf == 0) ++letter_buf;
+    while(*letter_buf_char == 0) ++letter_buf_char;
 #endif
 
-    dsc->text = letter_buf;
+    dsc->text = letter_buf_char;
     dsc->text_local = 1;
 
     lv_draw_label(layer, dsc, &a);

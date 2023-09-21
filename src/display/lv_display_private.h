@@ -89,7 +89,7 @@ struct _lv_display_t {
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
-    uint16_t inv_p;
+    uint32_t inv_p;
     int32_t inv_en_cnt;
 
     /*---------------------

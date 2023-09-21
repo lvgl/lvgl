@@ -48,12 +48,12 @@ static void lv_dropdownlist_destructor(const lv_obj_class_t * class_p, lv_obj_t 
 static void lv_dropdown_list_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_list(lv_event_t * e);
 
-static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state);
-static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state);
+static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, lv_state_t state);
+static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, lv_state_t state);
 static lv_result_t btn_release_handler(lv_obj_t * obj);
 static lv_result_t list_release_handler(lv_obj_t * list_obj);
 static void list_press_handler(lv_obj_t * page);
-static uint16_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y);
+static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y);
 static void position_to_selected(lv_obj_t * obj);
 static lv_obj_t * get_label(const lv_obj_t * obj);
 
@@ -272,7 +272,7 @@ void lv_dropdown_clear_options(lv_obj_t * obj)
     if(dropdown->list) lv_obj_invalidate(dropdown->list);
 }
 
-void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
+void lv_dropdown_set_selected(lv_obj_t * obj, uint32_t sel_opt)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -347,7 +347,7 @@ const char * lv_dropdown_get_options(const lv_obj_t * obj)
     return dropdown->options == NULL ? "" : dropdown->options;
 }
 
-uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
+uint32_t lv_dropdown_get_selected(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -356,7 +356,7 @@ uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
     return dropdown->sel_opt_id;
 }
 
-uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj)
+uint32_t lv_dropdown_get_option_cnt(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -929,7 +929,7 @@ static void draw_list(lv_event_t * e)
     }
 }
 
-static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state)
+static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, lv_state_t state)
 {
     if(id == LV_DROPDOWN_PR_NONE) return;
 
@@ -967,7 +967,7 @@ static void draw_box(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, l
     list_obj->skip_trans = 0;
 }
 
-static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint16_t id, lv_state_t state)
+static void draw_box_label(lv_obj_t * dropdown_obj, lv_layer_t * layer, uint32_t id, lv_state_t state)
 {
     if(id == LV_DROPDOWN_PR_NONE) return;
 
@@ -1102,7 +1102,7 @@ static void list_press_handler(lv_obj_t * list_obj)
     }
 }
 
-static uint16_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
+static uint32_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
 {
     lv_dropdown_t * dropdown = (lv_dropdown_t *)dropdown_obj;
     lv_obj_t * label = get_label(dropdown_obj);
@@ -1116,7 +1116,7 @@ static uint16_t get_id_on_point(lv_obj_t * dropdown_obj, lv_coord_t y)
     y += line_space / 2;
     lv_coord_t h = font_h + line_space;
 
-    uint16_t opt = y / h;
+    uint32_t opt = y / h;
 
     if(opt >= dropdown->option_cnt) opt = dropdown->option_cnt - 1;
     return opt;

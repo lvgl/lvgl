@@ -527,7 +527,7 @@ void lv_textarea_set_text_selection(lv_obj_t * obj, bool en)
 #endif
 }
 
-void lv_textarea_set_password_show_time(lv_obj_t * obj, uint16_t time)
+void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -691,7 +691,7 @@ bool lv_textarea_get_text_selection(lv_obj_t * obj)
 #endif
 }
 
-uint16_t lv_textarea_get_password_show_time(lv_obj_t * obj)
+uint32_t lv_textarea_get_password_show_time(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -1169,7 +1169,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
     const lv_event_code_t code = lv_event_get_code(e);
 
     lv_coord_t label_width = lv_obj_get_width(ta->label);
-    uint16_t char_id_at_click = 0;
+    uint32_t char_id_at_click = 0;
 
 #if LV_LABEL_TEXT_SELECTION
     lv_label_t * label_data = (lv_label_t *)ta->label;
