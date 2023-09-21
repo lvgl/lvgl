@@ -30,6 +30,8 @@ extern "C" {
 
 void lv_tjpgd_init(void);
 
+void lv_tjpgd_deinit(void);
+
 /**********************
  *      MACROS
  **********************/
