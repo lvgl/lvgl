@@ -204,7 +204,7 @@ void lv_image_decoder_delete(lv_image_decoder_t * decoder);
 
 /**
  * Get the next image decoder in the linked list of image decoders
- * @param decoder pointer to an image decoder
+ * @param decoder pointer to an image decoder or NULL to get the first one
  * @return the next image decoder or NULL if no more image decoder exists
  */
 lv_image_decoder_t * lv_image_decoder_get_next(lv_image_decoder_t * decoder);
