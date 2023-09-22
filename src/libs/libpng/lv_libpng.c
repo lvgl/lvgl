@@ -23,8 +23,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static const void * decode_png_file(const char * filename);
 static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
@@ -71,9 +71,9 @@ void lv_libpng_deinit(void)
  * Get info about a PNG image
  * @param src can be file name or pointer to a C array
  * @param header store the info here
- * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
     lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
@@ -84,7 +84,7 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
 
         lv_fs_file_t f;
         lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) return LV_RES_INV;
+        if(res != LV_FS_RES_OK) return LV_RESULT_INVALID;
 
         /* Read the width and height from the file. They have a constant location:
          * [16..19]: width
@@ -95,10 +95,10 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
         lv_fs_read(&f, buf, sizeof(buf), &rn);
         lv_fs_close(&f);
 
-        if(rn != sizeof(buf)) return LV_RES_INV;
+        if(rn != sizeof(buf)) return LV_RESULT_INVALID;
 
         const uint8_t magic[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
-        if(memcmp(buf, magic, sizeof(magic)) != 0) return LV_RES_INV;
+        if(memcmp(buf, magic, sizeof(magic)) != 0) return LV_RESULT_INVALID;
 
         uint32_t * size = (uint32_t *)&buf[16];
         /*Save the data in the header*/
@@ -108,10 +108,10 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
         header->w = (lv_coord_t)((size[0] & 0xff000000) >> 24) + ((size[0] & 0x00ff0000) >> 8);
         header->h = (lv_coord_t)((size[1] & 0xff000000) >> 24) + ((size[1] & 0x00ff0000) >> 8);
 
-        return LV_RES_OK;
+        return LV_RESULT_OK;
     }
 
-    return LV_RES_INV;         /*If didn't succeeded earlier then it's an error*/
+    return LV_RESULT_INVALID;         /*If didn't succeeded earlier then it's an error*/
 }
 
 
@@ -121,12 +121,12 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or  `LV_IMAGE_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
 
     /*Check the cache first*/
-    if(try_cache(dsc) == LV_RES_OK) return LV_RES_OK;
+    if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
 
     /*If it's a PNG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -135,7 +135,7 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
         lv_cache_entry_t * cache = lv_cache_add(dsc->header.w * dsc->header.h * sizeof(uint32_t));
         if(cache == NULL) {
             lv_cache_unlock();
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         uint32_t t = lv_tick_get();
@@ -158,10 +158,10 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
         dsc->user_data = cache;
 
         lv_cache_unlock();
-        return LV_RES_OK;     /*The image is fully decoded. Return with its pointer*/
+        return LV_RESULT_OK;     /*The image is fully decoded. Return with its pointer*/
     }
 
-    return LV_RES_INV;    /*If not returned earlier then it failed*/
+    return LV_RESULT_INVALID;    /*If not returned earlier then it failed*/
 }
 
 /**
