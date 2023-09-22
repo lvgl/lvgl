@@ -32,13 +32,13 @@ typedef struct error_mgr_s {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
-static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header);
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc);
 static const void * decode_jpeg_file(const char * filename);
 static bool get_jpeg_size(const char * filename, uint32_t * width, uint32_t * height);
 static void error_exit(j_common_ptr cinfo);
-static lv_res_t try_cache(lv_image_decoder_dsc_t * dsc);
+static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -82,9 +82,9 @@ void lv_libjpeg_turbo_deinit(void)
  * Get info about a JPEG image
  * @param src can be file name or pointer to a C array
  * @param header store the info here
- * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
+ * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
-static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+static lv_result_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
     LV_UNUSED(decoder); /*Unused*/
     lv_image_src_t src_type = lv_image_src_get_type(src);          /*Get the source type*/
@@ -97,7 +97,7 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
         lv_fs_res_t res = lv_fs_open(&f, fn, LV_FS_MODE_RD);
         if(res != LV_FS_RES_OK) {
             LV_LOG_WARN("Can't open file: %s", fn);
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         uint32_t jpg_signature = 0;
@@ -107,7 +107,7 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
 
         if(rn != sizeof(jpg_signature)) {
             LV_LOG_WARN("file: %s signature len = %" LV_PRIu32 " error", fn, rn);
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         bool is_jpeg_ext = (strcmp(lv_fs_get_ext(fn), "jpg") == 0)
@@ -117,14 +117,14 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
             if(is_jpeg_ext) {
                 LV_LOG_WARN("file: %s signature = 0X%" LV_PRIX32 " error", fn, jpg_signature);
             }
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         uint32_t width;
         uint32_t height;
 
         if(!get_jpeg_size(fn, &width, &height)) {
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         /*Save the data in the header*/
@@ -133,10 +133,10 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
         header->w = width;
         header->h = height;
 
-        return LV_RES_OK;
+        return LV_RESULT_OK;
     }
 
-    return LV_RES_INV;         /*If didn't succeeded earlier then it's an error*/
+    return LV_RESULT_INVALID;         /*If didn't succeeded earlier then it's an error*/
 }
 
 /**
@@ -145,12 +145,12 @@ static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_
  * @param style style of the image object (unused now but certain formats might use it)
  * @return pointer to the decoded image or  `LV_IMAGE_DECODER_OPEN_FAIL` if failed
  */
-static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
     LV_UNUSED(decoder); /*Unused*/
 
     /*Check the cache first*/
-    if(try_cache(dsc) == LV_RES_OK) return LV_RES_OK;
+    if(try_cache(dsc) == LV_RESULT_OK) return LV_RESULT_OK;
 
     /*If it's a JPEG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -160,7 +160,7 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
         lv_cache_entry_t * cache = lv_cache_add(dsc->header.w * dsc->header.h * JPEG_PIXEL_SIZE);
         if(cache == NULL) {
             lv_cache_unlock();
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
 
         uint32_t t = lv_tick_get();
@@ -183,10 +183,10 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
         dsc->user_data = cache;
 
         lv_cache_unlock();
-        return LV_RES_OK;    /*If not returned earlier then it failed*/
+        return LV_RESULT_OK;    /*If not returned earlier then it failed*/
     }
 
-    return LV_RES_INV;    /*If not returned earlier then it failed*/
+    return LV_RESULT_INVALID;    /*If not returned earlier then it failed*/
 }
 
 /**
@@ -200,7 +200,7 @@ static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t *
     lv_cache_unlock();
 }
 
-static lv_res_t try_cache(lv_image_decoder_dsc_t * dsc)
+static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
 {
     lv_cache_lock();
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
@@ -211,12 +211,12 @@ static lv_res_t try_cache(lv_image_decoder_dsc_t * dsc)
             dsc->img_data = lv_cache_get_data(cache);
             dsc->user_data = cache;     /*Save the cache to release it in decoder_close*/
             lv_cache_unlock();
-            return LV_RES_OK;
+            return LV_RESULT_OK;
         }
     }
 
     lv_cache_unlock();
-    return LV_RES_INV;
+    return LV_RESULT_INVALID;
 }
 
 static uint8_t * alloc_file(const char * filename, uint32_t * size)
