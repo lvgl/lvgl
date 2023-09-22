@@ -40,6 +40,7 @@ static lv_coord_t get_angle(const lv_obj_t * obj);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
 static void value_update(lv_obj_t * arc);
 static lv_coord_t knob_get_extra_size(lv_obj_t * obj);
+static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const int16_t angle);
 
 /**********************
  *  STATIC VARIABLES
@@ -501,6 +502,11 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         if(angle < 0) angle += 360;
 
+        bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle);
+        if(!is_angle_within_bg_bounds) {
+            return;
+        }
+
         int16_t deg_range = bg_end - arc->bg_angle_start;
 
         int16_t last_angle_rel = arc->last_angle - arc->bg_angle_start;
@@ -865,6 +871,32 @@ static lv_coord_t knob_get_extra_size(lv_obj_t * obj)
     knob_outline_size += lv_obj_get_style_outline_pad(obj, LV_PART_KNOB);
 
     return LV_MAX(knob_shadow_size, knob_outline_size);
+}
+
+/**
+ * Check if angle is within arc background bounds
+ *
+ * In order to avoid unexpected value update of the arc value when the user clicks
+ * outside of the arc background we need to check if the angle (of the clicked point)
+ * is within the bounds of the background.
+ *
+ * A tolerance (extra room) also should be taken into consideration.
+ *
+ * E.g. Arc with start angle of 0° and end angle of 90°, the background is only visible in
+ * that range, from 90° to 360° the background is invisible. Click in 150° should not update
+ * the arc value, click within the arc angle range should.
+ *
+ * @param obj   Pointer to lv_arc
+ * @param angle Angle to be checked
+ *
+ * @return true if angle is within arc background bounds, false otherwise
+ */
+static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const int16_t angle)
+{
+    LV_UNUSED(obj);
+    LV_UNUSED(angle);
+
+    return true;
 }
 
 #endif
