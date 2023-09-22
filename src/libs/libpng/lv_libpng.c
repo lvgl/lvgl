@@ -125,6 +125,9 @@ static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_
 {
     LV_UNUSED(decoder); /*Unused*/
 
+    /*Check the cache first*/
+    if(try_cache(dsc) == LV_RES_OK) return LV_RES_OK;
+
     /*If it's a PNG file...*/
     if(dsc->src_type == LV_IMAGE_SRC_FILE) {
         const char * fn = dsc->src;
