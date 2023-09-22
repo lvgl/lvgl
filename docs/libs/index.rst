@@ -9,7 +9,7 @@
     fs
     bmp
     tjpgd
-    sjpg
+    libjpeg_turbo
     lodepng
     gif
     freetype

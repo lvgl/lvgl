@@ -22,6 +22,7 @@ extern "C" {
 #include "qrcode/lv_example_qrcode.h"
 #include "rlottie/lv_example_rlottie.h"
 #include "tjpgd/lv_example_tjpgd.h"
+#include "libjpeg_turbo/lv_example_libjpeg_turbo.h"
 #include "tiny_ttf/lv_example_tiny_ttf.h"
 
 /*********************

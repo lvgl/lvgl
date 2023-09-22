@@ -1983,6 +1983,16 @@
     #endif
 #endif
 
+/* libjpeg-turbo decoder library.
+ * Supports complete JPEG specifications and high-performance JPEG decoding. */
+#ifndef LV_USE_LIBJPEG_TURBO
+    #ifdef CONFIG_LV_USE_LIBJPEG_TURBO
+        #define LV_USE_LIBJPEG_TURBO CONFIG_LV_USE_LIBJPEG_TURBO
+    #else
+        #define LV_USE_LIBJPEG_TURBO 0
+    #endif
+#endif
+
 /*GIF decoder library*/
 #ifndef LV_USE_GIF
     #ifdef CONFIG_LV_USE_GIF

@@ -86,7 +86,7 @@ jobs:
 
           install: |
             apt-get update -y
-            apt-get install build-essential ccache python3 libpng-dev ruby-full gcovr cmake -q -y
+            apt-get install build-essential ccache python3 libpng-dev ruby-full gcovr cmake libjpeg62-turbo-dev -q -y
             /usr/sbin/update-ccache-symlinks
             echo 'export PATH="/usr/lib/ccache:$PATH"' | tee -a ~/.bashrc
 

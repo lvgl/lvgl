@@ -41,6 +41,9 @@ static void create_images(void)
 
 void test_tjpgd_1(void)
 {
+    /* Temporarily remove libjpeg_turbo decoder */
+    lv_libjpeg_turbo_deinit();
+
     create_images();
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_1.png");
@@ -58,6 +61,8 @@ void test_tjpgd_1(void)
 
     TEST_ASSERT_EQUAL(mem_before, lv_test_get_free_mem());
 
+    /* Re-add libjpeg_turbo decoder */
+    lv_libjpeg_turbo_init();
 }
 
 #endif

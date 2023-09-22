@@ -176,6 +176,10 @@ set(generate_test_runner_rb
     ${CMAKE_CURRENT_SOURCE_DIR}/unity/generate_test_runner.rb)
 set(generate_test_runner_config ${CMAKE_CURRENT_SOURCE_DIR}/config.yml)
 
+# libjpeg is required for the jpeg test case
+find_package(JPEG REQUIRED)
+include_directories(${JPEG_INCLUDE_DIR})
+
 # disable test targets for build only tests
 if (ENABLE_TESTS)
     file( GLOB_RECURSE TEST_CASE_FILES src/test_cases/*.c )
@@ -204,7 +208,7 @@ foreach( test_case_fname ${TEST_CASE_FILES} )
         ${test_case_fname}
         ${test_runner_fname}
     )
-    target_link_libraries(${test_name} test_common lvgl_demos lvgl png m ${TEST_LIBS})
+    target_link_libraries(${test_name} test_common lvgl_demos lvgl png ${JPEG_LIBRARIES} m ${TEST_LIBS})
     target_include_directories(${test_name} PUBLIC ${TEST_INCLUDE_DIRS})
     target_compile_options(${test_name} PUBLIC ${LVGL_TESTFILE_COMPILE_OPTIONS})
 
