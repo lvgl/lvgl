@@ -195,27 +195,6 @@
             #define LV_DRAW_BUF_STRIDE_ALIGN 0
         #endif
     #else
-        #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
-    #endif
-#endif
-/*Align the start address of draw_buf addresses to this bytes*/
-#ifndef LV_DRAW_BUF_ALIGN
-    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
-        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
-    #else
-        #define LV_DRAW_BUF_ALIGN                       4
-    #endif
-#endif
-
-/*Align the stride of all layers and images to this bytes*/
-#ifndef LV_DRAW_BUF_STRIDE_ALIGN
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-        #else
-            #define LV_DRAW_BUF_STRIDE_ALIGN 0
-        #endif
-    #else
         #define LV_DRAW_BUF_STRIDE_ALIGN                1
     #endif
 #endif
