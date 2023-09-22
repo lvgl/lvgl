@@ -11,6 +11,7 @@
     tjpgd
     sjpg
     lodepng
+    libpng
     gif
     freetype
     tiny_ttf
