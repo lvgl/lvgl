@@ -12,7 +12,7 @@ static void loop_through_stress_test(void)
 #if LV_USE_DEMO_STRESS
     while(1) {
         lv_timer_handler();
-        if (lv_demo_stress_finished()) {
+        if(lv_demo_stress_finished()) {
             break;
         }
         lv_tick_inc(1);
