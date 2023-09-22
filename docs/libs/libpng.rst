@@ -3,7 +3,7 @@ libpng decoder
 ==============
 
 libpng is the official PNG reference library. It supports almost all PNG features, is extensible, and has been extensively tested for over 28 years.
-Detailed introduction: `libjpeg-turbo <http://www.libpng.org/pub/png/libpng.html>`__.
+Detailed introduction: `libpng <http://www.libpng.org/pub/png/libpng.html>`__.
 
 Install
 -------
