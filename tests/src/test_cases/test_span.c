@@ -3,7 +3,7 @@
 
 #include "unity/unity.h"
 
-lv_obj_t * spangroup = NULL;
+static lv_obj_t * spangroup = NULL;
 static lv_obj_t * active_screen = NULL;
 
 void setUp(void)
@@ -23,21 +23,21 @@ void tearDown(void)
     active_screen = NULL;
 }
 
-void test_spangroup_create_not_null(void)
+void test_spangroup_create_returns_not_null_object(void)
 {
     lv_obj_t * obj = lv_spangroup_create(NULL);
     
     TEST_ASSERT(NULL != obj);
 }
 
-void test_spangroup_new_span_with_null_parameter_fails(void)
+void test_spangroup_new_span_with_null_parameter_returns_null_object(void)
 {
     lv_span_t * span = lv_spangroup_new_span(NULL);
 
     TEST_ASSERT(NULL == span);
 }
 
-void test_spangroup_new_span_not_null(void)
+void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
 {
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
@@ -54,21 +54,11 @@ void test_spangroup_del_span_span_is_null(void)
     TEST_ASSERT(NULL != span);
 }
 
-void test_spangroup_get_child_cnt_returns_right_cnt(void)
-{
-
-    (void)lv_spangroup_new_span(spangroup);
-    (void)lv_spangroup_new_span(spangroup);
-
-    uint32_t cnt = lv_spangroup_get_child_cnt(spangroup);
-
-    TEST_ASSERT_EQUAL(2, cnt);
-}
-
 void test_span_set_text(void)
 {
     const char * test_text = "Test Text";    
     lv_span_t * span = lv_spangroup_new_span(spangroup);
+
     lv_span_set_text(span, test_text);
 
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
@@ -78,18 +68,19 @@ void test_span_set_text_with_bad_parameter_no_action_performed(void)
 {
     const char * test_text = "Test Text";    
     lv_span_t * span = lv_spangroup_new_span(spangroup);
+
     lv_span_set_text(span, test_text);
     lv_span_set_text(span, NULL);
 
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
 }
 
-
 void test_span_set_text_with_previous_test_overwrites(void)
 {
     const char * old_test_text = "Old Test Text";    
     const char * new_test_text = "New Test Text and it is longer";    
     lv_span_t * span = lv_spangroup_new_span(spangroup);
+
     lv_span_set_text(span, old_test_text);
     lv_span_set_text(span, new_test_text);
 
@@ -100,6 +91,7 @@ void test_span_set_text_static(void)
 {
     const char * test_text = "Test Text";    
     lv_span_t * span = lv_spangroup_new_span(spangroup);
+
     lv_span_set_text_static(span, test_text);
 
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
@@ -109,6 +101,7 @@ void test_span_set_text_static_with_bad_parameter_no_action_performed(void)
 {
     const char * test_text = "Test Text";    
     lv_span_t * span = lv_spangroup_new_span(spangroup);
+
     lv_span_set_text_static(span, test_text);
     lv_span_set_text_static(span, NULL);
     
@@ -145,6 +138,7 @@ void test_spangroup_set_overflow(void)
 void test_spangroup_set_indent(void)
 {
     const lv_coord_t indent = 100; 
+
     lv_spangroup_set_indent(spangroup, indent);
 
     TEST_ASSERT_EQUAL(indent, lv_spangroup_get_indent(spangroup));
@@ -164,101 +158,122 @@ void test_spangroup_set_mode(void)
 
 void test_spangroup_set_lines(void)
 {
-    const uint32_t lines = 100; 
+    const int32_t lines = 100; 
+
     lv_spangroup_set_lines(spangroup, lines);
 
-    TEST_ASSERT_EQUAL(lines, lv_spangroup_get_lines(spangroup));
+    TEST_ASSERT_EQUAL_INT32(lines, lv_spangroup_get_lines(spangroup));
 }
 
 void test_spangroup_get_lines_when_no_spans_added(void)
 {
-        int32_t lines;
-        
-        lines = lv_spangroup_get_lines(spangroup);
+    int32_t lines;
+    
+    lines = lv_spangroup_get_lines(spangroup);
 
-        TEST_ASSERT_EQUAL(-1, (int32_t)lines);
+    TEST_ASSERT_EQUAL_INT32(-1, lines);
 }
 
 void test_spangroup_get_lines_with_single_span_added(void)
 {
-        int32_t lines;
-        // TODO: figure out how to get lines to be > -1
-        //
-        lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
-        lv_obj_set_width(spangroup, 10);
-        lv_span_t * span = lv_spangroup_new_span(spangroup);
-        lv_span_set_text(span, "This text is over 100 pixels width");
+    int32_t lines;
+    
+    active_screen = lv_scr_act();
 
-        lines = lv_spangroup_get_lines(spangroup);
+    spangroup = lv_spangroup_create(active_screen);
+    
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span, "This text is over 100 pixels width");
+    
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+    lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP);
+    lv_obj_set_width(spangroup, 100);
+    
+    TEST_ASSERT_EQUAL_SCREENSHOT("span_01.png");
+    // TODO: this function seems to be broken
+    lines = lv_spangroup_get_lines(spangroup);
 
-        TEST_ASSERT_EQUAL(-1, (int32_t)lines);
+    TEST_ASSERT_EQUAL(3, lines);
 }
+
 void test_spangroup_get_max_line_h(void)
 {
-        lv_coord_t max_line;
-        
-        max_line = lv_spangroup_get_max_line_h(spangroup);
+    lv_coord_t max_line;
+    
+    max_line = lv_spangroup_get_max_line_h(spangroup);
 
-        TEST_ASSERT_EQUAL(0, (uint32_t)max_line);
+    TEST_ASSERT_EQUAL(0, (uint32_t)max_line);
 
-        (void)lv_spangroup_new_span(spangroup);
-        max_line = lv_spangroup_get_max_line_h(spangroup);
+    (void)lv_spangroup_new_span(spangroup);
+    max_line = lv_spangroup_get_max_line_h(spangroup);
 
-        // TODO: find out why this magic number
-        TEST_ASSERT_EQUAL(16, (uint32_t)max_line);
-
+    // TODO: find out why this magic numberdd
+    TEST_ASSERT_EQUAL(16, (uint32_t)max_line);
 }
 
 void test_spangroup_draw(void)
 {
-        active_screen = lv_scr_act();
+    active_screen = lv_scr_act();
+    spangroup = lv_spangroup_create(active_screen);
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
+    lv_obj_set_width(spangroup, 100);
+    lv_span_t * span_1 = lv_spangroup_new_span(spangroup);
+    lv_span_t * span_2 = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span_1, "This text is over 100 pixels width");
+    lv_span_set_text(span_2, "This text is also over 100 pixels width");
+    lv_style_set_text_decor(&span_2->style, LV_TEXT_DECOR_STRIKETHROUGH);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("span_02.png");
         
-        spangroup = lv_spangroup_create(active_screen);
-        lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
-        lv_obj_set_width(spangroup, 100);
-        lv_span_t * span = lv_spangroup_new_span(spangroup);
-        lv_span_set_text(span, "This text is over 100 pixels width");
+    lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
 
-        TEST_ASSERT_EQUAL_SCREENSHOT("testb.png");
-            
-        lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
-
-        TEST_ASSERT_EQUAL_SCREENSHOT("testc.png");
-        
-        lv_span_t * span2 = lv_spangroup_new_span(spangroup);
-        lv_style_set_text_decor(&span2->style, LV_TEXT_DECOR_STRIKETHROUGH);
-        lv_spangroup_refr_mode(spangroup);
-
-        TEST_ASSERT_EQUAL_SCREENSHOT("testz.png");
+    TEST_ASSERT_EQUAL_SCREENSHOT("span_03.png");
+    
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
+    
+    TEST_ASSERT_EQUAL_SCREENSHOT("span_04.png");
+    
+    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
+    
+    TEST_ASSERT_EQUAL_SCREENSHOT("span_05.png");
 }
 
 void test_spangroup_get_child(void)
 {
-        const int32_t span_1_idx = 0;
-        const int32_t span_2_idx = 1;
-        lv_span_t * span_1 = lv_spangroup_new_span(spangroup);
-        lv_span_t * span_2 = lv_spangroup_new_span(spangroup);
+    const int32_t span_1_idx = 0;
+    const int32_t span_2_idx = 1;
+    lv_span_t * span_1 = lv_spangroup_new_span(spangroup);
+    lv_span_t * span_2 = lv_spangroup_new_span(spangroup);
 
-        TEST_ASSERT_EQUAL_PTR(span_2, lv_spangroup_get_child(spangroup, span_2_idx));
-        TEST_ASSERT_EQUAL_PTR(span_1, lv_spangroup_get_child(spangroup, span_1_idx));
+    TEST_ASSERT_EQUAL_PTR(span_2, lv_spangroup_get_child(spangroup, span_2_idx));
+    TEST_ASSERT_EQUAL_PTR(span_1, lv_spangroup_get_child(spangroup, span_1_idx));
+}
+
+void test_spangroup_get_child_cnt(void)
+{
+    (void)lv_spangroup_new_span(spangroup);
+    (void)lv_spangroup_new_span(spangroup);
+
+    const uint32_t cnt = lv_spangroup_get_child_cnt(spangroup);
+
+    TEST_ASSERT_EQUAL(2, cnt);
 }
 
 void test_spangroup_get_expand_width(void)
 {
-        const uint32_t experimental_size = 232;
-        const uint32_t constrained_size = 232;
-        active_screen = lv_scr_act();
+    const uint32_t experimental_size = 232;
+    const uint32_t constrained_size = 232;
+    active_screen = lv_scr_act();
 
-        spangroup = lv_spangroup_create(active_screen);
-        lv_span_t * span = lv_spangroup_new_span(spangroup);
-        lv_span_set_text(span, "This text is over 100 pixels width");
+    spangroup = lv_spangroup_create(active_screen);
+    lv_span_t * span = lv_spangroup_new_span(spangroup);
+    lv_span_set_text(span, "This text is over 100 pixels width");
 
-        TEST_ASSERT_EQUAL_INT(experimental_size, 
-                              lv_spangroup_get_expand_width(spangroup, UINT32_MAX));
-        
-        TEST_ASSERT_EQUAL_INT(constrained_size, 
-                              lv_spangroup_get_expand_width(spangroup, experimental_size));
+    TEST_ASSERT_EQUAL_INT(experimental_size, 
+                          lv_spangroup_get_expand_width(spangroup, UINT32_MAX));
+    
+    TEST_ASSERT_EQUAL_INT(constrained_size, 
+                          lv_spangroup_get_expand_width(spangroup, experimental_size));
 }
-
 
 #endif
