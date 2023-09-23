@@ -35,6 +35,7 @@ void test_spangroup_new_span_with_null_parameter_returns_null_object(void)
     lv_span_t * span = lv_spangroup_new_span(NULL);
 
     TEST_ASSERT(NULL == span);
+    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_cnt(spangroup));
 }
 
 void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
@@ -42,6 +43,7 @@ void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     TEST_ASSERT(NULL != span);
+    TEST_ASSERT_EQUAL_INT(1, lv_spangroup_get_child_cnt(spangroup));
 }
 
 void test_spangroup_del_span_span_is_null(void)
@@ -50,8 +52,7 @@ void test_spangroup_del_span_span_is_null(void)
 
     lv_spangroup_del_span(spangroup, span);
 
-    // TODO: this test shouldn't pass this way
-    TEST_ASSERT(NULL != span);
+    TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_cnt(spangroup));
 }
 
 void test_span_set_text(void)
