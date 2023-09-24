@@ -30,6 +30,7 @@ typedef struct {
     lv_color_t dark_color;
     lv_color_t light_color;
     uint16_t scale;
+    lv_dir_t direction;
 } lv_barcode_t;
 
 extern const lv_obj_class_t lv_barcode_class;
@@ -65,6 +66,13 @@ void lv_barcode_set_light_color(lv_obj_t * obj, lv_color_t color);
  * @param scale scale factor
  */
 void lv_barcode_set_scale(lv_obj_t * obj, uint16_t scale);
+
+/**
+ * Set the direction of a barcode object
+ * @param obj pointer to barcode object
+ * @param direction draw direction (`LV_DIR_HOR` or `LB_DIR_VER`)
+ */
+void lv_barcode_set_direction(lv_obj_t * obj, lv_dir_t direction);
 
 /**
  * Set the data of a barcode object
