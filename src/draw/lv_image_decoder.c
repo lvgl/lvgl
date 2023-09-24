@@ -94,10 +94,10 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
     }
 
     lv_result_t res = LV_RESULT_INVALID;
-    lv_image_decoder_t * d;
-    _LV_LL_READ(img_decoder_ll_p, d) {
-        if(d->info_cb) {
-            res = d->info_cb(d, src, header);
+    lv_image_decoder_t * decoder;
+    _LV_LL_READ(img_decoder_ll_p, decoder) {
+        if(decoder->info_cb) {
+            res = decoder->info_cb(decoder, src, header);
             if(res == LV_RESULT_OK) {
                 if(header->stride == 0) header->stride = img_width_to_stride(header);
                 break;

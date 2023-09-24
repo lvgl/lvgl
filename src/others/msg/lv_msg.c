@@ -53,9 +53,9 @@ static void obj_delete_event_cb(lv_event_t * e);
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_MSG
-    #define MSG_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+    #define LV_TRACE_MSG(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define MSG_TRACE(...)
+    #define LV_TRACE_MSG(...)
 #endif
 
 /**********************
@@ -194,7 +194,7 @@ static void notify(lv_msg_t * m)
 
             /*restart or load next*/
             if(restart_notify) {
-                MSG_TRACE("Start from the first sub_dsc_t again because _subs_ll may have changed");
+                LV_TRACE_MSG("Start from the first sub_dsc_t again because _subs_ll may have changed");
                 break;
             }
             s = next;
