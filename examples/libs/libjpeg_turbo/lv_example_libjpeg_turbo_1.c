@@ -1,7 +1,7 @@
 #include "../../lv_examples.h"
-#if LV_USE_LIBJPEG_TURBO
-
 #if LV_BUILD_EXAMPLES
+
+#if LV_USE_LIBJPEG_TURBO
 
 /**
  * Load a JPG image
