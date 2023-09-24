@@ -414,6 +414,7 @@ int32_t lv_dropdown_get_option_index(lv_obj_t * obj, const char * option)
            memcmp(start, option, option_len) == 0) return opt_i; /*cannot match exactly unless they are the same length*/
         start = &start[char_i];
         if(start[0] == '\n') start++;
+        char_i = 0;
         opt_i++;
     }
 
