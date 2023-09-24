@@ -15,10 +15,10 @@ void tearDown(void)
 {
     lv_obj_del(spangroup);
 
-    if (active_screen) {
-            lv_obj_clean(active_screen);
-    }           
-    
+    if(active_screen) {
+        lv_obj_clean(active_screen);
+    }
+
     spangroup = NULL;
     active_screen = NULL;
 }
@@ -26,7 +26,7 @@ void tearDown(void)
 void test_spangroup_create_returns_not_null_object(void)
 {
     lv_obj_t * obj = lv_spangroup_create(NULL);
-    
+
     TEST_ASSERT(NULL != obj);
 }
 
@@ -57,7 +57,7 @@ void test_spangroup_del_span_span_is_null(void)
 
 void test_span_set_text(void)
 {
-    const char * test_text = "Test Text";    
+    const char * test_text = "Test Text";
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     lv_span_set_text(span, test_text);
@@ -67,7 +67,7 @@ void test_span_set_text(void)
 
 void test_span_set_text_with_bad_parameter_no_action_performed(void)
 {
-    const char * test_text = "Test Text";    
+    const char * test_text = "Test Text";
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     lv_span_set_text(span, test_text);
@@ -78,8 +78,8 @@ void test_span_set_text_with_bad_parameter_no_action_performed(void)
 
 void test_span_set_text_with_previous_test_overwrites(void)
 {
-    const char * old_test_text = "Old Test Text";    
-    const char * new_test_text = "New Test Text and it is longer";    
+    const char * old_test_text = "Old Test Text";
+    const char * new_test_text = "New Test Text and it is longer";
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     lv_span_set_text(span, old_test_text);
@@ -90,7 +90,7 @@ void test_span_set_text_with_previous_test_overwrites(void)
 
 void test_span_set_text_static(void)
 {
-    const char * test_text = "Test Text";    
+    const char * test_text = "Test Text";
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     lv_span_set_text_static(span, test_text);
@@ -100,19 +100,19 @@ void test_span_set_text_static(void)
 
 void test_span_set_text_static_with_bad_parameter_no_action_performed(void)
 {
-    const char * test_text = "Test Text";    
+    const char * test_text = "Test Text";
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
     lv_span_set_text_static(span, test_text);
     lv_span_set_text_static(span, NULL);
-    
+
     TEST_ASSERT_EQUAL_STRING(span->txt, test_text);
 }
 
 void test_span_set_text_static_with_previous_text_overwrites(void)
 {
-    const char * old_test_text = "Old Test Text";    
-    const char * new_test_text = "New Test Text and it is longer";    
+    const char * old_test_text = "Old Test Text";
+    const char * new_test_text = "New Test Text and it is longer";
     lv_span_t * span = lv_spangroup_new_span(spangroup);
     lv_span_set_text_static(span, old_test_text);
     lv_span_set_text_static(span, new_test_text);
@@ -122,7 +122,7 @@ void test_span_set_text_static_with_previous_text_overwrites(void)
 
 void test_spangroup_set_align(void)
 {
-    const lv_text_align_t align = LV_TEXT_ALIGN_CENTER; 
+    const lv_text_align_t align = LV_TEXT_ALIGN_CENTER;
     lv_spangroup_set_align(spangroup, align);
 
     TEST_ASSERT_EQUAL(align, lv_spangroup_get_align(spangroup));
@@ -130,7 +130,7 @@ void test_spangroup_set_align(void)
 
 void test_spangroup_set_overflow(void)
 {
-    const lv_span_overflow_t overflow = LV_SPAN_OVERFLOW_ELLIPSIS; 
+    const lv_span_overflow_t overflow = LV_SPAN_OVERFLOW_ELLIPSIS;
     lv_spangroup_set_overflow(spangroup, overflow);
 
     TEST_ASSERT_EQUAL(overflow, lv_spangroup_get_overflow(spangroup));
@@ -138,7 +138,7 @@ void test_spangroup_set_overflow(void)
 
 void test_spangroup_set_indent(void)
 {
-    const lv_coord_t indent = 100; 
+    const lv_coord_t indent = 100;
 
     lv_spangroup_set_indent(spangroup, indent);
 
@@ -149,17 +149,17 @@ void test_spangroup_set_mode(void)
 {
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_EXPAND, lv_spangroup_get_mode(spangroup));
-    
+
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_BREAK, lv_spangroup_get_mode(spangroup));
-    
+
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_FIXED, lv_spangroup_get_mode(spangroup));
 }
 
 void test_spangroup_set_lines(void)
 {
-    const int32_t lines = 100; 
+    const int32_t lines = 100;
 
     lv_spangroup_set_lines(spangroup, lines);
 
@@ -169,11 +169,11 @@ void test_spangroup_set_lines(void)
 void test_spangroup_get_lines_for_new_span_group(void)
 {
     int32_t lines;
-    
+
     lines = lv_spangroup_get_lines(spangroup);
 
     TEST_ASSERT_EQUAL_INT32(-1, lines);
-    
+
     lines = 3;
     lv_spangroup_set_lines(spangroup, lines);
     lines = lv_spangroup_get_lines(spangroup);
@@ -184,7 +184,7 @@ void test_spangroup_get_lines_for_new_span_group(void)
 void test_spangroup_get_max_line_h(void)
 {
     lv_coord_t max_line;
-    
+
     max_line = lv_spangroup_get_max_line_h(spangroup);
 
     TEST_ASSERT_EQUAL(0, (uint32_t)max_line);
@@ -209,17 +209,17 @@ void test_spangroup_draw(void)
     lv_style_set_text_decor(&span_2->style, LV_TEXT_DECOR_STRIKETHROUGH);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("span_02.png");
-        
+
     lv_spangroup_set_align(spangroup, LV_TEXT_ALIGN_CENTER);
 
     TEST_ASSERT_EQUAL_SCREENSHOT("span_03.png");
-    
+
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_EXPAND);
-    
+
     TEST_ASSERT_EQUAL_SCREENSHOT("span_04.png");
-    
+
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_FIXED);
-    
+
     TEST_ASSERT_EQUAL_SCREENSHOT("span_05.png");
 }
 
@@ -254,10 +254,10 @@ void test_spangroup_get_expand_width(void)
     lv_span_t * span = lv_spangroup_new_span(spangroup);
     lv_span_set_text(span, "This text is over 100 pixels width");
 
-    TEST_ASSERT_EQUAL_INT(experimental_size, 
+    TEST_ASSERT_EQUAL_INT(experimental_size,
                           lv_spangroup_get_expand_width(spangroup, UINT32_MAX));
-    
-    TEST_ASSERT_EQUAL_INT(constrained_size, 
+
+    TEST_ASSERT_EQUAL_INT(constrained_size,
                           lv_spangroup_get_expand_width(spangroup, experimental_size));
 }
 
