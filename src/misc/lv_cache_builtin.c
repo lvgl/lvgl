@@ -94,7 +94,7 @@ static lv_cache_entry_t * add_cb(size_t size)
     entry->temporary = temporary;
 
     if(temporary) {
-        LV_TRACE_CACHE("Add temporary cache: %lu bytes"(unsigned long)size);
+        LV_TRACE_CACHE("Add temporary cache: %lu bytes", (unsigned long)size);
     }
     else {
         LV_TRACE_CACHE("Add cache: %lu bytes", (unsigned long)size);
