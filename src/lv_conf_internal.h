@@ -195,27 +195,6 @@
             #define LV_DRAW_BUF_STRIDE_ALIGN 0
         #endif
     #else
-        #define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
-    #endif
-#endif
-/*Align the start address of draw_buf addresses to this bytes*/
-#ifndef LV_DRAW_BUF_ALIGN
-    #ifdef CONFIG_LV_DRAW_BUF_ALIGN
-        #define LV_DRAW_BUF_ALIGN CONFIG_LV_DRAW_BUF_ALIGN
-    #else
-        #define LV_DRAW_BUF_ALIGN                       4
-    #endif
-#endif
-
-/*Align the stride of all layers and images to this bytes*/
-#ifndef LV_DRAW_BUF_STRIDE_ALIGN
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-            #define LV_DRAW_BUF_STRIDE_ALIGN CONFIG_LV_DRAW_BUF_STRIDE_ALIGN
-        #else
-            #define LV_DRAW_BUF_STRIDE_ALIGN 0
-        #endif
-    #else
         #define LV_DRAW_BUF_STRIDE_ALIGN                1
     #endif
 #endif
@@ -526,10 +505,10 @@
 	        #ifdef LV_LOG_TRACE_CACHE
 	            #define LV_LOG_TRACE_CACHE CONFIG_LV_LOG_TRACE_CACHE
 	        #else
-	            #define LV_LOG_TRACE_CACHE 0
+	            #define LV_LOG_TRACE_CACHE  0
 	        #endif
 	    #else
-	        #define LV_LOG_TRACE_CACHE		1
+	        #define LV_LOG_TRACE_CACHE      1
 	    #endif
 	#endif
 
@@ -1991,6 +1970,16 @@
         #define LV_USE_TJPGD CONFIG_LV_USE_TJPGD
     #else
         #define LV_USE_TJPGD 0
+    #endif
+#endif
+
+/* libjpeg-turbo decoder library.
+ * Supports complete JPEG specifications and high-performance JPEG decoding. */
+#ifndef LV_USE_LIBJPEG_TURBO
+    #ifdef CONFIG_LV_USE_LIBJPEG_TURBO
+        #define LV_USE_LIBJPEG_TURBO CONFIG_LV_USE_LIBJPEG_TURBO
+    #else
+        #define LV_USE_LIBJPEG_TURBO 0
     #endif
 #endif
 
