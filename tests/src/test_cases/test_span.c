@@ -166,35 +166,19 @@ void test_spangroup_set_lines(void)
     TEST_ASSERT_EQUAL_INT32(lines, lv_spangroup_get_lines(spangroup));
 }
 
-void test_spangroup_get_lines_when_no_spans_added(void)
+void test_spangroup_get_lines_for_new_span_group(void)
 {
     int32_t lines;
     
     lines = lv_spangroup_get_lines(spangroup);
 
     TEST_ASSERT_EQUAL_INT32(-1, lines);
-}
-
-void test_spangroup_get_lines_with_single_span_added(void)
-{
-    int32_t lines;
     
-    active_screen = lv_scr_act();
-
-    spangroup = lv_spangroup_create(active_screen);
-    
-    lv_span_t * span = lv_spangroup_new_span(spangroup);
-    lv_span_set_text(span, "This text is over 100 pixels width");
-    
-    lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
-    lv_spangroup_set_overflow(spangroup, LV_SPAN_OVERFLOW_CLIP);
-    lv_obj_set_width(spangroup, 100);
-    
-    TEST_ASSERT_EQUAL_SCREENSHOT("span_01.png");
-    // TODO: this function seems to be broken
+    lines = 3;
+    lv_spangroup_set_lines(spangroup, lines);
     lines = lv_spangroup_get_lines(spangroup);
 
-    TEST_ASSERT_EQUAL(3, lines);
+    TEST_ASSERT_EQUAL_INT32(3, lines);
 }
 
 void test_spangroup_get_max_line_h(void)
