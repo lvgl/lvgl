@@ -40,7 +40,7 @@ static lv_coord_t get_angle(const lv_obj_t * obj);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
 static void value_update(lv_obj_t * arc);
 static lv_coord_t knob_get_extra_size(lv_obj_t * obj);
-static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const int16_t angle);
+static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, const uint32_t tolerance_deg);
 
 /**********************
  *  STATIC VARIABLES
@@ -500,9 +500,13 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         angle -= arc->rotation;
         angle -= arc->bg_angle_start;  /*Make the angle relative to the start angle*/
 
+        /* If we click near the bg_angle_start the angle will be close to 360° instead of an small angle */
         if(angle < 0) angle += 360;
 
-        bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, angle);
+        const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
+        const uint32_t tolerance_deg = 360U * lv_dpx(50U) / circumference;
+
+        bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, (uint32_t) angle, tolerance_deg);
         if(!is_angle_within_bg_bounds) {
             return;
         }
@@ -886,17 +890,72 @@ static lv_coord_t knob_get_extra_size(lv_obj_t * obj)
  * that range, from 90° to 360° the background is invisible. Click in 150° should not update
  * the arc value, click within the arc angle range should.
  *
+ * IMPORTANT NOTE: angle is always relative to bg_angle_start, e.g. if bg_angle_start is 30
+ * and we click a bit to the left, angle is 10, not the expected 40.
+ *
  * @param obj   Pointer to lv_arc
  * @param angle Angle to be checked
+ * @param tolerance_deg Tolerance
  *
  * @return true if angle is within arc background bounds, false otherwise
  */
-static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const int16_t angle)
+static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, const uint32_t tolerance_deg)
 {
-    LV_UNUSED(obj);
-    LV_UNUSED(angle);
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_arc_t * arc = (lv_arc_t *)obj;
 
-    return true;
+    /* Angle is between both background angles */
+    if((arc->bg_angle_end - arc->bg_angle_start) >= angle) {
+        return true;
+    }
+    /* Distance between background start and end angles is less than tolerance */
+    else if(((arc->bg_angle_start - tolerance_deg) <= 0U) &&
+            (360U - (arc->bg_angle_end + (arc->bg_angle_start - tolerance_deg)))) {
+        return true;
+    }
+
+    /* Legends:
+     * 0° = angle 0
+     * 360° = angle 360
+     * T: Tolerance
+     * A: Angle
+     * S: Arc background start angle
+     * E: Arc background end angle
+     *
+     * Start angle is bigger or equal to tolerance */
+    if((arc->bg_angle_start >= tolerance_deg)
+       /* (360° - T) --- A --- 360° */
+       && ((angle >= (360U - tolerance_deg)) && (angle <= 360U))) {
+
+        return true;
+    }
+    /* Tolerance is bigger than bg start angle */
+    else if((arc->bg_angle_start < tolerance_deg)
+            /* (360° - (T - S)) --- A --- 360° */
+            && (((360U - (tolerance_deg - arc->bg_angle_start)) <= angle)) && (angle <= 360U)) {
+
+        return true;
+    }
+    /* 360° is bigger than background end angle + tolerance */
+    else if((360U >= (arc->bg_angle_end + tolerance_deg))
+            /* E --- A --- (E + T) */
+            && ((arc->bg_angle_end <= (angle + arc->bg_angle_start)) &&
+                ((angle + arc->bg_angle_start) <= (arc->bg_angle_end + tolerance_deg)))) {
+
+        return true;
+    }
+    /* Background end angle + tolerance is bigger than 360° and bg_start_angle + tolerance is not near 0° + ((bg_end_angle + tolerance) - 360°)
+     * Here we can assume background is not near 0° because of the first two initial checks */
+    else if((360U < (arc->bg_angle_end + tolerance_deg))
+            && (angle <= 0U + ((arc->bg_angle_end + tolerance_deg) - 360U)) && (angle > arc->bg_angle_end)) {
+
+        return true;
+    }
+    else {
+        /* Nothing to do */
+    }
+
+    return false;
 }
 
 #endif
