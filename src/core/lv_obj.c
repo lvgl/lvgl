@@ -49,6 +49,7 @@ static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_obj_class = {
     .constructor_cb = lv_obj_constructor,
     .destructor_cb = lv_obj_destructor,
@@ -59,6 +60,7 @@ const lv_obj_class_t lv_obj_class = {
     .group_def = LV_OBJ_CLASS_GROUP_DEF_FALSE,
     .instance_size = (sizeof(lv_obj_t)),
     .base_class = NULL,
+    .name = "obj",
 };
 
 /**********************
@@ -306,6 +308,10 @@ static void lv_obj_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     obj->flags |= LV_OBJ_FLAG_SCROLL_WITH_ARROW;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
+#if LV_USE_OBJ_ID
+    lv_obj_assign_id(class_p, obj);
+#endif
+
     LV_TRACE_OBJ_CREATE("finished");
 }
 
@@ -341,6 +347,10 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
         lv_free(obj->spec_attr);
         obj->spec_attr = NULL;
     }
+
+#if LV_USE_OBJ_ID
+    lv_obj_free_id(obj);
+#endif
 }
 
 static void lv_obj_draw(lv_event_t * e)

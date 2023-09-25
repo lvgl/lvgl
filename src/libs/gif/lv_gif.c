@@ -31,11 +31,13 @@ static void next_frame_task_cb(lv_timer_t * t);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_gif_class = {
     .constructor_cb = lv_gif_constructor,
     .destructor_cb = lv_gif_destructor,
     .instance_size = sizeof(lv_gif_t),
-    .base_class = &lv_image_class
+    .base_class = &lv_image_class,
+    .name = "gif",
 };
 
 /**********************

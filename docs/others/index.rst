@@ -13,3 +13,4 @@ Others
     msg
     imgfont
     ime_pinyin
+    obj_id

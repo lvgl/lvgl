@@ -38,13 +38,15 @@ static void highlight_update(lv_obj_t * calendar);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_calendar_class = {
     .constructor_cb = lv_calendar_constructor,
     .width_def = (LV_DPI_DEF * 3) / 2,
     .height_def = (LV_DPI_DEF * 3) / 2,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_calendar_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "calendar",
 };
 
 static const char * day_names_def[7] = LV_CALENDAR_DEFAULT_DAY_NAMES;

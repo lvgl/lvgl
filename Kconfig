@@ -61,6 +61,15 @@ menu "LVGL configuration"
 			default 0x00FF00
 			help
 				See misc/lv_color.h for some color values examples.
+
+		config LV_USE_OBJ_ID
+			bool "Add id field to obj."
+			default n
+
+		config LV_USE_OBJ_ID_BUILTIN
+			bool "Use builtin method to deal with obj ID"
+			default n
+
 	endmenu
 
 	menu "Memory settings"

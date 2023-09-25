@@ -42,7 +42,8 @@ const lv_obj_class_t lv_menu_class = {
     .base_class = &lv_obj_class,
     .width_def = (LV_DPI_DEF * 3) / 2,
     .height_def = LV_DPI_DEF * 2,
-    .instance_size = sizeof(lv_menu_t)
+    .instance_size = sizeof(lv_menu_t),
+    .name = "menu",
 };
 const lv_obj_class_t lv_menu_page_class = {
     .constructor_cb = lv_menu_page_constructor,
@@ -50,43 +51,47 @@ const lv_obj_class_t lv_menu_page_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
     .height_def = LV_SIZE_CONTENT,
-    .instance_size = sizeof(lv_menu_page_t)
+    .instance_size = sizeof(lv_menu_page_t),
+    .name = "menu-page",
 };
 
 const lv_obj_class_t lv_menu_cont_class = {
     .constructor_cb = lv_menu_cont_constructor,
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
-    .height_def = LV_SIZE_CONTENT
+    .height_def = LV_SIZE_CONTENT,
+    .name = "menu-cont",
 };
 
 const lv_obj_class_t lv_menu_section_class = {
     .constructor_cb = lv_menu_section_constructor,
     .base_class = &lv_obj_class,
     .width_def = LV_PCT(100),
-    .height_def = LV_SIZE_CONTENT
+    .height_def = LV_SIZE_CONTENT,
+    .name = "menu-section",
 };
 
 const lv_obj_class_t lv_menu_separator_class = {
     .base_class = &lv_obj_class,
     .width_def = LV_SIZE_CONTENT,
-    .height_def = LV_SIZE_CONTENT
+    .height_def = LV_SIZE_CONTENT,
+    .name = "menu-separator",
 };
 
 const lv_obj_class_t lv_menu_sidebar_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
 };
 
 const lv_obj_class_t lv_menu_main_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
 };
 
 const lv_obj_class_t lv_menu_main_header_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
 };
 
 const lv_obj_class_t lv_menu_sidebar_header_cont_class = {
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
 };
 
 static void lv_menu_refr(lv_obj_t * obj);

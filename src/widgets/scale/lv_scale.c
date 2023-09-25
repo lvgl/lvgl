@@ -61,13 +61,15 @@ static void scale_build_custom_label_text(lv_obj_t * obj, lv_draw_label_dsc_t * 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_scale_class  = {
     .constructor_cb = lv_scale_constructor,
     .destructor_cb = lv_scale_destructor,
     .event_cb = lv_scale_event,
     .instance_size = sizeof(lv_scale_t),
     .editable = LV_OBJ_CLASS_EDITABLE_TRUE,
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "scale",
 };
 
 /**********************

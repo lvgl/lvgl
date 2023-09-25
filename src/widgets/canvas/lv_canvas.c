@@ -34,11 +34,13 @@ static void lv_canvas_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_canvas_class = {
     .constructor_cb = lv_canvas_constructor,
     .destructor_cb = lv_canvas_destructor,
     .instance_size = sizeof(lv_canvas_t),
-    .base_class = &lv_image_class
+    .base_class = &lv_image_class,
+    .name = "canvas",
 };
 
 /**********************

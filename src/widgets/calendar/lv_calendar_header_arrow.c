@@ -32,11 +32,13 @@ static void value_changed_event_cb(lv_event_t * e);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_calendar_header_arrow_class = {
     .base_class = &lv_obj_class,
     .constructor_cb = my_constructor,
     .width_def = LV_PCT(100),
-    .height_def = LV_DPI_DEF / 3
+    .height_def = LV_DPI_DEF / 3,
+    .name = "calendar-header-arrow",
 };
 
 static const char * month_names_def[12] = LV_CALENDAR_DEFAULT_MONTH_NAMES;

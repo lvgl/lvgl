@@ -187,6 +187,11 @@ typedef struct _lv_global_t {
 #if LV_USE_IME_PINYIN != 0
     size_t ime_cand_len;
 #endif
+
+#if LV_USE_OBJ_ID_BUILTIN
+    void * objid_array;
+    uint32_t objid_count;
+#endif
 } lv_global_t;
 
 

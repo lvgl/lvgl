@@ -53,7 +53,8 @@ const lv_obj_class_t lv_file_explorer_class = {
     .width_def      = LV_SIZE_CONTENT,
     .height_def     = LV_SIZE_CONTENT,
     .instance_size  = sizeof(lv_file_explorer_t),
-    .base_class     = &lv_obj_class
+    .base_class     = &lv_obj_class,
+    .name = "file-explorer",
 };
 
 /**********************

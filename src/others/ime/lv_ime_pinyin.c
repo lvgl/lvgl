@@ -48,6 +48,7 @@ static void pinyin_ime_clear_data(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_ime_pinyin_class = {
     .constructor_cb = lv_ime_pinyin_constructor,
     .destructor_cb  = lv_ime_pinyin_destructor,
@@ -55,7 +56,8 @@ const lv_obj_class_t lv_ime_pinyin_class = {
     .height_def     = LV_SIZE_CONTENT,
     .group_def      = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size  = sizeof(lv_ime_pinyin_t),
-    .base_class     = &lv_obj_class
+    .base_class     = &lv_obj_class,
+    .name = "ime-pinyin",
 };
 
 #if LV_IME_PINYIN_USE_K9_MODE

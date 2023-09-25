@@ -264,7 +264,13 @@
 
 
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
-#define  LV_OBJ_STYLE_CACHE 1
+#define LV_OBJ_STYLE_CACHE 0
+
+/* Add `id` field to `lv_obj_t` */
+#define LV_USE_OBJ_ID 0
+
+/* Use lvgl builtin method for obj ID */
+#define LV_USE_OBJ_ID_BUILTIN 0
 
 /*=====================
  *  COMPILER SETTINGS

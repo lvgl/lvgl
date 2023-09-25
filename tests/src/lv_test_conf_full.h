@@ -85,4 +85,5 @@
 #define LV_USE_DEMO_MULTILANG   1
 #define LV_USE_DEMO_SCROLL      1
 
-
+#define LV_USE_OBJ_ID           1
+#define LV_USE_OBJ_ID_BUILTIN   1

@@ -40,7 +40,8 @@ const lv_obj_class_t lv_tabview_class = {
     .width_def = LV_PCT(100),
     .height_def = LV_PCT(100),
     .base_class = &lv_obj_class,
-    .instance_size = sizeof(lv_tabview_t)
+    .instance_size = sizeof(lv_tabview_t),
+    .name = "tabview",
 };
 
 typedef struct {

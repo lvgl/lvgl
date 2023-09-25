@@ -58,7 +58,8 @@ const lv_obj_class_t lv_switch_class = {
     .height_def = (4 * LV_DPI_DEF) / 17,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_switch_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "switch",
 };
 
 /**********************

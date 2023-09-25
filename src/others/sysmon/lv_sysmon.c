@@ -57,6 +57,7 @@ static void sysmon_async_cb(void * user_data);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_sysmon_class = {
     .base_class = &lv_label_class,
     .constructor_cb = lv_sysmon_constructor,
@@ -64,6 +65,7 @@ const lv_obj_class_t lv_sysmon_class = {
     .height_def = LV_SIZE_CONTENT,
     .event_cb = lv_sysmon_event,
     .instance_size = sizeof(lv_sysmon_t),
+    .name = "sysmon",
 };
 
 /**********************

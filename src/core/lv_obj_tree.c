@@ -23,6 +23,8 @@
 #define MY_CLASS &lv_obj_class
 #define disp_ll_p &(LV_GLOBAL_DEFAULT()->disp_ll)
 
+#define OBJ_DUMP_STRING_LEN 128
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -33,6 +35,7 @@
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
+static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth);
 
 /**********************
  *  STATIC VARIABLES
@@ -359,6 +362,23 @@ void lv_obj_tree_walk(lv_obj_t * start_obj, lv_obj_tree_walk_cb_t cb, void * use
     walk_core(start_obj, cb, user_data);
 }
 
+void lv_obj_dump_tree(lv_obj_t * start_obj)
+{
+    if(start_obj == NULL) {
+        lv_display_t * disp = lv_display_get_next(NULL);
+        while(disp) {
+            uint32_t i;
+            for(i = 0; i < disp->screen_cnt; i++) {
+                dump_tree_core(disp->screens[i], 0);
+            }
+            disp = lv_display_get_next(disp);
+        }
+    }
+    else {
+        dump_tree_core(start_obj, 0);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -485,4 +505,33 @@ static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb
         }
     }
     return LV_OBJ_TREE_WALK_NEXT;
+}
+
+static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth)
+{
+    lv_obj_tree_walk_res_t res;
+    const char * id;
+
+#if LV_USE_OBJ_ID
+    char buf[OBJ_DUMP_STRING_LEN];
+    id = lv_obj_stringify_id(obj, buf, sizeof(buf));
+    if(id == NULL) id = "obj0";
+#else
+    id = "obj0";
+#endif
+
+    /*id of `obj0` is an invalid id for builtin id*/
+    LV_LOG_USER("parent:%p, obj:%p, id:%s;", (void *)(obj ? obj->parent : NULL), (void *)obj, id);
+
+    if(obj && obj->spec_attr && obj->spec_attr->child_cnt) {
+        for(uint32_t i = 0; i < obj->spec_attr->child_cnt; i++) {
+            res = dump_tree_core(lv_obj_get_child(obj, i), depth + 1);
+            if(res == LV_OBJ_TREE_WALK_END)
+                break;
+        }
+        return LV_OBJ_TREE_WALK_NEXT;
+    }
+    else {
+        return LV_OBJ_TREE_WALK_END;
+    }
 }

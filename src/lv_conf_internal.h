@@ -721,14 +721,28 @@
 
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
 #ifndef LV_OBJ_STYLE_CACHE
-    #ifdef _LV_KCONFIG_PRESENT
-        #ifdef CONFIG_LV_OBJ_STYLE_CACHE
-            #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
-        #else
-            #define LV_OBJ_STYLE_CACHE 0
-        #endif
+    #ifdef CONFIG_LV_OBJ_STYLE_CACHE
+        #define LV_OBJ_STYLE_CACHE CONFIG_LV_OBJ_STYLE_CACHE
     #else
-        #define  LV_OBJ_STYLE_CACHE 1
+        #define LV_OBJ_STYLE_CACHE 0
+    #endif
+#endif
+
+/* Add `id` field to `lv_obj_t` */
+#ifndef LV_USE_OBJ_ID
+    #ifdef CONFIG_LV_USE_OBJ_ID
+        #define LV_USE_OBJ_ID CONFIG_LV_USE_OBJ_ID
+    #else
+        #define LV_USE_OBJ_ID 0
+    #endif
+#endif
+
+/* Use lvgl builtin method for obj ID */
+#ifndef LV_USE_OBJ_ID_BUILTIN
+    #ifdef CONFIG_LV_USE_OBJ_ID_BUILTIN
+        #define LV_USE_OBJ_ID_BUILTIN CONFIG_LV_USE_OBJ_ID_BUILTIN
+    #else
+        #define LV_USE_OBJ_ID_BUILTIN 0
     #endif
 #endif
 

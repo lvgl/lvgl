@@ -36,11 +36,13 @@ static void update_src_info(lv_imgbtn_src_info_t * info, const void * src);
 /**********************
  *  STATIC VARIABLES
  **********************/
+
 const lv_obj_class_t lv_imgbtn_class = {
     .base_class = &lv_obj_class,
     .instance_size = sizeof(lv_imgbtn_t),
     .constructor_cb = lv_imgbtn_constructor,
     .event_cb = lv_imgbtn_event,
+    .name = "imgbtn",
 };
 
 /**********************

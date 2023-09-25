@@ -66,7 +66,8 @@ const lv_obj_class_t lv_label_class = {
     .width_def = LV_SIZE_CONTENT,
     .height_def = LV_SIZE_CONTENT,
     .instance_size = sizeof(lv_label_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "label",
 };
 
 /**********************
