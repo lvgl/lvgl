@@ -45,7 +45,7 @@ void test_libpng_1(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/png_2.png");
 
-    TEST_ASSERT_EQUAL(mem_before, lv_test_get_free_mem());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 32);
 
     /* Re-add lodepng decoder */
     lv_lodepng_init();

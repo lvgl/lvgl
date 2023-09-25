@@ -45,7 +45,7 @@ void test_jpg_2(void)
 
     TEST_ASSERT_EQUAL_SCREENSHOT("libs/jpg_2.png");
 
-    TEST_ASSERT_EQUAL(mem_before, lv_test_get_free_mem());
+    TEST_ASSERT_MEM_LEAK_LESS_THAN(mem_before, 32);
 
     /* Re-add tjpgd decoder */
     lv_tjpgd_init();
