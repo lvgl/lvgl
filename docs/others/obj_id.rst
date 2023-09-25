@@ -11,7 +11,7 @@ Usage
 
 Enable this feature by setting ``LV_USE_OBJ_ID`` to 1 in `lv_conf.h`.
 Use the builtin obj ID generator by setting ``LV_USE_OBJ_ID_BUILTIN`` to 1.
-Otherwise provide wer own custom implementation.
+Otherwise provide your own custom implementation.
 
 The ID is automatically generated and assigned to `obj->id` during obj's
 construction by calling API `lv_obj_assign_id(obj)` from ``lv_obj_constructor``.
