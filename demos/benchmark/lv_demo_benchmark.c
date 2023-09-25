@@ -50,6 +50,12 @@
 /**********************
  *      TYPEDEFS
  **********************/
+#define MAX_FRAMES 200
+
+typedef struct {
+    uint32_t elaps;
+    uint32_t px_num;
+} frame_prop_t;
 
 typedef struct {
     const char * name;
@@ -65,6 +71,13 @@ typedef struct {
     uint32_t fps_normal;
     uint32_t fps_opa;
     uint8_t weight;
+    uint32_t min_time_normal;
+    uint32_t min_time_opa;
+    uint32_t max_time_normal;
+    uint32_t max_time_opa;
+
+    frame_prop_t frame_prop_normal[MAX_FRAMES];
+    frame_prop_t frame_prop_opa[MAX_FRAMES];
 } scene_dsc_t;
 
 /**********************
@@ -711,6 +724,10 @@ void lv_demo_benchmark(void)
 {
     benchmark_init();
 
+    for(uint32_t i = 0; scenes[i].create_cb; i++) {
+        scenes[i].min_time_opa = UINT32_MAX;
+        scenes[i].min_time_normal = UINT32_MAX;
+    }
     /*Manually start scenes*/
     next_scene_timer_cb(NULL);
 }
@@ -788,6 +805,16 @@ static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px)
             scenes[scene_act].idle_pct_opa += idle;
             scenes[scene_act].idle_cnt_opa ++;
         }
+
+        scenes[scene_act].frame_prop_opa[scenes[scene_act].refr_cnt_opa - 1].elaps = time;
+        scenes[scene_act].frame_prop_opa[scenes[scene_act].refr_cnt_opa - 1].px_num = px;
+
+        if(time < scenes[scene_act].min_time_opa) {
+            scenes[scene_act].min_time_opa = time;
+        }
+        if(time > scenes[scene_act].max_time_opa) {
+            scenes[scene_act].max_time_opa = time;
+        }
     }
     else {
         scenes[scene_act].refr_cnt_normal ++;
@@ -799,6 +826,16 @@ static void monitor_cb(lv_disp_drv_t * drv, uint32_t time, uint32_t px)
         if((idle != 0) && (idle != prev_idle || scenes[scene_act].idle_cnt_normal == 0)) {
             scenes[scene_act].idle_pct_normal += idle;
             scenes[scene_act].idle_cnt_normal ++;
+        }
+
+        scenes[scene_act].frame_prop_normal[scenes[scene_act].refr_cnt_normal - 1].elaps = time;
+        scenes[scene_act].frame_prop_normal[scenes[scene_act].refr_cnt_normal - 1].px_num = px;
+
+        if(time < scenes[scene_act].min_time_normal) {
+            scenes[scene_act].min_time_normal = time;
+        }
+        if(time > scenes[scene_act].max_time_normal) {
+            scenes[scene_act].max_time_normal = time;
         }
     }
     prev_idle = idle;
@@ -815,6 +852,7 @@ static void generate_report(void)
     uint32_t fps_opa_sum = 0;
     uint32_t i;
     uint32_t cpu_load = 0;
+    uint32_t frame_time = 0;
 
     for(i = 0; scenes[i].create_cb; i++) {
         fps_normal_sum += scenes[i].fps_normal * scenes[i].weight;
@@ -854,11 +892,14 @@ static void generate_report(void)
     lv_coord_t w = lv_obj_get_content_width(lv_scr_act());
     lv_obj_t * table = lv_table_create(lv_scr_act());
     //        lv_obj_clean_style_list(table, LV_PART_MAIN);
-    lv_table_set_col_cnt(table, 3);
+    lv_table_set_col_cnt(table, 6);
 
-    lv_table_set_col_width(table, 0, w / 2);
-    lv_table_set_col_width(table, 1, w  / 4);
-    lv_table_set_col_width(table, 2, w  / 4);
+    lv_table_set_col_width(table, 0, 2 * w / 7);
+    lv_table_set_col_width(table, 1,     w / 7);
+    lv_table_set_col_width(table, 2,     w / 7);
+    lv_table_set_col_width(table, 3,     w / 7);
+    lv_table_set_col_width(table, 4,     w / 7);
+    lv_table_set_col_width(table, 5,     w / 7);
     lv_obj_set_width(table, lv_pct(100));
 
     //        static lv_style_t style_cell_slow;
@@ -911,6 +952,10 @@ static void generate_report(void)
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32"%% CPU", cpu_load);
             lv_table_set_cell_value(table, row, 2, buf);
 
+            frame_time = scenes[i].time_sum_normal / scenes[i].refr_cnt_normal;
+            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", frame_time);
+            lv_table_set_cell_value(table, row, 3, buf);
+
             row++;
         }
 
@@ -930,6 +975,10 @@ static void generate_report(void)
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32"%% CPU", cpu_load);
             lv_table_set_cell_value(table, row, 2, buf);
 
+            frame_time = scenes[i].time_sum_opa / scenes[i].refr_cnt_opa;
+            lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", frame_time);
+            lv_table_set_cell_value(table, row, 3, buf);
+
             row++;
         }
     }
@@ -944,6 +993,15 @@ static void generate_report(void)
     lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
     lv_table_set_cell_value(table, row, 0, "All cases");
     //        lv_table_set_cell_type(table, row, 0, 4);
+    row++;
+
+    lv_table_add_cell_ctrl(table, row, 0, LV_TABLE_CELL_CTRL_MERGE_RIGHT);
+    lv_table_set_cell_value(table, row, 0, "Test Name");
+    lv_table_set_cell_value(table, row, 1, "FPS");
+    lv_table_set_cell_value(table, row, 2, "CPU Load");
+    lv_table_set_cell_value(table, row, 3, "Medium time");
+    lv_table_set_cell_value(table, row, 4, "Min time");
+    lv_table_set_cell_value(table, row, 5, "Max time");
     row++;
 
     for(i = 0; scenes[i].create_cb; i++) {
@@ -967,9 +1025,22 @@ static void generate_report(void)
         lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32"%% CPU", cpu_load);
         lv_table_set_cell_value(table, row, 2, buf);
 
-        LV_LOG("%s: %"LV_PRIu32" FPS, %"LV_PRIu32"%% CPU\r\n",
-               scenes[i].name, scenes[i].fps_normal, cpu_load);
+        frame_time = scenes[i].time_sum_normal / scenes[i].refr_cnt_normal;
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", frame_time);
+        lv_table_set_cell_value(table, row, 3, buf);
 
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", scenes[i].min_time_normal);
+        lv_table_set_cell_value(table, row, 4, buf);
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", scenes[i].max_time_normal);
+        lv_table_set_cell_value(table, row, 5, buf);
+
+        LV_LOG("%s:%"LV_PRIu32":%"LV_PRIu32":%"LV_PRIu32":%"LV_PRIu32":%"LV_PRIu32"%\r",
+               scenes[i].name, scenes[i].fps_normal, cpu_load, frame_time, scenes[i].min_time_normal, scenes[i].max_time_normal);
+
+        for(uint32_t j = 0; j < 10; j++) {
+            LV_LOG("%s:%"LV_PRIu32" us, %"LV_PRIu32" px%\r",
+                   scenes[i].name, scenes[i].frame_prop_normal[j].elaps, scenes[i].frame_prop_normal[j].px_num);
+        }
         row++;
 
         lv_snprintf(buf, sizeof(buf), "%s + opa", scenes[i].name);
@@ -994,9 +1065,22 @@ static void generate_report(void)
         lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32"%% CPU", cpu_load);
         lv_table_set_cell_value(table, row, 2, buf);
 
-        LV_LOG("%s + opa: %"LV_PRIu32" FPS, %"LV_PRIu32"%% CPU\r\n",
-               scenes[i].name, scenes[i].fps_opa, cpu_load);
+        frame_time = scenes[i].time_sum_opa / scenes[i].refr_cnt_opa;
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", frame_time);
+        lv_table_set_cell_value(table, row, 3, buf);
 
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", scenes[i].min_time_opa);
+        lv_table_set_cell_value(table, row, 4, buf);
+        lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32" us", scenes[i].max_time_opa);
+        lv_table_set_cell_value(table, row, 5, buf);
+
+        LV_LOG("%s + opa:%"LV_PRIu32":%"LV_PRIu32":%"LV_PRIu32":%"LV_PRIu32":%"LV_PRIu32"%\r",
+               scenes[i].name, scenes[i].fps_opa, cpu_load, frame_time, scenes[i].min_time_opa, scenes[i].max_time_opa);
+
+        for(uint32_t j = 0; j < 10; j++) {
+            LV_LOG("%s:%"LV_PRIu32" us, %"LV_PRIu32" px%\r",
+                   scenes[i].name, scenes[i].frame_prop_opa[j].elaps, scenes[i].frame_prop_opa[j].px_num);
+        }
         row++;
     }
 
