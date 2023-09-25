@@ -512,26 +512,25 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
 
         int16_t deg_range = bg_end - arc->bg_angle_start;
-
         int16_t last_angle_rel = arc->last_angle - arc->bg_angle_start;
         int16_t delta_angle = angle - last_angle_rel;
 
         /*Do not allow big jumps.
          *It's mainly to avoid jumping to the opposite end if the "dead" range between min. and max. is crossed.
          *Check which end was closer on the last valid press (arc->min_close) and prefer that end*/
-        if(LV_ABS(delta_angle) > 280) {
+        const uint16_t middle_point = (arc->bg_angle_end - arc->bg_angle_start) / 2U;
+        if(LV_ABS(delta_angle) > middle_point) {
             if(arc->min_close) angle = 0;
             else angle = deg_range;
         }
-        else {
-            if(angle < deg_range / 2)arc->min_close = 1;
-            else arc->min_close = 0;
-        }
+        else { /* Nothing to do */ }
 
         /*Calculate the slew rate limited angle based on change rate (degrees/sec)*/
         delta_angle = angle - last_angle_rel;
+
         uint32_t delta_tick = lv_tick_elaps(arc->last_tick);
-        int16_t delta_angle_max = (arc->chg_rate * delta_tick) / 1000;
+        /* delta_angle_max can never be signed. delta_tick is always signed, same for ch_rate */
+        const uint16_t delta_angle_max = (arc->chg_rate * delta_tick) / 1000;
 
         if(delta_angle > delta_angle_max) {
             delta_angle = delta_angle_max;
@@ -539,6 +538,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(delta_angle < -delta_angle_max) {
             delta_angle = -delta_angle_max;
         }
+        else { /* Nothing to do */ }
 
         angle = last_angle_rel + delta_angle; /*Apply the limited angle change*/
 
@@ -555,7 +555,6 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(arc->type == LV_ARC_MODE_REVERSE) {
             new_value = arc->max_value - new_value + arc->min_value;
         }
-
 
         if(new_value != lv_arc_get_value(obj)) {
             arc->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
