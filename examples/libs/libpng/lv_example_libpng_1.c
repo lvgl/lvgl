@@ -1,5 +1,7 @@
 #include "../../lv_examples.h"
-#if LV_USE_LIBPNG && LV_USE_IMG && LV_BUILD_EXAMPLES
+#if LV_BUILD_EXAMPLES
+
+#if LV_USE_LIBPNG
 
 /**
  * Open a PNG image from a file
@@ -14,5 +16,16 @@ void lv_example_libpng_1(void)
     lv_image_set_src(img, "A:lvgl/examples/libs/libpng/png_demo.png");
     lv_obj_center(img);
 }
+
+#else
+
+void lv_example_libpng_1(void)
+{
+    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_label_set_text(label, "LibPNG is not installed");
+    lv_obj_center(label);
+}
+
+#endif
 
 #endif
