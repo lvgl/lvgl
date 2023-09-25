@@ -2435,13 +2435,6 @@
             #define LV_LINUX_FBDEV_BSD           0
         #endif
     #endif
-    #ifndef LV_LINUX_FBDEV_NUTTX
-        #ifdef CONFIG_LV_LINUX_FBDEV_NUTTX
-            #define LV_LINUX_FBDEV_NUTTX CONFIG_LV_LINUX_FBDEV_NUTTX
-        #else
-            #define LV_LINUX_FBDEV_NUTTX         0
-        #endif
-    #endif
     #ifndef LV_LINUX_FBDEV_RENDER_MODE
         #ifdef CONFIG_LV_LINUX_FBDEV_RENDER_MODE
             #define LV_LINUX_FBDEV_RENDER_MODE CONFIG_LV_LINUX_FBDEV_RENDER_MODE
@@ -2462,6 +2455,14 @@
         #else
             #define LV_LINUX_FBDEV_BUFFER_SIZE   60
         #endif
+    #endif
+#endif
+
+#ifndef LV_USE_NUTTX_FBDEV
+    #ifdef CONFIG_LV_USE_NUTTX_FBDEV
+        #define LV_USE_NUTTX_FBDEV CONFIG_LV_USE_NUTTX_FBDEV
+    #else
+        #define LV_USE_NUTTX_FBDEV     0
     #endif
 #endif
 

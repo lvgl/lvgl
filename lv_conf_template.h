@@ -745,11 +745,12 @@
 #define LV_USE_LINUX_FBDEV      0
 #if LV_USE_LINUX_FBDEV
     #define LV_LINUX_FBDEV_BSD           0
-    #define LV_LINUX_FBDEV_NUTTX         0
     #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
     #define LV_LINUX_FBDEV_BUFFER_COUNT  0
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
 #endif
+
+#define LV_USE_NUTTX_FBDEV     0
 
 /*Driver for /dev/lcd*/
 #define LV_USE_NUTTX_LCD      0

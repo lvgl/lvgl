@@ -1190,10 +1190,6 @@ menu "LVGL configuration"
 			bool "Use BSD flavored framebuffer device"
 			depends on LV_USE_LINUX_FBDEV
 			default n
-		config LV_LINUX_FBDEV_NUTTX
-			bool "Use NuttX flavored framebuffer device"
-			depends on LV_USE_LINUX_FBDEV
-			default n
 
 		choice
 			prompt "Framebuffer device render mode"
@@ -1246,6 +1242,10 @@ menu "LVGL configuration"
 			int "Custom partial buffer size (in number of rows)"
 			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
 			default 60
+
+		config LV_USE_NUTTX_FBDEV
+			bool "Use Nuttx framebuffer device"
+			default n
 
 		config LV_USE_NUTTX_LCD
 			bool "Use NuttX LCD device"
