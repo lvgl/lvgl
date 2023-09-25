@@ -489,17 +489,28 @@
             #define LV_LOG_TRACE_ANIM       1
         #endif
     #endif
-	#ifndef LV_LOG_TRACE_MSG
-	    #ifdef _LV_KCONFIG_PRESENT
-	        #ifdef CONFIG_LV_LOG_TRACE_MSG
-	            #define LV_LOG_TRACE_MSG CONFIG_LV_LOG_TRACE_MSG
-	        #else
-	            #define LV_LOG_TRACE_MSG 0
-	        #endif
-	    #else
-	        #define LV_LOG_TRACE_MSG		1
-	    #endif
-	#endif
+    #ifndef LV_LOG_TRACE_MSG
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LOG_TRACE_MSG
+                #define LV_LOG_TRACE_MSG CONFIG_LV_LOG_TRACE_MSG
+            #else
+                #define LV_LOG_TRACE_MSG 0
+            #endif
+        #else
+            #define LV_LOG_TRACE_MSG        1
+        #endif
+    #endif
+    #ifndef LV_LOG_TRACE_CACHE
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LOG_TRACE_CACHE
+                #define LV_LOG_TRACE_CACHE CONFIG_LV_LOG_TRACE_CACHE
+            #else
+                #define LV_LOG_TRACE_CACHE 0
+            #endif
+        #else
+            #define LV_LOG_TRACE_CACHE      1
+        #endif
+    #endif
 
 #endif  /*LV_USE_LOG*/
 
@@ -2414,7 +2425,7 @@
                 #define LV_SDL_DIRECT_EXIT 0
             #endif
         #else
-            #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
+            #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
         #endif
     #endif
 #endif

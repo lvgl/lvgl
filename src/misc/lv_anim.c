@@ -45,9 +45,9 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
  *      MACROS
  **********************/
 #if LV_LOG_TRACE_ANIM
-    #define TRACE_ANIM(...) LV_LOG_TRACE(__VA_ARGS__)
+    #define LV_TRACE_ANIM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define TRACE_ANIM(...)
+    #define LV_TRACE_ANIM(...)
 #endif
 
 
@@ -77,7 +77,7 @@ void lv_anim_init(lv_anim_t * a)
 
 lv_anim_t * lv_anim_start(const lv_anim_t * a)
 {
-    TRACE_ANIM("begin");
+    LV_TRACE_ANIM("begin");
 
     /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*exec_cb == NULL would delete all animations of var*/
@@ -108,7 +108,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
      *It's important if it happens in a ready callback. (see `anim_timer`)*/
     anim_mark_list_change();
 
-    TRACE_ANIM("finished");
+    LV_TRACE_ANIM("finished");
     return new_anim;
 }
 
