@@ -5,7 +5,7 @@ Grid
 Overview
 ********
 
-The Grid layout is a subset of `CSS Flexbox <https://css-tricks.com/snippets/css/complete-guide-grid/>`__.
+The Grid layout is a subset of `CSS Grid <https://css-tricks.com/snippets/css/complete-guide-grid/>`__.
 
 It can arrange items into a 2D "table" that has rows or columns
 (tracks). The item can span through multiple columns or rows. The
@@ -98,6 +98,24 @@ If there are some empty space the track can be aligned several ways:
 
 To set the track's alignment use
 :c:expr:`lv_obj_set_grid_align(obj, column_align, row_align)`.
+
+
+Sub grid
+--------
+
+If you set the column and/or row grid descriptors of a widget to ``NULL`` it will use the grid descriptor(s) from it's parent.
+For example if you create a grid item on 2..6 columns and 1..3 rows of the parent,
+the grid item will see 5 columns and 4 rows with the corresponding track size from the parent.
+
+This way even if a wrapper item is used on the grid and can be made "transparent"  from the grid's point of view.
+
+Limitations:
+
+- The sub grid is resolved only in one level depth. That is a grid can have a sub grid children, but a sub grid can't have an other sub grid.
+- ``LV_GRID_CONTENT`` tracks on the are not handled in the sub grid, only in the its own grid.
+
+The sub grid feature works the same as in CSS. For further reference see `this description <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_grid_layout/Subgrid>`__.
+
 
 Style interface
 ***************
