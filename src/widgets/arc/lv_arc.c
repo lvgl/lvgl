@@ -905,12 +905,22 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
     lv_arc_t * arc = (lv_arc_t *)obj;
 
     /* Angle is between both background angles */
-    if((arc->bg_angle_end - arc->bg_angle_start) >= angle) {
+    if(angle <= (arc->bg_angle_end - arc->bg_angle_start)) {
+
+        if(((arc->bg_angle_end - arc->bg_angle_start) / 2U) >= angle) {
+            arc->min_close = 1;
+        }
+        else {
+            arc->min_close = 0;
+        }
+
         return true;
     }
     /* Distance between background start and end angles is less than tolerance */
     else if(((arc->bg_angle_start - tolerance_deg) <= 0U) &&
             (360U - (arc->bg_angle_end + (arc->bg_angle_start - tolerance_deg)))) {
+
+        arc->min_close = 1;
         return true;
     }
 
@@ -927,6 +937,7 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
        /* (360° - T) --- A --- 360° */
        && ((angle >= (360U - tolerance_deg)) && (angle <= 360U))) {
 
+        arc->min_close = 1;
         return true;
     }
     /* Tolerance is bigger than bg start angle */
@@ -934,6 +945,7 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
             /* (360° - (T - S)) --- A --- 360° */
             && (((360U - (tolerance_deg - arc->bg_angle_start)) <= angle)) && (angle <= 360U)) {
 
+        arc->min_close = 1;
         return true;
     }
     /* 360° is bigger than background end angle + tolerance */
@@ -942,6 +954,7 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
             && ((arc->bg_angle_end <= (angle + arc->bg_angle_start)) &&
                 ((angle + arc->bg_angle_start) <= (arc->bg_angle_end + tolerance_deg)))) {
 
+        arc->min_close = 0;
         return true;
     }
     /* Background end angle + tolerance is bigger than 360° and bg_start_angle + tolerance is not near 0° + ((bg_end_angle + tolerance) - 360°)
@@ -949,6 +962,7 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
     else if((360U < (arc->bg_angle_end + tolerance_deg))
             && (angle <= 0U + ((arc->bg_angle_end + tolerance_deg) - 360U)) && (angle > arc->bg_angle_end)) {
 
+        arc->min_close = 0;
         return true;
     }
     else {
