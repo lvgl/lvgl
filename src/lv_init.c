@@ -19,6 +19,7 @@
 #include "libs/tjpgd/lv_tjpgd.h"
 #include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
 #include "libs/lodepng/lv_lodepng.h"
+#include "libs/libpng/lv_libpng.h"
 #include "draw/lv_draw.h"
 #include "misc/lv_cache.h"
 #include "misc/lv_cache_builtin.h"
@@ -232,6 +233,10 @@ void lv_init(void)
 
 #if LV_USE_LODEPNG
     lv_lodepng_init();
+#endif
+
+#if LV_USE_LIBPNG
+    lv_libpng_init();
 #endif
 
 #if LV_USE_TJPGD

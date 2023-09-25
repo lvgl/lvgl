@@ -62,6 +62,7 @@
 #define LV_FS_MEMFS_LETTER  'M'
 
 #define LV_USE_LODEPNG      1
+#define LV_USE_LIBPNG       1
 #define LV_USE_BMP          1
 #define LV_USE_TJPGD        1
 #define LV_USE_LIBJPEG_TURBO   1

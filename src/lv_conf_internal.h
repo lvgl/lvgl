@@ -1943,6 +1943,15 @@
     #endif
 #endif
 
+/*PNG decoder(libpng) library*/
+#ifndef LV_USE_LIBPNG
+    #ifdef CONFIG_LV_USE_LIBPNG
+        #define LV_USE_LIBPNG CONFIG_LV_USE_LIBPNG
+    #else
+        #define LV_USE_LIBPNG 0
+    #endif
+#endif
+
 /*BMP decoder library*/
 #ifndef LV_USE_BMP
     #ifdef CONFIG_LV_USE_BMP
