@@ -268,6 +268,16 @@ void lv_timer_set_repeat_count(lv_timer_t * timer, int32_t repeat_count)
 }
 
 /**
+ * Set custom parameter to the lv_timer.
+ * @param timer pointer to a lv_timer.
+ * @param user_data custom parameter
+ */
+void lv_timer_set_user_data(lv_timer_t * timer, void * user_data)
+{
+    timer->user_data = user_data;
+}
+
+/**
  * Reset a lv_timer.
  * It will be called the previously set period milliseconds later.
  * @param timer pointer to a lv_timer.
