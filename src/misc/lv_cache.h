@@ -153,7 +153,7 @@ void _lv_cache_init(void);
  * Replace cache manager module
  * @param new_cache_manager     the new cache manager with callback functions set
  */
-void lv_cache_replace_manager(lv_cache_manager_t *new_cache_manager);
+void lv_cache_replace_manager(lv_cache_manager_t * new_cache_manager);
 
 /**
  * Add a new entry to the cache with the given size.

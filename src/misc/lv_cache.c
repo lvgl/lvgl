@@ -42,7 +42,7 @@ void _lv_cache_init(void)
     lv_mutex_init(&_cache_manager.mutex);
 }
 
-void lv_cache_replace_manager(lv_cache_manager_t *new_cache_manager)
+void lv_cache_replace_manager(lv_cache_manager_t * new_cache_manager)
 {
     LV_ASSERT(_cache_manager.locked);
     if(new_cache_manager == NULL) return;
