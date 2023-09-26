@@ -951,7 +951,7 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
 {
     LV_PROFILER_BEGIN;
     LV_TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
-               	  (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2, (void *)px_map);
+                (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2, (void *)px_map);
 
     lv_area_t offset_area = {
         .x1 = area->x1 + disp->offset_x,
