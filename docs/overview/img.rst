@@ -395,8 +395,8 @@ The size of cache (in bytes) can be defined with
 no image is cached.
 
 The size of cache can be changed at run-time with
-:cpp:expr:`lv_cache_set_max_size(bytes)`, 
-and can be get with :cpp:expr:`lv_cache_get_max_size(bytes)`.
+:cpp:expr:`lv_cache_set_max_size(size_t size)`, 
+and get with :cpp:expr:`lv_cache_get_max_size()`.
 
 Value of images
 ---------------
