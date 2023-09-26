@@ -1,5 +1,5 @@
 /**
- * @file lv_image_cache.c
+ * @file lv_cache_builtin.c
  *
  */
 
@@ -31,6 +31,7 @@ static void invalidate_cb(lv_cache_entry_t * entry);
 static const void * get_data_cb(lv_cache_entry_t * entry);
 static void release_cb(lv_cache_entry_t * entry);
 static void set_max_size_cb(size_t new_size);
+static void empty_cb(void);
 static bool drop_youngest(void);
 
 /**********************
@@ -40,7 +41,7 @@ static bool drop_youngest(void);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_CACHE
+#if LV_USE_LOG && LV_LOG_TRACE_CACHE
     #define LV_TRACE_CACHE(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define LV_TRACE_CACHE(...)
@@ -52,15 +53,16 @@ static bool drop_youngest(void);
 
 void _lv_cache_builtin_init(void)
 {
-    lv_memzero(&_cache_manager, sizeof(lv_cache_manager_t));
+    lv_memzero(&dsc, sizeof(lv_cache_builtin_dsc_t));
+    _lv_ll_init(&dsc.entry_ll, sizeof(lv_cache_entry_t));
+
     _cache_manager.add_cb = add_cb;
     _cache_manager.find_cb = find_cb;
     _cache_manager.invalidate_cb = invalidate_cb;
     _cache_manager.get_data_cb = get_data_cb;
     _cache_manager.release_cb = release_cb;
     _cache_manager.set_max_size_cb = set_max_size_cb;
-
-    _lv_ll_init(&dsc.entry_ll, sizeof(lv_cache_entry_t));
+    _cache_manager.empty_cb = empty_cb;
 }
 
 /**********************
@@ -125,7 +127,7 @@ static void invalidate_cb(lv_cache_entry_t * entry)
     if(entry == NULL) return;
 
     dsc.cur_size -= entry->data_size;
-    LV_TRACE_CACHE("Drop cache: %lu bytes", (unsigned long)entry->data_size);
+    LV_TRACE_CACHE("Drop cache: %u bytes", (uint32_t)entry->data_size);
 
     if(entry->free_src) lv_free((void *)entry->src);
     if(entry->free_data) lv_draw_buf_free((void *)entry->data);
@@ -171,6 +173,17 @@ static void set_max_size_cb(size_t new_size)
         /*No item could be dropped.
          *It can happen because the usage_count of the remaining items are not zero.*/
         if(ret == false) return;
+    }
+}
+
+static void empty_cb(void)
+{
+    lv_cache_entry_t * entry_to_drop = NULL;
+    lv_cache_entry_t * entry = _lv_ll_get_head(&dsc.entry_ll);
+    while(entry) {
+        entry_to_drop = entry;
+        entry = _lv_ll_get_next(&dsc.entry_ll, entry);
+        invalidate_cb(entry_to_drop);
     }
 }
 

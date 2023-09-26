@@ -17,7 +17,7 @@ Variables
 ---------
 
 Images stored internally in a variable are composed mainly of an
-:cpp:struct:`lv_img_dsc_t` structure with the following fields:
+:cpp:struct:`lv_image_dsc_t` structure with the following fields:
 
 - **header**:
 
@@ -136,16 +136,16 @@ variable to display it using LVGL. For example:
 
    uint8_t my_img_data[] = {0x00, 0x01, 0x02, ...};
 
-   static lv_img_dsc_t my_img_dsc = {
+   static lv_image_dsc_t my_img_dsc = {
        .header.always_zero = 0,
        .header.w = 80,
        .header.h = 60,
        .data_size = 80 * 60 * LV_COLOR_DEPTH / 8,
-       .header.cf = LV_IMG_CF_TRUE_COLOR,          /*Set the color format*/
+       .header.cf = LV_COLOR_FORMAT_NATIVE,          /*Set the color format*/
        .data = my_img_data,
    };
 
-If the color format is :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA` you can set
+If the color format is :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA` you can set
 ``data_size`` like ``80 * 60 *`` :cpp:enumerator:`LV_IMG_PX_SIZE_ALPHA_BYTE`.
 
 Another (possibly simpler) option to create and display an image at
@@ -159,13 +159,13 @@ The simplest way to use an image in LVGL is to display it with an
 
 .. code:: c
 
-   lv_obj_t * icon = lv_img_create(lv_scr_act(), NULL);
+   lv_obj_t * icon = lv_image_create(lv_scr_act(), NULL);
 
    /*From variable*/
-   lv_img_set_src(icon, &my_icon_dsc);
+   lv_image_set_src(icon, &my_icon_dsc);
 
    /*From file*/
-   lv_img_set_src(icon, "S:my_icon.bin");
+   lv_image_set_src(icon, "S:my_icon.bin");
 
 If the image was converted with the online converter, you should use
 :cpp:expr:`LV_IMG_DECLARE(my_icon_dsc)` to declare the image in the file where
@@ -242,10 +242,10 @@ open/close the PNG files. It should look like this:
 .. code:: c
 
    /*Create a new decoder and register functions */
-   lv_img_decoder_t * dec = lv_img_decoder_create();
-   lv_img_decoder_set_info_cb(dec, decoder_info);
-   lv_img_decoder_set_open_cb(dec, decoder_open);
-   lv_img_decoder_set_close_cb(dec, decoder_close);
+   lv_image_decoder_t * dec = lv_image_decoder_create();
+   lv_image_decoder_set_info_cb(dec, decoder_info);
+   lv_image_decoder_set_open_cb(dec, decoder_open);
+   lv_image_decoder_set_close_cb(dec, decoder_close);
 
 
    /**
@@ -255,7 +255,7 @@ open/close the PNG files. It should look like this:
     * @param header store the info here
     * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
     */
-   static lv_res_t decoder_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+   static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
    {
      /*Check whether the type `src` is known by the decoder*/
      if(is_png(src) == false) return LV_RES_INV;
@@ -263,7 +263,7 @@ open/close the PNG files. It should look like this:
      /* Read the PNG header and find `width` and `height` */
      ...
 
-     header->cf = LV_IMG_CF_RAW_ALPHA;
+     header->cf = LV_COLOR_FORMAT_RAW_ALPHA;
      header->w = width;
      header->h = height;
    }
@@ -274,7 +274,7 @@ open/close the PNG files. It should look like this:
     * @param dsc pointer to a descriptor which describes this decoding session
     * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
     */
-   static lv_res_t decoder_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+   static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
    {
 
      /*Check whether the type `src` is known by the decoder*/
@@ -284,10 +284,10 @@ open/close the PNG files. It should look like this:
      dsc->img_data = my_png_decoder(src);
 
      /*Change the color format if required. For PNG usually 'Raw' is fine*/
-     dsc->header.cf = LV_IMG_CF_...
+     dsc->header.cf = LV_COLOR_FORMAT_...
 
      /*Call a built in decoder function if required. It's not required if`my_png_decoder` opened the image in true color format.*/
-     lv_res_t res = lv_img_decoder_built_in_open(decoder, dsc);
+     lv_res_t res = lv_image_decoder_built_in_open(decoder, dsc);
 
      return res;
    }
@@ -303,7 +303,7 @@ open/close the PNG files. It should look like this:
     * @param buf a buffer to store the decoded pixels
     * @return LV_RES_OK: ok; LV_RES_INV: failed
     */
-   lv_res_t decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
+   lv_res_t decoder_built_in_read_line(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_coord_t x,
                                                      lv_coord_t y, lv_coord_t len, uint8_t * buf)
    {
       /*With PNG it's usually not required*/
@@ -317,12 +317,12 @@ open/close the PNG files. It should look like this:
     * @param decoder pointer to the decoder where this function belongs
     * @param dsc pointer to a descriptor which describes this decoding session
     */
-   static void decoder_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+   static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
    {
      /*Free all allocated data*/
 
      /*Call the built-in close function if the built-in open/read_line was used*/
-     lv_img_decoder_built_in_close(decoder, dsc);
+     lv_image_decoder_built_in_close(decoder, dsc);
 
    }
 
@@ -348,8 +348,8 @@ Manually use an image decoder
 
 LVGL will use registered image decoders automatically if you try and
 draw a raw image (i.e. using the ``lv_img`` object) but you can use them
-manually too. Create an :cpp:type:`lv_img_decoder_dsc_t` variable to describe
-the decoding session and call :cpp:func:`lv_img_decoder_open`.
+manually too. Create an :cpp:type:`lv_image_decoder_dsc_t` variable to describe
+the decoding session and call :cpp:func:`lv_image_decoder_open`.
 
 The ``color`` parameter is used only with ``LV_IMG_CF_ALPHA_1/2/4/8BIT``
 images to tell color of the image. ``frame_id`` can be used if the image
@@ -359,12 +359,12 @@ to open is an animation.
 
 
    lv_res_t res;
-   lv_img_decoder_dsc_t dsc;
-   res = lv_img_decoder_open(&dsc, &my_img_dsc, color, frame_id);
+   lv_image_decoder_dsc_t dsc;
+   res = lv_image_decoder_open(&dsc, &my_img_dsc, color, frame_id);
 
    if(res == LV_RES_OK) {
      /*Do something with `dsc->img_data`*/
-     lv_img_decoder_close(&dsc);
+     lv_image_decoder_close(&dsc);
    }
 
 .. _image-caching:
@@ -390,12 +390,13 @@ a relatively fast storage medium.
 Cache size
 ----------
 
-The number of cache entries can be defined with
-:c:macro:`LV_IMG_CACHE_DEF_SIZE` in *lv_conf.h*. The default value is 1 so only
-the most recently used image will be left open.
+The size of cache (in bytes) can be defined with
+:c:macro:`LV_CACHE_DEF_SIZE` in *lv_conf.h*. The default value is 0, so 
+no image is cached.
 
-The size of the cache can be changed at run-time with
-:cpp:expr:`lv_img_cache_set_size(entry_num)`.
+The size of cache can be changed at run-time with
+:cpp:expr:`lv_cache_set_max_size(size_t size)`, 
+and get with :cpp:expr:`lv_cache_get_max_size()`.
 
 Value of images
 ---------------
@@ -435,55 +436,74 @@ to cache even the largest images at the same time.
 Clean the cache
 ---------------
 
-Let's say you have loaded a PNG image into a :cpp:struct:`lv_img_dsc_t` ``my_png``
-variable and use it in an ``lv_img`` object. If the image is already
+Let's say you have loaded a PNG image into a :cpp:struct:`lv_image_dsc_t` ``my_png``
+variable and use it in an ``lv_image`` object. If the image is already
 cached and you then change the underlying PNG file, you need to notify
 LVGL to cache the image again. Otherwise, there is no easy way of
 detecting that the underlying file changed and LVGL will still draw the
 old image from cache.
 
-To do this, use :cpp:expr:`lv_img_cache_invalidate_src(&my_png)`. If ``NULL`` is
-passed as a parameter, the whole cache will be cleaned.
+To do this, use :cpp:expr:`lv_cache_invalidate(lv_cache_find(&my_png, LV_CACHE_SRC_TYPE_PTR, 0, 0));`.
 
 Custom cache algorithm
 ----------------------
 
 If you want to implement your own cache algorithm, you can refer to the
-following code to replace the LVGL built-in image cache manager:
+following code to replace the LVGL built-in cache manager:
 
 .. code:: c
 
-   static _lv_img_cache_entry_t * my_img_cache_open(const void * src, lv_color_t color, int32_t frame_id)
+   static lv_cache_entry_t * my_cache_add_cb(size_t size)
    {
      ...
    }
 
-   static void my_img_cache_set_size(uint16_t new_entry_cnt)
+   static lv_cache_entry_t * my_cache_find_cb(const void * src, lv_cache_src_type_t src_type, uint32_t param1, uint32_t param2)
    {
      ...
    }
 
-   static void my_img_cache_invalidate_src(const void * src)
+   static void my_cache_invalidate_cb(lv_cache_entry_t * entry)
    {
      ...
    }
 
-   void my_img_cache_init(void)
+   static const void * my_cache_get_data_cb(lv_cache_entry_t * entry)
    {
-     /* Before replacing the image cache manager,
-      * you should ensure that all caches are cleared to prevent memory leaks.
-      */
-     lv_img_cache_invalidate_src(NULL);
+     ...
+   }
 
-     /*Initialize image cache manager.*/
-     lv_img_cache_manager_t manager;
-     lv_img_cache_manager_init(&manager);
-     manager.open_cb = my_img_cache_open;
-     manager.set_size_cb = my_img_cache_set_size;
-     manager.invalidate_src_cb = my_img_cache_invalidate_src;
+   static void my_cache_release_cb(lv_cache_entry_t * entry)
+   {
+     ...
+   }
 
-     /*Apply image cache manager to LVGL.*/
-     lv_img_cache_manager_apply(&manager);
+   static void my_cache_set_max_size_cb(size_t new_size)
+   {
+     ...
+   }
+
+   static void my_cache_empty_cb(void)
+   {
+     ...
+   }
+
+   void my_cache_init(void)
+   {
+    /*Initialize new cache manager.*/
+    lv_cache_manager_t my_manager;
+    my_manager.add_cb = my_cache_add_cb;
+    my_manager.find_cb = my_cache_find_cb;
+    my_manager.invalidate_cb = my_cache_invalidate_cb;
+    my_manager.get_data_cb = my_cache_get_data_cb;
+    my_manager.release_cb = my_cache_release_cb;
+    my_manager.set_max_size_cb = my_cache_set_max_size_cb;
+    my_manager.empty_cb = my_cache_empty_cb;
+
+    /*Replace existing cache manager with the new one.*/
+    lv_cache_lock();
+    lv_cache_replace_manager(&my_manager);
+    lv_cache_unlock();
    }
 
 API
