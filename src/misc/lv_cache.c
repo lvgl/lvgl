@@ -42,6 +42,25 @@ void _lv_cache_init(void)
     lv_mutex_init(&_cache_manager.mutex);
 }
 
+void lv_cache_replace_manager(lv_cache_manager_t *new_cache_manager)
+{
+    LV_ASSERT(_cache_manager.locked);
+    if(new_cache_manager == NULL) return NULL;
+    
+    if(_cache_manager.empty_cb != NULL) _cache_manager.empty_cb();
+    else if(_cache_manager.set_max_size_cb != NULL) _cache_manager.set_max_size_cb(0);
+
+    _cache_manager.add_cb = new_cache_manager->add_cb;
+    _cache_manager.find_cb = new_cache_manager->find_cb;
+    _cache_manager.invalidate_cb = new_cache_manager->invalidate_cb;
+    _cache_manager.get_data_cb = new_cache_manager->get_data_cb;
+    _cache_manager.release_cb = new_cache_manager->release_cb;
+    _cache_manager.set_max_size_cb = new_cache_manager->set_max_size_cb;
+    _cache_manager.empty_cb = new_cache_manager->empty_cb;
+
+    if(_cache_manager.set_max_size_cb != NULL) _cache_manager.set_max_size_cb(_cache_manager.max_size);
+}
+
 lv_cache_entry_t * lv_cache_add(size_t size)
 {
     LV_ASSERT(_cache_manager.locked);
