@@ -474,7 +474,7 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_layer_t * layer, const lv_a
             label_cord.x2 = label_cord.x1 + label_size.x;
             label_cord.y2 = label_cord.y1 + label_size.y;
 
-            lv_draw_label(layer, &label_dsc, &label_cord);
+            lv_draw_label(layer, &label_dsc_tmp, &label_cord);
         }
 
         line_dsc.p1 = p_outer;
