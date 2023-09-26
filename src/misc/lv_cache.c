@@ -46,7 +46,7 @@ void lv_cache_replace_manager(lv_cache_manager_t * new_cache_manager)
 {
     LV_ASSERT(_cache_manager.locked);
     if(new_cache_manager == NULL) return;
-    
+
     if(_cache_manager.empty_cb != NULL) _cache_manager.empty_cb();
     else if(_cache_manager.set_max_size_cb != NULL) _cache_manager.set_max_size_cb(0);
 
