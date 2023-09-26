@@ -282,6 +282,10 @@ void lv_deinit(void)
 
     lv_display_set_default(NULL);
 
+#if LV_USE_DRAW_SW
+    lv_draw_sw_deinit();
+#endif
+
 #if LV_USE_FREETYPE
     lv_freetype_uninit();
 #endif

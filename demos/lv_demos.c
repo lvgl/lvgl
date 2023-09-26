@@ -89,6 +89,10 @@ static const demo_entry_info_t demos_entry_info[] = {
     { "scroll", .entry_cb = lv_demo_scroll },
 #endif
 
+#if LV_USE_DEMO_VECTOR_GRAPHIC
+    { "vector_graphic", .entry_cb = lv_demo_vector_graphic },
+#endif
+
 #if LV_USE_DEMO_BENCHMARK
     { DEMO_BENCHMARK_NAME, .entry_benchmark_cb = lv_demo_benchmark, 1 },
     { DEMO_BENCHMARK_SCENE_NAME, .entry_benchmark_scene_cb = lv_demo_benchmark_run_scene, 2 },

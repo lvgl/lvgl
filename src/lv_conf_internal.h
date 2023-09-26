@@ -335,6 +335,14 @@
     #endif
 #endif
 
+/*Enable Vector Graphic APIs*/
+#ifndef LV_USE_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_VECTOR_GRAPHIC
+        #define LV_USE_VECTOR_GRAPHIC CONFIG_LV_USE_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_VECTOR_GRAPHIC   0
+    #endif
+#endif
 /*=================
  * OPERATING SYSTEM
  *=================*/
@@ -2156,6 +2164,15 @@
     #endif
 #endif
 
+/*ThorVG library*/
+#ifndef LV_USE_THORVG
+    #ifdef CONFIG_LV_USE_THORVG
+        #define LV_USE_THORVG CONFIG_LV_USE_THORVG
+    #else
+        #define LV_USE_THORVG 0
+    #endif
+#endif
+
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
 #ifndef LV_USE_FFMPEG
@@ -2755,6 +2772,16 @@
         #define LV_USE_DEMO_SCROLL          0
     #endif
 #endif
+
+/*Vector graphic demo*/
+#ifndef LV_USE_DEMO_VECTOR_GRAPHIC
+    #ifdef CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+        #define LV_USE_DEMO_VECTOR_GRAPHIC CONFIG_LV_USE_DEMO_VECTOR_GRAPHIC
+    #else
+        #define LV_USE_DEMO_VECTOR_GRAPHIC          0
+    #endif
+#endif
+
 
 
 /*----------------------------------
