@@ -50,10 +50,10 @@ lv_result_t lv_mem_test_core(void);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_MEM
-    #define MEM_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_MEM
+    #define LV_TRACE_MEM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define MEM_TRACE(...)
+    #define LV_TRACE_MEM(...)
 #endif
 
 /**********************
@@ -67,9 +67,9 @@ lv_result_t lv_mem_test_core(void);
  */
 void * lv_malloc(size_t size)
 {
-    MEM_TRACE("allocating %lu bytes", (unsigned long)size);
+    LV_TRACE_MEM("allocating %lu bytes", (unsigned long)size);
     if(size == 0) {
-        MEM_TRACE("using zero_mem");
+        LV_TRACE_MEM("using zero_mem");
         return &zero_mem;
     }
 
@@ -91,7 +91,7 @@ void * lv_malloc(size_t size)
     lv_memset(alloc, 0xaa, size);
 #endif
 
-    MEM_TRACE("allocated at %p", alloc);
+    LV_TRACE_MEM("allocated at %p", alloc);
 
     return alloc;
 }
@@ -102,7 +102,7 @@ void * lv_malloc(size_t size)
  */
 void lv_free(void * data)
 {
-    MEM_TRACE("freeing %p", data);
+    LV_TRACE_MEM("freeing %p", data);
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
@@ -119,9 +119,9 @@ void lv_free(void * data)
  */
 void * lv_realloc(void * data_p, size_t new_size)
 {
-    MEM_TRACE("reallocating %p with %lu size", data_p, (unsigned long)new_size);
+    LV_TRACE_MEM("reallocating %p with %lu size", data_p, (unsigned long)new_size);
     if(new_size == 0) {
-        MEM_TRACE("using zero_mem");
+        LV_TRACE_MEM("using zero_mem");
         lv_free(data_p);
         return &zero_mem;
     }
@@ -135,7 +135,7 @@ void * lv_realloc(void * data_p, size_t new_size)
         return NULL;
     }
 
-    MEM_TRACE("reallocated at %p", new_p);
+    LV_TRACE_MEM("reallocated at %p", new_p);
     return new_p;
 }
 

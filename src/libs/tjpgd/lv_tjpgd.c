@@ -241,8 +241,7 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
     }
     rc = jd_mcu_load(jd);                  /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
     if(rc != JDR_OK) return rc;
-    rc = jd_mcu_output(jd, NULL, decoded_area->x1,
-                       decoded_area->y1); /* Output the MCU (YCbCr to RGB, scaling and output) */
+    rc = jd_mcu_output(jd, NULL, decoded_area->x1, decoded_area->y1); /* Output the MCU (YCbCr to RGB, scaling and output) */
     if(rc != JDR_OK) return rc;
 
     return LV_RESULT_OK;

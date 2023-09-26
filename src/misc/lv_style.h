@@ -148,7 +148,6 @@ typedef uint8_t lv_grad_dir_t;
 
 /**
  * The dithering algorithm for the gradient
- * Depends on LV_DRAW_SW_GRADIENT_DITHER
  */
 enum _lv_dither_mode_t {
     LV_DITHER_NONE,     /**< No dithering, colors are just quantized to the output resolution*/

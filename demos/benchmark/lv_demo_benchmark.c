@@ -84,7 +84,6 @@ static uint32_t anim_ori_timer_period;
     LV_IMAGE_DECLARE(img_benchmark_cogwheel_argb);
 #endif
 LV_IMAGE_DECLARE(img_benchmark_cogwheel_rgb);
-LV_IMAGE_DECLARE(img_benchmark_cogwheel_chroma_keyed);
 LV_IMAGE_DECLARE(img_benchmark_cogwheel_indexed16);
 LV_IMAGE_DECLARE(img_benchmark_cogwheel_alpha256);
 

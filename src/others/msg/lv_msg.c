@@ -52,7 +52,7 @@ static void obj_delete_event_cb(lv_event_t * e);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_MSG
+#if LV_USE_LOG && LV_LOG_TRACE_MSG
     #define LV_TRACE_MSG(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define LV_TRACE_MSG(...)

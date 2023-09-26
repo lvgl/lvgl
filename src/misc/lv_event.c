@@ -35,10 +35,10 @@
  *      MACROS
  **********************/
 
-#if LV_LOG_TRACE_EVENT
-    #define EVENT_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_EVENT
+    #define LV_TRACE_EVENT(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define EVENT_TRACE(...)
+    #define LV_TRACE_EVENT(...)
 #endif
 
 /**********************

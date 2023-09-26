@@ -20,8 +20,8 @@ static void create_images(void)
 
     lv_obj_t * img;
 
-    img = lv_img_create(lv_scr_act());
-    lv_img_set_src(img, "A:src/test_assets/test_img_lvgl_logo.png");
+    img = lv_image_create(lv_scr_act());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo.png");
     lv_obj_center(img);
 }
 

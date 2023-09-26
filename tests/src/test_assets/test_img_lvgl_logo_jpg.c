@@ -163,7 +163,7 @@ test_img_lvgl_logo_jpg_map[] = {
     0x05, 0x00, 0x14, 0x00, 0x50, 0x01, 0x40, 0x1f, 0xff, 0xd9
 };
 
-const lv_img_dsc_t test_img_lvgl_logo_jpg = {
+const lv_image_dsc_t test_img_lvgl_logo_jpg = {
     .header.cf = LV_COLOR_FORMAT_RAW,
     .header.always_zero = 0,
     .header.reserved = 0,

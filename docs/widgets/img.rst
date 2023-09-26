@@ -29,10 +29,10 @@ To provide maximum flexibility, the source of the image can be:
 - a file stored externally (e.g. on an SD card).
 - a text with `Symbols </overview/font>`__.
 
-To set the source of an image, use :cpp:expr:`lv_img_set_src(img, src)`.
+To set the source of an image, use :cpp:expr:`lv_image_set_src(img, src)`.
 
 To generate a pixel array from a PNG, JPG or BMP image, use the `Online image converter tool <https://lvgl.io/tools/imageconverter>`__
-and set the converted image with its pointer  :cpp:expr:`lv_img_set_src(img1, &converted_img_var)`
+and set the converted image with its pointer  :cpp:expr:`lv_image_set_src(img1, &converted_img_var)`
 To make the variable visible in the C file, you need to declare it with
 :cpp:expr:`LV_IMG_DECLARE(converted_img_var)`.
 
@@ -41,13 +41,13 @@ the online converter tool but now you should select the binary output
 format. You also need to use LVGL's file system module and register a
 driver with some functions for the basic file operation. Go to the
 `File system </overview/file-system>`__ to learn more. To set an image sourced
-from a file, use :cpp:expr:`lv_img_set_src(img, "S:folder1/my_img.bin")`.
+from a file, use :cpp:expr:`lv_image_set_src(img, "S:folder1/my_img.bin")`.
 
 You can also set a symbol similarly to `Labels </widgets/label>`__. In
 this case, the image will be rendered as text according to the *font*
 specified in the style. It enables to use of light-weight monochrome
 "letters" instead of real images. You can set symbol like
-:cpp:expr:`lv_img_set_src(img1, LV_SYMBOL_OK)`.
+:cpp:expr:`lv_image_set_src(img1, LV_SYMBOL_OK)`.
 
 Label as an image
 -----------------
@@ -56,7 +56,7 @@ Images and labels are sometimes used to convey the same thing. For
 example, to describe what a button does. Therefore, images and labels
 are somewhat interchangeable, that is the images can display texts by
 using :c:macro:`LV_SYMBOL_DUMMY` as the prefix of the text. For example,
-:cpp:expr:`lv_img_set_src(img, LV_SYMBOL_DUMMY, "Some text")`.
+:cpp:expr:`lv_image_set_src(img, LV_SYMBOL_DUMMY, "Some text")`.
 
 Transparency
 ------------
@@ -64,8 +64,6 @@ Transparency
 The internal (variable) and external images support 2 transparency
 handling methods:
 
--  **Chroma-keying** - Pixels with :c:macro:`LV_COLOR_CHROMA_KEY` (*lv_conf.h*)
-   color will be transparent.
 -  **Alpha byte** - An alpha byte is added to every pixel that contains
    the pixel's opacity
 
@@ -113,8 +111,8 @@ the mosaic feature.
 Offset
 ------
 
-With :cpp:expr:`lv_img_set_offset_x(img, x_ofs)` and
-:cpp:expr:`lv_img_set_offset_y(img, y_ofs)`, you can add some offset to the
+With :cpp:expr:`lv_image_set_offset_x(img, x_ofs)` and
+:cpp:expr:`lv_image_set_offset_y(img, y_ofs)`, you can add some offset to the
 displayed image. Useful if the object size is smaller than the image
 source size. Using the offset parameter a `Texture atlas <https://en.wikipedia.org/wiki/Texture_atlas>`__
 or a "running image" effect can be created by `Animating </overview/animation>`__ the x or y offset.
@@ -122,24 +120,24 @@ or a "running image" effect can be created by `Animating </overview/animation>`_
 Transformations
 ***************
 
-Using the :cpp:expr:`lv_img_set_zoom(img, factor)` the images will be zoomed.
+Using the :cpp:expr:`lv_image_set_scale(img, factor)` the images will be zoomed.
 Set ``factor`` to ``256`` or :c:macro:`LV_ZOOM_NONE` to disable zooming. A
 larger value enlarges the images (e.g. ``512`` double size), a smaller
 value shrinks it (e.g. ``128`` half size). Fractional scale works as
 well. E.g. ``281`` for 10% enlargement.
 
-To rotate the image use :cpp:expr:`lv_img_set_angle(img, angle)`. Angle has 0.1
+To rotate the image use :cpp:expr:`lv_image_set_rotation(img, angle)`. Angle has 0.1
 degree precision, so for 45.8° set 458.
 
 The ``transform_zoom`` and ``transform_angle`` style properties are also
 used to determine the final zoom and angle.
 
 By default, the pivot point of the rotation is the center of the image.
-It can be changed with :cpp:expr:`lv_img_set_pivot(img, pivot_x, pivot_y)`.
+It can be changed with :cpp:expr:`lv_image_set_pivot(img, pivot_x, pivot_y)`.
 ``0;0`` is the top left corner.
 
 The quality of the transformation can be adjusted with
-:cpp:expr:`lv_img_set_antialias(img, true)`. With enabled anti-aliasing
+:cpp:expr:`lv_image_set_antialias(img, true)`. With enabled anti-aliasing
 the transformations are higher quality but slower.
 
 The transformations require the whole image to be available. Therefore
@@ -170,8 +168,8 @@ the object's boundaries. It also means the layouts are not affected the
 by the transformations.
 
 If you need the object size to be updated to the transformed size set
-:cpp:expr:`lv_img_set_size_mode(img, LV_IMG_SIZE_MODE_REAL)`. (The previous mode
-is the default and called :cpp:enumerator:`LV_IMG_SIZE_MODE_VIRTUAL`). In this case if
+:cpp:expr:`lv_image_set_size_mode(img, LV_IMAGE_SIZE_MODE_REAL)`. (The previous mode
+is the default and called :cpp:enumerator:`LV_IMAGE_SIZE_MODE_VIRTUAL`). In this case if
 the width/height of the object is set to :c:macro:`LV_SIZE_CONTENT` the
 object's size will be set to the zoomed and rotated size. If an explicit
 size is set then the overflowing content will be cropped.

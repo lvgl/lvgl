@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_arc.c
+ * @file lv_draw_sw_arc.c
  *
  */
 
@@ -273,4 +273,4 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t thickness
 }
 
 #endif /*LV_DRAW_SW_COMPLEX*/
-#endif /*LV_USE_DRAW_SW_ARC*/
+#endif /*LV_USE_DRAW_SW*/

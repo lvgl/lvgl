@@ -171,13 +171,12 @@ lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src
 }
 
 /**
- * Read a line from an opened image
- * @param dsc pointer to `lv_image_decoder_dsc_t` used in `lv_image_decoder_open`
- * @param x start X coordinate (from left)
- * @param y start Y coordinate (from top)
- * @param len number of pixels to read
- * @param buf store the data here
- * @return LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
+ * Decode an area of image
+ * @param decoder      pointer to the decoder where this function belongs
+ * @param dsc          pointer to `lv_image_decoder_dsc_t` used in `lv_image_decoder_open`
+ * @param full_area    full image area information
+ * @param decoded_area area information to decode (x1, y1, x2, y2)
+ * @return             LV_RESULT_OK: no error; LV_RESULT_INVALID: can't decode image area
  */
 lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
                                       lv_area_t * decoded_area)
@@ -264,13 +263,13 @@ void lv_image_decoder_set_open_cb(lv_image_decoder_t * decoder, lv_image_decoder
 }
 
 /**
- * Set a callback to a decoded line of an image
- * @param decoder pointer to an image decoder
- * @param read_line_cb a function to read a line of an image
+ * Set a callback to get decoded area of an image
+ * @param decoder       pointer to an image decoder
+ * @param get_area_cb   a function to get area of an image
  */
-void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t read_line_cb)
+void lv_image_decoder_set_get_area_cb(lv_image_decoder_t * decoder, lv_image_decoder_get_area_cb_t get_area_cb)
 {
-    decoder->get_area_cb = read_line_cb;
+    decoder->get_area_cb = get_area_cb;
 }
 
 /**
