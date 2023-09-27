@@ -206,7 +206,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
 
                 bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
 #if VGLITE_BLIT_SPLIT_ENABLED
-                bool has_transform = (draw_dsc->angle != 0 || draw_dsc->zoom != LV_ZOOM_NONE);
+                bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->zoom != LV_SCALE_NONE);
 #endif
 
                 if(has_recolor
