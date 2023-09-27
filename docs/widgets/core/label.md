@@ -44,7 +44,9 @@ This is not the case with `lv_label_set_text_static`. The buffer you pass to `lv
 
 ### Text recolor
 In the text, you can use commands to recolor parts of the text. For example: `"Write a #ff0000 red# word"`.
-This feature can be enabled individually for each label by `lv_label_set_recolor()` function.
+This feature can be enabled individually for each label by `lv_label_set_recolor()` function,
+recoloring is only supported when the text wrapped with `##ff0000 ... #`sintax is in one line,
+it is not supported in wrapped text, see example `Line wrap, recoloring and scrolling`.
 
 ### Text selection
 If enabled by `LV_LABEL_TEXT_SELECTION` part of the text can be selected. It's similar to when you use your mouse on a PC to select a text.
