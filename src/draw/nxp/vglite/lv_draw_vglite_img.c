@@ -63,10 +63,11 @@
  *
  * @param[in] dest_area Destination area with relative coordinates to dest buffer
  * @param[in] src_area Source area with relative coordinates to src buffer
- * @param[in] opa Opacity
+ * @param[in] dsc Image descriptor
  *
  */
-static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa);
+static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area,
+                                const lv_draw_image_dsc_t * dsc);
 
 #if VGLITE_BLIT_SPLIT_ENABLED
 /**
@@ -91,12 +92,12 @@ static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stri
  * @param[in] src_area Source area with relative coordinates to src buffer
  * @param[in] src_stride Stride of source buffer in bytes
  * @param[in] src_cf Color format of source buffer
- * @param[in] opa Opacity
+ * @param[in] dsc Image descriptor
  *
  */
 static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride, lv_color_format_t dest_cf,
                                const void * src_buf, lv_area_t * src_area, uint32_t src_stride, lv_color_format_t src_cf,
-                               lv_opa_t opa);
+                               const lv_draw_image_dsc_t * dsc);
 #else
 /**
  * BLock Image Transfer - copy rectangular image from src_buf to dst_buf with transformation.
@@ -169,19 +170,19 @@ void lv_draw_vglite_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * 
 
     if(!has_transform)
         _vglite_blit_split(dest_buf, &blend_area, dest_stride, dest_cf,
-                           src_buf, &src_area, src_stride, src_cf, dsc->opa);
+                           src_buf, &src_area, src_stride, src_cf, dsc);
 #else
     if(has_transform)
         _vglite_blit_transform(&blend_area, &rel_clip_area, &src_area, dsc);
     else
-        _vglite_blit_single(&blend_area, &src_area, dsc->opa);
+        _vglite_blit_single(&blend_area, &src_area, dsc);
 #endif
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void _vglite_blit(const lv_area_t * src_area, lv_opa_t opa)
+static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t * dsc)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
@@ -195,10 +196,10 @@ static void _vglite_blit(const lv_area_t * src_area, lv_opa_t opa)
     };
 
     uint32_t color;
-    vg_lite_blend_t blend;
+    lv_opa_t opa = dsc->opa;
+
     if(opa >= (lv_opa_t)LV_OPA_MAX) {
         color = 0xFFFFFFFFU;
-        blend = VG_LITE_BLEND_SRC_OVER;
         src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
     else {
@@ -208,20 +209,21 @@ static void _vglite_blit(const lv_area_t * src_area, lv_opa_t opa)
         else {
             color = (opa << 24) | (opa << 16) | (opa << 8) | opa;
         }
-        blend = VG_LITE_BLEND_SRC_OVER;
         src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
         src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
 
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
+    vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
 
-    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, rect, vgmatrix, blend, color, VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, rect, vgmatrix, vgblend, color, VG_LITE_FILTER_POINT);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Blit rectangle failed.");
 
     vglite_run();
 }
 
-static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area, lv_opa_t opa)
+static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * src_area,
+                                const lv_draw_image_dsc_t * dsc)
 {
     /* Set scissor. */
     vglite_set_scissor(dest_area);
@@ -230,7 +232,7 @@ static void _vglite_blit_single(const lv_area_t * dest_area, const lv_area_t * s
     vglite_set_translation_matrix(dest_area);
 
     /* Start blit. */
-    _vglite_blit(src_area, opa);
+    _vglite_blit(src_area, dsc);
 
     /* Disable scissor. */
     vglite_disable_scissor();
@@ -264,7 +266,7 @@ static void _move_buf_close_to_area(void ** buf, lv_area_t * area, uint32_t stri
 
 static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t dest_stride, lv_color_format_t dest_cf,
                                const void * src_buf, lv_area_t * src_area, uint32_t src_stride, lv_color_format_t src_cf,
-                               lv_opa_t opa)
+                               const lv_draw_image_dsc_t * dsc)
 {
     VGLITE_TRACE("Blit "
                  "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -288,7 +290,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
         vglite_set_dest_buf_ptr(dest_buf);
         vglite_set_src_buf_ptr(src_buf);
 
-        _vglite_blit_single(dest_area, src_area, opa);
+        _vglite_blit_single(dest_area, src_area, dsc);
 
         VGLITE_TRACE("Single "
                      "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -375,7 +377,7 @@ static void _vglite_blit_split(void * dest_buf, lv_area_t * dest_area, uint32_t 
             vglite_set_dest_buf_ptr(tile_dest_buf);
             vglite_set_src_buf_ptr(tile_src_buf);
 
-            _vglite_blit_single(&tile_dest_area, &tile_src_area, opa);
+            _vglite_blit_single(&tile_dest_area, &tile_src_area, dsc);
 
             VGLITE_TRACE("Tile [%d, %d] "
                          "Area: ([%d,%d], [%d,%d]) -> ([%d,%d], [%d,%d]) | "
@@ -401,7 +403,7 @@ static void _vglite_blit_transform(const lv_area_t * dest_area, const lv_area_t 
     vglite_set_transformation_matrix(dest_area, dsc);
 
     /* Start blit. */
-    _vglite_blit(src_area, dsc->opa);
+    _vglite_blit(src_area, dsc);
 
     /* Disable scissor. */
     vglite_disable_scissor();

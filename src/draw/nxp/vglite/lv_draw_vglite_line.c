@@ -107,8 +107,7 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
         stroke_dash_phase = (vg_lite_float_t)dsc->dash_width / 2;
     }
 
-    /* Choose vglite blend mode based on given lvgl blend mode */
-    vg_lite_blend_t vglite_blend_mode = vglite_get_blend_mode(dsc->blend_mode);
+    vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
 
     /*** Init path ***/
     int32_t width = dsc->width;
@@ -143,7 +142,7 @@ static void _vglite_draw_line(const lv_point_t * point1, const lv_point_t * poin
 
     vglite_set_scissor(clip_area);
 
-    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vglite_blend_mode, vgcol);
+    err = vg_lite_draw(vgbuf, &path, VG_LITE_FILL_NON_ZERO, &matrix, vgblend, vgcol);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw line failed.");
 
     vglite_run();
