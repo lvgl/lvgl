@@ -2687,6 +2687,25 @@
     #endif
 #endif
 
+/*Define main for 'lv_demos'*/
+#ifndef LV_USE_DEMO_MAIN
+    #ifdef CONFIG_LV_USE_DEMO_MAIN
+        #define LV_USE_DEMO_MAIN CONFIG_LV_USE_DEMO_MAIN
+    #else
+        #define LV_USE_DEMO_MAIN            0
+    #endif
+#endif
+
+/*Custom 'lv_demos' hal interfaces*/
+#ifndef LV_USE_DEMO_HAL_CUSTOM
+    #ifdef CONFIG_LV_USE_DEMO_HAL_CUSTOM
+        #define LV_USE_DEMO_HAL_CUSTOM CONFIG_LV_USE_DEMO_HAL_CUSTOM
+    #else
+        #define LV_USE_DEMO_HAL_CUSTOM      0
+    #endif
+#endif
+
+
 
 /*----------------------------------
  * End of parsing lv_conf_template.h

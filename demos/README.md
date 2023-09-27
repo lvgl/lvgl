@@ -35,6 +35,24 @@
 # define LV_DEMO_MUSIC_LARGE        0
 # define LV_DEMO_MUSIC_AUTO_PLAY    0
 #endif
+
+/*Flex layout demo*/
+#define LV_USE_DEMO_FLEX_LAYOUT     0
+
+/*Smart-phone like multi-language demo*/
+#define LV_USE_DEMO_MULTILANG       0
+
+/*Widget transformation demo*/
+#define LV_USE_DEMO_TRANSFORM       0
+
+/*Demonstrate scroll settings*/
+#define LV_USE_DEMO_SCROLL          0
+
+/*Define main for 'lv_demos'*/
+#define LV_USE_DEMO_MAIN            0
+
+/*Custom 'lv_demos' hal interfaces*/
+#define LV_USE_DEMO_HAL_CUSTOM      0
 ...
 ```
 
@@ -48,7 +66,72 @@
 ...
 ```
 
+## Configure Demos Entry
 
+"demos/lv_demos.c" provides a default implementation of the `main` function, which is enabled by `LV_USE_DEMO_MAIN`. It also depends on the SDL backend by default.
+
+If you enable `LV_USE_DEMO_MAIN` and compile the "demos/lv_demos.c" into an application called `lv_demos`, you can launch the widgets demo by running `lv_demos widgets` and the benchmark demo by running `lv_demos benchmark 1`.
+
+If you need a different backend and looper, you can customize them by enabling `LV_USE_DEMO_HAL_CUSTOM`, and implementing `lv_demos_hal_init_custom`, `lv_demos_hal_deinit_custom` and `lv_demos_run_custom` functions.
+
+If you disable `LV_USE_DEMO_MAIN`, you have the option to use the `lv_demos_create_demo` function to create your main entry for demos. For example:
+
+```c
+//! main.c
+#include "lvgl.h"
+#include "demos/lv_demos.h"
+
+...
+lv_disp_t* lv_demos_hal_init_custom(void)
+{
+    lv_disp_t* disp = NULL;
+    lv_tick_set_cb(...);
+
+    ...
+    /* TODO: init display and indev */
+    ...
+
+    return disp;
+}
+
+void lv_demos_hal_deinit_custom(void) { }
+
+void lv_demos_run_custom(void)
+{
+    while (1) {
+        uint32_t delay = lv_timer_handler();
+        if (delay < 1) delay = 1;
+        usleep(delay * 1000);
+    }
+}
+
+int main(int argc, char ** argv)
+{
+#if LV_USE_DEMO_HAL_CUSTOM
+    return lv_demos_main_entry(&argv[1], argc - 1);
+#else
+    lv_init();
+
+    lv_disp_t* disp = lv_demos_hal_init_custom();
+    if (disp == NULL) {
+        LV_LOG_ERROR("lv_demos initialization failure!");
+        return 1;
+    }
+
+    if (!lv_demos_create_demo(&argv[1], argc - 1)) {
+        goto demo_end;
+    }
+
+    lv_demos_run_custom();
+
+demo_end:
+    lv_demos_hal_deinit_custom();
+    lv_deinit();
+    return 0;
+#endif
+}
+
+```
 
 ## Demos
 
