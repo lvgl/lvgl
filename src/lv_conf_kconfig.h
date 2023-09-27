@@ -26,14 +26,6 @@ extern "C" {
 #endif /*LV_CONF_KCONFIG_EXTERNAL_INCLUDE*/
 
 /*******************
- * LV COLOR CHROMA KEY
- *******************/
-
-#ifdef CONFIG_LV_COLOR_CHROMA_KEY_HEX
-#  define CONFIG_LV_COLOR_CHROMA_KEY lv_color_hex(CONFIG_LV_COLOR_CHROMA_KEY_HEX)
-#endif
-
-/*******************
  * LV_USE_STDLIB_MALLOC
  *******************/
 

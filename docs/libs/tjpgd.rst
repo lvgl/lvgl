@@ -30,13 +30,13 @@ Overview
 Usage
 -----
 
-If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_SJPG` LVGL will register a new
-image decoder automatically so JPG and SJPG files can be directly used
+If enabled in ``lv_conf.h`` by :c:macro:`LV_USE_TJPGD` LVGL will register a new
+image decoder automatically so JPG and SJPG files can be used directly
 as image sources. For example:
 
 .. code:: c
 
-   lv_img_set_src(my_img, "S:path/to/picture.jpg");
+   lv_image_set_src(my_img, "S:path/to/picture.jpg");
 
 Note that, a file system driver needs to registered to open images from
 files. Read more about it :ref:`file-system` or just

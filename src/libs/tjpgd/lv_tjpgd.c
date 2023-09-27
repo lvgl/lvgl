@@ -233,16 +233,20 @@ static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decod
         decoded_area->y2 += my;
     }
 
+    /* Process restart interval if enabled */
     JRESULT rc;
-    if(jd->nrst && jd->rst++ == jd->nrst) {     /* Process restart interval if enabled */
+    if(jd->nrst && jd->rst++ == jd->nrst) {
         rc = jd_restart(jd, jd->rsc++);
         if(rc != JDR_OK) return rc;
         jd->rst = 1;
     }
-    rc = jd_mcu_load(jd);                  /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
+
+    /* Load an MCU (decompress huffman coded stream, dequantize and apply IDCT) */
+    rc = jd_mcu_load(jd);
     if(rc != JDR_OK) return rc;
-    rc = jd_mcu_output(jd, NULL, decoded_area->x1,
-                       decoded_area->y1); /* Output the MCU (YCbCr to RGB, scaling and output) */
+
+    /* Output the MCU (YCbCr to RGB, scaling and output) */
+    rc = jd_mcu_output(jd, NULL, decoded_area->x1, decoded_area->y1);
     if(rc != JDR_OK) return rc;
 
     return LV_RESULT_OK;

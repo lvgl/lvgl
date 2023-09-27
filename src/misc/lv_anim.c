@@ -44,7 +44,7 @@ static int32_t lv_anim_path_cubic_bezier(const lv_anim_t * a, int32_t x1,
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_ANIM
+#if LV_USE_LOG && LV_LOG_TRACE_ANIM
     #define LV_TRACE_ANIM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
     #define LV_TRACE_ANIM(...)

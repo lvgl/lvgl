@@ -77,7 +77,6 @@ lv_cache_entry_t * lv_cache_find(const void * src_ptr, lv_cache_src_type_t src_t
     return _cache_manager.find_cb(src_ptr, src_type, param1, param2);
 }
 
-
 void lv_cache_invalidate(lv_cache_entry_t * entry)
 {
     LV_ASSERT(_cache_manager.locked);

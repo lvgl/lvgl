@@ -55,13 +55,6 @@ menu "LVGL configuration"
 			bool "Use cache to speed up getting object style properties"
 			default y
 
-		config LV_COLOR_CHROMA_KEY_HEX
-			hex "Images pixels with this color will not be drawn (if they are chroma keyed)."
-			range 0x000000 0xFFFFFF
-			default 0x00FF00
-			help
-				See misc/lv_color.h for some color values examples.
-
 		config LV_USE_OBJ_ID
 			bool "Add id field to obj."
 			default n

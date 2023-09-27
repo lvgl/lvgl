@@ -75,9 +75,10 @@
  *=========================*/
 
 /* Possible values
- * - LV_STDLIB_BUILTIN: LVGL's built in implementation
- * - LV_STDLIB_CLIB:    Standard C functions, like malloc, strlen, etc
- * - LV_STDLIB_CUSTOM:  Implement the functions externally
+ * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
+ * - LV_STDLIB_CLIB:        Standard C functions, like malloc, strlen, etc
+ * - LV_STDLIB_MICROPYTHON: MicroPython implementation
+ * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
 #ifndef LV_USE_STDLIB_MALLOC
     #ifdef CONFIG_LV_USE_STDLIB_MALLOC
@@ -728,7 +729,6 @@
         #define LV_COLOR_MIX_ROUND_OFS 0
     #endif
 #endif
-
 
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
 #ifndef LV_OBJ_STYLE_CACHE

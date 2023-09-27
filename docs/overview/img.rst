@@ -54,12 +54,10 @@ Color formats
 Various built-in color formats are supported: 
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE`: Simply stores the RGB colors (in whatever color depth LVGL is configured for).
-- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`: Like :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` but it also adds an alpha (transparency) byte for every pixel.
-- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED`: Like :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` but if a pixel has the
-  :c:macro:`LV_COLOR_TRANSP` color (set in *lv_conf.h*) it will be transparent.
-- :cpp:enumerator:`LV_IMG_CF_INDEXED_1BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_2BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_4BIT`, :cpp:enumerator:`LV_IMG_CF_INDEXED_8BIT`:
+- :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`: Like :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` but it also adds an alpha (transparency) byte for every pixel.
+- :cpp:enumerator:`LV_COLOR_FORMAT_I1`, :cpp:enumerator:`LV_COLOR_FORMAT_I2`, :cpp:enumerator:`LV_COLOR_FORMAT_I4`, :cpp:enumerator:`LV_COLOR_FORMAT_I8`:
   Uses a palette with 2, 4, 16 or 256 colors and stores each pixel in 1, 2, 4 or 8 bits.
-- :cpp:enumerator:`LV_IMG_CF_ALPHA_1BIT`, :cpp:enumerator:`LV_IMG_CF_ALPHA_2BIT`, :cpp:enumerator:`LV_IMG_CF_ALPHA_4BIT`, :cpp:enumerator:`LV_IMG_CF_ALPHA_8BIT`:
+- :cpp:enumerator:`LV_COLOR_FORMAT_A1`, :cpp:enumerator:`LV_COLOR_FORMAT_A2`, :cpp:enumerator:`LV_COLOR_FORMAT_A4`, :cpp:enumerator:`LV_COLOR_FORMAT_A8`:
   **Only stores the Alpha value with 1, 2, 4 or 8 bits.** The pixels take the color of ``style.img_recolor`` and
   the set opacity. The source image has to be an alpha channel. This is
   ideal for bitmaps similar to fonts where the whole image is one color
@@ -71,14 +69,14 @@ The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the f
     - **Byte 0**: Blue
     - **Byte 1**: Green
     - **Byte 2**: Red
-    - **Byte 3**: Alpha (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`)
+    - **Byte 3**: Alpha (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 - 16-bit color depth:
     - **Byte 0**: Green 3 lower bit, Blue 5 bit
     - **Byte 1**: Red 5 bit, Green 3 higher bit
-    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`)
+    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 - 8-bit color depth:
     - **Byte 0**: Red 3 bit, Green 3 bit, Blue 2 bit
-    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_ALPHA`)
+    - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
 with one of the built-in color formats and an external `Image decoder <#image-decoder>`__ 
@@ -86,7 +84,6 @@ needs to be used to decode the image.
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel.
-- :cpp:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED`: Indicates that an image is chroma-keyed as described in :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_CHROMA_KEYED` above.
 
 Add and use images
 ******************
@@ -145,9 +142,6 @@ variable to display it using LVGL. For example:
        .data = my_img_data,
    };
 
-If the color format is :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA` you can set
-``data_size`` like ``80 * 60 *`` :cpp:enumerator:`LV_IMG_PX_SIZE_ALPHA_BYTE`.
-
 Another (possibly simpler) option to create and display an image at
 run-time is to use the `Canvas </widgets/canvas>`__ object.
 
@@ -155,7 +149,7 @@ Use images
 ----------
 
 The simplest way to use an image in LVGL is to display it with an
-`lv_img </widgets/img>`__ object:
+`lv_image </widgets/img>`__ object:
 
 .. code:: c
 
@@ -188,48 +182,43 @@ An image decoder consists of 4 callbacks:
 - **open** open an image: 
     - store a decoded image 
     - set it to ``NULL`` to indicate the image can be read line-by-line. 
-- **read** if *open* didn't fully open an image this function should give some decoded data (max 1 line) from a given position.
+- **get_area** if *open* didn't fully open an image this function should give back part of image as decoded data.
 - **close** close an opened image, free the allocated resources.
 
 You can add any number of image decoders. When an image needs to be
 drawn, the library will try all the registered image decoders until it
 finds one which can open the image, i.e. one which knows that format.
 
-The ``LV_IMG_CF_TRUE_COLOR_...``, ``LV_IMG_INDEXED_...`` and
-``LV_IMG_ALPHA_...`` formats (essentially, all non-``RAW`` formats) are
-understood by the built-in decoder.
+The following formats are understood by the built-in decoder:
+- ``LV_COLOR_FORMAT_I1``
+- ``LV_COLOR_FORMAT_I2``
+- ``LV_COLOR_FORMAT_I4``
+- ``LV_COLOR_FORMAT_I8``
+- ``LV_COLOR_FORMAT_RGB888``
+- ``LV_COLOR_FORMAT_XRGB8888``
+- ``LV_COLOR_FORMAT_ARGB8888``
+- ``LV_COLOR_FORMAT_RGB565``
+- ``LV_COLOR_FORMAT_RGB565A8``
+
 
 Custom image formats
 --------------------
 
 The easiest way to create a custom image is to use the online image
-converter and select ``Raw``, ``Raw with alpha`` or
-``Raw with chroma-keyed`` format. It will just take every byte of the
+converter and select ``Raw`` or ``Raw with alpha`` format. 
+It will just take every byte of the
 binary file you uploaded and write it as an image "bitmap". You then
 need to attach an image decoder that will parse that bitmap and generate
 the real, renderable bitmap.
 
-``header.cf`` will be :cpp:enumerator:`LV_IMG_CF_RAW`, :cpp:enumerator:`LV_IMG_CF_RAW_ALPHA` or
-:cpp:enumerator:`LV_IMG_CF_RAW_CHROMA_KEYED` accordingly. You should choose the
-correct format according to your needs: a fully opaque image, using an
-alpha channel or using a chroma key.
+``header.cf`` will be :cpp:enumerator:`LV_COLOR_FORMAT_RAW`, :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA` 
+accordingly. You should choose the correct format according to your needs: 
+a fully opaque image, using an alpha channel.
 
 After decoding, the *raw* formats are considered *True color* by the
 library. In other words, the image decoder must decode the *Raw* images
 to *True color* according to the format described in the `Color formats <#color-formats>`__ section.
 
-If you want to create a custom image, you should use
-``LV_IMG_CF_USER_ENCODED_0..7`` color formats. However, the library can
-draw images only in *True color* format (or *Raw* but ultimately it will
-be in *True color* format). The ``LV_IMG_CF_USER_ENCODED_...`` formats
-are not known by the library and therefore they should be decoded to one
-of the known formats from the `Color formats <#color-formats>`__
-section. It's possible to decode an image to a non-true color format
-first (for example: :cpp:enumerator:`LV_IMG_INDEXED_4BITS`) and then call the built-in
-decoder functions to convert it to *True color*.
-
-With *User encoded* formats, the color format in the open function
-(``dsc->header.cf``) should be changed according to the new format.
 
 Register an image decoder
 -------------------------
@@ -250,72 +239,67 @@ open/close the PNG files. It should look like this:
 
    /**
     * Get info about a PNG image
-    * @param decoder pointer to the decoder where this function belongs
-    * @param src can be file name or pointer to a C array
-    * @param header store the info here
-    * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
+    * @param decoder   pointer to the decoder where this function belongs
+    * @param src       can be file name or pointer to a C array
+    * @param header    image information is set in header parameter
+    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
     */
-   static lv_res_t decoder_info(lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
+   static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
    {
      /*Check whether the type `src` is known by the decoder*/
-     if(is_png(src) == false) return LV_RES_INV;
+     if(is_png(src) == false) return LV_RESULT_INVALID;
 
      /* Read the PNG header and find `width` and `height` */
      ...
 
-     header->cf = LV_COLOR_FORMAT_RAW_ALPHA;
+     header->cf = LV_COLOR_FORMAT_ARGB8888;
      header->w = width;
      header->h = height;
    }
 
    /**
-    * Open a PNG image and return the decided image
-    * @param decoder pointer to the decoder where this function belongs
-    * @param dsc pointer to a descriptor which describes this decoding session
-    * @return LV_RES_OK: no error; LV_RES_INV: can't get the info
+    * Open a PNG image and decode it into dsc.img_data
+    * @param decoder   pointer to the decoder where this function belongs
+    * @param dsc       image descriptor
+    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
     */
-   static lv_res_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
+   static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
    {
+     (void) decoder; /*Unused*/
 
      /*Check whether the type `src` is known by the decoder*/
-     if(is_png(src) == false) return LV_RES_INV;
+     if(is_png(dsc->src) == false) return LV_RESULT_INVALID;
 
      /*Decode and store the image. If `dsc->img_data` is `NULL`, the `read_line` function will be called to get the image data line-by-line*/
-     dsc->img_data = my_png_decoder(src);
+     dsc->img_data = my_png_decoder(dsc->src);
 
      /*Change the color format if required. For PNG usually 'Raw' is fine*/
      dsc->header.cf = LV_COLOR_FORMAT_...
 
-     /*Call a built in decoder function if required. It's not required if`my_png_decoder` opened the image in true color format.*/
-     lv_res_t res = lv_image_decoder_built_in_open(decoder, dsc);
+     /*Call a built in decoder function if required. It's not required if `my_png_decoder` opened the image in true color format.*/
+     lv_result_t res = lv_image_decoder_built_in_open(decoder, dsc);
 
      return res;
    }
 
    /**
-    * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
-    * Required only if the "open" function can't open the whole decoded pixel array. (dsc->img_data == NULL)
-    * @param decoder pointer to the decoder the function associated with
-    * @param dsc pointer to decoder descriptor
-    * @param x start x coordinate
-    * @param y start y coordinate
-    * @param len number of pixels to decode
-    * @param buf a buffer to store the decoded pixels
-    * @return LV_RES_OK: ok; LV_RES_INV: failed
+    * Decode an area of image
+    * @param decoder      pointer to the decoder where this function belongs
+    * @param dsc          image decoder descriptor
+    * @param full_area    full image area information
+    * @param decoded_area area information to decode (x1, y1, x2, y2)
+    * @return             LV_RESULT_OK: no error; LV_RESULT_INVALID: can't decode image area
     */
-   lv_res_t decoder_built_in_read_line(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc, lv_coord_t x,
-                                                     lv_coord_t y, lv_coord_t len, uint8_t * buf)
+   static lv_result_t decoder_get_area(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc,
+                                    const lv_area_t * full_area, lv_area_t * decoded_area)
    {
-      /*With PNG it's usually not required*/
-
-      /*Copy `len` pixels from `x` and `y` coordinates in True color format to `buf` */
-
    }
 
    /**
-    * Free the allocated resources
-    * @param decoder pointer to the decoder where this function belongs
-    * @param dsc pointer to a descriptor which describes this decoding session
+    * Close PNG image and free data
+    * @param decoder   pointer to the decoder where this function belongs
+    * @param dsc       image decoder descriptor
+    * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
     */
    static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
    {
@@ -331,38 +315,37 @@ So in summary:
 - In ``decoder_info``, you should collect some basic information about the image and store it in ``header``.
 - In ``decoder_open``, you should try to open the image source pointed by
   ``dsc->src``. Its type is already in ``dsc->src_type == LV_IMG_SRC_FILE/VARIABLE``.
-  If this format/type is not supported by the decoder, return :cpp:enumerator:`LV_RES_INV`.
+  If this format/type is not supported by the decoder, return :cpp:enumerator:`LV_RESULT_INVALID`.
   However, if you can open the image, a pointer to the decoded *True color* image should be
   set in ``dsc->img_data``. If the format is known, but you don't want to
   decode the entire image (e.g. no memory for it), set ``dsc->img_data = NULL`` and
-  use ``read_line`` to get the pixel data.
+  use ``decoder_get_area`` to get the image area pixels.
 - In ``decoder_close`` you should free all allocated resources.
-- ``decoder_read`` is optional. Decoding the whole image requires extra
-  memory and some computational overhead. However, it can decode one line
-  of the image without decoding the whole image, you can save memory and
-  time. To indicate that the *line read* function should be used, set
-  ``dsc->img_data = NULL`` in the open function.
+- ``decoder_get_area`` is optional. In this case you should decode the whole image In
+  ``decoder_open`` function and store image data in ``dsc->img_data``.
+  Decoding the whole image requires extra memory and some computational overhead.
+
 
 Manually use an image decoder
 -----------------------------
 
 LVGL will use registered image decoders automatically if you try and
-draw a raw image (i.e. using the ``lv_img`` object) but you can use them
+draw a raw image (i.e. using the ``lv_image`` object) but you can use them
 manually too. Create an :cpp:type:`lv_image_decoder_dsc_t` variable to describe
 the decoding session and call :cpp:func:`lv_image_decoder_open`.
 
-The ``color`` parameter is used only with ``LV_IMG_CF_ALPHA_1/2/4/8BIT``
+The ``color`` parameter is used only with ``LV_COLOR_FORMAT_A1/2/4/8``
 images to tell color of the image. ``frame_id`` can be used if the image
 to open is an animation.
 
 .. code:: c
 
 
-   lv_res_t res;
+   lv_result_t res;
    lv_image_decoder_dsc_t dsc;
    res = lv_image_decoder_open(&dsc, &my_img_dsc, color, frame_id);
 
-   if(res == LV_RES_OK) {
+   if(res == LV_RESULT_OK) {
      /*Do something with `dsc->img_data`*/
      lv_image_decoder_close(&dsc);
    }
@@ -373,10 +356,10 @@ Image caching
 *************
 
 Sometimes it takes a lot of time to open an image. Continuously decoding
-a PNG image or loading images from a slow external memory would be
+a PNG/JPEG image or loading images from a slow external memory would be
 inefficient and detrimental to the user experience.
 
-Therefore, LVGL caches a given number of images. Caching means some
+Therefore, LVGL caches image data. Caching means some
 images will be left open, hence LVGL can quickly access them from
 ``dsc->img_data`` instead of needing to decode them again.
 
@@ -401,7 +384,7 @@ and get with :cpp:expr:`lv_cache_get_max_size()`.
 Value of images
 ---------------
 
-When you use more images than cache entries, LVGL can't cache all the
+When you use more images than available cache size, LVGL can't cache all the
 images. Instead, the library will close one of the cached images to free
 space.
 
@@ -411,17 +394,18 @@ slower-to-open images are considered more valuable and are kept in the
 cache as long as possible.
 
 If you want or need to override LVGL's measurement, you can manually set
-the *time to open* value in the decoder open function in
-``dsc->time_to_open = time_ms`` to give a higher or lower value. (Leave
+the *weight* value in the cache entry in
+``cache_entry->weight = time_ms`` to give a higher or lower value. (Leave
 it unchanged to let LVGL control it.)
 
 Every cache entry has a *"life"* value. Every time an image is opened
-through the cache, the *life* value of all entries is decreased to make
-them older. When a cached image is used, its *life* value is increased
-by the *time to open* value to make it more alive.
+through the cache, the *life* value of all entries is increased by their 
+*weight* values to make them older. 
+When a cached image is used, its *usage_count* value is increased 
+to make it more alive.
 
-If there is no more space in the cache, the entry with the lowest life
-value will be closed.
+If there is no more space in the cache, the entry with *usage_count == 0*
+and lowest life value will be dropped.
 
 Memory usage
 ------------
@@ -502,7 +486,7 @@ following code to replace the LVGL built-in cache manager:
 
     /*Replace existing cache manager with the new one.*/
     lv_cache_lock();
-    lv_cache_replace_manager(&my_manager);
+    lv_cache_set_manager(&my_manager);
     lv_cache_unlock();
    }
 

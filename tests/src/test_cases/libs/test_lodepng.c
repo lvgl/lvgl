@@ -22,16 +22,16 @@ static void create_images(void)
     lv_obj_t * label;
 
     LV_IMG_DECLARE(test_img_lvgl_logo_png);
-    img = lv_img_create(lv_scr_act());
-    lv_img_set_src(img, &test_img_lvgl_logo_png);
+    img = lv_image_create(lv_scr_act());
+    lv_image_set_src(img, &test_img_lvgl_logo_png);
     lv_obj_align(img, LV_ALIGN_CENTER, -100, -20);
 
     label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "Array");
     lv_obj_align(label, LV_ALIGN_CENTER, -100, 20);
 
-    img = lv_img_create(lv_scr_act());
-    lv_img_set_src(img, "A:src/test_assets/test_img_lvgl_logo.png");
+    img = lv_image_create(lv_scr_act());
+    lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo.png");
     lv_obj_align(img, LV_ALIGN_CENTER, 100, -20);
 
     label = lv_label_create(lv_scr_act());

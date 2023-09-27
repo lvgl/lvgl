@@ -51,10 +51,10 @@ static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t *
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_DISP_REFR
-    #define REFR_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_DISP_REFR
+    #define LV_TRACE_REFR(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define REFR_TRACE(...)
+    #define LV_TRACE_REFR(...)
 #endif
 
 /**********************
@@ -319,7 +319,7 @@ lv_display_t * _lv_refr_get_disp_refreshing(void)
 void _lv_display_refr_timer(lv_timer_t * tmr)
 {
     LV_PROFILER_BEGIN;
-    REFR_TRACE("begin");
+    LV_TRACE_REFR("begin");
 
     if(tmr) {
         disp_refr = tmr->user_data;
@@ -416,7 +416,7 @@ refr_finish:
 
     lv_display_send_event(disp_refr, LV_EVENT_REFR_FINISH, NULL);
 
-    REFR_TRACE("finished");
+    LV_TRACE_REFR("finished");
     LV_PROFILER_END;
 }
 
@@ -950,9 +950,8 @@ static void draw_buf_flush(lv_display_t * disp)
 static void call_flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     LV_PROFILER_BEGIN;
-    REFR_TRACE("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
-               (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2,
-               (void *)px_map);
+    LV_TRACE_REFR("Calling flush_cb on (%d;%d)(%d;%d) area with %p image pointer",
+                  (int)area->x1, (int)area->y1, (int)area->x2, (int)area->y2, (void *)px_map);
 
     lv_area_t offset_area = {
         .x1 = area->x1 + disp->offset_x,

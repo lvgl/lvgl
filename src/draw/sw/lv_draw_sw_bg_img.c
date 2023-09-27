@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rect.c
+ * @file lv_draw_sw_bg_img.c
  *
  */
 
@@ -112,4 +112,4 @@ void lv_draw_sw_bg_image(lv_draw_unit_t * draw_unit, const lv_draw_bg_image_dsc_
  *   STATIC FUNCTIONS
  **********************/
 
-#endif
+#endif /*LV_USE_DRAW_SW*/

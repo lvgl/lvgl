@@ -128,7 +128,7 @@ static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
     lv_canvas_set_buffer(canvas2, canvas2_buf, 770, 390, large_render_cf);
     lv_canvas_fill_bg(canvas2, lv_palette_lighten(LV_PALETTE_BLUE_GREY, 2), LV_OPA_COVER);
 
-    lv_img_dsc_t img = { 0 };
+    lv_image_dsc_t img = { 0 };
     img.header.w = 180;
     img.header.h = 180;
     img.header.stride = 0;

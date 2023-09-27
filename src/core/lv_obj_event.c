@@ -32,10 +32,10 @@ static bool event_is_bubbled(lv_event_t * e);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_EVENT
-    #define EVENT_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_EVENT
+    #define LV_TRACE_EVENT(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define EVENT_TRACE(...)
+    #define LV_TRACE_EVENT(...)
 #endif
 
 /**********************
@@ -287,7 +287,7 @@ lv_draw_task_t * lv_event_get_draw_task(lv_event_t * e)
 
 static lv_result_t event_send_core(lv_event_t * e)
 {
-    EVENT_TRACE("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
+    LV_TRACE_EVENT("Sending event %d to %p with %p param", e->code, (void *)e->original_target, e->param);
 
     /*Call the input device's feedback callback if set*/
     lv_indev_t * indev_act = lv_indev_get_act();

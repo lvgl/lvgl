@@ -1,5 +1,4 @@
 #define  LV_MEM_SIZE        65535
-#define  LV_USE_DRAW_MASKS  0
 #define  LV_USE_METER       0
 #define  LV_USE_LOG         1
 #define  LV_USE_ASSERT_NULL             0

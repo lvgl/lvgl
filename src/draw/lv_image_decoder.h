@@ -173,13 +173,11 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id);
 
 /**
- * Read a line from an opened image
- * @param dsc pointer to `lv_image_decoder_dsc_t` used in `lv_image_decoder_open`
- * @param x start X coordinate (from left)
- * @param y start Y coordinate (from top)
- * @param len number of pixels to read
- * @param buf store the data here
- * @return LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
+ * Decode an area of the opened image
+ * @param dsc           image decoder descriptor
+ * @param full_area     start X coordinate (from left)
+ * @param decoded_area  start Y coordinate (from top)
+ * @return              LV_RESULT_OK: success; LV_RESULT_INVALID: an error occurred
  */
 lv_result_t lv_image_decoder_get_area(lv_image_decoder_dsc_t * dsc, const lv_area_t * full_area,
                                       lv_area_t * decoded_area);

@@ -31,9 +31,10 @@
  *=========================*/
 
 /* Possible values
- * - LV_STDLIB_BUILTIN: LVGL's built in implementation
- * - LV_STDLIB_CLIB:    Standard C functions, like malloc, strlen, etc
- * - LV_STDLIB_CUSTOM:  Implement the functions externally
+ * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
+ * - LV_STDLIB_CLIB:        Standard C functions, like malloc, strlen, etc
+ * - LV_STDLIB_MICROPYTHON: MicroPython implementation
+ * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
 #define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
 #define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
@@ -262,7 +263,6 @@
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
 #define LV_COLOR_MIX_ROUND_OFS 0
-
 
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
 #define LV_OBJ_STYLE_CACHE 0

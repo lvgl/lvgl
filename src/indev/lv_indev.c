@@ -80,10 +80,10 @@ static void indev_reset_core(lv_indev_t * indev, lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_INDEV
-    #define INDEV_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_INDEV
+    #define LV_TRACE_INDEV(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define INDEV_TRACE(...)
+    #define LV_TRACE_INDEV(...)
 #endif
 
 /**********************
@@ -159,7 +159,7 @@ void indev_read_core(lv_indev_t * indev, lv_indev_data_t * data)
     }
 
     if(indev->read_cb) {
-        INDEV_TRACE("calling indev_read_cb");
+        LV_TRACE_INDEV("calling indev_read_cb");
         indev->read_cb(indev, data);
     }
     else {
@@ -177,7 +177,7 @@ void lv_indev_read(lv_indev_t * indev_p)
 {
     if(!indev_p) return;
 
-    INDEV_TRACE("begin");
+    LV_TRACE_INDEV("begin");
 
     indev_act = indev_p;
 
@@ -234,7 +234,7 @@ void lv_indev_read(lv_indev_t * indev_p)
     indev_act     = NULL;
     indev_obj_act = NULL;
 
-    INDEV_TRACE("finished");
+    LV_TRACE_INDEV("finished");
     LV_PROFILER_END;
 }
 

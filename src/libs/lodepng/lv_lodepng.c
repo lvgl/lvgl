@@ -71,9 +71,10 @@ void lv_lodepng_deinit(void)
 
 /**
  * Get info about a PNG image
- * @param src can be file name or pointer to a C array
- * @param header store the info here
- * @return LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
+ * @param decoder   pointer to the decoder where this function belongs
+ * @param src       can be file name or pointer to a C array
+ * @param header    image information is set in header parameter
+ * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't get the info
  */
 static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void * src, lv_image_header_t * header)
 {
@@ -146,14 +147,13 @@ static lv_result_t decoder_info(struct _lv_image_decoder_t * decoder, const void
 
 
 /**
- * Open a PNG image and return the decided image
- * @param src can be file name or pointer to a C array
- * @param style style of the image object (unused now but certain formats might use it)
- * @return pointer to the decoded image or `LV_IMAGE_DECODER_OPEN_FAIL` if failed
+ * Open a PNG image and decode it into dsc.img_data
+ * @param decoder   pointer to the decoder where this function belongs
+ * @param dsc       decoded image descriptor
+ * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
  */
 static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-
     (void) decoder; /*Unused*/
 
     /*Check the cache first*/
@@ -176,7 +176,7 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
         }
     }
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = dsc->src;
+        const lv_image_dsc_t * img_dsc = dsc->src;
         png_data = img_dsc->data;
         png_data_size = img_dsc->data_size;
     }
@@ -215,9 +215,15 @@ static lv_result_t decoder_open(lv_image_decoder_t * decoder, lv_image_decoder_d
     return LV_RESULT_OK;    /*If not returned earlier then it failed*/
 }
 
-static void decoder_close(lv_image_decoder_t * dec, lv_image_decoder_dsc_t * dsc)
+/**
+ * Close PNG image and free data
+ * @param decoder   pointer to the decoder where this function belongs
+ * @param dsc       decoded image descriptor
+ * @return          LV_RESULT_OK: no error; LV_RESULT_INVALID: can't open the image
+ */
+static void decoder_close(lv_image_decoder_t * decoder, lv_image_decoder_dsc_t * dsc)
 {
-    LV_UNUSED(dec);
+    LV_UNUSED(decoder);
 
     lv_cache_lock();
     lv_cache_release(dsc->user_data);
@@ -241,7 +247,7 @@ static lv_result_t try_cache(lv_image_decoder_dsc_t * dsc)
     }
 
     else if(dsc->src_type == LV_IMAGE_SRC_VARIABLE) {
-        const lv_img_dsc_t * img_dsc = dsc->src;
+        const lv_image_dsc_t * img_dsc = dsc->src;
 
         lv_cache_entry_t * cache = lv_cache_find(img_dsc, LV_CACHE_SRC_TYPE_PTR, 0, 0);
         if(cache) {
@@ -274,7 +280,6 @@ static const void * decode_png_data(const void * png_data, size_t png_data_size)
     convert_color_depth(img_data,  png_width * png_height);
 
     return img_data;
-
 }
 
 
