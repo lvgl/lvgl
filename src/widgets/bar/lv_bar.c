@@ -415,88 +415,34 @@ static void draw_indic(lv_event_t * e)
     short_side = LV_MIN(indicw, indich);
     if(indic_radius > short_side >> 1) indic_radius = short_side >> 1;
 
-    bool simple = true;
-    if(draw_rect_dsc.shadow_width != 0 && draw_rect_dsc.shadow_opa > LV_OPA_TRANSP) simple = false;
-    else if(hor && draw_rect_dsc.bg_grad.dir == LV_GRAD_DIR_HOR) simple = false;
-    else if(!hor && draw_rect_dsc.bg_grad.dir == LV_GRAD_DIR_VER) simple = false;
-
-    if(simple) {
-        lv_draw_rect(layer, &draw_rect_dsc, &bar->indic_area);
-    }
-    else {
-        /*The radius of the bg and the indicator can make a strange shape where
-        *it'd be very difficult to draw shadow.*/
-        if((hor && lv_area_get_width(&bar->indic_area) > indic_radius * 2) ||
-           (!hor && lv_area_get_height(&bar->indic_area) > indic_radius * 2)) {
-            lv_opa_t bg_opa = draw_rect_dsc.bg_opa;
-            lv_opa_t bg_image_opa = draw_rect_dsc.bg_image_opa;
-            lv_opa_t border_opa = draw_rect_dsc.border_opa;
-            draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
-            draw_rect_dsc.bg_image_opa = LV_OPA_TRANSP;
-            draw_rect_dsc.border_opa = LV_OPA_TRANSP;
-
-            lv_draw_rect(layer, &draw_rect_dsc, &bar->indic_area);
-
-            draw_rect_dsc.bg_opa = bg_opa;
-            draw_rect_dsc.bg_image_opa = bg_image_opa;
-            draw_rect_dsc.border_opa = border_opa;
-        }
-
-        /*Draw_only the background and background image*/
-        lv_opa_t shadow_opa = draw_rect_dsc.shadow_opa;
-        lv_opa_t border_opa = draw_rect_dsc.border_opa;
-        draw_rect_dsc.border_opa = LV_OPA_TRANSP;
-        draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
-
-        /*Get the max possible indicator area. The gradient should be applied on this*/
-        lv_area_t mask_indic_max_area;
-        lv_area_copy(&mask_indic_max_area, &bar_coords);
-        mask_indic_max_area.x1 += bg_left;
-        mask_indic_max_area.y1 += bg_top;
-        mask_indic_max_area.x2 -= bg_right;
-        mask_indic_max_area.y2 -= bg_bottom;
-        if(hor && lv_area_get_height(&mask_indic_max_area) < LV_BAR_SIZE_MIN) {
-            mask_indic_max_area.y1 = obj->coords.y1 + (barh / 2) - (LV_BAR_SIZE_MIN / 2);
-            mask_indic_max_area.y2 = mask_indic_max_area.y1 + LV_BAR_SIZE_MIN;
-        }
-        else if(!hor && lv_area_get_width(&mask_indic_max_area) < LV_BAR_SIZE_MIN) {
-            mask_indic_max_area.x1 = obj->coords.x1 + (barw / 2) - (LV_BAR_SIZE_MIN / 2);
-            mask_indic_max_area.x2 = mask_indic_max_area.x1 + LV_BAR_SIZE_MIN;
-        }
+    /*TODO handle clipping from gradient*/
+    /*The radius of the bg and the indicator can make a strange shape where
+    *it'd be very difficult to draw shadow.
+    *Draw this strange shape as a layer without shadow*/
+    if(((hor && lv_area_get_width(&bar->indic_area) < indic_radius * 2) ||
+        (!hor && lv_area_get_height(&bar->indic_area) < indic_radius * 2))) {
+        draw_rect_dsc.shadow_width = 0;
 
         lv_area_t indic_clip_area;
         if(_lv_area_intersect(&indic_clip_area, &indic_area, &layer->clip_area)) {
             lv_layer_t * layer_indic = lv_draw_layer_create(layer, LV_COLOR_FORMAT_ARGB8888, &indic_area);
 
-            lv_draw_rect(layer_indic, &draw_rect_dsc, &mask_indic_max_area);
-            draw_rect_dsc.border_opa = border_opa;
-            draw_rect_dsc.shadow_opa = shadow_opa;
-
-            /*Draw the border. Make the border area and border with 2 pixels larger but
-             *mask this extra area. It avoids color bleeding on the edges.*/
-            lv_area_t border2_area = bar->indic_area;
-            lv_area_increase(&border2_area, 2, 2);
-            draw_rect_dsc.border_width += 2;
-            draw_rect_dsc.bg_opa = LV_OPA_TRANSP;
-            draw_rect_dsc.bg_image_opa = LV_OPA_TRANSP;
-            draw_rect_dsc.shadow_opa = LV_OPA_TRANSP;
-            lv_draw_rect(layer_indic, &draw_rect_dsc, &border2_area);
+            lv_draw_rect(layer_indic, &draw_rect_dsc, &indic_area);
 
             lv_draw_mask_rect_dsc_t mask_dsc;
             lv_draw_mask_rect_dsc_init(&mask_dsc);
-            mask_dsc.area = bar->indic_area;
-            mask_dsc.radius = indic_radius;
-            lv_draw_mask_rect(layer_indic, &mask_dsc);
-
-            mask_dsc.area = mask_indic_max_area;
+            mask_dsc.area = obj->coords;
+            mask_dsc.radius = bg_radius;
             lv_draw_mask_rect(layer_indic, &mask_dsc);
 
             lv_draw_image_dsc_t layer_draw_dsc;
             lv_draw_image_dsc_init(&layer_draw_dsc);
             layer_draw_dsc.src = layer_indic;
-
             lv_draw_layer(layer, &layer_draw_dsc, &indic_area);
         }
+    }
+    else {
+        lv_draw_rect(layer, &draw_rect_dsc, &indic_area);
     }
 }
 
