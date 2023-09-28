@@ -505,9 +505,9 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         if(angle < 0) angle += 360;
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
-        const uint32_t tolerance_deg = 360U * lv_dpx(50U) / circumference;
+        const uint32_t tolerance_deg = (360U * lv_dpx(50U)) / circumference;
 
-        bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, (uint32_t) angle, tolerance_deg);
+        const bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, (uint32_t) angle, tolerance_deg);
         if(!is_angle_within_bg_bounds) {
             return;
         }
