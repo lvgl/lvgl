@@ -421,6 +421,7 @@ static void lv_arc_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     arc->chg_rate = 720;
     arc->last_tick = lv_tick_get();
     arc->last_angle = arc->indic_angle_end;
+    arc->in_out = 0;
 
     lv_obj_add_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN | LV_OBJ_FLAG_SCROLLABLE);
@@ -515,15 +516,21 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
         int16_t last_angle_rel = arc->last_angle - arc->bg_angle_start;
         int16_t delta_angle = angle - last_angle_rel;
 
-        /*Do not allow big jumps.
+        /*Do not allow big jumps (jumps bigger than 280°).
          *It's mainly to avoid jumping to the opposite end if the "dead" range between min. and max. is crossed.
          *Check which end was closer on the last valid press (arc->min_close) and prefer that end*/
-        const uint16_t middle_point = (arc->bg_angle_end - arc->bg_angle_start) / 2U;
-        if(LV_ABS(delta_angle) > middle_point) {
+        if(LV_ABS(delta_angle) > 280) {
             if(arc->min_close) angle = 0;
             else angle = deg_range;
         }
-        else { /* Nothing to do */ }
+        else { /* Nothing to do. arc->min_close is determined in lv_arc_angle_within_bg_bounds */ }
+
+        /* Check if click was outside the background arc start and end angles */
+        if(0 == arc->in_out) {
+            if(arc->min_close) angle = -deg_range;
+            else angle = deg_range;
+        }
+        else { /* Keep the angle value */ }
 
         /*Calculate the slew rate limited angle based on change rate (degrees/sec)*/
         delta_angle = angle - last_angle_rel;
@@ -903,25 +910,42 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_arc_t * arc = (lv_arc_t *)obj;
 
-    /* Angle is between both background angles */
-    if(angle <= (arc->bg_angle_end - arc->bg_angle_start)) {
+    uint32_t smaller_angle = 0;
+    uint32_t bigger_angle = 0;
 
-        if(((arc->bg_angle_end - arc->bg_angle_start) / 2U) >= angle) {
+    /* Determine which background angle is smaller and bigger */
+    if(arc->bg_angle_start < arc->bg_angle_end) {
+        bigger_angle = arc->bg_angle_end;
+        smaller_angle = arc->bg_angle_start;
+    }
+    else {
+        bigger_angle = arc->bg_angle_start;
+        smaller_angle = arc->bg_angle_end;
+    }
+
+    /* Angle is between both background angles */
+    if(angle <= (bigger_angle - smaller_angle)) {
+
+        if(((bigger_angle - smaller_angle) / 2U) >= angle) {
             arc->min_close = 1;
         }
         else {
             arc->min_close = 0;
         }
 
+        arc->in_out = 1;
+
         return true;
     }
     /* Distance between background start and end angles is less than tolerance */
-    else if(((arc->bg_angle_start - tolerance_deg) <= 0U) &&
-            (360U - (arc->bg_angle_end + (arc->bg_angle_start - tolerance_deg)))) {
+    else if(((smaller_angle - tolerance_deg) <= 0U) &&
+            (360U - (bigger_angle + (smaller_angle - tolerance_deg)))) {
 
         arc->min_close = 1;
+        arc->in_out = 1; /* NOTE: When both angles are really close consider the click inside the arc */
         return true;
     }
+    else { /* Case handled below */ }
 
     /* Legends:
      * 0° = angle 0
@@ -932,36 +956,40 @@ static bool lv_arc_angle_within_bg_bounds(lv_obj_t * obj, const uint32_t angle, 
      * E: Arc background end angle
      *
      * Start angle is bigger or equal to tolerance */
-    if((arc->bg_angle_start >= tolerance_deg)
+    if((smaller_angle >= tolerance_deg)
        /* (360° - T) --- A --- 360° */
        && ((angle >= (360U - tolerance_deg)) && (angle <= 360U))) {
 
         arc->min_close = 1;
+        arc->in_out = 0;
         return true;
     }
     /* Tolerance is bigger than bg start angle */
-    else if((arc->bg_angle_start < tolerance_deg)
+    else if((smaller_angle < tolerance_deg)
             /* (360° - (T - S)) --- A --- 360° */
-            && (((360U - (tolerance_deg - arc->bg_angle_start)) <= angle)) && (angle <= 360U)) {
+            && (((360U - (tolerance_deg - smaller_angle)) <= angle)) && (angle <= 360U)) {
 
         arc->min_close = 1;
+        arc->in_out = 0;
         return true;
     }
     /* 360° is bigger than background end angle + tolerance */
-    else if((360U >= (arc->bg_angle_end + tolerance_deg))
+    else if((360U >= (bigger_angle + tolerance_deg))
             /* E --- A --- (E + T) */
-            && ((arc->bg_angle_end <= (angle + arc->bg_angle_start)) &&
-                ((angle + arc->bg_angle_start) <= (arc->bg_angle_end + tolerance_deg)))) {
+            && ((bigger_angle <= (angle + smaller_angle)) &&
+                ((angle + smaller_angle) <= (bigger_angle + tolerance_deg)))) {
 
         arc->min_close = 0;
+        arc->in_out = 0;
         return true;
     }
     /* Background end angle + tolerance is bigger than 360° and bg_start_angle + tolerance is not near 0° + ((bg_end_angle + tolerance) - 360°)
      * Here we can assume background is not near 0° because of the first two initial checks */
-    else if((360U < (arc->bg_angle_end + tolerance_deg))
-            && (angle <= 0U + ((arc->bg_angle_end + tolerance_deg) - 360U)) && (angle > arc->bg_angle_end)) {
+    else if((360U < (bigger_angle + tolerance_deg))
+            && (angle <= 0U + ((bigger_angle + tolerance_deg) - 360U)) && (angle > bigger_angle)) {
 
         arc->min_close = 0;
+        arc->in_out = 0;
         return true;
     }
     else {
