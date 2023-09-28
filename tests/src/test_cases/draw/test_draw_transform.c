@@ -1,13 +1,14 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "lv_test_helpers.h"
 
 #include "unity/unity.h"
+
 
 void setUp(void)
 {
     lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
-
 }
 
 void tearDown(void)
@@ -148,24 +149,24 @@ static void draw_images(lv_layer_t * layer, lv_draw_image_dsc_t * dsc)
 
 void create_test_screen(lv_color_format_t render_cf, const char * name)
 {
-    static uint8_t canvas_buf_large[760 * 440 * 4];
+    static uint8_t canvas_buf_large[CANVAS_WIDTH_TO_STRIDE(768, 4) * 440];
 
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, canvas_buf_large, 760, 440, LV_COLOR_FORMAT_ARGB8888);
+    lv_canvas_set_buffer(canvas, canvas_buf_large, 768, 440, LV_COLOR_FORMAT_ARGB8888);
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_BLUE_GREY, 2), LV_OPA_50);
 
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
-    static uint8_t canvas_buf_small[100 * 100 * 4];
+    static uint8_t canvas_buf_small[CANVAS_WIDTH_TO_STRIDE(100, 4) * 100];
 
     lv_image_dsc_t img;
     img.data = canvas_buf_small;
     img.header.cf = render_cf;
     img.header.w = 100;
     img.header.h = 100;
-    img.header.stride = 100 * lv_color_format_get_size(render_cf);
+    img.header.stride = lv_draw_buf_width_to_stride(100, render_cf);
     img.header.always_zero = 0;
 
     lv_draw_image_dsc_t img_dsc;

@@ -79,7 +79,7 @@ static void transform_a8(const uint8_t * src, lv_coord_t src_w, lv_coord_t src_h
  **********************/
 
 void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_area, const void * src_buf,
-                          lv_coord_t src_w, lv_coord_t src_h,
+                          lv_coord_t src_w, lv_coord_t src_h, lv_coord_t src_stride,
                           const lv_draw_image_dsc_t * draw_dsc, const lv_draw_image_sup_t * sup, lv_color_format_t src_cf, void * dest_buf)
 {
     LV_UNUSED(draw_unit);
@@ -110,13 +110,22 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
     lv_coord_t dest_w = lv_area_get_width(dest_area);
     lv_coord_t dest_h = lv_area_get_height(dest_area);
-    lv_coord_t src_stride = lv_draw_buf_width_to_stride(src_w, src_cf) / lv_color_format_get_size(src_cf);
 
-    lv_coord_t dest_stride_a8 = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_A8);
+    lv_coord_t dest_stride_a8 = dest_w;
     lv_coord_t dest_stride;
-    if(src_cf == LV_COLOR_FORMAT_RGB888) dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_ARGB8888);
-    else if(src_cf == LV_COLOR_FORMAT_RGB565A8) dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_RGB565);
-    else dest_stride = lv_draw_buf_width_to_stride(dest_w, src_cf);
+    lv_coord_t src_stride_px;
+    if(src_cf == LV_COLOR_FORMAT_RGB888) {
+        dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_ARGB8888);
+        src_stride_px = src_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB888);
+    }
+    else if(src_cf == LV_COLOR_FORMAT_RGB565A8) {
+        dest_stride = lv_draw_buf_width_to_stride(dest_w, LV_COLOR_FORMAT_RGB565);
+        src_stride_px = src_stride / lv_color_format_get_size(LV_COLOR_FORMAT_RGB565);
+    }
+    else {
+        dest_stride = lv_draw_buf_width_to_stride(dest_w, src_cf);
+        src_stride_px = src_stride / lv_color_format_get_size(src_cf);
+    }
 
     uint8_t * alpha_buf;
     if(src_cf == LV_COLOR_FORMAT_RGB565 || src_cf == LV_COLOR_FORMAT_RGB565A8) {
@@ -150,23 +159,25 @@ void lv_draw_sw_transform(lv_draw_unit_t * draw_unit, const lv_area_t * dest_are
 
         switch(src_cf) {
             case LV_COLOR_FORMAT_XRGB8888:
-                tranform_rgb888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa, 4);
+                tranform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
+                                4);
                 break;
             case LV_COLOR_FORMAT_RGB888:
-                tranform_rgb888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa, 3);
+                tranform_rgb888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa,
+                                3);
                 break;
             case LV_COLOR_FORMAT_A8:
-                transform_a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
+                transform_a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
             case LV_COLOR_FORMAT_ARGB8888:
-                tranform_argb8888(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
+                tranform_argb8888(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf, aa);
                 break;
             case LV_COLOR_FORMAT_RGB565:
-                transform_rgb565a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
+                transform_rgb565a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w, dest_buf,
                                    alpha_buf, false, aa);
                 break;
             case LV_COLOR_FORMAT_RGB565A8:
-                transform_rgb565a8(src_buf, src_w, src_h, src_stride, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w,
+                transform_rgb565a8(src_buf, src_w, src_h, src_stride_px, xs_ups, ys_ups, xs_step_256, ys_step_256, dest_w,
                                    (uint16_t *)dest_buf,
                                    alpha_buf, true, aa);
                 break;

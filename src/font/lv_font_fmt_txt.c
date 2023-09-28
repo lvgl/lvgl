@@ -386,11 +386,12 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     lv_coord_t y;
     lv_coord_t x;
+    uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
 
     for(x = 0; x < w; x++) {
         out[x] = opa_table[line_buf1[x]];
     }
-    out += w;
+    out += stride;
 
     for(y = 1; y < h; y++) {
         if(prefilter) {
@@ -408,7 +409,7 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
                 out[x] = opa_table[line_buf1[x]];
             }
         }
-        out += w;
+        out += stride;
     }
 
     lv_free(line_buf1);

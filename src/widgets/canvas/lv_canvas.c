@@ -73,7 +73,7 @@ void lv_canvas_set_buffer(lv_obj_t * obj, void * buf, lv_coord_t w, lv_coord_t h
     canvas->dsc.header.cf = cf;
     canvas->dsc.header.w  = w;
     canvas->dsc.header.h  = h;
-    canvas->dsc.header.stride  = 0; /*Let LVGL calculate it automatically*/
+    canvas->dsc.header.stride  = lv_draw_buf_width_to_stride(w, cf); /*Let LVGL calculate it automatically*/
     canvas->dsc.data      = buf;
     canvas->dsc.data_size = w * h * lv_color_format_get_size(cf);
 
@@ -243,10 +243,12 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     uint32_t x;
     uint32_t y;
 
+    uint32_t stride = lv_draw_buf_width_to_stride(dsc->header.w, dsc->header.cf);
+
     if(dsc->header.cf == LV_COLOR_FORMAT_RGB565) {
         uint16_t c16 = lv_color_to_u16(color);
         for(y = 0; y < dsc->header.h; y++) {
-            uint16_t * buf16 = (uint16_t *)(dsc->data + y * dsc->header.w * 2);
+            uint16_t * buf16 = (uint16_t *)(dsc->data + y * stride);
             for(x = 0; x < dsc->header.w; x++) {
                 buf16[x] = c16;
             }
@@ -259,7 +261,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
             c32 |= opa << 24;
         }
         for(y = 0; y < dsc->header.h; y++) {
-            uint32_t * buf32 = (uint32_t *)(dsc->data + y * dsc->header.w * 4);
+            uint32_t * buf32 = (uint32_t *)(dsc->data + y * stride);
             for(x = 0; x < dsc->header.w; x++) {
                 buf32[x] = c32;
             }
@@ -267,7 +269,7 @@ void lv_canvas_fill_bg(lv_obj_t * obj, lv_color_t color, lv_opa_t opa)
     }
     else if(dsc->header.cf == LV_COLOR_FORMAT_RGB888) {
         for(y = 0; y < dsc->header.h; y++) {
-            uint8_t * buf8 = (uint8_t *)(dsc->data + y * dsc->header.w * 3);
+            uint8_t * buf8 = (uint8_t *)(dsc->data + y * stride);
             for(x = 0; x < dsc->header.w * 3; x += 3) {
                 buf8[x + 0] = color.blue;
                 buf8[x + 1] = color.green;

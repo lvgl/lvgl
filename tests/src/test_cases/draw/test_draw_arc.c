@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "lv_test_helpers.h"
 
 #include "unity/unity.h"
 
@@ -63,7 +64,7 @@ static void draw_arcs_line(lv_layer_t * layer, lv_draw_arc_dsc_t * dsc, uint32_t
 
 static void draw_arcs(lv_draw_arc_dsc_t * arc_dsc, const char * fn)
 {
-    static uint8_t canvas_buf[760 * 440 * 4];
+    static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(760, 4) * 440];
 
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
     lv_canvas_set_buffer(canvas, canvas_buf, 760, 440, LV_COLOR_FORMAT_ARGB8888);

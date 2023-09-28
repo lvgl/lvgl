@@ -1,5 +1,6 @@
 #if LV_BUILD_TEST
 #include "../lvgl.h"
+#include "lv_test_helpers.h"
 
 #include "unity/unity.h"
 
@@ -55,11 +56,11 @@ static void draw_triangles(lv_layer_t * layer, lv_draw_triangle_dsc_t * dsc, uin
 
 void test_draw_triangle(void)
 {
-    static uint8_t canvas_buf[760 * 440 * 4];
+    static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(768, 4) * 440 * 4];
 
 
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, canvas_buf, 760, 440, LV_COLOR_FORMAT_ARGB8888);
+    lv_canvas_set_buffer(canvas, canvas_buf, 768, 440, LV_COLOR_FORMAT_ARGB8888);
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_RED, 2), LV_OPA_50);
 

@@ -338,7 +338,8 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
             return NULL;
         }
         memset(buffer, 0, buffer_size);
-        stbtt_MakeGlyphBitmap(info, buffer, w, h, w, dsc->scale, dsc->scale, g1);
+        uint32_t stride = lv_draw_buf_width_to_stride(w, LV_COLOR_FORMAT_A8);
+        stbtt_MakeGlyphBitmap(info, buffer, w, h, stride, dsc->scale, dsc->scale, g1);
     }
     return buffer; /*Or NULL if not found*/
 }

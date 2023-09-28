@@ -11,6 +11,7 @@
 #else
 #define LV_HEAP_CHECK(x) x
 
+
 static inline uint32_t lv_test_get_free_mem(void)
 {
     lv_mem_monitor_t m1;
@@ -19,6 +20,7 @@ static inline uint32_t lv_test_get_free_mem(void)
 }
 #endif /* LVGL_CI_USING_SYS_HEAP */
 
+#define CANVAS_WIDTH_TO_STRIDE(w, px_size) ((((w) * (px_size) + (LV_DRAW_BUF_STRIDE_ALIGN - 1)) / LV_DRAW_BUF_STRIDE_ALIGN) * LV_DRAW_BUF_STRIDE_ALIGN)
 
 #endif /*LV_TEST_HELPERS_H*/
 
