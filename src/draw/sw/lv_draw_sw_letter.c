@@ -103,7 +103,7 @@ void lv_draw_sw_letter(lv_draw_ctx_t * draw_ctx, const lv_draw_label_dsc_t * dsc
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" PRIX32, letter);
+            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%"LV_PRIu32, letter);
 
 #if LV_USE_FONT_PLACEHOLDER
             /* draw placeholder */
