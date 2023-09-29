@@ -72,6 +72,7 @@
 #define LV_USE_IMGFONT      1
 #define LV_USE_IME_PINYIN       1
 #define LV_USE_MSG              1
+#define LV_USE_OBSERVER         1
 #define LV_USE_FILE_EXPLORER    1
 #define LV_USE_TINY_TTF         1
 #define LV_USE_SYSMON           1
