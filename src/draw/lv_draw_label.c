@@ -103,7 +103,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
     }
 
     lv_font_glyph_dsc_t g;
-    lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0);
+    if(!lv_font_get_glyph_dsc(dsc->font, &g, unicode_letter, 0)) {
+        LV_LOG_WARN("glyph dsc. not found for U+%" LV_PRIX32, unicode_letter);
+        return;
+    }
 
     lv_area_t a;
     a.x1 = point->x;
@@ -377,7 +380,7 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
         if(letter >= 0x20 &&
            letter != 0xf8ff && /*LV_SYMBOL_DUMMY*/
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
-            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
+            LV_LOG_WARN("glyph dsc. not found for U+%" LV_PRIX32, letter);
         }
         LV_PROFILER_END;
         return;

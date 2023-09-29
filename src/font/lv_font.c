@@ -115,8 +115,7 @@ uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32
 {
     LV_ASSERT_NULL(font);
     lv_font_glyph_dsc_t g;
-    lv_font_get_glyph_dsc(font, &g, letter, letter_next);
-    return g.adv_w;
+    return lv_font_get_glyph_dsc(font, &g, letter, letter_next) ? g.adv_w : 0;
 }
 
 /**********************
