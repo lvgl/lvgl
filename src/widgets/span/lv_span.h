@@ -30,6 +30,7 @@ extern "C" {
 enum _lv_span_overflow_t {
     LV_SPAN_OVERFLOW_CLIP,
     LV_SPAN_OVERFLOW_ELLIPSIS,
+    _LV_SPAN_OVERFLOW_LAST,  /**< Fence member*/
 };
 
 #ifdef DOXYGEN
@@ -42,6 +43,7 @@ enum _lv_span_mode_t {
     LV_SPAN_MODE_FIXED,     /**< fixed the obj size*/
     LV_SPAN_MODE_EXPAND,    /**< Expand the object size to the text size*/
     LV_SPAN_MODE_BREAK,     /**< Keep width, break the too long lines and expand height*/
+    _LV_SPAN_MODE_LAST      /**< Fence member*/
 };
 
 #ifdef DOXYGEN

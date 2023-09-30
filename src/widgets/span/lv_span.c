@@ -209,7 +209,7 @@ void lv_spangroup_set_overflow(lv_obj_t * obj, lv_span_overflow_t overflow)
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
     if(spans->overflow == overflow) return;
-
+    if(overflow >= _LV_SPAN_OVERFLOW_LAST) return;
     spans->overflow = overflow;
     lv_obj_invalidate(obj);
 }
@@ -229,6 +229,9 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
+
+    if(mode >= _LV_SPAN_MODE_LAST) return;
+
     spans->mode = mode;
     lv_spangroup_refr_mode(obj);
 }
