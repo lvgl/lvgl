@@ -236,7 +236,7 @@ void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode)
     lv_spangroup_refr_mode(obj);
 }
 
-void lv_spangroup_set_lines(lv_obj_t * obj, int32_t lines)
+void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;
@@ -324,7 +324,7 @@ lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj)
     return spans->mode;
 }
 
-int32_t lv_spangroup_get_lines(lv_obj_t * obj)
+int32_t lv_spangroup_get_max_lines(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_spangroup_t * spans = (lv_spangroup_t *)obj;

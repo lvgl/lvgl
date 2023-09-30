@@ -172,26 +172,26 @@ void test_spangroup_set_mode_invalid_parameter_mode_not_changed(void)
     TEST_ASSERT_EQUAL(LV_SPAN_MODE_EXPAND, lv_spangroup_get_mode(spangroup));
 }
 
-void test_spangroup_set_lines(void)
+void test_spangroup_set_max_lines(void)
 {
     const int32_t lines = 100;
 
-    lv_spangroup_set_lines(spangroup, lines);
+    lv_spangroup_set_max_lines(spangroup, lines);
 
-    TEST_ASSERT_EQUAL_INT32(lines, lv_spangroup_get_lines(spangroup));
+    TEST_ASSERT_EQUAL_INT32(lines, lv_spangroup_get_max_lines(spangroup));
 }
 
-void test_spangroup_get_lines_for_new_span_group(void)
+void test_spangroup_get_max_lines_for_new_span_group(void)
 {
     int32_t lines;
 
-    lines = lv_spangroup_get_lines(spangroup);
+    lines = lv_spangroup_get_max_lines(spangroup);
 
     TEST_ASSERT_EQUAL_INT32(-1, lines);
 
     lines = 3;
-    lv_spangroup_set_lines(spangroup, lines);
-    lines = lv_spangroup_get_lines(spangroup);
+    lv_spangroup_set_max_lines(spangroup, lines);
+    lines = lv_spangroup_get_max_lines(spangroup);
 
     TEST_ASSERT_EQUAL_INT32(3, lines);
 }

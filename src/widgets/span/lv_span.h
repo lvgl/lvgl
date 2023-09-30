@@ -151,11 +151,11 @@ void lv_spangroup_set_indent(lv_obj_t * obj, lv_coord_t indent);
 void lv_spangroup_set_mode(lv_obj_t * obj, lv_span_mode_t mode);
 
 /**
- * Set lines of the spangroup.
+ * Set maximum lines of the spangroup.
  * @param obj pointer to a spangroup object.
  * @param lines max lines that can be displayed in LV_SPAN_MODE_BREAK mode. < 0 means no limit.
  */
-void lv_spangroup_set_lines(lv_obj_t * obj, int32_t lines);
+void lv_spangroup_set_max_lines(lv_obj_t * obj, int32_t lines);
 
 /*=====================
  * Getter functions
@@ -210,11 +210,11 @@ lv_coord_t lv_spangroup_get_indent(lv_obj_t * obj);
 lv_span_mode_t lv_spangroup_get_mode(lv_obj_t * obj);
 
 /**
- * get lines of the spangroup.
+ * get maximum lines of the spangroup.
  * @param obj pointer to a spangroup object.
- * @return the lines value.
+ * @return the max lines value.
  */
-int32_t lv_spangroup_get_lines(lv_obj_t * obj);
+int32_t lv_spangroup_get_max_lines(lv_obj_t * obj);
 
 /**
  * get max line height of all span in the spangroup.
