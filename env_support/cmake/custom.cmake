@@ -8,6 +8,8 @@ option(LV_CONF_INCLUDE_SIMPLE
 
 # Option LV_CONF_PATH, which should be the path for lv_conf.h
 # If set parent path LV_CONF_DIR is added to includes
+option(LV_CONF_PATH "Path defined for lv_conf.h")
+
 if( LV_CONF_PATH )
     get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
 endif( LV_CONF_PATH )
