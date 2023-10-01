@@ -14,6 +14,11 @@ if( LV_CONF_PATH )
     get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
 endif( LV_CONF_PATH )
 
+# Option to set lvgl as bundled.
+# If active, the install targets will be skipped, as lvgl will link
+# directly with its dependants.
+option(LVGL_BUNDLED "Set lvgl as bundled (disable install)." OFF)
+
 # Option to build shared libraries (as opposed to static), default: OFF
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
@@ -67,11 +72,13 @@ if("${INC_INSTALL_DIR}" STREQUAL "")
   set(INC_INSTALL_DIR "include/lvgl")
 endif()
 
+if( NOT LVGL_BUNDLED )
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src"
   DESTINATION "${CMAKE_INSTALL_PREFIX}/${INC_INSTALL_DIR}/"
   FILES_MATCHING
   PATTERN "*.h")
+endif()
 
 set_target_properties(
   lvgl
@@ -81,9 +88,11 @@ set_target_properties(
              RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
              PUBLIC_HEADER "${LVGL_PUBLIC_HEADERS}")
 
+if( NOT LVGL_BUNDLED )
 install(
   TARGETS lvgl
   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
   RUNTIME DESTINATION "${LIB_INSTALL_DIR}"
   PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+endif()
