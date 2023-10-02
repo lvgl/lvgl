@@ -99,7 +99,7 @@ static int drm_setup(drm_dev_t * drm_dev, const char * device_path, int64_t conn
 static int drm_allocate_dumb(drm_dev_t * drm_dev, drm_buffer_t * buf);
 static int drm_setup_buffers(drm_dev_t * drm_dev);
 static void drm_wait_vsync(drm_dev_t * drm_dev);
-static void drm_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p);
+static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
 
 /**********************
  *  STATIC VARIABLES
@@ -169,7 +169,7 @@ void lv_linux_drm_set_file(lv_display_t * disp, const char * file, int64_t conne
     uint32_t draw_buf_size = hor_res * ver_res / 4; /*1/4 screen sized buffer has the same performance */
     lv_color_t * draw_buf = malloc(draw_buf_size * sizeof(lv_color_t));
     lv_display_set_draw_buffers(disp, draw_buf, NULL, draw_buf_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
-    lv_display_set_res(disp, hor_res, ver_res);
+    lv_display_set_resolution(disp, hor_res, ver_res);
 
     if(width) {
         lv_display_set_dpi(disp, DIV_ROUND_UP(hor_res * 25400, width * 1000));
@@ -827,7 +827,7 @@ static void drm_wait_vsync(drm_dev_t * drm_dev)
     drm_dev->req = NULL;
 }
 
-static void drm_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * color_p)
+static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
     drm_buffer_t * fbuf = drm_dev->cur_bufs[1];
@@ -842,9 +842,9 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, lv_color_t * 
         memcpy(fbuf->map, drm_dev->cur_bufs[0]->map, fbuf->size);
 
     for(y = 0, i = area->y1 ; i <= area->y2 ; ++i, ++y) {
-        memcpy((uint8_t *)fbuf->map + (area->x1 * (LV_COLOR_SIZE / 8)) + (fbuf->pitch * i),
-               (uint8_t *)color_p + (w * (LV_COLOR_SIZE / 8) * y),
-               w * (LV_COLOR_SIZE / 8));
+        memcpy((uint8_t *)fbuf->map + (area->x1 * (LV_COLOR_DEPTH / 8)) + (fbuf->pitch * i),
+               px_map + (w * (LV_COLOR_DEPTH / 8) * y),
+               w * (LV_COLOR_DEPTH / 8));
     }
 
     if(drm_dev->req)
