@@ -41,7 +41,7 @@ typedef struct {
     uint32_t pitch;
     uint32_t offset;
     unsigned long int size;
-    void * map;
+    uint8_t * map;
     uint32_t fb_handle;
 } drm_buffer_t;
 
@@ -66,7 +66,7 @@ typedef struct {
     drmModePropertyPtr crtc_props[128];
     drmModePropertyPtr conn_props[128];
     drm_buffer_t drm_bufs[2]; /* DUMB buffers */
-    drm_buffer_t * cur_bufs[2]; /* double buffering handling */
+    uint8_t active_drm_buf_idx; /* double buffering handling */
 } drm_dev_t;
 
 /**********************
@@ -785,10 +785,6 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
     if(ret)
         return ret;
 
-    /* Set buffering handling */
-    drm_dev->cur_bufs[0] = NULL;
-    drm_dev->cur_bufs[1] = &drm_dev->drm_bufs[0];
-
     return 0;
 }
 
@@ -815,7 +811,7 @@ static void drm_wait_vsync(drm_dev_t * drm_dev)
 static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_map)
 {
     drm_dev_t * drm_dev = lv_display_get_driver_data(disp);
-    drm_buffer_t * fbuf = drm_dev->cur_bufs[1];
+    drm_buffer_t * fbuf = &drm_dev->drm_bufs[!drm_dev->active_drm_buf_idx];
     uint32_t w = (area->x2 - area->x1 + 1);
     uint32_t h = (area->y2 - area->y1 + 1);
     int i, y;
@@ -823,11 +819,11 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
     LV_LOG_TRACE("x %d:%d y %d:%d w %d h %d", area->x1, area->x2, area->y1, area->y2, w, h);
 
     /* Partial update */
-    if((w != drm_dev->width || h != drm_dev->height) && drm_dev->cur_bufs[0])
-        lv_memcpy(fbuf->map, drm_dev->cur_bufs[0]->map, fbuf->size);
+    if(area->x1 != 0 || area->y1 != 0 || w != drm_dev->width || h != drm_dev->height)
+        lv_memcpy(fbuf->map, drm_dev->drm_bufs[drm_dev->active_drm_buf_idx].map, fbuf->size);
 
     for(y = 0, i = area->y1 ; i <= area->y2 ; ++i, ++y) {
-        lv_memcpy((uint8_t *)fbuf->map + (area->x1 * (LV_COLOR_DEPTH / 8)) + (fbuf->pitch * i),
+        lv_memcpy(fbuf->map + (area->x1 * (LV_COLOR_DEPTH / 8)) + (fbuf->pitch * i),
                   px_map + (w * (LV_COLOR_DEPTH / 8) * y),
                   w * (LV_COLOR_DEPTH / 8));
     }
@@ -843,13 +839,7 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
     else
         LV_LOG_TRACE("Flush done");
 
-    if(!drm_dev->cur_bufs[0])
-        drm_dev->cur_bufs[1] = &drm_dev->drm_bufs[1];
-    else
-        drm_dev->cur_bufs[1] = drm_dev->cur_bufs[0];
-
-    drm_dev->cur_bufs[0] = fbuf;
-
+    drm_dev->active_drm_buf_idx = !drm_dev->active_drm_buf_idx;
     lv_display_flush_ready(disp);
 }
 
