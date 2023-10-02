@@ -67,6 +67,7 @@ typedef struct {
     drmModePropertyPtr conn_props[128];
     drm_buffer_t drm_bufs[2]; /* DUMB buffers */
     uint8_t active_drm_buf_idx; /* double buffering handling */
+    bool inactive_drm_buf_dirty;
 } drm_dev_t;
 
 /**********************
@@ -818,28 +819,34 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
     LV_LOG_TRACE("x %d:%d y %d:%d w %d h %d", area->x1, area->x2, area->y1, area->y2, w, h);
 
-    /* Partial update */
-    if(area->x1 != 0 || area->y1 != 0 || w != drm_dev->width || h != drm_dev->height)
+    /*Prepare background buffer for partial update*/
+    if(drm_dev->inactive_drm_buf_dirty && (area->x1 != 0 || area->y1 != 0 || w != drm_dev->width || h != drm_dev->height))
         lv_memcpy(fbuf->map, drm_dev->drm_bufs[drm_dev->active_drm_buf_idx].map, fbuf->size);
+    drm_dev->inactive_drm_buf_dirty = false;
 
+    /*Flush to background buffer*/
     for(y = 0, i = area->y1 ; i <= area->y2 ; ++i, ++y) {
         lv_memcpy(fbuf->map + (area->x1 * (LV_COLOR_DEPTH / 8)) + (fbuf->pitch * i),
                   px_map + (w * (LV_COLOR_DEPTH / 8) * y),
                   w * (LV_COLOR_DEPTH / 8));
     }
 
-    if(drm_dev->req)
-        drm_wait_vsync(drm_dev);
+    /*Swap buffers*/
+    if(lv_display_flush_is_last(disp)) {
+        if(drm_dev->req)
+            drm_wait_vsync(drm_dev);
 
-    /* show fbuf plane */
-    if(drm_dmabuf_set_plane(drm_dev, fbuf)) {
-        LV_LOG_ERROR("Flush fail");
-        return;
+        if(drm_dmabuf_set_plane(drm_dev, fbuf)) {
+            LV_LOG_ERROR("Flush fail");
+            return;
+        }
+        else
+            LV_LOG_TRACE("Flush done");
+
+        drm_dev->active_drm_buf_idx = !drm_dev->active_drm_buf_idx;
+        drm_dev->inactive_drm_buf_dirty = true;
     }
-    else
-        LV_LOG_TRACE("Flush done");
 
-    drm_dev->active_drm_buf_idx = !drm_dev->active_drm_buf_idx;
     lv_display_flush_ready(disp);
 }
 
