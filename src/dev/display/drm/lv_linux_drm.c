@@ -13,9 +13,9 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <stdint.h>
 #include <sys/mman.h>
-#include <sys/select.h>
 #include <unistd.h>
 
 #include <xf86drm.h>
@@ -794,24 +794,19 @@ static int drm_setup_buffers(drm_dev_t * drm_dev)
 
 static void drm_wait_vsync(drm_dev_t * drm_dev)
 {
-    int ret;
-    fd_set fds;
-    FD_ZERO(&fds);
-    FD_SET(drm_dev->fd, &fds);
+    struct pollfd pfd;
+    pfd.fd = drm_dev->fd;
+    pfd.events = POLLIN;
 
+    int ret;
     do {
-        ret = select(drm_dev->fd + 1, &fds, NULL, NULL, NULL);
+        ret = poll(&pfd, 1, -1);
     } while(ret == -1 && errno == EINTR);
 
-    if(ret < 0) {
-        LV_LOG_ERROR("select failed: %s", strerror(errno));
-        drmModeAtomicFree(drm_dev->req);
-        drm_dev->req = NULL;
-        return;
-    }
-
-    if(FD_ISSET(drm_dev->fd, &fds))
+    if(ret > 0)
         drmHandleEvent(drm_dev->fd, &drm_dev->drm_event_ctx);
+    else
+        LV_LOG_ERROR("poll failed: %s", strerror(errno));
 
     drmModeAtomicFree(drm_dev->req);
     drm_dev->req = NULL;
