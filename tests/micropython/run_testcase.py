@@ -45,4 +45,4 @@ try:
 
 except Exception as e:
     usys.print_exception(e)
-    usys.exit( ERROR_BINDING_SYSTEM_FAULT )
+    usys.exit( lv_test.ERROR_BINDING_SYSTEM_FAULT )
