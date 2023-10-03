@@ -35,8 +35,13 @@ try:
     exec ( open(usys.argv[1]).read() )
     #print( lv_testcase_result )
     time.sleep_ms(LV_TEST_TIMEOUT)
+    if recorded_exception: raise recorded_exception
     gc.collect()
-    usys.exit( lv_test.RESULT_OK  if lv_testcase_result>=LV_TESTCASE_SUBTESTS  else lv_test.ERROR_TESTCASE_FAILED )
+    if lv_testcase_result >= LV_TESTCASE_SUBTESTS:
+        usys.exit(lv_test.RESULT_OK)
+    else:
+        print(" Only",lv_testcase_result,'of the',LV_TESTCASE_SUBTESTS,"subtests succeeded!")
+        usys.exit( lv_test.ERROR_TESTCASE_FAILED )
 
 except Exception as e:
     usys.print_exception(e)
