@@ -295,7 +295,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         }
         else {
             uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
-            lv_coord_t buf_h = MAX_BUF_SIZE / buf_stride;
+            buf_h = MAX_BUF_SIZE / buf_stride;
             if(buf_h > blend_h) buf_h = blend_h;
             tmp_buf = lv_malloc(buf_stride * buf_h);
         }
