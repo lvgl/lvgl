@@ -127,7 +127,7 @@ static void time_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     int32_t format = lv_subject_get_int(lv_subject_get_group_element(subject, 2));
     int32_t am_pm = lv_subject_get_int(lv_subject_get_group_element(subject, 3));
 
-    lv_obj_t * label = lv_observer_get_obj(observer);
+    lv_obj_t * label = lv_observer_get_target(observer);
 
     if(format == TIME_FORMAT_24) {
         lv_label_set_text_fmt(label, "%d:%02d", hour, minute);
@@ -140,7 +140,7 @@ static void time_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 /*Change the hour options on format change*/
 static void hour_roller_options_update(lv_subject_t * subject, lv_observer_t * observer)
 {
-    lv_obj_t * roller = lv_observer_get_obj(observer);
+    lv_obj_t * roller = lv_observer_get_target(observer);
     int32_t prev_selected = lv_roller_get_selected(roller);
     int32_t v = lv_subject_get_int(subject);
     if(v == TIME_FORMAT_12) {

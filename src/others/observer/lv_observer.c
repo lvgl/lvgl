@@ -65,6 +65,7 @@ void lv_subject_init_int(lv_subject_t * subject, int32_t value)
     lv_memzero(subject, sizeof(lv_subject_t));
     subject->type = LV_SUBJECT_TYPE_INT;
     subject->value.num = value;
+    subject->prev_value.num = value;
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
@@ -78,6 +79,7 @@ void lv_subject_set_int(lv_subject_t * subject, int32_t value)
 
     subject->value.num = value;
     notify(subject);
+    subject->prev_value.num = subject->value.num;
 }
 
 int32_t lv_subject_get_int(lv_subject_t * subject)
@@ -88,6 +90,16 @@ int32_t lv_subject_get_int(lv_subject_t * subject)
     }
 
     return subject->value.num;
+}
+
+int32_t lv_subject_get_previous_int(lv_subject_t * subject)
+{
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");
+        return 0;
+    }
+
+    return subject->prev_value.num;
 }
 
 void lv_subject_init_string(lv_subject_t * subject, char * buf, size_t size)
@@ -227,7 +239,7 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
     observer->subject = subject;
     observer->cb = cb;
     observer->user_data = user_data;
-    observer->obj = obj;
+    observer->target = obj;
     /* subscribe to delete event of the object */
     if(obj != NULL) {
         lv_obj_add_event(obj, unsubscribe_on_delete_cb, LV_EVENT_DELETE, observer);
@@ -255,16 +267,16 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj)
     lv_observer_t * observer = _lv_ll_get_head(&subject->subs_ll);
     while(observer) {
         lv_observer_t * observer_next = _lv_ll_get_next(&subject->subs_ll, observer);
-        if(observer->obj == obj) {
+        if(observer->target == obj) {
             lv_observer_remove(observer);
         }
         observer = observer_next;
     }
 }
 
-lv_obj_t * lv_observer_get_obj(lv_observer_t * observer)
+void * lv_observer_get_target(lv_observer_t * observer)
 {
-    return observer->obj;
+    return observer->target;
 }
 
 lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag, int32_t ref_value)
@@ -272,7 +284,6 @@ lv_observer_t * lv_obj_bind_flag_if_eq(lv_obj_t * obj, lv_subject_t * subject, l
     lv_observer_t * observable = bind_to_bitfield(subject, obj, obj_flag_observer_cb, flag, ref_value, false);
     return observable;
 }
-
 
 lv_observer_t * lv_obj_bind_flag_if_not_eq(lv_obj_t * obj, lv_subject_t * subject, lv_obj_flag_t flag,
                                            int32_t ref_value)
@@ -416,10 +427,10 @@ static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observe
     if(p->inv) res = !res;
 
     if(res) {
-        lv_obj_add_flag(observer->obj, p->flag);
+        lv_obj_add_flag(observer->target, p->flag);
     }
     else {
-        lv_obj_clear_flag(observer->obj, p->flag);
+        lv_obj_clear_flag(observer->target, p->flag);
     }
 }
 
@@ -431,10 +442,10 @@ static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observ
     if(p->inv) res = !res;
 
     if(res) {
-        lv_obj_add_state(observer->obj, p->flag);
+        lv_obj_add_state(observer->target, p->flag);
     }
     else {
-        lv_obj_clear_state(observer->obj, p->flag);
+        lv_obj_clear_state(observer->target, p->flag);
     }
 }
 
@@ -452,16 +463,16 @@ static void label_text_cb(lv_subject_t * subject, lv_observer_t * observer)
     const char * fmt = observer->user_data;
 
     if(fmt == NULL) {
-        lv_label_set_text(observer->obj, subject->value.ptr);
+        lv_label_set_text(observer->target, subject->value.ptr);
     }
     else {
         switch(subject->type) {
             case LV_SUBJECT_TYPE_INT:
-                lv_label_set_text_fmt(observer->obj, fmt, subject->value.num);
+                lv_label_set_text_fmt(observer->target, fmt, subject->value.num);
                 break;
             case LV_SUBJECT_TYPE_STRING:
             case LV_SUBJECT_TYPE_POINTER:
-                lv_label_set_text_fmt(observer->obj, fmt, subject->value.ptr);
+                lv_label_set_text_fmt(observer->target, fmt, subject->value.ptr);
                 break;
             default:
                 break;
@@ -479,7 +490,7 @@ static void slider_value_changed_event_cb(lv_event_t * e)
 
 static void slider_value_cb(lv_subject_t * subject, lv_observer_t * observer)
 {
-    lv_slider_set_value(observer->obj, subject->value.num, LV_ANIM_OFF);
+    lv_slider_set_value(observer->target, subject->value.num, LV_ANIM_OFF);
 }
 
 static void roller_value_changed_event_cb(lv_event_t * e)
@@ -492,8 +503,8 @@ static void roller_value_changed_event_cb(lv_event_t * e)
 
 static void roller_value_cb(lv_subject_t * subject, lv_observer_t * observer)
 {
-    if((int32_t)lv_roller_get_selected(observer->obj) != subject->value.num) {
-        lv_roller_set_selected(observer->obj, subject->value.num, LV_ANIM_OFF);
+    if((int32_t)lv_roller_get_selected(observer->target) != subject->value.num) {
+        lv_roller_set_selected(observer->target, subject->value.num, LV_ANIM_OFF);
     }
 }
 
@@ -507,7 +518,7 @@ static void dropdown_value_changed_event_cb(lv_event_t * e)
 
 static void dropdown_value_cb(lv_subject_t * subject, lv_observer_t * observer)
 {
-    lv_dropdown_set_selected(observer->obj, subject->value.num);
+    lv_dropdown_set_selected(observer->target, subject->value.num);
 }
 
 #endif /*LV_USE_OBSERVER*/

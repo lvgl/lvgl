@@ -55,6 +55,7 @@ typedef struct {
     uint32_t type   : 4;
     uint32_t size   : 28;           /**< Might be used to store a size related to `type`*/
     lv_subject_value_t value;       /**< Actual value*/
+    lv_subject_value_t prev_value;       /**< Previous value*/
 } lv_subject_t;
 
 /**
@@ -69,7 +70,7 @@ typedef void (*lv_observer_cb_t)(lv_subject_t * subject, struct _lv_observer_t *
 typedef struct _lv_observer_t {
     lv_subject_t * subject;             /**< The observed value */
     lv_observer_cb_t cb;                /**< Callback that should be called when the value changes*/
-    lv_obj_t * obj;                  /**< LVGL widget which has subscribed for the value*/
+    void * target;                      /**< A target for the observer, e.g. a widget or style*/
     void * user_data;                   /**< Additional parameter supplied when subscribing*/
     uint32_t auto_free_user_data : 1;    /**< Automatically free user data when the observer is removed */
 } lv_observer_t;
@@ -215,11 +216,11 @@ void lv_observer_remove(lv_observer_t * observer);
 void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
 
 /**
- * Get the object of an observer
+ * Get the target of an observer
  * @param observer      pointer to an observer
- * @return              pointer to an object
+ * @return              pointer to the saved target
  */
-lv_obj_t * lv_observer_get_obj(lv_observer_t * observer);
+void * lv_observer_get_target(lv_observer_t * observer);
 
 /**
  * Set an object flag if an integer subject's value is equal to a reference value, clear the flag otherwise
