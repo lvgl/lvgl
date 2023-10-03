@@ -23,6 +23,8 @@
 #define VALUE_UNSET INT16_MIN
 #define CLICK_OUTSIDE_BG_ANGLES ((uint32_t) 0x00U)
 #define CLICK_INSIDE_BG_ANGLES  ((uint32_t) 0x01U)
+#define CLICK_CLOSER_TO_MAX_END ((uint32_t) 0x00U)
+#define CLICK_CLOSER_TO_MIN_END ((uint32_t) 0x01U)
 
 /**********************
  *      TYPEDEFS
@@ -508,6 +510,7 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
 
         const uint32_t circumference = (uint32_t)((2U * r * 314U) / 100U);  /* Equivalent to: 2r * 3.14, avoiding floats */
         const uint32_t tolerance_deg = (360U * lv_dpx(50U)) / circumference;
+        const uint32_t min_close_prev = (uint32_t) arc->min_close;
 
         const bool is_angle_within_bg_bounds = lv_arc_angle_within_bg_bounds(obj, (uint32_t) angle, tolerance_deg);
         if(!is_angle_within_bg_bounds) {
@@ -525,12 +528,22 @@ static void lv_arc_event(const lv_obj_class_t * class_p, lv_event_t * e)
             if(arc->min_close) angle = 0;
             else angle = deg_range;
         }
-        else { /* Nothing to do. arc->min_close is determined in lv_arc_angle_within_bg_bounds */ }
-
         /* Check if click was outside the background arc start and end angles */
-        if(CLICK_OUTSIDE_BG_ANGLES == arc->in_out) {
+        else if(CLICK_OUTSIDE_BG_ANGLES == arc->in_out) {
             if(arc->min_close) angle = -deg_range;
             else angle = deg_range;
+        }
+        else { /* Keep the angle value */ }
+
+        /* Prevent big jumps when the click goes from start to end angle in the invisible
+         * part of the background arc without being released */
+        if(((min_close_prev == CLICK_CLOSER_TO_MIN_END) && (arc->min_close == CLICK_CLOSER_TO_MAX_END))
+           && ((CLICK_OUTSIDE_BG_ANGLES == arc->in_out) && (LV_ABS(delta_angle) > 280))) {
+            angle = 0;
+        }
+        else if(((min_close_prev == CLICK_CLOSER_TO_MAX_END) && (arc->min_close == CLICK_CLOSER_TO_MIN_END))
+                && (CLICK_OUTSIDE_BG_ANGLES == arc->in_out)) {
+            angle = deg_range;
         }
         else { /* Keep the angle value */ }
 
