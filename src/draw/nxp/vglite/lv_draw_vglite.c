@@ -165,10 +165,8 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 lv_image_src_t src_type = lv_image_src_get_type(draw_dsc->src);
 
                 if(src_type != LV_IMAGE_SRC_SYMBOL) {
-                    bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
 
-                    if(has_recolor
-                       || (!_vglite_cf_supported(draw_dsc->img_header.cf))
+                    if((!_vglite_cf_supported(draw_dsc->img_header.cf))
                        || (!vglite_buf_aligned(draw_dsc->src, draw_dsc->img_header.stride, draw_dsc->img_header.cf))
                       )
                         return 0;
@@ -186,11 +184,7 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 lv_layer_t * layer_to_draw = (lv_layer_t *)draw_dsc->src;
                 lv_draw_buf_t * draw_buf = &layer_to_draw->draw_buf;
 
-                bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
-
-                if(has_recolor
-                   || (!_vglite_cf_supported(draw_buf->color_format))
-                  )
+                if(!_vglite_cf_supported(draw_buf->color_format))
                     return 0;
 
                 if(t->preference_score > 80) {
@@ -204,16 +198,14 @@ static int32_t _vglite_evaluate(lv_draw_unit_t * u, lv_draw_task_t * t)
                 lv_draw_image_dsc_t * draw_dsc = (lv_draw_image_dsc_t *) t->draw_dsc;
                 const lv_image_dsc_t * img_dsc = draw_dsc->src;
 
-                bool has_recolor = (draw_dsc->recolor_opa != LV_OPA_TRANSP);
 #if VGLITE_BLIT_SPLIT_ENABLED
                 bool has_transform = (draw_dsc->rotation != 0 || draw_dsc->zoom != LV_SCALE_NONE);
 #endif
 
-                if(has_recolor
+                if((!_vglite_cf_supported(img_dsc->header.cf))
 #if VGLITE_BLIT_SPLIT_ENABLED
                    || has_transform
 #endif
-                   || (!_vglite_cf_supported(img_dsc->header.cf))
                    || (!vglite_buf_aligned(img_dsc->data, img_dsc->header.stride, img_dsc->header.cf))
                   )
                     return 0;

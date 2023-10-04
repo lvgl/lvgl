@@ -97,7 +97,7 @@ void lv_draw_pxp_img(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dsc
     uint8_t * dest_buf = layer->draw_buf.buf;
     int32_t dest_stride = lv_draw_buf_get_stride(&layer->draw_buf);
     lv_color_format_t dest_cf = layer->draw_buf.color_format;
-    bool has_recolor = (dsc->recolor_opa != LV_OPA_TRANSP);
+    bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
 
     if(has_recolor && !has_transform)
         _pxp_blit_recolor(dest_buf, &blend_area, dest_stride, dest_cf,

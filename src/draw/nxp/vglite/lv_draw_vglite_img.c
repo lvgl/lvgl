@@ -195,23 +195,26 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
         (uint32_t)lv_area_get_height(src_area) /* height */
     };
 
-    uint32_t vgcol;
-    lv_opa_t opa = dsc->opa;
+    src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
-    if(opa >= (lv_opa_t)LV_OPA_MAX) {
-        vgcol = 0xFFFFFFFFU;
-        src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+    lv_color_t color;
+    lv_opa_t opa;
+
+    bool has_recolor = (dsc->recolor_opa > LV_OPA_MIN);
+    if(has_recolor) {
+        color = dsc->recolor;
+        opa = (lv_opa_t)((uint16_t)(dsc->recolor_opa * dsc->opa) >> 8);
     }
     else {
-        if(vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-            vgcol = (opa << 24) | 0x00FFFFFFU;
-        }
-        else {
-            vgcol = (opa << 24) | (opa << 16) | (opa << 8) | opa;
-        }
-        src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-        src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
+        color.red = 0xFF;
+        color.green = 0xFF;
+        color.blue = 0xFF;
+        opa = dsc->opa;
     }
+
+    lv_color32_t col32 = lv_color_to_32(color, opa);
+    vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);

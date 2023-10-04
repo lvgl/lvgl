@@ -90,9 +90,9 @@ vg_lite_color_t vglite_get_color(lv_color32_t lv_col32, bool gradient)
 
     /* Only pre-multiply color if hardware pre-multiplication is not present */
     if(!vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-        lv_col32.red = (uint8_t)((lv_col32.red * lv_col32.alpha) >> 8);
-        lv_col32.green = (uint8_t)((lv_col32.green * lv_col32.alpha) >> 8);
-        lv_col32.blue = (uint8_t)((lv_col32.blue * lv_col32.alpha) >> 8);
+        lv_col32.red = (uint8_t)((uint16_t)(lv_col32.red * lv_col32.alpha) >> 8);
+        lv_col32.green = (uint8_t)((uint16_t)(lv_col32.green * lv_col32.alpha) >> 8);
+        lv_col32.blue = (uint8_t)((uint16_t)(lv_col32.blue * lv_col32.alpha) >> 8);
     }
 
     if(!gradient)
