@@ -119,13 +119,10 @@ static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)
 
 static void _vglite_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
-    uint32_t stride = lv_draw_buf_get_stride(draw_buf);
-
     /* Set vgbuf structure. */
     vg_lite_buffer_t vgbuf;
-    vglite_set_buf(&vgbuf, draw_buf->buf, draw_buf->width, draw_buf->height, stride, draw_buf->color_format);
-
-    vg_lite_color_t vgcol = 0;
+    vglite_set_buf(&vgbuf, draw_buf->buf, draw_buf->width, draw_buf->height, lv_draw_buf_get_stride(draw_buf),
+                   draw_buf->color_format);
 
     vg_lite_rectangle_t rect = {
         .x = area->x1,
@@ -134,7 +131,7 @@ static void _vglite_buf_clear(lv_draw_buf_t * draw_buf, const lv_area_t * area)
         .height = lv_area_get_height(area)
     };
 
-    vg_lite_error_t err = vg_lite_clear(&vgbuf, &rect, vgcol);
+    vg_lite_error_t err = vg_lite_clear(&vgbuf, &rect, 0x0U);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Clear failed.");
 
     vglite_run();

@@ -195,19 +195,19 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
         (uint32_t)lv_area_get_height(src_area) /* height */
     };
 
-    uint32_t color;
+    uint32_t vgcol;
     lv_opa_t opa = dsc->opa;
 
     if(opa >= (lv_opa_t)LV_OPA_MAX) {
-        color = 0xFFFFFFFFU;
+        vgcol = 0xFFFFFFFFU;
         src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
     }
     else {
         if(vg_lite_query_feature(gcFEATURE_BIT_VG_PE_PREMULTIPLY)) {
-            color = (opa << 24) | 0x00FFFFFFU;
+            vgcol = (opa << 24) | 0x00FFFFFFU;
         }
         else {
-            color = (opa << 24) | (opa << 16) | (opa << 8) | opa;
+            vgcol = (opa << 24) | (opa << 16) | (opa << 8) | opa;
         }
         src_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
         src_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
@@ -216,7 +216,7 @@ static void _vglite_blit(const lv_area_t * src_area, const lv_draw_image_dsc_t *
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
     vg_lite_blend_t vgblend = vglite_get_blend_mode(dsc->blend_mode);
 
-    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, rect, vgmatrix, vgblend, color, VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, src_vgbuf, rect, vgmatrix, vgblend, vgcol, VG_LITE_FILTER_POINT);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Blit rectangle failed.");
 
     vglite_run();

@@ -40,17 +40,12 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
 /**
  * Draw letter (character bitmap blend) with optional color and opacity
  *
- * @param[in] dest_area Area with relative coordinates of destination buffer
- * @param[in] mask_buf Mask buffer
  * @param[in] mask_area Mask area with relative coordinates of source buffer
- * @param[in] mask_stride Stride of mask buffer in bytes
  * @param[in] color Color
  * @param[in] opa Opacity
  *
  */
-static void _vglite_draw_letter(const lv_area_t * dest_area,
-                                const void * mask_buf, const lv_area_t * mask_area, uint32_t mask_stride,
-                                lv_color_t color, lv_opa_t opa);
+static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, lv_opa_t opa);
 
 /**********************
  *  STATIC VARIABLES
@@ -130,8 +125,14 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 lv_draw_vglite_border(draw_unit, &border_draw_dsc, glyph_draw_dsc->bg_coords);
             }
             else {
-                _vglite_draw_letter(&blend_area, mask_buf, &mask_area, mask_stride,
-                                    glyph_draw_dsc->color, glyph_draw_dsc->opa);
+                /* Set src_vgbuf structure. */
+                vglite_set_src_buf(mask_buf, lv_area_get_width(&mask_area), lv_area_get_height(&mask_area),
+                                   mask_stride, LV_COLOR_FORMAT_A8);
+
+                /* Set vgmatrix. */
+                vglite_set_translation_matrix(&blend_area);
+
+                _vglite_draw_letter(&mask_area, glyph_draw_dsc->color, glyph_draw_dsc->opa);
             }
         }
         else if(glyph_draw_dsc->format == LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE) {
@@ -152,27 +153,14 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
     }
 }
 
-static void _vglite_draw_letter(const lv_area_t * dest_area,
-                                const void * mask_buf, const lv_area_t * mask_area, uint32_t mask_stride,
-                                lv_color_t color, lv_opa_t opa)
+static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, lv_opa_t opa)
 {
     vg_lite_error_t err = VG_LITE_SUCCESS;
     vg_lite_buffer_t * dst_vgbuf = vglite_get_dest_buf();
+    vg_lite_buffer_t * mask_vgbuf = vglite_get_src_buf();
 
-    vg_lite_buffer_t mask_vgbuf;
-    mask_vgbuf.format = VG_LITE_A8;
-    mask_vgbuf.tiled = VG_LITE_LINEAR;
-    mask_vgbuf.image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
-    mask_vgbuf.transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
-    mask_vgbuf.width = (int32_t)lv_area_get_width(mask_area);
-    mask_vgbuf.height = (int32_t)lv_area_get_height(mask_area);
-    mask_vgbuf.stride = (int32_t)mask_stride;
-
-    lv_memzero(&mask_vgbuf.yuv, sizeof(mask_vgbuf.yuv));
-
-    mask_vgbuf.memory = (void *)mask_buf;
-    mask_vgbuf.address = (uint32_t)mask_vgbuf.memory;
-    mask_vgbuf.handle = NULL;
+    mask_vgbuf->image_mode = VG_LITE_MULTIPLY_IMAGE_MODE;
+    mask_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
     uint32_t rect[] = {
         (uint32_t)0, /* start x */
@@ -184,13 +172,10 @@ static void _vglite_draw_letter(const lv_area_t * dest_area,
     lv_color32_t col32 = lv_color_to_32(color, opa);
     vg_lite_color_t vgcol = vglite_get_color(col32, false);
 
-    /* Set vgmatrix. */
-    vglite_set_translation_matrix(dest_area);
     vg_lite_matrix_t * vgmatrix = vglite_get_matrix();
 
     /*Blit with font color as paint color*/
-    err = vg_lite_blit_rect(dst_vgbuf, &mask_vgbuf, rect, vgmatrix, VG_LITE_BLEND_SRC_OVER, vgcol,
-                            VG_LITE_FILTER_POINT);
+    err = vg_lite_blit_rect(dst_vgbuf, mask_vgbuf, rect, vgmatrix, VG_LITE_BLEND_SRC_OVER, vgcol, VG_LITE_FILTER_POINT);
     LV_ASSERT_MSG(err == VG_LITE_SUCCESS, "Draw letter failed.");
 
     vglite_run();
