@@ -22,10 +22,10 @@ FileList = glob.glob( TESTCASE_FOLDER + '/*.py' )
 
 for FilePath in sorted(FileList):
     TestCaseCount += 1
-    print( "Running test-case" , TestCaseCount , ": " + FilePath )
+    print( "\nRunning test-case" , TestCaseCount , ": " + FilePath )
     lv_testcase_result = os.system( MICROPYTHON_COMMAND + " " + TESTCASE_RUNNER + " " + FilePath )
     if lv_testcase_result == lv_test.RESULT_OK: TestSuccessCount += 1
-    #else: print("Problem occurred during the test-case!")
+    #else: print( "Problem occurred during the test-case! Error-code:", lv_testcase_result>>8 )
 
 print( "\nSuccessful tests:",TestSuccessCount,"/",TestCaseCount,"\n" )
 

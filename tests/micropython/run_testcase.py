@@ -14,14 +14,18 @@ import test_definitions as lv_test
 
 LV_TEST_TIMEOUT = 100 #ms
 
-lv_testcase_result = 0
-recorded_exception = None
+lv_success_count = 0
+driver_exception = None
 
 
-def handle_exceptions(Null, e):
+def lv_handle_driver_exceptions (Null, e):
     lv_utils.event_loop.current_instance().deinit()
-    if not recorded_exception:
-        recorded_exception = e
+    if not driver_exception: driver_exception = e
+
+def lv_subtest_success (subtest_name, subtest_id=None):
+    global lv_success_count
+    lv_success_count += 1
+    print( "Subtest", subtest_id  if subtest_id else lv_success_count, "succeeded:", subtest_name )
 
 
 if len(usys.argv) < 2 :
@@ -29,20 +33,22 @@ if len(usys.argv) < 2 :
     usys.exit(lv_test.ERROR_TESTCASE_NOT_GIVEN)
 
 
-display_driver_utils.driver(exception_sink = handle_exceptions)
+display_driver_utils.driver(exception_sink = lv_handle_driver_exceptions)
 
 try:
     exec ( open(usys.argv[1]).read() )
-    #print( lv_testcase_result )
+    #print( lv_success_count )
     time.sleep_ms(LV_TEST_TIMEOUT)
-    if recorded_exception: raise recorded_exception
+    if driver_exception: raise driver_exception
     gc.collect()
-    if lv_testcase_result >= LV_TESTCASE_SUBTESTS:
+    if lv_success_count >= LV_TESTCASE_SUBTESTS:
         usys.exit(lv_test.RESULT_OK)
     else:
-        print(" Only",lv_testcase_result,'of the',LV_TESTCASE_SUBTESTS,"subtests succeeded!")
+        print("***ERROR*** Only",lv_success_count,'of the',LV_TESTCASE_SUBTESTS,"subtests succeeded!")
         usys.exit( lv_test.ERROR_TESTCASE_FAILED )
 
 except Exception as e:
+    print( "Driver issue happened!" );
     usys.print_exception(e)
     usys.exit( lv_test.ERROR_BINDING_SYSTEM_FAULT )
+
