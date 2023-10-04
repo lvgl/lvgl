@@ -15,6 +15,8 @@ import test_definitions as lv_test
 
 LV_TEST_TIMEOUT = 100 #ms
 
+lv_subtest_running = 0
+lv_subtest_count = 0
 lv_success_count = 0
 lv_driver_exception = None
 
@@ -23,14 +25,22 @@ def lv_handle_driver_exceptions (Null, e):
     lv_utils.event_loop.current_instance().deinit()
     if not lv_driver_exception: lv_driver_exception = e
 
-def lv_subtest_success (subtest_name=None, subtest_id=None):
-    global lv_success_count
+def lv_subtest_start (subtest_name, subtest_id=None): #for more verbose output
+    global lv_subtest_count, lv_subtest_running
+    lv_subtest_running = 1
+    lv_subtest_count += 1
+    print( "Subtest", subtest_id  if subtest_id  else "("+str(lv_subtest_count)+")"
+           , "started:", subtest_name  if subtest_name  else "", end=" ... " )
+
+def lv_subtest_success (subtest_name=None, success_id=None):
+    global lv_success_count, lv_subtest_running
+    lv_subest_running = 0
     lv_success_count += 1
     if ( type(subtest_name) == int ):
-        subtest_id = subtest_name
+        success_id = subtest_name
         subtest_name = None
-    print( "Subtest", subtest_id  if subtest_id  else "("+str(lv_success_count)+")"
-           , "succeeded:", subtest_name  if subtest_name  else "(no name)" )
+    print( "Subtest", success_id  if success_id  else "("+str(lv_success_count)+")"
+           , "succeeded", ": "+str(subtest_name)  if subtest_name  else "" )
 
 
 if len(usys.argv) < 2 :
@@ -51,6 +61,7 @@ try:
     if lv_success_count >= LV_TESTCASE_SUBTESTS:
         usys.exit(lv_test.RESULT_OK)
     else:
+        if lv_subtest_running: print()
         print("***ERROR*** Only",lv_success_count,'of the',LV_TESTCASE_SUBTESTS,"subtests succeeded!")
         usys.exit( lv_test.ERROR_TESTCASE_FAILED )
 

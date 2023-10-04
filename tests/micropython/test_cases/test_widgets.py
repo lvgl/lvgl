@@ -1,3 +1,4 @@
+#!../run_testcase.py
 #LVGL MicroPython binding tester script: Widget-creation/deletion and basic flag/property-settings
 
 LV_TESTCASE_SUBTESTS = 2

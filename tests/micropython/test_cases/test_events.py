@@ -1,3 +1,4 @@
+#!../run_testcase.py
 #LVGL MicroPython binding tester script: Events - trigger and capture events of a widget
 
 LV_TESTCASE_SUBTESTS = 1
