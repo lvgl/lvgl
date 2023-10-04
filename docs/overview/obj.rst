@@ -3,9 +3,9 @@ Objects
 =======
 
 In LVGL the **basic building blocks** of a user interface are the
-objects, also called *Widgets*. For example a 
-`Button </widgets/btn>`__, `Label </widgets/label>`__, 
-`Image </widgets/img>`__, `List </widgets/list>`__, 
+objects, also called *Widgets*. For example a
+`Button </widgets/btn>`__, `Label </widgets/label>`__,
+`Image </widgets/img>`__, `List </widgets/list>`__,
 `Chart </widgets/chart>`__ or `Text area </widgets/textarea>`__.
 
 You can see all the `Object types </widgets/index>`__ here.
@@ -22,11 +22,11 @@ Basic attributes
 
 All object types share some basic attributes:
 
-- Position 
-- Size 
+- Position
+- Size
 - Parent
-- Styles 
-- Event handlers 
+- Styles
+- Event handlers
 - Etc
 
 You can set/get these attributes with ``lv_obj_set_...`` and
@@ -45,7 +45,7 @@ Specific attributes
 
 The object types have special attributes too. For example, a slider has
 
-- Minimum and maximum values 
+- Minimum and maximum values
 - Current value
 
 For these special attributes, every object type may have unique API
@@ -174,7 +174,7 @@ be created like:
 
    lv_obj_t * scr1 = lv_obj_create(NULL);
 
-Screens can be created with any object type. For example, a 
+Screens can be created with any object type. For example, a
 `Base object </widgets/obj>`__ or an image to make a wallpaper.
 
 Get the active screen
@@ -193,9 +193,9 @@ To load a new screen, use :cpp:expr:`lv_scr_load(scr1)`.
 Layers
 ------
 
-There are two automatically generated layers: 
+There are two automatically generated layers:
 
-- top layer 
+- top layer
 - system layer
 
 They are independent of the screens and they will be shown on every
@@ -216,7 +216,7 @@ Load screen with animation
 
 A new screen can be loaded with animation by using
 :cpp:expr:`lv_scr_load_anim(scr, transition_type, time, delay, auto_del)`. The
-following transition types exist: 
+following transition types exist:
 
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_BOTTOM`: Move the new screen over the current towards the given direction
@@ -240,19 +240,19 @@ Screens are created on the currently selected *default display*. The
 display using :cpp:expr:`lv_disp_set_default(disp)`.
 
 :cpp:func:`lv_scr_act`, :cpp:func:`lv_scr_load` and :cpp:func:`lv_scr_load_anim` operate
-on the default screen.
+on the default display.
 
 Visit `Multi-display support </overview/display>`__ to learn more.
 
 Parts
 *****
 
-The widgets are built from multiple parts. For example a 
+The widgets are built from multiple parts. For example a
 `Base object </widgets/obj>`__ uses the main and scrollbar parts but a
 `Slider </widgets/slider>`__ uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
-The following predefined parts exist in LVGL: 
+The following predefined parts exist in LVGL:
 
 - :cpp:enumerator:`LV_PART_MAIN`: A background like rectangle
 - :cpp:enumerator:`LV_PART_SCROLLBAR`: The scrollbar(s)
@@ -265,7 +265,7 @@ The following predefined parts exist in LVGL:
 - :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom parts can be added from here.
 
 The main purpose of parts is to allow styling the "components" of the
-widgets. They are described in more detail in the 
+widgets. They are described in more detail in the
 `Style overview </overview/style>`__ section.
 
 States
