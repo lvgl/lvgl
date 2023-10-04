@@ -173,7 +173,7 @@ All inputs are disabled during the screen animation.
 Screens are created on the currently selected *default display*.
 The *default display* is the last registered display with `lv_disp_drv_register`. You can also explicitly select a new default display using `lv_disp_set_default(disp)`.
 
-`lv_scr_act()`, `lv_scr_load()` and `lv_scr_load_anim()` operate on the default screen.
+`lv_scr_act()`, `lv_scr_load()` and `lv_scr_load_anim()` operate on the default display.
 
 Visit [Multi-display support](/overview/display) to learn more.
 
