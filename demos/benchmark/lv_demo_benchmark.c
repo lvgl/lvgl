@@ -467,7 +467,7 @@ static void line_cb(void)
     line_create(&style_common);
 }
 
-static void arc_think_cb(void)
+static void arc_thin_cb(void)
 {
 
     lv_style_reset(&style_common);
@@ -612,7 +612,7 @@ static scene_dsc_t scenes[] = {
 
     {.name = "Line",                         .weight = 10, .create_cb = line_cb},
 
-    {.name = "Arc think",                    .weight = 10, .create_cb = arc_think_cb},
+    {.name = "Arc thin",                     .weight = 10, .create_cb = arc_thin_cb},
     {.name = "Arc thick",                    .weight = 10, .create_cb = arc_thick_cb},
 
     {.name = "Substr. rectangle",            .weight = 10, .create_cb = sub_rectangle_cb},
