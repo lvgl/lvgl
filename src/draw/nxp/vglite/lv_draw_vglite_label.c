@@ -119,10 +119,6 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
             uint32_t mask_stride = lv_draw_buf_width_to_stride(
                                        lv_area_get_width(glyph_draw_dsc->letter_coords),
                                        LV_COLOR_FORMAT_A8);
-            if(mask_buf) {
-                mask_buf += mask_stride * (blend_area.y1 - glyph_draw_dsc->letter_coords->y1) +
-                            (blend_area.x1 - glyph_draw_dsc->letter_coords->x1);
-            }
 
             if(!vglite_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
                 /* Draw a placeholder rectangle*/
@@ -134,7 +130,6 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
                 lv_draw_vglite_border(draw_unit, &border_draw_dsc, glyph_draw_dsc->bg_coords);
             }
             else {
-
                 _vglite_draw_letter(&blend_area, mask_buf, &mask_area, mask_stride,
                                     glyph_draw_dsc->color, glyph_draw_dsc->opa);
             }
