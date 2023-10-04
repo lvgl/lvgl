@@ -379,8 +379,6 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
         }
-        //        LV_PROFILER_END;
-        //        return;
     }
 
     /*Don't draw anything if the character is empty. E.g. space*/
