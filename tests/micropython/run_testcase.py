@@ -25,10 +25,13 @@ def lv_handle_driver_exceptions (Null, e):
     lv_utils.event_loop.current_instance().deinit()
     if not lv_driver_exception: lv_driver_exception = e
 
-def lv_subtest_start (subtest_name, subtest_id=None): #for more verbose output
+def lv_subtest_start (subtest_name=None, subtest_id=None): #for more verbose output
     global lv_subtest_count, lv_subtest_running
     lv_subtest_running = 1
     lv_subtest_count += 1
+    if ( type(subtest_name) == int ):
+        subtest_id = subtest_name
+        subtest_name = None
     print( "Subtest", subtest_id  if subtest_id  else "("+str(lv_subtest_count)+")"
            , "started:", subtest_name  if subtest_name  else "", end=" ... " )
     return lv_test.TESTMODE
@@ -59,12 +62,15 @@ try:
     gc.collect()
     if lv_utils.event_loop.is_running():
         lv_utils.event_loop.current_instance().deinit()
-    if lv_success_count >= LV_TESTCASE_SUBTESTS:
+    if lv_success_count == LV_TESTCASE_SUBTESTS:
         usys.exit(lv_test.RESULT_OK)
-    else:
+    elif lv_success_count < LV_TESTCASE_SUBTESTS:
         if lv_subtest_running: print()
         print("***ERROR*** Only",lv_success_count,'of the',LV_TESTCASE_SUBTESTS,"subtests succeeded!")
         usys.exit( lv_test.ERROR_TESTCASE_FAILED )
+    else:
+        print("Warning: set LV_TESTCASE_SUBTESTS from",LV_TESTCASE_SUBTESTS,"to",lv_success_count,"!")
+        usys.exit( lv_test.WARNING_SUBTEST_COUNT_MISMATCH )
 
 except Exception as e:
     print( "Driver issue happened!" );

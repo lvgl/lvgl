@@ -17,8 +17,11 @@ if lv_testslider.get_style_bg_color( lv.PART.MAIN ).blue == lv.color_white().blu
     lv_subtest_success("Slider whitening tested")
 
 lv_subtest_start( "Slider-knob pressed color change", 2 )
-lv_testslider.set_style_bg_color( lv.color_white(), lv.PART.KNOB | lv.STATE.PRESSED )
-if lv_testslider.get_style_bg_color( lv.PART.KNOB | lv.STATE.PRESSED ).blue == lv.color_white().blue:
+c_ref = lv.color_hex(0xAABBCC)
+lv_testslider.set_style_bg_color( c_ref, lv.PART.KNOB | lv.STATE.PRESSED )
+lv_testslider.add_state (lv.PART.KNOB | lv.STATE.PRESSED)
+c_pressed = lv_testslider.get_style_bg_color( lv.PART.KNOB | lv.STATE.PRESSED )
+if  c_pressed.blue==c_ref.blue and c_pressed.green==c_ref.green and c_pressed.blue==c_ref.blue:
     lv_subtest_success()
 
 
