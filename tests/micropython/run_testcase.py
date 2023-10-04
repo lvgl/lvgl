@@ -31,6 +31,7 @@ def lv_subtest_start (subtest_name, subtest_id=None): #for more verbose output
     lv_subtest_count += 1
     print( "Subtest", subtest_id  if subtest_id  else "("+str(lv_subtest_count)+")"
            , "started:", subtest_name  if subtest_name  else "", end=" ... " )
+    return lv_test.TESTMODE
 
 def lv_subtest_success (subtest_name=None, success_id=None):
     global lv_success_count, lv_subtest_running
