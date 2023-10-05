@@ -39,6 +39,9 @@ static void btn_value_changed_event_cb(lv_event_t * e);
 
 static void label_text_cb(lv_subject_t * subject, lv_observer_t * observer);
 
+static void arc_value_changed_event_cb(lv_event_t * e);
+static void arc_value_cb(lv_subject_t * subject, lv_observer_t * observer);
+
 static void slider_value_changed_event_cb(lv_event_t * e);
 static void slider_value_cb(lv_subject_t * subject, lv_observer_t * observer);
 
@@ -254,6 +257,9 @@ lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_
 void lv_observer_remove(lv_observer_t * observer)
 {
     LV_ASSERT_NULL(observer);
+
+    observer->subject->notify_restart_query = 1;
+
     _lv_ll_remove(&(observer->subject->subs_ll), observer);
 
     if(observer->auto_free_user_data) {
@@ -330,6 +336,20 @@ lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const
     return observer;
 }
 
+lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject)
+{
+    if(subject->type != LV_SUBJECT_TYPE_INT) {
+        LV_LOG_WARN("Incompatible subject type: %d", subject->type);
+        return NULL;
+    }
+
+    lv_obj_add_event(obj, arc_value_changed_event_cb, LV_EVENT_VALUE_CHANGED, subject);
+
+    lv_observer_t * observer = lv_subject_add_observer_obj(subject, arc_value_cb, obj, NULL);
+    return observer;
+}
+
+
 lv_observer_t * lv_slider_bind_value(lv_obj_t * obj, lv_subject_t * subject)
 {
     if(subject->type != LV_SUBJECT_TYPE_INT) {
@@ -379,8 +399,19 @@ static void notify(lv_subject_t * subject)
 {
     lv_observer_t * observer;
     _LV_LL_READ(&(subject->subs_ll), observer) {
-        if(observer->cb) observer->cb(subject, observer);
+        observer->notified = 0;
     }
+
+    do {
+        subject->notify_restart_query = 0;
+        _LV_LL_READ(&(subject->subs_ll), observer) {
+            if(observer->cb && observer->notified == 0) {
+                observer->cb(subject, observer);
+                if(subject->notify_restart_query) break;
+                observer->notified = 1;
+            }
+        }
+    } while(subject->notify_restart_query);
 }
 
 static void group_notify_cb(lv_subject_t * subject, lv_observer_t * observer)
@@ -478,6 +509,19 @@ static void label_text_cb(lv_subject_t * subject, lv_observer_t * observer)
                 break;
         }
     }
+}
+
+static void arc_value_changed_event_cb(lv_event_t * e)
+{
+    lv_obj_t * arc = lv_event_get_current_target(e);
+    lv_subject_t * subject = lv_event_get_user_data(e);
+
+    lv_subject_set_int(subject, lv_arc_get_value(arc));
+}
+
+static void arc_value_cb(lv_subject_t * subject, lv_observer_t * observer)
+{
+    lv_arc_set_value(observer->target, subject->value.num);
 }
 
 static void slider_value_changed_event_cb(lv_event_t * e)

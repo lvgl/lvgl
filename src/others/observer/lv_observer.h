@@ -51,11 +51,12 @@ typedef union {
  * The subject (an observable value)
  */
 typedef struct {
-    lv_ll_t subs_ll;                /**< Subscribers*/
+    lv_ll_t subs_ll;                    /**< Subscribers*/
     uint32_t type   : 4;
-    uint32_t size   : 28;           /**< Might be used to store a size related to `type`*/
-    lv_subject_value_t value;       /**< Actual value*/
-    lv_subject_value_t prev_value;       /**< Previous value*/
+    uint32_t size   : 28;               /**< Might be used to store a size related to `type`*/
+    lv_subject_value_t value;           /**< Actual value*/
+    lv_subject_value_t prev_value;      /**< Previous value*/
+    uint32_t notify_restart_query : 1; /**< If an observer deleted start notifying from the beginning. */
 } lv_subject_t;
 
 /**
@@ -72,7 +73,8 @@ typedef struct _lv_observer_t {
     lv_observer_cb_t cb;                /**< Callback that should be called when the value changes*/
     void * target;                      /**< A target for the observer, e.g. a widget or style*/
     void * user_data;                   /**< Additional parameter supplied when subscribing*/
-    uint32_t auto_free_user_data : 1;    /**< Automatically free user data when the observer is removed */
+    uint32_t auto_free_user_data : 1;   /**< Automatically free user data when the observer is removed */
+    uint32_t notified : 1;              /**< Mark if this observer was already notified*/
 } lv_observer_t;
 
 /**********************
@@ -283,6 +285,14 @@ lv_observer_t * lv_btn_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
  * @note            if the subject is a pointer must point to a `\0` terminated string.
  */
 lv_observer_t * lv_label_bind_text(lv_obj_t * obj, lv_subject_t * subject, const char * fmt);
+
+/**
+ * Bind an integer subject to an arc's value
+ * @param obj       pointer to an arc
+ * @param subject   pointer to a subject
+ * @return          pointer to the created observer
+ */
+lv_observer_t * lv_arc_bind_value(lv_obj_t * obj, lv_subject_t * subject);
 
 /**
  * Bind an integer subject to a slider's value
