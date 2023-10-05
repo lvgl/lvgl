@@ -288,16 +288,16 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
         lv_coord_t buf_h;
         if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
             uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565);
-            buf_stride += blend_w;          /*For the A8 part which not stride aligned*/
+            buf_stride += blend_w;          /*For the A8 part which is not stride aligned*/
             buf_h = MAX_BUF_SIZE / buf_stride;
             if(buf_h > blend_h) buf_h = blend_h;
-            tmp_buf = lv_malloc(buf_stride * buf_h);
+            tmp_buf = lv_draw_buf_malloc(buf_stride * buf_h, LV_COLOR_FORMAT_RGB565A8);
         }
         else {
             uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
             buf_h = MAX_BUF_SIZE / buf_stride;
             if(buf_h > blend_h) buf_h = blend_h;
-            tmp_buf = lv_malloc(buf_stride * buf_h);
+            tmp_buf = lv_draw_buf_malloc(buf_stride * buf_h, cf_final);
         }
 
         uint8_t * tmp_buf_aligned = lv_draw_buf_align_buf(tmp_buf, cf_final);
@@ -351,7 +351,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                         lv_memcpy(a_dest_buf, a_src_buf, blend_w);
                         rgb_src_buf += blend_dsc.src_stride;
                         a_src_buf += blend_dsc.src_stride / 2;
-                        rgb_dest_buf += blend_w * 2;
+                        rgb_dest_buf +=  blend_w * 2;
                         a_dest_buf += blend_w;
                     }
                 }
