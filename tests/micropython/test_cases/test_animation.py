@@ -1,7 +1,5 @@
-#!../run_testcase.py
+#! ../run_testcase.py
 #LVGL MicroPython binding tester script: Animation to change widget-position, start & ready callbacks
-
-LV_TESTCASE_SUBTESTS = 1
 
 
 #test-objects:
@@ -19,11 +17,10 @@ lv_testanim.set_custom_exec_cb( lambda a,v: lv_testbutton.set_x(v) )
 
 #tests:
 
-lv.anim_t.start (lv_testanim)
-
-if lv_subtest_start("Move button"):
+if lv_test.DO:
+    lv.anim_t.start (lv_testanim)
     for i in range(100):
         lv.refr_now(None)
         time.sleep_ms(10)
 
-if lv_testbutton.get_x() > 10: lv_subtest_success("Button moved")
+lv_test.check( lv_testbutton.get_x() > 10, True, "Button movement animation" )

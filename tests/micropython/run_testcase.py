@@ -1,4 +1,4 @@
-#!/usr/local/bin/micropython
+#! /usr/bin/env micropython
 #LVGL MicroPython single test-case runner script (test-case script is given as parameter)
 
 import gc
@@ -10,70 +10,63 @@ import lv_utils
 import display_driver
 import display_driver_utils
 
-import test_definitions as lv_test
+import test_constants as lv_cons
 
 
-LV_TEST_TIMEOUT = 100 #ms
+class lv_test:
+    DO = 1  #set to 0 to test the framework itself (in testcases this variable can be a test-condition)
+    subtest_count = 0
+    success_count = 0
+    driver_exception = None
+    TESTCASE_HOLD_TIME = 100 #ms
 
-lv_subtest_running = 0
-lv_subtest_count = 0
-lv_success_count = 0
-lv_driver_exception = None
+    @classmethod
+    def check (cls, tested_expression, expected_value, subtest_name=None):
+        cls.subtest_count += 1
+        print( "Subtest", str(cls.subtest_count)+":", subtest_name  if subtest_name  else "", end=" ... " )
+        if (tested_expression == expected_value):
+            cls.success_count += 1
+            print( "OK" )
+        else: print( "Failed (",tested_expression,"vs expected",expected_value,")" )
 
+    @classmethod
+    def handle_driver_exception (cls, e):
+        lv_utils.event_loop.current_instance().deinit()
+        cls.driver_exception = e
 
-def lv_handle_driver_exceptions (Null, e):
-    lv_utils.event_loop.current_instance().deinit()
-    if not lv_driver_exception: lv_driver_exception = e
-
-def lv_subtest_start (subtest_name=None, subtest_id=None): #for more verbose output
-    global lv_subtest_count, lv_subtest_running
-    lv_subtest_running = 1
-    lv_subtest_count += 1
-    if ( type(subtest_name) == int ):
-        subtest_id = subtest_name
-        subtest_name = None
-    print( "Subtest", subtest_id  if subtest_id  else "("+str(lv_subtest_count)+")"
-           , "started:", subtest_name  if subtest_name  else "", end=" ... " )
-    return lv_test.TESTMODE
-
-def lv_subtest_success (subtest_name=None, success_id=None):
-    global lv_success_count, lv_subtest_running
-    lv_subest_running = 0
-    lv_success_count += 1
-    if ( type(subtest_name) == int ):
-        success_id = subtest_name
-        subtest_name = None
-    print( "Subtest", success_id  if success_id  else "("+str(lv_success_count)+")"
-           , "succeeded", ": "+str(subtest_name)  if subtest_name  else "" )
+    @classmethod
+    def wait (cls, ms): time.sleep_ms( ms )
 
 
 if len(usys.argv) < 2 :
     print("Test-case filename is needed as argument!")
-    usys.exit(lv_test.ERROR_TESTCASE_NOT_GIVEN)
+    usys.exit(lv_cons.ERROR_TESTCASE_NOT_GIVEN)
 
 
-display_driver_utils.driver(exception_sink = lv_handle_driver_exceptions)
+display_driver_utils.driver( exception_sink = lv_test.handle_driver_exception )
+
 
 try:
     exec ( open(usys.argv[1]).read() )
-    #print( lv_success_count )
-    time.sleep_ms(LV_TEST_TIMEOUT)
-    if lv_driver_exception: raise lv_driver_exception
-    gc.collect()
+    time.sleep_ms(lv_test.TESTCASE_HOLD_TIME)
+    if lv_test.driver_exception: raise lv_test.driver_exception
     if lv_utils.event_loop.is_running():
         lv_utils.event_loop.current_instance().deinit()
-    if lv_success_count == LV_TESTCASE_SUBTESTS:
-        usys.exit(lv_test.RESULT_OK)
-    elif lv_success_count < LV_TESTCASE_SUBTESTS:
-        if lv_subtest_running: print()
-        print("***ERROR*** Only",lv_success_count,'of the',LV_TESTCASE_SUBTESTS,"subtests succeeded!")
-        usys.exit( lv_test.ERROR_TESTCASE_FAILED )
+    gc.collect()
+
+    if lv_test.subtest_count == 0 :
+        print("***ERROR*** Tests are not defined!")
+        usys.exit(lv_cons.ERROR_TESTCASE_IS_EMPTY)
+
+    if lv_test.success_count == lv_test.subtest_count:
+        usys.exit(lv_cons.RESULT_OK)
     else:
-        print("Warning: set LV_TESTCASE_SUBTESTS from",LV_TESTCASE_SUBTESTS,"to",lv_success_count,"!")
-        usys.exit( lv_test.WARNING_SUBTEST_COUNT_MISMATCH )
+        print("***ERROR*** Only",lv_test.success_count,'of the',lv_test.subtest_count,"subtests succeeded!")
+        usys.exit( lv_cons.ERROR_TESTCASE_FAILED )
+
 
 except Exception as e:
-    print( "Driver issue happened!" );
+    print( "Test System issue!" );
     usys.print_exception(e)
-    usys.exit( lv_test.ERROR_BINDING_SYSTEM_FAULT )
+    usys.exit( lv_cons.ERROR_TEST_SYSTEM_FAULT )
 
