@@ -842,6 +842,7 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
     uint32_t i;
     for(i = 0; i < obj->style_cnt; i++) {
         if(style == NULL || obj->styles[i].style == style) {
+            full_cache_refresh(obj, lv_obj_style_get_selector_part(obj->styles[i].selector));
             lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
             break;
         }
