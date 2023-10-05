@@ -22,9 +22,11 @@ lv_test.check( lv_compare_colors( lv_testslider.get_style_bg_color(lv.PART.MAIN)
 
 if lv_test.DO:
     lv_testslider.set_style_bg_color( lv_testcolor, lv.PART.KNOB | lv.STATE.PRESSED )
-    lv_testslider.add_state (lv.STATE.PRESSED)
-    lv_test.wait(500)  #seems required
+    lv_testslider.add_state( lv.STATE.PRESSED )
+    lv_test.wait(200)  #seems required, a polling with timeout would be better
 
 lv_test.check( lv_compare_colors( lv_testslider.get_style_bg_color(lv.PART.KNOB), lv_testcolor )
                ,True , "Slider-knob pressed color change" )
 
+
+#lv_test.assert_equal( expected, actual, message ) - seems the preferred form for asserts

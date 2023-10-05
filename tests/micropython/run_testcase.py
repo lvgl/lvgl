@@ -22,12 +22,16 @@ class lv_test:
 
     @classmethod
     def check (cls, tested_expression, expected_value, subtest_name=None):
+        def show_subtest ():
+            print( "Subtest", str(cls.subtest_count)+":", subtest_name  if subtest_name  else "", end=" ... " )
         cls.subtest_count += 1
-        print( "Subtest", str(cls.subtest_count)+":", subtest_name  if subtest_name  else "", end=" ... " )
         if (tested_expression == expected_value):
             cls.success_count += 1
-            print( "OK" )
-        else: print( "Failed (",tested_expression,"vs expected",expected_value,")" )
+            if lv_cons.SHOW_SUCCESSES: show_subtest(); print( "OK" )
+        else:
+            show_subtest()
+            print( "Failed (",tested_expression,"vs expected",expected_value,")" )
+            if lv_cons.EXIT_ON_ERROR: usys.exit( lv_cons.ERROR_SUBTEST_FAILED )
 
     @classmethod
     def handle_driver_exception (cls, e):

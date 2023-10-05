@@ -21,11 +21,19 @@ class Var:
     FileList = glob.glob( TESTCASE_FOLDER + '/*.py' )
 
 
+#print( "LVGL MicroPython binding tester. (Press ESC to stop the testing in the middle.)" )
+
 for Var.FilePath in sorted(Var.FileList):
     Var.TestCaseCount += 1
     print( "\nRunning test-case" , Var.TestCaseCount , ": ---------- " + Var.FilePath + " ----------" )
     Var.TestResult = os.system( Var.MICROPYTHON_COMMAND + " " + Var.TESTCASE_RUNNER + " " + Var.FilePath )
     if Var.TestResult == lv_cons.RESULT_OK: Var.TestSuccessCount += 1
+    elif lv_cons.EXIT_ON_ERROR:
+        print( "\nErrors were reported, exiting." )
+        break
+    #if sys.stdin.read(1) == '\x1b':
+    #    print( "\nTesting was terminated by hand." )
+    #    break
 
 print( "\nSuccessful tests:",Var.TestSuccessCount,"/",Var.TestCaseCount,"\n" )
 
