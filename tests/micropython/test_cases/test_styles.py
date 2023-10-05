@@ -13,20 +13,18 @@ lv_testcolor = lv.color_hex(0xAABBCC)
 
 #tests:
 
-if lv_test.DO:
-    lv_testslider.set_style_bg_color( lv.color_white(), lv.PART.MAIN )
+lv_testslider.set_style_bg_color( lv.color_white(), lv.PART.MAIN )
 
-lv_test.check( lv_compare_colors( lv_testslider.get_style_bg_color(lv.PART.MAIN), lv.color_white() )
-               , True, "Slider main-part default color change" )
+lv_test.assert_colormatch( lv.color_white(), lv_testslider.get_style_bg_color(lv.PART.MAIN)
+                           , "Slider main-part default color change" )
 
 
-if lv_test.DO:
-    lv_testslider.set_style_bg_color( lv_testcolor, lv.PART.KNOB | lv.STATE.PRESSED )
-    lv_testslider.add_state( lv.STATE.PRESSED )
-    lv_test.wait(200)  #seems required, a polling with timeout would be better
+lv_testslider.set_style_bg_color( lv_testcolor, lv.PART.KNOB | lv.STATE.PRESSED )
+lv_testslider.add_state( lv.STATE.PRESSED )
+lv_test.wait(200)  #wait for transition, a polling with timeout would be better
 
-lv_test.check( lv_compare_colors( lv_testslider.get_style_bg_color(lv.PART.KNOB), lv_testcolor )
-               ,True , "Slider-knob pressed color change" )
+lv_test.assert_colormatch ( lv_testcolor, lv_testslider.get_style_bg_color(lv.PART.KNOB)
+                            , "Slider-knob pressed color change" )
 
 
 #lv_test.assert_equal( expected, actual, message ) - seems the preferred form for asserts

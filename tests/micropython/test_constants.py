@@ -1,9 +1,11 @@
 #! /bin/false
 #LVGL MicroPython testing definitions (error codes, etc.) common for Python3 and MicroPython scripts
 
+
 #settings
 EXIT_ON_ERROR  = 0
 SHOW_SUCCESSES = 1
+TESTCASE_HOLD_TIME = 100 #ms
 
 
 #status codes (script return values):
