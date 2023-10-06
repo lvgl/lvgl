@@ -892,13 +892,8 @@ JRESULT jd_mcu_output(
     /* Squeeze up pixel table if a part of MCU is to be truncated */
     mx >>= jd->scale;
     if(rx < mx) {   /* Is the MCU spans rigit edge? */
-<<<<<<< HEAD:src/libs/sjpg/tjpgd.c
         uint8_t * s, * d;
-        unsigned int x, y;
-=======
-        uint8_t * s, *d;
         unsigned int xi, yi;
->>>>>>> master:src/libs/tjpgd/tjpgd.c
 
         s = d = (uint8_t *)jd->workbuf;
         for(yi = 0; yi < ry; yi++) {
