@@ -1,4 +1,4 @@
-#! ../run_testcase.py
+#! ../../../../../../../lv_micropython/ports/unix/build-standard/micropython ../run_testcase.py
 #LVGL MicroPython binding tester script: Animation to change widget-position, start & ready callbacks
 
 

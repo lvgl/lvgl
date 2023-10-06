@@ -1,4 +1,4 @@
-#! ../run_testcase.py
+#! ../../../../../../../lv_micropython/ports/unix/build-standard/micropython ../run_testcase.py
 #LVGL MicroPython binding tester script: Font - change on a label and check the label's size-change
 
 

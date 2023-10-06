@@ -10,7 +10,7 @@ import test_constants as lv_const
 
 
 class Var:
-    MICROPYTHON_COMMAND = "../../../../../../lv_micropython/ports/unix/build-standard/micropython"
+    MICROPYTHON_COMMAND = "./"  #"../../../../../../lv_micropython/ports/unix/build-standard/micropython "
     TESTCASE_RUNNER = "run_testcase.py"
     TESTCASE_FOLDER = "test_cases"
 
@@ -27,7 +27,7 @@ print( "\n==================== LVGL MicroPython binding tester =================
 for Var.FilePath in sorted(Var.FileList):
     Var.TestCaseCount += 1
     print( "\nRunning test-case" , Var.TestCaseCount , ": ---------- " + Var.FilePath + " ----------" )
-    Var.TestResult = os.system( Var.MICROPYTHON_COMMAND + " " + Var.TESTCASE_RUNNER + " " + Var.FilePath )
+    Var.TestResult = os.system( Var.MICROPYTHON_COMMAND + Var.TESTCASE_RUNNER + " " + Var.FilePath )
     if Var.TestResult == lv_const.RESULT_OK: Var.TestSuccessCount += 1
     elif lv_const.EXIT_ON_ERROR:
         print( "\nErrors were reported, exiting." )

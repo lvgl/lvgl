@@ -1,4 +1,4 @@
-#! ../run_testcase.py
+#! ../../../../../../../lv_micropython/ports/unix/build-standard/micropython ../run_testcase.py
 #LVGL MicroPython binding tester script: Widget-creation/deletion and basic flag/property-settings
 
 

@@ -1,4 +1,4 @@
-#! ../run_testcase.py
+#! ../../../../../../../lv_micropython/ports/unix/build-standard/micropython ../run_testcase.py
 #LVGL MicroPython binding tester script: Colour - creation by lv_color_*() and lv_palette_*()
 
 

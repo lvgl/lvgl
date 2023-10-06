@@ -1,4 +1,4 @@
-#! ../run_testcase.py
+#! ../../../../../../../lv_micropython/ports/unix/build-standard/micropython ../run_testcase.py
 #LVGL MicroPython binding tester script: Styles on widget-parts/states and local style-properties
 
 def lv_compare_colors (color1, color2):
@@ -21,7 +21,7 @@ lv_test.assert_colormatch( lv.color_white(), lv_testslider.get_style_bg_color(lv
 
 lv_testslider.set_style_bg_color( lv_testcolor, lv.PART.KNOB | lv.STATE.PRESSED )
 lv_testslider.add_state( lv.STATE.PRESSED )
-lv_test.wait(200)  #wait for transition, a polling with timeout would be better
+lv_test.wait( lv_const.TRANSITION_WAIT_TIME )  # (a polling with timeout might be better)
 
 lv_test.assert_colormatch ( lv_testcolor, lv_testslider.get_style_bg_color(lv.PART.KNOB)
                             , "Slider-knob pressed color change" )

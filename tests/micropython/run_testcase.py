@@ -1,7 +1,8 @@
-#! /usr/bin/env micropython
+#! ../../../../../../lv_micropython/ports/unix/build-standard/micropython
 #LVGL MicroPython single test-case runner script (test-case script is given as parameter)
 
 import gc
+import os
 import usys as sys
 import time
 
@@ -17,6 +18,7 @@ class lv_test:
     subtest_count = 0
     success_count = 0
     driver_exception = None
+    LV_TEST_FOLDER = ""
 
     @classmethod
     def assert_base (cls, expected_value, test_result, operator_fn, operator_symbol, format, subtest_name=None):
@@ -73,6 +75,9 @@ display_driver_utils.driver( exception_sink = lv_test.handle_driver_exception )
 
 
 try:
+    lv_test.FOLDER = ""
+    if os.getcwd().rsplit('/')[-1] != lv_const.TEST_FOLDER:  #so both local and runner scripts work
+        lv_test.FOLDER = lv_const.TEST_FOLDER + "/"
     exec ( open(sys.argv[1]).read() )
     time.sleep_ms(lv_const.TESTCASE_HOLD_TIME)
     if lv_test.driver_exception: raise lv_test.driver_exception
