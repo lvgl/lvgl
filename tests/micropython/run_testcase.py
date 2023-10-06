@@ -31,8 +31,12 @@ class lv_test:
         else:
             show_subtest(); print( "Failed,  not true:", end="" )
             if lv_const.EXIT_ON_ERROR: sys.exit( lv_const.ERROR_SUBTEST_FAILED )
-        print (" (", format%expected_value, operator_symbol, format%actual_value, ")" )
+        if format != "": print (" (", format%expected_value, operator_symbol, format%actual_value, ")" )
+        else: print()
 
+    @staticmethod
+    def assert_always (subtest_name=None):
+        lv_test.assert_base (True, True, lambda a,b: a==b, "is", "", subtest_name)
     @staticmethod
     def assert_true (actual_value, subtest_name=None):
         lv_test.assert_base (True, actual_value, lambda a,b: a==b, "is", "%r", subtest_name)
@@ -85,7 +89,7 @@ try:
     if os.getcwd().rsplit('/')[-1] != lv_const.TEST_FOLDER:  #so both local and runner scripts work
         lv_test.FOLDER = lv_const.TEST_FOLDER + "/"
     exec ( open(sys.argv[1]).read() )
-    time.sleep_ms(lv_const.TESTCASE_HOLD_TIME)
+    lv_test.wait( lv_const.TESTCASE_HOLD_TIME )
     if lv_test.driver_exception: raise lv_test.driver_exception
     if lv_utils.event_loop.is_running():
         lv_utils.event_loop.current_instance().deinit()

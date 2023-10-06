@@ -24,3 +24,6 @@ lv_testlabel.set_align( lv.ALIGN.CENTER )
 lv_test.wait( lv_const.TRANSITION_WAIT_TIME )
 
 lv_test.assert_less( 0, lv_testlabel.get_x(), "Image-loading from PNG-file " + LV_TESTIMAGE_FILENAME )
+
+
+#test loading image from array too

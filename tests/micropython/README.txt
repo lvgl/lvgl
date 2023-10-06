@@ -1,3 +1,4 @@
+
                LVGL MicroPython-binding testing toolkit
                ----------------------------------------
 
@@ -9,11 +10,11 @@ passing the parameters through the Python functions to LVGL works as expected.
 
 run_all_tests.py - as the name suggests, when executed, it checks all the
                    test-cases in 'test_cases' folder,
-                   returns error code if any test-case fails
+                   returns error code if any test-case fails, 0 if all are OK
 
 run_testcase.py - tests a particular test-case script given as argument
-                  (called by the main script mentioned above)
-                  returns error code if the given test-case fails
+                  (called by the main script mentioned above, runs alone too)
+                  returns error code if the given test-case fails, 0 if it's OK
 
 test_constants.py - a file with common constants (e.g. errorcodes) and settings:
                     EXIT_ON_ERROR: abort testing instantly if any test fails
@@ -30,16 +31,19 @@ the change. Every assertion denotes a 'subtest' of the test-case, and these
 subtests are counted automatically. If not all subtests perform successfully
 a fault-report is shown about the success rate (success-count vs subtest-count).
 
-Assertion's form is simple (comment is optional but useful):
+Assertion's form is simple (number of arguments depends on the assertion-type,
+comment is optional but useful):
 
  lv_test.assert_xxx ( comparison_value, actual_value, "comment" )
 
 Different assert-functions decide about the type of the comparison:
 
+assert_always: no value-checking, always asserts test (no arguments, just text)
+               (useful to use directly in callbacks to check if they happened)
 assert_true/assert_false: check if the given variable/expression is True/False
                           ('comparison value' argument is not needed for these)
 assert_equal/assert_differ: check for match of expected vs actual value
-                            or mismatch of an non-wished value vs actual value
+                            or mismatch of a non-wished value vs actual value
 assert_less/assert_greater: checks if the value is below/above a limit (range)
                             (useful when we don't know an exact expected value)
 assert_colormatch: a special check for equality-comparison of lv_color_t objects
@@ -53,11 +57,17 @@ so you can see what value you got by the object-changes in your subtest-code:
 Sometimes it's needed to wait a bit for the LVGL changes to take effect, for
 example when transitions delay the changes. In this case you should add ~200
 milliseconds of delay before checking the result with the assert-function by:
+
  lv_test.wait( lv_const.TRANSITION_WAIT_TIME )
+
+If you open local files it's advised to append lv_test.FOLDER variable before
+the path+filename. This takes care of the proper path, no matter where you
+run the test-script from. (Be it the main folder or 'test_cases' folder.)
 
 Note: The shebang-lines at the 1st rows of the source files help to test the
       cases individually. This comes handy during the editing of a test-case.
 
 Before you write a test-case/subtest it's a good idea to see some existing.
 
+Have a nice testing...
 

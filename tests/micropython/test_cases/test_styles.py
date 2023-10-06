@@ -24,4 +24,5 @@ lv_test.assert_colormatch ( lv_testcolor, lv_testslider.get_style_bg_color(lv.PA
                             , "Slider-knob pressed color change" )
 
 
-#lv_test.assert_equal( expected, actual, message ) - seems the preferred form for asserts
+#test other parts/states too
+

@@ -17,6 +17,18 @@ lv_testanim.set_custom_exec_cb( lambda a,v: lv_testbutton.set_x(v) )
 
 #tests:
 
+def lv_testanim_start_cb (o):
+    lv_test.assert_always( "Button animation started (callback)" )
+
+lv_testanim.set_start_cb( lv_testanim_start_cb )
+
+
+def lv_testanim_ready_cb (o):
+    lv_test.assert_always( "Button animation finished (callback)" )
+
+lv_testanim.set_ready_cb( lv_testanim_ready_cb )
+
+
 lv.anim_t.start (lv_testanim)
 for i in range(100):
     lv.refr_now(None)

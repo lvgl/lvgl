@@ -15,3 +15,5 @@ lv_test.assert_true( lv_testbutton.has_flag( lv.obj.FLAG.CHECKABLE ), "Widget Fl
 lv_testbutton.add_flag( lv.obj.FLAG.FLOATING )
 lv_test.assert_true( lv_testbutton.has_flag( lv.obj.FLAG.FLOATING ), "Widget Flag-setting Test: FLOATING" )
 
+
+#test other widget-types and parts/states too
