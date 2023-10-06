@@ -355,7 +355,7 @@ Set the opacity of the border. Value 0, `LV_OPA_0` or `LV_OPA_TRANSP` means full
 </ul>
 
 ### border_width
-Set hte width of the border. Only pixel values can be used.
+Set the width of the border. Only pixel values can be used.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
@@ -781,7 +781,7 @@ Describes how to blend the colors to the background. The possible values are `LV
 </ul>
 
 ### layout
-Set the layout if the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts.
+Set the layout of the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts.
 <ul>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Default</strong> 0</li>
 <li style='display:inline; margin-right: 20px; margin-left: 0px'><strong>Inherited</strong> No</li>
