@@ -21,4 +21,4 @@ lv_testbutton.add_event( lv_test_eventhandler, lv.EVENT.ALL, None )
 lv_testbutton.send_event( lv.EVENT.CLICKED, None )
 lv_test.wait(500)
 
-lv_test.assert_equal( lv_testbutton_pressed, True, "Button programmatic click test" )
+lv_test.assert_true( lv_testbutton_pressed, "Button programmatic click test" )

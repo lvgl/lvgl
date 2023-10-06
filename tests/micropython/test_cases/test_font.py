@@ -11,5 +11,5 @@ lv_testlabel = lv.label( lv.scr_act() )
 
 lv_testlabel.set_style_text_font( lv.font_dejavu_16_persian_hebrew,0) #lv.font_montserrat_18, 0 )
 
-lv_test.assert_equal( lv_testlabel.get_style_text_font(0).line_height != lv.font_default().line_height, True, "Label font-change" )
+lv_test.assert_differ( lv_testlabel.get_style_text_font(0).line_height, lv.font_default().line_height, "Label font-change" )
 

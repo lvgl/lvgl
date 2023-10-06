@@ -21,7 +21,8 @@ class Var:
     FileList = glob.glob( TESTCASE_FOLDER + '/*.py' )
 
 
-#print( "LVGL MicroPython binding tester. (Press ESC to stop the testing in the middle.)" )
+print( "\n==================== LVGL MicroPython binding tester ====================")
+#print( "Press ESC to stop the testing in the middle.)" )
 
 for Var.FilePath in sorted(Var.FileList):
     Var.TestCaseCount += 1
