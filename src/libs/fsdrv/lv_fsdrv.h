@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file lv_fsdrv.h
  *
  */
@@ -27,20 +27,24 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-#if LV_USE_FS_FATFS != '\0'
+#if LV_USE_FS_FATFS
 void lv_fs_fatfs_init(void);
 #endif
 
-#if LV_USE_FS_STDIO != '\0'
+#if LV_USE_FS_STDIO
 void lv_fs_stdio_init(void);
 #endif
 
-#if LV_USE_FS_POSIX != '\0'
+#if LV_USE_FS_POSIX
 void lv_fs_posix_init(void);
 #endif
 
-#if LV_USE_FS_WIN32 != '\0'
+#if LV_USE_FS_WIN32
 void lv_fs_win32_init(void);
+#endif
+
+#if LV_USE_FS_MEMFS
+void lv_fs_memfs_init(void);
 #endif
 
 /**********************

@@ -1,8 +1,7 @@
 #define LV_MEM_SIZE         (32 * 1024 * 1024)
 #define LV_LAYER_MAX_MEMORY_USAGE   (4 * 1024)
-#define LV_USE_DRAW_MASKS       1
 #define LV_SHADOW_CACHE_SIZE    (8 * 1024)
-#define LV_IMG_CACHE_DEF_SIZE   32
+#define LV_IMAGE_CACHE_DEF_SIZE   32
 #define LV_USE_LOG              1
 #define LV_LOG_LEVEL            LV_LOG_LEVEL_TRACE
 #define LV_LOG_PRINTF           1
@@ -58,10 +57,14 @@
 #define LV_FS_STDIO_CACHE_SIZE 512
 #define LV_USE_FS_POSIX     1
 #define LV_FS_POSIX_LETTER  'B'
+#define LV_USE_FS_MEMFS     1
+#define LV_FS_MEMFS_LETTER  'M'
 
-#define LV_USE_PNG          1
+#define LV_USE_LODEPNG      1
+#define LV_USE_LIBPNG       1
 #define LV_USE_BMP          1
-#define LV_USE_SJPG         1
+#define LV_USE_TJPGD        1
+#define LV_USE_LIBJPEG_TURBO   1
 #define LV_USE_GIF          1
 #define LV_USE_QRCODE       1
 #define LV_USE_BARCODE      1
@@ -81,4 +84,5 @@
 #define LV_USE_DEMO_MULTILANG   1
 #define LV_USE_DEMO_SCROLL      1
 
-
+#define LV_USE_OBJ_ID           1
+#define LV_USE_OBJ_ID_BUILTIN   1

@@ -30,6 +30,7 @@ Widgets
     meter
     msgbox
     roller
+    scale
     slider
     span
     spinbox

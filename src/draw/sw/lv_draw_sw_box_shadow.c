@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rect.c
+ * @file lv_draw_sw_box_shadow.c
  *
  */
 
@@ -38,7 +38,7 @@
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t s,
                                                          lv_coord_t r);
 LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
-#endif
+#endif /*LV_DRAW_SW_COMPLEX*/
 
 
 /**********************
@@ -120,7 +120,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
 #else
     sh_buf = lv_malloc(corner_size * corner_size * sizeof(uint16_t));
     shadow_draw_corner_buf(&core_area, (uint16_t *)sh_buf, dsc->width, r_sh);
-#endif
+#endif /*LV_DRAW_SW_SHADOW_CACHE_SIZE*/
 
     /*Skip a lot of masking if the background will cover the shadow that would be masked out*/
     bool simple = dsc->bg_cover;
@@ -553,7 +553,7 @@ void lv_draw_sw_box_shadow(lv_draw_unit_t * draw_unit, const lv_draw_box_shadow_
     lv_free(sh_buf);
     lv_free(mask_buf);
 }
-#endif /*LV_DRAW_MASKS*/
+#endif /*LV_USE_DRAW_SW*/
 
 /**********************
  *   STATIC FUNCTIONS
@@ -589,7 +589,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
     /*Set half shadow width width because blur will be repeated*/
     if(sw_ori == 1) sw = 1;
     else sw = sw_ori >> 1;
-#endif
+#endif /*SHADOW_ENHANCE*/
 
     int32_t y;
     lv_opa_t * mask_line = lv_malloc(size);
@@ -727,4 +727,4 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 
     lv_free(sh_ups_blur_buf);
 }
-#endif
+#endif /*LV_DRAW_SW_COMPLEX*/

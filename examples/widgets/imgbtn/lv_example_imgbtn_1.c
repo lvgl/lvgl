@@ -3,12 +3,12 @@
 
 void lv_example_imgbtn_1(void)
 {
-    LV_IMG_DECLARE(imgbtn_left);
-    LV_IMG_DECLARE(imgbtn_right);
-    LV_IMG_DECLARE(imgbtn_mid);
+    LV_IMAGE_DECLARE(imgbtn_left);
+    LV_IMAGE_DECLARE(imgbtn_right);
+    LV_IMAGE_DECLARE(imgbtn_mid);
 
     /*Create a transition animation on width transformation and recolor.*/
-    static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMG_RECOLOR_OPA, 0};
+    static lv_style_prop_t tr_prop[] = {LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_IMAGE_RECOLOR_OPA, 0};
     static lv_style_transition_dsc_t tr;
     lv_style_transition_dsc_init(&tr, tr_prop, lv_anim_path_linear, 200, 0, NULL);
 
@@ -20,8 +20,8 @@ void lv_example_imgbtn_1(void)
     /*Darken the button when pressed and make it wider*/
     static lv_style_t style_pr;
     lv_style_init(&style_pr);
-    lv_style_set_img_recolor_opa(&style_pr, LV_OPA_30);
-    lv_style_set_img_recolor(&style_pr, lv_color_black());
+    lv_style_set_image_recolor_opa(&style_pr, LV_OPA_30);
+    lv_style_set_image_recolor(&style_pr, lv_color_black());
     lv_style_set_transform_width(&style_pr, 20);
 
     /*Create an image button*/

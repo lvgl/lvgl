@@ -59,6 +59,37 @@ uint8_t lv_color_format_get_size(lv_color_format_t cf)
     }
 }
 
+uint8_t lv_color_format_get_bpp(lv_color_format_t cf)
+{
+    switch(cf) {
+        case LV_COLOR_FORMAT_NATIVE_REVERSED:
+            return LV_COLOR_DEPTH / 8;
+        case LV_COLOR_FORMAT_I1:
+            return 1;
+        case LV_COLOR_FORMAT_I2:
+            return 2;
+        case LV_COLOR_FORMAT_I4:
+            return 4;
+        case LV_COLOR_FORMAT_L8:
+        case LV_COLOR_FORMAT_A8:
+        case LV_COLOR_FORMAT_I8:
+            return 8;
+        case LV_COLOR_FORMAT_RGB565:
+            return 16;
+
+        case LV_COLOR_FORMAT_RGB565A8:
+        case LV_COLOR_FORMAT_RGB888:
+            return 24;
+        case LV_COLOR_FORMAT_ARGB8888:
+        case LV_COLOR_FORMAT_XRGB8888:
+            return 32;
+
+        case LV_COLOR_FORMAT_UNKNOWN:
+        default:
+            return 0;
+    }
+}
+
 bool lv_color_format_has_alpha(lv_color_format_t cf)
 {
     switch(cf) {

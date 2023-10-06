@@ -46,8 +46,8 @@ static void draw_event_cb(lv_event_t * e)
 static void change_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
-    uint16_t col;
-    uint16_t row;
+    uint32_t col;
+    uint32_t row;
     lv_table_get_selected_cell(obj, &row, &col);
     bool chk = lv_table_has_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);
     if(chk) lv_table_clear_cell_ctrl(obj, row, 0, LV_TABLE_CELL_CTRL_CUSTOM_1);

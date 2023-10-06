@@ -196,7 +196,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t img_lv_demo_music_btn_list_play_map[] = {
 #endif
 };
 
-lv_img_dsc_t img_lv_demo_music_btn_list_play = {
+lv_image_dsc_t img_lv_demo_music_btn_list_play = {
     .header.always_zero = 0,
     .header.w = 58,
     .header.h = 60,

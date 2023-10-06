@@ -7,9 +7,9 @@ try:
     #
     # Open an image from a file
     #
-    img = lv.img(lv.scr_act())
-    img.set_src("ffmpeg.png")
-    img.center()
+    image = lv.image(lv.scr_act())
+    image.set_src("ffmpeg.png")
+    image.center()
 except Exception as e:
     print(e)
     # TODO

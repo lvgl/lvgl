@@ -42,7 +42,7 @@ typedef struct {
     char * pwd_bullet;           /*Replacement characters displayed in password mode*/
     const char * accepted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint32_t max_length;         /*The max. number of characters. 0: no limit*/
-    uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*'*/
+    uint32_t pwd_show_time;      /*Time to show characters in password mode before change them to '*'*/
     struct {
         lv_coord_t valid_x;        /*Used when stepping up/down to a shorter line.
                                     *(Used by the library)*/
@@ -86,7 +86,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * parent);
 
 /**
  * Insert a character to the current cursor position.
- * To add a wide char, e.g. 'Á' use `_lv_txt_encoded_conv_wc('Á')`
+ * To add a wide char, e.g. 'Á' use `_lv_text_encoded_conv_wc('Á')`
  * @param obj       pointer to a text area object
  * @param c         a character (e.g. 'a')
  */
@@ -201,7 +201,7 @@ void lv_textarea_set_text_selection(lv_obj_t * obj, bool en);
  * @param obj       pointer to a text area object
  * @param time      show time in milliseconds. 0: hide immediately.
  */
-void lv_textarea_set_password_show_time(lv_obj_t * obj, uint16_t time);
+void lv_textarea_set_password_show_time(lv_obj_t * obj, uint32_t time);
 
 /**
  * Deprecated: use the normal text_align style property instead
@@ -306,7 +306,7 @@ bool lv_textarea_get_text_selection(lv_obj_t * obj);
  * @param obj       pointer to a text area object
  * @return          show time in milliseconds. 0: hide immediately.
  */
-uint16_t lv_textarea_get_password_show_time(lv_obj_t * obj);
+uint32_t lv_textarea_get_password_show_time(lv_obj_t * obj);
 
 /**
  * Get a the character from the current cursor position

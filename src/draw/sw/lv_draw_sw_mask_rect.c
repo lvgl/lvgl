@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_mask.c
+ * @file lv_draw_sw_mask_rect.c
  *
  */
 

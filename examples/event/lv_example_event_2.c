@@ -29,7 +29,7 @@ static void event_cb(lv_event_t * e)
  */
 void lv_example_event_2(void)
 {
-    lv_obj_t * btn = lv_btn_create(lv_scr_act());
+    lv_obj_t * btn = lv_button_create(lv_scr_act());
     lv_obj_set_size(btn, 100, 50);
     lv_obj_center(btn);
 

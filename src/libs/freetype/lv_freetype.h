@@ -39,9 +39,9 @@ typedef enum {
  * @param max_sizes Maximum number of opened FT_Size objects managed by this cache instance. Use 0 for defaults.
  * @param max_bytes Maximum number of bytes to use for cached data nodes. Use 0 for defaults.
  *                  Note that this value does not account for managed FT_Face and FT_Size objects.
- * @return LV_RES_OK on success, otherwise LV_RES_INV.
+ * @return LV_RESULT_OK on success, otherwise LV_RESULT_INVALID.
  */
-lv_res_t lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_bytes);
+lv_result_t lv_freetype_init(uint16_t max_faces, uint16_t max_sizes, uint32_t max_bytes);
 
 /**
  * Uninitialize the freetype library

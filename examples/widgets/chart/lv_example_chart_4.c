@@ -36,8 +36,8 @@ static void event_cb(lv_event_t * e)
             draw_rect_dsc.bg_color = lv_color_black();
             draw_rect_dsc.bg_opa = LV_OPA_50;
             draw_rect_dsc.radius = 3;
-            draw_rect_dsc.bg_img_src = buf;
-            draw_rect_dsc.bg_img_recolor = lv_color_white();
+            draw_rect_dsc.bg_image_src = buf;
+            draw_rect_dsc.bg_image_recolor = lv_color_white();
 
             lv_area_t a;
             a.x1 = chart->coords.x1 + p.x - 20;

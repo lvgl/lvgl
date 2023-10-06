@@ -13,7 +13,7 @@ sources. For example:
 
 .. code:: c
 
-   lv_img_set_src(my_img, "S:path/to/picture.bmp");
+   lv_image_set_src(my_img, "S:path/to/picture.bmp");
 
 Note that, a file system driver needs to registered to open images from
 files. Read more about it :ref:`file-system` or just
@@ -23,7 +23,7 @@ Limitations
 -----------
 
 -  Only BMP files are supported and BMP images as C array
-   (:c:struct:`lv_img_dsc_t`) are not. It's because there is no practical
+   (:c:struct:`lv_image_dsc_t`) are not. It's because there is no practical
    differences between how the BMP files and LVGL's image format stores
    the image data.
 -  BMP files can be loaded only from file. If you want to store them in

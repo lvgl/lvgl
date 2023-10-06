@@ -49,7 +49,7 @@ void lv_example_checkbox_2(void)
     lv_style_set_radius(&style_radio, LV_RADIUS_CIRCLE);
 
     lv_style_init(&style_radio_chk);
-    lv_style_set_bg_img_src(&style_radio_chk, NULL);
+    lv_style_set_bg_image_src(&style_radio_chk, NULL);
 
     uint32_t i;
     char buf[32];

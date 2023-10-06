@@ -8,8 +8,8 @@
  *********************/
 #include "lv_obj.h"
 #include "../themes/lv_theme.h"
-#include "../disp/lv_disp.h"
-#include "../disp/lv_disp_private.h"
+#include "../display/lv_display.h"
+#include "../display/lv_display_private.h"
 #include "../stdlib/lv_string.h"
 
 /*********************
@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_construct(lv_obj_t * obj);
+static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj);
 static uint32_t get_instance_size(const lv_obj_class_t * class_p);
 
 /**********************
@@ -56,7 +56,7 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
     /*Create a screen*/
     if(parent == NULL) {
         LV_TRACE_OBJ_CREATE("creating a screen");
-        lv_disp_t * disp = lv_disp_get_default();
+        lv_display_t * disp = lv_display_get_default();
         if(!disp) {
             LV_LOG_WARN("No display created yet. No place to assign the new screen");
             lv_free(obj);
@@ -74,8 +74,8 @@ lv_obj_t * lv_obj_class_create_obj(const lv_obj_class_t * class_p, lv_obj_t * pa
         /*Set coordinates to full screen size*/
         obj->coords.x1 = 0;
         obj->coords.y1 = 0;
-        obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
-        obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
+        obj->coords.x2 = lv_display_get_horizontal_resolution(NULL) - 1;
+        obj->coords.y2 = lv_display_get_vertical_resolution(NULL) - 1;
     }
     /*Create a normal object*/
     else {
@@ -100,7 +100,7 @@ void lv_obj_class_init_obj(lv_obj_t * obj)
     lv_obj_enable_style_refresh(false);
 
     lv_theme_apply(obj);
-    lv_obj_construct(obj);
+    lv_obj_construct(obj->class_p, obj);
 
     lv_obj_enable_style_refresh(true);
     lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY);
@@ -165,22 +165,23 @@ bool lv_obj_is_group_def(lv_obj_t * obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_construct(lv_obj_t * obj)
+static void lv_obj_construct(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
-    const lv_obj_class_t * original_class_p = obj->class_p;
-
     if(obj->class_p->base_class) {
+        const lv_obj_class_t * original_class_p = obj->class_p;
+
         /*Don't let the descendant methods run during constructing the ancestor type*/
         obj->class_p = obj->class_p->base_class;
 
         /*Construct the base first*/
-        lv_obj_construct(obj);
+        lv_obj_construct(class_p, obj);
+
+        /*Restore the original class*/
+        obj->class_p = original_class_p;
     }
 
-    /*Restore the original class*/
-    obj->class_p = original_class_p;
 
-    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(obj->class_p, obj);
+    if(obj->class_p->constructor_cb) obj->class_p->constructor_cb(class_p, obj);
 }
 
 static uint32_t get_instance_size(const lv_obj_class_t * class_p)

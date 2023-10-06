@@ -19,7 +19,7 @@ label = lv.label(cont1)
 label.set_text("No rollover")
 
 for i in range(10):
-    obj = lv.btn(cont1)
+    obj = lv.button(cont1)
     obj.set_size(70, lv.SIZE_CONTENT)
     obj.add_flag(lv.obj.FLAG.CHECKABLE)
     lv.group_remove_obj(obj)   # Not needed, we use the gridnav instead

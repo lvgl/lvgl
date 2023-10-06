@@ -253,7 +253,8 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-	#define LV_LOG_TRACE_MSG		1
+    #define LV_LOG_TRACE_MSG        1
+    #define LV_LOG_TRACE_CACHE      1
 
 #endif  /*LV_USE_LOG*/
 
@@ -499,8 +500,6 @@
 
 #define LV_USE_CHECKBOX   1
 
-#define LV_USE_COLORWHEEL 1
-
 #define LV_USE_DROPDOWN   1   /*Requires: lv_label*/
 
 #define LV_USE_IMG        1   /*Requires: lv_label*/
@@ -627,8 +626,8 @@
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
-/*PNG decoder library*/
-#define LV_USE_PNG 0
+/*LODEPNG decoder library*/
+#define LV_USE_LODEPNG 0
 
 /*BMP decoder library*/
 #define LV_USE_BMP 0

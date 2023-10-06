@@ -14,8 +14,7 @@
 #include "../../misc/lv_math.h"
 #include "../../misc/lv_anim.h"
 #include "../../indev/lv_indev.h"
-#include "../../disp/lv_disp.h"
-#include "../img/lv_img.h"
+#include "../../display/lv_display.h"
 
 /*********************
  *      DEFINES
@@ -59,7 +58,8 @@ const lv_obj_class_t lv_switch_class = {
     .height_def = (4 * LV_DPI_DEF) / 17,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_switch_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "switch",
 };
 
 /**********************
@@ -110,11 +110,11 @@ static void lv_switch_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
 
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);

@@ -32,8 +32,10 @@ static void obj_test_task_cb(lv_timer_t * tmr);
  **********************/
 static lv_obj_t * main_page;
 static lv_obj_t * ta;
-static const char * mbox_btns[] = {"Ok", "Cancel", ""};
+static const char * mbox_buttons[] = {"Ok", "Cancel", ""};
 static uint32_t mem_free_start = 0;
+static int16_t g_state = -1;
+
 /**********************
  *      MACROS
  **********************/
@@ -45,7 +47,13 @@ static uint32_t mem_free_start = 0;
 void lv_demo_stress(void)
 {
     LV_LOG_USER("Starting stress test. (< 100 bytes permanent memory leak is normal due to fragmentation)");
-    lv_timer_create(obj_test_task_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
+    lv_timer_t * t = lv_timer_create(obj_test_task_cb, LV_DEMO_STRESS_TIME_STEP, NULL);
+    lv_timer_ready(t); /*Prepare the test right now in first state change.*/
+}
+
+bool lv_demo_stress_finished(void)
+{
+    return g_state == -1;
 }
 
 /**********************
@@ -55,15 +63,14 @@ void lv_demo_stress(void)
 static void obj_test_task_cb(lv_timer_t * tmr)
 {
     (void) tmr;    /*Unused*/
-    static int16_t state = -1;
 
     lv_anim_t a;
     lv_obj_t * obj;
 
-    switch(state) {
+    switch(g_state) {
         case -1: {
-                lv_res_t res = lv_mem_test();
-                if(res != LV_RES_OK) {
+                lv_result_t res = lv_mem_test();
+                if(res != LV_RESULT_OK) {
                     LV_LOG_ERROR("Memory integrity error");
                 }
 
@@ -82,7 +89,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_flex_flow(main_page, LV_FLEX_FLOW_COLUMN);
 
 
-            obj = lv_btn_create(main_page);
+            obj = lv_button_create(main_page);
             lv_obj_set_size(obj, 100, 70);
             obj = lv_label_create(obj);
             lv_label_set_text(obj, "Multi line\n"LV_SYMBOL_OK LV_SYMBOL_CLOSE LV_SYMBOL_WIFI);
@@ -106,7 +113,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 2:
-            obj = lv_btn_create(main_page);
+            obj = lv_button_create(main_page);
             lv_obj_set_size(obj, 200, 70);
 
             /*Move to disabled state very slowly*/
@@ -137,9 +144,9 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 4:
-            obj = lv_btn_create(main_page);
+            obj = lv_button_create(main_page);
             lv_obj_set_size(obj, 100, 70);
-            lv_obj_set_style_bg_img_src(obj, LV_SYMBOL_DUMMY"Text from\nstyle", 0);
+            lv_obj_set_style_bg_image_src(obj, LV_SYMBOL_DUMMY"Text from\nstyle", 0);
             lv_obj_del_async(obj);  /*Delete on next call of `lv_task_handler` (so not now)*/
             break;
 
@@ -176,8 +183,8 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_obj_set_size(obj, LV_HOR_RES / 2, LV_VER_RES / 2);
             lv_obj_align(obj, LV_ALIGN_BOTTOM_RIGHT, 0, 0);
             lv_win_add_title(obj, "Window title");
-            lv_win_add_btn(obj, LV_SYMBOL_CLOSE, 40);
-            lv_win_add_btn(obj, LV_SYMBOL_DOWN, 40);
+            lv_win_add_button(obj, LV_SYMBOL_CLOSE, 40);
+            lv_win_add_button(obj, LV_SYMBOL_DOWN, 40);
             auto_del(obj, LV_DEMO_STRESS_TIME_STEP * 3 + 5);
 
             obj = lv_calendar_create(lv_win_get_content(obj));
@@ -234,7 +241,7 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             break;
 
         case 14:
-            obj = lv_msgbox_create(NULL, "Title", "Some text on the message box with average length", mbox_btns, true);
+            obj = lv_msgbox_create(NULL, "Title", "Some text on the message box with average length", mbox_buttons, true);
 
             lv_timer_t * msgbox_tmr = lv_timer_create(msgbox_del, LV_DEMO_STRESS_TIME_STEP * 5 + 30, obj);
             lv_timer_set_repeat_count(msgbox_tmr, 1);
@@ -270,15 +277,15 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             obj = lv_list_create(main_page);
             {
                 lv_obj_t * b;
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "1. Some very long text to scroll");
+                b = lv_list_add_button(obj, LV_SYMBOL_OK, "1. Some very long text to scroll");
                 auto_del(b, 10);
-                lv_list_add_btn(obj, LV_SYMBOL_OK, "2. Some very long text to scroll");
-                lv_list_add_btn(obj, LV_SYMBOL_OK, "3. Some very long text to scroll");
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "4. Some very long text to scroll");
+                lv_list_add_button(obj, LV_SYMBOL_OK, "2. Some very long text to scroll");
+                lv_list_add_button(obj, LV_SYMBOL_OK, "3. Some very long text to scroll");
+                b = lv_list_add_button(obj, LV_SYMBOL_OK, "4. Some very long text to scroll");
                 auto_del(b, LV_DEMO_STRESS_TIME_STEP);
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "5. Some very long text to scroll");
+                b = lv_list_add_button(obj, LV_SYMBOL_OK, "5. Some very long text to scroll");
                 auto_del(b, LV_DEMO_STRESS_TIME_STEP + 90);
-                b = lv_list_add_btn(obj, LV_SYMBOL_OK, "6. Some very long text to scroll");
+                b = lv_list_add_button(obj, LV_SYMBOL_OK, "6. Some very long text to scroll");
                 auto_del(b, LV_DEMO_STRESS_TIME_STEP + 10);
                 lv_obj_scroll_to_view(lv_obj_get_child(obj, -1),  LV_ANIM_ON);
             }
@@ -404,13 +411,13 @@ static void obj_test_task_cb(lv_timer_t * tmr)
         case 31:
             lv_obj_clean(lv_scr_act());
             main_page = NULL;
-            state = -2;
+            g_state = -2;
             break;
         default:
             break;
     }
 
-    state++;
+    g_state++;
 }
 
 static void auto_del(lv_obj_t * obj, uint32_t delay)

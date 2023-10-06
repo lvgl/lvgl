@@ -40,7 +40,7 @@ void lv_example_msg_2(void)
     lv_obj_t * label;
 
     /*Create a log out button which will be active only when logged in*/
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_scr_act());
     lv_obj_set_pos(btn, 240, 10);
     lv_obj_add_event(btn, log_out_event_cb, LV_EVENT_ALL, NULL);
     lv_msg_subscribe_obj(MSG_LOGIN_OK, btn, NULL);
@@ -59,7 +59,7 @@ void lv_example_msg_2(void)
     lv_msg_subscribe_obj(MSG_LOG_OUT, label, NULL);
 
     /*Create button which will be active only when logged in*/
-    btn = lv_btn_create(lv_scr_act());
+    btn = lv_button_create(lv_scr_act());
     lv_obj_set_pos(btn, 10, 80);
     lv_obj_add_event(btn, start_engine_msg_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);

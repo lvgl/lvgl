@@ -45,11 +45,11 @@ void lv_example_fragment_2(void)
     lv_obj_remove_style_all(container);
     lv_obj_set_grid_cell(container, LV_GRID_ALIGN_STRETCH, 0, 2, LV_GRID_ALIGN_STRETCH, 0, 1);
 
-    lv_obj_t * push_btn = lv_btn_create(root);
+    lv_obj_t * push_btn = lv_button_create(root);
     lv_obj_t * push_label = lv_label_create(push_btn);
     lv_label_set_text(push_label, "Push");
 
-    lv_obj_t * pop_btn = lv_btn_create(root);
+    lv_obj_t * pop_btn = lv_button_create(root);
     lv_obj_t * pop_label = lv_label_create(pop_btn);
     lv_label_set_text(pop_label, "Pop");
     lv_obj_set_grid_cell(push_btn, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_CENTER, 1, 1);
@@ -89,7 +89,7 @@ static lv_obj_t * sample_fragment_create_obj(lv_fragment_t * self, lv_obj_t * pa
     fragment->label = label;
     lv_label_set_text_fmt(label, "The button has been pressed %d times", fragment->counter);
 
-    lv_obj_t * inc_btn = lv_btn_create(content);
+    lv_obj_t * inc_btn = lv_button_create(content);
     lv_obj_t * inc_label = lv_label_create(inc_btn);
     lv_label_set_text(inc_label, "+1");
     lv_obj_add_event(inc_btn, sample_fragment_inc_click, LV_EVENT_CLICKED, fragment);

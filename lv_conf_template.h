@@ -31,9 +31,10 @@
  *=========================*/
 
 /* Possible values
- * - LV_STDLIB_BUILTIN: LVGL's built in implementation
- * - LV_STDLIB_CLIB:    Standard C functions, like malloc, strlen, etc
- * - LV_STDLIB_CUSTOM:  Implement the functions externally
+ * - LV_STDLIB_BUILTIN:     LVGL's built in implementation
+ * - LV_STDLIB_CLIB:        Standard C functions, like malloc, strlen, etc
+ * - LV_STDLIB_MICROPYTHON: MicroPython implementation
+ * - LV_STDLIB_CUSTOM:      Implement the functions externally
  */
 #define LV_USE_STDLIB_MALLOC    LV_STDLIB_BUILTIN
 #define LV_USE_STDLIB_STRING    LV_STDLIB_BUILTIN
@@ -77,11 +78,6 @@
  *========================*/
 
 /*Align the stride of all layers and images to this bytes*/
-#define LV_DRAW_BUF_STRIDE_ALIGN                1          /*Multiple of these Bytes*/
-/*Align the start address of draw_buf addresses to this bytes*/
-#define LV_DRAW_BUF_ALIGN                       4
-
-/*Align the stride of all layers and images to this bytes*/
 #define LV_DRAW_BUF_STRIDE_ALIGN                1
 
 /*Align the start address of draw_buf addresses to this bytes*/
@@ -122,6 +118,12 @@
         #define LV_DRAW_SW_CIRCLE_CACHE_SIZE 4
     #endif
 #endif
+
+/* Use NXP's VG-Lite GPU on iMX RTxxx platforms. */
+#define LV_USE_DRAW_VGLITE 0
+
+/* Use NXP's PXP on iMX RTxxx platforms. */
+#define LV_USE_DRAW_PXP 0
 
 /*=================
  * OPERATING SYSTEM
@@ -176,7 +178,8 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-	#define LV_LOG_TRACE_MSG		1
+    #define LV_LOG_TRACE_MSG        1
+    #define LV_LOG_TRACE_CACHE      1
 
 #endif  /*LV_USE_LOG*/
 
@@ -239,7 +242,7 @@
 
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
-#define LV_DISP_ROT_MAX_BUF (10*1024)
+#define LV_DISPLAY_ROT_MAX_BUF (10*1024)
 
 #define LV_ENABLE_GLOBAL_CUSTOM 0
 #if LV_ENABLE_GLOBAL_CUSTOM
@@ -247,13 +250,11 @@
     #define LV_GLOBAL_CUSTOM_INCLUDE <stdint.h>
 #endif
 
-/*Default image cache size. Image caching keeps some images opened.
- *If only the built-in image formats are used there is no real advantage of caching.
- *With other image decoders (e.g. PNG or JPG) caching save the continuous open/decode of images.
- *However the opened images consume additional RAM.
- *0: to disable caching*/
-#define LV_IMG_CACHE_DEF_SIZE 0
-
+/*Default cache size in bytes.
+ *Used by image decoders such as `lv_lodepng` to keep the decoded image in the memory.
+ *Data larger than the size of the cache also can be allocated but
+ *will be dropped immediately after usage.*/
+#define LV_CACHE_DEF_SIZE       0
 
 /*Number of stops allowed per gradient. Increase this to allow more stops.
  *This adds (sizeof(lv_color_t) + 1) bytes per additional stop*/
@@ -263,9 +264,14 @@
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
 #define LV_COLOR_MIX_ROUND_OFS 0
 
-
 /* Add 2 x 32 bit variables to each lv_obj_t to speed up getting style properties */
-#define  LV_OBJ_STYLE_CACHE 1
+#define LV_OBJ_STYLE_CACHE 0
+
+/* Add `id` field to `lv_obj_t` */
+#define LV_USE_OBJ_ID 0
+
+/* Use lvgl builtin method for obj ID */
+#define LV_USE_OBJ_ID_BUILTIN 0
 
 /*=====================
  *  COMPILER SETTINGS
@@ -280,7 +286,7 @@
 /*Define a custom attribute to `lv_timer_handler` function*/
 #define LV_ATTRIBUTE_TIMER_HANDLER
 
-/*Define a custom attribute to `lv_disp_flush_ready` function*/
+/*Define a custom attribute to `lv_display_flush_ready` function*/
 #define LV_ATTRIBUTE_FLUSH_READY
 
 /*Required alignment size for buffers*/
@@ -471,6 +477,8 @@
 
 #define LV_USE_ROLLER     1   /*Requires: lv_label*/
 
+#define LV_USE_SCALE      1
+
 #define LV_USE_SLIDER     1   /*Requires: lv_bar*/
 
 #define LV_USE_SPAN       1
@@ -569,15 +577,28 @@
     #define LV_FS_FATFS_CACHE_SIZE 0    /*>0 to cache this number of bytes in lv_fs_read()*/
 #endif
 
-/*PNG decoder library*/
-#define LV_USE_PNG 0
+/*API for memory-mapped file access. */
+#define LV_USE_FS_MEMFS 0
+#if LV_USE_FS_MEMFS
+    #define LV_FS_MEMFS_LETTER '\0'     /*Set an upper cased letter on which the drive will accessible (e.g. 'A')*/
+#endif
+
+/*LODEPNG decoder library*/
+#define LV_USE_LODEPNG 0
+
+/*PNG decoder(libpng) library*/
+#define LV_USE_LIBPNG 0
 
 /*BMP decoder library*/
 #define LV_USE_BMP 0
 
 /* JPG + split JPG decoder library.
  * Split JPG is a custom format optimized for embedded systems. */
-#define LV_USE_SJPG 0
+#define LV_USE_TJPGD 0
+
+/* libjpeg-turbo decoder library.
+ * Supports complete JPEG specifications and high-performance JPEG decoding. */
+#define LV_USE_LIBJPEG_TURBO 0
 
 /*GIF decoder library*/
 #define LV_USE_GIF 0
@@ -672,7 +693,7 @@
     #define LV_IMGFONT_PATH_MAX_LEN 64
 
     /*1: Use img cache to buffer header information*/
-    #define LV_IMGFONT_USE_IMG_CACHE_HEADER 0
+    #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
 
 /*1: Enable a published subscriber based messaging system */
@@ -715,21 +736,22 @@
 #define LV_USE_SDL              0
 #if LV_USE_SDL
     #define LV_SDL_INCLUDE_PATH    <SDL2/SDL.h>
-    #define LV_SDL_RENDER_MODE     LV_DISP_RENDER_MODE_DIRECT   /*LV_DISP_RENDER_MODE_DIRECT is recommended for best performance*/
+    #define LV_SDL_RENDER_MODE     LV_DISPLAY_RENDER_MODE_DIRECT   /*LV_DISPLAY_RENDER_MODE_DIRECT is recommended for best performance*/
     #define LV_SDL_BUF_COUNT       1   /*1 or 2*/
     #define LV_SDL_FULLSCREEN      0    /*1: Make the window full screen by default*/
-    #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL widows are closed*/
+    #define LV_SDL_DIRECT_EXIT     1    /*1: Exit the application when all SDL windows are closed*/
 #endif
 
 /*Driver for /dev/fb*/
 #define LV_USE_LINUX_FBDEV      0
 #if LV_USE_LINUX_FBDEV
     #define LV_LINUX_FBDEV_BSD           0
-    #define LV_LINUX_FBDEV_NUTTX         0
-    #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISP_RENDER_MODE_PARTIAL
+    #define LV_LINUX_FBDEV_RENDER_MODE   LV_DISPLAY_RENDER_MODE_PARTIAL
     #define LV_LINUX_FBDEV_BUFFER_COUNT  0
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
 #endif
+
+#define LV_USE_NUTTX_FBDEV     0
 
 /*Driver for /dev/lcd*/
 #define LV_USE_NUTTX_LCD      0

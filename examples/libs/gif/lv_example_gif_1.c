@@ -6,7 +6,7 @@
  */
 void lv_example_gif_1(void)
 {
-    LV_IMG_DECLARE(img_bulb_gif);
+    LV_IMAGE_DECLARE(img_bulb_gif);
     lv_obj_t * img;
 
     img = lv_gif_create(lv_scr_act());

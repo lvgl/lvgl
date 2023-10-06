@@ -55,10 +55,10 @@ static void lv_mem_walker(void * ptr, size_t size, int used, void * user);
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_MEM
-    #define MEM_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_MEM
+    #define LV_TRACE_MEM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define MEM_TRACE(...)
+    #define LV_TRACE_MEM(...)
 #endif
 
 #define _COPY(d, s) *d = *s; d++; s++;
@@ -187,7 +187,7 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 {
     /*Init the data*/
     lv_memset(mon_p, 0, sizeof(lv_mem_monitor_t));
-    MEM_TRACE("begin");
+    LV_TRACE_MEM("begin");
 
     lv_pool_t * pool_p;
     _LV_LL_READ(&state.pool_ll, pool_p) {
@@ -205,11 +205,11 @@ void lv_mem_monitor_core(lv_mem_monitor_t * mon_p)
 
     mon_p->max_used = state.max_used;
 
-    MEM_TRACE("finished");
+    LV_TRACE_MEM("finished");
 }
 
 
-lv_res_t lv_mem_test_core(void)
+lv_result_t lv_mem_test_core(void)
 {
 #if LV_USE_OS
     lv_mutex_lock(&state.mutex);
@@ -219,7 +219,7 @@ lv_res_t lv_mem_test_core(void)
 #if LV_USE_OS
         lv_mutex_unlock(&state.mutex);
 #endif
-        return LV_RES_INV;
+        return LV_RESULT_INVALID;
     }
 
     lv_pool_t * pool_p;
@@ -229,15 +229,15 @@ lv_res_t lv_mem_test_core(void)
 #if LV_USE_OS
             lv_mutex_unlock(&state.mutex);
 #endif
-            return LV_RES_INV;
+            return LV_RESULT_INVALID;
         }
     }
 
-    MEM_TRACE("passed");
+    LV_TRACE_MEM("passed");
 #if LV_USE_OS
     lv_mutex_unlock(&state.mutex);
 #endif
-    return LV_RES_OK;
+    return LV_RESULT_OK;
 }
 
 /**********************

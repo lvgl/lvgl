@@ -1,5 +1,5 @@
 /**
- * @file lv_draw_rect.c
+ * @file lv_draw_sw_fill.c
  *
  */
 
@@ -12,7 +12,7 @@
 #include "blend/lv_draw_sw_blend.h"
 #include "lv_draw_sw_gradient.h"
 #include "../../misc/lv_math.h"
-#include "../../misc/lv_txt_ap.h"
+#include "../../misc/lv_text_ap.h"
 #include "../../core/lv_refr.h"
 #include "../../misc/lv_assert.h"
 #include "../../stdlib/lv_string.h"
@@ -211,4 +211,4 @@ void lv_draw_sw_fill(lv_draw_unit_t * draw_unit, const lv_draw_fill_dsc_t * dsc,
 #endif
 }
 
-#endif
+#endif /*LV_USE_DRAW_SW*/

@@ -5,12 +5,12 @@
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_TEST_IMG_COGWHEEL_I4
-    #define LV_ATTRIBUTE_IMG_TEST_IMG_COGWHEEL_I4
+#ifndef LV_ATTRIBUTE_IMAGE_TEST_IMAGE_COGWHEEL_I4
+    #define LV_ATTRIBUTE_IMAGE_TEST_IMAGE_COGWHEEL_I4
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_TEST_IMG_COGWHEEL_I4 uint8_t
-test_img_cogwheel_i4_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_TEST_IMAGE_COGWHEEL_I4 uint8_t
+test_image_cogwheel_i4_map[] = {
     0x00, 0x00, 0x00, 0x00,   /*Color of index 0*/
     0xfe, 0xfe, 0xfe, 0x05,   /*Color of index 1*/
     0xed, 0xeb, 0xea, 0x1b,   /*Color of index 2*/
@@ -130,11 +130,11 @@ test_img_cogwheel_i4_map[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11, 0x10, 0x00, 0x00, 0x00, 0x01, 0x11, 0x21, 0x12, 0x11, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-const lv_img_dsc_t test_img_cogwheel_i4 = {
+const lv_image_dsc_t test_image_cogwheel_i4 = {
     .header.cf = LV_COLOR_FORMAT_I4,
     .header.always_zero = 0,
     .header.w = 100,
     .header.h = 100,
     .data_size = 5064,
-    .data = test_img_cogwheel_i4_map,
+    .data = test_image_cogwheel_i4_map,
 };

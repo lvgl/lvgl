@@ -41,13 +41,13 @@ Here is some pseudocode to illustrate the concept:
    {
        /* You must always hold the mutex while using LVGL APIs */
        mutex_lock(&lvgl_mutex);
-       lv_obj_t *img = lv_img_create(lv_scr_act());
+       lv_obj_t *img = lv_image_create(lv_scr_act());
        mutex_unlock(&lvgl_mutex);
 
        while(1) {
            mutex_lock(&lvgl_mutex);
            /* change to the next image */
-           lv_img_set_src(img, next_image);
+           lv_image_set_src(img, next_image);
            mutex_unlock(&lvgl_mutex);
            thread_sleep(2000);
        }

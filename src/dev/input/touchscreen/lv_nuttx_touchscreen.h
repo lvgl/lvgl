@@ -40,7 +40,7 @@ lv_indev_t * lv_nuttx_touchscreen_create(const char * dev_path);
  *      MACROS
  **********************/
 
-#endif /* LV_USE_LINUX_FBDEV */
+#endif /* LV_USE_NUTTX_TOUCHSCREEN */
 
 #ifdef __cplusplus
 } /* extern "C" */

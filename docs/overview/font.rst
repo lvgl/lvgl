@@ -69,7 +69,6 @@ bullet symbol (U+2022) and the built-in symbols (see below).
 Special fonts
 -------------
 
--  :c:macro:`LV_FONT_MONTSERRAT_12_SUBPX`: Same as normal 12 px font but with `subpixel rendering <#subpixel-rendering>`__
 -  :c:macro:`LV_FONT_MONTSERRAT_28_COMPRESSED`: Same as normal 28 px font but stored as a `compressed font <#compress-fonts>`__ with 3 bpp
 -  :c:macro:`LV_FONT_DEJAVU_16_PERSIAN_HEBREW`: 16 px font with normal range + Hebrew, Arabic, Persian letters and all their forms
 -  :c:macro:`LV_FONT_SIMSUN_16_CJK`: 16 px font with normal range plus 1000 of the most common CJK radicals
@@ -281,6 +280,35 @@ Example
 
    lv_font_t * my_font;
    my_font = lv_font_load(X/path/to/my_font.bin);
+
+   /*Use the font*/
+
+   /*Free the font if not required anymore*/
+   lv_font_free(my_font);
+
+Load a font from a memory buffer at run-time
+******************************************
+
+:cpp:func:`lv_font_load_from_buffer` can be used to load a font from a memory buffer.
+This function may be useful to load a font from an external file system, which is not
+supported by LVGL. The font needs to be in the same format as if it were loaded from a file.
+
+:note: To load a font from a buffer `LVGL's filesystem </overview/file-system>`__
+       needs to be enabled and the MEMFS driver must be added.
+
+Example
+
+.. code:: c
+
+   lv_font_t * my_font;
+   uint8_t *buf;
+   uint32_t bufsize;
+
+   /*Read font file into the buffer from the external file system*/
+   ...
+
+   /*Load font from the buffer*/
+   my_font = lv_font_load_from_buffer((void *)buf, buf));
 
    /*Use the font*/
 

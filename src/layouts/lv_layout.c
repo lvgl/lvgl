@@ -52,13 +52,12 @@ void _lv_layout_init(void)
 
 uint32_t lv_layout_register(lv_layout_update_cb_t cb, void * user_data)
 {
-    layout_cnt++;
-    layout_list_def = lv_realloc(layout_list_def, layout_cnt * sizeof(lv_layout_dsc_t));
+    layout_list_def = lv_realloc(layout_list_def, (layout_cnt + 1) * sizeof(lv_layout_dsc_t));
     LV_ASSERT_MALLOC(layout_list_def);
 
-    layout_list_def[layout_cnt - 1].cb = cb;
-    layout_list_def[layout_cnt - 1].user_data = user_data;
-    return layout_cnt;  /*No -1 to skip 0th index*/
+    layout_list_def[layout_cnt].cb = cb;
+    layout_list_def[layout_cnt].user_data = user_data;
+    return layout_cnt++;
 }
 
 void _lv_layout_apply(lv_obj_t * obj)

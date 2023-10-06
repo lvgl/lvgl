@@ -45,7 +45,7 @@ class KeyboardEncoder:
         obj = lv.calendar(parent)
         obj.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS)
 
-        obj = lv.btnmatrix(parent)
+        obj = lv.buttonmatrix(parent)
         obj.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS)
         obj = lv.checkbox(parent)
         obj.add_flag(lv.obj.FLAG.SCROLL_ON_FOCUS);
@@ -71,13 +71,13 @@ class KeyboardEncoder:
         if list.get_height() > parent.get_content_height() :
             list.set_height(parent.get_content_height())
 
-            list.add_btn(lv.SYMBOL.OK, "Apply")
-            list.add_btn(lv.SYMBOL.CLOSE, "Close")
-            list.add_btn(lv.SYMBOL.EYE_OPEN, "Show")
-            list.add_btn(lv.SYMBOL.EYE_CLOSE, "Hide")
-            list.add_btn(lv.SYMBOL.TRASH, "Delete")
-            list.add_btn(lv.SYMBOL.COPY, "Copy")
-            list.add_btn(lv.SYMBOL.PASTE, "Paste")
+            list.add_button(lv.SYMBOL.OK, "Apply")
+            list.add_button(lv.SYMBOL.CLOSE, "Close")
+            list.add_button(lv.SYMBOL.EYE_OPEN, "Show")
+            list.add_button(lv.SYMBOL.EYE_CLOSE, "Hide")
+            list.add_button(lv.SYMBOL.TRASH, "Delete")
+            list.add_button(lv.SYMBOL.COPY, "Copy")
+            list.add_button(lv.SYMBOL.PASTE, "Paste")
 
     def text_input_create(self,parent) :
 
@@ -102,11 +102,11 @@ class KeyboardEncoder:
 
     def msgbox_create(self):
 
-        btns = ["Ok", "Cancel", ""]
-        mbox = lv.msgbox(None, "Hi", "Welcome to the keyboard and encoder demo", btns, False)
+        buttons = ["Ok", "Cancel", ""]
+        mbox = lv.msgbox(None, "Hi", "Welcome to the keyboard and encoder demo", buttons, False)
         mbox.add_event(self.msgbox_event_cb, lv.EVENT.ALL, None)
-        lv.group_focus_obj(mbox.get_btns())
-        mbox.get_btns().add_state(lv.STATE.FOCUS_KEY)
+        lv.group_focus_obj(mbox.get_buttons())
+        mbox.get_buttons().add_state(lv.STATE.FOCUS_KEY)
         self.g.focus_freeze(True)
 
         mbox.align(lv.ALIGN.CENTER, 0, 0)
@@ -122,7 +122,7 @@ class KeyboardEncoder:
         msgbox = e.get_target()
 
         if code == lv.EVENT.VALUE_CHANGED:
-            txt = msgbox.get_active_btn_text()
+            txt = msgbox.get_active_button_text()
             if txt:
                 msgbox.close()
                 self.g.focus_freeze(False)

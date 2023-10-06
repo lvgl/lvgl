@@ -19,7 +19,7 @@ class LV_Example_Checkbox_2:
         self.style_radio_chk = lv.style_t()
         self.style_radio_chk.init()
         self.style_radio_chk.init()
-        self.style_radio_chk.set_bg_img_src(None)
+        self.style_radio_chk.set_bg_image_src(None)
 
         self.cont1 = lv.obj(lv.scr_act())
         self.cont1.set_flex_flow(lv.FLEX_FLOW.COLUMN)

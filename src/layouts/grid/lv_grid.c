@@ -180,9 +180,9 @@ static void grid_update(lv_obj_t * cont, void * user_data)
     LV_LOG_INFO("update %p container", (void *)cont);
     LV_UNUSED(user_data);
 
-    const lv_coord_t * col_templ = get_col_dsc(cont);
-    const lv_coord_t * row_templ = get_row_dsc(cont);
-    if(col_templ == NULL || row_templ == NULL) return;
+    //    const lv_coord_t * col_templ = get_col_dsc(cont);
+    //    const lv_coord_t * row_templ = get_row_dsc(cont);
+    //    if(col_templ == NULL || row_templ == NULL) return;
 
     _lv_grid_calc_t c;
     calc(cont, &c);
@@ -265,7 +265,28 @@ static void calc_free(_lv_grid_calc_t * calc)
 
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
 {
-    const lv_coord_t * col_templ = get_col_dsc(cont);
+
+    const lv_coord_t * col_templ;
+    col_templ = get_col_dsc(cont);
+    bool subgrid = false;
+    if(col_templ == NULL) {
+        lv_obj_t * parent = lv_obj_get_parent(cont);
+        col_templ = get_col_dsc(parent);
+        if(col_templ == NULL) {
+            LV_LOG_WARN("No col descriptor found even on the parent");
+            return;
+        }
+
+        lv_coord_t pos = get_col_pos(cont);
+        lv_coord_t span = get_col_span(cont);
+
+        lv_coord_t * col_templ_sub = lv_malloc(sizeof(lv_coord_t) * (span + 1));
+        lv_memcpy(col_templ_sub, &col_templ[pos], sizeof(lv_coord_t) * span);
+        col_templ_sub[span] = LV_GRID_TEMPLATE_LAST;
+        col_templ = col_templ_sub;
+        subgrid = true;
+    }
+
     lv_coord_t cont_w = lv_obj_get_content_width(cont);
 
     c->col_num = count_tracks(col_templ);
@@ -333,16 +354,41 @@ static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * c)
     if(last_fr_i >= 0) {
         c->w[last_fr_i] = free_w - ((free_w * (col_fr_cnt - last_fr_x)) / col_fr_cnt);
     }
+
+
+    if(subgrid) {
+        lv_free((void *)col_templ);
+    }
 }
 
 static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
 {
-    uint32_t i;
-    const lv_coord_t * row_templ = get_row_dsc(cont);
+    const lv_coord_t * row_templ;
+    row_templ = get_row_dsc(cont);
+    bool subgrid = false;
+    if(row_templ == NULL) {
+        lv_obj_t * parent = lv_obj_get_parent(cont);
+        row_templ = get_row_dsc(parent);
+        if(row_templ == NULL) {
+            LV_LOG_WARN("No row descriptor found even on the parent");
+            return;
+        }
+
+        lv_coord_t pos = get_row_pos(cont);
+        lv_coord_t span = get_row_span(cont);
+
+        lv_coord_t * row_templ_sub = lv_malloc(sizeof(lv_coord_t) * (span + 1));
+        lv_memcpy(row_templ_sub, &row_templ[pos], sizeof(lv_coord_t) * span);
+        row_templ_sub[span] = LV_GRID_TEMPLATE_LAST;
+        row_templ = row_templ_sub;
+        subgrid = true;
+    }
+
     c->row_num = count_tracks(row_templ);
     c->y = lv_malloc(sizeof(lv_coord_t) * c->row_num);
     c->h = lv_malloc(sizeof(lv_coord_t) * c->row_num);
     /*Set sizes for CONTENT cells*/
+    uint32_t i;
     for(i = 0; i < c->row_num; i++) {
         lv_coord_t size = LV_COORD_MIN;
         if(IS_CONTENT(row_templ[i])) {
@@ -402,6 +448,10 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * c)
     /*To avoid rounding errors set the last FR track to the remaining size */
     if(last_fr_i >= 0) {
         c->h[last_fr_i] = free_h - ((free_h * (row_fr_cnt - last_fr_x)) / row_fr_cnt);
+    }
+
+    if(subgrid) {
+        lv_free((void *)row_templ);
     }
 }
 

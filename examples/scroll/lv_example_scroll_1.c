@@ -25,7 +25,7 @@ void lv_example_scroll_1(void)
     lv_obj_set_pos(child, 160, 80);
     lv_obj_set_size(child, 80, 80);
 
-    lv_obj_t * child2 = lv_btn_create(child);
+    lv_obj_t * child2 = lv_button_create(child);
     lv_obj_set_size(child2, 100, 50);
 
     label = lv_label_create(child2);

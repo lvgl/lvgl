@@ -13,7 +13,6 @@
  *********************/
 #if LV_BUILD_TEST
 #include "../lvgl.h"
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,14 +42,14 @@ typedef struct {
     png_infop info_ptr;
     int number_of_passes;
     png_bytep * row_pointers;
-} png_img_t;
+} png_image_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static int read_png_file(png_img_t * p, const char * file_name);
+static int read_png_file(png_image_t * p, const char * file_name);
 static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char * file_name);
-static void png_release(png_img_t * p);
+static void png_release(png_image_t * p);
 
 /**********************
  *  STATIC VARIABLES
@@ -64,21 +63,19 @@ static void png_release(png_img_t * p);
  *   GLOBAL FUNCTIONS
  **********************/
 
-bool lv_test_assert_img_eq(const char * fn_ref)
+bool lv_test_assert_image_eq(const char * fn_ref)
 {
     char fn_ref_full[512];
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
-    uint8_t * screen_buf;
 
-    lv_obj_invalidate(lv_scr_act());
+    //lv_obj_invalidate(lv_scr_act());
     lv_refr_now(NULL);
 
-    extern lv_color32_t test_fb[];
+    extern uint8_t * last_flushed_buf;
+    uint8_t * screen_buf = last_flushed_buf;
 
-    screen_buf = (uint8_t *)test_fb;
-
-    png_img_t p;
+    png_image_t p;
     int res = read_png_file(&p, fn_ref_full);
     if(res == ERR_FILE_NOT_FOUND) {
         TEST_PRINTF("%s%s", fn_ref_full, " was not found, creating is now from the rendered screen");
@@ -141,7 +138,7 @@ bool lv_test_assert_img_eq(const char * fn_ref)
  *   STATIC FUNCTIONS
  **********************/
 
-static int read_png_file(png_img_t * p, const char * file_name)
+static int read_png_file(png_image_t * p, const char * file_name)
 {
     char header[8];    // 8 is the maximum size that can be checked
 
@@ -293,7 +290,7 @@ static int write_png_file(void * raw_img, uint32_t width, uint32_t height, char 
 }
 
 
-static void png_release(png_img_t * p)
+static void png_release(png_image_t * p)
 {
     int y;
     for(y = 0; y < p->height; y++) free(p->row_pointers[y]);

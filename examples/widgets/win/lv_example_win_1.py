@@ -2,17 +2,17 @@ def event_handler(e):
     code = e.get_code()
     obj = e.get_target_obj()
     if code == lv.EVENT.CLICKED:
-        print("Button {:d} clicked".format(obj.get_child_id()))
+        print("Button {:d} clicked".format(obj.get_index()))
 
 
 win = lv.win(lv.scr_act())
-btn1 = win.add_btn(lv.SYMBOL.LEFT, 40)
-btn1.add_event(event_handler, lv.EVENT.ALL, None)
+button1 = win.add_button(lv.SYMBOL.LEFT, 40)
+button1.add_event(event_handler, lv.EVENT.ALL, None)
 win.add_title("A title")
-btn2=win.add_btn(lv.SYMBOL.RIGHT, 40)
-btn2.add_event(event_handler, lv.EVENT.ALL, None)
-btn3 = win.add_btn(lv.SYMBOL.CLOSE, 60)
-btn3.add_event(event_handler, lv.EVENT.ALL, None)
+button2=win.add_button(lv.SYMBOL.RIGHT, 40)
+button2.add_event(event_handler, lv.EVENT.ALL, None)
+button3 = win.add_button(lv.SYMBOL.CLOSE, 60)
+button3.add_event(event_handler, lv.EVENT.ALL, None)
 
 cont = win.get_content()  # Content can be added here
 label = lv.label(cont)

@@ -10,7 +10,7 @@
 #if LV_USE_CHECKBOX != 0
 
 #include "../../misc/lv_assert.h"
-#include "../../misc/lv_txt_ap.h"
+#include "../../misc/lv_text_ap.h"
 #include "../../core/lv_group.h"
 #include "../../draw/lv_draw.h"
 #include "../../stdlib/lv_string.h"
@@ -43,7 +43,8 @@ const lv_obj_class_t lv_checkbox_class = {
     .height_def = LV_SIZE_CONTENT,
     .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,
     .instance_size = sizeof(lv_checkbox_t),
-    .base_class = &lv_obj_class
+    .base_class = &lv_obj_class,
+    .name = "checkbox",
 };
 
 /**********************
@@ -74,7 +75,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         size_t len;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        len = _lv_txt_ap_calc_bytes_cnt(txt) + 1;
+        len = _lv_text_ap_calc_bytes_cnt(txt) + 1;
 #else
         len = lv_strlen(txt) + 1;
 #endif
@@ -86,7 +87,7 @@ void lv_checkbox_set_text(lv_obj_t * obj, const char * txt)
         if(NULL == cb->txt) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
-        _lv_txt_ap_proc(txt, cb->txt);
+        _lv_text_ap_proc(txt, cb->txt);
 #else
         lv_strcpy(cb->txt, txt);
 #endif
@@ -165,10 +166,10 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
 {
     LV_UNUSED(class_p);
 
-    lv_res_t res;
+    lv_result_t res;
     /*Call the ancestor's event handler*/
     res = lv_obj_event_base(MY_CLASS, e);
-    if(res != LV_RES_OK) return;
+    if(res != LV_RESULT_OK) return;
 
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * obj = lv_event_get_target(e);
@@ -183,7 +184,7 @@ static void lv_checkbox_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
         lv_point_t txt_size;
-        lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+        lv_text_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
         lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
         lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
@@ -248,7 +249,7 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
 
     lv_point_t txt_size;
-    lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
+    lv_text_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
     lv_draw_label_dsc_t txt_dsc;
     lv_draw_label_dsc_init(&txt_dsc);

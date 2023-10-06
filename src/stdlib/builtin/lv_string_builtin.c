@@ -11,6 +11,7 @@
 #include "../../misc/lv_log.h"
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_string.h"
+#include "../../stdlib/lv_mem.h"
 
 /*********************
  *      DEFINES
@@ -38,10 +39,10 @@
 /**********************
  *      MACROS
  **********************/
-#if LV_LOG_TRACE_MEM
-    #define MEM_TRACE(...) LV_LOG_TRACE(__VA_ARGS__)
+#if LV_USE_LOG && LV_LOG_TRACE_MEM
+    #define LV_TRACE_MEM(...) LV_LOG_TRACE(__VA_ARGS__)
 #else
-    #define MEM_TRACE(...)
+    #define LV_TRACE_MEM(...)
 #endif
 
 #define _COPY(d, s) *d = *s; d++; s++;
@@ -168,6 +169,16 @@ char * lv_strcpy(char * dst, const char * src)
     char * tmp = dst;
     while((*dst++ = *src++) != '\0');
     return tmp;
+}
+
+char * lv_strdup(const char * src)
+{
+    size_t len = lv_strlen(src) + 1;
+    char * dst = lv_malloc(len);
+    if(dst == NULL) return NULL;
+
+    lv_memcpy(dst, src, len); /*do memcpy is faster than strncpy when length is known*/
+    return dst;
 }
 
 /**********************

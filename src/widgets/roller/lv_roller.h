@@ -47,9 +47,9 @@ typedef uint8_t lv_roller_mode_t;
 
 typedef struct {
     lv_obj_t obj;
-    uint16_t option_cnt;          /**< Number of options*/
-    uint16_t sel_opt_id;          /**< Index of the current option*/
-    uint16_t sel_opt_id_ori;      /**< Store the original index on focus*/
+    uint32_t option_cnt;          /**< Number of options*/
+    uint32_t sel_opt_id;          /**< Index of the current option*/
+    uint32_t sel_opt_id_ori;      /**< Store the original index on focus*/
     uint32_t inf_page_cnt;        /**< Number of extra pages added to make the roller look infinite */
     lv_roller_mode_t mode : 1;
     uint32_t moved : 1;
@@ -87,14 +87,14 @@ void lv_roller_set_options(lv_obj_t * obj, const char * options, lv_roller_mode_
  * @param sel_opt   index of the selected option (0 ... number of option - 1);
  * @param anim   LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
  */
-void lv_roller_set_selected(lv_obj_t * obj, uint16_t sel_opt, lv_anim_enable_t anim);
+void lv_roller_set_selected(lv_obj_t * obj, uint32_t sel_opt, lv_anim_enable_t anim);
 
 /**
  * Set the height to show the given number of rows (options)
  * @param obj       pointer to a roller object
  * @param row_cnt   number of desired visible rows
  */
-void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt);
+void lv_roller_set_visible_row_count(lv_obj_t * obj, uint32_t row_cnt);
 
 /*=====================
  * Getter functions
@@ -105,7 +105,7 @@ void lv_roller_set_visible_row_count(lv_obj_t * obj, uint8_t row_cnt);
  * @param obj       pointer to a roller object
  * @return          index of the selected option (0 ... number of option - 1);
  */
-uint16_t lv_roller_get_selected(const lv_obj_t * obj);
+uint32_t lv_roller_get_selected(const lv_obj_t * obj);
 
 /**
  * Get the current selected option as a string.
@@ -128,7 +128,7 @@ const char * lv_roller_get_options(const lv_obj_t * obj);
  * @param obj   pointer to a roller object
  * @return      the total number of options
  */
-uint16_t lv_roller_get_option_cnt(const lv_obj_t * obj);
+uint32_t lv_roller_get_option_cnt(const lv_obj_t * obj);
 
 /**********************
  *      MACROS

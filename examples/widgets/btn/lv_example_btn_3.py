@@ -28,11 +28,11 @@ style_pr.set_transform_height(-10)
 style_pr.set_text_letter_space(10)
 style_pr.set_transition(transition_dsc_pr)
 
-btn1 = lv.btn(lv.scr_act())
-btn1.align(lv.ALIGN.CENTER, 0, -80)
-btn1.add_style(style_pr, lv.STATE.PRESSED)
-btn1.add_style(style_def, 0)
+button1 = lv.button(lv.scr_act())
+button1.align(lv.ALIGN.CENTER, 0, -80)
+button1.add_style(style_pr, lv.STATE.PRESSED)
+button1.add_style(style_def, 0)
 
-label = lv.label(btn1)
+label = lv.label(button1)
 label.set_text("Gum")
 

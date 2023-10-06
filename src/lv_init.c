@@ -8,7 +8,7 @@
  *********************/
 #include "core/lv_global.h"
 #include "core/lv_obj.h"
-#include "disp/lv_disp_private.h"
+#include "display/lv_display_private.h"
 #include "indev/lv_indev_private.h"
 #include "layouts/lv_layout.h"
 #include "libs/bmp/lv_bmp.h"
@@ -16,12 +16,21 @@
 #include "libs/freetype/lv_freetype.h"
 #include "libs/fsdrv/lv_fsdrv.h"
 #include "libs/gif/lv_gif.h"
-#include "libs/png/lv_png.h"
-#include "libs/sjpg/lv_sjpg.h"
+#include "libs/tjpgd/lv_tjpgd.h"
+#include "libs/libjpeg_turbo/lv_libjpeg_turbo.h"
+#include "libs/lodepng/lv_lodepng.h"
+#include "libs/libpng/lv_libpng.h"
 #include "draw/lv_draw.h"
-#include "draw/lv_img_cache_builtin.h"
+#include "misc/lv_cache.h"
+#include "misc/lv_cache_builtin.h"
 #include "misc/lv_async.h"
 #include "misc/lv_fs.h"
+#if LV_USE_DRAW_VGLITE
+    #include "draw/nxp/vglite/lv_draw_vglite.h"
+#endif
+#if LV_USE_DRAW_PXP
+    #include "draw/nxp/pxp/lv_draw_pxp.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -61,13 +70,13 @@ static inline void lv_global_init(lv_global_t * global)
 
     lv_memset(global, 0, sizeof(lv_global_t));
 
-    _lv_ll_init(&(global->disp_ll), sizeof(lv_disp_t));
+    _lv_ll_init(&(global->disp_ll), sizeof(lv_display_t));
     _lv_ll_init(&(global->indev_ll), sizeof(lv_indev_t));
 
     global->memory_zero = ZERO_MEM_SENTINEL;
     global->style_refresh = true;
     global->layout_count = _LV_LAYOUT_LAST;
-    global->style_last_custom_prop_id = (uint16_t)_LV_STYLE_LAST_BUILT_IN_PROP;
+    global->style_last_custom_prop_id = (uint32_t)_LV_STYLE_LAST_BUILT_IN_PROP;
     global->area_trans_cache.angle_prev = INT32_MIN;
     global->event_last_register_id = _LV_EVENT_LAST;
     global->math_rand_seed = 0x1234ABCD;
@@ -136,6 +145,14 @@ void lv_init(void)
     lv_draw_sw_init();
 #endif
 
+#if LV_USE_DRAW_VGLITE
+    lv_draw_vglite_init();
+#endif
+
+#if LV_USE_DRAW_PXP
+    lv_draw_pxp_init();
+#endif
+
     _lv_obj_style_init();
 
     /*Initialize the screen refresh system*/
@@ -145,9 +162,13 @@ void lv_init(void)
     _lv_sysmon_builtin_init();
 #endif
 
-    _lv_img_decoder_init();
+    _lv_image_decoder_init();
 
-    _lv_img_cache_builtin_init();
+    _lv_cache_init();
+    _lv_cache_builtin_init();
+    lv_cache_lock();
+    lv_cache_set_max_size(LV_CACHE_DEF_SIZE);
+    lv_cache_unlock();
 
     /*Test if the IDE has UTF-8 encoding*/
     const char * txt = "Á";
@@ -206,12 +227,24 @@ void lv_init(void)
     lv_fs_win32_init();
 #endif
 
-#if LV_USE_PNG
-    lv_png_init();
+#if LV_USE_FS_MEMFS
+    lv_fs_memfs_init();
 #endif
 
-#if LV_USE_SJPG
-    lv_split_jpeg_init();
+#if LV_USE_LODEPNG
+    lv_lodepng_init();
+#endif
+
+#if LV_USE_LIBPNG
+    lv_libpng_init();
+#endif
+
+#if LV_USE_TJPGD
+    lv_tjpgd_init();
+#endif
+
+#if LV_USE_LIBJPEG_TURBO
+    lv_libjpeg_turbo_init();
 #endif
 
 #if LV_USE_BMP
@@ -246,7 +279,7 @@ void lv_deinit(void)
     _lv_sysmon_builtin_deinit();
 #endif
 
-    lv_disp_set_default(NULL);
+    lv_display_set_default(NULL);
 
 #if LV_USE_SPAN != 0
     lv_span_stack_deinit();
@@ -276,6 +309,10 @@ void lv_deinit(void)
 
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
+#endif
+
+#if LV_USE_OBJ_ID_BUILTIN
+    lv_objid_builtin_destroy();
 #endif
 }
 #endif

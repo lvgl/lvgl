@@ -41,5 +41,8 @@ In the first section of the table, "Slow but common cases", those cases are disp
 
 Below this in the "All cases section" all the results are shown. The < 10 FPS results are shown with red, the >= 10 but < 20 FPS values are displayed with orange.
 
-
 ![LVGL benchmark result summary](screenshot2.png)
+
+
+
+**NOTE**:  Compared to the past, the use of rotation and zoom(scaling) in GUI applications has become increasingly common. Therefore, starting from LVGL9, we have assigned a higher priority to zoom(scaling) and rotation operations.

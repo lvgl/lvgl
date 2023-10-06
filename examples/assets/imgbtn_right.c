@@ -6,11 +6,11 @@
     #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_IMGBTN_RIGHT
-    #define LV_ATTRIBUTE_IMG_IMGBTN_RIGHT
+#ifndef LV_ATTRIBUTE_IMAGE_IMGBTN_RIGHT
+    #define LV_ATTRIBUTE_IMAGE_IMGBTN_RIGHT
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMGBTN_RIGHT uint8_t imgbtn_right_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMGBTN_RIGHT uint8_t imgbtn_right_map[] = {
 #if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
     /*Pixel format: Blue: 2 bit, Green: 3 bit, Red: 3 bit, Alpha 8 bit */
     0x68, 0x23, 0x68, 0x14, 0x68, 0x04, 0x00, 0x00, 0x68, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -172,7 +172,7 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_IMGBTN_RI
 #endif
 };
 
-const lv_img_dsc_t imgbtn_right = {
+const lv_image_dsc_t imgbtn_right = {
     .header.always_zero = 0,
     .header.w = 8,
     .header.h = 50,

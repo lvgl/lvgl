@@ -36,14 +36,11 @@ typedef struct {
 typedef void (*lv_draw_buf_init_cb)(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h,
                                     lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_malloc_cb)(lv_draw_buf_t * draw_buf);
+typedef void * (*lv_draw_buf_malloc_cb)(size_t size, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_realloc_cb)(lv_draw_buf_t  * draw_buf, lv_coord_t w, lv_coord_t h,
-                                       lv_color_format_t color_format);
+typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
 
-typedef void (*lv_draw_buf_free_cb)(lv_draw_buf_t  * draw_buf);
-
-typedef void * (*lv_draw_buf_get_buf_cb)(lv_draw_buf_t * draw_buf);
+typedef void * (*lv_draw_buf_align_buf_cb)(void * buf, lv_color_format_t color_format);
 
 typedef void (*lv_draw_buf_invalidate_cache_cb)(lv_draw_buf_t  * draw_buf, const char * area);
 
@@ -61,12 +58,10 @@ typedef void (*lv_draw_buf_copy_cb)(void * dest_buf, uint32_t dest_stride, const
 typedef struct {
     lv_draw_buf_init_cb init_cb;
     lv_draw_buf_malloc_cb buf_malloc_cb;
-    lv_draw_buf_realloc_cb buf_realloc_cb;
     lv_draw_buf_free_cb buf_free_cb;
-    lv_draw_buf_get_buf_cb buf_get_cb;
+    lv_draw_buf_align_buf_cb align_pointer_cb;
     lv_draw_buf_invalidate_cache_cb invalidate_cache_cb;
     lv_draw_buf_width_to_stride_cb width_to_stride_cb;
-    lv_draw_buf_get_stride_cb get_stride_cb;
     lv_draw_buf_go_to_xy_cb go_to_xy_cb;
     lv_draw_buf_clear_cb buf_clear_cb;
     lv_draw_buf_copy_cb buf_copy_cb;
@@ -89,7 +84,7 @@ void _lv_draw_buf_init_handlers(void);
 lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
 
 /**
- * Initialize a draw buffer object. The buffer won't be allocated
+ * Initialize a draw buffer object. The buffer won't be allocated.
  * @param draw_buf          pointer to a draw buffer
  * @param w                 the width of the buffer in pixel
  * @param h                 the height of the buffer in pixel
@@ -98,25 +93,37 @@ lv_draw_buf_handlers_t * lv_draw_buf_get_handlers(void);
 void lv_draw_buf_init(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t color_format);
 
 /**
- * Allocate a buffer in the draw_buf, considering the set width, height and color format
+ * Initialize a draw buffer object and also allocate the buffer.
  * @param draw_buf          pointer to a draw buffer
+ * @param w                 the width of the buffer in pixel
+ * @param h                 the height of the buffer in pixel
+ * @param color_format      the color format of the buffer
  */
-void lv_draw_buf_malloc(lv_draw_buf_t * draw_buf);
+void lv_draw_buf_init_alloc(lv_draw_buf_t * draw_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t color_format);
 
 /**
- * Realloacte the buffer with a new width, height and color format
- * @param draw_buf          pointer to a draw buffer
- * @param w                 the new width of the buffer in pixel
- * @param h                 the new height of the buffer in pixel
- * @param color_format      the new color format of the buffer
+ * Allocate a buffer with the given size. It might allocate slightly larger buffer to fulfill the alignment requirements.
+ * @param size          the size to allocate in bytes
+ * @param color_format  the color format of the buffer to allcoate
+ * @return              the allocated buffer.
+ * @note The returned value can be saved in draw_buf->buf
+ * @note lv_draw_buf_align_buf can be sued the align the returned pointer
  */
-void lv_draw_buf_realloc(lv_draw_buf_t  * draw_buf, lv_coord_t w, lv_coord_t h, lv_color_format_t color_format);
+void * lv_draw_buf_malloc(size_t size_bytes, lv_color_format_t color_format);
 
 /**
- * Free the allocated buffer
- * @param draw_buf          pointer to draw buffer
+ * Free a buffer allocated by lv_draw_buf_malloc
+ * @param buf      pointer to a buffer
  */
-void lv_draw_buf_free(lv_draw_buf_t  * draw_buf);
+void lv_draw_buf_free(void  * buf);
+
+/**
+ * Align the address of a buffer. The buffer needs to be large enough for the real data after alignement
+ * @param buf           the data to align
+ * @param color_format  the color format of the buffer
+ * @return              the aligned buffer
+ */
+void * lv_draw_buf_align_buf(void * buf, lv_color_format_t color_format);
 
 /**
  * Get the buffer of the draw_buf.

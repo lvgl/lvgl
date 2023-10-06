@@ -11,22 +11,22 @@ class LV_ExampleAnimTimeline_1(object):
         self.par.set_flex_flow(lv.FLEX_FLOW.ROW)
         self.par.set_flex_align(lv.FLEX_ALIGN.SPACE_AROUND, lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.CENTER)
 
-        self.btn_run = lv.btn(self.par)
-        self.btn_run.add_event(self.btn_run_event_handler, lv.EVENT.VALUE_CHANGED, None)
-        self.btn_run.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
-        self.btn_run.add_flag(lv.obj.FLAG.CHECKABLE)
-        self.btn_run.align(lv.ALIGN.TOP_MID, -50, 20)
+        self.button_run = lv.button(self.par)
+        self.button_run.add_event(self.button_run_event_handler, lv.EVENT.VALUE_CHANGED, None)
+        self.button_run.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
+        self.button_run.add_flag(lv.obj.FLAG.CHECKABLE)
+        self.button_run.align(lv.ALIGN.TOP_MID, -50, 20)
 
-        self.label_run = lv.label(self.btn_run)
+        self.label_run = lv.label(self.button_run)
         self.label_run.set_text("Run")
         self.label_run.center()
 
-        self.btn_del = lv.btn(self.par)
-        self.btn_del.add_event(self.btn_del_event_handler, lv.EVENT.CLICKED, None)
-        self.btn_del.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
-        self.btn_del.align(lv.ALIGN.TOP_MID, 50, 20)
+        self.button_del = lv.button(self.par)
+        self.button_del.add_event(self.button_del_event_handler, lv.EVENT.CLICKED, None)
+        self.button_del.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
+        self.button_del.align(lv.ALIGN.TOP_MID, 50, 20)
 
-        self.label_del = lv.label(self.btn_del)
+        self.label_del = lv.label(self.button_del)
         self.label_del.set_text("Stop")
         self.label_del.center()
 
@@ -125,16 +125,16 @@ class LV_ExampleAnimTimeline_1(object):
         self.anim_timeline.set_progress(progress)
 
 
-    def btn_run_event_handler(self,e):
-        btn = e.get_target_obj()
+    def button_run_event_handler(self,e):
+        button = e.get_target_obj()
         if not self.anim_timeline:
             self.anim_timeline_create()
 
-        reverse = btn.has_state(lv.STATE.CHECKED)
+        reverse = button.has_state(lv.STATE.CHECKED)
         self.anim_timeline.set_reverse(reverse)
         self.anim_timeline.start()
 
-    def btn_del_event_handler(self,e):
+    def button_del_event_handler(self,e):
         if self.anim_timeline:
             self.anim_timeline._del()
         self.anim_timeline = None

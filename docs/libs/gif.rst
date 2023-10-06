@@ -8,8 +8,8 @@ https://github.com/lecram/gifdec
 When enabled in ``lv_conf.h`` with :c:macro:`LV_USE_GIF`
 :c:expr:`lv_gif_create(parent)` can be used to create a gif widget.
 
-:c:expr:`lv_gif_set_src(obj, src)` works very similarly to :c:func:`lv_img_set_src`.
-As source, it also accepts images as variables (:c:struct:`lv_img_dsc_t`) or
+:c:expr:`lv_gif_set_src(obj, src)` works very similarly to :c:func:`lv_image_set_src`.
+As source, it also accepts images as variables (:c:struct:`lv_image_dsc_t`) or
 files.
 
 Convert GIF files to C array

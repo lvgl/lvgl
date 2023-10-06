@@ -17,7 +17,8 @@ extern "C" {
 
 #include <stdbool.h>
 
-#include "../draw/lv_img_cache.h"
+#include "../misc/lv_cache.h"
+#include "../misc/lv_cache_builtin.h"
 #include "../draw/lv_draw.h"
 #if LV_USE_DRAW_SW
 #include "../draw/sw/lv_draw_sw.h"
@@ -48,7 +49,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-struct _lv_disp_t;
+struct _lv_display_t;
 struct _lv_group_t;
 struct _my_theme_t;
 struct _lv_indev_t;
@@ -67,13 +68,13 @@ typedef struct _lv_global_t {
     bool inited;
 
     lv_ll_t disp_ll;
-    struct _lv_disp_t * disp_refresh;
-    struct _lv_disp_t * disp_default;
+    struct _lv_display_t * disp_refresh;
+    struct _lv_display_t * disp_default;
 
     lv_ll_t style_trans_ll;
     bool style_refresh;
     uint32_t style_custom_table_size;
-    uint16_t style_last_custom_prop_id;
+    uint32_t style_last_custom_prop_id;
     uint8_t * style_custom_prop_flag_lookup_table;
 
     lv_ll_t group_ll;
@@ -101,15 +102,11 @@ typedef struct _lv_global_t {
     lv_draw_buf_handlers_t draw_buf_handlers;
 
     lv_ll_t img_decoder_ll;
-    lv_img_cache_manager_t img_cache_mgr;
-#if LV_IMG_CACHE_DEF_SIZE
-    uint16_t img_cache_entry_cnt;
-    _lv_img_cache_entry_t * img_cache_array;
-#else
-    _lv_img_cache_entry_t img_cache_single;
-#endif
+    lv_cache_manager_t cache_manager;
+    lv_cache_builtin_dsc_t cache_builtin_dsc;
+    size_t cache_builtin_max_size;
 
-    lv_draw_cache_t draw_cache;
+    lv_draw_global_info_t draw_info;
 #if defined(LV_DRAW_SW_SHADOW_CACHE_SIZE) && LV_DRAW_SW_SHADOW_CACHE_SIZE > 0
     lv_draw_sw_shadow_cache_t sw_shadow_cache;
 #endif
@@ -180,7 +177,7 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_FILE_EXPLORER != 0
-    lv_style_t fe_list_btn_style;
+    lv_style_t fe_list_button_style;
 #endif
 
 #if LV_USE_SYSMON && LV_USE_PERF_MONITOR
@@ -188,7 +185,12 @@ typedef struct _lv_global_t {
 #endif
 
 #if LV_USE_IME_PINYIN != 0
-    uint16_t ime_cand_len;
+    size_t ime_cand_len;
+#endif
+
+#if LV_USE_OBJ_ID_BUILTIN
+    void * objid_array;
+    uint32_t objid_count;
 #endif
 } lv_global_t;
 

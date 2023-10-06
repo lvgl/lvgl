@@ -46,11 +46,11 @@ void lv_example_meter_3(void)
     lv_meter_set_scale_major_ticks(meter, 5, 2, 20, lv_color_black(), 10);
     lv_meter_set_scale_range(meter, 0, 59, 354, 270);
 
-    LV_IMG_DECLARE(img_hand)
+    LV_IMAGE_DECLARE(img_hand)
 
     /*Add a the hands from images*/
-    lv_meter_indicator_t * indic_min = lv_meter_add_needle_img(meter, &img_hand, 5, 5);
-    lv_meter_indicator_t * indic_hour = lv_meter_add_needle_img(meter, &img_hand, 5, 5);
+    lv_meter_indicator_t * indic_min = lv_meter_add_needle_image(meter, &img_hand, 5, 5);
+    lv_meter_indicator_t * indic_hour = lv_meter_add_needle_image(meter, &img_hand, 5, 5);
 
     lv_obj_add_event(meter, tick_label_event, LV_EVENT_DRAW_PART_BEGIN, NULL);
 
