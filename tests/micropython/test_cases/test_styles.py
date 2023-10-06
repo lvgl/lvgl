@@ -1,9 +1,6 @@
 #! ../../../../../../../lv_micropython/ports/unix/build-standard/micropython ../run_testcase.py
 #LVGL MicroPython binding tester script: Styles on widget-parts/states and local style-properties
 
-def lv_compare_colors (color1, color2):
-    return ( color1.blue==color2.blue and color1.green==color2.green and color1.blue==color2.blue )
-
 
 #test-objects:
 

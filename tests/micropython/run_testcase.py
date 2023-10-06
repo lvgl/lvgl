@@ -18,44 +18,50 @@ class lv_test:
     subtest_count = 0
     success_count = 0
     driver_exception = None
-    LV_TEST_FOLDER = ""
+    LV_TEST_FOLDER = ""  #modified as needed, so both local and runner scripts work
 
     @classmethod
-    def assert_base (cls, expected_value, test_result, operator_fn, operator_symbol, format, subtest_name=None):
+    def assert_base (cls, expected_value, actual_value, operator_fn, operator_symbol, format, subtest_name=None):
         def show_subtest ():
             print( "Subtest", str(cls.subtest_count)+":", subtest_name  if subtest_name  else "", end=" ... " )
         cls.subtest_count += 1
-        if ( operator_fn(expected_value, test_result) ):
+        if ( operator_fn(expected_value, actual_value) ):
             cls.success_count += 1
             if lv_const.SHOW_SUCCESSES: show_subtest(); print( "OK", end=" " )
         else:
             show_subtest(); print( "Failed,  not true:", end="" )
             if lv_const.EXIT_ON_ERROR: sys.exit( lv_const.ERROR_SUBTEST_FAILED )
-        print (" (", format%expected_value, operator_symbol, format%test_result, ")" )
+        print (" (", format%expected_value, operator_symbol, format%actual_value, ")" )
 
     @staticmethod
-    def assert_true (test_result, subtest_name=None):
-        lv_test.assert_base (True, test_result, lambda a,b: a==b, "is", "%r", subtest_name)
+    def assert_true (actual_value, subtest_name=None):
+        lv_test.assert_base (True, actual_value, lambda a,b: a==b, "is", "%r", subtest_name)
     @staticmethod
-    def assert_false (test_result, subtest_name=None):
-        lv_test.assert_base (False, test_result, lambda a,b: a==b, "is", "%r", subtest_name)
+    def assert_false (actual_value, subtest_name=None):
+        lv_test.assert_base (False, actual_value, lambda a,b: a==b, "is", "%r", subtest_name)
     @staticmethod
-    def assert_equal (expected_value, test_result, subtest_name=None):
-        lv_test.assert_base (expected_value, test_result, lambda a,b: a==b, "=", "%d", subtest_name)
+    def assert_equal (expected_value, actual_value, subtest_name=None):
+        lv_test.assert_base (expected_value, actual_value, lambda a,b: a==b, "=", "%d", subtest_name)
     @staticmethod
-    def assert_differ (expected_value, test_result, subtest_name=None):
-        lv_test.assert_base (expected_value, test_result, lambda a,b: a!=b, "!=", "%d", subtest_name)
+    def assert_differ (comparison_value, actual_value, subtest_name=None):
+        lv_test.assert_base (comparison_value, actual_value, lambda a,b: a!=b, "!=", "%d", subtest_name)
     @staticmethod
-    def assert_less (expected_value, test_result, subtest_name=None):
-        lv_test.assert_base (expected_value, test_result, lambda a,b: a<b, "<", "%d", subtest_name)
+    def assert_less (comparison_value, actual_value, subtest_name=None):
+        lv_test.assert_base (comparison_value, actual_value, lambda a,b: a<b, "<", "%d", subtest_name)
     @staticmethod
-    def assert_greater (expected_value, test_result, subtest_name=None):
-        lv_test.assert_base (expected_value, test_result, lambda a,b: a>b, ">", "%d", subtest_name)
+    def assert_greater (comparison_value, actual_value, subtest_name=None):
+        lv_test.assert_base (comparison_value, actual_value, lambda a,b: a>b, ">", "%d", subtest_name)
+
+    def color_to_hex (color):
+        return (color.red << 16) | (color.green << 8) | color.blue
     @staticmethod
-    def assert_colormatch (expected_value, test_result, subtest_name=None):
-        color1 = (expected_value.red << 16) | (expected_value.green << 8) | expected_value.blue
-        color2 = (test_result.red << 16) | (test_result.green << 8) | test_result.blue
-        lv_test.assert_base (color1, color2, lambda a,b: a==b, "=", "$%06X", subtest_name)
+    def assert_colormatch (expected_value, actual_value, subtest_name=None):
+        lv_test.assert_base ( lv_test.color_to_hex( expected_value ), lv_test.color_to_hex( actual_value )
+                              , lambda a,b: a==b, "=", "$%06X", subtest_name )
+    @staticmethod
+    def assert_colordiff (comparison_value, actual_value, subtest_name=None):
+        lv_test.assert_base ( lv_test.color_to_hex( comparison_value ), lv_test.color_to_hex( actual_value )
+                              , lambda a,b: a!=b, "!=", "$%06X", subtest_name )
 
     @classmethod
     def handle_driver_exception (cls, e):

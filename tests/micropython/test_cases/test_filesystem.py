@@ -10,7 +10,7 @@ LV_TESTFILE_NAME = lv_test.FOLDER + "assets/testfile"
 fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
 
-#lv.fs.open( "S:"+LV_TESTFILE_NAME, lv.fs.MODE_RD )
+#lv.fs.open( "S:"+LV_TESTFILE_NAME, lv.fs.MODE_WR )
 
 
 #tests:
