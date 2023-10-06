@@ -372,6 +372,26 @@ uint32_t lv_group_get_obj_count(lv_group_t * group)
 {
     return _lv_ll_get_len(&group->obj_ll);
 }
+
+uint32_t lv_group_get_count(void)
+{
+    return _lv_ll_get_len(group_ll_p);
+}
+
+lv_group_t  * lv_group_by_index(uint32_t index)
+{
+    uint32_t len = 0;
+    void * node;
+
+    for(node = _lv_ll_get_tail(group_ll_p); node != NULL; node = _lv_ll_get_prev(group_ll_p, node)) {
+        if(len == index) {
+            return (lv_group_t *) node;
+        }
+        len++;
+    }
+
+    return NULL;
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
