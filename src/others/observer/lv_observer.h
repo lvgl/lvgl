@@ -43,7 +43,7 @@ typedef enum {
  */
 typedef union {
     int32_t num; /**< Integer number (opacity, enums, booleans or "normal" numbers)*/
-    const void * ptr; /**< Constant pointer  (string buffer, format string, font, cone text, etc)*/
+    const void * pointer; /**< Constant pointer  (string buffer, format string, font, cone text, etc)*/
     lv_color_t color; /**< Color */
 } lv_subject_value_t;
 
@@ -103,13 +103,22 @@ void lv_subject_set_int(lv_subject_t * subject, int32_t value);
 int32_t lv_subject_get_int(lv_subject_t * subject);
 
 /**
+ * Get the previous value of an integer subject
+ * @param subject   pointer to the subject
+ * @return          the current value
+ */
+int32_t lv_subject_get_previous_int(lv_subject_t * subject);
+
+/**
  * Initialize a string type subject
  * @param subject   pointer to the subject
  * @param buf       pointer to a buffer to store the string
+ * @param prev_buf  pointer to a buffer to store the previous string, can be NULL if not used
  * @param size      size of the buffer
+ * @param value     initial value as a string, e.g. "hello"
  * @note            the string subject stores the whole string, not only a pointer
  */
-void lv_subject_init_string(lv_subject_t * subject, char * buf, size_t size);
+void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf, size_t size, const char * value);
 
 /**
  * Copy a string to a subject. It will notify all the observers as well.
@@ -126,6 +135,15 @@ void lv_subject_copy_string(lv_subject_t * subject, char * buf);
 const char * lv_subject_get_string(lv_subject_t * subject);
 
 /**
+ * Get the previous value of an string subject
+ * @param subject   pointer to the subject
+ * @return          pointer to the buffer containing the current value
+ * @note            NULL will be returned if NULL was passed in `lv_subject_init_string()`
+ *                  as `prev_buf`
+ */
+const char * lv_subject_get_previous_string(lv_subject_t * subject);
+
+/**
  * Initialize an pointer type subject
  * @param subject   pointer to the subject
  * @param value     initial value
@@ -140,11 +158,18 @@ void lv_subject_init_pointer(lv_subject_t * subject, void * value);
 void lv_subject_set_pointer(lv_subject_t * subject, void * ptr);
 
 /**
- * Get the current value of an pointer subject
+ * Get the current value of a pointer subject
  * @param subject   pointer to the subject
  * @return          the current value
  */
 const void * lv_subject_get_pointer(lv_subject_t * subject);
+
+/**
+ * Get the previous value of a pointer subject
+ * @param subject   pointer to the subject
+ * @return          the current value
+ */
+const void * lv_subject_get_previous_pointer(lv_subject_t * subject);
 
 /**
  * Initialize an color type subject
@@ -161,11 +186,18 @@ void lv_subject_init_color(lv_subject_t * subject, lv_color_t color);
 void lv_subject_set_color(lv_subject_t * subject, lv_color_t color);
 
 /**
- * Get the current value of an color subject
+ * Get the current value of a color subject
  * @param subject   pointer to the subject
  * @return          the current value
  */
 lv_color_t lv_subject_get_color(lv_subject_t * subject);
+
+/**
+ * Get the previous value of a color subject
+ * @param subject   pointer to the subject
+ * @return          the current value
+ */
+lv_color_t lv_subject_get_previous_color(lv_subject_t * subject);
 
 /**
  * Initialize a subject group
@@ -194,7 +226,7 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
 
 /**
  * Add an observer to a subject for an object.
- * When the object is deleted, it will be remved from teh subject automatically.
+ * When the object is deleted, it will be removed from the subject automatically.
  * @param subject       pointer to the subject
  * @param observer_cb   the callback to call
  * @param obj           pointer to an object
@@ -203,6 +235,18 @@ lv_observer_t * lv_subject_add_observer(lv_subject_t * subject, lv_observer_cb_t
  */
 lv_observer_t * lv_subject_add_observer_obj(lv_subject_t * subject, lv_observer_cb_t observer_cb, lv_obj_t * obj,
                                             void * user_data);
+
+
+/**
+ * Add an observer to a subject and also save a target.
+ * @param subject       pointer to the subject
+ * @param observer_cb   the callback to call
+ * @param target        pointer to any data
+ * @param user_data     optional user data
+ * @return              pointer to the created observer
+ */
+lv_observer_t * lv_subject_add_observer_with_target(lv_subject_t * subject, lv_observer_cb_t cb, void * target,
+                                                    void * user_data);
 
 /**
  * Remove an observer from its subject
@@ -223,6 +267,12 @@ void lv_subject_remove_all_obj(lv_subject_t * subject, lv_obj_t * obj);
  * @return              pointer to the saved target
  */
 void * lv_observer_get_target(lv_observer_t * observer);
+
+/**
+ * Notify all observers of subject
+ * @param subject       pointer to a subject
+ */
+void lv_subject_notify(lv_subject_t * subject);
 
 /**
  * Set an object flag if an integer subject's value is equal to a reference value, clear the flag otherwise
@@ -272,7 +322,7 @@ lv_observer_t * lv_obj_bind_state_if_not_eq(lv_obj_t * obj, lv_subject_t * subje
  * @param subject   pointer to a subject
  * @return          pointer to the created observer
  */
-lv_observer_t * lv_btn_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
+lv_observer_t * lv_button_bind_checked(lv_obj_t * obj, lv_subject_t * subject);
 
 /**
  * Bind an integer, string, or pointer subject to a label.

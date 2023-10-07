@@ -28,6 +28,9 @@ extern "C" {
 void lv_example_observer_1(void);
 void lv_example_observer_2(void);
 void lv_example_observer_3(void);
+void lv_example_observer_4(void);
+void lv_example_observer_5(void);
+void lv_example_observer_6(void);
 
 /**********************
  *      MACROS

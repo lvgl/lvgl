@@ -58,6 +58,10 @@ void lv_example_observer_4(void)
     lv_obj_set_height(indicator, 10);
     lv_obj_align(indicator, LV_ALIGN_BOTTOM_LEFT, 0, 0);
     lv_obj_add_flag(indicator, LV_OBJ_FLAG_IGNORE_LAYOUT);
+
+    /*Be sure the indicator has the correct size*/
+    lv_obj_update_layout(indicator);
+    lv_subject_notify(&current_tab_subject);
 }
 
 static int32_t anim_get_x_cb(lv_anim_t * a)
@@ -115,7 +119,7 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
         for(i = 0; i < 3; i++) {
             lv_obj_t * dropdown = lv_dropdown_create(cont);
             lv_dropdown_bind_value(dropdown, &dropdown_subject[i]);
-            lv_obj_align(dropdown, LV_ALIGN_TOP_MID, 0, i * 40);
+            lv_obj_align(dropdown, LV_ALIGN_TOP_MID, 0, i * 50);
         }
     }
     if(cur_v == 2) {
@@ -173,7 +177,7 @@ static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     int32_t cur_v = lv_subject_get_int(subject);
 
     lv_obj_t * btn = lv_observer_get_target(observer);
-    uint32_t idx = lv_obj_get_index(btn);
+    int32_t idx = (int32_t)lv_obj_get_index(btn);
 
     if(idx == prev_v) lv_obj_clear_state(btn, LV_STATE_CHECKED);
     if(idx == cur_v) lv_obj_add_state(btn, LV_STATE_CHECKED);
@@ -181,7 +185,6 @@ static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 
 static void indicator_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 {
-    int32_t prev_v = lv_subject_get_previous_int(subject);
     int32_t cur_v = lv_subject_get_int(subject);
     lv_obj_t * indicator = lv_observer_get_target(observer);
 
@@ -191,7 +194,7 @@ static void indicator_observer_cb(lv_subject_t * subject, lv_observer_t * observ
 
     lv_anim_t a;
     lv_anim_init(&a);
-    lv_anim_set_exec_cb(&a, lv_obj_set_x);
+    lv_anim_set_exec_cb(&a, anim_set_x_cb);
     lv_anim_set_time(&a, 300);
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
     lv_anim_set_var(&a, indicator);
