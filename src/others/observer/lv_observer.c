@@ -118,7 +118,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
     _lv_ll_init(&(subject->subs_ll), sizeof(lv_observer_t));
 }
 
-void lv_subject_copy_string(lv_subject_t * subject, char * buf)
+void lv_subject_copy_string(lv_subject_t * subject, const char * buf)
 {
     if(subject->type != LV_SUBJECT_TYPE_STRING) {
         LV_LOG_WARN("Subject type is not LV_SUBJECT_TYPE_INT");

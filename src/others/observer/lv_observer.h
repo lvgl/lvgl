@@ -125,7 +125,7 @@ void lv_subject_init_string(lv_subject_t * subject, char * buf, char * prev_buf,
  * @param subject   pointer to the subject
  * @param buf       the new string
  */
-void lv_subject_copy_string(lv_subject_t * subject, char * buf);
+void lv_subject_copy_string(lv_subject_t * subject, const char * buf);
 
 /**
  * Get the current value of an string subject
