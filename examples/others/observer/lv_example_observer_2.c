@@ -111,7 +111,7 @@ static void ui_init(void)
 
     /*Create a log out button which will be active only when logged in*/
     btn = lv_button_create(lv_scr_act());
-    lv_obj_set_pos(btn, 240, 10);
+    lv_obj_set_pos(btn, 220, 10);
     lv_obj_add_event(btn, log_out_click_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_bind_state_if_not_eq(btn, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
 
@@ -131,7 +131,6 @@ static void ui_init(void)
     lv_button_bind_checked(btn, &engine_subject);
     label = lv_label_create(btn);
     lv_label_set_text(label, "START ENGINE");
-
 }
 
 #endif

@@ -404,4 +404,96 @@ void test_observer_label_text_formatted(void)
     TEST_ASSERT_EQUAL_STRING("pointer: WORLD", lv_label_get_text(obj));
 }
 
+void test_observer_arc_value(void)
+{
+    lv_obj_t * obj = lv_arc_create(lv_scr_act());
+
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 30);
+    lv_arc_bind_value(obj, &subject);
+
+    TEST_ASSERT_EQUAL(30, lv_arc_get_value(obj));
+
+    lv_subject_set_int(&subject, 40);
+    TEST_ASSERT_EQUAL(40, lv_arc_get_value(obj));
+
+    lv_obj_update_layout(obj);
+    lv_test_mouse_release();
+    lv_test_mouse_move_to(65, 10);
+    lv_test_mouse_press();
+    lv_test_indev_wait(100);
+    lv_test_mouse_release();
+
+    TEST_ASSERT_EQUAL(50, lv_arc_get_value(obj));
+    TEST_ASSERT_EQUAL(50, lv_subject_get_int(&subject));
+}
+
+void test_observer_slider_value(void)
+{
+    lv_obj_t * obj = lv_slider_create(lv_scr_act());
+
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 30);
+    lv_slider_bind_value(obj, &subject);
+
+    TEST_ASSERT_EQUAL(30, lv_slider_get_value(obj));
+
+    lv_subject_set_int(&subject, 40);
+    TEST_ASSERT_EQUAL(40, lv_slider_get_value(obj));
+
+    lv_obj_update_layout(obj);
+    lv_test_mouse_release();
+    lv_test_mouse_move_to(65, 10);
+    lv_test_mouse_press();
+    lv_test_indev_wait(100);
+    lv_test_mouse_move_to(75, 10);
+    lv_test_mouse_press();
+    lv_test_indev_wait(100);
+    lv_test_mouse_release();
+
+    TEST_ASSERT_EQUAL(29, lv_slider_get_value(obj));
+    TEST_ASSERT_EQUAL(29, lv_subject_get_int(&subject));
+}
+
+void test_observer_roller_value(void)
+{
+    lv_obj_t * obj = lv_roller_create(lv_scr_act());
+
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+    lv_roller_bind_value(obj, &subject);
+
+    TEST_ASSERT_EQUAL(1, lv_roller_get_selected(obj));
+
+    lv_subject_set_int(&subject, 2);
+    TEST_ASSERT_EQUAL(2, lv_roller_get_selected(obj));
+
+    lv_obj_update_layout(obj);
+    lv_test_mouse_click_at(30, 10);
+
+    TEST_ASSERT_EQUAL(1, lv_roller_get_selected(obj));
+    TEST_ASSERT_EQUAL(1, lv_subject_get_int(&subject));
+}
+
+void test_observer_dropdown_value(void)
+{
+    lv_obj_t * obj = lv_dropdown_create(lv_scr_act());
+
+    static lv_subject_t subject;
+    lv_subject_init_int(&subject, 1);
+    lv_dropdown_bind_value(obj, &subject);
+
+    TEST_ASSERT_EQUAL(1, lv_dropdown_get_selected(obj));
+
+    lv_subject_set_int(&subject, 2);
+    TEST_ASSERT_EQUAL(2, lv_dropdown_get_selected(obj));
+
+    lv_obj_update_layout(obj);
+    lv_test_mouse_click_at(30, 10);
+    lv_test_mouse_click_at(30, 60);
+
+    TEST_ASSERT_EQUAL(0, lv_dropdown_get_selected(obj));
+    TEST_ASSERT_EQUAL(0, lv_subject_get_int(&subject));
+}
+
 #endif
