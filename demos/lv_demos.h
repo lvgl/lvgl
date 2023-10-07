@@ -81,6 +81,11 @@ int lv_demos_main_entry(char * info[], int size);
  */
 bool lv_demos_create_demo(char * info[], int size);
 
+/**
+ * Show lv_demos usage.
+ */
+void lv_demos_show_usage(void);
+
 #if LV_USE_DEMO_HAL_CUSTOM
 lv_disp_t * lv_demos_hal_init_custom(void);
 void lv_demos_hal_deinit_custom(void);
