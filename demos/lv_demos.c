@@ -194,7 +194,7 @@ static void lv_demos_run(void)
 }
 #endif
 
-static void show_usage(void)
+void lv_demos_show_usage(void)
 {
     int i;
     const int len = sizeof(demos_entry_info)
@@ -230,7 +230,7 @@ int lv_demos_main_entry(char * info[], int size)
     }
 
     if(!lv_demos_create_demo(info, size)) {
-        show_usage();
+        lv_demos_show_usage();
         goto demo_end;
     }
 
