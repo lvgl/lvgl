@@ -2469,11 +2469,12 @@
     #endif
 #endif
 
-#ifndef LV_USE_NUTTX_FBDEV
-    #ifdef CONFIG_LV_USE_NUTTX_FBDEV
-        #define LV_USE_NUTTX_FBDEV CONFIG_LV_USE_NUTTX_FBDEV
+/*Use Nuttx to open window and handle touchscreen*/
+#ifndef LV_USE_NUTTX
+    #ifdef CONFIG_LV_USE_NUTTX
+        #define LV_USE_NUTTX CONFIG_LV_USE_NUTTX
     #else
-        #define LV_USE_NUTTX_FBDEV     0
+        #define LV_USE_NUTTX    0
     #endif
 #endif
 
@@ -2502,6 +2503,15 @@
     #endif
 #endif
 
+/*Driver for /dev/input*/
+#ifndef LV_USE_NUTTX_TOUCHSCREEN
+    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+    #else
+        #define LV_USE_NUTTX_TOUCHSCREEN    0
+    #endif
+#endif
+
 /*Driver for /dev/dri/card*/
 #ifndef LV_USE_LINUX_DRM
     #ifdef CONFIG_LV_USE_LINUX_DRM
@@ -2517,15 +2527,6 @@
         #define LV_USE_TFT_ESPI CONFIG_LV_USE_TFT_ESPI
     #else
         #define LV_USE_TFT_ESPI         0
-    #endif
-#endif
-
-/*Driver for /dev/input*/
-#ifndef LV_USE_NUTTX_TOUCHSCREEN
-    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-    #else
-        #define LV_USE_NUTTX_TOUCHSCREEN    0
     #endif
 #endif
 

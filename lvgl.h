@@ -118,10 +118,11 @@ extern "C" {
 
 #include "src/dev/display/drm/lv_linux_drm.h"
 #include "src/dev/display/fb/lv_linux_fbdev.h"
-#include "src/dev/display/fb/lv_nuttx_fbdev.h"
-#include "src/dev/display/lcd/lv_nuttx_lcd.h"
 
-#include "src/dev/input/touchscreen/lv_nuttx_touchscreen.h"
+#include "src/dev/nuttx/lv_nuttx_entry.h"
+#include "src/dev/nuttx/lv_nuttx_fbdev.h"
+#include "src/dev/nuttx/lv_nuttx_touchscreen.h"
+#include "src/dev/nuttx/lv_nuttx_lcd.h"
 
 #include "src/core/lv_global.h"
 /*********************

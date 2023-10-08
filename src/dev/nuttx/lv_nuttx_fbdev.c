@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_nuttx_fbdev.h"
-#if LV_USE_NUTTX_FBDEV
+#if LV_USE_NUTTX
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -18,8 +18,9 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <nuttx/video/fb.h>
+
 #include <lvgl/lvgl.h>
-#include "../../../lvgl_private.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -286,4 +287,4 @@ static int fbdev_init_mem2(lv_nuttx_fb_t * dsc)
     return 0;
 }
 
-#endif /*LV_USE_NUTTX_FBDEV*/
+#endif /*LV_USE_NUTTX*/
