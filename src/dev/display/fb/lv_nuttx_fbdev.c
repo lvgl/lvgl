@@ -153,6 +153,14 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * colo
 {
     lv_nuttx_fb_t * dsc = lv_display_get_driver_data(disp);
 
+
+    /* Skip the non-last flush */
+
+    if(!lv_display_flush_is_last(disp)) {
+        lv_display_flush_ready(disp);
+        return;
+    }
+
     if(dsc->mem == NULL ||
        area->x2 < 0 || area->y2 < 0 ||
        area->x1 > (int32_t)dsc->vinfo.xres - 1 || area->y1 > (int32_t)dsc->vinfo.yres - 1) {
