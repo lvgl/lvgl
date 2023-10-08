@@ -1346,14 +1346,6 @@ menu "LVGL configuration"
 		config LV_USE_DEMO_MULTILANG
 			bool "multi-language demo"
 			default n
-
-		config LV_USE_DEMO_MAIN
-			bool "Enable default main for lv_demos"
-			default n
-
-		config LV_USE_DEMO_HAL_CUSTOM
-			bool "Enable 'lv_demos' hal customization"
-			default n
 	endmenu
 
 endmenu

@@ -820,13 +820,6 @@
 
 /*Demonstrate scroll settings*/
 #define LV_USE_DEMO_SCROLL          0
-
-/*Define main for 'lv_demos'*/
-#define LV_USE_DEMO_MAIN            0
-
-/*Custom 'lv_demos' hal interfaces*/
-#define LV_USE_DEMO_HAL_CUSTOM      0
-
 /*--END OF LV_CONF_H--*/
 
 #endif /*LV_CONF_H*/
