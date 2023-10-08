@@ -12,7 +12,7 @@ It consists of
 - observers: attached to subjects to be notified on value change
 
 
-I typical use case looks like this:
+A typical use case looks like this:
 
 .. code:: c
     //It's a global variable
