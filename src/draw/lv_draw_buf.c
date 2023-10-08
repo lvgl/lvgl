@@ -102,9 +102,9 @@ void * lv_draw_buf_align_buf(void * data, lv_color_format_t color_format)
     else return NULL;
 }
 
-void lv_draw_buf_invalidate_cache(lv_draw_buf_t  * draw_buf, const char * area)
+void lv_draw_buf_invalidate_cache(void * buf, size_t size)
 {
-    if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(draw_buf, area);
+    if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, size);
 }
 
 void * lv_draw_buf_go_to_xy(lv_draw_buf_t * draw_buf, lv_coord_t x, lv_coord_t y)

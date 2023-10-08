@@ -42,7 +42,7 @@ typedef void (*lv_draw_buf_free_cb)(void * draw_buf);
 
 typedef void * (*lv_draw_buf_align_buf_cb)(void * buf, lv_color_format_t color_format);
 
-typedef void (*lv_draw_buf_invalidate_cache_cb)(lv_draw_buf_t  * draw_buf, const char * area);
+typedef void (*lv_draw_buf_invalidate_cache_cb)(void * buf, size_t size);
 
 typedef uint32_t (*lv_draw_buf_width_to_stride_cb)(uint32_t w, lv_color_format_t color_format);
 
@@ -135,10 +135,10 @@ void * lv_draw_buf_get_buf(lv_draw_buf_t * draw_buf);
 
 /**
  * Invalidate the cache of the buffer
- * @param draw_buf          pointer to a draw buffer
- * @param arae              the whose cache needs to be invalidated
+ * @param buf          a memory address to invalidate
+ * @param size         length of the memory to invalidate in bytes
  */
-void lv_draw_buf_invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
+void lv_draw_buf_invalidate_cache(void * buf, size_t size);
 
 /**
  * Calculate the stride in bytes based on a width and color format
