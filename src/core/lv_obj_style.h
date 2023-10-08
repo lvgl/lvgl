@@ -98,7 +98,7 @@ bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, 
                           lv_style_selector_t selector);
 
 /**
- * Add a style to an object.
+ * Remove a style from an object.
  * @param obj       pointer to an object
  * @param style     pointer to a style to remove. Can be NULL to check only the selector
  * @param selector  OR-ed values of states and a part to remove only styles with matching selectors. LV_STATE_ANY and LV_PART_ANY can be used
