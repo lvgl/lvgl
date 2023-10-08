@@ -63,16 +63,10 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+
 /**********************
  *      MACROS
  **********************/
-
-/**
- * The main entry which initializes LVGL instance and runs the specified demo.
- * @param info  the information which contains demo name and parameters needs by lv_demo_xxx.
- * @param size  the size of info.
- */
-int lv_demos_main_entry(char * info[], int size);
 
 /**
  * Call lv_demo_xxx.
@@ -82,9 +76,31 @@ int lv_demos_main_entry(char * info[], int size);
 bool lv_demos_create_demo(char * info[], int size);
 
 /**
- * Show lv_demos usage.
+ * Show usage for lv_demos.
  */
 void lv_demos_show_usage(void);
+
+/**
+ * Initialize HAL for lv_demos.
+ */
+lv_disp_t * lv_demos_hal_init(void);
+
+/**
+ * DeInitialize HAL for lv_demos.
+ */
+void lv_demos_hal_deinit(void);
+
+/**
+ * Looper for running lv_demos.
+ */
+void lv_demos_run(void);
+
+/**
+ * The main entry which initializes LVGL instance and runs the specified demo.
+ * @param info  the information which contains demo name and parameters needs by lv_demo_xxx.
+ * @param size  the size of info.
+ */
+int lv_demos_main_entry(char * info[], int size);
 
 #if LV_USE_DEMO_HAL_CUSTOM
 lv_disp_t * lv_demos_hal_init_custom(void);

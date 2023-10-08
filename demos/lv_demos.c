@@ -146,8 +146,6 @@ bool lv_demos_create_demo(char * info[], int size)
     return true;
 }
 
-#if LV_USE_DEMO_HAL_CUSTOM == 0
-
 #if LV_USE_SDL
 static lv_disp_t * lv_demos_hal_init_with_sdl(lv_coord_t w, lv_coord_t h)
 {
@@ -172,27 +170,43 @@ static lv_disp_t * lv_demos_hal_init_with_sdl(lv_coord_t w, lv_coord_t h)
 }
 #endif
 
-static lv_disp_t * lv_demos_hal_init(void)
+#if LV_USE_NUTTX_FBDEV
+lv_disp_t * lv_demos_hal_init_with_nuttx(void)
+{
+    lv_disp_t * disp = NULL;
+
+    disp = lv_nuttx_fbdev_create();
+    lv_nuttx_fbdev_set_file(disp, CONFIG_LV_FBDEV_INTERFACE_DEFAULT_DEVICEPATH);
+
+#if LV_USE_NUTTX_TOUCHSCREEN
+    lv_nuttx_touchscreen_create(CONFIG_LV_TOUCHPAD_INTERFACE_DEFAULT_DEVICEPATH);
+#endif
+    return disp;
+}
+#endif
+
+lv_disp_t * lv_demos_hal_init(void)
 {
 #if LV_USE_SDL
     return lv_demos_hal_init_with_sdl(800, 480);
+#elif LV_USE_NUTTX_FBDEV
+    return lv_demos_hal_init_with_nuttx();
 #else
     return NULL;
 #endif
 }
 
-static void lv_demos_hal_deinit(void)
+void lv_demos_hal_deinit(void)
 {
 }
 
-static void lv_demos_run(void)
+void lv_demos_run(void)
 {
     while(1) {
         lv_timer_handler();
         usleep(1 * 1000);
     }
 }
-#endif
 
 void lv_demos_show_usage(void)
 {
@@ -219,7 +233,6 @@ void lv_demos_show_usage(void)
     }
 }
 
-
 int lv_demos_main_entry(char * info[], int size)
 {
     lv_init();
@@ -237,6 +250,8 @@ int lv_demos_main_entry(char * info[], int size)
     LV_DEMO_RUN();
 
 demo_end:
+    lv_disp_remove(disp);
+
     LV_DEMO_HAL_DEINIT();
     lv_deinit();
     return 0;

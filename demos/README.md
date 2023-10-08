@@ -84,50 +84,50 @@ If you disable `LV_USE_DEMO_MAIN`, you have the option to use the `lv_demos_crea
 ...
 lv_disp_t* lv_demos_hal_init_custom(void)
 {
-    lv_disp_t* disp = NULL;
-    lv_tick_set_cb(...);
+  lv_disp_t* disp = NULL;
+  lv_tick_set_cb(...);
 
-    ...
-    /* TODO: init display and indev */
-    ...
+  ...
+  /* TODO: init display and indev */
+  ...
 
-    return disp;
+  return disp;
 }
 
 void lv_demos_hal_deinit_custom(void) { }
 
 void lv_demos_run_custom(void)
 {
-    while (1) {
-        uint32_t delay = lv_timer_handler();
-        if (delay < 1) delay = 1;
-        usleep(delay * 1000);
-    }
+  while (1) {
+    uint32_t delay = lv_timer_handler();
+    if (delay < 1) delay = 1;
+    usleep(delay * 1000);
+  }
 }
 
 int main(int argc, char ** argv)
 {
 #if LV_USE_DEMO_HAL_CUSTOM
-    return lv_demos_main_entry(&argv[1], argc - 1);
+  return lv_demos_main_entry(&argv[1], argc - 1);
 #else
-    lv_init();
+  lv_init();
 
-    lv_disp_t* disp = lv_demos_hal_init_custom();
-    if (disp == NULL) {
-        LV_LOG_ERROR("lv_demos initialization failure!");
-        return 1;
-    }
+  lv_disp_t* disp = lv_demos_hal_init_custom();
+  if (disp == NULL) {
+      LV_LOG_ERROR("lv_demos initialization failure!");
+      return 1;
+  }
 
-    if (!lv_demos_create_demo(&argv[1], argc - 1)) {
-        goto demo_end;
-    }
+  if (!lv_demos_create_demo(&argv[1], argc - 1)) {
+      goto demo_end;
+  }
 
-    lv_demos_run_custom();
+  lv_demos_run_custom();
 
 demo_end:
-    lv_demos_hal_deinit_custom();
-    lv_deinit();
-    return 0;
+  lv_demos_hal_deinit_custom();
+  lv_deinit();
+  return 0;
 #endif
 }
 
