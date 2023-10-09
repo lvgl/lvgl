@@ -36,7 +36,7 @@ class lv_test:
 
     @staticmethod
     def assert_always (subtest_name=None):
-        lv_test.assert_base (True, True, lambda a,b: a==b, "is", "", subtest_name)
+        lv_test.assert_base (True, True, lambda a,b: a==b, "always", "", subtest_name)
     @staticmethod
     def assert_true (actual_value, subtest_name=None):
         lv_test.assert_base (True, actual_value, lambda a,b: a==b, "is", "%r", subtest_name)
@@ -73,7 +73,12 @@ class lv_test:
         cls.driver_exception = e
 
     @staticmethod
-    def wait (ms): time.sleep_ms( ms )  #add gc.collect() and lv_timer_handler();
+    def wait (ms):
+        for i in range( ms / lv_const.WAIT_ROUTINE_PERIOD ):
+            gc.collect()
+            lv.timer_handler();
+            time.sleep_ms( lv_const.WAIT_ROUTINE_PERIOD )
+            gc.collect()
 
 
 if len(sys.argv) < 2 :

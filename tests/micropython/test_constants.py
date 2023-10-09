@@ -7,7 +7,9 @@ EXIT_ON_ERROR  = 0
 SHOW_SUCCESSES = 1
 TRANSITION_WAIT_TIME = 200 #ms
 TESTCASE_HOLD_TIME = 100 #ms
+WAIT_ROUTINE_PERIOD = 10 #ms
 TEST_FOLDER = "test_cases"
+
 
 #status codes (script return values):
 

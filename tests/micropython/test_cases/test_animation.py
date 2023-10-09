@@ -43,7 +43,7 @@ for i in range(LV_TESTANIM_LOOPCOUNT):
     time.sleep_ms(LV_TESTANIM_FRAMERATE)
 
 
-lv_test.wait( LV_TESTANIM_LOOPCOUNT * LV_TESTANIM_FRAMERATE * 2 )
+lv_test.wait( LV_TESTANIM_LOOPCOUNT * LV_TESTANIM_FRAMERATE * 2 ) #* 2 to be sure
 
 
 lv_test.assert_true( lv_testsignal_start, "Button animation start-callback" )

@@ -9,7 +9,7 @@ passing the parameters through the Python functions to LVGL works as expected. (
 As the name suggests, when executed, it checks all the test-cases in 'test_cases' folder, returns error code if any test-case fails, 0 if all are OK.
 
 -run_testcase.py:
-Tests a particular test-case script given as argument (called by the main script mentioned above, runs alone too), returns error code if the given test-case fails, 0 if it's OK
+Tests a particular test-case script given as argument, (called by the main script mentioned above, runs alone too), returns error code if the given test-case fails, 0 if it's OK
 
 -test_constants.py:
 A file with common constants (e.g. errorcodes) and settings:
@@ -61,6 +61,7 @@ Special check to see if the actual color differs from a color (for example to se
 ### Tips:
 
 -The shebang-lines at the 1st rows of the source files help to test the cases individually. This comes handy during the editing of a test-case.
+
 -Before you write a test-case/subtest it's a good idea to check out some other existing test-cases.
 
 

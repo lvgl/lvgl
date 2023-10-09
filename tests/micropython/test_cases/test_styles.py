@@ -10,9 +10,9 @@ lv_testcolor = lv.color_hex(0xAABBCC)
 
 #tests:
 
-lv_testslider.set_style_bg_color( lv.color_white(), lv.PART.MAIN )
+lv_testslider.set_style_bg_color( lv.color_black(), lv.PART.MAIN )
 
-lv_test.assert_colormatch( lv.color_white(), lv_testslider.get_style_bg_color(lv.PART.MAIN)
+lv_test.assert_colormatch( lv.color_black(), lv_testslider.get_style_bg_color(lv.PART.MAIN)
                            , "Slider main-part default color change" )
 
 

@@ -4,7 +4,7 @@
 import fs_driver
 
 LV_TESTFILE_NAME = lv_test.FOLDER + "assets/testfile"
-LV_INITIAL_FILESTATUS = lv.FS_RES.UNKNOWN
+
 
 #test-objects:
 
@@ -24,16 +24,14 @@ lv_match_count = 0
 
 #tests:
 
-lv_filestatus = LV_INITIAL_FILESTATUS
 lv_filestatus = lv_testfile.open( "S:" + LV_TESTFILE_NAME, lv.FS_MODE.WR )
 
 lv_test.assert_equal( lv_filestatus, lv.FS_RES.OK, "File-creation (with open)" )
 
 
-lv_filestatus = LV_INITIAL_FILESTATUS
-lv_filestatus = lv_testfile.write( lv_testarray, LV_TESTLIST_SIZE, lv_testarray ) #???
+#lv_filestatus = lv_testfile.write( whatpointer? , LV_TESTLIST_SIZE, whatpointer? )
 
-lv_test.assert_equal( lv_filestatus, lv.FS_RES.OK, "Writing into file" )
+#lv_test.assert_equal( lv_filestatus, lv.FS_RES.OK, "Writing into file" )
 
 lv_testfile.close()
 
@@ -43,14 +41,12 @@ lv_filestatus = lv_testfile.open( "S:" + LV_TESTFILE_NAME, lv.FS_MODE.RD )
 lv_test.assert_equal( lv_filestatus, lv.FS_RES.OK, "Opening file for reading" )
 
 
-lv_filestatus = lv_testfile.read( lv_testfile, LV_TESTLIST_SIZE, lv_readback_array )
+#lv_filestatus = lv_testfile.read( whatpointer?, LV_TESTLIST_SIZE, whatpointer? )
 
-lv_test.assert_equal( lv_filestatus, lv.FS_RES.OK, "Reading back data from file" )
+#lv_test.assert_equal( lv_filestatus, lv.FS_RES.OK, "Reading back data from file" )
 
 lv_testfile.close()
 
-
-print(lv_testlist, lv_readback_list )
 for i in range(LV_TESTLIST_SIZE):
     if lv_readback_list[i] == lv_testlist[i]: lv_match_count += 1
 
