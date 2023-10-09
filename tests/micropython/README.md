@@ -1,5 +1,5 @@
 
-#LVGL MicroPython-binding testing toolkit
+# LVGL MicroPython-binding testing toolkit
 
 
 This is a python-script based little environment for the functional testing of LVGL's MicroPython binding. The main purpose of these scripts is to check if
@@ -18,7 +18,7 @@ A file with common constants (e.g. errorcodes) and settings:
 - SHOW_SUCCESSES: if set to 0, only faulty tests are printed
 
 
-##Test-case script format (for those who want to write test-cases/subtests):
+## Test-case script format (for those who want to write test-cases/subtests):
 
 There's no strict rule how you should write a test-case, apart from the need for 'assert' calls inside. Those 'assert' functions should be called after changes to LVGL objects, and they compare a value expected by the change (or an existing value/range before the change) to the actual value you got by the change. Every assertion denotes a 'subtest' of the test-case, and these subtests are counted automatically. If not all subtests perform successfully a fault-report is shown about the success rate (success-count vs subtest-count).
 
@@ -27,7 +27,7 @@ Assertion's form is simple (number of arguments depends on the assertion-type, c
 ` lv_test.assert_xxx ( comparison_value, actual_value, "comment" ) `
 
 
-###Different assert-functions decide about the type of the comparison:
+### Different assert-functions decide about the type of the comparison:
 
 assert_always:
 No value-checking, always asserts test (no arguments, just text)
@@ -48,7 +48,7 @@ assert_colordiff:
 Special check to see if the actual color differs from a color (for example to see if the color really changed)
 
 
-###Notes:
+### Notes:
 
 -The comparison- and actual values are shown in the terminal after subtests so you can see what value you got by the object-changes in your subtest-code: ... OK/Failed  ( comparison_value  comparison  actual_value )
 
