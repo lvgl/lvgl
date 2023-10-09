@@ -259,6 +259,18 @@ bool lv_group_get_wrap(lv_group_t * group);
  */
 uint32_t lv_group_get_obj_count(lv_group_t * group);
 
+/**
+ * Get the number of groups
+ * @return              number of groups
+ */
+uint32_t lv_group_get_count(void);
+
+/**
+ * Get a group by its index
+ * @return              pointer to the group
+ */
+lv_group_t  * lv_group_by_index(uint32_t index);
+
 /**********************
  *      MACROS
  **********************/
