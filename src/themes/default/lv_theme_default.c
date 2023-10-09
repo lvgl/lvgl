@@ -1005,6 +1005,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
         lv_obj_add_style(obj, &theme->styles.transition_normal, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
     }
     else if(lv_obj_check_type(obj, &lv_dropdownlist_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);

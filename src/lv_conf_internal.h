@@ -2283,6 +2283,15 @@
     #endif
 #endif
 
+/*1: Enable an observer pattern implementation*/
+#ifndef LV_USE_OBSERVER
+    #ifdef CONFIG_LV_USE_OBSERVER
+        #define LV_USE_OBSERVER CONFIG_LV_USE_OBSERVER
+    #else
+        #define LV_USE_OBSERVER 0
+    #endif
+#endif
+
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
 #ifndef LV_USE_IME_PINYIN
