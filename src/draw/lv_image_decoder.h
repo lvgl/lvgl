@@ -44,6 +44,19 @@ typedef _lv_image_src_t lv_image_src_t;
 typedef uint8_t lv_image_src_t;
 #endif /*DOXYGEN*/
 
+enum _lv_image_decoder_process_flag_t {
+    LV_IMAGE_DECODER_PROCESS_FLAG_NONE = 0,
+    LV_IMAGE_DECODER_PROCESS_FLAG_ADDRESS_ALIGNED = 1 << 0,
+    LV_IMAGE_DECODER_PROCESS_FLAG_WIDTH_ALIGNED = 1 << 1,
+    LV_IMAGE_DECODER_PROCESS_FLAG_PREMULTIPLIED_ALPHA = 1 << 2,
+};
+
+#ifdef DOXYGEN
+typedef _lv_image_decoder_process_flag_t lv_image_decoder_process_flag_t;
+#else
+typedef uint32_t lv_image_decoder_process_flag_t;
+#endif /*DOXYGEN*/
+
 /*Decoder function definitions*/
 struct _lv_image_decoder_dsc_t;
 struct _lv_image_decoder_t;
@@ -87,6 +100,8 @@ typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t
  * @param dsc pointer to decoder descriptor
  */
 typedef void (*lv_image_decoder_close_f_t)(struct _lv_image_decoder_t * decoder, struct _lv_image_decoder_dsc_t * dsc);
+
+typedef lv_result_t (*lv_image_decoder_process_f_t)(struct _lv_image_decoder_dsc_t * dsc, void * user_data);
 
 typedef struct _lv_image_decoder_t {
     lv_image_decoder_info_f_t info_cb;
@@ -132,6 +147,9 @@ typedef struct _lv_image_decoder_dsc_t {
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
+    /**See enum _lv_image_decoder_process_flag_t*/
+    uint32_t process_flag;
+
     /**Store any custom data here is required*/
     void * user_data;
 } lv_image_decoder_dsc_t;
@@ -171,6 +189,20 @@ lv_result_t lv_image_decoder_get_info(const void * src, lv_image_header_t * head
  *         LV_RESULT_INVALID: none of the registered image decoders were able to open the image.
  */
 lv_result_t lv_image_decoder_open(lv_image_decoder_dsc_t * dsc, const void * src, lv_color_t color, int32_t frame_id);
+
+/**
+ * Set a callback to pre-process the image data before decoding.
+ * @param process_cb a function to process the image data
+ * @param user_data user data to pass to the callback
+ */
+void lv_image_decoder_set_pre_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data);
+
+/**
+ * Set a callback to post-process the image data after decoding.
+ * @param process_cb a function to process the image data
+ * @param user_data user data to pass to the callback
+ */
+void lv_image_decoder_set_post_process_cb(lv_image_decoder_process_f_t process_cb, void * user_data);
 
 /**
  * Decode an area of the opened image
