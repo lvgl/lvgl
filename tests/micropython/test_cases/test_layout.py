@@ -16,8 +16,8 @@ for i in range(BUTTON_COUNT):
 lv.scr_act().set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)
 lv_test.wait( lv_const.TRANSITION_WAIT_TIME ) #required for proper result
 
-lv_test.assert_less( 0, lv_testbuttons[BUTTON_COUNT-1].get_x(), "FlexBox layout widget X-coordinate" )
-lv_test.assert_less( 0, lv_testbuttons[BUTTON_COUNT-1].get_y(), "FlexBOx layout widget Y-coordinate" )
+lv_test.assert_greater( 0, lv_testbuttons[BUTTON_COUNT-1].get_x(), "FlexBox layout widget X-coordinate" )
+lv_test.assert_greater( 0, lv_testbuttons[BUTTON_COUNT-1].get_y(), "FlexBOx layout widget Y-coordinate" )
 
 
 #test grid layout too

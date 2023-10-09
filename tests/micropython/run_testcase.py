@@ -21,17 +21,17 @@ class lv_test:
     LV_TEST_FOLDER = ""  #modified as needed, so both local and runner scripts work
 
     @classmethod
-    def assert_base (cls, expected_value, actual_value, operator_fn, operator_symbol, format, subtest_name=None):
+    def assert_base (cls, comparison_value, actual_value, operator_fn, operator_symbol, format, subtest_name=None):
         def show_subtest ():
             print( "Subtest", str(cls.subtest_count)+":", subtest_name  if subtest_name  else "", end=" ... " )
         cls.subtest_count += 1
-        if ( operator_fn(expected_value, actual_value) ):
+        if ( operator_fn(comparison_value, actual_value) ):
             cls.success_count += 1
             if lv_const.SHOW_SUCCESSES: show_subtest(); print( "OK", end=" " )
         else:
             show_subtest(); print( "Failed,  not true:", end="" )
             if lv_const.EXIT_ON_ERROR: sys.exit( lv_const.ERROR_SUBTEST_FAILED )
-        if format != "": print (" (", format%expected_value, operator_symbol, format%actual_value, ")" )
+        if format != "": print (" (", format%comparison_value, operator_symbol, format%actual_value, ")" )
         else: print()
 
     @staticmethod
@@ -51,10 +51,10 @@ class lv_test:
         lv_test.assert_base (comparison_value, actual_value, lambda a,b: a!=b, "!=", "%d", subtest_name)
     @staticmethod
     def assert_less (comparison_value, actual_value, subtest_name=None):
-        lv_test.assert_base (comparison_value, actual_value, lambda a,b: a<b, "<", "%d", subtest_name)
+        lv_test.assert_base (comparison_value, actual_value, lambda a,b: a>b, ">", "%d", subtest_name)
     @staticmethod
     def assert_greater (comparison_value, actual_value, subtest_name=None):
-        lv_test.assert_base (comparison_value, actual_value, lambda a,b: a>b, ">", "%d", subtest_name)
+        lv_test.assert_base (comparison_value, actual_value, lambda a,b: a<b, "<", "%d", subtest_name)
 
     def color_to_hex (color):
         return (color.red << 16) | (color.green << 8) | color.blue
@@ -73,7 +73,7 @@ class lv_test:
         cls.driver_exception = e
 
     @staticmethod
-    def wait (ms): time.sleep_ms( ms )
+    def wait (ms): time.sleep_ms( ms )  #add gc.collect() and lv_timer_handler();
 
 
 if len(sys.argv) < 2 :
