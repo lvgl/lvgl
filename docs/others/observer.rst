@@ -8,7 +8,7 @@ Overview
 The ``lv_observer`` module implements a standard `Observer pattern <https://en.wikipedia.org/wiki/Observer_pattern>`__.
 It consists of
 
-- subjects: containing a value
+- subjects: each containing a value
 - observers: attached to subjects to be notified on value change
 
 
@@ -26,7 +26,7 @@ A typical use case looks like this:
 
     void main(void)
     {
-        //Initialize the subject with default value of 10
+        //Initialize the subject as integer with the default value of 10
         lv_subject_init_int(&my_subject, 10);
 
         some_module_init();
@@ -38,6 +38,7 @@ A typical use case looks like this:
 
     extern lv_subject_t some_subject;
 
+    //Will be called when the related subject's value changes
     static void some_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     {
         int32_t v = lv_subject_get_int(subject);
@@ -46,6 +47,7 @@ A typical use case looks like this:
 
     void some_module_init(void)
     {
+        //Subscribe to a subject
         lv_subject_add_observer(&some_subject, some_observer_cb, NULL);
     }
 
@@ -57,7 +59,7 @@ A typical use case looks like this:
 
     void some_event(void)
     {
-        //Set the subject to 30 and notify some_observer_cb
+        //Set the subject's value to 30. It will notify `some_observer_cb`
         lv_subject_set_int(&some_subject, 30);
     }
 
@@ -71,7 +73,7 @@ Subject initialization
 
 Subjects have to be static or global :c:expr:`lv_subject_t` type variables.
 
-To initialize a subject :c:expr:`lv_subject_init_<type>(&subject, <params>, init_value)`.
+To initialize a subject use :c:expr:`lv_subject_init_<type>(&subject, <params>, init_value)`.
 The following initializations exist for types:
 
 - **Integer** :c:expr:`void lv_subject_init_int(lv_subject_t * subject, int32_t value)`
@@ -84,6 +86,8 @@ The following initializations exist for types:
 Set subject value
 -----------------
 
+The following functions can be used to set a subject's value:
+
 - **Integer** :c:expr:`void lv_subject_set_int(lv_subject_t * subject, int32_t value)`
 - **String** :c:expr:`void lv_subject_copy_string(lv_subject_t * subject, char * buf)`
 - **Pointer**  :c:expr:`void lv_subject_set_pointer(lv_subject_t * subject, void * ptr)`
@@ -91,6 +95,9 @@ Set subject value
 
 Get subject's value
 -------------------
+
+The following functions can be used to get a subject's value:
+
 
 - **Integer** :c:expr:`int32_t lv_subject_get_int(lv_subject_t * subject)`
 - **String** :c:expr:`const char * lv_subject_get_string(lv_subject_t * subject)`
@@ -101,16 +108,14 @@ Get subject's value
 Get subject's previous value
 ----------------------------
 
+The following functions can be used to get a subject's previous value:
+
+
 - **Integer** :c:expr:`int32_t lv_subject_get_previous_int(lv_subject_t * subject)`
 - **String** :c:expr:`const char * lv_subject_get_previous_string(lv_subject_t * subject)`
 - **Pointer** :c:expr:`const void * lv_subject_get_previous_pointer(lv_subject_t * subject)`
 - **Color** :c:expr:`lv_color_t lv_subject_get_previous_color(lv_subject_t * subject)`
 
-
-Subject groups
---------------
-
-TODO
 
 Observer
 ********
@@ -118,6 +123,14 @@ Observer
 Subscribe to a subject
 ----------------------
 
+to subscribe to a subject the following function can be used:
+
+.. code:: c
+
+    lv_observer_t * observer = lv_subject_add_observer(&some_subject, some_observer_cb, user_data);
+
+
+Where the observer callback should look like this:
 .. code:: c
 
     static void some_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
@@ -126,12 +139,16 @@ Subscribe to a subject
     }
 
 
-    lv_observer_t * observer = lv_subject_add_observer(&some_subject, some_observer_cb, user_data);
+It's also possible to save a target widget when subscribing to a subject.
+In this case when widget is deleted, it will automatically unsubscribe from the subject.
 
+In the observer callback ``lv_observer_get_target(observer)`` can be used to get the saved widget.
 .. code:: c
 
     lv_observer_t * observer = lv_subject_add_observer_obj(&some_subject, some_observer_cb, obj, user_data);
 
+
+In more generic case any pointer can be saved a target:
 .. code:: c
 
     lv_observer_t * observer = lv_subject_add_observer_with_target(&some_subject, some_observer_cb, some_pointer, user_data);
@@ -145,10 +162,60 @@ Unsubscribe from a subject
 
     lv_observer_remove(observer)
 
+To unsubscribe from a subject with all widgets you can use:
 
 .. code:: c
 
     lv_subject_remove_obj(subject, obj)
+
+
+Subject groups
+**************
+
+There are cases when a subject changes, the value of some other subjects are also required.
+As practical example imagine an instrument which measures either voltage or current.
+To display the measured value on a label 3 things are required:
+
+1. What we measure (current or voltage)?
+2. What is the measured value?
+3. What is the unit (mV, V, mA, A)?
+
+What any of these 3 parameters changes the label needs to be updated,
+and it needs to know all 3 parameters to compose its text.
+
+For these kind of scenarios subject groups can be created.
+For the above example it looks like this:
+
+.. code:: c
+    lv_subject_t subject_mode;  //Voltage or Current
+    lv_subject_t subject_value; //Measured value
+    lv_subject_t subject_unit;  //The unit
+    lv_subject_t subject_all;   //It will be the subject group
+    lv_subject_t subject_list[3] = {&subject_mode, &subject_value, &subject_unit};  //The elements of the group
+
+    lv_subject_init_int(&subject_mode, 0); //Let's say 0 is Voltage, 1 is Current
+    lv_subject_init_int(&subject_value, 0);
+    lv_subject_init_pointer(&subject_unit, "V");
+    lv_subject_init_group(&subject_all, subject_list, 3);
+
+    lv_subject_add_observer(&subject_all, all_observer_cb, some_label, NULL);
+
+    ...
+
+    static void some_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
+    {
+        lv_obj_t * label = lv_observer_get_target(observer);
+        lv_subject_t * subject_mode = lv_subject_get_group_element(subject, 0)
+        lv_subject_t * subject_value = lv_subject_get_group_element(subject, 1)
+        lv_subject_t * subject_unit = lv_subject_get_group_element(subject, 2)
+
+        int32_t mode = lv_subject_get_int(subject_mode);
+        int32_t value = lv_subject_get_int(subject_value);
+        const char * unit = lv_subject_get_pointer(subject_unit);
+
+
+        lv_label_set_text_fmt(label, "%s: %d %s, mode ? "Current" : "Voltage", value, unit);
+    }
 
 
 Widget binding
