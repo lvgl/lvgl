@@ -15,6 +15,7 @@ It consists of
 A typical use case looks like this:
 
 .. code:: c
+
     //It's a global variable
     lv_subject_t my_subject;
 
@@ -131,6 +132,7 @@ to subscribe to a subject the following function can be used:
 
 
 Where the observer callback should look like this:
+
 .. code:: c
 
     static void some_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
@@ -143,12 +145,14 @@ It's also possible to save a target widget when subscribing to a subject.
 In this case when widget is deleted, it will automatically unsubscribe from the subject.
 
 In the observer callback ``lv_observer_get_target(observer)`` can be used to get the saved widget.
+
 .. code:: c
 
     lv_observer_t * observer = lv_subject_add_observer_obj(&some_subject, some_observer_cb, obj, user_data);
 
 
 In more generic case any pointer can be saved a target:
+
 .. code:: c
 
     lv_observer_t * observer = lv_subject_add_observer_with_target(&some_subject, some_observer_cb, some_pointer, user_data);
@@ -187,6 +191,7 @@ For these kind of scenarios subject groups can be created.
 For the above example it looks like this:
 
 .. code:: c
+
     lv_subject_t subject_mode;  //Voltage or Current
     lv_subject_t subject_value; //Measured value
     lv_subject_t subject_unit;  //The unit
