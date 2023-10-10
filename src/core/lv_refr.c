@@ -384,15 +384,6 @@ void _lv_display_refr_timer(lv_timer_t * tmr)
     /*We need to wait for ready here to not mess up the active screen*/
     while(disp_refr->flushing);
 
-    /*The buffers are already swapped.
-     *So the active buffer is the off screen buffer where LVGL will render*/
-    void * buf_off_screen = disp_refr->buf_act;
-    void * buf_on_screen = disp_refr->buf_act == disp_refr->buf_1
-                           ? disp_refr->buf_2
-                           : disp_refr->buf_1;
-
-    lv_coord_t stride = lv_draw_buf_width_to_stride(lv_display_get_horizontal_resolution(disp_refr),
-                                                    lv_display_get_color_format(disp_refr));
     uint32_t i;
     for(i = 0; i < disp_refr->inv_p; i++) {
         if(disp_refr->inv_area_joined[i])
@@ -467,10 +458,10 @@ static void lv_refr_join_area(void)
 static void refr_sync_areas(void)
 {
     /*Do not sync if not direct or double buffered*/
-    if(disp_refr->render_mode != LV_DISP_RENDER_MODE_DIRECT) return;
+    if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_DIRECT) return;
 
     /*Do not sync if not double buffered*/
-    if(!lv_disp_is_double_buffered(disp_refr)) return;
+    if(!lv_display_is_double_buffered(disp_refr)) return;
 
     /*Do not sync if no sync areas*/
     if(_lv_ll_is_empty(&disp_refr->sync_areas)) return;
@@ -488,8 +479,8 @@ static void refr_sync_areas(void)
 
     /*Get stride for buffer copy*/
     lv_coord_t stride = lv_draw_buf_width_to_stride(
-                            lv_disp_get_hor_res(disp_refr),
-                            lv_disp_get_color_format(disp_refr));
+                            lv_display_get_horizontal_resolution(disp_refr),
+                            lv_display_get_color_format(disp_refr));
 
     /*Iterate through invalidated areas to see if sync area should be copied*/
     uint16_t i;
@@ -532,7 +523,7 @@ static void refr_sync_areas(void)
         lv_draw_buf_copy(
             buf_off_screen, stride, sync_area,
             buf_on_screen, stride, sync_area,
-            lv_disp_get_color_format(disp_refr)
+            lv_display_get_color_format(disp_refr)
         );
     }
 

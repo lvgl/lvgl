@@ -85,7 +85,7 @@ lv_display_t * lv_display_create(lv_coord_t hor_res, lv_coord_t ver_res)
 
     _lv_ll_init(&disp->sync_areas, sizeof(lv_area_t));
 
-    lv_disp_t * disp_def_tmp = disp_def;
+    lv_display_t * disp_def_tmp = disp_def;
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh timer*/
