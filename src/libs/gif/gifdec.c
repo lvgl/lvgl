@@ -497,7 +497,7 @@ static void
 render_frame_rect(gd_GIF * gif, uint8_t * buffer)
 {
     int i, j, k;
-    uint8_t index, *color;
+    uint8_t index, * color;
     i = gif->fy * gif->width + gif->fx;
     for(j = 0; j < gif->fh; j++) {
         for(k = 0; k < gif->fw; k++) {
