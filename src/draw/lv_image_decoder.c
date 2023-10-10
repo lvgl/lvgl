@@ -17,10 +17,10 @@
  *      DEFINES
  *********************/
 #define img_decoder_ll_p &(LV_GLOBAL_DEFAULT()->img_decoder_ll)
-#define pre_process_cb (LV_GLOBAL_DEFAULT()->img_decoder_pre_process_cb)
-#define pre_process_user_data (LV_GLOBAL_DEFAULT()->img_decoder_pre_process_user_data)
-#define post_process_cb (LV_GLOBAL_DEFAULT()->img_decoder_post_process_cb)
-#define post_process_user_data (LV_GLOBAL_DEFAULT()->img_decoder_post_process_user_data)
+#define pre_process_cb (LV_GLOBAL_DEFAULT()->img_decoder_pre_process.cb)
+#define pre_process_user_data (LV_GLOBAL_DEFAULT()->img_decoder_pre_process.user_data)
+#define post_process_cb (LV_GLOBAL_DEFAULT()->img_decoder_post_process.cb)
+#define post_process_user_data (LV_GLOBAL_DEFAULT()->img_decoder_post_process.user_data)
 
 /**********************
  *      TYPEDEFS
