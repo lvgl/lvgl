@@ -2478,6 +2478,15 @@
     #endif
 #endif
 
+/*Use Nuttx custom init API to open window and handle touchscreen*/
+#ifndef LV_USE_NUTTX_CUSTOM_INIT
+    #ifdef CONFIG_LV_USE_NUTTX_CUSTOM_INIT
+        #define LV_USE_NUTTX_CUSTOM_INIT CONFIG_LV_USE_NUTTX_CUSTOM_INIT
+    #else
+        #define LV_USE_NUTTX_CUSTOM_INIT    0
+    #endif
+#endif
+
 /*Driver for /dev/lcd*/
 #ifndef LV_USE_NUTTX_LCD
     #ifdef CONFIG_LV_USE_NUTTX_LCD

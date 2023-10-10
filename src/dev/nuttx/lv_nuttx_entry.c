@@ -82,6 +82,8 @@ lv_display_t * lv_nuttx_init(lv_nuttx_t * info)
 {
     lv_display_t * disp = NULL;
 
+#if !LV_USE_NUTTX_CUSTOM_INIT
+
     if(info && info->fb_path) {
 #if LV_USE_NUTTX_LCD
         disp = lv_nuttx_lcd_create(info->fb_path);
@@ -99,6 +101,11 @@ lv_display_t * lv_nuttx_init(lv_nuttx_t * info)
         lv_nuttx_touchscreen_create(info->input_path);
 #endif
     }
+
+#else
+
+    disp = lv_nuttx_init_custom(info);
+#endif
 
     lv_tick_set_cb(millis);
 

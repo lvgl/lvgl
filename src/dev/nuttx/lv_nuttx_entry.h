@@ -42,6 +42,10 @@ typedef struct {
 
 lv_display_t * lv_nuttx_init(lv_nuttx_t * info);
 
+#if LV_USE_NUTTX_CUSTOM_INIT
+lv_display_t * lv_nuttx_init_custom(lv_nuttx_t * info);
+#endif
+
 /**********************
  *      MACROS
  **********************/
