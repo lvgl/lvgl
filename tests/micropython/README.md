@@ -45,7 +45,8 @@ Assertion's form is simple (number of arguments depends on the assertion-type, c
 - The comparison- and actual values are shown in the terminal after subtests so you can see what value you got by the object-changes in your subtest-code: ... OK/Failed  ( comparison_value  comparison  actual_value )
 
 - Sometimes it's needed to wait a bit for the LVGL changes to take effect, for example when transitions delay the changes. In this case you should add ~200 milliseconds of delay before checking the result with the assert-function by:
-` lv_test.wait( lv_const.TRANSITION_WAIT_TIME ) `
+
+    ` lv_test.wait( lv_const.TRANSITION_WAIT_TIME ) `
 
 - If you open local files it's advised to append lv_test.FOLDER variable before the path+filename. This takes care of the proper path, no matter where you run the test-script from. (Be it the main folder or 'test_cases' folder.)
 
