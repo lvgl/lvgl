@@ -92,6 +92,9 @@ struct _lv_display_t {
     uint32_t inv_p;
     int32_t inv_en_cnt;
 
+    /** Double buffer sync areas (redrawn during last refresh) */
+    lv_ll_t sync_areas;
+
     /*---------------------
      * Layer
      *--------------------*/
