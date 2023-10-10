@@ -93,4 +93,27 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
     LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size));
 }
 
+void test_checkbox_rtl(void)
+{
+    const char * message =
+        "מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).";
+
+    lv_obj_t * screen = lv_obj_create(lv_scr_act());
+    lv_obj_remove_style_all(screen);
+    lv_obj_set_size(screen, 800, 480);
+    lv_obj_center(screen);
+    lv_obj_set_style_bg_color(screen, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(screen, LV_OPA_100, 0);
+    lv_obj_set_style_pad_all(screen, 0, 0);
+
+    lv_obj_t * test_checkbox = lv_checkbox_create(active_screen);
+
+    lv_checkbox_set_text(test_checkbox, message);
+    lv_obj_set_style_text_font(test_checkbox, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_center(test_checkbox);
+    lv_obj_set_style_base_dir(test_checkbox, LV_BASE_DIR_RTL, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("checkbox_rtl_1.png");
+}
+
 #endif

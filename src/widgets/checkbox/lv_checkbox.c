@@ -217,9 +217,12 @@ static void lv_checkbox_draw(lv_event_t * e)
     const lv_font_t * font = lv_obj_get_style_text_font(obj, LV_PART_MAIN);
     lv_coord_t font_h = lv_font_get_line_height(font);
 
+    const bool is_rtl = LV_BASE_DIR_RTL == lv_obj_get_style_base_dir(obj, LV_PART_MAIN);
+
     lv_coord_t bg_border = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
     lv_coord_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN) + bg_border;
-    lv_coord_t bg_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + bg_border;
+    lv_coord_t bg_p = is_rtl ? lv_obj_get_style_pad_right(obj, LV_PART_MAIN) : lv_obj_get_style_pad_left(obj,
+                                                                                                         LV_PART_MAIN) + bg_border;
     lv_coord_t bg_colp = lv_obj_get_style_pad_column(obj, LV_PART_MAIN);
 
     lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_INDICATOR);
@@ -234,8 +237,14 @@ static void lv_checkbox_draw(lv_event_t * e)
     lv_draw_rect_dsc_init(&indic_dsc);
     lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &indic_dsc);
     lv_area_t marker_area;
-    marker_area.x1 = obj->coords.x1 + bg_leftp;
-    marker_area.x2 = marker_area.x1 + font_h + marker_leftp + marker_rightp - 1;
+    if(is_rtl) {
+        marker_area.x2 = obj->coords.x2 - bg_p;
+        marker_area.x1 = marker_area.x2 - font_h - marker_leftp - marker_rightp + 1;
+    }
+    else {
+        marker_area.x1 = obj->coords.x1 + bg_p;
+        marker_area.x2 = marker_area.x1 + font_h + marker_leftp + marker_rightp - 1;
+    }
     marker_area.y1 = obj->coords.y1 + bg_topp;
     marker_area.y2 = marker_area.y1 + font_h + marker_topp + marker_bottomp - 1;
 
@@ -258,8 +267,14 @@ static void lv_checkbox_draw(lv_event_t * e)
 
     lv_coord_t y_ofs = (lv_area_get_height(&marker_area) - font_h) / 2;
     lv_area_t txt_area;
-    txt_area.x1 = marker_area.x2 + bg_colp;
-    txt_area.x2 = txt_area.x1 + txt_size.x;
+    if(is_rtl) {
+        txt_area.x2 = marker_area.x1 - bg_colp;
+        txt_area.x1 = txt_area.x2 - txt_size.x;
+    }
+    else {
+        txt_area.x1 = marker_area.x2 + bg_colp;
+        txt_area.x2 = txt_area.x1 + txt_size.x;
+    }
     txt_area.y1 = obj->coords.y1 + bg_topp + y_ofs;
     txt_area.y2 = txt_area.y1 + txt_size.y;
 
