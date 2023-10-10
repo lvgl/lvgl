@@ -207,10 +207,6 @@ void lv_init(void)
     LV_LOG_WARN("Log level is set to 'Trace' which makes LVGL much slower");
 #endif
 
-#if LV_USE_MSG
-    lv_msg_init();
-#endif
-
 #if LV_USE_FS_FATFS != '\0'
     lv_fs_fatfs_init();
 #endif

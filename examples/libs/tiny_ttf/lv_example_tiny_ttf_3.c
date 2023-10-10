@@ -1,11 +1,9 @@
 #include "../../lv_examples.h"
-#if LV_USE_TINY_TTF && LV_BUILD_EXAMPLES && LV_USE_MSG
+#if LV_USE_TINY_TTF && LV_BUILD_EXAMPLES && LV_USE_OBSERVER
 
-#define DISPLAY_TEXT    "Hello World!"
-#define MSG_NEW_SIZE    1
+static void font_size_observer_cb(lv_subject_t * subject, lv_observer_t * observer);
 
-static void slider_event_cb(lv_event_t * e);
-static void label_event_cb(lv_event_t * e);
+static lv_subject_t subject_font;
 
 /**
  * Change font size with Tiny_TTF
@@ -15,59 +13,47 @@ void lv_example_tiny_ttf_3(void)
     extern const uint8_t ubuntu_font[];
     extern const int ubuntu_font_size;
 
-    int lsize = 25;
+    lv_subject_init_int(&subject_font, 25);
 
     /*Create style with the new font*/
     static lv_style_t style;
     lv_style_init(&style);
-    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, ubuntu_font_size, lsize);
+    lv_font_t * font = lv_tiny_ttf_create_data(ubuntu_font, ubuntu_font_size, 25);
     lv_style_set_text_font(&style, font);
     lv_style_set_text_align(&style, LV_TEXT_ALIGN_CENTER);
 
     lv_obj_t * slider = lv_slider_create(lv_scr_act());
     lv_obj_center(slider);
     lv_slider_set_range(slider, 5, 50);
-    lv_slider_set_value(slider, lsize, LV_ANIM_OFF);
     lv_obj_align(slider, LV_ALIGN_BOTTOM_MID, 0, -50);
+    lv_slider_bind_value(slider, &subject_font);
 
     lv_obj_t * slider_label = lv_label_create(lv_scr_act());
-    lv_label_set_text_fmt(slider_label, "%d", lsize);
     lv_obj_align_to(slider_label, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 10);
+    lv_label_bind_text(slider_label, &subject_font, "%d");
 
-    lv_obj_add_event(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, slider_label);
 
     /*Create a label with the new style*/
     lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_obj_add_style(label, &style, 0);
-    lv_obj_add_event(label, label_event_cb, LV_EVENT_MSG_RECEIVED, font);
     lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_label_set_text(label, "Hello world!");
     lv_obj_center(label);
 
-    lv_msg_subscribe_obj(MSG_NEW_SIZE, label, NULL);
-    lv_msg_send(MSG_NEW_SIZE, &lsize);
+
+    lv_subject_add_observer(&subject_font, font_size_observer_cb, &style);
 }
 
-static void slider_event_cb(lv_event_t * e)
+static void font_size_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
 {
-    lv_obj_t * slider = lv_event_get_target(e);
-    lv_obj_t * label = lv_event_get_user_data(e);
-    int lsize;
+    lv_style_t * style = observer->user_data;
+    lv_style_value_t v;
+    lv_style_get_prop(style, LV_STYLE_TEXT_FONT, &v);
+    lv_font_t * font = (lv_font_t *) v.ptr;
+    int32_t size = lv_subject_get_int(subject);
 
-    lsize = (int)lv_slider_get_value(slider);
+    lv_tiny_ttf_set_size(font, size);
 
-    lv_label_set_text_fmt(label, "%d", lsize);
-
-    lv_msg_send(MSG_NEW_SIZE, &lsize);
-}
-
-static void label_event_cb(lv_event_t * e)
-{
-    lv_obj_t * label = lv_event_get_target(e);
-    lv_font_t * font = lv_event_get_user_data(e);
-    lv_msg_t * m = lv_event_get_msg(e);
-    const int32_t * v = lv_msg_get_payload(m);
-
-    lv_tiny_ttf_set_size(font, *v);
-    lv_label_set_text(label, DISPLAY_TEXT);
+    lv_obj_report_style_change(style);
 }
 #endif
