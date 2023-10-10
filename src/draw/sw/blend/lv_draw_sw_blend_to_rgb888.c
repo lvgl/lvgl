@@ -281,7 +281,6 @@ LV_ATTRIBUTE_FAST_MEM static void rgb565_image_blend(_lv_draw_sw_blend_image_dsc
 LV_ATTRIBUTE_FAST_MEM static void rgb888_image_blend(_lv_draw_sw_blend_image_dsc_t * dsc, const uint8_t dest_px_size,
                                                      uint32_t src_px_size)
 {
-
     int32_t w = dsc->dest_w * dest_px_size;
     int32_t h = dsc->dest_h;
     lv_opa_t opa = dsc->opa;

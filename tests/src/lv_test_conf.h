@@ -89,7 +89,7 @@ typedef void * lv_user_data_t;
 #undef LV_LOG_PRINTF
 
 //#define LV_DRAW_BUF_STRIDE_ALIGN                64
-//#define LV_DRAW_BUF_ALIGN                       32
+//#define LV_DRAW_BUF_ALIGN                       40  /*Use non power of 2 to avoid the case when `malloc` returns aligned ponter by default*/
 
 /*For screenshots*/
 #undef LV_USE_PERF_MONITOR
