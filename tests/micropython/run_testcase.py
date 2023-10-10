@@ -21,14 +21,17 @@ class lv_test:
     LV_TEST_FOLDER = ""  #modified as needed, so both local and runner scripts work
 
     @classmethod
-    def assert_base (cls, comparison_value, actual_value, operator_fn, operator_symbol, format, subtest_name=None):
+    def assert_base (clss, comparison_value, actual_value, operator_fn, operator_symbol, format, subtest_name=None):
         def show_subtest ():
-            print( "Subtest", str(cls.subtest_count)+":", subtest_name  if subtest_name  else "", end=" ... " )
-        cls.subtest_count += 1
+            print( "Subtest", str(clss.subtest_count)+":", subtest_name  if subtest_name  else "", end=" ... " )
+        clss.subtest_count += 1
+        #TIMEOUT_PERIODS = int( lv_const.TRANSITION_WAIT_TIME / lv_const.WAIT_ROUTINE_PERIOD )
+        #for i in range( TIMEOUT_PERIODS ) :
         if ( operator_fn(comparison_value, actual_value) ):
-            cls.success_count += 1
-            if lv_const.SHOW_SUCCESSES: show_subtest(); print( "OK", end=" " )
-        else:
+            clss.success_count += 1
+            if lv_const.SHOW_SUCCESSES: show_subtest(); print( "OK", end=" " )  #break
+        #gc.collect() #lv.timer_handler() #time.sleep_ms( lv_const.WAIT_ROUTINE_PERIOD )
+        else:  #if i >= TIMEOUT_PERIODS-1:
             show_subtest(); print( "Failed,  not true:", end="" )
             if lv_const.EXIT_ON_ERROR: sys.exit( lv_const.ERROR_SUBTEST_FAILED )
         if format != "": print (" (", format%comparison_value, operator_symbol, format%actual_value, ")" )
@@ -68,13 +71,13 @@ class lv_test:
                               , lambda a,b: a!=b, "!=", "$%06X", subtest_name )
 
     @classmethod
-    def handle_driver_exception (cls, e):
+    def handle_driver_exception (clss, e):
         lv_utils.event_loop.current_instance().deinit()
-        cls.driver_exception = e
+        clss.driver_exception = e
 
     @staticmethod
-    def wait (ms):
-        for i in range( ms / lv_const.WAIT_ROUTINE_PERIOD ):
+    def wait (ms):  #a polling with timeout built into assert functions might be better than using this
+        for i in range( int (ms / lv_const.WAIT_ROUTINE_PERIOD) ):
             gc.collect()
             lv.timer_handler();
             time.sleep_ms( lv_const.WAIT_ROUTINE_PERIOD )

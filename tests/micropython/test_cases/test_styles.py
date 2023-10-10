@@ -7,6 +7,10 @@
 lv_testslider = lv.slider( lv.scr_act() )
 lv_testcolor = lv.color_hex(0xAABBCC)
 
+lv_teststyle = lv.style_t()
+lv_teststyle.init()
+lv_teststyle.set_height( lv.pct(50) )
+
 
 #tests:
 
@@ -18,11 +22,15 @@ lv_test.assert_colormatch( lv.color_black(), lv_testslider.get_style_bg_color(lv
 
 lv_testslider.set_style_bg_color( lv_testcolor, lv.PART.KNOB | lv.STATE.PRESSED )
 lv_testslider.add_state( lv.STATE.PRESSED )
-lv_test.wait( lv_const.TRANSITION_WAIT_TIME )  # (a polling with timeout might be better)
+lv_test.wait( lv_const.TRANSITION_WAIT_TIME )
 
 lv_test.assert_colormatch ( lv_testcolor, lv_testslider.get_style_bg_color(lv.PART.KNOB)
                             , "Slider-knob pressed color change" )
 
 
-#test other parts/states too
+lv_testslider_original_height = lv_testslider.get_height()
+lv_testslider.add_style( lv_teststyle, lv.PART.MAIN | lv.STATE.PRESSED )
+lv_test.wait( lv_const.TRANSITION_WAIT_TIME )
+
+lv_test.assert_greater( lv_testslider_original_height, lv_testslider.get_height(), "Slider main-part height set by style_t" )
 
