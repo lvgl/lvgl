@@ -12,7 +12,7 @@
 
 #include <time.h>
 #include <nuttx/tls.h>
-
+#include <syslog.h>
 #include <lvgl/lvgl.h>
 
 /*********************
@@ -28,6 +28,7 @@
  **********************/
 
 static uint32_t millis(void);
+static void syslog_print(lv_log_level_t level, const char * buf);
 
 /**********************
  *  STATIC VARIABLES
@@ -82,6 +83,9 @@ lv_display_t * lv_nuttx_init(lv_nuttx_t * info)
 {
     lv_display_t * disp = NULL;
 
+    lv_log_register_print_cb(syslog_print);
+    lv_tick_set_cb(millis);
+
 #if !LV_USE_NUTTX_CUSTOM_INIT
 
     if(info && info->fb_path) {
@@ -107,8 +111,6 @@ lv_display_t * lv_nuttx_init(lv_nuttx_t * info)
     disp = lv_nuttx_init_custom(info);
 #endif
 
-    lv_tick_set_cb(millis);
-
     return disp;
 }
 
@@ -124,6 +126,15 @@ static uint32_t millis(void)
     uint32_t tick = ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
 
     return tick;
+}
+
+static void syslog_print(lv_log_level_t level, const char * buf)
+{
+    static const int priority[_LV_LOG_LEVEL_NUM] = {
+        LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERR, LOG_CRIT
+    };
+
+    syslog(priority[level], "[LVGL] %s", buf);
 }
 
 #endif /*LV_USE_NUTTX*/
