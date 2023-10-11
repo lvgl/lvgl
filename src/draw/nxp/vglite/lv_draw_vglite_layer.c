@@ -53,6 +53,9 @@ void lv_draw_vglite_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
     if(layer_to_draw->draw_buf.buf == NULL)
         return;
 
+    clean_invalidate_dcache(layer_to_draw->draw_buf.buf, coords, lv_draw_buf_get_stride(&layer_to_draw->draw_buf),
+                            layer_to_draw->draw_buf.color_format);
+
     lv_image_dsc_t img_dsc = { 0 };
     img_dsc.header.w = layer_to_draw->draw_buf.width;
     img_dsc.header.h = layer_to_draw->draw_buf.height;

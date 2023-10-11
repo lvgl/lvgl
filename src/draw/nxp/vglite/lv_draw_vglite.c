@@ -279,8 +279,8 @@ static void _vglite_execute_drawing(lv_draw_vglite_unit_t * u)
     lv_layer_t * layer = draw_unit->target_layer;
     vglite_set_dest_buf(&layer->draw_buf);
 
-    /* Invalidate cache */
-    lv_draw_buf_invalidate_cache(&layer->draw_buf, (const char *)&t->area);
+    clean_invalidate_dcache(layer->draw_buf.buf, &t->area, lv_draw_buf_get_stride(&layer->draw_buf),
+                            layer->draw_buf.color_format);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_LABEL:

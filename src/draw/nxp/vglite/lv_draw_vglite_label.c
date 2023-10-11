@@ -104,16 +104,11 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
 
             const lv_draw_buf_t * draw_buf = glyph_draw_dsc->glyph_data;
             const uint8_t * mask_buf = draw_buf->data;
+
             lv_area_t mask_area;
             lv_area_copy(&mask_area, glyph_draw_dsc->letter_coords);
             lv_area_move(&mask_area, -layer->draw_buf_ofs.x, -layer->draw_buf_ofs.y);
-
-            /**
-             * @todo check if we can use draw_buf->header.stride directly.
-             */
-            uint32_t mask_stride = lv_draw_buf_width_to_stride(
-                                       lv_area_get_width(glyph_draw_dsc->letter_coords),
-                                       LV_COLOR_FORMAT_A8);
+            uint32_t mask_stride = draw_buf->header.stride;
 
             if(!vglite_buf_aligned(mask_buf, mask_stride, LV_COLOR_FORMAT_A8)) {
                 /* Draw a placeholder rectangle*/
@@ -126,11 +121,12 @@ static void _draw_vglite_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t 
             }
             else {
                 /* Set src_vgbuf structure. */
-                vglite_set_src_buf(mask_buf, lv_area_get_width(&mask_area), lv_area_get_height(&mask_area),
-                                   mask_stride, LV_COLOR_FORMAT_A8);
+                vglite_set_src_buf(mask_buf, mask_width, mask_height, mask_stride, LV_COLOR_FORMAT_A8);
 
                 /* Set vgmatrix. */
                 vglite_set_translation_matrix(&blend_area);
+
+                clean_invalidate_dcache(mask_buf, &mask_area, mask_stride, LV_COLOR_FORMAT_A8);
 
                 _vglite_draw_letter(&mask_area, glyph_draw_dsc->color, glyph_draw_dsc->opa);
             }
@@ -163,8 +159,8 @@ static void _vglite_draw_letter(const lv_area_t * mask_area, lv_color_t color, l
     mask_vgbuf->transparency_mode = VG_LITE_IMAGE_TRANSPARENT;
 
     uint32_t rect[] = {
-        (uint32_t)0, /* start x */
-        (uint32_t)0, /* start y */
+        (uint32_t)mask_area->x1, /* start x */
+        (uint32_t)mask_area->y1, /* start y */
         (uint32_t)lv_area_get_width(mask_area), /* width */
         (uint32_t)lv_area_get_height(mask_area) /* height */
     };

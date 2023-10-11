@@ -38,7 +38,7 @@ static void * _buf_malloc(size_t size_bytes, lv_color_format_t cf);
 
 static void * _align_buf(void * buf, lv_color_format_t cf);
 
-static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
+static void _invalidate_cache(void * buf, size_t size);
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf);
 
@@ -93,12 +93,9 @@ static void * _align_buf(void * buf, lv_color_format_t cf)
     return buf_u8;
 }
 
-static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area)
+static void _invalidate_cache(void * buf, size_t size)
 {
-    LV_UNUSED(draw_buf);
-    LV_UNUSED(area);
-
-    DEMO_CleanInvalidateCache();
+    DEMO_CleanInvalidateCacheByAddr(buf, size);
 }
 
 static uint32_t _width_to_stride(uint32_t w, lv_color_format_t cf)

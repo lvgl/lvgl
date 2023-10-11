@@ -64,8 +64,21 @@ static inline void vglite_disable_scissor(void);
 bool vglite_cmd_buf_is_flushed(void);
 #endif
 
+/*
+ * Cleans and invalidates D_Cache for the given address
+ *     D-Cache is cleaned and invalidated starting from a 32 byte aligned address in 32 byte granularity.
+ *     D-Cache memory blocks which are part of given address + given size are cleaned and invalidated.
+ *
+ * @param[in] buf The buffer address (should be already aligned to 32 bytes)
+ * @param[in] area Area in the buffer
+ * @param[in] stride Buffer stride in bytes
+ * @param[in] cf Color format
+ *
+ */
+void clean_invalidate_dcache(const void * buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf);
+
 /**
- * Clear cache and flush command to VG-Lite.
+ * Flush command to VG-Lite.
  *
  */
 void vglite_run(void);

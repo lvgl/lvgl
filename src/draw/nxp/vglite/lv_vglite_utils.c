@@ -59,6 +59,49 @@ bool vglite_cmd_buf_is_flushed(void)
 }
 #endif
 
+void clean_invalidate_dcache(const void * buf, lv_area_t * area, uint32_t stride, lv_color_format_t cf)
+{
+    if(area->y1 == 0) {
+        uint16_t size = stride * lv_area_get_height(area);
+
+        lv_draw_buf_invalidate_cache((void *)buf, size);
+        return;
+    }
+
+    const uint8_t * buf_u8 = buf;
+    uint8_t align_bytes = 32; // ARM require a 32 byte aligned address
+    uint8_t bits_per_pixel = vglite_get_px_size(cf);
+
+    uint16_t align_pixels = align_bytes * 8 / bits_per_pixel;
+    uint16_t offset_x = 0;
+
+    if(area->x1 >= (lv_coord_t)(area->x1 % align_pixels)) {
+        uint16_t shift_x = area->x1 - (area->x1 % align_pixels);
+
+        offset_x = area->x1 - shift_x;
+        buf_u8 += (shift_x * bits_per_pixel) / 8;
+    }
+
+    if(area->y1) {
+        uint16_t shift_y = area->y1;
+
+        buf_u8 += shift_y * stride;
+    }
+
+    /* Area to clear can start from a different offset in buffer.
+     * Invalidate the area line by line.
+     */
+    uint16_t line_pixels = offset_x + lv_area_get_width(area);
+    uint16_t line_size = (line_pixels * bits_per_pixel) / 8;
+    uint16_t area_height = lv_area_get_height(area);
+
+    for(uint16_t y = 0; y < area_height; y++) {
+        const void * line_addr = buf_u8 + y * stride;
+
+        lv_draw_buf_invalidate_cache((void *)line_addr, line_size);
+    }
+}
+
 void vglite_run(void)
 {
 #if LV_USE_OS
