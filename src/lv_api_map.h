@@ -95,6 +95,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define LV_RES_OK         LV_RESULT_OK
 #define LV_RES_INV        LV_RESULT_INVALID
 
+#define LV_INDEV_STATE_PR   LV_INDEV_STATE_PRESSED
+#define LV_INDEV_STATE_REL  LV_INDEV_STATE_RELEASED
 
 #define lv_disp_create                   lv_display_create
 #define lv_disp_remove                   lv_display_remove
