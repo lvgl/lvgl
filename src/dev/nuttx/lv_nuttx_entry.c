@@ -79,7 +79,14 @@ lv_global_t * lv_global_default(void)
 }
 #endif
 
-lv_display_t * lv_nuttx_init(lv_nuttx_t * info)
+void lv_nuttx_info_init(lv_nuttx_t * info)
+{
+    lv_memzero(info, sizeof(lv_nuttx_t));
+    info->fb_path = "/dev/fb0";
+    info->input_path = "/dev/input0";
+}
+
+lv_display_t * lv_nuttx_init(const lv_nuttx_t * info)
 {
     lv_display_t * disp = NULL;
 
