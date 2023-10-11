@@ -53,6 +53,8 @@ void lv_draw_pxp_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * d
     if(layer_to_draw->draw_buf.buf == NULL)
         return;
 
+    lv_draw_buf_invalidate_cache(NULL, 0);
+
     lv_image_dsc_t img_dsc = { 0 };
     img_dsc.header.w = layer_to_draw->draw_buf.width;
     img_dsc.header.h = layer_to_draw->draw_buf.height;

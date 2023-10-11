@@ -33,7 +33,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area);
+static void _invalidate_cache(void * buf, size_t size);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,10 +58,10 @@ void lv_draw_buf_pxp_init_handlers(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void _invalidate_cache(lv_draw_buf_t * draw_buf, const char * area)
+static void _invalidate_cache(void * buf, size_t size)
 {
-    LV_UNUSED(draw_buf);
-    LV_UNUSED(area);
+    LV_UNUSED(buf);
+    LV_UNUSED(size);
 
     DEMO_CleanInvalidateCache();
 }

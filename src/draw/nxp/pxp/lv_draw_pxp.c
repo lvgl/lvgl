@@ -269,8 +269,7 @@ static void _pxp_execute_drawing(lv_draw_pxp_unit_t * u)
     lv_draw_unit_t * draw_unit = (lv_draw_unit_t *)u;
 
     /* Invalidate cache */
-    lv_layer_t * layer = draw_unit->target_layer;
-    lv_draw_buf_invalidate_cache(&layer->draw_buf, (const char *)&t->area);
+    lv_draw_buf_invalidate_cache(NULL, 0);
 
     switch(t->type) {
         case LV_DRAW_TASK_TYPE_FILL:
