@@ -152,7 +152,7 @@ void create_test_screen(lv_color_format_t render_cf, const char * name)
     static uint8_t canvas_buf_large[CANVAS_WIDTH_TO_STRIDE(768, 4) * 440  + LV_DRAW_BUF_ALIGN];
 
     lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
-    lv_canvas_set_buffer(canvas, lv_draw_buf_align_buf(canvas_buf_large, LV_COLOR_FORMAT_ARGB8888), 768, 440,
+    lv_canvas_set_buffer(canvas, lv_draw_buf_align(canvas_buf_large, LV_COLOR_FORMAT_ARGB8888), 768, 440,
                          LV_COLOR_FORMAT_ARGB8888);
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_BLUE_GREY, 2), LV_OPA_50);
@@ -163,7 +163,7 @@ void create_test_screen(lv_color_format_t render_cf, const char * name)
     static uint8_t canvas_buf_small[CANVAS_WIDTH_TO_STRIDE(100, 4) * 100 + LV_DRAW_BUF_ALIGN];
 
     lv_image_dsc_t img;
-    img.data = lv_draw_buf_align_buf(canvas_buf_small, render_cf);
+    img.data = lv_draw_buf_align(canvas_buf_small, render_cf);
     img.header.cf = render_cf;
     img.header.w = 100;
     img.header.h = 100;
@@ -174,7 +174,7 @@ void create_test_screen(lv_color_format_t render_cf, const char * name)
     lv_draw_image_dsc_init(&img_dsc);
     img_dsc.src = &img;
 
-    canvas_basic_render(render_cf, lv_draw_buf_align_buf(canvas_buf_small, render_cf));
+    canvas_basic_render(render_cf, lv_draw_buf_align(canvas_buf_small, render_cf));
     draw_images(&layer, &img_dsc);
 
     lv_canvas_finish_layer(canvas, &layer);

@@ -577,15 +577,15 @@ static void refr_invalid_areas(void)
 static void refr_area(const lv_area_t * area_p)
 {
     lv_layer_t * layer = disp_refr->layer_head;
-    layer->draw_buf.buf = disp_refr->buf_act;
+    layer->buf = disp_refr->buf_act;
 
     /*With full refresh just redraw directly into the buffer*/
     /*In direct mode draw directly on the absolute coordinates of the buffer*/
     if(disp_refr->render_mode != LV_DISPLAY_RENDER_MODE_PARTIAL) {
-        layer->draw_buf.width = lv_display_get_horizontal_resolution(disp_refr);
-        layer->draw_buf.height = lv_display_get_vertical_resolution(disp_refr);
-        layer->draw_buf_ofs.x = 0;
-        layer->draw_buf_ofs.y = 0;
+        layer->buf_area.x1 = 0;
+        layer->buf_area.y1 = 0;
+        layer->buf_area.x2 = lv_display_get_horizontal_resolution(disp_refr) - 1;
+        layer->buf_area.y2 = lv_display_get_vertical_resolution(disp_refr) - 1;
         lv_area_t disp_area;
         lv_area_set(&disp_area, 0, 0, lv_display_get_horizontal_resolution(disp_refr) - 1,
                     lv_display_get_vertical_resolution(disp_refr) - 1);
@@ -621,11 +621,8 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = row + max_row - 1;
-        layer->draw_buf.buf = disp_refr->buf_act;
-        layer->draw_buf.width = lv_area_get_width(&sub_area);
-        layer->draw_buf.height = max_row;
-        layer->draw_buf_ofs.x = sub_area.x1;
-        layer->draw_buf_ofs.y = sub_area.y1;
+        layer->buf = disp_refr->buf_act;
+        layer->buf_area = sub_area;
         layer->clip_area = sub_area;
         if(sub_area.y2 > y2) sub_area.y2 = y2;
         row_last = sub_area.y2;
@@ -640,11 +637,8 @@ static void refr_area(const lv_area_t * area_p)
         sub_area.x2 = area_p->x2;
         sub_area.y1 = row;
         sub_area.y2 = y2;
-        layer->draw_buf.buf = disp_refr->buf_act;
-        layer->draw_buf.width = lv_area_get_width(&sub_area);
-        layer->draw_buf.height = lv_area_get_height(&sub_area);
-        layer->draw_buf_ofs.x = sub_area.x1;
-        layer->draw_buf_ofs.y = sub_area.y1;
+        layer->buf = disp_refr->buf_act;
+        layer->buf_area = sub_area;
         layer->clip_area = sub_area;
         disp_refr->last_part = 1;
         refr_area_part(layer);
@@ -662,7 +656,8 @@ static void refr_area_part(lv_layer_t * layer)
     }
     /*If the screen is transparent initialize it when the flushing is ready*/
     if(lv_color_format_has_alpha(disp_refr->color_format)) {
-        lv_draw_buf_clear(&layer->draw_buf, &disp_refr->refreshed_area);
+        uint32_t stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer->buf_area), layer->color_format);
+        lv_draw_buf_clear(layer->buf, stride, layer->color_format, &disp_refr->refreshed_area);
     }
 
     lv_obj_t * top_act_scr = NULL;
@@ -909,8 +904,8 @@ void refr_obj(lv_layer_t * layer, lv_obj_t * obj)
 
             lv_draw_image_dsc_t layer_draw_dsc;
             lv_draw_image_dsc_init(&layer_draw_dsc);
-            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->draw_buf_ofs.x;
-            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->draw_buf_ofs.y;
+            layer_draw_dsc.pivot.x = obj->coords.x1 + lv_obj_get_style_transform_pivot_x(obj, 0) - new_layer->buf_area.x1;
+            layer_draw_dsc.pivot.y = obj->coords.y1 + lv_obj_get_style_transform_pivot_y(obj, 0) - new_layer->buf_area.y1;
 
             layer_draw_dsc.opa = opa;
             layer_draw_dsc.rotation = lv_obj_get_style_transform_rotation(obj, 0);
@@ -1000,10 +995,10 @@ static void draw_buf_flush(lv_display_t * disp)
         /*Rotate the buffer to the display's native orientation if necessary*/
         if(disp->rotation != LV_DISPLAY_ROTATION_0 && disp->sw_rotate) {
             LV_LOG_WARN("SW rotation is not supported now");
-            call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf.buf);
+            call_flush_cb(disp, &disp->refreshed_area, layer->buf);
         }
         else {
-            call_flush_cb(disp, &disp->refreshed_area, layer->draw_buf.buf);
+            call_flush_cb(disp, &disp->refreshed_area, layer->buf);
         }
     }
     /*If there are 2 buffers swap them. With direct mode swap only on the last area*/

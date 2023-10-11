@@ -73,7 +73,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
     lv_refr_now(NULL);
 
     extern uint8_t * last_flushed_buf;
-    uint8_t * screen_buf = lv_draw_buf_align_buf(last_flushed_buf, LV_COLOR_FORMAT_XRGB8888);
+    uint8_t * screen_buf = lv_draw_buf_align(last_flushed_buf, LV_COLOR_FORMAT_XRGB8888);
 
     png_image_t p;
     int res = read_png_file(&p, fn_ref_full);

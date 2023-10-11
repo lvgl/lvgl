@@ -122,10 +122,12 @@ lv_result_t lv_snapshot_take_to_buf(lv_obj_t * obj, lv_color_format_t cf, lv_ima
     lv_layer_t layer;
     lv_memzero(&layer, sizeof(layer));
 
-    lv_draw_buf_init(&layer.draw_buf, dsc->header.w, dsc->header.h, dsc->header.cf);
-    layer.draw_buf.buf = buf;
-    layer.draw_buf_ofs.x = snapshot_area.x1;
-    layer.draw_buf_ofs.y = snapshot_area.y1;
+    layer.buf = lv_draw_buf_align(buf, cf);
+    layer.buf_area.x1 = snapshot_area.x1;
+    layer.buf_area.y1 = snapshot_area.y1;
+    layer.buf_area.x2 = snapshot_area.x1 + w - 1;
+    layer.buf_area.y2 = snapshot_area.y1 + h - 1;
+    layer.color_format = cf;
     layer.clip_area = snapshot_area;
 
     lv_obj_redraw(&layer, obj);

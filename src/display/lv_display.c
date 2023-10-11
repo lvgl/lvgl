@@ -78,8 +78,11 @@ lv_display_t * lv_display_create(lv_coord_t hor_res, lv_coord_t ver_res)
     lv_memzero(disp->layer_head, sizeof(lv_layer_t));
 
     if(disp->layer_init) disp->layer_init(disp, disp->layer_head);
-
-    lv_draw_buf_init(&disp->layer_head->draw_buf, hor_res, ver_res, disp->color_format);
+    disp->layer_head->buf_area.x1 = 0;
+    disp->layer_head->buf_area.y1 = 0;
+    disp->layer_head->buf_area.x2 = hor_res - 1;
+    disp->layer_head->buf_area.y2 = ver_res - 1;
+    disp->layer_head->color_format = disp->color_format;
 
     disp->inv_en_cnt = 1;
 
@@ -397,7 +400,7 @@ void lv_display_set_color_format(lv_display_t * disp, lv_color_format_t color_fo
     if(disp == NULL) return;
 
     disp->color_format = color_format;
-    disp->layer_head->draw_buf.color_format = color_format;
+    disp->layer_head->color_format = color_format;
 }
 
 lv_color_format_t lv_display_get_color_format(lv_display_t * disp)

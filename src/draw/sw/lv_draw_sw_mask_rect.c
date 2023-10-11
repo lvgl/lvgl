@@ -66,9 +66,8 @@ void lv_draw_sw_mask_rect(lv_draw_unit_t * draw_unit, const lv_draw_mask_rect_ds
         if(res == LV_DRAW_SW_MASK_RES_FULL_COVER) continue;
 
         lv_layer_t * target_layer = draw_unit->target_layer;
-
-        lv_color32_t * c32_buf = lv_draw_buf_go_to_xy(&target_layer->draw_buf, draw_area.x1 - target_layer->draw_buf_ofs.x,
-                                                      y - target_layer->draw_buf_ofs.y);
+        lv_color32_t * c32_buf = lv_draw_layer_go_to_xy(target_layer, draw_area.x1 - target_layer->buf_area.x1,
+                                                        y - target_layer->buf_area.y1);
 
         if(res == LV_DRAW_SW_MASK_RES_TRANSP) {
             uint32_t i;

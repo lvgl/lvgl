@@ -53,8 +53,8 @@ void test_func_1(void)
     create_panel(30, true);
     create_panel(100, true);
 
-
     TEST_ASSERT_EQUAL_SCREENSHOT("clip_corner_1.png");
+
 }
 
 #endif

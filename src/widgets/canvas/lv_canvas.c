@@ -299,8 +299,9 @@ void lv_canvas_init_layer(lv_obj_t * canvas, lv_layer_t * layer)
     lv_area_t canvas_area = {0, 0, dsc->header.w - 1,  dsc->header.h - 1};
     lv_memzero(layer, sizeof(*layer));
 
-    lv_draw_buf_init(&layer->draw_buf, dsc->header.w, dsc->header.h, dsc->header.cf);
-    layer->draw_buf.buf = (uint8_t *)dsc->data;
+    layer->buf = lv_draw_buf_align((uint8_t *)dsc->data, dsc->header.cf);
+    layer->color_format = dsc->header.cf;
+    layer->buf_area = canvas_area;
     layer->clip_area = canvas_area;
 }
 
