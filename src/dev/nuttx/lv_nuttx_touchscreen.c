@@ -18,7 +18,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <nuttx/input/touchscreen.h>
-#include "../../../lvgl_private.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES
@@ -137,4 +137,4 @@ static lv_indev_t * touchscreen_init(int fd)
     return touchscreen->indev_drv;
 }
 
-#endif /*LV_USE_NUTTX_SCREEN*/
+#endif /*LV_USE_NUTTX_TOUCHSCREEN*/

@@ -754,7 +754,11 @@
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
 #endif
 
-#define LV_USE_NUTTX_FBDEV     0
+/*Use Nuttx to open window and handle touchscreen*/
+#define LV_USE_NUTTX    0
+
+/*Use Nuttx custom init API to open window and handle touchscreen*/
+#define LV_USE_NUTTX_CUSTOM_INIT    0
 
 /*Driver for /dev/lcd*/
 #define LV_USE_NUTTX_LCD      0
@@ -763,14 +767,14 @@
     #define LV_NUTTX_LCD_BUFFER_SIZE     60
 #endif
 
+/*Driver for /dev/input*/
+#define LV_USE_NUTTX_TOUCHSCREEN    0
+
 /*Driver for /dev/dri/card*/
 #define LV_USE_LINUX_DRM        0
 
 /*Interface for TFT_eSPI*/
 #define LV_USE_TFT_ESPI         0
-
-/*Driver for /dev/input*/
-#define LV_USE_NUTTX_TOUCHSCREEN    0
 
 /*==================
 * EXAMPLES

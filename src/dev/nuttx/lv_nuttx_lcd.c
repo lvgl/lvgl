@@ -8,6 +8,7 @@
  *********************/
 
 #include "lv_nuttx_lcd.h"
+
 #if LV_USE_NUTTX_LCD
 
 #include <sys/ioctl.h>
@@ -20,7 +21,7 @@
 #include <nuttx/lcd/lcd_dev.h>
 
 #include <lvgl/lvgl.h>
-#include "../../../lvgl_private.h"
+#include "../../lvgl_private.h"
 
 /*********************
  *      DEFINES

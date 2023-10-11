@@ -1236,12 +1236,18 @@ menu "LVGL configuration"
 			depends on LV_USE_LINUX_FBDEV && LV_LINUX_FBDEV_CUSTOM_BUFFER
 			default 60
 
-		config LV_USE_NUTTX_FBDEV
-			bool "Use Nuttx framebuffer device"
+		config LV_USE_NUTTX
+			bool "Use Nuttx to open window and handle touchscreen"
+			default n
+
+		config LV_USE_NUTTX_CUSTOM_INIT
+			bool "Use Custom Nuttx init API to open window and handle touchscreen"
+			depends on LV_USE_NUTTX
 			default n
 
 		config LV_USE_NUTTX_LCD
 			bool "Use NuttX LCD device"
+			depends on LV_USE_NUTTX
 			default n
 
 		choice
@@ -1272,16 +1278,17 @@ menu "LVGL configuration"
 			depends on LV_USE_NUTTX_LCD && LV_NUTTX_LCD_CUSTOM_BUFFER
 			default 60
 
+		config LV_USE_NUTTX_TOUCHSCREEN
+			bool "Use NuttX touchscreen driver"
+			depends on LV_USE_NUTTX
+			default n
+
 		config LV_USE_LINUX_DRM
 			bool "Use Linux DRM device"
 			default n
 
 		config LV_USE_TFT_ESPI
 			bool "Use TFT_eSPI driver"
-			default n
-
-		config LV_USE_NUTTX_TOUCHSCREEN
-			bool "Use NuttX touchscreen driver"
 			default n
 	endmenu
 
