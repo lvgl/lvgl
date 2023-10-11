@@ -271,12 +271,20 @@ uint8_t vglite_get_alignment(lv_color_format_t cf)
         case LV_COLOR_FORMAT_I1:
         case LV_COLOR_FORMAT_I2:
         case LV_COLOR_FORMAT_I4:
-            align_bytes = 8;
+            /*
+             * VGLite alignment require 8 bytes.
+             * But ARM clean and invalidate cache needs 32 bytes address alignment.
+             */
+            align_bytes = 32;
             break;
         case LV_COLOR_FORMAT_I8:
         case LV_COLOR_FORMAT_A8:
         case LV_COLOR_FORMAT_L8:
-            align_bytes = 16;
+            /*
+             * VGLite alignment require 16 bytes.
+             * But ARM clean and invalidate cache needs 32 bytes address alignment.
+             */
+            align_bytes = 32;
             break;
         case LV_COLOR_FORMAT_RGB565:
             align_bytes = 32;
