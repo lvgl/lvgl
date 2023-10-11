@@ -44,17 +44,17 @@ typedef _lv_image_src_t lv_image_src_t;
 typedef uint8_t lv_image_src_t;
 #endif /*DOXYGEN*/
 
-enum _lv_image_decoder_process_flag_t {
-    LV_IMAGE_DECODER_PROCESS_FLAG_NONE = 0,
-    LV_IMAGE_DECODER_PROCESS_FLAG_ADDRESS_ALIGNED = 1 << 0,
-    LV_IMAGE_DECODER_PROCESS_FLAG_WIDTH_ALIGNED = 1 << 1,
-    LV_IMAGE_DECODER_PROCESS_FLAG_PREMULTIPLIED_ALPHA = 1 << 2,
+enum _lv_image_decoder_process_state_t {
+    LV_IMAGE_DECODER_PROCESS_STATE_NONE = 0,
+    LV_IMAGE_DECODER_PROCESS_STATE_ADDRESS_ALIGNED = 1 << 0,
+    LV_IMAGE_DECODER_PROCESS_STATE_WIDTH_ALIGNED = 1 << 1,
+    LV_IMAGE_DECODER_PROCESS_STATE_PREMULTIPLIED_ALPHA = 1 << 2,
 };
 
 #ifdef DOXYGEN
-typedef _lv_image_decoder_process_flag_t lv_image_decoder_process_flag_t;
+typedef _lv_image_decoder_process_state_t lv_image_decoder_process_state_t;
 #else
-typedef uint32_t lv_image_decoder_process_flag_t;
+typedef uint32_t lv_image_decoder_process_state_t;
 #endif /*DOXYGEN*/
 
 /*Decoder function definitions*/
@@ -101,6 +101,13 @@ typedef lv_result_t (*lv_image_decoder_get_area_cb_t)(struct _lv_image_decoder_t
  */
 typedef void (*lv_image_decoder_close_f_t)(struct _lv_image_decoder_t * decoder, struct _lv_image_decoder_dsc_t * dsc);
 
+/**
+ * Function pointer type for image decoder process function.
+ * This function is used to decode and process an image.
+ * @param dsc Pointer to an `_lv_image_decoder_dsc_t` struct containing information about the image to be decoded.
+ * @param user_data Pointer to user-defined data that can be passed to the decoder function.
+ * @return LV_RESULT_OK: ok; LV_RESULT_INVALID: failed
+ */
 typedef lv_result_t (*lv_image_decoder_process_f_t)(struct _lv_image_decoder_dsc_t * dsc, void * user_data);
 
 typedef struct _lv_image_decoder_t {
@@ -147,8 +154,8 @@ typedef struct _lv_image_decoder_dsc_t {
      * Can be set in `open` function or set NULL.*/
     const char * error_msg;
 
-    /**See enum _lv_image_decoder_process_flag_t*/
-    uint32_t process_flag;
+    /**See enum _lv_image_decoder_process_state_t*/
+    uint32_t process_state;
 
     /**Store any custom data here is required*/
     void * user_data;
