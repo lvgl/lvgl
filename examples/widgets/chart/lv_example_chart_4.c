@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_BUILD_EXAMPLES && 0
+#if LV_USE_CHART && LV_BUILD_EXAMPLES
 
 
 static void event_cb(lv_event_t * e)
