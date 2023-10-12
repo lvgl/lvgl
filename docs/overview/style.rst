@@ -183,7 +183,6 @@ The following predefined parts exist in LVGL:
 - :cpp:enumerator:`LV_PART_KNOB`: Like a handle to grab to adjust a value
 - :cpp:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section
 - :cpp:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells)
-- :cpp:enumerator:`LV_PART_TICKS`: Ticks on scales e.g. for a chart or meter
 - :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor
 - :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom part identifiers can be added starting from here.
 

@@ -253,7 +253,7 @@ void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_
         case LV_PART_INDICATOR:
             section->indicator_style = section_part_style;
             break;
-        case LV_PART_TICKS:
+        case LV_PART_ITEMS:
             section->items_style = section_part_style;
             break;
         default:
@@ -375,7 +375,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     /* Configure line draw descriptor for the minor tick drawing */
     lv_draw_line_dsc_t minor_tick_dsc;
     lv_draw_line_dsc_init(&minor_tick_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &minor_tick_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
 
     /* Main line style */
     lv_draw_line_dsc_t main_line_dsc;
@@ -405,14 +405,14 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                     }
                     else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_TICKS);
+                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
                 }
                 else {
                     /* Tick is not in section, get the proper styles */
                     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
                     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &minor_tick_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
                 }
             }
 
@@ -493,14 +493,14 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                     }
                     else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_TICKS);
+                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
                 }
                 else {
                     /* Tick is not in section, get the proper styles */
                     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
                     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &minor_tick_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
                 }
             }
 
@@ -792,10 +792,10 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
         const lv_coord_t pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN) + border_width;
         const lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN) + border_width;
         const lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
-        const lv_coord_t tick_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_TICKS);
-        const lv_coord_t tick_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_TICKS);
-        const lv_coord_t tick_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_TICKS);
-        const lv_coord_t tick_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_TICKS);
+        const lv_coord_t tick_pad_right = lv_obj_get_style_pad_right(obj, LV_PART_ITEMS);
+        const lv_coord_t tick_pad_left = lv_obj_get_style_pad_left(obj, LV_PART_ITEMS);
+        const lv_coord_t tick_pad_top = lv_obj_get_style_pad_top(obj, LV_PART_ITEMS);
+        const lv_coord_t tick_pad_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_ITEMS);
 
         lv_coord_t x_ofs = 0U;
         lv_coord_t y_ofs = 0U;
@@ -974,7 +974,7 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
  * @param obj       pointer to a scale object
  * @param line_dsc  pointer to line descriptor
  * @param items_section_style  pointer to indicator section style
- * @param part      line part, example: LV_PART_INDICATOR, LV_PART_TICKS, LV_PART_MAIN
+ * @param part      line part, example: LV_PART_INDICATOR, LV_PART_ITEMS, LV_PART_MAIN
  */
 static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * section_style,
                                       uint32_t part)
@@ -1259,7 +1259,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 scale_set_line_properties(obj, major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
             }
             else {
-                scale_set_line_properties(obj, minor_tick_dsc, section->items_style, LV_PART_TICKS);
+                scale_set_line_properties(obj, minor_tick_dsc, section->items_style, LV_PART_ITEMS);
             }
         }
 
