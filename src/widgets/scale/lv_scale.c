@@ -407,6 +407,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     else {
                         scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
+                    break;
                 }
                 else {
                     /* Tick is not in section, get the proper styles */
@@ -495,6 +496,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                     else {
                         scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
                     }
+                    break;
                 }
                 else {
                     /* Tick is not in section, get the proper styles */
