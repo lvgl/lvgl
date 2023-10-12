@@ -55,6 +55,7 @@ typedef struct {
     int32_t max_value;          /**< Maximum value of the bar*/
     int32_t start_value;        /**< Start value of the bar*/
     lv_area_t indic_area;       /**< Save the indicator area. Might be used by derived types*/
+    bool val_reversed;          /**< Whether value been reversed */
     _lv_bar_anim_t cur_value_anim;
     _lv_bar_anim_t start_value_anim;
     lv_bar_mode_t mode : 2;     /**< Type of bar*/
@@ -99,6 +100,7 @@ void lv_bar_set_start_value(lv_obj_t * obj, int32_t start_value, lv_anim_enable_
  * @param obj       pointer to the bar object
  * @param min       minimum value
  * @param max       maximum value
+ * @note If min is greater than max, the drawing direction becomes to the oppsite direction.
  */
 void lv_bar_set_range(lv_obj_t * obj, int32_t min, int32_t max);
 
