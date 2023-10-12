@@ -748,9 +748,15 @@ static void analytics_create(lv_obj_t * parent)
     static lv_style_t scale3_section1_main_style;
     static lv_style_t scale3_section1_indicator_style;
     static lv_style_t scale3_section1_tick_style;
+    static lv_style_t scale3_section2_main_style;
+    static lv_style_t scale3_section2_indicator_style;
+    static lv_style_t scale3_section2_tick_style;
+    static lv_style_t scale3_section3_main_style;
+    static lv_style_t scale3_section3_indicator_style;
+    static lv_style_t scale3_section3_tick_style;
 
     lv_style_init(&scale3_section1_main_style);
-    lv_style_set_arc_width(&scale3_section1_main_style, 5);
+    lv_style_set_arc_width(&scale3_section1_main_style, 8);
     lv_style_set_arc_color(&scale3_section1_main_style, lv_palette_main(LV_PALETTE_RED));
 
     lv_style_init(&scale3_section1_indicator_style);
@@ -761,12 +767,47 @@ static void analytics_create(lv_obj_t * parent)
     lv_style_set_line_width(&scale3_section1_tick_style, 4);
     lv_style_set_line_color(&scale3_section1_tick_style, lv_palette_darken(LV_PALETTE_RED, 2));
 
+    lv_style_init(&scale3_section2_main_style);
+    lv_style_set_arc_width(&scale3_section2_main_style, 8);
+    lv_style_set_arc_color(&scale3_section2_main_style, lv_palette_main(LV_PALETTE_BLUE));
+
+    lv_style_init(&scale3_section2_indicator_style);
+    lv_style_set_line_width(&scale3_section2_indicator_style, 4);
+    lv_style_set_line_color(&scale3_section2_indicator_style, lv_palette_darken(LV_PALETTE_BLUE, 2));
+
+    lv_style_init(&scale3_section2_tick_style);
+    lv_style_set_line_width(&scale3_section2_tick_style, 4);
+    lv_style_set_line_color(&scale3_section2_tick_style, lv_palette_darken(LV_PALETTE_BLUE, 2));
+
+    lv_style_init(&scale3_section3_main_style);
+    lv_style_set_arc_width(&scale3_section3_main_style, 8);
+    lv_style_set_arc_color(&scale3_section3_main_style, lv_palette_main(LV_PALETTE_GREEN));
+
+    lv_style_init(&scale3_section3_indicator_style);
+    lv_style_set_line_width(&scale3_section3_indicator_style, 4);
+    lv_style_set_line_color(&scale3_section3_indicator_style, lv_palette_darken(LV_PALETTE_GREEN, 2));
+
+    lv_style_init(&scale3_section3_tick_style);
+    lv_style_set_line_width(&scale3_section3_tick_style, 4);
+    lv_style_set_line_color(&scale3_section3_tick_style, lv_palette_darken(LV_PALETTE_GREEN, 2));
+
     lv_scale_section_t * section;
     section = lv_scale_add_section(scale3);
     lv_scale_section_set_range(section, 0, 20);
     lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section1_main_style);
     lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section1_indicator_style);
     lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section1_tick_style);
+    section = lv_scale_add_section(scale3);
+    lv_scale_section_set_range(section, 20, 40);
+    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section2_main_style);
+    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section2_indicator_style);
+    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section2_tick_style);
+
+    section = lv_scale_add_section(scale3);
+    lv_scale_section_set_range(section, 40, 60);
+    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section3_main_style);
+    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section3_indicator_style);
+    lv_scale_section_set_style(section, LV_PART_ITEMS, &scale3_section3_tick_style);
 
     LV_IMG_DECLARE(img_demo_widgets_needle);
     lv_obj_t * needle = lv_image_create(scale3);
