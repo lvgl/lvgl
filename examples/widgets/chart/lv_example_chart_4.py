@@ -72,7 +72,7 @@ chart.add_event(event_cb, lv.EVENT.ALL, None)
 chart.refresh_ext_draw_size()
 
 # Zoom in a little in X
-chart.set_zoom_x(800)
+#chart.set_zoom_x(800)
 
 # Add two data series
 ser1 = chart.add_series(lv.palette_main(lv.PALETTE.RED), lv.chart.AXIS.PRIMARY_Y)
