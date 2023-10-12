@@ -6,7 +6,7 @@
  */
 void lv_example_scale_5(void)
 {
-    lv_obj_t * scale = lv_scale_create(lv_scr_act());
+    lv_obj_t * scale = lv_scale_create(lv_screen_active());
     lv_obj_set_size(scale, lv_display_get_horizontal_resolution(NULL) / 2, lv_display_get_vertical_resolution(NULL) / 2);
     lv_scale_set_label_show(scale, true);
 

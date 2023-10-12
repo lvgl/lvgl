@@ -15,7 +15,7 @@ void tearDown(void)
 
 static lv_obj_t * create_panel(lv_coord_t radius, bool transform)
 {
-    lv_obj_t * parent = lv_obj_create(lv_scr_act());
+    lv_obj_t * parent = lv_obj_create(lv_screen_active());
     lv_obj_set_style_pad_all(parent, 3, 0);
     lv_obj_set_style_radius(parent, radius, 0);
     lv_obj_set_style_clip_corner(parent, true, 0);
@@ -38,9 +38,9 @@ static lv_obj_t * create_panel(lv_coord_t radius, bool transform)
 
 void test_func_1(void)
 {
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
-    lv_obj_set_style_pad_column(lv_scr_act(), 40, 0);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_style_pad_column(lv_screen_active(), 40, 0);
 
     create_panel(0, false);
     create_panel(10, false);

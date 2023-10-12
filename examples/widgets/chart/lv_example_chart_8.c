@@ -75,7 +75,7 @@ static int32_t round_fixed_point(int32_t n, int8_t shift)
 void lv_example_chart_8(void)
 {
     /*Create a stacked_area_chart.obj*/
-    stacked_area_chart.obj = lv_chart_create(lv_scr_act());
+    stacked_area_chart.obj = lv_chart_create(lv_screen_active());
     lv_obj_set_size(stacked_area_chart.obj, 200, 150);
     lv_obj_center(stacked_area_chart.obj);
     lv_chart_set_type(stacked_area_chart.obj, LV_CHART_TYPE_LINE);

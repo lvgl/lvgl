@@ -85,7 +85,7 @@ static void ctrl_pad_btn_remove_event_handler(lv_event_t * e)
             lv_obj_clean(ui->root);
         }
         else {
-            lv_obj_del(ui->obj_cur);
+            lv_obj_delete(ui->obj_cur);
             ui->obj_cur = NULL;
         }
     }
@@ -114,7 +114,7 @@ void ctrl_pad_obj_update(lv_obj_t * obj, view_t * ui)
         lv_obj_add_state(checkbox, LV_STATE_CHECKED);
     }
     else {
-        lv_obj_clear_state(checkbox, LV_STATE_CHECKED);
+        lv_obj_remove_state(checkbox, LV_STATE_CHECKED);
     }
 }
 
@@ -144,7 +144,8 @@ static void ctrl_pad_checkbox_event_handler(lv_event_t * e)
     view_t * ui = lv_event_get_user_data(e);
     if(ui->obj_cur) {
         bool checked = lv_obj_has_state(lv_event_get_target(e), LV_STATE_CHECKED);
-        checked ? lv_obj_add_flag(ui->obj_cur, LV_OBJ_FLAG_SCROLLABLE) : lv_obj_clear_flag(ui->obj_cur, LV_OBJ_FLAG_SCROLLABLE);
+        checked ? lv_obj_add_flag(ui->obj_cur, LV_OBJ_FLAG_SCROLLABLE) : lv_obj_remove_flag(ui->obj_cur,
+                                                                                            LV_OBJ_FLAG_SCROLLABLE);
     }
 }
 

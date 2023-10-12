@@ -17,7 +17,7 @@
  */
 void lv_example_chart_3(void)
 {
-    lv_obj_t * main_cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * main_cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(main_cont, 200, 150);
 
     lv_obj_t * wrapper = lv_obj_create(main_cont);

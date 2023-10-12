@@ -49,7 +49,7 @@ typedef lv_obj_tree_walk_res_t (*lv_obj_tree_walk_cb_t)(struct _lv_obj_t *, void
  * Send `LV_EVENT_DELETED` to deleted objects.
  * @param obj       pointer to an object
  */
-void lv_obj_del(struct _lv_obj_t * obj);
+void lv_obj_delete(struct _lv_obj_t * obj);
 
 /**
  * Delete all children of an object.
@@ -64,13 +64,13 @@ void lv_obj_clean(struct _lv_obj_t * obj);
  * @param obj       pointer to an object
  * @param delay_ms  time to wait before delete in milliseconds
  */
-void lv_obj_del_delayed(struct _lv_obj_t * obj, uint32_t delay_ms);
+void lv_obj_delete_delayed(struct _lv_obj_t * obj, uint32_t delay_ms);
 
 /**
  * A function to be easily used in animation ready callback to delete an object when the animation is ready
  * @param a         pointer to the animation
  */
-void lv_obj_del_anim_ready_cb(lv_anim_t * a);
+void lv_obj_delete_anim_ready_cb(lv_anim_t * a);
 
 /**
  * Helper function for asynchronously deleting objects.
@@ -78,7 +78,7 @@ void lv_obj_del_anim_ready_cb(lv_anim_t * a);
  * @param obj       object to delete
  * @see lv_async_call
  */
-void lv_obj_del_async(struct _lv_obj_t * obj);
+void lv_obj_delete_async(struct _lv_obj_t * obj);
 
 /**
  * Move the parent of an object. The relative coordinates will be kept.

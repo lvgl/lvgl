@@ -228,8 +228,15 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
  * @param obj   pointer to an object
  * @param f     OR-ed values from `lv_obj_flag_t` to set.
  */
-void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f);
+void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
+/**
+ * Set add or remove one or more flags.
+ * @param obj   pointer to an object
+ * @param f     OR-ed values from `lv_obj_flag_t` to set.
+ * @param v     true: add the flags; false: remove the flags
+ */
+void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v);
 
 /**
  * Add one or more states to the object. The other state bits will remain unchanged.
@@ -245,7 +252,15 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
  * @param obj       pointer to an object
  * @param state     the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
  */
-void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
+void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state);
+
+/**
+ * Add or remove one or more states to the object. The other state bits will remain unchanged.
+ * @param obj       pointer to an object
+ * @param state     the states to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ * @param v         true: add the states; false: remove the states
+ */
+void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v);
 
 /**
  * Set the user_data field of the object

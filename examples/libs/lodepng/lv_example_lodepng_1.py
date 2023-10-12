@@ -10,7 +10,7 @@ image_wink_png = lv.image_dsc_t(
         "data": img_wink_png_map,
     }
 )
-image1 = lv.image(lv.scr_act())
+image1 = lv.image(lv.screen_active())
 image1.set_src(image_wink_png)
 image1.align(lv.ALIGN.RIGHT_MID, -250, 0)
 
@@ -27,6 +27,6 @@ wink_argb = lv.image_dsc_t({
   'data': png_data
 })
 
-image2 = lv.image(lv.scr_act())
+image2 = lv.image(lv.screen_active())
 image2.set_src(wink_argb)
 image2.align(lv.ALIGN.RIGHT_MID, -150, 0)

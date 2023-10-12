@@ -162,9 +162,9 @@ void lv_demo_widgets(void)
     lv_style_set_border_width(&style_bullet, 0);
     lv_style_set_radius(&style_bullet, LV_RADIUS_CIRCLE);
 
-    tv = lv_tabview_create(lv_scr_act(), LV_DIR_TOP, tab_h);
+    tv = lv_tabview_create(lv_screen_active(), LV_DIR_TOP, tab_h);
 
-    lv_obj_set_style_text_font(lv_scr_act(), font_normal, 0);
+    lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
 
     if(disp_size == DISP_LARGE) {
         lv_obj_t * tab_buttons = lv_tabview_get_tab_buttons(tv);
@@ -247,7 +247,7 @@ static void profile_create(lv_obj_t * parent)
     lv_obj_center(label);
 
     /*Create a keyboard*/
-    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
+    lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
 
     /*Create the second panel*/
@@ -657,7 +657,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
     lv_anim_set_var(&a, arc);
@@ -672,7 +672,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
@@ -688,7 +688,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_opa(arc, 0, 0);
     lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
 
     lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
@@ -710,7 +710,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_width(arc, 10, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
 
     arc = lv_arc_create(scale2);
@@ -721,7 +721,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
 
     arc = lv_arc_create(scale2);
@@ -731,7 +731,7 @@ static void analytics_create(lv_obj_t * parent)
     lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
     lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
     lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
-    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_center(arc);
 
     lv_timer_t * scale2_timer = lv_timer_create(scale2_timer_cb, 100, scale2);
@@ -999,7 +999,7 @@ static void color_changer_create(lv_obj_t * parent)
         lv_obj_set_style_opa(c, LV_OPA_TRANSP, 0);
         lv_obj_set_size(c, 20, 20);
         lv_obj_add_event(c, color_event_cb, LV_EVENT_ALL, &palette[i]);
-        lv_obj_clear_flag(c, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_remove_flag(c, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     }
 
     lv_obj_t * btn = lv_button_create(parent);
@@ -1216,7 +1216,7 @@ static void ta_event_cb(lv_event_t * e)
             lv_obj_set_style_max_height(kb, LV_HOR_RES * 2 / 3, 0);
             lv_obj_update_layout(tv);   /*Be sure the sizes are recalculated*/
             lv_obj_set_height(tv, LV_VER_RES - lv_obj_get_height(kb));
-            lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
             lv_obj_scroll_to_view_recursive(ta, LV_ANIM_OFF);
             lv_indev_wait_release(lv_event_get_param(e));
         }
@@ -1272,9 +1272,9 @@ static void calendar_event_cb(lv_event_t * e)
         lv_snprintf(buf, sizeof(buf), "%02d.%02d.%d", d.day, d.month, d.year);
         lv_textarea_set_text(ta, buf);
 
-        lv_obj_del(calendar);
+        lv_obj_delete(calendar);
         calendar = NULL;
-        lv_obj_clear_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_remove_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);
         lv_obj_set_style_bg_opa(lv_layer_top(), LV_OPA_TRANSP, 0);
     }
 }
@@ -1494,7 +1494,7 @@ static void scale2_event_cb(lv_event_t * e)
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_DELETE) {
         lv_timer_t * scale2_timer = lv_event_get_user_data(e);
-        if(scale2_timer) lv_timer_del(scale2_timer);
+        if(scale2_timer) lv_timer_delete(scale2_timer);
     }
 }
 

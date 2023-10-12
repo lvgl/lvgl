@@ -26,7 +26,7 @@ static void add_data(lv_timer_t * t)
 void lv_example_chart_9(void)
 {
     /*Create a stacked_area_chart.obj*/
-    lv_obj_t * chart = lv_chart_create(lv_scr_act());
+    lv_obj_t * chart = lv_chart_create(lv_screen_active());
     lv_chart_set_update_mode(chart, LV_CHART_UPDATE_MODE_CIRCULAR);
     lv_obj_set_size(chart, 200, 150);
     lv_obj_center(chart);

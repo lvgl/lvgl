@@ -18,10 +18,10 @@ void test_group_count(void)
 
     TEST_ASSERT_EQUAL_UINT32(lv_group_get_count(), 2U);
 
-    lv_group_del(group_2);
+    lv_group_delete(group_2);
     TEST_ASSERT_EQUAL_UINT32(lv_group_get_count(), 1U);
 
-    lv_group_del(group_1);
+    lv_group_delete(group_1);
     TEST_ASSERT_EQUAL_UINT32(lv_group_get_count(), 0U);
 }
 
@@ -34,8 +34,8 @@ void test_group_by_index(void)
     TEST_ASSERT_EQUAL_PTR(lv_group_by_index(0), group_1);
     TEST_ASSERT_EQUAL_PTR(lv_group_by_index(1), group_2);
 
-    lv_group_del(group_1);
-    lv_group_del(group_2);
+    lv_group_delete(group_1);
+    lv_group_delete(group_2);
 }
 
 #endif

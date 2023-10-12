@@ -1,7 +1,7 @@
 #
 # Reverse the order of flex items
 #
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_size(300, 220)
 cont.center()
 cont.set_flex_flow(lv.FLEX_FLOW.COLUMN_REVERSE)

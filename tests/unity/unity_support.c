@@ -69,7 +69,7 @@ bool lv_test_assert_image_eq(const char * fn_ref)
     sprintf(fn_ref_full, "%s%s", REF_IMGS_PATH, fn_ref);
 
 
-    //lv_obj_invalidate(lv_scr_act());
+    //lv_obj_invalidate(lv_screen_active());
     lv_refr_now(NULL);
 
     extern uint8_t * last_flushed_buf;

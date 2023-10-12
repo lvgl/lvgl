@@ -103,13 +103,13 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt);
  * Delete a the left character from the current cursor position
  * @param obj       pointer to a text area object
  */
-void lv_textarea_del_char(lv_obj_t * obj);
+void lv_textarea_delete_char(lv_obj_t * obj);
 
 /**
  * Delete the right character from the current cursor position
  * @param obj       pointer to a text area object
  */
-void lv_textarea_del_char_forward(lv_obj_t * obj);
+void lv_textarea_delete_char_forward(lv_obj_t * obj);
 
 /*=====================
  * Setter functions

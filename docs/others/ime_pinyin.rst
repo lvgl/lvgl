@@ -48,7 +48,7 @@ Usage
 
 Enable :c:macro:`LV_USE_IME_PINYIN` in ``lv_conf.h``.
 
-First use :c:expr:`lv_ime_pinyin_create(lv_scr_act())` to create a Pinyin
+First use :c:expr:`lv_ime_pinyin_create(lv_screen_active())` to create a Pinyin
 input method plug-in, then use
 :c:expr:`lv_ime_pinyin_set_keyboard(pinyin_ime, kb)` to add the ``keyboard``
 you created to the Pinyin input method plug-in. You can use
@@ -85,7 +85,7 @@ the keyboard and dictionary at any time.
 
 在 ``lv_conf.h`` 中打开 :c:macro:`LV_USE_IME_PINYIN`\ 。
 
-首先，使用 :c:expr:`lv_ime_pinyin_create(lv_scr_act())`
+首先，使用 :c:expr:`lv_ime_pinyin_create(lv_screen_active())`
 函数创建一个拼音输入法插件， 然后使用
 :c:expr:`lv_ime_pinyin_set_keyboard(pinyin_ime, kb)`
 函数将您创建的键盘组件添加到插件中。
@@ -248,7 +248,7 @@ only need to call this function to set up and use your dictionary:
 
 .. code:: c
 
-       lv_obj_t * pinyin_ime = lv_100ask_pinyin_ime_create(lv_scr_act());
+       lv_obj_t * pinyin_ime = lv_100ask_pinyin_ime_create(lv_screen_active());
        lv_100ask_pinyin_ime_set_dict(pinyin_ime, your_pinyin_dict);
 
 Modes

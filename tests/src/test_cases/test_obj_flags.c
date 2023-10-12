@@ -12,7 +12,7 @@ void setUp(void)
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 }
 
 static void ext_draw_size_event_cb(lv_event_t * e)
@@ -28,7 +28,7 @@ static void btn_clicked_event_cb(lv_event_t * e)
 
 void test_obj_flag_overflow_visible_1(void)
 {
-    lv_obj_t * obj_main = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj_main = lv_obj_create(lv_screen_active());
     lv_obj_set_size(obj_main, 400, 300);
     lv_obj_set_style_bg_color(obj_main, lv_palette_main(LV_PALETTE_RED), 0);
     lv_obj_add_flag(obj_main, LV_OBJ_FLAG_OVERFLOW_VISIBLE);
@@ -43,7 +43,7 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_t * btn_1 = lv_button_create(obj_child_1);
     lv_obj_set_size(btn_1, 100, 100);
     lv_obj_align(btn_1, LV_ALIGN_LEFT_MID, -75, 0);
-    lv_obj_clear_flag(btn_1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(btn_1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     uint32_t cnt_1;
     lv_obj_add_event(btn_1, btn_clicked_event_cb, LV_EVENT_CLICKED, &cnt_1);
 
@@ -61,7 +61,7 @@ void test_obj_flag_overflow_visible_1(void)
     lv_obj_t * btn_2 = lv_button_create(obj_child_2);
     lv_obj_set_size(btn_2, 100, 100);
     lv_obj_align(btn_2, LV_ALIGN_RIGHT_MID, 75, 0);
-    lv_obj_clear_flag(btn_2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(btn_2, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     uint32_t cnt_2;
     lv_obj_add_event(btn_2, btn_clicked_event_cb, LV_EVENT_CLICKED, &cnt_2);
 

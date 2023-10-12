@@ -32,8 +32,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_obj_del_async_cb(void * obj);
-static void obj_del_core(lv_obj_t * obj);
+static void lv_obj_delete_async_cb(void * obj);
+static void obj_delete_core(lv_obj_t * obj);
 static lv_obj_tree_walk_res_t walk_core(lv_obj_t * obj, lv_obj_tree_walk_cb_t cb, void * user_data);
 static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth);
 
@@ -49,7 +49,7 @@ static lv_obj_tree_walk_res_t dump_tree_core(lv_obj_t * obj, lv_coord_t depth);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_del(lv_obj_t * obj)
+void lv_obj_delete(lv_obj_t * obj)
 {
     if(obj->is_deleting)
         return;
@@ -64,14 +64,14 @@ void lv_obj_del(lv_obj_t * obj)
     }
 
     lv_display_t * disp = NULL;
-    bool act_scr_del = false;
+    bool act_screen_del = false;
     if(par == NULL) {
         disp = lv_obj_get_disp(obj);
         if(!disp) return;   /*Shouldn't happen*/
-        if(disp->act_scr == obj) act_scr_del = true;
+        if(disp->act_scr == obj) act_screen_del = true;
     }
 
-    obj_del_core(obj);
+    obj_delete_core(obj);
 
     /*Call the ancestor's event handler to the parent to notify it about the child delete*/
     if(par && !par->is_deleting) {
@@ -83,7 +83,7 @@ void lv_obj_del(lv_obj_t * obj)
     }
 
     /*Handle if the active screen was deleted*/
-    if(act_scr_del) {
+    if(act_screen_del) {
         LV_LOG_WARN("the active screen was deleted");
         disp->act_scr = NULL;
     }
@@ -101,7 +101,7 @@ void lv_obj_clean(lv_obj_t * obj)
 
     lv_obj_t * child = lv_obj_get_child(obj, 0);
     while(child) {
-        obj_del_core(child);
+        obj_delete_core(child);
         child = lv_obj_get_child(obj, 0);
     }
     /*Just to remove scroll animations if any*/
@@ -116,7 +116,7 @@ void lv_obj_clean(lv_obj_t * obj)
     LV_LOG_TRACE("finished (clean %p)", (void *)obj);
 }
 
-void lv_obj_del_delayed(lv_obj_t * obj, uint32_t delay_ms)
+void lv_obj_delete_delayed(lv_obj_t * obj, uint32_t delay_ms)
 {
     lv_anim_t a;
     lv_anim_init(&a);
@@ -124,19 +124,19 @@ void lv_obj_del_delayed(lv_obj_t * obj, uint32_t delay_ms)
     lv_anim_set_exec_cb(&a, NULL);
     lv_anim_set_time(&a, 1);
     lv_anim_set_delay(&a, delay_ms);
-    lv_anim_set_ready_cb(&a, lv_obj_del_anim_ready_cb);
+    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
     lv_anim_start(&a);
 }
 
-void lv_obj_del_anim_ready_cb(lv_anim_t * a)
+void lv_obj_delete_anim_ready_cb(lv_anim_t * a)
 {
-    lv_obj_del(a->var);
+    lv_obj_delete(a->var);
 }
 
-void lv_obj_del_async(lv_obj_t * obj)
+void lv_obj_delete_async(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
-    lv_async_call(lv_obj_del_async_cb, obj);
+    lv_async_call(lv_obj_delete_async_cb, obj);
 }
 
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
@@ -390,14 +390,14 @@ void lv_obj_dump_tree(lv_obj_t * start_obj)
  *   STATIC FUNCTIONS
  **********************/
 
-static void lv_obj_del_async_cb(void * obj)
+static void lv_obj_delete_async_cb(void * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_del(obj);
+    lv_obj_delete(obj);
 }
 
-static void obj_del_core(lv_obj_t * obj)
+static void obj_delete_core(lv_obj_t * obj)
 {
     if(obj->is_deleting)
         return;
@@ -417,7 +417,7 @@ static void obj_del_core(lv_obj_t * obj)
     /*Recursively delete the children*/
     lv_obj_t * child = lv_obj_get_child(obj, 0);
     while(child) {
-        obj_del_core(child);
+        obj_delete_core(child);
         child = lv_obj_get_child(obj, 0);
     }
 
@@ -445,7 +445,7 @@ static void obj_del_core(lv_obj_t * obj)
     /*Delete all pending async del-s*/
     lv_result_t async_cancel_res = LV_RESULT_OK;
     while(async_cancel_res == LV_RESULT_OK) {
-        async_cancel_res = lv_async_call_cancel(lv_obj_del_async_cb, obj);
+        async_cancel_res = lv_async_call_cancel(lv_obj_delete_async_cb, obj);
     }
 
     /*All children deleted. Now clean up the object specific data*/

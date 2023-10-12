@@ -66,7 +66,7 @@ void lv_example_table_2(void)
 
     uint32_t t = lv_tick_get();
 
-    lv_obj_t * table = lv_table_create(lv_scr_act());
+    lv_obj_t * table = lv_table_create(lv_screen_active());
 
     /*Set a smaller height to the table. It'll make it scrollable*/
     lv_obj_set_size(table, LV_SIZE_CONTENT, 200);
@@ -97,7 +97,7 @@ void lv_example_table_2(void)
 
     uint32_t elaps = lv_tick_elaps(t);
 
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(label, "%"LV_PRIu32" items were created in %"LV_PRIu32" ms\n"
                           "using %"LV_PRIu32" bytes of memory",
                           (uint32_t)ITEM_CNT, elaps, mem_used);

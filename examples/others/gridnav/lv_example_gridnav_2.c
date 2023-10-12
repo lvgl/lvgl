@@ -9,7 +9,7 @@ void lv_example_gridnav_2(void)
     /*It's assumed that the default group is set and
      *there is a keyboard indev*/
 
-    lv_obj_t * list1 = lv_list_create(lv_scr_act());
+    lv_obj_t * list1 = lv_list_create(lv_screen_active());
     lv_gridnav_add(list1, LV_GRIDNAV_CTRL_NONE);
     lv_obj_set_size(list1, lv_pct(45), lv_pct(80));
     lv_obj_align(list1, LV_ALIGN_LEFT_MID, 5, 0);
@@ -26,7 +26,7 @@ void lv_example_gridnav_2(void)
         lv_group_remove_obj(item);   /*Not needed, we use the gridnav instead*/
     }
 
-    lv_obj_t * list2 = lv_list_create(lv_scr_act());
+    lv_obj_t * list2 = lv_list_create(lv_screen_active());
     lv_gridnav_add(list2, LV_GRIDNAV_CTRL_ROLLOVER);
     lv_obj_set_size(list2, lv_pct(45), lv_pct(80));
     lv_obj_align(list2, LV_ALIGN_RIGHT_MID, -5, 0);

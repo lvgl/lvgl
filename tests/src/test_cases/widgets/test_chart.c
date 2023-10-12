@@ -10,7 +10,7 @@ static lv_color_t red_color;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     chart = lv_chart_create(active_screen);
 
     red_color = lv_palette_main(LV_PALETTE_RED);

@@ -16,11 +16,11 @@ void tearDown(void)
 
 static void create_images(void)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 
     lv_obj_t * img;
 
-    img = lv_image_create(lv_scr_act());
+    img = lv_image_create(lv_screen_active());
     lv_image_set_src(img, "A:src/test_assets/test_img_lvgl_logo.png");
     lv_obj_center(img);
 }
@@ -39,7 +39,7 @@ void test_libpng_1(void)
     for(uint32_t i = 0; i < 20; i++) {
         create_images();
 
-        lv_obj_invalidate(lv_scr_act());
+        lv_obj_invalidate(lv_screen_active());
         lv_refr_now(NULL);
     }
 

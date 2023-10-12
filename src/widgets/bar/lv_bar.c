@@ -230,8 +230,8 @@ static void lv_bar_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_bar_init_anim(obj, &bar->cur_value_anim);
     lv_bar_init_anim(obj, &bar->start_value_anim);
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CHECKABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_bar_set_value(obj, 0, LV_ANIM_OFF);
 
     LV_TRACE_OBJ_CREATE("finished");
@@ -242,8 +242,8 @@ static void lv_bar_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     LV_UNUSED(class_p);
     lv_bar_t * bar = (lv_bar_t *)obj;
 
-    lv_anim_del(&bar->cur_value_anim, NULL);
-    lv_anim_del(&bar->start_value_anim, NULL);
+    lv_anim_delete(&bar->cur_value_anim, NULL);
+    lv_anim_delete(&bar->start_value_anim, NULL);
 }
 
 static void draw_indic(lv_event_t * e)
@@ -512,13 +512,13 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
                                        _lv_bar_anim_t * anim_info, lv_anim_enable_t en)
 {
     if(en == LV_ANIM_OFF) {
-        lv_anim_del(anim_info, NULL);
+        lv_anim_delete(anim_info, NULL);
         anim_info->anim_state = LV_BAR_ANIM_STATE_INV;
         *value_ptr = new_value;
         lv_obj_invalidate((lv_obj_t *)obj);
 
         /*Stop the previous animation if it exists*/
-        lv_anim_del(anim_info, NULL);
+        lv_anim_delete(anim_info, NULL);
         /*Reset animation state*/
         lv_bar_init_anim(obj, anim_info);
     }
@@ -535,7 +535,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * obj, int32_t new_value, int32_
         }
         *value_ptr = new_value;
         /*Stop the previous animation if it exists*/
-        lv_anim_del(anim_info, NULL);
+        lv_anim_delete(anim_info, NULL);
 
         lv_anim_t a;
         lv_anim_init(&a);

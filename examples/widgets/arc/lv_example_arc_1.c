@@ -6,10 +6,10 @@ static void value_changed_event_cb(lv_event_t * e);
 
 void lv_example_arc_1(void)
 {
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
 
     /*Create an Arc*/
-    lv_obj_t * arc = lv_arc_create(lv_scr_act());
+    lv_obj_t * arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, 150, 150);
     lv_arc_set_rotation(arc, 135);
     lv_arc_set_bg_angles(arc, 0, 270);

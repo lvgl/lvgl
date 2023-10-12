@@ -7,8 +7,8 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 
 }
 
@@ -20,7 +20,7 @@ void tearDown(void)
 static void canvas_basic_render(uint8_t * canvas_buf, lv_color_format_t render_cf, const char * name_main,
                                 const char * name_sub)
 {
-    lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas, canvas_buf, 180, 180, render_cf);
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_LIGHT_BLUE, 2), LV_OPA_COVER);
@@ -85,7 +85,7 @@ static void canvas_basic_render(uint8_t * canvas_buf, lv_color_format_t render_c
 
     lv_canvas_finish_layer(canvas, &layer);
 
-    lv_obj_del(canvas);
+    lv_obj_delete(canvas);
 }
 
 
@@ -120,13 +120,13 @@ void canvas_blend_test(lv_obj_t  * canvas_large, lv_draw_image_dsc_t * img_dsc, 
 
 static void canvas_draw(const char * name, lv_color_format_t large_render_cf)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 
     static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(180, 4) * 180 + LV_DRAW_BUF_ALIGN];
 
 
     static uint8_t canvas2_buf[CANVAS_WIDTH_TO_STRIDE(768, 4) * 390 + LV_DRAW_BUF_ALIGN];
-    lv_obj_t * canvas2 = lv_canvas_create(lv_scr_act());
+    lv_obj_t * canvas2 = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas2, lv_draw_buf_align(canvas2_buf, large_render_cf), 768, 390, large_render_cf);
     lv_canvas_fill_bg(canvas2, lv_palette_lighten(LV_PALETTE_BLUE_GREY, 2), LV_OPA_COVER);
 

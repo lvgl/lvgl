@@ -3,7 +3,7 @@
 #
 
 # Normal button
-button = lv.button(lv.scr_act())
+button = lv.button(lv.screen_active())
 button.set_size(100, 40)
 button.align(lv.ALIGN.CENTER, 0, -70)
 
@@ -13,7 +13,7 @@ label.center()
 
 # Set opacity
 # The button and the label is rendered to a layer first and that layer is blended
-button = lv.button(lv.scr_act())
+button = lv.button(lv.screen_active())
 button.set_size(100, 40)
 button.set_style_opa(lv.OPA._50, 0)
 button.align(lv.ALIGN.CENTER, 0, 0)
@@ -24,7 +24,7 @@ label.center()
 
 # Set transformations
 # The button and the label is rendered to a layer first and that layer is transformed
-button = lv.button(lv.scr_act())
+button = lv.button(lv.screen_active())
 button.set_size(100, 40)
 button.set_style_transform_rotation(150, 0)             # 15 deg
 button.set_style_transform_scale(256 + 64, 0)         # 1.25x

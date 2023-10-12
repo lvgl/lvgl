@@ -675,7 +675,7 @@ Fixes
    `25ce6e3 <https://github.com/lvgl/lvgl/commit/25ce6e3ae9e144e2df5dad34475dda3542015f6a>`__
 -  fix(indev): do not send keys to objects in disabled state
    `b0a46c4 <https://github.com/lvgl/lvgl/commit/b0a46c4837c922cb1303ef768da3209e7efa45ae>`__
--  fix(disp): make lv_scr_load work better with lv_scr_load_anim and
+-  fix(disp): make lv_screen_load work better with lv_screen_load_anim and
    auto_del = true
    `52287fd <https://github.com/lvgl/lvgl/commit/52287fd64ad59c35794d1f4486b777f4eb686abc>`__
 -  fix(draw): create intermediate layer for blend modes too
@@ -1084,7 +1084,7 @@ Fixes
    `2944 <https://github.com/littlevgl/lvgl/pull/2944>`__
 -  fix(rlottie): fix variable name
    `2971 <https://github.com/littlevgl/lvgl/pull/2971>`__
--  fix(group): in lv_group_del() remove group from indev (lvgl#2963)
+-  fix(group): in lv_group_delete() remove group from indev (lvgl#2963)
    `2964 <https://github.com/littlevgl/lvgl/pull/2964>`__
 -  fix(obj): old parent's scroll is not updated in lv_obj_set_parent()
    `2965 <https://github.com/littlevgl/lvgl/pull/2965>`__
@@ -1623,7 +1623,7 @@ New Features
 -  feat(event) add LV_SCREEN\_(UN)LOAD_START
    `7bae9e3 <https://github.com/lvgl/lvgl/commit/7bae9e3ddde9d6bdc06ae437f20a789cd330a556>`__
 
--  feat(obj) add lv_obj_del_delayed()
+-  feat(obj) add lv_obj_delete_delayed()
    `c6a2e15 <https://github.com/lvgl/lvgl/commit/c6a2e15ec23c8e96f71bafa8e43ef67fc4a73d0a>`__
 
 -  feat(docs) add view on GitHub link
@@ -1811,7 +1811,7 @@ Fixes
    and lv_tick_inc()
    `2675 <https://github.com/lvgl/lvgl/pull/2675>`__
 
--  fix(anim_timeline) avoid calling lv_anim_del(NULL, NULL)
+-  fix(anim_timeline) avoid calling lv_anim_delete(NULL, NULL)
    `2628 <https://github.com/lvgl/lvgl/pull/2628>`__
 
 -  fix(kconfig) sync Kconfig with the latest lv_conf_template.h
@@ -2245,7 +2245,7 @@ Fixes
    `e41c507 <https://github.com/lvgl/lvgl/commit/e41c50780495c7d6ac6a2b0edf12fc98c9d85a6b>`__
 
 -  fix(disp) be sure the pending scr load animation is finished in
-   lv_scr_load_anim
+   lv_screen_load_anim
    `eb6ae52 <https://github.com/lvgl/lvgl/commit/eb6ae526432453e4b9dbc7a760cd65d164050548>`__
 
 -  fix(color) fox color premult precision with 16-bit color depth
@@ -2999,7 +2999,7 @@ Others
 -  Fix typo in commands to build rlottie
    `2723 <https://github.com/lvgl/lvgl/pull/2723>`__
 
--  del(.gitmodules): delete .gitmodules
+-  delete(.gitmodules): delete .gitmodules
    `2718 <https://github.com/lvgl/lvgl/pull/2718>`__
 
 -  lv_obj_draw_part_dsc_t.text_length added
@@ -3542,7 +3542,7 @@ v7.8.1 (15.12.2020)
 Bugfixes
 ~~~~~~~~
 
--  fix(lv_scr_load_anim) fix when multiple screens are loaded at the
+-  fix(lv_screen_load_anim) fix when multiple screens are loaded at the
    same time with delay
 -  fix(page) fix LV_SCROLLBAR_MODE_DRAG
 
@@ -3822,7 +3822,7 @@ v7.2.0 (21.07.2020)
 New features
 ~~~~~~~~~~~~
 
--  Add screen transitions with lv_scr_load_anim()
+-  Add screen transitions with lv_screen_load_anim()
 -  Add display background color, wallpaper and opacity. Shown when the
    screen is transparent. Can be used with
    lv_disp_set_bg_opa/color/image().

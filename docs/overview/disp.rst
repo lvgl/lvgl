@@ -34,7 +34,7 @@ Therefore, the whole concept of multi-display handling is completely
 hidden if you register only one display. By default, the last created
 (and only) display is used.
 
-:cpp:func:`lv_scr_act`, :cpp:func:`lv_scr_load`, :cpp:func:`lv_layer_top`,
+:cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load`, :cpp:func:`lv_layer_top`,
 :cpp:func:`lv_layer_sys`, :c:macro:`LV_HOR_RES` and :c:macro:`LV_VER_RES` are always applied
 on the most recently created (default) display. If you pass ``NULL`` as
 ``disp`` parameter to display related functions the default display will
@@ -84,14 +84,14 @@ To create a screen, use
 ``lv_obj_t * scr = lv_<type>_create(NULL, copy)``. ``copy`` can be an
 existing screen copied into the new screen.
 
-To load a screen, use :cpp:expr:`lv_scr_load(scr)`. To get the active screen,
-use :cpp:expr:`lv_scr_act()`. These functions work on the default display. If
+To load a screen, use :cpp:expr:`lv_screen_load(scr)`. To get the active screen,
+use :cpp:expr:`lv_screen_active()`. These functions work on the default display. If
 you want to specify which display to work on, use
-:cpp:expr:`lv_disp_get_scr_act(disp)` and :cpp:expr:`lv_disp_load_scr(disp, scr)`. A
+:cpp:expr:`lv_disp_get_screen_act(disp)` and :cpp:expr:`lv_disp_load_scr(disp, scr)`. A
 screen can be loaded with animations too. Read more
 `here <object.html#load-screens>`__.
 
-Screens can be deleted with :cpp:expr:`lv_obj_del(scr)`, but ensure that you do
+Screens can be deleted with :cpp:expr:`lv_obj_delete(scr)`, but ensure that you do
 not delete the currently loaded screen.
 
 Transparent screens
@@ -114,9 +114,9 @@ In summary, to enable transparent screens and displays for OSD menu-like
 UIs:
 
 - Set the screen's ``bg_opa`` to transparent:
-  :cpp:expr:`lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_TRANSP, 0)`
 - Set the bottom layer's ``bg_opa`` to transparent:
-  :cpp:expr:`lv_obj_set_style_bg_opa(lv_scr_act(), LV_OPA_TRANSP, 0)`
+  :cpp:expr:`lv_obj_set_style_bg_opa(lv_screen_active(), LV_OPA_TRANSP, 0)`
 - Set the screen's bg_opa to 0:
   :cpp:expr:`lv_obj_set_style_bg_opa(lv_layer_bottom(), LV_OPA_TRANSP, 0)`
 - Set a color format with alpha channel. E.g.

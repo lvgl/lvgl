@@ -18,7 +18,7 @@ def event_handler(e):
             if child == currentButton:
                 child.add_state(lv.STATE.CHECKED)
             else:
-                child.clear_state(lv.STATE.CHECKED)
+                child.remove_state(lv.STATE.CHECKED)
 
 def event_handler_top(e):
     global currentButton
@@ -91,7 +91,7 @@ def event_handler_swap(e):
             currentButton.scroll_to_view(lv.ANIM.ON)
 
 #Create a list with buttons that can be sorted
-list1 = lv.list(lv.scr_act())
+list1 = lv.list(lv.screen_active())
 list1.set_size(lv.pct(60), lv.pct(100))
 list1.set_style_pad_row( 5, 0)
 
@@ -107,7 +107,7 @@ currentButton = list1.get_child(0)
 currentButton.add_state(lv.STATE.CHECKED)
 
 #Create a second list with up and down buttons
-list2 = lv.list(lv.scr_act())
+list2 = lv.list(lv.screen_active())
 list2.set_size(lv.pct(40), lv.pct(100))
 list2.align(lv.ALIGN.TOP_RIGHT, 0, 0)
 list2.set_flex_flow(lv.FLEX_FLOW.COLUMN)

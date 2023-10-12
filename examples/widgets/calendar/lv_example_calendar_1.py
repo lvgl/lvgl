@@ -10,7 +10,7 @@ def event_handler(e):
             print("Clicked date: %02d.%02d.%02d"%(date.day, date.month, date.year))
 
 
-calendar = lv.calendar(lv.scr_act())
+calendar = lv.calendar(lv.screen_active())
 calendar.set_size(200, 200)
 calendar.align(lv.ALIGN.CENTER, 0, 20)
 calendar.add_event(event_handler, lv.EVENT.ALL, None)

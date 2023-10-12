@@ -8,7 +8,7 @@ some metadata.
 Store images
 ************
 
-You can store images in two places 
+You can store images in two places
 
 - as a variable in internal memory (RAM or ROM)
 - as a file
@@ -21,12 +21,12 @@ Images stored internally in a variable are composed mainly of an
 
 - **header**:
 
-  - *cf*: Color format. See `below <#color-format>`__ 
-  - *w*: width in pixels (<= 2048) 
-  - *h*: height in pixels (<= 2048) 
-  - *always zero*: 3 bits which need to be always zero 
-  - *reserved*: reserved for future use 
-- **data**: pointer to an array where the image itself is stored 
+  - *cf*: Color format. See `below <#color-format>`__
+  - *w*: width in pixels (<= 2048)
+  - *h*: height in pixels (<= 2048)
+  - *always zero*: 3 bits which need to be always zero
+  - *reserved*: reserved for future use
+- **data**: pointer to an array where the image itself is stored
 - **data_size**: length of ``data`` in bytes
 
 These are usually stored within a project as C files. They are linked
@@ -51,7 +51,7 @@ easier to replace without needing to rebuild the main program.
 Color formats
 *************
 
-Various built-in color formats are supported: 
+Various built-in color formats are supported:
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE`: Simply stores the RGB colors (in whatever color depth LVGL is configured for).
 - :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`: Like :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` but it also adds an alpha (transparency) byte for every pixel.
@@ -79,8 +79,8 @@ The bytes of :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE` images are stored in the f
     - **Byte 2**: Alpha byte (only with :cpp:enumerator:`LV_COLOR_FORMAT_NATIVE_WITH_ALPHA`)
 
 You can store images in a *Raw* format to indicate that it's not encoded
-with one of the built-in color formats and an external `Image decoder <#image-decoder>`__ 
-needs to be used to decode the image. 
+with one of the built-in color formats and an external `Image decoder <#image-decoder>`__
+needs to be used to decode the image.
 
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW`: Indicates a basic raw image (e.g. a PNG or JPG image).
 - :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA`: Indicates that an image has alpha and an alpha byte is added for every pixel.
@@ -116,11 +116,11 @@ that matches :c:macro:`LV_COLOR_DEPTH` in *lv_conf.h* will actually be linked
 into the resulting executable.
 
 In the case of binary files, you need to specify the color format you
-want: 
+want:
 
-- RGB332 for 8-bit color depth 
-- RGB565 for 16-bit color depth 
-- RGB565 Swap for 16-bit color depth (two bytes are swapped) 
+- RGB332 for 8-bit color depth
+- RGB565 for 16-bit color depth
+- RGB565 Swap for 16-bit color depth (two bytes are swapped)
 - RGB888 for 32-bit color depth
 
 Manually create an image
@@ -153,7 +153,7 @@ The simplest way to use an image in LVGL is to display it with an
 
 .. code:: c
 
-   lv_obj_t * icon = lv_image_create(lv_scr_act(), NULL);
+   lv_obj_t * icon = lv_image_create(lv_screen_active(), NULL);
 
    /*From variable*/
    lv_image_set_src(icon, &my_icon_dsc);
@@ -176,12 +176,12 @@ formats like PNG or JPG.
 To handle non-built-in image formats, you need to use external libraries
 and attach them to LVGL via the *Image decoder* interface.
 
-An image decoder consists of 4 callbacks: 
+An image decoder consists of 4 callbacks:
 
-- **info** get some basic info about the image (width, height and color format). 
-- **open** open an image: 
-    - store a decoded image 
-    - set it to ``NULL`` to indicate the image can be read line-by-line. 
+- **info** get some basic info about the image (width, height and color format).
+- **open** open an image:
+    - store a decoded image
+    - set it to ``NULL`` to indicate the image can be read line-by-line.
 - **get_area** if *open* didn't fully open an image this function should give back part of image as decoded data.
 - **close** close an opened image, free the allocated resources.
 
@@ -205,14 +205,14 @@ Custom image formats
 --------------------
 
 The easiest way to create a custom image is to use the online image
-converter and select ``Raw`` or ``Raw with alpha`` format. 
+converter and select ``Raw`` or ``Raw with alpha`` format.
 It will just take every byte of the
 binary file you uploaded and write it as an image "bitmap". You then
 need to attach an image decoder that will parse that bitmap and generate
 the real, renderable bitmap.
 
-``header.cf`` will be :cpp:enumerator:`LV_COLOR_FORMAT_RAW`, :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA` 
-accordingly. You should choose the correct format according to your needs: 
+``header.cf`` will be :cpp:enumerator:`LV_COLOR_FORMAT_RAW`, :cpp:enumerator:`LV_COLOR_FORMAT_RAW_ALPHA`
+accordingly. You should choose the correct format according to your needs:
 a fully opaque image, using an alpha channel.
 
 After decoding, the *raw* formats are considered *True color* by the
@@ -374,11 +374,11 @@ Cache size
 ----------
 
 The size of cache (in bytes) can be defined with
-:c:macro:`LV_CACHE_DEF_SIZE` in *lv_conf.h*. The default value is 0, so 
+:c:macro:`LV_CACHE_DEF_SIZE` in *lv_conf.h*. The default value is 0, so
 no image is cached.
 
 The size of cache can be changed at run-time with
-:cpp:expr:`lv_cache_set_max_size(size_t size)`, 
+:cpp:expr:`lv_cache_set_max_size(size_t size)`,
 and get with :cpp:expr:`lv_cache_get_max_size()`.
 
 Value of images
@@ -399,9 +399,9 @@ the *weight* value in the cache entry in
 it unchanged to let LVGL control it.)
 
 Every cache entry has a *"life"* value. Every time an image is opened
-through the cache, the *life* value of all entries is increased by their 
-*weight* values to make them older. 
-When a cached image is used, its *usage_count* value is increased 
+through the cache, the *life* value of all entries is increased by their
+*weight* values to make them older.
+When a cached image is used, its *usage_count* value is increased
 to make it more alive.
 
 If there is no more space in the cache, the entry with *usage_count == 0*

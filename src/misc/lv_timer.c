@@ -215,7 +215,7 @@ void lv_timer_set_cb(lv_timer_t * timer, lv_timer_cb_t timer_cb)
  * Delete a lv_timer
  * @param timer pointer to timer created by timer
  */
-void lv_timer_del(lv_timer_t * timer)
+void lv_timer_delete(lv_timer_t * timer)
 {
     _lv_ll_remove(timer_ll_p, timer);
     state.timer_deleted = true;
@@ -366,7 +366,7 @@ static bool lv_timer_exec(lv_timer_t * timer)
     if(state.timer_deleted == false) { /*The timer might be deleted by itself as well*/
         if(timer->repeat_count == 0) { /*The repeat count is over, delete the timer*/
             LV_TRACE_TIMER("deleting timer with %p callback because the repeat count is over", *((void **)&timer->timer_cb));
-            lv_timer_del(timer);
+            lv_timer_delete(timer);
         }
     }
 

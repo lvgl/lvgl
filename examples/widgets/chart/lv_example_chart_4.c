@@ -63,7 +63,7 @@ void lv_example_chart_4(void)
 {
     /*Create a chart*/
     lv_obj_t * chart;
-    chart = lv_chart_create(lv_scr_act());
+    chart = lv_chart_create(lv_screen_active());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_center(chart);
 

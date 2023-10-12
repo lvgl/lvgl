@@ -13,7 +13,7 @@ style_line.set_line_color(lv.palette_main(lv.PALETTE.BLUE))
 style_line.set_line_rounded(True)
 
 # Create a line and apply the new style
-line1 = lv.line(lv.scr_act())
+line1 = lv.line(lv.screen_active())
 line1.set_points(line_points, 5)     # Set the points
 line1.add_style(style_line, 0)
 line1.center()

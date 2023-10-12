@@ -44,7 +44,7 @@ static void draw_event_cb(lv_event_t * e)
 
 void lv_example_table_1(void)
 {
-    lv_obj_t * table = lv_table_create(lv_scr_act());
+    lv_obj_t * table = lv_table_create(lv_screen_active());
 
     /*Fill the first column*/
     lv_table_set_cell_value(table, 0, 0, "Name");

@@ -10,7 +10,7 @@ def event_handler(e):
 # An infinite roller with the name of the months
 #
 
-roller1 = lv.roller(lv.scr_act())
+roller1 = lv.roller(lv.screen_active())
 roller1.set_options("\n".join([
     "January",
     "February",

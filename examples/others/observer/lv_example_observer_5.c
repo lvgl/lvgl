@@ -33,7 +33,7 @@ void lv_example_observer_5(void)
     lv_subject_add_observer(&fw_update_status_subject, fw_upload_manager_observer_cb, NULL);
 
     /*Create start FW update button*/
-    lv_obj_t * btn = lv_btn_create(lv_scr_act());
+    lv_obj_t * btn = lv_btn_create(lv_screen_active());
     lv_obj_add_event(btn, fw_update_btn_clicked_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_center(btn);
     lv_obj_t * label = lv_label_create(btn);
@@ -43,7 +43,7 @@ void lv_example_observer_5(void)
 static void fw_update_btn_clicked_event_cb(lv_event_t * e)
 {
     LV_UNUSED(e);
-    lv_obj_t * win = lv_win_create(lv_scr_act());
+    lv_obj_t * win = lv_win_create(lv_screen_active());
     lv_obj_set_size(win, lv_pct(90), lv_pct(90));
     lv_obj_set_height(lv_win_get_header(win), 40);
     lv_obj_set_style_radius(win, 8, 0);
@@ -69,7 +69,7 @@ static void fw_update_close_event_cb(lv_event_t * e)
 static void restart_btn_click_event_cb(lv_event_t * e)
 {
     lv_obj_t * win = lv_event_get_user_data(e);
-    lv_obj_del(win);
+    lv_obj_delete(win);
     lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_IDLE);
 }
 
@@ -96,7 +96,7 @@ static void fw_update_win_observer_cb(lv_subject_t * subject, lv_observer_t * ob
         lv_arc_bind_value(arc, &fw_download_percent_subject);
         lv_obj_center(arc);
         lv_obj_set_size(arc, 130, 130);
-        lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_remove_flag(arc, LV_OBJ_FLAG_CLICKABLE);
 
         lv_obj_t * label = lv_label_create(cont);
         lv_label_bind_text(label, &fw_download_percent_subject, "%d %%");
@@ -116,7 +116,7 @@ static void fw_update_win_observer_cb(lv_subject_t * subject, lv_observer_t * ob
         lv_label_set_text(label, "Restart");
     }
     else if(status == FW_UPDATE_STATE_CANCEL) {
-        lv_obj_del(win);
+        lv_obj_delete(win);
     }
 }
 
@@ -125,13 +125,13 @@ static void connect_timer_cb(lv_timer_t * t)
     if(lv_subject_get_int(&fw_update_status_subject) != FW_UPDATE_STATE_CANCEL) {
         lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_CONNECTED);
     }
-    lv_timer_del(t);
+    lv_timer_delete(t);
 }
 
 static void download_timer_cb(lv_timer_t * t)
 {
     if(lv_subject_get_int(&fw_update_status_subject) == FW_UPDATE_STATE_CANCEL) {
-        lv_timer_del(t);
+        lv_timer_delete(t);
         return;
     }
 
@@ -141,7 +141,7 @@ static void download_timer_cb(lv_timer_t * t)
     }
     else {
         lv_subject_set_int(&fw_update_status_subject, FW_UPDATE_STATE_READY);
-        lv_timer_del(t);
+        lv_timer_delete(t);
     }
 }
 

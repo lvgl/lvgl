@@ -664,7 +664,7 @@ static void refr_area_part(lv_layer_t * layer)
     lv_obj_t * top_prev_scr = NULL;
 
     /*Get the most top object which is not covered by others*/
-    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_display_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&layer->clip_area, lv_display_get_screen_act(disp_refr));
     if(disp_refr->prev_scr) {
         top_prev_scr = lv_refr_get_top_obj(&layer->clip_area, disp_refr->prev_scr);
     }
@@ -753,7 +753,7 @@ static void refr_obj_and_children(lv_layer_t * layer, lv_obj_t * top_obj)
     /*Normally always will be a top_obj (at least the screen)
      *but in special cases (e.g. if the screen has alpha) it won't.
      *In this case use the screen directly*/
-    if(top_obj == NULL) top_obj = lv_display_get_scr_act(disp_refr);
+    if(top_obj == NULL) top_obj = lv_display_get_screen_act(disp_refr);
     if(top_obj == NULL) return;  /*Shouldn't happen*/
 
     /*Refresh the top object and its children*/

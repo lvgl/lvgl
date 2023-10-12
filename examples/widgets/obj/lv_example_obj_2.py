@@ -15,7 +15,7 @@ def drag_event_handler(e):
 # Make an object draggable.
 #
 
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.set_size(150, 100)
 obj.add_event(drag_event_handler, lv.EVENT.PRESSING, None)
 

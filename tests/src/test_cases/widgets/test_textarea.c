@@ -10,7 +10,7 @@ static const char * textarea_default_text = "";
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     textarea = lv_textarea_create(active_screen);
 }
 

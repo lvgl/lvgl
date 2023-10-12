@@ -77,7 +77,7 @@ def switch_handler(e,menu):
 LV_MENU_ITEM_BUILDER_VARIANT_1 = const(0)
 LV_MENU_ITEM_BUILDER_VARIANT_2 = const(1)
 
-menu = lv.menu(lv.scr_act())
+menu = lv.menu(lv.screen_active())
 
 bg_color = menu.get_style_bg_color(0)
 if bg_color.brightness() > 127 :

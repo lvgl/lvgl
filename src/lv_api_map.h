@@ -19,7 +19,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-
 #define LV_DISP_ROTATION_0       LV_DISPLAY_ROTATION_0
 #define LV_DISP_ROTATION_90      LV_DISPLAY_ROTATION_90
 #define LV_DISP_ROTATION_180     LV_DISPLAY_ROTATION_180
@@ -98,6 +97,12 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define LV_INDEV_STATE_PR   LV_INDEV_STATE_PRESSED
 #define LV_INDEV_STATE_REL  LV_INDEV_STATE_RELEASED
 
+#define lv_obj_del                       lv_obj_delete
+#define lv_obj_del_async                 lv_obj_delete_async
+#define lv_obj_clear_flag                lv_obj_remove_flag
+#define lv_obj_clear_state               lv_obj_remove_state
+
+#define lv_scr_act                       lv_screen_active
 #define lv_disp_create                   lv_display_create
 #define lv_disp_remove                   lv_display_remove
 #define lv_disp_set_default              lv_display_set_default
@@ -125,8 +130,8 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define lv_disp_flush_ready              lv_display_flush_ready
 #define lv_disp_flush_is_last            lv_display_flush_is_last
 #define lv_disp_is_double_buffered       lv_display_is_double_buffered
-#define lv_disp_get_scr_act              lv_display_get_scr_act
-#define lv_disp_get_scr_prev             lv_display_get_scr_prev
+#define lv_disp_get_scr_act              lv_display_get_screen_act
+#define lv_disp_get_scr_prev             lv_display_get_screen_prev
 #define lv_disp_load_scr                 lv_display_load_scr
 #define lv_disp_get_layer_top            lv_display_get_layer_top
 #define lv_disp_get_layer_sys            lv_display_get_layer_sys
@@ -150,6 +155,12 @@ static inline void lv_obj_move_background(lv_obj_t * obj)
 #define _lv_disp_get_refr_timer          _lv_display_get_refr_timer
 #define lv_disp_render_mode_t            lv_display_render_mode_t
 
+#define lv_timer_del                    lv_timer_delete
+
+#define lv_anim_del                     lv_anim_delete
+#define lv_anim_del_all                 lv_anim_delete_all
+
+#define lv_group_del                    lv_group_delete
 
 #define lv_txt_get_size       lv_text_get_size
 #define lv_txt_get_width      lv_text_get_width

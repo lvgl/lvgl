@@ -20,7 +20,7 @@ static const char * default_infinite_roller_options = "One\nTwo\nThree\nFour\nFi
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     roller = lv_roller_create(active_screen);
     roller_infinite = lv_roller_create(active_screen);
     roller_mouse = lv_roller_create(active_screen);

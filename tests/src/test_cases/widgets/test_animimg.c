@@ -28,7 +28,7 @@ void test_animimg_start(void);
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     animimg = lv_animimg_create(active_screen);
 }
 

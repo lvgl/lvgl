@@ -94,7 +94,7 @@ static void ui_init(void)
     lv_subject_init_int(&auth_state_subject, LOGGED_OUT);
 
     /*Create a slider in the center of the display*/
-    lv_obj_t * ta = lv_textarea_create(lv_scr_act());
+    lv_obj_t * ta = lv_textarea_create(lv_screen_active());
     lv_obj_set_pos(ta, 10, 10);
     lv_obj_set_width(ta, 200);
     lv_textarea_set_one_line(ta, true);
@@ -103,14 +103,14 @@ static void ui_init(void)
     lv_obj_add_event(ta, textarea_event_cb, LV_EVENT_READY, NULL);
     lv_obj_bind_state_if_eq(ta, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
 
-    lv_obj_t * kb = lv_keyboard_create(lv_scr_act());
+    lv_obj_t * kb = lv_keyboard_create(lv_screen_active());
     lv_keyboard_set_textarea(kb, ta);
 
     lv_obj_t * btn;
     lv_obj_t * label;
 
     /*Create a log out button which will be active only when logged in*/
-    btn = lv_button_create(lv_scr_act());
+    btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 220, 10);
     lv_obj_add_event(btn, log_out_click_event_cb, LV_EVENT_CLICKED, NULL);
     lv_obj_bind_state_if_not_eq(btn, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);
@@ -119,12 +119,12 @@ static void ui_init(void)
     lv_label_set_text(label, "LOG OUT");
 
     /*Create a label to show info*/
-    label = lv_label_create(lv_scr_act());
+    label = lv_label_create(lv_screen_active());
     lv_obj_set_pos(label, 10, 60);
     lv_subject_add_observer_obj(&auth_state_subject, info_label_observer_cb, label, NULL);
 
     /*Create button which will be active only when logged in*/
-    btn = lv_button_create(lv_scr_act());
+    btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(btn, 10, 80);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_bind_state_if_not_eq(btn, &auth_state_subject, LV_STATE_DISABLED, LOGGED_IN);

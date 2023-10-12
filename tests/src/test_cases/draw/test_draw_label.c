@@ -6,21 +6,21 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 }
 
 void tearDown(void)
 {
     /* Function run after every test */
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 }
 
 
 
 static lv_obj_t * label_create(const lv_font_t * font, lv_style_t * style, const char * text_base)
 {
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(label, "%s: the quick brown fox jumps over the lazy dog", text_base);
     //    lv_label_set_text_fmt(label, "l");
     lv_obj_set_style_text_font(label, font, 0);
@@ -89,7 +89,7 @@ static lv_obj_t * decor_label_create(lv_text_decor_t decor, lv_text_align_t alig
     lv_color_t sel_bg_color = lv_palette_lighten(LV_PALETTE_RED, 4);
     lv_color_t sel_color = lv_palette_darken(LV_PALETTE_RED, 4);
 
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "Hi,\nTesting the\nlabels.");
     lv_obj_set_style_text_decor(label, decor, 0);
     lv_obj_set_style_text_color(label, color, 0);
@@ -131,7 +131,7 @@ void test_label_decor(void)
 
 void test_label_placeholder(void)
 {
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "ABCÁÉŐ\naáeéoő");
     TEST_ASSERT_EQUAL_SCREENSHOT("draw/label_placeholder.png");
 

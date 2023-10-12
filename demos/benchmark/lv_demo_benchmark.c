@@ -749,7 +749,7 @@ static void benchmark_init(void)
         lv_timer_set_period(anim_timer, 2);
     }
 
-    lv_obj_t * scr = lv_scr_act();
+    lv_obj_t * scr = lv_screen_active();
     lv_obj_remove_style_all(scr);
     lv_obj_set_style_bg_opa(scr, LV_OPA_COVER, 0);
     lv_obj_set_style_bg_color(scr, lv_palette_lighten(LV_PALETTE_GREY, 4), 0);
@@ -859,7 +859,7 @@ static void next_scene_timer_cb(lv_timer_t * timer)
     lv_result_t res = load_next_scene();
 
     if(res == LV_RESULT_INVALID) {
-        lv_timer_del(timer);
+        lv_timer_delete(timer);
         generate_report();
     }
 }
@@ -882,7 +882,7 @@ static void single_scene_finsih_timer_cb(lv_timer_t * timer)
     benchmark_event_remove();
     show_scene_report();
     lv_obj_clean(scene_bg);
-    lv_obj_invalidate(lv_scr_act());
+    lv_obj_invalidate(lv_screen_active());
 }
 
 static void dummy_flush_cb(lv_display_t * drv, const lv_area_t * area, uint8_t * pxmap)
@@ -987,19 +987,19 @@ static void generate_report(void)
 
     uint32_t opa_speed_pct = (fps_opa_unweighted * 100) / fps_normal_unweighted;
 
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
     scene_bg = NULL;
 
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_COLUMN);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_COLUMN);
 
-    title = lv_label_create(lv_scr_act());
+    title = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(title, "Weighted FPS: %"LV_PRIu32, fps_weighted);
 
-    subtitle = lv_label_create(lv_scr_act());
+    subtitle = lv_label_create(lv_screen_active());
     lv_label_set_text_fmt(subtitle, "Opa. speed: %"LV_PRIu32"%%", opa_speed_pct);
 
-    lv_coord_t w = lv_obj_get_content_width(lv_scr_act());
-    lv_obj_t * table = lv_table_create(lv_scr_act());
+    lv_coord_t w = lv_obj_get_content_width(lv_screen_active());
+    lv_obj_t * table = lv_table_create(lv_screen_active());
     //        lv_obj_clean_style_list(table, LV_PART_MAIN);
     lv_table_set_col_cnt(table, 2);
 

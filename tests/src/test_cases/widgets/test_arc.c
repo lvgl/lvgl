@@ -23,12 +23,12 @@ static void dummy_event_cb(lv_event_t * e);
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
 }
 
 void tearDown(void)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 }
 
 void test_arc_creation_successfull(void)
@@ -115,7 +115,7 @@ void test_arc_angles_when_reversed(void)
     int16_t expected_value = 40;
 
     lv_obj_t * arcBlack;
-    arcBlack = lv_arc_create(lv_scr_act());
+    arcBlack = lv_arc_create(lv_screen_active());
 
     lv_arc_set_mode(arcBlack, LV_ARC_MODE_REVERSE);
 
@@ -130,7 +130,7 @@ void test_arc_angles_when_reversed(void)
 
 void test_arc_click_area_with_adv_hittest(void)
 {
-    arc = lv_arc_create(lv_scr_act());
+    arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, 100, 100);
     lv_obj_set_style_arc_width(arc, 10, 0);
     lv_obj_add_flag(arc, LV_OBJ_FLAG_ADV_HITTEST);
@@ -165,7 +165,7 @@ void test_arc_click_area_with_adv_hittest(void)
 
 void test_arc_basic_render(void)
 {
-    arc = lv_arc_create(lv_scr_act());
+    arc = lv_arc_create(lv_screen_active());
     lv_obj_set_size(arc, 100, 100);
     lv_obj_center(arc);
     TEST_ASSERT_EQUAL_SCREENSHOT("arc_1.png");

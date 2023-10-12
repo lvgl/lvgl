@@ -28,7 +28,7 @@ def set_zoom(image, v):
 #
 
 # Now create the actual image
-image = lv.image(lv.scr_act())
+image = lv.image(lv.screen_active())
 image.set_src(image_cogwheel_argb)
 image.align(lv.ALIGN.CENTER, 50, 50)
 image.set_pivot(0, 0)               # Rotate around the top left corner

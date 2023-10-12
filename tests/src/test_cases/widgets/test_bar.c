@@ -10,7 +10,7 @@ static lv_obj_t * bar = NULL;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     bar = lv_bar_create(active_screen);
 }
 
@@ -147,7 +147,7 @@ void test_bar_normal(void)
     lv_color_t bg_color = lv_color_black();
     lv_color_t indic_color = lv_color_hex(0x0000FF);
 
-    lv_obj_t * screen = lv_obj_create(lv_scr_act());
+    lv_obj_t * screen = lv_obj_create(lv_screen_active());
     lv_obj_remove_style_all(screen);
     lv_obj_set_size(screen, 800, 480);
     lv_obj_center(screen);

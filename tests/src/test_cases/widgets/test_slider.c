@@ -13,7 +13,7 @@ static lv_group_t * g = NULL;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     slider = lv_slider_create(active_screen);
     sliderRangeMode = lv_slider_create(active_screen);
     sliderNormalMode = lv_slider_create(active_screen);

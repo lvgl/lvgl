@@ -29,7 +29,7 @@ void lv_example_roller_2(void)
     lv_obj_t * roller;
 
     /*A roller on the left with left aligned text, and custom width*/
-    roller = lv_roller_create(lv_scr_act());
+    roller = lv_roller_create(lv_screen_active());
     lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
     lv_roller_set_visible_row_count(roller, 2);
     lv_obj_set_width(roller, 100);
@@ -43,7 +43,7 @@ void lv_example_roller_2(void)
     lv_roller_set_selected(roller, 2, LV_ANIM_OFF);
 
     /*A roller on the middle with center aligned text, and auto (default) width*/
-    roller = lv_roller_create(lv_scr_act());
+    roller = lv_roller_create(lv_screen_active());
     lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
     lv_roller_set_visible_row_count(roller, 3);
     lv_obj_add_style(roller, &style_sel, LV_PART_SELECTED);
@@ -52,7 +52,7 @@ void lv_example_roller_2(void)
     lv_roller_set_selected(roller, 5, LV_ANIM_OFF);
 
     /*A roller on the right with right aligned text, and custom width*/
-    roller = lv_roller_create(lv_scr_act());
+    roller = lv_roller_create(lv_screen_active());
     lv_roller_set_options(roller, opts, LV_ROLLER_MODE_NORMAL);
     lv_roller_set_visible_row_count(roller, 4);
     lv_obj_set_width(roller, 80);

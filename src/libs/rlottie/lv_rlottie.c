@@ -170,7 +170,7 @@ static void lv_rlottie_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     }
 
     if(rlottie->task) {
-        lv_timer_del(rlottie->task);
+        lv_timer_delete(rlottie->task);
         rlottie->task = NULL;
         rlottie->play_ctrl = LV_RLOTTIE_CTRL_FORWARD;
         rlottie->dest_frame = 0;

@@ -44,7 +44,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e);
 static void draw_scrollbar(lv_obj_t * obj, lv_layer_t * layer);
 static lv_result_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
-static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state);
+static void update_obj_state(lv_obj_t * obj, lv_state_t new_state);
 
 /**********************
  *  STATIC VARIABLES
@@ -124,7 +124,7 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
     }
 }
 
-void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
+void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -152,6 +152,13 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
 }
 
+
+void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
+{
+    if(v) lv_obj_add_flag(obj, f);
+    else lv_obj_remove_flag(obj, f);
+}
+
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
@@ -163,18 +170,25 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
             lv_indev_reset(NULL, obj);
         }
 
-        lv_obj_set_state(obj, new_state);
+        update_obj_state(obj, new_state);
     }
 }
 
-void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
+void lv_obj_remove_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     lv_state_t new_state = obj->state & (~state);
     if(obj->state != new_state) {
-        lv_obj_set_state(obj, new_state);
+        update_obj_state(obj, new_state);
     }
+}
+
+
+void lv_obj_set_state(lv_obj_t * obj, lv_state_t state, bool v)
+{
+    if(v) lv_obj_add_state(obj, state);
+    else lv_obj_remove_state(obj, state);
 }
 
 /*=======================
@@ -327,7 +341,7 @@ static void lv_obj_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     lv_obj_enable_style_refresh(true);
 
     /*Remove the animations from this object*/
-    lv_anim_del(obj, NULL);
+    lv_anim_delete(obj, NULL);
 
     /*Delete from the group*/
     lv_group_t * group = lv_obj_get_group(obj);
@@ -522,19 +536,19 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_add_state(obj, LV_STATE_PRESSED);
     }
     else if(code == LV_EVENT_RELEASED) {
-        lv_obj_clear_state(obj, LV_STATE_PRESSED);
+        lv_obj_remove_state(obj, LV_STATE_PRESSED);
         void * param = lv_event_get_param(e);
         /*Go the checked state if enabled*/
         if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) lv_obj_add_state(obj, LV_STATE_CHECKED);
-            else lv_obj_clear_state(obj, LV_STATE_CHECKED);
+            else lv_obj_remove_state(obj, LV_STATE_CHECKED);
 
             lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RESULT_OK) return;
         }
     }
     else if(code == LV_EVENT_PRESS_LOST) {
-        lv_obj_clear_state(obj, LV_STATE_PRESSED);
+        lv_obj_remove_state(obj, LV_STATE_PRESSED);
     }
     else if(code == LV_EVENT_STYLE_CHANGED) {
         uint32_t child_cnt = lv_obj_get_child_cnt(obj);
@@ -550,7 +564,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
             }
             else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-                lv_obj_clear_state(obj, LV_STATE_CHECKED);
+                lv_obj_remove_state(obj, LV_STATE_CHECKED);
             }
 
             /*With Enter LV_EVENT_RELEASED will send VALUE_CHANGE event*/
@@ -611,14 +625,14 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
         else {
             lv_obj_add_state(obj, state);
-            lv_obj_clear_state(obj, LV_STATE_EDITED);
+            lv_obj_remove_state(obj, LV_STATE_EDITED);
         }
     }
     else if(code == LV_EVENT_SCROLL_BEGIN) {
         lv_obj_add_state(obj, LV_STATE_SCROLLED);
     }
     else if(code == LV_EVENT_SCROLL_END) {
-        lv_obj_clear_state(obj, LV_STATE_SCROLLED);
+        lv_obj_remove_state(obj, LV_STATE_SCROLLED);
         if(lv_obj_get_scrollbar_mode(obj) == LV_SCROLLBAR_MODE_ACTIVE) {
             lv_area_t hor_area, ver_area;
             lv_obj_get_scrollbar_area(obj, &hor_area, &ver_area);
@@ -627,7 +641,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         }
     }
     else if(code == LV_EVENT_DEFOCUSED) {
-        lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
+        lv_obj_remove_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED | LV_STATE_FOCUS_KEY);
     }
     else if(code == LV_EVENT_SIZE_CHANGED) {
         lv_coord_t align = lv_obj_get_style_align(obj, LV_PART_MAIN);
@@ -660,8 +674,8 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
         lv_obj_draw(e);
     }
     else if(code == LV_EVENT_INDEV_RESET) {
-        lv_obj_clear_state(obj, LV_STATE_PRESSED);
-        lv_obj_clear_state(obj, LV_STATE_SCROLLED);
+        lv_obj_remove_state(obj, LV_STATE_PRESSED);
+        lv_obj_remove_state(obj, LV_STATE_SCROLLED);
     }
 }
 
@@ -671,7 +685,7 @@ static void lv_obj_event(const lv_obj_class_t * class_p, lv_event_t * e)
  * @param obj       pointer to an object
  * @param state     the new state
  */
-static void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
+static void update_obj_state(lv_obj_t * obj, lv_state_t new_state)
 {
     if(obj->state == new_state) return;
 

@@ -34,7 +34,7 @@ To get the current state of the switch (with ``true`` being on), use
 :cpp:expr:`lv_obj_has_state(obj, LV_STATE_CHECKED)`.
 
 Call :cpp:expr:`lv_obj_add_state(obj, LV_STATE_CHECKED)` to turn it on, or
-:cpp:expr:`lv_obj_clear_state(obj, LV_STATE_CHECKED)` to turn it off.
+:cpp:expr:`lv_obj_remove_state(obj, LV_STATE_CHECKED)` to turn it off.
 
 Events
 ******

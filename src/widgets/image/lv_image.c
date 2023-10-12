@@ -422,7 +422,7 @@ static void lv_image_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     img->pivot.y   = LV_PCT(50);
     img->obj_size_mode = LV_IMAGE_SIZE_MODE_VIRTUAL;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
 
     LV_TRACE_OBJ_CREATE("finished");

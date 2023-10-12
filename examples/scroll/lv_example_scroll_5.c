@@ -7,7 +7,7 @@
  */
 void lv_example_scroll_5(void)
 {
-    lv_obj_t * obj = lv_obj_create(lv_scr_act());
+    lv_obj_t * obj = lv_obj_create(lv_screen_active());
     lv_obj_set_style_base_dir(obj, LV_BASE_DIR_RTL, 0);
     lv_obj_set_size(obj, 200, 100);
     lv_obj_center(obj);

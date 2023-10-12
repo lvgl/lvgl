@@ -69,7 +69,7 @@ static void obj_child_node_event_handler(lv_event_t * e)
     lv_obj_t * obj = lv_event_get_target(e);
 
     if(ui->obj_cur) {
-        lv_obj_clear_state(ui->obj_cur, LV_STATE_CHECKED);
+        lv_obj_remove_state(ui->obj_cur, LV_STATE_CHECKED);
     }
 
     lv_obj_add_state(obj, LV_STATE_CHECKED);

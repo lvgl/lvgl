@@ -5,7 +5,7 @@ def event_handler(e):
             print("Clicked: list1." + list1.get_button_text(obj))
 
 # Create a list
-list1 = lv.list(lv.scr_act())
+list1 = lv.list(lv.screen_active())
 list1.set_size(180, 220)
 list1.center()
 

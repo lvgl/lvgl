@@ -41,7 +41,7 @@ Here is some pseudocode to illustrate the concept:
    {
        /* You must always hold the mutex while using LVGL APIs */
        mutex_lock(&lvgl_mutex);
-       lv_obj_t *img = lv_image_create(lv_scr_act());
+       lv_obj_t *img = lv_image_create(lv_screen_active());
        mutex_unlock(&lvgl_mutex);
 
        while(1) {

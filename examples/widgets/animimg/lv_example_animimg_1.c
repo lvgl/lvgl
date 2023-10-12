@@ -12,7 +12,7 @@ static const lv_image_dsc_t * anim_imgs[3] = {
 
 void lv_example_animimg_1(void)
 {
-    lv_obj_t * animimg0 = lv_animimg_create(lv_scr_act());
+    lv_obj_t * animimg0 = lv_animimg_create(lv_screen_active());
     lv_obj_center(animimg0);
     lv_animimg_set_src(animimg0, (const void **) anim_imgs, 3);
     lv_animimg_set_duration(animimg0, 1000);

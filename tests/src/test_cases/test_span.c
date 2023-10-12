@@ -13,7 +13,7 @@ void setUp(void)
 
 void tearDown(void)
 {
-    lv_obj_del(spangroup);
+    lv_obj_delete(spangroup);
 
     if(active_screen) {
         lv_obj_clean(active_screen);
@@ -46,11 +46,11 @@ void test_spangroup_new_span_with_valid_parameter_returns_not_null_object(void)
     TEST_ASSERT_EQUAL_INT(1, lv_spangroup_get_child_cnt(spangroup));
 }
 
-void test_spangroup_del_span_span_is_null(void)
+void test_spangroup_delete_span_span_is_null(void)
 {
     lv_span_t * span = lv_spangroup_new_span(spangroup);
 
-    lv_spangroup_del_span(spangroup, span);
+    lv_spangroup_delete_span(spangroup, span);
 
     TEST_ASSERT_EQUAL_INT(0, lv_spangroup_get_child_cnt(spangroup));
 }
@@ -213,7 +213,7 @@ void test_spangroup_get_max_line_h(void)
 
 void test_spangroup_draw(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     spangroup = lv_spangroup_create(active_screen);
     lv_spangroup_set_mode(spangroup, LV_SPAN_MODE_BREAK);
     lv_obj_set_width(spangroup, 100);
@@ -263,7 +263,7 @@ void test_spangroup_get_expand_width(void)
 {
     const uint32_t experimental_size = 232;
     const uint32_t constrained_size = 232;
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
 
     spangroup = lv_spangroup_create(active_screen);
     lv_span_t * span = lv_spangroup_new_span(spangroup);

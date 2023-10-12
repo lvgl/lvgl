@@ -6,6 +6,6 @@ import display_driver
 #
 from lv_example_rlottie_approve import lv_example_rlottie_approve
 
-lottie = lv.rlottie_create_from_raw(lv.scr_act(), 100, 100, lv_example_rlottie_approve)
+lottie = lv.rlottie_create_from_raw(lv.screen_active(), 100, 100, lv_example_rlottie_approve)
 lottie.center()
 

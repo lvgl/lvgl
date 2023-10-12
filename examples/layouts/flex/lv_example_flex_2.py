@@ -7,7 +7,7 @@ style.set_flex_flow(lv.FLEX_FLOW.ROW_WRAP)
 style.set_flex_main_place(lv.FLEX_ALIGN.SPACE_EVENLY)
 style.set_layout(lv.LAYOUT.FLEX)
 
-cont = lv.obj(lv.scr_act())
+cont = lv.obj(lv.screen_active())
 cont.set_size(300, 220)
 cont.center()
 cont.add_style(style, 0)

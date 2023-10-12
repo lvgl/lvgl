@@ -23,7 +23,7 @@ static void event_cb(lv_event_t * e)
 void lv_example_snapshot_1(void)
 {
     LV_IMAGE_DECLARE(img_star);
-    lv_obj_t * root = lv_scr_act();
+    lv_obj_t * root = lv_screen_active();
     lv_obj_set_style_bg_color(root, lv_palette_main(LV_PALETTE_LIGHT_BLUE), 0);
 
     /*Create an image object to show snapshot*/

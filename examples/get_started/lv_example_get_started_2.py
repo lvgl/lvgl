@@ -5,7 +5,7 @@ class CounterBtn():
         # Create a button with a label and react on click event.
         #
 
-        button = lv.button(lv.scr_act())                               # Add a button the current screen
+        button = lv.button(lv.screen_active())                               # Add a button the current screen
         button.set_pos(10, 10)                                      # Set its position
         button.set_size(120, 50)                                    # Set its size
         button.align(lv.ALIGN.CENTER,0,0)

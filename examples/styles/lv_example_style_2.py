@@ -16,6 +16,6 @@ style.set_bg_main_stop(128)
 style.set_bg_grad_stop(192)
 
 # Create an object with the new style
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.add_style(style, 0)
 obj.center()

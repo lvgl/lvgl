@@ -6,7 +6,7 @@ gc.enable()
 gc.collect()
 mem_free = gc.mem_free()
 
-label = lv.label(lv.scr_act())
+label = lv.label(lv.screen_active())
 label.align(lv.ALIGN.BOTTOM_MID, 0, -10)
 label.set_text(" memory free:" + str(mem_free/1024) + " kB")
 
@@ -37,7 +37,7 @@ def event_cb(e, snapshot_obj):
     mem_used = mem_free - gc.mem_free()
     label.set_text("memory used:" + str(mem_used/1024) + " kB")
 
-root = lv.scr_act()
+root = lv.screen_active()
 root.set_style_bg_color(lv.palette_main(lv.PALETTE.LIGHT_BLUE), 0)
 
 # Create an image object to show snapshot

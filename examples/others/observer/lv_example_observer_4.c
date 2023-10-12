@@ -25,7 +25,7 @@ void lv_example_observer_4(void)
     lv_subject_init_int(&roller_subject[0], 0);
     lv_subject_init_int(&roller_subject[1], 0);
 
-    lv_obj_t * main_cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * main_cont = lv_obj_create(lv_screen_active());
     lv_obj_remove_style_all(main_cont);
     lv_obj_set_size(main_cont, lv_pct(100), lv_pct(100));
     lv_obj_set_style_pad_all(main_cont, 0, 0);
@@ -87,7 +87,7 @@ static void cont_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
     lv_anim_set_exec_cb(&a, anim_set_x_cb);
     lv_anim_set_get_value_cb(&a, anim_get_x_cb);
-    lv_anim_set_ready_cb(&a, lv_obj_del_anim_ready_cb);
+    lv_anim_set_ready_cb(&a, lv_obj_delete_anim_ready_cb);
 
     uint32_t i;
     uint32_t delay = 0;
@@ -179,7 +179,7 @@ static void btn_observer_cb(lv_subject_t * subject, lv_observer_t * observer)
     lv_obj_t * btn = lv_observer_get_target(observer);
     int32_t idx = (int32_t)lv_obj_get_index(btn);
 
-    if(idx == prev_v) lv_obj_clear_state(btn, LV_STATE_CHECKED);
+    if(idx == prev_v) lv_obj_remove_state(btn, LV_STATE_CHECKED);
     if(idx == cur_v) lv_obj_add_state(btn, LV_STATE_CHECKED);
 }
 

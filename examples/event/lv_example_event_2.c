@@ -29,7 +29,7 @@ static void event_cb(lv_event_t * e)
  */
 void lv_example_event_2(void)
 {
-    lv_obj_t * btn = lv_button_create(lv_scr_act());
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
     lv_obj_set_size(btn, 100, 50);
     lv_obj_center(btn);
 
@@ -37,7 +37,7 @@ void lv_example_event_2(void)
     lv_label_set_text(btn_label, "Click me!");
     lv_obj_center(btn_label);
 
-    lv_obj_t * info_label = lv_label_create(lv_scr_act());
+    lv_obj_t * info_label = lv_label_create(lv_screen_active());
     lv_label_set_text(info_label, "The last button event:\nNone");
 
     lv_obj_add_event(btn, event_cb, LV_EVENT_ALL, info_label);

@@ -68,7 +68,7 @@ static void slider_y_event_cb(lv_event_t * e)
 void lv_example_chart_5(void)
 {
     /*Create a chart*/
-    chart = lv_chart_create(lv_scr_act());
+    chart = lv_chart_create(lv_screen_active());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, LV_ALIGN_CENTER, -30, -30);
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, -1000, 1000);
@@ -83,13 +83,13 @@ void lv_example_chart_5(void)
     lv_chart_set_ext_y_array(chart, ser, (lv_coord_t *)ecg_sample);
 
     lv_obj_t * slider;
-    slider = lv_slider_create(lv_scr_act());
+    slider = lv_slider_create(lv_screen_active());
     lv_slider_set_range(slider, LV_SCALE_NONE, LV_SCALE_NONE * 10);
     lv_obj_add_event(slider, slider_x_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(slider, 200, 10);
     lv_obj_align_to(slider, chart, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
 
-    slider = lv_slider_create(lv_scr_act());
+    slider = lv_slider_create(lv_screen_active());
     lv_slider_set_range(slider, LV_SCALE_NONE, LV_SCALE_NONE * 10);
     lv_obj_add_event(slider, slider_y_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(slider, 10, 150);

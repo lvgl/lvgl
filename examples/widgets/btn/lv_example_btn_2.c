@@ -51,7 +51,7 @@ void lv_example_button_2(void)
 
     lv_style_set_transition(&style_pr, &trans);
 
-    lv_obj_t * btn1 = lv_button_create(lv_scr_act());
+    lv_obj_t * btn1 = lv_button_create(lv_screen_active());
     lv_obj_remove_style_all(btn1);                          /*Remove the style coming from the theme*/
     lv_obj_add_style(btn1, &style, 0);
     lv_obj_add_style(btn1, &style_pr, LV_STATE_PRESSED);

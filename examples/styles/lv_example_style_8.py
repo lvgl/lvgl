@@ -18,7 +18,7 @@ style.set_text_line_space(20)
 style.set_text_decor(lv.TEXT_DECOR.UNDERLINE)
 
 # Create an object with the new style
-obj = lv.label(lv.scr_act())
+obj = lv.label(lv.screen_active())
 obj.add_style(style, 0)
 obj.set_text("Text of\n"
              "a label")

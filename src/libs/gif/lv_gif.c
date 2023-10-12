@@ -134,7 +134,7 @@ static void lv_gif_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 
     if(gifobj->gif)
         gd_close_gif(gifobj->gif);
-    lv_timer_del(gifobj->timer);
+    lv_timer_delete(gifobj->timer);
 }
 
 static void next_frame_task_cb(lv_timer_t * t)

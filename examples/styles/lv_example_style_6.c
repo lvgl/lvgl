@@ -21,7 +21,7 @@ void lv_example_style_6(void)
     lv_style_set_transform_rotation(&style, 300);
 
     /*Create an object with the new style*/
-    lv_obj_t * obj = lv_image_create(lv_scr_act());
+    lv_obj_t * obj = lv_image_create(lv_screen_active());
     lv_obj_add_style(obj, &style, 0);
 
     LV_IMAGE_DECLARE(img_cogwheel_argb);

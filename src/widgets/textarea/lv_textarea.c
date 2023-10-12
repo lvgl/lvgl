@@ -210,7 +210,7 @@ void lv_textarea_add_text(lv_obj_t * obj, const char * txt)
     lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
-void lv_textarea_del_char(lv_obj_t * obj)
+void lv_textarea_delete_char(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
@@ -254,13 +254,13 @@ void lv_textarea_del_char(lv_obj_t * obj)
 
 }
 
-void lv_textarea_del_char_forward(lv_obj_t * obj)
+void lv_textarea_delete_char_forward(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
     uint32_t cp = lv_textarea_get_cursor_pos(obj);
     lv_textarea_set_cursor_pos(obj, cp + 1);
-    if(cp != lv_textarea_get_cursor_pos(obj)) lv_textarea_del_char(obj);
+    if(cp != lv_textarea_get_cursor_pos(obj)) lv_textarea_delete_char(obj);
 }
 
 /*=====================
@@ -842,7 +842,7 @@ static void lv_textarea_constructor(const lv_obj_class_t * class_p, lv_obj_t * o
     lv_label_set_text(ta->label, "");
     lv_obj_add_event(ta->label, label_event_cb, LV_EVENT_ALL, NULL);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_WITH_ARROW);
 
     lv_textarea_set_cursor_pos(obj, 0);
 
@@ -896,9 +896,9 @@ static void lv_textarea_event(const lv_obj_class_t * class_p, lv_event_t * e)
         else if(c == LV_KEY_DOWN)
             lv_textarea_cursor_down(obj);
         else if(c == LV_KEY_BACKSPACE)
-            lv_textarea_del_char(obj);
+            lv_textarea_delete_char(obj);
         else if(c == LV_KEY_DEL)
-            lv_textarea_del_char_forward(obj);
+            lv_textarea_delete_char_forward(obj);
         else if(c == LV_KEY_HOME)
             lv_textarea_set_cursor_pos(obj, 0);
         else if(c == LV_KEY_END)
@@ -1043,7 +1043,7 @@ static void start_cursor_blink(lv_obj_t * obj)
     lv_textarea_t * ta = (lv_textarea_t *)obj;
     uint32_t blink_time = lv_obj_get_style_anim_time(obj, LV_PART_CURSOR);
     if(blink_time == 0) {
-        lv_anim_del(obj, cursor_blink_anim_cb);
+        lv_anim_delete(obj, cursor_blink_anim_cb);
         ta->cursor.show = 1;
     }
     else {
@@ -1196,7 +1196,7 @@ static void update_cursor_position_on_click(lv_event_t * e)
             ta->sel_start    = char_id_at_click;
             ta->sel_end      = LV_LABEL_TEXT_SELECTION_OFF;
             ta->text_sel_in_prog = 1;
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN);
         }
         else if(ta->text_sel_in_prog && code == LV_EVENT_PRESSING) {
             /*Input device may be moving. Store the end position*/

@@ -160,7 +160,7 @@ void _lv_demo_music_list_button_check(uint32_t track_id, bool state)
         lv_obj_scroll_to_view(btn, LV_ANIM_ON);
     }
     else {
-        lv_obj_clear_state(btn, LV_STATE_CHECKED);
+        lv_obj_remove_state(btn, LV_STATE_CHECKED);
         lv_image_set_src(icon, &img_lv_demo_music_btn_list_play);
     }
 }

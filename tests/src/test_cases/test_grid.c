@@ -6,7 +6,7 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 }
 
 void tearDown(void)
@@ -31,7 +31,7 @@ void test_subgrid_row(void)
     const lv_coord_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     const lv_coord_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
-    lv_obj_t * cont_main = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont_main = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont_main, 700, 300);
     lv_obj_center(cont_main);
     lv_obj_set_grid_dsc_array(cont_main, col_dsc, row_dsc);
@@ -64,7 +64,7 @@ void test_subgrid_col(void)
     const lv_coord_t col_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
     const lv_coord_t row_dsc[] = {LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
-    lv_obj_t * cont_main = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont_main = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont_main, 700, 300);
     lv_obj_center(cont_main);
     lv_obj_set_grid_dsc_array(cont_main, col_dsc, row_dsc);

@@ -10,7 +10,7 @@ style.set_line_width(6)
 style.set_line_rounded(True)
 
 # Create an object with the new style
-obj = lv.line(lv.scr_act())
+obj = lv.line(lv.screen_active())
 obj.add_style(style, 0)
 p =  [ {"x":10, "y":30},
        {"x":30, "y":50},

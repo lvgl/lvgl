@@ -52,7 +52,7 @@ static _lv_obj_style_t * get_trans_style(lv_obj_t * obj, uint32_t part);
 static lv_style_res_t get_prop_core(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, lv_style_value_t * v);
 static void report_style_change_core(void * style, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
-static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
+static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit);
 static void trans_anim_cb(void * _tr, int32_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
@@ -83,7 +83,7 @@ void lv_obj_add_style(lv_obj_t * obj, const lv_style_t * style, lv_style_selecto
 {
     LV_ASSERT(obj->style_cnt < 63);
 
-    trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
+    trans_delete(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
     lv_part_t part = lv_obj_style_get_selector_part(selector);
 
@@ -151,7 +151,7 @@ bool lv_obj_replace_style(struct _lv_obj_t * obj, const lv_style_t * old_style, 
     }
 
     /*Similar to lv_obj_add_style, delete transition*/
-    trans_del(obj, selector, LV_STYLE_PROP_ANY, NULL);
+    trans_delete(obj, selector, LV_STYLE_PROP_ANY, NULL);
 
     bool replaced = false;
     uint32_t i;
@@ -209,7 +209,7 @@ void lv_obj_remove_style(lv_obj_t * obj, const lv_style_t * style, lv_style_sele
         }
 
         if(obj->styles[i].is_trans) {
-            trans_del(obj, part, LV_STYLE_PROP_ANY, NULL);
+            trans_delete(obj, part, LV_STYLE_PROP_ANY, NULL);
         }
 
         if(obj->styles[i].is_local || obj->styles[i].is_trans) {
@@ -882,7 +882,7 @@ static void refresh_children_style(lv_obj_t * obj)
  * @param prop a property or 0xFF to remove all properties
  * @param tr_limit delete transitions only "older" than this. `NULL` if not used
  */
-static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit)
+static bool trans_delete(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, trans_t * tr_limit)
 {
     trans_t * tr;
     trans_t * tr_prev;
@@ -905,7 +905,7 @@ static bool trans_del(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop, tran
             }
 
             /*Free the transition descriptor too*/
-            lv_anim_del(tr, NULL);
+            lv_anim_delete(tr, NULL);
             _lv_ll_remove(style_trans_ll_p, tr);
             lv_free(tr);
             removed = true;
@@ -992,7 +992,7 @@ static void trans_anim_start_cb(lv_anim_t * a)
     tr->prop = LV_STYLE_PROP_INV;
 
     /*Delete the related transitions if any*/
-    trans_del(tr->obj, part, prop_tmp, tr);
+    trans_delete(tr->obj, part, prop_tmp, tr);
 
     tr->prop = prop_tmp;
 

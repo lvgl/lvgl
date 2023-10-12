@@ -13,7 +13,7 @@ def buttonm_event_handler(e, ta):
         ta.add_text(txt)
 
 
-ta = lv.textarea(lv.scr_act())
+ta = lv.textarea(lv.screen_active())
 ta.set_one_line(True)
 ta.align(lv.ALIGN.TOP_MID, 0, 10)
 ta.add_event(lambda e: textarea_event_handler(e, ta), lv.EVENT.READY, None)
@@ -24,9 +24,9 @@ buttonm_map = ["1", "2", "3", "\n",
             "7", "8", "9", "\n",
             lv.SYMBOL.BACKSPACE, "0", lv.SYMBOL.NEW_LINE, ""]
 
-buttonm = lv.buttonmatrix(lv.scr_act())
+buttonm = lv.buttonmatrix(lv.screen_active())
 buttonm.set_size(200, 150)
 buttonm.align(lv.ALIGN.BOTTOM_MID, 0, -10)
 buttonm.add_event(lambda e: buttonm_event_handler(e, ta), lv.EVENT.VALUE_CHANGED, None)
-buttonm.clear_flag(lv.obj.FLAG.CLICK_FOCUSABLE)    # To keep the text area focused on button clicks
+buttonm.remove_flag(lv.obj.FLAG.CLICK_FOCUSABLE)    # To keep the text area focused on button clicks
 buttonm.set_map(buttonm_map)

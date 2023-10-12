@@ -29,7 +29,7 @@ style.set_image_recolor_opa(lv.OPA._50)
 style.set_transform_rotation(300)
 
 # Create an object with the new style
-obj = lv.image(lv.scr_act())
+obj = lv.image(lv.screen_active())
 obj.add_style(style, 0)
 
 obj.set_src(image_cogwheel_argb)

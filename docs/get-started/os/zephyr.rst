@@ -74,7 +74,7 @@ Leveraging Zephyr Features
 Shell
 ~~~~~
 
-Zephyr includes a powerful shell implementation that can be enabled with the Kconfig symbols 
+Zephyr includes a powerful shell implementation that can be enabled with the Kconfig symbols
 :code:`CONFIG_SHELL` and :code:`CONFIG_LV_Z_SHELL` (the demos from above have it enabled by default).
 
 The shell offers enabling/disabling of LVGL monkeys:
@@ -130,7 +130,7 @@ Example with the encoder device to assign a :code:`lv_group_t`:
     lv_obj_t *arc;
     lv_group_t *arc_group;
 
-    arc = lv_arc_create(lv_scr_act());
+    arc = lv_arc_create(lv_screen_active());
     lv_obj_align(arc, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_size(arc, 150, 150);
 

@@ -42,7 +42,7 @@ void lv_example_slider_2(void)
     lv_style_set_bg_color(&style_pressed_color, lv_palette_darken(LV_PALETTE_CYAN, 2));
 
     /*Create a slider and add the style*/
-    lv_obj_t * slider = lv_slider_create(lv_scr_act());
+    lv_obj_t * slider = lv_slider_create(lv_screen_active());
     lv_obj_remove_style_all(slider);        /*Remove the styles coming from the theme*/
 
     lv_obj_add_style(slider, &style_main, LV_PART_MAIN);

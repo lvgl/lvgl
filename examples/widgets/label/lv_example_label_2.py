@@ -9,11 +9,11 @@ style_shadow.set_text_opa(lv.OPA._30)
 style_shadow.set_text_color(lv.color_black())
 
 # Create a label for the shadow first (it's in the background)
-shadow_label = lv.label(lv.scr_act())
+shadow_label = lv.label(lv.screen_active())
 shadow_label.add_style(style_shadow, 0)
 
 # Create the main label
-main_label = lv.label(lv.scr_act())
+main_label = lv.label(lv.screen_active())
 main_label.set_text("A simple method to create\n"
                    "shadows on a text.\n"
                    "It even works with\n\n"

@@ -41,7 +41,7 @@ static void add_data(lv_timer_t * timer)
  */
 void lv_example_chart_7(void)
 {
-    lv_obj_t * chart = lv_chart_create(lv_scr_act());
+    lv_obj_t * chart = lv_chart_create(lv_screen_active());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, LV_ALIGN_CENTER, 0, 0);
     lv_obj_add_event(chart, draw_event_cb, LV_EVENT_DRAW_TASK_ADDED, NULL);

@@ -101,7 +101,7 @@ lv_span_t * lv_spangroup_new_span(lv_obj_t * obj);
  * @param obj pointer to a spangroup object.
  * @param span pointer to a span.
  */
-void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span);
+void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span);
 
 /*=====================
  * Setter functions

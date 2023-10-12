@@ -7,7 +7,7 @@ class LV_ExampleAnimTimeline_1(object):
         # Create an animation timeline
         #
 
-        self.par = lv.scr_act()
+        self.par = lv.screen_active()
         self.par.set_flex_flow(lv.FLEX_FLOW.ROW)
         self.par.set_flex_align(lv.FLEX_ALIGN.SPACE_AROUND, lv.FLEX_ALIGN.CENTER, lv.FLEX_ALIGN.CENTER)
 
@@ -22,7 +22,7 @@ class LV_ExampleAnimTimeline_1(object):
         self.label_run.center()
 
         self.button_del = lv.button(self.par)
-        self.button_del.add_event(self.button_del_event_handler, lv.EVENT.CLICKED, None)
+        self.button_del.add_event(self.button_delete_event_handler, lv.EVENT.CLICKED, None)
         self.button_del.add_flag(lv.obj.FLAG.IGNORE_LAYOUT)
         self.button_del.align(lv.ALIGN.TOP_MID, 50, 20)
 
@@ -134,9 +134,9 @@ class LV_ExampleAnimTimeline_1(object):
         self.anim_timeline.set_reverse(reverse)
         self.anim_timeline.start()
 
-    def button_del_event_handler(self,e):
+    def button_delete_event_handler(self,e):
         if self.anim_timeline:
-            self.anim_timeline._del()
+            self.anim_timeline._delete()
         self.anim_timeline = None
 
 

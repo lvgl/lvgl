@@ -17,7 +17,7 @@ void lv_example_gridnav_4(void)
     /*It's assumed that the default group is set and
      *there is a keyboard indev*/
 
-    lv_obj_t * list = lv_list_create(lv_scr_act());
+    lv_obj_t * list = lv_list_create(lv_screen_active());
     lv_gridnav_add(list, LV_GRIDNAV_CTRL_ROLLOVER);
     lv_obj_align(list, LV_ALIGN_LEFT_MID, 10, 0);
     lv_group_add_obj(lv_group_get_default(), list);
@@ -38,7 +38,7 @@ void lv_example_gridnav_4(void)
         lv_group_remove_obj(item);  /*The default group adds it automatically*/
     }
 
-    lv_obj_t * btn = lv_button_create(lv_scr_act());
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
     lv_obj_align(btn, LV_ALIGN_RIGHT_MID, -10, 0);
     lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, "Button");

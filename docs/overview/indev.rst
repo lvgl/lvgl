@@ -25,12 +25,12 @@ Pointer input devices (like a mouse) can have a cursor.
    lv_indev_t * mouse_indev = lv_indev_create();
    ...
    LV_IMG_DECLARE(mouse_cursor_icon);                          /*Declare the image source.*/
-   lv_obj_t * cursor_obj = lv_image_create(lv_scr_act());      /*Create an image object for the cursor */
+   lv_obj_t * cursor_obj = lv_image_create(lv_screen_active());      /*Create an image object for the cursor */
    lv_image_set_src(cursor_obj, &mouse_cursor_icon);           /*Set the image source*/
    lv_indev_set_cursor(mouse_indev, cursor_obj);               /*Connect the image  object to the driver*/
 
 Note that the cursor object should have
-:cpp:expr:`lv_obj_clear_flag(cursor_obj, LV_OBJ_FLAG_CLICKABLE)`. For images,
+:cpp:expr:`lv_obj_remove_flag(cursor_obj, LV_OBJ_FLAG_CLICKABLE)`. For images,
 *clicking* is disabled by default.
 
 Gestures
@@ -68,7 +68,7 @@ event. For example:
    lv_obj_add_event(screen1, my_event, LV_EVENT_GESTURE, NULL);
 
 To prevent passing the gesture event to the parent from an object use
-:cpp:expr:`lv_obj_clear_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.
+:cpp:expr:`lv_obj_remove_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)`.
 
 Note that, gestures are not triggered if an object is being scrolled.
 
@@ -109,7 +109,7 @@ To associate a group with an input device use
 Keys
 ^^^^
 
-There are some predefined keys which have special meaning: 
+There are some predefined keys which have special meaning:
 
 - :cpp:enumerator:`LV_KEY_NEXT`: Focus on the next object
 - :cpp:enumerator:`LV_KEY_PREV`: Focus on the previous object
@@ -134,7 +134,7 @@ The most important special keys In your ``read_cb`` function
  - :cpp:enumerator:`LV_KEY_LEFT`
  - :cpp:enumerator:`LV_KEY_RIGHT`
 
-You should translate some of your keys to these special keys to support navigation 
+You should translate some of your keys to these special keys to support navigation
 in a group and interact with selected objects.
 
 Usually, it's enough to use only :cpp:enumerator:`LV_KEY_LEFT` and :cpp:enumerator:`LV_KEY_RIGHT` because most

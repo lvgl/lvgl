@@ -129,7 +129,7 @@ lv_span_t * lv_spangroup_new_span(lv_obj_t * obj)
     return span;
 }
 
-void lv_spangroup_del_span(lv_obj_t * obj, lv_span_t * span)
+void lv_spangroup_delete_span(lv_obj_t * obj, lv_span_t * span)
 {
     if(obj == NULL || span == NULL) {
         return;

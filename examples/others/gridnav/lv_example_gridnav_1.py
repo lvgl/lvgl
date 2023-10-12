@@ -4,7 +4,7 @@
 # It's assumed that the default group is set and
 # there is a keyboard indev
 
-cont1 = lv.obj(lv.scr_act())
+cont1 = lv.obj(lv.screen_active())
 lv.gridnav_add(cont1, lv.GRIDNAV_CTRL.NONE)
 
 # Use flex here, but works with grid or manually placed objects as well
@@ -30,7 +30,7 @@ for i in range(10):
 
 # Create a second container with rollover grid nav mode.
 
-cont2 = lv.obj(lv.scr_act())
+cont2 = lv.obj(lv.screen_active())
 lv.gridnav_add(cont2,lv.GRIDNAV_CTRL.ROLLOVER)
 cont2.set_style_bg_color(lv.palette_lighten(lv.PALETTE.BLUE, 5), lv.STATE.FOCUSED)
 cont2.set_size(lv.pct(50), lv.pct(100))

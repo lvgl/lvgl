@@ -67,7 +67,7 @@ lv_group_t * lv_group_create(void)
     return group;
 }
 
-void lv_group_del(lv_group_t * group)
+void lv_group_delete(lv_group_t * group)
 {
     /*Defocus the currently focused object*/
     if(group->obj_focus != NULL) {

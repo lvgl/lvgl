@@ -576,7 +576,7 @@ static void lv_ime_pinyin_constructor(const lv_obj_class_t * class_p, lv_obj_t *
     lv_obj_add_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 
     lv_buttonmatrix_set_one_checked(pinyin_ime->cand_panel, true);
-    lv_obj_clear_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_remove_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     /* Set cand_panel style*/
     // Default style
@@ -622,10 +622,10 @@ static void lv_ime_pinyin_destructor(const lv_obj_class_t * class_p, lv_obj_t * 
     lv_ime_pinyin_t * pinyin_ime = (lv_ime_pinyin_t *)obj;
 
     if(lv_obj_is_valid(pinyin_ime->kb))
-        lv_obj_del(pinyin_ime->kb);
+        lv_obj_delete(pinyin_ime->kb);
 
     if(lv_obj_is_valid(pinyin_ime->cand_panel))
-        lv_obj_del(pinyin_ime->cand_panel);
+        lv_obj_delete(pinyin_ime->cand_panel);
 }
 
 
@@ -660,7 +660,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
                 pinyin_input_proc(obj);
 
                 for(int index = 0; index <  tmp_button_str_len; index++) {
-                    lv_textarea_del_char(ta);
+                    lv_textarea_delete_char(ta);
                 }
 
                 pinyin_ime->ta_count = tmp_button_str_len;
@@ -712,7 +712,7 @@ static void lv_ime_pinyin_kb_event(lv_event_t * e)
         }
         else if(strcmp(txt, "123") == 0) {
             for(uint16_t i = 0; i < lv_strlen(txt); i++)
-                lv_textarea_del_char(ta);
+                lv_textarea_delete_char(ta);
 
             pinyin_ime_clear_data(obj);
             lv_textarea_set_cursor_pos(ta, LV_TEXTAREA_CURSOR_LAST);
@@ -794,7 +794,7 @@ static void lv_ime_pinyin_cand_panel_event(lv_event_t * e)
         const char * txt = lv_buttonmatrix_get_button_text(cand_panel, id);
         uint16_t index = 0;
         for(index = 0; index < pinyin_ime->ta_count; index++)
-            lv_textarea_del_char(ta);
+            lv_textarea_delete_char(ta);
 
         lv_textarea_add_text(ta, txt);
 
@@ -826,7 +826,7 @@ static void pinyin_input_proc(lv_obj_t * obj)
         }
     }
 
-    lv_obj_clear_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(pinyin_ime->cand_panel, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void pinyin_page_proc(lv_obj_t * obj, uint16_t dir)
@@ -1137,7 +1137,7 @@ static void pinyin_k9_fill_cand(lv_obj_t * obj)
 
     lv_obj_t * ta = lv_keyboard_get_textarea(pinyin_ime->kb);
     for(index = 0; index < pinyin_ime->k9_input_str_len; index++) {
-        lv_textarea_del_char(ta);
+        lv_textarea_delete_char(ta);
     }
     pinyin_ime->k9_input_str_len = lv_strlen(pinyin_ime->input_char);
     lv_textarea_add_text(ta, pinyin_ime->input_char);

@@ -48,12 +48,12 @@ void lv_example_observer_3(void)
     lv_subject_init_group(&time_subject, time_group_array_subject, 4);
 
     /*Create the UI*/
-    lv_obj_t * time_label = lv_label_create(lv_scr_act());
+    lv_obj_t * time_label = lv_label_create(lv_screen_active());
     lv_obj_set_style_text_font(time_label, &lv_font_montserrat_30, 0);
     lv_subject_add_observer_obj(&time_subject, time_observer_cb, time_label, NULL);
     lv_obj_set_pos(time_label, 24, 24);
 
-    lv_obj_t * set_btn = lv_button_create(lv_scr_act());
+    lv_obj_t * set_btn = lv_button_create(lv_screen_active());
     lv_obj_set_pos(set_btn, 180, 24);
     lv_obj_add_event(set_btn, set_btn_clicked_event_cb, LV_EVENT_CLICKED, NULL);
 
@@ -73,7 +73,7 @@ static void set_btn_clicked_event_cb(lv_event_t * e)
     lv_obj_t * set_btn = lv_event_get_target(e);
     lv_obj_add_state(set_btn, LV_STATE_DISABLED);
 
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, lv_pct(100), LV_SIZE_CONTENT);
     lv_obj_align(cont, LV_ALIGN_BOTTOM_MID, 0, 0);
 
@@ -115,8 +115,8 @@ static void close_clicked_event_cb(lv_event_t * e)
     lv_obj_t * set_btn = lv_event_get_user_data(e);
     lv_obj_t * close_btn = lv_event_get_target(e);
     lv_obj_t * cont = lv_obj_get_parent(close_btn);
-    lv_obj_clear_state(set_btn, LV_STATE_DISABLED);
-    lv_obj_del(cont);
+    lv_obj_remove_state(set_btn, LV_STATE_DISABLED);
+    lv_obj_delete(cont);
 }
 
 /*Watch all related subject to display the current time correctly*/

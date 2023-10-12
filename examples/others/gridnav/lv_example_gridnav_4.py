@@ -10,7 +10,7 @@ def event_handler(e):
 # It's assumed that the default group is set and
 # there is a keyboard indev
 
-list = lv.list(lv.scr_act())
+list = lv.list(lv.screen_active())
 lv.gridnav_add(list, lv.GRIDNAV_CTRL.ROLLOVER)
 list.align(lv.ALIGN.LEFT_MID, 0, 10)
 lv.group_get_default().add_obj(list)
@@ -29,7 +29,7 @@ for i in range(20):
     item.add_event(event_handler, lv.EVENT.CLICKED, None)
     lv.group_remove_obj(item)  # The default group adds it automatically
 
-button = lv.button(lv.scr_act())
+button = lv.button(lv.screen_active())
 button.align(lv.ALIGN.RIGHT_MID, 0, -10)
 label = lv.label(button)
 label.set_text("Button")

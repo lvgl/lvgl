@@ -107,7 +107,7 @@ lv_group_t * lv_group_create(void);
  * Delete a group object
  * @param group     pointer to a group
  */
-void lv_group_del(lv_group_t * group);
+void lv_group_delete(lv_group_t * group);
 
 /**
  * Set a default group. New object are added to this group if it's enabled in their class with `add_to_def_group = true`

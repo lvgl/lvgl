@@ -25,7 +25,7 @@ void lv_example_imgbtn_1(void)
     lv_style_set_transform_width(&style_pr, 20);
 
     /*Create an image button*/
-    lv_obj_t * imgbtn1 = lv_imgbtn_create(lv_scr_act());
+    lv_obj_t * imgbtn1 = lv_imgbtn_create(lv_screen_active());
     lv_imgbtn_set_src(imgbtn1, LV_IMGBTN_STATE_RELEASED, &imgbtn_left, &imgbtn_mid, &imgbtn_right);
     lv_obj_add_style(imgbtn1, &style_def, 0);
     lv_obj_add_style(imgbtn1, &style_pr, LV_STATE_PRESSED);

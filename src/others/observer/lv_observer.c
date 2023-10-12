@@ -536,7 +536,7 @@ static void obj_flag_observer_cb(lv_subject_t * subject, lv_observer_t * observe
         lv_obj_add_flag(observer->target, p->flag);
     }
     else {
-        lv_obj_clear_flag(observer->target, p->flag);
+        lv_obj_remove_flag(observer->target, p->flag);
     }
 }
 
@@ -551,7 +551,7 @@ static void obj_state_observer_cb(lv_subject_t * subject, lv_observer_t * observ
         lv_obj_add_state(observer->target, p->flag);
     }
     else {
-        lv_obj_clear_state(observer->target, p->flag);
+        lv_obj_remove_state(observer->target, p->flag);
     }
 }
 

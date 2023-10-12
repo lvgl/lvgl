@@ -8,7 +8,7 @@ def event_cb(e,label):
         label.set_text("The last button event:\nLV_EVENT_LONG_PRESSED")
     elif code == lv.EVENT.LONG_PRESSED_REPEAT:
         label.set_text("The last button event:\nLV_EVENT_LONG_PRESSED_REPEAT")
-button = lv.button(lv.scr_act())
+button = lv.button(lv.screen_active())
 button.set_size(100, 50)
 button.center()
 
@@ -16,7 +16,7 @@ button_label = lv.label(button)
 button_label.set_text("Click me!")
 button_label.center()
 
-info_label = lv.label(lv.scr_act())
+info_label = lv.label(lv.screen_active())
 info_label.set_text("The last button event:\nNone")
 
 button.add_event(lambda e: event_cb(e,info_label), lv.EVENT.ALL, None)

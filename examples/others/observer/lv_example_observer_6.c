@@ -20,7 +20,7 @@ void lv_example_observer_6(void)
 {
     lv_subject_init_int(&theme_subject, THEME_MODE_DARK);
 
-    lv_obj_t * panel1 = my_panel_create(lv_scr_act());
+    lv_obj_t * panel1 = my_panel_create(lv_screen_active());
     lv_obj_set_flex_flow(panel1, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(panel1, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
     lv_obj_set_size(panel1, lv_pct(90), lv_pct(90));

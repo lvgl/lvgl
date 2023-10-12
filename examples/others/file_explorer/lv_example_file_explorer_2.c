@@ -39,7 +39,7 @@ static void btn_event_handler(lv_event_t * e)
         if(lv_obj_has_state(btn, LV_STATE_CHECKED))
             lv_obj_add_flag(file_explorer, LV_OBJ_FLAG_HIDDEN);
         else
-            lv_obj_clear_flag(file_explorer, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_remove_flag(file_explorer, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
@@ -63,7 +63,7 @@ static void dd_event_handler(lv_event_t * e)
 
 void lv_example_file_explorer_2(void)
 {
-    lv_obj_t * file_explorer = lv_file_explorer_create(lv_scr_act());
+    lv_obj_t * file_explorer = lv_file_explorer_create(lv_screen_active());
 
 #if LV_USE_FS_WIN32
     lv_file_explorer_open_dir(file_explorer, "D:");

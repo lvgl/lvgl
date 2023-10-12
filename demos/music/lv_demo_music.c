@@ -113,10 +113,10 @@ static const uint32_t time_list[] = {
 
 void lv_demo_music(void)
 {
-    lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x343247), 0);
+    lv_obj_set_style_bg_color(lv_screen_active(), lv_color_hex(0x343247), 0);
 
-    list = _lv_demo_music_list_create(lv_scr_act());
-    ctrl = _lv_demo_music_main_create(lv_scr_act());
+    list = _lv_demo_music_list_create(lv_screen_active());
+    ctrl = _lv_demo_music_main_create(lv_screen_active());
 
 #if LV_DEMO_MUSIC_AUTO_PLAY
     lv_timer_create(auto_step_cb, 1000, NULL);
@@ -241,7 +241,7 @@ static void auto_step_cb(lv_timer_t * t)
                 break;
             }
         case 41:
-            lv_scr_load(lv_obj_create(NULL));
+            lv_screen_load(lv_obj_create(NULL));
             _lv_demo_music_pause();
             break;
     }

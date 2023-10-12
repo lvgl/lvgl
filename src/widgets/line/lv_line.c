@@ -117,7 +117,7 @@ static void lv_line_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
     line->point_array = NULL;
     line->y_inv       = 0;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
     LV_TRACE_OBJ_CREATE("finished");
 }

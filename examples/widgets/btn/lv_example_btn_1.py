@@ -7,7 +7,7 @@ def event_handler(evt):
         print("Value changed seen")
 
 # create a simple button
-button1 = lv.button(lv.scr_act())
+button1 = lv.button(lv.screen_active())
 
 # attach the callback
 button1.add_event(event_handler,lv.EVENT.ALL, None)
@@ -17,7 +17,7 @@ label=lv.label(button1)
 label.set_text("Button")
 
 # create a toggle button
-button2 = lv.button(lv.scr_act())
+button2 = lv.button(lv.screen_active())
 
 # attach the callback
 #button2.add_event(event_handler,lv.EVENT.VALUE_CHANGED,None)

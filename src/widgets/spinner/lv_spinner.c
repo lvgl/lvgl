@@ -55,7 +55,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * parent)
 void lv_spinner_set_anim_params(lv_obj_t * obj, uint32_t t, uint32_t angle)
 {
     /*Delete the current animation*/
-    lv_anim_del(obj, NULL);
+    lv_anim_delete(obj, NULL);
 
     lv_anim_t a;
     lv_anim_init(&a);
@@ -87,7 +87,7 @@ static void lv_spinner_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
 
     LV_UNUSED(class_p);
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICKABLE);
 
     lv_spinner_set_anim_params(obj, DEF_TIME, DEF_ARC_ANGLE);
 }

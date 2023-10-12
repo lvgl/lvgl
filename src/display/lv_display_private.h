@@ -110,7 +110,7 @@ struct _lv_display_t {
     struct _lv_obj_t ** screens;    /**< Array of screen objects.*/
     struct _lv_obj_t * act_scr;     /**< Currently active screen on this display*/
     struct _lv_obj_t * prev_scr;    /**< Previous screen. Used during screen animations*/
-    struct _lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_scr_load_anim*/
+    struct _lv_obj_t * scr_to_load; /**< The screen prepared to load in lv_screen_load_anim*/
     struct _lv_obj_t * bottom_layer;    /**< @see lv_display_get_layer_bottom*/
     struct _lv_obj_t * top_layer;       /**< @see lv_display_get_layer_top*/
     struct _lv_obj_t * sys_layer;       /**< @see lv_display_get_layer_sys*/

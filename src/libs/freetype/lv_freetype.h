@@ -61,7 +61,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16
  * Delete a freetype font.
  * @param font freetype font to be deleted.
  */
-void lv_freetype_font_del(lv_font_t * font);
+void lv_freetype_font_delete(lv_font_t * font);
 
 /**********************
  *      MACROS
