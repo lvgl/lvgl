@@ -175,49 +175,6 @@ void lv_chart_set_update_mode(lv_obj_t * obj, lv_chart_update_mode_t update_mode
 void lv_chart_set_div_line_count(lv_obj_t * obj, uint8_t hdiv, uint8_t vdiv);
 
 /**
- * Zoom into the chart in X direction
- * @param obj       pointer to a chart object
- * @param zoom_x    zoom in x direction. LV_SCALE_NONE or 256 for no zoom, 512 double zoom
- */
-void lv_chart_set_zoom_x(lv_obj_t * obj, uint32_t zoom_x);
-
-/**
- * Zoom into the chart in Y direction
- * @param obj       pointer to a chart object
- * @param zoom_y    zoom in y direction. LV_SCALE_NONE or 256 for no zoom, 512 double zoom
- */
-void lv_chart_set_zoom_y(lv_obj_t * obj, uint32_t zoom_y);
-
-/**
- * Get X zoom of a chart
- * @param obj       pointer to a chart object
- * @return          the X zoom value
- */
-uint32_t lv_chart_get_zoom_x(const lv_obj_t * obj);
-
-/**
- * Get Y zoom of a chart
- * @param obj       pointer to a chart object
- * @return          the Y zoom value
- */
-uint32_t lv_chart_get_zoom_y(const lv_obj_t * obj);
-
-/**
- * Set the number of tick lines on an axis
- * @param obj           pointer to a chart object
- * @param axis          an axis which ticks count should be set
- * @param major_len     length of major ticks
- * @param minor_len     length of minor ticks
- * @param major_cnt     number of major ticks on the axis
- * @param minor_cnt     number of minor ticks between two major ticks
- * @param label_en      true: enable label drawing on major ticks
- * @param draw_size     extra size required to draw the tick and labels
- *                      (start with 20 px and increase if the ticks/labels are clipped)
- */
-void lv_chart_set_axis_tick(lv_obj_t * obj, lv_chart_axis_t axis, lv_coord_t major_len, lv_coord_t minor_len,
-                            lv_coord_t major_cnt, lv_coord_t minor_cnt, bool label_en, lv_coord_t draw_size);
-
-/**
  * Get the type of a chart
  * @param obj       pointer to chart object
  * @return          type of the chart (from 'lv_chart_t' enum)
