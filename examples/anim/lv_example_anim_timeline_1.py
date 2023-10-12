@@ -136,7 +136,7 @@ class LV_ExampleAnimTimeline_1(object):
 
     def button_delete_event_handler(self,e):
         if self.anim_timeline:
-            self.anim_timeline._delete()
+            self.anim_timeline.delete()
         self.anim_timeline = None
 
 
