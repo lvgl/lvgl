@@ -88,9 +88,9 @@ void * lv_draw_buf_align(void * data, lv_color_format_t color_format)
     else return NULL;
 }
 
-void lv_draw_buf_invalidate_cache(void * buf, size_t size)
+void lv_draw_buf_invalidate_cache(void * buf, uint32_t stride, lv_color_format_t color_format, const lv_area_t * area)
 {
-    if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, size);
+    if(handlers.invalidate_cache_cb) handlers.invalidate_cache_cb(buf, stride, color_format, area);
 }
 
 void * lv_draw_buf_go_to_xy(const void * buf, uint32_t stride, lv_color_format_t color_format, lv_coord_t x,
