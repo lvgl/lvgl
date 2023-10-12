@@ -48,7 +48,7 @@ enum {
     LV_SCALE_MODE_VERTICAL_LEFT     = 0x02U,
     LV_SCALE_MODE_VERTICAL_RIGHT    = 0x04U,
     LV_SCALE_MODE_ROUND_INNER       = 0x08U,
-    LV_SCALE_MODE_ROUND_OUTTER      = 0x10U,
+    LV_SCALE_MODE_ROUND_OUTER      = 0x10U,
     _LV_SCALE_MODE_LAST
 };
 typedef uint32_t lv_scale_mode_t;
@@ -72,7 +72,7 @@ typedef struct {
 typedef struct {
     lv_obj_t obj;
     lv_ll_t section_ll;     /**< Linked list for the sections (stores lv_scale_section_t)*/
-    char ** txt_src;
+    const char ** txt_src;
     lv_coord_t custom_label_cnt;
     lv_coord_t major_len;
     lv_coord_t minor_len;
@@ -174,7 +174,7 @@ void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rota
  * @param obj       pointer to a scale object
  * @param txt_src   pointer to an array of strings which will be display at major ticks
  */
-void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src[]);
+void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[]);
 
 /**
  * Draw the scale after all the children are drawn

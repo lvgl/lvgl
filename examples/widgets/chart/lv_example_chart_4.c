@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_BUILD_EXAMPLES
+#if LV_USE_CHART && LV_BUILD_EXAMPLES && 0
 
 
 static void event_cb(lv_event_t * e)
@@ -71,7 +71,7 @@ void lv_example_chart_4(void)
     lv_obj_refresh_ext_draw_size(chart);
 
     /*Zoom in a little in X*/
-    lv_chart_set_zoom_x(chart, 800);
+    //    lv_chart_set_zoom_x(chart, 800);
 
     /*Add two data series*/
     lv_chart_series_t * ser1 = lv_chart_add_series(chart, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);

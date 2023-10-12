@@ -141,6 +141,19 @@ struct _lv_obj_t * lv_obj_get_parent(const struct _lv_obj_t * obj);
 struct _lv_obj_t * lv_obj_get_child(const struct _lv_obj_t * obj, int32_t id);
 
 /**
+ * Return a sibling of an object
+ * @param obj       pointer to an object whose sibling should be get
+ * @param id        0: `obj` itself
+ *                  -1: the first older sibling
+ *                  -2: the next older sibling
+ *                  1: the first younger sibling
+ *                  2: the next younger sibling
+ *                  etc
+ * @return          pointer to the requested sibling  or NULL if there is no such sibling
+ */
+struct _lv_obj_t * lv_obj_get_sibling(const struct _lv_obj_t * obj, int32_t id);
+
+/**
  * Get the number of children
  * @param obj       pointer to an object
  * @return          the number of children

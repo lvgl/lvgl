@@ -50,8 +50,8 @@ void lv_example_chart_7(void)
 
     lv_chart_set_type(chart, LV_CHART_TYPE_SCATTER);
 
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 5, 5, 5, 1, true, 30);
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 5, true, 50);
+    //    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 5, 5, 5, 1, true, 30);
+    //    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 5, true, 50);
 
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_X, 0, 200);
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, 0, 1000);

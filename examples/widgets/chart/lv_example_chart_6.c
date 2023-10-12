@@ -25,8 +25,8 @@ void lv_example_chart_6(void)
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, LV_ALIGN_CENTER, 0, -10);
 
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 5, true, 40);
-    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 10, 5, 10, 1, true, 30);
+    //    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_Y, 10, 5, 6, 5, true, 40);
+    //    lv_chart_set_axis_tick(chart, LV_CHART_AXIS_PRIMARY_X, 10, 5, 10, 1, true, 30);
 
     lv_obj_add_event(chart, value_changed_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_refresh_ext_draw_size(chart);
@@ -39,7 +39,7 @@ void lv_example_chart_6(void)
         lv_chart_set_next_value(chart, ser, lv_rand(10, 90));
     }
 
-    lv_chart_set_zoom_x(chart, 500);
+    //    lv_chart_set_zoom_x(chart, 500);
 
     lv_obj_t * label = lv_label_create(lv_scr_act());
     lv_label_set_text(label, "Click on a point");

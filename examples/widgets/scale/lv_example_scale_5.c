@@ -17,7 +17,7 @@ void lv_example_scale_5(void)
     lv_scale_set_minor_tick_length(scale, 5);
     lv_scale_set_range(scale, 25, 35);
 
-    static char * custom_labels[3] = {"One", "Two", NULL};
+    static const char * custom_labels[3] = {"One", "Two", NULL};
     lv_scale_set_text_src(scale, custom_labels);
 
     static lv_style_t indicator_style;
@@ -36,7 +36,7 @@ void lv_example_scale_5(void)
     lv_style_set_line_color(&minor_ticks_style, lv_color_hex(0xff0000));
     lv_style_set_width(&minor_ticks_style, 5U); // Tick length
     lv_style_set_line_width(&minor_ticks_style, 2U); // Tick width
-    lv_obj_add_style(scale, &minor_ticks_style, LV_PART_ITEMS);
+    lv_obj_add_style(scale, &minor_ticks_style, LV_PART_TICKS);
 
     static lv_style_t main_line_style;
     lv_style_init(&main_line_style);

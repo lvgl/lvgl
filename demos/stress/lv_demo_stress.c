@@ -233,9 +233,9 @@ static void obj_test_task_cb(lv_timer_t * tmr)
             lv_anim_set_exec_cb(&a, arc_set_end_angle_anim);
             lv_anim_start(&a);
 
-            obj = lv_meter_create(main_page);
+            obj = lv_scale_create(main_page);
+            lv_scale_set_mode(obj, LV_SCALE_MODE_ROUND_INNER);
             lv_obj_scroll_to_view(obj, LV_ANIM_ON);
-            lv_meter_add_needle_line(obj, 3, lv_palette_main(LV_PALETTE_RED), -10);
 
             auto_del(obj, LV_DEMO_STRESS_TIME_STEP * 6 + 30);
             break;

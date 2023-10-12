@@ -107,21 +107,11 @@ typedef struct {
     uint32_t pos_set: 1; /*1: pos is set; 0: point_id is set*/
 } lv_chart_cursor_t;
 
-typedef struct {
-    lv_coord_t major_len;
-    lv_coord_t minor_len;
-    lv_coord_t draw_size;
-    uint32_t minor_cnt : 15;
-    uint32_t major_cnt : 15;
-    uint32_t label_en  : 1;
-} lv_chart_tick_dsc_t;
-
 
 typedef struct {
     lv_obj_t obj;
     lv_ll_t series_ll;     /**< Linked list for the series (stores lv_chart_series_t)*/
     lv_ll_t cursor_ll;     /**< Linked list for the cursors (stores lv_chart_cursor_t)*/
-    lv_chart_tick_dsc_t tick[4];
     lv_coord_t ymin[2];
     lv_coord_t ymax[2];
     lv_coord_t xmin[2];
@@ -130,8 +120,6 @@ typedef struct {
     uint32_t hdiv_cnt;      /**< Number of horizontal division lines*/
     uint32_t vdiv_cnt;      /**< Number of vertical division lines*/
     uint32_t point_cnt;    /**< Point number in a data line*/
-    uint32_t zoom_x;
-    uint32_t zoom_y;
     lv_chart_type_t type  : 3; /**< Line or column chart*/
     lv_chart_update_mode_t update_mode : 1;
 } lv_chart_t;
@@ -450,6 +438,14 @@ lv_coord_t * lv_chart_get_x_array(const lv_obj_t * obj, lv_chart_series_t * ser)
  * @return          the index of the point [0 .. point count] or LV_CHART_POINT_ID_NONE if no point is being pressed
  */
 uint32_t lv_chart_get_pressed_point(const lv_obj_t * obj);
+
+/**
+ * Get the overall offset from the chart's side to the center of the first point.
+ * In case of a bar chart it will be the center of the first column group
+ * @param obj       pointer to a chart object
+ * @return          the offset of the center
+ */
+int32_t lv_chart_get_first_point_center_offset(lv_obj_t * obj);
 
 /**********************
  *      MACROS

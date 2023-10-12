@@ -12,7 +12,7 @@ Parts and Styles
 The scale widget is divided in the following three parts:
 
 - :cpp:enumerator: `LV_PART_MAIN` Main line. See blue line in the example image.
-- :cpp:enumerator: `LV_PART_ITEMS` Minor ticks. See red minor ticks in the example image.
+- :cpp:enumerator: `LV_PART_TICKS` Minor ticks. See red minor ticks in the example image.
 - :cpp:enumerator: `LV_PART_INDICATOR` Major ticks and its labels (if enabled). See pink labels and green major ticks in the example image.
 
 ![](/misc/scale.png "Scale example")
@@ -37,7 +37,7 @@ Sections
 
 A section is the space between a minor and a major range. They can be created with :cpp:expr: `lv_scale_add_section(scale)` and it handles back an :cpp:expr: `lv_scale_section_t` pointer.
 
-The range of the section is configured with :cpp:expr: `lv_scale_section_set_range(section, minor_range, major_range)`. The style of each of the three parts of the scale section can be set with :cpp:expr: `lv_scale_section_set_style(section, PART, style_pointer)`, where `PART` can be :cpp:enumarator: `LV_PART_MAIN`, :cpp:enumarator: `LV_PART_ITEMS` or :cpp:enumarator: `LV_PART_INDICATOR`, :cpp:expr: `style_pointer` should point to a global or static :cpp:expr: `lv_style_t` variable.
+The range of the section is configured with :cpp:expr: `lv_scale_section_set_range(section, minor_range, major_range)`. The style of each of the three parts of the scale section can be set with :cpp:expr: `lv_scale_section_set_style(section, PART, style_pointer)`, where `PART` can be :cpp:enumarator: `LV_PART_MAIN`, :cpp:enumarator: `LV_PART_TICKS` or :cpp:enumarator: `LV_PART_INDICATOR`, :cpp:expr: `style_pointer` should point to a global or static :cpp:expr: `lv_style_t` variable.
 
 For labels the following properties can be configured:
 :cpp:expr: `lv_style_set_text_font`, :cpp:expr: `lv_style_set_text_color`, :cpp:expr: `lv_style_set_text_letter_space`, :cpp:expr: `lv_style_set_text_opa`.

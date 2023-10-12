@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_USE_SLIDER && LV_BUILD_EXAMPLES
+#if LV_USE_CHART && LV_USE_SLIDER && LV_BUILD_EXAMPLES && 0
 
 static lv_obj_t * chart;
 /* Source: https://github.com/ankur219/ECG-Arrhythmia-classification/blob/642230149583adfae1e4bd26c6f0e1fd8af2be0e/sample.csv*/
@@ -50,14 +50,14 @@ static void slider_x_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(obj);
-    lv_chart_set_zoom_x(chart, v);
+    //    lv_chart_set_zoom_x(chart, v);
 }
 
 static void slider_y_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(obj);
-    lv_chart_set_zoom_y(chart, v);
+    //    lv_chart_set_zoom_y(chart, v);
 }
 
 /**

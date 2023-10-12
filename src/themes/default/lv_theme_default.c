@@ -653,10 +653,10 @@ static void style_init(struct _my_theme_t * theme)
 
 #if LV_USE_SCALE
     style_init_reset(&theme->styles.scale);
-    lv_style_set_line_color(&theme->styles.scale, lv_color_black());
-    lv_style_set_line_width(&theme->styles.scale, 2U);
-    lv_style_set_arc_color(&theme->styles.scale, lv_color_black());
-    lv_style_set_arc_width(&theme->styles.scale, 2U);
+    lv_style_set_line_color(&theme->styles.scale, theme->color_grey);
+    lv_style_set_line_width(&theme->styles.scale, LV_DPX(2));
+    lv_style_set_arc_color(&theme->styles.scale, theme->color_grey);
+    lv_style_set_arc_width(&theme->styles.scale, LV_DPX(2));
 #endif
 }
 
@@ -1209,7 +1209,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_scale_class)) {
         lv_obj_add_style(obj, &theme->styles.scale, LV_PART_MAIN);
         lv_obj_add_style(obj, &theme->styles.scale, LV_PART_INDICATOR);
-        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_ITEMS);
+        lv_obj_add_style(obj, &theme->styles.scale, LV_PART_TICKS);
     }
 #endif
 }

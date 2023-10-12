@@ -335,6 +335,13 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, int32_t id)
     else return obj->spec_attr->children[id];
 }
 
+lv_obj_t * lv_obj_get_sibling(const lv_obj_t * obj, int32_t id)
+{
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    return lv_obj_get_child(parent, (int32_t)lv_obj_get_index(obj) + id);
+}
+
+
 uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);

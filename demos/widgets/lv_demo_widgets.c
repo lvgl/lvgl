@@ -35,7 +35,7 @@ static void analytics_create(lv_obj_t * parent);
 static void shop_create(lv_obj_t * parent);
 static void color_changer_create(lv_obj_t * parent);
 
-static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const char * text1, const char * text2,
+static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const char * text1, const char * text2,
                                    const char * text3);
 static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, const char * name, const char * category,
                                    const char * price);
@@ -48,12 +48,10 @@ static void calendar_event_cb(lv_event_t * e);
 static void slider_event_cb(lv_event_t * e);
 static void chart_event_cb(lv_event_t * e);
 static void shop_chart_event_cb(lv_event_t * e);
-static void meter2_event_cb(lv_event_t * e);
-static void meter1_indic1_anim_cb(void * var, int32_t v);
-static void meter1_indic2_anim_cb(void * var, int32_t v);
-static void meter1_indic3_anim_cb(void * var, int32_t v);
-static void meter2_timer_cb(lv_timer_t * timer);
-static void meter3_anim_cb(void * var, int32_t v);
+static void scale2_event_cb(lv_event_t * e);
+static void scale1_indic1_anim_cb(void * var, int32_t v);
+static void scale2_timer_cb(lv_timer_t * timer);
+static void scale3_anim_cb(void * var, int32_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -67,9 +65,9 @@ static lv_style_t style_title;
 static lv_style_t style_icon;
 static lv_style_t style_bullet;
 
-static lv_obj_t * meter1;
-static lv_obj_t * meter2;
-static lv_obj_t * meter3;
+static lv_obj_t * scale1;
+static lv_obj_t * scale2;
+static lv_obj_t * scale3;
 
 static lv_obj_t * chart1;
 static lv_obj_t * chart2;
@@ -529,249 +527,268 @@ static void profile_create(lv_obj_t * parent)
 }
 
 
+static lv_obj_t * create_chart_with_scales(lv_obj_t * parent, const char * title,  const char * hor_text[])
+{
+    static const lv_coord_t col_dsc[] = {40, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    static const lv_coord_t row_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), 40, LV_GRID_TEMPLATE_LAST};
+
+    lv_obj_set_grid_dsc_array(parent, col_dsc, row_dsc);
+    lv_obj_set_style_pad_column(parent, 0, 0);
+    lv_obj_set_style_pad_row(parent, 0, 0);
+
+    lv_obj_t * label = lv_label_create(parent);
+    lv_label_set_text(label, title);
+    lv_obj_add_style(label, &style_title, 0);
+    lv_obj_set_grid_cell(label, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
+
+    lv_obj_t * scale_ver = lv_scale_create(parent);
+    lv_scale_set_mode(scale_ver, LV_SCALE_MODE_VERTICAL_LEFT);
+    lv_obj_set_grid_cell(scale_ver, LV_GRID_ALIGN_END, 0, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
+    lv_scale_set_total_tick_count(scale_ver, 10);
+    lv_scale_set_major_tick_every(scale_ver, 2);
+    lv_scale_set_range(scale_ver, 0, 100);
+
+    lv_obj_t * wrapper = lv_obj_create(parent);
+    lv_obj_remove_style(wrapper, NULL, LV_PART_MAIN);
+    lv_obj_set_grid_dsc_array(wrapper, NULL, NULL);
+    lv_obj_set_grid_cell(wrapper, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 2);
+    lv_obj_set_scroll_dir(wrapper, LV_DIR_HOR);
+
+    lv_obj_t * chart = lv_chart_create(wrapper);
+    lv_group_add_obj(lv_group_get_default(), chart);
+    lv_obj_add_flag(chart, LV_OBJ_FLAG_SCROLL_ON_FOCUS | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
+    lv_chart_set_div_line_count(chart, 0, 12);
+    lv_chart_set_point_count(chart, 12);
+    lv_obj_set_grid_cell(chart, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
+    lv_obj_set_style_border_width(chart, 0, 0);
+    lv_obj_add_event(chart, chart_event_cb, LV_EVENT_ALL, NULL);
+    lv_obj_set_width(chart, lv_pct(200));
+    lv_obj_set_style_radius(chart, 0, 0);
+
+    lv_obj_t * scale_hor = lv_scale_create(wrapper);
+    lv_scale_set_mode(scale_hor, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
+    lv_obj_set_grid_cell(scale_hor, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 1);
+    lv_scale_set_total_tick_count(scale_hor, 11);
+    lv_scale_set_major_tick_every(scale_hor, 1);
+    lv_scale_set_text_src(scale_hor, hor_text);
+    lv_obj_set_width(scale_hor, lv_pct(200));
+    lv_obj_set_height(scale_hor, 40);
+    lv_obj_set_style_pad_hor(scale_hor, lv_obj_get_style_pad_left(chart, 0), 0);
+    lv_obj_set_style_pad_ver(scale_ver, lv_obj_get_style_pad_top(chart, 0), 0);
+    return chart;
+}
+
 static void analytics_create(lv_obj_t * parent)
 {
-    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_ROW_WRAP);
-
-    static lv_coord_t grid_chart_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_FR(1), 10, LV_GRID_TEMPLATE_LAST};
-    static lv_coord_t grid_chart_col_dsc[] = {20, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
+    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_ROW);
 
     lv_obj_t * chart1_cont = lv_obj_create(parent);
-    lv_obj_set_flex_grow(chart1_cont, 1);
-    lv_obj_set_grid_dsc_array(chart1_cont, grid_chart_col_dsc, grid_chart_row_dsc);
-
-    lv_obj_set_height(chart1_cont, LV_PCT(100));
+    lv_obj_set_height(chart1_cont, lv_pct(100));
     lv_obj_set_style_max_height(chart1_cont, 300, 0);
+    lv_obj_set_flex_grow(chart1_cont, 1);
 
-    lv_obj_t * title = lv_label_create(chart1_cont);
-    lv_label_set_text(title, "Unique visitors");
-    lv_obj_add_style(title, &style_title, 0);
-    lv_obj_set_grid_cell(title, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 0, 1);
 
-    chart1 = lv_chart_create(chart1_cont);
-    lv_group_add_obj(lv_group_get_default(), chart1);
-    lv_obj_add_flag(chart1, LV_OBJ_FLAG_SCROLL_ON_FOCUS | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-    lv_obj_set_grid_cell(chart1, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
-    lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 5, 1, true, 80);
-    lv_chart_set_axis_tick(chart1, LV_CHART_AXIS_PRIMARY_X, 0, 0, 12, 1, true, 50);
-    lv_chart_set_div_line_count(chart1, 0, 12);
-    lv_chart_set_point_count(chart1, 12);
-    lv_obj_add_event(chart1, chart_event_cb, LV_EVENT_ALL, NULL);
-    if(disp_size == DISP_SMALL) lv_chart_set_zoom_x(chart1, 256 * 3);
-    else if(disp_size == DISP_MEDIUM) lv_chart_set_zoom_x(chart1, 256 * 2);
-
-    lv_obj_set_style_border_side(chart1, LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_BOTTOM, 0);
-    lv_obj_set_style_radius(chart1, 0, 0);
+    static const char * chart1_texts[] = {"Jan", "Feb", "March", "April", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec", NULL};
+    chart1 = create_chart_with_scales(chart1_cont, "Unique visitors", chart1_texts);
 
     ser1 = lv_chart_add_series(chart1, lv_theme_get_color_primary(chart1), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
-    lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
+    uint32_t i;
+    for(i = 0; i < 12; i++) {
+        lv_chart_set_next_value(chart1, ser1, lv_rand(10, 80));
+    }
 
     lv_obj_t * chart2_cont = lv_obj_create(parent);
-    lv_obj_add_flag(chart2_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-    lv_obj_set_flex_grow(chart2_cont, 1);
-
-    lv_obj_set_height(chart2_cont, LV_PCT(100));
+    lv_obj_set_height(chart2_cont, lv_pct(100));
     lv_obj_set_style_max_height(chart2_cont, 300, 0);
+    lv_obj_set_flex_grow(chart2_cont, 1);
+    lv_obj_add_flag(chart2_cont, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
 
-    lv_obj_set_grid_dsc_array(chart2_cont, grid_chart_col_dsc, grid_chart_row_dsc);
 
-    title = lv_label_create(chart2_cont);
-    lv_label_set_text(title, "Monthly revenue");
-    lv_obj_add_style(title, &style_title, 0);
-    lv_obj_set_grid_cell(title, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 0, 1);
-
-    chart2 = lv_chart_create(chart2_cont);
-    lv_group_add_obj(lv_group_get_default(), chart2);
-    lv_obj_add_flag(chart2, LV_OBJ_FLAG_SCROLL_ON_FOCUS | LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
-
-    lv_obj_set_grid_cell(chart2, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 1, 1);
-    lv_chart_set_axis_tick(chart2, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 5, 1, true, 80);
-    lv_chart_set_axis_tick(chart2, LV_CHART_AXIS_PRIMARY_X, 0, 0, 12, 1, true, 50);
-    lv_obj_set_size(chart2, LV_PCT(100), LV_PCT(100));
+    static const char * chart2_texts[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", NULL};
+    chart2 = create_chart_with_scales(chart2_cont, "Monthly revenue", chart2_texts);
     lv_chart_set_type(chart2, LV_CHART_TYPE_BAR);
-    lv_chart_set_div_line_count(chart2, 6, 0);
-    lv_chart_set_point_count(chart2, 12);
-    lv_obj_add_event(chart2, chart_event_cb, LV_EVENT_ALL, NULL);
-    lv_chart_set_zoom_x(chart2, 256 * 2);
-    lv_obj_set_style_border_side(chart2, LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_BOTTOM, 0);
-    lv_obj_set_style_radius(chart2, 0, 0);
 
-    if(disp_size == DISP_SMALL) {
-        lv_obj_set_style_pad_gap(chart2, 0, LV_PART_ITEMS);
-        lv_obj_set_style_pad_gap(chart2, 2, LV_PART_MAIN);
+    ser2 = lv_chart_add_series(chart2, lv_palette_main(LV_PALETTE_GREY), LV_CHART_AXIS_PRIMARY_Y);
+    ser3 = lv_chart_add_series(chart2, lv_theme_get_color_primary(chart2), LV_CHART_AXIS_PRIMARY_Y);
+    for(i = 0; i < 12; i++) {
+        lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
+        lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
     }
-    else if(disp_size == DISP_LARGE) {
-        lv_obj_set_style_pad_gap(chart2, 16, 0);
+    lv_obj_t * chart2_hor_scale = lv_obj_get_sibling(chart2, 1);
+    lv_obj_set_style_pad_hor(chart2_hor_scale, lv_chart_get_first_point_center_offset(chart2), 0);
+
+    /*Create all 3 scales first to have their size resolved*/
+    scale1 = create_scale_box(parent, "Monthly Target", "Revenue: -", "Sales: -", "Costs: -");
+    lv_obj_add_flag(lv_obj_get_parent(scale1), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+
+    scale2 = create_scale_box(parent, "Sessions", "Desktop: -", "Tablet: -", "Mobile: -");
+    if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(scale2), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+
+    scale3 = create_scale_box(parent, "Network Speed", "Low speed", "Normal Speed", "High Speed");
+    if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(scale3), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+
+    lv_obj_update_layout(parent);
+    lv_coord_t scale_w;
+    if(disp_size == DISP_MEDIUM) {
+        scale_w = 200;
+        lv_obj_set_size(scale1, scale_w, scale_w);
+        lv_obj_set_size(scale2, scale_w, scale_w);
+        lv_obj_set_size(scale3, scale_w, scale_w);
     }
-
-    ser2 = lv_chart_add_series(chart2, lv_palette_lighten(LV_PALETTE_GREY, 1), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser2, lv_rand(10, 80));
-
-    ser3 = lv_chart_add_series(chart2, lv_theme_get_color_primary(chart1), LV_CHART_AXIS_PRIMARY_Y);
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-    lv_chart_set_next_value(chart2, ser3, lv_rand(10, 80));
-
-    lv_meter_indicator_t * indic;
-    meter1 = create_meter_box(parent, "Monthly Target", "Revenue: 63%", "Sales: 44%", "Costs: 58%");
-    lv_obj_add_flag(lv_obj_get_parent(meter1), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-    lv_meter_set_scale_range(meter1, 0, 100, 270, 90);
-    lv_meter_set_scale_ticks(meter1, 0, 0, 0, lv_color_black());
+    else {
+        scale_w = lv_obj_get_width(scale1);
+        lv_obj_set_height(scale1, scale_w);
+        lv_obj_set_height(scale2, scale_w);
+        lv_obj_set_height(scale3, scale_w);
+    }
 
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_values(&a, 20, 100);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
-    indic = lv_meter_add_arc(meter1, 15, lv_palette_main(LV_PALETTE_BLUE), 0);
-    lv_anim_set_exec_cb(&a, meter1_indic1_anim_cb);
-    lv_anim_set_var(&a, indic);
+    /*Scale 1*/
+    lv_scale_set_mode(scale1, LV_SCALE_MODE_ROUND_OUTER);
+    lv_obj_set_style_pad_all(scale1, 30, 0);
+    lv_obj_t * arc;
+    arc = lv_arc_create(scale1);
+    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+    lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_arc_opa(arc, 0, 0);
+    lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
+    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+
+    lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
+    lv_anim_set_var(&a, arc);
     lv_anim_set_time(&a, 4100);
     lv_anim_set_playback_time(&a, 2700);
     lv_anim_start(&a);
 
-    indic = lv_meter_add_arc(meter1, 15, lv_palette_main(LV_PALETTE_RED), -20);
-    lv_anim_set_exec_cb(&a, meter1_indic2_anim_cb);
-    lv_anim_set_var(&a, indic);
+    arc = lv_arc_create(scale1);
+    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+    lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_margin_all(arc, 20, 0);
+    lv_obj_set_style_arc_opa(arc, 0, 0);
+    lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
+    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(arc);
+
+    lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
+    lv_anim_set_var(&a, arc);
     lv_anim_set_time(&a, 2600);
     lv_anim_set_playback_time(&a, 3200);
-    a.user_data = indic;
     lv_anim_start(&a);
 
-    indic = lv_meter_add_arc(meter1, 15, lv_palette_main(LV_PALETTE_GREEN), -40);
-    lv_anim_set_exec_cb(&a, meter1_indic3_anim_cb);
-    lv_anim_set_var(&a, indic);
+    arc = lv_arc_create(scale1);
+    lv_obj_remove_style(arc, NULL, LV_PART_KNOB);
+    lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_margin_all(arc, 40, 0);
+    lv_obj_set_style_arc_opa(arc, 0, 0);
+    lv_obj_set_style_arc_width(arc, 15, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
+    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(arc);
+
+    lv_anim_set_exec_cb(&a, scale1_indic1_anim_cb);
+    lv_anim_set_var(&a, arc);
     lv_anim_set_time(&a, 2800);
     lv_anim_set_playback_time(&a, 1800);
     lv_anim_start(&a);
 
-    meter2 = create_meter_box(parent, "Sessions", "Desktop: ", "Tablet: ", "Mobile: ");
-    if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(meter2), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
-    lv_meter_set_scale_range(meter2, 0, 100, 360, 90);
-    lv_meter_set_scale_ticks(meter2, 0, 0, 0, lv_color_black());
+    /*Scale 2*/
+    lv_scale_set_round_props(scale2, 330, 0);
+    lv_scale_set_total_tick_count(scale2, 10);
+    lv_scale_set_major_tick_length(scale2, 30);
+    lv_scale_set_major_tick_every(scale2, 1);
+    arc = lv_arc_create(scale2);
+    lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_margin_all(arc, 10, 0);
+    lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    lv_obj_set_style_arc_width(arc, 10, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_BLUE), LV_PART_INDICATOR);
+    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(arc);
 
-    static lv_meter_indicator_t * meter2_indic[3];
-    meter2_indic[0] = lv_meter_add_arc(meter2, 20, lv_palette_main(LV_PALETTE_RED), -10);
-    lv_meter_set_indicator_start_value(meter2, meter2_indic[0], 0);
-    lv_meter_set_indicator_end_value(meter2, meter2_indic[0], 39);
+    arc = lv_arc_create(scale2);
+    lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_margin_all(arc, 5, 0);
+    lv_obj_set_style_arc_opa(arc, 0, 0);
+    lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    lv_obj_set_style_arc_width(arc, 20, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_RED), LV_PART_INDICATOR);
+    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(arc);
 
-    meter2_indic[1] = lv_meter_add_arc(meter2, 30, lv_palette_main(LV_PALETTE_BLUE), 0);
-    lv_meter_set_indicator_start_value(meter2, meter2_indic[1], 40);
-    lv_meter_set_indicator_end_value(meter2, meter2_indic[1], 69);
+    arc = lv_arc_create(scale2);
+    lv_obj_set_size(arc, lv_pct(100), lv_pct(100));
+    lv_obj_set_style_arc_opa(arc, 0, 0);
+    lv_obj_set_style_bg_opa(arc, 0, LV_PART_KNOB);
+    lv_obj_set_style_arc_width(arc, 30, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_rounded(arc, false, LV_PART_INDICATOR);
+    lv_obj_set_style_arc_color(arc, lv_palette_main(LV_PALETTE_GREEN), LV_PART_INDICATOR);
+    lv_obj_clear_flag(arc, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_center(arc);
 
-    meter2_indic[2] = lv_meter_add_arc(meter2, 10, lv_palette_main(LV_PALETTE_GREEN), -20);
-    lv_meter_set_indicator_start_value(meter2, meter2_indic[2], 70);
-    lv_meter_set_indicator_end_value(meter2, meter2_indic[2], 99);
+    lv_timer_t * scale2_timer = lv_timer_create(scale2_timer_cb, 100, scale2);
+    lv_obj_add_event(scale2, scale2_event_cb, LV_EVENT_DELETE, scale2_timer);
 
-    lv_timer_t * meter2_timer = lv_timer_create(meter2_timer_cb, 100, meter2_indic);
-    lv_obj_add_event(meter2, meter2_event_cb, LV_EVENT_DELETE, meter2_timer);
+    /*Scale 3*/
+    lv_scale_set_range(scale3, 10, 60);
+    lv_scale_set_total_tick_count(scale3, 20);
+    lv_scale_set_major_tick_every(scale3, 4);
+    lv_scale_set_minor_tick_length(scale3, 10);
+    lv_scale_set_major_tick_length(scale3, 20);
+    lv_scale_set_round_props(scale3, 225, 135);
 
+    static lv_style_t scale3_section1_main_style;
+    static lv_style_t scale3_section1_indicator_style;
+    static lv_style_t scale3_section1_tick_style;
 
-    meter3 = create_meter_box(parent, "Network Speed", "Low speed", "Normal Speed", "High Speed");
-    if(disp_size < DISP_LARGE) lv_obj_add_flag(lv_obj_get_parent(meter3), LV_OBJ_FLAG_FLEX_IN_NEW_TRACK);
+    lv_style_init(&scale3_section1_main_style);
+    lv_style_set_arc_width(&scale3_section1_main_style, 5);
+    lv_style_set_arc_color(&scale3_section1_main_style, lv_palette_main(LV_PALETTE_RED));
 
-    /*Add a special circle to the needle's pivot*/
-    lv_obj_set_style_pad_hor(meter3, 10, 0);
-    lv_obj_set_style_size(meter3, 10, 10, LV_PART_INDICATOR);
-    lv_obj_set_style_radius(meter3, LV_RADIUS_CIRCLE, LV_PART_INDICATOR);
-    lv_obj_set_style_bg_opa(meter3, LV_OPA_COVER, LV_PART_INDICATOR);
-    lv_obj_set_style_bg_color(meter3, lv_palette_darken(LV_PALETTE_GREY, 4), LV_PART_INDICATOR);
-    lv_obj_set_style_outline_color(meter3, lv_color_white(), LV_PART_INDICATOR);
-    lv_obj_set_style_outline_width(meter3, 3, LV_PART_INDICATOR);
-    lv_obj_set_style_text_color(meter3, lv_palette_darken(LV_PALETTE_GREY, 1), LV_PART_TICKS);
+    lv_style_init(&scale3_section1_indicator_style);
+    lv_style_set_line_width(&scale3_section1_indicator_style, 4);
+    lv_style_set_line_color(&scale3_section1_indicator_style, lv_palette_darken(LV_PALETTE_RED, 2));
 
-    lv_meter_set_scale_range(meter3, 10, 60, 220, 360 - 220);
-    lv_meter_set_scale_ticks(meter3, 21, 3, 17, lv_color_white());
-    lv_meter_set_scale_major_ticks(meter3, 4, 4, 22, lv_color_white(), 15);
+    lv_style_init(&scale3_section1_tick_style);
+    lv_style_set_line_width(&scale3_section1_tick_style, 4);
+    lv_style_set_line_color(&scale3_section1_tick_style, lv_palette_darken(LV_PALETTE_RED, 2));
 
-    indic = lv_meter_add_arc(meter3, 10, lv_palette_main(LV_PALETTE_RED), 0);
-    lv_meter_set_indicator_start_value(meter3, indic, 0);
-    lv_meter_set_indicator_end_value(meter3, indic, 20);
+    lv_scale_section_t * section;
+    section = lv_scale_add_section(scale3);
+    lv_scale_section_set_range(section, 0, 20);
+    lv_scale_section_set_style(section, LV_PART_MAIN, &scale3_section1_main_style);
+    lv_scale_section_set_style(section, LV_PART_INDICATOR, &scale3_section1_indicator_style);
+    lv_scale_section_set_style(section, LV_PART_TICKS, &scale3_section1_tick_style);
 
-    indic = lv_meter_add_scale_lines(meter3, lv_palette_darken(LV_PALETTE_RED, 3), lv_palette_darken(LV_PALETTE_RED,
-                                                                                                     3), true, 0);
-    lv_meter_set_indicator_start_value(meter3, indic, 0);
-    lv_meter_set_indicator_end_value(meter3, indic, 20);
+    LV_IMG_DECLARE(img_demo_widgets_needle);
+    lv_obj_t * needle = lv_image_create(scale3);
+    lv_image_set_src(needle, &img_demo_widgets_needle);
+    lv_image_set_pivot(needle, 3, 4);
+    lv_obj_align(needle, LV_ALIGN_CENTER, 47, -2);
 
-    indic = lv_meter_add_arc(meter3, 12, lv_palette_main(LV_PALETTE_BLUE), 0);
-    lv_meter_set_indicator_start_value(meter3, indic, 20);
-    lv_meter_set_indicator_end_value(meter3, indic, 40);
-
-    indic = lv_meter_add_scale_lines(meter3, lv_palette_darken(LV_PALETTE_BLUE, 3),
-                                     lv_palette_darken(LV_PALETTE_BLUE, 3), true, 0);
-    lv_meter_set_indicator_start_value(meter3, indic, 20);
-    lv_meter_set_indicator_end_value(meter3, indic, 40);
-
-    indic = lv_meter_add_arc(meter3, 10, lv_palette_main(LV_PALETTE_GREEN), 0);
-    lv_meter_set_indicator_start_value(meter3, indic, 40);
-    lv_meter_set_indicator_end_value(meter3, indic, 60);
-
-    indic = lv_meter_add_scale_lines(meter3, lv_palette_darken(LV_PALETTE_GREEN, 3),
-                                     lv_palette_darken(LV_PALETTE_GREEN, 3), true, 0);
-    lv_meter_set_indicator_start_value(meter3, indic, 40);
-    lv_meter_set_indicator_end_value(meter3, indic, 60);
-
-    indic = lv_meter_add_needle_line(meter3, 4, lv_palette_darken(LV_PALETTE_GREY, 4), -25);
-
-    lv_obj_t * mbps_label = lv_label_create(meter3);
+    lv_obj_t * mbps_label = lv_label_create(scale3);
     lv_label_set_text(mbps_label, "-");
     lv_obj_add_style(mbps_label, &style_title, 0);
 
-    lv_obj_t * mbps_unit_label = lv_label_create(meter3);
+    lv_obj_t * mbps_unit_label = lv_label_create(scale3);
     lv_label_set_text(mbps_unit_label, "Mbps");
 
     lv_anim_init(&a);
-    lv_anim_set_values(&a, 10, 60);
+    lv_anim_set_values(&a, 0, 60);
     lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_set_exec_cb(&a, meter3_anim_cb);
-    lv_anim_set_var(&a, indic);
+    lv_anim_set_exec_cb(&a, scale3_anim_cb);
+    lv_anim_set_var(&a, needle);
     lv_anim_set_time(&a, 4100);
     lv_anim_set_playback_time(&a, 800);
     lv_anim_start(&a);
-
-    lv_obj_update_layout(parent);
-    if(disp_size == DISP_MEDIUM) {
-        lv_obj_set_size(meter1, 200, 200);
-        lv_obj_set_size(meter2, 200, 200);
-        lv_obj_set_size(meter3, 200, 200);
-    }
-    else {
-        lv_coord_t meter_w = lv_obj_get_width(meter1);
-        lv_obj_set_height(meter1, meter_w);
-        lv_obj_set_height(meter2, meter_w);
-        lv_obj_set_height(meter3, meter_w);
-    }
 
     lv_obj_align(mbps_label, LV_ALIGN_TOP_MID, 10, lv_pct(55));
     lv_obj_align_to(mbps_unit_label, mbps_label, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
@@ -802,8 +819,8 @@ void shop_create(lv_obj_t * parent)
     lv_obj_set_style_text_color(hint, lv_palette_main(LV_PALETTE_GREEN), 0);
 
     chart3 = lv_chart_create(panel1);
-    lv_chart_set_axis_tick(chart3, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 6, 1, true, 80);
-    lv_chart_set_axis_tick(chart3, LV_CHART_AXIS_PRIMARY_X, 0, 0, 7, 1, true, 50);
+    //    lv_chart_set_axis_tick(chart3, LV_CHART_AXIS_PRIMARY_Y, 0, 0, 6, 1, true, 80);
+    //    lv_chart_set_axis_tick(chart3, LV_CHART_AXIS_PRIMARY_X, 0, 0, 7, 1, true, 50);
     lv_chart_set_type(chart3, LV_CHART_TYPE_BAR);
     lv_chart_set_div_line_count(chart3, 6, 0);
     lv_chart_set_point_count(chart3, 7);
@@ -874,7 +891,7 @@ void shop_create(lv_obj_t * parent)
         lv_obj_set_width(chart3, LV_PCT(95));
         lv_obj_set_height(chart3, LV_VER_RES - 70);
         lv_obj_set_style_max_height(chart3, 300, 0);
-        lv_chart_set_zoom_x(chart3, 512);
+        //        lv_chart_set_zoom_x(chart3, 512);
 
         lv_obj_set_grid_dsc_array(panel1, grid1_col_dsc, grid1_row_dsc);
         lv_obj_set_grid_cell(title, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
@@ -1086,7 +1103,7 @@ static void color_event_cb(lv_event_t * e)
     }
 }
 
-static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const char * text1, const char * text2,
+static lv_obj_t * create_scale_box(lv_obj_t * parent, const char * title, const char * text1, const char * text2,
                                    const char * text3)
 {
     lv_obj_t * cont = lv_obj_create(parent);
@@ -1097,10 +1114,10 @@ static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const 
     lv_label_set_text(title_label, title);
     lv_obj_add_style(title_label, &style_title, 0);
 
-    lv_obj_t * meter = lv_meter_create(cont);
-    lv_obj_remove_style(meter, NULL, LV_PART_MAIN);
-    lv_obj_remove_style(meter, NULL, LV_PART_INDICATOR);
-    lv_obj_set_width(meter, LV_PCT(100));
+    lv_obj_t * scale = lv_scale_create(cont);
+    lv_scale_set_mode(scale, LV_SCALE_MODE_ROUND_INNER);
+    lv_scale_set_post_draw(scale, true);
+    lv_obj_set_width(scale, LV_PCT(100));
 
     lv_obj_t * bullet1 = lv_obj_create(cont);
     lv_obj_set_size(bullet1, 13, 13);
@@ -1132,7 +1149,7 @@ static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const 
 
         lv_obj_set_grid_dsc_array(cont, grid_col_dsc, grid_row_dsc);
         lv_obj_set_grid_cell(title_label, LV_GRID_ALIGN_START, 0, 4, LV_GRID_ALIGN_START, 0, 1);
-        lv_obj_set_grid_cell(meter, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 3);
+        lv_obj_set_grid_cell(scale, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 1, 3);
         lv_obj_set_grid_cell(bullet1, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_CENTER, 2, 1);
         lv_obj_set_grid_cell(bullet2, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_CENTER, 3, 1);
         lv_obj_set_grid_cell(bullet3, LV_GRID_ALIGN_START, 2, 1, LV_GRID_ALIGN_CENTER, 4, 1);
@@ -1145,7 +1162,7 @@ static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const 
         static lv_coord_t grid_row_dsc[] = {LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_CONTENT, LV_GRID_TEMPLATE_LAST};
         lv_obj_set_grid_dsc_array(cont, grid_col_dsc, grid_row_dsc);
         lv_obj_set_grid_cell(title_label, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 0, 1);
-        lv_obj_set_grid_cell(meter, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 1, 1);
+        lv_obj_set_grid_cell(scale, LV_GRID_ALIGN_START, 0, 2, LV_GRID_ALIGN_START, 1, 1);
         lv_obj_set_grid_cell(bullet1, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 2, 1);
         lv_obj_set_grid_cell(bullet2, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 3, 1);
         lv_obj_set_grid_cell(bullet3, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 4, 1);
@@ -1153,10 +1170,7 @@ static lv_obj_t * create_meter_box(lv_obj_t * parent, const char * title, const 
         lv_obj_set_grid_cell(label2, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 3, 1);
         lv_obj_set_grid_cell(label3, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_START, 4, 1);
     }
-
-
-    return meter;
-
+    return scale;
 }
 
 static lv_obj_t * create_shop_item(lv_obj_t * parent, const void * img_src, const char * name, const char * category,
@@ -1327,32 +1341,7 @@ static void chart_event_cb(lv_event_t * e)
         lv_draw_task_t * draw_task = lv_event_get_param(e);
         lv_draw_dsc_base_t * base_dsc = draw_task->draw_dsc;
 
-        if(base_dsc->part == LV_PART_TICKS && draw_task->type == LV_DRAW_TASK_TYPE_LABEL) {
-            /*Set the markers' text*/
-            if(base_dsc->id1 == LV_CHART_AXIS_PRIMARY_X) {
-                lv_draw_label_dsc_t * label_draw_dsc = draw_task->draw_dsc;
-                if(label_draw_dsc->text_local) lv_free((void *)label_draw_dsc->text);
-                const char * txt;
-                if(lv_chart_get_type(obj) == LV_CHART_TYPE_BAR) {
-                    const char * month[] = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"};
-                    txt = month[base_dsc->id2];
-
-                }
-                else {
-                    const char * month[] = {"Jan", "Febr", "March", "Apr", "May", "Jun", "July", "Aug", "Sept", "Oct", "Nov", "Dec"};
-                    txt = month[base_dsc->id2];
-                }
-                label_draw_dsc->align = LV_TEXT_ALIGN_CENTER;
-                label_draw_dsc->text_local = 1;
-                label_draw_dsc->text = lv_malloc(strlen(txt) + 1);
-                strcpy((char *)label_draw_dsc->text, txt);
-                draw_task->area.x1 -= 30;
-                draw_task->area.x2 += 30;
-
-            }
-
-        }
-        else if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_LINE) {
+        if(base_dsc->part == LV_PART_ITEMS && draw_task->type == LV_DRAW_TASK_TYPE_LINE) {
             const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
             if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
 
@@ -1398,7 +1387,6 @@ static void chart_event_cb(lv_event_t * e)
             lv_draw_rect(base_dsc->layer, &rect_dsc, &rect_area);
         }
 
-
         bool add_value = false;
         if(base_dsc->part == LV_PART_INDICATOR && lv_chart_get_pressed_point(obj) == base_dsc->id2) {
             if(lv_chart_get_type(obj) == LV_CHART_TYPE_LINE) {
@@ -1431,7 +1419,9 @@ static void chart_event_cb(lv_event_t * e)
 
         if(add_value) {
             const lv_chart_series_t * ser = lv_chart_get_series_next(obj, NULL);
-            if(base_dsc->id1 == 1) ser = lv_chart_get_series_next(obj, ser);
+            if(base_dsc->id1 == 1) {
+                ser = lv_chart_get_series_next(obj, ser);
+            }
 
             char buf[8];
             lv_snprintf(buf, sizeof(buf), "%"LV_PRIu32, ser->y_points[base_dsc->id2]);
@@ -1490,46 +1480,27 @@ static void shop_chart_event_cb(lv_event_t * e)
 }
 
 
-static void meter1_indic1_anim_cb(void * var, int32_t v)
+static void scale1_indic1_anim_cb(void * var, int32_t v)
 {
-    lv_meter_set_indicator_end_value(meter1, var, v);
+    lv_arc_set_value(var, v);
 
-    lv_obj_t * card = lv_obj_get_parent(meter1);
+    lv_obj_t * card = lv_obj_get_parent(scale1);
     lv_obj_t * label = lv_obj_get_child(card, -5);
     lv_label_set_text_fmt(label, "Revenue: %"LV_PRId32" %%", v);
 }
 
-static void meter1_indic2_anim_cb(void * var, int32_t v)
-{
-    lv_meter_set_indicator_end_value(meter1, var, v);
-
-    lv_obj_t * card = lv_obj_get_parent(meter1);
-    lv_obj_t * label = lv_obj_get_child(card, -3);
-    lv_label_set_text_fmt(label, "Sales: %"LV_PRId32" %%", v);
-
-}
-
-static void meter1_indic3_anim_cb(void * var, int32_t v)
-{
-    lv_meter_set_indicator_end_value(meter1, var, v);
-
-    lv_obj_t * card = lv_obj_get_parent(meter1);
-    lv_obj_t * label = lv_obj_get_child(card, -1);
-    lv_label_set_text_fmt(label, "Costs: %"LV_PRId32" %%", v);
-}
-
-static void meter2_event_cb(lv_event_t * e)
+static void scale2_event_cb(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     if(code == LV_EVENT_DELETE) {
-        lv_timer_t * meter2_timer = lv_event_get_user_data(e);
-        if(meter2_timer) lv_timer_del(meter2_timer);
+        lv_timer_t * scale2_timer = lv_event_get_user_data(e);
+        if(scale2_timer) lv_timer_del(scale2_timer);
     }
 }
 
-static void meter2_timer_cb(lv_timer_t * timer)
+static void scale2_timer_cb(lv_timer_t * timer)
 {
-    lv_meter_indicator_t ** indics = timer->user_data;
+    LV_UNUSED(timer);
 
     static bool down1 = false;
     static bool down2 = false;
@@ -1564,19 +1535,14 @@ static void meter2_timer_cb(lv_timer_t * timer)
     }
 
     uint32_t all = session_desktop + session_tablet + session_mobile;
-    uint32_t pct1 = (session_desktop * 97) / all;
-    uint32_t pct2 = (session_tablet * 97) / all;
+    uint32_t angle1 = (session_desktop * 354) / all;
+    uint32_t angle2 = (session_tablet * 354) / all;
 
-    lv_meter_set_indicator_start_value(meter2, indics[0], 0);
-    lv_meter_set_indicator_end_value(meter2, indics[0], pct1);
+    lv_arc_set_angles(lv_obj_get_child(scale2, 0), 0, angle1);
+    lv_arc_set_angles(lv_obj_get_child(scale2, 1), angle1 + 2, angle1 + 2 + angle2);
+    lv_arc_set_angles(lv_obj_get_child(scale2, 2), angle1 + 2 + angle2 + 2, 358);
 
-    lv_meter_set_indicator_start_value(meter2, indics[1], pct1 + 1);
-    lv_meter_set_indicator_end_value(meter2, indics[1], pct1 + 1 + pct2);
-
-    lv_meter_set_indicator_start_value(meter2, indics[2], pct1 + 1 + pct2 + 1);
-    lv_meter_set_indicator_end_value(meter2, indics[2], 99);
-
-    lv_obj_t * card = lv_obj_get_parent(meter2);
+    lv_obj_t * card = lv_obj_get_parent(scale2);
     lv_obj_t * label;
 
     label = lv_obj_get_child(card, -5);
@@ -1589,11 +1555,15 @@ static void meter2_timer_cb(lv_timer_t * timer)
     lv_label_set_text_fmt(label, "Mobile: %"LV_PRIu32, session_mobile);
 }
 
-static void meter3_anim_cb(void * var, int32_t v)
+static void scale3_anim_cb(void * var, int32_t v)
 {
-    lv_meter_set_indicator_value(meter3, var, v);
+    LV_UNUSED(var);
 
-    lv_obj_t * label = lv_obj_get_child(meter3, 0);
+    int32_t angle = lv_map(v, 0, 60, 1350, 3600);
+    lv_obj_t * needle = lv_obj_get_child(scale3, 0);
+    lv_image_set_rotation(needle, angle);
+
+    lv_obj_t * label = lv_obj_get_child(scale3, 1);
     lv_label_set_text_fmt(label, "%"LV_PRId32, v);
 }
 

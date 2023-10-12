@@ -182,17 +182,18 @@ void lv_scale_set_round_props(lv_obj_t * obj, uint32_t angle_range, int32_t rota
     lv_obj_invalidate(obj);
 }
 
-void lv_scale_set_text_src(lv_obj_t * obj, char * txt_src[])
+void lv_scale_set_text_src(lv_obj_t * obj, const char * txt_src[])
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
     lv_scale_t * scale = (lv_scale_t *)obj;
 
     scale->txt_src = txt_src;
-
     scale->custom_label_cnt = 0;
-    lv_coord_t idx;
-    for(idx = 0; txt_src[idx]; ++idx) {
-        scale->custom_label_cnt++;
+    if(scale->txt_src) {
+        lv_coord_t idx;
+        for(idx = 0; txt_src[idx]; ++idx) {
+            scale->custom_label_cnt++;
+        }
     }
 
     lv_obj_invalidate(obj);
@@ -252,7 +253,7 @@ void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_
         case LV_PART_INDICATOR:
             section->indicator_style = section_part_style;
             break;
-        case LV_PART_ITEMS:
+        case LV_PART_TICKS:
             section->items_style = section_part_style;
             break;
         default:
@@ -260,7 +261,6 @@ void lv_scale_section_set_style(lv_scale_section_t * section, uint32_t part, lv_
             break;
     }
 }
-
 
 /*=====================
  * Getter functions
@@ -375,7 +375,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
     /* Configure line draw descriptor for the minor tick drawing */
     lv_draw_line_dsc_t minor_tick_dsc;
     lv_draw_line_dsc_init(&minor_tick_dsc);
-    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+    lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &minor_tick_dsc);
 
     /* Main line style */
     lv_draw_line_dsc_t main_line_dsc;
@@ -405,14 +405,14 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                     }
                     else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
+                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_TICKS);
                     }
                 }
                 else {
                     /* Tick is not in section, get the proper styles */
                     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
                     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &minor_tick_dsc);
                 }
             }
 
@@ -460,7 +460,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
             }
         }
     }
-    else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+    else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
 
@@ -493,14 +493,14 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                         scale_set_line_properties(obj, &major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
                     }
                     else {
-                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_ITEMS);
+                        scale_set_line_properties(obj, &minor_tick_dsc, section->items_style, LV_PART_TICKS);
                     }
                 }
                 else {
                     /* Tick is not in section, get the proper styles */
                     lv_obj_init_draw_label_dsc(obj, LV_PART_INDICATOR, &label_dsc);
                     lv_obj_init_draw_line_dsc(obj, LV_PART_INDICATOR, &major_tick_dsc);
-                    lv_obj_init_draw_line_dsc(obj, LV_PART_ITEMS, &minor_tick_dsc);
+                    lv_obj_init_draw_line_dsc(obj, LV_PART_TICKS, &minor_tick_dsc);
                 }
             }
 
@@ -533,7 +533,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
                 if(LV_SCALE_MODE_ROUND_INNER == scale->mode) {
                     radius_text = (radius_edge - scale->major_len) - (label_gap + label_dsc.letter_space);
                 }
-                else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode) {
+                else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode) {
                     radius_text = (radius_edge + scale->major_len) + (label_gap + label_dsc.letter_space);
                 }
                 else { /* Nothing to do */ }
@@ -616,7 +616,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             main_line_point_a.x = x_ofs - 1U;
             main_line_point_a.y = y_ofs;
             main_line_point_b.x = x_ofs - 1U;
-            main_line_point_b.y = obj->coords.y2 - pad_left;
+            main_line_point_b.y = obj->coords.y2 - pad_bottom;
 
             /* Adjust main line with initial and last tick width */
             main_line_point_a.y -= scale->last_tick_width / 2U;
@@ -679,7 +679,7 @@ static void scale_draw_main(lv_obj_t * obj, lv_event_t * event)
             lv_draw_line(layer, &main_line_section_dsc);
         }
     }
-    else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+    else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
         /* Configure arc draw descriptors for the main part */
         lv_draw_arc_dsc_t arc_dsc;
         lv_draw_arc_dsc_init(&arc_dsc);
@@ -873,7 +873,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             tick_point_b->y = tick_point_a->y + tick_length;
         }
     }
-    else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+    else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
         lv_area_t scale_area;
         lv_obj_get_content_coords(obj, &scale_area);
 
@@ -895,7 +895,7 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             point_closer_to_arc = radius_edge - main_line_dsc.width;
             adjusted_radio_with_tick_len = point_closer_to_arc - (is_major_tick ? major_len : minor_len);
         }
-        else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode) {
+        else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode) {
             point_closer_to_arc = radius_edge - main_line_dsc.width;
             adjusted_radio_with_tick_len = point_closer_to_arc + (is_major_tick ? major_len : minor_len);
         }
@@ -957,7 +957,7 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
             label_coords->x2 = tick_point->x + label_size.x + lv_obj_get_style_pad_right(obj, LV_PART_INDICATOR);
         }
     }
-    else if(LV_SCALE_MODE_ROUND_OUTTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
+    else if(LV_SCALE_MODE_ROUND_OUTER == scale->mode || LV_SCALE_MODE_ROUND_INNER == scale->mode) {
         label_coords->x1 = tick_point->x - (label_size.x / 2U);
         label_coords->y1 = tick_point->y - (label_size.y / 2U);
         label_coords->x2 = label_coords->x1 + label_size.x;
@@ -974,7 +974,7 @@ static void scale_get_label_coords(lv_obj_t * obj, lv_draw_label_dsc_t * label_d
  * @param obj       pointer to a scale object
  * @param line_dsc  pointer to line descriptor
  * @param items_section_style  pointer to indicator section style
- * @param part      line part, example: LV_PART_INDICATOR, LV_PART_ITEMS, LV_PART_MAIN
+ * @param part      line part, example: LV_PART_INDICATOR, LV_PART_TICKS, LV_PART_MAIN
  */
 static void scale_set_line_properties(lv_obj_t * obj, lv_draw_line_dsc_t * line_dsc, lv_style_t * section_style,
                                       uint32_t part)
@@ -1183,7 +1183,7 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
         else if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
             scale->first_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
         }
-        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTTER == scale->mode)) {
+        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTER == scale->mode)) {
             /* TODO */
         }
         else { /* Nothing to do */ }
@@ -1195,7 +1195,7 @@ static void scale_store_main_line_tick_width_compensation(lv_obj_t * obj, const 
         else if((LV_SCALE_MODE_HORIZONTAL_BOTTOM == scale->mode) || (LV_SCALE_MODE_HORIZONTAL_TOP == scale->mode)) {
             scale->last_tick_width = is_major_tick ? major_tick_width : minor_tick_width;
         }
-        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTTER == scale->mode)) {
+        else if((LV_SCALE_MODE_ROUND_INNER == scale->mode) || (LV_SCALE_MODE_ROUND_OUTER == scale->mode)) {
             /* TODO */
         }
         else { /* Nothing to do */ }
@@ -1259,7 +1259,7 @@ static void scale_store_section_line_tick_width_compensation(lv_obj_t * obj, con
                 scale_set_line_properties(obj, major_tick_dsc, section->indicator_style, LV_PART_INDICATOR);
             }
             else {
-                scale_set_line_properties(obj, minor_tick_dsc, section->items_style, LV_PART_ITEMS);
+                scale_set_line_properties(obj, minor_tick_dsc, section->items_style, LV_PART_TICKS);
             }
         }
 
