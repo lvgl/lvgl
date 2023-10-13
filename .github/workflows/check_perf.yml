@@ -1,5 +1,6 @@
 name: SO3-LVGL Performance check
-on: [push, pull_request, workflow_dispatch, self-hosted]
+on: [push, pull_request, workflow_dispatch]
+runs-on: [self-hosted, linux]
 jobs:
   so3_lvgl:
     runs-on: alpine-latest
