@@ -21,7 +21,7 @@ static void radial_lines_create(lv_style_t * style, uint32_t line_index)
 
     uint32_t i;
     for(i = 0; i < 24; i ++) {
-        lv_obj_t * line = lv_line_create(lv_scr_act());
+        lv_obj_t * line = lv_line_create(lv_screen_active());
         if(style) lv_obj_add_style(line, style, 0);
         p[i][0].x = 140;
         p[i][0].y = 100;

@@ -17,7 +17,7 @@ class KeyboardEncoder:
 
             cur_drv = cur_drv.get_next()
 
-        self.tv = lv.tabview(lv.scr_act(), lv.DIR.TOP, lv.DPI_DEF // 3)
+        self.tv = lv.tabview(lv.screen_active(), lv.DIR.TOP, lv.DPI_DEF // 3)
 
         self.t1 = self.tv.add_tab("Selectors")
         self.t2 = self.tv.add_tab("Text input")
@@ -93,7 +93,7 @@ class KeyboardEncoder:
         ta2.set_one_line(True)
         ta2.set_placeholder_text("Type something")
 
-        self.kb = lv.keyboard(lv.scr_act())
+        self.kb = lv.keyboard(lv.screen_active())
         self.kb.add_flag(lv.obj.FLAG.HIDDEN)
 
         ta1.add_event(self.ta_event_cb, lv.EVENT.ALL, None)
@@ -141,7 +141,7 @@ class KeyboardEncoder:
 
         if code == lv.EVENT.CLICKED and  indev_type == lv.INDEV_TYPE.ENCODER:
             self.kb.set_textarea(ta)
-            self.kb.clear_flag(lv.obj.FLAG.HIDDEN)
+            self.kb.remove_flag(lv.obj.FLAG.HIDDEN)
             self.kb.group_focus_obj()
             self.kb.get_group().set_editing()
             self.tv.set_height(lv.pct(50))

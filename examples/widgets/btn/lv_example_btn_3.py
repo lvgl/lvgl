@@ -28,7 +28,7 @@ style_pr.set_transform_height(-10)
 style_pr.set_text_letter_space(10)
 style_pr.set_transition(transition_dsc_pr)
 
-button1 = lv.button(lv.scr_act())
+button1 = lv.button(lv.screen_active())
 button1.align(lv.ALIGN.CENTER, 0, -80)
 button1.add_style(style_pr, lv.STATE.PRESSED)
 button1.add_style(style_def, 0)

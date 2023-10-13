@@ -346,8 +346,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t dx, lv_coord_t dy, lv_anim_enab
     }
     else {
         /*Remove pending animations*/
-        lv_anim_del(obj, scroll_y_anim);
-        lv_anim_del(obj, scroll_x_anim);
+        lv_anim_delete(obj, scroll_y_anim);
+        lv_anim_delete(obj, scroll_x_anim);
 
         lv_result_t res;
         res = lv_obj_send_event(obj, LV_EVENT_SCROLL_BEGIN, NULL);
@@ -369,7 +369,7 @@ void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
 
 void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
 {
-    lv_anim_del(obj, scroll_x_anim);
+    lv_anim_delete(obj, scroll_x_anim);
 
     lv_coord_t scroll_x = lv_obj_get_scroll_x(obj);
     lv_coord_t diff = -x + scroll_x;
@@ -379,7 +379,7 @@ void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
 
 void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 {
-    lv_anim_del(obj, scroll_y_anim);
+    lv_anim_delete(obj, scroll_y_anim);
 
     lv_coord_t scroll_y = lv_obj_get_scroll_y(obj);
     lv_coord_t diff = -y + scroll_y;
@@ -782,8 +782,8 @@ static void scroll_area_into_view(const lv_area_t * area, lv_obj_t * child, lv_p
     }
 
     /*Remove any pending scroll animations.*/
-    bool y_del = lv_anim_del(parent, scroll_y_anim);
-    bool x_del = lv_anim_del(parent, scroll_x_anim);
+    bool y_del = lv_anim_delete(parent, scroll_y_anim);
+    bool x_del = lv_anim_delete(parent, scroll_x_anim);
     if(y_del || x_del) {
         lv_result_t res;
         res = lv_obj_send_event(parent, LV_EVENT_SCROLL_END, NULL);

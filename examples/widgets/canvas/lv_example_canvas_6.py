@@ -24,7 +24,7 @@ image_star_argb = lv.image_dsc_t({
 cbuf = bytearray((LV_COLOR_SIZE // 8) * CANVAS_WIDTH * CANVAS_HEIGHT)
 
 # Create a canvas and initialize its palette
-canvas = lv.canvas(lv.scr_act())
+canvas = lv.canvas(lv.screen_active())
 canvas.set_buffer(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, lv.COLOR_FORMAT.NATIVE)
 canvas.fill_bg(lv.color_hex3(0xccc), lv.OPA.COVER)
 canvas.center()

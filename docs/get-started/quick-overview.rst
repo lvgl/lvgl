@@ -16,8 +16,8 @@ Instead of porting LVGL to embedded hardware straight away, it's highly
 recommended to get started in a simulator first.
 
 LVGL is ported to many IDEs to be sure you will find your favorite one.
-Go to the :ref:`simulator` section to get ready-to-use projects that can be run 
-on your PC. This way you can save the time of porting for now and get some 
+Go to the :ref:`simulator` section to get ready-to-use projects that can be run
+on your PC. This way you can save the time of porting for now and get some
 experience with LVGL immediately.
 
 Add LVGL into your project
@@ -126,8 +126,8 @@ other words, the parts of the children outside the parent are clipped.
 
 A Screen is the "root" parent. You can have any number of screens.
 
-To get the current screen call :cpp:func:`lv_scr_act`, and to load a screen
-use :cpp:expr:`lv_scr_load(scr1)`.
+To get the current screen call :cpp:func:`lv_screen_active`, and to load a screen
+use :cpp:expr:`lv_screen_load(scr1)`.
 
 You can create a new object with ``lv_<type>_create(parent)``. It will
 return an :cpp:type:`lv_obj_t` ``*`` variable that can be used as a reference to the
@@ -137,7 +137,7 @@ For example:
 
 .. code:: c
 
-   lv_obj_t * slider1 = lv_slider_create(lv_scr_act());
+   lv_obj_t * slider1 = lv_slider_create(lv_screen_active());
 
 To set some basic attributes ``lv_obj_set_<parameter_name>(obj, <value>)`` functions can be used. For
 example:
@@ -239,7 +239,7 @@ To manually add or remove states use:
 .. code:: c
 
    lv_obj_add_state(obj, LV_STATE_...);
-   lv_obj_clear_state(obj, LV_STATE_...);
+   lv_obj_remove_state(obj, LV_STATE_...);
 
 Styles
 ~~~~~~
@@ -342,9 +342,9 @@ Learn more about :ref:`micropython`.
    # Create a Button and a Label
    scr = lv.obj()
    btn = lv.btn(scr)
-   btn.align(lv.scr_act(), lv.ALIGN.CENTER, 0, 0)
+   btn.align(lv.screen_active(), lv.ALIGN.CENTER, 0, 0)
    label = lv.label(btn)
    label.set_text("Button")
 
    # Load the screen
-   lv.scr_load(scr)
+   lv.screen_load(scr)

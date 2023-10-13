@@ -210,7 +210,7 @@ void lv_keyboard_set_textarea(lv_obj_t * obj, lv_obj_t * ta)
 
     /*Hide the cursor of the old Text area if cursor management is enabled*/
     if(keyboard->ta) {
-        lv_obj_clear_state(obj, LV_STATE_FOCUSED);
+        lv_obj_remove_state(obj, LV_STATE_FOCUSED);
     }
 
     keyboard->ta = ta;
@@ -394,20 +394,20 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
         lv_textarea_cursor_right(keyboard->ta);
     }
     else if(strcmp(txt, LV_SYMBOL_BACKSPACE) == 0) {
-        lv_textarea_del_char(keyboard->ta);
+        lv_textarea_delete_char(keyboard->ta);
     }
     else if(strcmp(txt, "+/-") == 0) {
         uint32_t cur        = lv_textarea_get_cursor_pos(keyboard->ta);
         const char * ta_txt = lv_textarea_get_text(keyboard->ta);
         if(ta_txt[0] == '-') {
             lv_textarea_set_cursor_pos(keyboard->ta, 1);
-            lv_textarea_del_char(keyboard->ta);
+            lv_textarea_delete_char(keyboard->ta);
             lv_textarea_add_char(keyboard->ta, '+');
             lv_textarea_set_cursor_pos(keyboard->ta, cur);
         }
         else if(ta_txt[0] == '+') {
             lv_textarea_set_cursor_pos(keyboard->ta, 1);
-            lv_textarea_del_char(keyboard->ta);
+            lv_textarea_delete_char(keyboard->ta);
             lv_textarea_add_char(keyboard->ta, '-');
             lv_textarea_set_cursor_pos(keyboard->ta, cur);
         }
@@ -429,7 +429,7 @@ void lv_keyboard_def_event_cb(lv_event_t * e)
 static void lv_keyboard_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj)
 {
     LV_UNUSED(class_p);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
 
     lv_keyboard_t * keyboard = (lv_keyboard_t *)obj;
     keyboard->ta         = NULL;

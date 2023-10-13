@@ -11,11 +11,11 @@ implementation of CSS but a comparable subset is implemented (sometimes
 with minor adjustments).
 
 In short this means: - Explicitly set coordinates are stored in styles
-(size, position, layouts, etc.) 
+(size, position, layouts, etc.)
 
 - support min-width, max-width, min-height, max-height
-- have pixel, percentage, and "content" units 
-- x=0; y=0 coordinate means the top-left corner of the parent plus the left/top padding plus border width 
+- have pixel, percentage, and "content" units
+- x=0; y=0 coordinate means the top-left corner of the parent plus the left/top padding plus border width
 - width/height means the full size, the "content area" is smaller with padding and border width - a subset
   of flexbox and grid layouts are supported
 
@@ -290,7 +290,7 @@ Here are some examples to set an object's size using a style:
    lv_style_init(&style);
    lv_style_set_width(&style, 100);
 
-   lv_obj_t * btn = lv_btn_create(lv_scr_act());
+   lv_obj_t * btn = lv_btn_create(lv_screen_active());
    lv_obj_add_style(btn, &style, LV_PART_MAIN);
 
 As you will see below there are some other great features of size and
@@ -453,7 +453,7 @@ behave with layouts:
 - :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` The object is simply ignored by the layouts. Its coordinates can be set as usual.
 - :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` Same as :cpp:enumerator:`LV_OBJ_FLAG_IGNORE_LAYOUT` but the object with :cpp:enumerator:`LV_OBJ_FLAG_FLOATING` will be ignored in :c:macro:`LV_SIZE_CONTENT` calculations.
 
-These flags can be added/removed with :cpp:expr:`lv_obj_add_flag(obj, FLAG)` and :cpp:expr:`lv_obj_clear_flag(obj, FLAG)`
+These flags can be added/removed with :cpp:expr:`lv_obj_add_flag(obj, FLAG)` and :cpp:expr:`lv_obj_remove_flag(obj, FLAG)`
 
 Adding new layouts
 ------------------
@@ -472,7 +472,7 @@ LVGL can be freely extended by a custom layout like this:
 
    void my_layout_update(lv_obj_t * obj, void * user_data)
    {
-       /*Will be called automatically if it's required to reposition/resize the children of "obj" */   
+       /*Will be called automatically if it's required to reposition/resize the children of "obj" */
    }
 
 Custom style properties can be added which can be retrieved and used in

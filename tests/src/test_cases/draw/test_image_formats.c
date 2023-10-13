@@ -6,10 +6,10 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 
 }
 
@@ -21,7 +21,7 @@ void tearDown(void)
 
 static void img_create(const char * name, const void * img_src, bool rotate, bool recolor)
 {
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, 120, LV_SIZE_CONTENT);
     lv_obj_set_style_bg_color(cont, lv_palette_main(LV_PALETTE_LIGHT_BLUE), 0);
     lv_obj_set_style_pad_all(cont, 5, 0);

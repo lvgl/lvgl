@@ -59,7 +59,7 @@ void lv_example_chart_1(void);
 //void lv_example_chart_2(void);
 //void lv_example_chart_3(void);
 void lv_example_chart_4(void);
-void lv_example_chart_5(void);
+//void lv_example_chart_5(void);
 void lv_example_chart_6(void);
 void lv_example_chart_7(void);
 //void lv_example_chart_8(void);
@@ -100,11 +100,6 @@ void lv_example_menu_2(void);
 void lv_example_menu_3(void);
 void lv_example_menu_4(void);
 void lv_example_menu_5(void);
-
-void lv_example_meter_1(void);
-void lv_example_meter_2(void);
-//void lv_example_meter_3(void);
-void lv_example_meter_4(void);
 
 void lv_example_msgbox_1(void);
 

@@ -14,7 +14,7 @@ static void event_handler(lv_event_t * e)
 void lv_example_list_1(void)
 {
     /*Create a list*/
-    list1 = lv_list_create(lv_scr_act());
+    list1 = lv_list_create(lv_screen_active());
     lv_obj_set_size(list1, 180, 220);
     lv_obj_center(list1);
 

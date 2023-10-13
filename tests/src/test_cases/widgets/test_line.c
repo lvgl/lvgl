@@ -12,7 +12,7 @@ static const lv_coord_t final_extra_draw_size = 10U;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     line = lv_line_create(active_screen);
 }
 

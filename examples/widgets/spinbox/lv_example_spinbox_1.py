@@ -8,7 +8,7 @@ def decrement_event_cb(e):
     if code == lv.EVENT.SHORT_CLICKED or code == lv.EVENT.LONG_PRESSED_REPEAT:
         spinbox.decrement()
 
-spinbox = lv.spinbox(lv.scr_act())
+spinbox = lv.spinbox(lv.screen_active())
 spinbox.set_range(-1000, 25000)
 spinbox.set_digit_format(5, 2)
 spinbox.step_prev()
@@ -17,13 +17,13 @@ spinbox.center()
 
 h = spinbox.get_height()
 
-button = lv.button(lv.scr_act())
+button = lv.button(lv.screen_active())
 button.set_size(h, h)
 button.align_to(spinbox, lv.ALIGN.OUT_RIGHT_MID, 5, 0)
 button.set_style_bg_image_src(lv.SYMBOL.PLUS, 0)
 button.add_event(increment_event_cb, lv.EVENT.ALL,  None)
 
-button = lv.button(lv.scr_act())
+button = lv.button(lv.screen_active())
 button.set_size(h, h)
 button.align_to(spinbox, lv.ALIGN.OUT_LEFT_MID, -5, 0)
 button.set_style_bg_image_src(lv.SYMBOL.MINUS, 0)

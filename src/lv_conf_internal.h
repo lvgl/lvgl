@@ -401,6 +401,20 @@
         #endif
     #endif
 
+    /*1: Print file and line number of the log;
+     *0: Do not print file and line number of the log*/
+    #ifndef LV_LOG_USE_FILE_LINE
+        #ifdef _LV_KCONFIG_PRESENT
+            #ifdef CONFIG_LV_LOG_USE_FILE_LINE
+                #define LV_LOG_USE_FILE_LINE CONFIG_LV_LOG_USE_FILE_LINE
+            #else
+                #define LV_LOG_USE_FILE_LINE 0
+            #endif
+        #else
+            #define LV_LOG_USE_FILE_LINE 1
+        #endif
+    #endif
+
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #ifndef LV_LOG_TRACE_MEM
         #ifdef _LV_KCONFIG_PRESENT
@@ -2283,6 +2297,15 @@
     #endif
 #endif
 
+/*1: Enable an observer pattern implementation*/
+#ifndef LV_USE_OBSERVER
+    #ifdef CONFIG_LV_USE_OBSERVER
+        #define LV_USE_OBSERVER CONFIG_LV_USE_OBSERVER
+    #else
+        #define LV_USE_OBSERVER 0
+    #endif
+#endif
+
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
 #ifndef LV_USE_IME_PINYIN
@@ -2469,11 +2492,21 @@
     #endif
 #endif
 
-#ifndef LV_USE_NUTTX_FBDEV
-    #ifdef CONFIG_LV_USE_NUTTX_FBDEV
-        #define LV_USE_NUTTX_FBDEV CONFIG_LV_USE_NUTTX_FBDEV
+/*Use Nuttx to open window and handle touchscreen*/
+#ifndef LV_USE_NUTTX
+    #ifdef CONFIG_LV_USE_NUTTX
+        #define LV_USE_NUTTX CONFIG_LV_USE_NUTTX
     #else
-        #define LV_USE_NUTTX_FBDEV     0
+        #define LV_USE_NUTTX    0
+    #endif
+#endif
+
+/*Use Nuttx custom init API to open window and handle touchscreen*/
+#ifndef LV_USE_NUTTX_CUSTOM_INIT
+    #ifdef CONFIG_LV_USE_NUTTX_CUSTOM_INIT
+        #define LV_USE_NUTTX_CUSTOM_INIT CONFIG_LV_USE_NUTTX_CUSTOM_INIT
+    #else
+        #define LV_USE_NUTTX_CUSTOM_INIT    0
     #endif
 #endif
 
@@ -2502,6 +2535,15 @@
     #endif
 #endif
 
+/*Driver for /dev/input*/
+#ifndef LV_USE_NUTTX_TOUCHSCREEN
+    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
+    #else
+        #define LV_USE_NUTTX_TOUCHSCREEN    0
+    #endif
+#endif
+
 /*Driver for /dev/dri/card*/
 #ifndef LV_USE_LINUX_DRM
     #ifdef CONFIG_LV_USE_LINUX_DRM
@@ -2517,15 +2559,6 @@
         #define LV_USE_TFT_ESPI CONFIG_LV_USE_TFT_ESPI
     #else
         #define LV_USE_TFT_ESPI         0
-    #endif
-#endif
-
-/*Driver for /dev/input*/
-#ifndef LV_USE_NUTTX_TOUCHSCREEN
-    #ifdef CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-        #define LV_USE_NUTTX_TOUCHSCREEN CONFIG_LV_USE_NUTTX_TOUCHSCREEN
-    #else
-        #define LV_USE_NUTTX_TOUCHSCREEN    0
     #endif
 #endif
 

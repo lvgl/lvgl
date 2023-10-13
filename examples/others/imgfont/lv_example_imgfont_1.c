@@ -43,7 +43,7 @@ void lv_example_imgfont_1(void)
 
     imgfont->fallback = LV_FONT_DEFAULT;
 
-    lv_obj_t * label1 = lv_label_create(lv_scr_act());
+    lv_obj_t * label1 = lv_label_create(lv_screen_active());
     lv_label_set_text(label1, "12\uF600\uF617AB");
     lv_obj_set_style_text_font(label1, imgfont, LV_PART_MAIN);
     lv_obj_center(label1);
@@ -52,7 +52,7 @@ void lv_example_imgfont_1(void)
 
 void lv_example_imgfont_1(void)
 {
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_label_set_text(label, "imgfont is not installed");
     lv_obj_center(label);
 }

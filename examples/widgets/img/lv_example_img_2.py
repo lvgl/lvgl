@@ -17,7 +17,7 @@ image_cogwheel_argb = lv.image_dsc_t({
 })
 
 def create_slider(color):
-    slider = lv.slider(lv.scr_act())
+    slider = lv.slider(lv.screen_active())
     slider.set_range(0, 255)
     slider.set_size(10, 200)
     slider.set_style_bg_color(color, lv.PART.KNOB)
@@ -52,7 +52,7 @@ blue_slider.align_to(green_slider, lv.ALIGN.OUT_RIGHT_MID, 25, 0)
 intense_slider.align_to(blue_slider, lv.ALIGN.OUT_RIGHT_MID, 25, 0)
 
 # Now create the actual image
-image1 = lv.image(lv.scr_act())
+image1 = lv.image(lv.screen_active())
 image1.set_src(image_cogwheel_argb)
 image1.align(lv.ALIGN.RIGHT_MID, -20, 0)
 

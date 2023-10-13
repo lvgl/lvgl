@@ -18,7 +18,7 @@ random operations at random times within this range. Call
 
 If you want to pause the monkey, call
 :c:expr:`lv_monkey_set_enable(monkey, false)`. To delete the monkey, call
-:c:expr:`lv_monkey_del(monkey)`.
+:c:expr:`lv_monkey_delete(monkey)`.
 
 Note that ``input_range`` has different meanings in different ``type``:
 

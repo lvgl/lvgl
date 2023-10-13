@@ -169,6 +169,10 @@
      *0: Disable print timestamp*/
     #define LV_LOG_USE_TIMESTAMP 1
 
+    /*1: Print file and line number of the log;
+     *0: Do not print file and line number of the log*/
+    #define LV_LOG_USE_FILE_LINE 1
+
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #define LV_LOG_TRACE_MEM        1
     #define LV_LOG_TRACE_TIMER      1
@@ -699,6 +703,9 @@
 /*1: Enable a published subscriber based messaging system */
 #define LV_USE_MSG 0
 
+/*1: Enable an observer pattern implementation*/
+#define LV_USE_OBSERVER 0
+
 /*1: Enable Pinyin input method*/
 /*Requires: lv_keyboard*/
 #define LV_USE_IME_PINYIN 0
@@ -751,7 +758,11 @@
     #define LV_LINUX_FBDEV_BUFFER_SIZE   60
 #endif
 
-#define LV_USE_NUTTX_FBDEV     0
+/*Use Nuttx to open window and handle touchscreen*/
+#define LV_USE_NUTTX    0
+
+/*Use Nuttx custom init API to open window and handle touchscreen*/
+#define LV_USE_NUTTX_CUSTOM_INIT    0
 
 /*Driver for /dev/lcd*/
 #define LV_USE_NUTTX_LCD      0
@@ -760,14 +771,14 @@
     #define LV_NUTTX_LCD_BUFFER_SIZE     60
 #endif
 
+/*Driver for /dev/input*/
+#define LV_USE_NUTTX_TOUCHSCREEN    0
+
 /*Driver for /dev/dri/card*/
 #define LV_USE_LINUX_DRM        0
 
 /*Interface for TFT_eSPI*/
 #define LV_USE_TFT_ESPI         0
-
-/*Driver for /dev/input*/
-#define LV_USE_NUTTX_TOUCHSCREEN    0
 
 /*==================
 * EXAMPLES

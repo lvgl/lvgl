@@ -53,7 +53,7 @@ style_pr.set_image_recolor(lv.color_black())
 style_pr.set_transform_width(20)
 
 # Create an image button
-imgbtn1 = lv.imgbtn(lv.scr_act())
+imgbtn1 = lv.imgbtn(lv.screen_active())
 imgbtn1.set_src(lv.imgbtn.STATE.RELEASED, imgbtn_left_dsc, imgbtn_mid_dsc, imgbtn_right_dsc)
 imgbtn1.add_style(style_def, 0)
 imgbtn1.add_style(style_pr, lv.STATE.PRESSED)

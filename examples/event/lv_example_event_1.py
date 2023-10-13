@@ -5,7 +5,7 @@ class Event_1():
         # Add click event to a button
         #
 
-        button = lv.button(lv.scr_act())
+        button = lv.button(lv.screen_active())
         button.set_size(100, 50)
         button.center()
         button.add_event(self.event_cb, lv.EVENT.CLICKED, None)

@@ -207,10 +207,6 @@ void lv_init(void)
     LV_LOG_WARN("Log level is set to 'Trace' which makes LVGL much slower");
 #endif
 
-#if LV_USE_MSG
-    lv_msg_init();
-#endif
-
 #if LV_USE_FS_FATFS != '\0'
     lv_fs_fatfs_init();
 #endif
@@ -271,10 +267,15 @@ void lv_init(void)
     LV_LOG_TRACE("finished");
 }
 
-#if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
-
 void lv_deinit(void)
 {
+    /*Do nothing if already deinit*/
+    if(!lv_initialized) {
+        LV_LOG_WARN("lv_deinit: already deinit!");
+        return;
+    }
+#if LV_ENABLE_GLOBAL_CUSTOM || LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN
+
 #if LV_USE_SYSMON
     _lv_sysmon_builtin_deinit();
 #endif
@@ -303,10 +304,6 @@ void lv_deinit(void)
 
     lv_mem_deinit();
 
-    lv_initialized = false;
-
-    LV_LOG_INFO("lv_deinit done");
-
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
 #endif
@@ -314,8 +311,12 @@ void lv_deinit(void)
 #if LV_USE_OBJ_ID_BUILTIN
     lv_objid_builtin_destroy();
 #endif
-}
 #endif
+
+    lv_initialized = false;
+
+    LV_LOG_INFO("lv_deinit done");
+}
 
 /**********************
  *   STATIC FUNCTIONS

@@ -16,7 +16,7 @@ style.set_border_width(1)
 style.set_border_color(lv.palette_main(lv.PALETTE.ORANGE))
 style.set_pad_all(2)
 
-spans = lv.spangroup(lv.scr_act())
+spans = lv.spangroup(lv.screen_active())
 spans.set_width(300)
 spans.set_height(300)
 spans.center()
@@ -46,7 +46,7 @@ except:
     fs_drv = lv.fs_drv_t()
     fs_driver.fs_register(fs_drv, 'S')
     print("montserrat-24 not enabled in lv_conf.h, dynamically loading the font")
-    
+
     # get the directory in which the script is running
     try:
         script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
@@ -56,7 +56,7 @@ except:
     if script_path != '':
         try:
             font_montserrat_24 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-24.fnt")
-            span.style.set_text_font(font_montserrat_24)            
+            span.style.set_text_font(font_montserrat_24)
         except:
             print("Cannot load font file montserrat-24.fnt")
 
@@ -77,7 +77,7 @@ except:
     fs_drv = lv.fs_drv_t()
     fs_driver.fs_register(fs_drv, 'S')
     print("montserrat-20 not enabled in lv_conf.h, dynamically loading the font")
-    
+
     # get the directory in which the script is running
     try:
         script_path = __file__[:__file__.rfind('/')] if __file__.find('/') >= 0 else '.'
@@ -87,7 +87,7 @@ except:
     if script_path != '':
         try:
             font_montserrat_20 = lv.font_load("S:" + script_path + "/../../assets/font/montserrat-20.fnt")
-            span.style.set_text_font(font_montserrat_20)            
+            span.style.set_text_font(font_montserrat_20)
         except:
             print("Cannot load font file montserrat-20.fnt")
 

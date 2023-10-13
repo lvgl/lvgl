@@ -28,7 +28,7 @@ static void event_handler(lv_event_t * e)
 
 void test_checkbox_creation_successfull(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     checkbox = lv_checkbox_create(active_screen);
 
     TEST_ASSERT_NOT_NULL(checkbox);
@@ -36,7 +36,7 @@ void test_checkbox_creation_successfull(void)
 
 void test_checkbox_should_call_event_handler_on_click_when_enabled(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     checkbox = lv_checkbox_create(active_screen);
 
     lv_obj_add_state(checkbox, LV_STATE_CHECKED);
@@ -53,7 +53,7 @@ void test_checkbox_should_have_default_text_when_created(void)
 {
     const char * default_text = "Check box";
 
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     checkbox = lv_checkbox_create(active_screen);
 
     TEST_ASSERT_EQUAL_STRING(default_text, lv_checkbox_get_text(checkbox));
@@ -64,7 +64,7 @@ void test_checkbox_should_return_dinamically_allocated_text(void)
 {
     const char * message = "Hello World!";
 
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     checkbox = lv_checkbox_create(active_screen);
 
     lv_checkbox_set_text(checkbox, message);
@@ -81,7 +81,7 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
     lv_mem_monitor_t m1;
     lv_mem_monitor(&m1);
 
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     checkbox = lv_checkbox_create(active_screen);
 
     initial_available_memory = m1.free_size;
@@ -91,6 +91,29 @@ void test_checkbox_should_allocate_memory_for_static_text(void)
     lv_mem_monitor(&m1);
 
     LV_HEAP_CHECK(TEST_ASSERT_LESS_THAN(initial_available_memory, m1.free_size));
+}
+
+void test_checkbox_rtl(void)
+{
+    const char * message =
+        "מעבד, או בשמו המלא יחידת עיבוד מרכזית (באנגלית: CPU - Central Processing Unit).";
+
+    lv_obj_t * screen = lv_obj_create(lv_screen_active());
+    lv_obj_remove_style_all(screen);
+    lv_obj_set_size(screen, 800, 480);
+    lv_obj_center(screen);
+    lv_obj_set_style_bg_color(screen, lv_color_white(), 0);
+    lv_obj_set_style_bg_opa(screen, LV_OPA_100, 0);
+    lv_obj_set_style_pad_all(screen, 0, 0);
+
+    lv_obj_t * test_checkbox = lv_checkbox_create(active_screen);
+
+    lv_checkbox_set_text(test_checkbox, message);
+    lv_obj_set_style_text_font(test_checkbox, &lv_font_dejavu_16_persian_hebrew, 0);
+    lv_obj_center(test_checkbox);
+    lv_obj_set_style_base_dir(test_checkbox, LV_BASE_DIR_RTL, 0);
+
+    TEST_ASSERT_EQUAL_SCREENSHOT("checkbox_rtl_1.png");
 }
 
 #endif

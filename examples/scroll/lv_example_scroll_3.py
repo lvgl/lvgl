@@ -5,7 +5,7 @@ class ScrollExample_3():
         # Create a list with a floating button
         #
 
-        list = lv.list(lv.scr_act())
+        list = lv.list(lv.screen_active())
         list.set_size(280, 220)
         list.center()
 

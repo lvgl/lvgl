@@ -9,7 +9,7 @@ static lv_obj_t * active_screen = NULL;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
 }
 
 void tearDown(void)

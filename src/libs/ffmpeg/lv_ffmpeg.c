@@ -835,7 +835,7 @@ static void lv_ffmpeg_player_destructor(const lv_obj_class_t * class_p,
     lv_ffmpeg_player_t * player = (lv_ffmpeg_player_t *)obj;
 
     if(player->timer) {
-        lv_timer_del(player->timer);
+        lv_timer_delete(player->timer);
         player->timer = NULL;
     }
 

@@ -40,7 +40,7 @@ void lv_example_anim_3(void)
     static lv_coord_t row_dsc[] = {30, 10, 10, LV_GRID_FR(1), LV_GRID_TEMPLATE_LAST};
 
     /*Create a container with grid*/
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_style_pad_all(cont, 2, LV_PART_MAIN);
     lv_obj_set_style_pad_column(cont, 10, LV_PART_MAIN);
     lv_obj_set_style_pad_row(cont, 10, LV_PART_MAIN);
@@ -122,7 +122,7 @@ static void page_obj_init(lv_obj_t * par)
     ginfo.anim_obj = lv_obj_create(par);
     lv_obj_set_size(ginfo.anim_obj, 30, 30);
     lv_obj_set_align(ginfo.anim_obj, LV_ALIGN_TOP_LEFT);
-    lv_obj_clear_flag(ginfo.anim_obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(ginfo.anim_obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(ginfo.anim_obj, lv_palette_main(LV_PALETTE_RED), LV_PART_MAIN);
     lv_obj_set_grid_cell(ginfo.anim_obj, LV_GRID_ALIGN_START, 0, 1, LV_GRID_ALIGN_START, 0, 1);
 

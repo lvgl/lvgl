@@ -32,7 +32,7 @@ style_button_pressed.set_bg_color(lv.palette_main(lv.PALETTE.BLUE))
 style_button_pressed.set_bg_grad_color(lv.palette_darken(lv.PALETTE.RED, 3))
 
 # Create a button and use the new styles
-button = lv.button(lv.scr_act())                  # Add a button the current screen
+button = lv.button(lv.screen_active())                  # Add a button the current screen
 # Remove the styles coming from the theme
 # Note that size and position are also stored as style properties
 # so lv_obj_remove_style_all will remove the set size and position too
@@ -47,12 +47,12 @@ label.set_text("Button")                    # Set the labels text
 label.center()
 
 # Create a slider in the center of the display
-slider = lv.slider(lv.scr_act())
+slider = lv.slider(lv.screen_active())
 slider.set_width(200)                                              # Set the width
 slider.center()                                                    # Align to the center of the parent (screen)
 
 # Create another button and use the red style too
-button2 = lv.button(lv.scr_act())
+button2 = lv.button(lv.screen_active())
 button2.remove_style_all()                     # Remove the styles coming from the theme
 button2.set_pos(10, 80)                        # Set its position
 button2.set_size(120, 50)                      # Set its size

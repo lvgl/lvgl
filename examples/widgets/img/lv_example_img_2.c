@@ -31,7 +31,7 @@ void lv_example_image_2(void)
 
     /*Now create the actual image*/
     LV_IMAGE_DECLARE(img_cogwheel_argb)
-    img1 = lv_image_create(lv_scr_act());
+    img1 = lv_image_create(lv_screen_active());
     lv_image_set_src(img1, &img_cogwheel_argb);
     lv_obj_align(img1, LV_ALIGN_RIGHT_MID, -20, 0);
 
@@ -52,7 +52,7 @@ static void slider_event_cb(lv_event_t * e)
 
 static lv_obj_t * create_slider(lv_color_t color)
 {
-    lv_obj_t * slider = lv_slider_create(lv_scr_act());
+    lv_obj_t * slider = lv_slider_create(lv_screen_active());
     lv_slider_set_range(slider, 0, 255);
     lv_obj_set_size(slider, 10, 200);
     lv_obj_set_style_bg_color(slider, color, LV_PART_KNOB);

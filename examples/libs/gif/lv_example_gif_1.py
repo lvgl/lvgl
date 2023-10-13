@@ -16,11 +16,11 @@ image_bulb_gif = lv.image_dsc_t(
         "data": img_bulb_gif_map,
     }
 )
-image1 = lv.gif(lv.scr_act())
+image1 = lv.gif(lv.screen_active())
 image1.set_src(image_bulb_gif)
 image1.align(lv.ALIGN.RIGHT_MID, -150, 0)
 
-image2 = lv.gif(lv.scr_act())
+image2 = lv.gif(lv.screen_active())
 # The File system is attached to letter 'S'
 
 image2.set_src("S:bulb.gif")

@@ -16,7 +16,7 @@ style_indic.set_bg_opa(lv.OPA.COVER)
 style_indic.set_bg_color(lv.palette_main(lv.PALETTE.BLUE))
 style_indic.set_radius(3)
 
-bar = lv.bar(lv.scr_act())
+bar = lv.bar(lv.screen_active())
 bar.remove_style_all()   # To have a clean start
 bar.add_style(style_bg, 0)
 bar.add_style(style_indic, lv.PART.INDICATOR)

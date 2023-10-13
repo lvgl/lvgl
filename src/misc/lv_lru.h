@@ -70,7 +70,7 @@ typedef struct /// @cond
 lv_lru_t * lv_lru_create(size_t cache_size, size_t average_length, lv_lru_free_cb_t value_free,
                          lv_lru_free_cb_t key_free);
 
-void lv_lru_del(lv_lru_t * cache);
+void lv_lru_delete(lv_lru_t * cache);
 
 lv_lru_res_t lv_lru_set(lv_lru_t * cache, const void * key, size_t key_length, void * value, size_t value_length);
 

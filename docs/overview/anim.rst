@@ -123,7 +123,7 @@ pixels so *20* means *20 px/sec* speed.
 Delete animations
 *****************
 
-You can delete an animation with :cpp:expr:`lv_anim_del(var, func)` if you
+You can delete an animation with :cpp:expr:`lv_anim_delete(var, func)` if you
 provide the animated variable and its animator function.
 
 Timeline
@@ -159,7 +159,7 @@ duration of the entire animation timeline.
 Call :cpp:expr:`lv_anim_timeline_get_reverse(at)` function to get whether to
 reverse the animation timeline.
 
-Call :cpp:expr:`lv_anim_timeline_del(at)` function to delete the animation
+Call :cpp:expr:`lv_anim_timeline_delete(at)` function to delete the animation
 timeline.
 
 .. image:: /misc/anim-timeline.png

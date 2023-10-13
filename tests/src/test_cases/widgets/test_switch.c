@@ -15,7 +15,7 @@ lv_obj_t * sw = NULL;
 void setUp(void)
 {
     /* Function run before every test */
-    scr = lv_scr_act();
+    scr = lv_screen_active();
     sw = lv_switch_create(scr);
 }
 
@@ -62,7 +62,7 @@ void test_switch_should_not_leak_memory_after_deletion(void)
     }
 
     for(idx = 0; idx < SWITCHES_CNT; idx++) {
-        lv_obj_del(switches[idx]);
+        lv_obj_delete(switches[idx]);
     }
 
     lv_mem_monitor(&monitor);

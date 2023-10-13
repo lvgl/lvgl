@@ -3,7 +3,7 @@
 # Demonstrate scroll chaining with a long list that
 # scrolls the tile view when it can't be scrolled further.
 #
-tv = lv.tileview(lv.scr_act())
+tv = lv.tileview(lv.screen_active())
 
 # Tile1: just a label
 tile1 = tv.add_tile(0, 0, lv.DIR.BOTTOM)

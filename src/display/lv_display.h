@@ -81,7 +81,7 @@ typedef enum {
     LV_SCR_LOAD_ANIM_OUT_RIGHT,
     LV_SCR_LOAD_ANIM_OUT_TOP,
     LV_SCR_LOAD_ANIM_OUT_BOTTOM,
-} lv_scr_load_anim_t;
+} lv_screen_load_anim_t;
 
 
 typedef void (*lv_display_flush_cb_t)(struct _lv_display_t * disp, const lv_area_t * area, uint8_t * px_map);
@@ -312,9 +312,9 @@ bool lv_display_is_double_buffered(lv_display_t * disp);
  * Return a pointer to the active screen on a display
  * @param disp      pointer to display which active screen should be get.
  *                  (NULL to use the default screen)
- * @return          pointer to the active screen object (loaded by 'lv_scr_load()')
+ * @return          pointer to the active screen object (loaded by 'lv_screen_load()')
  */
-struct _lv_obj_t * lv_display_get_scr_act(lv_display_t * disp);
+struct _lv_obj_t * lv_display_get_screen_act(lv_display_t * disp);
 
 /**
  * Return with a pointer to the previous screen. Only used during screen transitions.
@@ -322,7 +322,7 @@ struct _lv_obj_t * lv_display_get_scr_act(lv_display_t * disp);
  *                  (NULL to use the default screen)
  * @return          pointer to the previous screen object or NULL if not used now
  */
-struct _lv_obj_t * lv_display_get_scr_prev(lv_display_t * disp);
+struct _lv_obj_t * lv_display_get_screen_prev(lv_display_t * disp);
 
 /**
  * Make a screen active
@@ -357,21 +357,21 @@ struct _lv_obj_t * lv_display_get_layer_bottom(lv_display_t * disp);
 /**
  * Switch screen with animation
  * @param scr       pointer to the new screen to load
- * @param anim_type type of the animation from `lv_scr_load_anim_t`, e.g. `LV_SCR_LOAD_ANIM_MOVE_LEFT`
+ * @param anim_type type of the animation from `lv_screen_load_anim_t`, e.g. `LV_SCR_LOAD_ANIM_MOVE_LEFT`
  * @param time      time of the animation
  * @param delay     delay before the transition
  * @param auto_del  true: automatically delete the old screen
  */
-void lv_scr_load_anim(struct _lv_obj_t * scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay,
-                      bool auto_del);
+void lv_screen_load_anim(struct _lv_obj_t * scr, lv_screen_load_anim_t anim_type, uint32_t time, uint32_t delay,
+                         bool auto_del);
 
 /**
  * Get the active screen of the default display
  * @return          pointer to the active screen
  */
-static inline struct _lv_obj_t * lv_scr_act(void)
+static inline struct _lv_obj_t * lv_screen_active(void)
 {
-    return lv_display_get_scr_act(lv_display_get_default());
+    return lv_display_get_screen_act(lv_display_get_default());
 }
 
 /**
@@ -405,7 +405,7 @@ static inline struct _lv_obj_t * lv_layer_bottom(void)
  * Load a screen on the default display
  * @param scr       pointer to a screen
  */
-static inline void lv_scr_load(struct _lv_obj_t * scr)
+static inline void lv_screen_load(struct _lv_obj_t * scr)
 {
     lv_display_load_scr(scr);
 }

@@ -7,7 +7,7 @@ static lv_obj_t * list;
 
 void setUp(void)
 {
-    list = lv_list_create(lv_scr_act());
+    list = lv_list_create(lv_screen_active());
 }
 
 void tearDown(void)
@@ -49,7 +49,7 @@ void test_list_get_text_from_label(void)
 
 void test_list_snapshot(void)
 {
-    lv_obj_t * snapshot_list = lv_list_create(lv_scr_act());
+    lv_obj_t * snapshot_list = lv_list_create(lv_screen_active());
 
     lv_list_add_text(snapshot_list, "File");
     lv_list_add_button(snapshot_list, LV_SYMBOL_FILE, "New");

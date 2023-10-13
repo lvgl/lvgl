@@ -85,7 +85,7 @@ A simple example
 .. code:: python
 
    lv.start()                 # start LVGL
-   scr = lv.scr_act()         # get default screen
+   scr = lv.screen_active()         # get default screen
    btn = lv.btn(scr)          # create button
    btn.center()
    label = lv.label(btn)      # create a label in the button

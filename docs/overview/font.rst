@@ -33,7 +33,7 @@ To test it try
 
 .. code:: c
 
-   lv_obj_t * label1 = lv_label_create(lv_scr_act(), NULL);
+   lv_obj_t * label1 = lv_label_create(lv_screen_active(), NULL);
    lv_label_set_text(label1, LV_SYMBOL_OK);
 
 If all works well, a ✓ character should be displayed.
@@ -135,20 +135,20 @@ The default base direction for screens can be set by
 base direction from their parent.
 
 To set an object's base direction use :cpp:expr:`lv_obj_set_base_dir(obj, base_dir)`.
-The possible base directions are: 
+The possible base directions are:
 
 - :cpp:enumerator:`LV_BASE_DIR_LTR`: Left to Right base direction
 - :cpp:enumerator:`LV_BASE_DIR_RTL`: Right to Left base direction
 - :cpp:enumerator:`LV_BASE_DIR_AUTO`: Auto detect base direction
 
-This list summarizes the effect of RTL base direction on objects: 
+This list summarizes the effect of RTL base direction on objects:
 
-- Create objects by default on the right 
-- ``lv_tabview``: Displays tabs from right to left 
-- ``lv_checkbox``: Shows the box on the right 
-- ``lv_btnmatrix``: Shows buttons from right to left 
-- ``lv_list``: Shows icons on the right 
-- ``lv_dropdown``: Aligns options to the right 
+- Create objects by default on the right
+- ``lv_tabview``: Displays tabs from right to left
+- ``lv_checkbox``: Shows the box on the right
+- ``lv_btnmatrix``: Shows buttons from right to left
+- ``lv_list``: Shows icons on the right
+- ``lv_dropdown``: Aligns options to the right
 - The texts in ``lv_table``, ``lv_btnmatrix``, ``lv_keyboard``, ``lv_tabview``, ``lv_dropdown``, ``lv_roller`` are "BiDi processed" to be displayed correctly
 
 Arabic and Persian support
@@ -162,9 +162,9 @@ should also be taken into account.
 
 LVGL supports these rules if :c:macro:`LV_USE_ARABIC_PERSIAN_CHARS` is enabled.
 
-However, there are some limitations: 
+However, there are some limitations:
 
-- Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature. 
+- Only displaying text is supported (e.g. on labels), text inputs (e.g. text area) don't support this feature.
 - Static text (i.e. const) is not processed. E.g. texts set by :cpp:func:`lv_label_set_text` will be "Arabic processed" but :cpp:func:`lv_label_set_text_static` won't.
 - Text get functions (e.g. :cpp:func:`lv_label_get_text`) will return the processed text.
 
@@ -179,9 +179,9 @@ letter anti-aliasing. Learn more
 `here <https://en.wikipedia.org/wiki/Subpixel_rendering>`__.
 
 For subpixel rendering, the fonts need to be generated with special
-settings: 
+settings:
 
-- In the online converter tick the ``Subpixel`` box 
+- In the online converter tick the ``Subpixel`` box
 - In the command line tool use ``--lcd`` flag. Note that the generated font needs about three times more memory.
 
 Subpixel rendering works only if the color channels of the pixels have a
@@ -194,18 +194,18 @@ however this can be swapped by setting :c:macro:`LV_SUBPX_BGR`  ``1`` in
 Compressed fonts
 ----------------
 
-The bitmaps of fonts can be compressed by 
+The bitmaps of fonts can be compressed by
 
-- ticking the ``Compressed`` check box in the online converter 
+- ticking the ``Compressed`` check box in the online converter
 - not passing the ``--no-compress`` flag to the offline converter (compression is applied by default)
 
 Compression is more effective with larger fonts and higher bpp. However,
 it's about 30% slower to render compressed fonts. Therefore, it's
 recommended to compress only the largest fonts of a user interface,
-because 
+because
 
-- they need the most memory 
-- they can be compressed better 
+- they need the most memory
+- they can be compressed better
 - and probably they are used less frequently then the medium-sized fonts, so the performance cost is smaller.
 
 .. _add_font:
@@ -213,13 +213,13 @@ because
 Add a new font
 **************
 
-There are several ways to add a new font to your project: 
+There are several ways to add a new font to your project:
 
-1. The simplest method is to use the `Online font converter <https://lvgl.io/tools/fontconverter>`__. 
+1. The simplest method is to use the `Online font converter <https://lvgl.io/tools/fontconverter>`__.
    Just set the parameters, click the *Convert* button, copy the font to your project
    and use it. **Be sure to carefully read the steps provided on that site
-   or you will get an error while converting.** 
-2. Use the `Offline font converter <https://github.com/lvgl/lv_font_conv>`__. 
+   or you will get an error while converting.**
+2. Use the `Offline font converter <https://github.com/lvgl/lv_font_conv>`__.
    (Requires Node.js to be installed)
 3. If you want to create something like the built-in
    fonts (Montserrat font and symbols) but in a different size and/or
@@ -237,10 +237,10 @@ Add new symbols
 
 The built-in symbols are created from the `FontAwesome <https://fontawesome.com/>`__ font.
 
-1. Search for a symbol on https://fontawesome.com. For example the 
+1. Search for a symbol on https://fontawesome.com. For example the
    `USB symbol <https://fontawesome.com/icons/usb?style=brands>`__. Copy its
    Unicode ID which is ``0xf287`` in this case.
-2. Open the `Online font converter <https://lvgl.io/tools/fontconverter>`__. 
+2. Open the `Online font converter <https://lvgl.io/tools/fontconverter>`__.
    Add `FontAwesome.woff <https://lvgl.io/assets/others/FontAwesome5-Solid+Brands+Regular.woff>`__.
 3. Set the parameters such as Name, Size, BPP. You'll use this name to
    declare and use the font in your code.
@@ -251,9 +251,9 @@ The built-in symbols are created from the `FontAwesome <https://fontawesome.com/
 6. Declare the font using ``extern lv_font_t my_font_name;`` or simply
    use :cpp:expr:`LV_FONT_DECLARE(my_font_name)`.
 
-**Using the symbol** 
+**Using the symbol**
 
-1. Convert the Unicode value to UTF8, for example on 
+1. Convert the Unicode value to UTF8, for example on
    `this site <http://www.ltg.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex>`__.
    For ``0xf287`` the *Hex UTF-8 bytes* are ``EF 8A 87``.
 2. Create a ``define`` string from the UTF8 values: ``#define MY_USB_SYMBOL "\xEF\x8A\x87"``

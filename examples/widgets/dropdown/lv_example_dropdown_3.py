@@ -21,7 +21,7 @@ def event_cb(e):
 #
 
 # Create a drop down list
-dropdown = lv.dropdown(lv.scr_act())
+dropdown = lv.dropdown(lv.screen_active())
 dropdown.align(lv.ALIGN.TOP_LEFT, 10, 10)
 dropdown.set_options("\n".join([
     "New project",

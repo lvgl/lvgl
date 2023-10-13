@@ -7,8 +7,8 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 }
 
 void tearDown(void)
@@ -59,7 +59,7 @@ void test_draw_triangle(void)
     static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(768, 4) * 440 * 4];
 
 
-    lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas, canvas_buf, 768, 440, LV_COLOR_FORMAT_ARGB8888);
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_RED, 2), LV_OPA_50);

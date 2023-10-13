@@ -109,7 +109,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_letter(lv_layer_t * layer, lv_draw_label_dsc_
     a.x1 = point->x;
     a.y1 = point->y;
     a.x2 = a.x1 + g.adv_w;
-    a.y2 = a.y1 + lv_font_get_line_height(g.resolved_font);
+    a.y2 = a.y1 + lv_font_get_line_height(g.resolved_font ? g.resolved_font : dsc->font);
 
     /*lv_draw_label needs UTF8 text so convert the Unicode character to an UTF8 string */
     uint32_t letter_buf[2];
@@ -379,8 +379,6 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
            letter != 0x200c) { /*ZERO WIDTH NON-JOINER*/
             LV_LOG_WARN("lv_draw_letter: glyph dsc. not found for U+%" LV_PRIX32, letter);
         }
-        LV_PROFILER_END;
-        return;
     }
 
     /*Don't draw anything if the character is empty. E.g. space*/
@@ -402,16 +400,22 @@ static void draw_letter(lv_draw_unit_t * draw_unit, lv_draw_glyph_dsc_t * dsc,  
     }
 
     uint32_t bitmap_size = lv_draw_buf_width_to_stride(g.box_w, LV_COLOR_FORMAT_A8) * g.box_h;
-    bitmap_size = (bitmap_size + 63) & (~63);   /*Round up*/
+    bitmap_size = (bitmap_size + 63) &
+                  (~63);   /*Round up to avoid many allocations if the next buffer is just slightly larger*/
     if(dsc->_bitmap_buf_size < bitmap_size) {
         lv_draw_buf_free(dsc->_bitmap_buf_unaligned);
         dsc->_bitmap_buf_unaligned = lv_draw_buf_malloc(bitmap_size, LV_COLOR_FORMAT_A8);
         LV_ASSERT_MALLOC(dsc->_bitmap_buf_unaligned);
-        dsc->bitmap_buf = lv_draw_buf_align_buf(dsc->_bitmap_buf_unaligned, LV_COLOR_FORMAT_A8);
+        dsc->bitmap_buf = lv_draw_buf_align(dsc->_bitmap_buf_unaligned, LV_COLOR_FORMAT_A8);
         dsc->_bitmap_buf_size = bitmap_size;
     }
 
-    dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter, dsc->bitmap_buf);
+    if(g.resolved_font) {
+        dsc->bitmap = lv_font_get_glyph_bitmap(g.resolved_font, letter, dsc->bitmap_buf);
+    }
+    else {
+        dsc->bitmap = NULL;
+    }
     dsc->letter_coords = &letter_coords;
     if(g.bpp == LV_IMGFONT_BPP) dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_IMAGE;
     else dsc->format = LV_DRAW_LETTER_BITMAP_FORMAT_A8;

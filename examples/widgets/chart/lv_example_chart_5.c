@@ -1,5 +1,5 @@
 #include "../../lv_examples.h"
-#if LV_USE_CHART && LV_USE_SLIDER && LV_BUILD_EXAMPLES
+#if LV_USE_CHART && LV_USE_SLIDER && LV_BUILD_EXAMPLES && 0
 
 static lv_obj_t * chart;
 /* Source: https://github.com/ankur219/ECG-Arrhythmia-classification/blob/642230149583adfae1e4bd26c6f0e1fd8af2be0e/sample.csv*/
@@ -50,14 +50,14 @@ static void slider_x_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(obj);
-    lv_chart_set_zoom_x(chart, v);
+    //    lv_chart_set_zoom_x(chart, v);
 }
 
 static void slider_y_event_cb(lv_event_t * e)
 {
     lv_obj_t * obj = lv_event_get_target(e);
     int32_t v = lv_slider_get_value(obj);
-    lv_chart_set_zoom_y(chart, v);
+    //    lv_chart_set_zoom_y(chart, v);
 }
 
 /**
@@ -68,7 +68,7 @@ static void slider_y_event_cb(lv_event_t * e)
 void lv_example_chart_5(void)
 {
     /*Create a chart*/
-    chart = lv_chart_create(lv_scr_act());
+    chart = lv_chart_create(lv_screen_active());
     lv_obj_set_size(chart, 200, 150);
     lv_obj_align(chart, LV_ALIGN_CENTER, -30, -30);
     lv_chart_set_range(chart, LV_CHART_AXIS_PRIMARY_Y, -1000, 1000);
@@ -83,13 +83,13 @@ void lv_example_chart_5(void)
     lv_chart_set_ext_y_array(chart, ser, (lv_coord_t *)ecg_sample);
 
     lv_obj_t * slider;
-    slider = lv_slider_create(lv_scr_act());
+    slider = lv_slider_create(lv_screen_active());
     lv_slider_set_range(slider, LV_SCALE_NONE, LV_SCALE_NONE * 10);
     lv_obj_add_event(slider, slider_x_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(slider, 200, 10);
     lv_obj_align_to(slider, chart, LV_ALIGN_OUT_BOTTOM_MID, 0, 20);
 
-    slider = lv_slider_create(lv_scr_act());
+    slider = lv_slider_create(lv_screen_active());
     lv_slider_set_range(slider, LV_SCALE_NONE, LV_SCALE_NONE * 10);
     lv_obj_add_event(slider, slider_y_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_set_size(slider, 10, 150);

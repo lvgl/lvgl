@@ -11,7 +11,7 @@ const char * dummy_text = "Hello LVGL!";
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
 }
 
 void tearDown(void)

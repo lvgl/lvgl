@@ -112,6 +112,8 @@ lv_event_dsc_t * lv_obj_get_event_dsc(struct _lv_obj_t * obj, uint32_t index);
 
 bool lv_obj_remove_event(struct _lv_obj_t * obj, uint32_t index);
 
+bool lv_obj_remove_event_cb(struct _lv_obj_t * obj, lv_event_cb_t event_cb);
+
 /**
  * Get the input device passed as parameter to indev related events.
  * @param e     pointer to an event

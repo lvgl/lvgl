@@ -1,6 +1,6 @@
 
 # Create a Tab view object
-tabview = lv.tabview(lv.scr_act(), lv.DIR.LEFT, 80)
+tabview = lv.tabview(lv.screen_active(), lv.DIR.LEFT, 80)
 
 tabview.set_style_bg_color(lv.palette_lighten(lv.PALETTE.RED, 2), 0)
 
@@ -36,5 +36,5 @@ label.set_text("Forth tab")
 label = lv.label(tab5)
 label.set_text("Fifth tab")
 
-tabview.get_content().clear_flag(lv.obj.FLAG.SCROLLABLE)
+tabview.get_content().remove_flag(lv.obj.FLAG.SCROLLABLE)
 

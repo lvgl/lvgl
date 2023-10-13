@@ -50,7 +50,7 @@ void lv_example_get_started_3(void)
     style_init();
 
     /*Create a button and use the new styles*/
-    lv_obj_t * btn = lv_button_create(lv_scr_act());
+    lv_obj_t * btn = lv_button_create(lv_screen_active());
     /* Remove the styles coming from the theme
      * Note that size and position are also stored as style properties
      * so lv_obj_remove_style_all will remove the set size and position too */
@@ -66,7 +66,7 @@ void lv_example_get_started_3(void)
     lv_obj_center(label);
 
     /*Create another button and use the red style too*/
-    lv_obj_t * btn2 = lv_button_create(lv_scr_act());
+    lv_obj_t * btn2 = lv_button_create(lv_screen_active());
     lv_obj_remove_style_all(btn2);                      /*Remove the styles coming from the theme*/
     lv_obj_set_pos(btn2, 10, 80);
     lv_obj_set_size(btn2, 120, 50);

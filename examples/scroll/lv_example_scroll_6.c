@@ -50,7 +50,7 @@ static void scroll_event_cb(lv_event_t * e)
  */
 void lv_example_scroll_6(void)
 {
-    lv_obj_t * cont = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont = lv_obj_create(lv_screen_active());
     lv_obj_set_size(cont, 200, 200);
     lv_obj_center(cont);
     lv_obj_set_flex_flow(cont, LV_FLEX_FLOW_COLUMN);

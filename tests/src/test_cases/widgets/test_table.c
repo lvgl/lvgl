@@ -8,13 +8,13 @@ static lv_obj_t * table = NULL;
 
 void setUp(void)
 {
-    scr = lv_scr_act();
+    scr = lv_screen_active();
     table = lv_table_create(scr);
 }
 
 void tearDown(void)
 {
-    lv_obj_clean(lv_scr_act());
+    lv_obj_clean(lv_screen_active());
 }
 
 void test_table_should_return_assigned_cell_value(void)

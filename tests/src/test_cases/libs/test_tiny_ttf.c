@@ -31,7 +31,7 @@ void test_tiny_ttf_rendering_test(void)
 
 
     /*Create a label with the new style*/
-    lv_obj_t * label = lv_label_create(lv_scr_act());
+    lv_obj_t * label = lv_label_create(lv_screen_active());
     lv_obj_add_style(label, &style, 0);
     lv_label_set_text(label, "Hello world\n"
                       "I'm a font created with Tiny TTF\n"

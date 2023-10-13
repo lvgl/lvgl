@@ -227,7 +227,7 @@ lv_font_t * lv_freetype_font_create(const char * pathname, uint16_t size, uint16
     return font;
 }
 
-void lv_freetype_font_del(lv_font_t * font)
+void lv_freetype_font_delete(lv_font_t * font)
 {
     LV_ASSERT_NULL(font);
     lv_freetype_font_dsc_t * dsc = (lv_freetype_font_dsc_t *)(font->dsc);

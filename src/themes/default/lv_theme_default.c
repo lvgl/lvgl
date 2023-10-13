@@ -89,7 +89,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CHART
-    lv_style_t chart_series, chart_indic, chart_ticks, chart_bg;
+    lv_style_t chart_series, chart_indic, chart_bg;
 #endif
 
 #if LV_USE_DROPDOWN
@@ -466,12 +466,6 @@ static void style_init(struct _my_theme_t * theme)
     lv_style_set_size(&theme->styles.chart_indic, chart_size, chart_size);
     lv_style_set_bg_color(&theme->styles.chart_indic, theme->base.color_primary);
     lv_style_set_bg_opa(&theme->styles.chart_indic, LV_OPA_COVER);
-
-    style_init_reset(&theme->styles.chart_ticks);
-    lv_style_set_line_width(&theme->styles.chart_ticks, _LV_DPX_CALC(theme->disp_dpi, 1));
-    lv_style_set_line_color(&theme->styles.chart_ticks, theme->color_text);
-    lv_style_set_pad_all(&theme->styles.chart_ticks, _LV_DPX_CALC(theme->disp_dpi, 2));
-    lv_style_set_text_color(&theme->styles.chart_ticks, lv_palette_main(LV_PALETTE_GREY));
 #endif
 
 #if LV_USE_MENU
@@ -653,10 +647,10 @@ static void style_init(struct _my_theme_t * theme)
 
 #if LV_USE_SCALE
     style_init_reset(&theme->styles.scale);
-    lv_style_set_line_color(&theme->styles.scale, lv_color_black());
-    lv_style_set_line_width(&theme->styles.scale, 2U);
-    lv_style_set_arc_color(&theme->styles.scale, lv_color_black());
-    lv_style_set_arc_width(&theme->styles.scale, 2U);
+    lv_style_set_line_color(&theme->styles.scale, theme->color_grey);
+    lv_style_set_line_width(&theme->styles.scale, LV_DPX(2));
+    lv_style_set_arc_color(&theme->styles.scale, theme->color_grey);
+    lv_style_set_arc_width(&theme->styles.scale, LV_DPX(2));
 #endif
 }
 
@@ -978,7 +972,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.scrollbar_scrolled, LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
         lv_obj_add_style(obj, &theme->styles.chart_series, LV_PART_ITEMS);
         lv_obj_add_style(obj, &theme->styles.chart_indic, LV_PART_INDICATOR);
-        lv_obj_add_style(obj, &theme->styles.chart_ticks, LV_PART_TICKS);
         lv_obj_add_style(obj, &theme->styles.chart_series, LV_PART_CURSOR);
     }
 #endif
@@ -1005,6 +998,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, &theme->styles.outline_primary, LV_STATE_FOCUS_KEY);
         lv_obj_add_style(obj, &theme->styles.outline_secondary, LV_STATE_EDITED);
         lv_obj_add_style(obj, &theme->styles.transition_normal, LV_PART_INDICATOR);
+        lv_obj_add_style(obj, &theme->styles.disabled, LV_STATE_DISABLED);
     }
     else if(lv_obj_check_type(obj, &lv_dropdownlist_class)) {
         lv_obj_add_style(obj, &theme->styles.card, 0);

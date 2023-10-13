@@ -3,9 +3,9 @@ Objects
 =======
 
 In LVGL the **basic building blocks** of a user interface are the
-objects, also called *Widgets*. For example a 
-`Button </widgets/btn>`__, `Label </widgets/label>`__, 
-`Image </widgets/img>`__, `List </widgets/list>`__, 
+objects, also called *Widgets*. For example a
+`Button </widgets/btn>`__, `Label </widgets/label>`__,
+`Image </widgets/img>`__, `List </widgets/list>`__,
 `Chart </widgets/chart>`__ or `Text area </widgets/textarea>`__.
 
 You can see all the `Object types </widgets/index>`__ here.
@@ -22,11 +22,11 @@ Basic attributes
 
 All object types share some basic attributes:
 
-- Position 
-- Size 
+- Position
+- Size
 - Parent
-- Styles 
-- Event handlers 
+- Styles
+- Event handlers
 - Etc
 
 You can set/get these attributes with ``lv_obj_set_...`` and
@@ -45,7 +45,7 @@ Specific attributes
 
 The object types have special attributes too. For example, a slider has
 
-- Minimum and maximum values 
+- Minimum and maximum values
 - Current value
 
 For these special attributes, every object type may have unique API
@@ -83,7 +83,7 @@ it. Therefore, all positions are relative to the parent.
 
 .. code:: c
 
-   lv_obj_t * parent = lv_obj_create(lv_scr_act());   /*Create a parent object on the current screen*/
+   lv_obj_t * parent = lv_obj_create(lv_screen_active());   /*Create a parent object on the current screen*/
    lv_obj_set_size(parent, 100, 80);                    /*Set the size of the parent*/
 
    lv_obj_t * obj1 = lv_obj_create(parent);             /*Create an object on the previously created parent object*/
@@ -146,11 +146,11 @@ the object and all of its children.
 
 .. code:: c
 
-   void lv_obj_del(lv_obj_t * obj);
+   void lv_obj_delete(lv_obj_t * obj);
 
 :cpp:func:`lv_obj_del` will delete the object immediately. If for any reason you
 can't delete the object immediately you can use
-:cpp:expr:`lv_obj_del_async(obj)` which will perform the deletion on the next
+:cpp:expr:`lv_obj_delete_async(obj)` which will perform the deletion on the next
 call of :cpp:func:`lv_timer_handler`. This is useful e.g. if you want to
 delete the parent of an object in the child's :cpp:enumerator:`LV_EVENT_DELETE`
 handler.
@@ -158,7 +158,7 @@ handler.
 You can remove all the children of an object (but not the object itself)
 using :cpp:expr:`lv_obj_clean(obj)`.
 
-You can use :cpp:expr:`lv_obj_del_delayed(obj, 1000)` to delete an object after
+You can use :cpp:expr:`lv_obj_delete_delayed(obj, 1000)` to delete an object after
 some time. The delay is expressed in milliseconds.
 
 Screens
@@ -174,7 +174,7 @@ be created like:
 
    lv_obj_t * scr1 = lv_obj_create(NULL);
 
-Screens can be created with any object type. For example, a 
+Screens can be created with any object type. For example, a
 `Base object </widgets/obj>`__ or an image to make a wallpaper.
 
 Get the active screen
@@ -183,19 +183,19 @@ Get the active screen
 There is always an active screen on each display. By default, the
 library creates and loads a "Base object" as a screen for each display.
 
-To get the currently active screen use the :cpp:func:`lv_scr_act` function.
+To get the currently active screen use the :cpp:func:`lv_screen_active` function.
 
 Load screens
 ------------
 
-To load a new screen, use :cpp:expr:`lv_scr_load(scr1)`.
+To load a new screen, use :cpp:expr:`lv_screen_load(scr1)`.
 
 Layers
 ------
 
-There are two automatically generated layers: 
+There are two automatically generated layers:
 
-- top layer 
+- top layer
 - system layer
 
 They are independent of the screens and they will be shown on every
@@ -215,8 +215,8 @@ Load screen with animation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A new screen can be loaded with animation by using
-:cpp:expr:`lv_scr_load_anim(scr, transition_type, time, delay, auto_del)`. The
-following transition types exist: 
+:cpp:expr:`lv_screen_load_anim(scr, transition_type, time, delay, auto_del)`. The
+following transition types exist:
 
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_NONE`: Switch immediately after ``delay`` milliseconds
 - :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_LEFT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_RIGHT`, :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_TOP` and :cpp:enumerator:`LV_SCR_LOAD_ANIM_OVER_BOTTOM`: Move the new screen over the current towards the given direction
@@ -227,7 +227,7 @@ following transition types exist:
 Setting ``auto_del`` to ``true`` will automatically delete the old
 screen when the animation is finished.
 
-The new screen will become active (returned by :cpp:func:`lv_scr_act`) when
+The new screen will become active (returned by :cpp:func:`lv_screen_active`) when
 the animation starts after ``delay`` time. All inputs are disabled
 during the screen animation.
 
@@ -239,20 +239,20 @@ Screens are created on the currently selected *default display*. The
 :cpp:func:`lv_disp_drv_register`. You can also explicitly select a new default
 display using :cpp:expr:`lv_disp_set_default(disp)`.
 
-:cpp:func:`lv_scr_act`, :cpp:func:`lv_scr_load` and :cpp:func:`lv_scr_load_anim` operate
-on the default screen.
+:cpp:func:`lv_screen_active`, :cpp:func:`lv_screen_load` and :cpp:func:`lv_screen_load_anim` operate
+on the default display.
 
 Visit `Multi-display support </overview/display>`__ to learn more.
 
 Parts
 *****
 
-The widgets are built from multiple parts. For example a 
+The widgets are built from multiple parts. For example a
 `Base object </widgets/obj>`__ uses the main and scrollbar parts but a
 `Slider </widgets/slider>`__ uses the main, indicator and knob parts.
 Parts are similar to *pseudo-elements* in CSS.
 
-The following predefined parts exist in LVGL: 
+The following predefined parts exist in LVGL:
 
 - :cpp:enumerator:`LV_PART_MAIN`: A background like rectangle
 - :cpp:enumerator:`LV_PART_SCROLLBAR`: The scrollbar(s)
@@ -260,12 +260,11 @@ The following predefined parts exist in LVGL:
 - :cpp:enumerator:`LV_PART_KNOB`: Like a handle to grab to adjust the value
 - :cpp:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section
 - :cpp:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells)
-- :cpp:enumerator:`LV_PART_TICKS`: Ticks on scales e.g. for a chart or meter
 - :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor
 - :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom parts can be added from here.
 
 The main purpose of parts is to allow styling the "components" of the
-widgets. They are described in more detail in the 
+widgets. They are described in more detail in the
 `Style overview </overview/style>`__ section.
 
 States
@@ -291,7 +290,7 @@ The states are usually automatically changed by the library as the user
 interacts with an object (presses, releases, focuses, etc.). However,
 the states can be changed manually too. To set or clear given state (but
 leave the other states untouched) use
-``lv_obj_add/clear_state(obj, LV_STATE_...)`` In both cases OR-ed state
+``lv_obj_add/remove_state(obj, LV_STATE_...)`` In both cases OR-ed state
 values can be used as well. E.g.
 :cpp:expr:`lv_obj_add_state(obj, part, LV_STATE_PRESSED | LV_PRESSED_CHECKED)`.
 

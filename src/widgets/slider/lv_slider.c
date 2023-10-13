@@ -92,8 +92,8 @@ static void lv_slider_constructor(const lv_obj_class_t * class_p, lv_obj_t * obj
     slider->dragging = 0U;
     slider->left_knob_focus = 0U;
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_ext_click_area(obj, LV_DPX(8));
 }
@@ -178,11 +178,11 @@ static void lv_slider_event(const lv_obj_class_t * class_p, lv_event_t * e)
     else if(code == LV_EVENT_SIZE_CHANGED) {
         if(is_slider_horizontal(obj)) {
             lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
         }
         else {
             lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         }
         lv_obj_refresh_ext_draw_size(obj);
     }
@@ -469,9 +469,9 @@ static void update_knob_pos(lv_obj_t * obj, bool check_drag)
     if(*slider->value_to_set != new_value) {
         *slider->value_to_set = new_value;
         if(is_hor)
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_VER);
         else
-            lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
+            lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_CHAIN_HOR);
 
         lv_obj_invalidate(obj);
         lv_result_t res = lv_obj_send_event(obj, LV_EVENT_VALUE_CHANGED, NULL);

@@ -64,7 +64,6 @@ extern "C" {
 #include "src/widgets/line/lv_line.h"
 #include "src/widgets/list/lv_list.h"
 #include "src/widgets/menu/lv_menu.h"
-#include "src/widgets/meter/lv_meter.h"
 #include "src/widgets/msgbox/lv_msgbox.h"
 #include "src/widgets/roller/lv_roller.h"
 #include "src/widgets/scale/lv_scale.h"
@@ -85,7 +84,7 @@ extern "C" {
 #include "src/others/gridnav/lv_gridnav.h"
 #include "src/others/fragment/lv_fragment.h"
 #include "src/others/imgfont/lv_imgfont.h"
-#include "src/others/msg/lv_msg.h"
+#include "src/others/observer/lv_observer.h"
 #include "src/others/ime/lv_ime_pinyin.h"
 #include "src/others/file_explorer/lv_file_explorer.h"
 
@@ -118,10 +117,11 @@ extern "C" {
 
 #include "src/dev/display/drm/lv_linux_drm.h"
 #include "src/dev/display/fb/lv_linux_fbdev.h"
-#include "src/dev/display/fb/lv_nuttx_fbdev.h"
-#include "src/dev/display/lcd/lv_nuttx_lcd.h"
 
-#include "src/dev/input/touchscreen/lv_nuttx_touchscreen.h"
+#include "src/dev/nuttx/lv_nuttx_entry.h"
+#include "src/dev/nuttx/lv_nuttx_fbdev.h"
+#include "src/dev/nuttx/lv_nuttx_touchscreen.h"
+#include "src/dev/nuttx/lv_nuttx_lcd.h"
 
 #include "src/core/lv_global.h"
 /*********************

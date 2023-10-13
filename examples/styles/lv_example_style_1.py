@@ -16,7 +16,7 @@ style.set_x(lv.pct(50))
 style.set_y(80)
 
 # Create an object with the new style
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.add_style(style, 0)
 
 label = lv.label(obj)

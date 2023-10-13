@@ -104,7 +104,7 @@ static void add_data(lv_timer_t * timer)
 void lv_example_chart_2(void)
 {
     /*Create a chart1*/
-    chart1 = lv_chart_create(lv_scr_act());
+    chart1 = lv_chart_create(lv_screen_active());
     lv_obj_set_size(chart1, 200, 150);
     lv_obj_center(chart1);
     lv_chart_set_type(chart1, LV_CHART_TYPE_LINE);   /*Show lines and points too*/

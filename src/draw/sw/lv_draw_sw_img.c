@@ -52,15 +52,16 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 
     /*It can happen that nothing was draw on a layer and therefore its buffer is not allocated.
      *In this case just return. */
-    if(layer_to_draw->draw_buf.buf == NULL) return;
+    if(layer_to_draw->buf == NULL) return;
 
     lv_image_dsc_t img_dsc;
-    img_dsc.header.w = layer_to_draw->draw_buf.width;
-    img_dsc.header.h = layer_to_draw->draw_buf.height;
-    img_dsc.header.cf = layer_to_draw->draw_buf.color_format;
-    img_dsc.header.stride = lv_draw_buf_get_stride(&layer_to_draw->draw_buf);
+    img_dsc.header.w = lv_area_get_width(&layer_to_draw->buf_area);
+    img_dsc.header.h = lv_area_get_height(&layer_to_draw->buf_area);
+    img_dsc.header.cf = layer_to_draw->color_format;
+    img_dsc.header.stride = lv_draw_buf_width_to_stride(lv_area_get_width(&layer_to_draw->buf_area),
+                                                        layer_to_draw->color_format);
     img_dsc.header.always_zero = 0;
-    img_dsc.data = lv_draw_buf_get_buf(&layer_to_draw->draw_buf);
+    img_dsc.data = lv_draw_buf_align(layer_to_draw->buf, layer_to_draw->color_format);
 
     lv_draw_image_dsc_t new_draw_dsc;
     lv_memcpy(&new_draw_dsc, draw_dsc, sizeof(lv_draw_image_dsc_t));
@@ -89,7 +90,7 @@ void lv_draw_sw_layer(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t * dr
 #if LV_USE_LAYER_DEBUG
     lv_draw_fill_dsc_t fill_dsc;
     lv_draw_fill_dsc_init(&fill_dsc);
-    fill_dsc.color = lv_color_hex(layer_to_draw->draw_buf.color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
+    fill_dsc.color = lv_color_hex(layer_to_draw->draw_color_format == LV_COLOR_FORMAT_ARGB8888 ? 0xff0000 : 0x00ff00);
     fill_dsc.opa = LV_OPA_20;
     lv_draw_sw_fill(draw_unit, &fill_dsc, &area_rot);
 
@@ -283,14 +284,24 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             if(cf == LV_COLOR_FORMAT_RGB888 || cf == LV_COLOR_FORMAT_XRGB8888) cf_final = LV_COLOR_FORMAT_ARGB8888;
             if(cf == LV_COLOR_FORMAT_RGB565) cf_final = LV_COLOR_FORMAT_RGB565A8;
         }
-
+        uint8_t * tmp_buf;
         uint32_t px_size = lv_color_format_get_size(cf_final);
-        uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
-        lv_coord_t buf_h = MAX_BUF_SIZE / buf_stride;
-        if(buf_h > blend_h) buf_h = blend_h;
+        lv_coord_t buf_h;
+        if(cf_final == LV_COLOR_FORMAT_RGB565A8) {
+            uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, LV_COLOR_FORMAT_RGB565);
+            buf_stride += blend_w;          /*For the A8 part which is not stride aligned*/
+            buf_h = MAX_BUF_SIZE / buf_stride;
+            if(buf_h > blend_h) buf_h = blend_h;
+            tmp_buf = lv_draw_buf_malloc(buf_stride * buf_h, LV_COLOR_FORMAT_RGB565A8);
+        }
+        else {
+            uint32_t buf_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
+            buf_h = MAX_BUF_SIZE / buf_stride;
+            if(buf_h > blend_h) buf_h = blend_h;
+            tmp_buf = lv_draw_buf_malloc(buf_stride * buf_h, cf_final);
+        }
 
-        uint8_t * tmp_buf = lv_malloc(buf_stride * buf_h);
-        uint8_t * tmp_buf_aligned = lv_draw_buf_align_buf(tmp_buf, cf_final);
+        uint8_t * tmp_buf_aligned = lv_draw_buf_align(tmp_buf, cf_final);
         blend_dsc.src_buf = tmp_buf_aligned;
         blend_dsc.src_color_format = cf_final;
         lv_coord_t y_last = blend_area.y2;
@@ -314,7 +325,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
             blend_dsc.src_buf = NULL;
         }
         else {
-            blend_dsc.src_stride = buf_stride;
+            blend_dsc.src_stride = lv_draw_buf_width_to_stride(blend_w, cf_final);
         }
 
 
@@ -341,7 +352,7 @@ static void img_draw_core(lv_draw_unit_t * draw_unit, const lv_draw_image_dsc_t 
                         lv_memcpy(a_dest_buf, a_src_buf, blend_w);
                         rgb_src_buf += blend_dsc.src_stride;
                         a_src_buf += blend_dsc.src_stride / 2;
-                        rgb_dest_buf += blend_w * 2;
+                        rgb_dest_buf +=  blend_w * 2;
                         a_dest_buf += blend_w;
                     }
                 }

@@ -10,7 +10,7 @@ static lv_color_t red_color;
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     chart = lv_chart_create(active_screen);
 
     red_color = lv_palette_main(LV_PALETTE_RED);
@@ -102,18 +102,6 @@ void test_chart_one_point_when_setting_point_count_to_zero(void)
 {
     lv_chart_set_point_count(chart, 0u);
     TEST_ASSERT_EQUAL(1u, lv_chart_get_point_count(chart));
-}
-
-void test_chart_set_zoom_y_to_none_when_factor_is_less_than_256(void)
-{
-    lv_chart_set_zoom_y(chart, 128);
-    TEST_ASSERT_EQUAL(LV_SCALE_NONE, lv_chart_get_zoom_y(chart));
-}
-
-void test_chart_set_zoom_x_to_none_when_factor_is_less_than_256(void)
-{
-    lv_chart_set_zoom_x(chart, 128);
-    TEST_ASSERT_EQUAL(LV_SCALE_NONE, lv_chart_get_zoom_x(chart));
 }
 
 #endif

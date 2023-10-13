@@ -47,7 +47,7 @@ trans.init(props, lv.anim_t.path_linear, 300, 0, None)
 
 style_pr.set_transition(trans)
 
-button1 = lv.button(lv.scr_act())
+button1 = lv.button(lv.screen_active())
 button1.remove_style_all()                          # Remove the style coming from the theme
 button1.add_style(style, 0)
 button1.add_style(style_pr, lv.STATE.PRESSED)

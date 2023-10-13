@@ -88,7 +88,7 @@ A simple example
    btn.align(lv.ALIGN.CENTER, 0, 0)
    label = lv.label(btn)
    label.set_text('Hello World!')
-   lv.scr_load(scr)
+   lv.screen_load(scr)
 
 
 How can I use it?

@@ -16,7 +16,7 @@ static void radio_event_handler(lv_event_t * e)
     /*Do nothing if the container was clicked*/
     if(act_cb == cont) return;
 
-    lv_obj_clear_state(old_cb, LV_STATE_CHECKED);   /*Uncheck the previous radio button*/
+    lv_obj_remove_state(old_cb, LV_STATE_CHECKED);   /*Uncheck the previous radio button*/
     lv_obj_add_state(act_cb, LV_STATE_CHECKED);     /*Uncheck the current radio button*/
 
     *active_id = lv_obj_get_index(act_cb);
@@ -54,7 +54,7 @@ void lv_example_checkbox_2(void)
     uint32_t i;
     char buf[32];
 
-    lv_obj_t * cont1 = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont1 = lv_obj_create(lv_screen_active());
     lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_size(cont1, lv_pct(40), lv_pct(80));
     lv_obj_add_event(cont1, radio_event_handler, LV_EVENT_CLICKED, &active_index_1);
@@ -67,7 +67,7 @@ void lv_example_checkbox_2(void)
     /*Make the first checkbox checked*/
     lv_obj_add_state(lv_obj_get_child(cont1, 0), LV_STATE_CHECKED);
 
-    lv_obj_t * cont2 = lv_obj_create(lv_scr_act());
+    lv_obj_t * cont2 = lv_obj_create(lv_screen_active());
     lv_obj_set_flex_flow(cont2, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_size(cont2, lv_pct(40), lv_pct(80));
     lv_obj_set_x(cont2, lv_pct(50));

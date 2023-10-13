@@ -6,6 +6,6 @@ import fs_driver
 fs_drv = lv.fs_drv_t()
 fs_driver.fs_register(fs_drv, 'S')
 
-image = lv.image(lv.scr_act())
+image = lv.image(lv.screen_active())
 image.set_src("S:png_demo.png")
 image.center()

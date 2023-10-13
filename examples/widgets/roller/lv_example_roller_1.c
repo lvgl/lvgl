@@ -17,7 +17,7 @@ static void event_handler(lv_event_t * e)
  */
 void lv_example_roller_1(void)
 {
-    lv_obj_t * roller1 = lv_roller_create(lv_scr_act());
+    lv_obj_t * roller1 = lv_roller_create(lv_screen_active());
     lv_roller_set_options(roller1,
                           "January\n"
                           "February\n"

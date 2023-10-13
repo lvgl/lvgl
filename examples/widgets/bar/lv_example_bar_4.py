@@ -22,7 +22,7 @@ style_indic.set_bg_image_src(image_skew_strip_dsc)
 style_indic.set_bg_image_tiled(True)
 style_indic.set_bg_image_opa(lv.OPA._30)
 
-bar = lv.bar(lv.scr_act())
+bar = lv.bar(lv.screen_active())
 bar.add_style(style_indic, lv.PART.INDICATOR)
 
 bar.set_size(260, 20)

@@ -461,7 +461,7 @@ void lv_dropdown_open(lv_obj_t * dropdown_obj)
     lv_obj_add_state(dropdown_obj, LV_STATE_CHECKED);
     lv_obj_set_parent(dropdown->list, lv_obj_get_screen(dropdown_obj));
     lv_obj_move_to_index(dropdown->list, -1);
-    lv_obj_clear_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_remove_flag(dropdown->list, LV_OBJ_FLAG_HIDDEN);
 
     /*To allow styling the list*/
     lv_obj_send_event(dropdown_obj, LV_EVENT_READY, NULL);
@@ -554,7 +554,7 @@ void lv_dropdown_close(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, MY_CLASS);
 
-    lv_obj_clear_state(obj, LV_STATE_CHECKED);
+    lv_obj_remove_state(obj, LV_STATE_CHECKED);
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
@@ -621,7 +621,7 @@ static void lv_dropdown_destructor(const lv_obj_class_t * class_p, lv_obj_t * ob
     lv_dropdown_t * dropdown = (lv_dropdown_t *)obj;
 
     if(dropdown->list) {
-        lv_obj_del(dropdown->list);
+        lv_obj_delete(dropdown->list);
         dropdown->list = NULL;
     }
 
@@ -636,8 +636,8 @@ static void lv_dropdownlist_constructor(const lv_obj_class_t * class_p, lv_obj_t
     LV_UNUSED(class_p);
     LV_TRACE_OBJ_CREATE("begin");
 
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-    lv_obj_clear_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(obj, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_add_flag(obj, LV_OBJ_FLAG_HIDDEN);
 

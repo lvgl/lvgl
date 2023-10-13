@@ -10,8 +10,8 @@ LV_IMAGE_DECLARE(test_animimg003)
 
 static const lv_image_dsc_t * anim_imgs[3] = {
     &test_animimg001,
-    &test_animimg002,
-    &test_animimg003,
+    & test_animimg002,
+    & test_animimg003,
 };
 
 static lv_obj_t * active_screen = NULL;
@@ -28,7 +28,7 @@ void test_animimg_start(void);
 
 void setUp(void)
 {
-    active_screen = lv_scr_act();
+    active_screen = lv_screen_active();
     animimg = lv_animimg_create(active_screen);
 }
 

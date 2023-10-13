@@ -80,7 +80,7 @@ lv_anim_t * lv_anim_start(const lv_anim_t * a)
     LV_TRACE_ANIM("begin");
 
     /*Do not let two animations for the same 'var' with the same 'exec_cb'*/
-    if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*exec_cb == NULL would delete all animations of var*/
+    if(a->exec_cb != NULL) lv_anim_delete(a->var, a->exec_cb); /*exec_cb == NULL would delete all animations of var*/
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = _lv_ll_ins_head(anim_ll_p);
@@ -133,7 +133,7 @@ uint32_t lv_anim_get_playtime(lv_anim_t * a)
     return playtime;
 }
 
-bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
+bool lv_anim_delete(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
     bool del_any = false;
@@ -158,7 +158,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
     return del_any;
 }
 
-void lv_anim_del_all(void)
+void lv_anim_delete_all(void)
 {
     _lv_ll_clear(anim_ll_p);
     anim_mark_list_change();
@@ -331,7 +331,7 @@ static void anim_timer(lv_timer_t * param)
     while(a != NULL) {
         uint32_t elaps = lv_tick_elaps(a->last_timer_run);
         a->last_timer_run = lv_tick_get();
-        /*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete
+        /*It can be set by `lv_anim_delete()` typically in `end_cb`. If set then an animation delete
          * happened in `anim_ready_handler` which could make this linked list reading corrupt
          * because the list is changed meanwhile
          */

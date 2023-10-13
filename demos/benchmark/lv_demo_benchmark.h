@@ -43,7 +43,12 @@ typedef enum {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/** Run all test scenes in the LVGL benchmark with a given mode
+ */
 void lv_demo_benchmark(lv_demo_benchmark_mode_t mode);
+
+/** Run a specific test scene in the LVGL benchmark with a given mode
+ */
 void lv_demo_benchmark_run_scene(lv_demo_benchmark_mode_t mode, uint16_t scene_no);
 
 /**********************

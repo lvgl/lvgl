@@ -32,7 +32,7 @@ def slider_event_cb(e):
 #
 #Create a slider in the center of the display
 
-slider = lv.slider(lv.scr_act())
+slider = lv.slider(lv.screen_active())
 slider.center()
 
 slider.set_mode(lv.slider.MODE.RANGE)

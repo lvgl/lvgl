@@ -44,9 +44,9 @@ struct _lv_fragment_manager_t {
 
 static void item_create_obj(lv_fragment_managed_states_t * item);
 
-static void item_del_obj(lv_fragment_managed_states_t * item);
+static void item_delete_obj(lv_fragment_managed_states_t * item);
 
-static void item_del_fragment(lv_fragment_managed_states_t * item);
+static void item_delete_fragment(lv_fragment_managed_states_t * item);
 
 static lv_fragment_managed_states_t * fragment_attach(lv_fragment_manager_t * manager, lv_fragment_t * fragment,
                                                       lv_obj_t * const * container);
@@ -73,13 +73,13 @@ lv_fragment_manager_t * lv_fragment_manager_create(lv_fragment_t * parent)
     return instance;
 }
 
-void lv_fragment_manager_del(lv_fragment_manager_t * manager)
+void lv_fragment_manager_delete(lv_fragment_manager_t * manager)
 {
     LV_ASSERT_NULL(manager);
     lv_fragment_managed_states_t * states;
     _LV_LL_READ_BACK(&manager->attached, states) {
-        item_del_obj(states);
-        item_del_fragment(states);
+        item_delete_obj(states);
+        item_delete_fragment(states);
     }
     _lv_ll_clear(&manager->attached);
     _lv_ll_clear(&manager->stack);
@@ -100,12 +100,12 @@ void lv_fragment_manager_create_obj(lv_fragment_manager_t * manager)
     }
 }
 
-void lv_fragment_manager_del_obj(lv_fragment_manager_t * manager)
+void lv_fragment_manager_delete_obj(lv_fragment_manager_t * manager)
 {
     LV_ASSERT_NULL(manager);
     lv_fragment_managed_states_t * states = NULL;
     _LV_LL_READ_BACK(&manager->attached, states) {
-        item_del_obj(states);
+        item_delete_obj(states);
     }
 }
 
@@ -143,8 +143,8 @@ void lv_fragment_manager_remove(lv_fragment_manager_t * manager, lv_fragment_t *
             lv_free(item);
         }
     }
-    item_del_obj(states);
-    item_del_fragment(states);
+    item_delete_obj(states);
+    item_delete_fragment(states);
     _lv_ll_remove(&manager->attached, states);
     lv_free(states);
     if(prev && was_top) {
@@ -156,7 +156,7 @@ void lv_fragment_manager_push(lv_fragment_manager_t * manager, lv_fragment_t * f
 {
     lv_fragment_stack_item_t * top = _lv_ll_get_tail(&manager->stack);
     if(top != NULL) {
-        item_del_obj(top->states);
+        item_delete_obj(top->states);
     }
     lv_fragment_managed_states_t * states = fragment_attach(manager, fragment, container);
     states->in_stack = true;
@@ -239,23 +239,23 @@ static void item_create_obj(lv_fragment_managed_states_t * item)
     lv_fragment_create_obj(item->instance, item->container ? *item->container : NULL);
 }
 
-static void item_del_obj(lv_fragment_managed_states_t * item)
+static void item_delete_obj(lv_fragment_managed_states_t * item)
 {
-    lv_fragment_del_obj(item->instance);
+    lv_fragment_delete_obj(item->instance);
 }
 
 /**
  * Detach, then destroy fragment
  * @param item fragment states
  */
-static void item_del_fragment(lv_fragment_managed_states_t * item)
+static void item_delete_fragment(lv_fragment_managed_states_t * item)
 {
     lv_fragment_t * instance = item->instance;
     if(instance->cls->detached_cb) {
         instance->cls->detached_cb(instance);
     }
     instance->managed = NULL;
-    lv_fragment_del(instance);
+    lv_fragment_delete(instance);
     item->instance = NULL;
 }
 

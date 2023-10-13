@@ -265,7 +265,7 @@ static void lv_tabview_constructor(const lv_obj_class_t * class_p, lv_obj_t * ob
         lv_obj_set_scroll_snap_y(cont, LV_SCROLL_SNAP_CENTER);
     }
     lv_obj_add_flag(cont, LV_OBJ_FLAG_SCROLL_ONE);
-    lv_obj_clear_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    lv_obj_remove_flag(cont, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
 }
 
 static void lv_tabview_destructor(const lv_obj_class_t * class_p, lv_obj_t * obj)

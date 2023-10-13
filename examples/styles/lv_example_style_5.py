@@ -17,6 +17,6 @@ style.set_shadow_ofs_x(10)
 style.set_shadow_ofs_y(20)
 
 # Create an object with the new style
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.add_style(style, 0)
 obj.center()

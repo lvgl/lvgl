@@ -21,6 +21,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_color_t lv_color_filter_shade_cb(const lv_color_filter_dsc_t * dsc, lv_color_t c, lv_opa_t opa);
+
+/**********************
+ *  GLOBAL VARIABLES
+ **********************/
+
+const lv_color_filter_dsc_t lv_color_filter_shade = {.filter_cb = lv_color_filter_shade_cb};
 
 /**********************
  *  STATIC VARIABLES
@@ -261,3 +268,29 @@ lv_color_hsv_t lv_color_to_hsv(lv_color_t c)
 {
     return lv_color_rgb_to_hsv(c.red, c.green, c.blue);
 }
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+/**
+ * Helper function to easily create color filters
+ * @param dsc       pointer to a color filter descriptor
+ * @param c         the color to modify
+ * @param opa       the intensity of the modification
+ *                      - LV_OPA_50:    do nothing
+ *                      - < LV_OPA_50:  darken
+ *                      - LV_OPA_0:     fully black
+ *                      - > LV_OPA_50:  lighten
+ *                      - LV_OPA_100:   fully white
+ * @return          the modified color
+ */
+static lv_color_t lv_color_filter_shade_cb(const lv_color_filter_dsc_t * dsc, lv_color_t c, lv_opa_t opa)
+{
+    LV_UNUSED(dsc);
+    if(opa == LV_OPA_50) return c;
+    if(opa < LV_OPA_50) return lv_color_lighten(c, (LV_OPA_50 - opa) * 2);
+    else return lv_color_darken(c, (opa - LV_OPA_50 * LV_OPA_50) * 2);
+}
+

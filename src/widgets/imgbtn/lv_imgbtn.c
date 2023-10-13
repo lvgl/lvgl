@@ -107,7 +107,7 @@ void lv_imgbtn_set_state(lv_obj_t * obj, lv_imgbtn_state_t state)
         obj_state |= LV_STATE_CHECKED;
     }
 
-    lv_obj_clear_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
+    lv_obj_remove_state(obj, LV_STATE_CHECKED | LV_STATE_PRESSED | LV_STATE_DISABLED);
     lv_obj_add_state(obj, obj_state);
 
     refr_image(obj);

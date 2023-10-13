@@ -56,7 +56,7 @@ Usage
 
 Enable :c:macro:`LV_USE_FILE_EXPLORER` in ``lv_conf.h``.
 
-First use :c:expr:`lv_file_explorer_create(lv_scr_act())` to create a file
+First use :c:expr:`lv_file_explorer_create(lv_screen_active())` to create a file
 explorer, The default size is the screen size. After that, you can
 customize the style like widget.
 
@@ -80,7 +80,7 @@ customize the style like widget.
 
 在 ``lv_conf.h`` 中打开 :c:macro:`LV_USE_FILE_EXPLORER`\ 。
 
-首先，使用 :c:expr:`lv_file_explorer_create(lv_scr_act())`
+首先，使用 :c:expr:`lv_file_explorer_create(lv_screen_active())`
 函数创建一个文件浏览器，默认大小为屏幕大小，之后可以像组件那样自定义样式。
 
 .. raw:: html

@@ -7,8 +7,8 @@
 void setUp(void)
 {
     /* Function run before every test */
-    lv_obj_set_flex_flow(lv_scr_act(), LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_flex_align(lv_scr_act(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
+    lv_obj_set_flex_flow(lv_screen_active(), LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_flex_align(lv_screen_active(), LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY);
 }
 
 void tearDown(void)
@@ -66,7 +66,7 @@ static void draw_arcs(lv_draw_arc_dsc_t * arc_dsc, const char * fn)
 {
     static uint8_t canvas_buf[CANVAS_WIDTH_TO_STRIDE(760, 4) * 440];
 
-    lv_obj_t * canvas = lv_canvas_create(lv_scr_act());
+    lv_obj_t * canvas = lv_canvas_create(lv_screen_active());
     lv_canvas_set_buffer(canvas, canvas_buf, 760, 440, LV_COLOR_FORMAT_ARGB8888);
 
     lv_canvas_fill_bg(canvas, lv_palette_lighten(LV_PALETTE_RED, 2), LV_OPA_50);
@@ -100,7 +100,7 @@ static void draw_arcs(lv_draw_arc_dsc_t * arc_dsc, const char * fn)
     lv_snprintf(fn_buf, sizeof(fn_buf), "draw/arc_%s.png", fn);
     TEST_ASSERT_EQUAL_SCREENSHOT(fn_buf);
 
-    lv_obj_del(canvas);
+    lv_obj_delete(canvas);
 }
 
 void test_colored_arc(void)

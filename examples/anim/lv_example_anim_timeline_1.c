@@ -102,11 +102,11 @@ static void btn_start_event_handler(lv_event_t * e)
     lv_anim_timeline_start(anim_timeline);
 }
 
-static void btn_del_event_handler(lv_event_t * e)
+static void btn_delete_event_handler(lv_event_t * e)
 {
     LV_UNUSED(e);
     if(anim_timeline) {
-        lv_anim_timeline_del(anim_timeline);
+        lv_anim_timeline_delete(anim_timeline);
         anim_timeline = NULL;
     }
 }
@@ -136,7 +136,7 @@ static void slider_prg_event_handler(lv_event_t * e)
  */
 void lv_example_anim_timeline_1(void)
 {
-    lv_obj_t * par = lv_scr_act();
+    lv_obj_t * par = lv_screen_active();
     lv_obj_set_flex_flow(par, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(par, LV_FLEX_ALIGN_SPACE_AROUND, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
@@ -153,7 +153,7 @@ void lv_example_anim_timeline_1(void)
 
     /* create btn_del */
     lv_obj_t * btn_del = lv_button_create(par);
-    lv_obj_add_event(btn_del, btn_del_event_handler, LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event(btn_del, btn_delete_event_handler, LV_EVENT_CLICKED, NULL);
     lv_obj_add_flag(btn_del, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_obj_align(btn_del, LV_ALIGN_TOP_MID, 0, 20);
 

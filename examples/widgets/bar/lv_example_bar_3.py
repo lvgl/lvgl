@@ -14,7 +14,7 @@ style_indic.set_bg_color(lv.palette_main(lv.PALETTE.RED))
 style_indic.set_bg_grad_color(lv.palette_main(lv.PALETTE.BLUE))
 style_indic.set_bg_grad_dir(lv.GRAD_DIR.VER)
 
-bar = lv.bar(lv.scr_act())
+bar = lv.bar(lv.screen_active())
 bar.add_style(style_indic, lv.PART.INDICATOR)
 bar.set_size(20, 200)
 bar.center()

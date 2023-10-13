@@ -295,12 +295,15 @@ static inline lv_color_t lv_color_black(void)
     return lv_color_make(0x00, 0x00, 0x00);
 }
 
+
 /**********************
  *      MACROS
  **********************/
 
 #include "lv_palette.h"
 #include "lv_color_op.h"
+
+extern const lv_color_filter_dsc_t lv_color_filter_shade;
 
 #ifdef __cplusplus
 } /*extern "C"*/

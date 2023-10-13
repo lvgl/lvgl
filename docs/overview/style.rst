@@ -183,7 +183,6 @@ The following predefined parts exist in LVGL:
 - :cpp:enumerator:`LV_PART_KNOB`: Like a handle to grab to adjust a value
 - :cpp:enumerator:`LV_PART_SELECTED`: Indicate the currently selected option or section
 - :cpp:enumerator:`LV_PART_ITEMS`: Used if the widget has multiple similar elements (e.g. table cells)
-- :cpp:enumerator:`LV_PART_TICKS`: Ticks on scales e.g. for a chart or meter
 - :cpp:enumerator:`LV_PART_CURSOR`: Mark a specific place e.g. text area's or chart's cursor
 - :cpp:enumerator:`LV_PART_CUSTOM_FIRST`: Custom part identifiers can be added starting from here.
 
@@ -336,7 +335,7 @@ notified. There are 3 options to do this:
 
 1. If you know that the changed properties can be applied by a simple redraw
    (e.g. color or opacity changes) just call :cpp:expr:`lv_obj_invalidate(obj)`
-   or :cpp:expr:`lv_obj_invalidate(lv_scr_act())`.
+   or :cpp:expr:`lv_obj_invalidate(lv_screen_active())`.
 2. If more complex style properties were changed or added, and you know which
    object(s) are affected by that style call :cpp:expr:`lv_obj_refresh_style(obj, part, property)`.
    To refresh all parts and properties use :cpp:expr:`lv_obj_refresh_style(obj, LV_PART_ANY, LV_STYLE_PROP_ANY)`.

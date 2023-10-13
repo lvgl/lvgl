@@ -13,7 +13,7 @@ def cont_sub_event_cb(e):
 # It's assumed that the default group is set and
 # there is a keyboard indev*/
 
-cont_main = lv.obj(lv.scr_act())
+cont_main = lv.obj(lv.screen_active())
 lv.gridnav_add(cont_main,lv.GRIDNAV_CTRL.ROLLOVER | lv.GRIDNAV_CTRL.SCROLL_FIRST)
 
 # Only the container needs to be in a group

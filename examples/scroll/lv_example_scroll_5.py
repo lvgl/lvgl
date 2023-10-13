@@ -1,7 +1,7 @@
 #
 # Scrolling with Right To Left base direction
 #
-obj = lv.obj(lv.scr_act())
+obj = lv.obj(lv.screen_active())
 obj.set_style_base_dir(lv.BASE_DIR.RTL, 0)
 obj.set_size(200, 100)
 obj.center()

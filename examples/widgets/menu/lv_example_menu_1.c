@@ -4,7 +4,7 @@
 void lv_example_menu_1(void)
 {
     /*Create a menu object*/
-    lv_obj_t * menu = lv_menu_create(lv_scr_act());
+    lv_obj_t * menu = lv_menu_create(lv_screen_active());
     lv_obj_set_size(menu, lv_display_get_horizontal_resolution(NULL), lv_display_get_vertical_resolution(NULL));
     lv_obj_center(menu);
 

@@ -124,6 +124,23 @@ bool lv_obj_remove_event(lv_obj_t * obj, uint32_t index)
     return lv_event_remove(&obj->spec_attr->event_list, index);
 }
 
+bool lv_obj_remove_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
+{
+    LV_ASSERT_NULL(obj);
+
+    uint32_t event_cnt = lv_obj_get_event_count(obj);
+    uint32_t i;
+    for(i = 0; i < event_cnt; i++) {
+        lv_event_dsc_t * dsc = lv_obj_get_event_dsc(obj, i);
+        if(dsc->cb == event_cb) {
+            lv_obj_remove_event(obj, i);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 lv_obj_t * lv_event_get_current_target_obj(lv_event_t * e)
 {
     return lv_event_get_current_target(e);
