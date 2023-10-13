@@ -2,14 +2,14 @@ name: SO3-LVGL Performance check
 on: [push, pull_request, workflow_dispatch]
 jobs:
   so3_lvgl:
-    runs-on: ubuntu-latest
+    runs-on: alpine-latest
     steps:
       - uses: actions/checkout@v2
       
       - name: Install required APT packages
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: cmake gcc-arm-none-eabi device-tree-compiler u-boot-tools pkg-config bridge-utils qemu-system-arm
+          packages: cmake gcc-aarch64-none-elf device-tree-compiler u-boot-tools pkg-config bridge-utils qemu-system-aarch64
           version: 1.0
           
       - name: Remove useless dependency
@@ -20,16 +20,16 @@ jobs:
         run: |
           wget https://github.com/smartobjectoriented/so3/archive/refs/heads/master.zip
           unzip master.zip
-          mv so3-master so3
+          mv so3-* so3
           cd so3
-          patch -s -p0 < ci/so3_ci.patch
-          cd u-boot; make vexpress_defconfig; make -j8; cd ..
-          cd so3; make vexpress_fb_defconfig; make -j8; cd ..
+          patch -p1 < ci/so3_ci.patch
+          cd u-boot; make virt64_defconfig; make -j$(ncores); cd ..
+          cd so3; make virt64_defconfig; make -j$(ncores); cd ..
           cd usr; ./build.sh; cd ..
           cd filesystem
-          ./create_img.sh vexpress
+          ./create_img.sh virt64
           cd ../rootfs
-          ./create_ramfs.sh vexpress
+          ./create_ramfs.sh virt64
           cd ..
           ./deploy.sh -bu
           
