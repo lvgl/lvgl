@@ -163,7 +163,7 @@ props = [
 
 {'name': 'BORDER_WIDTH',
  'style_type': 'num',   'var_type': 'lv_coord_t' ,  'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set hte width of the border. Only pixel values can be used."},
+ 'dsc': "Set the width of the border. Only pixel values can be used."},
 
 {'name': 'BORDER_SIDE',
  'style_type': 'num',   'var_type': 'lv_border_side_t',  'default':'`LV_BORDER_SIDE_NONE`', 'inherited': 0, 'layout': 0, 'ext_draw': 0,
@@ -350,7 +350,7 @@ props = [
 
 {'name': 'LAYOUT',
  'style_type': 'num',   'var_type': 'uint16_t', 'default':0, 'inherited': 0, 'layout': 1, 'ext_draw': 0,
- 'dsc': "Set the layout if the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts."},
+ 'dsc': "Set the layout of the object. The children will be repositioned and resized according to the policies set for the layout. For the possible values see the documentation of the layouts."},
 
 {'name': 'BASE_DIR',
  'style_type': 'num',   'var_type': 'lv_base_dir_t', 'default':'`LV_BASE_DIR_AUTO`', 'inherited': 1, 'layout': 1, 'ext_draw': 0,
