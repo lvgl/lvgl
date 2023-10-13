@@ -3,8 +3,8 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   runs-on: self-hosted
   so3_lvgl:
-    runs-on: ubuntu-latest
-
+    runs-on: alpine-latest
+    steps:
       - uses: actions/checkout@v2
       
       - name: Install required APT packages
