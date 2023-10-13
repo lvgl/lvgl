@@ -2,8 +2,8 @@ name: SO3-LVGL Performance check
 on: [push, pull_request, workflow_dispatch]
 jobs:
   so3_lvgl:
-    runs-on: alpine-latest
-    steps:
+    runs-on: self-hosted
+
       - uses: actions/checkout@v2
       
       - name: Install required APT packages
