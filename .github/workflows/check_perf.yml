@@ -3,6 +3,7 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   so3_lvgl:
     runs-on: alpine-latest
+    build:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
