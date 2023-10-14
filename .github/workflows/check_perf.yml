@@ -4,13 +4,12 @@ jobs:
   so3_lvgl:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      
+      - uses: jirutka/setup-alpine@v1
       - name: Install required APT packages
-        uses: awalsh128/cache-apt-pkgs-action@latest
+
         with:
+          branch: v3.15
           packages: cmake gcc-aarch64-linux-gnu device-tree-compiler u-boot-tools pkg-config bridge-utils qemu-system-arm
-          version: 1.0
           
       - name: Remove useless dependency
         run: |
