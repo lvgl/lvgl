@@ -152,8 +152,7 @@ void lv_obj_remove_flag(lv_obj_t * obj, lv_obj_flag_t f)
 
 }
 
-
-void lv_obj_set_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
+void lv_obj_update_flag(lv_obj_t * obj, lv_obj_flag_t f, bool v)
 {
     if(v) lv_obj_add_flag(obj, f);
     else lv_obj_remove_flag(obj, f);
