@@ -388,7 +388,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         uint32_t total_tick_count = scale->total_tick_count;
         uint32_t tick_idx = 0;
         uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx <= total_tick_count; tick_idx++) {
+        for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
             /* A major tick is the one which has a label in it */
             bool is_major_tick = false;
             if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
@@ -477,7 +477,7 @@ static void scale_draw_indicator(lv_obj_t * obj, lv_event_t * event)
         uint32_t label_gap = 15U; /* TODO: Add to style properties */
         uint32_t tick_idx = 0;
         uint32_t major_tick_idx = 0;
-        for(tick_idx = 0; tick_idx <= scale->total_tick_count; tick_idx++) {
+        for(tick_idx = 0; tick_idx < scale->total_tick_count; tick_idx++) {
             /* A major tick is the one which has a label in it */
             bool is_major_tick = false;
             if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
@@ -844,7 +844,8 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             /* Increment the tick offset depending of its index */
             else if(0 != tick_idx) {
                 const lv_coord_t scale_total_height = lv_obj_get_height(obj) - (pad_top + pad_bottom + tick_pad_top + tick_pad_bottom);
-                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_height) / (lv_coord_t) scale->total_tick_count;
+                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_height) / (lv_coord_t)(
+                                        scale->total_tick_count - 1);
                 vertical_position -= offset;
             }
             else { /* Nothing to do */ }
@@ -864,7 +865,8 @@ static void scale_get_tick_points(lv_obj_t * obj, const uint32_t tick_idx, bool 
             /* Increment the tick offset depending of its index */
             else if(0U != tick_idx) {
                 const lv_coord_t scale_total_width = lv_obj_get_width(obj) - (pad_right + pad_left + tick_pad_right + tick_pad_left);
-                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_width) / (lv_coord_t) scale->total_tick_count;
+                lv_coord_t offset = ((lv_coord_t) tick_idx * (lv_coord_t) scale_total_width) / (lv_coord_t)(
+                                        scale->total_tick_count - 1);
                 horizontal_position += offset;
             }
             else { /* Nothing to do */ }
@@ -1139,7 +1141,7 @@ static void scale_find_section_tick_idx(lv_obj_t * obj)
 
     /* Section handling */
     uint32_t tick_idx = 0;
-    for(tick_idx = 0; tick_idx <= total_tick_count; tick_idx++) {
+    for(tick_idx = 0; tick_idx < total_tick_count; tick_idx++) {
         bool is_major_tick = false;
         if(tick_idx % scale->major_tick_every == 0) is_major_tick = true;
 

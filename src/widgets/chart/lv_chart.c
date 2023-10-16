@@ -200,9 +200,9 @@ uint32_t lv_chart_get_point_count(const lv_obj_t * obj)
 uint32_t lv_chart_get_x_start_point(const lv_obj_t * obj, lv_chart_series_t * ser)
 {
     LV_ASSERT_NULL(ser);
-    lv_chart_t * chart  = (lv_chart_t *)obj;
+    LV_UNUSED(obj);
 
-    return chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+    return ser->start_point;
 }
 
 void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint32_t id, lv_point_t * p_out)
@@ -256,7 +256,7 @@ void lv_chart_get_point_pos_by_id(lv_obj_t * obj, lv_chart_series_t * ser, uint3
     p_out->x += lv_obj_get_style_pad_left(obj, LV_PART_MAIN) + border_width;
     p_out->x -= lv_obj_get_scroll_left(obj);
 
-    uint32_t start_point = lv_chart_get_x_start_point(obj, ser);
+    uint32_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
     id = ((int32_t)start_point + id) % chart->point_cnt;
     int32_t temp_y = 0;
     temp_y = (int32_t)((int32_t)ser->y_points[id] - chart->ymin[ser->y_axis_sec]) * h;
@@ -763,6 +763,7 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
             line_dsc.p1.y = (int32_t)((int32_t)h * i) / (chart->hdiv_cnt - 1);
             line_dsc.p1.y += y_ofs;
             line_dsc.p2.y = line_dsc.p1.y;
+            line_dsc.base.id1 = i;
 
             lv_draw_line(layer, &line_dsc);
         }
@@ -783,6 +784,7 @@ static void draw_div_lines(lv_obj_t * obj, lv_layer_t * layer)
             line_dsc.p1.x = (int32_t)((int32_t)w * i) / (chart->vdiv_cnt - 1);
             line_dsc.p1.x += x_ofs;
             line_dsc.p2.x = line_dsc.p1.x;
+            line_dsc.base.id1 = i;
 
             lv_draw_line(layer, &line_dsc);
         }
@@ -842,7 +844,7 @@ static void draw_series_line(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.base.id2 = 0;
         point_dsc_default.base.id2 = 0;
 
-        lv_coord_t start_point = lv_chart_get_x_start_point(obj, ser);
+        lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
@@ -980,7 +982,7 @@ static void draw_series_scatter(lv_obj_t * obj, lv_layer_t * layer)
         line_dsc.color = ser->color;
         point_dsc_default.bg_color = ser->color;
 
-        lv_coord_t start_point = lv_chart_get_x_start_point(obj, ser);
+        lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
         line_dsc.p1.x = x_ofs;
         line_dsc.p2.x = x_ofs;
@@ -1107,7 +1109,7 @@ static void draw_series_bar(lv_obj_t * obj, lv_layer_t * layer)
         _LV_LL_READ(&chart->series_ll, ser) {
             if(ser->hidden) continue;
 
-            lv_coord_t start_point = lv_chart_get_x_start_point(obj, ser);
+            lv_coord_t start_point = chart->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;
             col_a.x2 = col_a.x1 + col_w - 1;

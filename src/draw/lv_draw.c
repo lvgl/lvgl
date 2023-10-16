@@ -94,15 +94,6 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
 
     lv_draw_global_info_t * info = &_draw_info;
 
-    /*Let the draw units set their preference score*/
-    t->preference_score = 100;
-    t->preferred_draw_unit_id = 0;
-    lv_draw_unit_t * u = info->unit_head;
-    while(u) {
-        if(u->evaluate_cb) u->evaluate_cb(u, t);
-        u = u->next;
-    }
-
     /*Send LV_EVENT_DRAW_TASK_ADDED and dispatch only on the "main" draw_task
      *and not on the draw tasks added in the event.
      *Sending LV_EVENT_DRAW_TASK_ADDED events might cause recursive event sends
@@ -113,8 +104,28 @@ void lv_draw_finalize_task_creation(lv_layer_t * layer, lv_draw_task_t * t)
         if(base_dsc->obj && lv_obj_has_flag(base_dsc->obj, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS)) {
             lv_obj_send_event(base_dsc->obj, LV_EVENT_DRAW_TASK_ADDED, t);
         }
+
+        /*Let the draw units set their preference score*/
+        t->preference_score = 100;
+        t->preferred_draw_unit_id = 0;
+        lv_draw_unit_t * u = info->unit_head;
+        while(u) {
+            if(u->evaluate_cb) u->evaluate_cb(u, t);
+            u = u->next;
+        }
+
         lv_draw_dispatch();
         info->task_running = false;
+    }
+    else {
+        /*Let the draw units set their preference score*/
+        t->preference_score = 100;
+        t->preferred_draw_unit_id = 0;
+        lv_draw_unit_t * u = info->unit_head;
+        while(u) {
+            if(u->evaluate_cb) u->evaluate_cb(u, t);
+            u = u->next;
+        }
     }
 }
 

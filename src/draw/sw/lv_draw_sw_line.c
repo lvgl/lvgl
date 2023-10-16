@@ -229,6 +229,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(lv_draw_unit_t * draw_unit, cons
             if(dash_cnt > dsc->dash_width) {
                 blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_TRANSP;
             }
+            else {
+                blend_dsc.mask_res = LV_DRAW_SW_MASK_RES_FULL_COVER;
+            }
 
             if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
                 dash_cnt = 0;
