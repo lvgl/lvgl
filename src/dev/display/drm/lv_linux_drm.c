@@ -352,7 +352,7 @@ static int drm_dmabuf_set_plane(drm_dev_t * drm_dev, drm_buffer_t * buf)
 {
     int ret;
     static int first = 1;
-    uint32_t flags = DRM_MODE_PAGE_FLIP_EVENT;
+    uint32_t flags = DRM_MODE_PAGE_FLIP_EVENT | DRM_MODE_ATOMIC_NONBLOCK;
 
     drm_dev->req = drmModeAtomicAlloc();
 
@@ -819,6 +819,10 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
 
     LV_LOG_TRACE("x %d:%d y %d:%d w %d h %d", area->x1, area->x2, area->y1, area->y2, w, h);
 
+    /*Wait for last requested buffer swap to complete*/
+    if(drm_dev->req)
+        drm_wait_vsync(drm_dev);
+
     /*Prepare background buffer for partial update*/
     if(drm_dev->inactive_drm_buf_dirty && (area->x1 != 0 || area->y1 != 0 || w != drm_dev->width || h != drm_dev->height))
         lv_memcpy(fbuf->map, drm_dev->drm_bufs[drm_dev->active_drm_buf_idx].map, fbuf->size);
@@ -831,11 +835,8 @@ static void drm_flush(lv_display_t * disp, const lv_area_t * area, uint8_t * px_
                   w * (LV_COLOR_DEPTH / 8));
     }
 
-    /*Swap buffers*/
+    /*Request buffer swap*/
     if(lv_display_flush_is_last(disp)) {
-        if(drm_dev->req)
-            drm_wait_vsync(drm_dev);
-
         if(drm_dmabuf_set_plane(drm_dev, fbuf)) {
             LV_LOG_ERROR("Flush fail");
             return;
