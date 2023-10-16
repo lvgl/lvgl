@@ -360,6 +360,8 @@ static void draw_arcs(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area_t 
         int32_t end_angle = lv_map(indic->end_value, scale->min, scale->max, scale->rotation,
                                    scale->rotation + scale->angle_range);
 
+        arc_dsc.start_angle = start_angle;
+        arc_dsc.end_angle = end_angle;
         part_draw_dsc.radius = r_out + indic->type_data.arc.r_mod;
         part_draw_dsc.sub_part_ptr = indic;
         part_draw_dsc.p1 = &scale_center;
@@ -511,7 +513,8 @@ static void draw_ticks_and_labels(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, cons
                 lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
 
                 lv_point_t label_size;
-                lv_txt_get_size(&label_size, part_draw_dsc.text, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                lv_txt_get_size(&label_size, part_draw_dsc.text, label_dsc_tmp.font, label_dsc_tmp.letter_space,
+                                label_dsc_tmp.line_space,
                                 LV_COORD_MAX, LV_TEXT_FLAG_NONE);
 
                 lv_area_t label_cord;
@@ -569,6 +572,7 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
     lv_obj_draw_dsc_init(&part_draw_dsc, draw_ctx);
     part_draw_dsc.class_p = MY_CLASS;
     part_draw_dsc.p1 = &scale_center;
+    part_draw_dsc.part = LV_PART_INDICATOR;
 
     lv_meter_indicator_t * indic;
     _LV_LL_READ_BACK(&meter->indicator_ll, indic) {
@@ -585,7 +589,7 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             line_dsc.width = indic->type_data.needle_line.width;
             line_dsc.opa = indic->opa > LV_OPA_MAX ? opa_main : (opa_main * indic->opa) >> 8;
 
-            part_draw_dsc.id = LV_METER_DRAW_PART_NEEDLE_LINE;
+            part_draw_dsc.type = LV_METER_DRAW_PART_NEEDLE_LINE;
             part_draw_dsc.line_dsc = &line_dsc;
             part_draw_dsc.p2 = &p_end;
 
@@ -612,7 +616,7 @@ static void draw_needles(lv_obj_t * obj, lv_draw_ctx_t * draw_ctx, const lv_area
             if(angle > 3600) angle -= 3600;
             img_dsc.angle = angle;
 
-            part_draw_dsc.id = LV_METER_DRAW_PART_NEEDLE_IMG;
+            part_draw_dsc.type = LV_METER_DRAW_PART_NEEDLE_IMG;
             part_draw_dsc.img_dsc = &img_dsc;
 
             lv_event_send(obj, LV_EVENT_DRAW_PART_BEGIN, &part_draw_dsc);
