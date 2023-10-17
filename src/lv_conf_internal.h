@@ -504,17 +504,6 @@
             #define LV_LOG_TRACE_ANIM       1
         #endif
     #endif
-    #ifndef LV_LOG_TRACE_MSG
-        #ifdef _LV_KCONFIG_PRESENT
-            #ifdef CONFIG_LV_LOG_TRACE_MSG
-                #define LV_LOG_TRACE_MSG CONFIG_LV_LOG_TRACE_MSG
-            #else
-                #define LV_LOG_TRACE_MSG 0
-            #endif
-        #else
-            #define LV_LOG_TRACE_MSG        1
-        #endif
-    #endif
     #ifndef LV_LOG_TRACE_CACHE
         #ifdef _LV_KCONFIG_PRESENT
             #ifdef CONFIG_LV_LOG_TRACE_CACHE
@@ -2285,15 +2274,6 @@
         #else
             #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
         #endif
-    #endif
-#endif
-
-/*1: Enable a published subscriber based messaging system */
-#ifndef LV_USE_MSG
-    #ifdef CONFIG_LV_USE_MSG
-        #define LV_USE_MSG CONFIG_LV_USE_MSG
-    #else
-        #define LV_USE_MSG 0
     #endif
 #endif
 

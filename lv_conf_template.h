@@ -182,7 +182,6 @@
     #define LV_LOG_TRACE_OBJ_CREATE 1
     #define LV_LOG_TRACE_LAYOUT     1
     #define LV_LOG_TRACE_ANIM       1
-    #define LV_LOG_TRACE_MSG        1
     #define LV_LOG_TRACE_CACHE      1
 
 #endif  /*LV_USE_LOG*/
@@ -699,9 +698,6 @@
     /*1: Use img cache to buffer header information*/
     #define LV_IMGFONT_USE_IMAGE_CACHE_HEADER 0
 #endif
-
-/*1: Enable a published subscriber based messaging system */
-#define LV_USE_MSG 0
 
 /*1: Enable an observer pattern implementation*/
 #define LV_USE_OBSERVER 0
