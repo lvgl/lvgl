@@ -22,6 +22,17 @@ option(LVGL_BUNDLED "Set lvgl as bundled (disable install)." OFF)
 # Option to build shared libraries (as opposed to static), default: OFF
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
+option(LV_USE_FREETYPE "Link lvgl against libfreetype2." OFF)
+
+if( LV_USE_FREETYPE )
+  find_package(PkgConfig REQUIRED)
+endif( LV_USE_FREETYPE )
+
+if( LV_USE_FREETYPE )
+    pkg_check_modules( FREETYPE freetype2>=2.0 REQUIRED )
+endif( LV_USE_FREETYPE )
+
+
 # Set sources used for LVGL components
 file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c)
 file(GLOB_RECURSE EXAMPLE_SOURCES ${LVGL_ROOT_DIR}/examples/*.c)
@@ -42,6 +53,15 @@ endif()
 
 # Include root and optional parent path of LV_CONF_PATH
 target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR})
+
+target_compile_options(
+    lvgl PUBLIC $<$<BOOL:${LV_USE_FREETYPE}>:${FREETYPE_CFLAGS}>)
+
+target_link_libraries(
+    lvgl PUBLIC $<$<BOOL:${LV_USE_FREETYPE}>:${FREETYPE_LIBRARIES}>)
+
+target_link_options(
+    lvgl PUBLIC $<$<BOOL:${LV_USE_FREETYPE}>:${FREETYPE_LDFLAGS}>)
 
 # Build LVGL example library
 if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
